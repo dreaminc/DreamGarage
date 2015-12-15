@@ -9,14 +9,14 @@
 #include <assert.h>
 
 // TODO: Tie into the official console/interface system
-#define CONSOLE_OUT(str) do { printf(str); } while(0);
-#define CONSOLE_LINEOUT(str, ...) do { printf(str, __VA_ARGS__); } while(0);
+#define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
+#define CONSOLE_LINEOUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
 
 #ifdef _DEBUG
-    #define DEBUG_OUT(str) CONSOLE_OUT(str)
+    #define DEBUG_OUT(str, ...) CONSOLE_OUT(str, ##__VA_ARGS__)
     #define DEBUG_LINEOUT(str, ...) CONSOLE_LINEOUT(str, ##__VA_ARGS__)
 #else
-    #define DEBUG_OUT(str)
+    #define DEBUG_OUT(str, ...)
     #define DEBUG_LINEOUT(str, ...)
 #endif
 

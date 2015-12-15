@@ -75,7 +75,7 @@ public:
             this->m_pNumber = NULL;
         }
         
-        return R_OK;
+        return R_PASS;
     }
     
 public:
@@ -119,7 +119,7 @@ private:
             default: return R_FAIL;
         }
         
-        return R_OK;
+        return R_PASS;
     }
 
     void AddInt(int rhs) { *(int*)this->m_pNumber += rhs; }
@@ -136,7 +136,7 @@ private:
             default: return R_FAIL;
         }
 
-        return R_OK;
+        return R_PASS;
     }
     
     const bool CompareInt(int rhs) { return (*(int*)this->m_pNumber) == rhs; }
@@ -145,7 +145,7 @@ private:
 
 private:
     RESULT allocNumberType(void *pVal, NUMBER_TYPE type) {
-        RESULT r = R_OK;
+        RESULT r = R_PASS;
 
         CBM((type != NUMBER_INVALID), "Type cannot be invalid");
         CNM(pVal, "Value cannot be NULL");
