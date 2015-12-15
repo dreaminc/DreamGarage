@@ -6,12 +6,13 @@
 // Number is a general purpose dynamic class - ultimately the goal is to allow
 // Numbers to work interchangably between templates.
 
-#include "Primitives/Types/TypeObj.h"
+#include "TypeObj.h"
 
 typedef enum {
     NUMBER_INT,
     NUMBER_FLOAT,
     NUMBER_DOUBLE,
+    // TODO: Add NAN, POSINF, NEGINF, E, PI, others?
     NUMBER_INVALID
 } NUMBER_TYPE;
 
@@ -27,115 +28,120 @@ typedef enum {
 class Number : public TypeObj {
 private:
     void *m_pNumber;
+    NUMBER_TYPE m_numberType;
 
 public:
     Number() :
-        super(TYPE_OBJ_NUMBER),
+        TypeObj(TYPE_OBJ_NUMBER),
         m_pNumber(NULL)
     {
         ACR(allocNumberType(0, NUMBER_INVALID));
     }
 
     Number(int val) :
-        super(TYPE_OBJ_NUMBER),
+        TypeObj(TYPE_OBJ_NUMBER),
         m_pNumber(NULL)
     {
         ACR(allocNumberType((void*)&val, NUMBER_INT));
     }
 
     Number(float val) :
-        super(TYPE_OBJ_NUMBER),
+        TypeObj(TYPE_OBJ_NUMBER),
         m_pNumber(NULL)
     {
         ACR(allocNumberType((void*)&val, NUMBER_FLOAT));
     }
 
     Number(double val) :
-        super(TYPE_OBJ_NUMBER),
+        TypeObj(TYPE_OBJ_NUMBER),
         m_pNumber(NULL)
     {
         ACR(allocNumberType((void*)&val, NUMBER_DOUBLE));
     }
+    
+    // Copy constructor
+    Number(const Number &num) :
+        TypeObj(TYPE_OBJ_NUMBER),
+        m_pNumber(NULL)
+    {
+        ACR(allocNumberType((void*)(&num.m_pNumber), num.m_numberType));
+    }
 
     // Destructor implied
+    
+    RESULT Dealloc() {
+        if(this->m_pNumber != NULL) {
+            free(this->m_pNumber);
+            this->m_pNumber = NULL;
+        }
+        
+        return R_OK;
+    }
+    
+public:
+    NUMBER_TYPE getNumberType() {
+        return this->m_numberType;
+    }
+
+protected:
+    // Dual purpose get and cast functions
+    int getInt() { return (int)(*(int *)this->m_pNumber);}
+    float getFloat() { return (float)(*(float *)this->m_pNumber); }
+    double getDouble() { return (double)(*(double *)this->m_pNumber); }
 
 private:
-    // Dual purpose get and cast functions
-    inline int getInt() { return (int)(*(int *)this->m_pNumber);}
-    inline float getFloat() { return (float)(*(float *)this->m_pNumber); }
-    inline double getDouble() { return (double)(*(double *)this->m_pNumber); }
-
-    inline void setInt(int val) {
-        this->m_pNumber = val;
-    }
-
-    inline void setInt(void *pVal) {
+    void setInt(int val) { *(int*)this->m_pNumber = val; }
+    void setInt(void *pVal) {
         ACNM(pVal, "Int ptr cannot be NULL");
-        this->m_pNumber = *(int *)pVal;
+        *(int*)this->m_pNumber = *(int *)pVal;
     }
 
-    inline void setFloat(float val) {
-        this->m_pNumber = val;
-    }
-
-    inline void setFloat(void *pVal) {
+    void setFloat(float val) { *(float*)this->m_pNumber = val; }
+    void setFloat(void *pVal) {
         ACNM(pVal, "Float ptr cannot be NULL");
-        this->m_pNumber = *(float *)pVal;
+        *(float*)this->m_pNumber = *(float *)pVal;
     }
 
-    inline void setDouble(double val) {
-        this->m_pNumber = val;
-    }
-
-    inline void setDouble(void *pVal) {
+    void setDouble(double val) { *(double*)this->m_pNumber = val; }
+    void setDouble(void *pVal) {
         ACNM(pVal, "Double ptr cannot be NULL");
-        this->m_pNumber = *(double *)pVal;
+        *(double*)this->m_pNumber = *(double *)pVal;
+    }
+    
+    // TODO: Need to cover all of the cases
+    RESULT setNumber(Number num) {
+        switch(num.m_numberType) {
+            case NUMBER_INT: setInt(num.getInt()); break;
+            case NUMBER_FLOAT: setFloat(num.getFloat()); break;
+            case NUMBER_DOUBLE: setDouble(num.getDouble()); break;
+                
+            case NUMBER_INVALID:
+            default: return R_FAIL;
+        }
+        
+        return R_OK;
     }
 
+    void AddInt(int rhs) { *(int*)this->m_pNumber += rhs; }
+    void AddFloat(float rhs) { *(float*)this->m_pNumber += rhs; }
+    void AddDouble(double rhs) { *(double*)this->m_pNumber += rhs; }
+    
     inline RESULT AddNumber(Number num) {
-        switch(m_type) {
-            case NUMBER_INT: {
-
-            } break;
-
-            case NUMBER_FLOAT: {
-                this->m_pNumber = new float(*(float *)pVal);
-                CNM(this->m_pNumber, "Failed to alloc float Number");
-            } break;
-
-            case NUMBER_DOUBLE: {
-                this->m_pNumber = new double(*(double *)pVal);
-                CNM(this->m_pNumber, "Failed to alloc double Number");
-            } break;
+        switch(m_numberType) {
+            case NUMBER_INT: setInt(getInt() + num.getInt()); break;
+            case NUMBER_FLOAT: setFloat(getFloat() + num.getFloat()); break;
+            case NUMBER_DOUBLE: setDouble(getDouble() + num.getDouble()); break;
+                
+            case NUMBER_INVALID:
+            default: return R_FAIL;
         }
 
         return R_OK;
     }
-
-    // This is a RHS operation function:
-    // LHS OP RHS
-    RESULT operateNumber(Number num, NUMBER_OPERATION_TYPE type) {
-        RESULT r = R_OK;
-
-        switch(m_type) {
-            case NUMBER_INT: {
-
-            } break;
-
-            case NUMBER_FLOAT: {
-                this->m_pNumber = new float(*(float *)pVal);
-                CNM(this->m_pNumber, "Failed to alloc float Number");
-            } break;
-
-            case NUMBER_DOUBLE: {
-                this->m_pNumber = new double(*(double *)pVal);
-                CNM(this->m_pNumber, "Failed to alloc double Number");
-            } break;
-        }
-
-    Error:
-        return r;
-    }
+    
+    const bool CompareInt(int rhs) { return (*(int*)this->m_pNumber) == rhs; }
+    const bool CompareFloat(float rhs) { return (*(float*)this->m_pNumber) == rhs; }
+    const bool CompareDouble(double rhs) { return (*(double*)this->m_pNumber) == rhs; }
 
 private:
     RESULT allocNumberType(void *pVal, NUMBER_TYPE type) {
@@ -146,22 +152,25 @@ private:
 
         switch(type) {
             case NUMBER_INT: {
-                this->m_pNumber = new int;
+                this->m_pNumber = (int*)malloc(sizeof(int));
                 CNM(this->m_pNumber, "Failed to alloc int Number");
                 setInt(pVal);
             } break;
 
             case NUMBER_FLOAT: {
-                this->m_pNumber = new float;
+                this->m_pNumber = (float*)malloc(sizeof(float));
                 CNM(this->m_pNumber, "Failed to alloc float Number");
                 setFloat(pVal);
             } break;
 
             case NUMBER_DOUBLE: {
-                this->m_pNumber = new double;
+                this->m_pNumber = (double*)malloc(sizeof(double));
                 CNM(this->m_pNumber, "Failed to alloc double Number");
                 setDouble(pVal);
             } break;
+                
+            case NUMBER_INVALID:
+            default: return R_FAIL;
         }
 
     Error:
@@ -172,58 +181,62 @@ private:
 public:
     // Copy
     Number& operator=(const Number& arg) {
-        m_number = arg.m_number;
+        this->setNumber(arg);
         return *this;
     }
 
     // Move
     Number& operator=(Number&& arg) {
-        ACB(this != &arg);   // TODO: Asserts / EHM
-        m_number = arg.m_number;
+        this->setNumber((Number)(arg));
         return *this;
     }
 
     // Comparison
-    bool operator==( const Number<T> &arg) const {
-        return m_number == arg.m_number;
+    bool operator==(const Number &arg) const {
+        return m_pNumber == arg.m_pNumber;
     }
-
-    bool operator==( const T &arg) const {
-        return m_number == arg;
-    }
+    
+    //const bool operator==(const int &rhs) const { return CompareInt(rhs); }
+    //bool operator==(const float &rhs) const { return this->CompareFloat(rhs); }
+    //bool operator==(const double &rhs) const { return this->CompareDouble(rhs); }
 
     // Add
-    Number<T>& operator+=(const Number<T> &rhs) {
-        m_number += rhs.m_number;
+    Number& operator+=(const Number &rhs) {
+        this->AddNumber(rhs);
+        return *this;
+    }
+    
+    Number& operator+=(const int &rhs) {
+        this->AddInt(rhs);
+        return *this;
+    }
+    
+    Number& operator+=(const float &rhs) {
+        this->AddFloat(rhs);
+        return *this;
+    }
+    
+    Number& operator+=(const double &rhs) {
+        this->AddDouble(rhs);
         return *this;
     }
 
-    Number<T>& operator+=(const T &rhs) {
-        m_int += rhs;
-        return *this;
-    }
-
-    friend Number<T> operator+(Number<T> lhs, const Number<T> &rhs) {
+    friend Number operator+(Number lhs, const Number &rhs) {
         lhs += rhs; // Reuse compound assignment
         return lhs;
     }
+    
+    friend Number operator+(Number lhs, const int &rhs) { lhs += rhs; return lhs; }// Reuse compound assignment
+    friend Number operator+(Number lhs, const float &rhs) { lhs += rhs; return lhs; }// Reuse compound assignment
+    friend Number operator+(Number lhs, const double &rhs) { lhs += rhs; return lhs; }// Reuse compound assignment
 
-    friend Number<T> operator+(Number<T> lhs, const T &rhs) {
-        lhs += rhs; // Reuse compound assignment
-        return lhs;
-    }
-
-    Number<T> operator+( const Number<T> &arg ) const {
-        return Number<T>(*this).operator+=(arg);
-    }
-
-    Number<T> operator+( const T &arg ) const {
+    Number operator+( const Number &arg ) const {
         return Number(*this).operator+=(arg);
     }
-
-private:
-    // No real Destructor
-    RESULT Dealloc() = NULL;
-}
+    
+    Number operator+( const int &arg ) const { return Number(*this).operator+=(arg); }
+    Number operator+( const float &arg ) const { return Number(*this).operator+=(arg); }
+    Number operator+( const double &arg ) const { return Number(*this).operator+=(arg); }
+};
 
 #endif // !INTEGER_H_

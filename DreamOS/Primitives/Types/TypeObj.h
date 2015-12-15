@@ -18,7 +18,8 @@ typedef enum {
 } TYPE_OBJ;
 
 class TypeObj {
-private:
+
+protected:
     TYPE_OBJ m_type;
 
 public:
@@ -29,13 +30,11 @@ public:
     }
 
     ~TypeObj() {
-        if(Dealloc != NULL) {
-            ARM(Dealloc());
-        }
+        ACR(Dealloc());
     }
 
 private:
     virtual RESULT Dealloc() = NULL;
-}
+};
 
 #endif // ! TYPE_OBJ_H_

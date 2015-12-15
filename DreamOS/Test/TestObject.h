@@ -7,18 +7,19 @@
 // These can be used to benchmark components, or test the system within the
 // DreamOS TEST unit testing framework
 
-#include "RESULT/EHM.h"
-#include "Test/TestType.h"
+#include "EHM.h"
+#include "Types.h"
 
-RESULT (testCallback *)()
+// Test callbacks include an argument number and variable arguments 
+typedef RESULT fnTest(int, ...);
 
-template<typename T> class TestObject {
+class TestObject {
 private:
-    T m_result;
+    TypeObj *m_pResult;
 
 public:
     TestObject() {
-
+        
     }
 
     ~TestObject() {
