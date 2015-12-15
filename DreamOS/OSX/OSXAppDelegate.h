@@ -5,11 +5,13 @@
 #import <Cocoa/Cocoa.h>
 #import <AppKit/AppKit.h>
 
+#import "OSXOpenGLView.h"
+
 @class OSXAppDelegate;
 
-@interface OSXAppDelegate : NSObject <NSApplicationDelegate> {
+@interface OSXAppDelegate : NSObject <NSApplicationDelegate, NSWindowDelegate> {
     NSWindow *m_window;
-    NSView *m_view;
+    OSXOpenGLView *m_osxOpenGLView;
 }
 
 //@property (assign) IBOutlet NSWindow *m_window;
