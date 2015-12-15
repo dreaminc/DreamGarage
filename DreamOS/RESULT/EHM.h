@@ -8,13 +8,16 @@
 #include "RESULT.h"
 #include <assert.h>
 
+#define _DEBUG // TODO: Put into env
+
+#include <stdio.h>
+
 // TODO: Tie into the official console/interface system
 #define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
-#define CONSOLE_LINEOUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
 
 #ifdef _DEBUG
-    #define DEBUG_OUT(str, ...) CONSOLE_OUT(str, ##__VA_ARGS__)
-    #define DEBUG_LINEOUT(str, ...) CONSOLE_LINEOUT(str, ##__VA_ARGS__)
+    #define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
+    #define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0); 
 #else
     #define DEBUG_OUT(str, ...)
     #define DEBUG_LINEOUT(str, ...)
