@@ -5,24 +5,25 @@
 // DreamOS/RESULT/RESULT.h
 // RESULT Header File
 
-#ifndef NULL
-    #define NULL 0
-#endif
+#include "STDTYPES.h"
 
 #define RESULT_START_FAIL 0x80000000
 #define RESULT_START_OK 0x00000000
+#define RESULT_START_WARN 0x70000000
 
 typedef enum {
     //R_OK = RESULT_START_OK,
     R_K = RESULT_START_OK,
     R_PASS,
     R_SUCCESS,
+
+	R_WARNING = RESULT_START_WARN,
+	R_NOT_IMPLEMENTED,
     
     R_FAIL = RESULT_START_FAIL,
     R_ERROR,
     R_INVALID
 } _RESULT;
-
 
 typedef _RESULT RESULT;
 

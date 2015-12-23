@@ -1,0 +1,133 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="RESULT">
+      <UniqueIdentifier>{c5818450-ccaf-494f-a6a3-1829971017c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{4bbf355f-4691-48f4-8232-b4800b606d5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Sandbox">
+      <UniqueIdentifier>{394d99b2-78d3-4670-aa3f-893289f45340}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sandbox\Windows">
+      <UniqueIdentifier>{33b730f8-e45f-44ce-922e-c03c1304b623}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sandbox\OSX">
+      <UniqueIdentifier>{fc7ccd20-271e-4faa-962a-45b33f699455}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitives">
+      <UniqueIdentifier>{435f4a0d-a8be-4385-a06d-5bfeff5971d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitives\Types">
+      <UniqueIdentifier>{e2f83a20-955b-4bc8-80a3-96529c103e31}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\DreamOSMain.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
+      <Filter>Primitives\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\DreamOSMain.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\RESULT\EHM.h">
+      <Filter>RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\RESULT\RESULT.h">
+      <Filter>RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\TestObject.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\OSX\OSXApp.h">
+      <Filter>Sandbox\OSX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h">
+      <Filter>Sandbox\OSX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h">
+      <Filter>Sandbox\OSX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
+      <Filter>RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\AABV.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimObj.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\point.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\vector.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\Number.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\Types.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\UID.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\SandboxApp.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Makefile">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\..\Rakefile">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\..\OSX\OSXApp.mm">
+      <Filter>Sandbox\OSX</Filter>
+    </None>
+    <None Include="..\..\..\OSX\OSXAppDelegate.mm">
+      <Filter>Sandbox\OSX</Filter>
+    </None>
+    <None Include="..\..\..\OSX\OSXOpenGLView.m">
+      <Filter>Sandbox\OSX</Filter>
+    </None>
+  </ItemGroup>
+</Project>
