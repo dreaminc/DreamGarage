@@ -149,6 +149,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
@@ -156,6 +157,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h" />
+    <ClInclude Include="..\..\..\HAL\HAL.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h" />
     <ClInclude Include="..\..\..\OSX\OSXApp.h" />
     <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h" />
     <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h" />

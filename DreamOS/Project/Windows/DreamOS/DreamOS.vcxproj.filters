@@ -30,6 +30,12 @@
     <Filter Include="Primitives\Types">
       <UniqueIdentifier>{e2f83a20-955b-4bc8-80a3-96529c103e31}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HAL">
+      <UniqueIdentifier>{82b61aa2-ea9e-4a23-8597-487ea3b7a4e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl">
+      <UniqueIdentifier>{250a02de-03cb-461d-9d83-ff8a1ff56fc6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -46,6 +52,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp">
+      <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -111,6 +120,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h">
       <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\HAL.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\opengl.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

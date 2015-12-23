@@ -23,8 +23,13 @@ private:
 private:
 	TCHAR* m_pszClassName;
 	TCHAR* m_pszWindowTitle;
+
 	WNDCLASSEX m_wndclassex; 
 	HWND m_hwndWindow;
+
+	HDC m_hDC;					// Private GDI Device Context
+	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
+
 };
 
 #endif // ! WINDOWS_64_APP_H_
