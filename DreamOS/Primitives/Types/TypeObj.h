@@ -9,11 +9,12 @@
 // can be useful when looking to avoid strongly typed paradigms or for scripting
 // purposes.
 
-#include "RESULT.h"
+#include "RESULT/EHM.h"
 
 typedef enum {
     TYPE_OBJ_NUMBER,
     TYPE_OBJ_STRING,
+	TYPE_OBJ_UID,
     TYPE_OBJ_INVALID
 } TYPE_OBJ;
 
@@ -34,7 +35,9 @@ public:
     }
 
 private:
-    virtual RESULT Dealloc() = NULL;
+	virtual RESULT Dealloc() {
+		return R_NOT_IMPLEMENTED;
+	}
 };
 
 #endif // ! TYPE_OBJ_H_

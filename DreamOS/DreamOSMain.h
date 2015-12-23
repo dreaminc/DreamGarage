@@ -1,7 +1,9 @@
 #ifndef DREAM_OS_H_
 #define DREAM_OS_H_
 
-#include "RESULT/RESULT.h"
+#include "RESULT/EHM.h"
+
+#include <stdlib.h>
 
 // DREAM OS
 // DreamOS/DREAMOSMain.h
