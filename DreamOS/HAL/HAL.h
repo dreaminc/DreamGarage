@@ -13,4 +13,6 @@
 // Provides access to the OpenGL Implementation
 #include "opengl/opengl.h"
 
+#include "HALImp.h"
+
 #endif // ! HAL_H_

@@ -6,6 +6,7 @@
 // This is the top level header for OpenGL for either native or
 
 #include "./RESULT/EHM.h"
+#include "./HAL/HALImp.h"
 
 // #include <gl\gl.h>                                // Header File For The OpenGL32 Library
 // #include <gl\glu.h>                               // Header File For The GLu32 Library
@@ -22,16 +23,24 @@
 
 #pragma comment(lib,"opengl32.lib")
 
-class OpenGLImp {
+class OpenGLImp : public HALImp {
 private:
 	GLuint m_ID;
+	HGLRC m_hglrc;		// OpenGL rendering context
+
+	// TODO: Fix this architecture 
+	HDC e_hDC;
 
 public:
-	OpenGLImp();
+	OpenGLImp(HDC hDC);
 	~OpenGLImp();
+
+public:
+	RESULT Resize(int pxWidth, int pxHeight);
 
 private:
 	RESULT InitializeExtensions();
+	RESULT InitializeGLContext();
 
 private:
 	// OpengGL Extension Function Pointers
@@ -78,9 +87,6 @@ private:
 	PFNGLBINDBUFFERPROC	m_glBindBuffer;
 	PFNGLBUFFERDATAPROC	m_glBufferData;
 	PFNGLVERTEXATTRIBPOINTERPROC m_glVertexAttribPointer;
-
-private:
-	HGLRC hglrc;		// OpenGL rendering context
 };
 
 #endif // ! OPEN_GL_IMP_H

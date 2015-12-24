@@ -22,6 +22,8 @@ public:
 
 public:
 	virtual RESULT ShowSandbox() = 0;
+	virtual RESULT ShutdownSandbox() = 0;
+	virtual RESULT RecoverDisplayMode() = 0;		// Do all sandboxes need this ultimately? 
 
 private:
 	UID m_uid;
