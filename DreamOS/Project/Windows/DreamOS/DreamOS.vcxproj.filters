@@ -130,6 +130,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\HALImp.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
