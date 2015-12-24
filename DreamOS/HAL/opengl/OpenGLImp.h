@@ -21,7 +21,8 @@
 #include <gl\glext.h>
 #include <gl\wglext.h>
 
-#pragma comment(lib,"opengl32.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "glu32.lib")
 
 class OpenGLImp : public HALImp {
 private:
@@ -31,16 +32,23 @@ private:
 	// TODO: Fix this architecture 
 	HDC e_hDC;
 
+	int m_versionMajor;
+	int m_versionMinor;
+	int m_versionGLSL;
+
 public:
 	OpenGLImp(HDC hDC);
 	~OpenGLImp();
 
 public:
 	RESULT Resize(int pxWidth, int pxHeight);
+	RESULT ShutdownImplementaiton();
+	RESULT Render();
 
 private:
 	RESULT InitializeExtensions();
 	RESULT InitializeGLContext();
+	RESULT InitializeOpenGLVersion();
 
 private:
 	// OpengGL Extension Function Pointers
