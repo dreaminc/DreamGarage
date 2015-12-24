@@ -1,8 +1,13 @@
 #include "OpenGLImp.h"
 
 
-OpenGLImp::OpenGLImp(HDC hDC) {
-	m_ID = m_glCreateProgram();
+OpenGLImp::OpenGLImp(HDC hDC) :
+	m_ID(NULL),
+	m_versionMinor(0),
+	m_versionMajor(0),
+	m_versionGLSL(0)
+{
+	ACRM(InitializeExtensions(), "Failed to initialize extensions");
 	e_hDC = hDC;
 
 	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
@@ -10,6 +15,29 @@ OpenGLImp::OpenGLImp(HDC hDC) {
 
 OpenGLImp::~OpenGLImp() {
 	m_glDeleteProgram(m_ID);
+}
+
+RESULT OpenGLImp::InitializeOpenGLVersion() {
+	// For all versions
+	char* pszVersion = (char*)glGetString(GL_VERSION); // ver = "3.2.0"
+	DEBUG_LINEOUT("OpenGL Version %s", pszVersion);
+
+	m_versionMajor = pszVersion[0] - '0';
+	m_versionMinor = pszVersion[2] - '0';
+
+	// GL 3.x+
+	if (m_versionMajor >= 3) {
+		glGetIntegerv(GL_MAJOR_VERSION, &m_versionMajor); // major = 3
+		glGetIntegerv(GL_MINOR_VERSION, &m_versionMinor); // minor = 2
+	}
+
+	// GLSL
+	// "1.50 NVIDIA via Cg compiler"
+	// TODO: Parse this out for m_versionGLSL
+	pszVersion = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION); 
+	DEBUG_LINEOUT("OpenGL GLSL Version %s", pszVersion);
+
+	return R_PASS;
 }
 
 RESULT OpenGLImp::InitializeGLContext() {
@@ -36,6 +64,39 @@ RESULT OpenGLImp::InitializeGLContext() {
 
 	CBM((wglMakeCurrent(e_hDC, m_hglrc)), "Failed OGL wglMakeCurrent");
 
+	// Move this eventually?
+	if (m_glCreateProgram != NULL)
+		m_ID = m_glCreateProgram();
+
+	InitializeOpenGLVersion();
+
+	/*
+	if (m_versionMajor < 3 || (m_versionMajor == 3 && m_versionMinor < 2))
+		AfxMessageBox(_T("OpenGL 3.2 is not supported!"));
+
+	int attribs[] = {
+		WGL_CONTEXT_MAJOR_VERSION_ARB, m_versionMajor,
+		WGL_CONTEXT_MINOR_VERSION_ARB, m_versionMinor,
+		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+		0
+	};
+
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = NULL;
+	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+	if (wglCreateContextAttribsARB != NULL)
+		m_hrc = wglCreateContextAttribsARB(pDC->m_hDC, 0, attribs);
+
+	wglMakeCurrent(NULL, NULL);
+	wglDeleteContext(tempContext);
+
+
+	if (!m_hrc) {
+		AfxMessageBox(_T("OpenGL 3.x RC was not created!"));
+		return R_FAIL;
+	}
+	*/
+
 Error:
 	return r;
 }
@@ -48,14 +109,30 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 
 	int aspectratio = pxWidth / pxHeight;
 
-	/* TODO: Resize and such
 	glViewport(0, 0, pxWidth, pxHeight);
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 	gluPerspective(45.0f, aspectratio, 0.2f, 255.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-	*/
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::Render() {
+	RESULT r = R_PASS;
+
+
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::ShutdownImplementaiton() {
+	RESULT r = R_PASS;
+
+	CBM((wglDeleteContext(m_hglrc)), "Failed to wglDeleteContext(hglrc)");
 
 Error:
 	return r;
@@ -107,6 +184,51 @@ RESULT OpenGLImp::InitializeExtensions() {
 	m_glBindBuffer = NULL;
 	m_glBufferData = NULL;
 	m_glVertexAttribPointer = NULL;
+
+	/*
+	// Program
+	glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
+	glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram");
+	glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
+	glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
+	glDetachShader = (PFNGLDETACHSHADERPROC)wglGetProcAddress("glDetachShader");
+	glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
+	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv");
+	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
+	glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
+	glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
+	glUniform1iv = (PFNGLUNIFORM1IVPROC)wglGetProcAddress("glUniform1iv");
+	glUniform2iv = (PFNGLUNIFORM2IVPROC)wglGetProcAddress("glUniform2iv");
+	glUniform3iv = (PFNGLUNIFORM3IVPROC)wglGetProcAddress("glUniform3iv");
+	glUniform4iv = (PFNGLUNIFORM4IVPROC)wglGetProcAddress("glUniform4iv");
+	glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
+	glUniform1fv = (PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv");
+	glUniform2fv = (PFNGLUNIFORM2FVPROC)wglGetProcAddress("glUniform2fv");
+	glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv");
+	glUniform4fv = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv");
+	glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv");
+	glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation");
+	glVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)wglGetProcAddress("glVertexAttrib1f");
+	glVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)wglGetProcAddress("glVertexAttrib1fv");
+	glVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)wglGetProcAddress("glVertexAttrib2fv");
+	glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)wglGetProcAddress("glVertexAttrib3fv");
+	glVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)wglGetProcAddress("glVertexAttrib4fv");
+	glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
+	glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation");
+
+	// Shader
+	glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
+	glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
+	glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
+	glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
+	glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
+
+	// VBO
+	glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
+	glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
+	glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
+	glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
+	*/
 
 	return R_PASS;
 }

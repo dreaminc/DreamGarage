@@ -5,7 +5,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pxWidth(DEFAULT_WIDTH),
 	m_pxHeight(DEFAULT_HEIGHT),
 	m_fFullscreen(DEFAULT_FULLSCREEN),
-	m_wndStyle(WS_OVERLAPPEDWINDOW)
+	m_wndStyle(WS_OVERLAPPEDWINDOW),
+	m_hDC(NULL)
 {
 	// Default title
 	m_pszWindowTitle = _T("Dream OS Sandbox");
@@ -14,7 +15,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	m_wndclassex.cbSize = sizeof(WNDCLASSEX);
 	m_wndclassex.style = CS_DBLCLKS;
-	m_wndclassex.lpfnWndProc = WndProc;
+	m_wndclassex.lpfnWndProc = StaticWndProc;
 	m_wndclassex.cbClsExtra = NULL;
 	m_wndclassex.cbWndExtra = NULL;
 	m_wndclassex.hInstance = m_hInstance;
@@ -65,6 +66,7 @@ Windows64App::~Windows64App() {
 	// empty stub for now
 }
 
+// This also kicks off the OpenGL implementation
 RESULT Windows64App::SetDeviceContext(HDC hDC) {
 	m_hDC = hDC;
 	return R_PASS;
@@ -73,11 +75,32 @@ RESULT Windows64App::SetDeviceContext(HDC hDC) {
 RESULT Windows64App::SetDimensions(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
-	// TODO: OpenGL Resize the view after the window had been resized
-	// CRM(Resize(LOWORD(m_pxWidth), HIWORD(m_pxHeight)), "Failed to resize OpenGL Viewport");
+	m_pxWidth = pxWidth;
+	m_pxHeight = pxHeight;
+
+	// OpenGL Resize the view after the window had been resized
+	CRM(m_pOpenGLImp->Resize(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
+}
+
+long __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+	Windows64App *pApp = NULL;
+
+	// Get pointer to window
+	if (msg == WM_CREATE) {
+		pApp = (Windows64App*)((LPCREATESTRUCT)lp)->lpCreateParams;
+		SetWindowLongPtr(hWindow, GWL_USERDATA, (LONG_PTR)pApp);
+	}
+	else {
+		pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWL_USERDATA);
+		if (!pApp) 
+			return DefWindowProc(hWindow, msg, wp, lp);
+	}
+
+	//pApp->m_hwndWindow = hWindow;
+	return pApp->WndProc(hWindow, msg, wp, lp);
 }
 
 long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
@@ -91,8 +114,7 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 				return 0L;
 			}
 
-			Windows64App *pApp = (Windows64App*)((LPCREATESTRUCT)lp)->lpCreateParams;
-			pApp->SetDeviceContext(hDC);
+			SetDeviceContext(hDC);
 		} break;
 
 		case WM_DESTROY: {
@@ -102,9 +124,7 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 		} break;
 
 		case WM_SIZE: {
-			Windows64App *pApp = (Windows64App*)((LPCREATESTRUCT)lp)->lpCreateParams;			
-			pApp->SetDimensions(LOWORD(lp), HIWORD(lp));
-			
+			SetDimensions(LOWORD(lp), HIWORD(lp));
 		} break;
 
 		case WM_LBUTTONDOWN: {
@@ -131,7 +151,11 @@ RESULT Windows64App::ShowSandbox() {
 		return R_FAIL;
 	}
 
-	// TODO: Setup OpenGL and Resize Windows etc
+	// Setup OpenGL and Resize Windows etc
+	CNM(m_hDC, "Can't initialize OpenGL Implemenation with NULL Device Context");
+	m_pOpenGLImp = new OpenGLImp(m_hDC);
+	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
+	CRM(SetDimensions(m_posX, m_posY), "Failed to resize OpenGL Implemenation");
 
 	// Show the window
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
@@ -150,7 +174,9 @@ RESULT Windows64App::ShowSandbox() {
 			DispatchMessage(&msg);
 		}
 
-		//TODO: OpenGL RenderFrame();
+		if(m_pOpenGLImp != NULL)
+			m_pOpenGLImp->Render();
+
 		SwapBuffers(m_hDC);			// Swap buffers
 
 		if (GetAsyncKeyState(VK_ESCAPE))
@@ -169,8 +195,12 @@ RESULT Windows64App::ShutdownSandbox() {
 	// Release device context in use by rc
 	wglMakeCurrent(m_hDC, NULL);
 
-	// TODO: Delete GL Rendering Context
-	// wglDeleteContext(hglrc);	
+	// Shutdown and delete GL Rendering Context
+	if (m_pOpenGLImp != NULL) {
+		CRM(m_pOpenGLImp->ShutdownImplementaiton(), "Failed to shutdown opengl implemenation");
+		delete m_pOpenGLImp;
+		m_pOpenGLImp = NULL;
+	}
 
 	PostQuitMessage(0);		// make sure the window will be destroyed
 
@@ -185,6 +215,7 @@ Error:
 RESULT Windows64App::RecoverDisplayMode() {
 	RESULT r = R_PASS;
 
+	// TODO: What the hell is this?
 
 Error:
 	return r;

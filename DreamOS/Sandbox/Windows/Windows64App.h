@@ -9,6 +9,8 @@
 #include <string.h>
 #include <tchar.h>
 
+#include "./HAL/opengl/OpenGLImp.h"
+
 #define DEFAULT_WIDTH 1024
 #define DEFAULT_HEIGHT 768
 
@@ -25,7 +27,8 @@ public:	// Sandbox Interface
 	RESULT RecoverDisplayMode();
 
 private:
-	static long __stdcall WndProc(HWND window, unsigned int msg, WPARAM wp, LPARAM lp);
+	static long __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
+	long __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
@@ -47,6 +50,9 @@ private:
 	HDC m_hDC;					// Private GDI Device Context
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
+private:
+	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
+	OpenGLImp *m_pOpenGLImp;	
 };
 
 #endif // ! WINDOWS_64_APP_H_
