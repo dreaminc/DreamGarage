@@ -24,9 +24,11 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 
+#include "OpenGLShader.h"
+
 class OpenGLImp : public HALImp {
 private:
-	GLuint m_ID;
+	GLuint m_idOpenGLProgram;
 	HGLRC m_hglrc;		// OpenGL rendering context
 
 	// TODO: Fix this architecture 
@@ -49,6 +51,29 @@ private:
 	RESULT InitializeExtensions();
 	RESULT InitializeGLContext();
 	RESULT InitializeOpenGLVersion();
+
+	RESULT PrepareScene();
+
+private:
+	OpenGLShader *m_pVertexShader;
+	OpenGLShader *m_pFragmentShader;
+
+public:
+	inline GLuint glCreateProgram(void) { return m_glCreateProgram(); }
+	inline void glDeleteProgram(GLuint programID) { return m_glDeleteProgram(programID); }
+	inline GLuint glCreateShader(GLenum type) { return m_glCreateShader(type); }
+	inline void glShaderSource(GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length) {
+		return m_glShaderSource(shader, count, string, length);
+	}
+
+	inline void glCompileShader(GLuint shader) { return m_glCompileShader(shader); }
+	inline void glGetShaderiv(GLuint shader, GLenum pname, GLint *params) {
+		return m_glGetShaderiv(shader, pname, params);
+	}
+
+	inline void glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
+		return m_glGetShaderInfoLog(shader, bufSize, length, infoLog);
+	}
 
 private:
 	// OpengGL Extension Function Pointers
