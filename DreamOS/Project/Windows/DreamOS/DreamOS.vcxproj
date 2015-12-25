@@ -150,6 +150,7 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h" />
     <ClInclude Include="..\..\..\OSX\OSXApp.h" />
     <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h" />
     <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h" />
@@ -183,6 +185,8 @@
     <ClInclude Include="..\..\..\Test\TestObject.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\OSX\OSXApp.mm" />
     <None Include="..\..\..\OSX\OSXAppDelegate.mm" />

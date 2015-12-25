@@ -36,6 +36,9 @@
     <Filter Include="HAL\opengl">
       <UniqueIdentifier>{250a02de-03cb-461d-9d83-ff8a1ff56fc6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HAL\opengl\GLSL">
+      <UniqueIdentifier>{ad42cc41-1d80-4c6d-8048-f3c57f04dae6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -54,6 +57,9 @@
       <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
@@ -133,6 +139,9 @@
     <ClInclude Include="..\..\..\HAL\HALImp.h">
       <Filter>HAL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -149,6 +158,12 @@
     </None>
     <None Include="..\..\..\OSX\OSXOpenGLView.m">
       <Filter>Sandbox\OSX</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag">
+      <Filter>HAL\opengl\GLSL</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert">
+      <Filter>HAL\opengl\GLSL</Filter>
     </None>
   </ItemGroup>
 </Project>
