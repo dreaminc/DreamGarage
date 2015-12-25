@@ -57,6 +57,7 @@
 #define CN(pointer) do{if(pointer == NULL) {r = R_ERROR; goto Error;}}while(0);
 #define CNR(pointer, failCode) do{if(pointer == NULL) {r = failCode; goto Error;}}while(0);
 #define CNM(pointer, msg, ...) do{if(pointer == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_ERROR; goto Error; }}while(0);
+#define CNMW(pointer, msg, ...) do{if(pointer == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING; }}while(0);
 #define CNRM(pointer, failCode, msg, ...) do{if(pointer == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
 
 #define ACNM(pointer, msg, ...) do{if(pointer == NULL){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
