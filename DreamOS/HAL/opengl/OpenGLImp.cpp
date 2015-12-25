@@ -7,12 +7,11 @@ OpenGLImp::OpenGLImp(HDC hDC) :
 	m_versionMajor(0),
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
-	m_pFragmentShader(NULL)
+	m_pFragmentShader(NULL),
+	e_hDC(hDC)
 {
-	ACRM(InitializeExtensions(), "Failed to initialize extensions");
-	e_hDC = hDC;
-
 	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
+	ACRM(PrepareScene(), "Failed to prepare GL Scene");
 }
 
 OpenGLImp::~OpenGLImp() {
@@ -68,6 +67,9 @@ RESULT OpenGLImp::InitializeGLContext() {
 
 	InitializeOpenGLVersion();
 
+	// Should be called after context is created and made current
+	ACRM(InitializeExtensions(), "Failed to initialize extensions");
+
 	// Move this eventually?
 	if (m_glCreateProgram != NULL)
 		m_idOpenGLProgram = glCreateProgram();
@@ -114,6 +116,7 @@ RESULT OpenGLImp::PrepareScene() {
 	m_pVertexShader = new OpenGLShader(this, GL_VERTEX_SHADER);
 	m_pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
 
+	// Load the vertex shader
 
 
 Error:
@@ -160,51 +163,125 @@ Error:
 // Initialize all of the extensions
 // TODO: Stuff this into an object?
 RESULT OpenGLImp::InitializeExtensions() {
-	m_glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram");
-	m_glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram");
-	m_glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram");
-	m_glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader");
-	m_glDetachShader = (PFNGLDETACHSHADERPROC)wglGetProcAddress("glDetachShader");
-	m_glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram");
-	m_glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv");
-	m_glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog");
-	m_glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation");
-	m_glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i");
-	m_glUniform1iv = (PFNGLUNIFORM1IVPROC)wglGetProcAddress("glUniform1iv");
-	m_glUniform2iv = (PFNGLUNIFORM2IVPROC)wglGetProcAddress("glUniform2iv");
-	m_glUniform3iv = (PFNGLUNIFORM3IVPROC)wglGetProcAddress("glUniform3iv");
-	m_glUniform4iv = (PFNGLUNIFORM4IVPROC)wglGetProcAddress("glUniform4iv");
-	m_glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f");
-	m_glUniform1fv = (PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv");
-	m_glUniform2fv = (PFNGLUNIFORM2FVPROC)wglGetProcAddress("glUniform2fv");
-	m_glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv");
-	m_glUniform4fv = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv");
-	m_glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv");
-	m_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation");
-	m_glVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)wglGetProcAddress("glVertexAttrib1f");
-	m_glVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)wglGetProcAddress("glVertexAttrib1fv");
-	m_glVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)wglGetProcAddress("glVertexAttrib2fv");
-	m_glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)wglGetProcAddress("glVertexAttrib3fv");
-	m_glVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)wglGetProcAddress("glVertexAttrib4fv");
-	m_glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray");
-	m_glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation");
+	RESULT r = R_PASS;
+
+	CNMW((m_glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram")), 
+		"Failed to initialzie glCreateProgram extension");
+
+	CNMW((m_glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram")), 
+		"Failed to initialize glDeleteProgram extension");
+
+	CNMW((m_glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram")), 
+		"Failed to initialzie glUseProgram extension");
+
+	CNMW((m_glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader")), 
+		"Failed to initialize glAttachShader extension");
+
+	CNMW((m_glDetachShader = (PFNGLDETACHSHADERPROC)wglGetProcAddress("glDetachShader")), 
+		"Failed to initialize glDetachShader extension");
+
+	CNMW((m_glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram")), 
+		"Failed to initialize glLinkProgram extension");
+
+	CNMW((m_glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv")), 
+		"Failed to initialize glGetProgramiv extension");
+
+	CNMW((m_glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog")), 
+		"Failed to initialize glGetShaderInfoLog extension");
+
+	CNMW((m_glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation")), 
+		"Failed to initialize glGetUniformLocation extension");
+
+	CNMW((m_glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i")), 
+		"Failed to initialize glUniform1i extension");
+
+	CNMW((m_glUniform1iv = (PFNGLUNIFORM1IVPROC)wglGetProcAddress("glUniform1iv")), 
+		"Failed to initialize glUniform1iv extension");
+
+	CNMW((m_glUniform2iv = (PFNGLUNIFORM2IVPROC)wglGetProcAddress("glUniform2iv")), 
+		"Failed to initialize glUniform2iv extension");
+
+	CNMW((m_glUniform3iv = (PFNGLUNIFORM3IVPROC)wglGetProcAddress("glUniform3iv")), 
+		"Failed to initialize glUniform3iv extension");
+
+	CNMW((m_glUniform4iv = (PFNGLUNIFORM4IVPROC)wglGetProcAddress("glUniform4iv")), 
+		"Failed to initialize glUniform4iv extension");
+
+	CNMW((m_glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f")), 
+		"Failed to initialize glUniform1f extension");
+
+	CNMW((m_glUniform1fv = (PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv")), 
+		"Failed to initialize glUniform1fv extension");
+
+	CNMW((m_glUniform2fv = (PFNGLUNIFORM2FVPROC)wglGetProcAddress("glUniform2fv")), 
+		"Failed to initialize glUniform2fv extension");
+
+	CNMW((m_glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv")), 
+		"Failed to initialize glUniform3fv extension");
+
+	CNMW((m_glUniform4fv = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv")), 
+		"Failed to initialize glUniform4fv extension");
+
+	CNMW((m_glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv")), 
+		"Failed to initialize glUniformMatrix4fv extension");
+
+	CNMW((m_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation")), 
+		"Failed to initialize glGetAttribLocation extension");
+
+	CNMW((m_glVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)wglGetProcAddress("glVertexAttrib1f")), 
+		"Failed to initialize glVertexAttrib1f extension");
+
+	CNMW((m_glVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)wglGetProcAddress("glVertexAttrib1fv")), 
+		"Failed to initialize glVertexAttrib1fv extension");
+
+	CNMW((m_glVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)wglGetProcAddress("glVertexAttrib2fv")), 
+		"Failed to initialize glVertexAttrib2fv extension");
+
+	CNMW((m_glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)wglGetProcAddress("glVertexAttrib3fv")), 
+		"Failed to initialize glVertexAttrib3fv extension");
+
+	CNMW((m_glVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)wglGetProcAddress("glVertexAttrib4fv")), 
+		"Failed to initialize glVertexAttrib4fv extension");
+
+	CNMW((m_glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray")), 
+		"Failed to initialize glEnableVertexAttribArray extension");
+
+	CNMW((m_glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation")), 
+		"Failed to initialize glBindAttribLocation extension");
 	
 	// Not supported yet?
 	m_glDisableVertexAttribArray = NULL;
 	m_glGetActiveUniform = NULL;
 
 	// Shader
-	m_glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader");
-	m_glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader");
-	m_glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource");
-	m_glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader");
-	m_glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv");
+	CNMW((m_glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader")), 
+		"Failed to initialize glCreateShader extension");
+
+	CNMW((m_glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader")), 
+		"Failed to initialize glDeleteShader extension");
+
+	CNMW((m_glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource")), 
+		"Failed to initialize glShaderSource extension");
+
+	CNMW((m_glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader")),
+		"Failed to initialize glCompileShader extension");
+
+	CNMW((m_glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv")), 
+		"Failed to initialize glGetShaderiv extension");
 
 	// VBO
-	m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers");
-	m_glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer");
-	m_glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData");
-	m_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer");
+	CNMW((m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers")), 
+		"Failed to initialzie glGenBuffers extension");
 
-	return R_PASS;
+	CNMW((m_glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer")), 
+		"Failed to initialize glBindBuffer extension");
+
+	CNMW((m_glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData")), 
+		"Failed to initialize glBuifferData extension");
+	
+	CNMW((m_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer")), 
+		"Failed to initialize glVertexAttribPointer extension");
+
+Error:
+	return r;
 }
