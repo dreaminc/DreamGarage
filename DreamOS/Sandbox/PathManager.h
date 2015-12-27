@@ -30,6 +30,8 @@ public:
 protected:
 	virtual RESULT Dealloc() = 0;					// Deallocate all paths
 	virtual RESULT OpenDreamPathsFile() = 0;
+	virtual RESULT UpdateCurrentPath() = 0;
+	virtual RESULT SetCurrentPath(wchar_t *pszPath) = 0;
 	
 	// Set up path manager
 	virtual RESULT InitializePaths() {

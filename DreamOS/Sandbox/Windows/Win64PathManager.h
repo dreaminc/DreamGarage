@@ -21,6 +21,8 @@ protected:
 	RESULT Dealloc();
 	RESULT InitializePaths();
 	RESULT OpenDreamPathsFile();
+	RESULT UpdateCurrentPath();
+	RESULT SetCurrentPath(wchar_t *pszPath);
 
 public:
 	RESULT PrintPaths();
