@@ -20,14 +20,20 @@ public:
 protected:
 	RESULT Dealloc();
 	RESULT InitializePaths();
+	RESULT OpenDreamPathsFile();
 
 public:
 	RESULT PrintPaths();
 
 private:
 	wchar_t m_pszCurDirectiory[MAX_PATH];
+	size_t m_pszCurDirectiory_n;
+
 	wchar_t m_pszDreamRootPath[MAX_PATH];
+	size_t m_pszDreamRootPath_n;
+
 	wchar_t m_pszShadersPath[MAX_PATH];
+	size_t m_pszShadersPath_n;
 };
 
 #endif // ! WIN_64_PATH_MANAGER_H_

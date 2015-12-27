@@ -29,6 +29,7 @@ public:
 
 protected:
 	virtual RESULT Dealloc() = 0;					// Deallocate all paths
+	virtual RESULT OpenDreamPathsFile() = 0;
 	
 	// Set up path manager
 	virtual RESULT InitializePaths() {
