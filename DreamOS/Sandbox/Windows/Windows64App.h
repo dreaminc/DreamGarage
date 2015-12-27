@@ -4,12 +4,17 @@
 #include "RESULT/EHM.h"
 #include "Sandbox/SandboxApp.h"
 
+// DREAM OS
+// DreamOS/Sandbox/Windows/Windows64App.h
+// Dream OS Windows 64 Sandbox
+
 #include <windows.h>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
 
 #include "./HAL/opengl/OpenGLImp.h"
+#include "Sandbox/PathManager.h"
 
 #define DEFAULT_WIDTH 1024
 #define DEFAULT_HEIGHT 768
@@ -53,6 +58,7 @@ private:
 private:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	OpenGLImp *m_pOpenGLImp;	
+	PathManager *m_pPathManager;	
 };
 
 #endif // ! WINDOWS_64_APP_H_

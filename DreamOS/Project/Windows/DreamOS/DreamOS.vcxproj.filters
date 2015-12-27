@@ -39,6 +39,12 @@
     <Filter Include="HAL\opengl\GLSL">
       <UniqueIdentifier>{ad42cc41-1d80-4c6d-8048-f3c57f04dae6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{4f039fdc-08f8-43f4-88a5-313b7ed34769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Types">
+      <UniqueIdentifier>{44fa16e8-b322-4aa9-bf57-b79b92f4c3b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -61,6 +67,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp">
+      <Filter>Sandbox</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +154,21 @@
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\PathManager.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Types\Factory.h">
+      <Filter>Core\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Types\Object.h">
+      <Filter>Core\Types</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -165,5 +192,10 @@
     <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert">
       <Filter>HAL\opengl\GLSL</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\dreampath.txt">
+      <Filter>Main</Filter>
+    </Text>
   </ItemGroup>
 </Project>

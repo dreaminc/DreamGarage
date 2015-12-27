@@ -1,4 +1,5 @@
 #include "Windows64App.h"
+#include "Sandbox/PathManagerFactory.h"
 
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
@@ -6,12 +7,17 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pxHeight(DEFAULT_HEIGHT),
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
-	m_hDC(NULL)
+	m_hDC(NULL),
+	m_pPathManager(NULL)
 {
 	// Default title
 	m_pszWindowTitle = _T("Dream OS Sandbox");
 
 	m_hInstance = GetModuleHandle(0);
+
+	// Initialize Path Manager
+	m_pPathManager = PathManagerFactory::MakePathManager(PATH_MANAGER_WIN32);
+	m_pPathManager->PrintPaths();
 
 	m_wndclassex.cbSize = sizeof(WNDCLASSEX);
 	m_wndclassex.style = CS_DBLCLKS;
@@ -156,6 +162,8 @@ RESULT Windows64App::ShowSandbox() {
 	m_pOpenGLImp = new OpenGLImp(m_hDC);
 	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
 	CRM(SetDimensions(m_posX, m_posY), "Failed to resize OpenGL Implemenation");
+
+	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
 
 	// Show the window
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
