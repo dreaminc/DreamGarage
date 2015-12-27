@@ -18,6 +18,6 @@ int main(int argc, const char *argv[]) {
 	CRM(pWin32Sandbox->ShowSandbox(), "Failed to show Win32 Sandbox window");
 	
 Error:
-	system("pause");
+	//system("pause");
 	return (int)(r);
 }

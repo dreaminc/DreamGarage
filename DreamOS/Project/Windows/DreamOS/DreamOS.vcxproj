@@ -153,10 +153,14 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Core\Types\Factory.h" />
+    <ClInclude Include="..\..\..\Core\Types\Object.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
@@ -179,8 +183,11 @@
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
+    <ClInclude Include="..\..\..\Sandbox\PathManager.h" />
+    <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
   </ItemGroup>
@@ -192,6 +199,9 @@
     <None Include="..\..\..\OSX\OSXAppDelegate.mm" />
     <None Include="..\..\..\OSX\OSXOpenGLView.m" />
     <None Include="..\..\..\Rakefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\dreampath.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
