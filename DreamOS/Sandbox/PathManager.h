@@ -13,38 +13,58 @@
 #define DREAM_OS_PATH_ENV "DREAMOSPATH"
 #define DREAM_OS_PATHS_FILE "dreampaths.txt"	// TODO: Rename?
 
+#include <map>
+
 class PathManagerFactory;
+
+typedef enum {
+	PATH_ROOT = 0,
+	PATH_HAL,		
+	PATH_SHADERS,
+	PATH_SANDBOX,
+	PATH_RESULT,
+	PATH_INVALID	// Also acts as a found
+} PATH_VALUE_TYPE;
 
 class PathManager {
 	friend class PathManagerFactory;
 
-public:
-	PathManager() {
-		//ACRM(InitializePaths(), "Path Manager failed to initialzie paths");
-	}
+	const wchar_t *m_cszPathValues[PATH_INVALID] = {
+		L"ROOT",
+		L"HAL",
+		L"SHADERS",
+		L"SANDBOX",
+		L"RESULT"
+	};
 
-	~PathManager() {
-		ACRM(Dealloc(), "PathManager failed to deallocate paths");
-	}
+	int m_cszPathValues_n;
+
+public:
+	PathManager();
+	~PathManager();
 
 protected:
-	virtual RESULT Dealloc() = 0;					// Deallocate all paths
+	virtual RESULT Dealloc();					
 	virtual RESULT OpenDreamPathsFile() = 0;
 	virtual RESULT UpdateCurrentPath() = 0;
 	virtual RESULT SetCurrentPath(wchar_t *pszPath) = 0;
+
+	RESULT RegisterPath(wchar_t *pszName, wchar_t *pszValue);
 	
-	// Set up path manager
-	virtual RESULT InitializePaths() {
-		DEBUG_LINEOUT("PathManager Initialize Paths");
-		return R_VIRTUAL;
-	}
+	virtual RESULT InitializePaths();
+	PATH_VALUE_TYPE GetPathValueType(wchar_t *pszValue);
 
 public:
 	// Print Paths
 	virtual RESULT PrintPaths() = 0;
 
+	virtual RESULT GetCurrentPath(wchar_t*&pszCurrentPath) = 0;
+	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) = 0;
+	RESULT GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath);
+
 private:
 	UID m_uid;
+	std::map<PATH_VALUE_TYPE, wchar_t*> *m_pmapNVPPaths;
 };
 
 #endif // ! PATH_MANAGER_H_

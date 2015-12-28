@@ -23,9 +23,14 @@ protected:
 	RESULT OpenDreamPathsFile();
 	RESULT UpdateCurrentPath();
 	RESULT SetCurrentPath(wchar_t *pszPath);
+	//RESULT RegisterPath(wchar_t *pszName, wchar_t *pszValue);
 
 public:
 	RESULT PrintPaths();
+
+	RESULT GetCurrentPath(wchar_t*&pszCurrentPath);
+	RESULT GetDreamPath(wchar_t*&pszDreamPath);
+	//RESULT GetValuePath(PATH_VALUE_TYPE, wchar_t* &pszPath);
 
 private:
 	wchar_t m_pszCurDirectiory[MAX_PATH];

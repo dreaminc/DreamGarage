@@ -74,6 +74,9 @@
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp">
       <Filter>Sandbox</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\PathManager.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -194,8 +197,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\dreampath.txt">
-      <Filter>Main</Filter>
-    </Text>
+    <Text Include="..\..\..\dreampaths.txt" />
   </ItemGroup>
 </Project>
