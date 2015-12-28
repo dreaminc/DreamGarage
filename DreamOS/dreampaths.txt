@@ -1,0 +1,8 @@
+# DREAM PATHS
+# All of the Dream OS paths
+
+ROOT 		./ 
+HAL 		./HAL/
+SHADERS 	./HAL/opengl/GLSL/
+SANDBOX		./Sandbox/
+RESULT 		./RESULT/
