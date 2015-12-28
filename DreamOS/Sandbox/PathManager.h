@@ -57,10 +57,12 @@ protected:
 public:
 	// Print Paths
 	virtual RESULT PrintPaths() = 0;
+	RESULT IsPathRegistered(PATH_VALUE_TYPE type);
 
 	virtual RESULT GetCurrentPath(wchar_t*&pszCurrentPath) = 0;
 	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) = 0;
 	RESULT GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath);
+	RESULT GetFilePath(PATH_VALUE_TYPE type, wchar_t *pszFileName, wchar_t *n_pszFilePath);
 
 private:
 	UID m_uid;

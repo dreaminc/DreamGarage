@@ -60,6 +60,17 @@ PATH_VALUE_TYPE PathManager::GetPathValueType(wchar_t *pszValue) {
 	return PATH_INVALID;
 }
 
+RESULT PathManager::IsPathRegistered(PATH_VALUE_TYPE type) {
+	RESULT r = R_PASS;
+
+	// Check to see we have the type registered 
+	std::map<PATH_VALUE_TYPE, wchar_t*>::iterator it = m_pmapNVPPaths->find(type);
+	CBM((it != m_pmapNVPPaths->end()), "Path Value %d not found in map", type);
+
+Error:
+	return r;
+}
+
 RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	RESULT r = R_PASS;
 	int n_pszPath_n = 0;
@@ -69,9 +80,7 @@ RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	int pszValue_n = 0;
 	errno_t err;
 
-	// Check to see we have the type registered 
-	std::map<PATH_VALUE_TYPE, wchar_t*>::iterator it = m_pmapNVPPaths->find(type);
-	CBM((it != m_pmapNVPPaths->end()), "Path Value %d not found in map", type);
+	CRM(IsPathRegistered(type), "Value not registered");
 	
 	pszValue = m_pmapNVPPaths->at(type);
 	pszValue_n = wcslen(pszValue);
@@ -89,5 +98,36 @@ RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	err = wcsncat_s(n_pszPath, n_pszPath_n, pszValue, pszValue_n);
 
 Error:
+	return r;
+}
+
+RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, wchar_t *pszFileName, wchar_t *n_pszFilePath) {
+	RESULT r = R_PASS;
+	errno_t err;
+	int pszFileName_n = wcslen(pszFileName);
+	int n_pszFilePath_n = 0;
+
+	wchar_t *pszValuePath = NULL;
+	int pszValuePath_n = 0;
+
+	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
+	pszValuePath_n = wcslen(pszValuePath);
+
+	n_pszFilePath_n = pszValuePath_n + 1 + pszFileName_n + 1;
+	n_pszFilePath = new wchar_t[n_pszFilePath_n];
+	memset(n_pszFilePath, 0, sizeof(wchar_t) * n_pszFilePath_n);
+
+	// Compose the path
+	// TODO: Maybe do some lower level parsing here since ./ will just get attached
+	err = wcsncat_s(n_pszFilePath, n_pszFilePath_n, pszValuePath, pszValuePath_n);
+	err = wcsncat_s(n_pszFilePath, n_pszFilePath_n, pszFileName, pszFileName_n);
+
+Error:
+	// Release memory from GetValuePath
+	if (pszValuePath != NULL) {
+		delete[] pszValuePath;
+		pszValuePath = NULL;
+	}
+
 	return r;
 }
