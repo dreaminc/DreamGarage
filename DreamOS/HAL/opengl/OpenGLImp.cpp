@@ -10,7 +10,8 @@ OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
 	m_pFragmentShader(NULL),
-	m_pWindows64App(pWindows64App)
+	m_pWindows64App(pWindows64App),
+	m_hglrc(NULL)
 {
 	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
 	ACRM(PrepareScene(), "Failed to prepare GL Scene");
@@ -75,8 +76,8 @@ RESULT OpenGLImp::InitializeGLContext() {
 	pfd.nVersion = 1;
 	pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
 	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 24;
-	pfd.cDepthBits = 24;
+	pfd.cColorBits = 32;
+	pfd.cDepthBits = 32;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 
 	int nPixelFormat = ChoosePixelFormat(m_pWindows64App->GetDeviceContext(), &pfd);
@@ -103,11 +104,12 @@ RESULT OpenGLImp::InitializeGLContext() {
 	int attribs[] = {
 		WGL_CONTEXT_MAJOR_VERSION_ARB, m_versionMajor,
 		WGL_CONTEXT_MINOR_VERSION_ARB, m_versionMinor,
-		//WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-		//WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+		//WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+		//WGL_CONTEXT_MINOR_VERSION_ARB, 2,		
 		//WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
 		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
 		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+		//WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,		// This makes non VAO work
 		0
 	};
 
@@ -275,7 +277,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(AttachShader(m_pVertexShader), "Failed to attach vertex shader");
 	CRM(AttachShader(m_pFragmentShader), "Failed to attach fragment shader");
 
-	// Some shader routing
+	// Some Shader Routing
 	CRM(BindAttribLocation(0, "in_Position"), "Failed to bind in_Position attribute");
 	CRM(BindAttribLocation(1, "in_Color"), "Failed to bind in_Color attribute");
 	
@@ -325,53 +327,54 @@ Error:
 	return r;
 }
 
+#include "Primitives/Vertex.h"
+
 // This is temporary - replace with ObjectStore architecture soon
 RESULT OpenGLImp::SetData() {
 	RESULT r = R_PASS;
 
-	float* vert = new float[9]; // vertex array
-	float* col = new float[9]; // color array
+	float z = 0.0f;
+	float height = 0.8f;
+	float width = 0.8f;
+	vertex vertTemp[3];
+	vertTemp[0].SetPoint(0.0f, height, z);
+	vertTemp[0].SetColor(1.0f, 0.0f, 0.0f);
 
-	GLfloat z = -0.5f;
+	vertTemp[1].SetPoint(-width, -height, z);
+	vertTemp[1].SetColor(0.0f, 1.0f, 0.0f);
 
-	vert[0] = 0.0f;
-	vert[1] = 0.8f;
-	vert[2] = z;
+	vertTemp[2].SetPoint(width, -height, z);
+	vertTemp[2].SetColor(0.0f, 0.0f, 1.0f);
 
-	vert[3] = -0.8f;
-	vert[4] = -0.8f;
-	vert[5] = z;
+	// TODO: Temporary VAO - Put into OpenGL Vertex or something
+	m_glGenVertexArrays(1, &m_vaoID);  //create VAO container and get ID for it
+	CRM(CheckGLError(), "glGenVertexArrays failed");
 
-	vert[6] = 0.8f;
-	vert[7] = -0.8f;
-	vert[8] = z;
-
-	col[0] = 1.0f;
-	col[1] = 0.0f;
-	col[2] = 0.0f;
-
-	col[3] = 0.0f;
-	col[4] = 1.0f;
-	col[5] = 0.0f;
-
-	col[6] = 0.0f;
-	col[7] = 0.0f;
-	col[8] = 1.0f;
+	m_glBindVertexArray(m_vaoID);      //bind to OpenGL context
+	CRM(CheckGLError(), "glBindVertexArray failed");
 
 	m_glGenBuffers(2, &m_vboID[0]);
+	CRM(CheckGLError(), "glGenBuffers failed");
 
 	m_glBindBuffer(GL_ARRAY_BUFFER, m_vboID[0]);
-	m_glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), vert, GL_STATIC_DRAW);
-	m_glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	CRM(CheckGLError(), "glBindBuffer failed");
+
+	m_glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(vertex), vertTemp, GL_STATIC_DRAW);
+	CRM(CheckGLError(), "glBufferData failed");
+
+	// Location 0 (position)
 	m_glEnableVertexAttribArray(0);
+	CRM(CheckGLError(), "glEnableVertexAttribArray failed");
 
-	m_glBindBuffer(GL_ARRAY_BUFFER, m_vboID[1]);
-	m_glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), col, GL_STATIC_DRAW);
-	m_glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	m_glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)NULL);
+	CRM(CheckGLError(), "glVertexAttribPointer failed");
+
+	// Location 1 (color)
 	m_glEnableVertexAttribArray(1);
+	CRM(CheckGLError(), "glEnableVertexAttribArray failed");
 
-	delete[] vert;
-	delete[] col;
+	m_glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)(sizeof(vertex)/2));
+	CRM(CheckGLError(), "glVertexAttribPointer failed");
 
 Error:
 	return r;
@@ -385,7 +388,7 @@ RESULT OpenGLImp::Render() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	
-	///*
+	/*
 	GLfloat z = 0.0f;
 	glBegin(GL_TRIANGLES);                      // Drawing Using Triangles
 		glVertex3f(0.0f, 1.0f, z);              // Top
@@ -563,6 +566,13 @@ RESULT OpenGLImp::InitializeExtensions() {
 	
 	CNMW((m_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer")), 
 		"Failed to initialize glVertexAttribPointer extension");
+
+	// VAO
+	CNMW((m_glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays")),
+		"Failed to initialize glGenVertexArrays extension");
+
+	CNMW((m_glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray")),
+		"Failed to initialize glBindVertexArray extension");
 
 Error:
 	return r;
