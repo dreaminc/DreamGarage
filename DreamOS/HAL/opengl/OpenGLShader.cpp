@@ -7,7 +7,8 @@
 OpenGLShader::OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType) :
 	m_pParentImp(pParentImp),
 	m_shaderType(shaderType),
-	m_pszShaderCode(NULL)
+	m_pszShaderCode(NULL),
+	m_shaderID(NULL)
 {
 	m_shaderID = m_pParentImp->glCreateShader(m_shaderType);
 }
@@ -55,7 +56,6 @@ RESULT OpenGLShader::Compile(void) {
 
 	int param;
 	m_pParentImp->glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &param);
-
 	CBM((param == GL_TRUE), "Shader Compile Error: %s", GetInfoLog());
 
 	DEBUG_LINEOUT("Compiled shader type %d with Shader ID %d", m_shaderType, m_shaderID);

@@ -90,8 +90,14 @@ public:
 		return m_glGetShaderInfoLog(shader, bufSize, length, infoLog);
 	}
 
+	inline GLboolean glIsProgram(GLuint programID) {
+		return m_glIsProgram(programID);
+	}
+
 // Extension Mappings
 private:
+	RESULT CheckGLError();
+	RESULT CreateGLProgram();
 	char* GetInfoLog();
 	RESULT UseProgram();
 	RESULT LinkProgram();
@@ -103,6 +109,8 @@ private:
 private:
 	PFNGLCREATEPROGRAMPROC m_glCreateProgram;
 	PFNGLDELETEPROGRAMPROC m_glDeleteProgram;
+	PFNGLISPROGRAMPROC m_glIsProgram;
+
 	PFNGLUSEPROGRAMPROC m_glUseProgram;
 	PFNGLATTACHSHADERPROC m_glAttachShader;
 	PFNGLDETACHSHADERPROC m_glDetachShader;
