@@ -1,14 +1,18 @@
 #include "OpenGLImp.h"
 
+#include "Sandbox/SandboxApp.h"
+#include "Sandbox/Windows/Windows64App.h"	
 
-OpenGLImp::OpenGLImp(HDC hDC) :
+//OpenGLImp::OpenGLImp(HDC hDC) :
+OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
 	m_idOpenGLProgram(NULL),
 	m_versionMinor(0),
 	m_versionMajor(0),
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
 	m_pFragmentShader(NULL),
-	e_hDC(hDC)
+	//e_hDC(hDC),
+	m_pWindows64App(pWindows64App)
 {
 	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
 	ACRM(PrepareScene(), "Failed to prepare GL Scene");
@@ -41,6 +45,10 @@ RESULT OpenGLImp::InitializeOpenGLVersion() {
 	return R_PASS;
 }
 
+SandboxApp* OpenGLImp::GetParentApp() {		
+	return (SandboxApp*)(m_pWindows64App); 
+}
+
 RESULT OpenGLImp::InitializeGLContext() {
 	RESULT r = R_PASS;
 
@@ -55,15 +63,19 @@ RESULT OpenGLImp::InitializeGLContext() {
 	pfd.cDepthBits = 32;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 
-	int nPixelFormat = ChoosePixelFormat(e_hDC, &pfd);
+	//int nPixelFormat = ChoosePixelFormat(e_hDC, &pfd);
+	int nPixelFormat = ChoosePixelFormat(m_pWindows64App->GetDeviceContext(), &pfd);
 
 	CBM((nPixelFormat != NULL), "nPixelFormat is NULL");
-	CBM((SetPixelFormat(e_hDC, nPixelFormat, &pfd)), "Failed to SetPixelFormat");
+	//CBM((SetPixelFormat(e_hDC, nPixelFormat, &pfd)), "Failed to SetPixelFormat");
+	CBM((SetPixelFormat(m_pWindows64App->GetDeviceContext(), nPixelFormat, &pfd)), "Failed to SetPixelFormat");
 
-	m_hglrc = wglCreateContext(e_hDC);
+	//m_hglrc = wglCreateContext(e_hDC);
+	m_hglrc = wglCreateContext(m_pWindows64App->GetDeviceContext());
 	ACNM(m_hglrc, "Failed to Create GL Context");
 
-	CBM((wglMakeCurrent(e_hDC, m_hglrc)), "Failed OGL wglMakeCurrent");
+	//CBM((wglMakeCurrent(e_hDC, m_hglrc)), "Failed OGL wglMakeCurrent");
+	CBM((wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc)), "Failed OGL wglMakeCurrent");
 
 	InitializeOpenGLVersion();
 
@@ -93,8 +105,10 @@ RESULT OpenGLImp::InitializeGLContext() {
 	// Save HGLRC to temp
 	HGLRC hglrcTemp = m_hglrc;
 
-	if (wglCreateContextAttribsARB != NULL)
-		m_hglrc = wglCreateContextAttribsARB(e_hDC, 0, attribs);
+	if (wglCreateContextAttribsARB != NULL) {
+		//m_hglrc = wglCreateContextAttribsARB(e_hDC, 0, attribs);
+		m_hglrc = wglCreateContextAttribsARB(m_pWindows64App->GetDeviceContext(), 0, attribs);
+	}
 
 	wglMakeCurrent(NULL, NULL);
 	wglDeleteContext(hglrcTemp);
@@ -105,10 +119,144 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
+	RESULT r = R_PASS;
+
+	CNM(m_glAttachShader, "glAttachShader extension is NULL");
+
+	m_glAttachShader(m_idOpenGLProgram, pOpenGLShader->GetShaderID());
+
+	DEBUG_LINEOUT("Attached shader %d", pOpenGLShader->GetShaderID());
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
+	RESULT r = R_PASS;
+	unsigned int err;
+	DWORD werr;
+
+	CNM(m_glBindAttribLocation, "glBindAttribLocation extension is NULL");
+
+	m_glBindAttribLocation(m_idOpenGLProgram, index, pszName);
+
+	// Check for errors
+	// TODO: Actually check these
+	err = glGetError();
+	werr = GetLastError();
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::UseProgram() {
+	RESULT r = R_PASS;
+
+	CNM(m_glUseProgram, "glUseProgram extension is NULL");
+	m_glUseProgram(m_idOpenGLProgram);
+
+Error:
+	return r;
+}
+
+// TODO: Inconsistent since it doesn't check to see that m_glGetPRogramInfoLog is not NULL
+char* OpenGLImp::GetInfoLog() {
+	RESULT r = R_PASS;
+
+	char *pszInfoLog = NULL;
+	//int pszInfoLog_n = -1;
+	int pszInfoLog_n = 4096;
+	int charsWritten_n = -1;
+
+	m_glGetProgramiv(m_idOpenGLProgram, GL_INFO_LOG_LENGTH, &pszInfoLog_n);
+	CBM((pszInfoLog_n > 0), "Program Info Log of zero length");
+
+	pszInfoLog = new char[pszInfoLog_n];
+	memset(pszInfoLog, 0, sizeof(char) * pszInfoLog_n);
+	m_glGetProgramInfoLog(m_idOpenGLProgram, pszInfoLog_n, &charsWritten_n, pszInfoLog);
+
+Error:
+	return pszInfoLog;
+}
+
+RESULT OpenGLImp::LinkProgram() {
+	RESULT r = R_PASS;
+
+	CNM(m_glLinkProgram, "glLinkProgram extension is NULL");
+	CNM(m_glGetProgramiv, "glGetProgramiv extension is NULL");
+
+	m_glLinkProgram(m_idOpenGLProgram);
+	
+	// TODO: REALLY BAD - identifying potential driver bug
+	/*
+	GLint param = GL_FALSE;
+	m_glGetProgramiv(m_idOpenGLProgram, GL_LINK_STATUS, &param);
+
+	CBM((param == GL_TRUE), "Failed to link GL Program: %s", GetInfoLog());
+
+	DEBUG_LINEOUT("Successfully linked program ID %d", m_idOpenGLProgram);
+	*/
+
+Error:
+	return r;
+}
+
+// This is temporary - replace with ObjectStore architecture soon
+RESULT OpenGLImp::SetData() {
+	RESULT r = R_PASS;
+
+	float* vert = new float[9]; // vertex array
+	float* col = new float[9]; // color array
+
+	vert[0] = 0.0f; 
+	vert[1] = 0.8f; 
+	vert[2] = -1.0f;
+
+	vert[3] = -0.8f; 
+	vert[4] = -0.8f; 
+	vert[5] = -1.0f;
+
+	vert[6] = 0.8f; 
+	vert[7] = -0.8f; 
+	vert[8] = -1.0f;
+
+	col[0] = 1.0f; 
+	col[1] = 0.0f; 
+	col[2] = 0.0f;
+
+	col[3] = 0.0f; 
+	col[4] = 1.0f; 
+	col[5] = 0.0f;
+
+	col[6] = 0.0f; 
+	col[7] = 0.0f; 
+	col[8] = 1.0f;
+
+	m_glGenBuffers(2, &m_vboID[0]);
+
+	m_glBindBuffer(GL_ARRAY_BUFFER, m_vboID[0]);
+	m_glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), vert, GL_STATIC_DRAW);
+	m_glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	m_glEnableVertexAttribArray(0);
+
+	m_glBindBuffer(GL_ARRAY_BUFFER, m_vboID[1]);
+	m_glBufferData(GL_ARRAY_BUFFER, 9 * sizeof(GLfloat), col, GL_STATIC_DRAW);
+	m_glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	m_glEnableVertexAttribArray(1);
+
+	delete[] vert;
+	delete[] col;
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 
-	wglMakeCurrent(e_hDC, m_hglrc);
+	//wglMakeCurrent(e_hDC, m_hglrc);
+	wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc);
 
 	// Clear Background
 	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -117,15 +265,40 @@ RESULT OpenGLImp::PrepareScene() {
 	m_pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
 
 	// Load the vertex shader
+	// TODO: More complex shader handling - right now statically calling minimal shader
+	// TODO: Likely put into factory
+	CRM(m_pVertexShader->LoadFromFile(L"minimal.vert"), "Failed to load minimal vertex shader");
+	CRM(m_pFragmentShader->LoadFromFile(L"minimal.frag"), "Failed to load minimal fragment shader");
 
+	// Compile the shaders
+	CRM(m_pVertexShader->Compile(), "Failed to compile vertex shader");
+	CRM(m_pFragmentShader->Compile(), "Failed to compile fragment shader");
+
+	// Attach the shaders
+	CRM(AttachShader(m_pVertexShader), "Failed to attach vertex shader");
+	CRM(AttachShader(m_pFragmentShader), "Failed to attach fragment shader");
+
+	// Some shader routing
+	CRM(BindAttribLocation(0, "in_Position"), "Failed to bind in_Position attribute");
+	CRM(BindAttribLocation(1, "in_Color"), "Failed to bind in_Color attribute");
+
+	// Link OpenGL Program
+	// TODO: Fix the error handling here (driver issue?)
+	CRM(LinkProgram(), "Failed to link program");
+	CRM(UseProgram(), "Failed to use open gl program");
+
+	// TODO: Temporary, get some data into the funnel for now
+	CRM(SetData(), "Failed to set some data");
 
 Error:
+	wglMakeCurrent(NULL, NULL);
 	return r;
 }
 
 RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
-
+	
+	///*
 	if (pxHeight <= 0)
 		pxHeight = 1;
 
@@ -137,17 +310,31 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	gluPerspective(45.0f, aspectratio, 0.2f, 255.0f);
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
+	//*/
+
+	/*
+	wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc);
+	glViewport(0, 0, (GLsizei)pxWidth, (GLsizei)pxHeight);
+	*/
 
 Error:
+	wglMakeCurrent(NULL, NULL);
 	return r;
 }
 
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;
 
-
+	wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc);
+	
+	glClear(GL_COLOR_BUFFER_BIT);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	
+	glFlush();
+	//SwapBuffers(m_pWindows64App->GetDeviceContext());
 
 Error:
+	wglMakeCurrent(NULL, NULL);
 	return r;
 }
 
@@ -182,6 +369,9 @@ RESULT OpenGLImp::InitializeExtensions() {
 
 	CNMW((m_glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram")), 
 		"Failed to initialize glLinkProgram extension");
+
+	CNMW((m_glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)wglGetProcAddress("glGetProgramInfoLog")),
+		"Failed to initialize glGetProgramiv extension");
 
 	CNMW((m_glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv")), 
 		"Failed to initialize glGetProgramiv extension");

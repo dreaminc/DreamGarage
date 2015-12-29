@@ -23,16 +23,16 @@ public:
 	OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType);
 	~OpenGLShader(void);
 
-	RESULT LoadFromFile(char *pszFilename);
+	RESULT LoadFromFile(wchar_t *pszFilename);
 	RESULT Compile(void);
 	RESULT PrintInfoLog();
 
 	char* GetInfoLog();
 	
-	inline GLuint GetID() { return m_shaderID; }
+	inline GLuint GetShaderID() { return m_shaderID; }
 
 protected:
-	char* OpenGLShader::FileRead(char *pszFileName);
+	char* OpenGLShader::FileRead(wchar_t *pszFileName);
 
 protected:
 	GLenum	m_shaderType;		// GL_VERTEX_SHADER or GL_FRAGMENT_SHADER

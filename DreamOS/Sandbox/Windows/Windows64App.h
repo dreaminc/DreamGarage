@@ -13,13 +13,12 @@
 #include <string.h>
 #include <tchar.h>
 
-#include "./HAL/opengl/OpenGLImp.h"
-#include "Sandbox/PathManager.h"
-
 #define DEFAULT_WIDTH 1024
 #define DEFAULT_HEIGHT 768
 
 #define DEFAULT_FULLSCREEN false
+
+class OpenGLImp;
 
 class Windows64App : public SandboxApp {
 public:
@@ -36,6 +35,9 @@ private:
 	long __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
+
+public:
+	HDC GetDeviceContext();
 
 private:
 	bool m_fFullscreen;
@@ -58,7 +60,6 @@ private:
 private:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	OpenGLImp *m_pOpenGLImp;	
-	PathManager *m_pPathManager;	
 };
 
 #endif // ! WINDOWS_64_APP_H_

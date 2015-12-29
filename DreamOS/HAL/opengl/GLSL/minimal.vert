@@ -1,5 +1,5 @@
 // minimal.vert
-#version 150 code
+#version 150 core
 
 in vec3 in_Position;
 in vec3 in_Color;
