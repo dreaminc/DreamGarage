@@ -3,7 +3,6 @@
 #include "Sandbox/SandboxApp.h"
 #include "Sandbox/Windows/Windows64App.h"	
 
-//OpenGLImp::OpenGLImp(HDC hDC) :
 OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
 	m_idOpenGLProgram(NULL),
 	m_versionMinor(0),
@@ -11,7 +10,6 @@ OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
 	m_pFragmentShader(NULL),
-	//e_hDC(hDC),
 	m_pWindows64App(pWindows64App)
 {
 	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
@@ -49,6 +47,24 @@ SandboxApp* OpenGLImp::GetParentApp() {
 	return (SandboxApp*)(m_pWindows64App); 
 }
 
+RESULT OpenGLImp::CreateGLProgram() {
+	RESULT r = R_PASS;
+
+	CBM((m_idOpenGLProgram == NULL), "Cannot CreateGLProgram if program id not null");
+	CNM(m_glCreateProgram, "glCreateProgram extension is NULL");
+
+	m_idOpenGLProgram = glCreateProgram();
+	CBM((m_idOpenGLProgram != 0), "Failed to create program id");
+
+	GLboolean fIsProg = glIsProgram(m_idOpenGLProgram);
+	CBM(fIsProg, "Failed to create program");
+
+	DEBUG_LINEOUT("Created GL program ID %d", m_idOpenGLProgram);
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::InitializeGLContext() {
 	RESULT r = R_PASS;
 
@@ -59,59 +75,55 @@ RESULT OpenGLImp::InitializeGLContext() {
 	pfd.nVersion = 1;
 	pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
 	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 32;
-	pfd.cDepthBits = 32;
+	pfd.cColorBits = 24;
+	pfd.cDepthBits = 24;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 
-	//int nPixelFormat = ChoosePixelFormat(e_hDC, &pfd);
 	int nPixelFormat = ChoosePixelFormat(m_pWindows64App->GetDeviceContext(), &pfd);
 
 	CBM((nPixelFormat != NULL), "nPixelFormat is NULL");
-	//CBM((SetPixelFormat(e_hDC, nPixelFormat, &pfd)), "Failed to SetPixelFormat");
 	CBM((SetPixelFormat(m_pWindows64App->GetDeviceContext(), nPixelFormat, &pfd)), "Failed to SetPixelFormat");
 
-	//m_hglrc = wglCreateContext(e_hDC);
-	m_hglrc = wglCreateContext(m_pWindows64App->GetDeviceContext());
-	ACNM(m_hglrc, "Failed to Create GL Context");
+	HGLRC hglrcTemp = wglCreateContext(m_pWindows64App->GetDeviceContext());
+	CNM(hglrcTemp, "Failed to Create GL Context");
 
-	//CBM((wglMakeCurrent(e_hDC, m_hglrc)), "Failed OGL wglMakeCurrent");
-	CBM((wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc)), "Failed OGL wglMakeCurrent");
-
-	InitializeOpenGLVersion();
+	CBM((wglMakeCurrent(m_pWindows64App->GetDeviceContext(), hglrcTemp)), "Failed OGL wglMakeCurrent");
 
 	// Should be called after context is created and made current
 	ACRM(InitializeExtensions(), "Failed to initialize extensions");
-
-	// Move this eventually?
-	if (m_glCreateProgram != NULL)
-		m_idOpenGLProgram = glCreateProgram();
+	
+	InitializeOpenGLVersion();
 
 	if (m_versionMajor < 3 || (m_versionMajor == 3 && m_versionMinor < 2)) {
 		DEBUG_LINEOUT("OpenGL 3.2+ Not Supported");
+		m_hglrc = hglrcTemp;
 		goto Error;
 	}
 
 	int attribs[] = {
 		WGL_CONTEXT_MAJOR_VERSION_ARB, m_versionMajor,
 		WGL_CONTEXT_MINOR_VERSION_ARB, m_versionMinor,
-		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+		//WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+		//WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+		//WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
 		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 		0
 	};
 
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = NULL;
 	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+	CNM(wglCreateContextAttribsARB, "wglCreateContextAttribsARB cannot be NULL");
 
-	// Save HGLRC to temp
-	HGLRC hglrcTemp = m_hglrc;
+	m_hglrc = wglCreateContextAttribsARB(m_pWindows64App->GetDeviceContext(), 0, attribs);
+	DWORD werr = GetLastError();
+	DEBUG_LINEOUT("Created OpenGL Rendering Context 0x%x", werr);
+	
+	// Should be called after context is created and made current
+	ACRM(InitializeExtensions(), "Failed to initialize extensions");
 
-	if (wglCreateContextAttribsARB != NULL) {
-		//m_hglrc = wglCreateContextAttribsARB(e_hDC, 0, attribs);
-		m_hglrc = wglCreateContextAttribsARB(m_pWindows64App->GetDeviceContext(), 0, attribs);
-	}
-
-	wglMakeCurrent(NULL, NULL);
-	wglDeleteContext(hglrcTemp);
+	CBM(wglMakeCurrent(NULL, NULL), "Failed to release rendering context");
+	CBM(wglDeleteContext(hglrcTemp), "Failed to delete temporary rendering context");
 
 	CNM(m_hglrc, "OpenGL 3.x RC was not created!");
 
@@ -119,12 +131,41 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::CheckGLError() {
+	RESULT r = R_PASS;
+
+	GLenum glerr = glGetError();
+	switch (glerr) {
+		case GL_NO_ERROR: return R_PASS; break;
+		case GL_INVALID_ENUM: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_ENUM"); break;
+		case GL_INVALID_VALUE: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_VALUE"); break;
+		case GL_INVALID_OPERATION: CBRM(false, R_FAIL, "CheckGLError: GL_INVALID_OPERATION"); break;
+		case GL_STACK_OVERFLOW: CBRM(false, R_FAIL, "CheckGLError: GL_STACK_OVERFLOW"); break;
+		case GL_STACK_UNDERFLOW: CBRM(false, R_FAIL, "CheckGLError: GL_STACK_UNDERFLOW"); break;
+		case GL_OUT_OF_MEMORY: CBRM(false, R_FAIL, "CheckGLError: GL_OUT_OF_MEMORY"); break;
+	}
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 	RESULT r = R_PASS;
+	GLint param;
+	GLint numShaders;
+	GLenum glerr = GL_NO_ERROR;
 
 	CNM(m_glAttachShader, "glAttachShader extension is NULL");
 
+	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
+	//numShaders = param;
+
 	m_glAttachShader(m_idOpenGLProgram, pOpenGLShader->GetShaderID());
+
+	CRM(CheckGLError(), "AttachShader failed with GL log:%s", pOpenGLShader->GetInfoLog());
+
+	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
+	//CBM((param = numShaders + 1), "Failed to attach shader, num shaders attached %d", param);
 
 	DEBUG_LINEOUT("Attached shader %d", pOpenGLShader->GetShaderID());
 
@@ -134,17 +175,17 @@ Error:
 
 RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 	RESULT r = R_PASS;
-	unsigned int err;
+	GLenum glerr;
 	DWORD werr;
 
 	CNM(m_glBindAttribLocation, "glBindAttribLocation extension is NULL");
 
 	m_glBindAttribLocation(m_idOpenGLProgram, index, pszName);
 
-	// Check for errors
-	// TODO: Actually check these
-	err = glGetError();
+	CRM(CheckGLError(), "BindAttribLocation failed");
+
 	werr = GetLastError();
+	DEBUG_LINEOUT("Bound attribute %s to index location %d err:0x%x", pszName, index, werr);
 
 Error:
 	return r;
@@ -155,6 +196,8 @@ RESULT OpenGLImp::UseProgram() {
 
 	CNM(m_glUseProgram, "glUseProgram extension is NULL");
 	m_glUseProgram(m_idOpenGLProgram);
+
+	CRM(CheckGLError(), "UseProgram failed");
 
 Error:
 	return r;
@@ -187,18 +230,98 @@ RESULT OpenGLImp::LinkProgram() {
 	CNM(m_glGetProgramiv, "glGetProgramiv extension is NULL");
 
 	m_glLinkProgram(m_idOpenGLProgram);
+	CRM(CheckGLError(), "glLinkProgram failed");
 	
-	// TODO: REALLY BAD - identifying potential driver bug
-	/*
 	GLint param = GL_FALSE;
+
 	m_glGetProgramiv(m_idOpenGLProgram, GL_LINK_STATUS, &param);
-
 	CBM((param == GL_TRUE), "Failed to link GL Program: %s", GetInfoLog());
-
+	
 	DEBUG_LINEOUT("Successfully linked program ID %d", m_idOpenGLProgram);
-	*/
 
 Error:
+	return r;
+}
+
+RESULT OpenGLImp::PrepareScene() {
+	RESULT r = R_PASS;
+	GLenum glerr = GL_NO_ERROR;
+
+	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
+
+	// Clear Background
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+	CRM(CreateGLProgram(), "Failed to create GL program");
+	CRM(CheckGLError(), "CreateGLProgram failed");
+
+	// TODO: Should be stuffed into factory arch - return NULL on fail
+	m_pVertexShader = new OpenGLShader(this, GL_VERTEX_SHADER);
+	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
+	m_pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
+	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
+
+	// Load the vertex shader
+	// TODO: More complex shader handling - right now statically calling minimal shader
+	// TODO: Likely put into factory
+	CRM(m_pVertexShader->LoadFromFile(L"minimal.vert"), "Failed to load minimal vertex shader");
+	CRM(m_pFragmentShader->LoadFromFile(L"minimal.frag"), "Failed to load minimal fragment shader");
+
+	// Compile the shaders
+	CRM(m_pVertexShader->Compile(), "Failed to compile vertex shader");
+	CRM(m_pFragmentShader->Compile(), "Failed to compile fragment shader");
+
+	// Attach the shaders
+	CRM(AttachShader(m_pVertexShader), "Failed to attach vertex shader");
+	CRM(AttachShader(m_pFragmentShader), "Failed to attach fragment shader");
+
+	// Some shader routing
+	CRM(BindAttribLocation(0, "in_Position"), "Failed to bind in_Position attribute");
+	CRM(BindAttribLocation(1, "in_Color"), "Failed to bind in_Color attribute");
+	
+	// Link OpenGL Program
+	// TODO: Fix the error handling here (driver issue?)
+	CRM(LinkProgram(), "Failed to link program");
+	CRM(UseProgram(), "Failed to use open gl program");
+
+	// TODO: Temporary, get some data into the funnel for now
+	CRM(SetData(), "Failed to set some data");
+
+Error:
+	if (!wglMakeCurrent(NULL, NULL))
+		DEBUG_LINEOUT("Failed to release rendering context");
+
+	return r;
+}
+
+RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
+	
+	/*
+	if (pxHeight <= 0)
+		pxHeight = 1;
+
+	int aspectratio = pxWidth / pxHeight;
+
+	glViewport(0, 0, pxWidth, pxHeight);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0f, aspectratio, 0.2f, 255.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	//*/
+
+	///*
+	
+	glViewport(0, 0, (GLsizei)pxWidth, (GLsizei)pxHeight);
+	//*/
+
+Error:
+	if (!wglMakeCurrent(NULL, NULL))
+		DEBUG_LINEOUT("Failed to release rendering context");
+
 	return r;
 }
 
@@ -209,28 +332,30 @@ RESULT OpenGLImp::SetData() {
 	float* vert = new float[9]; // vertex array
 	float* col = new float[9]; // color array
 
-	vert[0] = 0.0f; 
-	vert[1] = 0.8f; 
-	vert[2] = -1.0f;
+	GLfloat z = -0.5f;
 
-	vert[3] = -0.8f; 
-	vert[4] = -0.8f; 
-	vert[5] = -1.0f;
+	vert[0] = 0.0f;
+	vert[1] = 0.8f;
+	vert[2] = z;
 
-	vert[6] = 0.8f; 
-	vert[7] = -0.8f; 
-	vert[8] = -1.0f;
+	vert[3] = -0.8f;
+	vert[4] = -0.8f;
+	vert[5] = z;
 
-	col[0] = 1.0f; 
-	col[1] = 0.0f; 
+	vert[6] = 0.8f;
+	vert[7] = -0.8f;
+	vert[8] = z;
+
+	col[0] = 1.0f;
+	col[1] = 0.0f;
 	col[2] = 0.0f;
 
-	col[3] = 0.0f; 
-	col[4] = 1.0f; 
+	col[3] = 0.0f;
+	col[4] = 1.0f;
 	col[5] = 0.0f;
 
-	col[6] = 0.0f; 
-	col[7] = 0.0f; 
+	col[6] = 0.0f;
+	col[7] = 0.0f;
 	col[8] = 1.0f;
 
 	m_glGenBuffers(2, &m_vboID[0]);
@@ -252,89 +377,30 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::PrepareScene() {
-	RESULT r = R_PASS;
-
-	//wglMakeCurrent(e_hDC, m_hglrc);
-	wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc);
-
-	// Clear Background
-	glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-
-	m_pVertexShader = new OpenGLShader(this, GL_VERTEX_SHADER);
-	m_pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
-
-	// Load the vertex shader
-	// TODO: More complex shader handling - right now statically calling minimal shader
-	// TODO: Likely put into factory
-	CRM(m_pVertexShader->LoadFromFile(L"minimal.vert"), "Failed to load minimal vertex shader");
-	CRM(m_pFragmentShader->LoadFromFile(L"minimal.frag"), "Failed to load minimal fragment shader");
-
-	// Compile the shaders
-	CRM(m_pVertexShader->Compile(), "Failed to compile vertex shader");
-	CRM(m_pFragmentShader->Compile(), "Failed to compile fragment shader");
-
-	// Attach the shaders
-	CRM(AttachShader(m_pVertexShader), "Failed to attach vertex shader");
-	CRM(AttachShader(m_pFragmentShader), "Failed to attach fragment shader");
-
-	// Some shader routing
-	CRM(BindAttribLocation(0, "in_Position"), "Failed to bind in_Position attribute");
-	CRM(BindAttribLocation(1, "in_Color"), "Failed to bind in_Color attribute");
-
-	// Link OpenGL Program
-	// TODO: Fix the error handling here (driver issue?)
-	CRM(LinkProgram(), "Failed to link program");
-	CRM(UseProgram(), "Failed to use open gl program");
-
-	// TODO: Temporary, get some data into the funnel for now
-	CRM(SetData(), "Failed to set some data");
-
-Error:
-	wglMakeCurrent(NULL, NULL);
-	return r;
-}
-
-RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
-	RESULT r = R_PASS;
-	
-	///*
-	if (pxHeight <= 0)
-		pxHeight = 1;
-
-	int aspectratio = pxWidth / pxHeight;
-
-	glViewport(0, 0, pxWidth, pxHeight);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f, aspectratio, 0.2f, 255.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	//*/
-
-	/*
-	wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc);
-	glViewport(0, 0, (GLsizei)pxWidth, (GLsizei)pxHeight);
-	*/
-
-Error:
-	wglMakeCurrent(NULL, NULL);
-	return r;
-}
-
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;
 
-	wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc);
-	
-	glClear(GL_COLOR_BUFFER_BIT);
+	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	
+	///*
+	GLfloat z = 0.0f;
+	glBegin(GL_TRIANGLES);                      // Drawing Using Triangles
+		glVertex3f(0.0f, 1.0f, z);              // Top
+		glVertex3f(-1.0f, -1.0f, z);              // Bottom Left
+		glVertex3f(1.0f, -1.0f, z);              // Bottom Right
+	glEnd();                            // Finished Drawing The Triangle
+	//*/
+	
 	glFlush();
-	//SwapBuffers(m_pWindows64App->GetDeviceContext());
+	//SwapBuffers(m_pWindows64App->GetDeviceContext()); // This is done in the App
 
 Error:
-	wglMakeCurrent(NULL, NULL);
+	if (!wglMakeCurrent(NULL, NULL))
+		DEBUG_LINEOUT("Failed to release rendering context");
+
 	return r;
 }
 
@@ -342,6 +408,29 @@ RESULT OpenGLImp::ShutdownImplementaiton() {
 	RESULT r = R_PASS;
 
 	CBM((wglDeleteContext(m_hglrc)), "Failed to wglDeleteContext(hglrc)");
+
+	/* TODO:  Add this stuff
+	wglMakeCurrent(pDC->m_hDC, m_hrc);
+	//--------------------------------
+	m_pProgram->DetachShader(m_pVertSh);
+	m_pProgram->DetachShader(m_pFragSh);
+
+	delete m_pProgram;
+	m_pProgram = NULL;
+
+	delete m_pVertSh;
+	m_pVertSh = NULL;
+	delete m_pFragSh;
+	m_pFragSh = NULL;
+
+	wglMakeCurrent(NULL, NULL);
+	//--------------------------------
+	if (m_hrc)
+	{
+		wglDeleteContext(m_hrc);
+		m_hrc = NULL;
+	}
+	*/
 
 Error:
 	return r;
@@ -357,6 +446,9 @@ RESULT OpenGLImp::InitializeExtensions() {
 
 	CNMW((m_glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram")), 
 		"Failed to initialize glDeleteProgram extension");
+
+	CNMW((m_glIsProgram = (PFNGLISPROGRAMPROC)wglGetProcAddress("glIsProgram")),
+		"Failed to initialize glIsProgram extension");
 
 	CNMW((m_glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram")), 
 		"Failed to initialzie glUseProgram extension");

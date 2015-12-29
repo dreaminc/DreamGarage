@@ -29,7 +29,7 @@ public:
 
 	char* GetInfoLog();
 	
-	inline GLuint GetShaderID() { return m_shaderID; }
+	GLuint GetShaderID() { return m_shaderID; }
 
 protected:
 	char* OpenGLShader::FileRead(wchar_t *pszFileName);
