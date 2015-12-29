@@ -181,6 +181,7 @@
     <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h" />
     <ClInclude Include="..\..\..\Primitives\Types\UID.h" />
     <ClInclude Include="..\..\..\Primitives\vector.h" />
+    <ClInclude Include="..\..\..\Primitives\Vertex.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />

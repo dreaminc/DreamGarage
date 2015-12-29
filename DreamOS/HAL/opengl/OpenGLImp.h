@@ -64,7 +64,8 @@ private:
 	RESULT PrepareScene();
 
 	// TODO: Temporary, replace with object store arch
-	unsigned int m_vboID[2];
+	GLuint m_vboID[2];	// Temporary 
+	GLuint m_vaoID;		// Temporary
 	RESULT SetData();
 
 private:
@@ -153,6 +154,10 @@ private:
 	PFNGLBINDBUFFERPROC	m_glBindBuffer;
 	PFNGLBUFFERDATAPROC	m_glBufferData;
 	PFNGLVERTEXATTRIBPOINTERPROC m_glVertexAttribPointer;
+
+	// VAO
+	PFNGLGENVERTEXARRAYSPROC m_glGenVertexArrays;
+	PFNGLBINDVERTEXARRAYPROC m_glBindVertexArray;
 };
 
 #endif // ! OPEN_GL_IMP_H

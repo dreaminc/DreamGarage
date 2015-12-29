@@ -1,5 +1,5 @@
 // minimal.frag
-#version 150 core
+#version 450 core
 
 // precision highp float;
 

@@ -172,6 +172,9 @@
     <ClInclude Include="..\..\..\Core\Types\Object.h">
       <Filter>Core\Types</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Vertex.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
