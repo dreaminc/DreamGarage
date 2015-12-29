@@ -12,7 +12,14 @@ PathManager::PathManager() :
 PathManager::~PathManager() {
 	ACRM(Dealloc(), "PathManager failed to deallocate paths");
 
+	// Dealloc the map
 	if (m_pmapNVPPaths != NULL) {
+		std::map<PATH_VALUE_TYPE, wchar_t*>::iterator it = m_pmapNVPPaths->begin();
+		while (it != m_pmapNVPPaths->end()) {
+			delete[] it->second;
+			it++;
+		}
+
 		delete m_pmapNVPPaths;
 		m_pmapNVPPaths = NULL;
 	}
@@ -26,12 +33,19 @@ RESULT PathManager::RegisterPath(wchar_t *pszName, wchar_t *pszValue) {
 	RESULT r = R_PASS;
 	std::pair<std::map<PATH_VALUE_TYPE, wchar_t*>::iterator, bool>retVal;
 	wchar_t *pszPath = NULL;
+	errno_t err;
 
 	DEBUG_LINEOUT("Registering Name:%S Value:%S", pszName, pszValue);
 	PATH_VALUE_TYPE pathValueType = GetPathValueType(pszName);
 	CBM((pathValueType != PATH_INVALID), "Not a valid path value type");
 
-	retVal = m_pmapNVPPaths->insert(std::pair<PATH_VALUE_TYPE, wchar_t*>(pathValueType, pszValue));
+	// Copy the value - save the memory
+	int pszValueCopy_n = wcslen(pszValue) + 1;
+	wchar_t *pszValueCopy = new wchar_t[pszValueCopy_n];
+	memset(pszValueCopy, 0, sizeof(wchar_t) * pszValueCopy_n);
+	err = wcscpy_s(pszValueCopy, pszValueCopy_n, pszValue);
+
+	retVal = m_pmapNVPPaths->insert(std::pair<PATH_VALUE_TYPE, wchar_t*>(pathValueType, pszValueCopy));
 	CBM((retVal.second != false), "Failed to insert NVP into Paths map");
 
 	CRM(GetValuePath(pathValueType, pszPath), "Failed to get path value");
@@ -101,7 +115,7 @@ Error:
 	return r;
 }
 
-RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, wchar_t *pszFileName, wchar_t *n_pszFilePath) {
+RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, wchar_t *pszFileName, wchar_t * &n_pszFilePath) {
 	RESULT r = R_PASS;
 	errno_t err;
 	int pszFileName_n = wcslen(pszFileName);

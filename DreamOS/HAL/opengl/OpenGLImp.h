@@ -24,7 +24,11 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 
+// TODO: This break architecture
 #include "OpenGLShader.h"
+
+class SandboxApp; 
+class Windows64App;
 
 class OpenGLImp : public HALImp {
 private:
@@ -32,14 +36,19 @@ private:
 	HGLRC m_hglrc;		// OpenGL rendering context
 
 	// TODO: Fix this architecture 
-	HDC e_hDC;
+	//HDC e_hDC;
+	Windows64App *m_pWindows64App;
 
 	int m_versionMajor;
 	int m_versionMinor;
 	int m_versionGLSL;
 
 public:
-	OpenGLImp(HDC hDC);
+	SandboxApp *GetParentApp();	// TODO: This should go into the HALImp
+
+public:
+	//OpenGLImp(HDC hDC);
+	OpenGLImp(Windows64App *pWindows64App);
 	~OpenGLImp();
 
 public:
@@ -54,10 +63,16 @@ private:
 
 	RESULT PrepareScene();
 
+	// TODO: Temporary, replace with object store arch
+	unsigned int m_vboID[2];
+	RESULT SetData();
+
 private:
 	OpenGLShader *m_pVertexShader;
 	OpenGLShader *m_pFragmentShader;
 
+
+// TODO: Unify access to extensions
 public:
 	inline GLuint glCreateProgram(void) { return m_glCreateProgram(); }
 	inline void glDeleteProgram(GLuint programID) { return m_glDeleteProgram(programID); }
@@ -75,8 +90,17 @@ public:
 		return m_glGetShaderInfoLog(shader, bufSize, length, infoLog);
 	}
 
+// Extension Mappings
 private:
-	// OpengGL Extension Function Pointers
+	char* GetInfoLog();
+	RESULT UseProgram();
+	RESULT LinkProgram();
+	RESULT BindAttribLocation(unsigned int index, char* pszName);
+	RESULT AttachShader(OpenGLShader *pOpenGLShader);
+
+// OpengGL Extension Function Pointers
+// TODO: Push this to another object to manage the extensions
+private:
 	PFNGLCREATEPROGRAMPROC m_glCreateProgram;
 	PFNGLDELETEPROGRAMPROC m_glDeleteProgram;
 	PFNGLUSEPROGRAMPROC m_glUseProgram;
@@ -84,6 +108,7 @@ private:
 	PFNGLDETACHSHADERPROC m_glDetachShader;
 	PFNGLLINKPROGRAMPROC m_glLinkProgram;
 	PFNGLGETPROGRAMIVPROC m_glGetProgramiv;
+	PFNGLGETPROGRAMINFOLOGPROC m_glGetProgramInfoLog;
 	PFNGLGETSHADERINFOLOGPROC m_glGetShaderInfoLog;
 	PFNGLGETUNIFORMLOCATIONPROC m_glGetUniformLocation;
 	PFNGLUNIFORM1IPROC m_glUniform1i;

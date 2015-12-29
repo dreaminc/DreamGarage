@@ -10,9 +10,13 @@
 // on a given platform.  A Sandbox implementation should effectively virtualize the host sytem as if it is running
 // natively on the DreamBox
 
+#include "Sandbox/PathManager.h"
+
 class SandboxApp {
 public:
-	SandboxApp() {
+	SandboxApp() :
+		m_pPathManager(NULL)
+	{
 		// empty stub
 	}
 
@@ -24,6 +28,12 @@ public:
 	virtual RESULT ShowSandbox() = 0;
 	virtual RESULT ShutdownSandbox() = 0;
 	virtual RESULT RecoverDisplayMode() = 0;		// Do all sandboxes need this ultimately? 
+
+public:
+	inline PathManager *GetPathManager() { return m_pPathManager; }
+
+protected:
+	PathManager *m_pPathManager;
 
 private:
 	UID m_uid;

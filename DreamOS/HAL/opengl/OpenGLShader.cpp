@@ -1,6 +1,9 @@
 #include "OpenGLShader.h"
 #include "OpenGLImp.h"
 
+#include "Sandbox/SandboxApp.h"
+#include "Sandbox/PathManager.h"
+
 OpenGLShader::OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType) :
 	m_pParentImp(pParentImp),
 	m_shaderType(shaderType),
@@ -16,13 +19,27 @@ OpenGLShader::~OpenGLShader(void) {
 	}
 }
 
-RESULT OpenGLShader::LoadFromFile(char *pszFilename) {
+RESULT OpenGLShader::LoadFromFile(wchar_t *pszFilename) {
 	RESULT r = R_PASS;
-	
-	m_pszShaderCode = FileRead(pszFilename);
-	CNM(m_pszShaderCode, "Failed to read file %s", pszFilename);
+
+	SandboxApp *pParentApp = m_pParentImp->GetParentApp();
+	PathManager *pPathManager = pParentApp->GetPathManager();
+	wchar_t *pFilePath = NULL;
+
+	CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+
+	m_pszShaderCode = FileRead(pFilePath);
+	CNM(m_pszShaderCode, "Failed to read file %S", pFilePath);
+
+	DEBUG_LINEOUT("Loaded new shader %S", pFilePath);
+	//DEBUG_OUT(m_pszShaderCode);
 
 Error:
+	if (pFilePath != NULL) {
+		delete[] pFilePath;
+		pFilePath = NULL;
+	}
+
 	return r;
 }
 
@@ -39,7 +56,9 @@ RESULT OpenGLShader::Compile(void) {
 	int param;
 	m_pParentImp->glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &param);
 
-	CBM((param != GL_TRUE), "Shader Compile Error: %s", GetInfoLog());
+	CBM((param == GL_TRUE), "Shader Compile Error: %s", GetInfoLog());
+
+	DEBUG_LINEOUT("Compiled shader type %d with Shader ID %d", m_shaderType, m_shaderID);
 
 Error:
 	return r;
@@ -72,22 +91,24 @@ Error:
 	return pszInfoLog;
 }
 
-char* OpenGLShader::FileRead(char *pszFileName) {
+// TODO: Fix arch, this call returns new memory
+char* OpenGLShader::FileRead(wchar_t *pszFileName) {
 	RESULT r = R_PASS;
-
+	errno_t err;
 	char *pszFileContent = NULL;
 	FILE *pFile = NULL;
 
 	CNM(pszFileName, "Filename cannot be NULL");
 	
-	errno_t err = fopen_s(&pFile, pszFileName, "r");
+	err = _wfopen_s(&pFile, pszFileName, L"r");
 	CNM(pFile, "Failed to open %s", pszFileName);
 
 	int pFile_n = -1;
-	fseek(pFile, 0, SEEK_END);
+	err = fseek(pFile, 0, SEEK_END);
+	pFile_n = ftell(pFile);
 	rewind(pFile);		
 
-	CBM((pFile_n > 0), "File %s is empty", pszFileName);
+	CBM((pFile_n > 0), "File %S is empty", pszFileName);
 
 	pszFileContent = new char[pFile_n + 1];
 	pFile_n = fread(pszFileContent, sizeof(char), pFile_n, pFile);

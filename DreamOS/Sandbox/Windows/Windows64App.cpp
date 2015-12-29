@@ -1,14 +1,15 @@
 #include "Windows64App.h"
 #include "Sandbox/PathManagerFactory.h"
 
+#include "./HAL/opengl/OpenGLImp.h"
+
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
 	m_pxWidth(DEFAULT_WIDTH),
 	m_pxHeight(DEFAULT_HEIGHT),
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
-	m_hDC(NULL),
-	m_pPathManager(NULL)
+	m_hDC(NULL)
 {
 	// Default title
 	m_pszWindowTitle = _T("Dream OS Sandbox");
@@ -70,6 +71,10 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 Windows64App::~Windows64App() {
 	// empty stub for now
+}
+
+HDC Windows64App::GetDeviceContext() {
+	return m_hDC;
 }
 
 // This also kicks off the OpenGL implementation
@@ -159,7 +164,9 @@ RESULT Windows64App::ShowSandbox() {
 
 	// Setup OpenGL and Resize Windows etc
 	CNM(m_hDC, "Can't initialize OpenGL Implemenation with NULL Device Context");
-	m_pOpenGLImp = new OpenGLImp(m_hDC);
+	//m_pOpenGLImp = new OpenGLImp(m_hDC);
+	m_pOpenGLImp = new OpenGLImp(this);
+
 	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
 	CRM(SetDimensions(m_posX, m_posY), "Failed to resize OpenGL Implemenation");
 
