@@ -296,29 +296,17 @@ Error:
 	return r;
 }
 
+#include "Primitives/ProjectionMatrix.h"
+
 RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
-	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
-	
-	/*
-	if (pxHeight <= 0)
-		pxHeight = 1;
+	// Attempt to play with a projection matrix
+	ProjectionMatrix projMatrix(PROJECTION_MATRIX_PERSPECTIVE, pxWidth, pxHeight, 0.0f, 100.0f, 45.0f);
+	projMatrix.PrintMatrix();
 
-	int aspectratio = pxWidth / pxHeight;
-
-	glViewport(0, 0, pxWidth, pxHeight);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(45.0f, aspectratio, 0.2f, 255.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	//*/
-
-	///*
-	
+	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");	
 	glViewport(0, 0, (GLsizei)pxWidth, (GLsizei)pxHeight);
-	//*/
 
 Error:
 	if (!wglMakeCurrent(NULL, NULL))
@@ -326,7 +314,7 @@ Error:
 
 	return r;
 }
-
+// TODO: Get this out of here
 #include "Primitives/Vertex.h"
 
 // This is temporary - replace with ObjectStore architecture soon

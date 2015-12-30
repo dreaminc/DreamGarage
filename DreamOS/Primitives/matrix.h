@@ -5,119 +5,173 @@
 // DreamOS/Dimension/Primitives/matrix.h
 // Matrix Primitive Object
 
-#include "EHM.h"
+#include "RESULT/EHM.h"
+#include <cstring>
+#include <math.h>
 
-#define RANGE_CHECK
+//#define RANGE_CHECK 
 
-template <typename T>
-virtual class MatrixBase {
+// BIG TODO: Create Matrix testing suite
+
+template <typename TBase>
+class MatrixBase {
 public:
     virtual int rows() = 0;
     virtual int cols() = 0;
 
+	/*
     virtual T& operator()(unsigned i, unsigned j) = 0;
     virtual const T& operator()( unsigned i, unsigned j ) const = 0;
     virtual const T& element(unsigned i, unsigned j) const = 0;
     virtual T& element(unsigned i, unsigned j) = 0;
+	
 
 protected:
     virtual T* getData() = 0;
+	*/
 };
 
-template <typename T, int N = 4, int M = 4>
-class matrix : public MatrixBase<T>
-{
+template <typename TMatrix, int N = 4, int M = 4>
+class matrix : public MatrixBase<TMatrix> {
+//class matrix : public MatrixBase {
 
-private:
-    T m_data[N * M];
+protected:
+    TMatrix m_data[N * M];
 
 public:
     int rows() { return N; }
     int cols() { return M; }
+	
+	// Simply clears data
+	RESULT clear() {
+		memset(m_data, 0, sizeof(TMatrix) * M * N);
+		return R_PASS;
+	}
 
+public:
+	// Constructors
+	matrix() {
+		/* stub */
+	}
+
+	matrix(const matrix<TMatrix, N, M> &cp) {
+		copyData(cp.m_data);
+	}
+
+	// Destructor
+	~matrix() {
+		// empty for now
+	}
+
+	RESULT PrintMatrix() {
+		RESULT r = R_PASS;
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				DEBUG_OUT("%02f ", m_data[i * N + j]);
+			}
+			DEBUG_LINEOUT("");
+		}
+
+	Error:
+		return r;
+	}
+
+public:
+	// Proxy object passed back from look up
+	class MatrixProxyObject {
+	public:
+		MatrixProxyObject(TMatrix* pProxyArray) :
+			m_pProxyArray(pProxyArray) 
+		{ 
+			// Empty - Proxy object
+		}
+
+		// TODO: Check bounds
+		TMatrix operator[](int index) {
+			return m_pProxyArray[index];
+		}
+	private:
+		TMatrix *m_pProxyArray;
+	};
+
+	// TODO: Check bounds
+	MatrixProxyObject operator[](int index) {
+		int lookUpValue = index * M;
+		return MatrixProxyObject(m_data[lookUpValue]);
+	}
 
 protected:
-    T* getData() { return m_data; }
+	TMatrix* getData() { return m_data; }
 
+
+#ifdef RANGE_CHECK
     RESULT rangeCheck( unsigned i, unsigned j ) const {
         if( rows() <= i )
-            return E_MATRIX_ROW_OUT_OF_RANGE;
+            return R_MATRIX_ROW_OUT_OF_RANGE;
         if( cols() <= j )
-            return E_MATRIX_COL_OUT_OF_RANGE;
+            return R_MATRIX_COL_OUT_OF_RANGE;
 
         return R_OK;
     }
+#endif
 
     // For a [N1 x M1] * [N2 x M2] matrix multiplication M1 needs to equal N2
-    inline RESULT checkMultDimensions(MatrixBase<T>& arg) {
+    inline RESULT checkMultDimensions(MatrixBase<TMatrix>& arg) {
         if(cols() != arg.rows())
             return E_MATRIX_MULT_DIMENSION_MISMATCH;
 
         return R_OK;
     }
 
-    inline void copyData(T *data) {
+    inline void copyData(TMatrix *data) {
         for(int i = 0; i < (N * M); i++)
             m_data[i] = data[i];
     }
 
-    inline void addData(T *data) {
+    inline void addData(TMatrix *data) {
         for(int i = 0; i < (N * M); i++)
             m_data[i] += data[i];
     }
 
-    inline void subData(T *data) {
+    inline void subData(TMatrix *data) {
         for(int i = 0; i < (N * M); i++)
             m_data[i] += data[i];
     }
 
-    inline void multData(const T& a) {
+    inline void multData(const TMatrix& a) {
         for(int i = 0; i < (N * M); i++)
             m_data[i] *= a;
     }
 
-    inline void divData(const T& a) {
+    inline void divData(const TMatrix& a) {
         for(int i = 0; i < (N * M); i++)
             m_data[i] /= a;
     }
 
-public:
-    // Constructors
-    matrix() {
-        /* stub */
-    }
-
-    matrix( const matrix<T, N, M> &cp ) {
-        copyData(cp.m_data);
-    }
-
-    // Destructor
-    ~matrix();
-
     // Look up
     // -------------------------------------------------------------------------
-    T& operator()(unsigned i, unsigned j) {
+	TMatrix& operator()(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
         return m_data[i * N + M];
      }
 
-     const T& operator()( unsigned i, unsigned j ) const {
+     const TMatrix& operator()( unsigned i, unsigned j ) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
         return m_data[i * N + M];
      }
 
-     const T& element(unsigned i, unsigned j) const {
+     const TMatrix& element(unsigned i, unsigned j) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
         return m_data[i * N + M];
      }
 
-     T& element(unsigned i, unsigned j) {
+	 TMatrix& element(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
@@ -126,22 +180,22 @@ public:
 
     // Assignment Operators
     // -------------------------------------------------------------------------
-
+	/*
     // Copy
-    matrix& matrix::operator=(const matrix<T, N, M>& arg) {
+    matrix& matrix::operator=(const matrix<TMatrix, N, M>& arg) {
         memcpy(&m_data, arg.m_data, sizeof(T) * N * M);
         return *this;
     }
 
     // Move
     matrix& matrix::operator=(matrix<T, N, M>&& arg) {
-        assert(this != &arg);   // TODO: Asserts / EHM
-        memcpy(&m_data, arg.m_data, sizeof(T) * N * M);
+        //assert((this != &arg));   // TODO: Asserts / EHM
+        memcpy(this->m_data, arg.m_data, sizeof(T) * N * M);
         return *this;
     }
 
     // comparison
-    bool operator==( const matrix<T, N, M>& arg) const {
+    bool operator==( const matrix<TMatrix, N, M>& arg) const {
         for(int i = 0; i < N * M; i++)
             if(m_data[i] != arg[i])
                 return false;
@@ -173,8 +227,8 @@ public:
         return lhs;
     }
 
-    matrix<T, N, M> operator+( const matrix<T, N, M>&arg ) const {
-        return matrix<T>(*this).operator+=(arg);
+    matrix<TMatrix, N, M> operator+( const matrix<TMatrix, N, M>&arg ) const {
+        return matrix<TMatrix>(*this).operator+=(arg);
     }
 
     matrix& operator-=(const matrix& rhs) {
@@ -187,28 +241,28 @@ public:
         return lhs;
     }
 
-    matrix<T, N, M> operator-( const matrix<T, N, M>&arg ) const {
-        return matrix<T, N, M>(*this).operator-=(arg);
+    matrix<TMatrix, N, M> operator-( const matrix<TMatrix, N, M>&arg ) const {
+        return matrix<TMatrix, N, M>(*this).operator-=(arg);
     }
 
     // Scalar multiplication / Division
     // -------------------------------------------------------------------------
-    matrix& operator*=( const T& a ) {
+    matrix& operator*=( const TMatrix& a ) {
         multData(a);
         return *this;
     }
 
-    matrix operator*( const T& a ) const {
-        return matrix<T, N, M>(*this).operator*=(a);
+    matrix operator*( const TMatrix& a ) const {
+        return matrix<TMatrix, N, M>(*this).operator*=(a);
     }
 
-    matrix& operator/=( const T& a ) {
+    matrix& operator/=( const TMatrix& a ) {
         divData(a);
         return *this;
     }
 
-    matrix<T> operator/( const T& a ) {
-        return matrix<T, N, M>(*this).operator/=(a);
+    matrix<TMatrix> operator/( const TMatrix& a ) {
+        return matrix<TMatrix, N, M>(*this).operator/=(a);
     }
 
     // Matrix multiplication
@@ -248,32 +302,31 @@ public:
     matrix<T>& operator/=( const matrix<T>& M ) {
         return *this = *this/M;
     }
-    */
 
     // Determinants
     // -------------------------------------------------------------------------
-    matrix<T> minor( unsigned i, unsigned j ) const {
+    matrix<TMatrix> minor( unsigned i, unsigned j ) const {
         // TODO:
     }
 
-    T Determinant() const {
+	TMatrix Determinant() const {
         // TODO:
     }
 
-    T MinorDeteterminant( unsigned i, unsigned j ) const {
+	TMatrix MinorDeteterminant( unsigned i, unsigned j ) const {
         // TODO:
     }
 
     // Only valid for squares
-    matrix<T> inverse() const {
+    matrix<TMatrix> inverse() const {
         // TODO:
     }
 
-    matrix<T> pow(int exp) const {
+    matrix<TMatrix> pow(int exp) const {
         // TODO:
     }
 
-    matrix<T> identity() const {
+    matrix<TMatrix> identity() const {
         // TODO:
     }
 
@@ -282,37 +335,38 @@ public:
     }
 
     // Vector operations
-    matrix<T> getRow(unsigned j) const {
+    matrix<TMatrix> getRow(unsigned j) const {
         // TODO:
     }
 
-    matrix<T> getCol(unsigned i) const {
+    matrix<TMatrix> getCol(unsigned i) const {
         // TODO:
     }
 
-    matrix<T>& setCol(unsigned j, const matrix<T>& arg) {
+    matrix<TMatrix>& setCol(unsigned j, const matrix<TMatrix>& arg) {
         // TODO:
     }
 
-    matrix<T>& setRow(unsigned i, const matrix<T>& arg) {
+    matrix<TMatrix>& setRow(unsigned i, const matrix<TMatrix>& arg) {
         // TODO:
     }
 
-    matrix<T> deleteRow(unsigned i) const {
+    matrix<TMatrix> deleteRow(unsigned i) const {
         // TODO:
     }
 
-    matrix<T> deleteCol(unsigned j) const {
+    matrix<TMatrix> deleteCol(unsigned j) const {
         // TODO:
     }
 
-    matrix<T, N, M> transpose() const {
+    matrix<TMatrix, N, M> transpose() const {
         // TODO:
     }
 
-    matrix<T, N, M> operator~() const {
+    matrix<TMatrix, N, M> operator~() const {
         return transpose();
     }
-}
+	*/
+};
 
 #endif MATRIX_H_

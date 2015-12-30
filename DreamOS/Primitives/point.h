@@ -13,7 +13,7 @@ public:
     PointBase() {
         memset(&m_data, 0, sizeof(T) * D);
     }
-}
+};
 
 template <typename T = double>
 class point4 : public point<T, 4> {
