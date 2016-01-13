@@ -63,6 +63,13 @@ public:
 		// empty for now
 	}
 
+	RESULT Numbers(TMatrix start, TMatrix increment) {
+		for (int i = 0; i < N * M; i++)
+			m_data[i] = start + i * increment;
+
+		return R_PASS;
+	}
+
 	RESULT PrintMatrix() {
 		RESULT r = R_PASS;
 		for (int i = 0; i < N; i++) {
@@ -87,7 +94,7 @@ public:
 		}
 
 		// TODO: Check bounds
-		TMatrix operator[](int index) {
+		TMatrix& operator[](const int index) {
 			return m_pProxyArray[index];
 		}
 	private:
@@ -95,9 +102,10 @@ public:
 	};
 
 	// TODO: Check bounds
-	MatrixProxyObject operator[](int index) {
+	MatrixProxyObject& operator[](const int index) {
 		int lookUpValue = index * M;
-		return MatrixProxyObject(m_data[lookUpValue]);
+		MatrixProxyObject retProxy(&(m_data[lookUpValue]));
+		return retProxy;
 	}
 
 protected:
@@ -150,6 +158,7 @@ protected:
 
     // Look up
     // -------------------------------------------------------------------------
+public:
 	TMatrix& operator()(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);

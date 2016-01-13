@@ -302,8 +302,29 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	// Attempt to play with a projection matrix
-	ProjectionMatrix projMatrix(PROJECTION_MATRIX_PERSPECTIVE, pxWidth, pxHeight, 0.0f, 100.0f, 45.0f);
+	DEBUG_LINEOUT("Setting Projection Matrix width %d height %d", pxWidth, pxHeight);
+	ProjectionMatrix projMatrix(PROJECTION_MATRIX_PERSPECTIVE, pxWidth, pxHeight, 1.0f, 100.0f, 45.0f);
 	projMatrix.PrintMatrix();
+
+	projMatrix.Numbers(0.0f, 1.0f);
+	projMatrix.PrintMatrix();
+
+	for (int i = 0; i < projMatrix.rows(); i++)
+		for (int j = 0; j < projMatrix.cols(); j++)
+			projMatrix.element(i, j) = i * projMatrix.cols() + j;
+	projMatrix.PrintMatrix();
+
+	for (int i = 0; i < projMatrix.rows(); i++)
+		for (int j = 0; j < projMatrix.cols(); j++)
+			projMatrix(i, j) = i * projMatrix.cols() + j;
+	projMatrix.PrintMatrix();
+
+	/*
+	for (int i = 0; i < projMatrix.rows(); i++)
+		for (int j = 0; j < projMatrix.cols(); j++)
+			projMatrix[i][j] = i * projMatrix.cols() + j;
+	projMatrix.PrintMatrix();
+	*/
 
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");	
 	glViewport(0, 0, (GLsizei)pxWidth, (GLsizei)pxHeight);
