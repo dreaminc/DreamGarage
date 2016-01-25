@@ -306,6 +306,10 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	ProjectionMatrix projMatrix(PROJECTION_MATRIX_PERSPECTIVE, pxWidth, pxHeight, 1.0f, 100.0f, 45.0f);
 	projMatrix.PrintMatrix();
 
+	/*
+	projMatrix.NumbersByElement(0.0f, 1.0f);
+	projMatrix.PrintMatrix();
+
 	projMatrix.Numbers(0.0f, 1.0f);
 	projMatrix.PrintMatrix();
 
@@ -318,6 +322,7 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 		for (int j = 0; j < projMatrix.cols(); j++)
 			projMatrix(i, j) = i * projMatrix.cols() + j;
 	projMatrix.PrintMatrix();
+	*/
 
 	/*
 	for (int i = 0; i < projMatrix.rows(); i++)
