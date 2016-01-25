@@ -70,6 +70,14 @@ public:
 		return R_PASS;
 	}
 
+	RESULT NumbersByElement(TMatrix start, TMatrix increment) {
+		for (int i = 0; i < N; i++)
+			for (int j = 0; j < M; j++) 
+				this->element(i, j) = start + ((i * N) + j) * increment;
+
+		return R_PASS;
+	}
+
 	RESULT PrintMatrix() {
 		RESULT r = R_PASS;
 		for (int i = 0; i < N; i++) {
@@ -114,9 +122,9 @@ protected:
 
 #ifdef RANGE_CHECK
     RESULT rangeCheck( unsigned i, unsigned j ) const {
-        if( rows() <= i )
+        if( i < rows())
             return R_MATRIX_ROW_OUT_OF_RANGE;
-        if( cols() <= j )
+        if( j < cols() )
             return R_MATRIX_COL_OUT_OF_RANGE;
 
         return R_OK;
@@ -182,9 +190,9 @@ public:
 
 	 TMatrix& element(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
-            rangeCheck(i,j);
+            rangeCheck(i, j);
         #endif
-        return m_data[i * N + M];
+        return m_data[(i * N) + j];
      }
 
     // Assignment Operators
