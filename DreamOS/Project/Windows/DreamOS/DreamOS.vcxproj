@@ -169,6 +169,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h" />
+    <ClInclude Include="..\..\..\HAL\Shader.h" />
     <ClInclude Include="..\..\..\OSX\OSXApp.h" />
     <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h" />
     <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h" />
