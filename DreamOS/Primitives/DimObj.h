@@ -22,6 +22,9 @@ public:
     ~DimObj() {
         /* stub */
     }
+
+private:
+	UID m_uid;
 }
 
 #endif // !DIM_OBJ_H_

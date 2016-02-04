@@ -7,7 +7,7 @@
 // These should be accessed through the OpenGLShaderFactory object
 
 #include "./RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
+#include "./HAL/Shader.h"
 
 // Header File For The OpenGL32 Library
 #include <windows.h>                              // Header File For Windows
@@ -18,7 +18,7 @@
 
 class OpenGLImp;	// Declare OpenGLImp class
 
-class OpenGLShader {
+class OpenGLShader : public Shader {
 public:
 	OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType);
 	~OpenGLShader(void);
@@ -29,7 +29,17 @@ public:
 
 	char* GetInfoLog();
 	
-	GLuint GetShaderID() { return m_shaderID; }
+	GLuint GetShaderID() { 
+		return m_shaderID; 
+	}
+
+	RESULT LoadFromString(const char* pszSource);
+	RESULT CreateAndLinkProgram();
+	RESULT Enable();
+	RESULT Disable();
+	RESULT AddAttribute(const char *pszAttribute);
+	RESULT AddUniform(const char *pszUniform);
+	RESULT DeleteShader();
 
 protected:
 	char* OpenGLShader::FileRead(wchar_t *pszFileName);
@@ -40,7 +50,6 @@ protected:
 	char*	m_pszShaderCode;
 
 private:
-	UID m_uid;
 	OpenGLImp *m_pParentImp;
 };
 
