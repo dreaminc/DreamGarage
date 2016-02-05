@@ -95,6 +95,15 @@ public:
 	inline GLboolean glIsProgram(GLuint programID) {
 		return m_glIsProgram(programID);
 	}
+	
+	RESULT glGenVertexArrays(GLsizei n, GLuint *arrays);
+	RESULT glBindVertexArray(GLuint gluiArray);
+	RESULT glGenBuffers(GLsizei n, GLuint *buffers);
+	RESULT glBindBuffer(GLenum target, GLuint buffer);
+	RESULT glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
+	RESULT glEnableVertexAtrribArray(GLuint index);
+	RESULT glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
+
 
 // Extension Mappings
 private:
