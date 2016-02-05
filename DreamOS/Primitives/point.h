@@ -10,7 +10,13 @@
 #include "matrix.h"
 #include "vector.h"
 
-class point : public matrix <double, 4, 0> {
+class point;
+class vector;
+
+// Difference between two points will be a vector
+vector operator-(const point &lhs, const point &rhs);
+
+class point : public matrix <double, 4, 1> {
 public:
 	point() {
 		clear();
@@ -37,11 +43,7 @@ public:
 		return *this;
 	}
 	*/
-	
-	// Difference between two points will be a vector
-	friend vector operator-(point lhs, const point& rhs) {
-		return retVector(rhs.x() - lhs.x(), rhs.y() - lhs.y(), rhs.z() - lhs.z());
-	}
+
 
 	/*
 	vector<TMatrix, N, M> operator-(const matrix<TMatrix, N, M>&arg) const {
