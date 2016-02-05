@@ -46,9 +46,22 @@ public:
 	// equ: AB == BC == AC
 	// iso: AB == BC != AC || AB == AC != BC | AB != BC == AC 
 	TRIANGLE_TYPE EvaluatePoints(point a, point b, point c) {
+		int count = 0;
+
 		double AB = (b - a).magnitude();
 		double BC = (c - b).magnitude();
 		double AC = (c - a).magnitude();
+
+		if (AB == BC) count++;
+		if (AB == AB) count++;
+		if (AC == AB) count++;
+
+		if (count == 3)
+			return EQUILATERAL;
+		else if (count == 2)
+			return ISOCELES;
+		else
+			return SCALANE;
 	}
 
 private:

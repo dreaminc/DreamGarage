@@ -55,7 +55,7 @@ public:
 	}
 
 	matrix(const matrix<TMatrix, N, M> &cp) {
-		copyData(cp.m_data);
+		copyData((TMatrix *)cp.m_data);
 	}
 
 	// Destructor

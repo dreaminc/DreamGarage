@@ -10,7 +10,7 @@
 #include "matrix.h"
 #include "point.h"
 
-class vector : public matrix <double, 4, 0> {
+class vector : public matrix <double, 4, 1> {
 public:
 	vector() {
 		clear();
@@ -29,6 +29,11 @@ public:
 	inline double &y() { return this->element(1, 0); }
 	inline double &z() { return this->element(2, 0); }
 	inline double &w() { return this->element(3, 0); }
+
+	inline double &x(double val) { return this->element(0, 0) = val; }
+	inline double &y(double val) { return this->element(1, 0) = val; }
+	inline double &z(double val) { return this->element(2, 0) = val; }
+	inline double &w(double val) { return this->element(3, 0) = val; }
 
 	double magnitude() {
 		double sqaureSum = pow(x(), 2) + pow(y(), 2) + pow(z(), 2);

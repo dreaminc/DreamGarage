@@ -22,7 +22,11 @@
 #define C_B 2 
 #define C_A 3 
 
-// TODO: Port to LinAlgLib
+#include "matrix.h"
+#include "vector.h"
+#include "point.h"
+
+// TODO: Port to LinAlgLib (using point etc)
 class vertex {
 public:
 	vertex() {
@@ -30,11 +34,23 @@ public:
 		for (int i = 0; i < COLOR_DIMENSIONS; i++) m_pColor[i] = 0.0f;
 	}
 
+	vertex(point p) {
+		SetPoint(p);
+	}
+
 	~vertex() {
 		// Empty stub for now
 	}
 
 public:
+	RESULT SetPoint(point p) {
+		m_pPoint[V_X] = p.x();
+		m_pPoint[V_Y] = p.y();
+		m_pPoint[V_Z] = p.z();
+
+		return R_PASS;
+	}
+
 	//RESULT SetPointW(float x, float y, float z, float w);
 	RESULT SetPoint(float x, float y, float z) {
 		m_pPoint[V_X] = x;
