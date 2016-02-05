@@ -192,6 +192,7 @@ RESULT Windows64App::ShowSandbox() {
 		if(m_pOpenGLImp != NULL)
 			m_pOpenGLImp->Render();
 
+		// Move into implementation?
 		SwapBuffers(m_hDC);			// Swap buffers
 
 		if (GetAsyncKeyState(VK_ESCAPE))
