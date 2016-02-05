@@ -23,23 +23,33 @@ public:
 	OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType);
 	~OpenGLShader(void);
 
-	RESULT LoadFromFile(wchar_t *pszFilename);
+	RESULT InitializeFromFile(wchar_t *pszFilename);
+	
+	
+	RESULT LoadShaderCodeFromFile(wchar_t *pszFilename);
+	RESULT LoadShaderCodeFromString(const char* pszSource);
+
+
 	RESULT Compile(void);
 	RESULT PrintInfoLog();
 
 	char* GetInfoLog();
 	
-	GLuint GetShaderID() { 
-		return m_shaderID; 
-	}
+	// Access funcs
+	GLuint GetShaderID() { return m_shaderID; }
+	GLenum GetShaderType() { return m_shaderType; }
+	const char *GetShaderCode() { return m_pszShaderCode; }
 
-	RESULT LoadFromString(const char* pszSource);
+	/*
 	RESULT CreateAndLinkProgram();
 	RESULT Enable();
 	RESULT Disable();
 	RESULT AddAttribute(const char *pszAttribute);
 	RESULT AddUniform(const char *pszUniform);
 	RESULT DeleteShader();
+	*/
+
+	RESULT AttachShader();
 
 protected:
 	char* OpenGLShader::FileRead(wchar_t *pszFileName);

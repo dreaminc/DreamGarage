@@ -20,7 +20,7 @@ OpenGLShader::~OpenGLShader(void) {
 	}
 }
 
-RESULT OpenGLShader::LoadFromFile(wchar_t *pszFilename) {
+RESULT OpenGLShader::LoadShaderCodeFromFile(wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
 	SandboxApp *pParentApp = m_pParentImp->GetParentApp();
@@ -44,6 +44,36 @@ Error:
 	return r;
 }
 
+RESULT OpenGLShader::InitializeFromFile(wchar_t *pszFilename) {
+	RESULT r = R_PASS;
+
+	CRM(LoadShaderCodeFromFile(pszFilename), "Failed to load vertex shader code from %S", pszFilename);
+	CRM(Compile(), "Failed to compile shader");
+	CRM(AttachShader(), "Failed to attach vertex shader");
+
+Error:
+	return r;
+}
+
+// Copy over the code - assuming const
+RESULT OpenGLShader::LoadShaderCodeFromString(const char* pszSource) {
+	RESULT r = R_PASS;
+
+	int length = strlen(pszSource);
+	m_pszShaderCode = (char*)(new char(length * sizeof(char)));
+	CNM(m_pszShaderCode, "Failed to allocated %d bytes for shader code", length);
+
+	CBM((strcpy_s(m_pszShaderCode, (length * sizeof(char)), pszSource) == 0), "Failed to copy over code string");
+
+	return r;
+Error:
+	if (m_pszShaderCode != NULL) {
+		delete m_pszShaderCode;
+		m_pszShaderCode = NULL;
+	}
+	return r;
+}
+
 RESULT OpenGLShader::Compile(void) {
 	RESULT r = R_PASS;
 
@@ -59,6 +89,16 @@ RESULT OpenGLShader::Compile(void) {
 	CBM((param == GL_TRUE), "Shader Compile Error: %s", GetInfoLog());
 
 	DEBUG_LINEOUT("Compiled shader type %d with Shader ID %d", m_shaderType, m_shaderID);
+
+Error:
+	return r;
+}
+
+// TODO: Is this even needed or can it be placed into the init function
+RESULT OpenGLShader::AttachShader() {
+	RESULT r = R_PASS;
+
+	CRM(m_pParentImp->AttachShader(this), "Failed to attach to parent implementation");
 
 Error:
 	return r;

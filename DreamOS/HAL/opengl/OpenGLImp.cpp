@@ -157,6 +157,24 @@ RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 	GLint numShaders;
 	GLenum glerr = GL_NO_ERROR;
 
+	OpenGLShader *&pOGLShader = this->m_pVertexShader;
+
+	switch (pOpenGLShader->GetShaderType()) {
+		case GL_VERTEX_SHADER: {
+			pOGLShader = this->m_pVertexShader;
+		} break;
+
+		case GL_FRAGMENT_SHADER: {
+			pOGLShader = this->m_pFragmentShader;
+		} break;
+
+		default: {
+			CBM((0), "Shader type 0x%x cannot be attached", pOpenGLShader->GetShaderType());
+		}
+	}
+
+	CBM((pOGLShader == NULL), "Current shader 0x%x already assigned, detach existing shader", pOpenGLShader->GetShaderType());
+
 	CNM(m_glAttachShader, "glAttachShader extension is NULL");
 
 	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
@@ -169,7 +187,9 @@ RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
 	//CBM((param = numShaders + 1), "Failed to attach shader, num shaders attached %d", param);
 
-	DEBUG_LINEOUT("Attached shader %d", pOpenGLShader->GetShaderID());
+	// Assign the shader to the implementation stage
+	pOGLShader = pOpenGLShader;
+	DEBUG_LINEOUT("Attached shader %d type 0x%x", pOpenGLShader->GetShaderID(), pOpenGLShader->GetShaderType());
 
 Error:
 	return r;
@@ -258,24 +278,15 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(CheckGLError(), "CreateGLProgram failed");
 
 	// TODO: Should be stuffed into factory arch - return NULL on fail
-	m_pVertexShader = new OpenGLShader(this, GL_VERTEX_SHADER);
-	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
-	m_pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
-	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
-
-	// Load the vertex shader
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
-	CRM(m_pVertexShader->LoadFromFile(L"minimal.vert"), "Failed to load minimal vertex shader");
-	CRM(m_pFragmentShader->LoadFromFile(L"minimal.frag"), "Failed to load minimal fragment shader");
+	OpenGLShader *pVertexShader = new OpenGLShader(this, GL_VERTEX_SHADER);
+	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
+	CRM(pVertexShader->InitializeFromFile(L"minimal.vert"), "Failed to initialize vertex shader from file");
 
-	// Compile the shaders
-	CRM(m_pVertexShader->Compile(), "Failed to compile vertex shader");
-	CRM(m_pFragmentShader->Compile(), "Failed to compile fragment shader");
-
-	// Attach the shaders
-	CRM(AttachShader(m_pVertexShader), "Failed to attach vertex shader");
-	CRM(AttachShader(m_pFragmentShader), "Failed to attach fragment shader");
+	OpenGLShader *pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
+	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
+	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag"), "Failed to initialize fragment shader from file");
 
 	// Some Shader Routing
 	CRM(BindAttribLocation(0, "in_Position"), "Failed to bind in_Position attribute");

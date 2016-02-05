@@ -71,6 +71,7 @@ private:
 private:
 	OpenGLShader *m_pVertexShader;
 	OpenGLShader *m_pFragmentShader;
+	// Other shaders
 
 
 // TODO: Unify access to extensions
@@ -103,6 +104,8 @@ private:
 	RESULT UseProgram();
 	RESULT LinkProgram();
 	RESULT BindAttribLocation(unsigned int index, char* pszName);
+
+public:
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 
 // OpengGL Extension Function Pointers
