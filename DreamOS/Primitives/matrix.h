@@ -181,14 +181,14 @@ public:
         return m_data[i * N + M];
      }
 
-     const TMatrix& element(unsigned i, unsigned j) const {
+     inline const TMatrix& element(unsigned i, unsigned j) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
         return m_data[i * N + M];
      }
 
-	 TMatrix& element(unsigned i, unsigned j) {
+	 inline TMatrix& element(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
             rangeCheck(i, j);
         #endif

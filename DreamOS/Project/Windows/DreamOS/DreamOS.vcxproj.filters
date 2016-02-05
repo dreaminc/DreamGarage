@@ -184,6 +184,9 @@
     <ClInclude Include="..\..\..\HAL\Shader.h">
       <Filter>HAL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Triangle.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
