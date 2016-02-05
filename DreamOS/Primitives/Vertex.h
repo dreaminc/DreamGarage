@@ -22,6 +22,7 @@
 #define C_B 2 
 #define C_A 3 
 
+// TODO: Port to LinAlgLib
 class vertex {
 public:
 	vertex() {

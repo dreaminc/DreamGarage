@@ -1,12 +1,56 @@
 #ifndef POINT_H_
 #define POINT_H_
 
+#include "RESULT/EHM.h"
+
 // DREAM OS
 // DreamOS/Dimension/Primitives/point.h
 // Point Primitive Object derived from matrix
 
 #include "matrix.h"
+#include "vector.h"
 
+class point : public matrix <double, 4, 0> {
+public:
+	point() {
+		clear();
+	}
+
+	point(double x, double y, double z) {
+		this->clear();
+		this->element(0, 0) = x;
+		this->element(1, 0) = y;
+		this->element(2, 0) = z;
+		this->element(3, 0) = 1.0f;
+	}
+
+	// TODO: Understand performance implications of this although both element and this are inline
+	inline double &x() { return this->element(0, 0); }
+	inline double &y() { return this->element(1, 0); }
+	inline double &z() { return this->element(2, 0); }
+	inline double &w() { return this->element(3, 0); }
+
+	/*
+	// Subtracting points results in vector
+	matrix& operator-=(const matrix& rhs) {
+		subData(rhs.m_data);
+		return *this;
+	}
+	*/
+	
+	// Difference between two points will be a vector
+	friend vector operator-(point lhs, const point& rhs) {
+		return retVector(rhs.x() - lhs.x(), rhs.y() - lhs.y(), rhs.z() - lhs.z());
+	}
+
+	/*
+	vector<TMatrix, N, M> operator-(const matrix<TMatrix, N, M>&arg) const {
+		return matrix<TMatrix, N, M>(*this).operator-=(arg);
+	}
+	*/
+};
+
+/*
 template <typename T = double, int D = 4>
 class PointBase : public matrix <T, D, 0> {
 public:
@@ -59,5 +103,6 @@ typedef point2<float, 2> point2f;
 
 // Default Point a 4 dimensional double point
 typedef point4d point;
+*/
 
 #endif // !POINT_H_
