@@ -405,67 +405,6 @@ Error:
 	return r;
 }
 
-// Bind Array to OpenGL context
-RESULT OpenGLImp::glBindVertexArray(GLuint gluiArray) {
-	RESULT r = R_PASS;
-
-	m_glBindVertexArray(gluiArray);      
-	CRM(CheckGLError(), "glBindVertexArray failed");
-
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::glGenBuffers(GLsizei n, GLuint *buffers) {
-	RESULT r = R_PASS;
-
-	m_glGenBuffers(n, buffers);
-	CRM(CheckGLError(), "glGenBuffers failed");
-
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
-	RESULT r = R_PASS;
-
-	m_glBindBuffer(target, gluiBuffer);
-	CRM(CheckGLError(), "glBindBuffer failed");
-
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
-	RESULT r = R_PASS;
-
-	m_glBufferData(target, size, data, usage);
-	CRM(CheckGLError(), "glBufferData failed");
-
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::glEnableVertexAtrribArray(GLuint index) {
-	RESULT r = R_PASS;
-
-	m_glEnableVertexAttribArray(index);
-	CRM(CheckGLError(), "glEnableVertexAttribArray failed");
-
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
-	RESULT r = R_PASS;
-
-	m_glVertexAttribPointer(index, size, type, normalized, stride, pointer);
-	CRM(CheckGLError(), "glVertexAttribPointer failed");
-
-Error:
-	return r;
-}
-
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;
 
@@ -532,6 +471,67 @@ RESULT OpenGLImp::glGenVertexArrays(GLsizei n, GLuint *arrays) {
 
 	m_glGenVertexArrays(n, arrays);  //create VAO container and get ID for it
 	CRM(CheckGLError(), "glGenVertexArrays failed");
+
+Error:
+	return r;
+}
+
+// Bind Array to OpenGL context
+RESULT OpenGLImp::glBindVertexArray(GLuint gluiArray) {
+	RESULT r = R_PASS;
+
+	m_glBindVertexArray(gluiArray);
+	CRM(CheckGLError(), "glBindVertexArray failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGenBuffers(GLsizei n, GLuint *buffers) {
+	RESULT r = R_PASS;
+
+	m_glGenBuffers(n, buffers);
+	CRM(CheckGLError(), "glGenBuffers failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
+	RESULT r = R_PASS;
+
+	m_glBindBuffer(target, gluiBuffer);
+	CRM(CheckGLError(), "glBindBuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
+	RESULT r = R_PASS;
+
+	m_glBufferData(target, size, data, usage);
+	CRM(CheckGLError(), "glBufferData failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glEnableVertexAtrribArray(GLuint index) {
+	RESULT r = R_PASS;
+
+	m_glEnableVertexAttribArray(index);
+	CRM(CheckGLError(), "glEnableVertexAttribArray failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
+	RESULT r = R_PASS;
+
+	m_glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+	CRM(CheckGLError(), "glVertexAttribPointer failed");
 
 Error:
 	return r;
