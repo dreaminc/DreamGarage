@@ -15,7 +15,7 @@
 #define NUM_TRI_POINTS 3
 
 class triangle : public DimObj {
-private:
+protected:
 	vertex m_vertices[NUM_TRI_POINTS];
 
 public:
