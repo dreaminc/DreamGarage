@@ -34,6 +34,7 @@ public:
 	//float m_pColor[COLOR_DIMENSIONS];
 	point m_point;
 	color m_color;
+	vector m_normal;
 
 	// TODO: Normal
 	// TODO: UV coordinate 
@@ -42,16 +43,25 @@ public:
 	vertex() {
 		m_point.clear();
 		m_color.clear();
+		m_normal.clear();
 	}
 
 	vertex(point p) {
 		SetPoint(p);
 		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
+		m_normal.clear();
 	}
 
 	vertex(point p, color c) {
 		SetPoint(p);
 		SetColor(c);
+		m_normal.clear();
+	}
+
+	vertex(point p, color c, vector n) {
+		SetPoint(p);
+		SetColor(c);
+		SetNormal(n);
 	}
 
 	~vertex() {
@@ -90,70 +100,53 @@ public:
 		return m_color;
 	}
 
+	inline vector GetNormal() {
+		return m_normal;
+	}
+
 public:
 	RESULT SetPoint(point p) {
-		/*m_pPoint[V_X] = p.x();
-		m_pPoint[V_Y] = p.y();
-		m_pPoint[V_Z] = p.z();*/
-
 		m_point = p;
-
 		return R_PASS;
 	}
 
 	//RESULT SetPointW(float x, float y, float z, float w);
 	RESULT SetPoint(point_precision x, point_precision y, point_precision z) {
-		/*m_pPoint[V_X] = x;
-		m_pPoint[V_Y] = y;
-		m_pPoint[V_Z] = z;*/
-
 		m_point = point(x, y, z);
-		
 		return R_PASS;
 	}
 	
 	//RESULT SetColorA(float x, float y, float z);
 	RESULT SetColor(color_precision r, color_precision g, color_precision b) {
-		/*m_pColor[C_R] = r;
-		m_pColor[C_G] = g;
-		m_pColor[C_B] = b;*/
-
 		m_color = color(r, g, b, 1.0f);
-
 		return R_PASS;
 	}
 
 	RESULT SetColor(color_precision r, color_precision g, color_precision b, color_precision a) {
-		/*m_pColor[C_R] = r;
-		m_pColor[C_G] = g;
-		m_pColor[C_B] = b;*/
-
 		m_color = color(r, g, b, a);
-
 		return R_PASS;
 	}
 
 	RESULT SetColor(color c) {
-		/*m_pColor[C_R] = c.r();
-		m_pColor[C_G] = c.g();
-		m_pColor[C_B] = c.b();*/
-
 		m_color = c;
+		return R_PASS;
+	}
 
+	RESULT SetNormal(vector n) {
+		m_normal = n;
+		return R_PASS;
+	}
+
+	//RESULT SetPointW(float x, float y, float z, float w);
+	RESULT SetNormal(vector_precision i, vector_precision j, vector_precision k) {
+		m_normal = vector(i, j, k);
 		return R_PASS;
 	}
 
 	RESULT SetVertex(vertex v) {
-		/*
-		for (int i = 0; i < VERTEX_DIMENSIONS; i++)
-			m_pPoint[i] = v.m_pPoint[i];
-
-		for (int i = 0; i < COLOR_DIMENSIONS; i++)
-			m_pColor[i] = v.m_pColor[i];
-		*/
-
 		m_point = v.GetPoint();
 		m_color = v.GetColor();
+		m_normal = v.GetNormal();
 
 		return R_PASS;
 	}
