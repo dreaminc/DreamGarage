@@ -27,7 +27,7 @@ public:
 	//virtual inline vertex *VertexData() = 0;
 	//virtual inline int VertexDataSize() = 0;
 
-	virtual RESULT Render() = 0;
+	//virtual RESULT Render() = 0;
 	virtual DimObj *GetDimObj() = 0;
 
 	// This needs to be called from the sub-class constructor
@@ -50,12 +50,13 @@ public:
 		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 	
-		/* Index Element Buffer
-		//index buffer object -> we hold the index of vertex
-		glGenBuffers(1, &gl_index_buffer_object);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gl_index_buffer_object);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(unsigned int), &indices[0], GL_STATIC_DRAW);
-		*/
+		// Index Element Buffer
+		dimindex *pIndex = pDimObj->IndexData();
+		int pIndex_s = pDimObj->IndexDataSize();
+
+		CR(m_pParentImp->glGenBuffers(1, &m_IBO));
+		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO));
+		CR(m_pParentImp->glBufferData(GL_ELEMENT_ARRAY_BUFFER, pIndex_s, pIndex, GL_STATIC_DRAW));
 
 		// Enable the vertex attribute arrays
 		// TODO: This needs to come out of the Implementation shader compilation, should not be static
@@ -89,10 +90,25 @@ public:
 		return r;
 	}
 
+	// Override this method when necessary by a child object
+	// Many objects will not need to though. 
+	RESULT Render() {
+		RESULT r = R_PASS;
+
+		// TODO: Rethink this since it's in the critical path
+		DimObj *pDimObj = GetDimObj();
+
+		CR(m_pParentImp->glBindVertexArray(m_hVAO));
+		glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+
+	Error:
+		return r;
+	}
+
 protected:
-	GLuint m_hVAO;
-	//GLuint m_hVBOs[NUM_VBO];
-	GLuint m_hVBO;
+	GLuint m_hVAO;		// vertex array object
+	GLuint m_hVBO;		// vertex buffer object
+	GLuint m_IBO;		// index buffer object
 	OpenGLImp *m_pParentImp;
 };
 

@@ -34,11 +34,19 @@ public:
 		CR(AllocateVertices(NUM_TRI_POINTS));
 		CR(AllocateIndices(NUM_TRI_POINTS));
 
+		// Triangle indices are simply their count
+		for (int i = 0; i < NUM_TRI_POINTS; i++)
+			m_pIndices[i] = i;
+
 	Error:
 		return R_PASS;
 	}
 
 	inline int NumberVertices() {
+		return NUM_TRI_POINTS;
+	}
+
+	inline int NumberIndices() {
 		return NUM_TRI_POINTS;
 	}
 
