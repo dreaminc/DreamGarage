@@ -30,18 +30,18 @@
 // TODO: Port to LinAlgLib (using point etc)
 class vertex {
 public:
-	float m_pPoint[VERTEX_DIMENSIONS];
-	float m_pColor[COLOR_DIMENSIONS];
+	//float m_pPoint[VERTEX_DIMENSIONS];
+	//float m_pColor[COLOR_DIMENSIONS];
+	point m_point;
+	color m_color;
+
 	// TODO: Normal
 	// TODO: UV coordinate 
 
 public:
 	vertex() {
-		for (int i = 0; i < VERTEX_DIMENSIONS; i++) 
-			m_pPoint[i] = 0.0f;
-
-		for (int i = 0; i < COLOR_DIMENSIONS; i++) 
-			m_pColor[i] = 0.0f;
+		m_point.clear();
+		m_color.clear();
 	}
 
 	vertex(point p) {
@@ -63,63 +63,102 @@ public:
 	}
 
 	static void* GetColorOffset() {
-		return (void*)(sizeof(float) * VERTEX_DIMENSIONS);
+		return (void*)(sizeof(point));
+	}
+
+	static void* GetNormalOffset() {
+		return (void*)(sizeof(point) + sizeof(color));
+	}
+
+	static void* GetUVOffset() {
+		return (void*)(sizeof(point) + sizeof(color) + sizeof(vector));
 	}
 
 	inline static int GetPointDimensions() {
-		return 3;	// temp
 		return point::rows();
 	}
 
 	inline static int GetColorDimensions() {
-		return 3; // temp
 		return color::rows();
+	}
+
+	inline point GetPoint() {
+		return m_point;
+	}
+
+	inline color GetColor() {
+		return m_color;
 	}
 
 public:
 	RESULT SetPoint(point p) {
-		m_pPoint[V_X] = p.x();
+		/*m_pPoint[V_X] = p.x();
 		m_pPoint[V_Y] = p.y();
-		m_pPoint[V_Z] = p.z();
+		m_pPoint[V_Z] = p.z();*/
+
+		m_point = p;
 
 		return R_PASS;
 	}
 
 	//RESULT SetPointW(float x, float y, float z, float w);
-	RESULT SetPoint(float x, float y, float z) {
-		m_pPoint[V_X] = x;
+	RESULT SetPoint(point_precision x, point_precision y, point_precision z) {
+		/*m_pPoint[V_X] = x;
 		m_pPoint[V_Y] = y;
-		m_pPoint[V_Z] = z;
+		m_pPoint[V_Z] = z;*/
+
+		m_point = point(x, y, z);
 		
 		return R_PASS;
 	}
 	
 	//RESULT SetColorA(float x, float y, float z);
-	RESULT SetColor(float r, float g, float b) {
-		m_pColor[C_R] = r;
+	RESULT SetColor(color_precision r, color_precision g, color_precision b) {
+		/*m_pColor[C_R] = r;
 		m_pColor[C_G] = g;
-		m_pColor[C_B] = b;
+		m_pColor[C_B] = b;*/
+
+		m_color = color(r, g, b, 1.0f);
+
+		return R_PASS;
+	}
+
+	RESULT SetColor(color_precision r, color_precision g, color_precision b, color_precision a) {
+		/*m_pColor[C_R] = r;
+		m_pColor[C_G] = g;
+		m_pColor[C_B] = b;*/
+
+		m_color = color(r, g, b, a);
 
 		return R_PASS;
 	}
 
 	RESULT SetColor(color c) {
-		m_pColor[C_R] = c.r();
+		/*m_pColor[C_R] = c.r();
 		m_pColor[C_G] = c.g();
-		m_pColor[C_B] = c.b();
+		m_pColor[C_B] = c.b();*/
+
+		m_color = c;
 
 		return R_PASS;
 	}
 
 	RESULT SetVertex(vertex v) {
+		/*
 		for (int i = 0; i < VERTEX_DIMENSIONS; i++)
 			m_pPoint[i] = v.m_pPoint[i];
 
 		for (int i = 0; i < COLOR_DIMENSIONS; i++)
 			m_pColor[i] = v.m_pColor[i];
+		*/
+
+		m_point = v.GetPoint();
+		m_color = v.GetColor();
 
 		return R_PASS;
 	}
+
+	// TODO: Operator overloading
 };
 
 #endif // ! VERTEX_H_
