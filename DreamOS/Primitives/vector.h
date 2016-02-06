@@ -10,13 +10,19 @@
 #include "matrix.h"
 #include "point.h"
 
-class vector : public matrix <double, 4, 1> {
+#ifdef FLOAT_PRECISION
+	typedef float vector_precision;
+#elif defined(DOUBLE_PRECISION)
+	typedef double vector_precision;
+#endif
+
+class vector : public matrix <vector_precision, 4, 1> {
 public:
 	vector() {
 		clear();
 	}
 
-	vector(double x, double y, double z) {
+	vector(vector_precision x, vector_precision y, vector_precision z) {
 		this->clear();
 		this->element(0, 0) = x;
 		this->element(1, 0) = y;
@@ -25,15 +31,15 @@ public:
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline
-	inline double &x() { return this->element(0, 0); }
-	inline double &y() { return this->element(1, 0); }
-	inline double &z() { return this->element(2, 0); }
-	inline double &w() { return this->element(3, 0); }
+	inline vector_precision &x() { return this->element(0, 0); }
+	inline vector_precision &y() { return this->element(1, 0); }
+	inline vector_precision &z() { return this->element(2, 0); }
+	inline vector_precision &w() { return this->element(3, 0); }
 
-	inline double &x(double val) { return this->element(0, 0) = val; }
-	inline double &y(double val) { return this->element(1, 0) = val; }
-	inline double &z(double val) { return this->element(2, 0) = val; }
-	inline double &w(double val) { return this->element(3, 0) = val; }
+	inline vector_precision &x(vector_precision val) { return this->element(0, 0) = val; }
+	inline vector_precision &y(vector_precision val) { return this->element(1, 0) = val; }
+	inline vector_precision &z(vector_precision val) { return this->element(2, 0) = val; }
+	inline vector_precision &w(vector_precision val) { return this->element(3, 0) = val; }
 
 	double magnitude() {
 		double sqaureSum = pow(x(), 2) + pow(y(), 2) + pow(z(), 2);

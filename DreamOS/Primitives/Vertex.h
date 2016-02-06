@@ -66,6 +66,16 @@ public:
 		return (void*)(sizeof(float) * VERTEX_DIMENSIONS);
 	}
 
+	inline static int GetPointDimensions() {
+		return 3;	// temp
+		return point::rows();
+	}
+
+	inline static int GetColorDimensions() {
+		return 3; // temp
+		return color::rows();
+	}
+
 public:
 	RESULT SetPoint(point p) {
 		m_pPoint[V_X] = p.x();

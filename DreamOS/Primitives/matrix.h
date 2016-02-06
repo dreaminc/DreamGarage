@@ -16,8 +16,8 @@
 template <typename TBase>
 class MatrixBase {
 public:
-    virtual int rows() = 0;
-    virtual int cols() = 0;
+    //virtual static int rows() = 0;
+    //virtual static int cols() = 0;
 
 	/*
     virtual T& operator()(unsigned i, unsigned j) = 0;
@@ -39,8 +39,8 @@ protected:
     TMatrix m_data[N * M];
 
 public:
-    int rows() { return N; }
-    int cols() { return M; }
+    static int rows() { return N; }
+    static int cols() { return M; }
 	
 	// Simply clears data
 	RESULT clear() {

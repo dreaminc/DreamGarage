@@ -54,6 +54,15 @@ public:
 		return r;
 	}
 
+	// This should be used in the OGLInitialize functon
+	inline GLushort GetOGLPrecision() {
+		#ifdef FLOAT_PRECISION
+			return GL_FLOAT;
+		#elif defined(DOUBLE_PRECISION)
+			return GL_DOUBLE;
+		#endif
+	}
+
 	// This needs to be called from the sub-class constructor
 	// or externally from the object (TODO: factory class needed)
 	RESULT OGLInitialize() {
@@ -70,17 +79,18 @@ public:
 		CR(m_pParentImp->glGenBuffers(1, &m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
+		// TODO: Remove convenience vars 
 		vertex *pVertex = pDimObj->VertexData();
 		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
-
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 	
 		// Index Element Buffer
-		dimindex *pIndex = pDimObj->IndexData();
-		int pIndex_s = pDimObj->IndexDataSize();
-
 		CR(m_pParentImp->glGenBuffers(1, &m_hIBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
+
+		// TODO: Remove convenience vars 
+		dimindex *pIndex = pDimObj->IndexData();
+		int pIndex_s = pDimObj->IndexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ELEMENT_ARRAY_BUFFER, pIndex_s, pIndex, GL_STATIC_DRAW));
 
 		// Enable the vertex attribute arrays
@@ -89,11 +99,11 @@ public:
 		// Bind Position
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glEnableVertexAtrribArray(0));		// TEMP: Position
-		CR(m_pParentImp->glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), vertex::GetVertexOffset()));
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)0, vertex::GetPointDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetVertexOffset()));
 
 		// Color
 		CR(m_pParentImp->glEnableVertexAtrribArray(1));		// TEMP: Color
-		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
 
 	Error:
 		return r;

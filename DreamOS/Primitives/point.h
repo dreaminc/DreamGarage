@@ -13,16 +13,22 @@
 class point;
 class vector;
 
+#ifdef FLOAT_PRECISION
+	typedef float point_precision;
+#elif defined(DOUBLE_PRECISION)
+	typedef double point_precision;
+#endif
+
 // Difference between two points will be a vector
 vector operator-(const point &lhs, const point &rhs);
 
-class point : public matrix <double, 4, 1> {
+class point : public matrix <point_precision, 4, 1> {
 public:
 	point() {
 		clear();
 	}
 
-	point(double x, double y, double z) {
+	point(point_precision x, point_precision y, point_precision z) {
 		this->clear();
 		this->element(0, 0) = x;
 		this->element(1, 0) = y;
@@ -31,10 +37,15 @@ public:
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline
-	inline double &x() { return this->element(0, 0); }
-	inline double &y() { return this->element(1, 0); }
-	inline double &z() { return this->element(2, 0); }
-	inline double &w() { return this->element(3, 0); }
+	inline point_precision &x() { return this->element(0, 0); }
+	inline point_precision &y() { return this->element(1, 0); }
+	inline point_precision &z() { return this->element(2, 0); }
+	inline point_precision &w() { return this->element(3, 0); }
+
+	inline point_precision &x(point_precision val) { return this->element(0, 0) = val; }
+	inline point_precision &y(point_precision val) { return this->element(1, 0) = val; }
+	inline point_precision &z(point_precision val) { return this->element(2, 0) = val; }
+	inline point_precision &w(point_precision val) { return this->element(3, 0) = val; }
 
 	/*
 	// Subtracting points results in vector
@@ -51,60 +62,5 @@ public:
 	}
 	*/
 };
-
-/*
-template <typename T = double, int D = 4>
-class PointBase : public matrix <T, D, 0> {
-public:
-    PointBase() {
-        memset(&m_data, 0, sizeof(T) * D);
-    }
-};
-
-template <typename T = double>
-class point4 : public point<T, 4> {
-    point(T x, T y, T z, T w) {
-        m_data[0] = x;
-        m_data[0] = y;
-        m_data[0] = z;
-        m_data[0] = w;
-    }
-};
-
-// Currently support specialized constructors for 4, 3 and 2 dimensional points
-template <typename T = double> class point4 : public PointBase<T, 4> {
-    point(T x, T y, T z, T w) {
-        m_data[0] = x;
-        m_data[0] = y;
-        m_data[0] = z;
-        m_data[0] = w;
-    }
-};
-
-template <typename T = double> class point3 : public PointBase<T, 3> {
-    point(T x, T y, T z) {
-        m_data[0] = x;
-        m_data[0] = y;
-        m_data[0] = z;
-    }
-};
-
-template <typename T = double> class point2 : public PointBase<T, 2> {
-    point(T x, T y) {
-        m_data[0] = x;
-        m_data[0] = y;
-    }
-};
-
-typedef point4<double> point4d;
-typedef point4<float> point4f;
-typedef point3<double, 3> point3d;
-typedef point3<float, 3> point3f;
-typedef point2<double, 2> point2d;
-typedef point2<float, 2> point2f;
-
-// Default Point a 4 dimensional double point
-typedef point4d point;
-*/
 
 #endif // !POINT_H_
