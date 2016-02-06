@@ -100,10 +100,14 @@ public:
 	RESULT glBindVertexArray(GLuint gluiArray);
 	RESULT glGenBuffers(GLsizei n, GLuint *buffers);
 	RESULT glBindBuffer(GLenum target, GLuint buffer);
+	
+	RESULT glDeleteBuffers(GLsizei n, const GLuint *buffers);
+
 	RESULT glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
 	RESULT glEnableVertexAtrribArray(GLuint index);
 	RESULT glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
 
+	RESULT glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
 
 // Extension Mappings
 private:
@@ -166,10 +170,12 @@ private:
 	PFNGLBINDBUFFERPROC	m_glBindBuffer;
 	PFNGLBUFFERDATAPROC	m_glBufferData;
 	PFNGLVERTEXATTRIBPOINTERPROC m_glVertexAttribPointer;
+	PFNGLDELETEBUFFERSPROC m_glDeleteBuffers;
 
 	// VAO
 	PFNGLGENVERTEXARRAYSPROC m_glGenVertexArrays;
 	PFNGLBINDVERTEXARRAYPROC m_glBindVertexArray;
+	PFNGLDELETEVERTEXARRAYSPROC m_glDeleteVertexArrays;
 };
 
 #endif // ! OPEN_GL_IMP_H

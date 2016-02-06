@@ -11,6 +11,11 @@
 #include "Primitives/quad.h"
 
 class OGLQuad : public quad, public OGLObj {
+protected:
+	DimObj *GetDimObj() {
+		return (DimObj*)this;
+	}
+
 public:
 	OGLQuad(OpenGLImp *pParentImp) :
 		quad(1.0f),
@@ -36,16 +41,8 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	// TODO: move this to DimObj
-	inline vertex *VertexData() {
-		return &m_vertices[0];
-	}
-
-	// TODO: move this to DimObj
-	inline int VertexDataSize() {
-		return (3 * sizeof(vertex));
-	}
-
+	/*
+	// Now handled in OGLObj
 	RESULT Render() {
 		RESULT r = R_PASS;
 
@@ -55,6 +52,7 @@ public:
 	Error:
 		return r;
 	}
+	*/
 };
 
 #endif // ! OGL_QUAD_H_
