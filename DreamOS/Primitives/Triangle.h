@@ -16,8 +16,9 @@
 #include "color.h"
 
 class triangle : public DimObj {
-protected:
-	vertex m_vertices[NUM_TRI_POINTS];
+
+//protected:
+//	vertex m_vertices[NUM_TRI_POINTS];
 
 public:
 	typedef enum {
@@ -27,33 +28,49 @@ public:
 		INVALID
 	} TRIANGLE_TYPE;
 
+	RESULT Allocate() {
+		RESULT r = R_PASS;
+
+		CR(AllocateVertices(NUM_TRI_POINTS));
+		CR(AllocateIndices(NUM_TRI_POINTS));
+
+	Error:
+		return R_PASS;
+	}
+
+	inline int NumberVertices() {
+		return NUM_TRI_POINTS;
+	}
+
 	triangle(double side) :
 		m_triangleType(EQUILATERAL)
 	{
+		RESULT r = R_PASS;
+		CR(Allocate());
+
 		double halfSide = side / 2.0f;
 		double halfHeight = (halfSide*sqrt(3.0f)) / 2.0f;
 
-		m_vertices[0] = vertex(point(0.0f, halfHeight, 0.0f));			// A
-		m_vertices[1] = vertex(point(-halfSide, -halfHeight, 0.0f));	// B
-		m_vertices[2] = vertex(point(halfSide, -halfHeight, 0.0f));		// C
+		m_pVertices[0] = vertex(point(0.0f, halfHeight, 0.0f));			// A
+		m_pVertices[1] = vertex(point(-halfSide, -halfHeight, 0.0f));	// B
+		m_pVertices[2] = vertex(point(halfSide, -halfHeight, 0.0f));	// C
+
+		Validate();
+	Error:
+		Invalidate();
 	}
 
 	triangle(double height, double width) :
 		m_triangleType(ISOCELES)
 	{
+		Allocate();
+
 		double halfHeight = height / 2.0f;
 		double halfWidth = width / 2.0f;
 
-		m_vertices[0] = vertex(point(0.0f, halfHeight, 0.0f));			// A
-		m_vertices[1] = vertex(point(-halfWidth, -halfHeight, 0.0f));	// B
-		m_vertices[2] = vertex(point(halfWidth, -halfHeight, 0.0f));	// C
-	}
-
-	RESULT SetColor(color c) {
-		for (int i = 0; i < NUM_TRI_POINTS; i++)
-			m_vertices[i].SetColor(c);
-
-		return R_PASS;
+		m_pVertices[0] = vertex(point(0.0f, halfHeight, 0.0f));			// A
+		m_pVertices[1] = vertex(point(-halfWidth, -halfHeight, 0.0f));	// B
+		m_pVertices[2] = vertex(point(halfWidth, -halfHeight, 0.0f));	// C
 	}
 
 	// TODO: Scalene arbitrary triangle 
@@ -84,13 +101,6 @@ public:
 			return ISOCELES;
 		else
 			return SCALANE;
-	}
-
-	RESULT CopyVertices(vertex verts[NUM_TRI_POINTS]) {
-		for (int i = 0; i < NUM_TRI_POINTS; i++)
-			m_vertices[i].SetVertex(verts[i]);
-
-		return R_PASS;
 	}
 
 private:

@@ -168,6 +168,7 @@
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h" />
@@ -182,12 +183,14 @@
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\point.h" />
+    <ClInclude Include="..\..\..\Primitives\quad.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Number.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Types.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h" />
     <ClInclude Include="..\..\..\Primitives\Types\UID.h" />
+    <ClInclude Include="..\..\..\Primitives\valid.h" />
     <ClInclude Include="..\..\..\Primitives\vector.h" />
     <ClInclude Include="..\..\..\Primitives\Vertex.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />

@@ -11,11 +11,18 @@
 #include "Primitives/Triangle.h"
 
 class OGLTriangle : public triangle, public OGLObj {
+protected:
+	DimObj *GetDimObj() {
+		return (DimObj*)this;
+	}
+
 public:
 	OGLTriangle(OpenGLImp *pParentImp) :
 		triangle(1.0f),
 		OGLObj(pParentImp)
 	{
+		//m_pDimTriangle = new triangle(1.0f);
+
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
@@ -24,6 +31,8 @@ public:
 		triangle(side),
 		OGLObj(pParentImp)
 	{
+		//m_pDimTriangle = new triangle(side);
+
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
@@ -32,16 +41,10 @@ public:
 		triangle(height, width),
 		OGLObj(pParentImp)
 	{
+		//m_pDimTriangle = new triangle(height, width);
+
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
-	}
-
-	inline vertex *VertexData() {
-		return &m_vertices[0];
-	}
-
-	inline int VertexDataSize() {
-		return (3 * sizeof(vertex));
 	}
 
 	RESULT Render() {
