@@ -9,13 +9,19 @@
 
 #include "matrix.h"
 
-class color : public matrix <double, 4, 1> {
+#ifdef FLOAT_PRECISION
+	typedef float color_precision;
+#elif defined(DOUBLE_PRECISION)
+	typedef double color_precision;
+#endif
+
+class color : public matrix <color_precision, 4, 1> {
 public:
 	color() {
 		clear();
 	}
 
-	color(double r, double g, double b, double a) {
+	color(color_precision r, color_precision g, color_precision b, color_precision a) {
 		this->clear();
 		this->element(0, 0) = r;
 		this->element(1, 0) = g;
@@ -24,10 +30,15 @@ public:
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline
-	inline double &r() { return this->element(0, 0); }
-	inline double &g() { return this->element(1, 0); }
-	inline double &b() { return this->element(2, 0); }
-	inline double &a() { return this->element(3, 0); }
+	inline color_precision &r() { return this->element(0, 0); }
+	inline color_precision &g() { return this->element(1, 0); }
+	inline color_precision &b() { return this->element(2, 0); }
+	inline color_precision &a() { return this->element(3, 0); }
+
+	inline color_precision &r(vector_precision val) { return this->element(0, 0) = val; }
+	inline color_precision &g(vector_precision val) { return this->element(1, 0) = val; }
+	inline color_precision &b(vector_precision val) { return this->element(2, 0) = val; }
+	inline color_precision &a(vector_precision val) { return this->element(3, 0) = val; }
 };
 
 #endif // ! COLOR_H_

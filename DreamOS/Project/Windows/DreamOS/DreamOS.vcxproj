@@ -90,6 +90,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)../../../;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>"Core/config.h";%(ForcedIncludeFiles)</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -162,6 +163,7 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
