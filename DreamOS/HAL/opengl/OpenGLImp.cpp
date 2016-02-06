@@ -353,6 +353,10 @@ Error:
 }
 // TODO: Get this out of here
 #include "Primitives/Vertex.h"
+#include "OGLTriangle.h"
+#include "Primitives/color.h"
+
+OGLTriangle *g_pTriangle = NULL;
 
 // This is temporary - replace with ObjectStore architecture soon
 RESULT OpenGLImp::SetData() {
@@ -371,6 +375,7 @@ RESULT OpenGLImp::SetData() {
 	vertTemp[2].SetPoint(width, -height, z);
 	vertTemp[2].SetColor(0.0f, 0.0f, 1.0f);
 
+	/*
 	// TODO: Temporary VAO - Put into OpenGL Vertex or something
 	m_glGenVertexArrays(1, &m_vaoID);  //create VAO container and get ID for it
 	CRM(CheckGLError(), "glGenVertexArrays failed");
@@ -400,6 +405,14 @@ RESULT OpenGLImp::SetData() {
 
 	m_glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)(sizeof(vertex)/2));
 	CRM(CheckGLError(), "glVertexAttribPointer failed");
+	//*/
+
+	///*
+	g_pTriangle = new OGLTriangle(this, 0.8f);
+	// TODO: Update this so that any changes force a change?
+	g_pTriangle->CopyVertices(vertTemp);
+	g_pTriangle->UpdateOGLBuffers();
+	//*/
 
 Error:
 	return r;
@@ -411,7 +424,8 @@ RESULT OpenGLImp::Render() {
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	//glDrawArrays(GL_TRIANGLES, 0, 3);
+	g_pTriangle->Render();
 	
 	/*
 	GLfloat z = 0.0f;

@@ -13,28 +13,31 @@
 class OGLTriangle : public triangle, public OGLObj {
 public:
 	OGLTriangle(OpenGLImp *pParentImp) :
-		OGLObj(pParentImp),
-		triangle(1.0f)
+		triangle(1.0f),
+		OGLObj(pParentImp)
 	{
-
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
 	}
 
 	OGLTriangle(OpenGLImp *pParentImp, double side) :
-		OGLObj(pParentImp),
-		triangle(side)
+		triangle(side),
+		OGLObj(pParentImp)
 	{
-
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
 	}
 
 	OGLTriangle(OpenGLImp *pParentImp, double height, double width) :
-		OGLObj(pParentImp),
-		triangle(height, width)
+		triangle(height, width),
+		OGLObj(pParentImp)
 	{
-
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
 	}
 
-	inline void *VertexData() {
-		return (void*)m_vertices;
+	inline vertex *VertexData() {
+		return &m_vertices[0];
 	}
 
 	inline int VertexDataSize() {

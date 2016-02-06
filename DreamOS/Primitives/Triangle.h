@@ -8,11 +8,12 @@
 // Triangle Primitive
 // Center is assumed as (0, 0, 0) so points are adjusted positive / negative as needed
 
+#define NUM_TRI_POINTS 3
+
 #include "DimObj.h"
 #include "Vertex.h"
 #include "point.h"
-
-#define NUM_TRI_POINTS 3
+#include "color.h"
 
 class triangle : public DimObj {
 protected:
@@ -48,6 +49,13 @@ public:
 		m_vertices[2] = vertex(point(halfWidth, -halfHeight, 0.0f));	// C
 	}
 
+	RESULT SetColor(color c) {
+		for (int i = 0; i < NUM_TRI_POINTS; i++)
+			m_vertices[i].SetColor(c);
+
+		return R_PASS;
+	}
+
 	// TODO: Scalene arbitrary triangle 
 	/*
 	triangle(point a, point b, point c) :
@@ -76,6 +84,13 @@ public:
 			return ISOCELES;
 		else
 			return SCALANE;
+	}
+
+	RESULT CopyVertices(vertex verts[NUM_TRI_POINTS]) {
+		for (int i = 0; i < NUM_TRI_POINTS; i++)
+			m_vertices[i].SetVertex(verts[i]);
+
+		return R_PASS;
 	}
 
 private:
