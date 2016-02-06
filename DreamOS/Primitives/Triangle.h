@@ -71,7 +71,8 @@ public:
 	triangle(double height, double width) :
 		m_triangleType(ISOCELES)
 	{
-		Allocate();
+		RESULT r = R_PASS;
+		CR(Allocate());
 
 		double halfHeight = height / 2.0f;
 		double halfWidth = width / 2.0f;
@@ -79,6 +80,10 @@ public:
 		m_pVertices[0] = vertex(point(0.0f, halfHeight, 0.0f));			// A
 		m_pVertices[1] = vertex(point(-halfWidth, -halfHeight, 0.0f));	// B
 		m_pVertices[2] = vertex(point(halfWidth, -halfHeight, 0.0f));	// C
+
+		Validate();
+	Error:
+		Invalidate();
 	}
 
 	// TODO: Scalene arbitrary triangle 

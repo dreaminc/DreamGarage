@@ -21,7 +21,7 @@ public:
 	}
 
 	~OGLObj() {
-		/* empty stub */
+		ReleaseOGLBuffers();
 	}
 
 	//virtual inline vertex *VertexData() = 0;
@@ -29,6 +29,30 @@ public:
 
 	//virtual RESULT Render() = 0;
 	virtual DimObj *GetDimObj() = 0;
+
+	RESULT ReleaseOGLBuffers() {
+		RESULT r = R_PASS;
+
+		if (m_pParentImp != NULL) {
+			if (m_hVBO != NULL) {
+				CR(m_pParentImp->glDeleteBuffers(1, &m_hVBO));
+				m_hVBO = NULL;
+			}
+
+			if (m_hIBO != NULL) {
+				CR(m_pParentImp->glDeleteBuffers(1, &m_hIBO));
+				m_hIBO = NULL;
+			}
+
+			if (m_hVAO != NULL) {
+				CR(m_pParentImp->glDeleteVertexArrays(1, &m_hVAO));
+				m_hVAO = NULL;
+			}
+		}
+
+	Error:
+		return r;
+	}
 
 	// This needs to be called from the sub-class constructor
 	// or externally from the object (TODO: factory class needed)
@@ -48,14 +72,15 @@ public:
 
 		vertex *pVertex = pDimObj->VertexData();
 		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
+
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 	
 		// Index Element Buffer
 		dimindex *pIndex = pDimObj->IndexData();
 		int pIndex_s = pDimObj->IndexDataSize();
 
-		CR(m_pParentImp->glGenBuffers(1, &m_IBO));
-		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_IBO));
+		CR(m_pParentImp->glGenBuffers(1, &m_hIBO));
+		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 		CR(m_pParentImp->glBufferData(GL_ELEMENT_ARRAY_BUFFER, pIndex_s, pIndex, GL_STATIC_DRAW));
 
 		// Enable the vertex attribute arrays
@@ -99,6 +124,9 @@ public:
 		DimObj *pDimObj = GetDimObj();
 
 		CR(m_pParentImp->glBindVertexArray(m_hVAO));
+		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
+		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
+
 		glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 
 	Error:
@@ -108,7 +136,7 @@ public:
 protected:
 	GLuint m_hVAO;		// vertex array object
 	GLuint m_hVBO;		// vertex buffer object
-	GLuint m_IBO;		// index buffer object
+	GLuint m_hIBO;		// index buffer object
 	OpenGLImp *m_pParentImp;
 };
 

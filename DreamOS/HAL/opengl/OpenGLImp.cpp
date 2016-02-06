@@ -354,9 +354,11 @@ Error:
 // TODO: Get this out of here
 #include "Primitives/Vertex.h"
 #include "OGLTriangle.h"
+#include "OGLQuad.h"
 #include "Primitives/color.h"
 
 OGLTriangle *g_pTriangle = NULL;
+OGLQuad *g_pQuad = NULL;
 
 // This is temporary - replace with ObjectStore architecture soon
 RESULT OpenGLImp::SetData() {
@@ -375,11 +377,15 @@ RESULT OpenGLImp::SetData() {
 	vertTemp[2].SetPoint(width, -height, z);
 	vertTemp[2].SetColor(0.0f, 0.0f, 1.0f);
 	
+	/*
 	g_pTriangle = new OGLTriangle(this, 0.8f);
-
 	// TODO: Update this so that any changes force a change?
 	g_pTriangle->CopyVertices(vertTemp, 3);
 	g_pTriangle->UpdateOGLBuffers();
+	*/
+
+	g_pQuad = new OGLQuad(this, 0.8f);
+	CVM(g_pQuad, "Failed to construct Quad");
 
 Error:
 	return r;
@@ -392,7 +398,9 @@ RESULT OpenGLImp::Render() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	g_pTriangle->Render();
+	//g_pTriangle->Render();
+
+	g_pQuad->Render();
 	
 	/*
 	GLfloat z = 0.0f;
@@ -483,6 +491,26 @@ RESULT OpenGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
 
 	m_glBindBuffer(target, gluiBuffer);
 	CRM(CheckGLError(), "glBindBuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
+	RESULT r = R_PASS;
+
+	m_glDeleteBuffers(n, buffers);
+	CRM(CheckGLError(), "glDeleteBuffers failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDeleteVertexArrays(GLsizei n, const GLuint *arrays) {
+	RESULT r = R_PASS;
+
+	m_glDeleteVertexArrays(n, arrays);
+	CRM(CheckGLError(), "glDeleteVertexArrays failed");
 
 Error:
 	return r;

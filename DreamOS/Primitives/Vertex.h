@@ -37,8 +37,11 @@ public:
 
 public:
 	vertex() {
-		for (int i = 0; i < VERTEX_DIMENSIONS; i++) m_pPoint[i] = 0.0f;
-		for (int i = 0; i < COLOR_DIMENSIONS; i++) m_pColor[i] = 0.0f;
+		for (int i = 0; i < VERTEX_DIMENSIONS; i++) 
+			m_pPoint[i] = 0.0f;
+
+		for (int i = 0; i < COLOR_DIMENSIONS; i++) 
+			m_pColor[i] = 0.0f;
 	}
 
 	vertex(point p) {
