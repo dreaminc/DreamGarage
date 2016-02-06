@@ -171,28 +171,28 @@ public:
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-        return m_data[i * N + M];
+		return m_data[(j * N) + i];
      }
 
      const TMatrix& operator()( unsigned i, unsigned j ) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-        return m_data[i * N + M];
+		return m_data[(j * N) + i];
      }
 
      inline const TMatrix& element(unsigned i, unsigned j) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-        return m_data[i * N + M];
+		return m_data[(j * N) + i];
      }
 
 	 inline TMatrix& element(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
             rangeCheck(i, j);
         #endif
-        return m_data[(i * N) + j];
+        return m_data[(j * N) + i];
      }
 
     // Assignment Operators

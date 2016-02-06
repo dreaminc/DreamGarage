@@ -25,9 +25,16 @@
 #include "matrix.h"
 #include "vector.h"
 #include "point.h"
+#include "color.h"
 
 // TODO: Port to LinAlgLib (using point etc)
 class vertex {
+public:
+	float m_pPoint[VERTEX_DIMENSIONS];
+	float m_pColor[COLOR_DIMENSIONS];
+	// TODO: Normal
+	// TODO: UV coordinate 
+
 public:
 	vertex() {
 		for (int i = 0; i < VERTEX_DIMENSIONS; i++) m_pPoint[i] = 0.0f;
@@ -36,10 +43,24 @@ public:
 
 	vertex(point p) {
 		SetPoint(p);
+		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
+	}
+
+	vertex(point p, color c) {
+		SetPoint(p);
+		SetColor(c);
 	}
 
 	~vertex() {
 		// Empty stub for now
+	}
+
+	static void *GetVertexOffset() {
+		return NULL;
+	}
+
+	static void* GetColorOffset() {
+		return (void*)(sizeof(float) * VERTEX_DIMENSIONS);
 	}
 
 public:
@@ -69,11 +90,23 @@ public:
 		return R_PASS;
 	}
 
-public:
-	float m_pPoint[VERTEX_DIMENSIONS];
-	float m_pColor[COLOR_DIMENSIONS];
-	// TODO: Normal
-	// TODO: UV coordinate 
+	RESULT SetColor(color c) {
+		m_pColor[C_R] = c.r();
+		m_pColor[C_G] = c.g();
+		m_pColor[C_B] = c.b();
+
+		return R_PASS;
+	}
+
+	RESULT SetVertex(vertex v) {
+		for (int i = 0; i < VERTEX_DIMENSIONS; i++)
+			m_pPoint[i] = v.m_pPoint[i];
+
+		for (int i = 0; i < COLOR_DIMENSIONS; i++)
+			m_pColor[i] = v.m_pColor[i];
+
+		return R_PASS;
+	}
 };
 
 #endif // ! VERTEX_H_

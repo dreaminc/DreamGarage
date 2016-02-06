@@ -9,12 +9,12 @@
 class DimObj {
 private:
     point m_ptOrigin;   // origin
-    AABV m_aabv;        // Axis Aligned Bounding Volume
+    //AABV m_aabv;        // Axis Aligned Bounding Volume
 
 public:
     DimObj() :
-        m_ptOrigin(),
-        m_aabv()
+        m_ptOrigin()
+        //m_aabv()
     {
         /* stub */
     }
@@ -25,6 +25,6 @@ public:
 
 private:
 	UID m_uid;
-}
+};
 
 #endif // !DIM_OBJ_H_
