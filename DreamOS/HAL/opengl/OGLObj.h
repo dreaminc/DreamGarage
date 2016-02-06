@@ -8,6 +8,7 @@
 // OpenGL Base Type - This is for coupling with the open GL implementation 
 
 #include "OpenGLImp.h"
+#include "Primitives/DimObj.h"
 
 #define NUM_VBO 2
 
@@ -23,15 +24,18 @@ public:
 		/* empty stub */
 	}
 
-	virtual inline vertex *VertexData() = 0;
-	virtual inline int VertexDataSize() = 0;
-	virtual RESULT Render() = 0;
+	//virtual inline vertex *VertexData() = 0;
+	//virtual inline int VertexDataSize() = 0;
 
+	virtual RESULT Render() = 0;
+	virtual DimObj *GetDimObj() = 0;
 
 	// This needs to be called from the sub-class constructor
 	// or externally from the object (TODO: factory class needed)
 	RESULT OGLInitialize() {
 		RESULT r = R_PASS;
+
+		DimObj *pDimObj = GetDimObj();
 
 		// Set up the Vertex Array Object (VAO)
 		CR(m_pParentImp->glGenVertexArrays(1, &m_hVAO));
@@ -42,8 +46,8 @@ public:
 		CR(m_pParentImp->glGenBuffers(1, &m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
-		vertex *pVertex = VertexData();
-		GLsizeiptr pVertex_n = VertexDataSize();
+		vertex *pVertex = pDimObj->VertexData();
+		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 	
 		/* Index Element Buffer
@@ -72,11 +76,13 @@ public:
 	RESULT UpdateOGLBuffers() {
 		RESULT r = R_PASS;
 
+		DimObj *pDimObj = GetDimObj();
+
 		CR(m_pParentImp->glBindVertexArray(m_hVAO));
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
-		vertex *pVertex = VertexData();
-		GLsizeiptr pVertex_n = VertexDataSize();
+		vertex *pVertex = pDimObj->VertexData();
+		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 
 	Error:

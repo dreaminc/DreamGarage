@@ -77,6 +77,13 @@
 #define CHM(pointer, msg, ...) CNM(pointer, msg, ##__VA_ARGS__)
 #define CHRM(pointer, msg, ...) CNRM(pointer, failCode, msg, ##__VA_ARGS__)
 
+// Check Valid 
+// Ensures that the object created is valid
+#define CV(pObject) do{if(!pObject->IsValid()) {r = R_FAIL; goto Error;}}while(0);
+#define CVR(pObject, failCode) do{if(!pObject->IsValid()) {r = failCode; goto Error;}}while(0);
+#define CVM(pObject, msg, ...) do{if(!pObject->IsValid()) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
+#define CVRM(pObject, failCode, msg, ...) do{if(!pObject->IsValid()) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
+
 // Calculate the memory offset of a field in a struct
 #define STRUCT_FIELD_OFFSET(struct_type, field_name)    ((long)(long*)&(((struct_type *)0)->field_name))
 

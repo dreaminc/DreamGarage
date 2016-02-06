@@ -374,45 +374,12 @@ RESULT OpenGLImp::SetData() {
 
 	vertTemp[2].SetPoint(width, -height, z);
 	vertTemp[2].SetColor(0.0f, 0.0f, 1.0f);
-
-	/*
-	// TODO: Temporary VAO - Put into OpenGL Vertex or something
-	m_glGenVertexArrays(1, &m_vaoID);  //create VAO container and get ID for it
-	CRM(CheckGLError(), "glGenVertexArrays failed");
-
-	m_glBindVertexArray(m_vaoID);      //bind to OpenGL context
-	CRM(CheckGLError(), "glBindVertexArray failed");
-
-	m_glGenBuffers(2, &m_vboID[0]);
-	CRM(CheckGLError(), "glGenBuffers failed");
-
-	m_glBindBuffer(GL_ARRAY_BUFFER, m_vboID[0]);
-	CRM(CheckGLError(), "glBindBuffer failed");
-
-	m_glBufferData(GL_ARRAY_BUFFER, 3 * sizeof(vertex), vertTemp, GL_STATIC_DRAW);
-	CRM(CheckGLError(), "glBufferData failed");
-
-	// Location 0 (position)
-	m_glEnableVertexAttribArray(0);
-	CRM(CheckGLError(), "glEnableVertexAttribArray failed");
-
-	m_glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)NULL);
-	CRM(CheckGLError(), "glVertexAttribPointer failed");
-
-	// Location 1 (color)
-	m_glEnableVertexAttribArray(1);
-	CRM(CheckGLError(), "glEnableVertexAttribArray failed");
-
-	m_glVertexAttribPointer((GLuint)1, 3, GL_FLOAT, GL_FALSE, sizeof(vertex), (void*)(sizeof(vertex)/2));
-	CRM(CheckGLError(), "glVertexAttribPointer failed");
-	//*/
-
-	///*
+	
 	g_pTriangle = new OGLTriangle(this, 0.8f);
+
 	// TODO: Update this so that any changes force a change?
-	g_pTriangle->CopyVertices(vertTemp);
+	g_pTriangle->CopyVertices(vertTemp, 3);
 	g_pTriangle->UpdateOGLBuffers();
-	//*/
 
 Error:
 	return r;
