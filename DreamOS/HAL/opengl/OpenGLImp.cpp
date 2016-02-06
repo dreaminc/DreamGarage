@@ -377,12 +377,12 @@ RESULT OpenGLImp::SetData() {
 	vertTemp[2].SetPoint(width, -height, z);
 	vertTemp[2].SetColor(0.0f, 0.0f, 1.0f);
 	
-	/*
+	///*
 	g_pTriangle = new OGLTriangle(this, 0.8f);
 	// TODO: Update this so that any changes force a change?
 	g_pTriangle->CopyVertices(vertTemp, 3);
 	g_pTriangle->UpdateOGLBuffers();
-	*/
+	//*/
 
 	g_pQuad = new OGLQuad(this, 0.8f);
 	CVM(g_pQuad, "Failed to construct Quad");
@@ -398,7 +398,7 @@ RESULT OpenGLImp::Render() {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	//g_pTriangle->Render();
+	g_pTriangle->Render();
 
 	g_pQuad->Render();
 	
