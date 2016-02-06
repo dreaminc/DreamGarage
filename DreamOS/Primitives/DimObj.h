@@ -8,6 +8,8 @@
 
 #include "valid.h"
 
+typedef uint32_t dimindex;
+
 class DimObj : public valid {
 private:
     point m_ptOrigin;   // origin
@@ -15,7 +17,7 @@ private:
 
 protected:
 	vertex *m_pVertices;
-	uint32_t *m_pIndices;
+	dimindex *m_pIndices;
 
 public:
     DimObj() :
@@ -39,16 +41,25 @@ public:
 		}
     }
 
-	virtual inline int NumberVertices() = 0;
+	
 	virtual RESULT Allocate() = 0;
 
+	virtual inline int NumberVertices() = 0;
 	inline vertex *VertexData() {
 		return m_pVertices;
 	}
 
 	inline int VertexDataSize() {
 		return NumberVertices() * sizeof(vertex);
+	}
 
+	virtual inline int NumberIndices() = 0;
+	inline dimindex *IndexData() {
+		return m_pIndices;
+	}
+
+	inline int IndexDataSize() {
+		return NumberIndices() * sizeof(dimindex);
 	}
 
 	RESULT AllocateVertices(uint32_t numVerts) {
