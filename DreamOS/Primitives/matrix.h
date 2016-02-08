@@ -169,7 +169,7 @@ public:
 
     inline void subData(TMatrix *data) {
         for(int i = 0; i < (N * M); i++)
-            m_data[i] += data[i];
+            m_data[i] -= data[i];
     }
 
     inline void multData(const TMatrix& a) {
@@ -280,24 +280,29 @@ public:
 	}
 
 	/*
-    matrix<TMatrix, N, M>& operator+( const matrix<TMatrix, N, M>&arg ) const {
+    const matrix<TMatrix, N, M>& operator+( const matrix<TMatrix, N, M>&arg ) const {
         return matrix<TMatrix, N, M>(*this).operator+=(arg);
     }
+	//*/
+
+	matrix<TMatrix, N, M>& operator-=(const matrix<TMatrix, N, M>& rhs) {
+		subData((TMatrix*)rhs.m_data);
+		return *this;
+	}
+
+	// TODO: Is this the right way?
+	friend matrix<TMatrix, N, M> operator-(const matrix<TMatrix, N, M>& lhs, const matrix<TMatrix, N, M>& rhs) {
+		//lhs -= rhs; // reuse compound assignment
+		matrix newMatrix = lhs;
+		newMatrix.subData((TMatrix*)rhs.m_data);
+		return newMatrix;
+	}
+
+	/*
+	matrix<TMatrix, N, M>& operator-( const matrix<TMatrix, N, M>&arg ) const {
+	return matrix<TMatrix, N, M>(*this).operator-=(arg);
+	}
 	*/
-
-    matrix& operator-=(const matrix& rhs) {
-        subData(rhs.m_data);
-        return *this;
-    }
-
-    friend matrix operator-(matrix lhs, const matrix& rhs) {
-        lhs += rhs; // reuse compound assignment
-        return lhs;
-    }
-
-    matrix<TMatrix, N, M> operator-( const matrix<TMatrix, N, M>&arg ) const {
-        return matrix<TMatrix, N, M>(*this).operator-=(arg);
-    }
 
 	/*
 
