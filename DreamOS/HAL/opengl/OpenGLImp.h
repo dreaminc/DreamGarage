@@ -26,6 +26,8 @@
 
 // TODO: This break architecture
 #include "OpenGLShader.h"
+#include "OGLVertexShader.h"
+#include "OGLFragmentShader.h"
 
 class SandboxApp; 
 class Windows64App;
@@ -116,6 +118,8 @@ public:
 	RESULT glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
 
 	RESULT glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
+
+	RESULT glBindAttribLocation(GLuint program, GLuint index, const GLchar *name);
 
 // Extension Mappings
 private:

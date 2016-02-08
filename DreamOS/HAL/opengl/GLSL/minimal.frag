@@ -3,10 +3,10 @@
 
 // precision highp float;
 
-in vec3 ex_Color;
-out vec4 out_Color;
+in vec3 inF_vec3Color;
+out vec4 out_vec4Color;
 
 void main(void)
 {
-      out_Color = vec4(ex_Color,1.0);
+      out_vec4Color = vec4(inF_vec3Color, 1.0);
 }

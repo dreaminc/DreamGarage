@@ -200,11 +200,7 @@ RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 	GLenum glerr;
 	DWORD werr;
 
-	CNM(m_glBindAttribLocation, "glBindAttribLocation extension is NULL");
-
-	m_glBindAttribLocation(m_idOpenGLProgram, index, pszName);
-
-	CRM(CheckGLError(), "BindAttribLocation failed");
+	CR(glBindAttribLocation(m_idOpenGLProgram, index, pszName));
 
 	werr = GetLastError();
 	DEBUG_LINEOUT("Bound attribute %s to index location %d err:0x%x", pszName, index, werr);
@@ -265,96 +261,6 @@ Error:
 	return r;
 }
 
-const char *OpenGLImp::GetOGLTypeString(GLushort GLType) {
-	switch (GLType) {
-		case GL_BYTE:										return "GL Byte"; break;
-		case GL_UNSIGNED_BYTE:								return "GL Unsigned Byte"; break;
-		case GL_SHORT:										return "GL Short"; break;
-		case GL_UNSIGNED_SHORT:								return "GL Unsigned Short"; break;
-		case GL_INT:										return "GL Int"; break;
-		case GL_UNSIGNED_INT:								return "GL Unsigned Int"; break;
-		case GL_FLOAT:										return "GL Float"; break;
-		case GL_2_BYTES:									return "GL 2 Bytes"; break;
-		case GL_3_BYTES:									return "GL 3 Bytes"; break;
-		case GL_4_BYTES:									return "GL 4 Bytes"; break;
-		case GL_DOUBLE:										return "GL Double"; break;
-		case GL_FLOAT_VEC3:									return "GL Float Vec3"; break;
-		case GL_FLOAT_VEC4:									return "GL Float Vec4"; break;
-		case GL_FLOAT_VEC2:									return "GL Float Vec2"; break;
-		case GL_DOUBLE_VEC2:								return "GL Double Vec2"; break;
-		case GL_DOUBLE_VEC3:								return "GL Double Vec3"; break;
-		case GL_DOUBLE_VEC4:								return "GL Double Vec4"; break;
-		case GL_INT_VEC2:									return "GL Int Vec2"; break;
-		case GL_INT_VEC3:									return "GL Int Vec3"; break;
-		case GL_INT_VEC4:									return "GL Int Vec4"; break;
-		case GL_UNSIGNED_INT_VEC2:							return "GL Unsigned Int Vec2"; break;
-		case GL_UNSIGNED_INT_VEC3:							return "GL Unsigned Int Vec3"; break;
-		case GL_UNSIGNED_INT_VEC4:							return "GL Unsigned Int Vec4"; break;
-		case GL_BOOL:										return "GL Boolean"; break;
-		case GL_BOOL_VEC2:									return "GL Boolean Vec2"; break;
-		case GL_BOOL_VEC3:									return "GL Boolean Vec3"; break;
-		case GL_BOOL_VEC4:									return "GL Boolean Vec4"; break;
-		case GL_FLOAT_MAT2:									return "GL Float Matrix 2"; break;
-		case GL_FLOAT_MAT3:									return "GL Float Matrix 3"; break;
-		case GL_FLOAT_MAT4:									return "GL Float Matrix 4"; break;
-		case GL_FLOAT_MAT2x3:								return "GL Float Matrix 2x3"; break;
-		case GL_FLOAT_MAT2x4:								return "GL Float Matrix 2x4"; break;
-		case GL_FLOAT_MAT3x2:								return "GL Float Matrix 3x2"; break;
-		case GL_FLOAT_MAT3x4:								return "GL Float Matrix 3x4"; break;
-		case GL_FLOAT_MAT4x2:								return "GL Float Matrix 4x2"; break;
-		case GL_FLOAT_MAT4x3:								return "GL Float Matrix 4x3"; break;
-		case GL_DOUBLE_MAT2:								return "GL Double Matrix 2"; break;
-		case GL_DOUBLE_MAT3:								return "GL Double Matrix 3"; break;
-		case GL_DOUBLE_MAT4:								return "GL Double Matrix 4"; break;
-		case GL_DOUBLE_MAT2x3:								return "GL Double Matrix 2x3"; break;
-		case GL_DOUBLE_MAT2x4:								return "GL Double Matrix 2x4"; break;
-		case GL_DOUBLE_MAT3x2:								return "GL Double Matrix 3x2"; break;
-		case GL_DOUBLE_MAT3x4:								return "GL Double Matrix 3x4"; break;
-		case GL_DOUBLE_MAT4x2:								return "GL Double Matrix 4x2"; break;
-		case GL_DOUBLE_MAT4x3:								return "GL Double Matrix 4x3"; break;
-		case GL_SAMPLER_1D:									return "GL Sampler 1D"; break;
-		case GL_SAMPLER_2D:									return "GL Sampler 2D"; break;
-		case GL_SAMPLER_3D:									return "GL Sampler 3D"; break;
-		case GL_SAMPLER_CUBE:								return "GL Sampler Cube"; break;
-		case GL_SAMPLER_1D_SHADOW:							return "GL Sampler 1D Shadow"; break;
-		case GL_SAMPLER_2D_SHADOW:							return "GL Sampler 2D Shadow"; break;
-		case GL_SAMPLER_1D_ARRAY:							return "GL Sampler 1D Array"; break;
-		case GL_SAMPLER_2D_ARRAY:							return "GL Sampler 2D Array"; break;
-		case GL_SAMPLER_1D_ARRAY_SHADOW:					return "GL Sampler 1D Array Shadow"; break;
-		case GL_SAMPLER_2D_ARRAY_SHADOW:					return "GL Sampler 2D Array Shadow"; break;
-		case GL_SAMPLER_2D_MULTISAMPLE:						return "GL Sampler 2D Multisample"; break;
-		case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:				return "GL Sampler 2D Multisample Array"; break;
-		case GL_SAMPLER_CUBE_SHADOW:						return "GL Sampler Cube Shadow"; break;
-		case GL_SAMPLER_BUFFER:								return "GL Sampler Buffer"; break;
-		case GL_SAMPLER_2D_RECT:							return "GL Sampler 2D Rect"; break;
-		case GL_SAMPLER_2D_RECT_SHADOW:						return "GL Sampler 2D Rect Shadow"; break;
-		case GL_INT_SAMPLER_1D:								return "GL Int Sampler 1D"; break;
-		case GL_INT_SAMPLER_2D:								return "GL Int Sampler 2D"; break;
-		case GL_INT_SAMPLER_3D:								return "GL Int Sampler 3D"; break;
-		case GL_INT_SAMPLER_CUBE:							return "GL Int Sampler Cube"; break;
-		case GL_INT_SAMPLER_1D_ARRAY:						return "GL Int Sampler 1D Array"; break;
-		case GL_INT_SAMPLER_2D_ARRAY:						return "GL Int Sampler 2D Array"; break;
-		case GL_INT_SAMPLER_2D_MULTISAMPLE:					return "GL Int Sampler 2D Multisample"; break;
-		case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:			return "GL Int Sampler 2D Multisample Array"; break;
-		case GL_INT_SAMPLER_BUFFER:							return "GL Int Sampler Buffer"; break;
-		case GL_INT_SAMPLER_2D_RECT:						return "GL Int Sampler 2D Rect"; break;
-		case GL_UNSIGNED_INT_SAMPLER_1D:					return "GL Unsigned Int Sampler 1D"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D:					return "GL Unsigned Int Sampler 2D"; break;
-		case GL_UNSIGNED_INT_SAMPLER_3D:					return "GL Unsigned Int Sampler 3D"; break;
-		case GL_UNSIGNED_INT_SAMPLER_CUBE:					return "GL Unsigned Int Sampler Cube"; break;
-		case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:				return "GL Unsigned Int Sampler 1D Array"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:				return "GL Unsigned Int Sampler 2D Array"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:		return "GL Unsigned Int Sampler 2D Multisample"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:	return "GL Unsigned Int Sampler 2D Multisample Array"; break;
-		case GL_UNSIGNED_INT_SAMPLER_BUFFER:				return "GL Unsigned Int Sampler Buffer"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D_RECT:				return "GL Unsigned Int Sampler 2D Rect"; break;
-
-		default: return "Unhandled GL Type"; break;
-	}
-
-	return NULL;
-}
-
 RESULT OpenGLImp::PrintVertexAttributes() {
 	RESULT r = R_PASS;
 
@@ -384,6 +290,8 @@ Error:
 	return r; 
 }
 
+#include "Primitives/ProjectionMatrix.h"
+
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -399,17 +307,20 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO: Should be stuffed into factory arch - return NULL on fail
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
-	OpenGLShader *pVertexShader = new OpenGLShader(this, GL_VERTEX_SHADER);
+	//OpenGLShader *pVertexShader = new OpenGLShader(this, GL_VERTEX_SHADER);
+	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
 	CRM(pVertexShader->InitializeFromFile(L"minimal.vert"), "Failed to initialize vertex shader from file");
 
-	OpenGLShader *pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
+	//OpenGLShader *pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
+	OpenGLShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
 	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag"), "Failed to initialize fragment shader from file");
 
-	// Some Shader Routing
-	CRM(BindAttribLocation(0, "in_Position"), "Failed to bind in_Position attribute");
-	CRM(BindAttribLocation(1, "in_Color"), "Failed to bind in_Color attribute");
+	// Vertex Shader Routing
+	// TODO: Absorb into the shader above
+	CRM(BindAttribLocation(0, "inV_vec3Position"), "Failed to bind in_Position attribute");
+	CRM(BindAttribLocation(1, "inV_vec3Color"), "Failed to bind in_Color attribute");
 	
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
@@ -427,8 +338,6 @@ Error:
 
 	return r;
 }
-
-#include "Primitives/ProjectionMatrix.h"
 
 RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
@@ -667,6 +576,18 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glBindAttribLocation(GLuint program, GLuint index, const GLchar *name) {
+	RESULT r = R_PASS;
+
+	CNM(m_glBindAttribLocation, "glBindAttribLocation extension is NULL");
+
+	m_glBindAttribLocation(program, index, name);
+	CRM(CheckGLError(), "glBindAttribLocation failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
 	RESULT r = R_PASS;
 
@@ -849,4 +770,95 @@ RESULT OpenGLImp::InitializeExtensions() {
 
 Error:
 	return r;
+}
+
+
+const char *OpenGLImp::GetOGLTypeString(GLushort GLType) {
+	switch (GLType) {
+		case GL_BYTE:										return "GL Byte"; break;
+		case GL_UNSIGNED_BYTE:								return "GL Unsigned Byte"; break;
+		case GL_SHORT:										return "GL Short"; break;
+		case GL_UNSIGNED_SHORT:								return "GL Unsigned Short"; break;
+		case GL_INT:										return "GL Int"; break;
+		case GL_UNSIGNED_INT:								return "GL Unsigned Int"; break;
+		case GL_FLOAT:										return "GL Float"; break;
+		case GL_2_BYTES:									return "GL 2 Bytes"; break;
+		case GL_3_BYTES:									return "GL 3 Bytes"; break;
+		case GL_4_BYTES:									return "GL 4 Bytes"; break;
+		case GL_DOUBLE:										return "GL Double"; break;
+		case GL_FLOAT_VEC3:									return "GL Float Vec3"; break;
+		case GL_FLOAT_VEC4:									return "GL Float Vec4"; break;
+		case GL_FLOAT_VEC2:									return "GL Float Vec2"; break;
+		case GL_DOUBLE_VEC2:								return "GL Double Vec2"; break;
+		case GL_DOUBLE_VEC3:								return "GL Double Vec3"; break;
+		case GL_DOUBLE_VEC4:								return "GL Double Vec4"; break;
+		case GL_INT_VEC2:									return "GL Int Vec2"; break;
+		case GL_INT_VEC3:									return "GL Int Vec3"; break;
+		case GL_INT_VEC4:									return "GL Int Vec4"; break;
+		case GL_UNSIGNED_INT_VEC2:							return "GL Unsigned Int Vec2"; break;
+		case GL_UNSIGNED_INT_VEC3:							return "GL Unsigned Int Vec3"; break;
+		case GL_UNSIGNED_INT_VEC4:							return "GL Unsigned Int Vec4"; break;
+		case GL_BOOL:										return "GL Boolean"; break;
+		case GL_BOOL_VEC2:									return "GL Boolean Vec2"; break;
+		case GL_BOOL_VEC3:									return "GL Boolean Vec3"; break;
+		case GL_BOOL_VEC4:									return "GL Boolean Vec4"; break;
+		case GL_FLOAT_MAT2:									return "GL Float Matrix 2"; break;
+		case GL_FLOAT_MAT3:									return "GL Float Matrix 3"; break;
+		case GL_FLOAT_MAT4:									return "GL Float Matrix 4"; break;
+		case GL_FLOAT_MAT2x3:								return "GL Float Matrix 2x3"; break;
+		case GL_FLOAT_MAT2x4:								return "GL Float Matrix 2x4"; break;
+		case GL_FLOAT_MAT3x2:								return "GL Float Matrix 3x2"; break;
+		case GL_FLOAT_MAT3x4:								return "GL Float Matrix 3x4"; break;
+		case GL_FLOAT_MAT4x2:								return "GL Float Matrix 4x2"; break;
+		case GL_FLOAT_MAT4x3:								return "GL Float Matrix 4x3"; break;
+		case GL_DOUBLE_MAT2:								return "GL Double Matrix 2"; break;
+		case GL_DOUBLE_MAT3:								return "GL Double Matrix 3"; break;
+		case GL_DOUBLE_MAT4:								return "GL Double Matrix 4"; break;
+		case GL_DOUBLE_MAT2x3:								return "GL Double Matrix 2x3"; break;
+		case GL_DOUBLE_MAT2x4:								return "GL Double Matrix 2x4"; break;
+		case GL_DOUBLE_MAT3x2:								return "GL Double Matrix 3x2"; break;
+		case GL_DOUBLE_MAT3x4:								return "GL Double Matrix 3x4"; break;
+		case GL_DOUBLE_MAT4x2:								return "GL Double Matrix 4x2"; break;
+		case GL_DOUBLE_MAT4x3:								return "GL Double Matrix 4x3"; break;
+		case GL_SAMPLER_1D:									return "GL Sampler 1D"; break;
+		case GL_SAMPLER_2D:									return "GL Sampler 2D"; break;
+		case GL_SAMPLER_3D:									return "GL Sampler 3D"; break;
+		case GL_SAMPLER_CUBE:								return "GL Sampler Cube"; break;
+		case GL_SAMPLER_1D_SHADOW:							return "GL Sampler 1D Shadow"; break;
+		case GL_SAMPLER_2D_SHADOW:							return "GL Sampler 2D Shadow"; break;
+		case GL_SAMPLER_1D_ARRAY:							return "GL Sampler 1D Array"; break;
+		case GL_SAMPLER_2D_ARRAY:							return "GL Sampler 2D Array"; break;
+		case GL_SAMPLER_1D_ARRAY_SHADOW:					return "GL Sampler 1D Array Shadow"; break;
+		case GL_SAMPLER_2D_ARRAY_SHADOW:					return "GL Sampler 2D Array Shadow"; break;
+		case GL_SAMPLER_2D_MULTISAMPLE:						return "GL Sampler 2D Multisample"; break;
+		case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:				return "GL Sampler 2D Multisample Array"; break;
+		case GL_SAMPLER_CUBE_SHADOW:						return "GL Sampler Cube Shadow"; break;
+		case GL_SAMPLER_BUFFER:								return "GL Sampler Buffer"; break;
+		case GL_SAMPLER_2D_RECT:							return "GL Sampler 2D Rect"; break;
+		case GL_SAMPLER_2D_RECT_SHADOW:						return "GL Sampler 2D Rect Shadow"; break;
+		case GL_INT_SAMPLER_1D:								return "GL Int Sampler 1D"; break;
+		case GL_INT_SAMPLER_2D:								return "GL Int Sampler 2D"; break;
+		case GL_INT_SAMPLER_3D:								return "GL Int Sampler 3D"; break;
+		case GL_INT_SAMPLER_CUBE:							return "GL Int Sampler Cube"; break;
+		case GL_INT_SAMPLER_1D_ARRAY:						return "GL Int Sampler 1D Array"; break;
+		case GL_INT_SAMPLER_2D_ARRAY:						return "GL Int Sampler 2D Array"; break;
+		case GL_INT_SAMPLER_2D_MULTISAMPLE:					return "GL Int Sampler 2D Multisample"; break;
+		case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:			return "GL Int Sampler 2D Multisample Array"; break;
+		case GL_INT_SAMPLER_BUFFER:							return "GL Int Sampler Buffer"; break;
+		case GL_INT_SAMPLER_2D_RECT:						return "GL Int Sampler 2D Rect"; break;
+		case GL_UNSIGNED_INT_SAMPLER_1D:					return "GL Unsigned Int Sampler 1D"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D:					return "GL Unsigned Int Sampler 2D"; break;
+		case GL_UNSIGNED_INT_SAMPLER_3D:					return "GL Unsigned Int Sampler 3D"; break;
+		case GL_UNSIGNED_INT_SAMPLER_CUBE:					return "GL Unsigned Int Sampler Cube"; break;
+		case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:				return "GL Unsigned Int Sampler 1D Array"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:				return "GL Unsigned Int Sampler 2D Array"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:		return "GL Unsigned Int Sampler 2D Multisample"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:	return "GL Unsigned Int Sampler 2D Multisample Array"; break;
+		case GL_UNSIGNED_INT_SAMPLER_BUFFER:				return "GL Unsigned Int Sampler Buffer"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D_RECT:				return "GL Unsigned Int Sampler 2D Rect"; break;
+
+		default: return "Unhandled GL Type"; break;
+	}
+
+	return NULL;
 }

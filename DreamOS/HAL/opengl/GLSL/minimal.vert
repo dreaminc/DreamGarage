@@ -1,12 +1,14 @@
 // minimal.vert
-#version 150 core
+//#version 150 core
+#version 450 core
 
-in vec3 in_Position;
-in vec3 in_Color;
-out vec3 ex_Color;
+in vec3 inV_vec3Position;
+in vec3 inV_vec3Color;
+
+out vec3 inF_vec3Color;
 
 void main(void)
 {
-      gl_Position = vec4(in_Position, 1.0);
-      ex_Color = in_Color;
+      gl_Position = vec4(inV_vec3Position, 1.0);
+      inF_vec3Color = inV_vec3Color;
 }
