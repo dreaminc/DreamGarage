@@ -456,6 +456,8 @@ RESULT OpenGLImp::Render() {
 	theta += 0.01f;
 
 	RotationMatrix matRotation(RotationMatrix::Y_AXIS, theta);
+	TranslationMatrix matTranslation(0, theta, 0.0f);
+
 	GLuint loc;
 
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
@@ -469,7 +471,7 @@ RESULT OpenGLImp::Render() {
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Rotation", &loc);
 	
 	if (loc >= 0) 
-		glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)(&matRotation));
+		glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)(&matTranslation));
 
 
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
