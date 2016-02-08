@@ -17,19 +17,27 @@ typedef enum {
 	PROJECTION_MATRIX_INVALID
 } PROJECTION_MATRIX_TYPE;
 
-// TODO: Template the type of the matrix?
+#ifdef FLOAT_PRECISION
+	typedef float projection_precision;
+#elif defined(DOUBLE_PRECISION)
+	typedef double projection_precision;
+#endif
 
-class ProjectionMatrix : public matrix<float, 4, 4> {
+class ProjectionMatrix : public matrix<projection_precision, 4, 4> {
 public:
-	ProjectionMatrix(PROJECTION_MATRIX_TYPE type, float width, float height, float nearPlane, float farPlane, float angle);
+	ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_precision width, 
+												  projection_precision height, 
+												  projection_precision nearPlane, 
+												  projection_precision farPlane, 
+												  projection_precision angle);
 	~ProjectionMatrix();
 
 	RESULT PrintMatrix();
 	const char *StringProjectionMatrixType();
 
 private:
-	RESULT SetPerspective(float width, float height, float nearPlane, float farPlane, float angle);
-	RESULT SetOrthographic(float width, float height, float nearPlane, float farPlane);
+	RESULT SetPerspective(projection_precision width, projection_precision height, projection_precision nearPlane, projection_precision farPlane, projection_precision angle);
+	RESULT SetOrthographic(projection_precision width, projection_precision height, projection_precision nearPlane, projection_precision farPlane);
 
 private:
 	PROJECTION_MATRIX_TYPE m_type;

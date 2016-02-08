@@ -306,6 +306,39 @@ Error:
 	return r; 
 }
 
+RESULT OpenGLImp::PrintActiveUniformVariables() {
+	RESULT r = R_PASS;
+
+	GLint variables_n = 0;
+	CR(glGetProgramInterfaceiv(m_idOpenGLProgram, GL_UNIFORM, GL_ACTIVE_RESOURCES, &variables_n));
+
+	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX };
+
+	DEBUG_LINEOUT("%d active uniform variables", variables_n);
+	for (int i = 0; i < variables_n; i++) {
+		GLint results[4];
+		CR(glGetProgramResourceiv(m_idOpenGLProgram, GL_UNIFORM, i, 4, properties, 4, NULL, results));
+
+		// Skip uniforms in blocks
+		if (results[3] != -1) continue; 
+		
+		GLint pszName_n = results[0] + 1;
+		char *pszName = new char[pszName_n];
+		CR(glGetProgramResourceName(m_idOpenGLProgram, GL_UNIFORM, i, pszName_n, NULL, pszName));
+
+		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, GetOGLTypeString(results[1]));
+
+		if (pszName != NULL) {
+			delete[] pszName;
+			pszName = NULL;
+		}
+
+	}
+
+Error:
+	return r;
+}
+
 // TODO: Get this outta here
 #include "Primitives/ProjectionMatrix.h"
 
@@ -345,6 +378,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(UseProgram(), "Failed to use open gl program");
 
 	CR(PrintVertexAttributes());
+	CR(PrintActiveUniformVariables());
 
 	// TODO: Temporary, get some data into the funnel for now
 	CRM(SetData(), "Failed to set some data");
@@ -359,38 +393,11 @@ Error:
 RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
-	// Attempt to play with a projection matrix
-	DEBUG_LINEOUT("Setting Projection Matrix width %d height %d", pxWidth, pxHeight);
-	ProjectionMatrix projMatrix(PROJECTION_MATRIX_PERSPECTIVE, pxWidth, pxHeight, 1.0f, 100.0f, 45.0f);
-	projMatrix.PrintMatrix();
-
-	/*
-	projMatrix.NumbersByElement(0.0f, 1.0f);
-	projMatrix.PrintMatrix();
-
-	projMatrix.Numbers(0.0f, 1.0f);
-	projMatrix.PrintMatrix();
-
-	for (int i = 0; i < projMatrix.rows(); i++)
-		for (int j = 0; j < projMatrix.cols(); j++)
-			projMatrix.element(i, j) = i * projMatrix.cols() + j;
-	projMatrix.PrintMatrix();
-
-	for (int i = 0; i < projMatrix.rows(); i++)
-		for (int j = 0; j < projMatrix.cols(); j++)
-			projMatrix(i, j) = i * projMatrix.cols() + j;
-	projMatrix.PrintMatrix();
-	*/
-
-	/*
-	for (int i = 0; i < projMatrix.rows(); i++)
-		for (int j = 0; j < projMatrix.cols(); j++)
-			projMatrix[i][j] = i * projMatrix.cols() + j;
-	projMatrix.PrintMatrix();
-	*/
+	m_pxViewWidth = pxWidth;
+	m_pxViewHeight = pxHeight;
 
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");	
-	glViewport(0, 0, (GLsizei)pxWidth, (GLsizei)pxHeight);
+	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
 
 Error:
 	if (!wglMakeCurrent(NULL, NULL))
@@ -431,9 +438,6 @@ RESULT OpenGLImp::SetData() {
 	g_pTriangle->UpdateOGLBuffers();
 	//*/
 
-	TranslationMatrix transMatrix(2, 3, 4);
-	transMatrix.PrintMatrix();
-
 	g_pQuad = new OGLQuad(this, 0.8f);
 	CVM(g_pQuad, "Failed to construct Quad");
 
@@ -451,27 +455,42 @@ projMatrix.PrintMatrix();
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;
 
-	static float theta = 0;
+	static float theta = 1;
 
-	theta += 0.01f;
+	//theta -= 0.02f;
 
-	RotationMatrix matRotation(RotationMatrix::Y_AXIS, theta);
-	TranslationMatrix matTranslation(0, theta, 0.0f);
-
-	GLuint loc;
+	//RotationMatrix matModel(RotationMatrix::Y_AXIS, theta);
+	
+	TranslationMatrix matModel(0, 0.0f, theta);
+	
+	TranslationMatrix matView(0.0f, 0.0f, 0.0f);
+	//ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
+	ProjectionMatrix matProjection(PROJECTION_MATRIX_ORTHOGRAPHIC, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 0.0f);
+	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1;
 
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// First test the identity 
-	//matRotation.identity();
+	//matModel.identity();
+	matView.identity();
+	matProjection.identity();
 
 	// This is for testing only
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Rotation", &loc);
-	
-	if (loc >= 0) 
-		glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)(&matTranslation));
+	// TODO: Combined MVP or do in the shader?
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Projection", &locationProjectionMatrix);
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4View", &locationViewMatrix);
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
+
+	if (locationProjectionMatrix >= 0) 
+		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matProjection));
+
+	if (locationViewMatrix >= 0)
+		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&matView));
+
+	if (locationModelMatrix >= 0)
+		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
 
 
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -634,7 +653,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLuint *pLocation) {
+RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
 	RESULT r = R_PASS;
 
 	CNM(m_glGetUniformLocation, "glGetUniformLocation extension is NULL");
@@ -644,7 +663,7 @@ RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLuin
 
 	return r;
 Error:
-	pLocation = NULL;
+	*pLocation = -1;
 	return r;
 }
 

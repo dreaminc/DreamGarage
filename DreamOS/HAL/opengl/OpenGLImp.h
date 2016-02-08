@@ -34,6 +34,9 @@ class Windows64App;
 
 class OpenGLImp : public HALImp {
 private:
+
+	// TODO: Create an OpenGL Program class which should combine
+	// the shaders since we might want to jump around OGL programs in the future
 	GLuint m_idOpenGLProgram;
 	HGLRC m_hglrc;		// OpenGL rendering context
 
@@ -44,6 +47,16 @@ private:
 	int m_versionMajor;
 	int m_versionMinor;
 	int m_versionGLSL;
+
+	// Viewport
+	// TODO: Move this into an object?
+private:
+	int m_pxViewWidth;
+	int m_pxViewHeight;
+
+public:
+	int GetViewWidth() { return m_pxViewWidth; }
+	int GetViewHeight() { return m_pxViewHeight; }
 
 public:
 	SandboxApp *GetParentApp();	// TODO: This should go into the HALImp
@@ -58,6 +71,7 @@ public:
 	RESULT ShutdownImplementaiton();
 	RESULT Render();
 	RESULT PrintVertexAttributes();
+	RESULT PrintActiveUniformVariables();
 
 private:
 	RESULT InitializeExtensions();
@@ -127,7 +141,7 @@ public:
 	RESULT BindAttribLocation(unsigned int index, char* pszName);
 
 	// Uniform Variables
-	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLuint *pLocation);
+	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 
 // Extension Mappings

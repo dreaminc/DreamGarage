@@ -1,6 +1,13 @@
 #include "ProjectionMatrix.h"
 
-ProjectionMatrix::ProjectionMatrix(PROJECTION_MATRIX_TYPE type, float width, float height, float nearPlane, float farPlane, float angle) :
+#define M_PI       3.14159265358979323846   // pi
+
+ProjectionMatrix::ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_precision width,
+																projection_precision height,
+																projection_precision nearPlane,
+																projection_precision farPlane,
+																projection_precision angle
+) :
 	m_type(type)
 {
 	switch (type) {
@@ -18,16 +25,34 @@ ProjectionMatrix::~ProjectionMatrix() {
 	// Empty Stub
 }
 
-RESULT ProjectionMatrix::SetPerspective(float width, float height, float nearPlane, float farPlane, float angle) {
+// https://solarianprogrammer.com/2013/05/22/opengl-101-matrices-projection-view-model/
+RESULT ProjectionMatrix::SetPerspective(projection_precision width, 
+										projection_precision height, 
+										projection_precision nearPlane, 
+										projection_precision farPlane, 
+										projection_precision angle) 
+{
 	RESULT r = R_PASS;
 
-	float ratio = width / height;
 	this->clear();
-	this->element(0, 0) = 1.0f / (ratio * tan(angle / 2.0f));
-	this->element(1, 1) = 1.0f / tan(angle / 2.0f);
-	this->element(2, 2) = (-nearPlane - farPlane) / (nearPlane -farPlane);
-	this->element(2, 3) = (1.0f);
-	this->element(3, 2) = 2.0f * nearPlane *farPlane / (nearPlane - farPlane);
+
+	projection_precision ratio = width / height;
+	projection_precision top = nearPlane * tan((M_PI / 180.0f) * (angle / 2.0f));
+	projection_precision bottom = -top;
+	projection_precision right = top * ratio;
+	projection_precision left = -right;
+
+	this->clear();
+	this->element(0, 0) = (2.0f * nearPlane) / (right - left);
+	this->element(0, 2) = (right + left) / (right - left);
+
+	this->element(1, 1) = (2.0f * nearPlane) / (top - bottom);
+	this->element(1, 1) = (top + bottom) / (top - bottom);
+
+	this->element(2, 2) = -(farPlane + nearPlane) / (farPlane - nearPlane);
+	this->element(2, 2) = (-2.0f*farPlane*nearPlane) / (farPlane - nearPlane);
+
+	this->element(3, 2) = (-1.0f);
 
 	m_type = PROJECTION_MATRIX_PERSPECTIVE;
 
@@ -35,19 +60,23 @@ Error:
 	return r;
 }
 
-RESULT ProjectionMatrix::SetOrthographic(float width, float height, float nearPlane, float farPlane) {
+// http://www.songho.ca/opengl/gl_projectionmatrix.html
+RESULT ProjectionMatrix::SetOrthographic(projection_precision width, 
+										 projection_precision height, 
+										 projection_precision nearPlane, 
+										 projection_precision farPlane) 
+{
 	RESULT r = R_PASS;
 
-	float ratio = width / height;
+	m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+
 	this->clear();
 
-	this->element(0, 0) = 2.0f / width;
-	this->element(1, 1) = 2.0f / height;
-	this->element(2, 2) = 1.0f / (farPlane - nearPlane);
-	this->element(3, 2) = -nearPlane / (farPlane - nearPlane);
+	this->element(0, 0) = 1.0f / width;
+	this->element(1, 1) = 1.0f / height;
+	this->element(2, 2) = -2.0f / (farPlane - nearPlane);
+	this->element(2, 3) = -(farPlane + nearPlane) / (farPlane - nearPlane);
 	this->element(3, 3) = 1.0f;
-
-	m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
 
 Error:
 	return r;
@@ -64,5 +93,5 @@ const char *ProjectionMatrix::StringProjectionMatrixType() {
 
 RESULT ProjectionMatrix::PrintMatrix() {
 	DEBUG_LINEOUT("%s Projection Matrix", StringProjectionMatrixType());
-	return matrix<float, 4, 4>::PrintMatrix();
+	return matrix<projection_precision, 4, 4>::PrintMatrix();
 }
