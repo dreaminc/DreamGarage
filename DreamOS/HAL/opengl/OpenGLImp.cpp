@@ -157,7 +157,7 @@ RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 	GLint numShaders;
 	GLenum glerr = GL_NO_ERROR;
 
-	OpenGLShader *&pOGLShader = this->m_pVertexShader;
+	OpenGLShader *&pOGLShader = (OpenGLShader *&)(this->m_pVertexShader);
 
 	switch (pOpenGLShader->GetShaderType()) {
 		case GL_VERTEX_SHADER: {
@@ -193,6 +193,20 @@ RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 
 Error:
 	return r;
+}
+
+RESULT OpenGLImp::EnableVertexPositionAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableVertexPositionAttribute();
+	else
+		return R_FAIL;
+}
+
+RESULT OpenGLImp::EnableVertexColorAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableVertexColorAttribute();
+	else
+		return R_FAIL;
 }
 
 RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
@@ -307,20 +321,21 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO: Should be stuffed into factory arch - return NULL on fail
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
-	//OpenGLShader *pVertexShader = new OpenGLShader(this, GL_VERTEX_SHADER);
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
 	CRM(pVertexShader->InitializeFromFile(L"minimal.vert"), "Failed to initialize vertex shader from file");
+	CR(pVertexShader->BindAttributes());
 
-	//OpenGLShader *pFragmentShader = new OpenGLShader(this, GL_FRAGMENT_SHADER);
 	OpenGLShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
 	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag"), "Failed to initialize fragment shader from file");
 
 	// Vertex Shader Routing
 	// TODO: Absorb into the shader above
+	/*
 	CRM(BindAttribLocation(0, "inV_vec3Position"), "Failed to bind in_Position attribute");
 	CRM(BindAttribLocation(1, "inV_vec3Color"), "Failed to bind in_Color attribute");
+	*/
 	
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)

@@ -72,9 +72,13 @@ private:
 	RESULT SetData();
 
 private:
-	OpenGLShader *m_pVertexShader;
-	OpenGLShader *m_pFragmentShader;
+	OGLVertexShader *m_pVertexShader;
+	OGLFragmentShader *m_pFragmentShader;
 	// Other shaders
+
+public:
+	inline RESULT EnableVertexPositionAttribute();
+	inline RESULT EnableVertexColorAttribute();
 
 	// Utility TODO: Move to a different object
 public:
@@ -118,8 +122,9 @@ public:
 	RESULT glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
 
 	RESULT glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
-
 	RESULT glBindAttribLocation(GLuint program, GLuint index, const GLchar *name);
+
+	RESULT BindAttribLocation(unsigned int index, char* pszName);
 
 // Extension Mappings
 private:
@@ -128,7 +133,6 @@ private:
 	char* GetInfoLog();
 	RESULT UseProgram();
 	RESULT LinkProgram();
-	RESULT BindAttribLocation(unsigned int index, char* pszName);
 
 public:
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);

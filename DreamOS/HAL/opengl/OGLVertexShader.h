@@ -37,6 +37,10 @@ public:
 	GLuint GetColorIndex() {
 		return VERTEX_SHADER_COLOR_INDEX;
 	}
+
+	RESULT BindAttributes();
+	RESULT EnableVertexPositionAttribute();
+	RESULT EnableVertexColorAttribute();
 };
 
 #endif // ! OGL_VERTEX_SHADER_H_
