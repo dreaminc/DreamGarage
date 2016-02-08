@@ -35,7 +35,7 @@ template <typename TMatrix, int N = 4, int M = 4>
 class matrix : public MatrixBase<TMatrix> {
 //class matrix : public MatrixBase {
 
-protected:
+public:
     TMatrix m_data[N * M];
 
 public:
@@ -134,7 +134,7 @@ public:
 		return retProxy;
 	}
 
-protected:
+public:
 	TMatrix* getData() { return m_data; }
 
 
@@ -215,20 +215,33 @@ public:
 
     // Assignment Operators
     // -------------------------------------------------------------------------
-	/*
+	
     // Copy
+	 /*
     matrix& matrix::operator=(const matrix<TMatrix, N, M>& arg) {
-        memcpy(&m_data, arg.m_data, sizeof(T) * N * M);
+        memcpy(m_data, arg.m_data, sizeof(TMatrix) * N * M);
         return *this;
     }
+	*/
+
+	 matrix<TMatrix, N, M>& operator=(const matrix<TMatrix, N, M> &arg) {
+		 if (this == &arg)      // Same object?
+			 return *this;        // Yes, so skip assignment, and just return *this.
+
+		memcpy(this->m_data, arg.m_data, sizeof(TMatrix) * N * M);
+
+		return *this;
+	}
 
     // Move
-    matrix& matrix::operator=(matrix<T, N, M>&& arg) {
-        //assert((this != &arg));   // TODO: Asserts / EHM
-        memcpy(this->m_data, arg.m_data, sizeof(T) * N * M);
+	/*
+    matrix& matrix::operator=(matrix<TMatrix, N, M>&& arg) {
+        //assert(this != &arg);   // TODO: Asserts / EHM
+        memcpy(m_data, arg.m_data, sizeof(TMatrix) * N * M);
         return *this;
     }
 
+	/*
     // comparison
     bool operator==( const matrix<TMatrix, N, M>& arg) const {
         for(int i = 0; i < N * M; i++)
@@ -249,22 +262,28 @@ public:
     bool operator!() const {
         return isZero();
     }
+	*/
 
     // Arithmetic Operators
     // -------------------------------------------------------------------------
-    matrix& operator+=(const matrix& rhs) {
-        addData(rhs.m_data);
+	matrix<TMatrix, N, M>& operator+=(const matrix<TMatrix, N, M>& rhs) {
+        addData((TMatrix*)rhs.m_data);
         return *this;
     }
 
-    friend matrix operator+(matrix lhs, const matrix& rhs) {
-        lhs += rhs; // reuse compound assignment
-        return lhs;
-    }
+	// TODO: Is this the right way?
+	friend matrix<TMatrix, N, M> operator+(const matrix<TMatrix, N, M>& lhs, const matrix<TMatrix, N, M>& rhs) {
+		//lhs += rhs; // reuse compound assignment
+		matrix newMatrix = lhs;
+		newMatrix.addData((TMatrix*)rhs.m_data);
+		return newMatrix;
+	}
 
-    matrix<TMatrix, N, M> operator+( const matrix<TMatrix, N, M>&arg ) const {
-        return matrix<TMatrix>(*this).operator+=(arg);
+	/*
+    matrix<TMatrix, N, M>& operator+( const matrix<TMatrix, N, M>&arg ) const {
+        return matrix<TMatrix, N, M>(*this).operator+=(arg);
     }
+	*/
 
     matrix& operator-=(const matrix& rhs) {
         subData(rhs.m_data);
@@ -279,6 +298,8 @@ public:
     matrix<TMatrix, N, M> operator-( const matrix<TMatrix, N, M>&arg ) const {
         return matrix<TMatrix, N, M>(*this).operator-=(arg);
     }
+
+	/*
 
     // Scalar multiplication / Division
     // -------------------------------------------------------------------------
