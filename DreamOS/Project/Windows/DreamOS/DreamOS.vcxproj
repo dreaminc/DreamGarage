@@ -190,6 +190,7 @@
     <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\point.h" />
     <ClInclude Include="..\..\..\Primitives\quad.h" />
+    <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Number.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h" />

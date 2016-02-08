@@ -275,6 +275,8 @@ Error:
 	return r;
 }
 
+// TODO: Might want to check this against the shader and find
+// any mismatches? 
 RESULT OpenGLImp::PrintVertexAttributes() {
 	RESULT r = R_PASS;
 
@@ -304,7 +306,11 @@ Error:
 	return r; 
 }
 
+// TODO: Get this outta here
 #include "Primitives/ProjectionMatrix.h"
+
+// TODO: Get this outta here
+#include "Primitives/TranslationMatrix.h"
 
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
@@ -329,13 +335,6 @@ RESULT OpenGLImp::PrepareScene() {
 	OpenGLShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
 	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag"), "Failed to initialize fragment shader from file");
-
-	// Vertex Shader Routing
-	// TODO: Absorb into the shader above
-	/*
-	CRM(BindAttribLocation(0, "inV_vec3Position"), "Failed to bind in_Position attribute");
-	CRM(BindAttribLocation(1, "inV_vec3Color"), "Failed to bind in_Color attribute");
-	*/
 	
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
@@ -429,12 +428,22 @@ RESULT OpenGLImp::SetData() {
 	g_pTriangle->UpdateOGLBuffers();
 	//*/
 
+	TranslationMatrix transMatrix(2, 3, 4);
+	transMatrix.PrintMatrix();
+
 	g_pQuad = new OGLQuad(this, 0.8f);
 	CVM(g_pQuad, "Failed to construct Quad");
 
 Error:
 	return r;
 }
+
+/*
+// Attempt to play with a projection matrix
+DEBUG_LINEOUT("Setting Projection Matrix width %d height %d", pxWidth, pxHeight);
+ProjectionMatrix projMatrix(PROJECTION_MATRIX_PERSPECTIVE, pxWidth, pxHeight, 1.0f, 100.0f, 45.0f);
+projMatrix.PrintMatrix();
+*/
 
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;

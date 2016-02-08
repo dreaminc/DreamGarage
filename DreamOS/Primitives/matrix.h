@@ -48,6 +48,22 @@ public:
 		return R_PASS;
 	}
 
+	// Sets up an identity matrix
+	RESULT identity() {
+		RESULT r = R_PASS;
+
+		// Ensure square matrix
+		CBM((N == M), "Cant sent identity matrix on %dx%d dimensions", N, M);
+
+		clear();
+
+		for (int i = 0; i < N; i++)
+			this->element(i, i) = 1.0f;
+
+	Error:
+		return r;
+	}
+
 public:
 	// Constructors
 	matrix() {
@@ -64,6 +80,8 @@ public:
 	}
 
 	RESULT Numbers(TMatrix start, TMatrix increment) {
+		clear();
+
 		for (int i = 0; i < N * M; i++)
 			m_data[i] = start + i * increment;
 

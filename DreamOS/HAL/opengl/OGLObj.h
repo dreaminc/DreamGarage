@@ -54,7 +54,7 @@ public:
 		return r;
 	}
 
-	// This should be used in the OGLInitialize functon
+	// This should be used in the OGLInitialize function
 	inline GLushort GetOGLPrecision() {
 		#ifdef FLOAT_PRECISION
 			return GL_FLOAT;
