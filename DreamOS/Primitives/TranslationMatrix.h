@@ -21,9 +21,9 @@ public:
 	TranslationMatrix(translate_precision x, translate_precision y, translate_precision z) {
 		this->identity();
 		
-		this->element(3, 0) = x;
-		this->element(3, 1) = y;
-		this->element(3, 2) = z;
+		this->element(0, 3) = x;
+		this->element(1, 3) = y;
+		this->element(2, 3) = z;
 	}
 
 	~TranslationMatrix() {
