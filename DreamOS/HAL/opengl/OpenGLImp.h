@@ -126,6 +126,10 @@ public:
 
 	RESULT BindAttribLocation(unsigned int index, char* pszName);
 
+	// Uniform Variables
+	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLuint *pLocation);
+	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+
 // Extension Mappings
 private:
 	RESULT CheckGLError();
