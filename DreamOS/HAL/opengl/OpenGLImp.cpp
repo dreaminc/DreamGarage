@@ -265,6 +265,125 @@ Error:
 	return r;
 }
 
+const char *OpenGLImp::GetOGLTypeString(GLushort GLType) {
+	switch (GLType) {
+		case GL_BYTE:										return "GL Byte"; break;
+		case GL_UNSIGNED_BYTE:								return "GL Unsigned Byte"; break;
+		case GL_SHORT:										return "GL Short"; break;
+		case GL_UNSIGNED_SHORT:								return "GL Unsigned Short"; break;
+		case GL_INT:										return "GL Int"; break;
+		case GL_UNSIGNED_INT:								return "GL Unsigned Int"; break;
+		case GL_FLOAT:										return "GL Float"; break;
+		case GL_2_BYTES:									return "GL 2 Bytes"; break;
+		case GL_3_BYTES:									return "GL 3 Bytes"; break;
+		case GL_4_BYTES:									return "GL 4 Bytes"; break;
+		case GL_DOUBLE:										return "GL Double"; break;
+		case GL_FLOAT_VEC3:									return "GL Float Vec3"; break;
+		case GL_FLOAT_VEC4:									return "GL Float Vec4"; break;
+		case GL_FLOAT_VEC2:									return "GL Float Vec2"; break;
+		case GL_DOUBLE_VEC2:								return "GL Double Vec2"; break;
+		case GL_DOUBLE_VEC3:								return "GL Double Vec3"; break;
+		case GL_DOUBLE_VEC4:								return "GL Double Vec4"; break;
+		case GL_INT_VEC2:									return "GL Int Vec2"; break;
+		case GL_INT_VEC3:									return "GL Int Vec3"; break;
+		case GL_INT_VEC4:									return "GL Int Vec4"; break;
+		case GL_UNSIGNED_INT_VEC2:							return "GL Unsigned Int Vec2"; break;
+		case GL_UNSIGNED_INT_VEC3:							return "GL Unsigned Int Vec3"; break;
+		case GL_UNSIGNED_INT_VEC4:							return "GL Unsigned Int Vec4"; break;
+		case GL_BOOL:										return "GL Boolean"; break;
+		case GL_BOOL_VEC2:									return "GL Boolean Vec2"; break;
+		case GL_BOOL_VEC3:									return "GL Boolean Vec3"; break;
+		case GL_BOOL_VEC4:									return "GL Boolean Vec4"; break;
+		case GL_FLOAT_MAT2:									return "GL Float Matrix 2"; break;
+		case GL_FLOAT_MAT3:									return "GL Float Matrix 3"; break;
+		case GL_FLOAT_MAT4:									return "GL Float Matrix 4"; break;
+		case GL_FLOAT_MAT2x3:								return "GL Float Matrix 2x3"; break;
+		case GL_FLOAT_MAT2x4:								return "GL Float Matrix 2x4"; break;
+		case GL_FLOAT_MAT3x2:								return "GL Float Matrix 3x2"; break;
+		case GL_FLOAT_MAT3x4:								return "GL Float Matrix 3x4"; break;
+		case GL_FLOAT_MAT4x2:								return "GL Float Matrix 4x2"; break;
+		case GL_FLOAT_MAT4x3:								return "GL Float Matrix 4x3"; break;
+		case GL_DOUBLE_MAT2:								return "GL Double Matrix 2"; break;
+		case GL_DOUBLE_MAT3:								return "GL Double Matrix 3"; break;
+		case GL_DOUBLE_MAT4:								return "GL Double Matrix 4"; break;
+		case GL_DOUBLE_MAT2x3:								return "GL Double Matrix 2x3"; break;
+		case GL_DOUBLE_MAT2x4:								return "GL Double Matrix 2x4"; break;
+		case GL_DOUBLE_MAT3x2:								return "GL Double Matrix 3x2"; break;
+		case GL_DOUBLE_MAT3x4:								return "GL Double Matrix 3x4"; break;
+		case GL_DOUBLE_MAT4x2:								return "GL Double Matrix 4x2"; break;
+		case GL_DOUBLE_MAT4x3:								return "GL Double Matrix 4x3"; break;
+		case GL_SAMPLER_1D:									return "GL Sampler 1D"; break;
+		case GL_SAMPLER_2D:									return "GL Sampler 2D"; break;
+		case GL_SAMPLER_3D:									return "GL Sampler 3D"; break;
+		case GL_SAMPLER_CUBE:								return "GL Sampler Cube"; break;
+		case GL_SAMPLER_1D_SHADOW:							return "GL Sampler 1D Shadow"; break;
+		case GL_SAMPLER_2D_SHADOW:							return "GL Sampler 2D Shadow"; break;
+		case GL_SAMPLER_1D_ARRAY:							return "GL Sampler 1D Array"; break;
+		case GL_SAMPLER_2D_ARRAY:							return "GL Sampler 2D Array"; break;
+		case GL_SAMPLER_1D_ARRAY_SHADOW:					return "GL Sampler 1D Array Shadow"; break;
+		case GL_SAMPLER_2D_ARRAY_SHADOW:					return "GL Sampler 2D Array Shadow"; break;
+		case GL_SAMPLER_2D_MULTISAMPLE:						return "GL Sampler 2D Multisample"; break;
+		case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:				return "GL Sampler 2D Multisample Array"; break;
+		case GL_SAMPLER_CUBE_SHADOW:						return "GL Sampler Cube Shadow"; break;
+		case GL_SAMPLER_BUFFER:								return "GL Sampler Buffer"; break;
+		case GL_SAMPLER_2D_RECT:							return "GL Sampler 2D Rect"; break;
+		case GL_SAMPLER_2D_RECT_SHADOW:						return "GL Sampler 2D Rect Shadow"; break;
+		case GL_INT_SAMPLER_1D:								return "GL Int Sampler 1D"; break;
+		case GL_INT_SAMPLER_2D:								return "GL Int Sampler 2D"; break;
+		case GL_INT_SAMPLER_3D:								return "GL Int Sampler 3D"; break;
+		case GL_INT_SAMPLER_CUBE:							return "GL Int Sampler Cube"; break;
+		case GL_INT_SAMPLER_1D_ARRAY:						return "GL Int Sampler 1D Array"; break;
+		case GL_INT_SAMPLER_2D_ARRAY:						return "GL Int Sampler 2D Array"; break;
+		case GL_INT_SAMPLER_2D_MULTISAMPLE:					return "GL Int Sampler 2D Multisample"; break;
+		case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:			return "GL Int Sampler 2D Multisample Array"; break;
+		case GL_INT_SAMPLER_BUFFER:							return "GL Int Sampler Buffer"; break;
+		case GL_INT_SAMPLER_2D_RECT:						return "GL Int Sampler 2D Rect"; break;
+		case GL_UNSIGNED_INT_SAMPLER_1D:					return "GL Unsigned Int Sampler 1D"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D:					return "GL Unsigned Int Sampler 2D"; break;
+		case GL_UNSIGNED_INT_SAMPLER_3D:					return "GL Unsigned Int Sampler 3D"; break;
+		case GL_UNSIGNED_INT_SAMPLER_CUBE:					return "GL Unsigned Int Sampler Cube"; break;
+		case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:				return "GL Unsigned Int Sampler 1D Array"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:				return "GL Unsigned Int Sampler 2D Array"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:		return "GL Unsigned Int Sampler 2D Multisample"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:	return "GL Unsigned Int Sampler 2D Multisample Array"; break;
+		case GL_UNSIGNED_INT_SAMPLER_BUFFER:				return "GL Unsigned Int Sampler Buffer"; break;
+		case GL_UNSIGNED_INT_SAMPLER_2D_RECT:				return "GL Unsigned Int Sampler 2D Rect"; break;
+
+		default: return "Unhandled GL Type"; break;
+	}
+
+	return NULL;
+}
+
+RESULT OpenGLImp::PrintVertexAttributes() {
+	RESULT r = R_PASS;
+
+	GLint attributes_n;
+	CR(glGetProgramInterfaceiv(m_idOpenGLProgram, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &attributes_n));
+
+	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
+
+	DEBUG_LINEOUT("%d active attributes", attributes_n);
+	for (int i = 0; i < attributes_n; i++) {
+		GLint results[3];
+		CR(glGetProgramResourceiv(m_idOpenGLProgram, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results));
+
+		GLint pszName_n = results[0] + 1;
+		char *pszName = new char[pszName_n];
+		CR(glGetProgramResourceName(m_idOpenGLProgram, GL_PROGRAM_INPUT, i, pszName_n, NULL, pszName));
+
+		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, GetOGLTypeString(results[1]));
+
+		if (pszName != NULL) {
+			delete[] pszName;
+			pszName = NULL;
+		}
+	}
+
+Error:
+	return r; 
+}
+
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -296,6 +415,8 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO: Fix the error handling here (driver issue?)
 	CRM(LinkProgram(), "Failed to link program");
 	CRM(UseProgram(), "Failed to use open gl program");
+
+	CR(PrintVertexAttributes());
 
 	// TODO: Temporary, get some data into the funnel for now
 	CRM(SetData(), "Failed to set some data");
@@ -455,6 +576,36 @@ Error:
 
 // Open GL / Wrappers
 
+RESULT OpenGLImp::glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_glGetProgramInterfaceiv(program, programInterface, pname, params);  
+	CRM(CheckGLError(), "glGetProgramInterfaceiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_glGetProgramResourceiv(program, programInterface, index, propCount, props, bufSize, length, params);
+	CRM(CheckGLError(), "glGetProgramResourceiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name) {
+	RESULT r = R_PASS;
+
+	m_glGetProgramResourceName(program, programInterface, index, bufSize, length, name);
+	CRM(CheckGLError(), "glGetProgramResourceName failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glGenVertexArrays(GLsizei n, GLuint *arrays) {
 	RESULT r = R_PASS;
 
@@ -559,6 +710,15 @@ RESULT OpenGLImp::InitializeExtensions() {
 
 	CNMW((m_glIsProgram = (PFNGLISPROGRAMPROC)wglGetProcAddress("glIsProgram")),
 		"Failed to initialize glIsProgram extension");
+
+	CNMW((m_glGetProgramInterfaceiv = (PFNGLGETPROGRAMINTERFACEIVPROC)wglGetProcAddress("glGetProgramInterfaceiv")),
+		"Failed to initialize glGetProgramInterfaceiv extension");
+
+	CNMW((m_glGetProgramResourceiv = (PFNGLGETPROGRAMRESOURCEIVPROC)wglGetProcAddress("glGetProgramResourceiv")),
+		"Failred to initialize glGetProgramResourceiv extension");
+
+	CNMW((m_glGetProgramResourceName = (PFNGLGETPROGRAMRESOURCENAMEPROC)wglGetProcAddress("glGetProgramResourceName")),
+		"Failred to initialize glGetProgramResourceName extension");
 
 	CNMW((m_glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram")), 
 		"Failed to initialzie glUseProgram extension");
@@ -674,12 +834,18 @@ RESULT OpenGLImp::InitializeExtensions() {
 	CNMW((m_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer")), 
 		"Failed to initialize glVertexAttribPointer extension");
 
+	CNMW((m_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers")),
+		"Failed to initialize glDeleteBuffers extension");
+
 	// VAO
 	CNMW((m_glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays")),
 		"Failed to initialize glGenVertexArrays extension");
 
 	CNMW((m_glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray")),
 		"Failed to initialize glBindVertexArray extension");
+
+	CNMW((m_glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays")),
+		"Failed to initialize glDeleteVertexArrays extension");
 
 Error:
 	return r;

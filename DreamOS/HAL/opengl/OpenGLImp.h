@@ -55,6 +55,7 @@ public:
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT ShutdownImplementaiton();
 	RESULT Render();
+	RESULT PrintVertexAttributes();
 
 private:
 	RESULT InitializeExtensions();
@@ -73,6 +74,9 @@ private:
 	OpenGLShader *m_pFragmentShader;
 	// Other shaders
 
+	// Utility TODO: Move to a different object
+public:
+	static const char *GetOGLTypeString(GLushort GLType);
 
 // TODO: Unify access to extensions
 public:
@@ -96,6 +100,10 @@ public:
 		return m_glIsProgram(programID);
 	}
 	
+	RESULT glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params);
+	RESULT glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params);
+	RESULT glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name);
+
 	RESULT glGenVertexArrays(GLsizei n, GLuint *arrays);
 	RESULT glBindVertexArray(GLuint gluiArray);
 	RESULT glGenBuffers(GLsizei n, GLuint *buffers);
@@ -124,9 +132,13 @@ public:
 // OpengGL Extension Function Pointers
 // TODO: Push this to another object to manage the extensions
 private:
+	// OGL Program 
 	PFNGLCREATEPROGRAMPROC m_glCreateProgram;
 	PFNGLDELETEPROGRAMPROC m_glDeleteProgram;
 	PFNGLISPROGRAMPROC m_glIsProgram;
+	PFNGLGETPROGRAMINTERFACEIVPROC m_glGetProgramInterfaceiv;
+	PFNGLGETPROGRAMRESOURCEIVPROC m_glGetProgramResourceiv;
+	PFNGLGETPROGRAMRESOURCENAMEPROC m_glGetProgramResourceName;
 
 	PFNGLUSEPROGRAMPROC m_glUseProgram;
 	PFNGLATTACHSHADERPROC m_glAttachShader;
