@@ -439,7 +439,15 @@ RESULT OpenGLImp::SetData() {
 	//*/
 
 	g_pQuad = new OGLQuad(this, 0.8f);
-	CVM(g_pQuad, "Failed to construct Quad");
+	//CVM(g_pQuad, "Failed to construct Quad");
+
+	TranslationMatrix A(1, 2, 3);
+	TranslationMatrix B(4, 5, 6);
+
+	//(A + B).PrintMatrix();
+	//TranslationMatrix C = (TranslationMatrix&)(A + B);
+	matrix<translate_precision, 4, 4> C = (A + B);
+	C.PrintMatrix();
 
 Error:
 	return r;
