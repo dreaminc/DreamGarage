@@ -223,6 +223,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
