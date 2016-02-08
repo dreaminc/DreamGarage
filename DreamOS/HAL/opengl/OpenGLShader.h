@@ -57,7 +57,7 @@ protected:
 	GLuint	m_shaderID;
 	char*	m_pszShaderCode;
 
-private:
+protected:
 	OpenGLImp *m_pParentImp;
 };
 

@@ -98,11 +98,13 @@ public:
 
 		// Bind Position
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
-		CR(m_pParentImp->glEnableVertexAtrribArray(0));		// TEMP: Position
+		//CR(m_pParentImp->glEnableVertexAtrribArray(0));		// TEMP: Position
+		CR(m_pParentImp->EnableVertexPositionAttribute());		// TODO: Investigate performance impact of this
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)0, vertex::GetPointDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetVertexOffset()));
 
 		// Color
-		CR(m_pParentImp->glEnableVertexAtrribArray(1));		// TEMP: Color
+		//CR(m_pParentImp->glEnableVertexAtrribArray(1));		// TEMP: Color
+		CR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
 
 	Error:
