@@ -312,6 +312,9 @@ Error:
 // TODO: Get this outta here
 #include "Primitives/TranslationMatrix.h"
 
+// TODO: Get this outta here
+#include "Primitives/RotationMatrix.h"
+
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -448,12 +451,29 @@ projMatrix.PrintMatrix();
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;
 
+	static float theta = 0;
+
+	theta += 0.01f;
+
+	RotationMatrix matRotation(RotationMatrix::Y_AXIS, theta);
+	GLuint loc;
+
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// First test the identity 
+	//matRotation.identity();
+
+	// This is for testing only
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Rotation", &loc);
+	
+	if (loc >= 0) 
+		glUniformMatrix4fv(loc, 1, GL_FALSE, (GLfloat*)(&matRotation));
+
+
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
 	g_pTriangle->Render();
-
 	g_pQuad->Render();
 	
 	/*
@@ -607,6 +627,32 @@ RESULT OpenGLImp::glBindAttribLocation(GLuint program, GLuint index, const GLcha
 
 	m_glBindAttribLocation(program, index, name);
 	CRM(CheckGLError(), "glBindAttribLocation failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLuint *pLocation) {
+	RESULT r = R_PASS;
+
+	CNM(m_glGetUniformLocation, "glGetUniformLocation extension is NULL");
+
+	*pLocation = m_glGetUniformLocation(program, name);
+	CRM(CheckGLError(), "glGetUniformLocation failed");
+
+	return r;
+Error:
+	pLocation = NULL;
+	return r;
+}
+
+RESULT OpenGLImp::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+	RESULT r = R_PASS;
+
+	CNM(m_glUniformMatrix4fv, "glUniformMatrix4fv extension is NULL");
+
+	m_glUniformMatrix4fv(location, count, transpose, value);
+	CRM(CheckGLError(), "glUniformMatrix4fv failed");
 
 Error:
 	return r;
