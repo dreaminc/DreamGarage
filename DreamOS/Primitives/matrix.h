@@ -315,6 +315,27 @@ public:
 	*/
 
 	/*
+	matrix<TMatrix, N, M>& operator*=(const matrix<TMatrix, N, M>& arg) {
+		DEBUG_LINEOUT("WARN: LinAlgLib doesn't support %d x %d mult by %d x %d matrix", N, M, arg.rows(), arg.cols());
+		return (*this);
+	}
+
+	const matrix<TMatrix, N, M> operator*(const matrix<TMatrix, N, M>& arg) const {
+		return MatrixBase<TMatrix, N, M>(this*) *= arg;
+	}
+	*/
+
+	// TODO: Is this the right way?
+	// TODO: Clean up / consolidate code
+	/*
+	friend matrix<TMatrix, N, M> operator*(const matrix<TMatrix, N, M>& lhs, const matrix<TMatrix, N, M>& rhs) {
+		matrix newMatrix = lhs;
+		DEBUG_LINEOUT("WARN: LinAlgLib doesn't support %d x %d mult by %d x %d matrix", lhs.rows(), lhs.cols(), rhs.rows(), rhs.cols());
+		return newMatrix;
+	}
+	*/
+
+	/*
 
     // Scalar multiplication / Division
     // -------------------------------------------------------------------------
@@ -338,9 +359,15 @@ public:
 
 	*/
 
+	// Matrix multiplication
+	// This needs to be explicit due to N, M templating 
+	// -------------------------------------------------------------------------   
+
+	// 4X4 Matrix
+	
+
+
 	/*
-    // Matrix multiplication
-    // -------------------------------------------------------------------------             
     MatrixBase<TMatrix> operator*( const MatrixBase<TMatrix>& arg) const {
         ARM(checkMultDimensions(arg));
 
@@ -448,5 +475,139 @@ public:
     }
 	*/
 };
+
+// Partial Multiplication Specialization for 4x4 Matrix
+
+// Square matrix, should work for all N
+template <typename TMat4x4, int N>
+matrix<TMat4x4, N, N> operator*(const matrix<TMat4x4, N, N>& lhs, const matrix<TMat4x4, N, N>& rhs) {
+	matrix<TMat4x4, N, N> result;
+	result.clear();
+
+	// TODO: Find a way to reuse this
+	for (int i = 0; i < N; i++) 
+		for (int j = 0; j < N; j++) 
+			for (int k = 0; k < N; k++)
+				result.element(i, j) += lhs.element(i, k) * rhs.element(k, j);
+
+	return result;
+}
+
+// N x M multiplied by M x 1, should work for all N, M
+template <typename TMat4x4, int N, int M>
+matrix<TMat4x4, N, 1> operator*(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, M, 1>& rhs) {
+	matrix<TMat4x4, N, 1> result;
+	result.clear();
+
+	// TODO: Find a way to reuse this
+	for (int i = 0; i < N; i++) 
+		for (int k = 0; k < M; k++)
+			result.element(i, j) += lhs.element(i, k) * rhs.element(k, 0);
+
+	return result;
+}
+
+// N x M multiplied by M x W, should work for all N, M, W
+template <typename TMat4x4, int N, int M, int W>
+matrix<TMat4x4, N, W> operator*(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, M, W>& rhs) {
+	matrix<TMat4x4, N, W> result;
+	result.clear();
+
+	// TODO: Find a way to reuse this
+	for (int i = 0; i < N; i++)
+		for (int j = 0; j < W; j++)
+			for (int k = 0; k < M; k++)
+				result.element(i, j) += lhs.element(i, k) * rhs.element(k, j);
+
+	return result;
+}
+
+/*
+template <typename TMat4x4>
+matrix<TMat4x4, 4, 4>& matrix<TMat4x4, 4, 4>::operator*=(const matrix<TMat4x4, 4, 4>& arg) {
+	matrix<TMat4x4, N, M> result;
+	result.clear();
+
+	// TODO: Find a way to reuse this
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; i < arg.cols(); j++) {
+			for (int k = 0; k < M; k++)
+				result->element(i, j) += this->element(i, k) * arg
+		}
+	}
+
+	return result;
+}
+
+template <typename TMat4x4>
+const matrix<TMat4x4, 4, 4> matrix<TMat4x4, 4, 4>::operator*(const matrix<TMat4x4, 4, 4>& arg) const {
+	return MatrixBase<TMat4x4, 4, 4>(this*) *= arg;
+}
+
+// 4X1 Matrix - returns 4x1
+template <typename TMat4x4>
+matrix<TMat4x4, 4, 1>& matrix<TMat4x4, 4, 4>::operator*=(const matrix<TMat4x4, 4, 1>& arg) {
+	matrix<TMat4x4, N, 1> result;
+	result.clear();
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; i < arg.cols(); j++) {
+			for (int k = 0; k < M; k++)
+				result->element(i, j) += this->element(i, k) * arg
+		}
+	}
+
+	return result;
+}
+
+template <typename TMat4x4>
+const matrix<TMat4x4, 4, 1> matrix<TMat4x4, 4, 4>::operator*(const matrix<TMat4x4, 4, 1>& arg) const {
+	return MatrixBase<TMatrix, 4, 1>(this*) *= arg;
+}
+
+/*
+template <typename TMat4x4>
+class matrix<TMat4x4, 4, 4> {
+public:
+	// Specialized 4x4 handling - returns 4x1
+	matrix<TMat4x4, 4, 4>& operator*=(const matrix<TMat4x4, 4, 4>& arg) {
+		matrix<TMat4x4, N, M> result;
+		result.clear();
+
+		// TODO: Find a way to reuse this
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; i < arg.cols(); j++) {
+				for (int k = 0; k < M; k++)
+					result->element(i, j) += this->element(i, k) * arg
+			}
+		}
+
+		return result;
+	}
+
+	const matrix<TMat4x4, 4, 4> operator*(const matrix<TMat4x4, 4, 4>& arg) const {
+		return MatrixBase<TMat4x4, 4, 4>(this*) *= arg;
+	}
+
+	// 4X1 Matrix - returns 4x1
+	matrix<TMat4x4, 4, 1>& operator*=(const matrix<TMat4x4, 4, 1>& arg) {
+		matrix<TMat4x4, N, 1> result;
+		result.clear();
+
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; i < arg.cols(); j++) {
+				for (int k = 0; k < M; k++)
+					result->element(i, j) += this->element(i, k) * arg
+			}
+		}
+
+		return result;
+	}
+
+	const matrix<TMat4x4, 4, 1> operator*(const matrix<TMat4x4, 4, 1>& arg) const {
+		return MatrixBase<TMatrix, 4, 1>(this*) *= arg;
+	}
+};
+*/
 
 #endif MATRIX_H_
