@@ -29,9 +29,11 @@ public:
 		
 	}
 
+	/*
 	ViewMatrix(point ptPosition, vector vLook, vector vUp) {
 
 	}
+	*/
 
 	~ViewMatrix() {
 		// empty stub

@@ -172,6 +172,10 @@ public:
         return R_OK;
     }
 
+	inline bool IsSquare() {
+		return (N == M);
+	}
+
     inline void copyData(TMatrix *data) {
         for(int i = 0; i < (N * M); i++)
             m_data[i] = data[i];
@@ -200,6 +204,14 @@ public:
     // Look up
     // -------------------------------------------------------------------------
 public:
+	TMatrix& operator()(unsigned i) {
+		#ifdef RANGE_CHECK
+			rangeCheck(i);
+		#endif
+
+		return m_data[i];
+	}
+
 	TMatrix& operator()(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
@@ -311,6 +323,21 @@ public:
 		matrix newMatrix = lhs;
 		newMatrix.subData((TMatrix*)rhs.m_data);
 		return newMatrix;
+	}
+
+	
+	// Only applicable for square matrices
+	TMatrix determinant() {
+		TMat4x4 result = 0;
+		
+		if (!IsSquare()) {
+			DEBUG_LINEOUT("Cannot calculate determinant for %d x %d matrix", N, M);
+			return NULL;
+		}
+
+		// TODO: Implement det
+
+		return result;
 	}
 
 	/*
@@ -489,7 +516,6 @@ matrix<TMat4x4, N, N> operator*(const matrix<TMat4x4, N, N>& lhs, const matrix<T
 	matrix<TMat4x4, N, N> result;
 	result.clear();
 
-	// TODO: Find a way to reuse this
 	for (int i = 0; i < N; i++) 
 		for (int j = 0; j < N; j++) 
 			for (int k = 0; k < N; k++)
@@ -505,7 +531,6 @@ matrix<TMat4x4, N, 1> operator*(const matrix<TMat4x4, N, M>& lhs, const matrix<T
 	matrix<TMat4x4, N, 1> result;
 	result.clear();
 
-	// TODO: Find a way to reuse this
 	for (int i = 0; i < N; i++) 
 		for (int k = 0; k < M; k++)
 			result.element(i, 0) += lhs.element(i, k) * rhs.element(k, 0);
@@ -519,11 +544,24 @@ matrix<TMat4x4, N, W> operator*(const matrix<TMat4x4, N, M>& lhs, const matrix<T
 	matrix<TMat4x4, N, W> result;
 	result.clear();
 
-	// TODO: Find a way to reuse this
 	for (int i = 0; i < N; i++)
 		for (int j = 0; j < W; j++)
 			for (int k = 0; k < M; k++)
 				result.element(i, j) += lhs.element(i, k) * rhs.element(k, j);
+
+	return result;
+}
+
+// DOT PRODUCT
+// Dot Product defined as when two N x 1 matrices are multiplied and this will return a scalar result
+// Square matrix, should work for all N
+// Warning: This is not suggested for calculating dot products for vectors, please use the vector dot and cross calls
+template <typename TMat4x4, int N>
+TMat4x4 operator*(const matrix<TMat4x4, N, 1>& lhs, const matrix<TMat4x4, N, 1>& rhs) {
+	TMat4x4 result = 0;	
+
+	for (int i = 0; i < N; i++)
+		result += lhs.element(i, 0) * rhs.element(i, 0);
 
 	return result;
 }
