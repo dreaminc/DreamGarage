@@ -419,8 +419,8 @@ RESULT OpenGLImp::SetData() {
 	RESULT r = R_PASS;
 
 	float z = 0.0f;
-	float height = 0.8f;
-	float width = 0.8f;
+	float height = 20.8f;
+	float width = 20.8f;
 	vertex vertTemp[3];
 	vertTemp[0].SetPoint(0.0f, height, z);
 	vertTemp[0].SetColor(1.0f, 0.0f, 0.0f);
@@ -464,17 +464,22 @@ projMatrix.PrintMatrix();
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;
 
-	static float theta = 1;
+	static float theta = -2.0;
 
-	//theta -= 0.02f;
+	theta -= 0.2f;
 
-	//RotationMatrix matModel(RotationMatrix::Y_AXIS, theta);
+	RotationMatrix matModel(RotationMatrix::Z_AXIS, theta);
 	
-	TranslationMatrix matModel(0, 0.0f, theta);
+	//TranslationMatrix matModel(0, 0.0f, theta);
 	
-	TranslationMatrix matView(0.0f, 0.0f, 0.0f);
-	//ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
-	ProjectionMatrix matProjection(PROJECTION_MATRIX_ORTHOGRAPHIC, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 0.0f);
+	TranslationMatrix matView(0.0f, 0.0f, theta);
+	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
+	//ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, 1.0f, 1.0f, 1.0f, 100.0f, 45.0f);
+
+	//ProjectionMatrix matProjection(PROJECTION_MATRIX_ORTHOGRAPHIC, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
+	//ProjectionMatrix matProjection(PROJECTION_MATRIX_ORTHOGRAPHIC, 1.0f, 1.0f, 1.0f, 100.0f, 45.0f);
+	//matProjection.PrintMatrix();
+
 	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1;
 
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
@@ -483,8 +488,8 @@ RESULT OpenGLImp::Render() {
 
 	// First test the identity 
 	//matModel.identity();
-	matView.identity();
-	matProjection.identity();
+	//matView.identity();
+	//matProjection.identity();
 
 	// This is for testing only
 	// TODO: Combined MVP or do in the shader?

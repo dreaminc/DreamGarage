@@ -26,6 +26,7 @@ ProjectionMatrix::~ProjectionMatrix() {
 }
 
 // https://solarianprogrammer.com/2013/05/22/opengl-101-matrices-projection-view-model/
+// https://unspecified.wordpress.com/2012/06/21/calculating-the-gluperspective-matrix-and-other-opengl-matrix-maths/
 RESULT ProjectionMatrix::SetPerspective(projection_precision width, 
 										projection_precision height, 
 										projection_precision nearPlane, 
@@ -41,16 +42,39 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision width,
 	projection_precision bottom = -top;
 	projection_precision right = top * ratio;
 	projection_precision left = -right;
+	projection_precision f = 1.0f / (tan((M_PI / 180.0f) * (angle / 2.0f)));
 
 	this->clear();
+	/*
 	this->element(0, 0) = (2.0f * nearPlane) / (right - left);
 	this->element(0, 2) = (right + left) / (right - left);
 
 	this->element(1, 1) = (2.0f * nearPlane) / (top - bottom);
-	this->element(1, 1) = (top + bottom) / (top - bottom);
+	this->element(1, 2) = (top + bottom) / (top - bottom);
 
 	this->element(2, 2) = -(farPlane + nearPlane) / (farPlane - nearPlane);
-	this->element(2, 2) = (-2.0f*farPlane*nearPlane) / (farPlane - nearPlane);
+	this->element(2, 3) = (-2.0f*farPlane*nearPlane) / (farPlane - nearPlane);
+
+	this->element(3, 2) = (-1.0f);
+	*/
+
+	// Symmetric volume
+	/*
+	this->element(0, 0) = nearPlane / width;
+
+	this->element(1, 1) = (2.0f * nearPlane) / (top - bottom);
+
+	this->element(2, 2) = -(farPlane + nearPlane) / (farPlane - nearPlane);
+	this->element(2, 3) = (-2.0f*farPlane*nearPlane) / (farPlane - nearPlane);
+
+	this->element(3, 2) = (-1.0f);
+	*/
+
+	this->element(0, 0) = f / ratio;
+	this->element(1, 1) = f;
+
+	this->element(2, 2) = (farPlane + nearPlane) / (farPlane - nearPlane);
+	this->element(2, 3) = (2.0f*farPlane*nearPlane) / (farPlane - nearPlane);
 
 	this->element(3, 2) = (-1.0f);
 
@@ -72,10 +96,23 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision width,
 
 	this->clear();
 
+	projection_precision ratio = width / height;
+
+	/*
 	this->element(0, 0) = 1.0f / width;
 	this->element(1, 1) = 1.0f / height;
 	this->element(2, 2) = -2.0f / (farPlane - nearPlane);
 	this->element(2, 3) = -(farPlane + nearPlane) / (farPlane - nearPlane);
+	this->element(3, 3) = 1.0f;
+	//*/
+
+	this->element(0, 0) = 1.0f / ratio;
+	
+	this->element(1, 1) = 1.0f;
+
+	this->element(2, 2) = -2.0f / (farPlane - nearPlane);
+	this->element(2, 3) = (-(farPlane + nearPlane)) / (farPlane - nearPlane);
+
 	this->element(3, 3) = 1.0f;
 
 Error:
