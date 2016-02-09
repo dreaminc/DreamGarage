@@ -446,7 +446,8 @@ RESULT OpenGLImp::SetData() {
 
 	//(A + B).PrintMatrix();
 	//TranslationMatrix C = (TranslationMatrix&)(A + B);
-	matrix<translate_precision, 4, 4> C = (A - B);
+	//matrix<translate_precision, 4, 4> C = (A - B);
+	auto C = (A - B);
 	C.PrintMatrix();
 
 Error:
