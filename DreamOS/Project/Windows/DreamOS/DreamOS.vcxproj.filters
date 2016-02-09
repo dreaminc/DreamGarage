@@ -229,6 +229,9 @@
     <ClInclude Include="..\..\..\Primitives\RotationMatrix.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

@@ -419,8 +419,8 @@ RESULT OpenGLImp::SetData() {
 	RESULT r = R_PASS;
 
 	float z = 0.0f;
-	float height = 20.8f;
-	float width = 20.8f;
+	float height = 10.8f;
+	float width = 10.8f;
 	vertex vertTemp[3];
 	vertTemp[0].SetPoint(0.0f, height, z);
 	vertTemp[0].SetColor(1.0f, 0.0f, 0.0f);
@@ -432,10 +432,10 @@ RESULT OpenGLImp::SetData() {
 	vertTemp[2].SetColor(0.0f, 0.0f, 1.0f);
 	
 	///*
-	g_pTriangle = new OGLTriangle(this, 0.8f);
+	g_pTriangle = new OGLTriangle(this, 10.0f);
 	// TODO: Update this so that any changes force a change?
-	g_pTriangle->CopyVertices(vertTemp, 3);
-	g_pTriangle->UpdateOGLBuffers();
+	//g_pTriangle->CopyVertices(vertTemp, 3);
+	//g_pTriangle->UpdateOGLBuffers();
 	//*/
 
 	g_pQuad = new OGLQuad(this, 0.8f);
@@ -447,7 +447,7 @@ RESULT OpenGLImp::SetData() {
 	//(A + B).PrintMatrix();
 	//TranslationMatrix C = (TranslationMatrix&)(A + B);
 	//matrix<translate_precision, 4, 4> C = (A - B);
-	auto C = (A - B);
+	auto C = (A * B);
 	C.PrintMatrix();
 
 Error:
@@ -466,19 +466,11 @@ RESULT OpenGLImp::Render() {
 
 	static float theta = -2.0;
 
-	theta -= 0.2f;
+	theta -= 0.1f;
 
 	RotationMatrix matModel(RotationMatrix::Z_AXIS, theta);
-	
-	//TranslationMatrix matModel(0, 0.0f, theta);
-	
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
-	//ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, 1.0f, 1.0f, 1.0f, 100.0f, 45.0f);
-
-	//ProjectionMatrix matProjection(PROJECTION_MATRIX_ORTHOGRAPHIC, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
-	//ProjectionMatrix matProjection(PROJECTION_MATRIX_ORTHOGRAPHIC, 1.0f, 1.0f, 1.0f, 100.0f, 45.0f);
-	//matProjection.PrintMatrix();
 
 	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1;
 
