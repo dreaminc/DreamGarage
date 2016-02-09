@@ -452,12 +452,15 @@ RESULT OpenGLImp::SetData() {
 	//(A + B).PrintMatrix();
 	//TranslationMatrix C = (TranslationMatrix&)(A + B);
 	//matrix<translate_precision, 4, 4> C = (A - B);
-	//auto C = (A * B);
-	//auto C = (A * p);
-	auto C = (A * tempMatrix);
-	
+	auto C = (A * B);
 	C.PrintMatrix();
+	
+	auto D = (A * p);
+	D.PrintMatrix();
 
+	auto E = (A * tempMatrix);
+	E.PrintMatrix();
+	
 Error:
 	return r;
 }
@@ -480,7 +483,9 @@ RESULT OpenGLImp::Render() {
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
 
-	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1;
+	auto matMVP = matProjection * matView * matModel;
+
+	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
 
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
 
@@ -496,6 +501,7 @@ RESULT OpenGLImp::Render() {
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Projection", &locationProjectionMatrix);
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4View", &locationViewMatrix);
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ModelViewProjection", &locationModelViewProjectionMatrix);
 
 	if (locationProjectionMatrix >= 0) 
 		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matProjection));
@@ -505,6 +511,9 @@ RESULT OpenGLImp::Render() {
 
 	if (locationModelMatrix >= 0)
 		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
+
+	if (locationModelViewProjectionMatrix >= 0)
+		glUniformMatrix4fv(locationModelViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matMVP));
 
 
 	//glDrawArrays(GL_TRIANGLES, 0, 3);

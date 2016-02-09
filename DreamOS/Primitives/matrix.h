@@ -481,7 +481,7 @@ public:
 	*/
 };
 
-// Partial Multiplication Specialization for 4x4 Matrix
+// Matrix Multiplication
 
 // Square matrix, should work for all N
 template <typename TMat4x4, int N>
@@ -499,6 +499,7 @@ matrix<TMat4x4, N, N> operator*(const matrix<TMat4x4, N, N>& lhs, const matrix<T
 }
 
 // N x M multiplied by M x 1, should work for all N, M
+// This is technically an optimized of the below
 template <typename TMat4x4, int N, int M>
 matrix<TMat4x4, N, 1> operator*(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, M, 1>& rhs) {
 	matrix<TMat4x4, N, 1> result;
