@@ -19,8 +19,8 @@ public:
     //virtual int rows() = 0;
     //virtual int cols() = 0;
 
-	virtual int getNumRows() = 0;
-	virtual int getNumColumns() = 0;
+	//virtual int getNumRows() = 0;
+	//virtual int getNumColumns() = 0;
 
 	/*
     virtual T& operator()(unsigned i, unsigned j) = 0;
@@ -45,13 +45,9 @@ public:
     static int rows() { return N; }
     static int cols() { return M; }
 
-	inline int getNumRows() {
-		return N;
-	}
-
-	inline int getNumColumns() {
-		return M;
-	}
+	//inline int getNumRows() { return N; }
+	//inline int getNumColumns() { return M; }
+	
 
 	//int rows() { return N; }
 	//int cols() { return M; }
