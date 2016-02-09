@@ -30,6 +30,19 @@ public:
 		this->element(3, 0) = 1.0f;
 	}
 
+	// Calculate the cross product
+	// Not assumed to be normalized
+	vector(vector rhs, vector lhs) {
+		clear();
+
+		x(rhs(1) * lhs(2)) - (rhs(2) * lhs(1));
+		y(rhs(2) * lhs(0)) - (rhs(0) * lhs(2));
+		z(rhs(0) * lhs(1)) - (rhs(1) * lhs(0));
+		
+		// For good measure
+		w(1);
+	}
+
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline vector_precision &x() { return this->element(0, 0); }
 	inline vector_precision &y() { return this->element(1, 0); }
@@ -63,9 +76,30 @@ public:
 
 	// Return a normalized version of this vector
 	vector Normal() {
-		vector result = this;
+		vector result = *this;
 		result.Normalize();
 		return result;
+	}
+
+	// Dot Product
+	// This calculates the dot product as if it is a R3 vector (ignores the w parameter) 
+	vector_precision dot(vector& rhs) {
+		vector_precision result = 0;
+
+		for (int i = 0; i < 3; i++)
+			result += element(i, 0) * rhs.element(i, 0);
+
+		return result;
+	}
+
+	// Cross Product
+	vector cross(vector rhs) {
+		return vector(*this, rhs);
+	}
+
+	// Normalized Cross Product
+	vector NormalizedCross(vector rhs) {
+		return vector(this->Normal(), rhs.Normal());
 	}
 };
 

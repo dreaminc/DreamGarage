@@ -203,6 +203,7 @@
     <ClInclude Include="..\..\..\Primitives\valid.h" />
     <ClInclude Include="..\..\..\Primitives\vector.h" />
     <ClInclude Include="..\..\..\Primitives\Vertex.h" />
+    <ClInclude Include="..\..\..\Primitives\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />

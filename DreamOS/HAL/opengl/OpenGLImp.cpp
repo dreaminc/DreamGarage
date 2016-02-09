@@ -460,6 +460,11 @@ RESULT OpenGLImp::SetData() {
 
 	auto E = (A * tempMatrix);
 	E.PrintMatrix();
+
+	vector v1(1, 2, 3);
+	vector v2(2, 3, 4);
+
+	auto F = v1 * v2;
 	
 Error:
 	return r;
@@ -477,7 +482,7 @@ RESULT OpenGLImp::Render() {
 
 	static float theta = -2.0;
 
-	theta -= 0.1f;
+	theta -= 0.02f;
 
 	RotationMatrix matModel(RotationMatrix::Z_AXIS, theta);
 	TranslationMatrix matView(0.0f, 0.0f, theta);
