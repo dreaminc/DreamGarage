@@ -80,6 +80,11 @@ public:
 		/* stub */
 	}
 
+	// Warning: This is a pretty vulnerable function
+	matrix(TMatrix *pInitArray) {
+		copyData((TMatrix *)pInitArray);
+	}
+
 	matrix(const matrix<TMatrix, N, M> &cp) {
 		copyData((TMatrix *)cp.m_data);
 	}
