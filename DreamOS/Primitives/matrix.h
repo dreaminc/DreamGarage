@@ -326,7 +326,11 @@ public:
 	}
 
 	
+	/*
+	// TODO: Implement determinant (not critical atm)
 	// Only applicable for square matrices
+	// TODO: Not using Leibniz / Laplace 
+	// Using recursive formula
 	TMatrix determinant() {
 		TMat4x4 result = 0;
 		
@@ -335,10 +339,11 @@ public:
 			return NULL;
 		}
 
-		// TODO: Implement det
+		
 
 		return result;
 	}
+	*/
 
 	/*
 	matrix<TMatrix, N, M>& operator-( const matrix<TMatrix, N, M>&arg ) const {
