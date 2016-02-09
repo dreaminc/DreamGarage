@@ -16,8 +16,11 @@
 template <typename TBase>
 class MatrixBase {
 public:
-    //virtual static int rows() = 0;
-    //virtual static int cols() = 0;
+    //virtual int rows() = 0;
+    //virtual int cols() = 0;
+
+	virtual int getNumRows() = 0;
+	virtual int getNumColumns() = 0;
 
 	/*
     virtual T& operator()(unsigned i, unsigned j) = 0;
@@ -41,6 +44,17 @@ public:
 public:
     static int rows() { return N; }
     static int cols() { return M; }
+
+	inline int getNumRows() {
+		return N;
+	}
+
+	inline int getNumColumns() {
+		return M;
+	}
+
+	//int rows() { return N; }
+	//int cols() { return M; }
 	
 	// Simply clears data
 	RESULT clear() {
@@ -326,27 +340,36 @@ public:
         return matrix<TMatrix, N, M>(*this).operator/=(a);
     }
 
+	*/
+
+	/*
     // Matrix multiplication
-    // -------------------------------------------------------------------------
-    /* TODO: This may require manually mapping handlers for different dimensions
-             in order to maintain static array design
-             
-    MatrixBase<T> operator*( const MatrixBase<T>& arg) const {
+    // -------------------------------------------------------------------------             
+    MatrixBase<TMatrix> operator*( const MatrixBase<TMatrix>& arg) const {
         ARM(checkMultDimensions(arg));
 
-        matrix<T, N, arg.cols>
+		matrix<TMatrix, N, arg.cols()> result;
 
-        for(int n = 0; i < N; n++) {
-            for(int m = 0; i < arg.cols(); m++) {
-                this->element()
+
+		result.clear();
+
+        for(int i = 0; i < N; i++) {
+            for(int j = 0; i < arg.cols(); j++) {
+				for (int k = 0; k < M; k++)
+					result->element(i, j) += this->element(i, k) * arg
             }
         }
     }
+	*/
 
+	/*
     MatrixBase<T>& operator*=( const matrix<T, N, M>& arg ) {
         return *this = *this * arg;
     }
+	*/
 
+
+	/*
     // Matrix Division
     // -------------------------------------------------------------------------
     matrix<T> leftDivide( const matrix<T>& arg) const {
