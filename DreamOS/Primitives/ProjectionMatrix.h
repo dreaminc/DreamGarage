@@ -1,5 +1,5 @@
-#ifndef PERSPECTIVE_MATRIX_H_
-#define PERSPECTIVE_MATRIX_H_
+#ifndef PROJECTION_MATRIX_H_
+#define PROJECTION_MATRIX_H_
 
 #include "RESULT/EHM.h"
 
@@ -25,6 +25,12 @@ typedef enum {
 
 class ProjectionMatrix : public matrix<projection_precision, 4, 4> {
 public:
+	ProjectionMatrix() :
+		m_type(PROJECTION_MATRIX_INVALID)
+	{
+		clear();
+	}
+
 	ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_precision width, 
 												  projection_precision height, 
 												  projection_precision nearPlane, 
@@ -43,4 +49,4 @@ private:
 	PROJECTION_MATRIX_TYPE m_type;
 };
 
-#endif // ! PERSPECTIVE_MATRIX_H_
+#endif // ! PROJECTION_MATRIX_H_

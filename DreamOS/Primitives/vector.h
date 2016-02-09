@@ -45,6 +45,28 @@ public:
 		double sqaureSum = pow(x(), 2) + pow(y(), 2) + pow(z(), 2);
 		return sqrt(sqaureSum);
 	}
+
+	// Will normalize this vector
+	RESULT Normalize() {
+		vector_precision denom = 0;
+
+		for (int i = 0; i < 4; i++)
+			denom += pow(element(i, 0), 2);
+
+		denom = sqrt(denom);
+
+		for (int i = 0; i < 4; i++)
+			element(i, 0) = element(i, 0) / denom;
+
+		return R_PASS;
+	}
+
+	// Return a normalized version of this vector
+	vector Normal() {
+		vector result = this;
+		result.Normalize();
+		return result;
+	}
 };
 
 #endif // !VECTOR_H_
