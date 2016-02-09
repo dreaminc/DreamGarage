@@ -430,7 +430,7 @@ RESULT OpenGLImp::SetData() {
 
 	vertTemp[2].SetPoint(width, -height, z);
 	vertTemp[2].SetColor(0.0f, 0.0f, 1.0f);
-	
+
 	///*
 	g_pTriangle = new OGLTriangle(this, 10.0f);
 	// TODO: Update this so that any changes force a change?
@@ -446,11 +446,15 @@ RESULT OpenGLImp::SetData() {
 
 	point p(1, 2, 3);
 
+	float temptMatData[] = {1, 2, 3, 1, 4, 5, 6, 1};
+	matrix<float, 4, 2> tempMatrix(temptMatData);
+
 	//(A + B).PrintMatrix();
 	//TranslationMatrix C = (TranslationMatrix&)(A + B);
 	//matrix<translate_precision, 4, 4> C = (A - B);
 	//auto C = (A * B);
-	auto C = (A * p);
+	//auto C = (A * p);
+	auto C = (A * tempMatrix);
 	
 	C.PrintMatrix();
 
