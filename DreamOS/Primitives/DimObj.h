@@ -11,7 +11,7 @@
 typedef uint32_t dimindex;
 
 class DimObj : public valid {
-private:
+protected:
     point m_ptOrigin;   // origin
     //AABV m_aabv;        // Axis Aligned Bounding Volume
 

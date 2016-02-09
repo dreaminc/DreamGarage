@@ -184,6 +184,7 @@
     <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h" />
     <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
+    <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
@@ -202,6 +203,7 @@
     <ClInclude Include="..\..\..\Primitives\valid.h" />
     <ClInclude Include="..\..\..\Primitives\vector.h" />
     <ClInclude Include="..\..\..\Primitives\Vertex.h" />
+    <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
