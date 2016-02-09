@@ -502,7 +502,7 @@ matrix<TMat4x4, N, 1> operator*(const matrix<TMat4x4, N, M>& lhs, const matrix<T
 	// TODO: Find a way to reuse this
 	for (int i = 0; i < N; i++) 
 		for (int k = 0; k < M; k++)
-			result.element(i, j) += lhs.element(i, k) * rhs.element(k, 0);
+			result.element(i, 0) += lhs.element(i, k) * rhs.element(k, 0);
 
 	return result;
 }
