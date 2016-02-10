@@ -15,6 +15,8 @@
 // controls or otherwise.  The base SenseDevice will get filled out with shared functionality and interfaces
 // to such devices and act as a shared handle for managers or controllers as they become needed.
 
+#include "Primitives/Subscriber.h"
+
 class SenseDevice {
 public:
 	SenseDevice() {
@@ -25,8 +27,7 @@ public:
 		// empty stub
 	}
 
-	typedef struct SenseDeviceEvent {
-		uint32_t SenseEventSize;
+	typedef struct SenseDeviceEvent : public Subscriber::SubscriberEvent {
 		clock_t SenseEventTickCount;
 
 		SenseDeviceEvent() {

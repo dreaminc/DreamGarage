@@ -10,31 +10,36 @@
 // Sense Keyboard Device
 
 #include "SenseDevice.h"
+#include "Primitives/Publisher.h"
 
 #define NUM_SENSE_KEYBOARD_KEYS 256
 
-class SenseKeyboard : public SenseDevice {
+typedef struct SenseKeyboardEvent : SenseDevice::SenseDeviceEvent {
+	uint8_t KeyCode;
+	uint8_t KeyState;
+
+	SenseKeyboardEvent(uint8_t key, uint8_t state) :
+		SenseDeviceEvent()
+	{
+		SenseEventSize = sizeof(SenseKeyboardEvent);
+		KeyCode = key;
+		KeyState = state;
+	}
+} SENSE_KEYBOARD_EVENT;
+
+class SenseKeyboard : public SenseDevice, public Publisher<int> {
 public:
 	SenseKeyboard() {
 		memset(m_KeyStates, 0, sizeof(uint8_t) * NUM_SENSE_KEYBOARD_KEYS);
+
+		for (int i = 0; i < NUM_SENSE_KEYBOARD_KEYS; i++) {
+			RegisterEvent(i);
+		}
 	}
 
 	~SenseKeyboard() {
 		// empty stub
 	}
-
-	typedef struct SenseKeyboardEvent : SenseDevice::SenseDeviceEvent {
-		uint8_t KeyCode;
-		uint8_t KeyState;
-
-		SenseKeyboardEvent(uint8_t key, uint8_t state) : 
-			SenseDeviceEvent()
-		{
-			SenseEventSize = sizeof(SenseKeyboardEvent);
-			KeyCode = key;
-			KeyState = state;
-		}
-	} SENSE_KEYBOARD_EVENT;
 
 	RESULT SetKeyState(uint8_t KeyCode, uint8_t KeyState) {
 		if (KeyState != m_KeyStates[KeyCode]) {
