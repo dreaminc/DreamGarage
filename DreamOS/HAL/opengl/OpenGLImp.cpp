@@ -549,7 +549,7 @@ RESULT OpenGLImp::Render() {
 	//*/
 	
 	glFlush();
-	//SwapBuffers(m_pWindows64App->GetDeviceContext()); // This is done in the App
+	SwapBuffers(m_pWindows64App->GetDeviceContext()); // This is done in the App
 
 Error:
 	if (!wglMakeCurrent(NULL, NULL))

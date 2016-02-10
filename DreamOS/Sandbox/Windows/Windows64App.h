@@ -19,6 +19,7 @@
 #define DEFAULT_FULLSCREEN false
 
 class OpenGLImp;
+class Win64Keyboard;
 
 class Windows64App : public SandboxApp {
 public:
@@ -60,6 +61,7 @@ private:
 private:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	OpenGLImp *m_pOpenGLImp;	
+	Win64Keyboard *m_pWin64Keyboard;
 };
 
 #endif // ! WINDOWS_64_APP_H_
