@@ -3,6 +3,8 @@
 
 #include "./HAL/opengl/OpenGLImp.h"
 
+#include "Win64Keyboard.h"
+
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
 	m_pxWidth(DEFAULT_WIDTH),
@@ -51,6 +53,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		// TODO: ?
 		//SysSetDisplayMode(screenw, screenh, SCRDEPTH);
 	}
+
+	// Create the Keyboard
+	m_pWin64Keyboard = new Win64Keyboard();
 
 	m_hwndWindow = CreateWindow(
 		m_pszClassName,										// lpClassName
@@ -142,6 +147,16 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 			DEBUG_LINEOUT("Left mouse button down!");
 		} break;
 
+		// Update the Keyboard in WndProc rather than in the run loop
+		// TODO: This should be different arch for native
+		case WM_KEYDOWN: {
+			m_pWin64Keyboard->UpdateKeyState((uint8_t)(wp), true);
+		} break;
+
+		case WM_KEYUP: {
+			m_pWin64Keyboard->UpdateKeyState((uint8_t)(wp), false);
+		} break;
+
 		default: {
 			// Empty stub
 		} break;
@@ -192,8 +207,8 @@ RESULT Windows64App::ShowSandbox() {
 		if(m_pOpenGLImp != NULL)
 			m_pOpenGLImp->Render();
 
-		// Move into implementation?
-		SwapBuffers(m_hDC);			// Swap buffers
+		// Moved into implementation?
+		//SwapBuffers(m_hDC);			// Swap buffers
 
 		if (GetAsyncKeyState(VK_ESCAPE))
 			ShutdownSandbox();

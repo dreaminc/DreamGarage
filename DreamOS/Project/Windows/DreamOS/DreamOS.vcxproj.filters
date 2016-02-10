@@ -45,6 +45,9 @@
     <Filter Include="Core\Types">
       <UniqueIdentifier>{44fa16e8-b322-4aa9-bf57-b79b92f4c3b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Sense">
+      <UniqueIdentifier>{d6f300ee-6f18-483b-9818-d0018fb18693}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -240,6 +243,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\ViewMatrix.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseDevice.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseKeyboard.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Subscriber.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Publisher.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h">
+      <Filter>Sandbox\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
