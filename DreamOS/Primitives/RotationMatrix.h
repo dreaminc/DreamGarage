@@ -97,7 +97,7 @@ public:
 		this->element(0, 1) = (cosPhi * sinPsi) + (sinPhi * sinTheta * cosPsi);
 		this->element(0, 2) = (sinPhi * sinPsi) - (cosPhi * sinTheta * cosPsi);
 
-		this->element(1, 0) = -cosTheta * cosPsi;
+		this->element(1, 0) = -cosTheta * sinPsi;
 		this->element(1, 1) = (cosPhi * cosPsi) - (sinPhi * sinTheta * sinPsi);
 		this->element(1, 2) = (sinPhi * cosPsi) + (cosPhi * sinTheta * sinPsi);
 

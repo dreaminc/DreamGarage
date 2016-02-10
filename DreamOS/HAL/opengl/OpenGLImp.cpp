@@ -348,6 +348,8 @@ Error:
 // TODO: Get this outta here
 #include "Primitives/RotationMatrix.h"
 
+#include "Primitives/camera.h"
+
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -482,13 +484,17 @@ RESULT OpenGLImp::Render() {
 
 	static float theta = -2.0;
 
-	theta -= 0.02f;
+	//theta -= 0.05f;
 
 	RotationMatrix matModel(RotationMatrix::Z_AXIS, theta);
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
 
-	auto matMVP = matProjection * matView * matModel;
+	camera tempCamera(point(0.0f, 0.0f, theta), 45.0f, m_pxViewWidth, m_pxViewHeight);
+
+	//auto matMVP = matProjection * matView * matModel;
+	//auto matMVP = tempCamera.GetProjectionMatrix() * tempCamera.GetViewMatrix() * matModel;
+	auto matMVP = tempCamera.GetProjectionViewMatrix() * matModel;
 
 	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
 
@@ -508,11 +514,19 @@ RESULT OpenGLImp::Render() {
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ModelViewProjection", &locationModelViewProjectionMatrix);
 
+	/*
 	if (locationProjectionMatrix >= 0) 
 		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matProjection));
 
 	if (locationViewMatrix >= 0)
 		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&matView));
+	*/
+
+	if (locationProjectionMatrix >= 0)
+		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&tempCamera.GetProjectionMatrix()));
+
+	if (locationViewMatrix >= 0)
+		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&tempCamera.GetViewMatrix()));
 
 	if (locationModelMatrix >= 0)
 		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));

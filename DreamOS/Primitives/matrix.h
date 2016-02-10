@@ -94,6 +94,11 @@ public:
 		// empty for now
 	}
 
+	RESULT SetMatrix(const matrix<TMatrix, N, M> &arg) {
+		copyData((TMatrix *)arg.m_data);
+		return R_PASS;
+	}
+
 	RESULT Numbers(TMatrix start, TMatrix increment) {
 		clear();
 

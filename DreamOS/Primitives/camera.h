@@ -17,6 +17,7 @@
 
 #include "matrix.h"
 #include "ProjectionMatrix.h"
+#include "ViewMatrix.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float camera_precision;
@@ -31,16 +32,18 @@
 
 class camera : public VirtualObj {
 public:
-	camera(point ptOrigin, vector vLook, vector vUp, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
+	camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
 		m_FielfOfViewAngle(FOV),
 		m_ProjectionType(DEFAULT_PROJECTION_TYPE),
 		m_NearPlane(DEFAULT_NEAR_PLANE),
 		m_FarPlane(DEFAULT_FAR_PLANE),
 		m_pxScreenWidth(pxScreenWidth),
-		m_pxScreenHeight(pxScreenHeight)
+		m_pxScreenHeight(pxScreenHeight),
+		m_pitch(0.0f),
+		m_yaw(0.0f),
+		m_roll(0.0f)
 	{
 		m_ptOrigin = ptOrigin;
-
 		Update();
 	}
 
@@ -53,10 +56,21 @@ public:
 
 		// Update the matrices 
 		m_ProjectionMatrix = ProjectionMatrix(m_ProjectionType, m_pxScreenWidth, m_pxScreenHeight, m_NearPlane, m_FarPlane, m_FielfOfViewAngle);
+		m_ViewMatrix = ViewMatrix(m_ptOrigin, m_pitch, m_yaw, m_roll);
+
+		// For later access, might want to rethink for performance
+		RotationMatrix matrixRotation(m_pitch, m_yaw, m_roll);
+		m_vLook = matrixRotation * vector(0.0f, 0.0f, 1.0f);
+		m_vUp = matrixRotation * vector(0.0f, 1.0f, 0.0f);
+		m_vRight = matrixRotation * vector(1.0f, 1.0f, 1.0f);
 
 	Error:
 		return r;
 	}
+
+	ProjectionMatrix GetProjectionMatrix() { return m_ProjectionMatrix;  }
+	ViewMatrix GetViewMatrix() { return m_ViewMatrix; }
+	matrix<camera_precision, 4, 4> GetProjectionViewMatrix() { return (m_ProjectionMatrix * m_ViewMatrix); }
 
 private:
 	// Projection
@@ -68,11 +82,17 @@ private:
 	camera_precision m_FielfOfViewAngle;		// Note this is in degrees, not radians
 	ProjectionMatrix m_ProjectionMatrix;
 
-	// View (origin is in the Virtual Object Parent)
+	// View (origin point is in the Virtual Object Parent)
+	// TODO: Move to virtual object?
+	camera_precision m_pitch;	// x
+	camera_precision m_yaw;		// y
+	camera_precision m_roll;	// z
+	ViewMatrix m_ViewMatrix;
+
+public:
 	vector m_vLook;
 	vector m_vUp;
 	vector m_vRight;
-	matrix<camera_precision, 4, 4> m_ViewMatrix;
 };
 
 #endif // ! CAMERA_H_

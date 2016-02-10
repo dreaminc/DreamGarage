@@ -26,6 +26,12 @@ public:
 		// Empty Stub
 	}
 
+	// This should also work with vector
+	RESULT translate(matrix <point_precision, 4, 1> v) {
+		m_ptOrigin.translate(v);
+		return R_PASS;
+	}
+
 private:
 	UID m_uid;
 };
