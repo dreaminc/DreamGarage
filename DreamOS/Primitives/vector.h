@@ -101,6 +101,16 @@ public:
 	vector NormalizedCross(vector rhs) {
 		return vector(this->Normal(), rhs.Normal());
 	}
+
+	// Explicitly specializing the assignment operator
+	vector& operator=(const matrix<vector_precision, 4, 1> &arg) {
+		if (this == &arg)      // Same object?
+			return *this;        // Yes, so skip assignment, and just return *this.
+
+		memcpy(this->m_data, arg.m_data, sizeof(vector_precision) * 4 * 1);
+
+		return *this;
+	}
 };
 
 #endif // !VECTOR_H_

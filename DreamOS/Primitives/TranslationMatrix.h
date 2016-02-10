@@ -9,6 +9,7 @@
 // A general purpose translation matrix
 
 #include "matrix.h"
+#include "point.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float translate_precision;
@@ -32,6 +33,14 @@ public:
 		this->element(0, 3) = x;
 		this->element(1, 3) = y;
 		this->element(2, 3) = z;
+	}
+
+	TranslationMatrix(point p) {
+		this->identity();
+
+		this->element(0, 3) = p.x();
+		this->element(1, 3) = p.y();
+		this->element(2, 3) = p.z();
 	}
 
 	~TranslationMatrix() {

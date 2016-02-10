@@ -47,6 +47,20 @@ public:
 	inline point_precision &z(point_precision val) { return this->element(2, 0) = val; }
 	inline point_precision &w(point_precision val) { return this->element(3, 0) = val; }
 
+	RESULT translate(point_precision x, point_precision y, point_precision z) {
+		this->x() = x;
+		this->y() = y;
+		this->z() = z;
+
+		return R_PASS;
+	}
+
+	// This should also work with vector
+	RESULT translate(matrix <point_precision, 4, 1> v) {
+		(*this).operator+=((matrix <point_precision, 4, 1>&)v);
+		return R_PASS;
+	}
+
 	/*
 	// Subtracting points results in vector
 	matrix& operator-=(const matrix& rhs) {
@@ -61,6 +75,16 @@ public:
 		return matrix<TMatrix, N, M>(*this).operator-=(arg);
 	}
 	*/
+
+	// Explicitly specializing the assignment operator
+	point& operator=(const matrix<point_precision, 4, 1> &arg) {
+		if (this == &arg)      // Same object?
+			return *this;        // Yes, so skip assignment, and just return *this.
+
+		memcpy(this->m_data, arg.m_data, sizeof(point_precision) * 4 * 1);
+
+		return *this;
+	}
 };
 
 #endif // !POINT_H_

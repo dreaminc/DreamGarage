@@ -13,6 +13,9 @@
 #include "vector.h"
 #include "point.h"
 
+#include "RotationMatrix.h"
+#include "TranslationMatrix.h"
+
 #ifdef FLOAT_PRECISION
 	typedef float view_precision;
 #elif defined(DOUBLE_PRECISION)
@@ -24,9 +27,12 @@ public:
 	ViewMatrix() {
 		clear();
 	}
-
-	ViewMatrix(point ptPosition, view_precision pitch, view_precision yaw) {
-		
+	
+	// This will start with i, j, k vectors and effectively rotate them about the appropriate axes 
+	// pitch is about the x axis, yaw is about the y axis and roll is about the z axis
+	ViewMatrix(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll) {
+		clear();
+		SetViewMatrixPitchYawRoll(ptPosition, pitch, yaw, roll);
 	}
 
 	/*
@@ -35,6 +41,18 @@ public:
 	}
 	*/
 
+	RESULT SetViewMatrixPitchYawRoll(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll) {
+		//m_ptPosition = ptPosition;
+
+		/*
+		m_vLook = matrixRotation * vector(0.0f, 0.0f, 1.0f);
+		m_vUp = matrixRotation * vector(0.0f, 1.0f, 0.0f);
+		m_vRight = matrixRotation * vector(1.0f, 1.0f, 1.0f);
+		*/
+
+		return SetMatrix(TranslationMatrix(ptPosition) * RotationMatrix(pitch, yaw, roll));
+	}
+
 	~ViewMatrix() {
 		// empty stub
 	}
@@ -42,10 +60,7 @@ public:
 	RESULT PrintMatrix() {
 		DEBUG_LINEOUT("View Matrix");
 		return matrix<view_precision, 4, 4>::PrintMatrix();
-	}
-
-private:
-	
+	}	
 };
 
 #endif // ! VIEW_MATRIX_H_
