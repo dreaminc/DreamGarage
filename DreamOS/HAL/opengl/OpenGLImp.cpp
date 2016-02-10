@@ -484,7 +484,7 @@ RESULT OpenGLImp::Render() {
 
 	static float theta = -2.0;
 
-	//theta -= 0.05f;
+	theta -= 0.05f;
 
 	RotationMatrix matModel(RotationMatrix::Z_AXIS, theta);
 	TranslationMatrix matView(0.0f, 0.0f, theta);

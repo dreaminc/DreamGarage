@@ -13,6 +13,9 @@
 
 // BIG TODO: Create Matrix testing suite
 
+// TODO: Implement Kahan addition flag for better precision
+// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+
 template <typename TBase>
 class MatrixBase {
 public:
