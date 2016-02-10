@@ -42,6 +42,10 @@
 #define ACRM(res, msg, ...) do{if(res&0x80000000){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0); }}while(0);
 #define ACR(res) do{if(res&0x80000000){assert(0); }}while(0);
 
+// Warning
+#define WCR(res) do{r=res;if(r&0x80000000){/*goto Error;*/}}while(0);
+#define WCRM(res, msg, ...) do{r = res;if(r&0x80000000){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Warning: 0x%x\n",r);/*goto Error;*/}}while(0)
+
 // Check Boolean Result
 // Ensures that condition evaluates to true
 #define CB(condition) do{if(!condition) {r = R_FAIL; goto Error;}}while(0);

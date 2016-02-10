@@ -10,6 +10,7 @@
 
 class Publisher;
 
+template <class SClass>
 class Subscriber {
 public:
 	Subscriber() {
@@ -23,6 +24,8 @@ public:
 	~Subscriber() {
 		// empty
 	}
+
+	virtual RESULT Notify(SClass pContext) = 0;
 
 private:
 	Publisher *m_pSubject;

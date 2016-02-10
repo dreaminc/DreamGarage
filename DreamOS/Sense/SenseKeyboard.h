@@ -23,6 +23,19 @@ public:
 		// empty stub
 	}
 
+	typedef struct SenseKeyboardEvent : SenseDevice::SenseDeviceEvent {
+		uint8_t KeyCode;
+		uint8_t KeyState;
+
+		SenseKeyboardEvent(uint8_t key, uint8_t state) : 
+			SenseDeviceEvent()
+		{
+			SenseEventSize = sizeof(SenseKeyboardEvent);
+			KeyCode = key;
+			KeyState = state;
+		}
+	} SENSE_KEYBOARD_EVENT;
+
 	RESULT SetKeyState(uint8_t KeyCode, uint8_t KeyState) {
 		if (KeyState != m_KeyStates[KeyCode]) {
 			m_KeyStates[KeyCode] = KeyState;

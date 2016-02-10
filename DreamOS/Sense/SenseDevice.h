@@ -1,6 +1,8 @@
 #ifndef SENSE_DEVICE_H_
 #define SENSE_DEVICE_H_
 
+#include <time.h>       
+
 #include "RESULT/EHM.h"
 
 // DREAM OS
@@ -22,6 +24,16 @@ public:
 	~SenseDevice() {
 		// empty stub
 	}
+
+	typedef struct SenseDeviceEvent {
+		uint32_t SenseEventSize;
+		clock_t SenseEventTickCount;
+
+		SenseDeviceEvent() {
+			SenseEventTickCount = clock();
+		}
+
+	} SENSE_DEVICE_EVENT;
 
 private:
 	UID m_uid;
