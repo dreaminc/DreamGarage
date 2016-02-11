@@ -41,6 +41,26 @@ public:
 		// empty stub
 	}
 
+	typedef enum SenseKeyboardScanCodes {
+		SK_SPACE	= 0x20,
+		SK_PRIOR	= 0x21,
+		SK_NEXT		= 0x22,
+		SK_END		= 0x23,
+		SK_HOME		= 0x24,
+		SK_LEFT     = 0x25,
+		SK_UP       = 0x26,
+		SK_RIGHT    = 0x27,
+		SK_DOWN     = 0x28,
+		SK_SELECT   = 0x29,
+		SK_PRINT    = 0x2A,
+		SK_EXECUTE  = 0x2B,
+		SK_SNAPSHOT = 0x2C,
+		SK_INSERT   = 0x2D,
+		SK_DELETE   = 0x2E,
+		SK_HELP     = 0x2F,
+		SK_INVALID
+	} SK_SCAN_CODE;
+
 	RESULT SetKeyState(uint8_t KeyCode, uint8_t KeyState) {
 		RESULT r = R_PASS;
 

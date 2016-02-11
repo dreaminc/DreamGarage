@@ -8,8 +8,9 @@
 
 #include "./RESULT/EHM.h"
 #include "Primitives/Types/UID.h"
+#include "Primitives/Subscriber.h"
 
-class HALImp {
+class HALImp : public Subscriber {
 public:
 	HALImp() {
 		// empty stub

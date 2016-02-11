@@ -76,6 +76,7 @@ public:
 		return "Publisher Base Class";
 	}
 
+protected:
 	RESULT RegisterEvent(PKeyClass keyEvent) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
@@ -101,20 +102,23 @@ public:
 		return r;
 	}
 	
+public:
 	// This requires the event to be registered 
 	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber* pSubscriber) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
+		std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
+		std::list<Subscriber*> *pSubscriberList = NULL;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
-
-		std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		it = m_events.find(keyEvent);
 
 		pszEvent = GetEventKeyString(keyEvent);
-		CBM((it == m_events.end()), "Event %s not registered", pszEvent);
+		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
 
 		// Check if already registered
-		std::list<Subscriber*> *pSubscriberList = reinterpret_cast<Subscriber*>(it->second);
+		pSubscriberList = reinterpret_cast<std::list<Subscriber*>*>(it->second);
+
 		for (std::list<Subscriber*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 			Subscriber *pTempSubscriber = reinterpret_cast<Subscriber*>(*eventIterator);
 			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", pszEvent);
@@ -146,7 +150,7 @@ public:
 		pszEvent = GetEventKeyString(keyEvent);
 		CBM((it == m_events.end()), "Event %s not registered", pszEvent);
 
-		std::list<Subscriber*> *pSubscriberList = reinterpret_cast<Subscriber*>(it->second);
+		std::list<Subscriber*> *pSubscriberList = reinterpret_cast<std::list<Subscriber*>*>(it->second);
 
 		if (pSubscriberList != NULL) {
 			for (std::list<Subscriber*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
@@ -206,13 +210,15 @@ public:
 		std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
 
 		pszEvent = GetEventKeyString(keyEvent);
-		CBM((it == m_events.end()), "Event %s not registered", pszEvent);
+		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
 
 		std::list<Subscriber*> *pSubscriberList = m_events[keyEvent];
 		CNM(pSubscriberList, "Subscriber list is NULL");
 
-		for (std::list<Subscriber*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
-			WCR(reinterpret_cast<Subscriber*>(*eventIterator)->Notify(pEvent));
+		if (pSubscriberList->size() > 0) {
+			for (std::list<Subscriber*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+				WCR(reinterpret_cast<Subscriber*>(*eventIterator)->Notify(pEvent));
+			}
 		}
 
 	Error:
@@ -227,6 +233,9 @@ public:
 private:
 	//std::list<Subscriber*> *m_pSubsribers; 
 	std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT> m_events;
+
+	// TODO: Add an subscribe all function
+	//std::list<Subscriber*> m_pSubscribeToAll;
 };
 
 

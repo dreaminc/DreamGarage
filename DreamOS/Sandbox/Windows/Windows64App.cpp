@@ -166,6 +166,18 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 	return DefWindowProc(hWindow, msg, wp, lp);
 }
 
+RESULT Windows64App::RegisterImpKeyboardEvents() {
+	RESULT r = R_PASS;
+
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, m_pOpenGLImp));
+
+Error:
+	return r;
+}
+
 // Note this call will never return and will actually run the event loop
 // TODO: Thread it?
 RESULT Windows64App::ShowSandbox() {
@@ -186,6 +198,8 @@ RESULT Windows64App::ShowSandbox() {
 	CRM(SetDimensions(m_posX, m_posY), "Failed to resize OpenGL Implemenation");
 
 	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
+
+	CR(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 
 	// Show the window
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);

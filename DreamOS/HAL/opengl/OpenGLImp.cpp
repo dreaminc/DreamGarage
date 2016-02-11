@@ -476,12 +476,35 @@ Error:
 	return r;
 }
 
-/*
-// Attempt to play with a projection matrix
-DEBUG_LINEOUT("Setting Projection Matrix width %d height %d", pxWidth, pxHeight);
-ProjectionMatrix projMatrix(PROJECTION_MATRIX_PERSPECTIVE, pxWidth, pxHeight, 1.0f, 100.0f, 45.0f);
-projMatrix.PrintMatrix();
-*/
+#include "Sense/SenseKeyboard.h"
+
+RESULT OpenGLImp::Notify(void *SubscriberEvent) {
+	RESULT r = R_PASS;
+
+	SenseKeyboardEvent *kbEvent = reinterpret_cast<SenseKeyboardEvent*>(SubscriberEvent);
+	//DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
+
+	switch (kbEvent->KeyCode) {
+		case SenseKeyboard::SK_LEFT: {
+			m_pCamera->translate(0.1f, 0.0f, 0.0f);
+		} break;
+
+		case SenseKeyboard::SK_RIGHT: {
+			m_pCamera->translate(-0.1f, 0.0f, 0.0f);
+		} break;
+
+		case SenseKeyboard::SK_UP: {
+			m_pCamera->translate(0.0f, 0.0f, 0.1);
+		} break;
+
+		case SenseKeyboard::SK_DOWN: {
+			m_pCamera->translate(0.0f, 0.0f, -0.1);
+		} break;
+	}
+
+Error:
+	return r;
+}
 
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;
@@ -494,7 +517,7 @@ RESULT OpenGLImp::Render() {
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
 
-	m_pCamera->translate(0.0f, 0.0f, -0.01);
+	
 
 	//auto matMVP = matProjection * matView * matModel;
 	auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
