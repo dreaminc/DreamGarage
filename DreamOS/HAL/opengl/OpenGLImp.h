@@ -95,6 +95,8 @@ private:
 
 	camera *m_pCamera;
 
+	RESULT Notify(void *SubscriberEvent);
+
 public:
 	inline RESULT EnableVertexPositionAttribute();
 	inline RESULT EnableVertexColorAttribute();
