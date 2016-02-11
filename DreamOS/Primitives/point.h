@@ -48,9 +48,9 @@ public:
 	inline point_precision &w(point_precision val) { return this->element(3, 0) = val; }
 
 	RESULT translate(point_precision x, point_precision y, point_precision z) {
-		this->x() = x;
-		this->y() = y;
-		this->z() = z;
+		this->x() += x;
+		this->y() += y;
+		this->z() += z;
 
 		return R_PASS;
 	}

@@ -212,7 +212,7 @@ public:
 		CNM(pSubscriberList, "Subscriber list is NULL");
 
 		for (std::list<Subscriber*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
-			WCR(reinterpret_cast<Subscriber*>(*eventIterator)->Notify(pContext));
+			WCR(reinterpret_cast<Subscriber*>(*eventIterator)->Notify(pEvent));
 		}
 
 	Error:
