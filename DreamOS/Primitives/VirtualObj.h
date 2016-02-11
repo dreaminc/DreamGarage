@@ -32,6 +32,23 @@ public:
 		return R_PASS;
 	}
 
+	RESULT translate(point_precision x, point_precision y, point_precision z) {
+		m_ptOrigin.translate(x, y, z);
+		return R_PASS;
+	}
+
+	RESULT MoveTo(point p) {
+		m_ptOrigin = p;
+	}
+
+	RESULT MoveTo(point_precision x, point_precision y, point_precision z) {
+		m_ptOrigin.x() = x;
+		m_ptOrigin.y() = y;
+		m_ptOrigin.z() = z;
+
+		return R_PASS;
+	}
+
 private:
 	UID m_uid;
 };

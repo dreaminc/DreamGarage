@@ -11,7 +11,8 @@ OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
 	m_pVertexShader(NULL),
 	m_pFragmentShader(NULL),
 	m_pWindows64App(pWindows64App),
-	m_hglrc(NULL)
+	m_hglrc(NULL),
+	m_pCamera(NULL)
 {
 	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
 	ACRM(PrepareScene(), "Failed to prepare GL Scene");
@@ -348,8 +349,6 @@ Error:
 // TODO: Get this outta here
 #include "Primitives/RotationMatrix.h"
 
-#include "Primitives/camera.h"
-
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -382,6 +381,9 @@ RESULT OpenGLImp::PrepareScene() {
 	CR(PrintVertexAttributes());
 	CR(PrintActiveUniformVariables());
 
+	// Allocate the camera
+	m_pCamera = new camera(point(0.0f, 0.0f, -2.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
+
 	// TODO: Temporary, get some data into the funnel for now
 	CRM(SetData(), "Failed to set some data");
 
@@ -401,6 +403,8 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");	
 	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
 
+	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
+
 Error:
 	if (!wglMakeCurrent(NULL, NULL))
 		DEBUG_LINEOUT("Failed to release rendering context");
@@ -418,7 +422,7 @@ OGLQuad *g_pQuad = NULL;
 
 // This is temporary - replace with ObjectStore architecture soon
 RESULT OpenGLImp::SetData() {
-	RESULT r = R_PASS;
+	RESULT r = R_PASS;	
 
 	float z = 0.0f;
 	float height = 10.8f;
@@ -490,11 +494,11 @@ RESULT OpenGLImp::Render() {
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
 
-	camera tempCamera(point(0.0f, 0.0f, theta), 45.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera->translate(0.0f, 0.0f, -0.01);
 
 	//auto matMVP = matProjection * matView * matModel;
-	//auto matMVP = tempCamera.GetProjectionMatrix() * tempCamera.GetViewMatrix() * matModel;
-	auto matMVP = tempCamera.GetProjectionViewMatrix() * matModel;
+	auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
+	//auto matMVP = m_pCamera->GetProjectionViewMatrix() * matModel;
 
 	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
 
@@ -523,10 +527,10 @@ RESULT OpenGLImp::Render() {
 	*/
 
 	if (locationProjectionMatrix >= 0)
-		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&tempCamera.GetProjectionMatrix()));
+		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetProjectionMatrix()));
 
 	if (locationViewMatrix >= 0)
-		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&tempCamera.GetViewMatrix()));
+		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetViewMatrix()));
 
 	if (locationModelMatrix >= 0)
 		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));

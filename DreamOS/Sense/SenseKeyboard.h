@@ -42,14 +42,19 @@ public:
 	}
 
 	RESULT SetKeyState(uint8_t KeyCode, uint8_t KeyState) {
+		RESULT r = R_PASS;
+
 		if (KeyState != m_KeyStates[KeyCode]) {
 			m_KeyStates[KeyCode] = KeyState;
 
 			DEBUG_LINEOUT("Key %d state: %x", KeyCode, KeyState);
 
-			// TODO: Notify Observers
+			// Notify Observers
+			SenseKeyboardEvent kbEvent(KeyCode, KeyState);
+			CR(NotifySubscribers(KeyCode, &kbEvent));
 		}
 
+	Error:
 		return R_PASS;
 	}
 

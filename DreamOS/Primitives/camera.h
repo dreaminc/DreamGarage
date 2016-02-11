@@ -50,6 +50,13 @@ public:
 	~camera() {
 		// empty stub
 	}
+
+	RESULT ResizeCamera(int pxWidth, int pxHeight) {
+		m_pxScreenWidth = pxWidth;
+		m_pxScreenHeight = pxHeight;
+
+		return Update();
+	}
 	
 	RESULT Update() {
 		RESULT r = R_PASS;
@@ -71,6 +78,46 @@ public:
 	ProjectionMatrix GetProjectionMatrix() { return m_ProjectionMatrix;  }
 	ViewMatrix GetViewMatrix() { return m_ViewMatrix; }
 	matrix<camera_precision, 4, 4> GetProjectionViewMatrix() { return (m_ProjectionMatrix * m_ViewMatrix); }
+
+	RESULT translate(matrix <point_precision, 4, 1> v) {
+		RESULT r = R_PASS;
+
+		CR(VirtualObj::translate(v));
+		CR(Update());
+
+	Error:
+		return r;
+	}
+
+	RESULT translate(point_precision x, point_precision y, point_precision z) {
+		RESULT r = R_PASS;
+		
+		VirtualObj::translate(x, y, z);
+		CR(Update());
+
+	Error:
+		return r;
+	}
+
+	RESULT MoveTo(point p) {
+		RESULT r = R_PASS;
+
+		VirtualObj::MoveTo(p);
+		CR(Update());
+
+	Error:
+		return r;
+	}
+
+	RESULT MoveTo(point_precision x, point_precision y, point_precision z) {
+		RESULT r = R_PASS;
+
+		VirtualObj::MoveTo(x, y, z);
+		CR(Update());
+
+	Error:
+		return r;
+	}
 
 private:
 	// Projection

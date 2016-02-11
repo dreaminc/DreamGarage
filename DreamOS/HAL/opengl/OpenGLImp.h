@@ -29,6 +29,8 @@
 #include "OGLVertexShader.h"
 #include "OGLFragmentShader.h"
 
+#include "Primitives/camera.h"
+
 class SandboxApp; 
 class Windows64App;
 
@@ -86,9 +88,12 @@ private:
 	RESULT SetData();
 
 private:
+	// TODO: Move this into OGLProgram class (implement)
 	OGLVertexShader *m_pVertexShader;
 	OGLFragmentShader *m_pFragmentShader;
-	// Other shaders
+	// other shaders
+
+	camera *m_pCamera;
 
 public:
 	inline RESULT EnableVertexPositionAttribute();
