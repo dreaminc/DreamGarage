@@ -41,6 +41,7 @@ public:
 		// empty stub
 	}
 
+	// TODO: Complete the scan codes, ensure they make sense 
 	typedef enum SenseKeyboardScanCodes {
 		SK_SPACE	= 0x20,
 		SK_PRIOR	= 0x21,

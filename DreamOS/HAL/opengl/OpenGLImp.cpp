@@ -486,19 +486,26 @@ RESULT OpenGLImp::Notify(void *SubscriberEvent) {
 
 	switch (kbEvent->KeyCode) {
 		case SenseKeyboard::SK_LEFT: {
-			m_pCamera->translate(0.1f, 0.0f, 0.0f);
+			//m_pCamera->translate(0.1f, 0.0f, 0.0f);
+
 		} break;
 
 		case SenseKeyboard::SK_RIGHT: {
-			m_pCamera->translate(-0.1f, 0.0f, 0.0f);
+			//m_pCamera->translate(-0.1f, 0.0f, 0.0f);
 		} break;
 
 		case SenseKeyboard::SK_UP: {
-			m_pCamera->translate(0.0f, 0.0f, 0.1);
+			//m_pCamera->translate(0.0f, 0.0f, 0.1);
+			if (kbEvent->KeyState)
+				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
+
 		} break;
 
 		case SenseKeyboard::SK_DOWN: {
-			m_pCamera->translate(0.0f, 0.0f, -0.1);
+			//m_pCamera->translate(0.0f, 0.0f, -0.1);
+
+			if (kbEvent->KeyState)
+				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
 		} break;
 	}
 
@@ -517,7 +524,7 @@ RESULT OpenGLImp::Render() {
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
 
-	
+	m_pCamera->UpdatePosition();
 
 	//auto matMVP = matProjection * matView * matModel;
 	auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;

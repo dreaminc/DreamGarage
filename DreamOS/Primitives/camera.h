@@ -119,6 +119,16 @@ public:
 		return r;
 	}
 
+	RESULT UpdatePosition() {
+		RESULT r = R_PASS;
+
+		VirtualObj::UpdatePosition();
+		CR(Update());
+	
+	Error:
+		return r;
+	}
+
 private:
 	// Projection
 	int m_pxScreenWidth;

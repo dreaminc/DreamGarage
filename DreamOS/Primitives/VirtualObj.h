@@ -9,15 +9,18 @@
 
 #include "valid.h"
 #include "point.h"
+#include "vector.h"
 #include "Primitives/Types/UID.h"
 
 class VirtualObj : public valid {
 protected:
 	point m_ptOrigin;   // origin
+	vector m_vVelocity;	// velocity
 
 public:
 	VirtualObj() :
-		m_ptOrigin()
+		m_ptOrigin(),
+		m_vVelocity()
 	{
 		/* stub */
 	}
@@ -46,6 +49,37 @@ public:
 		m_ptOrigin.y() = y;
 		m_ptOrigin.z() = z;
 
+		return R_PASS;
+	}
+
+	// This should also work with vector
+	RESULT AddVelocity(matrix <point_precision, 4, 1> v) {
+		m_vVelocity += v;
+		return R_PASS;
+	}
+
+	RESULT AddVelocity(point_precision x, point_precision y, point_precision z) {
+		m_vVelocity.x() += x;
+		m_vVelocity.y() += y;
+		m_vVelocity.z() += z;
+		return R_PASS;
+	}
+
+	// This should also work with vector
+	RESULT SetVelocity(matrix <point_precision, 4, 1> v) {
+		m_vVelocity = v;
+		return R_PASS;
+	}
+
+	RESULT SetVelocity(point_precision x, point_precision y, point_precision z) {
+		m_vVelocity.x() = x;
+		m_vVelocity.y() = y;
+		m_vVelocity.z() = z;
+		return R_PASS;
+	}
+
+	RESULT UpdatePosition() {
+		m_ptOrigin += m_vVelocity;
 		return R_PASS;
 	}
 
