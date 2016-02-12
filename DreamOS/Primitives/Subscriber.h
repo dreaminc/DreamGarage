@@ -10,6 +10,11 @@
 
 //class Publisher;
 
+typedef struct SubscriberEvent {
+	uint32_t SenseEventSize;
+} SUBSCRIBER_EVENT;
+
+template<typename SEventClass>
 class Subscriber {
 public:
 	Subscriber() {
@@ -26,11 +31,7 @@ public:
 		// empty
 	}
 
-	struct SubscriberEvent {
-		uint32_t SenseEventSize;
-	};
-
-	virtual RESULT Notify(void *SubscriberEvent) = 0;
+	virtual RESULT Notify(SEventClass *pSubscriberEvent) = 0;
 
 private:
 	//Publisher *m_pSubject;

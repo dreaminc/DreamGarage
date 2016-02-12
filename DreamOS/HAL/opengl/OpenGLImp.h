@@ -95,7 +95,7 @@ private:
 
 	camera *m_pCamera;
 
-	RESULT Notify(void *SubscriberEvent);
+	RESULT Notify(SenseKeyboardEvent *kbEvent);
 
 public:
 	inline RESULT EnableVertexPositionAttribute();
