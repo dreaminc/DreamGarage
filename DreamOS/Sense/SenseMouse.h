@@ -40,7 +40,7 @@ typedef struct SenseMouseEvent : SenseDevice::SenseDeviceEvent {
 	{
 		SenseEventSize = sizeof(SenseMouseEvent);
 		dx = newX - oldX;
-		dx = newY - oldY;
+		dy = newY - oldY;
 	}
 } SENSE_MOUSE_EVENT;
 
