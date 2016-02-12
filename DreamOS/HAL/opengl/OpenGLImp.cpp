@@ -484,24 +484,23 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 
 	switch (kbEvent->KeyCode) {
 		case SenseKeyboard::SK_LEFT: {
-			//m_pCamera->translate(0.1f, 0.0f, 0.0f);
+			if (kbEvent->KeyState)
+				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
 
 		} break;
 
 		case SenseKeyboard::SK_RIGHT: {
-			//m_pCamera->translate(-0.1f, 0.0f, 0.0f);
+			if (kbEvent->KeyState)
+				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.1f);
 		} break;
 
 		case SenseKeyboard::SK_UP: {
-			//m_pCamera->translate(0.0f, 0.0f, 0.1);
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
 
 		} break;
 
 		case SenseKeyboard::SK_DOWN: {
-			//m_pCamera->translate(0.0f, 0.0f, -0.1);
-
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
 		} break;
