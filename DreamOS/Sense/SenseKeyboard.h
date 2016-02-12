@@ -76,7 +76,7 @@ public:
 		}
 
 	Error:
-		return R_PASS;
+		return r;
 	}
 
 	uint8_t GetKeyState(uint8_t KeyCode) {

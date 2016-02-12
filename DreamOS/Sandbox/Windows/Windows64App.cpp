@@ -143,10 +143,86 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 			SetDimensions(LOWORD(lp), HIWORD(lp));
 		} break;
 
+		// Mouse
+		case WM_MOUSEMOVE: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+			DEBUG_LINEOUT("Mouse move %d %d!", xPos, yPos);
+		} break;
+		
 		case WM_LBUTTONDOWN: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
 			DEBUG_LINEOUT("Left mouse button down!");
 		} break;
+		
+		case WM_LBUTTONUP: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
 
+			DEBUG_LINEOUT("Left mouse button up!");
+		} break;
+
+		case WM_LBUTTONDBLCLK: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			DEBUG_LINEOUT("Left mouse button dbl click!");
+		} break;
+		
+		case WM_RBUTTONDOWN: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			DEBUG_LINEOUT("Right mouse button down!");
+		} break;
+
+		case WM_RBUTTONUP: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			DEBUG_LINEOUT("Right mouse button up!");
+		} break;
+		
+		case WM_RBUTTONDBLCLK: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			DEBUG_LINEOUT("Right mouse button dbl click!");
+		} break;
+		
+		case WM_MBUTTONDOWN: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			DEBUG_LINEOUT("Middle mouse button down!");
+		} break;
+		
+		case WM_MBUTTONUP: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			DEBUG_LINEOUT("Middle mouse button up!");
+		} break;
+		
+		case WM_MBUTTONDBLCLK: {
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			DEBUG_LINEOUT("Middle mouse button dbl click!");
+		} break;
+			
+		case WM_MOUSEWHEEL: {
+			int wheel = ((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
+
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			DEBUG_LINEOUT("Mousewheel %d!", wheel);
+		} break;
+
+		// Keyboard
 		// Update the Keyboard in WndProc rather than in the run loop
 		// TODO: This should be different arch for native
 		case WM_KEYDOWN: {
