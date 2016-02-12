@@ -4,6 +4,7 @@
 #include "./HAL/opengl/OpenGLImp.h"
 
 #include "Win64Keyboard.h"
+#include "Win64Mouse.h"
 
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
@@ -54,8 +55,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		//SysSetDisplayMode(screenw, screenh, SCRDEPTH);
 	}
 
-	// Create the Keyboard
+	// Create the Keyboard and Mouse
 	m_pWin64Keyboard = new Win64Keyboard();
+	m_pWin64Mouse = new Win64Mouse();
 
 	m_hwndWindow = CreateWindow(
 		m_pszClassName,										// lpClassName
@@ -147,44 +149,33 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 		case WM_MOUSEMOVE: {
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
-			DEBUG_LINEOUT("Mouse move %d %d!", xPos, yPos);
+			//DEBUG_LINEOUT("Mouse move %d %d!", xPos, yPos);
+			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_MOVE, xPos, yPos, (int)(wp));
 		} break;
 		
+		case WM_LBUTTONUP:
 		case WM_LBUTTONDOWN: {
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
-
-			DEBUG_LINEOUT("Left mouse button down!");
-		} break;
-		
-		case WM_LBUTTONUP: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-
-			DEBUG_LINEOUT("Left mouse button up!");
+			//DEBUG_LINEOUT("Left mouse button down!");
+			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 
 		case WM_LBUTTONDBLCLK: {
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
-
-			DEBUG_LINEOUT("Left mouse button dbl click!");
+			//DEBUG_LINEOUT("Left mouse button dbl click!");
+			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 		
+		case WM_RBUTTONUP:
 		case WM_RBUTTONDOWN: {
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
-
-			DEBUG_LINEOUT("Right mouse button down!");
+			//DEBUG_LINEOUT("Right mouse button down!");
+			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_RIGHT_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 
-		case WM_RBUTTONUP: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-
-			DEBUG_LINEOUT("Right mouse button up!");
-		} break;
-		
 		case WM_RBUTTONDBLCLK: {
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
@@ -192,18 +183,12 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 			DEBUG_LINEOUT("Right mouse button dbl click!");
 		} break;
 		
+		case WM_MBUTTONUP:
 		case WM_MBUTTONDOWN: {
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
-
-			DEBUG_LINEOUT("Middle mouse button down!");
-		} break;
-		
-		case WM_MBUTTONUP: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-
-			DEBUG_LINEOUT("Middle mouse button up!");
+			//DEBUG_LINEOUT("Middle mouse button down!");
+			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_MIDDLE_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 		
 		case WM_MBUTTONDBLCLK: {
@@ -215,11 +200,11 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 			
 		case WM_MOUSEWHEEL: {
 			int wheel = ((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
-
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
-
-			DEBUG_LINEOUT("Mousewheel %d!", wheel);
+			//DEBUG_LINEOUT("Mousewheel %d!", wheel);
+			//m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, (int)(wp));
+			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, wheel);
 		} break;
 
 		// Keyboard

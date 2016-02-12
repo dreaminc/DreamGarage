@@ -1,5 +1,5 @@
-#ifndef SENSE_KEYBOARD_H_
-#define SENSE_KEYBOARD_H_
+#ifndef SENSE_MOUSE_H_
+#define SENSE_MOUSE_H_
 
 #include <string.h>
 
@@ -13,11 +13,11 @@
 #include "Primitives/Publisher.h"
 
 typedef enum SenseMouseEventType {
-	SENSE_MOUSE_POSITION,
 	SENSE_MOUSE_LEFT_BUTTON,
 	SENSE_MOUSE_MIDDLE_BUTTON,
 	SENSE_MOUSE_RIGHT_BUTTON,
 	SENSE_MOUSE_WHEEL,
+	SENSE_MOUSE_MOVE,
 	SENSE_MOUSE_INVALID
 } SENSE_MOUSE_EVENT_TYPE;
 
@@ -55,10 +55,12 @@ protected:
 	int m_mouseWheel;
 
 private:
-	struct SenseMousePosition {
+	typedef struct SenseMousePosition {
 		int xPos;
 		int yPos;
-	} m_MousePosition;
+	} SENSE_MOUSE_POSITION;
+
+	SenseMousePosition m_MousePosition;
 
 public:
 	SenseMouse() :
@@ -77,11 +79,26 @@ public:
 		// empty stub
 	}
 
+	const char *GetEventTypeName(SenseMouseEventType eventType) {
+		switch (eventType) {
+			case SENSE_MOUSE_LEFT_BUTTON: return "left button"; 
+			case SENSE_MOUSE_MIDDLE_BUTTON: return "middle button";
+			case SENSE_MOUSE_RIGHT_BUTTON: return "right button";
+			case SENSE_MOUSE_WHEEL: return "wheel";
+			case SENSE_MOUSE_MOVE: return "position";
+
+			default:
+			case SENSE_MOUSE_INVALID: return "invalid";
+		}
+	}
+
 	RESULT SetMouseState(SenseMouseEventType eventType, int newX, int newY, int state) {
 		RESULT r = R_PASS;
 
 		SenseMouseEvent mEvent(eventType, newX, newY, m_MousePosition.xPos, m_MousePosition.yPos, state);
 		SetMousePosition(newX, newY);
+
+		DEBUG_LINEOUT("Event %s x:%d y:%d dx:%d dy:%d state:%d", GetEventTypeName(eventType), newX, newY, mEvent.dx, mEvent.dy, state);
 
 		CR(NotifySubscribers(eventType, &mEvent));
 
@@ -90,31 +107,40 @@ public:
 	}
 
 private:
-	int &GetMouseState(SenseMouseEventType eventType) {
+	RESULT GetMouseState(SenseMouseEventType eventType, int &rvalue) {
+		RESULT r = R_PASS;
+
+		CB((eventType <= SENSE_MOUSE_RIGHT_BUTTON));
+
 		switch (eventType) {
-			case SENSE_MOUSE_LEFT_BUTTON: return m_LeftButtonState; break;
-			case SENSE_MOUSE_MIDDLE_BUTTON: return m_MiddleButtonState; break;
-			case SENSE_MOUSE_RIGHT_BUTTON: return m_RightButtonState; break;
-			case SENSE_MOUSE_WHEEL: return m_mouseWheel; break;
+			case SENSE_MOUSE_LEFT_BUTTON: rvalue = m_LeftButtonState; break;
+			case SENSE_MOUSE_MIDDLE_BUTTON: rvalue = m_MiddleButtonState; break;
+			case SENSE_MOUSE_RIGHT_BUTTON: rvalue = m_RightButtonState; break;
+			case SENSE_MOUSE_WHEEL: rvalue = m_mouseWheel; break;
 		}
+
+	Error:
+		return r;
 	}
 
-	SenseMousePostion &GetMousePosition() {
+	/*
+	SenseMousePostion& GetMousePosition() {
 		return m_MousePosition;
 	}
+	*/
 
 	RESULT SetMousePosition(int x, int y) {
-		m_MousePosition.xPos = 0;
-		m_MousePosition.yPos = 0;
+		m_MousePosition.xPos = x;
+		m_MousePosition.yPos = y;
 
 		return R_PASS;
 	}
 
 	// The SenseMouse interface
 public:
-	virtual RESULT UpdateMouseStates() = 0;
-	virtual RESULT CheckMouseState(SenseMouseEventType eventType) = 0;
+	//virtual RESULT UpdateMouseStates() = 0;
+	//virtual RESULT CheckMouseState(SenseMouseEventType eventType) = 0;
 
 };
 
-#endif // ! SENSE_KEYBOARD_H_
+#endif // ! SENSE_MOUSE_H_
