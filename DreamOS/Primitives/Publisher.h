@@ -17,7 +17,7 @@
 // TODO: Bring back the PEventClass - no more subscriber predefined event struct?
 // First lets see if this topology works at all
 
-template <class PKeyClass>
+template <typename PKeyClass, typename PKEventClass>
 class Publisher {
 public:
 
@@ -33,16 +33,29 @@ public:
 	};
 
 	/*
-	struct MAP_COMPARE_FUNCTION_STRUCT {
-		bool operator()(char const *a, char const *b) {
-			return std::strcmp(a, b) < 0;
-		}
-	};
-	//*/
-
-	// TODO: Specialize
-	char *GetEventKeyString(PKeyClass keyEvent) {
+	char* Publisher<PKeyClass, PEventClass>::GetEventKeyString(PKeyClass keyEvent) {
 		return "FUNCNOTDEFINED";
+	}
+	*/
+	
+	char* GetEventKeyString(int keyEvent) {
+		int numLength = (keyEvent == 0) ? 2 : (int)(log10(keyEvent)) + 2;
+
+		char *pszNumString = new char[numLength];
+		memset(pszNumString, 0, sizeof(char) * numLength);
+		//itoa(keyEvent, pszNumString, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
+		_itoa_s(keyEvent, pszNumString, sizeof(char) * numLength, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
+
+		return pszNumString;
+	}
+
+	char* GetEventKeyString(char* keyEvent) {
+		int strLength = strlen(keyEvent) + 1;
+		char *pszString = new char[strLength];
+		memset(pszString, 0, sizeof(char) * strLength);
+		memcpy(pszString, keyEvent, sizeof(char) * (strLength - 1));
+
+		return pszString;
 	}
 
 	Publisher() {
@@ -55,10 +68,10 @@ public:
 	// and to unregister themselves
 	~Publisher() {
 		//if (m_pEvents != NULL) {
-			std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
+			std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
 			
 			while (it != m_events.end()) {
-				std::list<Subscriber*> *pSubscriberList = reinterpret_cast<std::list<Subscriber*>*>(it->second);
+				std::list<Subscriber<PKEventClass>*> *pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
 				if (pSubscriberList != NULL) {
 					delete pSubscriberList;
@@ -81,14 +94,14 @@ protected:
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
 
-		std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
 
 		pszEvent = GetEventKeyString(keyEvent);
 		CBM((it == m_events.end()), "Event %s already registered", pszEvent);
 		
 		// Create a new subscriber list for the event entry
 
-		std::list<Subscriber*>*	pNewSubscriberList = (std::list<Subscriber*>*)(new std::list<Subscriber*>());
+		std::list<Subscriber<PKEventClass>*>*	pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
 		m_events[keyEvent] = pNewSubscriberList;
 
 		DEBUG_LINEOUT("%s Registered event %s", GetPublisherName(), pszEvent);
@@ -104,11 +117,11 @@ protected:
 	
 public:
 	// This requires the event to be registered 
-	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber* pSubscriber) {
+	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
-		std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
-		std::list<Subscriber*> *pSubscriberList = NULL;
+		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
+		std::list<Subscriber<PKEventClass>*> *pSubscriberList = NULL;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 		it = m_events.find(keyEvent);
@@ -117,10 +130,10 @@ public:
 		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
 
 		// Check if already registered
-		pSubscriberList = reinterpret_cast<std::list<Subscriber*>*>(it->second);
+		pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
-		for (std::list<Subscriber*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
-			Subscriber *pTempSubscriber = reinterpret_cast<Subscriber*>(*eventIterator);
+		for (std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+			Subscriber<PKEventClass>* pTempSubscriber = reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator);
 			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", pszEvent);
 		}
 
@@ -136,25 +149,33 @@ public:
 		return r;
 	}
 
+	/* TODO:
+	// Similar to the above, but will register to the ALL list so will get notified for all events
+	// but will get secondary preference at the moment (TODO: Add priority)
+	RESULT RegisterSubscriber(Subscriber<PKEventClass>* pSubscriber) {
+
+	}
+	*/
+
 	// Error handling warranted by the fact that this should only be called with confidence 
 	// that the subscriber is subscriber to a given event per the subscriber or the Publisher 
 	// releasing all subscriber events for whatever purpose
-	RESULT UnregisterSubscriber(PKeyClass keyEvent, Subscriber* pSubscriber) {
+	RESULT UnregisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 
-		std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
 		
 		pszEvent = GetEventKeyString(keyEvent);
 		CBM((it == m_events.end()), "Event %s not registered", pszEvent);
 
-		std::list<Subscriber*> *pSubscriberList = reinterpret_cast<std::list<Subscriber*>*>(it->second);
+		std::list<Subscriber<PKEventClass>*> *pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
 		if (pSubscriberList != NULL) {
-			for (std::list<Subscriber*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
-				Subscriber* pListSubscriber = reinterpret_cast<Subscriber*>(*eventIterator);
+			for (std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+				Subscriber<PKEventClass>* pListSubscriber = reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator);
 
 				if (pListSubscriber == pSubscriber) {
 					pSubscriberList->remove(pSubscriber);
@@ -177,13 +198,13 @@ public:
 	// This will unsubscribe a subscriber from all events
 	// Error handling warranted by the fact that something is really wrong if
 	// things get out of line
-	RESULT UnregisterSubscriber(Subscriber* pSubscriber) {
+	RESULT UnregisterSubscriber(Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 
-		std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
+		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
 
 		while (it != m_events.end()) {
 			PKeyClass keyEvent = reinterpret_cast<PKeyClass>(it->first);
@@ -203,21 +224,21 @@ public:
 		return r;
 	}
 
-	RESULT NotifySubscribers(PKeyClass keyEvent, Subscriber::SubscriberEvent *pEvent) {
+	RESULT NotifySubscribers(PKeyClass keyEvent, PKEventClass *pEvent) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
 
-		std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
 
 		pszEvent = GetEventKeyString(keyEvent);
 		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
 
-		std::list<Subscriber*> *pSubscriberList = m_events[keyEvent];
+		std::list<Subscriber<PKEventClass>*> *pSubscriberList = m_events[keyEvent];
 		CNM(pSubscriberList, "Subscriber list is NULL");
 
 		if (pSubscriberList->size() > 0) {
-			for (std::list<Subscriber*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
-				WCR(reinterpret_cast<Subscriber*>(*eventIterator)->Notify(pEvent));
+			for (std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+				WCR(reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator)->Notify(pEvent));
 			}
 		}
 
@@ -232,53 +253,16 @@ public:
 
 private:
 	//std::list<Subscriber*> *m_pSubsribers; 
-	std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT> m_events;
+
+	// Maintain a list of all subscribers and the events they're subscribed to
+	//TODO: std::map<Subscriber<PKEventClass>*, std::list<Subscriber<PKEventClass>*> m_subscribers;
+
+	// Events 
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> m_events;
 
 	// TODO: Add an subscribe all function
-	//std::list<Subscriber*> m_pSubscribeToAll;
+	// These subscribers get notified of ALL events
+	//std::list<Subscriber<PKEventClass>*> m_pSubscribeAllList;
 };
-
-
-// Explicit specialization for char *
-template<>
-char* Publisher<char *>::GetEventKeyString(char *keyEvent) {
-	int strLength = strlen(keyEvent) + 1;
-	char *pszString = new char[strLength];
-	memset(pszString, 0, sizeof(char) * strLength);
-	memcpy(pszString, keyEvent, sizeof(char) * (strLength - 1));
-	
-	return pszString;
-}
-
-/*
-template<>
-struct Publisher<char *>::MAP_COMPARE_FUNCTION_STRUCT {
-	bool operator()(char const *a, char const *b) {
-		return std::strcmp(a, b) < 0;
-	}
-};
-*/
-
-// Explicit specialization for int
-template <>
-char *Publisher<int>::GetEventKeyString(int keyEvent) {
-	int numLength = (keyEvent == 0) ? 2 : (int)(log10(keyEvent)) + 2;
-
-	char *pszNumString = new char[numLength];
-	memset(pszNumString, 0, sizeof(char) * numLength);
-	//itoa(keyEvent, pszNumString, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
-	_itoa_s(keyEvent, pszNumString, sizeof(char) * numLength, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
-
-	return pszNumString;
-}
-
-/*
-template<>
-struct Publisher<int>::MAP_COMPARE_FUNCTION_STRUCT {
-	bool operator()(int lhs, int rhs) {
-		return lhs < rhs;
-	}
-};
-*/
 
 #endif // ! SUBSCRIBER_H_

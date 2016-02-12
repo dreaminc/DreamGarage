@@ -219,6 +219,7 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
+    <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
   </ItemGroup>
   <ItemGroup>

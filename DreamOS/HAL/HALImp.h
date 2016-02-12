@@ -10,7 +10,9 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/Subscriber.h"
 
-class HALImp : public Subscriber {
+#include "Sense/SenseKeyboard.h"
+
+class HALImp : public Subscriber<SenseKeyboardEvent> {
 public:
 	HALImp() {
 		// empty stub

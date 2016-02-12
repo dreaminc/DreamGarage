@@ -27,7 +27,7 @@ public:
 		// empty stub
 	}
 
-	typedef struct SenseDeviceEvent : public Subscriber::SubscriberEvent {
+	typedef struct SenseDeviceEvent : public SubscriberEvent {
 		clock_t SenseEventTickCount;
 
 		SenseDeviceEvent() {

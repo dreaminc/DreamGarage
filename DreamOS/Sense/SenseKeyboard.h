@@ -27,7 +27,7 @@ typedef struct SenseKeyboardEvent : SenseDevice::SenseDeviceEvent {
 	}
 } SENSE_KEYBOARD_EVENT;
 
-class SenseKeyboard : public SenseDevice, public Publisher<int> {
+class SenseKeyboard : public SenseDevice, public Publisher<int, SenseKeyboardEvent> {
 public:
 	SenseKeyboard() {
 		memset(m_KeyStates, 0, sizeof(uint8_t) * NUM_SENSE_KEYBOARD_KEYS);

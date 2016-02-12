@@ -476,12 +476,10 @@ Error:
 	return r;
 }
 
-#include "Sense/SenseKeyboard.h"
-
-RESULT OpenGLImp::Notify(void *SubscriberEvent) {
+RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
-	SenseKeyboardEvent *kbEvent = reinterpret_cast<SenseKeyboardEvent*>(SubscriberEvent);
+	//SenseKeyboardEvent *kbEvent = reinterpret_cast<SenseKeyboardEvent*>(SubscriberEvent);
 	//DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
 
 	switch (kbEvent->KeyCode) {

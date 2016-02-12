@@ -259,6 +259,9 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseMouse.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
