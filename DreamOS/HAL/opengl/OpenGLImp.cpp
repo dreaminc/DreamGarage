@@ -519,6 +519,8 @@ RESULT OpenGLImp::Render() {
 	theta -= 0.05f;
 
 	RotationMatrix matModel(RotationMatrix::Z_AXIS, theta);
+	//RotationMatrix matModel(0.0f, theta, -theta);
+
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
 
