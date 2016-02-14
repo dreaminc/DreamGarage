@@ -41,6 +41,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		return;	// TODO: Use assert EHM
 	}
 
+	// TODO: Improve this
 	m_posX = (GetSystemMetrics(SM_CXSCREEN) / 2) - (m_pxWidth / 2);
 	m_posY = (GetSystemMetrics(SM_CYSCREEN) / 2) - (m_pxHeight / 2);
 
@@ -54,10 +55,6 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		// TODO: ?
 		//SysSetDisplayMode(screenw, screenh, SCRDEPTH);
 	}
-
-	// Create the Keyboard and Mouse
-	m_pWin64Keyboard = new Win64Keyboard();
-	m_pWin64Mouse = new Win64Mouse();
 
 	m_hwndWindow = CreateWindow(
 		m_pszClassName,										// lpClassName
@@ -73,6 +70,15 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		this												// lpParam
 	);
 
+	// TODO: Move into Sandbox virtual function
+	// Create the Keyboard and Mouse
+	m_pWin64Keyboard = new Win64Keyboard(this);
+	m_pWin64Mouse = new Win64Mouse(this);
+
+	// Initialize Mouse 
+	m_pWin64Mouse->CaptureMouse();
+	m_pWin64Mouse->CenterMousePosition();
+
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 }
 
@@ -82,6 +88,10 @@ Windows64App::~Windows64App() {
 
 HDC Windows64App::GetDeviceContext() {
 	return m_hDC;
+}
+
+HWND Windows64App::GetWindowHandle() {
+	return m_hwndWindow;
 }
 
 // This also kicks off the OpenGL implementation
@@ -146,12 +156,16 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 		} break;
 
 		// Mouse
+		/*
+		// This needs to go into the event loop apparently
+		// TODO: Alternative approaches welcome
 		case WM_MOUSEMOVE: {
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Mouse move %d %d!", xPos, yPos);
 			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_MOVE, xPos, yPos, (int)(wp));
 		} break;
+		*/
 		
 		case WM_LBUTTONUP:
 		case WM_LBUTTONDOWN: {
@@ -213,11 +227,11 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 		// Update the Keyboard in WndProc rather than in the run loop
 		// TODO: This should be different arch for native
 		case WM_KEYDOWN: {
-			m_pWin64Keyboard->UpdateKeyState((uint8_t)(wp), true);
+			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), true);
 		} break;
 
 		case WM_KEYUP: {
-			m_pWin64Keyboard->UpdateKeyState((uint8_t)(wp), false);
+			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), false);
 		} break;
 
 		default: {
@@ -236,6 +250,10 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, m_pOpenGLImp));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, m_pOpenGLImp));
+
+	for (int i = 0; i < 26; i++) {
+		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), m_pOpenGLImp));
+	}
 
 Error:
 	return r;
@@ -273,7 +291,7 @@ RESULT Windows64App::ShowSandbox() {
 
 	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
 
-	// TODO: Move into Sandbox virtual function
+	// TODO: Move to Sandbox function
 	CR(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 	CR(RegisterImpMouseEvents(), "Failed to register mouse events");
 
@@ -293,6 +311,11 @@ RESULT Windows64App::ShowSandbox() {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		// Update the mouse
+		// TODO: This is wrong architecture, this should
+		// be parallel 
+		m_pWin64Mouse->UpdateMousePosition();
 
 		if(m_pOpenGLImp != NULL)
 			m_pOpenGLImp->Render();

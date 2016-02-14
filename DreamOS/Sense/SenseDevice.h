@@ -15,6 +15,7 @@
 // controls or otherwise.  The base SenseDevice will get filled out with shared functionality and interfaces
 // to such devices and act as a shared handle for managers or controllers as they become needed.
 
+#include "Primitives/Types/UID.h"
 #include "Primitives/Subscriber.h"
 
 class SenseDevice {

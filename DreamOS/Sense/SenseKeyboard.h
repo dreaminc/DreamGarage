@@ -14,11 +14,32 @@
 
 #define NUM_SENSE_KEYBOARD_KEYS 256
 
+// TODO: Complete the scan codes, ensure they make sense 
+typedef enum SenseKeyboardScanCodes {
+	SK_SPACE = 0x20,
+	SK_PRIOR = 0x21,
+	SK_NEXT = 0x22,
+	SK_END = 0x23,
+	SK_HOME = 0x24,
+	SK_LEFT = 0x25,
+	SK_UP = 0x26,
+	SK_RIGHT = 0x27,
+	SK_DOWN = 0x28,
+	SK_SELECT = 0x29,
+	SK_PRINT = 0x2A,
+	SK_EXECUTE = 0x2B,
+	SK_SNAPSHOT = 0x2C,
+	SK_INSERT = 0x2D,
+	SK_DELETE = 0x2E,
+	SK_HELP = 0x2F,
+	SK_INVALID
+} SK_SCAN_CODE;
+
 typedef struct SenseKeyboardEvent : SenseDevice::SenseDeviceEvent {
-	uint8_t KeyCode;
+	SK_SCAN_CODE KeyCode;
 	uint8_t KeyState;
 
-	SenseKeyboardEvent(uint8_t key, uint8_t state) :
+	SenseKeyboardEvent(SK_SCAN_CODE key, uint8_t state) :
 		SenseDeviceEvent()
 	{
 		SenseEventSize = sizeof(SenseKeyboardEvent);
@@ -41,28 +62,7 @@ public:
 		// empty stub
 	}
 
-	// TODO: Complete the scan codes, ensure they make sense 
-	typedef enum SenseKeyboardScanCodes {
-		SK_SPACE	= 0x20,
-		SK_PRIOR	= 0x21,
-		SK_NEXT		= 0x22,
-		SK_END		= 0x23,
-		SK_HOME		= 0x24,
-		SK_LEFT     = 0x25,
-		SK_UP       = 0x26,
-		SK_RIGHT    = 0x27,
-		SK_DOWN     = 0x28,
-		SK_SELECT   = 0x29,
-		SK_PRINT    = 0x2A,
-		SK_EXECUTE  = 0x2B,
-		SK_SNAPSHOT = 0x2C,
-		SK_INSERT   = 0x2D,
-		SK_DELETE   = 0x2E,
-		SK_HELP     = 0x2F,
-		SK_INVALID
-	} SK_SCAN_CODE;
-
-	RESULT SetKeyState(uint8_t KeyCode, uint8_t KeyState) {
+	RESULT SetKeyState(SK_SCAN_CODE KeyCode, uint8_t KeyState) {
 		RESULT r = R_PASS;
 
 		if (KeyState != m_KeyStates[KeyCode]) {
@@ -79,8 +79,8 @@ public:
 		return r;
 	}
 
-	uint8_t GetKeyState(uint8_t KeyCode) {
-		return m_KeyStates[KeyCode];
+	uint8_t GetKeyState(SK_SCAN_CODE KeyCode) {
+		return m_KeyStates[(int)KeyCode];
 	}
 
 	RESULT SetKeyStates(uint8_t KeyStates[NUM_SENSE_KEYBOARD_KEYS]) {
@@ -91,7 +91,7 @@ public:
 	// The SenseKeyboard interface
 public:
 	virtual RESULT UpdateKeyStates() = 0;
-	virtual RESULT CheckKeyState(int key) = 0;
+	virtual RESULT CheckKeyState(SK_SCAN_CODE key) = 0;
 
 protected:
 	uint8_t m_KeyStates[NUM_SENSE_KEYBOARD_KEYS];

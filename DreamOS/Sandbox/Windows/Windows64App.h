@@ -40,6 +40,7 @@ private:
 
 public:
 	HDC GetDeviceContext();
+	HWND GetWindowHandle();
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
 

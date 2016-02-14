@@ -92,6 +92,12 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

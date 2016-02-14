@@ -483,26 +483,38 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	//DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
 
 	switch (kbEvent->KeyCode) {
-		case SenseKeyboard::SK_LEFT: {
+		case (SK_SCAN_CODE)('A'):
+		case SK_LEFT: {
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
+			else
+				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
 
 		} break;
 
-		case SenseKeyboard::SK_RIGHT: {
+		case (SK_SCAN_CODE)('D') :
+		case SK_RIGHT: {
 			if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.1f);
+				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
+			else
+				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
 		} break;
 
-		case SenseKeyboard::SK_UP: {
+		case (SK_SCAN_CODE)('W') :
+		case SK_UP: {
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
+			else
+				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
 
 		} break;
 
-		case SenseKeyboard::SK_DOWN: {
+		case (SK_SCAN_CODE)('S') :
+		case SK_DOWN: {
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
+			else
+				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
 		} break;
 	}
 
