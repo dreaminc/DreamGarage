@@ -10,6 +10,8 @@
 
 typedef uint32_t dimindex;
 
+#include "TriangleIndexGroup.h"
+
 class DimObj : public valid {
 protected:
     point m_ptOrigin;   // origin
@@ -76,6 +78,16 @@ public:
 		RESULT r = R_PASS;
 
 		m_pIndices = new uint32_t[numIndices];
+		CN(m_pIndices);
+
+	Error:
+		return r;
+	}
+
+	RESULT AllocateTriangleIndexGroups(uint32_t numTriangles) {
+		RESULT r = R_PASS;
+
+		m_pIndices = (dimindex*)(new TriangleIndexGroup[numTriangles]);
 		CN(m_pIndices);
 
 	Error:

@@ -72,7 +72,7 @@ public:
 
 		m_vLook = matrixRotation * vector(0.0f, 0.0f, 1.0f);
 		m_vUp = matrixRotation * vector(0.0f, 1.0f, 0.0f);
-		m_vRight = matrixRotation * vector(1.0f, 1.0f, 1.0f);
+		m_vRight = matrixRotation * vector(1.0f, 0.0f, 0.0f);
 
 		//m_vVelocity = m_vLook * 0.1f;
 
