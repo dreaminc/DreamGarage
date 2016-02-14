@@ -180,7 +180,8 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 
-			DEBUG_LINEOUT("Right mouse button dbl click!");
+			//DEBUG_LINEOUT("Right mouse button dbl click!");
+			// TODO: Add this to the SenseMouse
 		} break;
 		
 		case WM_MBUTTONUP:
@@ -195,7 +196,8 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 
-			DEBUG_LINEOUT("Middle mouse button dbl click!");
+			//DEBUG_LINEOUT("Middle mouse button dbl click!");
+			// TODO: Add this to the SenseMouse
 		} break;
 			
 		case WM_MOUSEWHEEL: {
@@ -239,6 +241,17 @@ Error:
 	return r;
 }
 
+RESULT Windows64App::RegisterImpMouseEvents() {
+	RESULT r = R_PASS;
+
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_MOVE, m_pOpenGLImp));
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pOpenGLImp));
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pOpenGLImp));
+
+Error:
+	return r;
+}
+
 // Note this call will never return and will actually run the event loop
 // TODO: Thread it?
 RESULT Windows64App::ShowSandbox() {
@@ -260,7 +273,9 @@ RESULT Windows64App::ShowSandbox() {
 
 	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
 
+	// TODO: Move into Sandbox virtual function
 	CR(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
+	CR(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	// Show the window
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);

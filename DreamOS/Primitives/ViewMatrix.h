@@ -50,7 +50,7 @@ public:
 		m_vRight = matrixRotation * vector(1.0f, 1.0f, 1.0f);
 		*/
 
-		return SetMatrix(TranslationMatrix(ptPosition) * RotationMatrix(pitch, yaw, roll));
+		return SetMatrix(RotationMatrix(pitch, yaw, roll) * TranslationMatrix(ptPosition));
 	}
 
 	~ViewMatrix() {

@@ -79,7 +79,7 @@ public:
 		// empty stub
 	}
 
-	const char *GetEventTypeName(SenseMouseEventType eventType) {
+	static const char *GetEventTypeName(SenseMouseEventType eventType) {
 		switch (eventType) {
 			case SENSE_MOUSE_LEFT_BUTTON: return "left button"; 
 			case SENSE_MOUSE_MIDDLE_BUTTON: return "middle button";
@@ -92,13 +92,28 @@ public:
 		}
 	}
 
+	static const char *GetEventTypeName(SenseMouseEvent event) {
+		return GetEventTypeName(event.EventType);
+	}
+
+	static const char *GetEventTypeName(SenseMouseEvent *pEvent) {
+		return GetEventTypeName(pEvent->EventType);
+	}
+
+	static RESULT PrintEvent(SenseMouseEvent *pEvent) {
+		DEBUG_LINEOUT("Sense Mouse Event %s x:%d y:%d dx:%d dy:%d state:%d", 
+			GetEventTypeName(pEvent), pEvent->xPos, pEvent->yPos, pEvent->dx, pEvent->dy, pEvent->state);
+		
+		return R_PASS;
+	}
+
 	RESULT SetMouseState(SenseMouseEventType eventType, int newX, int newY, int state) {
 		RESULT r = R_PASS;
 
 		SenseMouseEvent mEvent(eventType, newX, newY, m_MousePosition.xPos, m_MousePosition.yPos, state);
 		SetMousePosition(newX, newY);
 
-		DEBUG_LINEOUT("Event %s x:%d y:%d dx:%d dy:%d state:%d", GetEventTypeName(eventType), newX, newY, mEvent.dx, mEvent.dy, state);
+		//DEBUG_LINEOUT("Event %s x:%d y:%d dx:%d dy:%d state:%d", GetEventTypeName(eventType), newX, newY, mEvent.dx, mEvent.dy, state);
 
 		CR(NotifySubscribers(eventType, &mEvent));
 
