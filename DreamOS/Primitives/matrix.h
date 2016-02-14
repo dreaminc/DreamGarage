@@ -333,7 +333,27 @@ public:
 		return newMatrix;
 	}
 
-	
+	// Scalar multiplication / Division
+	// -------------------------------------------------------------------------
+	matrix& operator*=(const TMatrix& a) {
+		multData(a);
+		return *this;
+	}
+
+	matrix operator*(const TMatrix& a) const {
+		return matrix<TMatrix, N, M>(*this).operator*=(a);
+	}
+
+	matrix& operator/=(const TMatrix& a) {
+		divData(a);
+		return *this;
+	}
+
+	matrix<TMatrix> operator/(const TMatrix& a) {
+		return matrix<TMatrix, N, M>(*this).operator/=(a);
+	}
+
+
 	/*
 	// TODO: Implement determinant (not critical atm)
 	// Only applicable for square matrices
@@ -382,25 +402,7 @@ public:
 
 	/*
 
-    // Scalar multiplication / Division
-    // -------------------------------------------------------------------------
-    matrix& operator*=( const TMatrix& a ) {
-        multData(a);
-        return *this;
-    }
-
-    matrix operator*( const TMatrix& a ) const {
-        return matrix<TMatrix, N, M>(*this).operator*=(a);
-    }
-
-    matrix& operator/=( const TMatrix& a ) {
-        divData(a);
-        return *this;
-    }
-
-    matrix<TMatrix> operator/( const TMatrix& a ) {
-        return matrix<TMatrix, N, M>(*this).operator/=(a);
-    }
+    
 
 	*/
 

@@ -68,7 +68,7 @@ public:
 		if (KeyState != m_KeyStates[KeyCode]) {
 			m_KeyStates[KeyCode] = KeyState;
 
-			DEBUG_LINEOUT("Key %d state: %x", KeyCode, KeyState);
+			//DEBUG_LINEOUT("Key %d state: %x", KeyCode, KeyState);
 
 			// Notify Observers
 			SenseKeyboardEvent kbEvent(KeyCode, KeyState);

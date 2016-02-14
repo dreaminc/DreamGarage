@@ -482,41 +482,58 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	//SenseKeyboardEvent *kbEvent = reinterpret_cast<SenseKeyboardEvent*>(SubscriberEvent);
 	//DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
 
+/*
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('A'):
 		case SK_LEFT: {
+			/ *
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
 			else
 				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
+			* /
+			if (kbEvent->KeyState)
+				m_pCamera->Strafe(0.1f);
 
 		} break;
 
 		case (SK_SCAN_CODE)('D') :
 		case SK_RIGHT: {
+			/ *
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
 			else
 				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
+			* /
+			if (kbEvent->KeyState)
+				m_pCamera->Strafe(-0.1f);
 		} break;
 
 		case (SK_SCAN_CODE)('W') :
 		case SK_UP: {
+			/ *
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
 			else
 				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
-
+			* /
+			if (kbEvent->KeyState)
+				m_pCamera->MoveForward(0.1f);
 		} break;
 
 		case (SK_SCAN_CODE)('S') :
 		case SK_DOWN: {
+			/ *
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
 			else
 				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
+			* /
+			if (kbEvent->KeyState)
+				m_pCamera->MoveForward(-0.1f);
 		} break;
 	}
+*/
 
 Error:
 	return r;
@@ -560,7 +577,8 @@ RESULT OpenGLImp::Render() {
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
 
-	m_pCamera->UpdatePosition();
+	m_pCamera->UpdateFromKeyboardState((SenseKeyboard*)(m_pWindows64App->m_pWin64Keyboard));
+	//m_pCamera->UpdatePosition(); Now done above
 
 	//auto matMVP = matProjection * matView * matModel;
 	auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
