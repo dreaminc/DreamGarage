@@ -415,10 +415,12 @@ Error:
 #include "Primitives/Vertex.h"
 #include "OGLTriangle.h"
 #include "OGLQuad.h"
+#include "OGLVolume.h"
 #include "Primitives/color.h"
 
 OGLTriangle *g_pTriangle = NULL;
 OGLQuad *g_pQuad = NULL;
+OGLVolume *g_pVolume = NULL;
 
 // This is temporary - replace with ObjectStore architecture soon
 RESULT OpenGLImp::SetData() {
@@ -471,6 +473,8 @@ RESULT OpenGLImp::SetData() {
 	vector v2(2, 3, 4);
 
 	auto F = v1 * v2;
+
+	g_pVolume = new OGLVolume(this, 2.0f);
 	
 Error:
 	return r;
@@ -569,9 +573,10 @@ RESULT OpenGLImp::Render() {
 
 	static float theta = 0.0;
 
-	//theta -= 0.05f;
+	theta -= 0.01f;
 
-	RotationMatrix matModel(RotationMatrix::Z_AXIS, theta);
+	auto matModel = RotationMatrix(RotationMatrix::Z_AXIS, theta) * RotationMatrix(RotationMatrix::Y_AXIS, theta) * RotationMatrix(RotationMatrix::X_AXIS, -theta);
+	//auto matModel = ;
 	//RotationMatrix matModel(0.0f, theta, -theta);
 
 	TranslationMatrix matView(0.0f, 0.0f, theta);
@@ -624,8 +629,9 @@ RESULT OpenGLImp::Render() {
 
 
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	g_pTriangle->Render();
-	g_pQuad->Render();
+	//g_pTriangle->Render();
+	//g_pQuad->Render();
+	g_pVolume->Render();
 	
 	/*
 	GLfloat z = 0.0f;

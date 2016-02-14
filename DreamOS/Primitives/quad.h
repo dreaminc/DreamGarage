@@ -43,13 +43,8 @@ protected:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() { 
-		return NUM_QUAD_POINTS;
-	}
-
-	inline int NumberIndices() {
-		return NUM_QUAD_TRIS * 3;
-	}
+	inline int NumberVertices() { return NUM_QUAD_POINTS; }
+	inline int NumberIndices() { return NUM_QUAD_TRIS * 3; }
 
 private:
 	QUAD_TYPE m_quadType;
@@ -102,16 +97,6 @@ public:
 	Error:
 		Invalidate();
 	}
-
-	/*
-	// Has been moved to DIMOBJ
-	RESULT SetColor(color c) {
-		for (int i = 0; i < NUM_QUAD_POINTS; i++)
-			m_pVertices[i].SetColor(c);
-
-		return R_PASS;
-	}
-	*/
 
 	// TODO: Parallelogram
 	// TODO: Trapezoid
