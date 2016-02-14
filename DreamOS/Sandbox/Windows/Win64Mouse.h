@@ -11,17 +11,23 @@
 
 #include "Sense/SenseMouse.h"
 
+class Windows64App;
+
 class Win64Mouse : public SenseMouse {
 public:
-	Win64Mouse() :
-		SenseMouse()
-	{
-		// empty for now
-	}
+	Win64Mouse(Windows64App *pWin64AppParent);
 
-	RESULT UpdateMouseState(SenseMouseEventType eventType, int newX, int newY, int state) {
-		return SetMouseState(eventType, newX, newY, state);
-	}
+	RESULT UpdateMouseState(SenseMouseEventType eventType, int newX, int newY, int state);
+
+	RESULT CaptureMouse();
+	RESULT ReleaseMouse();
+	RESULT SetMousePosition(int x, int y);
+	RESULT CenterMousePosition();
+
+	RESULT UpdateMousePosition();
+
+private:
+	Windows64App *m_pWin64AppParent;
 };
 
 #endif // ! WIN64_KEYBOARD_H_
