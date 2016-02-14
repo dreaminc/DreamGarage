@@ -199,6 +199,7 @@
     <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
+    <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Number.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Types.h" />
@@ -209,6 +210,7 @@
     <ClInclude Include="..\..\..\Primitives\Vertex.h" />
     <ClInclude Include="..\..\..\Primitives\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
+    <ClInclude Include="..\..\..\Primitives\volume.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />

@@ -16,9 +16,6 @@
 #include "point.h"
 #include "color.h"
 
-// TODO: Move this to cpp make it local
-dimindex g_QuadIndices[] = { 0, 1, 2, 1, 3, 2 };
-
 class quad : public DimObj {
 public:
 	typedef enum {
@@ -40,10 +37,7 @@ protected:
 		RESULT r = R_PASS;
 
 		CR(AllocateVertices(NumberVertices()));
-		CR(AllocateIndices(NumberIndices()));
-
-		for (int i = 0; i < NumberIndices(); i++)
-			m_pIndices[i] = g_QuadIndices[i];
+		CR(AllocateTriangleIndexGroups(NUM_QUAD_TRIS));
 
 	Error:
 		return R_PASS;
@@ -69,11 +63,20 @@ public:
 		CR(Allocate());
 
 		double halfSide = side / 2.0f;
+		int vertCount = 0;
+		int indexCount = 0;
+		int A, B, C, D;
 
-		m_pVertices[0] = vertex(point(-halfSide, halfSide, 0.0f));		// A
-		m_pVertices[1] = vertex(point(halfSide, halfSide, 0.0f));		// B
-		m_pVertices[2] = vertex(point(-halfSide, -halfSide, 0.0f));		// C
-		m_pVertices[3] = vertex(point(halfSide, -halfSide, 0.0f));		// D
+		// Set up indices 
+		TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
+
+		m_pVertices[A = vertCount++] = vertex(point(-halfSide, halfSide, 0.0f));		// A
+		m_pVertices[B = vertCount++] = vertex(point(halfSide, halfSide, 0.0f));			// B
+		m_pVertices[C = vertCount++] = vertex(point(-halfSide, -halfSide, 0.0f));		// C
+		m_pVertices[D = vertCount++] = vertex(point(halfSide, -halfSide, 0.0f));		// D
+
+		pTriIndices[indexCount++] = TriangleIndexGroup(A, B, C);
+		pTriIndices[indexCount++] = TriangleIndexGroup(B, D, C);
 
 		Validate();
 	Error:

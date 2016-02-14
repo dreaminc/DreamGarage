@@ -271,6 +271,12 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\volume.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
