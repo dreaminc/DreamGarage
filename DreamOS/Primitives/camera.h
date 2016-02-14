@@ -74,6 +74,8 @@ public:
 		m_vUp = matrixRotation * vector(0.0f, 1.0f, 0.0f);
 		m_vRight = matrixRotation * vector(1.0f, 1.0f, 1.0f);
 
+		//m_vVelocity = m_vLook * 0.1f;
+
 	Error:
 		return r;
 	}
@@ -169,6 +171,109 @@ public:
 		//m_roll		= 0.0f * m_cameraRotateSpeed;
 
 		return Update();
+	}
+
+	RESULT MoveForward(camera_precision amt) {
+		m_ptOrigin += m_vLook * amt;
+		m_ptOrigin(3) = 0.0f;
+		return Update();
+	}
+
+	RESULT Strafe(camera_precision amt) {
+		m_ptOrigin += m_vRight * amt;
+		return Update();
+	}
+
+	RESULT Notify(SenseKeyboardEvent *kbEvent) {
+		RESULT r = R_PASS;
+
+		DEBUG_LINEOUT("Key %d state: %x", kbEvent->KeyCode, kbEvent->KeyState);
+
+		switch (kbEvent->KeyCode) {
+			case (SK_SCAN_CODE)('A') :
+			case SK_LEFT: {
+				/*
+				if (kbEvent->KeyState)
+				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
+				else
+				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
+				*/
+				if (kbEvent->KeyState)
+					Strafe(0.1f);
+
+			} break;
+
+			case (SK_SCAN_CODE)('D') :
+			case SK_RIGHT: {
+				/*
+				if (kbEvent->KeyState)
+				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
+				else
+				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
+				*/
+				if (kbEvent->KeyState)
+					Strafe(-0.1f);
+			} break;
+
+			case (SK_SCAN_CODE)('W') :
+			case SK_UP: {
+				/*
+				if (kbEvent->KeyState)
+				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
+				else
+				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
+				*/
+				if (kbEvent->KeyState)
+					MoveForward(0.1f);
+			} break;
+
+			case (SK_SCAN_CODE)('S') :
+			case SK_DOWN: {
+				/*
+				if (kbEvent->KeyState)
+				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
+				else
+				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
+				*/
+				if (kbEvent->KeyState)
+					MoveForward(-0.1f);
+			} break;
+		}
+
+	Error:
+		return r;
+	}
+
+	// Non-Event driven keyboard input
+	RESULT UpdateFromKeyboardState(SenseKeyboard *pSK) {
+		RESULT r = R_PASS;
+
+		uint8_t state = pSK->GetKeyState(SK_LEFT);
+		if (state) {
+			DEBUG_LINEOUT("strafe");
+			Strafe(0.1f);
+		}
+
+		state = pSK->GetKeyState(SK_RIGHT);
+		//pSK->CheckKeyState((SK_SCAN_CODE)('D'))
+		if (state) {
+			Strafe(-0.1f);
+		}
+
+		state = pSK->GetKeyState(SK_UP);
+		if (state) {
+			MoveForward(0.1f);
+		}
+
+		state = pSK->GetKeyState(SK_DOWN);
+		if (state) {
+			MoveForward(-0.1f);
+		}
+
+		CR(UpdatePosition());
+
+	Error:
+		return r;
 	}
 
 private:

@@ -65,6 +65,8 @@ private:
 private:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	OpenGLImp *m_pOpenGLImp;	
+
+public:
 	Win64Keyboard *m_pWin64Keyboard;
 	Win64Mouse *m_pWin64Mouse;
 };
