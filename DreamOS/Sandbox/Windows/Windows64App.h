@@ -41,6 +41,7 @@ private:
 public:
 	HDC GetDeviceContext();
 	RESULT RegisterImpKeyboardEvents();
+	RESULT RegisterImpMouseEvents();
 
 private:
 	bool m_fFullscreen;

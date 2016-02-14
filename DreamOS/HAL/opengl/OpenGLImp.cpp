@@ -382,7 +382,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CR(PrintActiveUniformVariables());
 
 	// Allocate the camera
-	m_pCamera = new camera(point(0.0f, 0.0f, -2.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new camera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 
 	// TODO: Temporary, get some data into the funnel for now
 	CRM(SetData(), "Failed to set some data");
@@ -440,8 +440,8 @@ RESULT OpenGLImp::SetData() {
 	///*
 	g_pTriangle = new OGLTriangle(this, 10.0f);
 	// TODO: Update this so that any changes force a change?
-	//g_pTriangle->CopyVertices(vertTemp, 3);
-	//g_pTriangle->UpdateOGLBuffers();
+	g_pTriangle->CopyVertices(vertTemp, 3);
+	g_pTriangle->UpdateOGLBuffers();
 	//*/
 
 	g_pQuad = new OGLQuad(this, 0.8f);
@@ -510,12 +510,37 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
+	RESULT r = R_PASS;
+
+	SenseMouse::PrintEvent(mEvent);
+
+	float MouseMoveFactor = 0.1f;
+
+	switch (mEvent->EventType) {
+		case SENSE_MOUSE_MOVE: {
+			CR(m_pCamera->RotateCameraByDiffXY(mEvent->dx, mEvent->dy));
+		} break;
+
+		case SENSE_MOUSE_LEFT_BUTTON: {
+
+		} break;
+
+		case SENSE_MOUSE_RIGHT_BUTTON: {
+
+		} break;
+	}
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::Render() {
 	RESULT r = R_PASS;
 
-	static float theta = -2.0;
+	static float theta = 0.0;
 
-	theta -= 0.05f;
+	//theta -= 0.05f;
 
 	RotationMatrix matModel(RotationMatrix::Z_AXIS, theta);
 	//RotationMatrix matModel(0.0f, theta, -theta);

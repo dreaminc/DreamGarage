@@ -11,8 +11,9 @@
 #include "Primitives/Subscriber.h"
 
 #include "Sense/SenseKeyboard.h"
+#include "Sense/SenseMouse.h"
 
-class HALImp : public Subscriber<SenseKeyboardEvent> {
+class HALImp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent> {
 public:
 	HALImp() {
 		// empty stub

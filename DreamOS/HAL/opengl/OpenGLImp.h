@@ -94,8 +94,8 @@ private:
 	// other shaders
 
 	camera *m_pCamera;
-
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
+	RESULT Notify(SenseMouseEvent *mEvent);
 
 public:
 	inline RESULT EnableVertexPositionAttribute();
