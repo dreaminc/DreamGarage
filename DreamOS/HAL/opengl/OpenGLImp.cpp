@@ -556,11 +556,11 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 		} break;
 
 		case SENSE_MOUSE_LEFT_BUTTON: {
-
+			// TODO: Do something?
 		} break;
 
 		case SENSE_MOUSE_RIGHT_BUTTON: {
-
+			// TODO: Do something?
 		} break;
 	}
 
