@@ -198,6 +198,7 @@
     <ClInclude Include="..\..\..\Primitives\quad.h" />
     <ClInclude Include="..\..\..\Primitives\RotationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\texture.h" />
     <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
     <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />

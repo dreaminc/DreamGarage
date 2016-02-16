@@ -15,6 +15,7 @@ int main(int argc, const char *argv[]) {
 	SandboxApp *pWin32Sandbox = SandboxFactory::MakeSandbox(SANDBOX_APP_WIN32);
 	CNM(pWin32Sandbox, "Failed to create win32 sandbox");
 
+	// This will start the application
 	CRM(pWin32Sandbox->ShowSandbox(), "Failed to show Win32 Sandbox window");
 	
 Error:
