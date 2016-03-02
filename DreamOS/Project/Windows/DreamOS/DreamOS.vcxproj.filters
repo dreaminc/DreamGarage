@@ -1,0 +1,313 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="RESULT">
+      <UniqueIdentifier>{c5818450-ccaf-494f-a6a3-1829971017c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Test">
+      <UniqueIdentifier>{4bbf355f-4691-48f4-8232-b4800b606d5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Sandbox">
+      <UniqueIdentifier>{394d99b2-78d3-4670-aa3f-893289f45340}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sandbox\Windows">
+      <UniqueIdentifier>{33b730f8-e45f-44ce-922e-c03c1304b623}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sandbox\OSX">
+      <UniqueIdentifier>{fc7ccd20-271e-4faa-962a-45b33f699455}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitives">
+      <UniqueIdentifier>{435f4a0d-a8be-4385-a06d-5bfeff5971d8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Primitives\Types">
+      <UniqueIdentifier>{e2f83a20-955b-4bc8-80a3-96529c103e31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL">
+      <UniqueIdentifier>{82b61aa2-ea9e-4a23-8597-487ea3b7a4e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl">
+      <UniqueIdentifier>{250a02de-03cb-461d-9d83-ff8a1ff56fc6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl\GLSL">
+      <UniqueIdentifier>{ad42cc41-1d80-4c6d-8048-f3c57f04dae6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{4f039fdc-08f8-43f4-88a5-313b7ed34769}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Types">
+      <UniqueIdentifier>{44fa16e8-b322-4aa9-bf57-b79b92f4c3b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Sense">
+      <UniqueIdentifier>{d6f300ee-6f18-483b-9818-d0018fb18693}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\DreamOSMain.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
+      <Filter>Primitives\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\PathManager.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\point.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\DreamOSMain.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\RESULT\EHM.h">
+      <Filter>RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\RESULT\RESULT.h">
+      <Filter>RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\TestObject.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\OSX\OSXApp.h">
+      <Filter>Sandbox\OSX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h">
+      <Filter>Sandbox\OSX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h">
+      <Filter>Sandbox\OSX</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
+      <Filter>RESULT</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\AABV.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimObj.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\point.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\vector.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\Number.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\Types.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\UID.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\SandboxApp.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\HAL.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\opengl.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\HALImp.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\PathManager.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h">
+      <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Types\Factory.h">
+      <Filter>Core\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Types\Object.h">
+      <Filter>Core\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Vertex.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Shader.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Triangle.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\color.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\quad.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\valid.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\config.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\RotationMatrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\camera.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\VirtualObj.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ViewMatrix.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseDevice.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseKeyboard.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Subscriber.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Publisher.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseMouse.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\volume.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\texture.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\Makefile">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\..\Rakefile">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\..\OSX\OSXApp.mm">
+      <Filter>Sandbox\OSX</Filter>
+    </None>
+    <None Include="..\..\..\OSX\OSXAppDelegate.mm">
+      <Filter>Sandbox\OSX</Filter>
+    </None>
+    <None Include="..\..\..\OSX\OSXOpenGLView.m">
+      <Filter>Sandbox\OSX</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag">
+      <Filter>HAL\opengl\GLSL</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert">
+      <Filter>HAL\opengl\GLSL</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\dreampaths.txt" />
+  </ItemGroup>
+</Project>
