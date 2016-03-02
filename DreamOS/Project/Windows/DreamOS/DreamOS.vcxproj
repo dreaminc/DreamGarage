@@ -1,0 +1,247 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{E8896328-06EB-43A0-902C-59C3D2F3A3B5}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>DreamOS</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>"Core/config.h";%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\DreamOSMain.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
+    <ClCompile Include="..\..\..\Primitives\point.cpp" />
+    <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
+    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Core\config.h" />
+    <ClInclude Include="..\..\..\Core\Types\Factory.h" />
+    <ClInclude Include="..\..\..\Core\Types\Object.h" />
+    <ClInclude Include="..\..\..\DreamOSMain.h" />
+    <ClInclude Include="..\..\..\HAL\HAL.h" />
+    <ClInclude Include="..\..\..\HAL\HALImp.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h" />
+    <ClInclude Include="..\..\..\HAL\Shader.h" />
+    <ClInclude Include="..\..\..\OSX\OSXApp.h" />
+    <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h" />
+    <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h" />
+    <ClInclude Include="..\..\..\Primitives\AABV.h" />
+    <ClInclude Include="..\..\..\Primitives\camera.h" />
+    <ClInclude Include="..\..\..\Primitives\color.h" />
+    <ClInclude Include="..\..\..\Primitives\DimObj.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix.h" />
+    <ClInclude Include="..\..\..\Primitives\Publisher.h" />
+    <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
+    <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\point.h" />
+    <ClInclude Include="..\..\..\Primitives\quad.h" />
+    <ClInclude Include="..\..\..\Primitives\RotationMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\texture.h" />
+    <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\Triangle.h" />
+    <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\Number.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\Types.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\UID.h" />
+    <ClInclude Include="..\..\..\Primitives\valid.h" />
+    <ClInclude Include="..\..\..\Primitives\vector.h" />
+    <ClInclude Include="..\..\..\Primitives\Vertex.h" />
+    <ClInclude Include="..\..\..\Primitives\ViewMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
+    <ClInclude Include="..\..\..\Primitives\volume.h" />
+    <ClInclude Include="..\..\..\RESULT\EHM.h" />
+    <ClInclude Include="..\..\..\RESULT\RESULT.h" />
+    <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
+    <ClInclude Include="..\..\..\Sandbox\PathManager.h" />
+    <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
+    <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
+    <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
+    <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
+    <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
+    <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
+    <ClInclude Include="..\..\..\Test\TestObject.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert" />
+    <None Include="..\..\..\Makefile" />
+    <None Include="..\..\..\OSX\OSXApp.mm" />
+    <None Include="..\..\..\OSX\OSXAppDelegate.mm" />
+    <None Include="..\..\..\OSX\OSXOpenGLView.m" />
+    <None Include="..\..\..\Rakefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\..\..\dreampaths.txt" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

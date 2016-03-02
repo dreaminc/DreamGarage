@@ -1,0 +1,155 @@
+#ifndef OGL_OBJ_H_
+#define OGL_OBJ_H_
+
+#include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/HAL/OpenGL/OGLOBJ.h
+// OpenGL Base Type - This is for coupling with the open GL implementation 
+
+#include "OpenGLImp.h"
+#include "Primitives/DimObj.h"
+
+#define NUM_VBO 2
+
+class OGLObj {
+public:
+	OGLObj(OpenGLImp *pParentImp) :
+		m_pParentImp(pParentImp)
+	{
+		/* empty stub */
+	}
+
+	~OGLObj() {
+		ReleaseOGLBuffers();
+	}
+
+	//virtual inline vertex *VertexData() = 0;
+	//virtual inline int VertexDataSize() = 0;
+
+	//virtual RESULT Render() = 0;
+	virtual DimObj *GetDimObj() = 0;
+
+	RESULT ReleaseOGLBuffers() {
+		RESULT r = R_PASS;
+
+		if (m_pParentImp != NULL) {
+			if (m_hVBO != NULL) {
+				CR(m_pParentImp->glDeleteBuffers(1, &m_hVBO));
+				m_hVBO = NULL;
+			}
+
+			if (m_hIBO != NULL) {
+				CR(m_pParentImp->glDeleteBuffers(1, &m_hIBO));
+				m_hIBO = NULL;
+			}
+
+			if (m_hVAO != NULL) {
+				CR(m_pParentImp->glDeleteVertexArrays(1, &m_hVAO));
+				m_hVAO = NULL;
+			}
+		}
+
+	Error:
+		return r;
+	}
+
+	// This should be used in the OGLInitialize function
+	inline GLushort GetOGLPrecision() {
+		#ifdef FLOAT_PRECISION
+			return GL_FLOAT;
+		#elif defined(DOUBLE_PRECISION)
+			return GL_DOUBLE;
+		#endif
+	}
+
+	// This needs to be called from the sub-class constructor
+	// or externally from the object (TODO: factory class needed)
+	RESULT OGLInitialize() {
+		RESULT r = R_PASS;
+
+		DimObj *pDimObj = GetDimObj();
+
+		// Set up the Vertex Array Object (VAO)
+		CR(m_pParentImp->glGenVertexArrays(1, &m_hVAO));
+		CR(m_pParentImp->glBindVertexArray(m_hVAO));
+
+		// Create Buffer Objects
+		//CR(m_pParentImp->glGenBuffers(NUM_VBO, &m_hVBOs[0]));
+		CR(m_pParentImp->glGenBuffers(1, &m_hVBO));
+		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
+
+		// TODO: Remove convenience vars 
+		vertex *pVertex = pDimObj->VertexData();
+		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
+		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
+	
+		// Index Element Buffer
+		CR(m_pParentImp->glGenBuffers(1, &m_hIBO));
+		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
+
+		// TODO: Remove convenience vars 
+		dimindex *pIndex = pDimObj->IndexData();
+		int pIndex_s = pDimObj->IndexDataSize();
+		CR(m_pParentImp->glBufferData(GL_ELEMENT_ARRAY_BUFFER, pIndex_s, pIndex, GL_STATIC_DRAW));
+
+		// Enable the vertex attribute arrays
+		// TODO: This needs to come out of the Implementation shader compilation, should not be static
+
+		// Bind Position
+		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
+		//CR(m_pParentImp->glEnableVertexAtrribArray(0));		// TEMP: Position
+		CR(m_pParentImp->EnableVertexPositionAttribute());		// TODO: Investigate performance impact of this
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)0, vertex::GetPointDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetVertexOffset()));
+
+		// Color
+		//CR(m_pParentImp->glEnableVertexAtrribArray(1));		// TEMP: Color
+		CR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
+
+	Error:
+		return r;
+	}
+
+	RESULT UpdateOGLBuffers() {
+		RESULT r = R_PASS;
+
+		DimObj *pDimObj = GetDimObj();
+
+		CR(m_pParentImp->glBindVertexArray(m_hVAO));
+		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
+
+		vertex *pVertex = pDimObj->VertexData();
+		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
+		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
+
+	Error:
+		return r;
+	}
+
+	// Override this method when necessary by a child object
+	// Many objects will not need to though. 
+	RESULT Render() {
+		RESULT r = R_PASS;
+
+		// TODO: Rethink this since it's in the critical path
+		DimObj *pDimObj = GetDimObj();
+
+		CR(m_pParentImp->glBindVertexArray(m_hVAO));
+		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
+		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
+
+		glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+
+	Error:
+		return r;
+	}
+
+protected:
+	GLuint m_hVAO;		// vertex array object
+	GLuint m_hVBO;		// vertex buffer object
+	GLuint m_hIBO;		// index buffer object
+	OpenGLImp *m_pParentImp;
+};
+
+#endif // ! OGL_OBJ_H_

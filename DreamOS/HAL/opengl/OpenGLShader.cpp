@@ -1,0 +1,164 @@
+#include "OpenGLShader.h"
+#include "OpenGLImp.h"
+
+#include "Sandbox/SandboxApp.h"
+#include "Sandbox/PathManager.h"
+
+OpenGLShader::OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType) :
+	m_pParentImp(pParentImp),
+	m_shaderType(shaderType),
+	m_pszShaderCode(NULL),
+	m_shaderID(NULL)
+{
+	m_shaderID = m_pParentImp->glCreateShader(m_shaderType);
+}
+
+OpenGLShader::~OpenGLShader(void) {
+	if (m_pszShaderCode != NULL) {
+		delete [] m_pszShaderCode;
+		m_pszShaderCode = NULL;
+	}
+}
+
+RESULT OpenGLShader::LoadShaderCodeFromFile(wchar_t *pszFilename) {
+	RESULT r = R_PASS;
+
+	SandboxApp *pParentApp = m_pParentImp->GetParentApp();
+	PathManager *pPathManager = pParentApp->GetPathManager();
+	wchar_t *pFilePath = NULL;
+
+	CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+
+	m_pszShaderCode = FileRead(pFilePath);
+	CNM(m_pszShaderCode, "Failed to read file %S", pFilePath);
+
+	DEBUG_LINEOUT("Loaded new shader %S", pFilePath);
+	//DEBUG_OUT(m_pszShaderCode);
+
+Error:
+	if (pFilePath != NULL) {
+		delete[] pFilePath;
+		pFilePath = NULL;
+	}
+
+	return r;
+}
+
+RESULT OpenGLShader::InitializeFromFile(wchar_t *pszFilename) {
+	RESULT r = R_PASS;
+
+	CRM(LoadShaderCodeFromFile(pszFilename), "Failed to load vertex shader code from %S", pszFilename);
+	CRM(Compile(), "Failed to compile shader");
+	CRM(AttachShader(), "Failed to attach vertex shader");
+
+Error:
+	return r;
+}
+
+// Copy over the code - assuming const
+RESULT OpenGLShader::LoadShaderCodeFromString(const char* pszSource) {
+	RESULT r = R_PASS;
+
+	int length = strlen(pszSource);
+	m_pszShaderCode = (char*)(new char(length * sizeof(char)));
+	CNM(m_pszShaderCode, "Failed to allocated %d bytes for shader code", length);
+
+	CBM((strcpy_s(m_pszShaderCode, (length * sizeof(char)), pszSource) == 0), "Failed to copy over code string");
+
+	return r;
+Error:
+	if (m_pszShaderCode != NULL) {
+		delete m_pszShaderCode;
+		m_pszShaderCode = NULL;
+	}
+	return r;
+}
+
+RESULT OpenGLShader::Compile(void) {
+	RESULT r = R_PASS;
+
+	CNM(m_pszShaderCode, "Cannot compile NULL code");
+
+	const char *pszShaderCode = m_pszShaderCode;
+
+	m_pParentImp->glShaderSource(m_shaderID, 1, &pszShaderCode, NULL);
+	m_pParentImp->glCompileShader(m_shaderID);
+
+	int param;
+	m_pParentImp->glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &param);
+	CBM((param == GL_TRUE), "Shader Compile Error: %s", GetInfoLog());
+
+	DEBUG_LINEOUT("Compiled shader type %d with Shader ID %d", m_shaderType, m_shaderID);
+
+Error:
+	return r;
+}
+
+// TODO: Is this even needed or can it be placed into the init function
+RESULT OpenGLShader::AttachShader() {
+	RESULT r = R_PASS;
+
+	CRM(m_pParentImp->AttachShader(this), "Failed to attach to parent implementation");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLShader::PrintInfoLog() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT(GetInfoLog());
+
+Error:
+	return r;
+}
+
+char* OpenGLShader::GetInfoLog() {
+	RESULT r = R_PASS;
+
+	char *pszInfoLog = NULL;
+	int pszInfoLog_n = -1;
+	int charsWritten_n = -1;
+
+	m_pParentImp->glGetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &pszInfoLog_n);
+
+	CBM((pszInfoLog_n > 0), "Shader Info Log of zero length");
+
+	pszInfoLog = new char[pszInfoLog_n];
+	m_pParentImp->glGetShaderInfoLog(m_shaderID, pszInfoLog_n, &charsWritten_n, pszInfoLog);
+
+Error:
+	return pszInfoLog;
+}
+
+// TODO: Fix arch, this call returns new memory
+char* OpenGLShader::FileRead(wchar_t *pszFileName) {
+	RESULT r = R_PASS;
+	errno_t err;
+	char *pszFileContent = NULL;
+	FILE *pFile = NULL;
+
+	CNM(pszFileName, "Filename cannot be NULL");
+	
+	err = _wfopen_s(&pFile, pszFileName, L"r");
+	CNM(pFile, "Failed to open %s", pszFileName);
+
+	int pFile_n = -1;
+	err = fseek(pFile, 0, SEEK_END);
+	pFile_n = ftell(pFile);
+	rewind(pFile);		
+
+	CBM((pFile_n > 0), "File %S is empty", pszFileName);
+
+	pszFileContent = new char[pFile_n + 1];
+	pFile_n = fread(pszFileContent, sizeof(char), pFile_n, pFile);
+	pszFileContent[pFile_n] = '\0';
+
+Error:
+	if (pFile != NULL) {
+		fclose(pFile);
+		pFile = NULL;
+	}
+
+	return pszFileContent;
+}
