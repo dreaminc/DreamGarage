@@ -14,6 +14,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(NULL)
 {
+	RESULT r = R_PASS;
+
 	// Default title
 	m_pszWindowTitle = _T("Dream OS Sandbox");
 
@@ -80,6 +82,13 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pWin64Mouse->CenterMousePosition();
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
 }
 
 Windows64App::~Windows64App() {
