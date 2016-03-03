@@ -17,4 +17,19 @@
 #define RIGHT_HANDED
 //#define LEFT_HANDED
 
+#if defined(_WIN32)
+	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_WIN32
+#elif defined(__APPLE__)
+	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_OSX
+#elif defined (__linux__)
+	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_LINUX
+#else
+	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_DREAMOS
+#endif
+
+// MSFT Visual Studio
+#ifdef _MSC_VER
+	#define _CRT_SECURE_NO_WARNINGS		// Remove the errors for using STANDARD C/++ calls (msft jerks...)
+#endif
+
 #endif // ! CONFIG_H_

@@ -17,16 +17,18 @@ int main(int argc, const char *argv[]) {
     //CRM(InitializeOSXWindow(), "Failed to launch OSX Window");
 	
 	// Create the Sandbox
-	//SandboxApp *pSandbox = SandboxFactory::MakeSandbox(SANDBOX_APP_WIN32);
-    pSandbox = SandboxFactory::MakeSandbox(SANDBOX_APP_OSX);
+    pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
     CNM(pSandbox, "Failed to create sandbox");
     CVM(pSandbox, "Sandbox is Invalid!");
 
     // This will start the application
     CRM(pSandbox->ShowSandbox(), "Failed to show sandbox window");
 	
+	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", DREAM_OS_VERSION_STR, r);
+	return (int)(r);
+
 Error:
-	//system("pause");
-    DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", DREAM_OS_VERSION_STR, r);
+	DEBUG_LINEOUT("DREAM OS %s Exiting with Error 0x%x result", DREAM_OS_VERSION_STR, r);
+	system("pause");
 	return (int)(r);
 }
