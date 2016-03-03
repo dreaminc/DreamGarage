@@ -33,17 +33,23 @@ RESULT PathManager::RegisterPath(wchar_t *pszName, wchar_t *pszValue) {
 	RESULT r = R_PASS;
 	std::pair<std::map<PATH_VALUE_TYPE, wchar_t*>::iterator, bool>retVal;
 	wchar_t *pszPath = NULL;
-	errno_t err;
+
+    long pszValueCopy_n = 0;
+    wchar_t *pszValueCopy = NULL;
+    //errno_t err;
 
 	DEBUG_LINEOUT("Registering Name:%S Value:%S", pszName, pszValue);
 	PATH_VALUE_TYPE pathValueType = GetPathValueType(pszName);
 	CBM((pathValueType != PATH_INVALID), "Not a valid path value type");
 
 	// Copy the value - save the memory
-	int pszValueCopy_n = wcslen(pszValue) + 1;
-	wchar_t *pszValueCopy = new wchar_t[pszValueCopy_n];
+	pszValueCopy_n = wcslen(pszValue) + 1;
+	pszValueCopy = new wchar_t[pszValueCopy_n];
 	memset(pszValueCopy, 0, sizeof(wchar_t) * pszValueCopy_n);
-	err = wcscpy_s(pszValueCopy, pszValueCopy_n, pszValue);
+    
+    // TODO: This breaks cross platformness
+	//err = wcscpy_s(pszValueCopy, pszValueCopy_n, pszValue);
+    CNM(wcscpy(pszValueCopy, pszValue), "Failed to copy over value");
 
 	retVal = m_pmapNVPPaths->insert(std::pair<PATH_VALUE_TYPE, wchar_t*>(pathValueType, pszValueCopy));
 	CBM((retVal.second != false), "Failed to insert NVP into Paths map");
@@ -87,12 +93,12 @@ Error:
 
 RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	RESULT r = R_PASS;
-	int n_pszPath_n = 0;
+	long n_pszPath_n = 0;
 	wchar_t *pszDreamPath = NULL;
-	int pszDreamPath_n = 0;
+	long pszDreamPath_n = 0;
 	wchar_t *pszValue = NULL;
-	int pszValue_n = 0;
-	errno_t err;
+	long pszValue_n = 0;
+	//errno_t err;
 
 	CRM(IsPathRegistered(type), "Value not registered");
 	
@@ -108,8 +114,11 @@ RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 
 	// Compose the path
 	// TODO: Maybe do some lower level parsing here since ./ will just get attached
-	err = wcsncat_s(n_pszPath, n_pszPath_n, pszDreamPath, pszDreamPath_n);		
-	err = wcsncat_s(n_pszPath, n_pszPath_n, pszValue, pszValue_n);
+    // TODO: This breaks cross-platform-ness
+	//err = wcsncat_s(n_pszPath, n_pszPath_n, pszDreamPath, pszDreamPath_n);
+	//err = wcsncat_s(n_pszPath, n_pszPath_n, pszValue, pszValue_n);
+    wcsncat(n_pszPath, pszDreamPath, pszDreamPath_n);
+    wcsncat(n_pszPath, pszValue, pszValue_n);
 
 Error:
 	return r;
@@ -118,11 +127,11 @@ Error:
 RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, wchar_t *pszFileName, wchar_t * &n_pszFilePath) {
 	RESULT r = R_PASS;
 	errno_t err;
-	int pszFileName_n = wcslen(pszFileName);
-	int n_pszFilePath_n = 0;
+	long pszFileName_n = wcslen(pszFileName);
+	long n_pszFilePath_n = 0;
 
 	wchar_t *pszValuePath = NULL;
-	int pszValuePath_n = 0;
+	long pszValuePath_n = 0;
 
 	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
 	pszValuePath_n = wcslen(pszValuePath);
@@ -133,8 +142,10 @@ RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, wchar_t *pszFileName, wcha
 
 	// Compose the path
 	// TODO: Maybe do some lower level parsing here since ./ will just get attached
-	err = wcsncat_s(n_pszFilePath, n_pszFilePath_n, pszValuePath, pszValuePath_n);
-	err = wcsncat_s(n_pszFilePath, n_pszFilePath_n, pszFileName, pszFileName_n);
+	//err = wcsncat_s(n_pszFilePath, n_pszFilePath_n, pszValuePath, pszValuePath_n);
+	//err = wcsncat_s(n_pszFilePath, n_pszFilePath_n, pszFileName, pszFileName_n);
+    wcsncat(n_pszFilePath, pszValuePath, pszValuePath_n);
+    wcsncat(n_pszFilePath, pszFileName, pszFileName_n);
 
 Error:
 	// Release memory from GetValuePath

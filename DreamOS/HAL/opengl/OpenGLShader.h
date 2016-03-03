@@ -10,11 +10,19 @@
 #include "./HAL/Shader.h"
 
 // Header File For The OpenGL32 Library
-#include <windows.h>                              // Header File For Windows
-#include <gl\gl.h>                
-#include <gl\glu.h>                               // Header File For The GLu32 Library
-#include <gl\glext.h>
-#include <gl\wglext.h>
+#if defined(_WIN32)
+    #include <windows.h>                              // Header File For Windows TODO: This should not be necessary
+
+    #include <gl\gl.h>
+    #include <gl\glu.h>                               // Header File For The GLu32 Library
+    #include <gl\glext.h>
+    #include <gl\wglext.h>
+#elif defined(__APPLE__)
+    #import <OpenGL/gl.h>
+    #import <OpenGL/glu.h>
+    #include <OpenGL/glext.h>
+    //#include <OpenGL/wglext.h>
+#endif
 
 class OpenGLImp;	// Declare OpenGLImp class
 
@@ -50,7 +58,7 @@ public:
 	RESULT AttachShader();
 
 protected:
-	char* OpenGLShader::FileRead(wchar_t *pszFileName);
+	char* FileRead(wchar_t *pszFileName);
 
 protected:
 	GLenum	m_shaderType;		// GL_VERTEX_SHADER or GL_FRAGMENT_SHADER

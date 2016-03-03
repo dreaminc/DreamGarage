@@ -24,8 +24,11 @@ typedef enum {
     
     R_FAIL = RESULT_START_FAIL,
     R_ERROR,
+    
+    // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,
 	R_MATRIX_COL_OUT_OF_RANGE,
+    R_MATRIX_MULT_DIMENSION_MISMATCH,
 
 	R_INVALID
 } _RESULT;
