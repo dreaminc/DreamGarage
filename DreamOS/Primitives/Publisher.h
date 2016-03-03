@@ -4,6 +4,8 @@
 #include <list>
 #include <map>
 
+#include <math.h>
+
 #include "RESULT/EHM.h"
 
 // DREAM OS
@@ -44,7 +46,10 @@ public:
 		char *pszNumString = new char[numLength];
 		memset(pszNumString, 0, sizeof(char) * numLength);
 		//itoa(keyEvent, pszNumString, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
-		_itoa_s(keyEvent, pszNumString, sizeof(char) * numLength, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
+		//_itoa_s(keyEvent, pszNumString, sizeof(char) * numLength, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
+        
+        // Going C99 standard
+        snprintf(pszNumString, sizeof(char) * numLength, "%d", keyEvent);
 
 		return pszNumString;
 	}
@@ -68,7 +73,9 @@ public:
 	// and to unregister themselves
 	~Publisher() {
 		//if (m_pEvents != NULL) {
-			std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
+
+			//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
+			auto it = m_events.begin();
 			
 			while (it != m_events.end()) {
 				std::list<Subscriber<PKEventClass>*> *pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
@@ -93,15 +100,19 @@ protected:
 	RESULT RegisterEvent(PKeyClass keyEvent) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
-
-		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		
+		//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		auto it = m_events.find(keyEvent);
+        std::list<Subscriber<PKEventClass>*>* pNewSubscriberList = NULL;
 
 		pszEvent = GetEventKeyString(keyEvent);
 		CBM((it == m_events.end()), "Event %s already registered", pszEvent);
 		
 		// Create a new subscriber list for the event entry
 
-		std::list<Subscriber<PKEventClass>*>*	pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
+
+		// typename std::list<Subscriber<PKEventClass>*>*	pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
+		pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
 		m_events[keyEvent] = pNewSubscriberList;
 
 		DEBUG_LINEOUT("%s Registered event %s", GetPublisherName(), pszEvent);
@@ -120,7 +131,7 @@ public:
 	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
-		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
+		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
 		std::list<Subscriber<PKEventClass>*> *pSubscriberList = NULL;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
@@ -132,7 +143,8 @@ public:
 		// Check if already registered
 		pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
-		for (std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+		//for (std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+		for (auto eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 			Subscriber<PKEventClass>* pTempSubscriber = reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator);
 			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", pszEvent);
 		}
@@ -162,19 +174,21 @@ public:
 	// releasing all subscriber events for whatever purpose
 	RESULT UnregisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
-		char *pszEvent = NULL;
 
-		CNM(pSubscriber, "Subscriber cannot be NULL");
-
-		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
-		
-		pszEvent = GetEventKeyString(keyEvent);
+		//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		auto it = m_events.find(keyEvent);
+		char *pszEvent = GetEventKeyString(keyEvent);
+        
+        typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = NULL;
+        
+        CNM(pSubscriber, "Subscriber cannot be NULL");
 		CBM((it == m_events.end()), "Event %s not registered", pszEvent);
 
-		std::list<Subscriber<PKEventClass>*> *pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
+		pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
 		if (pSubscriberList != NULL) {
-			for (std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+			//for (typename std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+			for (auto eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 				Subscriber<PKEventClass>* pListSubscriber = reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator);
 
 				if (pListSubscriber == pSubscriber) {
@@ -184,7 +198,8 @@ public:
 			}
 		}
 
-		CBRM((0), "Subscriber not found for event %s", pszEvent);
+
+		CBM((0), "Subscriber not found for event %s", pszEvent);
 
 	Error:
 		if (pszEvent != NULL) {
@@ -202,9 +217,8 @@ public:
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
 
-		CNM(pSubscriber, "Subscriber cannot be NULL");
-
-		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
+		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
+        CNM(pSubscriber, "Subscriber cannot be NULL");
 
 		while (it != m_events.end()) {
 			PKeyClass keyEvent = reinterpret_cast<PKeyClass>(it->first);
@@ -227,17 +241,19 @@ public:
 	RESULT NotifySubscribers(PKeyClass keyEvent, PKEventClass *pEvent) {
 		RESULT r = R_PASS;
 		char *pszEvent = NULL;
-
-		std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+        typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = NULL;
+		//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		auto it = m_events.find(keyEvent);
 
 		pszEvent = GetEventKeyString(keyEvent);
 		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
-
-		std::list<Subscriber<PKEventClass>*> *pSubscriberList = m_events[keyEvent];
+		
+		pSubscriberList = m_events[keyEvent];
 		CNM(pSubscriberList, "Subscriber list is NULL");
 
 		if (pSubscriberList->size() > 0) {
-			for (std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+			//for (typename std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+			for (auto eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 				WCR(reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator)->Notify(pEvent));
 			}
 		}

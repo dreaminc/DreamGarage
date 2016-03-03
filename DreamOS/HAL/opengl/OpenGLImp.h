@@ -8,18 +8,19 @@
 #include "./RESULT/EHM.h"
 #include "./HAL/HALImp.h"
 
-// #include <gl\gl.h>                                // Header File For The OpenGL32 Library
-// #include <gl\glu.h>                               // Header File For The GLu32 Library
-// #include <gl\glaux.h>                             // Header File For The GLaux Library
+#if defined(_WIN32)
+    #include <windows.h>                              // Header File For Windows TODO: This should not be necessary
 
-// TODO: Get rid of this eventually (OpenGL dependencies)
-#include <windows.h>                              // Header File For Windows
-
-// Open GL Includes
-#include <gl\gl.h>                                // Header File For The OpenGL32 Library
-#include <gl\glu.h>                               // Header File For The GLu32 Library
-#include <gl\glext.h>
-#include <gl\wglext.h>
+    #include <gl\gl.h>
+    #include <gl\glu.h>                               // Header File For The GLu32 Library
+    #include <gl\glext.h>
+    #include <gl\wglext.h>
+#elif defined(__APPLE__)
+    #import <OpenGL/gl.h>
+    #import <OpenGL/glu.h>
+    #include <OpenGL/glext.h>
+    //#include <OpenGL/wglext.h>
+#endif
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")

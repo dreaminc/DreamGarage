@@ -12,7 +12,7 @@
     NSOpenGLPixelFormat *m_pixelFormat;
 }
 
-
+/*
 + (NSOpenGLPixelFormat*)defaultPixelFormat;
 - (id)initWithFrame:(NSRect)frameRect pixelFormat:(NSOpenGLPixelFormat*)format;
 - (void)setOpenGLContext:(NSOpenGLContext*)context;
@@ -22,5 +22,6 @@
 - (void)update;
 - (void)setPixelFormat:(NSOpenGLPixelFormat*)pixelFormat;
 - (NSOpenGLPixelFormat*)pixelFormat;
+ */
 
 @end

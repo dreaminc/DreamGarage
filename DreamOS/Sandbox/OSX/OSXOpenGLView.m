@@ -14,10 +14,10 @@
     [super drawRect:dirtyRect];
     
     glEnable(GL_DEPTH_TEST);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
     
-    /*
+    glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
     float s = .15;
     glBegin(GL_QUADS); {
         glColor3f(0, 0, 1);
@@ -75,9 +75,9 @@
         glVertex3f( 1*s, -1*s, -1*s); //F B R
     }
     glEnd();
-     */
     
     glFlush();
+    
     [self setNeedsDisplay:YES];
 }
 
@@ -91,9 +91,12 @@
     NSRect rect = [self bounds];
     
     glViewport(0, 0, rect.size.width, rect.size.height);
+    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
+    
     gluPerspective(50, rect.size.width / rect.size.height, 0.1f, 30);     // TODO: This is deprecated us GLKMatrix4MakePerspective etc
+    
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     

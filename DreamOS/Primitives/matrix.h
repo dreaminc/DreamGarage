@@ -175,9 +175,9 @@ public:
     // For a [N1 x M1] * [N2 x M2] matrix multiplication M1 needs to equal N2
     inline RESULT checkMultDimensions(MatrixBase<TMatrix>& arg) {
         if(cols() != arg.rows())
-            return E_MATRIX_MULT_DIMENSION_MISMATCH;
-
-        return R_OK;
+            return R_MATRIX_MULT_DIMENSION_MISMATCH;
+		else
+			return R_PASS;
     }
 
 	inline bool IsSquare() {

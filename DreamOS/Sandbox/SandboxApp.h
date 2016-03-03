@@ -4,6 +4,8 @@
 #include "RESULT/EHM.h"
 #include "Primitives/Types/UID.h"
 
+#include "Primitives/valid.h"
+
 // DREAM OS
 // DreamOS/SandboxApp.h
 // The Sandbox App is effectively a class to contain the common functions of running DreamOS in a Sandbox mode
@@ -12,7 +14,7 @@
 
 #include "Sandbox/PathManager.h"
 
-class SandboxApp {
+class SandboxApp : public valid {
 public:
 	SandboxApp() :
 		m_pPathManager(NULL)

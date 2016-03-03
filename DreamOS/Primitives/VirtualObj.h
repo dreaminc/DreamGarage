@@ -42,6 +42,7 @@ public:
 
 	RESULT MoveTo(point p) {
 		m_ptOrigin = p;
+        return R_PASS;
 	}
 
 	RESULT MoveTo(point_precision x, point_precision y, point_precision z) {
