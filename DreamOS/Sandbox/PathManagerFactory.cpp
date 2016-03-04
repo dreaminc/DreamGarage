@@ -43,6 +43,7 @@ PathManager* PathManagerFactory::MakePathManager(PATH_MANAGER_TYPE type) {
 		} break;
 	}
 
+	PathManager::SetSingletonPathManager(pPathManager);
 	return pPathManager;
     
 Error:

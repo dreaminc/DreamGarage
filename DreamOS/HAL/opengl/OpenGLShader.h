@@ -41,7 +41,7 @@ public:
 
 	char* GetInfoLog();
 	
-	// Access functiopns
+	// Access functions
 	GLuint GetShaderID() { return m_shaderID; }
 	GLenum GetShaderType() { return m_shaderType; }
 	const char *GetShaderCode() { return m_pszShaderCode; }

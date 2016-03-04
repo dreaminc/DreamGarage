@@ -23,8 +23,9 @@ OpenGLShader::~OpenGLShader(void) {
 RESULT OpenGLShader::LoadShaderCodeFromFile(wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
-	SandboxApp *pParentApp = m_pParentImp->GetParentApp();
-	PathManager *pPathManager = pParentApp->GetPathManager();
+	//SandboxApp *pParentApp = m_pParentImp->GetParentApp();
+	//PathManager *pPathManager = pParentApp->GetPathManager();
+	PathManager *pPathManager = PathManager::instance();
 	wchar_t *pFilePath = NULL;
 
 	CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);

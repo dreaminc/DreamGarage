@@ -1,17 +1,19 @@
 #include "OpenGLImp.h"
 
 #include "Sandbox/SandboxApp.h"
-#include "Sandbox/Windows/Windows64App.h"	
+//#include "Sandbox/Windows/Windows64App.h"	
 
-OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
+//OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
+OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
 	m_versionMinor(0),
 	m_versionMajor(0),
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
 	m_pFragmentShader(NULL),
-	m_pWindows64App(pWindows64App),
-	m_hglrc(NULL),
+	//m_pWindows64App(pWindows64App),
+	//m_hglrc(NULL),
+	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
 	m_pCamera(NULL)
 {
 	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
@@ -24,7 +26,7 @@ OpenGLImp::~OpenGLImp() {
 
 RESULT OpenGLImp::InitializeOpenGLVersion() {
 	// For all versions
-	char* pszVersion = (char*)glGetString(GL_VERSION); // ver = "3.2.0"
+	char* pszVersion = (char*)glGetString(GL_VERSION); // Ver = "3.2.0"
 	DEBUG_LINEOUT("OpenGL Version %s", pszVersion);
 
 	m_versionMajor = pszVersion[0] - '0';
@@ -45,9 +47,11 @@ RESULT OpenGLImp::InitializeOpenGLVersion() {
 	return R_PASS;
 }
 
+/*
 SandboxApp* OpenGLImp::GetParentApp() {		
 	return (SandboxApp*)(m_pWindows64App); 
 }
+*/
 
 RESULT OpenGLImp::CreateGLProgram() {
 	RESULT r = R_PASS;
@@ -70,6 +74,7 @@ Error:
 RESULT OpenGLImp::InitializeGLContext() {
 	RESULT r = R_PASS;
 
+	/*
 	PIXELFORMATDESCRIPTOR pfd;
 	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
 
@@ -90,12 +95,19 @@ RESULT OpenGLImp::InitializeGLContext() {
 	CNM(hglrcTemp, "Failed to Create GL Context");
 
 	CBM((wglMakeCurrent(m_pWindows64App->GetDeviceContext(), hglrcTemp)), "Failed OGL wglMakeCurrent");
+	*/
+
+	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
+	CR(InitializeOpenGLVersion());
+	CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
 
 	// Should be called after context is created and made current
 	ACRM(InitializeExtensions(), "Failed to initialize extensions");
 	
-	InitializeOpenGLVersion();
-
+	// Lets create a better context
+	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(m_versionMajor, m_versionMinor), "Failed to initialize oglrc");
+	
+	/*
 	if (m_versionMajor < 3 || (m_versionMajor == 3 && m_versionMinor < 2)) {
 		DEBUG_LINEOUT("OpenGL 3.2+ Not Supported");
 		m_hglrc = hglrcTemp;
@@ -129,6 +141,7 @@ RESULT OpenGLImp::InitializeGLContext() {
 	CBM(wglDeleteContext(hglrcTemp), "Failed to delete temporary rendering context");
 
 	CNM(m_hglrc, "OpenGL 3.x RC was not created!");
+	*/
 
 Error:
 	return r;
@@ -353,7 +366,8 @@ RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
 
-	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
+	//CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
+	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
 	// Clear Background
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -388,8 +402,12 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(SetData(), "Failed to set some data");
 
 Error:
+	/*
 	if (!wglMakeCurrent(NULL, NULL))
 		DEBUG_LINEOUT("Failed to release rendering context");
+		*/
+
+	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
 	return r;
 }
@@ -400,14 +418,19 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	m_pxViewWidth = pxWidth;
 	m_pxViewHeight = pxHeight;
 
-	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");	
+	//CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");	
+	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
+
 	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
 
 	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
 Error:
+	/*
 	if (!wglMakeCurrent(NULL, NULL))
 		DEBUG_LINEOUT("Failed to release rendering context");
+		*/
+	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
 	return r;
 }
@@ -582,7 +605,8 @@ RESULT OpenGLImp::Render() {
 	TranslationMatrix matView(0.0f, 0.0f, theta);
 	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
 
-	m_pCamera->UpdateFromKeyboardState((SenseKeyboard*)(m_pWindows64App->m_pWin64Keyboard));
+	// TODO: fix camera thing !!
+	//m_pCamera->UpdateFromKeyboardState((SenseKeyboard*)(m_pWindows64App->m_pWin64Keyboard));
 	//m_pCamera->UpdatePosition(); Now done above
 
 	//auto matMVP = matProjection * matView * matModel;
@@ -591,7 +615,8 @@ RESULT OpenGLImp::Render() {
 
 	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
 
-	CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
+	//CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
+	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -643,11 +668,14 @@ RESULT OpenGLImp::Render() {
 	//*/
 	
 	glFlush();
-	SwapBuffers(m_pWindows64App->GetDeviceContext()); // This is done in the App
+	//SwapBuffers(m_pWindows64App->GetDeviceContext());	// This is done in the App
 
 Error:
+	/*
 	if (!wglMakeCurrent(NULL, NULL))
 		DEBUG_LINEOUT("Failed to release rendering context");
+		*/
+	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
 	return r;
 }
@@ -655,7 +683,7 @@ Error:
 RESULT OpenGLImp::ShutdownImplementaiton() {
 	RESULT r = R_PASS;
 
-	CBM((wglDeleteContext(m_hglrc)), "Failed to wglDeleteContext(hglrc)");
+	//CBM((wglDeleteContext(m_hglrc)), "Failed to wglDeleteContext(hglrc)");
 
 	/* TODO:  Add this stuff
 	wglMakeCurrent(pDC->m_hDC, m_hrc);
@@ -675,10 +703,15 @@ RESULT OpenGLImp::ShutdownImplementaiton() {
 	//--------------------------------
 	if (m_hrc)
 	{
-		wglDeleteContext(m_hrc);
-		m_hrc = NULL;
+	wglDeleteContext(m_hrc);
+	m_hrc = NULL;
 	}
 	*/
+
+	if (m_pOpenGLRenderingContext != NULL) {
+		delete m_pOpenGLRenderingContext;
+		m_pOpenGLRenderingContext = NULL;
+	}
 
 Error:
 	return r;

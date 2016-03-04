@@ -1,5 +1,6 @@
 #include "Windows64App.h"
 #include "Sandbox/PathManagerFactory.h"
+#include "HAL/opengl/OpenGLRenderingContextFactory.h"
 
 #include "./HAL/opengl/OpenGLImp.h"
 
@@ -20,10 +21,6 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszWindowTitle = _T("Dream OS Sandbox");
 
 	m_hInstance = GetModuleHandle(0);
-
-	// Initialize Path Manager
-	m_pPathManager = PathManagerFactory::MakePathManager(PATH_MANAGER_WIN32);
-	m_pPathManager->PrintPaths();
 
 	m_wndclassex.cbSize = sizeof(WNDCLASSEX);
 	m_wndclassex.style = CS_DBLCLKS;
@@ -101,6 +98,31 @@ HDC Windows64App::GetDeviceContext() {
 
 HWND Windows64App::GetWindowHandle() {
 	return m_hwndWindow;
+}
+
+RESULT Windows64App::InitializePathManager() {
+	RESULT r = R_PASS;
+
+	// Initialize Path Manager
+	m_pPathManager = PathManagerFactory::MakePathManager(PATH_MANAGER_WIN32);
+	CVM(m_pPathManager, "Failed to initialize path manager");
+
+	m_pPathManager->PrintPaths();
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeOpenGLRenderingContext() {
+	RESULT r = R_PASS;
+
+	m_pOpenGLRenderingContext = OpenGLRenderingContextFactory::MakeOpenGLRenderingContext(OPEN_GL_RC_WIN32);
+	CVM(m_pOpenGLRenderingContext, "Failed to initialize OpenGL Rendering Context");
+
+	m_pOpenGLRenderingContext->SetParentApp(this);
+
+Error:
+	return r;
 }
 
 // This also kicks off the OpenGL implementation
@@ -291,11 +313,12 @@ RESULT Windows64App::ShowSandbox() {
 	}
 
 	// Setup OpenGL and Resize Windows etc
-	CNM(m_hDC, "Can't initialize OpenGL Implemenation with NULL Device Context");
+	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
 	//m_pOpenGLImp = new OpenGLImp(m_hDC);
-	m_pOpenGLImp = new OpenGLImp(this);
-
+	
+	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
 	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
+
 	CRM(SetDimensions(m_posX, m_posY), "Failed to resize OpenGL Implemenation");
 
 	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
@@ -329,8 +352,8 @@ RESULT Windows64App::ShowSandbox() {
 		if(m_pOpenGLImp != NULL)
 			m_pOpenGLImp->Render();
 
-		// Moved into implementation?
-		//SwapBuffers(m_hDC);			// Swap buffers
+		// Swap buffers
+		SwapBuffers(m_hDC);
 
 		if (GetAsyncKeyState(VK_ESCAPE))
 			ShutdownSandbox();

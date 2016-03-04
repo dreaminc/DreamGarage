@@ -36,36 +36,36 @@
 
 // Check RESULT value
 // Ensures that RESULT is successful
-#define CR(res) do{r=res;if(r&0x80000000){goto Error;}}while(0);
-#define CRM(res, msg, ...) do{r= res;if(r&0x80000000){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: 0x%x\n",r);goto Error;}}while(0)
+#define CR(res) do{r=(res);if(r&0x80000000){goto Error;}}while(0);
+#define CRM(res, msg, ...) do{r= (res);if(r&0x80000000){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: 0x%x\n",r);goto Error;}}while(0)
 
-#define ACRM(res, msg, ...) do{if(res&0x80000000){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0); }}while(0);
-#define ACR(res) do{if(res&0x80000000){assert(0); }}while(0);
+#define ACRM(res, msg, ...) do{if((res)&0x80000000){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0); }}while(0);
+#define ACR(res) do{if((res)&0x80000000){assert(0); }}while(0);
 
 // Warning
-#define WCR(res) do{r=res;if(r&0x80000000){/*goto Error;*/}}while(0);
-#define WCRM(res, msg, ...) do{r = res;if(r&0x80000000){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Warning: 0x%x\n",r);/*goto Error;*/}}while(0)
+#define WCR(res) do{r=(res);if(r&0x80000000){/*goto Error;*/}}while(0);
+#define WCRM(res, msg, ...) do{r = (res);if(r&0x80000000){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Warning: 0x%x\n",r);/*goto Error;*/}}while(0)
 
 // Check Boolean Result
 // Ensures that condition evaluates to true
-#define CB(condition) do{if(!condition) {r = R_FAIL; goto Error;}}while(0);
-#define CBR(condition, failCode) do{if(!condition) {r = failCode; goto Error;}}while(0);
-#define CBM(condition, msg, ...) do{if(!condition) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
-#define CBRM(condition, failCode, msg, ...) do{if(!condition) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
+#define CB(condition) do{if(!(condition)) {r = R_FAIL; goto Error;}}while(0);
+#define CBR(condition, failCode) do{if(!(condition)) {r = failCode; goto Error;}}while(0);
+#define CBM(condition, msg, ...) do{if(!(condition)) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
+#define CBRM(condition, failCode, msg, ...) do{if(!(condition)) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
 
 #define ACBM(condition, msg, ...) do{if(!condition){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
 #define ACB(condition) do{if(!condition){assert(0);}}while(0);
 
 // Check NULL Result
 // Ensures that the pointer is not a NULL
-#define CN(pointer) do{if(pointer == NULL) {r = R_ERROR; goto Error;}}while(0);
-#define CNR(pointer, failCode) do{if(pointer == NULL) {r = failCode; goto Error;}}while(0);
-#define CNM(pointer, msg, ...) do{if(pointer == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_ERROR; goto Error; }}while(0);
-#define CNMW(pointer, msg, ...) do{if(pointer == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING; }}while(0);
-#define CNRM(pointer, failCode, msg, ...) do{if(pointer == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
+#define CN(pointer) do{if((pointer) == NULL) {r = R_ERROR; goto Error;}}while(0);
+#define CNR(pointer, failCode) do{if((pointer) == NULL) {r = failCode; goto Error;}}while(0);
+#define CNM(pointer, msg, ...) do{if((pointer) == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_ERROR; goto Error; }}while(0);
+#define CNMW(pointer, msg, ...) do{if((pointer) == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING; }}while(0);
+#define CNRM(pointer, failCode, msg, ...) do{if((pointer) == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
 
-#define ACNM(pointer, msg, ...) do{if(pointer == NULL){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
-#define ACN(pointer) do{if(pointer == NULL){assert(0);}}while(0);
+#define ACNM(pointer, msg, ...) do{if((pointer) == NULL){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
+#define ACN(pointer) do{if((pointer) == NULL){assert(0);}}while(0);
 
 // Check Pointer Result
 // Ensures that the pointer is not a NULL
@@ -83,12 +83,9 @@
 
 // Check Valid 
 // Ensures that the object created is valid
-#define CV(pObject) do{if(!pObject->IsValid()) {r = R_FAIL; goto Error;}}while(0);
-#define CVR(pObject, failCode) do{if(!pObject->IsValid()) {r = failCode; goto Error;}}while(0);
-#define CVM(pObject, msg, ...) do{if(!pObject->IsValid()) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
-#define CVRM(pObject, failCode, msg, ...) do{if(!pObject->IsValid()) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
-
-// Calculate the memory offset of a field in a struct
-#define STRUCT_FIELD_OFFSET(struct_type, field_name)    ((long)(long*)&(((struct_type *)0)->field_name))
+#define CV(pObject) do{if(!((pObject)->IsValid())) {r = R_FAIL; goto Error;}}while(0);
+#define CVR(pObject, failCode) do{if(!((pObject)->IsValid())) {r = failCode; goto Error;}}while(0);
+#define CVM(pObject, msg, ...) do{if(!((pObject)->IsValid())) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
+#define CVRM(pObject, failCode, msg, ...) do{if(!((pObject)->IsValid())) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
 
 #endif // ! EHM_H_

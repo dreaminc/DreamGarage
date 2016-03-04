@@ -32,6 +32,10 @@ public:	// Sandbox Interface
 	RESULT ShutdownSandbox();
 	RESULT RecoverDisplayMode();
 
+public:
+	RESULT InitializePathManager();
+	RESULT InitializeOpenGLRenderingContext();
+
 private:
 	static long __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
 	long __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);

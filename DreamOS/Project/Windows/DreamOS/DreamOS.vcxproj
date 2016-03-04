@@ -153,6 +153,7 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
@@ -163,6 +164,7 @@
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
   </ItemGroup>
@@ -181,6 +183,8 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h" />
     <ClInclude Include="..\..\..\HAL\Shader.h" />
     <ClInclude Include="..\..\..\OSX\OSXApp.h" />
@@ -222,6 +226,7 @@
     <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />

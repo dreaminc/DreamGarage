@@ -3,6 +3,7 @@
 
 #include "RESULT/EHM.h"
 #include "Primitives/Types/UID.h"
+#include "Primitives/valid.h"
 
 // DREAM OS
 // DreamOS/Sandbox/PathManager.h
@@ -26,7 +27,7 @@ typedef enum {
 	PATH_INVALID	// Also acts as a found
 } PATH_VALUE_TYPE;
 
-class PathManager {
+class PathManager : public valid {
 	friend class PathManagerFactory;
 
 	const wchar_t *m_cszPathValues[PATH_INVALID] = {
@@ -67,6 +68,28 @@ public:
 private:
 	UID m_uid;
 	std::map<PATH_VALUE_TYPE, wchar_t*> *m_pmapNVPPaths;
+
+	// Singleton Usage
+protected:
+	static PathManager *m_pInstance;
+
+	static RESULT SetSingletonPathManager(PathManager *pInstance) {
+		if (m_pInstance != NULL) {
+			delete m_pInstance;
+			m_pInstance = NULL;
+		}
+
+		m_pInstance = pInstance;
+		return R_PASS;
+	}
+
+public:
+	static PathManager *instance() {
+		if (m_pInstance)
+			return m_pInstance;
+		else
+			return NULL;
+	}
 };
 
 #endif // ! PATH_MANAGER_H_

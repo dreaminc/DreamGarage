@@ -1,12 +1,23 @@
 #include "PathManager.h"
 
+// Initialize and allocate the instance
+PathManager* PathManager::m_pInstance = NULL;
+
 PathManager::PathManager() :
 	m_pmapNVPPaths(NULL)
 {
+	RESULT r = R_PASS;
+
 	m_cszPathValues_n = sizeof(m_cszPathValues) / sizeof(m_cszPathValues[0]);
 
 	m_pmapNVPPaths = new std::map<PATH_VALUE_TYPE, wchar_t*>();
 	ACNM(m_pmapNVPPaths, "Failed to allocate paths map");
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
 }
 
 PathManager::~PathManager() {
@@ -47,8 +58,6 @@ RESULT PathManager::RegisterPath(wchar_t *pszName, wchar_t *pszValue) {
 	pszValueCopy = new wchar_t[pszValueCopy_n];
 	memset(pszValueCopy, 0, sizeof(wchar_t) * pszValueCopy_n);
     
-    // TODO: This breaks cross platformness
-	//err = wcscpy_s(pszValueCopy, pszValueCopy_n, pszValue);
     CNM(wcscpy(pszValueCopy, pszValue), "Failed to copy over value");
 
 	retVal = m_pmapNVPPaths->insert(std::pair<PATH_VALUE_TYPE, wchar_t*>(pathValueType, pszValueCopy));

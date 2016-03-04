@@ -62,9 +62,6 @@
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -97,6 +94,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp">
       <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp">
+      <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -282,6 +288,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\texture.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContext.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -25,12 +25,13 @@
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
 
-// TODO: This break architecture
 #include "OpenGLShader.h"
 #include "OGLVertexShader.h"
 #include "OGLFragmentShader.h"
 
 #include "Primitives/camera.h"
+
+#include "OpenGLRenderingContext.h"
 
 class SandboxApp; 
 class Windows64App;
@@ -41,11 +42,12 @@ private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
 	GLuint m_idOpenGLProgram;
-	HGLRC m_hglrc;		// OpenGL rendering context
+
+	//HGLRC m_hglrc;		// OpenGL rendering context
 
 	// TODO: Fix this architecture 
-	//HDC e_hDC;
-	Windows64App *m_pWindows64App;
+	//Windows64App *m_pWindows64App;
+	OpenGLRenderingContext *m_pOpenGLRenderingContext;
 
 	int m_versionMajor;
 	int m_versionMinor;
@@ -61,12 +63,12 @@ public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
 
-public:
-	SandboxApp *GetParentApp();	// TODO: This should go into the HALImp
+//public:
+//	SandboxApp *GetParentApp();	// TODO: This should go into the HALImp
 
 public:
 	//OpenGLImp(HDC hDC);
-	OpenGLImp(Windows64App *pWindows64App);
+	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
 
 public:
@@ -84,15 +86,13 @@ private:
 	RESULT PrepareScene();
 
 	// TODO: Temporary, replace with object store arch
-	GLuint m_vboID[2];	// Temporary 
-	GLuint m_vaoID;		// Temporary
 	RESULT SetData();
 
 private:
 	// TODO: Move this into OGLProgram class (implement)
 	OGLVertexShader *m_pVertexShader;
 	OGLFragmentShader *m_pFragmentShader;
-	// other shaders
+	// TODO: Other shaders
 
 	camera *m_pCamera;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);

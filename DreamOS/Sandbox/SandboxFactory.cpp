@@ -13,6 +13,7 @@
 #endif
 
 SandboxApp* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type) {
+	RESULT r = R_PASS;
 	SandboxApp *pSandbox = NULL;
 	
 	switch (type) {
@@ -40,5 +41,15 @@ SandboxApp* SandboxFactory::MakeSandbox(SANDBOX_APP_TYPE type) {
 		} break;
 	}
 
+	// Set up the Sandbox
+	CRM(pSandbox->InitializePathManager(), "Failed to initialize Sandbox path manager");
+	CRM(pSandbox->InitializeOpenGLRenderingContext(), "Failed to initialize Sandbox OpenGL rendering context");
+
 	return pSandbox;
+Error:
+	if (pSandbox != NULL) {
+		delete pSandbox;
+		pSandbox = NULL;
+	}
+	return NULL;
 }
