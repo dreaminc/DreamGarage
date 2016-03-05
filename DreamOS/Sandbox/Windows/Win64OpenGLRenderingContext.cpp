@@ -72,21 +72,21 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext() {
 	Windows64App *pWin64App = reinterpret_cast<Windows64App*>(GetParentApp());
 	HGLRC hglrcTemp = NULL;
 
-	PIXELFORMATDESCRIPTOR pfd;
-	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
+	
+	memset(&m_pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
 
-	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-	pfd.nVersion = 1;
-	pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
-	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 32;
-	pfd.cDepthBits = 32;
-	pfd.iLayerType = PFD_MAIN_PLANE;
+	m_pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
+	m_pfd.nVersion = 1;
+	m_pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
+	m_pfd.iPixelType = PFD_TYPE_RGBA;
+	m_pfd.cColorBits = 32;
+	m_pfd.cDepthBits = 32;
+	m_pfd.iLayerType = PFD_MAIN_PLANE;
 
-	int nPixelFormat = ChoosePixelFormat(pWin64App->GetDeviceContext(), &pfd);
+	int nPixelFormat = ChoosePixelFormat(pWin64App->GetDeviceContext(), &m_pfd);
 
 	CBM((nPixelFormat != NULL), "nPixelFormat is NULL");
-	CBM((SetPixelFormat(pWin64App->GetDeviceContext(), nPixelFormat, &pfd)), "Failed to SetPixelFormat");
+	CBM((SetPixelFormat(pWin64App->GetDeviceContext(), nPixelFormat, &m_pfd)), "Failed to SetPixelFormat %d", nPixelFormat);
 
 	hglrcTemp = wglCreateContext(pWin64App->GetDeviceContext());
 	CNM(hglrcTemp, "Failed to Create GL Context");

@@ -104,6 +104,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -296,6 +299,9 @@
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLExtensions.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>

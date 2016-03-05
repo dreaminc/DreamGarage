@@ -1,6 +1,6 @@
 #include "OpenGLImp.h"
-
 #include "Sandbox/SandboxApp.h"
+
 //#include "Sandbox/Windows/Windows64App.h"	
 
 //OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
@@ -21,7 +21,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 }
 
 OpenGLImp::~OpenGLImp() {
-	glDeleteProgram(m_idOpenGLProgram);
+	m_OpenGLExtensions.glDeleteProgram(m_idOpenGLProgram);
 }
 
 RESULT OpenGLImp::InitializeOpenGLVersion() {
@@ -47,22 +47,16 @@ RESULT OpenGLImp::InitializeOpenGLVersion() {
 	return R_PASS;
 }
 
-/*
-SandboxApp* OpenGLImp::GetParentApp() {		
-	return (SandboxApp*)(m_pWindows64App); 
-}
-*/
-
 RESULT OpenGLImp::CreateGLProgram() {
 	RESULT r = R_PASS;
 
 	CBM((m_idOpenGLProgram == NULL), "Cannot CreateGLProgram if program id not null");
-	CNM(m_glCreateProgram, "glCreateProgram extension is NULL");
+	//CNM(m_glCreateProgram, "glCreateProgram extension is NULL");
 
-	m_idOpenGLProgram = glCreateProgram();
+	m_idOpenGLProgram = m_OpenGLExtensions.glCreateProgram();
 	CBM((m_idOpenGLProgram != 0), "Failed to create program id");
 
-	GLboolean fIsProg = glIsProgram(m_idOpenGLProgram);
+	GLboolean fIsProg = m_OpenGLExtensions.glIsProgram(m_idOpenGLProgram);
 	CBM(fIsProg, "Failed to create program");
 
 	DEBUG_LINEOUT("Created GL program ID %d", m_idOpenGLProgram);
@@ -74,75 +68,17 @@ Error:
 RESULT OpenGLImp::InitializeGLContext() {
 	RESULT r = R_PASS;
 
-	/*
-	PIXELFORMATDESCRIPTOR pfd;
-	memset(&pfd, 0, sizeof(PIXELFORMATDESCRIPTOR));
-
-	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
-	pfd.nVersion = 1;
-	pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
-	pfd.iPixelType = PFD_TYPE_RGBA;
-	pfd.cColorBits = 32;
-	pfd.cDepthBits = 32;
-	pfd.iLayerType = PFD_MAIN_PLANE;
-
-	int nPixelFormat = ChoosePixelFormat(m_pWindows64App->GetDeviceContext(), &pfd);
-
-	CBM((nPixelFormat != NULL), "nPixelFormat is NULL");
-	CBM((SetPixelFormat(m_pWindows64App->GetDeviceContext(), nPixelFormat, &pfd)), "Failed to SetPixelFormat");
-
-	HGLRC hglrcTemp = wglCreateContext(m_pWindows64App->GetDeviceContext());
-	CNM(hglrcTemp, "Failed to Create GL Context");
-
-	CBM((wglMakeCurrent(m_pWindows64App->GetDeviceContext(), hglrcTemp)), "Failed OGL wglMakeCurrent");
-	*/
-
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
 	CR(InitializeOpenGLVersion());
 	CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
 
 	// Should be called after context is created and made current
-	ACRM(InitializeExtensions(), "Failed to initialize extensions");
+	//ACRM(InitializeExtensions(), "Failed to initialize extensions");
+	ACRM(m_OpenGLExtensions.InitializeExtensions(), "Failed to initialize extensions");
 	
-	// Lets create a better context
+	// Lets create the 3.2+ context
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(m_versionMajor, m_versionMinor), "Failed to initialize oglrc");
 	
-	/*
-	if (m_versionMajor < 3 || (m_versionMajor == 3 && m_versionMinor < 2)) {
-		DEBUG_LINEOUT("OpenGL 3.2+ Not Supported");
-		m_hglrc = hglrcTemp;
-		goto Error;
-	}
-
-	int attribs[] = {
-		WGL_CONTEXT_MAJOR_VERSION_ARB, m_versionMajor,
-		WGL_CONTEXT_MINOR_VERSION_ARB, m_versionMinor,
-		//WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-		//WGL_CONTEXT_MINOR_VERSION_ARB, 2,		
-		//WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-		//WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,		// This makes non VAO work
-		0
-	};
-
-	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = NULL;
-	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
-	CNM(wglCreateContextAttribsARB, "wglCreateContextAttribsARB cannot be NULL");
-
-	m_hglrc = wglCreateContextAttribsARB(m_pWindows64App->GetDeviceContext(), 0, attribs);
-	DWORD werr = GetLastError();
-	DEBUG_LINEOUT("Created OpenGL Rendering Context 0x%x", werr);
-	
-	// Should be called after context is created and made current
-	ACRM(InitializeExtensions(), "Failed to initialize extensions");
-
-	CBM(wglMakeCurrent(NULL, NULL), "Failed to release rendering context");
-	CBM(wglDeleteContext(hglrcTemp), "Failed to delete temporary rendering context");
-
-	CNM(m_hglrc, "OpenGL 3.x RC was not created!");
-	*/
-
 Error:
 	return r;
 }
@@ -189,12 +125,12 @@ RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 
 	CBM((pOGLShader == NULL), "Current shader 0x%x already assigned, detach existing shader", pOpenGLShader->GetShaderType());
 
-	CNM(m_glAttachShader, "glAttachShader extension is NULL");
+	//CNM(m_glAttachShader, "glAttachShader extension is NULL");
 
 	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
 	//numShaders = param;
 
-	m_glAttachShader(m_idOpenGLProgram, pOpenGLShader->GetShaderID());
+	m_OpenGLExtensions.glAttachShader(m_idOpenGLProgram, pOpenGLShader->GetShaderID());
 
 	CRM(CheckGLError(), "AttachShader failed with GL log:%s", pOpenGLShader->GetInfoLog());
 
@@ -240,8 +176,8 @@ Error:
 RESULT OpenGLImp::UseProgram() {
 	RESULT r = R_PASS;
 
-	CNM(m_glUseProgram, "glUseProgram extension is NULL");
-	m_glUseProgram(m_idOpenGLProgram);
+	//CNM(m_glUseProgram, "glUseProgram extension is NULL");
+	m_OpenGLExtensions.glUseProgram(m_idOpenGLProgram);
 
 	CRM(CheckGLError(), "UseProgram failed");
 
@@ -258,12 +194,12 @@ char* OpenGLImp::GetInfoLog() {
 	int pszInfoLog_n = 4096;
 	int charsWritten_n = -1;
 
-	m_glGetProgramiv(m_idOpenGLProgram, GL_INFO_LOG_LENGTH, &pszInfoLog_n);
+	m_OpenGLExtensions.glGetProgramiv(m_idOpenGLProgram, GL_INFO_LOG_LENGTH, &pszInfoLog_n);
 	CBM((pszInfoLog_n > 0), "Program Info Log of zero length");
 
 	pszInfoLog = new char[pszInfoLog_n];
 	memset(pszInfoLog, 0, sizeof(char) * pszInfoLog_n);
-	m_glGetProgramInfoLog(m_idOpenGLProgram, pszInfoLog_n, &charsWritten_n, pszInfoLog);
+	m_OpenGLExtensions.glGetProgramInfoLog(m_idOpenGLProgram, pszInfoLog_n, &charsWritten_n, pszInfoLog);
 
 Error:
 	return pszInfoLog;
@@ -272,15 +208,15 @@ Error:
 RESULT OpenGLImp::LinkProgram() {
 	RESULT r = R_PASS;
 
-	CNM(m_glLinkProgram, "glLinkProgram extension is NULL");
-	CNM(m_glGetProgramiv, "glGetProgramiv extension is NULL");
+	//CNM(m_glLinkProgram, "glLinkProgram extension is NULL");
+	//CNM(m_glGetProgramiv, "glGetProgramiv extension is NULL");
 
-	m_glLinkProgram(m_idOpenGLProgram);
+	m_OpenGLExtensions.glLinkProgram(m_idOpenGLProgram);
 	CRM(CheckGLError(), "glLinkProgram failed");
 	
 	GLint param = GL_FALSE;
 
-	m_glGetProgramiv(m_idOpenGLProgram, GL_LINK_STATUS, &param);
+	m_OpenGLExtensions.glGetProgramiv(m_idOpenGLProgram, GL_LINK_STATUS, &param);
 	CBM((param == GL_TRUE), "Failed to link GL Program: %s", GetInfoLog());
 	
 	DEBUG_LINEOUT("Successfully linked program ID %d", m_idOpenGLProgram);
@@ -719,10 +655,12 @@ Error:
 
 // Open GL / Wrappers
 
+// OpenGL Program
+
 RESULT OpenGLImp::glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params) {
 	RESULT r = R_PASS;
 
-	m_glGetProgramInterfaceiv(program, programInterface, pname, params);  
+	m_OpenGLExtensions.glGetProgramInterfaceiv(program, programInterface, pname, params);  
 	CRM(CheckGLError(), "glGetProgramInterfaceiv failed");
 
 Error:
@@ -732,7 +670,7 @@ Error:
 RESULT OpenGLImp::glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params) {
 	RESULT r = R_PASS;
 
-	m_glGetProgramResourceiv(program, programInterface, index, propCount, props, bufSize, length, params);
+	m_OpenGLExtensions.glGetProgramResourceiv(program, programInterface, index, propCount, props, bufSize, length, params);
 	CRM(CheckGLError(), "glGetProgramResourceiv failed");
 
 Error:
@@ -742,7 +680,7 @@ Error:
 RESULT OpenGLImp::glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name) {
 	RESULT r = R_PASS;
 
-	m_glGetProgramResourceName(program, programInterface, index, bufSize, length, name);
+	m_OpenGLExtensions.glGetProgramResourceName(program, programInterface, index, bufSize, length, name);
 	CRM(CheckGLError(), "glGetProgramResourceName failed");
 
 Error:
@@ -752,7 +690,7 @@ Error:
 RESULT OpenGLImp::glGenVertexArrays(GLsizei n, GLuint *arrays) {
 	RESULT r = R_PASS;
 
-	m_glGenVertexArrays(n, arrays);  //create VAO container and get ID for it
+	m_OpenGLExtensions.glGenVertexArrays(n, arrays);  //create VAO container and get ID for it
 	CRM(CheckGLError(), "glGenVertexArrays failed");
 
 Error:
@@ -763,7 +701,7 @@ Error:
 RESULT OpenGLImp::glBindVertexArray(GLuint gluiArray) {
 	RESULT r = R_PASS;
 
-	m_glBindVertexArray(gluiArray);
+	m_OpenGLExtensions.glBindVertexArray(gluiArray);
 	CRM(CheckGLError(), "glBindVertexArray failed");
 
 Error:
@@ -773,7 +711,7 @@ Error:
 RESULT OpenGLImp::glGenBuffers(GLsizei n, GLuint *buffers) {
 	RESULT r = R_PASS;
 
-	m_glGenBuffers(n, buffers);
+	m_OpenGLExtensions.glGenBuffers(n, buffers);
 	CRM(CheckGLError(), "glGenBuffers failed");
 
 Error:
@@ -783,7 +721,7 @@ Error:
 RESULT OpenGLImp::glBindBuffer(GLenum target, GLuint gluiBuffer) {
 	RESULT r = R_PASS;
 
-	m_glBindBuffer(target, gluiBuffer);
+	m_OpenGLExtensions.glBindBuffer(target, gluiBuffer);
 	CRM(CheckGLError(), "glBindBuffer failed");
 
 Error:
@@ -793,7 +731,7 @@ Error:
 RESULT OpenGLImp::glDeleteBuffers(GLsizei n, const GLuint *buffers) {
 	RESULT r = R_PASS;
 
-	m_glDeleteBuffers(n, buffers);
+	m_OpenGLExtensions.glDeleteBuffers(n, buffers);
 	CRM(CheckGLError(), "glDeleteBuffers failed");
 
 Error:
@@ -803,7 +741,7 @@ Error:
 RESULT OpenGLImp::glDeleteVertexArrays(GLsizei n, const GLuint *arrays) {
 	RESULT r = R_PASS;
 
-	m_glDeleteVertexArrays(n, arrays);
+	m_OpenGLExtensions.glDeleteVertexArrays(n, arrays);
 	CRM(CheckGLError(), "glDeleteVertexArrays failed");
 
 Error:
@@ -813,9 +751,9 @@ Error:
 RESULT OpenGLImp::glBindAttribLocation(GLuint program, GLuint index, const GLchar *name) {
 	RESULT r = R_PASS;
 
-	CNM(m_glBindAttribLocation, "glBindAttribLocation extension is NULL");
+	//CNM(m_glBindAttribLocation, "glBindAttribLocation extension is NULL");
 
-	m_glBindAttribLocation(program, index, name);
+	m_OpenGLExtensions.glBindAttribLocation(program, index, name);
 	CRM(CheckGLError(), "glBindAttribLocation failed");
 
 Error:
@@ -825,9 +763,9 @@ Error:
 RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
 	RESULT r = R_PASS;
 
-	CNM(m_glGetUniformLocation, "glGetUniformLocation extension is NULL");
+	//CNM(m_glGetUniformLocation, "glGetUniformLocation extension is NULL");
 
-	*pLocation = m_glGetUniformLocation(program, name);
+	*pLocation = m_OpenGLExtensions.glGetUniformLocation(program, name);
 	CRM(CheckGLError(), "glGetUniformLocation failed");
 
 	return r;
@@ -839,10 +777,66 @@ Error:
 RESULT OpenGLImp::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
 	RESULT r = R_PASS;
 
-	CNM(m_glUniformMatrix4fv, "glUniformMatrix4fv extension is NULL");
+	//CNM(m_glUniformMatrix4fv, "glUniformMatrix4fv extension is NULL");
 
-	m_glUniformMatrix4fv(location, count, transpose, value);
+	m_OpenGLExtensions.glUniformMatrix4fv(location, count, transpose, value);
 	CRM(CheckGLError(), "glUniformMatrix4fv failed");
+
+Error:
+	return r;
+}
+
+// OpenGL Shaders
+RESULT OpenGLImp::CreateShader(GLenum type, GLuint *shaderID) {
+	RESULT r = R_PASS;
+
+	*shaderID = m_OpenGLExtensions.glCreateShader(type);
+	CRM(CheckGLError(), "glCreateShader failed");
+
+	return r;
+Error:
+	*shaderID = NULL;
+	return r;
+}
+
+RESULT OpenGLImp::GetShaderiv(GLuint programID, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetShaderiv(programID, pname, params);
+	CRM(CheckGLError(), "glGetShaderiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetShaderInfoLog(shader, bufSize, length, infoLog);
+	CRM(CheckGLError(), "glGetShaderInfoLog failed");
+
+Error:
+	return r;
+}
+
+//CR(m_pParentImp->ShaderSource(m_shaderID, 1, &pszShaderCode, NULL));
+//CR(m_pParentImp->CompileShader(m_shaderID));
+
+RESULT OpenGLImp::ShaderSource(GLuint shaderID, GLsizei count, const GLchar *const*string, const GLint *length) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glShaderSource(shaderID, count, string, length);
+	CRM(CheckGLError(), "glShaderSource failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::CompileShader(GLuint shaderID) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glCompileShader(shaderID);
+	CRM(CheckGLError(), "glCompileShader failed");
 
 Error:
 	return r;
@@ -851,7 +845,7 @@ Error:
 RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
 	RESULT r = R_PASS;
 
-	m_glBufferData(target, size, data, usage);
+	m_OpenGLExtensions.glBufferData(target, size, data, usage);
 	CRM(CheckGLError(), "glBufferData failed");
 
 Error:
@@ -861,7 +855,7 @@ Error:
 RESULT OpenGLImp::glEnableVertexAtrribArray(GLuint index) {
 	RESULT r = R_PASS;
 
-	m_glEnableVertexAttribArray(index);
+	m_OpenGLExtensions.glEnableVertexAttribArray(index);
 	CRM(CheckGLError(), "glEnableVertexAttribArray failed");
 
 Error:
@@ -871,167 +865,12 @@ Error:
 RESULT OpenGLImp::glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
 	RESULT r = R_PASS;
 
-	m_glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+	m_OpenGLExtensions.glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 	CRM(CheckGLError(), "glVertexAttribPointer failed");
 
 Error:
 	return r;
 }
-
-// Initialize all of the extensions
-// TODO: Stuff this into an object?
-RESULT OpenGLImp::InitializeExtensions() {
-	RESULT r = R_PASS;
-
-	CNMW((m_glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram")), 
-		"Failed to initialzie glCreateProgram extension");
-
-	CNMW((m_glDeleteProgram = (PFNGLDELETEPROGRAMPROC)wglGetProcAddress("glDeleteProgram")), 
-		"Failed to initialize glDeleteProgram extension");
-
-	CNMW((m_glIsProgram = (PFNGLISPROGRAMPROC)wglGetProcAddress("glIsProgram")),
-		"Failed to initialize glIsProgram extension");
-
-	CNMW((m_glGetProgramInterfaceiv = (PFNGLGETPROGRAMINTERFACEIVPROC)wglGetProcAddress("glGetProgramInterfaceiv")),
-		"Failed to initialize glGetProgramInterfaceiv extension");
-
-	CNMW((m_glGetProgramResourceiv = (PFNGLGETPROGRAMRESOURCEIVPROC)wglGetProcAddress("glGetProgramResourceiv")),
-		"Failred to initialize glGetProgramResourceiv extension");
-
-	CNMW((m_glGetProgramResourceName = (PFNGLGETPROGRAMRESOURCENAMEPROC)wglGetProcAddress("glGetProgramResourceName")),
-		"Failred to initialize glGetProgramResourceName extension");
-
-	CNMW((m_glUseProgram = (PFNGLUSEPROGRAMPROC)wglGetProcAddress("glUseProgram")), 
-		"Failed to initialzie glUseProgram extension");
-
-	CNMW((m_glAttachShader = (PFNGLATTACHSHADERPROC)wglGetProcAddress("glAttachShader")), 
-		"Failed to initialize glAttachShader extension");
-
-	CNMW((m_glDetachShader = (PFNGLDETACHSHADERPROC)wglGetProcAddress("glDetachShader")), 
-		"Failed to initialize glDetachShader extension");
-
-	CNMW((m_glLinkProgram = (PFNGLLINKPROGRAMPROC)wglGetProcAddress("glLinkProgram")), 
-		"Failed to initialize glLinkProgram extension");
-
-	CNMW((m_glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)wglGetProcAddress("glGetProgramInfoLog")),
-		"Failed to initialize glGetProgramiv extension");
-
-	CNMW((m_glGetProgramiv = (PFNGLGETPROGRAMIVPROC)wglGetProcAddress("glGetProgramiv")), 
-		"Failed to initialize glGetProgramiv extension");
-
-	CNMW((m_glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog")), 
-		"Failed to initialize glGetShaderInfoLog extension");
-
-	CNMW((m_glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation")), 
-		"Failed to initialize glGetUniformLocation extension");
-
-	CNMW((m_glUniform1i = (PFNGLUNIFORM1IPROC)wglGetProcAddress("glUniform1i")), 
-		"Failed to initialize glUniform1i extension");
-
-	CNMW((m_glUniform1iv = (PFNGLUNIFORM1IVPROC)wglGetProcAddress("glUniform1iv")), 
-		"Failed to initialize glUniform1iv extension");
-
-	CNMW((m_glUniform2iv = (PFNGLUNIFORM2IVPROC)wglGetProcAddress("glUniform2iv")), 
-		"Failed to initialize glUniform2iv extension");
-
-	CNMW((m_glUniform3iv = (PFNGLUNIFORM3IVPROC)wglGetProcAddress("glUniform3iv")), 
-		"Failed to initialize glUniform3iv extension");
-
-	CNMW((m_glUniform4iv = (PFNGLUNIFORM4IVPROC)wglGetProcAddress("glUniform4iv")), 
-		"Failed to initialize glUniform4iv extension");
-
-	CNMW((m_glUniform1f = (PFNGLUNIFORM1FPROC)wglGetProcAddress("glUniform1f")), 
-		"Failed to initialize glUniform1f extension");
-
-	CNMW((m_glUniform1fv = (PFNGLUNIFORM1FVPROC)wglGetProcAddress("glUniform1fv")), 
-		"Failed to initialize glUniform1fv extension");
-
-	CNMW((m_glUniform2fv = (PFNGLUNIFORM2FVPROC)wglGetProcAddress("glUniform2fv")), 
-		"Failed to initialize glUniform2fv extension");
-
-	CNMW((m_glUniform3fv = (PFNGLUNIFORM3FVPROC)wglGetProcAddress("glUniform3fv")), 
-		"Failed to initialize glUniform3fv extension");
-
-	CNMW((m_glUniform4fv = (PFNGLUNIFORM4FVPROC)wglGetProcAddress("glUniform4fv")), 
-		"Failed to initialize glUniform4fv extension");
-
-	CNMW((m_glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv")), 
-		"Failed to initialize glUniformMatrix4fv extension");
-
-	CNMW((m_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation")), 
-		"Failed to initialize glGetAttribLocation extension");
-
-	CNMW((m_glVertexAttrib1f = (PFNGLVERTEXATTRIB1FPROC)wglGetProcAddress("glVertexAttrib1f")), 
-		"Failed to initialize glVertexAttrib1f extension");
-
-	CNMW((m_glVertexAttrib1fv = (PFNGLVERTEXATTRIB1FVPROC)wglGetProcAddress("glVertexAttrib1fv")), 
-		"Failed to initialize glVertexAttrib1fv extension");
-
-	CNMW((m_glVertexAttrib2fv = (PFNGLVERTEXATTRIB2FVPROC)wglGetProcAddress("glVertexAttrib2fv")), 
-		"Failed to initialize glVertexAttrib2fv extension");
-
-	CNMW((m_glVertexAttrib3fv = (PFNGLVERTEXATTRIB3FVPROC)wglGetProcAddress("glVertexAttrib3fv")), 
-		"Failed to initialize glVertexAttrib3fv extension");
-
-	CNMW((m_glVertexAttrib4fv = (PFNGLVERTEXATTRIB4FVPROC)wglGetProcAddress("glVertexAttrib4fv")), 
-		"Failed to initialize glVertexAttrib4fv extension");
-
-	CNMW((m_glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)wglGetProcAddress("glEnableVertexAttribArray")), 
-		"Failed to initialize glEnableVertexAttribArray extension");
-
-	CNMW((m_glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation")), 
-		"Failed to initialize glBindAttribLocation extension");
-	
-	// Not supported yet?
-	m_glDisableVertexAttribArray = NULL;
-	m_glGetActiveUniform = NULL;
-
-	// Shader
-	CNMW((m_glCreateShader = (PFNGLCREATESHADERPROC)wglGetProcAddress("glCreateShader")), 
-		"Failed to initialize glCreateShader extension");
-
-	CNMW((m_glDeleteShader = (PFNGLDELETESHADERPROC)wglGetProcAddress("glDeleteShader")), 
-		"Failed to initialize glDeleteShader extension");
-
-	CNMW((m_glShaderSource = (PFNGLSHADERSOURCEPROC)wglGetProcAddress("glShaderSource")), 
-		"Failed to initialize glShaderSource extension");
-
-	CNMW((m_glCompileShader = (PFNGLCOMPILESHADERPROC)wglGetProcAddress("glCompileShader")),
-		"Failed to initialize glCompileShader extension");
-
-	CNMW((m_glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv")), 
-		"Failed to initialize glGetShaderiv extension");
-
-	// VBO
-	CNMW((m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers")), 
-		"Failed to initialzie glGenBuffers extension");
-
-	CNMW((m_glBindBuffer = (PFNGLBINDBUFFERPROC)wglGetProcAddress("glBindBuffer")), 
-		"Failed to initialize glBindBuffer extension");
-
-	CNMW((m_glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData")), 
-		"Failed to initialize glBuifferData extension");
-	
-	CNMW((m_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer")), 
-		"Failed to initialize glVertexAttribPointer extension");
-
-	CNMW((m_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers")),
-		"Failed to initialize glDeleteBuffers extension");
-
-	// VAO
-	CNMW((m_glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays")),
-		"Failed to initialize glGenVertexArrays extension");
-
-	CNMW((m_glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)wglGetProcAddress("glBindVertexArray")),
-		"Failed to initialize glBindVertexArray extension");
-
-	CNMW((m_glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays")),
-		"Failed to initialize glDeleteVertexArrays extension");
-
-Error:
-	return r;
-}
-
 
 const char *OpenGLImp::GetOGLTypeString(GLushort GLType) {
 	switch (GLType) {

@@ -32,6 +32,7 @@ public:
 	RESULT ReleaseCurrentContext();
 
 private:
+	PIXELFORMATDESCRIPTOR m_pfd;
 	HGLRC m_hglrc;								// OpenGL rendering context
 };
 

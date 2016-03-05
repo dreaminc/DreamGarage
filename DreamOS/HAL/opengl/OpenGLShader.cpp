@@ -10,7 +10,16 @@ OpenGLShader::OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType) :
 	m_pszShaderCode(NULL),
 	m_shaderID(NULL)
 {
-	m_shaderID = m_pParentImp->glCreateShader(m_shaderType);
+	RESULT r = R_PASS;
+	//m_shaderID = m_pParentImp->glCreateShader(m_shaderType);
+	CR(m_pParentImp->CreateShader(m_shaderType, &m_shaderID));
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
 }
 
 OpenGLShader::~OpenGLShader(void) {
@@ -18,6 +27,17 @@ OpenGLShader::~OpenGLShader(void) {
 		delete [] m_pszShaderCode;
 		m_pszShaderCode = NULL;
 	}
+}
+
+GLuint OpenGLShader::GetShaderID() {
+	return m_shaderID; 
+}
+
+GLenum OpenGLShader::GetShaderType() {
+	return m_shaderType; 
+}
+const char *OpenGLShader::GetShaderCode() { 
+	return m_pszShaderCode; 
 }
 
 RESULT OpenGLShader::LoadShaderCodeFromFile(wchar_t *pszFilename) {
@@ -82,11 +102,14 @@ RESULT OpenGLShader::Compile(void) {
 
 	const char *pszShaderCode = m_pszShaderCode;
 
-	m_pParentImp->glShaderSource(m_shaderID, 1, &pszShaderCode, NULL);
-	m_pParentImp->glCompileShader(m_shaderID);
+	//m_pParentImp->glShaderSource(m_shaderID, 1, &pszShaderCode, NULL);
+	//m_pParentImp->glCompileShader(m_shaderID);
+
+	CR(m_pParentImp->ShaderSource(m_shaderID, 1, &pszShaderCode, NULL));
+	CR(m_pParentImp->CompileShader(m_shaderID));
 
 	int param;
-	m_pParentImp->glGetShaderiv(m_shaderID, GL_COMPILE_STATUS, &param);
+	CR(m_pParentImp->GetShaderiv(m_shaderID, GL_COMPILE_STATUS, &param));
 	CBM((param == GL_TRUE), "Shader Compile Error: %s", GetInfoLog());
 
 	DEBUG_LINEOUT("Compiled shader type %d with Shader ID %d", m_shaderType, m_shaderID);
@@ -121,12 +144,12 @@ char* OpenGLShader::GetInfoLog() {
 	int pszInfoLog_n = -1;
 	int charsWritten_n = -1;
 
-	m_pParentImp->glGetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &pszInfoLog_n);
+	CR(m_pParentImp->GetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &pszInfoLog_n));
 
 	CBM((pszInfoLog_n > 0), "Shader Info Log of zero length");
 
 	pszInfoLog = new char[pszInfoLog_n];
-	m_pParentImp->glGetShaderInfoLog(m_shaderID, pszInfoLog_n, &charsWritten_n, pszInfoLog);
+	CR(m_pParentImp->GetShaderInfoLog(m_shaderID, pszInfoLog_n, &charsWritten_n, pszInfoLog));
 
 Error:
 	return pszInfoLog;

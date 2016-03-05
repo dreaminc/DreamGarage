@@ -3,6 +3,7 @@
 
 #include "RESULT/EHM.h"
 #include "Primitives/Types/UID.h"
+#include "Primitives/valid.h"
 
 // DREAM OS
 // DreamOS/HAL/Shader.h
@@ -19,7 +20,7 @@ typedef enum ShaderType {
 	SHADER_INVALID
 } SHADER_TYPE;
 
-class Shader {
+class Shader : public valid {
 public:
 	//virtual RESULT Enable() = 0;
 	//virtual RESULT Disable() = 0;

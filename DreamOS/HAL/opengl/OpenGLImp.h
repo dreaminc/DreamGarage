@@ -9,21 +9,22 @@
 #include "./HAL/HALImp.h"
 
 #if defined(_WIN32)
-    #include <windows.h>                              // Header File For Windows TODO: This should not be necessary
+	#include <windows.h>
 
-    #include <gl\gl.h>
-    #include <gl\glu.h>                               // Header File For The GLu32 Library
-    #include <gl\glext.h>
-    #include <gl\wglext.h>
+	#include <gl\gl.h>
+	#include <gl\glu.h>                               // Header File For The GLu32 Library
+	#include <gl\glext.h>
 #elif defined(__APPLE__)
-    #import <OpenGL/gl.h>
-    #import <OpenGL/glu.h>
-    #include <OpenGL/glext.h>
-    //#include <OpenGL/wglext.h>
+	#import <OpenGL/gl.h>
+	#import <OpenGL/glu.h>
+	#include <OpenGL/glext.h>
+	//#include <OpenGL/wglext.h>
 #endif
 
 #pragma comment(lib, "opengl32.lib")
 #pragma comment(lib, "glu32.lib")
+
+#include "OpenGLRenderingContext.h"
 
 #include "OpenGLShader.h"
 #include "OGLVertexShader.h"
@@ -31,7 +32,7 @@
 
 #include "Primitives/camera.h"
 
-#include "OpenGLRenderingContext.h"
+#include "OpenGLExtensions.h"
 
 class SandboxApp; 
 class Windows64App;
@@ -43,10 +44,7 @@ private:
 	// the shaders since we might want to jump around OGL programs in the future
 	GLuint m_idOpenGLProgram;
 
-	//HGLRC m_hglrc;		// OpenGL rendering context
-
 	// TODO: Fix this architecture 
-	//Windows64App *m_pWindows64App;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
 
 	int m_versionMajor;
@@ -63,11 +61,7 @@ public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
 
-//public:
-//	SandboxApp *GetParentApp();	// TODO: This should go into the HALImp
-
 public:
-	//OpenGLImp(HDC hDC);
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
 
@@ -79,7 +73,7 @@ public:
 	RESULT PrintActiveUniformVariables();
 
 private:
-	RESULT InitializeExtensions();
+	//RESULT InitializeExtensions();
 	RESULT InitializeGLContext();
 	RESULT InitializeOpenGLVersion();
 
@@ -108,26 +102,10 @@ public:
 
 // TODO: Unify access to extensions
 public:
-	inline GLuint glCreateProgram(void) { return m_glCreateProgram(); }
-	inline void glDeleteProgram(GLuint programID) { return m_glDeleteProgram(programID); }
-	inline GLuint glCreateShader(GLenum type) { return m_glCreateShader(type); }
-	inline void glShaderSource(GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length) {
-		return m_glShaderSource(shader, count, string, length);
-	}
 
-	inline void glCompileShader(GLuint shader) { return m_glCompileShader(shader); }
-	inline void glGetShaderiv(GLuint shader, GLenum pname, GLint *params) {
-		return m_glGetShaderiv(shader, pname, params);
-	}
-
-	inline void glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
-		return m_glGetShaderInfoLog(shader, bufSize, length, infoLog);
-	}
-
-	inline GLboolean glIsProgram(GLuint programID) {
-		return m_glIsProgram(programID);
-	}
 	
+	// TODO: Unify extension call / wrappers 
+
 	RESULT glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params);
 	RESULT glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params);
 	RESULT glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name);
@@ -152,6 +130,13 @@ public:
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 
+	// Shaders
+	RESULT CreateShader(GLenum type, GLuint *shaderID);
+	RESULT ShaderSource(GLuint shaderID, GLsizei count, const GLchar *const*string, const GLint *length);
+	RESULT CompileShader(GLuint shaderID);
+	RESULT GetShaderiv(GLuint programID, GLenum pname, GLint *params);
+	RESULT GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+
 // Extension Mappings
 private:
 	RESULT CheckGLError();
@@ -166,6 +151,8 @@ public:
 // OpengGL Extension Function Pointers
 // TODO: Push this to another object to manage the extensions
 private:
+	OpenGLExtensions m_OpenGLExtensions;
+	/*
 	// OGL Program 
 	PFNGLCREATEPROGRAMPROC m_glCreateProgram;
 	PFNGLDELETEPROGRAMPROC m_glDeleteProgram;
@@ -222,6 +209,7 @@ private:
 	PFNGLGENVERTEXARRAYSPROC m_glGenVertexArrays;
 	PFNGLBINDVERTEXARRAYPROC m_glBindVertexArray;
 	PFNGLDELETEVERTEXARRAYSPROC m_glDeleteVertexArrays;
+	*/
 };
 
 #endif // ! OPEN_GL_IMP_H

@@ -9,19 +9,18 @@
 #include "./RESULT/EHM.h"
 #include "./HAL/Shader.h"
 
-// Header File For The OpenGL32 Library
 #if defined(_WIN32)
-    #include <windows.h>                              // Header File For Windows TODO: This should not be necessary
+	#include <windows.h>
 
-    #include <gl\gl.h>
-    #include <gl\glu.h>                               // Header File For The GLu32 Library
-    #include <gl\glext.h>
-    #include <gl\wglext.h>
+	#include <gl\GL.h>
+	#include <gl\GLU.h>                               // Header File For The GLu32 Library
+	#include <gl\glext.h>
+	#include <gl\wglext.h>
 #elif defined(__APPLE__)
-    #import <OpenGL/gl.h>
-    #import <OpenGL/glu.h>
-    #include <OpenGL/glext.h>
-    //#include <OpenGL/wglext.h>
+	#import <OpenGL/gl.h>
+	#import <OpenGL/glu.h>
+	#include <OpenGL/glext.h>
+	//#include <OpenGL/wglext.h>
 #endif
 
 class OpenGLImp;	// Declare OpenGLImp class
@@ -42,9 +41,9 @@ public:
 	char* GetInfoLog();
 	
 	// Access functions
-	GLuint GetShaderID() { return m_shaderID; }
-	GLenum GetShaderType() { return m_shaderType; }
-	const char *GetShaderCode() { return m_pszShaderCode; }
+	GLuint GetShaderID();
+	GLenum GetShaderType();
+	const char *GetShaderCode();
 
 	/*
 	RESULT CreateAndLinkProgram();

@@ -152,6 +152,7 @@
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
@@ -182,6 +183,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLExtensions.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.h" />
