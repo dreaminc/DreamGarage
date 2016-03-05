@@ -28,8 +28,13 @@ public:
 		RESULT r = R_PASS;
 
 		// TODO: Solve this
-		PathManager *pPathManager = pParentApp->GetPathManager();
+		PathManager *pPathManager = PathManager::instance();
 		wchar_t *pFilePath = NULL;
+
+		// TODO: Move to key based file paths
+		CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+
+		// Load file
 
 	Error:
 		return r;
