@@ -8,19 +8,7 @@
 // DreamOS/HAL/opengl/OpenGLExtensions.h
 // This encapsulates all of the OpenGL Extensions
 
-#if defined(_WIN32)
-	#include <windows.h>
-
-	#include <gl\gl.h>
-	#include <gl\glu.h>                               // Header File For The GLu32 Library
-	#include <gl\glext.h>
-	#include <gl/wglext.h>
-#elif defined(__APPLE__)
-	#import <OpenGL/gl.h>
-	#import <OpenGL/glu.h>
-	#include <OpenGL/glext.h>
-	//#include <OpenGL/wglext.h>
-#endif
+#include "OpenGLCommon.h"
 
 class OpenGLExtensions {
 public:

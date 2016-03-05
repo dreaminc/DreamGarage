@@ -1,9 +1,6 @@
 #include "OpenGLImp.h"
 #include "Sandbox/SandboxApp.h"
 
-//#include "Sandbox/Windows/Windows64App.h"	
-
-//OpenGLImp::OpenGLImp(Windows64App *pWindows64App) :
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
 	m_versionMinor(0),
@@ -11,8 +8,6 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
 	m_pFragmentShader(NULL),
-	//m_pWindows64App(pWindows64App),
-	//m_hglrc(NULL),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
 	m_pCamera(NULL)
 {
@@ -51,7 +46,6 @@ RESULT OpenGLImp::CreateGLProgram() {
 	RESULT r = R_PASS;
 
 	CBM((m_idOpenGLProgram == NULL), "Cannot CreateGLProgram if program id not null");
-	//CNM(m_glCreateProgram, "glCreateProgram extension is NULL");
 
 	m_idOpenGLProgram = m_OpenGLExtensions.glCreateProgram();
 	CBM((m_idOpenGLProgram != 0), "Failed to create program id");
@@ -73,7 +67,6 @@ RESULT OpenGLImp::InitializeGLContext() {
 	CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
 
 	// Should be called after context is created and made current
-	//ACRM(InitializeExtensions(), "Failed to initialize extensions");
 	ACRM(m_OpenGLExtensions.InitializeExtensions(), "Failed to initialize extensions");
 	
 	// Lets create the 3.2+ context
@@ -125,8 +118,6 @@ RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 
 	CBM((pOGLShader == NULL), "Current shader 0x%x already assigned, detach existing shader", pOpenGLShader->GetShaderType());
 
-	//CNM(m_glAttachShader, "glAttachShader extension is NULL");
-
 	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
 	//numShaders = param;
 
@@ -176,7 +167,6 @@ Error:
 RESULT OpenGLImp::UseProgram() {
 	RESULT r = R_PASS;
 
-	//CNM(m_glUseProgram, "glUseProgram extension is NULL");
 	m_OpenGLExtensions.glUseProgram(m_idOpenGLProgram);
 
 	CRM(CheckGLError(), "UseProgram failed");
@@ -185,12 +175,10 @@ Error:
 	return r;
 }
 
-// TODO: Inconsistent since it doesn't check to see that m_glGetPRogramInfoLog is not NULL
 char* OpenGLImp::GetInfoLog() {
 	RESULT r = R_PASS;
 
 	char *pszInfoLog = NULL;
-	//int pszInfoLog_n = -1;
 	int pszInfoLog_n = 4096;
 	int charsWritten_n = -1;
 
@@ -207,9 +195,6 @@ Error:
 
 RESULT OpenGLImp::LinkProgram() {
 	RESULT r = R_PASS;
-
-	//CNM(m_glLinkProgram, "glLinkProgram extension is NULL");
-	//CNM(m_glGetProgramiv, "glGetProgramiv extension is NULL");
 
 	m_OpenGLExtensions.glLinkProgram(m_idOpenGLProgram);
 	CRM(CheckGLError(), "glLinkProgram failed");
@@ -244,7 +229,7 @@ RESULT OpenGLImp::PrintVertexAttributes() {
 		char *pszName = new char[pszName_n];
 		CR(glGetProgramResourceName(m_idOpenGLProgram, GL_PROGRAM_INPUT, i, pszName_n, NULL, pszName));
 
-		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, GetOGLTypeString(results[1]));
+		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
 
 		if (pszName != NULL) {
 			delete[] pszName;
@@ -276,7 +261,7 @@ RESULT OpenGLImp::PrintActiveUniformVariables() {
 		char *pszName = new char[pszName_n];
 		CR(glGetProgramResourceName(m_idOpenGLProgram, GL_UNIFORM, i, pszName_n, NULL, pszName));
 
-		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, GetOGLTypeString(results[1]));
+		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
 
 		if (pszName != NULL) {
 			delete[] pszName;
@@ -302,7 +287,6 @@ RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
 
-	//CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
 	// Clear Background
@@ -338,11 +322,6 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(SetData(), "Failed to set some data");
 
 Error:
-	/*
-	if (!wglMakeCurrent(NULL, NULL))
-		DEBUG_LINEOUT("Failed to release rendering context");
-		*/
-
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
 	return r;
@@ -354,7 +333,6 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	m_pxViewWidth = pxWidth;
 	m_pxViewHeight = pxHeight;
 
-	//CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");	
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
 	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
@@ -362,10 +340,6 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
 Error:
-	/*
-	if (!wglMakeCurrent(NULL, NULL))
-		DEBUG_LINEOUT("Failed to release rendering context");
-		*/
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
 	return r;
@@ -442,19 +416,16 @@ Error:
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
-	//SenseKeyboardEvent *kbEvent = reinterpret_cast<SenseKeyboardEvent*>(SubscriberEvent);
-	//DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
+	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
 
-/*
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('A'):
 		case SK_LEFT: {
-			/ *
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
 			else
 				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
-			* /
+	
 			if (kbEvent->KeyState)
 				m_pCamera->Strafe(0.1f);
 
@@ -462,41 +433,37 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 
 		case (SK_SCAN_CODE)('D') :
 		case SK_RIGHT: {
-			/ *
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
 			else
 				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
-			* /
+			
 			if (kbEvent->KeyState)
 				m_pCamera->Strafe(-0.1f);
 		} break;
 
 		case (SK_SCAN_CODE)('W') :
 		case SK_UP: {
-			/ *
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
 			else
 				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
-			* /
+			
 			if (kbEvent->KeyState)
 				m_pCamera->MoveForward(0.1f);
 		} break;
 
 		case (SK_SCAN_CODE)('S') :
 		case SK_DOWN: {
-			/ *
 			if (kbEvent->KeyState)
 				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
 			else
 				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
-			* /
+			
 			if (kbEvent->KeyState)
 				m_pCamera->MoveForward(-0.1f);
 		} break;
 	}
-*/
 
 Error:
 	return r;
@@ -543,7 +510,7 @@ RESULT OpenGLImp::Render() {
 
 	// TODO: fix camera thing !!
 	//m_pCamera->UpdateFromKeyboardState((SenseKeyboard*)(m_pWindows64App->m_pWin64Keyboard));
-	//m_pCamera->UpdatePosition(); Now done above
+	m_pCamera->UpdatePosition(); 
 
 	//auto matMVP = matProjection * matView * matModel;
 	auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
@@ -551,9 +518,7 @@ RESULT OpenGLImp::Render() {
 
 	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
 
-	//CBM(wglMakeCurrent(m_pWindows64App->GetDeviceContext(), m_hglrc), "Failed to make current rendering context");
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// First test the identity 
@@ -607,10 +572,6 @@ RESULT OpenGLImp::Render() {
 	//SwapBuffers(m_pWindows64App->GetDeviceContext());	// This is done in the App
 
 Error:
-	/*
-	if (!wglMakeCurrent(NULL, NULL))
-		DEBUG_LINEOUT("Failed to release rendering context");
-		*/
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
 	return r;
@@ -751,8 +712,6 @@ Error:
 RESULT OpenGLImp::glBindAttribLocation(GLuint program, GLuint index, const GLchar *name) {
 	RESULT r = R_PASS;
 
-	//CNM(m_glBindAttribLocation, "glBindAttribLocation extension is NULL");
-
 	m_OpenGLExtensions.glBindAttribLocation(program, index, name);
 	CRM(CheckGLError(), "glBindAttribLocation failed");
 
@@ -762,8 +721,6 @@ Error:
 
 RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
 	RESULT r = R_PASS;
-
-	//CNM(m_glGetUniformLocation, "glGetUniformLocation extension is NULL");
 
 	*pLocation = m_OpenGLExtensions.glGetUniformLocation(program, name);
 	CRM(CheckGLError(), "glGetUniformLocation failed");
@@ -776,8 +733,6 @@ Error:
 
 RESULT OpenGLImp::glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
 	RESULT r = R_PASS;
-
-	//CNM(m_glUniformMatrix4fv, "glUniformMatrix4fv extension is NULL");
 
 	m_OpenGLExtensions.glUniformMatrix4fv(location, count, transpose, value);
 	CRM(CheckGLError(), "glUniformMatrix4fv failed");
@@ -818,9 +773,6 @@ RESULT OpenGLImp::GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *leng
 Error:
 	return r;
 }
-
-//CR(m_pParentImp->ShaderSource(m_shaderID, 1, &pszShaderCode, NULL));
-//CR(m_pParentImp->CompileShader(m_shaderID));
 
 RESULT OpenGLImp::ShaderSource(GLuint shaderID, GLsizei count, const GLchar *const*string, const GLint *length) {
 	RESULT r = R_PASS;
@@ -870,94 +822,4 @@ RESULT OpenGLImp::glVertexAttribPointer(GLuint index, GLint size, GLenum type, G
 
 Error:
 	return r;
-}
-
-const char *OpenGLImp::GetOGLTypeString(GLushort GLType) {
-	switch (GLType) {
-		case GL_BYTE:										return "GL Byte"; break;
-		case GL_UNSIGNED_BYTE:								return "GL Unsigned Byte"; break;
-		case GL_SHORT:										return "GL Short"; break;
-		case GL_UNSIGNED_SHORT:								return "GL Unsigned Short"; break;
-		case GL_INT:										return "GL Int"; break;
-		case GL_UNSIGNED_INT:								return "GL Unsigned Int"; break;
-		case GL_FLOAT:										return "GL Float"; break;
-		case GL_2_BYTES:									return "GL 2 Bytes"; break;
-		case GL_3_BYTES:									return "GL 3 Bytes"; break;
-		case GL_4_BYTES:									return "GL 4 Bytes"; break;
-		case GL_DOUBLE:										return "GL Double"; break;
-		case GL_FLOAT_VEC3:									return "GL Float Vec3"; break;
-		case GL_FLOAT_VEC4:									return "GL Float Vec4"; break;
-		case GL_FLOAT_VEC2:									return "GL Float Vec2"; break;
-		case GL_DOUBLE_VEC2:								return "GL Double Vec2"; break;
-		case GL_DOUBLE_VEC3:								return "GL Double Vec3"; break;
-		case GL_DOUBLE_VEC4:								return "GL Double Vec4"; break;
-		case GL_INT_VEC2:									return "GL Int Vec2"; break;
-		case GL_INT_VEC3:									return "GL Int Vec3"; break;
-		case GL_INT_VEC4:									return "GL Int Vec4"; break;
-		case GL_UNSIGNED_INT_VEC2:							return "GL Unsigned Int Vec2"; break;
-		case GL_UNSIGNED_INT_VEC3:							return "GL Unsigned Int Vec3"; break;
-		case GL_UNSIGNED_INT_VEC4:							return "GL Unsigned Int Vec4"; break;
-		case GL_BOOL:										return "GL Boolean"; break;
-		case GL_BOOL_VEC2:									return "GL Boolean Vec2"; break;
-		case GL_BOOL_VEC3:									return "GL Boolean Vec3"; break;
-		case GL_BOOL_VEC4:									return "GL Boolean Vec4"; break;
-		case GL_FLOAT_MAT2:									return "GL Float Matrix 2"; break;
-		case GL_FLOAT_MAT3:									return "GL Float Matrix 3"; break;
-		case GL_FLOAT_MAT4:									return "GL Float Matrix 4"; break;
-		case GL_FLOAT_MAT2x3:								return "GL Float Matrix 2x3"; break;
-		case GL_FLOAT_MAT2x4:								return "GL Float Matrix 2x4"; break;
-		case GL_FLOAT_MAT3x2:								return "GL Float Matrix 3x2"; break;
-		case GL_FLOAT_MAT3x4:								return "GL Float Matrix 3x4"; break;
-		case GL_FLOAT_MAT4x2:								return "GL Float Matrix 4x2"; break;
-		case GL_FLOAT_MAT4x3:								return "GL Float Matrix 4x3"; break;
-		case GL_DOUBLE_MAT2:								return "GL Double Matrix 2"; break;
-		case GL_DOUBLE_MAT3:								return "GL Double Matrix 3"; break;
-		case GL_DOUBLE_MAT4:								return "GL Double Matrix 4"; break;
-		case GL_DOUBLE_MAT2x3:								return "GL Double Matrix 2x3"; break;
-		case GL_DOUBLE_MAT2x4:								return "GL Double Matrix 2x4"; break;
-		case GL_DOUBLE_MAT3x2:								return "GL Double Matrix 3x2"; break;
-		case GL_DOUBLE_MAT3x4:								return "GL Double Matrix 3x4"; break;
-		case GL_DOUBLE_MAT4x2:								return "GL Double Matrix 4x2"; break;
-		case GL_DOUBLE_MAT4x3:								return "GL Double Matrix 4x3"; break;
-		case GL_SAMPLER_1D:									return "GL Sampler 1D"; break;
-		case GL_SAMPLER_2D:									return "GL Sampler 2D"; break;
-		case GL_SAMPLER_3D:									return "GL Sampler 3D"; break;
-		case GL_SAMPLER_CUBE:								return "GL Sampler Cube"; break;
-		case GL_SAMPLER_1D_SHADOW:							return "GL Sampler 1D Shadow"; break;
-		case GL_SAMPLER_2D_SHADOW:							return "GL Sampler 2D Shadow"; break;
-		case GL_SAMPLER_1D_ARRAY:							return "GL Sampler 1D Array"; break;
-		case GL_SAMPLER_2D_ARRAY:							return "GL Sampler 2D Array"; break;
-		case GL_SAMPLER_1D_ARRAY_SHADOW:					return "GL Sampler 1D Array Shadow"; break;
-		case GL_SAMPLER_2D_ARRAY_SHADOW:					return "GL Sampler 2D Array Shadow"; break;
-		case GL_SAMPLER_2D_MULTISAMPLE:						return "GL Sampler 2D Multisample"; break;
-		case GL_SAMPLER_2D_MULTISAMPLE_ARRAY:				return "GL Sampler 2D Multisample Array"; break;
-		case GL_SAMPLER_CUBE_SHADOW:						return "GL Sampler Cube Shadow"; break;
-		case GL_SAMPLER_BUFFER:								return "GL Sampler Buffer"; break;
-		case GL_SAMPLER_2D_RECT:							return "GL Sampler 2D Rect"; break;
-		case GL_SAMPLER_2D_RECT_SHADOW:						return "GL Sampler 2D Rect Shadow"; break;
-		case GL_INT_SAMPLER_1D:								return "GL Int Sampler 1D"; break;
-		case GL_INT_SAMPLER_2D:								return "GL Int Sampler 2D"; break;
-		case GL_INT_SAMPLER_3D:								return "GL Int Sampler 3D"; break;
-		case GL_INT_SAMPLER_CUBE:							return "GL Int Sampler Cube"; break;
-		case GL_INT_SAMPLER_1D_ARRAY:						return "GL Int Sampler 1D Array"; break;
-		case GL_INT_SAMPLER_2D_ARRAY:						return "GL Int Sampler 2D Array"; break;
-		case GL_INT_SAMPLER_2D_MULTISAMPLE:					return "GL Int Sampler 2D Multisample"; break;
-		case GL_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:			return "GL Int Sampler 2D Multisample Array"; break;
-		case GL_INT_SAMPLER_BUFFER:							return "GL Int Sampler Buffer"; break;
-		case GL_INT_SAMPLER_2D_RECT:						return "GL Int Sampler 2D Rect"; break;
-		case GL_UNSIGNED_INT_SAMPLER_1D:					return "GL Unsigned Int Sampler 1D"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D:					return "GL Unsigned Int Sampler 2D"; break;
-		case GL_UNSIGNED_INT_SAMPLER_3D:					return "GL Unsigned Int Sampler 3D"; break;
-		case GL_UNSIGNED_INT_SAMPLER_CUBE:					return "GL Unsigned Int Sampler Cube"; break;
-		case GL_UNSIGNED_INT_SAMPLER_1D_ARRAY:				return "GL Unsigned Int Sampler 1D Array"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D_ARRAY:				return "GL Unsigned Int Sampler 2D Array"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE:		return "GL Unsigned Int Sampler 2D Multisample"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D_MULTISAMPLE_ARRAY:	return "GL Unsigned Int Sampler 2D Multisample Array"; break;
-		case GL_UNSIGNED_INT_SAMPLER_BUFFER:				return "GL Unsigned Int Sampler Buffer"; break;
-		case GL_UNSIGNED_INT_SAMPLER_2D_RECT:				return "GL Unsigned Int Sampler 2D Rect"; break;
-
-		default: return "Unhandled GL Type"; break;
-	}
-
-	return NULL;
 }

@@ -1,28 +1,15 @@
 #ifndef OPEN_GL_IMP_H_
 #define OPEN_GL_IMP_H_
 
+#include "RESULT/EHM.h"
+#include "OpenGLCommon.h"
+#include "OpenGLUtility.h"
+
 // Dream OS
 // DreamOS/HAL/opengl/OpenGLImp.h
 // This is the top level header for OpenGL for either native or
 
-#include "./RESULT/EHM.h"
-#include "./HAL/HALImp.h"
-
-#if defined(_WIN32)
-	#include <windows.h>
-
-	#include <gl\gl.h>
-	#include <gl\glu.h>                               // Header File For The GLu32 Library
-	#include <gl\glext.h>
-#elif defined(__APPLE__)
-	#import <OpenGL/gl.h>
-	#import <OpenGL/glu.h>
-	#include <OpenGL/glext.h>
-	//#include <OpenGL/wglext.h>
-#endif
-
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "glu32.lib")
+#include "HAL/HALImp.h"
 
 #include "OpenGLRenderingContext.h"
 
@@ -96,10 +83,6 @@ public:
 	inline RESULT EnableVertexPositionAttribute();
 	inline RESULT EnableVertexColorAttribute();
 
-	// Utility TODO: Move to a different object
-public:
-	static const char *GetOGLTypeString(GLushort GLType);
-
 // TODO: Unify access to extensions
 public:
 
@@ -149,67 +132,8 @@ public:
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 
 // OpengGL Extension Function Pointers
-// TODO: Push this to another object to manage the extensions
 private:
 	OpenGLExtensions m_OpenGLExtensions;
-	/*
-	// OGL Program 
-	PFNGLCREATEPROGRAMPROC m_glCreateProgram;
-	PFNGLDELETEPROGRAMPROC m_glDeleteProgram;
-	PFNGLISPROGRAMPROC m_glIsProgram;
-	PFNGLGETPROGRAMINTERFACEIVPROC m_glGetProgramInterfaceiv;
-	PFNGLGETPROGRAMRESOURCEIVPROC m_glGetProgramResourceiv;
-	PFNGLGETPROGRAMRESOURCENAMEPROC m_glGetProgramResourceName;
-
-	PFNGLUSEPROGRAMPROC m_glUseProgram;
-	PFNGLATTACHSHADERPROC m_glAttachShader;
-	PFNGLDETACHSHADERPROC m_glDetachShader;
-	PFNGLLINKPROGRAMPROC m_glLinkProgram;
-	PFNGLGETPROGRAMIVPROC m_glGetProgramiv;
-	PFNGLGETPROGRAMINFOLOGPROC m_glGetProgramInfoLog;
-	PFNGLGETSHADERINFOLOGPROC m_glGetShaderInfoLog;
-	PFNGLGETUNIFORMLOCATIONPROC m_glGetUniformLocation;
-	PFNGLUNIFORM1IPROC m_glUniform1i;
-	PFNGLUNIFORM1IVPROC m_glUniform1iv;
-	PFNGLUNIFORM2IVPROC m_glUniform2iv;
-	PFNGLUNIFORM3IVPROC m_glUniform3iv;
-	PFNGLUNIFORM4IVPROC m_glUniform4iv;
-	PFNGLUNIFORM1FPROC m_glUniform1f;
-	PFNGLUNIFORM1FVPROC m_glUniform1fv;
-	PFNGLUNIFORM2FVPROC m_glUniform2fv;
-	PFNGLUNIFORM3FVPROC m_glUniform3fv;
-	PFNGLUNIFORM4FVPROC m_glUniform4fv;
-	PFNGLUNIFORMMATRIX4FVPROC m_glUniformMatrix4fv;
-	PFNGLGETATTRIBLOCATIONPROC m_glGetAttribLocation;
-	PFNGLVERTEXATTRIB1FPROC m_glVertexAttrib1f;
-	PFNGLVERTEXATTRIB1FVPROC m_glVertexAttrib1fv;
-	PFNGLVERTEXATTRIB2FVPROC m_glVertexAttrib2fv;
-	PFNGLVERTEXATTRIB3FVPROC m_glVertexAttrib3fv;
-	PFNGLVERTEXATTRIB4FVPROC m_glVertexAttrib4fv;
-	PFNGLENABLEVERTEXATTRIBARRAYPROC m_glEnableVertexAttribArray;
-	PFNGLDISABLEVERTEXATTRIBARRAYPROC m_glDisableVertexAttribArray;
-	PFNGLBINDATTRIBLOCATIONPROC m_glBindAttribLocation;
-	PFNGLGETACTIVEUNIFORMPROC m_glGetActiveUniform;
-
-	// Shader
-	PFNGLCREATESHADERPROC m_glCreateShader;
-	PFNGLDELETESHADERPROC m_glDeleteShader;
-	PFNGLSHADERSOURCEPROC m_glShaderSource;
-	PFNGLCOMPILESHADERPROC m_glCompileShader;
-	PFNGLGETSHADERIVPROC m_glGetShaderiv;
-
-	// VBO
-	PFNGLGENBUFFERSPROC m_glGenBuffers;
-	PFNGLBINDBUFFERPROC	m_glBindBuffer;
-	PFNGLBUFFERDATAPROC	m_glBufferData;
-	PFNGLVERTEXATTRIBPOINTERPROC m_glVertexAttribPointer;
-	PFNGLDELETEBUFFERSPROC m_glDeleteBuffers;
-
-	// VAO
-	PFNGLGENVERTEXARRAYSPROC m_glGenVertexArrays;
-	PFNGLBINDVERTEXARRAYPROC m_glBindVertexArray;
-	PFNGLDELETEVERTEXARRAYSPROC m_glDeleteVertexArrays;
-	*/
 };
 
 #endif // ! OPEN_GL_IMP_H

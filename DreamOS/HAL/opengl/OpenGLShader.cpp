@@ -11,7 +11,7 @@ OpenGLShader::OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType) :
 	m_shaderID(NULL)
 {
 	RESULT r = R_PASS;
-	//m_shaderID = m_pParentImp->glCreateShader(m_shaderType);
+
 	CR(m_pParentImp->CreateShader(m_shaderType, &m_shaderID));
 
 	Validate();
@@ -43,8 +43,6 @@ const char *OpenGLShader::GetShaderCode() {
 RESULT OpenGLShader::LoadShaderCodeFromFile(wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
-	//SandboxApp *pParentApp = m_pParentImp->GetParentApp();
-	//PathManager *pPathManager = pParentApp->GetPathManager();
 	PathManager *pPathManager = PathManager::instance();
 	wchar_t *pFilePath = NULL;
 
@@ -101,9 +99,6 @@ RESULT OpenGLShader::Compile(void) {
 	CNM(m_pszShaderCode, "Cannot compile NULL code");
 
 	const char *pszShaderCode = m_pszShaderCode;
-
-	//m_pParentImp->glShaderSource(m_shaderID, 1, &pszShaderCode, NULL);
-	//m_pParentImp->glCompileShader(m_shaderID);
 
 	CR(m_pParentImp->ShaderSource(m_shaderID, 1, &pszShaderCode, NULL));
 	CR(m_pParentImp->CompileShader(m_shaderID));
