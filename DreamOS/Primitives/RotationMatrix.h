@@ -10,6 +10,7 @@
 
 #include "matrix.h"
 #include "vector.h"
+#include "quaternion.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float rotation_precision;
@@ -31,6 +32,7 @@ public:
 		Z_AXIS,
 		XYZ_AXIS,
 		ARBITRARY_AXIS,
+		QUATERNION,
 		INVALID
 	} ROTATION_MATRIX_TYPE;
 
@@ -55,6 +57,35 @@ public:
 			case Z_AXIS: SetZRotationMatrix(theta); break;
 		}
 	}
+
+	RotationMatrix(quaternion q) :
+		m_type(QUATERNION)
+	{
+		SetQuaternionRotationMatrix(q);
+	}
+
+	// http://www.cprogramming.com/tutorial/3d/quaternions.html
+	RESULT SetQuaternionRotationMatrix(quaternion q) {
+		m_type = QUATERNION;
+		q.Normalize();	
+
+		this->identity();
+
+		this->element(0, 0) = 1.0f - 2*q.y2() - 2*q.z2();
+		this->element(0, 1) = 2*q.x()*q.y() - 2*q.w()*q.z();
+		this->element(0, 2) = 2*q.x()*q.z() + 2*q.w()*q.y();
+
+		this->element(1, 0) = 2*q.x()*q.y() + 2*q.w()*q.z();
+		this->element(1, 1) = 1.0f - 2*q.x2() - 2*q.z2();
+		this->element(1, 2) = 2*q.y()*q.z() + 2*q.w()*q.x();
+
+		this->element(2, 0) = 2*q.x()*q.z() - 2*q.w()*q.y();
+		this->element(2, 1) = 2*q.y()*q.z() - 2*q.w()*q.x();
+		this->element(2, 2) = 1.0f - 2*q.x2() - 2*q.y2();
+
+		return R_PASS;
+	}
+
 	// https://en.wikipedia.org/wiki/Rotation_matrix
 	RESULT SetArbitraryVectorRotationMatrix(vector u, rotation_precision theta) {
 		m_type = ARBITRARY_AXIS;

@@ -64,8 +64,11 @@ public:
 		m_pVertices[2] = vertex(point(halfSide, -halfHeight, 0.0f));	// C
 
 		Validate();
+		return;
+
 	Error:
 		Invalidate();
+		return;
 	}
 
 	triangle(double height, double width) :
@@ -82,8 +85,11 @@ public:
 		m_pVertices[2] = vertex(point(halfWidth, -halfHeight, 0.0f));	// C
 
 		Validate();
+		return;
+
 	Error:
 		Invalidate();
+		return;
 	}
 
 	// TODO: Scalene arbitrary triangle 
