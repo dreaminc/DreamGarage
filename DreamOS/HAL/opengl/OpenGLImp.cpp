@@ -434,6 +434,7 @@ Error:
 RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	OGLObj *pOGLObj = NULL;
+	DimObj *pDimObj = NULL;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 
 	// TODO: Remove
@@ -487,7 +488,8 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	// Process SceneGraph
 	pSceneGraph->Reset();
-	while((pOGLObj = reinterpret_cast<OGLObj*>(pObjectStore->GetNextObject())) != NULL) {
+	while((pDimObj = pObjectStore->GetNextObject()) != NULL) {
+		pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
 		pOGLObj->Render();
 	}
 

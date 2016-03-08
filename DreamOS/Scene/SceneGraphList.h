@@ -8,7 +8,6 @@
 // A simple SceneGraphStore utilizing a linked list implementation
 
 #include <list>
-
 #include "SceneGraphStore.h"
 
 class SceneGraphList : public SceneGraphStore {
