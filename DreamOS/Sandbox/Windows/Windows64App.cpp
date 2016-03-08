@@ -150,10 +150,12 @@ long __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARA
 	// Get pointer to window
 	if (msg == WM_CREATE) {
 		pApp = (Windows64App*)((LPCREATESTRUCT)lp)->lpCreateParams;
-		SetWindowLongPtr(hWindow, GWL_USERDATA, (LONG_PTR)pApp);
+		//SetWindowLongPtr(hWindow, GWL_USERDATA, (LONG_PTR)pApp);
+		SetWindowLongPtr(hWindow, GWLP_USERDATA, (LONG_PTR)pApp);
 	}
 	else {
-		pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWL_USERDATA);
+		//pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWL_USERDATA);
+		pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWLP_USERDATA);
 		if (!pApp) 
 			return DefWindowProc(hWindow, msg, wp, lp);
 	}
@@ -301,6 +303,8 @@ Error:
 	return r;
 }
 
+#include "HAL/opengl/OGLVolume.h"
+
 // Note this call will never return and will actually run the event loop
 // TODO: Thread it?
 RESULT Windows64App::ShowSandbox() {
@@ -331,6 +335,10 @@ RESULT Windows64App::ShowSandbox() {
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
 
+	// TODO: Proper loading of the scene here?
+	OGLVolume *pVolume = new OGLVolume(m_pOpenGLImp, 2.0f);
+	m_pSceneGraph->PushObject(pVolume);
+
 	// Launch main message loop
 	MSG msg;
 	bool fQuit = false;
@@ -350,7 +358,7 @@ RESULT Windows64App::ShowSandbox() {
 		m_pWin64Mouse->UpdateMousePosition();
 
 		if(m_pOpenGLImp != NULL)
-			m_pOpenGLImp->Render();
+			m_pOpenGLImp->Render(m_pSceneGraph);
 
 		// Swap buffers
 		SwapBuffers(m_hDC);

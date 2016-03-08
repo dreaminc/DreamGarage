@@ -11,6 +11,14 @@ public:
 	UINT64 GetID();
 	RESULT Dealloc();
 
+	bool operator==(const UID& rhs) {
+		return(m_uiID == rhs.m_uiID);
+	}
+
+	friend inline bool operator==(const UID& lhs, const UID& rhs) {
+		return(lhs.m_uiID == rhs.m_uiID);
+	}
+
 private:
 	UINT64 m_uiID;
 

@@ -1,5 +1,5 @@
 #include "OpenGLImp.h"
-#include "Sandbox/SandboxApp.h"
+#include "OGLObj.h"
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
@@ -274,6 +274,14 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::MakeCurrentContext() {
+	return m_pOpenGLRenderingContext->MakeCurrentContext();
+}
+
+RESULT OpenGLImp::ReleaseCurrentContext() {
+	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
+}
+
 // TODO: Get this outta here
 #include "Primitives/ProjectionMatrix.h"
 
@@ -318,9 +326,6 @@ RESULT OpenGLImp::PrepareScene() {
 	// Allocate the camera
 	m_pCamera = new camera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 
-	// TODO: Temporary, get some data into the funnel for now
-	CRM(SetData(), "Failed to set some data");
-
 Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
@@ -342,74 +347,6 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
-	return r;
-}
-// TODO: Get this out of here
-#include "Primitives/Vertex.h"
-#include "OGLTriangle.h"
-#include "OGLQuad.h"
-#include "OGLVolume.h"
-#include "Primitives/color.h"
-
-OGLTriangle *g_pTriangle = NULL;
-OGLQuad *g_pQuad = NULL;
-OGLVolume *g_pVolume = NULL;
-
-// This is temporary - replace with ObjectStore architecture soon
-RESULT OpenGLImp::SetData() {
-	RESULT r = R_PASS;	
-
-	float z = 0.0f;
-	float height = 10.8f;
-	float width = 10.8f;
-	vertex vertTemp[3];
-	vertTemp[0].SetPoint(0.0f, height, z);
-	vertTemp[0].SetColor(1.0f, 0.0f, 0.0f);
-
-	vertTemp[1].SetPoint(-width, -height, z);
-	vertTemp[1].SetColor(0.0f, 1.0f, 0.0f);
-
-	vertTemp[2].SetPoint(width, -height, z);
-	vertTemp[2].SetColor(0.0f, 0.0f, 1.0f);
-
-	///*
-	g_pTriangle = new OGLTriangle(this, 10.0f);
-	// TODO: Update this so that any changes force a change?
-	g_pTriangle->CopyVertices(vertTemp, 3);
-	g_pTriangle->UpdateOGLBuffers();
-	//*/
-
-	g_pQuad = new OGLQuad(this, 0.8f);
-	//CVM(g_pQuad, "Failed to construct Quad");
-
-	TranslationMatrix A(1, 2, 3);
-	TranslationMatrix B(4, 5, 6);
-
-	point p(1, 2, 3);
-
-	float temptMatData[] = {1, 2, 3, 1, 4, 5, 6, 1};
-	matrix<float, 4, 2> tempMatrix(temptMatData);
-
-	//(A + B).PrintMatrix();
-	//TranslationMatrix C = (TranslationMatrix&)(A + B);
-	//matrix<translate_precision, 4, 4> C = (A - B);
-	auto C = (A * B);
-	C.PrintMatrix();
-	
-	auto D = (A * p);
-	D.PrintMatrix();
-
-	auto E = (A * tempMatrix);
-	E.PrintMatrix();
-
-	vector v1(1, 2, 3);
-	vector v2(2, 3, 4);
-
-	auto F = v1 * v2;
-
-	g_pVolume = new OGLVolume(this, 2.0f);
-	
-Error:
 	return r;
 }
 
@@ -494,11 +431,13 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::Render() {
+RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
+	OGLObj *pOGLObj = NULL;
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 
+	// TODO: Remove
 	static float theta = 0.0;
-
 	theta -= 0.01f;
 
 	auto matModel = RotationMatrix(RotationMatrix::Z_AXIS, theta) * RotationMatrix(RotationMatrix::Y_AXIS, theta) * RotationMatrix(RotationMatrix::X_AXIS, -theta);
@@ -533,14 +472,6 @@ RESULT OpenGLImp::Render() {
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ModelViewProjection", &locationModelViewProjectionMatrix);
 
-	/*
-	if (locationProjectionMatrix >= 0) 
-		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matProjection));
-
-	if (locationViewMatrix >= 0)
-		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&matView));
-	*/
-
 	if (locationProjectionMatrix >= 0)
 		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetProjectionMatrix()));
 
@@ -554,22 +485,14 @@ RESULT OpenGLImp::Render() {
 		glUniformMatrix4fv(locationModelViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matMVP));
 
 
-	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	//g_pTriangle->Render();
-	//g_pQuad->Render();
-	g_pVolume->Render();
-	
-	/*
-	GLfloat z = 0.0f;
-	glBegin(GL_TRIANGLES);                      // Drawing Using Triangles
-		glVertex3f(0.0f, 1.0f, z);              // Top
-		glVertex3f(-1.0f, -1.0f, z);              // Bottom Left
-		glVertex3f(1.0f, -1.0f, z);              // Bottom Right
-	glEnd();                            // Finished Drawing The Triangle
-	//*/
+	// Process SceneGraph
+	pSceneGraph->Reset();
+	while((pOGLObj = reinterpret_cast<OGLObj*>(pObjectStore->GetNextObject())) != NULL) {
+		pOGLObj->Render();
+	}
+
 	
 	glFlush();
-	//SwapBuffers(m_pWindows64App->GetDeviceContext());	// This is done in the App
 
 Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());

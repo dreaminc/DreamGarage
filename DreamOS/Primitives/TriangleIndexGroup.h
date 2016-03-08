@@ -9,6 +9,8 @@
 
 #include "matrix.h"
 
+typedef uint32_t dimindex;
+
 class TriangleIndexGroup : public matrix <dimindex, 3, 1> {
 public:
 	TriangleIndexGroup() {

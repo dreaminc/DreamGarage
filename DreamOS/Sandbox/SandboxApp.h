@@ -15,18 +15,12 @@
 #include "Sandbox/PathManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
+#include "Scene/SceneGraph.h"
+
 class SandboxApp : public valid {
 public:
-	SandboxApp() :
-		m_pPathManager(NULL),
-		m_pOpenGLRenderingContext(NULL)
-	{
-		// empty stub
-	}
-
-	~SandboxApp() {
-		// empty stub
-	}
+	SandboxApp();
+	~SandboxApp();
 
 public:
 	virtual RESULT ShowSandbox() = 0;
@@ -38,12 +32,13 @@ public:
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 
 public:
-	inline PathManager *GetPathManager() { return m_pPathManager; }
-	inline OpenGLRenderingContext *GetOpenGLRenderingContext() { return m_pOpenGLRenderingContext; }
+	PathManager *GetPathManager();
+	OpenGLRenderingContext *GetOpenGLRenderingContext();
 
 protected:
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
+	SceneGraph *m_pSceneGraph;
 
 private:
 	UID m_uid;

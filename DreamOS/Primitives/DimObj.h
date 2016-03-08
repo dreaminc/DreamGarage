@@ -7,10 +7,11 @@
 // All objects in Dimension should derive from this base class
 
 #include "valid.h"
+#include "Primitives/Types/UID.h"
 
-typedef uint32_t dimindex;
-
+#include "point.h"
 #include "TriangleIndexGroup.h"
+#include "Vertex.h"
 
 class DimObj : public valid {
 protected:
@@ -111,6 +112,9 @@ public:
 	Error:
 		return r;
 	}
+
+public:
+	UID getID() { return m_uid; }
 
 private:
 	UID m_uid;

@@ -21,6 +21,8 @@
 
 #include "OpenGLExtensions.h"
 
+#include "Scene/SceneGraph.h"
+
 class SandboxApp; 
 class Windows64App;
 
@@ -55,9 +57,13 @@ public:
 public:
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT ShutdownImplementaiton();
-	RESULT Render();
+	RESULT Render(SceneGraph *pSceneGraph);
 	RESULT PrintVertexAttributes();
 	RESULT PrintActiveUniformVariables();
+
+	// Rendering Context 
+	RESULT MakeCurrentContext();
+	RESULT ReleaseCurrentContext();
 
 private:
 	//RESULT InitializeExtensions();
@@ -65,9 +71,6 @@ private:
 	RESULT InitializeOpenGLVersion();
 
 	RESULT PrepareScene();
-
-	// TODO: Temporary, replace with object store arch
-	RESULT SetData();
 
 private:
 	// TODO: Move this into OGLProgram class (implement)
@@ -80,8 +83,8 @@ private:
 	RESULT Notify(SenseMouseEvent *mEvent);
 
 public:
-	inline RESULT EnableVertexPositionAttribute();
-	inline RESULT EnableVertexColorAttribute();
+	RESULT EnableVertexPositionAttribute();
+	RESULT EnableVertexColorAttribute();
 
 // TODO: Unify access to extensions
 public:

@@ -69,6 +69,7 @@ public:
 		RESULT r = R_PASS;
 
 		DimObj *pDimObj = GetDimObj();
+		CR(m_pParentImp->MakeCurrentContext());
 
 		// Set up the Vertex Array Object (VAO)
 		CR(m_pParentImp->glGenVertexArrays(1, &m_hVAO));
@@ -106,6 +107,8 @@ public:
 		//CR(m_pParentImp->glEnableVertexAtrribArray(1));		// TEMP: Color
 		CR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
+
+		CR(m_pParentImp->ReleaseCurrentContext());
 
 	Error:
 		return r;

@@ -48,6 +48,9 @@
     <Filter Include="Sense">
       <UniqueIdentifier>{d6f300ee-6f18-483b-9818-d0018fb18693}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{2be3e3ef-4d89-4383-b2de-5d5a55e6a51b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -106,6 +109,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\SceneGraph.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp">
+      <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -309,6 +321,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\SceneGraph.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\SceneGraphStore.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\SceneGraphList.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

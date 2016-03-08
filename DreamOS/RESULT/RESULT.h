@@ -25,6 +25,8 @@ typedef enum {
     R_FAIL = RESULT_START_FAIL,
     R_ERROR,
     
+	R_NOT_FOUND,		// general purpose not found error
+
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,
 	R_MATRIX_COL_OUT_OF_RANGE,
