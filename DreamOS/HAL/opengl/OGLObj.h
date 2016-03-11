@@ -108,7 +108,8 @@ public:
 		CR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
 
-		CR(m_pParentImp->ReleaseCurrentContext());
+		
+		//CR(m_pParentImp->ReleaseCurrentContext());
 
 	Error:
 		return r;
@@ -129,7 +130,7 @@ public:
 		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 
-		CR(m_pParentImp->ReleaseCurrentContext());
+		//CR(m_pParentImp->ReleaseCurrentContext());
 
 	Error:
 		return r;
@@ -142,7 +143,6 @@ public:
 
 		// TODO: Rethink this since it's in the critical path
 		DimObj *pDimObj = GetDimObj();
-
 		CR(m_pParentImp->glBindVertexArray(m_hVAO));
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));

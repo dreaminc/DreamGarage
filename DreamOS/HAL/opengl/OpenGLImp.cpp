@@ -61,17 +61,15 @@ Error:
 
 RESULT OpenGLImp::InitializeGLContext() {
 	RESULT r = R_PASS;
-
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
 	CR(InitializeOpenGLVersion());
 	CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
-
 	// Should be called after context is created and made current
 	ACRM(m_OpenGLExtensions.InitializeExtensions(), "Failed to initialize extensions");
 	
 	// Lets create the 3.2+ context
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(m_versionMajor, m_versionMinor), "Failed to initialize oglrc");
-	
+
 Error:
 	return r;
 }
@@ -296,7 +294,6 @@ RESULT OpenGLImp::PrepareScene() {
 	GLenum glerr = GL_NO_ERROR;
 
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
-
 	// Clear Background
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -322,7 +319,7 @@ RESULT OpenGLImp::PrepareScene() {
 	OpenGLShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
 	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag"), "Failed to initialize fragment shader from file");
-	
+
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
 	CRM(LinkProgram(), "Failed to link program");
@@ -333,6 +330,8 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Allocate the camera
 	m_pCamera = new camera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
+
+	return R_PASS;
 
 Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -351,6 +350,8 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
 
 	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
+
+	return R_PASS;
 
 Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -502,6 +503,8 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	}
 	
 	glFlush();
+
+	return R_PASS;
 
 Error:
 	CheckGLError();

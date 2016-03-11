@@ -22,7 +22,6 @@ Win64OpenGLRenderingContext::~Win64OpenGLRenderingContext() {
 // cost some performance
 inline RESULT Win64OpenGLRenderingContext::MakeCurrentContext() {
 	Windows64App *pWin64App = reinterpret_cast<Windows64App*>(GetParentApp());
-
 	if (!wglMakeCurrent(pWin64App->GetDeviceContext(), m_hglrc))
 		return R_FAIL;
 
@@ -53,14 +52,11 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext(int versionMajor,
 	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
 	CNM(wglCreateContextAttribsARB, "wglCreateContextAttribsARB cannot be NULL");
 
-	HGLRC hglrcTemp = m_hglrc;
+	CBM(wglDeleteContext(m_hglrc), "Failed to delete temporary rendering context");
+
 	m_hglrc = wglCreateContextAttribsARB(pWin64App->GetDeviceContext(), 0, attribs);
-	DWORD werr = GetLastError();
-	DEBUG_LINEOUT("Created OpenGL Rendering Context 0x%x", werr);
 
-	CBM(wglMakeCurrent(NULL, NULL), "Failed to release rendering context");
-	CBM(wglDeleteContext(hglrcTemp), "Failed to delete temporary rendering context");
-
+	CBM((wglMakeCurrent(pWin64App->GetDeviceContext(), m_hglrc)), "Failed OGL wglMakeCurrent");
 	CNM(m_hglrc, "OpenGL 3.x RC was not created!");
 
 Error:
@@ -85,13 +81,11 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext() {
 	m_pfd.iLayerType = PFD_MAIN_PLANE;
 
 	int nPixelFormat = ChoosePixelFormat(pWin64App->GetDeviceContext(), &m_pfd);
-
 	CBM((nPixelFormat != NULL), "nPixelFormat is NULL with error 0x%x", GetLastError());
 	CBM((SetPixelFormat(pWin64App->GetDeviceContext(), nPixelFormat, &m_pfd)), "Failed to SetPixelFormat %d", nPixelFormat);
 
 	hglrcTemp = wglCreateContext(pWin64App->GetDeviceContext());
 	CNM(hglrcTemp, "Failed to Create GL Context");
-
 	CBM((wglMakeCurrent(pWin64App->GetDeviceContext(), hglrcTemp)), "Failed OGL wglMakeCurrent");
 
 Error:
