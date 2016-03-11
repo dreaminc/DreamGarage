@@ -111,6 +111,16 @@ public:
 
 		return *this;
 	}
+
+	// Utility
+public:
+	static vector XUnitVector() { return vector(1.0f, 0.0f, 0.0f); }
+	static vector YUnitVector() { return vector(0.0f, 1.0f, 0.0f); }
+	static vector ZUnitVector() { return vector(0.0f, 0.0f, 1.0f); }
+
+	static vector iVector() { return vector(1.0f, 0.0f, 0.0f); }
+	static vector jVector() { return vector(0.0f, 1.0f, 0.0f); }
+	static vector kVector() { return vector(0.0f, 0.0f, 1.0f); }
 };
 
 #endif // !VECTOR_H_

@@ -26,6 +26,7 @@ typedef enum {
     R_ERROR,
     
 	R_NOT_FOUND,		// general purpose not found error
+	R_INVALID_PARAM,	// invalid parameter 
 
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,

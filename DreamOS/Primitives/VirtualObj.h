@@ -11,79 +11,67 @@
 #include "point.h"
 #include "vector.h"
 #include "Primitives/Types/UID.h"
+#include "quaternion.h"
+
+#include "matrix.h"
+#include "RotationMatrix.h"
+#include "TranslationMatrix.h"
+#include "ScalingMatrix.h"
+
+#ifdef FLOAT_PRECISION
+	typedef float virtual_precision;
+#elif defined(DOUBLE_PRECISION)
+	typedef double virtual_precision;
+#endif
 
 class VirtualObj : public valid {
 protected:
-	point m_ptOrigin;   // origin
-	vector m_vVelocity;	// velocity
+	point m_ptOrigin;			// Origin
+	vector m_vVelocity;			// Velocity
+
+	quaternion m_qRotation;				// Rotation
+	quaternion m_qAngularMomentum;		// Angular Momentum
 
 public:
-	VirtualObj() :
-		m_ptOrigin(),
-		m_vVelocity()
-	{
-		/* stub */
-	}
+	VirtualObj();
+	~VirtualObj();
 
-	~VirtualObj() {
-		// Empty Stub
-	}
+	// Position
+	VirtualObj translate(matrix <point_precision, 4, 1> v);
+	VirtualObj translate(point_precision x, point_precision y, point_precision z);
+	VirtualObj MoveTo(point p);
+	VirtualObj MoveTo(point_precision x, point_precision y, point_precision z);
 
-	// This should also work with vector
-	RESULT translate(matrix <point_precision, 4, 1> v) {
-		m_ptOrigin.translate(v);
-		return R_PASS;
-	}
+	// Velocity
+	VirtualObj AddVelocity(matrix <point_precision, 4, 1> v);
+	VirtualObj AddVelocity(point_precision x, point_precision y, point_precision z);
+	VirtualObj SetVelocity(matrix <point_precision, 4, 1> v);
+	VirtualObj SetVelocity(point_precision x, point_precision y, point_precision z);
 
-	RESULT translate(point_precision x, point_precision y, point_precision z) {
-		m_ptOrigin.translate(x, y, z);
-		return R_PASS;
-	}
+	// Rotation
+	VirtualObj RotateBy(quaternion q);
+	VirtualObj RotateBy(quaternion_precision x, quaternion_precision y, quaternion_precision z);
+	VirtualObj RotateXBy(quaternion_precision theta);
+	VirtualObj RotateYBy(quaternion_precision theta);
+	VirtualObj RotateZBy(quaternion_precision theta);
 
-	RESULT MoveTo(point p) {
-		m_ptOrigin = p;
-        return R_PASS;
-	}
+	VirtualObj SetRotate(quaternion q);
+	VirtualObj SetRotate(quaternion_precision x, quaternion_precision y, quaternion_precision z);
+	VirtualObj SetRotateX(quaternion_precision theta);
+	VirtualObj SetRotateY(quaternion_precision theta);
+	VirtualObj SetRotateZ(quaternion_precision theta);
 
-	RESULT MoveTo(point_precision x, point_precision y, point_precision z) {
-		m_ptOrigin.x() = x;
-		m_ptOrigin.y() = y;
-		m_ptOrigin.z() = z;
+	// Angular Momentum
+	VirtualObj AddAngularMomentum(quaternion q);
+	VirtualObj SetAngularMomentum(quaternion am);
 
-		return R_PASS;
-	}
+	// Update functions
+	VirtualObj Update();
+	VirtualObj UpdatePosition();
+	VirtualObj UpdateRotation();
 
-	// This should also work with vector
-	RESULT AddVelocity(matrix <point_precision, 4, 1> v) {
-		m_vVelocity += v;
-		return R_PASS;
-	}
-
-	RESULT AddVelocity(point_precision x, point_precision y, point_precision z) {
-		m_vVelocity.x() += x;
-		m_vVelocity.y() += y;
-		m_vVelocity.z() += z;
-
-		return R_PASS;
-	}
-
-	// This should also work with vector
-	RESULT SetVelocity(matrix <point_precision, 4, 1> v) {
-		m_vVelocity = v;
-		return R_PASS;
-	}
-
-	RESULT SetVelocity(point_precision x, point_precision y, point_precision z) {
-		m_vVelocity.x() = x;
-		m_vVelocity.y() = y;
-		m_vVelocity.z() = z;
-		return R_PASS;
-	}
-
-	RESULT UpdatePosition() {
-		m_ptOrigin += m_vVelocity;
-		return R_PASS;
-	}
+	// Matrix Functions
+	matrix<virtual_precision, 4, 4> GetModelMatrix();
 
 private:
 	UID m_uid;

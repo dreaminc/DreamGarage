@@ -160,6 +160,7 @@
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
+    <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
@@ -203,6 +204,7 @@
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
+    <ClInclude Include="..\..\..\Primitives\quaternion.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
     <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\point.h" />

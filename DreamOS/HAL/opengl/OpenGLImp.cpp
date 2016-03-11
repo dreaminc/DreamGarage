@@ -298,7 +298,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
 	// Clear Background
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
 	CRM(CreateGLProgram(), "Failed to create GL program");
 	CRM(CheckGLError(), "CreateGLProgram failed");
@@ -441,55 +441,50 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	static float theta = 0.0;
 	theta -= 0.01f;
 
-	auto matModel = RotationMatrix(RotationMatrix::Z_AXIS, theta) * RotationMatrix(RotationMatrix::Y_AXIS, theta) * RotationMatrix(RotationMatrix::X_AXIS, -theta);
-	//auto matModel = ;
-	//RotationMatrix matModel(0.0f, theta, -theta);
-
-	TranslationMatrix matView(0.0f, 0.0f, theta);
-	ProjectionMatrix matProjection(PROJECTION_MATRIX_PERSPECTIVE, m_pxViewWidth, m_pxViewHeight, 1.0f, 100.0f, 45.0f);
-
 	// TODO: fix camera thing !!
 	//m_pCamera->UpdateFromKeyboardState((SenseKeyboard*)(m_pWindows64App->m_pWin64Keyboard));
 	m_pCamera->UpdatePosition(); 
 
-	//auto matMVP = matProjection * matView * matModel;
-	auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
-	//auto matMVP = m_pCamera->GetProjectionViewMatrix() * matModel;
-
 	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
 
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
+	
+	// TODO: Push to separate function
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// First test the identity 
-	//matModel.identity();
-	//matView.identity();
-	//matProjection.identity();
-
-	// This is for testing only
-	// TODO: Combined MVP or do in the shader?
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Projection", &locationProjectionMatrix);
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4View", &locationViewMatrix);
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ModelViewProjection", &locationModelViewProjectionMatrix);
-
-	if (locationProjectionMatrix >= 0)
-		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetProjectionMatrix()));
-
-	if (locationViewMatrix >= 0)
-		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetViewMatrix()));
-
-	if (locationModelMatrix >= 0)
-		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
-
-	if (locationModelViewProjectionMatrix >= 0)
-		glUniformMatrix4fv(locationModelViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matMVP));
-
+	CRM(CheckGLError(), "glClear failed");
 
 	// Process SceneGraph
 	pSceneGraph->Reset();
 	while((pDimObj = pObjectStore->GetNextObject()) != NULL) {
 		pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+
+		pDimObj->RotateZBy(0.1f);
+
+		auto matModel = pDimObj->GetModelMatrix();
+		//auto matModel = RotationMatrix(RotationMatrix::Z_AXIS, theta) * RotationMatrix(RotationMatrix::Y_AXIS, theta) * RotationMatrix(RotationMatrix::X_AXIS, -theta);
+
+		auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
+
+		// This is for testing only
+		// TODO: Combined MVP or do in the shader?
+		// TODO: Own function?
+		glGetUniformLocation(m_idOpenGLProgram, "u_mat4Projection", &locationProjectionMatrix);
+		glGetUniformLocation(m_idOpenGLProgram, "u_mat4View", &locationViewMatrix);
+		glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
+		glGetUniformLocation(m_idOpenGLProgram, "u_mat4ModelViewProjection", &locationModelViewProjectionMatrix);
+
+		if (locationProjectionMatrix >= 0)
+			glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetProjectionMatrix()));
+
+		if (locationViewMatrix >= 0)
+			glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetViewMatrix()));
+
+		if (locationModelMatrix >= 0)
+			glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
+
+		if (locationModelViewProjectionMatrix >= 0)
+			glUniformMatrix4fv(locationModelViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matMVP));
+
 		pOGLObj->Render();
 	}
 
@@ -497,7 +492,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	glFlush();
 
 Error:
-	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
+	m_pOpenGLRenderingContext->ReleaseCurrentContext();
 
 	return r;
 }

@@ -9,13 +9,14 @@
 #include "valid.h"
 #include "Primitives/Types/UID.h"
 
+#include "VirtualObj.h"
 #include "point.h"
 #include "TriangleIndexGroup.h"
 #include "Vertex.h"
 
-class DimObj : public valid {
+class DimObj : public VirtualObj {
 protected:
-    point m_ptOrigin;   // origin
+    //point m_ptOrigin;   // origin > now in virtual object
     //AABV m_aabv;        // Axis Aligned Bounding Volume
 
 protected:
@@ -24,7 +25,7 @@ protected:
 
 public:
     DimObj() :
-        m_ptOrigin(),
+        VirtualObj(),	// velocity, origin
 		m_pVertices(NULL),
 		m_pIndices(NULL)
         //m_aabv()

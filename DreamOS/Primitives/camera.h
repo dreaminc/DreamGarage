@@ -87,8 +87,8 @@ public:
 	RESULT translate(matrix <point_precision, 4, 1> v) {
 		RESULT r = R_PASS;
 
-		CR(VirtualObj::translate(v));
-		CR(Update());
+		VirtualObj::translate(v);
+		Update();
 
 	Error:
 		return r;

@@ -78,6 +78,7 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext() {
 	m_pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
 	m_pfd.nVersion = 1;
 	m_pfd.dwFlags = PFD_DOUBLEBUFFER | PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
+	//m_pfd.dwFlags = PFD_SUPPORT_OPENGL | PFD_DRAW_TO_WINDOW;
 	m_pfd.iPixelType = PFD_TYPE_RGBA;
 	m_pfd.cColorBits = 32;
 	m_pfd.cDepthBits = 32;

@@ -119,6 +119,9 @@
     <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -330,6 +333,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Scene\SceneGraphList.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\quaternion.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,8 +20,11 @@ public:
 		CR(LoadTextureFromFile(pszFilename);
 
 		Validate();
+		return;
+
 	Error:
 		Invalidate();
+		return;
 	}
 
 	RESULT LoadTextureFromFile(wchar_t *pszFilename) {
