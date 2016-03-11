@@ -3,6 +3,7 @@
 #if defined(_WIN32) 
 	#if defined(_WIN64)
 		#include "./Sandbox/Windows/Windows64App.h"
+		#include "./Sandbox/Windows/Win64OpenGLRenderingContext.h"
 	#else
 		#include "./Sandbox/Windows/Win64OpenGLRenderingContext.h"
 	#endif

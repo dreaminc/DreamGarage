@@ -106,6 +106,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>Core/config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -191,9 +192,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h" />
     <ClInclude Include="..\..\..\HAL\Shader.h" />
-    <ClInclude Include="..\..\..\OSX\OSXApp.h" />
-    <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h" />
-    <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
@@ -242,9 +240,6 @@
     <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert" />
     <None Include="..\..\..\Makefile" />
-    <None Include="..\..\..\OSX\OSXApp.mm" />
-    <None Include="..\..\..\OSX\OSXAppDelegate.mm" />
-    <None Include="..\..\..\OSX\OSXOpenGLView.m" />
     <None Include="..\..\..\Rakefile" />
   </ItemGroup>
   <ItemGroup>

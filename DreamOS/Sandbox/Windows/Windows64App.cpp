@@ -24,7 +24,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	m_wndclassex.cbSize = sizeof(WNDCLASSEX);
 	m_wndclassex.style = CS_DBLCLKS;
-	m_wndclassex.lpfnWndProc = StaticWndProc;
+	m_wndclassex.lpfnWndProc = (WNDPROC)StaticWndProc;
 	m_wndclassex.cbClsExtra = NULL;
 	m_wndclassex.cbWndExtra = NULL;
 	m_wndclassex.hInstance = m_hInstance;
@@ -150,10 +150,10 @@ long __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARA
 	// Get pointer to window
 	if (msg == WM_CREATE) {
 		pApp = (Windows64App*)((LPCREATESTRUCT)lp)->lpCreateParams;
-		SetWindowLongPtr(hWindow, GWL_USERDATA, (LONG_PTR)pApp);
+		SetWindowLongPtr(hWindow, GWLP_USERDATA, (LONG_PTR)pApp);
 	}
 	else {
-		pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWL_USERDATA);
+		pApp = (Windows64App *)GetWindowLongPtr(hWindow, GWLP_USERDATA);
 		if (!pApp) 
 			return DefWindowProc(hWindow, msg, wp, lp);
 	}
