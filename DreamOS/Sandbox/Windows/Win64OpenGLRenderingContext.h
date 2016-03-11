@@ -7,8 +7,6 @@
 
 #include "RESULT/EHM.h"
 
-#include "HAL/opengl/OpenGLRenderingContext.h"
-
 // Header File For Windows
 #include <windows.h>      
 

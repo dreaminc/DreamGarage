@@ -306,7 +306,7 @@ RESULT OpenGLImp::PrepareScene() {
 	OpenGLShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
 	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag"), "Failed to initialize fragment shader from file");
-	
+
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
 	CRM(LinkProgram(), "Failed to link program");
@@ -570,6 +570,8 @@ RESULT OpenGLImp::Render() {
 	
 	glFlush();
 	//SwapBuffers(m_pWindows64App->GetDeviceContext());	// This is done in the App
+
+	return R_PASS;
 
 Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
