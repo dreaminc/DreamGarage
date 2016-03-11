@@ -20,7 +20,7 @@ Win64OpenGLRenderingContext::~Win64OpenGLRenderingContext() {
 
 // TODO: Might make sense to push this into the SandboxApp since the cast might
 // cost some performance
-RESULT Win64OpenGLRenderingContext::MakeCurrentContext() {
+inline RESULT Win64OpenGLRenderingContext::MakeCurrentContext() {
 	Windows64App *pWin64App = reinterpret_cast<Windows64App*>(GetParentApp());
 
 	if (!wglMakeCurrent(pWin64App->GetDeviceContext(), m_hglrc))
@@ -29,7 +29,7 @@ RESULT Win64OpenGLRenderingContext::MakeCurrentContext() {
 	return R_PASS;
 }
 
-RESULT Win64OpenGLRenderingContext::ReleaseCurrentContext() {
+inline RESULT Win64OpenGLRenderingContext::ReleaseCurrentContext() {
 	if (!wglMakeCurrent(NULL, NULL))
 		return R_FAIL;
 
@@ -86,7 +86,7 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext() {
 
 	int nPixelFormat = ChoosePixelFormat(pWin64App->GetDeviceContext(), &m_pfd);
 
-	CBM((nPixelFormat != NULL), "nPixelFormat is NULL");
+	CBM((nPixelFormat != NULL), "nPixelFormat is NULL with error 0x%x", GetLastError());
 	CBM((SetPixelFormat(pWin64App->GetDeviceContext(), nPixelFormat, &m_pfd)), "Failed to SetPixelFormat %d", nPixelFormat);
 
 	hglrcTemp = wglCreateContext(pWin64App->GetDeviceContext());

@@ -129,13 +129,21 @@ public:
 	inline quaternion_precision &y(quaternion_precision val) { return m_y = val; }
 	inline quaternion_precision &z(quaternion_precision val) { return m_z = val; }
 
-	quaternion& operator*=(const quaternion& rhs) {
+	// http://www.mathworks.com/help/aeroblks/quaternionmultiplication.html
+	quaternion& operator*=(const quaternion& r) {
+		/*
 		m_w = m_w * rhs.m_w - m_x*rhs.m_x - m_y*rhs.m_y - m_z*rhs.m_z;
-		m_x = m_w * rhs.m_x + m_x*rhs.m_w + m_y*rhs.m_z - m_z*rhs.m_y;
-		m_y = m_w * rhs.m_y - m_x*rhs.m_z + m_y*rhs.m_w + m_z*rhs.m_x;
-		m_z = m_w * rhs.m_z + m_x*rhs.m_y - m_y*rhs.m_x + m_z*rhs.m_w;
+		m_x = m_w * rhs.m_x + m_x*rhs.m_w - m_y*rhs.m_z + m_z*rhs.m_y;
+		m_y = m_w * rhs.m_y + m_x*rhs.m_z + m_y*rhs.m_w - m_z*rhs.m_x;
+		m_z = m_w * rhs.m_z - m_x*rhs.m_y + m_y*rhs.m_x + m_z*rhs.m_w;
+		*/
 
-		return *this;
+		m_w = r.m_w * m_w - r.m_x * m_x - r.m_y * m_y - r.m_z * m_z;
+		m_x = r.m_w * m_x + r.m_x * m_w - r.m_y * m_z + r.m_z * m_y;
+		m_y = r.m_w * m_y + r.m_x * m_z + r.m_y * m_w - r.m_z * m_x;
+		m_z = r.m_w * m_z - r.m_x * m_y + r.m_y * m_x + r.m_z * m_w;
+
+		return (*this);
 	}
 
 	const quaternion& operator*(const quaternion& arg) const {

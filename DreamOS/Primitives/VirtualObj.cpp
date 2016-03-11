@@ -69,8 +69,15 @@ VirtualObj VirtualObj::RotateBy(quaternion q) {
 	return (*this);
 }
 
+// TODO: This is not working
 VirtualObj VirtualObj::RotateBy(quaternion_precision x, quaternion_precision y, quaternion_precision z) {
-	m_qRotation *= quaternion::iQuaternion(x) * quaternion::jQuaternion(y) * quaternion::kQuaternion(z);
+	m_qRotation *= quaternion::iQuaternion(x); 
+	m_qRotation *= quaternion::jQuaternion(y); 
+	m_qRotation *= quaternion::kQuaternion(z);
+
+	//m_qRotation = m_qRotation * quaternion::iQuaternion(x);
+	//m_qRotation *= quaternion::jQuaternion(y);
+	
 	return (*this);
 }
 

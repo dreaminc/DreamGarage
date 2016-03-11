@@ -431,67 +431,60 @@ Error:
 	return r;
 }
 
+inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
+
+	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
+	auto matModel = pDimObj->GetModelMatrix();
+	auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
+
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Projection", &locationProjectionMatrix);
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4View", &locationViewMatrix);
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ModelViewProjection", &locationModelViewProjectionMatrix);
+
+	if (locationProjectionMatrix >= 0)
+		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetProjectionMatrix()));
+
+	if (locationViewMatrix >= 0)
+		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetViewMatrix()));
+
+	if (locationModelMatrix >= 0)
+		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
+
+	if (locationModelViewProjectionMatrix >= 0)
+		glUniformMatrix4fv(locationModelViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matMVP));
+
+	return pOGLObj->Render();
+}
+
 RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
-	OGLObj *pOGLObj = NULL;
-	DimObj *pDimObj = NULL;
+	
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
-
-	// TODO: Remove
-	static float theta = 0.0;
-	theta -= 0.01f;
 
 	// TODO: fix camera thing !!
 	//m_pCamera->UpdateFromKeyboardState((SenseKeyboard*)(m_pWindows64App->m_pWin64Keyboard));
 	m_pCamera->UpdatePosition(); 
 
-	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
+	m_pOpenGLRenderingContext->MakeCurrentContext();
 
-	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
-	
-	// TODO: Push to separate function
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	CRM(CheckGLError(), "glClear failed");
 
-	// Process SceneGraph
+	// Send SceneGraph objects to shader
 	pSceneGraph->Reset();
+	
+	DimObj *pDimObj = NULL;
 	while((pDimObj = pObjectStore->GetNextObject()) != NULL) {
-		pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-
-		pDimObj->RotateZBy(0.1f);
-
-		auto matModel = pDimObj->GetModelMatrix();
-		//auto matModel = RotationMatrix(RotationMatrix::Z_AXIS, theta) * RotationMatrix(RotationMatrix::Y_AXIS, theta) * RotationMatrix(RotationMatrix::X_AXIS, -theta);
-
-		auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
-
-		// This is for testing only
-		// TODO: Combined MVP or do in the shader?
-		// TODO: Own function?
-		glGetUniformLocation(m_idOpenGLProgram, "u_mat4Projection", &locationProjectionMatrix);
-		glGetUniformLocation(m_idOpenGLProgram, "u_mat4View", &locationViewMatrix);
-		glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
-		glGetUniformLocation(m_idOpenGLProgram, "u_mat4ModelViewProjection", &locationModelViewProjectionMatrix);
-
-		if (locationProjectionMatrix >= 0)
-			glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetProjectionMatrix()));
-
-		if (locationViewMatrix >= 0)
-			glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetViewMatrix()));
-
-		if (locationModelMatrix >= 0)
-			glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
-
-		if (locationModelViewProjectionMatrix >= 0)
-			glUniformMatrix4fv(locationModelViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matMVP));
-
-		pOGLObj->Render();
+		pDimObj->RotateBy(0.1f, 0.1f, 0.1f);
+		SendObjectToShader(pDimObj);
 	}
-
 	
 	glFlush();
 
 Error:
+	CheckGLError();
 	m_pOpenGLRenderingContext->ReleaseCurrentContext();
 
 	return r;

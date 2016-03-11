@@ -58,6 +58,7 @@ public:
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT ShutdownImplementaiton();
 	RESULT Render(SceneGraph *pSceneGraph);
+	RESULT SendObjectToShader(DimObj *pDimObj);
 	RESULT PrintVertexAttributes();
 	RESULT PrintActiveUniformVariables();
 

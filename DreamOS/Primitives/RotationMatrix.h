@@ -77,10 +77,10 @@ public:
 
 		this->element(1, 0) = 2*q.x()*q.y() + 2*q.w()*q.z();
 		this->element(1, 1) = 1.0f - 2*q.x2() - 2*q.z2();
-		this->element(1, 2) = 2*q.y()*q.z() + 2*q.w()*q.x();
+		this->element(1, 2) = 2*q.y()*q.z() - 2*q.w()*q.x();
 
 		this->element(2, 0) = 2*q.x()*q.z() - 2*q.w()*q.y();
-		this->element(2, 1) = 2*q.y()*q.z() - 2*q.w()*q.x();
+		this->element(2, 1) = 2*q.y()*q.z() + 2*q.w()*q.x();
 		this->element(2, 2) = 1.0f - 2*q.x2() - 2*q.y2();
 
 		return R_PASS;
