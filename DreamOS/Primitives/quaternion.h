@@ -113,6 +113,22 @@ public:
 		return R_PASS;
 	}
 
+	quaternion GetConjugate() {
+		quaternion q;
+
+		q.m_w = m_w;
+		
+		q.m_x = -m_x;
+		q.m_y = -m_y;
+		q.m_z = -m_z;
+
+		return q;
+	}
+
+	static quaternion Conjugate(quaternion arg) {
+		return arg.GetConjugate();
+	}
+
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline quaternion_precision &w() { return m_w; }
 	inline quaternion_precision &x() { return m_x; }

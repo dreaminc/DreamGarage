@@ -51,6 +51,7 @@ public:
 		*/
 
 		return SetMatrix(RotationMatrix(pitch, yaw, roll) * TranslationMatrix(ptPosition));
+		//return SetMatrix(TranslationMatrix(ptPosition));
 	}
 
 	~ViewMatrix() {

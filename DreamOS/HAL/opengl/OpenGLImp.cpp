@@ -303,6 +303,14 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(CreateGLProgram(), "Failed to create GL program");
 	CRM(CheckGLError(), "CreateGLProgram failed");
 
+	// Depth testing
+	glEnable(GL_DEPTH_TEST);	// Enable depth test
+	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
+
+	// Face culling
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
 	// TODO: Should be stuffed into factory arch - return NULL on fail
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
@@ -477,7 +485,19 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	
 	DimObj *pDimObj = NULL;
 	while((pDimObj = pObjectStore->GetNextObject()) != NULL) {
-		pDimObj->RotateBy(0.1f, 0.1f, 0.1f);
+		quaternion_precision factor = 0.05;
+		quaternion_precision filter = 0.1;
+		
+		static quaternion_precision x = 0;
+		static quaternion_precision y = 0;
+		static quaternion_precision z = 0;
+
+		x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
+		y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
+		z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
+
+		pDimObj->RotateBy(x * factor, y * factor, z * factor);
+
 		SendObjectToShader(pDimObj);
 	}
 	

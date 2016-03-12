@@ -118,6 +118,9 @@ public:
 		RESULT r = R_PASS;
 
 		DimObj *pDimObj = GetDimObj();
+		CNM(pDimObj, "Failed to acquire Dimension Object");
+
+		CR(m_pParentImp->MakeCurrentContext());
 
 		CR(m_pParentImp->glBindVertexArray(m_hVAO));
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
@@ -125,6 +128,8 @@ public:
 		vertex *pVertex = pDimObj->VertexData();
 		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
+
+		CR(m_pParentImp->ReleaseCurrentContext());
 
 	Error:
 		return r;

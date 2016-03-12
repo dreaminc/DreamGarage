@@ -1,6 +1,8 @@
 #ifndef COLOR_H_
 #define COLOR_H_
 
+#include <stdlib.h>
+
 #include "RESULT/EHM.h"
 
 // DREAM OS
@@ -15,6 +17,11 @@
 	typedef double color_precision;
 #endif
 
+enum COLOR_TYPE {
+	COLOR_RANDOM,
+	COLOR_INVALID
+};
+
 class color : public matrix <color_precision, 4, 1> {
 public:
 	color() {
@@ -27,6 +34,33 @@ public:
 		this->element(1, 0) = g;
 		this->element(2, 0) = b;
 		this->element(3, 0) = a;
+	}
+
+	color(COLOR_TYPE type) {
+		this->clear();
+
+		switch (type) {
+			case COLOR_RANDOM: {
+				color_precision r = static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX);
+				color_precision g = static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX);
+				color_precision b = static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX);
+
+				SetColor(r, g, b, 1.0f);
+			} break;
+
+			default: {
+				this->clear();
+			} break;
+		}
+	}
+
+	RESULT SetColor(color_precision r, color_precision g, color_precision b, color_precision a) {
+		this->element(0, 0) = r;
+		this->element(1, 0) = g;
+		this->element(2, 0) = b;
+		this->element(3, 0) = a;
+
+		return R_PASS;
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline

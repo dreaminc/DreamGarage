@@ -30,6 +30,7 @@
 #define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
 
 #define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
+//#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_ORTHOGRAPHIC
 
 class camera : public VirtualObj {
 public:
@@ -64,7 +65,6 @@ public:
 		RESULT r = R_PASS;
 
 		// Update the matrices 
-		m_ProjectionMatrix = ProjectionMatrix(m_ProjectionType, m_pxScreenWidth, m_pxScreenHeight, m_NearPlane, m_FarPlane, m_FielfOfViewAngle);
 		m_ViewMatrix = ViewMatrix(m_ptOrigin, m_pitch, m_yaw, m_roll);
 
 		// For later access, might want to rethink for performance
@@ -80,9 +80,21 @@ public:
 		return r;
 	}
 
-	ProjectionMatrix GetProjectionMatrix() { return m_ProjectionMatrix;  }
-	ViewMatrix GetViewMatrix() { return m_ViewMatrix; }
-	matrix<camera_precision, 4, 4> GetProjectionViewMatrix() { return (m_ProjectionMatrix * m_ViewMatrix); }
+	ProjectionMatrix GetProjectionMatrix() { 
+		return ProjectionMatrix(m_ProjectionType, m_pxScreenWidth, m_pxScreenHeight, m_NearPlane, m_FarPlane, m_FielfOfViewAngle);
+	}
+
+	ViewMatrix GetViewMatrix() { 
+		ViewMatrix matIdentity = ViewMatrix(m_ptOrigin, m_pitch, m_yaw, m_roll);
+		
+		//matIdentity.identity();
+
+		return matIdentity;
+	}
+
+	matrix<camera_precision, 4, 4> GetProjectionViewMatrix() { 
+		return (GetProjectionMatrix() * GetViewMatrix());
+	}
 
 	RESULT translate(matrix <point_precision, 4, 1> v) {
 		RESULT r = R_PASS;
@@ -284,7 +296,8 @@ private:
 	camera_precision m_FarPlane;
 	PROJECTION_MATRIX_TYPE m_ProjectionType;
 	camera_precision m_FielfOfViewAngle;		// Note this is in degrees, not radians
-	ProjectionMatrix m_ProjectionMatrix;
+
+	
 
 	// View (origin point is in the Virtual Object Parent)
 	// TODO: Move to virtual object?

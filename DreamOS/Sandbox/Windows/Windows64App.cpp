@@ -337,6 +337,9 @@ RESULT Windows64App::ShowSandbox() {
 
 	// TODO: Proper loading of the scene here?
 	OGLVolume *pVolume = new OGLVolume(m_pOpenGLImp, 2.0f);
+	pVolume->SetRandomColor();
+	pVolume->UpdateOGLBuffers();
+
 	m_pSceneGraph->PushObject(pVolume);
 
 	// Launch main message loop

@@ -103,6 +103,13 @@ public:
 		return R_PASS;
 	}
 
+	RESULT SetRandomColor() {
+		for (int i = 0; i < NumberVertices(); i++)
+			m_pVertices[i].SetRandomColor();
+
+		return R_PASS;
+	}
+
 	RESULT CopyVertices(vertex pVerts[], int pVerts_n) {
 		RESULT r = R_PASS;
 

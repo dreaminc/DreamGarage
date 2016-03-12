@@ -1,6 +1,8 @@
 //#include "DreamOSMain.h"
 //#include "OSX/OSXApp.h"
 
+#include <ctime>
+
 #include "RESULT/EHM.h"
 
 #include "Sandbox/SandboxFactory.h"
@@ -10,6 +12,8 @@
 int main(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
     SandboxApp *pSandbox = NULL;
+
+	srand(static_cast <unsigned> (time(0)));
 	
 	// This is the entry point for the DreamOS Engine
     DEBUG_LINEOUT("DREAM OS %s Starting ...", DREAM_OS_VERSION_STR);

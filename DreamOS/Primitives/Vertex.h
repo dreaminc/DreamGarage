@@ -132,6 +132,11 @@ public:
 		return R_PASS;
 	}
 
+	RESULT SetRandomColor() {
+		m_color = color(COLOR_RANDOM);
+		return R_PASS;
+	}
+
 	RESULT SetNormal(vector n) {
 		m_normal = n;
 		return R_PASS;
