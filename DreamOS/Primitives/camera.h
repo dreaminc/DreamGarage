@@ -41,12 +41,11 @@ public:
 		m_FarPlane(DEFAULT_FAR_PLANE),
 		m_pxScreenWidth(pxScreenWidth),
 		m_pxScreenHeight(pxScreenHeight),
-		m_pitch(0.0f),
-		m_yaw(0.0f),
-		m_roll(0.0f),
 		m_cameraRotateSpeed(DEFAULT_CAMERA_ROTATE_SPEED)
 	{
 		m_ptOrigin = ptOrigin;
+		m_qRotation = quaternion(0.0f, 0.0f, -1.0f, 0.0f);
+
 		Update();
 	}
 
@@ -57,27 +56,21 @@ public:
 	RESULT ResizeCamera(int pxWidth, int pxHeight) {
 		m_pxScreenWidth = pxWidth;
 		m_pxScreenHeight = pxHeight;
-
-		return Update();
+		return R_PASS;
 	}
-	
-	RESULT Update() {
-		RESULT r = R_PASS;
 
-		// Update the matrices 
-		m_ViewMatrix = ViewMatrix(m_ptOrigin, m_pitch, m_yaw, m_roll);
+	matrix<camera_precision, 4, 1> GetUpVector() {
+		RotationMatrix matrixRotation(m_qRotation);
+		return matrixRotation * vector(0.0f, 1.0f, 0.0f);
+	}
 
-		// For later access, might want to rethink for performance
-		RotationMatrix matrixRotation(m_pitch, m_yaw, m_roll);
+	matrix<camera_precision, 4, 1> GetRightVector() {
+		RotationMatrix matrixRotation(m_qRotation);
+		return matrixRotation * vector(1.0f, 0.0f, 0.0f);
+	}
 
-		m_vLook = matrixRotation * vector(0.0f, 0.0f, 1.0f);
-		m_vUp = matrixRotation * vector(0.0f, 1.0f, 0.0f);
-		m_vRight = matrixRotation * vector(1.0f, 0.0f, 0.0f);
-
-		//m_vVelocity = m_vLook * 0.1f;
-
-	Error:
-		return r;
+	vector GetLookVector() {
+		return m_qRotation.GetVector();
 	}
 
 	ProjectionMatrix GetProjectionMatrix() { 
@@ -85,17 +78,17 @@ public:
 	}
 
 	ViewMatrix GetViewMatrix() { 
-		ViewMatrix matIdentity = ViewMatrix(m_ptOrigin, m_pitch, m_yaw, m_roll);
+		//ViewMatrix matIdentity = ViewMatrix(m_ptOrigin, m_pitch, m_yaw, m_roll);
+		ViewMatrix mat = ViewMatrix(m_ptOrigin, m_qRotation);
 		
-		//matIdentity.identity();
-
-		return matIdentity;
+		return mat;
 	}
 
 	matrix<camera_precision, 4, 4> GetProjectionViewMatrix() { 
 		return (GetProjectionMatrix() * GetViewMatrix());
 	}
 
+	/* Now done in Virtual Object
 	RESULT translate(matrix <point_precision, 4, 1> v) {
 		RESULT r = R_PASS;
 
@@ -145,7 +138,9 @@ public:
 	Error:
 		return r;
 	}
+	*/
 
+	/*  All replaced by virtual object functions
 	RESULT IncrementPitch(camera_precision incPitch) {
 		m_pitch += incPitch;
 		return Update();
@@ -174,26 +169,30 @@ public:
 		m_yaw = v(1);
 		m_roll = v(2);
 
-		return Update();
+		return R_PASS;
 	}
+	*/
 
 	RESULT RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {
-		m_pitch		-= dy * m_cameraRotateSpeed;
-		m_yaw		-= dx * m_cameraRotateSpeed;
+		//m_pitch		-= dy * m_cameraRotateSpeed;
+		//m_yaw		-= dx * m_cameraRotateSpeed;
 		//m_roll		= 0.0f * m_cameraRotateSpeed;
 
-		return Update();
+		RotateYBy(dx * m_cameraRotateSpeed);
+		RotateXBy(dy * m_cameraRotateSpeed);
+
+		return R_PASS;
 	}
 
 	RESULT MoveForward(camera_precision amt) {
-		m_ptOrigin += m_vLook * amt;
+		m_ptOrigin += GetLookVector() * amt;
 		m_ptOrigin(3) = 0.0f;
-		return Update();
+		return R_PASS;
 	}
 
 	RESULT Strafe(camera_precision amt) {
-		m_ptOrigin += m_vRight * amt;
-		return Update();
+		m_ptOrigin += GetRightVector() * amt;
+		return R_PASS;
 	}
 
 	RESULT Notify(SenseKeyboardEvent *kbEvent) {
@@ -282,7 +281,7 @@ public:
 			MoveForward(-0.1f);
 		}
 
-		CR(UpdatePosition());
+		//CR(UpdatePosition());
 
 	Error:
 		return r;
@@ -302,15 +301,13 @@ private:
 	// View (origin point is in the Virtual Object Parent)
 	// TODO: Move to virtual object?
 	camera_precision m_cameraRotateSpeed;
-	camera_precision m_pitch;	// x
-	camera_precision m_yaw;		// y
-	camera_precision m_roll;	// z
-	ViewMatrix m_ViewMatrix;
 
+	/*
 public:
 	vector m_vLook;
 	vector m_vUp;
 	vector m_vRight;
+	*/
 };
 
 #endif // ! CAMERA_H_

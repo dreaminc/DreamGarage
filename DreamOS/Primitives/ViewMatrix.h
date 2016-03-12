@@ -12,6 +12,7 @@
 #include "matrix.h"
 #include "vector.h"
 #include "point.h"
+#include "quaternion.h"
 
 #include "RotationMatrix.h"
 #include "TranslationMatrix.h"
@@ -35,11 +36,10 @@ public:
 		SetViewMatrixPitchYawRoll(ptPosition, pitch, yaw, roll);
 	}
 
-	/*
-	ViewMatrix(point ptPosition, vector vLook, vector vUp) {
-
+	ViewMatrix(point ptPosition, quaternion qLook) {
+		clear();
+		SetViewMatrixPointQuaternion(ptPosition, qLook);
 	}
-	*/
 
 	RESULT SetViewMatrixPitchYawRoll(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll) {
 		//m_ptPosition = ptPosition;
@@ -52,6 +52,10 @@ public:
 
 		return SetMatrix(RotationMatrix(pitch, yaw, roll) * TranslationMatrix(ptPosition));
 		//return SetMatrix(TranslationMatrix(ptPosition));
+	}
+
+	RESULT SetViewMatrixPointQuaternion(point ptPosition, quaternion qLook) {
+		return SetMatrix(RotationMatrix(qLook) * TranslationMatrix(ptPosition));
 	}
 
 	~ViewMatrix() {

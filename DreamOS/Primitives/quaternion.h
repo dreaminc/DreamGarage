@@ -11,6 +11,8 @@
 
 #include <math.h>
 
+#include "vector.h"
+
 #ifdef FLOAT_PRECISION
 	typedef float quaternion_precision;
 #elif defined(DOUBLE_PRECISION)
@@ -127,6 +129,10 @@ public:
 
 	static quaternion Conjugate(quaternion arg) {
 		return arg.GetConjugate();
+	}
+
+	vector GetVector() {
+		return vector(m_x, m_y, m_z);
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline
