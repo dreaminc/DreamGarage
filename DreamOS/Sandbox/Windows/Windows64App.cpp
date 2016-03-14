@@ -24,7 +24,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	m_wndclassex.cbSize = sizeof(WNDCLASSEX);
 	m_wndclassex.style = CS_DBLCLKS;
-	m_wndclassex.lpfnWndProc = StaticWndProc;
+	m_wndclassex.lpfnWndProc = (WNDPROC)(StaticWndProc);
 	m_wndclassex.cbClsExtra = NULL;
 	m_wndclassex.cbWndExtra = NULL;
 	m_wndclassex.hInstance = m_hInstance;
