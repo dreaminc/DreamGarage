@@ -61,6 +61,8 @@ public:
 	RESULT SendObjectToShader(DimObj *pDimObj);
 	RESULT PrintVertexAttributes();
 	RESULT PrintActiveUniformVariables();
+	
+	camera *GetCamera();
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();

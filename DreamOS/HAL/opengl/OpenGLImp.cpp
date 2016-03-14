@@ -358,9 +358,14 @@ Error:
 	return r;
 }
 
+camera * OpenGLImp::GetCamera() {
+	return m_pCamera;
+}
+
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
+	/* This has been moved to the camera 
 	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
 
 	switch (kbEvent->KeyCode) {
@@ -409,11 +414,13 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 				m_pCamera->MoveForward(-0.1f);
 		} break;
 	}
+	*/
 
 Error:
 	return r;
 }
 
+// TODO: Move to camera?
 RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 	RESULT r = R_PASS;
 
@@ -474,7 +481,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	// TODO: fix camera thing !!
 	//m_pCamera->UpdateFromKeyboardState((SenseKeyboard*)(m_pWindows64App->m_pWin64Keyboard));
-	m_pCamera->UpdatePosition(); 
+	m_pCamera->UpdateCameraPosition(); 
 
 	m_pOpenGLRenderingContext->MakeCurrentContext();
 
@@ -496,7 +503,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
 		z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
 
-		pDimObj->RotateBy(x * factor, y * factor, z * factor);
+		//pDimObj->RotateBy(x * factor, y * factor, z * factor);
 
 		SendObjectToShader(pDimObj);
 	}

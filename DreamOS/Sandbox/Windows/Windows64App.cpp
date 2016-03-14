@@ -279,6 +279,9 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 RESULT Windows64App::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
+	camera *pCamera = m_pOpenGLImp->GetCamera();
+
+	/*
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, m_pOpenGLImp));
@@ -287,6 +290,16 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 	for (int i = 0; i < 26; i++) {
 		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), m_pOpenGLImp));
 	}
+	*/
+
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, pCamera));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, pCamera));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, pCamera));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, pCamera));
+
+	for (int i = 0; i < 26; i++) {
+		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
+	}
 
 Error:
 	return r;
@@ -294,6 +307,8 @@ Error:
 
 RESULT Windows64App::RegisterImpMouseEvents() {
 	RESULT r = R_PASS;
+
+	//camera *pCamera = m_pOpenGLImp->GetCamera();
 
 	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_MOVE, m_pOpenGLImp));
 	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pOpenGLImp));
@@ -336,11 +351,23 @@ RESULT Windows64App::ShowSandbox() {
 	UpdateWindow(m_hwndWindow);
 
 	// TODO: Proper loading of the scene here?
-	OGLVolume *pVolume = new OGLVolume(m_pOpenGLImp, 2.0f);
-	pVolume->SetRandomColor();
-	pVolume->UpdateOGLBuffers();
+	{
+		OGLVolume *pVolume = NULL;
+		int num = 20;
+		double size = 0.2f;
 
-	m_pSceneGraph->PushObject(pVolume);
+		for (int i = 0; i < num; i++) {
+			for (int j = 0; j < num; j++) {
+				pVolume = new OGLVolume(m_pOpenGLImp, size);
+				pVolume->SetRandomColor();
+				pVolume->translate(i * (size * 2) - (num * size), 0.0f, j * (size * 2) - (num * size));
+				pVolume->UpdateOGLBuffers();
+				m_pSceneGraph->PushObject(pVolume);
+			}
+		}		
+	}
+
+	
 
 	// Launch main message loop
 	MSG msg;

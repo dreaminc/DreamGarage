@@ -32,7 +32,10 @@
 #define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
 //#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_ORTHOGRAPHIC
 
-class camera : public VirtualObj {
+#include "Primitives/Subscriber.h"
+#include "Sense/SenseKeyboard.h"
+
+class camera : public VirtualObj, public Subscriber<SenseKeyboardEvent> {
 public:
 	camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
 		m_FielfOfViewAngle(FOV),
@@ -41,10 +44,12 @@ public:
 		m_FarPlane(DEFAULT_FAR_PLANE),
 		m_pxScreenWidth(pxScreenWidth),
 		m_pxScreenHeight(pxScreenHeight),
-		m_cameraRotateSpeed(DEFAULT_CAMERA_ROTATE_SPEED)
+		m_cameraRotateSpeed(DEFAULT_CAMERA_ROTATE_SPEED),
+		m_cameraForwardSpeed(0.0f),
+		m_cameraStrafeSpeed(0.0f)
 	{
 		m_ptOrigin = ptOrigin;
-		m_qRotation = quaternion(0.0f, 0.0f, -1.0f, 0.0f);
+		m_qRotation = quaternion(0.0f, 0.0f, 0.0f, 0.0f);
 
 		Update();
 	}
@@ -78,7 +83,6 @@ public:
 	}
 
 	ViewMatrix GetViewMatrix() { 
-		//ViewMatrix matIdentity = ViewMatrix(m_ptOrigin, m_pitch, m_yaw, m_roll);
 		ViewMatrix mat = ViewMatrix(m_ptOrigin, m_qRotation);
 		
 		return mat;
@@ -88,96 +92,7 @@ public:
 		return (GetProjectionMatrix() * GetViewMatrix());
 	}
 
-	/* Now done in Virtual Object
-	RESULT translate(matrix <point_precision, 4, 1> v) {
-		RESULT r = R_PASS;
-
-		VirtualObj::translate(v);
-		Update();
-
-	Error:
-		return r;
-	}
-
-	RESULT translate(point_precision x, point_precision y, point_precision z) {
-		RESULT r = R_PASS;
-		
-		VirtualObj::translate(x, y, z);
-		CR(Update());
-
-	Error:
-		return r;
-	}
-
-	RESULT MoveTo(point p) {
-		RESULT r = R_PASS;
-
-		VirtualObj::MoveTo(p);
-		CR(Update());
-
-	Error:
-		return r;
-	}
-
-	RESULT MoveTo(point_precision x, point_precision y, point_precision z) {
-		RESULT r = R_PASS;
-
-		VirtualObj::MoveTo(x, y, z);
-		CR(Update());
-
-	Error:
-		return r;
-	}
-
-	RESULT UpdatePosition() {
-		RESULT r = R_PASS;
-
-		VirtualObj::UpdatePosition();
-		CR(Update());
-	
-	Error:
-		return r;
-	}
-	*/
-
-	/*  All replaced by virtual object functions
-	RESULT IncrementPitch(camera_precision incPitch) {
-		m_pitch += incPitch;
-		return Update();
-	}
-
-	RESULT IncrementYaw(camera_precision incYaw) {
-		m_yaw += incYaw;
-		return Update();
-	}
-
-	RESULT IncrementRoll(camera_precision incRoll) {
-		m_roll += incRoll;
-		return Update();
-	}
-
-	RESULT IncrementPYR(matrix<camera_precision, 3, 1> v) {
-		m_pitch += v(0);
-		m_yaw   += v(1);
-		m_roll  += v(2);
-
-		return Update();
-	}
-
-	RESULT SetPYR(matrix<camera_precision, 3, 1> v) {
-		m_pitch = v(0);
-		m_yaw = v(1);
-		m_roll = v(2);
-
-		return R_PASS;
-	}
-	*/
-
 	RESULT RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {
-		//m_pitch		-= dy * m_cameraRotateSpeed;
-		//m_yaw		-= dx * m_cameraRotateSpeed;
-		//m_roll		= 0.0f * m_cameraRotateSpeed;
-
 		RotateYBy(dx * m_cameraRotateSpeed);
 		RotateXBy(dy * m_cameraRotateSpeed);
 
@@ -195,6 +110,26 @@ public:
 		return R_PASS;
 	}
 
+	RESULT SetStrafeSpeed(camera_precision speed) {
+		m_cameraStrafeSpeed = speed;
+		return R_PASS;
+	}
+
+	RESULT AddStrafeSpeed(camera_precision speed) {
+		m_cameraStrafeSpeed += speed;
+		return R_PASS;
+	}
+
+	RESULT SetForwardSpeed(camera_precision speed) {
+		m_cameraForwardSpeed = speed;
+		return R_PASS;
+	}
+
+	RESULT AddForwardSpeed(camera_precision speed) {
+		m_cameraForwardSpeed += speed;
+		return R_PASS;
+	}
+
 	RESULT Notify(SenseKeyboardEvent *kbEvent) {
 		RESULT r = R_PASS;
 
@@ -203,56 +138,49 @@ public:
 		switch (kbEvent->KeyCode) {
 			case (SK_SCAN_CODE)('A') :
 			case SK_LEFT: {
-				/*
 				if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
+					AddStrafeSpeed(0.1f);
 				else
-				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
-				*/
-				if (kbEvent->KeyState)
-					Strafe(0.1f);
-
+					AddStrafeSpeed(-0.1f);
 			} break;
 
 			case (SK_SCAN_CODE)('D') :
 			case SK_RIGHT: {
-				/*
 				if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
+					AddStrafeSpeed(-0.1f);
 				else
-				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
-				*/
-				if (kbEvent->KeyState)
-					Strafe(-0.1f);
+					AddStrafeSpeed(0.1f);
 			} break;
 
 			case (SK_SCAN_CODE)('W') :
 			case SK_UP: {
-				/*
 				if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
+					AddForwardSpeed(0.1f);
 				else
-				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
-				*/
-				if (kbEvent->KeyState)
-					MoveForward(0.1f);
+					AddForwardSpeed(-0.1f);
 			} break;
 
 			case (SK_SCAN_CODE)('S') :
 			case SK_DOWN: {
-				/*
 				if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
+					AddForwardSpeed(-0.1f);
 				else
-				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
-				*/
-				if (kbEvent->KeyState)
-					MoveForward(-0.1f);
+					AddForwardSpeed(0.1f);
 			} break;
 		}
 
 	Error:
 		return r;
+	}
+
+	// Update Functions
+	camera UpdateCameraPosition() {
+		camera_precision x, y, z;
+		m_qRotation.GetEulerAngles(&x, &y, &z);
+		
+		m_ptOrigin += vector(x, y, z) * m_cameraForwardSpeed;
+		//m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
+		return (*this);
 	}
 
 	// Non-Event driven keyboard input
@@ -281,8 +209,6 @@ public:
 			MoveForward(-0.1f);
 		}
 
-		//CR(UpdatePosition());
-
 	Error:
 		return r;
 	}
@@ -301,6 +227,8 @@ private:
 	// View (origin point is in the Virtual Object Parent)
 	// TODO: Move to virtual object?
 	camera_precision m_cameraRotateSpeed;
+	camera_precision m_cameraForwardSpeed;
+	camera_precision m_cameraStrafeSpeed;
 
 	/*
 public:

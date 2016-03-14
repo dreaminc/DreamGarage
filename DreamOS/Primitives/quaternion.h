@@ -22,21 +22,27 @@
 class quaternion {
 public:
 	quaternion() {
-		SetValues(0.0f, 1.0f, 0.0f, 0.0f);
+		SetQuaternion(0.0f, 0.0f, 0.0f, -1.0f);
 		Normalize();
 	}
 
 	quaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
+		SetQuaternion(theta, x, y, z);
+	}
+
+	RESULT SetQuaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 		quaternion_precision factor = sin(theta / 2.0);
 
 		quaternion_precision w = cos(theta / 2.0f);
-		
+
 		x *= factor;
 		y *= factor;
 		z *= factor;
 
 		SetValues(w, x, y, z);
 		Normalize();
+
+		return R_PASS;
 	}
 
 	RESULT SetValues(quaternion_precision w, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
@@ -132,7 +138,7 @@ public:
 	}
 
 	vector GetVector() {
-		return vector(m_x, m_y, m_z);
+		return vector(GetEulerAngelX(), GetEulerAngelY(), GetEulerAngelZ());
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline
