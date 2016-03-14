@@ -14,8 +14,11 @@
 
 #include <gl\gl.h>
 #include <gl\glu.h>                               // Header File For The GLu32 Library
-#include <gl\glext.h>
-#include <gl\wglext.h>
+//#include <gl\glext.h>
+//#include <gl\wglext.h>
+#include "HAL/opengl/GL/glext.h"
+#include "HAL/opengl/GL/wglext.h"
+
 
 #include "Sandbox/Windows/Windows64App.h"
 
