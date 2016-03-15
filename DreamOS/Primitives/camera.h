@@ -64,18 +64,24 @@ public:
 		return R_PASS;
 	}
 
-	matrix<camera_precision, 4, 1> GetUpVector() {
-		RotationMatrix matrixRotation(m_qRotation);
-		return matrixRotation * vector(0.0f, 1.0f, 0.0f);
+	vector GetUpVector() {
+		return vector::jVector();
 	}
 
-	matrix<camera_precision, 4, 1> GetRightVector() {
-		RotationMatrix matrixRotation(m_qRotation);
-		return matrixRotation * vector(1.0f, 0.0f, 0.0f);
+	vector GetRightVector() {
+		quaternion temp = m_qRotation;
+		temp.Normalize();
+
+		vector vectorRight = temp.RotateVector(vector::iVector());
+		return vectorRight.Normal();
 	}
 
 	vector GetLookVector() {
-		return m_qRotation.GetVector();
+		quaternion temp = m_qRotation;
+		temp.Normalize();
+
+		vector vectorLook = temp.RotateVector(vector::kVector());
+		return vectorLook.Normal();
 	}
 
 	ProjectionMatrix GetProjectionMatrix() { 
@@ -83,8 +89,7 @@ public:
 	}
 
 	ViewMatrix GetViewMatrix() { 
-		ViewMatrix mat = ViewMatrix(m_ptOrigin, m_qRotation);
-		
+		ViewMatrix mat = ViewMatrix(m_ptOrigin, m_qRotation);		
 		return mat;
 	}
 
@@ -92,9 +97,13 @@ public:
 		return (GetProjectionMatrix() * GetViewMatrix());
 	}
 
-	RESULT RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {
-		RotateYBy(dx * m_cameraRotateSpeed);
-		RotateXBy(dy * m_cameraRotateSpeed);
+	RESULT RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {	
+		m_qRotation.RotateByVector(GetRightVector(), dy * m_cameraRotateSpeed);
+		m_qRotation.RotateByVector(GetUpVector(), dx * m_cameraRotateSpeed);
+		m_qRotation.Normalize();
+
+		vector vectorLook = GetLookVector();
+		DEBUG_LINEOUT_RETURN("Camera rotating: x:%0.3f y:%0.3f z:%0.3f", vectorLook.x(), vectorLook.y(), vectorLook.z());
 
 		return R_PASS;
 	}
@@ -177,9 +186,10 @@ public:
 	camera UpdateCameraPosition() {
 		camera_precision x, y, z;
 		m_qRotation.GetEulerAngles(&x, &y, &z);
-		
-		m_ptOrigin += vector(x, y, z) * m_cameraForwardSpeed;
-		//m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
+				
+		m_ptOrigin += GetLookVector() * m_cameraForwardSpeed;
+		m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
+
 		return (*this);
 	}
 
@@ -222,20 +232,10 @@ private:
 	PROJECTION_MATRIX_TYPE m_ProjectionType;
 	camera_precision m_FielfOfViewAngle;		// Note this is in degrees, not radians
 
-	
-
-	// View (origin point is in the Virtual Object Parent)
 	// TODO: Move to virtual object?
 	camera_precision m_cameraRotateSpeed;
 	camera_precision m_cameraForwardSpeed;
 	camera_precision m_cameraStrafeSpeed;
-
-	/*
-public:
-	vector m_vLook;
-	vector m_vUp;
-	vector m_vRight;
-	*/
 };
 
 #endif // ! CAMERA_H_

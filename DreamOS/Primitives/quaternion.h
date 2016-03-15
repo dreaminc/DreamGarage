@@ -26,6 +26,14 @@ public:
 		Normalize();
 	}
 
+	quaternion(vector v) {
+		SetValues(0.0f, v.x(), v.y(), v.z());
+	}
+
+	quaternion(quaternion_precision theta, vector vectorAxis) {
+		SetQuaternion(theta, vectorAxis.x(), vectorAxis.y(), vectorAxis.z());
+	}
+
 	quaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 		SetQuaternion(theta, x, y, z);
 	}
@@ -40,6 +48,7 @@ public:
 		z *= factor;
 
 		SetValues(w, x, y, z);
+		
 		Normalize();
 
 		return R_PASS;
@@ -73,15 +82,8 @@ public:
 	}
 
 	RESULT RotateByVector(vector v, quaternion_precision theta) {
-		quaternion localRotation;
-		quaternion_precision halfTheta = theta / 2.0f;
-
-		localRotation.w() = cos(halfTheta);
-		localRotation.x() = v.x() * sin(halfTheta);
-		localRotation.y() = v.y() * sin(halfTheta);
-		localRotation.z() = v.z() * sin(halfTheta);
-
-		quaternion(*this).operator*=(localRotation);
+		quaternion localRotation(theta, v);
+		(*this) *= localRotation;
 
 		return R_PASS;
 	}
@@ -99,17 +101,17 @@ public:
 	}
 
 	// Euler Conversions: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-	quaternion_precision GetEulerAngelX() {
+	quaternion_precision GetEulerAngelZ() {
 		quaternion_precision phi = atan2((2.0f * ((m_w * m_x) + (m_y * m_z))), (1 - 2.0f * (m_x*m_x + m_y*m_y)));
 		return phi;
 	}
 
-	quaternion_precision GetEulerAngelY() {
+	quaternion_precision GetEulerAngelX() {
 		quaternion_precision theta = asin((2.0f * ((m_w * m_y) - (m_z * m_x))));
 		return theta;
 	}
 
-	quaternion_precision GetEulerAngelZ() {
+	quaternion_precision GetEulerAngelY() {
 		quaternion_precision psi = atan2((2.0f * ((m_w * m_z) + (m_x * m_y))), (1 - 2.0f * (m_y*m_y + m_z*m_z)));
 		return psi;
 	}
@@ -126,9 +128,9 @@ public:
 
 		q.m_w = m_w;
 		
-		q.m_x = -m_x;
-		q.m_y = -m_y;
-		q.m_z = -m_z;
+		q.m_x = -1.0f * m_x;
+		q.m_y = -1.0f * m_y;
+		q.m_z = -1.0f * m_z;
 
 		return q;
 	}
@@ -138,7 +140,26 @@ public:
 	}
 
 	vector GetVector() {
-		return vector(GetEulerAngelX(), GetEulerAngelY(), GetEulerAngelZ());
+		return vector(m_x, m_y, m_z);
+	}
+
+	// http://www.mathworks.com/help/aeroblks/quaternionrotation.html
+	vector RotateVector(vector v) {
+		vector retVal;
+
+		retVal.x() = v.x() * (1.0f - 2 * (y2() + z2()))	+
+				     v.y() * (2 * (x()*y() + w()*z()))	+
+					 v.z() * (2 * (x()*z() - w()*y()));
+
+		retVal.y() = v.x() * (2 * (x()*y() - w()*z())) +
+					 v.y() * (1.0f - 2 * (x2() + z2())) +
+					 v.z() * (2 * (y()*z() + w()*x()));
+
+		retVal.z() = v.x() * (2 * (x()*z() + w()*y())) +
+					 v.y() * (2 * (y()*z() - w()*x())) +
+					 v.z() * (1.0f - 2 * (x2() + y2()));
+
+		return retVal;
 	}
 
 	// TODO: Understand performance implications of this although both element and this are inline
@@ -160,16 +181,18 @@ public:
 	// http://www.mathworks.com/help/aeroblks/quaternionmultiplication.html
 	quaternion& operator*=(const quaternion& r) {
 		/*
-		m_w = m_w * rhs.m_w - m_x*rhs.m_x - m_y*rhs.m_y - m_z*rhs.m_z;
-		m_x = m_w * rhs.m_x + m_x*rhs.m_w - m_y*rhs.m_z + m_z*rhs.m_y;
-		m_y = m_w * rhs.m_y + m_x*rhs.m_z + m_y*rhs.m_w - m_z*rhs.m_x;
-		m_z = m_w * rhs.m_z - m_x*rhs.m_y + m_y*rhs.m_x + m_z*rhs.m_w;
-		*/
+		m_w = m_w * r.m_w - m_x*r.m_x - m_y*r.m_y - m_z*r.m_z;
+		m_x = m_w * r.m_x + m_x*r.m_w - m_y*r.m_z + m_z*r.m_y;
+		m_y = m_w * r.m_y + m_x*r.m_z + m_y*r.m_w - m_z*r.m_x;
+		m_z = m_w * r.m_z - m_x*r.m_y + m_y*r.m_x + m_z*r.m_w;
+		//*/
 
+		///*
 		m_w = r.m_w * m_w - r.m_x * m_x - r.m_y * m_y - r.m_z * m_z;
 		m_x = r.m_w * m_x + r.m_x * m_w - r.m_y * m_z + r.m_z * m_y;
 		m_y = r.m_w * m_y + r.m_x * m_z + r.m_y * m_w - r.m_z * m_x;
 		m_z = r.m_w * m_z - r.m_x * m_y + r.m_y * m_x + r.m_z * m_w;
+		//*/
 
 		return (*this);
 	}
@@ -206,12 +229,23 @@ public:
 
 	// Utility
 public:
-	static quaternion iQuaternion(quaternion_precision theta) { return quaternion(theta, 1.0f, 0.0f, 0.0f); }
-	static quaternion jQuaternion(quaternion_precision theta) { return quaternion(theta, 0.0f, 1.0f, 0.0f); }
-	static quaternion kQuaternion(quaternion_precision theta) { return quaternion(theta, 0.0f, 0.0f, 1.0f); }
+	static quaternion iQuaternion(quaternion_precision theta) { 
+		return quaternion(theta, 1.0f, 0.0f, 0.0f); 
+	}
+
+	static quaternion jQuaternion(quaternion_precision theta) { 
+		return quaternion(theta, 0.0f, 1.0f, 0.0f); 
+	}
+	
+	static quaternion kQuaternion(quaternion_precision theta) { 
+		return quaternion(theta, 0.0f, 0.0f, 1.0f); 
+	}
 
 private:
+	// theta (q0)
 	quaternion_precision m_w;
+
+	// vector (q1, q2, q3)
 	quaternion_precision m_x;
 	quaternion_precision m_y;
 	quaternion_precision m_z;

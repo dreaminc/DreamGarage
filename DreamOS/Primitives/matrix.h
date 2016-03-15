@@ -199,11 +199,6 @@ public:
             m_data[i] -= data[i];
     }
 
-    inline void multData(const TMatrix& a) {
-        for(int i = 0; i < (N * M); i++)
-            m_data[i] *= a;
-    }
-
     inline void divData(const TMatrix& a) {
         for(int i = 0; i < (N * M); i++)
             m_data[i] /= a;
@@ -336,7 +331,9 @@ public:
 	// Scalar multiplication / Division
 	// -------------------------------------------------------------------------
 	matrix& operator*=(const TMatrix& a) {
-		multData(a);
+		for (int i = 0; i < (N * M); i++)
+			m_data[i] *= a;
+
 		return *this;
 	}
 

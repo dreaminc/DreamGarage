@@ -503,7 +503,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
 		z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
 
-		//pDimObj->RotateBy(x * factor, y * factor, z * factor);
+		pDimObj->RotateBy(x * factor, y * factor, z * factor);
 
 		SendObjectToShader(pDimObj);
 	}
