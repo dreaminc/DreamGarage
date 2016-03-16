@@ -36,6 +36,12 @@ public:
 		this->element(3, 0) = 1.0f;
 	}
 
+	point(const matrix<point_precision, 4, 1>& arg) :
+		matrix<point_precision, 4, 1>(arg)
+	{
+		// empty
+	}
+
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline point_precision &x() { return this->element(0, 0); }
 	inline point_precision &y() { return this->element(1, 0); }
@@ -85,6 +91,12 @@ public:
 
 		return *this;
 	}
+
+	/*
+	point& operator+=(const matrix<point_precision, 4, 1>& arg) {
+		return (point)(matrix<point_precision, 4, 1>::operator+=(arg));
+	}
+	*/
 };
 
 #endif // !POINT_H_

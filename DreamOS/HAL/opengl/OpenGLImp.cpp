@@ -327,7 +327,8 @@ RESULT OpenGLImp::PrepareScene() {
 	CR(PrintActiveUniformVariables());
 
 	// Allocate the camera
-	m_pCamera = new camera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
+	//m_pCamera = new camera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 
 Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -354,15 +355,15 @@ Error:
 }
 
 // Assumes Context Current
-RESULT OpenGLImp::SetStereoViewTarget(RENDER_VIEW_TARGET target) {
+RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
-	switch (target) {
-		case RENDER_VIEW_STEREO_LEFT: {
+	switch (eye) {
+		case EYE_LEFT: {
 			glViewport(0, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
 		} break;
 
-		case RENDER_VIEW_STEREO_RIGHT: {
+		case EYE_RIGHT: {
 			glViewport((GLsizei)m_pxViewWidth / 2, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
 		} break;
 
@@ -481,7 +482,16 @@ RESULT OpenGLImp::UpdateCamera() {
 	RESULT r = R_PASS;
 
 	m_pCamera->UpdateCameraPosition();
-	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix();
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
+	RESULT r = R_PASS;
+
+	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix(eye);
+
 	GLint locationViewProjectionMatrix = -1;
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ViewProjection", &locationViewProjectionMatrix);
 
@@ -493,7 +503,6 @@ Error:
 }
 
 #include "OGLVolume.h"
-
 
 // TODO: Other approach 
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
@@ -519,20 +528,21 @@ Error:
 
 RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
-	
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	DimObj *pDimObj = NULL;
 
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Camera Projection Matrix
+	SetCameraMatrix(EYE_MONO);
 
 	// Send SceneGraph objects to shader
 	pSceneGraph->Reset();
-	
-	DimObj *pDimObj = NULL;
 	while((pDimObj = pObjectStore->GetNextObject()) != NULL) {
 		SendObjectToShader(pDimObj);
 	}
 	
-	//glFlush();
+	glFlush();
 
 Error:
 	CheckGLError();
@@ -541,16 +551,24 @@ Error:
 
 RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
-	
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	DimObj *pDimObj = NULL;
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Left View
-	CR(SetStereoViewTarget(RENDER_VIEW_STEREO_LEFT));
-	CR(Render(pSceneGraph));
+	for (int i = 0; i < 2; i++) {
 
-	// Right View
-	CR(SetStereoViewTarget(RENDER_VIEW_STEREO_RIGHT));
-	CR(Render(pSceneGraph));
+		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
+
+		SetStereoViewTarget(eye);
+		SetCameraMatrix(eye);
+
+		// Send SceneGraph objects to shader
+		pSceneGraph->Reset();
+		while ((pDimObj = pObjectStore->GetNextObject()) != NULL) {
+			SendObjectToShader(pDimObj);
+		}
+	}
 	
 	glFlush();
 

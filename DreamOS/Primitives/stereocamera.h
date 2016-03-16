@@ -22,10 +22,9 @@ enum EYE_TYPE {
 class stereocamera : public camera {
 public:
 	stereocamera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
-		camera(ptOrigin, FOV, pxScreenWidth, pxScreenHeight),
-		m_pupillaryDistance(DEFAULT_PUPILLARY_DISTANCE)
+		camera(ptOrigin, FOV, pxScreenWidth, pxScreenHeight)
 	{
-
+		m_pupillaryDistance = (DEFAULT_PUPILLARY_DISTANCE / 1000.0f);
 	}
 
 	ViewMatrix GetViewMatrix(EYE_TYPE eye) {
@@ -37,7 +36,7 @@ public:
 			} break;
 
 			case EYE_RIGHT: {
-				point rightEyePoint = m_ptOrigin - (GetRightVector() * (m_pupillaryDistance / 2.0f));
+				point rightEyePoint = m_ptOrigin + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
 				mat = ViewMatrix(rightEyePoint, m_qRotation);
 			} break;
 

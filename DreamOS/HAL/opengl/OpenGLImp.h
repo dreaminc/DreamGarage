@@ -17,7 +17,8 @@
 #include "OGLVertexShader.h"
 #include "OGLFragmentShader.h"
 
-#include "Primitives/camera.h"
+//#include "Primitives/camera.h"
+#include "Primitives/stereocamera.h"
 
 #include "OpenGLExtensions.h"
 
@@ -56,7 +57,7 @@ public:
 
 public:
 
-	RESULT SetStereoViewTarget(RENDER_VIEW_TARGET target);
+	RESULT SetStereoViewTarget(EYE_TYPE eye);
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT ShutdownImplementaiton();
 	
@@ -69,6 +70,8 @@ public:
 	
 	camera *GetCamera();
 	RESULT UpdateCamera();
+	RESULT SetCameraMatrix(EYE_TYPE viewTarget);
+
 	RESULT LoadScene(SceneGraph *pSceneGraph);
 
 	// Rendering Context 
@@ -88,7 +91,8 @@ private:
 	OGLFragmentShader *m_pFragmentShader;
 	// TODO: Other shaders
 
-	camera *m_pCamera;
+	//camera *m_pCamera;
+	stereocamera *m_pCamera;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
