@@ -136,15 +136,6 @@
     <ClInclude Include="..\..\..\Test\TestObject.h">
       <Filter>Test</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\OSX\OSXApp.h">
-      <Filter>Sandbox\OSX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h">
-      <Filter>Sandbox\OSX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h">
-      <Filter>Sandbox\OSX</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
       <Filter>RESULT</Filter>
     </ClInclude>
@@ -347,15 +338,6 @@
     </None>
     <None Include="..\..\..\Rakefile">
       <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\..\OSX\OSXApp.mm">
-      <Filter>Sandbox\OSX</Filter>
-    </None>
-    <None Include="..\..\..\OSX\OSXAppDelegate.mm">
-      <Filter>Sandbox\OSX</Filter>
-    </None>
-    <None Include="..\..\..\OSX\OSXOpenGLView.m">
-      <Filter>Sandbox\OSX</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag">
       <Filter>HAL\opengl\GLSL</Filter>
