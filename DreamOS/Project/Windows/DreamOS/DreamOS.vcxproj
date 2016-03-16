@@ -106,6 +106,9 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedUsingFiles>
+      </ForcedUsingFiles>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
