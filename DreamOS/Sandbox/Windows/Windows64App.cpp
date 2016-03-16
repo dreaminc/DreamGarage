@@ -338,7 +338,7 @@ RESULT Windows64App::ShowSandbox() {
 	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
 	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
 
-	CRM(SetDimensions(m_posX, m_posY), "Failed to resize OpenGL Implemenation");
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
 
