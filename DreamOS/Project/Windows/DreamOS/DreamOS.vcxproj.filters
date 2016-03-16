@@ -337,6 +337,9 @@
     <ClInclude Include="..\..\..\Primitives\quaternion.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\stereocamera.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

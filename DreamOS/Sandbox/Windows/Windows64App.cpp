@@ -382,7 +382,8 @@ RESULT Windows64App::ShowSandbox() {
 		m_pOpenGLImp->UpdateCamera();
 
 		// Render Scene
-		m_pOpenGLImp->Render(m_pSceneGraph);
+		//m_pOpenGLImp->Render(m_pSceneGraph);
+		m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 
 		// Swap buffers
 		SwapBuffers(m_hDC);

@@ -205,6 +205,7 @@
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
+    <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
     <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\point.h" />

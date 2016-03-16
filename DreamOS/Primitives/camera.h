@@ -25,6 +25,12 @@
 	typedef double camera_precision;
 #endif
 
+enum RENDER_VIEW_TARGET {
+	RENDER_VIEW_STEREO_LEFT,
+	RENDER_VIEW_STEREO_RIGHT,
+	RENDER_VIEW_STEREO_TARGET_INVALID
+};
+
 #define DEFAULT_NEAR_PLANE 1.0f
 #define DEFAULT_FAR_PLANE 100.0f
 #define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
@@ -50,8 +56,6 @@ public:
 	{
 		m_ptOrigin = ptOrigin;
 		m_qRotation = quaternion(0.0f, 0.0f, 0.0f, 0.0f);
-
-		Update();
 	}
 
 	~camera() {

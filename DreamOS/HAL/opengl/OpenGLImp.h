@@ -55,9 +55,14 @@ public:
 	~OpenGLImp();
 
 public:
+
+	RESULT SetStereoViewTarget(RENDER_VIEW_TARGET target);
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT ShutdownImplementaiton();
+	
 	RESULT Render(SceneGraph *pSceneGraph);
+	RESULT RenderStereo(SceneGraph *pSceneGraph);
+
 	RESULT SendObjectToShader(DimObj *pDimObj);
 	RESULT PrintVertexAttributes();
 	RESULT PrintActiveUniformVariables();

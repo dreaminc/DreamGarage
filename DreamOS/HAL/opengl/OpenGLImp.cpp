@@ -348,8 +348,29 @@ RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
 	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
 Error:
-	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
+	//CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
+	return r;
+}
+
+// Assumes Context Current
+RESULT OpenGLImp::SetStereoViewTarget(RENDER_VIEW_TARGET target) {
+	RESULT r = R_PASS;
+
+	switch (target) {
+		case RENDER_VIEW_STEREO_LEFT: {
+			glViewport(0, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
+		} break;
+
+		case RENDER_VIEW_STEREO_RIGHT: {
+			glViewport((GLsizei)m_pxViewWidth / 2, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
+		} break;
+
+	}
+
+	m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight);
+
+Error:
 	return r;
 }
 
@@ -501,7 +522,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Send SceneGraph objects to shader
 	pSceneGraph->Reset();
@@ -511,12 +532,32 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		SendObjectToShader(pDimObj);
 	}
 	
-	glFlush();
+	//glFlush();
 
 Error:
 	CheckGLError();
 	return r;
 }
+
+RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Left View
+	CR(SetStereoViewTarget(RENDER_VIEW_STEREO_LEFT));
+	CR(Render(pSceneGraph));
+
+	// Right View
+	CR(SetStereoViewTarget(RENDER_VIEW_STEREO_RIGHT));
+	CR(Render(pSceneGraph));
+	
+	glFlush();
+
+Error:
+	return r;
+}
+
 
 RESULT OpenGLImp::ShutdownImplementaiton() {
 	RESULT r = R_PASS;
