@@ -133,7 +133,7 @@ Error:
 	return r;
 }
 
-RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, wchar_t *pszFileName, wchar_t * &n_pszFilePath) {
+RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName, wchar_t * &n_pszFilePath) {
 	RESULT r = R_PASS;
 	errno_t err;
 	long pszFileName_n = wcslen(pszFileName);

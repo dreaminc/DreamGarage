@@ -25,7 +25,7 @@ public:
 	//virtual RESULT Enable() = 0;
 	//virtual RESULT Disable() = 0;
 
-	virtual RESULT LoadShaderCodeFromFile(wchar_t *pszFilename) = 0;
+	virtual RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename) = 0;
 	virtual RESULT Compile(void) = 0;
 
 	/*

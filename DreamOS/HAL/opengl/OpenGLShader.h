@@ -18,9 +18,9 @@ public:
 	OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType);
 	~OpenGLShader(void);
 
-	RESULT InitializeFromFile(wchar_t *pszFilename);
+	RESULT InitializeFromFile(const wchar_t *pszFilename);
 	
-	RESULT LoadShaderCodeFromFile(wchar_t *pszFilename);
+	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename);
 	RESULT LoadShaderCodeFromString(const char* pszSource);
 
 	RESULT Compile(void);

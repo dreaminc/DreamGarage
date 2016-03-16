@@ -40,7 +40,7 @@ const char *OpenGLShader::GetShaderCode() {
 	return m_pszShaderCode; 
 }
 
-RESULT OpenGLShader::LoadShaderCodeFromFile(wchar_t *pszFilename) {
+RESULT OpenGLShader::LoadShaderCodeFromFile(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
@@ -63,7 +63,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLShader::InitializeFromFile(wchar_t *pszFilename) {
+RESULT OpenGLShader::InitializeFromFile(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
 	CRM(LoadShaderCodeFromFile(pszFilename), "Failed to load vertex shader code from %S", pszFilename);

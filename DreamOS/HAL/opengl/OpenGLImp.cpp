@@ -46,6 +46,26 @@ RESULT OpenGLImp::InitializeOpenGLVersion() {
 	return R_PASS;
 }
 
+RESULT OpenGLImp::InitializeShadersFolder() {
+	if (m_versionMajor != 4)
+	{
+		DEBUG_LINEOUT("No existing shader for this GLSL version.");
+		return R_FAIL;
+	}
+
+	switch (m_versionMinor)
+	{
+	case 0:
+		m_shadersFolder = L"v400";
+		break;
+	case 4:
+		m_shadersFolder = L"v440";
+		break;
+	}
+
+	return R_PASS;
+}
+
 RESULT OpenGLImp::CreateGLProgram() {
 	RESULT r = R_PASS;
 
@@ -69,6 +89,8 @@ RESULT OpenGLImp::InitializeGLContext() {
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
 	CR(InitializeOpenGLVersion());
 	CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
+
+	CR(InitializeShadersFolder());
 
 	// Should be called after context is created and made current
 	ACRM(m_OpenGLExtensions.InitializeExtensions(), "Failed to initialize extensions");
@@ -311,12 +333,12 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO: Likely put into factory
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
-	CRM(pVertexShader->InitializeFromFile(L"minimal.vert"), "Failed to initialize vertex shader from file");
+	CRM(pVertexShader->InitializeFromFile((m_shadersFolder + L"\\minimal.vert").c_str()), "Failed to initialize vertex shader from file");
 	CR(pVertexShader->BindAttributes());
 
 	OpenGLShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
-	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag"), "Failed to initialize fragment shader from file");
+	CRM(pFragmentShader->InitializeFromFile((m_shadersFolder + L"\\minimal.frag").c_str()), "Failed to initialize fragment shader from file");
 	
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
