@@ -506,6 +506,8 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	return R_PASS;
 
+	return R_PASS;
+
 Error:
 	CheckGLError();
 	m_pOpenGLRenderingContext->ReleaseCurrentContext();
