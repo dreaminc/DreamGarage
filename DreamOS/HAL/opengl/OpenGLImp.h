@@ -63,6 +63,8 @@ public:
 	RESULT PrintActiveUniformVariables();
 	
 	camera *GetCamera();
+	RESULT UpdateCamera();
+	RESULT LoadScene(SceneGraph *pSceneGraph);
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();

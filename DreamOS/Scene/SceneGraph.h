@@ -41,6 +41,10 @@ public:
 
 	SceneGraphStore *GetSceneGraphStore() { return m_pSceneGraphStore; }
 
+	// TODO: Arch here
+	RESULT UpdateScene();
+	RESULT LoadScene();
+
 private:
 	SceneGraphStore *m_pSceneGraphStore;
 	UID m_uid;

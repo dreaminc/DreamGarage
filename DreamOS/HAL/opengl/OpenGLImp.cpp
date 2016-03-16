@@ -1,6 +1,10 @@
 #include "OpenGLImp.h"
 #include "OGLObj.h"
 
+#include "Primitives/ProjectionMatrix.h"
+#include "Primitives/TranslationMatrix.h"
+#include "Primitives/RotationMatrix.h"
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
 	m_versionMinor(0),
@@ -282,15 +286,6 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
 }
 
-// TODO: Get this outta here
-#include "Primitives/ProjectionMatrix.h"
-
-// TODO: Get this outta here
-#include "Primitives/TranslationMatrix.h"
-
-// TODO: Get this outta here
-#include "Primitives/RotationMatrix.h"
-
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -452,38 +447,59 @@ inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 
 	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
 	auto matModel = pDimObj->GetModelMatrix();
-	auto matMVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix() * matModel;
-
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Projection", &locationProjectionMatrix);
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4View", &locationViewMatrix);
+	
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ModelViewProjection", &locationModelViewProjectionMatrix);
-
-	if (locationProjectionMatrix >= 0)
-		glUniformMatrix4fv(locationProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetProjectionMatrix()));
-
-	if (locationViewMatrix >= 0)
-		glUniformMatrix4fv(locationViewMatrix, 1, GL_FALSE, (GLfloat*)(&m_pCamera->GetViewMatrix()));
 
 	if (locationModelMatrix >= 0)
 		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
 
-	if (locationModelViewProjectionMatrix >= 0)
-		glUniformMatrix4fv(locationModelViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matMVP));
-
 	return pOGLObj->Render();
+}
+
+RESULT OpenGLImp::UpdateCamera() {
+	RESULT r = R_PASS;
+
+	m_pCamera->UpdateCameraPosition();
+	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix();
+	GLint locationViewProjectionMatrix = -1;
+	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ViewProjection", &locationViewProjectionMatrix);
+
+	if (locationViewProjectionMatrix >= 0)
+		glUniformMatrix4fv(locationViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matVP));
+
+Error:
+	return r;
+}
+
+#include "OGLVolume.h"
+
+
+// TODO: Other approach 
+RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+
+	OGLVolume *pVolume = NULL;
+	int num = 20;
+	double size = 0.2f;
+
+	for (int i = 0; i < num; i++) {
+		for (int j = 0; j < num; j++) {
+			pVolume = new OGLVolume(this, size);
+			pVolume->SetRandomColor();
+			pVolume->translate(i * (size * 2) - (num * size), 0.0f, j * (size * 2) - (num * size));
+			pVolume->UpdateOGLBuffers();
+			pSceneGraph->PushObject(pVolume);
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
-
-	// TODO: fix camera thing !!
-	//m_pCamera->UpdateFromKeyboardState((SenseKeyboard*)(m_pWindows64App->m_pWin64Keyboard));
-	m_pCamera->UpdateCameraPosition(); 
-
-	m_pOpenGLRenderingContext->MakeCurrentContext();
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -492,19 +508,6 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	
 	DimObj *pDimObj = NULL;
 	while((pDimObj = pObjectStore->GetNextObject()) != NULL) {
-		quaternion_precision factor = 0.05;
-		quaternion_precision filter = 0.1;
-		
-		static quaternion_precision x = 0;
-		static quaternion_precision y = 0;
-		static quaternion_precision z = 0;
-
-		x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-
-		pDimObj->RotateBy(x * factor, y * factor, z * factor);
-
 		SendObjectToShader(pDimObj);
 	}
 	
@@ -512,8 +515,6 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 Error:
 	CheckGLError();
-	m_pOpenGLRenderingContext->ReleaseCurrentContext();
-
 	return r;
 }
 

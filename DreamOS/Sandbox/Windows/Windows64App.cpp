@@ -350,28 +350,15 @@ RESULT Windows64App::ShowSandbox() {
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
 
-	// TODO: Proper loading of the scene here?
-	{
-		OGLVolume *pVolume = NULL;
-		int num = 20;
-		double size = 0.2f;
-
-		for (int i = 0; i < num; i++) {
-			for (int j = 0; j < num; j++) {
-				pVolume = new OGLVolume(m_pOpenGLImp, size);
-				pVolume->SetRandomColor();
-				pVolume->translate(i * (size * 2) - (num * size), 0.0f, j * (size * 2) - (num * size));
-				pVolume->UpdateOGLBuffers();
-				m_pSceneGraph->PushObject(pVolume);
-			}
-		}		
-	}
-
-	
+	// TODO: Should replace this with a proper scene loader
+	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph), "Failed to load scene");
 
 	// Launch main message loop
 	MSG msg;
 	bool fQuit = false;
+
+	CN(m_pOpenGLImp);
+	CR(m_pOpenGLImp->MakeCurrentContext());
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {
@@ -385,20 +372,28 @@ RESULT Windows64App::ShowSandbox() {
 		// Update the mouse
 		// TODO: This is wrong architecture, this should
 		// be parallel 
+		// TODO: Update Sense etc
 		m_pWin64Mouse->UpdateMousePosition();
 
-		if(m_pOpenGLImp != NULL)
-			m_pOpenGLImp->Render(m_pSceneGraph);
+		// Update Scene 
+		CR(m_pSceneGraph->UpdateScene());
+
+		// Update Camera
+		m_pOpenGLImp->UpdateCamera();
+
+		// Render Scene
+		m_pOpenGLImp->Render(m_pSceneGraph);
 
 		// Swap buffers
 		SwapBuffers(m_hDC);
 
-		if (GetAsyncKeyState(VK_ESCAPE))
+		if (GetAsyncKeyState(VK_ESCAPE)) {
 			ShutdownSandbox();
+			fQuit = true;
+		}
 	}
 
 	return (RESULT)(msg.wParam);
-
 Error:
 	return r;
 }
@@ -416,11 +411,14 @@ RESULT Windows64App::ShutdownSandbox() {
 		m_pOpenGLImp = NULL;
 	}
 
+	wglMakeCurrent(NULL, NULL);
+
 	PostQuitMessage(0);		// make sure the window will be destroyed
 
 	// If full screen, change back to original res
-	if (m_fFullscreen)	
+	if (m_fFullscreen) {
 		RecoverDisplayMode();
+	}
 
 Error:
 	return r;
