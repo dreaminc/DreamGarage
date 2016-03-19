@@ -351,7 +351,7 @@ RESULT Windows64App::ShowSandbox() {
 	UpdateWindow(m_hwndWindow);
 
 	// TODO: Should replace this with a proper scene loader
-	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph), "Failed to load scene");
+	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, &m_globalTime), "Failed to load scene");
 
 	// Launch main message loop
 	MSG msg;
@@ -368,6 +368,8 @@ RESULT Windows64App::ShowSandbox() {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		m_globalTime.update();
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should

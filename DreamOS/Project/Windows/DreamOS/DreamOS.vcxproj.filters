@@ -122,6 +122,9 @@
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\TimeObj.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -329,6 +332,9 @@
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\stereocamera.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\TimeObj.h">
       <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>

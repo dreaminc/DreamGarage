@@ -162,6 +162,7 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\TimeObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
@@ -214,6 +215,7 @@
     <ClInclude Include="..\..\..\Primitives\RotationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\texture.h" />
+    <ClInclude Include="..\..\..\Primitives\TimeObj.h" />
     <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
     <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />

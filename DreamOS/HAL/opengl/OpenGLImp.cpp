@@ -527,11 +527,11 @@ Error:
 #include "OGLVolume.h"
 
 // TODO: Other approach 
-RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
+RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeObj *pTimeObj) {
 	RESULT r = R_PASS;
 
 	OGLVolume *pVolume = NULL;
-	int num = 20;
+	int num = 100;
 	double size = 0.2f;
 
 	for (int i = 0; i < num; i++) {
@@ -540,6 +540,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 			pVolume->SetRandomColor();
 			pVolume->translate(i * (size * 2) - (num * size), 0.0f, j * (size * 2) - (num * size));
 			pVolume->UpdateOGLBuffers();
+			pTimeObj->addTimeObject(static_cast<TimeObject*>(pVolume));
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
