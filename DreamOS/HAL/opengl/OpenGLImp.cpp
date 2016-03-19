@@ -47,22 +47,27 @@ RESULT OpenGLImp::InitializeOpenGLVersion() {
 }
 
 RESULT OpenGLImp::InitializeShadersFolder() {
-	if (m_versionMajor != 4)
-	{
-		DEBUG_LINEOUT("No existing shader for this GLSL version.");
-		return R_FAIL;
+	RESULT r = R_PASS;
+
+	CBM((m_versionMajor == 4), "No existing shader for this GLSL version");
+
+	switch (m_versionMinor) {
+		case 0: {
+			m_shadersFolder = L"v400";
+		} break;
+
+		case 5: 
+		case 4: {
+			m_shadersFolder = L"v440";
+			break;
+		}
+
+		default: {
+			CBM((0), "No existing shader for GL %d.%d", m_versionMajor, m_versionMinor);
+		} break;
 	}
 
-	switch (m_versionMinor)
-	{
-	case 0:
-		m_shadersFolder = L"v400";
-		break;
-	case 4:
-		m_shadersFolder = L"v440";
-		break;
-	}
-
+Error:
 	return R_PASS;
 }
 
