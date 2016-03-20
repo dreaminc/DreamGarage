@@ -1,5 +1,5 @@
-#include "OGLVertexShader.h"
 #include "OpenGLImp.h"
+#include "OGLVertexShader.h"
 
 OGLVertexShader::OGLVertexShader(OpenGLImp *pParentImp) :
 	OpenGLShader(pParentImp, GL_VERTEX_SHADER)

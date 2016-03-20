@@ -242,7 +242,13 @@ public:
 
 	// Utility
 public:
-	static long DigitCount(double num) { return ceil(log10((double)num)); }
+	static long DigitCount(double num) { 
+		if (num == 0)
+			return 1.0f;
+
+		long digitCount = (long)ceil(log10((double)(num)));
+		return digitCount;
+	}
 };
 
 #endif // !INTEGER_H_

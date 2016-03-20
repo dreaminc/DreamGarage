@@ -7,16 +7,26 @@
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
-	m_versionMinor(0),
-	m_versionMajor(0),
+	//m_versionMinor(0),
+	//m_versionMajor(0),
+	//m_versionGLSL(0),
+	m_versionOGL(0),
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
 	m_pFragmentShader(NULL),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
 	m_pCamera(NULL)
 {
-	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
-	ACRM(PrepareScene(), "Failed to prepare GL Scene");
+	RESULT r = R_PASS;
+
+	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
+	CRM(PrepareScene(), "Failed to prepare GL Scene");
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
 }
 
 OpenGLImp::~OpenGLImp() {
@@ -26,26 +36,36 @@ OpenGLImp::~OpenGLImp() {
 RESULT OpenGLImp::InitializeOpenGLVersion() {
 	// For all versions
 	char* pszVersion = (char*)glGetString(GL_VERSION); // Ver = "3.2.0"
+	int vMajor = 0, vMinor = 0, vDblMinor = 0;	// TODO: use minor?
 	DEBUG_LINEOUT("OpenGL Version %s", pszVersion);
 
-	m_versionMajor = pszVersion[0] - '0';
-	m_versionMinor = pszVersion[2] - '0';
+	vMajor = pszVersion[0] - '0';
+	vMinor = pszVersion[2] - '0';
+	vDblMinor = pszVersion[4] - '0';
 
 	// GL 3.x+
-	if (m_versionMajor >= 3) {
-		glGetIntegerv(GL_MAJOR_VERSION, &m_versionMajor); // major = 3
-		glGetIntegerv(GL_MINOR_VERSION, &m_versionMinor); // minor = 2
+	if (vMajor >= 3) {
+		glGetIntegerv(GL_MAJOR_VERSION, &vMajor); // major = 3
+		glGetIntegerv(GL_MINOR_VERSION, &vMinor); // minor = 2
 	}
+
+	m_versionOGL.SetVersion(vMajor, vMinor);
 
 	// GLSL
 	// "1.50 NVIDIA via Cg compiler"
-	// TODO: Parse this out for m_versionGLSL
 	pszVersion = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION); 
 	DEBUG_LINEOUT("OpenGL GLSL Version %s", pszVersion);
+
+	vMajor = pszVersion[0] - '0';
+	vMinor = pszVersion[2] - '0';
+	vDblMinor = pszVersion[4] - '0';
+
+	m_versionGLSL.SetVersion(vMajor, vMinor);
 
 	return R_PASS;
 }
 
+/*
 RESULT OpenGLImp::InitializeShadersFolder() {
 	RESULT r = R_PASS;
 
@@ -70,6 +90,7 @@ RESULT OpenGLImp::InitializeShadersFolder() {
 Error:
 	return R_PASS;
 }
+*/
 
 RESULT OpenGLImp::CreateGLProgram() {
 	RESULT r = R_PASS;
@@ -93,15 +114,16 @@ RESULT OpenGLImp::InitializeGLContext() {
 
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
 	CR(InitializeOpenGLVersion());
-	CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
+	//CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
+	CBM((m_versionOGL >= 3.2), "OpengL 3.2+ Not Supported");
 
-	CR(InitializeShadersFolder());
+	//CR(InitializeShadersFolder());
 
 	// Should be called after context is created and made current
 	ACRM(m_OpenGLExtensions.InitializeExtensions(), "Failed to initialize extensions");
 	
 	// Lets create the 3.2+ context
-	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(m_versionMajor, m_versionMinor), "Failed to initialize oglrc");
+	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(m_versionOGL), "Failed to initialize oglrc");
 	
 Error:
 	return r;
@@ -336,14 +358,18 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO: Should be stuffed into factory arch - return NULL on fail
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
+	// TODO: Move to GLSL version
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
-	CRM(pVertexShader->InitializeFromFile((m_shadersFolder + L"\\minimal.vert").c_str()), "Failed to initialize vertex shader from file");
+	//CRM(pVertexShader->InitializeFromFile((m_shadersFolder + L"\\minimal.vert").c_str()), "Failed to initialize vertex shader from file");
+	CRM(pVertexShader->InitializeFromFile(L"minimal.vert", m_versionOGL), "Failed to initialize vertex shader from file");
 	CR(pVertexShader->BindAttributes());
 
-	OpenGLShader *pFragmentShader = new OGLFragmentShader(this);
+	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
-	CRM(pFragmentShader->InitializeFromFile((m_shadersFolder + L"\\minimal.frag").c_str()), "Failed to initialize fragment shader from file");
+	//CRM(pFragmentShader->InitializeFromFile((m_shadersFolder + L"\\minimal.frag").c_str()), "Failed to initialize fragment shader from file");
+	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag", m_versionOGL), "Failed to initialize fragment shader from file");
+	//CR(pFragmentShader->BindAttributes());
 	
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
@@ -354,7 +380,6 @@ RESULT OpenGLImp::PrepareScene() {
 	CR(PrintActiveUniformVariables());
 
 	// Allocate the camera
-	//m_pCamera = new camera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());

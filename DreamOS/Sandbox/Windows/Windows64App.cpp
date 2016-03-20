@@ -337,6 +337,7 @@ RESULT Windows64App::ShowSandbox() {
 	
 	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
 	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
+	CVM(m_pOpenGLImp, "OpenGL Implementation Invalid");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 

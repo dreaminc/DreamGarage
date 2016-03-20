@@ -41,18 +41,28 @@ const char *OpenGLShader::GetShaderCode() {
 }
 
 RESULT OpenGLShader::LoadShaderCodeFromFile(const wchar_t *pszFilename) {
+	version tempVersion(0);
+	return LoadShaderCodeFromFile(pszFilename, tempVersion);
+}
+
+RESULT OpenGLShader::LoadShaderCodeFromFile(const wchar_t *pszFilename, version versionFile) {
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
 	wchar_t *pFilePath = NULL;
 
-	CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+	if (versionFile == 0) {
+		CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+	}
+	else {
+		CRM(pPathManager->GetFilePathVersion(PATH_SHADERS, versionFile, pszFilename, pFilePath), 
+			"Failed to get path for %S shader version %d.%d", pszFilename, versionFile.major(), versionFile.minor());
+	}
 
 	m_pszShaderCode = FileRead(pFilePath);
 	CNM(m_pszShaderCode, "Failed to read file %S", pFilePath);
 
 	DEBUG_LINEOUT("Loaded new shader %S", pFilePath);
-	//DEBUG_OUT(m_pszShaderCode);
 
 Error:
 	if (pFilePath != NULL) {
@@ -63,10 +73,10 @@ Error:
 	return r;
 }
 
-RESULT OpenGLShader::InitializeFromFile(const wchar_t *pszFilename) {
+RESULT OpenGLShader::InitializeFromFile(const wchar_t *pszFilename, version versionFile) {
 	RESULT r = R_PASS;
 
-	CRM(LoadShaderCodeFromFile(pszFilename), "Failed to load vertex shader code from %S", pszFilename);
+	CRM(LoadShaderCodeFromFile(pszFilename, versionFile), "Failed to load vertex shader code from %S", pszFilename);
 	CRM(Compile(), "Failed to compile shader");
 	CRM(AttachShader(), "Failed to attach vertex shader");
 

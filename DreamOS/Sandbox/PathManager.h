@@ -15,6 +15,7 @@
 #define DREAM_OS_PATHS_FILE "dreampaths.txt"	// TODO: Rename?
 
 #include <map>
+#include "Primitives/version.h"
 
 class PathManagerFactory;
 
@@ -30,14 +31,6 @@ typedef enum {
 // This sets the configuration that version paths will be preceded by
 // the letter v as in "v123\" vs "123\" for example
 #define PATH_VERSION_PATH_WITH_V true
-
-typedef struct AssetVersion {
-	int major;
-	int minor;
-	int doubleminor;
-} AssetVersion;
-
-AssetVersion CreateAssetVersion(int major, int minor, int doubleminor = 0);
 
 class PathManager : public valid {
 	friend class PathManagerFactory;
@@ -79,13 +72,13 @@ public:
 	virtual RESULT GetCurrentPath(wchar_t*&pszCurrentPath) = 0;
 	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) = 0;
 	
-	RESULT GetVersionFolder(AssetVersion ver, wchar_t* &n_pszVersionFolder);
+	RESULT GetVersionFolder(version ver, wchar_t* &n_pszVersionFolder);
 
 	RESULT GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath);
-	RESULT GetValuePathVersion(PATH_VALUE_TYPE type, AssetVersion ver, wchar_t* &n_pszVersionPath);
+	RESULT GetValuePathVersion(PATH_VALUE_TYPE type, version ver, wchar_t* &n_pszVersionPath);
 
 	RESULT GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName, wchar_t* &n_pszFilePath);
-	RESULT GetFilePathVersion(PATH_VALUE_TYPE type, AssetVersion ver, const wchar_t *pszFileName, wchar_t * &n_pszVersionFilePath);
+	RESULT GetFilePathVersion(PATH_VALUE_TYPE type, version ver, const wchar_t *pszFileName, wchar_t * &n_pszVersionFilePath);
 
 private:
 	UID m_uid;

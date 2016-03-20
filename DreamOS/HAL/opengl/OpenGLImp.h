@@ -18,6 +18,8 @@
 #include "OGLFragmentShader.h"
 
 //#include "Primitives/camera.h"
+#include "Primitives/valid.h"
+#include "Primitives/version.h"
 #include "Primitives/stereocamera.h"
 
 #include "OpenGLExtensions.h"
@@ -27,7 +29,7 @@
 class SandboxApp; 
 class Windows64App;
 
-class OpenGLImp : public HALImp {
+class OpenGLImp : public HALImp, public valid {
 private:
 
 	// TODO: Create an OpenGL Program class which should combine
@@ -37,10 +39,13 @@ private:
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
 
-	int m_versionMajor;
-	int m_versionMinor;
-	int m_versionGLSL;
-	std::wstring m_shadersFolder;	
+	version m_versionOGL;
+	version m_versionGLSL;
+
+	//int m_versionMajor;
+	//int m_versionMinor;
+	//int m_versionGLSL;
+	//std::wstring m_shadersFolder;	
 
 	// Viewport
 	// TODO: Move this into an object?
@@ -83,7 +88,7 @@ private:
 	//RESULT InitializeExtensions();
 	RESULT InitializeGLContext();
 	RESULT InitializeOpenGLVersion();
-	RESULT InitializeShadersFolder();
+	//RESULT InitializeShadersFolder();
 
 	RESULT PrepareScene();
 
