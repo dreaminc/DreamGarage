@@ -1,4 +1,15 @@
 #include "PathManager.h"
+#include "Primitives/Types/Number.h"
+
+AssetVersion CreateAssetVersion(int major, int minor, int doubleminor) {
+	AssetVersion retVer = {
+		major,			// major version
+		minor,			// minor version
+		doubleminor		// double minor version
+	};
+
+	return retVer;
+}
 
 // Initialize and allocate the instance
 PathManager* PathManager::m_pInstance = NULL;
@@ -100,14 +111,38 @@ Error:
 	return r;
 }
 
+RESULT PathManager::GetVersionFolder(AssetVersion ver, wchar_t* &n_pszVersionFolder) {
+	RESULT r = R_PASS;
+
+	// Length of digits of major, minor, double minor and the forward slash as well as null terminator
+	long n_pszVersionFolder_n = Number::DigitCount(ver.major) + Number::DigitCount(ver.minor) + Number::DigitCount(ver.doubleminor) + 2;
+	bool fPathVersionWithV = PATH_VERSION_PATH_WITH_V;
+
+	// Add one for the 'v' if applicable
+	if (fPathVersionWithV)
+		n_pszVersionFolder_n++;
+
+	memset(n_pszVersionFolder, 0, sizeof(wchar_t) * n_pszVersionFolder_n);
+
+	if (fPathVersionWithV) {
+		swprintf(n_pszVersionFolder, n_pszVersionFolder_n, L"v%d%d%d/", ver.major, ver.minor, ver.doubleminor);
+	}
+	else {
+		swprintf(n_pszVersionFolder, n_pszVersionFolder_n, L"%d%d%d/", ver.major, ver.minor, ver.doubleminor);
+	}
+
+Error:
+	return r;
+}
+
 RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	RESULT r = R_PASS;
+
 	long n_pszPath_n = 0;
 	wchar_t *pszDreamPath = NULL;
 	long pszDreamPath_n = 0;
 	wchar_t *pszValue = NULL;
 	long pszValue_n = 0;
-	//errno_t err;
 
 	CRM(IsPathRegistered(type), "Value not registered");
 	
@@ -124,8 +159,6 @@ RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	// Compose the path
 	// TODO: Maybe do some lower level parsing here since ./ will just get attached
     // TODO: This breaks cross-platform-ness
-	//err = wcsncat_s(n_pszPath, n_pszPath_n, pszDreamPath, pszDreamPath_n);
-	//err = wcsncat_s(n_pszPath, n_pszPath_n, pszValue, pszValue_n);
     wcsncat(n_pszPath, pszDreamPath, pszDreamPath_n);
     wcsncat(n_pszPath, pszValue, pszValue_n);
 
@@ -133,9 +166,50 @@ Error:
 	return r;
 }
 
+RESULT PathManager::GetValuePathVersion(PATH_VALUE_TYPE type, AssetVersion ver, wchar_t* &n_pszVersionPath) {
+	RESULT r = R_PASS;
+
+	wchar_t *pszValuePath = NULL;
+	long pszValuePath_n = 0;
+
+	wchar_t *pszVersionFolder = NULL;
+	long pszVersionFolder_n = 0;
+
+	long n_pszVersionPath_n = 0;
+
+	// Get Path
+	CRM(GetValuePath(type, pszValuePath), "Failed to get value %S path", GetPathValueString(type));
+	pszValuePath_n = wcslen(pszValuePath);
+
+	CRM(GetVersionFolder(ver, pszVersionFolder), "Failed to get version folder");
+	pszVersionFolder_n = wcslen(pszVersionFolder);
+
+	n_pszVersionPath_n = (pszValuePath_n + 1) + (pszVersionFolder_n + 1);
+	n_pszVersionPath = new wchar_t[n_pszVersionPath_n];
+	memset(n_pszVersionPath, 0, sizeof(wchar_t) * n_pszVersionPath_n);
+
+	// Compose the path
+	// TODO: Maybe do some lower level parsing here since ./ will just get attached
+	// TODO: This breaks cross-platform-ness
+	wcsncat(n_pszVersionPath, pszValuePath, pszValuePath_n);
+	wcsncat(n_pszVersionPath, pszVersionFolder, pszVersionFolder_n);
+
+Error:
+	if (pszValuePath != NULL) {
+		delete [] pszValuePath;
+		pszValuePath = NULL;
+	}
+
+	if (pszVersionFolder != NULL) {
+		delete [] pszVersionFolder;
+		pszVersionFolder = NULL;
+	}
+	return r;
+}
+
+// TODO: Move this to get file / FileManager
 RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName, wchar_t * &n_pszFilePath) {
 	RESULT r = R_PASS;
-	errno_t err;
 	long pszFileName_n = wcslen(pszFileName);
 	long n_pszFilePath_n = 0;
 
@@ -151,8 +225,6 @@ RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName
 
 	// Compose the path
 	// TODO: Maybe do some lower level parsing here since ./ will just get attached
-	//err = wcsncat_s(n_pszFilePath, n_pszFilePath_n, pszValuePath, pszValuePath_n);
-	//err = wcsncat_s(n_pszFilePath, n_pszFilePath_n, pszFileName, pszFileName_n);
     wcsncat(n_pszFilePath, pszValuePath, pszValuePath_n);
     wcsncat(n_pszFilePath, pszFileName, pszFileName_n);
 
@@ -163,5 +235,35 @@ Error:
 		pszValuePath = NULL;
 	}
 
+	return r;
+}
+
+// TODO: There is a lot of redundancy between this and the GetFilePath call
+// intent is different so better to keep it this way for now
+RESULT PathManager::GetFilePathVersion(PATH_VALUE_TYPE type, AssetVersion ver, const wchar_t *pszFileName, wchar_t * &n_pszVersionFilePath) {
+	RESULT r = R_PASS;
+	long pszFileName_n = wcslen(pszFileName);
+	long n_pszVersionFilePath_n = 0;
+
+	wchar_t *pszValueVersionPath = NULL;
+	long pszValueVersionPath_n = 0;
+
+	CRM(GetValuePathVersion(type, ver, pszValueVersionPath), "Failed to get value version path");
+	pszValueVersionPath_n = wcslen(pszValueVersionPath);
+
+	n_pszVersionFilePath_n = pszValueVersionPath_n + 1 + pszFileName_n + 1;
+	n_pszVersionFilePath = new wchar_t[n_pszVersionFilePath_n];
+	memset(n_pszVersionFilePath, 0, sizeof(wchar_t) * n_pszVersionFilePath_n);
+
+	// Compose the path
+	// TODO: Maybe do some lower level parsing here since ./ will just get attached
+	wcsncat(n_pszVersionFilePath, pszValueVersionPath, pszValueVersionPath_n);
+	wcsncat(n_pszVersionFilePath, pszFileName, pszFileName_n);
+
+Error:
+	if (pszValueVersionPath != NULL) {
+		delete[] pszValueVersionPath;
+		pszValueVersionPath = NULL;
+	}
 	return r;
 }

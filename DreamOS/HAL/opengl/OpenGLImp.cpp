@@ -357,9 +357,9 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pCamera = new camera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 
-Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
+Error:
 	return r;
 }
 

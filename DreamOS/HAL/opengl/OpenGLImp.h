@@ -40,7 +40,7 @@ private:
 	int m_versionMajor;
 	int m_versionMinor;
 	int m_versionGLSL;
-	std::wstring m_shadersFolder;
+	std::wstring m_shadersFolder;	
 
 	// Viewport
 	// TODO: Move this into an object?
