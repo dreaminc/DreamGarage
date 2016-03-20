@@ -58,7 +58,7 @@ RESULT OpenGLShader::LoadShaderCodeFromFile(const wchar_t *pszFilename, version 
 		version versionFileExists = 0;
 		CRM(pPathManager->GetFileVersionThatExists(PATH_SHADERS, versionFile, pszFilename, &versionFileExists), "Failed to get existing file version");
 
-		CRM(pPathManager->GetFilePathVersion(PATH_SHADERS, versionFile, pszFilename, pFilePath), 
+		CRM(pPathManager->GetFilePathVersion(PATH_SHADERS, versionFileExists, pszFilename, pFilePath),
 			"Failed to get path for %S shader version %d.%d", pszFilename, versionFile.major(), versionFile.minor());
 	}
 

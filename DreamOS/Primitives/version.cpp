@@ -16,6 +16,10 @@ version::version(float fVer) {
 	SetVersion(fVer);
 }
 
+version::version(long lVer) {
+	SetVersion(lVer);
+}
+
 version::~version() {
 	// empty
 }
@@ -49,6 +53,25 @@ RESULT version::SetVersion(float fVer) {
 	m_major = vMaj;
 	m_minor = vMin;
 	m_doubleminor = 0;
+
+Error:
+	return r;
+}
+
+// Set version for long assumes the following format: ABC
+// The first three digits A, B, and C are used for the major, minor, 
+// and double minor version numbers respectively
+RESULT version::SetVersion(long lVer) {
+	RESULT r = R_PASS;
+
+	long numDigits = (int)ceil(log10((double)lVer));
+	
+	if(numDigits > 3)
+		lVer = lVer / (pow(10, numDigits - 3));
+
+	m_major = (int)((lVer % 1000) / 100);
+	m_minor = (int)((lVer % 100) / 10);
+	m_doubleminor = (int)((lVer % 10) / 1);
 
 Error:
 	return r;

@@ -13,10 +13,12 @@ public:
 	version(const version &ver);
 	version(int major, int minor = 0, int doubleminor = 0);
 	version(float fVer);
+	version(long lVer);
 	~version();
 
 	RESULT SetVersion(int major, int minor = 0, int doubleminor = 0);
 	RESULT SetVersion(float fVer);
+	RESULT SetVersion(long lVer);
 
 private:
 	int m_major;

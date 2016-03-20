@@ -316,9 +316,32 @@ Error:
 RESULT PathManager::GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists) {
 	RESULT r = R_PASS;
 	std::list<wchar_t*> *pListDirs = new std::list<wchar_t*>();
+	version maxVersion = 0;
+	//wchar_t *pszMaxVersionDir = NULL;
 
 	// Tabulate directories in given path
 	CRM(GetListOfDirectoriesInPath(type, pListDirs), "Failed to get list of directories");
+
+	for (auto it = pListDirs->begin(); it != pListDirs->end(); it++) {
+		wchar_t *pszDirectory = (*it);
+		long pszDirectory_n = wcslen(pszDirectory);
+
+		while (pszDirectory[0] < L'0' || pszDirectory[0] > L'9') {
+			pszDirectory++;
+			CBM((pszDirectory[0] != L'\0'), "Invalid directory %S found in path %S", (*it), GetPathValueString(type));
+		}
+
+		for (int i = 0; i < pszDirectory_n; i++) {
+			long value = wcstol(pszDirectory, NULL, 10);
+			version versionDir = version(value);
+			if (versionDir > maxVersion && versionDir <= versionFile) {
+				maxVersion = versionDir;
+				//pszMaxVersionDir = (*it);
+			}
+		}
+	}
+
+	*versionFileExists = maxVersion;
 
 Error:
 	while(pListDirs->size() > 0) {
