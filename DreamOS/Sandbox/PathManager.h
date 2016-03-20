@@ -14,6 +14,7 @@
 #define DREAM_OS_PATH_ENV "DREAMOSPATH"
 #define DREAM_OS_PATHS_FILE "dreampaths.txt"	// TODO: Rename?
 
+#include <list>
 #include <map>
 #include "Primitives/version.h"
 
@@ -79,6 +80,13 @@ public:
 
 	RESULT GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName, wchar_t* &n_pszFilePath);
 	RESULT GetFilePathVersion(PATH_VALUE_TYPE type, version ver, const wchar_t *pszFileName, wchar_t * &n_pszVersionFilePath);
+
+	virtual RESULT DoesPathExist(const wchar_t *pszPath) = 0;
+	virtual RESULT GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs) = 0;
+
+	RESULT DoesPathExist(PATH_VALUE_TYPE type);
+	RESULT DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
+	RESULT GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists);
 
 private:
 	UID m_uid;

@@ -242,6 +242,7 @@ Error:
 // intent is different so better to keep it this way for now
 RESULT PathManager::GetFilePathVersion(PATH_VALUE_TYPE type, version ver, const wchar_t *pszFileName, wchar_t * &n_pszVersionFilePath) {
 	RESULT r = R_PASS;
+
 	long pszFileName_n = wcslen(pszFileName);
 	long n_pszVersionFilePath_n = 0;
 
@@ -264,6 +265,75 @@ Error:
 	if (pszValueVersionPath != NULL) {
 		delete[] pszValueVersionPath;
 		pszValueVersionPath = NULL;
+	}
+
+	return r;
+}
+
+RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {
+	RESULT r = R_PASS;
+
+	wchar_t *pszValuePath = NULL;
+	long pszValuePath_n = 0;
+
+	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
+	pszValuePath_n = wcslen(pszValuePath);
+	CRM(DoesPathExist(pszValuePath), "Path %S does not exist", pszValuePath);
+
+Error:
+	if (pszValuePath != NULL) {
+		delete[] pszValuePath;
+		pszValuePath = NULL;
+	}
+
+	return r;
+}
+
+RESULT PathManager::DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName) {
+	RESULT r = R_PASS;
+	
+	wchar_t *pszFilePath = NULL;
+	long pszFilePath_n = 0;
+
+	CRM(GetFilePath(type, pszFileName, pszFilePath), "Failed to file path");	
+	pszFilePath_n = wcslen(pszFilePath);
+
+	r = DoesPathExist(pszFilePath);
+	if (r == R_FILE_FOUND)
+		return r;
+	else
+		return R_FILE_NOT_FOUND;
+
+Error:
+	if (pszFilePath != NULL) {
+		delete[] pszFilePath;
+		pszFilePath = NULL;
+	}
+
+	return r;
+}
+
+RESULT PathManager::GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists) {
+	RESULT r = R_PASS;
+	std::list<wchar_t*> *pListDirs = new std::list<wchar_t*>();
+
+	// Tabulate directories in given path
+	CRM(GetListOfDirectoriesInPath(type, pListDirs), "Failed to get list of directories");
+
+Error:
+	while(pListDirs->size() > 0) {
+		wchar_t *pszTemp = pListDirs->front();
+		pListDirs->pop_front();
+
+		if (pszTemp != NULL) {
+			delete[]pszTemp;
+			pszTemp = NULL;
+		}
+	}
+
+	if (pListDirs != NULL) {
+		delete pListDirs;
+		pListDirs = NULL;
 	}
 
 	return r;
