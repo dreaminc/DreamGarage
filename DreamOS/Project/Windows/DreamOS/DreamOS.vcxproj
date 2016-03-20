@@ -165,6 +165,7 @@
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
@@ -185,6 +186,7 @@
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLMesh.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
@@ -204,6 +206,7 @@
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
+    <ClInclude Include="..\..\..\Primitives\mesh.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
     <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
@@ -231,6 +234,7 @@
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
+    <ClInclude Include="..\..\..\Sandbox\FileLoader.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />

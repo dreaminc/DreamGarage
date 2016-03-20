@@ -5,6 +5,9 @@
 #include "Primitives/TranslationMatrix.h"
 #include "Primitives/RotationMatrix.h"
 
+#include "../DreamOS/Sandbox/FileLoader.h"
+#include <vector>
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
 	m_versionMinor(0),
@@ -525,15 +528,18 @@ Error:
 }
 
 #include "OGLVolume.h"
+#include "OGLMesh.h"
+#include "OGLTriangle.h"
+#include "../DreamOS/Sandbox/PathManager.h"
 
 // TODO: Other approach 
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 
 	OGLVolume *pVolume = NULL;
-	int num = 20;
+	int num = 10;
 	double size = 0.2f;
-
+	/*
 	for (int i = 0; i < num; i++) {
 		for (int j = 0; j < num; j++) {
 			pVolume = new OGLVolume(this, size);
@@ -543,6 +549,20 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
+	*/
+
+	std::vector<vertex> v;
+
+	PathManager* pMgr = PathManager::instance();
+	wchar_t*	path;
+	pMgr->GetCurrentPath((wchar_t*&)path);
+	std::wstring objFile(path);
+
+	FileLoaderHelper::LoadOBJFile(objFile + L"Models/car.obj", v);
+	OGLMesh* pMesh = new OGLMesh(this, v);
+	pMesh->SetRandomColor();
+	pMesh->UpdateOGLBuffers();
+	pSceneGraph->PushObject(pMesh);
 
 Error:
 	return r;
