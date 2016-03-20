@@ -7,9 +7,6 @@
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
-	//m_versionMinor(0),
-	//m_versionMajor(0),
-	//m_versionGLSL(0),
 	m_versionOGL(0),
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
@@ -64,33 +61,6 @@ RESULT OpenGLImp::InitializeOpenGLVersion() {
 
 	return R_PASS;
 }
-
-/*
-RESULT OpenGLImp::InitializeShadersFolder() {
-	RESULT r = R_PASS;
-
-	CBM((m_versionMajor == 4), "No existing shader for this GLSL version");
-
-	switch (m_versionMinor) {
-		case 0: {
-			m_shadersFolder = L"v400";
-		} break;
-
-		case 5: 
-		case 4: {
-			m_shadersFolder = L"v440";
-			break;
-		}
-
-		default: {
-			CBM((0), "No existing shader for GL %d.%d", m_versionMajor, m_versionMinor);
-		} break;
-	}
-
-Error:
-	return R_PASS;
-}
-*/
 
 RESULT OpenGLImp::CreateGLProgram() {
 	RESULT r = R_PASS;
@@ -358,16 +328,14 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO: Should be stuffed into factory arch - return NULL on fail
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
-	// TODO: Move to GLSL version
+	// TODO: Move to GLSL version?
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
-	//CRM(pVertexShader->InitializeFromFile((m_shadersFolder + L"\\minimal.vert").c_str()), "Failed to initialize vertex shader from file");
 	CRM(pVertexShader->InitializeFromFile(L"minimal.vert", m_versionOGL), "Failed to initialize vertex shader from file");
 	CR(pVertexShader->BindAttributes());
 
 	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
-	//CRM(pFragmentShader->InitializeFromFile((m_shadersFolder + L"\\minimal.frag").c_str()), "Failed to initialize fragment shader from file");
 	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag", m_versionOGL), "Failed to initialize fragment shader from file");
 	//CR(pFragmentShader->BindAttributes());
 	

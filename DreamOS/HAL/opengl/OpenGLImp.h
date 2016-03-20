@@ -17,7 +17,6 @@
 #include "OGLVertexShader.h"
 #include "OGLFragmentShader.h"
 
-//#include "Primitives/camera.h"
 #include "Primitives/valid.h"
 #include "Primitives/version.h"
 #include "Primitives/stereocamera.h"
@@ -41,11 +40,6 @@ private:
 
 	version m_versionOGL;
 	version m_versionGLSL;
-
-	//int m_versionMajor;
-	//int m_versionMinor;
-	//int m_versionGLSL;
-	//std::wstring m_shadersFolder;	
 
 	// Viewport
 	// TODO: Move this into an object?
@@ -88,7 +82,6 @@ private:
 	//RESULT InitializeExtensions();
 	RESULT InitializeGLContext();
 	RESULT InitializeOpenGLVersion();
-	//RESULT InitializeShadersFolder();
 
 	RESULT PrepareScene();
 
@@ -98,7 +91,6 @@ private:
 	OGLFragmentShader *m_pFragmentShader;
 	// TODO: Other shaders
 
-	//camera *m_pCamera;
 	stereocamera *m_pCamera;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
@@ -110,9 +102,7 @@ public:
 // TODO: Unify access to extensions
 public:
 
-	
 	// TODO: Unify extension call / wrappers 
-
 	RESULT glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params);
 	RESULT glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params);
 	RESULT glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name);
