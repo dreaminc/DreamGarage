@@ -17,18 +17,18 @@ public:
 
 public:
 	RESULT ResetIterator();
-	DimObj *GetNextObject();
+	VirtualObj *GetNextObject();
 
-	RESULT PushObject(DimObj *pObject);
-	RESULT RemoveObject(DimObj *pObject);
+	RESULT PushObject(VirtualObj *pObject);
+	RESULT RemoveObject(VirtualObj *pObject);
 
 	RESULT RemoveObjectByUID(UID uid);
-	DimObj *FindObjectByUID(UID uid);
-	DimObj *FindObject(DimObj *pObject);
+	VirtualObj *FindObjectByUID(UID uid);
+	VirtualObj *FindObject(VirtualObj *pObject);
 
 private:
-	std::list<DimObj*> m_objects;
-	std::list<DimObj*>::iterator m_objectIterator;
+	std::list<VirtualObj*> m_objects;
+	std::list<VirtualObj*>::iterator m_objectIterator;
 
 };
 

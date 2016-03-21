@@ -19,6 +19,11 @@
 
 enum COLOR_TYPE {
 	COLOR_RANDOM,
+	COLOR_WHITE,
+	COLOR_BLACK,
+	COLOR_RED,
+	COLOR_GREEN,
+	COLOR_BLUE,
 	COLOR_INVALID
 };
 
@@ -47,6 +52,12 @@ public:
 
 				SetColor(r, g, b, 1.0f);
 			} break;
+
+			case COLOR_BLACK: { SetColor(0.0f, 0.0f, 0.0f, 1.0f); } break;
+			case COLOR_WHITE: { SetColor(1.0f, 1.0f, 1.0f, 1.0f); } break;
+			case COLOR_RED: { SetColor(1.0f, 0.0f, 0.0f, 1.0f); } break;
+			case COLOR_GREEN: { SetColor(0.0f, 1.0f, 0.0f, 1.0f); } break;
+			case COLOR_BLUE: { SetColor(0.0f, 0.0f, 1.0f, 1.0f); } break;
 
 			default: {
 				this->clear();

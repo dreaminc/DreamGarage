@@ -7,20 +7,19 @@
 // DreamOS/Dimension/Scene/SceneGraphStore.h
 // This abstract class simply represents 
 
-#include "Primitives/DimObj.h"
+#include "Primitives/VirtualObj.h"
 
 class SceneGraphStore {
 public:
-
 	virtual RESULT ResetIterator() = 0;
-	virtual DimObj *GetNextObject() = 0;
+	virtual VirtualObj *GetNextObject() = 0;
 
-	virtual RESULT PushObject(DimObj *pObject) = 0;
-	virtual RESULT RemoveObject(DimObj *pObject) = 0;
+	virtual RESULT PushObject(VirtualObj *pObject) = 0;
+	virtual RESULT RemoveObject(VirtualObj *pObject) = 0;
 
 	virtual RESULT RemoveObjectByUID(UID uid) = 0;
-	virtual DimObj *FindObjectByUID(UID uid) = 0;
-	virtual DimObj *FindObject(DimObj *pObject) = 0;
+	virtual VirtualObj *FindObjectByUID(UID uid) = 0;
+	virtual VirtualObj *FindObject(VirtualObj *pObject) = 0;
 };
 
 #endif // ! SCENE_GRAPH_STORE_H_

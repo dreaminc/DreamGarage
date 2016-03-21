@@ -120,12 +120,6 @@ public:
 	Error:
 		return r;
 	}
-
-public:
-	UID getID() { return m_uid; }
-
-private:
-	UID m_uid;
 };
 
 #endif // !DIM_OBJ_H_

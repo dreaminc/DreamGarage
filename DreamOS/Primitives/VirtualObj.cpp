@@ -9,6 +9,15 @@ VirtualObj::VirtualObj() :
 	/* stub */
 }
 
+VirtualObj::VirtualObj(point ptOrigin) : 
+	m_ptOrigin(ptOrigin),
+	m_vVelocity(),
+	m_qRotation(),
+	m_qAngularMomentum()
+{
+	// stub 
+}
+
 VirtualObj::~VirtualObj() {
 	// Empty Stub
 }

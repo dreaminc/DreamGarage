@@ -24,6 +24,7 @@
 #include "OpenGLExtensions.h"
 
 #include "Scene/SceneGraph.h"
+#include "Primitives/DimObj.h"
 
 class SandboxApp; 
 class Windows64App;

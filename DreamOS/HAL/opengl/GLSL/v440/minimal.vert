@@ -1,29 +1,40 @@
 // minimal.vert
+// shadertype=glsl
 
+#define MAX_TOTAL_LIGHTS 10
 #version 440 core
 
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
 layout (location = 2) in vec4 inV_vec4Normal;
 
+out vec3 inF_vec3Color;
+
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4ViewProjection;
 
-out vec3 inF_vec3Color;
-
-// Lights
+// Light Structure
 struct Light {
+	int m_type;
 	float m_power;
 	vec4 m_ptOrigin;
 	vec4 m_colorDiffuse;
-	vec4 m_colorSpecular; 
+	vec4 m_colorSpecular;
+	vec4 m_vectorDirection; 
+};
+
+layout(std140) uniform LightArray {
+	Light lights[MAX_TOTAL_LIGHTS];
+	int numLights;
 };
 
 Light g_lightTemp = Light(
+	0,								// type
 	1.0,							// Light Emit Power
 	vec4(0.0, 5.0, 0.0, 1.0),		// origin
 	vec4(1.0, 1.0, 1.0, 1.0),		// diffuse
-	vec4(1.0, 1.0, 1.0, 1.0)		// specular
+	vec4(1.0, 1.0, 1.0, 1.0),		// specular
+	vec4(0.0, -1.0, 0.0, 0.0)		// direction
 );
 
 vec4 g_vec4AmbientLightLevel = 0.0 * vec4(1.0, 1.0, 1.0, 0.0);

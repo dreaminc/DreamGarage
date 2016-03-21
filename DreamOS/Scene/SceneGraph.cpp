@@ -44,11 +44,11 @@ RESULT SceneGraph::Reset() {
 	return m_pSceneGraphStore->ResetIterator();
 }
 
-RESULT SceneGraph::PushObject(DimObj *pObject) {
+RESULT SceneGraph::PushObject(VirtualObj *pObject) {
 	return m_pSceneGraphStore->PushObject(pObject);
 }
 
-RESULT SceneGraph::RemoveObject(DimObj *pObject) {
+RESULT SceneGraph::RemoveObject(VirtualObj *pObject) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	CN(m_pSceneGraphStore);
@@ -68,7 +68,7 @@ Error:
 	return r;
 }
 
-DimObj *SceneGraph::FindObjectByUID(UID uid) {
+VirtualObj *SceneGraph::FindObjectByUID(UID uid) {
 	RESULT r = R_PASS;
 
 	CN(m_pSceneGraphStore);
@@ -86,8 +86,8 @@ RESULT SceneGraph::UpdateScene() {
 	Reset();
 	SceneGraphStore *pObjectStore = GetSceneGraphStore();
 
-	DimObj *pDimObj = NULL;
-	while ((pDimObj = pObjectStore->GetNextObject()) != NULL) {
+	VirtualObj *pVirtualObj = NULL;
+	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
 		quaternion_precision factor = 0.05;
 		quaternion_precision filter = 0.1;
 
@@ -95,11 +95,11 @@ RESULT SceneGraph::UpdateScene() {
 		static quaternion_precision y = 0;
 		static quaternion_precision z = 0;
 
-		x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
+		x = ((1.0f - filter) * x) + filter * (static_cast <point_precision> (rand()) / static_cast <point_precision> (RAND_MAX));
+		y = ((1.0f - filter) * y) + filter * (static_cast <point_precision> (rand()) / static_cast <point_precision> (RAND_MAX));
+		z = ((1.0f - filter) * z) + filter * (static_cast <point_precision> (rand()) / static_cast <point_precision> (RAND_MAX));
 
-		pDimObj->RotateBy(x * factor, y * factor, z * factor);
+		pVirtualObj->RotateBy(x * factor, y * factor, z * factor);
 	}
 	//*/
 

@@ -557,7 +557,7 @@ Error:
 RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	DimObj *pDimObj = NULL;
+	VirtualObj *pVirtualObj = NULL;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -566,8 +566,12 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	// Send SceneGraph objects to shader
 	pSceneGraph->Reset();
-	while((pDimObj = pObjectStore->GetNextObject()) != NULL) {
-		SendObjectToShader(pDimObj);
+	while((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+		
+		if(pDimObj != NULL) {
+			SendObjectToShader(pDimObj);
+		}
 	}
 	
 	glFlush();
@@ -580,7 +584,7 @@ Error:
 RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	DimObj *pDimObj = NULL;
+	VirtualObj *pVirtualObj = NULL;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -593,8 +597,11 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 
 		// Send SceneGraph objects to shader
 		pSceneGraph->Reset();
-		while ((pDimObj = pObjectStore->GetNextObject()) != NULL) {
-			SendObjectToShader(pDimObj);
+		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+			DimObj *pDimObj = reinterpret_cast<DimObj*>(pVirtualObj);
+
+			if(pDimObj != NULL)
+				SendObjectToShader(pDimObj);
 		}
 	}
 	

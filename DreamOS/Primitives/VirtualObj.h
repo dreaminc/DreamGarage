@@ -34,7 +34,8 @@ protected:
 
 public:
 	VirtualObj();
-	~VirtualObj();
+	VirtualObj(point ptOrigin);
+	virtual ~VirtualObj();
 
 	// Position
 	VirtualObj translate(matrix <point_precision, 4, 1> v);
@@ -72,6 +73,9 @@ public:
 
 	// Matrix Functions
 	matrix<virtual_precision, 4, 4> GetModelMatrix();
+
+public:
+	UID getID() { return m_uid; }
 
 private:
 	UID m_uid;
