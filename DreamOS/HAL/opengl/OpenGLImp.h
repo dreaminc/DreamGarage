@@ -98,6 +98,7 @@ private:
 public:
 	RESULT EnableVertexPositionAttribute();
 	RESULT EnableVertexColorAttribute();
+	RESULT EnableVertexNormalAttribute();
 
 // TODO: Unify access to extensions
 public:

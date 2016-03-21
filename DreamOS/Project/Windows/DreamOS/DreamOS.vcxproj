@@ -255,8 +255,10 @@
     <ClInclude Include="..\..\..\Test\TestObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag" />
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />

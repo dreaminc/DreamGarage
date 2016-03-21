@@ -108,6 +108,12 @@ public:
 		CR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
 
+		// Normal
+		CR(m_pParentImp->EnableVertexNormalAttribute());		
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)2, vertex::GetNormalDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetNormalOffset()));
+
+		// TODO: UV Coord
+
 		CR(m_pParentImp->ReleaseCurrentContext());
 
 	Error:

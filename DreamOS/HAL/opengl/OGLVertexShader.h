@@ -23,11 +23,15 @@ public:
 public:
 	// TODO: These could be generated, even within a macro
 	const char *GetPositionAttributeName() {
-		return "inV_vec3Color";
+		return "inV_vec4Position";
 	}
 
 	const char *GetColorAttributeName() {
-		return "inV_vec3Color";
+		return "inV_vec4Color";
+	}
+
+	const char *GetNormalAttributeName() {
+		return "inV_vec4Normal";
 	}
 
 	GLuint GetPositionIndex() {
@@ -38,9 +42,14 @@ public:
 		return VERTEX_SHADER_COLOR_INDEX;
 	}
 
+	GLuint GetNormalIndex() {
+		return VERTEX_SHADER_NORMAL_INDEX;
+	}
+
 	RESULT BindAttributes();
 	RESULT EnableVertexPositionAttribute();
 	RESULT EnableVertexColorAttribute();
+	RESULT EnableVertexNormalAttribute();
 };
 
 #endif // ! OGL_VERTEX_SHADER_H_

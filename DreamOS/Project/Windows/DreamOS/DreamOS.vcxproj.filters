@@ -54,6 +54,12 @@
     <Filter Include="HAL\opengl\GL">
       <UniqueIdentifier>{d90f805b-bf9a-4f40-9742-e7bb02818c72}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HAL\opengl\GLSL\v400">
+      <UniqueIdentifier>{f27b7344-cb72-4d25-befe-543ced6e4527}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl\GLSL\v440">
+      <UniqueIdentifier>{7f1c2dc0-01a8-4076-a88c-4315fbe75d6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -360,14 +366,20 @@
     <None Include="..\..\..\Rakefile">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag">
-      <Filter>HAL\opengl\GLSL</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert">
-      <Filter>HAL\opengl\GLSL</Filter>
-    </None>
     <None Include="..\..\..\Primitives\.DS_Store">
       <Filter>Primitives</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag">
+      <Filter>HAL\opengl\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert">
+      <Filter>HAL\opengl\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

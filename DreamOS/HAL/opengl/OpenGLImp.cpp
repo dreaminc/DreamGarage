@@ -173,6 +173,13 @@ RESULT OpenGLImp::EnableVertexColorAttribute() {
 		return R_FAIL;
 }
 
+RESULT OpenGLImp::EnableVertexNormalAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableVertexNormalAttribute();
+	else
+		return R_FAIL;
+}
+
 RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 	RESULT r = R_PASS;
 	GLenum glerr;
@@ -530,13 +537,14 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	OGLVolume *pVolume = NULL;
 	int num = 20;
-	double size = 0.2f;
+	double size = 0.5f;
+	int spaceFactor = 2;
 
 	for (int i = 0; i < num; i++) {
 		for (int j = 0; j < num; j++) {
 			pVolume = new OGLVolume(this, size);
-			pVolume->SetRandomColor();
-			pVolume->translate(i * (size * 2) - (num * size), 0.0f, j * (size * 2) - (num * size));
+			//pVolume->SetRandomColor();
+			pVolume->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
 			pVolume->UpdateOGLBuffers();
 			pSceneGraph->PushObject(pVolume);
 		}

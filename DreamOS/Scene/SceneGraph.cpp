@@ -81,7 +81,8 @@ Error:
 // TODO: Perhaps pass this to a scene graph handler (like physics etc)
 RESULT SceneGraph::UpdateScene() {
 	RESULT r = R_PASS;
-
+	
+	///*
 	Reset();
 	SceneGraphStore *pObjectStore = GetSceneGraphStore();
 
@@ -100,6 +101,7 @@ RESULT SceneGraph::UpdateScene() {
 
 		pDimObj->RotateBy(x * factor, y * factor, z * factor);
 	}
+	//*/
 
 Error:
 	return r;

@@ -12,6 +12,7 @@ RESULT OGLVertexShader::BindAttributes() {
 
 	CRM(m_pParentImp->BindAttribLocation(GetPositionIndex(), (char*)GetPositionAttributeName()), "Failed to bind %s to position attribute", GetPositionAttributeName());
 	CRM(m_pParentImp->BindAttribLocation(GetColorIndex(), (char*)GetColorAttributeName()), "Failed to bind %s to color attribute", GetColorAttributeName());
+	CRM(m_pParentImp->BindAttribLocation(GetNormalIndex(), (char*)GetNormalAttributeName()), "Failed to bind %s to normal attribute", GetNormalAttributeName());
 
 	// TODO: Normal and Tex Coord etc
 
@@ -25,4 +26,8 @@ RESULT OGLVertexShader::EnableVertexPositionAttribute() {
 
 RESULT OGLVertexShader::EnableVertexColorAttribute() {
 	return m_pParentImp->glEnableVertexAtrribArray(GetColorIndex());
+}
+
+RESULT OGLVertexShader::EnableVertexNormalAttribute() {
+	return m_pParentImp->glEnableVertexAtrribArray(GetNormalIndex());
 }
