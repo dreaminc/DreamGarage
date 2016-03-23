@@ -83,6 +83,11 @@ RESULT OpenGLShader::InitializeFromFile(const wchar_t *pszFilename, version vers
 	CRM(Compile(), "Failed to compile shader");
 	CRM(AttachShader(), "Failed to attach vertex shader");
 
+	// Initialize all of the IDs
+	// TODO: This can't be done until after linking
+	//CRM(GetAttributeLocationsFromShader(), "Failed to get attribute locations");
+	//CRM(GetUniformLocationsFromShader(), "Failed to get uniform locations");
+
 Error:
 	return r;
 }

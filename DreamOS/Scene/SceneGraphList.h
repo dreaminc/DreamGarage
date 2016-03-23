@@ -10,6 +10,8 @@
 #include <list>
 #include "SceneGraphStore.h"
 
+#include "Primitives/DimObj.h"
+
 class SceneGraphList : public SceneGraphStore {
 public:
 	SceneGraphList();
@@ -19,6 +21,9 @@ public:
 	RESULT ResetIterator();
 	VirtualObj *GetNextObject();
 
+	RESULT PushDimensionObject(DimObj *pDimObj);
+	RESULT PushLight(light *pLight);
+
 	RESULT PushObject(VirtualObj *pObject);
 	RESULT RemoveObject(VirtualObj *pObject);
 
@@ -26,8 +31,13 @@ public:
 	VirtualObj *FindObjectByUID(UID uid);
 	VirtualObj *FindObject(VirtualObj *pObject);
 
+	RESULT GetLights(std::vector<light*>*& pLights);
+
 private:
 	std::list<VirtualObj*> m_objects;
+	
+	std::vector<light*> m_lights;		
+
 	std::list<VirtualObj*>::iterator m_objectIterator;
 
 };

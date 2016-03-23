@@ -18,6 +18,9 @@ public:
 	// This is handled by the parent class 
 	//~OGLVertexShader(void);
 
+	RESULT GetAttributeLocationsFromShader();
+	RESULT GetUniformLocationsFromShader();
+
 public:
 	const char *GetColorAttributeName() {
 		return "inF_vec3Color";

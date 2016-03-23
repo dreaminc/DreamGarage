@@ -26,9 +26,27 @@ VirtualObj *SceneGraphList::GetNextObject() {
 }
 
 
-RESULT SceneGraphList::PushObject(VirtualObj *pObject) {
-	m_objects.push_back(pObject);
+RESULT SceneGraphList::PushDimensionObject(DimObj *pDimObj) {
+	m_objects.push_back(pDimObj);
 	return R_PASS;
+}
+
+RESULT SceneGraphList::PushLight(light *pLight) {
+	m_lights.push_back(pLight);
+	return R_PASS;
+}
+
+RESULT SceneGraphList::PushObject(VirtualObj *pObject) {
+	
+	light *pLight = dynamic_cast<light*>(pObject);
+	if (pLight != NULL)
+		return PushLight(pLight);
+	
+	DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+	if (pObject != NULL)
+		return PushDimensionObject(pDimObj);
+	
+	return R_INVALID_OBJECT;
 }
 
 RESULT SceneGraphList::RemoveObject(VirtualObj *pObject) {
@@ -47,6 +65,17 @@ RESULT SceneGraphList::RemoveObjectByUID(UID uid) {
 	}
 
 	return R_NOT_FOUND;
+}
+
+// Note: This memory location is not guaranteed and needs to be collected each time
+// Caller should create a copy if needed
+RESULT SceneGraphList::GetLights(std::vector<light*>*& pLights) {
+	RESULT r = R_PASS;
+
+	pLights = &(m_lights);
+
+Error:
+	return r;
 }
 
 VirtualObj *SceneGraphList::FindObjectByUID(UID uid) {

@@ -6,3 +6,11 @@ OGLFragmentShader::OGLFragmentShader(OpenGLImp *pParentImp) :
 {
 	/* empty stub */
 }
+
+RESULT OGLFragmentShader::GetAttributeLocationsFromShader() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT OGLFragmentShader::GetUniformLocationsFromShader() {
+	return R_NOT_IMPLEMENTED;
+}

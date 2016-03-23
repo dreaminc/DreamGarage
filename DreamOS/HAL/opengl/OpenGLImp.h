@@ -51,6 +51,7 @@ private:
 public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
+	GLuint GetOGLProgramID() { return m_idOpenGLProgram; }
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
@@ -66,6 +67,8 @@ public:
 	RESULT RenderStereo(SceneGraph *pSceneGraph);
 
 	RESULT SendObjectToShader(DimObj *pDimObj);
+	RESULT SendLightsToShader(std::vector<light*> *pLights);
+
 	RESULT PrintVertexAttributes();
 	RESULT PrintActiveUniformVariables();
 	
@@ -125,9 +128,17 @@ public:
 
 	RESULT BindAttribLocation(unsigned int index, char* pszName);
 
+	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
+
+	RESULT glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation);
+
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+
+	// Uniform Blocks
+	RESULT glGetUniformBlockIndex(GLuint programID, const GLchar *pszName, GLint *pLocation);
+	RESULT glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
 
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *shaderID);

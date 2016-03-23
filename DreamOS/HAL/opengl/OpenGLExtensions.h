@@ -115,6 +115,15 @@ public:
 	inline void glGetActiveUniform(GLuint programID, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *pszName) {
 		return m_glGetActiveUniform(programID, index, bufSize, length, size, type, pszName);
 	}
+
+	// Uniform Blocks
+	inline GLint glGetUniformBlockIndex(GLuint programID, const GLchar *pszName) {
+		return m_glGetUniformBlockIndex(programID, pszName);
+	}
+
+	inline void glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
+		return m_glUniformBlockBinding(programID, uniformBlockIndex, uniformBlockBindingPoint);
+	}
 	
 	// Attributes
 	inline GLint glGetAttribLocation(GLuint programID, const GLchar *pszName) {
@@ -247,6 +256,10 @@ private:
 	PFNGLUNIFORM4FVPROC m_glUniform4fv;
 	PFNGLUNIFORMMATRIX4FVPROC m_glUniformMatrix4fv;
 	PFNGLGETACTIVEUNIFORMPROC m_glGetActiveUniform;
+
+	// Uniform Blocks
+	PFNGLGETUNIFORMBLOCKINDEXPROC m_glGetUniformBlockIndex;
+	PFNGLUNIFORMBLOCKBINDINGPROC m_glUniformBlockBinding;
 
 	// Attributes
 	PFNGLGETATTRIBLOCATIONPROC m_glGetAttribLocation;

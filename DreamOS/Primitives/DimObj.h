@@ -45,6 +45,10 @@ public:
 		}
     }
 
+	virtual OBJECT_TYPE GetType() {
+		return OBJECT_DIMENSION;
+	}
+
 	
 	virtual RESULT Allocate() = 0;
 

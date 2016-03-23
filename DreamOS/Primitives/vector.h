@@ -118,9 +118,9 @@ public:
 	static vector YUnitVector() { return vector(0.0f, 1.0f, 0.0f); }
 	static vector ZUnitVector() { return vector(0.0f, 0.0f, 1.0f); }
 
-	static vector iVector() { return vector(1.0f, 0.0f, 0.0f); }
+	static vector iVector(vector_precision value = 1.0f) { return vector(value, 0.0f, 0.0f); }
 	static vector jVector(vector_precision value = 1.0f) { return vector(0.0f, value, 0.0f); }
-	static vector kVector() { return vector(0.0f, 0.0f, 1.0f); }
+	static vector kVector(vector_precision value = 1.0f) { return vector(0.0f, 0.0f, value); }
 };
 
 #endif // !VECTOR_H_

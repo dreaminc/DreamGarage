@@ -1,8 +1,9 @@
 // minimal.vert
 // shadertype=glsl
 
-#define MAX_TOTAL_LIGHTS 10
 #version 440 core
+
+#define MAX_TOTAL_LIGHTS 10
 
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
@@ -23,9 +24,9 @@ struct Light {
 	vec4 m_vectorDirection; 
 };
 
-layout(std140) uniform LightArray {
+layout(std140) uniform ub_LightArray {
+	int numLights;	
 	Light lights[MAX_TOTAL_LIGHTS];
-	int numLights;
 };
 
 Light g_lightTemp = Light(

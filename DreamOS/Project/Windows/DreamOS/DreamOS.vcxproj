@@ -190,6 +190,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLLight.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />

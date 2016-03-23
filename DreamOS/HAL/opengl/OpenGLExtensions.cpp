@@ -80,6 +80,14 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)wglGetProcAddress("glUniformMatrix4fv")),
 		"Failed to initialize glUniformMatrix4fv extension");
 
+	// Uniform Blocks
+	CNMW((m_glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)wglGetProcAddress("glGetUniformBlockIndex")),
+		"Failed to initialize glGetUniformBlockIndex extension");
+ 
+	CNMW((m_glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)wglGetProcAddress("glUniformBlockBinding")),
+		"Failed to initialize glUniformBlockBinding extension");
+
+	// Attributes
 	CNMW((m_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation")),
 		"Failed to initialize glGetAttribLocation extension");
 

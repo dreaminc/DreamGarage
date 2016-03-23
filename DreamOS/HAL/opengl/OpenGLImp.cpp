@@ -194,6 +194,20 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
+	RESULT r = R_PASS;
+	GLenum glerr;
+	DWORD werr;
+
+	CR(glUniformBlockBinding(m_idOpenGLProgram, uniformBlockIndex, uniformBlockBindingPoint));
+
+	werr = GetLastError();
+	DEBUG_LINEOUT("Bound uniform block index %d to binding point %d err:0x%x", uniformBlockIndex, uniformBlockBindingPoint, werr);
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::UseProgram() {
 	RESULT r = R_PASS;
 
@@ -339,7 +353,6 @@ RESULT OpenGLImp::PrepareScene() {
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
 	CRM(pVertexShader->InitializeFromFile(L"minimal.vert", m_versionOGL), "Failed to initialize vertex shader from file");
-	CR(pVertexShader->BindAttributes());
 
 	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
@@ -351,11 +364,20 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(LinkProgram(), "Failed to link program");
 	CRM(UseProgram(), "Failed to use open gl program");
 
+	CR(pVertexShader->GetAttributeLocationsFromShader());
+	CR(pVertexShader->GetUniformLocationsFromShader());
+	CR(pVertexShader->BindAttributes());
+	CR(pVertexShader->BindUniformBlocks());
+
 	CR(PrintVertexAttributes());
 	CR(PrintActiveUniformVariables());
 
+	m_pVertexShader = pVertexShader;
+	m_pFragmentShader = pFragmentShader;
+
 	// Allocate the camera
 	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
+	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
@@ -496,13 +518,23 @@ inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 
 	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
 	auto matModel = pDimObj->GetModelMatrix();
-	
+
+	// TODO: Add to vertex shader
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
 
 	if (locationModelMatrix >= 0)
 		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
 
 	return pOGLObj->Render();
+}
+
+RESULT OpenGLImp::SendLightsToShader(std::vector<light*> *pLights) {
+	RESULT r = R_PASS;
+
+
+
+Error:
+	return r;
 }
 
 RESULT OpenGLImp::UpdateCamera() {
@@ -519,6 +551,7 @@ RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
 
 	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix(eye);
 
+	// TODO: Push into vertex shader
 	GLint locationViewProjectionMatrix = -1;
 	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ViewProjection", &locationViewProjectionMatrix);
 
@@ -530,10 +563,15 @@ Error:
 }
 
 #include "OGLVolume.h"
+#include "OGLLight.h"
 
 // TODO: Other approach 
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
+
+	// Add lights
+	OGLLight *pLight = new OGLLight(LIGHT_POINT, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), point(0.0f, 4.0f, 0.0f), vector::jVector(-1.0f));
+	pSceneGraph->PushObject(pLight);
 
 	OGLVolume *pVolume = NULL;
 	int num = 20;
@@ -568,8 +606,10 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	pSceneGraph->Reset();
 	while((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-		
-		if(pDimObj != NULL) {
+
+		if (pDimObj == NULL)
+			continue;
+		else {
 			SendObjectToShader(pDimObj);
 		}
 	}
@@ -588,8 +628,13 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (int i = 0; i < 2; i++) {
+	// Send lights to shader
+	std::vector<light*> *pLights = NULL;
+	CR(pObjectStore->GetLights(pLights));
+	CN(pLights);
+	CR(SendLightsToShader(pLights));
 
+	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
 		SetStereoViewTarget(eye);
@@ -598,10 +643,15 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		// Send SceneGraph objects to shader
 		pSceneGraph->Reset();
 		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-			DimObj *pDimObj = reinterpret_cast<DimObj*>(pVirtualObj);
 
-			if(pDimObj != NULL)
+			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+			
+			if (pDimObj == NULL)
+				continue;
+			else {
 				SendObjectToShader(pDimObj);
+			}
+			
 		}
 	}
 	
@@ -749,6 +799,40 @@ RESULT OpenGLImp::glBindAttribLocation(GLuint program, GLuint index, const GLcha
 
 	m_OpenGLExtensions.glBindAttribLocation(program, index, name);
 	CRM(CheckGLError(), "glBindAttribLocation failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation) {
+	RESULT r = R_PASS;
+
+	*pLocation = m_OpenGLExtensions.glGetAttribLocation(programID, pszName);
+	CRM(CheckGLError(), "glGetAttribLocation failed");
+
+	return r;
+Error:
+	*pLocation = -1;
+	return r;
+}
+
+RESULT OpenGLImp::glGetUniformBlockIndex(GLuint programID, const GLchar *pszName, GLint *pLocation) {
+	RESULT r = R_PASS;
+
+	*pLocation = m_OpenGLExtensions.glGetUniformBlockIndex(programID, pszName);
+	CRM(CheckGLError(), "glGetUniformLocation failed");
+
+	return r;
+Error:
+	*pLocation = -1;
+	return r;
+}
+
+RESULT OpenGLImp::glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUniformBlockBinding(programID, uniformBlockIndex, uniformBlockBindingPoint);
+	CRM(CheckGLError(), "glGetUniformLocation failed");
 
 Error:
 	return r;

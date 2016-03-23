@@ -25,6 +25,9 @@ public:
 	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename, version versionFile);
 	RESULT LoadShaderCodeFromString(const char* pszSource);
 
+	virtual RESULT GetAttributeLocationsFromShader() = 0;
+	virtual RESULT GetUniformLocationsFromShader() = 0;
+
 	RESULT Compile(void);
 	RESULT PrintInfoLog();
 
