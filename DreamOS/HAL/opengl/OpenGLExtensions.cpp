@@ -87,6 +87,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)wglGetProcAddress("glUniformBlockBinding")),
 		"Failed to initialize glUniformBlockBinding extension");
 
+	CNMW((m_glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)wglGetProcAddress("glBindBufferBase")),
+		"Failed to initialize glBindBufferBase extension");
+
 	// Attributes
 	CNMW((m_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation")),
 		"Failed to initialize glGetAttribLocation extension");
@@ -141,6 +144,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 
 	CNMW((m_glBufferData = (PFNGLBUFFERDATAPROC)wglGetProcAddress("glBufferData")),
 		"Failed to initialize glBuifferData extension");
+
+	CNMW((m_glBufferSubData = (PFNGLBUFFERSUBDATAPROC)wglGetProcAddress("glBufferSubData")),
+		"Failed to initialize glBuifferSubData extension");
 
 	CNMW((m_glVertexAttribPointer = (PFNGLVERTEXATTRIBPOINTERPROC)wglGetProcAddress("glVertexAttribPointer")),
 		"Failed to initialize glVertexAttribPointer extension");

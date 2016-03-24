@@ -48,6 +48,8 @@ public:
 	}
 
 	// Position
+	point GetOrigin();
+
 	VirtualObj translate(matrix <point_precision, 4, 1> v);
 	VirtualObj translate(point_precision x, point_precision y, point_precision z);
 	VirtualObj MoveTo(point p);

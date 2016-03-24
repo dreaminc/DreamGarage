@@ -2,10 +2,9 @@
 #include "OGLVertexShader.h"
 
 OGLVertexShader::OGLVertexShader(OpenGLImp *pParentImp) :
-	OpenGLShader(pParentImp, GL_VERTEX_SHADER),
-	m_uniformBlockLightsBindingPoint(VERTEX_SHADER_LIGHTING_UNIFORM_BLOCK_BINDING_POINT)
+	OpenGLShader(pParentImp, GL_VERTEX_SHADER)
 {
-	// empty
+	m_pLightsBlock = new OGLLightsBlock(pParentImp);
 }
 
 RESULT OGLVertexShader::BindAttributes() {
@@ -24,7 +23,25 @@ Error:
 RESULT OGLVertexShader::BindUniformBlocks() {
 	RESULT r = R_PASS;
 
-	CRM(m_pParentImp->BindUniformBlock(GetLightsUniformBlockIndex(), GetLightsUniformBlockBindingPoint()), "Failed to bind %s to lights uniform block", GetLightsUniformBlockName());
+	CRM(m_pLightsBlock->BindUniformBlock(), "Failed to bind %s to lights uniform block", GetLightsUniformBlockName());
+
+Error:
+	return r;
+}
+
+RESULT OGLVertexShader::InitializeUniformBlocks() {
+	RESULT r = R_PASS;
+
+	CR(m_pLightsBlock->OGLInitialize());
+
+Error:
+	return r;
+}
+
+RESULT OGLVertexShader::UpdateUniformBlockBuffers() {
+	RESULT r = R_PASS;
+
+	CR(m_pLightsBlock->UpdateOGLUniformBlockBuffers());
 
 Error:
 	return r;
@@ -63,8 +80,51 @@ RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetModelMatrixUniformName(), &m_uniformModelMatrixIndex), "Failed to acquire model matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetViewProjectionMatrixUniformName(), &m_uniformViewProjectionMatrixIndex), "Failed to acquire projection view matrix uniform GL location");
 
-	CRM(m_pParentImp->glGetUniformBlockIndex(oglProgramID, GetLightsUniformBlockName(), &m_uniformBlockLightsIndex), "Failed to acquire lights uniform block GL location");
+	//CRM(m_pParentImp->glGetUniformBlockIndex(oglProgramID, GetLightsUniformBlockName(), &m_uniformBlockLightsIndex), "Failed to acquire lights uniform block GL location");
+	CRM(m_pLightsBlock->UpdateUniformBlockIndexFromShader(GetLightsUniformBlockName()), "Failed to acquire lights uniform block GL location");
 
 Error:
 	return r;
+}
+
+RESULT OGLVertexShader::SetLights(std::vector<light*> *pLights) {
+	return m_pLightsBlock->SetLights(pLights);
+}
+
+GLint OGLVertexShader::GetPositionIndex() {
+	//return VERTEX_SHADER_POSITION_INDEX;
+	return m_PositionIndex;
+}
+
+GLint OGLVertexShader::GetColorIndex() {
+	//return VERTEX_SHADER_COLOR_INDEX;
+	return m_ColorIndex;
+}
+
+GLint OGLVertexShader::GetNormalIndex() {
+	//return VERTEX_SHADER_NORMAL_INDEX;
+	return m_NormalIndex;
+}
+
+GLint OGLVertexShader::GetModelMatrixUniformIndex() {
+	return m_uniformModelMatrixIndex;
+}
+
+GLint OGLVertexShader::GetViewProjectionMatrixUniformIndex() {
+	return m_uniformViewProjectionMatrixIndex;
+}
+
+GLint OGLVertexShader::GetLightsUniformBlockBufferIndex() {
+	//return m_uniformBlockLightsIndex;
+	return m_pLightsBlock->GetBufferIndex();
+}
+
+GLint OGLVertexShader::GetLightsUniformBlockIndex() {
+	//return m_uniformBlockLightsIndex;
+	return m_pLightsBlock->GetBlockIndex();
+}
+
+GLint OGLVertexShader::GetLightsUniformBlockBindingPoint() {
+	//return m_uniformBlockLightsBindingPoint;
+	return m_pLightsBlock->GetBindingPoint();
 }

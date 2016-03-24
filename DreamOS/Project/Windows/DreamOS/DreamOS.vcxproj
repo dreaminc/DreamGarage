@@ -155,6 +155,8 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLUniformBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
@@ -190,10 +192,11 @@
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
-    <ClInclude Include="..\..\..\HAL\opengl\OGLLight.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />

@@ -134,6 +134,12 @@
     <ClCompile Include="..\..\..\Primitives\version.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLUniformBlock.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -361,8 +367,11 @@
     <ClInclude Include="..\..\..\Primitives\light.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLLight.h">
-      <Filter>HAL</Filter>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

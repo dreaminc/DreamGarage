@@ -120,6 +120,7 @@ public:
 	RESULT glDeleteBuffers(GLsizei n, const GLuint *buffers);
 
 	RESULT glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
+	RESULT glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data);
 	RESULT glEnableVertexAtrribArray(GLuint index);
 	RESULT glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
 
@@ -129,6 +130,7 @@ public:
 	RESULT BindAttribLocation(unsigned int index, char* pszName);
 
 	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
+	RESULT BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex);
 
 	RESULT glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation);
 
@@ -139,6 +141,7 @@ public:
 	// Uniform Blocks
 	RESULT glGetUniformBlockIndex(GLuint programID, const GLchar *pszName, GLint *pLocation);
 	RESULT glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
+	RESULT glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex);
 
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *shaderID);

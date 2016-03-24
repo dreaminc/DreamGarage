@@ -6,15 +6,13 @@
 // This is a OGL vertex shader object
 
 #include "OpenGLShader.h"
+#include "OGLLightsBlock.h"
 
 class OpenGLImp;	// Declare OpenGLImp class
 
 #define VERTEX_SHADER_POSITION_INDEX 0
 #define VERTEX_SHADER_COLOR_INDEX 1
 #define VERTEX_SHADER_NORMAL_INDEX 2
-
-// TODO: More arch here?
-#define VERTEX_SHADER_LIGHTING_UNIFORM_BLOCK_BINDING_POINT 0
 
 class OGLVertexShader : public OpenGLShader {
 public:
@@ -37,43 +35,29 @@ public:
 
 	const char *GetLightsUniformBlockName() { return "ub_LightArray"; }
 
-	GLint GetPositionIndex() {
-		//return VERTEX_SHADER_POSITION_INDEX;
-		return m_PositionIndex;
-	}
+	GLint GetPositionIndex();
+	GLint GetColorIndex();
+	GLint GetNormalIndex();
+	
+	GLint GetModelMatrixUniformIndex();
+	GLint GetViewProjectionMatrixUniformIndex();
 
-	GLint GetColorIndex() {
-		//return VERTEX_SHADER_COLOR_INDEX;
-		return m_ColorIndex;
-	}
+	GLint GetLightsUniformBlockBufferIndex();
+	GLint GetLightsUniformBlockIndex();
+	GLint GetLightsUniformBlockBindingPoint();
 
-	GLint GetNormalIndex() {
-		//return VERTEX_SHADER_NORMAL_INDEX;
-		return m_NormalIndex;
-	}
-
-	GLint GetModelMatrixUniformIndex() {
-		return m_uniformModelMatrixIndex;
-	}
-
-	GLint GetViewProjectionMatrixUniformIndex() {
-		return m_uniformViewProjectionMatrixIndex;
-	}
-
-	GLint GetLightsUniformBlockIndex() {
-		return m_uniformBlockLightsIndex;
-	}
-
-	GLint GetLightsUniformBlockBindingPoint() {
-		return m_uniformBlockLightsBindingPoint;
-	}
-
+	// TODO: Create OGLAttributes, OGLUniform, OGLUniformBlock objects instead
 	RESULT BindAttributes();
 	RESULT BindUniformBlocks();
+
+	RESULT InitializeUniformBlocks();
+	RESULT UpdateUniformBlockBuffers();
 
 	RESULT EnableVertexPositionAttribute();
 	RESULT EnableVertexColorAttribute();
 	RESULT EnableVertexNormalAttribute();
+
+	RESULT SetLights(std::vector<light*> *pLights);
 
 private:
 	GLint m_PositionIndex;
@@ -83,8 +67,12 @@ private:
 	GLint m_uniformModelMatrixIndex;
 	GLint m_uniformViewProjectionMatrixIndex;
 
+	/* Move into OGLUniformBlock - OGLLightsBlock
 	GLint m_uniformBlockLightsIndex;
 	GLint m_uniformBlockLightsBindingPoint;
+	*/
+
+	OGLLightsBlock *m_pLightsBlock;
 };
 
 #endif // ! OGL_VERTEX_SHADER_H_

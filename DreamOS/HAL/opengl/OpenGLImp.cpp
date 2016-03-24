@@ -208,6 +208,20 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
+	RESULT r = R_PASS;
+	GLenum glerr;
+	DWORD werr;
+
+	CR(glBindBufferBase(target, bindingPointIndex, bufferIndex));
+
+	werr = GetLastError();
+	DEBUG_LINEOUT("Bound uniform block binding point %d to base buffer %d err:0x%x", bindingPointIndex, bufferIndex, werr);
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::UseProgram() {
 	RESULT r = R_PASS;
 
@@ -364,10 +378,17 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(LinkProgram(), "Failed to link program");
 	CRM(UseProgram(), "Failed to use open gl program");
 
+	// TODO: This could all be done in one call in the shader honestly
+	// Attributes
 	CR(pVertexShader->GetAttributeLocationsFromShader());
-	CR(pVertexShader->GetUniformLocationsFromShader());
 	CR(pVertexShader->BindAttributes());
+
+	// TODO: Uniform Variables
+
+	// Uniform Blocks
+	CR(pVertexShader->GetUniformLocationsFromShader());
 	CR(pVertexShader->BindUniformBlocks());
+	CR(pVertexShader->InitializeUniformBlocks());
 
 	CR(PrintVertexAttributes());
 	CR(PrintActiveUniformVariables());
@@ -531,7 +552,8 @@ inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 RESULT OpenGLImp::SendLightsToShader(std::vector<light*> *pLights) {
 	RESULT r = R_PASS;
 
-
+	CR(m_pVertexShader->SetLights(pLights));
+	CR(m_pVertexShader->UpdateUniformBlockBuffers());
 
 Error:
 	return r;
@@ -563,14 +585,14 @@ Error:
 }
 
 #include "OGLVolume.h"
-#include "OGLLight.h"
+#include "Primitives/light.h"
 
 // TODO: Other approach 
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 
 	// Add lights
-	OGLLight *pLight = new OGLLight(LIGHT_POINT, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), point(0.0f, 4.0f, 0.0f), vector::jVector(-1.0f));
+	light *pLight = new light(LIGHT_POINT, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), point(0.0f, 4.0f, 0.0f), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 
 	OGLVolume *pVolume = NULL;
@@ -838,6 +860,18 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBindBufferBase(target, bindingPointIndex, bufferIndex);
+	CRM(CheckGLError(), "glBindBufferBase failed");
+
+Error:
+	return r;
+}
+
+
+
 RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
 	RESULT r = R_PASS;
 
@@ -918,6 +952,18 @@ RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data,
 
 	m_OpenGLExtensions.glBufferData(target, size, data, usage);
 	CRM(CheckGLError(), "glBufferData failed");
+
+Error:
+	return r;
+}
+
+
+
+RESULT OpenGLImp::glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBufferSubData(target, offset, size, data);
+	CRM(CheckGLError(), "glBufferSubData failed");
 
 Error:
 	return r;

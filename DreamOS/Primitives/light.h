@@ -25,7 +25,7 @@ typedef enum LightType {
 
 class light : public VirtualObj {
 public:
-	light() : 
+	light() :
 		VirtualObj(),
 		m_type(DEFAULT_LIGHT_TYPE),
 		m_power(DEFAULT_LIGHT_INTENSITY),
@@ -50,6 +50,13 @@ public:
 	~light() {
 		// empty
 	}
+
+	LIGHT_TYPE GetLightType() { return m_type; }
+	light_precision GetPower() { return m_power; }
+	color GetDiffuseColor() { return m_colorDiffuse; }
+	color GetSpecularColor() { return m_colorSpecular; }
+	vector GetLightDirection() { return m_vectorDirection; }
+
 
 private:
 	LIGHT_TYPE m_type;		// NOTE: This is treated as an int

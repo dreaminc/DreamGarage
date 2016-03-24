@@ -38,18 +38,23 @@ Light g_lightTemp = Light(
 	vec4(0.0, -1.0, 0.0, 0.0)		// direction
 );
 
-vec4 g_vec4AmbientLightLevel = 0.0 * vec4(1.0, 1.0, 1.0, 0.0);
+vec4 g_vec4AmbientLightLevel = 0.05 * vec4(1.0, 1.0, 1.0, 0.0);
 
 mat4 mat4InvTransposeModel = transpose(inverse(u_mat4Model));
 
 void main(void) {	
+	Light activeLight = g_lightTemp;
+	//Light activeLight = lights[0];
+
 	vec4 vertWorldSpace = u_mat4Model * inV_vec4Position;
-	vec3 directionLight = vec3(g_lightTemp.m_ptOrigin - vertWorldSpace);
+	
+	vec3 directionLight = vec3(activeLight.m_ptOrigin - vertWorldSpace);
 	float distanceLight = length(directionLight);
+	
 	vec4 vec4ModelNormal = mat4InvTransposeModel * inV_vec4Normal;
 
 	float cosThetaOfLightToVert = max(dot(vec3(vec4ModelNormal), directionLight), 0.0);
-	float lightValue = (g_lightTemp.m_power / (distanceLight * distanceLight)) * cosThetaOfLightToVert;
+	float lightValue = (activeLight.m_power / (distanceLight * distanceLight)) * cosThetaOfLightToVert;
 
 	// Projected Vert Position
 	gl_Position = u_mat4ViewProjection * vertWorldSpace;
