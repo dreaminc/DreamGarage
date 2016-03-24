@@ -36,7 +36,7 @@ public:
 		// empty
 	}
 
-	light(LIGHT_TYPE type, light_precision intensity, color colorDiffuse, color colorSpecular, point ptOrigin, vector vectorDirection) :
+	light(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) :
 		VirtualObj(ptOrigin),
 		m_type(type),
 		m_power(intensity),

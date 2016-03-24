@@ -69,9 +69,9 @@ RESULT OGLUniformBlock::UpdateOGLUniformBlockBuffers() {
 	CR(GetUniformBlockBuffer(pUniformBufferData, &pUniformBufferData_n));
 	CR(m_pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
 
-	CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
+	//CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 
-	CR(m_pParentImp->glBufferSubData(GL_UNIFORM_BUFFER, 0, pUniformBufferData_n, pUniformBufferData));
+	//CR(m_pParentImp->glBufferSubData(GL_UNIFORM_BUFFER, 0, pUniformBufferData_n, pUniformBufferData));
 
 	//CR(m_pParentImp->ReleaseCurrentContext());
 

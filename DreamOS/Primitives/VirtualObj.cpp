@@ -37,6 +37,21 @@ VirtualObj VirtualObj::translate(point_precision x, point_precision y, point_pre
 	return (*this);
 }
 
+VirtualObj VirtualObj::translateX(point_precision x) {
+	m_ptOrigin.translateX(x);
+	return (*this);
+}
+
+VirtualObj VirtualObj::translateY(point_precision y) {
+	m_ptOrigin.translateY(y);
+	return (*this);
+}
+
+VirtualObj VirtualObj::translateZ(point_precision z) {
+	m_ptOrigin.translateZ(z);
+	return (*this);
+}
+
 VirtualObj VirtualObj::MoveTo(point p) {
 	m_ptOrigin = p;
 	return (*this);

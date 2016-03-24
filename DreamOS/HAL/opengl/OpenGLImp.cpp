@@ -587,13 +587,16 @@ Error:
 #include "OGLVolume.h"
 #include "Primitives/light.h"
 
+light *g_pLight = NULL;
+
 // TODO: Other approach 
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 
 	// Add lights
-	light *pLight = new light(LIGHT_POINT, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), point(0.0f, 4.0f, 0.0f), vector::jVector(-1.0f));
+	light *pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 2.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
+	g_pLight = pLight;
 
 	OGLVolume *pVolume = NULL;
 	int num = 20;
@@ -649,6 +652,8 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	VirtualObj *pVirtualObj = NULL;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	g_pLight->translateX(0.005f);
 
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;

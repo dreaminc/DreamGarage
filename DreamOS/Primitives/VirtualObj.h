@@ -52,6 +52,10 @@ public:
 
 	VirtualObj translate(matrix <point_precision, 4, 1> v);
 	VirtualObj translate(point_precision x, point_precision y, point_precision z);
+	VirtualObj translateX(point_precision x);
+	VirtualObj translateY(point_precision y);
+	VirtualObj translateZ(point_precision z);
+
 	VirtualObj MoveTo(point p);
 	VirtualObj MoveTo(point_precision x, point_precision y, point_precision z);
 

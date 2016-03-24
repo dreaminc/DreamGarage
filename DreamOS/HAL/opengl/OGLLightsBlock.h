@@ -12,7 +12,7 @@
 #include "Primitives/light.h"
 #include <vector>
 
-#define MAX_TOTAL_LIGHTS 10
+#define MAX_TOTAL_LIGHTS 2
 #define LIGHTS_UNIFORM_BLOCK_BINDING_POINT 0
 
 class OGLLightsBlock : public OGLUniformBlock {
@@ -22,7 +22,7 @@ public:
 
 	RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
 	
-	RESULT AddLight(LIGHT_TYPE type, light_precision intensity, color colorDiffuse, color colorSpecular, point ptOrigin, vector vectorDirection);
+	RESULT AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	RESULT AddLight(light *pLight);
 	RESULT ClearLights();
 
@@ -33,20 +33,31 @@ private:
 	// This is the equivalent to the shader
 	// Since the light virtual object has other stuff in there
 	// TODO? Maybe move to VirtualObj as the standard
+
+#pragma pack(push)  /* push current alignment to stack */
+#pragma pack(1)     /* set alignment to 1 byte boundary */
 	struct LightBlockLight {
-		int type;
-		float power;
-		vector ptOrigin;
+		GLint type;
+		GLfloat power;
+		GLfloat reserved1;
+		GLfloat reserved2;
+
+		point ptOrigin;
 		vector colorDiffuse;
 		color colorSpecular;
 		vector vectorDirection;
 	};
+#pragma pack(pop)
 
+#pragma pack(push)  /* push current alignment to stack */
+#pragma pack(1)     /* set alignment to 1 byte boundary */
 	struct LightBlock {
-		int numActiveLights;
 		//light lights[MAX_TOTAL_LIGHTS];
 		LightBlockLight lights[MAX_TOTAL_LIGHTS];
+		GLint numActiveLights;
 	} m_LightBlock;
+#pragma pack(pop)
+
 };
 
 #endif // ! OGL_LIGHTS_BLOCK_H_

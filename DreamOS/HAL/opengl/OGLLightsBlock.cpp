@@ -22,16 +22,17 @@ Error:
 	return r;
 }
 
-RESULT OGLLightsBlock::AddLight(LIGHT_TYPE type, light_precision intensity, color colorDiffuse, color colorSpecular, point ptOrigin, vector vectorDirection) {
+RESULT OGLLightsBlock::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
 
 	LightBlockLight newLight;
+	memset(&newLight, 0, sizeof(LightBlockLight));
 
 	CBM((m_LightBlock.numActiveLights < MAX_TOTAL_LIGHTS), "Cannot add more than %d lights", MAX_TOTAL_LIGHTS);
 
 	newLight.type = type;
-	newLight.ptOrigin = ptOrigin;
 	newLight.power = intensity;
+	newLight.ptOrigin = ptOrigin;
 	newLight.colorDiffuse = colorDiffuse;
 	newLight.colorSpecular = colorSpecular;
 	newLight.vectorDirection = vectorDirection;
@@ -49,9 +50,9 @@ RESULT OGLLightsBlock::AddLight(light *pLight) {
 	CR(AddLight(
 		pLight->GetLightType(), 
 		pLight->GetPower(),
+		pLight->GetOrigin(),
 		pLight->GetDiffuseColor(),
 		pLight->GetSpecularColor(),
-		pLight->GetOrigin(),
 		pLight->GetLightDirection()
 	));
 
