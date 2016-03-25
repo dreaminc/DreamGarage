@@ -660,7 +660,7 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//g_pLight->translateX(0.005f);
+	g_pLight->translateZ(0.005f);
 
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;

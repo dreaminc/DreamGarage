@@ -39,7 +39,7 @@ private:
 	struct LightBlockLight {
 		GLint type;
 		GLfloat power;
-		GLfloat reserved1;
+		GLfloat shine;
 		GLfloat reserved2;
 
 		point ptOrigin;

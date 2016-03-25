@@ -53,6 +53,7 @@ public:
 
 	LIGHT_TYPE GetLightType() { return m_type; }
 	light_precision GetPower() { return m_power; }
+
 	color GetDiffuseColor() { return m_colorDiffuse; }
 	color GetSpecularColor() { return m_colorSpecular; }
 	vector GetLightDirection() { return m_vectorDirection; }

@@ -32,6 +32,7 @@ RESULT OGLLightsBlock::AddLight(LIGHT_TYPE type, light_precision intensity, poin
 
 	newLight.type = type;
 	newLight.power = intensity;
+
 	newLight.ptOrigin = ptOrigin;
 	newLight.colorDiffuse = colorDiffuse;
 	newLight.colorSpecular = colorSpecular;
@@ -48,7 +49,7 @@ RESULT OGLLightsBlock::AddLight(light *pLight) {
 	RESULT r = R_PASS;
 
 	CR(AddLight(
-		pLight->GetLightType(), 
+		pLight->GetLightType(),
 		pLight->GetPower(),
 		pLight->GetOrigin(),
 		pLight->GetDiffuseColor(),
