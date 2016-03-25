@@ -19,7 +19,7 @@ uniform mat4 u_mat4ViewProjection;
 struct Light {
 	int m_type;
 	float m_power;
-	float reserved1;
+	float m_shine;
 	float reserved2;
 
 	vec4 m_ptOrigin;
@@ -28,25 +28,34 @@ struct Light {
 	vec4 m_vectorDirection; 
 };
 
+struct Material {
+    float m_shine;
+	float reserved1;
+	float reserved2;
+	float reserved3;
+    vec4 m_colorAmbient;
+    vec4 m_colorDiffuse;
+    vec4 m_colorSpecular;
+};
+
 layout(std140) uniform ub_LightArray {
 	Light lights[MAX_TOTAL_LIGHTS];
 	int numLights;	
 };
 
-Light g_lightTemp = Light(
-	2,								// type
-	1.0,							// Light Emit Power
-	0,
-	0,
-
-	vec4(0.0, 5.0, 0.0, 1.0),		// origin
-	vec4(1.0, 1.0, 1.0, 1.0),		// diffuse
-	vec4(1.0, 1.0, 1.0, 1.0),		// specular
-	vec4(0.0, -1.0, 0.0, 0.0)		// direction
-);
+Material g_mat = {
+	0.5f,	// shine
+	0.0f,
+	0.0f,
+	0.0f,
+	vec4(1.0f, 1.0f, 1.0f, 1.0f),	// ambient
+	vec4(1.0f, 1.0f, 1.0f, 1.0f),	// diffuse
+	vec4(1.0f, 1.0f, 1.0f, 1.0f)	// specular
+};
 
 vec4 g_vec4AmbientLightLevel = 0.05 * vec4(1.0, 1.0, 1.0, 0.0);
 
+// TODO: Move to CPU side
 mat4 mat4InvTransposeModel = transpose(inverse(u_mat4Model));
 
 void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 vectorNormal, out float lightValue) {
