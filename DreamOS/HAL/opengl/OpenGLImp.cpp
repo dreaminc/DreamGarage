@@ -594,7 +594,15 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 
 	// Add lights
-	light *pLight = new light(LIGHT_POINT, 1.0f, point(2.0f, 1.0f, -1.0f), color(COLOR_BLUE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	light *pLight = NULL; 
+
+	///*
+	pLight = new light(LIGHT_POINT, 10.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pSceneGraph->PushObject(pLight);
+	//*/
+
+	/*
+	pLight = new light(LIGHT_POINT, 1.0f, point(2.0f, 1.0f, -1.0f), color(COLOR_BLUE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 
 	pLight = new light(LIGHT_POINT, 1.0f, point(-2.0f, 1.0f, -1.0f), color(COLOR_RED), color(COLOR_WHITE), vector::jVector(-1.0f));
@@ -602,6 +610,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 1.0f, 2.0f), color(COLOR_GREEN), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
+	//*/
 
 	g_pLight = pLight;
 
@@ -660,7 +669,7 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	g_pLight->translateZ(0.005f);
+	//g_pLight->translateZ(0.005f);
 
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;

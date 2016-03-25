@@ -297,6 +297,8 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, pCamera));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, pCamera));
 
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_SPACE, pCamera));
+
 	for (int i = 0; i < 26; i++) {
 		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
 	}
