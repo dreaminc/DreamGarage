@@ -3,7 +3,7 @@
 
 #version 440 core
 
-#define MAX_TOTAL_LIGHTS 2
+#define MAX_TOTAL_LIGHTS 10
 
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
@@ -48,19 +48,27 @@ vec4 g_vec4AmbientLightLevel = 0.05 * vec4(1.0, 1.0, 1.0, 0.0);
 
 mat4 mat4InvTransposeModel = transpose(inverse(u_mat4Model));
 
-void main(void) {	
-	//Light activeLight = g_lightTemp;
-	Light activeLight = lights[0];
-
-	vec4 vertWorldSpace = u_mat4Model * inV_vec4Position;
-	
-	vec3 directionLight = vec3(activeLight.m_ptOrigin - vertWorldSpace);
+void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 vectorNormal, out float lightValue) {
+	vec3 directionLight = vec3(light.m_ptOrigin - vertWorldSpace);
 	float distanceLight = length(directionLight);
 	
-	vec4 vec4ModelNormal = mat4InvTransposeModel * inV_vec4Normal;
+	vec4 vec4ModelNormal = mat4InvTransposeModel * vectorNormal;
 
 	float cosThetaOfLightToVert = max(dot(vec3(vec4ModelNormal), directionLight), 0.0);
-	float lightValue = (activeLight.m_power / (distanceLight * distanceLight)) * cosThetaOfLightToVert;
+	
+	lightValue = (light.m_power / (distanceLight * distanceLight)) * cosThetaOfLightToVert;
+}
+
+void main(void) {	
+	vec4 vertWorldSpace = u_mat4Model * inV_vec4Position;
+
+	float lightValue = 0;
+	float activeLightValue = 0;
+
+	for(int i = 0; i < numLights; i++) {
+		CalculateVertexLightValue(lights[i], vertWorldSpace, inV_vec4Normal, activeLightValue);
+		lightValue += activeLightValue;
+	}
 
 	// Projected Vert Position
 	gl_Position = u_mat4ViewProjection * vertWorldSpace;
