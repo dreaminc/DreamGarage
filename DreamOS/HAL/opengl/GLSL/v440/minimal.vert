@@ -51,6 +51,11 @@ mat4 mat4InvTransposeModel = transpose(inverse(u_mat4Model));
 
 void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 vectorNormal, out float lightValue) {
 	vec3 directionLight = vec3(light.m_ptOrigin - vertWorldSpace);
+	vec3 directionEye = vec3(-vertWorldSpace);
+	
+	vec3 halfVector = directionLight + directionEye;
+	float specularComponent = 
+
 	float distanceLight = length(directionLight);
 	
 	vec4 vec4ModelNormal = mat4InvTransposeModel * vectorNormal;
