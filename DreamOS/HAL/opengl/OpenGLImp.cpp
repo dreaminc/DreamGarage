@@ -594,13 +594,13 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 
 	// Add lights
-	light *pLight = new light(LIGHT_POINT, 1.0f, point(5.0f, 1.0f, -3.0f), color(COLOR_BLUE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	light *pLight = new light(LIGHT_POINT, 1.0f, point(2.0f, 1.0f, -1.0f), color(COLOR_BLUE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 
-	pLight = new light(LIGHT_POINT, 1.0f, point(-5.0f, 1.0f, -3.0f), color(COLOR_RED), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(-2.0f, 1.0f, -1.0f), color(COLOR_RED), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 
-	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 1.0f, 3.0f), color(COLOR_GREEN), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 1.0f, 2.0f), color(COLOR_GREEN), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 
 	g_pLight = pLight;

@@ -5,6 +5,7 @@
 
 #define MAX_TOTAL_LIGHTS 10
 
+// TODO: Move to a uniform block
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
 layout (location = 2) in vec4 inV_vec4Normal;
@@ -62,17 +63,17 @@ void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 v
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * inV_vec4Position;
 
-	float lightValue = 0;
-	float activeLightValue = 0;
+	vec3 vec3LightValue = vec3(0.0f, 0.0f, 0.0f);
+	float activeLightValue = 0.0f;
 
 	for(int i = 0; i < numLights; i++) {
 		CalculateVertexLightValue(lights[i], vertWorldSpace, inV_vec4Normal, activeLightValue);
-		lightValue += activeLightValue;
+		vec3LightValue += activeLightValue * vec3(lights[i].m_colorDiffuse);
 	}
 
 	// Projected Vert Position
 	gl_Position = u_mat4ViewProjection * vertWorldSpace;
 
 	// Vert Color
-	inF_vec3Color = (lightValue * vec3(inV_vec4Color)) + vec3(g_vec4AmbientLightLevel);
+	inF_vec3Color = (vec3LightValue * vec3(inV_vec4Color)) + vec3(g_vec4AmbientLightLevel);
 }
