@@ -82,10 +82,6 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	Validate();
 	return;
-
-Error:
-	Invalidate();
-	return;
 }
 
 Windows64App::~Windows64App() {
@@ -144,7 +140,7 @@ Error:
 	return r;
 }
 
-long __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
 	Windows64App *pApp = NULL;
 
 	// Get pointer to window
@@ -164,7 +160,7 @@ long __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARA
 	return pApp->WndProc(hWindow, msg, wp, lp);
 }
 
-long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
 	switch (msg) {
 		case WM_CREATE: {
 			HDC hDC = GetDC(hWindow);
@@ -248,7 +244,7 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 		} break;
 			
 		case WM_MOUSEWHEEL: {
-			int wheel = ((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
+			int wheel = static_cast<int>((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Mousewheel %d!", wheel);

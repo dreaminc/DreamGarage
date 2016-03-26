@@ -83,7 +83,12 @@ public:
 	}
 
 	ProjectionMatrix GetProjectionMatrix() { 
-		return ProjectionMatrix(m_ProjectionType, m_pxScreenWidth, m_pxScreenHeight, m_NearPlane, m_FarPlane, m_FielfOfViewAngle);
+		return ProjectionMatrix(m_ProjectionType,
+								static_cast<projection_precision>(m_pxScreenWidth),
+								static_cast<projection_precision>(m_pxScreenHeight),
+								static_cast<projection_precision>(m_NearPlane),
+								static_cast<projection_precision>(m_FarPlane),
+								static_cast<projection_precision>(m_FielfOfViewAngle));
 	}
 
 	ViewMatrix GetViewMatrix() { 
@@ -176,7 +181,6 @@ public:
 			} break;
 		}
 
-	Error:
 		return r;
 	}
 
@@ -217,7 +221,6 @@ public:
 			MoveForward(-0.1f);
 		}
 
-	Error:
 		return r;
 	}
 

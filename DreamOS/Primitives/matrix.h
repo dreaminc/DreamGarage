@@ -120,16 +120,13 @@ public:
 	}
 
 	RESULT PrintMatrix() {
-		RESULT r = R_PASS;
 		for (int i = 0; i < N; i++) {
 			for (int j = 0; j < M; j++) {
 				DEBUG_OUT("%02f ", m_data[(j * N) + i]);
 			}
 			DEBUG_LINEOUT("");
 		}
-
-	Error:
-		return r;
+		return R_PASS;
 	}
 
 public:

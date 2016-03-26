@@ -37,8 +37,8 @@ public:
 	RESULT InitializeOpenGLRenderingContext();
 
 private:
-	static long __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
-	long __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
+	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
+	LRESULT __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 

@@ -19,6 +19,11 @@
 	typedef double quaternion_precision;
 #endif
 
+constexpr quaternion_precision operator "" _q(long double number)
+{
+	return static_cast<quaternion_precision>(number);
+}
+
 class quaternion {
 public:
 	quaternion() {
@@ -39,9 +44,9 @@ public:
 	}
 
 	RESULT SetQuaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
-		quaternion_precision factor = sin(theta / 2.0);
+		quaternion_precision factor = static_cast<quaternion_precision>(sin(theta / 2.0));
 
-		quaternion_precision w = cos(theta / 2.0f);
+		quaternion_precision w = static_cast<quaternion_precision>(cos(theta / 2.0f));
 
 		x *= factor;
 		y *= factor;
@@ -67,7 +72,7 @@ public:
 	}
 
 	quaternion Normalize() {
-		quaternion_precision magnitude = sqrt(pow(m_w, 2) + pow(m_x, 2) + pow(m_y, 2) + pow(m_z, 2));
+		quaternion_precision magnitude = static_cast<quaternion_precision>(sqrt(pow(m_w, 2) + pow(m_x, 2) + pow(m_y, 2) + pow(m_z, 2)));
 
 		m_w /= magnitude;
 		m_x /= magnitude;
@@ -78,7 +83,7 @@ public:
 	}
 
 	quaternion_precision Magnitude() {
-		return sqrt(pow(m_w, 2) + pow(m_x, 2) + pow(m_y, 2) + pow(m_z, 2));
+		return static_cast<quaternion_precision>(pow(m_w, 2) + pow(m_x, 2) + pow(m_y, 2) + pow(m_z, 2));
 	}
 
 	RESULT RotateByVector(vector v, quaternion_precision theta) {
@@ -102,17 +107,17 @@ public:
 
 	// Euler Conversions: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 	quaternion_precision GetEulerAngelZ() {
-		quaternion_precision phi = atan2((2.0f * ((m_w * m_x) + (m_y * m_z))), (1 - 2.0f * (m_x*m_x + m_y*m_y)));
+		quaternion_precision phi = static_cast<quaternion_precision>((2.0f * ((m_w * m_x) + (m_y * m_z))), (1 - 2.0f * (m_x*m_x + m_y*m_y)));
 		return phi;
 	}
 
 	quaternion_precision GetEulerAngelX() {
-		quaternion_precision theta = asin((2.0f * ((m_w * m_y) - (m_z * m_x))));
+		quaternion_precision theta = static_cast<quaternion_precision>((2.0f * ((m_w * m_y) - (m_z * m_x))));
 		return theta;
 	}
 
 	quaternion_precision GetEulerAngelY() {
-		quaternion_precision psi = atan2((2.0f * ((m_w * m_z) + (m_x * m_y))), (1 - 2.0f * (m_y*m_y + m_z*m_z)));
+		quaternion_precision psi = static_cast<quaternion_precision>((2.0f * ((m_w * m_z) + (m_x * m_y))), (1 - 2.0f * (m_y*m_y + m_z*m_z)));
 		return psi;
 	}
 

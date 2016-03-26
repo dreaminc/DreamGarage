@@ -92,20 +92,20 @@ public:
 
 		this->identity();
 
-		rotation_precision cosTheta = cos(theta);
-		rotation_precision sinTheta = ROTATION_HAND_SIGN * sin(theta);
+		rotation_precision cosTheta = static_cast<rotation_precision>(theta);
+		rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(theta);
 
-		this->element(0, 0) = cosTheta  + (pow(u.x(), 2) * (1 - cosTheta));
+		this->element(0, 0) = cosTheta  + (static_cast<rotation_precision>(pow(u.x(), 2)) * (1 - cosTheta));
 		this->element(0, 1) = (u.x() * u.y() * (1 - cosTheta)) - (u.z() * sinTheta);
 		this->element(0, 2) = (u.x() * u.z() * (1 - cosTheta)) + (u.y() * sinTheta);
 
 		this->element(1, 0) = (u.x() * u.y() * (1 - cosTheta)) + (u.z() * sinTheta);
-		this->element(1, 1) = cosTheta + (pow(u.y(), 2) * (1 - cosTheta));
+		this->element(1, 1) = cosTheta + (static_cast<rotation_precision>(pow(u.y(), 2)) * (1 - cosTheta));
 		this->element(1, 2) = (u.y() * u.z() * (1 - cosTheta)) - (u.x() * sinTheta);
 
 		this->element(2, 0) = (u.x() * u.z() * (1 - cosTheta)) - (u.y() * sinTheta);
 		this->element(2, 1) = (u.y() * u.z() * (1 - cosTheta)) + (u.x() * sinTheta);
-		this->element(2, 2) = cosTheta + (pow(u.z(), 2) * (1 - cosTheta));
+		this->element(2, 2) = cosTheta + (static_cast<rotation_precision>(pow(u.z(), 2)) * (1 - cosTheta));
 
 		return R_PASS;
 	}
@@ -115,14 +115,14 @@ public:
 		m_type = XYZ_AXIS;
 		this->identity();
 
-		rotation_precision cosPhi = cos(phi);
-		rotation_precision sinPhi = ROTATION_HAND_SIGN * sin(phi);
+		rotation_precision cosPhi = static_cast<rotation_precision>(cos(phi));
+		rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(phi));
 
-		rotation_precision cosTheta = cos(theta);
-		rotation_precision sinTheta = ROTATION_HAND_SIGN * sin(theta);
+		rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
+		rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
 
-		rotation_precision cosPsi = cos(psi);
-		rotation_precision sinPsi = ROTATION_HAND_SIGN * sin(psi);
+		rotation_precision cosPsi = static_cast<rotation_precision>(cos(psi));
+		rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(psi));
 
 		this->element(0, 0) = cosTheta * cosPsi;
 		this->element(0, 1) = (cosPhi * sinPsi) + (sinPhi * sinTheta * cosPsi);
@@ -146,8 +146,8 @@ public:
 
 		this->identity();
 
-		rotation_precision cosPhi = cos(theta);
-		rotation_precision sinPhi = ROTATION_HAND_SIGN * sin(theta);
+		rotation_precision cosPhi = static_cast<rotation_precision>(cos(theta));
+		rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
 
 		this->element(1, 1) = cosPhi;
 		this->element(1, 2) = -sinPhi;
@@ -162,8 +162,8 @@ public:
 
 		this->identity();
 
-		rotation_precision cosTheta = cos(theta);
-		rotation_precision sinTheta = ROTATION_HAND_SIGN * sin(theta);
+		rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
+		rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
 
 		this->element(0, 0) = cosTheta;
 		this->element(0, 2) = sinTheta;
@@ -178,8 +178,8 @@ public:
 
 		this->identity();
 
-		rotation_precision cosPsi = cos(theta);
-		rotation_precision sinPsi = ROTATION_HAND_SIGN * sin(theta);
+		rotation_precision cosPsi = static_cast<rotation_precision>(cos(theta));
+		rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
 
 		this->element(0, 0) = cosPsi;
 		this->element(0, 1) = -sinPsi;

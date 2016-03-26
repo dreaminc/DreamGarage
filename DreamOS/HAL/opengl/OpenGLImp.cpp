@@ -85,7 +85,7 @@ RESULT OpenGLImp::InitializeGLContext() {
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
 	CR(InitializeOpenGLVersion());
 	//CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
-	CBM((m_versionOGL >= 3.2), "OpengL 3.2+ Not Supported");
+	CBM((m_versionOGL >= 3.2f), "OpengL 3.2+ Not Supported");
 
 	//CR(InitializeShadersFolder());
 
@@ -119,8 +119,6 @@ Error:
 
 RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 	RESULT r = R_PASS;
-	GLint param;
-	GLint numShaders;
 	GLenum glerr = GL_NO_ERROR;
 
 	OpenGLShader *&pOGLShader = (OpenGLShader *&)(this->m_pVertexShader);
@@ -164,6 +162,8 @@ RESULT OpenGLImp::EnableVertexPositionAttribute() {
 		m_pVertexShader->EnableVertexPositionAttribute();
 	else
 		return R_FAIL;
+
+	return R_PASS;
 }
 
 RESULT OpenGLImp::EnableVertexColorAttribute() {
@@ -171,11 +171,12 @@ RESULT OpenGLImp::EnableVertexColorAttribute() {
 		m_pVertexShader->EnableVertexColorAttribute();
 	else
 		return R_FAIL;
+
+	return R_PASS;
 }
 
 RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 	RESULT r = R_PASS;
-	GLenum glerr;
 	DWORD werr;
 
 	CR(glBindAttribLocation(m_idOpenGLProgram, index, pszName));
@@ -391,7 +392,6 @@ RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 
 	m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight);
 
-Error:
 	return r;
 }
 
@@ -453,7 +453,6 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	}
 	*/
 
-Error:
 	return r;
 }
 
@@ -467,7 +466,8 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 
 	switch (mEvent->EventType) {
 		case SENSE_MOUSE_MOVE: {
-			CR(m_pCamera->RotateCameraByDiffXY(mEvent->dx, mEvent->dy));
+			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx), 
+				static_cast<camera_precision>(mEvent->dy)));
 		} break;
 
 		case SENSE_MOUSE_LEFT_BUTTON: {
@@ -503,7 +503,6 @@ RESULT OpenGLImp::UpdateCamera() {
 
 	m_pCamera->UpdateCameraPosition();
 
-Error:
 	return r;
 }
 
@@ -518,7 +517,6 @@ RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
 	if (locationViewProjectionMatrix >= 0)
 		glUniformMatrix4fv(locationViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matVP));
 
-Error:
 	return r;
 }
 
@@ -536,13 +534,14 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 		for (int j = 0; j < num; j++) {
 			pVolume = new OGLVolume(this, size);
 			pVolume->SetRandomColor();
-			pVolume->translate(i * (size * 2) - (num * size), 0.0f, j * (size * 2) - (num * size));
+			pVolume->translate(static_cast<point_precision>(i * (size * 2) - (num * size)), 
+				static_cast<point_precision>(0.0f),
+				static_cast<point_precision>(j * (size * 2) - (num * size)));
 			pVolume->UpdateOGLBuffers();
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
 
-Error:
 	return r;
 }
 
@@ -564,7 +563,6 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	
 	glFlush();
 
-Error:
 	CheckGLError();
 	return r;
 }
@@ -592,7 +590,6 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	
 	glFlush();
 
-Error:
 	return r;
 }
 
@@ -630,7 +627,6 @@ RESULT OpenGLImp::ShutdownImplementaiton() {
 		m_pOpenGLRenderingContext = NULL;
 	}
 
-Error:
 	return r;
 }
 
