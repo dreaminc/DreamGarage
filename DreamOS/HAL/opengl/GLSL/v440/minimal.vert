@@ -53,7 +53,7 @@ Material g_mat = {
 	vec4(1.0f, 1.0f, 1.0f, 1.0f)	// specular
 };
 
-vec4 g_vec4AmbientLightLevel = 0.05 * vec4(1.0, 1.0, 1.0, 0.0);
+vec4 g_vec4AmbientLightLevel = 1.0 * vec4(1.0, 1.0, 1.0, 0.0);
 
 // TODO: Move to CPU side
 mat4 mat4InvTransposeModel = transpose(inverse(u_mat4Model));

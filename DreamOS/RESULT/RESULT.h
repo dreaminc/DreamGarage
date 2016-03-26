@@ -11,6 +11,8 @@
 #define RESULT_START_OK 0x00000000
 #define RESULT_START_WARN 0x70000000
 
+#define M_PI       3.14159265358979323846   // pi
+
 typedef enum {
     //R_OK = RESULT_START_OK,
     R_K = RESULT_START_OK,

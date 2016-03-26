@@ -585,6 +585,7 @@ Error:
 }
 
 #include "OGLVolume.h"
+#include "OGLSphere.h"
 #include "Primitives/light.h"
 
 light *g_pLight = NULL;
@@ -614,6 +615,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	g_pLight = pLight;
 
+	/*
 	OGLVolume *pVolume = NULL;
 	int num = 20;
 	double size = 0.5f;
@@ -628,6 +630,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
+	*/
+
+	OGLSphere *pSphere = new OGLSphere(this, 1.0f, 10, 10);
+	pSceneGraph->PushObject(pSphere);
 
 Error:
 	return r;

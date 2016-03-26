@@ -195,6 +195,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
@@ -216,6 +217,7 @@
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
+    <ClInclude Include="..\..\..\Primitives\sphere.h" />
     <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
     <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />

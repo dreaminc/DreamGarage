@@ -83,7 +83,7 @@ public:
 	RESULT AllocateIndices(uint32_t numIndices) {
 		RESULT r = R_PASS;
 
-		m_pIndices = new uint32_t[numIndices];
+		m_pIndices = new dimindex[numIndices];
 		CN(m_pIndices);
 
 	Error:
