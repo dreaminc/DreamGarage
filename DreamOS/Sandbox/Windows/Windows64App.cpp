@@ -340,8 +340,8 @@ RESULT Windows64App::ShowSandbox() {
 	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
 
 	// TODO: Move to Sandbox function
-	CR(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
-	CR(RegisterImpMouseEvents(), "Failed to register mouse events");
+	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
+	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	// Show the window
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
@@ -427,6 +427,5 @@ RESULT Windows64App::RecoverDisplayMode() {
 
 	// TODO: What the hell is this?
 
-Error:
 	return r;
 }

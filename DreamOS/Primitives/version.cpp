@@ -54,7 +54,6 @@ RESULT version::SetVersion(float fVer) {
 	m_minor = vMin;
 	m_doubleminor = 0;
 
-Error:
 	return r;
 }
 
@@ -67,13 +66,12 @@ RESULT version::SetVersion(long lVer) {
 	long numDigits = (int)ceil(log10((double)lVer));
 	
 	if(numDigits > 3)
-		lVer = lVer / (pow(10, numDigits - 3));
+		lVer = static_cast<long>(lVer / (pow(10, numDigits - 3)));
 
 	m_major = (int)((lVer % 1000) / 100);
 	m_minor = (int)((lVer % 100) / 10);
 	m_doubleminor = (int)((lVer % 10) / 1);
 
-Error:
 	return r;
 }
 

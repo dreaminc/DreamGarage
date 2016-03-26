@@ -150,6 +150,5 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays")),
 		"Failed to initialize glDeleteVertexArrays extension");
 
-Error:
 	return r;
 }

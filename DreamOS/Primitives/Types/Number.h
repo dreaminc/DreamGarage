@@ -244,7 +244,7 @@ public:
 public:
 	static long DigitCount(double num) { 
 		if (num == 0)
-			return 1.0f;
+			return 1;
 
 		long digitCount = (long)ceil(log10((double)(num)));
 		return digitCount;

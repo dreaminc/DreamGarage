@@ -16,9 +16,6 @@ PathManager::PathManager() :
 
 	Validate();
 	return;
-
-Error:
-	Invalidate();
 }
 
 PathManager::~PathManager() {
@@ -55,7 +52,7 @@ RESULT PathManager::RegisterPath(wchar_t *pszName, wchar_t *pszValue) {
 	CBM((pathValueType != PATH_INVALID), "Not a valid path value type");
 
 	// Copy the value - save the memory
-	pszValueCopy_n = wcslen(pszValue) + 1;
+	pszValueCopy_n = static_cast<long>(wcslen(pszValue) + 1);
 	pszValueCopy = new wchar_t[pszValueCopy_n];
 	memset(pszValueCopy, 0, sizeof(wchar_t) * pszValueCopy_n);
     
@@ -147,10 +144,10 @@ RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	CRM(IsPathRegistered(type), "Value not registered");
 	
 	pszValue = m_pmapNVPPaths->at(type);
-	pszValue_n = wcslen(pszValue);
+	pszValue_n = static_cast<long>(wcslen(pszValue));
 	
 	CRM(GetDreamPath(pszDreamPath), "Failed to acquire dream path");
-	pszDreamPath_n = wcslen(pszDreamPath);
+	pszDreamPath_n = static_cast<long>(wcslen(pszDreamPath));
 
 	n_pszPath_n = pszDreamPath_n + 1 + pszValue_n + 1;
 	n_pszPath = new wchar_t[n_pszPath_n];
@@ -179,10 +176,10 @@ RESULT PathManager::GetValuePathVersion(PATH_VALUE_TYPE type, version ver, wchar
 
 	// Get Path
 	CRM(GetValuePath(type, pszValuePath), "Failed to get value %S path", GetPathValueString(type));
-	pszValuePath_n = wcslen(pszValuePath);
+	pszValuePath_n = static_cast<long>(wcslen(pszValuePath));
 
 	CRM(GetVersionFolder(ver, pszVersionFolder), "Failed to get version folder");
-	pszVersionFolder_n = wcslen(pszVersionFolder);
+	pszVersionFolder_n = static_cast<long>(wcslen(pszVersionFolder));
 
 	n_pszVersionPath_n = (pszValuePath_n + 1) + (pszVersionFolder_n + 1);
 	n_pszVersionPath = new wchar_t[n_pszVersionPath_n];
@@ -210,14 +207,14 @@ Error:
 // TODO: Move this to get file / FileManager
 RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName, wchar_t * &n_pszFilePath) {
 	RESULT r = R_PASS;
-	long pszFileName_n = wcslen(pszFileName);
+	long pszFileName_n = static_cast<long>(wcslen(pszFileName));
 	long n_pszFilePath_n = 0;
 
 	wchar_t *pszValuePath = NULL;
 	long pszValuePath_n = 0;
 
 	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
-	pszValuePath_n = wcslen(pszValuePath);
+	pszValuePath_n = static_cast<long>(wcslen(pszValuePath));
 
 	n_pszFilePath_n = pszValuePath_n + 1 + pszFileName_n + 1;
 	n_pszFilePath = new wchar_t[n_pszFilePath_n];
@@ -243,14 +240,14 @@ Error:
 RESULT PathManager::GetFilePathVersion(PATH_VALUE_TYPE type, version ver, const wchar_t *pszFileName, wchar_t * &n_pszVersionFilePath) {
 	RESULT r = R_PASS;
 
-	long pszFileName_n = wcslen(pszFileName);
+	long pszFileName_n = static_cast<long>(wcslen(pszFileName));
 	long n_pszVersionFilePath_n = 0;
 
 	wchar_t *pszValueVersionPath = NULL;
 	long pszValueVersionPath_n = 0;
 
 	CRM(GetValuePathVersion(type, ver, pszValueVersionPath), "Failed to get value version path");
-	pszValueVersionPath_n = wcslen(pszValueVersionPath);
+	pszValueVersionPath_n = static_cast<long>(wcslen(pszValueVersionPath));
 
 	n_pszVersionFilePath_n = pszValueVersionPath_n + 1 + pszFileName_n + 1;
 	n_pszVersionFilePath = new wchar_t[n_pszVersionFilePath_n];
@@ -277,7 +274,7 @@ RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {
 	long pszValuePath_n = 0;
 
 	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
-	pszValuePath_n = wcslen(pszValuePath);
+	pszValuePath_n = static_cast<long>(wcslen(pszValuePath));
 	CRM(DoesPathExist(pszValuePath), "Path %S does not exist", pszValuePath);
 
 Error:
@@ -296,7 +293,7 @@ RESULT PathManager::DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileNa
 	long pszFilePath_n = 0;
 
 	CRM(GetFilePath(type, pszFileName, pszFilePath), "Failed to file path");	
-	pszFilePath_n = wcslen(pszFilePath);
+	pszFilePath_n = static_cast<long>(wcslen(pszFilePath));
 
 	r = DoesPathExist(pszFilePath);
 	if (r == R_FILE_FOUND)
@@ -324,7 +321,7 @@ RESULT PathManager::GetFileVersionThatExists(PATH_VALUE_TYPE type, version versi
 
 	for (auto it = pListDirs->begin(); it != pListDirs->end(); it++) {
 		wchar_t *pszDirectory = (*it);
-		long pszDirectory_n = wcslen(pszDirectory);
+		long pszDirectory_n = static_cast<long>(wcslen(pszDirectory));
 
 		while (pszDirectory[0] < L'0' || pszDirectory[0] > L'9') {
 			pszDirectory++;

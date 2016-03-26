@@ -91,9 +91,9 @@ Error:
 RESULT OpenGLShader::LoadShaderCodeFromString(const char* pszSource) {
 	RESULT r = R_PASS;
 
-	int length = strlen(pszSource);
-	m_pszShaderCode = (char*)(new char(length * sizeof(char)));
-	CNM(m_pszShaderCode, "Failed to allocated %d bytes for shader code", length);
+	size_t length = strlen(pszSource);
+	m_pszShaderCode = (char*)(new char[sizeof(char) * length]);
+	CNM(m_pszShaderCode, "Failed to allocated %zu bytes for shader code", length);
 
 	CBM((strcpy_s(m_pszShaderCode, (length * sizeof(char)), pszSource) == 0), "Failed to copy over code string");
 
@@ -141,7 +141,6 @@ RESULT OpenGLShader::PrintInfoLog() {
 
 	DEBUG_LINEOUT(GetInfoLog());
 
-Error:
 	return r;
 }
 
@@ -173,9 +172,11 @@ char* OpenGLShader::FileRead(wchar_t *pszFileName) {
 	CNM(pszFileName, "Filename cannot be NULL");
 	
 	err = _wfopen_s(&pFile, pszFileName, L"r");
-	CNM(pFile, "Failed to open %s", pszFileName);
+	
+	// TODO: print out with unicode support.
+	CNM(pFile, "Failed to open file");
 
-	int pFile_n = -1;
+	size_t pFile_n = -1;
 	err = fseek(pFile, 0, SEEK_END);
 	pFile_n = ftell(pFile);
 	rewind(pFile);		

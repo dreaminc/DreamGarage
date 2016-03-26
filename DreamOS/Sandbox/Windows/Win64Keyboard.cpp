@@ -26,8 +26,8 @@ RESULT Win64Keyboard::CheckKeyState(SK_SCAN_CODE key) {
 
 	uint16_t keyState = GetAsyncKeyState(key);
 
-	bool fDown = keyState & 0x8000;
-	bool fPressed = keyState & 0x0001;
+	bool fDown = (keyState & 0x8000) != 0;
+	bool fPressed = (keyState & 0x0001) != 0;
 
 	if (fDown)
 		DEBUG_LINEOUT("Key %d: %d down pressed: %d", key, fDown, fPressed);
@@ -35,6 +35,5 @@ RESULT Win64Keyboard::CheckKeyState(SK_SCAN_CODE key) {
 	uint8_t newKeyState = (fDown << 1) + (fPressed << 0);
 	SetKeyState(key, newKeyState);
 
-Error:
 	return r;
 }
