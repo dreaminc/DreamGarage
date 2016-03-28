@@ -97,30 +97,35 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
-		//glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
-		//glDrawElements(GL_TRIANGLE_FAN, 1 + m_numAngularDivisions, GL_UNSIGNED_INT, NULL);
-		//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
-
+		/*
 		int numVerts = pDimObj->NumberVertices();
-		//int numFanVerts = m_numAngularDivisions + 1;
-
-		//glDrawArrays(GL_TRIANGLE_FAN, 0, numFanVerts);
-
-		//glDrawArrays(GL_POINTS, 0, numVerts);
-		//glDrawArrays(GL_LINES, 0, numVerts);
+		glDrawArrays(GL_POINTS, 0, numVerts);
+		//*/
+		
 
 		// Top Fan
+		///*
 		int indexCount = 0;
+		void *pOffset = (void*)(sizeof(dimindex) * indexCount);
 		int numFanVerts = m_numAngularDivisions + 2;
-		glDrawElements(GL_TRIANGLE_FAN, 1 + m_numAngularDivisions + 1, GL_UNSIGNED_INT, NULL);
-
+		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
+		indexCount += numFanVerts;
+		
 		// Strips
 		int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
 		int numStrips = m_numVerticalDivisions - 3;
-		glDrawElements(GL_TRIANGLE_FAN, 1 + m_numAngularDivisions + 1, GL_UNSIGNED_INT, sizeof(dimindex) * );
-		
 
-		// TODO: Bottom Fan
+		for (int i = 0; i < numStrips; i++) {
+			pOffset = (void*)(sizeof(dimindex) * indexCount);
+			glDrawElements(GL_TRIANGLE_STRIP, numTriangleStripVerts, GL_UNSIGNED_INT, pOffset);
+			indexCount += numTriangleStripVerts;
+		}
+		
+		// Bottom Fan
+		pOffset = (void*)(sizeof(dimindex) * indexCount);
+		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
+		indexCount += numFanVerts;
+		//*/
 
 
 	Error:

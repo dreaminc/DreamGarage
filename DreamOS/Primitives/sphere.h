@@ -59,18 +59,19 @@ public:
 		
 		CR(Allocate());
 
-		// Set up indices 
-		//TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
+		// Vertices 
 
 		// Top vertex
 		m_pVertices[0] = vertex(point(0.0f, radius, 0.0f), vector(0.0f, 1.0f, 0.0f));
 
 		int vertCount = 1;
 		float thetaDiv = ((2.0f * M_PI) / (float)m_numAngularDivisions);
+		float psiDiv = ((1.0f * M_PI) / (float)(m_numVerticalDivisions - 1));
 
 		for (int i = 1; i < (m_numVerticalDivisions - 1); i++) {
-			point_precision sphereY = radius * cos((M_PI / (float)m_numVerticalDivisions) * (float)(i));
-			point_precision effRadius = radius * sin((M_PI / (float)m_numVerticalDivisions) * (float)(i));
+			float effPsi = psiDiv * (float)(i);
+			point_precision sphereY = radius * cos(effPsi);
+			point_precision effRadius = radius * sin(effPsi);
 
 			for (int j = 0; j < m_numAngularDivisions; j++) {
 				float effTheta = thetaDiv * (float)(j);
@@ -82,16 +83,43 @@ public:
 		}
 
 		// Bottom vertex
-		//vertCount = NumberVertices() - 1;
 		m_pVertices[NumberVertices() - 1] = vertex(point(0.0f, -radius, 0.0f), vector(0.0f, -1.0f, 0.0f));
 
 		// Indices
+
 		// Top Triangle Fan
 		int indexCount = 0;
 
 		for (int i = 0; i < m_numAngularDivisions + 1; i++)
 			m_pIndices[indexCount++] = i;
 		m_pIndices[indexCount++] = 1;
+
+		// Strips
+		int numStrips = m_numVerticalDivisions - 3;
+		int indexStripTop, indexStripBottom, bottomCount, topCount;
+
+		for (int i = 0; i < numStrips; i++) {
+			indexStripTop = 1 + (i * (m_numAngularDivisions));
+			indexStripBottom = 1 + ((i + 1) * (m_numAngularDivisions));
+			topCount = indexStripTop;
+			bottomCount = indexStripBottom;
+
+			for (int j = 0; j < m_numAngularDivisions * 2; j++) {
+				if (j % 2 == 0)
+					m_pIndices[indexCount++] = topCount++;
+				else
+					m_pIndices[indexCount++] = bottomCount++;
+			}
+
+			m_pIndices[indexCount++] = indexStripTop;
+			m_pIndices[indexCount++] = indexStripBottom;
+		}
+
+		// Bottom Triangle Fan
+		m_pIndices[indexCount++] = NumberVertices() - 1;
+		for (int i = 0; i < m_numAngularDivisions; i++)
+			m_pIndices[indexCount++] = NumberVertices() - 2 - i;
+		m_pIndices[indexCount++] = NumberVertices() - 2;
 
 		Validate();
 		return;
