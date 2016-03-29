@@ -20,8 +20,10 @@ out Data {
 } DataOut;
 
 uniform mat4 u_mat4Model;
+uniform mat4 u_mat4View;
 uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
+uniform mat4 u_mat4Normal;
 
 // Light Structure
 struct Light {
@@ -64,7 +66,8 @@ layout(std140) uniform ub_LightArray {
 vec4 g_vec4AmbientLightLevel = 0.1 * vec4(1.0, 1.0, 1.0, 0.0);
 
 // TODO: Move to CPU side
-mat4 mat4InvTransposeModel = transpose(inverse(u_mat4Model));
+mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
+mat4 mat4InvTransposeModel = transpose(inverse(g_mat4ModelView));
 
 void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 vectorNormal, out float diffuseValue, out float specularValue) {
 	//float distanceLight = length(vec3(light.m_ptOrigin - vertWorldSpace));
@@ -91,13 +94,14 @@ void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 v
 
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * inV_vec4Position;
+	vec4 vertViewSpace = g_mat4ModelView * inV_vec4Position;
 
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	for(int i = 0; i < numLights; i++) {
 		CalculateVertexLightValue(lights[i], vertWorldSpace, inV_vec4Normal, diffuseValue, specularValue);
-		//vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
-		vec4LightValue += specularValue * lights[i].m_colorSpecular;
+		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
+		//vec4LightValue += specularValue * lights[i].m_colorSpecular;
 	}
 
 	// Projected Vert Position

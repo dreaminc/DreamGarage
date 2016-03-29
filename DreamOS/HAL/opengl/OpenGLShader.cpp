@@ -92,6 +92,21 @@ Error:
 	return r;
 }
 
+RESULT OpenGLShader::Set44MAtrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+
+	GLint location = -1;
+	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+
+	CB((location >= 0));
+	m_pParentImp->glUniformMatrix4fv(location, 1, GL_FALSE, (GLfloat*)(&mat));
+
+Error:
+	return r;
+}
+
 // Copy over the code - assuming const
 RESULT OpenGLShader::LoadShaderCodeFromString(const char* pszSource) {
 	RESULT r = R_PASS;

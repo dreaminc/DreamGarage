@@ -78,8 +78,10 @@ RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
 
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetModelMatrixUniformName(), &m_uniformModelMatrixIndex), "Failed to acquire model matrix uniform GL location");
+	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetViewMatrixUniformName(), &m_uniformViewMatrixIndex), "Failed to acquire view matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetModelViewMatrixUniformName(), &m_uniformModelViewMatrixIndex), "Failed to acquire model matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetViewProjectionMatrixUniformName(), &m_uniformViewProjectionMatrixIndex), "Failed to acquire projection view matrix uniform GL location");
+	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetNormalMatrixUniformName(), &m_uniformNormalMatrixIndex), "Failed to acquire normal matrix uniform GL location");
 
 	//CRM(m_pParentImp->glGetUniformBlockIndex(oglProgramID, GetLightsUniformBlockName(), &m_uniformBlockLightsIndex), "Failed to acquire lights uniform block GL location");
 	CRM(m_pLightsBlock->UpdateUniformBlockIndexFromShader(GetLightsUniformBlockName()), "Failed to acquire lights uniform block GL location");
@@ -111,12 +113,20 @@ GLint OGLVertexShader::GetModelMatrixUniformIndex() {
 	return m_uniformModelMatrixIndex;
 }
 
+GLint OGLVertexShader::GetViewMatrixUniformIndex() {
+	return m_uniformViewMatrixIndex;
+}
+
 GLint OGLVertexShader::GetModelViewMatrixUniformIndex() {
 	return m_uniformModelViewMatrixIndex;
 }
 
 GLint OGLVertexShader::GetViewProjectionMatrixUniformIndex() {
 	return m_uniformViewProjectionMatrixIndex;
+}
+
+GLint OGLVertexShader::GetNormalMatrixUniformIndex() {
+	return m_uniformNormalMatrixIndex;
 }
 
 GLint OGLVertexShader::GetLightsUniformBlockBufferIndex() {
@@ -132,4 +142,25 @@ GLint OGLVertexShader::GetLightsUniformBlockIndex() {
 GLint OGLVertexShader::GetLightsUniformBlockBindingPoint() {
 	//return m_uniformBlockLightsBindingPoint;
 	return m_pLightsBlock->GetBindingPoint();
+}
+
+// Set Matrix Functions
+RESULT OGLVertexShader::SetModelMatrixUniform(matrix<float, 4, 4> matModel) {
+	return Set44MAtrixUniform(matModel, GetModelMatrixUniformName());
+}
+
+RESULT OGLVertexShader::SetViewMatrixUniform(matrix<float, 4, 4> matView) {
+	return Set44MAtrixUniform(matView, GetViewMatrixUniformName());
+}
+
+RESULT OGLVertexShader::SetModelViewMatrixUniform(matrix<float, 4, 4> matModelView) {
+	return Set44MAtrixUniform(matModelView, GetModelViewMatrixUniformName());
+}
+
+RESULT OGLVertexShader::SetViewProjectionMatrixUniform(matrix<float, 4, 4> matViewProjection) {
+	return Set44MAtrixUniform(matViewProjection, GetViewProjectionMatrixUniformName());
+}
+
+RESULT OGLVertexShader::SetNormalMatrixUniform(matrix<float, 4, 4> matNormal) {
+	return Set44MAtrixUniform(matNormal, GetNormalMatrixUniformName());
 }

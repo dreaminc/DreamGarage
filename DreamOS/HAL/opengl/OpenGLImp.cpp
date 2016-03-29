@@ -543,11 +543,7 @@ inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
 	auto matModel = pDimObj->GetModelMatrix();
 
-	// TODO: Add to vertex shader
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
-
-	if (locationModelMatrix >= 0)
-		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
+	m_pVertexShader->SetModelMatrixUniform(matModel);
 
 	return pOGLObj->Render();
 }
@@ -574,14 +570,11 @@ Error:
 RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
+	auto matV = m_pCamera->GetViewMatrix(eye);
 	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix(eye);
 
-	// TODO: Push into vertex shader
-	GLint locationViewProjectionMatrix = -1;
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ViewProjection", &locationViewProjectionMatrix);
-
-	if (locationViewProjectionMatrix >= 0)
-		glUniformMatrix4fv(locationViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matVP));
+	CR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
+	CR(m_pVertexShader->SetViewMatrixUniform(matV));
 
 Error:
 	return r;
@@ -601,7 +594,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	light *pLight = NULL; 
 
 	///*
-	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 20.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 

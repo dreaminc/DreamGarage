@@ -11,6 +11,7 @@
 
 #include "OpenGLCommon.h"
 #include "Primitives/version.h"
+#include "Primitives/matrix.h"
 
 class OpenGLImp;	// Declare OpenGLImp class
 
@@ -24,6 +25,8 @@ public:
 	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename);
 	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename, version versionFile);
 	RESULT LoadShaderCodeFromString(const char* pszSource);
+
+	RESULT Set44MAtrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName);
 
 	virtual RESULT GetAttributeLocationsFromShader() = 0;
 	virtual RESULT GetUniformLocationsFromShader() = 0;
