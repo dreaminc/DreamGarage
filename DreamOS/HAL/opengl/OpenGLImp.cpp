@@ -538,7 +538,7 @@ Error:
 
 inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
+	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewMatrix = -1, locationModelViewProjectionMatrix = -1;
 
 	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
 	auto matModel = pDimObj->GetModelMatrix();
@@ -601,7 +601,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	light *pLight = NULL; 
 
 	///*
-	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 20.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
@@ -693,7 +693,7 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	g_pLight->translateZ(0.01f);
+	//g_pLight->translateZ(0.01f);
 
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;

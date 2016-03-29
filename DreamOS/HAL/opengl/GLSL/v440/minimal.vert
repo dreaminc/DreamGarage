@@ -20,6 +20,7 @@ out Data {
 } DataOut;
 
 uniform mat4 u_mat4Model;
+uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 
 // Light Structure
@@ -66,12 +67,15 @@ vec4 g_vec4AmbientLightLevel = 0.1 * vec4(1.0, 1.0, 1.0, 0.0);
 mat4 mat4InvTransposeModel = transpose(inverse(u_mat4Model));
 
 void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 vectorNormal, out float diffuseValue, out float specularValue) {
-	float distanceLight = length(vec3(light.m_ptOrigin - vertWorldSpace));
-	vec3 directionLight = vec3(light.m_ptOrigin - vertWorldSpace) / distanceLight;
+	//float distanceLight = length(vec3(light.m_ptOrigin - vertWorldSpace));
+	vec3 directionLight = normalize(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
 		
-	vec4 vec4ModelNormal = normalize(mat4InvTransposeModel * vectorNormal);
+	//vec4 vec4ModelNormal = normalize(mat4InvTransposeModel * vectorNormal);
+	vec4 vec4ModelNormal = normalize(vectorNormal);
+	
 
-	float cosThetaOfLightToVert = max(dot(vec3(vec4ModelNormal), directionLight), 0.0);
+	float cosThetaOfLightToVert = max(0, dot(vec3(vec4ModelNormal), directionLight));
+
 	//diffuseValue = (light.m_power / (distanceLight * distanceLight)) * cosThetaOfLightToVert;
 	diffuseValue = (light.m_power) * cosThetaOfLightToVert;
 
@@ -92,17 +96,18 @@ void main(void) {
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	for(int i = 0; i < numLights; i++) {
 		CalculateVertexLightValue(lights[i], vertWorldSpace, inV_vec4Normal, diffuseValue, specularValue);
-		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
+		//vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
 		vec4LightValue += specularValue * lights[i].m_colorSpecular;
 	}
 
 	// Projected Vert Position
 	gl_Position = u_mat4ViewProjection * vertWorldSpace;
-
 	
+	/*
 	DataOut.vertWorldSpace = vertWorldSpace;
 	DataOut.normal = normalize(mat4InvTransposeModel * inV_vec4Normal);
     DataOut.eye = -(vertWorldSpace);
+	*/
 
 	// Vert Color
 	DataOut.color = (vec4LightValue * inV_vec4Color) + g_vec4AmbientLightLevel;

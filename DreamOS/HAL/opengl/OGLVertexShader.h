@@ -31,6 +31,7 @@ public:
 	const char *GetNormalAttributeName() { return "inV_vec4Normal"; }
 
 	const char *GetModelMatrixUniformName() { return "u_mat4Model";  }
+	const char *GetModelViewMatrixUniformName() { return "u_mat4ModelView"; }
 	const char *GetViewProjectionMatrixUniformName() { return "u_mat4ViewProjection"; }
 
 	const char *GetLightsUniformBlockName() { return "ub_LightArray"; }
@@ -40,6 +41,7 @@ public:
 	GLint GetNormalIndex();
 	
 	GLint GetModelMatrixUniformIndex();
+	GLint GetModelViewMatrixUniformIndex();
 	GLint GetViewProjectionMatrixUniformIndex();
 
 	GLint GetLightsUniformBlockBufferIndex();
@@ -65,6 +67,7 @@ private:
 	GLint m_NormalIndex;
 
 	GLint m_uniformModelMatrixIndex;
+	GLint m_uniformModelViewMatrixIndex;
 	GLint m_uniformViewProjectionMatrixIndex;
 
 	/* Move into OGLUniformBlock - OGLLightsBlock

@@ -66,7 +66,7 @@ public:
 
 		int vertCount = 1;
 		float thetaDiv = ((2.0f * M_PI) / (float)m_numAngularDivisions);
-		float psiDiv = ((1.0f * M_PI) / (float)(m_numVerticalDivisions - 1));
+		float psiDiv = ((1.0f * M_PI) / (float)(m_numVerticalDivisions));
 
 		for (int i = 1; i < (m_numVerticalDivisions - 1); i++) {
 			float effPsi = psiDiv * (float)(i);

@@ -78,6 +78,7 @@ RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
 
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetModelMatrixUniformName(), &m_uniformModelMatrixIndex), "Failed to acquire model matrix uniform GL location");
+	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetModelViewMatrixUniformName(), &m_uniformModelViewMatrixIndex), "Failed to acquire model matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetViewProjectionMatrixUniformName(), &m_uniformViewProjectionMatrixIndex), "Failed to acquire projection view matrix uniform GL location");
 
 	//CRM(m_pParentImp->glGetUniformBlockIndex(oglProgramID, GetLightsUniformBlockName(), &m_uniformBlockLightsIndex), "Failed to acquire lights uniform block GL location");
@@ -108,6 +109,10 @@ GLint OGLVertexShader::GetNormalIndex() {
 
 GLint OGLVertexShader::GetModelMatrixUniformIndex() {
 	return m_uniformModelMatrixIndex;
+}
+
+GLint OGLVertexShader::GetModelViewMatrixUniformIndex() {
+	return m_uniformModelViewMatrixIndex;
 }
 
 GLint OGLVertexShader::GetViewProjectionMatrixUniformIndex() {
