@@ -360,6 +360,9 @@ RESULT OpenGLImp::PrepareScene() {
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
+	// Dithering 
+	glEnable(GL_DITHER);
+
 	// TODO: Should be stuffed into factory arch - return NULL on fail
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
@@ -598,18 +601,18 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	light *pLight = NULL; 
 
 	///*
-	pLight = new light(LIGHT_POINT, 10.0f, point(2.0f, 4.0f, 2.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 0.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
 	/*
-	pLight = new light(LIGHT_POINT, 1.0f, point(2.0f, 1.0f, -1.0f), color(COLOR_BLUE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(2.0f, 2.0f, -1.0f), color(COLOR_BLUE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 
-	pLight = new light(LIGHT_POINT, 1.0f, point(-2.0f, 1.0f, -1.0f), color(COLOR_RED), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(-2.0f, 2.0f, -1.0f), color(COLOR_RED), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 
-	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 1.0f, 2.0f), color(COLOR_GREEN), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 2.0f, 2.0f), color(COLOR_GREEN), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
@@ -630,10 +633,25 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
-	*/
+	//*/
 
-	OGLSphere *pSphere = new OGLSphere(this, 1.0f, 10, 10);
-	pSceneGraph->PushObject(pSphere);
+	///*
+	OGLSphere *pSphere = NULL;
+	int num = 10;
+	double radius = 0.5f;
+	double size = radius * 2;
+	int spaceFactor = 4;
+
+	for (int i = 0; i < num; i++) {
+		for (int j = 0; j < num; j++) {
+			pSphere = new OGLSphere(this, radius, 30, 30);
+			//pVolume->SetRandomColor();
+			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
+			pSphere->UpdateOGLBuffers();
+			pSceneGraph->PushObject(pSphere);
+		}
+	}
+	//*/
 
 Error:
 	return r;
@@ -675,7 +693,7 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//g_pLight->translateZ(0.005f);
+	g_pLight->translateZ(0.01f);
 
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;

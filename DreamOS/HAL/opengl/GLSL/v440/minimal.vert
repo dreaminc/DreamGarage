@@ -10,7 +10,14 @@ layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
 layout (location = 2) in vec4 inV_vec4Normal;
 
-out vec3 inF_vec3Color;
+//out vec3 inF_vec3Color;
+
+out Data {
+	vec4 normal;
+	vec4 eye;
+	vec4 color;
+	vec4 vertWorldSpace;
+} DataOut;
 
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4ViewProjection;
@@ -20,7 +27,7 @@ struct Light {
 	int m_type;
 	float m_power;
 	float m_shine;
-	float reserved2;
+	float m_reserved;
 
 	vec4 m_ptOrigin;
 	vec4 m_colorDiffuse;
@@ -38,11 +45,6 @@ struct Material {
     vec4 m_colorSpecular;
 };
 
-layout(std140) uniform ub_LightArray {
-	Light lights[MAX_TOTAL_LIGHTS];
-	int numLights;	
-};
-
 Material g_mat = {
 	5.0f,	// shine
 	0.0f,
@@ -51,6 +53,11 @@ Material g_mat = {
 	vec4(1.0f, 1.0f, 1.0f, 1.0f),	// ambient
 	vec4(1.0f, 1.0f, 1.0f, 1.0f),	// diffuse
 	vec4(1.0f, 1.0f, 1.0f, 1.0f)	// specular
+};
+
+layout(std140) uniform ub_LightArray {
+	Light lights[MAX_TOTAL_LIGHTS];
+	int numLights;	
 };
 
 vec4 g_vec4AmbientLightLevel = 0.1 * vec4(1.0, 1.0, 1.0, 0.0);
@@ -65,7 +72,8 @@ void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 v
 	vec4 vec4ModelNormal = normalize(mat4InvTransposeModel * vectorNormal);
 
 	float cosThetaOfLightToVert = max(dot(vec3(vec4ModelNormal), directionLight), 0.0);
-	diffuseValue = (light.m_power / (distanceLight * distanceLight)) * cosThetaOfLightToVert;
+	//diffuseValue = (light.m_power / (distanceLight * distanceLight)) * cosThetaOfLightToVert;
+	diffuseValue = (light.m_power) * cosThetaOfLightToVert;
 
 	if(diffuseValue > 0.0) {
 		vec3 directionEye = vec3(normalize(-vertWorldSpace));
@@ -80,18 +88,23 @@ void CalculateVertexLightValue(in Light light, in vec4 vertWorldSpace, in vec4 v
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * inV_vec4Position;
 
-	vec3 vec3LightValue = vec3(0.0f, 0.0f, 0.0f);
+	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f, specularValue = 0.0f;
-
 	for(int i = 0; i < numLights; i++) {
 		CalculateVertexLightValue(lights[i], vertWorldSpace, inV_vec4Normal, diffuseValue, specularValue);
-		vec3LightValue += diffuseValue * vec3(lights[i].m_colorDiffuse);
-		vec3LightValue += specularValue * vec3(lights[i].m_colorSpecular);
+		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
+		vec4LightValue += specularValue * lights[i].m_colorSpecular;
 	}
 
 	// Projected Vert Position
 	gl_Position = u_mat4ViewProjection * vertWorldSpace;
 
+	
+	DataOut.vertWorldSpace = vertWorldSpace;
+	DataOut.normal = normalize(mat4InvTransposeModel * inV_vec4Normal);
+    DataOut.eye = -(vertWorldSpace);
+
 	// Vert Color
-	inF_vec3Color = (vec3LightValue * vec3(inV_vec4Color)) + vec3(g_vec4AmbientLightLevel);
+	DataOut.color = (vec4LightValue * inV_vec4Color) + g_vec4AmbientLightLevel;
+	//DataOut.color = inV_vec4Color;
 }
