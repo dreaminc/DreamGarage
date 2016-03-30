@@ -6,15 +6,33 @@
 // Time Object
 
 #include "valid.h"
+#include "Publisher.h"
 #include <vector>
 #include <chrono>
+
+typedef enum TimeEventType {
+	TIME_ELAPSED,
+} TIME_EVENT_TYPE;
+
+typedef struct TimeEvent {
+	TimeEventType EventType;
+
+	double m_currentTime;
+	double m_deltaTime;
+
+	TimeEvent(TimeEventType eventType, double currentTime, double deltaTime) :
+		EventType(eventType), m_currentTime(currentTime), m_deltaTime(deltaTime)
+	{
+
+	}
+} TIME_EVENT;
 
 class TimeObject {
 public:
 	virtual void onTimeUpdate(double currentTime, double deltaTime) = 0;
 };
 
-class TimeObj : TimeObject, valid {
+class TimeObj : TimeObject, public Publisher<TimeEventType, TimeEvent>, valid {
 public:
 	TimeObj(double	processingTimeQuantum = 0.0167);
 

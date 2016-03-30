@@ -2,6 +2,7 @@
 
 TimeObj::TimeObj(double	processingTimeQuantum) : m_processingTimeQuantum(processingTimeQuantum)
 {
+	RegisterEvent(TIME_ELAPSED);
 	reset();
 }
 
@@ -22,7 +23,9 @@ void TimeObj::update()
 	m_totalTimeToProcess += deltaTime;
 
 	while (m_totalTimeToProcess >= m_processingTimeQuantum) {
-		this->onTimeUpdate(m_totalElapsedTime, m_processingTimeQuantum);
+		//this->onTimeUpdate(m_totalElapsedTime, m_processingTimeQuantum);
+		TimeEvent event(TIME_ELAPSED, m_totalElapsedTime, m_processingTimeQuantum);
+		NotifySubscribers(TIME_ELAPSED, &event);
 
 		m_totalTimeToProcess -= m_processingTimeQuantum;
 		m_totalElapsedTime += m_processingTimeQuantum;
