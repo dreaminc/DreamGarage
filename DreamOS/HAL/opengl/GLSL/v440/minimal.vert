@@ -16,6 +16,7 @@ out Data {
 	vec4 normal;
 	vec3 directionEye;
 	vec3 directionLight[MAX_TOTAL_LIGHTS];
+	float distanceLight[MAX_TOTAL_LIGHTS];
 	vec4 color;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
@@ -106,10 +107,13 @@ void main(void) {
 	for(int i = 0; i < numLights; i++) {
 		vec3 ptLightViewSpace = vec3(u_mat4View * lights[i].m_ptOrigin);
 		DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
+		DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
 
+		/*
 		CalculateVertexLightValue(lights[i], vertWorldSpace, vertViewSpace, vec4ModelNormal, DataOut.directionLight[i], diffuseValue, specularValue);
 		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
 		vec4LightValue += specularValue * lights[i].m_colorSpecular;
+		*/
 	}
 	//*/
 
@@ -121,6 +125,6 @@ void main(void) {
 	DataOut.normal = vec4ModelNormal;
 
 	// Vert Color
-	DataOut.color = (vec4LightValue * inV_vec4Color) + g_vec4AmbientLightLevel;
-	//DataOut.color = inV_vec4Color;
+	//DataOut.color = (vec4LightValue * inV_vec4Color) + g_vec4AmbientLightLevel;
+	DataOut.color = inV_vec4Color;
 }

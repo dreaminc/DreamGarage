@@ -10,6 +10,7 @@ in Data {
     vec4 normal;
     vec3 directionEye;
 	vec3 directionLight[MAX_TOTAL_LIGHTS];
+	float distanceLight[MAX_TOTAL_LIGHTS];
 	vec4 color;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
@@ -57,16 +58,17 @@ layout (location = 0) out vec4 out_vec4Color;
 
 vec4 g_vec4AmbientLightLevel = 0.05 * vec4(1.0, 1.0, 1.0, 0.0);
 
-void CalculateFragmentLightValue(in Light light, in vec4 vertWorldSpace, in vec4 vectorNormal, out float diffuseValue, out float specularValue) {
-	float distanceLight = length(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
-	vec3 directionLight = normalize(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
+void CalculateFragmentLightValue(in Light light, in vec4 vertWorldSpace, in vec3 vectorNormal, in vec3 directionLight, in float distanceLight, out float diffuseValue, out float specularValue) {
+	//float distanceLight = length(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
+	//vec3 directionLight = normalize(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
 
-	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal.xyz, directionLight.xyz));
+	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
 	diffuseValue = (light.m_power / (pow(distanceLight, 2))) * cosThetaOfLightToVert;
 	
 	if(diffuseValue > 0.0) {
-		vec3 halfVector = normalize(directionLight.xyz + DataIn.directionEye.xyz);
-		specularValue = pow(max(0.0f, dot(vectorNormal.xyz, halfVector)), g_mat.m_shine);
+		//vec3 halfVector = normalize(directionLight.xyz + DataIn.directionEye.xyz);
+		vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
+		specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), g_mat.m_shine);
 	}
 	else {
 		specularValue = 0.0f;
@@ -79,7 +81,8 @@ void main(void) {
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 
 	for(int i = 0; i < numLights; i++) {
-		CalculateFragmentLightValue(lights[i], DataIn.vertWorldSpace, DataIn.normal, diffuseValue, specularValue);
+		CalculateFragmentLightValue(lights[i], DataIn.vertWorldSpace, normalize(DataIn.normal.xyz), normalize(DataIn.directionLight[i]), DataIn.distanceLight[i], diffuseValue, specularValue);
+
 		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
 		vec4LightValue += specularValue * lights[i].m_colorSpecular;
 	}
@@ -92,5 +95,5 @@ void main(void) {
 	//out_vec4Color = vec4LightValue;
 	//out_vec4Color += DataIn.color * 0.00001; // optimization hack
 
-	out_vec4Color = DataIn.color;
+	//out_vec4Color = DataIn.color;
 }
