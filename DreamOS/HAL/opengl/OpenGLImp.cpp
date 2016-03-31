@@ -538,11 +538,9 @@ Error:
 
 inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewMatrix = -1, locationModelViewProjectionMatrix = -1;
 
 	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
 	auto matModel = pDimObj->GetModelMatrix();
-
 	m_pVertexShader->SetModelMatrixUniform(matModel);
 
 	return pOGLObj->Render();
@@ -570,11 +568,13 @@ Error:
 RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
+	auto ptEye = m_pCamera->GetEyePosition(eye);
 	auto matV = m_pCamera->GetViewMatrix(eye);
 	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix(eye);
 
 	CR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
 	CR(m_pVertexShader->SetViewMatrixUniform(matV));
+	CR(m_pVertexShader->SetEyePositionUniform(ptEye));
 
 Error:
 	return r;
@@ -594,7 +594,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	light *pLight = NULL; 
 
 	///*
-	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 5.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
@@ -631,13 +631,14 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	///*
 	OGLSphere *pSphere = NULL;
 	int num = 10;
+	int sects = 20;
 	double radius = 0.5f;
 	double size = radius * 2;
 	int spaceFactor = 4;
 
 	for (int i = 0; i < num; i++) {
 		for (int j = 0; j < num; j++) {
-			pSphere = new OGLSphere(this, radius, 30, 30);
+			pSphere = new OGLSphere(this, radius, sects, sects);
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
 			pSphere->UpdateOGLBuffers();
@@ -919,6 +920,16 @@ RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint
 	return r;
 Error:
 	*pLocation = -1;
+	return r;
+}
+
+RESULT OpenGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUniform4fv(location, count, value);
+	CRM(CheckGLError(), "glUniform4fv failed");
+
+Error:
 	return r;
 }
 

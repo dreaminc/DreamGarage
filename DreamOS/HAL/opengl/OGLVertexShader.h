@@ -30,6 +30,7 @@ public:
 	const char *GetColorAttributeName() { return "inV_vec4Color"; }
 	const char *GetNormalAttributeName() { return "inV_vec4Normal"; }
 
+	const char *GetEyePositionUniformName() { return "u_vec4Eye"; }
 	const char *GetModelMatrixUniformName() { return "u_mat4Model";  }
 	const char *GetViewMatrixUniformName() { return "u_mat4View"; }
 	const char *GetModelViewMatrixUniformName() { return "u_mat4ModelView"; }
@@ -42,12 +43,14 @@ public:
 	GLint GetColorIndex();
 	GLint GetNormalIndex();
 	
+	GLint GetEyePositionUniformIndex();
 	GLint GetModelMatrixUniformIndex();
 	GLint GetViewMatrixUniformIndex();
 	GLint GetModelViewMatrixUniformIndex();
 	GLint GetViewProjectionMatrixUniformIndex();
 	GLint GetNormalMatrixUniformIndex();
 
+	RESULT SetEyePositionUniform(matrix<float, 4, 1> ptEye);
 	RESULT SetModelMatrixUniform(matrix<float, 4, 4> matModel);
 	RESULT SetViewMatrixUniform(matrix<float, 4, 4> matView);
 	RESULT SetModelViewMatrixUniform(matrix<float, 4, 4> matModelView);
@@ -76,6 +79,7 @@ private:
 	GLint m_ColorIndex;
 	GLint m_NormalIndex;
 
+	GLint m_uniformEyePositionIndex;
 	GLint m_uniformModelMatrixIndex;
 	GLint m_uniformViewMatrixIndex;
 	GLint m_uniformModelViewMatrixIndex;

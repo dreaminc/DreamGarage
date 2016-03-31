@@ -8,9 +8,11 @@ in vec3 inF_vec3Color;
 
 in Data {
     vec4 normal;
-    vec4 eye;
+    vec3 directionEye;
+	vec3 directionLight[MAX_TOTAL_LIGHTS];
 	vec4 color;
 	vec4 vertWorldSpace;
+	vec4 vertViewSpace;
 } DataIn;
 
 // Light Structure
@@ -37,7 +39,7 @@ struct Material {
 };
 
 Material g_mat = {
-	5.0f,	// shine
+	100.0f,	// shine
 	0.0f,
 	0.0f,
 	0.0f,
@@ -53,22 +55,18 @@ layout(std140) uniform ub_LightArray {
 
 layout (location = 0) out vec4 out_vec4Color;
 
-vec4 g_vec4AmbientLightLevel = 0.1 * vec4(1.0, 1.0, 1.0, 0.0);
+vec4 g_vec4AmbientLightLevel = 0.05 * vec4(1.0, 1.0, 1.0, 0.0);
 
 void CalculateFragmentLightValue(in Light light, in vec4 vertWorldSpace, in vec4 vectorNormal, out float diffuseValue, out float specularValue) {
-	float distanceLight = length(vec3(light.m_ptOrigin) - vec3(vertWorldSpace));
-	vec3 directionLight = normalize(vec3(light.m_ptOrigin) - vec3(vertWorldSpace));
+	float distanceLight = length(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
+	vec3 directionLight = normalize(light.m_ptOrigin.xyz - vertWorldSpace.xyz);
 
-	float cosThetaOfLightToVert = max(dot(vec3(vectorNormal), directionLight), 0.0);
-	diffuseValue = (light.m_power / (distanceLight * distanceLight)) * cosThetaOfLightToVert;
-	//diffuseValue = (light.m_power) * cosThetaOfLightToVert;
+	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal.xyz, directionLight.xyz));
+	diffuseValue = (light.m_power / (pow(distanceLight, 2))) * cosThetaOfLightToVert;
 	
-
 	if(diffuseValue > 0.0) {
-		vec3 directionEye = normalize(-vec3(vertWorldSpace));
-		vec3 halfVector = normalize(directionLight + directionEye);
-		specularValue = pow(max(dot(halfVector, vec3(vectorNormal)), 0.0), g_mat.m_shine);
-		specularValue *= 100;
+		vec3 halfVector = normalize(directionLight.xyz + DataIn.directionEye.xyz);
+		specularValue = pow(max(0.0f, dot(vectorNormal.xyz, halfVector)), g_mat.m_shine);
 	}
 	else {
 		specularValue = 0.0f;
@@ -90,9 +88,9 @@ void main(void) {
 
 	
 	//out_vec4Color = max((vec4LightValue * DataIn.color), g_vec4AmbientLightLevel);
-	//out_vec4Color = max((vec4LightValue * DataIn.color), g_vec4AmbientLightLevel);
-	out_vec4Color = vec4LightValue;
-	out_vec4Color += DataIn.color * 0.00001; // optimization hack
+	out_vec4Color = max((vec4LightValue * DataIn.color), g_vec4AmbientLightLevel);
+	//out_vec4Color = vec4LightValue;
+	//out_vec4Color += DataIn.color * 0.00001; // optimization hack
 
 	out_vec4Color = DataIn.color;
 }

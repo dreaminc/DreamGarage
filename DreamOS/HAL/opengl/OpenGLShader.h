@@ -26,7 +26,9 @@ public:
 	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename, version versionFile);
 	RESULT LoadShaderCodeFromString(const char* pszSource);
 
-	RESULT Set44MAtrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName);
+	//RESULT SetUniform();
+	RESULT SetPointUniform(matrix<float, 4, 1> pt, const char* pszUniformName);
+	RESULT Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName);
 
 	virtual RESULT GetAttributeLocationsFromShader() = 0;
 	virtual RESULT GetUniformLocationsFromShader() = 0;

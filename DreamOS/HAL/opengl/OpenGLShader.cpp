@@ -92,7 +92,22 @@ Error:
 	return r;
 }
 
-RESULT OpenGLShader::Set44MAtrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName) {
+RESULT OpenGLShader::SetPointUniform(matrix<float, 4, 1> pt, const char* pszUniformName) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+
+	GLint location = -1;
+	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+
+	CB((location >= 0)); 
+	m_pParentImp->glUniform4fv(location, 1, reinterpret_cast<GLfloat*>(&pt));
+
+Error:
+	return r;
+}
+
+RESULT OpenGLShader::Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName) {
 	RESULT r = R_PASS;
 
 	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
@@ -101,7 +116,7 @@ RESULT OpenGLShader::Set44MAtrixUniform(matrix<float, 4, 4> mat, const char* psz
 	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
 
 	CB((location >= 0));
-	m_pParentImp->glUniformMatrix4fv(location, 1, GL_FALSE, (GLfloat*)(&mat));
+	m_pParentImp->glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<GLfloat*>(&mat));
 
 Error:
 	return r;

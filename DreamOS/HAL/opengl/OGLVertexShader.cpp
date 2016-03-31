@@ -109,6 +109,10 @@ GLint OGLVertexShader::GetNormalIndex() {
 	return m_NormalIndex;
 }
 
+GLint OGLVertexShader::GetEyePositionUniformIndex() {
+	return m_uniformEyePositionIndex;
+}
+
 GLint OGLVertexShader::GetModelMatrixUniformIndex() {
 	return m_uniformModelMatrixIndex;
 }
@@ -145,22 +149,26 @@ GLint OGLVertexShader::GetLightsUniformBlockBindingPoint() {
 }
 
 // Set Matrix Functions
+RESULT OGLVertexShader::SetEyePositionUniform(matrix<float, 4, 1> ptEye) {
+	return SetPointUniform(ptEye, GetEyePositionUniformName());
+}
+
 RESULT OGLVertexShader::SetModelMatrixUniform(matrix<float, 4, 4> matModel) {
-	return Set44MAtrixUniform(matModel, GetModelMatrixUniformName());
+	return Set44MatrixUniform(matModel, GetModelMatrixUniformName());
 }
 
 RESULT OGLVertexShader::SetViewMatrixUniform(matrix<float, 4, 4> matView) {
-	return Set44MAtrixUniform(matView, GetViewMatrixUniformName());
+	return Set44MatrixUniform(matView, GetViewMatrixUniformName());
 }
 
 RESULT OGLVertexShader::SetModelViewMatrixUniform(matrix<float, 4, 4> matModelView) {
-	return Set44MAtrixUniform(matModelView, GetModelViewMatrixUniformName());
+	return Set44MatrixUniform(matModelView, GetModelViewMatrixUniformName());
 }
 
 RESULT OGLVertexShader::SetViewProjectionMatrixUniform(matrix<float, 4, 4> matViewProjection) {
-	return Set44MAtrixUniform(matViewProjection, GetViewProjectionMatrixUniformName());
+	return Set44MatrixUniform(matViewProjection, GetViewProjectionMatrixUniformName());
 }
 
 RESULT OGLVertexShader::SetNormalMatrixUniform(matrix<float, 4, 4> matNormal) {
-	return Set44MAtrixUniform(matNormal, GetNormalMatrixUniformName());
+	return Set44MatrixUniform(matNormal, GetNormalMatrixUniformName());
 }

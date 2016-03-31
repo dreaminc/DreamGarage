@@ -82,7 +82,7 @@ Error:
 RESULT SceneGraph::UpdateScene() {
 	RESULT r = R_PASS;
 	
-	/*
+	///*
 	Reset();
 	SceneGraphStore *pObjectStore = GetSceneGraphStore();
 
