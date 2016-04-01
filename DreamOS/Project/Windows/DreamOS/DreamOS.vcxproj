@@ -155,6 +155,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLUniformBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
@@ -162,7 +165,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
-    <ClCompile Include="..\..\..\Primitives\TimeObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
@@ -178,6 +180,7 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraph.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp" />
+    <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Core\config.h" />
@@ -191,9 +194,13 @@
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
@@ -209,9 +216,12 @@
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
+    <ClInclude Include="..\..\..\Primitives\light.h" />
+    <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
+    <ClInclude Include="..\..\..\Primitives\sphere.h" />
     <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
     <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />
@@ -220,7 +230,6 @@
     <ClInclude Include="..\..\..\Primitives\RotationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\texture.h" />
-    <ClInclude Include="..\..\..\Primitives\TimeObj.h" />
     <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
     <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />
@@ -255,10 +264,13 @@
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
     <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
+    <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag" />
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />

@@ -9,11 +9,24 @@ VirtualObj::VirtualObj() :
 	/* stub */
 }
 
+VirtualObj::VirtualObj(point ptOrigin) : 
+	m_ptOrigin(ptOrigin),
+	m_vVelocity(),
+	m_qRotation(),
+	m_qAngularMomentum()
+{
+	// stub 
+}
+
 VirtualObj::~VirtualObj() {
 	// Empty Stub
 }
 
 // Position
+point VirtualObj::GetOrigin() {
+	return m_ptOrigin;
+}
+
 VirtualObj VirtualObj::translate(matrix <point_precision, 4, 1> v) {
 	m_ptOrigin.translate(v);
 	return *this;
@@ -21,6 +34,21 @@ VirtualObj VirtualObj::translate(matrix <point_precision, 4, 1> v) {
 
 VirtualObj VirtualObj::translate(point_precision x, point_precision y, point_precision z) {
 	m_ptOrigin.translate(x, y, z);
+	return (*this);
+}
+
+VirtualObj VirtualObj::translateX(point_precision x) {
+	m_ptOrigin.translateX(x);
+	return (*this);
+}
+
+VirtualObj VirtualObj::translateY(point_precision y) {
+	m_ptOrigin.translateY(y);
+	return (*this);
+}
+
+VirtualObj VirtualObj::translateZ(point_precision z) {
+	m_ptOrigin.translateZ(z);
 	return (*this);
 }
 

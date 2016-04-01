@@ -80,7 +80,16 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
+	// Initialize Time Manager
+	m_pTimeManager = new TimeManager();
+	CNM(m_pTimeManager, "Failed to allocate Time Manager");
+	CV(m_pTimeManager, "Failed to validate Time Manager");
+
 	Validate();
+	return;
+
+Error:
+	Invalidate();
 	return;
 }
 
@@ -293,6 +302,8 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, pCamera));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, pCamera));
 
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_SPACE, pCamera));
+
 	for (int i = 0; i < 26; i++) {
 		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
 	}
@@ -348,7 +359,7 @@ RESULT Windows64App::ShowSandbox() {
 	UpdateWindow(m_hwndWindow);
 
 	// TODO: Should replace this with a proper scene loader
-	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, &m_globalTime), "Failed to load scene");
+	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
 
 	// Launch main message loop
 	MSG msg;
@@ -366,7 +377,7 @@ RESULT Windows64App::ShowSandbox() {
 			DispatchMessage(&msg);
 		}
 
-		m_globalTime.update();
+		m_pTimeManager->Update();
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should

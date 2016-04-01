@@ -1,21 +1,40 @@
-#include "TimeObj.h"
+#include "TimeManager.h"
 
-TimeObj::TimeObj(double	processingTimeQuantum) : m_processingTimeQuantum(processingTimeQuantum)
+TimeManager::TimeManager(double	processingTimeQuantum) : 
+	m_processingTimeQuantum(processingTimeQuantum),
+	m_totalElapsedTime(0.0f),
+	m_totalTimeToProcess(0.0f),
+	m_startTime(std::chrono::high_resolution_clock::now()),
+	m_currentTime(std::chrono::high_resolution_clock::now())
 {
+	RESULT r = R_PASS;
+
 	RegisterEvent(TIME_ELAPSED);
-	reset();
+	Reset();
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
 }
 
-void TimeObj::reset()
-{
+TimeManager::~TimeManager() {
+	// empty
+}
+
+RESULT TimeManager::Reset() {
 	m_startTime = std::chrono::high_resolution_clock::now();
+
 	m_currentTime = m_startTime;
 	m_totalElapsedTime = 0;
 	m_totalTimeToProcess = 0;
+
+	return R_PASS;
 }
 
-void TimeObj::update()
-{
+RESULT TimeManager::Update() {
+
 	auto now = std::chrono::high_resolution_clock::now();
 	auto deltaTime = std::chrono::duration<double>(now - m_currentTime).count();
 	m_currentTime = now;
@@ -29,4 +48,6 @@ void TimeObj::update()
 		m_totalTimeToProcess -= m_processingTimeQuantum;
 		m_totalElapsedTime += m_processingTimeQuantum;
 	}
+
+	return R_PASS;
 }

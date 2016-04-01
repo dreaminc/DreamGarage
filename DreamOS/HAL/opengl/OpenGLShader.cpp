@@ -83,6 +83,41 @@ RESULT OpenGLShader::InitializeFromFile(const wchar_t *pszFilename, version vers
 	CRM(Compile(), "Failed to compile shader");
 	CRM(AttachShader(), "Failed to attach vertex shader");
 
+	// Initialize all of the IDs
+	// TODO: This can't be done until after linking
+	//CRM(GetAttributeLocationsFromShader(), "Failed to get attribute locations");
+	//CRM(GetUniformLocationsFromShader(), "Failed to get uniform locations");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLShader::SetPointUniform(matrix<float, 4, 1> pt, const char* pszUniformName) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+
+	GLint location = -1;
+	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+
+	CB((location >= 0)); 
+	m_pParentImp->glUniform4fv(location, 1, reinterpret_cast<GLfloat*>(&pt));
+
+Error:
+	return r;
+}
+
+RESULT OpenGLShader::Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+
+	GLint location = -1;
+	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+
+	CB((location >= 0));
+	m_pParentImp->glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<GLfloat*>(&mat));
+
 Error:
 	return r;
 }

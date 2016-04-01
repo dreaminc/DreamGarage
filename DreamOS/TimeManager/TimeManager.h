@@ -1,14 +1,18 @@
-#ifndef TIME_OBJ_H_
-#define TIME_OBJ_H_
+#ifndef TIME_MANAGER_H_
+#define TIME_MANAGER_H_
 
 // DREAM OS
-// DreamOS/Dimension/Primitives/TimeObj.h
-// Time Object
+// DreamOS/Dimension/Primitives/TimeManager.h
+// Time Manager 
 
-#include "valid.h"
-#include "Publisher.h"
+#include "Primitives/valid.h"
+#include "Primitives/Types/UID.h"
+#include "Primitives/Publisher.h"
+
 #include <vector>
 #include <chrono>
+
+// TODO: This should be made into a singleton
 
 typedef enum TimeEventType {
 	TIME_ELAPSED,
@@ -23,30 +27,32 @@ typedef struct TimeEvent {
 	TimeEvent(TimeEventType eventType, double currentTime, double deltaTime) :
 		EventType(eventType), m_currentTime(currentTime), m_deltaTime(deltaTime)
 	{
-
+		// empty
 	}
 } TIME_EVENT;
 
 
-class TimeObj : public Publisher<TimeEventType, TimeEvent>, valid {
+class TimeManager : public Publisher<TimeEventType, TimeEvent>, public valid {
 public:
-	TimeObj(double	processingTimeQuantum = 0.0167);
+	TimeManager(double	processingTimeQuantum = 0.0167);
+	~TimeManager();
 
-	// Resets time
-	void reset();
-
-	// Updates the time from previous call to update.
-	void update();
+	RESULT Reset();		// Resets time
+	RESULT Update();	// Updates the time from previous call to update.
 
 private:
-	void onTimeUpdate(double currentTime, double deltaTime);
-
 	std::chrono::time_point<std::chrono::high_resolution_clock>	m_startTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_currentTime;
 
 	double m_processingTimeQuantum;
 	double m_totalElapsedTime;
 	double m_totalTimeToProcess;
+
+public:
+	UID getID() { return m_uid; }
+
+private:
+	UID m_uid;
 };
 
-#endif // !TIME_OBJ_H_
+#endif // !TIME_MANAGER_H_

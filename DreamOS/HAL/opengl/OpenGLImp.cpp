@@ -175,6 +175,13 @@ RESULT OpenGLImp::EnableVertexColorAttribute() {
 	return R_PASS;
 }
 
+RESULT OpenGLImp::EnableVertexNormalAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableVertexNormalAttribute();
+	else
+		return R_FAIL;
+}
+
 RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 	RESULT r = R_PASS;
 	DWORD werr;
@@ -183,6 +190,34 @@ RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 
 	werr = GetLastError();
 	DEBUG_LINEOUT("Bound attribute %s to index location %d err:0x%x", pszName, index, werr);
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
+	RESULT r = R_PASS;
+	GLenum glerr;
+	DWORD werr;
+
+	CR(glUniformBlockBinding(m_idOpenGLProgram, uniformBlockIndex, uniformBlockBindingPoint));
+
+	werr = GetLastError();
+	DEBUG_LINEOUT("Bound uniform block index %d to binding point %d err:0x%x", uniformBlockIndex, uniformBlockBindingPoint, werr);
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
+	RESULT r = R_PASS;
+	GLenum glerr;
+	DWORD werr;
+
+	CR(glBindBufferBase(target, bindingPointIndex, bufferIndex));
+
+	werr = GetLastError();
+	DEBUG_LINEOUT("Bound uniform block binding point %d to base buffer %d err:0x%x", bindingPointIndex, bufferIndex, werr);
 
 Error:
 	return r;
@@ -326,6 +361,9 @@ RESULT OpenGLImp::PrepareScene() {
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
 
+	// Dithering 
+	glEnable(GL_DITHER);
+
 	// TODO: Should be stuffed into factory arch - return NULL on fail
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
@@ -333,7 +371,6 @@ RESULT OpenGLImp::PrepareScene() {
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
 	CRM(pVertexShader->InitializeFromFile(L"minimal.vert", m_versionOGL), "Failed to initialize vertex shader from file");
-	CR(pVertexShader->BindAttributes());
 
 	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
@@ -345,11 +382,36 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(LinkProgram(), "Failed to link program");
 	CRM(UseProgram(), "Failed to use open gl program");
 
+	// TODO: This could all be done in one call in the shader honestly
+	// Attributes
+	CR(pVertexShader->GetAttributeLocationsFromShader());
+	CR(pVertexShader->BindAttributes());
+
+	// TODO: Uniform Variables
+
+	// Uniform Blocks
+	CR(pVertexShader->GetUniformLocationsFromShader());
+	CR(pVertexShader->BindUniformBlocks());
+	CR(pVertexShader->InitializeUniformBlocks());
+
+	// Fragment shader
+	CR(pFragmentShader->GetUniformLocationsFromShader());
+	CR(pFragmentShader->BindUniformBlocks());
+	CR(pFragmentShader->InitializeUniformBlocks());
+
 	CR(PrintVertexAttributes());
 	CR(PrintActiveUniformVariables());
 
+	m_pVertexShader = pVertexShader;
+	m_pFragmentShader = pFragmentShader;
+
 	// Allocate the camera
 	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
+	CN(m_pCamera);
+
+	// TODO:  Currently using a global material 
+	m_pFragmentShader->SetMaterial(&material(100.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	m_pFragmentShader->UpdateUniformBlockBuffers();
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
@@ -483,19 +545,30 @@ Error:
 	return r;
 }
 
+// TODO: Actually move this to OpenGL Program
 inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-	GLint locationProjectionMatrix = -1, locationViewMatrix = -1, locationModelMatrix = -1, locationModelViewProjectionMatrix = -1;
 
 	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
 	auto matModel = pDimObj->GetModelMatrix();
-	
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4Model", &locationModelMatrix);
+	m_pVertexShader->SetModelMatrixUniform(matModel);
 
-	if (locationModelMatrix >= 0)
-		glUniformMatrix4fv(locationModelMatrix, 1, GL_FALSE, (GLfloat*)(&matModel));
+	/* TODO: This should be replaced with a materials store or OGLMaterial that pre-allocates and swaps binding points (Wait for textures)
+	m_pFragmentShader->SetMaterial(pDimObj->GetMaterial());
+	m_pFragmentShader->UpdateUniformBlockBuffers();
+	//*/
 
 	return pOGLObj->Render();
+}
+
+RESULT OpenGLImp::SendLightsToShader(std::vector<light*> *pLights) {
+	RESULT r = R_PASS;
+
+	CR(m_pVertexShader->SetLights(pLights));
+	CR(m_pVertexShader->UpdateUniformBlockBuffers());
+
+Error:
+	return r;
 }
 
 RESULT OpenGLImp::UpdateCamera() {
@@ -509,39 +582,91 @@ RESULT OpenGLImp::UpdateCamera() {
 RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
+	auto ptEye = m_pCamera->GetEyePosition(eye);
+	auto matV = m_pCamera->GetViewMatrix(eye);
 	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix(eye);
 
-	GLint locationViewProjectionMatrix = -1;
-	glGetUniformLocation(m_idOpenGLProgram, "u_mat4ViewProjection", &locationViewProjectionMatrix);
+	CR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
+	CR(m_pVertexShader->SetViewMatrixUniform(matV));
+	CR(m_pVertexShader->SetEyePositionUniform(ptEye));
 
-	if (locationViewProjectionMatrix >= 0)
-		glUniformMatrix4fv(locationViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matVP));
-
+Error:
 	return r;
 }
 
 #include "OGLVolume.h"
+#include "OGLSphere.h"
+#include "Primitives/light.h"
+
+light *g_pLight = NULL;
 
 // TODO: Other approach 
-RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeObj *pTimeObj) {
+RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
 	RESULT r = R_PASS;
 
+	// Add lights
+	light *pLight = NULL; 
+
+	/*
+	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pSceneGraph->PushObject(pLight);
+	//*/
+
+	///*
+	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
+	pLight = new light(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
+	pSceneGraph->PushObject(pLight);
+
+	pLight = new light(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace/2.0)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f));
+	pSceneGraph->PushObject(pLight);
+
+	pLight = new light(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f));
+	pSceneGraph->PushObject(pLight);
+	//*/
+
+	g_pLight = pLight;
+
+	///*
 	OGLVolume *pVolume = NULL;
 	int num = 20;
-	double size = 0.2f;
+	double size = 0.5f;
+	int spaceFactor = 2;
 
 	for (int i = 0; i < num; i++) {
 		for (int j = 0; j < num; j++) {
 			pVolume = new OGLVolume(this, size);
-			pVolume->SetRandomColor();
+
+			//pVolume->SetRandomColor();
 			pVolume->translate(static_cast<point_precision>(i * (size * 2) - (num * size)), 
 				static_cast<point_precision>(0.0f),
 				static_cast<point_precision>(j * (size * 2) - (num * size)));
+
 			pVolume->UpdateOGLBuffers();
-			pTimeObj->RegisterSubscriber(TIME_ELAPSED, pVolume);
+			pTimeManager->RegisterSubscriber(TIME_ELAPSED, pVolume);
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
+	//*/
+
+	/*
+	OGLSphere *pSphere = NULL;
+	int num = 20;
+	int sects = 5;
+	double radius = 0.5f;
+	double size = radius * 2;
+	int spaceFactor = 4;
+
+	for (int i = 0; i < num; i++) {
+		for (int j = 0; j < num; j++) {
+			pSphere = new OGLSphere(this, radius, sects, sects);
+			//pVolume->SetRandomColor();
+			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
+			pSphere->UpdateOGLBuffers();
+			//pTimeManager->RegisterSubscriber(TIME_ELAPSED, pSphere);
+			pSceneGraph->PushObject(pSphere);
+		}
+	}
+	//*/
 
 	return r;
 }
@@ -549,7 +674,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeObj *pTimeObj) {
 RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	DimObj *pDimObj = NULL;
+	VirtualObj *pVirtualObj = NULL;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -558,8 +683,14 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	// Send SceneGraph objects to shader
 	pSceneGraph->Reset();
-	while((pDimObj = pObjectStore->GetNextObject()) != NULL) {
-		SendObjectToShader(pDimObj);
+	while((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+		if (pDimObj == NULL)
+			continue;
+		else {
+			SendObjectToShader(pDimObj);
+		}
 	}
 	
 	glFlush();
@@ -571,12 +702,19 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	DimObj *pDimObj = NULL;
+	VirtualObj *pVirtualObj = NULL;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for (int i = 0; i < 2; i++) {
+	//g_pLight->translateZ(0.01f);
 
+	// Send lights to shader
+	std::vector<light*> *pLights = NULL;
+	CR(pObjectStore->GetLights(pLights));
+	CN(pLights);
+	CR(SendLightsToShader(pLights));
+
+	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
 		SetStereoViewTarget(eye);
@@ -584,13 +722,22 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 
 		// Send SceneGraph objects to shader
 		pSceneGraph->Reset();
-		while ((pDimObj = pObjectStore->GetNextObject()) != NULL) {
-			SendObjectToShader(pDimObj);
+		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+			
+			if (pDimObj == NULL)
+				continue;
+			else {
+				SendObjectToShader(pDimObj);
+			}
+			
 		}
 	}
 	
 	glFlush();
 
+Error:
 	return r;
 }
 
@@ -736,6 +883,52 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation) {
+	RESULT r = R_PASS;
+
+	*pLocation = m_OpenGLExtensions.glGetAttribLocation(programID, pszName);
+	CRM(CheckGLError(), "glGetAttribLocation failed");
+
+	return r;
+Error:
+	*pLocation = -1;
+	return r;
+}
+
+RESULT OpenGLImp::glGetUniformBlockIndex(GLuint programID, const GLchar *pszName, GLint *pLocation) {
+	RESULT r = R_PASS;
+
+	*pLocation = m_OpenGLExtensions.glGetUniformBlockIndex(programID, pszName);
+	CRM(CheckGLError(), "glGetUniformLocation failed");
+
+	return r;
+Error:
+	*pLocation = -1;
+	return r;
+}
+
+RESULT OpenGLImp::glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUniformBlockBinding(programID, uniformBlockIndex, uniformBlockBindingPoint);
+	CRM(CheckGLError(), "glGetUniformLocation failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBindBufferBase(target, bindingPointIndex, bufferIndex);
+	CRM(CheckGLError(), "glBindBufferBase failed");
+
+Error:
+	return r;
+}
+
+
+
 RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
 	RESULT r = R_PASS;
 
@@ -745,6 +938,16 @@ RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint
 	return r;
 Error:
 	*pLocation = -1;
+	return r;
+}
+
+RESULT OpenGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUniform4fv(location, count, value);
+	CRM(CheckGLError(), "glUniform4fv failed");
+
+Error:
 	return r;
 }
 
@@ -816,6 +1019,18 @@ RESULT OpenGLImp::glBufferData(GLenum target, GLsizeiptr size, const void *data,
 
 	m_OpenGLExtensions.glBufferData(target, size, data, usage);
 	CRM(CheckGLError(), "glBufferData failed");
+
+Error:
+	return r;
+}
+
+
+
+RESULT OpenGLImp::glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBufferSubData(target, offset, size, data);
+	CRM(CheckGLError(), "glBufferSubData failed");
 
 Error:
 	return r;

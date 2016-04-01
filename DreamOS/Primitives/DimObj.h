@@ -13,7 +13,10 @@
 #include "point.h"
 #include "TriangleIndexGroup.h"
 #include "Vertex.h"
-#include "TimeObj.h"
+
+#include "TimeManager/TimeManager.h"
+#include "material.h"
+
 
 class DimObj : public VirtualObj, public Subscriber<TimeEvent> {
 protected:
@@ -23,12 +26,14 @@ protected:
 protected:
 	vertex *m_pVertices;
 	dimindex *m_pIndices;
+	material m_material;
 
 public:
     DimObj() :
         VirtualObj(),	// velocity, origin
 		m_pVertices(NULL),
-		m_pIndices(NULL)
+		m_pIndices(NULL),
+		m_material()
         //m_aabv()
     {
         /* stub */
@@ -45,6 +50,10 @@ public:
 			m_pVertices = NULL;
 		}
     }
+
+	virtual OBJECT_TYPE GetType() {
+		return OBJECT_DIMENSION;
+	}
 
 	
 	virtual RESULT Allocate() = 0;
@@ -80,7 +89,7 @@ public:
 	RESULT AllocateIndices(uint32_t numIndices) {
 		RESULT r = R_PASS;
 
-		m_pIndices = new uint32_t[numIndices];
+		m_pIndices = new dimindex[numIndices];
 		CN(m_pIndices);
 
 	Error:
@@ -139,28 +148,9 @@ public:
 		return R_PASS;
 	}
 
-	void onTimeUpdate(double currentTime, double deltaTime) {
-		//printf("nir\n");
-		quaternion_precision factor = 0.05;
-		quaternion_precision filter = 0.1;
-
-		static quaternion_precision x = 1.0;
-		static quaternion_precision y = 1.0;
-		static quaternion_precision z = 1.0;
-
-		//x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		//y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		//z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-
-		RotateBy(x * factor, y * factor, z * factor);
-
+	material *GetMaterial() {
+		return (&m_material);
 	}
-
-public:
-	UID getID() { return m_uid; }
-
-private:
-	UID m_uid;
 };
 
 #endif // !DIM_OBJ_H_

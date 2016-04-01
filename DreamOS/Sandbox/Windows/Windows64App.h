@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 #include "Sandbox/SandboxApp.h"
 
-#include "Primitives/TimeObj.h"
+#include "TimeManager/TimeManager.h"
 
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
@@ -72,7 +72,7 @@ private:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	OpenGLImp *m_pOpenGLImp;	
 
-	TimeObj	m_globalTime;
+	TimeManager	*m_pTimeManager;
 
 public:
 	Win64Keyboard *m_pWin64Keyboard;
