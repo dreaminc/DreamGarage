@@ -1,6 +1,5 @@
 // minimal.vert
-//#version 150 core
-#version 440 core
+#version 400 core
 
 layout (location = 0) in vec3 inV_vec3Position;
 layout (location = 1) in vec3 inV_vec3Color;

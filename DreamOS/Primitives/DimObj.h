@@ -13,6 +13,7 @@
 #include "point.h"
 #include "TriangleIndexGroup.h"
 #include "Vertex.h"
+#include "material.h"
 
 class DimObj : public VirtualObj {
 protected:
@@ -22,12 +23,14 @@ protected:
 protected:
 	vertex *m_pVertices;
 	dimindex *m_pIndices;
+	material m_material;
 
 public:
     DimObj() :
         VirtualObj(),	// velocity, origin
 		m_pVertices(NULL),
-		m_pIndices(NULL)
+		m_pIndices(NULL),
+		m_material()
         //m_aabv()
     {
         /* stub */
@@ -44,6 +47,10 @@ public:
 			m_pVertices = NULL;
 		}
     }
+
+	virtual OBJECT_TYPE GetType() {
+		return OBJECT_DIMENSION;
+	}
 
 	
 	virtual RESULT Allocate() = 0;
@@ -79,7 +86,7 @@ public:
 	RESULT AllocateIndices(uint32_t numIndices) {
 		RESULT r = R_PASS;
 
-		m_pIndices = new uint32_t[numIndices];
+		m_pIndices = new dimindex[numIndices];
 		CN(m_pIndices);
 
 	Error:
@@ -121,11 +128,9 @@ public:
 		return r;
 	}
 
-public:
-	UID getID() { return m_uid; }
-
-private:
-	UID m_uid;
+	material *GetMaterial() {
+		return (&m_material);
+	}
 };
 
 #endif // !DIM_OBJ_H_

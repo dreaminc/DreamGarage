@@ -145,6 +145,18 @@ Error:
 	return r;
 }
 
+RESULT Win64PathManager::DoesPathExist(const wchar_t *pszPath) {
+	RESULT r = R_PATH_NOT_FOUND;
+	DWORD fileAttributes = GetFileAttributesW(pszPath);
+	
+	if (fileAttributes != INVALID_FILE_ATTRIBUTES) 
+		if (fileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+			return R_DIRECTORY_FOUND;
+		else
+			return R_FILE_FOUND;
+
+	return r;
+}
 
 RESULT Win64PathManager::PrintPaths() {
 	RESULT r = R_PASS;
@@ -152,8 +164,68 @@ RESULT Win64PathManager::PrintPaths() {
 	// Some debug / path management
 	DEBUG_LINEOUT("Current directory %S", m_pszCurDirectiory);
 	DEBUG_LINEOUT("Dream Root Path %S", m_pszDreamRootPath);
-	
 
 Error:
+	return r;
+}
+
+// Make note that this will allocate new strings and push them into the directory list
+RESULT Win64PathManager::GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs) {
+	RESULT r = R_PASS;
+	wchar_t *pszValuePath = NULL;
+	long pszValuePath_n = 0;
+
+	wchar_t *pszValueFindPath = NULL;
+	long pszValueFindPath_n = 0;
+
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+	WIN32_FIND_DATA fileFindData;
+	int i = 0;
+
+	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
+	pszValuePath_n = wcslen(pszValuePath);
+	CRM(DoesPathExist(pszValuePath), "Path %S does not exist", pszValuePath);
+	CBM((r == R_DIRECTORY_FOUND), "Invalid return from DoesPathExist");
+
+	// FindFirstFile call requires some characters at the end
+	pszValueFindPath_n = pszValuePath_n + 2;
+	pszValueFindPath = new wchar_t[pszValueFindPath_n];
+	memset(pszValueFindPath, 0, sizeof(wchar_t) * pszValueFindPath_n);
+	wcscat(pszValueFindPath, pszValuePath);
+	wcscat(pszValueFindPath, L"*");
+
+	// Find all directories in path
+	hFind = FindFirstFile(pszValueFindPath, &fileFindData);
+
+	//hFind = FindFirstFile(L"D:\\dev\\DreamGarage\\DreamOS./HAL/opengl/GLSL/*", &fileFindData);
+	CBM((hFind != INVALID_HANDLE_VALUE), "Could not find anything");
+
+	do {
+		if (fileFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			if (wcscmp(L".", fileFindData.cFileName) != 0 && wcscmp(L"..", fileFindData.cFileName) != 0) {
+				long pszFoundDir_n = wcslen(fileFindData.cFileName) + 1;
+				wchar_t *pszFoundDir = new wchar_t[pszFoundDir_n];
+				
+				memset(pszFoundDir, 0, sizeof(wchar_t) * pszFoundDir_n);
+				memcpy(pszFoundDir, fileFindData.cFileName, sizeof(wchar_t) * pszFoundDir_n);
+				
+				pListDirs->push_back(pszFoundDir);
+			}
+		}
+	} while (FindNextFile(hFind, &fileFindData) != 0);
+
+Error:
+	if (pszValuePath != NULL) {
+		delete[] pszValuePath;
+		pszValuePath = NULL;
+	}
+
+	if (pszValueFindPath != NULL) {
+		delete[] pszValueFindPath;
+		pszValueFindPath = NULL;
+	}
+
+	FindClose(hFind);
+
 	return r;
 }

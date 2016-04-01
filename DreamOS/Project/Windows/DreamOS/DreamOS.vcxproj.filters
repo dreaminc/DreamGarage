@@ -51,6 +51,15 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{2be3e3ef-4d89-4383-b2de-5d5a55e6a51b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HAL\opengl\GL">
+      <UniqueIdentifier>{d90f805b-bf9a-4f40-9742-e7bb02818c72}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl\GLSL\v400">
+      <UniqueIdentifier>{f27b7344-cb72-4d25-befe-543ced6e4527}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl\GLSL\v440">
+      <UniqueIdentifier>{7f1c2dc0-01a8-4076-a88c-4315fbe75d6d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -122,6 +131,18 @@
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\version.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLUniformBlock.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -135,15 +156,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Test\TestObject.h">
       <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\OSX\OSXApp.h">
-      <Filter>Sandbox\OSX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h">
-      <Filter>Sandbox\OSX</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h">
-      <Filter>Sandbox\OSX</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
       <Filter>RESULT</Filter>
@@ -340,6 +352,42 @@
     <ClInclude Include="..\..\..\Primitives\stereocamera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h">
+      <Filter>HAL\opengl\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h">
+      <Filter>HAL\opengl\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h">
+      <Filter>HAL\opengl\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h">
+      <Filter>HAL\opengl\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\version.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\light.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\sphere.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\material.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -348,20 +396,20 @@
     <None Include="..\..\..\Rakefile">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\OSX\OSXApp.mm">
-      <Filter>Sandbox\OSX</Filter>
+    <None Include="..\..\..\Primitives\.DS_Store">
+      <Filter>Primitives</Filter>
     </None>
-    <None Include="..\..\..\OSX\OSXAppDelegate.mm">
-      <Filter>Sandbox\OSX</Filter>
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag">
+      <Filter>HAL\opengl\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\OSX\OSXOpenGLView.m">
-      <Filter>Sandbox\OSX</Filter>
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert">
+      <Filter>HAL\opengl\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag">
-      <Filter>HAL\opengl\GLSL</Filter>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert">
-      <Filter>HAL\opengl\GLSL</Filter>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

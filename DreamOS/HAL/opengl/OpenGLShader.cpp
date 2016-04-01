@@ -40,19 +40,32 @@ const char *OpenGLShader::GetShaderCode() {
 	return m_pszShaderCode; 
 }
 
-RESULT OpenGLShader::LoadShaderCodeFromFile(wchar_t *pszFilename) {
+RESULT OpenGLShader::LoadShaderCodeFromFile(const wchar_t *pszFilename) {
+	version tempVersion(0);
+	return LoadShaderCodeFromFile(pszFilename, tempVersion);
+}
+
+RESULT OpenGLShader::LoadShaderCodeFromFile(const wchar_t *pszFilename, version versionFile) {
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
 	wchar_t *pFilePath = NULL;
 
-	CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+	if (versionFile == 0) {
+		CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+	}
+	else {
+		version versionFileExists = 0;
+		CRM(pPathManager->GetFileVersionThatExists(PATH_SHADERS, versionFile, pszFilename, &versionFileExists), "Failed to get existing file version");
+
+		CRM(pPathManager->GetFilePathVersion(PATH_SHADERS, versionFileExists, pszFilename, pFilePath),
+			"Failed to get path for %S shader version %d.%d", pszFilename, versionFile.major(), versionFile.minor());
+	}
 
 	m_pszShaderCode = FileRead(pFilePath);
 	CNM(m_pszShaderCode, "Failed to read file %S", pFilePath);
 
 	DEBUG_LINEOUT("Loaded new shader %S", pFilePath);
-	//DEBUG_OUT(m_pszShaderCode);
 
 Error:
 	if (pFilePath != NULL) {
@@ -63,12 +76,47 @@ Error:
 	return r;
 }
 
-RESULT OpenGLShader::InitializeFromFile(wchar_t *pszFilename) {
+RESULT OpenGLShader::InitializeFromFile(const wchar_t *pszFilename, version versionFile) {
 	RESULT r = R_PASS;
 
-	CRM(LoadShaderCodeFromFile(pszFilename), "Failed to load vertex shader code from %S", pszFilename);
+	CRM(LoadShaderCodeFromFile(pszFilename, versionFile), "Failed to load vertex shader code from %S", pszFilename);
 	CRM(Compile(), "Failed to compile shader");
 	CRM(AttachShader(), "Failed to attach vertex shader");
+
+	// Initialize all of the IDs
+	// TODO: This can't be done until after linking
+	//CRM(GetAttributeLocationsFromShader(), "Failed to get attribute locations");
+	//CRM(GetUniformLocationsFromShader(), "Failed to get uniform locations");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLShader::SetPointUniform(matrix<float, 4, 1> pt, const char* pszUniformName) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+
+	GLint location = -1;
+	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+
+	CB((location >= 0)); 
+	m_pParentImp->glUniform4fv(location, 1, reinterpret_cast<GLfloat*>(&pt));
+
+Error:
+	return r;
+}
+
+RESULT OpenGLShader::Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+
+	GLint location = -1;
+	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+
+	CB((location >= 0));
+	m_pParentImp->glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<GLfloat*>(&mat));
 
 Error:
 	return r;

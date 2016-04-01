@@ -70,68 +70,74 @@ public:
 
 		///*
 		// Front face
-		m_pVertices[TR = vertCount++] = vertex(point(halfSide, halfSide, halfSide));		// A top left
-		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, halfSide, halfSide));		// B top right
-		m_pVertices[BR = vertCount++] = vertex(point(halfSide, -halfSide, halfSide));		// C bottom left
-		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide));		// D bottom right
+		m_pVertices[TR = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(0.0f, 0.0f, 1.0f));		// A top left
+		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(0.0f, 0.0f, 1.0f));		// B top right
+		m_pVertices[BR = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(0.0f, 0.0f, 1.0f));		// C bottom left
+		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(0.0f, 0.0f, 1.0f));		// D bottom right
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
 		//*/
 
 		///*
 		// Back face
-		m_pVertices[TL = vertCount++] = vertex(point(halfSide, halfSide, -halfSide));		// A
-		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide));		// B
-		m_pVertices[BL = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide));		// C
-		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide));		// D
+		m_pVertices[TL = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f));		// A
+		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f));		// B
+		m_pVertices[BL = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f));		// C
+		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
 		//*/
 		
 		///*
 		// Left face
-		m_pVertices[TL = vertCount++] = vertex(point(halfSide, -halfSide, halfSide));		// A
-		m_pVertices[TR = vertCount++] = vertex(point(halfSide, halfSide, halfSide));			// B
-		m_pVertices[BL = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide));		// C
-		m_pVertices[BR = vertCount++] = vertex(point(halfSide, halfSide, -halfSide));		// D
+		m_pVertices[TL = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(1.0f, 0.0f, 0.0f));		// A
+		m_pVertices[TR = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(1.0f, 0.0f, 0.0f));		// B
+		m_pVertices[BL = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(1.0f, 0.0f, 0.0f));		// C
+		m_pVertices[BR = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(1.0f, 0.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
 		//*/
 
 		///*
 		// Right face
-		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide));		// A
-		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, halfSide, halfSide));		// B
-		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide));		// C
-		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide));		// D
+		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(-1.0f, 0.0f, 0.0f));		// A
+		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(-1.0f, 0.0f, 0.0f));		// B
+		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(-1.0f, 0.0f, 0.0f));		// C
+		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(-1.0f, 0.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
 		//*/
 
 		///*
 		// Top face
-		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, halfSide, halfSide));		// A
-		m_pVertices[TL = vertCount++] = vertex(point(halfSide, halfSide, halfSide));			// B
-		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide));		// C
-		m_pVertices[BL = vertCount++] = vertex(point(halfSide, halfSide, -halfSide));		// D
+		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(0.0f, 1.0f, 0.0f));		// A
+		m_pVertices[TL = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(0.0f, 1.0f, 0.0f));			// B
+		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(0.0f, 1.0f, 0.0f));		// C
+		m_pVertices[BL = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(0.0f, 1.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
 		//*/
 
 		///*
 		// Bottom face
-		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide));		// A
-		m_pVertices[TR = vertCount++] = vertex(point(halfSide, -halfSide, halfSide));		// B
-		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide));		// C
-		m_pVertices[BR = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide));		// D
+		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(0.0f, -1.0f, 0.0f));		// A
+		m_pVertices[TR = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(0.0f, -1.0f, 0.0f));		// B
+		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(0.0f, -1.0f, 0.0f));		// C
+		m_pVertices[BR = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(0.0f, -1.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
 		//*/
 
 		Validate();

@@ -1,6 +1,8 @@
 #ifndef INTEGER_H_
 #define INTEGER_H_
 
+#include <math.h>
+
 // DREAM OS
 // DreamOS/Primitives/Types/Number.h
 // Number is a general purpose dynamic class - ultimately the goal is to allow
@@ -237,6 +239,16 @@ public:
     Number operator+( const int &arg ) const { return Number(*this).operator+=(arg); }
     Number operator+( const float &arg ) const { return Number(*this).operator+=(arg); }
     Number operator+( const double &arg ) const { return Number(*this).operator+=(arg); }
+
+	// Utility
+public:
+	static long DigitCount(double num) { 
+		if (num == 0)
+			return 1.0f;
+
+		long digitCount = (long)ceil(log10((double)(num)));
+		return digitCount;
+	}
 };
 
 #endif // !INTEGER_H_

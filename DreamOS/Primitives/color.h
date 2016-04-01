@@ -19,6 +19,11 @@
 
 enum COLOR_TYPE {
 	COLOR_RANDOM,
+	COLOR_WHITE,
+	COLOR_BLACK,
+	COLOR_RED,
+	COLOR_GREEN,
+	COLOR_BLUE,
 	COLOR_INVALID
 };
 
@@ -48,6 +53,12 @@ public:
 				SetColor(r, g, b, 1.0f);
 			} break;
 
+			case COLOR_BLACK: { SetColor(0.0f, 0.0f, 0.0f, 1.0f); } break;
+			case COLOR_WHITE: { SetColor(1.0f, 1.0f, 1.0f, 1.0f); } break;
+			case COLOR_RED: { SetColor(1.0f, 0.0f, 0.0f, 1.0f); } break;
+			case COLOR_GREEN: { SetColor(0.0f, 1.0f, 0.0f, 1.0f); } break;
+			case COLOR_BLUE: { SetColor(0.0f, 0.0f, 1.0f, 1.0f); } break;
+
 			default: {
 				this->clear();
 			} break;
@@ -69,10 +80,10 @@ public:
 	inline color_precision &b() { return this->element(2, 0); }
 	inline color_precision &a() { return this->element(3, 0); }
 
-	inline color_precision &r(vector_precision val) { return this->element(0, 0) = val; }
-	inline color_precision &g(vector_precision val) { return this->element(1, 0) = val; }
-	inline color_precision &b(vector_precision val) { return this->element(2, 0) = val; }
-	inline color_precision &a(vector_precision val) { return this->element(3, 0) = val; }
+	inline color_precision &r(color_precision val) { return this->element(0, 0) = val; }
+	inline color_precision &g(color_precision val) { return this->element(1, 0) = val; }
+	inline color_precision &b(color_precision val) { return this->element(2, 0) = val; }
+	inline color_precision &a(color_precision val) { return this->element(3, 0) = val; }
 };
 
 #endif // ! COLOR_H_

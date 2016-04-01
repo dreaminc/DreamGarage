@@ -1,71 +1,34 @@
-#ifndef OGL_OBJ_H_
-#define OGL_OBJ_H_
+#ifndef OGL_SPHERE_H_
+#define OGL_SPHERE_H_
 
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/HAL/OpenGL/OGLOBJ.h
-// OpenGL Base Type - This is for coupling with the open GL implementation 
+// DreamOS/HAL/OpenGL/OGLSphere.h
+// OpenGL Sphere Object
 
-#include "OpenGLImp.h"
-#include "Primitives/DimObj.h"
+#include "OGLObj.h"
+#include "Primitives/sphere.h"
 
-#define NUM_VBO 2
+class OGLSphere : public sphere, public OGLObj {
+protected:
+	DimObj *GetDimObj() {
+		return (DimObj*)this;
+	}
 
-class OGLObj {
 public:
-	OGLObj(OpenGLImp *pParentImp) :
-		m_pParentImp(pParentImp)
+	OGLSphere(OpenGLImp *pParentImp, float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) :
+		sphere(1.0f, numAngularDivisions, numVerticalDivisions),
+		OGLObj(pParentImp)
 	{
-		/* empty stub */
-	}
-
-	~OGLObj() {
-		ReleaseOGLBuffers();
-	}
-
-	//virtual inline vertex *VertexData() = 0;
-	//virtual inline int VertexDataSize() = 0;
-
-	//virtual RESULT Render() = 0;
-	virtual DimObj *GetDimObj() = 0;
-
-	RESULT ReleaseOGLBuffers() {
-		RESULT r = R_PASS;
-
-		if (m_pParentImp != NULL) {
-			if (m_hVBO != NULL) {
-				CR(m_pParentImp->glDeleteBuffers(1, &m_hVBO));
-				m_hVBO = NULL;
-			}
-
-			if (m_hIBO != NULL) {
-				CR(m_pParentImp->glDeleteBuffers(1, &m_hIBO));
-				m_hIBO = NULL;
-			}
-
-			if (m_hVAO != NULL) {
-				CR(m_pParentImp->glDeleteVertexArrays(1, &m_hVAO));
-				m_hVAO = NULL;
-			}
-		}
-
-	Error:
-		return r;
-	}
-
-	// This should be used in the OGLInitialize function
-	inline GLushort GetOGLPrecision() {
-		#ifdef FLOAT_PRECISION
-			return GL_FLOAT;
-		#elif defined(DOUBLE_PRECISION)
-			return GL_DOUBLE;
-		#endif
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
 	}
 
 	// This needs to be called from the sub-class constructor
 	// or externally from the object (TODO: factory class needed)
-	virtual RESULT OGLInitialize() {
+	// TODO: Move this back to OGLObj
+	RESULT OGLInitialize() {
 		RESULT r = R_PASS;
 
 		DimObj *pDimObj = GetDimObj();
@@ -84,8 +47,9 @@ public:
 		vertex *pVertex = pDimObj->VertexData();
 		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
-	
+
 		// Index Element Buffer
+		///*
 		CR(m_pParentImp->glGenBuffers(1, &m_hIBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
@@ -93,6 +57,7 @@ public:
 		dimindex *pIndex = pDimObj->IndexData();
 		int pIndex_s = pDimObj->IndexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ELEMENT_ARRAY_BUFFER, pIndex_s, pIndex, GL_STATIC_DRAW));
+		//*/
 
 		// Enable the vertex attribute arrays
 		// TODO: This needs to come out of the Implementation shader compilation, should not be static
@@ -109,7 +74,7 @@ public:
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
 
 		// Normal
-		CR(m_pParentImp->EnableVertexNormalAttribute());		
+		CR(m_pParentImp->EnableVertexNormalAttribute());
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)2, vertex::GetNormalDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetNormalOffset()));
 
 		// TODO: UV Coord
@@ -120,30 +85,9 @@ public:
 		return r;
 	}
 
-	RESULT UpdateOGLBuffers() {
-		RESULT r = R_PASS;
-
-		DimObj *pDimObj = GetDimObj();
-		CNM(pDimObj, "Failed to acquire Dimension Object");
-
-		CR(m_pParentImp->MakeCurrentContext());
-
-		CR(m_pParentImp->glBindVertexArray(m_hVAO));
-		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
-
-		vertex *pVertex = pDimObj->VertexData();
-		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
-		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
-
-		CR(m_pParentImp->ReleaseCurrentContext());
-
-	Error:
-		return r;
-	}
-
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
-	virtual RESULT Render() {
+	RESULT Render() {
 		RESULT r = R_PASS;
 
 		// TODO: Rethink this since it's in the critical path
@@ -153,17 +97,40 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
-		glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+		/*
+		int numVerts = pDimObj->NumberVertices();
+		glDrawArrays(GL_POINTS, 0, numVerts);
+		//*/
+		
+
+		// Top Fan
+		///*
+		int indexCount = 0;
+		void *pOffset = (void*)(sizeof(dimindex) * indexCount);
+		int numFanVerts = m_numAngularDivisions + 2;
+		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
+		indexCount += numFanVerts;
+		
+		// Strips
+		int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
+		int numStrips = m_numVerticalDivisions - 3;
+
+		for (int i = 0; i < numStrips; i++) {
+			pOffset = (void*)(sizeof(dimindex) * indexCount);
+			glDrawElements(GL_TRIANGLE_STRIP, numTriangleStripVerts, GL_UNSIGNED_INT, pOffset);
+			indexCount += numTriangleStripVerts;
+		}
+		
+		// Bottom Fan
+		pOffset = (void*)(sizeof(dimindex) * indexCount);
+		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
+		indexCount += numFanVerts;
+		//*/
+
 
 	Error:
 		return r;
 	}
-
-protected:
-	GLuint m_hVAO;		// vertex array object
-	GLuint m_hVBO;		// vertex buffer object
-	GLuint m_hIBO;		// index buffer object
-	OpenGLImp *m_pParentImp;
 };
 
-#endif // ! OGL_OBJ_H_
+#endif // ! OGL_SPHERE_H_

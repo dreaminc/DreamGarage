@@ -106,6 +106,9 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedUsingFiles>
+      </ForcedUsingFiles>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +143,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -151,6 +155,9 @@
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLUniformBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
@@ -160,6 +167,7 @@
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
+    <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
@@ -180,10 +188,18 @@
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
@@ -195,16 +211,16 @@
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h" />
     <ClInclude Include="..\..\..\HAL\Shader.h" />
-    <ClInclude Include="..\..\..\OSX\OSXApp.h" />
-    <ClInclude Include="..\..\..\OSX\OSXAppDelegate.h" />
-    <ClInclude Include="..\..\..\OSX\OSXOpenGLView.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
+    <ClInclude Include="..\..\..\Primitives\light.h" />
+    <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
+    <ClInclude Include="..\..\..\Primitives\sphere.h" />
     <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
     <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />
@@ -223,6 +239,7 @@
     <ClInclude Include="..\..\..\Primitives\Types\UID.h" />
     <ClInclude Include="..\..\..\Primitives\valid.h" />
     <ClInclude Include="..\..\..\Primitives\vector.h" />
+    <ClInclude Include="..\..\..\Primitives\version.h" />
     <ClInclude Include="..\..\..\Primitives\Vertex.h" />
     <ClInclude Include="..\..\..\Primitives\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
@@ -248,12 +265,12 @@
     <ClInclude Include="..\..\..\Test\TestObject.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.frag" />
-    <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert" />
     <None Include="..\..\..\Makefile" />
-    <None Include="..\..\..\OSX\OSXApp.mm" />
-    <None Include="..\..\..\OSX\OSXAppDelegate.mm" />
-    <None Include="..\..\..\OSX\OSXOpenGLView.m" />
+    <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />
   </ItemGroup>
   <ItemGroup>

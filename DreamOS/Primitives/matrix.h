@@ -578,6 +578,7 @@ TMat4x4 operator*(const matrix<TMat4x4, N, 1>& lhs, const matrix<TMat4x4, N, 1>&
 	return result;
 }
 
+
 /*
 template <typename TMat4x4>
 matrix<TMat4x4, 4, 4>& matrix<TMat4x4, 4, 4>::operator*=(const matrix<TMat4x4, 4, 4>& arg) {

@@ -297,6 +297,8 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, pCamera));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, pCamera));
 
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_SPACE, pCamera));
+
 	for (int i = 0; i < 26; i++) {
 		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
 	}
@@ -337,8 +339,9 @@ RESULT Windows64App::ShowSandbox() {
 	
 	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
 	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
+	CVM(m_pOpenGLImp, "OpenGL Implementation Invalid");
 
-	CRM(SetDimensions(m_posX, m_posY), "Failed to resize OpenGL Implemenation");
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
 

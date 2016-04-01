@@ -17,17 +17,20 @@
 #include "OGLVertexShader.h"
 #include "OGLFragmentShader.h"
 
-//#include "Primitives/camera.h"
+#include "Primitives/valid.h"
+#include "Primitives/version.h"
 #include "Primitives/stereocamera.h"
 
 #include "OpenGLExtensions.h"
 
 #include "Scene/SceneGraph.h"
+#include "Primitives/DimObj.h"
+#include "Primitives/material.h"
 
 class SandboxApp; 
 class Windows64App;
 
-class OpenGLImp : public HALImp {
+class OpenGLImp : public HALImp, public valid {
 private:
 
 	// TODO: Create an OpenGL Program class which should combine
@@ -37,9 +40,8 @@ private:
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
 
-	int m_versionMajor;
-	int m_versionMinor;
-	int m_versionGLSL;
+	version m_versionOGL;
+	version m_versionGLSL;
 
 	// Viewport
 	// TODO: Move this into an object?
@@ -50,6 +52,7 @@ private:
 public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
+	GLuint GetOGLProgramID() { return m_idOpenGLProgram; }
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
@@ -65,6 +68,8 @@ public:
 	RESULT RenderStereo(SceneGraph *pSceneGraph);
 
 	RESULT SendObjectToShader(DimObj *pDimObj);
+	RESULT SendLightsToShader(std::vector<light*> *pLights);
+
 	RESULT PrintVertexAttributes();
 	RESULT PrintActiveUniformVariables();
 	
@@ -91,7 +96,6 @@ private:
 	OGLFragmentShader *m_pFragmentShader;
 	// TODO: Other shaders
 
-	//camera *m_pCamera;
 	stereocamera *m_pCamera;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
@@ -99,13 +103,12 @@ private:
 public:
 	RESULT EnableVertexPositionAttribute();
 	RESULT EnableVertexColorAttribute();
+	RESULT EnableVertexNormalAttribute();
 
 // TODO: Unify access to extensions
 public:
 
-	
 	// TODO: Unify extension call / wrappers 
-
 	RESULT glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params);
 	RESULT glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params);
 	RESULT glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name);
@@ -118,6 +121,7 @@ public:
 	RESULT glDeleteBuffers(GLsizei n, const GLuint *buffers);
 
 	RESULT glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
+	RESULT glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data);
 	RESULT glEnableVertexAtrribArray(GLuint index);
 	RESULT glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
 
@@ -126,9 +130,20 @@ public:
 
 	RESULT BindAttribLocation(unsigned int index, char* pszName);
 
+	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
+	RESULT BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex);
+
+	RESULT glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation);
+
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
+	RESULT glUniform4fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+
+	// Uniform Blocks
+	RESULT glGetUniformBlockIndex(GLuint programID, const GLchar *pszName, GLint *pLocation);
+	RESULT glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
+	RESULT glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex);
 
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *shaderID);
