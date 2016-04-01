@@ -46,7 +46,8 @@ public:
 		m_pxScreenHeight(pxScreenHeight),
 		m_cameraRotateSpeed(DEFAULT_CAMERA_ROTATE_SPEED),
 		m_cameraForwardSpeed(0.0f),
-		m_cameraStrafeSpeed(0.0f)
+		m_cameraStrafeSpeed(0.0f),
+		m_cameraUpSpeed(0.0f)
 	{
 		m_ptOrigin = ptOrigin;
 		m_qRotation = quaternion(0.0f, 0.0f, 0.0f, 0.0f);
@@ -142,6 +143,16 @@ public:
 		return R_PASS;
 	}
 
+	RESULT SetUpSpeed(camera_precision speed) {
+		m_cameraUpSpeed = speed;
+		return R_PASS;
+	}
+
+	RESULT AddUpSpeed(camera_precision speed) {
+		m_cameraUpSpeed += speed;
+		return R_PASS;
+	}
+
 	RESULT Notify(SenseKeyboardEvent *kbEvent) {
 		RESULT r = R_PASS;
 
@@ -179,6 +190,13 @@ public:
 				else
 					AddForwardSpeed(0.1f);
 			} break;
+
+			case SK_SPACE: {
+				if (kbEvent->KeyState)
+					AddUpSpeed(-0.1f);
+				else
+					AddUpSpeed(0.1f);
+			} break;
 		}
 
 		return r;
@@ -191,6 +209,7 @@ public:
 				
 		m_ptOrigin += GetLookVector() * m_cameraForwardSpeed;
 		m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
+		m_ptOrigin += GetUpVector() * m_cameraUpSpeed;
 
 		return (*this);
 	}
@@ -237,6 +256,7 @@ private:
 	camera_precision m_cameraRotateSpeed;
 	camera_precision m_cameraForwardSpeed;
 	camera_precision m_cameraStrafeSpeed;
+	camera_precision m_cameraUpSpeed;
 };
 
 #endif // ! CAMERA_H_

@@ -24,6 +24,12 @@
 	typedef double virtual_precision;
 #endif
 
+typedef enum ObjectType {
+	OBJECT_VIRTUAL,
+	OBJECT_DIMENSION,
+	OBJECT_INVALID
+} OBJECT_TYPE;
+
 class VirtualObj : public valid {
 protected:
 	point m_ptOrigin;			// Origin
@@ -34,11 +40,22 @@ protected:
 
 public:
 	VirtualObj();
+	VirtualObj(point ptOrigin);
 	~VirtualObj();
 
+	virtual OBJECT_TYPE GetType() {
+		return OBJECT_VIRTUAL;
+	}
+
 	// Position
+	point GetOrigin();
+
 	VirtualObj translate(matrix <point_precision, 4, 1> v);
 	VirtualObj translate(point_precision x, point_precision y, point_precision z);
+	VirtualObj translateX(point_precision x);
+	VirtualObj translateY(point_precision y);
+	VirtualObj translateZ(point_precision z);
+
 	VirtualObj MoveTo(point p);
 	VirtualObj MoveTo(point_precision x, point_precision y, point_precision z);
 
@@ -72,6 +89,9 @@ public:
 
 	// Matrix Functions
 	matrix<virtual_precision, 4, 4> GetModelMatrix();
+
+public:
+	UID getID() { return m_uid; }
 
 private:
 	UID m_uid;

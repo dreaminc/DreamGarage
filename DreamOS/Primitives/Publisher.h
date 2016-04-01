@@ -281,4 +281,4 @@ private:
 	//std::list<Subscriber<PKEventClass>*> m_pSubscribeAllList;
 };
 
-#endif // ! SUBSCRIBER_H_
+#endif // ! PUBLISHER_H_

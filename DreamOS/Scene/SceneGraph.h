@@ -30,14 +30,14 @@ public:
 
 	RESULT Reset();
 
-	RESULT PushObject(DimObj *pObject);
-	RESULT RemoveObject(DimObj *pObject);
+	RESULT PushObject(VirtualObj *pObject);
+	RESULT RemoveObject(VirtualObj *pObject);
 
 	// Effectively a factory method to set up the object store
 	RESULT InitializeSceneGraphStore(SCENE_GRAPH_STORE_TYPE type);
 
 	RESULT RemoveObjectByUID(UID uid);
-	DimObj *FindObjectByUID(UID uid);
+	VirtualObj *FindObjectByUID(UID uid);
 
 	SceneGraphStore *GetSceneGraphStore() { return m_pSceneGraphStore; }
 

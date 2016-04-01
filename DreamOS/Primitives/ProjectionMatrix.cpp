@@ -1,7 +1,5 @@
 #include "ProjectionMatrix.h"
 
-#define M_PI       3.14159265358979323846   // pi
-
 ProjectionMatrix::ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_precision width,
 																projection_precision height,
 																projection_precision nearPlane,

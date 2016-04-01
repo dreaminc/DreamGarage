@@ -36,6 +36,15 @@ public:
 		this->element(3, 0) = 1.0f;
 	}
 
+	point(point_precision x, point_precision y, point_precision z, point_precision w) {
+		this->clear();
+
+		this->element(0, 0) = x;
+		this->element(1, 0) = y;
+		this->element(2, 0) = z;
+		this->element(3, 0) = w;
+	}
+
 	point(const matrix<point_precision, 4, 1>& arg) :
 		matrix<point_precision, 4, 1>(arg)
 	{
@@ -58,6 +67,21 @@ public:
 		this->y() += y;
 		this->z() += z;
 
+		return R_PASS;
+	}
+
+	RESULT translateX(point_precision x) {
+		this->x() += x;
+		return R_PASS;
+	}
+
+	RESULT translateY(point_precision y) {
+		this->y() += y;
+		return R_PASS;
+	}
+
+	RESULT translateZ(point_precision z) {
+		this->z() += z;
 		return R_PASS;
 	}
 

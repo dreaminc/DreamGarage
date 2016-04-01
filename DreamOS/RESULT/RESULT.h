@@ -11,6 +11,8 @@
 #define RESULT_START_OK 0x00000000
 #define RESULT_START_WARN 0x70000000
 
+#define M_PI       3.14159265358979323846   // pi
+
 typedef enum {
     //R_OK = RESULT_START_OK,
     R_K = RESULT_START_OK,
@@ -33,6 +35,7 @@ typedef enum {
 	R_FILE_NOT_FOUND,		// slightly more specific file not found error
 	R_INVALID_PARAM,		// invalid parameter 
 	R_PATH_NOT_FOUND,		// path not found
+	R_INVALID_OBJECT,		// Wrong Object passed to function
 
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,
