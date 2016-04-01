@@ -590,6 +590,7 @@ RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
 	CR(m_pVertexShader->SetViewMatrixUniform(matV));
 	CR(m_pVertexShader->SetEyePositionUniform(ptEye));
 
+Error:
 	return r;
 }
 
@@ -734,6 +735,7 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	
 	glFlush();
 
+Error:
 	return r;
 }
 
