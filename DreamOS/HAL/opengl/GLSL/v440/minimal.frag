@@ -43,18 +43,6 @@ layout(std140) uniform ub_material {
     Material material;
 };
 
-/*
-Material g_mat = {
-	100.0f,	// shine
-	0.0f,
-	0.0f,
-	0.0f,
-	vec4(1.0f, 1.0f, 1.0f, 1.0f),	// ambient
-	vec4(1.0f, 1.0f, 1.0f, 1.0f),	// diffuse
-	vec4(1.0f, 1.0f, 1.0f, 1.0f)	// specular
-};
-*/
-
 layout(std140) uniform ub_LightArray {
 	Light lights[MAX_TOTAL_LIGHTS];
 	int numLights;	
@@ -62,11 +50,14 @@ layout(std140) uniform ub_LightArray {
 
 layout (location = 0) out vec4 out_vec4Color;
 
-vec4 g_vec4AmbientLightLevel = 0.01 * vec4(1.0, 1.0, 1.0, 0.0);
+float g_ambient = 0.01f;
+
+vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
 void CalculateFragmentLightValue(in Light light, in vec4 vertWorldSpace, in vec3 vectorNormal, in vec3 directionLight, in float distanceLight, out float diffuseValue, out float specularValue) {
 	//float attenuation = 1 / pow(distanceLight, 2);
 	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
+
 	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
 	diffuseValue = (light.m_power * attenuation) * cosThetaOfLightToVert;
 	
@@ -87,8 +78,8 @@ void main(void) {
 	for(int i = 0; i < numLights; i++) {
 		CalculateFragmentLightValue(lights[i], DataIn.vertWorldSpace, normalize(DataIn.normal.xyz), normalize(DataIn.directionLight[i]), DataIn.distanceLight[i], diffuseValue, specularValue);
 
-		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
-		vec4LightValue += specularValue * lights[i].m_colorSpecular;
+		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
+		vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
 	}
 	vec4LightValue[3] = 1.0f;
 	

@@ -25,6 +25,7 @@
 
 #include "Scene/SceneGraph.h"
 #include "Primitives/DimObj.h"
+#include "Primitives/material.h"
 
 class SandboxApp; 
 class Windows64App;

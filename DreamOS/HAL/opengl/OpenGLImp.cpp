@@ -408,6 +408,10 @@ RESULT OpenGLImp::PrepareScene() {
 	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
+	// TODO:  Currently using a global material 
+	m_pFragmentShader->SetMaterial(&material(100.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	m_pFragmentShader->UpdateUniformBlockBuffers();
+
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
 Error:
@@ -541,6 +545,7 @@ Error:
 	return r;
 }
 
+// TODO: Actually move this to OpenGL Program
 inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
 
@@ -548,8 +553,10 @@ inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pVertexShader->SetModelMatrixUniform(matModel);
 
+	/* TODO: This should be replaced with a materials store or OGLMaterial that pre-allocates and swaps binding points (Wait for textures)
 	m_pFragmentShader->SetMaterial(pDimObj->GetMaterial());
 	m_pFragmentShader->UpdateUniformBlockBuffers();
+	//*/
 
 	return pOGLObj->Render();
 }
@@ -602,7 +609,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	light *pLight = NULL; 
 
 	/*
-	pLight = new light(LIGHT_POINT, 10.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
@@ -639,7 +646,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	///*
 	OGLSphere *pSphere = NULL;
-	int num = 10;
+	int num = 20;
 	int sects = 20;
 	double radius = 0.5f;
 	double size = radius * 2;
