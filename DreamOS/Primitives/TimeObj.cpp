@@ -23,7 +23,6 @@ void TimeObj::update()
 	m_totalTimeToProcess += deltaTime;
 
 	while (m_totalTimeToProcess >= m_processingTimeQuantum) {
-		//this->onTimeUpdate(m_totalElapsedTime, m_processingTimeQuantum);
 		TimeEvent event(TIME_ELAPSED, m_totalElapsedTime, m_processingTimeQuantum);
 		NotifySubscribers(TIME_ELAPSED, &event);
 
@@ -31,17 +30,3 @@ void TimeObj::update()
 		m_totalElapsedTime += m_processingTimeQuantum;
 	}
 }
-
-void TimeObj::addTimeObject(TimeObject* pObj)
-{
-	m_timeObjects.push_back(pObj);
-}
-
-void TimeObj::onTimeUpdate(double currentTime, double deltaTime)
-{
-	for (auto& obj : m_timeObjects)
-	{
-		obj->onTimeUpdate(currentTime, deltaTime);
-	}
-}
-

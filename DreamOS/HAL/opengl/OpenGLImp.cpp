@@ -540,8 +540,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeObj *pTimeObj) {
 			pVolume->SetRandomColor();
 			pVolume->translate(i * (size * 2) - (num * size), 0.0f, j * (size * 2) - (num * size));
 			pVolume->UpdateOGLBuffers();
-			//pTimeObj->addTimeObject(static_cast<TimeObject*>(pVolume));
-			pTimeObj->RegisterSubscriber(TIME_ELAPSED, (DimObj*)pVolume);
+			pTimeObj->RegisterSubscriber(TIME_ELAPSED, pVolume);
 			pSceneGraph->PushObject(pVolume);
 		}
 	}

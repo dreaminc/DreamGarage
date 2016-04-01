@@ -15,7 +15,7 @@
 #include "Vertex.h"
 #include "TimeObj.h"
 
-class DimObj : public VirtualObj, public TimeObject, public Subscriber<TimeEvent> {
+class DimObj : public VirtualObj, public Subscriber<TimeEvent> {
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
     //AABV m_aabv;        // Axis Aligned Bounding Volume
