@@ -22,7 +22,7 @@ public:
 	texture(wchar_t *pszFilename) {
 		RESULT r = R_PASS;
 
-
+		CR(LoadTextureFromFile(pszFilename));
 
 		Validate();
 		return;
@@ -55,7 +55,18 @@ public:
 
 	// TODO: Add direct image loads
 	RESULT LoadTextureFromFile(wchar_t *pszFilename) {
-		return R_NOT_IMPLEMENTED;
+		RESULT r = R_PASS;
+		wchar_t *pszFilePath = nullptr;
+
+		CR(GetTextureFilePath(pszFilename, pszFilePath));
+
+	Error:
+		if (pszFilePath != nullptr) {
+			delete[] pszFilePath;
+			pszFilePath = nullptr;
+		}
+
+		return r;
 	}
 
 private:

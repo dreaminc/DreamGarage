@@ -16,7 +16,14 @@ public:
 		texture(),
 		m_textureIndex(0)
 	{
+		// empty
+	}
 
+	OGLTexture(wchar_t *pszFilename) :
+		texture(pszFilename),
+		m_textureIndex(0)
+	{
+		// empty for now
 	}
 
 	~OGLTexture() {

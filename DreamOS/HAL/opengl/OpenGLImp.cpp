@@ -597,7 +597,7 @@ Error:
 #include "OGLVolume.h"
 #include "OGLSphere.h"
 #include "Primitives/light.h"
-#include "Primitives/texture.h"
+#include "OGLTexture.h"
 
 light *g_pLight = NULL;
 
@@ -627,9 +627,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	g_pLight = pLight;
 
-
+	texture *pTexture = new OGLTexture(L"create_color.png");
 
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
+	pVolume->SetTexture(pTexture);
 	pSceneGraph->PushObject(pVolume);
 
 	/*
