@@ -13,7 +13,7 @@
 #include <vector>
 
 #define MAX_TOTAL_LIGHTS 10
-#define LIGHTS_UNIFORM_BLOCK_BINDING_POINT 0
+#define LIGHTS_UNIFORM_BLOCK_BINDING_POINT	0	// TODO: This should come from the OpenGL program
 
 class OGLLightsBlock : public OGLUniformBlock {
 public:

@@ -80,10 +80,10 @@ public:
 	inline color_precision &b() { return this->element(2, 0); }
 	inline color_precision &a() { return this->element(3, 0); }
 
-	inline color_precision &r(vector_precision val) { return this->element(0, 0) = val; }
-	inline color_precision &g(vector_precision val) { return this->element(1, 0) = val; }
-	inline color_precision &b(vector_precision val) { return this->element(2, 0) = val; }
-	inline color_precision &a(vector_precision val) { return this->element(3, 0) = val; }
+	inline color_precision &r(color_precision val) { return this->element(0, 0) = val; }
+	inline color_precision &g(color_precision val) { return this->element(1, 0) = val; }
+	inline color_precision &b(color_precision val) { return this->element(2, 0) = val; }
+	inline color_precision &a(color_precision val) { return this->element(3, 0) = val; }
 };
 
 #endif // ! COLOR_H_

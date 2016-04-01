@@ -31,7 +31,12 @@ public:
 	RESULT Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName);
 
 	virtual RESULT GetAttributeLocationsFromShader() = 0;
+
+	// TODO: Uniform Blocks (uniforms in general?) should be pushed into OpenGL program
+	virtual RESULT BindUniformBlocks() = 0;
 	virtual RESULT GetUniformLocationsFromShader() = 0;
+	virtual RESULT InitializeUniformBlocks() = 0;
+	virtual RESULT UpdateUniformBlockBuffers() = 0;
 
 	RESULT Compile(void);
 	RESULT PrintInfoLog();

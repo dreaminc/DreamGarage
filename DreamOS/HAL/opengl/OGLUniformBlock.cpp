@@ -62,6 +62,7 @@ RESULT OGLUniformBlock::UpdateOGLUniformBlockBuffers() {
 	CR(m_pParentImp->MakeCurrentContext());
 
 	CR(m_pParentImp->glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBlockBufferIndex));
+	//CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 
 	// Set the data
 	void *pUniformBufferData = NULL;
@@ -95,18 +96,27 @@ RESULT OGLUniformBlock::SetBufferIndex(GLint bufferIndex) {
 	return R_PASS;
 }
 
-GLint OGLUniformBlock::GetBufferIndex() { return m_uniformBlockBufferIndex; }
+GLint OGLUniformBlock::GetBufferIndex()
+{
+	return m_uniformBlockBufferIndex;
+}
 
 RESULT OGLUniformBlock::SetBlockIndex(GLint blockIndex) {
 	m_uniformBlockIndex = blockIndex;
 	return R_PASS;
 }
 
-GLint OGLUniformBlock::GetBlockIndex() { return m_uniformBlockIndex; }
+GLint OGLUniformBlock::GetBlockIndex()
+{
+	return m_uniformBlockIndex;
+}
 
 RESULT OGLUniformBlock::SetBindingPoint(GLint bindingPointIndex) {
 	m_uniformBlockBindingPoint = bindingPointIndex;
 	return R_PASS;
 }
 
-GLint OGLUniformBlock::GetBindingPoint() { return m_uniformBlockBindingPoint; }
+GLint OGLUniformBlock::GetBindingPoint()
+{
+	return m_uniformBlockBindingPoint;
+}

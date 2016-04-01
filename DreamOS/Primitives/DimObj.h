@@ -13,6 +13,7 @@
 #include "point.h"
 #include "TriangleIndexGroup.h"
 #include "Vertex.h"
+#include "material.h"
 
 class DimObj : public VirtualObj {
 protected:
@@ -22,12 +23,14 @@ protected:
 protected:
 	vertex *m_pVertices;
 	dimindex *m_pIndices;
+	material m_material;
 
 public:
     DimObj() :
         VirtualObj(),	// velocity, origin
 		m_pVertices(NULL),
-		m_pIndices(NULL)
+		m_pIndices(NULL),
+		m_material()
         //m_aabv()
     {
         /* stub */
@@ -123,6 +126,10 @@ public:
 
 	Error:
 		return r;
+	}
+
+	material *GetMaterial() {
+		return (&m_material);
 	}
 };
 

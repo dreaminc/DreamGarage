@@ -7,6 +7,9 @@
 
 #include "OpenGLShader.h"
 
+#include "Primitives/material.h"
+#include "OGLMaterialBlock.h"
+
 class OpenGLImp;	// Declare OpenGLImp class
 
 #define FRAGMENT_SHADER_COLOR_INDEX 0
@@ -19,16 +22,22 @@ public:
 	//~OGLVertexShader(void);
 
 	RESULT GetAttributeLocationsFromShader();
+	RESULT BindUniformBlocks();
 	RESULT GetUniformLocationsFromShader();
+	RESULT InitializeUniformBlocks();
+	RESULT UpdateUniformBlockBuffers();
 
 public:
-	const char *GetColorAttributeName() {
-		return "inF_vec3Color";
-	}
+	const char *GetColorAttributeName() { return "inF_vec3Color"; }
+	const char *GetMaterialUniformBlockName() { return "ub_material"; }
 
-	GLuint GetColorIndex() {
-		return FRAGMENT_SHADER_COLOR_INDEX;
-	}
+	GLuint GetColorIndex() { return FRAGMENT_SHADER_COLOR_INDEX; }
+
+
+	RESULT SetMaterial(material *pMaterial);
+
+private:
+	OGLMaterialBlock *m_pMaterialBlock;
 };
 
 #endif // ! OGL_FRAGMENT_SHADER_H_
