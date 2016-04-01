@@ -125,6 +125,16 @@ public:
 		return r;
 	}
 
+	RESULT ClearTexture() {
+		RESULT r = R_PASS;
+
+		CB((m_pTexture != nullptr));
+		m_pTexture = nullptr;
+
+	Error:
+		return r;
+	}
+
 	RESULT SetRandomColor() {
 		for (int i = 0; i < NumberVertices(); i++)
 			m_pVertices[i].SetRandomColor();

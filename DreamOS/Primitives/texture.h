@@ -19,6 +19,18 @@ public:
 		Validate();
 	}
 
+	texture(wchar_t *pszFilename) {
+		RESULT r = R_PASS;
+
+
+
+		Validate();
+		return;
+	Error:
+		Invalidate();
+		return;
+	}
+
 	RESULT GetTextureFilePath(const wchar_t *pszFilename, wchar_t * &n_pszFilePath) {
 		RESULT r = R_PASS;
 
