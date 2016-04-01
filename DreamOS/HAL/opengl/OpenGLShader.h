@@ -10,6 +10,7 @@
 #include "./HAL/Shader.h"
 
 #include "OpenGLCommon.h"
+#include "Primitives/version.h"
 
 class OpenGLImp;	// Declare OpenGLImp class
 
@@ -18,9 +19,10 @@ public:
 	OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType);
 	~OpenGLShader(void);
 
-	RESULT InitializeFromFile(const wchar_t *pszFilename);
+	RESULT InitializeFromFile(const wchar_t *pszFilename, version versionFile);
 	
 	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename);
+	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename, version versionFile);
 	RESULT LoadShaderCodeFromString(const char* pszSource);
 
 	RESULT Compile(void);

@@ -51,6 +51,9 @@
     <Filter Include="Scene">
       <UniqueIdentifier>{2be3e3ef-4d89-4383-b2de-5d5a55e6a51b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HAL\opengl\GL">
+      <UniqueIdentifier>{d90f805b-bf9a-4f40-9742-e7bb02818c72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -123,6 +126,9 @@
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\TimeObj.cpp">
+	  <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\version.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
@@ -335,6 +341,21 @@
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\TimeObj.h">
+	  <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h">
+      <Filter>HAL\opengl\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h">
+      <Filter>HAL\opengl\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h">
+      <Filter>HAL\opengl\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h">
+      <Filter>HAL\opengl\GL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\version.h">
       <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
@@ -350,6 +371,9 @@
     </None>
     <None Include="..\..\..\HAL\opengl\GLSL\minimal.vert">
       <Filter>HAL\opengl\GLSL</Filter>
+    </None>
+    <None Include="..\..\..\Primitives\.DS_Store">
+      <Filter>Primitives</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

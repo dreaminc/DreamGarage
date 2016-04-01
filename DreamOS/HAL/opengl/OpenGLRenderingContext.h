@@ -13,6 +13,7 @@
 #include "RESULT/EHM.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
+#include "Primitives/version.h"
 //#include "Sandbox/SandboxApp.h"
 
 class SandboxApp;
@@ -28,7 +29,8 @@ public:
 	}
 
 	virtual RESULT InitializeRenderingContext() = 0;
-	virtual RESULT InitializeRenderingContext(int versionMajor, int versionMinor) = 0;
+	//virtual RESULT InitializeRenderingContext(int versionMajor, int versionMinor) = 0;
+	virtual RESULT InitializeRenderingContext(version versionOGL) = 0;
 	virtual RESULT MakeCurrentContext() = 0;
 	virtual RESULT ReleaseCurrentContext() = 0;
 

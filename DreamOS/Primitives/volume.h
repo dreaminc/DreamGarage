@@ -58,7 +58,7 @@ public:
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		double halfSide = side / 2.0f;
+		point_precision halfSide = static_cast<point_precision>(side / 2.0f);
 		int vertCount = 0;
 		int triCount = 0;
 		int TL, TR, BL, BR;

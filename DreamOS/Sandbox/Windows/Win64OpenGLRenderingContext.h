@@ -29,7 +29,8 @@ public:
 
 public:
 	RESULT InitializeRenderingContext();
-	RESULT InitializeRenderingContext(int versionMajor, int versionMinor);
+	//RESULT InitializeRenderingContext(int versionMajor, int versionMinor);
+	RESULT InitializeRenderingContext(version versionOGL);
 
 	RESULT MakeCurrentContext();
 	RESULT ReleaseCurrentContext();

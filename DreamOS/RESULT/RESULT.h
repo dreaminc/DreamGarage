@@ -21,12 +21,18 @@ typedef enum {
 	R_NOT_IMPLEMENTED,
 	R_VIRTUAL,
 	R_ABSTRACT,
+
+	R_FILE_FOUND,
+	R_DIRECTORY_FOUND,
+	R_PATH_FOUND,
     
     R_FAIL = RESULT_START_FAIL,
     R_ERROR,
     
-	R_NOT_FOUND,		// general purpose not found error
-	R_INVALID_PARAM,	// invalid parameter 
+	R_NOT_FOUND,			// general purpose not found error
+	R_FILE_NOT_FOUND,		// slightly more specific file not found error
+	R_INVALID_PARAM,		// invalid parameter 
+	R_PATH_NOT_FOUND,		// path not found
 
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,

@@ -87,8 +87,8 @@ RESULT SceneGraph::UpdateScene() {
 
 	DimObj *pDimObj = NULL;
 	while ((pDimObj = pObjectStore->GetNextObject()) != NULL) {
-		quaternion_precision factor = 0.05;
-		quaternion_precision filter = 0.1;
+		quaternion_precision factor = 0.05_q;
+		quaternion_precision filter = 0.1_q;
 
 		static quaternion_precision x = 0;
 		static quaternion_precision y = 0;
@@ -101,7 +101,6 @@ RESULT SceneGraph::UpdateScene() {
 		pDimObj->RotateBy(x * factor, y * factor, z * factor);
 	}
 
-Error:
 	return r;
 }
 

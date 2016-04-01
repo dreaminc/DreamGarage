@@ -7,16 +7,23 @@
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
-	m_versionMinor(0),
-	m_versionMajor(0),
+	m_versionOGL(0),
 	m_versionGLSL(0),
 	m_pVertexShader(NULL),
 	m_pFragmentShader(NULL),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
 	m_pCamera(NULL)
 {
-	ACRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
-	ACRM(PrepareScene(), "Failed to prepare GL Scene");
+	RESULT r = R_PASS;
+
+	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
+	CRM(PrepareScene(), "Failed to prepare GL Scene");
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
 }
 
 OpenGLImp::~OpenGLImp() {
@@ -26,42 +33,31 @@ OpenGLImp::~OpenGLImp() {
 RESULT OpenGLImp::InitializeOpenGLVersion() {
 	// For all versions
 	char* pszVersion = (char*)glGetString(GL_VERSION); // Ver = "3.2.0"
+	int vMajor = 0, vMinor = 0, vDblMinor = 0;	// TODO: use minor?
 	DEBUG_LINEOUT("OpenGL Version %s", pszVersion);
 
-	m_versionMajor = pszVersion[0] - '0';
-	m_versionMinor = pszVersion[2] - '0';
+	vMajor = pszVersion[0] - '0';
+	vMinor = pszVersion[2] - '0';
+	vDblMinor = pszVersion[4] - '0';
 
 	// GL 3.x+
-	if (m_versionMajor >= 3) {
-		glGetIntegerv(GL_MAJOR_VERSION, &m_versionMajor); // major = 3
-		glGetIntegerv(GL_MINOR_VERSION, &m_versionMinor); // minor = 2
+	if (vMajor >= 3) {
+		glGetIntegerv(GL_MAJOR_VERSION, &vMajor); // major = 3
+		glGetIntegerv(GL_MINOR_VERSION, &vMinor); // minor = 2
 	}
+
+	m_versionOGL.SetVersion(vMajor, vMinor);
 
 	// GLSL
 	// "1.50 NVIDIA via Cg compiler"
-	// TODO: Parse this out for m_versionGLSL
 	pszVersion = (char*)glGetString(GL_SHADING_LANGUAGE_VERSION); 
 	DEBUG_LINEOUT("OpenGL GLSL Version %s", pszVersion);
 
-	return R_PASS;
-}
+	vMajor = pszVersion[0] - '0';
+	vMinor = pszVersion[2] - '0';
+	vDblMinor = pszVersion[4] - '0';
 
-RESULT OpenGLImp::InitializeShadersFolder() {
-	if (m_versionMajor != 4)
-	{
-		DEBUG_LINEOUT("No existing shader for this GLSL version.");
-		return R_FAIL;
-	}
-
-	switch (m_versionMinor)
-	{
-	case 0:
-		m_shadersFolder = L"v400";
-		break;
-	case 4:
-		m_shadersFolder = L"v440";
-		break;
-	}
+	m_versionGLSL.SetVersion(vMajor, vMinor);
 
 	return R_PASS;
 }
@@ -88,15 +84,16 @@ RESULT OpenGLImp::InitializeGLContext() {
 
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
 	CR(InitializeOpenGLVersion());
-	CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
+	//CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
+	CBM((m_versionOGL >= 3.2f), "OpengL 3.2+ Not Supported");
 
-	CR(InitializeShadersFolder());
+	//CR(InitializeShadersFolder());
 
 	// Should be called after context is created and made current
 	ACRM(m_OpenGLExtensions.InitializeExtensions(), "Failed to initialize extensions");
 	
 	// Lets create the 3.2+ context
-	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(m_versionMajor, m_versionMinor), "Failed to initialize oglrc");
+	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(m_versionOGL), "Failed to initialize oglrc");
 	
 Error:
 	return r;
@@ -122,8 +119,6 @@ Error:
 
 RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 	RESULT r = R_PASS;
-	GLint param;
-	GLint numShaders;
 	GLenum glerr = GL_NO_ERROR;
 
 	OpenGLShader *&pOGLShader = (OpenGLShader *&)(this->m_pVertexShader);
@@ -167,6 +162,8 @@ RESULT OpenGLImp::EnableVertexPositionAttribute() {
 		m_pVertexShader->EnableVertexPositionAttribute();
 	else
 		return R_FAIL;
+
+	return R_PASS;
 }
 
 RESULT OpenGLImp::EnableVertexColorAttribute() {
@@ -174,11 +171,12 @@ RESULT OpenGLImp::EnableVertexColorAttribute() {
 		m_pVertexShader->EnableVertexColorAttribute();
 	else
 		return R_FAIL;
+
+	return R_PASS;
 }
 
 RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 	RESULT r = R_PASS;
-	GLenum glerr;
 	DWORD werr;
 
 	CR(glBindAttribLocation(m_idOpenGLProgram, index, pszName));
@@ -331,14 +329,16 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO: Should be stuffed into factory arch - return NULL on fail
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
+	// TODO: Move to GLSL version?
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
-	CRM(pVertexShader->InitializeFromFile((m_shadersFolder + L"\\minimal.vert").c_str()), "Failed to initialize vertex shader from file");
+	CRM(pVertexShader->InitializeFromFile(L"minimal.vert", m_versionOGL), "Failed to initialize vertex shader from file");
 	CR(pVertexShader->BindAttributes());
 
-	OpenGLShader *pFragmentShader = new OGLFragmentShader(this);
+	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
-	CRM(pFragmentShader->InitializeFromFile((m_shadersFolder + L"\\minimal.frag").c_str()), "Failed to initialize fragment shader from file");
+	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag", m_versionOGL), "Failed to initialize fragment shader from file");
+	//CR(pFragmentShader->BindAttributes());
 	
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
@@ -349,12 +349,11 @@ RESULT OpenGLImp::PrepareScene() {
 	CR(PrintActiveUniformVariables());
 
 	// Allocate the camera
-	//m_pCamera = new camera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 
-Error:
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
+Error:
 	return r;
 }
 
@@ -393,7 +392,6 @@ RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 
 	m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight);
 
-Error:
 	return r;
 }
 
@@ -455,7 +453,6 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	}
 	*/
 
-Error:
 	return r;
 }
 
@@ -469,7 +466,8 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 
 	switch (mEvent->EventType) {
 		case SENSE_MOUSE_MOVE: {
-			CR(m_pCamera->RotateCameraByDiffXY(mEvent->dx, mEvent->dy));
+			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx), 
+				static_cast<camera_precision>(mEvent->dy)));
 		} break;
 
 		case SENSE_MOUSE_LEFT_BUTTON: {
@@ -505,7 +503,6 @@ RESULT OpenGLImp::UpdateCamera() {
 
 	m_pCamera->UpdateCameraPosition();
 
-Error:
 	return r;
 }
 
@@ -520,7 +517,6 @@ RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
 	if (locationViewProjectionMatrix >= 0)
 		glUniformMatrix4fv(locationViewProjectionMatrix, 1, GL_FALSE, (GLfloat*)(&matVP));
 
-Error:
 	return r;
 }
 
@@ -538,14 +534,15 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeObj *pTimeObj) {
 		for (int j = 0; j < num; j++) {
 			pVolume = new OGLVolume(this, size);
 			pVolume->SetRandomColor();
-			pVolume->translate(i * (size * 2) - (num * size), 0.0f, j * (size * 2) - (num * size));
+			pVolume->translate(static_cast<point_precision>(i * (size * 2) - (num * size)), 
+				static_cast<point_precision>(0.0f),
+				static_cast<point_precision>(j * (size * 2) - (num * size)));
 			pVolume->UpdateOGLBuffers();
 			pTimeObj->RegisterSubscriber(TIME_ELAPSED, pVolume);
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
 
-Error:
 	return r;
 }
 
@@ -567,7 +564,6 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	
 	glFlush();
 
-Error:
 	CheckGLError();
 	return r;
 }
@@ -595,7 +591,6 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	
 	glFlush();
 
-Error:
 	return r;
 }
 
@@ -633,7 +628,6 @@ RESULT OpenGLImp::ShutdownImplementaiton() {
 		m_pOpenGLRenderingContext = NULL;
 	}
 
-Error:
 	return r;
 }
 
