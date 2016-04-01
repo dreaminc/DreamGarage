@@ -15,6 +15,8 @@
 #include "Vertex.h"
 #include "material.h"
 
+#include "texture.h"
+
 class DimObj : public VirtualObj {
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
@@ -25,12 +27,16 @@ protected:
 	dimindex *m_pIndices;
 	material m_material;
 
+	// TODO: Multiple textures (one for now)
+	texture *m_pTexture;
+
 public:
     DimObj() :
         VirtualObj(),	// velocity, origin
-		m_pVertices(NULL),
-		m_pIndices(NULL),
-		m_material()
+		m_pVertices(nullptr),
+		m_pIndices(nullptr),
+		m_material(),
+		m_pTexture(nullptr)
         //m_aabv()
     {
         /* stub */
@@ -52,7 +58,6 @@ public:
 		return OBJECT_DIMENSION;
 	}
 
-	
 	virtual RESULT Allocate() = 0;
 
 	virtual inline int NumberVertices() = 0;
@@ -108,6 +113,16 @@ public:
 			m_pVertices[i].SetColor(c);
 
 		return R_PASS;
+	}
+
+	RESULT SetTexture(texture *pTexture) {
+		RESULT r = R_PASS;
+
+		CBM((m_pTexture == nullptr), "Cannot overwrite texture");
+		m_pTexture = pTexture;
+
+	Error:
+		return r;
 	}
 
 	RESULT SetRandomColor() {

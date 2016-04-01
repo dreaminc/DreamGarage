@@ -424,6 +424,9 @@
     <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h">
       <Filter>External\SOIL</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

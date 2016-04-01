@@ -11,36 +11,39 @@
 #include "Types/UID.h"
 #include "Sandbox/PathManager.h"
 
+#include "External/SOIL/SOIL.h"
+
 class texture : public valid {
 public:
-	texture(wchar_t *pszFilename) {
-		RESULT r = R_PASS;
-		
-		// TODO: Load the texture
-		CR(LoadTextureFromFile(pszFilename);
-
+	texture() {
 		Validate();
-		return;
-
-	Error:
-		Invalidate();
-		return;
 	}
 
-	RESULT LoadTextureFromFile(wchar_t *pszFilename) {
+	RESULT GetTextureFilePath(const wchar_t *pszFilename, wchar_t * &n_pszFilePath) {
 		RESULT r = R_PASS;
 
-		// TODO: Solve this
 		PathManager *pPathManager = PathManager::instance();
 		wchar_t *pFilePath = NULL;
 
-		// TODO: Move to key based file paths
-		CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+		// Move to key based file paths
+		CRM(pPathManager->GetFilePath(PATH_TEXTURE, pszFilename, n_pszFilePath), "Failed to get path for %S texture", pszFilename);
+		CN(n_pszFilePath);
 
-		// Load file
+		return r;
 
 	Error:
+		if (n_pszFilePath != nullptr) {
+			delete [] n_pszFilePath;
+			n_pszFilePath = nullptr;
+		}
 		return r;
+	}
+
+	virtual RESULT InitializeFromFile(const wchar_t *pszFileName) = 0;
+
+	// TODO: Add direct image loads
+	RESULT LoadTextureFromFile(wchar_t *pszFilename) {
+		return R_NOT_IMPLEMENTED;
 	}
 
 private:

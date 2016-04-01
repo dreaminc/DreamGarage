@@ -26,6 +26,7 @@ typedef enum {
 	PATH_SHADERS,
 	PATH_SANDBOX,
 	PATH_RESULT,
+	PATH_TEXTURE,
 	PATH_INVALID	// Also acts as a found
 } PATH_VALUE_TYPE;
 
@@ -41,7 +42,8 @@ class PathManager : public valid {
 		L"HAL",
 		L"SHADERS",
 		L"SANDBOX",
-		L"RESULT"
+		L"RESULT",
+		L"TEXTURE"
 	};
 
 	int m_cszPathValues_n;

@@ -47,8 +47,6 @@ layout(std140) uniform ub_LightArray {
 	int numLights;	
 };
 
-vec4 g_vec4AmbientLightLevel = 0.05 * vec4(1.0, 1.0, 1.0, 0.0);
-
 // TODO: Move to CPU side
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModel = transpose(inverse(g_mat4ModelView));
