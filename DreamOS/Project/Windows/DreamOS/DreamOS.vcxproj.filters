@@ -60,6 +60,12 @@
     <Filter Include="HAL\opengl\GLSL\v440">
       <UniqueIdentifier>{7f1c2dc0-01a8-4076-a88c-4315fbe75d6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{82d7a177-6e17-489e-8f48-0f30a427b8fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\SOIL">
+      <UniqueIdentifier>{959b6fa9-ce2d-43ef-b7b5-652c05626a9d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -142,6 +148,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\SOIL\image_DXT.c">
+      <Filter>External\SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\SOIL\image_helper.c">
+      <Filter>External\SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\SOIL\SOIL.c">
+      <Filter>External\SOIL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c">
+      <Filter>External\SOIL</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -387,6 +405,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\SOIL\image_DXT.h">
+      <Filter>External\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\SOIL\image_helper.h">
+      <Filter>External\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\SOIL\SOIL.h">
+      <Filter>External\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h">
+      <Filter>External\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug.h">
+      <Filter>External\SOIL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h">
+      <Filter>External\SOIL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
