@@ -94,7 +94,10 @@ Error:
 }
 
 Windows64App::~Windows64App() {
-	// empty stub for now
+	if (m_pTimeManager != nullptr) {
+		delete m_pTimeManager;
+		m_pTimeManager = nullptr;
+	}
 }
 
 HDC Windows64App::GetDeviceContext() {
