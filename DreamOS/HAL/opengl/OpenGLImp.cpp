@@ -182,7 +182,7 @@ RESULT OpenGLImp::EnableVertexNormalAttribute() {
 		return R_FAIL;
 }
 
-RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
+RESULT OpenGLImp::BindAttribLocation(GLint index, char* pszName) {
 	RESULT r = R_PASS;
 	DWORD werr;
 

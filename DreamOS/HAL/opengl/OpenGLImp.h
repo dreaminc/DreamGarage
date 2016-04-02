@@ -133,7 +133,7 @@ public:
 	RESULT glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
 	RESULT glBindAttribLocation(GLuint program, GLuint index, const GLchar *name);
 
-	RESULT BindAttribLocation(unsigned int index, char* pszName);
+	RESULT BindAttribLocation(GLint index, char* pszName);
 
 	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
 	RESULT BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex);
