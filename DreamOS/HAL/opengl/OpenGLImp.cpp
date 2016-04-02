@@ -627,7 +627,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	g_pLight = pLight;
 
-	texture *pTexture = new OGLTexture(L"create_color.png");
+	texture *pTexture = new OGLTexture(this, L"crate_color.png");
 
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetTexture(pTexture);
@@ -1029,8 +1029,6 @@ Error:
 	return r;
 }
 
-
-
 RESULT OpenGLImp::glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
 	RESULT r = R_PASS;
 
@@ -1056,6 +1054,68 @@ RESULT OpenGLImp::glVertexAttribPointer(GLuint index, GLint size, GLenum type, G
 
 	m_OpenGLExtensions.glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 	CRM(CheckGLError(), "glVertexAttribPointer failed");
+
+Error:
+	return r;
+}
+
+// Textures
+RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *textures) {
+	RESULT r = R_PASS;
+
+	//m_OpenGLExtensions.glGenTextures(n, textures);
+	glGenTextures(n, textures);
+	CRM(CheckGLError(), "glGenTextures failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glActiveTexture(GLenum texture) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glActiveTexture(texture);
+	CRM(CheckGLError(), "glActiveTexture failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBindTextures(GLuint first, GLsizei count, const GLuint *textures) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBindTextures(first, count, textures);
+	CRM(CheckGLError(), "glBindTextures failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::BindTexture(GLenum target, GLuint texture) {
+	RESULT r = R_PASS;
+
+	glBindTexture(target, texture);
+	CRM(CheckGLError(), "glBindTexture failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glTexParamteri(GLenum target, GLenum pname, GLint param) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glTexParamteri(target, pname, param);
+	CRM(CheckGLError(), "glTexParameteri failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+	CRM(CheckGLError(), "glTexImage2D failed");
 
 Error:
 	return r;

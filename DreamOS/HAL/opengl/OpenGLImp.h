@@ -152,6 +152,14 @@ public:
 	RESULT GetShaderiv(GLuint programID, GLenum pname, GLint *params);
 	RESULT GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
 
+	// Textures
+	RESULT GenerateTextures(GLsizei n, GLuint *textures);
+	RESULT glActiveTexture(GLenum texture);
+	RESULT glBindTextures(GLuint first, GLsizei count, const GLuint *textures);
+	RESULT BindTexture(GLenum target, GLuint texture);
+	RESULT glTexParamteri(GLenum target, GLenum pname, GLint param);
+	RESULT glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+
 // Extension Mappings
 private:
 	RESULT CheckGLError();

@@ -12,27 +12,35 @@
 
 class OGLTexture : public texture {
 public: 
-	OGLTexture() :
+	OGLTexture(OpenGLImp *pParentImp) :
 		texture(),
-		m_textureIndex(0)
+		m_textureIndex(0),
+		m_pParentImp(pParentImp)
 	{
 		// empty
 	}
 
-	OGLTexture(wchar_t *pszFilename) :
+	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename) :
 		texture(pszFilename),
-		m_textureIndex(0)
+		m_textureIndex(0),
+		m_pParentImp(pParentImp)
 	{
-		// empty for now
+		RESULT r = OGLInitialize();
 	}
 
 	~OGLTexture() {
 		// empty stub
 	}
 
-	RESULT InitializeFromFile(const wchar_t *pszFileName) {
+	RESULT OGLInitialize() {
 		RESULT r = R_PASS;
+		
+		CR(m_pParentImp->MakeCurrentContext());
+		
+		CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
 
+		CR(m_pParentImp->glActiveTexture(GL_TEXTURE0));
+		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_textureIndex));
 
 
 	Error:
@@ -40,6 +48,8 @@ public:
 	}
 
 private:
+	OpenGLImp *m_pParentImp;
+
 	GLuint m_textureIndex;
 };
 

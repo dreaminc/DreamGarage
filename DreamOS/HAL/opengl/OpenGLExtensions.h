@@ -199,6 +199,29 @@ public:
 		return m_glGetShaderInfoLog(shader, bufSize, length, infoLog);
 	}
 
+	// Textures
+	/*
+	inline void glGenTextures(GLsizei n, GLuint *textures) {
+		return m_glGenTextures(n, textures);
+	}
+	*/
+
+	inline void glActiveTexture(GLenum texture) {
+		return m_glActiveTexture(texture);
+	}
+
+	inline void glBindTextures(GLuint first, GLsizei count, const GLuint *textures) {
+		return m_glBindTextures(first, count, textures);
+	}
+
+	inline void glTexParamteri(GLenum target, GLenum pname, GLint param) {
+		return m_glTexParameteri(target, pname, param);
+	}
+
+	inline void glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
+		return m_glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+	}
+
 	// VBO
 	inline void glGenBuffers(GLsizei n, GLuint *buffers) {
 		return m_glGenBuffers(n, buffers);
@@ -290,6 +313,14 @@ private:
 	PFNGLCOMPILESHADERPROC m_glCompileShader;
 	PFNGLGETSHADERIVPROC m_glGetShaderiv;
 	PFNGLGETSHADERINFOLOGPROC m_glGetShaderInfoLog;
+
+	// Textures
+	//PFNGLGENTEXTURESPROC m_glGenTextures;
+	PFNGLACTIVETEXTUREPROC m_glActiveTexture;
+	PFNGLBINDTEXTURESPROC m_glBindTextures;
+	//PFNGLBINDTEXTUREPROC m_glBindTexture;
+	PFNGLTEXPARAMETERIPROC m_glTexParameteri;
+	PFNGLTEXIMAGE2DPROC m_glTexImage2D;
 
 	// VBO
 	PFNGLGENBUFFERSPROC m_glGenBuffers;

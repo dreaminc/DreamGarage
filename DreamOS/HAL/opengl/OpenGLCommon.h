@@ -8,6 +8,7 @@
 	#include <gl\glu.h>                               // Header File For The GLu32 Library
 	//#include <gl\glext.h>
 	#include "HAL/opengl/GL/glext.h"
+	#include "HAL/opengl/GL/glcorearb.h"
 #elif defined(__APPLE__)
 	#import <OpenGL/gl.h>
 	#import <OpenGL/glu.h>
