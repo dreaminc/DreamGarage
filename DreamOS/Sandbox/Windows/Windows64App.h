@@ -4,6 +4,8 @@
 #include "RESULT/EHM.h"
 #include "Sandbox/SandboxApp.h"
 
+#include "TimeManager/TimeManager.h"
+
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
 // Dream OS Windows 64 Sandbox
@@ -69,6 +71,8 @@ private:
 private:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	OpenGLImp *m_pOpenGLImp;	
+
+	TimeManager	*m_pTimeManager;
 
 public:
 	Win64Keyboard *m_pWin64Keyboard;

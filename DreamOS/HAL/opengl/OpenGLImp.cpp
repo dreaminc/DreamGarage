@@ -601,7 +601,7 @@ Error:
 light *g_pLight = NULL;
 
 // TODO: Other approach 
-RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
+RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
 	RESULT r = R_PASS;
 
 	// Add lights
@@ -626,7 +626,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	g_pLight = pLight;
 
-	/*
+	///*
 	OGLVolume *pVolume = NULL;
 	int num = 20;
 	double size = 0.5f;
@@ -642,15 +642,16 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 				static_cast<point_precision>(j * (size * 2) - (num * size)));
 
 			pVolume->UpdateOGLBuffers();
+			pTimeManager->RegisterSubscriber(TIME_ELAPSED, pVolume);
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
 	//*/
 
-	///*
+	/*
 	OGLSphere *pSphere = NULL;
 	int num = 20;
-	int sects = 20;
+	int sects = 5;
 	double radius = 0.5f;
 	double size = radius * 2;
 	int spaceFactor = 4;
@@ -661,6 +662,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
 			pSphere->UpdateOGLBuffers();
+			//pTimeManager->RegisterSubscriber(TIME_ELAPSED, pSphere);
 			pSceneGraph->PushObject(pSphere);
 		}
 	}

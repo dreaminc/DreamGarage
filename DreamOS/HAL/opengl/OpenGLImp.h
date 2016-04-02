@@ -17,8 +17,13 @@
 #include "OGLVertexShader.h"
 #include "OGLFragmentShader.h"
 
+#include "TimeManager/TimeManager.h"
+
+//#include "Primitives/camera.h"
+
 #include "Primitives/valid.h"
 #include "Primitives/version.h"
+
 #include "Primitives/stereocamera.h"
 
 #include "OpenGLExtensions.h"
@@ -77,7 +82,7 @@ public:
 	RESULT UpdateCamera();
 	RESULT SetCameraMatrix(EYE_TYPE viewTarget);
 
-	RESULT LoadScene(SceneGraph *pSceneGraph);
+	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();

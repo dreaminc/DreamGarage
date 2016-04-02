@@ -60,6 +60,9 @@
     <Filter Include="HAL\opengl\GLSL\v440">
       <UniqueIdentifier>{7f1c2dc0-01a8-4076-a88c-4315fbe75d6d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="TimeManager">
+      <UniqueIdentifier>{8b96d977-b3e9-4a11-a23d-f434f6d4d4ec}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -142,6 +145,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp">
+      <Filter>TimeManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -387,6 +393,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\TimeManager\TimeManager.h">
+      <Filter>TimeManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

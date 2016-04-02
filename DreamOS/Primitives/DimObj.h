@@ -13,9 +13,12 @@
 #include "point.h"
 #include "TriangleIndexGroup.h"
 #include "Vertex.h"
+
+#include "TimeManager/TimeManager.h"
 #include "material.h"
 
-class DimObj : public VirtualObj {
+
+class DimObj : public VirtualObj, public Subscriber<TimeEvent> {
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
     //AABV m_aabv;        // Axis Aligned Bounding Volume
@@ -126,6 +129,23 @@ public:
 
 	Error:
 		return r;
+	}
+	
+	RESULT Notify(TimeEvent *event) {
+		quaternion_precision factor = 0.05;
+		quaternion_precision filter = 0.1;
+
+		static quaternion_precision x = 1.0;
+		static quaternion_precision y = 1.0;
+		static quaternion_precision z = 1.0;
+
+		//x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
+		//y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
+		//z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
+
+		RotateBy(x * factor, y * factor, z * factor);
+
+		return R_PASS;
 	}
 
 	material *GetMaterial() {
