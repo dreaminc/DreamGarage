@@ -1,10 +1,10 @@
-#ifndef OGL_MESH_H_
-#define OGL_MESH_H_
+#ifndef OGL_MODEL_H_
+#define OGL_MODEL_H_
 
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/HAL/OpenGL/OGLMesh.h
+// DreamOS/HAL/OpenGL/OGLModel.h
 
 #include "OGLObj.h"
 #include "Primitives/model.h"
@@ -26,4 +26,4 @@ public:
 	}
 };
 
-#endif // ! OGL_MESH_H_
+#endif // ! OGL_MODEL_H_

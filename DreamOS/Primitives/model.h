@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Dimension/Primitives/mesh.h
+// DreamOS/Dimension/Primitives/model.h
 
 #include <vector>
 #include "DimObj.h"
