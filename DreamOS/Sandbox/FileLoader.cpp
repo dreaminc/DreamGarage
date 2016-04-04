@@ -9,11 +9,11 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 
 	std::vector<point> all_positions;
 	std::vector<point> all_uvs;
-	std::vector<point> all_normals;
+	std::vector<vector> all_normals;
 
-	std::vector<size_t> vertexIndices;
-	std::vector<size_t> uvIndices;
-	std::vector<size_t> normalIndices;
+	std::vector<int> positionIndices;
+	std::vector<int> uvIndices;
+	std::vector<int> normalIndices;
 
 	std::ifstream obj_file(obj_file_name, std::ios::binary);
 
@@ -51,21 +51,21 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 			all_normals.emplace_back(x, y, z);
 		}
 		else if (type.compare("f") == 0) {
-			size_t newVertexIndices[3], newUvIndices[3], newNormalIndices[3];
+			size_t newPositionIndices[3], newUvIndices[3], newNormalIndices[3];
 
 			// Read as vertex/uv/normal format
 			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d\n",
-										&newVertexIndices[0], &newUvIndices[0], &newNormalIndices[0],
-										&newVertexIndices[1], &newUvIndices[1], &newNormalIndices[1],
-										&newVertexIndices[2], &newUvIndices[2], &newNormalIndices[2]);
+										&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0],
+										&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
+										&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2]);
 
 			if (num_matches != 9) {
 
 				// Read as vertex//normal format
 				num_matches = std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d\n",
-										&newVertexIndices[0], &newNormalIndices[0],
-										&newVertexIndices[1], &newNormalIndices[1],
-										&newVertexIndices[2], &newNormalIndices[2]);
+										&newPositionIndices[0], &newNormalIndices[0],
+										&newPositionIndices[1], &newNormalIndices[1],
+										&newPositionIndices[2], &newNormalIndices[2]);
 
 				if (num_matches != 6) {
 					// Cannot read face format.
@@ -75,7 +75,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 			}
 
 			for (int i = 0; i < 3; ++i) {
-				vertexIndices.push_back(newVertexIndices[i]);
+				positionIndices.push_back(newPositionIndices[i]);
 				uvIndices.push_back(newUvIndices[i]);
 				normalIndices.push_back(newNormalIndices[i]);
 			}
@@ -83,9 +83,11 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 
 	}
 
-	for (int i : vertexIndices) {
-		point vertex = all_positions[i - 1];
-		out_vertices.push_back(vertex);
+	for (int index = 0; index < positionIndices.size(); ++index) {
+		// TBD: add texture coordinates
+
+		// Add a vertex with position and normal
+		out_vertices.emplace_back(all_positions[positionIndices[index] - 1], all_normals[normalIndices[index] - 1]);
 	}
 
 	obj_file.close();
