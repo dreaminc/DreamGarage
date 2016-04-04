@@ -17,6 +17,9 @@ class Win64PathManager : public PathManager {
 public:
 	Win64PathManager();
 
+	RESULT DoesPathExist(const wchar_t *pszPath);
+	RESULT GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs);
+
 protected:
 	RESULT Dealloc();
 	RESULT InitializePaths();

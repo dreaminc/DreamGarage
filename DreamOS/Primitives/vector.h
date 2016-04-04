@@ -35,9 +35,9 @@ public:
 	vector(vector rhs, vector lhs) {
 		clear();
 
-		x(rhs(1) * lhs(2)) - (rhs(2) * lhs(1));
-		y(rhs(2) * lhs(0)) - (rhs(0) * lhs(2));
-		z(rhs(0) * lhs(1)) - (rhs(1) * lhs(0));
+		x((rhs(1) * lhs(2)) - (rhs(2) * lhs(1)));
+		y((rhs(2) * lhs(0)) - (rhs(0) * lhs(2)));
+		z((rhs(0) * lhs(1)) - (rhs(1) * lhs(0)));
 		
 		// For good measure
 		w(1);
@@ -64,9 +64,9 @@ public:
 		vector_precision denom = 0;
 
 		for (int i = 0; i < 4; i++)
-			denom += pow(element(i, 0), 2);
+			denom += static_cast<vector_precision>(pow(element(i, 0), 2));
 
-		denom = sqrt(denom);
+		denom = static_cast<vector_precision>(denom);
 
 		for (int i = 0; i < 4; i++)
 			element(i, 0) = element(i, 0) / denom;
@@ -118,9 +118,9 @@ public:
 	static vector YUnitVector() { return vector(0.0f, 1.0f, 0.0f); }
 	static vector ZUnitVector() { return vector(0.0f, 0.0f, 1.0f); }
 
-	static vector iVector() { return vector(1.0f, 0.0f, 0.0f); }
-	static vector jVector() { return vector(0.0f, 1.0f, 0.0f); }
-	static vector kVector() { return vector(0.0f, 0.0f, 1.0f); }
+	static vector iVector(vector_precision value = 1.0f) { return vector(value, 0.0f, 0.0f); }
+	static vector jVector(vector_precision value = 1.0f) { return vector(0.0f, value, 0.0f); }
+	static vector kVector(vector_precision value = 1.0f) { return vector(0.0f, 0.0f, value); }
 };
 
 #endif // !VECTOR_H_

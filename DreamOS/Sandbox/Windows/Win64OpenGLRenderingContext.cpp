@@ -6,10 +6,6 @@ Win64OpenGLRenderingContext::Win64OpenGLRenderingContext() {
 
 	Validate();
 	return;
-
-Error:
-	Invalidate();
-	return;
 }
 
 Win64OpenGLRenderingContext::~Win64OpenGLRenderingContext() {
@@ -36,13 +32,14 @@ inline RESULT Win64OpenGLRenderingContext::ReleaseCurrentContext() {
 	return R_PASS;
 }
 
-RESULT Win64OpenGLRenderingContext::InitializeRenderingContext(int versionMajor, int versionMinor) {
+//RESULT Win64OpenGLRenderingContext::InitializeRenderingContext(int versionMajor, int versionMinor) {
+RESULT Win64OpenGLRenderingContext::InitializeRenderingContext(version versionOGL) {
 	RESULT r = R_PASS;
 	Windows64App *pWin64App = reinterpret_cast<Windows64App*>(GetParentApp());
 
 	int attribs[] = {
-		WGL_CONTEXT_MAJOR_VERSION_ARB, versionMajor,
-		WGL_CONTEXT_MINOR_VERSION_ARB, versionMinor,
+		WGL_CONTEXT_MAJOR_VERSION_ARB, versionOGL.major(),
+		WGL_CONTEXT_MINOR_VERSION_ARB, versionOGL.minor(),
 		WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
 		WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
 		0

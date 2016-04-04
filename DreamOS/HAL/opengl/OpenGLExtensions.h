@@ -115,6 +115,19 @@ public:
 	inline void glGetActiveUniform(GLuint programID, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *pszName) {
 		return m_glGetActiveUniform(programID, index, bufSize, length, size, type, pszName);
 	}
+
+	// Uniform Blocks
+	inline GLint glGetUniformBlockIndex(GLuint programID, const GLchar *pszName) {
+		return m_glGetUniformBlockIndex(programID, pszName);
+	}
+
+	inline void glUniformBlockBinding(GLuint programID, GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
+		return m_glUniformBlockBinding(programID, uniformBlockIndex, uniformBlockBindingPoint);
+	}
+
+	inline void glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
+		return m_glBindBufferBase(target, bindingPointIndex, bufferIndex);
+	}
 	
 	// Attributes
 	inline GLint glGetAttribLocation(GLuint programID, const GLchar *pszName) {
@@ -198,6 +211,10 @@ public:
 	inline void glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
 		return m_glBufferData(target, size, data, usage);
 	}
+
+	inline void glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
+		return m_glBufferSubData(target, offset, size, data);
+	}
 	
 	inline void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
 		return m_glVertexAttribPointer(index, size, type, normalized, stride, pointer);
@@ -248,6 +265,11 @@ private:
 	PFNGLUNIFORMMATRIX4FVPROC m_glUniformMatrix4fv;
 	PFNGLGETACTIVEUNIFORMPROC m_glGetActiveUniform;
 
+	// Uniform Blocks
+	PFNGLGETUNIFORMBLOCKINDEXPROC m_glGetUniformBlockIndex;
+	PFNGLUNIFORMBLOCKBINDINGPROC m_glUniformBlockBinding;
+	PFNGLBINDBUFFERBASEPROC m_glBindBufferBase;
+
 	// Attributes
 	PFNGLGETATTRIBLOCATIONPROC m_glGetAttribLocation;
 	PFNGLVERTEXATTRIB1FPROC m_glVertexAttrib1f;
@@ -273,6 +295,7 @@ private:
 	PFNGLGENBUFFERSPROC m_glGenBuffers;
 	PFNGLBINDBUFFERPROC	m_glBindBuffer;
 	PFNGLBUFFERDATAPROC	m_glBufferData;
+	PFNGLBUFFERSUBDATAPROC m_glBufferSubData;
 	PFNGLVERTEXATTRIBPOINTERPROC m_glVertexAttribPointer;
 	PFNGLDELETEBUFFERSPROC m_glDeleteBuffers;
 

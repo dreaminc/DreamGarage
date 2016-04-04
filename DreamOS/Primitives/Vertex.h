@@ -30,13 +30,10 @@
 // TODO: Port to LinAlgLib (using point etc)
 class vertex {
 public:
-	//float m_pPoint[VERTEX_DIMENSIONS];
-	//float m_pColor[COLOR_DIMENSIONS];
 	point m_point;
 	color m_color;
 	vector m_normal;
 
-	// TODO: Normal
 	// TODO: UV coordinate 
 
 public:
@@ -75,19 +72,23 @@ public:
 	}
 
 	static void *GetVertexOffset() {
-		return NULL;
+		int offset = NULL;
+		return (void*)(offset);
 	}
 
 	static void* GetColorOffset() {
-		return (void*)(sizeof(point));
+		int offset = (int)(GetVertexOffset()) + sizeof(point);
+		return (void*)(offset);
 	}
 
 	static void* GetNormalOffset() {
-		return (void*)(sizeof(point) + sizeof(color));
+		int offset = (int)(GetColorOffset()) + sizeof(color);
+		return (void*)(offset);
 	}
 
 	static void* GetUVOffset() {
-		return (void*)(sizeof(point) + sizeof(color) + sizeof(vector));
+		int offset = (int)(GetNormalOffset()) + sizeof(vector);
+		return (void*)(offset);
 	}
 
 	inline static int GetPointDimensions() {
@@ -96,6 +97,10 @@ public:
 
 	inline static int GetColorDimensions() {
 		return color::rows();
+	}
+
+	inline static int GetNormalDimensions() {
+		return vector::rows();
 	}
 
 	inline point GetPoint() {

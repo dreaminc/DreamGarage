@@ -10,6 +10,8 @@
 #include "./HAL/Shader.h"
 
 #include "OpenGLCommon.h"
+#include "Primitives/version.h"
+#include "Primitives/matrix.h"
 
 class OpenGLImp;	// Declare OpenGLImp class
 
@@ -18,10 +20,23 @@ public:
 	OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType);
 	~OpenGLShader(void);
 
-	RESULT InitializeFromFile(const wchar_t *pszFilename);
+	RESULT InitializeFromFile(const wchar_t *pszFilename, version versionFile);
 	
 	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename);
+	RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename, version versionFile);
 	RESULT LoadShaderCodeFromString(const char* pszSource);
+
+	//RESULT SetUniform();
+	RESULT SetPointUniform(matrix<float, 4, 1> pt, const char* pszUniformName);
+	RESULT Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName);
+
+	virtual RESULT GetAttributeLocationsFromShader() = 0;
+
+	// TODO: Uniform Blocks (uniforms in general?) should be pushed into OpenGL program
+	virtual RESULT BindUniformBlocks() = 0;
+	virtual RESULT GetUniformLocationsFromShader() = 0;
+	virtual RESULT InitializeUniformBlocks() = 0;
+	virtual RESULT UpdateUniformBlockBuffers() = 0;
 
 	RESULT Compile(void);
 	RESULT PrintInfoLog();

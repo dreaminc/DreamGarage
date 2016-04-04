@@ -80,6 +80,11 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
+	// Initialize Time Manager
+	m_pTimeManager = new TimeManager();
+	CNM(m_pTimeManager, "Failed to allocate Time Manager");
+	CV(m_pTimeManager, "Failed to validate Time Manager");
+
 	Validate();
 	return;
 
@@ -89,7 +94,10 @@ Error:
 }
 
 Windows64App::~Windows64App() {
-	// empty stub for now
+	if (m_pTimeManager != nullptr) {
+		delete m_pTimeManager;
+		m_pTimeManager = nullptr;
+	}
 }
 
 HDC Windows64App::GetDeviceContext() {
@@ -144,7 +152,7 @@ Error:
 	return r;
 }
 
-long __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
 	Windows64App *pApp = NULL;
 
 	// Get pointer to window
@@ -164,7 +172,7 @@ long __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARA
 	return pApp->WndProc(hWindow, msg, wp, lp);
 }
 
-long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
+LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
 	switch (msg) {
 		case WM_CREATE: {
 			HDC hDC = GetDC(hWindow);
@@ -248,7 +256,7 @@ long __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM wp, 
 		} break;
 			
 		case WM_MOUSEWHEEL: {
-			int wheel = ((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
+			int wheel = static_cast<int>((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Mousewheel %d!", wheel);
@@ -297,6 +305,8 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, pCamera));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, pCamera));
 
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_SPACE, pCamera));
+
 	for (int i = 0; i < 26; i++) {
 		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
 	}
@@ -337,21 +347,22 @@ RESULT Windows64App::ShowSandbox() {
 	
 	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
 	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
+	CVM(m_pOpenGLImp, "OpenGL Implementation Invalid");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
 
 	// TODO: Move to Sandbox function
-	CR(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
-	CR(RegisterImpMouseEvents(), "Failed to register mouse events");
+	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
+	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	// Show the window
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
 
 	// TODO: Should replace this with a proper scene loader
-	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph), "Failed to load scene");
+	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
 
 	// Launch main message loop
 	MSG msg;
@@ -368,6 +379,8 @@ RESULT Windows64App::ShowSandbox() {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		m_pTimeManager->Update();
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should
@@ -430,6 +443,5 @@ RESULT Windows64App::RecoverDisplayMode() {
 
 	// TODO: What the hell is this?
 
-Error:
 	return r;
 }

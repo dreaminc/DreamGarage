@@ -25,6 +25,7 @@
 #else
     #define DEBUG_OUT(str, ...)
     #define DEBUG_LINEOUT(str, ...)
+	#define DEBUG_LINEOUT_RETURN(str, ...) 
 #endif
 
 #define DEBUG_FILE_LINE

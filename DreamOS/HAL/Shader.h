@@ -4,6 +4,7 @@
 #include "RESULT/EHM.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
+#include "Primitives/version.h"
 
 // DREAM OS
 // DreamOS/HAL/Shader.h
@@ -26,6 +27,8 @@ public:
 	//virtual RESULT Disable() = 0;
 
 	virtual RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename) = 0;
+	virtual RESULT LoadShaderCodeFromFile(const wchar_t *pszFilename, version versionFile) = 0;
+
 	virtual RESULT Compile(void) = 0;
 
 	/*

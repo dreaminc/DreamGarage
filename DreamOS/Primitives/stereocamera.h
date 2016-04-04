@@ -27,8 +27,29 @@ public:
 		m_pupillaryDistance = (DEFAULT_PUPILLARY_DISTANCE / 1000.0f);
 	}
 
+	point GetEyePosition(EYE_TYPE eye) {
+		point ptEye;
+		
+		switch (eye) {
+			case EYE_LEFT: {
+				ptEye = m_ptOrigin + (GetRightVector() * (m_pupillaryDistance / 2.0f));
+			} break;
+
+			case EYE_RIGHT: {
+				ptEye = m_ptOrigin + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
+			} break;
+
+			case EYE_MONO: {
+				ptEye = m_ptOrigin;
+			} break;
+		}
+
+		return ptEye;
+	}
+
 	ViewMatrix GetViewMatrix(EYE_TYPE eye) {
 		ViewMatrix mat;
+
 		switch (eye) {
 			case EYE_LEFT: {
 				point leftEyePoint = m_ptOrigin + (GetRightVector() * (m_pupillaryDistance / 2.0f));
