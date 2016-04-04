@@ -7,9 +7,9 @@
 // DreamOS/HAL/OpenGL/OGLMesh.h
 
 #include "OGLObj.h"
-#include "Primitives/mesh.h"
+#include "Primitives/model.h"
 
-class OGLMesh : public mesh, public OGLObj {
+class OGLModel : public model, public OGLObj {
 protected:
 	DimObj *GetDimObj() {
 		return (DimObj*)this;
@@ -17,8 +17,8 @@ protected:
 
 public:
 
-	OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices) :
-		mesh(vertices),
+	OGLModel(OpenGLImp *pParentImp, const std::vector<vertex>& vertices) :
+		model(vertices),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM

@@ -1,5 +1,5 @@
-#ifndef MESH_H_
-#define MESH_H_
+#ifndef MODEL_H_
+#define MODEL_H_
 
 #include "RESULT/EHM.h"
 
@@ -12,7 +12,7 @@
 #include "point.h"
 #include "color.h"
 
-class mesh : public DimObj {
+class model : public DimObj {
 public:
 
 	RESULT Allocate() {
@@ -35,7 +35,7 @@ private:
 	unsigned int m_nVertices;
 
 public:
-	mesh(const std::vector<vertex>& vertices)
+	model(const std::vector<vertex>& vertices)
 	{
 		m_nVertices = vertices.size();
 
@@ -55,4 +55,4 @@ public:
 	}
 };
 
-#endif // ! MESH_H_
+#endif // ! MODEL_H_

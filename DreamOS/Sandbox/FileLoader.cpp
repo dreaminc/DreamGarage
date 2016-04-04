@@ -7,7 +7,7 @@
 bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 								std::vector<vertex> &out_vertices) {
 
-	std::vector<point> all_vertices;
+	std::vector<point> all_positions;
 	std::vector<point> all_uvs;
 	std::vector<point> all_normals;
 
@@ -38,7 +38,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 		if (type.compare("v") == 0) {
 			float x, y, z;
 			std::sscanf(value.c_str(), "%f %f %f\n", &x, &y, &z);
-			all_vertices.emplace_back(x, y, z);
+			all_positions.emplace_back(x, y, z);
 		}
 		else if (type.compare("vt") == 0) {
 			float u, v;
@@ -84,7 +84,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 	}
 
 	for (int i : vertexIndices) {
-		point vertex = all_vertices[i - 1];
+		point vertex = all_positions[i - 1];
 		out_vertices.push_back(vertex);
 	}
 

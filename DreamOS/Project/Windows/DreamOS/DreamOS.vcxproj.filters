@@ -334,14 +334,14 @@
     <ClInclude Include="..\..\..\Primitives\stereocamera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\mesh.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLMesh.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\FileLoader.h">
       <Filter>Sandbox</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\model.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

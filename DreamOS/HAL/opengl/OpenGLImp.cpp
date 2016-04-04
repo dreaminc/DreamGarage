@@ -528,7 +528,7 @@ Error:
 }
 
 #include "OGLVolume.h"
-#include "OGLMesh.h"
+#include "OGLModel.h"
 #include "OGLTriangle.h"
 #include "../DreamOS/Sandbox/PathManager.h"
 
@@ -559,10 +559,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	std::wstring objFile(path);
 
 	FileLoaderHelper::LoadOBJFile(objFile + L"Models/car.obj", v);
-	OGLMesh* pMesh = new OGLMesh(this, v);
-	pMesh->SetRandomColor();
-	pMesh->UpdateOGLBuffers();
-	pSceneGraph->PushObject(pMesh);
+	OGLModel* pModel = new OGLModel(this, v);
+	pModel->SetRandomColor();
+	pModel->UpdateOGLBuffers();
+	pSceneGraph->PushObject(pModel);
 
 Error:
 	return r;
