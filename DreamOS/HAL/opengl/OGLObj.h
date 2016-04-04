@@ -161,6 +161,18 @@ public:
 		return r;
 	}
 
+	OGLTexture *GetColorTexture() {
+		DimObj *pDimObj = GetDimObj();
+		OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetColorTexture());
+		return pTexture;
+	}
+
+	OGLTexture *GetBumpTexture() {
+		DimObj *pDimObj = GetDimObj();
+		OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetBumpTexture());
+		return pTexture;
+	}
+
 protected:
 	GLuint m_hVAO;		// vertex array object
 	GLuint m_hVBO;		// vertex buffer object

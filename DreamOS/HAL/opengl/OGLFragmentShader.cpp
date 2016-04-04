@@ -1,6 +1,7 @@
 #include "OGLFragmentShader.h"
 #include "OpenGLImp.h"
 #include "OGLTexture.h"
+#include "OGLObj.h"
 
 OGLFragmentShader::OGLFragmentShader(OpenGLImp *pParentImp) :
 	OpenGLShader(pParentImp, GL_FRAGMENT_SHADER)
@@ -34,7 +35,8 @@ RESULT OGLFragmentShader::GetUniformLocationsFromShader() {
 	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
 
 	// Uniforms
-	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetTextureUniformName(), &m_uniformTextureIndex), "Failed to acquire texture uniform GL location");
+	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetColorTextureUniformName(), &m_uniformColorTextureIndex), "Failed to acquire color texture uniform GL location");
+	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetBumpTextureUniformName(), &m_uniformBumpTextureIndex), "Failed to acquire bump texture uniform GL location");
 
 	// Blocks
 	CRM(m_pMaterialBlock->UpdateUniformBlockIndexFromShader(GetMaterialUniformBlockName()), "Failed to acquire material uniform block GL location");
@@ -78,13 +80,41 @@ RESULT OGLFragmentShader::SetMaterial(material *pMaterial) {
 RESULT OGLFragmentShader::SetTexture(OGLTexture *pTexture) {
 	RESULT r = R_PASS;
 
-	CR(SetTextureUniform(pTexture->GetTextureNumber()));
+	switch (pTexture->GetTextureType()) {
+		case texture::TEXTURE_TYPE::TEXTURE_COLOR: {
+			CR(SetColorTextureUniform(pTexture->GetTextureNumber()));
+		} break;
+
+		case texture::TEXTURE_TYPE::TEXTURE_BUMP: {
+			CR(SetBumpTextureUniform(pTexture->GetTextureNumber()));
+		} break;
+
+		default: {
+			CB(false);
+		} break;
+	}
+
+	CR(pTexture->OGLActivateTexture());
 
 Error:
 	return r;
 }
 
-RESULT OGLFragmentShader::SetTextureUniform(GLint textureNumber) {
-	return SetUniformInteger(textureNumber, GetTextureUniformName());
+RESULT OGLFragmentShader::SetColorTextureUniform(GLint textureNumber) {
+	return SetUniformInteger(textureNumber, GetColorTextureUniformName());
+}
+
+RESULT OGLFragmentShader::SetBumpTextureUniform(GLint textureNumber) {
+	return SetUniformInteger(textureNumber, GetBumpTextureUniformName());
+}
+
+RESULT OGLFragmentShader::SetObjectTextures(OGLObj *pOGLObj) {
+	RESULT r = R_PASS;
+
+	WCR(SetTexture(reinterpret_cast<OGLTexture*>(pOGLObj->GetColorTexture())));
+	WCR(SetTexture(reinterpret_cast<OGLTexture*>(pOGLObj->GetBumpTexture())));
+
+Error:
+	return r;
 }
 

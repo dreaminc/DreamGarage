@@ -417,7 +417,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pCamera);
 
 	// TODO:  Currently using a global material 
-	m_pFragmentShader->SetMaterial(&material(100.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	m_pFragmentShader->SetMaterial(&material(1000.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -565,6 +565,8 @@ inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 	//*/
 
+	m_pFragmentShader->SetObjectTextures(pOGLObj);
+
 	return pOGLObj->Render();
 }
 
@@ -634,13 +636,15 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	g_pLight = pLight;
 
-	texture *pTexture = new OGLTexture(this, L"crate_color.png");
-	m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pTexture));
-
+	texture *pBumpTexture = new OGLTexture(this, L"crate_bump.png");
+	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
+	
 	///*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
-	pVolume->SetTexture(pTexture);
+	pVolume->SetColorTexture(pColorTexture);
+	pVolume->SetBumpTexture(pBumpTexture);
 	pSceneGraph->PushObject(pVolume);
+	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
 	//*/
 
 	/*

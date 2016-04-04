@@ -32,7 +32,7 @@ struct Light {
 
 struct Material {
 	float m_shine;
-	float reserved1;
+	float m_bump;
 	float reserved2;
 	float reserved3;
     vec4 m_colorAmbient;
@@ -49,7 +49,8 @@ layout(std140) uniform ub_LightArray {
 	int numLights;	
 };
 
-uniform sampler2D u_texture;
+uniform sampler2D u_textureColor;
+uniform sampler2D u_textureBump;
 
 layout (location = 0) out vec4 out_vec4Color;
 
@@ -86,7 +87,9 @@ void main(void) {
 	}
 	vec4LightValue[3] = 1.0f;
 	
-	vec4 textureColor = texture(u_texture, DataIn.uvCoord);
-	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), g_vec4AmbientLightLevel);
-	//out_vec4Color = textureColor + (out_vec4Color * 0.0001);
+	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord);
+	//vec4 textureColor = texture(u_textureBump, DataIn.uvCoord);
+
+	vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
+	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
 }

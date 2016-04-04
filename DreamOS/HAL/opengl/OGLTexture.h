@@ -17,8 +17,7 @@ public:
 	OGLTexture(OpenGLImp *pParentImp) :
 		texture(),
 		m_textureIndex(0),
-		m_pParentImp(pParentImp),
-		m_textureNumber(0)
+		m_pParentImp(pParentImp)
 	{
 		// empty
 	}
@@ -26,14 +25,13 @@ public:
 	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename) :
 		texture(pszFilename),
 		m_textureIndex(0),
-		m_pParentImp(pParentImp),
-		m_textureNumber(0)
+		m_pParentImp(pParentImp)
 	{
 		RESULT r = OGLInitialize();
 	}
 
 	~OGLTexture() {
-		// empty stub
+		texture::~texture();
 	}
 
 	RESULT OGLInitialize() {
@@ -62,18 +60,22 @@ public:
 		return r;
 	}
 
+	RESULT OGLActivateTexture() {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine()));
+		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_textureIndex));
+
+	Error:
+		return r;
+	}
+
 	GLenum GetGLTextureNumberDefine() {
 		return (GLenum)((GL_TEXTURE0) + m_textureNumber);
 	}
 
-	GLint GetTextureNumber() {
-		return m_textureNumber;
-	}
-
 private:
 	OpenGLImp *m_pParentImp;
-
-	GLint m_textureNumber;
 	GLuint m_textureIndex;
 };
 

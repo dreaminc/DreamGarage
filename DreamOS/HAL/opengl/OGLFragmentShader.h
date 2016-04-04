@@ -11,7 +11,8 @@
 #include "OGLMaterialBlock.h"
 
 class OpenGLImp;	// Declare OpenGLImp class
-class OGLTexture;	
+class OGLTexture;
+class OGLObj;
 
 //#define FRAGMENT_SHADER_COLOR_INDEX 0
 
@@ -32,25 +33,29 @@ public:
 public:
 	const char *GetColorAttributeName() { return "inF_vec3Color"; }
 	
-	const char *GetTextureUniformName() { return "u_texture";  }
+	const char *GetColorTextureUniformName() { return "u_textureColor"; }
+	const char *GetBumpTextureUniformName() { return "u_textureBump"; }
+
 	const char *GetMaterialUniformBlockName() { return "ub_material"; }
 
-	GLint GetColorIndex() { 
-		return m_ColorIndex; 
-	}
+	GLint GetColorIndex() { return m_ColorIndex; }
 
-	GLint GetTextureUniformIndex() {
-		return m_uniformTextureIndex;
-	}
+	GLint GetColorTextureUniformIndex() { return m_uniformColorTextureIndex; }
+	GLint GetBumpTextureUniformIndex() { return m_uniformBumpTextureIndex; }
 	
-	RESULT SetTextureUniform(GLint textureNumber);
-
 	RESULT SetTexture(OGLTexture *pTexture);
+	
+	RESULT SetColorTextureUniform(GLint textureNumber);
+	RESULT SetBumpTextureUniform(GLint textureNumber);
+	
 	RESULT SetMaterial(material *pMaterial);
+
+	RESULT SetObjectTextures(OGLObj *pOGLObj);
 
 private:
 	GLint m_ColorIndex;
-	GLint m_uniformTextureIndex;
+	GLint m_uniformColorTextureIndex;
+	GLint m_uniformBumpTextureIndex;
 
 	OGLMaterialBlock *m_pMaterialBlock;
 };

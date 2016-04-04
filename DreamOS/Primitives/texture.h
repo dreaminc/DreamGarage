@@ -24,7 +24,8 @@ public:
 		m_pImageBuffer(NULL),
 		m_width(0),
 		m_height(0),
-		m_channels(0)
+		m_channels(0),
+		m_textureNumber(0)
 	{
 		Validate();
 	}
@@ -33,7 +34,8 @@ public:
 		m_pImageBuffer(NULL),
 		m_width(0),
 		m_height(0),
-		m_channels(0)
+		m_channels(0),
+		m_textureNumber(0)
 	{
 		RESULT r = R_PASS;
 
@@ -51,6 +53,30 @@ public:
 			delete[] m_pImageBuffer;
 			m_pImageBuffer = nullptr;
 		}
+	}
+
+	// The texture type and channel
+	enum class TEXTURE_TYPE {
+		TEXTURE_COLOR = 0,
+		TEXTURE_BUMP = 1,
+		TEXTURE_INVALID = 32
+	};
+
+	RESULT SetTextureType(TEXTURE_TYPE textureType) {
+		return SetTextureNumber(static_cast<int>(textureType));
+	}
+
+	int GetTextureNumber() {
+		return m_textureNumber;
+	}
+
+	TEXTURE_TYPE GetTextureType() {
+		return static_cast<TEXTURE_TYPE>(m_textureNumber);
+	}
+
+	RESULT SetTextureNumber(int texNum) {
+		m_textureNumber = texNum;
+		return R_PASS;
 	}
 
 	RESULT GetTextureFilePath(const wchar_t *pszFilename, wchar_t * &n_pszFilePath) {
@@ -142,6 +168,8 @@ protected:
 	int m_channels;
 
 	unsigned char *m_pImageBuffer;
+
+	int m_textureNumber;
 
 private:
 	UID m_uid;

@@ -28,7 +28,8 @@ protected:
 	material m_material;
 
 	// TODO: Multiple textures (one for now)
-	texture *m_pTexture;
+	texture *m_pColorTexture;
+	texture *m_pBumpTexture;
 
 public:
     DimObj() :
@@ -36,7 +37,8 @@ public:
 		m_pVertices(nullptr),
 		m_pIndices(nullptr),
 		m_material(),
-		m_pTexture(nullptr)
+		m_pColorTexture(nullptr),
+		m_pBumpTexture(nullptr)
         //m_aabv()
     {
         /* stub */
@@ -115,24 +117,54 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetTexture(texture *pTexture) {
+	RESULT SetColorTexture(texture *pTexture) {
 		RESULT r = R_PASS;
 
-		CBM((m_pTexture == nullptr), "Cannot overwrite texture");
-		m_pTexture = pTexture;
+		CBM((m_pColorTexture == nullptr), "Cannot overwrite color texture");
+		m_pColorTexture = pTexture;
+		m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	Error:
 		return r;
 	}
 
-	RESULT ClearTexture() {
+	RESULT ClearColorTexture() {
 		RESULT r = R_PASS;
 
-		CB((m_pTexture != nullptr));
-		m_pTexture = nullptr;
+		CB((m_pColorTexture != nullptr));
+		m_pColorTexture = nullptr;
 
 	Error:
 		return r;
+	}
+
+	RESULT SetBumpTexture(texture *pBumpTexture) {
+		RESULT r = R_PASS;
+
+		CBM((m_pBumpTexture == nullptr), "Cannot overwrite bump texture");
+		m_pBumpTexture = pBumpTexture;
+		m_pBumpTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_BUMP);
+
+	Error:
+		return r;
+	}
+
+	RESULT ClearBumpTexture() {
+		RESULT r = R_PASS;
+
+		CB((m_pBumpTexture != nullptr));
+		m_pBumpTexture = nullptr;
+
+	Error:
+		return r;
+	}
+
+	texture *GetColorTexture() {
+		return m_pColorTexture;
+	}
+
+	texture *GetBumpTexture() {
+		return m_pBumpTexture;
 	}
 
 	RESULT SetRandomColor() {
