@@ -136,7 +136,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
       <Filter>Sandbox</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\version.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -361,15 +361,9 @@
     <ClInclude Include="..\..\..\Primitives\stereocamera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\mesh.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLMesh.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\FileLoader.h">
       <Filter>Sandbox</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h">
       <Filter>HAL\opengl\GL</Filter>
     </ClInclude>
@@ -408,6 +402,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h">
       <Filter>TimeManager</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\model.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

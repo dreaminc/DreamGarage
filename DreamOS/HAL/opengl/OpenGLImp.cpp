@@ -656,7 +656,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	}
 	//*/
 		
-	/*
+	///*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 	
@@ -673,7 +673,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pModel);
 	//*/
 
-	///*
+	/*
 	OGLSphere *pSphere = NULL;
 	int num = 20;
 	int sects = 25;

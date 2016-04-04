@@ -84,4 +84,5 @@ void main(void) {
 	vec4LightValue[3] = 1.0f;
 	
 	out_vec4Color = max((vec4LightValue * DataIn.color), g_vec4AmbientLightLevel);
+	out_vec4Color = DataIn.color;
 }
