@@ -334,17 +334,6 @@
     <ClInclude Include="..\..\..\Primitives\stereocamera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-<<<<<<< HEAD
-    <ClInclude Include="..\..\..\Sandbox\FileLoader.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\model.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-=======
     <ClInclude Include="..\..\..\Primitives\mesh.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -354,7 +343,6 @@
     <ClInclude Include="..\..\..\Sandbox\FileLoader.h">
       <Filter>Sandbox</Filter>
     </ClInclude>
->>>>>>> c9feb13f009e67c1dc2028e97e0dc344602c0657
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
