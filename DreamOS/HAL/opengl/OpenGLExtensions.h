@@ -214,7 +214,11 @@ public:
 		return m_glBindTextures(first, count, textures);
 	}
 
-	inline void glTexParamteri(GLenum target, GLenum pname, GLint param) {
+	inline void glTextStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {
+		return m_glTexStorage2D(target, levels, internalformat, width, height);
+	}
+
+	inline void glTexParameteri(GLenum target, GLenum pname, GLint param) {
 		return m_glTexParameteri(target, pname, param);
 	}
 
@@ -319,8 +323,10 @@ private:
 	PFNGLACTIVETEXTUREPROC m_glActiveTexture;
 	PFNGLBINDTEXTURESPROC m_glBindTextures;
 	//PFNGLBINDTEXTUREPROC m_glBindTexture;
+	PFNGLTEXSTORAGE2DPROC m_glTexStorage2D;
 	PFNGLTEXPARAMETERIPROC m_glTexParameteri;
 	PFNGLTEXIMAGE2DPROC m_glTexImage2D;
+	//PFNGLTEXSUBIMAGE2DPROC m_glTexSubImage2D;
 
 	// VBO
 	PFNGLGENBUFFERSPROC m_glGenBuffers;

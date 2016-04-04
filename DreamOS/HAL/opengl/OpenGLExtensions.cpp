@@ -147,6 +147,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glBindTextures = (PFNGLBINDTEXTURESPROC)wglGetProcAddress("glBindTextures")),
 		"Failed to initialize glBindTextures extension");
 
+	CNMW((m_glTexStorage2D = (PFNGLTEXSTORAGE2DPROC)wglGetProcAddress("glTexStorage2D")),
+		"Failed to initialize glTexStorage2D extension");
+
 	CNMW((m_glTexParameteri = (PFNGLTEXPARAMETERIPROC)wglGetProcAddress("glTexParameteri")),
 		"Failed to initialize glTexParameteri extension");
 

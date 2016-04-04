@@ -182,6 +182,13 @@ RESULT OpenGLImp::EnableVertexNormalAttribute() {
 		return R_FAIL;
 }
 
+RESULT OpenGLImp::EnableVertexUVCoordAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableUVCoordAttribute();
+	else
+		return R_FAIL;
+}
+
 RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 	RESULT r = R_PASS;
 	DWORD werr;
@@ -628,14 +635,17 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	g_pLight = pLight;
 
 	texture *pTexture = new OGLTexture(this, L"crate_color.png");
+	m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pTexture));
 
+	///*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetTexture(pTexture);
 	pSceneGraph->PushObject(pVolume);
+	//*/
 
 	/*
 	OGLVolume *pVolume = NULL;
-	int num = 2;
+	int num = 10;
 	double size = 0.5f;
 	int spaceFactor = 2;
 
@@ -946,6 +956,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glUniform1i(GLint location, GLint v0) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUniform1i(location, v0);
+	CRM(CheckGLError(), "glUniform1i failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
 	RESULT r = R_PASS;
 
@@ -1101,21 +1121,43 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::glTexParamteri(GLenum target, GLenum pname, GLint param) {
+RESULT OpenGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {
 	RESULT r = R_PASS;
 
-	m_OpenGLExtensions.glTexParamteri(target, pname, param);
+	m_OpenGLExtensions.glTextStorage2D(target, levels, internalformat, width, height);
+	CRM(CheckGLError(), "glTexStorage2D failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::TexParamteri(GLenum target, GLenum pname, GLint param) {
+	RESULT r = R_PASS;
+
+	//m_OpenGLExtensions.glTexParamteri(target, pname, param);
+	glTexParameteri(target, pname, param);
 	CRM(CheckGLError(), "glTexParameteri failed");
 
 Error:
 	return r;
 }
 
-RESULT OpenGLImp::glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
+RESULT OpenGLImp::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
 	RESULT r = R_PASS;
 
-	m_OpenGLExtensions.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+	//m_OpenGLExtensions.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+	glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	CRM(CheckGLError(), "glTexImage2D failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
+	RESULT r = R_PASS;
+
+	glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+	CRM(CheckGLError(), "glTexSubImage2D failed");
 
 Error:
 	return r;

@@ -91,6 +91,16 @@ public:
 		return r;
 	}
 
+	RESULT ReleaseTextureData() {
+		RESULT r = R_PASS;
+
+		SOIL_free_image_data(m_pImageBuffer);
+		CB((m_pImageBuffer == nullptr));
+
+	Error:
+		return r;
+	}
+
 	RESULT LoadTextureFromPath(wchar_t *pszFilepath) {
 		RESULT r = R_PASS;
 
@@ -126,7 +136,7 @@ public:
 		return r;
 	}
 
-private:
+protected:
 	int m_width;
 	int m_height;
 	int m_channels;

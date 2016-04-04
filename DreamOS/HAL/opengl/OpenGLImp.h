@@ -101,9 +101,11 @@ private:
 	RESULT Notify(SenseMouseEvent *mEvent);
 
 public:
+	// TODO: [SHADER] This should be baked into Shader
 	RESULT EnableVertexPositionAttribute();
 	RESULT EnableVertexColorAttribute();
 	RESULT EnableVertexNormalAttribute();
+	RESULT EnableVertexUVCoordAttribute();
 
 // TODO: Unify access to extensions
 public:
@@ -137,6 +139,7 @@ public:
 
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
+	RESULT glUniform1i(GLint location, GLint v0);
 	RESULT glUniform4fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 
@@ -157,8 +160,12 @@ public:
 	RESULT glActiveTexture(GLenum texture);
 	RESULT glBindTextures(GLuint first, GLsizei count, const GLuint *textures);
 	RESULT BindTexture(GLenum target, GLuint texture);
-	RESULT glTexParamteri(GLenum target, GLenum pname, GLint param);
-	RESULT glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+	RESULT glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height);
+	//RESULT glTexParamteri(GLenum target, GLenum pname, GLint param);
+	RESULT TexParamteri(GLenum target, GLenum pname, GLint param);
+	//RESULT glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+	RESULT TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+	RESULT TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
 
 // Extension Mappings
 private:

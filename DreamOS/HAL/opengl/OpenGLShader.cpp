@@ -122,6 +122,21 @@ Error:
 	return r;
 }
 
+RESULT OpenGLShader::SetUniformInteger(GLint value, const char* pszUniformName) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+
+	GLint location = -1;
+	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+
+	CB((location >= 0));
+	m_pParentImp->glUniform1i(location, value);
+
+Error:
+	return r;
+}
+
 // Copy over the code - assuming const
 RESULT OpenGLShader::LoadShaderCodeFromString(const char* pszSource) {
 	RESULT r = R_PASS;

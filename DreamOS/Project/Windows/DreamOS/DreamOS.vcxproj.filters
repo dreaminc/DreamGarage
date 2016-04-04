@@ -427,6 +427,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\uvcoord.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

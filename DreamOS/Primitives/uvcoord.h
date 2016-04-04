@@ -1,0 +1,55 @@
+#ifndef UV_COORD_H_
+#define UV_COORD_H_
+
+#include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/Dimension/Primitives/uvcoord.h
+// UV Coordinate
+
+#include "matrix.h"
+
+
+#ifdef FLOAT_PRECISION
+	typedef float uv_precision;
+#elif defined(DOUBLE_PRECISION)
+	typedef double uv_precision;
+#endif
+
+class uvcoord : public matrix <uv_precision, 2, 1> {
+public:
+	uvcoord() {
+		clear();
+	}
+
+	uvcoord(uv_precision u, uv_precision v) {
+		this->clear();
+		this->element(0, 0) = u;
+		this->element(1, 0) = v;
+	}
+
+	uvcoord(const matrix<uv_precision, 2, 1>& arg) :
+		matrix<uv_precision, 2, 1>(arg)
+	{
+		// empty
+	}
+
+	// TODO: Understand performance implications of this although both element and this are inline
+	inline uv_precision &u() { return this->element(0, 0); }
+	inline uv_precision &v() { return this->element(1, 0); }
+	
+	inline uv_precision &u(uv_precision val) { return this->element(0, 0) = val; }
+	inline uv_precision &v(uv_precision val) { return this->element(1, 0) = val; }
+
+	// Explicitly specializing the assignment operator
+	uvcoord& operator=(const matrix<uv_precision, 2, 1> &arg) {
+		if (this == &arg)      // Same object?
+			return *this;        // Yes, so skip assignment, and just return *this.
+
+		memcpy(this->m_data, arg.m_data, sizeof(uv_precision) * 2 * 1);
+
+		return *this;
+	}
+};
+
+#endif // ! UVCOORD_H_

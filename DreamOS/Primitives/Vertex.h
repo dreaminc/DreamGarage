@@ -25,6 +25,7 @@
 #include "matrix.h"
 #include "vector.h"
 #include "point.h"
+#include "uvcoord.h"
 #include "color.h"
 
 // TODO: Port to LinAlgLib (using point etc)
@@ -33,6 +34,7 @@ public:
 	point m_point;
 	color m_color;
 	vector m_normal;
+	uvcoord m_uvcoord;
 
 	// TODO: UV coordinate 
 
@@ -41,30 +43,42 @@ public:
 		m_point.clear();
 		m_color.clear();
 		m_normal.clear();
+		m_uvcoord.clear();
 	}
 
 	vertex(point p) {
 		SetPoint(p);
 		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
 		m_normal.clear();
+		m_uvcoord.clear();
 	}
 
 	vertex(point p, color c) {
 		SetPoint(p);
 		SetColor(c);
 		m_normal.clear();
+		m_uvcoord.clear();
 	}
 
 	vertex(point p, color c, vector n) {
 		SetPoint(p);
 		SetColor(c);
 		SetNormal(n);
+		m_uvcoord.clear();
 	}
 
 	vertex(point p, vector n) {
 		SetPoint(p);
 		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
 		SetNormal(n);
+		m_uvcoord.clear();
+	}
+
+	vertex(point p, vector n, uvcoord uv) {
+		SetPoint(p);
+		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
+		SetNormal(n);
+		SetUV(uv);
 	}
 
 	~vertex() {
@@ -103,6 +117,10 @@ public:
 		return vector::rows();
 	}
 
+	inline static int GetUVCoordDimensions() {
+		return uvcoord::rows();
+	}
+
 	inline point GetPoint() {
 		return m_point;
 	}
@@ -113,6 +131,10 @@ public:
 
 	inline vector GetNormal() {
 		return m_normal;
+	}
+
+	inline uvcoord GetUV() {
+		return m_uvcoord;
 	}
 
 public:
@@ -159,10 +181,21 @@ public:
 		return R_PASS;
 	}
 
+	RESULT SetUV(uvcoord uv) {
+		m_uvcoord = uv;
+		return R_PASS;
+	}
+
+	RESULT SetUV(uv_precision u, uv_precision v) {
+		m_uvcoord = uvcoord(u, v);
+		return R_PASS;
+	}
+
 	RESULT SetVertex(vertex v) {
 		m_point = v.GetPoint();
 		m_color = v.GetColor();
 		m_normal = v.GetNormal();
+		m_uvcoord = v.GetUV();
 
 		return R_PASS;
 	}

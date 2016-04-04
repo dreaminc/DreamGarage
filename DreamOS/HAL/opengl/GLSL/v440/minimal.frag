@@ -12,6 +12,7 @@ in Data {
 	vec3 directionLight[MAX_TOTAL_LIGHTS];
 	float distanceLight[MAX_TOTAL_LIGHTS];
 	vec4 color;
+	vec2 uvCoord;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
 } DataIn;
@@ -48,6 +49,8 @@ layout(std140) uniform ub_LightArray {
 	int numLights;	
 };
 
+uniform sampler2D u_texture;
+
 layout (location = 0) out vec4 out_vec4Color;
 
 float g_ambient = 0.1f;
@@ -83,5 +86,7 @@ void main(void) {
 	}
 	vec4LightValue[3] = 1.0f;
 	
-	out_vec4Color = max((vec4LightValue * DataIn.color), g_vec4AmbientLightLevel);
+	vec4 textureColor = texture(u_texture, DataIn.uvCoord);
+	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), g_vec4AmbientLightLevel);
+	//out_vec4Color = textureColor + (out_vec4Color * 0.0001);
 }

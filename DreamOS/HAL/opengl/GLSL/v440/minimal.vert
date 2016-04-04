@@ -9,6 +9,7 @@
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
 layout (location = 2) in vec4 inV_vec4Normal;
+layout (location = 3) in vec2 inV_vec2UVCoord;
 
 //out vec3 inF_vec3Color;
 
@@ -18,6 +19,7 @@ out Data {
 	vec3 directionLight[MAX_TOTAL_LIGHTS];
 	float distanceLight[MAX_TOTAL_LIGHTS];
 	vec4 color;
+	vec2 uvCoord;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
 } DataOut;
@@ -68,6 +70,7 @@ void main(void) {
 	DataOut.vertWorldSpace = vertWorldSpace;
 	DataOut.vertViewSpace = vertViewSpace;
 	DataOut.normal = vec4ModelNormal;
+	DataOut.uvCoord = inV_vec2UVCoord;
 
 	// Vert Color
 	DataOut.color = inV_vec4Color;

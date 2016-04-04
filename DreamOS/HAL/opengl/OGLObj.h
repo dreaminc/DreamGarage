@@ -112,7 +112,9 @@ public:
 		CR(m_pParentImp->EnableVertexNormalAttribute());		
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)2, vertex::GetNormalDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetNormalOffset()));
 
-		// TODO: UV Coord
+		// UV Coordinate
+		CR(m_pParentImp->EnableVertexUVCoordAttribute());
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)3, vertex::GetUVCoordDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetUVOffset()));
 
 		CR(m_pParentImp->ReleaseCurrentContext());
 

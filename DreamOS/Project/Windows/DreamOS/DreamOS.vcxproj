@@ -248,6 +248,7 @@
     <ClInclude Include="..\..\..\Primitives\Types\Types.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h" />
     <ClInclude Include="..\..\..\Primitives\Types\UID.h" />
+    <ClInclude Include="..\..\..\Primitives\uvcoord.h" />
     <ClInclude Include="..\..\..\Primitives\valid.h" />
     <ClInclude Include="..\..\..\Primitives\vector.h" />
     <ClInclude Include="..\..\..\Primitives\version.h" />
