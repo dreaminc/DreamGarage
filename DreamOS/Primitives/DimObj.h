@@ -174,6 +174,81 @@ public:
 		return R_PASS;
 	}
 
+	// This assumes the other vertices have a valid position and uv mapping
+	// This will set the tangents/bi-tangents for all three vertices
+	// Source: http://learnopengl.com/#!Advanced-Lighting/Normal-Mapping
+	// TODO: Use matrix to simplify logic
+	//RESULT SetTangentBitangent(vertex v1, vertex v2, vertex v3) {
+	RESULT SetTriangleTangentBitangent(dimindex i1, dimindex i2, dimindex i3) {
+		RESULT r = R_PASS;
+		vector tangent, bitangent;
+		vertex *pV1 = nullptr, *pV2 = nullptr, *pV3 = nullptr;
+		vector edge1, edge2;
+		uvcoord deltaUV1, deltaUV2;
+		point_precision factor = 0.0f;
+
+		// TODO: More eloquent way than this
+		CB((i1 < NumberIndices()));
+		pV1 = &(m_pVertices[i1]);
+		CN(pV1);
+
+		CB((i2 < NumberIndices()));
+		pV2 = &(m_pVertices[i2]);
+		CN(pV2);
+
+		CB((i3 < NumberIndices()));
+		pV3 = &(m_pVertices[i3]);
+		CN(pV3);
+
+		edge1 = pV2->GetPoint() - pV1->GetPoint();
+		edge2 = pV3->GetPoint() - pV1->GetPoint();
+
+		deltaUV1 = pV2->GetUV() - pV1->GetUV();
+		deltaUV2 = pV3->GetUV() - pV1->GetUV();
+
+		factor = 1.0f / ( (deltaUV1.u() * deltaUV2.v()) - (deltaUV1.v() * deltaUV2.u()) );
+
+		tangent = vector();
+		tangent.x() = factor * ( (deltaUV2.v() * edge1.x()) - (deltaUV1.v() * edge2.x()) );
+		tangent.y() = factor * ( (deltaUV2.v() * edge1.y()) - (deltaUV1.v() * edge2.y()) );
+		tangent.z() = factor * ( (deltaUV2.v() * edge1.z()) - (deltaUV1.v() * edge2.z()) );
+		tangent.Normalize();
+
+		bitangent = vector();
+		bitangent.x() = factor * ((-deltaUV2.u() * edge1.x()) + (deltaUV1.u() * edge2.x()));
+		bitangent.y() = factor * ((-deltaUV2.u() * edge1.y()) + (deltaUV1.u() * edge2.y()));
+		bitangent.z() = factor * ((-deltaUV2.u() * edge1.z()) + (deltaUV1.u() * edge2.z()));
+		bitangent.Normalize();
+
+		pV1->SetTangentBitangent(tangent, bitangent);
+		pV2->SetTangentBitangent(tangent, bitangent);
+		pV3->SetTangentBitangent(tangent, bitangent);
+
+	Error:
+		return r;
+	}
+
+	RESULT SetQuadTangentBitangent(dimindex TL, dimindex TR, dimindex BL, dimindex BR) {
+		RESULT r = R_PASS;
+		vertex *pVTR = nullptr, *pVBL = nullptr;
+
+		// TODO: More eloquent way than this
+		CB((TR < NumberIndices()));
+		pVTR = &(m_pVertices[TR]);
+		CN(pVTR);
+
+		CB((BL < NumberIndices()));
+		pVBL = &(m_pVertices[BL]);
+		CN(pVBL);
+
+		CR(SetTriangleTangentBitangent(TL, BR, BL));
+
+		CR(pVTR->SetTangentBitangent(pVBL->GetTangent(), pVBL->GetBitangent()));
+
+	Error:
+		return r;
+	}
+
 	RESULT CopyVertices(vertex pVerts[], int pVerts_n) {
 		RESULT r = R_PASS;
 

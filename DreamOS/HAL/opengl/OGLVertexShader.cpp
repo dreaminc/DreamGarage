@@ -9,11 +9,14 @@ OGLVertexShader::OGLVertexShader(OpenGLImp *pParentImp) :
 
 RESULT OGLVertexShader::BindAttributes() {
 	RESULT r = R_PASS;
+	
+	WCRM(m_pParentImp->BindAttribLocation(GetNormalIndex(), (char*)GetNormalAttributeName()), "Failed to bind %s to normal attribute", GetNormalAttributeName());
+	WCRM(m_pParentImp->BindAttribLocation(GetUVCoordIndex(), (char*)GetUVCoordAttributeName()), "Failed to bind %s to uv coord attribute", GetUVCoordAttributeName());
+	WCRM(m_pParentImp->BindAttribLocation(GetTangentIndex(), (char*)GetTangentAttributeName()), "Failed to bind %s to tangent attribute", GetTangentAttributeName());
+	WCRM(m_pParentImp->BindAttribLocation(GetBitangentIndex(), (char*)GetBitangentAttributeName()), "Failed to bind %s to bitangent attribute", GetBitangentAttributeName());
 
 	CRM(m_pParentImp->BindAttribLocation(GetPositionIndex(), (char*)GetPositionAttributeName()), "Failed to bind %s to position attribute", GetPositionAttributeName());
 	CRM(m_pParentImp->BindAttribLocation(GetColorIndex(), (char*)GetColorAttributeName()), "Failed to bind %s to color attribute", GetColorAttributeName());
-	CRM(m_pParentImp->BindAttribLocation(GetNormalIndex(), (char*)GetNormalAttributeName()), "Failed to bind %s to normal attribute", GetNormalAttributeName());
-	CRM(m_pParentImp->BindAttribLocation(GetUVCoordIndex(), (char*)GetUVCoordAttributeName()), "Failed to bind %s to uv coord attribute", GetUVCoordAttributeName());
 
 Error:
 	return r;
@@ -62,6 +65,14 @@ RESULT OGLVertexShader::EnableUVCoordAttribute() {
 	return m_pParentImp->glEnableVertexAtrribArray(GetUVCoordIndex());
 }
 
+RESULT OGLVertexShader::EnableTangentAttribute() {
+	return m_pParentImp->glEnableVertexAtrribArray(GetTangentIndex());
+}
+
+RESULT OGLVertexShader::EnableBitangentAttribute() {
+	return m_pParentImp->glEnableVertexAtrribArray(GetBitangentIndex());
+}
+
 RESULT OGLVertexShader::GetAttributeLocationsFromShader() {
 	RESULT r = R_PASS;
 
@@ -71,6 +82,8 @@ RESULT OGLVertexShader::GetAttributeLocationsFromShader() {
 	CRM(m_pParentImp->glGetAttribLocation(oglProgramID, GetColorAttributeName(), &m_ColorIndex), "Failed to acquire color GL location");
 	CRM(m_pParentImp->glGetAttribLocation(oglProgramID, GetNormalAttributeName(), &m_NormalIndex), "Failed to acquire normal GL location");
 	CRM(m_pParentImp->glGetAttribLocation(oglProgramID, GetUVCoordAttributeName(), &m_UVCoordIndex), "Failed to acquire uv coord GL location");
+	CRM(m_pParentImp->glGetAttribLocation(oglProgramID, GetTangentAttributeName(), &m_TangentIndex), "Failed to acquire tangent GL location");
+	CRM(m_pParentImp->glGetAttribLocation(oglProgramID, GetBitangentAttributeName(), &m_BitangentIndex), "Failed to acquire bitangent GL location");
 	
 Error:
 	return r;
@@ -115,6 +128,14 @@ GLint OGLVertexShader::GetNormalIndex() {
 
 GLint OGLVertexShader::GetUVCoordIndex() {
 	return m_UVCoordIndex;
+}
+
+GLint OGLVertexShader::GetTangentIndex() {
+	return m_TangentIndex;
+}
+
+GLint OGLVertexShader::GetBitangentIndex() {
+	return m_BitangentIndex;
 }
 
 GLint OGLVertexShader::GetEyePositionUniformIndex() {

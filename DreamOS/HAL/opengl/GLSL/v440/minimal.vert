@@ -10,6 +10,8 @@ layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
 layout (location = 2) in vec4 inV_vec4Normal;
 layout (location = 3) in vec2 inV_vec2UVCoord;
+layout (location = 4) in vec4 inV_vec4Tangent;
+layout (location = 5) in vec4 inV_vec4Bitangent;
 
 //out vec3 inF_vec3Color;
 

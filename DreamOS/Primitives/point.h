@@ -20,7 +20,7 @@ class vector;
 #endif
 
 // Difference between two points will be a vector
-vector operator-(const point &lhs, const point &rhs);
+//vector operator-(const point &lhs, const point &rhs);
 
 class point : public matrix <point_precision, 4, 1> {
 public:
@@ -91,20 +91,29 @@ public:
 		return R_PASS;
 	}
 
-	/*
 	// Subtracting points results in vector
-	matrix& operator-=(const matrix& rhs) {
-		subData(rhs.m_data);
-		return *this;
-	}
-	*/
-
-
 	/*
-	vector<TMatrix, N, M> operator-(const matrix<TMatrix, N, M>&arg) const {
-		return matrix<TMatrix, N, M>(*this).operator-=(arg);
+	point& operator-=(const matrix<point_precision, 4, 1> &arg) {
+		subData((point_precision*)(arg.m_data));
+		return (*this);
+	}
+
+	vector operator-(const matrix<point_precision, 4, 1>&arg) const {
+		matrix<point_precision, 4, 1> retMat = matrix<point_precision, 4, 1>(*this).operator-=(arg);
+		vector *pv = reinterpret_cast<vector*>(&retMat);
+		return (*pv);
 	}
 	*/
+
+	friend vector operator-(point &lhs, point &rhs) {
+		vector rtv;
+
+		rtv.x(rhs.x() - lhs.x());
+		rtv.y(rhs.y() - lhs.y());
+		rtv.z(rhs.z() - lhs.z());
+
+		return rtv;
+	}
 
 	// Explicitly specializing the assignment operator
 	point& operator=(const matrix<point_precision, 4, 1> &arg) {

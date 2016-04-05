@@ -189,6 +189,20 @@ RESULT OpenGLImp::EnableVertexUVCoordAttribute() {
 		return R_FAIL;
 }
 
+RESULT OpenGLImp::EnableVertexTangentAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableTangentAttribute();
+	else
+		return R_FAIL;
+}
+
+RESULT OpenGLImp::EnableVertexBitangentAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableBitangentAttribute();
+	else
+		return R_FAIL;
+}
+
 RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
 	RESULT r = R_PASS;
 	DWORD werr;
@@ -348,6 +362,7 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
 }
 
+// TODO: This should be moved to OpenGL Program arch/design
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -638,6 +653,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	texture *pBumpTexture = new OGLTexture(this, L"crate_bump.png");
 	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
+	//texture *pColorTexture = new OGLTexture(this, L"brick1_color.jpg");
 	
 	///*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);

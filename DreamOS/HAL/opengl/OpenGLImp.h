@@ -106,6 +106,8 @@ public:
 	RESULT EnableVertexColorAttribute();
 	RESULT EnableVertexNormalAttribute();
 	RESULT EnableVertexUVCoordAttribute();
+	RESULT EnableVertexTangentAttribute();
+	RESULT EnableVertexBitangentAttribute();
 
 // TODO: Unify access to extensions
 public:

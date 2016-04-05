@@ -30,6 +30,8 @@ public:
 	const char *GetColorAttributeName() { return "inV_vec4Color"; }
 	const char *GetNormalAttributeName() { return "inV_vec4Normal"; }
 	const char *GetUVCoordAttributeName() { return "inV_vec2UVCoord"; }
+	const char *GetTangentAttributeName() { return "inV_vec4Tangent"; }
+	const char *GetBitangentAttributeName() { return "inV_vec4Bitangent"; }
 
 	const char *GetEyePositionUniformName() { return "u_vec4Eye"; }
 	const char *GetModelMatrixUniformName() { return "u_mat4Model";  }
@@ -44,6 +46,8 @@ public:
 	GLint GetColorIndex();
 	GLint GetNormalIndex();
 	GLint GetUVCoordIndex();
+	GLint GetTangentIndex();
+	GLint GetBitangentIndex();
 	
 	GLint GetEyePositionUniformIndex();
 	GLint GetModelMatrixUniformIndex();
@@ -75,6 +79,8 @@ public:
 	RESULT EnableVertexColorAttribute();
 	RESULT EnableVertexNormalAttribute();
 	RESULT EnableUVCoordAttribute();
+	RESULT EnableTangentAttribute();
+	RESULT EnableBitangentAttribute();
 
 	RESULT SetLights(std::vector<light*> *pLights);
 
@@ -85,6 +91,8 @@ private:
 	GLint m_ColorIndex;
 	GLint m_NormalIndex;
 	GLint m_UVCoordIndex;
+	GLint m_TangentIndex;
+	GLint m_BitangentIndex;
 
 	GLint m_uniformEyePositionIndex;
 	GLint m_uniformModelMatrixIndex;

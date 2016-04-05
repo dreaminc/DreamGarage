@@ -78,6 +78,11 @@ public:
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
 		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+
+		//SetTriangleTangentBitangent(BL, BR, TR);
+		SetQuadTangentBitangent(TL, TR, BL, BR);
+
+
 		//*/
 
 		///*
@@ -90,6 +95,8 @@ public:
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
 		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+
+		SetQuadTangentBitangent(TL, TR, BL, BR);
 		//*/
 		
 		///*
@@ -102,6 +109,8 @@ public:
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
 		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+
+		SetQuadTangentBitangent(TL, TR, BL, BR);
 		//*/
 
 		///*
@@ -114,6 +123,8 @@ public:
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
 		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+
+		SetQuadTangentBitangent(TL, TR, BL, BR);
 		//*/
 
 		///*
@@ -126,6 +137,8 @@ public:
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
 		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+
+		SetQuadTangentBitangent(TL, TR, BL, BR);
 		//*/
 
 		///*
@@ -138,6 +151,8 @@ public:
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
 		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+
+		SetQuadTangentBitangent(TL, TR, BL, BR);
 		//*/
 
 		Validate();
