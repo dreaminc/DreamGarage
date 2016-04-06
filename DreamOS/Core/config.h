@@ -19,6 +19,14 @@
 
 #if defined(_WIN32)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_WIN32
+
+	#ifdef WIN32_LEAN_AND_MEAN
+		#unfdef WIN32_LEAN_AND_MEAN
+	#endif
+
+	#ifndef WIN32
+		#define WIN32
+	#endif
 #elif defined(__APPLE__)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_OSX
 #elif defined (__linux__)

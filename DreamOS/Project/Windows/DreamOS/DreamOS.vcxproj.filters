@@ -161,6 +161,9 @@
     <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c">
       <Filter>External\SOIL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\texture.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

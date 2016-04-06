@@ -1,10 +1,8 @@
-//#include "DreamOSMain.h"
+#include "DreamOSMain.h"
 //#include "OSX/OSXApp.h"
 
 #include <ctime>
-
 #include "RESULT/EHM.h"
-
 #include "Sandbox/SandboxFactory.h"
 
 #define DREAM_OS_VERSION_STR "V0.1"
