@@ -24,6 +24,7 @@ out Data {
 	vec2 uvCoord;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
+	mat3 TangentBitangentNormalMatrix;
 } DataOut;
 
 uniform vec4 u_vec4Eye;
@@ -73,6 +74,16 @@ void main(void) {
 	DataOut.vertViewSpace = vertViewSpace;
 	DataOut.normal = vec4ModelNormal;
 	DataOut.uvCoord = inV_vec2UVCoord;
+
+	// BTN Matrix
+	// TODO: All vectors to tangent space in vert shader?
+	// TODO: Calc this CPU side?  Understand tradeoffs 
+	//mat4 BTNTransformMatrix = u_mat4Model;
+	mat4 BTNTransformMatrix = g_mat4InvTransposeModel;
+	vec3 ModelTangent = normalize(vec3(u_mat4Model * vec4(inV_vec4Tangent.xyz, 0.0)));
+	vec3 ModelBitangent = normalize(vec3(u_mat4Model * vec4(inV_vec4Bitangent.xyz, 0.0)));
+	vec3 ModelNormal = normalize(vec3(u_mat4Model * vec4(inV_vec4Normal.xyz, 0.0)));
+	DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
 
 	// Vert Color
 	DataOut.color = inV_vec4Color;

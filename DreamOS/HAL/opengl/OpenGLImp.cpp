@@ -432,7 +432,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pCamera);
 
 	// TODO:  Currently using a global material 
-	m_pFragmentShader->SetMaterial(&material(1000.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	m_pFragmentShader->SetMaterial(&material(100.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -650,12 +650,19 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	//*/
 
 	g_pLight = pLight;
-
+	
+	/*
 	texture *pBumpTexture = new OGLTexture(this, L"crate_bump.png");
 	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
-	//texture *pColorTexture = new OGLTexture(this, L"brick1_color.jpg");
-	
+	//*/
+
 	///*
+	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg");
+	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg");
+	//*/
+	
+	
+	/*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
 	pVolume->SetBumpTexture(pBumpTexture);
@@ -663,7 +670,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
 	//*/
 
-	/*
+	///*
 	OGLVolume *pVolume = NULL;
 	int num = 10;
 	double size = 0.5f;
@@ -672,6 +679,9 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	for (int i = 0; i < num; i++) {
 		for (int j = 0; j < num; j++) {
 			pVolume = new OGLVolume(this, size);
+
+			pVolume->SetColorTexture(pColorTexture);
+			pVolume->SetBumpTexture(pBumpTexture);
 
 			//pVolume->SetRandomColor();
 			pVolume->translate(static_cast<point_precision>(i * (size * 2) - (num * size)), 

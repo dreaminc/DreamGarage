@@ -206,7 +206,7 @@ public:
 		deltaUV1 = pV2->GetUV() - pV1->GetUV();
 		deltaUV2 = pV3->GetUV() - pV1->GetUV();
 
-		factor = 1.0f / ( (deltaUV1.u() * deltaUV2.v()) - (deltaUV1.v() * deltaUV2.u()) );
+		factor = -1.0f / ( (deltaUV1.u() * deltaUV2.v()) - (deltaUV1.v() * deltaUV2.u()) );
 
 		tangent = vector();
 		tangent.x() = factor * ( (deltaUV2.v() * edge1.x()) - (deltaUV1.v() * edge2.x()) );
