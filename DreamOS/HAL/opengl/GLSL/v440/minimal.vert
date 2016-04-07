@@ -78,16 +78,17 @@ void main(void) {
 	// BTN Matrix
 	// TODO: All vectors to tangent space in vert shader?
 	// TODO: Calc this CPU side?  Understand tradeoffs 
-	//mat4 TBNTransformMatrix = u_mat4Model;
-	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
-	//mat3 TBNTransformMatrix = mat3(g_mat4ModelView);
+	//mat3 TBNTransformMatrix = mat3(u_mat4Model);
+	//mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
+	mat3 TBNTransformMatrix = mat3(g_mat4ModelView);
+	//mat3 TBNTransformMatrix = mat3(u_mat4View);
 
-	vec3 ModelTangent = normalize(TBNTransformMatrix * normalize(inV_vec4Tangent.xyz));
-	vec3 ModelBitangent = normalize(TBNTransformMatrix * normalize(inV_vec4Bitangent.xyz));
-	vec3 ModelNormal = normalize(TBNTransformMatrix * normalize(inV_vec4Normal.xyz));
+	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
+	vec3 ModelBitangent = normalize(TBNTransformMatrix * inV_vec4Bitangent.xyz);
+	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
 
-	DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
-	//DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
+	//DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
+	DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
 
 	// Vert Color
 	DataOut.color = inV_vec4Color;
