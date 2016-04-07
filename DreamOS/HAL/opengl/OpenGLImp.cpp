@@ -432,7 +432,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pCamera);
 
 	// TODO:  Currently using a global material 
-	m_pFragmentShader->SetMaterial(&material(100.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	m_pFragmentShader->SetMaterial(&material(160.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -705,6 +705,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	for (int i = 0; i < num; i++) {
 		for (int j = 0; j < num; j++) {
 			pSphere = new OGLSphere(this, radius, sects, sects);
+
+			pSphere->SetColorTexture(pColorTexture);
+			pSphere->SetBumpTexture(pBumpTexture);
+
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
 			pSphere->UpdateOGLBuffers();

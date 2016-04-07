@@ -54,7 +54,7 @@ layout(std140) uniform ub_LightArray {
 
 // TODO: Move to CPU side
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
-mat4 g_mat4InvTransposeModel = transpose(inverse(g_mat4ModelView));
+mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 //mat4 g_mat4InvTransposeModel = transpose(inverse(u_mat4Model));
 
 void main(void) {	
@@ -62,7 +62,7 @@ void main(void) {
 	vec4 vertViewSpace = u_mat4View * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 
 	DataOut.directionEye = -normalize(vertViewSpace.xyz);
-	vec4 vec4ModelNormal = g_mat4InvTransposeModel * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
+	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {
 		vec3 ptLightViewSpace = vec3(u_mat4View * lights[i].m_ptOrigin);
@@ -78,12 +78,16 @@ void main(void) {
 	// BTN Matrix
 	// TODO: All vectors to tangent space in vert shader?
 	// TODO: Calc this CPU side?  Understand tradeoffs 
-	//mat4 BTNTransformMatrix = u_mat4Model;
-	mat4 BTNTransformMatrix = g_mat4InvTransposeModel;
-	vec3 ModelTangent = normalize(vec3(u_mat4Model * vec4(inV_vec4Tangent.xyz, 0.0)));
-	vec3 ModelBitangent = normalize(vec3(u_mat4Model * vec4(inV_vec4Bitangent.xyz, 0.0)));
-	vec3 ModelNormal = normalize(vec3(u_mat4Model * vec4(inV_vec4Normal.xyz, 0.0)));
-	DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
+	//mat4 TBNTransformMatrix = u_mat4Model;
+	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
+	//mat3 TBNTransformMatrix = mat3(g_mat4ModelView);
+
+	vec3 ModelTangent = normalize(TBNTransformMatrix * normalize(inV_vec4Tangent.xyz));
+	vec3 ModelBitangent = normalize(TBNTransformMatrix * normalize(inV_vec4Bitangent.xyz));
+	vec3 ModelNormal = normalize(TBNTransformMatrix * normalize(inV_vec4Normal.xyz));
+
+	DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
+	//DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
 
 	// Vert Color
 	DataOut.color = inV_vec4Color;

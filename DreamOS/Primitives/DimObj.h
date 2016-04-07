@@ -183,7 +183,7 @@ public:
 		RESULT r = R_PASS;
 		vector tangent, bitangent;
 		vertex *pV1 = nullptr, *pV2 = nullptr, *pV3 = nullptr;
-		vector edge1, edge2;
+		vector deltaPos1, deltaPos2;
 		uvcoord deltaUV1, deltaUV2;
 		point_precision factor = 0.0f;
 
@@ -200,24 +200,35 @@ public:
 		pV3 = &(m_pVertices[i3]);
 		CN(pV3);
 
-		edge1 = pV2->GetPoint() - pV1->GetPoint();
-		edge2 = pV3->GetPoint() - pV1->GetPoint();
+		deltaPos1 = pV2->GetPoint() - pV1->GetPoint();
+		deltaPos2 = pV3->GetPoint() - pV1->GetPoint();
 
 		deltaUV1 = pV2->GetUV() - pV1->GetUV();
 		deltaUV2 = pV3->GetUV() - pV1->GetUV();
 
-		factor = -1.0f / ( (deltaUV1.u() * deltaUV2.v()) - (deltaUV1.v() * deltaUV2.u()) );
+		factor = 1.0f / ( (deltaUV1.u() * deltaUV2.v()) - (deltaUV1.v() * deltaUV2.u()) );
 
+		/*
 		tangent = vector();
 		tangent.x() = factor * ( (deltaUV2.v() * edge1.x()) - (deltaUV1.v() * edge2.x()) );
 		tangent.y() = factor * ( (deltaUV2.v() * edge1.y()) - (deltaUV1.v() * edge2.y()) );
 		tangent.z() = factor * ( (deltaUV2.v() * edge1.z()) - (deltaUV1.v() * edge2.z()) );
+		//*/
+		///*
+		tangent = factor * ((deltaPos1 * deltaUV2.v()) - (deltaPos2 * deltaUV1.v()));
+		//*/
 		tangent.Normalize();
 
+		/*
 		bitangent = vector();
 		bitangent.x() = factor * ((-deltaUV2.u() * edge1.x()) + (deltaUV1.u() * edge2.x()));
 		bitangent.y() = factor * ((-deltaUV2.u() * edge1.y()) + (deltaUV1.u() * edge2.y()));
 		bitangent.z() = factor * ((-deltaUV2.u() * edge1.z()) + (deltaUV1.u() * edge2.z()));
+		//*/
+
+		///*
+		bitangent = factor * ((deltaPos2 * deltaUV1.u()) - (deltaPos1 * deltaUV2.u()));
+		//*/
 		bitangent.Normalize();
 
 		pV1->SetTangentBitangent(tangent, bitangent);
@@ -244,6 +255,35 @@ public:
 		CR(SetTriangleTangentBitangent(TL, BR, BL));
 
 		CR(pVTR->SetTangentBitangent(pVBL->GetTangent(), pVBL->GetBitangent()));
+
+	Error:
+		return r;
+	}
+
+	RESULT SetQuadTangentBitangent(dimindex TL, dimindex TR, dimindex BL, dimindex BR, vector tangent, vector bitangent) {
+		RESULT r = R_PASS;
+		vertex *pVTL = nullptr, *pVTR = nullptr, *pVBL = nullptr, *pVBR = nullptr;
+
+		// TODO: More eloquent way than this
+		CB((TL < NumberIndices()));
+		pVTL = &(m_pVertices[TL]);
+		CN(pVTL);
+		CR(pVTL->SetTangentBitangent(tangent, bitangent));
+
+		CB((TR < NumberIndices()));
+		pVTR = &(m_pVertices[TR]);
+		CN(pVTR);
+		CR(pVTR->SetTangentBitangent(tangent, bitangent));
+
+		CB((BL < NumberIndices()));
+		pVBL = &(m_pVertices[BL]);
+		CN(pVBL);
+		CR(pVBL->SetTangentBitangent(tangent, bitangent));
+
+		CB((BR < NumberIndices()));
+		pVBR = &(m_pVertices[BR]);
+		CN(pVBR);
+		CR(pVBR->SetTangentBitangent(tangent, bitangent));
 
 	Error:
 		return r;

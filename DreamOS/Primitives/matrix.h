@@ -327,23 +327,23 @@ public:
 
 	// Scalar multiplication / Division
 	// -------------------------------------------------------------------------
-	matrix& operator*=(const TMatrix& a) {
+	matrix<TMatrix, N, M>& operator*=(const TMatrix& a) {
 		for (int i = 0; i < (N * M); i++)
 			m_data[i] *= a;
 
 		return *this;
 	}
 
-	matrix operator*(const TMatrix& a) const {
+	matrix<TMatrix, N, M> operator*(const TMatrix& a) const {
 		return matrix<TMatrix, N, M>(*this).operator*=(a);
 	}
 
-	matrix& operator/=(const TMatrix& a) {
+	matrix<TMatrix, N, M>& operator/=(const TMatrix& a) {
 		divData(a);
 		return *this;
 	}
 
-	matrix<TMatrix> operator/(const TMatrix& a) {
+	matrix<TMatrix, N, M> operator/(const TMatrix& a) {
 		return matrix<TMatrix, N, M>(*this).operator/=(a);
 	}
 
@@ -516,6 +516,20 @@ public:
     }
 	*/
 };
+
+// Scalar multiplication
+// TODO: Fix const-ness?
+template <typename TMat4x4, int N, int M>
+matrix<TMat4x4, N, M> operator* (TMat4x4 val, matrix<TMat4x4, N, M>& arg) {
+	return arg *= (val);
+}
+
+/*
+template <typename TMat4x4, int N, int M>
+matrix<TMat4x4, N, M> operator* (const matrix<TMat4x4, N, M>& arg, TMat4x4 val) {
+	return arg.operator*=(val);
+}
+*/
 
 // Matrix Multiplication
 

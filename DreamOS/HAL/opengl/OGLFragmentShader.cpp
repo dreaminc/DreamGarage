@@ -111,8 +111,15 @@ RESULT OGLFragmentShader::SetBumpTextureUniform(GLint textureNumber) {
 RESULT OGLFragmentShader::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
-	WCR(SetTexture(reinterpret_cast<OGLTexture*>(pOGLObj->GetColorTexture())));
-	WCR(SetTexture(reinterpret_cast<OGLTexture*>(pOGLObj->GetBumpTexture())));
+	texture *pTexture = nullptr;
+
+	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+		WCR(SetTexture(reinterpret_cast<OGLTexture*>(pTexture)));
+	}
+
+	if ((pTexture = pOGLObj->GetBumpTexture()) != nullptr) {
+		WCR(SetTexture(reinterpret_cast<OGLTexture*>(pTexture)));
+	}
 
 Error:
 	return r;

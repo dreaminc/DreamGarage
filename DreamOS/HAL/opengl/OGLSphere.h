@@ -77,7 +77,17 @@ public:
 		CR(m_pParentImp->EnableVertexNormalAttribute());
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)2, vertex::GetNormalDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetNormalOffset()));
 
-		// TODO: UV Coord
+		// UV Coordinate
+		CR(m_pParentImp->EnableVertexUVCoordAttribute());
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)3, vertex::GetUVCoordDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetUVOffset()));
+
+		// Tangent 
+		CR(m_pParentImp->EnableVertexTangentAttribute());
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)4, vertex::GetTangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetTangentOffset()));
+
+		// Bi-Tangent 
+		CR(m_pParentImp->EnableVertexBitangentAttribute());
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)5, vertex::GetBitangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetBitangentOffset()));
 
 		CR(m_pParentImp->ReleaseCurrentContext());
 

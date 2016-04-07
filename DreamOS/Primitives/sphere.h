@@ -62,7 +62,7 @@ public:
 		// Vertices 
 
 		// Top vertex
-		m_pVertices[0] = vertex(point(0.0f, radius, 0.0f), vector(0.0f, 1.0f, 0.0f));
+		m_pVertices[0] = vertex(point(0.0f, radius, 0.0f), vector(0.0f, 1.0f, 0.0f), uvcoord(0.5f, 0.0f));
 
 		int vertCount = 1;
 		float thetaDiv = ((2.0f * M_PI) / (float)m_numAngularDivisions);
@@ -78,15 +78,17 @@ public:
 				point_precision sphereX = effRadius * sin(effTheta);
 				point_precision sphereZ = effRadius * cos(effTheta);
 
-				m_pVertices[vertCount++] = vertex(point(sphereX, sphereY, sphereZ), vector(sphereX, sphereY, sphereZ).Normal());
+				uv_precision u = 0.5f + ((atan2(cos(effTheta), sin(effTheta)))) / (2.0f * M_PI);
+				uv_precision v = 0.5f - ((asin(cos(effPsi)))) / (M_PI);
+
+				m_pVertices[vertCount++] = vertex(point(sphereX, sphereY, sphereZ), vector(sphereX, sphereY, sphereZ).Normal(), uvcoord(u, v));
 			}
 		}
 
 		// Bottom vertex
-		m_pVertices[NumberVertices() - 1] = vertex(point(0.0f, -radius, 0.0f), vector(0.0f, -1.0f, 0.0f));
+		m_pVertices[NumberVertices() - 1] = vertex(point(0.0f, -radius, 0.0f), vector(0.0f, -1.0f, 0.0f), uvcoord(0.5f, 1.0f));
 
 		// Indices
-
 		// Top Triangle Fan
 		int indexCount = 0;
 
@@ -120,6 +122,9 @@ public:
 		for (int i = 0; i < m_numAngularDivisions; i++)
 			m_pIndices[indexCount++] = NumberVertices() - 2 - i;
 		m_pIndices[indexCount++] = NumberVertices() - 2;
+
+		// Tangent / Bitangent
+		// Top strip 
 
 		Validate();
 		return;
