@@ -633,7 +633,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	light *pLight = NULL; 
 
 	///*
-	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(2.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
@@ -647,7 +647,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	pLight = new light(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
-	//*/
+	*/
 
 	g_pLight = pLight;
 	
@@ -672,7 +672,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	///*
 	OGLVolume *pVolume = NULL;
-	int num = 10;
+	int num = 1;
 	double size = 0.5f;
 	int spaceFactor = 2;
 
@@ -696,7 +696,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 
 	/*
 	OGLSphere *pSphere = NULL;
-	int num = 20;
+	int num = 2;
 	int sects = 20;
 	double radius = 0.5f;
 	double size = radius * 2;

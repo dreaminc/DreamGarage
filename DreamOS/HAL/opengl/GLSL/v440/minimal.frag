@@ -55,7 +55,7 @@ uniform sampler2D u_textureBump;
 
 layout (location = 0) out vec4 out_vec4Color;
 
-float g_ambient = 0.1f;
+float g_ambient = 0.0f;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
@@ -63,7 +63,7 @@ void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 d
 	//float attenuation = 1 / pow(distanceLight, 2);
 	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
 
-	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
+	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, normalize(directionLight)));
 	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
 	
 	if(diffuseValue > 0.0) {
@@ -81,7 +81,7 @@ void main(void) {
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	
 	vec3 TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
-	TBNNormal = normalize(TBNNormal * 2.0f - 1.0f);   
+	TBNNormal = normalize(TBNNormal * 2.0f - vec3(1.0f));   
 	TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
 
 	for(int i = 0; i < numLights; i++) {
@@ -89,12 +89,12 @@ void main(void) {
 
 		//CalculateFragmentLightValue(lights[i].m_power, normalize(DataIn.normal.xyz), normalize(DataIn.directionLight[i]), DataIn.distanceLight[i], diffuseValue, specularValue);
 		CalculateFragmentLightValue(lights[i].m_power, TBNNormal, normalize(DataIn.directionLight[i]), DataIn.distanceLight[i], diffuseValue, specularValue);
-		//CalculateFragmentLightValue(lights[i], DataIn.vertWorldSpace, TBNNormal, lightDirection, DataIn.distanceLight[i], diffuseValue, specularValue);
+		//CalculateFragmentLightValue(lights[i].m_power, TBNNormal, lightDirection, DataIn.distanceLight[i], diffuseValue, specularValue);
 		//CalculateFragmentLightValue(lights[i], DataIn.vertWorldSpace, TBNNormal, normalize(DataIn.directionLight[i]), DataIn.distanceLight[i], diffuseValue, specularValue);
 		//CalculateFragmentLightValue(lights[i], DataIn.vertWorldSpace, normalize(DataIn.normal.xyz), lightDirection, DataIn.distanceLight[i], diffuseValue, specularValue);
 
 		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
-		//vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
+		vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
 	}
 	vec4LightValue[3] = 1.0f;
 	
