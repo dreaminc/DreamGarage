@@ -5,6 +5,9 @@
 #include "Primitives/TranslationMatrix.h"
 #include "Primitives/RotationMatrix.h"
 
+#include "../DreamOS/Sandbox/FileLoader.h"
+#include <vector>
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
 	m_versionOGL(0),
@@ -595,6 +598,11 @@ Error:
 }
 
 #include "OGLVolume.h"
+
+#include "OGLModel.h"
+#include "OGLTriangle.h"
+#include "Sandbox/PathManager.h"
+
 #include "OGLSphere.h"
 #include "Primitives/light.h"
 
@@ -607,12 +615,12 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	// Add lights
 	light *pLight = NULL; 
 
-	/*
+	///*
 	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
-	///*
+	/*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
 	pLight = new light(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
@@ -626,10 +634,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 
 	g_pLight = pLight;
 
-	///*
+	/*
 	OGLVolume *pVolume = NULL;
-	int num = 20;
-	double size = 0.5f;
+	int num = 10;
+	double size = 0.2f;
 	int spaceFactor = 2;
 
 	for (int i = 0; i < num; i++) {
@@ -647,11 +655,28 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 		}
 	}
 	//*/
+		
+	///*
+	// TODO: All this should go into Model
+	std::vector<vertex> v;
+	
+	// TODO: Should move to using path manager
+	PathManager* pMgr = PathManager::instance();
+	wchar_t*	path;
+	pMgr->GetCurrentPath((wchar_t*&)path);
+	std::wstring objFile(path);
+
+	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\car.obj", v);
+	OGLModel* pModel = new OGLModel(this, v);
+	//pModel->SetRandomColor();
+	pModel->UpdateOGLBuffers();
+	pSceneGraph->PushObject(pModel);
+	//*/
 
 	/*
 	OGLSphere *pSphere = NULL;
 	int num = 20;
-	int sects = 5;
+	int sects = 25;
 	double radius = 0.5f;
 	double size = radius * 2;
 	int spaceFactor = 4;

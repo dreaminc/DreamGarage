@@ -55,15 +55,15 @@ public:
 		m_normal.clear();
 	}
 
-	vertex(point p, color c, vector n) {
-		SetPoint(p);
-		SetColor(c);
-		SetNormal(n);
-	}
-
 	vertex(point p, vector n) {
 		SetPoint(p);
 		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
+		SetNormal(n);
+	}
+
+	vertex(point p, color c, vector n) {
+		SetPoint(p);
+		SetColor(c);
 		SetNormal(n);
 	}
 
