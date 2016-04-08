@@ -28,6 +28,7 @@
 #define DEFAULT_NEAR_PLANE 1.0f
 #define DEFAULT_FAR_PLANE 100.0f
 #define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
+#define DEFAULT_CAMERA_MOVE_SPEED 0.01f
 
 #define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
 //#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_ORTHOGRAPHIC
@@ -156,46 +157,46 @@ public:
 	RESULT Notify(SenseKeyboardEvent *kbEvent) {
 		RESULT r = R_PASS;
 
-		DEBUG_LINEOUT("Key %d state: %x", kbEvent->KeyCode, kbEvent->KeyState);
+		DEBUG_LINEOUT("Cam Key %d state: %x", kbEvent->KeyCode, kbEvent->KeyState);
 
 		switch (kbEvent->KeyCode) {
 			case (SK_SCAN_CODE)('A') :
 			case SK_LEFT: {
 				if (kbEvent->KeyState)
-					AddStrafeSpeed(0.1f);
+					AddStrafeSpeed(DEFAULT_CAMERA_MOVE_SPEED);
 				else
-					AddStrafeSpeed(-0.1f);
+					AddStrafeSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 
 			case (SK_SCAN_CODE)('D') :
 			case SK_RIGHT: {
 				if (kbEvent->KeyState)
-					AddStrafeSpeed(-0.1f);
+					AddStrafeSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 				else
-					AddStrafeSpeed(0.1f);
+					AddStrafeSpeed(DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 
 			case (SK_SCAN_CODE)('W') :
 			case SK_UP: {
 				if (kbEvent->KeyState)
-					AddForwardSpeed(0.1f);
+					AddForwardSpeed(DEFAULT_CAMERA_MOVE_SPEED);
 				else
-					AddForwardSpeed(-0.1f);
+					AddForwardSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 
 			case (SK_SCAN_CODE)('S') :
 			case SK_DOWN: {
 				if (kbEvent->KeyState)
-					AddForwardSpeed(-0.1f);
+					AddForwardSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 				else
-					AddForwardSpeed(0.1f);
+					AddForwardSpeed(DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 
 			case SK_SPACE: {
 				if (kbEvent->KeyState)
-					AddUpSpeed(-0.1f);
+					AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 				else
-					AddUpSpeed(0.1f);
+					AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 		}
 

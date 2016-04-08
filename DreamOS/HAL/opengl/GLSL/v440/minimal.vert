@@ -64,25 +64,25 @@ void main(void) {
 	// BTN Matrix
 	// TODO: All vectors to tangent space in vert shader?
 	// TODO: Calc this CPU side?  Understand tradeoffs 
-	//mat3 TBNTransformMatrix = mat3(u_mat4Model);
 	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
-	//mat3 TBNTransformMatrix = mat3(g_mat4ModelView);
-	//mat3 TBNTransformMatrix = mat3(u_mat4View);
 
 	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
 	//vec3 ModelBitangent = normalize(TBNTransformMatrix * inV_vec4Bitangent.xyz);
-	vec3 ModelBitangent = normalize(TBNTransformMatrix * cross(inV_vec4Normal.xyz, inV_vec4Tangent.xyz));
+	vec3 ModelBitangent = normalize(TBNTransformMatrix * (cross(inV_vec4Normal.xyz, inV_vec4Tangent.xyz) * -1.0f));
 	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
 
-	//DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
-	DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
+	DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
+	//DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
 
-	DataOut.directionEye = -normalize(vertViewSpace.xyz);
+	DataOut.directionEye = DataOut.TangentBitangentNormalMatrix * (-normalize(vertViewSpace.xyz));
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {
-		vec3 ptLightViewSpace = vec3(u_mat4View * lights[i].m_ptOrigin);
-		DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
+		vec3 ptLightViewSpace = vec3(u_mat4View * vec4(lights[i].m_ptOrigin.xyz, 1.0f));
+		//DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
+
+		vec3 vLightDirectionView = ptLightViewSpace.xyz - vertViewSpace.xyz;
+		DataOut.directionLight[i] = normalize(DataOut.TangentBitangentNormalMatrix * vLightDirectionView);
 		DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
 	}
 
@@ -90,8 +90,6 @@ void main(void) {
 	DataOut.vertViewSpace = vertViewSpace;
 	DataOut.normal = vec4ModelNormal;
 	DataOut.uvCoord = inV_vec2UVCoord;
-
-	
 
 	// Vert Color
 	DataOut.color = inV_vec4Color;

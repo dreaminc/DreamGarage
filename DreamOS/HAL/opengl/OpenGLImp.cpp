@@ -633,7 +633,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	light *pLight = NULL; 
 
 	///*
-	pLight = new light(LIGHT_POINT, 1.0f, point(2.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
@@ -657,7 +657,8 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	//*/
 
 	///*
-	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg");
+	//texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg");
+	texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
 	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg");
 	//*/
 	
@@ -670,9 +671,9 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
 	//*/
 
-	///*
+	/*
 	OGLVolume *pVolume = NULL;
-	int num = 1;
+	int num = 10;
 	double size = 0.5f;
 	int spaceFactor = 2;
 
@@ -694,9 +695,9 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	}
 	//*/
 
-	/*
+	///*
 	OGLSphere *pSphere = NULL;
-	int num = 2;
+	int num = 10;
 	int sects = 20;
 	double radius = 0.5f;
 	double size = radius * 2;
