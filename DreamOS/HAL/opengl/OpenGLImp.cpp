@@ -680,7 +680,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//*/
 
 
-	///*
+	/*
 	OGLVolume *pVolume = NULL;
 	int num = 10;
 	double size = 0.5f;
@@ -699,13 +699,13 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 				static_cast<point_precision>(j * (size * 2) - (num * size)));
 
 			pVolume->UpdateOGLBuffers();
-			pTimeManager->RegisterSubscriber(TIME_ELAPSED, pVolume);
+			//pTimeManager->RegisterSubscriber(TIME_ELAPSED, pVolume);
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
 	//*/
 		
-	/*
+	///*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 	

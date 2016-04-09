@@ -55,17 +55,17 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 
 			// Read as vertex/uv/normal format
 			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d\n",
-										&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0],
+										&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
 										&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
-										&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2]);
+										&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]);
 
 			if (num_matches != 9) {
 
 				// Read as vertex//normal format
 				num_matches = std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d\n",
-										&newPositionIndices[0], &newNormalIndices[0],
+										&newPositionIndices[2], &newNormalIndices[2],
 										&newPositionIndices[1], &newNormalIndices[1],
-										&newPositionIndices[2], &newNormalIndices[2]);
+										&newPositionIndices[0], &newNormalIndices[0]);
 
 				if (num_matches != 6) {
 					// Cannot read face format.

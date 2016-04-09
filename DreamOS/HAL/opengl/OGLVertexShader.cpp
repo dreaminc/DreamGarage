@@ -15,8 +15,10 @@ RESULT OGLVertexShader::BindAttributes() {
 	WCRM(m_pParentImp->BindAttribLocation(GetTangentIndex(), (char*)GetTangentAttributeName()), "Failed to bind %s to tangent attribute", GetTangentAttributeName());
 	WCRM(m_pParentImp->BindAttribLocation(GetBitangentIndex(), (char*)GetBitangentAttributeName()), "Failed to bind %s to bitangent attribute", GetBitangentAttributeName());
 
-	CRM(m_pParentImp->BindAttribLocation(GetPositionIndex(), (char*)GetPositionAttributeName()), "Failed to bind %s to position attribute", GetPositionAttributeName());
-	CRM(m_pParentImp->BindAttribLocation(GetColorIndex(), (char*)GetColorAttributeName()), "Failed to bind %s to color attribute", GetColorAttributeName());
+	WCRM(m_pParentImp->BindAttribLocation(GetPositionIndex(), (char*)GetPositionAttributeName()), "Failed to bind %s to position attribute", GetPositionAttributeName());
+	WCRM(m_pParentImp->BindAttribLocation(GetColorIndex(), (char*)GetColorAttributeName()), "Failed to bind %s to color attribute", GetColorAttributeName());
+
+	r = R_PASS;
 
 Error:
 	return r;

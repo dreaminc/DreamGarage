@@ -8,7 +8,7 @@
 // Point Primitive Object derived from matrix
 
 #include "matrix.h"
-#include "vector.h"
+//#include "vector.h"
 
 class point;
 class vector;
@@ -105,15 +105,7 @@ public:
 	}
 	*/
 
-	friend vector operator-(point &lhs, point &rhs) {
-		vector rtv;
-
-		rtv.x(rhs.x() - lhs.x());
-		rtv.y(rhs.y() - lhs.y());
-		rtv.z(rhs.z() - lhs.z());
-
-		return rtv;
-	}
+	friend vector operator-(point &lhs, point &rhs);
 
 	// Explicitly specializing the assignment operator
 	point& operator=(const matrix<point_precision, 4, 1> &arg) {
