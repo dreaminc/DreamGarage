@@ -206,29 +206,12 @@ public:
 		deltaUV1 = pV2->GetUV() - pV1->GetUV();
 		deltaUV2 = pV3->GetUV() - pV1->GetUV();
 
-		factor = 1.0f / ( (deltaUV1.u() * deltaUV2.v()) - (deltaUV1.v() * deltaUV2.u()) );
+		factor = -1.0f / ( (deltaUV1.u() * deltaUV2.v()) - (deltaUV1.v() * deltaUV2.u()) );
 
-		/*
-		tangent = vector();
-		tangent.x() = factor * ( (deltaUV2.v() * edge1.x()) - (deltaUV1.v() * edge2.x()) );
-		tangent.y() = factor * ( (deltaUV2.v() * edge1.y()) - (deltaUV1.v() * edge2.y()) );
-		tangent.z() = factor * ( (deltaUV2.v() * edge1.z()) - (deltaUV1.v() * edge2.z()) );
-		//*/
-		///*
 		tangent = factor * ((deltaPos1 * deltaUV2.v()) - (deltaPos2 * deltaUV1.v()));
-		//*/
 		tangent.Normalize();
 
-		/*
-		bitangent = vector();
-		bitangent.x() = factor * ((-deltaUV2.u() * edge1.x()) + (deltaUV1.u() * edge2.x()));
-		bitangent.y() = factor * ((-deltaUV2.u() * edge1.y()) + (deltaUV1.u() * edge2.y()));
-		bitangent.z() = factor * ((-deltaUV2.u() * edge1.z()) + (deltaUV1.u() * edge2.z()));
-		//*/
-
-		///*
 		bitangent = factor * ((deltaPos2 * deltaUV1.u()) - (deltaPos1 * deltaUV2.u()));
-		//*/
 		bitangent.Normalize();
 
 		pV1->SetTangentBitangent(tangent, bitangent);

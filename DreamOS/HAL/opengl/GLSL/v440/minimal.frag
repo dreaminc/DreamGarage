@@ -88,16 +88,12 @@ void main(void) {
 	//TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
 
 	for(int i = 0; i < numLights; i++) {
-		//vec3 lightDirection = normalize(DataIn.TangentBitangentNormalMatrix * DataIn.directionLight[i]);
-
-		//CalculateFragmentLightValue(lights[i].m_power, normalize(DataIn.normal.xyz), normalize(DataIn.directionLight[i]), DataIn.distanceLight[i], diffuseValue, specularValue);
-		CalculateFragmentLightValue(lights[i].m_power, TBNNormal, normalize(DataIn.directionLight[i]), DataIn.distanceLight[i], diffuseValue, specularValue);
-		//CalculateFragmentLightValue(lights[i].m_power, TBNNormal, lightDirection, DataIn.distanceLight[i], diffuseValue, specularValue);
-		//CalculateFragmentLightValue(lights[i], DataIn.vertWorldSpace, TBNNormal, normalize(DataIn.directionLight[i]), DataIn.distanceLight[i], diffuseValue, specularValue);
-		//CalculateFragmentLightValue(lights[i], DataIn.vertWorldSpace, normalize(DataIn.normal.xyz), lightDirection, DataIn.distanceLight[i], diffuseValue, specularValue);
-
-		vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
-		vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
+		vec3 directionLight = normalize(DataIn.directionLight[i]);
+		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
+			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, DataIn.distanceLight[i], diffuseValue, specularValue);
+			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
+			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
+		}
 	}
 	vec4LightValue[3] = 1.0f;
 	

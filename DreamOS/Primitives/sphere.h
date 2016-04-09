@@ -32,19 +32,17 @@ public:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() {
-		return (m_numVerticalDivisions - 2) * (m_numAngularDivisions + 1) + 2;
+	inline int NumberVertices() override {
+		int numVertsPerStrip = m_numAngularDivisions + 1;
+		int numStrips = m_numVerticalDivisions;
+		return (numStrips) * (numVertsPerStrip);
 	}
 
-	inline int NumberIndices() {
-
-		int numFanVerts = m_numAngularDivisions + 2;
+	inline int NumberIndices() override {
 		int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
-		int numStrips = m_numVerticalDivisions - 3;
+		int numStrips = m_numVerticalDivisions;
 
-		int numIndices = (numFanVerts * 2) + (numTriangleStripVerts * numStrips);
-
-		return numIndices;
+		return (numTriangleStripVerts * numStrips);
 	}
 
 	sphere(double radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS) :
@@ -60,34 +58,32 @@ public:
 		CR(Allocate());
 
 		// Vertices 
+		int numStrips = m_numVerticalDivisions;
+		int numStripDivs = (m_numAngularDivisions + 1);
+		int vertCount = 0;
+		float thetaDiv = ((2.0f * M_PI) / static_cast<float>(m_numAngularDivisions - 1));
+		float psiDiv = ((1.0f * M_PI) / static_cast<float>(m_numVerticalDivisions - 1));
 
-		// Top vertex
-		m_pVertices[0] = vertex(point(0.0f, radius, 0.0f), vector(0.0f, 1.0f, 0.0f), uvcoord(1.0f, 0.0f));
-		m_pVertices[0].SetTangentBitangent(vector(1.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, 1.0f));
-
-		int vertCount = 1;
-		float thetaDiv = ((2.0f * M_PI) / (float)m_numAngularDivisions);
-		float psiDiv = ((1.0f * M_PI) / (float)(m_numVerticalDivisions));
-
-		for (int i = 1; i < (m_numVerticalDivisions - 1); i++) {
-			float effPsi = psiDiv * (float)(i);
+		for (int i = 0; i < numStrips; i++) {
+			float effPsi = psiDiv * static_cast<float>(i);
 			point_precision sphereY = radius * cos(effPsi);
 			point_precision effRadius = radius * sin(effPsi);
 
-			for (int j = 0; j < (m_numAngularDivisions + 1); j++) {
-				float effTheta = thetaDiv * (float)(j);
+			for (int j = 0; j < numStripDivs; j++) {
+				float effTheta = thetaDiv * static_cast<float>(j);
 				point_precision sphereX = effRadius * sin(effTheta);
 				point_precision sphereZ = effRadius * cos(effTheta);
 
-				uv_precision u = 0.5f + ((atan2(cos(effTheta), sin(effTheta)))) / (2.0f * M_PI);
+				uv_precision u = 0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) / (2.0f * M_PI);
+				//uv_precision u = 0.5f + ((atan2(sin(effTheta), cos(effTheta)))) / (2.0f * M_PI);
+				if (j == (numStripDivs - 1))
+					u += 1.0f;
 				uv_precision v = 0.5f - ((asin(cos(effPsi)))) / (M_PI);
-
-				if (u >= 1) u = 1.0f;
-				if (v >= 1) v = 0.99f;
 
 				vector n = vector(sphereX, sphereY, sphereZ).Normal();
 				m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));
 
+				// TODO: Fix Sphere BTN
 				vector b(n.x(), -n.y(), n.z());
 				vector t;
 				if (effPsi < M_PI / 2) {
@@ -100,50 +96,34 @@ public:
 					b = vector(0.0f, -1.0f, 0.0f);
 					t = n.cross(b);
 				}
-				m_pVertices[vertCount].SetTangentBitangent(t.Normal(), b.Normal());
 
+				//t = RotationMatrix(RotationMatrix::X_AXIS, effPsi) * RotationMatrix(RotationMatrix::Y_AXIS, effTheta) * vector::iVector();
+				//b = n.cross(t);
+				
+				m_pVertices[vertCount].SetTangentBitangent(t.Normal(), b.Normal());
+				
 				vertCount++;
 			}
 		}
 
-		// Bottom vertex
-		m_pVertices[NumberVertices() - 1] = vertex(point(0.0f, -radius, 0.0f), vector(0.0f, -1.0f, 0.0f), uvcoord(1.0f, 1.0f));
-		m_pVertices[NumberVertices() - 1].SetTangentBitangent(vector(-1.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
-
 		// Indices
-		// Top Triangle Fan
 		int indexCount = 0;
-
-		for (int i = 0; i < m_numAngularDivisions + 1; i++)
-			m_pIndices[indexCount++] = i;
-		m_pIndices[indexCount++] = 1;
-
-		// Strips
-		int numStrips = m_numVerticalDivisions - 3;
-		int indexStripTop, indexStripBottom, bottomCount, topCount;
+		int indexStripTop, indexStripBottom;
 
 		for (int i = 0; i < numStrips; i++) {
-			indexStripTop = 1 + (i * (m_numAngularDivisions + 1));
-			indexStripBottom = 1 + ((i + 1) * (m_numAngularDivisions + 1));
-			topCount = indexStripTop;
-			bottomCount = indexStripBottom;
+			
+			indexStripTop = (i * numStripDivs);
+			indexStripBottom = ((i + 1) * numStripDivs);
 
-			for (int j = 0; j < (m_numAngularDivisions + 1) * 2; j++) {
+			for (int j = 0; j < (numStripDivs) * 2; j++) {
 				if (j % 2 == 0)
-					m_pIndices[indexCount++] = topCount++;
+					m_pIndices[indexCount] = indexStripTop++;
 				else
-					m_pIndices[indexCount++] = bottomCount++;
+					m_pIndices[indexCount] = indexStripBottom++;
+
+				indexCount++;
 			}
-
-			//m_pIndices[indexCount++] = indexStripTop;
-			//m_pIndices[indexCount++] = indexStripBottom;
 		}
-
-		// Bottom Triangle Fan
-		m_pIndices[indexCount++] = NumberVertices() - 1;
-		for (int i = 0; i < m_numAngularDivisions; i++)
-			m_pIndices[indexCount++] = NumberVertices() - 2 - i;
-		m_pIndices[indexCount++] = NumberVertices() - 2;
 
 		Validate();
 		return;

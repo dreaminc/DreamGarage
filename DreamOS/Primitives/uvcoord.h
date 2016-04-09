@@ -34,6 +34,17 @@ public:
 		// empty
 	}
 
+	inline RESULT Clamp(uv_precision low = 0.0f, uv_precision high = 1.0f) {
+		for (int i = 0; i < 2; i++) {
+			if (this->element(i, 0) > high)
+				this->element(i, 0) = high;
+			else if (this->element(i, 0) < low)
+				this->element(i, 0) = low;
+		}
+
+			return R_PASS;
+	}
+
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline uv_precision &u() { return this->element(0, 0); }
 	inline uv_precision &v() { return this->element(1, 0); }

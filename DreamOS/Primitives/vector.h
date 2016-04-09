@@ -22,6 +22,14 @@ public:
 		clear();
 	}
 
+	vector(matrix <vector_precision, 4, 1> &rhs) {
+		this->clear();
+		this->element(0, 0) = rhs.element(0, 0);
+		this->element(1, 0) = rhs.element(1, 0);
+		this->element(2, 0) = rhs.element(2, 0);
+		this->element(3, 0) = 1.0f;
+	}
+
 	vector(vector_precision x, vector_precision y, vector_precision z) {
 		this->clear();
 		this->element(0, 0) = x;
@@ -63,14 +71,16 @@ public:
 	RESULT Normalize() {
 		vector_precision denom = 0;
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 3; i++)
 			denom += static_cast<vector_precision>(pow(element(i, 0), 2));
 
 		denom = static_cast<vector_precision>(denom);
 		denom = sqrt(denom);
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < 3; i++)
 			element(i, 0) = element(i, 0) / denom;
+
+		element(3, 0) = 1.0f;
 
 		return R_PASS;
 	}

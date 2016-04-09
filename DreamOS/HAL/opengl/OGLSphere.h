@@ -110,27 +110,32 @@ public:
 		/*
 		int numVerts = pDimObj->NumberVertices();
 		glDrawArrays(GL_POINTS, 0, numVerts);
+		return r;
 		//*/
 		
+		
+		//void *pOffset = (void*)(sizeof(dimindex) * indexCount);
 
 		// Top Fan
-		///*
-		int indexCount = 0;
-		void *pOffset = (void*)(sizeof(dimindex) * indexCount);
+		/*
 		int numFanVerts = m_numAngularDivisions + 2;
 		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
 		indexCount += numFanVerts;
+		*/
 		
 		// Strips
+		int indexCount = 0;
 		int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
-		int numStrips = m_numVerticalDivisions - 3;
+		int numStrips = m_numVerticalDivisions - 1;
+		//numStrips = 2;
 
 		for (int i = 0; i < numStrips; i++) {
-			pOffset = (void*)(sizeof(dimindex) * indexCount);
+			void *pOffset = (void*)(sizeof(dimindex) * indexCount);
 			glDrawElements(GL_TRIANGLE_STRIP, numTriangleStripVerts, GL_UNSIGNED_INT, pOffset);
 			indexCount += numTriangleStripVerts;
 		}
 		
+		/*
 		// Bottom Fan
 		pOffset = (void*)(sizeof(dimindex) * indexCount);
 		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);

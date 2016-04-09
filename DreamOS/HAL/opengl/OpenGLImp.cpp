@@ -657,8 +657,8 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	//*/
 
 	///*
-	//texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg");
-	texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
+	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg");
+	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
 	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg");
 	//*/
 	
