@@ -17,8 +17,13 @@
 #include "OGLVertexShader.h"
 #include "OGLFragmentShader.h"
 
+#include "TimeManager/TimeManager.h"
+
+//#include "Primitives/camera.h"
+
 #include "Primitives/valid.h"
 #include "Primitives/version.h"
+
 #include "Primitives/stereocamera.h"
 
 #include "OpenGLExtensions.h"
@@ -77,7 +82,7 @@ public:
 	RESULT UpdateCamera();
 	RESULT SetCameraMatrix(EYE_TYPE viewTarget);
 
-	RESULT LoadScene(SceneGraph *pSceneGraph);
+	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();
@@ -101,9 +106,13 @@ private:
 	RESULT Notify(SenseMouseEvent *mEvent);
 
 public:
+	// TODO: [SHADER] This should be baked into Shader
 	RESULT EnableVertexPositionAttribute();
 	RESULT EnableVertexColorAttribute();
 	RESULT EnableVertexNormalAttribute();
+	RESULT EnableVertexUVCoordAttribute();
+	RESULT EnableVertexTangentAttribute();
+	RESULT EnableVertexBitangentAttribute();
 
 // TODO: Unify access to extensions
 public:
@@ -128,7 +137,7 @@ public:
 	RESULT glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
 	RESULT glBindAttribLocation(GLuint program, GLuint index, const GLchar *name);
 
-	RESULT BindAttribLocation(unsigned int index, char* pszName);
+	RESULT BindAttribLocation(GLint index, char* pszName);
 
 	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
 	RESULT BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex);
@@ -137,6 +146,7 @@ public:
 
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
+	RESULT glUniform1i(GLint location, GLint v0);
 	RESULT glUniform4fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 
@@ -151,6 +161,18 @@ public:
 	RESULT CompileShader(GLuint shaderID);
 	RESULT GetShaderiv(GLuint programID, GLenum pname, GLint *params);
 	RESULT GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+
+	// Textures
+	RESULT GenerateTextures(GLsizei n, GLuint *textures);
+	RESULT glActiveTexture(GLenum texture);
+	RESULT glBindTextures(GLuint first, GLsizei count, const GLuint *textures);
+	RESULT BindTexture(GLenum target, GLuint texture);
+	RESULT glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height);
+	//RESULT glTexParamteri(GLenum target, GLenum pname, GLint param);
+	RESULT TexParamteri(GLenum target, GLenum pname, GLint param);
+	//RESULT glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+	RESULT TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
+	RESULT TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
 
 // Extension Mappings
 private:

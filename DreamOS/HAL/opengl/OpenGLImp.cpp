@@ -5,6 +5,9 @@
 #include "Primitives/TranslationMatrix.h"
 #include "Primitives/RotationMatrix.h"
 
+#include "../DreamOS/Sandbox/FileLoader.h"
+#include <vector>
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
 	m_versionOGL(0),
@@ -85,7 +88,7 @@ RESULT OpenGLImp::InitializeGLContext() {
 	CRM(m_pOpenGLRenderingContext->InitializeRenderingContext(), "Failed to initialize oglrc");
 	CR(InitializeOpenGLVersion());
 	//CBM((m_versionMajor >= 3 || (m_versionMajor == 3 && m_versionMinor >= 2)), "OpenGL 3.2 + Not Supported");
-	CBM((m_versionOGL >= 3.2), "OpengL 3.2+ Not Supported");
+	CBM((m_versionOGL >= 3.2f), "OpengL 3.2+ Not Supported");
 
 	//CR(InitializeShadersFolder());
 
@@ -119,8 +122,6 @@ Error:
 
 RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
 	RESULT r = R_PASS;
-	GLint param;
-	GLint numShaders;
 	GLenum glerr = GL_NO_ERROR;
 
 	OpenGLShader *&pOGLShader = (OpenGLShader *&)(this->m_pVertexShader);
@@ -164,6 +165,8 @@ RESULT OpenGLImp::EnableVertexPositionAttribute() {
 		m_pVertexShader->EnableVertexPositionAttribute();
 	else
 		return R_FAIL;
+
+	return R_PASS;
 }
 
 RESULT OpenGLImp::EnableVertexColorAttribute() {
@@ -171,6 +174,8 @@ RESULT OpenGLImp::EnableVertexColorAttribute() {
 		m_pVertexShader->EnableVertexColorAttribute();
 	else
 		return R_FAIL;
+
+	return R_PASS;
 }
 
 RESULT OpenGLImp::EnableVertexNormalAttribute() {
@@ -180,9 +185,29 @@ RESULT OpenGLImp::EnableVertexNormalAttribute() {
 		return R_FAIL;
 }
 
-RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
+RESULT OpenGLImp::EnableVertexUVCoordAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableUVCoordAttribute();
+	else
+		return R_FAIL;
+}
+
+RESULT OpenGLImp::EnableVertexTangentAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableTangentAttribute();
+	else
+		return R_FAIL;
+}
+
+RESULT OpenGLImp::EnableVertexBitangentAttribute() {
+	if (m_pVertexShader != NULL)
+		m_pVertexShader->EnableBitangentAttribute();
+	else
+		return R_FAIL;
+}
+
+RESULT OpenGLImp::BindAttribLocation(GLint index, char* pszName) {
 	RESULT r = R_PASS;
-	GLenum glerr;
 	DWORD werr;
 
 	CR(glBindAttribLocation(m_idOpenGLProgram, index, pszName));
@@ -340,6 +365,7 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
 }
 
+// TODO: This should be moved to OpenGL Program arch/design
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -409,7 +435,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pCamera);
 
 	// TODO:  Currently using a global material 
-	m_pFragmentShader->SetMaterial(&material(100.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	m_pFragmentShader->SetMaterial(&material(160.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -453,7 +479,6 @@ RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 
 	m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight);
 
-Error:
 	return r;
 }
 
@@ -515,7 +540,6 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	}
 	*/
 
-Error:
 	return r;
 }
 
@@ -529,7 +553,8 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 
 	switch (mEvent->EventType) {
 		case SENSE_MOUSE_MOVE: {
-			CR(m_pCamera->RotateCameraByDiffXY(mEvent->dx, mEvent->dy));
+			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx), 
+				static_cast<camera_precision>(mEvent->dy)));
 		} break;
 
 		case SENSE_MOUSE_LEFT_BUTTON: {
@@ -558,6 +583,8 @@ inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 	//*/
 
+	m_pFragmentShader->SetObjectTextures(pOGLObj);
+
 	return pOGLObj->Render();
 }
 
@@ -576,7 +603,6 @@ RESULT OpenGLImp::UpdateCamera() {
 
 	m_pCamera->UpdateCameraPosition();
 
-Error:
 	return r;
 }
 
@@ -596,24 +622,30 @@ Error:
 }
 
 #include "OGLVolume.h"
+
+#include "OGLModel.h"
+#include "OGLTriangle.h"
+#include "Sandbox/PathManager.h"
+
 #include "OGLSphere.h"
 #include "Primitives/light.h"
+#include "OGLTexture.h"
 
 light *g_pLight = NULL;
 
 // TODO: Other approach 
-RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
+RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
 	RESULT r = R_PASS;
 
 	// Add lights
 	light *pLight = NULL; 
 
-	/*
+	///*
 	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
-	///*
+	/*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
 	pLight = new light(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
@@ -626,28 +658,75 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	//*/
 
 	g_pLight = pLight;
+	
+	/*
+	texture *pBumpTexture = new OGLTexture(this, L"crate_bump.png");
+	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
+	//*/
+
+	///*
+	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg");
+	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
+	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg");
+	//*/
+	
+	
+	/*
+	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
+	pVolume->SetColorTexture(pColorTexture);
+	pVolume->SetBumpTexture(pBumpTexture);
+	pSceneGraph->PushObject(pVolume);
+	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
+	//*/
+
 
 	/*
 	OGLVolume *pVolume = NULL;
-	int num = 20;
+	int num = 10;
 	double size = 0.5f;
 	int spaceFactor = 2;
 
 	for (int i = 0; i < num; i++) {
 		for (int j = 0; j < num; j++) {
 			pVolume = new OGLVolume(this, size);
+
+			pVolume->SetColorTexture(pColorTexture);
+			pVolume->SetBumpTexture(pBumpTexture);
+
 			//pVolume->SetRandomColor();
-			pVolume->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
+			pVolume->translate(static_cast<point_precision>(i * (size * 2) - (num * size)), 
+				static_cast<point_precision>(0.0f),
+				static_cast<point_precision>(j * (size * 2) - (num * size)));
+
 			pVolume->UpdateOGLBuffers();
+			//pTimeManager->RegisterSubscriber(TIME_ELAPSED, pVolume);
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
 	//*/
-
+		
 	///*
+	// TODO: All this should go into Model
+	std::vector<vertex> v;
+	
+	// TODO: Should move to using path manager
+	PathManager* pMgr = PathManager::instance();
+	wchar_t*	path;
+	pMgr->GetCurrentPath((wchar_t*&)path);
+	std::wstring objFile(path);
+
+	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\car.obj", v);
+	OGLModel* pModel = new OGLModel(this, v);
+	//pModel->SetRandomColor();
+	pModel->UpdateOGLBuffers();
+	pSceneGraph->PushObject(pModel);
+	//*/
+
+	/*
 	OGLSphere *pSphere = NULL;
-	int num = 20;
-	int sects = 20;
+
+	int num = 10;
+	int sects = 40;
 	double radius = 0.5f;
 	double size = radius * 2;
 	int spaceFactor = 4;
@@ -655,15 +734,19 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	for (int i = 0; i < num; i++) {
 		for (int j = 0; j < num; j++) {
 			pSphere = new OGLSphere(this, radius, sects, sects);
+
+			pSphere->SetColorTexture(pColorTexture);
+			pSphere->SetBumpTexture(pBumpTexture);
+
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
 			pSphere->UpdateOGLBuffers();
+			//pTimeManager->RegisterSubscriber(TIME_ELAPSED, pSphere);
 			pSceneGraph->PushObject(pSphere);
 		}
 	}
 	//*/
 
-Error:
 	return r;
 }
 
@@ -691,7 +774,6 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	
 	glFlush();
 
-Error:
 	CheckGLError();
 	return r;
 }
@@ -772,7 +854,6 @@ RESULT OpenGLImp::ShutdownImplementaiton() {
 		m_pOpenGLRenderingContext = NULL;
 	}
 
-Error:
 	return r;
 }
 
@@ -939,6 +1020,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glUniform1i(GLint location, GLint v0) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUniform1i(location, v0);
+	CRM(CheckGLError(), "glUniform1i failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
 	RESULT r = R_PASS;
 
@@ -1022,8 +1113,6 @@ Error:
 	return r;
 }
 
-
-
 RESULT OpenGLImp::glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
 	RESULT r = R_PASS;
 
@@ -1049,6 +1138,90 @@ RESULT OpenGLImp::glVertexAttribPointer(GLuint index, GLint size, GLenum type, G
 
 	m_OpenGLExtensions.glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 	CRM(CheckGLError(), "glVertexAttribPointer failed");
+
+Error:
+	return r;
+}
+
+// Textures
+RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *textures) {
+	RESULT r = R_PASS;
+
+	//m_OpenGLExtensions.glGenTextures(n, textures);
+	glGenTextures(n, textures);
+	CRM(CheckGLError(), "glGenTextures failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glActiveTexture(GLenum texture) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glActiveTexture(texture);
+	CRM(CheckGLError(), "glActiveTexture failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBindTextures(GLuint first, GLsizei count, const GLuint *textures) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBindTextures(first, count, textures);
+	CRM(CheckGLError(), "glBindTextures failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::BindTexture(GLenum target, GLuint texture) {
+	RESULT r = R_PASS;
+
+	glBindTexture(target, texture);
+	CRM(CheckGLError(), "glBindTexture failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glTextStorage2D(target, levels, internalformat, width, height);
+	CRM(CheckGLError(), "glTexStorage2D failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::TexParamteri(GLenum target, GLenum pname, GLint param) {
+	RESULT r = R_PASS;
+
+	//m_OpenGLExtensions.glTexParamteri(target, pname, param);
+	glTexParameteri(target, pname, param);
+	CRM(CheckGLError(), "glTexParameteri failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
+	RESULT r = R_PASS;
+
+	//m_OpenGLExtensions.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+	glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+	CRM(CheckGLError(), "glTexImage2D failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
+	RESULT r = R_PASS;
+
+	glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+	CRM(CheckGLError(), "glTexSubImage2D failed");
 
 Error:
 	return r;

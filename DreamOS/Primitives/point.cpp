@@ -1,4 +1,5 @@
 #include "point.h"
+#include "vector.h"
 
 vector operator-(point &lhs, point &rhs) {
 	vector rtv;

@@ -9,39 +9,41 @@
 
 #include "valid.h"
 #include "Types/UID.h"
-#include "Sandbox/PathManager.h"
 
 class texture : public valid {
 public:
-	texture(wchar_t *pszFilename) {
-		RESULT r = R_PASS;
-		
-		// TODO: Load the texture
-		CR(LoadTextureFromFile(pszFilename);
+	// The texture type and channel
+	enum class TEXTURE_TYPE {
+		TEXTURE_COLOR = 0,
+		TEXTURE_BUMP = 1,
+		TEXTURE_INVALID = 32
+	};
 
-		Validate();
-		return;
+public:
+	texture();
+	texture(wchar_t *pszFilename);
+	~texture();
 
-	Error:
-		Invalidate();
-		return;
-	}
+	// TODO: There's a redundancy with number/type that should be resolved
+	RESULT SetTextureType(texture::TEXTURE_TYPE textureType);
+	int GetTextureNumber();
+	texture::TEXTURE_TYPE GetTextureType();
+	RESULT SetTextureNumber(int texNum);
 
-	RESULT LoadTextureFromFile(wchar_t *pszFilename) {
-		RESULT r = R_PASS;
+	RESULT GetTextureFilePath(const wchar_t *pszFilename, wchar_t * &n_pszFilePath);
+	RESULT FlipTextureVertical();
+	RESULT ReleaseTextureData();
+	RESULT LoadTextureFromPath(wchar_t *pszFilepath);
+	RESULT LoadTextureFromFile(wchar_t *pszFilename);
 
-		// TODO: Solve this
-		PathManager *pPathManager = PathManager::instance();
-		wchar_t *pFilePath = NULL;
+protected:
+	int m_width;
+	int m_height;
+	int m_channels;
 
-		// TODO: Move to key based file paths
-		CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
+	unsigned char *m_pImageBuffer;
 
-		// Load file
-
-	Error:
-		return r;
-	}
+	int m_textureNumber;
 
 private:
 	UID m_uid;

@@ -24,7 +24,6 @@ RESULT Win64PathManager::Dealloc() {
 
 	// Empty for now
 
-Error:
 	return r;
 }
 
@@ -112,7 +111,6 @@ RESULT Win64PathManager::UpdateCurrentPath() {
 	DWORD dwReturn = GetCurrentDirectory(MAX_PATH, m_pszCurDirectiory);
 	DEBUG_LINEOUT("Current directory %S", m_pszCurDirectiory);
 
-Error:
 	return r;
 }
 
@@ -165,7 +163,6 @@ RESULT Win64PathManager::PrintPaths() {
 	DEBUG_LINEOUT("Current directory %S", m_pszCurDirectiory);
 	DEBUG_LINEOUT("Dream Root Path %S", m_pszDreamRootPath);
 
-Error:
 	return r;
 }
 
@@ -183,7 +180,7 @@ RESULT Win64PathManager::GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::l
 	int i = 0;
 
 	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
-	pszValuePath_n = wcslen(pszValuePath);
+	pszValuePath_n = static_cast<long>(wcslen(pszValuePath));
 	CRM(DoesPathExist(pszValuePath), "Path %S does not exist", pszValuePath);
 	CBM((r == R_DIRECTORY_FOUND), "Invalid return from DoesPathExist");
 
@@ -203,7 +200,7 @@ RESULT Win64PathManager::GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::l
 	do {
 		if (fileFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
 			if (wcscmp(L".", fileFindData.cFileName) != 0 && wcscmp(L"..", fileFindData.cFileName) != 0) {
-				long pszFoundDir_n = wcslen(fileFindData.cFileName) + 1;
+				long pszFoundDir_n = static_cast<long>(wcslen(fileFindData.cFileName) + 1);
 				wchar_t *pszFoundDir = new wchar_t[pszFoundDir_n];
 				
 				memset(pszFoundDir, 0, sizeof(wchar_t) * pszFoundDir_n);

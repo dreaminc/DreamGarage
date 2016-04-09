@@ -6,10 +6,6 @@ Win64OpenGLRenderingContext::Win64OpenGLRenderingContext() {
 
 	Validate();
 	return;
-
-Error:
-	Invalidate();
-	return;
 }
 
 Win64OpenGLRenderingContext::~Win64OpenGLRenderingContext() {

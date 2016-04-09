@@ -135,6 +135,27 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glGetShaderiv = (PFNGLGETSHADERIVPROC)wglGetProcAddress("glGetShaderiv")),
 		"Failed to initialize glGetShaderiv extension");
 
+	// Textures
+	/*
+	CNMW((m_glGenTextures = (PFNGLGENTEXTURESPROC)wglGetProcAddress("glGenTextures")),
+		"Failed to initialize glGenTextures extension");
+	*/
+
+	CNMW((m_glActiveTexture = (PFNGLACTIVETEXTUREPROC)wglGetProcAddress("glActiveTexture")),
+		"Failed to initialize glActiveTexture extension");
+	
+	CNMW((m_glBindTextures = (PFNGLBINDTEXTURESPROC)wglGetProcAddress("glBindTextures")),
+		"Failed to initialize glBindTextures extension");
+
+	CNMW((m_glTexStorage2D = (PFNGLTEXSTORAGE2DPROC)wglGetProcAddress("glTexStorage2D")),
+		"Failed to initialize glTexStorage2D extension");
+
+	CNMW((m_glTexParameteri = (PFNGLTEXPARAMETERIPROC)wglGetProcAddress("glTexParameteri")),
+		"Failed to initialize glTexParameteri extension");
+
+	CNMW((m_glTexImage2D = (PFNGLTEXIMAGE2DPROC)wglGetProcAddress("m_glTexImage2D")),
+		"Failed to initialize m_glTexImage2D extension");
+
 	// VBO
 	CNMW((m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers")),
 		"Failed to initialzie glGenBuffers extension");
@@ -164,6 +185,5 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays")),
 		"Failed to initialize glDeleteVertexArrays extension");
 
-Error:
 	return r;
 }

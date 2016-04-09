@@ -154,6 +154,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
+    <ClCompile Include="..\..\..\External\SOIL\image_DXT.c" />
+    <ClCompile Include="..\..\..\External\SOIL\image_helper.c" />
+    <ClCompile Include="..\..\..\External\SOIL\SOIL.c" />
+    <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
@@ -165,10 +169,12 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\texture.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
@@ -180,12 +186,19 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraph.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp" />
+    <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
+    <ClInclude Include="..\..\..\External\SOIL\image_DXT.h" />
+    <ClInclude Include="..\..\..\External\SOIL\image_helper.h" />
+    <ClInclude Include="..\..\..\External\SOIL\SOIL.h" />
+    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug.h" />
+    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h" />
+    <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h" />
@@ -193,11 +206,13 @@
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
@@ -218,6 +233,7 @@
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
+    <ClInclude Include="..\..\..\Primitives\model.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
     <ClInclude Include="..\..\..\Primitives\sphere.h" />
@@ -237,6 +253,7 @@
     <ClInclude Include="..\..\..\Primitives\Types\Types.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h" />
     <ClInclude Include="..\..\..\Primitives\Types\UID.h" />
+    <ClInclude Include="..\..\..\Primitives\uvcoord.h" />
     <ClInclude Include="..\..\..\Primitives\valid.h" />
     <ClInclude Include="..\..\..\Primitives\vector.h" />
     <ClInclude Include="..\..\..\Primitives\version.h" />
@@ -247,6 +264,7 @@
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
+    <ClInclude Include="..\..\..\Sandbox\FileLoader.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
@@ -263,6 +281,7 @@
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
     <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
+    <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag" />

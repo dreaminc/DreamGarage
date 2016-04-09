@@ -58,7 +58,7 @@ public:
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		double halfSide = side / 2.0f;
+		point_precision halfSide = static_cast<point_precision>(side / 2.0f);
 		int vertCount = 0;
 		int triCount = 0;
 		int TL, TR, BL, BR;
@@ -70,74 +70,105 @@ public:
 
 		///*
 		// Front face
-		m_pVertices[TR = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(0.0f, 0.0f, 1.0f));		// A top left
-		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(0.0f, 0.0f, 1.0f));		// B top right
-		m_pVertices[BR = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(0.0f, 0.0f, 1.0f));		// C bottom left
-		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(0.0f, 0.0f, 1.0f));		// D bottom right
+		m_pVertices[TR = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(0.0f, 0.0f, 1.0f), uvcoord(1.0f, 1.0f));		// A top left
+		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(0.0f, 0.0f, 1.0f), uvcoord(0.0f, 1.0f));		// B top right
+		m_pVertices[BR = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(0.0f, 0.0f, 1.0f), uvcoord(1.0f, 0.0f));		// C bottom left
+		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(0.0f, 0.0f, 1.0f), uvcoord(0.0f, 0.0f));		// D bottom right
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		SetTriangleTangentBitangent(BL, BR, TR);
+
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+		SetTriangleTangentBitangent(TR, TL, BL);
+
+		//SetTriangleTangentBitangent(BL, BR, TR);
+		//SetQuadTangentBitangent(TL, TR, BL, BR);
+		//SetQuadTangentBitangent(TL, TR, BL, BR, vector::jVector(1.0f), vector::iVector(1.0f));
+
 		//*/
 
 		///*
 		// Back face
-		m_pVertices[TL = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f));		// A
-		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f));		// B
-		m_pVertices[BL = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f));		// C
-		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f));		// D
+		m_pVertices[TL = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f), uvcoord(0.0f, 1.0f));		// A
+		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f), uvcoord(1.0f, 1.0f));		// B
+		m_pVertices[BL = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f), uvcoord(0.0f, 0.0f));		// C
+		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(0.0f, 0.0f, -1.0f), uvcoord(1.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		SetTriangleTangentBitangent(BL, BR, TR);
+
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+		SetTriangleTangentBitangent(TR, TL, BL);
+
+		//SetQuadTangentBitangent(TL, TR, BL, BR);
+		//SetQuadTangentBitangent(TL, TR, BL, BR, vector::jVector(1.0f), vector::iVector(-1.0f));
 		//*/
 		
 		///*
 		// Left face
-		m_pVertices[TL = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(1.0f, 0.0f, 0.0f));		// A
-		m_pVertices[TR = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(1.0f, 0.0f, 0.0f));		// B
-		m_pVertices[BL = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(1.0f, 0.0f, 0.0f));		// C
-		m_pVertices[BR = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(1.0f, 0.0f, 0.0f));		// D
+		m_pVertices[TL = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// A
+		m_pVertices[TR = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// B
+		m_pVertices[BL = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// C
+		m_pVertices[BR = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		SetTriangleTangentBitangent(BL, BR, TR);
+
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+		SetTriangleTangentBitangent(TR, TL, BL);
+
+		//SetQuadTangentBitangent(TL, TR, BL, BR);
+		//SetQuadTangentBitangent(TL, TR, BL, BR, vector::jVector(1.0f), vector::kVector(1.0f));
 		//*/
 
 		///*
 		// Right face
-		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(-1.0f, 0.0f, 0.0f));		// A
-		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(-1.0f, 0.0f, 0.0f));		// B
-		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(-1.0f, 0.0f, 0.0f));		// C
-		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(-1.0f, 0.0f, 0.0f));		// D
+		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 1.0f));		// A
+		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 1.0f));		// B
+		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(-1.0f, 0.0f, 0.0f), uvcoord(1.0f, 0.0f));		// C
+		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(-1.0f, 0.0f, 0.0f), uvcoord(0.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		SetTriangleTangentBitangent(BL, BR, TR);
+
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+		SetTriangleTangentBitangent(TR, TL, BL);
+
+		//SetQuadTangentBitangent(TL, TR, BL, BR);
+		//SetQuadTangentBitangent(TL, TR, BL, BR, vector::jVector(1.0f), vector::kVector(-1.0f));
 		//*/
 
 		///*
 		// Top face
-		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(0.0f, 1.0f, 0.0f));		// A
-		m_pVertices[TL = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(0.0f, 1.0f, 0.0f));			// B
-		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(0.0f, 1.0f, 0.0f));		// C
-		m_pVertices[BL = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(0.0f, 1.0f, 0.0f));		// D
+		m_pVertices[TR = vertCount++] = vertex(point(-halfSide, halfSide, halfSide), vector(0.0f, 1.0f, 0.0f), uvcoord(1.0f, 1.0f));		// A
+		m_pVertices[TL = vertCount++] = vertex(point(halfSide, halfSide, halfSide), vector(0.0f, 1.0f, 0.0f), uvcoord(0.0f, 1.0f));			// B
+		m_pVertices[BR = vertCount++] = vertex(point(-halfSide, halfSide, -halfSide), vector(0.0f, 1.0f, 0.0f), uvcoord(1.0f, 0.0f));		// C
+		m_pVertices[BL = vertCount++] = vertex(point(halfSide, halfSide, -halfSide), vector(0.0f, 1.0f, 0.0f), uvcoord(0.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		SetTriangleTangentBitangent(BL, BR, TR);
+
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+		SetTriangleTangentBitangent(TR, TL, BL);
+
+		//SetQuadTangentBitangent(TL, TR, BL, BR);
+		//SetQuadTangentBitangent(TL, TR, BL, BR, vector::jVector(1.0f), vector::iVector(-1.0f));
 		//*/
 
 		///*
 		// Bottom face
-		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(0.0f, -1.0f, 0.0f));		// A
-		m_pVertices[TR = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(0.0f, -1.0f, 0.0f));		// B
-		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(0.0f, -1.0f, 0.0f));		// C
-		m_pVertices[BR = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(0.0f, -1.0f, 0.0f));		// D
+		m_pVertices[TL = vertCount++] = vertex(point(-halfSide, -halfSide, halfSide), vector(0.0f, -1.0f, 0.0f), uvcoord(0.0f, 1.0f));		// A
+		m_pVertices[TR = vertCount++] = vertex(point(halfSide, -halfSide, halfSide), vector(0.0f, -1.0f, 0.0f), uvcoord(1.0f, 1.0f));		// B
+		m_pVertices[BL = vertCount++] = vertex(point(-halfSide, -halfSide, -halfSide), vector(0.0f, -1.0f, 0.0f), uvcoord(0.0f, 0.0f));		// C
+		m_pVertices[BR = vertCount++] = vertex(point(halfSide, -halfSide, -halfSide), vector(0.0f, -1.0f, 0.0f), uvcoord(1.0f, 0.0f));		// D
 
 		pTriIndices[triCount++] = TriangleIndexGroup(BL, BR, TR);
-		//pTriIndices[triCount++] = TriangleIndexGroup(BL, TR, TL);
+		SetTriangleTangentBitangent(BL, BR, TR);
+
 		pTriIndices[triCount++] = TriangleIndexGroup(TR, TL, BL);
+		SetTriangleTangentBitangent(TR, TL, BL);
+
+		//SetQuadTangentBitangent(TL, TR, BL, BR);
 		//*/
 
 		Validate();

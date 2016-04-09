@@ -77,7 +77,17 @@ public:
 		CR(m_pParentImp->EnableVertexNormalAttribute());
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)2, vertex::GetNormalDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetNormalOffset()));
 
-		// TODO: UV Coord
+		// UV Coordinate
+		CR(m_pParentImp->EnableVertexUVCoordAttribute());
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)3, vertex::GetUVCoordDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetUVOffset()));
+
+		// Tangent 
+		CR(m_pParentImp->EnableVertexTangentAttribute());
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)4, vertex::GetTangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetTangentOffset()));
+
+		// Bi-Tangent 
+		CR(m_pParentImp->EnableVertexBitangentAttribute());
+		CR(m_pParentImp->glVertexAttribPointer((GLuint)5, vertex::GetBitangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetBitangentOffset()));
 
 		CR(m_pParentImp->ReleaseCurrentContext());
 
@@ -100,27 +110,32 @@ public:
 		/*
 		int numVerts = pDimObj->NumberVertices();
 		glDrawArrays(GL_POINTS, 0, numVerts);
+		return r;
 		//*/
 		
+		
+		//void *pOffset = (void*)(sizeof(dimindex) * indexCount);
 
 		// Top Fan
-		///*
-		int indexCount = 0;
-		void *pOffset = (void*)(sizeof(dimindex) * indexCount);
+		/*
 		int numFanVerts = m_numAngularDivisions + 2;
 		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
 		indexCount += numFanVerts;
+		*/
 		
 		// Strips
+		int indexCount = 0;
 		int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
-		int numStrips = m_numVerticalDivisions - 3;
+		int numStrips = m_numVerticalDivisions - 1;
+		//numStrips = 2;
 
 		for (int i = 0; i < numStrips; i++) {
-			pOffset = (void*)(sizeof(dimindex) * indexCount);
+			void *pOffset = (void*)(sizeof(dimindex) * indexCount);
 			glDrawElements(GL_TRIANGLE_STRIP, numTriangleStripVerts, GL_UNSIGNED_INT, pOffset);
 			indexCount += numTriangleStripVerts;
 		}
 		
+		/*
 		// Bottom Fan
 		pOffset = (void*)(sizeof(dimindex) * indexCount);
 		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);

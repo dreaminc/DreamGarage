@@ -25,6 +25,7 @@
 #include "matrix.h"
 #include "vector.h"
 #include "point.h"
+#include "uvcoord.h"
 #include "color.h"
 
 // TODO: Port to LinAlgLib (using point etc)
@@ -33,38 +34,64 @@ public:
 	point m_point;
 	color m_color;
 	vector m_normal;
-
-	// TODO: UV coordinate 
+	uvcoord m_uvcoord;
+	vector m_tangent;
+	vector m_bitangent;
+	
 
 public:
 	vertex() {
 		m_point.clear();
 		m_color.clear();
 		m_normal.clear();
+		m_uvcoord.clear();
+		m_tangent.clear();
+		m_bitangent.clear();
 	}
 
 	vertex(point p) {
 		SetPoint(p);
 		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
 		m_normal.clear();
+		m_uvcoord.clear();
+		m_tangent.clear();
+		m_bitangent.clear();
 	}
 
 	vertex(point p, color c) {
 		SetPoint(p);
 		SetColor(c);
 		m_normal.clear();
-	}
-
-	vertex(point p, color c, vector n) {
-		SetPoint(p);
-		SetColor(c);
-		SetNormal(n);
+		m_uvcoord.clear();
+		m_tangent.clear();
+		m_bitangent.clear();
 	}
 
 	vertex(point p, vector n) {
 		SetPoint(p);
 		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
 		SetNormal(n);
+		m_uvcoord.clear();
+		m_tangent.clear();
+		m_bitangent.clear();
+	}
+
+	vertex(point p, color c, vector n) {
+		SetPoint(p);
+		SetColor(c);
+		SetNormal(n);
+		m_uvcoord.clear();
+		m_tangent.clear();
+		m_bitangent.clear();
+	}
+
+	vertex(point p, vector n, uvcoord uv) {
+		SetPoint(p);
+		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
+		SetNormal(n);
+		SetUV(uv);
+		m_tangent.clear();
+		m_bitangent.clear();
 	}
 
 	~vertex() {
@@ -91,6 +118,16 @@ public:
 		return (void*)(offset);
 	}
 
+	static void* GetTangentOffset() {
+		int offset = (int)(GetUVOffset()) + sizeof(uvcoord);
+		return (void*)(offset);
+	}
+
+	static void* GetBitangentOffset() {
+		int offset = (int)(GetTangentOffset()) + sizeof(vector);
+		return (void*)(offset);
+	}
+
 	inline static int GetPointDimensions() {
 		return point::rows();
 	}
@@ -100,6 +137,18 @@ public:
 	}
 
 	inline static int GetNormalDimensions() {
+		return vector::rows();
+	}
+
+	inline static int GetUVCoordDimensions() {
+		return uvcoord::rows();
+	}
+
+	inline static int GetTangentDimensions() {
+		return vector::rows();
+	}
+
+	inline static int GetBitangentDimensions() {
 		return vector::rows();
 	}
 
@@ -113,6 +162,18 @@ public:
 
 	inline vector GetNormal() {
 		return m_normal;
+	}
+
+	inline uvcoord GetUV() {
+		return m_uvcoord;
+	}
+
+	inline vector GetTangent() {
+		return m_tangent;
+	}
+
+	inline vector GetBitangent() {
+		return m_bitangent;
 	}
 
 public:
@@ -153,9 +214,44 @@ public:
 		return R_PASS;
 	}
 
-	//RESULT SetPointW(float x, float y, float z, float w);
 	RESULT SetNormal(vector_precision i, vector_precision j, vector_precision k) {
 		m_normal = vector(i, j, k);
+		return R_PASS;
+	}
+
+	RESULT SetUV(uvcoord uv) {
+		m_uvcoord = uv;
+		return R_PASS;
+	}
+
+	RESULT SetUV(uv_precision u, uv_precision v) {
+		m_uvcoord = uvcoord(u, v);
+		return R_PASS;
+	}
+
+	RESULT SetTangent(vector t) {
+		m_tangent = t;
+		return R_PASS;
+	}
+
+	RESULT SetTangent(vector_precision i, vector_precision j, vector_precision k) {
+		m_tangent = vector(i, j, k);
+		return R_PASS;
+	}
+
+	RESULT SetBitangent(vector b) {
+		m_bitangent = b;
+		return R_PASS;
+	}
+
+	RESULT SetBitangent(vector_precision i, vector_precision j, vector_precision k) {
+		m_bitangent = vector(i, j, k);
+		return R_PASS;
+	}
+
+	RESULT SetTangentBitangent(vector t, vector b) {
+		SetTangent(t);
+		SetBitangent(b);
 		return R_PASS;
 	}
 
@@ -163,6 +259,9 @@ public:
 		m_point = v.GetPoint();
 		m_color = v.GetColor();
 		m_normal = v.GetNormal();
+		m_uvcoord = v.GetUV();
+		m_tangent = v.GetTangent();
+		m_bitangent = v.GetBitangent();
 
 		return R_PASS;
 	}

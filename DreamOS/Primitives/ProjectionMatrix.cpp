@@ -36,11 +36,11 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision width,
 	this->clear();
 
 	projection_precision ratio = width / height;
-	projection_precision top = nearPlane * tan((M_PI / 180.0f) * (angle / 2.0f));
+	projection_precision top = nearPlane * static_cast<projection_precision>(((M_PI / 180.0f) * (angle / 2.0f)));
 	projection_precision bottom = -top;
 	projection_precision right = top * ratio;
 	projection_precision left = -right;
-	projection_precision f = 1.0f / (tan((M_PI / 180.0f) * (angle / 2.0f)));
+	projection_precision f = 1.0f / static_cast<projection_precision>((tan((M_PI / 180.0f) * (angle / 2.0f))));
 
 	/*
 	this->element(0, 0) = f / ratio;
@@ -62,7 +62,6 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision width,
 
 	m_type = PROJECTION_MATRIX_PERSPECTIVE;
 
-Error:
 	return r;
 }
 
@@ -90,7 +89,6 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision width,
 
 	this->element(3, 3) = 1.0f;
 
-Error:
 	return r;
 }
 

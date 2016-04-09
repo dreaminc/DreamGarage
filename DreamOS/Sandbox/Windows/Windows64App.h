@@ -4,6 +4,8 @@
 #include "RESULT/EHM.h"
 #include "Sandbox/SandboxApp.h"
 
+#include "TimeManager/TimeManager.h"
+
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
 // Dream OS Windows 64 Sandbox
@@ -13,8 +15,8 @@
 #include <string.h>
 #include <tchar.h>
 
-#define DEFAULT_WIDTH 1024
-#define DEFAULT_HEIGHT 768
+#define DEFAULT_WIDTH 1920
+#define DEFAULT_HEIGHT 1080
 
 #define DEFAULT_FULLSCREEN false
 
@@ -37,8 +39,8 @@ public:
 	RESULT InitializeOpenGLRenderingContext();
 
 private:
-	static long __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
-	long __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
+	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
+	LRESULT __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
@@ -69,6 +71,8 @@ private:
 private:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	OpenGLImp *m_pOpenGLImp;	
+
+	TimeManager	*m_pTimeManager;
 
 public:
 	Win64Keyboard *m_pWin64Keyboard;
