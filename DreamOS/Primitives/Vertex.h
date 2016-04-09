@@ -67,18 +67,18 @@ public:
 		m_bitangent.clear();
 	}
 
-	vertex(point p, color c, vector n) {
+	vertex(point p, vector n) {
 		SetPoint(p);
-		SetColor(c);
+		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
 		SetNormal(n);
 		m_uvcoord.clear();
 		m_tangent.clear();
 		m_bitangent.clear();
 	}
 
-	vertex(point p, vector n) {
+	vertex(point p, color c, vector n) {
 		SetPoint(p);
-		SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
+		SetColor(c);
 		SetNormal(n);
 		m_uvcoord.clear();
 		m_tangent.clear();

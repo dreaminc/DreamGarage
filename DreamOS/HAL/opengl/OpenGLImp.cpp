@@ -5,6 +5,9 @@
 #include "Primitives/TranslationMatrix.h"
 #include "Primitives/RotationMatrix.h"
 
+#include "../DreamOS/Sandbox/FileLoader.h"
+#include <vector>
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
 	m_versionOGL(0),
@@ -619,6 +622,11 @@ Error:
 }
 
 #include "OGLVolume.h"
+
+#include "OGLModel.h"
+#include "OGLTriangle.h"
+#include "Sandbox/PathManager.h"
+
 #include "OGLSphere.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
@@ -671,8 +679,8 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
 	//*/
 
-	///*
 
+	///*
 	OGLVolume *pVolume = NULL;
 	int num = 10;
 	double size = 0.5f;
@@ -696,9 +704,27 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 		}
 	}
 	//*/
+		
+	/*
+	// TODO: All this should go into Model
+	std::vector<vertex> v;
+	
+	// TODO: Should move to using path manager
+	PathManager* pMgr = PathManager::instance();
+	wchar_t*	path;
+	pMgr->GetCurrentPath((wchar_t*&)path);
+	std::wstring objFile(path);
+
+	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\car.obj", v);
+	OGLModel* pModel = new OGLModel(this, v);
+	//pModel->SetRandomColor();
+	pModel->UpdateOGLBuffers();
+	pSceneGraph->PushObject(pModel);
+	//*/
 
 	/*
 	OGLSphere *pSphere = NULL;
+
 	int num = 10;
 	int sects = 40;
 	double radius = 0.5f;
