@@ -203,7 +203,7 @@ RESULT OpenGLImp::EnableVertexBitangentAttribute() {
 		return R_FAIL;
 }
 
-RESULT OpenGLImp::BindAttribLocation(unsigned int index, char* pszName) {
+RESULT OpenGLImp::BindAttribLocation(GLint index, char* pszName) {
 	RESULT r = R_PASS;
 	DWORD werr;
 
@@ -626,7 +626,7 @@ Error:
 light *g_pLight = NULL;
 
 // TODO: Other approach 
-RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
+RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
 	RESULT r = R_PASS;
 
 	// Add lights
@@ -672,6 +672,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 	//*/
 
 	///*
+
 	OGLVolume *pVolume = NULL;
 	int num = 10;
 	double size = 0.5f;
@@ -690,6 +691,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 				static_cast<point_precision>(j * (size * 2) - (num * size)));
 
 			pVolume->UpdateOGLBuffers();
+			pTimeManager->RegisterSubscriber(TIME_ELAPSED, pVolume);
 			pSceneGraph->PushObject(pVolume);
 		}
 	}
@@ -713,6 +715,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph) {
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
 			pSphere->UpdateOGLBuffers();
+			//pTimeManager->RegisterSubscriber(TIME_ELAPSED, pSphere);
 			pSceneGraph->PushObject(pSphere);
 		}
 	}

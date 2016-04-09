@@ -80,12 +80,24 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
+	// Initialize Time Manager
+	m_pTimeManager = new TimeManager();
+	CNM(m_pTimeManager, "Failed to allocate Time Manager");
+	CV(m_pTimeManager, "Failed to validate Time Manager");
+
 	Validate();
+	return;
+
+Error:
+	Invalidate();
 	return;
 }
 
 Windows64App::~Windows64App() {
-	// empty stub for now
+	if (m_pTimeManager != nullptr) {
+		delete m_pTimeManager;
+		m_pTimeManager = nullptr;
+	}
 }
 
 HDC Windows64App::GetDeviceContext() {
@@ -350,7 +362,7 @@ RESULT Windows64App::ShowSandbox() {
 	UpdateWindow(m_hwndWindow);
 
 	// TODO: Should replace this with a proper scene loader
-	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph), "Failed to load scene");
+	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
 
 	// Launch main message loop
 	MSG msg;
@@ -367,6 +379,8 @@ RESULT Windows64App::ShowSandbox() {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
+
+		m_pTimeManager->Update();
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should

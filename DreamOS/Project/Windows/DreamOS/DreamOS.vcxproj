@@ -185,6 +185,7 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraph.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp" />
+    <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Core\config.h" />
@@ -276,6 +277,7 @@
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
     <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
+    <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag" />
