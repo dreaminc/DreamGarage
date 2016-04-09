@@ -62,6 +62,7 @@ vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in float distanceLight, out float diffuseValue, out float specularValue) {
 	//float attenuation = 1 / pow(distanceLight, 2);
 	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
+	//float attenuation = 1.0f;
 
 	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
 	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
@@ -82,13 +83,14 @@ void main(void) {
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	
-	vec3 TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
+	vec3 TBNNormal = texture(u_textureBump, DataIn.uvCoord * 4.0f).rgb;
 	TBNNormal = normalize(TBNNormal * 2.0f - vec3(1.0f));   
 	//TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	//TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
+
 		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, DataIn.distanceLight[i], diffuseValue, specularValue);
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
@@ -97,9 +99,9 @@ void main(void) {
 	}
 	vec4LightValue[3] = 1.0f;
 	
-	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord);
+	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 4.0f);
 	//vec4 textureColor = texture(u_textureBump, DataIn.uvCoord);
-	textureColor = vec4(1.0f);
+	//textureColor = vec4(1.0f);
 
 	vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
 	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);

@@ -61,7 +61,7 @@ public:
 		int numStrips = m_numVerticalDivisions;
 		int numStripDivs = (m_numAngularDivisions + 1);
 		int vertCount = 0;
-		float thetaDiv = ((2.0f * M_PI) / static_cast<float>(m_numAngularDivisions - 1));
+		float thetaDiv = ((2.0f * M_PI) / static_cast<float>(m_numAngularDivisions));
 		float psiDiv = ((1.0f * M_PI) / static_cast<float>(m_numVerticalDivisions - 1));
 
 		for (int i = 0; i < numStrips; i++) {
@@ -84,9 +84,10 @@ public:
 				m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));
 
 				// TODO: Fix Sphere BTN
-				vector b(n.x(), -n.y(), n.z());
-				vector t;
-				if (effPsi < M_PI / 2) {
+				vector b(cos(effTheta), 0.0f, -sin(effTheta));
+				vector t = b.cross(n);
+				
+				/*if (effPsi < M_PI / 2) {
 					t = b.cross(n);
 				}
 				else if (effPsi > M_PI / 2) {
@@ -96,6 +97,7 @@ public:
 					b = vector(0.0f, -1.0f, 0.0f);
 					t = n.cross(b);
 				}
+				*/
 
 				//t = RotationMatrix(RotationMatrix::X_AXIS, effPsi) * RotationMatrix(RotationMatrix::Y_AXIS, effTheta) * vector::iVector();
 				//b = n.cross(t);

@@ -75,13 +75,14 @@ void main(void) {
 	//DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
 
 	DataOut.directionEye = DataOut.TangentBitangentNormalMatrix * (-normalize(vertViewSpace.xyz));
+	//DataOut.directionEye = -1.0f * DataOut.TangentBitangentNormalMatrix * vertViewSpace.xyz;
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {
 		vec3 ptLightViewSpace = vec3(u_mat4View * vec4(lights[i].m_ptOrigin.xyz, 1.0f));
 		//DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
 
-		vec3 vLightDirectionView = ptLightViewSpace.xyz - vertViewSpace.xyz;
+		vec3 vLightDirectionView = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
 		DataOut.directionLight[i] = normalize(DataOut.TangentBitangentNormalMatrix * vLightDirectionView);
 		DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
 	}
