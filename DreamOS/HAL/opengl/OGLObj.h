@@ -145,7 +145,7 @@ public:
 		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 
-		CR(m_pParentImp->ReleaseCurrentContext());
+		//CR(m_pParentImp->ReleaseCurrentContext());
 
 	Error:
 		return r;

@@ -358,3 +358,14 @@ Error:
 
 	return r;
 }
+
+// Returns in uppercase 
+std::wstring PathManager::GetFilenameExtension(wchar_t *pszFilename) {
+	std::wstring strFilename(pszFilename);
+	std::wstring strFilenameExtension = strFilename.substr(strFilename.find_last_of(L".") + 1);
+	
+	for (auto it = strFilenameExtension.begin(); it != strFilenameExtension.end(); ++it)
+		*it = towupper(*it);
+
+	return strFilenameExtension;
+}

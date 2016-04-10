@@ -9,20 +9,19 @@
 #include "OGLObj.h"
 #include "Primitives/model.h"
 
-class OGLModel : public model, public OGLObj {
+class OGLModel : /*public model, */public OGLObj {
 protected:
 	DimObj *GetDimObj() {
 		return (DimObj*)this;
 	}
 
 public:
-
-	OGLModel(OpenGLImp *pParentImp, const std::vector<vertex>& vertices) :
-		model(vertices),
+	OGLModel(OpenGLImp *pParentImp) :
+		/*model(),*/
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
+		// RESULT r = OGLInitialize();
 	}
 };
 

@@ -16,6 +16,7 @@
 
 #include <list>
 #include <map>
+#include <string>
 #include "Primitives/version.h"
 
 class PathManagerFactory;
@@ -27,6 +28,7 @@ typedef enum {
 	PATH_SANDBOX,
 	PATH_RESULT,
 	PATH_TEXTURE,
+	PATH_MODELS,
 	PATH_INVALID	// Also acts as a found
 } PATH_VALUE_TYPE;
 
@@ -43,7 +45,8 @@ class PathManager : public valid {
 		L"SHADERS",
 		L"SANDBOX",
 		L"RESULT",
-		L"TEXTURE"
+		L"TEXTURE",
+		L"MODELS"
 	};
 
 	int m_cszPathValues_n;
@@ -52,6 +55,8 @@ public:
 	PathManager();
 	~PathManager();
 
+
+public:
 	const wchar_t *GetPathValueString(PATH_VALUE_TYPE type) {
 		return m_cszPathValues[type];
 	}
@@ -89,6 +94,8 @@ public:
 	RESULT DoesPathExist(PATH_VALUE_TYPE type);
 	RESULT DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
 	RESULT GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists);
+
+	static std::wstring GetFilenameExtension(wchar_t *pszFilename);
 
 private:
 	UID m_uid;
