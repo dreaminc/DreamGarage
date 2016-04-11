@@ -236,6 +236,7 @@
     <ClInclude Include="..\..\..\Primitives\model.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
+    <ClInclude Include="..\..\..\Primitives\skybox.h" />
     <ClInclude Include="..\..\..\Primitives\sphere.h" />
     <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />

@@ -12,22 +12,39 @@ texture::texture() :
 	m_pImageBuffer(nullptr),
 	m_width(0),
 	m_height(0),
-	m_channels(0),
-	m_textureNumber(0)
+	m_channels(0)
 {
 	Validate();
 }
 
-texture::texture(wchar_t *pszFilename) :
+texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_INVALID) :
 	m_pImageBuffer(nullptr),
 	m_width(0),
 	m_height(0),
 	m_channels(0),
-	m_textureNumber(0)
+	m_type(type)
 {
 	RESULT r = R_PASS;
 
 	CR(LoadTextureFromFile(pszFilename));
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
+texture::texture(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight) :
+	m_pImageBuffer(nullptr),
+	m_width(0),
+	m_height(0),
+	m_channels(0),
+	m_type(texture::TEXTURE_TYPE::TEXTURE_CUBE)
+{
+	RESULT r = R_PASS;
+
+	CR(LoadCubeMapFromFiles(pszFilenameFront, pszFilenameBack, pszFilenameTop, pszFilenameBottom, pszFilenameLeft, pszFilenameRight));
 
 	Validate();
 	return;
@@ -51,21 +68,29 @@ enum class TEXTURE_TYPE {
 };
 
 RESULT texture::SetTextureType(texture::TEXTURE_TYPE textureType) {
-	return SetTextureNumber(static_cast<int>(textureType));
+	m_type = textureType;
+	//return SetTextureNumber(static_cast<int>(textureType));
+	return R_PASS;
 }
 
+/*
 int texture::GetTextureNumber() {
 	return m_textureNumber;
 }
+*/
 
 texture::TEXTURE_TYPE texture::GetTextureType() {
-	return static_cast<texture::TEXTURE_TYPE>(m_textureNumber);
+	//return static_cast<texture::TEXTURE_TYPE>(m_textureNumber);
+	return m_type;
 }
 
+/*
 RESULT texture::SetTextureNumber(int texNum) {
 	m_textureNumber = texNum;
+	m_type = GetTextureType();
 	return R_PASS;
 }
+*/
 
 RESULT texture::GetTextureFilePath(const wchar_t *pszFilename, wchar_t * &n_pszFilePath) {
 	RESULT r = R_PASS;
@@ -145,6 +170,64 @@ Error:
 	if (pszFilePath != nullptr) {
 		delete[] pszFilePath;
 		pszFilePath = nullptr;
+	}
+
+	return r;
+}
+
+RESULT texture::LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight) {
+	RESULT r = R_PASS;
+	wchar_t *pszFilenames[NUM_CUBE_MAP_TEXTURES] = { pszFilenameFront, pszFilenameBack, pszFilenameTop, pszFilenameBottom, pszFilenameLeft, pszFilenameRight };
+	wchar_t *pszFilePaths[NUM_CUBE_MAP_TEXTURES] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	uint8_t *pBuffers[NUM_CUBE_MAP_TEXTURES] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	int widths[NUM_CUBE_MAP_TEXTURES] = { 0, 0, 0, 0, 0, 0 };
+	int heights[NUM_CUBE_MAP_TEXTURES] = { 0, 0, 0, 0, 0, 0 };
+	int channels[NUM_CUBE_MAP_TEXTURES] = { 0, 0, 0, 0, 0, 0 };
+
+	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+		CR(GetTextureFilePath(pszFilenames[i], pszFilePaths[i]));
+		CN(pszFilePaths[i]);
+
+		std::wstring wstrFilepath(pszFilePaths[i]);
+		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> wstrConverter;
+		std::string strFilepath = wstrConverter.to_bytes(wstrFilepath);
+
+		pBuffers[i] = SOIL_load_image(strFilepath.c_str(), &widths[i], &heights[i], &channels[i], SOIL_LOAD_AUTO);
+		CN(pBuffers[i]);
+
+		// Ensure all heights are the same
+		if(i == 0) {
+			m_width = widths[i];
+			m_height = heights[i];
+		}
+		else {
+			CBM((m_width == widths[i]), "Cube map width %d mismatches %d", widths[i], m_width);
+			CBM((m_height == heights[i]), "Cube map width %d mismatches %d", heights[i], m_height);
+		}
+	}
+
+	// Stitch it together here
+	size_t sizeSide = m_width * m_height * sizeof(unsigned char);
+	size_t sizeTexture = sizeSide * NUM_CUBE_MAP_TEXTURES;
+	m_pImageBuffer = new unsigned char[sizeTexture];
+	CNM(m_pImageBuffer, "Failed to allocate Image Buffer for cube map");
+
+	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+		unsigned char *ptrOffset = m_pImageBuffer + i * (sizeSide);
+		memcpy(ptrOffset, pBuffers[i], sizeSide);
+	}
+
+Error:
+	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+		if(pszFilePaths[i] != nullptr) {
+			delete[] pszFilePaths[i];
+			pszFilePaths[i] = nullptr;
+		}
+
+		if(pBuffers[i] != nullptr) {
+			delete[] pBuffers[i];
+			pBuffers[i] = nullptr;
+		}
 	}
 
 	return r;

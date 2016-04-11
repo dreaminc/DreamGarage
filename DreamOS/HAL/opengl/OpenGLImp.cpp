@@ -665,9 +665,9 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//*/
 
 	///*
-	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg");
+	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
-	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg");
+	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	//*/
 	
 	
@@ -680,7 +680,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//*/
 
 
-	/*
+	///*
 	OGLVolume *pVolume = NULL;
 	int num = 10;
 	double size = 0.5f;
@@ -705,7 +705,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	}
 	//*/
 		
-	///*
+	/*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 	
