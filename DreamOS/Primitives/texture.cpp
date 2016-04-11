@@ -26,7 +26,12 @@ texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEX
 {
 	RESULT r = R_PASS;
 
-	CR(LoadTextureFromFile(pszFilename));
+	if(type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
+		CR(LoadCubeMapByName(pszFilename));
+	}
+	else {
+		CR(LoadTextureFromFile(pszFilename));
+	}
 
 	Validate();
 	return;
@@ -96,7 +101,7 @@ RESULT texture::GetTextureFilePath(const wchar_t *pszFilename, wchar_t * &n_pszF
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
-	wchar_t *pFilePath = NULL;
+	//wchar_t *pFilePath = nullptr;
 
 	// Move to key based file paths
 	CRM(pPathManager->GetFilePath(PATH_TEXTURE, pszFilename, n_pszFilePath), "Failed to get path for %S texture", pszFilename);
@@ -109,6 +114,17 @@ Error:
 		delete[] n_pszFilePath;
 		n_pszFilePath = nullptr;
 	}
+	return r;
+}
+
+RESULT texture::GetCubeMapFiles(const wchar_t *pszName, std::vector<std::wstring> &vstrFiles) {
+	RESULT r = R_PASS;
+
+	PathManager *pPathManager = PathManager::instance();
+	
+	CRM(pPathManager->GetFilesForNameInPath(PATH_TEXTURE_CUBE, pszName, vstrFiles), "Failed to get files for %S cube map", pszName);
+
+Error:
 	return r;
 }
 
@@ -172,6 +188,17 @@ Error:
 		pszFilePath = nullptr;
 	}
 
+	return r;
+}
+
+RESULT texture::LoadCubeMapByName(wchar_t * pszName) {
+	RESULT r = R_PASS;
+
+	std::vector<std::wstring> vstrFiles;
+
+	CR(GetCubeMapFiles(pszName, vstrFiles));
+
+Error:
 	return r;
 }
 

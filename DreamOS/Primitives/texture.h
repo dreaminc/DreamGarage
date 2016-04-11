@@ -9,6 +9,7 @@
 
 #include "valid.h"
 #include "Types/UID.h"
+#include <vector>
 
 #define NUM_CUBE_MAP_TEXTURES 6
 
@@ -37,11 +38,16 @@ public:
 	//RESULT SetTextureNumber(int texNum);
 
 	RESULT GetTextureFilePath(const wchar_t *pszFilename, wchar_t * &n_pszFilePath);
+	//RESULT GetCubeMapFilePath(const wchar_t *pszName, wchar_t * &n_pszFilePath);
+	RESULT GetCubeMapFiles(const wchar_t *pszName, std::vector<std::wstring> &vstrFiles);
+
 	RESULT FlipTextureVertical();
 	RESULT ReleaseTextureData();
+
 	RESULT LoadTextureFromPath(wchar_t *pszFilepath);
 	RESULT LoadTextureFromFile(wchar_t *pszFilename);
 	RESULT LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
+	RESULT LoadCubeMapByName(wchar_t * pszName);
 
 protected:
 	int m_width;

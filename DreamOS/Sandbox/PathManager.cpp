@@ -267,6 +267,28 @@ Error:
 	return r;
 }
 
+RESULT PathManager::GetFilePathWithFolder(PATH_VALUE_TYPE type, const wchar_t *pszFolderName, std::wstring &strPathWithFolder) {
+	RESULT r = R_PASS;
+
+	wchar_t *pszValuePath = nullptr;
+	long pszValuePath_n = 0;
+
+	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
+	pszValuePath_n = static_cast<long>(wcslen(pszValuePath));
+
+	strPathWithFolder = std::wstring(pszValuePath);
+	strPathWithFolder += pszFolderName;
+	strPathWithFolder += '/';
+
+Error:
+	if (pszValuePath != nullptr) {
+		delete[] pszValuePath;
+		pszValuePath = nullptr;
+	}
+
+	return r;
+}
+
 RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {
 	RESULT r = R_PASS;
 
@@ -354,6 +376,50 @@ Error:
 	if (pListDirs != NULL) {
 		delete pListDirs;
 		pListDirs = NULL;
+	}
+
+	return r;
+}
+
+RESULT PathManager::GetFilesForNameInPath(PATH_VALUE_TYPE type, const wchar_t *pszName, std::vector<std::wstring> &vstrFiles) {
+	RESULT r = R_PASS;
+	std::list<wchar_t*> *pListDirs = new std::list<wchar_t*>();
+	bool fFound = false;
+
+	CRM(GetListOfDirectoriesInPath(type, pListDirs), "Failed to get list of directories");
+
+	for (auto it = pListDirs->begin(); it != pListDirs->end(); it++) {
+		wchar_t *pszDirectory = (*it);
+		long pszDirectory_n = static_cast<long>(wcslen(pszDirectory));
+
+		if(wcscmp(pszDirectory, pszName) == 0) {
+			std::wstring strNameDirPath;
+			CR(GetFilePathWithFolder(type, pszName, strNameDirPath));
+
+			// Get the files
+			CRM(GetListOfFilesInPath(strNameDirPath, vstrFiles), "Failed to get list of directories");
+
+			fFound = true;
+			break;
+		}
+	}
+
+	CBM(fFound, "Name %S not found in path %S", pszName, GetPathValueString(type));
+
+Error:
+	while (pListDirs->size() > 0) {
+		wchar_t *pszTemp = pListDirs->front();
+		pListDirs->pop_front();
+
+		if (pszTemp != nullptr) {
+			delete[]pszTemp;
+			pszTemp = nullptr;
+		}
+	}
+
+	if (pListDirs != nullptr) {
+		delete pListDirs;
+		pListDirs = nullptr;
 	}
 
 	return r;

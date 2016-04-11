@@ -166,6 +166,39 @@ RESULT Win64PathManager::PrintPaths() {
 	return r;
 }
 
+RESULT Win64PathManager::GetListOfFilesInPath(std::wstring strNameDir, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension) {
+	RESULT r = R_PASS;
+	HANDLE hFind = INVALID_HANDLE_VALUE;
+	WIN32_FIND_DATA fileFindData;
+	int i = 0;
+
+	// Need this at end of search string
+	if (pszOptExtension == nullptr) {
+		strNameDir += '*';	
+	}
+	else {
+		CBM((wcslen(pszOptExtension) == 3), "Only 3 letter extensions currently supported");
+		strNameDir += L"*.";	
+		strNameDir += pszOptExtension;
+	}
+
+	hFind = FindFirstFile(strNameDir.c_str(), &fileFindData);
+	CBM((hFind != INVALID_HANDLE_VALUE), "Could not find anything");
+
+	do {
+		if (fileFindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) {
+			// Skip directories 
+		}
+		else {
+			std::wstring strFoundFileName(fileFindData.cFileName);
+			vstrFiles.push_back(strFoundFileName);
+		}
+	} while (FindNextFile(hFind, &fileFindData) != 0);
+
+Error:
+	return r;
+}
+
 // Make note that this will allocate new strings and push them into the directory list
 RESULT Win64PathManager::GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs) {
 	RESULT r = R_PASS;

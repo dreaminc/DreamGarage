@@ -19,6 +19,7 @@ public:
 
 	RESULT DoesPathExist(const wchar_t *pszPath);
 	RESULT GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs);
+	RESULT GetListOfFilesInPath(std::wstring strNameDir, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension = nullptr);
 
 protected:
 	RESULT Dealloc();

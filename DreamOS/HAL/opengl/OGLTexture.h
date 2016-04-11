@@ -13,6 +13,16 @@
 #include "OpenGLImp.h"
 
 class OGLTexture : public texture {
+public:
+	const GLenum GLCubeMapEnums[NUM_CUBE_MAP_TEXTURES] = {
+		GL_TEXTURE_CUBE_MAP_POSITIVE_X,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_X,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Y,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
+		GL_TEXTURE_CUBE_MAP_POSITIVE_Z,
+		GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+	};
+
 public: 
 	OGLTexture(OpenGLImp *pParentImp) :
 		texture(),
@@ -85,7 +95,7 @@ public:
 
 		CR(m_pParentImp->MakeCurrentContext());
 		CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
-
+		
 		CR(m_pParentImp->glActiveTexture(textureNumber));
 		CR(m_pParentImp->BindTexture(textureTarget, *pTextureIndex));
 		//CR(m_pParentImp->glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, m_width, m_height));
@@ -100,40 +110,40 @@ public:
 		// TODO: Pull deeper settings from texture object
 		CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
 
+		// TODO: Delete the image data here?
+
+	Error:
+		return r;
+	}
+
+	RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber) {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->MakeCurrentContext());
+		CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
+		CR(m_pParentImp->BindTexture(GL_TEXTURE_CUBE_MAP, *pTextureIndex));
+
+		for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+			size_t sizeSide = m_width * m_height * sizeof(unsigned char);
+			unsigned char *ptrOffset = m_pImageBuffer + (i * (sizeSide));
+			CR(m_pParentImp->TexImage2D(GLCubeMapEnums[i], 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
+		}
+
+		// TODO: Delete the image data here?
+
 	Error:
 		return r;
 	}
 
 	RESULT OGLInitialize() {
 		RESULT r = R_PASS;
-		
-		/*
-		CR(m_pParentImp->MakeCurrentContext());
-		
-		CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
 
-		CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine()));
-		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_textureIndex));
-		//CR(m_pParentImp->glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, m_width, m_height));
-		//CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, m_pImageBuffer));
-
-		// Texture params TODO: Add controls for these 
-		CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
-		CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
-		//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
-		//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
-
-		CR(m_pParentImp->TexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
-
-		// TODO: We can technically release the image data here if we want
-		*/
-
-		GLenum textureTarget = GL_TEXTURE_2D;
-
-		if(GetTextureType() == texture::TEXTURE_TYPE::TEXTURE_CUBE)
-			textureTarget = GL_TEXTURE_CUBE_MAP;
-
-		CRM(OGLInitializeTexture(&m_textureIndex, GetGLTextureNumberDefine(), textureTarget), "Failed to initialize texture");
+		if(GetTextureType() == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
+			CRM(OGLInitializeCubeMap(&m_textureIndex, GetGLTextureNumberDefine()), "Failed to initialize texture");
+		}
+		else {
+			CRM(OGLInitializeTexture(&m_textureIndex, GetGLTextureNumberDefine(), GL_TEXTURE_2D), "Failed to initialize texture");
+		}
 
 	Error:
 		return r;
@@ -143,7 +153,8 @@ public:
 		RESULT r = R_PASS;
 
 		if (GetTextureType() == TEXTURE_TYPE::TEXTURE_CUBE) {
-			// TODO:
+			//CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine()));
+			CR(m_pParentImp->BindTexture(GL_TEXTURE_CUBE_MAP, m_textureIndex));
 		}
 		else {
 			CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine()));

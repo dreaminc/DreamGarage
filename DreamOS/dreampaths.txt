@@ -3,9 +3,10 @@
 # Note - DREAMOSPATH needs to be set in environment variables
 # to the DreamOS root path so DreamOS can find this file
 
-ROOT 		./ 
-HAL 		./HAL/
-SHADERS 	./HAL/opengl/GLSL/
-SANDBOX		./Sandbox/
-RESULT 		./RESULT/
-TEXTURE		./Texture/
+ROOT 			./ 
+HAL 			./HAL/
+SHADERS 		./HAL/opengl/GLSL/
+SANDBOX			./Sandbox/
+RESULT 			./RESULT/
+TEXTURE			./Texture/
+TEXTURE_CUBE	./Texture/Cube/
