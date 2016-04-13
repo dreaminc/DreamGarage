@@ -710,7 +710,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	///*
 	//OGLModel* pModel = new OGLModel(this, L"car.obj");
 	OGLModelFactory *pModelFactory = OGLModelFactory::instance();
-	OGLOBJModel* pModel = reinterpret_cast<OGLOBJModel*>(pModelFactory->MakeOGLModel(this, L"car.obj"));
+	OGLModel* pModel = reinterpret_cast<OGLModel*>(pModelFactory->MakeOGLModel(this, L"car.obj"));
 
 	//pModel->SetRandomColor();
 	pModel->UpdateOGLBuffers();

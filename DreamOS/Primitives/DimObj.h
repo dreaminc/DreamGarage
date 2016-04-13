@@ -45,6 +45,19 @@ public:
         /* stub */
     }
 
+	// This is an assignment constructor
+	// NOT COPY
+	DimObj(DimObj *pObj) : 
+		VirtualObj(pObj),	// velocity, origin
+		m_pVertices(pObj->m_pVertices),
+		m_pIndices(pObj->m_pIndices),
+		m_material(*(pObj->GetMaterial())),
+		m_pColorTexture(pObj->m_pColorTexture),
+		m_pBumpTexture(pObj->m_pColorTexture)
+	{
+		// stub
+	}
+
     ~DimObj() {
 		if (m_pIndices != NULL) {
 			delete[] m_pIndices;

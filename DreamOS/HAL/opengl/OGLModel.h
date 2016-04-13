@@ -9,19 +9,23 @@
 #include "OGLObj.h"
 #include "Primitives/model.h"
 
-class OGLModel : /*public model, */public OGLObj {
+class OGLModel : public model, public OGLObj {
 protected:
 	DimObj *GetDimObj() {
 		return (DimObj*)this;
 	}
 
 public:
-	OGLModel(OpenGLImp *pParentImp) :
-		/*model(),*/
+	OGLModel(OpenGLImp *pParentImp, model *pModel) :
+		model(pModel),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
 		// RESULT r = OGLInitialize();
+	}
+
+	RESULT LoadFile(std::ifstream *pFile) {
+		return R_NOT_IMPLEMENTED;
 	}
 };
 

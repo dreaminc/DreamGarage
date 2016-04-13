@@ -8,9 +8,11 @@
 // This class will create and open a given file by name
 
 #include "OGLObj.h"
-#include "OGLOBJModel.h"
+#include "OGLModel.h"
+//#include "OGLOBJModel.h"
 #include "Sandbox\PathManager.h"
 #include "Primitives\Types\UID.h"
+#include <Primitives/OBJModel.h>
 
 class OGLModelFactory {
 private:
@@ -52,13 +54,16 @@ public:
 		
 		switch(type) {
 			case OGLModelFactory::MODEL_OBJ: {
-				OGLOBJModel *pTempModel = new OGLOBJModel(pParentImp);
-				RESULT r = pTempModel->InitializeFromFile(pszFilename);
+				OBJModel *pOBJModel = new OBJModel();
+
+				RESULT r = pOBJModel->InitializeFromFile(pszFilename);
 				if (r != R_PASS) {
 					DEBUG_LINEOUT("OGLModelFactory Error: %S model failed to load", pszFilename);
 					return nullptr;
 				}
-					
+
+				// This is an assignment, no copy occurs but do not release pOBJModel since the memory is passed to pTempModel
+				OGLModel *pTempModel = new OGLModel(pParentImp, pOBJModel);
 				r = pTempModel->OGLInitialize();
 				/*if (r != R_PASS) {
 					DEBUG_LINEOUT("OGLModelFactory Error: %S model failed to load", pszFilename);

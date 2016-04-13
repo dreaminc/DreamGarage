@@ -10,6 +10,8 @@
 // but it might make sense to instead use the OGL Object class 
 // to simply pipe data between the OGL OBJ implementation 
 
+// NOTE: THIS HAS BEEN DEPRECATED 
+
 #include "OGLObj.h"
 #include "Primitives/OBJModel.h"
 

@@ -12,6 +12,7 @@
 #include "Sandbox\PathManager.h"
 #include "point.h"
 #include "color.h"
+#include <Sandbox/FileLoader.h>
 
 class model : public DimObj {
 public:
@@ -51,6 +52,14 @@ public:
 	//model(const std::vector<vertex>& vertices) {
 	model() {
 		// empty stub
+	}
+
+	model(model *pModel) :
+		DimObj(pModel),
+		m_nVertices(pModel->NumberVertices()),
+		m_nIndices(pModel->NumberIndices())
+	{
+		// empty	
 	}
 
 	RESULT InitializeFromFile(wchar_t *pszFilename) {

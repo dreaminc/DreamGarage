@@ -22,6 +22,7 @@ public:
 public:
 	texture();
 	texture(wchar_t *pszFilename);
+	texture(texture *pTexture);
 	~texture();
 
 	// TODO: There's a redundancy with number/type that should be resolved

@@ -36,6 +36,18 @@ Error:
 	return;
 }
 
+texture::texture(texture *pTexture) :
+	m_pImageBuffer(nullptr),
+	m_width(pTexture->m_width),
+	m_height(pTexture->m_height),
+	m_channels(pTexture->m_channels),
+	m_textureNumber(pTexture->m_textureNumber)
+{
+	if (pTexture->m_pImageBuffer != nullptr) {
+		memcpy(m_pImageBuffer, pTexture->m_pImageBuffer, pTexture->m_channels * pTexture->m_height * pTexture->m_width * sizeof(unsigned char));
+	}
+}
+
 texture::~texture() {
 	if (m_pImageBuffer != nullptr) {
 		delete[] m_pImageBuffer;

@@ -41,6 +41,7 @@ protected:
 public:
 	VirtualObj();
 	VirtualObj(point ptOrigin);
+	VirtualObj(VirtualObj *pObj);
 	~VirtualObj();
 
 	virtual OBJECT_TYPE GetType() {
