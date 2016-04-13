@@ -23,6 +23,18 @@ public:
 		// empty
 	}
 
+	material(const material &mat) :
+		m_shine(mat.m_shine),
+		m_bump(mat.m_bump),
+		reserved2(mat.reserved2),
+		reserved3(mat.reserved3),
+		m_colorAmbient(mat.m_colorAmbient),
+		m_colorDiffuse(mat.m_colorDiffuse),
+		m_colorSpecular(mat.m_colorSpecular)
+	{
+
+	}
+
 	material(float shine, color colorAmbient, color colorDiffuse, color colorSpecular) :
 		m_shine(shine),
 		m_bump(0.0f),

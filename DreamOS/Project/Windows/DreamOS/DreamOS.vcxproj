@@ -209,7 +209,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLModelFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLOBJModel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
@@ -234,6 +236,7 @@
     <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\model.h" />
+    <ClInclude Include="..\..\..\Primitives\OBJModel.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
     <ClInclude Include="..\..\..\Primitives\sphere.h" />

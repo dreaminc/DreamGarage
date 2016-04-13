@@ -9,3 +9,4 @@ SHADERS 	./HAL/opengl/GLSL/
 SANDBOX		./Sandbox/
 RESULT 		./RESULT/
 TEXTURE		./Texture/
+MODELS		./Models/

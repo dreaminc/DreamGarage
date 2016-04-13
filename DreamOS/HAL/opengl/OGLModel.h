@@ -16,13 +16,16 @@ protected:
 	}
 
 public:
-
-	OGLModel(OpenGLImp *pParentImp, const std::vector<vertex>& vertices) :
-		model(vertices),
+	OGLModel(OpenGLImp *pParentImp, model *pModel) :
+		model(pModel),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
-		RESULT r = OGLInitialize();
+		// RESULT r = OGLInitialize();
+	}
+
+	RESULT LoadFile(std::ifstream *pFile) {
+		return R_NOT_IMPLEMENTED;
 	}
 };
 

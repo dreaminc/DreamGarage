@@ -1,17 +1,17 @@
 #ifndef FILE_LOADER_H_
 #define FILE_LOADER_H_
 
-#include <string>
-#include <vector>
-#include "Primitives/Vertex.h"
+#include "RESULT/EHM.h"
 
 // DREAM OS
 // DreamOS/Sandbox/FileLoader.h
 
-class FileLoaderHelper {
+#include <string>
+#include <fstream>
+
+class FileLoader {
 public:
-	static bool LoadOBJFile(const std::wstring& obj_file_name,
-		std::vector<vertex> &out_vertices);
+	static RESULT LoadFile(const std::wstring& strFilename, std::ifstream * &n_pFile);
 };
 
 #endif // ! FILE_LOADER_H_
