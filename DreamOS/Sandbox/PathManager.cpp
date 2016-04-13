@@ -381,7 +381,19 @@ Error:
 	return r;
 }
 
-RESULT PathManager::GetFilesForNameInPath(PATH_VALUE_TYPE type, const wchar_t *pszName, std::vector<std::wstring> &vstrFiles) {
+RESULT PathManager::GetFilePathForName(PATH_VALUE_TYPE type, const wchar_t *pszName, std::wstring strFilename, std::wstring &strFilePath) {
+	RESULT r = R_PASS;
+
+	std::wstring strNameDirPath;
+	CR(GetFilePathWithFolder(type, pszName, strNameDirPath));
+
+	strFilePath = strNameDirPath + strFilename;
+
+Error:
+	return r;
+}
+
+RESULT PathManager::GetFilesForNameInPath(PATH_VALUE_TYPE type, const wchar_t *pszName, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension) {
 	RESULT r = R_PASS;
 	std::list<wchar_t*> *pListDirs = new std::list<wchar_t*>();
 	bool fFound = false;
@@ -397,7 +409,7 @@ RESULT PathManager::GetFilesForNameInPath(PATH_VALUE_TYPE type, const wchar_t *p
 			CR(GetFilePathWithFolder(type, pszName, strNameDirPath));
 
 			// Get the files
-			CRM(GetListOfFilesInPath(strNameDirPath, vstrFiles), "Failed to get list of directories");
+			CRM(GetListOfFilesInPath(strNameDirPath, vstrFiles, pszOptExtension), "Failed to get list of directories");
 
 			fFound = true;
 			break;

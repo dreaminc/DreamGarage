@@ -23,10 +23,20 @@ public:
 		TEXTURE_INVALID = 32
 	};
 
+	enum class CUBE_MAP {
+		CUBE_MAP_NEG_X = 0,
+		CUBE_MAP_POS_X = 1,
+		CUBE_MAP_NEG_Y = 2,
+		CUBE_MAP_POS_Y = 3,
+		CUBE_MAP_NEG_Z = 4,
+		CUBE_MAP_POS_Z = 5,
+		CUBE_MAP_INVALID 
+	};
+
 public:
 	texture();
 	texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
+	texture(wchar_t * pszName, std::vector<std::wstring> cubeMapFiles);
 	~texture();
 
 	// TODO: There's a redundancy with number/type that should be resolved
@@ -46,8 +56,11 @@ public:
 
 	RESULT LoadTextureFromPath(wchar_t *pszFilepath);
 	RESULT LoadTextureFromFile(wchar_t *pszFilename);
-	RESULT LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
+	//RESULT LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
+	RESULT LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
 	RESULT LoadCubeMapByName(wchar_t * pszName);
+
+	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
 
 protected:
 	int m_width;

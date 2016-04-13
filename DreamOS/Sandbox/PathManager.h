@@ -95,12 +95,14 @@ public:
 	RESULT DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
 	RESULT GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists);
 
-	RESULT GetFilesForNameInPath(PATH_VALUE_TYPE type, const wchar_t *pszName, std::vector<std::wstring> &vstrFiles);
+	RESULT GetFilesForNameInPath(PATH_VALUE_TYPE type, const wchar_t *pszName, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension = nullptr);
+	RESULT GetFilePathForName(PATH_VALUE_TYPE type, const wchar_t *pszName, std::wstring strFilename, std::wstring &strFilePath);
 
 private:
 	UID m_uid;
 	std::map<PATH_VALUE_TYPE, wchar_t*> *m_pmapNVPPaths;
 
+	// TODO: Move to design pattern class
 	// Singleton Usage
 protected:
 	static PathManager *m_pInstance;
