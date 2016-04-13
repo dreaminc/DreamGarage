@@ -250,6 +250,18 @@ texture::CUBE_MAP texture::GetCubeMapTypeFromFilename(std::wstring strFilename) 
 	return retType;
 }
 
+// TODO: Based on 8 bit per channel atm
+// Note this returns the size of the texture, in the case of cube maps this refers to 
+// one side not all six textures - for that use GetCubeMapSize
+size_t texture::GetTextureSize() {
+	const size_t sizeTexture = m_width * m_height * m_channels * sizeof(unsigned char);
+	return sizeTexture;
+}
+
+size_t texture::GetCubeMapSize() {
+	return GetTextureSize() * NUM_CUBE_MAP_TEXTURES;
+}
+
 //RESULT texture::LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight) {
 RESULT texture::LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) {
 	RESULT r = R_PASS;
@@ -280,15 +292,17 @@ RESULT texture::LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring>
 		if(CubeMapFace == 0) {
 			m_width = widths[CubeMapFace];
 			m_height = heights[CubeMapFace];
+			m_channels = channels[CubeMapFace];
 		}
 		else {
 			CBM((m_width == widths[CubeMapFace]), "Cube map width %d mismatches %d", widths[CubeMapFace], m_width);
-			CBM((m_height == heights[CubeMapFace]), "Cube map width %d mismatches %d", heights[CubeMapFace], m_height);
+			CBM((m_height == heights[CubeMapFace]), "Cube map height %d mismatches %d", heights[CubeMapFace], m_height);
+			CBM((m_channels == channels[CubeMapFace]), "Cube map channels %d mismatches %d", channels[CubeMapFace], m_channels);
 		}
 	}
 
 	// Stitch it together here
-	size_t sizeSide = m_width * m_height * sizeof(unsigned char);
+	size_t sizeSide = GetTextureSize();
 	size_t sizeTexture = sizeSide * NUM_CUBE_MAP_TEXTURES;
 	m_pImageBuffer = new unsigned char[sizeTexture];
 	CNM(m_pImageBuffer, "Failed to allocate Image Buffer for cube map");

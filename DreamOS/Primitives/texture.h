@@ -43,6 +43,8 @@ public:
 	// Texture number should be resolved on OGLTexture side - type held in texture
 	RESULT SetTextureType(texture::TEXTURE_TYPE textureType);
 	texture::TEXTURE_TYPE GetTextureType();
+	size_t GetTextureSize();
+	size_t GetCubeMapSize();
 	
 	//int GetTextureNumber();
 	//RESULT SetTextureNumber(int texNum);

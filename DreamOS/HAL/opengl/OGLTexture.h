@@ -40,8 +40,8 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight) :
-		texture(pszFilenameFront, pszFilenameBack, pszFilenameTop, pszFilenameBottom, pszFilenameLeft, pszFilenameRight),
+	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) :
+		texture(pszName, vstrCubeMapFiles),
 		m_textureIndex(0),
 		m_pParentImp(pParentImp)
 	{
@@ -124,7 +124,8 @@ public:
 		CR(m_pParentImp->BindTexture(GL_TEXTURE_CUBE_MAP, *pTextureIndex));
 
 		for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
-			size_t sizeSide = m_width * m_height * sizeof(unsigned char);
+			//size_t sizeSide = m_width * m_height * sizeof(unsigned char);
+			size_t sizeSide = GetTextureSize();
 			unsigned char *ptrOffset = m_pImageBuffer + (i * (sizeSide));
 			CR(m_pParentImp->TexImage2D(GLCubeMapEnums[i], 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
 		}
