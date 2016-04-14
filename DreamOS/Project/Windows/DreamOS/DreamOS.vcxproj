@@ -211,6 +211,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />

@@ -8,15 +8,42 @@
 // Skybox Primitive
 
 #include "volume.h"
+#include "texture.h"
 
-#define DEFAULT_SKYBOX_SIZE 100.0f;
+#define DEFAULT_SKYBOX_SIZE 5.0f
 
 class skybox : public volume {
+
+protected:
+	texture *m_pCubeMapTexture;
+
 public:
 	skybox() :
-		volume(DEFAULT_SKYBOX_SIZE)
+		volume(DEFAULT_SKYBOX_SIZE),
+		m_pCubeMapTexture(nullptr)
 	{
 		// empty
+	}
+
+	RESULT SetCubeMapTexture(texture *pTexture) {
+		RESULT r = R_PASS;
+
+		CBM((m_pCubeMapTexture == nullptr), "Cannot overwrite cube map texture");
+		m_pCubeMapTexture = pTexture;
+		m_pCubeMapTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_CUBE);
+
+	Error:
+		return r;
+	}
+
+	RESULT ClearCubeMapTexture() {
+		RESULT r = R_PASS;
+
+		CB((m_pCubeMapTexture != nullptr));
+		m_pCubeMapTexture = nullptr;
+
+	Error:
+		return r;
 	}
 };
 

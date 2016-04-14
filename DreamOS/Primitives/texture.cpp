@@ -213,6 +213,7 @@ RESULT texture::LoadCubeMapByName(wchar_t * pszName) {
 	CR(GetCubeMapFiles(pszName, vstrCubeMapFiles));
 
 	CR(LoadCubeMapFromFiles(pszName, vstrCubeMapFiles));
+	CN(m_pImageBuffer);
 
 Error:
 	return r;
@@ -267,8 +268,6 @@ RESULT texture::LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring>
 	RESULT r = R_PASS;
 	
 	PathManager *pPathManager = PathManager::instance();
-
-	wchar_t *pszFilePaths[NUM_CUBE_MAP_TEXTURES] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	uint8_t *pBuffers[NUM_CUBE_MAP_TEXTURES] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
 	int widths[NUM_CUBE_MAP_TEXTURES] = { 0, 0, 0, 0, 0, 0 };
@@ -314,11 +313,6 @@ RESULT texture::LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring>
 
 Error:
 	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
-		if(pszFilePaths[i] != nullptr) {
-			delete[] pszFilePaths[i];
-			pszFilePaths[i] = nullptr;
-		}
-
 		if(pBuffers[i] != nullptr) {
 			delete[] pBuffers[i];
 			pBuffers[i] = nullptr;

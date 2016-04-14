@@ -63,7 +63,7 @@ public:
 
 	// TODO: Is this even needed?
 	GLint GetCubeTextureNumber() {
-		return 0;
+		return 2;
 	}
 
 	GLint GetTextureNumber() {
@@ -78,7 +78,7 @@ public:
 			
 			// TODO: Do we need this?
 			case TEXTURE_TYPE::TEXTURE_CUBE: {
-				return 0;
+				return GetCubeTextureNumber();
 			} break; 
 
 			default:
@@ -128,6 +128,9 @@ public:
 			size_t sizeSide = GetTextureSize();
 			unsigned char *ptrOffset = m_pImageBuffer + (i * (sizeSide));
 			CR(m_pParentImp->TexImage2D(GLCubeMapEnums[i], 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
+
+			CRM(m_pParentImp->TexParamteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
+			CRM(m_pParentImp->TexParamteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
 		}
 
 		// TODO: Delete the image data here?
@@ -154,7 +157,7 @@ public:
 		RESULT r = R_PASS;
 
 		if (GetTextureType() == TEXTURE_TYPE::TEXTURE_CUBE) {
-			//CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine()));
+			CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine()));
 			CR(m_pParentImp->BindTexture(GL_TEXTURE_CUBE_MAP, m_textureIndex));
 		}
 		else {

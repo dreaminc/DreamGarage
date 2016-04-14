@@ -630,6 +630,7 @@ Error:
 #include "OGLSphere.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
+#include "OGLSkybox.h"
 
 light *g_pLight = NULL;
 
@@ -669,7 +670,14 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
 	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	texture *pCubeMap = new OGLTexture(this, L"NissiBeach2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
+	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
+	OGLSkybox *pSkybox = new OGLSkybox(this);
+	OGLTexture *pCubeMap = new OGLTexture(this, L"NissiBeach2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
+	pSkybox->SetCubeMapTexture(pCubeMap);
+	pSkybox->OGLActivateCubeMapTexture();
+	
+	// TODO: Special lane for Skybox 
+	pSceneGraph->PushObject(pSkybox);
 	//*/
 	
 	
@@ -682,7 +690,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//*/
 
 
-	///*
+	/*
 	OGLVolume *pVolume = NULL;
 	int num = 10;
 	double size = 0.5f;

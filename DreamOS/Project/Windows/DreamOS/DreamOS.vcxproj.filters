@@ -457,6 +457,9 @@
     <ClInclude Include="..\..\..\Primitives\skybox.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

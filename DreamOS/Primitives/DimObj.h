@@ -46,14 +46,14 @@ public:
     }
 
     ~DimObj() {
-		if (m_pIndices != NULL) {
+		if (m_pIndices != nullptr) {
 			delete[] m_pIndices;
-			m_pIndices = NULL;
+			m_pIndices = nullptr;
 		}
 
-		if (m_pVertices != NULL) {
+		if (m_pVertices != nullptr) {
 			delete[] m_pVertices;
-			m_pVertices = NULL;
+			m_pVertices = nullptr;
 		}
     }
 
