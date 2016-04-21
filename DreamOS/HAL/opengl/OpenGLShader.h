@@ -13,6 +13,9 @@
 #include "Primitives/version.h"
 #include "Primitives/matrix.h"
 
+class point;
+class quaternion;
+class vector;
 class OpenGLImp;	// Declare OpenGLImp class
 
 class OpenGLShader : public Shader {
@@ -28,7 +31,12 @@ public:
 
 	//RESULT SetUniform();
 	RESULT SetUniformInteger(GLint value, const char* pszUniformName);
-	RESULT SetPointUniform(matrix<float, 4, 1> pt, const char* pszUniformName);
+	
+	RESULT SetUniform4fv(GLfloat *pVal4fv, const char* pszUniformName);
+	RESULT SetQuaternionUniform(quaternion q, const char* pszUniformName);
+	RESULT SetPointUniform(point pt, const char* pszUniformName);
+	RESULT SetVectorUniform(vector v, const char* pszUniformName);
+
 	RESULT Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName);
 
 	virtual RESULT GetAttributeLocationsFromShader() = 0;

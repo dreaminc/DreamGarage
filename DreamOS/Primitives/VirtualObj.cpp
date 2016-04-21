@@ -146,6 +146,15 @@ VirtualObj VirtualObj::SetRotateZ(quaternion_precision theta) {
 	return (*this);
 }
 
+quaternion VirtualObj::GetOrientation() {
+	return m_qRotation;
+}
+
+matrix<virtual_precision, 4, 4> VirtualObj::GetOrientationMatrix() {
+	matrix<virtual_precision, 4, 4> retMatrix = RotationMatrix(m_qRotation);
+	return retMatrix;
+}
+
 // Angular Momentum
 VirtualObj VirtualObj::AddAngularMomentum(quaternion q) {
 	m_qAngularMomentum *= q;

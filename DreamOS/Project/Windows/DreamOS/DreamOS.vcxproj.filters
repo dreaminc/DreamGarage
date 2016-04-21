@@ -65,7 +65,7 @@
     </Filter>
     <Filter Include="External\SOIL">
       <UniqueIdentifier>{959b6fa9-ce2d-43ef-b7b5-652c05626a9d}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="TimeManager">
       <UniqueIdentifier>{8b96d977-b3e9-4a11-a23d-f434f6d4d4ec}</UniqueIdentifier>
     </Filter>
@@ -169,7 +169,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\texture.cpp">
       <Filter>Primitives</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp">
       <Filter>TimeManager</Filter>
     </ClCompile>
@@ -444,7 +444,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\uvcoord.h">
       <Filter>Primitives</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h">
       <Filter>TimeManager</Filter>
     </ClInclude>
@@ -452,6 +452,12 @@
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\skybox.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
@@ -475,6 +481,12 @@
       <Filter>HAL\opengl\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\skybox.frag">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\skybox.vert">
       <Filter>HAL\opengl\GLSL\v440</Filter>
     </None>
   </ItemGroup>

@@ -393,6 +393,7 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO: More complex shader handling - right now statically calling minimal shader
 	// TODO: Likely put into factory
 	// TODO: Move to GLSL version?
+	/*
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
 	CRM(pVertexShader->InitializeFromFile(L"minimal.vert", m_versionOGL), "Failed to initialize vertex shader from file");
@@ -401,6 +402,19 @@ RESULT OpenGLImp::PrepareScene() {
 	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
 	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag", m_versionOGL), "Failed to initialize fragment shader from file");
 	//CR(pFragmentShader->BindAttributes());
+	//*/
+
+	// TODO: Move into better OGLProg design - this is stop gap
+	///*
+	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
+	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
+	CRM(pVertexShader->InitializeFromFile(L"skybox.vert", m_versionOGL), "Failed to initialize vertex shader from file");
+
+	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
+	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
+	CRM(pFragmentShader->InitializeFromFile(L"skybox.frag", m_versionOGL), "Failed to initialize fragment shader from file");
+	//CR(pFragmentShader->BindAttributes());
+	//*/
 	
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
@@ -409,20 +423,20 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// TODO: This could all be done in one call in the shader honestly
 	// Attributes
-	CR(pVertexShader->GetAttributeLocationsFromShader());
-	CR(pVertexShader->BindAttributes());
+	WCR(pVertexShader->GetAttributeLocationsFromShader());
+	WCR(pVertexShader->BindAttributes());
 
 	// TODO: Uniform Variables
 
 	// Uniform Blocks
-	CR(pVertexShader->GetUniformLocationsFromShader());
-	CR(pVertexShader->BindUniformBlocks());
-	CR(pVertexShader->InitializeUniformBlocks());
+	WCR(pVertexShader->GetUniformLocationsFromShader());
+	WCR(pVertexShader->BindUniformBlocks());
+	WCR(pVertexShader->InitializeUniformBlocks());
 
 	// Fragment shader
-	CR(pFragmentShader->GetUniformLocationsFromShader());
-	CR(pFragmentShader->BindUniformBlocks());
-	CR(pFragmentShader->InitializeUniformBlocks());
+	WCR(pFragmentShader->GetUniformLocationsFromShader());
+	WCR(pFragmentShader->BindUniformBlocks());
+	WCR(pFragmentShader->InitializeUniformBlocks());
 
 	CR(PrintVertexAttributes());
 	CR(PrintActiveUniformVariables());
@@ -611,11 +625,15 @@ RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
 
 	auto ptEye = m_pCamera->GetEyePosition(eye);
 	auto matV = m_pCamera->GetViewMatrix(eye);
+	auto matP = m_pCamera->GetProjectionMatrix();
 	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix(eye);
+	auto matViewOrientation = m_pCamera->GetOrientationMatrix();
 
-	CR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
-	CR(m_pVertexShader->SetViewMatrixUniform(matV));
-	CR(m_pVertexShader->SetEyePositionUniform(ptEye));
+	WCR(m_pVertexShader->SetViewMatrixUniform(matV));
+	WCR(m_pVertexShader->SetProjectionMatrixUniform(matP));
+	WCR(m_pVertexShader->SetViewOrientationMatrixUniform(matViewOrientation));
+	WCR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
+	WCR(m_pVertexShader->SetEyePositionUniform(ptEye));
 
 Error:
 	return r;
@@ -630,6 +648,7 @@ Error:
 #include "OGLSphere.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
+#include "OGLSkybox.h"
 
 light *g_pLight = NULL;
 
@@ -665,11 +684,17 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//*/
 
 	///*
-	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg");
+	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
-	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg");
+	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
+	OGLSkybox *pSkybox = new OGLSkybox(this);
+	OGLTexture *pCubeMap = new OGLTexture(this, L"NissiBeach", texture::TEXTURE_TYPE::TEXTURE_CUBE);
+	pSkybox->SetCubeMapTexture(pCubeMap);
+	pSkybox->OGLActivateCubeMapTexture();
+	pSceneGraph->PushObject(pSkybox);
 	//*/
-	
 	
 	/*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
@@ -705,7 +730,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	}
 	//*/
 		
-	///*
+	/*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 	
@@ -757,6 +782,12 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	// Send lights to shader
+	std::vector<light*> *pLights = NULL;
+	CR(pObjectStore->GetLights(pLights));
+	CN(pLights);
+	CR(SendLightsToShader(pLights));
+
 	// Camera Projection Matrix
 	SetCameraMatrix(EYE_MONO);
 
@@ -771,9 +802,15 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 			SendObjectToShader(pDimObj);
 		}
 	}
+
+	skybox *pSkybox = nullptr;
+	CR(pObjectStore->GetSkybox(pSkybox));
+	if(pSkybox != nullptr)
+		SendObjectToShader(pSkybox);
 	
 	glFlush();
 
+Error:
 	CheckGLError();
 	return r;
 }
@@ -812,6 +849,11 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 			}
 			
 		}
+
+		skybox *pSkybox = nullptr;
+		CR(pObjectStore->GetSkybox(pSkybox));
+		if (pSkybox != nullptr)
+			SendObjectToShader(pSkybox);
 	}
 	
 	glFlush();

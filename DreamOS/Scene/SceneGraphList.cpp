@@ -1,6 +1,8 @@
 #include "SceneGraphList.h"
 
-SceneGraphList::SceneGraphList() {
+SceneGraphList::SceneGraphList() :
+	m_pSkybox(nullptr)
+{
 	ResetIterator();
 }
 
@@ -41,6 +43,10 @@ RESULT SceneGraphList::PushObject(VirtualObj *pObject) {
 	light *pLight = dynamic_cast<light*>(pObject);
 	if (pLight != NULL)
 		return PushLight(pLight);
+
+	skybox *pSkybox = dynamic_cast<skybox*>(pObject);
+	if (pSkybox != NULL)
+		return SetSkybox(pSkybox);
 	
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 	if (pObject != NULL)
@@ -76,6 +82,16 @@ RESULT SceneGraphList::GetLights(std::vector<light*>*& pLights) {
 
 Error:
 	return r;
+}
+
+RESULT SceneGraphList::SetSkybox(skybox *pSkybox) {
+	m_pSkybox = pSkybox;
+	return R_PASS;
+}
+
+RESULT SceneGraphList::GetSkybox(skybox*& pSkybox) {
+	pSkybox = m_pSkybox;
+	return R_PASS;
 }
 
 VirtualObj *SceneGraphList::FindObjectByUID(UID uid) {

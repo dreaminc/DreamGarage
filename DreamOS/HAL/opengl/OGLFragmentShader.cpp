@@ -35,11 +35,11 @@ RESULT OGLFragmentShader::GetUniformLocationsFromShader() {
 	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
 
 	// Uniforms
-	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetColorTextureUniformName(), &m_uniformColorTextureIndex), "Failed to acquire color texture uniform GL location");
-	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetBumpTextureUniformName(), &m_uniformBumpTextureIndex), "Failed to acquire bump texture uniform GL location");
+	WCRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetColorTextureUniformName(), &m_uniformColorTextureIndex), "Failed to acquire color texture uniform GL location");
+	WCRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetBumpTextureUniformName(), &m_uniformBumpTextureIndex), "Failed to acquire bump texture uniform GL location");
 
 	// Blocks
-	CRM(m_pMaterialBlock->UpdateUniformBlockIndexFromShader(GetMaterialUniformBlockName()), "Failed to acquire material uniform block GL location");
+	WCRM(m_pMaterialBlock->UpdateUniformBlockIndexFromShader(GetMaterialUniformBlockName()), "Failed to acquire material uniform block GL location");
 	
 Error:
 	return r;
@@ -49,7 +49,7 @@ Error:
 RESULT OGLFragmentShader::BindUniformBlocks() {
 	RESULT r = R_PASS;
 
-	CRM(m_pMaterialBlock->BindUniformBlock(), "Failed to bind %s to material uniform block", GetMaterialUniformBlockName());
+	WCRM(m_pMaterialBlock->BindUniformBlock(), "Failed to bind %s to material uniform block", GetMaterialUniformBlockName());
 
 Error:
 	return r;

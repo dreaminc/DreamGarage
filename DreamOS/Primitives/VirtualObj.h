@@ -78,6 +78,9 @@ public:
 	VirtualObj SetRotateY(quaternion_precision theta);
 	VirtualObj SetRotateZ(quaternion_precision theta);
 
+	quaternion GetOrientation();
+	matrix<virtual_precision, 4, 4> GetOrientationMatrix();
+
 	// Angular Momentum
 	VirtualObj AddAngularMomentum(quaternion q);
 	VirtualObj SetAngularMomentum(quaternion am);

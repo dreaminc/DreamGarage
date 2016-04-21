@@ -211,6 +211,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
@@ -236,6 +237,7 @@
     <ClInclude Include="..\..\..\Primitives\model.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
+    <ClInclude Include="..\..\..\Primitives\skybox.h" />
     <ClInclude Include="..\..\..\Primitives\sphere.h" />
     <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
@@ -288,6 +290,8 @@
     <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\skybox.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\skybox.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />
