@@ -45,9 +45,13 @@ public:
 		bool fCullingEnabled = glIsEnabled(GL_CULL_FACE);
 
 		glDisable(GL_CULL_FACE);
+		glDepthMask(GL_FALSE);
+
 		CR(OGLObj::Render());
 
 	Error:
+		glDepthMask(GL_TRUE);
+
 		if(fCullingEnabled)
 			glEnable(GL_CULL_FACE);
 

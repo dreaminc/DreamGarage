@@ -18,8 +18,6 @@ RESULT OGLVertexShader::BindAttributes() {
 	WCRM(m_pParentImp->BindAttribLocation(GetPositionIndex(), (char*)GetPositionAttributeName()), "Failed to bind %s to position attribute", GetPositionAttributeName());
 	WCRM(m_pParentImp->BindAttribLocation(GetColorIndex(), (char*)GetColorAttributeName()), "Failed to bind %s to color attribute", GetColorAttributeName());
 
-	r = R_PASS;
-
 Error:
 	return r;
 }
@@ -98,9 +96,11 @@ RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetModelMatrixUniformName(), &m_uniformModelMatrixIndex), "Failed to acquire model matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetViewMatrixUniformName(), &m_uniformViewMatrixIndex), "Failed to acquire view matrix uniform GL location");
+	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetProjectionMatrixUniformName(), &m_uniformProjectionMatrixIndex), "Failed to acquire view matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetModelViewMatrixUniformName(), &m_uniformModelViewMatrixIndex), "Failed to acquire model matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetViewProjectionMatrixUniformName(), &m_uniformViewProjectionMatrixIndex), "Failed to acquire projection view matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetNormalMatrixUniformName(), &m_uniformNormalMatrixIndex), "Failed to acquire normal matrix uniform GL location");
+	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetViewOrientationMatrixUniformName(), &m_uniformViewOrientationMatrixIndex), "Failed to acquire view orientation quaternion uniform GL location");
 
 	//CRM(m_pParentImp->glGetUniformBlockIndex(oglProgramID, GetLightsUniformBlockName(), &m_uniformBlockLightsIndex), "Failed to acquire lights uniform block GL location");
 	CRM(m_pLightsBlock->UpdateUniformBlockIndexFromShader(GetLightsUniformBlockName()), "Failed to acquire lights uniform block GL location");
@@ -181,7 +181,7 @@ GLint OGLVertexShader::GetLightsUniformBlockBindingPoint() {
 
 // Set Matrix Functions
 // TODO: This should be generalized 
-RESULT OGLVertexShader::SetEyePositionUniform(matrix<float, 4, 1> ptEye) {
+RESULT OGLVertexShader::SetEyePositionUniform(point ptEye) {
 	return SetPointUniform(ptEye, GetEyePositionUniformName());
 }
 
@@ -191,6 +191,10 @@ RESULT OGLVertexShader::SetModelMatrixUniform(matrix<float, 4, 4> matModel) {
 
 RESULT OGLVertexShader::SetViewMatrixUniform(matrix<float, 4, 4> matView) {
 	return Set44MatrixUniform(matView, GetViewMatrixUniformName());
+}
+
+RESULT OGLVertexShader::SetProjectionMatrixUniform(matrix<float, 4, 4> matProjection) {
+	return Set44MatrixUniform(matProjection, GetProjectionMatrixUniformName());
 }
 
 RESULT OGLVertexShader::SetModelViewMatrixUniform(matrix<float, 4, 4> matModelView) {
@@ -203,4 +207,8 @@ RESULT OGLVertexShader::SetViewProjectionMatrixUniform(matrix<float, 4, 4> matVi
 
 RESULT OGLVertexShader::SetNormalMatrixUniform(matrix<float, 4, 4> matNormal) {
 	return Set44MatrixUniform(matNormal, GetNormalMatrixUniformName());
+}
+
+RESULT OGLVertexShader::SetViewOrientationMatrixUniform(matrix<float, 4, 4> matViewOrientaton) {
+	return Set44MatrixUniform(matViewOrientaton, GetViewOrientationMatrixUniformName());
 }

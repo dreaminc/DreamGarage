@@ -92,6 +92,34 @@ Error:
 	return r;
 }
 
+RESULT OpenGLShader::SetUniform4fv(GLfloat *pVal4fv, const char* pszUniformName) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+
+	GLint location = -1;
+	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+
+	CB((location >= 0));
+	m_pParentImp->glUniform4fv(location, 1, pVal4fv);
+
+Error:
+	return r;
+}
+
+RESULT OpenGLShader::SetQuaternionUniform(quaternion q, const char* pszUniformName) {
+	return SetUniform4fv(reinterpret_cast<GLfloat*>(&q), pszUniformName);
+}
+
+RESULT OpenGLShader::SetPointUniform(point pt, const char* pszUniformName) {
+	return SetUniform4fv(reinterpret_cast<GLfloat*>(&pt), pszUniformName);
+}
+
+RESULT OpenGLShader::SetVectorUniform(vector v, const char* pszUniformName) {
+	return SetUniform4fv(reinterpret_cast<GLfloat*>(&v), pszUniformName);
+}
+
+/*
 RESULT OpenGLShader::SetPointUniform(matrix<float, 4, 1> pt, const char* pszUniformName) {
 	RESULT r = R_PASS;
 
@@ -106,6 +134,7 @@ RESULT OpenGLShader::SetPointUniform(matrix<float, 4, 1> pt, const char* pszUnif
 Error:
 	return r;
 }
+*/
 
 RESULT OpenGLShader::Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName) {
 	RESULT r = R_PASS;

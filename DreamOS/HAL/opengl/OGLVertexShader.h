@@ -36,9 +36,11 @@ public:
 	const char *GetEyePositionUniformName() { return "u_vec4Eye"; }
 	const char *GetModelMatrixUniformName() { return "u_mat4Model";  }
 	const char *GetViewMatrixUniformName() { return "u_mat4View"; }
+	const char *GetProjectionMatrixUniformName() { return "u_mat4Projection"; }
 	const char *GetModelViewMatrixUniformName() { return "u_mat4ModelView"; }
 	const char *GetViewProjectionMatrixUniformName() { return "u_mat4ViewProjection"; }
 	const char *GetNormalMatrixUniformName() { return "u_mat4Normal"; }
+	const char *GetViewOrientationMatrixUniformName() { return "u_mat4ViewOrientation";  }
 
 	const char *GetLightsUniformBlockName() { return "ub_LightArray"; }
 
@@ -56,12 +58,14 @@ public:
 	GLint GetViewProjectionMatrixUniformIndex();
 	GLint GetNormalMatrixUniformIndex();
 
-	RESULT SetEyePositionUniform(matrix<float, 4, 1> ptEye);
+	RESULT SetEyePositionUniform(point ptEye);
 	RESULT SetModelMatrixUniform(matrix<float, 4, 4> matModel);
 	RESULT SetViewMatrixUniform(matrix<float, 4, 4> matView);
+	RESULT SetProjectionMatrixUniform(matrix<float, 4, 4> matProjection);
 	RESULT SetModelViewMatrixUniform(matrix<float, 4, 4> matModelView);
 	RESULT SetViewProjectionMatrixUniform(matrix<float, 4, 4> matViewProjection);
 	RESULT SetNormalMatrixUniform(matrix<float, 4, 4> matNormal);
+	RESULT SetViewOrientationMatrixUniform(matrix<float, 4, 4> matViewOrientaton);
 
 	GLint GetLightsUniformBlockBufferIndex();
 	GLint GetLightsUniformBlockIndex();
@@ -97,9 +101,11 @@ private:
 	GLint m_uniformEyePositionIndex;
 	GLint m_uniformModelMatrixIndex;
 	GLint m_uniformViewMatrixIndex;
+	GLint m_uniformProjectionMatrixIndex;
 	GLint m_uniformModelViewMatrixIndex;
 	GLint m_uniformViewProjectionMatrixIndex;
 	GLint m_uniformNormalMatrixIndex;
+	GLint m_uniformViewOrientationMatrixIndex;
 
 	/* Move into OGLUniformBlock - OGLLightsBlock
 	GLint m_uniformBlockLightsIndex;

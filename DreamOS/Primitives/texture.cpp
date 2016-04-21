@@ -288,7 +288,7 @@ RESULT texture::LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring>
 		CN(pBuffers[CubeMapFace]);
 
 		// Ensure all heights are the same
-		if(CubeMapFace == 0) {
+		if(m_width == 0) {
 			m_width = widths[CubeMapFace];
 			m_height = heights[CubeMapFace];
 			m_channels = channels[CubeMapFace];

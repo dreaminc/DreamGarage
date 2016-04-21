@@ -24,12 +24,12 @@ public:
 	};
 
 	enum class CUBE_MAP {
-		CUBE_MAP_NEG_X = 0,
-		CUBE_MAP_POS_X = 1,
-		CUBE_MAP_NEG_Y = 2,
+		CUBE_MAP_POS_X = 0,
+		CUBE_MAP_NEG_X = 1,
 		CUBE_MAP_POS_Y = 3,
-		CUBE_MAP_NEG_Z = 4,
+		CUBE_MAP_NEG_Y = 2,
 		CUBE_MAP_POS_Z = 5,
+		CUBE_MAP_NEG_Z = 4,
 		CUBE_MAP_INVALID 
 	};
 

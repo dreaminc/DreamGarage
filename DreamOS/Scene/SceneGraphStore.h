@@ -11,9 +11,11 @@
 
 #include <vector>
 #include "Primitives/light.h"
+#include "Primitives/skybox.h"
 
 class SceneGraphStore {
 public:
+	// Objects
 	virtual RESULT ResetIterator() = 0;
 	virtual VirtualObj *GetNextObject() = 0;
 
@@ -24,7 +26,11 @@ public:
 	virtual VirtualObj *FindObjectByUID(UID uid) = 0;
 	virtual VirtualObj *FindObject(VirtualObj *pObject) = 0;
 
+	// Lights
 	virtual RESULT GetLights(std::vector<light*>*& pLights) = 0;
+
+	// Skybox / Sphere
+	virtual RESULT GetSkybox(skybox*& pSkybox) = 0;
 };
 
 #endif // ! SCENE_GRAPH_STORE_H_

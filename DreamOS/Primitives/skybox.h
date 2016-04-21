@@ -10,7 +10,7 @@
 #include "volume.h"
 #include "texture.h"
 
-#define DEFAULT_SKYBOX_SIZE 5.0f
+#define DEFAULT_SKYBOX_SIZE 1000.0f
 
 class skybox : public volume {
 
