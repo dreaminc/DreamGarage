@@ -690,7 +690,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 
 	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
 	OGLSkybox *pSkybox = new OGLSkybox(this);
-	OGLTexture *pCubeMap = new OGLTexture(this, L"NissiBeach", texture::TEXTURE_TYPE::TEXTURE_CUBE);
+	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	pSkybox->OGLActivateCubeMapTexture();
 	pSceneGraph->PushObject(pSkybox);
