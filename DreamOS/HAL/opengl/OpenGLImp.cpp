@@ -704,7 +704,6 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
 	//*/
 
-
 	/*
 	OGLVolume *pVolume = NULL;
 	int num = 10;

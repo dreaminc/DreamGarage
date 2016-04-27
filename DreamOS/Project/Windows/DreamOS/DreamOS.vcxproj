@@ -154,6 +154,48 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\GL\CAPI_GLE.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Alg.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Allocator.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Atomic.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Callbacks.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_CRC32.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_DebugHelp.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_File.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_FileFILE.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_JSON.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Lockless.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Log.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_mach_exc_OSX.c" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Rand.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_RefCount.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_SharedMemory.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Std.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_String.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_String_FormatUtil.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_String_PathUtil.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_SysFile.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_System.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_ThreadCommandQueue.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_ThreadsPthread.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_ThreadsWinAPI.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Timer.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_UTF8Util.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_D3D11_Blitter.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_Direct3D.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_GetSystemSpecs.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_GL_Blitter.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_ImageWindow.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_LongPollThread.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_SystemGUI.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_SystemInfo.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_Watchdog.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVR\Src\OVR_CAPIShim.c" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVR\Src\OVR_CAPI_Util.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\LibOVR\Src\OVR_StereoProjection.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp" />
     <ClCompile Include="..\..\..\External\SOIL\image_DXT.c" />
     <ClCompile Include="..\..\..\External\SOIL\image_helper.c" />
     <ClCompile Include="..\..\..\External\SOIL\SOIL.c" />
@@ -193,6 +235,68 @@
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\GL\CAPI_GLE.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\GL\CAPI_GLE_GL.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Alg.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Allocator.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Array.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Atomic.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Callbacks.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_CallbacksInternal.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Color.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Compiler.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_ContainerAllocator.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_CRC32.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_DebugHelp.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Delegates.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Deque.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_File.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Hash.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_JSON.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_KeyCodes.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_List.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Lockless.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Log.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_mach_exc_OSX.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Nullptr.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Rand.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_RefCount.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_SharedMemory.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Std.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_String.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_StringHash.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_SysFile.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_System.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_ThreadCommandQueue.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Threads.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Timer.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Types.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_UTF8Util.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_Win32_IncludeWindows.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Tracing\LibOVREvents.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Tracing\Tracing.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_D3D11_Blitter.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_Direct3D.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_GL_Blitter.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_ImageWindow.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_LongPollThread.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_SystemGUI.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_SystemInfo.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Util_Watchdog.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\Extras\OVR_CAPI_Util.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\Extras\OVR_Math.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\Extras\OVR_StereoProjection.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\OVR_CAPI.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\OVR_CAPI_Audio.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\OVR_CAPI_D3D.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\OVR_CAPI_GL.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\OVR_CAPI_Keys.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\OVR_ErrorCode.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Include\OVR_Version.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\LibOVR\Src\Resources\Windows\resource.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
     <ClInclude Include="..\..\..\External\SOIL\image_DXT.h" />
     <ClInclude Include="..\..\..\External\SOIL\image_helper.h" />
     <ClInclude Include="..\..\..\External\SOIL\SOIL.h" />
@@ -286,6 +390,7 @@
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Kernel\OVR_NewOverride.inl" />
     <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag" />
@@ -298,6 +403,17 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Tracing\LibOVREvents.rc" />
+    <ResourceCompile Include="..\..\..\External\OCULUS\v132\LibOVR\Src\Resources\Windows\LibOVR.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\External\OCULUS\v132\LibOVR\Src\Resources\Windows\Oculus.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Shaders\Blt_ps.hlsl" />
+    <FxCompile Include="..\..\..\External\OCULUS\v132\LibOVRKernel\Src\Util\Shaders\Blt_vs.hlsl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
