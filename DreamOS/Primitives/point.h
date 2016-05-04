@@ -36,6 +36,14 @@ public:
 		this->element(3, 0) = 1.0f;
 	}
 
+	point(point_precision values[3]) {
+		this->clear();
+		this->element(0, 0) = values[0];
+		this->element(1, 0) = values[1];
+		this->element(2, 0) = values[2];
+		this->element(3, 0) = 1.0f;
+	}
+
 	point(point_precision x, point_precision y, point_precision z, point_precision w) {
 		this->clear();
 

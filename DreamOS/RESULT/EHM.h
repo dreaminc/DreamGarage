@@ -39,7 +39,11 @@
 // Check RESULT value
 // Ensures that RESULT is successful
 #define CR(res) do{r=(res);if(r&0x80000000){goto Error;}}while(0);
-#define CRM(res, msg, ...) do{r= (res);if(r&0x80000000){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: 0x%x\n",r);goto Error;}}while(0)
+#define CRM(res, msg, ...) do{r= (res);if(r&0x80000000){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: 0x%x\n",r);goto Error;}}while(0);
+
+// Check result no assign (this allows for mapping with non RESULT error types without having to cast
+#define CRNA(res) do{if(res&0x80000000){goto Error;r=R_FAIL;}}while(0);
+#define CRNAM(res, msg, ...) do{if(res&0x80000000){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: 0x%x\n", res);r=R_FAIL;goto Error;}}while(0);
 
 #define ACRM(res, msg, ...) do{if((res)&0x80000000){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0); }}while(0);
 #define ACR(res) do{if((res)&0x80000000){assert(0); }}while(0);

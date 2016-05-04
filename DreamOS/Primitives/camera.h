@@ -35,8 +35,9 @@
 
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseKeyboard.h"
+#include "HMD/HMD.h"
 
-class camera : public VirtualObj, public Subscriber<SenseKeyboardEvent> {
+class camera : public VirtualObj, public Subscriber<SenseKeyboardEvent>, public Subscriber<HMDEvent> {
 public:
 	camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
 		m_FielfOfViewAngle(FOV),
@@ -152,6 +153,15 @@ public:
 	RESULT AddUpSpeed(camera_precision speed) {
 		m_cameraUpSpeed += speed;
 		return R_PASS;
+	}
+
+	RESULT Notify(HMDEvent *hmdEvent) {
+		RESULT r = R_PASS;
+
+		DEBUG_LINEOUT("Cam hmd event");//, kbEvent->KeyCode, kbEvent->KeyState);
+
+	Error:
+		return r;
 	}
 
 	RESULT Notify(SenseKeyboardEvent *kbEvent) {

@@ -24,6 +24,10 @@ constexpr quaternion_precision operator "" _q(long double number)
 	return static_cast<quaternion_precision>(number);
 }
 
+typedef struct {
+	quaternion_precision x, y, z, w;
+} quaternionXYZW;
+
 class quaternion {
 public:
 	quaternion() {
@@ -41,6 +45,16 @@ public:
 
 	quaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 		SetQuaternion(theta, x, y, z);
+	}
+
+	quaternion(quaternion_precision values[4]) {
+		SetValues(values);
+		Normalize();
+	}
+
+	quaternion(quaternionXYZW qXYZW) {
+		SetValues(qXYZW);
+		Normalize();
 	}
 
 	RESULT SetQuaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
@@ -64,6 +78,42 @@ public:
 		m_x = x;
 		m_y = y;
 		m_z = z;
+
+		if (Magnitude() > 0)
+			return R_PASS;
+		else
+			return R_INVALID_PARAM;
+	}
+
+	RESULT SetValues(quaternion_precision values[4]) {
+		m_w = values[0];
+		m_x = values[1];
+		m_y = values[2];
+		m_z = values[3];
+
+		if (Magnitude() > 0)
+			return R_PASS;
+		else
+			return R_INVALID_PARAM;
+	}
+
+	RESULT SetValues(quaternionXYZW qXYZW) {
+		m_w = qXYZW.w;
+		m_x = qXYZW.x;
+		m_y = qXYZW.y;
+		m_z = qXYZW.z;
+
+		if (Magnitude() > 0)
+			return R_PASS;
+		else
+			return R_INVALID_PARAM;
+	}
+
+	RESULT SetValuesXYZW(quaternion_precision values[4]) {
+		m_x = values[0];
+		m_y = values[1];
+		m_z = values[2];
+		m_w = values[3];
 
 		if (Magnitude() > 0)
 			return R_PASS;

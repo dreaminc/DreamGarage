@@ -93,6 +93,12 @@
     <Filter Include="External\OCULUS\v132\Logging\src\internal">
       <UniqueIdentifier>{cf6c4deb-a89a-47e2-aa2d-10b4412d9151}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HMD">
+      <UniqueIdentifier>{e122ce99-434d-454c-a1b9-c035729da930}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HMD\Oculus">
+      <UniqueIdentifier>{a53afd0a-b5a4-4b9b-80ab-050429f6f805}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -205,6 +211,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
       <Filter>External\OCULUS\v132\Logging\src\internal</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\HMDFactory.cpp">
+      <Filter>HMD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -501,6 +510,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h">
       <Filter>External\OCULUS\v132\Logging\include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\HMD.h">
+      <Filter>HMD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\Oculus\OVR.h">
+      <Filter>HMD\Oculus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\HMDFactory.h">
+      <Filter>HMD</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

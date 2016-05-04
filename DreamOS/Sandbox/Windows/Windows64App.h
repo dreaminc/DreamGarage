@@ -14,6 +14,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
+#include <HMD/HMD.h>
 
 #define DEFAULT_WIDTH 1920
 #define DEFAULT_HEIGHT 1080
@@ -77,6 +78,7 @@ private:
 public:
 	Win64Keyboard *m_pWin64Keyboard;
 	Win64Mouse *m_pWin64Mouse;
+	HMD *m_pHMD;
 };
 
 #endif // ! WINDOWS_64_APP_H_

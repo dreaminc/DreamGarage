@@ -6,6 +6,7 @@
 
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
+#include <HMD/HMDFactory.h>
 
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
@@ -77,6 +78,10 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	// Initialize Mouse 
 	m_pWin64Mouse->CaptureMouse();
 	m_pWin64Mouse->CenterMousePosition();
+
+	// HMD
+	// TODO: This should go into (as well as the above) into the Sandbox
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR);
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 

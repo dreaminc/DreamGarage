@@ -21,7 +21,4 @@ public:
 	}
 };
 
-#else
-	// Throw error for these core types
-	#error FACTORY_H_ include collision
 #endif // ! FACTORY_H_

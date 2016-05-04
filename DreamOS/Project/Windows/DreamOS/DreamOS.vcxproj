@@ -113,6 +113,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(ProjectDir)../../../External/OCULUS/v132/LibOVR/Lib/Windows/x64/Release/VS2015/LibOVR.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -170,6 +171,7 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp" />
+    <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
@@ -233,6 +235,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h" />
     <ClInclude Include="..\..\..\HAL\Shader.h" />
+    <ClInclude Include="..\..\..\HMD\HMD.h" />
+    <ClInclude Include="..\..\..\HMD\HMDFactory.h" />
+    <ClInclude Include="..\..\..\HMD\Oculus\OVR.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
