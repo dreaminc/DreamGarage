@@ -639,6 +639,10 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::SetCameraOrientation(quaternion qOrientation) {
+	m_pCamera->SetOrientation(qOrientation);
+	return R_PASS;
+}
 #include "OGLVolume.h"
 
 #include "OGLModel.h"
@@ -953,6 +957,28 @@ Error:
 	return r;
 }
 
+// FBO
+RESULT OpenGLImp::glGenFramebuffers(GLsizei n, GLuint *framebuffers) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGenFramebuffers(n, framebuffers);
+	CRM(CheckGLError(), "glGenFramebuffers failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBindFramebuffer(GLenum target, GLuint gluiFramebuffer) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBindFramebuffer(target, gluiFramebuffer);
+	CRM(CheckGLError(), "glBindFramebuffer failed");
+
+Error:
+	return r;
+}
+
+// VBO
 RESULT OpenGLImp::glGenBuffers(GLsizei n, GLuint *buffers) {
 	RESULT r = R_PASS;
 

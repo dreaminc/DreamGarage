@@ -78,6 +78,7 @@ public:
 	VirtualObj SetRotateY(quaternion_precision theta);
 	VirtualObj SetRotateZ(quaternion_precision theta);
 
+	VirtualObj SetOrientation(quaternion qOrientation);
 	quaternion GetOrientation();
 	matrix<virtual_precision, 4, 4> GetOrientationMatrix();
 

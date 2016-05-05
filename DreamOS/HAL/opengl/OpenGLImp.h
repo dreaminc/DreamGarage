@@ -81,6 +81,7 @@ public:
 	camera *GetCamera();
 	RESULT UpdateCamera();
 	RESULT SetCameraMatrix(EYE_TYPE viewTarget);
+	RESULT SetCameraOrientation(quaternion qOrientation);
 
 	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
 
@@ -105,6 +106,10 @@ private:
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
+	// TODO: The Eye Buffers shouldn't be in the OpenGLImp
+	// Best to push into FrameBuffer -> OGLFrameBuffer then attach to HMD or stereo camera
+
+
 public:
 	// TODO: [SHADER] This should be baked into Shader
 	RESULT EnableVertexPositionAttribute();
@@ -121,6 +126,10 @@ public:
 	RESULT glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params);
 	RESULT glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params);
 	RESULT glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name);
+
+	// FBO
+	RESULT glGenFramebuffers(GLsizei n, GLuint *framebuffers);
+	RESULT glBindFramebuffer(GLenum target, GLuint gluiFramebuffer);
 
 	RESULT glGenVertexArrays(GLsizei n, GLuint *arrays);
 	RESULT glBindVertexArray(GLuint gluiArray);

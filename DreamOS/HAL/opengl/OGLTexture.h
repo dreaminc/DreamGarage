@@ -32,6 +32,14 @@ public:
 		// empty
 	}
 
+	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type) :
+		texture(type),
+		m_textureIndex(0),
+		m_pParentImp(pParentImp)
+	{
+		RESULT r = OGLInitialize();
+	}
+
 	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename, texture::TEXTURE_TYPE type) :
 		texture(pszFilename, type),
 		m_textureIndex(0),

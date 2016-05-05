@@ -121,8 +121,14 @@ VirtualObj VirtualObj::RotateZBy(quaternion_precision theta) {
 	return (*this);
 }
 		   
+// TODO: This is reproduced, choose one
 VirtualObj VirtualObj::SetRotate(quaternion q) {
 	m_qRotation = q;
+	return (*this);
+}
+
+VirtualObj VirtualObj::SetOrientation(quaternion qOrientation) {
+	m_qRotation = qOrientation;
 	return (*this);
 }
 

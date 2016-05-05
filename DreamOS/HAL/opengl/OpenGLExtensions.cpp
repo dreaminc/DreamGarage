@@ -156,6 +156,13 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glTexImage2D = (PFNGLTEXIMAGE2DPROC)wglGetProcAddress("m_glTexImage2D")),
 		"Failed to initialize m_glTexImage2D extension");
 
+	// FBO
+	CNMW((m_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers")),
+		"Failed to initialzie glGenFramebuffers extension");
+
+	CNMW((m_glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer")),
+		"Failed to initialize glBindFramebuffer extension");
+
 	// VBO
 	CNMW((m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers")),
 		"Failed to initialzie glGenBuffers extension");

@@ -520,6 +520,12 @@
     <ClInclude Include="..\..\..\HMD\HMDFactory.h">
       <Filter>HMD</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Framebuffer.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

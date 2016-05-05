@@ -214,6 +214,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
@@ -242,6 +243,7 @@
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
+    <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />

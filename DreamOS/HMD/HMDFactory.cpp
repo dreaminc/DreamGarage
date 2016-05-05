@@ -19,7 +19,6 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type) {
 	}
 
 	return pHMD;
-
 Error:
 	if (pHMD != nullptr) {
 		delete pHMD;

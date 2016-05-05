@@ -226,6 +226,15 @@ public:
 		return m_glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	}
 
+	// FBO
+	inline void glGenFramebuffers(GLsizei n, GLuint *framebuffers) {
+		return m_glGenFramebuffers(n, framebuffers);
+	}
+
+	inline void glBindFramebuffer(GLenum target, GLuint framebufferID) {
+		return m_glBindFramebuffer(target, framebufferID);
+	}
+
 	// VBO
 	inline void glGenBuffers(GLsizei n, GLuint *buffers) {
 		return m_glGenBuffers(n, buffers);
@@ -327,6 +336,10 @@ private:
 	PFNGLTEXPARAMETERIPROC m_glTexParameteri;
 	PFNGLTEXIMAGE2DPROC m_glTexImage2D;
 	//PFNGLTEXSUBIMAGE2DPROC m_glTexSubImage2D;
+
+	// FBO
+	PFNGLGENFRAMEBUFFERSPROC m_glGenFramebuffers;
+	PFNGLBINDFRAMEBUFFERPROC m_glBindFramebuffer;
 
 	// VBO
 	PFNGLGENBUFFERSPROC m_glGenBuffers;

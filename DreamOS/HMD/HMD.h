@@ -74,6 +74,9 @@ public:
 	// Called to update/poll tracking info
 	virtual RESULT UpdateHMD() = 0;
 
+	quaternion GetHMDOrientation() { return m_qOrientation; }
+	point GetHMDOrigin() { return m_ptOrigin; }
+
 protected:
 	point m_ptOrigin;
 	quaternion m_qOrientation;

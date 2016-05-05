@@ -14,7 +14,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pxHeight(DEFAULT_HEIGHT),
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
-	m_hDC(NULL)
+	m_hDC(nullptr),
+	m_pHMD(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -32,12 +33,12 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_wndclassex.hIcon = LoadIcon(0, IDI_APPLICATION);
 	m_wndclassex.hCursor = LoadCursor(0, IDC_ARROW);
 	m_wndclassex.hbrBackground = HBRUSH(COLOR_WINDOW + 1);
-	m_wndclassex.lpszMenuName = NULL;
+	m_wndclassex.lpszMenuName = nullptr;
 	m_wndclassex.lpszClassName = m_pszClassName;
 	m_wndclassex.hIconSm = LoadIcon(0, IDI_APPLICATION);
 
 	if (!RegisterClassEx(&m_wndclassex)) {
-		MessageBox(NULL, _T("Failed to register sandbox window class"), _T("Dream OS Sandbox Error"), NULL);
+		MessageBox(nullptr, _T("Failed to register sandbox window class"), _T("Dream OS Sandbox Error"), NULL);
 		return;	// TODO: Use assert EHM
 	}
 
@@ -64,8 +65,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		m_posY,												// Y
 		m_pxWidth,											// Width
 		m_pxHeight,											// Height
-		NULL,												// hWndParent
-		NULL,												// hMenu
+		nullptr,												// hWndParent
+		nullptr,												// hMenu
 		m_hInstance,										// hInstance
 		this												// lpParam
 	);
@@ -158,7 +159,7 @@ Error:
 }
 
 LRESULT __stdcall Windows64App::StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp) {
-	Windows64App *pApp = NULL;
+	Windows64App *pApp = nullptr;
 
 	// Get pointer to window
 	if (msg == WM_CREATE) {
@@ -182,7 +183,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 		case WM_CREATE: {
 			HDC hDC = GetDC(hWindow);
 
-			if (hDC == NULL) {
+			if (hDC == nullptr) {
 				DEBUG_LINEOUT("Failed to capture Device Context");
 				PostQuitMessage(0);
 				return 0L;
@@ -377,7 +378,7 @@ RESULT Windows64App::ShowSandbox() {
 	CR(m_pOpenGLImp->MakeCurrentContext());
 
 	while (!fQuit) {
-		if (PeekMessage(&msg, NULL, NULL, NULL, PM_REMOVE)) {
+		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
 			if (msg.message == WM_QUIT)
 				fQuit = true;
 
@@ -398,6 +399,12 @@ RESULT Windows64App::ShowSandbox() {
 
 		// Update Camera
 		m_pOpenGLImp->UpdateCamera();
+
+		// Update HMD
+		if (m_pHMD != nullptr) {
+			m_pHMD->UpdateHMD();
+			m_pOpenGLImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
+		}
 
 		// Render Scene
 		//m_pOpenGLImp->Render(m_pSceneGraph);
@@ -421,16 +428,16 @@ RESULT Windows64App::ShutdownSandbox() {
 	RESULT r = R_PASS;
 
 	// Release device context in use by rc
-	wglMakeCurrent(m_hDC, NULL);
+	wglMakeCurrent(m_hDC, nullptr);
 
 	// Shutdown and delete GL Rendering Context
-	if (m_pOpenGLImp != NULL) {
+	if (m_pOpenGLImp != nullptr) {
 		CRM(m_pOpenGLImp->ShutdownImplementaiton(), "Failed to shutdown opengl implemenation");
 		delete m_pOpenGLImp;
-		m_pOpenGLImp = NULL;
+		m_pOpenGLImp = nullptr;
 	}
 
-	wglMakeCurrent(NULL, NULL);
+	wglMakeCurrent(nullptr, nullptr);
 
 	PostQuitMessage(0);		// make sure the window will be destroyed
 
