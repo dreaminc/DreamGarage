@@ -77,9 +77,15 @@ public:
 	quaternion GetHMDOrientation() { return m_qOrientation; }
 	point GetHMDOrigin() { return m_ptOrigin; }
 
+	int GetEyeWidth() { return m_eyeWidth; }
+	int GetEyeHeight() { return m_eyeHeight; }
+
 protected:
 	point m_ptOrigin;
 	quaternion m_qOrientation;
+
+	int m_eyeWidth;
+	int m_eyeHeight;
 
 private:
 	UID m_uid;

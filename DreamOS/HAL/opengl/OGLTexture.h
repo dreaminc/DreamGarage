@@ -32,8 +32,8 @@ public:
 		// empty
 	}
 
-	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type) :
-		texture(type),
+	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels) :
+		texture(type, width, height, channels),
 		m_textureIndex(0),
 		m_pParentImp(pParentImp)
 	{
@@ -105,7 +105,7 @@ public:
 		CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
 		
 		CR(m_pParentImp->glActiveTexture(textureNumber));
-		CR(m_pParentImp->BindTexture(textureTarget, *pTextureIndex));
+		//CR(m_pParentImp->BindTexture(textureTarget, *pTextureIndex));
 		//CR(m_pParentImp->glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, m_width, m_height));
 		//CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, m_pImageBuffer));
 
@@ -129,7 +129,7 @@ public:
 
 		CR(m_pParentImp->MakeCurrentContext());
 		CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
-		CR(m_pParentImp->BindTexture(GL_TEXTURE_CUBE_MAP, *pTextureIndex));
+		//CR(m_pParentImp->BindTexture(GL_TEXTURE_CUBE_MAP, *pTextureIndex));
 
 		for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
 			//size_t sizeSide = m_width * m_height * sizeof(unsigned char);
@@ -183,6 +183,10 @@ public:
 
 	GLenum GetGLTextureNumberDefine() {
 		return (GLenum)((GL_TEXTURE0) + GetTextureNumber());
+	}
+
+	GLuint GetOGLTextureIndex() {
+		return m_textureIndex;
 	}
 
 private:

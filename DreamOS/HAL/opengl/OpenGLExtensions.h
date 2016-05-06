@@ -235,6 +235,34 @@ public:
 		return m_glBindFramebuffer(target, framebufferID);
 	}
 
+	inline void glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+		return m_glGenRenderbuffers(n, renderbuffers);
+	}
+
+	inline void glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
+		return m_glBindRenderbuffer(target, renderbuffer);
+	}
+	
+	inline void glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) {
+		return m_glRenderbufferStorage(target, internalformat, width, height);
+	}
+
+	inline void glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) {
+		return m_glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
+	}
+
+	inline void glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level) {
+		return m_glFramebufferTexture(target, attachment, texture, level);
+	}
+
+	inline GLenum glCheckFramebufferStatus(GLenum target) {
+		return m_glCheckFramebufferStatus(target);
+	}
+
+	inline void glDrawBuffers(GLsizei n, const GLenum *bufs) {
+		return m_glDrawBuffers(n, bufs);
+	}
+
 	// VBO
 	inline void glGenBuffers(GLsizei n, GLuint *buffers) {
 		return m_glGenBuffers(n, buffers);
@@ -340,6 +368,15 @@ private:
 	// FBO
 	PFNGLGENFRAMEBUFFERSPROC m_glGenFramebuffers;
 	PFNGLBINDFRAMEBUFFERPROC m_glBindFramebuffer;
+
+	PFNGLGENRENDERBUFFERSPROC m_glGenRenderbuffers;
+	PFNGLBINDRENDERBUFFERPROC m_glBindRenderbuffer;
+	PFNGLRENDERBUFFERSTORAGEPROC m_glRenderbufferStorage;
+	PFNGLFRAMEBUFFERRENDERBUFFERPROC m_glFramebufferRenderbuffer;
+	PFNGLFRAMEBUFFERTEXTUREPROC m_glFramebufferTexture;
+	PFNGLCHECKFRAMEBUFFERSTATUSPROC m_glCheckFramebufferStatus;
+
+	PFNGLDRAWBUFFERSPROC m_glDrawBuffers;
 
 	// VBO
 	PFNGLGENBUFFERSPROC m_glGenBuffers;

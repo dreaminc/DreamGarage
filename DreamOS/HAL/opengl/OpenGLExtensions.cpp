@@ -163,6 +163,24 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)wglGetProcAddress("glBindFramebuffer")),
 		"Failed to initialize glBindFramebuffer extension");
 
+	CNMW((m_glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers")),
+		"Failed to initialize glGenRenderbuffers extension");
+
+	CNMW((m_glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer")),
+		"Failed to initialize glBindRenderbuffer extension");
+
+	CNMW((m_glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage")),
+		"Failed to initialize glRenderbufferStorage extension");
+
+	CNMW((m_glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer")),
+		"Failed to initialize glFramebufferRenderbuffer extension");
+
+	CNMW((m_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus")),
+		"Failed to initialize glCheckFramebufferStatus extension");
+
+	CNMW((m_glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)wglGetProcAddress("glFramebufferTexture")),
+		"Failed to initialize glFramebufferTexture extension");
+
 	// VBO
 	CNMW((m_glGenBuffers = (PFNGLGENBUFFERSPROC)wglGetProcAddress("glGenBuffers")),
 		"Failed to initialzie glGenBuffers extension");
@@ -181,6 +199,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 
 	CNMW((m_glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)wglGetProcAddress("glDeleteBuffers")),
 		"Failed to initialize glDeleteBuffers extension");
+
+	CNMW((m_glDrawBuffers = (PFNGLDRAWBUFFERSPROC)wglGetProcAddress("glDrawBuffers")),
+		"Failed to initialize glDrawBuffers extension");
 
 	// VAO
 	CNMW((m_glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)wglGetProcAddress("glGenVertexArrays")),

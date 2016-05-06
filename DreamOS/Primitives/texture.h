@@ -35,6 +35,7 @@ public:
 
 public:
 	texture();
+	texture(texture::TEXTURE_TYPE type, int width, int height, int channels);
 	texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture(wchar_t * pszName, std::vector<std::wstring> cubeMapFiles);
 	~texture();

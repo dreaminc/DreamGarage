@@ -24,6 +24,7 @@
 #include "Primitives/valid.h"
 #include "Primitives/version.h"
 
+#include "HMD/HMD.h"
 #include "Primitives/stereocamera.h"
 
 #include "OpenGLExtensions.h"
@@ -34,6 +35,7 @@
 
 class SandboxApp; 
 class Windows64App;
+class OGLFramebuffer;
 
 class OpenGLImp : public HALImp, public valid {
 private:
@@ -65,12 +67,17 @@ public:
 
 public:
 
+	// TODO: Consolidate all of these
+	RESULT SetMonoViewTarget();
 	RESULT SetStereoViewTarget(EYE_TYPE eye);
+	RESULT SetStereoFramebufferViewTarget(EYE_TYPE eye);
+
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT ShutdownImplementaiton();
 	
 	RESULT Render(SceneGraph *pSceneGraph);
 	RESULT RenderStereo(SceneGraph *pSceneGraph);
+	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
 
 	RESULT SendObjectToShader(DimObj *pDimObj);
 	RESULT SendLightsToShader(std::vector<light*> *pLights);
@@ -84,6 +91,7 @@ public:
 	RESULT SetCameraOrientation(quaternion qOrientation);
 
 	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
+	RESULT InitializeStereoFramebuffers(HMD *pHMD);
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();
@@ -101,6 +109,9 @@ private:
 	OGLVertexShader *m_pVertexShader;
 	OGLFragmentShader *m_pFragmentShader;
 	// TODO: Other shaders
+
+	// Framebuffers
+	OGLFramebuffer *m_pStereoFramebuffers[2];
 
 	stereocamera *m_pCamera;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
@@ -130,6 +141,14 @@ public:
 	// FBO
 	RESULT glGenFramebuffers(GLsizei n, GLuint *framebuffers);
 	RESULT glBindFramebuffer(GLenum target, GLuint gluiFramebuffer);
+
+	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);
+	RESULT glBindRenderbuffer(GLenum target, GLuint renderbuffer);
+	RESULT glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+	RESULT glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+	RESULT glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level);
+	RESULT CheckFramebufferStatus(GLenum target);
+	RESULT glDrawBuffers(GLsizei n, const GLenum *bufs);
 
 	RESULT glGenVertexArrays(GLsizei n, GLuint *arrays);
 	RESULT glBindVertexArray(GLuint gluiArray);

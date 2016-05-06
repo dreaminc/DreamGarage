@@ -11,13 +11,27 @@
 #include "Primitives/Types/UID.h"
 
 class framebuffer {
-	framebuffer() {
+public:
+	framebuffer(int width, int height, int channels) :
+		m_width(width),
+		m_height(height),
+		m_channels(channels)
+	{
 		// empty
 	}
 
 	~framebuffer() {
 		// empty
 	}
+
+	int GetWidth() { return m_width; }
+	int GetHeight() { return m_height; }
+	int GetChannels() { return m_channels; }
+
+protected:
+	int m_width;
+	int m_height;
+	int m_channels;
 
 public:
 	UID getID() { return m_uid; }

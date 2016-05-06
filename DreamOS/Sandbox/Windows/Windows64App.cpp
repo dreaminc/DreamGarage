@@ -80,10 +80,6 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pWin64Mouse->CaptureMouse();
 	m_pWin64Mouse->CenterMousePosition();
 
-	// HMD
-	// TODO: This should go into (as well as the above) into the Sandbox
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR);
-
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
 	// Initialize Time Manager
@@ -367,8 +363,17 @@ RESULT Windows64App::ShowSandbox() {
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
 
+	// HMD
+	// TODO: This should go into (as well as the above) into the Sandbox
+	// This needs to be done after GL set up
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR);
+
 	// TODO: Should replace this with a proper scene loader
 	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
+
+	if (m_pHMD != nullptr) {
+		CRM(m_pOpenGLImp->InitializeStereoFramebuffers(m_pHMD), "Failed to initialize stereo frame buffers");
+	}
 
 	// Launch main message loop
 	MSG msg;
@@ -407,8 +412,9 @@ RESULT Windows64App::ShowSandbox() {
 		}
 
 		// Render Scene
-		//m_pOpenGLImp->Render(m_pSceneGraph);
-		m_pOpenGLImp->RenderStereo(m_pSceneGraph);
+		m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
+		m_pOpenGLImp->Render(m_pSceneGraph);
+		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 
 		// Swap buffers
 		SwapBuffers(m_hDC);

@@ -1,5 +1,6 @@
 #include "OpenGLImp.h"
 #include "OGLObj.h"
+#include "OGLFramebuffer.h"
 
 #include "Primitives/ProjectionMatrix.h"
 #include "Primitives/TranslationMatrix.h"
@@ -476,6 +477,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::SetMonoViewTarget() {
+	RESULT r = R_PASS;
+
+	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
+	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
+
+Error:
+	return r;
+}
+
 // Assumes Context Current
 RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 	RESULT r = R_PASS;
@@ -494,6 +505,12 @@ RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 	m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight);
 
 	return r;
+}
+
+// Assumes Context Current
+RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
+	m_pCamera->ResizeCamera(m_pStereoFramebuffers[eye]->GetWidth(), m_pStereoFramebuffers[eye]->GetHeight());
+	return m_pStereoFramebuffers[eye]->BindOGLFramebuffer();
 }
 
 camera * OpenGLImp::GetCamera() {
@@ -792,6 +809,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	CR(SendLightsToShader(pLights));
 
 	// Camera Projection Matrix
+	SetMonoViewTarget();
 	SetCameraMatrix(EYE_MONO);
 
 	// Send SceneGraph objects to shader
@@ -844,13 +862,13 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
 
 			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-			
+
 			if (pDimObj == NULL)
 				continue;
 			else {
 				SendObjectToShader(pDimObj);
 			}
-			
+
 		}
 
 		skybox *pSkybox = nullptr;
@@ -858,13 +876,70 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		if (pSkybox != nullptr)
 			SendObjectToShader(pSkybox);
 	}
-	
+
 	glFlush();
 
 Error:
 	return r;
 }
 
+RESULT OpenGLImp::InitializeStereoFramebuffers(HMD *pHMD) {
+	RESULT r = R_PASS;
+	
+	for (int i = 0; i < 2; i++) {
+		m_pStereoFramebuffers[i] = new OGLFramebuffer(this, pHMD->GetEyeWidth(), pHMD->GetEyeHeight(), 3);
+	}
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = NULL;
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	//g_pLight->translateZ(0.01f);
+
+	// Send lights to shader
+	std::vector<light*> *pLights = NULL;
+	CR(pObjectStore->GetLights(pLights));
+	CN(pLights);
+	CR(SendLightsToShader(pLights));
+
+	for (int i = 0; i < 2; i++) {
+		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
+
+		SetStereoFramebufferViewTarget(eye);
+		SetCameraMatrix(eye);
+
+		// Send SceneGraph objects to shader
+		pSceneGraph->Reset();
+		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+			if (pDimObj == NULL)
+				continue;
+			else {
+				SendObjectToShader(pDimObj);
+			}
+
+		}
+
+		skybox *pSkybox = nullptr;
+		CR(pObjectStore->GetSkybox(pSkybox));
+		if (pSkybox != nullptr)
+			SendObjectToShader(pSkybox);
+	}
+
+	glFlush();
+
+Error:
+	return r;
+}
 
 RESULT OpenGLImp::ShutdownImplementaiton() {
 	RESULT r = R_PASS;
@@ -973,6 +1048,77 @@ RESULT OpenGLImp::glBindFramebuffer(GLenum target, GLuint gluiFramebuffer) {
 
 	m_OpenGLExtensions.glBindFramebuffer(target, gluiFramebuffer);
 	CRM(CheckGLError(), "glBindFramebuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGenRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGenRenderbuffers(n, renderbuffers);
+	CRM(CheckGLError(), "glGenRenderbuffers failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBindRenderbuffer(target, renderbuffer);
+	CRM(CheckGLError(), "glBindRenderbuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glRenderbufferStorage(target, internalformat, width, height);
+	CRM(CheckGLError(), "glRenderbufferStorage failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glFramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
+	CRM(CheckGLError(), "glFramebufferRenderbuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::CheckFramebufferStatus(GLenum target) {
+	RESULT r = R_PASS;
+
+	GLenum glenumCheckFramebufferStatus = m_OpenGLExtensions.glCheckFramebufferStatus(target);
+	CBM((glenumCheckFramebufferStatus == GL_FRAMEBUFFER_COMPLETE), "glCheckframebufferStatus failed with 0x%x", glenumCheckFramebufferStatus);
+	CRM(CheckGLError(), "glFramebufferRenderbuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDrawBuffers(GLsizei n, const GLenum *bufs) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDrawBuffers(n, bufs);
+	CRM(CheckGLError(), "glFramebufferRenderbuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glFramebufferTexture(target, attachment, texture, level);
+	CRM(CheckGLError(), "glFramebufferTexture failed");
 
 Error:
 	return r;
