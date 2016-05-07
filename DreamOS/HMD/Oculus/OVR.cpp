@@ -1,6 +1,11 @@
 #include "OVR.h"
 #include <math.h>
 
+// TODO: Fix this encapsulation
+#include "HAL/opengl/OpenGLImp.h"
+
+#include "Primitives/stereocamera.h"
+
 OVR::OVR() :
 	m_ovrSession(nullptr),
 	m_ovrTextureChain(nullptr),
@@ -13,7 +18,7 @@ OVR::~OVR() {
 	// empty stub
 }
 
-RESULT OVR::InitializeHMD() {
+RESULT OVR::InitializeHMD(HALImp *halimp) {
 	RESULT r = R_PASS;
 	ovrGraphicsLuid luid;
 
@@ -58,20 +63,28 @@ RESULT OVR::InitializeHMD() {
 	m_ovrTextureSwapChainDescription.StaticImage = ovrFalse;
 
 	// TODO: Need to set up OpenGL first
-
+	// TODO: This is GL specific 
 	CRM((RESULT)ovr_CreateTextureSwapChainGL(m_ovrSession, &m_ovrTextureSwapChainDescription, &m_ovrTextureChain), "Failed to create Texture Swap Chain for OGL");
 	CRM((RESULT)ovr_GetTextureSwapChainLength(m_ovrSession, m_ovrTextureChain, &m_ovrSwapChainLength), "Failed to get OVR Swap Chain Length");
+
+	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
 
 	for (int i = 0; i < 2; i++) {
 		GLuint swapChainTextureIndex;
 		ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureChain, i, &swapChainTextureIndex);
 
-	}
+		// TODO: Set up the framebuffers here
+		m_pStereoFramebuffers[i] = new OGLFramebuffer(oglimp, GetEyeWidth(), GetEyeHeight(), 3);
 
+	}
 
 
 Error:
 	return r;
+}
+
+RESULT OVR::BindFramebuffer(EYE_TYPE eye) {
+	return m_pStereoFramebuffers[eye]->BindOGLFramebuffer();
 }
 
 // TODO: Better way?

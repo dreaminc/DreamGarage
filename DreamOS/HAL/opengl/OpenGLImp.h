@@ -35,7 +35,6 @@
 
 class SandboxApp; 
 class Windows64App;
-class OGLFramebuffer;
 
 class OpenGLImp : public HALImp, public valid {
 private:
@@ -91,7 +90,8 @@ public:
 	RESULT SetCameraOrientation(quaternion qOrientation);
 
 	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
-	RESULT InitializeStereoFramebuffers(HMD *pHMD);
+	//RESULT InitializeStereoFramebuffers(HMD *pHMD);
+	RESULT SetHMD(HMD *pHMD);
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();
@@ -110,10 +110,8 @@ private:
 	OGLFragmentShader *m_pFragmentShader;
 	// TODO: Other shaders
 
-	// Framebuffers
-	OGLFramebuffer *m_pStereoFramebuffers[2];
-
 	stereocamera *m_pCamera;
+	HMD *m_pHMD;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 

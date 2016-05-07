@@ -366,13 +366,13 @@ RESULT Windows64App::ShowSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR);
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp);
 
 	// TODO: Should replace this with a proper scene loader
 	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
 
 	if (m_pHMD != nullptr) {
-		CRM(m_pOpenGLImp->InitializeStereoFramebuffers(m_pHMD), "Failed to initialize stereo frame buffers");
+		CRM(m_pOpenGLImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
 	}
 
 	// Launch main message loop

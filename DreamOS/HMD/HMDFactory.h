@@ -14,9 +14,11 @@ typedef enum {
 	HMD_INVALID
 } HMD_TYPE;
 
+#include "HAL\HALImp.h"
+
 class HMDFactory : public Factory {
 public:
-	static HMD* MakeHMD(HMD_TYPE type);
+	static HMD* MakeHMD(HMD_TYPE type, HALImp *halimp);
 };
 
 #endif // ! PATH_MANAGER_FACTORY_H_

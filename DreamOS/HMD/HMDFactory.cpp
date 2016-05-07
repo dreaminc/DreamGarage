@@ -2,14 +2,14 @@
 
 #include "HMD\Oculus\OVR.h"
 
-HMD* HMDFactory::MakeHMD(HMD_TYPE type) {
+HMD* HMDFactory::MakeHMD(HMD_TYPE type, HALImp *halimp) {
 	RESULT r = R_PASS;
 	HMD *pHMD = nullptr;
 
 	switch (type) {
 		case HMD_OVR: {
 			pHMD = new OVR();
-			CRM(pHMD->InitializeHMD(), "Failed to initialize HMD!");
+			CRM(pHMD->InitializeHMD(halimp), "Failed to initialize HMD!");
 		} break;
 
 		default: {

@@ -40,6 +40,14 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLuint textureID, int width, int height, int channels) :
+		texture(type, width, height, channels),
+		m_textureIndex(0),
+		m_pParentImp(pParentImp)
+	{
+		RESULT r = OGLInitialize(textureID);
+	}
+
 	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename, texture::TEXTURE_TYPE type) :
 		texture(pszFilename, type),
 		m_textureIndex(0),
@@ -116,9 +124,27 @@ public:
 		//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
 
 		// TODO: Pull deeper settings from texture object
-		CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
+		if (m_pImageBuffer != NULL) {
+			CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
+		}
 
 		// TODO: Delete the image data here?
+
+	Error:
+		return r;
+	}
+
+	RESULT OGLInitializeTexture(GLuint textureIndex, GLenum textureNumber, GLenum textureTarget) {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->MakeCurrentContext());
+		
+		m_textureIndex = textureIndex;
+		CR(m_pParentImp->glActiveTexture(textureNumber));
+
+		// Texture params TODO: Add controls for these 
+		CRM(m_pParentImp->TexParamteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
+		CRM(m_pParentImp->TexParamteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
 
 	Error:
 		return r;
@@ -151,14 +177,19 @@ public:
 		return r;
 	}
 
-	RESULT OGLInitialize() {
+	RESULT OGLInitialize(GLuint textureID = NULL) {
 		RESULT r = R_PASS;
 
 		if(GetTextureType() == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
 			CRM(OGLInitializeCubeMap(&m_textureIndex, GetGLTextureNumberDefine()), "Failed to initialize texture");
 		}
 		else {
-			CRM(OGLInitializeTexture(&m_textureIndex, GetGLTextureNumberDefine(), GL_TEXTURE_2D), "Failed to initialize texture");
+			if (textureID == NULL) {
+				CRM(OGLInitializeTexture(&m_textureIndex, GetGLTextureNumberDefine(), GL_TEXTURE_2D), "Failed to initialize texture");
+			}
+			else {
+				CRM(OGLInitializeTexture(textureID, GetGLTextureNumberDefine(), GL_TEXTURE_2D), "Failed to initialize texture");
+			}
 		}
 
 	Error:

@@ -13,10 +13,11 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_idOpenGLProgram(NULL),
 	m_versionOGL(0),
 	m_versionGLSL(0),
-	m_pVertexShader(NULL),
-	m_pFragmentShader(NULL),
+	m_pVertexShader(nullptr),
+	m_pFragmentShader(nullptr),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
-	m_pCamera(NULL)
+	m_pCamera(nullptr),
+	m_pHMD(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -509,8 +510,8 @@ RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 
 // Assumes Context Current
 RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
-	m_pCamera->ResizeCamera(m_pStereoFramebuffers[eye]->GetWidth(), m_pStereoFramebuffers[eye]->GetHeight());
-	return m_pStereoFramebuffers[eye]->BindOGLFramebuffer();
+	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
+	return m_pHMD->BindFramebuffer(eye);
 }
 
 camera * OpenGLImp::GetCamera() {
@@ -883,12 +884,23 @@ Error:
 	return r;
 }
 
+/*
 RESULT OpenGLImp::InitializeStereoFramebuffers(HMD *pHMD) {
 	RESULT r = R_PASS;
 	
 	for (int i = 0; i < 2; i++) {
 		m_pStereoFramebuffers[i] = new OGLFramebuffer(this, pHMD->GetEyeWidth(), pHMD->GetEyeHeight(), 3);
 	}
+
+Error:
+	return r;
+}
+*/
+
+RESULT OpenGLImp::SetHMD(HMD *pHMD) {
+	RESULT r = R_PASS;
+
+	m_pHMD = pHMD;
 
 Error:
 	return r;

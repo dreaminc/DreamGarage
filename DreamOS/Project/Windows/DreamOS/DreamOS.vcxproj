@@ -119,7 +119,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>D:\ovr_sdk_win_1.3.2_public\LibOVR\Lib\Windows\x64\Debug\VS2015\LibOVR.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\dev\ovr_sdk_win_1.3.2_public\OculusSDK\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

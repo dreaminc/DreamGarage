@@ -17,12 +17,16 @@
 #include "Primitives/quaternion.h"
 #include "Primitives/point.h"
 
+#include "HAL/HALImp.h"
+
 typedef enum HMDEventType {
 	HMD_EVENT_ORIENTATION,
 	HMD_EVENT_POSITION,
 	HMD_EVENT_BOTH,
 	HMD_EVENT_INVALID
 } HMD_EVENT_TYPE;
+
+enum EYE_TYPE;
 
 typedef struct HMDEvent {
 	HMDEventType EventType;
@@ -69,10 +73,12 @@ public:
 
 public:
 	// Called by factory to initialize HMD
-	virtual RESULT InitializeHMD() = 0;
+	virtual RESULT InitializeHMD(HALImp *halimp) = 0;
 
 	// Called to update/poll tracking info
 	virtual RESULT UpdateHMD() = 0;
+
+	virtual RESULT BindFramebuffer(EYE_TYPE eye) = 0;
 
 	quaternion GetHMDOrientation() { return m_qOrientation; }
 	point GetHMDOrigin() { return m_ptOrigin; }

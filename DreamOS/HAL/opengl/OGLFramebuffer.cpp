@@ -11,6 +11,14 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int
 	// empty
 }
 
+OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int width, int height, int channels) :
+	framebuffer(width, height, channels),
+	m_pParentImp(pParentImp),
+	m_pOGLTexture(nullptr)
+{
+
+}
+
 OGLFramebuffer::~OGLFramebuffer() {
 	if (m_pOGLTexture != nullptr) {
 		delete m_pOGLTexture;
@@ -18,7 +26,7 @@ OGLFramebuffer::~OGLFramebuffer() {
 	}
 }
 
-RESULT OGLFramebuffer::OGLInitialize() {
+RESULT OGLFramebuffer::OGLInitialize(GLuint textureID = NULL) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
@@ -27,7 +35,11 @@ RESULT OGLFramebuffer::OGLInitialize() {
 	CR(m_pParentImp->glGenFramebuffers(1, &m_framebufferIndex));
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
 
-	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, m_width, m_height, m_channels);
+	if (textureID == NULL) 
+		m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, m_width, m_height, m_channels);
+	else 
+		m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, textureID, m_width, m_height, m_channels);
+
 	CN(m_pOGLTexture);
 
 	// The depth buffer

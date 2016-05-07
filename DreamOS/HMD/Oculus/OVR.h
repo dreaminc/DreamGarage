@@ -25,14 +25,18 @@
 
 #include "HAL/opengl/OGLFramebuffer.h"
 
+class OGLFramebuffer;
+
 class OVR : public HMD {
 public:
 	OVR();
 	~OVR();
 
-	RESULT InitializeHMD();
+	RESULT InitializeHMD(HALImp *halimp);
 	RESULT UpdateHMD();
 	RESULT ReleaseHMD();
+
+	RESULT BindFramebuffer(EYE_TYPE eye);
 
 public:
 	ovrSession m_ovrSession;
@@ -45,6 +49,8 @@ public:
 	int m_ovrSwapChainLength;
 
 	// Framebuffers
+	// TODO: This should not be GL specific
+	OGLFramebuffer *m_pStereoFramebuffers[2];
 
 };
 

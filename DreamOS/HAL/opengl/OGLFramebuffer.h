@@ -18,9 +18,11 @@ class OGLTexture;
 class OGLFramebuffer : public framebuffer {
 public:
 	OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels);
+	OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int width, int height, int channels);
+
 	~OGLFramebuffer();
 
-	RESULT OGLInitialize();
+	RESULT OGLInitialize(GLuint textureID);
 	RESULT BindOGLFramebuffer();
 
 private:
