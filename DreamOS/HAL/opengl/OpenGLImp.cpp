@@ -906,6 +906,7 @@ Error:
 	return r;
 }
 
+// TODO: Naming is kind of lame since this hits the HMD
 RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
@@ -946,6 +947,10 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		if (pSkybox != nullptr)
 			SendObjectToShader(pSkybox);
 	}
+
+	// Send to the HMD
+	m_pHMD->CommitSwapChain();
+	m_pHMD->SubmitFrame();
 
 	glFlush();
 

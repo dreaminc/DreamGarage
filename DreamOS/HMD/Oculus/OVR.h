@@ -37,11 +37,15 @@ public:
 	RESULT ReleaseHMD();
 
 	RESULT BindFramebuffer(EYE_TYPE eye);
+	RESULT CommitSwapChain();
+	RESULT SubmitFrame();
 
 public:
 	ovrSession m_ovrSession;
 	ovrHmdDesc m_ovrHMDDescription;
+	ovrEyeRenderDesc m_ovrEyeRenderDescription[2];
 	std::vector<ovrTrackerDesc>   m_TrackerDescriptions;
+	ovrLayerEyeFov m_ovrLayer;
 
 	// Swap Chain
 	ovrTextureSwapChainDesc m_ovrTextureSwapChainDescription;

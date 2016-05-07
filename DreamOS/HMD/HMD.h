@@ -79,6 +79,8 @@ public:
 	virtual RESULT UpdateHMD() = 0;
 
 	virtual RESULT BindFramebuffer(EYE_TYPE eye) = 0;
+	virtual RESULT CommitSwapChain() = 0;
+	virtual RESULT SubmitFrame() = 0;
 
 	quaternion GetHMDOrientation() { return m_qOrientation; }
 	point GetHMDOrigin() { return m_ptOrigin; }

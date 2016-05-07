@@ -5,6 +5,7 @@
 #include "HAL/opengl/OpenGLImp.h"
 
 #include "Primitives/stereocamera.h"
+#include "Primitives/rectangle.h"
 
 OVR::OVR() :
 	m_ovrSession(nullptr),
@@ -30,9 +31,6 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 
 	m_ovrHMDDescription = ovr_GetHmdDesc(m_ovrSession);
 
-	m_eyeWidth = m_ovrHMDDescription.Resolution.w / 2;
-	m_eyeHeight = m_ovrHMDDescription.Resolution.h;
-
 	// Get tracker descriptions
 	unsigned int trackerCount = std::max<unsigned int>(1, ovr_GetTrackerCount(m_ovrSession));
 	for (unsigned int i = 0; i < trackerCount; ++i)
@@ -42,21 +40,20 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 	ovrSizei recommenedTex0Size = ovr_GetFovTextureSize(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0], 1.0f);
 	ovrSizei recommenedTex1Size = ovr_GetFovTextureSize(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1], 1.0f);
 	
-	ovrSizei bufferSize;
-	bufferSize.w = recommenedTex0Size.w + recommenedTex1Size.w;
-	bufferSize.h = fmax(recommenedTex0Size.h, recommenedTex1Size.h);
+	// TODO: Check for mismatch
+
+	//ovrSizei bufferSize;
+	//bufferSize.w = recommenedTex0Size.w + recommenedTex1Size.w;
+	//bufferSize.h = fmax(recommenedTex0Size.h, recommenedTex1Size.h);
+	m_eyeWidth = recommenedTex0Size.w;
+	m_eyeHeight = recommenedTex0Size.h;
 
 	// Set up the OGL Swap Chain
 	// TODO: This should be done in a cross platform way
 	m_ovrTextureSwapChainDescription.Type = ovrTexture_2D;
 	m_ovrTextureSwapChainDescription.ArraySize = 1;
-	
-	m_ovrTextureSwapChainDescription.Width = m_eyeWidth;
-	m_ovrTextureSwapChainDescription.Height = m_eyeHeight;
-
-	//m_ovrTextureSwapChainDescription.Width = bufferSize.w;
-	//m_ovrTextureSwapChainDescription.Height = bufferSize.h;
-
+	m_ovrTextureSwapChainDescription.Width = GetEyeWidth();
+	m_ovrTextureSwapChainDescription.Height = GetEyeHeight();
 	m_ovrTextureSwapChainDescription.MipLevels = 1;
 	m_ovrTextureSwapChainDescription.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
 	m_ovrTextureSwapChainDescription.SampleCount = 1;
@@ -75,9 +72,21 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 
 		// TODO: Set up the framebuffers here
 		m_pStereoFramebuffers[i] = new OGLFramebuffer(oglimp, GetEyeWidth(), GetEyeHeight(), 3);
-
 	}
 
+	// Implement a single layer
+	// Initialize our single full screen Fov layer.
+	m_ovrEyeRenderDescription[0] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0]);
+	m_ovrEyeRenderDescription[1] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1]);
+
+	m_ovrLayer.Header.Type = ovrLayerType_EyeFov;
+	m_ovrLayer.Header.Flags = 0;
+	m_ovrLayer.ColorTexture[0] = m_ovrTextureChain;
+	m_ovrLayer.ColorTexture[1] = m_ovrTextureChain;
+	m_ovrLayer.Fov[0] = m_ovrEyeRenderDescription[0].Fov;
+	m_ovrLayer.Fov[1] = m_ovrEyeRenderDescription[1].Fov;
+	m_ovrLayer.Viewport[0] = *(reinterpret_cast<ovrRecti*>(&(rectangle<int>(0, 0, GetEyeWidth(), GetEyeHeight()))));
+	m_ovrLayer.Viewport[1] = *(reinterpret_cast<ovrRecti*>(&(rectangle<int>(GetEyeWidth(), 0, GetEyeWidth(), GetEyeHeight()))));
 
 Error:
 	return r;
@@ -85,6 +94,26 @@ Error:
 
 RESULT OVR::BindFramebuffer(EYE_TYPE eye) {
 	return m_pStereoFramebuffers[eye]->BindOGLFramebuffer();
+}
+
+// Commit the changes to the texture swap chain
+RESULT OVR::CommitSwapChain() {	
+	RESULT r = R_PASS;
+
+	CR((RESULT)ovr_CommitTextureSwapChain(m_ovrSession, m_ovrTextureChain));
+
+Error:
+	return r;
+}
+
+RESULT OVR::SubmitFrame() {
+	RESULT r = R_PASS;
+
+	ovrLayerHeader* layers = &m_ovrLayer.Header;
+	CR((RESULT)ovr_SubmitFrame(m_ovrSession, 0, nullptr, &layers, 1));
+
+Error:
+	return r;
 }
 
 // TODO: Better way?
