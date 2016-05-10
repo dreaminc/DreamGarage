@@ -13,9 +13,22 @@
 // TODO: Once this is working, replace all parts using OGL objects
 
 #include "HAL/opengl/OpenGLImp.h"
+#include "HAL/opengl/OGLDepthbuffer.h"
 #include "OVR_CAPI_GL.h"
 
 class OVRTextureSwapChain {
+private:
+	// This is identical to ovrTextureSwapChain
+	ovrSession m_ovrSession;
+	ovrTextureSwapChain  m_ovrTextureSwapChain;
+	GLuint	m_textureIndex;
+	GLuint	m_framebufferIndex;
+	int m_width;
+	int m_height;
+	// End of ovrTextureSwapChain equivalent struct
+
+	OpenGLImp *m_pParentImp;
+
 public:
 	OVRTextureSwapChain(OpenGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount) :
 		m_ovrSession(session),
@@ -65,6 +78,26 @@ public:
 		pParentImp->glGenFramebuffers(1, &m_framebufferIndex);
 	}
 
+	ovrSizei GetOVRSizei() {
+		ovrSizei retSizei;
+
+		retSizei.w = m_width;
+		retSizei.h = m_height;
+
+		return retSizei;
+	}
+
+	ovrRecti GetOVRViewportRecti() {
+		ovrRecti retRecti;
+		
+		retRecti.Pos.x = 0;
+		retRecti.Pos.y = 0;
+
+		retRecti.Size = GetOVRSizei();
+
+		return retRecti;
+	}
+
 	RESULT Commit() {
 		if (m_ovrTextureSwapChain)
 			return (RESULT)ovr_CommitTextureSwapChain(m_ovrSession, m_ovrTextureSwapChain);
@@ -73,6 +106,8 @@ public:
 	}
 
 	RESULT SetAndClearRenderSurface(OGLDepthbuffer *oglDepthbuffer) {
+		RESULT r = R_PASS;
+
 		GLuint curTexId;
 		if (m_ovrTextureSwapChain) {
 			int curIndex;
@@ -84,12 +119,15 @@ public:
 		}
 
 		m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex);
-		m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, oglDepthbuffer->GetOGLTextureIndex, 0);
+		m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, oglDepthbuffer->GetOGLTextureIndex(), 0);
 		m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, curTexId, 0);
 
 		glViewport(0, 0, m_width, m_height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_FRAMEBUFFER_SRGB);
+
+	Error:
+		return r;
 	}
 
 	RESULT UnsetRenderSurface() {
@@ -99,17 +137,6 @@ public:
 
 		return R_PASS;
 	}
-
-private:
-	OpenGLImp *m_pParentImp;
-
-	ovrSession m_ovrSession;
-	ovrTextureSwapChain  m_ovrTextureSwapChain;
-	GLuint	m_textureIndex;
-	GLuint	m_framebufferIndex;
-	
-	int m_width;
-	int m_height;
 };
 
 #endif // !OVR_TEXTURE_SWAP_CHAIN_H_

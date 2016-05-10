@@ -957,7 +957,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 		m_pHMD->SetAndClearRenderSurface(eye);
 
-		m_pHMD->CommitSwapChain();
+		m_pHMD->CommitSwapChain(eye);
 	}
 
 	glFlush();

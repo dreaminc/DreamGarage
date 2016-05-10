@@ -218,13 +218,17 @@ public:
 		return m_glTexStorage2D(target, levels, internalformat, width, height);
 	}
 
+	/*
 	inline void glTexParameteri(GLenum target, GLenum pname, GLint param) {
 		return m_glTexParameteri(target, pname, param);
 	}
+	*/
 
+	/*
 	inline void glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
 		return m_glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	}
+	*/
 
 	// FBO
 	inline void glGenFramebuffers(GLsizei n, GLuint *framebuffers) {
@@ -365,8 +369,8 @@ private:
 	PFNGLBINDTEXTURESPROC m_glBindTextures;
 	//PFNGLBINDTEXTUREPROC m_glBindTexture;
 	PFNGLTEXSTORAGE2DPROC m_glTexStorage2D;
-	PFNGLTEXPARAMETERIPROC m_glTexParameteri;
-	PFNGLTEXIMAGE2DPROC m_glTexImage2D;
+	//PFNGLTEXPARAMETERIPROC m_glTexParameteri;
+	//PFNGLTEXIMAGE2DPROC m_glTexImage2D;
 	//PFNGLTEXSUBIMAGE2DPROC m_glTexSubImage2D;
 
 	// FBO

@@ -68,3 +68,5 @@ private:
 	int m_height;
 	int m_sampleCount;
 };
+
+#endif // ! OGL_DEPTHBUFFER_H_

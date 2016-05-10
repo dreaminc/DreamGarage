@@ -8,9 +8,9 @@
 #include "Primitives/rectangle.h"
 
 OVR::OVR() :
-	m_ovrSession(nullptr),
-	m_ovrTextureChain(nullptr),
-	m_ovrSwapChainLength(0)
+	m_ovrSession(nullptr)
+	//m_ovrTextureChain(nullptr),
+	//m_ovrSwapChainLength(0)
 {
 	// empty stub
 }
@@ -157,16 +157,25 @@ RESULT OVR::SubmitFrame() {
 	RESULT r = R_PASS;
 
 	//ovrLayerHeader* layers = &m_ovrLayer.Header;
+	long long frameIndex = 0;
 
 	ovrLayerEyeFov ld;
 	ld.Header.Type = ovrLayerType_EyeFov;
 	ld.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
 
-	for (int eye = 0; eye < 2; ++eye)
-	{
-		ld.ColorTexture[eye] = eyeRenderTexture[eye]->TextureChain;
-		ld.Viewport[eye] = Recti(eyeRenderTexture[eye]->GetSize());
-		ld.Fov[eye] = hmdDesc.DefaultEyeFov[eye];
+	ovrPosef EyeRenderPose[2];
+	ovrVector3f HmdToEyeOffset[2] = { m_ovrEyeRenderDescription[0].HmdToEyeOffset, m_ovrEyeRenderDescription[1].HmdToEyeOffset };
+
+	m_ovrEyeRenderDescription[0] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0]);
+	m_ovrEyeRenderDescription[1] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1]);
+
+	double sensorSampleTime;    // sensorSampleTime is fed into the layer later
+	ovr_GetEyePoses(m_ovrSession, frameIndex, ovrTrue, HmdToEyeOffset, EyeRenderPose, &sensorSampleTime);
+
+	for (int eye = 0; eye < 2; ++eye) {
+		ld.ColorTexture[eye] = reinterpret_cast<ovrTextureSwapChain>(m_ovrTextureSwapChains[eye]);
+		ld.Viewport[eye] = m_ovrTextureSwapChains[eye]->GetOVRViewportRecti();
+		ld.Fov[eye] = m_ovrHMDDescription.DefaultEyeFov[eye];
 		ld.RenderPose[eye] = EyeRenderPose[eye];
 		ld.SensorSampleTime = sensorSampleTime;
 	}
@@ -210,10 +219,14 @@ RESULT OVR::ReleaseHMD() {
 		m_ovrSession = nullptr;
 	}
 
+	/*
 	if (m_ovrTextureChain != nullptr) {
 		ovr_DestroyTextureSwapChain(m_ovrSession, m_ovrTextureChain);
 		m_ovrTextureChain = nullptr;
 	}
+	*/
+
+	// TODO: Release the swap chain and depth buffers
 
 	ovr_Shutdown();
 

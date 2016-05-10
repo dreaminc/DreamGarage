@@ -412,12 +412,17 @@ RESULT Windows64App::ShowSandbox() {
 		}
 
 		// Render Scene
-		m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
+		
 		m_pOpenGLImp->Render(m_pSceneGraph);
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 
+		///*
 		// Send to the HMD
-		m_pHMD->SubmitFrame();
+		if (m_pHMD != nullptr) {
+			m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
+			m_pHMD->SubmitFrame();
+		}
+		//*/
 
 		// Swap buffers
 		SwapBuffers(m_hDC);
