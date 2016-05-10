@@ -22,8 +22,11 @@ public:
 
 	~OGLFramebuffer();
 
-	RESULT OGLInitialize(GLuint textureID);
+	RESULT OGLInitialize(GLuint textureID = NULL);
 	RESULT BindOGLFramebuffer();
+	RESULT UnbindOGLFramebuffer();
+
+	GLuint GetOGLTextureIndex();
 
 private:
 	OpenGLImp *m_pParentImp;

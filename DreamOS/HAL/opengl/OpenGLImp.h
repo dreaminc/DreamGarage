@@ -146,7 +146,9 @@ public:
 	RESULT glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
 	RESULT glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level);
 	RESULT CheckFramebufferStatus(GLenum target);
+	RESULT glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
 	RESULT glDrawBuffers(GLsizei n, const GLenum *bufs);
+
 
 	RESULT glGenVertexArrays(GLsizei n, GLuint *arrays);
 	RESULT glBindVertexArray(GLuint gluiArray);

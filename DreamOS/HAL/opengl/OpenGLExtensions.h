@@ -259,6 +259,10 @@ public:
 		return m_glCheckFramebufferStatus(target);
 	}
 
+	inline void glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) {
+		return m_glFramebufferTexture2D(target, attachment, textarget, texture, level);
+	}
+
 	inline void glDrawBuffers(GLsizei n, const GLenum *bufs) {
 		return m_glDrawBuffers(n, bufs);
 	}
@@ -375,6 +379,7 @@ private:
 	PFNGLFRAMEBUFFERRENDERBUFFERPROC m_glFramebufferRenderbuffer;
 	PFNGLFRAMEBUFFERTEXTUREPROC m_glFramebufferTexture;
 	PFNGLCHECKFRAMEBUFFERSTATUSPROC m_glCheckFramebufferStatus;
+	PFNGLFRAMEBUFFERTEXTURE2DPROC m_glFramebufferTexture2D;
 
 	PFNGLDRAWBUFFERSPROC m_glDrawBuffers;
 

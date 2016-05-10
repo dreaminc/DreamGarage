@@ -26,7 +26,7 @@ OGLFramebuffer::~OGLFramebuffer() {
 	}
 }
 
-RESULT OGLFramebuffer::OGLInitialize(GLuint textureID = NULL) {
+RESULT OGLFramebuffer::OGLInitialize(GLuint textureID) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
@@ -43,6 +43,7 @@ RESULT OGLFramebuffer::OGLInitialize(GLuint textureID = NULL) {
 	CN(m_pOGLTexture);
 
 	// The depth buffer
+	// TODO: Create a depth buffer object (like OGLTexture / Framebuffer 
 	CR(m_pParentImp->glGenRenderbuffers(1, &m_renderbufferIndex));
 	CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_renderbufferIndex));
 	CR(m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height));
@@ -61,12 +62,39 @@ Error:
 	return r;
 }
 
+GLuint OGLFramebuffer::GetOGLTextureIndex() {
+	if (m_pOGLTexture != nullptr) {
+		return m_pOGLTexture->GetOGLTextureIndex();
+	}
+	else {
+		return 0;
+	}
+}
+
 RESULT OGLFramebuffer::BindOGLFramebuffer() {
 	RESULT r = R_PASS;
 
 	// Render to our framebuffer
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
+	
+	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GetOGLTextureIndex(), 0));
+	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_renderbufferIndex, 0));
+	
+	// TODO: Stuff this into the implementation
 	glViewport(0, 0, m_width, m_height); 
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_FRAMEBUFFER_SRGB);
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::UnbindOGLFramebuffer() {
+	RESULT r = R_PASS;
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
+
+	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0));
+	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0))
 
 Error:
 	return r;

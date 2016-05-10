@@ -221,6 +221,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
@@ -247,6 +248,7 @@
     <ClInclude Include="..\..\..\HMD\HMD.h" />
     <ClInclude Include="..\..\..\HMD\HMDFactory.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVR.h" />
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />

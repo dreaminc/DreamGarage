@@ -535,6 +535,12 @@
     <ClInclude Include="..\..\..\Primitives\rectangle.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h">
+      <Filter>HMD\Oculus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

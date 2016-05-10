@@ -19,6 +19,8 @@
 
 #include "HAL/HALImp.h"
 
+#define HMD_NUM_EYES 2
+
 typedef enum HMDEventType {
 	HMD_EVENT_ORIENTATION,
 	HMD_EVENT_POSITION,
@@ -79,8 +81,12 @@ public:
 	virtual RESULT UpdateHMD() = 0;
 
 	virtual RESULT BindFramebuffer(EYE_TYPE eye) = 0;
-	virtual RESULT CommitSwapChain() = 0;
+	virtual RESULT CommitSwapChain(EYE_TYPE eye) = 0;
 	virtual RESULT SubmitFrame() = 0;
+
+	// TODO: Rename this - it's not well named (currently named after OVR sample code)
+	virtual RESULT SetAndClearRenderSurface(EYE_TYPE eye) = 0;
+	virtual RESULT UnsetRenderSurface(EYE_TYPE eye) = 0;
 
 	quaternion GetHMDOrientation() { return m_qOrientation; }
 	point GetHMDOrigin() { return m_ptOrigin; }

@@ -10,6 +10,8 @@
 // TODO: Should this go into Sense?
 
 #include "HMD/HMD.h"
+#include "OVRTextureSwapChain.h"
+#include "HAL/opengl/OGLDepthbuffer.h"
 
 // TODO: Better way?
 #define HMD_OVR_USE_PREDICTED_TIMNIG
@@ -37,8 +39,11 @@ public:
 	RESULT ReleaseHMD();
 
 	RESULT BindFramebuffer(EYE_TYPE eye);
-	RESULT CommitSwapChain();
+	RESULT CommitSwapChain(EYE_TYPE eye);
 	RESULT SubmitFrame();
+
+	RESULT SetAndClearRenderSurface(EYE_TYPE eye);
+	RESULT UnsetRenderSurface(EYE_TYPE eye);
 
 public:
 	ovrSession m_ovrSession;
@@ -47,14 +52,20 @@ public:
 	std::vector<ovrTrackerDesc>   m_TrackerDescriptions;
 	ovrLayerEyeFov m_ovrLayer;
 
+	// Texture Swap Chains
+	OVRTextureSwapChain *m_ovrTextureSwapChains[HMD_NUM_EYES];
+	OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
+
 	// Swap Chain
+	/*
 	ovrTextureSwapChainDesc m_ovrTextureSwapChainDescription;
 	ovrTextureSwapChain  m_ovrTextureChain;
 	int m_ovrSwapChainLength;
+	*/
 
 	// Framebuffers
 	// TODO: This should not be GL specific
-	OGLFramebuffer *m_pStereoFramebuffers[2];
+	//OGLFramebuffer *m_pStereoFramebuffers[2];
 
 };
 

@@ -416,6 +416,9 @@ RESULT Windows64App::ShowSandbox() {
 		m_pOpenGLImp->Render(m_pSceneGraph);
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 
+		// Send to the HMD
+		m_pHMD->SubmitFrame();
+
 		// Swap buffers
 		SwapBuffers(m_hDC);
 

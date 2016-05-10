@@ -481,6 +481,9 @@ Error:
 RESULT OpenGLImp::SetMonoViewTarget() {
 	RESULT r = R_PASS;
 
+	// Render to screen
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
 	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
@@ -491,6 +494,9 @@ Error:
 // Assumes Context Current
 RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 	RESULT r = R_PASS;
+
+	// Render to screen
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	switch (eye) {
 		case EYE_LEFT: {
@@ -925,8 +931,10 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
-		SetStereoFramebufferViewTarget(eye);
+		//SetStereoFramebufferViewTarget(eye);
 		SetCameraMatrix(eye);
+		m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
+		m_pHMD->SetAndClearRenderSurface(eye);
 
 		// Send SceneGraph objects to shader
 		pSceneGraph->Reset();
@@ -946,11 +954,11 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		CR(pObjectStore->GetSkybox(pSkybox));
 		if (pSkybox != nullptr)
 			SendObjectToShader(pSkybox);
-	}
 
-	// Send to the HMD
-	m_pHMD->CommitSwapChain();
-	m_pHMD->SubmitFrame();
+		m_pHMD->SetAndClearRenderSurface(eye);
+
+		m_pHMD->CommitSwapChain();
+	}
 
 	glFlush();
 
@@ -1116,6 +1124,16 @@ RESULT OpenGLImp::CheckFramebufferStatus(GLenum target) {
 	GLenum glenumCheckFramebufferStatus = m_OpenGLExtensions.glCheckFramebufferStatus(target);
 	CBM((glenumCheckFramebufferStatus == GL_FRAMEBUFFER_COMPLETE), "glCheckframebufferStatus failed with 0x%x", glenumCheckFramebufferStatus);
 	CRM(CheckGLError(), "glFramebufferRenderbuffer failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glFramebufferTexture2D(target, attachment, textarget, texture, level);
+	CRM(CheckGLError(), "glFramebufferTexture2D failed");
 
 Error:
 	return r;

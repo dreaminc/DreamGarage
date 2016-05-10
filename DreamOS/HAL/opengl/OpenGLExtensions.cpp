@@ -178,6 +178,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)wglGetProcAddress("glCheckFramebufferStatus")),
 		"Failed to initialize glCheckFramebufferStatus extension");
 
+	CNMW((m_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D")),
+		"Failed to initialize glFramebufferTexture2D extension");
+
 	CNMW((m_glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)wglGetProcAddress("glFramebufferTexture")),
 		"Failed to initialize glFramebufferTexture extension");
 
