@@ -30,6 +30,15 @@ private:
 	OpenGLImp *m_pParentImp;
 
 public:
+	struct OVRTextureBuffer {
+		ovrSession ovrSession;
+		ovrTextureSwapChain ovrTextureChain;
+		GLuint textureIndex;
+		GLuint framebufferIndex;
+		ovrSizei textureSize;
+	};
+
+public:
 	OVRTextureSwapChain(OpenGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount) :
 		m_ovrSession(session),
 		m_ovrTextureSwapChain(nullptr),
@@ -76,6 +85,10 @@ public:
 		*/
 
 		pParentImp->glGenFramebuffers(1, &m_framebufferIndex);
+	}
+
+	ovrTextureSwapChain GetOVRTextureSwapChain() {
+		return m_ovrTextureSwapChain;
 	}
 
 	ovrSizei GetOVRSizei() {

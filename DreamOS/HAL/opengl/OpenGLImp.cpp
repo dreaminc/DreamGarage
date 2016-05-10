@@ -913,6 +913,7 @@ Error:
 }
 
 // TODO: Naming is kind of lame since this hits the HMD
+// TODO: Shared code should be consolidated
 RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
@@ -928,12 +929,13 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	CN(pLights);
 	CR(SendLightsToShader(pLights));
 
+	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
+
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
 		//SetStereoFramebufferViewTarget(eye);
 		SetCameraMatrix(eye);
-		m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
 		m_pHMD->SetAndClearRenderSurface(eye);
 
 		// Send SceneGraph objects to shader
@@ -955,9 +957,10 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		if (pSkybox != nullptr)
 			SendObjectToShader(pSkybox);
 
-		m_pHMD->SetAndClearRenderSurface(eye);
+		m_pHMD->UnsetRenderSurface(eye);
 
 		m_pHMD->CommitSwapChain(eye);
+
 	}
 
 	glFlush();

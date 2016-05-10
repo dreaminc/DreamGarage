@@ -57,6 +57,16 @@ public:
 		Normalize();
 	}
 
+	RESULT Reverse() {
+		//m_w = m_w;
+
+		m_x *= -1.0f;
+		m_y *= -1.0f;
+		m_z *= -1.0f;
+
+		return R_PASS;
+	}
+
 	RESULT SetQuaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 		quaternion_precision factor = static_cast<quaternion_precision>(sin(theta / 2.0));
 

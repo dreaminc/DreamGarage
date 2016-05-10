@@ -37,50 +37,17 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 	for (unsigned int i = 0; i < trackerCount; ++i)
 		m_TrackerDescriptions.push_back(ovr_GetTrackerDesc(m_ovrSession, i));
 
+	// FloorLevel will give tracking poses where the floor height is 0
+	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_FloorLevel));
+
 	// Configure Stereo settings.
-	ovrSizei recommenedTex0Size = ovr_GetFovTextureSize(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0], 1.0f);
-	ovrSizei recommenedTex1Size = ovr_GetFovTextureSize(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1], 1.0f);
-	
-	// TODO: Check for mismatch
+	//ovrSizei recommenedTex0Size = ovr_GetFovTextureSize(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0], 1.0f);
+	//ovrSizei recommenedTex1Size = ovr_GetFovTextureSize(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1], 1.0f);
+	//m_eyeWidth = recommenedTex0Size.w;
+	//m_eyeHeight = recommenedTex0Size.h;
 
-	//ovrSizei bufferSize;
-	//bufferSize.w = recommenedTex0Size.w + recommenedTex1Size.w;
-	//bufferSize.h = fmax(recommenedTex0Size.h, recommenedTex1Size.h);
-	m_eyeWidth = recommenedTex0Size.w;
-	m_eyeHeight = recommenedTex0Size.h;
-
-	/*
-	// Set up the OGL Swap Chain
-	// TODO: This should be done in a cross platform way
-	m_ovrTextureSwapChainDescription.Type = ovrTexture_2D;
-	m_ovrTextureSwapChainDescription.ArraySize = 1;
-	m_ovrTextureSwapChainDescription.Width = GetEyeWidth();
-	m_ovrTextureSwapChainDescription.Height = GetEyeHeight();
-	m_ovrTextureSwapChainDescription.MipLevels = 1;
-	m_ovrTextureSwapChainDescription.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
-	m_ovrTextureSwapChainDescription.SampleCount = 1;
-	m_ovrTextureSwapChainDescription.StaticImage = ovrFalse;
-
-	// TODO: Need to set up OpenGL first
-	// TODO: This is GL specific 
-	CRM((RESULT)ovr_CreateTextureSwapChainGL(m_ovrSession, &m_ovrTextureSwapChainDescription, &m_ovrTextureChain), "Failed to create Texture Swap Chain for OGL");
-	CRM((RESULT)ovr_GetTextureSwapChainLength(m_ovrSession, m_ovrTextureChain, &m_ovrSwapChainLength), "Failed to get OVR Swap Chain Length");
-
-	
-
-	// Set up eyes
-	// TODO: Use primitives for this instead
-	for (int i = 0; i < 2; i++) {
-		ovrSizei idealTextureSize = ovr_GetFovTextureSize(m_ovrSession, ovrEyeType(i), m_ovrHMDDescription.DefaultEyeFov[i], 1);
-
-		GLuint swapChainTextureIndex;
-		ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureChain, i, &swapChainTextureIndex);
-
-		// TODO: Set up the framebuffers here
-		m_pStereoFramebuffers[i] = new OGLFramebuffer(oglimp, GetEyeWidth(), GetEyeHeight(), 3);
-		CRM(m_pStereoFramebuffers[i]->OGLInitialize(swapChainTextureIndex), "Failed to initialzie eye %d framebuffer for HMD", i);
-	}
-	*/
+	m_eyeWidth = m_ovrHMDDescription.Resolution.w / 2;
+	m_eyeHeight = m_ovrHMDDescription.Resolution.h;
 
 	for (int i = 0; i < HMD_NUM_EYES; i++) {
 		ovrSizei idealTextureSize = ovr_GetFovTextureSize(m_ovrSession, ovrEyeType(i), m_ovrHMDDescription.DefaultEyeFov[i], 1);
@@ -88,24 +55,6 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 		m_ovrTextureSwapChains[i] = new OVRTextureSwapChain(oglimp, m_ovrSession, idealTextureSize.w, idealTextureSize.h, 1, NULL, 1);
 		m_depthbuffers[i] = new OGLDepthbuffer(oglimp, idealTextureSize.w, idealTextureSize.h, 0);
 	}
-
-	m_ovrEyeRenderDescription[0] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0]);
-	m_ovrEyeRenderDescription[1] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1]);
-	
-	/*
-	// Implement a single layer
-	// Initialize our single full screen Fov layer.
-	
-
-	m_ovrLayer.Header.Type = ovrLayerType_EyeFov;
-	m_ovrLayer.Header.Flags = 0;
-	m_ovrLayer.ColorTexture[0] = m_ovrTextureChain;
-	m_ovrLayer.ColorTexture[1] = m_ovrTextureChain;
-	m_ovrLayer.Fov[0] = m_ovrEyeRenderDescription[0].Fov;
-	m_ovrLayer.Fov[1] = m_ovrEyeRenderDescription[1].Fov;
-	m_ovrLayer.Viewport[0] = *(reinterpret_cast<ovrRecti*>(&(rectangle<int>(0, 0, GetEyeWidth(), GetEyeHeight()))));
-	m_ovrLayer.Viewport[1] = *(reinterpret_cast<ovrRecti*>(&(rectangle<int>(GetEyeWidth(), 0, GetEyeWidth(), GetEyeHeight()))));
-	*/
 
 Error:
 	return r;
@@ -156,13 +105,8 @@ RESULT OVR::UnsetRenderSurface(EYE_TYPE eye) {
 RESULT OVR::SubmitFrame() {
 	RESULT r = R_PASS;
 
-	//ovrLayerHeader* layers = &m_ovrLayer.Header;
+	// TODO: Split this across the eyes 
 	long long frameIndex = 0;
-
-	ovrLayerEyeFov ld;
-	ld.Header.Type = ovrLayerType_EyeFov;
-	ld.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
-
 	ovrPosef EyeRenderPose[2];
 	ovrVector3f HmdToEyeOffset[2] = { m_ovrEyeRenderDescription[0].HmdToEyeOffset, m_ovrEyeRenderDescription[1].HmdToEyeOffset };
 
@@ -172,8 +116,13 @@ RESULT OVR::SubmitFrame() {
 	double sensorSampleTime;    // sensorSampleTime is fed into the layer later
 	ovr_GetEyePoses(m_ovrSession, frameIndex, ovrTrue, HmdToEyeOffset, EyeRenderPose, &sensorSampleTime);
 
+	// TODO: How much of this can be done in init 
+	ovrLayerEyeFov ld;
+	ld.Header.Type = ovrLayerType_EyeFov;
+	ld.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
+
 	for (int eye = 0; eye < 2; ++eye) {
-		ld.ColorTexture[eye] = reinterpret_cast<ovrTextureSwapChain>(m_ovrTextureSwapChains[eye]);
+		ld.ColorTexture[eye] = m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain();
 		ld.Viewport[eye] = m_ovrTextureSwapChains[eye]->GetOVRViewportRecti();
 		ld.Fov[eye] = m_ovrHMDDescription.DefaultEyeFov[eye];
 		ld.RenderPose[eye] = EyeRenderPose[eye];
@@ -181,7 +130,6 @@ RESULT OVR::SubmitFrame() {
 	}
 
 	ovrLayerHeader* layers = &ld.Header;
-
 	CR((RESULT)ovr_SubmitFrame(m_ovrSession, 0, nullptr, &layers, 1));
 
 Error:
@@ -205,6 +153,7 @@ RESULT OVR::UpdateHMD() {
 		//ovrPosef headPose = trackingState.HeadPose.ThePose;
 		m_ptOrigin = point(reinterpret_cast<float*>(&(trackingState.HeadPose.ThePose.Position)));
 		m_qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HeadPose.ThePose.Orientation)));
+		m_qOrientation.Reverse();
 	}
 
 Error:

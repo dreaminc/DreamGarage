@@ -411,9 +411,6 @@ RESULT Windows64App::ShowSandbox() {
 			m_pOpenGLImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
 		}
 
-		// Render Scene
-		
-		m_pOpenGLImp->Render(m_pSceneGraph);
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 
 		///*
@@ -423,6 +420,9 @@ RESULT Windows64App::ShowSandbox() {
 			m_pHMD->SubmitFrame();
 		}
 		//*/
+
+		// Render Scene
+		m_pOpenGLImp->Render(m_pSceneGraph);
 
 		// Swap buffers
 		SwapBuffers(m_hDC);
