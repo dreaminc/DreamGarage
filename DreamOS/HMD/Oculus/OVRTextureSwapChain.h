@@ -39,7 +39,6 @@ public:
 		m_width(width),
 		m_height(height),
 		m_pOGLFramebuffer(nullptr),
-		m_framebufferIndex(0),
 		m_mipLevels(mipLevels),
 		m_pParentImp(pParentImp),
 		m_sampleCount(sampleCount),
@@ -82,7 +81,6 @@ public:
 		CR((RESULT)ovr_CreateTextureSwapChainGL(m_ovrSession, &m_ovrTextureSwapChainDescription, &m_ovrTextureSwapChain));
 		CR((RESULT)ovr_GetTextureSwapChainLength(m_ovrSession, m_ovrTextureSwapChain, &m_textureSwapChainLength));
 
-		// TODO: Replace with OGLTexture
 		for (int i = 0; i < m_textureSwapChainLength; ++i) {
 			GLuint chainTextureIndex;
 			ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, i, &chainTextureIndex);
@@ -101,10 +99,9 @@ public:
 			m_swapChainOGLTextures.push_back(pOGLTexture);
 		}
 
-		// TODO: Replace with Framebuffer
-		m_pParentImp->glGenFramebuffers(1, &m_framebufferIndex);
-
 		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp);
+		CR(m_pOGLFramebuffer->OGLInitialize());
+		CR(m_pOGLFramebuffer->SetOGLDepthbuffer(nullptr));
 
 	Error:
 		return r;
@@ -140,28 +137,23 @@ public:
 			return R_FAIL;
 	}
 
-	RESULT SetAndClearRenderSurface(OGLDepthbuffer *oglDepthbuffer) {
+	RESULT SetAndClearRenderSurface() {
 		RESULT r = R_PASS;
 
-		GLuint curTexId;
+		GLuint currentTextureIndex;
 
 		if (m_ovrTextureSwapChain) {
-			int curIndex;
-			CR((RESULT)ovr_GetTextureSwapChainCurrentIndex(m_ovrSession, m_ovrTextureSwapChain, &curIndex));
-			CR((RESULT)ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, curIndex, &curTexId));
+			int currentIndex;
+			CR((RESULT)ovr_GetTextureSwapChainCurrentIndex(m_ovrSession, m_ovrTextureSwapChain, &currentIndex));
+			CR((RESULT)ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, currentIndex, &currentTextureIndex));
 		}
 		else {
 			// TODO:
 			// curTexId = m_textureIndex;
 		}
 
-		CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, oglDepthbuffer->GetOGLTextureIndex(), 0));
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, curTexId, 0));
-
-		glViewport(0, 0, m_width, m_height);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_FRAMEBUFFER_SRGB);
+		CR(m_pOGLFramebuffer->BindOGLFramebuffer(currentTextureIndex));
+		CR(m_pOGLFramebuffer->SetAndClearViewport());
 
 	Error:
 		return r;
@@ -170,9 +162,7 @@ public:
 	RESULT UnsetRenderSurface() {
 		RESULT r = R_PASS;
 
-		CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0));
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0));
+		CR(m_pOGLFramebuffer->UnbindOGLFramebuffer());
 
 	Error:
 		return R_PASS;

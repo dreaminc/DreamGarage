@@ -126,17 +126,10 @@ GLuint OGLFramebuffer::GetOGLTextureIndex() {
 	}
 }
 
-RESULT OGLFramebuffer::BindOGLFramebuffer() {
+RESULT OGLFramebuffer::SetAndClearViewport() {
 	RESULT r = R_PASS;
 
-	// Render to our framebuffer
-	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
-	
-	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GetOGLTextureIndex(), 0));
-	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_renderbufferIndex, 0));
-	
-	// TODO: Stuff this into the implementation
-	glViewport(0, 0, m_width, m_height); 
+	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_FRAMEBUFFER_SRGB);
 
@@ -144,10 +137,31 @@ Error:
 	return r;
 }
 
-RESULT OGLFramebuffer::UnbindOGLFramebuffer() {
+RESULT OGLFramebuffer::BindOGLFramebuffer(GLuint textureIndex) {
 	RESULT r = R_PASS;
+
+	// Render to our framebuffer
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
 
+	if (m_pOGLDepthbuffer != nullptr) {
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
+	}
+
+	if (textureIndex == NULL) {
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GetOGLTextureIndex(), 0));
+	}
+	else {
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureIndex, 0));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::UnbindOGLFramebuffer() {
+	RESULT r = R_PASS;
+
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
 	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0));
 	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0))
 

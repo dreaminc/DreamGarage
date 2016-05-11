@@ -46,14 +46,11 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 		
 		m_ovrTextureSwapChains[i] = new OVRTextureSwapChain(oglimp, m_ovrSession, idealTextureSize.w, idealTextureSize.h, 1, NULL, 1);
 		CR(m_ovrTextureSwapChains[i]->OVRInitialize());
-
-		m_depthbuffers[i] = new OGLDepthbuffer(oglimp, idealTextureSize.w, idealTextureSize.h);
 	}
 
 Error:
 	return r;
 }
-
 RESULT OVR::BindFramebuffer(EYE_TYPE eye) {
 	return R_NOT_IMPLEMENTED;
 }
@@ -64,7 +61,7 @@ RESULT OVR::CommitSwapChain(EYE_TYPE eye) {
 }
 
 RESULT OVR::SetAndClearRenderSurface(EYE_TYPE eye) {
-	return m_ovrTextureSwapChains[eye]->SetAndClearRenderSurface(m_depthbuffers[eye]);
+	return m_ovrTextureSwapChains[eye]->SetAndClearRenderSurface();
 }
 
 RESULT OVR::UnsetRenderSurface(EYE_TYPE eye) {

@@ -27,8 +27,8 @@ public:
 		RESULT r = R_PASS;
 
 		// TODO: Replace with texture object instead?
-		CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
-		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_textureIndex));
+		CR(m_pParentImp->GenerateTextures(1, &m_depthbufferIndex));
+		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_depthbufferIndex));
 
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
@@ -61,21 +61,21 @@ public:
 		return r;
 	}
 
-	GLuint GetOGLTextureIndex() {
-		return m_textureIndex;
+	GLuint GetOGLDepthbufferIndex() {
+		return m_depthbufferIndex;
 	}
 
 	~OGLDepthbuffer() {
-		if (m_textureIndex) {
-			glDeleteTextures(1, &m_textureIndex);
-			m_textureIndex = 0;
+		if (m_depthbufferIndex) {
+			glDeleteTextures(1, &m_depthbufferIndex);
+			m_depthbufferIndex = 0;
 		}
 	}
 
 private:
 	OpenGLImp *m_pParentImp;
 
-	GLuint m_textureIndex;
+	GLuint m_depthbufferIndex;
 
 	int m_width;
 	int m_height;

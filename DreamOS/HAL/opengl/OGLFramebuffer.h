@@ -27,7 +27,7 @@ public:
 	~OGLFramebuffer();
 
 	RESULT OGLInitialize();
-	RESULT BindOGLFramebuffer();
+	RESULT BindOGLFramebuffer(GLuint textureIndex);
 	RESULT UnbindOGLFramebuffer();
 
 	RESULT SetOGLTexture(GLuint textureIndex = NULL);
@@ -35,6 +35,8 @@ public:
 	RESULT SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer = nullptr);
 
 	GLuint GetOGLTextureIndex();
+
+	RESULT SetAndClearViewport();
 
 private:
 	OpenGLImp *m_pParentImp;
