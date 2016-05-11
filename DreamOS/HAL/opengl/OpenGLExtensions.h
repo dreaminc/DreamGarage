@@ -230,6 +230,10 @@ public:
 	}
 	*/
 
+	inline void glGenerateMipmap(GLenum target) {
+		return m_glGenerateMipmap(target);
+	}
+
 	// FBO
 	inline void glGenFramebuffers(GLsizei n, GLuint *framebuffers) {
 		return m_glGenFramebuffers(n, framebuffers);
@@ -372,6 +376,7 @@ private:
 	//PFNGLTEXPARAMETERIPROC m_glTexParameteri;
 	//PFNGLTEXIMAGE2DPROC m_glTexImage2D;
 	//PFNGLTEXSUBIMAGE2DPROC m_glTexSubImage2D;
+	PFNGLGENERATEMIPMAPPROC m_glGenerateMipmap;
 
 	// FBO
 	PFNGLGENFRAMEBUFFERSPROC m_glGenFramebuffers;

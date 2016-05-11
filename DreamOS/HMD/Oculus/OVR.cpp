@@ -9,8 +9,6 @@
 
 OVR::OVR() :
 	m_ovrSession(nullptr)
-	//m_ovrTextureChain(nullptr),
-	//m_ovrSwapChainLength(0)
 {
 	// empty stub
 }
@@ -40,12 +38,6 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 	// FloorLevel will give tracking poses where the floor height is 0
 	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_FloorLevel));
 
-	// Configure Stereo settings.
-	//ovrSizei recommenedTex0Size = ovr_GetFovTextureSize(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0], 1.0f);
-	//ovrSizei recommenedTex1Size = ovr_GetFovTextureSize(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1], 1.0f);
-	//m_eyeWidth = recommenedTex0Size.w;
-	//m_eyeHeight = recommenedTex0Size.h;
-
 	m_eyeWidth = m_ovrHMDDescription.Resolution.w / 2;
 	m_eyeHeight = m_ovrHMDDescription.Resolution.h;
 
@@ -53,7 +45,9 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 		ovrSizei idealTextureSize = ovr_GetFovTextureSize(m_ovrSession, ovrEyeType(i), m_ovrHMDDescription.DefaultEyeFov[i], 1);
 		
 		m_ovrTextureSwapChains[i] = new OVRTextureSwapChain(oglimp, m_ovrSession, idealTextureSize.w, idealTextureSize.h, 1, NULL, 1);
-		m_depthbuffers[i] = new OGLDepthbuffer(oglimp, idealTextureSize.w, idealTextureSize.h, 0);
+		CR(m_ovrTextureSwapChains[i]->OVRInitialize());
+
+		m_depthbuffers[i] = new OGLDepthbuffer(oglimp, idealTextureSize.w, idealTextureSize.h);
 	}
 
 Error:
@@ -61,44 +55,19 @@ Error:
 }
 
 RESULT OVR::BindFramebuffer(EYE_TYPE eye) {
-	//return m_pStereoFramebuffers[eye]->BindOGLFramebuffer();
 	return R_NOT_IMPLEMENTED;
 }
 
 // Commit the changes to the texture swap chain
 RESULT OVR::CommitSwapChain(EYE_TYPE eye) {
 	return m_ovrTextureSwapChains[eye]->Commit();
-	/*RESULT r = R_PASS;
-
-	CR((RESULT)ovr_CommitTextureSwapChain(m_ovrSession, m_ovrTextureChain));
-
-Error:
-	return r;*/
 }
 
 RESULT OVR::SetAndClearRenderSurface(EYE_TYPE eye) {
 	return m_ovrTextureSwapChains[eye]->SetAndClearRenderSurface(m_depthbuffers[eye]);
-	/*RESULT r = R_PASS;
-
-	GLuint curTexId;
-
-	if (m_ovrTextureChain) {
-		int currentIndex;
-		ovr_GetTextureSwapChainCurrentIndex(m_ovrSession, m_ovrTextureChain, &currentIndex);
-		ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureChain, currentIndex, &curTexId);
-	}
-	else {
-		curTexId = m_pStereoFramebuffers[eye]->GetOGLTextureIndex();
-	}
-
-	CR(BindFramebuffer(eye));
-
-Error:
-	return r;*/
 }
 
 RESULT OVR::UnsetRenderSurface(EYE_TYPE eye) {
-	//return m_pStereoFramebuffers[eye]->UnbindOGLFramebuffer();
 	return m_ovrTextureSwapChains[eye]->UnsetRenderSurface();
 }
 
@@ -137,12 +106,12 @@ Error:
 }
 
 // TODO: Better way?
-#define HMD_OVR_USE_PREDICTED_TIMNIG
+#define HMD_OVR_USE_PREDICTED_TIMING
 
 RESULT OVR::UpdateHMD() {
 	RESULT r = R_PASS;
 
-#ifdef HMD_OVR_USE_PREDICTED_TIMNIG
+#ifdef HMD_OVR_USE_PREDICTED_TIMING
 	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
 #else
 	double fTiming = ovr_GetTimeInSeconds();
@@ -168,14 +137,17 @@ RESULT OVR::ReleaseHMD() {
 		m_ovrSession = nullptr;
 	}
 
-	/*
-	if (m_ovrTextureChain != nullptr) {
-		ovr_DestroyTextureSwapChain(m_ovrSession, m_ovrTextureChain);
-		m_ovrTextureChain = nullptr;
-	}
-	*/
+	for (int i = 0; i < HMD_NUM_EYES; i++) {
+		if (m_ovrTextureSwapChains[i] != nullptr) {
+			delete m_ovrTextureSwapChains[i];
+			m_ovrTextureSwapChains[i] = nullptr;
+		}
 
-	// TODO: Release the swap chain and depth buffers
+		if (m_depthbuffers[i] != nullptr) {
+			delete m_depthbuffers[i];
+			m_depthbuffers[i] = nullptr;
+		}
+	}
 
 	ovr_Shutdown();
 

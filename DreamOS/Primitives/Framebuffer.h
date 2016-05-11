@@ -10,8 +10,18 @@
 
 #include "Primitives/Types/UID.h"
 
+#define DEFAULT_FRAMEBUFFER_CHANNELS 3
+
 class framebuffer {
 public:
+	framebuffer() :
+		m_width(0),
+		m_height(0),
+		m_channels(DEFAULT_FRAMEBUFFER_CHANNELS)
+	{
+		// empty
+	}
+
 	framebuffer(int width, int height, int channels) :
 		m_width(width),
 		m_height(height),

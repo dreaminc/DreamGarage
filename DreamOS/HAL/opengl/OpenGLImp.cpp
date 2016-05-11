@@ -1446,7 +1446,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::TexParamteri(GLenum target, GLenum pname, GLint param) {
+RESULT OpenGLImp::TexParameteri(GLenum target, GLenum pname, GLint param) {
 	RESULT r = R_PASS;
 
 	//m_OpenGLExtensions.glTexParamteri(target, pname, param);
@@ -1473,6 +1473,16 @@ RESULT OpenGLImp::TextureSubImage2D(GLenum target, GLint level, GLint xoffset, G
 
 	glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
 	CRM(CheckGLError(), "glTexSubImage2D failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGenerateMipmap(GLenum target) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGenerateMipmap(target);
+	CRM(CheckGLError(), "glGenerateMipmap failed");
 
 Error:
 	return r;

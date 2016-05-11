@@ -55,18 +55,6 @@ public:
 	// Texture Swap Chains
 	OVRTextureSwapChain *m_ovrTextureSwapChains[HMD_NUM_EYES];
 	OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
-
-	// Swap Chain
-	/*
-	ovrTextureSwapChainDesc m_ovrTextureSwapChainDescription;
-	ovrTextureSwapChain  m_ovrTextureChain;
-	int m_ovrSwapChainLength;
-	*/
-
-	// Framebuffers
-	// TODO: This should not be GL specific
-	//OGLFramebuffer *m_pStereoFramebuffers[2];
-
 };
 
 #endif // ! HMD_IMP_H_

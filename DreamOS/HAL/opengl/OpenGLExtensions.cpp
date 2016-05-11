@@ -153,8 +153,11 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	//CNMW((m_glTexParameteri = (PFNGLTEXPARAMETERIPROC)wglGetProcAddress("glTexParameteri")),
 	//	"Failed to initialize glTexParameteri extension");
 
-	//CNMW((m_glTexImage2D = (PFNGLTEXIMAGE2DPROC)wglGetProcAddress("m_glTexImage2D")),
-	//	"Failed to initialize m_glTexImage2D extension");
+	//CNMW((m_glTexImage2D = (PFNGLTEXIMAGE2DPROC)wglGetProcAddress("glTexImage2D")),
+	//	"Failed to initializm_glTexImage2D extension");
+
+	CNMW((m_glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)wglGetProcAddress("glGenerateMipmap")),
+		"Failed to initialize glGenerateMipmap extension");
 
 	// FBO
 	CNMW((m_glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)wglGetProcAddress("glGenFramebuffers")),

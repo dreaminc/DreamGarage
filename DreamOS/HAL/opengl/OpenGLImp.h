@@ -197,10 +197,11 @@ public:
 	RESULT BindTexture(GLenum target, GLuint texture);
 	RESULT glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height);
 	//RESULT glTexParamteri(GLenum target, GLenum pname, GLint param);
-	RESULT TexParamteri(GLenum target, GLenum pname, GLint param);
+	RESULT TexParameteri(GLenum target, GLenum pname, GLint param);
 	//RESULT glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
 	RESULT TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
 	RESULT TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
+	RESULT glGenerateMipmap(GLenum target);
 
 // Extension Mappings
 private:

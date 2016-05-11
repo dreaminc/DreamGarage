@@ -10,6 +10,8 @@
 #include "OpenGLCommon.h"
 #include "Primitives/Framebuffer.h"
 
+#include "OGLDepthbuffer.h"
+
 class OpenGLImp;
 class OGLTexture;
 
@@ -17,23 +19,34 @@ class OGLTexture;
 
 class OGLFramebuffer : public framebuffer {
 public:
+
+	OGLFramebuffer(OpenGLImp *pParentImp);
 	OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels);
 	OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int width, int height, int channels);
 
 	~OGLFramebuffer();
 
-	RESULT OGLInitialize(GLuint textureID = NULL);
+	RESULT OGLInitialize();
 	RESULT BindOGLFramebuffer();
 	RESULT UnbindOGLFramebuffer();
+
+	RESULT SetOGLTexture(GLuint textureIndex = NULL);
+	RESULT SetOGLDrawBuffers(int numDrawBuffers);
+	RESULT SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer = nullptr);
 
 	GLuint GetOGLTextureIndex();
 
 private:
 	OpenGLImp *m_pParentImp;
 
-	GLenum m_drawBuffers[NUM_OGL_DRAW_BUFFERS];
+	//GLenum m_drawBuffers[NUM_OGL_DRAW_BUFFERS];
+	GLenum *m_pDrawBuffers;
+	int m_pDrawBuffers_n;
+	
 	GLuint m_framebufferIndex;
 	GLuint m_renderbufferIndex;
+
+	OGLDepthbuffer *m_pOGLDepthbuffer;
 
 	OGLTexture *m_pOGLTexture;
 };

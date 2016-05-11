@@ -3,10 +3,22 @@
 #include "OpenGLImp.h"
 #include "OGLTexture.h"
 
+OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp) :
+	framebuffer(),
+	m_pParentImp(pParentImp),
+	m_pOGLTexture(nullptr),
+	m_pDrawBuffers(nullptr),
+	m_pOGLDepthbuffer(nullptr)
+{
+	// empty
+}
+
 OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels) :
 	framebuffer(width, height, channels),
 	m_pParentImp(pParentImp),
-	m_pOGLTexture(nullptr)
+	m_pOGLTexture(nullptr),
+	m_pDrawBuffers(nullptr),
+	m_pOGLDepthbuffer(nullptr)
 {
 	// empty
 }
@@ -14,9 +26,11 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int
 OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int width, int height, int channels) :
 	framebuffer(width, height, channels),
 	m_pParentImp(pParentImp),
-	m_pOGLTexture(nullptr)
+	m_pOGLTexture(nullptr),
+	m_pDrawBuffers(nullptr),
+	m_pOGLDepthbuffer(nullptr)
 {
-
+	// empty
 }
 
 OGLFramebuffer::~OGLFramebuffer() {
@@ -24,36 +38,77 @@ OGLFramebuffer::~OGLFramebuffer() {
 		delete m_pOGLTexture;
 		m_pOGLTexture = nullptr;
 	}
+
+	if (m_pOGLDepthbuffer != nullptr) {
+		delete m_pOGLDepthbuffer;
+		m_pOGLDepthbuffer = nullptr;
+	}
+
+	if (m_pDrawBuffers != nullptr) {
+		delete[] m_pDrawBuffers;
+		m_pDrawBuffers = nullptr;
+	}
 }
 
-RESULT OGLFramebuffer::OGLInitialize(GLuint textureID) {
+RESULT OGLFramebuffer::SetOGLTexture(GLuint textureIndex) {
+	RESULT r = R_PASS;
+
+	if (textureIndex == NULL)
+		m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, m_width, m_height, m_channels);
+	else
+		m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, textureIndex, m_width, m_height, m_channels);
+
+	CN(m_pOGLTexture);
+
+	// Set the Framebuffer Texture
+	CR(m_pParentImp->glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_pOGLTexture->GetOGLTextureIndex(), 0));
+
+Error:
+	return r;
+}
+
+// TODO: Not sure if this is right / should be used
+RESULT OGLFramebuffer::SetOGLDrawBuffers(int numDrawBuffers) {
+	RESULT r = R_PASS;
+	
+	m_pDrawBuffers_n = numDrawBuffers;
+	m_pDrawBuffers = new GLenum[m_pDrawBuffers_n];
+	CN(m_pDrawBuffers);
+
+	for (int i = 0; i < m_pDrawBuffers_n; i++) {
+		m_pDrawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+	}
+
+	CR(m_pParentImp->glDrawBuffers(m_pDrawBuffers_n, m_pDrawBuffers));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer) {
+	RESULT r = R_PASS;
+
+	if (pOGLDepthbuffer != nullptr) {
+		m_pOGLDepthbuffer = pOGLDepthbuffer;
+	}
+	else {
+		m_pOGLDepthbuffer = new OGLDepthbuffer(m_pParentImp, m_width, m_height);
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
 
 	// Create Buffer Objects
 	CR(m_pParentImp->glGenFramebuffers(1, &m_framebufferIndex));
-	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
-
-	if (textureID == NULL) 
-		m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, m_width, m_height, m_channels);
-	else 
-		m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, textureID, m_width, m_height, m_channels);
-
-	CN(m_pOGLTexture);
-
-	// The depth buffer
-	// TODO: Create a depth buffer object (like OGLTexture / Framebuffer 
-	CR(m_pParentImp->glGenRenderbuffers(1, &m_renderbufferIndex));
-	CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_renderbufferIndex));
-	CR(m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height));
-	CR(m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderbufferIndex));
-
-	CR(m_pParentImp->glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, m_pOGLTexture->GetOGLTextureIndex(), 0));
-
-	// Set the list of draw buffers.
-	m_drawBuffers[0] = { GL_COLOR_ATTACHMENT0 };
-	CR(m_pParentImp->glDrawBuffers(NUM_OGL_DRAW_BUFFERS, m_drawBuffers));
 
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));

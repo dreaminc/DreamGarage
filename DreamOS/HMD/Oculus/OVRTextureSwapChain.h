@@ -16,18 +16,12 @@
 #include "HAL/opengl/OGLDepthbuffer.h"
 #include "OVR_CAPI_GL.h"
 
-class OVRTextureSwapChain {
-private:
-	// This is identical to ovrTextureSwapChain
-	ovrSession m_ovrSession;
-	ovrTextureSwapChain  m_ovrTextureSwapChain;
-	GLuint	m_textureIndex;
-	GLuint	m_framebufferIndex;
-	int m_width;
-	int m_height;
-	// End of ovrTextureSwapChain equivalent struct
+#include "HAL/opengl/OGLTexture.h"
+#include "HAL/opengl/OGLFramebuffer.h"
 
-	OpenGLImp *m_pParentImp;
+#include <vector>
+
+class OVRTextureSwapChain {
 
 public:
 	struct OVRTextureBuffer {
@@ -44,47 +38,76 @@ public:
 		m_ovrTextureSwapChain(nullptr),
 		m_width(width),
 		m_height(height),
-		m_textureIndex(0),
+		m_pOGLFramebuffer(nullptr),
 		m_framebufferIndex(0),
-		m_pParentImp(pParentImp)
+		m_mipLevels(mipLevels),
+		m_pParentImp(pParentImp),
+		m_sampleCount(sampleCount),
+		m_textureSwapChainLength(0)
 	{
-		assert(sampleCount <= 1); // The code doesn't currently handle MSAA textures.
+		m_swapChainOGLTextures.clear();
+	}
 
-		ovrTextureSwapChainDesc textureSwapChainDescription = {};
-		textureSwapChainDescription.Type = ovrTexture_2D;
-		textureSwapChainDescription.ArraySize = 1;
-		textureSwapChainDescription.Width = m_width;
-		textureSwapChainDescription.Height = m_height;
-		textureSwapChainDescription.MipLevels = 1;
-		textureSwapChainDescription.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
-		textureSwapChainDescription.SampleCount = 1;
-		textureSwapChainDescription.StaticImage = ovrFalse;
+	~OVRTextureSwapChain() {
+		while (m_swapChainOGLTextures.size() > 0) {
+			OGLTexture *pTempOGLTexture = m_swapChainOGLTextures.back();
+			m_swapChainOGLTextures.pop_back();
 
-		ovrResult result = ovr_CreateTextureSwapChainGL(m_ovrSession, &textureSwapChainDescription, &m_ovrTextureSwapChain);
+			delete pTempOGLTexture;
+			pTempOGLTexture = nullptr;
+		}
 
-		int length = 0;
-		ovr_GetTextureSwapChainLength(session, m_ovrTextureSwapChain, &length);
+		if (m_pOGLFramebuffer != nullptr) {
+			delete m_pOGLFramebuffer;
+			m_pOGLFramebuffer = nullptr;
+		}
+	}
 
-		if (OVR_SUCCESS(result)) {
-			for (int i = 0; i < length; ++i) {
-				GLuint chainTextureIndex;
-				ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, i, &chainTextureIndex);
-				glBindTexture(GL_TEXTURE_2D, chainTextureIndex);
+	RESULT OVRInitialize() {
+		RESULT r = R_PASS;
 
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		int m_textureSwapChainLength = 0;
+
+		CB(m_sampleCount <= 1); // The code doesn't currently handle MSAA textures.
+
+		m_ovrTextureSwapChainDescription.Type = ovrTexture_2D;
+		m_ovrTextureSwapChainDescription.ArraySize = 1;
+		m_ovrTextureSwapChainDescription.Width = m_width;
+		m_ovrTextureSwapChainDescription.Height = m_height;
+		m_ovrTextureSwapChainDescription.MipLevels = 1;
+		m_ovrTextureSwapChainDescription.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+		m_ovrTextureSwapChainDescription.SampleCount = 1;
+		m_ovrTextureSwapChainDescription.StaticImage = ovrFalse;
+
+		CR((RESULT)ovr_CreateTextureSwapChainGL(m_ovrSession, &m_ovrTextureSwapChainDescription, &m_ovrTextureSwapChain));
+		CR((RESULT)ovr_GetTextureSwapChainLength(m_ovrSession, m_ovrTextureSwapChain, &m_textureSwapChainLength));
+
+		// TODO: Replace with OGLTexture
+		for (int i = 0; i < m_textureSwapChainLength; ++i) {
+			GLuint chainTextureIndex;
+			ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, i, &chainTextureIndex);
+
+			OGLTexture *pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, chainTextureIndex, m_width, m_height, 3);
+			CR(pOGLTexture->BindTexture(GL_TEXTURE_2D));
+			CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+			CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+			CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+			CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+
+			if (m_mipLevels > 1) {
+				CR(m_pParentImp->glGenerateMipmap(GL_TEXTURE_2D));
 			}
+
+			m_swapChainOGLTextures.push_back(pOGLTexture);
 		}
 
-		/* TODO (implementation fill out)
-		if (mipLevels > 1) {
-			pParentImp->glGenerateMipmap(GL_TEXTURE_2D);
-		}
-		*/
+		// TODO: Replace with Framebuffer
+		m_pParentImp->glGenFramebuffers(1, &m_framebufferIndex);
 
-		pParentImp->glGenFramebuffers(1, &m_framebufferIndex);
+		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp);
+
+	Error:
+		return r;
 	}
 
 	ovrTextureSwapChain GetOVRTextureSwapChain() {
@@ -105,7 +128,6 @@ public:
 		
 		retRecti.Pos.x = 0;
 		retRecti.Pos.y = 0;
-
 		retRecti.Size = GetOVRSizei();
 
 		return retRecti;
@@ -122,18 +144,20 @@ public:
 		RESULT r = R_PASS;
 
 		GLuint curTexId;
+
 		if (m_ovrTextureSwapChain) {
 			int curIndex;
-			ovr_GetTextureSwapChainCurrentIndex(m_ovrSession, m_ovrTextureSwapChain, &curIndex);
-			ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, curIndex, &curTexId);
+			CR((RESULT)ovr_GetTextureSwapChainCurrentIndex(m_ovrSession, m_ovrTextureSwapChain, &curIndex));
+			CR((RESULT)ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, curIndex, &curTexId));
 		}
 		else {
-			curTexId = m_textureIndex;
+			// TODO:
+			// curTexId = m_textureIndex;
 		}
 
-		m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex);
-		m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, oglDepthbuffer->GetOGLTextureIndex(), 0);
-		m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, curTexId, 0);
+		CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, oglDepthbuffer->GetOGLTextureIndex(), 0));
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, curTexId, 0));
 
 		glViewport(0, 0, m_width, m_height);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -144,12 +168,35 @@ public:
 	}
 
 	RESULT UnsetRenderSurface() {
-		m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex);
-		m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-		m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0);
+		RESULT r = R_PASS;
 
+		CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0));
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0));
+
+	Error:
 		return R_PASS;
 	}
+
+private:
+	ovrSession m_ovrSession;
+
+	ovrTextureSwapChainDesc m_ovrTextureSwapChainDescription;
+	ovrTextureSwapChain  m_ovrTextureSwapChain;
+
+	std::vector<OGLTexture*> m_swapChainOGLTextures;
+	OGLFramebuffer *m_pOGLFramebuffer;
+
+	GLuint	m_framebufferIndex;
+	
+	int m_width;
+	int m_height;
+	int m_sampleCount;
+	int m_mipLevels;
+
+	int m_textureSwapChainLength;
+	
+	OpenGLImp *m_pParentImp;
 };
 
 #endif // !OVR_TEXTURE_SWAP_CHAIN_H_
