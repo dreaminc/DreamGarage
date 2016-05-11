@@ -248,6 +248,7 @@
     <ClInclude Include="..\..\..\HMD\HMD.h" />
     <ClInclude Include="..\..\..\HMD\HMDFactory.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVR.h" />
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />

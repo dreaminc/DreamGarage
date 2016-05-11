@@ -366,7 +366,7 @@ RESULT Windows64App::ShowSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp);
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
 
 	// TODO: Should replace this with a proper scene loader
 	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
@@ -417,12 +417,15 @@ RESULT Windows64App::ShowSandbox() {
 		// Send to the HMD
 		if (m_pHMD != nullptr) {
 			m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
+			
 			m_pHMD->SubmitFrame();
+
+			m_pHMD->RenderHMDMirror();
 		}
 		//*/
 
 		// Render Scene
-		m_pOpenGLImp->Render(m_pSceneGraph);
+		//m_pOpenGLImp->Render(m_pSceneGraph);
 
 		// Swap buffers
 		SwapBuffers(m_hDC);

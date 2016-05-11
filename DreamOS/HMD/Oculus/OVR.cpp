@@ -8,7 +8,8 @@
 #include "Primitives/rectangle.h"
 
 OVR::OVR() :
-	m_ovrSession(nullptr)
+	m_ovrSession(nullptr),
+	m_ovrMirrorTexture(nullptr)
 {
 	// empty stub
 }
@@ -17,7 +18,7 @@ OVR::~OVR() {
 	// empty stub
 }
 
-RESULT OVR::InitializeHMD(HALImp *halimp) {
+RESULT OVR::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	RESULT r = R_PASS;
 	ovrGraphicsLuid luid;
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
@@ -35,6 +36,9 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 	for (unsigned int i = 0; i < trackerCount; ++i)
 		m_TrackerDescriptions.push_back(ovr_GetTrackerDesc(m_ovrSession, i));
 
+	// Turn off vsync to let the compositor do its magic
+	//wglSwapIntervalEXT(0);
+
 	// FloorLevel will give tracking poses where the floor height is 0
 	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_FloorLevel));
 
@@ -48,9 +52,39 @@ RESULT OVR::InitializeHMD(HALImp *halimp) {
 		CR(m_ovrTextureSwapChains[i]->OVRInitialize());
 	}
 
+	// Frontload Layer Initialization
+	m_ovrLayer.Header.Type = ovrLayerType_EyeFov;
+	m_ovrLayer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
+
+	// Set up the mirror texture
+	if (wndWidth == 0)
+		wndWidth = m_ovrHMDDescription.Resolution.w / 2;
+
+	if (wndHeight == 0)
+		wndHeight = m_ovrHMDDescription.Resolution.h / 2;
+
+	m_ovrMirrorTexture = new OVRMirrorTexture(oglimp, m_ovrSession, wndWidth, wndHeight);
+	
+	CN(m_ovrMirrorTexture);
+	CR(m_ovrMirrorTexture->OVRInitialize());
+	
 Error:
 	return r;
 }
+
+RESULT OVR::SetUpFrame() {
+	RESULT r = R_PASS;
+
+	// TODO: Set up frame
+
+Error:
+	return r;
+}
+
+RESULT OVR::RenderHMDMirror() {
+	return m_ovrMirrorTexture->RenderMirrorToBackBuffer();
+}
+
 RESULT OVR::BindFramebuffer(EYE_TYPE eye) {
 	return R_NOT_IMPLEMENTED;
 }
@@ -61,6 +95,8 @@ RESULT OVR::CommitSwapChain(EYE_TYPE eye) {
 }
 
 RESULT OVR::SetAndClearRenderSurface(EYE_TYPE eye) {
+	m_ovrEyeRenderDescription[eye] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[eye]);
+
 	return m_ovrTextureSwapChains[eye]->SetAndClearRenderSurface();
 }
 
@@ -76,27 +112,28 @@ RESULT OVR::SubmitFrame() {
 	ovrPosef EyeRenderPose[2];
 	ovrVector3f HmdToEyeOffset[2] = { m_ovrEyeRenderDescription[0].HmdToEyeOffset, m_ovrEyeRenderDescription[1].HmdToEyeOffset };
 
-	m_ovrEyeRenderDescription[0] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0]);
-	m_ovrEyeRenderDescription[1] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1]);
-
 	double sensorSampleTime;    // sensorSampleTime is fed into the layer later
 	ovr_GetEyePoses(m_ovrSession, frameIndex, ovrTrue, HmdToEyeOffset, EyeRenderPose, &sensorSampleTime);
 
-	// TODO: How much of this can be done in init 
-	ovrLayerEyeFov ld;
-	ld.Header.Type = ovrLayerType_EyeFov;
-	ld.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
-
 	for (int eye = 0; eye < 2; ++eye) {
-		ld.ColorTexture[eye] = m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain();
-		ld.Viewport[eye] = m_ovrTextureSwapChains[eye]->GetOVRViewportRecti();
-		ld.Fov[eye] = m_ovrHMDDescription.DefaultEyeFov[eye];
-		ld.RenderPose[eye] = EyeRenderPose[eye];
-		ld.SensorSampleTime = sensorSampleTime;
+		m_ovrLayer.ColorTexture[eye] = m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain();
+		m_ovrLayer.Viewport[eye] = m_ovrTextureSwapChains[eye]->GetOVRViewportRecti();
+		m_ovrLayer.Fov[eye] = m_ovrHMDDescription.DefaultEyeFov[eye];
+		m_ovrLayer.RenderPose[eye] = EyeRenderPose[eye];
+		m_ovrLayer.SensorSampleTime = sensorSampleTime;
 	}
 
-	ovrLayerHeader* layers = &ld.Header;
+	ovrLayerHeader* layers = &m_ovrLayer.Header;
 	CR((RESULT)ovr_SubmitFrame(m_ovrSession, 0, nullptr, &layers, 1));
+
+	/* TODO: Might want to check on session
+	ovrSessionStatus sessionStatus;
+		ovr_GetSessionStatus(session, &sessionStatus);
+		if (sessionStatus.ShouldQuit)
+			goto Done;
+		if (sessionStatus.ShouldRecenter)
+			ovr_RecenterTrackingOrigin(session);
+	*/
 
 Error:
 	return r;
@@ -140,10 +177,12 @@ RESULT OVR::ReleaseHMD() {
 			m_ovrTextureSwapChains[i] = nullptr;
 		}
 
+		/*
 		if (m_depthbuffers[i] != nullptr) {
 			delete m_depthbuffers[i];
 			m_depthbuffers[i] = nullptr;
 		}
+		*/
 	}
 
 	ovr_Shutdown();

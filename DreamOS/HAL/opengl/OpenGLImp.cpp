@@ -1142,6 +1142,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+	CRM(CheckGLError(), "glBlitFramebuffer failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glDrawBuffers(GLsizei n, const GLenum *bufs) {
 	RESULT r = R_PASS;
 
@@ -1483,6 +1493,16 @@ RESULT OpenGLImp::glGenerateMipmap(GLenum target) {
 
 	m_OpenGLExtensions.glGenerateMipmap(target);
 	CRM(CheckGLError(), "glGenerateMipmap failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::wglSwapIntervalEXT(int interval) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.wglSwapIntervalEXT(interval);
+	CRM(CheckGLError(), "wglSwapIntervalEXT failed");
 
 Error:
 	return r;

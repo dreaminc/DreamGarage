@@ -38,6 +38,8 @@ public:
 
 	RESULT SetAndClearViewport();
 
+	GLuint GetFramebufferIndex();
+
 private:
 	OpenGLImp *m_pParentImp;
 

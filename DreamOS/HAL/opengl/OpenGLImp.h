@@ -131,6 +131,9 @@ public:
 // TODO: Unify access to extensions
 public:
 
+	// TODO: Make these generic WGL Functions
+	RESULT wglSwapIntervalEXT(int interval);
+
 	// TODO: Unify extension call / wrappers 
 	RESULT glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params);
 	RESULT glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params);
@@ -147,6 +150,7 @@ public:
 	RESULT glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level);
 	RESULT CheckFramebufferStatus(GLenum target);
 	RESULT glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+	RESULT glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 	RESULT glDrawBuffers(GLsizei n, const GLenum *bufs);
 
 

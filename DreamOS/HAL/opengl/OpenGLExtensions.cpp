@@ -5,6 +5,10 @@
 RESULT OpenGLExtensions::InitializeExtensions() {
 	RESULT r = R_PASS;
 
+	// TODO: WGL stuff should be else where
+	CNMW((m_wglSwapIntervalEXT = (BOOL(WINAPI *)(int interval))wglGetProcAddress("wglSwapIntervalEXT")),
+		"Failed to initialzie wglSwapIntervalEXT extension");
+
 	CNMW((m_glCreateProgram = (PFNGLCREATEPROGRAMPROC)wglGetProcAddress("glCreateProgram")),
 		"Failed to initialzie glCreateProgram extension");
 
@@ -183,6 +187,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 
 	CNMW((m_glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)wglGetProcAddress("glFramebufferTexture2D")),
 		"Failed to initialize glFramebufferTexture2D extension");
+
+	CNMW((m_glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)wglGetProcAddress("glBlitFramebuffer")),
+		"Failed to initialize glBlitFramebuffer extension");
 
 	CNMW((m_glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)wglGetProcAddress("glFramebufferTexture")),
 		"Failed to initialize glFramebufferTexture extension");

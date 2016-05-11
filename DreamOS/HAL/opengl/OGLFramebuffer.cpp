@@ -126,6 +126,10 @@ GLuint OGLFramebuffer::GetOGLTextureIndex() {
 	}
 }
 
+GLuint OGLFramebuffer::GetFramebufferIndex() {
+	return m_framebufferIndex;
+}
+
 RESULT OGLFramebuffer::SetAndClearViewport() {
 	RESULT r = R_PASS;
 

@@ -26,6 +26,7 @@
 #include <algorithm>
 
 #include "HAL/opengl/OGLFramebuffer.h"
+#include "OVRMirrorTexture.h"
 
 class OGLFramebuffer;
 
@@ -34,16 +35,20 @@ public:
 	OVR();
 	~OVR();
 
-	RESULT InitializeHMD(HALImp *halimp);
+	//RESULT InitializeHMD(HALImp *halimp);
+	RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
 	RESULT UpdateHMD();
 	RESULT ReleaseHMD();
 
+	RESULT SetUpFrame();
 	RESULT BindFramebuffer(EYE_TYPE eye);
 	RESULT CommitSwapChain(EYE_TYPE eye);
 	RESULT SubmitFrame();
 
 	RESULT SetAndClearRenderSurface(EYE_TYPE eye);
 	RESULT UnsetRenderSurface(EYE_TYPE eye);
+
+	RESULT RenderHMDMirror();
 
 public:
 	ovrSession m_ovrSession;
@@ -54,7 +59,8 @@ public:
 
 	// Texture Swap Chains
 	OVRTextureSwapChain *m_ovrTextureSwapChains[HMD_NUM_EYES];
-	OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
+	OVRMirrorTexture *m_ovrMirrorTexture;
+	//OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
 };
 
 #endif // ! HMD_IMP_H_

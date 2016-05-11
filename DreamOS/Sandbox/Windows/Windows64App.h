@@ -16,8 +16,8 @@
 #include <tchar.h>
 #include <HMD/HMD.h>
 
-#define DEFAULT_WIDTH 1920
-#define DEFAULT_HEIGHT 1080
+#define DEFAULT_WIDTH 1920 / 2
+#define DEFAULT_HEIGHT 1080 / 2
 
 #define DEFAULT_FULLSCREEN false
 

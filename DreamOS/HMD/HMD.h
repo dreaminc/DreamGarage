@@ -75,11 +75,14 @@ public:
 
 public:
 	// Called by factory to initialize HMD
-	virtual RESULT InitializeHMD(HALImp *halimp) = 0;
+	//virtual RESULT InitializeHMD(HALImp *halimp) = 0;
+	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) = 0;
 
 	// Called to update/poll tracking info
 	virtual RESULT UpdateHMD() = 0;
 
+
+	virtual RESULT SetUpFrame() = 0;
 	virtual RESULT BindFramebuffer(EYE_TYPE eye) = 0;
 	virtual RESULT CommitSwapChain(EYE_TYPE eye) = 0;
 	virtual RESULT SubmitFrame() = 0;
@@ -87,6 +90,8 @@ public:
 	// TODO: Rename this - it's not well named (currently named after OVR sample code)
 	virtual RESULT SetAndClearRenderSurface(EYE_TYPE eye) = 0;
 	virtual RESULT UnsetRenderSurface(EYE_TYPE eye) = 0;
+
+	virtual RESULT RenderHMDMirror() = 0;
 
 	quaternion GetHMDOrientation() { return m_qOrientation; }
 	point GetHMDOrigin() { return m_ptOrigin; }

@@ -541,6 +541,9 @@
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h">
       <Filter>HMD\Oculus</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h">
+      <Filter>HMD\Oculus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

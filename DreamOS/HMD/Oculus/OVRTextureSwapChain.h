@@ -10,8 +10,6 @@
 // should wrap up the respective frame and depth buffers as well as the respective textures in the 
 // chain
 
-// TODO: Once this is working, replace all parts using OGL objects
-
 #include "HAL/opengl/OpenGLImp.h"
 #include "HAL/opengl/OGLDepthbuffer.h"
 #include "OVR_CAPI_GL.h"
@@ -21,16 +19,9 @@
 
 #include <vector>
 
-class OVRTextureSwapChain {
+#define DEFAULT_TEXTURE_SWAP_CHAIN_CHANNELS 3
 
-public:
-	struct OVRTextureBuffer {
-		ovrSession ovrSession;
-		ovrTextureSwapChain ovrTextureChain;
-		GLuint textureIndex;
-		GLuint framebufferIndex;
-		ovrSizei textureSize;
-	};
+class OVRTextureSwapChain {
 
 public:
 	OVRTextureSwapChain(OpenGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount) :
@@ -38,6 +29,7 @@ public:
 		m_ovrTextureSwapChain(nullptr),
 		m_width(width),
 		m_height(height),
+		m_channels(DEFAULT_TEXTURE_SWAP_CHAIN_CHANNELS),
 		m_pOGLFramebuffer(nullptr),
 		m_mipLevels(mipLevels),
 		m_pParentImp(pParentImp),
@@ -85,7 +77,7 @@ public:
 			GLuint chainTextureIndex;
 			ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, i, &chainTextureIndex);
 
-			OGLTexture *pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, chainTextureIndex, m_width, m_height, 3);
+			OGLTexture *pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, chainTextureIndex, m_width, m_height, m_channels);
 			CR(pOGLTexture->BindTexture(GL_TEXTURE_2D));
 			CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
 			CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
@@ -99,7 +91,7 @@ public:
 			m_swapChainOGLTextures.push_back(pOGLTexture);
 		}
 
-		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp);
+		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
 		CR(m_pOGLFramebuffer->OGLInitialize());
 		CR(m_pOGLFramebuffer->SetOGLDepthbuffer(nullptr));
 
@@ -181,6 +173,7 @@ private:
 	
 	int m_width;
 	int m_height;
+	int m_channels;
 	int m_sampleCount;
 	int m_mipLevels;
 

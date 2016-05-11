@@ -22,6 +22,12 @@ public:
 
 	RESULT InitializeExtensions();
 
+	// TODO: WGL Extensions should be elsewhere
+
+	inline BOOL wglSwapIntervalEXT(int interval) {
+		return m_wglSwapIntervalEXT(interval);
+	}
+
 	// OGL Program
 	inline GLuint glCreateProgram(void) { 
 		return m_glCreateProgram(); 
@@ -271,6 +277,10 @@ public:
 		return m_glFramebufferTexture2D(target, attachment, textarget, texture, level);
 	}
 
+	inline void glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter) {
+		return m_glBlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
+	}
+
 	inline void glDrawBuffers(GLsizei n, const GLenum *bufs) {
 		return m_glDrawBuffers(n, bufs);
 	}
@@ -314,6 +324,10 @@ public:
 	}
 
 private:
+	// TODO: WGL stuff should be elsewhere
+	//PFNWGLSWAPINTERVALEXTPROC m_wglSwapIntervalEXT;
+	BOOL(WINAPI * m_wglSwapIntervalEXT) (int interval);
+
 	// OGL Program 
 	PFNGLCREATEPROGRAMPROC m_glCreateProgram;
 	PFNGLDELETEPROGRAMPROC m_glDeleteProgram;
@@ -389,6 +403,7 @@ private:
 	PFNGLFRAMEBUFFERTEXTUREPROC m_glFramebufferTexture;
 	PFNGLCHECKFRAMEBUFFERSTATUSPROC m_glCheckFramebufferStatus;
 	PFNGLFRAMEBUFFERTEXTURE2DPROC m_glFramebufferTexture2D;
+	PFNGLBLITFRAMEBUFFERPROC m_glBlitFramebuffer;
 
 	PFNGLDRAWBUFFERSPROC m_glDrawBuffers;
 
