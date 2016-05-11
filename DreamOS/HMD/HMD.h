@@ -93,8 +93,9 @@ public:
 
 	virtual RESULT RenderHMDMirror() = 0;
 
-	quaternion GetHMDOrientation() { return m_qOrientation; }
-	point GetHMDOrigin() { return m_ptOrigin; }
+	inline quaternion GetHMDOrientation() { return m_qOrientation; }
+	inline point GetHMDOrigin() { return m_ptOrigin; }
+	inline vector GetHMDTrackerDeviation() { return GetHMDOrigin(); }
 
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }

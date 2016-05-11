@@ -88,6 +88,7 @@ public:
 	RESULT UpdateCamera();
 	RESULT SetCameraMatrix(EYE_TYPE viewTarget);
 	RESULT SetCameraOrientation(quaternion qOrientation);
+	RESULT SetCameraPositionDeviation(vector vDeviation);
 
 	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
 	//RESULT InitializeStereoFramebuffers(HMD *pHMD);

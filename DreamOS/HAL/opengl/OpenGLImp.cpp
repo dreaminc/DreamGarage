@@ -667,6 +667,12 @@ RESULT OpenGLImp::SetCameraOrientation(quaternion qOrientation) {
 	m_pCamera->SetOrientation(qOrientation);
 	return R_PASS;
 }
+
+RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
+	m_pCamera->SetCameraPositionDeviation(vDeviation);
+	return R_PASS;
+}
+
 #include "OGLVolume.h"
 
 #include "OGLModel.h"

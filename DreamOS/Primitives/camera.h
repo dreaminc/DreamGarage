@@ -49,7 +49,8 @@ public:
 		m_cameraRotateSpeed(DEFAULT_CAMERA_ROTATE_SPEED),
 		m_cameraForwardSpeed(0.0f),
 		m_cameraStrafeSpeed(0.0f),
-		m_cameraUpSpeed(0.0f)
+		m_cameraUpSpeed(0.0f),
+		m_vDeviation()
 	{
 		m_ptOrigin = ptOrigin;
 		m_qRotation = quaternion(0.0f, 0.0f, 0.0f, 0.0f);
@@ -95,7 +96,8 @@ public:
 	}
 
 	ViewMatrix GetViewMatrix() { 
-		ViewMatrix mat = ViewMatrix(m_ptOrigin, m_qRotation);		
+		point ptOrigin = m_ptOrigin + m_vDeviation;
+		ViewMatrix mat = ViewMatrix(ptOrigin, m_qRotation);
 		return mat;
 	}
 
@@ -225,6 +227,14 @@ public:
 		return (*this);
 	}
 
+	// Deviation vector is a vector of deviation from the origin point
+	// So resulting point = ptOrigin + vDeviation
+	// This does not affect orientation
+	RESULT SetCameraPositionDeviation(vector vDeviation) {
+		m_vDeviation = vDeviation;
+		return R_PASS;
+	}
+
 	// Non-Event driven keyboard input
 	RESULT UpdateFromKeyboardState(SenseKeyboard *pSK) {
 		RESULT r = R_PASS;
@@ -268,6 +278,8 @@ private:
 	camera_precision m_cameraForwardSpeed;
 	camera_precision m_cameraStrafeSpeed;
 	camera_precision m_cameraUpSpeed;
+
+	vector m_vDeviation;
 };
 
 #endif // ! CAMERA_H_

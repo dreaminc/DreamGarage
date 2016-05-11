@@ -409,24 +409,22 @@ RESULT Windows64App::ShowSandbox() {
 		if (m_pHMD != nullptr) {
 			m_pHMD->UpdateHMD();
 			m_pOpenGLImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
+			m_pOpenGLImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}
 
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 
-		///*
 		// Send to the HMD
 		if (m_pHMD != nullptr) {
 			m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
-			
 			m_pHMD->SubmitFrame();
-
 			m_pHMD->RenderHMDMirror();
 		}
-		//*/
-
-		// Render Scene
-		//m_pOpenGLImp->Render(m_pSceneGraph);
-
+		else {
+			// Render Scene
+			m_pOpenGLImp->Render(m_pSceneGraph);
+		}
+	
 		// Swap buffers
 		SwapBuffers(m_hDC);
 
