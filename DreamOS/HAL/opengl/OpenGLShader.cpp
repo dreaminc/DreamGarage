@@ -1,5 +1,5 @@
 #include "OpenGLShader.h"
-//#include "OpenGLImp.h"
+#include "OpenGLImp.h"
 #include "OGLProgram.h"
 
 #include "Sandbox/SandboxApp.h"
@@ -7,7 +7,7 @@
 
 OpenGLShader::OpenGLShader(OGLProgram *pParentProgram, GLenum shaderType) :
 	//m_pParentImp(pParentImp),
-	m_pParentProgram(pParentProgram),
+	GLSLObject(pParentProgram),
 	m_shaderType(shaderType),
 	m_pszShaderCode(NULL),
 	m_shaderID(NULL)
@@ -97,13 +97,14 @@ Error:
 RESULT OpenGLShader::SetUniform4fv(GLfloat *pVal4fv, const char* pszUniformName) {
 	RESULT r = R_PASS;
 
-	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
 	GLint location = -1;
-	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+	pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
 
 	CB((location >= 0));
-	m_pParentImp->glUniform4fv(location, 1, pVal4fv);
+	pParentImp->glUniform4fv(location, 1, pVal4fv);
 
 Error:
 	return r;
@@ -141,13 +142,14 @@ Error:
 RESULT OpenGLShader::Set44MatrixUniform(matrix<float, 4, 4> mat, const char* pszUniformName) {
 	RESULT r = R_PASS;
 
-	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
 	GLint location = -1;
-	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+	pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
 
 	CB((location >= 0));
-	m_pParentImp->glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<GLfloat*>(&mat));
+	pParentImp->glUniformMatrix4fv(location, 1, GL_FALSE, reinterpret_cast<GLfloat*>(&mat));
 
 Error:
 	return r;
@@ -156,13 +158,14 @@ Error:
 RESULT OpenGLShader::SetUniformInteger(GLint value, const char* pszUniformName) {
 	RESULT r = R_PASS;
 
-	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
 	GLint location = -1;
-	m_pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
+	pParentImp->glGetUniformLocation(oglProgramID, pszUniformName, &location);
 
 	CB((location >= 0));
-	m_pParentImp->glUniform1i(location, value);
+	pParentImp->glUniform1i(location, value);
 
 Error:
 	return r;
@@ -193,12 +196,13 @@ RESULT OpenGLShader::Compile(void) {
 	CNM(m_pszShaderCode, "Cannot compile NULL code");
 
 	const char *pszShaderCode = m_pszShaderCode;
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
-	CR(m_pParentImp->ShaderSource(m_shaderID, 1, &pszShaderCode, NULL));
-	CR(m_pParentImp->CompileShader(m_shaderID));
+	CR(pParentImp->ShaderSource(m_shaderID, 1, &pszShaderCode, NULL));
+	CR(pParentImp->CompileShader(m_shaderID));
 
 	int param;
-	CR(m_pParentImp->GetShaderiv(m_shaderID, GL_COMPILE_STATUS, &param));
+	CR(pParentImp->GetShaderiv(m_shaderID, GL_COMPILE_STATUS, &param));
 	CBM((param == GL_TRUE), "Shader Compile Error: %s", GetInfoLog());
 
 	DEBUG_LINEOUT("Compiled shader type %d with Shader ID %d", m_shaderType, m_shaderID);
@@ -211,7 +215,7 @@ Error:
 RESULT OpenGLShader::AttachShader() {
 	RESULT r = R_PASS;
 
-	CRM(m_pParentImp->AttachShader(this), "Failed to attach to parent implementation");
+	CRM(m_pParentProgram->AttachShader(this), "Failed to attach to parent implementation");
 
 Error:
 	return r;
@@ -232,12 +236,14 @@ char* OpenGLShader::GetInfoLog() {
 	int pszInfoLog_n = -1;
 	int charsWritten_n = -1;
 
-	CR(m_pParentImp->GetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &pszInfoLog_n));
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
+
+	CR(pParentImp->GetShaderiv(m_shaderID, GL_INFO_LOG_LENGTH, &pszInfoLog_n));
 
 	CBM((pszInfoLog_n > 0), "Shader Info Log of zero length");
 
 	pszInfoLog = new char[pszInfoLog_n];
-	CR(m_pParentImp->GetShaderInfoLog(m_shaderID, pszInfoLog_n, &charsWritten_n, pszInfoLog));
+	CR(pParentImp->GetShaderInfoLog(m_shaderID, pszInfoLog_n, &charsWritten_n, pszInfoLog));
 
 Error:
 	return pszInfoLog;

@@ -127,33 +127,6 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::BindAttribLocation(GLint index, const char* pszName) {
-	RESULT r = R_PASS;
-	DWORD werr;
-
-	CR(glBindAttribLocation(m_idOpenGLProgram, index, pszName));
-
-	werr = GetLastError();
-	DEBUG_LINEOUT("Bound attribute %s to index location %d err:0x%x", pszName, index, werr);
-
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
-	RESULT r = R_PASS;
-	GLenum glerr;
-	DWORD werr;
-
-	CR(glUniformBlockBinding(m_idOpenGLProgram, uniformBlockIndex, uniformBlockBindingPoint));
-
-	werr = GetLastError();
-	DEBUG_LINEOUT("Bound uniform block index %d to binding point %d err:0x%x", uniformBlockIndex, uniformBlockBindingPoint, werr);
-
-Error:
-	return r;
-}
-
 RESULT OpenGLImp::BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
 	RESULT r = R_PASS;
 	GLenum glerr;

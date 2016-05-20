@@ -8,15 +8,13 @@
 #include "OpenGLShader.h"
 #include "OGLLightsBlock.h"
 
-class OpenGLImp;	// Declare OpenGLImp class
-
 #define VERTEX_SHADER_POSITION_INDEX 0
 #define VERTEX_SHADER_COLOR_INDEX 1
 #define VERTEX_SHADER_NORMAL_INDEX 2
 
 class OGLVertexShader : public OpenGLShader {
 public:
-	OGLVertexShader(OpenGLImp *pParentImp);
+	OGLVertexShader(OGLProgram *pParentProgram);
 	
 	// This is handled by the parent class 
 	//~OGLVertexShader(void);

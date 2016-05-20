@@ -224,6 +224,12 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLVertexAttribute.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -548,6 +554,12 @@
       <Filter>HMD\Oculus</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLVertexAttribute.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>

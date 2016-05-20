@@ -1,5 +1,5 @@
 #ifndef GLSL_OBJECT_H_
-#define GLSL_OBJECT
+#define GLSL_OBJECT_H_
 
 #include "RESULT/EHM.h"
 
@@ -9,22 +9,19 @@
 // and used within it.  These include Vertex Attributes, Uniform Variables / Blocks etc
 
 #include "OpenGLCommon.h"
-#include "OGLProgram.h"
+
+class OpenGLImp;
+class OGLProgram;
 
 class GLSLObject {
 public:
-	GLSLObject(OGLProgram *pParentProgram) :
-		m_pParentProgram(pParentProgram)
-	{
-		// empty
-	}
+	GLSLObject(OGLProgram *pParentProgram);
+	~GLSLObject();
 
-	~GLSLObject() {
-		// empty
-	}
+	OpenGLImp *GetParentOGLImplementation();
 
-private:
+protected:
 	OGLProgram *m_pParentProgram;
 };
 
-#endif // ! GLSL_OBJECT
+#endif // ! GLSL_OBJECT_H_

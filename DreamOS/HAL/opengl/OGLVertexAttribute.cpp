@@ -25,8 +25,7 @@ Error:
 RESULT OGLVertexAttribute::BindAttribute() {
 	RESULT r = R_PASS;
 	
-	OpenGLImp *pParentImp = m_pParentProgram->GetOGLImp();
-	CRM(pParentImp->BindAttribLocation(m_attributeIndex, m_strAttributeName.c_str()), "Failed to bind %s attribute", m_strAttributeName.c_str());
+	CRM(m_pParentProgram->BindAttribLocation(m_attributeIndex, m_strAttributeName.c_str()), "Failed to bind %s attribute", m_strAttributeName.c_str());
 
 Error:
 	return r;

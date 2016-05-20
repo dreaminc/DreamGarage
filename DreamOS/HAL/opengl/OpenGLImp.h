@@ -13,10 +13,6 @@
 
 #include "OpenGLRenderingContext.h"
 
-#include "OpenGLShader.h"
-#include "OGLVertexShader.h"
-#include "OGLFragmentShader.h"
-
 #include "TimeManager/TimeManager.h"
 
 //#include "Primitives/camera.h"
@@ -25,7 +21,7 @@
 #include "Primitives/version.h"
 
 #include "HMD/HMD.h"
-#include "Primitives/stereocamera.h"
+
 
 #include "OpenGLExtensions.h"
 
@@ -159,9 +155,9 @@ public:
 	RESULT glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
 	RESULT glBindAttribLocation(GLuint program, GLuint index, const GLchar *name);
 
-	RESULT BindAttribLocation(GLint index, const char* pszName);
+	//RESULT BindAttribLocation(GLint index, const char* pszName);
 
-	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
+	//RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
 	RESULT BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex);
 
 	RESULT glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation);

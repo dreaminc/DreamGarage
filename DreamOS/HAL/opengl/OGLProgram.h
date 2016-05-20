@@ -7,10 +7,17 @@
 // DreamOS/HAL/opengl/OGLProgram.h
 // OpenGL Program class
 
+#include <vector>
+
 #include "OpenGLCommon.h"
 
 #include "Primitives/DimObj.h"
-#include <vector>
+#include "Primitives/light.h"
+#include "Primitives/stereocamera.h"
+
+#include "OpenGLShader.h"
+#include "OGLVertexShader.h"
+#include "OGLFragmentShader.h"
 
 class OpenGLImp;
 class OGLVertexAttribute;
@@ -29,9 +36,14 @@ public:
 	RESULT UseProgram();
 	RESULT IsProgram();
 
+	// Attributes
 	// TODO: Is this really vertex only?
 	RESULT PrintActiveAttributes();
+	RESULT BindAttribLocation(GLint index, const char* pszName);
+
+	// Uniform Variables
 	RESULT PrintActiveUniformVariables();
+	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
 	char* GetProgramInfoLog();
 
 	//RESULT MakeShader(const wchar_t *pszFilename, version versionFile);

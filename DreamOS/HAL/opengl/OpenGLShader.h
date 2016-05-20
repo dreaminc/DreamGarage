@@ -13,13 +13,15 @@
 #include "Primitives/version.h"
 #include "Primitives/matrix.h"
 
+#include "GLSLObject.h"
+
 class point;
 class quaternion;
 class vector;
 //class OpenGLImp;	// Declare OpenGLImp class
 class OGLProgram;
 
-class OpenGLShader : public Shader {
+class OpenGLShader : public Shader, public GLSLObject {
 public:
 	OpenGLShader(OGLProgram *pParentProgram, GLenum shaderType);
 	~OpenGLShader(void);
@@ -78,9 +80,6 @@ protected:
 	GLenum	m_shaderType;		// GL_VERTEX_SHADER or GL_FRAGMENT_SHADER
 	GLuint	m_shaderID;
 	char*	m_pszShaderCode;
-
-protected:
-	OGLProgram *m_pParentProgram;
 };
 
 #endif // ! OPEN_GL_SHADER_H_

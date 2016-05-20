@@ -137,6 +137,20 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
+	RESULT r = R_PASS;
+	GLenum glerr;
+	DWORD werr;
+
+	CR(m_pParentImp->glUniformBlockBinding(m_OGLProgramIndex, uniformBlockIndex, uniformBlockBindingPoint));
+
+	werr = GetLastError();
+	DEBUG_LINEOUT("Bound uniform block index %d to binding point %d err:0x%x", uniformBlockIndex, uniformBlockBindingPoint, werr);
+
+Error:
+	return r;
+}
+
 RESULT OGLProgram::PrintActiveUniformVariables() {
 	RESULT r = R_PASS;
 
@@ -164,6 +178,19 @@ RESULT OGLProgram::PrintActiveUniformVariables() {
 			pszName = NULL;
 		}
 	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindAttribLocation(GLint index, const char* pszName) {
+	RESULT r = R_PASS;
+	DWORD werr;
+
+	CR(m_pParentImp->glBindAttribLocation(m_OGLProgramIndex, index, pszName));
+
+	werr = GetLastError();
+	DEBUG_LINEOUT("Bound attribute %s to index location %d err:0x%x", pszName, index, werr);
 
 Error:
 	return r;

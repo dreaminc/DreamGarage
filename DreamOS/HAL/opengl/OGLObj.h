@@ -99,27 +99,27 @@ public:
 
 		// Bind Position
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
-		CR(m_pParentImp->EnableVertexPositionAttribute());		// TODO: Investigate performance impact of this
+		//CR(m_pParentImp->EnableVertexPositionAttribute());		// TODO: Investigate performance impact of this
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)0, vertex::GetPointDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetVertexOffset()));
 
 		// Color
-		WCR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
+		//WCR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
 
 		// Normal
-		WCR(m_pParentImp->EnableVertexNormalAttribute());		
+		//WCR(m_pParentImp->EnableVertexNormalAttribute());		
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)2, vertex::GetNormalDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetNormalOffset()));
 
 		// UV Coordinate
-		WCR(m_pParentImp->EnableVertexUVCoordAttribute());
+		//WCR(m_pParentImp->EnableVertexUVCoordAttribute());
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)3, vertex::GetUVCoordDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetUVOffset()));
 
 		// Tangent 
-		WCR(m_pParentImp->EnableVertexTangentAttribute());
+		//WCR(m_pParentImp->EnableVertexTangentAttribute());
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)4, vertex::GetTangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetTangentOffset()));
 
 		// Bi-Tangent 
-		WCR(m_pParentImp->EnableVertexBitangentAttribute());
+		//WCR(m_pParentImp->EnableVertexBitangentAttribute());
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)5, vertex::GetBitangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetBitangentOffset()));
 
 		//CR(m_pParentImp->ReleaseCurrentContext());

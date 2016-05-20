@@ -168,12 +168,14 @@
     <ClCompile Include="..\..\..\External\SOIL\image_helper.c" />
     <ClCompile Include="..\..\..\External\SOIL\SOIL.c" />
     <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c" />
+    <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLUniformBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLVertexAttribute.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
@@ -218,6 +220,7 @@
     <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
@@ -236,6 +239,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLVertexAttribute.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
