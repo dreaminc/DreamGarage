@@ -2,8 +2,8 @@
 
 #include "OpenGLImp.h"
 
-OGLUniformBlock::OGLUniformBlock(OpenGLImp *pParentImp) :
-	m_pParentImp(pParentImp)
+OGLUniformBlock::OGLUniformBlock(OGLProgram *pParentProgram) :
+	GLSLObject(pParentProgram)
 {
 	/* empty stub */
 }
@@ -11,21 +11,23 @@ OGLUniformBlock::OGLUniformBlock(OpenGLImp *pParentImp) :
 RESULT OGLUniformBlock::OGLInitialize() {
 	RESULT r = R_PASS;
 
-	CR(m_pParentImp->MakeCurrentContext());
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
+
+	CR(pParentImp->MakeCurrentContext());
 
 	// Create Buffer Objects
-	CR(m_pParentImp->glGenBuffers(1, &m_uniformBlockBufferIndex));
-	CR(m_pParentImp->glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBlockBufferIndex));
+	CR(pParentImp->glGenBuffers(1, &m_uniformBlockBufferIndex));
+	CR(pParentImp->glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBlockBufferIndex));
 
 	// Set the data
 	// TODO: Code reuse from UpdateOGLUniformBlockBuffers
 	void *pUniformBufferData = NULL;
 	GLsizeiptr pUniformBufferData_n = 0;
 	CR(GetUniformBlockBuffer(pUniformBufferData, &pUniformBufferData_n));
-	CR(m_pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
+	CR(pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
 
 	// Bind buffer to binding point
-	CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
+	CR(pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 
 	//CR(m_pParentImp->ReleaseCurrentContext());
 
@@ -36,7 +38,7 @@ Error:
 RESULT OGLUniformBlock::BindUniformBlock() {
 	RESULT r = R_PASS;
 
-	CR(m_pParentImp->BindUniformBlock(m_uniformBlockIndex, m_uniformBlockBindingPoint));
+	CR(m_pParentProgram->BindUniformBlock(m_uniformBlockIndex, m_uniformBlockBindingPoint));
 	
 Error:
 	return r;
@@ -45,9 +47,11 @@ Error:
 RESULT OGLUniformBlock::ReleaseOGLUniformBlockBuffers() {
 	RESULT r = R_PASS;
 
-	if (m_pParentImp != NULL) {
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
+
+	if (pParentImp != NULL) {
 		if (m_uniformBlockBufferIndex != NULL) {
-			CR(m_pParentImp->glDeleteBuffers(1, &m_uniformBlockBufferIndex));
+			CR(pParentImp->glDeleteBuffers(1, &m_uniformBlockBufferIndex));
 			m_uniformBlockBufferIndex = NULL;
 		}
 	}
@@ -59,16 +63,18 @@ Error:
 RESULT OGLUniformBlock::UpdateOGLUniformBlockBuffers() {
 	RESULT r = R_PASS;
 
-	CR(m_pParentImp->MakeCurrentContext());
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
-	CR(m_pParentImp->glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBlockBufferIndex));
+	CR(pParentImp->MakeCurrentContext());
+
+	CR(pParentImp->glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBlockBufferIndex));
 	//CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 
 	// Set the data
 	void *pUniformBufferData = NULL;
 	GLsizeiptr pUniformBufferData_n = 0;
 	CR(GetUniformBlockBuffer(pUniformBufferData, &pUniformBufferData_n));
-	(m_pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
+	(pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
 
 	//CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 
@@ -83,21 +89,21 @@ Error:
 RESULT OGLUniformBlock::UpdateUniformBlockIndexFromShader(const char* pszUniformBlockName) {
 	RESULT r = R_PASS;
 
-	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
-	CR(m_pParentImp->glGetUniformBlockIndex(oglProgramID, pszUniformBlockName, &m_uniformBlockIndex));
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
+
+	CR(pParentImp->glGetUniformBlockIndex(oglProgramID, pszUniformBlockName, &m_uniformBlockIndex));
 
 Error:
 	return r;
 }
-
 
 RESULT OGLUniformBlock::SetBufferIndex(GLint bufferIndex) {
 	m_uniformBlockBufferIndex = bufferIndex;
 	return R_PASS;
 }
 
-GLint OGLUniformBlock::GetBufferIndex()
-{
+GLint OGLUniformBlock::GetBufferIndex() {
 	return m_uniformBlockBufferIndex;
 }
 
@@ -106,8 +112,7 @@ RESULT OGLUniformBlock::SetBlockIndex(GLint blockIndex) {
 	return R_PASS;
 }
 
-GLint OGLUniformBlock::GetBlockIndex()
-{
+GLint OGLUniformBlock::GetBlockIndex() {
 	return m_uniformBlockIndex;
 }
 
@@ -116,7 +121,6 @@ RESULT OGLUniformBlock::SetBindingPoint(GLint bindingPointIndex) {
 	return R_PASS;
 }
 
-GLint OGLUniformBlock::GetBindingPoint()
-{
+GLint OGLUniformBlock::GetBindingPoint() {
 	return m_uniformBlockBindingPoint;
 }

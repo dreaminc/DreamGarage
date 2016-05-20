@@ -1,8 +1,8 @@
 #include "OGLMaterialBlock.h"
 #include "OpenGLImp.h"
 
-OGLMaterialBlock::OGLMaterialBlock(OpenGLImp *pParentImp) :
-	OGLUniformBlock(pParentImp)
+OGLMaterialBlock::OGLMaterialBlock(OGLProgram *pParentProgram) :
+	OGLUniformBlock(pParentProgram)
 {
 	ClearMaterial();
 	SetBindingPoint(MATERIAL_UNIFORM_BLOCK_BINDING_POINT);

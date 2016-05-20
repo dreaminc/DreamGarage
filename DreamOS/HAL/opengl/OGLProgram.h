@@ -50,7 +50,7 @@ public:
 	RESULT MakeVertexShader(const wchar_t *pszFilename);
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
 
-	inline RESULT RenderObject(DimObj *pDimObj);
+	RESULT RenderObject(DimObj *pDimObj);
 	RESULT SetLights(std::vector<light*> *pLights);
 	
 	RESULT SetCamera(camera *pCamera);
@@ -66,6 +66,9 @@ public:
 	OpenGLImp *GetOGLImp() {
 		return m_pParentImp;
 	}
+
+	// Render Objects
+
 
 public:
 	// TODO: [SHADER] This should be baked into Shader

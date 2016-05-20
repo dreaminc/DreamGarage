@@ -10,7 +10,7 @@
 #include "Primitives/material.h"
 #include "OGLMaterialBlock.h"
 
-class OpenGLImp;	// Declare OpenGLImp class
+class OGLProgram;	// Declare OpenGLImp class
 class OGLTexture;
 class OGLObj;
 
@@ -18,7 +18,7 @@ class OGLObj;
 
 class OGLFragmentShader : public OpenGLShader {
 public:
-	OGLFragmentShader(OpenGLImp *pParentImp);
+	OGLFragmentShader(OGLProgram *pParentProgram);
 
 	// This is handled by the parent class 
 	//~OGLVertexShader(void);

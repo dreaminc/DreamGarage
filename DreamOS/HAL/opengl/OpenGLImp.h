@@ -196,7 +196,7 @@ public:
 
 public:
 	RESULT CheckGLError();
-	char* GetInfoLog();
+	//char* GetInfoLog();
 
 // OpengGL Extension Function Pointers
 private:

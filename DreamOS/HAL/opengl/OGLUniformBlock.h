@@ -8,12 +8,14 @@
 // OpenGL Uniform Block - Represents a contiguous section of memory passed into the shader through GL uniform blocks
 
 #include "OpenGLCommon.h"
+#include "GLSLObject.h"
 
-class OpenGLImp;
+//class OpenGLImp;
+class OGLProgram;
 
-class OGLUniformBlock {
+class OGLUniformBlock : public GLSLObject {
 public:
-	OGLUniformBlock(OpenGLImp *pParentImp);
+	OGLUniformBlock(OGLProgram *pParentProgram);
 
 	RESULT OGLInitialize();
 
@@ -38,9 +40,6 @@ private:
 	GLuint m_uniformBlockBufferIndex;
 	GLint m_uniformBlockIndex;
 	GLint m_uniformBlockBindingPoint;
-
-private:
-	OpenGLImp *m_pParentImp;
 };
 
 #endif // !OGL_UNIFORM_BLOCK_H_

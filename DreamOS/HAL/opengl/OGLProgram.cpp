@@ -118,7 +118,7 @@ RESULT OGLProgram::LinkProgram() {
 
 	GLint param = GL_FALSE;
 	CR(m_pParentImp->glGetProgramiv(m_OGLProgramIndex, GL_LINK_STATUS, &param));
-	CBM((param == GL_TRUE), "Failed to link GL Program: %s", m_pParentImp->GetInfoLog());
+	CBM((param == GL_TRUE), "Failed to link GL Program: %s", GetProgramInfoLog());
 
 	DEBUG_LINEOUT("Successfully linked program ID %d", m_OGLProgramIndex);
 
@@ -258,7 +258,7 @@ Error:
 RESULT OGLProgram::MakeVertexShader(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
-	OGLVertexShader *pVertexShader = new OGLVertexShader(m_pParentImp);
+	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
 	CRM(m_pParentImp->CheckGLError(), "Create OpenGL Vertex Shader failed");
 
 	CRM(m_pVertexShader->InitializeFromFile(L"skybox.vert", m_versionOGL), "Failed to initialize vertex shader from file");
@@ -270,7 +270,7 @@ Error:
 RESULT OGLProgram::MakeFragmentShader(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
-	m_pFragmentShader = new OGLFragmentShader(m_pParentImp);
+	m_pFragmentShader = new OGLFragmentShader(this);
 	CRM(m_pParentImp->CheckGLError(), "Create OpenGL Fragment Shader failed");
 
 	CRM(m_pFragmentShader->InitializeFromFile(L"skybox.frag", m_versionOGL), "Failed to initialize fragment shader from file");
@@ -279,7 +279,7 @@ Error:
 	return r;
 }
 
-inline RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
+RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
 
 	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 

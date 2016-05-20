@@ -1,18 +1,18 @@
 #include "OGLFragmentShader.h"
-#include "OpenGLImp.h"
+#include "OGLProgram.h"
 #include "OGLTexture.h"
 #include "OGLObj.h"
 
-OGLFragmentShader::OGLFragmentShader(OpenGLImp *pParentImp) :
-	OpenGLShader(pParentImp, GL_FRAGMENT_SHADER)
+OGLFragmentShader::OGLFragmentShader(OGLProgram *pParentProgram) :
+	OpenGLShader(pParentProgram, GL_FRAGMENT_SHADER)
 {
-	m_pMaterialBlock = new OGLMaterialBlock(pParentImp);
+	m_pMaterialBlock = new OGLMaterialBlock(pParentProgram);
 }
 
 RESULT OGLFragmentShader::BindAttributes() {
 	RESULT r = R_PASS;
 
-	CRM(m_pParentImp->BindAttribLocation(GetColorIndex(), (char*)GetColorAttributeName()), "Failed to bind %s to color attribute", GetColorAttributeName());
+	CRM(m_pParentProgram->BindAttribLocation(GetColorIndex(), (char*)GetColorAttributeName()), "Failed to bind %s to color attribute", GetColorAttributeName());
 
 Error:
 	return r;
@@ -21,9 +21,10 @@ Error:
 RESULT OGLFragmentShader::GetAttributeLocationsFromShader() {
 	RESULT r = R_PASS;
 
-	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
-	CRM(m_pParentImp->glGetAttribLocation(oglProgramID, GetColorAttributeName(), &m_ColorIndex), "Failed to acquire position GL location");
+	CRM(pParentImp->glGetAttribLocation(oglProgramID, GetColorAttributeName(), &m_ColorIndex), "Failed to acquire position GL location");
 
 Error:
 	return r;
@@ -32,11 +33,12 @@ Error:
 RESULT OGLFragmentShader::GetUniformLocationsFromShader() {
 	RESULT r = R_PASS;
 
-	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
 	// Uniforms
-	WCRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetColorTextureUniformName(), &m_uniformColorTextureIndex), "Failed to acquire color texture uniform GL location");
-	WCRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetBumpTextureUniformName(), &m_uniformBumpTextureIndex), "Failed to acquire bump texture uniform GL location");
+	WCRM(pParentImp->glGetUniformLocation(oglProgramID, GetColorTextureUniformName(), &m_uniformColorTextureIndex), "Failed to acquire color texture uniform GL location");
+	WCRM(pParentImp->glGetUniformLocation(oglProgramID, GetBumpTextureUniformName(), &m_uniformBumpTextureIndex), "Failed to acquire bump texture uniform GL location");
 
 	// Blocks
 	WCRM(m_pMaterialBlock->UpdateUniformBlockIndexFromShader(GetMaterialUniformBlockName()), "Failed to acquire material uniform block GL location");

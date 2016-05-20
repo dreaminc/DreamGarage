@@ -5,7 +5,7 @@ OGLVertexShader::OGLVertexShader(OGLProgram *pParentProgram) :
 	OpenGLShader(pParentProgram, GL_VERTEX_SHADER)
 {
 	// TODO: This needs to be fixed so that LightsBlock is created in the OGLprogram (not hard coded
-	m_pLightsBlock = new OGLLightsBlock(pParentProgram->GetOGLImp());
+	m_pLightsBlock = new OGLLightsBlock(pParentProgram);
 }
 
 RESULT OGLVertexShader::BindAttributes() {
