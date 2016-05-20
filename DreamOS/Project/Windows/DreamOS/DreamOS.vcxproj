@@ -172,6 +172,7 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLUniformBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
@@ -228,6 +229,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />

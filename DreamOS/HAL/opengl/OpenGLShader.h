@@ -16,11 +16,12 @@
 class point;
 class quaternion;
 class vector;
-class OpenGLImp;	// Declare OpenGLImp class
+//class OpenGLImp;	// Declare OpenGLImp class
+class OGLProgram;
 
 class OpenGLShader : public Shader {
 public:
-	OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType);
+	OpenGLShader(OGLProgram *pParentProgram, GLenum shaderType);
 	~OpenGLShader(void);
 
 	RESULT InitializeFromFile(const wchar_t *pszFilename, version versionFile);
@@ -79,7 +80,7 @@ protected:
 	char*	m_pszShaderCode;
 
 protected:
-	OpenGLImp *m_pParentImp;
+	OGLProgram *m_pParentProgram;
 };
 
 #endif // ! OPEN_GL_SHADER_H_

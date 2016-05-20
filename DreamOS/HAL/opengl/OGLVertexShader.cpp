@@ -76,7 +76,8 @@ RESULT OGLVertexShader::EnableBitangentAttribute() {
 RESULT OGLVertexShader::GetAttributeLocationsFromShader() {
 	RESULT r = R_PASS;
 
-	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	//GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
 
 	CRM(m_pParentImp->glGetAttribLocation(oglProgramID, GetPositionAttributeName(), &m_PositionIndex), "Failed to acquire position GL location");
 	CRM(m_pParentImp->glGetAttribLocation(oglProgramID, GetColorAttributeName(), &m_ColorIndex), "Failed to acquire color GL location");
@@ -92,7 +93,8 @@ Error:
 RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 	RESULT r = R_PASS;
 
-	GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	//GLuint oglProgramID = m_pParentImp->GetOGLProgramID();
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
 
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetModelMatrixUniformName(), &m_uniformModelMatrixIndex), "Failed to acquire model matrix uniform GL location");
 	CRM(m_pParentImp->glGetUniformLocation(oglProgramID, GetViewMatrixUniformName(), &m_uniformViewMatrixIndex), "Failed to acquire view matrix uniform GL location");

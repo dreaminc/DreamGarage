@@ -1,18 +1,20 @@
 #include "OpenGLShader.h"
-#include "OpenGLImp.h"
+//#include "OpenGLImp.h"
+#include "OGLProgram.h"
 
 #include "Sandbox/SandboxApp.h"
 #include "Sandbox/PathManager.h"
 
-OpenGLShader::OpenGLShader(OpenGLImp *pParentImp, GLenum shaderType) :
-	m_pParentImp(pParentImp),
+OpenGLShader::OpenGLShader(OGLProgram *pParentProgram, GLenum shaderType) :
+	//m_pParentImp(pParentImp),
+	m_pParentProgram(pParentProgram),
 	m_shaderType(shaderType),
 	m_pszShaderCode(NULL),
 	m_shaderID(NULL)
 {
 	RESULT r = R_PASS;
 
-	CR(m_pParentImp->CreateShader(m_shaderType, &m_shaderID));
+	CR(m_pParentProgram->CreateShader(m_shaderType, &m_shaderID));
 
 	Validate();
 	return;

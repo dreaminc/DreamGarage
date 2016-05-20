@@ -10,11 +10,9 @@
 #include <vector>
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
-	m_idOpenGLProgram(NULL),
 	m_versionOGL(0),
 	m_versionGLSL(0),
-	m_pVertexShader(nullptr),
-	m_pFragmentShader(nullptr),
+	m_pOGLProgram(nullptr),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
 	m_pCamera(nullptr),
 	m_pHMD(nullptr)
@@ -32,7 +30,10 @@ Error:
 }
 
 OpenGLImp::~OpenGLImp() {
-	m_OpenGLExtensions.glDeleteProgram(m_idOpenGLProgram);
+	if (m_pOGLProgram != nullptr) {
+		delete m_pOGLProgram;
+		m_pOGLProgram = nullptr;
+	}
 }
 
 RESULT OpenGLImp::InitializeOpenGLVersion() {
@@ -67,6 +68,7 @@ RESULT OpenGLImp::InitializeOpenGLVersion() {
 	return R_PASS;
 }
 
+/*
 RESULT OpenGLImp::CreateGLProgram() {
 	RESULT r = R_PASS;
 
@@ -78,11 +80,14 @@ RESULT OpenGLImp::CreateGLProgram() {
 	GLboolean fIsProg = m_OpenGLExtensions.glIsProgram(m_idOpenGLProgram);
 	CBM(fIsProg, "Failed to create program");
 
+	CRM(CheckGLError(), "CreateGLProgram failed")
+
 	DEBUG_LINEOUT("Created GL program ID %d", m_idOpenGLProgram);
 
 Error:
 	return r;
 }
+*/
 
 RESULT OpenGLImp::InitializeGLContext() {
 	RESULT r = R_PASS;
@@ -122,93 +127,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::AttachShader(OpenGLShader *pOpenGLShader) {
-	RESULT r = R_PASS;
-	GLenum glerr = GL_NO_ERROR;
-
-	OpenGLShader *&pOGLShader = (OpenGLShader *&)(this->m_pVertexShader);
-
-	switch (pOpenGLShader->GetShaderType()) {
-		case GL_VERTEX_SHADER: {
-			pOGLShader = this->m_pVertexShader;
-		} break;
-
-		case GL_FRAGMENT_SHADER: {
-			pOGLShader = this->m_pFragmentShader;
-		} break;
-
-		default: {
-			CBM((0), "Shader type 0x%x cannot be attached", pOpenGLShader->GetShaderType());
-		}
-	}
-
-	CBM((pOGLShader == NULL), "Current shader 0x%x already assigned, detach existing shader", pOpenGLShader->GetShaderType());
-
-	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
-	//numShaders = param;
-
-	m_OpenGLExtensions.glAttachShader(m_idOpenGLProgram, pOpenGLShader->GetShaderID());
-
-	CRM(CheckGLError(), "AttachShader failed with GL log:%s", pOpenGLShader->GetInfoLog());
-
-	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
-	//CBM((param = numShaders + 1), "Failed to attach shader, num shaders attached %d", param);
-
-	// Assign the shader to the implementation stage
-	pOGLShader = pOpenGLShader;
-	DEBUG_LINEOUT("Attached shader %d type 0x%x", pOpenGLShader->GetShaderID(), pOpenGLShader->GetShaderType());
-
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::EnableVertexPositionAttribute() {
-	if (m_pVertexShader != NULL)
-		m_pVertexShader->EnableVertexPositionAttribute();
-	else
-		return R_FAIL;
-
-	return R_PASS;
-}
-
-RESULT OpenGLImp::EnableVertexColorAttribute() {
-	if (m_pVertexShader != NULL)
-		m_pVertexShader->EnableVertexColorAttribute();
-	else
-		return R_FAIL;
-
-	return R_PASS;
-}
-
-RESULT OpenGLImp::EnableVertexNormalAttribute() {
-	if (m_pVertexShader != NULL)
-		m_pVertexShader->EnableVertexNormalAttribute();
-	else
-		return R_FAIL;
-}
-
-RESULT OpenGLImp::EnableVertexUVCoordAttribute() {
-	if (m_pVertexShader != NULL)
-		m_pVertexShader->EnableUVCoordAttribute();
-	else
-		return R_FAIL;
-}
-
-RESULT OpenGLImp::EnableVertexTangentAttribute() {
-	if (m_pVertexShader != NULL)
-		m_pVertexShader->EnableTangentAttribute();
-	else
-		return R_FAIL;
-}
-
-RESULT OpenGLImp::EnableVertexBitangentAttribute() {
-	if (m_pVertexShader != NULL)
-		m_pVertexShader->EnableBitangentAttribute();
-	else
-		return R_FAIL;
-}
-
-RESULT OpenGLImp::BindAttribLocation(GLint index, char* pszName) {
+RESULT OpenGLImp::BindAttribLocation(GLint index, const char* pszName) {
 	RESULT r = R_PASS;
 	DWORD werr;
 
@@ -249,116 +168,6 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::UseProgram() {
-	RESULT r = R_PASS;
-
-	m_OpenGLExtensions.glUseProgram(m_idOpenGLProgram);
-
-	CRM(CheckGLError(), "UseProgram failed");
-
-Error:
-	return r;
-}
-
-char* OpenGLImp::GetInfoLog() {
-	RESULT r = R_PASS;
-
-	char *pszInfoLog = NULL;
-	int pszInfoLog_n = 4096;
-	int charsWritten_n = -1;
-
-	m_OpenGLExtensions.glGetProgramiv(m_idOpenGLProgram, GL_INFO_LOG_LENGTH, &pszInfoLog_n);
-	CBM((pszInfoLog_n > 0), "Program Info Log of zero length");
-
-	pszInfoLog = new char[pszInfoLog_n];
-	memset(pszInfoLog, 0, sizeof(char) * pszInfoLog_n);
-	m_OpenGLExtensions.glGetProgramInfoLog(m_idOpenGLProgram, pszInfoLog_n, &charsWritten_n, pszInfoLog);
-
-Error:
-	return pszInfoLog;
-}
-
-RESULT OpenGLImp::LinkProgram() {
-	RESULT r = R_PASS;
-
-	m_OpenGLExtensions.glLinkProgram(m_idOpenGLProgram);
-	CRM(CheckGLError(), "glLinkProgram failed");
-	
-	GLint param = GL_FALSE;
-
-	m_OpenGLExtensions.glGetProgramiv(m_idOpenGLProgram, GL_LINK_STATUS, &param);
-	CBM((param == GL_TRUE), "Failed to link GL Program: %s", GetInfoLog());
-	
-	DEBUG_LINEOUT("Successfully linked program ID %d", m_idOpenGLProgram);
-
-Error:
-	return r;
-}
-
-// TODO: Might want to check this against the shader and find
-// any mismatches? 
-RESULT OpenGLImp::PrintVertexAttributes() {
-	RESULT r = R_PASS;
-
-	GLint attributes_n;
-	CR(glGetProgramInterfaceiv(m_idOpenGLProgram, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &attributes_n));
-
-	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
-
-	DEBUG_LINEOUT("%d active attributes", attributes_n);
-	for (int i = 0; i < attributes_n; i++) {
-		GLint results[3];
-		CR(glGetProgramResourceiv(m_idOpenGLProgram, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results));
-
-		GLint pszName_n = results[0] + 1;
-		char *pszName = new char[pszName_n];
-		CR(glGetProgramResourceName(m_idOpenGLProgram, GL_PROGRAM_INPUT, i, pszName_n, NULL, pszName));
-
-		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
-
-		if (pszName != NULL) {
-			delete[] pszName;
-			pszName = NULL;
-		}
-	}
-
-Error:
-	return r; 
-}
-
-RESULT OpenGLImp::PrintActiveUniformVariables() {
-	RESULT r = R_PASS;
-
-	GLint variables_n = 0;
-	CR(glGetProgramInterfaceiv(m_idOpenGLProgram, GL_UNIFORM, GL_ACTIVE_RESOURCES, &variables_n));
-
-	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX };
-
-	DEBUG_LINEOUT("%d active uniform variables", variables_n);
-	for (int i = 0; i < variables_n; i++) {
-		GLint results[4];
-		CR(glGetProgramResourceiv(m_idOpenGLProgram, GL_UNIFORM, i, 4, properties, 4, NULL, results));
-
-		// Skip uniforms in blocks
-		if (results[3] != -1) continue; 
-		
-		GLint pszName_n = results[0] + 1;
-		char *pszName = new char[pszName_n];
-		CR(glGetProgramResourceName(m_idOpenGLProgram, GL_UNIFORM, i, pszName_n, NULL, pszName));
-
-		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
-
-		if (pszName != NULL) {
-			delete[] pszName;
-			pszName = NULL;
-		}
-
-	}
-
-Error:
-	return r;
-}
-
 RESULT OpenGLImp::MakeCurrentContext() {
 	return m_pOpenGLRenderingContext->MakeCurrentContext();
 }
@@ -377,8 +186,11 @@ RESULT OpenGLImp::PrepareScene() {
 	// Clear Background
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	CRM(CreateGLProgram(), "Failed to create GL program");
-	CRM(CheckGLError(), "CreateGLProgram failed");
+	//CRM(CreateGLProgram(), "Failed to create GL program");
+	m_pOGLProgram = new OGLProgram(this);
+	CN(m_pOGLProgram);
+	CRM(m_pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
+	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
@@ -408,51 +220,16 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// TODO: Move into better OGLProg design - this is stop gap
 	///*
-	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
-	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
-	CRM(pVertexShader->InitializeFromFile(L"skybox.vert", m_versionOGL), "Failed to initialize vertex shader from file");
-
-	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
-	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
-	CRM(pFragmentShader->InitializeFromFile(L"skybox.frag", m_versionOGL), "Failed to initialize fragment shader from file");
-	//CR(pFragmentShader->BindAttributes());
+	
+	
 	//*/
 	
 	// Link OpenGL Program
 	// TODO: Fix the error handling here (driver issue?)
-	CRM(LinkProgram(), "Failed to link program");
-	CRM(UseProgram(), "Failed to use open gl program");
-
-	// TODO: This could all be done in one call in the shader honestly
-	// Attributes
-	WCR(pVertexShader->GetAttributeLocationsFromShader());
-	WCR(pVertexShader->BindAttributes());
-
-	// TODO: Uniform Variables
-
-	// Uniform Blocks
-	WCR(pVertexShader->GetUniformLocationsFromShader());
-	WCR(pVertexShader->BindUniformBlocks());
-	WCR(pVertexShader->InitializeUniformBlocks());
-
-	// Fragment shader
-	WCR(pFragmentShader->GetUniformLocationsFromShader());
-	WCR(pFragmentShader->BindUniformBlocks());
-	WCR(pFragmentShader->InitializeUniformBlocks());
-
-	CR(PrintVertexAttributes());
-	CR(PrintActiveUniformVariables());
-
-	m_pVertexShader = pVertexShader;
-	m_pFragmentShader = pFragmentShader;
 
 	// Allocate the camera
 	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
-
-	// TODO:  Currently using a global material 
-	m_pFragmentShader->SetMaterial(&material(160.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
-	m_pFragmentShader->UpdateUniformBlockBuffers();
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
 
@@ -608,58 +385,11 @@ Error:
 	return r;
 }
 
-// TODO: Actually move this to OpenGL Program
-inline RESULT OpenGLImp::SendObjectToShader(DimObj *pDimObj) {
-	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-
-	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
-	auto matModel = pDimObj->GetModelMatrix();
-	m_pVertexShader->SetModelMatrixUniform(matModel);
-
-	/* TODO: This should be replaced with a materials store or OGLMaterial that pre-allocates and swaps binding points (Wait for textures)
-	m_pFragmentShader->SetMaterial(pDimObj->GetMaterial());
-	m_pFragmentShader->UpdateUniformBlockBuffers();
-	//*/
-
-	m_pFragmentShader->SetObjectTextures(pOGLObj);
-
-	return pOGLObj->Render();
-}
-
-RESULT OpenGLImp::SendLightsToShader(std::vector<light*> *pLights) {
-	RESULT r = R_PASS;
-
-	CR(m_pVertexShader->SetLights(pLights));
-	CR(m_pVertexShader->UpdateUniformBlockBuffers());
-
-Error:
-	return r;
-}
-
 RESULT OpenGLImp::UpdateCamera() {
 	RESULT r = R_PASS;
 
 	m_pCamera->UpdateCameraPosition();
 
-	return r;
-}
-
-RESULT OpenGLImp::SetCameraMatrix(EYE_TYPE eye) {
-	RESULT r = R_PASS;
-
-	auto ptEye = m_pCamera->GetEyePosition(eye);
-	auto matV = m_pCamera->GetViewMatrix(eye);
-	auto matP = m_pCamera->GetProjectionMatrix();
-	auto matVP = m_pCamera->GetProjectionMatrix() * m_pCamera->GetViewMatrix(eye);
-	auto matViewOrientation = m_pCamera->GetOrientationMatrix();
-
-	WCR(m_pVertexShader->SetViewMatrixUniform(matV));
-	WCR(m_pVertexShader->SetProjectionMatrixUniform(matP));
-	WCR(m_pVertexShader->SetViewOrientationMatrixUniform(matViewOrientation));
-	WCR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
-	WCR(m_pVertexShader->SetEyePositionUniform(ptEye));
-
-Error:
 	return r;
 }
 
@@ -819,11 +549,14 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
-	CR(SendLightsToShader(pLights));
+	//CR(SendLightsToShader(pLights));
+	CR(m_pOGLProgram->SetLights(pLights));
 
 	// Camera Projection Matrix
 	SetMonoViewTarget();
-	SetCameraMatrix(EYE_MONO);
+	//SetCameraMatrix(EYE_MONO);
+	//CR(m_pOGLProgram->SetStereoCamera(m_pCamera, EYE_MONO));
+	CR(m_pOGLProgram->SetCamera(m_pCamera));
 
 	// Send SceneGraph objects to shader
 	pSceneGraph->Reset();
@@ -833,14 +566,17 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		if (pDimObj == NULL)
 			continue;
 		else {
-			SendObjectToShader(pDimObj);
+			//SendObjectToShader(pDimObj);
+			CR(m_pOGLProgram->RenderObject(pDimObj));
 		}
 	}
 
 	skybox *pSkybox = nullptr;
 	CR(pObjectStore->GetSkybox(pSkybox));
-	if(pSkybox != nullptr)
-		SendObjectToShader(pSkybox);
+	if (pSkybox != nullptr) {
+		//SendObjectToShader(pSkybox);
+		CR(m_pOGLProgram->RenderObject(pSkybox));
+	}
 	
 	glFlush();
 
@@ -862,13 +598,15 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
-	CR(SendLightsToShader(pLights));
+	//CR(SendLightsToShader(pLights));
+	CR(m_pOGLProgram->SetLights(pLights));
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
 		SetStereoViewTarget(eye);
-		SetCameraMatrix(eye);
+		//SetCameraMatrix(eye);
+		CR(m_pOGLProgram->SetStereoCamera(m_pCamera, eye));
 
 		// Send SceneGraph objects to shader
 		pSceneGraph->Reset();
@@ -879,15 +617,18 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 			if (pDimObj == NULL)
 				continue;
 			else {
-				SendObjectToShader(pDimObj);
+				//SendObjectToShader(pDimObj);
+				CR(m_pOGLProgram->RenderObject(pDimObj));
 			}
 
 		}
 
 		skybox *pSkybox = nullptr;
 		CR(pObjectStore->GetSkybox(pSkybox));
-		if (pSkybox != nullptr)
-			SendObjectToShader(pSkybox);
+		if (pSkybox != nullptr) {
+			//SendObjectToShader(pSkybox);
+			CR(m_pOGLProgram->RenderObject(pSkybox));
+		}
 	}
 
 	glFlush();
@@ -933,7 +674,8 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
-	CR(SendLightsToShader(pLights));
+	//CR(SendLightsToShader(pLights));
+	CR(m_pOGLProgram->SetLights(pLights));
 
 	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
 
@@ -941,7 +683,8 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
 		//SetStereoFramebufferViewTarget(eye);
-		SetCameraMatrix(eye);
+		//SetCameraMatrix(eye);
+		CR(m_pOGLProgram->SetStereoCamera(m_pCamera, eye));
 		m_pHMD->SetAndClearRenderSurface(eye);
 
 		// Send SceneGraph objects to shader
@@ -953,15 +696,18 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 			if (pDimObj == NULL)
 				continue;
 			else {
-				SendObjectToShader(pDimObj);
+				//SendObjectToShader(pDimObj);
+				CR(m_pOGLProgram->RenderObject(pDimObj));
 			}
 
 		}
 
 		skybox *pSkybox = nullptr;
 		CR(pObjectStore->GetSkybox(pSkybox));
-		if (pSkybox != nullptr)
-			SendObjectToShader(pSkybox);
+		if (pSkybox != nullptr) {
+			//SendObjectToShader(pSkybox);
+			CR(m_pOGLProgram->RenderObject(pSkybox));
+		}
 
 		m_pHMD->UnsetRenderSurface(eye);
 
@@ -1014,6 +760,76 @@ RESULT OpenGLImp::ShutdownImplementaiton() {
 // Open GL / Wrappers
 
 // OpenGL Program
+
+RESULT OpenGLImp::CreateProgram(GLuint *pOGLProgramIndex) {
+	RESULT r = R_PASS;
+
+	*pOGLProgramIndex = m_OpenGLExtensions.glCreateProgram();
+	CRM(CheckGLError(), "glCreateProgram failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::DeleteProgram(GLuint OGLProgramIndex) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteProgram(OGLProgramIndex);
+	CRM(CheckGLError(), "glDeleteProgram failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::UseProgram(GLuint OGLProgramIndex) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUseProgram(OGLProgramIndex);
+	CRM(CheckGLError(), "UseProgram failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::LinkProgram(GLuint OGLProgramIndex) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glLinkProgram(OGLProgramIndex);
+	CRM(CheckGLError(), "glLinkProgram failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetProgramInfoLog(GLuint programID, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetProgramInfoLog(programID, bufSize, length, infoLog);
+	CRM(CheckGLError(), "glGetProgramInfoLog failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::IsProgram(GLuint m_OGLProgramIndex) {
+	RESULT r = R_PASS;
+
+	CB((m_OpenGLExtensions.glIsProgram(m_OGLProgramIndex)));
+	CRM(CheckGLError(), "glCreateProgram failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetProgramiv(GLuint programID, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetProgramiv(programID, pname, params);
+	CRM(CheckGLError(), "glGetProgramiv failed");
+
+Error:
+	return r;
+}
 
 RESULT OpenGLImp::glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params) {
 	RESULT r = R_PASS;
@@ -1345,6 +1161,16 @@ RESULT OpenGLImp::GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *leng
 
 	m_OpenGLExtensions.glGetShaderInfoLog(shader, bufSize, length, infoLog);
 	CRM(CheckGLError(), "glGetShaderInfoLog failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glAttachShader(GLuint program, GLuint shader) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glAttachShader(program, shader);
+	CRM(CheckGLError(), "glAttachShader failed");
 
 Error:
 	return r;

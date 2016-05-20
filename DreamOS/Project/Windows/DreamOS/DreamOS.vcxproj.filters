@@ -221,6 +221,9 @@
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp">
       <Filter>HMD\Oculus</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -543,6 +546,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h">
       <Filter>HMD\Oculus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -33,6 +33,8 @@
 #include "Primitives/DimObj.h"
 #include "Primitives/material.h"
 
+#include "OGLProgram.h"
+
 class SandboxApp; 
 class Windows64App;
 
@@ -41,7 +43,7 @@ private:
 
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
-	GLuint m_idOpenGLProgram;
+	OGLProgram *m_pOGLProgram;
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
@@ -58,35 +60,26 @@ private:
 public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
-	GLuint GetOGLProgramID() { return m_idOpenGLProgram; }
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
 
 public:
-
-	// TODO: Consolidate all of these
+	// TODO: Consolidate all of these (one Render function)
 	RESULT SetMonoViewTarget();
 	RESULT SetStereoViewTarget(EYE_TYPE eye);
 	RESULT SetStereoFramebufferViewTarget(EYE_TYPE eye);
 
-	RESULT Resize(int pxWidth, int pxHeight);
-	RESULT ShutdownImplementaiton();
-	
 	RESULT Render(SceneGraph *pSceneGraph);
 	RESULT RenderStereo(SceneGraph *pSceneGraph);
 	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
 
-	RESULT SendObjectToShader(DimObj *pDimObj);
-	RESULT SendLightsToShader(std::vector<light*> *pLights);
-
-	RESULT PrintVertexAttributes();
-	RESULT PrintActiveUniformVariables();
+	RESULT Resize(int pxWidth, int pxHeight);
+	RESULT ShutdownImplementaiton();
 	
 	camera *GetCamera();
 	RESULT UpdateCamera();
-	RESULT SetCameraMatrix(EYE_TYPE viewTarget);
 	RESULT SetCameraOrientation(quaternion qOrientation);
 	RESULT SetCameraPositionDeviation(vector vDeviation);
 
@@ -106,11 +99,6 @@ private:
 	RESULT PrepareScene();
 
 private:
-	// TODO: Move this into OGLProgram class (implement)
-	OGLVertexShader *m_pVertexShader;
-	OGLFragmentShader *m_pFragmentShader;
-	// TODO: Other shaders
-
 	stereocamera *m_pCamera;
 	HMD *m_pHMD;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
@@ -120,15 +108,6 @@ private:
 	// Best to push into FrameBuffer -> OGLFrameBuffer then attach to HMD or stereo camera
 
 
-public:
-	// TODO: [SHADER] This should be baked into Shader
-	RESULT EnableVertexPositionAttribute();
-	RESULT EnableVertexColorAttribute();
-	RESULT EnableVertexNormalAttribute();
-	RESULT EnableVertexUVCoordAttribute();
-	RESULT EnableVertexTangentAttribute();
-	RESULT EnableVertexBitangentAttribute();
-
 // TODO: Unify access to extensions
 public:
 
@@ -136,6 +115,16 @@ public:
 	RESULT wglSwapIntervalEXT(int interval);
 
 	// TODO: Unify extension call / wrappers 
+
+	// OGL Program
+	RESULT CreateProgram(GLuint *pOGLProgramIndex);
+	RESULT IsProgram(GLuint m_OGLProgramIndex);
+	RESULT DeleteProgram(GLuint OGLProgramIndex);
+	RESULT UseProgram(GLuint OGLProgramIndex);
+	RESULT LinkProgram(GLuint OGLProgramIndex);
+	RESULT glGetProgramInfoLog(GLuint programID, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+
+	RESULT glGetProgramiv(GLuint programID, GLenum pname, GLint *params);
 	RESULT glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params);
 	RESULT glGetProgramResourceiv(GLuint program, GLenum programInterface, GLuint index, GLsizei propCount, const GLenum *props, GLsizei bufSize, GLsizei *length, GLint *params);
 	RESULT glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name);
@@ -170,7 +159,7 @@ public:
 	RESULT glDeleteVertexArrays(GLsizei n, const GLuint *arrays);
 	RESULT glBindAttribLocation(GLuint program, GLuint index, const GLchar *name);
 
-	RESULT BindAttribLocation(GLint index, char* pszName);
+	RESULT BindAttribLocation(GLint index, const char* pszName);
 
 	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
 	RESULT BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex);
@@ -194,6 +183,7 @@ public:
 	RESULT CompileShader(GLuint shaderID);
 	RESULT GetShaderiv(GLuint programID, GLenum pname, GLint *params);
 	RESULT GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+	RESULT glAttachShader(GLuint program, GLuint shader);
 
 	// Textures
 	RESULT GenerateTextures(GLsizei n, GLuint *textures);
@@ -208,16 +198,9 @@ public:
 	RESULT TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
 	RESULT glGenerateMipmap(GLenum target);
 
-// Extension Mappings
-private:
-	RESULT CheckGLError();
-	RESULT CreateGLProgram();
-	char* GetInfoLog();
-	RESULT UseProgram();
-	RESULT LinkProgram();
-
 public:
-	RESULT AttachShader(OpenGLShader *pOpenGLShader);
+	RESULT CheckGLError();
+	char* GetInfoLog();
 
 // OpengGL Extension Function Pointers
 private:
