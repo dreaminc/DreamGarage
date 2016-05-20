@@ -99,6 +99,9 @@
     <Filter Include="HMD\Oculus">
       <UniqueIdentifier>{a53afd0a-b5a4-4b9b-80ab-050429f6f805}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -220,6 +223,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp">
       <Filter>HMD\Oculus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Profiler\Profiler.cpp">
+      <Filter>Profiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -543,6 +549,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h">
       <Filter>HMD\Oculus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Profiler\Profiler.h">
+      <Filter>Profiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -185,6 +185,7 @@
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
+    <ClCompile Include="..\..\..\Profiler\Profiler.cpp" />
     <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
@@ -286,6 +287,7 @@
     <ClInclude Include="..\..\..\Primitives\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
     <ClInclude Include="..\..\..\Primitives\volume.h" />
+    <ClInclude Include="..\..\..\Profiler\Profiler.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
