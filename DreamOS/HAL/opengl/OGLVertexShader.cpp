@@ -8,6 +8,7 @@ OGLVertexShader::OGLVertexShader(OGLProgram *pParentProgram) :
 	m_pLightsBlock = new OGLLightsBlock(pParentProgram);
 }
 
+// TODO: Don't have this hard coded 
 RESULT OGLVertexShader::BindAttributes() {
 	RESULT r = R_PASS;
 
@@ -18,6 +19,23 @@ RESULT OGLVertexShader::BindAttributes() {
 		 
 	WCRM(m_pParentProgram->BindAttribLocation(GetPositionIndex(), (char*)GetPositionAttributeName()), "Failed to bind %s to position attribute", GetPositionAttributeName());
 	WCRM(m_pParentProgram->BindAttribLocation(GetColorIndex(), (char*)GetColorAttributeName()), "Failed to bind %s to color attribute", GetColorAttributeName());
+
+Error:
+	return r;
+}
+
+// TODO: Don't have this hard coded 
+RESULT OGLVertexShader::EnableAttributes() {
+	RESULT r = R_PASS;
+
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
+
+	WCRM(pParentImp->glEnableVertexAtrribArray((GLuint)GetPositionIndex()), "Failed to enable position vertex attribute at index %d", GetPositionIndex());
+	WCRM(pParentImp->glEnableVertexAtrribArray((GLuint)GetColorIndex()), "Failed to enable color vertex attribute at index %d", GetColorIndex());
+	WCRM(pParentImp->glEnableVertexAtrribArray((GLuint)GetNormalIndex()), "Failed to enable normal vertex attribute at index %d", GetNormalIndex());
+	WCRM(pParentImp->glEnableVertexAtrribArray((GLuint)GetUVCoordIndex()), "Failed to enable uv coord vertex attribute at index %d", GetUVCoordIndex());
+	WCRM(pParentImp->glEnableVertexAtrribArray((GLuint)GetTangentIndex()), "Failed to enable tangent vertex attribute at index %d", GetTangentIndex());
+	WCRM(pParentImp->glEnableVertexAtrribArray((GLuint)GetBitangentIndex()), "Failed to enable bitangent vertex attribute at index %d", GetBitangentIndex());
 
 Error:
 	return r;
@@ -50,35 +68,7 @@ Error:
 	return r;
 }
 
-RESULT OGLVertexShader::EnableVertexPositionAttribute() {
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
-	return pParentImp->glEnableVertexAtrribArray((GLuint)GetPositionIndex());
-}
-
-RESULT OGLVertexShader::EnableVertexColorAttribute() {
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
-	return pParentImp->glEnableVertexAtrribArray(GetColorIndex());
-}
-
-RESULT OGLVertexShader::EnableVertexNormalAttribute() {
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
-	return pParentImp->glEnableVertexAtrribArray(GetNormalIndex());
-}
-
-RESULT OGLVertexShader::EnableUVCoordAttribute() {
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
-	return pParentImp->glEnableVertexAtrribArray(GetUVCoordIndex());
-}
-
-RESULT OGLVertexShader::EnableTangentAttribute() {
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
-	return pParentImp->glEnableVertexAtrribArray(GetTangentIndex());
-}
-
-RESULT OGLVertexShader::EnableBitangentAttribute() {
-	OpenGLImp *pParentImp = GetParentOGLImplementation();
-	return pParentImp->glEnableVertexAtrribArray(GetBitangentIndex());
-}
+// TODO: Don't have this hard coded 
 
 RESULT OGLVertexShader::GetAttributeLocationsFromShader() {
 	RESULT r = R_PASS;
@@ -97,6 +87,8 @@ RESULT OGLVertexShader::GetAttributeLocationsFromShader() {
 Error:
 	return r;
 }
+
+// TODO: Don't have this hard coded 
 
 RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 	RESULT r = R_PASS;
@@ -123,6 +115,8 @@ Error:
 RESULT OGLVertexShader::SetLights(std::vector<light*> *pLights) {
 	return m_pLightsBlock->SetLights(pLights);
 }
+
+// TODO: Don't have this hard coded 
 
 GLint OGLVertexShader::GetPositionIndex() {
 	//return VERTEX_SHADER_POSITION_INDEX;

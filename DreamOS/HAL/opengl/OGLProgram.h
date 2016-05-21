@@ -73,12 +73,14 @@ public:
 public:
 	// TODO: [SHADER] This should be baked into Shader
 	// TODO: Build Shader Attribute Registration
+	/*
 	RESULT EnableVertexPositionAttribute();
 	RESULT EnableVertexColorAttribute();
 	RESULT EnableVertexNormalAttribute();
 	RESULT EnableVertexUVCoordAttribute();
 	RESULT EnableVertexTangentAttribute();
 	RESULT EnableVertexBitangentAttribute();
+	*/
 
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 

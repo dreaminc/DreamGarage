@@ -96,30 +96,38 @@ public:
 
 		// Enable the vertex attribute arrays
 		// TODO: This needs to come out of the Implementation shader compilation, should not be static
+		// TODO: Might want to encapsulate this in a VertexDecleration / VertexAttributeDeclaration or simply
+		// have it fall out of the actual shader
 
 		// Bind Position
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		//CR(m_pParentImp->EnableVertexPositionAttribute());		// TODO: Investigate performance impact of this
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)0));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)0, vertex::GetPointDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetVertexOffset()));
 
 		// Color
 		//WCR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)1));
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
 
 		// Normal
-		//WCR(m_pParentImp->EnableVertexNormalAttribute());		
+		//WCR(m_pParentImp->EnableVertexNormalAttribute());	
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)2));
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)2, vertex::GetNormalDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetNormalOffset()));
 
 		// UV Coordinate
 		//WCR(m_pParentImp->EnableVertexUVCoordAttribute());
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)3));
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)3, vertex::GetUVCoordDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetUVOffset()));
 
 		// Tangent 
 		//WCR(m_pParentImp->EnableVertexTangentAttribute());
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)4));
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)4, vertex::GetTangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetTangentOffset()));
 
 		// Bi-Tangent 
 		//WCR(m_pParentImp->EnableVertexBitangentAttribute());
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)5));
 		WCR(m_pParentImp->glVertexAttribPointer((GLuint)5, vertex::GetBitangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetBitangentOffset()));
 
 		//CR(m_pParentImp->ReleaseCurrentContext());
@@ -162,6 +170,7 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
 		glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+		//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
 
 	Error:
 		return r;

@@ -159,10 +159,10 @@ RESULT OpenGLImp::PrepareScene() {
 	// Clear Background
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	//CRM(CreateGLProgram(), "Failed to create GL program");
 	m_pOGLProgram = new OGLProgram(this);
 	CN(m_pOGLProgram);
-	CRM(m_pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
+	//CRM(m_pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
+	CRM(m_pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
 	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Depth testing
@@ -175,30 +175,6 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Dithering 
 	glEnable(GL_DITHER);
-
-	// TODO: Should be stuffed into factory arch - return NULL on fail
-	// TODO: More complex shader handling - right now statically calling minimal shader
-	// TODO: Likely put into factory
-	// TODO: Move to GLSL version?
-	/*
-	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
-	CRM(CheckGLError(), "Create OpenGL Vertex Shader failed");
-	CRM(pVertexShader->InitializeFromFile(L"minimal.vert", m_versionOGL), "Failed to initialize vertex shader from file");
-
-	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
-	CRM(CheckGLError(), "Create OpenGL Fragment Shader failed");
-	CRM(pFragmentShader->InitializeFromFile(L"minimal.frag", m_versionOGL), "Failed to initialize fragment shader from file");
-	//CR(pFragmentShader->BindAttributes());
-	//*/
-
-	// TODO: Move into better OGLProg design - this is stop gap
-	///*
-	
-	
-	//*/
-	
-	// Link OpenGL Program
-	// TODO: Fix the error handling here (driver issue?)
 
 	// Allocate the camera
 	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
@@ -424,8 +400,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
 	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//*/
 
 	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
+	/*
 	OGLSkybox *pSkybox = new OGLSkybox(this);
 	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
@@ -441,7 +419,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
 	//*/
 
-	/*
+	///*
 	OGLVolume *pVolume = NULL;
 	int num = 10;
 	double size = 0.5f;

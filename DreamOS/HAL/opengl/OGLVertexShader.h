@@ -70,6 +70,7 @@ public:
 	GLint GetLightsUniformBlockBindingPoint();
 
 	// TODO: Create OGLAttributes, OGLUniform, OGLUniformBlock objects instead
+	RESULT EnableAttributes();
 	RESULT BindAttributes();
 	RESULT BindUniformBlocks();
 
@@ -77,12 +78,14 @@ public:
 	RESULT UpdateUniformBlockBuffers();
 
 	// TODO: [SHADER] This should be redesigned
+	/*
 	RESULT EnableVertexPositionAttribute();
 	RESULT EnableVertexColorAttribute();
 	RESULT EnableVertexNormalAttribute();
 	RESULT EnableUVCoordAttribute();
 	RESULT EnableTangentAttribute();
 	RESULT EnableBitangentAttribute();
+	*/
 
 	RESULT SetLights(std::vector<light*> *pLights);
 

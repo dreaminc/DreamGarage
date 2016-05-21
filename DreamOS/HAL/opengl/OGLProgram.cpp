@@ -45,7 +45,7 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 	// TODO: Tabulate attributes (get them from shader, not from class)
 	WCR(m_pVertexShader->GetAttributeLocationsFromShader());
 	WCR(m_pVertexShader->BindAttributes());
-	// TODO: Enable Attributes
+	//WCR(m_pVertexShader->EnableAttributes());
 
 	CR(PrintActiveAttributes());
 
@@ -268,7 +268,7 @@ RESULT OGLProgram::MakeVertexShader(const wchar_t *pszFilename) {
 	CN(pVertexShader);
 	CRM(m_pParentImp->CheckGLError(), "Create OpenGL Vertex Shader failed");
 
-	CRM(pVertexShader->InitializeFromFile(L"skybox.vert", m_versionOGL), "Failed to initialize vertex shader from file");
+	CRM(pVertexShader->InitializeFromFile(pszFilename, m_versionOGL), "Failed to initialize vertex shader from file");
 
 	CRM(AttachShader(pVertexShader), "Failed to attach vertex shader");
 
@@ -283,7 +283,7 @@ RESULT OGLProgram::MakeFragmentShader(const wchar_t *pszFilename) {
 	CN(pFragmentShader);
 	CRM(m_pParentImp->CheckGLError(), "Create OpenGL Fragment Shader failed");
 
-	CRM(pFragmentShader->InitializeFromFile(L"skybox.frag", m_versionOGL), "Failed to initialize fragment shader from file");
+	CRM(pFragmentShader->InitializeFromFile(pszFilename, m_versionOGL), "Failed to initialize fragment shader from file");
 
 	CRM(AttachShader(pFragmentShader), "Failed to attach fragment shader");
 
@@ -353,6 +353,9 @@ RESULT OGLProgram::SetCamera(camera *pCamera) {
 	WCR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
 	WCR(m_pVertexShader->SetEyePositionUniform(ptEye));
 
+	// TODO: Better handle this
+	r = R_PASS;
+
 Error:
 	return r;
 }
@@ -392,6 +395,7 @@ Error:
 	return r;
 }
 
+/*
 // TODO: Re-design using attribute registration approach
 RESULT OGLProgram::EnableVertexPositionAttribute() {
 	if (m_pVertexShader != NULL)
@@ -438,3 +442,4 @@ RESULT OGLProgram::EnableVertexBitangentAttribute() {
 	else
 		return R_FAIL;
 }
+*/

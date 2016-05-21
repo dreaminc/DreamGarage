@@ -51,6 +51,7 @@ public:
 	virtual RESULT GetUniformLocationsFromShader() = 0;
 	virtual RESULT InitializeUniformBlocks() = 0;
 	virtual RESULT UpdateUniformBlockBuffers() = 0;
+	//virtual RESULT EnableAttributes() = 0;
 
 	RESULT Compile(void);
 	RESULT PrintInfoLog();
