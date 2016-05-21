@@ -1,5 +1,9 @@
-// minimal.vert
+// blinnPhoneTexTBNBump.vert
 // shadertype=glsl
+
+// This shader implements Blinn Phong lighting with color and bump textures
+// using a BTN matrix
+
 #version 440 core
 
 #define MAX_TOTAL_LIGHTS 10
