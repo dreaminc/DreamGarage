@@ -42,8 +42,12 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 
 	// TODO: This could all be done in one call in the OGLShader honestly
 	// Attributes
+	// TODO: Tabulate attributes (get them from shader, not from class)
 	WCR(m_pVertexShader->GetAttributeLocationsFromShader());
 	WCR(m_pVertexShader->BindAttributes());
+	// TODO: Enable Attributes
+
+	CR(PrintActiveAttributes());
 
 	// TODO: Uniform Variables
 
@@ -60,7 +64,6 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 	WCR(m_pFragmentShader->BindUniformBlocks());
 	WCR(m_pFragmentShader->InitializeUniformBlocks());
 
-	CR(PrintActiveAttributes());
 	CR(PrintActiveUniformVariables());
 
 	// TODO:  Currently using a global material 
@@ -255,13 +258,19 @@ Error:
 }
 */
 
+// TODO: This is repeated functionality - should create MakeShader function 
+// that either takes a shader type or uses the extension
+
 RESULT OGLProgram::MakeVertexShader(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
 	OGLVertexShader *pVertexShader = new OGLVertexShader(this);
+	CN(pVertexShader);
 	CRM(m_pParentImp->CheckGLError(), "Create OpenGL Vertex Shader failed");
 
-	CRM(m_pVertexShader->InitializeFromFile(L"skybox.vert", m_versionOGL), "Failed to initialize vertex shader from file");
+	CRM(pVertexShader->InitializeFromFile(L"skybox.vert", m_versionOGL), "Failed to initialize vertex shader from file");
+
+	CRM(AttachShader(pVertexShader), "Failed to attach vertex shader");
 
 Error:
 	return r;
@@ -270,10 +279,13 @@ Error:
 RESULT OGLProgram::MakeFragmentShader(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 
-	m_pFragmentShader = new OGLFragmentShader(this);
+	OGLFragmentShader *pFragmentShader = new OGLFragmentShader(this);
+	CN(pFragmentShader);
 	CRM(m_pParentImp->CheckGLError(), "Create OpenGL Fragment Shader failed");
 
-	CRM(m_pFragmentShader->InitializeFromFile(L"skybox.frag", m_versionOGL), "Failed to initialize fragment shader from file");
+	CRM(pFragmentShader->InitializeFromFile(L"skybox.frag", m_versionOGL), "Failed to initialize fragment shader from file");
+
+	CRM(AttachShader(pFragmentShader), "Failed to attach fragment shader");
 
 Error:
 	return r;
@@ -349,23 +361,21 @@ RESULT OGLProgram::AttachShader(OpenGLShader *pOpenGLShader) {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
 
-	OpenGLShader *&pOGLShader = (OpenGLShader *&)(this->m_pVertexShader);
-
 	switch (pOpenGLShader->GetShaderType()) {
 		case GL_VERTEX_SHADER: {
-			pOGLShader = this->m_pVertexShader;
+			this->m_pVertexShader = dynamic_cast<OGLVertexShader*>(pOpenGLShader);
+			CN(this->m_pVertexShader);
 		} break;
 
 		case GL_FRAGMENT_SHADER: {
-			pOGLShader = this->m_pFragmentShader;
+			this->m_pFragmentShader = dynamic_cast<OGLFragmentShader*>(pOpenGLShader);
+			CN(this->m_pFragmentShader);
 		} break;
 
 		default: {
 			CBM((0), "Shader type 0x%x cannot be attached", pOpenGLShader->GetShaderType());
 		}
 	}
-
-	CBM((pOGLShader == NULL), "Current shader 0x%x already assigned, detach existing shader", pOpenGLShader->GetShaderType());
 
 	//m_glGetProgramiv(m_idOpenGLProgram, GL_ATTACHED_SHADERS, &param);
 	//numShaders = param;
@@ -376,7 +386,6 @@ RESULT OGLProgram::AttachShader(OpenGLShader *pOpenGLShader) {
 	//CBM((param = numShaders + 1), "Failed to attach shader, num shaders attached %d", param);
 
 	// Assign the shader to the implementation stage
-	pOGLShader = pOpenGLShader;
 	DEBUG_LINEOUT("Attached shader %d type 0x%x", pOpenGLShader->GetShaderID(), pOpenGLShader->GetShaderType());
 
 Error:

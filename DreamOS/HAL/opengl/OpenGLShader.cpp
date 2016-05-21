@@ -83,7 +83,7 @@ RESULT OpenGLShader::InitializeFromFile(const wchar_t *pszFilename, version vers
 
 	CRM(LoadShaderCodeFromFile(pszFilename, versionFile), "Failed to load vertex shader code from %S", pszFilename);
 	CRM(Compile(), "Failed to compile shader");
-	CRM(AttachShader(), "Failed to attach vertex shader");
+	//CRM(AttachShader(), "Failed to attach vertex shader");	// This is pushed into the OGLProgram now
 
 	// Initialize all of the IDs
 	// TODO: This can't be done until after linking
@@ -211,6 +211,7 @@ Error:
 	return r;
 }
 
+/*
 // TODO: Is this even needed or can it be placed into the init function
 RESULT OpenGLShader::AttachShader() {
 	RESULT r = R_PASS;
@@ -220,6 +221,7 @@ RESULT OpenGLShader::AttachShader() {
 Error:
 	return r;
 }
+*/
 
 RESULT OpenGLShader::PrintInfoLog() {
 	RESULT r = R_PASS;

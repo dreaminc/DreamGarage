@@ -71,7 +71,7 @@ public:
 	RESULT DeleteShader();
 	*/
 
-	RESULT AttachShader();
+	//RESULT AttachShader();  This goes in the OGLProgram
 
 protected:
 	char* FileRead(wchar_t *pszFileName);
