@@ -43,11 +43,12 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 	// TODO: This could all be done in one call in the OGLShader honestly
 	// Attributes
 	// TODO: Tabulate attributes (get them from shader, not from class)
-	WCR(m_pVertexShader->GetAttributeLocationsFromShader());
+	WCR(m_pVertexShader->GetVertexAttributesFromShader());
+	//WCR(m_pVertexShader->GetAttributeLocationsFromShader());
 	WCR(m_pVertexShader->BindAttributes());
 	//WCR(m_pVertexShader->EnableAttributes());
 
-	CR(PrintActiveAttributes());
+	//CR(PrintActiveAttributes());
 
 	// TODO: Uniform Variables
 
@@ -194,36 +195,6 @@ RESULT OGLProgram::BindAttribLocation(GLint index, const char* pszName) {
 
 	werr = GetLastError();
 	DEBUG_LINEOUT("Bound attribute %s to index location %d err:0x%x", pszName, index, werr);
-
-Error:
-	return r;
-}
-
-// TODO: Might want to check this against the shader and find any mismatches? 
-RESULT OGLProgram::PrintActiveAttributes() {
-	RESULT r = R_PASS;
-
-	GLint attributes_n;
-	CR(m_pParentImp->glGetProgramInterfaceiv(m_OGLProgramIndex, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &attributes_n));
-
-	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
-
-	DEBUG_LINEOUT("%d active attributes", attributes_n);
-	for (int i = 0; i < attributes_n; i++) {
-		GLint results[3];
-		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results));
-
-		GLint pszName_n = results[0] + 1;
-		char *pszName = new char[pszName_n];
-		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, pszName_n, NULL, pszName));
-
-		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
-
-		if (pszName != NULL) {
-			delete[] pszName;
-			pszName = NULL;
-		}
-	}
 
 Error:
 	return r;

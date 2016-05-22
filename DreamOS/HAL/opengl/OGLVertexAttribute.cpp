@@ -2,8 +2,10 @@
 
 #include "OpenGLImp.h"
 
-OGLVertexAttribute::OGLVertexAttribute(OGLProgram *pParentProgram, const char *pszAttributeName) :
-	GLSLObject(pParentProgram)
+OGLVertexAttribute::OGLVertexAttribute(OGLProgram *pParentProgram, const char *pszAttributeName, GLint attributeLocationIndex, GLint GLType) :
+	GLSLObject(pParentProgram),
+	m_attributeIndex(attributeLocationIndex),
+	m_GLType(GLType)
 {
 	m_strAttributeName.assign(pszAttributeName);
 }
@@ -25,7 +27,7 @@ Error:
 RESULT OGLVertexAttribute::BindAttribute() {
 	RESULT r = R_PASS;
 	
-	CRM(m_pParentProgram->BindAttribLocation(m_attributeIndex, m_strAttributeName.c_str()), "Failed to bind %s attribute", m_strAttributeName.c_str());
+	CRM(m_pParentProgram->BindAttribLocation(m_attributeIndex, m_strAttributeName.c_str()), "Failed to bind %s attribute to %d location", m_strAttributeName.c_str(), m_attributeIndex);
 
 Error:
 	return r;

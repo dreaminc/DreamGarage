@@ -14,17 +14,16 @@
 
 class OGLVertexAttribute : public GLSLObject {
 public:
-	OGLVertexAttribute(OGLProgram *pParentProgram, const char *pszAttributeName);
+	OGLVertexAttribute(OGLProgram *pParentProgram, const char *pszAttributeName, GLint attributeLocationIndex, GLint GLType);
 	~OGLVertexAttribute();
 
 	RESULT EnableAttribute();
 	RESULT BindAttribute();
 
 private:
-	OGLProgram *m_pParentProgram;
-
 	std::string m_strAttributeName;
 	GLint m_attributeIndex;
+	GLint m_GLType;
 };
 
 #endif // ! OGL_VERTEX_ATTRIBUTE_H_

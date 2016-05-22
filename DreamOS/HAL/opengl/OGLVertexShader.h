@@ -7,6 +7,7 @@
 
 #include "OpenGLShader.h"
 #include "OGLLightsBlock.h"
+#include "OGLVertexAttribute.h"
 
 #define VERTEX_SHADER_POSITION_INDEX 0
 #define VERTEX_SHADER_COLOR_INDEX 1
@@ -19,18 +20,16 @@ public:
 	// This is handled by the parent class 
 	//~OGLVertexShader(void);
 
-	RESULT GetAttributeLocationsFromShader();
+	//RESULT GetAttributeLocationsFromShader();
 	RESULT GetUniformLocationsFromShader();
 
-public:
-	// TODO: These could be generated, even within a macro
-	const char *GetPositionAttributeName() { return "inV_vec4Position"; }
-	const char *GetColorAttributeName() { return "inV_vec4Color"; }
-	const char *GetNormalAttributeName() { return "inV_vec4Normal"; }
-	const char *GetUVCoordAttributeName() { return "inV_vec2UVCoord"; }
-	const char *GetTangentAttributeName() { return "inV_vec4Tangent"; }
-	const char *GetBitangentAttributeName() { return "inV_vec4Bitangent"; }
+	// Vertex Attributes
+	RESULT GetVertexAttributesFromShader();
+	RESULT InitializeAttributes();
+	RESULT EnableAttributes();
+	RESULT BindAttributes();
 
+public:
 	const char *GetEyePositionUniformName() { return "u_vec4Eye"; }
 	const char *GetModelMatrixUniformName() { return "u_mat4Model";  }
 	const char *GetViewMatrixUniformName() { return "u_mat4View"; }
@@ -42,20 +41,14 @@ public:
 
 	const char *GetLightsUniformBlockName() { return "ub_LightArray"; }
 
-	GLint GetPositionIndex();
-	GLint GetColorIndex();
-	GLint GetNormalIndex();
-	GLint GetUVCoordIndex();
-	GLint GetTangentIndex();
-	GLint GetBitangentIndex();
-	
 	GLint GetEyePositionUniformIndex();
 	GLint GetModelMatrixUniformIndex();
 	GLint GetViewMatrixUniformIndex();
 	GLint GetModelViewMatrixUniformIndex();
 	GLint GetViewProjectionMatrixUniformIndex();
 	GLint GetNormalMatrixUniformIndex();
-
+	
+	// All uniform work should go up into the OGLShader
 	RESULT SetEyePositionUniform(point ptEye);
 	RESULT SetModelMatrixUniform(matrix<float, 4, 4> matModel);
 	RESULT SetViewMatrixUniform(matrix<float, 4, 4> matView);
@@ -70,10 +63,7 @@ public:
 	GLint GetLightsUniformBlockBindingPoint();
 
 	// TODO: Create OGLAttributes, OGLUniform, OGLUniformBlock objects instead
-	RESULT EnableAttributes();
-	RESULT BindAttributes();
 	RESULT BindUniformBlocks();
-
 	RESULT InitializeUniformBlocks();
 	RESULT UpdateUniformBlockBuffers();
 
@@ -90,6 +80,8 @@ public:
 	RESULT SetLights(std::vector<light*> *pLights);
 
 private:
+	std::vector<OGLVertexAttribute*> m_vertexAttributes;
+
 	// All of this is the same across shaders
 	// TODO: Push this up into shader class using registration
 	GLint m_PositionIndex;

@@ -38,7 +38,6 @@ public:
 
 	// Attributes
 	// TODO: Is this really vertex only?
-	RESULT PrintActiveAttributes();
 	RESULT BindAttribLocation(GLint index, const char* pszName);
 
 	// Uniform Variables
