@@ -162,7 +162,8 @@ RESULT OpenGLImp::PrepareScene() {
 	m_pOGLProgram = new OGLProgram(this);
 	CN(m_pOGLProgram);
 	//CRM(m_pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
-	CRM(m_pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
+	//CRM(m_pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", m_versionOGL), "Failed to initialzie OGL minimal Program");
+	CRM(m_pOGLProgram->OGLInitialize(L"minimalTexture.vert", L"minimalTexture.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
 	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Depth testing
@@ -411,7 +412,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pSkybox);
 	//*/
 	
-	/*
+	///*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
 	pVolume->SetBumpTexture(pBumpTexture);
@@ -419,7 +420,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
 	//*/
 
-	///*
+	/*
 	OGLVolume *pVolume = NULL;
 	int num = 10;
 	double size = 0.5f;

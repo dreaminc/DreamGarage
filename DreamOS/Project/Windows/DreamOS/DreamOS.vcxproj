@@ -319,10 +319,14 @@
   <ItemGroup>
     <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhong.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhong.vert" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhongTexTBNBump.frag" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhongTexTBNBump.vert" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimalTexture.frag" />
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimalTexture.vert" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\skybox.frag" />
     <None Include="..\..\..\HAL\opengl\GLSL\v440\skybox.vert" />
     <None Include="..\..\..\Makefile" />

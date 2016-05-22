@@ -84,11 +84,13 @@ RESULT OGLFragmentShader::SetTexture(OGLTexture *pTexture) {
 
 	switch (pTexture->GetTextureType()) {
 		case texture::TEXTURE_TYPE::TEXTURE_COLOR: {
-			CR(SetColorTextureUniform(pTexture->GetTextureNumber()));
+			//CR(SetColorTextureUniform(pTexture->GetTextureNumber()));
+			CR(SetColorTextureUniform(pTexture->GetOGLTextureIndex()));
 		} break;
 
 		case texture::TEXTURE_TYPE::TEXTURE_BUMP: {
-			CR(SetBumpTextureUniform(pTexture->GetTextureNumber()));
+			//CR(SetBumpTextureUniform(pTexture->GetTextureNumber()));
+			CR(SetBumpTextureUniform(pTexture->GetOGLTextureIndex()));
 		} break;
 
 		default: {

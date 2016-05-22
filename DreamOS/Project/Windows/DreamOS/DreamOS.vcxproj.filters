@@ -597,6 +597,18 @@
     <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhongTexTBNBump.vert">
       <Filter>HAL\opengl\GLSL\v440</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhong.frag">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhong.vert">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimalTexture.vert">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimalTexture.frag">
+      <Filter>HAL\opengl\GLSL\v440</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
