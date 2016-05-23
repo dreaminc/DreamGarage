@@ -163,7 +163,9 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pOGLProgram);
 	//CRM(m_pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
 	//CRM(m_pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", m_versionOGL), "Failed to initialzie OGL minimal Program");
-	CRM(m_pOGLProgram->OGLInitialize(L"minimalTexture.vert", L"minimalTexture.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
+	//CRM(m_pOGLProgram->OGLInitialize(L"minimalTexture.vert", L"minimalTexture.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
+	CRM(m_pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
+	//CRM(m_pOGLProgram->OGLInitialize(L"blinnPhongTexTBNBump.vert", L"blinnPhongTexTBNBump.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
 	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Depth testing
@@ -373,12 +375,12 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	// Add lights
 	light *pLight = NULL; 
 
-	///*
+	/*
 	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
 	//*/
 
-	/*
+	///*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
 	pLight = new light(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
@@ -397,7 +399,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
 	//*/
 
-	///*
+	/*
 	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
 	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -412,7 +414,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pSkybox);
 	//*/
 	
-	///*
+	/*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
 	pVolume->SetBumpTexture(pBumpTexture);
@@ -462,10 +464,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pModel);
 	//*/
 
-	/*
+	///*
 	OGLSphere *pSphere = NULL;
 
-	int num = 10;
+	int num = 2;
 	int sects = 40;
 	double radius = 0.5f;
 	double size = radius * 2;
@@ -475,8 +477,8 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 		for (int j = 0; j < num; j++) {
 			pSphere = new OGLSphere(this, radius, sects, sects);
 
-			pSphere->SetColorTexture(pColorTexture);
-			pSphere->SetBumpTexture(pBumpTexture);
+			//pSphere->SetColorTexture(pColorTexture);
+			//pSphere->SetBumpTexture(pBumpTexture);
 
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));

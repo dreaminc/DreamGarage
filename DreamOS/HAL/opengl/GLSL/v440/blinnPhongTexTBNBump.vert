@@ -1,4 +1,4 @@
-// blinnPhoneTexTBNBump.vert
+// blinnPhongTexTBNBump.vert
 // shadertype=glsl
 
 // This shader implements Blinn Phong lighting with color and bump textures

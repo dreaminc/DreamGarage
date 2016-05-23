@@ -562,6 +562,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUniform.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

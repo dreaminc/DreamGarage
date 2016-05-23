@@ -175,7 +175,7 @@ RESULT OGLProgram::PrintActiveUniformVariables() {
 		char *pszName = new char[pszName_n];
 		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM, i, pszName_n, NULL, pszName));
 
-		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
+		DEBUG_LINEOUT("%-5d %s (%s) block index %d", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]), results[3]);
 
 		if (pszName != NULL) {
 			delete[] pszName;
@@ -304,6 +304,9 @@ RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {
 	WCR(m_pVertexShader->SetViewOrientationMatrixUniform(matViewOrientation));
 	WCR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
 	WCR(m_pVertexShader->SetEyePositionUniform(ptEye));
+
+	// TODO: Better handle this
+	r = R_PASS;
 
 Error:
 	return r;

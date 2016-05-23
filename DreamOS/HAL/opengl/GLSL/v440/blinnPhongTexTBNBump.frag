@@ -87,7 +87,7 @@ void main(void) {
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	
-	vec3 TBNNormal = texture(u_textureBump, DataIn.uvCoord * 4.0f).rgb;
+	vec3 TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
 	TBNNormal = normalize(TBNNormal * 2.0f - vec3(1.0f));   
 	//TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	//TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
@@ -103,7 +103,7 @@ void main(void) {
 	}
 	vec4LightValue[3] = 1.0f;
 	
-	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 4.0f);
+	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord);
 	//vec4 textureColor = texture(u_textureBump, DataIn.uvCoord);
 	//textureColor = vec4(1.0f);
 

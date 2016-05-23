@@ -95,8 +95,8 @@ private:
 	OGLFragmentShader *m_pFragmentShader;
 	// TODO: Other shaders
 
-	// Vertex Attributes 
-	std::vector<OGLVertexAttribute*> m_OGLVertexAttributes;
+	// Vertex Attributes have been pushed into the OGLVertexShader
+	//std::vector<OGLVertexAttribute*> m_OGLVertexAttributes;
 
 	// TODO: Uniforms
 

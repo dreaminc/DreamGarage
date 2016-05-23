@@ -238,6 +238,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUniform.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexAttribute.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h" />
