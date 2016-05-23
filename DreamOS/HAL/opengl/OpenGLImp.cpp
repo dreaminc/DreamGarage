@@ -180,7 +180,8 @@ RESULT OpenGLImp::PrepareScene() {
 	glEnable(GL_DITHER);
 
 	// Allocate the camera
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 45.0f, m_pxViewWidth, m_pxViewHeight);
+	// TODO: Wire this up directly to HMD
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 100.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());

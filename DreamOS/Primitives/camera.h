@@ -25,7 +25,7 @@
 	typedef double camera_precision;
 #endif
 
-#define DEFAULT_NEAR_PLANE 1.0f
+#define DEFAULT_NEAR_PLANE 0.1f
 #define DEFAULT_FAR_PLANE 1000.0f
 #define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
 #define DEFAULT_CAMERA_MOVE_SPEED 0.05f
