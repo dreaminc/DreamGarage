@@ -19,8 +19,12 @@
 #include "OGLVertexShader.h"
 #include "OGLFragmentShader.h"
 
+#include "OGLUniform.h"
+#include "OGLUniformBlock.h"
+
 class OpenGLImp;
 class OGLVertexAttribute;
+class OGLUniform;
 
 class OGLProgram {
 public:
@@ -41,7 +45,9 @@ public:
 	RESULT BindAttribLocation(GLint index, const char* pszName);
 
 	// Uniform Variables
-	RESULT PrintActiveUniformVariables();
+	RESULT GetUniformVariablesFromProgram();
+
+	RESULT GetUniformBlocksFromProgram();
 	RESULT BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint);
 	char* GetProgramInfoLog();
 
@@ -51,6 +57,7 @@ public:
 
 	RESULT RenderObject(DimObj *pDimObj);
 	RESULT SetLights(std::vector<light*> *pLights);
+	RESULT SetMaterial(material *pMaterial);
 	
 	RESULT SetCamera(camera *pCamera);
 	RESULT SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye);
@@ -98,7 +105,20 @@ private:
 	// Vertex Attributes have been pushed into the OGLVertexShader
 	//std::vector<OGLVertexAttribute*> m_OGLVertexAttributes;
 
-	// TODO: Uniforms
+	// Uniforms
+	std::vector<OGLUniform*> m_uniformVariables;
+	std::vector<OGLUniformBlock*> m_uniformBlocks;
+
+	// Structural Uniform Blocks
+	const char *GetLightsUniformBlockName() { return "ub_Lights"; }
+	const char *GetMaterialsUniformBlockName() { return "ub_material"; }
+
+	OGLLightsBlock *m_pLightsBlock;
+	OGLMaterialBlock *m_pMaterialsBlock;
+
+	RESULT UpdateUniformBlockBuffers();
+	RESULT BindUniformBlocks();
+	RESULT InitializeUniformBlocks();
 
 	// TODO: Pipelines
 };

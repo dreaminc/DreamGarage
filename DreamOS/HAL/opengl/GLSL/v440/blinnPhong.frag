@@ -48,7 +48,7 @@ layout(std140) uniform ub_material {
     Material material;
 };
 
-layout(std140) uniform ub_LightArray {
+layout(std140) uniform ub_Lights {
 	Light lights[MAX_TOTAL_LIGHTS];
 	int numLights;	
 };

@@ -7,7 +7,8 @@ OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),
 	m_pFragmentShader(nullptr),
-	m_versionOGL(0)
+	m_versionOGL(0),
+	m_pLightsBlock(nullptr)
 {
 	// empty
 }
@@ -25,6 +26,72 @@ RESULT OGLProgram::OGLInitialize() {
 Error:
 	return r;
 }
+
+RESULT OGLProgram::SetLights(std::vector<light*> *pLights) {
+	RESULT r = R_PASS;
+
+	CR(m_pLightsBlock->SetLights(pLights));
+	CR(m_pLightsBlock->UpdateOGLUniformBlockBuffers());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::SetMaterial(material *pMaterial) {
+	RESULT r = R_PASS;
+
+	CR(m_pMaterialsBlock->SetMaterial(pMaterial));
+	CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UpdateUniformBlockBuffers() {
+	RESULT r = R_PASS;
+
+	for (auto const& oglUniformBlock : m_uniformBlocks) {
+		CRM(oglUniformBlock->UpdateOGLUniformBlockBuffers(), "Failed to bind %s uniform block", oglUniformBlock->GetUniformBlockName());
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindUniformBlocks() {
+	RESULT r = R_PASS;
+
+	//CRM(m_pLightsBlock->BindUniformBlock(), "Failed to bind %s to lights uniform block", GetLightsUniformBlockName());
+	for (auto const& oglUniformBlock : m_uniformBlocks) {
+		CRM(oglUniformBlock->BindUniformBlock(), "Failed to bind %s uniform block", oglUniformBlock->GetUniformBlockName());
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeUniformBlocks() {
+	RESULT r = R_PASS;
+
+	for (auto const& oglUniformBlock : m_uniformBlocks) {
+		CRM(oglUniformBlock->OGLInitialize(), "Failed to bind %s uniform block", oglUniformBlock->GetUniformBlockName());
+	}
+
+Error:
+	return r;
+}
+
+/*
+RESULT OGLProgram::SetLights(std::vector<light*> *pLights) {
+	RESULT r = R_PASS;
+
+	CR(m_pVertexShader->SetLights(pLights));
+	CR(m_pVertexShader->UpdateUniformBlockBuffers());
+
+Error:
+	return r;
+}
+*/
 
 RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionOGL) {
 	RESULT r = R_PASS;
@@ -50,22 +117,20 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 
 	//CR(PrintActiveAttributes());
 
-	// TODO: Uniform Variables
+	// Uniform Variables
+	CR(GetUniformVariablesFromProgram());
 
 	// Uniform Blocks
-	WCR(m_pVertexShader->GetUniformLocationsFromShader());
+	CR(GetUniformBlocksFromProgram());
+
+	//WCR(m_pVertexShader->GetUniformLocationsFromShader());
 	WCR(m_pVertexShader->BindUniformBlocks());
 	WCR(m_pVertexShader->InitializeUniformBlocks());
 
-	// Fragment shader
-	//CR(m_pFragmentShader->GetAttributeLocationsFromShader());
-	//CR(m_pFragmentShader->BindAttributes());
-
-	WCR(m_pFragmentShader->GetUniformLocationsFromShader());
+	//WCR(m_pFragmentShader->GetUniformLocationsFromShader());
 	WCR(m_pFragmentShader->BindUniformBlocks());
 	WCR(m_pFragmentShader->InitializeUniformBlocks());
 
-	CR(PrintActiveUniformVariables());
 
 	// TODO:  Currently using a global material 
 	m_pFragmentShader->SetMaterial(&material(160.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
@@ -155,31 +220,93 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::PrintActiveUniformVariables() {
+RESULT OGLProgram::GetUniformVariablesFromProgram() {
 	RESULT r = R_PASS;
 
 	GLint variables_n = 0;
 	CR(m_pParentImp->glGetProgramInterfaceiv(m_OGLProgramIndex, GL_UNIFORM, GL_ACTIVE_RESOURCES, &variables_n));
 
 	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION, GL_BLOCK_INDEX };
+	int properties_n = sizeof(properties) / sizeof(properties[0]);
 
 	DEBUG_LINEOUT("%d active uniform variables", variables_n);
 	for (int i = 0; i < variables_n; i++) {
-		GLint results[4];
-		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM, i, 4, properties, 4, NULL, results));
+		GLint *pResults = new GLint[properties_n];
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM, i, 4, properties, 4, NULL, pResults));
 
 		// Skip uniforms in blocks
-		if (results[3] != -1) continue;
+		if (pResults[3] != -1) continue;
 
-		GLint pszName_n = results[0] + 1;
+		GLint pszName_n = pResults[0] + 1;
 		char *pszName = new char[pszName_n];
 		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM, i, pszName_n, NULL, pszName));
 
-		DEBUG_LINEOUT("%-5d %s (%s) block index %d", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]), results[3]);
+		DEBUG_LINEOUT("%-5d %s (%s)", pResults[2], pszName, OpenGLUtility::GetOGLTypeString(pResults[1]));
+
+		OGLUniform *pOGLUniform = new OGLUniform(this, pszName, pResults[2], pResults[1]);
+		m_uniformVariables.push_back(pOGLUniform);
 
 		if (pszName != NULL) {
 			delete[] pszName;
 			pszName = NULL;
+		}
+		
+		if (pResults != nullptr) {
+			delete[] pResults;
+			pResults = nullptr;
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::GetUniformBlocksFromProgram() {
+	RESULT r = R_PASS;
+
+	GLint variables_n = 0;
+	CR(m_pParentImp->glGetProgramInterfaceiv(m_OGLProgramIndex, GL_UNIFORM_BLOCK, GL_ACTIVE_RESOURCES, &variables_n));
+
+	GLenum properties[] = { GL_NAME_LENGTH, GL_BUFFER_DATA_SIZE};
+	int properties_n = sizeof(properties) / sizeof(properties[0]);
+
+	DEBUG_LINEOUT("%d active uniform blocks", variables_n);
+	for (int i = 0; i < variables_n; i++) {
+		GLint *pResults = new GLint[properties_n];
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, properties_n, properties, 4, NULL, pResults));
+
+		GLint pszName_n = pResults[0] + 1;
+		char *pszName = new char[pszName_n];
+		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, pszName_n, NULL, pszName));
+
+		DEBUG_LINEOUT("%-5d %s block index size %d", i, pszName, pResults[1]);
+
+		OGLUniformBlock *pOGLUniformBlock = nullptr;
+		if (strcmp(pszName, GetMaterialsUniformBlockName()) == 0) {
+			m_pMaterialsBlock = new OGLMaterialBlock(this, pResults[1], pszName);
+			pOGLUniformBlock = m_pMaterialsBlock;
+		}
+		else if (strcmp(pszName, GetLightsUniformBlockName()) == 0) {
+			m_pLightsBlock = new OGLLightsBlock(this, pResults[1], pszName);
+			pOGLUniformBlock = m_pLightsBlock;
+		}
+		else {
+			// TODO: Do we just create the buffer in OGLUniformBlock?
+			// first get things to work again
+			// OGLUniformBlock *pOGLUniformBlock = new OGLUniformBlock(this, pResults[1], pszName);
+		}
+
+		m_uniformBlocks.push_back(pOGLUniformBlock);
+
+
+		if (pszName != nullptr) {
+			delete[] pszName;
+			pszName = nullptr;
+		}
+
+		if (pResults != nullptr) {
+			delete[] pResults;
+			pResults = nullptr;
 		}
 	}
 
@@ -279,16 +406,6 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	return pOGLObj->Render();
 }
 
-RESULT OGLProgram::SetLights(std::vector<light*> *pLights) {
-	RESULT r = R_PASS;
-
-	CR(m_pVertexShader->SetLights(pLights));
-	CR(m_pVertexShader->UpdateUniformBlockBuffers());
-
-Error:
-	return r;
-}
-
 // TODO: Consolidate?
 RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
@@ -367,6 +484,41 @@ RESULT OGLProgram::AttachShader(OpenGLShader *pOpenGLShader) {
 
 Error:
 	return r;
+}
+
+
+
+// Set Matrix Functions
+RESULT OGLProgram::SetEyePosition(point ptEye) {
+	return SetPointUniform(ptEye, GetEyePositionUniformName());
+}
+
+RESULT OGLProgram::SetModelMatrix(matrix<float, 4, 4> matModel) {
+	return Set44MatrixUniform(matModel, GetModelMatrixUniformName());
+}
+
+RESULT OGLProgram::SetViewMatrix(matrix<float, 4, 4> matView) {
+	return Set44MatrixUniform(matView, GetViewMatrixUniformName());
+}
+
+RESULT OGLProgram::SetProjectionMatrix(matrix<float, 4, 4> matProjection) {
+	return Set44MatrixUniform(matProjection, GetProjectionMatrixUniformName());
+}
+
+RESULT OGLProgram::SetModelViewMatrix(matrix<float, 4, 4> matModelView) {
+	return Set44MatrixUniform(matModelView, GetModelViewMatrixUniformName());
+}
+
+RESULT OGLProgram::SetViewProjectionMatrix(matrix<float, 4, 4> matViewProjection) {
+	return Set44MatrixUniform(matViewProjection, GetViewProjectionMatrixUniformName());
+}
+
+RESULT OGLProgram::SetNormalMatrix(matrix<float, 4, 4> matNormal) {
+	return Set44MatrixUniform(matNormal, GetNormalMatrixUniformName());
+}
+
+RESULT OGLProgram::SetViewOrientationMatrix(matrix<float, 4, 4> matViewOrientaton) {
+	return Set44MatrixUniform(matViewOrientaton, GetViewOrientationMatrixUniformName());
 }
 
 /*

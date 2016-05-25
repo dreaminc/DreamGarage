@@ -45,10 +45,11 @@ public:
 	// TODO: Uniform Blocks (uniforms in general?) should be pushed into OpenGL program
 	// Nearly all of these can just be pushed into the OpenGLShader using a uniform/block/attribute registration system
 	virtual RESULT BindAttributes() = 0;
-	virtual RESULT BindUniformBlocks() = 0;
-	virtual RESULT GetUniformLocationsFromShader() = 0;
-	virtual RESULT InitializeUniformBlocks() = 0;
-	virtual RESULT UpdateUniformBlockBuffers() = 0;
+	
+	//virtual RESULT BindUniformBlocks() = 0;
+	//virtual RESULT GetUniformLocationsFromShader() = 0;
+	//virtual RESULT InitializeUniformBlocks() = 0;
+	//virtual RESULT UpdateUniformBlockBuffers() = 0;
 	//virtual RESULT EnableAttributes() = 0;
 
 	RESULT Compile(void);

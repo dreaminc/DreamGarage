@@ -21,7 +21,7 @@ public:
 	//~OGLVertexShader(void);
 
 	//RESULT GetAttributeLocationsFromShader();
-	RESULT GetUniformLocationsFromShader();
+	//RESULT GetUniformLocationsFromShader();
 
 	// Vertex Attributes
 	RESULT GetVertexAttributesFromShader();
@@ -30,17 +30,6 @@ public:
 	RESULT BindAttributes();
 
 public:
-	const char *GetEyePositionUniformName() { return "u_vec4Eye"; }
-	const char *GetModelMatrixUniformName() { return "u_mat4Model";  }
-	const char *GetViewMatrixUniformName() { return "u_mat4View"; }
-	const char *GetProjectionMatrixUniformName() { return "u_mat4Projection"; }
-	const char *GetModelViewMatrixUniformName() { return "u_mat4ModelView"; }
-	const char *GetViewProjectionMatrixUniformName() { return "u_mat4ViewProjection"; }
-	const char *GetNormalMatrixUniformName() { return "u_mat4Normal"; }
-	const char *GetViewOrientationMatrixUniformName() { return "u_mat4ViewOrientation";  }
-
-	const char *GetLightsUniformBlockName() { return "ub_LightArray"; }
-
 	GLint GetEyePositionUniformIndex();
 	GLint GetModelMatrixUniformIndex();
 	GLint GetViewMatrixUniformIndex();
@@ -58,14 +47,16 @@ public:
 	RESULT SetNormalMatrixUniform(matrix<float, 4, 4> matNormal);
 	RESULT SetViewOrientationMatrixUniform(matrix<float, 4, 4> matViewOrientaton);
 
+	/*
 	GLint GetLightsUniformBlockBufferIndex();
 	GLint GetLightsUniformBlockIndex();
 	GLint GetLightsUniformBlockBindingPoint();
+	*/
 
 	// TODO: Create OGLAttributes, OGLUniform, OGLUniformBlock objects instead
-	RESULT BindUniformBlocks();
-	RESULT InitializeUniformBlocks();
-	RESULT UpdateUniformBlockBuffers();
+	//RESULT BindUniformBlocks();
+	//RESULT InitializeUniformBlocks();
+	//RESULT UpdateUniformBlockBuffers();
 
 	// TODO: [SHADER] This should be redesigned
 	/*
@@ -104,8 +95,6 @@ private:
 	GLint m_uniformBlockLightsIndex;
 	GLint m_uniformBlockLightsBindingPoint;
 	*/
-
-	OGLLightsBlock *m_pLightsBlock;
 };
 
 #endif // ! OGL_VERTEX_SHADER_H_

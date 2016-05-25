@@ -4,8 +4,7 @@
 OGLVertexShader::OGLVertexShader(OGLProgram *pParentProgram) :
 	OpenGLShader(pParentProgram, GL_VERTEX_SHADER)
 {
-	// TODO: This needs to be fixed so that LightsBlock is created in the OGLprogram (not hard coded
-	m_pLightsBlock = new OGLLightsBlock(pParentProgram);
+	// empty
 }
 
 RESULT OGLVertexShader::InitializeAttributes() {
@@ -42,33 +41,6 @@ Error:
 	return r;
 }
 
-RESULT OGLVertexShader::BindUniformBlocks() {
-	RESULT r = R_PASS;
-
-	CRM(m_pLightsBlock->BindUniformBlock(), "Failed to bind %s to lights uniform block", GetLightsUniformBlockName());
-
-Error:
-	return r;
-}
-
-RESULT OGLVertexShader::InitializeUniformBlocks() {
-	RESULT r = R_PASS;
-
-	CR(m_pLightsBlock->OGLInitialize());
-
-Error:
-	return r;
-}
-
-RESULT OGLVertexShader::UpdateUniformBlockBuffers() {
-	RESULT r = R_PASS;
-
-	CR(m_pLightsBlock->UpdateOGLUniformBlockBuffers());
-
-Error:
-	return r;
-}
-
 
 RESULT OGLVertexShader::GetVertexAttributesFromShader() {
 	RESULT r = R_PASS;
@@ -93,7 +65,7 @@ RESULT OGLVertexShader::GetVertexAttributesFromShader() {
 		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
 
 		OGLVertexAttribute *pOGLVertexAttribute = new OGLVertexAttribute(m_pParentProgram, pszName, results[2], results[1]);
-		m_vertexAttributes.emplace_back(pOGLVertexAttribute);
+		m_vertexAttributes.push_back(pOGLVertexAttribute);
 
 		if (pszName != NULL) {
 			delete[] pszName;
@@ -126,7 +98,7 @@ Error:
 */
 
 // TODO: Don't have this hard coded 
-
+/*/
 RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 	RESULT r = R_PASS;
 
@@ -148,10 +120,7 @@ RESULT OGLVertexShader::GetUniformLocationsFromShader() {
 Error:
 	return r;
 }
-
-RESULT OGLVertexShader::SetLights(std::vector<light*> *pLights) {
-	return m_pLightsBlock->SetLights(pLights);
-}
+*/
 
 GLint OGLVertexShader::GetEyePositionUniformIndex() {
 	return m_uniformEyePositionIndex;
@@ -177,6 +146,7 @@ GLint OGLVertexShader::GetNormalMatrixUniformIndex() {
 	return m_uniformNormalMatrixIndex;
 }
 
+/*
 GLint OGLVertexShader::GetLightsUniformBlockBufferIndex() {
 	//return m_uniformBlockLightsIndex;
 	return m_pLightsBlock->GetBufferIndex();
@@ -191,37 +161,4 @@ GLint OGLVertexShader::GetLightsUniformBlockBindingPoint() {
 	//return m_uniformBlockLightsBindingPoint;
 	return m_pLightsBlock->GetBindingPoint();
 }
-
-// Set Matrix Functions
-// TODO: This should be generalized 
-RESULT OGLVertexShader::SetEyePositionUniform(point ptEye) {
-	return SetPointUniform(ptEye, GetEyePositionUniformName());
-}
-
-RESULT OGLVertexShader::SetModelMatrixUniform(matrix<float, 4, 4> matModel) {
-	return Set44MatrixUniform(matModel, GetModelMatrixUniformName());
-}
-
-RESULT OGLVertexShader::SetViewMatrixUniform(matrix<float, 4, 4> matView) {
-	return Set44MatrixUniform(matView, GetViewMatrixUniformName());
-}
-
-RESULT OGLVertexShader::SetProjectionMatrixUniform(matrix<float, 4, 4> matProjection) {
-	return Set44MatrixUniform(matProjection, GetProjectionMatrixUniformName());
-}
-
-RESULT OGLVertexShader::SetModelViewMatrixUniform(matrix<float, 4, 4> matModelView) {
-	return Set44MatrixUniform(matModelView, GetModelViewMatrixUniformName());
-}
-
-RESULT OGLVertexShader::SetViewProjectionMatrixUniform(matrix<float, 4, 4> matViewProjection) {
-	return Set44MatrixUniform(matViewProjection, GetViewProjectionMatrixUniformName());
-}
-
-RESULT OGLVertexShader::SetNormalMatrixUniform(matrix<float, 4, 4> matNormal) {
-	return Set44MatrixUniform(matNormal, GetNormalMatrixUniformName());
-}
-
-RESULT OGLVertexShader::SetViewOrientationMatrixUniform(matrix<float, 4, 4> matViewOrientaton) {
-	return Set44MatrixUniform(matViewOrientaton, GetViewOrientationMatrixUniformName());
-}
+*/

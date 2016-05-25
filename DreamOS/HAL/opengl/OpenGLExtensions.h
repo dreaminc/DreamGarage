@@ -134,6 +134,10 @@ public:
 	inline void glBindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
 		return m_glBindBufferBase(target, bindingPointIndex, bufferIndex);
 	}
+
+	inline void glGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar *const*uniformNames, GLuint *uniformIndices) {
+		return m_glGetUniformIndices(program, uniformCount, uniformNames, uniformIndices);
+	}
 	
 	// Attributes
 	inline GLint glGetAttribLocation(GLuint programID, const GLchar *pszName) {
@@ -359,6 +363,7 @@ private:
 	PFNGLGETUNIFORMBLOCKINDEXPROC m_glGetUniformBlockIndex;
 	PFNGLUNIFORMBLOCKBINDINGPROC m_glUniformBlockBinding;
 	PFNGLBINDBUFFERBASEPROC m_glBindBufferBase;
+	PFNGLGETUNIFORMINDICESPROC m_glGetUniformIndices;
 
 	// Attributes
 	PFNGLGETATTRIBLOCATIONPROC m_glGetAttribLocation;

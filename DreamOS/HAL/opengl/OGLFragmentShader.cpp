@@ -6,7 +6,7 @@
 OGLFragmentShader::OGLFragmentShader(OGLProgram *pParentProgram) :
 	OpenGLShader(pParentProgram, GL_FRAGMENT_SHADER)
 {
-	m_pMaterialBlock = new OGLMaterialBlock(pParentProgram);
+	// empty
 }
 
 RESULT OGLFragmentShader::BindAttributes() {
@@ -30,6 +30,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT OGLFragmentShader::GetUniformLocationsFromShader() {
 	RESULT r = R_PASS;
 
@@ -46,7 +47,9 @@ RESULT OGLFragmentShader::GetUniformLocationsFromShader() {
 Error:
 	return r;
 }
+*/
 
+/*
 // TODO: Uniform blocks should be OpenGL Program layer
 RESULT OGLFragmentShader::BindUniformBlocks() {
 	RESULT r = R_PASS;
@@ -74,10 +77,7 @@ RESULT OGLFragmentShader::UpdateUniformBlockBuffers() {
 Error:
 	return r;
 }
-
-RESULT OGLFragmentShader::SetMaterial(material *pMaterial) {
-	return m_pMaterialBlock->SetMaterial(pMaterial);
-}
+*/
 
 RESULT OGLFragmentShader::SetTexture(OGLTexture *pTexture) {
 	RESULT r = R_PASS;

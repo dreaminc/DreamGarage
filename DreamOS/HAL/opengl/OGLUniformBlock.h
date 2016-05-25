@@ -15,7 +15,7 @@ class OGLProgram;
 
 class OGLUniformBlock : public GLSLObject {
 public:
-	OGLUniformBlock(OGLProgram *pParentProgram);
+	OGLUniformBlock(OGLProgram *pParentPRogram, GLint dataSize, const char *pszName);
 
 	RESULT OGLInitialize();
 
@@ -36,10 +36,18 @@ public:
 	RESULT SetBindingPoint(GLint bindingPointIndex);
 	GLint GetBindingPoint();
 
+	const char* GetUniformBlockName() {
+		return m_strUniformBlockName.c_str();
+	}
+
 private:
-	GLuint m_uniformBlockBufferIndex;
+	std::string m_strUniformBlockName;
+
 	GLint m_uniformBlockIndex;
+	GLuint m_uniformBlockBufferIndex;
 	GLint m_uniformBlockBindingPoint;
+
+	GLint m_uniformBlockDataSize;
 };
 
 #endif // !OGL_UNIFORM_BLOCK_H_

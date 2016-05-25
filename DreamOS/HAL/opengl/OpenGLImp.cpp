@@ -164,7 +164,7 @@ RESULT OpenGLImp::PrepareScene() {
 	//CRM(m_pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
 	//CRM(m_pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", m_versionOGL), "Failed to initialzie OGL minimal Program");
 	//CRM(m_pOGLProgram->OGLInitialize(L"minimalTexture.vert", L"minimalTexture.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
-	CRM(m_pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
+	CRM(m_pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", m_versionOGL), "Failed to initialzie OGL blinnPhong Program");
 	//CRM(m_pOGLProgram->OGLInitialize(L"blinnPhongTexTBNBump.vert", L"blinnPhongTexTBNBump.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
 	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
@@ -1044,7 +1044,15 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar *const*uniformNames, GLuint *uniformIndices) {
+	RESULT r = R_PASS;
 
+	m_OpenGLExtensions.glGetUniformIndices(program, uniformCount, uniformNames, uniformIndices);
+	CRM(CheckGLError(), "glGetUniformIndices failed");
+
+Error:
+	return r;
+}
 
 RESULT OpenGLImp::glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation) {
 	RESULT r = R_PASS;

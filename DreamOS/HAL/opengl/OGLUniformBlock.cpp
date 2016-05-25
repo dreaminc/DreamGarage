@@ -2,10 +2,11 @@
 
 #include "OpenGLImp.h"
 
-OGLUniformBlock::OGLUniformBlock(OGLProgram *pParentProgram) :
-	GLSLObject(pParentProgram)
+OGLUniformBlock::OGLUniformBlock(OGLProgram *pParentProgram, GLint dataSize, const char *pszName) :
+	GLSLObject(pParentProgram),
+	m_uniformBlockDataSize(dataSize)
 {
-	/* empty stub */
+	m_strUniformBlockName.assign(pszName);
 }
 
 RESULT OGLUniformBlock::OGLInitialize() {

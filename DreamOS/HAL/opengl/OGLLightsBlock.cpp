@@ -1,8 +1,8 @@
 #include "OGLLightsBlock.h"
 #include "OpenGLImp.h"
 
-OGLLightsBlock::OGLLightsBlock(OGLProgram *pParentProgram) :
-	OGLUniformBlock(pParentProgram)
+OGLLightsBlock::OGLLightsBlock(OGLProgram *pParentProgram, GLint dataSize, const char *pszName) :
+	OGLUniformBlock(pParentProgram, dataSize, pszName)
 {
 	ClearLights();
 	SetBindingPoint(LIGHTS_UNIFORM_BLOCK_BINDING_POINT);

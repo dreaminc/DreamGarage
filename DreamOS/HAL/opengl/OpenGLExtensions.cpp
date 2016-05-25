@@ -94,6 +94,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glBindBufferBase = (PFNGLBINDBUFFERBASEPROC)wglGetProcAddress("glBindBufferBase")),
 		"Failed to initialize glBindBufferBase extension");
 
+	CNMW((m_glGetUniformIndices = (PFNGLGETUNIFORMINDICESPROC)wglGetProcAddress("glGetUniformIndices")),
+		"Failed to initialize glGetUniformIndices extension");
+
 	// Attributes
 	CNMW((m_glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)wglGetProcAddress("glGetAttribLocation")),
 		"Failed to initialize glGetAttribLocation extension");

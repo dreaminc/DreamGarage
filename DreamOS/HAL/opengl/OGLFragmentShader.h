@@ -25,18 +25,19 @@ public:
 	
 	RESULT BindAttributes();
 	RESULT GetAttributeLocationsFromShader();
-	RESULT BindUniformBlocks();
-	RESULT GetUniformLocationsFromShader();
-	RESULT InitializeUniformBlocks();
-	RESULT UpdateUniformBlockBuffers();
+	
+	//RESULT BindUniformBlocks();
+	//RESULT GetUniformLocationsFromShader();
+	//RESULT InitializeUniformBlocks();
+	//RESULT UpdateUniformBlockBuffers();
 
 public:
+	// TODO: Output Attributes for Frag shader?
 	const char *GetColorAttributeName() { return "inF_vec3Color"; }
 	
+	// TODO: Push this to the OGLProgram layer
 	const char *GetColorTextureUniformName() { return "u_textureColor"; }
 	const char *GetBumpTextureUniformName() { return "u_textureBump"; }
-
-	const char *GetMaterialUniformBlockName() { return "ub_material"; }
 
 	GLint GetColorIndex() { return m_ColorIndex; }
 
@@ -47,8 +48,6 @@ public:
 	
 	RESULT SetColorTextureUniform(GLint textureNumber);
 	RESULT SetBumpTextureUniform(GLint textureNumber);
-	
-	RESULT SetMaterial(material *pMaterial);
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj);
 
@@ -56,8 +55,6 @@ private:
 	GLint m_ColorIndex;
 	GLint m_uniformColorTextureIndex;
 	GLint m_uniformBumpTextureIndex;
-
-	OGLMaterialBlock *m_pMaterialBlock;
 };
 
 #endif // ! OGL_FRAGMENT_SHADER_H_

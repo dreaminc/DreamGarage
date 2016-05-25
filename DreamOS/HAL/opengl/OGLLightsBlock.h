@@ -17,7 +17,7 @@
 
 class OGLLightsBlock : public OGLUniformBlock {
 public:
-	OGLLightsBlock(OGLProgram *pParentProgram);
+	OGLLightsBlock(OGLProgram *pParentProgram, GLint dataSize, const char *pszName);
 	~OGLLightsBlock();
 
 	RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
