@@ -18,7 +18,7 @@
 #define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
 
-#ifdef defined(DEBUG_OUT_TO_CONSOLE)
+#if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system
 	#define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
 #elif defined(DEBUG_OUT_TO_WIN_DEBUGGER)
