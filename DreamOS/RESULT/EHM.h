@@ -15,8 +15,8 @@
 
 #include <stdio.h>
 
-#define DEBUG_OUT_TO_CONSOLE
-//#define DEBUG_OUT_TO_WIN_DEBUGGER
+//#define DEBUG_OUT_TO_CONSOLE
+#define DEBUG_OUT_TO_WIN_DEBUGGER
 
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system
@@ -29,7 +29,7 @@
 	#define	OUTPUT_MAX_SIZE	1024
 
 	static char outstr[OUTPUT_MAX_SIZE] = { DEBUGGER_SIGNATURE };
-	#define CONSOLE_OUT(str, ...) do { sprintf_s(outstr + DEBUGGER_SIGNATURE_SIZE, OUTPUT_MAX_SIZE - DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__); if (outstr[0] != '\n' && outstr[0] != '\r') OutputDebugStringA(outstr); } while(0);
+	#define CONSOLE_OUT(str, ...) do { sprintf_s(outstr + DEBUGGER_SIGNATURE_SIZE, OUTPUT_MAX_SIZE - DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__); if (outstr[DEBUGGER_SIGNATURE_SIZE] != '\n' && outstr[DEBUGGER_SIGNATURE_SIZE] != '\r') OutputDebugStringA(outstr); } while(0);
 #endif
 
 
