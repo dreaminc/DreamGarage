@@ -15,8 +15,8 @@
 
 #include <stdio.h>
 
-//#define DEBUG_OUT_TO_CONSOLE
-#define DEBUG_OUT_TO_WIN_DEBUGGER
+#define DEBUG_OUT_TO_CONSOLE
+//#define DEBUG_OUT_TO_WIN_DEBUGGER
 
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system
