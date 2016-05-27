@@ -15,10 +15,13 @@
 #include "Primitives/vector.h"
 #include "Primitives/quaternion.h"
 
+//#include "../OGLTexture.h"
+
 #include <string>
 
 class OpenGLImp;
 class OGLProgram;
+class OGLTexture;
 
 class OGLUniform : public GLSLObject {
 public:
@@ -69,6 +72,20 @@ class OGLUniformMatrix4 : public OGLUniform {
 public:
 	RESULT SetUniform(matrix<float, 4, 4> mat) {
 		return Set44MatrixUniform(mat);
+	}
+};
+
+class OGLUniformSampler2D : public OGLUniform {
+	RESULT SetUniform(OGLTexture *pTexture) {
+		// TODO: DO IT
+		return R_NOT_IMPLEMENTED;
+	}
+};
+
+class OGLUniformSamplerCube : public OGLUniform {
+	RESULT SetUniform(OGLTexture *pTexture) {
+		// TODO: DO IT
+		return R_NOT_IMPLEMENTED;
 	}
 };
 

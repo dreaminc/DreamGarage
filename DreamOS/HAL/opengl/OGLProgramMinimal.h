@@ -7,14 +7,6 @@
 // for a minimal shader that simply takes in a vertex point and color
 // and renders it using the usual suspects of required matrices (no lights, no textures)
 
-/*
-layout(location = 0) in vec4 inV_vec4Position;
-layout(location = 1) in vec4 inV_vec4Color;
-
-uniform mat4 u_mat4Model;
-uniform mat4 u_mat4ViewProjection;
-*/
-
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 

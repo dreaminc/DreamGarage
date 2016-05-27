@@ -284,6 +284,7 @@ RESULT OGLProgram::GetVertexAttributesFromProgram() {
 		auto it = m_registeredProgramShaderVertexAttribute.find(std::string(pszName));
 		if (it != m_registeredProgramShaderVertexAttribute.end()) {
 			*(it->second) = pOGLVertexAttribute;
+			DEBUG_LINEOUT("%s Vertex Attribute found in OGLProgram registry", pszName);
 		}
 
 		if (pszName != NULL) {
@@ -353,6 +354,9 @@ RESULT OGLProgram::GetUniformVariablesFromProgram() {
 		auto it = m_registeredProgramShaderUniforms.find(std::string(pszName));
 		if (it != m_registeredProgramShaderUniforms.end()) {
 			*(it->second) = pOGLUniform;
+		}
+		else {
+			DEBUG_LINEOUT("Warning: %s Uniform NOT found in OGLProgram registry", pszName);
 		}
 
 		if (pszName != NULL) {
@@ -535,7 +539,6 @@ RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {
 	WCR(m_pVertexShader->SetViewOrientationMatrixUniform(matViewOrientation));
 	WCR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
 	WCR(m_pVertexShader->SetEyePositionUniform(ptEye));
-
 	*/
 
 	CR(SetCameraUniforms(pStereoCamera, eye));

@@ -1,7 +1,7 @@
 #include "OGLProgramFactory.h"
 
 #include "OGLProgramMinimal.h"
-//#include "OGLProgramSkybox.h"
+#include "OGLProgramSkybox.h"
 
 OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL) {
 	OGLProgram *pOGLProgram = nullptr;
@@ -14,13 +14,12 @@ OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *p
 			CRM(pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", versionOGL), "Failed to initialize OGL minimal Program");
 		} break;
 
-		/*
+		
 		case OGLPROGRAM_SKYBOX: {
-			pOGLProgram = new OGLProgramMinimal(pParentImp);
+			pOGLProgram = new OGLProgramSkybox(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", versionOGL), "Failed to initialize OGL skybox Program");
 		} break;
-		*/
 
 		/*
 		case OGLPROGRAM_BLINNPHONG: {
