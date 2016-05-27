@@ -7,7 +7,7 @@
 // DreamOS/HAL/OpenGL/OGLLightsBlock.h
 // OpenGL Lights Block - effectively responsible for passing the light data block to the OGLImp
 
-#include "OGLUniformBlock.h"
+#include "shaders/OGLUniformBlock.h"
 
 #include "Primitives/light.h"
 #include <vector>

@@ -29,7 +29,8 @@
 #include "Primitives/DimObj.h"
 #include "Primitives/material.h"
 
-#include "OGLProgram.h"
+//#include "OGLProgram.h"
+#include "OGLProgramFactory.h"
 
 class SandboxApp; 
 class Windows64App;

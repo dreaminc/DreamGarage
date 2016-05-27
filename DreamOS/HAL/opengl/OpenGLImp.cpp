@@ -159,13 +159,15 @@ RESULT OpenGLImp::PrepareScene() {
 	// Clear Background
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-	m_pOGLProgram = new OGLProgram(this);
-	CN(m_pOGLProgram);
+	
 	//CRM(m_pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
 	//CRM(m_pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", m_versionOGL), "Failed to initialzie OGL minimal Program");
 	//CRM(m_pOGLProgram->OGLInitialize(L"minimalTexture.vert", L"minimalTexture.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
-	CRM(m_pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", m_versionOGL), "Failed to initialzie OGL blinnPhong Program");
+	//CRM(m_pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", m_versionOGL), "Failed to initialzie OGL blinnPhong Program");
 	//CRM(m_pOGLProgram->OGLInitialize(L"blinnPhongTexTBNBump.vert", L"blinnPhongTexTBNBump.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
+
+	m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	CN(m_pOGLProgram);
 	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Depth testing

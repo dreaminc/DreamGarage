@@ -29,9 +29,11 @@ Error:
 
 RESULT OGLProgram::SetLights(std::vector<light*> *pLights) {
 	RESULT r = R_PASS;
-
-	CR(m_pLightsBlock->SetLights(pLights));
-	CR(m_pLightsBlock->UpdateOGLUniformBlockBuffers());
+	
+	if (m_pLightsBlock != nullptr) {
+		CR(m_pLightsBlock->SetLights(pLights));
+		CR(m_pLightsBlock->UpdateOGLUniformBlockBuffers());
+	}
 
 Error:
 	return r;
@@ -40,8 +42,10 @@ Error:
 RESULT OGLProgram::SetMaterial(material *pMaterial) {
 	RESULT r = R_PASS;
 
-	CR(m_pMaterialsBlock->SetMaterial(pMaterial));
-	CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
+	if (m_pMaterialsBlock != nullptr) {
+		CR(m_pMaterialsBlock->SetMaterial(pMaterial));
+		CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
+	}
 
 Error:
 	return r;
@@ -122,19 +126,20 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 
 	// Uniform Blocks
 	CR(GetUniformBlocksFromProgram());
+	CR(BindUniformBlocks());
+	CR(InitializeUniformBlocks());
 
 	//WCR(m_pVertexShader->GetUniformLocationsFromShader());
-	WCR(m_pVertexShader->BindUniformBlocks());
-	WCR(m_pVertexShader->InitializeUniformBlocks());
+	//WCR(m_pVertexShader->BindUniformBlocks());
+	//WCR(m_pVertexShader->InitializeUniformBlocks());
 
 	//WCR(m_pFragmentShader->GetUniformLocationsFromShader());
-	WCR(m_pFragmentShader->BindUniformBlocks());
-	WCR(m_pFragmentShader->InitializeUniformBlocks());
+	//WCR(m_pFragmentShader->BindUniformBlocks());
+	//WCR(m_pFragmentShader->InitializeUniformBlocks());
 
 
 	// TODO:  Currently using a global material 
-	m_pFragmentShader->SetMaterial(&material(160.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
-	m_pFragmentShader->UpdateUniformBlockBuffers();
+	SetMaterial(&material(160.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 
 Error:
 	return r;
@@ -220,6 +225,18 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::RegisterUniform(OGLUniform **pOGLUniform, std::string strUniformName) {
+	RESULT r = R_PASS;
+
+	auto it = m_registeredProgramShaderUniforms.find(strUniformName);
+	CBM((it == m_registeredProgramShaderUniforms.end()), "Uniform %s already registered", strUniformName);
+
+	m_registeredProgramShaderUniforms[strUniformName] = (pOGLUniform);
+
+Error:
+	return r;
+}
+
 RESULT OGLProgram::GetUniformVariablesFromProgram() {
 	RESULT r = R_PASS;
 
@@ -245,6 +262,11 @@ RESULT OGLProgram::GetUniformVariablesFromProgram() {
 
 		OGLUniform *pOGLUniform = new OGLUniform(this, pszName, pResults[2], pResults[1]);
 		m_uniformVariables.push_back(pOGLUniform);
+
+		auto it = m_registeredProgramShaderUniforms.find(std::string(pszName));
+		if (it != m_registeredProgramShaderUniforms.end()) {
+			*(it->second) = pOGLUniform;
+		}
 
 		if (pszName != NULL) {
 			delete[] pszName;
@@ -393,15 +415,19 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
 
 	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
-	auto matModel = pDimObj->GetModelMatrix();
-	m_pVertexShader->SetModelMatrixUniform(matModel);
+	//auto matModel = pDimObj->GetModelMatrix();
+	//m_pVertexShader->SetModelMatrix(matModel);
 
 	/* TODO: This should be replaced with a materials store or OGLMaterial that pre-allocates and swaps binding points (Wait for textures)
 	m_pFragmentShader->SetMaterial(pDimObj->GetMaterial());
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 	//*/
 
+	SetObjectUniforms(pDimObj);
+
+	/*
 	m_pFragmentShader->SetObjectTextures(pOGLObj);
+	*/
 
 	return pOGLObj->Render();
 }
@@ -410,6 +436,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
+	/*
 	auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
 	auto matP = pStereoCamera->GetProjectionMatrix();
@@ -422,8 +449,9 @@ RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {
 	WCR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
 	WCR(m_pVertexShader->SetEyePositionUniform(ptEye));
 
-	// TODO: Better handle this
-	r = R_PASS;
+	*/
+
+	CR(SetCameraUniforms(pStereoCamera, eye));
 
 Error:
 	return r;
@@ -432,6 +460,7 @@ Error:
 RESULT OGLProgram::SetCamera(camera *pCamera) {
 	RESULT r = R_PASS;
 
+	/*
 	auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
 	auto matP = pCamera->GetProjectionMatrix();
@@ -443,9 +472,9 @@ RESULT OGLProgram::SetCamera(camera *pCamera) {
 	WCR(m_pVertexShader->SetViewOrientationMatrixUniform(matViewOrientation));
 	WCR(m_pVertexShader->SetViewProjectionMatrixUniform(matVP));
 	WCR(m_pVertexShader->SetEyePositionUniform(ptEye));
+	*/
 
-	// TODO: Better handle this
-	r = R_PASS;
+	CR(SetCameraUniforms(pCamera));
 
 Error:
 	return r;
@@ -489,6 +518,7 @@ Error:
 
 
 // Set Matrix Functions
+/*
 RESULT OGLProgram::SetEyePosition(point ptEye) {
 	return SetPointUniform(ptEye, GetEyePositionUniformName());
 }
@@ -520,6 +550,7 @@ RESULT OGLProgram::SetNormalMatrix(matrix<float, 4, 4> matNormal) {
 RESULT OGLProgram::SetViewOrientationMatrix(matrix<float, 4, 4> matViewOrientaton) {
 	return Set44MatrixUniform(matViewOrientaton, GetViewOrientationMatrixUniformName());
 }
+*/
 
 /*
 // TODO: Re-design using attribute registration approach

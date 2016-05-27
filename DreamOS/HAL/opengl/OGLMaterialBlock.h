@@ -7,7 +7,7 @@
 // DreamOS/HAL/OpenGL/OGLMaterialBlock.h
 // OpenGL Material Block - This is a block representing the current material
 
-#include "OGLUniformBlock.h"
+#include "shaders/OGLUniformBlock.h"
 
 #include "Primitives/material.h"
 #include <vector>

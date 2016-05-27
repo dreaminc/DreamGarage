@@ -36,9 +36,6 @@
     <Filter Include="HAL\opengl">
       <UniqueIdentifier>{250a02de-03cb-461d-9d83-ff8a1ff56fc6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="HAL\opengl\GLSL">
-      <UniqueIdentifier>{ad42cc41-1d80-4c6d-8048-f3c57f04dae6}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Core">
       <UniqueIdentifier>{4f039fdc-08f8-43f4-88a5-313b7ed34769}</UniqueIdentifier>
     </Filter>
@@ -53,12 +50,6 @@
     </Filter>
     <Filter Include="HAL\opengl\GL">
       <UniqueIdentifier>{d90f805b-bf9a-4f40-9742-e7bb02818c72}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL\opengl\GLSL\v400">
-      <UniqueIdentifier>{f27b7344-cb72-4d25-befe-543ced6e4527}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL\opengl\GLSL\v440">
-      <UniqueIdentifier>{7f1c2dc0-01a8-4076-a88c-4315fbe75d6d}</UniqueIdentifier>
     </Filter>
     <Filter Include="External">
       <UniqueIdentifier>{82d7a177-6e17-489e-8f48-0f30a427b8fd}</UniqueIdentifier>
@@ -99,6 +90,18 @@
     <Filter Include="HMD\Oculus">
       <UniqueIdentifier>{a53afd0a-b5a4-4b9b-80ab-050429f6f805}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HAL\opengl\shaders">
+      <UniqueIdentifier>{e0da08a9-31cd-4af0-98a1-edfdec0ab066}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl\shaders\GLSL">
+      <UniqueIdentifier>{3bf90752-857f-43d2-a095-f33ca2e68b6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl\shaders\GLSL\v400">
+      <UniqueIdentifier>{4122d50c-6ec2-4425-aca8-8175db942fc1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\opengl\shaders\GLSL\v440">
+      <UniqueIdentifier>{0405a75c-6f11-4a68-b9ec-d514c26e465c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -116,9 +119,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OpenGLShader.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp">
       <Filter>Sandbox\Windows</Filter>
     </ClCompile>
@@ -133,12 +133,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\point.cpp">
       <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLVertexShader.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLFragmentShader.cpp">
-      <Filter>HAL\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp">
       <Filter>Sandbox\Windows</Filter>
@@ -175,9 +169,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\version.cpp">
       <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLUniformBlock.cpp">
-      <Filter>HAL\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp">
       <Filter>HAL\opengl</Filter>
@@ -224,11 +215,29 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLVertexAttribute.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLFragmentShader.cpp">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.cpp">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.cpp">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.cpp">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniform.cpp">
+      <Filter>HAL\opengl\shaders</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -298,9 +307,6 @@
     <ClInclude Include="..\..\..\HAL\HALImp.h">
       <Filter>HAL</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OpenGLShader.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
@@ -348,12 +354,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Core\config.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLVertexShader.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLFragmentShader.h">
-      <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h">
       <Filter>Primitives</Filter>
@@ -463,9 +463,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLUniformBlock.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\sphere.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -556,13 +553,31 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLVertexAttribute.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLUniform.h">
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLFragmentShader.h">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniform.h">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.h">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.h">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.h">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OpenGLShader.h">
+      <Filter>HAL\opengl\shaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
@@ -576,41 +591,41 @@
     <None Include="..\..\..\Primitives\.DS_Store">
       <Filter>Primitives</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.frag">
-      <Filter>HAL\opengl\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v400\minimal.vert">
-      <Filter>HAL\opengl\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.frag">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimal.vert">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\skybox.frag">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexTBNBump.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\skybox.vert">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexTBNBump.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhongTexTBNBump.frag">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhongTexTBNBump.vert">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhong.frag">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\blinnPhong.vert">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimalTexture.vert">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\GLSL\v440\minimalTexture.frag">
-      <Filter>HAL\opengl\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

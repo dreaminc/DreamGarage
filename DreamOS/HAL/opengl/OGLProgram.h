@@ -8,6 +8,7 @@
 // OpenGL Program class
 
 #include <vector>
+#include <map>
 
 #include "OpenGLCommon.h"
 
@@ -15,12 +16,16 @@
 #include "Primitives/light.h"
 #include "Primitives/stereocamera.h"
 
-#include "OpenGLShader.h"
-#include "OGLVertexShader.h"
-#include "OGLFragmentShader.h"
+#include "shaders/OpenGLShader.h"
+#include "shaders/OGLVertexShader.h"
+#include "shaders/OGLFragmentShader.h"
 
-#include "OGLUniform.h"
-#include "OGLUniformBlock.h"
+#include "shaders/OGLUniform.h"
+#include "shaders/OGLUniformBlock.h"
+
+// TODO: This will go into a specific OGLProgram
+#include "OGLLightsBlock.h"
+#include "OGLMaterialBlock.h"
 
 class OpenGLImp;
 class OGLVertexAttribute;
@@ -31,7 +36,7 @@ public:
 	OGLProgram(OpenGLImp *pParentImp);
 	~OGLProgram();
 
-	RESULT OGLInitialize();
+	virtual RESULT OGLInitialize();
 	RESULT OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionFile);
 	
 	RESULT CreateProgram();
@@ -61,6 +66,10 @@ public:
 	
 	RESULT SetCamera(camera *pCamera);
 	RESULT SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye);
+
+	virtual RESULT SetObjectUniforms(DimObj *pDimObj) = 0;
+	virtual RESULT SetCameraUniforms(camera *pCamera) = 0;
+	virtual RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) = 0;
 	
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *pShaderID);
@@ -90,7 +99,7 @@ public:
 
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 
-private:
+protected:
 	OpenGLImp *m_pParentImp;
 
 	version m_versionOGL;
@@ -106,15 +115,20 @@ private:
 	//std::vector<OGLVertexAttribute*> m_OGLVertexAttributes;
 
 	// Uniforms
+	RESULT RegisterUniform(OGLUniform **pOGLUniform, std::string strUniformName);
+	std::map<std::string, OGLUniform**> m_registeredProgramShaderUniforms;
 	std::vector<OGLUniform*> m_uniformVariables;
-	std::vector<OGLUniformBlock*> m_uniformBlocks;
 
-	// Structural Uniform Blocks
+	// Uniform Blocks
+	std::vector<OGLUniformBlock*> m_uniformBlocks;
+	
+	// TODO: This should go into the actual OGLProgram implementation
+	///*
 	const char *GetLightsUniformBlockName() { return "ub_Lights"; }
 	const char *GetMaterialsUniformBlockName() { return "ub_material"; }
-
 	OGLLightsBlock *m_pLightsBlock;
 	OGLMaterialBlock *m_pMaterialsBlock;
+	//*/
 
 	RESULT UpdateUniformBlockBuffers();
 	RESULT BindUniformBlocks();
