@@ -26,4 +26,9 @@ private:
 	GLint m_GLType;
 };
 
+// Explicit specialziation (instead of using templates)
+class OGLVertexAttributeVector : public OGLVertexAttribute {};
+class OGLVertexAttributePoint : public OGLVertexAttribute {};
+class OGLVertexAttributeColor : public OGLVertexAttribute {};
+
 #endif // ! OGL_VERTEX_ATTRIBUTE_H_

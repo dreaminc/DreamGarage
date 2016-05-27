@@ -114,9 +114,9 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 	// TODO: This could all be done in one call in the OGLShader honestly
 	// Attributes
 	// TODO: Tabulate attributes (get them from shader, not from class)
-	WCR(m_pVertexShader->GetVertexAttributesFromShader());
+	WCR(GetVertexAttributesFromProgram());
+	WCR(BindAttributes());
 	//WCR(m_pVertexShader->GetAttributeLocationsFromShader());
-	WCR(m_pVertexShader->BindAttributes());
 	//WCR(m_pVertexShader->EnableAttributes());
 
 	//CR(PrintActiveAttributes());
@@ -210,6 +210,93 @@ RESULT OGLProgram::UseProgram() {
 Error:
 	return r;
 }
+
+// Vertex Attributes
+RESULT OGLProgram::RegisterVertexAttribute(OGLVertexAttribute **pOGLVertexAttribute, std::string strVertexAttributeName) {
+	RESULT r = R_PASS;
+
+	auto it = m_registeredProgramShaderVertexAttribute.find(strVertexAttributeName);
+	CBM((it == m_registeredProgramShaderVertexAttribute.end()), "Uniform %s already registered", strVertexAttributeName);
+
+	m_registeredProgramShaderVertexAttribute[strVertexAttributeName] = (pOGLVertexAttribute);
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeAttributes() {
+	RESULT r = R_PASS;
+
+	CR(GetVertexAttributesFromProgram());
+	CR(BindAttributes());
+	CR(EnableAttributes());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindAttributes() {
+	RESULT r = R_PASS;
+
+	for (auto const& oglVertexAttribute : m_vertexAttributes) {
+		CR(oglVertexAttribute->BindAttribute());
+	}
+
+Error:
+	return r;
+}
+
+// TODO: Don't have this hard coded 
+RESULT OGLProgram::EnableAttributes() {
+	RESULT r = R_PASS;
+
+	for (auto const& oglVertexAttribute : m_vertexAttributes) {
+		CR(oglVertexAttribute->EnableAttribute());
+	}
+
+Error:
+	return r;
+}
+
+
+RESULT OGLProgram::GetVertexAttributesFromProgram() {
+	RESULT r = R_PASS;
+
+	GLint attributes_n;
+	CR(m_pParentImp->glGetProgramInterfaceiv(m_OGLProgramIndex, GL_PROGRAM_INPUT, GL_ACTIVE_RESOURCES, &attributes_n));
+
+	GLenum properties[] = { GL_NAME_LENGTH, GL_TYPE, GL_LOCATION };
+
+	DEBUG_LINEOUT("%d active attributes", attributes_n);
+	for (int i = 0; i < attributes_n; i++) {
+		GLint results[3];
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results));
+
+		GLint pszName_n = results[0] + 1;
+		char *pszName = new char[pszName_n];
+		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, pszName_n, NULL, pszName));
+
+		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
+
+		OGLVertexAttribute *pOGLVertexAttribute = new OGLVertexAttribute(this, pszName, results[2], results[1]);
+		m_vertexAttributes.push_back(pOGLVertexAttribute);
+
+		auto it = m_registeredProgramShaderVertexAttribute.find(std::string(pszName));
+		if (it != m_registeredProgramShaderVertexAttribute.end()) {
+			*(it->second) = pOGLVertexAttribute;
+		}
+
+		if (pszName != NULL) {
+			delete[] pszName;
+			pszName = NULL;
+		}
+	}
+
+Error:
+	return r;
+}
+
+// Uniform Blocks
 
 RESULT OGLProgram::BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
 	RESULT r = R_PASS;

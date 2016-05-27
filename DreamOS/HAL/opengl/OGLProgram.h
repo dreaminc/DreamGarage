@@ -46,8 +46,11 @@ public:
 	RESULT IsProgram();
 
 	// Attributes
-	// TODO: Is this really vertex only?
 	RESULT BindAttribLocation(GLint index, const char* pszName);
+	RESULT GetVertexAttributesFromProgram();
+	RESULT InitializeAttributes();
+	RESULT EnableAttributes();
+	RESULT BindAttributes();
 
 	// Uniform Variables
 	RESULT GetUniformVariablesFromProgram();
@@ -101,18 +104,18 @@ public:
 
 protected:
 	OpenGLImp *m_pParentImp;
-
 	version m_versionOGL;
-
 	GLuint m_OGLProgramIndex;
 
 	// Shaders
 	OGLVertexShader *m_pVertexShader;
 	OGLFragmentShader *m_pFragmentShader;
-	// TODO: Other shaders
+	// TODO: Other shaders ?
 
-	// Vertex Attributes have been pushed into the OGLVertexShader
-	//std::vector<OGLVertexAttribute*> m_OGLVertexAttributes;
+	// Vertex Attributes
+	RESULT RegisterVertexAttribute(OGLVertexAttribute **pOGLVertexAttribute, std::string strVertexAttributeName);
+	std::map<std::string, OGLVertexAttribute**> m_registeredProgramShaderVertexAttribute;
+	std::vector<OGLVertexAttribute*> m_vertexAttributes;
 
 	// Uniforms
 	RESULT RegisterUniform(OGLUniform **pOGLUniform, std::string strUniformName);

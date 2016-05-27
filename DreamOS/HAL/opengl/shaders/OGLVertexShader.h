@@ -24,12 +24,6 @@ public:
 	//RESULT GetAttributeLocationsFromShader();
 	//RESULT GetUniformLocationsFromShader();
 
-	// Vertex Attributes
-	RESULT GetVertexAttributesFromShader();
-	RESULT InitializeAttributes();
-	RESULT EnableAttributes();
-	RESULT BindAttributes();
-
 public:
 	/*
 	GLint GetEyePositionUniformIndex();
@@ -72,7 +66,7 @@ public:
 	*/
 
 private:
-	std::vector<OGLVertexAttribute*> m_vertexAttributes;
+	//std::vector<OGLVertexAttribute*> m_vertexAttributes;
 
 	/*
 	GLint m_uniformEyePositionIndex;
