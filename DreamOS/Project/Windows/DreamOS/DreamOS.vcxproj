@@ -234,6 +234,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />

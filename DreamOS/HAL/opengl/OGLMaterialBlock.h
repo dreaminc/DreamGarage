@@ -19,7 +19,7 @@ public:
 	OGLMaterialBlock(OGLProgram *pParentProgram, GLint dataSize, const char *pszName);
 	~OGLMaterialBlock();
 
-	RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
+	//RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
 
 	RESULT ClearMaterial();
 	RESULT SetMaterial(material *pMaterial);
@@ -50,7 +50,7 @@ private:
 #pragma pack(1)     /* set alignment to 1 byte boundary */
 	struct MaterialBlock {
 		material m_material;
-	} m_materialBlock;
+	};
 #pragma pack(pop)
 };
 

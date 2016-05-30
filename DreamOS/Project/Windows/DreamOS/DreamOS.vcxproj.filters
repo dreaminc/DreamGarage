@@ -583,6 +583,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

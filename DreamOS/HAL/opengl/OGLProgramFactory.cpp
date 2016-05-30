@@ -2,6 +2,7 @@
 
 #include "OGLProgramMinimal.h"
 #include "OGLProgramSkybox.h"
+#include "OGLProgramBlinnPhong.h"
 
 OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL) {
 	OGLProgram *pOGLProgram = nullptr;
@@ -21,13 +22,12 @@ OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *p
 			CRM(pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", versionOGL), "Failed to initialize OGL skybox Program");
 		} break;
 
-		/*
+		
 		case OGLPROGRAM_BLINNPHONG: {
-			pOGLProgram = new OGLProgramMinimal(pParentImp);
+			pOGLProgram = new OGLProgramBlinnPhong(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", versionOGL), "Failed to initialize OGL blinnPhong Program");
 		} break;
-		*/
 
 		/*
 		case OGLPROGRAM_BLINNPHONG_TEXTURE: {

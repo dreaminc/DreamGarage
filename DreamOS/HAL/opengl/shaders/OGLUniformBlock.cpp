@@ -4,7 +4,9 @@
 
 OGLUniformBlock::OGLUniformBlock(OGLProgram *pParentProgram, GLint dataSize, const char *pszName) :
 	GLSLObject(pParentProgram),
-	m_uniformBlockDataSize(dataSize)
+	m_uniformBlockDataSize(dataSize),
+	m_pUniformBufferData(nullptr),
+	m_pUniformBufferData_n(0)
 {
 	m_strUniformBlockName.assign(pszName);
 }
@@ -22,10 +24,17 @@ RESULT OGLUniformBlock::OGLInitialize() {
 
 	// Set the data
 	// TODO: Code reuse from UpdateOGLUniformBlockBuffers
+	/*
 	void *pUniformBufferData = NULL;
 	GLsizeiptr pUniformBufferData_n = 0;
 	CR(GetUniformBlockBuffer(pUniformBufferData, &pUniformBufferData_n));
 	CR(pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
+	*/
+
+	m_pUniformBufferData_n = m_uniformBlockDataSize;
+	m_pUniformBufferData = (void*)malloc(sizeof(float) * m_pUniformBufferData_n);
+	memset(m_pUniformBufferData, 0, sizeof(float) * m_pUniformBufferData_n);
+	CR(pParentImp->glBufferData(GL_UNIFORM_BUFFER, m_pUniformBufferData_n, m_pUniformBufferData, GL_DYNAMIC_DRAW));
 
 	// Bind buffer to binding point
 	CR(pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
@@ -35,6 +44,14 @@ RESULT OGLUniformBlock::OGLInitialize() {
 Error:
 	return r;
 }
+
+// TODO: Mapping done by child - but allocate the space
+// this would no longer be needed 
+/*
+RESULT OGLUniformBlock::GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n) {
+	return R_NOT_IMPLEMENTED;
+}
+*/
 
 RESULT OGLUniformBlock::BindUniformBlock() {
 	RESULT r = R_PASS;
@@ -72,10 +89,16 @@ RESULT OGLUniformBlock::UpdateOGLUniformBlockBuffers() {
 	//CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 
 	// Set the data
+	/*
 	void *pUniformBufferData = NULL;
 	GLsizeiptr pUniformBufferData_n = 0;
 	CR(GetUniformBlockBuffer(pUniformBufferData, &pUniformBufferData_n));
 	(pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
+	*/
+
+	CR(pParentImp->glBufferData(GL_UNIFORM_BUFFER, m_pUniformBufferData_n, m_pUniformBufferData, GL_DYNAMIC_DRAW));
+
+	
 
 	//CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 

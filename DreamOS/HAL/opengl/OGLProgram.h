@@ -64,8 +64,9 @@ public:
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
 
 	RESULT RenderObject(DimObj *pDimObj);
-	RESULT SetLights(std::vector<light*> *pLights);
-	RESULT SetMaterial(material *pMaterial);
+	
+	virtual RESULT SetLights(std::vector<light*> *pLights);
+	virtual RESULT SetMaterial(material *pMaterial);
 	
 	RESULT SetCamera(camera *pCamera);
 	RESULT SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye);
@@ -123,14 +124,16 @@ protected:
 	std::vector<OGLUniform*> m_uniformVariables;
 
 	// Uniform Blocks
+	RESULT RegisterUniformBlock(OGLUniformBlock **pOGLUniformBlock, std::string strUniformBlockName);
+	std::map<std::string, OGLUniformBlock**> m_registeredProgramShaderUniformBlocks;
 	std::vector<OGLUniformBlock*> m_uniformBlocks;
 	
 	// TODO: This should go into the actual OGLProgram implementation
 	///*
-	const char *GetLightsUniformBlockName() { return "ub_Lights"; }
-	const char *GetMaterialsUniformBlockName() { return "ub_material"; }
-	OGLLightsBlock *m_pLightsBlock;
-	OGLMaterialBlock *m_pMaterialsBlock;
+	//const char *GetLightsUniformBlockName() { return "ub_Lights"; }
+	//const char *GetMaterialsUniformBlockName() { return "ub_material"; }
+	//OGLLightsBlock *m_pLightsBlock;
+	//OGLMaterialBlock *m_pMaterialsBlock;
 	//*/
 
 	RESULT UpdateUniformBlockBuffers();

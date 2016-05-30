@@ -7,8 +7,7 @@ OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),
 	m_pFragmentShader(nullptr),
-	m_versionOGL(0),
-	m_pLightsBlock(nullptr)
+	m_versionOGL(0)
 {
 	// empty
 }
@@ -17,6 +16,8 @@ OGLProgram::~OGLProgram() {
 	ReleaseProgram();
 }
 
+// Note that all vertex attrib, uniforms, uniform blocks are actually 
+// allocated in the OGLInitialize function
 RESULT OGLProgram::OGLInitialize() {
 	RESULT r = R_PASS;
 
@@ -28,27 +29,11 @@ Error:
 }
 
 RESULT OGLProgram::SetLights(std::vector<light*> *pLights) {
-	RESULT r = R_PASS;
-	
-	if (m_pLightsBlock != nullptr) {
-		CR(m_pLightsBlock->SetLights(pLights));
-		CR(m_pLightsBlock->UpdateOGLUniformBlockBuffers());
-	}
-
-Error:
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT OGLProgram::SetMaterial(material *pMaterial) {
-	RESULT r = R_PASS;
-
-	if (m_pMaterialsBlock != nullptr) {
-		CR(m_pMaterialsBlock->SetMaterial(pMaterial));
-		CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
-	}
-
-Error:
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT OGLProgram::UpdateUniformBlockBuffers() {
@@ -127,7 +112,7 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 	// Uniform Blocks
 	CR(GetUniformBlocksFromProgram());
 	CR(BindUniformBlocks());
-	CR(InitializeUniformBlocks());
+//	CR(InitializeUniformBlocks());
 
 	//WCR(m_pVertexShader->GetUniformLocationsFromShader());
 	//WCR(m_pVertexShader->BindUniformBlocks());
@@ -325,6 +310,18 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::RegisterUniformBlock(OGLUniformBlock **pOGLUniformBlock, std::string strUniformBlockName) {
+	RESULT r = R_PASS;
+
+	auto it = m_registeredProgramShaderUniformBlocks.find(strUniformBlockName);
+	CBM((it == m_registeredProgramShaderUniformBlocks.end()), "Uniform Block %s already registered", strUniformBlockName);
+
+	m_registeredProgramShaderUniformBlocks[strUniformBlockName] = (pOGLUniformBlock);
+
+Error:
+	return r;
+}
+
 RESULT OGLProgram::GetUniformVariablesFromProgram() {
 	RESULT r = R_PASS;
 
@@ -394,7 +391,7 @@ RESULT OGLProgram::GetUniformBlocksFromProgram() {
 
 		DEBUG_LINEOUT("%-5d %s block index size %d", i, pszName, pResults[1]);
 
-		OGLUniformBlock *pOGLUniformBlock = nullptr;
+		/*OGLUniformBlock *pOGLUniformBlock = nullptr;
 		if (strcmp(pszName, GetMaterialsUniformBlockName()) == 0) {
 			m_pMaterialsBlock = new OGLMaterialBlock(this, pResults[1], pszName);
 			pOGLUniformBlock = m_pMaterialsBlock;
@@ -408,9 +405,22 @@ RESULT OGLProgram::GetUniformBlocksFromProgram() {
 			// first get things to work again
 			// OGLUniformBlock *pOGLUniformBlock = new OGLUniformBlock(this, pResults[1], pszName);
 		}
+		m_uniformBlocks.push_back(pOGLUniformBlock);
+		*/
 
+		//OGLUniformBlock(OGLProgram *pParentPRogram, GLint dataSize, const char *pszName);
+
+		OGLUniformBlock  *pOGLUniformBlock = new OGLUniformBlock(this, pResults[1], pszName);
+		CRM(pOGLUniformBlock->OGLInitialize(), "Failed to bind %s uniform block", pszName);
 		m_uniformBlocks.push_back(pOGLUniformBlock);
 
+		auto it = m_registeredProgramShaderUniformBlocks.find(std::string(pszName));
+		if (it != m_registeredProgramShaderUniformBlocks.end()) {
+			*(it->second) = pOGLUniformBlock;
+		}
+		else {
+			DEBUG_LINEOUT("Warning: %s Uniform Block NOT found in OGLProgram registry", pszName);
+		}
 
 		if (pszName != nullptr) {
 			delete[] pszName;

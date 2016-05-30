@@ -12,6 +12,7 @@ OGLLightsBlock::~OGLLightsBlock() {
 	// empty, everything is static
 }
 
+/*
 RESULT OGLLightsBlock::GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n) {
 	RESULT r = R_PASS;
 
@@ -21,6 +22,7 @@ RESULT OGLLightsBlock::GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeip
 Error:
 	return r;
 }
+*/
 
 RESULT OGLLightsBlock::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
@@ -28,7 +30,10 @@ RESULT OGLLightsBlock::AddLight(LIGHT_TYPE type, light_precision intensity, poin
 	LightBlockLight newLight;
 	memset(&newLight, 0, sizeof(LightBlockLight));
 
-	CBM((m_LightBlock.numActiveLights < MAX_TOTAL_LIGHTS), "Cannot add more than %d lights", MAX_TOTAL_LIGHTS);
+	LightBlock *pLightBlock = reinterpret_cast<LightBlock*>(m_pUniformBufferData);
+	CN(pLightBlock);
+
+	CBM((pLightBlock->numActiveLights < MAX_TOTAL_LIGHTS), "Cannot add more than %d lights", MAX_TOTAL_LIGHTS);
 
 	newLight.type = type;
 	newLight.power = intensity;
@@ -39,7 +44,7 @@ RESULT OGLLightsBlock::AddLight(LIGHT_TYPE type, light_precision intensity, poin
 	newLight.vectorDirection = vectorDirection;
 
 	//m_LightBlock.lights[m_LightBlock.numActiveLights++] = light(type, intensity, colorDiffuse, colorSpecular, ptOrigin, vectorDirection);
-	m_LightBlock.lights[m_LightBlock.numActiveLights++] = newLight;
+	pLightBlock->lights[pLightBlock->numActiveLights++] = newLight;
 
 Error:
 	return r;
@@ -62,10 +67,16 @@ Error:
 }
 
 RESULT OGLLightsBlock::ClearLights() {
-	memset(&m_LightBlock, 0, sizeof(LightBlock));
-	m_LightBlock.numActiveLights = 0;	// for good measure
+	RESULT r = R_PASS;
 
-	return R_PASS;
+	LightBlock *pLightBlock = reinterpret_cast<LightBlock*>(m_pUniformBufferData);
+	CN(pLightBlock);
+
+	memset(pLightBlock, 0, sizeof(LightBlock));
+	pLightBlock->numActiveLights = 0;	// for good measure
+
+Error:
+	return r;
 }
 
 RESULT OGLLightsBlock::SetLights(std::vector<light*> *pLights) {

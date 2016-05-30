@@ -27,7 +27,7 @@ public:
 
 	RESULT BindUniformBlock();
 	
-	virtual RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferDatA_n) = 0;
+	//virtual RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
 
 	RESULT SetBufferIndex(GLint bufferIndex);
 	GLint GetBufferIndex();
@@ -50,6 +50,10 @@ private:
 	GLint m_uniformBlockBindingPoint;
 
 	GLint m_uniformBlockDataSize;
+
+protected:
+	void *m_pUniformBufferData; 
+	GLsizeiptr m_pUniformBufferData_n;
 };
 
 #endif // !OGL_UNIFORM_BLOCK_H_

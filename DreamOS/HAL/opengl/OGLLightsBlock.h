@@ -20,7 +20,7 @@ public:
 	OGLLightsBlock(OGLProgram *pParentProgram, GLint dataSize, const char *pszName);
 	~OGLLightsBlock();
 
-	RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
+	//RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
 	
 	RESULT AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	RESULT AddLight(light *pLight);
@@ -55,7 +55,7 @@ private:
 		//light lights[MAX_TOTAL_LIGHTS];
 		LightBlockLight lights[MAX_TOTAL_LIGHTS];
 		GLint numActiveLights;
-	} m_LightBlock;
+	};
 #pragma pack(pop)
 
 };

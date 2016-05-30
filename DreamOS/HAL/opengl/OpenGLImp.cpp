@@ -167,7 +167,8 @@ RESULT OpenGLImp::PrepareScene() {
 	//CRM(m_pOGLProgram->OGLInitialize(L"blinnPhongTexTBNBump.vert", L"blinnPhongTexTBNBump.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
 
 	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
+	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
+	m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	CN(m_pOGLProgram);
 	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
@@ -410,7 +411,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//*/
 
 	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
-	///*
+	/*
 	OGLSkybox *pSkybox = new OGLSkybox(this);
 	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
@@ -468,7 +469,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pModel);
 	//*/
 
-	/*
+	///*
 	OGLSphere *pSphere = NULL;
 
 	int num = 2;
