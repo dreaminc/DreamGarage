@@ -47,6 +47,10 @@ public:
 		return r;
 	}
 
+	RESULT SetObjectTextures(OGLObj *pOGLObj) {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	RESULT SetLights(std::vector<light*> *pLights) {
 		RESULT r = R_PASS;
 

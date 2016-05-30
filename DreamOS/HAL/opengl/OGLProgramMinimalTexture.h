@@ -1,18 +1,21 @@
-#ifndef OGLPROGRAM_MINIMAL_H_
-#define OGLPROGRAM_MINIMAL_H_
+#ifndef OGLPROGRAM_MINIMAL_TEXTURE_H_
+#define OGLPROGRAM_MINIMAL_TEXTURE_H_
 
 // Dream OS
-// DreamOS/HAL/opengl/OGLProgramMinimal.h
-// OGLProgramMinimal is an OGLProgram that encapsulates the OGLProgram 
-// for a minimal shader that simply takes in a vertex point and color
-// and renders it using the usual suspects of required matrices (no lights, no textures)
+// DreamOS/HAL/opengl/OGLProgramMinimalTexture.h
+// OGLProgramMinimalTexture  is an OGLProgram that encapsulates the OGLProgram 
+// for a minimal shader with a color texture that simply takes in a point, color, and UV coord
+// and renders it using the usual suspects of required matrices (no lights)
 
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
+#include "OGLObj.h"
 
-class OGLProgramMinimal : public OGLProgram {
+#include "OGLTexture.h"
+
+class OGLProgramMinimalTexture : public OGLProgram {
 public:
-	OGLProgramMinimal(OpenGLImp *pParentImp) :
+	OGLProgramMinimalTexture(OpenGLImp *pParentImp) :
 		OGLProgram(pParentImp)
 	{
 		// empty
@@ -23,18 +26,32 @@ public:
 
 		CR(OGLProgram::OGLInitialize());
 
+		// Vertex Attributes
 		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
 		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
+		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeUVCoord), std::string("inV_vec2UVCoord")));
 
+		// Uniform Variables
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
 	Error:
 		return r;
 	}
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
-		return R_NOT_IMPLEMENTED;
+		RESULT r = R_PASS;
+
+		OGLTexture *pTexture = nullptr;
+
+		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+			pTexture->OGLActivateTexture();
+			m_pUniformTextureColor->SetUniform(pTexture);
+		}
+
+	Error:
+		return r;
 	}
 
 	RESULT SetObjectUniforms(DimObj *pDimObj) {
@@ -61,9 +78,12 @@ public:
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
 	OGLVertexAttributeColor *m_pVertexAttributeColor;
+	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
 
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+
+	OGLUniformSampler2D *m_pUniformTextureColor;
 };
 
-#endif // ! OGLPROGRAM_MINIMAL_H_
+#endif // ! OGLPROGRAM_MINIMAL_TEXTURE_H_

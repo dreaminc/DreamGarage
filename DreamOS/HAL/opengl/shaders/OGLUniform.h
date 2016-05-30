@@ -15,8 +15,6 @@
 #include "Primitives/vector.h"
 #include "Primitives/quaternion.h"
 
-//#include "../OGLTexture.h"
-
 #include <string>
 
 class OpenGLImp;
@@ -48,45 +46,33 @@ private:
 // Explicit class based specialization (instead of a template based approach)
 class OGLUniformPoint : public OGLUniform {
 public:
-	RESULT SetUniform(point pt) {
-		return SetUniform4fv(reinterpret_cast<GLfloat*>(&pt));
-	}
+	RESULT SetUniform(point pt);
 };
 
 class OGLUniformVector : public OGLUniform {
 public:
-	RESULT SetUniform(vector v) {
-		return SetUniform4fv(reinterpret_cast<GLfloat*>(&v));
-	}
+	RESULT SetUniform(vector v);
 };
 
 class OGLUniformQuaternion : public OGLUniform {
 public:
-	RESULT SetUniform(quaternion q) {
-		return SetUniform4fv(reinterpret_cast<GLfloat*>(&q));
-	}
+	RESULT SetUniform(quaternion q);
 };
 
 // TODO: Generalize this further 
 class OGLUniformMatrix4 : public OGLUniform {
 public:
-	RESULT SetUniform(matrix<float, 4, 4> mat) {
-		return Set44MatrixUniform(mat);
-	}
+	RESULT SetUniform(matrix<float, 4, 4> mat);
 };
 
 class OGLUniformSampler2D : public OGLUniform {
-	RESULT SetUniform(OGLTexture *pTexture) {
-		// TODO: DO IT
-		return R_NOT_IMPLEMENTED;
-	}
+public:
+	RESULT SetUniform(OGLTexture *pTexture);
 };
 
 class OGLUniformSamplerCube : public OGLUniform {
-	RESULT SetUniform(OGLTexture *pTexture) {
-		// TODO: DO IT
-		return R_NOT_IMPLEMENTED;
-	}
+public:
+	RESULT SetUniform(OGLTexture *pTexture);
 };
 
 #endif // ! OGL_UNIFORM_H_

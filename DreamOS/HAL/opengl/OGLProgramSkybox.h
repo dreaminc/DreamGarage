@@ -41,6 +41,10 @@ public:
 		return r;
 	}
 
+	RESULT SetObjectTextures(OGLObj *pOGLObj) {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	RESULT SetObjectUniforms(DimObj *pDimObj) {
 		//auto matModel = pDimObj->GetModelMatrix();
 		//m_pUniformModelMatrix->SetUniform(matModel);

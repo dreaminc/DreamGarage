@@ -71,6 +71,7 @@ public:
 	RESULT SetCamera(camera *pCamera);
 	RESULT SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye);
 
+	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) = 0;
 	virtual RESULT SetObjectUniforms(DimObj *pDimObj) = 0;
 	virtual RESULT SetCameraUniforms(camera *pCamera) = 0;
 	virtual RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) = 0;

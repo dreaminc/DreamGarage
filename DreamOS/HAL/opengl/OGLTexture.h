@@ -128,12 +128,16 @@ public:
 		RESULT r = R_PASS;
 
 		CR(m_pParentImp->MakeCurrentContext());
-		CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
 		
-		CR(m_pParentImp->glActiveTexture(textureNumber));
-		//CR(m_pParentImp->BindTexture(textureTarget, *pTextureIndex));
-		//CR(m_pParentImp->glTexStorage2D(GL_TEXTURE_2D, 1, GL_RGBA8, m_width, m_height));
-		//CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, m_width, m_height, GL_RGBA, GL_UNSIGNED_BYTE, m_pImageBuffer));
+		CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
+
+		//CR(m_pParentImp->glActiveTexture(textureNumber));
+		CR(m_pParentImp->BindTexture(textureTarget, *pTextureIndex));
+
+		// TODO: Pull deeper settings from texture object
+		if (m_pImageBuffer != NULL) {
+			CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
+		}
 
 		// Texture params TODO: Add controls for these 
 		CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
@@ -141,11 +145,7 @@ public:
 		//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
 		//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
 
-		// TODO: Pull deeper settings from texture object
-		if (m_pImageBuffer != NULL) {
-			CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
-		}
-
+		
 		// TODO: Delete the image data here?
 
 	Error:

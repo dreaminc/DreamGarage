@@ -168,7 +168,8 @@ RESULT OpenGLImp::PrepareScene() {
 
 	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
-	m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	CN(m_pOGLProgram);
 	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
@@ -404,10 +405,11 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
 	//*/
 
-	/*
-	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	///*
+	//texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
 	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pColorTexture2 = new OGLTexture(this, L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	//*/
 
 	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
@@ -419,12 +421,18 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pSkybox);
 	//*/
 	
-	/*
+	///*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
-	pVolume->SetBumpTexture(pBumpTexture);
+	//pVolume->SetBumpTexture(pBumpTexture);
 	pSceneGraph->PushObject(pVolume);
 	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
+
+	pVolume = new OGLVolume(this, 1.0f);
+	pVolume->SetColorTexture(pColorTexture2);
+	pVolume->translateX(2.0f);
+	//pVolume->SetBumpTexture(pBumpTexture);
+	pSceneGraph->PushObject(pVolume);
 	//*/
 
 	/*
@@ -469,7 +477,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pModel);
 	//*/
 
-	///*
+	/*
 	OGLSphere *pSphere = NULL;
 
 	int num = 2;
@@ -482,7 +490,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 		for (int j = 0; j < num; j++) {
 			pSphere = new OGLSphere(this, radius, sects, sects);
 
-			//pSphere->SetColorTexture(pColorTexture);
+			pSphere->SetColorTexture(pColorTexture);
 			//pSphere->SetBumpTexture(pBumpTexture);
 
 			//pVolume->SetRandomColor();

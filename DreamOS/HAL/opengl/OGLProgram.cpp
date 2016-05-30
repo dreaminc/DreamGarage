@@ -511,6 +511,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	//*/
 
 	SetObjectUniforms(pDimObj);
+	SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
 
 	/*
 	m_pFragmentShader->SetObjectTextures(pOGLObj);

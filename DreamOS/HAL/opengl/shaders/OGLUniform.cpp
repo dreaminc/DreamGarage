@@ -3,6 +3,8 @@
 #include "../OpenGLImp.h"
 #include "../OGLProgram.h"
 
+#include "../OGLTexture.h"
+
 OGLUniform::OGLUniform(OGLProgram *pParentProgram, const char *pszUniformName, GLint uniformLocationIndex, GLint GLType) :
 	GLSLObject(pParentProgram),
 	m_uniformIndex(uniformLocationIndex),
@@ -62,4 +64,30 @@ RESULT OGLUniform::Set44MatrixUniform(matrix<float, 4, 4> mat) {
 
 Error:
 	return r;
+}
+
+// Explicit class based specialization (instead of a template based approach)
+RESULT OGLUniformPoint::SetUniform(point pt) {
+	return SetUniform4fv(reinterpret_cast<GLfloat*>(&pt));
+}
+
+RESULT OGLUniformVector::SetUniform(vector v) {
+	return SetUniform4fv(reinterpret_cast<GLfloat*>(&v));
+}
+
+RESULT OGLUniformQuaternion::SetUniform(quaternion q) {
+	return SetUniform4fv(reinterpret_cast<GLfloat*>(&q));
+}
+
+// TODO: Generalize this further 
+RESULT OGLUniformMatrix4::SetUniform(matrix<float, 4, 4> mat) {
+	return Set44MatrixUniform(mat);
+}
+
+RESULT OGLUniformSampler2D::SetUniform(OGLTexture *pTexture) {
+	return SetUniformInteger(pTexture->GetGLTextureNumberDefine());
+}
+
+RESULT OGLUniformSamplerCube::SetUniform(OGLTexture *pTexture) {
+	return SetUniformInteger(pTexture->GetOGLTextureIndex());
 }
