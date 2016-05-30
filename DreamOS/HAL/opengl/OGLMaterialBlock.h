@@ -16,7 +16,7 @@
 
 class OGLMaterialBlock : public OGLUniformBlock {
 public:
-	OGLMaterialBlock(OGLProgram *pParentProgram, GLint dataSize, const char *pszName);
+	OGLMaterialBlock(OGLProgram *pParentProgram, GLint dataSize, GLint uniformLocationIndex, const char *pszName);
 	~OGLMaterialBlock();
 
 	//RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);

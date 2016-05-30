@@ -2,11 +2,13 @@
 
 #include "../OpenGLImp.h"
 
-OGLUniformBlock::OGLUniformBlock(OGLProgram *pParentProgram, GLint dataSize, const char *pszName) :
+OGLUniformBlock::OGLUniformBlock(OGLProgram *pParentProgram, GLint dataSize, GLint uniformLocationIndex, const char *pszName) :
 	GLSLObject(pParentProgram),
 	m_uniformBlockDataSize(dataSize),
 	m_pUniformBufferData(nullptr),
-	m_pUniformBufferData_n(0)
+	m_pUniformBufferData_n(0),
+	m_uniformLocationIndex(uniformLocationIndex),
+	m_uniformBlockBindingPoint(uniformLocationIndex)
 {
 	m_strUniformBlockName.assign(pszName);
 }
@@ -32,8 +34,8 @@ RESULT OGLUniformBlock::OGLInitialize() {
 	*/
 
 	m_pUniformBufferData_n = m_uniformBlockDataSize;
-	m_pUniformBufferData = (void*)malloc(sizeof(float) * m_pUniformBufferData_n);
-	memset(m_pUniformBufferData, 0, sizeof(float) * m_pUniformBufferData_n);
+	m_pUniformBufferData = (void*)malloc(m_pUniformBufferData_n);
+	memset(m_pUniformBufferData, 0, m_pUniformBufferData_n);
 	CR(pParentImp->glBufferData(GL_UNIFORM_BUFFER, m_pUniformBufferData_n, m_pUniformBufferData, GL_DYNAMIC_DRAW));
 
 	// Bind buffer to binding point
@@ -56,7 +58,7 @@ RESULT OGLUniformBlock::GetUniformBlockBuffer(void *&pUniformBufferData, GLsizei
 RESULT OGLUniformBlock::BindUniformBlock() {
 	RESULT r = R_PASS;
 
-	CR(m_pParentProgram->BindUniformBlock(m_uniformBlockIndex, m_uniformBlockBindingPoint));
+	CR(m_pParentProgram->BindUniformBlock(m_uniformLocationIndex, m_uniformBlockBindingPoint));
 	
 Error:
 	return r;

@@ -34,7 +34,6 @@ struct Light {
 	vec4 m_vectorDirection; 
 };
 
-/*
 struct Material {
 	float m_shine;
 	float m_bump;
@@ -48,7 +47,6 @@ struct Material {
 layout(std140) uniform ub_material {
     Material material;
 };
-*/
 
 layout(std140) uniform ub_Lights {
 	Light lights[MAX_TOTAL_LIGHTS];
@@ -57,10 +55,9 @@ layout(std140) uniform ub_Lights {
 
 layout (location = 0) out vec4 out_vec4Color;
 
-float g_ambient = 0.1f;
+float g_ambient = 0.01f;
 
-//vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
-vec4 g_vec4AmbientLightLevel = g_ambient * vec4(1.0f);
+vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
 void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in float distanceLight, out float diffuseValue, out float specularValue) {
 	//float attenuation = 1 / pow(distanceLight, 2);
@@ -73,8 +70,7 @@ void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 d
 	///*
 	if(diffuseValue > 0.0f) {
 		vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
-		//specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), material.m_shine) * attenuation;
-		specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), 160) * attenuation;
+		specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), material.m_shine) * attenuation;
 	}
 	else {
 		specularValue = 0.0f;
@@ -95,10 +91,8 @@ void main(void) {
 
 		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, DataIn.distanceLight[i], diffuseValue, specularValue);
-			//vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
-			//vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
-			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse;
-			vec4LightValue += specularValue * lights[i].m_colorSpecular;
+			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
+			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
 		}
 	}
 	vec4LightValue[3] = 1.0f;

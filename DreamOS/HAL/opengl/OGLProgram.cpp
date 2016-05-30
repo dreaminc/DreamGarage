@@ -124,7 +124,7 @@ RESULT OGLProgram::OGLInitialize(const wchar_t *pszVertexShaderFilename, const w
 
 
 	// TODO:  Currently using a global material 
-	SetMaterial(&material(160.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
+	SetMaterial(&material(60.0f, 1.0f, color(COLOR_WHITE), color(COLOR_WHITE), color(COLOR_WHITE)));
 
 Error:
 	return r;
@@ -389,28 +389,14 @@ RESULT OGLProgram::GetUniformBlocksFromProgram() {
 		char *pszName = new char[pszName_n];
 		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, pszName_n, NULL, pszName));
 
+		// For debug - can remove if needed or wrap in debug
+		GLint uniformBlockIndex = 0;
+		CR(m_pParentImp->glGetUniformBlockIndex(m_OGLProgramIndex, pszName, &uniformBlockIndex));
+		CBM((uniformBlockIndex == i), "Uniform location index %d and counter %d mistmatch", uniformBlockIndex, i);
+
 		DEBUG_LINEOUT("%-5d %s block index size %d", i, pszName, pResults[1]);
 
-		/*OGLUniformBlock *pOGLUniformBlock = nullptr;
-		if (strcmp(pszName, GetMaterialsUniformBlockName()) == 0) {
-			m_pMaterialsBlock = new OGLMaterialBlock(this, pResults[1], pszName);
-			pOGLUniformBlock = m_pMaterialsBlock;
-		}
-		else if (strcmp(pszName, GetLightsUniformBlockName()) == 0) {
-			m_pLightsBlock = new OGLLightsBlock(this, pResults[1], pszName);
-			pOGLUniformBlock = m_pLightsBlock;
-		}
-		else {
-			// TODO: Do we just create the buffer in OGLUniformBlock?
-			// first get things to work again
-			// OGLUniformBlock *pOGLUniformBlock = new OGLUniformBlock(this, pResults[1], pszName);
-		}
-		m_uniformBlocks.push_back(pOGLUniformBlock);
-		*/
-
-		//OGLUniformBlock(OGLProgram *pParentPRogram, GLint dataSize, const char *pszName);
-
-		OGLUniformBlock  *pOGLUniformBlock = new OGLUniformBlock(this, pResults[1], pszName);
+		OGLUniformBlock  *pOGLUniformBlock = new OGLUniformBlock(this, pResults[1], i, pszName);
 		CRM(pOGLUniformBlock->OGLInitialize(), "Failed to bind %s uniform block", pszName);
 		m_uniformBlocks.push_back(pOGLUniformBlock);
 
