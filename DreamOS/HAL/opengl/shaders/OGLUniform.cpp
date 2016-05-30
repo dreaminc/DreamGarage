@@ -85,7 +85,9 @@ RESULT OGLUniformMatrix4::SetUniform(matrix<float, 4, 4> mat) {
 }
 
 RESULT OGLUniformSampler2D::SetUniform(OGLTexture *pTexture) {
-	return SetUniformInteger(pTexture->GetGLTextureNumberDefine());
+	//return SetUniformInteger(pTexture->GetGLTextureNumberDefine());
+	//return SetUniformInteger(0);
+	return SetUniformInteger(pTexture->GetTextureNumber());
 }
 
 RESULT OGLUniformSamplerCube::SetUniform(OGLTexture *pTexture) {

@@ -10,7 +10,6 @@
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 #include "OGLObj.h"
-
 #include "OGLTexture.h"
 
 class OGLProgramMinimalTexture : public OGLProgram {
