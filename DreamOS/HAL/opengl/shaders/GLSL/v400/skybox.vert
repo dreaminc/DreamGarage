@@ -1,9 +1,8 @@
-// minimal.vert
+// skybox.vert
 // shadertype=glsl
 
 #version 400 core
 
-// TODO: Move to a uniform block
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;
 layout (location = 2) in vec4 inV_vec4Normal;
