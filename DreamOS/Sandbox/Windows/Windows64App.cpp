@@ -413,7 +413,9 @@ RESULT Windows64App::ShowSandbox() {
 		}
 
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
+		//m_pOpenGLImp->Render(m_pSceneGraph);
 
+		///*
 		// Send to the HMD
 		if (m_pHMD != nullptr) {
 			m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
@@ -424,6 +426,7 @@ RESULT Windows64App::ShowSandbox() {
 			// Render Scene
 			m_pOpenGLImp->Render(m_pSceneGraph);
 		}
+		//*/
 	
 		// Swap buffers
 		SwapBuffers(m_hDC);

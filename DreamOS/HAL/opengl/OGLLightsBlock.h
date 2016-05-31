@@ -7,7 +7,7 @@
 // DreamOS/HAL/OpenGL/OGLLightsBlock.h
 // OpenGL Lights Block - effectively responsible for passing the light data block to the OGLImp
 
-#include "OGLUniformBlock.h"
+#include "shaders/OGLUniformBlock.h"
 
 #include "Primitives/light.h"
 #include <vector>
@@ -17,10 +17,10 @@
 
 class OGLLightsBlock : public OGLUniformBlock {
 public:
-	OGLLightsBlock(OpenGLImp *pParentImp);
+	OGLLightsBlock(OGLProgram *pParentProgram, GLint dataSize, GLint uniformLocationIndex, const char *pszName);
 	~OGLLightsBlock();
 
-	RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
+	//RESULT GetUniformBlockBuffer(void *&pUniformBufferData, GLsizeiptr *pUniformBufferData_n);
 	
 	RESULT AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	RESULT AddLight(light *pLight);
@@ -55,7 +55,7 @@ private:
 		//light lights[MAX_TOTAL_LIGHTS];
 		LightBlockLight lights[MAX_TOTAL_LIGHTS];
 		GLint numActiveLights;
-	} m_LightBlock;
+	};
 #pragma pack(pop)
 
 };

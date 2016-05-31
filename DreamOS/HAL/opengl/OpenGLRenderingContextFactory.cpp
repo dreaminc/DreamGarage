@@ -16,29 +16,28 @@ OpenGLRenderingContext* OpenGLRenderingContextFactory::MakeOpenGLRenderingContex
 	OpenGLRenderingContext *pOGLRC = NULL;
 
 	switch (type) {
-	case OPEN_GL_RC_WIN32: {
-		#if defined(_WIN32)
-				pOGLRC = new Win64OpenGLRenderingContext();
-		#else
-				pSandbox = NULL;
+		case OPEN_GL_RC_WIN32: {
+			#if defined(_WIN32)
+					pOGLRC = new Win64OpenGLRenderingContext();
+			#else
+					pSandbox = NULL;
+					DEBUG_LINEOUT("OpenGL Rendering Context type %d not supported on this platform!", type);
+			#endif
+		} break;
+
+		case OPEN_GL_RC_OSX: {
+			#if defined(__APPLE__)
+					pOGLRC = new OSXOpenGLRenderingContext();
+			#else
+				pOGLRC = NULL;
 				DEBUG_LINEOUT("OpenGL Rendering Context type %d not supported on this platform!", type);
-		#endif
-	} break;
+			#endif
+		} break;
 
-	case OPEN_GL_RC_OSX: {
-		#if defined(__APPLE__)
-				pOGLRC = new OSXOpenGLRenderingContext();
-		#else
-
-		pOGLRC = NULL;
-		DEBUG_LINEOUT("OpenGL Rendering Context type %d not supported on this platform!", type);
-#endif
-	} break;
-
-	default: {
-		pOGLRC = NULL;
-		DEBUG_LINEOUT("OpenGL Rendering Context type %d not supported on this platform!", type);
-	} break;
+		default: {
+			pOGLRC = NULL;
+			DEBUG_LINEOUT("OpenGL Rendering Context type %d not supported on this platform!", type);
+		} break;
 	}
 
 	return pOGLRC;

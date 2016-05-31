@@ -65,28 +65,34 @@ public:
 		// Bind Position
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		//CR(m_pParentImp->glEnableVertexAtrribArray(0));		// TEMP: Position
-		CR(m_pParentImp->EnableVertexPositionAttribute());		// TODO: Investigate performance impact of this
+		//CR(m_pParentImp->EnableVertexPositionAttribute());		// TODO: Investigate performance impact of this
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)0));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)0, vertex::GetPointDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetVertexOffset()));
 
 		// Color
 		//CR(m_pParentImp->glEnableVertexAtrribArray(1));		// TEMP: Color
-		CR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
+		//CR(m_pParentImp->EnableVertexColorAttribute());		// TEMP: Position
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)1));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)1, vertex::GetColorDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetColorOffset()));
 
 		// Normal
-		CR(m_pParentImp->EnableVertexNormalAttribute());
+		//CR(m_pParentImp->EnableVertexNormalAttribute());
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)2));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)2, vertex::GetNormalDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetNormalOffset()));
 
 		// UV Coordinate
-		CR(m_pParentImp->EnableVertexUVCoordAttribute());
+		//CR(m_pParentImp->EnableVertexUVCoordAttribute());
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)3));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)3, vertex::GetUVCoordDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetUVOffset()));
 
 		// Tangent 
-		CR(m_pParentImp->EnableVertexTangentAttribute());
+		//CR(m_pParentImp->EnableVertexTangentAttribute());
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)4));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)4, vertex::GetTangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetTangentOffset()));
 
 		// Bi-Tangent 
-		CR(m_pParentImp->EnableVertexBitangentAttribute());
+		//CR(m_pParentImp->EnableVertexBitangentAttribute());
+		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)5));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)5, vertex::GetBitangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetBitangentOffset()));
 
 		CR(m_pParentImp->ReleaseCurrentContext());
