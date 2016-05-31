@@ -190,7 +190,7 @@ RESULT OGLProgram::UseProgram() {
 
 	CR(m_pParentImp->UseProgram(m_OGLProgramIndex));
 
-	DEBUG_LINEOUT("USING program ID %d", m_OGLProgramIndex);
+	//DEBUG_LINEOUT("USING program ID %d", m_OGLProgramIndex);
 
 Error:
 	return r;

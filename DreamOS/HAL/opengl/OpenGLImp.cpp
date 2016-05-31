@@ -12,7 +12,8 @@
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
-	m_pOGLProgram(nullptr),
+	m_pOGLRenderProgram(nullptr),
+	m_pOGLSkyboxProgram(nullptr),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
 	m_pCamera(nullptr),
 	m_pHMD(nullptr)
@@ -30,9 +31,14 @@ Error:
 }
 
 OpenGLImp::~OpenGLImp() {
-	if (m_pOGLProgram != nullptr) {
-		delete m_pOGLProgram;
-		m_pOGLProgram = nullptr;
+	if (m_pOGLRenderProgram != nullptr) {
+		delete m_pOGLRenderProgram;
+		m_pOGLRenderProgram = nullptr;
+	}
+
+	if (m_pOGLSkyboxProgram != nullptr) {
+		delete m_pOGLSkyboxProgram;
+		m_pOGLSkyboxProgram = nullptr;
 	}
 }
 
@@ -158,22 +164,13 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Clear Background
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
 	
-	//CRM(m_pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", m_versionOGL), "Failed to initialzie OGL Skybox Program");
-	//CRM(m_pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", m_versionOGL), "Failed to initialzie OGL minimal Program");
-	//CRM(m_pOGLProgram->OGLInitialize(L"minimalTexture.vert", L"minimalTexture.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
-	//CRM(m_pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", m_versionOGL), "Failed to initialzie OGL blinnPhong Program");
-	//CRM(m_pOGLProgram->OGLInitialize(L"blinnPhongTexTBNBump.vert", L"blinnPhongTexTBNBump.frag", m_versionOGL), "Failed to initialzie OGL minimalTexture Program");
+	// TODO(NTH): Add a program / render pipeline arch
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+	CN(m_pOGLRenderProgram);
 
-	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
-	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
-	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE, this, m_versionGLSL);
-	m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
-	CN(m_pOGLProgram);
-	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
+	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
+	CN(m_pOGLSkyboxProgram);
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
@@ -388,7 +385,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pLight);
 	//*/
 
-	/*
+	///*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
 	pLight = new light(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
@@ -407,7 +404,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
 	//*/
 
-	///*
+	//*
 	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	texture *pBumpTexture2 = new OGLTexture(this, L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
@@ -416,7 +413,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	//*/
 
 	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
-	/*
+	///*
 	OGLSkybox *pSkybox = new OGLSkybox(this);
 	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
@@ -424,7 +421,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pSkybox);
 	//*/
 	
-	///*
+	/*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
 	pVolume->SetBumpTexture(pBumpTexture);
@@ -481,10 +478,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pModel);
 	//*/
 
-	/*
+	///*
 	OGLSphere *pSphere = NULL;
 
-	int num = 2;
+	int num = 10;
 	int sects = 40;
 	double radius = 0.5f;
 	double size = radius * 2;
@@ -495,7 +492,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 			pSphere = new OGLSphere(this, radius, sects, sects);
 
 			pSphere->SetColorTexture(pColorTexture);
-			//pSphere->SetBumpTexture(pBumpTexture);
+			pSphere->SetBumpTexture(pBumpTexture);
 
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
@@ -516,18 +513,17 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
-	//CR(SendLightsToShader(pLights));
-	CR(m_pOGLProgram->SetLights(pLights));
+	CR(m_pOGLRenderProgram->SetLights(pLights));
 
 	// Camera Projection Matrix
 	SetMonoViewTarget();
-	//SetCameraMatrix(EYE_MONO);
-	//CR(m_pOGLProgram->SetStereoCamera(m_pCamera, EYE_MONO));
-	CR(m_pOGLProgram->SetCamera(m_pCamera));
+	CR(m_pOGLRenderProgram->SetCamera(m_pCamera));
 
 	// Send SceneGraph objects to shader
 	pSceneGraph->Reset();
@@ -537,16 +533,16 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		if (pDimObj == NULL)
 			continue;
 		else {
-			//SendObjectToShader(pDimObj);
-			CR(m_pOGLProgram->RenderObject(pDimObj));
+			CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 		}
 	}
 
 	skybox *pSkybox = nullptr;
 	CR(pObjectStore->GetSkybox(pSkybox));
 	if (pSkybox != nullptr) {
-		//SendObjectToShader(pSkybox);
-		CR(m_pOGLProgram->RenderObject(pSkybox));
+		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLSkyboxProgram->SetCamera(m_pCamera));
+		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 	}
 	
 	glFlush();
@@ -563,21 +559,19 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//g_pLight->translateZ(0.01f);
+	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
-	//CR(SendLightsToShader(pLights));
-	CR(m_pOGLProgram->SetLights(pLights));
+	CR(m_pOGLRenderProgram->SetLights(pLights));
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
 		SetStereoViewTarget(eye);
-		//SetCameraMatrix(eye);
-		CR(m_pOGLProgram->SetStereoCamera(m_pCamera, eye));
+		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
 
 		// Send SceneGraph objects to shader
 		pSceneGraph->Reset();
@@ -588,8 +582,7 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 			if (pDimObj == NULL)
 				continue;
 			else {
-				//SendObjectToShader(pDimObj);
-				CR(m_pOGLProgram->RenderObject(pDimObj));
+				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 			}
 
 		}
@@ -597,8 +590,9 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		skybox *pSkybox = nullptr;
 		CR(pObjectStore->GetSkybox(pSkybox));
 		if (pSkybox != nullptr) {
-			//SendObjectToShader(pSkybox);
-			CR(m_pOGLProgram->RenderObject(pSkybox));
+			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
+			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 		}
 	}
 
@@ -639,14 +633,13 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//g_pLight->translateZ(0.01f);
+	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
-	//CR(SendLightsToShader(pLights));
-	CR(m_pOGLProgram->SetLights(pLights));
+	CR(m_pOGLRenderProgram->SetLights(pLights));
 
 	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
 
@@ -655,7 +648,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 		//SetStereoFramebufferViewTarget(eye);
 		//SetCameraMatrix(eye);
-		CR(m_pOGLProgram->SetStereoCamera(m_pCamera, eye));
+		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
 		m_pHMD->SetAndClearRenderSurface(eye);
 
 		// Send SceneGraph objects to shader
@@ -667,21 +660,20 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 			if (pDimObj == NULL)
 				continue;
 			else {
-				//SendObjectToShader(pDimObj);
-				CR(m_pOGLProgram->RenderObject(pDimObj));
+				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 			}
 
-		}
+		}		
 
 		skybox *pSkybox = nullptr;
 		CR(pObjectStore->GetSkybox(pSkybox));
 		if (pSkybox != nullptr) {
-			//SendObjectToShader(pSkybox);
-			CR(m_pOGLProgram->RenderObject(pSkybox));
+			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
+			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 		}
 
 		m_pHMD->UnsetRenderSurface(eye);
-
 		m_pHMD->CommitSwapChain(eye);
 
 	}

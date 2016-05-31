@@ -40,7 +40,8 @@ private:
 
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
-	OGLProgram *m_pOGLProgram;
+	OGLProgram *m_pOGLRenderProgram;
+	OGLProgram *m_pOGLSkyboxProgram;
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
