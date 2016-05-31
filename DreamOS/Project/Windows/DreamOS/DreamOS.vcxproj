@@ -327,6 +327,8 @@
   <ItemGroup>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag" />

@@ -648,6 +648,12 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
