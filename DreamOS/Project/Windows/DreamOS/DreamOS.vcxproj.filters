@@ -592,6 +592,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -613,12 +616,6 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexTBNBump.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexTBNBump.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
@@ -643,6 +640,12 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

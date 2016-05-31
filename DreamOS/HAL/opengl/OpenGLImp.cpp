@@ -170,7 +170,8 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
 	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-	m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE, this, m_versionGLSL);
+	//m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE, this, m_versionGLSL);
+	m_pOGLProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 	CN(m_pOGLProgram);
 	CRM(m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
 
@@ -408,6 +409,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 
 	///*
 	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	texture *pBumpTexture2 = new OGLTexture(this, L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
 	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	texture *pColorTexture2 = new OGLTexture(this, L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -425,14 +427,15 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	///*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
-	//pVolume->SetBumpTexture(pBumpTexture);
+	pVolume->SetBumpTexture(pBumpTexture);
 	pSceneGraph->PushObject(pVolume);
 	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
 
+	///*
 	pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture2);
 	pVolume->translateX(2.0f);
-	//pVolume->SetBumpTexture(pBumpTexture);
+	pVolume->SetBumpTexture(pBumpTexture2);
 	pSceneGraph->PushObject(pVolume);
 	//*/
 

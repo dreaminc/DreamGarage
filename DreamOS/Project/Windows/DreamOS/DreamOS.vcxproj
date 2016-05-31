@@ -236,6 +236,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
@@ -330,10 +331,10 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexTBNBump.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexTBNBump.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag" />
