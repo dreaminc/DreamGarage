@@ -37,7 +37,8 @@ protected:
 		RESULT r = R_PASS;
 
 		CR(AllocateVertices(NumberVertices()));
-		CR(AllocateTriangleIndexGroups(NUM_QUAD_TRIS));
+		CR(AllocateIndices(NumberIndices()));
+		//CR(AllocateTriangleIndexGroups(NUM_QUAD_TRIS));
 
 	Error:
 		return R_PASS;
@@ -50,6 +51,25 @@ private:
 	QUAD_TYPE m_quadType;
 
 public:
+
+	// copy ctor
+	quad(quad& q) : m_quadType(q.m_quadType) {
+		m_pVertices = q.m_pVertices;
+		m_pIndices = q.m_pIndices;
+
+		q.m_pVertices = nullptr;
+		q.m_pIndices = nullptr;
+	}
+
+	// move ctor
+	quad(quad&& q) : m_quadType(q.m_quadType) {
+		m_pVertices = q.m_pVertices;
+		m_pIndices = q.m_pIndices;
+
+		q.m_pVertices = nullptr;
+		q.m_pIndices = nullptr;
+	}
+	
 	// Square
 	quad(double side) :
 		m_quadType(SQUARE)
@@ -65,13 +85,13 @@ public:
 		// Set up indices 
 		TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
 
-		m_pVertices[A = vertCount++] = vertex(point(-halfSide, halfSide, 0.0f));		// A
-		m_pVertices[B = vertCount++] = vertex(point(halfSide, halfSide, 0.0f));			// B
-		m_pVertices[C = vertCount++] = vertex(point(-halfSide, -halfSide, 0.0f));		// C
-		m_pVertices[D = vertCount++] = vertex(point(halfSide, -halfSide, 0.0f));		// D
+		m_pVertices[A = vertCount++] = vertex(point(-halfSide, halfSide, 0.0f), vector(0, 0, 1), uvcoord(0, 1.0f));		// A
+		m_pVertices[B = vertCount++] = vertex(point(halfSide, halfSide, 0.0f), vector(0, 0, 1), uvcoord(1.0f, 1.0f));			// B
+		m_pVertices[C = vertCount++] = vertex(point(-halfSide, -halfSide, 0.0f), vector(0, 0, 1), uvcoord(0, 0));		// C
+		m_pVertices[D = vertCount++] = vertex(point(halfSide, -halfSide, 0.0f), vector(0, 0, 1), uvcoord(1.0f, 0));		// D
 
-		pTriIndices[indexCount++] = TriangleIndexGroup(A, B, C);
-		pTriIndices[indexCount++] = TriangleIndexGroup(B, D, C);
+		pTriIndices[indexCount++] = TriangleIndexGroup(A, C, B);
+		pTriIndices[indexCount++] = TriangleIndexGroup(B, C, D);
 
 		Validate();
 	Error:
@@ -92,6 +112,35 @@ public:
 		m_pVertices[1] = vertex(point(halfWidth, halfHeight, 0.0f));		// B
 		m_pVertices[2] = vertex(point(-halfWidth, -halfHeight, 0.0f));	// C
 		m_pVertices[3] = vertex(point(halfWidth, -halfHeight, 0.0f));	// D
+
+		Validate();
+	Error:
+		Invalidate();
+	}
+
+	// This needs to be re-designed, too specific for 2D blits.
+	quad(double height, double width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright) :
+		m_quadType(RECTANGLE)
+	{
+		RESULT r = R_PASS;
+		CR(Allocate());
+
+		double halfSideX = width / 2.0f;
+		double halfSideY = height / 2.0f;
+		int vertCount = 0;
+		int indexCount = 0;
+		int A, B, C, D;
+
+		// Set up indices 
+		TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
+	
+		m_pVertices[A = vertCount++] = vertex(point(-halfSideX + center.x(), halfSideY + center.y(), center.z()), vector(0, 0, 1), uvcoord(uv_bottomleft.u(), uv_upperright.v()));		// A
+		m_pVertices[B = vertCount++] = vertex(point(halfSideX + center.x(), halfSideY + center.y(), center.z()), vector(0, 0, 1), uv_upperright);			// B
+		m_pVertices[C = vertCount++] = vertex(point(-halfSideX + center.x(), -halfSideY + center.y(), center.z()), vector(0, 0, 1), uv_bottomleft);		// C
+		m_pVertices[D = vertCount++] = vertex(point(halfSideX + center.x(), -halfSideY + center.y(), center.z()), vector(0, 0, 1), uvcoord(uv_upperright.u(), uv_bottomleft.v()));		// D
+
+		pTriIndices[indexCount++] = TriangleIndexGroup(A, C, B);
+		pTriIndices[indexCount++] = TriangleIndexGroup(B, C, D);
 
 		Validate();
 	Error:

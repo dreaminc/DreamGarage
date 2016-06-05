@@ -42,6 +42,7 @@ private:
 	// the shaders since we might want to jump around OGL programs in the future
 	OGLProgram *m_pOGLRenderProgram;
 	OGLProgram *m_pOGLSkyboxProgram;
+	OGLProgram *m_pOGLOverlayProgram;
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;

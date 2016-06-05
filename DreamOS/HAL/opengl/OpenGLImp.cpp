@@ -14,6 +14,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionGLSL(0),
 	m_pOGLRenderProgram(nullptr),
 	m_pOGLSkyboxProgram(nullptr),
+	m_pOGLOverlayProgram(nullptr),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
 	m_pCamera(nullptr),
 	m_pHMD(nullptr)
@@ -39,6 +40,11 @@ OpenGLImp::~OpenGLImp() {
 	if (m_pOGLSkyboxProgram != nullptr) {
 		delete m_pOGLSkyboxProgram;
 		m_pOGLSkyboxProgram = nullptr;
+	}
+
+	if (m_pOGLOverlayProgram != nullptr) {
+		delete m_pOGLOverlayProgram;
+		m_pOGLOverlayProgram = nullptr;
 	}
 }
 
@@ -171,6 +177,9 @@ RESULT OpenGLImp::PrepareScene() {
 
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
+
+	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
+	CN(m_pOGLOverlayProgram);
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
@@ -363,7 +372,9 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 #include "OGLVolume.h"
 
 #include "OGLModel.h"
+#include "OGLText.h"
 #include "OGLTriangle.h"
+#include "OGLQuad.h"
 #include "Sandbox/PathManager.h"
 
 #include "OGLSphere.h"
@@ -501,6 +512,12 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 			pSceneGraph->PushObject(pSphere);
 		}
 	}
+	/*
+	OGLQuad *pQuad = NULL;
+	pQuad = new OGLQuad(this, 10.0f);
+	pQuad->SetColorTexture(pColorTexture);
+	pSceneGraph->PushObject(pQuad);
+
 	//*/
 
 	return r;
@@ -545,6 +562,50 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 	}
 	
+	CRM(m_pOGLOverlayProgram->UseProgram(), "Failed to use OGLProgram");
+	
+	static OGLTriangle* pTri = nullptr;
+	static OGLQuad*	pQuad = nullptr;
+	static OGLText*	pText = nullptr;
+
+	if (pTri == nullptr)
+	{
+		pTri = new OGLTriangle(this, 1.0f, 1.0f);
+
+		texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+		pTri->SetColorTexture(pColorTexture);
+	}
+
+	if (pQuad == nullptr)
+	{
+		pQuad = new OGLQuad(this, quad(1.0, 1.0, vector(0, 0, 0), uvcoord(0,0), uvcoord(0.3,1)));
+
+		texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+		pQuad->SetColorTexture(pColorTexture);
+	}
+
+	if (pText == nullptr)
+	{
+		std::vector<quad> quads;
+		quads.push_back(quad(1.0, 1.0, vector(0.2, 0.2, 0), uvcoord(0, 0), uvcoord(0.1, 1)));
+		quads.push_back(quad(1.0, 1.0, vector(0, 0, 0), uvcoord(0, 0), uvcoord(0.8, 1)));
+
+		pText = new OGLText(this, quads);
+
+		texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+		pText->SetColorTexture(pColorTexture);
+	}
+
+	CR(m_pOGLOverlayProgram->SetCamera(m_pCamera));
+
+//	m_pOGLOverlayProgram->RenderObject(pTri);
+//	m_pOGLOverlayProgram->RenderObject(pQuad);
+	m_pOGLOverlayProgram->RenderObject(pText);
+
+
 	glFlush();
 
 Error:
