@@ -62,7 +62,9 @@ public:
 		m_CEFApp = CefRefPtr<CEFApp>(new CEFApp);
 
 		// Initialize CEF.
-		CefInitialize(CEFMainArgs, m_CEFSettings, m_CEFApp.get(), CEFSandboxInfo);
+		CB(CefInitialize(CEFMainArgs, m_CEFSettings, m_CEFApp.get(), CEFSandboxInfo));
+
+		DEBUG_LINEOUT("CEF Successfully initialized");
 
 	Error:
 		return r;
