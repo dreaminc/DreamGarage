@@ -1,6 +1,7 @@
 #include "Windows64App.h"
 #include "Sandbox/PathManagerFactory.h"
 #include "HAL/opengl/OpenGLRenderingContextFactory.h"
+#include "Cloud/CloudControllerFactory.h"
 
 #include "./HAL/opengl/OpenGLImp.h"
 
@@ -17,7 +18,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr)
+	m_pHMD(nullptr),
+	m_pCloudController(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -88,6 +90,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pTimeManager = new TimeManager();
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CV(m_pTimeManager, "Failed to validate Time Manager");
+
+	// Set up the Cloud Controller
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
 
 	Validate();
 	return;

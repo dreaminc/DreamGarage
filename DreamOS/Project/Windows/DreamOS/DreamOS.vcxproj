@@ -167,6 +167,7 @@ xcopy /y "C:\dev\junk\cef_binary_3.2556.1368.g535c4fb_windows64\Debug\*" "$(Targ
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
+    <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp" />
@@ -221,6 +222,7 @@ xcopy /y "C:\dev\junk\cef_binary_3.2556.1368.g535c4fb_windows64\Debug\*" "$(Targ
     <ClInclude Include="..\..\..\Cloud\CEFHandler.h" />
     <ClInclude Include="..\..\..\Cloud\CEFImp.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />

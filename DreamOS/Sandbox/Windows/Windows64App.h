@@ -25,6 +25,7 @@
 class OpenGLImp;
 class Win64Keyboard;
 class Win64Mouse;
+class CloudController;
 
 class Windows64App : public SandboxApp {
 public:
@@ -73,8 +74,9 @@ private:
 private:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	OpenGLImp *m_pOpenGLImp;	
-
 	TimeManager	*m_pTimeManager;
+	CloudController *m_pCloudController;
+
 
 	Profiler	m_profiler;
 public:

@@ -9,9 +9,14 @@
 // DreamOS/Cloud/CloudController.h
 // The base DreamCloud controller 
 
+#include "CloudImp.h"
+#include <memory>
+
 class CloudController {
 public:
-	CloudController() {
+	CloudController() :
+		m_pCloudImp(nullptr)
+	{
 		// empty
 	}
 
@@ -19,8 +24,19 @@ public:
 		// empty
 	}
 
+	RESULT SetCloudImp(std::unique_ptr<CloudImp> m_pCloudImp) {
+		RESULT r = R_PASS;
+
+		m_pCloudImp = std::unique_ptr<CloudImp>(std::move(m_pCloudImp));
+		CN(m_pCloudImp);
+
+	Error:
+		return r;
+	}
+
 private:
 	UID m_uid;
+	std::unique_ptr<CloudImp> m_pCloudImp;
 };
 
 #endif
