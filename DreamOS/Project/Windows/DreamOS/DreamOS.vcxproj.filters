@@ -129,9 +129,6 @@
     <Filter Include="External\CEF\v3.2556\include\wrapper">
       <UniqueIdentifier>{a00bacef-de45-4c28-a2a9-4a1f03ee7b07}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\CEF\v3.2556\Debug">
-      <UniqueIdentifier>{28e8904b-bd2a-48aa-8c99-eda5a8575b50}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -1327,17 +1324,9 @@
       <Filter>External\CEF\v3.2556\Debug</Filter>
     </None>
   </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-  
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
   </ItemGroup>
-</Project>
   <ItemGroup>
     <Library Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\cef_sandbox.lib">
       <Filter>External\CEF\v3.2556\Debug</Filter>

@@ -119,10 +119,13 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;C:\dev\junk\cef_binary_3.2556.1368.g535c4fb_windows64\build\libcef_dll\Debug\libcef_dll_wrapper.lib;C:\dev\junk\cef_binary_3.2556.1368.g535c4fb_windows64\Debug\libcef.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\*" "$(TargetDir)"</Command>
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\*" "$(TargetDir)"
+xcopy /y "C:\dev\junk\cef_binary_3.2556.1368.g535c4fb_windows64\Debug\*" "$(TargetDir)"
+
+</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -569,11 +572,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <Library Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\cef_sandbox.lib" />
-    <Library Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.lib" />
-    <Library Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -58,15 +58,18 @@ class CEFImp : public CloudImp {
 		int exitCode = CefExecuteProcess(CEFMainArgs, NULL, CEFSandboxInfo);
 		CBM((exitCode < 0), "CEF sub-process has completed");
 
-		CefSettings settings;
-		CefRefPtr<CEFApp> m_CEFApp(new CEFApp);
+		m_CEFApp = CefRefPtr<CEFApp>(new CEFApp);
 
 		// Initialize CEF.
-		CefInitialize(CEFMainArgs, settings, m_CEFApp.get(), CEFSandboxInfo);
+		CefInitialize(CEFMainArgs, m_CEFSettings, m_CEFApp.get(), CEFSandboxInfo);
 
 	Error:
 		return r;
 	}
+
+private:
+	CefRefPtr<CEFApp> m_CEFApp;
+	CefSettings m_CEFSettings;
 };
 
 #endif
