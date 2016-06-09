@@ -266,6 +266,9 @@
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1166,6 +1169,9 @@
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CEFHandler.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
       <Filter>Cloud</Filter>
     </ClInclude>
   </ItemGroup>

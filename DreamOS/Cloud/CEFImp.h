@@ -22,6 +22,7 @@
 #include "CEFApp.h"
 
 class CEFImp : public CloudImp {
+public:
 	CEFImp() :
 		CloudImp()
 	{
