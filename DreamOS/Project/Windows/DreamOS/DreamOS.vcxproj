@@ -121,6 +121,9 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\*" "$(TargetDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -510,6 +513,18 @@
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\d3dcompiler_43.dll" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\d3dcompiler_47.dll" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.dll">
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</DeploymentContent>
+      <FileType>Document</FileType>
+    </None>
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libEGL.dll" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libGLESv2.dll" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\widevinecdmadapter.dll" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag" />
@@ -532,6 +547,11 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Library Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\cef_sandbox.lib" />
+    <Library Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.lib" />
+    <Library Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.lib" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

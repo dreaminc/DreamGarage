@@ -35,9 +35,11 @@ public:
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() OVERRIDE {
 		return this;
 	}
+	
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() OVERRIDE {
 		return this;
 	}
+
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() OVERRIDE {
 		return this;
 	}
