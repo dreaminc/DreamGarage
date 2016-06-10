@@ -373,6 +373,7 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 
 #include "OGLModel.h"
 #include "OGLText.h"
+#include "Primitives/font.h"
 #include "OGLTriangle.h"
 #include "OGLQuad.h"
 #include "Sandbox/PathManager.h"
@@ -588,16 +589,28 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	if (pText == nullptr)
 	{
-		std::vector<quad> quads;
-		quads.push_back(quad(1.0, 1.0, vector(0.2, 0.2, 0), uvcoord(0, 0), uvcoord(0.1, 1)));
-		quads.push_back(quad(1.0, 1.0, vector(0, 0, 0), uvcoord(0, 0), uvcoord(0.8, 1)));
+		static std::shared_ptr<Font> pFont = nullptr;
+		
+		if (pFont == nullptr)
+		{
+			pFont = std::make_shared<Font>(L"Arial.fnt");
+		}
+		
+		pText = new OGLText(this, pFont, "321");
 
-		pText = new OGLText(this, quads);
-
-		texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-		pText->SetColorTexture(pColorTexture);
+		pText->MoveTo(-1.0, -1.0, 0);
 	}
+
+	static int cnt = 0;
+	static DWORD time = GetTickCount();
+	if (GetTickCount() - time > 100)
+	{
+		cnt++;
+		pText->SetText(std::to_string(cnt));
+		time = GetTickCount();
+	}
+
+	
 
 	CR(m_pOGLOverlayProgram->SetCamera(m_pCamera));
 

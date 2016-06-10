@@ -136,7 +136,16 @@ public:
 
 		// TODO: Pull deeper settings from texture object
 		if (m_pImageBuffer != NULL) {
-			CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
+			// This code needs to change. We need to store the texture format when loading the texture and loading with the right format here.
+			switch (m_channels)
+			{
+			case 3:
+				CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
+				break;
+			case 4:
+				CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pImageBuffer));
+				break;
+			}
 		}
 
 		// Texture params TODO: Add controls for these 

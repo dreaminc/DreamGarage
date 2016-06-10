@@ -7,6 +7,7 @@
 // DreamOS/Dimension/Primitives/text.h
 // text is defined as a list of quads (per each character in the text). The quads as a whole define the "geometry" of a text.
 
+#include <algorithm>
 #include <vector>
 #include "DimObj.h"
 #include "Vertex.h"
@@ -35,13 +36,62 @@ private:
 	unsigned int m_nIndices;
 
 public:
-	text(std::vector<quad>& quads)
+	text(std::shared_ptr<Font> font, const std::string& text) :
+		m_font(font)
 	{
-		m_nVertices = 4 * quads.size();
-		m_nIndices = 6 * quads.size();
+		SetText(text);
 
-		RESULT r = R_PASS;
-		CR(Allocate());
+		Validate();
+	Error:
+		Invalidate();
+	}
+
+	RESULT SetText(const std::string& text)
+	{
+		std::vector<quad> quads;
+
+		if (m_text.compare(text) == 0)
+		{
+			// no need to update the text
+			return R_SUCCESS;
+		}
+
+		if (m_text.length() != text.length())
+		{
+			// text length was changed, we need to re-allocate buffers
+			Destroy();
+
+			m_nVertices = 4 * text.length();
+			m_nIndices = 6 * text.length();
+
+			RESULT r = R_PASS;
+			CR(Allocate());
+		}
+		
+		m_text = text;
+
+		double posx = 0;
+
+		// For now this is hard-coded. Need to fix incorrect size
+		const int screen_width = 1180;// 1920 / 2;
+		const int screen_height = 626;// 1080 / 2;
+
+		for_each(text.begin(), text.end(), [&](char c) {
+			Font::CharacterGlyph glyph;
+			if (m_font->GetGlyphFromChr(c, glyph))
+			{
+				uv_precision x = glyph.x / 512.0f;
+				uv_precision y = (512 - glyph.y) / 512.0f;
+				uv_precision w = glyph.width / 512.0f;
+				uv_precision h = glyph.height / 512.0f;
+
+				double dx = 2.0f * glyph.width / screen_width;
+				double dy = 2.0f * glyph.height / screen_height;
+
+				quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + 2.0f * glyph.xoffset / screen_width, 2.0f * 75 / screen_height - dy / 2.0f - 2.0f * glyph.yoffset / screen_height, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
+				posx += 2.0f * glyph.xadvance / screen_width;
+			}
+		});
 
 		unsigned int verticesCnt = 0;
 		unsigned int indicesCnt = 0;
@@ -67,11 +117,20 @@ public:
 
 			quadCnt += 4;
 		}
-	
-		Validate();
+
+		return R_SUCCESS;
+
 	Error:
-		Invalidate();
+		return R_FAIL;
 	}
+
+private:
+
+	// Font to be used for the text
+	std::shared_ptr<Font> m_font = nullptr;
+
+	// String of the text
+	std::string	m_text = "";
 };
 
 #endif // ! TEXT_H_

@@ -239,6 +239,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniform.cpp">
       <Filter>HAL\opengl\shaders</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\font.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -603,6 +606,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLText.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\font.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
