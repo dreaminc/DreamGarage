@@ -29,7 +29,7 @@ public:
 		RESULT r = OGLInitialize();
 
 		// Load appropriate glyph texture
-		texture *pColorTexture = new OGLTexture(pParentImp, L"Arial.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		texture *pColorTexture = new OGLTexture(pParentImp, L"Fonts/Arial.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 		SetColorTexture(pColorTexture);
 	}
