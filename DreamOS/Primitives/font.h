@@ -57,6 +57,9 @@ public:
 	bool GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret);
 
 	const std::wstring& GetGlyphImageFile() const;
+	uint32_t GetGlyphWidth() const;
+	uint32_t GetGlyphHeight() const;
+	uint32_t GetGlyphBase() const;
 
 private:
 	bool LoadFontFromFile(const std::wstring& fnt_file);
@@ -71,10 +74,13 @@ private:
 	std::map<uint32_t, const std::string>	m_glyphTexturesMap;
 	std::map<uint8_t, CharacterGlyph>	m_charMap;
 
-	std::wstring	m_glyphImageFileName;
+	std::wstring	m_glyphImageFileName = L"";
 
-	uint32_t m_glyphWidth;
-	uint32_t m_glyphHeight;
+	uint32_t m_glyphWidth = 0;
+	uint32_t m_glyphHeight = 0;
+
+	// A glyph base defines the number of pixels in the y-axis above the virtual line of drawing a text
+	uint32_t m_glyphBase = 0;
 };
 
 #endif // ! FONT_H_

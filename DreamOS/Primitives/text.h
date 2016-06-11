@@ -72,24 +72,31 @@ public:
 
 		double posx = 0;
 
-		// For now this is hard-coded. Need to fix incorrect size
-		const int screen_width = 1180;// 1920 / 2;
-		const int screen_height = 626;// 1080 / 2;
+		// For now the font scale is based on 1080p
+		const int screen_width = 1920;
+		const int screen_height = 1080;
+
+		double	glyphWidth = m_font->GetGlyphWidth();
+		double	glyphHeight = m_font->GetGlyphHeight();
+		double	glyphBase = m_font->GetGlyphBase();
+
+		#define XSCALE_TO_SCREEN(x)	2.0f * (x) / screen_width
+		#define YSCALE_TO_SCREEN(y)	2.0f * (y) / screen_height
 
 		for_each(text.begin(), text.end(), [&](char c) {
 			Font::CharacterGlyph glyph;
 			if (m_font->GetGlyphFromChr(c, glyph))
 			{
-				uv_precision x = glyph.x / 512.0f;
-				uv_precision y = (512 - glyph.y) / 512.0f;
-				uv_precision w = glyph.width / 512.0f;
-				uv_precision h = glyph.height / 512.0f;
+				uv_precision x = glyph.x / glyphWidth;
+				uv_precision y = (glyphHeight - glyph.y) / glyphHeight;
+				uv_precision w = glyph.width / glyphWidth;
+				uv_precision h = glyph.height / glyphHeight;
 
-				double dx = 2.0f * glyph.width / screen_width;
-				double dy = 2.0f * glyph.height / screen_height;
+				double dx = XSCALE_TO_SCREEN(glyph.width);
+				double dy = YSCALE_TO_SCREEN(glyph.height);
 
-				quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + 2.0f * glyph.xoffset / screen_width, 2.0f * 75 / screen_height - dy / 2.0f - 2.0f * glyph.yoffset / screen_height, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
-				posx += 2.0f * glyph.xadvance / screen_width;
+				quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + XSCALE_TO_SCREEN(glyph.xoffset), YSCALE_TO_SCREEN(glyphBase - glyph.yoffset) - dy / 2.0f, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
+				posx += XSCALE_TO_SCREEN(glyph.xadvance);
 			}
 		});
 
