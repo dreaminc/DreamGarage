@@ -563,6 +563,9 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 	}
 	
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	CRM(m_pOGLOverlayProgram->UseProgram(), "Failed to use OGLProgram");
 	
 	static OGLTriangle* pTri = nullptr;
