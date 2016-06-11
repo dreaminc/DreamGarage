@@ -32,7 +32,7 @@ public:
 
 		// Uniform Variables
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+		//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
 	Error:
@@ -61,17 +61,11 @@ public:
 	}
 
 	RESULT SetCameraUniforms(camera *pCamera) {
-		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-
-		return R_PASS;
+		return R_NOT_IMPLEMENTED;
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
-		auto matVP = pStereoCamera->GetProjectionMatrix() * pStereoCamera->GetViewMatrix(eye);
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-
-		return R_PASS;
+		return R_NOT_IMPLEMENTED;
 	}
 
 private:
@@ -80,7 +74,7 @@ private:
 	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
 
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
-	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+	//OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
 };

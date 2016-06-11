@@ -330,10 +330,20 @@
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag" />
@@ -346,6 +356,8 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />
