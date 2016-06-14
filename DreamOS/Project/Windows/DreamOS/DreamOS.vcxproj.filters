@@ -92,6 +92,7 @@
     </Filter>
     <Filter Include="Profiler">
       <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
+    </Filter>
     <Filter Include="HAL\opengl\shaders">
       <UniqueIdentifier>{e0da08a9-31cd-4af0-98a1-edfdec0ab066}</UniqueIdentifier>
     </Filter>
@@ -216,6 +217,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Profiler\Profiler.cpp">
       <Filter>Profiler</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -559,6 +561,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Profiler\Profiler.h">
       <Filter>Profiler</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
