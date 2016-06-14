@@ -10,7 +10,7 @@
 
 #include "camera.h"
 
-#define DEFAULT_PUPILLARY_DISTANCE 55
+#define DEFAULT_PUPILLARY_DISTANCE 65
 
 enum EYE_TYPE {
 	EYE_LEFT,
@@ -43,6 +43,8 @@ public:
 				ptEye = m_ptOrigin;
 			} break;
 		}
+
+		ptEye.w() = 0.0f;
 
 		return ptEye;
 	}

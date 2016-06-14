@@ -15,8 +15,23 @@
 
 #include <stdio.h>
 
-// TODO: Tie into the official console/interface system
-#define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
+#define DEBUG_OUT_TO_CONSOLE
+//#define DEBUG_OUT_TO_WIN_DEBUGGER
+
+#if defined(DEBUG_OUT_TO_CONSOLE)
+	// TODO: Tie into the official console/interface system
+	#define CONSOLE_OUT(str, ...) do { printf(str, ##__VA_ARGS__); } while(0);
+#elif defined(DEBUG_OUT_TO_WIN_DEBUGGER)
+	#include <windows.h>
+
+	#define DEBUGGER_SIGNATURE "DOS::"
+	#define DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
+	#define	OUTPUT_MAX_SIZE	1024
+
+	static char outstr[OUTPUT_MAX_SIZE] = { DEBUGGER_SIGNATURE };
+	#define CONSOLE_OUT(str, ...) do { sprintf_s(outstr + DEBUGGER_SIGNATURE_SIZE, OUTPUT_MAX_SIZE - DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__); if (outstr[DEBUGGER_SIGNATURE_SIZE] != '\n' && outstr[DEBUGGER_SIGNATURE_SIZE] != '\r') OutputDebugStringA(outstr); } while(0);
+#endif
+
 
 #ifdef _DEBUG
     #define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);

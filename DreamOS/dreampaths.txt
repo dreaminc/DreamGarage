@@ -5,8 +5,9 @@
 
 ROOT 			./ 
 HAL 			./HAL/
-SHADERS 		./HAL/opengl/GLSL/
+SHADERS 		./HAL/opengl/shaders/GLSL/
 SANDBOX			./Sandbox/
 RESULT 			./RESULT/
 TEXTURE			./Texture/
-TEXTURE_CUBE	./Texture/Cube/
+TEXTURE_CUBE		./Texture/Cube/
+FONT			./Resources/Fonts/

@@ -135,9 +135,8 @@ RESULT Win64PathManager::InitializePaths() {
 	else {
 		// Try to back pedal to find dreampaths.txt
 		DEBUG_LINEOUT("%s env variable not found", DREAM_OS_PATH_ENV);
+		DEBUG_LINEOUT("Please define the %s env to point at the root directory of DreamOS", DREAM_OS_PATH_ENV);
 	}
-
-	
 
 Error:
 	return r;
