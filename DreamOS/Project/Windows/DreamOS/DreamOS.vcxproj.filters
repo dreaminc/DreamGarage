@@ -669,6 +669,42 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
