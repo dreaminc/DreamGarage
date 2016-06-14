@@ -29,6 +29,7 @@ typedef enum {
 	PATH_RESULT,
 	PATH_TEXTURE,
 	PATH_TEXTURE_CUBE,
+	PATH_FONT,
 	PATH_INVALID	// Also acts as a found
 } PATH_VALUE_TYPE;
 
@@ -46,7 +47,8 @@ class PathManager : public valid {
 		L"SANDBOX",
 		L"RESULT",
 		L"TEXTURE",
-		L"TEXTURE_CUBE"
+		L"TEXTURE_CUBE",
+		L"FONT"
 	};
 
 	int m_cszPathValues_n;

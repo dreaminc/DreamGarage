@@ -143,7 +143,6 @@ public:
 		CNM(pDimObj, "Failed to acquire Dimension Object");
 
 		CR(m_pParentImp->MakeCurrentContext());
-
 		CR(m_pParentImp->glBindVertexArray(m_hVAO));
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
@@ -151,7 +150,10 @@ public:
 		GLsizeiptr pVertex_n = pDimObj->VertexDataSize();
 		CR(m_pParentImp->glBufferData(GL_ARRAY_BUFFER, pVertex_n, &pVertex[0], GL_STATIC_DRAW));
 
-		CR(m_pParentImp->ReleaseCurrentContext());
+		// Usually we prefer to release the context so that it won't get mistakenly used by next OGL calls.
+		// We're constantly getting error 1282 from wglMakeContext(null, null).
+		// For now, removing this safety.
+		// CR(m_pParentImp->ReleaseCurrentContext());
 
 	Error:
 		return r;

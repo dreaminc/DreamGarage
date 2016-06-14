@@ -25,6 +25,14 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	OGLQuad(OpenGLImp *pParentImp, quad&& q) :
+		quad(q),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
+
 	OGLQuad(OpenGLImp *pParentImp, double side) :
 		quad(side),
 		OGLObj(pParentImp)

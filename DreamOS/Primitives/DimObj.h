@@ -46,6 +46,16 @@ public:
     }
 
     ~DimObj() {
+		Destroy();
+    }
+
+	virtual OBJECT_TYPE GetType() {
+		return OBJECT_DIMENSION;
+	}
+
+	virtual RESULT Allocate() = 0;
+
+	virtual RESULT Destroy() {
 		if (m_pIndices != nullptr) {
 			delete[] m_pIndices;
 			m_pIndices = nullptr;
@@ -55,13 +65,9 @@ public:
 			delete[] m_pVertices;
 			m_pVertices = nullptr;
 		}
-    }
 
-	virtual OBJECT_TYPE GetType() {
-		return OBJECT_DIMENSION;
+		return R_PASS;
 	}
-
-	virtual RESULT Allocate() = 0;
 
 	virtual inline int NumberVertices() = 0;
 	inline vertex *VertexData() {
