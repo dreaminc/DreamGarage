@@ -20,13 +20,13 @@
 
 class CEFURLRequestClient : public CefURLRequestClient {
 public:
-	CEFURLRequestClient(std::wstring strURL) :
+	CEFURLRequestClient(std::wstring& strURL) :
 		m_UploadTotal(0),
 		m_DownloadTotal(0),
 		m_strURL(strURL)
 	{
 		m_pCefRequest = CefRequest::Create();
-		CefString cefstrURL(strURL);
+		CefString cefstrURL(m_strURL);
 
 		// Set URL and Method
 		m_pCefRequest->SetURL(cefstrURL);
@@ -102,7 +102,7 @@ public:
 		// TODO: Release the request
 	}
 
-	RESULT CreateNewURLRequest(std::wstring strURL) {
+	RESULT CreateNewURLRequest(std::wstring& strURL) {
 		RESULT r = R_PASS;
 
 		CefRefPtr<CEFURLRequestClient> pNewCEFURLRequestClient = new CEFURLRequestClient(strURL);

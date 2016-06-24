@@ -81,7 +81,7 @@ public:
 		return r;
 	}
 
-	RESULT CreateNewURLRequest(std::wstring strURL) {
+	RESULT CreateNewURLRequest(std::wstring& strURL) {
 		RESULT r = R_PASS;
 
 		CRM(m_CEFURLRequestController.CreateNewURLRequest(strURL), "Failed to create CEF URL request for %S", strURL.c_str());
