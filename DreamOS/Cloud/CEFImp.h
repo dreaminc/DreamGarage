@@ -20,6 +20,7 @@
 #include <windows.h>
 
 #include "CEFApp.h"
+#include "CEFURLRequestController.h"
 
 class CEFImp : public CloudImp {
 public:
@@ -70,9 +71,30 @@ public:
 		return r;
 	}
 
+	// Will simply update the message loop as needed
+	RESULT Update() {
+		RESULT r = R_PASS;
+
+		CR(CEFDoMessageLoopWork());
+
+	Error:
+		return r;
+	}
+
+	RESULT CreateNewURLRequest(std::wstring strURL) {
+		RESULT r = R_PASS;
+
+		CRM(m_CEFURLRequestController.CreateNewURLRequest(strURL), "Failed to create CEF URL request for %S", strURL.c_str());
+
+	Error:
+		return r;
+	}
+
 private:
 	CefRefPtr<CEFApp> m_CEFApp;
 	CefSettings m_CEFSettings;
+
+	CEFURLRequestController m_CEFURLRequestController;
 };
 
 #endif

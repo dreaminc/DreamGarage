@@ -168,6 +168,7 @@ xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales"
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
@@ -223,6 +224,7 @@ xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales"
     <ClInclude Include="..\..\..\Cloud\CEFApp.h" />
     <ClInclude Include="..\..\..\Cloud\CEFHandler.h" />
     <ClInclude Include="..\..\..\Cloud\CEFImp.h" />
+    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />

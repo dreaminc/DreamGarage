@@ -103,8 +103,10 @@ void CEFHandler::CloseAllBrowsers(bool force_close) {
 		return;
 
 	BrowserList::const_iterator it = browser_list_.begin();
-	for (; it != browser_list_.end(); ++it)
+
+	for (; it != browser_list_.end(); ++it) {
 		(*it)->GetHost()->CloseBrowser(force_close);
+	}
 }
 
 void CEFHandler::OnTitleChange(CefRefPtr<CefBrowser> browser,
