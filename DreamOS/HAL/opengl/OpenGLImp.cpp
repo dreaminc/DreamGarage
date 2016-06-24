@@ -473,7 +473,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	}
 	//*/
 		
-	/*
+	///*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 	
@@ -483,14 +483,15 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pMgr->GetCurrentPath((wchar_t*&)path);
 	std::wstring objFile(path);
 
-	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\car.obj", v);
+// 	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\car.obj", v);
+	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\chainsaw_free.obj", v);
 	OGLModel* pModel = new OGLModel(this, v);
 	//pModel->SetRandomColor();
 	pModel->UpdateOGLBuffers();
 	pSceneGraph->PushObject(pModel);
 	//*/
 
-	///*
+	/*
 	OGLSphere *pSphere = NULL;
 
 	int num = 10;
