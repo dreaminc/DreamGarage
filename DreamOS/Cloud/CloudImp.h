@@ -1,0 +1,33 @@
+#ifndef CLOUD_IMP_H_
+#define CLOUD_IMP_H_
+
+#include "RESULT/EHM.h"
+#include "Primitives/Types/UID.h"
+#include "Primitives/valid.h"
+
+// DREAM OS
+// DreamOS/Cloud/CloudImp.h
+// The base DreamCloud Implementation intefrace
+
+#include <string>
+
+class CloudImp {
+public:
+	CloudImp() {
+		// empty
+	}
+
+	~CloudImp() {
+		// empty
+	}
+
+	virtual RESULT Update() = 0;
+	virtual RESULT CreateNewURLRequest(std::wstring& strURL) = 0;
+
+	// TODO: Add a handle URL request callback here
+
+private:
+	UID m_uid;
+};
+
+#endif

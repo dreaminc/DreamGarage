@@ -1,6 +1,7 @@
 #include "Windows64App.h"
 #include "Sandbox/PathManagerFactory.h"
 #include "HAL/opengl/OpenGLRenderingContextFactory.h"
+#include "Cloud/CloudControllerFactory.h"
 
 #include "./HAL/opengl/OpenGLImp.h"
 
@@ -15,7 +16,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr)
+	m_pHMD(nullptr),
+	m_pCloudController(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -86,6 +88,10 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pTimeManager = new TimeManager();
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CV(m_pTimeManager, "Failed to validate Time Manager");
+
+	// Set up the Cloud Controller
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 
 	Validate();
 	return;
@@ -332,6 +338,8 @@ Error:
 
 #include "HAL/opengl/OGLVolume.h"
 
+#include "Cloud/CEFImp.h"
+
 // Note this call will never return and will actually run the event loop
 // TODO: Thread it?
 RESULT Windows64App::ShowSandbox() {
@@ -342,6 +350,7 @@ RESULT Windows64App::ShowSandbox() {
 		MessageBox(NULL, _T("Failed to create windows sandbox"), _T("Dream OS Sandbox"), NULL);
 		return R_FAIL;
 	}
+
 
 	// Setup OpenGL and Resize Windows etc
 	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
@@ -366,7 +375,10 @@ RESULT Windows64App::ShowSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
+	///*
 	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
+	CNM(m_pHMD, "Failed to create HMD");
+	//*/
 
 	// TODO: Should replace this with a proper scene loader
 	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
@@ -391,13 +403,17 @@ RESULT Windows64App::ShowSandbox() {
 			DispatchMessage(&msg);
 		}
 
-		m_pTimeManager->Update();
+		// Update Network
+		CR(m_pCloudController->Update());
+
+		// Time Manager
+		CR(m_pTimeManager->Update());
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		m_pWin64Mouse->UpdateMousePosition();
+		//m_pWin64Mouse->UpdateMousePosition();
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());

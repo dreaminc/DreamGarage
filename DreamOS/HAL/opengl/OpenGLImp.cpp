@@ -173,6 +173,7 @@ RESULT OpenGLImp::PrepareScene() {
 	
 	// TODO(NTH): Add a program / render pipeline arch
 	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
