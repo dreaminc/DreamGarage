@@ -24,11 +24,30 @@ public:
 		// empty
 	}
 
-	RESULT SetCloudImp(std::unique_ptr<CloudImp> m_pCloudImp) {
+	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp) {
 		RESULT r = R_PASS;
 
-		m_pCloudImp = std::unique_ptr<CloudImp>(std::move(m_pCloudImp));
+		m_pCloudImp = std::unique_ptr<CloudImp>(std::move(pCloudImp));
 		CN(m_pCloudImp);
+
+	Error:
+		return r;
+	}
+
+	RESULT CreateNewURLRequest(std::wstring strURL) {
+		RESULT r = R_PASS;
+
+		CNM(m_pCloudImp, "Cloud Imp not initialized");
+		CRM(m_pCloudImp->CreateNewURLRequest(strURL), "Failed to create CEF URL request for %S", strURL.c_str());
+
+	Error:
+		return r;
+	}
+
+	RESULT Update() {
+		RESULT r = R_PASS;
+
+		CR(m_pCloudImp->Update());
 
 	Error:
 		return r;

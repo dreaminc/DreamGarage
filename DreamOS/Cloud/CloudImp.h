@@ -9,6 +9,8 @@
 // DreamOS/Cloud/CloudImp.h
 // The base DreamCloud Implementation intefrace
 
+#include <string>
+
 class CloudImp {
 public:
 	CloudImp() {
@@ -18,6 +20,11 @@ public:
 	~CloudImp() {
 		// empty
 	}
+
+	virtual RESULT Update() = 0;
+	virtual RESULT CreateNewURLRequest(std::wstring strURL) = 0;
+
+	// TODO: Add a handle URL request callback here
 
 private:
 	UID m_uid;
