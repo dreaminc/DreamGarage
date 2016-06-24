@@ -51,36 +51,53 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 			all_normals.emplace_back(x, y, z);
 		}
 		else if (type.compare("f") == 0) {
-			size_t newPositionIndices[3], newUvIndices[3], newNormalIndices[3];
+			size_t newPositionIndices[4], newUvIndices[4 ], newNormalIndices[4];
 
-			// Read as vertex/uv/normal format
-			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d\n",
-										&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
-										&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
-										&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]);
+			// Read as vertex/uv/normal quad format
+			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
+						&newPositionIndices[3], &newUvIndices[3], &newNormalIndices[3],
+						&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
+						&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
+						&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]);
 
-			if (num_matches != 9) {
+			if (num_matches != 12) {
+				// Read as vertex/uv/normal tri format
+				num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d\n",
+					&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
+					&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
+					&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]);
 
-				// Read as vertex//normal format
-				num_matches = std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d\n",
-										&newPositionIndices[2], &newNormalIndices[2],
-										&newPositionIndices[1], &newNormalIndices[1],
-										&newPositionIndices[0], &newNormalIndices[0]);
+				if (num_matches != 9) {
 
-				if (num_matches != 6) {
-					// Cannot read face format.
-					return false;
+					// Read as vertex//normal format
+					num_matches = std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d\n",
+						&newPositionIndices[2], &newNormalIndices[2],
+						&newPositionIndices[1], &newNormalIndices[1],
+						&newPositionIndices[0], &newNormalIndices[0]);
+
+					if (num_matches != 6) {
+						// Cannot read face format.
+						return false;
+					}
 				}
-
 			}
-
 			for (int i = 0; i < 3; ++i) {
 				positionIndices.push_back(newPositionIndices[i]);
 				uvIndices.push_back(newUvIndices[i]);
 				normalIndices.push_back(newNormalIndices[i]);
 			}
-		}
 
+			if (num_matches == 12) {
+				for (int j = 0; j < 3; ++j) {
+					int i = j == 0 ? j : j + 1;
+					positionIndices.push_back(newPositionIndices[i]);
+					uvIndices.push_back(newUvIndices[i]);
+					normalIndices.push_back(newNormalIndices[i]);
+
+				}
+			}
+
+		}
 	}
 
 	for (int index = 0; index < positionIndices.size(); ++index) {
