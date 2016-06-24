@@ -28,7 +28,7 @@ DreamOS utilizes factory to construct a Cloud Controller that may use various Cl
 Making a request is as simple as the following to create a request for www.google.com
 
 
-```c_cpp
+```c++
 CloudController->CreateNewURLRequest(std::wstring(L"http://www.google.com"));
 ```
 
