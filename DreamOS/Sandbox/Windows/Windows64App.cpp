@@ -375,7 +375,7 @@ RESULT Windows64App::ShowSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	/*
+	///*
 	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
 	CNM(m_pHMD, "Failed to create HMD");
 	//*/
@@ -393,9 +393,6 @@ RESULT Windows64App::ShowSandbox() {
 
 	CN(m_pOpenGLImp);
 	CR(m_pOpenGLImp->MakeCurrentContext());
-
-	// temp code:
-	m_pCloudController->CreateNewURLRequest(std::wstring(L"http://www.google.com"));
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
@@ -416,7 +413,7 @@ RESULT Windows64App::ShowSandbox() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		//m_pWin64Mouse->UpdateMousePosition();
+		m_pWin64Mouse->UpdateMousePosition();
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
