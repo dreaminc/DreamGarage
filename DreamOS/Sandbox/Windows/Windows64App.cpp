@@ -433,7 +433,7 @@ RESULT Windows64App::ShowSandbox() {
 		// Swap buffers
 		SwapBuffers(m_hDC);
 
-		m_profiler.Tick();
+		Profiler::GetProfiler()->OnFrameRendered();
 
 #if 0 // Temporary for debugging
 		static DWORD time = GetTickCount();

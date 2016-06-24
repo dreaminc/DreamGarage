@@ -80,9 +80,9 @@ public:
 		double halfHeight = height / 2.0f;
 		double halfWidth = width / 2.0f;
 
-		m_pVertices[0] = vertex(point(0.0f, halfHeight, 0.0f));			// A
-		m_pVertices[1] = vertex(point(-halfWidth, -halfHeight, 0.0f));	// B
-		m_pVertices[2] = vertex(point(halfWidth, -halfHeight, 0.0f));	// C
+		m_pVertices[0] = vertex(point(0.0f, halfHeight, 0.0f),color(1.0, 0.0, 1.0, 1.0));			// A
+		m_pVertices[1] = vertex(point(-halfWidth, -halfHeight, 0.0f), color(1.0, 0.0, 1.0, 1.0));	// B
+		m_pVertices[2] = vertex(point(halfWidth, -halfHeight, 0.0f), color(1.0, 0.0, 1.0, 1.0));	// C
 
 		Validate();
 		return;
@@ -90,6 +90,31 @@ public:
 	Error:
 		Invalidate();
 		return;
+	}
+
+	triangle(point p1, point p2, point p3) :
+		m_triangleType(ISOCELES)
+	{
+		RESULT r = R_PASS;
+		CR(Allocate());
+
+		m_pVertices[0] = vertex(p1, color(1.0, 0.0, 1.0, 1.0));			// A
+		m_pVertices[1] = vertex(p2, color(1.0, 0.0, 1.0, 1.0));	// B
+		m_pVertices[2] = vertex(p3, color(1.0, 0.0, 1.0, 1.0));	// C
+
+		Validate();
+		return;
+
+	Error:
+		Invalidate();
+		return;
+	}
+
+	void set(point p1, point p2, point p3)
+	{
+		m_pVertices[0] = vertex(p1, color(1.0, 0.0, 1.0, 1.0)); // A
+		m_pVertices[1] = vertex(p2, color(1.0, 0.0, 1.0, 1.0));	// B
+		m_pVertices[2] = vertex(p3, color(1.0, 0.0, 1.0, 1.0));	// C
 	}
 
 	// TODO: Scalene arbitrary triangle 
