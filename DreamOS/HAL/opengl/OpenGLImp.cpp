@@ -741,7 +741,6 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 			else {
 				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 			}
-
 		}		
 
 		skybox *pSkybox = nullptr;
