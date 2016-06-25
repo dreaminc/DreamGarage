@@ -32,12 +32,16 @@ public:
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 
 public:
+	virtual RESULT AddObject(VirtualObj *pObject) = 0;	// TODO: This may be unsafe
+	RESULT AddLight(light *pLight);
+
+public:
 	PathManager *GetPathManager();
 	OpenGLRenderingContext *GetOpenGLRenderingContext();
 
 protected:
 	PathManager *m_pPathManager;
-	OpenGLRenderingContext *m_pOpenGLRenderingContext;
+	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	SceneGraph *m_pSceneGraph;
 
 private:

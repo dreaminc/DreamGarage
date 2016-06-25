@@ -336,9 +336,16 @@ Error:
 	return r;
 }
 
-#include "HAL/opengl/OGLVolume.h"
+RESULT Windows64App::AddObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
 
-#include "Cloud/CEFImp.h"
+	// TODO: Handle conversion / check OGL objects as needed potentially
+
+	CR(m_pSceneGraph->PushObject(pObject));
+
+Error:
+	return r;
+}
 
 // Note this call will never return and will actually run the event loop
 // TODO: Thread it?
@@ -375,7 +382,7 @@ RESULT Windows64App::ShowSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	///*
+	/*
 	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
 	CNM(m_pHMD, "Failed to create HMD");
 	//*/

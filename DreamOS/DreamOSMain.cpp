@@ -12,6 +12,7 @@ int main(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
     
 	DreamGarage dreamGarageApp;
+	CRM(dreamGarageApp.Initialize(), "Failed to initialize Dream Garage");
 	
 	// This is the entry point for the DreamOS Engine
 	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");

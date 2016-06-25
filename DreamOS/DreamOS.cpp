@@ -6,8 +6,6 @@ DreamOS::DreamOS() :
 {
 	RESULT r = R_PASS;
 
-	CRM(Initialize(), "Failed to initialize DreamOS");
-
 Success:
 	Validate();
 	return;
@@ -32,6 +30,9 @@ RESULT DreamOS::Initialize() {
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 
+	// Load the scene
+	CRM(LoadScene(), "Failed to load scene");
+
 Error:
 	return r;
 }
@@ -51,4 +52,14 @@ Error:
 RESULT DreamOS::Exit(RESULT exitcode) {
 	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", m_versionDreamOS.GetString(), exitcode);
 	return exitcode;
+}
+
+
+RESULT DreamOS::AddLight(light *pLight) {
+	RESULT r = R_PASS;
+
+	CR(m_pSandbox->AddLight(pLight));
+
+Error:
+	return r;
 }

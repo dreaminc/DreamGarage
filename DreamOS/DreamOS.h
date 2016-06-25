@@ -31,6 +31,11 @@ public:
 	RESULT Start();
 	RESULT Exit(RESULT exitcode);
 
+	virtual RESULT LoadScene() = 0;
+
+protected:
+	RESULT AddLight(light *pLight);
+
 private:
 	SandboxApp *m_pSandbox;
 

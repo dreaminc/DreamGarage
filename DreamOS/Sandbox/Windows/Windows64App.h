@@ -52,6 +52,9 @@ public:
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
 
+public:
+	RESULT AddObject(VirtualObj *pObject);
+
 private:
 	bool m_fFullscreen;
 	long m_wndStyle;

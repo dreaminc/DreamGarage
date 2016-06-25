@@ -19,3 +19,12 @@ inline PathManager * SandboxApp::GetPathManager() {
 inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext; 
 }
+
+RESULT SandboxApp::AddLight(light *pLight) {
+	RESULT r = R_PASS;
+
+	CR(AddObject(pLight));
+
+Error:
+	return r;
+}

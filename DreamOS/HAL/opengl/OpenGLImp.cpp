@@ -384,34 +384,10 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 #include "OGLTexture.h"
 #include "OGLSkybox.h"
 
-light *g_pLight = NULL;
-
 // TODO: Other approach 
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
 	RESULT r = R_PASS;
 
-	// Add lights
-	light *pLight = NULL; 
-
-	///*
-	pLight = new light(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	pSceneGraph->PushObject(pLight);
-	//*/
-
-	///*
-	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
-	pLight = new light(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
-	pSceneGraph->PushObject(pLight);
-
-	pLight = new light(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace/2.0)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f));
-	pSceneGraph->PushObject(pLight);
-
-	pLight = new light(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f));
-	pSceneGraph->PushObject(pLight);
-	//*/
-
-	g_pLight = pLight;
-	
 	/*
 	texture *pBumpTexture = new OGLTexture(this, L"crate_bump.png");
 	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
@@ -474,7 +450,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	}
 	//*/
 		
-	///*
+	/*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 	
@@ -492,7 +468,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pModel);
 	//*/
 
-	/*
+	///*
 	OGLSphere *pSphere = NULL;
 
 	int num = 10;
