@@ -46,6 +46,14 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
+
+	OGLTriangle(OpenGLImp *pParentImp, triangle&& q) :
+		triangle(q),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
 };
 
 #endif // ! OGL_TRIANGLE_H_
