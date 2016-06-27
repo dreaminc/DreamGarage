@@ -30,6 +30,8 @@ RESULT DreamOS::Initialize() {
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 
+	// TODO: Initialize the sandbox
+
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
 
@@ -55,11 +57,6 @@ RESULT DreamOS::Exit(RESULT exitcode) {
 }
 
 
-RESULT DreamOS::AddLight(light *pLight) {
-	RESULT r = R_PASS;
-
-	CR(m_pSandbox->AddLight(pLight));
-
-Error:
-	return r;
+light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }

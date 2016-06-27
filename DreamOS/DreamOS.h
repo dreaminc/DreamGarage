@@ -34,7 +34,8 @@ public:
 	virtual RESULT LoadScene() = 0;
 
 protected:
-	RESULT AddLight(light *pLight);
+	//RESULT AddLight(light *pLight);
+	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
 private:
 	SandboxApp *m_pSandbox;

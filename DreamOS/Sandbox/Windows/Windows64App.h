@@ -54,6 +54,7 @@ public:
 
 public:
 	RESULT AddObject(VirtualObj *pObject);
+	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
 private:
 	bool m_fFullscreen;

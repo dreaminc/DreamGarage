@@ -33,7 +33,7 @@ public:
 
 public:
 	virtual RESULT AddObject(VirtualObj *pObject) = 0;	// TODO: This may be unsafe
-	RESULT AddLight(light *pLight);
+	virtual light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 
 public:
 	PathManager *GetPathManager();

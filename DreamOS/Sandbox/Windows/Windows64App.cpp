@@ -336,15 +336,35 @@ Error:
 	return r;
 }
 
+// Sandbox Factory Methods
+// TODO: This should all go up into the sandbox
 RESULT Windows64App::AddObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
-
-	// TODO: Handle conversion / check OGL objects as needed potentially
 
 	CR(m_pSceneGraph->PushObject(pObject));
 
 Error:
 	return r;
+}
+
+light* Windows64App::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+	RESULT r = R_PASS;
+	
+	light *pLight = new light(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+	CN(pLight);
+
+	CR(AddObject(pLight));
+
+Success:
+	return pLight;
+
+Error:
+	if (pLight != nullptr) {
+		delete pLight;
+		pLight = nullptr;
+	}
+
+	return nullptr;
 }
 
 // Note this call will never return and will actually run the event loop
