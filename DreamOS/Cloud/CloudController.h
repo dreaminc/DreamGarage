@@ -21,7 +21,7 @@ public:
 	}
 
 	~CloudController() {
-		// empty
+		// empty 
 	}
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp) {

@@ -22,6 +22,9 @@
 #define DREAM_OS_VERSION_MINOR 1
 #define DREAM_OS_VERSION_MINOR_MINOR 0
 
+#include "Primitives/light.h"
+#include "Primitives/sphere.h"
+
 class DreamOS : public valid {
 public:
 	DreamOS();
@@ -36,6 +39,8 @@ public:
 protected:
 	//RESULT AddLight(light *pLight);
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	volume *AddVolume(double side);
 
 private:
 	SandboxApp *m_pSandbox;

@@ -64,6 +64,12 @@ public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
 
+	// Object Factory Methods
+public:
+	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	volume* MakeVolume(double side);
+
 public:
 	// TODO: Consolidate all of these (one Render function)
 	RESULT SetMonoViewTarget();

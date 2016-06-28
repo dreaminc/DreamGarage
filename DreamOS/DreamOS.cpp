@@ -30,7 +30,8 @@ RESULT DreamOS::Initialize() {
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 
-	// TODO: Initialize the sandbox
+	// Initialize the sandbox
+	CRM(m_pSandbox->Initialize(), "Failed to initialize Sandbox");
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
@@ -45,7 +46,7 @@ RESULT DreamOS::Start() {
 	DEBUG_LINEOUT("DREAM OS %s Starting ...", m_versionDreamOS.GetString());
 
 	// This will start the application
-	CRM(m_pSandbox->ShowSandbox(), "Failed to show sandbox window");
+	CRM(m_pSandbox->Show(), "Failed to show sandbox window");
 
 Error:
 	return r;
@@ -59,4 +60,12 @@ RESULT DreamOS::Exit(RESULT exitcode) {
 
 light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+}
+
+sphere* DreamOS::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
+	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions);
+}
+
+volume* DreamOS::AddVolume(double side) {
+	return m_pSandbox->AddVolume(side);
 }

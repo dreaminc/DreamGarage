@@ -16,8 +16,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr),
-	m_pCloudController(nullptr)
+	m_pHMD(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -89,9 +88,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CV(m_pTimeManager, "Failed to validate Time Manager");
 
-	// Set up the Cloud Controller
-	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
-	CNM(m_pCloudController, "Cloud Controller failed to initialize");
+	
 
 	Validate();
 	return;
@@ -106,6 +103,17 @@ Windows64App::~Windows64App() {
 		delete m_pTimeManager;
 		m_pTimeManager = nullptr;
 	}
+}
+
+RESULT Windows64App::InitializeCloudController() {
+	RESULT r = R_PASS;
+
+	// Set up the Cloud Controller
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	CNM(m_pCloudController, "Cloud Controller failed to initialize");
+
+Error:
+	return r;
 }
 
 HDC Windows64App::GetDeviceContext() {
@@ -350,7 +358,7 @@ Error:
 light* Windows64App::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
 	
-	light *pLight = new light(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+	light *pLight = m_pOpenGLImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 	CN(pLight);
 
 	CR(AddObject(pLight));
@@ -363,13 +371,48 @@ Error:
 		delete pLight;
 		pLight = nullptr;
 	}
-
 	return nullptr;
 }
 
-// Note this call will never return and will actually run the event loop
-// TODO: Thread it?
-RESULT Windows64App::ShowSandbox() {
+sphere* Windows64App::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
+	RESULT r = R_PASS;
+
+	sphere *pSphere = m_pOpenGLImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
+	CN(pSphere);
+
+	CR(AddObject(pSphere));
+
+Success:
+	return pSphere;
+
+Error:
+	if (pSphere != nullptr) {
+		delete pSphere;
+		pSphere = nullptr;
+	}
+	return nullptr;
+}
+
+volume* Windows64App::AddVolume(double side) {
+	RESULT r = R_PASS;
+
+	volume *pVolume = m_pOpenGLImp->MakeVolume(side);
+	CN(pVolume);
+
+	CR(AddObject(pVolume));
+
+Success:
+	return pVolume;
+
+Error:
+	if (pVolume != nullptr) {
+		delete pVolume;
+		pVolume = nullptr;
+	}
+	return nullptr;
+}
+
+RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
 
 	// TODO: Use EHM for this
@@ -378,26 +421,13 @@ RESULT Windows64App::ShowSandbox() {
 		return R_FAIL;
 	}
 
-
 	// Setup OpenGL and Resize Windows etc
 	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
-	//m_pOpenGLImp = new OpenGLImp(m_hDC);
-	
+
+	// Create and initialize OpenGL Imp
 	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
 	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
 	CVM(m_pOpenGLImp, "OpenGL Implementation Invalid");
-
-	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
-
-	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
-
-	// TODO: Move to Sandbox function
-	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
-	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
-
-	// Show the window
-	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
-	UpdateWindow(m_hwndWindow);
 
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
@@ -405,14 +435,33 @@ RESULT Windows64App::ShowSandbox() {
 	/*
 	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
 	CNM(m_pHMD, "Failed to create HMD");
+	
+	if (m_pHMD != nullptr) {
+		CRM(m_pOpenGLImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+	}
 	//*/
+
+	// TODO: Move to Sandbox function
+	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
+	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
+
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 	// TODO: Should replace this with a proper scene loader
 	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
 
-	if (m_pHMD != nullptr) {
-		CRM(m_pOpenGLImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
-	}
+Error:
+	return r;
+}
+
+// Note this call will never return and will actually run the event loop
+// TODO: Thread it?
+RESULT Windows64App::Show() {
+	RESULT r = R_PASS;
+
+	// Show the window
+	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
+	UpdateWindow(m_hwndWindow);
 
 	// Launch main message loop
 	MSG msg;
@@ -440,7 +489,7 @@ RESULT Windows64App::ShowSandbox() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		//m_pWin64Mouse->UpdateMousePosition();
+		m_pWin64Mouse->UpdateMousePosition();
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
@@ -475,7 +524,7 @@ RESULT Windows64App::ShowSandbox() {
 		SwapBuffers(m_hDC);
 
 		if (GetAsyncKeyState(VK_ESCAPE)) {
-			ShutdownSandbox();
+			Shutdown();
 			fQuit = true;
 		}
 	}
@@ -485,11 +534,16 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::ShutdownSandbox() {
+RESULT Windows64App::Shutdown() {
 	RESULT r = R_PASS;
 
 	// Release device context in use by rc
 	wglMakeCurrent(m_hDC, nullptr);
+
+	if (m_pCloudController != nullptr) {
+		delete m_pCloudController;
+		m_pCloudController = nullptr;
+	}
 
 	// Shutdown and delete GL Rendering Context
 	if (m_pOpenGLImp != nullptr) {

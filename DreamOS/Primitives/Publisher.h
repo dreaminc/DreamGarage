@@ -115,7 +115,7 @@ protected:
 		pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
 		m_events[keyEvent] = pNewSubscriberList;
 
-		DEBUG_LINEOUT("%s Registered event %s", GetPublisherName(), pszEvent);
+		//DEBUG_LINEOUT("%s Registered event %s", GetPublisherName(), pszEvent);
 
 	Error:
 		if (pszEvent != NULL) {

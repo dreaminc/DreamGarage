@@ -26,7 +26,7 @@ public:
 		// Add lights
 
 		///*
-		CN(AddLight(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f)));
+		//CN(AddLight(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f)));
 		//*/
 
 		///*
@@ -35,6 +35,16 @@ public:
 		CN(AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f)));
 		CN(AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f)));
 		//*/
+
+		/*
+		sphere *pSphere1 = AddSphere(0.5f, 40, 40);
+		sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+		
+		pSphere2->translateX(5.0f);
+		//*/
+
+		volume *pVolume = AddVolume(1.0f);
+		pVolume->translateX(5.0f);
 
 	Error:
 		return r;

@@ -174,6 +174,7 @@ RESULT OpenGLImp::PrepareScene() {
 	// TODO(NTH): Add a program / render pipeline arch
 	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
@@ -384,6 +385,57 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 #include "OGLTexture.h"
 #include "OGLSkybox.h"
 
+light* OpenGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+	RESULT r = R_PASS;
+
+	light *pLight = new light(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+	CN(pLight);
+
+Success:
+	return pLight;
+
+Error:
+	if (pLight != nullptr) {
+		delete pLight;
+		pLight = nullptr;
+	}
+	return nullptr;
+}
+
+sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
+	RESULT r = R_PASS;
+
+	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions);
+	CN(pSphere);
+
+Success:
+	return pSphere;
+
+Error:
+	if (pSphere != nullptr) {
+		delete pSphere;
+		pSphere = nullptr;
+	}
+	return nullptr;
+}
+
+volume* OpenGLImp::MakeVolume(double side) {
+	RESULT r = R_PASS;
+
+	volume *pVolume = new OGLVolume(this, side);
+	CN(pVolume);
+
+Success:
+	return pVolume;
+
+Error:
+	if (pVolume != nullptr) {
+		delete pVolume;
+		pVolume = nullptr;
+	}
+	return nullptr;
+}
+
 // TODO: Other approach 
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
 	RESULT r = R_PASS;
@@ -468,7 +520,8 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pModel);
 	//*/
 
-	///*
+	
+	/*
 	OGLSphere *pSphere = NULL;
 
 	int num = 10;
