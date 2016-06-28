@@ -32,6 +32,9 @@ protected:
 	texture *m_pColorTexture;
 	texture *m_pBumpTexture;
 
+	// Use this flag to signal the appropriate rendering object (such as OGLObj) that it needs to update the buffer
+	bool	m_isDirty;
+
 public:
     DimObj() :
         VirtualObj(),	// velocity, origin
@@ -39,7 +42,8 @@ public:
 		m_pIndices(nullptr),
 		m_material(),
 		m_pColorTexture(nullptr),
-		m_pBumpTexture(nullptr)
+		m_pBumpTexture(nullptr),
+		m_isDirty(false)
         //m_aabv()
     {
         /* stub */
@@ -115,6 +119,21 @@ public:
 
 	Error:
 		return r;
+	}
+
+	// Mark the object as dirty, data should be updated by the renderer
+	void SetDirty()
+	{
+		m_isDirty = true;
+	}
+
+	// Check if dirty, and clean the dirty state
+	bool	CheckAndCleanDirty()
+	{
+		bool	isDirty = m_isDirty;
+		m_isDirty = false;
+
+		return isDirty;
 	}
 
 	RESULT SetColor(color c) {

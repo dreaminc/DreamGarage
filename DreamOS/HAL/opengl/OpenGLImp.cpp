@@ -9,6 +9,8 @@
 #include "../DreamOS/Sandbox/FileLoader.h"
 #include <vector>
 
+#include "../DreamOS/Profiler/Profiler.h"
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
@@ -32,6 +34,8 @@ Error:
 }
 
 OpenGLImp::~OpenGLImp() {
+	m_pOGLProfiler.release();
+
 	if (m_pOGLRenderProgram != nullptr) {
 		delete m_pOGLRenderProgram;
 		m_pOGLRenderProgram = nullptr;
@@ -180,6 +184,8 @@ RESULT OpenGLImp::PrepareScene() {
 
 	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
 	CN(m_pOGLOverlayProgram);
+
+	m_pOGLProfiler = std::make_unique<OGLProfiler>(this, m_pOGLOverlayProgram);
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
@@ -383,6 +389,8 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 #include "OGLTexture.h"
 #include "OGLSkybox.h"
 
+#include "OGLProfiler.h"
+
 light *g_pLight = NULL;
 
 // TODO: Other approach 
@@ -505,7 +513,6 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 
 			pSphere->SetColorTexture(pColorTexture);
 			pSphere->SetBumpTexture(pBumpTexture);
-
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
 			pSphere->UpdateOGLBuffers();
@@ -563,64 +570,8 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 	}
 	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	CRM(m_pOGLOverlayProgram->UseProgram(), "Failed to use OGLProgram");
-	
-	static OGLTriangle* pTri = nullptr;
-	static OGLQuad*	pQuad = nullptr;
-	static OGLText*	pText = nullptr;
-
-	if (pTri == nullptr)
-	{
-		pTri = new OGLTriangle(this, 1.0f, 1.0f);
-
-		texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-		pTri->SetColorTexture(pColorTexture);
-	}
-
-	if (pQuad == nullptr)
-	{
-		pQuad = new OGLQuad(this, quad(1.0, 1.0, vector(0, 0, 0), uvcoord(0,0), uvcoord(0.3,1)));
-
-		texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-		pQuad->SetColorTexture(pColorTexture);
-	}
-
-	if (pText == nullptr)
-	{
-		static std::shared_ptr<Font> pFont = nullptr;
-		
-		if (pFont == nullptr)
-		{
-			pFont = std::make_shared<Font>(L"Arial.fnt");
-		}
-		
-		pText = new OGLText(this, pFont, "321");
-
-		pText->MoveTo(-1.0, -1.0, 0);
-	}
-
-	static int cnt = 0;
-	static DWORD time = GetTickCount();
-	if (GetTickCount() - time > 100)
-	{
-		cnt++;
-		pText->SetText(std::to_string(cnt));
-		time = GetTickCount();
-	}
-
-	
-
-	CR(m_pOGLOverlayProgram->SetCamera(m_pCamera));
-
-//	m_pOGLOverlayProgram->RenderObject(pTri);
-//	m_pOGLOverlayProgram->RenderObject(pQuad);
-	m_pOGLOverlayProgram->RenderObject(pText);
-
+	// Render profiler overlay
+	m_pOGLProfiler->Render();
 
 	glFlush();
 

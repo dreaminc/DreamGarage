@@ -1,6 +1,9 @@
 #include "Profiler.h"
+#include "ProfilerGraph.h"
 
 #include <algorithm>
+
+#include "windows.h"
 
 // Profiler
 
@@ -13,6 +16,20 @@ Profiler::Profiler()
 Profiler::~Profiler()
 {
 
+}
+
+void Profiler::OnFrameRendered()
+{
+	m_ticker.Tick();
+
+	m_FPSGraph.AddMeasurement(static_cast<uint16_t>(m_ticker.GetTicksPerSecond()));
+
+	return;
+}
+
+Profiler::FPSGraph_t& Profiler::GetFPSGraph()
+{
+	return m_FPSGraph;
 }
 
 // TickCounter

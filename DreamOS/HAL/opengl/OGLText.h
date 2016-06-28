@@ -38,11 +38,13 @@ public:
 		SetColorTexture(pColorTexture);
 	}
 
-	void SetText(const std::string& text, double size = 1.0)
+	OGLText* SetText(const std::string& text, double size = 1.0)
 	{
 		text::SetText(text, size);
 
-		UpdateOGLBuffers();
+		SetDirty();
+
+		return this;
 	}
 };
 

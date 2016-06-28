@@ -9,6 +9,8 @@
 #include <chrono>
 #include <vector>
 
+#include "ProfilerGraph.h"
+
 class TickCounter
 {
 public:
@@ -16,10 +18,10 @@ public:
 	~TickCounter();
 
 	// Submits a tick to the counter
-	void Tick();
+	virtual void Tick();
 
 	// Measure the ticks per second for the last m_nsamples samples
-	double	GetTicksPerSecond();
+	virtual double	GetTicksPerSecond();
 
 private:
 	static const int m_nsamples = 5;
@@ -27,12 +29,27 @@ private:
 	std::vector<std::chrono::time_point<std::chrono::high_resolution_clock>>	m_tickTimes;
 };
 
-class Profiler : public TickCounter, public valid {
+class Profiler : public valid {
 public:
+	static Profiler* GetProfiler()
+	{
+		static Profiler profiler;
+		return &profiler;
+	}
+
 	Profiler();
 	~Profiler();
 
+	void OnFrameRendered();
+
+	typedef ProfilerGraph<uint16_t>	FPSGraph_t;
+
+	FPSGraph_t& GetFPSGraph();
+
 private:
+
+	TickCounter	m_ticker;
+	FPSGraph_t m_FPSGraph{ 5.0 };
 };
 
 #endif // !PROFILER_H_

@@ -36,17 +36,17 @@ private:
 	unsigned int m_nIndices;
 
 public:
-	text(std::shared_ptr<Font> font, const std::string& text) :
+	text(std::shared_ptr<Font> font, const std::string& text, double size = 1.0) :
 		m_font(font)
 	{
-		SetText(text);
+		SetText(text, size);
 
 		Validate();
 	Error:
 		Invalidate();
 	}
 
-	RESULT SetText(const std::string& text)
+	RESULT SetText(const std::string& text, double size)
 	{
 		std::vector<quad> quads;
 
@@ -73,8 +73,8 @@ public:
 		double posx = 0;
 
 		// For now the font scale is based on 1080p
-		const int screen_width = 1920;
-		const int screen_height = 1080;
+		const int screen_width = 1920 * size;
+		const int screen_height = 1080 * size;
 
 		double	glyphWidth = m_font->GetGlyphWidth();
 		double	glyphHeight = m_font->GetGlyphHeight();
