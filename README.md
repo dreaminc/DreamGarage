@@ -39,3 +39,21 @@ The request handling is TBD at the moment
 Using CEF should only be done through the Cloud Controller
 
 
+## Using Dream OS 
+
+DreamGarage is a child object of the DreamOS object which can be instantiated to set up the platform sandbox and HAL subsystems.  DreamOS can then be used to manipulate the internal state of the engine, such as creating / adding new objects and manipulating them.  
+
+On initialization DreamOS will call `virtual RESULT LoadScene()` which is an opportunity for the DreamGarage object to set up the objects that it wants in the scene graph.  Handles to these objects can then be manipulated in the `virtual RESULT Update()` function which is called once per update loop in the engine.
+
+The following functions can be used to create / Add objects:
+
+```c++
+light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+volume *AddVolume(double side);
+texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+skybox *AddSkybox();
+model *AddModel(wchar_t *pszModelName);
+```
+
+Currently no notifications / events are set up but this will be added to help notify the applicatio of things like keyboard entry, mouse movement or other pertinent application layer events.

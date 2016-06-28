@@ -373,8 +373,6 @@ RESULT Windows64App::InitializeSandbox() {
 	// This needs to be done after GL set up
 	/*
 	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
-	CNM(m_pHMD, "Failed to create HMD");
-	
 	if (m_pHMD != nullptr) {
 		CRM(m_pOpenGLImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
 	}
