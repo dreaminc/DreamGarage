@@ -91,9 +91,11 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CV(m_pTimeManager, "Failed to validate Time Manager");
 
+#ifdef CEF_ON
 	// Set up the Cloud Controller
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
+#endif
 
 	Validate();
 	return;
@@ -379,7 +381,7 @@ RESULT Windows64App::ShowSandbox() {
 	// This needs to be done after GL set up
 	///*
 	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
-	CNM(m_pHMD, "Failed to create HMD");
+	//CNM(m_pHMD, "Failed to create HMD");
 	//*/
 
 	// TODO: Should replace this with a proper scene loader
@@ -405,8 +407,10 @@ RESULT Windows64App::ShowSandbox() {
 			DispatchMessage(&msg);
 		}
 
+#ifdef CEF_ON
 		// Update Network
 		CR(m_pCloudController->Update());
+#endif
 
 		// Time Manager
 		CR(m_pTimeManager->Update());
@@ -415,7 +419,7 @@ RESULT Windows64App::ShowSandbox() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		//m_pWin64Mouse->UpdateMousePosition();
+		m_pWin64Mouse->UpdateMousePosition();
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
