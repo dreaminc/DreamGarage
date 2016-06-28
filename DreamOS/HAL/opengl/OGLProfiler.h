@@ -2,12 +2,14 @@
 #define OGLPROFILER_H_
 
 #include "HAL/opengl/OGLProgram.h"
+
 #include "OGLTriangle.h"
 #include "OGLText.h"
 
 #include <memory>
 
 #include "Profiler/ProfilerGraph.h"
+
 
 // Dream OS
 // DreamOS/HAL/opengl/OGLProfiler.h
