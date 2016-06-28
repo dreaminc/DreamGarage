@@ -24,6 +24,9 @@
 
 #include "Primitives/light.h"
 #include "Primitives/sphere.h"
+#include "Primitives/volume.h"
+#include "Primitives/texture.h"
+#include "Primitives/skybox.h"
 
 class DreamOS : public valid {
 public:
@@ -35,6 +38,7 @@ public:
 	RESULT Exit(RESULT exitcode);
 
 	virtual RESULT LoadScene() = 0;
+	virtual RESULT Update(void) = 0;
 
 protected:
 	//RESULT AddLight(light *pLight);
@@ -42,6 +46,12 @@ protected:
 	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	volume *AddVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	skybox *AddSkybox();
+	model *AddModel(wchar_t *pszModelName);
+
+protected:
+	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
+	RESULT UnregisterUpdateCallback();
 
 private:
 	SandboxApp *m_pSandbox;

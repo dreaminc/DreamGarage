@@ -36,6 +36,9 @@ RESULT DreamOS::Initialize() {
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
 
+	// Register the update callback
+	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
+
 Error:
 	return r;
 }
@@ -72,4 +75,20 @@ volume* DreamOS::AddVolume(double side) {
 
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pSandbox->MakeTexture(pszFilename, type);
+}
+
+skybox *DreamOS::AddSkybox() {
+	return m_pSandbox->AddSkybox();
+}
+
+model *DreamOS::AddModel(wchar_t *pszModelName) {
+	return m_pSandbox->AddModel(pszModelName);
+}
+
+RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
+	return m_pSandbox->RegisterUpdateCallback(fnUpdateCallback);
+}
+
+RESULT DreamOS::UnregisterUpdateCallback() {
+	return m_pSandbox->UnregisterUpdateCallback();
 }

@@ -385,10 +385,6 @@ RESULT Windows64App::InitializeSandbox() {
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
-
-	// TODO: Should replace this with a proper scene loader
-	CRM(m_pHALImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
-
 Error:
 	return r;
 }
@@ -423,6 +419,11 @@ RESULT Windows64App::Show() {
 
 		// Time Manager
 		CR(m_pTimeManager->Update());
+
+		// Update Callback
+		if (m_fnUpdateCallback != nullptr) {
+			CR(m_fnUpdateCallback());
+		}
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should

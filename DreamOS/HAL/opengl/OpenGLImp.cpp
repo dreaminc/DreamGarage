@@ -5,8 +5,6 @@
 #include "Primitives/ProjectionMatrix.h"
 #include "Primitives/TranslationMatrix.h"
 #include "Primitives/RotationMatrix.h"
-
-#include "../DreamOS/Sandbox/FileLoader.h"
 #include <vector>
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
@@ -176,6 +174,7 @@ RESULT OpenGLImp::PrepareScene() {
 	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
@@ -357,7 +356,6 @@ Error:
 #include "Primitives/font.h"
 #include "OGLTriangle.h"
 #include "OGLQuad.h"
-#include "Sandbox/PathManager.h"
 
 #include "OGLSphere.h"
 #include "Primitives/light.h"
@@ -432,124 +430,38 @@ Error:
 	return nullptr;
 }
 
-// TODO: Other approach 
-///*
-RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
+skybox *OpenGLImp::MakeSkybox() {
 	RESULT r = R_PASS;
 
-	/*
-	texture *pBumpTexture = new OGLTexture(this, L"crate_bump.png");
-	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
-	//*/
+	skybox *pSkybox = new OGLSkybox(this);
+	CN(pSkybox);
 
-	///*
-	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-	texture *pBumpTexture2 = new OGLTexture(this, L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
-	texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	texture *pColorTexture2 = new OGLTexture(this, L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	//*/
+Success:
+	return pSkybox;
 
-	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
-	///*
-	OGLSkybox *pSkybox = new OGLSkybox(this);
-	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
-	pSkybox->SetCubeMapTexture(pCubeMap);
-	pSkybox->OGLActivateCubeMapTexture();
-	pSceneGraph->PushObject(pSkybox);
-	//*/
-	
-	/*
-	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
-	pVolume->SetColorTexture(pColorTexture);
-	pVolume->SetBumpTexture(pBumpTexture);
-	pSceneGraph->PushObject(pVolume);
-	//m_pFragmentShader->SetTexture(reinterpret_cast<OGLTexture*>(pColorTexture));
-
-	///*
-	pVolume = new OGLVolume(this, 1.0f);
-	pVolume->SetColorTexture(pColorTexture2);
-	pVolume->translateX(2.0f);
-	pVolume->SetBumpTexture(pBumpTexture2);
-	pSceneGraph->PushObject(pVolume);
-	//*/
-
-	/*
-	OGLVolume *pVolume = NULL;
-	int num = 10;
-	double size = 0.5f;
-	int spaceFactor = 2;
-
-	for (int i = 0; i < num; i++) {
-		for (int j = 0; j < num; j++) {
-			pVolume = new OGLVolume(this, size);
-
-			pVolume->SetColorTexture(pColorTexture);
-			pVolume->SetBumpTexture(pBumpTexture);
-
-			//pVolume->SetRandomColor();
-			pVolume->translate(static_cast<point_precision>(i * (size * 2) - (num * size)), 
-				static_cast<point_precision>(0.0f),
-				static_cast<point_precision>(j * (size * 2) - (num * size)));
-
-			pVolume->UpdateOGLBuffers();
-			//pTimeManager->RegisterSubscriber(TIME_ELAPSED, pVolume);
-			pSceneGraph->PushObject(pVolume);
-		}
+Error:
+	if (pSkybox != nullptr) {
+		delete pSkybox;
+		pSkybox = nullptr;
 	}
-	//*/
-		
-	/*
-	// TODO: All this should go into Model
-	std::vector<vertex> v;
-	
-	// TODO: Should move to using path manager
-	PathManager* pMgr = PathManager::instance();
-	wchar_t*	path;
-	pMgr->GetCurrentPath((wchar_t*&)path);
-	std::wstring objFile(path);
+	return nullptr;
+}
 
-// 	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\car.obj", v);
-	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\chainsaw_free.obj", v);
-	OGLModel* pModel = new OGLModel(this, v);
-	//pModel->SetRandomColor();
-	pModel->UpdateOGLBuffers();
-	pSceneGraph->PushObject(pModel);
-	//*/
+model *OpenGLImp::MakeModel(wchar_t *pszModelName) {
+	RESULT r = R_PASS;
 
-	
-	/*
-	OGLSphere *pSphere = NULL;
+	model *pModel = new OGLModel(this, pszModelName);
+	CN(pModel);
 
-	int num = 10;
-	int sects = 40;
-	double radius = 0.5f;
-	double size = radius * 2;
-	int spaceFactor = 4;
+Success:
+	return pModel;
 
-	for (int i = 0; i < num; i++) {
-		for (int j = 0; j < num; j++) {
-			pSphere = new OGLSphere(this, radius, sects, sects);
-
-			pSphere->SetColorTexture(pColorTexture);
-			pSphere->SetBumpTexture(pBumpTexture);
-
-			//pVolume->SetRandomColor();
-			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
-			pSphere->UpdateOGLBuffers();
-			//pTimeManager->RegisterSubscriber(TIME_ELAPSED, pSphere);
-			pSceneGraph->PushObject(pSphere);
-		}
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
 	}
-	/*
-	OGLQuad *pQuad = NULL;
-	pQuad = new OGLQuad(this, 10.0f);
-	pQuad->SetColorTexture(pColorTexture);
-	pSceneGraph->PushObject(pQuad);
-
-	//*/
-
-	return r;
+	return nullptr;
 }
 
 RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {

@@ -19,6 +19,8 @@
 
 #include "Scene/SceneGraph.h"
 
+#include <functional>
+
 class CloudController;
 
 class light; 
@@ -26,6 +28,7 @@ class sphere;
 class volume; 
 class texture; 
 class skybox;
+class model;
 
 class SandboxApp : public valid {
 public:
@@ -52,10 +55,14 @@ public:
 	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	volume* AddVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	skybox *AddSkybox();
+	model *AddModel(wchar_t *pszModelName);
 
 public:
 	PathManager *GetPathManager();
 	OpenGLRenderingContext *GetOpenGLRenderingContext();
+	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
+	RESULT UnregisterUpdateCallback();
 
 protected:
 	PathManager *m_pPathManager;
@@ -66,6 +73,9 @@ protected:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
+
+protected:
+	std::function<RESULT(void)> m_fnUpdateCallback;
 
 private:
 	UID m_uid;

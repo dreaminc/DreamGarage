@@ -5,7 +5,8 @@ SandboxApp::SandboxApp() :
 	m_pOpenGLRenderingContext(NULL),
 	m_pSceneGraph(NULL),
 	m_pCloudController(nullptr),
-	m_pHALImp(nullptr)
+	m_pHALImp(nullptr),
+	m_fnUpdateCallback(nullptr)
 {
 	// empty
 }
@@ -108,4 +109,63 @@ Error:
 
 texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pHALImp->MakeTexture(pszFilename, type);
+}
+
+skybox *SandboxApp::AddSkybox() {
+	RESULT r = R_PASS;
+
+	skybox *pSkybox = m_pHALImp->MakeSkybox();
+	CN(pSkybox);
+
+	CR(AddObject(pSkybox));
+
+Success:
+	return pSkybox;
+
+Error:
+	if (pSkybox != nullptr) {
+		delete pSkybox;
+		pSkybox = nullptr;
+	}
+	return nullptr;
+}
+
+// TODO: A lot of this should go into the model object itself
+model *SandboxApp::AddModel(wchar_t *pszModelName) {
+	RESULT r = R_PASS;
+
+	model* pModel = m_pHALImp->MakeModel(pszModelName);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+RESULT SandboxApp::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
+	RESULT r = R_PASS;
+
+	CB((m_fnUpdateCallback == nullptr));
+	m_fnUpdateCallback = fnUpdateCallback;
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::UnregisterUpdateCallback() {
+	RESULT r = R_PASS;
+
+	CB((m_fnUpdateCallback != nullptr));
+	m_fnUpdateCallback = nullptr;
+
+Error:
+	return r;
 }

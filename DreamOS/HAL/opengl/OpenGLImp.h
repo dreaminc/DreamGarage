@@ -66,6 +66,8 @@ public:
 	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	volume* MakeVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	skybox *MakeSkybox();
+	model *MakeModel(wchar_t *pszModelName);
 
 public:
 	// TODO: Consolidate all of these (one Render function)
@@ -80,7 +82,6 @@ public:
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT Shutdown();
 
-	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
 	//RESULT InitializeStereoFramebuffers(HMD *pHMD);
 	RESULT SetHMD(HMD *pHMD);
 
