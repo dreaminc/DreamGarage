@@ -70,8 +70,8 @@ OGLProfilerGraph::~OGLProfilerGraph()
 
 void OGLProfilerGraph::Init()
 {
-	m_OGLTriangle = std::make_unique<OGLTriangle>(m_OGLImp, triangle(point(-0.5, -0.5, 0), point(0.5, -0.5, 0), point(0.5, 0.5, 0)));
-	m_OGLTriangle->SetColorTexture(new OGLTexture(m_OGLImp, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_OGLTriangle = std::make_unique<OGLTriangle>(m_OGLImp);
+	m_OGLTriangle->SetColor(color(0.8, 0.8, 0.8, 1));
 
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "000");
@@ -145,10 +145,10 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 
 	// Draw local min/max bars
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left - 0.05, YSCALE(minFPS), 0), point(right + 0.1, YSCALE(minFPS), 0), point(right + 0.1, YSCALE(minFPS), 0)));
-	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left - 0.05, YSCALE(maxFPS), 0), point(right + 0.1, YSCALE(maxFPS), 0), point(right + 0.1, YSCALE(maxFPS), 0)));
+	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(minFPS), 0), point(right, YSCALE(minFPS), 0), point(right, YSCALE(minFPS), 0)));
+	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(maxFPS), 0), point(right, YSCALE(maxFPS), 0), point(right, YSCALE(maxFPS), 0)));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 2.0)->MoveTo(left - 0.05, YSCALE(minFPS) - 0.05, 0));
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 2.0)->MoveTo(left - 0.05, YSCALE(maxFPS), 0));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 2.0)->MoveTo(left - 0.03, YSCALE(minFPS) - 0.05, 0));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 2.0)->MoveTo(left - 0.03, YSCALE(maxFPS), 0));
 }

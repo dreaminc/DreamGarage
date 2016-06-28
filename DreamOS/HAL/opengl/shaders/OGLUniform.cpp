@@ -67,6 +67,10 @@ Error:
 }
 
 // Explicit class based specialization (instead of a template based approach)
+RESULT OGLUniformBool::SetUniform(bool flag) {
+	return SetUniformInteger((flag)? 1 : 0);
+}
+
 RESULT OGLUniformPoint::SetUniform(point pt) {
 	return SetUniform4fv(reinterpret_cast<GLfloat*>(&pt));
 }

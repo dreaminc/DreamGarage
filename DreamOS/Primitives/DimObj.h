@@ -140,6 +140,8 @@ public:
 		for (int i = 0; i < NumberVertices(); i++)
 			m_pVertices[i].SetColor(c);
 
+		SetDirty();
+
 		return R_PASS;
 	}
 
