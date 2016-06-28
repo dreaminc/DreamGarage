@@ -88,8 +88,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CV(m_pTimeManager, "Failed to validate Time Manager");
 
-	
-
+Success:
 	Validate();
 	return;
 
@@ -103,6 +102,22 @@ Windows64App::~Windows64App() {
 		delete m_pTimeManager;
 		m_pTimeManager = nullptr;
 	}
+}
+
+RESULT Windows64App::InitializeHAL() {
+	RESULT r = R_PASS;
+
+	// Setup OpenGL and Resize Windows etc
+	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
+
+	// Create and initialize OpenGL Imp
+	// TODO: HAL factory pattern
+	m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
+	CNM(m_pHALImp, "Failed to create HAL Implementation");
+	CVM(m_pHALImp, "HAL Implementation Invalid");
+
+Error:
+	return r;
 }
 
 RESULT Windows64App::InitializeCloudController() {
@@ -162,7 +177,7 @@ RESULT Windows64App::SetDimensions(int pxWidth, int pxHeight) {
 	m_pxHeight = pxHeight;
 
 	// OpenGL Resize the view after the window had been resized
-	CRM(m_pOpenGLImp->Resize(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	CRM(m_pHALImp->Resize(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
@@ -303,7 +318,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 RESULT Windows64App::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
-	camera *pCamera = m_pOpenGLImp->GetCamera();
+	camera *pCamera = m_pHALImp->GetCamera();
 
 	/*
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
@@ -336,80 +351,12 @@ RESULT Windows64App::RegisterImpMouseEvents() {
 
 	//camera *pCamera = m_pOpenGLImp->GetCamera();
 
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_MOVE, m_pOpenGLImp));
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pOpenGLImp));
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pOpenGLImp));
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pHALImp));
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pHALImp));
 
 Error:
 	return r;
-}
-
-// Sandbox Factory Methods
-// TODO: This should all go up into the sandbox
-RESULT Windows64App::AddObject(VirtualObj *pObject) {
-	RESULT r = R_PASS;
-
-	CR(m_pSceneGraph->PushObject(pObject));
-
-Error:
-	return r;
-}
-
-light* Windows64App::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
-	RESULT r = R_PASS;
-	
-	light *pLight = m_pOpenGLImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
-	CN(pLight);
-
-	CR(AddObject(pLight));
-
-Success:
-	return pLight;
-
-Error:
-	if (pLight != nullptr) {
-		delete pLight;
-		pLight = nullptr;
-	}
-	return nullptr;
-}
-
-sphere* Windows64App::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
-	RESULT r = R_PASS;
-
-	sphere *pSphere = m_pOpenGLImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
-	CN(pSphere);
-
-	CR(AddObject(pSphere));
-
-Success:
-	return pSphere;
-
-Error:
-	if (pSphere != nullptr) {
-		delete pSphere;
-		pSphere = nullptr;
-	}
-	return nullptr;
-}
-
-volume* Windows64App::AddVolume(double side) {
-	RESULT r = R_PASS;
-
-	volume *pVolume = m_pOpenGLImp->MakeVolume(side);
-	CN(pVolume);
-
-	CR(AddObject(pVolume));
-
-Success:
-	return pVolume;
-
-Error:
-	if (pVolume != nullptr) {
-		delete pVolume;
-		pVolume = nullptr;
-	}
-	return nullptr;
 }
 
 RESULT Windows64App::InitializeSandbox() {
@@ -420,14 +367,6 @@ RESULT Windows64App::InitializeSandbox() {
 		MessageBox(NULL, _T("Failed to create windows sandbox"), _T("Dream OS Sandbox"), NULL);
 		return R_FAIL;
 	}
-
-	// Setup OpenGL and Resize Windows etc
-	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
-
-	// Create and initialize OpenGL Imp
-	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
-	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
-	CVM(m_pOpenGLImp, "OpenGL Implementation Invalid");
 
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
@@ -448,7 +387,7 @@ RESULT Windows64App::InitializeSandbox() {
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 	// TODO: Should replace this with a proper scene loader
-	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
+	CRM(m_pHALImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
 
 Error:
 	return r;
@@ -467,8 +406,8 @@ RESULT Windows64App::Show() {
 	MSG msg;
 	bool fQuit = false;
 
-	CN(m_pOpenGLImp);
-	CR(m_pOpenGLImp->MakeCurrentContext());
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
@@ -495,13 +434,13 @@ RESULT Windows64App::Show() {
 		CR(m_pSceneGraph->UpdateScene());
 
 		// Update Camera
-		m_pOpenGLImp->UpdateCamera();
+		m_pHALImp->UpdateCamera();
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
 			m_pHMD->UpdateHMD();
-			m_pOpenGLImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
-			m_pOpenGLImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
+			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
+			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}
 
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
@@ -510,13 +449,13 @@ RESULT Windows64App::Show() {
 		///*
 		// Send to the HMD
 		if (m_pHMD != nullptr) {
-			m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
+			m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}
 		else {
 			// Render Scene
-			m_pOpenGLImp->Render(m_pSceneGraph);
+			m_pHALImp->Render(m_pSceneGraph);
 		}
 		//*/
 	
@@ -546,10 +485,10 @@ RESULT Windows64App::Shutdown() {
 	}
 
 	// Shutdown and delete GL Rendering Context
-	if (m_pOpenGLImp != nullptr) {
-		CRM(m_pOpenGLImp->ShutdownImplementaiton(), "Failed to shutdown opengl implemenation");
-		delete m_pOpenGLImp;
-		m_pOpenGLImp = nullptr;
+	if (m_pHALImp != nullptr) {
+		CRM(m_pHALImp->Shutdown(), "Failed to shutdown HAL implemenation");
+		delete m_pHALImp;
+		m_pHALImp = nullptr;
 	}
 
 	wglMakeCurrent(nullptr, nullptr);

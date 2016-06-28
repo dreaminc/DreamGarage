@@ -284,6 +284,9 @@
     <ClCompile Include="..\..\..\DreamOS.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\HALImp.cpp">
+      <Filter>HAL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

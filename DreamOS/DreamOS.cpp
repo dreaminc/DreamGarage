@@ -69,3 +69,7 @@ sphere* DreamOS::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int
 volume* DreamOS::AddVolume(double side) {
 	return m_pSandbox->AddVolume(side);
 }
+
+texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+	return m_pSandbox->MakeTexture(pszFilename, type);
+}

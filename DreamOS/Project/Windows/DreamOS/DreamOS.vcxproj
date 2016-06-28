@@ -180,6 +180,7 @@ xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales"
     <ClCompile Include="..\..\..\External\SOIL\image_helper.c" />
     <ClCompile Include="..\..\..\External\SOIL\SOIL.c" />
     <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c" />
+    <ClCompile Include="..\..\..\HAL\HALImp.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />

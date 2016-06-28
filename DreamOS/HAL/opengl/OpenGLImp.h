@@ -16,16 +16,12 @@
 #include "TimeManager/TimeManager.h"
 
 //#include "Primitives/camera.h"
-
-#include "Primitives/valid.h"
 #include "Primitives/version.h"
 
 #include "HMD/HMD.h"
 
 
 #include "OpenGLExtensions.h"
-
-#include "Scene/SceneGraph.h"
 #include "Primitives/DimObj.h"
 #include "Primitives/material.h"
 
@@ -35,7 +31,7 @@
 class SandboxApp; 
 class Windows64App;
 
-class OpenGLImp : public HALImp, public valid {
+class OpenGLImp : public HALImp {
 private:
 
 	// TODO: Create an OpenGL Program class which should combine
@@ -69,6 +65,7 @@ public:
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	volume* MakeVolume(double side);
+	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 
 public:
 	// TODO: Consolidate all of these (one Render function)
@@ -81,12 +78,7 @@ public:
 	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
 
 	RESULT Resize(int pxWidth, int pxHeight);
-	RESULT ShutdownImplementaiton();
-	
-	camera *GetCamera();
-	RESULT UpdateCamera();
-	RESULT SetCameraOrientation(quaternion qOrientation);
-	RESULT SetCameraPositionDeviation(vector vDeviation);
+	RESULT Shutdown();
 
 	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
 	//RESULT InitializeStereoFramebuffers(HMD *pHMD);
@@ -104,7 +96,6 @@ private:
 	RESULT PrepareScene();
 
 private:
-	stereocamera *m_pCamera;
 	HMD *m_pHMD;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);

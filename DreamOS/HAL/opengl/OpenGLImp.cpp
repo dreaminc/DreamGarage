@@ -16,7 +16,6 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_pOGLSkyboxProgram(nullptr),
 	m_pOGLOverlayProgram(nullptr),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
-	m_pCamera(nullptr),
 	m_pHMD(nullptr)
 {
 	RESULT r = R_PASS;
@@ -24,6 +23,8 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
 	CRM(PrepareScene(), "Failed to prepare GL Scene");
 
+
+Success:
 	Validate();
 	return;
 Error:
@@ -265,10 +266,6 @@ RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
 	return m_pHMD->BindFramebuffer(eye);
 }
 
-camera * OpenGLImp::GetCamera() {
-	return m_pCamera;
-}
-
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
@@ -353,24 +350,6 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::UpdateCamera() {
-	RESULT r = R_PASS;
-
-	m_pCamera->UpdateCameraPosition();
-
-	return r;
-}
-
-RESULT OpenGLImp::SetCameraOrientation(quaternion qOrientation) {
-	m_pCamera->SetOrientation(qOrientation);
-	return R_PASS;
-}
-
-RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
-	m_pCamera->SetCameraPositionDeviation(vDeviation);
-	return R_PASS;
-}
-
 #include "OGLVolume.h"
 
 #include "OGLModel.h"
@@ -436,7 +415,25 @@ Error:
 	return nullptr;
 }
 
+texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+	RESULT r = R_PASS;
+
+	texture *pTexture = new OGLTexture(this, pszFilename, type);
+	CN(pTexture);
+
+Success:
+	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+	return nullptr;
+}
+
 // TODO: Other approach 
+///*
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
 	RESULT r = R_PASS;
 
@@ -445,7 +442,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	texture *pColorTexture = new OGLTexture(this, L"crate_color.png");
 	//*/
 
-	//*
+	///*
 	texture *pBumpTexture = new OGLTexture(this, L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	texture *pBumpTexture2 = new OGLTexture(this, L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture = new OGLTexture(this, L"bubbles_bump.jpg");
@@ -791,7 +788,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::ShutdownImplementaiton() {
+RESULT OpenGLImp::Shutdown() {
 	RESULT r = R_PASS;
 
 	//CBM((wglDeleteContext(m_hglrc)), "Failed to wglDeleteContext(hglrc)");

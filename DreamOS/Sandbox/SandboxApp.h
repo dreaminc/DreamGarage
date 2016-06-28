@@ -12,6 +12,8 @@
 // on a given platform.  A Sandbox implementation should effectively virtualize the host system as if it is running
 // natively on the DreamBox
 
+#include "HAL/HALImp.h"
+
 #include "Sandbox/PathManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
@@ -42,12 +44,14 @@ public:
 	virtual RESULT InitializePathManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
+	virtual RESULT InitializeHAL() = 0;
 
 public:
-	virtual RESULT AddObject(VirtualObj *pObject) = 0;	// TODO: This may be unsafe
-	virtual light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
-	virtual sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) = 0;
-	virtual volume* AddVolume(double side) = 0;
+	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
+	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	volume* AddVolume(double side);
+	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 
 public:
 	PathManager *GetPathManager();
@@ -58,6 +62,10 @@ protected:
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	SceneGraph *m_pSceneGraph;
 	CloudController *m_pCloudController;
+
+	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
+	//OpenGLImp *m_pOpenGLImp;
+	HALImp *m_pHALImp;
 
 private:
 	UID m_uid;

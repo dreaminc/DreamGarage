@@ -40,6 +40,7 @@ public:
 	RESULT InitializePathManager();
 	RESULT InitializeOpenGLRenderingContext();
 	RESULT InitializeCloudController();
+	RESULT InitializeHAL();
 
 private:
 	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
@@ -52,12 +53,6 @@ public:
 	HWND GetWindowHandle();
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
-
-public:
-	RESULT AddObject(VirtualObj *pObject);
-	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
-	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
-	volume* AddVolume(double side);
 
 private:
 	bool m_fFullscreen;
@@ -78,8 +73,6 @@ private:
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
-	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
-	OpenGLImp *m_pOpenGLImp;	
 	TimeManager	*m_pTimeManager;
 
 public:

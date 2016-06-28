@@ -41,6 +41,7 @@ protected:
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	volume *AddVolume(double side);
+	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 
 private:
 	SandboxApp *m_pSandbox;
