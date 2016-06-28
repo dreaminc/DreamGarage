@@ -510,6 +510,12 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 	//*/
 
+	if (pDimObj->CheckAndCleanDirty())
+	{
+		// Update buffers if marked as dirty
+		pOGLObj->UpdateOGLBuffers();
+	}
+
 	SetObjectUniforms(pDimObj);
 	SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
 
@@ -518,6 +524,17 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	*/
 
 	return pOGLObj->Render();
+}
+
+RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
+	DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+	if (pDimObj != nullptr)
+	{
+		return RenderObject(pDimObj);
+	}
+
+	return R_FAIL;
 }
 
 // TODO: Consolidate?
