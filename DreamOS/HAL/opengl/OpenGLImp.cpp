@@ -394,6 +394,29 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 
 light *g_pLight = NULL;
 
+void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, std::string obj_file, std::wstring tex_folder, point pos)
+{
+	FileLoaderHelper::multi_mesh_t v;
+	FileLoaderHelper::LoadOBJFile(obj_file, v);
+
+	for (auto& m : v)
+	{
+		if (m.second.size() == 0)
+		{
+			continue;
+		}
+
+		OGLModel* pModel = new OGLModel(pOGLImp, std::move(m.second));
+		std::string tex = m.first.map_Kd;
+		std::wstring wstr(tex.begin(), tex.end());
+		wstr = tex_folder + wstr;
+		texture *pText = new OGLTexture(pOGLImp, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		pModel->SetColorTexture(pText);
+		pModel->MoveTo(pos);
+		pModel->UpdateOGLBuffers();
+		pSceneGraph->PushObject(pModel);
+	}
+}
 // TODO: Other approach 
 RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) {
 	RESULT r = R_PASS;
@@ -485,7 +508,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	///*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
-	
+
 	// TODO: Should move to using path manager
 	PathManager* pMgr = PathManager::instance();
 	wchar_t*	path;
@@ -493,9 +516,51 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	std::wstring objFile(path);
 
 // 	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\car.obj", v);
-	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\chainsaw_free.obj", v);
+//	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\Bear\\bear-obj.obj", v);
+	
+	LoadModel(pSceneGraph, this, "c:\\Work\\DreamGarage\\DreamOS\\Models\\Bear\\bear-obj.obj",
+		L"\\Bear\\",
+		point(1.0, 0, 0));
+
+//	LoadModel(pSceneGraph, this, "c:\\Work\\DreamGarage\\DreamOS\\Models\\table\\diningtable.obj",
+//		L"\\table\\",
+//		point(0.0, 0, 0));
+
+//	LoadModel(pSceneGraph, this, "c:\\Work\\DreamGarage\\DreamOS\\Models\\toyplane\\toyplane.obj",
+//		L"\\toyplane\\",
+//		point(0.0, 0, 0));
+
+//	LoadModel(pSceneGraph, this, "c:\\Work\\DreamGarage\\DreamOS\\Models\\mario\\mario_obj.obj",
+//		L"\\mario\\",
+//		point(0.0, 0, 0));
+
+/*
+	FileLoaderHelper::multi_mesh_t v2;
+	FileLoaderHelper::LoadOBJFile("c:\\Work\\DreamGarage\\DreamOS\\Models\\Bear\\bear-obj.obj", v2);
+	
+	for (auto& m : v2)
+	{
+		if (m.second.size() == 0)
+		{
+			continue;
+		}
+
+		OGLModel* pModel = new OGLModel(this, std::move(m.second));
+		std::string tex = m.first.map_Kd;
+		std::wstring wstr(tex.begin(), tex.end());
+		wstr = L"\\Bear\\" + wstr;
+		texture *pText = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		pModel->SetColorTexture(pText);
+		pModel->UpdateOGLBuffers();
+		pSceneGraph->PushObject(pModel);
+	}
+
+/*
+ 	FileLoaderHelper::LoadOBJFile(objFile + L"\\Models\\car.obj", v);
+
 	OGLModel* pModel = new OGLModel(this, v);
 	//pModel->SetRandomColor();
+	pModel->SetColorTexture(pColorTexture);
 	pModel->UpdateOGLBuffers();
 	pSceneGraph->PushObject(pModel);
 	//*/
@@ -539,6 +604,8 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	VirtualObj *pVirtualObj = NULL;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	glDisable(GL_CULL_FACE);
 
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
