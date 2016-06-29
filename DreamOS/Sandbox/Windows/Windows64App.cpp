@@ -16,7 +16,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr)
+	m_pHMD(nullptr),
+	m_pSenseLeapMotion(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -80,6 +81,10 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	// Initialize Mouse 
 	m_pWin64Mouse->CaptureMouse();
 	m_pWin64Mouse->CenterMousePosition();
+
+	// Sense Leap Motion Device (TODO: temporarily here!)
+	m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
+	CN(m_pSenseLeapMotion);
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
@@ -429,7 +434,7 @@ RESULT Windows64App::Show() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		m_pWin64Mouse->UpdateMousePosition();
+		//m_pWin64Mouse->UpdateMousePosition();
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());

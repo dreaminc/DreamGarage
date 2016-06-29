@@ -290,6 +290,9 @@
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1215,6 +1218,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\DreamGarage.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
+      <Filter>Sense</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

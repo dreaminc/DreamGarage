@@ -11,6 +11,7 @@
 // Dream OS Windows 64 Sandbox
 
 #include <windows.h>
+#include <memory>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
@@ -24,6 +25,8 @@
 class OpenGLImp;
 class Win64Keyboard;
 class Win64Mouse;
+
+#include "Sense/SenseLeapMotion.h"
 
 class Windows64App : public SandboxApp {
 public:
@@ -76,6 +79,7 @@ private:
 	TimeManager	*m_pTimeManager;
 
 public:
+	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
 	Win64Keyboard *m_pWin64Keyboard;
 	Win64Mouse *m_pWin64Mouse;
 	HMD *m_pHMD;
