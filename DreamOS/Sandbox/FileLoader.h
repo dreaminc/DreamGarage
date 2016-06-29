@@ -18,7 +18,7 @@ public:
 
 	typedef std::vector < std::pair<material_t, std::vector<vertex>>> multi_mesh_t;
 
-	static bool FileLoaderHelper::LoadOBJFile(const std::string& obj_file_name,
+	static bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 		multi_mesh_t &out);
 
 	static bool LoadOBJFile(const std::wstring& obj_file_name,

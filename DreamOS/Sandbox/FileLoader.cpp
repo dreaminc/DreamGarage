@@ -4,7 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-bool FileLoaderHelper::LoadOBJFile(const std::string& obj_file_name,
+bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 	multi_mesh_t &out) {
 
 	std::vector<point> all_positions;
@@ -177,13 +177,16 @@ bool FileLoaderHelper::LoadOBJFile(const std::string& obj_file_name,
 			current_material_name = std::string(name);
 		}
 		else if (type.compare("mtllib") == 0) {
-			char	mtl_file_name[1024];
+			char	file[1024];
 			std::sscanf(value.c_str(), "%s\n",
-				mtl_file_name);
+				file);
 
-			std::string path = obj_file_name.substr(0, obj_file_name.rfind('\\')) + "\\";
+			std::wstring path = obj_file_name.substr(0, obj_file_name.rfind('\\')) + L"\\";
 
-			std::ifstream mtl_file(path + mtl_file_name, std::ios::binary);
+			std::string mtl_file_name(file);
+			std::wstring mtl_file_name_w(mtl_file_name.begin(), mtl_file_name.end());
+
+			std::ifstream mtl_file(path + mtl_file_name_w, std::ios::binary);
 
 			if (!mtl_file.is_open())
 			{
