@@ -168,9 +168,11 @@ xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales"
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp" />
@@ -179,6 +181,7 @@ xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales"
     <ClCompile Include="..\..\..\External\SOIL\image_helper.c" />
     <ClCompile Include="..\..\..\External\SOIL\SOIL.c" />
     <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c" />
+    <ClCompile Include="..\..\..\HAL\HALImp.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
@@ -219,6 +222,7 @@ xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales"
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\..\DreamGarage.h" />
     <ClInclude Include="..\..\..\Cloud\CEFApp.h" />
     <ClInclude Include="..\..\..\Cloud\CEFHandler.h" />
     <ClInclude Include="..\..\..\Cloud\CEFImp.h" />
@@ -229,6 +233,7 @@ xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales"
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
+    <ClInclude Include="..\..\..\DreamOS.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_atomicops.h" />
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_atomic_ref_count.h" />

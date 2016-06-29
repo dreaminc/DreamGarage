@@ -17,9 +17,9 @@
 #include "Primitives/quaternion.h"
 #include "Primitives/point.h"
 
-#include "HAL/HALImp.h"
-
 #define HMD_NUM_EYES 2
+
+class HALImp;
 
 typedef enum HMDEventType {
 	HMD_EVENT_ORIENTATION,

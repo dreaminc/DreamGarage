@@ -1,5 +1,5 @@
-#ifndef DREAM_OS_H_
-#define DREAM_OS_H_
+#ifndef DREAM_OS_MAIN_H_
+#define DREAM_OS_MAIN_H_
 
 #include "RESULT/EHM.h"
 #include <stdlib.h>
@@ -13,4 +13,4 @@
 	#include <windows.h>
 #endif
 
-#endif // !DREAM_OS_H_
+#endif // !DREAM_OS_MAIN_H_
