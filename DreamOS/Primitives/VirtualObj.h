@@ -35,6 +35,8 @@ protected:
 	point m_ptOrigin;			// Origin
 	vector m_vVelocity;			// Velocity
 
+	vector m_vScale;			// Scale
+
 	quaternion m_qRotation;				// Rotation
 	quaternion m_qAngularMomentum;		// Angular Momentum
 
@@ -58,6 +60,8 @@ public:
 
 	VirtualObj MoveTo(point p);
 	VirtualObj MoveTo(point_precision x, point_precision y, point_precision z);
+
+	VirtualObj Scale(point_precision scale);
 
 	// Velocity
 	VirtualObj AddVelocity(matrix <point_precision, 4, 1> v);
