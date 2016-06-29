@@ -13,8 +13,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_pOGLRenderProgram(nullptr),
 	m_pOGLSkyboxProgram(nullptr),
 	m_pOGLOverlayProgram(nullptr),
-	m_pOpenGLRenderingContext(pOpenGLRenderingContext),
-	m_pHMD(nullptr)
+	m_pOpenGLRenderingContext(pOpenGLRenderingContext)
 {
 	RESULT r = R_PASS;
 
@@ -631,15 +630,6 @@ Error:
 	return r;
 }
 */
-
-RESULT OpenGLImp::SetHMD(HMD *pHMD) {
-	RESULT r = R_PASS;
-
-	m_pHMD = pHMD;
-
-Error:
-	return r;
-}
 
 // TODO: Naming is kind of lame since this hits the HMD
 // TODO: Shared code should be consolidated

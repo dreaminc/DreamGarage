@@ -17,6 +17,8 @@
 
 #include "Primitives/valid.h"
 
+#include "HMD/HMD.h"
+
 #include "Primitives/stereocamera.h"
 #include "Primitives/light.h"
 #include "Primitives/sphere.h"
@@ -36,7 +38,9 @@ public:
 	RESULT SetCameraOrientation(quaternion qOrientation);
 	RESULT SetCameraPositionDeviation(vector vDeviation);
 
+	RESULT SetHMD(HMD *pHMD);
 public:
+
 	virtual RESULT Resize(int pxWidth, int pxHeight) = 0;
 	virtual RESULT MakeCurrentContext() = 0;
 
@@ -60,6 +64,7 @@ public:
 
 protected:
 	stereocamera *m_pCamera;
+	HMD *m_pHMD;
 
 private:
 	UID m_uid;

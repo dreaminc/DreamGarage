@@ -18,8 +18,6 @@
 //#include "Primitives/camera.h"
 #include "Primitives/version.h"
 
-#include "HMD/HMD.h"
-
 
 #include "OpenGLExtensions.h"
 #include "Primitives/DimObj.h"
@@ -83,7 +81,7 @@ public:
 	RESULT Shutdown();
 
 	//RESULT InitializeStereoFramebuffers(HMD *pHMD);
-	RESULT SetHMD(HMD *pHMD);
+	//RESULT SetHMD(HMD *pHMD);
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();
@@ -97,7 +95,6 @@ private:
 	RESULT PrepareScene();
 
 private:
-	HMD *m_pHMD;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 

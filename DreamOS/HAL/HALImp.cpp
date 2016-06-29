@@ -1,7 +1,8 @@
 #include "HALImp.h"
 
 HALImp::HALImp() :
-	m_pCamera(nullptr)
+	m_pCamera(nullptr),
+	m_pHMD(nullptr)
 {
 	// empty stub
 }
@@ -30,4 +31,13 @@ RESULT HALImp::SetCameraOrientation(quaternion qOrientation) {
 RESULT HALImp::SetCameraPositionDeviation(vector vDeviation) {
 	m_pCamera->SetCameraPositionDeviation(vDeviation);
 	return R_PASS;
+}
+
+RESULT HALImp::SetHMD(HMD *pHMD) {
+	RESULT r = R_PASS;
+
+	m_pHMD = pHMD;
+
+Error:
+	return r;
 }

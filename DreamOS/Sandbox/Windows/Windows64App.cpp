@@ -88,12 +88,6 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CV(m_pTimeManager, "Failed to validate Time Manager");
 
-#ifdef CEF_ON
-	// Set up the Cloud Controller
-	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
-	CNM(m_pCloudController, "Cloud Controller failed to initialize");
-#endif
-
 Success:
 	Validate();
 	return;
@@ -377,10 +371,10 @@ RESULT Windows64App::InitializeSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	/*
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
+
 	if (m_pHMD != nullptr) {
-		CRM(m_pOpenGLImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
 	}
 	//*/
 
@@ -401,21 +395,6 @@ RESULT Windows64App::Show() {
 	// Show the window
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
-
-	// HMD
-	// TODO: This should go into (as well as the above) into the Sandbox
-	// This needs to be done after GL set up
-	///*
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
-	//CNM(m_pHMD, "Failed to create HMD");
-	//*/
-
-	// TODO: Should replace this with a proper scene loader
-	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
-
-	if (m_pHMD != nullptr) {
-		CRM(m_pOpenGLImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
-	}
 	
 	// Launch main message loop
 	MSG msg;
@@ -433,7 +412,7 @@ RESULT Windows64App::Show() {
 			DispatchMessage(&msg);
 		}
 
-#ifdef CEF_ON
+#ifdef CEF_ENABLED
 		// Update Network
 		CR(m_pCloudController->Update());
 #endif
