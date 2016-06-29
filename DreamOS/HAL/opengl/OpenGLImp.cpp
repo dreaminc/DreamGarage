@@ -394,7 +394,7 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 
 light *g_pLight = NULL;
 
-void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& root_folder, const std::wstring& obj_file, point pos)
+void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& root_folder, const std::wstring& obj_file, point pos, point_precision scale = 1.0)
 {
 	FileLoaderHelper::multi_mesh_t v;
 	FileLoaderHelper::LoadOBJFile(root_folder + obj_file, v);
@@ -412,6 +412,7 @@ void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& 
 		wstr = L"..\\" + obj_file.substr(0, obj_file.rfind('\\')) + L"\\" + wstr;
 		texture *pText = new OGLTexture(pOGLImp, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
 		pModel->SetColorTexture(pText);
+		pModel->Scale(scale);
 		pModel->MoveTo(pos);
 		pModel->UpdateOGLBuffers();
 		pSceneGraph->PushObject(pModel);

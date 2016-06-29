@@ -3,6 +3,7 @@
 VirtualObj::VirtualObj() :
 	m_ptOrigin(),
 	m_vVelocity(),
+	m_vScale(1.0, 1.0, 1.0),
 	m_qRotation(),
 	m_qAngularMomentum()
 {
@@ -12,6 +13,7 @@ VirtualObj::VirtualObj() :
 VirtualObj::VirtualObj(point ptOrigin) : 
 	m_ptOrigin(ptOrigin),
 	m_vVelocity(),
+	m_vScale(1.0, 1.0, 1.0),
 	m_qRotation(),
 	m_qAngularMomentum()
 {
@@ -55,6 +57,11 @@ VirtualObj* VirtualObj::translateZ(point_precision z) {
 VirtualObj* VirtualObj::MoveTo(point p) {
 	m_ptOrigin = p;
 	return this;
+}
+
+VirtualObj* VirtualObj::Scale(point_precision scale) {
+	m_vScale.x() = m_vScale.y() = m_vScale.z() = scale;
+	return (this);
 }
 
 VirtualObj* VirtualObj::MoveTo(point_precision x, point_precision y, point_precision z) {
@@ -189,6 +196,6 @@ VirtualObj* VirtualObj::Update() {
 
 // Matrix Functions
 matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix() {
-	matrix<virtual_precision, 4, 4> retMatrix = TranslationMatrix(m_ptOrigin) * RotationMatrix(m_qRotation);
+	matrix<virtual_precision, 4, 4> retMatrix = TranslationMatrix(m_ptOrigin) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z());
 	return retMatrix;
 }
