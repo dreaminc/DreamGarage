@@ -386,7 +386,7 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 
 light *g_pLight = NULL;
 
-void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& root_folder, const std::wstring& obj_file, texture* pTexture, point pos, point_precision scale = 1.0)
+void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& root_folder, const std::wstring& obj_file, texture* pTexture, point pos, point_precision scale = 1.0, point_precision rotateY = 0)
 {
 	FileLoaderHelper::multi_mesh_t v;
 	FileLoaderHelper::LoadOBJFile(root_folder + obj_file, v);
@@ -415,6 +415,7 @@ void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& 
 
 		pModel->Scale(scale);
 		pModel->MoveTo(pos);
+		pModel->RotateYBy(rotateY);
 		pModel->UpdateOGLBuffers();
 		pSceneGraph->PushObject(pModel);
 	}
@@ -517,7 +518,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	wchar_t*	path;
 	pMgr->GetCurrentPath((wchar_t*&)path);
 	std::wstring objFile(path);
-	
+/*	
 	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-20.0, -5.0, 0.0));
@@ -528,12 +529,37 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 
 	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
-		point(20.0, 0, 20.0));
+		point(20.0, 0, 10.0));
+*/
+	
+	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Bear\\bear-obj.obj",
+		nullptr,
+		point(-4.5, -4.8, 0.0),
+		0.1,
+		1.0);
+
+	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Boar\\boar-obj.obj",
+		nullptr,
+		point(-3.0, -4.2, 0.0),
+		0.15,
+		4.0);
 
 	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Dwarf\\dwarf_2_low.obj",
 		new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-		point(0.0, -5.0, 0),
-		100.0);
+		point(0.0, -4.9, 0),
+		20.0);
+
+	LoadModel(pSceneGraph, this, objFile, L"\\Models\\car\\untitled.obj",
+		nullptr,
+		point(6.0, -3.7, -1.0),
+		0.015,
+		1.0);
+
+	LoadModel(pSceneGraph, this, objFile, L"\\Models\\table\\untitled.obj",
+		nullptr,
+		point(0.0, -13.0, 0.0),
+		10.0,
+		3.14f);
 
 	/*
 	OGLSphere *pSphere = NULL;
