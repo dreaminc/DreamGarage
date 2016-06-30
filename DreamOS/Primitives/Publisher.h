@@ -25,11 +25,11 @@ public:
 
 	// Forward declaration for template
 	struct MAP_COMPARE_FUNCTION_STRUCT {
-		bool operator()(char const *a, char const *b) {
+		bool operator()(char const *a, char const *b) const {
 			return std::strcmp(a, b) < 0;
 		}
 
-		bool operator()(int lhs, int rhs) {
+		bool operator()(int lhs, int rhs) const {
 			return lhs < rhs;
 		}
 	};
