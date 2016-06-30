@@ -176,7 +176,7 @@ RESULT OpenGLImp::PrepareScene() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	// TODO(NTH): Add a program / render pipeline arch
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
@@ -441,7 +441,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pLight);
 	//*/
 
-	///*
+	//*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
 	pLight = new light(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
