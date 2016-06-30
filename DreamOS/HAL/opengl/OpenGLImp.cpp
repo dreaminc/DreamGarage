@@ -394,7 +394,7 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 
 light *g_pLight = NULL;
 
-void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& root_folder, const std::wstring& obj_file, point pos, point_precision scale = 1.0)
+void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& root_folder, const std::wstring& obj_file, texture* pTexture, point pos, point_precision scale = 1.0)
 {
 	FileLoaderHelper::multi_mesh_t v;
 	FileLoaderHelper::LoadOBJFile(root_folder + obj_file, v);
@@ -407,11 +407,20 @@ void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& 
 		}
 
 		OGLModel* pModel = new OGLModel(pOGLImp, std::move(m.second));
-		std::string tex = m.first.map_Kd;
-		std::wstring wstr(tex.begin(), tex.end());
-		wstr = L"..\\" + obj_file.substr(0, obj_file.rfind('\\')) + L"\\" + wstr;
-		texture *pText = new OGLTexture(pOGLImp, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
-		pModel->SetColorTexture(pText);
+
+		if (pTexture != nullptr)
+		{
+			pModel->SetColorTexture(pTexture);
+		}
+		else
+		{
+			std::string tex = m.first.map_Kd;
+			std::wstring wstr(tex.begin(), tex.end());
+			wstr = L"..\\" + obj_file.substr(0, obj_file.rfind('\\')) + L"\\" + wstr;
+			texture *pText = new OGLTexture(pOGLImp, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			pModel->SetColorTexture(pText);
+		}
+
 		pModel->Scale(scale);
 		pModel->MoveTo(pos);
 		pModel->UpdateOGLBuffers();
@@ -518,10 +527,21 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	std::wstring objFile(path);
 	
 	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Bear\\bear-obj.obj",
-		point(20.0, 0, 0));
+		nullptr,
+		point(-20.0, -5.0, 0.0));
 
 	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Bear\\bear-obj.obj",
-		point(0.0, 0, 0));
+		nullptr,
+		point(40.0, -5.0, 0));
+
+	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Boar\\boar-obj.obj",
+		nullptr,
+		point(20.0, 0, 20.0));
+
+	LoadModel(pSceneGraph, this, objFile, L"\\Models\\Dwarf\\dwarf_2_low.obj",
+		new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+		point(0.0, -5.0, 0),
+		100.0);
 
 	/*
 	OGLSphere *pSphere = NULL;
