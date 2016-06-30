@@ -364,6 +364,20 @@ Error:
 	return r;
 }
 
+
+// TODO: shouldn't be this way ultimately 
+RESULT Windows64App::RegisterImpLeapMotionEvents() {
+	RESULT r = R_PASS;
+
+	//CR(m_pSenseLeapMotion->RegisterSubscriber(SENSE_LEAPMOTION_EVENT_HAND_LEFT, m_pHALImp));
+
+	volume *pLeapObj = AddVolume(1.0f);
+	CR(m_pSenseLeapMotion->AttachVirtualObj(pLeapObj));
+
+Error:
+	return r;
+}
+
 RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
 
@@ -386,6 +400,7 @@ RESULT Windows64App::InitializeSandbox() {
 	// TODO: Move to Sandbox function
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
+	CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 Error:

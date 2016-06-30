@@ -18,17 +18,84 @@
 
 #include "Primitives/valid.h"
 
-// TODO
-typedef struct SenseLeapMotionEvent : SenseDevice::SenseDeviceEvent {
-	//SK_SCAN_CODE KeyCode;
-	//uint8_t KeyState;
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
 
-	SenseLeapMotionEvent() :
-		SenseDeviceEvent()
+#include "Primitives/VirtualObj.h"
+
+typedef enum SenseLeapMotionEventType {
+	SENSE_LEAPMOTION_EVENT_HAND_LEFT,
+	SENSE_LEAPMOTION_EVENT_HAND_RIGHT,
+	SENSE_LEAPMOTION_EVENT_INVALID,
+} SENSE_LEAPMOTION_EVENT_TYPE;
+
+typedef enum SenseLeapMotionHandType {
+	SENSE_LEAPMOTION_HAND_LEFT,
+	SENSE_LEAPMOTION_HAND_RIGHT,
+	SENSE_LEAPMOTION_HAND_INVALID
+} SENSE_LEAPMOTION_HAND_TYPE;
+
+class SenseLeapMotionHand {
+public:
+	SenseLeapMotionHand(const Leap::Hand hand) {
+		InitializeFromLeapHand(hand);
+	}
+
+	~SenseLeapMotionHand() {
+		// empty
+	}
+
+	RESULT InitializeFromLeapHand(const Leap::Hand hand) {
+		RESULT r = R_PASS;
+
+		m_handType = (hand.isLeft()) ? SENSE_LEAPMOTION_HAND_LEFT : SENSE_LEAPMOTION_HAND_RIGHT;
+
+		m_leapHandID = hand.id();
+		Leap::Vector leapPalmPosition = hand.palmPosition();
+		leapPalmPosition /= 1000.0f;	// Leap outputs in mm, and our engine is in meters
+
+		m_ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.y, leapPalmPosition.z);
+
+	Error:
+		return r;
+	}
+
+	const char *HandTypeString() {
+		if (m_handType == SENSE_LEAPMOTION_HAND_LEFT)
+			return "left";
+		else if (m_handType == SENSE_LEAPMOTION_HAND_RIGHT)
+			return "right";
+		else
+			return "invalid";
+	}
+
+	RESULT toString() {
+		RESULT r = R_PASS;
+
+		DEBUG_LINEOUT("%s hand id:%d position:%s", HandTypeString(), m_leapHandID, m_ptPalmPosition.toString().c_str());
+
+	Error:
+		return r;
+	}
+
+	point PalmPosition() {
+		return m_ptPalmPosition;
+	}
+
+private:
+	SENSE_LEAPMOTION_HAND_TYPE m_handType;
+	point m_ptPalmPosition;
+	int32_t m_leapHandID;
+};
+
+typedef struct SenseLeapMotionEvent : SenseDevice::SenseDeviceEvent {
+	SenseLeapMotionHand SLMHand;
+
+	SenseLeapMotionEvent(SenseLeapMotionHand slmHand) :
+		SenseDeviceEvent(),
+		SLMHand(slmHand)
 	{
 		SenseEventSize = sizeof(SenseLeapMotionEvent);
-		//KeyCode = key;
-		//KeyState = state;
 	}
 } SENSE_LEAPMOTION_EVENT;
 
@@ -38,6 +105,9 @@ public:
 	~SenseLeapMotion();
 
 private:
+	const std::string FingerNames[5] = { "Thumb", "Index", "Middle", "Ring", "Pinky" };
+	const std::string BoneNames[5] = { "Metacarpal", "Proximal", "Middle", "Distal" };
+
 	// Leap Motion Callbacks
 	virtual void onInit(const Leap::Controller&);
 	virtual void onConnect(const Leap::Controller&);
@@ -53,14 +123,24 @@ private:
 	virtual void onDeviceFailure(const Leap::Controller&);
 	virtual void onLogMessage(const Leap::Controller&, Leap::MessageSeverity severity, int64_t timestamp, const char* msg);
 
+
+	// TODO: debug func
+public:
+	RESULT AttachVirtualObj(VirtualObj *pVirtualObj) {
+		m_pVirtualObj = pVirtualObj;
+		return R_PASS;
+	}
+
 private:
 	RESULT SetPause(bool fPauseState);
 
 public:
 	RESULT Pause();
 	RESULT Resume();
+
 private:
 	std::unique_ptr<Leap::Controller> m_pLeapController;
+	VirtualObj *m_pVirtualObj;	// temp
 };
 
 #endif // ! SENSE_LEAPMOTION_H_

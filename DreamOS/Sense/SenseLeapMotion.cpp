@@ -1,7 +1,8 @@
 #include "SenseLeapMotion.h"
 
 SenseLeapMotion::SenseLeapMotion() :
-	m_pLeapController(nullptr)
+	m_pLeapController(nullptr),
+	m_pVirtualObj(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -62,7 +63,63 @@ void SenseLeapMotion::onExit(const Leap::Controller&) {
 }
 
 void SenseLeapMotion::onFrame(const Leap::Controller&) {
-	// TODO
+	const Leap::Frame leapFrame = m_pLeapController->frame();
+
+	//DEBUG_LINEOUT("Frame id:%d timestamp:%d hands:%d fingers:%d", leapFrame.id(), leapFrame.timestamp(), leapFrame.hands().count(), leapFrame.fingers().count());
+
+	Leap::HandList hands = leapFrame.hands();
+
+	for (auto hl = hands.begin(); hl != hands.end(); ++hl) {
+		// Get the first hand
+		const Leap::Hand hand = *hl;
+
+		SenseLeapMotionHand sHand(hand);
+		sHand.toString();
+
+		if (m_pVirtualObj != nullptr) {
+			m_pVirtualObj->MoveTo(sHand.PalmPosition());
+		}
+
+		/*
+		// Get the hand's normal vector and direction
+		const Leap::Vector normal = hand.palmNormal();
+		const Leap::Vector direction = hand.direction();
+
+		// Calculate the hand's pitch, roll, and yaw angles
+		std::cout << std::string(2, ' ') << "pitch: " << direction.pitch() * Leap::RAD_TO_DEG << " degrees, "
+			<< "roll: " << normal.roll() * Leap::RAD_TO_DEG << " degrees, "
+			<< "yaw: " << direction.yaw() * Leap::RAD_TO_DEG << " degrees" << std::endl;
+
+		// Get the Arm bone
+		Leap::Arm arm = hand.arm();
+
+		std::cout << std::string(2, ' ') << "Arm direction: " << arm.direction()
+			<< " wrist position: " << arm.wristPosition()
+			<< " elbow position: " << arm.elbowPosition() << std::endl;
+
+		// Get fingers
+		const Leap::FingerList fingers = hand.fingers();
+		for (auto fl = fingers.begin(); fl != fingers.end(); ++fl) {
+			const Leap::Finger finger = *fl;
+
+			std::cout << std::string(4, ' ') << FingerNames[finger.type()]
+				<< " finger, id: " << finger.id()
+				<< ", length: " << finger.length()
+				<< "mm, width: " << finger.width() << std::endl;
+
+			// Get finger bones
+			for (int b = 0; b < 4; ++b) {
+				Leap::Bone::Type boneType = static_cast<Leap::Bone::Type>(b);
+				Leap::Bone bone = finger.bone(boneType);
+
+				std::cout << std::string(6, ' ') << BoneNames[boneType]
+					<< " bone, start: " << bone.prevJoint()
+					<< ", end: " << bone.nextJoint()
+					<< ", direction: " << bone.direction() << std::endl;
+			}
+		}
+		*/
+	}
 }
 
 void SenseLeapMotion::onFocusGained(const Leap::Controller&) {

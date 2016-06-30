@@ -54,8 +54,10 @@ private:
 public:
 	HDC GetDeviceContext();
 	HWND GetWindowHandle();
+
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
+	RESULT RegisterImpLeapMotionEvents();
 
 private:
 	bool m_fFullscreen;
