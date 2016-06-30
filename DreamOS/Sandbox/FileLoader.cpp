@@ -113,7 +113,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 			{
 			case FaceType::PTN3:
 				for (int j = 0; j < 3; ++j) {
-					int i = j;// (j == 0) ? j : 3 - j;
+					int i = (j == 0) ? j : 3 - j;
 					current_mesh.emplace_back(all_positions[newPositionIndices[i] - 1],
 						all_normals[newNormalIndices[i] - 1],
 						uvcoord(all_uvs[newUvIndices[i] - 1].x(), all_uvs[newUvIndices[i] - 1].y()));
@@ -121,13 +121,14 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 				break;
 			case FaceType::PTN4:
 				for (int j = 0; j < 3; ++j) {
-					int i = j;// (j == 0) ? j : 3 - j;
+					int i = (j == 0) ? j : 3 - j;
 					current_mesh.emplace_back(all_positions[newPositionIndices[i] - 1],
 						all_normals[newNormalIndices[i] - 1],
 						uvcoord(all_uvs[newUvIndices[i] - 1].x(), all_uvs[newUvIndices[i] - 1].y()));
 				}
 				for (int j = 0; j < 3; ++j) {
-					int i = (j == 0) ? j : j + 1;
+					// triangle order 0, 3, 2
+					int i = (j == 1) ? j + 2 : j;
 					current_mesh.emplace_back(all_positions[newPositionIndices[i] - 1],
 						all_normals[newNormalIndices[i] - 1],
 						uvcoord(all_uvs[newUvIndices[i] - 1].x(), all_uvs[newUvIndices[i] - 1].y()));
@@ -135,14 +136,14 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 				break;
 			case FaceType::PN3:
 				for (int j = 0; j < 3; ++j) {
-					int i = j;// (j == 0) ? j : 3 - j;
+					int i = (j == 0) ? j : j + 1;
 					current_mesh.emplace_back(all_positions[newPositionIndices[i] - 1],
 						all_normals[newNormalIndices[i] - 1]);
 				}
 				break;
 			case FaceType::PT3:
 				for (int j = 0; j < 3; ++j) {
-					int i = j;// (j == 0) ? j : 3 - j;
+					int i = (j == 0) ? j : 3 - j;
 					current_mesh.emplace_back(all_positions[newPositionIndices[i] - 1],
 						all_uvs[newUvIndices[i] - 1]);
 				}

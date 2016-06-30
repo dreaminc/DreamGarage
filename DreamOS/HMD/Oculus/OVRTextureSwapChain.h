@@ -92,8 +92,8 @@ public:
 		}
 
 		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
-		CR(m_pOGLFramebuffer->OGLInitialize());
 		CR(m_pOGLFramebuffer->SetOGLDepthbuffer(nullptr));
+		CR(m_pOGLFramebuffer->OGLInitialize());
 
 	Error:
 		return r;

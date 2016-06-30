@@ -466,9 +466,8 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	pSkybox->OGLActivateCubeMapTexture();
-	pSceneGraph->PushObject(pSkybox);
-	//*/
-	
+//	pSceneGraph->PushObject(pSkybox);
+
 	/*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
@@ -509,7 +508,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	}
 	//*/
 		
-	///*
+
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 
@@ -561,7 +560,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 		10.0,
 		3.14f);
 
-	/*
+/*
 	OGLSphere *pSphere = NULL;
 
 	int num = 10;
@@ -570,8 +569,10 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	double size = radius * 2;
 	int spaceFactor = 4;
 
-	for (int i = 0; i < num; i++) {
-		for (int j = 0; j < num; j++) {
+	for (int i = num-1; i >= 0; i--) {
+	//for (int i = 0; i < num; i++) {
+		for (int j = num-1; j >= 0; j--) {
+		//for (int j = 0; j < num; j++) {
 			pSphere = new OGLSphere(this, radius, sects, sects);
 
 			pSphere->SetColorTexture(pColorTexture);
@@ -602,8 +603,6 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDisable(GL_CULL_FACE);
-
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Send lights to shader
@@ -627,7 +626,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 			CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 		}
 	}
-
+	
 	skybox *pSkybox = nullptr;
 	CR(pObjectStore->GetSkybox(pSkybox));
 	if (pSkybox != nullptr) {
@@ -641,18 +640,9 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	CRM(m_pOGLOverlayProgram->UseProgram(), "Failed to use OGLProgram");
 	
-	static OGLTriangle* pTri = nullptr;
 	static OGLQuad*	pQuad = nullptr;
 	static OGLText*	pText = nullptr;
 
-	if (pTri == nullptr)
-	{
-		pTri = new OGLTriangle(this, 1.0f, 1.0f);
-
-		texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-		pTri->SetColorTexture(pColorTexture);
-	}
 
 	if (pQuad == nullptr)
 	{
@@ -780,7 +770,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
-
+	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
