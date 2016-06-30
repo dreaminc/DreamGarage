@@ -188,7 +188,7 @@ VirtualObj VirtualObj::Update() {
 }
 
 // Matrix Functions
-matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix() {
-	matrix<virtual_precision, 4, 4> retMatrix = TranslationMatrix(m_ptOrigin) * RotationMatrix(m_qRotation);
+matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	matrix<virtual_precision, 4, 4> retMatrix = TranslationMatrix(m_ptOrigin) * RotationMatrix(m_qRotation) * childMat;
 	return retMatrix;
 }

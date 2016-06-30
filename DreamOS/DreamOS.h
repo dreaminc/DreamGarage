@@ -41,13 +41,22 @@ public:
 	virtual RESULT Update(void) = 0;
 
 protected:
-	//RESULT AddLight(light *pLight);
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	
 	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	sphere *MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	
 	volume *AddVolume(double side);
+	volume *MakeVolume(double side);
+	
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	
 	skybox *AddSkybox();
+	skybox *MakeSkybox();
+
 	model *AddModel(wchar_t *pszModelName);
+	model *MakeModel(wchar_t *pszModelName);
 
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);

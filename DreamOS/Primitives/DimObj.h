@@ -18,6 +18,9 @@
 #include "material.h"
 #include "texture.h"
 
+#include <vector>
+#include <memory>
+
 class DimObj : public VirtualObj, public Subscriber<TimeEvent> {
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
@@ -39,7 +42,9 @@ public:
 		m_pIndices(nullptr),
 		m_material(),
 		m_pColorTexture(nullptr),
-		m_pBumpTexture(nullptr)
+		m_pBumpTexture(nullptr),
+		m_pObjects(nullptr),
+		m_pParent(nullptr)
         //m_aabv()
     {
         /* stub */
@@ -181,6 +186,42 @@ public:
 		return R_PASS;
 	}
 
+	// Children (composite objects)
+	RESULT AddChild(std::shared_ptr<DimObj> pDimObj) {
+		if (m_pObjects == nullptr) {
+			m_pObjects = std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>>(new std::vector<std::shared_ptr<VirtualObj>>);
+		}
+
+		m_pObjects->push_back(pDimObj);
+		pDimObj->SetParent(this);
+
+		return R_PASS;
+	}
+
+	RESULT ClearChildren() {
+		m_pObjects->clear();
+		return R_PASS;
+	}
+
+	bool HasChildren() {
+		return (m_pObjects != nullptr) && (m_pObjects->size() != 0);
+	}
+
+	std::vector<std::shared_ptr<VirtualObj>> GetChildren() {
+		return *(m_pObjects.get());
+	}
+
+protected:
+	RESULT SetParent(DimObj* pParent) {
+		m_pParent = pParent;
+		return R_PASS;
+	}
+
+private:
+	DimObj* m_pParent;
+	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
+
+public:
 	// This assumes the other vertices have a valid position and uv mapping
 	// This will set the tangents/bi-tangents for all three vertices
 	// Source: http://learnopengl.com/#!Advanced-Lighting/Normal-Mapping
@@ -311,6 +352,17 @@ public:
 	material *GetMaterial() {
 		return (&m_material);
 	}
+
+	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f)) {
+		if (m_pParent != nullptr) {
+			auto modelMatrix = VirtualObj::GetModelMatrix(childMat);
+			return m_pParent->GetModelMatrix(modelMatrix);
+		}
+		else {
+			return VirtualObj::GetModelMatrix(childMat);
+		}
+	}
+
 };
 
 #endif // !DIM_OBJ_H_

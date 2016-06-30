@@ -40,6 +40,7 @@ public:
 	// Face culling
 	
 	///*
+	//RESULT Render() {
 	RESULT Render() {
 		RESULT r = R_PASS;
 		bool fCullingEnabled = glIsEnabled(GL_CULL_FACE);

@@ -556,8 +556,8 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	CR(m_pOGLOverlayProgram->SetCamera(m_pCamera));
 
-//	m_pOGLOverlayProgram->RenderObject(pTri);
-//	m_pOGLOverlayProgram->RenderObject(pQuad);
+	//m_pOGLOverlayProgram->RenderObject(pTri);
+	//m_pOGLOverlayProgram->RenderObject(pQuad);
 	m_pOGLOverlayProgram->RenderObject(pText);
 
 

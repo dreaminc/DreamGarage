@@ -64,6 +64,7 @@ public:
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
 
 	RESULT RenderObject(DimObj *pDimObj);
+	RESULT RenderChildren(DimObj *pDimObj);	// TODO: Likely more eloquent way to do this
 	
 	virtual RESULT SetLights(std::vector<light*> *pLights);
 	virtual RESULT SetMaterial(material *pMaterial);

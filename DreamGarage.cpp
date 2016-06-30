@@ -5,16 +5,13 @@ RESULT DreamGarage::LoadScene() {
 
 	// Add lights
 
-	///*
-	//CN(AddLight(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f)));
-	//*/
-
-	///*
+	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
-	CN(AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f)));
-	CN(AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f)));
-	CN(AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f)));
-	//*/
+	AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f));
+	
 
 	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
@@ -32,16 +29,23 @@ RESULT DreamGarage::LoadScene() {
 	pModel->SetBumpTexture(pBumpTexture);
 
 
-	m_pSphere = AddSphere(0.5f, 40, 40);
+	m_pSphere = AddSphere(1.5f, 40, 40);
 	m_pSphere->SetColorTexture(pColorTexture);
 	m_pSphere->SetBumpTexture(pBumpTexture);
 
-	/*
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40));
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
+	pSphere2->translateX(3.0f);
+	m_pSphere->AddChild(pSphere2);
 
-	pSphere2->translateX(5.0f);
+
+	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40));
+	pSphere3->SetColorTexture(pColorTexture2);
+	pSphere3->SetBumpTexture(pBumpTexture2);
+	pSphere3->translateX(2.0f);
+	pSphere2->AddChild(pSphere3);
+
 	//*/
 
 	/*
@@ -60,6 +64,7 @@ RESULT DreamGarage::Update(void) {
 	// Update stuff ...
 
 	m_pSphere->translateX(0.01f);
+	m_pSphere->RotateBy(0.01f, 0.02f, 0.01f);
 
 Error:
 	return r;

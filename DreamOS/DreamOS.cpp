@@ -65,12 +65,24 @@ light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOri
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
+light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+}
+
 sphere* DreamOS::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
 	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions);
 }
 
+sphere* DreamOS::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
+	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
+}
+
 volume* DreamOS::AddVolume(double side) {
 	return m_pSandbox->AddVolume(side);
+}
+
+volume* DreamOS::MakeVolume(double side) {
+	return m_pSandbox->MakeVolume(side);
 }
 
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
@@ -81,7 +93,15 @@ skybox *DreamOS::AddSkybox() {
 	return m_pSandbox->AddSkybox();
 }
 
+skybox *DreamOS::MakeSkybox() {
+	return m_pSandbox->MakeSkybox();
+}
+
 model *DreamOS::AddModel(wchar_t *pszModelName) {
+	return m_pSandbox->AddModel(pszModelName);
+}
+
+model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
 

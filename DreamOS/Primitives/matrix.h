@@ -62,7 +62,7 @@ public:
 	}
 
 	// Sets up an identity matrix
-	RESULT identity() {
+	RESULT identity(TMatrix val = 1.0f) {
 		RESULT r = R_PASS;
 
 		// Ensure square matrix
@@ -71,7 +71,7 @@ public:
 		clear();
 
 		for (int i = 0; i < N; i++)
-			this->element(i, i) = 1.0f;
+			this->element(i, i) = val;
 
 	Error:
 		return r;
@@ -90,6 +90,10 @@ public:
 
 	matrix(const matrix<TMatrix, N, M> &cp) {
 		copyData((TMatrix *)cp.m_data);
+	}
+
+	matrix(TMatrix diagVal) {
+		identity(diagVal);
 	}
 
 	// Destructor

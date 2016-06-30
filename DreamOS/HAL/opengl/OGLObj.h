@@ -161,6 +161,7 @@ public:
 
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
+	//virtual RESULT Render() {
 	virtual RESULT Render() {
 		RESULT r = R_PASS;
 

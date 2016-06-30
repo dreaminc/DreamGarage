@@ -92,7 +92,8 @@ public:
 	VirtualObj UpdateRotation();
 
 	// Matrix Functions
-	matrix<virtual_precision, 4, 4> GetModelMatrix();
+	//matrix<virtual_precision, 4, 4> GetModelMatrix();
+	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 
 public:
 	UID getID() { return m_uid; }

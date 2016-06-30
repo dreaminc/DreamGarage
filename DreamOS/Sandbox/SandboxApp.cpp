@@ -53,10 +53,14 @@ Error:
 	return r;
 }
 
+light* SandboxApp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+	return m_pHALImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+}
+
 light* SandboxApp::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
 
-	light *pLight = m_pHALImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+	light *pLight = MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 	CN(pLight);
 
 	CR(AddObject(pLight));
@@ -72,10 +76,14 @@ Error:
 	return nullptr;
 }
 
+sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions) {
+	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
+}
+
 sphere* SandboxApp::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
 	RESULT r = R_PASS;
 
-	sphere *pSphere = m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
+	sphere *pSphere = MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
 	CN(pSphere);
 
 	CR(AddObject(pSphere));
@@ -91,10 +99,14 @@ Error:
 	return nullptr;
 }
 
+volume* SandboxApp::MakeVolume(double side) {
+	return m_pHALImp->MakeVolume(side);
+}
+
 volume* SandboxApp::AddVolume(double side) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = m_pHALImp->MakeVolume(side);
+	volume *pVolume = MakeVolume(side);
 	CN(pVolume);
 
 	CR(AddObject(pVolume));
@@ -114,10 +126,14 @@ texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE typ
 	return m_pHALImp->MakeTexture(pszFilename, type);
 }
 
+skybox* SandboxApp::MakeSkybox() {
+	return m_pHALImp->MakeSkybox();
+}
+
 skybox *SandboxApp::AddSkybox() {
 	RESULT r = R_PASS;
 
-	skybox *pSkybox = m_pHALImp->MakeSkybox();
+	skybox *pSkybox = MakeSkybox();
 	CN(pSkybox);
 
 	CR(AddObject(pSkybox));
@@ -133,11 +149,14 @@ Error:
 	return nullptr;
 }
 
-// TODO: A lot of this should go into the model object itself
+model* SandboxApp::MakeModel(wchar_t *pszModelName) {
+	return m_pHALImp->MakeModel(pszModelName);
+}
+
 model *SandboxApp::AddModel(wchar_t *pszModelName) {
 	RESULT r = R_PASS;
 
-	model* pModel = m_pHALImp->MakeModel(pszModelName);
+	model* pModel = MakeModel(pszModelName);
 	CN(pModel);
 
 	CR(AddObject(pModel));

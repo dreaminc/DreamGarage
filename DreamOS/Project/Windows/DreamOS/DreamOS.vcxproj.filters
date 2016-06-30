@@ -1222,6 +1222,9 @@
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
       <Filter>Sense</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\composite.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
