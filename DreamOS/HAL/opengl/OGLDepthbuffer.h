@@ -49,9 +49,9 @@ public:
 		// The depth buffer
 		// Implement OGLRenderbuffer
 		// TODO: Create a depth buffer object (like OGLTexture / Framebuffer
-		m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufferIndex);
-		m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
-		m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex);
+		//m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufferIndex);
+		//m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
+		//m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex);
 		
 
 	Error:
