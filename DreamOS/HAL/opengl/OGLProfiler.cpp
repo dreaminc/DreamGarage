@@ -27,7 +27,7 @@ void OGLProfiler::Init()
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 
 	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
-	m_OGLTitleText->MoveTo(-1.0, -1.0, 0);
+	m_OGLTitleText->MoveTo(-0.7, -0.7, 0);
 }
 
 void OGLProfiler::Destroy()
@@ -46,7 +46,8 @@ void OGLProfiler::Render()
 	//pOGLProgram->SetCamera();
 
 	// Render FPS graph
-	m_OGLGraph.Render(point(-0.8, -0.8 + 0.4, 0), point(-0.8 + 0.5, -0.8, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
+	//m_OGLGraph.Render(point(-0.8, -0.8 + 0.4, 0), point(-0.8 + 0.5, -0.8, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
+	m_OGLGraph.Render(point(-0.5, -0.5 + 0.4, 0), point(-0.5 + 0.5, -0.5, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
 
 	// Revert to 'default' render state. TODO: refactor rendering states
 	glEnable(GL_CULL_FACE);

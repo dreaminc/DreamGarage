@@ -474,7 +474,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	pSkybox->OGLActivateCubeMapTexture();
-//	pSceneGraph->PushObject(pSkybox);
+	pSceneGraph->PushObject(pSkybox);
 
 	/*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
@@ -670,6 +670,8 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
+		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+
 		SetStereoViewTarget(eye);
 		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
 
@@ -694,6 +696,9 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
 			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 		}
+
+		// Render profiler overlay
+		m_pOGLProfiler->Render();
 	}
 
 	glFlush();
@@ -745,6 +750,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
+		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 		//SetStereoFramebufferViewTarget(eye);
 		//SetCameraMatrix(eye);
@@ -772,6 +778,9 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
 			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 		}
+		
+		// Render profiler overlay
+		m_pOGLProfiler->Render();
 
 		m_pHMD->UnsetRenderSurface(eye);
 		m_pHMD->CommitSwapChain(eye);

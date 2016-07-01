@@ -61,7 +61,7 @@ public:
 	VirtualObj* MoveTo(point p);
 	VirtualObj* MoveTo(point_precision x, point_precision y, point_precision z);
 
-	VirtualObj Scale(point_precision scale);
+	VirtualObj* Scale(point_precision scale);
 
 	// Velocity
 	VirtualObj* AddVelocity(matrix <point_precision, 4, 1> v);
