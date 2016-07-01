@@ -478,6 +478,7 @@ xcopy /y "$(LEAPMOTIONPATH)\lib\x64\Leap.dll" "$(TargetDir)" /D
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
+    <ClInclude Include="..\..\..\Primitives\hand.h" />
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />

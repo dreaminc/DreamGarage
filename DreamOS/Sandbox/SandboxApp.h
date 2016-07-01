@@ -54,6 +54,7 @@ public:
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	volume* MakeVolume(double width, double length, double height);
 	volume* MakeVolume(double side);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
@@ -61,6 +62,7 @@ public:
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	volume* AddVolume(double width, double length, double height);
 	volume* AddVolume(double side);
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);

@@ -49,6 +49,8 @@ protected:
 	
 	volume *AddVolume(double side);
 	volume *MakeVolume(double side);
+	volume *AddVolume(double width, double length, double height);
+	volume *MakeVolume(double width, double length, double height);
 	
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	

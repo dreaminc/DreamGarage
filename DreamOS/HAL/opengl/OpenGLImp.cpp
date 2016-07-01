@@ -395,10 +395,10 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double side) {
+volume* OpenGLImp::MakeVolume(double width, double length, double height) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, side);
+	volume *pVolume = new OGLVolume(this, width, length, height);
 	CN(pVolume);
 
 Success:
@@ -410,6 +410,10 @@ Error:
 		pVolume = nullptr;
 	}
 	return nullptr;
+}
+
+volume* OpenGLImp::MakeVolume(double side) {
+	return MakeVolume(side, side, side);
 }
 
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
@@ -586,6 +590,8 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
+		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+
 		SetStereoViewTarget(eye);
 		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
 
@@ -652,6 +658,8 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
+
+		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 		//SetStereoFramebufferViewTarget(eye);
 		//SetCameraMatrix(eye);

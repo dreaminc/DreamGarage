@@ -25,6 +25,14 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	OGLVolume(OpenGLImp *pParentImp, double width, double length, double height) :
+		volume(width, length, height),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
+
 	OGLVolume(OpenGLImp *pParentImp, double side) :
 		volume(side),
 		OGLObj(pParentImp)

@@ -77,6 +77,14 @@ sphere* DreamOS::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, in
 	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
 }
 
+volume* DreamOS::AddVolume(double width, double length, double height) {
+	return m_pSandbox->AddVolume(width, length, height);
+}
+
+volume* DreamOS::MakeVolume(double width, double length, double height) {
+	return m_pSandbox->MakeVolume(width, length, height);
+}
+
 volume* DreamOS::AddVolume(double side) {
 	return m_pSandbox->AddVolume(side);
 }

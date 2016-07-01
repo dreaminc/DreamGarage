@@ -99,14 +99,18 @@ Error:
 	return nullptr;
 }
 
+volume* SandboxApp::MakeVolume(double width, double length, double height) {
+	return m_pHALImp->MakeVolume(width, length, height);
+}
+
 volume* SandboxApp::MakeVolume(double side) {
 	return m_pHALImp->MakeVolume(side);
 }
 
-volume* SandboxApp::AddVolume(double side) {
+volume* SandboxApp::AddVolume(double width, double length, double height) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = MakeVolume(side);
+	volume *pVolume = MakeVolume(width, length, height);
 	CN(pVolume);
 
 	CR(AddObject(pVolume));
@@ -120,6 +124,10 @@ Error:
 		pVolume = nullptr;
 	}
 	return nullptr;
+}
+
+volume* SandboxApp::AddVolume(double side) {
+	return AddVolume(side, side, side);
 }
 
 texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {

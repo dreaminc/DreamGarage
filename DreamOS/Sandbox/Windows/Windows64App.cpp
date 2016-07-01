@@ -371,7 +371,7 @@ RESULT Windows64App::RegisterImpLeapMotionEvents() {
 
 	//CR(m_pSenseLeapMotion->RegisterSubscriber(SENSE_LEAPMOTION_EVENT_HAND_LEFT, m_pHALImp));
 
-	volume *pLeapObj = AddVolume(1.0f);
+	volume *pLeapObj = AddVolume(1.0f, 1.0f, 0.25f);
 	CR(m_pSenseLeapMotion->AttachVirtualObj(pLeapObj));
 
 Error:
@@ -449,7 +449,7 @@ RESULT Windows64App::Show() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		//m_pWin64Mouse->UpdateMousePosition();
+		m_pWin64Mouse->UpdateMousePosition();
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
@@ -476,7 +476,8 @@ RESULT Windows64App::Show() {
 		}
 		else {
 			// Render Scene
-			m_pHALImp->Render(m_pSceneGraph);
+			//m_pHALImp->Render(m_pSceneGraph);
+			m_pHALImp->RenderStereo(m_pSceneGraph);
 		}
 		//*/
 	
