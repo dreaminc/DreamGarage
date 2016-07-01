@@ -57,6 +57,23 @@ public:
 		Normalize();
 	}
 
+	// TODO: Not sure if this is right (orientation might be hard to predict)
+	quaternion(vector v1, vector v2) {
+		vector v1n = v1.Normal();
+		vector v2n = v2.Normal();
+
+		vector w = (v1n.cross(v2n));
+		quaternion_precision vecDotProd = v1n * v2n;
+
+		SetValues(vecDotProd + 1.0f, w.x(), w.y(), w.z());
+		
+		Normalize();
+	}
+
+	quaternion(vector i, vector j, vector k) {
+		SetQuaternion(i, j, k);
+	}
+
 	RESULT Reverse() {
 		//m_w = m_w;
 
@@ -78,6 +95,26 @@ public:
 
 		SetValues(w, x, y, z);
 		
+		Normalize();
+
+		return R_PASS;
+	}
+
+	RESULT SetQuaternion(vector i, vector j, vector k) {
+		vector in = i.Normal();
+		vector jn = j.Normal();
+		vector kn = k.Normal();
+
+		quaternion_precision w = 0.5f * sqrt(1.0f + in.x() + jn.y() + kn.z());
+		
+		quaternion_precision w4 = w * 4.0f;
+
+		quaternion_precision x = (kn.y() - jn.z()) / w4;
+		quaternion_precision y = (in.z() - kn.x()) / w4;
+		quaternion_precision z = (jn.x() - in.y()) / w4;
+
+		SetValues(w, x, y, z);
+
 		Normalize();
 
 		return R_PASS;

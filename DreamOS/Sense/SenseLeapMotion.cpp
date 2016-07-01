@@ -79,6 +79,7 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 
 		if (sHand.IsLeftHand()) {
 			if (m_pLeftHand != nullptr) {
+				m_pLeftHand->SetOrientation(sHand.PalmOrientation());
 				m_pLeftHand->MoveTo(sHand.PalmPosition());
 			}
 		}

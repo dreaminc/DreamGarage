@@ -65,6 +65,23 @@ public:
 
 		m_ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.y, leapPalmPosition.z);
 
+		hand.basis();
+		Leap::Vector leapPalmNormal = hand.palmNormal();
+		Leap::Vector leapPalmDirection = hand.direction();
+		vector vecPalmDir = vector(leapPalmDirection.x, leapPalmDirection.y, leapPalmDirection.z);
+		vector vecPalmNorm = vector(leapPalmNormal.x, leapPalmNormal.y, leapPalmNormal.z);
+		float dotVal = leapPalmDirection.roll();
+		
+		m_qOrientation = quaternion(dotVal, vector::kVector());
+		
+		
+		/*
+		m_qOrientation = quaternion(
+			vector(leapPalmDirection.x, leapPalmDirection.y, leapPalmDirection.z), 
+			vector(leapPalmNormal.x, leapPalmNormal.y, leapPalmNormal.z)
+		);
+		*/
+
 	Error:
 		return r;
 	}
@@ -81,7 +98,7 @@ public:
 	RESULT toString() {
 		RESULT r = R_PASS;
 
-		DEBUG_LINEOUT("%s hand id:%d position:%s", HandTypeString(), m_leapHandID, m_ptPalmPosition.toString().c_str());
+		DEBUG_LINEOUT("%s hand id:%d position:%s rol:%f", HandTypeString(), m_leapHandID, m_ptPalmPosition.toString().c_str());
 
 	Error:
 		return r;
@@ -91,9 +108,14 @@ public:
 		return m_ptPalmPosition;
 	}
 
+	quaternion PalmOrientation() {
+		return m_qOrientation;
+	}
+
 private:
 	SENSE_LEAPMOTION_HAND_TYPE m_handType;
 	point m_ptPalmPosition;
+	quaternion m_qOrientation;
 	int32_t m_leapHandID;
 };
 
