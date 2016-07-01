@@ -43,6 +43,16 @@ public:
 		this->element(2, 3) = p.z();
 	}
 
+	TranslationMatrix(point ptTranslate, point ptPivot) {
+		this->identity();
+
+		point p = ptTranslate - ptPivot;
+
+		this->element(0, 3) = p.x();
+		this->element(1, 3) = p.y();
+		this->element(2, 3) = p.z();
+	}
+
 	~TranslationMatrix() {
 		// empty stub
 	}

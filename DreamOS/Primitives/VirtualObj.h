@@ -38,6 +38,9 @@ protected:
 	quaternion m_qRotation;				// Rotation
 	quaternion m_qAngularMomentum;		// Angular Momentum
 
+	// The pivot point
+	point m_ptPivot;
+
 public:
 	VirtualObj();
 	VirtualObj(point ptOrigin);
@@ -58,6 +61,10 @@ public:
 
 	VirtualObj MoveTo(point p);
 	VirtualObj MoveTo(point_precision x, point_precision y, point_precision z);
+
+	// Pivot Point
+	RESULT SetPivotPoint(point ptPivot);
+	RESULT SetPivotPoint(point_precision x, point_precision y, point_precision z);
 
 	// Velocity
 	VirtualObj AddVelocity(matrix <point_precision, 4, 1> v);

@@ -2,7 +2,8 @@
 
 SenseLeapMotion::SenseLeapMotion() :
 	m_pLeapController(nullptr),
-	m_pVirtualObj(nullptr)
+	m_pLeftHand(nullptr),
+	m_pRightHand(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -76,8 +77,10 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 		SenseLeapMotionHand sHand(hand);
 		sHand.toString();
 
-		if (m_pVirtualObj != nullptr) {
-			m_pVirtualObj->MoveTo(sHand.PalmPosition());
+		if (sHand.IsLeftHand()) {
+			if (m_pLeftHand != nullptr) {
+				m_pLeftHand->MoveTo(sHand.PalmPosition());
+			}
 		}
 
 		/*

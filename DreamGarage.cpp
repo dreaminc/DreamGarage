@@ -24,11 +24,13 @@ RESULT DreamGarage::LoadScene() {
 	skybox *pSkybox = AddSkybox();
 	pSkybox->SetCubeMapTexture(pCubeMap);
 
+	/*
 	model* pModel = AddModel(L"chainsaw_free.obj");
 	pModel->SetColorTexture(pColorTexture);
 	pModel->SetBumpTexture(pBumpTexture);
+	*/
 
-
+	/*
 	m_pSphere = AddSphere(1.5f, 40, 40);
 	m_pSphere->SetColorTexture(pColorTexture);
 	m_pSphere->SetBumpTexture(pBumpTexture);
@@ -45,6 +47,7 @@ RESULT DreamGarage::LoadScene() {
 	pSphere3->SetBumpTexture(pBumpTexture2);
 	pSphere3->translateX(2.0f);
 	pSphere2->AddChild(pSphere3);
+	*/
 
 	//*/
 
@@ -63,8 +66,10 @@ RESULT DreamGarage::Update(void) {
 
 	// Update stuff ...
 
-	m_pSphere->translateX(0.01f);
-	m_pSphere->RotateBy(0.01f, 0.02f, 0.01f);
+	if (m_pSphere != nullptr) {
+		m_pSphere->translateX(0.01f);
+		m_pSphere->RotateBy(0.01f, 0.02f, 0.01f);
+	}
 
 Error:
 	return r;

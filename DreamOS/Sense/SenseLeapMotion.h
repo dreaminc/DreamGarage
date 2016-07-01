@@ -20,6 +20,7 @@
 
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
+#include "Primitives/hand.h"
 
 #include "Primitives/VirtualObj.h"
 
@@ -43,6 +44,14 @@ public:
 
 	~SenseLeapMotionHand() {
 		// empty
+	}
+
+	bool IsLeftHand() {
+		return (m_handType == SENSE_LEAPMOTION_HAND_LEFT);
+	}
+
+	bool IsRightHand() {
+		return (m_handType == SENSE_LEAPMOTION_HAND_RIGHT);
 	}
 
 	RESULT InitializeFromLeapHand(const Leap::Hand hand) {
@@ -126,8 +135,15 @@ private:
 
 	// TODO: debug func
 public:
+	/*
 	RESULT AttachVirtualObj(VirtualObj *pVirtualObj) {
 		m_pVirtualObj = pVirtualObj;
+		return R_PASS;
+	}
+	*/
+
+	RESULT AttachHand(hand *pHand) {
+		m_pLeftHand = pHand;
 		return R_PASS;
 	}
 
@@ -140,7 +156,9 @@ public:
 
 private:
 	std::unique_ptr<Leap::Controller> m_pLeapController;
-	VirtualObj *m_pVirtualObj;	// temp
+	//VirtualObj *m_pVirtualObj;	// temp
+	hand *m_pLeftHand;
+	hand *m_pRightHand;
 };
 
 #endif // ! SENSE_LEAPMOTION_H_

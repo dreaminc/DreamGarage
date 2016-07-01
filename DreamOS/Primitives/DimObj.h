@@ -122,6 +122,10 @@ public:
 		return r;
 	}
 
+	virtual RESULT UpdateBuffers() {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	RESULT SetColor(color c) {
 		for (int i = 0; i < NumberVertices(); i++)
 			m_pVertices[i].SetColor(c);

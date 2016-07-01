@@ -508,14 +508,14 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 	//*/
 
-	///*
-	SetObjectUniforms(pDimObj);
-	SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
-	//*/
+	if (pOGLObj != nullptr) {
+		SetObjectUniforms(pDimObj);
+		SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
+	
+		CR(pOGLObj->Render());
+	}
 
-	CR(pOGLObj->Render());
-
-	if (pOGLObj->GetDimObj()->HasChildren()) {
+	if (pDimObj->HasChildren()) {
 		CR(RenderChildren(pDimObj));
 	}
 

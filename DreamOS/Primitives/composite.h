@@ -10,69 +10,37 @@
 // this is really a convenience object that should be used to derive others rather than off of DimObj directly
 
 #include "DimObj.h"
-
-#include "HAL/HALImp.h"
-
 #include <memory>
+
+class HALImp;
+
+#include "Primitives/sphere.h"
+#include "Primitives/volume.h"
 
 class composite : public DimObj {
 public:
-	composite(std::shared_ptr<HALImp> pHALImp) :
-		m_pHALImp(pHALImp)
-	{
-		// empty
-	}
+	composite(HALImp *pHALImp);
 
-	~composite() {
-		ClearObjects();
-	}
+	// DimObj Interface
+	RESULT Allocate();
+	inline int NumberVertices();
+	inline int NumberIndices();
 
-	RESULT AddObject(std::shared_ptr<DimObj> pDimObj) {
-		return AddChild(pDimObj);
-	}
+	RESULT AddObject(std::shared_ptr<DimObj> pDimObj);
+	RESULT ClearObjects();
 
-	RESULT ClearObjects() {
-		return ClearChildren();
-	}
+	std::shared_ptr<sphere> MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	std::shared_ptr<sphere> AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 
-	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
-		RESULT r = R_PASS;
+	std::shared_ptr<volume> MakeVolume(double width, double length, double height);
+	std::shared_ptr<volume> AddVolume(double width, double length, double height);
+	std::shared_ptr<volume> MakeVolume(double side);
+	std::shared_ptr<volume> AddVolume(double side);
 
-		sphere *pSphere = m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
-		CR(AddObject(std::make_shared<DimObj>(pSphere)));
 
-	Success:
-		return pSphere;
 
-	Error:
-		if (pSphere != nullptr) {
-			delete pSphere;
-			pSphere = nullptr;
-		}
-
-		return nullptr;
-	}
-
-	volume* AddVolume(double side) {
-		RESULT r = R_PASS;
-
-		volume *pVolume = m_pHALImp->MakeVolume(side);
-		CR(AddObject(std::make_shared<DimObj>(pVolume)));
-
-	Success:
-		return pVolume;
-
-	Error:
-		if (pVolume != nullptr) {
-			delete pVolume;
-			pVolume = nullptr;
-		}
-
-		return nullptr;
-	}
-
-private:
-	std::shared_ptr<HALImp> m_pHALImp;
+protected:
+	HALImp *m_pHALImp;
 };
 
 #endif	// ! COMPOSITE_H_

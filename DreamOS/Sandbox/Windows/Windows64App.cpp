@@ -365,14 +365,22 @@ Error:
 }
 
 
+// temp
+#include "HAL/opengl/OGLHand.h"
+
 // TODO: shouldn't be this way ultimately 
 RESULT Windows64App::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
 	//CR(m_pSenseLeapMotion->RegisterSubscriber(SENSE_LEAPMOTION_EVENT_HAND_LEFT, m_pHALImp));
 
-	volume *pLeapObj = AddVolume(1.0f, 1.0f, 0.25f);
-	CR(m_pSenseLeapMotion->AttachVirtualObj(pLeapObj));
+	//volume *pLeapObj = AddVolume(1.0f, 1.0f, 0.25f);
+	//CR(m_pSenseLeapMotion->AttachVirtualObj(pLeapObj));
+	
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	AddObject(pLeftHand);
+
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand));
 
 Error:
 	return r;

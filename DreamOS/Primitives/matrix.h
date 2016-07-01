@@ -61,6 +61,15 @@ public:
 		return R_PASS;
 	}
 
+	bool IsZero() {
+		for (int i = 0; i < N; i++)
+			for (int j = 0; j < M; i++)
+				if (element(i, j) != 0)
+					return false;
+
+		return true;
+	}
+
 	// Sets up an identity matrix
 	RESULT identity(TMatrix val = 1.0f) {
 		RESULT r = R_PASS;

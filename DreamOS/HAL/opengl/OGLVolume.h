@@ -40,6 +40,11 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
+
+	// TODO: Need to make this better
+	RESULT UpdateBuffers() override {
+		return UpdateOGLBuffers();
+	}
 };
 
 #endif // ! OGL_QUAD_H_

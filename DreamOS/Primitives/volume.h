@@ -55,8 +55,8 @@ public:
 	RESULT SetVolumeVertices(double width, double length, double height) {
 		RESULT r = R_PASS;
 
-		point_precision halfWidth = static_cast<point_precision>(width / 2.0f);
-		point_precision halfLength = static_cast<point_precision>(length / 2.0f);
+		point_precision halfWidth = static_cast<point_precision>(length / 2.0f);
+		point_precision halfLength = static_cast<point_precision>(width / 2.0f);
 		point_precision halfHeight = static_cast<point_precision>(height / 2.0f);
 		int vertCount = 0;
 		int triCount = 0;

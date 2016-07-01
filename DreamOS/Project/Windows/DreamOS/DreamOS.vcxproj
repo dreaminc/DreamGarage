@@ -200,6 +200,7 @@ xcopy /y "$(LEAPMOTIONPATH)\lib\x64\Leap.dll" "$(TargetDir)" /D
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp" />
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
+    <ClCompile Include="..\..\..\Primitives\composite.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
@@ -430,8 +431,10 @@ xcopy /y "$(LEAPMOTIONPATH)\lib\x64\Leap.dll" "$(TargetDir)" /D
     <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
