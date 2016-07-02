@@ -61,7 +61,7 @@ VirtualObj* VirtualObj::MoveTo(point p) {
 
 VirtualObj* VirtualObj::Scale(point_precision scale) {
 	m_vScale.x() = m_vScale.y() = m_vScale.z() = scale;
-	return (this);
+	return this;
 }
 
 VirtualObj* VirtualObj::MoveTo(point_precision x, point_precision y, point_precision z) {
