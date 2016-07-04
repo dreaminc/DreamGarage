@@ -11,7 +11,7 @@
 // OGLProfiler
 
 OGLProfiler::OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
-	OGLRenderContext(pOGL, pOGLProgram),
+	OGLContext(pOGL, pOGLProgram),
 	m_OGLGraph(pOGL, pOGLProgram)
 {
 	Init();
@@ -58,7 +58,7 @@ void OGLProfiler::Render()
 // OGLProfilerGraph
 
 OGLProfilerGraph::OGLProfilerGraph(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
-	OGLRenderContext(pOGL, pOGLProgram)
+	OGLContext(pOGL, pOGLProgram)
 {
 	Init();
 }

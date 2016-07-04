@@ -15,25 +15,21 @@
 // DreamOS/HAL/opengl/OGLProfiler.h
 // OGLProfiler renders the profiler to an OGL program
 
-class OGLRenderContext {
+class OGLContext {
 public:
-	OGLRenderContext(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
+	OGLContext(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
 		m_OGLImp(pOGL),
 		m_OGLProgram(pOGLProgram)
 	{}
 
-	virtual ~OGLRenderContext() {}
+	virtual ~OGLContext() {}
 
 protected:
 	OpenGLImp*	m_OGLImp;
 	OGLProgram*	m_OGLProgram;
 };
 
-template<typename T>
-void Render(const point& topLeft, const point& rightBottom, ProfilerGraph<T>& data)
-{}
-
-class OGLProfilerGraph : public OGLRenderContext {
+class OGLProfilerGraph : public OGLContext {
 public:
 	OGLProfilerGraph(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
 	~OGLProfilerGraph();
@@ -56,7 +52,7 @@ private:
 	std::unique_ptr<OGLText>	 m_OGLFPSText;
 };
 
-class OGLProfiler : public OGLRenderContext {
+class OGLProfiler : public OGLContext {
 public:
 	OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
 	~OGLProfiler();
