@@ -49,50 +49,19 @@ public:
 		return ptEye;
 	}
 
-	// Temp
-	// TODO: Fix this
 	ProjectionMatrix GetProjectionMatrix(EYE_TYPE eye) {
-		
-		projection_precision left = -m_pxScreenWidth / 2;
-		projection_precision right = m_pxScreenWidth / 2;
-		projection_precision top = m_pxScreenHeight / 2;
-		projection_precision bottom = -m_pxScreenHeight / 2;
+		ProjectionMatrix projMat;
 
-		ProjectionMatrix projMat = ProjectionMatrix(left, right, top, bottom, m_NearPlane, m_FarPlane);
+		if (m_pHMD != nullptr) {
+			projMat = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
+			//projMat.element(0, 2) = projMat.element(2, 0);
+			//projMat.element(1, 2) = projMat.element(2, 1);
+		}
+		else {
+			projMat = camera::GetProjectionMatrix();
+		}
 
-		ProjectionMatrix projMat1 = camera::GetProjectionMatrix();
-		ProjectionMatrix projMat2 = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
-
-		///*
-		projMat1.element(0, 0) = projMat2.element(0, 0);
-		//projMat.element(2, 0) = projMat2.element(2, 0);
-
-		projMat1.element(1, 1) = projMat2.element(1, 1);
-		//projMat.element(2, 1) = projMat2.element(2, 1);
-
-		///*
-		//projMat2.element(2, 2) = projMat1.element(2, 2);
-		//projMat2.element(2, 3) = projMat1.element(2, 3);
-		projMat2.element(3, 2) = projMat1.element(3, 2);
-		//*/
-
-		//projMat2(3, 2) = -0.2f;
-
-		// TODO: Flip matrix stuff (everything is transposed it seems)
-		projMat2.element(0, 2) = projMat2.element(2, 0);
-
-		
-		/*
-		// offset?
-		float val = -0.15;
-		if (eye == EYE_LEFT)
-			projMat2.element(0, 2) = val;
-		else
-			projMat2.element(0, 2) = -val;
-			*/
-
-		//return projMat1;*/
-		return projMat2;
+		return projMat;
 	}
 
 	ViewMatrix GetViewMatrix(EYE_TYPE eye) {

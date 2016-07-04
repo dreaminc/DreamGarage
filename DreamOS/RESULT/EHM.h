@@ -8,11 +8,6 @@
 #include "RESULT.h"
 #include <assert.h>
 
-// _DEBUG macro define
-#ifndef _DEBUG
-	#define _DEBUG // TODO: Put into env
-#endif
-
 #include <stdio.h>
 
 #define DEBUG_OUT_TO_CONSOLE

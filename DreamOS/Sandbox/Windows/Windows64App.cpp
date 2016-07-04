@@ -9,6 +9,8 @@
 #include "Win64Mouse.h"
 #include <HMD/HMDFactory.h>
 
+#include <string>
+
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
 	m_pxWidth(DEFAULT_WIDTH),
@@ -450,6 +452,17 @@ RESULT Windows64App::ShowSandbox() {
 	
 		// Swap buffers
 		SwapBuffers(m_hDC);
+
+		Profiler::GetProfiler()->OnFrameRendered();
+
+#if 0 // Temporary for debugging
+		static DWORD time = GetTickCount();
+		if (GetTickCount() - time > 1000)
+		{
+			OutputDebugStringW((std::wstring(L"DVR::tick ") + std::to_wstring(m_profiler.GetTicksPerSecond())).c_str());
+			time = GetTickCount();
+		}
+#endif
 
 		if (GetAsyncKeyState(VK_ESCAPE)) {
 			ShutdownSandbox();

@@ -81,7 +81,10 @@ ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, floa
 	ovrMatrix4f OVRProjMatrix = ovrMatrix4f_Projection(m_ovrHMDDescription.DefaultEyeFov[eyeType], znear, zfar, ovrProjection_None);
 
 	ProjectionMatrix projMat;
-	memcpy(&projMat, &OVRProjMatrix, sizeof(ovrMatrix4f));
+	//memcpy(&projMat, &OVRProjMatrix, sizeof(ovrMatrix4f));
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			projMat(i, j) = OVRProjMatrix.M[i][j];
 
 	return projMat;
 }

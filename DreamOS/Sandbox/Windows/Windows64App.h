@@ -5,6 +5,7 @@
 #include "Sandbox/SandboxApp.h"
 
 #include "TimeManager/TimeManager.h"
+#include "Profiler/Profiler.h"
 
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
@@ -77,6 +78,7 @@ private:
 	CloudController *m_pCloudController;
 
 
+	Profiler	m_profiler;
 public:
 	Win64Keyboard *m_pWin64Keyboard;
 	Win64Mouse *m_pWin64Mouse;

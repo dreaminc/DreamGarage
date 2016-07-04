@@ -86,7 +86,7 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision left, projection_pr
 	this->element(2, 0) = (right + left) / (right - left);
 
 	this->element(1, 1) = (2.0f * nearPlane) / (top - bottom);
-	this->element(2, 1) = (top + bottom) / (top - bottom);
+	this->element(1, 2) = (top + bottom) / (top - bottom);
 
 	this->element(2, 2) = -((farPlane + nearPlane) / (farPlane - nearPlane));
 	this->element(2, 3) = -((2.0f*farPlane*nearPlane) / (farPlane - nearPlane));

@@ -32,8 +32,12 @@
 //#include "OGLProgram.h"
 #include "OGLProgramFactory.h"
 
+#include <memory>
+
 class SandboxApp; 
 class Windows64App;
+
+class OGLProfiler;
 
 class OpenGLImp : public HALImp, public valid {
 private:
@@ -49,6 +53,8 @@ private:
 
 	version m_versionOGL;
 	version m_versionGLSL;
+
+	std::unique_ptr<OGLProfiler>	m_pOGLProfiler;
 
 	// Viewport
 	// TODO: Move this into an object?

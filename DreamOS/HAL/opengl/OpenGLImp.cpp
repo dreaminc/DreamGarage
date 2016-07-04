@@ -9,6 +9,8 @@
 #include "../DreamOS/Sandbox/FileLoader.h"
 #include <vector>
 
+#include "../DreamOS/Profiler/Profiler.h"
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
@@ -32,6 +34,8 @@ Error:
 }
 
 OpenGLImp::~OpenGLImp() {
+	m_pOGLProfiler.release();
+
 	if (m_pOGLRenderProgram != nullptr) {
 		delete m_pOGLRenderProgram;
 		m_pOGLRenderProgram = nullptr;
@@ -172,7 +176,7 @@ RESULT OpenGLImp::PrepareScene() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	// TODO(NTH): Add a program / render pipeline arch
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
@@ -181,6 +185,8 @@ RESULT OpenGLImp::PrepareScene() {
 
 	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
 	CN(m_pOGLOverlayProgram);
+
+	m_pOGLProfiler = std::make_unique<OGLProfiler>(this, m_pOGLOverlayProgram);
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
@@ -384,6 +390,8 @@ RESULT OpenGLImp::SetCameraPositionDeviation(vector vDeviation) {
 #include "OGLTexture.h"
 #include "OGLSkybox.h"
 
+#include "OGLProfiler.h"
+
 light *g_pLight = NULL;
 
 void LoadModel(SceneGraph* pSceneGraph, OpenGLImp* pOGLImp, const std::wstring& root_folder, const std::wstring& obj_file, texture* pTexture, point pos, point_precision scale = 1.0, point_precision rotateY = 0)
@@ -433,7 +441,6 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pSceneGraph->PushObject(pLight);
 	//*/
 
-	///*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 5.0f;
 	pLight = new light(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
 	pSceneGraph->PushObject(pLight);
@@ -473,7 +480,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	pSkybox->OGLActivateCubeMapTexture();
-//	pSceneGraph->PushObject(pSkybox);
+	pSceneGraph->PushObject(pSkybox);
 
 	///*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
@@ -567,7 +574,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 		10.0,
 		3.14f);
 
-
+/*
 	OGLSphere *pSphere = NULL;
 
 	int num = 10;
@@ -584,7 +591,6 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 
 			pSphere->SetColorTexture(pColorTexture);
 			pSphere->SetBumpTexture(pBumpTexture);
-
 			//pVolume->SetRandomColor();
 			pSphere->translate(i * (size * spaceFactor) - (num * size), 0.0f, j * (size * spaceFactor) - (num * size));
 			pSphere->UpdateOGLBuffers();
@@ -642,55 +648,8 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 	}
 	
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	CRM(m_pOGLOverlayProgram->UseProgram(), "Failed to use OGLProgram");
-	
-	static OGLQuad*	pQuad = nullptr;
-	static OGLText*	pText = nullptr;
-
-
-	if (pQuad == nullptr)
-	{
-		pQuad = new OGLQuad(this, quad(1.0, 1.0, vector(0, 0, 0), uvcoord(0,0), uvcoord(0.3,1)));
-
-		texture *pColorTexture = new OGLTexture(this, L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-		pQuad->SetColorTexture(pColorTexture);
-	}
-
-	if (pText == nullptr)
-	{
-		static std::shared_ptr<Font> pFont = nullptr;
-		
-		if (pFont == nullptr)
-		{
-			pFont = std::make_shared<Font>(L"Arial.fnt");
-		}
-		
-		pText = new OGLText(this, pFont, "321");
-
-		pText->MoveTo(-1.0, -1.0, 0);
-	}
-
-	static int cnt = 0;
-	static DWORD time = GetTickCount();
-	if (GetTickCount() - time > 100)
-	{
-		cnt++;
-		pText->SetText(std::to_string(cnt));
-		time = GetTickCount();
-	}
-
-	
-
-	CR(m_pOGLOverlayProgram->SetCamera(m_pCamera));
-
-//	m_pOGLOverlayProgram->RenderObject(pTri);
-//	m_pOGLOverlayProgram->RenderObject(pQuad);
-	m_pOGLOverlayProgram->RenderObject(pText);
-
+	// Render profiler overlay
+	m_pOGLProfiler->Render();
 
 	glFlush();
 
@@ -717,6 +676,8 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
+		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+
 		SetStereoViewTarget(eye);
 		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
 
@@ -741,6 +702,9 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
 			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 		}
+
+		// Render profiler overlay
+		m_pOGLProfiler->Render();
 	}
 
 	glFlush();
@@ -793,6 +757,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
+		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 		//SetStereoFramebufferViewTarget(eye);
 		//SetCameraMatrix(eye);
@@ -819,6 +784,11 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
 			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
 			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
+		}
+		
+		// Render profiler overlay
+		if (eye == EYE_LEFT) {
+			m_pOGLProfiler->Render();
 		}
 
 		m_pHMD->UnsetRenderSurface(eye);

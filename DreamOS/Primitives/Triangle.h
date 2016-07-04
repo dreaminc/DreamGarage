@@ -92,6 +92,35 @@ public:
 		return;
 	}
 
+	triangle(point p1, point p2, point p3) :
+		m_triangleType(ISOCELES)
+	{
+		RESULT r = R_PASS;
+		CR(Allocate());
+
+		m_pVertices[0] = vertex(p1);	// A
+		m_pVertices[1] = vertex(p2);	// B
+		m_pVertices[2] = vertex(p3);	// C
+
+		Validate();
+		return;
+
+	Error:
+		Invalidate();
+		return;
+	}
+
+	DimObj* Set(point p1, point p2, point p3)
+	{
+		m_pVertices[0].SetPoint(p1);
+		m_pVertices[1].SetPoint(p2);
+		m_pVertices[2].SetPoint(p3);
+
+		SetDirty();
+
+		return this;
+	}
+
 	// TODO: Scalene arbitrary triangle 
 	/*
 	triangle(point a, point b, point c) :
