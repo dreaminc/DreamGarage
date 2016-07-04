@@ -31,7 +31,7 @@ public:
 	}
 
 	~CEFImp() {
-		// empty
+		CEFShutdown();
 	}
 
 	RESULT CEFDoMessageLoopWork() {

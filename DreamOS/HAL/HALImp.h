@@ -1,29 +1,73 @@
 #ifndef HAL_IMP_H_
 #define HAL_IMP_H_
 
+#include "./RESULT/EHM.h"
+#include "Primitives/Types/UID.h"
+#include "Primitives/Subscriber.h"
+
 // Dream OS
 // DreamOS/HAL/HALImp.h
 // The HAL Implementation class  is the parent class for implementations
 // such as the OpenGL implementation and ultimately native ones as well
 
-#include "./RESULT/EHM.h"
-#include "Primitives/Types/UID.h"
-#include "Primitives/Subscriber.h"
+#include "Scene/SceneGraph.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
 
-class HALImp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent> {
-public:
-	HALImp() {
-		// empty stub
-	}
+#include "Primitives/valid.h"
 
-	~HALImp() {
-		// empty stub
-	}
+#include "HMD/HMD.h"
+
+#include "Primitives/stereocamera.h"
+#include "Primitives/light.h"
+#include "Primitives/sphere.h"
+#include "Primitives/volume.h"
+#include "Primitives/texture.h"
+#include "Primitives/skybox.h"
+#include "Primitives/model.h"
+
+class HALImp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent>, public valid {
+public:
+	HALImp();
+	~HALImp();
 
 public:
+	camera *GetCamera();
+	RESULT UpdateCamera();
+	RESULT SetCameraOrientation(quaternion qOrientation);
+	RESULT SetCameraPositionDeviation(vector vDeviation);
+
+	RESULT SetHMD(HMD *pHMD);
+public:
+
+	virtual RESULT Resize(int pxWidth, int pxHeight) = 0;
+	virtual RESULT MakeCurrentContext() = 0;
+
+	virtual RESULT Render(SceneGraph *pSceneGraph) = 0;
+	virtual RESULT RenderStereo(SceneGraph *pSceneGraph) = 0;
+	virtual RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph) = 0;
+
+	virtual RESULT Shutdown() = 0;
+
+public:
+	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
+	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) = 0;
+	virtual volume* MakeVolume(double side) = 0;
+	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
+	virtual skybox *MakeSkybox() = 0;
+	virtual model *MakeModel(wchar_t *pszModelName) = 0;
+
+	// TODO: Fix this
+	virtual RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0) = 0;
+
+	/*
+	virtual model* MakeModel(const std::vector<vertex>& vertices) = 0;
+	*/
+
+protected:
+	stereocamera *m_pCamera;
+	HMD *m_pHMD;
 
 private:
 	UID m_uid;

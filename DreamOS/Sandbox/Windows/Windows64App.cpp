@@ -18,8 +18,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr),
-	m_pCloudController(nullptr)
+	m_pHMD(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -91,12 +90,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CV(m_pTimeManager, "Failed to validate Time Manager");
 
-#ifdef CEF_ON
-	// Set up the Cloud Controller
-	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
-	CNM(m_pCloudController, "Cloud Controller failed to initialize");
-#endif
-
+Success:
 	Validate();
 	return;
 
@@ -110,6 +104,33 @@ Windows64App::~Windows64App() {
 		delete m_pTimeManager;
 		m_pTimeManager = nullptr;
 	}
+}
+
+RESULT Windows64App::InitializeHAL() {
+	RESULT r = R_PASS;
+
+	// Setup OpenGL and Resize Windows etc
+	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
+
+	// Create and initialize OpenGL Imp
+	// TODO: HAL factory pattern
+	m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
+	CNM(m_pHALImp, "Failed to create HAL Implementation");
+	CVM(m_pHALImp, "HAL Implementation Invalid");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeCloudController() {
+	RESULT r = R_PASS;
+
+	// Set up the Cloud Controller
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	CNM(m_pCloudController, "Cloud Controller failed to initialize");
+
+Error:
+	return r;
 }
 
 HDC Windows64App::GetDeviceContext() {
@@ -158,7 +179,7 @@ RESULT Windows64App::SetDimensions(int pxWidth, int pxHeight) {
 	m_pxHeight = pxHeight;
 
 	// OpenGL Resize the view after the window had been resized
-	CRM(m_pOpenGLImp->Resize(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	CRM(m_pHALImp->Resize(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
@@ -299,7 +320,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 RESULT Windows64App::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
-	camera *pCamera = m_pOpenGLImp->GetCamera();
+	camera *pCamera = m_pHALImp->GetCamera();
 
 	/*
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
@@ -332,21 +353,15 @@ RESULT Windows64App::RegisterImpMouseEvents() {
 
 	//camera *pCamera = m_pOpenGLImp->GetCamera();
 
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_MOVE, m_pOpenGLImp));
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pOpenGLImp));
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pOpenGLImp));
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pHALImp));
+	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pHALImp));
 
 Error:
 	return r;
 }
 
-#include "HAL/opengl/OGLVolume.h"
-
-#include "Cloud/CEFImp.h"
-
-// Note this call will never return and will actually run the event loop
-// TODO: Thread it?
-RESULT Windows64App::ShowSandbox() {
+RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
 
 	// TODO: Use EHM for this
@@ -355,48 +370,44 @@ RESULT Windows64App::ShowSandbox() {
 		return R_FAIL;
 	}
 
-
-	// Setup OpenGL and Resize Windows etc
-	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
-	//m_pOpenGLImp = new OpenGLImp(m_hDC);
-	
-	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
-	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
-	CVM(m_pOpenGLImp, "OpenGL Implementation Invalid");
-
-	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
-
-	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
-
 	// TODO: Move to Sandbox function
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
-	// Show the window
-	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
-	UpdateWindow(m_hwndWindow);
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
 
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	///*
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
-	//CNM(m_pHMD, "Failed to create HMD");
-	//*/
-
-	// TODO: Should replace this with a proper scene loader
-	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
-		CRM(m_pOpenGLImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
 	}
+	//*/
 
+Error:
+	return r;
+}
+
+// Note this call will never return and will actually run the event loop
+// TODO: Thread it?
+RESULT Windows64App::Show() {
+	RESULT r = R_PASS;
+
+	// Show the window
+	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
+	UpdateWindow(m_hwndWindow);
+	
 	// Launch main message loop
 	MSG msg;
 	bool fQuit = false;
 
-	CN(m_pOpenGLImp);
-	CR(m_pOpenGLImp->MakeCurrentContext());
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
@@ -407,13 +418,18 @@ RESULT Windows64App::ShowSandbox() {
 			DispatchMessage(&msg);
 		}
 
-#ifdef CEF_ON
+#ifdef CEF_ENABLED
 		// Update Network
 		CR(m_pCloudController->Update());
 #endif
 
 		// Time Manager
 		CR(m_pTimeManager->Update());
+
+		// Update Callback
+		if (m_fnUpdateCallback != nullptr) {
+			CR(m_fnUpdateCallback());
+		}
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should
@@ -425,13 +441,13 @@ RESULT Windows64App::ShowSandbox() {
 		CR(m_pSceneGraph->UpdateScene());
 
 		// Update Camera
-		m_pOpenGLImp->UpdateCamera();
+		m_pHALImp->UpdateCamera();
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
 			m_pHMD->UpdateHMD();
-			m_pOpenGLImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
-			m_pOpenGLImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
+			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
+			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}
 
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
@@ -440,13 +456,13 @@ RESULT Windows64App::ShowSandbox() {
 		///*
 		// Send to the HMD
 		if (m_pHMD != nullptr) {
-			m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
+			m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}
 		else {
 			// Render Scene
-			m_pOpenGLImp->Render(m_pSceneGraph);
+			m_pHALImp->Render(m_pSceneGraph);
 		}
 		//*/
 	
@@ -465,7 +481,7 @@ RESULT Windows64App::ShowSandbox() {
 #endif
 
 		if (GetAsyncKeyState(VK_ESCAPE)) {
-			ShutdownSandbox();
+			Shutdown();
 			fQuit = true;
 		}
 	}
@@ -475,17 +491,22 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::ShutdownSandbox() {
+RESULT Windows64App::Shutdown() {
 	RESULT r = R_PASS;
 
 	// Release device context in use by rc
 	wglMakeCurrent(m_hDC, nullptr);
 
+	if (m_pCloudController != nullptr) {
+		delete m_pCloudController;
+		m_pCloudController = nullptr;
+	}
+
 	// Shutdown and delete GL Rendering Context
-	if (m_pOpenGLImp != nullptr) {
-		CRM(m_pOpenGLImp->ShutdownImplementaiton(), "Failed to shutdown opengl implemenation");
-		delete m_pOpenGLImp;
-		m_pOpenGLImp = nullptr;
+	if (m_pHALImp != nullptr) {
+		CRM(m_pHALImp->Shutdown(), "Failed to shutdown HAL implemenation");
+		delete m_pHALImp;
+		m_pHALImp = nullptr;
 	}
 
 	wglMakeCurrent(nullptr, nullptr);

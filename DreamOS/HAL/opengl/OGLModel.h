@@ -24,6 +24,14 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
+
+	OGLModel(OpenGLImp *pParentImp, wchar_t *pszModelName) :
+		model(pszModelName),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
 };
 
 #endif // ! OGL_MODEL_H_

@@ -8,6 +8,8 @@
 // Simple version container class for versions in the 
 // format of major.minor.doubleminor
 
+#include <string>
+
 class version {
 public:
 	version(const version &ver);
@@ -19,6 +21,8 @@ public:
 	RESULT SetVersion(int major, int minor = 0, int doubleminor = 0);
 	RESULT SetVersion(float fVer);
 	RESULT SetVersion(long lVer);
+
+	std::string GetString();
 
 private:
 	int m_major;

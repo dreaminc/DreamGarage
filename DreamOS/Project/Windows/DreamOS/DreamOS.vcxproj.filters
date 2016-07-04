@@ -129,6 +129,12 @@
     <Filter Include="External\CEF\v3.2556\include\wrapper">
       <UniqueIdentifier>{a00bacef-de45-4c28-a2a9-4a1f03ee7b07}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamOS">
+      <UniqueIdentifier>{730db82d-4c28-45f4-928a-51f3c3fb19a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamGarage">
+      <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -271,7 +277,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\font.cpp">
       <Filter>Primitives</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
@@ -292,6 +298,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\DreamOS.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\HALImp.cpp">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamGarage.cpp">
+      <Filter>DreamGarage</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -663,7 +678,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\font.h">
       <Filter>Primitives</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
@@ -1773,6 +1788,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\DreamOS.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamGarage.h">
+      <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

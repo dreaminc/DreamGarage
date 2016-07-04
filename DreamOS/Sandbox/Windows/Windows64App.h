@@ -25,7 +25,6 @@
 class OpenGLImp;
 class Win64Keyboard;
 class Win64Mouse;
-class CloudController;
 
 class Windows64App : public SandboxApp {
 public:
@@ -33,13 +32,16 @@ public:
 	~Windows64App();
 
 public:	// Sandbox Interface
-	RESULT ShowSandbox();
-	RESULT ShutdownSandbox();
+	RESULT InitializeSandbox();
+	RESULT Show();
+	RESULT Shutdown();
 	RESULT RecoverDisplayMode();
 
 public:
 	RESULT InitializePathManager();
 	RESULT InitializeOpenGLRenderingContext();
+	RESULT InitializeCloudController();
+	RESULT InitializeHAL();
 
 private:
 	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
@@ -72,11 +74,7 @@ private:
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
-	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
-	OpenGLImp *m_pOpenGLImp;	
 	TimeManager	*m_pTimeManager;
-	CloudController *m_pCloudController;
-
 
 	Profiler	m_profiler;
 public:

@@ -16,16 +16,10 @@
 #include "TimeManager/TimeManager.h"
 
 //#include "Primitives/camera.h"
-
-#include "Primitives/valid.h"
 #include "Primitives/version.h"
-
-#include "HMD/HMD.h"
 
 
 #include "OpenGLExtensions.h"
-
-#include "Scene/SceneGraph.h"
 #include "Primitives/DimObj.h"
 #include "Primitives/material.h"
 
@@ -36,12 +30,10 @@
 
 class SandboxApp; 
 class Windows64App;
-
 class OGLProfiler;
 
-class OpenGLImp : public HALImp, public valid {
+class OpenGLImp : public HALImp {
 private:
-
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
 	OGLProgram *m_pOGLRenderProgram;
@@ -70,6 +62,18 @@ public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
 
+	// Object Factory Methods
+public:
+	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	volume* MakeVolume(double side);
+	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	skybox *MakeSkybox();
+	model *MakeModel(wchar_t *pszModelName);
+
+	// TODO: Convert to composite
+	RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+
 public:
 	// TODO: Consolidate all of these (one Render function)
 	RESULT SetMonoViewTarget();
@@ -81,16 +85,10 @@ public:
 	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
 
 	RESULT Resize(int pxWidth, int pxHeight);
-	RESULT ShutdownImplementaiton();
-	
-	camera *GetCamera();
-	RESULT UpdateCamera();
-	RESULT SetCameraOrientation(quaternion qOrientation);
-	RESULT SetCameraPositionDeviation(vector vDeviation);
+	RESULT Shutdown();
 
-	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
 	//RESULT InitializeStereoFramebuffers(HMD *pHMD);
-	RESULT SetHMD(HMD *pHMD);
+	//RESULT SetHMD(HMD *pHMD);
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();
@@ -104,8 +102,6 @@ private:
 	RESULT PrepareScene();
 
 private:
-	stereocamera *m_pCamera;
-	HMD *m_pHMD;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 

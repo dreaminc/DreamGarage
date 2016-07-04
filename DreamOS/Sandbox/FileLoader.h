@@ -10,8 +10,7 @@
 
 class FileLoaderHelper {
 public:
-	struct material_t
-	{
+	struct material_t {
 		std::string	name;
 		std::string	map_Kd;
 	};
