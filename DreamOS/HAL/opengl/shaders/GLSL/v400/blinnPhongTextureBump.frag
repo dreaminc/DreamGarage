@@ -54,7 +54,10 @@ layout(std140) uniform ub_Lights {
 	int numLights;	
 };
 
+uniform	bool u_fUseColorTexture;
 uniform sampler2D u_textureColor;
+
+uniform	bool u_fUseBumpTexture;
 uniform sampler2D u_textureBump;
 
 layout (location = 0) out vec4 out_vec4Color;
@@ -87,9 +90,16 @@ void main(void) {
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	
-	vec3 TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
-	TBNNormal = normalize(TBNNormal * 2.0f - vec3(1.0f));   
-	//TBNNormal = vec3(0.0f, 0.0f, 1.0f);
+	vec3 TBNNormal;
+	
+	if(u_fUseBumpTexture == true) {
+		TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
+		TBNNormal = normalize(TBNNormal * 2.0f - vec3(1.0f));   
+	}
+	else {
+		TBNNormal = vec3(0.0f, 0.0f, 1.0f);
+	}
+
 	//TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
 
 	for(int i = 0; i < numLights; i++) {
@@ -108,6 +118,12 @@ void main(void) {
 	//textureColor = vec4(1.0f);
 
 	vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
-	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
-	out_vec4Color = textureColor;
+	if(u_fUseColorTexture == true) {
+		out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
+	}
+	else {
+		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
+	}
+
+	//out_vec4Color = textureColor;
 }
