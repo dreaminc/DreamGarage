@@ -18,12 +18,11 @@ layout (location = 0) out vec4 out_vec4Color;
 
 void main(void) {  
 	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 1.0f);
-	if (u_hasTexture == 1)
-	{
+
+	if (u_hasTexture == 1) {
 		out_vec4Color = textureColor;
 	}
-	else
-	{
+	else {
 		out_vec4Color = DataIn.color;
 	}
 }
