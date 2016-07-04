@@ -298,7 +298,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\DreamOS.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
@@ -1788,7 +1788,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\DreamOS.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
@@ -1890,19 +1890,13 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\d3dcompiler_43.dll" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\d3dcompiler_47.dll" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.dll" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libEGL.dll" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libGLESv2.dll" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\widevinecdmadapter.dll" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
