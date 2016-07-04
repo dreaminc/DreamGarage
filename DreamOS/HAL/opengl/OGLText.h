@@ -28,17 +28,23 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 
+		std::wstring font(L"Fonts/" + pFont->GetGlyphImageFile());
 		// Load appropriate glyph texture
-		texture *pColorTexture = new OGLTexture(pParentImp, L"Fonts/Arial.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+		#pragma message ("bad code - use const std::string")
+
+		texture *pColorTexture = new OGLTexture(pParentImp, (wchar_t*)font.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 		SetColorTexture(pColorTexture);
 	}
 
-	void SetText(const std::string& text)
+	OGLText* SetText(const std::string& text, double size = 1.0)
 	{
-		text::SetText(text);
+		text::SetText(text, size);
 
-		UpdateOGLBuffers();
+		SetDirty();
+
+		return this;
 	}
 };
 

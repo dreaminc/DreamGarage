@@ -32,7 +32,7 @@ public:
 		this->element(0, 0) = x;
 		this->element(1, 1) = y;
 		this->element(2, 2) = z;
-		this->element(3, 3) = 0.0f;
+		this->element(3, 3) = 1.0f;
 	}
 
 	~ScalingMatrix() {

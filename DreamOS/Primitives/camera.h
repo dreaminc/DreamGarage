@@ -264,7 +264,7 @@ public:
 		return r;
 	}
 
-private:
+protected:
 	// Projection
 	int m_pxScreenWidth;
 	int m_pxScreenHeight;

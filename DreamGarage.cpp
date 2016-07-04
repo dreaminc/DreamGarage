@@ -11,9 +11,9 @@ RESULT DreamGarage::LoadScene() {
 
 	///*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
-	CN(AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f)));
-	CN(AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f)));
-	CN(AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f)));
+	AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f));
 	//*/
 
 	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
@@ -27,9 +27,12 @@ RESULT DreamGarage::LoadScene() {
 	skybox *pSkybox = AddSkybox();
 	pSkybox->SetCubeMapTexture(pCubeMap);
 
-	model* pModel = AddModel(L"chainsaw_free.obj");
+	/*
+	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
 	pModel->SetColorTexture(pColorTexture);
 	pModel->SetBumpTexture(pBumpTexture);
+	pModel->Scale(0.1f);
+	*/
 
 
 	m_pSphere = AddSphere(0.5f, 40, 40);
@@ -49,6 +52,46 @@ RESULT DreamGarage::LoadScene() {
 	pVolume->translateX(5.0f);
 	*/
 
+	///*
+	// TODO: All this should go into Model
+	std::vector<vertex> v;
+
+	// TODO: Should move to using path manager
+	PathManager* pMgr = PathManager::instance();
+	wchar_t*	path;
+	pMgr->GetCurrentPath((wchar_t*&)path);
+	std::wstring objFile(path);
+
+	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
+		nullptr,
+		point(-4.5, -4.8, 0.0),
+		0.1,
+		1.0);
+
+	AddModel(objFile, L"\\Models\\Boar\\boar-obj.obj",
+		nullptr,
+		point(-3.0, -4.2, 0.0),
+		0.15,
+		4.0);
+
+	AddModel(objFile, L"\\Models\\Dwarf\\dwarf_2_low.obj",
+		//new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+		MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+		point(0.0, -4.9, 0),
+		20.0);
+
+	AddModel(objFile, L"\\Models\\car\\untitled.obj",
+		nullptr,
+		point(6.0, -3.7, -1.0),
+		0.015,
+		1.0);
+
+	AddModel(objFile, L"\\Models\\table\\untitled.obj",
+		nullptr,
+		point(0.0, -13.0, 0.0),
+		10.0,
+		3.14f);
+
 
 Error:
 	return r;
@@ -59,7 +102,7 @@ RESULT DreamGarage::Update(void) {
 
 	// Update stuff ...
 
-	m_pSphere->translateX(0.01f);
+	m_pSphere->translateX(0.005f);
 
 Error:
 	return r;

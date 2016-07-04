@@ -101,7 +101,6 @@ RESULT OGLFramebuffer::SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer) {
 Error:
 	return r;
 }
-
 RESULT OGLFramebuffer::OGLInitialize() {
 	RESULT r = R_PASS;
 
@@ -109,9 +108,13 @@ RESULT OGLFramebuffer::OGLInitialize() {
 
 	// Create Buffer Objects
 	CR(m_pParentImp->glGenFramebuffers(1, &m_framebufferIndex));
-
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+	
+	// Initialize the depth buffer if it exists
+	if (m_pOGLDepthbuffer != nullptr) {
+		m_pOGLDepthbuffer->OGLInitialize();
+	}
 
 Error:
 	return r;

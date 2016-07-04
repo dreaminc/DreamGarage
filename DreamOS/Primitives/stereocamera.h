@@ -10,7 +10,7 @@
 
 #include "camera.h"
 
-#define DEFAULT_PUPILLARY_DISTANCE 65
+#define DEFAULT_PUPILLARY_DISTANCE 55
 
 enum EYE_TYPE {
 	EYE_LEFT,
@@ -49,30 +49,54 @@ public:
 		return ptEye;
 	}
 
+	ProjectionMatrix GetProjectionMatrix(EYE_TYPE eye) {
+		ProjectionMatrix projMat;
+
+		if (m_pHMD != nullptr) {
+			projMat = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
+			//projMat.element(0, 2) = projMat.element(2, 0);
+			//projMat.element(1, 2) = projMat.element(2, 1);
+		}
+		else {
+			projMat = camera::GetProjectionMatrix();
+		}
+
+		return projMat;
+	}
+
 	ViewMatrix GetViewMatrix(EYE_TYPE eye) {
 		ViewMatrix mat;
 
+		point eyePos = GetEyePosition(eye);
+
+		if (m_pHMD != nullptr)
+			eyePos += m_pHMD->GetHeadPointOrigin();
+
 		switch (eye) {
 			case EYE_LEFT: {
-				point leftEyePoint = m_ptOrigin + (GetRightVector() * (m_pupillaryDistance / 2.0f));
-				mat = ViewMatrix(leftEyePoint, m_qRotation);
+				mat = ViewMatrix(eyePos, m_qRotation);
 			} break;
 
 			case EYE_RIGHT: {
-				point rightEyePoint = m_ptOrigin + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
-				mat = ViewMatrix(rightEyePoint, m_qRotation);
+				mat = ViewMatrix(eyePos, m_qRotation);
 			} break;
 
 			case EYE_MONO: {
 				mat = ViewMatrix(m_ptOrigin, m_qRotation);
 			} break;
 		}
-		
+			
 		return mat;
+	}
+
+	RESULT SetHMD(HMD *pHMD) {
+		m_pHMD = pHMD;
+		return R_PASS;
 	}
 
 private:
 	camera_precision m_pupillaryDistance;	//  Distance between eyes (in mm)
+	HMD *m_pHMD;
 };
 
 #endif // ! STEREO_CAMERA_H_

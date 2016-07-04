@@ -58,6 +58,8 @@ public:
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);
 
+	RESULT AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+
 public:
 	PathManager *GetPathManager();
 	OpenGLRenderingContext *GetOpenGLRenderingContext();

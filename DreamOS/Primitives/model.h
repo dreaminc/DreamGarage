@@ -51,6 +51,10 @@ private:
 		for (auto& v : vertices) {
 			m_pIndices[verticesCnt] = verticesCnt;
 			m_pVertices[verticesCnt++] = vertex(v);
+
+			if (verticesCnt % 3 == 0) {
+				SetTriangleTangentBitangent(verticesCnt - 3, verticesCnt - 2, verticesCnt - 1);
+			}
 		}
 
 	Error:
@@ -97,6 +101,10 @@ public:
 
 		for (auto& v : vertices) {
 			m_pVertices[verticesCnt++] = vertex(v);
+
+			if (verticesCnt % 3 == 0) {
+				SetTriangleTangentBitangent(verticesCnt - 3, verticesCnt - 2, verticesCnt - 1);
+			}
 		}
 		*/
 

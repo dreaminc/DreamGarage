@@ -26,12 +26,14 @@
 //#include "OGLProgram.h"
 #include "OGLProgramFactory.h"
 
+#include <memory>
+
 class SandboxApp; 
 class Windows64App;
+class OGLProfiler;
 
 class OpenGLImp : public HALImp {
 private:
-
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
 	OGLProgram *m_pOGLRenderProgram;
@@ -43,6 +45,8 @@ private:
 
 	version m_versionOGL;
 	version m_versionGLSL;
+
+	std::unique_ptr<OGLProfiler>	m_pOGLProfiler;
 
 	// Viewport
 	// TODO: Move this into an object?
@@ -66,6 +70,9 @@ public:
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
+
+	// TODO: Convert to composite
+	RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
 public:
 	// TODO: Consolidate all of these (one Render function)

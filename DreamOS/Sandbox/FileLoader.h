@@ -10,6 +10,16 @@
 
 class FileLoaderHelper {
 public:
+	struct material_t {
+		std::string	name;
+		std::string	map_Kd;
+	};
+
+	typedef std::vector < std::pair<material_t, std::vector<vertex>>> multi_mesh_t;
+
+	static bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
+		multi_mesh_t &out);
+
 	static bool LoadOBJFile(const std::wstring& obj_file_name,
 		std::vector<vertex> &out_vertices);
 };
