@@ -19,6 +19,13 @@ ProjectionMatrix::ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_preci
 	}
 }
 
+ProjectionMatrix::ProjectionMatrix(projection_precision left, projection_precision right,
+								   projection_precision top, projection_precision bottom,
+								   projection_precision nearPlane, projection_precision farPlane)
+{
+	ACRM(SetPerspective(left, right, top, bottom, nearPlane, farPlane), "Failed to set perspective matrix");
+}
+
 ProjectionMatrix::~ProjectionMatrix() {
 	// Empty Stub
 }
@@ -40,6 +47,7 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision width,
 	projection_precision bottom = -top;
 	projection_precision right = top * ratio;
 	projection_precision left = -right;
+
 	projection_precision f = 1.0f / static_cast<projection_precision>((tan((M_PI / 180.0f) * (angle / 2.0f))));
 
 	/*
@@ -49,8 +57,36 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision width,
 
 	///*
 	this->element(0, 0) = f / ratio;
+	
 	this->element(1, 1) = f;
 	//*/
+
+	this->element(2, 2) = -((farPlane + nearPlane) / (farPlane - nearPlane));
+	this->element(2, 3) = -((2.0f*farPlane*nearPlane) / (farPlane - nearPlane));
+
+	this->element(3, 2) = (-1.0f);
+
+	m_type = PROJECTION_MATRIX_PERSPECTIVE;
+
+	return r;
+}
+
+//http://www.songho.ca/opengl/gl_projectionmatrix.html
+RESULT ProjectionMatrix::SetPerspective(projection_precision left, projection_precision right,
+										projection_precision top, projection_precision bottom,
+										projection_precision nearPlane,
+										projection_precision farPlane)
+{
+	RESULT r = R_PASS;
+	
+	this->clear();
+
+	
+	this->element(0, 0) = (2.0f * nearPlane) / (right - left);
+	this->element(2, 0) = (right + left) / (right - left);
+
+	this->element(1, 1) = (2.0f * nearPlane) / (top - bottom);
+	this->element(2, 1) = (top + bottom) / (top - bottom);
 
 	this->element(2, 2) = -((farPlane + nearPlane) / (farPlane - nearPlane));
 	this->element(2, 3) = -((2.0f*farPlane*nearPlane) / (farPlane - nearPlane));

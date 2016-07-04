@@ -8,7 +8,7 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, HALImp *halimp, int wndWidth, int wndHei
 
 	switch (type) {
 		case HMD_OVR: {
-			pHMD = new OVR();
+			pHMD = new OVRHMD();
 			CRM(pHMD->InitializeHMD(halimp, wndWidth, wndHeight), "Failed to initialize HMD!");
 		} break;
 

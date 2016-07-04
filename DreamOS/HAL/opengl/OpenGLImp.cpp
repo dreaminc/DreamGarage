@@ -195,7 +195,7 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Allocate the camera
 	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 100.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 120.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -460,15 +460,22 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	texture *pColorTexture2 = new OGLTexture(this, L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	//*/
 
+	/*
+	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
+	pVolume->SetColorTexture(pColorTexture2);
+	pVolume->translateX(2.0f);
+	pVolume->SetBumpTexture(pBumpTexture);
+	pSceneGraph->PushObject(pVolume);
+
 	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
-	///*
+	/*
 	OGLSkybox *pSkybox = new OGLSkybox(this);
 	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	pSkybox->OGLActivateCubeMapTexture();
 //	pSceneGraph->PushObject(pSkybox);
 
-	/*
+	///*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
 	pVolume->SetBumpTexture(pBumpTexture);
@@ -485,7 +492,7 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 
 	/*
 	OGLVolume *pVolume = NULL;
-	int num = 10;
+	int num = 1;
 	double size = 0.5f;
 	int spaceFactor = 2;
 
@@ -759,6 +766,7 @@ RESULT OpenGLImp::SetHMD(HMD *pHMD) {
 	RESULT r = R_PASS;
 
 	m_pHMD = pHMD;
+	m_pCamera->SetHMD(pHMD);
 
 Error:
 	return r;

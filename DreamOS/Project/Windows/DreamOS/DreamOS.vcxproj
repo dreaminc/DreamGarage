@@ -122,9 +122,9 @@
       <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(CEFPATH)\Debug\*" "$(TargetDir)"
-xcopy /y "$(CEFPATH)\Resources\*" "$(TargetDir)"
-xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales"
+      <Command>xcopy /y "$(CEFPATH)\Debug\*" "$(TargetDir)" /D
+xcopy /y "$(CEFPATH)\Resources\*" "$(TargetDir)" /D
+xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
 
 
 </Command>

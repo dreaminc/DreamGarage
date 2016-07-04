@@ -73,7 +73,7 @@ public:
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
 		//auto ptEye = pStereoCamera->GetEyePosition(eye);
 		//auto matV = pStereoCamera->GetViewMatrix(eye);
-		auto matP = pStereoCamera->GetProjectionMatrix();
+		auto matP = pStereoCamera->GetProjectionMatrix(eye);
 		//auto matVP = pStereoCamera->GetProjectionMatrix() * pStereoCamera->GetViewMatrix(eye);
 		auto matViewOrientation = pStereoCamera->GetOrientationMatrix();
 		
