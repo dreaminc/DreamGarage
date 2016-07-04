@@ -471,15 +471,6 @@ RESULT Windows64App::Show() {
 
 		Profiler::GetProfiler()->OnFrameRendered();
 
-#if 0 // Temporary for debugging
-		static DWORD time = GetTickCount();
-		if (GetTickCount() - time > 1000)
-		{
-			OutputDebugStringW((std::wstring(L"DVR::tick ") + std::to_wstring(m_profiler.GetTicksPerSecond())).c_str());
-			time = GetTickCount();
-		}
-#endif
-
 		if (GetAsyncKeyState(VK_ESCAPE)) {
 			Shutdown();
 			fQuit = true;
