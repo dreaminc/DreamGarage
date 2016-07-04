@@ -473,16 +473,18 @@ RESULT OpenGLImp::LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeManager) 
 	pVolume->translateX(2.0f);
 	pVolume->SetBumpTexture(pBumpTexture);
 	pSceneGraph->PushObject(pVolume);
+	*/
 
 	// TODO: This should be handled in a factory or other compositional approach (constructor or otherwise)
-	/*
+	///*
 	OGLSkybox *pSkybox = new OGLSkybox(this);
 	OGLTexture *pCubeMap = new OGLTexture(this, L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	pSkybox->OGLActivateCubeMapTexture();
 	pSceneGraph->PushObject(pSkybox);
+	//*/
 
-	///*
+	/*
 	OGLVolume *pVolume = new OGLVolume(this, 1.0f);
 	pVolume->SetColorTexture(pColorTexture);
 	pVolume->SetBumpTexture(pBumpTexture);
@@ -782,7 +784,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		CR(pObjectStore->GetSkybox(pSkybox));
 		if (pSkybox != nullptr) {
 			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
+			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
 			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 		}
 		
