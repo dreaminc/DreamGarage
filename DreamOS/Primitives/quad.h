@@ -44,16 +44,38 @@ protected:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() { return NUM_QUAD_POINTS; }
-	inline int NumberIndices() { return NUM_QUAD_TRIS * 3; }
+	inline int NumberVertices() { 
+		//return NUM_QUAD_POINTS; 
+
+		int numVerts = (m_numVerticalDivisions + 1) * (m_numHorizontalDivisions + 1);
+		return numVerts;
+	}
+
+	inline int NumberIndices() { 
+		//return NUM_QUAD_TRIS * 3; 
+
+		int numDivisions = m_numVerticalDivisions * m_numHorizontalDivisions;
+		int numTris = numDivisions * 2;
+		int numIndices = numTris * 3;
+
+		return numIndices;
+	}
 
 private:
 	QUAD_TYPE m_quadType;
 
+	int m_numVerticalDivisions;
+	int m_numHorizontalDivisions;
+
+
 public:
 
 	// copy ctor
-	quad(quad& q) : m_quadType(q.m_quadType) {
+	quad(quad& q) : 
+		m_quadType(q.m_quadType),
+		m_numHorizontalDivisions(q.m_numHorizontalDivisions),
+		m_numVerticalDivisions(q.m_numVerticalDivisions)
+	{
 		m_pVertices = q.m_pVertices;
 		m_pIndices = q.m_pIndices;
 
@@ -62,22 +84,25 @@ public:
 	}
 
 	// move ctor
-	quad(quad&& q) : m_quadType(q.m_quadType) {
+	quad(quad&& q) : 
+		m_quadType(q.m_quadType),
+		m_numHorizontalDivisions(q.m_numHorizontalDivisions),
+		m_numVerticalDivisions(q.m_numVerticalDivisions)
+	{
 		m_pVertices = q.m_pVertices;
 		m_pIndices = q.m_pIndices;
 
 		q.m_pVertices = nullptr;
 		q.m_pIndices = nullptr;
 	}
-	
-	// Square
-	quad(double side) :
-		m_quadType(SQUARE)
-	{
+
+	RESULT SetVerticies(double width, double height) {
 		RESULT r = R_PASS;
+
 		CR(Allocate());
 
-		double halfSide = side / 2.0f;
+		double halfHeight = height / 2.0f;
+		double halfWidth = width / 2.0f;
 		int vertCount = 0;
 		int indexCount = 0;
 		int A, B, C, D;
@@ -85,42 +110,62 @@ public:
 		// Set up indices 
 		TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
 
-		m_pVertices[A = vertCount++] = vertex(point(-halfSide, halfSide, 0.0f), vector(0, 0, 1), uvcoord(0, 1.0f));		// A
-		m_pVertices[B = vertCount++] = vertex(point(halfSide, halfSide, 0.0f), vector(0, 0, 1), uvcoord(1.0f, 1.0f));			// B
-		m_pVertices[C = vertCount++] = vertex(point(-halfSide, -halfSide, 0.0f), vector(0, 0, 1), uvcoord(0, 0));		// C
-		m_pVertices[D = vertCount++] = vertex(point(halfSide, -halfSide, 0.0f), vector(0, 0, 1), uvcoord(1.0f, 0));		// D
+		m_pVertices[A = vertCount++] = vertex(point(halfWidth, halfHeight, 0.0f), vector(0.0f, 0.0f, 1.0f), uvcoord(1.0f, 1.0f));		// A
+		m_pVertices[B = vertCount++] = vertex(point(-halfWidth, halfHeight, 0.0f), vector(0.0f, 0.0f, 1.0f), uvcoord(0.0f, 1.0f));			// B
+		m_pVertices[C = vertCount++] = vertex(point(halfWidth, -halfHeight, 0.0f), vector(0.0f, 0.0f, 1.0f), uvcoord(1.0f, 0.0f));		// C
+		m_pVertices[D = vertCount++] = vertex(point(-halfWidth, -halfHeight, 0.0f), vector(0.0f, 0.0f, 1.0f), uvcoord(0.0f, 0.0f));		// D
 
-		pTriIndices[indexCount++] = TriangleIndexGroup(A, C, B);
-		pTriIndices[indexCount++] = TriangleIndexGroup(B, C, D);
+		pTriIndices[indexCount++] = TriangleIndexGroup(A, B, C);
+		SetTriangleTangentBitangent(A, B, C);
+
+		pTriIndices[indexCount++] = TriangleIndexGroup(C, B, D);
+		SetTriangleTangentBitangent(C, B, D);
+
+	Error:
+		return r;
+	}
+	
+	// Square
+	quad(double side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1) :
+		m_quadType(SQUARE),
+		m_numHorizontalDivisions(numHorizontalDivisions),
+		m_numVerticalDivisions(numVerticalDivisions)
+	{
+		RESULT r = R_PASS;
+
+		CR(SetVerticies(side, side));
 
 		Validate();
+		return;
+
 	Error:
 		Invalidate();
+		return;
 	}
 
 	// Rectangle
-	quad(double height, double width) :
-		m_quadType(RECTANGLE)
+	quad(double height, double width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1) :
+		m_quadType(RECTANGLE),
+		m_numHorizontalDivisions(numHorizontalDivisions),
+		m_numVerticalDivisions(numVerticalDivisions)
 	{
 		RESULT r = R_PASS;
-		CR(Allocate());
-
-		double halfHeight = height / 2.0f;
-		double halfWidth = width / 2.0f;
-
-		m_pVertices[0] = vertex(point(-halfWidth, halfHeight, 0.0f));	// A
-		m_pVertices[1] = vertex(point(halfWidth, halfHeight, 0.0f));		// B
-		m_pVertices[2] = vertex(point(-halfWidth, -halfHeight, 0.0f));	// C
-		m_pVertices[3] = vertex(point(halfWidth, -halfHeight, 0.0f));	// D
+		
+		CR(SetVerticies(width, height));
 
 		Validate();
+		return;
+
 	Error:
 		Invalidate();
+		return;
 	}
 
 	// This needs to be re-designed, too specific for 2D blits.
 	quad(double height, double width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright) :
-		m_quadType(RECTANGLE)
+		m_quadType(RECTANGLE),
+		m_numHorizontalDivisions(1),
+		m_numVerticalDivisions(1)
 	{
 		RESULT r = R_PASS;
 		CR(Allocate());

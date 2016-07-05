@@ -37,6 +37,7 @@ public:
 
 	quaternion(vector v) {
 		SetValues(0.0f, v.x(), v.y(), v.z());
+		Normalize();
 	}
 
 	quaternion(quaternion_precision theta, vector vectorAxis) {

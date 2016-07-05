@@ -447,6 +447,23 @@ Error:
 	return nullptr;
 }
 
+quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions) {
+	RESULT r = R_PASS;
+
+	quad *pQuad = new OGLQuad(this, width, height, numHorizontalDivisions, numVerticalDivisions);
+	CN(pQuad);
+
+Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+	return nullptr;
+}
+
 sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
 	RESULT r = R_PASS;
 

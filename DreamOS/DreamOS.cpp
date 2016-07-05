@@ -69,6 +69,10 @@ sphere* DreamOS::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int
 	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions);
 }
 
+quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions) {
+	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions);
+}
+
 volume* DreamOS::AddVolume(double side) {
 	return m_pSandbox->AddVolume(side);
 }

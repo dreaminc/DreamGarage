@@ -23,6 +23,7 @@
 #define DREAM_OS_VERSION_MINOR_MINOR 0
 
 #include "Primitives/light.h"
+#include "Primitives/quad.h"
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
 #include "Primitives/texture.h"
@@ -43,6 +44,9 @@ public:
 protected:
 	//RESULT AddLight(light *pLight);
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+
+	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1);
+
 	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	volume *AddVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
