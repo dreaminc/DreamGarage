@@ -20,6 +20,7 @@ public:
 		TEXTURE_COLOR = 0,
 		TEXTURE_BUMP = 1,
 		TEXTURE_CUBE = 2,
+		TEXTURE_HEIGHT = 3,
 		TEXTURE_INVALID = 32
 	};
 
@@ -64,6 +65,8 @@ public:
 	RESULT LoadCubeMapByName(wchar_t * pszName);
 
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
+
+	double GetValueAtUV(double uValue, double vValue);
 
 protected:
 	int m_width;

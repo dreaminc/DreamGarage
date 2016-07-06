@@ -31,7 +31,7 @@ typedef struct {
 class quaternion {
 public:
 	quaternion() {
-		SetQuaternion(0.0f, 0.0f, 0.0f, -1.0f);
+		SetQuaternion(0.0f, 0.0f, 1.0f, 0.0f);
 		Normalize();
 	}
 
@@ -168,17 +168,17 @@ public:
 
 	// Euler Conversions: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 	quaternion_precision GetEulerAngelZ() {
-		quaternion_precision phi = static_cast<quaternion_precision>((2.0f * ((m_w * m_x) + (m_y * m_z))), (1 - 2.0f * (m_x*m_x + m_y*m_y)));
+		quaternion_precision phi = static_cast<quaternion_precision>( atan2((2.0f * ((m_w * m_x) + (m_y * m_z))), (1 - 2.0f * (m_x*m_x + m_y*m_y))) );
 		return phi;
 	}
 
 	quaternion_precision GetEulerAngelX() {
-		quaternion_precision theta = static_cast<quaternion_precision>((2.0f * ((m_w * m_y) - (m_z * m_x))));
+		quaternion_precision theta = static_cast<quaternion_precision>( asin((2.0f * ((m_w * m_y) - (m_z * m_x)))) );
 		return theta;
 	}
 
 	quaternion_precision GetEulerAngelY() {
-		quaternion_precision psi = static_cast<quaternion_precision>((2.0f * ((m_w * m_z) + (m_x * m_y))), (1 - 2.0f * (m_y*m_y + m_z*m_z)));
+		quaternion_precision psi = static_cast<quaternion_precision>( atan2((2.0f * ((m_w * m_z) + (m_x * m_y))), (1 - 2.0f * (m_y*m_y + m_z*m_z))) );
 		return psi;
 	}
 

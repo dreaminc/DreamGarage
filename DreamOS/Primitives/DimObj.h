@@ -250,6 +250,41 @@ public:
 		return r;
 	}
 
+	// This will not take into consideration surfaces that are continuous 
+	// TODO: Create surface based normal calculation function (this works at the vertex level rather the triangle one)
+	RESULT SetTriangleNormal(dimindex i1, dimindex i2, dimindex i3) {
+		RESULT r = R_PASS;
+		
+		vertex *pV1 = nullptr, *pV2 = nullptr, *pV3 = nullptr;
+		vector deltaPos1, deltaPos2;
+		vector normalVector;
+
+		// TODO: More eloquent way than this
+		CB((i1 < NumberIndices()));
+		pV1 = &(m_pVertices[i1]);
+		CN(pV1);
+
+		CB((i2 < NumberIndices()));
+		pV2 = &(m_pVertices[i2]);
+		CN(pV2);
+
+		CB((i3 < NumberIndices()));
+		pV3 = &(m_pVertices[i3]);
+		CN(pV3);
+
+		deltaPos1 = pV2->GetPoint() - pV1->GetPoint();
+		deltaPos2 = pV3->GetPoint() - pV1->GetPoint();
+
+		normalVector = deltaPos1.NormalizedCross(deltaPos2);
+
+		pV1->SetNormal(normalVector);
+		pV2->SetNormal(normalVector);
+		pV3->SetNormal(normalVector);
+
+	Error:
+		return r;
+	}
+
 	RESULT SetQuadTangentBitangent(dimindex TL, dimindex TR, dimindex BL, dimindex BR) {
 		RESULT r = R_PASS;
 		vertex *pVTR = nullptr, *pVBL = nullptr;

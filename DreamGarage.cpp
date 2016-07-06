@@ -24,6 +24,9 @@ RESULT DreamGarage::LoadScene() {
 
 	texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
 	//*/
 
 	// TODO: Combine this into one call
@@ -31,10 +34,9 @@ RESULT DreamGarage::LoadScene() {
 	skybox *pSkybox = AddSkybox();
 	pSkybox->SetCubeMapTexture(pCubeMap);
 
-	quad *pQuad = AddQuad(10.0f, 10.0f);
-	//pQuad->SetColorTexture(pColorTexture);
-	pQuad->SetBumpTexture(pBumpTexture);
-	pQuad->RotateXByDeg(-90.0f);
+	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
+	pQuad->SetColorTexture(pColorTextureCobble);
+	//pQuad->SetBumpTexture(pBumpTexture);
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");

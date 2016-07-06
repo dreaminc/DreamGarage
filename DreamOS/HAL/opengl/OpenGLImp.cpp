@@ -447,10 +447,10 @@ Error:
 	return nullptr;
 }
 
-quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions) {
+quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
 	RESULT r = R_PASS;
 
-	quad *pQuad = new OGLQuad(this, width, height, numHorizontalDivisions, numVerticalDivisions);
+	quad *pQuad = new OGLQuad(this, width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 	CN(pQuad);
 
 Success:

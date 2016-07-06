@@ -109,31 +109,32 @@ VirtualObj* VirtualObj::RotateBy(quaternion q) {
 // TODO: This is not working
 VirtualObj* VirtualObj::RotateBy(quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 	m_qRotation *= quaternion::iQuaternion(x);
-	m_qRotation.Normalize();
+	//m_qRotation.Normalize();
 
 	m_qRotation *= quaternion::jQuaternion(y);
-	m_qRotation.Normalize();
+	//m_qRotation.Normalize();
 
 	m_qRotation *= quaternion::kQuaternion(z);
-	m_qRotation.Normalize();
+	//m_qRotation.Normalize();
 	
 	return this;
 }
 
 VirtualObj* VirtualObj::RotateXBy(quaternion_precision theta) {
 	m_qRotation *= quaternion::iQuaternion(theta).Normalize();
-	m_qRotation.Normalize();
+	//m_qRotation.Normalize();
 	return this;
 }
 
 VirtualObj* VirtualObj::RotateYBy(quaternion_precision theta) {
 	m_qRotation *= quaternion::jQuaternion(theta);
-	m_qRotation.Normalize();
+	//m_qRotation.Normalize();
 	return this;
 }
 
 VirtualObj* VirtualObj::RotateZBy(quaternion_precision theta) {
 	m_qRotation *= quaternion::kQuaternion(theta);
+	//m_qRotation.Normalize();
 	return this;
 }
 
@@ -174,7 +175,6 @@ VirtualObj* VirtualObj::SetOrientation(quaternion qOrientation) {
 
 VirtualObj* VirtualObj::SetRotate(quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 	m_qRotation = quaternion::iQuaternion(x) * quaternion::jQuaternion(y) * quaternion::kQuaternion(z);
-	m_qRotation.Normalize();
 	return this;
 }
 

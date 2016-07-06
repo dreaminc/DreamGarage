@@ -33,16 +33,16 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, double side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1) :
-		quad(side, numHorizontalDivisions, numVerticalDivisions),
+	OGLQuad(OpenGLImp *pParentImp, double side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
+		quad(side, numHorizontalDivisions, numVerticalDivisions, pTextureHeight),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, double height, double width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1) :
-		quad(height, width, numHorizontalDivisions, numVerticalDivisions),
+	OGLQuad(OpenGLImp *pParentImp, double height, double width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
+		quad(height, width, numHorizontalDivisions, numVerticalDivisions, pTextureHeight),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM

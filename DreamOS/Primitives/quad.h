@@ -10,11 +10,13 @@
 
 #define NUM_QUAD_POINTS 4
 #define NUM_QUAD_TRIS 2
+#define DEFAULT_HEIGHT_MAP_SCALE 1.0f
 
 #include "DimObj.h"
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
+#include "texture.h"
 
 class quad : public DimObj {
 public:
@@ -67,6 +69,9 @@ private:
 	int m_numVerticalDivisions;
 	int m_numHorizontalDivisions;
 
+	texture *m_pTextureHeight;
+	double m_heightMapScale;
+
 
 public:
 
@@ -74,7 +79,9 @@ public:
 	quad(quad& q) : 
 		m_quadType(q.m_quadType),
 		m_numHorizontalDivisions(q.m_numHorizontalDivisions),
-		m_numVerticalDivisions(q.m_numVerticalDivisions)
+		m_numVerticalDivisions(q.m_numVerticalDivisions),
+		m_pTextureHeight(q.m_pTextureHeight),
+		m_heightMapScale(q.m_heightMapScale)
 	{
 		m_pVertices = q.m_pVertices;
 		m_pIndices = q.m_pIndices;
@@ -87,7 +94,9 @@ public:
 	quad(quad&& q) : 
 		m_quadType(q.m_quadType),
 		m_numHorizontalDivisions(q.m_numHorizontalDivisions),
-		m_numVerticalDivisions(q.m_numVerticalDivisions)
+		m_numVerticalDivisions(q.m_numVerticalDivisions),
+		m_pTextureHeight(q.m_pTextureHeight),
+		m_heightMapScale(q.m_heightMapScale)
 	{
 		m_pVertices = q.m_pVertices;
 		m_pIndices = q.m_pIndices;
@@ -103,6 +112,10 @@ public:
 
 		double halfHeight = height / 2.0f;
 		double halfWidth = width / 2.0f;
+
+		double widthInc = width / m_numHorizontalDivisions;
+		double heightInc = height / m_numVerticalDivisions;
+		
 		int vertCount = 0;
 		int indexCount = 0;
 		int A, B, C, D;
@@ -110,26 +123,58 @@ public:
 		// Set up indices 
 		TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
 
-		m_pVertices[A = vertCount++] = vertex(point(halfWidth, halfHeight, 0.0f), vector(0.0f, 0.0f, 1.0f), uvcoord(1.0f, 1.0f));		// A
-		m_pVertices[B = vertCount++] = vertex(point(-halfWidth, halfHeight, 0.0f), vector(0.0f, 0.0f, 1.0f), uvcoord(0.0f, 1.0f));			// B
-		m_pVertices[C = vertCount++] = vertex(point(halfWidth, -halfHeight, 0.0f), vector(0.0f, 0.0f, 1.0f), uvcoord(1.0f, 0.0f));		// C
-		m_pVertices[D = vertCount++] = vertex(point(-halfWidth, -halfHeight, 0.0f), vector(0.0f, 0.0f, 1.0f), uvcoord(0.0f, 0.0f));		// D
+		for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
+			for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
 
-		pTriIndices[indexCount++] = TriangleIndexGroup(A, B, C);
-		SetTriangleTangentBitangent(A, B, C);
+				double yValue = 0.0f;
+				double uValue = (float)(i) / (float)(m_numHorizontalDivisions);
+				double vValue = (float)(j) / (float)(m_numVerticalDivisions);
 
-		pTriIndices[indexCount++] = TriangleIndexGroup(C, B, D);
-		SetTriangleTangentBitangent(C, B, D);
+				if (m_pTextureHeight != nullptr) {
+					yValue = m_pTextureHeight->GetValueAtUV(uValue, vValue);
+					yValue *= m_heightMapScale;
+				}
+
+				m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, yValue, (heightInc * j) - halfHeight),
+												  vector(0.0f, 1.0f, 0.0f), 
+												  uvcoord(uValue, vValue));	
+
+				// TODO: Calculate normal (based on geometry)
+
+				m_pVertices[vertCount].SetTangent(vector(1.0f, 0.0f, 0.0f));
+				m_pVertices[vertCount].SetBitangent(vector(0.0f, 0.0f, -1.0f));
+
+				vertCount++;
+			}
+		}
+
+		for (int i = 0; i < m_numHorizontalDivisions; i++) {
+			for (int j = 0; j < m_numVerticalDivisions; j++) {
+				int A = (i) + ((m_numHorizontalDivisions + 1) * j);
+				int B = (i + 1) + ((m_numHorizontalDivisions + 1) * j);
+
+				int C = (i) + ((m_numHorizontalDivisions + 1) * (j + 1));
+				int D = (i + 1) + ((m_numHorizontalDivisions + 1) * (j + 1));
+
+				pTriIndices[indexCount++] = TriangleIndexGroup(A, B, C);
+				SetTriangleNormal(A, B, C);
+
+				pTriIndices[indexCount++] = TriangleIndexGroup(C, B, D);
+				SetTriangleNormal(C, B, D);
+			}
+		}
 
 	Error:
 		return r;
 	}
 	
 	// Square
-	quad(double side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1) :
+	quad(double side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
 		m_quadType(SQUARE),
 		m_numHorizontalDivisions(numHorizontalDivisions),
-		m_numVerticalDivisions(numVerticalDivisions)
+		m_numVerticalDivisions(numVerticalDivisions),
+		m_pTextureHeight(pTextureHeight),
+		m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
 	{
 		RESULT r = R_PASS;
 
@@ -144,10 +189,12 @@ public:
 	}
 
 	// Rectangle
-	quad(double height, double width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1) :
+	quad(double height, double width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
 		m_quadType(RECTANGLE),
 		m_numHorizontalDivisions(numHorizontalDivisions),
-		m_numVerticalDivisions(numVerticalDivisions)
+		m_numVerticalDivisions(numVerticalDivisions),
+		m_pTextureHeight(pTextureHeight),
+		m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
 	{
 		RESULT r = R_PASS;
 		
@@ -165,7 +212,9 @@ public:
 	quad(double height, double width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright) :
 		m_quadType(RECTANGLE),
 		m_numHorizontalDivisions(1),
-		m_numVerticalDivisions(1)
+		m_numVerticalDivisions(1),
+		m_pTextureHeight(nullptr),
+		m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
 	{
 		RESULT r = R_PASS;
 		CR(Allocate());
