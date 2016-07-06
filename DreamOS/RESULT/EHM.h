@@ -10,8 +10,9 @@
 
 #include <stdio.h>
 
-#define DEBUG_OUT_TO_CONSOLE
+//#define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
+#define DEBUG_OUT_TO_DOS_CONSOLE
 
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system
@@ -25,6 +26,17 @@
 
 	static char outstr[OUTPUT_MAX_SIZE] = { DEBUGGER_SIGNATURE };
 	#define CONSOLE_OUT(str, ...) do { sprintf_s(outstr + DEBUGGER_SIGNATURE_SIZE, OUTPUT_MAX_SIZE - DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__); if (outstr[DEBUGGER_SIGNATURE_SIZE] != '\n' && outstr[DEBUGGER_SIGNATURE_SIZE] != '\r') OutputDebugStringA(outstr); } while(0);
+#elif defined(DEBUG_OUT_TO_DOS_CONSOLE)
+#include <windows.h>
+#include "Profiler/Profiler.h"
+#include <string>
+
+#define DEBUGGER_SIGNATURE "DOS::"
+#define DEBUGGER_SIGNATURE_SIZE	5		// size in bytes
+#define	OUTPUT_MAX_SIZE	1024
+
+static char outstr[OUTPUT_MAX_SIZE] = { DEBUGGER_SIGNATURE };
+#define CONSOLE_OUT(str, ...) do { sprintf_s(outstr + DEBUGGER_SIGNATURE_SIZE, OUTPUT_MAX_SIZE - DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__); if (outstr[DEBUGGER_SIGNATURE_SIZE] != '\n' && outstr[DEBUGGER_SIGNATURE_SIZE] != '\r') Profiler::GetProfiler()->AddConsoleLine(std::string(outstr)); } while(0);
 #endif
 
 
@@ -32,9 +44,13 @@
     #define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
     #define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0); 
 	#define DEBUG_LINEOUT_RETURN(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\r"); } while(0); 
+#elif defined(DEBUG_OUT_TO_DOS_CONSOLE)
+	#define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
+	#define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0); 
+	#define DEBUG_LINEOUT_RETURN(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\r"); } while(0); 
 #else
-    #define DEBUG_OUT(str, ...)
-    #define DEBUG_LINEOUT(str, ...)
+	#define DEBUG_OUT(str, ...)
+	#define DEBUG_LINEOUT(str, ...)
 	#define DEBUG_LINEOUT_RETURN(str, ...) 
 #endif
 
