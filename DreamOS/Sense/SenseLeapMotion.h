@@ -18,106 +18,15 @@
 
 #include "Primitives/valid.h"
 
-#include "Primitives/point.h"
-#include "Primitives/vector.h"
-#include "Primitives/hand.h"
-
 #include "Primitives/VirtualObj.h"
+
+#include "SenseLeapMotionHand.h"
 
 typedef enum SenseLeapMotionEventType {
 	SENSE_LEAPMOTION_EVENT_HAND_LEFT,
 	SENSE_LEAPMOTION_EVENT_HAND_RIGHT,
 	SENSE_LEAPMOTION_EVENT_INVALID,
 } SENSE_LEAPMOTION_EVENT_TYPE;
-
-typedef enum SenseLeapMotionHandType {
-	SENSE_LEAPMOTION_HAND_LEFT,
-	SENSE_LEAPMOTION_HAND_RIGHT,
-	SENSE_LEAPMOTION_HAND_INVALID
-} SENSE_LEAPMOTION_HAND_TYPE;
-
-class SenseLeapMotionHand {
-public:
-	SenseLeapMotionHand(const Leap::Hand hand) {
-		InitializeFromLeapHand(hand);
-	}
-
-	~SenseLeapMotionHand() {
-		// empty
-	}
-
-	bool IsLeftHand() {
-		return (m_handType == SENSE_LEAPMOTION_HAND_LEFT);
-	}
-
-	bool IsRightHand() {
-		return (m_handType == SENSE_LEAPMOTION_HAND_RIGHT);
-	}
-
-	RESULT InitializeFromLeapHand(const Leap::Hand hand) {
-		RESULT r = R_PASS;
-
-		m_handType = (hand.isLeft()) ? SENSE_LEAPMOTION_HAND_LEFT : SENSE_LEAPMOTION_HAND_RIGHT;
-
-		m_leapHandID = hand.id();
-		Leap::Vector leapPalmPosition = hand.palmPosition();
-		leapPalmPosition /= 1000.0f;	// Leap outputs in mm, and our engine is in meters
-
-		m_ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.y, leapPalmPosition.z);
-
-		hand.basis();
-		Leap::Vector leapPalmNormal = hand.palmNormal();
-		Leap::Vector leapPalmDirection = hand.direction();
-		vector vecPalmDir = vector(leapPalmDirection.x, leapPalmDirection.y, leapPalmDirection.z);
-		vector vecPalmNorm = vector(leapPalmNormal.x, leapPalmNormal.y, leapPalmNormal.z);
-		float dotVal = leapPalmDirection.roll();
-		
-		m_qOrientation = quaternion(dotVal, vector::kVector());
-		
-		
-		/*
-		m_qOrientation = quaternion(
-			vector(leapPalmDirection.x, leapPalmDirection.y, leapPalmDirection.z), 
-			vector(leapPalmNormal.x, leapPalmNormal.y, leapPalmNormal.z)
-		);
-		*/
-
-	Error:
-		return r;
-	}
-
-	const char *HandTypeString() {
-		if (m_handType == SENSE_LEAPMOTION_HAND_LEFT)
-			return "left";
-		else if (m_handType == SENSE_LEAPMOTION_HAND_RIGHT)
-			return "right";
-		else
-			return "invalid";
-	}
-
-	RESULT toString() {
-		RESULT r = R_PASS;
-
-		DEBUG_LINEOUT("%s hand id:%d position:%s rol:%f", HandTypeString(), m_leapHandID, m_ptPalmPosition.toString().c_str());
-
-	Error:
-		return r;
-	}
-
-	point PalmPosition() {
-		return m_ptPalmPosition;
-	}
-
-	quaternion PalmOrientation() {
-		return m_qOrientation;
-	}
-
-private:
-	SENSE_LEAPMOTION_HAND_TYPE m_handType;
-	point m_ptPalmPosition;
-	quaternion m_qOrientation;
-	int32_t m_leapHandID;
-};
 
 typedef struct SenseLeapMotionEvent : SenseDevice::SenseDeviceEvent {
 	SenseLeapMotionHand SLMHand;
@@ -164,8 +73,14 @@ public:
 	}
 	*/
 
-	RESULT AttachHand(hand *pHand) {
-		m_pLeftHand = pHand;
+	RESULT AttachHand(hand *pHand, hand::HAND_TYPE handType) {
+		if(handType == hand::HAND_TYPE::HAND_LEFT)
+			m_pLeftHand = pHand;
+		else if (handType == hand::HAND_TYPE::HAND_RIGHT)
+			m_pRightHand = pHand;
+		else
+			return R_FAIL;
+
 		return R_PASS;
 	}
 

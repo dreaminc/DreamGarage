@@ -314,6 +314,9 @@
     <ClCompile Include="..\..\..\Primitives\composite.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\hand.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1257,7 +1260,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h">
       <Filter>HAL\opengl</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
@@ -1815,6 +1818,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\DreamGarage.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h">
+      <Filter>Sense</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

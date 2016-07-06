@@ -382,7 +382,11 @@ RESULT Windows64App::RegisterImpLeapMotionEvents() {
 	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 	AddObject(pLeftHand);
 
-	CR(m_pSenseLeapMotion->AttachHand(pLeftHand));
+	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	AddObject(pRightHand);
+
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
 
 Error:
 	return r;
@@ -498,8 +502,8 @@ RESULT Windows64App::Show() {
 		}
 		else {
 			// Render Scene
-			//m_pHALImp->Render(m_pSceneGraph);
-			m_pHALImp->RenderStereo(m_pSceneGraph);
+			m_pHALImp->Render(m_pSceneGraph);
+			//m_pHALImp->RenderStereo(m_pSceneGraph);
 		}
 		//*/
 	

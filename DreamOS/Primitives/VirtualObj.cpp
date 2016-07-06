@@ -54,6 +54,11 @@ VirtualObj* VirtualObj::translateZ(point_precision z) {
 	return this;
 }
 
+VirtualObj* VirtualObj::SetPosition(point p) {
+	m_ptOrigin = p;
+	return this;
+}
+
 VirtualObj* VirtualObj::MoveTo(point p) {
 	m_ptOrigin = p;
 	return this;

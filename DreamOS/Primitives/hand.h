@@ -10,129 +10,75 @@
 // this is really a convenience object that should be used to derive others rather than off of DimObj directly
 
 #include "composite.h"
+#include "Leap.h"
 
-typedef enum HandType {
-	HAND_LEFT,
-	HAND_RIGHT,
-	HAND_INVALID
-} HAND_TYPE;
-
-class thumb : public composite {
-public:
-	thumb(HALImp* pHALImp) :
-		composite(pHALImp)
-	{
-		Initialize();
-	}
-
-	RESULT Initialize() {
-		RESULT r = R_PASS;
-
-		float width = 0.25f;
-		float height = 0.25f;
-		float length = 1.0f;
-
-		m_pMetacarpal = AddVolume(width, height, length);
-		m_pMetacarpal->SetColor(color(COLOR_RED));
-		m_pMetacarpal->UpdateBuffers();
-
-		m_pProximalPhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-		m_pProximalPhalanx->SetPivotPoint(0, length, 0);
-		m_pProximalPhalanx->SetColor(color(COLOR_BLUE));
-		m_pProximalPhalanx->UpdateBuffers();
-		m_pMetacarpal->AddChild(m_pProximalPhalanx);
-
-		m_pDistalPhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-		m_pDistalPhalanx->SetPivotPoint(0, length, 0);
-		m_pDistalPhalanx->SetColor(color(COLOR_YELLOW));
-		m_pDistalPhalanx->UpdateBuffers();
-		m_pProximalPhalanx->AddChild(m_pDistalPhalanx);
-
-	Error:
-		return r;
-	}
-
-private:
-	std::shared_ptr<volume> m_pMetacarpal;
-	std::shared_ptr<volume> m_pProximalPhalanx;
-	std::shared_ptr<volume> m_pDistalPhalanx;
-};
+class SenseLeapMotionHand;
 
 class finger : public composite {
 public:
-	finger(HALImp* pHALImp) :
-		composite(pHALImp)
-	{
-		Initialize();
-	}
+	// Note: This is compatible with the leap motion library
+	typedef enum JointType {
+		JOINT_MCP,		// Metacarpal phalangeal Joint
+		JOINT_PIP,		// Proximal interphalangeal joint
+		JOINT_DIP,		// distal interphalangeal joint
+		JOINT_TIP,		// tip joint
+		JOINT_INVALID
+	} JOINT_TYPE;
 
-	RESULT Initialize() {
-		RESULT r = R_PASS;
+public:
+	finger(HALImp* pHALImp);
 
-		float width = 0.25f;
-		float height = 0.25f;
-		float length = 1.0f;
+	RESULT Initialize();
+	RESULT SetJointPosition(point ptJoint, JOINT_TYPE jointType);
 
-		m_pMetacarpal = AddVolume(width, height, length);
-		m_pMetacarpal->SetColor(color(COLOR_RED));
-		m_pMetacarpal->UpdateBuffers();
-
-		m_pProximalPhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-		m_pProximalPhalanx->SetPivotPoint(0, length, 0);
-		m_pProximalPhalanx->SetColor(color(COLOR_BLUE));
-		m_pProximalPhalanx->UpdateBuffers();
-		m_pMetacarpal->AddChild(m_pProximalPhalanx);
-
-		m_pIntermediatePhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-		m_pIntermediatePhalanx->SetPivotPoint(0, length, 0);
-		m_pIntermediatePhalanx->SetColor(color(COLOR_GREEN));
-		m_pIntermediatePhalanx->UpdateBuffers();
-		m_pProximalPhalanx->AddChild(m_pIntermediatePhalanx);
-
-		m_pDistalPhalanx = MakeVolume(0.25f, 0.25f, 1.0f);
-		m_pDistalPhalanx->SetPivotPoint(0, length, 0);
-		m_pDistalPhalanx->SetColor(color(COLOR_YELLOW));
-		m_pDistalPhalanx->UpdateBuffers();
-		m_pIntermediatePhalanx->AddChild(m_pDistalPhalanx);
-
-	Error:
-		return r;
-	}
-
-private:
+protected:
+	/*
 	std::shared_ptr<volume> m_pMetacarpal;
 	std::shared_ptr<volume> m_pProximalPhalanx;
 	std::shared_ptr<volume> m_pIntermediatePhalanx;
 	std::shared_ptr<volume> m_pDistalPhalanx;
+	*/
+
+	std::shared_ptr<sphere> m_pTip;
+	std::shared_ptr<sphere> m_pMCP;
+	std::shared_ptr<sphere> m_pPIP;
+	std::shared_ptr<sphere> m_pDIP;
+};
+
+class thumb : public finger {
+public:
+	thumb(HALImp* pHALImp);
+
+	RESULT Initialize();
 };
 
 class hand : public composite {
 public:
-	hand(HALImp* pHALImp) :
-		composite(pHALImp)
-	{
-		Initialize();
-	}
+	typedef enum HandType {
+		HAND_LEFT,
+		HAND_RIGHT,
+		HAND_INVALID
+	} HAND_TYPE;
 
-	RESULT Initialize() {
-		RESULT r = R_PASS;
+public:
+	hand(HALImp* pHALImp);
 
-		m_pPalm = AddVolume(1.0f, 0.5f, 0.25);
+	RESULT Initialize();
 
-		m_pIndexFinger = std::shared_ptr<finger>(new finger(m_pHALImp));
-		AddObject(m_pIndexFinger);
-
-	Error:
-		return r;
-	}
+	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
+	RESULT SetFromLeapHand(const Leap::Hand hand);
 
 private:
-	std::shared_ptr<volume> m_pPalm;
+	HAND_TYPE m_handType;
+
+	std::shared_ptr<sphere> m_pPalm;
 
 	std::shared_ptr<finger> m_pIndexFinger;
 	std::shared_ptr<finger> m_pMiddleFinger;
 	std::shared_ptr<finger> m_pRingFinger;
 	std::shared_ptr<finger> m_pPinkyFinger;
+
+	std::shared_ptr<thumb> m_pThumb;
 };
 
 #endif	// ! HAND_H_

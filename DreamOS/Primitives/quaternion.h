@@ -58,10 +58,12 @@ public:
 		Normalize();
 	}
 
-	// TODO: Not sure if this is right (orientation might be hard to predict)
-	quaternion(vector v1, vector v2) {
+	// Create a quaternion from a set of basis vectors
+	/*
+	quaternion(vector v1, vector v2, vector v3) {
 		vector v1n = v1.Normal();
 		vector v2n = v2.Normal();
+		vector v3n = v3.Normal();
 
 		vector w = (v1n.cross(v2n));
 		quaternion_precision vecDotProd = v1n * v2n;
@@ -70,6 +72,7 @@ public:
 		
 		Normalize();
 	}
+	*/
 
 	quaternion(vector i, vector j, vector k) {
 		SetQuaternion(i, j, k);

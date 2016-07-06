@@ -74,55 +74,16 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 		// Get the first hand
 		const Leap::Hand hand = *hl;
 
-		SenseLeapMotionHand sHand(hand);
-		sHand.toString();
-
-		if (sHand.IsLeftHand()) {
+		if ((hand.isLeft())) {
 			if (m_pLeftHand != nullptr) {
-				m_pLeftHand->SetOrientation(sHand.PalmOrientation());
-				m_pLeftHand->MoveTo(sHand.PalmPosition());
+				m_pLeftHand->SetFromLeapHand(hand);
 			}
 		}
-
-		/*
-		// Get the hand's normal vector and direction
-		const Leap::Vector normal = hand.palmNormal();
-		const Leap::Vector direction = hand.direction();
-
-		// Calculate the hand's pitch, roll, and yaw angles
-		std::cout << std::string(2, ' ') << "pitch: " << direction.pitch() * Leap::RAD_TO_DEG << " degrees, "
-			<< "roll: " << normal.roll() * Leap::RAD_TO_DEG << " degrees, "
-			<< "yaw: " << direction.yaw() * Leap::RAD_TO_DEG << " degrees" << std::endl;
-
-		// Get the Arm bone
-		Leap::Arm arm = hand.arm();
-
-		std::cout << std::string(2, ' ') << "Arm direction: " << arm.direction()
-			<< " wrist position: " << arm.wristPosition()
-			<< " elbow position: " << arm.elbowPosition() << std::endl;
-
-		// Get fingers
-		const Leap::FingerList fingers = hand.fingers();
-		for (auto fl = fingers.begin(); fl != fingers.end(); ++fl) {
-			const Leap::Finger finger = *fl;
-
-			std::cout << std::string(4, ' ') << FingerNames[finger.type()]
-				<< " finger, id: " << finger.id()
-				<< ", length: " << finger.length()
-				<< "mm, width: " << finger.width() << std::endl;
-
-			// Get finger bones
-			for (int b = 0; b < 4; ++b) {
-				Leap::Bone::Type boneType = static_cast<Leap::Bone::Type>(b);
-				Leap::Bone bone = finger.bone(boneType);
-
-				std::cout << std::string(6, ' ') << BoneNames[boneType]
-					<< " bone, start: " << bone.prevJoint()
-					<< ", end: " << bone.nextJoint()
-					<< ", direction: " << bone.direction() << std::endl;
+		else {
+			if (m_pRightHand != nullptr) {
+				m_pRightHand->SetFromLeapHand(hand);
 			}
 		}
-		*/
 	}
 }
 

@@ -30,9 +30,11 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 
 	// TODO: Combine this into one call
+	/*
 	texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	skybox *pSkybox = AddSkybox();
 	pSkybox->SetCubeMapTexture(pCubeMap);
+	*/
 
 	/*
 	model* pModel = AddModel(L"chainsaw_free.obj");

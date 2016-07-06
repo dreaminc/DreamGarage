@@ -122,7 +122,7 @@
       <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;$(LEAPMOTIONPATH)\lib\x64\Leap.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-		<Command>
+      <Command>
 			xcopy /y "$(CEFPATH)\Debug\*" "$(TargetDir)" /D
 			xcopy /y "$(CEFPATH)\Resources\*" "$(TargetDir)" /D
 			xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
@@ -204,6 +204,7 @@
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
+    <ClCompile Include="..\..\..\Primitives\hand.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
@@ -541,6 +542,7 @@
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h" />
     <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />

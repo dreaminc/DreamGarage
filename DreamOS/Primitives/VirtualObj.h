@@ -61,6 +61,7 @@ public:
 	VirtualObj* translateY(point_precision y);
 	VirtualObj* translateZ(point_precision z);
 
+	VirtualObj* SetPosition(point p);
 	VirtualObj* MoveTo(point p);
 	VirtualObj* MoveTo(point_precision x, point_precision y, point_precision z);
 
