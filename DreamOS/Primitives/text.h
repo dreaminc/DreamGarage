@@ -66,6 +66,8 @@ public:
 
 			RESULT r = R_PASS;
 			CR(Allocate());
+
+			SetDirty();
 		}
 		
 		m_text = text;
