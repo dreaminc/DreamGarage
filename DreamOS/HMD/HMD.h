@@ -13,6 +13,8 @@
 
 #include "Primitives/Publisher.h"
 
+#include "Primitives/ViewMatrix.h"
+#include "Primitives/ProjectionMatrix.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/quaternion.h"
 #include "Primitives/point.h"
@@ -63,6 +65,8 @@ typedef struct HMDEvent {
 	}
 } HMD_EVENT;
 
+
+
 class HMD : public Publisher<HMDEventType, HMDEvent> {
 public:
 	HMD() {
@@ -97,8 +101,15 @@ public:
 	inline point GetHMDOrigin() { return m_ptOrigin; }
 	inline vector GetHMDTrackerDeviation() { return GetHMDOrigin(); }
 
+	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) = 0;
+	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) = 0;
+
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
+
+	point GetHeadPointOrigin() {
+		return m_ptOrigin;
+	}
 
 protected:
 	point m_ptOrigin;
@@ -106,6 +117,8 @@ protected:
 
 	int m_eyeWidth;
 	int m_eyeHeight;
+
+
 
 private:
 	UID m_uid;

@@ -35,6 +35,10 @@ protected:
 	texture *m_pColorTexture;
 	texture *m_pBumpTexture;
 
+	// Use this flag to signal the appropriate rendering object (such as OGLObj) that it needs to update the buffer
+	// TODO: This should be encapsulated as a dirty pattern
+	bool m_fDirty;
+
 public:
     DimObj() :
         VirtualObj(),	// velocity, origin
@@ -44,7 +48,8 @@ public:
 		m_pColorTexture(nullptr),
 		m_pBumpTexture(nullptr),
 		m_pObjects(nullptr),
-		m_pParent(nullptr)
+		m_pParent(nullptr),
+		m_fDirty(false)
         //m_aabv()
     {
         /* stub */
@@ -125,10 +130,27 @@ public:
 	virtual RESULT UpdateBuffers() {
 		return R_NOT_IMPLEMENTED;
 	}
+	
+	// TODO: Put these into dirty pattern class
+	// Mark the object as dirty, data should be updated by the renderer
+	RESULT SetDirty() {
+		m_fDirty = true;
+		return R_PASS;
+	}
+
+	// Check if dirty, and clean the dirty state
+	bool CheckAndCleanDirty() {
+		bool fDirty = m_fDirty;
+		m_fDirty = false;
+
+		return fDirty;
+	}
 
 	RESULT SetColor(color c) {
 		for (int i = 0; i < NumberVertices(); i++)
 			m_pVertices[i].SetColor(c);
+
+		SetDirty();
 
 		return R_PASS;
 	}
@@ -269,6 +291,41 @@ public:
 		pV1->SetTangentBitangent(tangent, bitangent);
 		pV2->SetTangentBitangent(tangent, bitangent);
 		pV3->SetTangentBitangent(tangent, bitangent);
+
+	Error:
+		return r;
+	}
+
+	// This will not take into consideration surfaces that are continuous 
+	// TODO: Create surface based normal calculation function (this works at the vertex level rather the triangle one)
+	RESULT SetTriangleNormal(dimindex i1, dimindex i2, dimindex i3) {
+		RESULT r = R_PASS;
+		
+		vertex *pV1 = nullptr, *pV2 = nullptr, *pV3 = nullptr;
+		vector deltaPos1, deltaPos2;
+		vector normalVector;
+
+		// TODO: More eloquent way than this
+		CB((i1 < NumberIndices()));
+		pV1 = &(m_pVertices[i1]);
+		CN(pV1);
+
+		CB((i2 < NumberIndices()));
+		pV2 = &(m_pVertices[i2]);
+		CN(pV2);
+
+		CB((i3 < NumberIndices()));
+		pV3 = &(m_pVertices[i3]);
+		CN(pV3);
+
+		deltaPos1 = pV2->GetPoint() - pV1->GetPoint();
+		deltaPos2 = pV3->GetPoint() - pV1->GetPoint();
+
+		normalVector = deltaPos1.NormalizedCross(deltaPos2);
+
+		pV1->SetNormal(normalVector);
+		pV2->SetNormal(normalVector);
+		pV3->SetNormal(normalVector);
 
 	Error:
 		return r;

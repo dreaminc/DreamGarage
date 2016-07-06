@@ -75,6 +75,26 @@ Error:
 	}
 	return nullptr;
 }
+	
+quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) {
+	RESULT r = R_PASS;
+
+	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+	CN(pQuad);
+
+	CR(AddObject(pQuad));
+
+Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+
+	return nullptr;
+}
 
 sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions) {
 	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
@@ -178,6 +198,11 @@ Error:
 		pModel = nullptr;
 	}
 	return nullptr;
+}
+
+// TODO: Fix this
+RESULT SandboxApp::AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	return m_pHALImp->LoadModel(m_pSceneGraph, strRootFolder, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
 }
 
 RESULT SandboxApp::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {

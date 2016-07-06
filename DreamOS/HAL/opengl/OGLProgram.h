@@ -63,9 +63,11 @@ public:
 	RESULT MakeVertexShader(const wchar_t *pszFilename);
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
 
+	// TODO: Likely more eloquent way to do this
 	RESULT RenderObject(DimObj *pDimObj);
-	RESULT RenderChildren(DimObj *pDimObj);	// TODO: Likely more eloquent way to do this
-	
+	RESULT RenderChildren(DimObj *pDimObj);	
+	RESULT RenderObject(VirtualObj *pVirtualObj);
+
 	virtual RESULT SetLights(std::vector<light*> *pLights);
 	virtual RESULT SetMaterial(material *pMaterial);
 	

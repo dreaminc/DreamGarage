@@ -29,6 +29,11 @@ public:
 		clear();
 	}
 	
+	ViewMatrix(point ptPosition) {
+		clear();
+		SetViewMatrixPitchYawRoll(ptPosition, 0.0f, 0.0f, 0.0f);
+	}
+
 	// This will start with i, j, k vectors and effectively rotate them about the appropriate axes 
 	// pitch is about the x axis, yaw is about the y axis and roll is about the z axis
 	ViewMatrix(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll) {

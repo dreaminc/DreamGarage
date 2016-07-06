@@ -65,7 +65,7 @@ private:
 	bool LoadFontFromFile(const std::wstring& fnt_file);
 
 	template <typename T>
-	T GetValue(const std::wstring& line, const std::wstring& valueName);
+	T GetValue(const std::wstring& line, const std::wstring& valueName, const char breaker = ' ');
 
 	template <typename T>
 	bool GetValue(T& value, const std::wstring& line, const std::wstring& valueName);

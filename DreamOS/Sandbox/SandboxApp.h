@@ -24,6 +24,7 @@
 class CloudController;
 
 class light; 
+class quad;
 class sphere; 
 class volume; 
 class texture; 
@@ -61,11 +62,14 @@ public:
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
 	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	volume* AddVolume(double width, double length, double height);
 	volume* AddVolume(double side);
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);
+
+	RESULT AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
 public:
 	PathManager *GetPathManager();

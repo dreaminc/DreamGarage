@@ -36,6 +36,9 @@ public:
 	RESULT ReleaseCurrentContext();
 
 private:
+	bool WGLExtensionSupported(const char* extension_name);
+
+private:
 	PIXELFORMATDESCRIPTOR m_pfd;
 	HGLRC m_hglrc;								// OpenGL rendering context
 };

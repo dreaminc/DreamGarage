@@ -5,6 +5,7 @@
 #include "Sandbox/SandboxApp.h"
 
 #include "TimeManager/TimeManager.h"
+#include "Profiler/Profiler.h"
 
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
@@ -80,6 +81,7 @@ private:
 private:
 	TimeManager	*m_pTimeManager;
 
+	Profiler	m_profiler;
 public:
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
 	Win64Keyboard *m_pWin64Keyboard;

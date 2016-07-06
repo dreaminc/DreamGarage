@@ -23,6 +23,7 @@
 #define DREAM_OS_VERSION_MINOR_MINOR 0
 
 #include "Primitives/light.h"
+#include "Primitives/quad.h"
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
 #include "Primitives/texture.h"
@@ -43,7 +44,9 @@ public:
 protected:
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
-	
+
+	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
+
 	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	sphere *MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	
@@ -59,6 +62,8 @@ protected:
 
 	model *AddModel(wchar_t *pszModelName);
 	model *MakeModel(wchar_t *pszModelName);
+
+	RESULT AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);

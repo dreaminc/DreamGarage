@@ -32,8 +32,8 @@ public:
 
 		// Uniform Variables
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
-		//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTexture), std::string("u_hasTexture")));
 
 	Error:
 		return r;
@@ -47,6 +47,11 @@ public:
 		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
 			pTexture->OGLActivateTexture();
 			m_pUniformTextureColor->SetUniform(pTexture);
+			m_pUniformHasTexture->SetUniform(true);
+		}
+		else
+		{
+			m_pUniformHasTexture->SetUniform(false);
 		}
 
 	Error:
@@ -77,6 +82,7 @@ private:
 	//OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniformBool *m_pUniformHasTexture;
 };
 
 #endif // ! OGLPROGRAM_TEXTURE_BIT_BLIT_H_

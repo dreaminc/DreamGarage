@@ -84,6 +84,10 @@ volume* DreamOS::AddVolume(double width, double length, double height) {
 volume* DreamOS::MakeVolume(double width, double length, double height) {
 	return m_pSandbox->MakeVolume(width, length, height);
 }
+	
+quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
+	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+}
 
 volume* DreamOS::AddVolume(double side) {
 	return m_pSandbox->AddVolume(side);
@@ -111,6 +115,10 @@ model *DreamOS::AddModel(wchar_t *pszModelName) {
 
 model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
+}
+	
+RESULT DreamOS::AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	return m_pSandbox->AddModel(strRootFolder, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
 }
 
 RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {

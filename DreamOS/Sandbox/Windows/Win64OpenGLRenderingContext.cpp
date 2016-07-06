@@ -1,6 +1,8 @@
 #include "Win64OpenGLRenderingContext.h"
 #include "Windows64App.h"
 
+
+
 Win64OpenGLRenderingContext::Win64OpenGLRenderingContext() {
 	RESULT r = R_PASS;
 
@@ -55,6 +57,25 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext(version versionOG
 	DWORD werr = GetLastError();
 	DEBUG_LINEOUT("Created OpenGL Rendering Context 0x%x", werr);
 
+	// Init swap interval control	
+	if (WGLExtensionSupported("WGL_EXT_swap_control"))
+	{
+		PFNWGLSWAPINTERVALEXTPROC       wglSwapIntervalEXT = NULL;
+		PFNWGLGETSWAPINTERVALEXTPROC    wglGetSwapIntervalEXT = NULL;
+
+		// Extension is supported, init pointers.
+		wglSwapIntervalEXT = (PFNWGLSWAPINTERVALEXTPROC)wglGetProcAddress("wglSwapIntervalEXT");
+
+		// this is another function from WGL_EXT_swap_control extension
+		wglGetSwapIntervalEXT = (PFNWGLGETSWAPINTERVALEXTPROC)wglGetProcAddress("wglGetSwapIntervalEXT");
+
+		if (wglSwapIntervalEXT)
+		{
+			// Setting it to infinite rendering 
+			wglSwapIntervalEXT(0);
+		}
+	}
+
 	CBM(wglMakeCurrent(NULL, NULL), "Failed to release rendering context");
 	CBM(wglDeleteContext(hglrcTemp), "Failed to delete temporary rendering context");
 
@@ -90,8 +111,27 @@ RESULT Win64OpenGLRenderingContext::InitializeRenderingContext() {
 	CNM(hglrcTemp, "Failed to Create GL Context");
 
 	CBM((wglMakeCurrent(pWin64App->GetDeviceContext(), hglrcTemp)), "Failed OGL wglMakeCurrent");
+	
 
 Error:
 	m_hglrc = hglrcTemp;
 	return r;
+}
+
+bool Win64OpenGLRenderingContext::WGLExtensionSupported(const char* extension_name)
+{
+    // this is pointer to function which returns pointer to string with list of all wgl extensions
+    PFNWGLGETEXTENSIONSSTRINGEXTPROC _wglGetExtensionsStringEXT = NULL;
+
+    // determine pointer to wglGetExtensionsStringEXT function
+    _wglGetExtensionsStringEXT = (PFNWGLGETEXTENSIONSSTRINGEXTPROC) wglGetProcAddress("wglGetExtensionsStringEXT");
+
+    if (strstr(_wglGetExtensionsStringEXT(), extension_name) == NULL)
+    {
+        // string was not found
+        return false;
+    }
+
+    // extension is supported
+    return true;
 }
