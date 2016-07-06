@@ -112,6 +112,7 @@ public:
 
 		vector vectorLook = GetLookVector();
 		DEBUG_LINEOUT_RETURN("Camera rotating: x:%0.3f y:%0.3f z:%0.3f", vectorLook.x(), vectorLook.y(), vectorLook.z());
+		HUD_OUT("Camera rotating: x:%0.3f y:%0.3f z:%0.3f", vectorLook.x(), vectorLook.y(), vectorLook.z());
 
 		return R_PASS;
 	}
