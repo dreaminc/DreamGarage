@@ -83,19 +83,18 @@ vec3 absorb(float dist, vec3 color, vec3 Kr, float factor) {
 void main(void) {  
 	//out_vec4Color = DataIn.color;
 
-	vec4 lightDirection = normalize(vec4(0.5, 0.5, 0.5, 1.0));
+	vec4 lightDirection = normalize(vec4(0.5, 0.5, -0.5, 1.0));
 	vec4 eyeDirection = getWorldNormal();
 	float theta = dot(eyeDirection, lightDirection);
 	
 	float rayleighBrightness = 1.0;
 	float mieBrightness = 1.0;
-	float spotBrightness = 10.0;
+	float spotBrightness = 1.0;
 	float rayleighFactor = phase(theta, -0.01)*rayleighBrightness;
-	float mieFactor = phase(theta, 0.9995)*mieBrightness;
+	float mieFactor = phase(theta, -0.9995)*mieBrightness;
 	float spotFactor = smoothstep(0.0, 15.0, phase(theta, 0.9995))*spotBrightness;
 
-
-	float surfaceHeight = 0.95;
+	float surfaceHeight = 0.995;
 	int stepCount = 5;
 	vec3 eyePosition = vec3(0.0, surfaceHeight, 0.0);
 	float eyeDepth = atmosphericDepth(eyePosition, eyeDirection.xyz);
