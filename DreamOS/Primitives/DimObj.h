@@ -216,7 +216,7 @@ public:
 		point_precision factor = 0.0f;
 
 		// TODO: More eloquent way than this
-		CB((i1 < NumberIndices()));
+		CB((i1 < (uint)NumberIndices()));
 		pV1 = &(m_pVertices[i1]);
 		CN(pV1);
 
