@@ -58,9 +58,14 @@ void OGLProfiler::Render()
 
 	m_OGLProgram->RenderObject(m_OGLTitleText.get());
 
+	// Render hud text
 	double posY = 0;
+	const int maxRows = 28;
 
-	for (auto it = Profiler::GetProfiler()->GetConsoleText().end() - 28; it < Profiler::GetProfiler()->GetConsoleText().end(); it++)
+	for (auto it = (Profiler::GetProfiler()->GetConsoleText().size() > maxRows) ?
+			Profiler::GetProfiler()->GetConsoleText().end() - maxRows : Profiler::GetProfiler()->GetConsoleText().begin();
+		 it < Profiler::GetProfiler()->GetConsoleText().end();
+		 it++)
 	{
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1)->MoveTo(-0.8, 0.8 - posY, 0));
 		posY += 0.05;
