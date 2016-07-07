@@ -63,7 +63,7 @@ OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *p
 		} break;
 	}
 
-Success:
+//Success:
 	return pOGLProgram;
 
 Error:

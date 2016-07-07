@@ -201,7 +201,7 @@ RESULT OGLProgram::RegisterVertexAttribute(OGLVertexAttribute **pOGLVertexAttrib
 	RESULT r = R_PASS;
 
 	auto it = m_registeredProgramShaderVertexAttribute.find(strVertexAttributeName);
-	CBM((it == m_registeredProgramShaderVertexAttribute.end()), "Uniform %s already registered", strVertexAttributeName);
+	CBM((it == m_registeredProgramShaderVertexAttribute.end()), "Uniform %s already registered", strVertexAttributeName.c_str());
 
 	m_registeredProgramShaderVertexAttribute[strVertexAttributeName] = (pOGLVertexAttribute);
 
@@ -286,7 +286,7 @@ Error:
 
 RESULT OGLProgram::BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
 	RESULT r = R_PASS;
-	GLenum glerr;
+//	GLenum glerr;
 	DWORD werr;
 
 	CR(m_pParentImp->glUniformBlockBinding(m_OGLProgramIndex, uniformBlockIndex, uniformBlockBindingPoint));
@@ -302,7 +302,7 @@ RESULT OGLProgram::RegisterUniform(OGLUniform **pOGLUniform, std::string strUnif
 	RESULT r = R_PASS;
 
 	auto it = m_registeredProgramShaderUniforms.find(strUniformName);
-	CBM((it == m_registeredProgramShaderUniforms.end()), "Uniform %s already registered", strUniformName);
+	CBM((it == m_registeredProgramShaderUniforms.end()), "Uniform %s already registered", strUniformName.c_str());
 
 	m_registeredProgramShaderUniforms[strUniformName] = (pOGLUniform);
 
@@ -314,7 +314,7 @@ RESULT OGLProgram::RegisterUniformBlock(OGLUniformBlock **pOGLUniformBlock, std:
 	RESULT r = R_PASS;
 
 	auto it = m_registeredProgramShaderUniformBlocks.find(strUniformBlockName);
-	CBM((it == m_registeredProgramShaderUniformBlocks.end()), "Uniform Block %s already registered", strUniformBlockName);
+	CBM((it == m_registeredProgramShaderUniformBlocks.end()), "Uniform Block %s already registered", strUniformBlockName.c_str());
 
 	m_registeredProgramShaderUniformBlocks[strUniformBlockName] = (pOGLUniformBlock);
 

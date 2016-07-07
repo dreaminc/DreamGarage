@@ -6,13 +6,13 @@ DreamOS::DreamOS() :
 {
 	RESULT r = R_PASS;
 
-Success:
+//Success:
 	Validate();
 	return;
 
-Error:
-	Invalidate();
-	return;
+//Error:
+//	Invalidate();
+//	return;
 }
 
 DreamOS::~DreamOS() {
@@ -46,7 +46,7 @@ Error:
 RESULT DreamOS::Start() {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("DREAM OS %s Starting ...", m_versionDreamOS.GetString());
+	DEBUG_LINEOUT("DREAM OS %s Starting ...", m_versionDreamOS.GetString().c_str());
 
 	// This will start the application
 	CRM(m_pSandbox->Show(), "Failed to show sandbox window");
@@ -56,7 +56,7 @@ Error:
 }
 
 RESULT DreamOS::Exit(RESULT exitcode) {
-	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", m_versionDreamOS.GetString(), exitcode);
+	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", m_versionDreamOS.GetString().c_str(), exitcode);
 	return exitcode;
 }
 

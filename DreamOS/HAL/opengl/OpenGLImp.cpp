@@ -418,7 +418,7 @@ model *OpenGLImp::MakeModel(wchar_t *pszModelName) {
 	model *pModel = new OGLModel(this, pszModelName);
 	CN(pModel);
 
-Success:
+//Success:
 	return pModel;
 
 Error:
@@ -436,7 +436,7 @@ light* OpenGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point pt
 	light *pLight = new light(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 	CN(pLight);
 
-Success:
+//Success:
 	return pLight;
 
 Error:
@@ -453,7 +453,7 @@ sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, 
 	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions);
 	CN(pSphere);
 
-Success:
+//Success:
 	return pSphere;
 
 Error:
@@ -470,7 +470,7 @@ volume* OpenGLImp::MakeVolume(double side) {
 	volume *pVolume = new OGLVolume(this, side);
 	CN(pVolume);
 
-Success:
+//Success:
 	return pVolume;
 
 Error:
@@ -487,7 +487,7 @@ texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type
 	texture *pTexture = new OGLTexture(this, pszFilename, type);
 	CN(pTexture);
 
-Success:
+//Success:
 	return pTexture;
 
 Error:
@@ -504,7 +504,7 @@ skybox *OpenGLImp::MakeSkybox() {
 	skybox *pSkybox = new OGLSkybox(this);
 	CN(pSkybox);
 
-Success:
+//Success:
 	return pSkybox;
 
 Error:

@@ -61,7 +61,7 @@ public:
 			m_pUniformTextureColor->SetUniform(pTexture);
 		}
 
-	Error:
+//	Error:
 		return r;
 	}
 

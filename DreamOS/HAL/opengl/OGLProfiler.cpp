@@ -27,7 +27,7 @@ void OGLProfiler::Init()
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 
 	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
-	m_OGLTitleText->MoveTo(-0.7, -0.7, 0);
+	m_OGLTitleText->MoveTo(-0.7f, -0.7f, 0);
 }
 
 void OGLProfiler::Destroy()
@@ -47,7 +47,7 @@ void OGLProfiler::Render()
 
 	// Render FPS graph
 	//m_OGLGraph.Render(point(-0.8, -0.8 + 0.4, 0), point(-0.8 + 0.5, -0.8, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
-	m_OGLGraph.Render(point(-0.5, -0.5 + 0.4, 0), point(-0.5 + 0.5, -0.5, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
+	m_OGLGraph.Render(point(-0.5f, -0.5f + 0.4f, 0), point(-0.5f + 0.5f, -0.5f, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
 
 	// Revert to 'default' render state. TODO: refactor rendering states
 	glEnable(GL_CULL_FACE);
@@ -72,7 +72,7 @@ OGLProfilerGraph::~OGLProfilerGraph()
 void OGLProfilerGraph::Init()
 {
 	m_OGLTriangle = std::make_unique<OGLTriangle>(m_OGLImp);
-	m_OGLTriangle->SetColor(color(0.8, 0.8, 0.8, 1));
+	m_OGLTriangle->SetColor(color(0.8f, 0.8f, 0.8f, 1));
 
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "000");
@@ -91,17 +91,17 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 
-	const double left = topLeft.x();
-	const double bottom = bottomRight.y();
-	const double right = bottomRight.x();
-	const double top = topLeft.y();
+	const float left = topLeft.x();
+	const float bottom = bottomRight.y();
+	const float right = bottomRight.x();
+	const float top = topLeft.y();
 
-	double width = right - left;
-	double height = top - bottom;
+	float width = right - left;
+	float height = top - bottom;
 
 	size_t index = graph.GetNewestIndex();
 
-	#define YSCALE(y) (y * vScale + bottom)
+	#define YSCALE(y) (y * (float)vScale + bottom)
 
 	point prevPoint(right, YSCALE(records[index].first), 0);
 	point currentPoint = prevPoint;

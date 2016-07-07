@@ -29,7 +29,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 		} break;
 	}
 
-Success:
+//Success:
 	return pCloudController;
 
 Error:

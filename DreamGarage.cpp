@@ -64,36 +64,36 @@ RESULT DreamGarage::LoadScene() {
 
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
-		point(-4.5, -4.8, 0.0),
-		0.1,
-		1.0);
+		point(-4.5f, -4.8f, 0.0f),
+		0.1f,
+		1.0f);
 
 	AddModel(objFile, L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
-		point(-3.0, -4.2, 0.0),
-		0.15,
-		4.0);
+		point(-3.0f, -4.2f, 0.0f),
+		0.15f,
+		4.0f);
 
 	AddModel(objFile, L"\\Models\\Dwarf\\dwarf_2_low.obj",
 		//new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-		point(0.0, -4.9, 0),
-		20.0);
+		point(0.0f, -4.9f, 0.0f),
+		20.0f);
 
 	AddModel(objFile, L"\\Models\\car\\untitled.obj",
 		nullptr,
-		point(6.0, -3.7, -1.0),
-		0.015,
-		1.0);
+		point(6.0f, -3.7f, -1.0f),
+		0.015f,
+		1.0f);
 
 	AddModel(objFile, L"\\Models\\table\\untitled.obj",
 		nullptr,
-		point(0.0, -13.0, 0.0),
-		10.0,
+		point(0.0f, -13.0f, 0.0f),
+		10.0f,
 		3.14f);
 
 
-Error:
+//Error:
 	return r;
 }
 
@@ -104,6 +104,6 @@ RESULT DreamGarage::Update(void) {
 
 	m_pSphere->translateX(0.005f);
 
-Error:
+//Error:
 	return r;
 }
