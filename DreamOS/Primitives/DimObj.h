@@ -73,7 +73,7 @@ public:
 		return R_PASS;
 	}
 
-	virtual inline int NumberVertices() = 0;
+	virtual inline dimindex NumberVertices() = 0;
 	inline vertex *VertexData() {
 		return m_pVertices;
 	}
@@ -82,7 +82,7 @@ public:
 		return NumberVertices() * sizeof(vertex);
 	}
 
-	virtual inline int NumberIndices() = 0;
+	virtual inline dimindex NumberIndices() = 0;
 	inline dimindex *IndexData() {
 		return m_pIndices;
 	}
@@ -137,7 +137,7 @@ public:
 	}
 
 	RESULT SetColor(color c) {
-		for (int i = 0; i < NumberVertices(); i++)
+		for (unsigned int i = 0; i < NumberVertices(); i++)
 			m_pVertices[i].SetColor(c);
 
 		SetDirty();
@@ -196,7 +196,7 @@ public:
 	}
 
 	RESULT SetRandomColor() {
-		for (int i = 0; i < NumberVertices(); i++)
+		for (unsigned int i = 0; i < NumberVertices(); i++)
 			m_pVertices[i].SetRandomColor();
 
 		return R_PASS;
@@ -216,15 +216,15 @@ public:
 		point_precision factor = 0.0f;
 
 		// TODO: More eloquent way than this
-		CB((i1 < (uint)NumberIndices()));
+		CB((i1 < (unsigned int)NumberIndices()));
 		pV1 = &(m_pVertices[i1]);
 		CN(pV1);
 
-		CB((i2 < NumberIndices()));
+		CB((i2 < (unsigned int)NumberIndices()));
 		pV2 = &(m_pVertices[i2]);
 		CN(pV2);
 
-		CB((i3 < NumberIndices()));
+		CB((i3 < (unsigned int)NumberIndices()));
 		pV3 = &(m_pVertices[i3]);
 		CN(pV3);
 
@@ -255,11 +255,11 @@ public:
 		vertex *pVTR = nullptr, *pVBL = nullptr;
 
 		// TODO: More eloquent way than this
-		CB((TR < NumberIndices()));
+		CB((TR < (unsigned int)NumberIndices()));
 		pVTR = &(m_pVertices[TR]);
 		CN(pVTR);
 
-		CB((BL < NumberIndices()));
+		CB((BL < (unsigned int)NumberIndices()));
 		pVBL = &(m_pVertices[BL]);
 		CN(pVBL);
 
@@ -313,12 +313,12 @@ public:
 	
 	// TODO: This shoudln't be baked in here ultimately
 	RESULT Notify(TimeEvent *event) {
-		quaternion_precision factor = 0.05;
-		quaternion_precision filter = 0.1;
+		quaternion_precision factor = 0.05f;
+		quaternion_precision filter = 0.1f;
 
-		static quaternion_precision x = 1.0;
-		static quaternion_precision y = 1.0;
-		static quaternion_precision z = 1.0;
+		static quaternion_precision x = 1.0f;
+		static quaternion_precision y = 1.0f;
+		static quaternion_precision z = 1.0f;
 
 		//x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
 		//y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));

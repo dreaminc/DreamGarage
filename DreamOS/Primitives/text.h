@@ -28,8 +28,8 @@ public:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() { return m_nVertices; }
-	inline int NumberIndices() { return m_nIndices; }
+	inline dimindex NumberVertices() { return m_nVertices; }
+	inline dimindex NumberIndices() { return m_nIndices; }
 
 private:
 	unsigned int m_nVertices;

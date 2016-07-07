@@ -256,9 +256,9 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 	std::vector<point> all_uvs;
 	std::vector<vector> all_normals;
 
-	std::vector<int> positionIndices;
-	std::vector<int> uvIndices;
-	std::vector<int> normalIndices;
+	std::vector<size_t> positionIndices;
+	std::vector<size_t> uvIndices;
+	std::vector<size_t> normalIndices;
 
 	std::ifstream obj_file(obj_file_name, std::ios::binary);
 
@@ -299,7 +299,8 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 			size_t newPositionIndices[4], newUvIndices[4], newNormalIndices[4];
 
 			// Read as vertex/uv/normal quad format
-			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
+			// %Iu is for windows 64, %zu is for linux 
+			int num_matches = std::sscanf(value.c_str(), "%Iu/%Iu/%Iu %Iu/%Iu/%Iu %Iu/%Iu/%Iu %Iu/%Iu/%Iu\n",
 				&newPositionIndices[3], &newUvIndices[3], &newNormalIndices[3],
 				&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
 				&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
@@ -307,7 +308,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 
 			if (num_matches != 12) {
 				// Read as vertex/uv/normal tri format
-				num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d\n",
+				num_matches = std::sscanf(value.c_str(), "%Iu/%Iu/%Iu %Iu/%Iu/%Iu %Iu/%Iu/%Iu\n",
 					&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
 					&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
 					&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]);
@@ -315,7 +316,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 				if (num_matches != 9) {
 
 					// Read as vertex//normal format
-					num_matches = std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d\n",
+					num_matches = std::sscanf(value.c_str(), "%Iu//%Iu %Iu//%Iu %Iu//%Iu\n",
 						&newPositionIndices[2], &newNormalIndices[2],
 						&newPositionIndices[1], &newNormalIndices[1],
 						&newPositionIndices[0], &newNormalIndices[0]);

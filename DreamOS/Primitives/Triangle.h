@@ -42,11 +42,11 @@ public:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() {
+	inline dimindex NumberVertices() {
 		return NUM_TRI_POINTS;
 	}
 
-	inline int NumberIndices() {
+	inline dimindex NumberIndices() {
 		return NUM_TRI_POINTS;
 	}
 

@@ -75,7 +75,7 @@ public:
 			denom += static_cast<vector_precision>(pow(element(i, 0), 2));
 
 		denom = static_cast<vector_precision>(denom);
-		denom = sqrt(denom);
+		denom = (float)sqrt(denom);
 
 		for (int i = 0; i < 3; i++)
 			element(i, 0) = element(i, 0) / denom;
