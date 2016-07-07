@@ -31,7 +31,7 @@ typedef struct {
 class quaternion {
 public:
 	quaternion() {
-		SetQuaternion(0.0f, 0.0f, 1.0f, 0.0f);
+		SetQuaternion(0.0f, 0.0f, 0.0f, -1.0f);
 		Normalize();
 	}
 

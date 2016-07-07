@@ -136,7 +136,7 @@ hand::hand(HALImp* pHALImp) :
 RESULT hand::Initialize() {
 	RESULT r = R_PASS;
 
-	float palmRadius = 0.02f;
+	float palmRadius = 0.01f;
 
 	m_pPalm = AddSphere(palmRadius, 10, 10);
 
@@ -160,6 +160,8 @@ RESULT hand::Initialize() {
 	m_pThumb->Initialize();
 	AddObject(m_pThumb);
 
+	SetPosition(point(0.0f, 0.0f, 1.0f));
+
 Error:
 	return r;
 }
@@ -172,79 +174,37 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 
 	Leap::Vector leapPalmPosition = hand.stabilizedPalmPosition();
 	leapPalmPosition /= 1000.0f;	// Leap outputs in mm, and our engine is in meters
-	point ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.y, leapPalmPosition.z);
+	point ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.z, leapPalmPosition.y);
 
-	SetPosition(ptPalmPosition * -1.0f);
+	SetPosition(ptPalmPosition * 1.0f);
 
-	Leap::Matrix handTransform = hand.basis();
+	// = hand.basis();
+	Leap::Matrix handTransform;
 	handTransform.origin = hand.palmPosition();
 	handTransform = handTransform.rigidInverse();
 
 	for (int i = 0; i < hand.fingers().count(); i++) {
-		Leap::Finger finger = hand.fingers()[i];
-		
-		/*
-		Leap::Vector transformedPosition = handTransform.transformPoint(finger.tipPosition());
-		Leap::Vector transformedDirection = handTransform.transformDirection(finger.direction());
-		*/
-		// Do something with the transformed fingers
+		Leap::Finger leapFinger = hand.fingers()[i];
+	
+		Leap::Vector jointPosition;
+		Leap::Vector transformedJointPosition;
 
-		// This will set it in reference to the palm
-		Leap::Vector tipPosition = finger.jointPosition(Leap::Finger::JOINT_TIP);
-		point ptTipPosition = point(tipPosition.x, tipPosition.y, tipPosition.z);
-		ptTipPosition *= -(1.0f / 1000.0f);
-		ptTipPosition -= ptPalmPosition;
+		std::shared_ptr<finger> pFinger = nullptr;
 
-		Leap::Vector distalJointPosition = finger.jointPosition(Leap::Finger::JOINT_DIP);
-		point ptDistalJointPosition = point(distalJointPosition.x, distalJointPosition.y, distalJointPosition.z);
-		ptDistalJointPosition *= -(1.0f / 1000.0f);
-		ptDistalJointPosition -= ptPalmPosition;
-
-		Leap::Vector proximalJointPosition = finger.jointPosition(Leap::Finger::JOINT_PIP);
-		point ptProximalJointPosition = point(proximalJointPosition.x, proximalJointPosition.y, proximalJointPosition.z);
-		ptProximalJointPosition *= -(1.0f / 1000.0f);
-		ptProximalJointPosition -= ptPalmPosition;
-
-		Leap::Vector metacarpalJointPosition = finger.jointPosition(Leap::Finger::JOINT_MCP);
-		point ptMetacarpalJointPosition = point(metacarpalJointPosition.x, metacarpalJointPosition.y, metacarpalJointPosition.z);
-		ptMetacarpalJointPosition *= -(1.0f / 1000.0f);
-		ptMetacarpalJointPosition -= ptPalmPosition;
-
-		switch (finger.type()) {
-			case Leap::Finger::TYPE_THUMB: {
-				m_pThumb->SetJointPosition(ptTipPosition, finger::JOINT_TYPE::JOINT_TIP);
-				m_pThumb->SetJointPosition(ptDistalJointPosition, finger::JOINT_TYPE::JOINT_DIP);
-				m_pThumb->SetJointPosition(ptProximalJointPosition, finger::JOINT_TYPE::JOINT_PIP);
-				m_pThumb->SetJointPosition(ptMetacarpalJointPosition, finger::JOINT_TYPE::JOINT_MCP);
-			} break;
-
-			case Leap::Finger::TYPE_INDEX: {
-				m_pIndexFinger->SetJointPosition(ptTipPosition, finger::JOINT_TYPE::JOINT_TIP);
-				m_pIndexFinger->SetJointPosition(ptDistalJointPosition, finger::JOINT_TYPE::JOINT_DIP);
-				m_pIndexFinger->SetJointPosition(ptProximalJointPosition, finger::JOINT_TYPE::JOINT_PIP);
-				m_pIndexFinger->SetJointPosition(ptMetacarpalJointPosition, finger::JOINT_TYPE::JOINT_MCP);
-			} break;
-
-			case Leap::Finger::TYPE_MIDDLE: {
-				m_pMiddleFinger->SetJointPosition(ptTipPosition, finger::JOINT_TYPE::JOINT_TIP);
-				m_pMiddleFinger->SetJointPosition(ptDistalJointPosition, finger::JOINT_TYPE::JOINT_DIP);
-				m_pMiddleFinger->SetJointPosition(ptProximalJointPosition, finger::JOINT_TYPE::JOINT_PIP);
-				m_pMiddleFinger->SetJointPosition(ptMetacarpalJointPosition, finger::JOINT_TYPE::JOINT_MCP);
-			} break;
-
-			case Leap::Finger::TYPE_RING: {
-				m_pRingFinger->SetJointPosition(ptTipPosition, finger::JOINT_TYPE::JOINT_TIP);
-				m_pRingFinger->SetJointPosition(ptDistalJointPosition, finger::JOINT_TYPE::JOINT_DIP);
-				m_pRingFinger->SetJointPosition(ptProximalJointPosition, finger::JOINT_TYPE::JOINT_PIP);
-				m_pRingFinger->SetJointPosition(ptMetacarpalJointPosition, finger::JOINT_TYPE::JOINT_MCP);
-			} break;
-
-			case Leap::Finger::TYPE_PINKY: {
-				m_pPinkyFinger->SetJointPosition(ptTipPosition, finger::JOINT_TYPE::JOINT_TIP);
-				m_pPinkyFinger->SetJointPosition(ptDistalJointPosition, finger::JOINT_TYPE::JOINT_DIP);
-				m_pPinkyFinger->SetJointPosition(ptProximalJointPosition, finger::JOINT_TYPE::JOINT_PIP);
-				m_pPinkyFinger->SetJointPosition(ptMetacarpalJointPosition, finger::JOINT_TYPE::JOINT_MCP);
-			} break;
+		switch (leapFinger.type()) {
+			case Leap::Finger::TYPE_THUMB: pFinger = m_pThumb; break;
+			case Leap::Finger::TYPE_INDEX: pFinger = m_pIndexFinger; break;
+			case Leap::Finger::TYPE_MIDDLE: pFinger = m_pMiddleFinger; break;
+			case Leap::Finger::TYPE_RING: pFinger = m_pRingFinger; break;
+			case Leap::Finger::TYPE_PINKY: pFinger = m_pPinkyFinger; break;
+		}
+	
+		for (int j = 0; j <= (int)(Leap::Finger::JOINT_TIP); j++) {
+			Leap::Finger::Joint jt = (Leap::Finger::Joint)(j);
+			transformedJointPosition = handTransform.transformPoint(leapFinger.jointPosition(jt));
+			point ptPosition = point(transformedJointPosition.x, transformedJointPosition.z, transformedJointPosition.y);
+			ptPosition *= (1.0f / 1000.0f);
+			pFinger->SetJointPosition(ptPosition, (finger::JOINT_TYPE)(jt));
 		}
 	}
 

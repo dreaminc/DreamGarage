@@ -50,7 +50,8 @@ public:
 		m_cameraForwardSpeed(0.0f),
 		m_cameraStrafeSpeed(0.0f),
 		m_cameraUpSpeed(0.0f),
-		m_vDeviation()
+		m_vDeviation(),
+		m_pCameraFrameOfReference(nullptr)
 	{
 		m_ptOrigin = ptOrigin;
 		m_qRotation = quaternion(0.0f, 0.0f, 0.0f, 0.0f);
@@ -224,6 +225,19 @@ public:
 		m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
 		m_ptOrigin += GetUpVector() * m_cameraUpSpeed;
 
+		///*
+		// Update frame of reference
+		quaternion qRotation = m_qRotation;
+		qRotation.Reverse();
+
+		if (m_pHMD != nullptr) 
+			m_pCameraFrameOfReference->SetPosition(m_ptOrigin + m_pHMD->GetHeadPointOrigin());
+		else 
+			m_pCameraFrameOfReference->SetPosition(m_ptOrigin);
+		
+		m_pCameraFrameOfReference->SetOrientation(qRotation);
+		//*/
+
 		return (*this);
 	}
 
@@ -264,7 +278,32 @@ public:
 		return r;
 	}
 
+	composite *GetFrameOfReferenceComposite() {
+		return m_pCameraFrameOfReference;
+	}
+
+	RESULT AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj> pDimObj) {
+		return m_pCameraFrameOfReference->AddObject(pDimObj);
+	}
+
+	RESULT SetFrameOfReferenceComposite(composite *pComposite) {
+		RESULT r = R_PASS;
+		
+		m_pCameraFrameOfReference = pComposite;
+		CN(m_pCameraFrameOfReference);
+
+	Error:
+		return r;
+	}
+
+	RESULT SetHMD(HMD *pHMD) {
+		m_pHMD = pHMD;
+		return R_PASS;
+	}
+
 protected:
+	HMD *m_pHMD;
+
 	// Projection
 	int m_pxScreenWidth;
 	int m_pxScreenHeight;
@@ -280,6 +319,9 @@ protected:
 	camera_precision m_cameraUpSpeed;
 
 	vector m_vDeviation;
+
+	// Set up HMD frame of reference 
+	composite *m_pCameraFrameOfReference;
 };
 
 #endif // ! CAMERA_H_

@@ -30,11 +30,11 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 
 	// TODO: Combine this into one call
-	/*
+	///*
 	texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	skybox *pSkybox = AddSkybox();
 	pSkybox->SetCubeMapTexture(pCubeMap);
-	*/
+	//*/
 
 	/*
 	model* pModel = AddModel(L"chainsaw_free.obj");
@@ -42,7 +42,7 @@ RESULT DreamGarage::LoadScene() {
 	pModel->SetBumpTexture(pBumpTexture);
 	*/
 
-	/*
+	///*
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	pQuad->SetColorTexture(pColorTextureCobble);
 	//pQuad->SetBumpTexture(pBumpTexture);
@@ -55,11 +55,11 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	/*
+	///*
 	m_pSphere = AddSphere(0.5f, 40, 40);
 	m_pSphere->SetColorTexture(pColorTexture);
 	m_pSphere->SetBumpTexture(pBumpTexture);
-	*/
+	//*/
 
 	/*
 	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40));
@@ -83,7 +83,6 @@ RESULT DreamGarage::LoadScene() {
 	pVolume->translateX(5.0f);
 	*/
 
-	/*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 
@@ -93,6 +92,7 @@ RESULT DreamGarage::LoadScene() {
 	pMgr->GetCurrentPath((wchar_t*&)path);
 	std::wstring objFile(path);
 
+	/*
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5, -4.8, 0.0),
@@ -117,12 +117,16 @@ RESULT DreamGarage::LoadScene() {
 		0.015,
 		1.0);
 
+	
+	*/
+
+	/*
 	AddModel(objFile, L"\\Models\\table\\untitled.obj",
 		nullptr,
-		point(0.0, -13.0, 0.0),
+		point(0.0, 13.0, 0.0),
 		10.0,
 		3.14f);
-	*/
+	//*/
 
 
 Error:
@@ -134,7 +138,7 @@ RESULT DreamGarage::Update(void) {
 
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
-		//m_pSphere->translateX(-0.01f);
+		m_pSphere->translateY(0.01f);
 		//m_pSphere->RotateBy(0.01f, 0.02f, 0.01f);
 	}
 

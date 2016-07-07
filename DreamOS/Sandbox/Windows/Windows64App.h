@@ -82,6 +82,7 @@ private:
 	TimeManager	*m_pTimeManager;
 
 	Profiler	m_profiler;
+
 public:
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
 	Win64Keyboard *m_pWin64Keyboard;

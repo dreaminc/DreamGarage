@@ -429,6 +429,25 @@ Error:
 	return nullptr;
 }
 
+#include "HAL/opengl/OGLComposite.h"
+
+composite *OpenGLImp::MakeComposite() {
+	RESULT r = R_PASS;
+
+	composite *pComposite = new OGLComposite(this);
+	CN(pComposite);
+
+Success:
+	return pComposite;
+
+Error:
+	if (pComposite != nullptr) {
+		delete pComposite;
+		pComposite = nullptr;
+	}
+	return nullptr;
+}
+
 // TODO: Other approach 
 light* OpenGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;

@@ -73,6 +73,8 @@ public:
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
 
+	composite *MakeComposite();
+
 	// TODO: Convert to composite
 	RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
