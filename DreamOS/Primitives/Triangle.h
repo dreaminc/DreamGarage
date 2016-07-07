@@ -50,14 +50,14 @@ public:
 		return NUM_TRI_POINTS;
 	}
 
-	triangle(double side) :
+	triangle(float side) :
 		m_triangleType(EQUILATERAL)
 	{
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		double halfSide = side / 2.0f;
-		double halfHeight = (halfSide*sqrt(3.0f)) / 2.0f;
+		float halfSide = side / 2.0f;
+		float halfHeight = (halfSide*sqrt(3.0f)) / 2.0f;
 
 		m_pVertices[0] = vertex(point(0.0f, halfHeight, 0.0f));			// A
 		m_pVertices[1] = vertex(point(-halfSide, -halfHeight, 0.0f));	// B
@@ -71,14 +71,14 @@ public:
 		return;
 	}
 
-	triangle(double height, double width) :
+	triangle(float height, float width) :
 		m_triangleType(ISOCELES)
 	{
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		double halfHeight = height / 2.0f;
-		double halfWidth = width / 2.0f;
+		float halfHeight = height / 2.0f;
+		float halfWidth = width / 2.0f;
 
 		m_pVertices[0] = vertex(point(0.0f, halfHeight, 0.0f));			// A
 		m_pVertices[1] = vertex(point(-halfWidth, -halfHeight, 0.0f));	// B

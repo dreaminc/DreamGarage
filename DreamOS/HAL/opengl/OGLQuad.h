@@ -33,7 +33,7 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, double side) :
+	OGLQuad(OpenGLImp *pParentImp, float side) :
 		quad(side),
 		OGLObj(pParentImp)
 	{
@@ -41,7 +41,7 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, double height, double width) :
+	OGLQuad(OpenGLImp *pParentImp, float height, float width) :
 		quad(height, width),
 		OGLObj(pParentImp)
 	{

@@ -22,7 +22,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
 	CRM(PrepareScene(), "Failed to prepare GL Scene");
 
-Success:
+//Success:
 	Validate();
 	return;
 
@@ -143,7 +143,7 @@ Error:
 
 RESULT OpenGLImp::BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
 	RESULT r = R_PASS;
-	GLenum glerr;
+//	GLenum glerr;
 	DWORD werr;
 
 	CR(glBindBufferBase(target, bindingPointIndex, bufferIndex));
@@ -237,7 +237,7 @@ RESULT OpenGLImp::SetMonoViewTarget() {
 	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
 	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
-Error:
+//Error:
 	return r;
 }
 

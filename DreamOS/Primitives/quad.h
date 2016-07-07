@@ -71,13 +71,13 @@ public:
 	}
 	
 	// Square
-	quad(double side) :
+	quad(float side) :
 		m_quadType(SQUARE)
 	{
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		double halfSide = side / 2.0f;
+		float halfSide = side / 2.0f;
 		int vertCount = 0;
 		int indexCount = 0;
 		int A, B, C, D;
@@ -99,14 +99,14 @@ public:
 	}
 
 	// Rectangle
-	quad(double height, double width) :
+	quad(float height, float width) :
 		m_quadType(RECTANGLE)
 	{
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		double halfHeight = height / 2.0f;
-		double halfWidth = width / 2.0f;
+		float halfHeight = height / 2.0f;
+		float halfWidth = width / 2.0f;
 
 		m_pVertices[0] = vertex(point(-halfWidth, halfHeight, 0.0f));	// A
 		m_pVertices[1] = vertex(point(halfWidth, halfHeight, 0.0f));		// B
@@ -119,14 +119,14 @@ public:
 	}
 
 	// This needs to be re-designed, too specific for 2D blits.
-	quad(double height, double width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright) :
+	quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright) :
 		m_quadType(RECTANGLE)
 	{
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		double halfSideX = width / 2.0f;
-		double halfSideY = height / 2.0f;
+		float halfSideX = width / 2.0f;
+		float halfSideY = height / 2.0f;
 		int vertCount = 0;
 		int indexCount = 0;
 		int A, B, C, D;

@@ -129,7 +129,7 @@ RESULT OGLFragmentShader::SetObjectTextures(OGLObj *pOGLObj) {
 		WCR(SetTexture(reinterpret_cast<OGLTexture*>(pTexture)));
 	}
 
-Error:
+//Error:
 	return r;
 }
 

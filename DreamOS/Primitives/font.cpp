@@ -110,8 +110,8 @@ bool Font::LoadFontFromFile(const std::wstring& fnt_file)
 
 	return true;
 
-Error:
-	return false;
+//Error:
+//	return false;
 }
 
 const std::wstring& Font::GetGlyphImageFile() const
