@@ -8,7 +8,8 @@ RESULT DreamGarage::LoadScene() {
 	// Add lights
 
 	///*
-	AddLight(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	//*/
 
 	/*
@@ -43,7 +44,8 @@ RESULT DreamGarage::LoadScene() {
 
 	quad *pQuad = AddQuad(20.0f, 20.0f, 100, 100);
 
-	//sphere *pSphere2 = AddSphere(0.5f, 10, 10);
+	sphere *pSphere2 = AddSphere(0.5f, 20, 20);
+	pSphere2->MoveTo(0.0f, 2.0f, 0.0f);
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");

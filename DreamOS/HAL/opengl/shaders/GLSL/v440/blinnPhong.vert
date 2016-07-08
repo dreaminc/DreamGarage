@@ -62,10 +62,18 @@ void main(void) {
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {
-		vec3 ptLightViewSpace = vec3(u_mat4View * vec4(lights[i].m_ptOrigin.xyz, 1.0f));
 		
-		DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
-		DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
+		if(lights[i].m_type == 0) {
+			// Directional Light
+			DataOut.directionLight[i] = normalize(vec3(mat3(u_mat4View) * (-lights[i].m_vectorDirection.xyz)));
+			DataOut.distanceLight[i] = 0.0f;
+		}
+		else  {
+			// Point Light
+			vec3 ptLightViewSpace = vec3(u_mat4View * vec4(lights[i].m_ptOrigin.xyz, 1.0f));
+			DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
+			DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
+		}
 	}
 
 	DataOut.directionEye = -normalize(vertViewSpace.xyz);
