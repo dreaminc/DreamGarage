@@ -23,7 +23,6 @@ out Data {
 	vec4 color;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
-	mat3 TangentBitangentNormalMatrix;
 } DataOut;
 
 uniform vec4 u_vec4Eye;
@@ -59,33 +58,17 @@ mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 	vec4 vertViewSpace = u_mat4View * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
-
-	// BTN Matrix
-	// TODO: All vectors to tangent space in vert shader?
-	// TODO: Calc this CPU side?  Understand tradeoffs 
-	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
-
-	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
-	//vec3 ModelBitangent = normalize(TBNTransformMatrix * inV_vec4Bitangent.xyz);
-	vec3 ModelBitangent = normalize(TBNTransformMatrix * normalize(cross(inV_vec4Normal.xyz, inV_vec4Tangent.xyz) * -1.0f));
-	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
-
-	DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
-	//DataOut.TangentBitangentNormalMatrix = mat3(ModelTangent, ModelBitangent, ModelNormal);
-
-	DataOut.directionEye = DataOut.TangentBitangentNormalMatrix * (-normalize(vertViewSpace.xyz));
-	//DataOut.directionEye = -1.0f * DataOut.TangentBitangentNormalMatrix * vertViewSpace.xyz;
+	
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
 	for(int i = 0; i < numLights; i++) {
 		vec3 ptLightViewSpace = vec3(u_mat4View * vec4(lights[i].m_ptOrigin.xyz, 1.0f));
-		//DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
-
-		vec3 vLightDirectionView = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
-		DataOut.directionLight[i] = normalize(DataOut.TangentBitangentNormalMatrix * vLightDirectionView);
+		
+		DataOut.directionLight[i] = normalize(ptLightViewSpace.xyz - vertViewSpace.xyz);
 		DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
 	}
 
+	DataOut.directionEye = -normalize(vertViewSpace.xyz);
 	DataOut.vertWorldSpace = vertWorldSpace;
 	DataOut.vertViewSpace = vertViewSpace;
 	DataOut.normal = vec4ModelNormal;

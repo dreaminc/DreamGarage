@@ -20,6 +20,7 @@ in Data {
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
+	vec3 vertTBNSpace;
 } DataIn;
 
 // Light Structure
@@ -66,17 +67,18 @@ float g_ambient = 0.1f;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
-void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in float distanceLight, out float diffuseValue, out float specularValue) {
+void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue) {
 	//float attenuation = 1 / pow(distanceLight, 2);
-	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
-	//float attenuation = 1.0f;
+	//float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
+	float attenuation = 1.0f;
 
 	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
 	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
-	
+
 	///*
 	if(diffuseValue > 0.0f) {
-		vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
+		//vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
+		vec3 halfVector = normalize(directionLight + directionEye);
 		specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), material.m_shine) * attenuation;
 	}
 	else {
@@ -100,13 +102,13 @@ void main(void) {
 		TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	}
 
-	//TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
+	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 
 		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
-			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, DataIn.distanceLight[i], diffuseValue, specularValue);
+			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
 			vec4LightValue += specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
 		}
@@ -117,13 +119,17 @@ void main(void) {
 	//vec4 textureColor = texture(u_textureBump, DataIn.uvCoord);
 	//textureColor = vec4(1.0f);
 
-	vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
 	if(u_fUseColorTexture == true) {
+		vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
 		out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
 	}
 	else {
+		vec4 ambientColor = g_vec4AmbientLightLevel;
 		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 	}
-
-	//out_vec4Color = textureColor;
+	
+	/*
+	vec3 directionEye = DataIn.TangentBitangentNormalMatrix * (-normalize(DataIn.vertViewSpace.xyz));
+	out_vec4Color = vec4(directionEye, 1.0f);
+	*/
 }
