@@ -29,8 +29,9 @@ RESULT Win64Keyboard::CheckKeyState(SK_SCAN_CODE key) {
 	bool fDown = (keyState & 0x8000) != 0;
 	bool fPressed = (keyState & 0x0001) != 0;
 
-	if (fDown)
+	if (fDown) {
 		DEBUG_LINEOUT("Key %d: %d down pressed: %d", key, fDown, fPressed);
+	};
 
 	uint8_t newKeyState = (fDown << 1) + (fPressed << 0);
 	SetKeyState(key, newKeyState);
