@@ -7,6 +7,7 @@
 // All objects in Dimension should derive from this base class
 
 #include "valid.h"
+#include "dirty.h"
 #include "Primitives/Types/UID.h"
 
 #include "VirtualObj.h"
@@ -21,7 +22,7 @@
 #include <vector>
 #include <memory>
 
-class DimObj : public VirtualObj, public Subscriber<TimeEvent> {
+class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
     //AABV m_aabv;        // Axis Aligned Bounding Volume
@@ -48,8 +49,7 @@ public:
 		m_pColorTexture(nullptr),
 		m_pBumpTexture(nullptr),
 		m_pObjects(nullptr),
-		m_pParent(nullptr),
-		m_fDirty(false)
+		m_pParent(nullptr)
         //m_aabv()
     {
         /* stub */
@@ -129,21 +129,6 @@ public:
 
 	virtual RESULT UpdateBuffers() {
 		return R_NOT_IMPLEMENTED;
-	}
-	
-	// TODO: Put these into dirty pattern class
-	// Mark the object as dirty, data should be updated by the renderer
-	RESULT SetDirty() {
-		m_fDirty = true;
-		return R_PASS;
-	}
-
-	// Check if dirty, and clean the dirty state
-	bool CheckAndCleanDirty() {
-		bool fDirty = m_fDirty;
-		m_fDirty = false;
-
-		return fDirty;
 	}
 
 	RESULT SetColor(color c) {

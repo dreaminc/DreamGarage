@@ -484,6 +484,7 @@
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\composite.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
+    <ClInclude Include="..\..\..\Primitives\dirty.h" />
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
     <ClInclude Include="..\..\..\Primitives\hand.h" />
