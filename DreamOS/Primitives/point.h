@@ -61,12 +61,14 @@ public:
 		// empty
 	}
 
+	/*
 	bool IsZero(){
 		if(x() != 0 | y() != 0 | z() != 0)
 			return false;
 
 		return true;
 	}
+	*/
 
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline point_precision &x() { return this->element(0, 0); }
