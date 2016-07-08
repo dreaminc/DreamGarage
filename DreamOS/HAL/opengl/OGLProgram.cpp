@@ -255,11 +255,11 @@ RESULT OGLProgram::GetVertexAttributesFromProgram() {
 	DEBUG_LINEOUT("%d active attributes", attributes_n);
 	for (int i = 0; i < attributes_n; i++) {
 		GLint results[3];
-		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results));
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, 3, properties, 3, nullptr, results));
 
 		GLint pszName_n = results[0] + 1;
 		char *pszName = new char[pszName_n];
-		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, pszName_n, NULL, pszName));
+		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, pszName_n, nullptr, pszName));
 
 		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
 
@@ -272,9 +272,9 @@ RESULT OGLProgram::GetVertexAttributesFromProgram() {
 			DEBUG_LINEOUT("%s Vertex Attribute found in OGLProgram registry", pszName);
 		}
 
-		if (pszName != NULL) {
+		if (pszName != nullptr) {
 			delete[] pszName;
-			pszName = NULL;
+			pszName = nullptr;
 		}
 	}
 
@@ -334,14 +334,14 @@ RESULT OGLProgram::GetUniformVariablesFromProgram() {
 	DEBUG_LINEOUT("%d active uniform variables", variables_n);
 	for (int i = 0; i < variables_n; i++) {
 		GLint *pResults = new GLint[properties_n];
-		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM, i, 4, properties, 4, NULL, pResults));
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM, i, 4, properties, 4, nullptr, pResults));
 
 		// Skip uniforms in blocks
 		if (pResults[3] != -1) continue;
 
 		GLint pszName_n = pResults[0] + 1;
 		char *pszName = new char[pszName_n];
-		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM, i, pszName_n, NULL, pszName));
+		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM, i, pszName_n, nullptr, pszName));
 
 		DEBUG_LINEOUT("%-5d %s (%s)", pResults[2], pszName, OpenGLUtility::GetOGLTypeString(pResults[1]));
 
@@ -356,9 +356,9 @@ RESULT OGLProgram::GetUniformVariablesFromProgram() {
 			DEBUG_LINEOUT("Warning: %s Uniform NOT found in OGLProgram registry", pszName);
 		}
 
-		if (pszName != NULL) {
+		if (pszName != nullptr) {
 			delete[] pszName;
-			pszName = NULL;
+			pszName = nullptr;
 		}
 		
 		if (pResults != nullptr) {
@@ -383,11 +383,11 @@ RESULT OGLProgram::GetUniformBlocksFromProgram() {
 	DEBUG_LINEOUT("%d active uniform blocks", variables_n);
 	for (int i = 0; i < variables_n; i++) {
 		GLint *pResults = new GLint[properties_n];
-		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, properties_n, properties, 4, NULL, pResults));
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, properties_n, properties, 4, nullptr, pResults));
 
 		GLint pszName_n = pResults[0] + 1;
 		char *pszName = new char[pszName_n];
-		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, pszName_n, NULL, pszName));
+		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, pszName_n, nullptr, pszName));
 
 		// For debug - can remove if needed or wrap in debug
 		GLint uniformBlockIndex = 0;
@@ -439,7 +439,7 @@ Error:
 char* OGLProgram::GetProgramInfoLog() {
 	RESULT r = R_PASS;
 
-	char *pszInfoLog = NULL;
+	char *pszInfoLog = nullptr;
 	int pszInfoLog_n = 4096;
 	int charsWritten_n = -1;
 

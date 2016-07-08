@@ -2,10 +2,10 @@
 #include "Primitives/Types/Number.h"
 
 // Initialize and allocate the instance
-PathManager* PathManager::m_pInstance = NULL;
+PathManager* PathManager::m_pInstance = nullptr;
 
 PathManager::PathManager() :
-	m_pmapNVPPaths(NULL)
+	m_pmapNVPPaths(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -22,7 +22,7 @@ PathManager::~PathManager() {
 	ACRM(Dealloc(), "PathManager failed to deallocate paths");
 
 	// Dealloc the map
-	if (m_pmapNVPPaths != NULL) {
+	if (m_pmapNVPPaths != nullptr) {
 		std::map<PATH_VALUE_TYPE, wchar_t*>::iterator it = m_pmapNVPPaths->begin();
 		while (it != m_pmapNVPPaths->end()) {
 			delete[] it->second;
@@ -30,7 +30,7 @@ PathManager::~PathManager() {
 		}
 
 		delete m_pmapNVPPaths;
-		m_pmapNVPPaths = NULL;
+		m_pmapNVPPaths = nullptr;
 	}
 }
 
@@ -41,10 +41,10 @@ RESULT PathManager::Dealloc() {
 RESULT PathManager::RegisterPath(wchar_t *pszName, wchar_t *pszValue) {
 	RESULT r = R_PASS;
 	std::pair<std::map<PATH_VALUE_TYPE, wchar_t*>::iterator, bool>retVal;
-	wchar_t *pszPath = NULL;
+	wchar_t *pszPath = nullptr;
 
     long pszValueCopy_n = 0;
-    wchar_t *pszValueCopy = NULL;
+    wchar_t *pszValueCopy = nullptr;
     //errno_t err;
 
 	DEBUG_LINEOUT("Registering Name:%S Value:%S", pszName, pszValue);
@@ -65,9 +65,9 @@ RESULT PathManager::RegisterPath(wchar_t *pszName, wchar_t *pszValue) {
 	DEBUG_LINEOUT("Registered type:%d Value:%S", pathValueType, pszPath);
 
 Error:
-	if (pszPath != NULL) {
+	if (pszPath != nullptr) {
 		delete[] pszPath;
-		pszPath = NULL;
+		pszPath = nullptr;
 	}
 
 	return r;
@@ -136,9 +136,9 @@ RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	RESULT r = R_PASS;
 
 	long n_pszPath_n = 0;
-	wchar_t *pszDreamPath = NULL;
+	wchar_t *pszDreamPath = nullptr;
 	long pszDreamPath_n = 0;
-	wchar_t *pszValue = NULL;
+	wchar_t *pszValue = nullptr;
 	long pszValue_n = 0;
 
 	CRM(IsPathRegistered(type), "Value not registered");
@@ -166,10 +166,10 @@ Error:
 RESULT PathManager::GetValuePathVersion(PATH_VALUE_TYPE type, version ver, wchar_t* &n_pszVersionPath) {
 	RESULT r = R_PASS;
 
-	wchar_t *pszValuePath = NULL;
+	wchar_t *pszValuePath = nullptr;
 	long pszValuePath_n = 0;
 
-	wchar_t *pszVersionFolder = NULL;
+	wchar_t *pszVersionFolder = nullptr;
 	long pszVersionFolder_n = 0;
 
 	long n_pszVersionPath_n = 0;
@@ -192,14 +192,14 @@ RESULT PathManager::GetValuePathVersion(PATH_VALUE_TYPE type, version ver, wchar
 	wcsncat(n_pszVersionPath, pszVersionFolder, pszVersionFolder_n);
 
 Error:
-	if (pszValuePath != NULL) {
+	if (pszValuePath != nullptr) {
 		delete [] pszValuePath;
-		pszValuePath = NULL;
+		pszValuePath = nullptr;
 	}
 
-	if (pszVersionFolder != NULL) {
+	if (pszVersionFolder != nullptr) {
 		delete [] pszVersionFolder;
-		pszVersionFolder = NULL;
+		pszVersionFolder = nullptr;
 	}
 	return r;
 }
@@ -210,7 +210,7 @@ RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName
 	long pszFileName_n = static_cast<long>(wcslen(pszFileName));
 	long n_pszFilePath_n = 0;
 
-	wchar_t *pszValuePath = NULL;
+	wchar_t *pszValuePath = nullptr;
 	long pszValuePath_n = 0;
 
 	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
@@ -227,9 +227,9 @@ RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName
 
 Error:
 	// Release memory from GetValuePath
-	if (pszValuePath != NULL) {
+	if (pszValuePath != nullptr) {
 		delete[] pszValuePath;
-		pszValuePath = NULL;
+		pszValuePath = nullptr;
 	}
 
 	return r;
@@ -243,7 +243,7 @@ RESULT PathManager::GetFilePathVersion(PATH_VALUE_TYPE type, version ver, const 
 	long pszFileName_n = static_cast<long>(wcslen(pszFileName));
 	long n_pszVersionFilePath_n = 0;
 
-	wchar_t *pszValueVersionPath = NULL;
+	wchar_t *pszValueVersionPath = nullptr;
 	long pszValueVersionPath_n = 0;
 
 	CRM(GetValuePathVersion(type, ver, pszValueVersionPath), "Failed to get value version path");
@@ -259,9 +259,9 @@ RESULT PathManager::GetFilePathVersion(PATH_VALUE_TYPE type, version ver, const 
 	wcsncat(n_pszVersionFilePath, pszFileName, pszFileName_n);
 
 Error:
-	if (pszValueVersionPath != NULL) {
+	if (pszValueVersionPath != nullptr) {
 		delete[] pszValueVersionPath;
-		pszValueVersionPath = NULL;
+		pszValueVersionPath = nullptr;
 	}
 
 	return r;
@@ -292,7 +292,7 @@ Error:
 RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {
 	RESULT r = R_PASS;
 
-	wchar_t *pszValuePath = NULL;
+	wchar_t *pszValuePath = nullptr;
 	long pszValuePath_n = 0;
 
 	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
@@ -300,9 +300,9 @@ RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {
 	CRM(DoesPathExist(pszValuePath), "Path %S does not exist", pszValuePath);
 
 Error:
-	if (pszValuePath != NULL) {
+	if (pszValuePath != nullptr) {
 		delete[] pszValuePath;
-		pszValuePath = NULL;
+		pszValuePath = nullptr;
 	}
 
 	return r;
@@ -311,7 +311,7 @@ Error:
 RESULT PathManager::DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName) {
 	RESULT r = R_PASS;
 	
-	wchar_t *pszFilePath = NULL;
+	wchar_t *pszFilePath = nullptr;
 	long pszFilePath_n = 0;
 
 	CRM(GetFilePath(type, pszFileName, pszFilePath), "Failed to file path");	
@@ -324,9 +324,9 @@ RESULT PathManager::DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileNa
 		return R_FILE_NOT_FOUND;
 
 Error:
-	if (pszFilePath != NULL) {
+	if (pszFilePath != nullptr) {
 		delete[] pszFilePath;
-		pszFilePath = NULL;
+		pszFilePath = nullptr;
 	}
 
 	return r;
@@ -351,7 +351,7 @@ RESULT PathManager::GetFileVersionThatExists(PATH_VALUE_TYPE type, version versi
 		}
 
 		for (int i = 0; i < pszDirectory_n; i++) {
-			long value = wcstol(pszDirectory, NULL, 10);
+			long value = wcstol(pszDirectory, nullptr, 10);
 			version versionDir = version(value);
 			if (versionDir > maxVersion && versionDir <= versionFile) {
 				maxVersion = versionDir;
@@ -367,15 +367,15 @@ Error:
 		wchar_t *pszTemp = pListDirs->front();
 		pListDirs->pop_front();
 
-		if (pszTemp != NULL) {
+		if (pszTemp != nullptr) {
 			delete[]pszTemp;
-			pszTemp = NULL;
+			pszTemp = nullptr;
 		}
 	}
 
-	if (pListDirs != NULL) {
+	if (pListDirs != nullptr) {
 		delete pListDirs;
-		pListDirs = NULL;
+		pListDirs = nullptr;
 	}
 
 	return r;

@@ -55,9 +55,9 @@ public:
 		RESULT r = R_PASS;
 
 		CefMainArgs CEFMainArgs(hInstance);
-		void* CEFSandboxInfo = NULL;
+		void* CEFSandboxInfo = nullptr;
 
-		int exitCode = CefExecuteProcess(CEFMainArgs, NULL, CEFSandboxInfo);
+		int exitCode = CefExecuteProcess(CEFMainArgs, nullptr, CEFSandboxInfo);
 		CBM((exitCode < 0), "CEF sub-process has completed");
 
 		m_CEFApp = CefRefPtr<CEFApp>(new CEFApp);

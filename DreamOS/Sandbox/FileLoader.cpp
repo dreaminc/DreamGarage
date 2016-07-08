@@ -4,8 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
-	multi_mesh_t &out) {
+bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh_t &out) {
 
 	std::vector<point> all_positions;
 	std::vector<point> all_uvs;
@@ -43,17 +42,17 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 		std::string value = line.substr(space + 1);
 
 		if (type.compare("v") == 0) {
-			float x, y, z;
+			point_precision x, y, z;
 			std::sscanf(value.c_str(), "%f %f %f\n", &x, &y, &z);
 			all_positions.emplace_back(x, y, z);
 		}
 		else if (type.compare("vt") == 0) {
-			float u, v;
+			point_precision u, v;
 			std::sscanf(value.c_str(), "%f %f\n", &u, &v);
 			all_uvs.emplace_back(u, v, 0);
 		}
 		else if (type.compare("vn") == 0) {
-			float x, y, z;
+			vector_precision x, y, z;
 			std::sscanf(value.c_str(), "%f %f %f\n", &x, &y, &z);
 			all_normals.emplace_back(x, y, z);
 		}

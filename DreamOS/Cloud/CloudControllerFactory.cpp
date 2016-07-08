@@ -5,7 +5,7 @@
 
 CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TYPE type, void *pContext = nullptr) {
 	RESULT r = R_PASS;
-	CloudController *pCloudController = NULL;
+	CloudController *pCloudController = nullptr;
 
 	pCloudController = new CloudController();
 	CN(pCloudController);
@@ -24,7 +24,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 		} break;
 
 		default: {
-			pCloudController = NULL;
+			pCloudController = nullptr;
 			DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
 		} break;
 	}
@@ -33,10 +33,10 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	return pCloudController;
 
 Error:
-	if (pCloudController != NULL) {
+	if (pCloudController != nullptr) {
 		delete pCloudController;
-		pCloudController = NULL;
+		pCloudController = nullptr;
 	}
 
-	return NULL;
+	return nullptr;
 }
