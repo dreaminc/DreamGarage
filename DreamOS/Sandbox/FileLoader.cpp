@@ -49,7 +49,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 		else if (type.compare("vt") == 0) {
 			point_precision u, v;
 			std::sscanf(value.c_str(), "%f %f\n", &u, &v);
-			all_uvs.emplace_back(u, v, 0);
+			all_uvs.emplace_back(u, v, point_precision(0));
 		}
 		else if (type.compare("vn") == 0) {
 			vector_precision x, y, z;
@@ -287,7 +287,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 		else if (type.compare("vt") == 0) {
 			float u, v;
 			std::sscanf(value.c_str(), "%f %f\n", &u, &v);
-			all_uvs.emplace_back(u, v, 0);
+			all_uvs.emplace_back(u, v, point_precision(0));
 		}
 		else if (type.compare("vn") == 0) {
 			float x, y, z;
