@@ -142,7 +142,7 @@ RESULT texture::GetCubeMapFiles(const wchar_t *pszName, std::vector<std::wstring
 		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> StringConverter;
 		std::string strFilenameConverted = StringConverter.to_bytes(strFilename);
 
-		std::regex strRegEx("((pos|neg)(x|y|z))\.(([a-z]){3,3})");
+		std::regex strRegEx("((pos|neg)(x|y|z))\\.(([a-z]){3,3})");
 
 		if(std::regex_match(strFilenameConverted, strRegEx))
 			vstrFiles.push_back(strFilename);

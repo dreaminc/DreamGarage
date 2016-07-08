@@ -42,7 +42,7 @@ public:
 	///*
 	RESULT Render() {
 		RESULT r = R_PASS;
-		bool fCullingEnabled = glIsEnabled(GL_CULL_FACE);
+		bool fCullingEnabled = glIsEnabled(GL_CULL_FACE)!=0;
 
 		glDisable(GL_CULL_FACE);
 		glDepthMask(GL_FALSE);

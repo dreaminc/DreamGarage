@@ -114,7 +114,7 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		prevPoint = currentPoint;
 		auto deltaTime = std::chrono::duration<double>(currentTime - records[index].second).count();
 
-		currentPoint.x() = right - deltaTime * width / time_scale;
+		currentPoint.x() = right - (float)deltaTime * width / (float)time_scale;
 		currentPoint.y() = YSCALE(records[index].first);
 
 		minFPS = min(minFPS, records[index].first);
@@ -150,6 +150,6 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(maxFPS), 0), point(right, YSCALE(maxFPS), 0), point(right, YSCALE(maxFPS), 0)));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 2.0)->MoveTo(left - 0.03, YSCALE(minFPS) - 0.05, 0));
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 2.0)->MoveTo(left - 0.03, YSCALE(maxFPS), 0));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 2.0f)->MoveTo(left - 0.03f, YSCALE(minFPS) - 0.05f, 0));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 2.0f)->MoveTo(left - 0.03f, YSCALE(maxFPS), 0));
 }

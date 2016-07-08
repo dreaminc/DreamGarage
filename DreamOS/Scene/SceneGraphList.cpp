@@ -79,9 +79,8 @@ RESULT SceneGraphList::GetLights(std::vector<light*>*& pLights) {
 	RESULT r = R_PASS;
 
 	pLights = &(m_lights);
-/*TODO: Reference this error case
-Error:
-	return r;*/
+//Error:
+	return r;
 }
 
 RESULT SceneGraphList::SetSkybox(skybox *pSkybox) {
