@@ -37,7 +37,6 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 		if (space == line.size()) {
 			continue;
 		}
-
 		std::string type = line.substr(0, space);
 		std::string value = line.substr(space + 1);
 
@@ -49,7 +48,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 		else if (type.compare("vt") == 0) {
 			point_precision u, v;
 			std::sscanf(value.c_str(), "%f %f\n", &u, &v);
-			all_uvs.emplace_back(u, v, point_precision(0));
+			all_uvs.emplace_back(u, v, 0.0f); 
 		}
 		else if (type.compare("vn") == 0) {
 			vector_precision x, y, z;
@@ -57,7 +56,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 			all_normals.emplace_back(x, y, z);
 		}
 		else if (type.compare("f") == 0) {
-			int newPositionIndices[4], newUvIndices[4 ], newNormalIndices[4];
+			int newPositionIndices[4], newUvIndices[4], newNormalIndices[4];
 
 			enum class FaceType {
 				PTN4,
@@ -67,7 +66,6 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 			};
 
 			FaceType face;
-
 			// Read as vertex/uv/normal quad format
 			face = FaceType::PTN4;
 			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
@@ -287,7 +285,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 		else if (type.compare("vt") == 0) {
 			float u, v;
 			std::sscanf(value.c_str(), "%f %f\n", &u, &v);
-			all_uvs.emplace_back(u, v, point_precision(0));
+			all_uvs.emplace_back(u, v, 0.0f);
 		}
 		else if (type.compare("vn") == 0) {
 			float x, y, z;
