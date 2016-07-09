@@ -33,8 +33,8 @@ public:
 		return R_PASS;
 	}
 
-	inline dimindex NumberVertices() { return m_nVertices; }
-	inline dimindex NumberIndices() { return m_nVertices; }
+	inline unsigned int NumberVertices() { return m_nVertices; }
+	inline unsigned int NumberIndices() { return m_nVertices; }
 
 private:
 	unsigned int m_nVertices;
@@ -43,7 +43,7 @@ private:
 	RESULT SetVertices(const std::vector<vertex>& vertices) {
 		RESULT r = R_PASS;
 
-		m_nVertices = (unsigned int)vertices.size();
+		m_nVertices = static_cast<unsigned int>(vertices.size());
 		CR(Allocate());
 
 		unsigned int verticesCnt = 0;

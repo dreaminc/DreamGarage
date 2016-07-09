@@ -44,8 +44,8 @@ protected:
 		return R_PASS;
 	}
 
-	inline dimindex NumberVertices() { return NUM_QUAD_POINTS; }
-	inline dimindex NumberIndices() { return NUM_QUAD_TRIS * 3; }
+	inline unsigned int NumberVertices() { return NUM_QUAD_POINTS; }
+	inline unsigned int NumberIndices() { return NUM_QUAD_TRIS * 3; }
 
 private:
 	QUAD_TYPE m_quadType;

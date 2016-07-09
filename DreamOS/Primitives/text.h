@@ -28,8 +28,8 @@ public:
 		return R_PASS;
 	}
 
-	inline dimindex NumberVertices() { return m_nVertices; }
-	inline dimindex NumberIndices() { return m_nIndices; }
+	inline unsigned int NumberVertices() { return m_nVertices; }
+	inline unsigned int NumberIndices() { return m_nIndices; }
 
 private:
 	unsigned int m_nVertices;
@@ -61,8 +61,8 @@ public:
 			// text length was changed, we need to re-allocate buffers
 			Destroy();
 
-			m_nVertices = 4 * (unsigned int)text.length();
-			m_nIndices = 6 * (unsigned int)text.length();
+			m_nVertices = 4 * static_cast<unsigned int>(text.length());
+			m_nIndices = 6 * static_cast<unsigned int>(text.length());
 
 			RESULT r = R_PASS;
 			CR(Allocate());

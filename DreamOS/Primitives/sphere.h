@@ -32,13 +32,13 @@ public:
 		return R_PASS;
 	}
 
-	inline dimindex NumberVertices() override {
+	inline unsigned int NumberVertices() override {
 		int numVertsPerStrip = m_numAngularDivisions + 1;
 		int numStrips = m_numVerticalDivisions;
 		return (numStrips) * (numVertsPerStrip);
 	}
 
-	inline dimindex NumberIndices() override {
+	inline unsigned int NumberIndices() override {
 		int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
 		int numStrips = m_numVerticalDivisions;
 
@@ -61,8 +61,8 @@ public:
 		int numStrips = m_numVerticalDivisions;
 		int numStripDivs = (m_numAngularDivisions + 1);
 		int vertCount = 0;
-		float thetaDiv = (float)((2.0f * M_PI) / static_cast<float>(m_numAngularDivisions));
-		float psiDiv = (float)((1.0f * M_PI) / static_cast<float>(m_numVerticalDivisions - 1));
+		float thetaDiv = static_cast<float>((2.0f * M_PI) / (m_numAngularDivisions));
+		float psiDiv = static_cast<float>((1.0f * M_PI) / (m_numVerticalDivisions - 1));
 
 		for (int i = 0; i < numStrips; i++) {
 			float effPsi = psiDiv * static_cast<float>(i);
@@ -74,11 +74,11 @@ public:
 				point_precision sphereX = effRadius * sin(effTheta);
 				point_precision sphereZ = effRadius * cos(effTheta);
 
-				uv_precision u = (float)(0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) / (2.0f * M_PI));
+				uv_precision u = static_cast<float>(0.5f + ((atan2(sin(effTheta - M_PI), cos(effTheta - M_PI)))) / (2.0f * M_PI));
 				//uv_precision u = 0.5f + ((atan2(sin(effTheta), cos(effTheta)))) / (2.0f * M_PI);
 				if (j == (numStripDivs - 1))
 					u += 1.0f;
-				uv_precision v = (float)(0.5f - ((asin(cos(effPsi)))) / (M_PI));
+				uv_precision v = static_cast<float>(0.5f - ((asin(cos(effPsi)))) / (M_PI));
 
 				vector n = vector(sphereX, sphereY, sphereZ).Normal();
 				m_pVertices[vertCount] = vertex(point(sphereX, sphereY, sphereZ), n, uvcoord(u, v));

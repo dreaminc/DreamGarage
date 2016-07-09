@@ -73,7 +73,7 @@ public:
 		return R_PASS;
 	}
 
-	virtual inline dimindex NumberVertices() = 0;
+	virtual inline unsigned int NumberVertices() = 0;
 	inline vertex *VertexData() {
 		return m_pVertices;
 	}
@@ -82,7 +82,7 @@ public:
 		return NumberVertices() * sizeof(vertex);
 	}
 
-	virtual inline dimindex NumberIndices() = 0;
+	virtual inline unsigned int NumberIndices() = 0;
 	inline dimindex *IndexData() {
 		return m_pIndices;
 	}
@@ -216,15 +216,15 @@ public:
 		point_precision factor = 0.0f;
 
 		// TODO: More eloquent way than this
-		CB((i1 < (unsigned int)NumberIndices()));
+		CB((i1 < static_cast<unsigned int>(NumberIndices())));
 		pV1 = &(m_pVertices[i1]);
 		CN(pV1);
 
-		CB((i2 < (unsigned int)NumberIndices()));
+		CB((i2 < static_cast<unsigned int>(NumberIndices())));
 		pV2 = &(m_pVertices[i2]);
 		CN(pV2);
 
-		CB((i3 < (unsigned int)NumberIndices()));
+		CB((i3 < static_cast<unsigned int>(NumberIndices())));
 		pV3 = &(m_pVertices[i3]);
 		CN(pV3);
 
@@ -255,11 +255,11 @@ public:
 		vertex *pVTR = nullptr, *pVBL = nullptr;
 
 		// TODO: More eloquent way than this
-		CB((TR < (unsigned int)NumberIndices()));
+		CB((TR < static_cast<unsigned int>(NumberIndices())));
 		pVTR = &(m_pVertices[TR]);
 		CN(pVTR);
 
-		CB((BL < (unsigned int)NumberIndices()));
+		CB((BL < static_cast<unsigned int>(NumberIndices())));
 		pVBL = &(m_pVertices[BL]);
 		CN(pVBL);
 
