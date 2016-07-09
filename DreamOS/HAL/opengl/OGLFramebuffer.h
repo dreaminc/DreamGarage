@@ -26,8 +26,10 @@ public:
 
 	~OGLFramebuffer();
 
-	RESULT OGLInitialize();
+	//RESULT OGLInitialize();
+	RESULT OGLInitialize(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT);
 	RESULT BindOGLFramebuffer(GLuint textureIndex);
+	RESULT BindOGLDepthBuffer();
 	RESULT UnbindOGLFramebuffer();
 
 	RESULT SetOGLTexture(GLuint textureIndex = NULL);
@@ -39,6 +41,8 @@ public:
 	RESULT SetAndClearViewport();
 
 	GLuint GetFramebufferIndex();
+
+	RESULT SetAndClearViewportDepthBuffer();
 
 private:
 	OpenGLImp *m_pParentImp;

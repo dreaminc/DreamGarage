@@ -23,7 +23,7 @@ public:
 		// Empty
 	}
 
-	RESULT OGLInitialize() {
+	RESULT OGLInitialize(GLenum internalFormat = GL_DEPTH_COMPONENT24, GLenum type = GL_UNSIGNED_INT) {
 		RESULT r = R_PASS;
 
 		// TODO: Replace with texture object instead?
@@ -34,9 +34,6 @@ public:
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-
-		GLenum internalFormat = GL_DEPTH_COMPONENT24;
-		GLenum type = GL_UNSIGNED_INT;
 
 		/*
 		if (GLE_ARB_depth_buffer_float) {

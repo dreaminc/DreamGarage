@@ -180,6 +180,9 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
+	m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
+	CN(m_pOGLProgramShadowDepth);
+
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
 
@@ -538,6 +541,20 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	VirtualObj *pVirtualObj = NULL;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// TODO: Temporary go through scene graph again
+	m_pOGLProgramShadowDepth->UseProgram();
+	m_pOGLProgramShadowDepth->BindToDepthBuffer();
+	pSceneGraph->Reset();
+	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+		if (pDimObj == NULL)
+			continue;
+		else {
+			CR(m_pOGLProgramShadowDepth->RenderObject(pDimObj));
+		}
+	}
 
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 

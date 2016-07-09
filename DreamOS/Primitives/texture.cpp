@@ -19,6 +19,16 @@ texture::texture() :
 	Validate();
 }
 
+texture::texture(texture::TEXTURE_TYPE type) :
+	m_pImageBuffer(nullptr),
+	m_width(NULL),
+	m_height(NULL),
+	m_channels(NULL),
+	m_type(type)
+{
+	Validate();
+}
+
 texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels) :
 	m_pImageBuffer(nullptr),
 	m_width(width),

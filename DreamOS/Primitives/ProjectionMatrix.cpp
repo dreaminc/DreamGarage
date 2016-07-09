@@ -113,12 +113,12 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision width,
 	projection_precision ratio = width / height;
 	
 
-	this->element(0, 0) = 1.0f / ratio;
+	this->element(0, 0) = 2.0f / width;
 	
-	this->element(1, 1) = 1.0f;
+	this->element(1, 1) = 2.0f / height;
 
 	this->element(2, 2) = -2.0f / (farPlane - nearPlane);
-	this->element(2, 3) = (-(farPlane + nearPlane)) / (farPlane - nearPlane);
+	this->element(3, 2) = (-(farPlane + nearPlane)) / (farPlane - nearPlane);
 
 	this->element(3, 3) = 1.0f;
 

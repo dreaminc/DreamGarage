@@ -2,12 +2,17 @@
 #include "OpenGLImp.h"
 #include "OGLObj.h"
 
+#include "OGLFramebuffer.h"
+#include "OGLTexture.h"
+
 OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),
 	m_pFragmentShader(nullptr),
-	m_versionOGL(0)
+	m_versionOGL(0),
+	m_pOGLFramebuffer(nullptr),
+	m_pOGLRenderTexture(nullptr)
 {
 	// empty
 }
@@ -42,6 +47,63 @@ RESULT OGLProgram::UpdateUniformBlockBuffers() {
 	for (auto const& oglUniformBlock : m_uniformBlocks) {
 		CRM(oglUniformBlock->UpdateOGLUniformBlockBuffers(), "Failed to bind %s uniform block", oglUniformBlock->GetUniformBlockName());
 	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindToDepthBuffer() {
+	RESULT r = R_PASS;
+
+	CR(m_pOGLFramebuffer->BindOGLDepthBuffer());
+	CR(m_pOGLFramebuffer->SetAndClearViewportDepthBuffer());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeRenderToTexture(int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CR(InitializeFrameBuffer(pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+// TODO: This is not generic, hacking right now to get shadows to work first then will generalize
+RESULT OGLProgram::InitializeFrameBuffer(int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
+	CN(m_pOGLFramebuffer);
+
+	CR(m_pOGLFramebuffer->SetOGLDepthbuffer(nullptr));		// Note: This will create a new depth buffer
+	CR(m_pOGLFramebuffer->OGLInitialize(GL_DEPTH_COMPONENT16, GL_FLOAT));
+
+	CR(m_pOGLFramebuffer->BindOGLDepthBuffer());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeRenderTexture(int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	m_pOGLRenderTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR); 
+	CN(m_pOGLRenderTexture);
+
+	CR(m_pOGLRenderTexture->SetWidth(pxWidth));
+	CR(m_pOGLRenderTexture->SetHeight(pxWidth));
+	CR(m_pOGLRenderTexture->SetChannels(channels));
+
+	CR(m_pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_FLOAT));
+
+	CR(m_pOGLRenderTexture->BindTexture(GL_TEXTURE_2D));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
 Error:
 	return r;

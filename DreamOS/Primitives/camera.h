@@ -265,6 +265,14 @@ public:
 		return r;
 	}
 
+	int GetScreenWidth() {
+		return m_pxScreenWidth;
+	}
+
+	int GetScreenHeight() {
+		return m_pxScreenHeight;
+	}
+
 protected:
 	// Projection
 	int m_pxScreenWidth;

@@ -37,6 +37,7 @@ private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
 	OGLProgram *m_pOGLRenderProgram;
+	OGLProgram *m_pOGLProgramShadowDepth;
 	OGLProgram *m_pOGLSkyboxProgram;
 	OGLProgram *m_pOGLOverlayProgram;
 

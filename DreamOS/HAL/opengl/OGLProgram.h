@@ -30,6 +30,8 @@
 class OpenGLImp;
 class OGLVertexAttribute;
 class OGLUniform;
+class OGLFramebuffer;
+class OGLTexture;
 
 class OGLProgram {
 public:
@@ -105,10 +107,21 @@ public:
 
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 
+	RESULT BindToDepthBuffer();
+
 protected:
 	OpenGLImp *m_pParentImp;
 	version m_versionOGL;
 	GLuint m_OGLProgramIndex;
+
+	// OGL Framebuffer
+	// This can be used to render the program to a texture / framebuffer
+	OGLFramebuffer *m_pOGLFramebuffer;
+	OGLTexture *m_pOGLRenderTexture;
+	//RESULT BindToFrameBuffer();
+	RESULT InitializeRenderToTexture(int pxWidth, int pxHeight, int channels);
+	RESULT InitializeFrameBuffer(int pxWidth, int pxHeight, int channels);
+	RESULT InitializeRenderTexture(int pxWidth, int pxHeight, int channels);
 
 	// Shaders
 	OGLVertexShader *m_pVertexShader;

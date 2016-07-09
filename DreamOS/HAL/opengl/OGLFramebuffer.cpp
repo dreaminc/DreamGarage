@@ -101,19 +101,20 @@ RESULT OGLFramebuffer::SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer) {
 Error:
 	return r;
 }
-RESULT OGLFramebuffer::OGLInitialize() {
+RESULT OGLFramebuffer::OGLInitialize(GLenum internalDepthFormat, GLenum typeDepth) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
 
 	// Create Buffer Objects
 	CR(m_pParentImp->glGenFramebuffers(1, &m_framebufferIndex));
+
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 	
 	// Initialize the depth buffer if it exists
 	if (m_pOGLDepthbuffer != nullptr) {
-		m_pOGLDepthbuffer->OGLInitialize();
+		m_pOGLDepthbuffer->OGLInitialize(internalDepthFormat, typeDepth);
 	}
 
 Error:
@@ -139,6 +140,39 @@ RESULT OGLFramebuffer::SetAndClearViewport() {
 	glViewport(0, 0, m_width, m_height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_FRAMEBUFFER_SRGB);
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::SetAndClearViewportDepthBuffer() {
+	RESULT r = R_PASS;
+
+	glViewport(0, 0, m_width, m_height);
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_FRAMEBUFFER_SRGB);
+
+Error:
+	return r;
+}
+
+// This binds only the depth buffer (color not used) 
+RESULT OGLFramebuffer::BindOGLDepthBuffer() {
+	RESULT r = R_PASS;
+
+	// Render to our framebuffer
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
+
+	if (m_pOGLDepthbuffer != nullptr) {
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
+	}
+	
+	// No color buffer is drawn to.
+	glDrawBuffer(GL_NONE); 
+
+	// Check framebuffer
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 Error:
 	return r;

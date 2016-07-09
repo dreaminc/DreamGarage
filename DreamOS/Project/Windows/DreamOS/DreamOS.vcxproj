@@ -442,6 +442,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
@@ -562,6 +563,8 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag" />
