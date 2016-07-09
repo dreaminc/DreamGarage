@@ -181,8 +181,8 @@ Error:
 }
 
 double texture::GetValueAtUV(double uValue, double vValue) {
-	int pxValueX = uValue * m_width;
-	int pxValueY = vValue * m_height;
+	int pxValueX = static_cast<int>(uValue * m_width);
+	int pxValueY = static_cast<int>(vValue * m_height);
 
 	int lookUp = pxValueX * (sizeof(unsigned char) * m_channels) + (pxValueY * (sizeof(unsigned char) * m_channels * m_width));
 	

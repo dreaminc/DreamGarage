@@ -80,7 +80,7 @@ quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivision
 
 	CR(AddObject(pQuad));
 
-Success:
+//Success:
 	return pQuad;
 
 Error:

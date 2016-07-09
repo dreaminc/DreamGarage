@@ -127,15 +127,15 @@ public:
 			for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
 
 				double yValue = 0.0f;
-				double uValue = (float)(i) / (float)(m_numHorizontalDivisions);
-				double vValue = (float)(j) / (float)(m_numVerticalDivisions);
+				uv_precision uValue = (float)(i) / (float)(m_numHorizontalDivisions);
+				uv_precision vValue = (float)(j) / (float)(m_numVerticalDivisions);
 
 				if (m_pTextureHeight != nullptr) {
 					yValue = m_pTextureHeight->GetValueAtUV(uValue, vValue);
 					yValue *= m_heightMapScale;
 				}
 
-				m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, yValue, (heightInc * j) - halfHeight),
+				m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, static_cast<float>(yValue), (heightInc * j) - halfHeight),
 												  vector(0.0f, 1.0f, 0.0f), 
 												  uvcoord(uValue, vValue));	
 
@@ -150,11 +150,11 @@ public:
 
 		for (int i = 0; i < m_numHorizontalDivisions; i++) {
 			for (int j = 0; j < m_numVerticalDivisions; j++) {
-				int A = (i) + ((m_numHorizontalDivisions + 1) * j);
-				int B = (i + 1) + ((m_numHorizontalDivisions + 1) * j);
+				A = (i) + ((m_numHorizontalDivisions + 1) * j);
+				B = (i + 1) + ((m_numHorizontalDivisions + 1) * j);
 
-				int C = (i) + ((m_numHorizontalDivisions + 1) * (j + 1));
-				int D = (i + 1) + ((m_numHorizontalDivisions + 1) * (j + 1));
+				C = (i) + ((m_numHorizontalDivisions + 1) * (j + 1));
+				D = (i + 1) + ((m_numHorizontalDivisions + 1) * (j + 1));
 
 				pTriIndices[indexCount++] = TriangleIndexGroup(A, B, C);
 				SetTriangleNormal(A, B, C);
@@ -169,7 +169,7 @@ public:
 	}
 	
 	// Square
-	quad(double side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
+	quad(float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
 		m_quadType(SQUARE),
 		m_numHorizontalDivisions(numHorizontalDivisions),
 		m_numVerticalDivisions(numVerticalDivisions),
