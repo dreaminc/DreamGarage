@@ -72,6 +72,26 @@ Error:
 	return nullptr;
 }
 
+quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) {
+	RESULT r = R_PASS;
+
+	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+	CN(pQuad);
+
+	CR(AddObject(pQuad));
+
+Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+
+	return nullptr;
+}
+
 sphere* SandboxApp::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
 	RESULT r = R_PASS;
 

@@ -180,6 +180,23 @@ Error:
 	return r;
 }
 
+double texture::GetValueAtUV(double uValue, double vValue) {
+	int pxValueX = uValue * m_width;
+	int pxValueY = vValue * m_height;
+
+	int lookUp = pxValueX * (sizeof(unsigned char) * m_channels) + (pxValueY * (sizeof(unsigned char) * m_channels * m_width));
+	
+	int accum = 0;
+	for (int i = 0; i < m_channels; i++) {
+		accum += m_pImageBuffer[lookUp + i];
+	}
+
+	double retVal = (double)((double)accum / (double)m_channels);
+	retVal /= 255.0f;
+
+	return retVal;
+}
+
 RESULT texture::LoadTextureFromPath(wchar_t *pszFilepath) {
 	RESULT r = R_PASS;
 

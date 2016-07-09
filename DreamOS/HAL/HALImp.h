@@ -21,6 +21,7 @@
 
 #include "Primitives/stereocamera.h"
 #include "Primitives/light.h"
+#include "Primitives/quad.h"
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
 #include "Primitives/texture.h"
@@ -52,6 +53,7 @@ public:
 
 public:
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
+	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) = 0;
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) = 0;
 	virtual volume* MakeVolume(double side) = 0;
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;

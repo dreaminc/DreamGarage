@@ -72,15 +72,25 @@ public:
 	// Rotation
 	VirtualObj* RotateBy(quaternion q);
 	VirtualObj* RotateBy(quaternion_precision x, quaternion_precision y, quaternion_precision z);
-	VirtualObj* RotateXBy(quaternion_precision theta);
-	VirtualObj* RotateYBy(quaternion_precision theta);
-	VirtualObj* RotateZBy(quaternion_precision theta);
+	VirtualObj* RotateXBy(quaternion_precision deg);
+	VirtualObj* RotateYBy(quaternion_precision deg);
+	VirtualObj* RotateZBy(quaternion_precision deg);
+
+	VirtualObj* RotateByDeg(quaternion_precision x, quaternion_precision y, quaternion_precision z);
+	VirtualObj* RotateXByDeg(quaternion_precision theta);
+	VirtualObj* RotateYByDeg(quaternion_precision theta);
+	VirtualObj* RotateZByDeg(quaternion_precision theta);
 
 	VirtualObj* SetRotate(quaternion q);
 	VirtualObj* SetRotate(quaternion_precision x, quaternion_precision y, quaternion_precision z);
 	VirtualObj* SetRotateX(quaternion_precision theta);
 	VirtualObj* SetRotateY(quaternion_precision theta);
 	VirtualObj* SetRotateZ(quaternion_precision theta);
+
+	VirtualObj* SetRotateDeg(quaternion_precision degX, quaternion_precision degY, quaternion_precision degZ);
+	VirtualObj* SetRotateXDeg(quaternion_precision deg);
+	VirtualObj* SetRotateYDeg(quaternion_precision deg);
+	VirtualObj* SetRotateZDeg(quaternion_precision deg);
 
 	VirtualObj* SetOrientation(quaternion qOrientation);
 	quaternion GetOrientation();

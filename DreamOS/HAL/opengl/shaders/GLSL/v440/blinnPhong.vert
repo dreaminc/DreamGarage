@@ -67,7 +67,7 @@ void main(void) {
 
 	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
 	//vec3 ModelBitangent = normalize(TBNTransformMatrix * inV_vec4Bitangent.xyz);
-	vec3 ModelBitangent = normalize(TBNTransformMatrix * (cross(inV_vec4Normal.xyz, inV_vec4Tangent.xyz) * -1.0f));
+	vec3 ModelBitangent = normalize(TBNTransformMatrix * normalize(cross(inV_vec4Normal.xyz, inV_vec4Tangent.xyz) * -1.0f));
 	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
 
 	DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));
