@@ -15,20 +15,19 @@ in Data {
 
 layout (location = 0) out vec4 out_vec4Color;
 
-vec4 getWorldNormal() {
+vec3 getWorldNormal() {
 
 	vec2 fragCoord = gl_FragCoord.xy/DataIn.viewport;
 	fragCoord = (fragCoord-0.5)*2.0;
 
 	vec4 deviceNormal = vec4(fragCoord, 0.0, 1.0);
 	vec4 eyeNormal = normalize((DataIn.invProjection * deviceNormal));
-	//inverse view rotation matrix not defined
-	vec4 worldNormal = normalize(DataIn.invViewOrientation*eyeNormal);
+	vec3 worldNormal = normalize((DataIn.invViewOrientation*eyeNormal).xyz);
 
 	return worldNormal;
 }
 
-vec4 displayAsColor(vec4 vec) {
+vec4 displayAsColor(vec3 vec) {
 	return vec4(	vec.x/2+0.5,
 					vec.y/2+0.5,
 					vec.z/2+0.5,
@@ -84,9 +83,9 @@ vec3 absorb(float dist, vec3 color, vec3 Kr, float factor) {
 void main(void) {  
 	//out_vec4Color = DataIn.color;
 
-	vec4 lightDirection = normalize(vec4(0.0, 1.0, 0.0, 1.0));
-	//vec4 lightDirection = normalize(vec4(0.5, 1.0, -0.5, 1.0));
-	vec4 eyeDirection = normalize(getWorldNormal());
+	//vec4 lightDirection = normalize(vec4(0.0, 1.0, 0.0, 1.0));
+	vec3 lightDirection = normalize(vec3(0.0, 0.0, -0.5));
+	vec3 eyeDirection = normalize(getWorldNormal());
 	float theta = dot(eyeDirection, lightDirection);
 	
 	float rayleighBrightness = 1.0;
@@ -99,10 +98,10 @@ void main(void) {
 	float surfaceHeight = 0.75;
 	int stepCount = 15;
 	vec3 eyePosition = vec3(0.0, surfaceHeight, 0.0);
-	float eyeDepth = atmosphericDepth(eyePosition, eyeDirection.xyz);
+	float eyeDepth = atmosphericDepth(eyePosition, eyeDirection);
 	float stepLength = eyeDepth/float(stepCount);
  
-	float eyeExtinction = horizonExtinction(eyePosition, normalize(eyeDirection.xyz), surfaceHeight-0.15);
+	float eyeExtinction = horizonExtinction(eyePosition, normalize(eyeDirection), surfaceHeight-0.15);
 
 	// absorption profile of Nitrogen
 	vec3 Kr = vec3(
@@ -115,32 +114,34 @@ void main(void) {
 	vec4 intensity = vec4(1.0, 1.0, 1.0, 1.0);
 	//vec4 intensity = vec4(0.5, 0.5, 0.5, 0.5);
 	float rayleighStrength = 1.0f;
-	float mieStrength = 0.5f;
-	float scatterStrength = 0.55f;
+	float mieStrength = 0.0f;
+	float scatterStrength = 1.0f;
 
 	// loop through the eye ray, approximating at each step
 	for(int i=0; i < stepCount; i++) {
 		
 		float sampleDistance = stepLength*float(i);
 		vec3 position = eyePosition + eyeDirection.xyz*sampleDistance;		
-		float extinction = horizonExtinction(position, lightDirection.xyz, surfaceHeight-0.35);
-		float sampleDepth = atmosphericDepth(position, lightDirection.xyz);
+		float extinction = horizonExtinction(position, lightDirection, surfaceHeight-0.35);
+		float sampleDepth = atmosphericDepth(position, lightDirection);
 
 		vec3 influx = absorb(sampleDepth, intensity.xyz, Kr, scatterStrength)*extinction;
 
 		rayleighCollected += (absorb(sampleDistance, Kr*influx, Kr, rayleighStrength));
-		mieCollected += (absorb(sampleDistance, influx, vec3(1.0, 1.0, 1.0), mieStrength));
+		mieCollected += (absorb(sampleDistance, influx, Kr, mieStrength));
 	}	
 
-	float rayleighCollectionPower = 1.1;
-	float mieCollectionPower = 0.0;
+	float rayleighCollectionPower = 1.0f;
+	float mieCollectionPower = 1.0f;
 	rayleighCollected = (rayleighCollected * eyeExtinction * pow(eyeDepth, rayleighCollectionPower))/float(stepCount);
 	mieCollected = (mieCollected * eyeExtinction * pow(eyeDepth, mieCollectionPower))/float(stepCount);
-
+///*
 	out_vec4Color = vec4(
 		spotFactor*mieCollected +
 		mieFactor*mieCollected +
 		rayleighFactor*rayleighCollected,
 		1.0);
+	//	*/
 	//out_vec4Color = vec4(theta, theta, theta, 1.0);
+	//out_vec4Color = displayAsColor(eyeDirection);
 }
