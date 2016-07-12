@@ -47,7 +47,7 @@ protected:
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 
-	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume *AddVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *AddSkybox();

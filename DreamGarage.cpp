@@ -44,7 +44,7 @@ RESULT DreamGarage::LoadScene() {
 
 	quad *pQuad = AddQuad(20.0f, 20.0f, 100, 100);
 
-	sphere *pSphere2 = AddSphere(0.5f, 20, 20);
+	sphere *pSphere2 = AddSphere(0.5f, 20, 20, color(COLOR_RED));
 	pSphere2->MoveTo(0.0f, 2.0f, 0.0f);
 
 	/*

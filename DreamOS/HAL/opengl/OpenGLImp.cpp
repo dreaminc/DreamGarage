@@ -475,10 +475,10 @@ Error:
 	return nullptr;
 }
 
-sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
+sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
 	RESULT r = R_PASS;
 
-	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions);
+	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
 	CN(pSphere);
 
 Success:
@@ -572,7 +572,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	CR(m_pOGLProgramCapture->UnbindFramebuffer());
 
-	/*
+	///*
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Send lights to shader
