@@ -38,6 +38,7 @@ private:
 	// the shaders since we might want to jump around OGL programs in the future
 	OGLProgram *m_pOGLRenderProgram;
 	OGLProgram *m_pOGLProgramShadowDepth;
+	OGLProgram *m_pOGLProgramCapture;		// temp for testing
 	OGLProgram *m_pOGLSkyboxProgram;
 	OGLProgram *m_pOGLOverlayProgram;
 

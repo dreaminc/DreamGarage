@@ -156,7 +156,6 @@ public:
 
 		// TODO: Pull deeper settings from texture object
 		if (m_pImageBuffer != NULL) {
-
 			// This code needs to change. We need to store the texture format when loading the texture and loading with the right format here.
 			switch (m_channels) {
 				case 3: {
@@ -168,14 +167,16 @@ public:
 				} break;
 			}
 		}
+		else {
+			CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
+		}
 
 		// Texture params TODO: Add controls for these 
-		CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
-		CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
+		CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST), "Failed to set GL_TEXTURE_MAG_FILTER");
+		CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST), "Failed to set GL_TEXTURE_MIN_FILTER");
 		//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
 		//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
 
-		
 		// TODO: Delete the image data here?
 
 	Error:

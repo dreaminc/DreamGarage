@@ -35,7 +35,7 @@ public:
 		//CR(InitializeFrameBuffer(SHADOW_MAP_WIDTH, SHADOW_MAP_WIDTH, SHADOW_MAP_CHANNELS));
 
 		// TODO: This is not the right way to create a pure depth map, but this is for now
-		CR(InitializeFrameBuffer(SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 1));
+		CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 1));
 
 	Error:
 		return r;

@@ -108,6 +108,11 @@ public:
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 
 	RESULT BindToDepthBuffer();
+	RESULT BindToFramebuffer();
+	RESULT UnbindFramebuffer();
+	RESULT BindToScreen(int pxWidth, int pxHeight);
+
+	RESULT InitializeRenderToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 protected:
 	OpenGLImp *m_pParentImp;
@@ -119,9 +124,8 @@ protected:
 	OGLFramebuffer *m_pOGLFramebuffer;
 	OGLTexture *m_pOGLRenderTexture;
 	//RESULT BindToFrameBuffer();
-	RESULT InitializeRenderToTexture(int pxWidth, int pxHeight, int channels);
-	RESULT InitializeFrameBuffer(int pxWidth, int pxHeight, int channels);
-	RESULT InitializeRenderTexture(int pxWidth, int pxHeight, int channels);
+	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 	// Shaders
 	OGLVertexShader *m_pVertexShader;

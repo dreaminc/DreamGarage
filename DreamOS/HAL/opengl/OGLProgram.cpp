@@ -62,32 +62,78 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::InitializeRenderToTexture(int pxWidth, int pxHeight, int channels) {
+RESULT OGLProgram::BindToFramebuffer() {
 	RESULT r = R_PASS;
 
-	CR(InitializeFrameBuffer(pxWidth, pxHeight, channels));
+	//CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+
+	// Render to our framebuffer
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebuffer->GetFramebufferIndex()));
+	CR(m_pOGLFramebuffer->SetAndClearViewport());
+
+	// Check framebuffer
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UnbindFramebuffer() {
+	RESULT r = R_PASS;
+
+	//CR(m_pOGLFramebuffer->UnbindOGLFramebuffer());
+
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebuffer->GetFramebufferIndex()));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindToScreen(int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CR(m_pOGLFramebuffer->BindToScreen(pxWidth, pxHeight));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeRenderToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CR(InitializeFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
 }
 
 // TODO: This is not generic, hacking right now to get shadows to work first then will generalize
-RESULT OGLProgram::InitializeFrameBuffer(int pxWidth, int pxHeight, int channels) {
+RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
 	CN(m_pOGLFramebuffer);
+	
+	CR(m_pOGLFramebuffer->OGLInitialize());	
+	CR(m_pOGLFramebuffer->BindOGLFramebuffer());
 
-	CR(m_pOGLFramebuffer->SetOGLDepthbuffer(nullptr));		// Note: This will create a new depth buffer
-	CR(m_pOGLFramebuffer->OGLInitialize(GL_DEPTH_COMPONENT16, GL_FLOAT));
+	CR(m_pOGLFramebuffer->MakeOGLTexture());
 
-	CR(m_pOGLFramebuffer->BindOGLDepthBuffer());
+	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(m_pOGLFramebuffer->InitializeDepthBuffer(internalDepthFormat, typeDepth));
+
+	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(1));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 Error:
 	return r;
 }
 
-RESULT OGLProgram::InitializeRenderTexture(int pxWidth, int pxHeight, int channels) {
+RESULT OGLProgram::InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	m_pOGLRenderTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR); 
@@ -97,7 +143,7 @@ RESULT OGLProgram::InitializeRenderTexture(int pxWidth, int pxHeight, int channe
 	CR(m_pOGLRenderTexture->SetHeight(pxWidth));
 	CR(m_pOGLRenderTexture->SetChannels(channels));
 
-	CR(m_pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT16, GL_DEPTH_COMPONENT, GL_FLOAT));
+	CR(m_pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, internalDepthFormat, GL_DEPTH_COMPONENT, typeDepth));
 
 	CR(m_pOGLRenderTexture->BindTexture(GL_TEXTURE_2D));
 	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));

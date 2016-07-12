@@ -15,6 +15,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_pOGLRenderProgram(nullptr),
 	m_pOGLSkyboxProgram(nullptr),
 	m_pOGLOverlayProgram(nullptr),
+	m_pOGLProgramCapture(nullptr),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext)
 {
 	RESULT r = R_PASS;
@@ -180,8 +181,15 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
+	/*/
 	m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
 	CN(m_pOGLProgramShadowDepth);
+	*/
+
+	m_pOGLProgramCapture = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	CN(m_pOGLProgramCapture);
+	//m_pOGLProgramCapture->InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
+	m_pOGLProgramCapture->InitializeRenderToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
 
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
@@ -542,9 +550,15 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	CheckFramebufferStatus(GL_FRAMEBUFFER);
+
 	// TODO: Temporary go through scene graph again
-	m_pOGLProgramShadowDepth->UseProgram();
-	m_pOGLProgramShadowDepth->BindToDepthBuffer();
+	m_pOGLProgramCapture->UseProgram();
+	//SetMonoViewTarget();
+	//m_pOGLProgramCapture->BindToDepthBuffer();
+	m_pOGLProgramCapture->BindToFramebuffer();
+	CR(m_pOGLProgramCapture->SetCamera(m_pCamera));
+
 	pSceneGraph->Reset();
 	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
@@ -552,10 +566,13 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 		if (pDimObj == NULL)
 			continue;
 		else {
-			CR(m_pOGLProgramShadowDepth->RenderObject(pDimObj));
+			CR(m_pOGLProgramCapture->RenderObject(pDimObj));
 		}
 	}
 
+	CR(m_pOGLProgramCapture->UnbindFramebuffer());
+
+	/*
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Send lights to shader
@@ -590,6 +607,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	
 	// Render profiler overlay
 	m_pOGLProfiler->Render();
+	//*/
 
 	glFlush();
 
