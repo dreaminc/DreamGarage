@@ -117,8 +117,8 @@ void main(void) {
 	vec4 intensity = vec4(1.0, 1.0, 1.0, 1.0);
 	//vec4 intensity = vec4(0.5, 0.5, 0.5, 0.5);
 	float rayleighStrength = 1.0f;
-	float mieStrength = 1.0f;
-	float scatterStrength = 1.0f;
+	float mieStrength = 0.5f;
+	float scatterStrength = 0.5f;
 
 	// loop through the eye ray, approximating at each step
 	for(int i=0; i < stepCount; i++) {
