@@ -84,8 +84,8 @@ void main(void) {
 	//out_vec4Color = DataIn.color;
 
 	//vec4 lightDirection = normalize(vec4(0.0, 1.0, 0.0, 1.0));
-	vec3 lightDirection = normalize(vec3(0.0, 0.0, -0.5));
-	vec3 eyeDirection = normalize(getWorldNormal());
+	vec3 lightDirection = normalize(vec3(0.0, 0.5, -0.5));
+	vec3 eyeDirection = getWorldNormal();
 	float theta = dot(eyeDirection, lightDirection);
 	
 	float rayleighBrightness = 1.0;
@@ -101,12 +101,15 @@ void main(void) {
 	float eyeDepth = atmosphericDepth(eyePosition, eyeDirection);
 	float stepLength = eyeDepth/float(stepCount);
  
-	float eyeExtinction = horizonExtinction(eyePosition, normalize(eyeDirection), surfaceHeight-0.15);
+	float eyeExtinction = horizonExtinction(eyePosition, eyeDirection, surfaceHeight-0.15);
 
 	// absorption profile of Nitrogen
 	vec3 Kr = vec3(
 		0.18867780436772762, 0.4978442963618773, 0.6616065586417131
 	);
+	
+//	Kr = vec3(50.0f/255.0f, 125.0f/255.0f, 235.0f/255.0f);
+
 
 	vec3 rayleighCollected = vec3(0.0, 0.0, 0.0);
 	vec3 mieCollected = vec3(0.0, 0.0, 0.0);
@@ -114,7 +117,7 @@ void main(void) {
 	vec4 intensity = vec4(1.0, 1.0, 1.0, 1.0);
 	//vec4 intensity = vec4(0.5, 0.5, 0.5, 0.5);
 	float rayleighStrength = 1.0f;
-	float mieStrength = 0.0f;
+	float mieStrength = 1.0f;
 	float scatterStrength = 1.0f;
 
 	// loop through the eye ray, approximating at each step
@@ -138,7 +141,7 @@ void main(void) {
 ///*
 	out_vec4Color = vec4(
 		spotFactor*mieCollected +
-		mieFactor*mieCollected +
+		mieFactor*mieCollected+
 		rayleighFactor*rayleighCollected,
 		1.0);
 	//	*/

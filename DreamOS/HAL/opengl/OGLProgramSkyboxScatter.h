@@ -93,6 +93,8 @@ public:
 		auto matV = pStereoCamera->GetViewMatrix(eye);
 		auto matP = pStereoCamera->GetProjectionMatrix(eye);
 		auto matVP = matP * matV;
+		//auto matVO = matrix<rotation_precision, 4, 4>();
+		//matVO->identity();
 		auto matVO = pStereoCamera->GetOrientationMatrix();
 
 		auto pxWidth = pStereoCamera->GetPXWidth();
