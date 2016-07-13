@@ -52,9 +52,11 @@ public:
 
 
 	RESULT SetCameraUniforms(camera *pCamera) {
-		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
+		//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * pCamera->GetViewMatrix();
-		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * ViewMatrix(point(0.0f, -10.0f, 0.0f), -M_PI/2.0f, 0.0f, 0.0f);
+		//auto matVP = ProjectionMatrix(10.0f, 10.0f, 0.1f, 1000.0f) * ViewMatrix(point(0.0f, 10.0f, 0.0f), M_PI/2.0f, 0.0f, 0.0f);
+
+		auto matVP = ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI/2.0f, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
 		
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
