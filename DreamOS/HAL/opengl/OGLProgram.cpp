@@ -83,7 +83,7 @@ RESULT OGLProgram::UnbindFramebuffer() {
 
 	//CR(m_pOGLFramebuffer->UnbindOGLFramebuffer());
 
-	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebuffer->GetFramebufferIndex()));
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 Error:
 	return r;
@@ -120,7 +120,7 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 	CR(m_pOGLFramebuffer->MakeOGLTexture());
 
 	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-	CR(m_pOGLFramebuffer->InitializeDepthBuffer(internalDepthFormat, typeDepth));
+	CR(m_pOGLFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
 
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 

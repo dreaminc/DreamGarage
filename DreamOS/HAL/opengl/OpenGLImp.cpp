@@ -175,9 +175,9 @@ RESULT OpenGLImp::PrepareScene() {
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	
 	// TODO(NTH): Add a program / render pipeline arch
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
@@ -186,10 +186,11 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pOGLProgramShadowDepth);
 	*/
 
-	m_pOGLProgramCapture = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	m_pOGLProgramCapture = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	//m_pOGLProgramCapture = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	CN(m_pOGLProgramCapture);
-	//m_pOGLProgramCapture->InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
 	m_pOGLProgramCapture->InitializeRenderToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
+	//m_pOGLProgramCapture->InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
 
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
@@ -560,8 +561,6 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	///*
 	m_pOGLProgramCapture->UseProgram();
 	CR(m_pOGLProgramCapture->SetLights(pLights));
-	//SetMonoViewTarget();
-	//m_pOGLProgramCapture->BindToDepthBuffer();
 	m_pOGLProgramCapture->BindToFramebuffer();
 	CR(m_pOGLProgramCapture->SetCamera(m_pCamera));
 
@@ -693,14 +692,37 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
 	// Send lights to shader
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// TODO: Temporary go through scene graph again
+	///*
+	m_pOGLProgramCapture->UseProgram();
+	CR(m_pOGLProgramCapture->SetLights(pLights));
+	//SetMonoViewTarget();
+	//m_pOGLProgramCapture->BindToDepthBuffer();
+	m_pOGLProgramCapture->BindToFramebuffer();
+	CR(m_pOGLProgramCapture->SetCamera(m_pCamera));
+
+	pSceneGraph->Reset();
+	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+		if (pDimObj == NULL)
+			continue;
+		else {
+			CR(m_pOGLProgramCapture->RenderObject(pDimObj));
+		}
+	}
+
+	CR(m_pOGLProgramCapture->UnbindFramebuffer());
+	//*/
+
+	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 	CR(m_pOGLRenderProgram->SetLights(pLights));
 
 	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
