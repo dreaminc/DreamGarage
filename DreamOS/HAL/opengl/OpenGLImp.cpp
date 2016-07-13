@@ -548,12 +548,18 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
+	std::vector<light*> *pLights = NULL;
+	CR(pObjectStore->GetLights(pLights));
+	CN(pLights);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	CheckFramebufferStatus(GL_FRAMEBUFFER);
 
 	// TODO: Temporary go through scene graph again
+	///*
 	m_pOGLProgramCapture->UseProgram();
+	CR(m_pOGLProgramCapture->SetLights(pLights));
 	//SetMonoViewTarget();
 	//m_pOGLProgramCapture->BindToDepthBuffer();
 	m_pOGLProgramCapture->BindToFramebuffer();
@@ -571,14 +577,10 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	}
 
 	CR(m_pOGLProgramCapture->UnbindFramebuffer());
+	//*/
 
 	///*
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
-	// Send lights to shader
-	std::vector<light*> *pLights = NULL;
-	CR(pObjectStore->GetLights(pLights));
-	CN(pLights);
 	CR(m_pOGLRenderProgram->SetLights(pLights));
 
 	// Camera Projection Matrix

@@ -104,7 +104,7 @@ Error:
 	return r;
 }
 
-RESULT OGLFramebuffer::InitializeDepthBuffer(GLenum internalDepthFormat, GLenum typeDepth) {
+RESULT OGLFramebuffer::InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth) {
 	RESULT r = R_PASS;
 
 	CN(m_pOGLDepthbuffer);
@@ -129,6 +129,16 @@ RESULT OGLFramebuffer::SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer) {
 
 	CB((pOGLDepthbuffer == nullptr));
 	m_pOGLDepthbuffer = pOGLDepthbuffer;
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::InitializeDepthBuffer(GLenum internalDepthFormat, GLenum typeDepth) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLDepthbuffer);
+	CR(m_pOGLDepthbuffer->OGLInitialize(internalDepthFormat, typeDepth));
 
 Error:
 	return r;
@@ -219,7 +229,33 @@ Error:
 	return r;
 }
 
-RESULT OGLFramebuffer::BindOGLFramebuffer(GLuint textureIndex) {
+RESULT OGLFramebuffer::AttachOGLTexture(GLuint textureIndex) {
+	RESULT r = R_PASS;
+
+	if (textureIndex == NULL) {
+		if (m_pOGLTexture != nullptr) {
+			CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GetOGLTextureIndex(), 0));
+		}
+	}
+	else {
+		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureIndex, 0));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::AttachOGLDepthbuffer() {
+	RESULT r = R_PASS;
+		
+	CN(m_pOGLDepthbuffer);
+	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::BindOGLFramebuffer() {
 	RESULT r = R_PASS;
 
 	// Render to our framebuffer
@@ -239,7 +275,7 @@ RESULT OGLFramebuffer::BindOGLFramebuffer(GLuint textureIndex) {
 	else {
 		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureIndex, 0));
 	}
-	*/
+	//*/
 
 	// Check framebuffer
 	//CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -256,8 +292,6 @@ RESULT OGLFramebuffer::UnbindOGLFramebuffer() {
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
 	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0));
 	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0));
-
-	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 Error:
 	return r;

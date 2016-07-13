@@ -29,9 +29,12 @@ public:
 	
 	// TODO: Consolidate - there's a conflict with the texture swap chain stuff and this, so the code paths are different 
 	RESULT OGLInitialize(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT);
-	RESULT BindOGLFramebuffer(GLuint textureIndex = NULL);
+	RESULT BindOGLFramebuffer();
 	RESULT BindOGLDepthBuffer();
 	RESULT UnbindOGLFramebuffer();
+
+	RESULT AttachOGLTexture(GLuint textureIndex);
+	RESULT AttachOGLDepthbuffer();
 
 	RESULT SetOGLTextureToFramebuffer(GLenum target, GLenum attachment);
 	RESULT MakeOGLTexture();
@@ -50,6 +53,7 @@ public:
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
 	RESULT InitializeDepthBuffer(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT);
+	RESULT InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth);
 
 private:
 	OpenGLImp *m_pParentImp;

@@ -31,11 +31,11 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 
 	// TODO: Combine this into one call
-	/*
+	///*
 	texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	skybox *pSkybox = AddSkybox();
 	pSkybox->SetCubeMapTexture(pCubeMap);
-	*/
+	//*/
 
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
