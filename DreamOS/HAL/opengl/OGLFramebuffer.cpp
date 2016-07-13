@@ -60,6 +60,16 @@ Error:
 	return r;
 }
 
+RESULT OGLFramebuffer::SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLDepthbuffer);
+	CR(m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
+
+Error:
+	return r;
+}
+
 RESULT OGLFramebuffer::SetOGLTextureToFramebuffer(GLenum target, GLenum attachment) {
 	RESULT r = R_PASS;
 
@@ -91,14 +101,25 @@ RESULT OGLFramebuffer::SetOGLDrawBuffers(int numDrawBuffers) {
 	RESULT r = R_PASS;
 	
 	m_pDrawBuffers_n = numDrawBuffers;
-	m_pDrawBuffers = new GLenum[m_pDrawBuffers_n];
-	CN(m_pDrawBuffers);
 
-	for (int i = 0; i < m_pDrawBuffers_n; i++) {
-		m_pDrawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+	if (m_pDrawBuffers != nullptr) {
+		delete[] m_pDrawBuffers;
+		m_pDrawBuffers = nullptr;
 	}
 
-	CR(m_pParentImp->glDrawBuffers(m_pDrawBuffers_n, m_pDrawBuffers));
+	if (m_pDrawBuffers_n == 0) {
+		glDrawBuffer(GL_NONE);
+	}
+	else {
+		m_pDrawBuffers = new GLenum[m_pDrawBuffers_n];
+		CN(m_pDrawBuffers);
+
+		for (int i = 0; i < m_pDrawBuffers_n; i++) {
+			m_pDrawBuffers[i] = GL_COLOR_ATTACHMENT0 + i;
+		}
+
+		CR(m_pParentImp->glDrawBuffers(m_pDrawBuffers_n, m_pDrawBuffers));
+	}
 
 Error:
 	return r;
@@ -193,7 +214,7 @@ RESULT OGLFramebuffer::SetAndClearViewportDepthBuffer() {
 	glViewport(0, 0, m_width, m_height);
 	
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable(GL_FRAMEBUFFER_SRGB);
+	//glEnable(GL_FRAMEBUFFER_SRGB);
 
 Error:
 	return r;
@@ -216,6 +237,7 @@ RESULT OGLFramebuffer::BindOGLDepthBuffer() {
 	// Render to our framebuffer
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
 
+	/*
 	if (m_pOGLDepthbuffer != nullptr) {
 		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
 	}
@@ -224,6 +246,7 @@ RESULT OGLFramebuffer::BindOGLDepthBuffer() {
 
 	// Check framebuffer
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+	*/
 
 Error:
 	return r;

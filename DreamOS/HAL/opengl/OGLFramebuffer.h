@@ -37,6 +37,7 @@ public:
 	RESULT AttachOGLDepthbuffer();
 
 	RESULT SetOGLTextureToFramebuffer(GLenum target, GLenum attachment);
+	RESULT SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment);
 	RESULT MakeOGLTexture();
 	RESULT SetOGLTexture(GLuint textureIndex = NULL);
 	RESULT SetOGLDrawBuffers(int numDrawBuffers);

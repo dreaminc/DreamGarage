@@ -32,10 +32,8 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
-		//CR(InitializeFrameBuffer(SHADOW_MAP_WIDTH, SHADOW_MAP_WIDTH, SHADOW_MAP_CHANNELS));
-
-		// TODO: This is not the right way to create a pure depth map, but this is for now
-		CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT, 1));
+		// Create this as a pure depth map texture
+		CR(InitializeDepthToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT));
 
 	Error:
 		return r;
@@ -54,18 +52,20 @@ public:
 
 
 	RESULT SetCameraUniforms(camera *pCamera) {
-		//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
+		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * pCamera->GetViewMatrix();
-		auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * ViewMatrix(point(0.0f, -10.0f, 0.0f), -M_PI/2.0f, 0.0f, 0.0f);
+		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * ViewMatrix(point(0.0f, -10.0f, 0.0f), -M_PI/2.0f, 0.0f, 0.0f);
+		
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 		return R_PASS;
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
-		//auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
+		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * TranslationMatrix(0.0f, 5.0f, 0.0f);
-		auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * TranslationMatrix(0.0f, 5.0f, 0.0f) * RotationMatrix(vector::jVector(-1.0f), 0.0f);
+		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * TranslationMatrix(0.0f, 5.0f, 0.0f) * RotationMatrix(vector::jVector(-1.0f), 0.0f);
+		
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 		return R_PASS;

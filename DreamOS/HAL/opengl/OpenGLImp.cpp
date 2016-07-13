@@ -181,16 +181,18 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
-	/*/
+	//m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
 	m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
 	CN(m_pOGLProgramShadowDepth);
-	*/
+	
 
+	/*
 	m_pOGLProgramCapture = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLProgramCapture = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	CN(m_pOGLProgramCapture);
 	m_pOGLProgramCapture->InitializeRenderToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
 	//m_pOGLProgramCapture->InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
+	*/
 
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
@@ -558,7 +560,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	CheckFramebufferStatus(GL_FRAMEBUFFER);
 
 	// TODO: Temporary go through scene graph again
-	///*
+	/*
 	m_pOGLProgramCapture->UseProgram();
 	CR(m_pOGLProgramCapture->SetLights(pLights));
 	m_pOGLProgramCapture->BindToFramebuffer();
@@ -577,6 +579,12 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 
 	CR(m_pOGLProgramCapture->UnbindFramebuffer());
 	//*/
+
+	m_pOGLProgramShadowDepth->UseProgram();
+	m_pOGLProgramShadowDepth->BindToDepthBuffer();
+	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
+	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
+	m_pOGLProgramShadowDepth->UnbindFramebuffer();
 
 	///*
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");

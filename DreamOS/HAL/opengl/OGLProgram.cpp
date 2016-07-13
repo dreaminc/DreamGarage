@@ -5,6 +5,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLTexture.h"
 
+#include "Scene/SceneGraph.h"
+
 OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),
@@ -28,6 +30,20 @@ RESULT OGLProgram::OGLInitialize() {
 
 	CR(CreateProgram());
 	CR(IsProgram());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::SetLights(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	std::vector<light*> *pLights = NULL;
+	CR(pObjectStore->GetLights(pLights));
+	CN(pLights);
+
+	CR(SetLights(pLights));
 
 Error:
 	return r;
@@ -102,6 +118,39 @@ RESULT OGLProgram::InitializeRenderToTexture(GLenum internalDepthFormat, GLenum 
 	RESULT r = R_PASS;
 
 	CR(InitializeFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeDepthToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CR(InitializeDepthFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight));
+
+Error:
+	return r;
+}
+
+// TODO: here
+RESULT OGLProgram::InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 1);
+	CN(m_pOGLFramebuffer);
+
+	CR(m_pOGLFramebuffer->OGLInitialize());
+	CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+
+	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(m_pOGLFramebuffer->InitializeDepthBuffer(internalDepthFormat, typeDepth));
+
+	CR(m_pOGLFramebuffer->SetOGLDepthbufferTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+
+	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(0));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 Error:
 	return r;
@@ -601,6 +650,27 @@ RESULT OGLProgram::MakeFragmentShader(const wchar_t *pszFilename) {
 	CRM(pFragmentShader->InitializeFromFile(pszFilename, m_versionOGL), "Failed to initialize fragment shader from file");
 
 	CRM(AttachShader(pFragmentShader), "Failed to attach fragment shader");
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderSceneGraph(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+	
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = NULL;
+
+	pSceneGraph->Reset();
+	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+		if (pDimObj == NULL)
+			continue;
+		else {
+			CR(RenderObject(pDimObj));
+		}
+	}
 
 Error:
 	return r;
