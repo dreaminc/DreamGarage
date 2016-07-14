@@ -10,14 +10,18 @@ in Data {
 	vec4 color;
 	mat4 invProjection;
 	mat4 invViewOrientation;
-	vec2 viewport;
+//	ivec2 viewport;
 } DataIn;
+
+uniform	int u_pxWidth;
+uniform int u_pxHeight;
+uniform vec4 u_sunDirection;
 
 layout (location = 0) out vec4 out_vec4Color;
 
 vec3 getWorldNormal() {
 
-	vec2 fragCoord = gl_FragCoord.xy/DataIn.viewport;
+	vec2 fragCoord = gl_FragCoord.xy/ivec2(u_pxWidth, u_pxHeight);
 	fragCoord = (fragCoord-0.5)*2.0;
 
 	vec4 deviceNormal = vec4(fragCoord, 0.0, 1.0);
@@ -84,7 +88,8 @@ void main(void) {
 	//out_vec4Color = DataIn.color;
 
 	//vec4 lightDirection = normalize(vec4(0.0, 1.0, 0.0, 1.0));
-	vec3 lightDirection = normalize(vec3(0.0, 0.5, -0.5));
+	//vec3 lightDirection = normalize(vec3(0.0, 0.5, -0.5));
+	vec3 lightDirection = normalize(u_sunDirection.xyz);
 	vec3 eyeDirection = getWorldNormal();
 	float theta = dot(eyeDirection, lightDirection);
 	
@@ -141,7 +146,7 @@ void main(void) {
 ///*
 	out_vec4Color = vec4(
 		spotFactor*mieCollected +
-		mieFactor*mieCollected+
+		mieFactor*mieCollected +
 		rayleighFactor*rayleighCollected,
 		1.0);
 	//	*/

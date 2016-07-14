@@ -31,9 +31,9 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewOrientationMatrix), std::string("u_mat4ViewOrientation")));
 //		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
-//		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewWidth), std::string("u_intViewWidth")));
-//		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_intViewHeight")));
-
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewWidth), std::string("u_pxWidth")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_pxHeight")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformSunDirection), std::string("u_sunDirection")));
 
 
 	Error:
@@ -50,6 +50,7 @@ public:
 
 		return R_PASS;
 	}
+	float sunY = -1.0f;
 
 	RESULT SetCameraUniforms(camera *pCamera) {
 		
@@ -61,30 +62,17 @@ public:
 		auto pxWidth = pCamera->GetPXWidth();
 		auto pxHeight = pCamera->GetPXHeight();
 
-		if (m_pUniformViewMatrix)
-			m_pUniformViewMatrix->SetUniform(matV);
-		else
-			DEBUG_OUT("View\n");
-		
-		if (m_pUniformProjectionMatrix)
-			m_pUniformProjectionMatrix->SetUniform(matP);
-		else
-			DEBUG_OUT("Pro\n");
-//		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-		if (m_pUniformViewOrientationMatrix)
-			m_pUniformViewOrientationMatrix->SetUniform(matVO);
-		else
-			DEBUG_OUT("Ori\n");
-/*
-		if (m_pUniformViewWidth)
-			m_pUniformViewWidth->SetUniformInteger(pxWidth);
-		else
-			DEBUG_OUT("Width %d\n", pxHeight);
-		if (m_pUniformViewHeight)
-			m_pUniformViewHeight->SetUniformInteger(pxHeight);
-		else
-			DEBUG_OUT("Height\n");
-*/
+		point sunDirection = point(0.0f, sunY, -0.5f);
+		sunY += 0.01f;
+		DEBUG_OUT("%f", sunY);
+
+		m_pUniformSunDirection->SetUniform(sunDirection);
+		m_pUniformViewMatrix->SetUniform(matV);
+		m_pUniformProjectionMatrix->SetUniform(matP);
+		m_pUniformViewOrientationMatrix->SetUniform(matVO);
+		m_pUniformViewWidth->SetUniformInteger(pxWidth);
+		m_pUniformViewHeight->SetUniformInteger(pxHeight);
+
 		return R_PASS;
 	}
 
@@ -97,33 +85,20 @@ public:
 		//matVO->identity();
 		auto matVO = pStereoCamera->GetOrientationMatrix();
 
-		auto pxWidth = pStereoCamera->GetPXWidth();
-		auto pxHeight = pStereoCamera->GetPXHeight();
+		auto pxWidth = (pStereoCamera->GetPXWidth());
+		auto pxHeight = (pStereoCamera->GetPXHeight());
 
-		if (m_pUniformViewMatrix)
-			m_pUniformViewMatrix->SetUniform(matV);
-		else
-			DEBUG_OUT("View\n");
-		
-		if (m_pUniformProjectionMatrix)
-			m_pUniformProjectionMatrix->SetUniform(matP);
-		else
-			DEBUG_OUT("Pro\n");
-//		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-		if (m_pUniformViewOrientationMatrix)
-			m_pUniformViewOrientationMatrix->SetUniform(matVO);
-		else
-			DEBUG_OUT("Ori\n");
-/*
-		if (m_pUniformViewWidth)
-			m_pUniformViewWidth->SetUniformInteger(pxWidth);
-		else
-			DEBUG_OUT("Width %d\n", pxWidth);
-		if (m_pUniformViewHeight)
-			m_pUniformViewHeight->SetUniformInteger(pxHeight);
-		else
-			DEBUG_OUT("Height %d\n", pxHeight);
-*/
+		point sunDirection = point(0.3f, sunY, -0.5f);
+		sunY += 0.0002f;
+		DEBUG_OUT("%f\n", sunY);
+
+		m_pUniformSunDirection->SetUniform(sunDirection);
+		m_pUniformViewMatrix->SetUniform(matV);
+		m_pUniformProjectionMatrix->SetUniform(matP);
+		m_pUniformViewOrientationMatrix->SetUniform(matVO);
+		m_pUniformViewWidth->SetUniformInteger(pxWidth);
+		m_pUniformViewHeight->SetUniformInteger(pxHeight);
+
 		return R_PASS;
 	}
 
@@ -137,7 +112,8 @@ private:
 //	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformViewOrientationMatrix;
 
-//	OGLUniform *m_pUniformViewWidth;
-//	OGLUniform *m_pUniformViewHeight;
+	OGLUniform *m_pUniformViewWidth;
+	OGLUniform *m_pUniformViewHeight;
+	OGLUniformVector *m_pUniformSunDirection;
 };
 #endif // ! OGLPROGRAM_SKYBOX_SCATTER_H_
