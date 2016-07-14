@@ -12,6 +12,10 @@
 #include "vector.h"
 #include "quaternion.h"
 
+#define M_PI       3.14159265358979323846   // pi
+#define M_PI_2     1.57079632679489661923   // pi/2
+#define M_PI_4     0.785398163397448309616  // pi/4
+
 #ifdef FLOAT_PRECISION
 	typedef float rotation_precision;
 #elif defined(DOUBLE_PRECISION)
@@ -101,7 +105,7 @@ public:
 		// TODO: Push this into the vector w/ basis matrix etc
 		rotation_precision thetaX = atan2(v.y(), v.z());
 		rotation_precision thetaY = atan2(v.z(), v.x());
-		rotation_precision thetaZ = atan2(v.y(), v.x());
+		rotation_precision thetaZ = 0.0f;
 
 		return SetXYZRotationMatrix(thetaX, thetaY, thetaZ);
 
