@@ -33,6 +33,7 @@ public:
 		XYZ_AXIS,
 		ARBITRARY_AXIS,
 		QUATERNION,
+		VECTOR,
 		INVALID
 	} ROTATION_MATRIX_TYPE;
 
@@ -64,6 +65,12 @@ public:
 		SetQuaternionRotationMatrix(q);
 	}
 
+	RotationMatrix(vector v) :
+		m_type(VECTOR)
+	{
+		SetVectorRotationMatrix(v);
+	}
+
 	// http://www.cprogramming.com/tutorial/3d/quaternions.html
 	RESULT SetQuaternionRotationMatrix(quaternion q) {
 		m_type = QUATERNION;
@@ -82,6 +89,21 @@ public:
 		this->element(2, 0) = 2*q.x()*q.z() - 2*q.w()*q.y();
 		this->element(2, 1) = 2*q.y()*q.z() + 2*q.w()*q.x();
 		this->element(2, 2) = 1.0f - 2*q.x2() - 2*q.y2();
+
+		return R_PASS;
+	}
+
+	// This is defined based on a basis of {1,0,0}, {0,1,0}, {0,0,-1}
+	RESULT SetVectorRotationMatrix(vector v) {
+		m_type = VECTOR;
+		v.Normalize();
+
+		// TODO: Push this into the vector w/ basis matrix etc
+		rotation_precision thetaX = atan2(v.y(), v.z());
+		rotation_precision thetaY = atan2(v.z(), v.x());
+		rotation_precision thetaZ = atan2(v.y(), v.x());
+
+		return SetXYZRotationMatrix(thetaX, thetaY, thetaZ);
 
 		return R_PASS;
 	}

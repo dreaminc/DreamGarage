@@ -28,6 +28,14 @@ ProjectionMatrix::ProjectionMatrix(projection_precision left, projection_precisi
 }
 
 ProjectionMatrix::ProjectionMatrix(projection_precision width, projection_precision height,
+	projection_precision nearPlane, projection_precision farPlane,
+	projection_precision angle) :
+	m_type(PROJECTION_MATRIX_PERSPECTIVE)
+{
+	ACRM(SetPerspective(width, height, nearPlane, farPlane, angle), "Failed to set perspective matrix");
+}
+
+ProjectionMatrix::ProjectionMatrix(projection_precision width, projection_precision height,
 								   projection_precision nearPlane, projection_precision farPlane) :
 	m_type(PROJECTION_MATRIX_ORTHOGRAPHIC)
 {

@@ -65,7 +65,7 @@ light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOri
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
-sphere* DreamOS::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
+sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 

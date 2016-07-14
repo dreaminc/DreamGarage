@@ -10,7 +10,8 @@ RESULT DreamGarage::LoadScene() {
 	///*
 	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	// TODO: Special lane for global light
-	AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	light *pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	pLight->EnableShadows();
 	//*/
 
 	/*
@@ -48,6 +49,9 @@ RESULT DreamGarage::LoadScene() {
 
 	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
+
+	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -125,7 +129,7 @@ RESULT DreamGarage::Update(void) {
 
 	// Update stuff ...
 
-	m_pSphere->translateX(0.005f);
+	m_pSphere->translateX(0.001f);
 
 Error:
 	return r;

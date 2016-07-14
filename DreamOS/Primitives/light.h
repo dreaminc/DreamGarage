@@ -10,6 +10,7 @@
 
 #include "VirtualObj.h"
 #include "color.h"
+#include "ProjectionMatrix.h"
 
 typedef float light_precision;
 
@@ -31,7 +32,9 @@ public:
 		m_power(DEFAULT_LIGHT_INTENSITY),
 		m_colorDiffuse(COLOR_WHITE),
 		m_colorSpecular(COLOR_WHITE),
-		m_vectorDirection(vector::jVector(-1.0f))
+		m_vectorDirection(vector::jVector(-1.0f)),
+		m_fShadowEmitter(false),
+		m_spotAngle(0.0f)
 	{
 		// empty
 	}
@@ -51,6 +54,20 @@ public:
 		// empty
 	}
 
+	matrix<virtual_precision, 4, 4> GetViewProjectionMatrix(virtual_precision width, virtual_precision height, virtual_precision nearPlane, virtual_precision farPlane) {
+		matrix<virtual_precision, 4, 4> matVP;
+		matVP.identity();
+
+		if (m_type == LIGHT_DIRECITONAL) {
+			matVP = ProjectionMatrix(width, height, nearPlane, farPlane) * RotationMatrix(m_vectorDirection) * TranslationMatrix(m_ptOrigin);
+		}
+		else if (m_type == LIGHT_SPOT) {
+			matVP = ProjectionMatrix(width, height, nearPlane, farPlane, m_spotAngle) * RotationMatrix(m_vectorDirection) * TranslationMatrix(m_ptOrigin);
+		}
+
+		return matVP;
+	}
+
 	LIGHT_TYPE GetLightType() { return m_type; }
 	light_precision GetPower() { return m_power; }
 
@@ -58,6 +75,9 @@ public:
 	color GetSpecularColor() { return m_colorSpecular; }
 	vector GetLightDirection() { return m_vectorDirection; }
 
+	RESULT EnableShadows() { m_fShadowEmitter = true; return R_FAIL; }
+	RESULT DisableShadows() { m_fShadowEmitter = false; return R_FAIL; }
+	bool IsShadowEmitter() { return m_fShadowEmitter; }
 
 private:
 	LIGHT_TYPE m_type;		// NOTE: This is treated as an int
@@ -65,6 +85,10 @@ private:
 	color m_colorDiffuse;
 	color m_colorSpecular;
 	vector m_vectorDirection;
+	virtual_precision m_spotAngle;
+
+private:
+	bool m_fShadowEmitter;
 };
 
 #endif // ! LIGHT_H_

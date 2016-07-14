@@ -23,7 +23,9 @@ out Data {
 	vec4 color;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
+	
 	vec4 vertShadowCoordinate;
+	vec3 directionShadowCastingLight;
 } DataOut;
 
 uniform vec4 u_vec4Eye;
@@ -85,6 +87,8 @@ void main(void) {
 		}
 	}
 
+	// TODO: Fix this
+	DataOut.directionShadowCastingLight = vec3(0.0f, 1.0f, 0.0f);
 	DataOut.vertShadowCoordinate = vertDepthSpace;
 	DataOut.directionEye = -normalize(vertViewSpace.xyz);
 	DataOut.vertWorldSpace = vertWorldSpace;

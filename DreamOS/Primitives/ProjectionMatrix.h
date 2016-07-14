@@ -43,6 +43,10 @@ public:
 					 projection_precision top, projection_precision bottom,
 					 projection_precision nearPlane, projection_precision farPlane);
 
+	ProjectionMatrix(projection_precision width, projection_precision height, 
+					 projection_precision nearPlane, projection_precision farPlane, 
+					 projection_precision angle);
+
 	// Orthographic
 	ProjectionMatrix(projection_precision width, projection_precision height, projection_precision nearPlane, projection_precision farPlane);
 

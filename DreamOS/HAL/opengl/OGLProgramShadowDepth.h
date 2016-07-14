@@ -18,7 +18,7 @@ class OGLProgramShadowDepth : public OGLProgram {
 public:
 	OGLProgramShadowDepth(OpenGLImp *pParentImp) :
 		OGLProgram(pParentImp),
-		m_pShadowCastingLight(nullptr)
+		m_pShadowEmitter(nullptr)
 	{
 		// empty
 	}
@@ -40,6 +40,20 @@ public:
 		return r;
 	}
 
+	RESULT SetLights(std::vector<light*> *pLights) {
+		RESULT r = R_PASS;
+
+		// TODO: This will use the first light that has shadows enabled
+		for (auto it = pLights->begin(); it != pLights->end(); it++) {
+			if ((*it)->IsShadowEmitter()) {
+				m_pShadowEmitter = (*it);
+			}
+		}
+
+	Error:
+		return r;
+	}
+
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
 		return R_NOT_IMPLEMENTED;
 	}
@@ -51,11 +65,20 @@ public:
 		return R_PASS;
 	}
 
-	auto GetViewProjectionMatrix() {
+	matrix<virtual_precision, 4, 4>GetViewProjectionMatrix() {
 		//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * pCamera->GetViewMatrix();
 		//auto matVP = ProjectionMatrix(10.0f, 10.0f, 0.1f, 1000.0f) * ViewMatrix(point(0.0f, 10.0f, 0.0f), M_PI/2.0f, 0.0f, 0.0f);
-		auto matVP = ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI / 2.0f, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
+		//auto matVP = ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI / 2.0f, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
+		matrix<virtual_precision, 4, 4> matVP;
+		matVP.identity();
+
+		matVP = ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI / 2.0f, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
+
+		if (m_pShadowEmitter != nullptr) {
+			matVP = m_pShadowEmitter->GetViewProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f);
+		}
+
 		return matVP;
 	}
 
@@ -68,12 +91,12 @@ public:
 	}
 
 	RESULT SetShadowCastingLightSource(light *pLight) {
-		m_pShadowCastingLight = pLight;
+		m_pShadowEmitter = pLight;
 		return R_PASS;
 	}
 
 	light *pGetShadowCastingLight() {
-		return m_pShadowCastingLight;
+		return m_pShadowEmitter;
 	}
 
 private:
@@ -83,7 +106,7 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
 private:
-	light *m_pShadowCastingLight;
+	light *m_pShadowEmitter;
 };
 
 #endif // ! OGLPROGRAM_SHADOW_DEPTH_H_

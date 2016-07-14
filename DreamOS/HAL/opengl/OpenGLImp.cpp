@@ -583,6 +583,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	m_pOGLProgramShadowDepth->UseProgram();
 	m_pOGLProgramShadowDepth->BindToDepthBuffer();
 	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
+	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
 	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
 
