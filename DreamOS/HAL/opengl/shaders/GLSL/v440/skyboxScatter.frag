@@ -10,18 +10,17 @@ in Data {
 	vec4 color;
 	mat4 invProjection;
 	mat4 invViewOrientation;
-//	ivec2 viewport;
 } DataIn;
 
-uniform	int u_pxWidth;
-uniform int u_pxHeight;
-uniform vec4 u_sunDirection;
+uniform	int u_intViewWidth;
+uniform int u_intViewHeight;
+uniform vec4 u_vecSunDirection;
 
 layout (location = 0) out vec4 out_vec4Color;
 
 vec3 getWorldNormal() {
 
-	vec2 fragCoord = gl_FragCoord.xy/ivec2(u_pxWidth, u_pxHeight);
+	vec2 fragCoord = gl_FragCoord.xy/ivec2(u_intViewWidth, u_intViewHeight);
 	fragCoord = (fragCoord-0.5)*2.0;
 
 	vec4 deviceNormal = vec4(fragCoord, 0.0, 1.0);
@@ -85,20 +84,20 @@ vec3 absorb(float dist, vec3 color, vec3 Kr, float factor) {
 
 
 void main(void) {  
-	//out_vec4Color = DataIn.color;
 
-	//vec4 lightDirection = normalize(vec4(0.0, 1.0, 0.0, 1.0));
-	//vec3 lightDirection = normalize(vec3(0.0, 0.5, -0.5));
-	vec3 lightDirection = normalize(u_sunDirection.xyz);
+	vec3 lightDirection = normalize(u_vecSunDirection.xyz);
 	vec3 eyeDirection = getWorldNormal();
 	float theta = dot(eyeDirection, lightDirection);
 	
 	float rayleighBrightness = 1.0;
 	float mieBrightness = 1.0;
-	float spotBrightness = 1.0;
+	float spotBrightness = (cos(theta) < 0.0f) ? 0.0f : 1.0f;
+
 	float rayleighFactor = phase(theta, 0.0)*rayleighBrightness;
-	float mieFactor = phase(theta, -0.9995)*mieBrightness;
-	float spotFactor = smoothstep(0.0, 15.0, phase(theta, 0.9995))*spotBrightness;
+	float mieFactor = phase(theta, 0.9995)*mieBrightness;
+
+	float sunSize = 0.9995f;
+	float spotFactor = smoothstep(0.0, 15.0, phase(theta, sunSize))*spotBrightness;
 
 	float surfaceHeight = 0.75;
 	int stepCount = 15;
@@ -113,19 +112,15 @@ void main(void) {
 		0.18867780436772762, 0.4978442963618773, 0.6616065586417131
 	);
 	
-//	Kr = vec3(50.0f/255.0f, 125.0f/255.0f, 235.0f/255.0f);
-
-
 	vec3 rayleighCollected = vec3(0.0, 0.0, 0.0);
 	vec3 mieCollected = vec3(0.0, 0.0, 0.0);
 
 	vec4 intensity = vec4(1.0, 1.0, 1.0, 1.0);
-	//vec4 intensity = vec4(0.5, 0.5, 0.5, 0.5);
 	float rayleighStrength = 1.0f;
 	float mieStrength = 0.5f;
 	float scatterStrength = 0.5f;
 
-	// loop through the eye ray, approximating at each step
+	// loop through the eye ray, approximating scattering at each iteration
 	for(int i=0; i < stepCount; i++) {
 		
 		float sampleDistance = stepLength*float(i);
