@@ -29,11 +29,10 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewMatrix), std::string("u_mat4View")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewOrientationMatrix), std::string("u_mat4ViewOrientation")));
-//		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewWidth), std::string("u_pxWidth")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_pxHeight")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformSunDirection), std::string("u_sunDirection")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewWidth), std::string("u_intViewWidth")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewHeight), std::string("u_intViewHeight")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformSunDirection), std::string("u_vecSunDirection")));
 
 
 	Error:
@@ -66,6 +65,7 @@ public:
 		sunY += 0.01f;
 		DEBUG_OUT("%f", sunY);
 
+
 		m_pUniformSunDirection->SetUniform(sunDirection);
 		m_pUniformViewMatrix->SetUniform(matV);
 		m_pUniformProjectionMatrix->SetUniform(matP);
@@ -81,8 +81,6 @@ public:
 		auto matV = pStereoCamera->GetViewMatrix(eye);
 		auto matP = pStereoCamera->GetProjectionMatrix(eye);
 		auto matVP = matP * matV;
-		//auto matVO = matrix<rotation_precision, 4, 4>();
-		//matVO->identity();
 		auto matVO = pStereoCamera->GetOrientationMatrix();
 
 		auto pxWidth = (pStereoCamera->GetPXWidth());
@@ -93,9 +91,11 @@ public:
 		DEBUG_OUT("%f\n", sunY);
 
 		m_pUniformSunDirection->SetUniform(sunDirection);
+
 		m_pUniformViewMatrix->SetUniform(matV);
 		m_pUniformProjectionMatrix->SetUniform(matP);
 		m_pUniformViewOrientationMatrix->SetUniform(matVO);
+
 		m_pUniformViewWidth->SetUniformInteger(pxWidth);
 		m_pUniformViewHeight->SetUniformInteger(pxHeight);
 
@@ -109,7 +109,6 @@ private:
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewMatrix;
 	OGLUniformMatrix4 *m_pUniformProjectionMatrix;
-//	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformViewOrientationMatrix;
 
 	OGLUniform *m_pUniformViewWidth;
