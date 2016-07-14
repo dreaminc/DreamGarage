@@ -9,7 +9,8 @@ RESULT DreamGarage::LoadScene() {
 
 	///*
 	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	// TODO: Special lane for global light
+	AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	//*/
 
 	/*
@@ -43,9 +44,10 @@ RESULT DreamGarage::LoadScene() {
 
 
 	quad *pQuad = AddQuad(20.0f, 20.0f, 100, 100);
+	pQuad->MoveTo(0.0f, -1.0f, 0.0f);
 
-	sphere *pSphere2 = AddSphere(0.5f, 20, 20, color(COLOR_RED));
-	pSphere2->MoveTo(0.0f, 2.0f, 0.0f);
+	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
+	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -68,10 +70,9 @@ RESULT DreamGarage::LoadScene() {
 	pSphere2->translateX(5.0f);
 	//*/
 
-	/*
-	volume *pVolume = AddVolume(1.0f);
-	pVolume->translateX(5.0f);
-	*/
+	
+	volume *pVolume = AddVolume(0.5f);
+	pVolume->MoveTo(-1.0f, 1.0f, 0.0f);
 
 	/*
 	// TODO: All this should go into Model
@@ -124,7 +125,7 @@ RESULT DreamGarage::Update(void) {
 
 	// Update stuff ...
 
-	//m_pSphere->translateX(0.005f);
+	m_pSphere->translateX(0.005f);
 
 Error:
 	return r;

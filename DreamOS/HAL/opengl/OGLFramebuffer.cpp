@@ -60,6 +60,10 @@ Error:
 	return r;
 }
 
+GLuint OGLFramebuffer::GetOGLDepthbufferIndex() {
+	return m_pOGLDepthbuffer->GetOGLDepthbufferIndex();
+}
+
 RESULT OGLFramebuffer::SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment) {
 	RESULT r = R_PASS;
 

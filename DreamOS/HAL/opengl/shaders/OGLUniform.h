@@ -38,6 +38,8 @@ public:
 
 	std::string GetName() { return m_strUniformName; }
 
+	GLint GetUniformIndex() { return m_uniformIndex; }
+
 private:
 	std::string m_strUniformName;
 	GLint m_uniformIndex;
@@ -74,6 +76,7 @@ public:
 class OGLUniformSampler2D : public OGLUniform {
 public:
 	RESULT SetUniform(OGLTexture *pTexture);
+	RESULT SetUniform(GLint textureIndex);
 };
 
 class OGLUniformSamplerCube : public OGLUniform {

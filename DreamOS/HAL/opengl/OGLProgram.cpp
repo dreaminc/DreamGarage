@@ -132,6 +132,10 @@ Error:
 	return r;
 }
 
+GLuint OGLProgram::GetOGLDepthbufferIndex() {
+	return m_pOGLFramebuffer->GetOGLDepthbufferIndex();
+}
+
 // TODO: here
 RESULT OGLProgram::InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;

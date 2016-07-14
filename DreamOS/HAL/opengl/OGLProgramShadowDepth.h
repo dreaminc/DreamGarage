@@ -17,7 +17,8 @@
 class OGLProgramShadowDepth : public OGLProgram {
 public:
 	OGLProgramShadowDepth(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp)
+		OGLProgram(pParentImp),
+		m_pShadowCastingLight(nullptr)
 	{
 		// empty
 	}
@@ -50,27 +51,29 @@ public:
 		return R_PASS;
 	}
 
-
-	RESULT SetCameraUniforms(camera *pCamera) {
+	auto GetViewProjectionMatrix() {
 		//auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * pCamera->GetViewMatrix();
 		//auto matVP = ProjectionMatrix(10.0f, 10.0f, 0.1f, 1000.0f) * ViewMatrix(point(0.0f, 10.0f, 0.0f), M_PI/2.0f, 0.0f, 0.0f);
+		auto matVP = ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI / 2.0f, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
+		return matVP;
+	}
 
-		auto matVP = ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI/2.0f, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
-		
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-
-		return R_PASS;
+	RESULT SetCameraUniforms(camera *pCamera) {
+		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
-		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
-		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * TranslationMatrix(0.0f, 5.0f, 0.0f);
-		//auto matVP = ProjectionMatrix(PROJECTION_MATRIX_ORTHOGRAPHIC, 10.0f, 10.0f, 0.1f, 1000.0f, 0.0f) * TranslationMatrix(0.0f, 5.0f, 0.0f) * RotationMatrix(vector::jVector(-1.0f), 0.0f);
-		
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
+		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
+	}
 
+	RESULT SetShadowCastingLightSource(light *pLight) {
+		m_pShadowCastingLight = pLight;
 		return R_PASS;
+	}
+
+	light *pGetShadowCastingLight() {
+		return m_pShadowCastingLight;
 	}
 
 private:
@@ -78,6 +81,9 @@ private:
 
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+
+private:
+	light *m_pShadowCastingLight;
 };
 
 #endif // ! OGLPROGRAM_SHADOW_DEPTH_H_
