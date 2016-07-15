@@ -105,18 +105,20 @@ void main(void) {
 	bias = clamp(bias, 0.0f, 0.01f);
 	bias = 0.0f;
 
+	///*
 	if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy).x  <  (DataIn.vertShadowCoordinate.z - bias)) {
-		lightVisibility = 0.0;
+		lightVisibility = 0.5;
 	}
+	//*/
 
 	/*
 	for (int i=0; i < 4; i++){
 		if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy + poissonDisk[i]/700.0).x  <  (DataIn.vertShadowCoordinate.z - bias)){
 			//lightVisibility = 0.5;
-			lightVisibility -= 0.1;
+			lightVisibility -= 0.2;
 		}
 	}
-	*/
+	//*/
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);

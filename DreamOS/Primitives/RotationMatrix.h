@@ -69,10 +69,10 @@ public:
 		SetQuaternionRotationMatrix(q);
 	}
 
-	RotationMatrix(vector v) :
+	RotationMatrix(vector v, vector up) :
 		m_type(VECTOR)
 	{
-		SetVectorRotationMatrix(v);
+		SetVectorRotationMatrix(v, up);
 	}
 
 	// http://www.cprogramming.com/tutorial/3d/quaternions.html
@@ -98,24 +98,37 @@ public:
 	}
 
 	// This is defined based on a basis of {1,0,0}, {0,1,0}, {0,0,-1}
-	RESULT SetVectorRotationMatrix(vector v) {
+	RESULT SetVectorRotationMatrix(vector v, vector up) {
 		m_type = VECTOR;
 		v.Normalize();
+		identity();
+		
+		vector zAxis = -1.0f * v.Normal();
+		vector xAxis; 
+		
+		if ((zAxis * up) != 0.0f)
+			xAxis = up.cross(zAxis);
+		else
+			xAxis = vector(-zAxis.y(), zAxis.x(), zAxis.z());
 
-		// Rotation about X axis
-		rotation_precision phi = atan2(v.y(), -v.z());
+		xAxis.Normalize();
 
-		// Rotation about Z axis
-		//rotation_precision theta = atan2(v.y(), -v.x());
-		//rotation_precision theta = atan2(v.y(), -v.x());
-		rotation_precision theta = 0.0f;
+		vector yAxis = zAxis.cross(xAxis);
+		yAxis.Normalize();
 
-		// rotation about Y axis
-		//rotation_precision psi = atan2(v.z(), v.x());
-		rotation_precision psi = 0.0f;
+		this->element(0, 0) = xAxis.x();
+		this->element(0, 1) = xAxis.y();
+		this->element(0, 2) = xAxis.z();
 
-		// TODO: Direct vector to rotation matrix is possible, get cos/sin from unit vectors
-		return SetXYZRotationMatrix(phi, theta, psi);
+		this->element(1, 0) = yAxis.x();
+		this->element(1, 1) = yAxis.y();
+		this->element(1, 2) = yAxis.z();
+
+		this->element(2, 0) = zAxis.x();
+		this->element(2, 1) = zAxis.y();
+		this->element(2, 2) = zAxis.z();
+
+		this->element(3, 3) = 1.0f;
 
 		return R_PASS;
 	}
