@@ -21,8 +21,8 @@ protected:
 
 public:
 
-	OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& text) :
-		text(pFont, text),
+	OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& text, text::AlignmentType align=text::AlignmentType::LEFT) :
+		text(pFont, text, align),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM

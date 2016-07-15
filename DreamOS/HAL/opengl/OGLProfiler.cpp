@@ -26,7 +26,7 @@ void OGLProfiler::Init()
 {
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 
-	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
+	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01", text::AlignmentType::RIGHT);
 	m_OGLTitleText->MoveTo(-0.7f, -0.7f, 0);
 
 	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(100, '0'));
@@ -67,7 +67,8 @@ void OGLProfiler::Render()
 		 it < Profiler::GetProfiler()->GetConsoleText().end();
 		 it++)
 	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1f)->MoveTo(-0.8f, 0.8f - posY, 0));
+		//m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1f)->MoveTo(-0.8f, 0.8f - posY, 0));
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1f)->SetPosition(point(-0.4f, 0.8f - posY, 0.0f)));
 		posY += 0.05f;
 	}
 }
