@@ -102,12 +102,17 @@ public:
 		m_type = VECTOR;
 		v.Normalize();
 
-		// TODO: Push this into the vector w/ basis matrix etc
-		rotation_precision thetaX = atan2(v.y(), v.z());
-		rotation_precision thetaY = atan2(v.z(), v.x());
-		rotation_precision thetaZ = 0.0f;
+		// Rotation about X axis
+		rotation_precision phi = atan2(v.y(), -v.z());
 
-		return SetXYZRotationMatrix(thetaX, thetaY, thetaZ);
+		// Rotation about Z axis
+		rotation_precision theta = atan2(-v.y(), -v.x());
+
+		// rotation about Y axis
+		rotation_precision psi = 0.0f;
+
+		// TODO: Direct vector to rotation matrix is possible, get cos/sin from unit vectors
+		return SetXYZRotationMatrix(phi, theta, psi);
 
 		return R_PASS;
 	}
@@ -163,7 +168,6 @@ public:
 		this->element(2, 2) = cosPhi * cosTheta;
 
 		return R_PASS;
-		
 	}
 
 	// https://en.wikipedia.org/wiki/Rotation_matrix

@@ -11,6 +11,7 @@
 
 #include "Primitives/BiasMatrix.h"
 #include "OpenGLImp.h"
+#include "OGLProgramShadowDepth.h"
 
 class OGLProgramBlinnPhongShadow : public OGLProgram {
 public:
@@ -101,15 +102,16 @@ public:
 		//m_pUniformModelViewMatrix
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
-		// TODO: Temp (total hack!)
-		//auto matBiasDepthVP = BiasMatrix(0.5f) * ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI / 2.0f, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
-		auto matDepthVP = ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI / 2.0f, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
-		m_pUniformDepthViewProjectionMatrix->SetUniform(matDepthVP);
+		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
+		if (pOGLProgramShadowDepth != nullptr) {
+			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
 
-		GLint texID = 1;
-		m_pUniformTextureDepth->SetUniform(texID);
-		m_pParentImp->glActiveTexture(GL_TEXTURE1);
-		m_pParentImp->BindTexture(GL_TEXTURE_2D, texID);
+			// TODO: 
+			GLint texID = 1;
+			m_pParentImp->glActiveTexture(GL_TEXTURE0);
+			m_pParentImp->BindTexture(GL_TEXTURE_2D, texID);
+			m_pUniformTextureDepth->SetUniform(0);
+		}
 
 		return R_PASS;
 	}

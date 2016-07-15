@@ -14,13 +14,19 @@ OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
 	m_pFragmentShader(nullptr),
 	m_versionOGL(0),
 	m_pOGLFramebuffer(nullptr),
-	m_pOGLRenderTexture(nullptr)
+	m_pOGLRenderTexture(nullptr),
+	m_pOGLProgramDepth(nullptr)
 {
 	// empty
 }
 
 OGLProgram::~OGLProgram() {
 	ReleaseProgram();
+}
+
+RESULT OGLProgram::SetOGLProgramDepth(OGLProgram *pOGLProgramDepth) {
+	m_pOGLProgramDepth = pOGLProgramDepth;
+	return R_PASS;
 }
 
 // Note that all vertex attrib, uniforms, uniform blocks are actually 

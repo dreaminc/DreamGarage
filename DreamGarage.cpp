@@ -2,6 +2,8 @@
 
 //quad *g_pQuad;
 
+light *g_pLight = nullptr;
+
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
@@ -10,8 +12,10 @@ RESULT DreamGarage::LoadScene() {
 	///*
 	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	// TODO: Special lane for global light
-	light *pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	pLight->EnableShadows();
+	vector lightdir = vector(-1.0f, -0.1f, 0.0f);
+	lightdir.Normalize();
+	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
+	g_pLight->EnableShadows();
 	//*/
 
 	/*
@@ -130,6 +134,8 @@ RESULT DreamGarage::Update(void) {
 	// Update stuff ...
 
 	m_pSphere->translateX(0.001f);
+
+	//g_pLight->RotateLightDirectionYAxis(0.0001f);
 
 Error:
 	return r;

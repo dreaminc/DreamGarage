@@ -72,9 +72,6 @@ public:
 		if (m_pShadowEmitter != nullptr) {
 			matVP = m_pShadowEmitter->GetViewProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f);
 		}
-		else {
-			matVP = ProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f) * RotationMatrix(-M_PI_2, 0.0f, 0.0f) * TranslationMatrix(point(0.0f, 10.0f, 0.0f));
-		}
 
 		return matVP;
 	}

@@ -79,6 +79,30 @@ public:
 	RESULT DisableShadows() { m_fShadowEmitter = false; return R_FAIL; }
 	bool IsShadowEmitter() { return m_fShadowEmitter; }
 
+	RESULT RotateLightDirection(rotation_precision phi, rotation_precision theta, rotation_precision psi) {
+		m_vectorDirection = RotationMatrix(phi, theta, psi) * m_vectorDirection;
+		m_vectorDirection.Normalize();
+		return R_PASS;
+	}
+
+	RESULT RotateLightDirectionXAxis(rotation_precision theta) {
+		m_vectorDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, theta) * m_vectorDirection;
+		m_vectorDirection.Normalize();
+		return R_PASS;
+	}
+
+	RESULT RotateLightDirectionYAxis(rotation_precision theta) {
+		m_vectorDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::Y_AXIS, theta) * m_vectorDirection;
+		m_vectorDirection.Normalize();
+		return R_PASS;
+	}
+
+	RESULT RotateLightDirectionZAxis(rotation_precision theta) {
+		m_vectorDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::Z_AXIS, theta) * m_vectorDirection;
+		m_vectorDirection.Normalize();
+		return R_PASS;
+	}
+
 private:
 	LIGHT_TYPE m_type;		// NOTE: This is treated as an int
 	light_precision m_power;
