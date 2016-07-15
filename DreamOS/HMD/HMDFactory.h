@@ -11,6 +11,7 @@
 
 typedef enum {
 	HMD_OVR,
+	HMD_OPENVR,
 	HMD_INVALID
 } HMD_TYPE;
 

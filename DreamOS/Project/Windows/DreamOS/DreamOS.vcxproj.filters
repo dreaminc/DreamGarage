@@ -135,6 +135,9 @@
     <Filter Include="DreamGarage">
       <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="HMD\OpenVR">
+      <UniqueIdentifier>{0484651f-4677-4432-aa79-1926163bb61b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -307,6 +310,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp">
+      <Filter>HMD\OpenVR</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1797,6 +1803,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
+      <Filter>HMD\OpenVR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
