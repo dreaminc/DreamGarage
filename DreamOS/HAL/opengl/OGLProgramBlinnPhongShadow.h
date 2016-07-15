@@ -106,11 +106,9 @@ public:
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
 
-			// TODO: 
-			GLint texID = 1;
-			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(GL_TEXTURE_2D, texID);
-			m_pUniformTextureDepth->SetUniform(0);
+			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
+			pOGLProgramShadowDepth->SetDepthTexture(0);
+			m_pUniformTextureDepth->SetUniform(0);			
 		}
 
 		return R_PASS;

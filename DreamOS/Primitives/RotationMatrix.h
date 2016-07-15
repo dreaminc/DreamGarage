@@ -106,9 +106,12 @@ public:
 		rotation_precision phi = atan2(v.y(), -v.z());
 
 		// Rotation about Z axis
-		rotation_precision theta = atan2(-v.y(), -v.x());
+		//rotation_precision theta = atan2(v.y(), -v.x());
+		//rotation_precision theta = atan2(v.y(), -v.x());
+		rotation_precision theta = 0.0f;
 
 		// rotation about Y axis
+		//rotation_precision psi = atan2(v.z(), v.x());
 		rotation_precision psi = 0.0f;
 
 		// TODO: Direct vector to rotation matrix is possible, get cos/sin from unit vectors

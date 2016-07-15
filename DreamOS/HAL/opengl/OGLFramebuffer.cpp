@@ -74,6 +74,20 @@ Error:
 	return r;
 }
 
+RESULT OGLFramebuffer::SetDepthTexture(int textureNumber) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLDepthbuffer);
+
+	GLenum glTextureUnit = GL_TEXTURE0 + textureNumber;
+
+	m_pParentImp->glActiveTexture(glTextureUnit);
+	m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex());
+
+Error:
+	return r;
+}
+
 RESULT OGLFramebuffer::SetOGLTextureToFramebuffer(GLenum target, GLenum attachment) {
 	RESULT r = R_PASS;
 

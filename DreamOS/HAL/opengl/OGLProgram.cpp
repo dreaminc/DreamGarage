@@ -138,6 +138,10 @@ Error:
 	return r;
 }
 
+RESULT OGLProgram::SetDepthTexture(int textureNumber) {
+	return m_pOGLFramebuffer->SetDepthTexture(textureNumber);
+}
+
 GLuint OGLProgram::GetOGLDepthbufferIndex() {
 	return m_pOGLFramebuffer->GetOGLDepthbufferIndex();
 }

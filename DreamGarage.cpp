@@ -12,9 +12,15 @@ RESULT DreamGarage::LoadScene() {
 	///*
 	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	// TODO: Special lane for global light
-	vector lightdir = vector(-1.0f, -0.1f, 0.0f);
+	vector lightdir = vector(0.0f, -1.0f, 0.0f);
 	lightdir.Normalize();
-	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
+
+	//float lightdistance = 10.0f;
+	//point lightpoint = -1.0f * lightdir * lightdistance;
+	//lightpoint.w() = 0.0f;
+
+	point lightpoint = point(0.0f, 10.0f, 0.0f);
+	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, lightpoint, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
 	g_pLight->EnableShadows();
 	//*/
 

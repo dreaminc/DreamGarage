@@ -118,6 +118,7 @@ public:
 	RESULT InitializeRenderToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 	RESULT InitializeDepthToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
 	GLuint GetOGLDepthbufferIndex();
+	RESULT SetDepthTexture(int textureNumber);
 
 	// TODO: Is this the right way to do it?  It's better than feeding the texture directly in
 	// This may be better with an OGLProgram hierarchy - children/dependents etc
