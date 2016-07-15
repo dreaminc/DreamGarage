@@ -16,6 +16,14 @@ This is the path of the DreamOS folder in the DreamGarage repo. Since there may 
 
 Currently DreamOS is using CEF for all cloud connectivity, or WebRTC/WebSockets for peer to peer.  CEF can get quite large, especially the debug binaries.  At the moment CEF is included through the use the C++ wrapper for the binaries, and since these are so large they are not kept in the repo.  This can also allow for rapid updating of the most recent version of CEF, the current supported build is reflected in the external\CEF\CEF_BINARARY_X.XXXX.XXXX folder.
 
+**OPENVRPATH**
+
+This is the path to the OpenVR libraries and headers
+
+**LEAPMOTIONPATH**
+
+The path to the Leap Motion binaries and headers as required for Leap Motion use
+
 
 ## Network
 
@@ -57,3 +65,14 @@ model *AddModel(wchar_t *pszModelName);
 ```
 
 Currently no notifications / events are set up but this will be added to help notify the applicatio of things like keyboard entry, mouse movement or other pertinent application layer events.
+
+
+# Headsets 
+
+## Vive
+
+The Vive requires the use of OpenVR, and for the given binaries to reside on the client system as provided by the environment variable **OPENVRPATH**.  This should point to the root variable where the given libraries and headers can be found.
+
+## Oculus
+
+Oculus use requires the installation of the Oculus run time at the moment.  Apart from this the Oculus binaries are currently residing inside of the source tree in EXTERNAL, so updates to this will require updates to the source.  Might be a good idea to push this out as an environment variable as the others to make it easier to update / control which version.  Ultimately, we will build a more configurable system to set which version is to be used etc. 
