@@ -9,6 +9,8 @@
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
+#include "Primitives/RotationMatrix.h"
+
 class OGLProgramSkyboxScatter : public OGLProgram {
 public:
 	OGLProgramSkyboxScatter(OpenGLImp *pParentImp) :
@@ -49,7 +51,9 @@ public:
 
 		return R_PASS;
 	}
+
 	float sunY = -1.0f;
+	float theta = 0.0f;
 
 	RESULT SetCameraUniforms(camera *pCamera) {
 		
@@ -61,10 +65,11 @@ public:
 		auto pxWidth = pCamera->GetPXWidth();
 		auto pxHeight = pCamera->GetPXHeight();
 
-		point sunDirection = point(0.0f, sunY, -0.5f);
-		sunY += 0.01f;
-		DEBUG_OUT("%f", sunY);
-
+		vector sunDirection = vector(0.0f, sunY, -0.5f);
+		//sunY += 0.01f;
+		theta += 0.0005f;
+		sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, theta) * sunDirection;
+		sunDirection.Normalize();
 
 		m_pUniformSunDirection->SetUniform(sunDirection);
 		m_pUniformViewMatrix->SetUniform(matV);
@@ -86,9 +91,17 @@ public:
 		auto pxWidth = (pStereoCamera->GetPXWidth());
 		auto pxHeight = (pStereoCamera->GetPXHeight());
 
+		/*
 		point sunDirection = point(0.3f, sunY, -0.5f);
 		sunY += 0.0002f;
 		DEBUG_OUT("%f\n", sunY);
+		*/
+
+		vector sunDirection = vector(0.0f, sunY, -0.5f);
+		//sunY += 0.01f;
+		theta += 0.0005f;
+		sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, theta) * sunDirection;
+		sunDirection.Normalize();
 
 		m_pUniformSunDirection->SetUniform(sunDirection);
 
