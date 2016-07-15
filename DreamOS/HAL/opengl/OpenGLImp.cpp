@@ -180,7 +180,7 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
-	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
+	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
 
 	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
