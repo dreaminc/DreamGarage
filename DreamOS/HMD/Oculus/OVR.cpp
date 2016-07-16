@@ -23,6 +23,7 @@ OVRHMD::~OVRHMD() {
 RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	RESULT r = R_PASS;
 	ovrGraphicsLuid luid;
+	m_pHALImp = halimp;
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
 
 	// Initializes LibOVR, and the Rift

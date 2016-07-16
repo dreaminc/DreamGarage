@@ -69,7 +69,11 @@ typedef struct HMDEvent {
 
 class HMD : public Publisher<HMDEventType, HMDEvent> {
 public:
-	HMD() {
+	HMD() :
+		m_pHALImp(nullptr),
+		m_eyeWidth(0),
+		m_eyeHeight(0)
+	{
 		// empty stub
 	}
 
@@ -115,10 +119,10 @@ protected:
 	point m_ptOrigin;
 	quaternion m_qOrientation;
 
-	int m_eyeWidth;
-	int m_eyeHeight;
+	uint32_t m_eyeWidth;
+	uint32_t m_eyeHeight;
 
-
+	HALImp *m_pHALImp;
 
 private:
 	UID m_uid;
