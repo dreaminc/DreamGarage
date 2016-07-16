@@ -37,11 +37,14 @@ public:
 	RESULT AttachOGLDepthbuffer();
 
 	RESULT SetOGLTextureToFramebuffer(GLenum target, GLenum attachment);
+	RESULT SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget);
 	RESULT SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment);
 	RESULT SetDepthTexture(int textureNumber);
 
 	GLuint GetOGLDepthbufferIndex();
 	RESULT MakeOGLTexture();
+	OGLTexture *GetOGLTexture();
+	RESULT MakeOGLTextureMultisample();
 	RESULT SetOGLTexture(GLuint textureIndex = NULL);
 	RESULT SetOGLDrawBuffers(int numDrawBuffers);
 	RESULT SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer);
@@ -58,6 +61,7 @@ public:
 
 	RESULT InitializeDepthBuffer(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT);
 	RESULT InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth);
+	RESULT InitializeRenderBufferMultisample(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT, int multisample = 4);
 
 private:
 	OpenGLImp *m_pParentImp;

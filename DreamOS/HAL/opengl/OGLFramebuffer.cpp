@@ -60,6 +60,26 @@ Error:
 	return r;
 }
 
+OGLTexture* OGLFramebuffer::GetOGLTexture() {
+	return m_pOGLTexture;
+}
+
+RESULT OGLFramebuffer::MakeOGLTextureMultisample() {
+	RESULT r = R_PASS;
+
+	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	CN(m_pOGLTexture);
+
+	m_pOGLTexture->SetWidth(m_width);
+	m_pOGLTexture->SetHeight(m_height);
+	m_pOGLTexture->SetChannels(m_channels);
+
+	m_pOGLTexture->OGLInitializeMultisample();
+
+Error:
+	return r;
+}
+
 GLuint OGLFramebuffer::GetOGLDepthbufferIndex() {
 	return m_pOGLDepthbuffer->GetOGLDepthbufferIndex();
 }
@@ -92,6 +112,16 @@ RESULT OGLFramebuffer::SetOGLTextureToFramebuffer(GLenum target, GLenum attachme
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLTexture->GetOGLTextureIndex(), 0));
+
+Error:
+	return r;
+}
+
+//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId, 0);
+RESULT OGLFramebuffer::SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget) {
+	RESULT r = R_PASS;
+
+	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLTexture->GetOGLTextureIndex(), 0));
 
 Error:
 	return r;
@@ -153,6 +183,16 @@ Error:
 	return r;
 }
 
+RESULT OGLFramebuffer::InitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLDepthbuffer);
+	CR(m_pOGLDepthbuffer->OGLInitializeRenderBufferMultisample(internalDepthFormat, typeDepth, multisample));
+
+Error:
+	return r;
+}
+
 RESULT OGLFramebuffer::MakeOGLDepthbuffer() {
 	RESULT r = R_PASS;
 
@@ -179,7 +219,7 @@ RESULT OGLFramebuffer::InitializeDepthBuffer(GLenum internalDepthFormat, GLenum 
 	CN(m_pOGLDepthbuffer);
 	CR(m_pOGLDepthbuffer->OGLInitialize(internalDepthFormat, typeDepth));
 
-//Error:
+Error:
 	return r;
 }
 
@@ -282,7 +322,7 @@ RESULT OGLFramebuffer::AttachOGLTexture(GLuint textureIndex) {
 		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureIndex, 0));
 	}
 
-//Error:
+Error:
 	return r;
 }
 

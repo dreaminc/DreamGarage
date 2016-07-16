@@ -1,11 +1,14 @@
 #include "OpenVRDevice.h"
+#include "HAL/opengl/OGLTexture.h"
 
 OpenVRDevice::OpenVRDevice() :
 	m_pIVRHMD(nullptr),
 	m_pRenderModels(nullptr),
 	m_pCompositor(nullptr),
-	m_pFramebufferLeft(nullptr),
-	m_pFramebufferRight(nullptr)
+	m_pFramebufferRenderLeft(nullptr),
+	m_pFramebufferResolveLeft(nullptr),
+	m_pFramebufferRenderRight(nullptr),
+	m_pFramebufferResolveRight(nullptr)
 {
 	// TODO
 }
@@ -38,28 +41,31 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 	
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(m_pHALImp);
 
-	OGLFramebuffer *pOGLFramebuffer = nullptr;
+	OGLFramebuffer *pOGLRenderFramebuffer = nullptr;
+	OGLFramebuffer *pOGLResolveFramebuffer = nullptr;
+
 	if (eye == EYE_LEFT) {
-		m_pFramebufferLeft = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_CHANNELS);
-		pOGLFramebuffer = m_pFramebufferLeft;
+		m_pFramebufferRenderLeft = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_RENDER_CHANNELS);
+		m_pFramebufferResolveLeft = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_RESOLVE_CHANNELS);
+		pOGLRenderFramebuffer = m_pFramebufferRenderLeft;
+		pOGLResolveFramebuffer = m_pFramebufferResolveLeft;
 	}
 	else if (eye == EYE_RIGHT) {
-		m_pFramebufferRight = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_CHANNELS);
-		pOGLFramebuffer = m_pFramebufferRight;
+		m_pFramebufferRenderRight = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_RENDER_CHANNELS);
+		m_pFramebufferResolveRight = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_RESOLVE_CHANNELS);
+		pOGLRenderFramebuffer = m_pFramebufferRenderRight;
+		pOGLResolveFramebuffer = m_pFramebufferResolveRight;
 	}
 	else {
 		CBM((0), "Invalid Eye Passed");
 	}
 
 	
-	CR(pOGLFramebuffer->OGLInitialize());
-	CR(pOGLFramebuffer->BindOGLFramebuffer(NULL));
-
 	//glGenFramebuffers(1, &framebufferDesc.m_nRenderFramebufferId);
 	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nRenderFramebufferId);
 
-	CR(pOGLFramebuffer->SetOGLDepthbuffer());
-	CR(pOGLFramebuffer->OGLInitializeOGLDepthBuffer());
+	CR(pOGLRenderFramebuffer->OGLInitialize());
+	CR(pOGLRenderFramebuffer->BindOGLFramebuffer());
 
 	/*
 	glGenRenderbuffers(1, &framebufferDesc.m_nDepthBufferId);
@@ -68,32 +74,46 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebufferDesc.m_nDepthBufferId);
 	*/
 
+	CR(pOGLRenderFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(pOGLRenderFramebuffer->InitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OPENVR_MULTISAMPLE));
+
+	/*
 	glGenTextures(1, &framebufferDesc.m_nRenderTextureId);
 	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId);
 	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, nWidth, nHeight, true);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId, 0);
+	*/
 
+	CR(pOGLRenderFramebuffer->MakeOGLTextureMultisample());
+	CR(pOGLRenderFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
+
+	/*
 	glGenFramebuffers(1, &framebufferDesc.m_nResolveFramebufferId);
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nResolveFramebufferId);
+	*/
 
+	CR(pOGLResolveFramebuffer->OGLInitialize());
+	CR(pOGLResolveFramebuffer->BindOGLFramebuffer());
+
+	/*
 	glGenTextures(1, &framebufferDesc.m_nResolveTextureId);
 	glBindTexture(GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, nWidth, nHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId, 0);
-
-	/*
-	// check FBO status
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-	if (status != GL_FRAMEBUFFER_COMPLETE)
-	{
-		return false;
-	}
 	*/
 
-	CR(pOGLFramebuffer->CheckStatus());
-	CR(pOGLFramebuffer->Unbind());
+	CR(pOGLResolveFramebuffer->MakeOGLTexture());
+	OGLTexture* pOGLTexture = pOGLResolveFramebuffer->GetOGLTexture();
+	pOGLTexture->SetGLTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	pOGLTexture->SetGLTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+	CR(pOGLResolveFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D));
+
+
+	// Check FBO status and unbind
+	CR(oglimp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+	CR(oglimp->glBindFramebuffer(GL_FRAMEBUFFER, 0));
 
 Error:
 	return r;

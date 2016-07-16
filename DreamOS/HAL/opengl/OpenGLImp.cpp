@@ -993,6 +993,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glRenderbufferStorageMultisample(target, samples, internalformat, width, height);
+	CRM(CheckGLError(), "glRenderbufferStorageMultisample failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) {
 	RESULT r = R_PASS;
 
@@ -1351,6 +1361,16 @@ RESULT OpenGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalf
 
 	m_OpenGLExtensions.glTextStorage2D(target, levels, internalformat, width, height);
 	CRM(CheckGLError(), "glTexStorage2D failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glTexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations);
+	CRM(CheckGLError(), "glTexImage2DMultisample failed");
 
 Error:
 	return r;

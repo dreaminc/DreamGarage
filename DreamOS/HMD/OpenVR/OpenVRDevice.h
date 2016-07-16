@@ -17,7 +17,9 @@
 #include "HMD/HMD.h"
 #include "HAL/opengl/OGLDepthbuffer.h"
 
-#define DEFAULT_OPENVR_CHANNELS 3
+#define DEFAULT_OPENVR_RENDER_CHANNELS 3
+#define DEFAULT_OPENVR_RESOLVE_CHANNELS 4
+#define DEFAULT_OPENVR_MULTISAMPLE 4
 
 #include <vector>
 #include <algorithm>
@@ -64,8 +66,10 @@ public:
 	std::string m_strDriver;
 	std::string m_strDisplay;
 
-	OGLFramebuffer *m_pFramebufferLeft;
-	OGLFramebuffer *m_pFramebufferRight;
+	OGLFramebuffer *m_pFramebufferRenderLeft;
+	OGLFramebuffer *m_pFramebufferResolveLeft;
+	OGLFramebuffer *m_pFramebufferRenderRight;
+	OGLFramebuffer *m_pFramebufferResolveRight;
 };
 
 #endif // ! OPENVR_DEVICE_H_

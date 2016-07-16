@@ -157,6 +157,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glTexStorage2D = (PFNGLTEXSTORAGE2DPROC)wglGetProcAddress("glTexStorage2D")),
 		"Failed to initialize glTexStorage2D extension");
 
+	CNMW((m_glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)wglGetProcAddress("glTexImage2DMultisample")),
+		"Failed to initialize glTexImage2DMultisample extension");
+
 	//CNMW((m_glTexParameteri = (PFNGLTEXPARAMETERIPROC)wglGetProcAddress("glTexParameteri")),
 	//	"Failed to initialize glTexParameteri extension");
 
@@ -181,6 +184,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 
 	CNMW((m_glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage")),
 		"Failed to initialize glRenderbufferStorage extension");
+
+	CNMW((m_glRenderBufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)wglGetProcAddress("glRenderBufferStorageMultisample")),
+		"Failed to initialize glRenderBufferStorageMultisample extension");
 
 	CNMW((m_glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer")),
 		"Failed to initialize glFramebufferRenderbuffer extension");
