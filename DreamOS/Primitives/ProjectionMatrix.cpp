@@ -21,9 +21,25 @@ ProjectionMatrix::ProjectionMatrix(PROJECTION_MATRIX_TYPE type, projection_preci
 
 ProjectionMatrix::ProjectionMatrix(projection_precision left, projection_precision right,
 								   projection_precision top, projection_precision bottom,
-								   projection_precision nearPlane, projection_precision farPlane)
+								   projection_precision nearPlane, projection_precision farPlane) :
+	m_type(PROJECTION_MATRIX_PERSPECTIVE)
 {
 	ACRM(SetPerspective(left, right, top, bottom, nearPlane, farPlane), "Failed to set perspective matrix");
+}
+
+ProjectionMatrix::ProjectionMatrix(projection_precision width, projection_precision height,
+	projection_precision nearPlane, projection_precision farPlane,
+	projection_precision angle) :
+	m_type(PROJECTION_MATRIX_PERSPECTIVE)
+{
+	ACRM(SetPerspective(width, height, nearPlane, farPlane, angle), "Failed to set perspective matrix");
+}
+
+ProjectionMatrix::ProjectionMatrix(projection_precision width, projection_precision height,
+								   projection_precision nearPlane, projection_precision farPlane) :
+	m_type(PROJECTION_MATRIX_ORTHOGRAPHIC)
+{
+	ACRM(SetOrthographic(width, height, nearPlane, farPlane), "Failed to set perspective matrix");
 }
 
 ProjectionMatrix::~ProjectionMatrix() {
@@ -112,13 +128,17 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision width,
 
 	projection_precision ratio = width / height;
 	
-
-	this->element(0, 0) = 1.0f / ratio;
+	this->element(0, 0) = 2.0f / width;
 	
-	this->element(1, 1) = 1.0f;
+	this->element(1, 1) = 2.0f / height;
 
+	/*
 	this->element(2, 2) = -2.0f / (farPlane - nearPlane);
-	this->element(2, 3) = (-(farPlane + nearPlane)) / (farPlane - nearPlane);
+	this->element(3, 2) = (-(farPlane + nearPlane)) / (farPlane - nearPlane);
+	*/
+
+	this->element(2, 2) = -1.0f / (farPlane - nearPlane);
+	this->element(3, 2) = (-nearPlane) / (farPlane - nearPlane);
 
 	this->element(3, 3) = 1.0f;
 

@@ -436,7 +436,7 @@ RESULT Windows64App::Show() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		m_pWin64Mouse->UpdateMousePosition();
+		//m_pWin64Mouse->UpdateMousePosition();
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());

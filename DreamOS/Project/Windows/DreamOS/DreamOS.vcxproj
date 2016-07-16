@@ -445,11 +445,13 @@ xcopy /y "$(OPENVRPATH)\bin\win64\openvr_api.dll" "$(TargetDir)" /D</Command>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProfiler.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
@@ -481,6 +483,7 @@ xcopy /y "$(OPENVRPATH)\bin\win64\openvr_api.dll" "$(TargetDir)" /D</Command>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
+    <ClInclude Include="..\..\..\Primitives\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
@@ -564,6 +567,8 @@ xcopy /y "$(OPENVRPATH)\bin\win64\openvr_api.dll" "$(TargetDir)" /D</Command>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag" />
@@ -572,6 +577,8 @@ xcopy /y "$(OPENVRPATH)\bin\win64\openvr_api.dll" "$(TargetDir)" /D</Command>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag" />

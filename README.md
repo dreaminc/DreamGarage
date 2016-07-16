@@ -66,7 +66,6 @@ model *AddModel(wchar_t *pszModelName);
 
 Currently no notifications / events are set up but this will be added to help notify the applicatio of things like keyboard entry, mouse movement or other pertinent application layer events.
 
-
 # Headsets 
 
 ## Vive
@@ -76,3 +75,16 @@ The Vive requires the use of OpenVR, and for the given binaries to reside on the
 ## Oculus
 
 Oculus use requires the installation of the Oculus run time at the moment.  Apart from this the Oculus binaries are currently residing inside of the source tree in EXTERNAL, so updates to this will require updates to the source.  Might be a good idea to push this out as an environment variable as the others to make it easier to update / control which version.  Ultimately, we will build a more configurable system to set which version is to be used etc. 
+
+# Using Dream OS
+
+## Dream Garage
+
+### Lights
+
+Dream supports lights by the way of the `light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);` function.  Retaining the pointer to the light allows the application layer to update the light position or other parameters during the update cycle or otherwise.
+
+#### Shadows
+
+To enable shadows on a given light, utilize the `RESULT EnableShadows()` function of the light object, which turns a given light into a shadow emitter.  Currently the engine is only capable of supporting one directional light emitter, although point lights casting shadows are future feature. 
+
