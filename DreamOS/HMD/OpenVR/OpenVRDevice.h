@@ -57,6 +57,7 @@ private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);
 	RESULT InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32_t nHeight);
 	RESULT SetupStereoRenderTargets();
+	RESULT HandleVREvent(vr::VREvent_t event);
 
 public:
 	vr::IVRSystem *m_pIVRHMD;
@@ -70,6 +71,11 @@ public:
 	OGLFramebuffer *m_pFramebufferResolveLeft;
 	OGLFramebuffer *m_pFramebufferRenderRight;
 	OGLFramebuffer *m_pFramebufferResolveRight;
+
+	vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
+
+	bool m_fVblank;
+	bool m_fGlFinishHack;
 };
 
 #endif // ! OPENVR_DEVICE_H_

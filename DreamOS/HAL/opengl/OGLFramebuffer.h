@@ -32,6 +32,7 @@ public:
 	RESULT BindOGLFramebuffer();
 	RESULT BindOGLDepthBuffer();
 	RESULT UnbindOGLFramebuffer();
+	RESULT Unbind();
 
 	RESULT AttachOGLTexture(GLuint textureIndex);
 	RESULT AttachOGLDepthbuffer();

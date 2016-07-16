@@ -163,8 +163,87 @@ Error:
 	return r;
 }
 
+RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
+	RESULT r = R_PASS;
+
+	switch (event.eventType) {
+		case vr::VREvent_TrackedDeviceActivated: {
+			//SetupRenderModelForTrackedDevice(event.trackedDeviceIndex);
+			//dprintf("Device %u attached. Setting up render model.\n", event.trackedDeviceIndex);
+			DEBUG_LINEOUT("Device %u attached", event.trackedDeviceIndex);
+		} break;
+
+		case vr::VREvent_TrackedDeviceDeactivated: {
+			DEBUG_LINEOUT("Device %u detached.\n", event.trackedDeviceIndex);
+		} break;
+
+		case vr::VREvent_TrackedDeviceUpdated: {
+			DEBUG_LINEOUT("Device %u updated.\n", event.trackedDeviceIndex);
+		} break;
+
+		// TODO: Lots more events to ultimately map...
+	}
+
+Error:
+	return r;
+}
+
 RESULT OpenVRDevice::UpdateHMD() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	// Process SteamVR events
+	vr::VREvent_t event;
+	while (m_pIVRHMD->PollNextEvent(&event, sizeof(event))) {
+		HandleVREvent(event);
+	}
+
+	// Process SteamVR controller state
+	for (vr::TrackedDeviceIndex_t unDevice = 0; unDevice < vr::k_unMaxTrackedDeviceCount; unDevice++) {
+		vr::VRControllerState_t state;
+
+		if (m_pIVRHMD->GetControllerState(unDevice, &state)) {
+			//m_rbShowTrackedDevice[unDevice] = state.ulButtonPressed == 0;
+			// TODO: do stuff
+		}
+	}
+
+	CN(m_pIVRHMD);
+
+	vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
+	/*
+
+	m_iValidPoseCount = 0;
+	m_strPoseClasses = "";
+	for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice)
+	{
+		if (m_rTrackedDevicePose[nDevice].bPoseIsValid)
+		{
+			m_iValidPoseCount++;
+			m_rmat4DevicePose[nDevice] = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
+			if (m_rDevClassChar[nDevice] == 0)
+			{
+				switch (m_pHMD->GetTrackedDeviceClass(nDevice))
+				{
+				case vr::TrackedDeviceClass_Controller:        m_rDevClassChar[nDevice] = 'C'; break;
+				case vr::TrackedDeviceClass_HMD:               m_rDevClassChar[nDevice] = 'H'; break;
+				case vr::TrackedDeviceClass_Invalid:           m_rDevClassChar[nDevice] = 'I'; break;
+				case vr::TrackedDeviceClass_Other:             m_rDevClassChar[nDevice] = 'O'; break;
+				case vr::TrackedDeviceClass_TrackingReference: m_rDevClassChar[nDevice] = 'T'; break;
+				default:                                       m_rDevClassChar[nDevice] = '?'; break;
+				}
+			}
+			m_strPoseClasses += m_rDevClassChar[nDevice];
+		}
+	}
+
+	if (m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid)
+	{
+		m_mat4HMDPose = m_rmat4DevicePose[vr::k_unTrackedDeviceIndex_Hmd].invert();
+	}
+	*/
+
+Error:
+	return r;
 }
 
 RESULT OpenVRDevice::ReleaseHMD() {
@@ -184,15 +263,113 @@ RESULT OpenVRDevice::CommitSwapChain(EYE_TYPE eye) {
 }
 
 RESULT OpenVRDevice::SubmitFrame() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+	vr::EVRCompositorError ivrResult = vr::VRCompositorError_None;
+
+	// Left Eye
+	vr::Texture_t leftEyeTexture;
+	leftEyeTexture.handle = (void*)(m_pFramebufferResolveLeft->GetOGLTextureIndex());
+	leftEyeTexture.eType = vr::API_OpenGL;
+	leftEyeTexture.eColorSpace = vr::ColorSpace_Gamma;
+	ivrResult = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
+	CB((ivrResult == vr::VRCompositorError_None));
+
+	// Right Eye
+	vr::Texture_t rightEyeTexture;
+	rightEyeTexture.handle = (void*)(m_pFramebufferResolveRight->GetOGLTextureIndex());
+	rightEyeTexture.eType = vr::API_OpenGL;
+	rightEyeTexture.eColorSpace = vr::ColorSpace_Gamma;
+	ivrResult = vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
+	CB((ivrResult == vr::VRCompositorError_None));
+	
+	if (m_fVblank && m_fGlFinishHack) {
+		//$ HACKHACK. From gpuview profiling, it looks like there is a bug where two renders and a present
+		// happen right before and after the vsync causing all kinds of jittering issues. This glFinish()
+		// appears to clear that up. Temporary fix while I try to get nvidia to investigate this problem.
+		// 1/29/2014 mikesart
+		glFinish();
+	}
+
+	/*
+	// SwapWindow
+	{
+		SDL_GL_SwapWindow(m_pWindow);
+	}
+	*/
+
+	// Clear
+	{
+		// We want to make sure the glFinish waits for the entire present to complete, not just the submission
+		// of the command. So, we do a clear here right here so the glFinish will wait fully for the swap.
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+// Flush and wait for swap.
+	if (m_fVblank) {
+		glFlush();
+		glFinish();
+	}
+
+	/*
+	// Spew out the controller and pose count whenever they change.
+	if (m_iTrackedControllerCount != m_iTrackedControllerCount_Last || m_iValidPoseCount != m_iValidPoseCount_Last)
+	{
+		m_iValidPoseCount_Last = m_iValidPoseCount;
+		m_iTrackedControllerCount_Last = m_iTrackedControllerCount;
+
+		dprintf("PoseCount:%d(%s) Controllers:%d\n", m_iValidPoseCount, m_strPoseClasses.c_str(), m_iTrackedControllerCount);
+	}
+	*/
+
+	glFinish();
+
+Error:
+	return r;
 }
 
 RESULT OpenVRDevice::SetAndClearRenderSurface(EYE_TYPE eye) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	glEnable(GL_MULTISAMPLE);
+
+	if (eye == EYE_LEFT) {
+		m_pFramebufferRenderLeft->BindOGLFramebuffer();
+		m_pFramebufferRenderLeft->SetAndClearViewportDepthBuffer();
+	}
+	else if (eye == EYE_RIGHT) {
+		m_pFramebufferRenderRight->BindOGLFramebuffer();
+		m_pFramebufferRenderRight->SetAndClearViewportDepthBuffer();
+	}
+
+Error:	
+	return r;
 }
 
 RESULT OpenVRDevice::UnsetRenderSurface(EYE_TYPE eye) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(m_pHALImp);
+
+	oglimp->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_MULTISAMPLE);
+
+	if (eye == EYE_LEFT) {
+		oglimp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_pFramebufferRenderLeft->GetFramebufferIndex());
+		oglimp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_pFramebufferResolveLeft->GetFramebufferIndex());
+	}
+	else if (eye == EYE_RIGHT) {
+		oglimp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_pFramebufferRenderRight->GetFramebufferIndex());
+		oglimp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_pFramebufferResolveRight->GetFramebufferIndex());
+	}
+
+	oglimp->glBlitFramebuffer(0, 0, m_eyeWidth, m_eyeHeight, 0, 0, m_eyeWidth, m_eyeHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+	oglimp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+	oglimp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+
+Error:
+	return r;
 }
 
 RESULT OpenVRDevice::RenderHMDMirror() {

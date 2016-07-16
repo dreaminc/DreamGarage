@@ -377,3 +377,7 @@ RESULT OGLFramebuffer::UnbindOGLFramebuffer() {
 Error:
 	return r;
 }
+
+RESULT OGLFramebuffer::Unbind() {
+	return m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
