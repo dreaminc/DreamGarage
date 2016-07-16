@@ -185,7 +185,7 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEPROC)wglGetProcAddress("glRenderbufferStorage")),
 		"Failed to initialize glRenderbufferStorage extension");
 
-	CNMW((m_glRenderBufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)wglGetProcAddress("glRenderBufferStorageMultisample")),
+	CNMW((m_glRenderBufferStorageMultisample = (PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC)wglGetProcAddress("glRenderbufferStorageMultisample")),
 		"Failed to initialize glRenderBufferStorageMultisample extension");
 
 	CNMW((m_glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)wglGetProcAddress("glFramebufferRenderbuffer")),

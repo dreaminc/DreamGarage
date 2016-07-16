@@ -60,7 +60,6 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 		CBM((0), "Invalid Eye Passed");
 	}
 
-	
 	//glGenFramebuffers(1, &framebufferDesc.m_nRenderFramebufferId);
 	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nRenderFramebufferId);
 
@@ -136,6 +135,8 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 
 	m_strDriver = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String);
 	m_strDisplay = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String);
+
+	CR(SetupStereoRenderTargets());
 
 	m_pCompositor = vr::VRCompositor();
 	CNM(m_pCompositor, "Failed to initialize IVR compositor");
