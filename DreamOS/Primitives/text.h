@@ -54,7 +54,7 @@ public:
 //	Error:
 //		Invalidate();
 	}
-	
+
 	RESULT SetText(const std::string& text, double size)
 	{
 		std::vector<quad> quads;
@@ -119,7 +119,7 @@ public:
 				vector_precision dxs = XSCALE_TO_SCREEN(glyph.xoffset);
 				vector_precision dys = YSCALE_TO_SCREEN(glyphBase - glyph.yoffset) - dy / 2.0f;
 
-				quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs , dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
+				quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs, dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
 				posx += XSCALE_TO_SCREEN(glyph.xadvance);
 			}
 		});
@@ -157,7 +157,7 @@ public:
 	
 	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)
 	{
-		float dx = (align == LEFT) ? 0.0f : ((align == CENTER) ? m_width / 2 : m_width);
+		uv_precision dx = (align == LEFT) ? 0.0f : ((align == CENTER) ? m_width / 2 : m_width);
 		return this->MoveTo(p.x() - dx, p.y(), p.z());
 	}
 
