@@ -69,8 +69,10 @@ public:
 
 		point eyePos = GetEyePosition(eye);
 
-		if (m_pHMD != nullptr)
+		if (m_pHMD != nullptr) {
 			eyePos += m_pHMD->GetHeadPointOrigin();
+			return m_pHMD->GetViewMatrix(eye);
+		}
 
 		switch (eye) {
 			case EYE_LEFT: {

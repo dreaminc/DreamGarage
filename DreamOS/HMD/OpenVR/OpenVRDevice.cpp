@@ -393,6 +393,21 @@ ProjectionMatrix OpenVRDevice::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear
 	return projMat;
 }
 
+
+// TODO: Temp for testing
+#include "External/Matrices/Matrices.h"
+
+Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose) {
+	Matrix4 matrixObj(
+		matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
+		matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
+		matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
+		matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0f
+	);
+
+	return matrixObj;
+}
+
 ViewMatrix OpenVRDevice::GetViewMatrix(EYE_TYPE eye) {
 	vr::EVREye eyeType = (eye == EYE_LEFT) ? vr::Eye_Left : vr::Eye_Right;
 
@@ -400,12 +415,31 @@ ViewMatrix OpenVRDevice::GetViewMatrix(EYE_TYPE eye) {
 		return ViewMatrix();
 
 	vr::HmdMatrix34_t matEye = m_pIVRHMD->GetEyeToHeadTransform(eyeType);
+	Matrix4 mat4Eye = ConvertSteamVRMatrixToMatrix4(matEye);
+	mat4Eye.invert();
+
+	/*
+	matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
+	matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
+	matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
+	matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0f
+	*/
 
 	ViewMatrix viewMat;
+	viewMat.identity();
 
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 3; i++)
 		for (int j = 0; j < 4; j++)
-			viewMat(i, j) = matEye.m[i][j];
+			viewMat(j, i) = mat4Eye[i * 4 + j];
+
+	Matrix4 mat4View = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
+	mat4View.invert();
+
+	viewMat.identity();
+
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 4; j++)
+			viewMat(j, i) = mat4View[i * 4 + j];
 
 	return viewMat;
 }

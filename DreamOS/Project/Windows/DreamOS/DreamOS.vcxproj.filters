@@ -138,6 +138,9 @@
     <Filter Include="HMD\OpenVR">
       <UniqueIdentifier>{0484651f-4677-4432-aa79-1926163bb61b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\Matrices">
+      <UniqueIdentifier>{ac063e77-2be8-4932-a115-19a7ed9fb129}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -313,6 +316,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp">
       <Filter>HMD\OpenVR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp">
+      <Filter>External\Matrices</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1806,8 +1812,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
       <Filter>HMD\OpenVR</Filter>
-	</ClInclude>
-
+    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
@@ -1816,6 +1821,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\BiasMatrix.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\Matrices\Matrices.h">
+      <Filter>External\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\Matrices\Vectors.h">
+      <Filter>External\Matrices</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

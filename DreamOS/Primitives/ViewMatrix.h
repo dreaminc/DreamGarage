@@ -67,10 +67,44 @@ public:
 		// empty stub
 	}
 
+	RotationMatrix GetRotationMatrix() {
+		RotationMatrix matRotation;
+
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				matRotation.element(i, j) = this->element(i, j);
+
+		return matRotation;
+	}
+
+	point GetPosition() {
+		view_precision x = m_data[3];
+		view_precision y = m_data[(4) + 3];
+		view_precision z = m_data[(8) + 3];
+		//view_precision w = this->element(3, 3);
+		view_precision w = 1.0f;
+
+		return point(x, y, z, 1.0f);
+	}
+
+	quaternion GetOrientation() {
+		return GetRotationMatrix().GetQuaternion();
+	}
+
 	RESULT PrintMatrix() {
 		DEBUG_LINEOUT("View Matrix");
 		return matrix<view_precision, 4, 4>::PrintMatrix();
 	}	
+
+	// Explicitly specializing the assignment operator
+	ViewMatrix& operator=(const matrix<view_precision, 4, 4> &arg) {
+		if (this == &arg)      // Same object?
+			return *this;        // Yes, so skip assignment, and just return *this.
+
+		memcpy(this->m_data, arg.m_data, sizeof(view_precision) * 4 * 4);
+
+		return *this;
+	}
 };
 
 #endif // ! VIEW_MATRIX_H_

@@ -58,6 +58,7 @@ private:
 	RESULT InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32_t nHeight);
 	RESULT SetupStereoRenderTargets();
 	RESULT HandleVREvent(vr::VREvent_t event);
+	float PredictSecondsToPhotons(float secondOffset = 0.0f);
 
 public:
 	vr::IVRSystem *m_pIVRHMD;
@@ -72,7 +73,14 @@ public:
 	OGLFramebuffer *m_pFramebufferRenderRight;
 	OGLFramebuffer *m_pFramebufferResolveRight;
 
+	// Pose / device tracking
+	int m_trackedControllerCount;
+	int m_trackedControllerCount_Last;
+	int m_validPoseCount;
+	int m_validPoseCount_Last;
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
+	std::string m_strPoseClasses;                            // what classes we saw poses for this frame
+	char m_rDevClassChar[vr::k_unMaxTrackedDeviceCount];   // for each device, a character representing its class
 
 	bool m_fVblank;
 	bool m_fGlFinishHack;

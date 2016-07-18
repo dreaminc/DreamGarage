@@ -41,6 +41,12 @@ public:
 		INVALID
 	} ROTATION_MATRIX_TYPE;
 
+	RotationMatrix() :
+		m_type(ARBITRARY_AXIS)
+	{
+		identity();
+	}
+
 	RotationMatrix(vector rotationAxis, rotation_precision theta) :
 		m_type(ARBITRARY_AXIS)
 	{
@@ -95,6 +101,20 @@ public:
 		this->element(2, 2) = 1.0f - 2*q.x2() - 2*q.y2();
 
 		return R_PASS;
+	}
+
+	// http://www.euclideanspace.com/maths/geometry/rotations/conversions/matrixToQuaternion/
+	quaternion GetQuaternion() {
+		quaternion q;
+		q.w() = sqrt(1.0f + this->element(0, 0) + this->element(1, 1) + this->element(2, 2)) / 2.0f;
+		
+		float w4 = q.w() * 4.0f;
+		
+		q.x() = (this->element(1, 2) - this->element(2, 1)) / w4;
+		q.y() = (this->element(2, 0) - this->element(0, 2)) / w4;
+		q.z() = (this->element(0, 1) - this->element(1, 0)) / w4;
+
+		return q;
 	}
 
 	// This is defined based on a basis of {1,0,0}, {0,1,0}, {0,0,-1}

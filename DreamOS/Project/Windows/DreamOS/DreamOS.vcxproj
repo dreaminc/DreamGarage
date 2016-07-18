@@ -177,6 +177,7 @@ xcopy /y "$(OPENVRPATH)\bin\win64\openvr_api.dll" "$(TargetDir)" /D</Command>
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
+    <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp" />
@@ -420,6 +421,8 @@ xcopy /y "$(OPENVRPATH)\bin\win64\openvr_api.dll" "$(TargetDir)" /D</Command>
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_stream_resource_handler.h" />
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_xml_object.h" />
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_zip_archive.h" />
+    <ClInclude Include="..\..\..\External\Matrices\Matrices.h" />
+    <ClInclude Include="..\..\..\External\Matrices\Vectors.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />

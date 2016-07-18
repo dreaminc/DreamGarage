@@ -99,6 +99,11 @@ public:
 		return R_PASS;
 	}
 
+	RESULT Print() {
+		DEBUG_LINEOUT("pt(%f, %f, %f, %f)", x(), y(), z(), w());
+		return R_PASS;
+	}
+
 	// Subtracting points results in vector
 	/*
 	point& operator-=(const matrix<point_precision, 4, 1> &arg) {
