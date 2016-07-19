@@ -8,7 +8,10 @@ OpenVRDevice::OpenVRDevice() :
 	m_pFramebufferRenderLeft(nullptr),
 	m_pFramebufferResolveLeft(nullptr),
 	m_pFramebufferRenderRight(nullptr),
-	m_pFramebufferResolveRight(nullptr)
+	m_pFramebufferResolveRight(nullptr),
+	m_pControllerModelLeft(nullptr),
+	m_pControllerModelRight(nullptr),
+	m_pHMDModel(nullptr)
 {
 	// TODO
 }
@@ -60,55 +63,23 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 		CBM((0), "Invalid Eye Passed");
 	}
 
-	//glGenFramebuffers(1, &framebufferDesc.m_nRenderFramebufferId);
-	//glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nRenderFramebufferId);
-
 	CR(pOGLRenderFramebuffer->OGLInitialize());
 	CR(pOGLRenderFramebuffer->BindOGLFramebuffer());
-
-	/*
-	glGenRenderbuffers(1, &framebufferDesc.m_nDepthBufferId);
-	glBindRenderbuffer(GL_RENDERBUFFER, framebufferDesc.m_nDepthBufferId);
-	glRenderbufferStorageMultisample(GL_RENDERBUFFER, 4, GL_DEPTH_COMPONENT, nWidth, nHeight);
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, framebufferDesc.m_nDepthBufferId);
-	*/
 
 	CR(pOGLRenderFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
 	CR(pOGLRenderFramebuffer->InitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OPENVR_MULTISAMPLE));
 
-	/*
-	glGenTextures(1, &framebufferDesc.m_nRenderTextureId);
-	glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId);
-	glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, 4, GL_RGBA8, nWidth, nHeight, true);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, framebufferDesc.m_nRenderTextureId, 0);
-	*/
-
 	CR(pOGLRenderFramebuffer->MakeOGLTextureMultisample());
 	CR(pOGLRenderFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
 
-	/*
-	glGenFramebuffers(1, &framebufferDesc.m_nResolveFramebufferId);
-	glBindFramebuffer(GL_FRAMEBUFFER, framebufferDesc.m_nResolveFramebufferId);
-	*/
-
 	CR(pOGLResolveFramebuffer->OGLInitialize());
 	CR(pOGLResolveFramebuffer->BindOGLFramebuffer());
-
-	/*
-	glGenTextures(1, &framebufferDesc.m_nResolveTextureId);
-	glBindTexture(GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, nWidth, nHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebufferDesc.m_nResolveTextureId, 0);
-	*/
 
 	CR(pOGLResolveFramebuffer->MakeOGLTexture());
 	OGLTexture* pOGLTexture = pOGLResolveFramebuffer->GetOGLTexture();
 	pOGLTexture->SetGLTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	pOGLTexture->SetGLTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
 	CR(pOGLResolveFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D));
-
 
 	// Check FBO status and unbind
 	CR(oglimp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -127,16 +98,13 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	CNM(m_pIVRHMD, "Failed to initialize and allocate IVR HMD");
 	CIVRM(ivrResult, "Unable to initialize IVR runtime");
 
-	m_pRenderModels = (vr::IVRRenderModels *)vr::VR_GetGenericInterface(vr::IVRRenderModels_Version, &ivrResult);
-	CIVRM(ivrResult, "Unable to get render model interface");
-
 	m_strDriver = "No Driver";
 	m_strDisplay = "No Display";
 
 	m_strDriver = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String);
 	m_strDisplay = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String);
 
-	CR(SetupStereoRenderTargets());
+	CRM(SetupStereoRenderTargets(), "Failed to get render models");
 
 	m_pCompositor = vr::VRCompositor();
 	CNM(m_pCompositor, "Failed to initialize IVR compositor");
@@ -145,9 +113,50 @@ Error:
 	return r;
 }
 
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
+void IVRThreadSleep(unsigned long nMilliseconds) {
+#if defined(_WIN32)
+	::Sleep(nMilliseconds);
+#elif defined(POSIX)
+	usleep(nMilliseconds * 1000);
+#endif
+}
+
+// TODO: Might not want to have this here (move to sandbox or sense)
+RESULT OpenVRDevice::InitializeRenderModels() {
+	RESULT r = R_PASS;
+	vr::EVRInitError ivrResult = vr::VRInitError_None;
+
+	CN(m_pHALImp);
+
+	m_pRenderModels = (vr::IVRRenderModels *)vr::VR_GetGenericInterface(vr::IVRRenderModels_Version, &ivrResult);
+	CIVRM(ivrResult, "Unable to get render model interface");
+
+	for (uint32_t unTrackedDevice = vr::k_unTrackedDeviceIndex_Hmd + 1; unTrackedDevice < vr::k_unMaxTrackedDeviceCount; unTrackedDevice++) {
+		std::string sRenderModelName = GetTrackedDeviceString(m_pIVRHMD, unTrackedDevice, vr::Prop_RenderModelName_String);
+		//CGLRenderModel *pRenderModel = FindOrLoadRenderModel(sRenderModelName.c_str());
+
+		vr::RenderModel_t *pRenderModel = nullptr;
+		vr::EVRRenderModelError error = vr::VRRenderModelError_None;
+
+		while (1) {
+			error = vr::VRRenderModels()->LoadRenderModel_Async(sRenderModelName.c_str(), &pRenderModel);
+			if (error == vr::VRRenderModelError_Loading) {
+				IVRThreadSleep(1);
+			}
+			else {
+				break;
+			}
+		}
+
+		CBM((error == vr::VRRenderModelError_None), "Failed to load %s model", sRenderModelName);
+
+
+	}
+
+Error:
+	return r;
+}
+
 RESULT OpenVRDevice::SetupStereoRenderTargets() {
 	RESULT r = R_PASS;
 
@@ -188,6 +197,32 @@ Error:
 	return r;
 }
 
+Matrix4 OpenVRDevice::ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose) {
+
+	Matrix4 matrixObj(
+		matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
+		matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
+		matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
+		matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0f
+		);
+
+	return matrixObj;
+}
+
+ViewMatrix OpenVRDevice::ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_t &matPose) {
+	Matrix4 mat4 = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
+	mat4.invert();
+
+	ViewMatrix viewMat;
+	viewMat.identity();
+
+	for (int i = 0; i < 3; i++)
+		for (int j = 0; j < 4; j++)
+			viewMat(j, i) = mat4[i * 4 + j];
+
+	return viewMat;
+}
+
 RESULT OpenVRDevice::UpdateHMD() {
 	RESULT r = R_PASS;
 
@@ -210,37 +245,52 @@ RESULT OpenVRDevice::UpdateHMD() {
 	CN(m_pIVRHMD);
 
 	vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
-	/*
 
-	m_iValidPoseCount = 0;
+	m_validPoseCount = 0;
 	m_strPoseClasses = "";
-	for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice)
-	{
-		if (m_rTrackedDevicePose[nDevice].bPoseIsValid)
-		{
-			m_iValidPoseCount++;
-			m_rmat4DevicePose[nDevice] = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
-			if (m_rDevClassChar[nDevice] == 0)
-			{
-				switch (m_pHMD->GetTrackedDeviceClass(nDevice))
-				{
-				case vr::TrackedDeviceClass_Controller:        m_rDevClassChar[nDevice] = 'C'; break;
-				case vr::TrackedDeviceClass_HMD:               m_rDevClassChar[nDevice] = 'H'; break;
-				case vr::TrackedDeviceClass_Invalid:           m_rDevClassChar[nDevice] = 'I'; break;
-				case vr::TrackedDeviceClass_Other:             m_rDevClassChar[nDevice] = 'O'; break;
-				case vr::TrackedDeviceClass_TrackingReference: m_rDevClassChar[nDevice] = 'T'; break;
-				default:                                       m_rDevClassChar[nDevice] = '?'; break;
+
+	for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice) {
+		if (m_rTrackedDevicePose[nDevice].bPoseIsValid) {
+			
+			m_validPoseCount++;
+
+				switch (m_pIVRHMD->GetTrackedDeviceClass(nDevice)) {
+					case vr::TrackedDeviceClass_Controller: {
+						Matrix4 poseMat4 = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
+						Vector4 centerVec4 = poseMat4 * Vector4(0, 0, 0, 1);
+						
+						point ptControllerPosition = point(centerVec4.x, centerVec4.y, centerVec4.z);
+						ptControllerPosition.Print();
+
+					} break;
+
+					case vr::TrackedDeviceClass_HMD: {
+						ViewMatrix viewMat = ConvertSteamVRMatrixToViewMatrix(m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
+						m_ptOrigin = viewMat.GetPosition();
+
+						m_qOrientation = viewMat.GetOrientation();
+						m_qOrientation.Reverse();
+					} break;
+
+					case vr::TrackedDeviceClass_Invalid: {
+						// TODO: Handle invalid
+					} break;
+
+					case vr::TrackedDeviceClass_Other: {
+						// TODO: Handle other
+					} break;
+
+					case vr::TrackedDeviceClass_TrackingReference: {
+						// TODO: Handle tracking reference
+					} break;
+
+					default: {
+						// TODO: Default handling
+					} break;
 				}
-			}
-			m_strPoseClasses += m_rDevClassChar[nDevice];
+			
 		}
 	}
-
-	if (m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].bPoseIsValid)
-	{
-		m_mat4HMDPose = m_rmat4DevicePose[vr::k_unTrackedDeviceIndex_Hmd].invert();
-	}
-	*/
 
 Error:
 	return r;
@@ -391,21 +441,6 @@ ProjectionMatrix OpenVRDevice::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear
 			projMat(i, j) = mat.m[i][j];
 
 	return projMat;
-}
-
-
-// TODO: Temp for testing
-#include "External/Matrices/Matrices.h"
-
-Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose) {
-	Matrix4 matrixObj(
-		matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
-		matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
-		matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
-		matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0f
-	);
-
-	return matrixObj;
 }
 
 ViewMatrix OpenVRDevice::GetViewMatrix(EYE_TYPE eye) {

@@ -26,6 +26,9 @@
 
 #include "HAL/opengl/OGLFramebuffer.h"
 
+// TODO: Temp for testing
+#include "External/Matrices/Matrices.h"
+
 // IVR EHM extension
 
 #define CIVR(ivrr) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){goto Error;}}while(0);
@@ -58,11 +61,14 @@ private:
 	RESULT InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32_t nHeight);
 	RESULT SetupStereoRenderTargets();
 	RESULT HandleVREvent(vr::VREvent_t event);
-	float PredictSecondsToPhotons(float secondOffset = 0.0f);
+	//float PredictSecondsToPhotons(float secondOffset = 0.0f);
+	Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose);
+	ViewMatrix ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_t &matPose);
+
+	RESULT InitializeRenderModels();
 
 public:
 	vr::IVRSystem *m_pIVRHMD;
-	vr::IVRRenderModels *m_pRenderModels;
 	vr::IVRCompositor *m_pCompositor;
 
 	std::string m_strDriver;
@@ -80,10 +86,15 @@ public:
 	int m_validPoseCount_Last;
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
 	std::string m_strPoseClasses;                            // what classes we saw poses for this frame
-	char m_rDevClassChar[vr::k_unMaxTrackedDeviceCount];   // for each device, a character representing its class
 
 	bool m_fVblank;
 	bool m_fGlFinishHack;
+
+	// Device Render Models
+	vr::IVRRenderModels *m_pRenderModels;
+	model *m_pControllerModelLeft;
+	model *m_pControllerModelRight;
+	model *m_pHMDModel;
 };
 
 #endif // ! OPENVR_DEVICE_H_

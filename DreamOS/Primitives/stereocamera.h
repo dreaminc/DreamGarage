@@ -71,7 +71,7 @@ public:
 
 		if (m_pHMD != nullptr) {
 			eyePos += m_pHMD->GetHeadPointOrigin();
-			return m_pHMD->GetViewMatrix(eye);
+			//return m_pHMD->GetViewMatrix(eye);
 		}
 
 		switch (eye) {
