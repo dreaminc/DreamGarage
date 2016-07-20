@@ -40,7 +40,8 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
-
+	
+	/* For DEBUG
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
 	RESULT Render() override {
@@ -60,6 +61,7 @@ public:
 	Error:
 		return r;
 	}
+	*/
 };
 
 #endif // ! OGL_MODEL_H_
