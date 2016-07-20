@@ -59,6 +59,8 @@ public:
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual skybox *MakeSkybox() = 0;
 	virtual model *MakeModel(wchar_t *pszModelName) = 0;
+	virtual model *MakeModel(const std::vector<vertex>& vertices) = 0;
+	virtual model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) = 0;
 
 	// TODO: Fix this
 	virtual RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0) = 0;

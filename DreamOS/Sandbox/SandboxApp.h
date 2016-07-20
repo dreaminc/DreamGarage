@@ -59,6 +59,8 @@ public:
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);
+	model *AddModel(const std::vector<vertex>& vertices);
+	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	RESULT AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 

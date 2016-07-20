@@ -73,6 +73,8 @@ public:
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
+	model *MakeModel(const std::vector<vertex>& vertices);
+	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	// TODO: Convert to composite
 	RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);

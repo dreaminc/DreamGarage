@@ -22,6 +22,7 @@
 #define HMD_NUM_EYES 2
 
 class HALImp;
+class SandboxApp;
 
 typedef enum HMDEventType {
 	HMD_EVENT_ORIENTATION,
@@ -69,8 +70,9 @@ typedef struct HMDEvent {
 
 class HMD : public Publisher<HMDEventType, HMDEvent> {
 public:
-	HMD() :
+	HMD(SandboxApp *pParentSandbox) :
 		m_pHALImp(nullptr),
+		m_pParentSandbox(pParentSandbox),
 		m_eyeWidth(0),
 		m_eyeHeight(0)
 	{
@@ -122,7 +124,9 @@ protected:
 	uint32_t m_eyeWidth;
 	uint32_t m_eyeHeight;
 
-	HALImp *m_pHALImp;
+	HALImp *m_pHALImp;	// TODO: This may not be needed if Sandbox parent is kept
+
+	SandboxApp *m_pParentSandbox;
 
 private:
 	UID m_uid;

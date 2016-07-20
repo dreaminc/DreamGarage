@@ -36,7 +36,7 @@
 
 class OpenVRDevice : public HMD {
 public:
-	OpenVRDevice();
+	OpenVRDevice(SandboxApp *pParentSandbox);
 	~OpenVRDevice();
 
 	RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
@@ -65,7 +65,9 @@ private:
 	Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose);
 	ViewMatrix ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_t &matPose);
 
-	RESULT InitializeRenderModels();
+	// Models
+	RESULT InitializeRenderModels();								// This sets up the models
+	RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID);	// This sets up a given model
 
 public:
 	vr::IVRSystem *m_pIVRHMD;

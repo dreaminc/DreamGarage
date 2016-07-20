@@ -32,7 +32,7 @@ class OGLFramebuffer;
 
 class OVRHMD : public HMD {
 public:
-	OVRHMD();
+	OVRHMD(SandboxApp *pParentSandbox);
 	~OVRHMD();
 
 	//RESULT InitializeHMD(HALImp *halimp);

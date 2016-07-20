@@ -1,6 +1,8 @@
 #include "OVR.h"
 #include <math.h>
 
+#include "Sandbox/SandboxApp.h"
+
 // TODO: Fix this encapsulation
 #include "HAL/opengl/OpenGLImp.h"
 
@@ -9,7 +11,8 @@
 
 #include "Extras/OVR_Math.h"
 
-OVRHMD::OVRHMD() :
+OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
+	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
 	m_ovrMirrorTexture(nullptr)
 {

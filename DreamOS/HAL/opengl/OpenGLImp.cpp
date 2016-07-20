@@ -180,10 +180,10 @@ RESULT OpenGLImp::PrepareScene() {
 	
 	// TODO(NTH): Add a program / render pipeline arch
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
 	
@@ -216,7 +216,7 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Allocate the camera
 	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 100.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, -2.0f), 100.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -432,6 +432,40 @@ model *OpenGLImp::MakeModel(wchar_t *pszModelName) {
 	CN(pModel);
 
 //Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices) {
+	RESULT r = R_PASS;
+
+	model *pModel = new OGLModel(this, vertices);
+	CN(pModel);
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+	RESULT r = R_PASS;
+
+	model *pModel = new OGLModel(this, vertices, indices);
+	CN(pModel);
+
+	//Success:
 	return pModel;
 
 Error:

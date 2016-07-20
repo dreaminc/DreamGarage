@@ -1,7 +1,10 @@
 #include "OpenVRDevice.h"
 #include "HAL/opengl/OGLTexture.h"
 
-OpenVRDevice::OpenVRDevice() :
+#include "Sandbox/SandboxApp.h"
+
+OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
+	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),
 	m_pRenderModels(nullptr),
 	m_pCompositor(nullptr),
@@ -109,6 +112,8 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	m_pCompositor = vr::VRCompositor();
 	CNM(m_pCompositor, "Failed to initialize IVR compositor");
 
+	CRM(InitializeRenderModels(), "Failed to load render models");
+
 Error:
 	return r;
 }
@@ -119,6 +124,87 @@ void IVRThreadSleep(unsigned long nMilliseconds) {
 #elif defined(POSIX)
 	usleep(nMilliseconds * 1000);
 #endif
+}
+
+RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
+	RESULT r = R_PASS;
+
+	vr::RenderModel_t *pRenderModel = nullptr;
+	vr::RenderModel_TextureMap_t *pRenderModelTexture = nullptr;
+	vr::EVRRenderModelError error = vr::VRRenderModelError_None;
+	std::vector<vertex> verts;
+	std::vector<dimindex> indices;
+
+	std::string sRenderModelName = GetTrackedDeviceString(m_pIVRHMD, deviceID, vr::Prop_RenderModelName_String);
+	CB((sRenderModelName.length() > 0));
+
+	while (1) {
+		error = vr::VRRenderModels()->LoadRenderModel_Async(sRenderModelName.c_str(), &pRenderModel);
+		if (error == vr::VRRenderModelError_Loading) {
+			IVRThreadSleep(1);
+		}
+		else {
+			break;
+		}
+	}
+	CBM((error == vr::VRRenderModelError_None), "Failed to load %s model", sRenderModelName);
+
+	while (1) {
+		error = vr::VRRenderModels()->LoadTexture_Async(pRenderModel->diffuseTextureId, &pRenderModelTexture);
+		if (error == vr::VRRenderModelError_Loading) {
+			IVRThreadSleep(1);
+		}
+		else {
+			break;
+		}
+	}
+	CBM((error == vr::VRRenderModelError_None), "Failed to load %s model", sRenderModelName);
+
+	// TODO: Load these as models now
+	for (uint32_t i = 0; i < pRenderModel->unVertexCount; i++) {
+		vr::RenderModel_Vertex_t pVertex = pRenderModel->rVertexData[i];
+
+		point ptVert = point(pVertex.vPosition.v[0], pVertex.vPosition.v[1], pVertex.vPosition.v[2]);
+		vector vVertNormal = vector(pVertex.vNormal.v[0], pVertex.vNormal.v[1], pVertex.vNormal.v[2]);
+		uvcoord uvVert = uvcoord(pVertex.rfTextureCoord[0], pVertex.rfTextureCoord[1]);
+
+		vertex newVert = vertex(ptVert, vVertNormal, uvVert);
+		verts.push_back(newVert);
+	}
+
+	for (uint32_t i = 0; i < pRenderModel->unTriangleCount; i++) {
+		dimindex indA = (dimindex)pRenderModel->rIndexData[(i * 3)];
+		dimindex indB = (dimindex)pRenderModel->rIndexData[(i * 3) + 1];
+		dimindex indC = (dimindex)pRenderModel->rIndexData[(i * 3) + 2];
+
+		// TODO: THIS
+		//TriangleIndexGroup triGroup = TriangleIndexGroup(indA, indB, indC);
+
+		indices.push_back(indA);
+		indices.push_back(indB);
+		indices.push_back(indC);
+	}
+
+	CBM((verts.size() == pRenderModel->unVertexCount), "Vertex count mismatch");
+	CBM((indices.size() == (pRenderModel->unTriangleCount * 3)), "Index count mismatch");
+
+	model *pModel = m_pParentSandbox->AddModel(verts, indices);
+
+
+Error:
+	/*
+	if(pRenderModel != nullptr) {
+		vr::VRRenderModels()->FreeRenderModel(pRenderModel);
+		pRenderModel = nullptr;
+	}
+
+	if (pRenderModelTexture != nullptr) {
+		vr::VRRenderModels()->FreeTexture(pRenderModelTexture);
+		pRenderModelTexture = nullptr;
+	}
+	*/
+
+	return r;
 }
 
 // TODO: Might not want to have this here (move to sandbox or sense)
@@ -132,25 +218,12 @@ RESULT OpenVRDevice::InitializeRenderModels() {
 	CIVRM(ivrResult, "Unable to get render model interface");
 
 	for (uint32_t unTrackedDevice = vr::k_unTrackedDeviceIndex_Hmd + 1; unTrackedDevice < vr::k_unMaxTrackedDeviceCount; unTrackedDevice++) {
-		std::string sRenderModelName = GetTrackedDeviceString(m_pIVRHMD, unTrackedDevice, vr::Prop_RenderModelName_String);
-		//CGLRenderModel *pRenderModel = FindOrLoadRenderModel(sRenderModelName.c_str());
+		vr::ETrackedDeviceClass trackedDeviceClass = m_pIVRHMD->GetTrackedDeviceClass(unTrackedDevice);
 
-		vr::RenderModel_t *pRenderModel = nullptr;
-		vr::EVRRenderModelError error = vr::VRRenderModelError_None;
-
-		while (1) {
-			error = vr::VRRenderModels()->LoadRenderModel_Async(sRenderModelName.c_str(), &pRenderModel);
-			if (error == vr::VRRenderModelError_Loading) {
-				IVRThreadSleep(1);
-			}
-			else {
-				break;
-			}
+		// Set up controller
+		if (trackedDeviceClass == vr::TrackedDeviceClass_Controller) {
+			CR(InitializeRenderModel(unTrackedDevice));
 		}
-
-		CBM((error == vr::VRRenderModelError_None), "Failed to load %s model", sRenderModelName);
-
-
 	}
 
 Error:
