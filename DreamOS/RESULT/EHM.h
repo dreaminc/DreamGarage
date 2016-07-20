@@ -13,7 +13,7 @@
 #define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
 
-#define HUD_ON
+//#define HUD_ON
 
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system

@@ -6,6 +6,7 @@
 #include "Primitives/TranslationMatrix.h"
 #include "Primitives/RotationMatrix.h"
 #include <vector>
+#include <string>
 
 #include "../DreamOS/Profiler/Profiler.h"
 
@@ -272,6 +273,14 @@ RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
 
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("!!!!!!!!!!!!!Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
+	switch (kbEvent->KeyCode) {
+		case (SK_SCAN_CODE)('F') : {
+			this->SetRenderProfiler(!this->GetRenderProfiler());
+			this->p->SetValue(std::to_string(this->GetRenderProfiler()));
+		}
+	}
 
 	/* This has been moved to the camera 
 	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
@@ -572,7 +581,9 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	}
 	
 	// Render profiler overlay
-	m_pOGLProfiler->Render();
+	if (this->GetRenderProfiler()) {
+		m_pOGLProfiler->Render();
+	}
 
 	glFlush();
 
@@ -627,7 +638,10 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		}
 
 		// Render profiler overlay
-		m_pOGLProfiler->Render();
+		// Render profiler overlay
+		if (!this->GetRenderProfiler()) {
+			m_pOGLProfiler->Render();
+		}
 	}
 
 	glFlush();
@@ -699,7 +713,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		}
 		
 		// Render profiler overlay
-		if (eye == EYE_LEFT) {
+		if (eye == EYE_LEFT && this->GetRenderProfiler()) {
 			m_pOGLProfiler->Render();
 		}
 

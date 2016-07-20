@@ -119,7 +119,7 @@ RESULT DreamGarage::Update(void) {
 	m_pSphere->translateX(0.005f);
 	if (p)
 		p->SetValue(std::to_string(m_pSphere->GetOrigin().x()));
-	if (m_pSphere->GetOrigin().x() > 3)
+	if (m_pSphere->GetOrigin().x() > 30)
 		DebugConsole::GetDebugConsole()->Unregister(p);
 
 //Error:
