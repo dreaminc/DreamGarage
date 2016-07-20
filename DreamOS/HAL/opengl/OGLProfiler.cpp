@@ -73,17 +73,8 @@ void OGLProfiler::Render()
 		posY += 0.05f;
 	}
 
-	posY = 0;
-	//const int maxRows = 28;
-	for (auto	it = DebugConsole::GetDebugConsole()->GetConsoleData().begin();
-		it < DebugConsole::GetDebugConsole()->GetConsoleData().end();
-		it++)
-	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText((*it)->GetValue(), 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
-		posY += 0.05f;
-	}
 	// Render debug console text
-	//m_OGLConsole.Render();
+	m_OGLConsole.Render();
 }
 
 // OGLProfilerGraph
@@ -201,26 +192,18 @@ void OGLDebugConsole::Init()
 {
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 
-/*	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
-	m_OGLTitleText->MoveTo(-0.7f, -0.7f, 0);
-
 	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(100, '0'));
-	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);*/
+	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 }
 
 void OGLDebugConsole::Render()
 {
-
 	float posY = 0;
-	//const int maxRows = 28;
-	auto a = DebugConsole::GetDebugConsole();
 	for (auto	it = DebugConsole::GetDebugConsole()->GetConsoleData().begin();
 		it < DebugConsole::GetDebugConsole()->GetConsoleData().end();
 		it++)
 	{
-	//	HUD_OUT("test");
-		//HUD_OUT("%s", *it);
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText("test", 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText((*it)->GetValue(), 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
 		posY += 0.05f;
 	}
 }
