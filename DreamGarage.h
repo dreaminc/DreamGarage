@@ -2,6 +2,7 @@
 #define DREAM_GARAGE_H_
 
 #include "RESULT/EHM.h"
+#include "Profiler/DebugConsole.h"
 
 // DREAM GARAGE
 // DreamGarage.h
@@ -25,6 +26,7 @@ public:
 
 private:
 	sphere *m_pSphere;
+	std::shared_ptr<DebugData> p;
 };
 
 

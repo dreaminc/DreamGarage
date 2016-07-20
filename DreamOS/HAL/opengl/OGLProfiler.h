@@ -56,6 +56,22 @@ private:
 	std::unique_ptr<OGLText>	 m_OGLFPSText;
 };
 
+class OGLDebugConsole : public OGLRenderContext {
+public:
+	OGLDebugConsole(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
+	~OGLDebugConsole();
+
+	void Init();
+	void Render();
+	void Destroy();
+
+private:
+	
+	std::shared_ptr<Font>	m_OGLFont;
+	std::unique_ptr<OGLText>	m_OGLConsoleText;
+
+};
+
 class OGLProfiler : public OGLRenderContext {
 public:
 	OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
@@ -75,6 +91,7 @@ private:
 	std::unique_ptr<OGLText>	 m_OGLConsoleText;
 
 	OGLProfilerGraph	m_OGLGraph;
+	OGLDebugConsole		m_OGLConsole;
 };
 
 #endif // ! OGLPROFILER_H

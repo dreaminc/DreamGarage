@@ -308,6 +308,9 @@
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1797,6 +1800,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Profiler\DebugConsole.h">
+      <Filter>Profiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

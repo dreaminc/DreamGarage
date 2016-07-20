@@ -1,4 +1,5 @@
 #include "DreamGarage.h"
+#include <string>
 
 //quad *g_pQuad;
 
@@ -45,11 +46,12 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	/*
+	///*
 	m_pSphere = AddSphere(0.5f, 40, 40);
 	m_pSphere->SetColorTexture(pColorTexture);
 	m_pSphere->SetBumpTexture(pBumpTexture);
 	//*/
+	p = DebugConsole::GetDebugConsole()->Register();
 
 	/*
 	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
@@ -114,8 +116,11 @@ RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 
 	// Update stuff ...
-
-	//m_pSphere->translateX(0.005f);
+	m_pSphere->translateX(0.005f);
+	if (p)
+		p->SetValue(std::to_string(m_pSphere->GetOrigin().x()));
+	if (m_pSphere->GetOrigin().x() > 3)
+		DebugConsole::GetDebugConsole()->Unregister(p);
 
 //Error:
 	return r;

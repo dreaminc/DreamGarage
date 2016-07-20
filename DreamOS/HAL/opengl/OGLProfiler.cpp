@@ -7,12 +7,14 @@
 #include "OGLText.h"
 
 #include "Profiler/Profiler.h"
+#include "Profiler/DebugConsole.h"
 
 // OGLProfiler
 
 OGLProfiler::OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
 	OGLRenderContext(pOGL, pOGLProgram),
-	m_OGLGraph(pOGL, pOGLProgram)
+	m_OGLGraph(pOGL, pOGLProgram),
+	m_OGLConsole(pOGL, pOGLProgram)
 {
 	Init();
 }
@@ -70,6 +72,18 @@ void OGLProfiler::Render()
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1f)->MoveTo(-0.8f, 0.8f - posY, 0));
 		posY += 0.05f;
 	}
+
+	posY = 0;
+	//const int maxRows = 28;
+	for (auto	it = DebugConsole::GetDebugConsole()->GetConsoleData().begin();
+		it < DebugConsole::GetDebugConsole()->GetConsoleData().end();
+		it++)
+	{
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText((*it)->GetValue(), 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
+		posY += 0.05f;
+	}
+	// Render debug console text
+	//m_OGLConsole.Render();
 }
 
 // OGLProfilerGraph
@@ -168,4 +182,50 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 3.0f)->MoveTo(left - 0.03f, YSCALE(minFPS) - 0.05f, 0));
 	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 3.0f)->MoveTo(left - 0.03f, YSCALE(maxFPS), 0));
+}
+
+
+// OGLDebugConsole
+OGLDebugConsole::OGLDebugConsole(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
+	OGLRenderContext(pOGL, pOGLProgram)
+{
+	Init();
+}
+
+OGLDebugConsole::~OGLDebugConsole()
+{
+	Destroy();
+}
+
+void OGLDebugConsole::Init()
+{
+	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
+
+/*	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
+	m_OGLTitleText->MoveTo(-0.7f, -0.7f, 0);
+
+	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(100, '0'));
+	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);*/
+}
+
+void OGLDebugConsole::Render()
+{
+
+	float posY = 0;
+	//const int maxRows = 28;
+	auto a = DebugConsole::GetDebugConsole();
+	for (auto	it = DebugConsole::GetDebugConsole()->GetConsoleData().begin();
+		it < DebugConsole::GetDebugConsole()->GetConsoleData().end();
+		it++)
+	{
+	//	HUD_OUT("test");
+		//HUD_OUT("%s", *it);
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText("test", 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
+		posY += 0.05f;
+	}
+}
+
+void OGLDebugConsole::Destroy()
+{
+
 }
