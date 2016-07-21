@@ -9,7 +9,7 @@ DebugConsole::DebugConsole()
 
 DebugConsole::~DebugConsole()
 {
-
+	m_data.clear();
 }
 
 const std::vector<std::shared_ptr<DebugData>>& DebugConsole::GetConsoleData()
@@ -40,10 +40,9 @@ DebugData::DebugData()
 
 DebugData::~DebugData()
 {
-
 };
 
-std::string DebugData::GetValue()
+const std::string& DebugData::GetValue()
 {
 	return m_value;
 }

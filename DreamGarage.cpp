@@ -51,7 +51,7 @@ RESULT DreamGarage::LoadScene() {
 	m_pSphere->SetColorTexture(pColorTexture);
 	m_pSphere->SetBumpTexture(pBumpTexture);
 	//*/
-	spherePosition = DebugConsole::GetDebugConsole()->Register();
+	m_spherePosition = DebugConsole::GetDebugConsole()->Register();
 
 	/*
 	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
@@ -117,8 +117,8 @@ RESULT DreamGarage::Update(void) {
 
 	// Update stuff ...
 	m_pSphere->translateX(0.005f);
-	CN(spherePosition);
-	spherePosition->SetValue(std::to_string(m_pSphere->GetOrigin().x()));
+	CN(m_spherePosition);
+	m_spherePosition->SetValue(std::to_string(m_pSphere->GetOrigin().x()));
 
 Error:
 	return r;

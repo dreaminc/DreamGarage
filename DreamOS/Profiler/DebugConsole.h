@@ -8,7 +8,7 @@
 class DebugData {
 
 public:
-	std::string GetValue();
+	const std::string& GetValue();
 	void SetValue(std::string value);
 
 	DebugData();
