@@ -17,8 +17,8 @@ protected:
 	}
 
 public:
-	OGLSphere(OpenGLImp *pParentImp, float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) :
-		sphere(1.0f, numAngularDivisions, numVerticalDivisions),
+	OGLSphere(OpenGLImp *pParentImp, float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) :
+		sphere(1.0f, numAngularDivisions, numVerticalDivisions, c),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM

@@ -2,13 +2,27 @@
 
 //quad *g_pQuad;
 
+light *g_pLight = nullptr;
+
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
 	// Add lights
 
 	///*
-	AddLight(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	// TODO: Special lane for global light
+	//vector lightdir = vector(0.0f, 1.0f, -0.5f);
+	vector lightdir = vector(0.0f, -1.0f, 0.5f);
+	lightdir.Normalize();
+
+	//float lightdistance = 10.0f;
+	//point lightpoint = -1.0f * lightdir * lightdistance;
+	//lightpoint.w() = 0.0f;
+
+	point lightpoint = point(0.0f, 10.0f, 0.0f);
+	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, lightpoint, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
+	g_pLight->EnableShadows();
 	//*/
 
 	/*
@@ -30,15 +44,31 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 
 	// TODO: Combine this into one call
+	///*
 	texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	skybox *pSkybox = AddSkybox();
 	pSkybox->SetCubeMapTexture(pCubeMap);
+	//*/
 
-	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
-	pQuad->SetColorTexture(pColorTextureCobble);
+
+	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
+	//pQuad->SetColorTexture(pColorTextureCobble);
+
+	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
+	//pQuad->SetColorTexture(pColorTextureCobble);
 
 	HUD_OUT("Hello World");
+
 	//pQuad->SetBumpTexture(pBumpTexture);
+
+	quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
+	pQuad->MoveTo(0.0f, -1.0f, 0.0f);
+
+	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
+	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
+
+	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -61,10 +91,9 @@ RESULT DreamGarage::LoadScene() {
 	pSphere2->translateX(5.0f);
 	//*/
 
-	/*
-	volume *pVolume = AddVolume(1.0f);
-	pVolume->translateX(5.0f);
-	*/
+	
+	volume *pVolume = AddVolume(0.5f);
+	pVolume->MoveTo(-1.0f, 1.0f, 0.0f);
 
 	/*
 	// TODO: All this should go into Model
@@ -117,7 +146,10 @@ RESULT DreamGarage::Update(void) {
 
 	// Update stuff ...
 
-	//m_pSphere->translateX(0.005f);
+	//m_pSphere->translateX(0.001f);
+
+	//g_pLight->RotateLightDirectionYAxis(0.001f);
+	g_pLight->RotateLightDirectionXAxis(0.00005f * 1.3f);
 
 //Error:
 	return r;

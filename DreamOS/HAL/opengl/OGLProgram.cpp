@@ -2,18 +2,31 @@
 #include "OpenGLImp.h"
 #include "OGLObj.h"
 
+#include "OGLFramebuffer.h"
+#include "OGLTexture.h"
+
+#include "Scene/SceneGraph.h"
+
 OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),
 	m_pFragmentShader(nullptr),
-	m_versionOGL(0)
+	m_versionOGL(0),
+	m_pOGLFramebuffer(nullptr),
+	m_pOGLRenderTexture(nullptr),
+	m_pOGLProgramDepth(nullptr)
 {
 	// empty
 }
 
 OGLProgram::~OGLProgram() {
 	ReleaseProgram();
+}
+
+RESULT OGLProgram::SetOGLProgramDepth(OGLProgram *pOGLProgramDepth) {
+	m_pOGLProgramDepth = pOGLProgramDepth;
+	return R_PASS;
 }
 
 // Note that all vertex attrib, uniforms, uniform blocks are actually 
@@ -23,6 +36,20 @@ RESULT OGLProgram::OGLInitialize() {
 
 	CR(CreateProgram());
 	CR(IsProgram());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::SetLights(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	std::vector<light*> *pLights = NULL;
+	CR(pObjectStore->GetLights(pLights));
+	CN(pLights);
+
+	CR(SetLights(pLights));
 
 Error:
 	return r;
@@ -42,6 +69,150 @@ RESULT OGLProgram::UpdateUniformBlockBuffers() {
 	for (auto const& oglUniformBlock : m_uniformBlocks) {
 		CRM(oglUniformBlock->UpdateOGLUniformBlockBuffers(), "Failed to bind %s uniform block", oglUniformBlock->GetUniformBlockName());
 	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindToDepthBuffer() {
+	RESULT r = R_PASS;
+
+	CR(m_pOGLFramebuffer->BindOGLDepthBuffer());
+	CR(m_pOGLFramebuffer->SetAndClearViewportDepthBuffer());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindToFramebuffer() {
+	RESULT r = R_PASS;
+
+	//CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+
+	// Render to our framebuffer
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebuffer->GetFramebufferIndex()));
+	CR(m_pOGLFramebuffer->SetAndClearViewport());
+
+	// Check framebuffer
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UnbindFramebuffer() {
+	RESULT r = R_PASS;
+
+	//CR(m_pOGLFramebuffer->UnbindOGLFramebuffer());
+
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindToScreen(int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CR(m_pOGLFramebuffer->BindToScreen(pxWidth, pxHeight));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeRenderToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CR(InitializeFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeDepthToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CR(InitializeDepthFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::SetDepthTexture(int textureNumber) {
+	return m_pOGLFramebuffer->SetDepthTexture(textureNumber);
+}
+
+GLuint OGLProgram::GetOGLDepthbufferIndex() {
+	return m_pOGLFramebuffer->GetOGLDepthbufferIndex();
+}
+
+// TODO: here
+RESULT OGLProgram::InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 1);
+	CN(m_pOGLFramebuffer);
+
+	CR(m_pOGLFramebuffer->OGLInitialize());
+	CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+
+	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(m_pOGLFramebuffer->InitializeDepthBuffer(internalDepthFormat, typeDepth));
+
+	CR(m_pOGLFramebuffer->SetOGLDepthbufferTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+
+	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(0));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+// TODO: This is not generic, hacking right now to get shadows to work first then will generalize
+RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
+	CN(m_pOGLFramebuffer);
+	
+	CR(m_pOGLFramebuffer->OGLInitialize());	
+	CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+
+	CR(m_pOGLFramebuffer->MakeOGLTexture());
+
+	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(m_pOGLFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
+
+	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(1));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	m_pOGLRenderTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR); 
+	CN(m_pOGLRenderTexture);
+
+	CR(m_pOGLRenderTexture->SetWidth(pxWidth));
+	CR(m_pOGLRenderTexture->SetHeight(pxWidth));
+	CR(m_pOGLRenderTexture->SetChannels(channels));
+
+	CR(m_pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, internalDepthFormat, GL_DEPTH_COMPONENT, typeDepth));
+
+	CR(m_pOGLRenderTexture->BindTexture(GL_TEXTURE_2D));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
 Error:
 	return r;
@@ -493,6 +664,27 @@ RESULT OGLProgram::MakeFragmentShader(const wchar_t *pszFilename) {
 	CRM(pFragmentShader->InitializeFromFile(pszFilename, m_versionOGL), "Failed to initialize fragment shader from file");
 
 	CRM(AttachShader(pFragmentShader), "Failed to attach fragment shader");
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderSceneGraph(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+	
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = NULL;
+
+	pSceneGraph->Reset();
+	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+		if (pDimObj == NULL)
+			continue;
+		else {
+			CR(RenderObject(pDimObj));
+		}
+	}
 
 Error:
 	return r;

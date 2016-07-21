@@ -36,6 +36,7 @@ public:
 
 public:
 	texture();
+	texture(texture::TEXTURE_TYPE type);
 	texture(texture::TEXTURE_TYPE type, int width, int height, int channels);
 	texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture(wchar_t * pszName, std::vector<std::wstring> cubeMapFiles);
@@ -67,6 +68,48 @@ public:
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
 
 	double GetValueAtUV(double uValue, double vValue);
+
+	int GetWidth() {
+		return m_width;
+	}
+
+	int GetHeight() {
+		return m_height;
+	}
+
+	int GetChannels() {
+		return m_channels;
+	}
+
+	RESULT SetWidth(int width) {
+		if (m_width != NULL) {
+			return R_FAIL;
+		}
+		else {
+			m_width = width;
+			return R_PASS;
+		}
+	}
+
+	RESULT SetHeight(int height) {
+		if (m_height != NULL) {
+			return R_FAIL;
+		}
+		else {
+			m_height = height;
+			return R_PASS;
+		}
+	}
+
+	RESULT SetChannels(int channels) {
+		if (m_channels != NULL) {
+			return R_FAIL;
+		}
+		else {
+			m_channels = channels;
+			return R_PASS;
+		}
+	}
 
 protected:
 	int m_width;

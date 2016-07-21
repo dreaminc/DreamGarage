@@ -23,7 +23,20 @@ public:
 		// Empty
 	}
 
-	RESULT OGLInitialize() {
+	// TODO: This is a temporary approach
+	RESULT OGLInitializeRenderBuffer() {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->glGenRenderbuffers(1, &m_depthbufferIndex));
+		CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufferIndex));
+		CR(m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height));
+		CR(m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex));
+
+	Error:
+		return r;
+	}
+
+	RESULT OGLInitialize(GLenum internalFormat = GL_DEPTH_COMPONENT24, GLenum type = GL_UNSIGNED_INT) {
 		RESULT r = R_PASS;
 
 		// TODO: Replace with texture object instead?
@@ -34,9 +47,6 @@ public:
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-
-		GLenum internalFormat = GL_DEPTH_COMPONENT24;
-		GLenum type = GL_UNSIGNED_INT;
 
 		/*
 		if (GLE_ARB_depth_buffer_float) {

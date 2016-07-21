@@ -382,7 +382,7 @@ RESULT Windows64App::InitializeSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -435,7 +435,7 @@ RESULT Windows64App::Show() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		m_pWin64Mouse->UpdateMousePosition();
+		//m_pWin64Mouse->UpdateMousePosition();
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
