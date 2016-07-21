@@ -37,9 +37,18 @@ public:
 												  projection_precision farPlane, 
 												  projection_precision angle);
 
+
+	// Perspective 
 	ProjectionMatrix(projection_precision left, projection_precision right,
 					 projection_precision top, projection_precision bottom,
 					 projection_precision nearPlane, projection_precision farPlane);
+
+	ProjectionMatrix(projection_precision width, projection_precision height, 
+					 projection_precision nearPlane, projection_precision farPlane, 
+					 projection_precision angle);
+
+	// Orthographic
+	ProjectionMatrix(projection_precision width, projection_precision height, projection_precision nearPlane, projection_precision farPlane);
 
 	~ProjectionMatrix();
 
