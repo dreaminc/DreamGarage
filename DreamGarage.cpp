@@ -50,10 +50,16 @@ RESULT DreamGarage::LoadScene() {
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	//*/
 
+
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
-	//pQuad->SetBumpTexture(pBumpTexture);
 
+	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
+	//pQuad->SetColorTexture(pColorTextureCobble);
+
+	HUD_OUT("Hello World");
+
+	//pQuad->SetBumpTexture(pBumpTexture);
 
 	quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
 	pQuad->MoveTo(0.0f, -1.0f, 0.0f);
