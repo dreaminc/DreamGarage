@@ -37,6 +37,8 @@ RESULT DreamGarage::LoadScene() {
 
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	pQuad->SetColorTexture(pColorTextureCobble);
+
+	HUD_OUT("Hello World");
 	//pQuad->SetBumpTexture(pBumpTexture);
 
 	/*

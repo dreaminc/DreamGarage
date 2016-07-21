@@ -69,7 +69,7 @@ void OGLProfiler::Render()
 		 it < Profiler::GetProfiler()->GetConsoleText().end();
 		 it++)
 	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1f)->MoveTo(-0.8f, 0.8f - posY, 0));
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1f)->SetPosition(point(-0.4f, 0.8f - posY, 0.0f)));
 		posY += 0.05f;
 	}
 
