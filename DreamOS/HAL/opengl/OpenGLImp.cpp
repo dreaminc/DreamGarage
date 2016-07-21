@@ -23,7 +23,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
 	CRM(PrepareScene(), "Failed to prepare GL Scene");
 
-Success:
+//Success:
 	Validate();
 	return;
 
@@ -144,7 +144,7 @@ Error:
 
 RESULT OpenGLImp::BindBufferBase(GLenum target, GLuint bindingPointIndex, GLuint bufferIndex) {
 	RESULT r = R_PASS;
-	GLenum glerr;
+//	GLenum glerr;
 	DWORD werr;
 
 	CR(glBindBufferBase(target, bindingPointIndex, bufferIndex));
@@ -195,7 +195,7 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLProgramCapture->InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
 	*/
 
-	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
+	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
 
 	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
@@ -252,7 +252,7 @@ RESULT OpenGLImp::SetMonoViewTarget() {
 	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
 	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
-Error:
+//Error:
 	return r;
 }
 
@@ -431,7 +431,7 @@ model *OpenGLImp::MakeModel(wchar_t *pszModelName) {
 	model *pModel = new OGLModel(this, pszModelName);
 	CN(pModel);
 
-Success:
+//Success:
 	return pModel;
 
 Error:
@@ -449,7 +449,7 @@ light* OpenGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point pt
 	light *pLight = new light(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 	CN(pLight);
 
-Success:
+//Success:
 	return pLight;
 
 Error:
@@ -463,10 +463,10 @@ Error:
 quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
 	RESULT r = R_PASS;
 
-	quad *pQuad = new OGLQuad(this, width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+	quad *pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 	CN(pQuad);
 
-Success:
+//Success:
 	return pQuad;
 
 Error:
@@ -483,7 +483,7 @@ sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, 
 	sphere *pSphere = new OGLSphere(this, radius, numAngularDivisions, numVerticalDivisions, c);
 	CN(pSphere);
 
-Success:
+//Success:
 	return pSphere;
 
 Error:
@@ -500,7 +500,7 @@ volume* OpenGLImp::MakeVolume(double side) {
 	volume *pVolume = new OGLVolume(this, side);
 	CN(pVolume);
 
-Success:
+//Success:
 	return pVolume;
 
 Error:
@@ -517,7 +517,7 @@ texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type
 	texture *pTexture = new OGLTexture(this, pszFilename, type);
 	CN(pTexture);
 
-Success:
+//Success:
 	return pTexture;
 
 Error:
@@ -534,7 +534,7 @@ skybox *OpenGLImp::MakeSkybox() {
 	skybox *pSkybox = new OGLSkybox(this);
 	CN(pSkybox);
 
-Success:
+//Success:
 	return pSkybox;
 
 Error:

@@ -44,11 +44,11 @@ public:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() {
+	inline unsigned int NumberVertices() {
 		return NUM_VOLUME_POINTS;
 	}
 
-	inline int NumberIndices() {
+	inline unsigned int NumberIndices() {
 		return NUM_VOLUME_INDICES;
 	}
 

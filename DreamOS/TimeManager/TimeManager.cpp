@@ -14,9 +14,10 @@ TimeManager::TimeManager(double	processingTimeQuantum) :
 
 	Validate();
 	return;
+/*TODO: Reference this error case
 Error:
 	Invalidate();
-	return;
+	return;*/
 }
 
 TimeManager::~TimeManager() {

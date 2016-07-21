@@ -24,7 +24,7 @@ public:
 		m_minTime(std::chrono::high_resolution_clock::now()),
 		m_recordTime(time)
 	{
-		Resize(time / m_recordRate + 1);
+		Resize(static_cast<size_t>(time / m_recordRate) + 1);
 	}
 
 	// Graph recording the past [time] seconds, [record_rate] is the density measured in seconds

@@ -39,6 +39,6 @@ RESULT HALImp::SetHMD(HMD *pHMD) {
 	m_pHMD = pHMD;
 	m_pCamera->SetHMD(pHMD);
 
-Error:
+//Error:
 	return r;
 }

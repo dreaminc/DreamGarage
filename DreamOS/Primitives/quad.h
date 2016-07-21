@@ -46,19 +46,19 @@ protected:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() { 
+	inline unsigned int NumberVertices() { 
 		//return NUM_QUAD_POINTS; 
 
-		int numVerts = (m_numVerticalDivisions + 1) * (m_numHorizontalDivisions + 1);
+		unsigned int numVerts = (m_numVerticalDivisions + 1) * (m_numHorizontalDivisions + 1);
 		return numVerts;
 	}
 
-	inline int NumberIndices() { 
+	inline unsigned int NumberIndices() { 
 		//return NUM_QUAD_TRIS * 3; 
 
-		int numDivisions = m_numVerticalDivisions * m_numHorizontalDivisions;
-		int numTris = numDivisions * 2;
-		int numIndices = numTris * 3;
+		unsigned int numDivisions = m_numVerticalDivisions * m_numHorizontalDivisions;
+		unsigned int numTris = numDivisions * 2;
+		unsigned int numIndices = numTris * 3;
 
 		return numIndices;
 	}
@@ -105,16 +105,16 @@ public:
 		q.m_pIndices = nullptr;
 	}
 
-	RESULT SetVerticies(double width, double height) {
+	RESULT SetVertices(float width, float height) {
 		RESULT r = R_PASS;
 
 		CR(Allocate());
 
-		double halfHeight = height / 2.0f;
-		double halfWidth = width / 2.0f;
+		float halfHeight = height / 2.0f;
+		float halfWidth = width / 2.0f;
 
-		double widthInc = width / m_numHorizontalDivisions;
-		double heightInc = height / m_numVerticalDivisions;
+		float widthInc = width / m_numHorizontalDivisions;
+		float heightInc = height / m_numVerticalDivisions;
 		
 		int vertCount = 0;
 		int indexCount = 0;
@@ -127,15 +127,15 @@ public:
 			for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
 
 				double yValue = 0.0f;
-				double uValue = (float)(i) / (float)(m_numHorizontalDivisions);
-				double vValue = (float)(j) / (float)(m_numVerticalDivisions);
+				uv_precision uValue = (float)(i) / (float)(m_numHorizontalDivisions);
+				uv_precision vValue = (float)(j) / (float)(m_numVerticalDivisions);
 
 				if (m_pTextureHeight != nullptr) {
 					yValue = m_pTextureHeight->GetValueAtUV(uValue, vValue);
 					yValue *= m_heightMapScale;
 				}
 
-				m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, yValue, (heightInc * j) - halfHeight),
+				m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, static_cast<float>(yValue), (heightInc * j) - halfHeight),
 												  vector(0.0f, 1.0f, 0.0f), 
 												  uvcoord(uValue, vValue));	
 
@@ -150,11 +150,11 @@ public:
 
 		for (int i = 0; i < m_numHorizontalDivisions; i++) {
 			for (int j = 0; j < m_numVerticalDivisions; j++) {
-				int A = (i) + ((m_numHorizontalDivisions + 1) * j);
-				int B = (i + 1) + ((m_numHorizontalDivisions + 1) * j);
+				A = (i) + ((m_numHorizontalDivisions + 1) * j);
+				B = (i + 1) + ((m_numHorizontalDivisions + 1) * j);
 
-				int C = (i) + ((m_numHorizontalDivisions + 1) * (j + 1));
-				int D = (i + 1) + ((m_numHorizontalDivisions + 1) * (j + 1));
+				C = (i) + ((m_numHorizontalDivisions + 1) * (j + 1));
+				D = (i + 1) + ((m_numHorizontalDivisions + 1) * (j + 1));
 
 				pTriIndices[indexCount++] = TriangleIndexGroup(A, B, C);
 				SetTriangleNormal(A, B, C);
@@ -169,7 +169,7 @@ public:
 	}
 	
 	// Square
-	quad(double side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
+	quad(float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
 		m_quadType(SQUARE),
 		m_numHorizontalDivisions(numHorizontalDivisions),
 		m_numVerticalDivisions(numVerticalDivisions),
@@ -178,7 +178,7 @@ public:
 	{
 		RESULT r = R_PASS;
 
-		CR(SetVerticies(side, side));
+		CR(SetVertices(side, side));
 
 		Validate();
 		return;
@@ -189,7 +189,7 @@ public:
 	}
 
 	// Rectangle
-	quad(double height, double width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
+	quad(float height, float width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
 		m_quadType(RECTANGLE),
 		m_numHorizontalDivisions(numHorizontalDivisions),
 		m_numVerticalDivisions(numVerticalDivisions),
@@ -198,7 +198,7 @@ public:
 	{
 		RESULT r = R_PASS;
 		
-		CR(SetVerticies(width, height));
+		CR(SetVertices(width, height));
 
 		Validate();
 		return;
@@ -209,7 +209,7 @@ public:
 	}
 
 	// This needs to be re-designed, too specific for 2D blits.
-	quad(double height, double width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright) :
+	quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright) :
 		m_quadType(RECTANGLE),
 		m_numHorizontalDivisions(1),
 		m_numVerticalDivisions(1),
@@ -219,8 +219,8 @@ public:
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		double halfSideX = width / 2.0f;
-		double halfSideY = height / 2.0f;
+		float halfSideX = width / 2.0f;
+		float halfSideY = height / 2.0f;
 		int vertCount = 0;
 		int indexCount = 0;
 		int A, B, C, D;

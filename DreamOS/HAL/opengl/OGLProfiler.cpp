@@ -27,10 +27,10 @@ void OGLProfiler::Init()
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 
 	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
-	m_OGLTitleText->MoveTo(-0.7, -0.7, 0);
+	m_OGLTitleText->MoveTo(-0.7f, -0.7f, 0);
 
 	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(100, '0'));
-	m_OGLConsoleText->MoveTo(-0.8, 0.8, 0);
+	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 }
 
 void OGLProfiler::Destroy()
@@ -50,7 +50,7 @@ void OGLProfiler::Render()
 
 	// Render FPS graph
 	//m_OGLGraph.Render(point(-0.5, -0.5 + 0.4, 0), point(-0.5 + 0.5, -0.5, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
-	m_OGLGraph.Render(point(0.15, -0.5 + 0.4, 0), point(0.15 + 0.5, -0.5, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
+	m_OGLGraph.Render(point(0.15f, -0.5f + 0.4f, 0), point(0.15f + 0.5f, -0.5f, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);
 
 	// Revert to 'default' render state. TODO: refactor rendering states
 	glEnable(GL_CULL_FACE);
@@ -59,7 +59,7 @@ void OGLProfiler::Render()
 	m_OGLProgram->RenderObject(m_OGLTitleText.get());
 
 	// Render hud text
-	double posY = 0;
+	float posY = 0;
 	const int maxRows = 28;
 
 	for (auto it = (Profiler::GetProfiler()->GetConsoleText().size() > maxRows) ?
@@ -67,8 +67,8 @@ void OGLProfiler::Render()
 		 it < Profiler::GetProfiler()->GetConsoleText().end();
 		 it++)
 	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1)->MoveTo(-0.8, 0.8 - posY, 0));
-		posY += 0.05;
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, 3.1f)->MoveTo(-0.8f, 0.8f - posY, 0));
+		posY += 0.05f;
 	}
 }
 
@@ -88,7 +88,7 @@ OGLProfilerGraph::~OGLProfilerGraph()
 void OGLProfilerGraph::Init()
 {
 	m_OGLTriangle = std::make_unique<OGLTriangle>(m_OGLImp);
-	m_OGLTriangle->SetColor(color(0.8, 0.0, 0.0, 1));
+	m_OGLTriangle->SetColor(color(0.8f, 0.0f, 0.0f, 1));
 
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "000");
@@ -107,17 +107,17 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 
 	auto currentTime = std::chrono::high_resolution_clock::now();
 
-	const double left = topLeft.x();
-	const double bottom = bottomRight.y();
-	const double right = bottomRight.x();
-	const double top = topLeft.y();
+	const float left = topLeft.x();
+	const float bottom = bottomRight.y();
+	const float right = bottomRight.x();
+	const float top = topLeft.y();
 
-	double width = right - left;
-	double height = top - bottom;
+	float width = right - left;
+	float height = top - bottom;
 
 	size_t index = graph.GetNewestIndex();
 
-	#define YSCALE(y) (y * vScale + bottom)
+	#define YSCALE(y) (y * (float)vScale + bottom)
 
 	point prevPoint(right, YSCALE(records[index].first), 0);
 	point currentPoint = prevPoint;
@@ -130,7 +130,7 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		prevPoint = currentPoint;
 		auto deltaTime = std::chrono::duration<double>(currentTime - records[index].second).count();
 
-		currentPoint.x() = right - deltaTime * width / time_scale;
+		currentPoint.x() = right - (float)deltaTime * width / (float)time_scale;
 		currentPoint.y() = YSCALE(records[index].first);
 
 		minFPS = min(minFPS, records[index].first);
@@ -166,6 +166,6 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(maxFPS), 0), point(right, YSCALE(maxFPS), 0), point(right, YSCALE(maxFPS), 0)));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 3.0)->MoveTo(left - 0.03, YSCALE(minFPS) - 0.05, 0));
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 3.0)->MoveTo(left - 0.03, YSCALE(maxFPS), 0));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 3.0f)->MoveTo(left - 0.03f, YSCALE(minFPS) - 0.05f, 0));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 3.0f)->MoveTo(left - 0.03f, YSCALE(maxFPS), 0));
 }

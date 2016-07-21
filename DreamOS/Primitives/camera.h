@@ -70,6 +70,14 @@ public:
 		return vector::jVector();
 	}
 
+	int GetPXWidth() {
+		return m_pxScreenWidth;
+	}
+
+	int GetPXHeight() {
+		return m_pxScreenHeight;
+	}
+
 	vector GetRightVector() {
 		quaternion temp = m_qRotation;
 		temp.Normalize();
@@ -163,7 +171,7 @@ public:
 
 		DEBUG_LINEOUT("Cam hmd event");//, kbEvent->KeyCode, kbEvent->KeyState);
 
-	Error:
+//	Error:
 		return r;
 	}
 

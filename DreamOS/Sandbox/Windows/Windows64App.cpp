@@ -88,9 +88,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	// Initialize Time Manager
 	m_pTimeManager = new TimeManager();
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
-	CV(m_pTimeManager, "Failed to validate Time Manager");
-
-Success:
+	CVM(m_pTimeManager, "Failed to validate Time Manager");
+//TODO: use this label
+//Success:
 	Validate();
 	return;
 

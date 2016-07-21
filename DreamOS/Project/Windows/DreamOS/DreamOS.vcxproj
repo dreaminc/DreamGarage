@@ -115,6 +115,7 @@
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,6 +157,7 @@
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -207,7 +209,9 @@
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Profiler\Profiler.cpp" />
-    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
+    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
@@ -445,6 +449,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h" />

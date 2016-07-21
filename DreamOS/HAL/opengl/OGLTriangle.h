@@ -27,7 +27,7 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLTriangle(OpenGLImp *pParentImp, double side) :
+	OGLTriangle(OpenGLImp *pParentImp, float side) :
 		triangle(side),
 		OGLObj(pParentImp)
 	{
@@ -37,7 +37,7 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLTriangle(OpenGLImp *pParentImp, double height, double width) :
+	OGLTriangle(OpenGLImp *pParentImp, float height, float width) :
 		triangle(height, width),
 		OGLObj(pParentImp)
 	{

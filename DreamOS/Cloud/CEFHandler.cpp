@@ -11,7 +11,7 @@
 #include "include\base\cef_logging.h"
 
 namespace {
-	CEFHandler* g_instance = NULL;
+	CEFHandler* g_instance = nullptr;
 }  // namespace
 
 CEFHandler::CEFHandler() :
@@ -22,7 +22,7 @@ CEFHandler::CEFHandler() :
 }
 
 CEFHandler::~CEFHandler() {
-	g_instance = NULL;
+	g_instance = nullptr;
 }
 
 // static

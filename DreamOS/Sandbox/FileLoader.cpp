@@ -4,8 +4,7 @@
 #include <fstream>
 #include <sstream>
 
-bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
-	multi_mesh_t &out) {
+bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh_t &out) {
 
 	std::vector<point> all_positions;
 	std::vector<point> all_uvs;
@@ -38,27 +37,26 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 		if (space == line.size()) {
 			continue;
 		}
-
 		std::string type = line.substr(0, space);
 		std::string value = line.substr(space + 1);
 
 		if (type.compare("v") == 0) {
-			float x, y, z;
+			point_precision x, y, z;
 			std::sscanf(value.c_str(), "%f %f %f\n", &x, &y, &z);
 			all_positions.emplace_back(x, y, z);
 		}
 		else if (type.compare("vt") == 0) {
-			float u, v;
+			point_precision u, v;
 			std::sscanf(value.c_str(), "%f %f\n", &u, &v);
-			all_uvs.emplace_back(u, v, 0);
+			all_uvs.emplace_back(u, v, 0.0f); 
 		}
 		else if (type.compare("vn") == 0) {
-			float x, y, z;
+			vector_precision x, y, z;
 			std::sscanf(value.c_str(), "%f %f %f\n", &x, &y, &z);
 			all_normals.emplace_back(x, y, z);
 		}
 		else if (type.compare("f") == 0) {
-			int newPositionIndices[4], newUvIndices[4 ], newNormalIndices[4];
+			int newPositionIndices[4], newUvIndices[4], newNormalIndices[4];
 
 			enum class FaceType {
 				PTN4,
@@ -68,7 +66,6 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 			};
 
 			FaceType face;
-
 			// Read as vertex/uv/normal quad format
 			face = FaceType::PTN4;
 			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
@@ -256,9 +253,9 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 	std::vector<point> all_uvs;
 	std::vector<vector> all_normals;
 
-	std::vector<int> positionIndices;
-	std::vector<int> uvIndices;
-	std::vector<int> normalIndices;
+	std::vector<size_t> positionIndices;
+	std::vector<size_t> uvIndices;
+	std::vector<size_t> normalIndices;
 
 	std::ifstream obj_file(obj_file_name, std::ios::binary);
 
@@ -288,7 +285,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 		else if (type.compare("vt") == 0) {
 			float u, v;
 			std::sscanf(value.c_str(), "%f %f\n", &u, &v);
-			all_uvs.emplace_back(u, v, 0);
+			all_uvs.emplace_back(u, v, 0.0f);
 		}
 		else if (type.compare("vn") == 0) {
 			float x, y, z;
@@ -299,7 +296,8 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 			size_t newPositionIndices[4], newUvIndices[4], newNormalIndices[4];
 
 			// Read as vertex/uv/normal quad format
-			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
+			// %Iu is for windows 64, %zu is for linux 
+			int num_matches = std::sscanf(value.c_str(), "%Iu/%Iu/%Iu %Iu/%Iu/%Iu %Iu/%Iu/%Iu %Iu/%Iu/%Iu\n",
 				&newPositionIndices[3], &newUvIndices[3], &newNormalIndices[3],
 				&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
 				&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
@@ -307,7 +305,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 
 			if (num_matches != 12) {
 				// Read as vertex/uv/normal tri format
-				num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d\n",
+				num_matches = std::sscanf(value.c_str(), "%Iu/%Iu/%Iu %Iu/%Iu/%Iu %Iu/%Iu/%Iu\n",
 					&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
 					&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
 					&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]);
@@ -315,7 +313,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 				if (num_matches != 9) {
 
 					// Read as vertex//normal format
-					num_matches = std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d\n",
+					num_matches = std::sscanf(value.c_str(), "%Iu//%Iu %Iu//%Iu %Iu//%Iu\n",
 						&newPositionIndices[2], &newNormalIndices[2],
 						&newPositionIndices[1], &newNormalIndices[1],
 						&newPositionIndices[0], &newNormalIndices[0]);

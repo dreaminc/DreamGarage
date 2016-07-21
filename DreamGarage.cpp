@@ -12,7 +12,8 @@ RESULT DreamGarage::LoadScene() {
 	///*
 	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	// TODO: Special lane for global light
-	vector lightdir = vector(-1.0f, -1.0f, 0.0f);
+	//vector lightdir = vector(0.0f, 1.0f, -0.5f);
+	vector lightdir = vector(0.0f, -1.0f, 0.5f);
 	lightdir.Normalize();
 
 	//float lightdistance = 10.0f;
@@ -26,8 +27,8 @@ RESULT DreamGarage::LoadScene() {
 
 	/*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
-	AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
-	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f));
 	AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f));
 	//*/
 
@@ -100,37 +101,37 @@ RESULT DreamGarage::LoadScene() {
 
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
-		point(-4.5, -4.8, 0.0),
-		0.1,
-		1.0);
+		point(-4.5f, -4.8f, 0.0f),
+		0.1f,
+		1.0f);
 
 	AddModel(objFile, L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
-		point(-3.0, -4.2, 0.0),
-		0.15,
-		4.0);
+		point(-3.0f, -4.2f, 0.0f),
+		0.15f,
+		4.0f);
 
 	AddModel(objFile, L"\\Models\\Dwarf\\dwarf_2_low.obj",
 		//new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-		point(0.0, -4.9, 0),
-		20.0);
+		point(0.0f, -4.9f, 0.0f),
+		20.0f);
 
 	AddModel(objFile, L"\\Models\\car\\untitled.obj",
 		nullptr,
-		point(6.0, -3.7, -1.0),
-		0.015,
-		1.0);
+		point(6.0f, -3.7f, -1.0f),
+		0.015f,
+		1.0f);
 
 	AddModel(objFile, L"\\Models\\table\\untitled.obj",
 		nullptr,
-		point(0.0, -13.0, 0.0),
-		10.0,
+		point(0.0f, -13.0f, 0.0f),
+		10.0f,
 		3.14f);
 	*/
 
 
-Error:
+//Error:
 	return r;
 }
 
@@ -141,8 +142,9 @@ RESULT DreamGarage::Update(void) {
 
 	//m_pSphere->translateX(0.001f);
 
-	g_pLight->RotateLightDirectionYAxis(0.001f);
+	//g_pLight->RotateLightDirectionYAxis(0.001f);
+	g_pLight->RotateLightDirectionXAxis(0.00005f * 1.3f);
 
-Error:
+//Error:
 	return r;
 }

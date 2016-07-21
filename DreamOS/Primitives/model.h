@@ -33,8 +33,8 @@ public:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() { return m_nVertices; }
-	inline int NumberIndices() { return m_nVertices; }
+	inline unsigned int NumberVertices() { return m_nVertices; }
+	inline unsigned int NumberIndices() { return m_nVertices; }
 
 private:
 	unsigned int m_nVertices;
@@ -43,7 +43,7 @@ private:
 	RESULT SetVertices(const std::vector<vertex>& vertices) {
 		RESULT r = R_PASS;
 
-		m_nVertices = vertices.size();
+		m_nVertices = static_cast<unsigned int>(vertices.size());
 		CR(Allocate());
 
 		unsigned int verticesCnt = 0;
@@ -81,8 +81,8 @@ public:
 		// TODO: This is a stop gap approach, this should move to manipulating the verts/indices of the DimObj directly
 		// TODO: to avoid mem duplication
 		CR(SetVertices(vertices));
-
-	Success:
+// TODO: use this label
+//	Success:
 		Validate();
 		return;
 

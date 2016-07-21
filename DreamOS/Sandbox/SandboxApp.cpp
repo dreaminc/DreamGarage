@@ -61,7 +61,7 @@ light* SandboxApp::AddLight(LIGHT_TYPE type, light_precision intensity, point pt
 
 	CR(AddObject(pLight));
 
-Success:
+//Success:
 	return pLight;
 
 Error:
@@ -80,7 +80,7 @@ quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivision
 
 	CR(AddObject(pQuad));
 
-Success:
+//Success:
 	return pQuad;
 
 Error:
@@ -100,7 +100,7 @@ sphere* SandboxApp::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, 
 
 	CR(AddObject(pSphere));
 
-Success:
+//Success:
 	return pSphere;
 
 Error:
@@ -119,7 +119,7 @@ volume* SandboxApp::AddVolume(double side) {
 
 	CR(AddObject(pVolume));
 
-Success:
+//Success:
 	return pVolume;
 
 Error:
@@ -142,7 +142,7 @@ skybox *SandboxApp::AddSkybox() {
 
 	CR(AddObject(pSkybox));
 
-Success:
+//Success:
 	return pSkybox;
 
 Error:
@@ -162,7 +162,7 @@ model *SandboxApp::AddModel(wchar_t *pszModelName) {
 
 	CR(AddObject(pModel));
 
-Success:
+//Success:
 	return pModel;
 
 Error:
