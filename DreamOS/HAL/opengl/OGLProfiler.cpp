@@ -199,11 +199,9 @@ void OGLDebugConsole::Init()
 void OGLDebugConsole::Render()
 {
 	float posY = 0;
-	for (auto	it = DebugConsole::GetDebugConsole()->GetConsoleData().begin();
-		it < DebugConsole::GetDebugConsole()->GetConsoleData().end();
-		it++)
+	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData())
 	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText((*it)->GetValue(), 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(it->GetValue(), 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
 		posY += 0.05f;
 	}
 }

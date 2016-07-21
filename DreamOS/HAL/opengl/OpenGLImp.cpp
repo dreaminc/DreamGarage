@@ -273,7 +273,7 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('F') : {
-			this->SetRenderProfiler(!this->GetRenderProfiler());
+			SetRenderProfiler(!GetRenderProfiler());
 		}
 	}
 
@@ -576,7 +576,7 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	}
 	
 	// Render profiler overlay
-	if (this->GetRenderProfiler()) {
+	if (GetRenderProfiler()) {
 		m_pOGLProfiler->Render();
 	}
 
@@ -633,7 +633,7 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		}
 
 		// Render profiler overlay
-		if (!this->GetRenderProfiler()) {
+		if (!GetRenderProfiler()) {
 			m_pOGLProfiler->Render();
 		}
 	}
@@ -707,7 +707,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		}
 		
 		// Render profiler overlay
-		if (eye == EYE_LEFT && this->GetRenderProfiler()) {
+		if (eye == EYE_LEFT && GetRenderProfiler()) {
 			m_pOGLProfiler->Render();
 		}
 

@@ -26,7 +26,7 @@ public:
 
 private:
 	sphere *m_pSphere;
-	std::shared_ptr<DebugData> p;
+	std::shared_ptr<DebugData> spherePosition;
 };
 
 
