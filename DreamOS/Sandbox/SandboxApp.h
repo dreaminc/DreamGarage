@@ -57,6 +57,7 @@ public:
 	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* AddVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);
 	model *AddModel(const std::vector<vertex>& vertices);

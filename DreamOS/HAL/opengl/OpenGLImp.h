@@ -71,6 +71,7 @@ public:
 	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* MakeVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
 	model *MakeModel(const std::vector<vertex>& vertices);

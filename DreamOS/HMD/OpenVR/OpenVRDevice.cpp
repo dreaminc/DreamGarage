@@ -190,6 +190,19 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 
 	model *pModel = m_pParentSandbox->AddModel(verts, indices);
 
+	/*
+	uint16_t unWidth, unHeight; // width and height of the texture map in pixels
+	const uint8_t *rubTextureMapData;	// Map texture data. All textures are RGBA with 8 bits per channel per pixel. Data size is width * height * 4ub
+	*/
+	int width = pRenderModelTexture->unWidth;
+	int height = pRenderModelTexture->unHeight;
+	int channels = 4;
+	void *pBuffer = (void*)(pRenderModelTexture->rubTextureMapData);
+	int pBuffer_n = sizeof(uint8_t) * width * height * channels;
+
+	texture *pTexture = m_pParentSandbox->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, channels, pBuffer, pBuffer_n);
+	pModel->SetColorTexture(pTexture);
+
 
 Error:
 	/*
