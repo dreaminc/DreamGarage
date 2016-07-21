@@ -75,7 +75,6 @@ public:
 
 		switch (eye) {
 			case EYE_LEFT: {
-				eyePos.Print();
 				mat = ViewMatrix(eyePos, m_qRotation);
 			} break;
 

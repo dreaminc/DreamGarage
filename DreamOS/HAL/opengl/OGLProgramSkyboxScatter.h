@@ -52,8 +52,10 @@ public:
 		return R_PASS;
 	}
 
-	float sunY = -1.0f;
+	float sunY = 1.0f;
 	float theta = 0.0f;
+	//float delta = 0.00005f;
+	float delta = 0.0f;
 
 	RESULT SetCameraUniforms(camera *pCamera) {
 		
@@ -65,9 +67,10 @@ public:
 		auto pxWidth = pCamera->GetPXWidth();
 		auto pxHeight = pCamera->GetPXHeight();
 
-		vector sunDirection = vector(0.0f, sunY, -0.5f);
+		vector sunDirection = vector(0.0f, sunY, 0.5f);
+		sunDirection.Normalize();
 		//sunY += 0.01f;
-		theta += 0.0005f;
+		theta += delta;
 		sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, theta) * sunDirection;
 		sunDirection.Normalize();
 
@@ -98,8 +101,9 @@ public:
 		*/
 
 		vector sunDirection = vector(0.0f, sunY, -0.5f);
+		sunDirection.Normalize();
 		//sunY += 0.01f;
-		theta += 0.0005f;
+		theta += delta;
 		sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, theta) * sunDirection;
 		sunDirection.Normalize();
 

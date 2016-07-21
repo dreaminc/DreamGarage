@@ -1813,6 +1813,7 @@
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
       <Filter>HMD\OpenVR</Filter>
     </ClInclude>
+
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
