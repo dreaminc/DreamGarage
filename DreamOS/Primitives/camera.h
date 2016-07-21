@@ -219,16 +219,6 @@ public:
 				else
 					AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
-
-			case (SK_SCAN_CODE)('F') :
-				if (kbEvent->KeyState)
-				{
-#ifdef HUD_ON
-#undef HUD_ON
-#else
-#define HUD_ON
-#endif
-				}
 		}
 
 		return r;

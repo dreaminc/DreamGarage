@@ -26,8 +26,6 @@
 //#include "OGLProgram.h"
 #include "OGLProgramFactory.h"
 
-#include "Profiler\DebugConsole.h"
-
 #include <memory>
 
 class SandboxApp; 
@@ -65,7 +63,6 @@ private:
 public:
 	bool GetRenderProfiler() { return m_renderProfiler; }
 	void SetRenderProfiler(bool render) { m_renderProfiler = render; }
-	std::shared_ptr<DebugData> p = DebugConsole::GetDebugConsole()->Register();
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);

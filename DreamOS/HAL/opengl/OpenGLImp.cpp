@@ -6,9 +6,6 @@
 #include "Primitives/TranslationMatrix.h"
 #include "Primitives/RotationMatrix.h"
 #include <vector>
-#include <string>
-
-#include "../DreamOS/Profiler/Profiler.h"
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
@@ -274,11 +271,9 @@ RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("!!!!!!!!!!!!!Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('F') : {
 			this->SetRenderProfiler(!this->GetRenderProfiler());
-			this->p->SetValue(std::to_string(this->GetRenderProfiler()));
 		}
 	}
 
@@ -637,7 +632,6 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 		}
 
-		// Render profiler overlay
 		// Render profiler overlay
 		if (!this->GetRenderProfiler()) {
 			m_pOGLProfiler->Render();
