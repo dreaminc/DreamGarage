@@ -67,7 +67,8 @@ private:
 
 	// Models
 	RESULT InitializeRenderModels();								// This sets up the models
-	RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID);	// This sets up a given model
+	RESULT InitializeRenderModel(uint32_t deviceID);	// This sets up a given model
+	RESULT SetControllerModelTexture(model *pModel, texture *pTexture, vr::ETrackedControllerRole controllerRole);
 
 public:
 	vr::IVRSystem *m_pIVRHMD;
@@ -94,8 +95,13 @@ public:
 
 	// Device Render Models
 	vr::IVRRenderModels *m_pRenderModels;
+	
 	model *m_pControllerModelLeft;
+	texture *m_pControllerModelLeftTexture;
+	
 	model *m_pControllerModelRight;
+	texture *m_pControllerModelRightTexture;
+
 	model *m_pHMDModel;
 };
 

@@ -239,3 +239,7 @@ RESULT SandboxApp::UnregisterUpdateCallback() {
 Error:
 	return r;
 }
+
+point SandboxApp::GetCameraPosition() {
+	return m_pHALImp->GetCamera()->GetPosition();
+}

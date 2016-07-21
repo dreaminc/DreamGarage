@@ -29,6 +29,10 @@ point VirtualObj::GetOrigin() {
 	return m_ptOrigin;
 }
 
+point VirtualObj::GetPosition() {
+	return m_ptOrigin;
+}
+
 VirtualObj* VirtualObj::translate(matrix <point_precision, 4, 1> v) {
 	m_ptOrigin.translate(v);
 	return this;
@@ -51,6 +55,11 @@ VirtualObj* VirtualObj::translateY(point_precision y) {
 
 VirtualObj* VirtualObj::translateZ(point_precision z) {
 	m_ptOrigin.translateZ(z);
+	return this;
+}
+
+VirtualObj* VirtualObj::SetPosition(point p) {
+	m_ptOrigin = p;
 	return this;
 }
 

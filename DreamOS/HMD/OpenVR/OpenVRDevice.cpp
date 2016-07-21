@@ -126,6 +126,36 @@ void IVRThreadSleep(unsigned long nMilliseconds) {
 #endif
 }
 
+// TODO: Use a more generic interface for this
+RESULT OpenVRDevice::SetControllerModelTexture(model *pModel, texture *pTexture, vr::ETrackedControllerRole controllerRole) {
+	RESULT r = R_PASS;
+
+	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+		m_pControllerModelLeft = pModel;
+		m_pControllerModelLeftTexture = pTexture;
+	}
+	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+		m_pControllerModelRight = pModel;
+		m_pControllerModelRightTexture = pTexture;
+	}
+	else if (controllerRole == vr::TrackedControllerRole_Invalid) {
+		if (m_pControllerModelLeft == nullptr) {
+			m_pControllerModelLeft = pModel;
+			m_pControllerModelLeftTexture = pTexture;
+		}
+		else if (m_pControllerModelRight == nullptr) {
+			m_pControllerModelRight = pModel;
+			m_pControllerModelRightTexture = pTexture;
+		}
+		else {
+			CBM((0), "Invalid controller role and both controllers already set");
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	RESULT r = R_PASS;
 
@@ -203,9 +233,10 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	texture *pTexture = m_pParentSandbox->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, channels, pBuffer, pBuffer_n);
 	pModel->SetColorTexture(pTexture);
 
+	vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(deviceID);
+	CR(SetControllerModelTexture(pModel, pTexture, controllerRole))
 
 Error:
-	/*
 	if(pRenderModel != nullptr) {
 		vr::VRRenderModels()->FreeRenderModel(pRenderModel);
 		pRenderModel = nullptr;
@@ -215,7 +246,6 @@ Error:
 		vr::VRRenderModels()->FreeTexture(pRenderModelTexture);
 		pRenderModelTexture = nullptr;
 	}
-	*/
 
 	return r;
 }
@@ -340,40 +370,74 @@ RESULT OpenVRDevice::UpdateHMD() {
 			
 			m_validPoseCount++;
 
-				switch (m_pIVRHMD->GetTrackedDeviceClass(nDevice)) {
-					case vr::TrackedDeviceClass_Controller: {
-						Matrix4 poseMat4 = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
-						Vector4 centerVec4 = poseMat4 * Vector4(0, 0, 0, 1);
+			Matrix4 poseMat4 = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[nDevice].mDeviceToAbsoluteTracking);
+			Vector4 centerVec4 = poseMat4 * Vector4(0, 0, 0, 1);
+
+			switch (m_pIVRHMD->GetTrackedDeviceClass(nDevice)) {
+				case vr::TrackedDeviceClass_Controller: {
+					ViewMatrix viewMat;
+					viewMat.identity();
+
+					for (int i = 0; i < 4; i++)
+						for (int j = 0; j < 4; j++)
+							viewMat(j, i) = poseMat4[i * 4 + j];
+
+					vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(nDevice);
 						
-						point ptControllerPosition = point(centerVec4.x, centerVec4.y, centerVec4.z);
-						ptControllerPosition.Print();
+					//point ptControllerPosition = viewMat.GetPosition();
+					point ptControllerPosition = point(centerVec4.x, centerVec4.y, centerVec4.z);
+					//ptControllerPosition += point(0.0f, 0.0f, 2.0f);
+					ptControllerPosition -= m_pParentSandbox->GetCameraPosition();
+					ptControllerPosition.w() = 1.0f;
 
-					} break;
+					quaternion qOrientation = viewMat.GetOrientation();
+					qOrientation.Reverse();
 
-					case vr::TrackedDeviceClass_HMD: {
-						ViewMatrix viewMat = ConvertSteamVRMatrixToViewMatrix(m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
-						m_ptOrigin = viewMat.GetPosition();
+					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerModelLeft != nullptr) {
+						m_pControllerModelLeft->SetPosition(ptControllerPosition);
+						m_pControllerModelLeft->SetOrientation(qOrientation);
+					}
+					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerModelRight != nullptr) {
+						m_pControllerModelRight->SetPosition(ptControllerPosition);
+						m_pControllerModelRight->SetOrientation(qOrientation);
+					}
 
-						m_qOrientation = viewMat.GetOrientation();
-						m_qOrientation.Reverse();
-					} break;
+				} break;
 
-					case vr::TrackedDeviceClass_Invalid: {
-						// TODO: Handle invalid
-					} break;
+				case vr::TrackedDeviceClass_HMD: {
+					ViewMatrix viewMat;
+					viewMat.identity();
 
-					case vr::TrackedDeviceClass_Other: {
-						// TODO: Handle other
-					} break;
+					for (int i = 0; i < 4; i++)
+						for (int j = 0; j < 4; j++)
+							viewMat(j, i) = poseMat4[i * 4 + j];
 
-					case vr::TrackedDeviceClass_TrackingReference: {
-						// TODO: Handle tracking reference
-					} break;
+					//m_ptOrigin = viewMat.GetPosition();
 
-					default: {
-						// TODO: Default handling
-					} break;
-				}
+					m_ptOrigin = -1.0f * point(viewMat(12), viewMat(13), viewMat(14));
+
+					//m_ptOrigin = viewMat.GetPosition();
+
+					m_qOrientation = viewMat.GetOrientation();
+					//m_qOrientation.Reverse();
+				} break;
+
+				case vr::TrackedDeviceClass_Invalid: {
+					// TODO: Handle invalid
+				} break;
+
+				case vr::TrackedDeviceClass_Other: {
+					// TODO: Handle other
+				} break;
+
+				case vr::TrackedDeviceClass_TrackingReference: {
+					// TODO: Handle tracking reference
+				} break;
+
+				default: {
+					// TODO: Default handling
+				} break;
+			}
 			
 		}
 	}
@@ -539,26 +603,20 @@ ViewMatrix OpenVRDevice::GetViewMatrix(EYE_TYPE eye) {
 	Matrix4 mat4Eye = ConvertSteamVRMatrixToMatrix4(matEye);
 	mat4Eye.invert();
 
-	/*
-	matPose.m[0][0], matPose.m[1][0], matPose.m[2][0], 0.0,
-	matPose.m[0][1], matPose.m[1][1], matPose.m[2][1], 0.0,
-	matPose.m[0][2], matPose.m[1][2], matPose.m[2][2], 0.0,
-	matPose.m[0][3], matPose.m[1][3], matPose.m[2][3], 1.0f
-	*/
+	ViewMatrix eyeMat;
+	eyeMat.identity();
 
-	ViewMatrix viewMat;
-	viewMat.identity();
-
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++)
-			viewMat(j, i) = mat4Eye[i * 4 + j];
+			eyeMat(j, i) = mat4Eye[i * 4 + j];
 
 	Matrix4 mat4View = ConvertSteamVRMatrixToMatrix4(m_rTrackedDevicePose[vr::k_unTrackedDeviceIndex_Hmd].mDeviceToAbsoluteTracking);
 	mat4View.invert();
 
+	ViewMatrix viewMat;
 	viewMat.identity();
 
-	for (int i = 0; i < 3; i++)
+	for (int i = 0; i < 4; i++)
 		for (int j = 0; j < 4; j++)
 			viewMat(j, i) = mat4View[i * 4 + j];
 

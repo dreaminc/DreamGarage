@@ -71,6 +71,8 @@ public:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
 
+	point GetCameraPosition();
+
 protected:
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!

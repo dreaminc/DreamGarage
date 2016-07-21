@@ -78,9 +78,9 @@ public:
 	}
 
 	point GetPosition() {
-		view_precision x = m_data[3];
-		view_precision y = m_data[(4) + 3];
-		view_precision z = m_data[(8) + 3];
+		view_precision x = this->element(0, 3);
+		view_precision y = this->element(1, 3);
+		view_precision z = this->element(2, 3);
 		//view_precision w = this->element(3, 3);
 		view_precision w = 1.0f;
 

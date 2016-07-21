@@ -438,6 +438,10 @@ RESULT Windows64App::Show() {
 		// TODO: Update Sense etc
 		//m_pWin64Mouse->UpdateMousePosition();
 
+		if (m_pHMD != nullptr) {
+			m_pHMD->UpdateHMD();
+		}
+
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
 
@@ -446,7 +450,6 @@ RESULT Windows64App::Show() {
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
 			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
 			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}
