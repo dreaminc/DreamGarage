@@ -1813,7 +1813,6 @@
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
       <Filter>HMD\OpenVR</Filter>
     </ClInclude>
-
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
@@ -1828,6 +1827,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\External\Matrices\Vectors.h">
       <Filter>External\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1941,6 +1943,12 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

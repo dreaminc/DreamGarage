@@ -7,6 +7,7 @@
 #include "OGLProgramBlinnPhongShadow.h"
 #include "OGLProgramMinimalTexture.h"
 #include "OGLProgramBlinnPhongTexture.h"
+#include "OGLProgramBlinnPhongTextureShadow.h"
 #include "OGLProgramBlinnPhongTextureBump.h"
 #include "OGLProgramTextureBitBlit.h"
 #include "OGLProgramShadowDepth.h"
@@ -56,6 +57,12 @@ OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *p
 			pOGLProgram = new OGLProgramBlinnPhongTexture(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blinnPhongTexture.vert", L"blinnPhongTexture.frag", versionOGL), "Failed to initialize OGL blinnPhongTexture Program");
+		} break;
+
+		case OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW: {
+			pOGLProgram = new OGLProgramBlinnPhongTextureShadow(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"blinnPhongTextureShadow.vert", L"blinnPhongTextureShadow.frag", versionOGL), "Failed to initialize OGL blinnPhongTexture Program");
 		} break;
 
 		case OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP: {
