@@ -4,6 +4,7 @@
 #include "HAL/opengl/OGLProgram.h"
 
 #include "OGLTriangle.h"
+#include "OGLQuad.h"
 #include "OGLText.h"
 
 #include <memory>
@@ -27,6 +28,7 @@ public:
 protected:
 	OpenGLImp*	m_OGLImp;
 	OGLProgram*	m_OGLProgram;
+	std::unique_ptr<OGLTriangle> m_Background;
 };
 
 template<typename T>

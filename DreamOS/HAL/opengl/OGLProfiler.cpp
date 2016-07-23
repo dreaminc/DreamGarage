@@ -97,6 +97,10 @@ void OGLProfilerGraph::Init()
 
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "000");
+	//m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "000");
+
+	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
+	m_Background->SetColor(color(0.1f, 0.1f, 0.1f, 0.5f));
 }
 
 void OGLProfilerGraph::Destroy()
@@ -136,7 +140,7 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		auto deltaTime = std::chrono::duration<double>(currentTime - records[index].second).count();
 
 		currentPoint.x() = right - (float)deltaTime * width / (float)time_scale;
-		currentPoint.y() = YSCALE(records[index].first);
+		currentPoint.y() = YSCALE(static_cast<int>(records[index].first));
 
 		minFPS = min(minFPS, records[index].first);
 		maxFPS = max(maxFPS, records[index].first);
@@ -145,7 +149,7 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		{
 			// draw current FPS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), 3.0)->MoveTo(right, currentPoint.y(), 0));
+			m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), 3.0)->MoveTo(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0));
 		}
 
 		if (currentPoint.x() < left)
@@ -154,25 +158,43 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 			currentPoint.x() = left;
 
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-			m_OGLProgram->RenderObject(m_OGLTriangle->Set(currentPoint, prevPoint, prevPoint));
-
+			point cr = point(currentPoint.x(), currentPoint.y() - YSCALE(minFPS) + bottom, 0.0f);
+			point pr = point(prevPoint.x(), prevPoint.y() - YSCALE(minFPS) + bottom, 0.0f);
+			m_OGLProgram->RenderObject(m_OGLTriangle->Set(cr, pr, pr));
 			break;
 		}
 
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		m_OGLProgram->RenderObject(m_OGLTriangle->Set(currentPoint, prevPoint, prevPoint));
+		point cr = point(currentPoint.x(), currentPoint.y() - YSCALE(minFPS) + bottom, 0.0f);
+		point pr = point(prevPoint.x(), prevPoint.y() - YSCALE(minFPS) + bottom, 0.0f);
+		m_OGLProgram->RenderObject(m_OGLTriangle->Set(cr, pr, pr));
 
 		index = (index == 0) ? records.size() - 1 : index - 1;
 	}
 
 	// Draw local min/max bars
+	int fpsDiff = static_cast<int>(maxFPS) - static_cast<int>(minFPS);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(minFPS), 0), point(right, YSCALE(minFPS), 0), point(right, YSCALE(minFPS), 0)));
-	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(maxFPS), 0), point(right, YSCALE(maxFPS), 0), point(right, YSCALE(maxFPS), 0)));
+	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(0), 0), point(right, YSCALE(0), 0), point(right, YSCALE(0), 0)));
+	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0)));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 3.0f)->MoveTo(left - 0.03f, YSCALE(minFPS) - 0.05f, 0));
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 3.0f)->MoveTo(left - 0.03f, YSCALE(maxFPS), 0));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), 3.0f)->SetPosition(point(left, YSCALE(0), 0), text::TOP_RIGHT));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), 3.0f)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::BOTTOM_RIGHT));
+
+//	m_OGLProgram->RenderObject(m_Background->Set(point(0.0f, 0.0f, 0.0f), point(0.0f, 1.0f, 0.0f), point(1.0f, 0.0f, 0.0f)));
+	float marginX = 0.05f;
+	float marginY = 0.05f;
+	float scaledTop = YSCALE(fpsDiff);
+
+	point bl = point(left - marginX, bottom - marginY, 0.0f);
+	point br = point(right + marginX, bottom - marginY, 0.0f);
+	point tl = point(left - marginX, scaledTop + marginY, 0.0f);
+	point tr = point(right + marginX, scaledTop + marginY, 0.0f);
+
+	m_OGLProgram->RenderObject(m_Background->Set(bl, br, tl));
+	m_OGLProgram->RenderObject(m_Background->Set(tl, br, tr));
+
 }
 
 
@@ -194,6 +216,9 @@ void OGLDebugConsole::Init()
 
 	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(100, '0'));
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
+
+	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
+	m_Background->SetColor(color(0.5f, 0.5f, 0.5f, 1.0f));
 }
 
 void OGLDebugConsole::Render()
@@ -204,6 +229,9 @@ void OGLDebugConsole::Render()
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(it->GetValue(), 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
 		posY += 0.05f;
 	}
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	m_OGLProgram->RenderObject(m_Background->Set(point(0.0f, 0.0f, 0.0f), point(0.0f, 1.0f, 0.0f), point(1.0f, 0.0f, 0.0f)));
 }
 
 void OGLDebugConsole::Destroy()
