@@ -9,6 +9,8 @@
 #include "Profiler/Profiler.h"
 #include "Profiler/DebugConsole.h"
 
+#include <Windows.h>
+
 // OGLProfiler
 
 OGLProfiler::OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
@@ -33,6 +35,9 @@ void OGLProfiler::Init()
 
 	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(100, '0'));
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
+
+	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
+	m_Background->SetColor(color(0.0f, 0.0f, 0.0f, 0.5f));
 }
 
 void OGLProfiler::Destroy()
@@ -63,6 +68,7 @@ void OGLProfiler::Render()
 	// Render hud text
 	float posY = 0;
 	const int maxRows = 28;
+	float consoleHeight = min(maxRows, Profiler::GetProfiler()->GetConsoleText().size())*0.05f;
 
 	for (auto it = (Profiler::GetProfiler()->GetConsoleText().size() > maxRows) ?
 			Profiler::GetProfiler()->GetConsoleText().end() - maxRows : Profiler::GetProfiler()->GetConsoleText().begin();
@@ -73,7 +79,20 @@ void OGLProfiler::Render()
 		posY += 0.05f;
 	}
 
+	float left = -0.6f; float right = -0.1f; float top = 0.8f; float bottom = top - consoleHeight;
+	float marginX = 0.05f; float marginY = 0.05f;
+	
+	point bl = point(left - marginX, bottom - marginY, 0.0f);
+	point br = point(right + marginX, bottom - marginY, 0.0f);
+	point tl = point(left - marginX, top + marginY, 0.0f);
+	point tr = point(right + marginX, top + marginY, 0.0f);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	m_OGLProgram->RenderObject(m_Background->Set(bl, br, tl));
+	m_OGLProgram->RenderObject(m_Background->Set(tl, br, tr));
+
 	// Render debug console text
+	//m_OGLProgram->RenderObject(m_Background->Set(point(0.0f, 0.0f, 0.0f), point(1.0f, 0.0f, 0.0f), point(0.0f, 1.0f, 0.0f)));
 	m_OGLConsole.Render();
 }
 
@@ -100,7 +119,7 @@ void OGLProfilerGraph::Init()
 	//m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "000");
 
 	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
-	m_Background->SetColor(color(0.1f, 0.1f, 0.1f, 0.5f));
+	m_Background->SetColor(color(0.0f, 0.0f, 0.0f, 0.5f));
 }
 
 void OGLProfilerGraph::Destroy()
@@ -218,20 +237,35 @@ void OGLDebugConsole::Init()
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 
 	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
-	m_Background->SetColor(color(0.5f, 0.5f, 0.5f, 1.0f));
+	m_Background->SetColor(color(0.0f, 0.0f, 0.0f, 0.5f));
 }
 
 void OGLDebugConsole::Render()
 {
-	float posY = 0;
+	float consoleHeight = 0;
+	float rowSize = 0.05;
+	float fontSize = 3.1f;
+	point debugConsoleTL = point(0.0f, 0.8f, 0.0f);
+
 	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData())
 	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(it->GetValue(), 3.1f)->MoveTo(0.0f, 0.8f - posY, 0));
-		posY += 0.05f;
+		point rowTL = point(debugConsoleTL.x(), debugConsoleTL.y() - consoleHeight, 0.0f);
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(it->GetValue(), fontSize)->SetPosition(rowTL, text::BOTTOM_LEFT));
+		consoleHeight += rowSize;
 	}
 
+	float left = 0.0f; float right = 0.5f; float top = 0.8f; float bottom = top - consoleHeight;
+	float marginX = 0.05f; float marginY = 0.05f;
+	
+	point bl = point(left - marginX, bottom - marginY, 0.0f);
+	point br = point(right + marginX, bottom - marginY, 0.0f);
+	point tl = point(left - marginX, top + marginY, 0.0f);
+	point tr = point(right + marginX, top + marginY, 0.0f);
+
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_OGLProgram->RenderObject(m_Background->Set(point(0.0f, 0.0f, 0.0f), point(0.0f, 1.0f, 0.0f), point(1.0f, 0.0f, 0.0f)));
+	m_OGLProgram->RenderObject(m_Background->Set(bl, br, tl));
+	m_OGLProgram->RenderObject(m_Background->Set(tl, br, tr));
+
 }
 
 void OGLDebugConsole::Destroy()
