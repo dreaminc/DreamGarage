@@ -1,5 +1,7 @@
 #include "CloudControllerFactory.h"
+
 #include "CEFImp.h"
+#include "webrtc/WebRTCImp.h"
 
 #include <memory>
 
@@ -22,6 +24,13 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 			pCloudController->SetCloudImp(std::move(pCEFImp));
 
 		} break;
+
+		case CLOUD_CONTROLLER_WEBRTC: {
+			// Create the CEF implementation			
+
+			std::unique_ptr<WebRTCImp> pWebRTCImp(new WebRTCImp());
+			pCloudController->SetCloudImp(std::move(pWebRTCImp));
+		}
 
 		default: {
 			pCloudController = nullptr;

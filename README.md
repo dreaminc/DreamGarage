@@ -70,3 +70,23 @@ Dream supports lights by the way of the `light *AddLight(LIGHT_TYPE type, light_
 #### Shadows
 
 To enable shadows on a given light, utilize the `RESULT EnableShadows()` function of the light object, which turns a given light into a shadow emitter.  Currently the engine is only capable of supporting one directional light emitter, although point lights casting shadows are future feature. 
+
+## WebRTC Setup and Installation
+
+https://webrtc.org/native-code/development/prerequisite-sw/
+
+You will need to install Update 2 for VS2015 https://www.visualstudio.com/en-us/news/vs2015-update2-vs.aspx
+
+### Installing Chromium Depot Tools
+
+http://dev.chromium.org/developers/how-tos/install-depot-tools
+
+Install as described and then run gclient for the first time through CMD.  This will install a bunch of other stuff too, but will only work if the PATH is set correctly.  
+
+###  Build Chromium
+
+https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instructions.md
+
+Keep note that to run gclient sync you will need to run the command prompt as administrator in windows to set up the Ninja build files correctly
+
+

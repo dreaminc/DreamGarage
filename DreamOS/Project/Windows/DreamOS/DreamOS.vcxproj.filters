@@ -135,6 +135,9 @@
     <Filter Include="DreamGarage">
       <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cloud\webrtc">
+      <UniqueIdentifier>{e82ece0f-07c1-4cff-87ab-e214e415001c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -1806,6 +1809,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h">
+      <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -126,7 +126,8 @@ RESULT Windows64App::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	// Set up the Cloud Controller
-	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 
 Error:
