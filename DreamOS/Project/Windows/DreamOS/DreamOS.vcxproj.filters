@@ -75,15 +75,6 @@
     <Filter Include="External\OCULUS\v132\Logging">
       <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\OCULUS\v132\Logging\include">
-      <UniqueIdentifier>{f9f3a04d-e419-41ac-988e-59bb38aba634}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\Logging\src">
-      <UniqueIdentifier>{46b485da-652c-4ed2-a379-ddf8a19f9d3c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\Logging\src\internal">
-      <UniqueIdentifier>{cf6c4deb-a89a-47e2-aa2d-10b4412d9151}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HMD">
       <UniqueIdentifier>{e122ce99-434d-454c-a1b9-c035729da930}</UniqueIdentifier>
     </Filter>
@@ -229,15 +220,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp">
       <Filter>TimeManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
-      <Filter>External\OCULUS\v132\Logging\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
-      <Filter>External\OCULUS\v132\Logging\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
-      <Filter>External\OCULUS\v132\Logging\src\internal</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp">
       <Filter>HMD</Filter>
@@ -585,15 +567,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h">
       <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h">
-      <Filter>External\OCULUS\v132\Logging\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h">
-      <Filter>External\OCULUS\v132\Logging\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h">
-      <Filter>External\OCULUS\v132\Logging\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\HMD.h">
       <Filter>HMD</Filter>
@@ -1811,6 +1784,9 @@
       <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>

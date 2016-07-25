@@ -20,8 +20,12 @@
 #if defined(_WIN32)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_WIN32
 
+	#include <WinSock2.h>
+	#include <WS2tcpip.h>
+	#include <Windows.h>
+
 	#ifdef WIN32_LEAN_AND_MEAN
-		#unfdef WIN32_LEAN_AND_MEAN
+		#undef WIN32_LEAN_AND_MEAN
 	#endif
 
 	#ifndef WIN32

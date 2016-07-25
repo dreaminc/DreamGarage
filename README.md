@@ -16,6 +16,10 @@ This is the path of the DreamOS folder in the DreamGarage repo. Since there may 
 
 Currently DreamOS is using CEF for all cloud connectivity, or WebRTC/WebSockets for peer to peer.  CEF can get quite large, especially the debug binaries.  At the moment CEF is included through the use the C++ wrapper for the binaries, and since these are so large they are not kept in the repo.  This can also allow for rapid updating of the most recent version of CEF, the current supported build is reflected in the external\CEF\CEF_BINARARY_X.XXXX.XXXX folder.
 
+**WEBRTCSRCPATH**
+
+This path should point to the src/ path of the WebRTC source/build as described in the below WebRTC section
+
 
 ## Network
 

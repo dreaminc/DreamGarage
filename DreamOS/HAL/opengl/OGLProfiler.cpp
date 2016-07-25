@@ -133,8 +133,8 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		currentPoint.x() = right - (float)deltaTime * width / (float)time_scale;
 		currentPoint.y() = YSCALE(records[index].first);
 
-		minFPS = min(minFPS, records[index].first);
-		maxFPS = max(maxFPS, records[index].first);
+		minFPS = std::min(minFPS, records[index].first);
+		maxFPS = std::max(maxFPS, records[index].first);
 
 		if (cnt == 0)
 		{
