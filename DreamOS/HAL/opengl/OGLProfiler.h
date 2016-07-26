@@ -12,7 +12,6 @@
 #include "Profiler/ProfilerGraph.h"
 #include "Profiler/DebugConsole.h"
 
-
 // Dream OS
 // DreamOS/HAL/opengl/OGLProfiler.h
 // OGLProfiler renders the profiler to an OGL program
@@ -77,8 +76,6 @@ public:
 
 private:
 	std::unique_ptr<OGLText>	m_OGLConsoleText;
-	std::shared_ptr<DebugData> m_bufferValues;
-
 };
 
 class OGLProfiler : public OGLRenderContext {

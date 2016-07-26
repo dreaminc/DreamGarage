@@ -707,7 +707,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		}
 		
 		// Render profiler overlay
-		if (/*eye == EYE_LEFT && */GetRenderProfiler()) {
+		if (GetRenderProfiler()) {
 			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
 			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 			m_pOGLProfiler->Render();

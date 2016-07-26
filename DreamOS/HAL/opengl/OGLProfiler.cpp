@@ -99,8 +99,6 @@ void OGLProfiler::Render()
 	OGLRenderContext::Render(point(left, top, 0.0f), point(-0.1f, top - consoleHeight, 0.0f));
 	// Render debug console text
 	m_OGLConsole.Render(point(0.0f, top, 0.0f), point(0.6f, 0.0f, 0.0f));
-
-
 }
 
 // OGLProfilerGraph
@@ -205,8 +203,6 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize)->SetPosition(point(left, YSCALE(0), 0), text::TOP_RIGHT));
 	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::BOTTOM_RIGHT));
 
-	float marginX = 0.05f;
-	float marginY = 0.05f;
 	OGLRenderContext::Render(point(left, YSCALE(fpsDiff), 0.0f), point(right, bottom, 0.0f));
 
 }
@@ -228,8 +224,6 @@ void OGLDebugConsole::Init()
 {
 	OGLRenderContext::Init();
 	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(""));
-
-	m_bufferValues = DebugConsole::GetDebugConsole()->Register();
 }
 
 void OGLDebugConsole::Render(point& topLeft, point& bottomRight)
@@ -243,11 +237,7 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight)
 		m_OGLConsoleText->SetText(it->GetValue(), m_fontSize);
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetPosition(rowTL, text::TOP_LEFT));
 		consoleHeight += rowSize;
-
 	}
-	std::string el = DebugConsole::GetDebugConsole()->GetConsoleData()[1]->GetValue();
-	m_bufferValues->SetValue(std::to_string(el.length()));
-	m_bufferValues->SetValue(std::to_string(m_OGLConsoleText->NumberVertices()));
 	
 	OGLRenderContext::Render(topLeft, point(bottomRight.x(), topLeft.y() - consoleHeight, 0.0f));
 
