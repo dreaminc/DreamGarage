@@ -52,8 +52,8 @@ void OGLProfiler::Render()
 
 	glDisable(GL_CULL_FACE);
 
-	m_OGLProgram->UseProgram();
-	//pOGLProgram->SetCamera();
+//	m_OGLProgram->UseProgram();
+
 
 	// Render FPS graph
 	//m_OGLGraph.Render(point(-0.5, -0.5 + 0.4, 0), point(-0.5 + 0.5, -0.5, 0), Profiler::GetProfiler()->GetFPSGraph(), 0.005);

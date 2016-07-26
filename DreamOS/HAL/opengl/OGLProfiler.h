@@ -25,10 +25,10 @@ public:
 	{}
 
 	virtual ~OGLRenderContext() {}
+	OGLProgram*	m_OGLProgram;
 
 protected:
 	OpenGLImp*	m_OGLImp;
-	OGLProgram*	m_OGLProgram;
 	std::unique_ptr<OGLTriangle> m_Background;
 };
 
