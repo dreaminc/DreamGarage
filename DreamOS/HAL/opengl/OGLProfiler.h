@@ -25,11 +25,21 @@ public:
 	{}
 
 	virtual ~OGLRenderContext() {}
+
+	void Init();
+	void Render(point& topLeft, point& rightBottom);
+
 	OGLProgram*	m_OGLProgram;
 
 protected:
 	OpenGLImp*	m_OGLImp;
+
 	std::unique_ptr<OGLTriangle> m_Background;
+	float m_BackgroundMargin = 0.025f;
+
+	// A font for the text. TBD: remove and use a font factory
+	std::shared_ptr<Font>	m_OGLFont;
+	float m_fontSize;
 };
 
 template<typename T>
@@ -52,9 +62,6 @@ private:
 	// Use triangle primitive to draw a line for the graphs
 	std::unique_ptr<OGLTriangle> m_OGLTriangle;
 
-	// A font for the text. TBD: remove and use a font factory
-	std::shared_ptr<Font>	m_OGLFont;
-
 	// Use text for FPS
 	std::unique_ptr<OGLText>	 m_OGLFPSText;
 };
@@ -65,12 +72,10 @@ public:
 	~OGLDebugConsole();
 
 	void Init();
-	void Render();
+	void Render(point& topLeft, point& bottomRight);
 	void Destroy();
 
 private:
-	
-	std::shared_ptr<Font>	m_OGLFont;
 	std::unique_ptr<OGLText>	m_OGLConsoleText;
 	std::shared_ptr<DebugData> m_bufferValues;
 
@@ -86,9 +91,6 @@ public:
 	void Destroy();
 
 private:
-	// A font for the text. TBD: remove and use a font factory
-	std::shared_ptr<Font>	m_OGLFont;
-
 	// Title for the profiler
 	std::unique_ptr<OGLText>	 m_OGLTitleText;
 
