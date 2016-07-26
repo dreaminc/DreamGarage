@@ -7,9 +7,9 @@
 #include "OGLText.h"
 
 #include "Profiler/Profiler.h"
-#include "Profiler/DebugConsole.h"
 
 #include <Windows.h>
+#include <string>
 
 // OGLProfiler
 
@@ -33,7 +33,7 @@ void OGLProfiler::Init()
 	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
 	m_OGLTitleText->MoveTo(-0.7f, -0.7f, 0);
 
-	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(100, '0'));
+	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(""));
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 
 	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
@@ -92,7 +92,6 @@ void OGLProfiler::Render()
 	m_OGLProgram->RenderObject(m_Background->Set(tl, br, tr));
 
 	// Render debug console text
-	//m_OGLProgram->RenderObject(m_Background->Set(point(0.0f, 0.0f, 0.0f), point(1.0f, 0.0f, 0.0f), point(0.0f, 1.0f, 0.0f)));
 	m_OGLConsole.Render();
 }
 
@@ -115,8 +114,7 @@ void OGLProfilerGraph::Init()
 	m_OGLTriangle->SetColor(color(0.8f, 0.0f, 0.0f, 1));
 
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
-	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "000");
-	//m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "000");
+	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(""));
 
 	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
 	m_Background->SetColor(color(0.0f, 0.0f, 0.0f, 0.5f));
@@ -233,11 +231,13 @@ void OGLDebugConsole::Init()
 {
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
 
-	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(100, '0'));
+	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(""));
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 
 	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
 	m_Background->SetColor(color(0.0f, 0.0f, 0.0f, 0.5f));
+	
+	m_bufferValues = DebugConsole::GetDebugConsole()->Register();
 }
 
 void OGLDebugConsole::Render()
@@ -250,9 +250,15 @@ void OGLDebugConsole::Render()
 	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData())
 	{
 		point rowTL = point(debugConsoleTL.x(), debugConsoleTL.y() - consoleHeight, 0.0f);
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(it->GetValue(), fontSize)->SetPosition(rowTL, text::BOTTOM_LEFT));
+		m_OGLConsoleText->SetText(it->GetValue(), fontSize);
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetPosition(rowTL, text::BOTTOM_LEFT));
 		consoleHeight += rowSize;
+
 	}
+	std::string el = DebugConsole::GetDebugConsole()->GetConsoleData()[1]->GetValue();
+	m_bufferValues->SetValue(std::to_string(el.length()));
+	m_bufferValues->SetValue(std::to_string(m_OGLConsoleText->NumberVertices()));
+	
 
 	float left = 0.0f; float right = 0.5f; float top = 0.8f; float bottom = top - consoleHeight;
 	float marginX = 0.05f; float marginY = 0.05f;

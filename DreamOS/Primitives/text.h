@@ -98,15 +98,6 @@ public:
 		#define YSCALE_TO_SCREEN(y)	2.0f * (y) / screen_height
 
 		m_width = 0.0f;
-/*		for_each(text.begin(), text.end(), [&](char c) {
-			Font::CharacterGlyph glyph;
-			if (m_font->GetGlyphFromChr(c, glyph))
-			{
-				m_width += (c == text.back()) ? XSCALE_TO_SCREEN(glyph.xadvance) : 
-												XSCALE_TO_SCREEN(glyph.width);
-			}
-		});
-*/		
 		float max_below = 0.0f;
 		float max_above = 0.0f;
 		for_each(text.begin(), text.end(), [&](char c) {
@@ -130,7 +121,6 @@ public:
 				m_width += (c == text.back()) ? XSCALE_TO_SCREEN(glyph.xadvance) : 
 												XSCALE_TO_SCREEN(glyph.width);
 
-				// not quite correct, but close
 				m_height = (dys > m_height) ? dys : m_height;
 			}
 		});

@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "Profiler/ProfilerGraph.h"
+#include "Profiler/DebugConsole.h"
 
 
 // Dream OS
@@ -71,6 +72,7 @@ private:
 	
 	std::shared_ptr<Font>	m_OGLFont;
 	std::unique_ptr<OGLText>	m_OGLConsoleText;
+	std::shared_ptr<DebugData> m_bufferValues;
 
 };
 
@@ -94,6 +96,7 @@ private:
 
 	OGLProfilerGraph	m_OGLGraph;
 	OGLDebugConsole		m_OGLConsole;
+
 };
 
 #endif // ! OGLPROFILER_H

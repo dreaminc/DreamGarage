@@ -42,6 +42,12 @@ public:
 	{
 		text::SetText(text, size);
 
+		if (CheckAndCleanDirty())
+		{
+			ReleaseOGLBuffers();
+			OGLInitialize();
+		}
+
 		SetDirty();
 
 		return this;
