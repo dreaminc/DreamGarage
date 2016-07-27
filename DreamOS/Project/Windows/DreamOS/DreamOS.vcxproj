@@ -123,8 +123,8 @@
       <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\libcurl_imp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -166,6 +166,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Release\libcef_dll_wrapper.lib;$(CEFPATH)\Release\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
