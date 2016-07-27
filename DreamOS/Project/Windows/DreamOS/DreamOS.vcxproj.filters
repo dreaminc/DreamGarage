@@ -135,6 +135,9 @@
     <Filter Include="DreamGarage">
       <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cloud\Protocols">
+      <UniqueIdentifier>{53b92527-af4f-46be-b785-0364e161fff1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -307,6 +310,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Protocols\Http.cpp">
+      <Filter>Cloud\Protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Protocols\Websocket.cpp">
+      <Filter>Cloud\Protocols</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1806,6 +1815,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Protocols\Http.h">
+      <Filter>Cloud\Protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Protocols\Websocket.h">
+      <Filter>Cloud\Protocols</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
