@@ -21,6 +21,8 @@
 #include "webrtc/base/win32socketinit.h"
 #include "webrtc/base/win32socketserver.h"
 
+#include "WebRTCClient.h"
+
 class WebRTCImp : public CloudImp {
 public:
 	WebRTCImp() :
@@ -38,6 +40,10 @@ public:
 
 		rtc::EnsureWinsockInit();
 		rtc::ThreadManager::Instance()->SetCurrentThread(&m_Win32thread);
+		rtc::InitializeSSL();
+
+
+		rtc::scoped_refptr<WebRTCConductor> conductor(new rtc::RefCountedObject<WebRTCConductor>(&m_WebRTCClient, &wnd));
 
 	Error:
 		return r;
@@ -53,6 +59,7 @@ public:
 	}
 
 private:
+	WebRTCClient m_WebRTCClient;
 	rtc::Win32Thread m_Win32thread;
 };
 
