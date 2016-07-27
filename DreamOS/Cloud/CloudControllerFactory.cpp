@@ -29,6 +29,8 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 			// Create the CEF implementation			
 
 			std::unique_ptr<WebRTCImp> pWebRTCImp(new WebRTCImp());
+			CR(pWebRTCImp->Initialize());
+
 			pCloudController->SetCloudImp(std::move(pWebRTCImp));
 		}
 

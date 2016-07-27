@@ -31,9 +31,7 @@ RESULT SandboxApp::Initialize() {
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
-#ifdef CEF_ENABLED
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
-#endif
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
