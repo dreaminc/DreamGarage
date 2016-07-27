@@ -222,7 +222,7 @@ RESULT OGLFramebuffer::SetAndClearViewport() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 
-Error:
+//Error:
 	return r;
 }
 
@@ -234,7 +234,7 @@ RESULT OGLFramebuffer::SetAndClearViewportDepthBuffer() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	//glEnable(GL_FRAMEBUFFER_SRGB);
 
-Error:
+//Error:
 	return r;
 }
 

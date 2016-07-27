@@ -17,7 +17,7 @@ int main(int argc, const char *argv[]) {
 	// This is the entry point for the DreamOS Engine
 	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");
 
-Success:
+//Success:
 	return (int)(r);
 
 Error:
