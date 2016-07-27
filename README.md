@@ -93,4 +93,4 @@ https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instr
 
 Keep note that to run gclient sync you will need to run the command prompt as administrator in windows to set up the Ninja build files correctly
 
-
+In some cases it might be needed to run the build ninja with x64 indicated as the architectuer per the following `python webrtc\build\gyp_webrtc -Dtarget_arch=x64`

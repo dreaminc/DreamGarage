@@ -120,7 +120,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;winmm.lib;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\webrtc.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base_approved.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base_tests_utils.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_task_queue.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log_parser.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log_proto.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\system_wrappers\system_wrappers.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\rtc_event_log_source.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\rtp_rtcp.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_utility.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_device.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
