@@ -70,6 +70,7 @@ public:
 	quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* MakeVolume(double side);
+	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);

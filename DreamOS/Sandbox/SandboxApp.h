@@ -56,6 +56,7 @@ public:
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
 	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* AddVolume(double side);
+	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);

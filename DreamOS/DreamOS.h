@@ -26,6 +26,7 @@
 #include "Primitives/quad.h"
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
+#include "Primitives/text.h"
 #include "Primitives/texture.h"
 #include "Primitives/skybox.h"
 
@@ -49,6 +50,7 @@ protected:
 
 	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	volume *AddVolume(double side);
+	text *AddText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);

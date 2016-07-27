@@ -308,6 +308,9 @@
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\text.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

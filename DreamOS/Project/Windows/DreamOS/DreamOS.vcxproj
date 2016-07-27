@@ -203,6 +203,7 @@
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\text.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />

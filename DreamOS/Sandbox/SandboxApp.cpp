@@ -130,6 +130,26 @@ Error:
 	return nullptr;
 }
 
+text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard)
+{
+	RESULT r = R_PASS;
+
+	text *pText = m_pHALImp->MakeText(fontName, content, size, isBillboard);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+	return nullptr;
+}
+
 texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pHALImp->MakeTexture(pszFilename, type);
 }

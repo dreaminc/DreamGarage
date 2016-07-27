@@ -95,6 +95,10 @@ RESULT DreamGarage::LoadScene() {
 	volume *pVolume = AddVolume(0.5f);
 	pVolume->MoveTo(-1.0f, 1.0f, 0.0f);
 
+	text *pText = AddText(L"Arial.png", "Hello world", 100.0f, true);
+	pText->MoveTo(5.0f, 5.0f, 0.0f);
+	text *pText2 = AddText(L"Arial.png", "Hello world", 100.0f, true);
+	pText2->RotateYByDeg(180.0f);
 	/*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
@@ -151,6 +155,6 @@ RESULT DreamGarage::Update(void) {
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
 	g_pLight->RotateLightDirectionXAxis(0.00005f * 1.3f);
 
-//Error:
+	//Error:
 	return r;
 }

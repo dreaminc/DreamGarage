@@ -511,6 +511,24 @@ Error:
 	return nullptr;
 }
 
+text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)
+{
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, std::make_shared<Font>(fontName), content, size, isBillboard);
+	CN(pText);
+
+//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+	return nullptr;
+}
+
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
@@ -708,7 +726,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// TODO: Temporary go through scene graph again
-	///*
+	/*
 	m_pOGLProgramCapture->UseProgram();
 	CR(m_pOGLProgramCapture->SetLights(pLights));
 	//SetMonoViewTarget();

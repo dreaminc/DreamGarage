@@ -1,6 +1,5 @@
 #ifndef HAL_IMP_H_
 #define HAL_IMP_H_
-
 #include "./RESULT/EHM.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/Subscriber.h"
@@ -24,7 +23,7 @@
 #include "Primitives/quad.h"
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
-#include "Primitives/texture.h"
+#include "Primitives/text.h"
 #include "Primitives/skybox.h"
 #include "Primitives/model.h"
 
@@ -56,6 +55,7 @@ public:
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) = 0;
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
 	virtual volume* MakeVolume(double side) = 0;
+	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false) = 0;
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual skybox *MakeSkybox() = 0;
 	virtual model *MakeModel(wchar_t *pszModelName) = 0;

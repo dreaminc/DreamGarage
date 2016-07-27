@@ -77,6 +77,11 @@ volume* DreamOS::AddVolume(double side) {
 	return m_pSandbox->AddVolume(side);
 }
 
+text* DreamOS::AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)
+{
+	return m_pSandbox->AddText(fontName, content, size, isBillboard);
+}
+
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pSandbox->MakeTexture(pszFilename, type);
 }
