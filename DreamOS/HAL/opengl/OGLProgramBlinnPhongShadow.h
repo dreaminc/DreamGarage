@@ -43,6 +43,7 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformDepthViewProjectionMatrix), std::string("u_mat4DepthVP")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformIsBillboard), std::string("u_boolIsBillboard")));
 
 		// Uniform Blocks
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
@@ -86,6 +87,13 @@ public:
 	RESULT SetObjectUniforms(DimObj *pDimObj) {
 		auto matModel = pDimObj->GetModelMatrix();
 		m_pUniformModelMatrix->SetUniform(matModel);
+
+		quad *pQuad = dynamic_cast<quad *>(pDimObj);
+		if (pQuad != nullptr && pQuad->GetBillboard()) {
+			m_pUniformIsBillboard->SetUniform(true);
+		} else {
+			m_pUniformIsBillboard->SetUniform(false);
+		}
 
 		return R_PASS;
 	}
@@ -144,6 +152,9 @@ private:
 	OGLUniformMatrix4 *m_pUniformModelViewMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformDepthViewProjectionMatrix;
+
+	// Booleans
+	OGLUniformBool *m_pUniformIsBillboard;
 
 	// Textures
 	OGLUniformSampler2D *m_pUniformTextureDepth;

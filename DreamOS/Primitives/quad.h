@@ -63,6 +63,9 @@ protected:
 		return numIndices;
 	}
 
+	bool GetBillboard() { return m_isBillboard; }
+	void SetBillboard(bool billboard) { m_isBillboard = billboard;  }
+
 private:
 	QUAD_TYPE m_quadType;
 
@@ -71,6 +74,8 @@ private:
 
 	texture *m_pTextureHeight;
 	double m_heightMapScale;
+
+	bool m_isBillboard = false;
 
 
 public:

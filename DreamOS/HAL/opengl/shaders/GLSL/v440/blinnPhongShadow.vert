@@ -37,6 +37,8 @@ uniform mat4 u_mat4Normal;
 
 uniform mat4 u_mat4DepthVP;
 
+uniform bool u_boolIsBillboard;
+
 // Light Structure
 // TODO: Create a parsing system to create shader GLSL code
 struct Light {
@@ -99,5 +101,22 @@ void main(void) {
 	DataOut.color = inV_vec4Color;
 
 	// Projected Vert Position
-	gl_Position = u_mat4ViewProjection * vertWorldSpace;
+	if (!u_boolIsBillboard) {
+		gl_Position = u_mat4ViewProjection * vertWorldSpace;
+	} else {
+		
+		// remove rotation from modelview matrix
+		for (int x = 0; x < 3; x++) {
+			for (int y = 0; y < 3; y++) {
+				if (x == y) {
+					g_mat4ModelView[x][y] = 1;
+				} else {
+					g_mat4ModelView[x][y] = 0;
+				}
+			}
+		}
+
+		mat4 g_mat4Projection = u_mat4ViewProjection * inverse(u_mat4View);
+		gl_Position = g_mat4Projection * g_mat4ModelView * vec4(inV_vec4Position.xyz, 1.0f);	
+	}
 }

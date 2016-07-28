@@ -63,6 +63,7 @@ RESULT DreamGarage::LoadScene() {
 
 	quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
 	pQuad->MoveTo(0.0f, -1.0f, 0.0f);
+	pQuad->SetBillboard(true);
 
 	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
