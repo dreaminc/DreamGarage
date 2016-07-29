@@ -32,11 +32,11 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 			CR(pWebRTCImp->Initialize());
 
 			pCloudController->SetCloudImp(std::move(pWebRTCImp));
-		}
+		} break;
 
 		default: {
 			pCloudController = nullptr;
-			DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
+			DEBUG_LINEOUT("CloudControllerFactory: Cloud controller type %d not supported on this platform!", type);
 		} break;
 	}
 

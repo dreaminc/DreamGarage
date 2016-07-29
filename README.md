@@ -94,3 +94,13 @@ https://chromium.googlesource.com/chromium/src/+/master/docs/windows_build_instr
 Keep note that to run gclient sync you will need to run the command prompt as administrator in windows to set up the Ninja build files correctly
 
 In some cases it might be needed to run the build ninja with x64 indicated as the architectuer per the following `python webrtc\build\gyp_webrtc -Dtarget_arch=x64`
+
+### External Dependencies 
+
+WebRTC comes with many external dependencies, this section covers some potential pit falls
+
+#### LibYUV
+
+If Libyuv fails to build under x64 and is failing as a dependency, it is possible to build it directly from Chromium using gclient as per the instructions found here:
+
+https://chromium.googlesource.com/libyuv/libyuv/+/master/docs/getting_started.md

@@ -293,6 +293,15 @@
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCClient.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1787,6 +1796,9 @@
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCClient.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>

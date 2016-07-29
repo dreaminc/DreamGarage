@@ -14,53 +14,52 @@
 
 #include <algorithm>
 
+#include "webrtc/base/win32.h"
+
 #include "webrtc/api/mediastreaminterface.h"
 #include "webrtc/api/peerconnectioninterface.h"
 
 #include "webrtc/base/ssladapter.h"
 #include "webrtc/base/win32socketinit.h"
 #include "webrtc/base/win32socketserver.h"
+#include "webrtc/base/refcount.h"
 
 #include "WebRTCClient.h"
+#include "WebRTCConductor.h"
+
+const char kAudioLabel[] = "audio_label";
+const char kVideoLabel[] = "video_label";
+const char kStreamLabel[] = "stream_label";
+const uint16_t kDefaultServerPort = 8888;
 
 class WebRTCImp : public CloudImp {
 public:
-	WebRTCImp() :
-		CloudImp()
-	{
-		// TodO
-	}
+	enum WindowMessages {
+		UI_THREAD_CALLBACK = WM_APP + 1,
+	};
 
-	~WebRTCImp() {
-		// TODO
-	}
+public:
+	WebRTCImp();
+	~WebRTCImp();
 
-	RESULT Initialize() {
-		RESULT r = R_PASS;
+	// CloudImp Interface
+	RESULT Initialize();
+	RESULT CreateNewURLRequest(std::wstring& strURL);
+	RESULT Update();
 
-		rtc::EnsureWinsockInit();
-		rtc::ThreadManager::Instance()->SetCurrentThread(&m_Win32thread);
-		rtc::InitializeSSL();
+	friend class WebRTCClient;
+	friend class WebRTCConductor;
 
-
-		rtc::scoped_refptr<WebRTCConductor> conductor(new rtc::RefCountedObject<WebRTCConductor>(&m_WebRTCClient, &wnd));
-
-	Error:
-		return r;
-	}
-
-	RESULT CreateNewURLRequest(std::wstring& strURL) {
-		return R_NOT_IMPLEMENTED;
-	}
-
-	// Will simply update the message loop as needed
-	RESULT Update() {
-		return R_NOT_IMPLEMENTED;
-	}
+protected:
+	// WebRTC Specific
+	RESULT QueueUIThreadCallback(int msg_id, void* data);
+	DWORD GetUIThreadID() { return m_UIThreadID; }
 
 private:
 	WebRTCClient m_WebRTCClient;
 	rtc::Win32Thread m_Win32thread;
+
+	DWORD m_UIThreadID;
 };
 
 #endif	// ! WEBRTC_IMP_H_

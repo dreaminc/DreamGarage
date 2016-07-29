@@ -8,6 +8,8 @@
 // DreamOS/Cloud/webrtc/WebRTCClient.h
 // The WebRTC Client that handles all WebRTC messages 
 
+#include <map>
+
 #include "webrtc/base/nethelpers.h"
 #include "webrtc/base/physicalsocketserver.h"
 #include "webrtc/base/signalthread.h"
@@ -27,19 +29,35 @@ public:
 
 public:
 	WebRTCClient();
+	~WebRTCClient();
 
 	// implements the MessageHandler interface
 	void OnMessage(rtc::Message* msg);
 
+	RESULT SignOut();
 
 	int GetID() const { return m_WebRTCID; }
 	State GetState() const { return m_WebRTCState; }
-	bool IsConnected const{ return (m_WebRTCID != -1); }
+	bool IsConnected() const { return (m_WebRTCID != -1); }
 
+private:
+	RESULT ConnectControlSocket();
+
+private:
+	RESULT Close();
 
 private:
 	State m_WebRTCState;
 	int m_WebRTCID;
-}
+
+	rtc::SocketAddress m_SocketAddressServer;
+
+	rtc::AsyncResolver* m_pAsyncResolver;
+	std::unique_ptr<rtc::AsyncSocket> m_pAsyncSocketControl;
+	std::unique_ptr<rtc::AsyncSocket> m_pAsyncSocketHangingGet;
+	std::string m_strOnConnectData;
+
+	std::map<int, std::string> m_peers;
+};
 
 #endif	// ! WEBRTC_CLIENT_H_
