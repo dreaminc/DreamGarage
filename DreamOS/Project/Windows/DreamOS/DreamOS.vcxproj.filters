@@ -138,6 +138,9 @@
     <Filter Include="Cloud\Protocols">
       <UniqueIdentifier>{53b92527-af4f-46be-b785-0364e161fff1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cloud\Objects">
+      <UniqueIdentifier>{7148f2c0-486b-4638-9b6f-951c7aa6fa46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -316,6 +319,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\Protocols\Websocket.cpp">
       <Filter>Cloud\Protocols</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Objects\User.cpp">
+      <Filter>Cloud\Objects</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1821,6 +1827,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Protocols\Websocket.h">
       <Filter>Cloud\Protocols</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Objects\User.h">
+      <Filter>Cloud\Objects</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
