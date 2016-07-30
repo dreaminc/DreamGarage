@@ -2,6 +2,7 @@
 
 #include <curl/curl.h>
 #include <iostream>
+#include <future>
 
 #ifdef _WIN32
 #define SHORT_SLEEP Sleep(100)
@@ -98,7 +99,7 @@ void Http::Update()
 	curl_multi_perform(multi_handle, &handle_count);
 }
 
-bool Http::Request(std::function<HttpRequestHandler_t*(CURL*)> request, HttpResponse* response)
+bool Http::Request(std::function<HttpRequestHandler_t*(CURL*)> request)
 {
 	CURL* curl = NULL;
 	curl = curl_easy_init();
@@ -120,28 +121,85 @@ bool Http::Request(std::function<HttpRequestHandler_t*(CURL*)> request, HttpResp
 	return true;
 }
 
-bool Http::GET(const std::string& uri, HttpResponse* response)
+bool Http::AGET(const std::string& uri, const std::vector<std::string>& header, HttpResponse* response)
 {
 	return Request([&](CURL* curl) -> HttpRequestHandler_t*
 		{ 
-			HttpRequestHandler_t* cb = new HttpRequestHandler_t{
-				new HttpRequest{ curl, uri },
-				(response) ? response : &m_defaultResponse };
+			HttpRequestHandler_t* cb = new HttpRequestHandler_t(
+				new HttpRequest{ curl, uri, header },
+				(response) ? response : &m_defaultResponse,
+				nullptr);
 
 			curl_easy_setopt(curl, CURLOPT_URL, cb->request->uri.c_str());
+			curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L);
+
+			struct curl_slist *h = NULL;
+
+			for (const auto& st : cb->request->header)
+			{
+				h = curl_slist_append(h, st.c_str());
+			}
+
+			curl_easy_setopt(curl, CURLOPT_HTTPHEADER, h);
 
 			return cb;
-		},
-		response);
+		});
 }
 
-bool Http::POST(const std::string& uri, const std::vector<std::string>& header, const std::string& body, HttpResponse* response)
+bool Http::AGET(const std::string& uri, const std::vector<std::string>& header, HttpResponseFunc_t responseFunc)
+{
+	return Request([&](CURL* curl) -> HttpRequestHandler_t*
+	{
+		HttpRequestHandler_t* cb = new HttpRequestHandler_t(
+			new HttpRequest{ curl, uri, header },
+			nullptr,
+			responseFunc);
+
+		curl_easy_setopt(curl, CURLOPT_URL, cb->request->uri.c_str());
+
+		struct curl_slist *h = NULL;
+
+		for (const auto& st : cb->request->header)
+		{
+			h = curl_slist_append(h, st.c_str());
+		}
+
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, h);
+
+		return cb;
+	});
+}
+
+bool Http::GET(const std::string& uri, const std::vector<std::string>& header, HttpResponse& response)
+{
+	std::promise<std::string> prom;
+	std::future<std::string> fut = prom.get_future();
+
+	bool ret = AGET(uri,
+		header,
+		[&](std::string&& in) {
+		prom.set_value(in); });
+
+	if (!ret)
+	{
+		// request failed
+		return false;
+	}
+
+	response.PutResponse(fut.get());
+
+	return true;
+}
+
+bool Http::APOST(const std::string& uri, const std::vector<std::string>& header, const std::string& body, HttpResponse* response)
 {
 	return Request([&](CURL* curl) -> HttpRequestHandler_t*
 		{
-			HttpRequestHandler_t*	cb = new HttpRequestHandler_t{
+			HttpRequestHandler_t*	cb = new HttpRequestHandler_t(
 				new HttpRequest{ curl, uri, header, body },
-				(response) ? response : &m_defaultResponse };
+				(response) ? response : &m_defaultResponse,
+				nullptr);
+
 
 			curl_easy_setopt(curl, CURLOPT_URL, cb->request->uri.c_str());
 			curl_easy_setopt(curl, CURLOPT_POST, 1L);
@@ -157,8 +215,55 @@ bool Http::POST(const std::string& uri, const std::vector<std::string>& header, 
 			curl_easy_setopt(curl, CURLOPT_POSTFIELDS, cb->request->body.c_str());
 
 			return cb;
-		},
-		response);
+		});
+}
+
+bool Http::APOST(const std::string& uri, const std::vector<std::string>& header, const std::string& body, HttpResponseFunc_t responseFunc)
+{
+	return Request([&](CURL* curl) -> HttpRequestHandler_t*
+	{
+		HttpRequestHandler_t*	cb = new HttpRequestHandler_t(
+			new HttpRequest{ curl, uri, header, body },
+			nullptr,
+			responseFunc);
+
+		curl_easy_setopt(curl, CURLOPT_URL, cb->request->uri.c_str());
+		curl_easy_setopt(curl, CURLOPT_POST, 1L);
+
+		struct curl_slist *h = NULL;
+
+		for (const auto& st : cb->request->header)
+		{
+			h = curl_slist_append(h, st.c_str());
+		}
+
+		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, h);
+		curl_easy_setopt(curl, CURLOPT_POSTFIELDS, cb->request->body.c_str());
+
+		return cb;
+	});
+}
+
+bool Http::POST(const std::string& uri, const std::vector<std::string>& header, const std::string& body, HttpResponse& response)
+{
+	std::promise<std::string> prom;
+	std::future<std::string> fut = prom.get_future();
+
+	bool ret = APOST(uri,
+		header,
+		body,
+		[&](std::string&& in) {
+		prom.set_value(in); });
+
+	if (!ret)
+	{
+		// request failed
+		return false;
+	}
+
+	response.PutResponse(fut.get());
+
+	return true;
 }
 
 size_t Http::callback(void *ptr, size_t size, size_t nmemb, HttpRequestHandler_t *cb)
@@ -175,13 +280,29 @@ size_t Http::callback(void *ptr, size_t size, size_t nmemb, HttpRequestHandler_t
 	{
 		std::string st(static_cast<char*>(ptr));
 
-		cb->response->OnResponse(std::move(st));
+		if (cb->response)
+		{
+			// using HttpResponse
+			cb->response->OnResponse(std::move(st));
+			delete cb->request;
+			cb->request = nullptr;
+			cb->response = nullptr;
+		}
+		else if (cb->responseFunc)
+		{
+			// using HttpResponseFunc
+			cb->responseFunc(std::move(st));
+			delete cb->request;
+			cb->request = nullptr;
+			cb->responseFunc = nullptr;
+		}
 
 		// cleanup should be made after the callback(!)
 		//curl_easy_cleanup(cb->request->curl);
-
-		delete cb->request;
-		delete cb;
+		//CURL* c = cb->request->curl;
+		//cb->response = &m_defaultResponse;
+		//delete cb;
+		//curl_easy_cleanup(c);
 	}
 
 	return size*nmemb;
