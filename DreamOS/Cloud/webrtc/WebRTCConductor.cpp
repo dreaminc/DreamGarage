@@ -1,11 +1,19 @@
-#include "WebRTCImp.h"
-
 #include "WebRTCConductor.h"
-#include "webrtc/base/json.h"
-#include "webrtc/media/engine/webrtcvideocapturerfactory.h"
-#include "webrtc/modules/video_capture/video_capture_factory.h"
+
+#include "WebRTCImp.h"
+#include "WebRTCClient.h"
+
+#include <memory>
+#include <utility>
+#include <vector>
 
 #include "webrtc/api/test/fakeconstraints.h"
+#include "webrtc/base/common.h"
+#include "webrtc/base/json.h"
+#include "webrtc/base/logging.h"
+#include "webrtc/examples/peerconnection/client/defaults.h"
+#include "webrtc/media/engine/webrtcvideocapturerfactory.h"
+#include "webrtc/modules/video_capture/video_capture_factory.h"
 
 // Names used for a IceCandidate JSON object.
 const char kCandidateSdpMidName[] = "sdpMid";
@@ -112,19 +120,6 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* desc) {
 	jmessage[kSessionDescriptionSdpName] = sdp;
 
 	SendMessage(writer.write(jmessage));
-}
-
-std::string WebRTCConductor::GetEnvVarOrDefault(const char* env_var_name, const char* default_value) {
-	std::string value;
-	const char* env_var = getenv(env_var_name);
-
-	if (env_var)
-		value = env_var;
-
-	if (value.empty())
-		value = default_value;
-
-	return value;
 }
 
 std::string WebRTCConductor::GetPeerConnectionString() {

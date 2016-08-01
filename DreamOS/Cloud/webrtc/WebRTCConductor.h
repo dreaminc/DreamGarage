@@ -9,15 +9,19 @@
 // The WebRTC Conductor which conducts the peer connection and generally handles the WebRTC 
 // connections
 
+#include <deque>
+#include <map>
+#include <set>
+#include <string>
+
 #include "webrtc/api/mediastreaminterface.h"
 #include "webrtc/api/peerconnectioninterface.h"
-
-#include "WebRTCClient.h"
 
 #define DTLS_ON  true
 #define DTLS_OFF false
 
 class WebRTCImp;
+class WebRTCClient;
 
 class WebRTCConductor : public webrtc::PeerConnectionObserver, public webrtc::CreateSessionDescriptionObserver /*, public PeerConnectionClientObserver, public MainWndCallback */
 {
@@ -77,7 +81,6 @@ protected:
 
 private:
 	// Utility (TODO: Move this elsewhere?)
-	std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
 	std::string GetPeerConnectionString();
 
 private:
