@@ -31,6 +31,7 @@ out Data {
 uniform vec4 u_vec4Eye;
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4View;
+uniform mat4 u_mat4Projection;
 uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
@@ -38,6 +39,7 @@ uniform mat4 u_mat4Normal;
 uniform mat4 u_mat4DepthVP;
 
 uniform bool u_boolIsBillboard;
+uniform vec4 u_vec3Center;
 
 // Light Structure
 // TODO: Create a parsing system to create shader GLSL code
@@ -66,6 +68,18 @@ mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.0,
 					0.0, 0.5, 0.0, 0.0,
 					0.0, 0.0, 0.5, 0.0,
 					0.5, 0.5, 0.5, 1.0);
+
+
+mat3 g_mat3X90 = mat3(	1.0,0.0,0.0,
+						0.0,0.0,1.0,
+						0.0,-1.0,0.0);
+
+mat4 g_mat4X90 = mat4(	1.0, 0.0, 0.0, 0.0,
+						0.0, 0.0, 1.0, 0.0,
+						0.0,-1.0, 0.0, 0.0,
+						0.0, 0.0, 0.0, 1.0);	
+
+
 
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
@@ -106,17 +120,99 @@ void main(void) {
 	} else {
 		
 		// remove rotation from modelview matrix
+/*		g_mat4ModelView[0][0] = 1;
+		g_mat4ModelView[0][1] = 0;
+		g_mat4ModelView[0][2] = 0;
+
+		g_mat4ModelView[1][0] = 0;
+		g_mat4ModelView[1][1] = 0;
+		g_mat4ModelView[1][2] = 1;
+
+		g_mat4ModelView[2][0] = 0;
+		g_mat4ModelView[2][1] = -1;
+		g_mat4ModelView[2][2] = 0;
+
+		vec3 y = vec3( 0.0, 1.0, 0.0);
+
+		vec3 yProj = (dot(lookV,y)/dot(y,y))*y;
+		vec3 yRej = normalize(lookV - yProj);
+		vec3 lookBillboard = -yRej;
+
+		vec3 n = vec4ModelNormal.xyz;
+
+		vec3 nProj = (dot(n,y)/dot(y,y))*y;
+		vec3 nRej = normalize(n-nProj);
+
+		//float theta = acos(dot(lookV, n));
+		float theta = acos((dot(lookBillboard, nRej)));
+
+		mat4 g_mat4YRot = mat4(	cos(theta),	0.0, sin(theta),	0.0,
+								0.0,		1.0, 0.0,			0.0,
+								-sin(theta), 0.0, cos(theta),	0.0,
+								0.0,		0.0, 0.0,			1.0);
+
+		mat4 g_mat4XRot = mat4(1.0, 0.0, 0.0, 0.0,
+								0.0, cos(theta), sin(theta), 0.0,
+								0.0, -sin(theta), cos(theta), 0.0,
+								0.0, 0.0, 0.0, 1.0);
+
+		mat4 g_mat4ZRot = mat4(cos(theta), sin(theta), 0.0, 0.0,
+								-sin(theta), cos(theta), 0.0, 0.0,
+								0.0, 0.0, 1.0, 0.0,
+								0.0, 0.0, 0.0, 1.0);
+*/
+
+
+		mat4 g_mat4View = (u_mat4View);
+		vec3 lookV = vec3(	g_mat4View[0][2],
+							g_mat4View[1][2],
+							g_mat4View[2][2]);
+
+		vec3 rightV = vec3( g_mat4View[0][0],
+							g_mat4View[1][0],
+							g_mat4View[2][0]);
+
+		vec3 upV = vec3(	g_mat4View[0][1],
+							g_mat4View[1][1],
+							g_mat4View[2][1]);
+
+
+		vec3 position_world = u_vec3Center.xyz + inV_vec4Position.xyz;
+		vec3 model = vec3(vertWorldSpace.x,vertWorldSpace.y, vertWorldSpace.z);
+		vec3 worldX = vec3(inV_vec4Position.x, 0.0f, 0.0f);
+		vec3 worldY = vec3(0.0f, inV_vec4Position.z, 0.0f);
+		vec3 worldZ = vec3(0.0f, 0.0f, inV_vec4Position.y);
+		worldY = (-inV_vec4Position.z) * normalize(upV);
+		worldX = (inV_vec4Position.x) * normalize(rightV);
+		position_world = u_vec3Center.xyz + worldX + worldY + worldZ;
+		vec4 center = vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+		//gl_Position = u_mat4Projection * u_mat4View * vec4(position_world.xyz, 1.0f);	
+		mat4 g_mat4Y90 = mat4(	0.0, 0.0, 1.0, 0.0,
+								0.0, 1.0, 0.0, 0.0,
+							   -1.0, 0.0, 0.0, 0.0,
+								0.0, 0.0, 0.0, 1.0);	
+
+		mat4 g_mat4Z180 = mat4(-1.0, 0.0, 0.0, 0.0,
+								0.0,-1.0, 0.0, 0.0,
+								0.0, 0.0, 1.0, 0.0, 
+								0.0, 0.0, 0.0, 1.0);
+
+		//gl_Position = u_mat4Projection * u_mat4View * u_mat4Model * g_mat4Z180 * inverse(u_mat4Model) * vec4(position_world.xyz, 1.0f);
+		gl_Position = u_mat4Projection * u_mat4View * u_mat4Model * vec4(position_world.xyz, 1.0f);
+
+/*
+
+
 		for (int x = 0; x < 3; x++) {
-			for (int y = 0; y < 3; y++) {
-				if (x == y) {
-					g_mat4ModelView[x][y] = 1;
-				} else {
-					g_mat4ModelView[x][y] = 0;
-				}
+			for (int z = 0; z < 3; z++) {
+				g_mat4ModelView[x][z] = (g_mat4YRot)[x][z];
 			}
 		}
-
-		mat4 g_mat4Projection = u_mat4ViewProjection * inverse(u_mat4View);
-		gl_Position = g_mat4Projection * g_mat4ModelView * vec4(inV_vec4Position.xyz, 1.0f);	
+*/
+//		vec3 u_vec3Center = vec3(0.0f, 0.0f, 0.0f);
+//		vec3 position_world = u_vec3Center + (rightV * (vertWorldSpace.x - u_vec3Center.x)) + (upV * (vertWorldSpace.y - u_vec3Center.y));
+		//gl_Position = u_mat4Projection * g_mat4ModelView * g_mat4X90 * g_mat4Y90 * vec4(inV_vec4Position.xyz, 1.0f);	
+//		gl_Position = u_mat4Projection * u_mat4View * u_mat4Model * vec4(position_world.xyz, 1.0f);	
 	}
 }
