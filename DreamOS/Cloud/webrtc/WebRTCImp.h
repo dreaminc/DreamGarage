@@ -24,7 +24,7 @@ const uint16_t kDefaultServerPort = 8888;
 class WebRTCClient;
 class WebRTCConductor;
 
-class WebRTCImp : public CloudImp {
+class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp> {
 public:
 	enum WindowMessages {
 		UI_THREAD_CALLBACK = WM_APP + 1,

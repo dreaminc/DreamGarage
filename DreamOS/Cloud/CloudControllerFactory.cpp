@@ -15,7 +15,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	switch (type) {
 		case CLOUD_CONTROLLER_CEF: {
 			// Create the CEF implementation			
-			std::unique_ptr<CEFImp> pCEFImp(new CEFImp());
+			std::unique_ptr<CEFImp> pCEFImp = std::make_unique<CEFImp>();
 			CN(pContext);
 
 			HINSTANCE hInstance = reinterpret_cast<HINSTANCE>(pContext);
@@ -28,7 +28,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 		case CLOUD_CONTROLLER_WEBRTC: {
 			// Create the CEF implementation			
 
-			std::unique_ptr<WebRTCImp> pWebRTCImp(new WebRTCImp());
+			std::unique_ptr<WebRTCImp> pWebRTCImp = std::make_unique<WebRTCImp>();
 			CR(pWebRTCImp->Initialize());
 
 			pCloudController->SetCloudImp(std::move(pWebRTCImp));

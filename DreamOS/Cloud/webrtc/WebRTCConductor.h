@@ -23,7 +23,9 @@
 class WebRTCImp;
 class WebRTCClient;
 
-class WebRTCConductor : public webrtc::PeerConnectionObserver, public webrtc::CreateSessionDescriptionObserver /*, public PeerConnectionClientObserver, public MainWndCallback */
+class WebRTCConductor : 
+	public webrtc::PeerConnectionObserver, 
+	public webrtc::CreateSessionDescriptionObserver /*, public PeerConnectionClientObserver, public MainWndCallback */
 {
 
 public:

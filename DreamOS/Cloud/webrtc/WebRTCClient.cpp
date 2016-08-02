@@ -4,7 +4,7 @@
 #include "WebRTCConductor.h"
 
 //WebRTCClient::WebRTCClient() :
-WebRTCClient::WebRTCClient(const std::shared_ptr<WebRTCImp> &pParentWebRTCImp) :
+WebRTCClient::WebRTCClient(std::shared_ptr<WebRTCImp> pParentWebRTCImp) :
 	m_WebRTCID(-1),
 	m_WebRTCState(UNINITIALIZED),
 	m_pAsyncResolver(nullptr),
