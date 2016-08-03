@@ -147,7 +147,7 @@ public:
 
 private:
 	// Vertex Attribute
-	OGLVertexAttributeVector *m_pVertexAttributePosition;
+	OGLVertexAttributePoint *m_pVertexAttributePosition;
 	OGLVertexAttributeColor *m_pVertexAttributeColor;
 	OGLVertexAttributeVector *m_pVertexAttributeNormal;
 	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;

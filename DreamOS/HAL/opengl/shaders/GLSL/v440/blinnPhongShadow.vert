@@ -134,8 +134,9 @@ void main(void) {
 			//TODO expose these?
 			float scalingMagnitude = 0.1f;
 			float farScale = 3.0f;
+			float nearScale = 1.0f;
 
-			scale = max(1.0f, length(u_vec4CamOrigin.xyz + u_vec4Center.xyz)*scalingMagnitude);
+			scale = max(nearScale, length(u_vec4CamOrigin.xyz + u_vec4Center.xyz)*scalingMagnitude);
 
 			if (scale > farScale) 
 				scale = 0.0f;
