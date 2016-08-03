@@ -9,7 +9,8 @@
 #include "webrtc/base/arraysize.h"
 
 WebRTCImp::WebRTCImp() :
-	CloudImp()
+	CloudImp(),
+	m_pWebRTCConductor(nullptr)
 {
 	// empty
 }
@@ -22,7 +23,7 @@ WebRTCImp::~WebRTCImp() {
 RESULT WebRTCImp::Initialize() {
 	RESULT r = R_PASS;
 
-	rtc::scoped_refptr<WebRTCConductor> pWebRTCConductor = nullptr;
+	//rtc::scoped_refptr<WebRTCConductor> pWebRTCConductor = nullptr;
 
 	//m_pWin32thread = std::shared_ptr<rtc::Win32Thread>();
 	//rtc::Win32Thread Win32thread;
@@ -36,8 +37,8 @@ RESULT WebRTCImp::Initialize() {
 	m_pWebRTCClient = std::make_shared<WebRTCClient>(this);
 	CN(m_pWebRTCClient);
 
-	pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(m_pWebRTCClient.get(), this));
-	m_pWebRTCConductor = std::shared_ptr<WebRTCConductor>(pWebRTCConductor.get());
+	m_pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(m_pWebRTCClient.get(), this));
+	//m_pWebRTCConductor = std::shared_ptr<WebRTCConductor>(pWebRTCConductor);
 
 Error:
 	return r;
@@ -76,10 +77,11 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::GetICEServer() {
+RESULT WebRTCImp::InitializePeerConnection() {
 	RESULT r = R_PASS;
 
-	CR(m_pWebRTCConductor->CreatePeerConnection(true)); 
+	CR(m_pWebRTCConductor->InitializePeerConnection());
+	CR(m_pWebRTCConductor->CreateOffer());
 
 Error:
 	return r;

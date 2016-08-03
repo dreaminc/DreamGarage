@@ -70,7 +70,7 @@ protected:
 	virtual void OnServerConnectionFailure();
 
 	// CreateSessionDescriptionObserver implementation.
-	virtual void OnSuccess(webrtc::SessionDescriptionInterface* desc);
+	void OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription);
 	virtual void OnFailure(const std::string& error);
 
 protected:
@@ -83,6 +83,8 @@ protected:
 	RESULT ReinitializePeerConnectionForLoopback();
 	RESULT AddStreams();
 	cricket::VideoCapturer* OpenVideoCaptureDevice();
+
+	RESULT CreateOffer();
 
 private:
 	// Utility (TODO: Move this elsewhere?)
@@ -97,6 +99,7 @@ private:
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
+
 	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCActiveStreams;
 
 	std::string m_strWebRTCServer;

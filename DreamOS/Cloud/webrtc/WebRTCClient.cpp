@@ -155,6 +155,8 @@ Error:
 void WebRTCClient::OnMessageFromPeer(int peer_id, const std::string& message) {
 	RESULT r = R_PASS;
 
+	DEBUG_LINEOUT("WebRTCClient: OnMessageFromPeer");
+
 	if (message.length() == (sizeof(kByeMessage) - 1) && message.compare(kByeMessage) == 0) {
 		//callback_->OnPeerDisconnected(peer_id);
 		// TODO
