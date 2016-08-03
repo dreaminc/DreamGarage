@@ -66,8 +66,10 @@ public:
 	RESULT MakeVertexShader(const wchar_t *pszFilename);
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
 
+	// TODO: Likely more eloquent way to do this
 	RESULT RenderSceneGraph(SceneGraph *pSceneGraph);
 	RESULT RenderObject(DimObj *pDimObj);
+	RESULT RenderChildren(DimObj *pDimObj);	
 	RESULT RenderObject(VirtualObj *pVirtualObj);
 	
 	RESULT SetLights(SceneGraph *pSceneGraph);

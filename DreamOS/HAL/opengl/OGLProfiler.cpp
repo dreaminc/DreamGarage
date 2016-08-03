@@ -33,13 +33,11 @@ void OGLProfiler::Init()
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 }
 
-void OGLProfiler::Destroy()
-{
+void OGLProfiler::Destroy() {
 
 }
 
-void OGLProfiler::Render()
-{
+void OGLProfiler::Render() {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
