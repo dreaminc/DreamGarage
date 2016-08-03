@@ -31,7 +31,6 @@ out Data {
 uniform vec4 u_vec4Eye;
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4View;
-uniform mat4 u_mat4Projection;
 uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
@@ -39,6 +38,8 @@ uniform mat4 u_mat4Normal;
 uniform mat4 u_mat4DepthVP;
 
 uniform bool u_boolIsBillboard;
+uniform bool u_boolShouldScale;
+
 uniform vec4 u_vec4Center;
 uniform vec4 u_vec4CamOrigin;
 
@@ -70,17 +71,22 @@ mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.0,
 					0.0, 0.0, 0.5, 0.0,
 					0.5, 0.5, 0.5, 1.0);
 
+// billboarding matrices
+vec3 dir = -normalize(u_vec4CamOrigin.xyz + u_vec4Center.xyz);
 
-mat3 g_mat3X90 = mat3(	1.0,0.0,0.0,
-						0.0,0.0,1.0,
-						0.0,-1.0,0.0);
+vec3 rightV = vec3( u_mat4View[0][0],
+					u_mat4View[1][0],
+					u_mat4View[2][0]);
 
-mat4 g_mat4X90 = mat4(	1.0, 0.0, 0.0, 0.0,
-						0.0, 0.0, 1.0, 0.0,
-						0.0,-1.0, 0.0, 0.0,
-						0.0, 0.0, 0.0, 1.0);	
+vec3 upV = vec3(	u_mat4View[0][1],
+					u_mat4View[1][1],
+					u_mat4View[2][1]);
 
 
+vec3 y = vec3(0.0f, 1.0f, 0.0f);
+
+vec3 rightV2 = normalize(cross(y, dir));
+vec3 upV2 = normalize(cross(rightV2, dir));
 
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
@@ -115,42 +121,32 @@ void main(void) {
 	// Vert Color
 	DataOut.color = inV_vec4Color;
 
-	vec3 dir = -normalize(u_vec4CamOrigin.xyz + u_vec4Center.xyz);
-	mat4 g_mat4View = (u_mat4View);
-	vec3 lookV = vec3(	g_mat4View[0][2],
-						g_mat4View[1][2],
-						g_mat4View[2][2]);
 
-	vec3 rightV = vec3( g_mat4View[0][0],
-						g_mat4View[1][0],
-						g_mat4View[2][0]);
-
-	vec3 upV = vec3(	g_mat4View[0][1],
-						g_mat4View[1][1],
-						g_mat4View[2][1]);
-
-
-	vec3 y = vec3(0.0f, 1.0f, 0.0f);
-	vec3 rightV2 = normalize(cross(y, dir));
-	vec3 upV2 = normalize(cross(rightV2, dir));
-
-	vec3 testSpace = vertWorldSpace.xyz + rightV2;
 
 	// Projected Vert Position
 	if (!u_boolIsBillboard) {
-		gl_Position = u_mat4ViewProjection * vec4(testSpace, 1.0f);
+		gl_Position = u_mat4ViewProjection * vertWorldSpace;
 	} else {
 
 		float scale = 1.0f;
+		if (u_boolShouldScale) {
+			// May be a hack, but it makes sense and looks right
+			//TODO expose these?
+			float scalingMagnitude = 0.1f;
+			float farScale = 3.0f;
 
-		vec3 worldX = (inV_vec4Position.x) * normalize(rightV2) * scale;
-		vec3 worldY = (inV_vec4Position.z) * normalize(upV2) * scale;
+			scale = max(1.0f, length(u_vec4CamOrigin.xyz + u_vec4Center.xyz)*scalingMagnitude);
+
+			if (scale > farScale) 
+				scale = 0.0f;
+		}
+
+		vec3 worldX = inV_vec4Position.x * normalize(rightV2) * scale;
+		vec3 worldY = inV_vec4Position.z * normalize(upV2) * scale;
 		vec3 worldZ = vec3(0.0f, 0.0f, inV_vec4Position.y);
 
-		// using u_vec3Center.xyz is equivalent to using the model matrix
 		vec3 position_world = u_vec4Center.xyz + worldX + worldY + worldZ;
 
-		// Change to viewprojection remove projection from uniforms
-		gl_Position = u_mat4Projection * u_mat4View * vec4(position_world.xyz, 1.0f);
+		gl_Position = u_mat4ViewProjection * vec4(position_world.xyz, 1.0f);
 	}
 }

@@ -66,6 +66,9 @@ protected:
 	bool GetBillboard() { return m_isBillboard; }
 	void SetBillboard(bool billboard) { m_isBillboard = billboard; }
 
+	bool GetScaleBillboard() { return m_scaledBillboard; }
+	void SetScaleBillboard(bool scale) { m_scaledBillboard = scale; }
+
 private:
 	QUAD_TYPE m_quadType;
 
@@ -76,6 +79,7 @@ private:
 	double m_heightMapScale;
 
 	bool m_isBillboard = false;
+	bool m_scaledBillboard = false;
 
 public:
 

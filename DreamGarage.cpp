@@ -66,29 +66,9 @@ RESULT DreamGarage::LoadScene() {
 	pQuad->SetBillboard(true);
 
 	quad *pQuad2 = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad2->MoveTo(2.0f, 1.0f, 2.0f);
+	pQuad2->MoveTo(3.0f, 1.0f, 3.0f);
+	pQuad2->SetScaleBillboard(true);
 	pQuad2->SetBillboard(true);
-/*
-	quad *pQuad1 = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad1->MoveTo(0.0f, 0.0f, 0.0f);
-	pQuad1->SetBillboard(false);
-
-	quad *pQuad12 = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad12->MoveTo(2.0f, 1.0f, 2.0f);
-	pQuad12->SetBillboard(false);
-
-/*
-	for (float x = -10.0f; x <= 10.0f; x += 2.0f) {
-		for (float y = -10.0f; y <= 10.0f; y += 2.0f) {
-			for (float z = -10.0f; z <= 10.0f; z += 2.0f) {
-				quad *tQuad = AddQuad(1.0f, 1.0f, 10, 10);
-				tQuad->MoveTo(x, y, z);
-				tQuad->RotateXBy(M_PI);
-				tQuad->SetBillboard(true);
-			}
-		}
-	}
-//*/
 	
 	//tQuad->SetBillboard(true);
 /*
@@ -120,7 +100,7 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 	
 	volume *pVolume = AddVolume(0.5f);
-	pVolume->MoveTo(2.0f, 1.0f, 2.0f);
+	pVolume->MoveTo(0.0f, 0.0f, 0.0f);
 /*
 	text *pText = AddText(L"Arial.png", "Hello world", 100.0f, true);
 	pText->MoveTo(5.0f, 5.0f, 0.0f);
