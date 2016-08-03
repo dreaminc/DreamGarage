@@ -37,6 +37,9 @@ public:
 		STREAM_REMOVED,
 	};
 
+	friend class WebRTCImp;
+	friend class WebRTCClient;
+
 public:
 	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
 

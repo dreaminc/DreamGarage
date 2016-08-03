@@ -47,6 +47,8 @@ protected:
 WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp) :
 	m_pParentWebRTCImp(pParentWebRTCImp),
 	m_pWebRTCClient(pWebRTCClient),
+	m_pWebRTCPeerConnection(nullptr),
+	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_WebRTCPeerID(-1),
 	m_fLoopback(false)
 {

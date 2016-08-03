@@ -32,7 +32,8 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 			CR(pWebRTCImp->Initialize());
 
 			// TOOD: TEST CODE:
-			pWebRTCImp->StartLogin("localhost", 8888);
+			//pWebRTCImp->StartLogin("localhost", 8888);
+			pWebRTCImp->GetICEServer();
 
 			pCloudController->SetCloudImp(std::move(pWebRTCImp));
 

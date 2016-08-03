@@ -41,8 +41,15 @@ WebRTCClient::~WebRTCClient() {
 }
 
 void WebRTCClient::OnMessage(rtc::Message* msg) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("WebRTCClient: OnMessage");
+
 	// ignore msg; there is currently only one supported message ("retry")
-	DoConnect();
+	CR(DoConnect());
+
+Error:
+	return;
 }
 
 void WebRTCClient::OnClose(rtc::AsyncSocket* socket, int err) {
@@ -113,6 +120,8 @@ Error:
 void WebRTCClient::OnConnect(rtc::AsyncSocket* socket) {
 	RESULT r = R_PASS;
 
+	DEBUG_LINEOUT("WebRTCClient: OnConnect");
+
 	CB((!m_strOnConnectData.empty()));
 
 	size_t sent = socket->Send(m_strOnConnectData.c_str(), m_strOnConnectData.length());
@@ -129,6 +138,8 @@ Error:
 void WebRTCClient::OnHangingGetConnect(rtc::AsyncSocket* socket) {
 	RESULT r = R_PASS;
 	char buffer[1024];
+
+	DEBUG_LINEOUT("WebRTCClient: OnHangingGetConnect");
 
 	rtc::sprintfn(buffer, sizeof(buffer), "GET /wait?peer_id=%i HTTP/1.0\r\n\r\n", m_WebRTCID);
 	int len = static_cast<int>(strlen(buffer));
@@ -305,6 +316,8 @@ Error:
 void WebRTCClient::OnRead(rtc::AsyncSocket* socket) {
 	RESULT r = R_PASS;
 
+	DEBUG_LINEOUT("WebRTCClient: OnRead");
+
 	size_t content_length = 0;
 	if (ReadIntoBuffer(socket, &m_strControlData, &content_length)) {
 		size_t peer_id = 0, eoh = 0;
@@ -369,6 +382,8 @@ Error:
 
 void WebRTCClient::OnHangingGetRead(rtc::AsyncSocket* socket) {
 	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("WebRTCClient: OnHandingGetRead");
 
 	LOG(INFO) << __FUNCTION__;
 	size_t content_length = 0;

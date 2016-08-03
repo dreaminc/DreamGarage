@@ -76,6 +76,15 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::GetICEServer() {
+	RESULT r = R_PASS;
+
+	CR(m_pWebRTCConductor->CreatePeerConnection(true)); 
+
+Error:
+	return r;
+}
+
 // Utilities
 std::string WebRTCImp::GetPeerName() {
 	char computer_name[256];

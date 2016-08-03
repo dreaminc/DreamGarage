@@ -44,6 +44,7 @@ public:
 
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);
+	RESULT GetICEServer();
 
 public:
 	// Utilities
