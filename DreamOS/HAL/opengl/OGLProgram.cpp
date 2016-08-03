@@ -691,38 +691,54 @@ Error:
 }
 
 RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-
-	// This is done once on the CPU side rather than per-vertex (although this in theory could be better precision) 
-	//auto matModel = pDimObj->GetModelMatrix();
-	//m_pVertexShader->SetModelMatrix(matModel);
-
+	
 	/* TODO: This should be replaced with a materials store or OGLMaterial that pre-allocates and swaps binding points (Wait for textures)
 	m_pFragmentShader->SetMaterial(pDimObj->GetMaterial());
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 	//*/
 
-	if (pDimObj->CheckAndCleanDirty())
-	{
+	if (pDimObj->CheckAndCleanDirty()) {
 		// Update buffers if marked as dirty
 		pOGLObj->UpdateOGLBuffers();
 	}
+	
+	if (pOGLObj != nullptr) {
+		SetObjectUniforms(pDimObj);
+		SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
+	
+		CR(pOGLObj->Render());
+	}
 
-	SetObjectUniforms(pDimObj);
-	SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
+	if (pDimObj->HasChildren()) {
+		CR(RenderChildren(pDimObj));
+	}
 
-	/*
-	m_pFragmentShader->SetObjectTextures(pOGLObj);
-	*/
+Error:
+	return r;
+}
 
-	return pOGLObj->Render();
+RESULT OGLProgram::RenderChildren(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Rethink this since it's in the critical path
+	auto objects = pDimObj->GetChildren();
+
+	for (auto &pVirtualObj : objects) {
+		auto pDimObj = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
+		CR(RenderObject(pDimObj.get()));
+	}
+
+Error:
+	return r;
 }
 
 RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
 
-	if (pDimObj != nullptr)
-	{
+	if (pDimObj != nullptr) {
 		return RenderObject(pDimObj);
 	}
 

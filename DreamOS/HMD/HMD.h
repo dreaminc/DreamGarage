@@ -18,6 +18,7 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/quaternion.h"
 #include "Primitives/point.h"
+#include "Primitives/composite.h"
 
 #define HMD_NUM_EYES 2
 
@@ -69,7 +70,8 @@ typedef struct HMDEvent {
 
 class HMD : public Publisher<HMDEventType, HMDEvent> {
 public:
-	HMD() {
+	HMD() 
+	{
 		// empty stub
 	}
 
@@ -117,8 +119,6 @@ protected:
 
 	int m_eyeWidth;
 	int m_eyeHeight;
-
-
 
 private:
 	UID m_uid;

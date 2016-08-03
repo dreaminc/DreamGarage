@@ -9,6 +9,8 @@
 
 #include "Extras/OVR_Math.h"
 
+#include "HAL/opengl/OGLComposite.h"
+
 OVRHMD::OVRHMD() :
 	m_ovrSession(nullptr),
 	m_ovrMirrorTexture(nullptr)
@@ -213,6 +215,8 @@ Error:
 
 RESULT OVRHMD::UpdateHMD() {
 	RESULT r = R_PASS;
+
+	//ovr_RecenterTrackingOrigin(m_ovrSession);
 
 #ifdef HMD_OVR_USE_PREDICTED_TIMING
 	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
