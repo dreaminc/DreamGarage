@@ -69,6 +69,7 @@ private:
 
 	WNDCLASSEX m_wndclassex; 
 	HWND m_hwndWindow;
+	DWORD m_ThreadID;
 
 	HDC m_hDC;					// Private GDI Device Context
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application

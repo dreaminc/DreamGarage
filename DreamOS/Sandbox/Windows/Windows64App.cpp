@@ -18,7 +18,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr)
+	m_pHMD(nullptr),
+	m_ThreadID(0)
 {
 	RESULT r = R_PASS;
 
@@ -59,6 +60,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		// TODO: ?
 		//SysSetDisplayMode(screenw, screenh, SCRDEPTH);
 	}
+
+	m_ThreadID = ::GetCurrentThreadId();
+	CB((m_ThreadID != 0));
 
 	m_hwndWindow = CreateWindow(
 		m_pszClassName,										// lpClassName

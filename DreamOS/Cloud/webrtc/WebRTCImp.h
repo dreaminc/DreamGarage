@@ -67,7 +67,8 @@ protected:
 private:
 	std::shared_ptr<WebRTCClient> m_pWebRTCClient;
 	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
-	std::shared_ptr<rtc::Win32Thread> m_pWin32thread;
+	//std::shared_ptr<rtc::Win32Thread> m_pWin32thread;
+	rtc::Win32Thread m_Win32thread;
 
 	DWORD m_UIThreadID;
 

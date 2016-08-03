@@ -439,10 +439,12 @@ Error:
 RESULT WebRTCClient::DoConnect() {
 	RESULT r = R_PASS;
 
+	DEBUG_LINEOUT("WebRTCClient: DoConnect");
+
 	m_pAsyncSocketControl.reset(CreateClientSocket(m_SocketAddressServer.ipaddr().family()));
 	m_pAsyncSocketHangingGet.reset(CreateClientSocket(m_SocketAddressServer.ipaddr().family()));
 
-	InitSocketSignals();
+	CR(InitSocketSignals());
 	char buffer[1024];
 	
 	rtc::sprintfn(buffer, sizeof(buffer), "GET /sign_in?%s HTTP/1.0\r\n\r\n", m_strClientName.c_str());
@@ -453,7 +455,6 @@ RESULT WebRTCClient::DoConnect() {
 	}
 	else {
 		// TODO:
-#pragma message("TODO")
 		//callback_->OnServerConnectionFailure();
 	}
 
@@ -511,7 +512,7 @@ void WebRTCClient::OnResolveResult(rtc::AsyncResolverInterface* resolver) {
 	}
 	else {
 		m_SocketAddressServer = m_pAsyncResolver->address();
-		DoConnect();
+		CR(DoConnect());
 	}
 
 Error:
