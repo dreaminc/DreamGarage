@@ -123,7 +123,7 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* desc) {
 }
 
 std::string WebRTCConductor::GetPeerConnectionString() {
-	return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
 }
 
 void WebRTCConductor::OnFailure(const std::string& error) {

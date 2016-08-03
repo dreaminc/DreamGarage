@@ -3,6 +3,29 @@
 #include "WebRTCImp.h"
 #include "WebRTCConductor.h"
 
+namespace {
+
+	// This is our magical hangup signal.
+	const char kByeMessage[] = "BYE";
+	// Delay between server connection retries, in milliseconds
+	const int kReconnectDelay = 2000;
+
+	rtc::AsyncSocket* CreateClientSocket(int family) {
+#ifdef WIN32
+		rtc::Win32Socket* sock = new rtc::Win32Socket();
+		sock->CreateT(family, SOCK_STREAM);
+		return sock;
+#elif defined(WEBRTC_POSIX)
+		rtc::Thread* thread = rtc::Thread::Current();
+		ASSERT(thread != NULL);
+		return thread->socketserver()->CreateAsyncSocket(family, SOCK_STREAM);
+#else
+#error Platform not supported.
+#endif
+	}
+
+}  // namespace
+
 //WebRTCClient::WebRTCClient() :
 WebRTCClient::WebRTCClient(std::shared_ptr<WebRTCImp> pParentWebRTCImp) :
 	m_WebRTCID(-1),
@@ -18,7 +41,43 @@ WebRTCClient::~WebRTCClient() {
 }
 
 void WebRTCClient::OnMessage(rtc::Message* msg) {
+	// ignore msg; there is currently only one supported message ("retry")
+	DoConnect();
+}
 
+void WebRTCClient::OnClose(rtc::AsyncSocket* socket, int err) {
+	LOG(INFO) << __FUNCTION__;
+
+	socket->Close();
+
+#ifdef WIN32
+	if (err != WSAECONNREFUSED) {
+#else
+	if (err != ECONNREFUSED) {
+#endif
+		if (socket == m_pAsyncSocketHangingGet.get()) {
+			if (m_WebRTCState == CONNECTED) {
+				m_pAsyncSocketHangingGet->Close();
+				m_pAsyncSocketHangingGet->Connect(m_SocketAddressServer);
+			}
+		}
+		else {
+			// TODO:
+			//callback_->OnMessageSent(err);
+		}
+	}
+	else {
+		if (socket == m_pAsyncSocketControl.get()) {
+			LOG(WARNING) << "Connection refused; retrying in 2 seconds";
+			rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kReconnectDelay, this, 0);
+		}
+		else {
+			Close();
+
+			// TODO:
+			//callback_->OnDisconnected();
+		}
+	}
 }
 
 RESULT WebRTCClient::SignOut() {
@@ -51,15 +110,17 @@ Error:
 	return r;
 }
 
-/*
 void WebRTCClient::OnConnect(rtc::AsyncSocket* socket) {
 	RESULT r = R_PASS;
 
-	ASSERT(!onconnect_data_.empty());
-	size_t sent = socket->Send(onconnect_data_.c_str(), onconnect_data_.length());
-	ASSERT(sent == onconnect_data_.length());
+	CB((!m_strOnConnectData.empty()));
+
+	size_t sent = socket->Send(m_strOnConnectData.c_str(), m_strOnConnectData.length());
+	CB((sent == m_strOnConnectData.length()));
+	
 	RTC_UNUSED(sent);
-	onconnect_data_.clear();
+	
+	m_strOnConnectData.clear();
 
 Error:
 	return;
@@ -69,7 +130,7 @@ void WebRTCClient::OnHangingGetConnect(rtc::AsyncSocket* socket) {
 	RESULT r = R_PASS;
 	char buffer[1024];
 
-	rtc::sprintfn(buffer, sizeof(buffer), "GET /wait?peer_id=%i HTTP/1.0\r\n\r\n", my_id_);
+	rtc::sprintfn(buffer, sizeof(buffer), "GET /wait?peer_id=%i HTTP/1.0\r\n\r\n", m_WebRTCID);
 	int len = static_cast<int>(strlen(buffer));
 	int sent = socket->Send(buffer, len);
 
@@ -96,57 +157,209 @@ Error:
 	return;
 }
 
+int WebRTCClient::GetResponseStatus(const std::string& response) {
+	int status = -1;
+	
+	size_t pos = response.find(' ');
+	
+	if (pos != std::string::npos)
+		status = atoi(&response[pos + 1]);
+
+	return status;
+}
+
+RESULT WebRTCClient::ParseServerResponse(const std::string& response, size_t content_length, size_t* peer_id, size_t* eoh) {
+	RESULT r = R_PASS;
+
+	int status = GetResponseStatus(response.c_str());
+	CB((status == 200));
+
+	*eoh = response.find("\r\n\r\n");
+	CB((*eoh != std::string::npos));
+
+	*peer_id = -1;
+
+	// See comment in peer_channel.cc for why we use the Pragma header and not e.g. "X-Peer-Id".
+	CR(GetHeaderValue(response, *eoh, "\r\nPragma: ", peer_id));
+
+Success:
+	return r;
+
+Error:
+	// TODO:
+	//callback_->OnDisconnected();
+	LOG(LS_ERROR) << "Received error from server";
+	Close();
+	return r;
+}
+
+RESULT WebRTCClient::ParseEntry(const std::string& entry, std::string* name, int* id, bool* connected) {
+	RESULT r = R_PASS;
+
+	CB((name != nullptr));
+	CB((id != nullptr));
+	CB((connected != nullptr));
+	CB((!entry.empty()));
+
+	*connected = false;
+	size_t separator = entry.find(',');
+
+	if (separator != std::string::npos) {
+		*id = atoi(&entry[separator + 1]);
+		name->assign(entry.substr(0, separator));
+		separator = entry.find(',', separator + 1);
+		
+		if (separator != std::string::npos) 
+			*connected = atoi(&entry[separator + 1]) ? true : false;
+	}
+
+	CB((!name->empty()));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCClient::GetHeaderValue(const std::string& data, size_t eoh, const char* header_pattern, size_t* value) {
+	RESULT r = R_PASS;
+
+	CB((value != nullptr));
+	size_t found = data.find(header_pattern);
+	
+	CB((found != std::string::npos));
+	CB((found < eoh));
+
+	*value = atoi(&data[found + strlen(header_pattern)]);
+
+Error:
+	return r;
+}
+
+RESULT WebRTCClient::GetHeaderValue(const std::string& data, size_t eoh, const char* header_pattern, std::string* value) {
+	RESULT r = R_PASS;
+
+	CB((value != nullptr));
+
+	size_t found = data.find(header_pattern);
+
+	CB((found != std::string::npos));
+	CB((found < eoh));
+
+	size_t begin = found + strlen(header_pattern);
+	size_t end = data.find("\r\n", begin);
+	
+	if (end == std::string::npos)
+		end = eoh;
+
+	value->assign(data.substr(begin, end - begin));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCClient::ReadIntoBuffer(rtc::AsyncSocket* socket, std::string* data, size_t* content_length) {
+	RESULT r = R_PASS;
+	char buffer[0xffff];
+
+	do {
+		int bytes = socket->Recv(buffer, sizeof(buffer), nullptr);
+
+		if (bytes <= 0) 
+			break;
+
+		data->append(buffer, bytes);
+	} while (true);
+
+	bool ret = false;
+	size_t i = data->find("\r\n\r\n");
+
+	if (i != std::string::npos) {
+		LOG(INFO) << "Headers received";
+		if (GetHeaderValue(*data, i, "\r\nContent-Length: ", content_length)) {
+			size_t total_response_size = (i + 4) + *content_length;
+			if (data->length() >= total_response_size) {
+				ret = true;
+				std::string should_close;
+				const char kConnection[] = "\r\nConnection: ";
+
+				if (GetHeaderValue(*data, i, kConnection, &should_close) && should_close.compare("close") != R_PASS) {
+					socket->Close();
+					
+					// Since we closed the socket, there was no notification delivered
+					// to us.  Compensate by letting ourselves know.
+					OnClose(socket, 0);
+				}
+			}
+			else {
+				// We haven't received everything.  Just continue to accept data.
+			}
+		}
+		else {
+			LOG(LS_ERROR) << "No content length field specified by the server.";
+		}
+	}
+
+Error:
+	return r;
+}
+
 void WebRTCClient::OnRead(rtc::AsyncSocket* socket) {
 	RESULT r = R_PASS;
 
 	size_t content_length = 0;
-	if (ReadIntoBuffer(socket, &control_data_, &content_length)) {
+	if (ReadIntoBuffer(socket, &m_strControlData, &content_length)) {
 		size_t peer_id = 0, eoh = 0;
-		bool ok = ParseServerResponse(control_data_, content_length, &peer_id,
-			&eoh);
-		if (ok) {
-			if (my_id_ == -1) {
-				// First response.  Let's store our server assigned ID.
-				ASSERT(state_ == SIGNING_IN);
-				my_id_ = static_cast<int>(peer_id);
-				ASSERT(my_id_ != -1);
 
-				// The body of the response will be a list of already connected peers.
-				if (content_length) {
-					size_t pos = eoh + 4;
-					while (pos < control_data_.size()) {
-						size_t eol = control_data_.find('\n', pos);
-						if (eol == std::string::npos)
-							break;
-						int id = 0;
-						std::string name;
-						bool connected;
-						if (ParseEntry(control_data_.substr(pos, eol - pos), &name, &id,
-							&connected) && id != my_id_) {
-							peers_[id] = name;
-							callback_->OnPeerConnected(id, name);
-						}
-						pos = eol + 1;
+		CR(ParseServerResponse(m_strControlData, content_length, &peer_id, &eoh));
+
+		if (m_WebRTCID == -1) {
+			// First response.  Let's store our server assigned ID.
+			CB((m_WebRTCState == SIGNING_IN));
+				
+			m_WebRTCID = static_cast<int>(peer_id);
+			CB((m_WebRTCID != -1));
+
+			// The body of the response will be a list of already connected peers.
+			if (content_length) {
+				size_t pos = eoh + 4;
+				while (pos < m_strControlData.size()) {
+					size_t eol = m_strControlData.find('\n', pos);
+					if (eol == std::string::npos)
+						break;
+					int id = 0;
+					std::string name;
+					bool connected;
+
+					if (ParseEntry(m_strControlData.substr(pos, eol - pos), &name, &id, &connected) && id != m_WebRTCID) {
+						m_peers[id] = name;
+						
+						// TODO:
+						//callback_->OnPeerConnected(id, name);
 					}
+					pos = eol + 1;
 				}
-				ASSERT(is_connected());
-				callback_->OnSignedIn();
 			}
-			else if (state_ == SIGNING_OUT) {
-				Close();
-				callback_->OnDisconnected();
-			}
-			else if (state_ == SIGNING_OUT_WAITING) {
-				SignOut();
-			}
+
+			CB((IsConnected()));
+			
+			// TODO: 
+			//callback_->OnSignedIn();
+		}
+		else if (m_WebRTCState == SIGNING_OUT) {
+			Close();
+			
+			// TODO:
+			//callback_->OnDisconnected();
+		}
+		else if (m_WebRTCState == SIGNING_OUT_WAITING) {
+			SignOut();
 		}
 
-		control_data_.clear();
+		m_strControlData.clear();
 
-		if (state_ == SIGNING_IN) {
-			ASSERT(hanging_get_->GetState() == rtc::Socket::CS_CLOSED);
-			state_ = CONNECTED;
-			hanging_get_->Connect(server_address_);
+		if (m_WebRTCState == SIGNING_IN) {
+			CB((m_pAsyncSocketHangingGet->GetState() == rtc::Socket::CS_CLOSED));
+			m_WebRTCState = CONNECTED;
+			m_pAsyncSocketHangingGet->Connect(m_SocketAddressServer);
 		}
 	}
 
@@ -159,51 +372,50 @@ void WebRTCClient::OnHangingGetRead(rtc::AsyncSocket* socket) {
 
 	LOG(INFO) << __FUNCTION__;
 	size_t content_length = 0;
-	if (ReadIntoBuffer(socket, &notification_data_, &content_length)) {
+	if (ReadIntoBuffer(socket, &m_strNotificatonData, &content_length)) {
+
 		size_t peer_id = 0, eoh = 0;
-		bool ok = ParseServerResponse(notification_data_, content_length,
-			&peer_id, &eoh);
+		CR(ParseServerResponse(m_strNotificatonData, content_length, &peer_id, &eoh));
 
-		if (ok) {
-			// Store the position where the body begins.
-			size_t pos = eoh + 4;
+		// Store the position where the body begins.
+		size_t pos = eoh + 4;
 
-			if (my_id_ == static_cast<int>(peer_id)) {
-				// A notification about a new member or a member that just
-				// disconnected.
-				int id = 0;
-				std::string name;
-				bool connected = false;
-				if (ParseEntry(notification_data_.substr(pos), &name, &id,
-					&connected)) {
-					if (connected) {
-						peers_[id] = name;
-						callback_->OnPeerConnected(id, name);
-					}
-					else {
-						peers_.erase(id);
-						callback_->OnPeerDisconnected(id);
-					}
+		if (m_WebRTCID == static_cast<int>(peer_id)) {
+			// A notification about a new member or a member that just
+			// disconnected.
+			int id = 0;
+			std::string name;
+			bool connected = false;
+			if (ParseEntry(m_strNotificatonData.substr(pos), &name, &id, &connected) == R_PASS) {
+				if (connected) {
+					m_peers[id] = name;
+
+					// TODO:
+					//callback_->OnPeerConnected(id, name);
+				}
+				else {
+					m_peers.erase(id);
+
+					// TODO:
+					//callback_->OnPeerDisconnected(id);
 				}
 			}
-			else {
-				OnMessageFromPeer(static_cast<int>(peer_id),
-					notification_data_.substr(pos));
-			}
 		}
-
-		notification_data_.clear();
+		else {
+			OnMessageFromPeer(static_cast<int>(peer_id),
+				m_strNotificatonData.substr(pos));
+		}
 	}
 
-	if (hanging_get_->GetState() == rtc::Socket::CS_CLOSED &&
-		state_ == CONNECTED) {
-		hanging_get_->Connect(server_address_);
+	m_strNotificatonData.clear();
+
+	if (m_pAsyncSocketHangingGet->GetState() == rtc::Socket::CS_CLOSED && m_WebRTCState == CONNECTED) {
+		m_pAsyncSocketHangingGet->Connect(m_SocketAddressServer);
 	}
 
 Error:
 	return;
 }
-*/
 
 RESULT WebRTCClient::InitSocketSignals() {
 	RESULT r = R_PASS;
@@ -223,30 +435,6 @@ RESULT WebRTCClient::InitSocketSignals() {
 Error:
 	return r;
 }
-
-
-namespace {
-
-	// This is our magical hangup signal.
-	const char kByeMessage[] = "BYE";
-	// Delay between server connection retries, in milliseconds
-	const int kReconnectDelay = 2000;
-
-	rtc::AsyncSocket* CreateClientSocket(int family) {
-#ifdef WIN32
-		rtc::Win32Socket* sock = new rtc::Win32Socket();
-		sock->CreateT(family, SOCK_STREAM);
-		return sock;
-#elif defined(WEBRTC_POSIX)
-		rtc::Thread* thread = rtc::Thread::Current();
-		ASSERT(thread != NULL);
-		return thread->socketserver()->CreateAsyncSocket(family, SOCK_STREAM);
-#else
-#error Platform not supported.
-#endif
-	}
-
-}  // namespace
 
 RESULT WebRTCClient::DoConnect() {
 	RESULT r = R_PASS;

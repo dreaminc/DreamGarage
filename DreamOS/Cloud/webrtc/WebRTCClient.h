@@ -35,7 +35,7 @@ public:
 	WebRTCClient(std::shared_ptr<WebRTCImp> pParentWebRTCImp);
 	~WebRTCClient();
 
-	// implements the MessageHandler interface
+	// Implements the MessageHandler interface
 	void OnMessage(rtc::Message* msg);
 	void OnClose(rtc::AsyncSocket* socket, int err);	// TODO: Not implemented?
 	void OnConnect(rtc::AsyncSocket* socket);
@@ -64,6 +64,12 @@ private:
 	RESULT DoConnect();
 	RESULT ConnectControlSocket();
 	RESULT InitSocketSignals();
+	RESULT ReadIntoBuffer(rtc::AsyncSocket* socket, std::string* data, size_t* content_length);
+	RESULT GetHeaderValue(const std::string& data, size_t eoh, const char* header_pattern, size_t* value);
+	RESULT GetHeaderValue(const std::string& data, size_t eoh, const char* header_pattern, std::string* value);
+	RESULT ParseServerResponse(const std::string& response, size_t content_length, size_t* peer_id, size_t* eoh);
+	RESULT ParseEntry(const std::string& entry, std::string* name, int* id, bool* connected);
+	int GetResponseStatus(const std::string& response);
 
 private:
 	RESULT Close();
@@ -76,12 +82,16 @@ private:
 	int m_WebRTCID;
 
 	rtc::SocketAddress m_SocketAddressServer;
-	std::string m_strClientName;
 
 	rtc::AsyncResolver* m_pAsyncResolver;
 	std::unique_ptr<rtc::AsyncSocket> m_pAsyncSocketControl;
 	std::unique_ptr<rtc::AsyncSocket> m_pAsyncSocketHangingGet;
+	
+
+	std::string m_strClientName;
+	std::string m_strNotificatonData;
 	std::string m_strOnConnectData;
+	std::string m_strControlData;
 
 	std::map<int, std::string> m_peers;
 
