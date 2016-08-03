@@ -51,6 +51,11 @@ RESULT DreamGarage::LoadScene() {
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	//*/
 
+	/*
+	model* pModel = AddModel(L"chainsaw_free.obj");
+	pModel->SetColorTexture(pColorTexture);
+	pModel->SetBumpTexture(pBumpTexture);
+	*/
 
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
@@ -61,6 +66,7 @@ RESULT DreamGarage::LoadScene() {
 	HUD_OUT("Hello World");
 
 	//pQuad->SetBumpTexture(pBumpTexture);
+	//*/
 
 	quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
 	pQuad->MoveTo(0.0f, -1.0f, 0.0f);
@@ -78,26 +84,26 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	///*
-	m_pSphere = AddSphere(0.5f, 40, 40);
-	m_pSphere->SetColorTexture(pColorTexture);
-	m_pSphere->SetBumpTexture(pBumpTexture);
-	//*/
-	m_spherePosition = DebugConsole::GetDebugConsole()->Register();
-
 	/*
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40));
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
+	pSphere2->translateX(3.0f);
+	m_pSphere->AddChild(pSphere2);
 
-	pSphere2->translateX(5.0f);
+
+	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40));
+	pSphere3->SetColorTexture(pColorTexture2);
+	pSphere3->SetBumpTexture(pBumpTexture2);
+	pSphere3->translateX(2.0f);
+	pSphere2->AddChild(pSphere3);
 	//*/
 
+	//*/
 	
 	volume *pVolume = AddVolume(0.5f);
 	pVolume->MoveTo(-1.0f, 1.0f, 0.0f);
 
-	/*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 
@@ -107,6 +113,7 @@ RESULT DreamGarage::LoadScene() {
 	pMgr->GetCurrentPath((wchar_t*&)path);
 	std::wstring objFile(path);
 
+	/*
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f, 0.0f),
@@ -131,12 +138,16 @@ RESULT DreamGarage::LoadScene() {
 		0.015f,
 		1.0f);
 
+	
+	*/
+
+	/*
 	AddModel(objFile, L"\\Models\\table\\untitled.obj",
 		nullptr,
-		point(0.0f, -13.0f, 0.0f),
-		10.0f,
+		point(0.0, 13.0, 0.0),
+		10.0,
 		3.14f);
-	*/
+	//*/
 
 
 //Error:
@@ -147,9 +158,10 @@ RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 
 	// Update stuff ...
-	m_pSphere->translateX(0.005f);
-	CN(m_spherePosition);
-	m_spherePosition->SetValue(std::to_string(m_pSphere->GetOrigin().x()));
+	if (m_pSphere != nullptr) {
+		//m_pSphere->translateY(0.01f);
+		//m_pSphere->RotateBy(0.01f, 0.02f, 0.01f);
+	}
 
 	//m_pSphere->translateX(0.001f);
 

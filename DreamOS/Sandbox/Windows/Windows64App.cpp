@@ -18,7 +18,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr)
+	m_pHMD(nullptr),
+	m_pSenseLeapMotion(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -82,6 +83,10 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	// Initialize Mouse 
 	m_pWin64Mouse->CaptureMouse();
 	m_pWin64Mouse->CenterMousePosition();
+
+	// Sense Leap Motion Device (TODO: temporarily here!)
+	m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
+	CN(m_pSenseLeapMotion);
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
@@ -364,6 +369,60 @@ Error:
 	return r;
 }
 
+
+// temp
+#include "HAL/opengl/OGLHand.h"
+
+// TODO: shouldn't be this way ultimately 
+RESULT Windows64App::RegisterImpLeapMotionEvents() {
+	RESULT r = R_PASS;
+
+	//CR(m_pSenseLeapMotion->RegisterSubscriber(SENSE_LEAPMOTION_EVENT_HAND_LEFT, m_pHALImp));
+
+	//volume *pLeapObj = AddVolume(1.0f, 1.0f, 0.25f);
+	//CR(m_pSenseLeapMotion->AttachVirtualObj(pLeapObj));
+
+	/*
+	composite *pHMDFrameOfReference = new OGLComposite(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	AddObject(pHMDFrameOfReference);
+	//*/
+
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	
+	/*
+	if (m_pHMD != nullptr) {
+		std::shared_ptr<DimObj> pLeftHandShaderPtr(pLeftHand);
+		m_pHALImp->GetCamera()->AddObject(pLeftHandShaderPtr);
+
+		std::shared_ptr<DimObj> pRightHandShaderPtr(pRightHand);
+		m_pHALImp->GetCamera()->AddObject(pRightHandShaderPtr);
+	}
+	else {
+		AddObject(pLeftHand);
+		AddObject(pRightHand);
+	}
+	*/
+
+	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
+
+	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
+
+	/*
+	sphere *pSphere = MakeSphere(1.0f, 10, 10);
+	pSphere->MoveTo(0.0f, 0.0f, 5.0f);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj>(pSphere));
+	//*/
+
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
+
+Error:
+	return r;
+}
+
 RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
 
@@ -373,11 +432,13 @@ RESULT Windows64App::InitializeSandbox() {
 		return R_FAIL;
 	}
 
+	/*
 	// TODO: Move to Sandbox function
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	*/
 
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
@@ -385,12 +446,28 @@ RESULT Windows64App::InitializeSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
-
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
 	}
 	//*/
+
+	///*
+	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
+	m_pHALImp->GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
+	CRM(AddObject(pCameraFrameOfReferenceComposite), "Failed to add composite camera frame of reference");
+	//*/
+
+	// TODO: Move to Sandbox function
+	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
+	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
+
+	// TODO: This will only turn on Leap if connected at boot up
+	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected()) {
+		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
+	}
+
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
@@ -466,6 +543,7 @@ RESULT Windows64App::Show() {
 		else {
 			// Render Scene
 			m_pHALImp->Render(m_pSceneGraph);
+			//m_pHALImp->RenderStereo(m_pSceneGraph);
 		}
 		//*/
 	
@@ -523,3 +601,5 @@ RESULT Windows64App::RecoverDisplayMode() {
 
 	return r;
 }
+
+

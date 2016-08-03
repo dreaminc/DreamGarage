@@ -446,6 +446,25 @@ Error:
 	return nullptr;
 }
 
+#include "HAL/opengl/OGLComposite.h"
+
+composite *OpenGLImp::MakeComposite() {
+	RESULT r = R_PASS;
+
+	composite *pComposite = new OGLComposite(this);
+	CN(pComposite);
+
+Success:
+	return pComposite;
+
+Error:
+	if (pComposite != nullptr) {
+		delete pComposite;
+		pComposite = nullptr;
+	}
+	return nullptr;
+}
+
 // TODO: Other approach 
 light* OpenGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
@@ -498,10 +517,10 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double side) {
+volume* OpenGLImp::MakeVolume(double width, double length, double height) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, side);
+	volume *pVolume = new OGLVolume(this, width, length, height);
 	CN(pVolume);
 
 //Success:
@@ -513,6 +532,10 @@ Error:
 		pVolume = nullptr;
 	}
 	return nullptr;
+}
+
+volume* OpenGLImp::MakeVolume(double side) {
+	return MakeVolume(side, side, side);
 }
 
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
@@ -744,6 +767,8 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
+		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+
 		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 		//SetStereoFramebufferViewTarget(eye);

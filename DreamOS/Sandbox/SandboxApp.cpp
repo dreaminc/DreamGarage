@@ -53,10 +53,14 @@ Error:
 	return r;
 }
 
+light* SandboxApp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+	return m_pHALImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+}
+
 light* SandboxApp::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
 
-	light *pLight = m_pHALImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+	light *pLight = MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 	CN(pLight);
 
 	CR(AddObject(pLight));
@@ -71,7 +75,7 @@ Error:
 	}
 	return nullptr;
 }
-
+	
 quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) {
 	RESULT r = R_PASS;
 
@@ -90,6 +94,10 @@ Error:
 	}
 
 	return nullptr;
+}
+
+sphere* SandboxApp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
+	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
 }
 
 sphere* SandboxApp::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
@@ -111,10 +119,18 @@ Error:
 	return nullptr;
 }
 
-volume* SandboxApp::AddVolume(double side) {
+volume* SandboxApp::MakeVolume(double width, double length, double height) {
+	return m_pHALImp->MakeVolume(width, length, height);
+}
+
+volume* SandboxApp::MakeVolume(double side) {
+	return m_pHALImp->MakeVolume(side);
+}
+
+volume* SandboxApp::AddVolume(double width, double length, double height) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = m_pHALImp->MakeVolume(side);
+	volume *pVolume = MakeVolume(width, length, height);
 	CN(pVolume);
 
 	CR(AddObject(pVolume));
@@ -130,14 +146,22 @@ Error:
 	return nullptr;
 }
 
+volume* SandboxApp::AddVolume(double side) {
+	return AddVolume(side, side, side);
+}
+
 texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pHALImp->MakeTexture(pszFilename, type);
+}
+
+skybox* SandboxApp::MakeSkybox() {
+	return m_pHALImp->MakeSkybox();
 }
 
 skybox *SandboxApp::AddSkybox() {
 	RESULT r = R_PASS;
 
-	skybox *pSkybox = m_pHALImp->MakeSkybox();
+	skybox *pSkybox = MakeSkybox();
 	CN(pSkybox);
 
 	CR(AddObject(pSkybox));
@@ -153,11 +177,14 @@ Error:
 	return nullptr;
 }
 
-// TODO: A lot of this should go into the model object itself
+model* SandboxApp::MakeModel(wchar_t *pszModelName) {
+	return m_pHALImp->MakeModel(pszModelName);
+}
+
 model *SandboxApp::AddModel(wchar_t *pszModelName) {
 	RESULT r = R_PASS;
 
-	model* pModel = m_pHALImp->MakeModel(pszModelName);
+	model* pModel = MakeModel(pszModelName);
 	CN(pModel);
 
 	CR(AddObject(pModel));

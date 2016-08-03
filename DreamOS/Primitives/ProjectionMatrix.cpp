@@ -87,6 +87,7 @@ RESULT ProjectionMatrix::SetPerspective(projection_precision width,
 	return r;
 }
 
+
 //http://www.songho.ca/opengl/gl_projectionmatrix.html
 RESULT ProjectionMatrix::SetPerspective(projection_precision left, projection_precision right,
 										projection_precision top, projection_precision bottom,

@@ -58,6 +58,11 @@ model *AddModel(wchar_t *pszModelName);
 
 Currently no notifications / events are set up but this will be added to help notify the applicatio of things like keyboard entry, mouse movement or other pertinent application layer events.
 
+# Input
+
+## Leap Motion
+
+The engine supports using the Leap Motion input controller, but this requires the Leap runtime to be running and libraries/DLLs installed on the machine.  Also, the compiler will look for the library at the path as provided by the `LEAPMOTIONPATH` environment variable which should be set to where the SDK is installed.
 
 # Using Dream OS
 

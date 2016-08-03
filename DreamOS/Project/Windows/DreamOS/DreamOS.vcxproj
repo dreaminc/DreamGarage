@@ -109,7 +109,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(LEAPMOTIONPATH)\include\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
@@ -120,11 +120,15 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;$(LEAPMOTIONPATH)\lib\x64\Leap.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
-      </Command>
+			xcopy /y "$(CEFPATH)\Debug\*" "$(TargetDir)" /D
+			xcopy /y "$(CEFPATH)\Resources\*" "$(TargetDir)" /D
+			xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
+			xcopy /y "$(LEAPMOTIONPATH)\lib\x64\Leap.dll" "$(TargetDir)" /D
+		</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -200,7 +204,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp" />
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
+    <ClCompile Include="..\..\..\Primitives\composite.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
+    <ClCompile Include="..\..\..\Primitives\hand.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
@@ -224,6 +230,7 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraph.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -433,8 +440,10 @@
     <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
@@ -482,9 +491,12 @@
     <ClInclude Include="..\..\..\Primitives\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
+    <ClInclude Include="..\..\..\Primitives\composite.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
+    <ClInclude Include="..\..\..\Primitives\dirty.h" />
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
+    <ClInclude Include="..\..\..\Primitives\hand.h" />
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
@@ -540,6 +552,8 @@
     <ClInclude Include="..\..\..\Scene\SceneGraphStore.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h" />
     <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
