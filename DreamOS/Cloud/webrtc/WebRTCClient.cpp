@@ -27,13 +27,13 @@ namespace {
 }  // namespace
 
 //WebRTCClient::WebRTCClient() :
-WebRTCClient::WebRTCClient(std::shared_ptr<WebRTCImp> pParentWebRTCImp) :
+WebRTCClient::WebRTCClient(WebRTCImp* pParentWebRTCImp) :
 	m_WebRTCID(-1),
 	m_WebRTCState(UNINITIALIZED),
 	m_pAsyncResolver(nullptr),
-	m_pParentWebRTCImp(pParentWebRTCImp)
+	m_pParentWebRTCImp(nullptr)
 {
-	// empty
+	m_pParentWebRTCImp = std::shared_ptr<WebRTCImp>(pParentWebRTCImp);
 }
 
 WebRTCClient::~WebRTCClient() {
@@ -471,7 +471,7 @@ RESULT WebRTCClient::Connect(const std::string& strServer, int port, const std::
 	// TODO:
 	//callback_->OnServerConnectionFailure();
 
-	CB((strServer.empty() || strServer.empty()));
+	CB((!strServer.empty()) || (!strServer.empty()));
 	// TODO: 
 	// callback_->OnServerConnectionFailure();
 

@@ -30,7 +30,7 @@ RESULT WebRTCImp::Initialize() {
 	rtc::ThreadManager::Instance()->SetCurrentThread(m_pWin32thread.get());
 	rtc::InitializeSSL();
 
-	m_pWebRTCClient = std::shared_ptr<WebRTCClient>(new WebRTCClient(shared_from_this()));
+	m_pWebRTCClient = std::make_shared<WebRTCClient>(this);
 	CN(m_pWebRTCClient);
 
 	pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(m_pWebRTCClient.get(), this));
@@ -100,6 +100,30 @@ std::string WebRTCImp::GetEnvVarOrDefault(const char* env_var_name, const char* 
 		value = default_value;
 
 	return value;
+}
+
+RESULT WebRTCImp::OnSignedIn() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT WebRTCImp::OnDisconnected() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT WebRTCImp::OnPeerConnected(int id, const std::string& name) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT WebRTCImp::OnPeerDisconnected(int peer_id) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT WebRTCImp::OnMessageFromPeer(int peer_id, const std::string& message) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT WebRTCImp::OnMessageSent(int err) {
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT WebRTCImp::OnServerConnectionFailure() {

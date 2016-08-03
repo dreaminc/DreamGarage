@@ -31,7 +31,11 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 			std::unique_ptr<WebRTCImp> pWebRTCImp = std::make_unique<WebRTCImp>();
 			CR(pWebRTCImp->Initialize());
 
+			// TOOD: TEST CODE:
+			pWebRTCImp->StartLogin("localhost", 8888);
+
 			pCloudController->SetCloudImp(std::move(pWebRTCImp));
+
 		} break;
 
 		default: {

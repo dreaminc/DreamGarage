@@ -45,7 +45,6 @@ public:
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);
 
-
 public:
 	// Utilities
 	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);

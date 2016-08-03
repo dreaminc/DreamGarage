@@ -32,7 +32,7 @@ public:
 	};
 
 public:
-	WebRTCClient(std::shared_ptr<WebRTCImp> pParentWebRTCImp);
+	WebRTCClient(WebRTCImp *pParentWebRTCImp);
 	~WebRTCClient();
 
 	// Implements the MessageHandler interface
