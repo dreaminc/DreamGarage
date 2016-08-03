@@ -29,7 +29,6 @@ public:
 	}
 
 	inline unsigned int NumberVertices() { return m_nVertices; }
-	//inline unsigned int NumberIndices() { return m_nVertices; }
 	inline unsigned int NumberIndices() { return m_nIndices; }
 
 private:
@@ -114,7 +113,7 @@ public:
 		Invalidate();
 		return;
 	}
-
+	/*
 	model(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 		RESULT r = R_PASS;
 		CR(SetVerticesIndices(vertices, indices));
@@ -126,27 +125,45 @@ public:
 		Invalidate();
 		return;
 	}
-
+	*/
 	model(const std::vector<vertex>& vertices) {
-		/*m_nVertices = vertices.size();
-
-		RESULT r = R_PASS;
-		CR(Allocate());
-
-		unsigned int verticesCnt = 0;
-
-		for (auto& v : vertices) {
-			m_pVertices[verticesCnt++] = vertex(v);
-
-			if (verticesCnt % 3 == 0) {
-				SetTriangleTangentBitangent(verticesCnt - 3, verticesCnt - 2, verticesCnt - 1);
-			}
-		}
-		*/
+		// init a model with index for each vertex
+		m_nIndices = m_nVertices;
 
 		RESULT r = R_PASS;
 		CR(SetVertices(vertices));
 	
+		Validate();
+		return;
+
+	Error:
+		Invalidate();
+		return;
+	}
+
+	model(const std::vector<vertex>& vertices, const std::vector<size_t>& indices) {
+		RESULT r = R_PASS;
+
+		m_nIndices = static_cast<unsigned int>(indices.size());		
+		m_nVertices = static_cast<unsigned int>(vertices.size());
+		CR(Allocate());
+
+		unsigned int Cnt = 0;
+
+		for (auto& v : vertices) {
+			m_pVertices[Cnt++] = vertex(v);
+		}
+
+		Cnt = 0;
+
+		for (auto& i : indices) {
+			m_pIndices[Cnt++] = static_cast<dimindex>(i);
+
+			if (Cnt % 3 == 0) {
+				SetTriangleTangentBitangent(m_pIndices[Cnt - 3], m_pIndices[Cnt - 2], m_pIndices[Cnt - 1]);
+			}
+		}
+
 		Validate();
 		return;
 

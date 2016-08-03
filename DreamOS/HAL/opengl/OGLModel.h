@@ -25,7 +25,7 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLModel(OpenGLImp *pParentImp, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) :
+	OGLModel(OpenGLImp *pParentImp, const std::vector<vertex>& vertices, const std::vector<size_t>& indices) :
 		model(vertices, indices),
 		OGLObj(pParentImp)
 	{

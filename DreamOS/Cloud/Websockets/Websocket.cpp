@@ -112,6 +112,7 @@ RESULT Websocket::ProcessingThread() {
 			m_websocketClient.run();
 		}
 		catch (websocketpp::exception const & e) {
+			e;
 			DEBUG_LINEOUT("Websocket Exception: %s", e.what());
 		}
 	}

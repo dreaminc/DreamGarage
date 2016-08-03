@@ -131,7 +131,7 @@ RESULT DreamGarage::LoadScene() {
 	pMgr->GetCurrentPath((wchar_t*&)path);
 	std::wstring objFile(path);
 
-	/*
+	
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f, 0.0f),
@@ -157,7 +157,7 @@ RESULT DreamGarage::LoadScene() {
 		1.0f);
 
 	
-	*/
+	
 
 	/*
 	AddModel(objFile, L"\\Models\\table\\untitled.obj",
