@@ -12,6 +12,10 @@
 #include "vector.h"
 #include "quaternion.h"
 
+#define M_PI       3.14159265358979323846   // pi
+#define M_PI_2     1.57079632679489661923   // pi/2
+#define M_PI_4     0.785398163397448309616  // pi/4
+
 #ifdef FLOAT_PRECISION
 	typedef float rotation_precision;
 #elif defined(DOUBLE_PRECISION)
@@ -33,6 +37,7 @@ public:
 		XYZ_AXIS,
 		ARBITRARY_AXIS,
 		QUATERNION,
+		VECTOR,
 		INVALID
 	} ROTATION_MATRIX_TYPE;
 
@@ -64,6 +69,12 @@ public:
 		SetQuaternionRotationMatrix(q);
 	}
 
+	RotationMatrix(vector v, vector up) :
+		m_type(VECTOR)
+	{
+		SetVectorRotationMatrix(v, up);
+	}
+
 	// http://www.cprogramming.com/tutorial/3d/quaternions.html
 	RESULT SetQuaternionRotationMatrix(quaternion q) {
 		m_type = QUATERNION;
@@ -82,6 +93,42 @@ public:
 		this->element(2, 0) = 2*q.x()*q.z() - 2*q.w()*q.y();
 		this->element(2, 1) = 2*q.y()*q.z() + 2*q.w()*q.x();
 		this->element(2, 2) = 1.0f - 2*q.x2() - 2*q.y2();
+
+		return R_PASS;
+	}
+
+	// This is defined based on a basis of {1,0,0}, {0,1,0}, {0,0,-1}
+	RESULT SetVectorRotationMatrix(vector v, vector up) {
+		m_type = VECTOR;
+		v.Normalize();
+		identity();
+		
+		vector zAxis = -1.0f * v.Normal();
+		vector xAxis; 
+		
+		if ((zAxis * up) != 0.0f)
+			xAxis = up.cross(zAxis);
+		else
+			xAxis = vector(-zAxis.y(), zAxis.x(), zAxis.z());
+
+		xAxis.Normalize();
+
+		vector yAxis = zAxis.cross(xAxis);
+		yAxis.Normalize();
+
+		this->element(0, 0) = xAxis.x();
+		this->element(0, 1) = xAxis.y();
+		this->element(0, 2) = xAxis.z();
+
+		this->element(1, 0) = yAxis.x();
+		this->element(1, 1) = yAxis.y();
+		this->element(1, 2) = yAxis.z();
+
+		this->element(2, 0) = zAxis.x();
+		this->element(2, 1) = zAxis.y();
+		this->element(2, 2) = zAxis.z();
+
+		this->element(3, 3) = 1.0f;
 
 		return R_PASS;
 	}
@@ -137,7 +184,6 @@ public:
 		this->element(2, 2) = cosPhi * cosTheta;
 
 		return R_PASS;
-		
 	}
 
 	// https://en.wikipedia.org/wiki/Rotation_matrix

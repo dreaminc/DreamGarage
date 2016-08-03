@@ -54,7 +54,7 @@ public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
-	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* AddVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *AddSkybox();

@@ -94,6 +94,10 @@ RESULT OGLUniformSampler2D::SetUniform(OGLTexture *pTexture) {
 	return SetUniformInteger(pTexture->GetTextureNumber());
 }
 
+RESULT OGLUniformSampler2D::SetUniform(GLint textureIndex) {
+	return SetUniformInteger(textureIndex);
+}
+
 RESULT OGLUniformSamplerCube::SetUniform(OGLTexture *pTexture) {
 	return SetUniformInteger(pTexture->GetOGLTextureIndex());
 }

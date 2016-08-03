@@ -4,7 +4,7 @@
 // This is a minimal shader that simply displays
 // a vertex color and position (no lighting, no textures)
 
-#version 440 core
+#version 400 core
 
 #define MAX_TOTAL_LIGHTS 10
 
@@ -23,6 +23,9 @@ out Data {
 	vec4 color;
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
+	
+	vec4 vertShadowCoordinate;
+	vec3 directionShadowCastingLight;
 } DataOut;
 
 uniform vec4 u_vec4Eye;
@@ -31,6 +34,8 @@ uniform mat4 u_mat4View;
 uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
+
+uniform mat4 u_mat4DepthVP;
 
 // Light Structure
 // TODO: Create a parsing system to create shader GLSL code
@@ -55,9 +60,15 @@ layout(std140) uniform ub_Lights {
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 
+mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.0,
+					0.0, 0.5, 0.0, 0.0,
+					0.0, 0.0, 0.5, 0.0,
+					0.5, 0.5, 0.5, 1.0);
+
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 	vec4 vertViewSpace = u_mat4View * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
+	vec4 vertDepthSpace = biasMat * u_mat4DepthVP * u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 	
 	vec4 vec4ModelNormal = g_mat4InvTransposeModelView * normalize(vec4(inV_vec4Normal.xyz, 0.0f));
 	
@@ -76,6 +87,9 @@ void main(void) {
 		}
 	}
 
+	// TODO: Fix this
+	DataOut.directionShadowCastingLight = vec3(0.0f, 1.0f, 0.0f);
+	DataOut.vertShadowCoordinate = vertDepthSpace;
 	DataOut.directionEye = -normalize(vertViewSpace.xyz);
 	DataOut.vertWorldSpace = vertWorldSpace;
 	DataOut.vertViewSpace = vertViewSpace;

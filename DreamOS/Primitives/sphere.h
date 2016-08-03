@@ -45,7 +45,7 @@ public:
 		return (numTriangleStripVerts * numStrips);
 	}
 
-	sphere(float radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS) :
+	sphere(double radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, color c = color(COLOR_WHITE)) :
 		m_radius(radius),
 		m_numAngularDivisions(numAngularDivisions),
 		m_numVerticalDivisions(numVerticalDivisions)
@@ -126,6 +126,8 @@ public:
 				indexCount++;
 			}
 		}
+
+		SetColor(c);
 
 		Validate();
 		return;

@@ -37,6 +37,8 @@ private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
 	OGLProgram *m_pOGLRenderProgram;
+	OGLProgram *m_pOGLProgramShadowDepth;
+	OGLProgram *m_pOGLProgramCapture;		// temp for testing
 	OGLProgram *m_pOGLSkyboxProgram;
 	OGLProgram *m_pOGLOverlayProgram;
 
@@ -72,7 +74,7 @@ public:
 public:
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
-	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* MakeVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	skybox *MakeSkybox();
