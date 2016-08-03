@@ -23,8 +23,8 @@ public:
 
 	// DimObj Interface
 	RESULT Allocate();
-	inline int NumberVertices();
-	inline int NumberIndices();
+	inline unsigned int NumberVertices();
+	inline unsigned int NumberIndices();
 
 	RESULT AddObject(std::shared_ptr<DimObj> pDimObj);
 	RESULT ClearObjects();
@@ -36,8 +36,6 @@ public:
 	std::shared_ptr<volume> AddVolume(double width, double length, double height);
 	std::shared_ptr<volume> MakeVolume(double side);
 	std::shared_ptr<volume> AddVolume(double side);
-
-
 
 protected:
 	HALImp *m_pHALImp;

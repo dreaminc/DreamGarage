@@ -47,9 +47,9 @@ protected:
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 
-	sphere *AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
-	sphere *MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
-	
+	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
+	sphere *MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
+
 	volume *AddVolume(double side);
 	volume *MakeVolume(double side);
 	volume *AddVolume(double width, double length, double height);

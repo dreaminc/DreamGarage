@@ -54,7 +54,7 @@ public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
-	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* MakeVolume(double width, double length, double height);
 	volume* MakeVolume(double side);
 	skybox *MakeSkybox();
@@ -63,8 +63,10 @@ public:
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
-	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
+
+	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* AddVolume(double width, double length, double height);
+
 	volume* AddVolume(double side);
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);

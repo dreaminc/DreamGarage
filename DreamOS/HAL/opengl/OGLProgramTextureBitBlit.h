@@ -54,7 +54,7 @@ public:
 			m_pUniformHasTexture->SetUniform(false);
 		}
 
-	Error:
+//	Error:
 		return r;
 	}
 

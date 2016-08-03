@@ -72,6 +72,8 @@ private:
 	// Title for the profiler
 	std::unique_ptr<OGLText>	 m_OGLTitleText;
 
+	std::unique_ptr<OGLText>	 m_OGLConsoleText;
+
 	OGLProfilerGraph	m_OGLGraph;
 };
 

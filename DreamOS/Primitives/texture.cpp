@@ -19,6 +19,16 @@ texture::texture() :
 	Validate();
 }
 
+texture::texture(texture::TEXTURE_TYPE type) :
+	m_pImageBuffer(nullptr),
+	m_width(NULL),
+	m_height(NULL),
+	m_channels(NULL),
+	m_type(type)
+{
+	Validate();
+}
+
 texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels) :
 	m_pImageBuffer(nullptr),
 	m_width(width),
@@ -142,7 +152,7 @@ RESULT texture::GetCubeMapFiles(const wchar_t *pszName, std::vector<std::wstring
 		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> StringConverter;
 		std::string strFilenameConverted = StringConverter.to_bytes(strFilename);
 
-		std::regex strRegEx("((pos|neg)(x|y|z))\.(([a-z]){3,3})");
+		std::regex strRegEx("((pos|neg)(x|y|z))\\.(([a-z]){3,3})");
 
 		if(std::regex_match(strFilenameConverted, strRegEx))
 			vstrFiles.push_back(strFilename);
@@ -181,8 +191,8 @@ Error:
 }
 
 double texture::GetValueAtUV(double uValue, double vValue) {
-	int pxValueX = uValue * m_width;
-	int pxValueY = vValue * m_height;
+	int pxValueX = static_cast<int>(uValue * m_width);
+	int pxValueY = static_cast<int>(vValue * m_height);
 
 	int lookUp = pxValueX * (sizeof(unsigned char) * m_channels) + (pxValueY * (sizeof(unsigned char) * m_channels * m_width));
 	

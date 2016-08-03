@@ -2,11 +2,14 @@
 
 #include "OGLProgramMinimal.h"
 #include "OGLProgramSkybox.h"
+#include "OGLProgramSkyboxScatter.h"
 #include "OGLProgramBlinnPhong.h"
+#include "OGLProgramBlinnPhongShadow.h"
 #include "OGLProgramMinimalTexture.h"
 #include "OGLProgramBlinnPhongTexture.h"
 #include "OGLProgramBlinnPhongTextureBump.h"
 #include "OGLProgramTextureBitBlit.h"
+#include "OGLProgramShadowDepth.h"
 
 OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL) {
 	OGLProgram *pOGLProgram = nullptr;
@@ -31,11 +34,22 @@ OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *p
 			CRM(pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", versionOGL), "Failed to initialize OGL skybox Program");
 		} break;
 
+		case OGLPROGRAM_SKYBOX_SCATTER: {
+			pOGLProgram = new OGLProgramSkyboxScatter(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"skyboxScatter.vert", L"skyboxScatter.frag", versionOGL), "Failed to initialize OGL skybox Program");
+		} break;
 		
 		case OGLPROGRAM_BLINNPHONG: {
 			pOGLProgram = new OGLProgramBlinnPhong(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", versionOGL), "Failed to initialize OGL blinnPhong Program");
+		} break;
+
+		case OGLPROGRAM_BLINNPHONG_SHADOW: {
+			pOGLProgram = new OGLProgramBlinnPhongShadow(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"blinnPhongShadow.vert", L"blinnPhongShadow.frag", versionOGL), "Failed to initialize OGL blinnPhong Program");
 		} break;
 
 		case OGLPROGRAM_BLINNPHONG_TEXTURE: {
@@ -56,6 +70,12 @@ OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *p
 			CRM(pOGLProgram->OGLInitialize(L"TextureBitBlit.vert", L"TextureBitBlit.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
 		} break;
 
+		case OGLPROGRAM_SHADOW_DEPTH: {
+			pOGLProgram = new OGLProgramShadowDepth(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"ShadowDepth.vert", L"ShadowDepth.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
+		}
+
 		case OGLPROGRAM_CUSTOM:
 		case OGLPROGRAM_INVALID: 
 		default: {
@@ -63,7 +83,7 @@ OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *p
 		} break;
 	}
 
-Success:
+//Success:
 	return pOGLProgram;
 
 Error:

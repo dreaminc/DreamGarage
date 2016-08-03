@@ -33,7 +33,7 @@ public:
 	RESULT ReleaseOGLBuffers() {
 		RESULT r = R_PASS;
 
-		if (m_pParentImp != NULL) {
+		if (m_pParentImp != nullptr) {
 			if (m_hVBO != NULL) {
 				CR(m_pParentImp->glDeleteBuffers(1, &m_hVBO));
 				m_hVBO = NULL;

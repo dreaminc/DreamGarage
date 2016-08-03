@@ -156,3 +156,24 @@ void SenseLeapMotion::onLogMessage(const Leap::Controller&, Leap::MessageSeverit
 	DEBUG_LINEOUT("[%d]", timestamp);
 	DEBUG_LINEOUT(msg);
 }
+
+bool SenseLeapMotion::IsConnected() {
+	if (m_pLeapController != nullptr)
+		return m_pLeapController->isConnected();
+	else
+		return false;
+}
+
+bool SenseLeapMotion::IsServiceConnected() {
+	if (m_pLeapController != nullptr)
+		return m_pLeapController->isServiceConnected();
+	else
+		return false;
+}
+
+bool SenseLeapMotion::HasFocus() {
+	if (m_pLeapController != nullptr)
+		return m_pLeapController->hasFocus();
+	else
+		return false;
+}

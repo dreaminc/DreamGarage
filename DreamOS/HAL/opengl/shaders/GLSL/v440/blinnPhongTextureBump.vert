@@ -28,6 +28,7 @@ out Data {
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
+	vec3 vertTBNSpace;
 } DataOut;
 
 uniform vec4 u_vec4Eye;
@@ -90,6 +91,7 @@ void main(void) {
 		DataOut.distanceLight[i] = length(lights[i].m_ptOrigin.xyz - vertWorldSpace.xyz);
 	}
 
+	DataOut.vertTBNSpace = DataOut.TangentBitangentNormalMatrix * vertViewSpace.xyz;
 	DataOut.vertWorldSpace = vertWorldSpace;
 	DataOut.vertViewSpace = vertViewSpace;
 	DataOut.normal = vec4ModelNormal;

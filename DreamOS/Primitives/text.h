@@ -28,22 +28,31 @@ public:
 		return R_PASS;
 	}
 
-	inline int NumberVertices() { return m_nVertices; }
-	inline int NumberIndices() { return m_nIndices; }
+	inline unsigned int NumberVertices() { return m_nVertices; }
+	inline unsigned int NumberIndices() { return m_nIndices; }
 
 private:
 	unsigned int m_nVertices;
 	unsigned int m_nIndices;
 
 public:
+
+	typedef enum AlignmentType {
+		LEFT,
+		CENTER,
+		RIGHT
+	};
+
+	uv_precision m_width = 0.0f;
+
 	text(std::shared_ptr<Font> font, const std::string& text, double size = 1.0) :
 		m_font(font)
 	{
 		SetText(text, size);
 
 		Validate();
-	Error:
-		Invalidate();
+//	Error:
+//		Invalidate();
 	}
 
 	RESULT SetText(const std::string& text, double size)
@@ -61,28 +70,40 @@ public:
 			// text length was changed, we need to re-allocate buffers
 			Destroy();
 
-			m_nVertices = 4 * text.length();
-			m_nIndices = 6 * text.length();
+			m_nVertices = 4 * static_cast<unsigned int>(text.length());
+			m_nIndices = 6 * static_cast<unsigned int>(text.length());
 
 			RESULT r = R_PASS;
 			CR(Allocate());
+
+			SetDirty();
 		}
 		
 		m_text = text;
 
-		double posx = 0;
+		float posx = 0;
 
 		// For now the font scale is based on 1080p
-		const int screen_width = 1920 * size;
-		const int screen_height = 1080 * size;
+		const int screen_width = static_cast<int>(1920 * size);
+		const int screen_height = static_cast<int>(1080 * size);
 
-		double	glyphWidth = m_font->GetGlyphWidth();
-		double	glyphHeight = m_font->GetGlyphHeight();
-		double	glyphBase = m_font->GetGlyphBase();
+		uv_precision	glyphWidth = static_cast<float>(m_font->GetGlyphWidth());
+		uv_precision	glyphHeight = static_cast<float>(m_font->GetGlyphHeight());
+		uv_precision	glyphBase = static_cast<float>(m_font->GetGlyphBase());
 
 		#define XSCALE_TO_SCREEN(x)	2.0f * (x) / screen_width
 		#define YSCALE_TO_SCREEN(y)	2.0f * (y) / screen_height
 
+		m_width = 0.0f;
+		for_each(text.begin(), text.end(), [&](char c) {
+			Font::CharacterGlyph glyph;
+			if (m_font->GetGlyphFromChr(c, glyph))
+			{
+				m_width += (c == text.back()) ? XSCALE_TO_SCREEN(glyph.xadvance) : 
+												XSCALE_TO_SCREEN(glyph.width);
+			}
+		});
+		
 		for_each(text.begin(), text.end(), [&](char c) {
 			Font::CharacterGlyph glyph;
 			if (m_font->GetGlyphFromChr(c, glyph))
@@ -92,10 +113,13 @@ public:
 				uv_precision w = glyph.width / glyphWidth;
 				uv_precision h = glyph.height / glyphHeight;
 
-				double dx = XSCALE_TO_SCREEN(glyph.width);
-				double dy = YSCALE_TO_SCREEN(glyph.height);
+				uv_precision dx = XSCALE_TO_SCREEN(glyph.width);
+				uv_precision dy = YSCALE_TO_SCREEN(glyph.height);
+				
+				vector_precision dxs = XSCALE_TO_SCREEN(glyph.xoffset);
+				vector_precision dys = YSCALE_TO_SCREEN(glyphBase - glyph.yoffset) - dy / 2.0f;
 
-				quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + XSCALE_TO_SCREEN(glyph.xoffset), YSCALE_TO_SCREEN(glyphBase - glyph.yoffset) - dy / 2.0f, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
+				quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs, dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
 				posx += XSCALE_TO_SCREEN(glyph.xadvance);
 			}
 		});
@@ -124,12 +148,19 @@ public:
 
 			quadCnt += 4;
 		}
-
+			
 		return R_SUCCESS;
 
 	Error:
 		return R_FAIL;
 	}
+	
+	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)
+	{
+		uv_precision dx = (align == LEFT) ? 0.0f : ((align == CENTER) ? m_width / 2 : m_width);
+		return this->MoveTo(p.x() - dx, p.y(), p.z());
+	}
+
 
 private:
 

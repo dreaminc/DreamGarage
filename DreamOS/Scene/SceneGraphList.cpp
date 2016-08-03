@@ -17,7 +17,7 @@ RESULT SceneGraphList::ResetIterator() {
 
 VirtualObj *SceneGraphList::GetNextObject() {
 	if (m_objectIterator == m_objects.end())
-		return NULL;
+		return nullptr;
 
 	VirtualObj *pVirtualObj = (*m_objectIterator);
 
@@ -41,15 +41,15 @@ RESULT SceneGraphList::PushLight(light *pLight) {
 RESULT SceneGraphList::PushObject(VirtualObj *pObject) {
 	
 	light *pLight = dynamic_cast<light*>(pObject);
-	if (pLight != NULL)
+	if (pLight != nullptr)
 		return PushLight(pLight);
 
 	skybox *pSkybox = dynamic_cast<skybox*>(pObject);
-	if (pSkybox != NULL)
+	if (pSkybox != nullptr)
 		return SetSkybox(pSkybox);
 	
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
-	if (pObject != NULL)
+	if (pObject != nullptr)
 		return PushDimensionObject(pDimObj);
 	
 	return R_INVALID_OBJECT;
@@ -79,8 +79,7 @@ RESULT SceneGraphList::GetLights(std::vector<light*>*& pLights) {
 	RESULT r = R_PASS;
 
 	pLights = &(m_lights);
-
-Error:
+//Error:
 	return r;
 }
 
@@ -99,7 +98,7 @@ VirtualObj *SceneGraphList::FindObjectByUID(UID uid) {
 		if ((*it)->getID() == uid) 
 			return (*it);
 
-	return NULL;
+	return nullptr;
 }
 
 VirtualObj *SceneGraphList::FindObject(VirtualObj *pObject) {
@@ -107,5 +106,5 @@ VirtualObj *SceneGraphList::FindObject(VirtualObj *pObject) {
 		if ((*it) == pObject)
 			return (*it);
 
-	return NULL;
+	return nullptr;
 }

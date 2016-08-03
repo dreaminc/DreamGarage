@@ -32,6 +32,20 @@ Profiler::FPSGraph_t& Profiler::GetFPSGraph()
 	return m_FPSGraph;
 }
 
+void Profiler::AddConsoleLine(const std::string& text)
+{
+	m_ConsoleText.push_back(text);
+	while (m_ConsoleText.size() > console_max_lines)
+	{
+		m_ConsoleText.pop_front();
+	}
+}
+
+const std::deque<std::string>& Profiler::GetConsoleText()
+{
+	return m_ConsoleText;
+}
+
 // TickCounter
 TickCounter::TickCounter()
 {
@@ -62,4 +76,5 @@ double	TickCounter::GetTicksPerSecond()
 
 	return (m_nsamples - 1) / elapsedTime;
 }
+
 

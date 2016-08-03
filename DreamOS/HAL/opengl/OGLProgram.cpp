@@ -2,18 +2,31 @@
 #include "OpenGLImp.h"
 #include "OGLObj.h"
 
+#include "OGLFramebuffer.h"
+#include "OGLTexture.h"
+
+#include "Scene/SceneGraph.h"
+
 OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),
 	m_pFragmentShader(nullptr),
-	m_versionOGL(0)
+	m_versionOGL(0),
+	m_pOGLFramebuffer(nullptr),
+	m_pOGLRenderTexture(nullptr),
+	m_pOGLProgramDepth(nullptr)
 {
 	// empty
 }
 
 OGLProgram::~OGLProgram() {
 	ReleaseProgram();
+}
+
+RESULT OGLProgram::SetOGLProgramDepth(OGLProgram *pOGLProgramDepth) {
+	m_pOGLProgramDepth = pOGLProgramDepth;
+	return R_PASS;
 }
 
 // Note that all vertex attrib, uniforms, uniform blocks are actually 
@@ -23,6 +36,20 @@ RESULT OGLProgram::OGLInitialize() {
 
 	CR(CreateProgram());
 	CR(IsProgram());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::SetLights(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	std::vector<light*> *pLights = NULL;
+	CR(pObjectStore->GetLights(pLights));
+	CN(pLights);
+
+	CR(SetLights(pLights));
 
 Error:
 	return r;
@@ -42,6 +69,150 @@ RESULT OGLProgram::UpdateUniformBlockBuffers() {
 	for (auto const& oglUniformBlock : m_uniformBlocks) {
 		CRM(oglUniformBlock->UpdateOGLUniformBlockBuffers(), "Failed to bind %s uniform block", oglUniformBlock->GetUniformBlockName());
 	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindToDepthBuffer() {
+	RESULT r = R_PASS;
+
+	CR(m_pOGLFramebuffer->BindOGLDepthBuffer());
+	CR(m_pOGLFramebuffer->SetAndClearViewportDepthBuffer());
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindToFramebuffer() {
+	RESULT r = R_PASS;
+
+	//CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+
+	// Render to our framebuffer
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebuffer->GetFramebufferIndex()));
+	CR(m_pOGLFramebuffer->SetAndClearViewport());
+
+	// Check framebuffer
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UnbindFramebuffer() {
+	RESULT r = R_PASS;
+
+	//CR(m_pOGLFramebuffer->UnbindOGLFramebuffer());
+
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::BindToScreen(int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CR(m_pOGLFramebuffer->BindToScreen(pxWidth, pxHeight));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeRenderToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CR(InitializeFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeDepthToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	CR(InitializeDepthFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::SetDepthTexture(int textureNumber) {
+	return m_pOGLFramebuffer->SetDepthTexture(textureNumber);
+}
+
+GLuint OGLProgram::GetOGLDepthbufferIndex() {
+	return m_pOGLFramebuffer->GetOGLDepthbufferIndex();
+}
+
+// TODO: here
+RESULT OGLProgram::InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 1);
+	CN(m_pOGLFramebuffer);
+
+	CR(m_pOGLFramebuffer->OGLInitialize());
+	CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+
+	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(m_pOGLFramebuffer->InitializeDepthBuffer(internalDepthFormat, typeDepth));
+
+	CR(m_pOGLFramebuffer->SetOGLDepthbufferTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+
+	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(0));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+// TODO: This is not generic, hacking right now to get shadows to work first then will generalize
+RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
+	CN(m_pOGLFramebuffer);
+	
+	CR(m_pOGLFramebuffer->OGLInitialize());	
+	CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+
+	CR(m_pOGLFramebuffer->MakeOGLTexture());
+
+	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(m_pOGLFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
+
+	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(1));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	m_pOGLRenderTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR); 
+	CN(m_pOGLRenderTexture);
+
+	CR(m_pOGLRenderTexture->SetWidth(pxWidth));
+	CR(m_pOGLRenderTexture->SetHeight(pxWidth));
+	CR(m_pOGLRenderTexture->SetChannels(channels));
+
+	CR(m_pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, internalDepthFormat, GL_DEPTH_COMPONENT, typeDepth));
+
+	CR(m_pOGLRenderTexture->BindTexture(GL_TEXTURE_2D));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
 Error:
 	return r;
@@ -201,7 +372,7 @@ RESULT OGLProgram::RegisterVertexAttribute(OGLVertexAttribute **pOGLVertexAttrib
 	RESULT r = R_PASS;
 
 	auto it = m_registeredProgramShaderVertexAttribute.find(strVertexAttributeName);
-	CBM((it == m_registeredProgramShaderVertexAttribute.end()), "Uniform %s already registered", strVertexAttributeName);
+	CBM((it == m_registeredProgramShaderVertexAttribute.end()), "Uniform %s already registered", strVertexAttributeName.c_str());
 
 	m_registeredProgramShaderVertexAttribute[strVertexAttributeName] = (pOGLVertexAttribute);
 
@@ -255,11 +426,11 @@ RESULT OGLProgram::GetVertexAttributesFromProgram() {
 	DEBUG_LINEOUT("%d active attributes", attributes_n);
 	for (int i = 0; i < attributes_n; i++) {
 		GLint results[3];
-		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, 3, properties, 3, NULL, results));
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, 3, properties, 3, nullptr, results));
 
 		GLint pszName_n = results[0] + 1;
 		char *pszName = new char[pszName_n];
-		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, pszName_n, NULL, pszName));
+		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_PROGRAM_INPUT, i, pszName_n, nullptr, pszName));
 
 		DEBUG_LINEOUT("%-5d %s (%s)", results[2], pszName, OpenGLUtility::GetOGLTypeString(results[1]));
 
@@ -272,9 +443,9 @@ RESULT OGLProgram::GetVertexAttributesFromProgram() {
 			DEBUG_LINEOUT("%s Vertex Attribute found in OGLProgram registry", pszName);
 		}
 
-		if (pszName != NULL) {
+		if (pszName != nullptr) {
 			delete[] pszName;
-			pszName = NULL;
+			pszName = nullptr;
 		}
 	}
 
@@ -286,7 +457,7 @@ Error:
 
 RESULT OGLProgram::BindUniformBlock(GLint uniformBlockIndex, GLint uniformBlockBindingPoint) {
 	RESULT r = R_PASS;
-	GLenum glerr;
+//	GLenum glerr;
 	DWORD werr;
 
 	CR(m_pParentImp->glUniformBlockBinding(m_OGLProgramIndex, uniformBlockIndex, uniformBlockBindingPoint));
@@ -302,7 +473,7 @@ RESULT OGLProgram::RegisterUniform(OGLUniform **pOGLUniform, std::string strUnif
 	RESULT r = R_PASS;
 
 	auto it = m_registeredProgramShaderUniforms.find(strUniformName);
-	CBM((it == m_registeredProgramShaderUniforms.end()), "Uniform %s already registered", strUniformName);
+	CBM((it == m_registeredProgramShaderUniforms.end()), "Uniform %s already registered", strUniformName.c_str());
 
 	m_registeredProgramShaderUniforms[strUniformName] = (pOGLUniform);
 
@@ -314,7 +485,7 @@ RESULT OGLProgram::RegisterUniformBlock(OGLUniformBlock **pOGLUniformBlock, std:
 	RESULT r = R_PASS;
 
 	auto it = m_registeredProgramShaderUniformBlocks.find(strUniformBlockName);
-	CBM((it == m_registeredProgramShaderUniformBlocks.end()), "Uniform Block %s already registered", strUniformBlockName);
+	CBM((it == m_registeredProgramShaderUniformBlocks.end()), "Uniform Block %s already registered", strUniformBlockName.c_str());
 
 	m_registeredProgramShaderUniformBlocks[strUniformBlockName] = (pOGLUniformBlock);
 
@@ -334,14 +505,14 @@ RESULT OGLProgram::GetUniformVariablesFromProgram() {
 	DEBUG_LINEOUT("%d active uniform variables", variables_n);
 	for (int i = 0; i < variables_n; i++) {
 		GLint *pResults = new GLint[properties_n];
-		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM, i, 4, properties, 4, NULL, pResults));
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM, i, 4, properties, 4, nullptr, pResults));
 
 		// Skip uniforms in blocks
 		if (pResults[3] != -1) continue;
 
 		GLint pszName_n = pResults[0] + 1;
 		char *pszName = new char[pszName_n];
-		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM, i, pszName_n, NULL, pszName));
+		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM, i, pszName_n, nullptr, pszName));
 
 		DEBUG_LINEOUT("%-5d %s (%s)", pResults[2], pszName, OpenGLUtility::GetOGLTypeString(pResults[1]));
 
@@ -356,9 +527,9 @@ RESULT OGLProgram::GetUniformVariablesFromProgram() {
 			DEBUG_LINEOUT("Warning: %s Uniform NOT found in OGLProgram registry", pszName);
 		}
 
-		if (pszName != NULL) {
+		if (pszName != nullptr) {
 			delete[] pszName;
-			pszName = NULL;
+			pszName = nullptr;
 		}
 		
 		if (pResults != nullptr) {
@@ -383,11 +554,11 @@ RESULT OGLProgram::GetUniformBlocksFromProgram() {
 	DEBUG_LINEOUT("%d active uniform blocks", variables_n);
 	for (int i = 0; i < variables_n; i++) {
 		GLint *pResults = new GLint[properties_n];
-		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, properties_n, properties, 4, NULL, pResults));
+		CR(m_pParentImp->glGetProgramResourceiv(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, properties_n, properties, 4, nullptr, pResults));
 
 		GLint pszName_n = pResults[0] + 1;
 		char *pszName = new char[pszName_n];
-		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, pszName_n, NULL, pszName));
+		CR(m_pParentImp->glGetProgramResourceName(m_OGLProgramIndex, GL_UNIFORM_BLOCK, i, pszName_n, nullptr, pszName));
 
 		// For debug - can remove if needed or wrap in debug
 		GLint uniformBlockIndex = 0;
@@ -439,7 +610,7 @@ Error:
 char* OGLProgram::GetProgramInfoLog() {
 	RESULT r = R_PASS;
 
-	char *pszInfoLog = NULL;
+	char *pszInfoLog = nullptr;
 	int pszInfoLog_n = 4096;
 	int charsWritten_n = -1;
 
@@ -493,6 +664,27 @@ RESULT OGLProgram::MakeFragmentShader(const wchar_t *pszFilename) {
 	CRM(pFragmentShader->InitializeFromFile(pszFilename, m_versionOGL), "Failed to initialize fragment shader from file");
 
 	CRM(AttachShader(pFragmentShader), "Failed to attach fragment shader");
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderSceneGraph(SceneGraph *pSceneGraph) {
+	RESULT r = R_PASS;
+	
+	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = NULL;
+
+	pSceneGraph->Reset();
+	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+		if (pDimObj == NULL)
+			continue;
+		else {
+			CR(RenderObject(pDimObj));
+		}
+	}
 
 Error:
 	return r;

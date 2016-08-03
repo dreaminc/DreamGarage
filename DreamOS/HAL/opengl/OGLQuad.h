@@ -33,7 +33,7 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, double side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
+	OGLQuad(OpenGLImp *pParentImp, float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
 		quad(side, numHorizontalDivisions, numVerticalDivisions, pTextureHeight),
 		OGLObj(pParentImp)
 	{
@@ -41,7 +41,7 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, double height, double width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
+	OGLQuad(OpenGLImp *pParentImp, float height, float width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
 		quad(height, width, numHorizontalDivisions, numVerticalDivisions, pTextureHeight),
 		OGLObj(pParentImp)
 	{

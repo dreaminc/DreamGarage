@@ -63,3 +63,15 @@ Currently no notifications / events are set up but this will be added to help no
 ## Leap Motion
 
 The engine supports using the Leap Motion input controller, but this requires the Leap runtime to be running and libraries/DLLs installed on the machine.  Also, the compiler will look for the library at the path as provided by the `LEAPMOTIONPATH` environment variable which should be set to where the SDK is installed.
+
+# Using Dream OS
+
+## Dream Garage
+
+### Lights
+
+Dream supports lights by the way of the `light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);` function.  Retaining the pointer to the light allows the application layer to update the light position or other parameters during the update cycle or otherwise.
+
+#### Shadows
+
+To enable shadows on a given light, utilize the `RESULT EnableShadows()` function of the light object, which turns a given light into a shadow emitter.  Currently the engine is only capable of supporting one directional light emitter, although point lights casting shadows are future feature. 

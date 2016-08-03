@@ -78,7 +78,7 @@ public:
 			m_pUniformUseBumpTexture->SetUniform(false);
 		}
 
-	Error:
+//	Error:
 		return r;
 	}
 

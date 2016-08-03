@@ -8,6 +8,7 @@
 #include "Primitives/valid.h"
 #include <chrono>
 #include <vector>
+#include <deque>
 
 #include "ProfilerGraph.h"
 
@@ -46,10 +47,17 @@ public:
 
 	FPSGraph_t& GetFPSGraph();
 
+	void AddConsoleLine(const std::string& text);
+
+	const std::deque<std::string>& GetConsoleText();
+
 private:
 
 	TickCounter	m_ticker;
 	FPSGraph_t m_FPSGraph{ 5.0 };
+
+	std::deque<std::string>	m_ConsoleText;
+	const unsigned int console_max_lines = 200;
 };
 
 #endif // !PROFILER_H_

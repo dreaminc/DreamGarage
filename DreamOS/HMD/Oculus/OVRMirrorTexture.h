@@ -65,7 +65,8 @@ public:
 		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, textureIndex, m_width, m_height, m_channels);
 		CN(m_pOGLFramebuffer);
 		CR(m_pOGLFramebuffer->OGLInitialize());
-		CR(m_pOGLFramebuffer->BindOGLFramebuffer(textureIndex));
+		CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+		CR(m_pOGLFramebuffer->AttachOGLTexture(textureIndex));
 
 		CR(m_pParentImp->glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));
 		CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));

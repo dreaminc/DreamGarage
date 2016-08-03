@@ -146,7 +146,7 @@ RESULT OVRHMD::SetUpFrame() {
 
 	// TODO: Set up frame
 
-Error:
+//Error:
 	return r;
 }
 
@@ -234,7 +234,7 @@ RESULT OVRHMD::UpdateHMD() {
 		m_qOrientation.Reverse();
 	}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -262,6 +262,6 @@ RESULT OVRHMD::ReleaseHMD() {
 
 	ovr_Shutdown();
 
-Error:
+//Error:
 	return r;
 }

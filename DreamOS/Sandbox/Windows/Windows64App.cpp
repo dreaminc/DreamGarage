@@ -93,9 +93,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	// Initialize Time Manager
 	m_pTimeManager = new TimeManager();
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
-	CV(m_pTimeManager, "Failed to validate Time Manager");
-
-Success:
+	CVM(m_pTimeManager, "Failed to validate Time Manager");
+//TODO: use this label
+//Success:
 	Validate();
 	return;
 
@@ -443,7 +443,7 @@ RESULT Windows64App::InitializeSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -459,7 +459,11 @@ RESULT Windows64App::InitializeSandbox() {
 	// TODO: Move to Sandbox function
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
-	CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
+
+	// TODO: This will only turn on Leap if connected at boot up
+	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected()) {
+		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
+	}
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 

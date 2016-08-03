@@ -84,6 +84,10 @@ public:
 		return R_PASS;
 	}
 
+	bool IsConnected();
+	bool IsServiceConnected();
+	bool HasFocus();
+
 private:
 	RESULT SetPause(bool fPauseState);
 

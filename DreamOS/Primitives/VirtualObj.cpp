@@ -271,8 +271,10 @@ VirtualObj* VirtualObj::Update() {
 
 // TODO: Fix naming on scaling matrix + add vector function
 matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
-	if (m_ptPivot.IsZero()) 
+	if (m_ptPivot.IsZero()) {
 		return (TranslationMatrix(m_ptOrigin) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()) * childMat);
-	else
+	}
+	else {
 		return (TranslationMatrix(m_ptOrigin, m_ptPivot) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()) * childMat);
+	}
 }

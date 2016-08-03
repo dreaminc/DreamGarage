@@ -18,11 +18,11 @@ RESULT composite::Allocate() {
 	return R_NOT_IMPLEMENTED;
 }
 
-inline int composite::NumberVertices() {
+inline unsigned int composite::NumberVertices() {
 	return 0;
 }
 
-inline int composite::NumberIndices() {
+inline unsigned int composite::NumberIndices() {
 	return 0;
 }
 

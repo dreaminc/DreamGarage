@@ -115,6 +115,7 @@
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -160,6 +161,7 @@
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>false</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -213,7 +215,9 @@
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Profiler\Profiler.cpp" />
-    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
+    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
@@ -446,12 +450,15 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProfiler.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h" />
@@ -480,6 +487,7 @@
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
+    <ClInclude Include="..\..\..\Primitives\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\composite.h" />
@@ -568,6 +576,8 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag" />
@@ -576,6 +586,8 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag" />

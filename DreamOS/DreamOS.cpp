@@ -6,13 +6,13 @@ DreamOS::DreamOS() :
 {
 	RESULT r = R_PASS;
 
-Success:
+//Success:
 	Validate();
 	return;
 
-Error:
-	Invalidate();
-	return;
+//Error:
+//	Invalidate();
+//	return;
 }
 
 DreamOS::~DreamOS() {
@@ -46,7 +46,7 @@ Error:
 RESULT DreamOS::Start() {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("DREAM OS %s Starting ...", m_versionDreamOS.GetString());
+	DEBUG_LINEOUT("DREAM OS %s Starting ...", m_versionDreamOS.GetString().c_str());
 
 	// This will start the application
 	CRM(m_pSandbox->Show(), "Failed to show sandbox window");
@@ -56,7 +56,7 @@ Error:
 }
 
 RESULT DreamOS::Exit(RESULT exitcode) {
-	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", m_versionDreamOS.GetString(), exitcode);
+	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", m_versionDreamOS.GetString().c_str(), exitcode);
 	return exitcode;
 }
 
@@ -69,12 +69,12 @@ light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOr
 	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
-sphere* DreamOS::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
-	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions);
+sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
-sphere* DreamOS::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
-	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
+sphere* DreamOS::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
 volume* DreamOS::AddVolume(double width, double length, double height) {

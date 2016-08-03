@@ -71,6 +71,14 @@ public:
 		return vector::jVector();
 	}
 
+	int GetPXWidth() {
+		return m_pxScreenWidth;
+	}
+
+	int GetPXHeight() {
+		return m_pxScreenHeight;
+	}
+
 	vector GetRightVector() {
 		quaternion temp = m_qRotation;
 		temp.Normalize();
@@ -113,6 +121,7 @@ public:
 
 		vector vectorLook = GetLookVector();
 		DEBUG_LINEOUT_RETURN("Camera rotating: x:%0.3f y:%0.3f z:%0.3f", vectorLook.x(), vectorLook.y(), vectorLook.z());
+		HUD_OUT("Camera rotating: x:%0.3f y:%0.3f z:%0.3f", vectorLook.x(), vectorLook.y(), vectorLook.z());
 
 		return R_PASS;
 	}
@@ -163,7 +172,7 @@ public:
 
 		DEBUG_LINEOUT("Cam hmd event");//, kbEvent->KeyCode, kbEvent->KeyState);
 
-	Error:
+//	Error:
 		return r;
 	}
 
@@ -299,6 +308,14 @@ public:
 	RESULT SetHMD(HMD *pHMD) {
 		m_pHMD = pHMD;
 		return R_PASS;
+	}
+
+	int GetScreenWidth() {
+		return m_pxScreenWidth;
+	}
+
+	int GetScreenHeight() {
+		return m_pxScreenHeight;
 	}
 
 protected:
