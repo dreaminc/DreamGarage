@@ -55,7 +55,7 @@ void OGLProfiler::Init()
 	m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
 	m_OGLTitleText->MoveTo(-0.7f, -0.7f, 0);
 
-	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(""));
+	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont);
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 }
 
@@ -122,7 +122,7 @@ void OGLProfilerGraph::Init()
 	m_OGLTriangle->SetColor(color(0.8f, 0.0f, 0.0f, 1));
 
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
-	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(""));
+	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont);
 
 	m_BackgroundMargin = 0.05f;
 }
@@ -223,7 +223,7 @@ OGLDebugConsole::~OGLDebugConsole()
 void OGLDebugConsole::Init()
 {
 	OGLRenderContext::Init();
-	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, std::string(""));
+	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont);
 }
 
 void OGLDebugConsole::Render(point& topLeft, point& bottomRight)

@@ -48,7 +48,7 @@ public:
 	uv_precision m_width = 0.0f;
 	uv_precision m_height = 0.0f;
 
-	text(std::shared_ptr<Font> font, const std::string& text, double size = 1.0) :
+	text(std::shared_ptr<Font> font, const std::string& text = "", double size = 1.0) :
 		m_font(font)
 	{
 		SetText(text, size);

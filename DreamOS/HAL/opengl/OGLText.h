@@ -21,7 +21,7 @@ protected:
 
 public:
 
-	OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& text) :
+	OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& text = "") :
 		text(pFont, text),
 		OGLObj(pParentImp)
 	{
@@ -42,6 +42,7 @@ public:
 	{
 		text::SetText(text, size);
 
+		// TODO: need to be able to deal with changing vertex amounts automatically
 		if (CheckAndCleanDirty())
 		{
 			ReleaseOGLBuffers();
