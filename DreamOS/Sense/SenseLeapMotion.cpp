@@ -20,7 +20,7 @@ SenseLeapMotion::SenseLeapMotion() :
 	}
 	*/
 
-Success:
+//Success:
 	Validate();
 	return;
 
@@ -101,7 +101,7 @@ void SenseLeapMotion::onDeviceChange(const Leap::Controller&) {
 	const Leap::DeviceList leapDevices = m_pLeapController->devices();
 
 	for (int i = 0; i < leapDevices.count(); ++i) {
-		DEBUG_LINEOUT("id: %s", leapDevices[i].toString());
+		DEBUG_LINEOUT("id: %s", leapDevices[i].toString().c_str());
 		DEBUG_LINEOUT("  isStreaming: %s", (leapDevices[i].isStreaming() ? "true" : "false"));
 		DEBUG_LINEOUT("  isSmudged: %s", (leapDevices[i].isSmudged() ? "true" : "false"));
 		DEBUG_LINEOUT("  isLightingBad: %s", (leapDevices[i].isLightingBad() ? "true" : "false"));
@@ -128,7 +128,7 @@ void SenseLeapMotion::onDeviceFailure(const Leap::Controller&) {
 	for (auto dl = leapDevices.begin(); dl != leapDevices.end(); ++dl) {
 		const Leap::FailedDevice leapDevice = *dl;
 
-		DEBUG_LINEOUT("  PNP ID: %s", leapDevice.pnpId());
+		DEBUG_LINEOUT("  PNP ID: %s", leapDevice.pnpId().c_str());
 		DEBUG_LINEOUT("  Failure type: %d", leapDevice.failure());
 	}
 }
@@ -153,7 +153,7 @@ void SenseLeapMotion::onLogMessage(const Leap::Controller&, Leap::MessageSeverit
 		} break;
 	}
 
-	DEBUG_LINEOUT("[%d]", timestamp);
+	DEBUG_LINEOUT("[%I64d]", timestamp);
 	DEBUG_LINEOUT(msg);
 }
 

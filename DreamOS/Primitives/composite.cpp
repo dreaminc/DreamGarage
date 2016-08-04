@@ -39,10 +39,10 @@ std::shared_ptr<sphere> composite::MakeSphere(float radius = 1.0f, int numAngula
 
 	std::shared_ptr<sphere> pSphere(m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions));
 	
-Success:
+//Success:
 	return pSphere;
 
-Error:
+//Error:
 	return nullptr;
 }
 
@@ -52,7 +52,7 @@ std::shared_ptr<sphere> composite::AddSphere(float radius = 1.0f, int numAngular
 	std::shared_ptr<sphere> pSphere = MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
 	CR(AddObject(pSphere));
 
-Success:
+//Success:
 	return pSphere;
 
 Error:
@@ -64,10 +64,10 @@ std::shared_ptr<volume> composite::MakeVolume(double width, double length, doubl
 
 	std::shared_ptr<volume> pVolume(m_pHALImp->MakeVolume(width, length, height));
 
-Success:
+//Success:
 	return pVolume;
 
-Error:
+//Error:
 	return nullptr;
 }
 
@@ -81,7 +81,7 @@ std::shared_ptr<volume> composite::AddVolume(double width, double length, double
 	std::shared_ptr<volume> pVolume = MakeVolume(width, length, height);
 	CR(AddObject(pVolume));
 
-Success:
+//Success:
 	return pVolume;
 
 Error:

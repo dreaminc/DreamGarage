@@ -170,7 +170,7 @@ public:
 		//SetQuadTangentBitangent(TL, TR, BL, BR);
 		//*/
 
-	Error:
+//	Error:
 		return r;
 	}
 
@@ -180,7 +180,9 @@ public:
 		RESULT r = R_PASS;
 		CR(Allocate());
 
-		if (width == length == height)
+		if (width == length &&
+			width == height &&
+			length == height)
 			m_volumeType = CUBE;
 
 		CR(SetVolumeVertices(width, length, height));

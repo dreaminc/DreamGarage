@@ -227,7 +227,7 @@ void OGLDebugConsole::Init()
 void OGLDebugConsole::Render(point& topLeft, point& bottomRight)
 {
 	float consoleHeight = 0;
-	float rowSize = 0.05;
+	float rowSize = 0.05f;
 
 	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData())
 	{
