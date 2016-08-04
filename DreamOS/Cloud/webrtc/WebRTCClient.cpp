@@ -53,6 +53,8 @@ Error:
 }
 
 void WebRTCClient::OnClose(rtc::AsyncSocket* socket, int err) {
+	RESULT r = R_PASS;
+
 	LOG(INFO) << __FUNCTION__;
 
 	socket->Close();
@@ -69,8 +71,7 @@ void WebRTCClient::OnClose(rtc::AsyncSocket* socket, int err) {
 			}
 		}
 		else {
-			// TODO:
-			//callback_->OnMessageSent(err);
+			CR(m_pParentWebRTCImp->OnMessageSent(err));
 		}
 	}
 	else {
@@ -80,11 +81,12 @@ void WebRTCClient::OnClose(rtc::AsyncSocket* socket, int err) {
 		}
 		else {
 			Close();
-
-			// TODO:
-			//callback_->OnDisconnected();
+			CR(m_pParentWebRTCImp->OnDisconnected());
 		}
 	}
+
+Error:
+	return;
 }
 
 RESULT WebRTCClient::SignOut() {
@@ -158,12 +160,10 @@ void WebRTCClient::OnMessageFromPeer(int peer_id, const std::string& message) {
 	DEBUG_LINEOUT("WebRTCClient: OnMessageFromPeer");
 
 	if (message.length() == (sizeof(kByeMessage) - 1) && message.compare(kByeMessage) == 0) {
-		//callback_->OnPeerDisconnected(peer_id);
-		// TODO
+		CR(m_pParentWebRTCImp->OnPeerDisconnected(peer_id));
 	}
 	else {
-		//callback_->OnMessageFromPeer(peer_id, message);
-		// TODO
+		CR(m_pParentWebRTCImp->OnMessageFromPeer(peer_id, message));
 	}
 
 Error:
@@ -199,8 +199,7 @@ Success:
 	return r;
 
 Error:
-	// TODO:
-	//callback_->OnDisconnected();
+	CR(m_pParentWebRTCImp->OnDisconnected());
 	LOG(LS_ERROR) << "Received error from server";
 	Close();
 	return r;
@@ -346,24 +345,18 @@ void WebRTCClient::OnRead(rtc::AsyncSocket* socket) {
 
 					if (ParseEntry(m_strControlData.substr(pos, eol - pos), &name, &id, &connected) && id != m_WebRTCID) {
 						m_peers[id] = name;
-						
-						// TODO:
-						//callback_->OnPeerConnected(id, name);
+						CR(m_pParentWebRTCImp->OnPeerConnected(id, name));
 					}
 					pos = eol + 1;
 				}
 			}
 
 			CB((IsConnected()));
-			
-			// TODO: 
-			//callback_->OnSignedIn();
+			CR(m_pParentWebRTCImp->OnSignedIn());
 		}
 		else if (m_WebRTCState == SIGNING_OUT) {
 			Close();
-			
-			// TODO:
-			//callback_->OnDisconnected();
+			CR(m_pParentWebRTCImp->OnDisconnected());
 		}
 		else if (m_WebRTCState == SIGNING_OUT_WAITING) {
 			SignOut();
@@ -403,24 +396,21 @@ void WebRTCClient::OnHangingGetRead(rtc::AsyncSocket* socket) {
 			int id = 0;
 			std::string name;
 			bool connected = false;
+
+			// TODO: The ID is server assigned, this has got to go!
 			if (ParseEntry(m_strNotificatonData.substr(pos), &name, &id, &connected) == R_PASS) {
 				if (connected) {
 					m_peers[id] = name;
-
-					// TODO:
-					//callback_->OnPeerConnected(id, name);
+					CR(m_pParentWebRTCImp->OnPeerConnected(id, name));
 				}
 				else {
 					m_peers.erase(id);
-
-					// TODO:
-					//callback_->OnPeerDisconnected(id);
+					CR(m_pParentWebRTCImp->OnPeerDisconnected(id));
 				}
 			}
 		}
 		else {
-			OnMessageFromPeer(static_cast<int>(peer_id),
-				m_strNotificatonData.substr(pos));
+			OnMessageFromPeer(static_cast<int>(peer_id), m_strNotificatonData.substr(pos));
 		}
 	}
 
@@ -471,8 +461,7 @@ RESULT WebRTCClient::DoConnect() {
 		m_WebRTCState = SIGNING_IN;
 	}
 	else {
-		// TODO:
-		//callback_->OnServerConnectionFailure();
+		CR(m_pParentWebRTCImp->OnServerConnectionFailure());
 	}
 
 Error:
@@ -486,12 +475,8 @@ RESULT WebRTCClient::Connect(const std::string& strServer, int port, const std::
 	CB((!strClientName.empty()));
 
 	CBM((m_WebRTCState != NOT_CONNECTED), "The client must not be connected before you can call Connect()");
-	// TODO:
-	//callback_->OnServerConnectionFailure();
 
 	CB((!strServer.empty()) || (!strServer.empty()));
-	// TODO: 
-	// callback_->OnServerConnectionFailure();
 
 	if (port <= 0) {
 		port = kDefaultServerPort;
@@ -512,7 +497,11 @@ RESULT WebRTCClient::Connect(const std::string& strServer, int port, const std::
 		DoConnect();
 	}
 
+Success:
+	return r;
+
 Error:
+	m_pParentWebRTCImp->OnServerConnectionFailure();
 	return r;
 }
 
@@ -520,7 +509,7 @@ void WebRTCClient::OnResolveResult(rtc::AsyncResolverInterface* resolver) {
 	RESULT r = R_PASS;
 
 	if (m_pAsyncResolver->GetError() != 0) {
-		m_pParentWebRTCImp->OnServerConnectionFailure();
+		CR(m_pParentWebRTCImp->OnServerConnectionFailure());
 		
 		m_pAsyncResolver->Destroy(false);
 		

@@ -23,14 +23,7 @@ WebRTCImp::~WebRTCImp() {
 RESULT WebRTCImp::Initialize() {
 	RESULT r = R_PASS;
 
-	//rtc::scoped_refptr<WebRTCConductor> pWebRTCConductor = nullptr;
-
-	//m_pWin32thread = std::shared_ptr<rtc::Win32Thread>();
-	//rtc::Win32Thread Win32thread;
-
 	rtc::EnsureWinsockInit();
-	//rtc::ThreadManager::Instance()->SetCurrentThread(m_pWin32thread.get());
-	//rtc::ThreadManager::Instance()->SetCurrentThread(&Win32thread);
 	rtc::ThreadManager::Instance()->SetCurrentThread(&m_Win32thread);
 	rtc::InitializeSSL();
 
@@ -38,7 +31,6 @@ RESULT WebRTCImp::Initialize() {
 	CN(m_pWebRTCClient);
 
 	m_pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(m_pWebRTCClient.get(), this));
-	//m_pWebRTCConductor = std::shared_ptr<WebRTCConductor>(pWebRTCConductor);
 
 Error:
 	return r;
