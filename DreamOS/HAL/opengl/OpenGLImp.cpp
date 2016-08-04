@@ -765,6 +765,13 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	CR(m_pOGLProgramCapture->UnbindFramebuffer());
 	//*/
 
+	m_pOGLProgramShadowDepth->UseProgram();
+	m_pOGLProgramShadowDepth->BindToDepthBuffer();
+	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
+	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
+	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
+	m_pOGLProgramShadowDepth->UnbindFramebuffer();
+
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 	CR(m_pOGLRenderProgram->SetLights(pLights));
 
@@ -772,8 +779,6 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
-		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
 		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 		//SetStereoFramebufferViewTarget(eye);
@@ -811,7 +816,6 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 		m_pHMD->UnsetRenderSurface(eye);
 		m_pHMD->CommitSwapChain(eye);
-
 	}
 
 	glFlush();
