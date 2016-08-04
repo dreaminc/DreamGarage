@@ -61,10 +61,11 @@ public:
 	int GetViewHeight() { return m_pxViewHeight; }
 
 private:
-	bool m_renderProfiler = false;
+	bool m_fRenderProfiler = false;
+
 public:
-	bool GetRenderProfiler() { return m_renderProfiler; }
-	void SetRenderProfiler(bool render) { m_renderProfiler = render; }
+	bool GetRenderProfiler() { return m_fRenderProfiler; }
+	void SetRenderProfiler(bool render) { m_fRenderProfiler = render; }
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);

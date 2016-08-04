@@ -288,7 +288,8 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('F') : {
-			SetRenderProfiler(!GetRenderProfiler());
+			if(kbEvent->KeyState != 0)
+				SetRenderProfiler(!GetRenderProfiler());
 		}
 	}
 
@@ -643,6 +644,8 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	
 	// Render profiler overlay
 	if (GetRenderProfiler()) {
+		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLProfiler->m_OGLProgram->SetCamera(m_pCamera));
 		m_pOGLProfiler->Render();
 	}
 
@@ -699,7 +702,9 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		}
 
 		// Render profiler overlay
-		if (!GetRenderProfiler()) {
+		if (GetRenderProfiler()) {
+			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 			m_pOGLProfiler->Render();
 		}
 	}
