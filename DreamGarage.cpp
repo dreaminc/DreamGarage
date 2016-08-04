@@ -65,16 +65,22 @@ RESULT DreamGarage::LoadScene() {
 	HUD_OUT("Hello World");
 
 	//pQuad->SetBumpTexture(pBumpTexture);
+	
 	//*/
 
+
+	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
+
+	/*
 	quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
 	pQuad->MoveTo(0.0f, -1.0f, 0.0f);
 
-	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
+	
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
 
 	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
+	//*/
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -83,7 +89,7 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	/*
+	///*
 	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40));
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
@@ -100,8 +106,10 @@ RESULT DreamGarage::LoadScene() {
 
 	//*/
 	
+	/*
 	volume *pVolume = AddVolume(0.5f);
 	pVolume->MoveTo(-1.0f, 1.0f, 0.0f);
+	*/
 
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
@@ -158,7 +166,7 @@ RESULT DreamGarage::Update(void) {
 
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
-		//m_pSphere->translateY(0.01f);
+		m_pSphere->translateY(0.01f);
 		//m_pSphere->RotateBy(0.01f, 0.02f, 0.01f);
 	}
 

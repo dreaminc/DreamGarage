@@ -61,10 +61,9 @@ public:
 		// empty
 	}
 
-	bool IsZero(){
-		if(x() != 0 | y() != 0 | z() != 0)
+	bool IsZero() {
+		if ((x() != 0) || (y() != 0) || (z() != 0))
 			return false;
-
 		return true;
 	}
 

@@ -239,10 +239,13 @@ public:
 		quaternion qRotation = m_qRotation;
 		qRotation.Reverse();
 
-		if (m_pHMD != nullptr) 
+		if (m_pHMD != nullptr) {
 			m_pCameraFrameOfReference->SetPosition(m_ptOrigin + m_pHMD->GetHeadPointOrigin());
-		else 
+			//m_pCameraFrameOfReference->SetPosition(m_pHMD->GetHeadPointOrigin());
+		}
+		else {
 			m_pCameraFrameOfReference->SetPosition(m_ptOrigin);
+		}
 		
 		m_pCameraFrameOfReference->SetOrientation(qRotation);
 		//*/
