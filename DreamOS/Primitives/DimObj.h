@@ -7,6 +7,7 @@
 // All objects in Dimension should derive from this base class
 
 #include "valid.h"
+#include "dirty.h"
 #include "Primitives/Types/UID.h"
 
 #include "VirtualObj.h"
@@ -18,7 +19,10 @@
 #include "material.h"
 #include "texture.h"
 
-class DimObj : public VirtualObj, public Subscriber<TimeEvent> {
+#include <vector>
+#include <memory>
+
+class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
     //AABV m_aabv;        // Axis Aligned Bounding Volume
@@ -33,7 +37,8 @@ protected:
 	texture *m_pBumpTexture;
 
 	// Use this flag to signal the appropriate rendering object (such as OGLObj) that it needs to update the buffer
-	bool	m_isDirty;
+	// TODO: This should be encapsulated as a dirty pattern
+	bool m_fDirty;
 
 public:
     DimObj() :
@@ -43,7 +48,8 @@ public:
 		m_material(),
 		m_pColorTexture(nullptr),
 		m_pBumpTexture(nullptr),
-		m_isDirty(false)
+		m_pObjects(nullptr),
+		m_pParent(nullptr)
         //m_aabv()
     {
         /* stub */
@@ -121,19 +127,8 @@ public:
 		return r;
 	}
 
-	// Mark the object as dirty, data should be updated by the renderer
-	void SetDirty()
-	{
-		m_isDirty = true;
-	}
-
-	// Check if dirty, and clean the dirty state
-	bool	CheckAndCleanDirty()
-	{
-		bool	isDirty = m_isDirty;
-		m_isDirty = false;
-
-		return isDirty;
+	virtual RESULT UpdateBuffers() {
+		return R_NOT_IMPLEMENTED;
 	}
 
 	RESULT SetColor(color c) {
@@ -202,6 +197,42 @@ public:
 		return R_PASS;
 	}
 
+	// Children (composite objects)
+	RESULT AddChild(std::shared_ptr<DimObj> pDimObj) {
+		if (m_pObjects == nullptr) {
+			m_pObjects = std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>>(new std::vector<std::shared_ptr<VirtualObj>>);
+		}
+
+		m_pObjects->push_back(pDimObj);
+		pDimObj->SetParent(this);
+
+		return R_PASS;
+	}
+
+	RESULT ClearChildren() {
+		m_pObjects->clear();
+		return R_PASS;
+	}
+
+	bool HasChildren() {
+		return (m_pObjects != nullptr) && (m_pObjects->size() != 0);
+	}
+
+	std::vector<std::shared_ptr<VirtualObj>> GetChildren() {
+		return *(m_pObjects.get());
+	}
+
+protected:
+	RESULT SetParent(DimObj* pParent) {
+		m_pParent = pParent;
+		return R_PASS;
+	}
+
+private:
+	DimObj* m_pParent;
+	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
+
+public:
 	// This assumes the other vertices have a valid position and uv mapping
 	// This will set the tangents/bi-tangents for all three vertices
 	// Source: http://learnopengl.com/#!Advanced-Lighting/Normal-Mapping
@@ -367,6 +398,17 @@ public:
 	material *GetMaterial() {
 		return (&m_material);
 	}
+
+	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f)) {
+		if (m_pParent != nullptr) {
+			auto modelMatrix = VirtualObj::GetModelMatrix(childMat);
+			return m_pParent->GetModelMatrix(modelMatrix);
+		}
+		else {
+			return VirtualObj::GetModelMatrix(childMat);
+		}
+	}
+
 };
 
 #endif // !DIM_OBJ_H_
