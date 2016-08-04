@@ -18,6 +18,9 @@ public:
 	// read username and password from file and login, get a token
 	bool Login(const std::wstring& file);
 
+	// obsolete. to be removed
+	bool Login_Json(const std::wstring& file);
+	
 	// loads the user profile using the token
 	bool LoadProfile();
 

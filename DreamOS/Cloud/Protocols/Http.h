@@ -82,7 +82,11 @@ public:
 	bool APOST(const std::string& uri, const std::vector<std::string>& header, const std::string& body, HttpResponseFunc_t responseFunc);
 	bool POST(const std::string& uri, const std::vector<std::string>& header, const std::string& body, HttpResponse& response);
 
-	static const std::vector<std::string> JsonHeader() {
+	static const std::vector<std::string> ContentHttp() {
+		return{ "Content-Type: application/x-www-form-urlencoded" };
+	}
+
+	static const std::vector<std::string> ContentAcceptJson() {
 		return { "Content-Type: application/json", "Accept: application/json; version=1.0" };
 	}
 
