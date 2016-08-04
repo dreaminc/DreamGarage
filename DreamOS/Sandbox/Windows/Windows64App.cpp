@@ -412,7 +412,7 @@ RESULT Windows64App::RegisterImpLeapMotionEvents() {
 
 	/*
 	sphere *pSphere = MakeSphere(1.0f, 10, 10);
-	pSphere->MoveTo(0.0f, 0.0f, 5.0f);
+	pSphere->MoveTo(0.0f, 0.0f, -5.0f);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj>(pSphere));
 	//*/
 
@@ -425,6 +425,9 @@ Error:
 
 RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
+
+	// TODO: remove
+	std::shared_ptr<DimObj> pSphere = nullptr;
 
 	// TODO: Use EHM for this
 	if (!m_hwndWindow) {
@@ -453,10 +456,17 @@ RESULT Windows64App::InitializeSandbox() {
 	}
 	//*/
 
-	///*
 	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
 	m_pHALImp->GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
 	CRM(AddObject(pCameraFrameOfReferenceComposite), "Failed to add composite camera frame of reference");
+
+	/*
+	pSphere = std::shared_ptr<DimObj>(MakeSphere(0.25f, 30, 30, color(COLOR_RED)));
+	pSphere->SetPosition(point(0.0f, 0.0f, -1.0f));
+	pCameraFrameOfReferenceComposite->AddObject(pSphere);
+
+	sphere *pSphere2 = AddSphere(0.25f, 30, 30, color(COLOR_GREEN));
+	pSphere2->SetPosition(point(0.0f, 0.0f, 9.0f));
 	//*/
 
 	// TODO: Move to Sandbox function

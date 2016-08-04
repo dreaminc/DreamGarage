@@ -96,11 +96,11 @@ Error:
 	return nullptr;
 }
 
-sphere* SandboxApp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
-	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
+sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
-sphere* SandboxApp::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
+sphere* SandboxApp::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	RESULT r = R_PASS;
 
 	sphere *pSphere = m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);

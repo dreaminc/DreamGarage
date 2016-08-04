@@ -105,7 +105,9 @@ public:
 	}
 
 	ViewMatrix GetViewMatrix() { 
-		point ptOrigin = m_ptOrigin + m_vDeviation;
+		point ptOrigin = m_ptOrigin;
+		ptOrigin.SetZeroW();
+		ptOrigin += m_vDeviation;
 		ViewMatrix mat = ViewMatrix(ptOrigin, m_qRotation);
 		return mat;
 	}
@@ -233,6 +235,7 @@ public:
 		m_ptOrigin += GetLookVector() * m_cameraForwardSpeed;
 		m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
 		m_ptOrigin += GetUpVector() * m_cameraUpSpeed;
+		m_ptOrigin.SetZeroW();
 
 		///*
 		// Update frame of reference
@@ -240,11 +243,17 @@ public:
 		qRotation.Reverse();
 
 		if (m_pHMD != nullptr) {
-			m_pCameraFrameOfReference->SetPosition(m_ptOrigin + m_pHMD->GetHeadPointOrigin());
+			point ptOrigin = m_ptOrigin + m_pHMD->GetHeadPointOrigin();
+			ptOrigin.Reverse();
+
+			m_pCameraFrameOfReference->SetPosition(ptOrigin);
 			//m_pCameraFrameOfReference->SetPosition(m_pHMD->GetHeadPointOrigin());
 		}
 		else {
-			m_pCameraFrameOfReference->SetPosition(m_ptOrigin);
+			point ptOrigin = m_ptOrigin;
+			ptOrigin.Reverse();
+
+			m_pCameraFrameOfReference->SetPosition(ptOrigin);
 		}
 		
 		m_pCameraFrameOfReference->SetOrientation(qRotation);
@@ -295,7 +304,13 @@ public:
 	}
 
 	RESULT AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj> pDimObj) {
-		return m_pCameraFrameOfReference->AddObject(pDimObj);
+		RESULT r = R_PASS;
+
+		CN(m_pCameraFrameOfReference);
+		CR(m_pCameraFrameOfReference->AddObject(pDimObj));
+
+	Error:
+		return r;
 	}
 
 	RESULT SetFrameOfReferenceComposite(composite *pComposite) {

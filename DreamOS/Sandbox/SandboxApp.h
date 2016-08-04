@@ -54,7 +54,7 @@ public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
-	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
+	sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	volume* MakeVolume(double width, double length, double height);
 	volume* MakeVolume(double side);
 	skybox *MakeSkybox();
@@ -64,7 +64,7 @@ public:
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
 
-	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
+	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	volume* AddVolume(double width, double length, double height);
 
 	volume* AddVolume(double side);

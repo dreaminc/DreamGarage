@@ -61,6 +61,20 @@ public:
 		// empty
 	}
 
+	RESULT SetZeroW() {
+		this->element(3, 0) = 1.0f;
+		return R_PASS;
+	}
+
+	RESULT Reverse() {
+		
+		x() = -x();
+		y() = -y(); 
+		z() = -z();
+
+		return R_PASS;
+	}
+
 	bool IsZero() {
 		if ((x() != 0) || (y() != 0) || (z() != 0))
 			return false;

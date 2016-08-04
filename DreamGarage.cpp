@@ -69,8 +69,7 @@ RESULT DreamGarage::LoadScene() {
 	
 	//*/
 
-
-	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
+	
 
 	/*
 	quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
@@ -90,18 +89,20 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	///*
-	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40));
+	/*
+	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
+
+	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
 	pSphere2->translateX(3.0f);
 	m_pSphere->AddChild(pSphere2);
 
 
-	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40));
+	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40, color(COLOR_GREEN)));
 	pSphere3->SetColorTexture(pColorTexture2);
 	pSphere3->SetBumpTexture(pBumpTexture2);
-	pSphere3->translateX(2.0f);
+	pSphere3->translateX(1.0f);
 	pSphere2->AddChild(pSphere3);
 	//*/
 
@@ -165,16 +166,22 @@ RESULT DreamGarage::LoadScene() {
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 
+	/*
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
-		m_pSphere->translateY(0.01f);
-		//m_pSphere->RotateBy(0.01f, 0.02f, 0.01f);
+		m_pSphere->translateY(0.0005f);
+		//m_pSphere->RotateBy(0.001f, 0.002f, 0.001f);
+		m_pSphere->RotateYBy(0.001f);
+		for (auto &childObj : m_pSphere->GetChildren()) {
+			childObj->RotateYBy(0.001f);
+		}
 	}
 
 	//m_pSphere->translateX(0.001f);
 
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
 	g_pLight->RotateLightDirectionXAxis(0.00005f * 1.3f);
+	*/
 
 //Error:
 	return r;
