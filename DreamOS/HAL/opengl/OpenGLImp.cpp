@@ -738,7 +738,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// TODO: Temporary go through scene graph again
-	///*
+	/*
 	m_pOGLProgramCapture->UseProgram();
 	CR(m_pOGLProgramCapture->SetLights(pLights));
 	//SetMonoViewTarget();
