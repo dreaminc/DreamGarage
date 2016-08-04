@@ -1,4 +1,5 @@
 #include "DreamGarage.h"
+#include <string>
 
 //quad *g_pQuad;
 

@@ -60,6 +60,13 @@ public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
 
+private:
+	bool m_fRenderProfiler = false;
+
+public:
+	bool GetRenderProfiler() { return m_fRenderProfiler; }
+	void SetRenderProfiler(bool render) { m_fRenderProfiler = render; }
+
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();

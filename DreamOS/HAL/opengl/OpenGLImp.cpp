@@ -7,8 +7,6 @@
 #include "Primitives/RotationMatrix.h"
 #include <vector>
 
-#include "../DreamOS/Profiler/Profiler.h"
-
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
@@ -287,6 +285,13 @@ RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
 
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
+
+	switch (kbEvent->KeyCode) {
+		case (SK_SCAN_CODE)('F') : {
+			if(kbEvent->KeyState != 0)
+				SetRenderProfiler(!GetRenderProfiler());
+		}
+	}
 
 	/* This has been moved to the camera 
 	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
@@ -638,8 +643,11 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	}
 	
 	// Render profiler overlay
-	m_pOGLProfiler->Render();
-	//*/
+	if (GetRenderProfiler()) {
+		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLProfiler->m_OGLProgram->SetCamera(m_pCamera));
+		m_pOGLProfiler->Render();
+	}
 
 	glFlush();
 
@@ -694,7 +702,11 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		}
 
 		// Render profiler overlay
-		m_pOGLProfiler->Render();
+		if (GetRenderProfiler()) {
+			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
+			m_pOGLProfiler->Render();
+		}
 	}
 
 	glFlush();
@@ -791,7 +803,9 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		}
 		
 		// Render profiler overlay
-		if (eye == EYE_LEFT) {
+		if (GetRenderProfiler()) {
+			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 			m_pOGLProfiler->Render();
 		}
 
