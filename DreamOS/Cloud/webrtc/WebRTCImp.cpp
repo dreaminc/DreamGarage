@@ -112,6 +112,7 @@ RESULT WebRTCImp::OnSignedIn() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("WebRTCImp: OnSignedIn");
+	CR(InitializePeerConnection());
 
 Error:
 	return r;
