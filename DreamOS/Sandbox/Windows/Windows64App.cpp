@@ -349,6 +349,9 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
 	}
 
+	CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
+	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
+
 Error:
 	return r;
 }

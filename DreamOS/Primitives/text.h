@@ -38,14 +38,17 @@ private:
 public:
 
 	enum AlignmentType {
-		LEFT,
+		TOP_LEFT,
+		TOP_RIGHT,
 		CENTER,
-		RIGHT
+		BOTTOM_LEFT,
+		BOTTOM_RIGHT
 	};
 
 	uv_precision m_width = 0.0f;
+	uv_precision m_height = 0.0f;
 
-	text(std::shared_ptr<Font> font, const std::string& text, double size = 1.0) :
+	text(std::shared_ptr<Font> font, const std::string& text = "", double size = 1.0) :
 		m_font(font)
 	{
 		SetText(text, size);
@@ -95,15 +98,8 @@ public:
 		#define YSCALE_TO_SCREEN(y)	2.0f * (y) / screen_height
 
 		m_width = 0.0f;
-		for_each(text.begin(), text.end(), [&](char c) {
-			Font::CharacterGlyph glyph;
-			if (m_font->GetGlyphFromChr(c, glyph))
-			{
-				m_width += (c == text.back()) ? XSCALE_TO_SCREEN(glyph.xadvance) : 
-												XSCALE_TO_SCREEN(glyph.width);
-			}
-		});
-		
+		float max_below = 0.0f;
+		float max_above = 0.0f;
 		for_each(text.begin(), text.end(), [&](char c) {
 			Font::CharacterGlyph glyph;
 			if (m_font->GetGlyphFromChr(c, glyph))
@@ -121,6 +117,11 @@ public:
 
 				quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs, dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
 				posx += XSCALE_TO_SCREEN(glyph.xadvance);
+
+				m_width += (c == text.back()) ? XSCALE_TO_SCREEN(glyph.xadvance) : 
+												XSCALE_TO_SCREEN(glyph.width);
+
+				m_height = (dys > m_height) ? dys : m_height;
 			}
 		});
 
@@ -157,8 +158,9 @@ public:
 	
 	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)
 	{
-		uv_precision dx = (align == LEFT) ? 0.0f : ((align == CENTER) ? m_width / 2 : m_width);
-		return this->MoveTo(p.x() - dx, p.y(), p.z());
+		uv_precision dx = (align == BOTTOM_LEFT || align == TOP_LEFT) ? 0.0f : ((align == CENTER) ? m_width / 2 : m_width);
+		uv_precision dy = (align == BOTTOM_LEFT || align == BOTTOM_RIGHT) ? 0.0f : ((align == CENTER) ? m_height / 2 : m_height);
+		return this->MoveTo(p.x() - dx, p.y() - dy, p.z());
 	}
 
 
