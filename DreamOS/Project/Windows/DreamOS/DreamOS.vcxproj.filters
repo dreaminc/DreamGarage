@@ -319,6 +319,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp">
       <Filter>External\Matrices</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\composite.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\hand.cpp">
+      <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1249,6 +1261,21 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProfiler.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\composite.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\hand.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
@@ -1812,6 +1839,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
       <Filter>HMD\OpenVR</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\dirty.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h">
       <Filter>HAL\opengl</Filter>
@@ -1830,6 +1863,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Profiler\DebugConsole.h">
+      <Filter>Profiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

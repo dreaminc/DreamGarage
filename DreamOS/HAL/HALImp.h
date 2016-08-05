@@ -54,7 +54,10 @@ public:
 public:
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) = 0;
+
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
+	virtual volume* MakeVolume(double width, double length, double height) = 0;
+
 	virtual volume* MakeVolume(double side) = 0;
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) = 0;
@@ -65,6 +68,8 @@ public:
 
 	// TODO: Fix this
 	virtual RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0) = 0;
+
+	virtual composite *MakeComposite() = 0;
 
 	/*
 	virtual model* MakeModel(const std::vector<vertex>& vertices) = 0;

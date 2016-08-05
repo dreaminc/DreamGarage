@@ -65,16 +65,36 @@ light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOri
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
+light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
+	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+}
+
 sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
+sphere* DreamOS::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
+}
+
+volume* DreamOS::AddVolume(double width, double length, double height) {
+	return m_pSandbox->AddVolume(width, length, height);
+}
+
+volume* DreamOS::MakeVolume(double width, double length, double height) {
+	return m_pSandbox->MakeVolume(width, length, height);
+}
+	
 quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 }
 
 volume* DreamOS::AddVolume(double side) {
 	return m_pSandbox->AddVolume(side);
+}
+
+volume* DreamOS::MakeVolume(double side) {
+	return m_pSandbox->MakeVolume(side);
 }
 
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
@@ -85,10 +105,18 @@ skybox *DreamOS::AddSkybox() {
 	return m_pSandbox->AddSkybox();
 }
 
+skybox *DreamOS::MakeSkybox() {
+	return m_pSandbox->MakeSkybox();
+}
+
 model *DreamOS::AddModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
 
+model *DreamOS::MakeModel(wchar_t *pszModelName) {
+	return m_pSandbox->AddModel(pszModelName);
+}
+	
 RESULT DreamOS::AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 	return m_pSandbox->AddModel(strRootFolder, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
 }

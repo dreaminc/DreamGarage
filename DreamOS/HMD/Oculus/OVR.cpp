@@ -218,6 +218,8 @@ Error:
 RESULT OVRHMD::UpdateHMD() {
 	RESULT r = R_PASS;
 
+	//ovr_RecenterTrackingOrigin(m_ovrSession);
+
 #ifdef HMD_OVR_USE_PREDICTED_TIMING
 	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
 #else

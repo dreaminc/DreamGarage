@@ -1,4 +1,5 @@
 #include "DreamGarage.h"
+#include <string>
 
 //quad *g_pQuad;
 
@@ -56,10 +57,8 @@ RESULT DreamGarage::LoadScene() {
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
 	pQuad->SetColorTexture(pColorTextureCobble);
+	pQuad->translateY(-2.0f);
 	//pQuad->SetBumpTexture(pBumpTexture);
-
-	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
-	//pQuad->SetColorTexture(pColorTextureCobble);
 
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
@@ -67,17 +66,18 @@ RESULT DreamGarage::LoadScene() {
 	HUD_OUT("Hello World");
 
 	//pQuad->SetBumpTexture(pBumpTexture);
+	
+	//*/
+
 
 	//quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
 	//pQuad->MoveTo(0.0f, -1.0f, 0.0f);
-
-	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
-	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
 
 	/*
 	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
 	*/
+
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -86,25 +86,30 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	/*
-	m_pSphere = AddSphere(0.5f, 40, 40);
-	m_pSphere->SetColorTexture(pColorTexture);
-	m_pSphere->SetBumpTexture(pBumpTexture);
-	//*/
+	//*
+	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
 
-	/*
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
+	pSphere2->translateX(3.0f);
+	m_pSphere->AddChild(pSphere2);
 
-	pSphere2->translateX(5.0f);
+
+	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40, color(COLOR_GREEN)));
+	pSphere3->SetColorTexture(pColorTexture2);
+	pSphere3->SetBumpTexture(pBumpTexture2);
+	pSphere3->translateX(1.0f);
+	pSphere2->AddChild(pSphere3);
 	//*/
 
+	//*/
 	
+	/*
 	volume *pVolume = AddVolume(0.5f);
 	pVolume->MoveTo(-1.0f, 1.0f, 0.0f);
+	*/
 
-	/*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 
@@ -114,6 +119,7 @@ RESULT DreamGarage::LoadScene() {
 	pMgr->GetCurrentPath((wchar_t*&)path);
 	std::wstring objFile(path);
 
+	/*
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f, 0.0f),
@@ -138,12 +144,16 @@ RESULT DreamGarage::LoadScene() {
 		0.015f,
 		1.0f);
 
+	
+	*/
+
+	/*
 	AddModel(objFile, L"\\Models\\table\\untitled.obj",
 		nullptr,
-		point(0.0f, -13.0f, 0.0f),
-		10.0f,
+		point(0.0, 13.0, 0.0),
+		10.0,
 		3.14f);
-	*/
+	//*/
 
 
 //Error:
@@ -153,7 +163,16 @@ RESULT DreamGarage::LoadScene() {
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 
+	//*
 	// Update stuff ...
+	if (m_pSphere != nullptr) {
+		//m_pSphere->translateY(0.0005f);
+		//m_pSphere->RotateBy(0.001f, 0.002f, 0.001f);
+		m_pSphere->RotateYBy(0.001f);
+		for (auto &childObj : m_pSphere->GetChildren()) {
+			childObj->RotateYBy(0.001f);
+		}
+	}
 
 	m_pSphere->translateX(0.001f);
 

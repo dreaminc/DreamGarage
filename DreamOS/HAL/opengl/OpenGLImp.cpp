@@ -7,8 +7,6 @@
 #include "Primitives/RotationMatrix.h"
 #include <vector>
 
-#include "../DreamOS/Profiler/Profiler.h"
-
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
@@ -289,6 +287,13 @@ RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
+	switch (kbEvent->KeyCode) {
+		case (SK_SCAN_CODE)('F') : {
+			if(kbEvent->KeyState != 0)
+				SetRenderProfiler(!GetRenderProfiler());
+		}
+	}
+
 	/* This has been moved to the camera 
 	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
 
@@ -443,6 +448,7 @@ Error:
 	return nullptr;
 }
 
+
 model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
@@ -473,6 +479,25 @@ Error:
 	if (pModel != nullptr) {
 		delete pModel;
 		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+#include "HAL/opengl/OGLComposite.h"
+
+composite *OpenGLImp::MakeComposite() {
+	RESULT r = R_PASS;
+
+	composite *pComposite = new OGLComposite(this);
+	CN(pComposite);
+
+Success:
+	return pComposite;
+
+Error:
+	if (pComposite != nullptr) {
+		delete pComposite;
+		pComposite = nullptr;
 	}
 	return nullptr;
 }
@@ -529,10 +554,10 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double side) {
+volume* OpenGLImp::MakeVolume(double width, double length, double height) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, side);
+	volume *pVolume = new OGLVolume(this, width, length, height);
 	CN(pVolume);
 
 //Success:
@@ -544,6 +569,10 @@ Error:
 		pVolume = nullptr;
 	}
 	return nullptr;
+}
+
+volume* OpenGLImp::MakeVolume(double side) {
+	return MakeVolume(side, side, side);
 }
 
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
@@ -667,8 +696,11 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	}
 	
 	// Render profiler overlay
-	m_pOGLProfiler->Render();
-	//*/
+	if (GetRenderProfiler()) {
+		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLProfiler->m_OGLProgram->SetCamera(m_pCamera));
+		m_pOGLProfiler->Render();
+	}
 
 	glFlush();
 
@@ -723,7 +755,11 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		}
 
 		// Render profiler overlay
-		m_pOGLProfiler->Render();
+		if (GetRenderProfiler()) {
+			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
+			m_pOGLProfiler->Render();
+		}
 	}
 
 	glFlush();
@@ -825,13 +861,14 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		}
 		
 		// Render profiler overlay
-		if (eye == EYE_LEFT) {
+		if (GetRenderProfiler()) {
+			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 			m_pOGLProfiler->Render();
 		}
 
 		m_pHMD->UnsetRenderSurface(eye);
 		m_pHMD->CommitSwapChain(eye);
-
 	}
 
 	glFlush();

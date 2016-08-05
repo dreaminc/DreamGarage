@@ -76,6 +76,12 @@ The Vive requires the use of OpenVR, and for the given binaries to reside on the
 
 Oculus use requires the installation of the Oculus run time at the moment.  Apart from this the Oculus binaries are currently residing inside of the source tree in EXTERNAL, so updates to this will require updates to the source.  Might be a good idea to push this out as an environment variable as the others to make it easier to update / control which version.  Ultimately, we will build a more configurable system to set which version is to be used etc. 
 
+# Input
+
+## Leap Motion
+
+The engine supports using the Leap Motion input controller, but this requires the Leap runtime to be running and libraries/DLLs installed on the machine.  Also, the compiler will look for the library at the path as provided by the `LEAPMOTIONPATH` environment variable which should be set to where the SDK is installed.
+
 # Using Dream OS
 
 ## Dream Garage

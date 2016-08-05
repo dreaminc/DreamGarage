@@ -60,6 +60,13 @@ public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
 
+private:
+	bool m_fRenderProfiler = false;
+
+public:
+	bool GetRenderProfiler() { return m_fRenderProfiler; }
+	void SetRenderProfiler(bool render) { m_fRenderProfiler = render; }
+
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
@@ -68,7 +75,10 @@ public:
 public:
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
+
 	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
+	volume* MakeVolume(double width, double length, double height);
+	
 	volume* MakeVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
@@ -76,6 +86,8 @@ public:
 	model *MakeModel(wchar_t *pszModelName);
 	model *MakeModel(const std::vector<vertex>& vertices);
 	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+
+	composite *MakeComposite();
 
 	// TODO: Convert to composite
 	RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);

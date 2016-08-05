@@ -4,12 +4,13 @@
 #include "HAL/opengl/OGLProgram.h"
 
 #include "OGLTriangle.h"
+#include "OGLQuad.h"
 #include "OGLText.h"
 
 #include <memory>
 
 #include "Profiler/ProfilerGraph.h"
-
+#include "Profiler/DebugConsole.h"
 
 // Dream OS
 // DreamOS/HAL/opengl/OGLProfiler.h
@@ -24,9 +25,20 @@ public:
 
 	virtual ~OGLRenderContext() {}
 
+	void Init();
+	void Render(point& topLeft, point& rightBottom);
+
+	OGLProgram*	m_OGLProgram;
+
 protected:
 	OpenGLImp*	m_OGLImp;
-	OGLProgram*	m_OGLProgram;
+
+	std::unique_ptr<OGLTriangle> m_Background;
+	float m_BackgroundMargin = 0.025f;
+
+	// A font for the text. TBD: remove and use a font factory
+	std::shared_ptr<Font>	m_OGLFont;
+	float m_fontSize;
 };
 
 template<typename T>
@@ -49,11 +61,21 @@ private:
 	// Use triangle primitive to draw a line for the graphs
 	std::unique_ptr<OGLTriangle> m_OGLTriangle;
 
-	// A font for the text. TBD: remove and use a font factory
-	std::shared_ptr<Font>	m_OGLFont;
-
 	// Use text for FPS
 	std::unique_ptr<OGLText>	 m_OGLFPSText;
+};
+
+class OGLDebugConsole : public OGLRenderContext {
+public:
+	OGLDebugConsole(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
+	~OGLDebugConsole();
+
+	void Init();
+	void Render(point& topLeft, point& bottomRight);
+	void Destroy();
+
+private:
+	std::unique_ptr<OGLText>	m_OGLConsoleText;
 };
 
 class OGLProfiler : public OGLRenderContext {
@@ -66,15 +88,14 @@ public:
 	void Destroy();
 
 private:
-	// A font for the text. TBD: remove and use a font factory
-	std::shared_ptr<Font>	m_OGLFont;
-
 	// Title for the profiler
 	std::unique_ptr<OGLText>	 m_OGLTitleText;
 
 	std::unique_ptr<OGLText>	 m_OGLConsoleText;
 
 	OGLProfilerGraph	m_OGLGraph;
+	OGLDebugConsole		m_OGLConsole;
+
 };
 
 #endif // ! OGLPROFILER_H
