@@ -39,6 +39,24 @@ texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels
 	Validate();
 }
 
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) :
+	m_pImageBuffer(nullptr),
+	m_width(width),
+	m_height(height),
+	m_channels(channels),
+	m_type(type) 
+{
+	RESULT r = R_PASS;
+
+	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n))
+	
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
 texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_INVALID) :
 	m_pImageBuffer(nullptr),
 	m_width(0),
@@ -216,6 +234,22 @@ RESULT texture::LoadTextureFromPath(wchar_t *pszFilepath) {
 
 	m_pImageBuffer = SOIL_load_image(strFilepath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 	CN(m_pImageBuffer);
+
+Error:
+	return r;
+}
+
+RESULT texture::CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n) {
+	RESULT r = R_PASS;
+
+	// TODO: May need to add size of stuff
+
+	// TODO: Move to member?
+	long pImageBuffer_n = sizeof(unsigned char) * pBuffer_n;
+	m_pImageBuffer = (unsigned char*)malloc(pImageBuffer_n);
+	CN(m_pImageBuffer);
+
+	memcpy(m_pImageBuffer, pBuffer, pImageBuffer_n);
 
 Error:
 	return r;

@@ -69,6 +69,7 @@ public:
 
 		point eyePos = GetEyePosition(eye);
 
+
 		// TODO: Fix this
 		if (m_pHMD != nullptr) {
 			eyePos += m_pHMD->GetHeadPointOrigin();

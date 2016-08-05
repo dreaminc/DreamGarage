@@ -1,21 +1,19 @@
-#ifndef OGLPROGRAM_BLINN_PHONG_SHADOW_H_
-#define OGLPROGRAM_BLINN_PHONG_SHADOW_H_
+#ifndef OGLPROGRAM_BLINN_PHONG_TEXTURE_SHADOW_H_
+#define OGLPROGRAM_BLINN_PHONG_TEXTURE_SHADOW_H_
 
 // Dream OS
-// DreamOS/HAL/opengl/OGLProgramBlinnPhongShadow.h
-// OGLProgramBlinnPhongShadow is an OGL Program that utilizes the Blinn Phong
-// algorithm and also employs shadow mapping
+// DreamOS/HAL/opengl/OGLProgramBlinnPhongTexture.h
+// Blinn Phong Texture OGL shader program - this uses the blinn phong
+// shading model along with one color texture
 
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
+#include "OGLObj.h"
+#include "OGLTexture.h"
 
-#include "Primitives/BiasMatrix.h"
-#include "OpenGLImp.h"
-#include "OGLProgramShadowDepth.h"
-
-class OGLProgramBlinnPhongShadow : public OGLProgram {
+class OGLProgramBlinnPhongTextureShadow : public OGLProgram {
 public:
-	OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp) :
+	OGLProgramBlinnPhongTextureShadow(OpenGLImp *pParentImp) :
 		OGLProgram(pParentImp),
 		m_pLightsBlock(nullptr),
 		m_pMaterialsBlock(nullptr)
@@ -44,19 +42,29 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformDepthViewProjectionMatrix), std::string("u_mat4DepthVP")));
 
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
+
 		// Uniform Blocks
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
-
-		// Depth Map Texture
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
 
 	Error:
 		return r;
 	}
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
-		return R_NOT_IMPLEMENTED;
+		RESULT r = R_PASS;
+
+		OGLTexture *pTexture = nullptr;
+
+		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+			pTexture->OGLActivateTexture();
+			m_pUniformTextureColor->SetUniform(pTexture);
+		}
+
+//	Error:
+		return r;
 	}
 
 	RESULT SetLights(std::vector<light*> *pLights) {
@@ -107,8 +115,8 @@ public:
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
 
 			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
-			pOGLProgramShadowDepth->SetDepthTexture(0);
-			m_pUniformTextureDepth->SetUniform(0);			
+			pOGLProgramShadowDepth->SetDepthTexture(1);
+			m_pUniformTextureDepth->SetUniform(1);
 		}
 
 		return R_PASS;
@@ -130,8 +138,8 @@ public:
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
 
 			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
-			pOGLProgramShadowDepth->SetDepthTexture(0);
-			m_pUniformTextureDepth->SetUniform(0);
+			pOGLProgramShadowDepth->SetDepthTexture(1);
+			m_pUniformTextureDepth->SetUniform(1);
 		}
 
 		return R_PASS;
@@ -154,7 +162,7 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformDepthViewProjectionMatrix;
 
-	// Textures
+	OGLUniformSampler2D *m_pUniformTextureColor;
 	OGLUniformSampler2D *m_pUniformTextureDepth;
 
 	// Uniform Blocks

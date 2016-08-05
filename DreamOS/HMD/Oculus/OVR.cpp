@@ -1,6 +1,8 @@
 #include "OVR.h"
 #include <math.h>
 
+#include "Sandbox/SandboxApp.h"
+
 // TODO: Fix this encapsulation
 #include "HAL/opengl/OpenGLImp.h"
 
@@ -9,9 +11,8 @@
 
 #include "Extras/OVR_Math.h"
 
-#include "HAL/opengl/OGLComposite.h"
-
-OVRHMD::OVRHMD() :
+OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
+	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
 	m_ovrMirrorTexture(nullptr)
 {
@@ -25,6 +26,7 @@ OVRHMD::~OVRHMD() {
 RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	RESULT r = R_PASS;
 	ovrGraphicsLuid luid;
+	m_pHALImp = halimp;
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
 
 	// Initializes LibOVR, and the Rift

@@ -146,6 +146,10 @@ Error:
 	return nullptr;
 }
 
+texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) {
+	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, channels, pBuffer, pBuffer_n);
+}
+
 volume* SandboxApp::AddVolume(double side) {
 	return AddVolume(side, side, side);
 }
@@ -200,6 +204,44 @@ Error:
 	return nullptr;
 }
 
+model *SandboxApp::AddModel(const std::vector<vertex>& vertices) {
+	RESULT r = R_PASS;
+
+	model* pModel = m_pHALImp->MakeModel(vertices);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+model *SandboxApp::AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+	RESULT r = R_PASS;
+
+	model* pModel = m_pHALImp->MakeModel(vertices, indices);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
 // TODO: Fix this
 RESULT SandboxApp::AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 	return m_pHALImp->LoadModel(m_pSceneGraph, strRootFolder, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
@@ -223,4 +265,8 @@ RESULT SandboxApp::UnregisterUpdateCallback() {
 
 Error:
 	return r;
+}
+
+point SandboxApp::GetCameraPosition() {
+	return m_pHALImp->GetCamera()->GetPosition();
 }

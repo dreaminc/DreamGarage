@@ -13,13 +13,16 @@ RESULT DreamGarage::LoadScene() {
 	///*
 	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	// TODO: Special lane for global light
+
 	//vector lightdir = vector(0.0f, 1.0f, -0.5f);
 	vector lightdir = vector(0.0f, -1.0f, 0.5f);
 	lightdir.Normalize();
 
-	//float lightdistance = 10.0f;
-	//point lightpoint = -1.0f * lightdir * lightdistance;
-	//lightpoint.w() = 0.0f;
+	/*
+	float lightdistance = 10.0f;
+	point lightpoint = -1.0f * lightdir * lightdistance;
+	lightpoint.w() = 1.0f;
+	//*/
 
 	point lightpoint = point(0.0f, 10.0f, 0.0f);
 	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, lightpoint, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
@@ -51,15 +54,11 @@ RESULT DreamGarage::LoadScene() {
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	//*/
 
-	/*
-	model* pModel = AddModel(L"chainsaw_free.obj");
-	pModel->SetColorTexture(pColorTexture);
-	pModel->SetBumpTexture(pBumpTexture);
-	*/
-
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
+	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
 	pQuad->SetColorTexture(pColorTextureCobble);
 	pQuad->translateY(-2.0f);
+	//pQuad->SetBumpTexture(pBumpTexture);
 
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
@@ -70,18 +69,15 @@ RESULT DreamGarage::LoadScene() {
 	
 	//*/
 
-	
+
+	//quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
+	//pQuad->MoveTo(0.0f, -1.0f, 0.0f);
 
 	/*
-	quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
-	pQuad->MoveTo(0.0f, -1.0f, 0.0f);
-
-	
-	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
-
 	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
-	//*/
+	*/
+
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -178,11 +174,10 @@ RESULT DreamGarage::Update(void) {
 		}
 	}
 
-	//m_pSphere->translateX(0.001f);
+	m_pSphere->translateX(0.001f);
 
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
-	g_pLight->RotateLightDirectionXAxis(0.00005f * 1.3f);
-	//*/
+	//g_pLight->RotateLightDirectionXAxis(0.0005f * 1.3f);
 
 //Error:
 	return r;
