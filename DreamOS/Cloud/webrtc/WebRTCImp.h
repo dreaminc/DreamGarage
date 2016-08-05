@@ -19,6 +19,7 @@
 const char kAudioLabel[] = "audio_label";
 const char kVideoLabel[] = "video_label";
 const char kStreamLabel[] = "stream_label";
+const char kDataLabel[] = "data_label";
 const uint16_t kDefaultServerPort = 8888;
 
 class WebRTCClient;
@@ -45,6 +46,9 @@ public:
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);
 	RESULT InitializePeerConnection();
+	int GetFirstPeerID();
+	
+	virtual RESULT ConnectToPeer(int peerID) override;
 
 public:
 	// Utilities

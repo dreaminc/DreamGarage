@@ -44,6 +44,7 @@ public:
 	void OnHangingGetRead(rtc::AsyncSocket* socket);
 
 	void OnMessageFromPeer(int peer_id, const std::string& message);
+	RESULT SendMessageToPeer(int peerID, const std::string& message);
 
 	RESULT SignOut();
 	RESULT Connect(const std::string& strServer, int port, const std::string& strClientName);
@@ -58,6 +59,10 @@ public:
 
 	bool WebRTCClient::IsConnected() const {
 		return (m_WebRTCID != -1);
+	}
+
+	const std::map<int, std::string>& GetPeers() const {
+		return m_peers;
 	}
 
 private:

@@ -24,6 +24,8 @@ public:
 	virtual RESULT Update() = 0;
 	virtual RESULT CreateNewURLRequest(std::wstring& strURL) = 0;
 
+	virtual RESULT ConnectToPeer(int peerID) = 0;
+
 	// TODO: Add a handle URL request callback here
 
 private:

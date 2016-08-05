@@ -27,8 +27,7 @@ const char kSessionDescriptionSdpName[] = "sdp";
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
 public:
 	static DummySetSessionDescriptionObserver* Create() {
-		return
-			new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
+		return new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
 	}
 
 	virtual void OnSuccess() {
@@ -64,14 +63,24 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 void WebRTCConductor::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
 	DEBUG_LINEOUT("OnAddStream: %s", stream->label().c_str());
 
-	m_pParentWebRTCImp->QueueUIThreadCallback(NEW_STREAM_ADDED, stream.release());
+	// TODO:
+	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_STREAM_ADDED, stream.release());
 }
 
-void WebRTCConductor::OnRemoveStream(
-	rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
+void WebRTCConductor::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
 	DEBUG_LINEOUT("OnRemoveStream: %s", stream->label().c_str());
 	
-	m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
+	// TODO:
+	// m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
+}
+
+void WebRTCConductor::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) {
+	DEBUG_LINEOUT("OnDataChannel: %s", channel->label().c_str());
+
+	channel->Send(webrtc::DataBuffer("DEADBEEF"));
+
+	// TODO: 
+	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_DATA, stream.release());
 }
 
 void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
@@ -91,19 +100,35 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 	jmessage[kCandidateSdpMidName] = candidate->sdp_mid();
 	jmessage[kCandidateSdpMlineIndexName] = candidate->sdp_mline_index();
 	std::string sdp;
+	
 	if (!candidate->ToString(&sdp)) {
 		LOG(LS_ERROR) << "Failed to serialize candidate";
 		return;
 	}
+
 	jmessage[kCandidateSdpName] = sdp;
 	SendMessage(writer.write(jmessage));
+}
+
+RESULT WebRTCConductor::SendMessageToPeer(std::string* strMessage, int peerID) {
+	RESULT r = R_PASS;
+
+	// TODO: Add a queue here for messages, this is not correct
+
+	CN(m_pWebRTCPeerConnection);
+	CRM(m_pWebRTCClient->SendMessageToPeer(peerID, *strMessage), "Failed to send message to peer");
+
+	// TODO: Disconnect server if failed to connect?
+
+Error:
+	return r;
 }
 
 void WebRTCConductor::SendMessage(const std::string& strJSONObject) {
 	std::string* msg = new std::string(strJSONObject);
 
 	// TODO:
-	m_pParentWebRTCImp->QueueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
+	//m_pParentWebRTCImp->QueueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
 }
 
 void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) {
@@ -177,38 +202,90 @@ cricket::VideoCapturer* WebRTCConductor::OpenVideoCaptureDevice() {
 	return capturer;
 }
 
-RESULT WebRTCConductor::AddStreams() {
+RESULT WebRTCConductor::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
 	RESULT r = R_PASS;
 
-	rtc::scoped_refptr<webrtc::MediaStreamInterface> pStream = nullptr;
-	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
 	rtc::scoped_refptr<webrtc::VideoTrackInterface> pVideoTrack = nullptr;
 
-	CB((m_WebRTCActiveStreams.find(kStreamLabel) == m_WebRTCActiveStreams.end()));
+	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
+		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kVideoLabel,
+			m_pWebRTCPeerConnectionFactory->CreateVideoSource(OpenVideoCaptureDevice(), nullptr)));
+
+	pMediaStreamInterface->AddTrack(pVideoTrack);
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
 
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
 		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(nullptr)));
 
-	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateVideoTrack( kVideoLabel, 
-			m_pWebRTCPeerConnectionFactory->CreateVideoSource(OpenVideoCaptureDevice(), nullptr)));
+	pMediaStreamInterface->AddTrack(pAudioTrack);
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::AddDataStream() {
+	RESULT r = R_PASS;
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::AddStreams() {
+	RESULT r = R_PASS;
+
+	rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface = nullptr;
+	
+	CB((m_WebRTCActiveStreams.find(kStreamLabel) == m_WebRTCActiveStreams.end()));
+	
+	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
+	
+	CR(AddAudioStream(pMediaStreamInterface));
+	CR(AddVideoStream(pMediaStreamInterface));
 
 	// TODO: STREAMMMM
 	//main_wnd_->StartLocalRenderer(video_track);
 
-	pStream = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
 
-	pStream->AddTrack(pAudioTrack);
-	pStream->AddTrack(pVideoTrack);
-
-	if (!m_pWebRTCPeerConnection->AddStream(pStream)) {
+	// TODO:  Add streams
+	if (!m_pWebRTCPeerConnection->AddStream(pMediaStreamInterface)) {
 		LOG(LS_ERROR) << "Adding stream to PeerConnection failed";
 	}
-
+	
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
-	m_WebRTCActiveStreams.insert(MediaStreamPair(pStream->label(), pStream));
+	m_WebRTCActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
 	
 	//main_wnd_->SwitchToStreamingUI();
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::AddDataChannel() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("WebRTCConductor::AddDataChannel");
+
+	rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface = nullptr;
+	webrtc::DataChannelInit dataChannelInit;
+
+	CB((m_WebRTCActiveDataChannels.find(kDataLabel) == m_WebRTCActiveDataChannels.end()));
+	pDataChannelInterface = m_pWebRTCPeerConnection->CreateDataChannel(kDataLabel, &dataChannelInit);
+	CN(pDataChannelInterface);
+
+	// Add Channel
+	//pDataChannelInterface->  .connect(this, &PeerConnectionEndToEndTest::OnCallerAddedDataChanel);
+	//m_SignalOnDataChannel.connect(this, &WebRTCConductor::OnDataChannel);
+
+	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataChannelPair;
+	m_WebRTCActiveDataChannels.insert(DataChannelPair(pDataChannelInterface->label(), pDataChannelInterface));
 
 Error:
 	return r;
@@ -243,7 +320,8 @@ RESULT WebRTCConductor::InitializePeerConnection() {
 		DeletePeerConnection();
 	}
 	
-	CR(AddStreams());
+	//CR(AddStreams());
+	CR(AddDataChannel());
 	
 	CN(m_pWebRTCPeerConnection.get());
 
@@ -347,6 +425,13 @@ Error:
 
 void WebRTCConductor::OnPeerConnected(int id, const std::string& name) {
 	LOG(INFO) << __FUNCTION__;
+
+	DEBUG_LINEOUT("WebRTCConductor:OnPeerConnected:");
+	
+	std::map<int, std::string> peers = m_pWebRTCClient->GetPeers();
+	for (auto &peer : peers) {
+		DEBUG_LINEOUT("%d: %s", peer.first, peer.second.c_str());
+	}
 
 	// Refresh the list if we're showing it.
 	/*if (m_pParentWebRTCImp->current_ui() == MainWindow::LIST_PEERS)

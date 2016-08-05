@@ -306,6 +306,14 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 		// Update the Keyboard in WndProc rather than in the run loop
 		// TODO: This should be different arch for native
 		case WM_KEYDOWN: {
+			// DEBUG: Bypass for connect to cloud
+			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('C')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+
+				}
+			}
+
 			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), true);
 		} break;
 

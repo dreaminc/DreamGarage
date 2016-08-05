@@ -44,6 +44,18 @@ public:
 		return r;
 	}
 
+	// TODO: This will attempt to connect to the first peer in the list, should make more robust
+	// and expose the available peer list at the CloudController layer
+	RESULT ConnectToPeer(int peerID) {
+		RESULT r = R_PASS;
+
+		CN(m_pCloudImp);
+		CR(m_pCloudImp->ConnectToPeer(peerID));
+
+	Error:
+		return r;
+	}
+
 	RESULT Update() {
 		RESULT r = R_PASS;
 

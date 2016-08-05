@@ -44,14 +44,13 @@ public:
 	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
 
 protected:
-
 	// PeerConnectionObserver implementation.
 	void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override {};
 
 	void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
+	void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
 
-	void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override {}
 	void OnRenegotiationNeeded() override {}
 	void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) override {};
 	void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override {};
@@ -81,10 +80,16 @@ protected:
 	RESULT DeletePeerConnection();
 	RESULT InitializePeerConnection();
 	RESULT ReinitializePeerConnectionForLoopback();
-	RESULT AddStreams();
 	cricket::VideoCapturer* OpenVideoCaptureDevice();
+	
+	RESULT AddStreams();
+	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
+	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
+	RESULT AddDataStream();
+	RESULT AddDataChannel();
 
 	RESULT CreateOffer();
+	RESULT SendMessageToPeer(std::string* strMessage, int peerID);
 
 private:
 	// Utility (TODO: Move this elsewhere?)
@@ -101,6 +106,9 @@ private:
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
 
 	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCActiveStreams;
+	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCActiveDataChannels;
+
+	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
 
 	std::string m_strWebRTCServer;
 };

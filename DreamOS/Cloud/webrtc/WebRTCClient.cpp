@@ -468,6 +468,33 @@ Error:
 	return r;
 }
 
+// This will send the data to the server to be passed to the other peer
+RESULT WebRTCClient::SendMessageToPeer(int peerID, const std::string& message) {
+	RESULT r = R_PASS;
+
+	CB((m_WebRTCState == CONNECTED));
+
+	CB((IsConnected()));
+	CB((m_pAsyncSocketControl->GetState() == rtc::Socket::CS_CLOSED));
+	CB(peerID != -1);
+
+	char headers[1024];
+	rtc::sprintfn(headers, sizeof(headers),
+		"POST /message?peer_id=%i&to=%i HTTP/1.0\r\n"
+		"Content-Length: %i\r\n"
+		"Content-Type: text/plain\r\n"
+		"\r\n",
+		m_WebRTCID, peerID, message.length());
+
+	m_strOnConnectData = headers;
+	m_strOnConnectData += message;
+	
+	CR(ConnectControlSocket());
+
+Error:
+	return r;
+}
+
 RESULT WebRTCClient::Connect(const std::string& strServer, int port, const std::string& strClientName) {
 	RESULT r = R_PASS;
 

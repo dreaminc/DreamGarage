@@ -79,12 +79,38 @@ Error:
 	return r;
 }
 
+int WebRTCImp::GetFirstPeerID() {
+
+	int peerID = -1;
+	std::map<int, std::string> peers = m_pWebRTCClient->GetPeers();
+	
+	if (peers.size() > 0) {
+		peerID = peers.begin()->first
+	}
+
+	return peerID;
+}
+
+RESULT WebRTCImp::ConnectToPeer(int peerID) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+	CN(m_pWebRTCClient);
+
+	int peerID = GetFirstPeerID();
+	//CR(m_pWebRTCClient->SendMessageToPeer())
+
+Error:
+	return r;
+}
+
 // Utilities
 std::string WebRTCImp::GetPeerName() {
 	char computer_name[256];
 
 	std::string ret(GetEnvVarOrDefault("USERNAME", "user"));
 	ret += '@';
+
 	if (gethostname(computer_name, arraysize(computer_name)) == 0) {
 		ret += computer_name;
 	}
@@ -130,7 +156,12 @@ Error:
 RESULT WebRTCImp::OnPeerConnected(int id, const std::string& name) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("WebRTCImp: OnPeerConnected");
+	DEBUG_LINEOUT("WebRTCImp:OnPeerConnected:");
+
+	std::map<int, std::string> peers = m_pWebRTCClient->GetPeers();
+	for (auto &peer : peers) {
+		DEBUG_LINEOUT("%d: %s", peer.first, peer.second.c_str());
+	}
 
 Error:
 	return r;
