@@ -54,6 +54,7 @@ public:
 
 	// Position
 	point GetOrigin();
+	point GetPosition();
 
 	VirtualObj* translate(matrix <point_precision, 4, 1> v);
 	VirtualObj* translate(point_precision x, point_precision y, point_precision z);

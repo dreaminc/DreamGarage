@@ -81,8 +81,11 @@ public:
 	
 	volume* MakeVolume(double side);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
+	model *MakeModel(const std::vector<vertex>& vertices);
+	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	composite *MakeComposite();
 
@@ -152,6 +155,7 @@ public:
 	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);
 	RESULT glBindRenderbuffer(GLenum target, GLuint renderbuffer);
 	RESULT glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+	RESULT glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
 	RESULT glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
 	RESULT glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level);
 	RESULT CheckFramebufferStatus(GLenum target);
@@ -208,6 +212,7 @@ public:
 	RESULT glBindTextures(GLuint first, GLsizei count, const GLuint *textures);
 	RESULT BindTexture(GLenum target, GLuint texture);
 	RESULT glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height);
+	RESULT glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations);
 	//RESULT glTexParamteri(GLenum target, GLenum pname, GLint param);
 	RESULT TexParameteri(GLenum target, GLenum pname, GLint param);
 	//RESULT glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);

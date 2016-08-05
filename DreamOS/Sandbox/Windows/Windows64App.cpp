@@ -449,7 +449,9 @@ RESULT Windows64App::InitializeSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
+
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -528,6 +530,10 @@ RESULT Windows64App::Show() {
 		// TODO: Update Sense etc
 		//m_pWin64Mouse->UpdateMousePosition();
 
+		if (m_pHMD != nullptr) {
+			m_pHMD->UpdateHMD();
+		}
+
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
 
@@ -536,7 +542,6 @@ RESULT Windows64App::Show() {
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
 			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
 			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}

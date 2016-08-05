@@ -40,6 +40,14 @@ public:
 		// This constructor should be used when deeper configuration is sought 
 	}
 
+	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) :
+		texture(type, width, height, channels, pBuffer, pBuffer_n),
+		m_textureIndex(0),
+		m_pParentImp(pParentImp)
+	{
+		RESULT r = OGLInitialize();
+	}
+
 	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels) :
 		texture(type, width, height, channels),
 		m_textureIndex(0),
@@ -168,7 +176,12 @@ public:
 			}
 		}
 		else {
-			CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
+			if (m_channels == 3) {
+				CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
+			}
+			else if (m_channels == 4) {
+				CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
+			}
 		}
 
 		// Texture params TODO: Add controls for these 
@@ -178,6 +191,18 @@ public:
 		//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
 
 		// TODO: Delete the image data here?
+
+	Error:
+		return r;
+	}
+	
+	// TODO: Replace all calls with this, and maybe add flags to reduce the need to current contexts and binds
+	RESULT SetGLTexParameteri(GLenum target, GLenum pname, GLint param) {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->MakeCurrentContext());
+		CR(m_pParentImp->BindTexture(target, m_textureIndex));
+		CR(m_pParentImp->TexParameteri(target, pname, param));
 
 	Error:
 		return r;
@@ -223,6 +248,20 @@ public:
 		}
 
 		// TODO: Delete the image data here?
+
+	Error:
+		return r;
+	}
+
+	RESULT OGLInitializeMultisample(int multisample = 4) {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->MakeCurrentContext());
+		CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
+
+		//CR(m_pParentImp->glActiveTexture(textureNumber));
+		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_textureIndex));
+		CR(m_pParentImp->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, multisample, GL_RGBA8, m_width, m_height, true));
 
 	Error:
 		return r;
