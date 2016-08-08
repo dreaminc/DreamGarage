@@ -508,10 +508,10 @@ void WebRTCConductor::OnPeerDisconnected(int id) {
 	}
 }
 
-void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& message) {
+void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& strMessage) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("OnMessageFromPeer: %d: %s", peerID, message);
+	DEBUG_LINEOUT("WebRTCConductor:OnMessageFromPeer: %d: %s", peerID, strMessage.c_str());
 	return;
 
 	/*
@@ -541,8 +541,8 @@ void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& message) 
 
 	Json::Reader reader;
 	Json::Value jmessage;
-	if (!reader.parse(message, jmessage)) {
-		LOG(WARNING) << "Received unknown message. " << message;
+	if (!reader.parse(strMessage, jmessage)) {
+		LOG(WARNING) << "Received unknown message. " << strMessage;
 		return;
 	}
 	std::string type;
@@ -578,11 +578,9 @@ void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& message) 
 				<< "SdpParseError was: " << error.description;
 			return;
 		}
-		LOG(INFO) << " Received session description :" << message;
-		m_pWebRTCPeerConnection->SetRemoteDescription(
-			DummySetSessionDescriptionObserver::Create(), session_description);
-		if (session_description->type() ==
-			webrtc::SessionDescriptionInterface::kOffer) {
+		LOG(INFO) << " Received session description :" << strMessage;
+		m_pWebRTCPeerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), session_description);
+		if (session_description->type() == webrtc::SessionDescriptionInterface::kOffer) {
 			m_pWebRTCPeerConnection->CreateAnswer(this, NULL);
 		}
 		return;
@@ -614,7 +612,7 @@ void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& message) 
 			return;
 		}
 
-		LOG(INFO) << " Received candidate :" << message;
+		LOG(INFO) << " Received candidate :" << strMessage;
 		return;
 	}
 

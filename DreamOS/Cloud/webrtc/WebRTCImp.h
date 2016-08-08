@@ -62,7 +62,7 @@ protected:
 	RESULT OnDisconnected();
 	RESULT OnPeerConnected(int id, const std::string& name);
 	RESULT OnPeerDisconnected(int peer_id);
-	RESULT OnMessageFromPeer(int peer_id, const std::string& message);
+	RESULT OnMessageFromPeer(int peerID, const std::string& strMessage);
 	RESULT OnMessageSent(int err);
 	RESULT OnServerConnectionFailure();
 	RESULT OnPeerConnectionInitialized();

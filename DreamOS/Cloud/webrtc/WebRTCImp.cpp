@@ -204,10 +204,14 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnMessageFromPeer(int peer_id, const std::string& message) {
+RESULT WebRTCImp::OnMessageFromPeer(int peerID, const std::string& strMessage) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("WebRTCImp: OnMessageFromPeer");
+
+	CN(m_pWebRTCConductor);
+
+	m_pWebRTCConductor->OnMessageFromPeer(peerID, strMessage);
 
 Error:
 	return r;

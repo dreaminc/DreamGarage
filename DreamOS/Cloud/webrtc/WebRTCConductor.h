@@ -64,7 +64,7 @@ protected:
 	virtual void OnDisconnected();
 	virtual void OnPeerConnected(int id, const std::string& name);
 	virtual void OnPeerDisconnected(int id);
-	virtual void OnMessageFromPeer(int peerID, const std::string& message);
+	virtual void OnMessageFromPeer(int peerID, const std::string& strMessage);
 	virtual void OnMessageSent(int err);
 	virtual void OnServerConnectionFailure();
 
