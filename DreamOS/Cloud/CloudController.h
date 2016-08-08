@@ -56,6 +56,16 @@ public:
 		return r;
 	}
 
+	RESULT SendMessageToPeer(int peerID, std::string& strMessage) {
+		RESULT r = R_PASS;
+
+		CN(m_pCloudImp);
+		CR(m_pCloudImp->SendMessageToPeer(int peerID, std::string& strMessage));
+
+	Error:
+		return r;
+	}
+
 	std::function<void(int msgID, void* data)> GetUIThreadCallback() {
 		return m_pCloudImp->GetUIThreadCallback();
 	}

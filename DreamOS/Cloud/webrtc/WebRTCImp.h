@@ -51,6 +51,7 @@ public:
 	virtual RESULT ConnectToPeer(int peerID) override;
 	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() override;
 	void QueueUIThreadCallback(int msg_id, void* data);
+	virtual RESULT SendMessageToPeer(int peerID, std::string& strMessage) override;
 
 public:
 	// Utilities

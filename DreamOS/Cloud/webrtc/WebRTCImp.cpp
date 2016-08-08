@@ -57,6 +57,27 @@ Error:
 }
 */
 
+RESULT WebRTCImp::SendMessageToPeer(int peerID, std::string& strMessage) {
+	RESULT r = R_PASS;
+
+
+	// TODO: Remove this!
+	int pid;
+
+	CN(m_pWebRTCClient);
+	CN(m_pWebRTCConductor);
+
+	CB(m_pWebRTCClient->IsConnected());
+
+	//pid = GetFirstPeerID();
+	pid = m_pWebRTCConductor->GetPeerConnectionID();
+	//CR(m_pWebRTCClient->SendMessageToPeer(pid, strMessage));
+
+
+Error:
+	return r;
+}
+
 void WebRTCImp::QueueUIThreadCallback(int msgID, void* data) {
 	::PostThreadMessage(m_UIThreadID, UI_THREAD_CALLBACK, static_cast<WPARAM>(msgID), reinterpret_cast<LPARAM>(data));
 }
@@ -100,7 +121,9 @@ RESULT WebRTCImp::OnPeerConnectionInitialized() {
 	RESULT r = R_PASS;
 
 	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
+	// TODO: Remove this!
 	int peerID = GetFirstPeerID();
+	m_pWebRTCConductor->SetPeerConnectionID(peerID);
 
 	CN(m_pWebRTCConductor);
 
