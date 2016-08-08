@@ -17,6 +17,8 @@
 #include <tchar.h>
 #include <HMD/HMD.h>
 
+#include <functional>
+
 #define DEFAULT_WIDTH 1920 / 2
 #define DEFAULT_HEIGHT 1080 / 2
 
@@ -27,6 +29,11 @@ class Win64Keyboard;
 class Win64Mouse;
 
 class Windows64App : public SandboxApp {
+public:
+	enum WindowMessages {
+		UI_THREAD_CALLBACK = WM_APP + 1
+	};
+
 public:
 	Windows64App(TCHAR* pszClassName);
 	~Windows64App();
@@ -55,6 +62,9 @@ public:
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
 
+	RESULT RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> m_fnUIThreadCallback);
+	RESULT UnregisterUIThreadCallback();
+
 private:
 	bool m_fFullscreen;
 	long m_wndStyle;
@@ -76,8 +86,9 @@ private:
 
 private:
 	TimeManager	*m_pTimeManager;
-
 	Profiler	m_profiler;
+
+	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
 public:
 	Win64Keyboard *m_pWin64Keyboard;
 	Win64Mouse *m_pWin64Mouse;

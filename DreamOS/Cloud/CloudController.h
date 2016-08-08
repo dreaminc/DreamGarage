@@ -56,6 +56,15 @@ public:
 		return r;
 	}
 
+	std::function<void(int msgID, void* data)> GetUIThreadCallback() {
+		return m_pCloudImp->GetUIThreadCallback();
+	}
+
+	void CallGetUIThreadCallback(int msgID, void* data) {
+		std::function<void(int msg_id, void* data)> fnUIThreadCallback;
+		return fnUIThreadCallback(msgID, data);
+	}
+
 	RESULT Update() {
 		RESULT r = R_PASS;
 

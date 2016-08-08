@@ -49,6 +49,8 @@ public:
 	int GetFirstPeerID();
 	
 	virtual RESULT ConnectToPeer(int peerID) override;
+	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() override;
+	void QueueUIThreadCallback(int msg_id, void* data);
 
 public:
 	// Utilities
@@ -63,10 +65,11 @@ protected:
 	RESULT OnMessageFromPeer(int peer_id, const std::string& message);
 	RESULT OnMessageSent(int err);
 	RESULT OnServerConnectionFailure();
+	RESULT OnPeerConnectionInitialized();
 
 protected:
 	// WebRTC Specific
-	RESULT QueueUIThreadCallback(int msg_id, void* data);
+	//RESULT QueueUIThreadCallback(int msgID, void* data);
 	DWORD GetUIThreadID() { return m_UIThreadID; }
 
 private:

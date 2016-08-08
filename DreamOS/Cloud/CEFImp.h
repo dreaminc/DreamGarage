@@ -90,6 +90,14 @@ public:
 		return r;
 	}
 
+	virtual RESULT ConnectToPeer(int peerID) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() override {
+		return nullptr;
+	}
+
 private:
 	CefRefPtr<CEFApp> m_CEFApp;
 	CefSettings m_CEFSettings;

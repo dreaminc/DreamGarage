@@ -94,6 +94,22 @@ protected:
 private:
 	// Utility (TODO: Move this elsewhere?)
 	std::string GetPeerConnectionString();
+	std::string GetSessionDescriptionString();
+	RESULT ClearSessionDescriptionProtocol();
+	RESULT PrintSDP();
+	std::string GetSDPJSONString();
+
+public:
+	RESULT SetPeerConnectionID(int peerID) {
+		m_WebRTCPeerID = peerID;
+		return R_PASS;
+	}
+
+	int GetPeerConnectionID() {
+		return m_WebRTCPeerID;
+	}
+
+	void UIThreadCallback(int msgID, void* data);
 
 private:
 	WebRTCImp *m_pParentWebRTCImp;
@@ -111,6 +127,9 @@ private:
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
 
 	std::string m_strWebRTCServer;
+
+	std::string m_strSessionDescriptionProtocol;
+	std::string m_strSessionDescriptionType;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

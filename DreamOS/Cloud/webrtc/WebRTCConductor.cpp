@@ -58,6 +58,18 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 	if (m_pWebRTCPeerConnection.get() != nullptr) {
 		m_pWebRTCPeerConnection.release();
 	}
+
+	ClearSessionDescriptionProtocol();
+}
+
+std::string WebRTCConductor::GetSessionDescriptionString() {
+	return m_strSessionDescriptionProtocol;
+}
+
+RESULT WebRTCConductor::ClearSessionDescriptionProtocol() {
+	m_strSessionDescriptionProtocol.clear();
+	m_strSessionDescriptionType.clear();
+	return R_PASS;
 }
 
 void WebRTCConductor::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
@@ -126,28 +138,64 @@ Error:
 
 void WebRTCConductor::SendMessage(const std::string& strJSONObject) {
 	std::string* msg = new std::string(strJSONObject);
-
-	// TODO:
-	//m_pParentWebRTCImp->QueueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
+	m_pParentWebRTCImp->QueueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
 }
 
+
+RESULT WebRTCConductor::PrintSDP() {
+	DEBUG_LINEOUT("WebRTCConductor: SDP:");
+	DEBUG_LINEOUT("%s", m_strSessionDescriptionProtocol.c_str());
+	return R_PASS;
+}
+
+std::string WebRTCConductor::GetSDPJSONString() {
+	Json::StyledWriter JSONWriter;
+	Json::Value JSONMessage;
+
+	JSONMessage[kSessionDescriptionTypeName] = m_strSessionDescriptionType;
+	JSONMessage[kSessionDescriptionSdpName] = m_strSessionDescriptionProtocol;
+
+	std::string strReturn = JSONWriter.write(JSONMessage);
+
+	return strReturn;
+}
+
+// TODO: This doesn't actually work
+void WebRTCConductor::UIThreadCallback(int msgID, void* data) {
+	RESULT r = R_PASS;
+
+	// TODO:
+
+	DEBUG_LINEOUT("WebRTCConductor::UIThreadCallback: msg ID %d");
+
+Error:
+	return;
+}
+
+// OnSuccess called when PeerConnection established 
 void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) {
+	RESULT r = R_PASS;
+
 	m_pWebRTCPeerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
+	
+	CR(ClearSessionDescriptionProtocol());
+	
+	m_strSessionDescriptionType = sessionDescription->type();
+	sessionDescription->ToString(&m_strSessionDescriptionProtocol);
 
-	std::string strSDP;
-	sessionDescription->ToString(&strSDP);
-
-	//DEBUG_LINEOUT("WebRTCConductor: SDP:");
-	//DEBUG_LINEOUT("%s", strSDP.c_str());
+	CR(PrintSDP());
 
 	// For loopback test. To save some connecting delay.
 	if (m_fLoopback) {
 		// Replace message type from "offer" to "answer"
-		webrtc::SessionDescriptionInterface* pWebRTCSessionDescription(webrtc::CreateSessionDescription("answer", strSDP, nullptr));
+		webrtc::SessionDescriptionInterface* pWebRTCSessionDescription(webrtc::CreateSessionDescription("answer", m_strSessionDescriptionProtocol, nullptr));
 		m_pWebRTCPeerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), pWebRTCSessionDescription);
 		return;
 	}
 
+	CR(m_pParentWebRTCImp->OnPeerConnectionInitialized());
+
+	/*
 	Json::StyledWriter JSONWriter;
 	Json::Value JSONMessage;
 
@@ -158,6 +206,9 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDesc
 	DEBUG_LINEOUT("%s", JSONWriter.write(JSONMessage).c_str());
 
 	SendMessage(JSONWriter.write(JSONMessage));
+	*/
+Error:
+	return;
 }
 
 std::string WebRTCConductor::GetPeerConnectionString() {
@@ -458,8 +509,16 @@ void WebRTCConductor::OnPeerDisconnected(int id) {
 }
 
 void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& message) {
-	ASSERT(m_WebRTCPeerID == peerID || m_WebRTCPeerID == -1);
-	ASSERT(!message.empty());
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("OnMessageFromPeer: %d: %s", peerID, message);
+	return;
+
+	/*
+	CB((m_WebRTCPeerID == peerID));
+	CB((m_WebRTCPeerID == -1));
+	CB((!message.empty()));
+	*/
 
 	if (!m_pWebRTCPeerConnection.get()) {
 		ASSERT(m_WebRTCPeerID == -1);
@@ -558,6 +617,9 @@ void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& message) 
 		LOG(INFO) << " Received candidate :" << message;
 		return;
 	}
+
+Error:
+	return;
 }
 
 void WebRTCConductor::OnMessageSent(int err) {

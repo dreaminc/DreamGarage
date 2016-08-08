@@ -10,6 +10,7 @@
 // The base DreamCloud Implementation intefrace
 
 #include <string>
+#include <functional>
 
 class CloudImp {
 public:
@@ -25,6 +26,7 @@ public:
 	virtual RESULT CreateNewURLRequest(std::wstring& strURL) = 0;
 
 	virtual RESULT ConnectToPeer(int peerID) = 0;
+	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() = 0;
 
 	// TODO: Add a handle URL request callback here
 

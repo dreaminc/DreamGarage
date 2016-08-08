@@ -46,7 +46,7 @@ RESULT WebRTCImp::Update() {
 }
 
 // WebRTC Specific
-
+/*
 RESULT WebRTCImp::QueueUIThreadCallback(int msg_id, void* data) {
 	RESULT r = R_PASS;
 	
@@ -54,6 +54,11 @@ RESULT WebRTCImp::QueueUIThreadCallback(int msg_id, void* data) {
 
 Error:
 	return r;
+}
+*/
+
+void WebRTCImp::QueueUIThreadCallback(int msgID, void* data) {
+	::PostThreadMessage(m_UIThreadID, UI_THREAD_CALLBACK, static_cast<WPARAM>(msgID), reinterpret_cast<LPARAM>(data));
 }
 
 // Functionality
@@ -72,8 +77,8 @@ Error:
 RESULT WebRTCImp::InitializePeerConnection() {
 	RESULT r = R_PASS;
 
-	CR(m_pWebRTCConductor->InitializePeerConnection());
-	CR(m_pWebRTCConductor->CreateOffer());
+	CRM(m_pWebRTCConductor->InitializePeerConnection(), "Failed to initialize WebRTC Peer Connection");
+	CRM(m_pWebRTCConductor->CreateOffer(), "Failed to create WebRTC Offer");
 
 Error:
 	return r;
@@ -85,10 +90,25 @@ int WebRTCImp::GetFirstPeerID() {
 	std::map<int, std::string> peers = m_pWebRTCClient->GetPeers();
 	
 	if (peers.size() > 0) {
-		peerID = peers.begin()->first
+		peerID = peers.begin()->first;
 	}
 
 	return peerID;
+}
+
+RESULT WebRTCImp::OnPeerConnectionInitialized() {
+	RESULT r = R_PASS;
+
+	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
+	int peerID = GetFirstPeerID();
+
+	CN(m_pWebRTCConductor);
+
+	CR(m_pWebRTCClient->SendMessageToPeer(peerID, m_pWebRTCConductor->GetSDPJSONString()));
+	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
+
+Error:
+	return r;
 }
 
 RESULT WebRTCImp::ConnectToPeer(int peerID) {
@@ -97,11 +117,20 @@ RESULT WebRTCImp::ConnectToPeer(int peerID) {
 	CN(m_pWebRTCConductor);
 	CN(m_pWebRTCClient);
 
-	int peerID = GetFirstPeerID();
-	//CR(m_pWebRTCClient->SendMessageToPeer())
+	m_pWebRTCConductor->SetPeerConnectionID(peerID);
+	CRM(InitializePeerConnection(), "WebRTCImp: ConnectToPeer failed to Initialzie Peer Connection");
 
 Error:
 	return r;
+}
+
+std::function<void(int msg_id, void* data)> WebRTCImp::GetUIThreadCallback() {
+	using std::placeholders::_1;
+	using std::placeholders::_2;
+
+	std::function<void(int msg_id, void* data)> fnUIThreadCallback = std::bind (&WebRTCConductor::UIThreadCallback, m_pWebRTCConductor, _1, _2);
+
+	return fnUIThreadCallback;
 }
 
 // Utilities
@@ -138,7 +167,6 @@ RESULT WebRTCImp::OnSignedIn() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("WebRTCImp: OnSignedIn");
-	CR(InitializePeerConnection());
 
 Error:
 	return r;

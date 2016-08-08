@@ -19,7 +19,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
 	m_pHMD(nullptr),
-	m_ThreadID(0)
+	m_ThreadID(0),
+	m_fnUIThreadCallback(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -133,6 +134,8 @@ RESULT Windows64App::InitializeCloudController() {
 	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
+	
+	CR(RegisterUIThreadCallback(m_pCloudController->GetUIThreadCallback()));
 
 Error:
 	return r;
@@ -310,7 +313,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('C')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
-
+					m_pCloudController->ConnectToPeer(NULL);
 				}
 			}
 
@@ -374,6 +377,26 @@ Error:
 	return r;
 }
 
+RESULT Windows64App::RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> fnUIThreadCallback) {
+	RESULT r = R_PASS;
+
+	CB((m_fnUIThreadCallback == nullptr));
+	m_fnUIThreadCallback = fnUIThreadCallback;
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::UnregisterUIThreadCallback() {
+	RESULT r = R_PASS;
+
+	CN(m_fnUIThreadCallback);
+	m_fnUIThreadCallback = nullptr;
+
+Error:
+	return r;
+}
+
 RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
 
@@ -424,8 +447,12 @@ RESULT Windows64App::Show() {
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-			if (msg.message == WM_QUIT)
+			if (msg.message == WM_QUIT) {
 				fQuit = true;
+			}
+			else if (msg.message == Windows64App::WindowMessages::UI_THREAD_CALLBACK) {
+				m_pCloudController->CallGetUIThreadCallback(static_cast<int>(msg.wParam), reinterpret_cast<void*>(msg.lParam));
+			} 
 
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
