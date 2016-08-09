@@ -3,6 +3,8 @@
 #include "CEFImp.h"
 #include "webrtc/WebRTCImp.h"
 
+#include "Sandbox/CommandLineManager.h"
+
 #include <memory>
 
 CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TYPE type, void *pContext = nullptr) {
@@ -32,7 +34,14 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 			CR(pWebRTCImp->Initialize());
 
 			// TOOD: TEST CODE:
-			pWebRTCImp->StartLogin("localhost", 8888);
+			CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+			if (pCommandLineManager->GetNumCommandLineArguments() < 2) {
+				pWebRTCImp->StartLogin("localhost", 8888);
+			}
+			else {
+				std::string strIPAddress = pCommandLineManager->GetCommandLineArgument(1);
+				pWebRTCImp->StartLogin(strIPAddress, 8888);
+			}
 
 			pCloudController->SetCloudImp(std::move(pWebRTCImp));
 

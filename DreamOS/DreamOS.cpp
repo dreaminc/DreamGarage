@@ -20,7 +20,7 @@ DreamOS::~DreamOS() {
 }
 
 // This will construct and initialize all of the parts of the DreamOS client
-RESULT DreamOS::Initialize() {
+RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
 
 	srand(static_cast <unsigned> (time(0)));
@@ -31,7 +31,7 @@ RESULT DreamOS::Initialize() {
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 
 	// Initialize the sandbox
-	CRM(m_pSandbox->Initialize(), "Failed to initialize Sandbox");
+	CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");

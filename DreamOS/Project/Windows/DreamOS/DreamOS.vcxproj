@@ -209,6 +209,7 @@
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Profiler\Profiler.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
     </ClCompile>
@@ -523,6 +524,7 @@
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
+    <ClInclude Include="..\..\..\Sandbox\CommandLineManager.h" />
     <ClInclude Include="..\..\..\Sandbox\FileLoader.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />

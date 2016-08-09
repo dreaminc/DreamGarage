@@ -302,6 +302,9 @@
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1800,6 +1803,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCClient.h">
       <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\CommandLineManager.h">
+      <Filter>Sandbox</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

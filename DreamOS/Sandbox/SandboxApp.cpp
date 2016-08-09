@@ -1,7 +1,8 @@
 #include "SandboxApp.h"
 
 SandboxApp::SandboxApp() :
-	m_pPathManager(NULL),
+	m_pPathManager(nullptr),
+	m_pCommandLineManager(nullptr),
 	m_pOpenGLRenderingContext(NULL),
 	m_pSceneGraph(NULL),
 	m_pCloudController(nullptr),
@@ -15,7 +16,7 @@ SandboxApp::~SandboxApp() {
 	// empty stub
 }
 
-inline PathManager * SandboxApp::GetPathManager() {
+inline PathManager* SandboxApp::GetPathManager() {
 	return m_pPathManager; 
 }
 
@@ -23,9 +24,15 @@ inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext; 
 }
 
-RESULT SandboxApp::Initialize() {
+RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
 
+	// Set up command line manager
+	m_pCommandLineManager = CommandLineManager::instance();
+	CN(m_pCommandLineManager);
+	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv))
+
+	// Set up Scene Graph
 	m_pSceneGraph = new SceneGraph();
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 

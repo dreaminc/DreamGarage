@@ -105,8 +105,8 @@ public:
 private:
 	UID m_uid;
 	std::map<PATH_VALUE_TYPE, wchar_t*> *m_pmapNVPPaths;
-
-	// TODO: Move to design pattern class
+	
+	// TODO: Replace with Singleton pattern / manager
 	// Singleton Usage
 protected:
 	static PathManager *m_pInstance;

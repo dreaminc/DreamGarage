@@ -15,6 +15,7 @@
 #include "HAL/HALImp.h"
 
 #include "Sandbox/PathManager.h"
+#include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
 #include "Scene/SceneGraph.h"
@@ -37,7 +38,7 @@ public:
 	~SandboxApp();
 
 public:
-	RESULT Initialize();
+	RESULT SandboxApp::Initialize(int argc = 0, const char *argv[] = nullptr);
 
 	virtual RESULT InitializeSandbox() = 0;
 	virtual RESULT Show() = 0;
@@ -69,6 +70,7 @@ public:
 	RESULT UnregisterUpdateCallback();
 
 protected:
+	CommandLineManager *m_pCommandLineManager;
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	SceneGraph *m_pSceneGraph;

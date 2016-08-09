@@ -34,7 +34,7 @@ public:
 	DreamOS();
 	~DreamOS();
 
-	RESULT Initialize();
+	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
 	RESULT Start();
 	RESULT Exit(RESULT exitcode);
 
