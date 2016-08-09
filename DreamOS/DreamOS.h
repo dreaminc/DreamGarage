@@ -43,17 +43,27 @@ public:
 	virtual RESULT Update(void) = 0;
 
 protected:
-	//RESULT AddLight(light *pLight);
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 
 	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
-	volume *AddVolume(double side);
+	sphere *MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
+
 	text *AddText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	
+	volume *MakeVolume(double side);
+	volume *AddVolume(double width, double length, double height);
+	volume *MakeVolume(double width, double length, double height);
+	
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	
 	skybox *AddSkybox();
+	skybox *MakeSkybox();
+
 	model *AddModel(wchar_t *pszModelName);
+	model *MakeModel(wchar_t *pszModelName);
 
 	RESULT AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 

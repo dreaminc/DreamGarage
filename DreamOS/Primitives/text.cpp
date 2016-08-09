@@ -26,7 +26,7 @@ RESULT text::SetText(const std::string& text, double size)
 
 		SetDirty();
 	}
-	
+
 	m_text = text;
 
 	float posx = 0;
@@ -43,15 +43,8 @@ RESULT text::SetText(const std::string& text, double size)
 	#define YSCALE_TO_SCREEN(y)	2.0f * (y) / screen_height
 
 	m_width = 0.0f;
-	for_each(text.begin(), text.end(), [&](char c) {
-		Font::CharacterGlyph glyph;
-		if (m_font->GetGlyphFromChr(c, glyph))
-		{
-			m_width += (c == text.back()) ? XSCALE_TO_SCREEN(glyph.xadvance) : 
-											XSCALE_TO_SCREEN(glyph.width);
-		}
-	});
-	
+	float max_below = 0.0f;
+	float max_above = 0.0f;
 	for_each(text.begin(), text.end(), [&](char c) {
 		Font::CharacterGlyph glyph;
 		if (m_font->GetGlyphFromChr(c, glyph))
@@ -63,12 +56,17 @@ RESULT text::SetText(const std::string& text, double size)
 
 			uv_precision dx = XSCALE_TO_SCREEN(glyph.width);
 			uv_precision dy = YSCALE_TO_SCREEN(glyph.height);
-			
+
 			vector_precision dxs = XSCALE_TO_SCREEN(glyph.xoffset);
 			vector_precision dys = YSCALE_TO_SCREEN(glyphBase - glyph.yoffset) - dy / 2.0f;
 
 			quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs, dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
 			posx += XSCALE_TO_SCREEN(glyph.xadvance);
+
+			m_width += (c == text.back()) ? XSCALE_TO_SCREEN(glyph.xadvance) :
+				XSCALE_TO_SCREEN(glyph.width);
+
+			m_height = (dys > m_height) ? dys : m_height;
 		}
 	});
 
@@ -96,7 +94,7 @@ RESULT text::SetText(const std::string& text, double size)
 
 		quadCnt += 4;
 	}
-		
+
 	return R_SUCCESS;
 
 Error:

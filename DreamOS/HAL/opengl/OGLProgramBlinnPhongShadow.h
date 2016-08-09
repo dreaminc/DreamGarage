@@ -142,6 +142,15 @@ public:
 		point origin = pStereoCamera->GetOrigin();
 		m_pUniformOrigin->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
 
+		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
+		if (pOGLProgramShadowDepth != nullptr) {
+			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
+
+			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
+			pOGLProgramShadowDepth->SetDepthTexture(0);
+			m_pUniformTextureDepth->SetUniform(0);
+		}
+
 		return R_PASS;
 	}
 

@@ -50,7 +50,8 @@ public:
 		m_cameraForwardSpeed(0.0f),
 		m_cameraStrafeSpeed(0.0f),
 		m_cameraUpSpeed(0.0f),
-		m_vDeviation()
+		m_vDeviation(),
+		m_pCameraFrameOfReference(nullptr)
 	{
 		m_ptOrigin = ptOrigin;
 		m_qRotation = quaternion(0.0f, 0.0f, 0.0f, 0.0f);
@@ -104,7 +105,9 @@ public:
 	}
 
 	ViewMatrix GetViewMatrix() { 
-		point ptOrigin = m_ptOrigin + m_vDeviation;
+		point ptOrigin = m_ptOrigin;
+		ptOrigin.SetZeroW();
+		ptOrigin += m_vDeviation;
 		ViewMatrix mat = ViewMatrix(ptOrigin, m_qRotation);
 		return mat;
 	}
@@ -232,6 +235,29 @@ public:
 		m_ptOrigin += GetLookVector() * m_cameraForwardSpeed;
 		m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
 		m_ptOrigin += GetUpVector() * m_cameraUpSpeed;
+		m_ptOrigin.SetZeroW();
+
+		///*
+		// Update frame of reference
+		quaternion qRotation = m_qRotation;
+		qRotation.Reverse();
+
+		if (m_pHMD != nullptr) {
+			point ptOrigin = m_ptOrigin + m_pHMD->GetHeadPointOrigin();
+			ptOrigin.Reverse();
+
+			m_pCameraFrameOfReference->SetPosition(ptOrigin);
+			//m_pCameraFrameOfReference->SetPosition(m_pHMD->GetHeadPointOrigin());
+		}
+		else {
+			point ptOrigin = m_ptOrigin;
+			ptOrigin.Reverse();
+
+			m_pCameraFrameOfReference->SetPosition(ptOrigin);
+		}
+		
+		m_pCameraFrameOfReference->SetOrientation(qRotation);
+		//*/
 
 		return (*this);
 	}
@@ -273,6 +299,35 @@ public:
 		return r;
 	}
 
+	composite *GetFrameOfReferenceComposite() {
+		return m_pCameraFrameOfReference;
+	}
+
+	RESULT AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj> pDimObj) {
+		RESULT r = R_PASS;
+
+		CN(m_pCameraFrameOfReference);
+		CR(m_pCameraFrameOfReference->AddObject(pDimObj));
+
+	Error:
+		return r;
+	}
+
+	RESULT SetFrameOfReferenceComposite(composite *pComposite) {
+		RESULT r = R_PASS;
+		
+		m_pCameraFrameOfReference = pComposite;
+		CN(m_pCameraFrameOfReference);
+
+	Error:
+		return r;
+	}
+
+	RESULT SetHMD(HMD *pHMD) {
+		m_pHMD = pHMD;
+		return R_PASS;
+	}
+
 	int GetScreenWidth() {
 		return m_pxScreenWidth;
 	}
@@ -282,6 +337,8 @@ public:
 	}
 
 protected:
+	HMD *m_pHMD;
+
 	// Projection
 	int m_pxScreenWidth;
 	int m_pxScreenHeight;
@@ -297,6 +354,9 @@ protected:
 	camera_precision m_cameraUpSpeed;
 
 	vector m_vDeviation;
+
+	// Set up HMD frame of reference 
+	composite *m_pCameraFrameOfReference;
 };
 
 #endif // ! CAMERA_H_

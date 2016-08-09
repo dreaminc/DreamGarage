@@ -37,14 +37,17 @@ private:
 public:
 
 	typedef enum AlignmentType {
-		LEFT,
+		TOP_LEFT,
+		TOP_RIGHT,
 		CENTER,
-		RIGHT
+		BOTTOM_LEFT,
+		BOTTOM_RIGHT
 	};
 
 	uv_precision m_width = 0.0f;
+	uv_precision m_height = 0.0f;
 
-	text(std::shared_ptr<Font> font, const std::string& text, double size = 1.0, bool isBillboard = false) :
+	text(std::shared_ptr<Font> font, const std::string& text = "", double size = 1.0, bool isBillboard = false) :
 		m_font(font)
 	{
 		SetText(text, size);
@@ -58,8 +61,9 @@ public:
 	
 	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)
 	{
-		uv_precision dx = (align == LEFT) ? 0.0f : ((align == CENTER) ? m_width / 2 : m_width);
-		return this->MoveTo(p.x() - dx, p.y(), p.z());
+		uv_precision dx = (align == BOTTOM_LEFT || align == TOP_LEFT) ? 0.0f : ((align == CENTER) ? m_width / 2 : m_width);
+		uv_precision dy = (align == BOTTOM_LEFT || align == BOTTOM_RIGHT) ? 0.0f : ((align == CENTER) ? m_height / 2 : m_height);
+		return this->MoveTo(p.x() - dx, p.y() - dy, p.z());
 	}
 
 
