@@ -29,6 +29,10 @@ point VirtualObj::GetOrigin() {
 	return m_ptOrigin;
 }
 
+point VirtualObj::GetPosition() {
+	return m_ptOrigin;
+}
+
 VirtualObj* VirtualObj::translate(matrix <point_precision, 4, 1> v) {
 	m_ptOrigin.translate(v);
 	return this;
@@ -271,10 +275,14 @@ VirtualObj* VirtualObj::Update() {
 
 // TODO: Fix naming on scaling matrix + add vector function
 matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	return (TranslationMatrix(m_ptOrigin, m_ptPivot) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()) * childMat);
+	//return (TranslationMatrix(m_ptOrigin, m_ptPivot) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()));
+	/*
 	if (m_ptPivot.IsZero()) {
 		return (TranslationMatrix(m_ptOrigin) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()) * childMat);
 	}
 	else {
 		return (TranslationMatrix(m_ptOrigin, m_ptPivot) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()) * childMat);
 	}
+	*/
 }

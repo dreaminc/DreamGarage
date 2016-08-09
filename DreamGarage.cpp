@@ -13,13 +13,16 @@ RESULT DreamGarage::LoadScene() {
 	///*
 	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	// TODO: Special lane for global light
+
 	//vector lightdir = vector(0.0f, 1.0f, -0.5f);
 	vector lightdir = vector(0.0f, -1.0f, 0.5f);
 	lightdir.Normalize();
 
-	//float lightdistance = 10.0f;
-	//point lightpoint = -1.0f * lightdir * lightdistance;
-	//lightpoint.w() = 0.0f;
+	/*
+	float lightdistance = 10.0f;
+	point lightpoint = -1.0f * lightdir * lightdistance;
+	lightpoint.w() = 1.0f;
+	//*/
 
 	point lightpoint = point(0.0f, 10.0f, 0.0f);
 	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, lightpoint, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
@@ -51,14 +54,11 @@ RESULT DreamGarage::LoadScene() {
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	//*/
 
-	/*
-	model* pModel = AddModel(L"chainsaw_free.obj");
-	pModel->SetColorTexture(pColorTexture);
-	pModel->SetBumpTexture(pBumpTexture);
-	*/
-
-	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
-	//pQuad->SetColorTexture(pColorTextureCobble);
+	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
+	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
+	pQuad->SetColorTexture(pColorTextureCobble);
+	pQuad->translateY(-2.0f);
+	//pQuad->SetBumpTexture(pBumpTexture);
 
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
@@ -66,16 +66,18 @@ RESULT DreamGarage::LoadScene() {
 	HUD_OUT("Hello World");
 
 	//pQuad->SetBumpTexture(pBumpTexture);
+	
 	//*/
 
-	quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
-	pQuad->MoveTo(0.0f, -1.0f, 0.0f);
 
-	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
-	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
+	//quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
+	//pQuad->MoveTo(0.0f, -1.0f, 0.0f);
 
+	/*
 	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
+	*/
+
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -84,25 +86,29 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	/*
-	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40));
+	//*
+	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
+
+	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
 	pSphere2->translateX(3.0f);
 	m_pSphere->AddChild(pSphere2);
 
 
-	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40));
+	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40, color(COLOR_GREEN)));
 	pSphere3->SetColorTexture(pColorTexture2);
 	pSphere3->SetBumpTexture(pBumpTexture2);
-	pSphere3->translateX(2.0f);
+	pSphere3->translateX(1.0f);
 	pSphere2->AddChild(pSphere3);
 	//*/
 
 	//*/
 	
+	/*
 	volume *pVolume = AddVolume(0.5f);
 	pVolume->MoveTo(-1.0f, 1.0f, 0.0f);
+	*/
 
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
@@ -157,16 +163,21 @@ RESULT DreamGarage::LoadScene() {
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 
+	//*
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
-		//m_pSphere->translateY(0.01f);
-		//m_pSphere->RotateBy(0.01f, 0.02f, 0.01f);
+		//m_pSphere->translateY(0.0005f);
+		//m_pSphere->RotateBy(0.001f, 0.002f, 0.001f);
+		m_pSphere->RotateYBy(0.001f);
+		for (auto &childObj : m_pSphere->GetChildren()) {
+			childObj->RotateYBy(0.001f);
+		}
 	}
 
-	//m_pSphere->translateX(0.001f);
+	m_pSphere->translateX(0.001f);
 
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
-	g_pLight->RotateLightDirectionXAxis(0.00005f * 1.3f);
+	//g_pLight->RotateLightDirectionXAxis(0.0005f * 1.3f);
 
 //Error:
 	return r;

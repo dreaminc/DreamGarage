@@ -54,7 +54,8 @@ public:
 
 	float sunY = 1.0f;
 	float theta = 0.0f;
-	float delta = 0.00005f;
+	//float delta = 0.00005f;
+	float delta = 0.0f;
 
 	RESULT SetCameraUniforms(camera *pCamera) {
 		

@@ -700,8 +700,8 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	m_pFragmentShader->UpdateUniformBlockBuffers();
 	//*/
 
+	// Update buffers if marked as dirty
 	if (pDimObj->CheckAndCleanDirty()) {
-		// Update buffers if marked as dirty
 		pOGLObj->UpdateOGLBuffers();
 	}
 	
@@ -727,8 +727,8 @@ RESULT OGLProgram::RenderChildren(DimObj *pDimObj) {
 	auto objects = pDimObj->GetChildren();
 
 	for (auto &pVirtualObj : objects) {
-		auto pDimObj = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
-		CR(RenderObject(pDimObj.get()));
+		auto pDimObjChild = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
+		CR(RenderObject(pDimObjChild.get()));
 	}
 
 Error:

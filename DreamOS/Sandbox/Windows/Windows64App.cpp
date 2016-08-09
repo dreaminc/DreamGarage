@@ -412,7 +412,7 @@ RESULT Windows64App::RegisterImpLeapMotionEvents() {
 
 	/*
 	sphere *pSphere = MakeSphere(1.0f, 10, 10);
-	pSphere->MoveTo(0.0f, 0.0f, 5.0f);
+	pSphere->MoveTo(0.0f, 0.0f, -5.0f);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj>(pSphere));
 	//*/
 
@@ -425,6 +425,9 @@ Error:
 
 RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
+
+	// TODO: remove
+	std::shared_ptr<DimObj> pSphere = nullptr;
 
 	// TODO: Use EHM for this
 	if (!m_hwndWindow) {
@@ -446,16 +449,26 @@ RESULT Windows64App::InitializeSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
+
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
 	}
 	//*/
 
-	///*
 	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
 	m_pHALImp->GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
 	CRM(AddObject(pCameraFrameOfReferenceComposite), "Failed to add composite camera frame of reference");
+
+	/*
+	pSphere = std::shared_ptr<DimObj>(MakeSphere(0.25f, 30, 30, color(COLOR_RED)));
+	pSphere->SetPosition(point(0.0f, 0.0f, -1.0f));
+	pCameraFrameOfReferenceComposite->AddObject(pSphere);
+
+	sphere *pSphere2 = AddSphere(0.25f, 30, 30, color(COLOR_GREEN));
+	pSphere2->SetPosition(point(0.0f, 0.0f, 9.0f));
 	//*/
 
 	// TODO: Move to Sandbox function
@@ -517,6 +530,10 @@ RESULT Windows64App::Show() {
 		// TODO: Update Sense etc
 		//m_pWin64Mouse->UpdateMousePosition();
 
+		if (m_pHMD != nullptr) {
+			m_pHMD->UpdateHMD();
+		}
+
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
 
@@ -525,7 +542,6 @@ RESULT Windows64App::Show() {
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
 			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
 			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}

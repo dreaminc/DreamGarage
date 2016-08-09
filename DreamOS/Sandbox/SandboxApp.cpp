@@ -96,11 +96,11 @@ Error:
 	return nullptr;
 }
 
-sphere* SandboxApp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
-	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions);
+sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
-sphere* SandboxApp::AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
+sphere* SandboxApp::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	RESULT r = R_PASS;
 
 	sphere *pSphere = m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
@@ -144,6 +144,10 @@ Error:
 		pVolume = nullptr;
 	}
 	return nullptr;
+}
+
+texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) {
+	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, channels, pBuffer, pBuffer_n);
 }
 
 volume* SandboxApp::AddVolume(double side) {
@@ -200,6 +204,44 @@ Error:
 	return nullptr;
 }
 
+model *SandboxApp::AddModel(const std::vector<vertex>& vertices) {
+	RESULT r = R_PASS;
+
+	model* pModel = m_pHALImp->MakeModel(vertices);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+model *SandboxApp::AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+	RESULT r = R_PASS;
+
+	model* pModel = m_pHALImp->MakeModel(vertices, indices);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
 // TODO: Fix this
 RESULT SandboxApp::AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 	return m_pHALImp->LoadModel(m_pSceneGraph, strRootFolder, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
@@ -223,4 +265,8 @@ RESULT SandboxApp::UnregisterUpdateCallback() {
 
 Error:
 	return r;
+}
+
+point SandboxApp::GetCameraPosition() {
+	return m_pHALImp->GetCamera()->GetPosition();
 }

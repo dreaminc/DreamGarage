@@ -160,7 +160,7 @@ RESULT hand::Initialize() {
 	m_pThumb->Initialize();
 	AddObject(m_pThumb);
 
-	SetPosition(point(0.0f, 0.0f, 1.0f));
+	SetPosition(point(0.0f, 0.0f, -1.0f));
 
 //Error:
 	return r;
@@ -176,7 +176,7 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	leapPalmPosition /= 1000.0f;	// Leap outputs in mm, and our engine is in meters
 	point ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.z, leapPalmPosition.y);
 
-	SetPosition(ptPalmPosition * 1.0f);
+	SetPosition(ptPalmPosition * -1.0f);
 
 	// = hand.basis();
 	Leap::Matrix handTransform;
@@ -203,7 +203,7 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 			Leap::Finger::Joint jt = (Leap::Finger::Joint)(j);
 			transformedJointPosition = handTransform.transformPoint(leapFinger.jointPosition(jt));
 			point ptPosition = point(transformedJointPosition.x, transformedJointPosition.z, transformedJointPosition.y);
-			ptPosition *= (1.0f / 1000.0f);
+			ptPosition *= (-1.0f / 1000.0f);
 			pFinger->SetJointPosition(ptPosition, (finger::JOINT_TYPE)(jt));
 		}
 	}
