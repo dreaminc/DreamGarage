@@ -67,10 +67,14 @@ RESULT WebRTCImp::SendMessageToPeer(int peerID, std::string& strMessage) {
 	CN(m_pWebRTCClient);
 	CN(m_pWebRTCConductor);
 
-	CB(m_pWebRTCClient->IsConnected());
+	// TODO: this is failing
+	//CB(m_pWebRTCClient->IsConnected());
+
+	DEBUG_LINEOUT("WebRTCImp::SendMessageToPeer: Sending %s to peer on data channel", strMessage.c_str());
 
 	//pid = GetFirstPeerID();
 	pid = m_pWebRTCConductor->GetPeerConnectionID();
+	CR(m_pWebRTCConductor->SendDataChannel(strMessage));
 	//CR(m_pWebRTCClient->SendMessageToPeer(pid, strMessage));
 
 

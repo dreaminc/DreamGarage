@@ -86,29 +86,6 @@ void WebRTCConductor::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInter
 	// m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
 }
 
-void WebRTCConductor::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) {
-	DEBUG_LINEOUT("OnDataChannel: %s", channel->label().c_str());
-
-	channel->Send(webrtc::DataBuffer("DEADBEEF"));
-
-	// TODO: 
-	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_DATA, stream.release());
-}
-
-RESULT WebRTCConductor::SendDataChannel(std::string& strMessage) {
-	RESULT r = R_PASS;
-
-	//m_SignalOnDataChannel
-
-	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
-	CN(pWebRTCDataChannel);
-
-	CB(pWebRTCDataChannel->Send(webrtc::DataBuffer(strMessage)));
-
-Error:
-	return r;
-}
-
 void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
 	DEBUG_LINEOUT("OnIceCandidate: %d", candidate->sdp_mline_index());
 	
@@ -133,7 +110,8 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 	}
 
 	jmessage[kCandidateSdpName] = sdp;
-	SendMessage(writer.write(jmessage));
+	//SendMessage(writer.write(jmessage));
+	SendMessageToPeer(&(writer.write(jmessage)), m_WebRTCPeerID);
 }
 
 RESULT WebRTCConductor::SendMessageToPeer(std::string* strMessage, int peerID) {
@@ -296,12 +274,14 @@ Error:
 	return r;
 }
 
+/*
 RESULT WebRTCConductor::AddDataStream() {
 	RESULT r = R_PASS;
 
 Error:
 	return r;
 }
+*/
 
 RESULT WebRTCConductor::AddStreams() {
 	RESULT r = R_PASS;
@@ -356,6 +336,52 @@ Error:
 	return r;
 }
 
+void WebRTCConductor::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) {
+	DEBUG_LINEOUT("OnDataChannel: %s", channel->label().c_str());
+
+	//channel->Send(webrtc::DataBuffer("DEADBEEF"));
+
+	// Register self as observer 
+	rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface = m_WebRTCActiveDataChannels[kDataLabel];
+	pDataChannelInterface->RegisterObserver(this);
+
+	// TODO: 
+	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_DATA, stream.release());
+}
+
+RESULT WebRTCConductor::SendDataChannel(std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	//m_SignalOnDataChannel
+
+	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	CN(pWebRTCDataChannel);
+
+	CB(pWebRTCDataChannel->Send(webrtc::DataBuffer(strMessage)));
+
+Error:
+	return r;
+}
+
+// DataChannelObserver Implementation
+void WebRTCConductor::OnStateChange() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("WebRTCConductor::OnStateChange");
+
+Error:
+	return;
+}
+
+void WebRTCConductor::OnMessage(const webrtc::DataBuffer& buffer) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("WebRTCConductor::OnMessage");
+
+Error:
+	return;
+}
+
 RESULT WebRTCConductor::CreateOffer(){
 	RESULT r = R_PASS;
 
@@ -386,7 +412,7 @@ RESULT WebRTCConductor::InitializePeerConnection() {
 	}
 	
 	//CR(AddStreams());
-	CR(AddDataChannel());
+	//CR(AddDataChannel());
 	
 	CN(m_pWebRTCPeerConnection.get());
 

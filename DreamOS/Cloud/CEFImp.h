@@ -94,6 +94,10 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
+	virtual RESULT SendMessageToPeer(int peerID, std::string& strMessage) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() override {
 		return nullptr;
 	}

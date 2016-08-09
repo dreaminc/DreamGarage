@@ -60,7 +60,7 @@ public:
 		RESULT r = R_PASS;
 
 		CN(m_pCloudImp);
-		CR(m_pCloudImp->SendMessageToPeer(int peerID, std::string& strMessage));
+		CR(m_pCloudImp->SendMessageToPeer(peerID, strMessage));
 
 	Error:
 		return r;

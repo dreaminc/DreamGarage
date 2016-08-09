@@ -25,7 +25,8 @@ class WebRTCClient;
 
 class WebRTCConductor : 
 	public webrtc::PeerConnectionObserver, 
-	public webrtc::CreateSessionDescriptionObserver /*, public PeerConnectionClientObserver, public MainWndCallback */
+	public webrtc::CreateSessionDescriptionObserver,
+	public webrtc::DataChannelObserver /*, public PeerConnectionClientObserver, public MainWndCallback */
 {
 
 public:
@@ -70,6 +71,11 @@ protected:
 	virtual void OnMessageSent(int err);
 	virtual void OnServerConnectionFailure();
 
+	// DataChannelObserver Implementation
+	virtual void OnStateChange() override;
+	virtual void OnMessage(const webrtc::DataBuffer& buffer) override;
+	virtual void OnBufferedAmountChange(uint64_t previous_amount) override  {/* empty */};
+
 	// CreateSessionDescriptionObserver implementation.
 	void OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription);
 	virtual void OnFailure(const std::string& error);
@@ -87,7 +93,7 @@ protected:
 	RESULT AddStreams();
 	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
 	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddDataStream();
+	//RESULT AddDataStream();
 	RESULT AddDataChannel();
 
 	RESULT CreateOffer();

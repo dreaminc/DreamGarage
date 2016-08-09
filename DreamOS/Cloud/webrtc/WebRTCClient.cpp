@@ -128,12 +128,10 @@ void WebRTCClient::OnConnect(rtc::AsyncSocket* socket) {
 
 	size_t sent = socket->Send(m_strOnConnectData.c_str(), m_strOnConnectData.length());
 	CB((sent == m_strOnConnectData.length()));
-	
-	RTC_UNUSED(sent);
-	
-	m_strOnConnectData.clear();
 
 Error:
+	RTC_UNUSED(sent);
+	m_strOnConnectData.clear();
 	return;
 }
 
@@ -185,15 +183,15 @@ RESULT WebRTCClient::ParseServerResponse(const std::string& response, size_t con
 	RESULT r = R_PASS;
 
 	int status = GetResponseStatus(response.c_str());
-	CB((status == 200));
+	CBM((status == 200), "Error: server returned status %d", status);
 
 	*eoh = response.find("\r\n\r\n");
-	CB((*eoh != std::string::npos));
+	CBM((*eoh != std::string::npos), "Error: could not find end of header");
 
 	*peer_id = -1;
 
 	// See comment in peer_channel.cc for why we use the Pragma header and not e.g. "X-Peer-Id".
-	CR(GetHeaderValue(response, *eoh, "\r\nPragma: ", peer_id));
+	CRM(GetHeaderValue(response, *eoh, "\r\nPragma: ", peer_id), "ParseServerResponse: GetHeaderValue FAILED");
 
 Success:
 	return r;
@@ -232,13 +230,13 @@ Error:
 }
 
 RESULT WebRTCClient::GetHeaderValue(const std::string& data, size_t eoh, const char* header_pattern, size_t* value) {
-	RESULT r = R_PASS;
+	RESULT r = R_PASS_TRUE;
 
-	CB((value != nullptr));
+	CBM((value != nullptr), "GetHeaderValue: value can't be null");
 	size_t found = data.find(header_pattern);
 	
-	CB((found != std::string::npos));
-	CB((found < eoh));
+	CBR((found != std::string::npos), R_PASS_FALSE);
+	CBR((found < eoh), R_PASS_FALSE);
 
 	*value = atoi(&data[found + strlen(header_pattern)]);
 
