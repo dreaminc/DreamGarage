@@ -256,8 +256,7 @@ RESULT WebRTCConductor::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	rtc::scoped_refptr<webrtc::VideoTrackInterface> pVideoTrack = nullptr;
 
 	pVideoTrack = rtc::scoped_refptr<webrtc::VideoTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kVideoLabel,
-			m_pWebRTCPeerConnectionFactory->CreateVideoSource(OpenVideoCaptureDevice(), nullptr)));
+		m_pWebRTCPeerConnectionFactory->CreateVideoTrack(kVideoLabel, m_pWebRTCPeerConnectionFactory->CreateVideoSource(OpenVideoCaptureDevice(), nullptr)));
 
 	pMediaStreamInterface->AddTrack(pVideoTrack);
 
@@ -265,15 +264,30 @@ Error:
 	return r;
 }
 
+#include "webrtc/api/localaudiosource.h"
+
 RESULT WebRTCConductor::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
 
+	// Set up constraints
+	webrtc::FakeConstraints audioSourceConstraints;
+
+	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kGoogEchoCancellation, false);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExtendedFilterEchoCancellation, true);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kDAEchoCancellation, true);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kAutoGainControl, true);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, true);
+	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kNoiseSuppression, false);
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, true);
+
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
-		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(nullptr)));
+		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints)));
 
 	pMediaStreamInterface->AddTrack(pAudioTrack);
+
+	//pAudioTrack->GetSource()
 
 Error:
 	return r;
@@ -292,19 +306,27 @@ RESULT WebRTCConductor::AddStreams() {
 	RESULT r = R_PASS;
 
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface = nullptr;
+	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
 	
 	CB((m_WebRTCActiveStreams.find(kStreamLabel) == m_WebRTCActiveStreams.end()));
+
+	/*
+	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
+		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(nullptr)));
+		*/
 	
 	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
 	
+	//pMediaStreamInterface->AddTrack(pAudioTrack);
+
 	CR(AddAudioStream(pMediaStreamInterface));
-	CR(AddVideoStream(pMediaStreamInterface));
+	//CR(AddVideoStream(pMediaStreamInterface));
 
 	// TODO: STREAMMMM
 	//main_wnd_->StartLocalRenderer(video_track);
 
 
-	// TODO:  Add streams
+	// Add streams
 	if (!m_pWebRTCPeerConnection->AddStream(pMediaStreamInterface)) {
 		LOG(LS_ERROR) << "Adding stream to PeerConnection failed";
 	}
@@ -451,7 +473,7 @@ RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 	
 	CN(m_pWebRTCPeerConnection.get());
 
-	//CR(AddStreams());
+	CR(AddStreams());
 
 	if (fAddDataChannel) {
 		CR(AddDataChannel());
