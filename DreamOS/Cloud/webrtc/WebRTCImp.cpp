@@ -99,10 +99,10 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::InitializePeerConnection() {
+RESULT WebRTCImp::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
-	CRM(m_pWebRTCConductor->InitializePeerConnection(), "Failed to initialize WebRTC Peer Connection");
+	CRM(m_pWebRTCConductor->InitializePeerConnection(fAddDataChannel), "Failed to initialize WebRTC Peer Connection");
 	CRM(m_pWebRTCConductor->CreateOffer(), "Failed to create WebRTC Offer");
 
 Error:
@@ -138,6 +138,7 @@ Error:
 	return r;
 }
 
+// Connect to peer will set up the data channel from the initiator
 RESULT WebRTCImp::ConnectToPeer(int peerID) {
 	RESULT r = R_PASS;
 
@@ -145,7 +146,7 @@ RESULT WebRTCImp::ConnectToPeer(int peerID) {
 	CN(m_pWebRTCClient);
 
 	m_pWebRTCConductor->SetPeerConnectionID(peerID);
-	CRM(InitializePeerConnection(), "WebRTCImp: ConnectToPeer failed to Initialzie Peer Connection");
+	CRM(InitializePeerConnection(true), "WebRTCImp: ConnectToPeer failed to Initialzie Peer Connection");
 
 Error:
 	return r;

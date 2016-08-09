@@ -470,11 +470,11 @@ Error:
 RESULT WebRTCClient::SendMessageToPeer(int peerID, const std::string& message) {
 	RESULT r = R_PASS;
 
-	CB((m_WebRTCState == CONNECTED));
+	CBM((m_WebRTCState == CONNECTED), "Error: SendMessageToPeer: WebRTC State not connected");
 
-	CB((IsConnected()));
-	CB((m_pAsyncSocketControl->GetState() == rtc::Socket::CS_CLOSED));
-	CB(peerID != -1);
+	CBM((IsConnected()), "Error: SendMessageToPeer: WebRTC client not connected");
+	CBM((m_pAsyncSocketControl->GetState() == rtc::Socket::CS_CLOSED), "Error: SendMessageToPeer: Socket state isn't closed");
+	CBM(peerID != -1, "Error: SendMessageToPeer: Peer ID is -1");
 
 	char headers[1024];
 	rtc::sprintfn(headers, sizeof(headers),
@@ -487,7 +487,7 @@ RESULT WebRTCClient::SendMessageToPeer(int peerID, const std::string& message) {
 	m_strOnConnectData = headers;
 	m_strOnConnectData += message;
 	
-	CR(ConnectControlSocket());
+	CR(ConnectControlSocket(), "Error: SendMessageToPeer: Control socket connect failed");
 
 Error:
 	return r;

@@ -15,6 +15,9 @@
 #include "webrtc/media/engine/webrtcvideocapturerfactory.h"
 #include "webrtc/modules/video_capture/video_capture_factory.h"
 
+#include "webrtc/api/test/fakertccertificategenerator.h"
+#include "webrtc/p2p/base/fakeportallocator.h"
+
 // Names used for a IceCandidate JSON object.
 const char kCandidateSdpMidName[] = "sdpMid";
 const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
@@ -49,7 +52,8 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 	m_pWebRTCPeerConnection(nullptr),
 	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_WebRTCPeerID(-1),
-	m_fLoopback(false)
+	m_fLoopback(false),
+	m_pDataChannelInterface(nullptr)
 {
 	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
 		m_pWebRTCPeerConnectionFactory.release();
@@ -110,6 +114,7 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 	}
 
 	jmessage[kCandidateSdpName] = sdp;
+
 	//SendMessage(writer.write(jmessage));
 	SendMessageToPeer(&(writer.write(jmessage)), m_WebRTCPeerID);
 }
@@ -318,19 +323,21 @@ RESULT WebRTCConductor::AddDataChannel() {
 
 	DEBUG_LINEOUT("WebRTCConductor::AddDataChannel");
 
-	rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface = nullptr;
+	//rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface = nullptr;
 	webrtc::DataChannelInit dataChannelInit;
 
 	CB((m_WebRTCActiveDataChannels.find(kDataLabel) == m_WebRTCActiveDataChannels.end()));
-	pDataChannelInterface = m_pWebRTCPeerConnection->CreateDataChannel(kDataLabel, &dataChannelInit);
-	CN(pDataChannelInterface);
+	//pDataChannelInterface = m_pWebRTCPeerConnection->CreateDataChannel(kDataLabel, &dataChannelInit);
+	m_pDataChannelInterface = m_pWebRTCPeerConnection->CreateDataChannel(kDataLabel, &dataChannelInit);
+	//CN(pDataChannelInterface);
+	CN(m_pDataChannelInterface);
 
 	// Add Channel
 	//pDataChannelInterface->  .connect(this, &PeerConnectionEndToEndTest::OnCallerAddedDataChanel);
 	//m_SignalOnDataChannel.connect(this, &WebRTCConductor::OnDataChannel);
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataChannelPair;
-	m_WebRTCActiveDataChannels.insert(DataChannelPair(pDataChannelInterface->label(), pDataChannelInterface));
+	m_WebRTCActiveDataChannels.insert(DataChannelPair(m_pDataChannelInterface->label(), m_pDataChannelInterface));
 
 Error:
 	return r;
@@ -342,11 +349,13 @@ void WebRTCConductor::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterf
 	//channel->Send(webrtc::DataBuffer("DEADBEEF"));
 
 	// Register self as observer 
-	rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface = m_WebRTCActiveDataChannels[kDataLabel];
-	pDataChannelInterface->RegisterObserver(this);
+	//rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface = m_WebRTCActiveDataChannels[kDataLabel];
+	//pDataChannelInterface->RegisterObserver(this);
 
 	// TODO: 
 	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_DATA, stream.release());
+
+	channel->RegisterObserver(this);
 }
 
 RESULT WebRTCConductor::SendDataChannel(std::string& strMessage) {
@@ -355,19 +364,36 @@ RESULT WebRTCConductor::SendDataChannel(std::string& strMessage) {
 	//m_SignalOnDataChannel
 
 	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
-	CN(pWebRTCDataChannel);
+	//CN(pWebRTCDataChannel);
+	CN(m_pDataChannelInterface);
 
-	CB(pWebRTCDataChannel->Send(webrtc::DataBuffer(strMessage)));
+	//CB(pWebRTCDataChannel->Send(webrtc::DataBuffer(strMessage)));
+	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(strMessage)));
 
 Error:
 	return r;
+}
+
+std::string GetDataStateString(webrtc::DataChannelInterface::DataState state) {
+	switch (state) {
+		case webrtc::DataChannelInterface::DataState::kConnecting: return std::string("connecting"); break;
+		case webrtc::DataChannelInterface::DataState::kOpen: return std::string("open"); break;
+		case webrtc::DataChannelInterface::DataState::kClosing: return std::string("closing"); break;
+		case webrtc::DataChannelInterface::DataState::kClosed: return std::string("closed"); break;
+		default:  return std::string("invalid state"); break;
+	}
 }
 
 // DataChannelObserver Implementation
 void WebRTCConductor::OnStateChange() {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("WebRTCConductor::OnStateChange");
+	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	//CN(pWebRTCDataChannel);
+	CN(m_pDataChannelInterface);
+
+	//DEBUG_LINEOUT("WebRTCConductor::OnStateChange %d", pWebRTCDataChannel->state());
+	DEBUG_LINEOUT("WebRTCConductor::OnStateChange %d", GetDataStateString(m_pDataChannelInterface->state()).c_str());
 
 Error:
 	return;
@@ -375,8 +401,19 @@ Error:
 
 void WebRTCConductor::OnMessage(const webrtc::DataBuffer& buffer) {
 	RESULT r = R_PASS;
+	
+	
 
-	DEBUG_LINEOUT("WebRTCConductor::OnMessage");
+	if (buffer.binary) {
+		DEBUG_LINEOUT("WebRTCConductor::OnMessage (Binary Databuffer)");
+	}
+	else {
+		std::string strData = std::string(buffer.data.data<char>());
+		DEBUG_LINEOUT("WebRTCConductor::OnMessage: %s (String Databuffer)", strData.c_str());
+	}
+
+	//auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	//CN(pWebRTCDataChannel);
 
 Error:
 	return;
@@ -392,7 +429,7 @@ Error:
 	return r;
 }
 
-RESULT WebRTCConductor::InitializePeerConnection() {
+RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
 	CB((m_pWebRTCPeerConnectionFactory.get() == nullptr));	// ensure peer connection factory uninitialized
@@ -406,15 +443,19 @@ RESULT WebRTCConductor::InitializePeerConnection() {
 		return R_FAIL;
 	}
 
-	if (!CreatePeerConnection(DTLS_ON)) {
+	//if (!CreatePeerConnection(DTLS_ON)) {
+	if (!CreatePeerConnection(DTLS_OFF)) {
 		DEBUG_LINEOUT("Error CreatePeerConnection failed");
 		DeletePeerConnection();
 	}
 	
-	//CR(AddStreams());
-	//CR(AddDataChannel());
-	
 	CN(m_pWebRTCPeerConnection.get());
+
+	//CR(AddStreams());
+
+	if (fAddDataChannel) {
+		CR(AddDataChannel());
+	}
 
 Error:
 	return r;
@@ -445,25 +486,31 @@ RESULT WebRTCConductor::CreatePeerConnection(bool dtls) {
 	RESULT r = R_PASS;
 
 	webrtc::PeerConnectionInterface::RTCConfiguration config;
-	webrtc::PeerConnectionInterface::IceServer server;
+	webrtc::PeerConnectionInterface::IceServer iceServer;
 	webrtc::FakeConstraints constraints;
+	std::unique_ptr<rtc::RTCCertificateGeneratorInterface> pCertificateGenerator = nullptr;
 
 	CN(m_pWebRTCPeerConnectionFactory.get());		// ensure factory is valid
 	CB((m_pWebRTCPeerConnection.get() == nullptr));	// ensure peer connection is nullptr
 
-	server.uri = GetPeerConnectionString();
-	config.servers.push_back(server);
+	iceServer.uri = GetPeerConnectionString();
+	config.servers.push_back(iceServer);
+
+	if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
+		pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
+	}
 
 	if (dtls) {
-		constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
+		constraints.AddMandatory(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
 	}
 	else {
-		constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
+		constraints.AddMandatory(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
+		constraints.AddMandatory(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
 	}
 
-	m_pWebRTCPeerConnection = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(config, &constraints, NULL, NULL, this);
+	m_pWebRTCPeerConnection = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(config, &constraints, NULL, std::move(pCertificateGenerator), this);
 
-	CN(m_pWebRTCPeerConnection.get());
+	CNM(m_pWebRTCPeerConnection.get(), "WebRTC Peer Connection failed to initialize");
 
 Error:
 	return r;

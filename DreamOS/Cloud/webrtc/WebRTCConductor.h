@@ -86,7 +86,7 @@ protected:
 
 	RESULT CreatePeerConnection(bool dtls);
 	RESULT DeletePeerConnection();
-	RESULT InitializePeerConnection();
+	RESULT InitializePeerConnection(bool fAddDataChannel = false);
 	RESULT ReinitializePeerConnectionForLoopback();
 	cricket::VideoCapturer* OpenVideoCaptureDevice();
 	
@@ -131,6 +131,8 @@ private:
 
 	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCActiveDataChannels;
+
+	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
 

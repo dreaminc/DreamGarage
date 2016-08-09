@@ -45,7 +45,7 @@ public:
 
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);
-	RESULT InitializePeerConnection();
+	RESULT InitializePeerConnection(bool fAddDataChannel = false);
 	int GetFirstPeerID();
 	
 	virtual RESULT ConnectToPeer(int peerID) override;
