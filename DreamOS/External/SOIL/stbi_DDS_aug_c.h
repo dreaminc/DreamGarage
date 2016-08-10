@@ -1,3 +1,6 @@
+#pragma warning(push)
+// ignore signed/unsigned mismatch warnings encountered in this file
+#pragma warning(disable: 4018)
 
 ///	DDS file support, does decoding, _not_ direct uploading
 ///	(use SOIL for that ;-)
@@ -509,3 +512,5 @@ stbi_uc *stbi_dds_load_from_memory (stbi_uc const *buffer, int len, int *x, int 
    start_mem(&s,buffer, len);
    return dds_load(&s,x,y,comp,req_comp);
 }
+
+#pragma warning(pop)

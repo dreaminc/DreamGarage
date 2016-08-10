@@ -491,7 +491,7 @@ composite *OpenGLImp::MakeComposite() {
 	composite *pComposite = new OGLComposite(this);
 	CN(pComposite);
 
-Success:
+//Success:
 	return pComposite;
 
 Error:

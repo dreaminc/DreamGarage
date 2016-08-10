@@ -36,7 +36,7 @@ private:
 
 public:
 
-	typedef enum AlignmentType {
+	enum AlignmentType {
 		TOP_LEFT,
 		TOP_RIGHT,
 		CENTER,

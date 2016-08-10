@@ -39,7 +39,7 @@ RESULT thumb::Initialize() {
 	m_pPIP = AddSphere(jointRadius, 10, 10);
 	//m_pMCP = AddSphere(jointRadius, 10, 10);
 
-Error:
+//Error:
 	return r;
 }
 
@@ -91,7 +91,7 @@ RESULT finger::Initialize() {
 	m_pDIP = AddSphere(jointRadius, 10, 10);
 	m_pPIP = AddSphere(jointRadius, 10, 10);
 
-Error:
+//Error:
 	return r;
 }
 
@@ -162,7 +162,7 @@ RESULT hand::Initialize() {
 
 	SetPosition(point(0.0f, 0.0f, -1.0f));
 
-Error:
+//Error:
 	return r;
 }
 
@@ -208,6 +208,6 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 		}
 	}
 
-Error:
+//Error:
 	return r;
 }

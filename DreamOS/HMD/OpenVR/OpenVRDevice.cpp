@@ -3,6 +3,8 @@
 
 #include "Sandbox/SandboxApp.h"
 
+#include <stdint.h>
+
 OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),
@@ -177,7 +179,7 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 			break;
 		}
 	}
-	CBM((error == vr::VRRenderModelError_None), "Failed to load %s model", sRenderModelName);
+	CBM((error == vr::VRRenderModelError_None), "Failed to load %s model", sRenderModelName.c_str());
 
 	while (1) {
 		error = vr::VRRenderModels()->LoadTexture_Async(pRenderModel->diffuseTextureId, &pRenderModelTexture);
@@ -188,7 +190,7 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 			break;
 		}
 	}
-	CBM((error == vr::VRRenderModelError_None), "Failed to load %s model", sRenderModelName);
+	CBM((error == vr::VRRenderModelError_None), "Failed to load %s model", sRenderModelName.c_str());
 
 	// TODO: Load these as models now
 	for (uint32_t i = 0; i < pRenderModel->unVertexCount; i++) {
@@ -309,7 +311,7 @@ RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
 		// TODO: Lots more events to ultimately map...
 	}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -468,7 +470,7 @@ RESULT OpenVRDevice::SubmitFrame() {
 
 	// Left Eye
 	vr::Texture_t leftEyeTexture;
-	leftEyeTexture.handle = (void*)(m_pFramebufferResolveLeft->GetOGLTextureIndex());
+	leftEyeTexture.handle = (void*)(static_cast<int64_t>(m_pFramebufferResolveLeft->GetOGLTextureIndex()));
 	leftEyeTexture.eType = vr::API_OpenGL;
 	leftEyeTexture.eColorSpace = vr::ColorSpace_Gamma;
 	ivrResult = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
@@ -476,7 +478,7 @@ RESULT OpenVRDevice::SubmitFrame() {
 
 	// Right Eye
 	vr::Texture_t rightEyeTexture;
-	rightEyeTexture.handle = (void*)(m_pFramebufferResolveRight->GetOGLTextureIndex());
+	rightEyeTexture.handle = (void*)(static_cast<int64_t>(m_pFramebufferResolveRight->GetOGLTextureIndex()));
 	rightEyeTexture.eType = vr::API_OpenGL;
 	rightEyeTexture.eColorSpace = vr::ColorSpace_Gamma;
 	ivrResult = vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
@@ -542,7 +544,7 @@ RESULT OpenVRDevice::SetAndClearRenderSurface(EYE_TYPE eye) {
 		m_pFramebufferRenderRight->SetAndClearViewportDepthBuffer();
 	}
 
-Error:	
+//Error:	
 	return r;
 }
 
@@ -568,7 +570,7 @@ RESULT OpenVRDevice::UnsetRenderSurface(EYE_TYPE eye) {
 	oglimp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
 
-Error:
+//Error:
 	return r;
 }
 

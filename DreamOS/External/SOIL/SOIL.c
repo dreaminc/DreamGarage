@@ -30,6 +30,10 @@
 	#include <GL/glx.h>
 #endif
 
+#pragma warning(push)
+// ignore signed/unsigned mismatch and size_t conversion warnings encountered in this file
+#pragma warning(disable : 4267 4018)
+
 #include "SOIL.h"
 #include "stb_image_aug.h"
 #include "image_helper.h"
@@ -2022,3 +2026,4 @@ int query_DXT_capability( void )
 	/*	let the user know if we can do DXT or not	*/
 	return has_DXT_capability;
 }
+#pragma warning(pop)

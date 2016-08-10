@@ -130,7 +130,7 @@ public:
 		);
 		*/
 
-	Error:
+//	Error:
 		return r;
 	}
 
@@ -148,7 +148,7 @@ public:
 
 		//DEBUG_LINEOUT("%s hand id:%d position:%s rol:%f", HandTypeString(), m_leapHandID, m_ptPalmPosition.toString().c_str());
 
-	Error:
+//	Error:
 		return r;
 	}
 
