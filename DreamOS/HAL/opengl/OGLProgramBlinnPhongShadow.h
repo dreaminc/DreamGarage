@@ -44,12 +44,12 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformDepthViewProjectionMatrix), std::string("u_mat4DepthVP")));
 
 		// Billboard boolean uniforms
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformIsBillboard), std::string("u_boolIsBillboard")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformShouldScale), std::string("u_boolShouldScale")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfBillboard), std::string("u_fBillboard")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfScale), std::string("u_fScale")));
 
 		// Object position uniforms
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformCenter), std::string("u_vec4Center")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformOrigin), std::string("u_vec4CamOrigin")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformObjectCenter), std::string("u_vec4ObjectCenter")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformEyePosition), std::string("u_vec4EyePosition")));
 
 		// Uniform Blocks
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
@@ -94,11 +94,11 @@ public:
 		auto matModel = pDimObj->GetModelMatrix();
 		m_pUniformModelMatrix->SetUniform(matModel);
 
-		m_pUniformCenter->SetUniform(pDimObj->GetOrigin());
+		m_pUniformObjectCenter->SetUniform(pDimObj->GetOrigin());
 
 		quad *pQuad = dynamic_cast<quad *>(pDimObj);
-		m_pUniformIsBillboard->SetUniform(pQuad != nullptr && pQuad->GetBillboard());
-		m_pUniformShouldScale->SetUniform(pQuad != nullptr && pQuad->GetScaleBillboard());
+		m_pUniformfBillboard->SetUniform(pQuad != nullptr && pQuad->IsBillboard());
+		m_pUniformfScale->SetUniform(pQuad != nullptr && pQuad->IsScaledBillboard());
 
 		return R_PASS;
 	}
@@ -124,7 +124,7 @@ public:
 		}
 
 		point origin = pCamera->GetOrigin();
-		m_pUniformOrigin->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
+		m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
 
 		return R_PASS;
 	}
@@ -140,7 +140,7 @@ public:
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 		point origin = pStereoCamera->GetOrigin();
-		m_pUniformOrigin->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
+		m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
 
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
@@ -169,12 +169,13 @@ private:
 	OGLUniformMatrix4 *m_pUniformModelViewMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformDepthViewProjectionMatrix;
-	OGLUniformPoint *m_pUniformCenter;
-	OGLUniformPoint *m_pUniformOrigin;
+
+	OGLUniformPoint *m_pUniformObjectCenter;
+	OGLUniformPoint *m_pUniformEyePosition;
 
 	// Booleans
-	OGLUniformBool *m_pUniformIsBillboard;
-	OGLUniformBool *m_pUniformShouldScale;
+	OGLUniformBool *m_pUniformfBillboard;
+	OGLUniformBool *m_pUniformfScale;
 
 	// Textures
 	OGLUniformSampler2D *m_pUniformTextureDepth;

@@ -63,11 +63,11 @@ protected:
 		return numIndices;
 	}
 
-	bool GetBillboard() { return m_isBillboard; }
-	void SetBillboard(bool billboard) { m_isBillboard = billboard; }
+	bool IsBillboard() { return m_fBillboard; }
+	void SetBillboard(bool billboard) { m_fBillboard = billboard; }
 
-	bool GetScaleBillboard() { return m_scaledBillboard; }
-	void SetScaleBillboard(bool scale) { m_scaledBillboard = scale; }
+	bool IsScaledBillboard() { return m_fScaledBillboard; }
+	void SetScaledBillboard(bool scale) { m_fScaledBillboard = scale; }
 
 private:
 	QUAD_TYPE m_quadType;
@@ -78,8 +78,8 @@ private:
 	texture *m_pTextureHeight;
 	double m_heightMapScale;
 
-	bool m_isBillboard = false;
-	bool m_scaledBillboard = false;
+	bool m_fBillboard = false;
+	bool m_fScaledBillboard = false;
 
 public:
 

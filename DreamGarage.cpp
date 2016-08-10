@@ -76,7 +76,7 @@ RESULT DreamGarage::LoadScene() {
 
 	quad *pQuad2 = AddQuad(1.0f, 1.0f, 10, 10);
 	pQuad2->MoveTo(3.0f, 1.0f, 3.0f);
-	pQuad2->SetScaleBillboard(true);
+	pQuad2->SetScaledBillboard(true);
 	pQuad2->SetBillboard(true);
 	
 	//tQuad->SetBillboard(true);
