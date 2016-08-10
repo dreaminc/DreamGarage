@@ -30,9 +30,13 @@ public:
 	inline unsigned int NumberVertices() { return m_nVertices; }
 	inline unsigned int NumberIndices() { return m_nIndices; }
 
+	bool IsBillboard() { return m_fBillboard; }
+	void SetBillboard(bool billboard) { m_fBillboard = billboard; }
+
 private:
 	unsigned int m_nVertices;
 	unsigned int m_nIndices;
+	bool m_fBillboard;
 
 public:
 

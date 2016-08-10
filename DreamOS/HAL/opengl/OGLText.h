@@ -28,6 +28,11 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 
+		if (isBillboard) {
+			this->RotateXByDeg(-180.0f);
+			UpdateOGLBuffers();
+		}
+
 		std::wstring font(L"Fonts/" + pFont->GetGlyphImageFile());
 		// Load appropriate glyph texture
 
@@ -52,6 +57,29 @@ public:
 		SetDirty();
 
 		return this;
+	}
+
+	RESULT Render() {
+		RESULT r = R_PASS;
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		// TODO: Rethink this since it's in the critical path
+		DimObj *pDimObj = GetDimObj();
+
+		CR(m_pParentImp->glBindVertexArray(m_hVAO));
+		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
+		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
+
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+		//glDrawElements(GL_LINES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+		//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
+
+		glDisable(GL_BLEND);
+
+	Error:
+		return r;
 	}
 };
 

@@ -177,7 +177,7 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pOGLProgramShadowDepth);
 	
 	// TODO(NTH): Add a program / render pipeline arch
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
@@ -194,7 +194,8 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLProgramCapture->InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
 	*/
 
-	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
+	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX, this, m_versionGLSL);
+	//m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
 
 	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
@@ -850,15 +851,24 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
-		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
-		//SetStereoFramebufferViewTarget(eye);
-		//SetCameraMatrix(eye);
-		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
-		m_pHMD->SetAndClearRenderSurface(eye);
 
 		// Send SceneGraph objects to shader
 		pSceneGraph->Reset();
+		m_pHMD->SetAndClearRenderSurface(eye);
+
+		skybox *pSkybox = nullptr;
+		CR(pObjectStore->GetSkybox(pSkybox));
+		/*
+		CR(pObjectStore->GetSkybox(pSkybox));
+		if (pSkybox != nullptr) {
+			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
+			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
+		}
+//*/
+		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
+
 		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
 
 			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
@@ -870,13 +880,14 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 			}
 		}		
 
-		skybox *pSkybox = nullptr;
-		CR(pObjectStore->GetSkybox(pSkybox));
+		//skybox *pSkybox = nullptr;
+//		/*
 		if (pSkybox != nullptr) {
 			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
 			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
 			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 		}
+//		*/
 		
 		// Render profiler overlay
 		if (GetRenderProfiler()) {

@@ -95,10 +95,15 @@ public:
 		m_pUniformModelMatrix->SetUniform(matModel);
 
 		m_pUniformObjectCenter->SetUniform(pDimObj->GetOrigin());
-
+		text *pText = dynamic_cast<text *>(pDimObj);
 		quad *pQuad = dynamic_cast<quad *>(pDimObj);
-		m_pUniformfBillboard->SetUniform(pQuad != nullptr && pQuad->IsBillboard());
-		m_pUniformfScale->SetUniform(pQuad != nullptr && pQuad->IsScaledBillboard());
+//		bool canBillboard = pText != nullptr || pQuad != nullptr;
+//		m_pUniformfBillboard->SetUniform(pQuad && pQuad->IsBillboard());
+		if (pText != nullptr)
+			m_pUniformfBillboard->SetUniform(pText && pText->IsBillboard());
+		else
+			m_pUniformfBillboard->SetUniform(false);
+//		m_pUniformfScale->SetUniform(pQuad != nullptr && pQuad->IsScaledBillboard());
 
 		return R_PASS;
 	}

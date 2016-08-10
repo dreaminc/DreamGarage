@@ -67,6 +67,6 @@ void main(void) {
 	//vec3 rotatedPoint = RotateVectorByQuaternion(vec4(0.0f, 0.0f, 0.0f, -1.0f), inV_vec4Position.xyz);
 	vec4 transformedPosition = u_mat4Projection * u_mat4ViewOrientation * vec4(inV_vec4Position.xyz, 1.0f);
 	//vec4 transformedPosition = u_mat4Projection * vec4(rotatedPoint, 1.0f);
-	gl_Position = transformedPosition;
+	gl_Position = transformedPosition.xyww;
 	DataOut.position = inV_vec4Position.xyz;
 }

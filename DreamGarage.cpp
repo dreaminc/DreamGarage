@@ -122,6 +122,19 @@ RESULT DreamGarage::LoadScene() {
 	pVolume->MoveTo(0.0f, 0.0f, 0.0f);
 	*/
 
+
+	text *pText = AddText(L"Arial.fnt", "Hello world", 1.0f, true);
+	pText->MoveTo(1.0f, 1.0f, 0.0f);
+//	pText->RotateYByDeg(360.0f);
+//	pText->SetBillboard(true);
+
+	text *pText2 = AddText(L"Arial.fnt", "Hello world", 0.1f, true);
+	pText2->MoveTo(5.0f, 5.0f, 0.0f);
+//	pText2->RotateYByDeg(360.0f);
+//	pText2->RotateXByDeg(180.0f);
+	pText2->SetBillboard(true);
+
+	///*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 
@@ -131,7 +144,7 @@ RESULT DreamGarage::LoadScene() {
 	pMgr->GetCurrentPath((wchar_t*&)path);
 	std::wstring objFile(path);
 
-	/*
+	///*
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f, 0.0f),
@@ -157,9 +170,9 @@ RESULT DreamGarage::LoadScene() {
 		1.0f);
 
 	
-	*/
+	//*/
 
-	/*
+	///*
 	AddModel(objFile, L"\\Models\\table\\untitled.obj",
 		nullptr,
 		point(0.0, 13.0, 0.0),
