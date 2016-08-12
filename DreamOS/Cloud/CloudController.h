@@ -10,12 +10,14 @@
 // The base DreamCloud controller 
 
 #include "CloudImp.h"
+#include "User/UserFactory.h"
 #include <memory>
 
 class CloudController {
 public:
 	CloudController() :
-		m_pCloudImp(nullptr)
+		m_pCloudImp(nullptr),
+		m_pUser(nullptr)
 	{
 		// empty
 	}
@@ -29,6 +31,16 @@ public:
 
 		m_pCloudImp = std::move(pCloudImp);
 		CN(m_pCloudImp);
+
+	Error:
+		return r;
+	}
+
+	RESULT InitializeUser(version ver = 1.0f) {
+		RESULT r = R_PASS;
+
+		m_pUser = std::unique_ptr<User>(UserFactory::MakeUser(ver));
+		CN(m_pUser);
 
 	Error:
 		return r;
@@ -56,6 +68,8 @@ public:
 private:
 	UID m_uid;
 	std::unique_ptr<CloudImp> m_pCloudImp;
+
+	std::unique_ptr<User> m_pUser;
 };
 
 #endif

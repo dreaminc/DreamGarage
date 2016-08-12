@@ -10,6 +10,9 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	pCloudController = new CloudController();
 	CN(pCloudController);
 
+	// Initialize the User Object
+	CR(pCloudController->InitializeUser());
+
 	switch (type) {
 		case CLOUD_CONTROLLER_CEF: {
 			// Create the CEF implementation			
@@ -28,6 +31,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 			DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
 		} break;
 	}
+
 
 //Success:
 	return pCloudController;

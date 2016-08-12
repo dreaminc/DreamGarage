@@ -138,8 +138,8 @@
     <Filter Include="Cloud\Protocols">
       <UniqueIdentifier>{53b92527-af4f-46be-b785-0364e161fff1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Cloud\Objects">
-      <UniqueIdentifier>{7148f2c0-486b-4638-9b6f-951c7aa6fa46}</UniqueIdentifier>
+    <Filter Include="Cloud\User">
+      <UniqueIdentifier>{e80be9ff-7887-4799-9a5a-ce9fb6cddb54}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -320,8 +320,11 @@
     <ClCompile Include="..\..\..\Cloud\Protocols\Websocket.cpp">
       <Filter>Cloud\Protocols</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Objects\User.cpp">
-      <Filter>Cloud\Objects</Filter>
+    <ClCompile Include="..\..\..\Cloud\User\User.cpp">
+      <Filter>Cloud\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp">
+      <Filter>Cloud\User</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1828,8 +1831,11 @@
     <ClInclude Include="..\..\..\Cloud\Protocols\Websocket.h">
       <Filter>Cloud\Protocols</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Objects\User.h">
-      <Filter>Cloud\Objects</Filter>
+    <ClInclude Include="..\..\..\Cloud\User\User.h">
+      <Filter>Cloud\User</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\User\UserFactory.h">
+      <Filter>Cloud\User</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
