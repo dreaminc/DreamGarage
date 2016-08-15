@@ -17,7 +17,7 @@ class CloudController {
 public:
 	CloudController() :
 		m_pCloudImp(nullptr),
-		m_pUser(nullptr)
+		m_pUserController(nullptr)
 	{
 		// empty
 	}
@@ -39,8 +39,8 @@ public:
 	RESULT InitializeUser(version ver = 1.0f) {
 		RESULT r = R_PASS;
 
-		m_pUser = std::unique_ptr<User>(UserFactory::MakeUser(ver));
-		CN(m_pUser);
+		m_pUserController = std::unique_ptr<User>(UserFactory::MakeUser(ver));
+		CN(m_pUserController);
 
 	Error:
 		return r;
@@ -51,6 +51,20 @@ public:
 
 		CNM(m_pCloudImp, "Cloud Imp not initialized");
 		CRM(m_pCloudImp->CreateNewURLRequest(strURL), "Failed to create CEF URL request for %S", strURL.c_str());
+
+	Error:
+		return r;
+	}
+
+	RESULT LoginUser() {
+		RESULT r = R_PASS;
+
+		std::string strUsername = "dream@dreamos.com";
+		std::string strPassword = "dreamy";
+
+		// TODO: command line / config file - right now hard coded
+		CN(m_pUserController);
+		CR(m_pUserController->Login(strUsername, strPassword));
 
 	Error:
 		return r;
@@ -69,7 +83,7 @@ private:
 	UID m_uid;
 	std::unique_ptr<CloudImp> m_pCloudImp;
 
-	std::unique_ptr<User> m_pUser;
+	std::unique_ptr<User> m_pUserController;
 };
 
 #endif

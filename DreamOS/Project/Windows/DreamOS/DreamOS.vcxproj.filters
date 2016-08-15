@@ -135,11 +135,14 @@
     <Filter Include="DreamGarage">
       <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Cloud\Protocols">
-      <UniqueIdentifier>{53b92527-af4f-46be-b785-0364e161fff1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Cloud\User">
       <UniqueIdentifier>{e80be9ff-7887-4799-9a5a-ce9fb6cddb54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cloud\HTTP">
+      <UniqueIdentifier>{818234de-b701-46c6-b1a9-663501c3c2f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cloud\Websockets">
+      <UniqueIdentifier>{dbdd8c80-c654-40a5-94ca-e83096da4b22}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -314,17 +317,17 @@
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Protocols\Http.cpp">
-      <Filter>Cloud\Protocols</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Protocols\Websocket.cpp">
-      <Filter>Cloud\Protocols</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\User\User.cpp">
       <Filter>Cloud\User</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp">
       <Filter>Cloud\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp">
+      <Filter>Cloud\Websockets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1825,17 +1828,23 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Protocols\Http.h">
-      <Filter>Cloud\Protocols</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Protocols\Websocket.h">
-      <Filter>Cloud\Protocols</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\User.h">
       <Filter>Cloud\User</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h">
       <Filter>Cloud\User</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPController.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h">
+      <Filter>Cloud\Websockets</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPResponse.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequest.h">
+      <Filter>Cloud\HTTP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

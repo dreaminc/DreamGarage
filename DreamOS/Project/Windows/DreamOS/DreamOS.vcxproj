@@ -176,10 +176,10 @@ xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Rel
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
-    <ClCompile Include="..\..\..\Cloud\Protocols\Http.cpp" />
-    <ClCompile Include="..\..\..\Cloud\Protocols\Websocket.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\User.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp" />
@@ -242,10 +242,12 @@ xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Rel
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
-    <ClInclude Include="..\..\..\Cloud\Protocols\Http.h" />
-    <ClInclude Include="..\..\..\Cloud\Protocols\Websocket.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPController.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequest.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPResponse.h" />
     <ClInclude Include="..\..\..\Cloud\User\User.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
+    <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />

@@ -18,19 +18,26 @@ typedef struct UserProfile {
 	long m_defaultEnvId;
 };
 
+// TODO: This is actually a UserController - so change the name of object and file
 class User {
 public:
 	User();
 	~User();
 
 	// Read username and password from file and login, get a token
-	RESULT Login(const std::wstring& file);
+	RESULT LoginFromFilename(const std::wstring& file);
+	RESULT LoginFromCommandline();
 
 	// obsolete. to be removed
-	RESULT Login_Json(const std::wstring& file);
+	//RESULT Login_Json(const std::wstring& strFilename);
 	
 	// Loads the user profile using the token
 	RESULT LoadProfile();
+
+// TODO: Move to private when CommandLineManager is brought in from WebRTC branch
+//private:
+public:
+	RESULT Login(std::string& strUsername, std::string& strPassword);
 
 private:
 	bool m_fLoggedIn = false;

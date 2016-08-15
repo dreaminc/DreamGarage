@@ -1,6 +1,6 @@
 #include "User.h"
 
-#include "Cloud/Protocols/Http.h"
+#include "Cloud/HTTP/HTTPController.h"
 #include "json.hpp"
 
 #include <fstream>
@@ -24,7 +24,47 @@ User::~User() {
 	// empty
 }
 
-RESULT User::Login(const std::wstring& file) {
+RESULT User::Login(std::string& strUsername, std::string& strPassword) {
+	RESULT r = R_PASS;
+
+	std::string strHTTPRequest{ "username=" + strUsername + "&password=" + strPassword };
+	HTTPResponse httpResponse;
+	nlohmann::json jsonResponse;
+	std::string strResponse;
+
+	HTTPController *pHTTPController = HTTPController::instance();
+
+	CRM(pHTTPController->POST("http://localhost:8000/token/", HTTPController::ContentHttp(), strHTTPRequest, httpResponse), "User login failed to post request");
+	
+	strResponse = std::string(httpResponse.PullResponse());
+	strResponse = strResponse.substr(0, strResponse.find('\r'));
+	jsonResponse = nlohmann::json::parse(strResponse);
+
+	DEBUG_LINEOUT(jsonResponse.get<std::string>().c_str());
+
+	CBM(("/token"_json_pointer.to_string() != ""), "Token missing from JSON");
+	CBM((jsonResponse["/token"_json_pointer].is_null()), "Token is missing from JSON");
+
+	m_strToken = jsonResponse["/token"_json_pointer].get<std::string>();
+
+	DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
+	m_fLoggedIn = true;
+
+Error:
+	return r;
+}
+
+RESULT User::LoginFromCommandline() {
+	RESULT r = R_PASS;
+
+	// TODO:
+
+Error:
+	return r;
+}
+
+// TODO: Split this up into login / get user/pass from file function
+RESULT User::LoginFromFilename(const std::wstring& file) {
 	RESULT r = R_PASS;
 
 	std::ifstream userLoginFile(file, std::ios::binary);
@@ -33,38 +73,23 @@ RESULT User::Login(const std::wstring& file) {
 	std::map<std::string, std::string> keyValue;
 
 	CB((userLoginFile.is_open()));
-	{
-		while (std::getline(userLoginFile, line)) {
-			line.erase(std::remove_if(line.begin(), line.end(), [](char c) {return (c == '\r' || c == '\n'); }), line.end());
-			size_t lineCount = line.find(':');
-			CBM((lineCount != line.length()), "Cannot read line %d", line.c_str());
-			keyValue[line.substr(0, lineCount)] = line.substr(lineCount + 1);
-		}
-
-		userLoginFile.close();
-		std::string strHTTPRequest{ "username=" + keyValue["email"] + "&password=" + keyValue["password"] };
-
-		HttpResponse httpResponse;
-		CBM(Http::GetHttp()->POST("http://localhost:8000/token/", Http::ContentHttp(), strHTTPRequest, httpResponse), "User login failed to post request");
-		std::string strResponse(httpResponse.PullResponse());
-		strResponse = strResponse.substr(0, strResponse.find('\r'));
-		nlohmann::json jsonResponse = nlohmann::json::parse(strResponse);
-
-		DEBUG_LINEOUT(jsonResponse.get<std::string>().c_str());
-
-		CBM(("/token"_json_pointer.to_string() != ""), "Token missing from JSON");
-		CBM((jsonResponse["/token"_json_pointer].is_null()), "Token is missing from JSON");
-
-		m_strToken = jsonResponse["/token"_json_pointer].get<std::string>();
-
-		DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
-		m_fLoggedIn = true;
+	
+	while (std::getline(userLoginFile, line)) {
+		line.erase(std::remove_if(line.begin(), line.end(), [](char c) {return (c == '\r' || c == '\n'); }), line.end());
+		size_t lineCount = line.find(':');
+		CBM((lineCount != line.length()), "Cannot read line %d", line.c_str());
+		keyValue[line.substr(0, lineCount)] = line.substr(lineCount + 1);
 	}
+
+	userLoginFile.close();
+
+	CR(Login(keyValue["email"], keyValue["password"]));
 
 Error:
 	return r;
 }
 
+/*
 RESULT User::Login_Json(const std::wstring& file) {
 	RESULT r = R_PASS;
 
@@ -89,9 +114,9 @@ RESULT User::Login_Json(const std::wstring& file) {
 
 		DEBUG_LINEOUT(jsonRequest.get<std::string>().c_str());
 
-		HttpResponse httpResponse;
+		HTTPResponse httpResponse;
 
-		CBM((Http::GetHttp()->POST("http://10.0.75.1:8000/session/", Http::ContentAcceptJson(), jsonRequest.dump(), httpResponse)),
+		CBM((HTTPController::GetHttp()->POST("http://10.0.75.1:8000/session/", HTTPController::ContentAcceptJson(), jsonRequest.dump(), httpResponse)),
 			"User Login JSON failed to post request");
 
 		std::string strHTTPResponse(httpResponse.PullResponse());
@@ -109,6 +134,7 @@ RESULT User::Login_Json(const std::wstring& file) {
 Error:
 	return r;
 }
+*/
 
 RESULT User::LoadProfile() {
 	RESULT r = R_PASS;
@@ -117,13 +143,14 @@ RESULT User::LoadProfile() {
 
 	CBM(m_fLoggedIn, "user not logged in yet");
 	{
-		HttpResponse httpResponse;
+		HTTPResponse httpResponse;
 		std::string strAuthorizationToken = "Authorization: Token " + m_strToken;
+		HTTPController *pHTTPController = HTTPController::instance();
 
-		auto headers = Http::ContentAcceptJson();
+		auto headers = HTTPController::ContentAcceptJson();
 		headers.push_back(strAuthorizationToken);
 
-		CB((Http::GetHttp()->GET("http://localhost:8000/user/", headers, httpResponse)), "User LoadProfile failed to post request");
+		CB((pHTTPController->GET("http://localhost:8000/user/", headers, httpResponse)), "User LoadProfile failed to post request");
 
 		DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
 
