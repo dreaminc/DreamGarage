@@ -44,6 +44,8 @@ public:
 
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureChannels), std::string("u_intTextureChannels")));
+		
 
 		// Uniform Blocks
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
@@ -61,6 +63,10 @@ public:
 		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
 			pTexture->OGLActivateTexture();
 			m_pUniformTextureColor->SetUniform(pTexture);
+			m_pUniformTextureChannels->SetUniformInteger(pTexture->GetChannels());
+		}
+		else {
+			m_pUniformTextureChannels->SetUniformInteger(0);
 		}
 
 //	Error:
@@ -164,6 +170,7 @@ private:
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
 	OGLUniformSampler2D *m_pUniformTextureDepth;
+	OGLUniform *m_pUniformTextureChannels;
 
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock;

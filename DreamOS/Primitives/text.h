@@ -55,7 +55,7 @@ public:
 		m_font(font)
 	{
 		SetText(text, size);
-
+		m_fBillboard = isBillboard;
 		Validate();
 //	Error:
 //		Invalidate();

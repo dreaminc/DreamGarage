@@ -366,6 +366,8 @@ public:
 		return r;
 	}
 
+	vertex* GetVertices() { return m_pVertices; };
+
 	RESULT CopyVertices(vertex pVerts[], int pVerts_n) {
 		RESULT r = R_PASS;
 

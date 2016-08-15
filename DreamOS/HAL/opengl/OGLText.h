@@ -28,11 +28,6 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 
-		if (isBillboard) {
-			this->RotateXByDeg(-180.0f);
-			UpdateOGLBuffers();
-		}
-
 		std::wstring font(L"Fonts/" + pFont->GetGlyphImageFile());
 		// Load appropriate glyph texture
 
@@ -41,6 +36,21 @@ public:
 		texture *pColorTexture = new OGLTexture(pParentImp, (wchar_t*)font.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 		SetColorTexture(pColorTexture);
+
+		if (isBillboard) {
+
+			// switch z and y coordinates to match quad
+			vertex* textVertices = GetVertices();
+			for (unsigned int i = 0; i < NumberVertices(); i++) {
+				point current = textVertices[i].GetPoint();
+				//centers billboard
+				textVertices[i].SetPoint(point(current.x() - (m_width*0.5f), current.z(), -current.y() + (m_height*0.5f)));
+			}
+
+			//SetPosition(point(0.0f, 0.0f, 0.0f));
+			UpdateOGLBuffers();
+		
+		}
 	}
 
 	OGLText* SetText(const std::string& text, double size = 1.0)

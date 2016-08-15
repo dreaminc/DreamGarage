@@ -71,6 +71,7 @@ public:
 	// Pivot Point
 	RESULT SetPivotPoint(point ptPivot);
 	RESULT SetPivotPoint(point_precision x, point_precision y, point_precision z);
+	point  GetPivotPoint();
 
 	// Velocity
 	VirtualObj* AddVelocity(matrix <point_precision, 4, 1> v);

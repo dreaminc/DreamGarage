@@ -75,7 +75,7 @@ RESULT DreamGarage::LoadScene() {
 	pQuad->SetBillboard(true);
 
 	quad *pQuad2 = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad2->MoveTo(3.0f, 1.0f, 3.0f);
+	pQuad2->MoveTo(5.0f, 5.0f, 0.0f);
 	pQuad2->SetScaledBillboard(true);
 	pQuad2->SetBillboard(true);
 	
@@ -117,10 +117,7 @@ RESULT DreamGarage::LoadScene() {
 	pSphere2->AddChild(pSphere3);
 	//*/
 	
-	/*
-	volume *pVolume = AddVolume(0.5f);
-	pVolume->MoveTo(0.0f, 0.0f, 0.0f);
-	*/
+
 
 
 	text *pText = AddText(L"Arial.fnt", "Hello world", 1.0f, true);
@@ -129,10 +126,15 @@ RESULT DreamGarage::LoadScene() {
 //	pText->SetBillboard(true);
 
 	text *pText2 = AddText(L"Arial.fnt", "Hello world", 0.1f, true);
-	pText2->MoveTo(5.0f, 5.0f, 0.0f);
+	//pText2->MoveTo(5.0f, 5.0f, 0.0f);
+	pText2->SetPosition(point(5.0f, 5.0f, 0.0f));
 //	pText2->RotateYByDeg(360.0f);
 //	pText2->RotateXByDeg(180.0f);
-	pText2->SetBillboard(true);
+//	pText2->SetBillboard(true);
+
+	// one arg?
+	volume *pVolume = AddVolume(0.5f, 0.5f, 0.5f);
+	pVolume->MoveTo(pText2->GetOrigin());
 
 	///*
 	// TODO: All this should go into Model

@@ -95,12 +95,17 @@ public:
 		m_pUniformModelMatrix->SetUniform(matModel);
 
 		m_pUniformObjectCenter->SetUniform(pDimObj->GetOrigin());
+//		m_pUniformObjectOrigin->SetUniform(pDimObj->GetOrigin());
+
 		text *pText = dynamic_cast<text *>(pDimObj);
 		quad *pQuad = dynamic_cast<quad *>(pDimObj);
-//		bool canBillboard = pText != nullptr || pQuad != nullptr;
-//		m_pUniformfBillboard->SetUniform(pQuad && pQuad->IsBillboard());
 		if (pText != nullptr)
+		{
 			m_pUniformfBillboard->SetUniform(pText && pText->IsBillboard());
+//			m_pUniformObjectCenter->SetUniform(pDimObj->GetOrigin() + point(pText->m_width*0.5f, pText->m_height*0.5f, 0.0f));
+		}
+		else if (pQuad != nullptr)
+			m_pUniformfBillboard->SetUniform(pQuad && pQuad->IsBillboard());
 		else
 			m_pUniformfBillboard->SetUniform(false);
 //		m_pUniformfScale->SetUniform(pQuad != nullptr && pQuad->IsScaledBillboard());
@@ -175,6 +180,7 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformDepthViewProjectionMatrix;
 
+	OGLUniformPoint *m_pUniformObjectOrigin;
 	OGLUniformPoint *m_pUniformObjectCenter;
 	OGLUniformPoint *m_pUniformEyePosition;
 
