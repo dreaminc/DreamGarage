@@ -2,7 +2,7 @@
 #define USER_FACTORY_H_
 
 #include "RESULT/EHM.h"
-#include "User.h"
+#include "UserController.h"
 #include "Core/Types/Factory.h"
 
 // DREAM OS
@@ -13,7 +13,7 @@
 
 class UserFactory : public Factory {
 public:
-	static User* MakeUser(version ver);
+	static UserController* MakeUserController(version ver);
 };
 
 #endif // ! USER_FACTORY_H_

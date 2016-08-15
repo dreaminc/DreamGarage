@@ -11,79 +11,32 @@
 
 #include "CloudImp.h"
 #include "User/UserFactory.h"
+#include "Environment/EnvironmentController.h"
 #include <memory>
 
 class CloudController {
 public:
-	CloudController() :
-		m_pCloudImp(nullptr),
-		m_pUserController(nullptr)
-	{
-		// empty
-	}
+	CloudController();
+	~CloudController();
 
-	~CloudController() {
-		// empty 
-	}
+	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
-	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp) {
-		RESULT r = R_PASS;
+	RESULT InitializeUser(version ver = 1.0f);
 
-		m_pCloudImp = std::move(pCloudImp);
-		CN(m_pCloudImp);
+	RESULT InitializeEnvironment(long environmentID = -1);
 
-	Error:
-		return r;
-	}
+	RESULT CreateNewURLRequest(std::wstring& strURL);
 
-	RESULT InitializeUser(version ver = 1.0f) {
-		RESULT r = R_PASS;
+	RESULT LoginUser();
 
-		m_pUserController = std::unique_ptr<User>(UserFactory::MakeUser(ver));
-		CN(m_pUserController);
-
-	Error:
-		return r;
-	}
-
-	RESULT CreateNewURLRequest(std::wstring& strURL) {
-		RESULT r = R_PASS;
-
-		CNM(m_pCloudImp, "Cloud Imp not initialized");
-		CRM(m_pCloudImp->CreateNewURLRequest(strURL), "Failed to create CEF URL request for %S", strURL.c_str());
-
-	Error:
-		return r;
-	}
-
-	RESULT LoginUser() {
-		RESULT r = R_PASS;
-
-		std::string strUsername = "dream@dreamos.com";
-		std::string strPassword = "dreamy";
-
-		// TODO: command line / config file - right now hard coded
-		CN(m_pUserController);
-		CR(m_pUserController->Login(strUsername, strPassword));
-
-	Error:
-		return r;
-	}
-
-	RESULT Update() {
-		RESULT r = R_PASS;
-
-		CR(m_pCloudImp->Update());
-
-	Error:
-		return r;
-	}
+	RESULT Update();
 
 private:
 	UID m_uid;
 	std::unique_ptr<CloudImp> m_pCloudImp;
 
-	std::unique_ptr<User> m_pUserController;
+	std::unique_ptr<UserController> m_pUserController;
+	std::unique_ptr<EnvironmentController> m_pEnvironmentController;
 };
 
 #endif

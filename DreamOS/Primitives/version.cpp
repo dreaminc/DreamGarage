@@ -78,11 +78,11 @@ RESULT version::SetVersion(long lVer) {
 std::string version::GetString() {
 	std::string strRet = "";
 	
-	strRet += m_major;
+	strRet += std::to_string(m_major);
 	strRet += '.';
-	strRet += m_minor;
+	strRet += std::to_string(m_minor);
 	strRet += '.';
-	strRet += m_doubleminor;
+	strRet += std::to_string(m_doubleminor);
 
 	return strRet;
 }

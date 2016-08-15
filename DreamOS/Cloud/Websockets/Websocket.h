@@ -1,4 +1,11 @@
-#pragma once
+#ifndef WEBSOCKET_H_
+#define WEBSOCKET_H_
+
+#include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/Cloud/Websockets/Websocket.h
+// The Websocket wrapper for Websocket++
 
 #include <string>
 #include <vector>
@@ -17,7 +24,7 @@
 #include <websocketpp/config/asio_no_tls_client.hpp>
 #include <websocketpp/client.hpp>
 
-typedef websocketpp::client<websocketpp::config::asio_client> client;
+typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
@@ -27,32 +34,36 @@ using websocketpp::lib::bind;
 // pull out the type of messages sent by our config
 typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
-class Websocket
-{
+class Websocket {
 public:
-	typedef std::function<void(client*, websocketpp::connection_hdl, message_ptr)> Callback;
+	typedef std::function<void(WebsocketClient*, websocketpp::connection_hdl, message_ptr)> WebsocketCallback;
 
-	Websocket(const std::string& uri, const Callback& callback);
-	Websocket(const std::string& uri);
+	Websocket(const std::string& strURI, const WebsocketCallback& fnWebsocketCallback);
+	Websocket(const std::string& strURI);
 	~Websocket();
 
-	void Send(const std::string& message);
+	RESULT Send(const std::string& strMessage);
+	RESULT Start();
+	RESULT Stop();
 
-	void Start();
-	void Stop();
+	RESULT SetToken(std::string& strToken);
 
 private:
-	void ProcessingThread();
-
-	void OnMessage(client* c, websocketpp::connection_hdl hdl, message_ptr msg);
+	RESULT ProcessingThread();
+	void OnMessage(WebsocketClient* pWebsicketClient, websocketpp::connection_hdl hWebsocketConnection, message_ptr pWebsocketMessage);
 
 private:
 	std::thread	m_thread;
-	bool	m_isRunning;
+	bool m_fRunning;
 
-	const std::string m_uri;
-	Callback m_callback;
+	const std::string m_strURI;
+	WebsocketCallback m_fnWebsocketCallback;
 
-	client::connection_ptr m_connection;
-	client m_client;
+	WebsocketClient::connection_ptr m_pWebsocketConnection;
+	WebsocketClient m_websocketClient;
+
+	// TODO: This is repeated
+	std::string	m_strToken;
 };
+
+#endif	// !WEBSOCKET_H_

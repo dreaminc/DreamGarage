@@ -1,13 +1,13 @@
 #include "UserFactory.h"
-#include "User.h"
+#include "UserController.h"
 
 #include <memory>
 
-User* UserFactory::MakeUser(version ver) {
+UserController* UserFactory::MakeUserController(version ver) {
 	RESULT r = R_PASS;
-	User *pUser = nullptr;
+	UserController *pUser = nullptr;
 
-	pUser = new User();
+	pUser = new UserController();
 	CN(pUser);
 
 	//Success:

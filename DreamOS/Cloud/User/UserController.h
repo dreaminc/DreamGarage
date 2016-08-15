@@ -4,8 +4,8 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Dimension/Cloud/Objects/User.h
-// Base User object
+// DreamOS/Dimension/Cloud/User/UserController.h
+// The User Controller 
 
 #include <string>
 #include "User.h"
@@ -30,6 +30,14 @@ public:
 //private:
 public:
 	RESULT Login(std::string& strUsername, std::string& strPassword);
+
+	long GetUserDefaultEnvironmentID() {
+		return m_user.GetDefaultEnvironmentID();
+	}
+
+	User GetUser() {
+		return m_user;
+	}
 
 private:
 	bool m_fLoggedIn = false;

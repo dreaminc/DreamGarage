@@ -69,6 +69,7 @@ public:
 	RESULT UnregisterUpdateCallback();
 
 protected:
+	// TODO: Move to unique_ptr
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	SceneGraph *m_pSceneGraph;

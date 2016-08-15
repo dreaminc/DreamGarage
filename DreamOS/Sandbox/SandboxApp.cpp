@@ -12,7 +12,20 @@ SandboxApp::SandboxApp() :
 }
 
 SandboxApp::~SandboxApp() {
-	// empty stub
+	if (m_pCloudController != nullptr) {
+		delete m_pCloudController;
+		m_pCloudController = nullptr;
+	}
+
+	if (m_pHALImp != nullptr) {
+		delete m_pHALImp;
+		m_pHALImp = nullptr;
+	}
+
+	if (m_pOpenGLRenderingContext != nullptr) {
+		delete m_pOpenGLRenderingContext;
+		m_pOpenGLRenderingContext = nullptr;
+	}
 }
 
 inline PathManager * SandboxApp::GetPathManager() {

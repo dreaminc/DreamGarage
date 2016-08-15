@@ -21,7 +21,7 @@ UserController::UserController() :
 
 
 UserController::~UserController() {
-	// empty
+	// 
 }
 
 RESULT UserController::Login(std::string& strUsername, std::string& strPassword) {
@@ -34,6 +34,7 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 
 	HTTPController *pHTTPController = HTTPController::instance();
 
+	// TODO: Not hard coded!
 	CRM(pHTTPController->POST("http://localhost:8000/token/", HTTPController::ContentHttp(), strHTTPRequest, httpResponse), "User login failed to post request");
 	
 	strResponse = std::string(httpResponse.PullResponse());
@@ -168,6 +169,8 @@ RESULT UserController::LoadProfile() {
 			jsonResponse["/data/last_name"_json_pointer].get<std::string>(),
 			version(1.0f)	// version
 		);
+
+		m_user.SetToken(m_strToken);
 
 		DEBUG_LINEOUT("User Profile Loaded");
 		m_user.PrintUser();

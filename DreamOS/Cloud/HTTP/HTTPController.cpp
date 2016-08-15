@@ -73,6 +73,9 @@ void HTTPController::ProcessingThread() {
 			} break;
 		}
 	}
+
+	DEBUG_LINEOUT("HTTP Thread Exit");
+
 }
 
 RESULT HTTPController::Start() {
@@ -84,7 +87,6 @@ RESULT HTTPController::Start() {
 	CNM(m_pCURLMultiHandle, "Failed to initialzie CURL multi handle");
 
 	m_CURLMultiHandleCount = 0;
-
 	m_thread = std::thread(&HTTPController::ProcessingThread, this);
 
 Error:
@@ -104,7 +106,7 @@ RESULT HTTPController::Stop() {
 	CB((cmc == CURLM_OK), "CURL failed to clean up multi handle");
 
 	curl_global_cleanup();
-
+	
 Error:
 	return r;
 }
@@ -178,12 +180,20 @@ RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::st
 RESULT HTTPController::GET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse& httpResponse) {
 	RESULT r = R_PASS;
 
-	std::promise<std::string> strPromise;
-	std::future<std::string> strFuture = strPromise.get_future();
+	std::promise<std::string> httpPromise;
+	std::future<std::string> httpFuture = httpPromise.get_future();
 
-	CR(AGET(strURI, strHeaders, [&](std::string&& in) {strPromise.set_value(in); }));
+	CR(AGET(strURI, strHeaders, [&](std::string&& in) {httpPromise.set_value(in); }));
 
-	httpResponse.PutResponse(strFuture.get());
+	{
+		// Future Timeout
+		std::chrono::system_clock::time_point httpTimeout = std::chrono::system_clock::now() + std::chrono::seconds(HTTP_DELAY_SECONDS);
+		std::future_status statusFuture = httpFuture.wait_until(httpTimeout);
+
+		CBM((statusFuture == std::future_status::ready), "POST future timed out");
+	}
+
+	httpResponse.PutResponse(httpFuture.get());
 
 Error:
 	return r;

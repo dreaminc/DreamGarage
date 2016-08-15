@@ -144,6 +144,9 @@
     <Filter Include="Cloud\Websockets">
       <UniqueIdentifier>{dbdd8c80-c654-40a5-94ca-e83096da4b22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cloud\Environment">
+      <UniqueIdentifier>{8f3dd62d-3f99-4e45-bf9a-5adc56e8a76f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -317,9 +320,6 @@
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\User\User.cpp">
-      <Filter>Cloud\User</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp">
       <Filter>Cloud\User</Filter>
     </ClCompile>
@@ -328,6 +328,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp">
       <Filter>Cloud\Websockets</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\User\UserController.cpp">
+      <Filter>Cloud\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp">
+      <Filter>Cloud\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\CloudController.cpp">
+      <Filter>Cloud</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1828,9 +1837,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\User\User.h">
-      <Filter>Cloud\User</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h">
       <Filter>Cloud\User</Filter>
     </ClInclude>
@@ -1845,6 +1851,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequest.h">
       <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\User\UserController.h">
+      <Filter>Cloud\User</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\User\User.h">
+      <Filter>Cloud\User</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h">
+      <Filter>Cloud\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\Environment.h">
+      <Filter>Cloud\Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
