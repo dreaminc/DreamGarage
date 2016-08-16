@@ -10,24 +10,26 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	pCloudController = new CloudController();
 	CN(pCloudController);
 
-	switch (type) {
-		case CLOUD_CONTROLLER_CEF: {
-			// Create the CEF implementation			
-			std::unique_ptr<CEFImp> pCEFImp(new CEFImp());
-			CN(pContext);
+	// Initialize the User Object
+	CR(pCloudController->InitializeUser());
 
-			HINSTANCE hInstance = reinterpret_cast<HINSTANCE>(pContext);
-			pCEFImp->CEFInitialize(hInstance);
+	// TODO: Non-exclusive for clopudimp
+	if(type & CLOUD_CONTROLLER_CEF) {
 
-			pCloudController->SetCloudImp(std::move(pCEFImp));
+		// Create the CEF implementation			
+		std::unique_ptr<CEFImp> pCEFImp(new CEFImp());
+		CN(pContext);
 
-		} break;
+		HINSTANCE hInstance = reinterpret_cast<HINSTANCE>(pContext);
+		pCEFImp->CEFInitialize(hInstance);
 
-		default: {
-			pCloudController = nullptr;
-			DEBUG_LINEOUT("Sandbox type %d not supported on this platform!", type);
-		} break;
-	}
+		pCloudController->SetCloudImp(std::move(pCEFImp));
+	} 
+
+	// TODO: Add initialization here
+	//CLOUD_CONTROLLER_WEBRTC = (1u << 1),
+	//CLOUD_CONTROLLER_WEBSOCKET = (1u << 2),
+	//CLOUD_CONTROLLER_CURL = (1u << 3),
 
 //Success:
 	return pCloudController;

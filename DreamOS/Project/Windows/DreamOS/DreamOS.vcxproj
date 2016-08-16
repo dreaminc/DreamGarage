@@ -107,9 +107,9 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;_SCL_SECURE_NO_WARNINGS;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(LEAPMOTIONPATH)\include\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(OPENVRPATH)\headers\;$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(LEAPMOTIONPATH)\include\;$(OPENVRPATH)\headers\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
@@ -120,10 +120,12 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;$(LEAPMOTIONPATH)\lib\x64\Leap.lib;$(OPENVRPATH)\lib\win64\openvr_api.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\libcurl_imp.lib;$(LEAPMOTIONPATH)\lib\x64\Leap.lib;$(OPENVRPATH)\lib\win64\openvr_api.lib;%(AdditionalDependencies)</AdditionalDependencies>      
     </Link>
     <PostBuildEvent>
 		<Command>
+			xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+			xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
 			xcopy /y "$(CEFPATH)\Debug\*" "$(TargetDir)" /D
 			xcopy /y "$(CEFPATH)\Resources\*" "$(TargetDir)" /D
 			xcopy /y "$(CEFPATH)\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
@@ -161,22 +163,34 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <TreatWarningAsError>true</TreatWarningAsError>
+	  <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+	  <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Release\libcef_dll_wrapper.lib;$(CEFPATH)\Release\libcef.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Release\libcef_dll_wrapper.lib;$(CEFPATH)\Release\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>
+		xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+		xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+	  </Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
+    <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
@@ -246,6 +260,16 @@
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\Environment.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPController.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequest.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPResponse.h" />
+    <ClInclude Include="..\..\..\Cloud\User\User.h" />
+    <ClInclude Include="..\..\..\Cloud\User\UserController.h" />
+    <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
+    <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
