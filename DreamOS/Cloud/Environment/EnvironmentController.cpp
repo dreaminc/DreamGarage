@@ -224,19 +224,32 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 			} break;
 
-			case state::ENVIRONMENT_CONNECTED_AND_READY: {
-				// TODO: Handle the message here - depending on the type
-			} break;
+			
 		}
 	}
 	else {
-		// Error
+		switch (m_state) {
+			case state::ENVIRONMENT_CONNECTED_AND_READY: {
+				// TODO: Message type not implemented
+				DEBUG_LINEOUT("New Environment Peer Connected");
+
+				nlohmann::json jsonPeer = jsonCloudResponse["/data"_json_pointer];
+
+				long userID = jsonPeer["/user"_json_pointer].get<long>();
+				long environmentID = jsonPeer["/environment"_json_pointer].get<long>();
+
+				std::string strSDPOffer = jsonPeer["/sdp_offer"_json_pointer].get<std::string>();
+
+				AddNewPeer(userID, environmentID, strSDPOffer);
+
+				PrintEnvironmentPeerList();
+
+				// TODO: Attempt to connect here
+
+				m_state = state::ENVIRONMENT_CONNECTED_AND_READY;
+			} break;
+		}
 	}
-
-	// Handle message
-
-
-
 }
 
 void EnvironmentController::HandleWebsocketConnectionOpen() {
