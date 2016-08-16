@@ -1,6 +1,7 @@
 #include "UserController.h"
 
 #include "Cloud/HTTP/HTTPController.h"
+#include "Sandbox/CommandLineManager.h"
 #include "json.hpp"
 
 #include <fstream>
@@ -24,6 +25,25 @@ UserController::~UserController() {
 	// 
 }
 
+std::string UserController::GetMethodURI(UserMethod userMethod) {
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	std::string strURI = "";
+	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
+	std::string strIP = pCommandLineManager->GetParameterValue("ip");
+
+	switch (userMethod) {
+		case UserMethod::LOGIN: {
+			strURI = "http://" + strIP + ":" + std::to_string(port) + "/token/";
+		} break;
+
+		case UserMethod::LOAD_PROFILE: {	
+			strURI = "http://" + strIP + ":" + std::to_string(port) + "/user/";
+		} break;
+	}
+
+	return strURI;
+}
+
 RESULT UserController::Login(std::string& strUsername, std::string& strPassword) {
 	RESULT r = R_PASS;
 
@@ -31,11 +51,12 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 	HTTPResponse httpResponse;
 	nlohmann::json jsonResponse;
 	std::string strResponse;
+	std::string strURI = GetMethodURI(UserMethod::LOGIN);
 
 	HTTPController *pHTTPController = HTTPController::instance();
 
 	// TODO: Not hard coded!
-	CRM(pHTTPController->POST("http://localhost:8000/token/", HTTPController::ContentHttp(), strHTTPRequest, httpResponse), "User login failed to post request");
+	CRM(pHTTPController->POST(strURI, HTTPController::ContentHttp(), strHTTPRequest, httpResponse), "User login failed to post request");
 	
 	strResponse = std::string(httpResponse.PullResponse());
 	strResponse = strResponse.substr(0, strResponse.find('\r'));
@@ -147,12 +168,13 @@ RESULT UserController::LoadProfile() {
 	{
 		HTTPResponse httpResponse;
 		std::string strAuthorizationToken = "Authorization: Token " + m_strToken;
+		std::string strURI = GetMethodURI(UserMethod::LOAD_PROFILE);
 		HTTPController *pHTTPController = HTTPController::instance();
 
 		auto headers = HTTPController::ContentAcceptJson();
 		headers.push_back(strAuthorizationToken);
 
-		CBM((pHTTPController->GET("http://localhost:8000/user/", headers, httpResponse)), "User LoadProfile failed to post request");
+		CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadProfile failed to post request");
 
 		DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
 

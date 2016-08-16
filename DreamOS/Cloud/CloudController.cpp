@@ -1,6 +1,7 @@
 #include "CloudController.h"
 
 #include "Cloud/HTTP/HTTPController.h"
+#include "Sandbox/CommandLineManager.h"
 
 CloudController::CloudController() :
 	m_pCloudImp(nullptr),
@@ -64,8 +65,11 @@ Error:
 RESULT CloudController::LoginUser() {
 	RESULT r = R_PASS;
 
-	std::string strUsername = "dream@dreamos.com";
-	std::string strPassword = "dreamy";
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
+	std::string strURI = pCommandLineManager->GetParameterValue("ip");
+	std::string strUsername = pCommandLineManager->GetParameterValue("username");
+	std::string strPassword = pCommandLineManager->GetParameterValue("password");
 
 	// TODO: command line / config file - right now hard coded
 	CN(m_pUserController);

@@ -3,7 +3,7 @@
 #include "CEFImp.h"
 #include "webrtc/WebRTCImp.h"
 
-#include "Sandbox/CommandLineManager.h"
+
 
 #include <memory>
 
@@ -17,7 +17,9 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	// Initialize the User Object
 	CR(pCloudController->InitializeUser());
 
-	// TODO: Non-exclusive for clopudimp
+	// TODO: Create a collection of cloud implementations
+	// or the various ones that can be used
+
 	if(type & CLOUD_CONTROLLER_CEF) {
 
 		// Create the CEF implementation			
@@ -37,7 +39,9 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 		CR(pWebRTCImp->Initialize());
 
 		// TOOD: TEST CODE:
-		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		
+
+		/*
 		if (pCommandLineManager->GetNumCommandLineArguments() < 2) {
 			pWebRTCImp->StartLogin("localhost", 8888);
 		}
@@ -45,6 +49,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 			std::string strIPAddress = pCommandLineManager->GetCommandLineArgument(1);
 			pWebRTCImp->StartLogin(strIPAddress, 8888);
 		}
+		*/
 
 		pCloudController->SetCloudImp(std::move(pWebRTCImp));
 	} 

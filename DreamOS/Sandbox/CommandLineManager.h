@@ -25,8 +25,24 @@ public:
 	int GetNumCommandLineArguments();
 	bool CommandLineArgumentFound(std::string strCommandLineArgument);
 
+	struct RegisteredParameter {
+		std::string m_strParamName;
+		std::string m_strParamTag;
+		std::string m_strDefaultValue;
+
+		bool m_fValueSet;
+		std::string m_strParamValue;
+	};
+
+	RESULT RegisterParameter(std::string strParamName, std::string strParamTag, std::string strDefaultValue);
+	RESULT SetParameterValue(std::string strParamName, std::string strParamValue);
+	std::string GetParameterValue(std::string strParamName);
+
 private:
 	std::vector<std::string> m_strCommandLineArguments;
+	
+	std::map<std::string, RegisteredParameter> m_mapRegisteredParams;	// This holds the registered params
+	
 	UID m_uid;
 
 	// TODO: Replace with Singleton pattern / manager

@@ -13,6 +13,13 @@
 // TODO: This is actually a UserController - so change the name of object and file
 class UserController {
 public:
+	enum class UserMethod {
+		LOGIN,
+		LOAD_PROFILE,
+		INVALID
+	};
+
+public:
 	UserController();
 	~UserController();
 
@@ -25,6 +32,9 @@ public:
 	
 	// Loads the user profile using the token
 	RESULT LoadProfile();
+
+private:
+	std::string GetMethodURI(UserMethod userMethod);
 
 // TODO: Move to private when CommandLineManager is brought in from WebRTC branch
 //private:
