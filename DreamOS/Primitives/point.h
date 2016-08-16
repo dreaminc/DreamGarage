@@ -3,6 +3,8 @@
 
 #include "RESULT/EHM.h"
 
+#include <string>
+
 // DREAM OS
 // DreamOS/Dimension/Primitives/point.h
 // Point Primitive Object derived from matrix
@@ -59,6 +61,26 @@ public:
 		// empty
 	}
 
+	RESULT SetZeroW() {
+		this->element(3, 0) = 1.0f;
+		return R_PASS;
+	}
+
+	RESULT Reverse() {
+		
+		x() = -x();
+		y() = -y(); 
+		z() = -z();
+
+		return R_PASS;
+	}
+
+	bool IsZero() {
+		if ((x() != 0) || (y() != 0) || (z() != 0))
+			return false;
+		return true;
+	}
+
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline point_precision &x() { return this->element(0, 0); }
 	inline point_precision &y() { return this->element(1, 0); }
@@ -97,6 +119,30 @@ public:
 	RESULT translate(matrix <point_precision, 4, 1> v) {
 		(*this).operator+=((matrix <point_precision, 4, 1>&)v);
 		return R_PASS;
+	}
+
+	RESULT Print() {
+		DEBUG_LINEOUT("pt(%f, %f, %f, %f)", x(), y(), z(), w());
+		return R_PASS;
+	}
+	
+	std::string toString(bool fW = false) {
+		std::string strRet = "(";
+
+		strRet += std::to_string(x()); 
+		strRet += ",";
+		strRet += std::to_string(y());
+		strRet += ",";
+		strRet += std::to_string(z());
+
+		if (fW) {
+			strRet += ",";
+			strRet += std::to_string(w());
+		}
+
+		strRet += ")";
+
+		return strRet;
 	}
 
 	// Subtracting points results in vector

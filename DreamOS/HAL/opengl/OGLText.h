@@ -21,8 +21,8 @@ protected:
 
 public:
 
-	OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& text) :
-		text(pFont, text),
+	OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& text = "", double size = 1.0f, bool isBillboard = false) :
+		text(pFont, text, size, isBillboard),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
@@ -41,6 +41,13 @@ public:
 	OGLText* SetText(const std::string& text, double size = 1.0)
 	{
 		text::SetText(text, size);
+
+		// TODO: need to be able to deal with changing vertex amounts automatically
+		if (CheckAndCleanDirty())
+		{
+			ReleaseOGLBuffers();
+			OGLInitialize();
+		}
 
 		SetDirty();
 

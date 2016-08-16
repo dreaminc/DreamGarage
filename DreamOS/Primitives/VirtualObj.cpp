@@ -29,6 +29,10 @@ point VirtualObj::GetOrigin() {
 	return m_ptOrigin;
 }
 
+point VirtualObj::GetPosition() {
+	return m_ptOrigin;
+}
+
 VirtualObj* VirtualObj::translate(matrix <point_precision, 4, 1> v) {
 	m_ptOrigin.translate(v);
 	return this;
@@ -54,6 +58,11 @@ VirtualObj* VirtualObj::translateZ(point_precision z) {
 	return this;
 }
 
+VirtualObj* VirtualObj::SetPosition(point p) {
+	m_ptOrigin = p;
+	return this;
+}
+
 VirtualObj* VirtualObj::MoveTo(point p) {
 	m_ptOrigin = p;
 	return this;
@@ -70,6 +79,17 @@ VirtualObj* VirtualObj::MoveTo(point_precision x, point_precision y, point_preci
 	m_ptOrigin.z() = z;
 
 	return this;
+}
+
+// Pivot Point
+RESULT VirtualObj::SetPivotPoint(point ptPivot) {
+	m_ptPivot = ptPivot;
+	return R_PASS;
+}
+
+RESULT VirtualObj::SetPivotPoint(point_precision x, point_precision y, point_precision z) {
+	m_ptPivot = point(x, y, z);
+	return R_PASS;
 }
 
 // Velocity
@@ -252,7 +272,17 @@ VirtualObj* VirtualObj::Update() {
 }
 
 // Matrix Functions
-matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix() {
-	matrix<virtual_precision, 4, 4> retMatrix = TranslationMatrix(m_ptOrigin) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z());
-	return retMatrix;
+
+// TODO: Fix naming on scaling matrix + add vector function
+matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	return (TranslationMatrix(m_ptOrigin, m_ptPivot) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()) * childMat);
+	//return (TranslationMatrix(m_ptOrigin, m_ptPivot) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()));
+	/*
+	if (m_ptPivot.IsZero()) {
+		return (TranslationMatrix(m_ptOrigin) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()) * childMat);
+	}
+	else {
+		return (TranslationMatrix(m_ptOrigin, m_ptPivot) * RotationMatrix(m_qRotation) * ScalingMatrix(m_vScale.x(), m_vScale.y(), m_vScale.z()) * childMat);
+	}
+	*/
 }

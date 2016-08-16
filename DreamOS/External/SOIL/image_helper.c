@@ -1,3 +1,7 @@
+#pragma warning(push)
+// ignore conversion warnings encountered in this file
+#pragma warning(disable : 4244)
+
 /*
     Jonathan Dummer
 
@@ -433,3 +437,5 @@ RGBE_to_RGBdivA2
 	}
 	return 1;
 }
+
+#pragma warning(pop)

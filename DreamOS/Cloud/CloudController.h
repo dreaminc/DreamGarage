@@ -10,33 +10,30 @@
 // The base DreamCloud controller 
 
 #include "CloudImp.h"
+#include "User/UserFactory.h"
+#include "Environment/EnvironmentController.h"
 #include <memory>
 
 class CloudController {
 public:
-	CloudController() :
-		m_pCloudImp(nullptr)
-	{
-		// empty
-	}
+	CloudController();
+	~CloudController();
 
-	~CloudController() {
-		// empty 
-	}
+	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
-	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp) {
+	RESULT InitializeUser(version ver = 1.0f);
+
+	RESULT InitializeEnvironment(long environmentID = -1);
+
+	RESULT CreateNewURLRequest(std::wstring& strURL);
+
+	RESULT LoginUser();
+	
+	RESULT Update();
+
+RESULT CreateNewURLRequest(std::wstring& strURL) {
 		RESULT r = R_PASS;
-
-		m_pCloudImp = std::move(pCloudImp);
-		CN(m_pCloudImp);
-
-	Error:
-		return r;
-	}
-
-	RESULT CreateNewURLRequest(std::wstring& strURL) {
-		RESULT r = R_PASS;
-
+		
 		CNM(m_pCloudImp, "Cloud Imp not initialized");
 		CRM(m_pCloudImp->CreateNewURLRequest(strURL), "Failed to create CEF URL request for %S", strURL.c_str());
 
@@ -75,6 +72,7 @@ public:
 		return fnUIThreadCallback(msgID, data);
 	}
 
+	/* Moved to CPP
 	RESULT Update() {
 		RESULT r = R_PASS;
 
@@ -83,10 +81,14 @@ public:
 	Error:
 		return r;
 	}
+	*/
 
 private:
 	UID m_uid;
 	std::unique_ptr<CloudImp> m_pCloudImp;
+
+	std::unique_ptr<UserController> m_pUserController;
+	std::unique_ptr<EnvironmentController> m_pEnvironmentController;
 };
 
 #endif

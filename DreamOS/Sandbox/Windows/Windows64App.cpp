@@ -21,6 +21,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pHMD(nullptr),
 	m_ThreadID(0),
 	m_fnUIThreadCallback(nullptr)
+	m_pSenseLeapMotion(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -88,6 +89,10 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pWin64Mouse->CaptureMouse();
 	m_pWin64Mouse->CenterMousePosition();
 
+	// Sense Leap Motion Device (TODO: temporarily here!)
+	m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
+	CN(m_pSenseLeapMotion);
+
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
 	// Initialize Time Manager
@@ -132,7 +137,9 @@ RESULT Windows64App::InitializeCloudController() {
 
 	// Set up the Cloud Controller
 	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
+
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 	
 	CR(RegisterUIThreadCallback(m_pCloudController->GetUIThreadCallback()));
@@ -309,6 +316,9 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 		// Update the Keyboard in WndProc rather than in the run loop
 		// TODO: This should be different arch for native
 		case WM_KEYDOWN: {
+			
+			// TODO: Clean this up / remove it eventually
+			
 			// DEBUG: Bypass for connect to cloud
 			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('C')) {
 				if (m_pCloudController != nullptr) {
@@ -320,6 +330,12 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
 					m_pCloudController->SendMessageToPeer(NULL, std::string("hi"));
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->LoginUser();
 				}
 			}
 
@@ -366,6 +382,9 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
 	}
 
+	CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
+	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
+
 Error:
 	return r;
 }
@@ -383,6 +402,7 @@ Error:
 	return r;
 }
 
+
 RESULT Windows64App::RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> fnUIThreadCallback) {
 	RESULT r = R_PASS;
 
@@ -399,6 +419,59 @@ RESULT Windows64App::UnregisterUIThreadCallback() {
 	CN(m_fnUIThreadCallback);
 	m_fnUIThreadCallback = nullptr;
 
+	Error:
+	return r;
+}
+
+// temp
+#include "HAL/opengl/OGLHand.h"
+
+// TODO: shouldn't be this way ultimately 
+RESULT Windows64App::RegisterImpLeapMotionEvents() {
+	RESULT r = R_PASS;
+
+	//CR(m_pSenseLeapMotion->RegisterSubscriber(SENSE_LEAPMOTION_EVENT_HAND_LEFT, m_pHALImp));
+
+	//volume *pLeapObj = AddVolume(1.0f, 1.0f, 0.25f);
+	//CR(m_pSenseLeapMotion->AttachVirtualObj(pLeapObj));
+
+	/*
+	composite *pHMDFrameOfReference = new OGLComposite(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	AddObject(pHMDFrameOfReference);
+	//*/
+
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	
+	/*
+	if (m_pHMD != nullptr) {
+		std::shared_ptr<DimObj> pLeftHandShaderPtr(pLeftHand);
+		m_pHALImp->GetCamera()->AddObject(pLeftHandShaderPtr);
+
+		std::shared_ptr<DimObj> pRightHandShaderPtr(pRightHand);
+		m_pHALImp->GetCamera()->AddObject(pRightHandShaderPtr);
+	}
+	else {
+		AddObject(pLeftHand);
+		AddObject(pRightHand);
+	}
+	*/
+
+	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
+
+	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
+
+	/*
+	sphere *pSphere = MakeSphere(1.0f, 10, 10);
+	pSphere->MoveTo(0.0f, 0.0f, -5.0f);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj>(pSphere));
+	//*/
+
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
+
 Error:
 	return r;
 }
@@ -406,17 +479,22 @@ Error:
 RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
 
+	// TODO: remove
+	std::shared_ptr<DimObj> pSphere = nullptr;
+
 	// TODO: Use EHM for this
 	if (!m_hwndWindow) {
 		MessageBox(NULL, _T("Failed to create windows sandbox"), _T("Dream OS Sandbox"), NULL);
 		return R_FAIL;
 	}
 
+	/*
 	// TODO: Move to Sandbox function
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	*/
 
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
@@ -424,12 +502,38 @@ RESULT Windows64App::InitializeSandbox() {
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pHALImp, m_pxWidth, m_pxHeight);
+
+	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
 	}
 	//*/
+
+	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
+	m_pHALImp->GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
+	CRM(AddObject(pCameraFrameOfReferenceComposite), "Failed to add composite camera frame of reference");
+
+	/*
+	pSphere = std::shared_ptr<DimObj>(MakeSphere(0.25f, 30, 30, color(COLOR_RED)));
+	pSphere->SetPosition(point(0.0f, 0.0f, -1.0f));
+	pCameraFrameOfReferenceComposite->AddObject(pSphere);
+
+	sphere *pSphere2 = AddSphere(0.25f, 30, 30, color(COLOR_GREEN));
+	pSphere2->SetPosition(point(0.0f, 0.0f, 9.0f));
+	//*/
+
+	// TODO: Move to Sandbox function
+	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
+	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
+
+	// TODO: This will only turn on Leap if connected at boot up
+	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected()) {
+		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
+	}
+
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
@@ -483,6 +587,10 @@ RESULT Windows64App::Show() {
 		// TODO: Update Sense etc
 		//m_pWin64Mouse->UpdateMousePosition();
 
+		if (m_pHMD != nullptr) {
+			m_pHMD->UpdateHMD();
+		}
+
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
 
@@ -491,7 +599,6 @@ RESULT Windows64App::Show() {
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
 			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
 			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}
@@ -509,6 +616,7 @@ RESULT Windows64App::Show() {
 		else {
 			// Render Scene
 			m_pHALImp->Render(m_pSceneGraph);
+			//m_pHALImp->RenderStereo(m_pSceneGraph);
 		}
 		//*/
 	
@@ -566,3 +674,5 @@ RESULT Windows64App::RecoverDisplayMode() {
 
 	return r;
 }
+
+

@@ -53,13 +53,31 @@ public:
 
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
+
+	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
+	volume* MakeVolume(double width, double length, double height);
+	volume* MakeVolume(double side);
+	skybox *MakeSkybox();
+	model *MakeModel(wchar_t *pszModelName);
+
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
-	sphere* AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
+
+	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
+	volume* AddVolume(double width, double length, double height);
+
 	volume* AddVolume(double side);
+
+	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
+
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
+
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);
+	model *AddModel(const std::vector<vertex>& vertices);
+	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	RESULT AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
@@ -69,7 +87,10 @@ public:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
 
+	point GetCameraPosition();
+
 protected:
+	// TODO: Move to unique_ptr
 	CommandLineManager *m_pCommandLineManager;
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!

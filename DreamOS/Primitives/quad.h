@@ -63,6 +63,12 @@ protected:
 		return numIndices;
 	}
 
+	bool IsBillboard() { return m_fBillboard; }
+	void SetBillboard(bool billboard) { m_fBillboard = billboard; }
+
+	bool IsScaledBillboard() { return m_fScaledBillboard; }
+	void SetScaledBillboard(bool scale) { m_fScaledBillboard = scale; }
+
 private:
 	QUAD_TYPE m_quadType;
 
@@ -72,6 +78,8 @@ private:
 	texture *m_pTextureHeight;
 	double m_heightMapScale;
 
+	bool m_fBillboard = false;
+	bool m_fScaledBillboard = false;
 
 public:
 

@@ -16,6 +16,7 @@ out Data {
 } DataOut;
 
 uniform mat4 u_mat4Model;
+uniform mat4 u_mat4Projection;
 
 void main(void) {	
 	// UV Coordinate
@@ -24,6 +25,10 @@ void main(void) {
 	// Vert Color
 	DataOut.color = inV_vec4Color;
 
+	float xoffset = u_mat4Projection[2][0]*-1;
+	float yoffset = u_mat4Projection[2][1]*-1;
+
 	// Projected Vert Position
-	gl_Position = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
+	gl_Position = u_mat4Model * vec4(inV_vec4Position.x + xoffset, inV_vec4Position.y + yoffset, inV_vec4Position.z, 1.0f);
+	//gl_Position = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 }

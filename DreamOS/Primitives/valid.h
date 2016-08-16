@@ -10,8 +10,6 @@
 
 // Useful with the CV, CVM EHM
 
-#include "valid.h"
-
 class valid {
 private:
 	bool m_fValidated;

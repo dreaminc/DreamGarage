@@ -45,7 +45,7 @@ public:
 		return (numTriangleStripVerts * numStrips);
 	}
 
-	sphere(double radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, color c = color(COLOR_WHITE)) :
+	sphere(float radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, color c = color(COLOR_WHITE)) :
 		m_radius(radius),
 		m_numAngularDivisions(numAngularDivisions),
 		m_numVerticalDivisions(numVerticalDivisions)
@@ -66,8 +66,8 @@ public:
 
 		for (int i = 0; i < numStrips; i++) {
 			float effPsi = psiDiv * static_cast<float>(i);
-			point_precision sphereY = radius * cos(effPsi);
-			point_precision effRadius = radius * sin(effPsi);
+			point_precision sphereY = static_cast<float>(radius * cos(effPsi));
+			point_precision effRadius = static_cast<float>(radius * sin(effPsi));
 
 			for (int j = 0; j < numStripDivs; j++) {
 				float effTheta = thetaDiv * static_cast<float>(j);
