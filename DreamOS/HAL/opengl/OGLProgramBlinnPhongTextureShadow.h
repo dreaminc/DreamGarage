@@ -45,7 +45,15 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureChannels), std::string("u_intTextureChannels")));
-		
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformUseColorTexture), std::string("u_fUseColorTexture")));
+
+		// Billboard boolean uniforms
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfBillboard), std::string("u_fBillboard")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfScale), std::string("u_fScale")));
+
+		// Object position uniforms
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformObjectCenter), std::string("u_vec4ObjectCenter")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformEyePosition), std::string("u_vec4EyePosition")));
 
 		// Uniform Blocks
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
@@ -63,10 +71,16 @@ public:
 		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
 			pTexture->OGLActivateTexture();
 			m_pUniformTextureColor->SetUniform(pTexture);
-			m_pUniformTextureChannels->SetUniformInteger(pTexture->GetChannels());
+			int channels = pTexture->GetChannels();
+			m_pUniformUseColorTexture->SetUniform(true);
+			if (m_pUniformTextureChannels)
+				m_pUniformTextureChannels->SetUniformInteger(channels);
 		}
 		else {
-			m_pUniformTextureChannels->SetUniformInteger(0);
+			m_pUniformUseColorTexture->SetUniform(false);
+			
+			if (m_pUniformTextureChannels)
+				m_pUniformTextureChannels->SetUniformInteger(0);
 		}
 
 //	Error:
@@ -101,6 +115,21 @@ public:
 		auto matModel = pDimObj->GetModelMatrix();
 		m_pUniformModelMatrix->SetUniform(matModel);
 
+		m_pUniformObjectCenter->SetUniform(pDimObj->GetOrigin());
+
+		text *pText = dynamic_cast<text *>(pDimObj);
+		quad *pQuad = dynamic_cast<quad *>(pDimObj);
+		if (pText != nullptr)
+		{
+			m_pUniformfBillboard->SetUniform(pText && pText->IsBillboard());
+		}
+		else if (pQuad != nullptr) {
+			m_pUniformfBillboard->SetUniform(pQuad && pQuad->IsBillboard());
+			m_pUniformfScale->SetUniform(pQuad != nullptr && pQuad->IsScaledBillboard());
+		}
+		else
+			m_pUniformfBillboard->SetUniform(false);
+
 		return R_PASS;
 	}
 
@@ -125,6 +154,9 @@ public:
 			m_pUniformTextureDepth->SetUniform(1);
 		}
 
+		point origin = pCamera->GetOrigin();
+		m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
+
 		return R_PASS;
 	}
 
@@ -138,6 +170,9 @@ public:
 		//m_pUniformProjectionMatrix->SetUniform(matP);
 		//m_pUniformModelViewMatrix->SetUniform(matM)
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
+
+		point origin = pStereoCamera->GetOrigin();
+		m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
 
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
@@ -168,9 +203,18 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformDepthViewProjectionMatrix;
 
+	OGLUniformPoint *m_pUniformObjectCenter;
+	OGLUniformPoint *m_pUniformEyePosition;
+
+	// Booleans
+	OGLUniformBool *m_pUniformfBillboard;
+	OGLUniformBool *m_pUniformfScale;
+
 	OGLUniformSampler2D *m_pUniformTextureColor;
 	OGLUniformSampler2D *m_pUniformTextureDepth;
 	OGLUniform *m_pUniformTextureChannels;
+
+	OGLUniformBool *m_pUniformUseColorTexture;
 
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock;
