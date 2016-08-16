@@ -62,6 +62,16 @@ Error:
 	return r;
 }
 
+RESULT CloudController::AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) {
+	RESULT r = R_PASS;
+
+	CN(m_pCloudImp);
+	CR(m_pCloudImp->AddICECandidateFromSDPOfferStringJSON(strSDPOfferJSON));
+
+Error:
+	return r;
+}
+
 RESULT CloudController::LoginUser() {
 	RESULT r = R_PASS;
 

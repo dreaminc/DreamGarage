@@ -22,6 +22,7 @@
 const char kCandidateSdpMidName[] = "sdpMid";
 const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
 const char kCandidateSdpName[] = "candidate";
+const char kSDPName[] = "sdp";
 
 // Names used for a SessionDescription JSON object.
 const char kSessionDescriptionTypeName[] = "type";
@@ -90,6 +91,11 @@ void WebRTCConductor::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInter
 	// m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
 }
 
+// TODO: Move this to class
+static std::string s_strSDPCandidate = "";
+static std::string s_strSDPMediaID = "";
+static int s_SDPMediateLineIndex = 0;
+
 void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
 	DEBUG_LINEOUT("OnIceCandidate: %d", candidate->sdp_mline_index());
 	
@@ -104,18 +110,24 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 	Json::StyledWriter writer;
 	Json::Value jmessage;
 
-	jmessage[kCandidateSdpMidName] = candidate->sdp_mid();
-	jmessage[kCandidateSdpMlineIndexName] = candidate->sdp_mline_index();
-	std::string sdp;
+	s_strSDPMediaID = candidate->sdp_mid();
+	s_SDPMediateLineIndex = candidate->sdp_mline_index();
+
+	jmessage[kCandidateSdpMidName] = s_strSDPMediaID;
+	jmessage[kCandidateSdpMlineIndexName] = s_SDPMediateLineIndex;
+
+	//std::string strSDP;
 	
-	if (!candidate->ToString(&sdp)) {
+	if (!candidate->ToString(&s_strSDPCandidate)) {
 		LOG(LS_ERROR) << "Failed to serialize candidate";
 		return;
 	}
 
-	jmessage[kCandidateSdpName] = sdp;
+	jmessage[kCandidateSdpName] = s_strSDPCandidate;
 
 	//SendMessage(writer.write(jmessage));
+
+	// TODO: was doing this below
 	//SendMessageToPeer(&(writer.write(jmessage)), m_WebRTCPeerID);
 }
 
@@ -151,6 +163,9 @@ std::string WebRTCConductor::GetSDPJSONString() {
 
 	JSONMessage[kSessionDescriptionTypeName] = m_strSessionDescriptionType;
 	JSONMessage[kSessionDescriptionSdpName] = m_strSessionDescriptionProtocol;
+	JSONMessage[kCandidateSdpName] = s_strSDPCandidate;
+	JSONMessage[kCandidateSdpMidName] = s_strSDPMediaID;
+	JSONMessage[kCandidateSdpMlineIndexName] = s_SDPMediateLineIndex;
 
 	std::string strReturn = JSONWriter.write(JSONMessage);
 
@@ -734,6 +749,41 @@ void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& strMessag
 
 Error:
 	return;
+}
+
+RESULT WebRTCConductor::AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) {
+	RESULT r = R_PASS;
+
+	Json::Reader jsonReader;
+	Json::Value jsonMessage;
+	std::string strType;
+	std::string strJSONObject;
+	std::string strSDPMID;
+	int sdpMLineIndex = 0;
+	std::string strSDP;
+	std::string strSDPCandidate;
+
+	CBM((jsonReader.parse(strSDPOfferJSON, jsonMessage)), "Failed to parse SDP Offer Message");
+
+	CBM((rtc::GetStringFromJsonObject(jsonMessage, kSessionDescriptionTypeName, &strType)), "Failed to parse message");
+	CBM((rtc::GetStringFromJsonObject(jsonMessage, kCandidateSdpMidName, &strSDPMID)), "Failed to parse message");
+	CBM((rtc::GetIntFromJsonObject(jsonMessage, kCandidateSdpMlineIndexName, &sdpMLineIndex)), "Failed to parse message");
+	CBM((rtc::GetStringFromJsonObject(jsonMessage, kCandidateSdpName, &strSDPCandidate)), "Failed to parse message");
+	CBM((rtc::GetStringFromJsonObject(jsonMessage, kSDPName, &strSDP)), "Failed to parse message");
+	
+	{
+		webrtc::SdpParseError sdpError;
+		//std::unique_ptr<webrtc::IceCandidateInterface> candidate(webrtc::CreateIceCandidate(strSDPMID, sdpMLineIndex, strSDP, &sdpError));
+		std::unique_ptr<webrtc::IceCandidateInterface> candidate(webrtc::CreateIceCandidate(strSDPMID, sdpMLineIndex, strSDPCandidate, &sdpError));
+
+		CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
+		CBM((m_pWebRTCPeerConnection->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
+
+		DEBUG_LINEOUT(" Received candidate : %s", strSDPOfferJSON.c_str());
+	}
+
+Error:
+	return r;
 }
 
 void WebRTCConductor::OnMessageSent(int err) {

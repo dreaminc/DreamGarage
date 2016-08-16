@@ -228,26 +228,33 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		}
 	}
 	else {
-		switch (m_state) {
-			case state::ENVIRONMENT_CONNECTED_AND_READY: {
-				// TODO: Message type not implemented
-				DEBUG_LINEOUT("New Environment Peer Connected");
+		CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+		if (pParentCloudController != nullptr) {
+			switch (m_state) {
+				case state::ENVIRONMENT_CONNECTED_AND_READY: {
+					// TODO: Message type not implemented
+					DEBUG_LINEOUT("New Environment Peer Connected");
 
-				nlohmann::json jsonPeer = jsonCloudResponse["/data"_json_pointer];
+					nlohmann::json jsonPeer = jsonCloudResponse["/data"_json_pointer];
 
-				long userID = jsonPeer["/user"_json_pointer].get<long>();
-				long environmentID = jsonPeer["/environment"_json_pointer].get<long>();
+					long userID = jsonPeer["/user"_json_pointer].get<long>();
+					long environmentID = jsonPeer["/environment"_json_pointer].get<long>();
 
-				std::string strSDPOffer = jsonPeer["/sdp_offer"_json_pointer].get<std::string>();
+					std::string strSDPOffer = jsonPeer["/sdp_offer"_json_pointer].get<std::string>();
 
-				AddNewPeer(userID, environmentID, strSDPOffer);
+					AddNewPeer(userID, environmentID, strSDPOffer);
 
-				PrintEnvironmentPeerList();
+					PrintEnvironmentPeerList();
 
-				// TODO: Attempt to connect here
+					// TODO: Attempt to connect here
+					pParentCloudController->AddICECandidateFromSDPOfferStringJSON(strSDPOffer);
 
-				m_state = state::ENVIRONMENT_CONNECTED_AND_READY;
-			} break;
+					m_state = state::ENVIRONMENT_CONNECTED_AND_READY;
+				} break;
+			}
+		}
+		else {
+			DEBUG_LINEOUT("Cannot handle message, cloud controller not found");
 		}
 	}
 }

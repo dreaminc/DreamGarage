@@ -59,6 +59,7 @@ public:
 	static std::string GetPeerName();
 	virtual std::string GetSDPOfferString() override;
 	virtual RESULT InitializeConnection() override;
+	virtual RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) override;
 
 protected:
 	RESULT OnSignedIn();

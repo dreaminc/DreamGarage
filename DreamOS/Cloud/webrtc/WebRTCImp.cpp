@@ -99,8 +99,9 @@ Error:
 	return r;
 }
 
+// TODO: Data channel fucks it up
 RESULT WebRTCImp::InitializeConnection() {
-	return InitializePeerConnection(true);
+	return InitializePeerConnection(false);
 }
 
 RESULT WebRTCImp::InitializePeerConnection(bool fAddDataChannel) {
@@ -166,6 +167,16 @@ std::string WebRTCImp::GetSDPOfferString() {
 	else {
 		return std::string("");
 	}
+}
+
+RESULT WebRTCImp::AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+	CR(m_pWebRTCConductor->AddICECandidateFromSDPOfferStringJSON(strSDPOfferJSON));
+
+Error:
+	return r;
 }
 
 std::function<void(int msg_id, void* data)> WebRTCImp::GetUIThreadCallback() {

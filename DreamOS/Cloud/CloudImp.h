@@ -30,6 +30,7 @@ public:
 	virtual RESULT SendMessageToPeer(int peerID, std::string& strMessage) = 0;
 
 	virtual std::string GetSDPOfferString() { return std::string(""); };
+	virtual RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) { return R_NOT_IMPLEMENTED; };
 	virtual RESULT InitializeConnection() = 0;
 
 	// TODO: Add a handle URL request callback here

@@ -28,11 +28,13 @@ public:
 	RESULT LoginUser();
 	RESULT Update();
 
+	RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON);
 	std::string GetSDPOfferString();
 	RESULT InitializeConnection();
 
 	// TODO: This will attempt to connect to the first peer in the list, should make more robust
 	// and expose the available peer list at the CloudController layer
+	// TODO: CLEAN UP MIGHT NOT DO STUFF ANYMORE
 	RESULT ConnectToPeer(int peerID);
 
 	RESULT SendMessageToPeer(int peerID, std::string& strMessage);

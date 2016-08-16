@@ -45,6 +45,7 @@ public:
 	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
 	
 	RESULT SendDataChannel(std::string& strMessage);
+	RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON);
 
 protected:
 	// PeerConnectionObserver implementation.
