@@ -1864,6 +1864,9 @@
     <ClInclude Include="..\..\..\Cloud\Environment\Environment.h">
       <Filter>Cloud\Environment</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h">
+      <Filter>Cloud\Environment</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

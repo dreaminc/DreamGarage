@@ -246,6 +246,7 @@ xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Rel
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\Environment.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h" />
     <ClInclude Include="..\..\..\Cloud\HTTP\HTTPController.h" />
     <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequest.h" />
     <ClInclude Include="..\..\..\Cloud\HTTP\HTTPResponse.h" />

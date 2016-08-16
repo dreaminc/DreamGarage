@@ -22,7 +22,7 @@ public:
 	RESULT SetVersion(float fVer);
 	RESULT SetVersion(long lVer);
 
-	std::string GetString();
+	std::string GetString(bool fShowMinorMinor = false);
 
 private:
 	int m_major;

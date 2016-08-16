@@ -36,9 +36,31 @@ typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
 class Websocket {
 public:
-	typedef std::function<void(WebsocketClient*, websocketpp::connection_hdl, message_ptr)> WebsocketCallback;
+	// Websocket Side callbacks
+	typedef std::function<void(WebsocketClient*, websocketpp::connection_hdl, message_ptr)> OnWebsocketMessageCallback;
+	typedef std::function<void(websocketpp::connection_hdl)> OnWebsocketConnectionOpenCallback;
+	typedef std::function<void(websocketpp::connection_hdl)> OnWebsocketConnectionCloseCallback;
+	typedef std::function<void(websocketpp::connection_hdl)> OnWebsocketConnectionFailCallback;
 
-	Websocket(const std::string& strURI, const WebsocketCallback& fnWebsocketCallback);
+	// Client side callbacks
+	typedef std::function<void(const std::string&)> HandleWebsocketMessageCallback;
+	typedef std::function<void(void)> HandleWebsocketConnectionOpenCallback;
+	typedef std::function<void(void)> HandleWebsocketConnectionCloseCallback;
+	typedef std::function<void(void)> HandleWebsocketConnectionFailCallback;
+
+	//Websocket(const std::string& strURI, const OnWebsocketMessageCallback& fnOnWebsocketMessageCallback);
+	/*
+	Websocket(const std::string& strURI, const OnWebsocketMessageCallback& fnOnWebsocketMessageCallback,
+			  const OnWebsocketConnectionOpenCallback& fnOnWebsocketConnectionOpenCallback,
+			  const OnWebsocketConnectionCloseCallback& fnOnWebsocketConnectionCloseCallback,
+			  const OnWebsocketConnectionFailCallback& fnOnWebsocketConnectionFailCallback);
+			  */
+
+	Websocket(const std::string& strURI, const HandleWebsocketMessageCallback& fnHandleWebsocketMessageCallback,
+			  const HandleWebsocketConnectionOpenCallback&	fnHandleWebsocketConnectionOpenCallback,
+			  const HandleWebsocketConnectionCloseCallback& fnHandleWebsocketConnectionCloseCallback,
+			  const HandleWebsocketConnectionFailCallback&	fnHandleWebsocketConnectionFailCallback);
+
 	Websocket(const std::string& strURI);
 	~Websocket();
 
@@ -48,16 +70,37 @@ public:
 
 	RESULT SetToken(std::string& strToken);
 
+	bool IsRunning() {
+		return m_fRunning;
+	}
+
+	bool IsConnected() {
+		return m_fConnectionOpen;
+	}
+
 private:
 	RESULT ProcessingThread();
 	void OnMessage(WebsocketClient* pWebsicketClient, websocketpp::connection_hdl hWebsocketConnection, message_ptr pWebsocketMessage);
 
+	void OnOpen(websocketpp::connection_hdl hWebsocketConnection);
+	void OnClose(websocketpp::connection_hdl hWebsocketConnection);
+	void OnFail(websocketpp::connection_hdl hWebsocketConnection);
+
 private:
 	std::thread	m_thread;
 	bool m_fRunning;
+	bool m_fConnectionOpen;
 
 	const std::string m_strURI;
-	WebsocketCallback m_fnWebsocketCallback;
+	OnWebsocketMessageCallback			m_fnOnWebsocketMessageCallback;
+	OnWebsocketConnectionOpenCallback	m_fnOnWebsocketConnectionOpenCallback;
+	OnWebsocketConnectionFailCallback	m_fnOnWebsocketConnectionFailCallback;
+	OnWebsocketConnectionCloseCallback	m_fnOnWebsocketConnectionCloseCallback;
+
+	HandleWebsocketMessageCallback			m_fnHandleWebsocketMessageCallback;
+	HandleWebsocketConnectionOpenCallback	m_fnHandleWebsocketConnectionOpenCallback;
+	HandleWebsocketConnectionFailCallback	m_fnHandleWebsocketConnectionFailCallback;
+	HandleWebsocketConnectionCloseCallback	m_fnHandleWebsocketConnectionCloseCallback;
 
 	WebsocketClient::connection_ptr m_pWebsocketConnection;
 	WebsocketClient m_websocketClient;

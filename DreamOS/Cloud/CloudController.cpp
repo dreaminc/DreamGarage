@@ -78,7 +78,7 @@ RESULT CloudController::LoginUser() {
 	CR(InitializeEnvironment(m_pUserController->GetUserDefaultEnvironmentID()));
 	CN(m_pEnvironmentController);
 
-	// Connect to environment
+	// Connect to environment 
 	CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser()));
 
 Error:

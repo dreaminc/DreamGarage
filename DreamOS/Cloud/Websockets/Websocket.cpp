@@ -2,21 +2,66 @@
 
 #include <iostream>
 
-Websocket::Websocket(const std::string& strURI, const WebsocketCallback& fnWebsocketCallback) :
+/*
+Websocket::Websocket(const std::string& strURI, 
+					 const OnWebsocketMessageCallback& fnOnWebsocketMessageCallback,
+					 const OnWebsocketConnectionOpenCallback& fnOnWebsocketConnectionOpenCallback,
+					 const OnWebsocketConnectionCloseCallback& fnOnWebsocketConnectionCloseCallback,
+					 const OnWebsocketConnectionFailCallback& fnOnWebsocketConnectionFailCallback
+) :
 	m_fRunning(false),
+	m_fConnectionOpen(false),
 	m_strURI(strURI),
-	m_fnWebsocketCallback(fnWebsocketCallback)
+	m_fnOnWebsocketMessageCallback(fnOnWebsocketMessageCallback),
+	m_fnOnWebsocketConnectionOpenCallback(fnOnWebsocketConnectionOpenCallback),
+	m_fnOnWebsocketConnectionFailCallback(fnOnWebsocketConnectionFailCallback),
+	m_fnOnWebsocketConnectionCloseCallback(fnOnWebsocketConnectionCloseCallback),
+	m_fnHandleWebsocketMessageCallback(nullptr),
+	m_fnHandleWebsocketConnectionOpenCallback(nullptr),
+	m_fnHandleWebsocketConnectionFailCallback(nullptr),
+	m_fnHandleWebsocketConnectionCloseCallback(nullptr)
 {
 	//Start();
+}
+*/
+
+Websocket::Websocket(const std::string& strURI, const HandleWebsocketMessageCallback& fnHandleWebsocketMessageCallback,
+					 const HandleWebsocketConnectionOpenCallback&	fnHandleWebsocketConnectionOpenCallback,
+					 const HandleWebsocketConnectionCloseCallback& fnHandleWebsocketConnectionCloseCallback,
+					 const HandleWebsocketConnectionFailCallback&	fnHandleWebsocketConnectionFailCallback
+) :
+	m_fRunning(false),
+	m_fConnectionOpen(false),
+	m_strURI(strURI),
+	m_fnOnWebsocketMessageCallback(std::bind(&Websocket::OnMessage, this, ::_1, ::_2, ::_3)),
+	m_fnOnWebsocketConnectionOpenCallback(std::bind(&Websocket::OnOpen, this, ::_1)),
+	m_fnOnWebsocketConnectionFailCallback(std::bind(&Websocket::OnFail, this, ::_1)),
+	m_fnOnWebsocketConnectionCloseCallback(std::bind(&Websocket::OnClose, this, ::_1)),
+	m_fnHandleWebsocketMessageCallback(fnHandleWebsocketMessageCallback),
+	m_fnHandleWebsocketConnectionOpenCallback(fnHandleWebsocketConnectionOpenCallback),
+	m_fnHandleWebsocketConnectionFailCallback(fnHandleWebsocketConnectionFailCallback),
+	m_fnHandleWebsocketConnectionCloseCallback(fnHandleWebsocketConnectionCloseCallback)
+{
+	// Start();
 }
 
 Websocket::Websocket(const std::string& strURI) :
 	m_fRunning(false),
+	m_fConnectionOpen(false),
 	m_strURI(strURI),
-	m_fnWebsocketCallback(std::bind(&Websocket::OnMessage, this, ::_1, ::_2, ::_3))
+	m_fnOnWebsocketMessageCallback(std::bind(&Websocket::OnMessage, this, ::_1, ::_2, ::_3)),
+	m_fnOnWebsocketConnectionOpenCallback(std::bind(&Websocket::OnOpen, this, ::_1)),
+	m_fnOnWebsocketConnectionFailCallback(std::bind(&Websocket::OnFail, this, ::_1)),
+	m_fnOnWebsocketConnectionCloseCallback(std::bind(&Websocket::OnClose, this, ::_1)),
+	m_fnHandleWebsocketMessageCallback(nullptr),
+	m_fnHandleWebsocketConnectionOpenCallback(nullptr),
+	m_fnHandleWebsocketConnectionFailCallback(nullptr),
+	m_fnHandleWebsocketConnectionCloseCallback(nullptr)
 {
 	//Start();
 }
+
+
 
 Websocket::~Websocket() {
 	if (m_fRunning) {
@@ -44,7 +89,12 @@ RESULT Websocket::ProcessingThread() {
 
 			m_websocketClient.init_asio();
 
-			m_websocketClient.set_message_handler(bind(m_fnWebsocketCallback, &m_websocketClient, ::_1, ::_2));
+			m_websocketClient.set_message_handler(std::bind(m_fnOnWebsocketMessageCallback, &m_websocketClient, ::_1, ::_2));
+			
+			// Handlers
+			m_websocketClient.set_open_handler(std::bind(m_fnOnWebsocketConnectionOpenCallback, ::_1));
+			m_websocketClient.set_close_handler(std::bind(m_fnOnWebsocketConnectionCloseCallback, ::_1));
+			m_websocketClient.set_fail_handler(std::bind(m_fnOnWebsocketConnectionFailCallback, ::_1));
 
 			//c.set_open_handler(bind(&on_open, &c, ::_1));
 			//c.set_fail_handler(bind(&on_fail, &c, ::_1));
@@ -71,6 +121,18 @@ RESULT Websocket::ProcessingThread() {
 Error:
 	return r;
 }
+
+/*
+bool Websocket::IsConnected() {
+	if (m_pWebsocketConnection == nullptr)
+		return false;
+
+	if (m_pWebsocketConnection->get_state() == websocketpp::session::state::value::open)
+		return true;
+	
+	return false;
+}
+*/
 
 RESULT Websocket::Start() {
 	DEBUG_LINEOUT("Websocket::Start");	
@@ -115,11 +177,54 @@ Error:
 void Websocket::OnMessage(WebsocketClient* pWebsocketClient, websocketpp::connection_hdl hWebsocketConnection, message_ptr pWebsocketMessage) {
 
 	DEBUG_LINEOUT("OnMessage called with handle: 0x%x and message: %s", hWebsocketConnection.lock().get(), pWebsocketMessage->get_payload().c_str());
+	
+	/*
 	websocketpp::lib::error_code websocketError;
-
 	pWebsocketClient->send(hWebsocketConnection, pWebsocketMessage->get_payload(), pWebsocketMessage->get_opcode(), websocketError);
-
 	if (websocketError) {
 		DEBUG_LINEOUT("Echo failed with message: %s", websocketError.message().c_str());
+	}
+	*/
+
+	if (m_fnHandleWebsocketMessageCallback != nullptr) {
+		m_fnHandleWebsocketMessageCallback(pWebsocketMessage->get_payload().c_str());
+	}
+}
+
+
+void Websocket::OnOpen(websocketpp::connection_hdl hWebsocketConnection) {
+	//m_client.get_alog().write(websocketpp::log::alevel::app, "Connection opened, starting telemetry!");
+	DEBUG_LINEOUT("Websocket Connection Opened");
+
+	//scoped_lock guard(m_lock);
+	m_fConnectionOpen = true;
+
+	if (m_fnHandleWebsocketConnectionOpenCallback != nullptr) {
+		m_fnHandleWebsocketConnectionOpenCallback();
+	}
+}
+
+
+void Websocket::OnClose(websocketpp::connection_hdl hWebsocketConnection) {
+	//m_client.get_alog().write(websocketpp::log::alevel::app, "Connection closed, stopping telemetry!");
+	DEBUG_LINEOUT("Websocket Connection Closed");
+
+	//scoped_lock guard(m_lock);
+	m_fRunning = false;
+
+	if (m_fnHandleWebsocketConnectionCloseCallback != nullptr) {
+		m_fnHandleWebsocketConnectionCloseCallback();
+	}
+}
+
+void Websocket::OnFail(websocketpp::connection_hdl hWebsocketConnection) {
+	//m_client.get_alog().write(websocketpp::log::alevel::app, "Connection failed, stopping telemetry!");
+	DEBUG_LINEOUT("Websocket Connection Failed");
+
+	//scoped_lock guard(m_lock);
+	m_fRunning = false;
+
+	if (m_fnHandleWebsocketConnectionFailCallback != nullptr) {
+		m_fnHandleWebsocketConnectionFailCallback();
 	}
 }
