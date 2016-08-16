@@ -92,10 +92,6 @@ RESULT VirtualObj::SetPivotPoint(point_precision x, point_precision y, point_pre
 	return R_PASS;
 }
 
-point VirtualObj::GetPivotPoint() {
-	return m_ptPivot;
-}
-
 // Velocity
 VirtualObj* VirtualObj::AddVelocity(matrix <point_precision, 4, 1> v) {
 	m_vVelocity += v;

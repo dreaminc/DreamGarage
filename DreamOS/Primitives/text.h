@@ -33,10 +33,14 @@ public:
 	bool IsBillboard() { return m_fBillboard; }
 	void SetBillboard(bool billboard) { m_fBillboard = billboard; }
 
+	bool IsScaledBillboard() { return m_fScaledBillboard; }
+	void SetScaledBillboard(bool scale) { m_fScaledBillboard = scale; }
+
 private:
 	unsigned int m_nVertices;
 	unsigned int m_nIndices;
 	bool m_fBillboard;
+	bool m_fScaledBillboard = false;
 
 public:
 

@@ -117,20 +117,12 @@ RESULT DreamGarage::LoadScene() {
 	pSphere2->AddChild(pSphere3);
 	//*/
 	
-
-
-
 	text *pText = AddText(L"Arial.fnt", "Hello world", 1.0f, true);
 	pText->MoveTo(1.0f, 1.0f, 0.0f);
-//	pText->RotateYByDeg(360.0f);
-//	pText->SetBillboard(true);
 
 	text *pText2 = AddText(L"Arial.fnt", "Hello world", 0.1f, true);
-	//pText2->MoveTo(5.0f, 5.0f, 0.0f);
 	pText2->SetPosition(point(5.0f, 5.0f, 0.0f));
-//	pText2->RotateYByDeg(360.0f);
-//	pText2->RotateXByDeg(180.0f);
-//	pText2->SetBillboard(true);
+	//pText2->SetScaledBillboard(true);
 
 	// one arg?
 	volume *pVolume = AddVolume(0.5f, 0.5f, 0.5f);
