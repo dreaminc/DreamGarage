@@ -228,6 +228,10 @@ public:
 		return m_glTexStorage2D(target, levels, internalformat, width, height);
 	}
 
+	inline void glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations) {
+		return m_glTexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations);
+	}
+
 	/*
 	inline void glTexParameteri(GLenum target, GLenum pname, GLint param) {
 		return m_glTexParameteri(target, pname, param);
@@ -263,6 +267,10 @@ public:
 	
 	inline void glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) {
 		return m_glRenderbufferStorage(target, internalformat, width, height);
+	}
+
+	inline void glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height) {
+		return m_glRenderBufferStorageMultisample(target, samples, internalformat, width, height);
 	}
 
 	inline void glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer) {
@@ -392,6 +400,7 @@ private:
 	PFNGLBINDTEXTURESPROC m_glBindTextures;
 	//PFNGLBINDTEXTUREPROC m_glBindTexture;
 	PFNGLTEXSTORAGE2DPROC m_glTexStorage2D;
+	PFNGLTEXIMAGE2DMULTISAMPLEPROC m_glTexImage2DMultisample;
 	//PFNGLTEXPARAMETERIPROC m_glTexParameteri;
 	//PFNGLTEXIMAGE2DPROC m_glTexImage2D;
 	//PFNGLTEXSUBIMAGE2DPROC m_glTexSubImage2D;
@@ -404,6 +413,7 @@ private:
 	PFNGLGENRENDERBUFFERSPROC m_glGenRenderbuffers;
 	PFNGLBINDRENDERBUFFERPROC m_glBindRenderbuffer;
 	PFNGLRENDERBUFFERSTORAGEPROC m_glRenderbufferStorage;
+	PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC m_glRenderBufferStorageMultisample;
 	PFNGLFRAMEBUFFERRENDERBUFFERPROC m_glFramebufferRenderbuffer;
 	PFNGLFRAMEBUFFERTEXTUREPROC m_glFramebufferTexture;
 	PFNGLCHECKFRAMEBUFFERSTATUSPROC m_glCheckFramebufferStatus;

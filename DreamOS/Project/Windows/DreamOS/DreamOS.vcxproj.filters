@@ -135,6 +135,7 @@
     <Filter Include="DreamGarage">
       <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
     </Filter>
+
     <Filter Include="Cloud\User">
       <UniqueIdentifier>{e80be9ff-7887-4799-9a5a-ce9fb6cddb54}</UniqueIdentifier>
     </Filter>
@@ -146,6 +147,12 @@
     </Filter>
     <Filter Include="Cloud\Environment">
       <UniqueIdentifier>{8f3dd62d-3f99-4e45-bf9a-5adc56e8a76f}</UniqueIdentifier>
+	</Filter>
+    <Filter Include="HMD\OpenVR">
+      <UniqueIdentifier>{0484651f-4677-4432-aa79-1926163bb61b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\Matrices">
+      <UniqueIdentifier>{ac063e77-2be8-4932-a115-19a7ed9fb129}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -337,6 +344,27 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp">
       <Filter>Cloud</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\Primitives\text.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp">
+      <Filter>HMD\OpenVR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp">
+      <Filter>External\Matrices</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\composite.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\hand.cpp">
+      <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1267,6 +1295,21 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProfiler.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\composite.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\hand.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
@@ -1825,6 +1868,18 @@
     <ClInclude Include="..\..\..\..\DreamGarage.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
+      <Filter>HMD\OpenVR</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\dirty.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
@@ -1834,7 +1889,13 @@
     <ClInclude Include="..\..\..\Primitives\BiasMatrix.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
+    <ClInclude Include="..\..\..\External\Matrices\Matrices.h">
+      <Filter>External\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\Matrices\Vectors.h">
+      <Filter>External\Matrices</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h">
@@ -1866,6 +1927,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h">
       <Filter>Cloud\Environment</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\Profiler\DebugConsole.h">
+      <Filter>Profiler</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1979,6 +2043,12 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

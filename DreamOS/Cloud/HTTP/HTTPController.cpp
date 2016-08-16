@@ -103,7 +103,7 @@ RESULT HTTPController::Stop() {
 
 	// TODO: Test 
 	CURLMcode cmc = curl_multi_cleanup(m_pCURLMultiHandle);
-	CB((cmc == CURLM_OK), "CURL failed to clean up multi handle");
+	CBM((cmc == CURLM_OK), "CURL failed to clean up multi handle");
 
 	curl_global_cleanup();
 	

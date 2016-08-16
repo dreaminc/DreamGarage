@@ -7,8 +7,6 @@
 #include "Primitives/RotationMatrix.h"
 #include <vector>
 
-#include "../DreamOS/Profiler/Profiler.h"
-
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
@@ -184,6 +182,7 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
 	
@@ -216,7 +215,7 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Allocate the camera
 	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, -10.0f), 100.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, -2.0f), 100.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -287,6 +286,13 @@ RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
 
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
+
+	switch (kbEvent->KeyCode) {
+		case (SK_SCAN_CODE)('F') : {
+			if(kbEvent->KeyState != 0)
+				SetRenderProfiler(!GetRenderProfiler());
+		}
+	}
 
 	/* This has been moved to the camera 
 	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
@@ -442,6 +448,60 @@ Error:
 	return nullptr;
 }
 
+
+model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices) {
+	RESULT r = R_PASS;
+
+	model *pModel = new OGLModel(this, vertices);
+	CN(pModel);
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+	RESULT r = R_PASS;
+
+	model *pModel = new OGLModel(this, vertices, indices);
+	CN(pModel);
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+#include "HAL/opengl/OGLComposite.h"
+
+composite *OpenGLImp::MakeComposite() {
+	RESULT r = R_PASS;
+
+	composite *pComposite = new OGLComposite(this);
+	CN(pComposite);
+
+//Success:
+	return pComposite;
+
+Error:
+	if (pComposite != nullptr) {
+		delete pComposite;
+		pComposite = nullptr;
+	}
+	return nullptr;
+}
+
 // TODO: Other approach 
 light* OpenGLImp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	RESULT r = R_PASS;
@@ -494,10 +554,10 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double side) {
+volume* OpenGLImp::MakeVolume(double width, double length, double height) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, side);
+	volume *pVolume = new OGLVolume(this, width, length, height);
 	CN(pVolume);
 
 //Success:
@@ -511,6 +571,28 @@ Error:
 	return nullptr;
 }
 
+volume* OpenGLImp::MakeVolume(double side) {
+	return MakeVolume(side, side, side);
+}
+
+text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)
+{
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, std::make_shared<Font>(fontName), content, size, isBillboard);
+	CN(pText);
+
+//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+	return nullptr;
+}
+
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
@@ -518,6 +600,23 @@ texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type
 	CN(pTexture);
 
 //Success:
+	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+	return nullptr;
+}
+
+texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) {
+	RESULT r = R_PASS;
+
+	texture *pTexture = new OGLTexture(this, type, width, height, channels, pBuffer, pBuffer_n);
+	CN(pTexture);
+
+	//Success:
 	return pTexture;
 
 Error:
@@ -615,8 +714,11 @@ RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
 	}
 	
 	// Render profiler overlay
-	m_pOGLProfiler->Render();
-	//*/
+	if (GetRenderProfiler()) {
+		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLProfiler->m_OGLProgram->SetCamera(m_pCamera));
+		m_pOGLProfiler->Render();
+	}
 
 	glFlush();
 
@@ -671,7 +773,11 @@ RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
 		}
 
 		// Render profiler overlay
-		m_pOGLProfiler->Render();
+		if (GetRenderProfiler()) {
+			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
+			m_pOGLProfiler->Render();
+		}
 	}
 
 	glFlush();
@@ -708,7 +814,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// TODO: Temporary go through scene graph again
-	///*
+	/*
 	m_pOGLProgramCapture->UseProgram();
 	CR(m_pOGLProgramCapture->SetLights(pLights));
 	//SetMonoViewTarget();
@@ -729,6 +835,13 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 
 	CR(m_pOGLProgramCapture->UnbindFramebuffer());
 	//*/
+
+	m_pOGLProgramShadowDepth->UseProgram();
+	m_pOGLProgramShadowDepth->BindToDepthBuffer();
+	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
+	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
+	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
+	m_pOGLProgramShadowDepth->UnbindFramebuffer();
 
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 	CR(m_pOGLRenderProgram->SetLights(pLights));
@@ -766,13 +879,14 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 		}
 		
 		// Render profiler overlay
-		if (eye == EYE_LEFT) {
+		if (GetRenderProfiler()) {
+			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 			m_pOGLProfiler->Render();
 		}
 
 		m_pHMD->UnsetRenderSurface(eye);
 		m_pHMD->CommitSwapChain(eye);
-
 	}
 
 	glFlush();
@@ -988,6 +1102,16 @@ RESULT OpenGLImp::glRenderbufferStorage(GLenum target, GLenum internalformat, GL
 
 	m_OpenGLExtensions.glRenderbufferStorage(target, internalformat, width, height);
 	CRM(CheckGLError(), "glRenderbufferStorage failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glRenderbufferStorageMultisample(target, samples, internalformat, width, height);
+	CRM(CheckGLError(), "glRenderbufferStorageMultisample failed");
 
 Error:
 	return r;
@@ -1351,6 +1475,16 @@ RESULT OpenGLImp::glTexStorage2D(GLenum target, GLsizei levels, GLenum internalf
 
 	m_OpenGLExtensions.glTextStorage2D(target, levels, internalformat, width, height);
 	CRM(CheckGLError(), "glTexStorage2D failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glTexImage2DMultisample(target, samples, internalformat, width, height, fixedsamplelocations);
+	CRM(CheckGLError(), "glTexImage2DMultisample failed");
 
 Error:
 	return r;

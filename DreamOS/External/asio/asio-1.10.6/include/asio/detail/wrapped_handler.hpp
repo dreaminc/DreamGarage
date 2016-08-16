@@ -267,6 +267,8 @@ inline bool asio_handler_is_continuation(
       this_handler->context_);
 }
 
+#pragma warning(disable : 4503)
+
 template <typename Function, typename Handler, typename Context>
 inline void asio_handler_invoke(Function& function,
     rewrapped_handler<Handler, Context>* this_handler)

@@ -22,6 +22,7 @@ in Data {
 	mat3 TangentBitangentNormalMatrix;
 } DataIn;
 
+uniform	bool u_fUseColorTexture;
 uniform sampler2D u_textureColor;
 
 // Light Structure
@@ -101,7 +102,11 @@ void main(void) {
 	vec4LightValue[3] = 1.0f;
 	
 	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 1.0f);
-	vec4 ambientColor = g_vec4AmbientLightLevel;
-	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
-	//out_vec4Color = textureColor;
+	vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
+	if(u_fUseColorTexture == true) {
+		out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
+	}
+	else {
+		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
+	}
 }

@@ -72,7 +72,7 @@ RESULT CloudController::LoginUser() {
 	CRM(m_pUserController->Login(strUsername, strPassword), "Failed to login");
 
 	// Get user profile
-	CR(m_pUserController->LoadProfile(), "Failed to load profile");
+	CRM(m_pUserController->LoadProfile(), "Failed to load profile");
 
 	// Set up environment
 	CR(InitializeEnvironment(m_pUserController->GetUserDefaultEnvironmentID()));

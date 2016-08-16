@@ -102,7 +102,7 @@ RESULT Websocket::ProcessingThread() {
 
 			websocketpp::lib::error_code websocketError;
 			m_pWebsocketConnection = m_websocketClient.get_connection(m_strURI, websocketError);
-			CB((!websocketError), "Connection failed with error: %s", websocketError.message().c_str());
+			CBM((!websocketError), "Connection failed with error: %s", websocketError.message().c_str());
 
 			if (m_strToken.size() > 0) {
 				m_pWebsocketConnection->append_header("token", m_strToken);
@@ -168,7 +168,7 @@ RESULT Websocket::Send(const std::string & strMessage) {
 	websocketpp::lib::error_code websocketError;
 	m_websocketClient.send(m_pWebsocketConnection->get_handle(), websocketMessage->get_payload(), websocketMessage->get_opcode(), websocketError);
 
-	CB((!websocketError), "Echo failed with message: %s", websocketError.message().c_str());
+	CBM((!websocketError), "Echo failed with message: %s", websocketError.message().c_str());
 
 Error:
 	return r;
@@ -176,7 +176,8 @@ Error:
 
 void Websocket::OnMessage(WebsocketClient* pWebsocketClient, websocketpp::connection_hdl hWebsocketConnection, message_ptr pWebsocketMessage) {
 
-	DEBUG_LINEOUT("OnMessage called with handle: 0x%x and message: %s", hWebsocketConnection.lock().get(), pWebsocketMessage->get_payload().c_str());
+	DEBUG_LINEOUT("OnMessage called with handle: 0x%p and message: %s", hWebsocketConnection.lock().get(), pWebsocketMessage->get_payload().c_str());
+	//DEBUG_LINEOUT("OnMessage called with message: %s", pWebsocketMessage->get_payload().c_str());
 	
 	/*
 	websocketpp::lib::error_code websocketError;
@@ -191,6 +192,7 @@ void Websocket::OnMessage(WebsocketClient* pWebsocketClient, websocketpp::connec
 	}
 }
 
+#pragma warning(disable : 4503)
 
 void Websocket::OnOpen(websocketpp::connection_hdl hWebsocketConnection) {
 	//m_client.get_alog().write(websocketpp::log::alevel::app, "Connection opened, starting telemetry!");

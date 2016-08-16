@@ -69,8 +69,11 @@ public:
 
 		point eyePos = GetEyePosition(eye);
 
-		if (m_pHMD != nullptr)
+
+		// TODO: Fix this
+		if (m_pHMD != nullptr) {
 			eyePos += m_pHMD->GetHeadPointOrigin();
+		}
 
 		switch (eye) {
 			case EYE_LEFT: {
@@ -89,14 +92,8 @@ public:
 		return mat;
 	}
 
-	RESULT SetHMD(HMD *pHMD) {
-		m_pHMD = pHMD;
-		return R_PASS;
-	}
-
 private:
 	camera_precision m_pupillaryDistance;	//  Distance between eyes (in mm)
-	HMD *m_pHMD;
 };
 
 #endif // ! STEREO_CAMERA_H_

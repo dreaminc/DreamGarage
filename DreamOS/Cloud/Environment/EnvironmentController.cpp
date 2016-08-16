@@ -131,7 +131,7 @@ Error:
 }
 
 RESULT EnvironmentController::PrintEnvironmentPeerList() {
-	DEBUG_LINEOUT("%d Peers Environment: %d", m_environmentPeers.size(), m_environment.GetEnvironmentID());
+	DEBUG_LINEOUT("%d Peers Environment: %d", (int)(m_environmentPeers.size()), (int)(m_environment.GetEnvironmentID()));
 	for (auto &peer : m_environmentPeers)
 		peer.PrintEnvironmentPeer();
 
@@ -175,7 +175,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	long statusCode = jsonCloudResponse["/meta/status_code"_json_pointer].get<long>();
 
 	DEBUG_LINEOUT("HandleWebsocketMessage id:%d statuscode: %d pending:%d pending id:%d state: 0x%x", 
-		id, statusCode, m_fPendingMessage, m_pendingMessageID, m_state);
+		(int)(id), (int)(statusCode), m_fPendingMessage, (int)(m_pendingMessageID), m_state);
 
 	if (m_fPendingMessage && (m_pendingMessageID == id)) {
 		m_fPendingMessage = false;

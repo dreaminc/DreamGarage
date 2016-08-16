@@ -26,6 +26,8 @@
 // namespace is defined here for that purpose.
 namespace asio_handler_invoke_helpers {
 
+#pragma warning(disable : 4503)
+
 template <typename Function, typename Context>
 inline void invoke(Function& function, Context& context)
 {

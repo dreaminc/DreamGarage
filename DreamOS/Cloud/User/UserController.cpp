@@ -60,7 +60,7 @@ RESULT UserController::LoginFromCommandline() {
 
 	// TODO:
 
-Error:
+//Error:
 	return r;
 }
 
@@ -78,7 +78,7 @@ RESULT UserController::LoginFromFilename(const std::wstring& file) {
 	while (std::getline(userLoginFile, line)) {
 		line.erase(std::remove_if(line.begin(), line.end(), [](char c) {return (c == '\r' || c == '\n'); }), line.end());
 		size_t lineCount = line.find(':');
-		CBM((lineCount != line.length()), "Cannot read line %d", line.c_str());
+		CBM((lineCount != line.length()), "Cannot read line %s", line.c_str());
 		keyValue[line.substr(0, lineCount)] = line.substr(lineCount + 1);
 	}
 
@@ -152,7 +152,7 @@ RESULT UserController::LoadProfile() {
 		auto headers = HTTPController::ContentAcceptJson();
 		headers.push_back(strAuthorizationToken);
 
-		CB((pHTTPController->GET("http://localhost:8000/user/", headers, httpResponse)), "User LoadProfile failed to post request");
+		CBM((pHTTPController->GET("http://localhost:8000/user/", headers, httpResponse)), "User LoadProfile failed to post request");
 
 		DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
 

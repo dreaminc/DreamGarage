@@ -50,7 +50,7 @@ public:
 			}
 		}
 
-	Error:
+//	Error:
 		return r;
 	}
 
