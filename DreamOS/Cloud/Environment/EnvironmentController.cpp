@@ -215,6 +215,10 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 				m_state = state::ENVIRONMENT_CONNECTED_AND_READY;
 
 			} break;
+
+			case state::ENVIRONMENT_CONNECTED_AND_READY: {
+				// TODO: Handle the message here - depending on the type
+			} break;
 		}
 	}
 	else {
