@@ -75,14 +75,17 @@ RESULT version::SetVersion(long lVer) {
 	return r;
 }
 
-std::string version::GetString() {
+std::string version::GetString(bool fShowMinorMinor) {
 	std::string strRet = "";
 	
-	strRet += m_major;
+	strRet += std::to_string(m_major);
 	strRet += '.';
-	strRet += m_minor;
-	strRet += '.';
-	strRet += m_doubleminor;
+	strRet += std::to_string(m_minor);
+
+	if (fShowMinorMinor) {
+		strRet += '.';
+		strRet += std::to_string(m_doubleminor);
+	}
 
 	return strRet;
 }
