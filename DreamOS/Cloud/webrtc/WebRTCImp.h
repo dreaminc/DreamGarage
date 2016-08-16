@@ -57,6 +57,8 @@ public:
 	// Utilities
 	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
 	static std::string GetPeerName();
+	virtual std::string GetSDPOfferString() override;
+	virtual RESULT InitializeConnection() override;
 
 protected:
 	RESULT OnSignedIn();

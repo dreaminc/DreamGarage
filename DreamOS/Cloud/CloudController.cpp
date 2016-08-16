@@ -33,7 +33,7 @@ Error:
 RESULT CloudController::InitializeUser(version ver) {
 	RESULT r = R_PASS;
 
-	m_pUserController = std::unique_ptr<UserController>(UserFactory::MakeUserController(ver));
+	m_pUserController = std::unique_ptr<UserController>(UserFactory::MakeUserController(ver, this));
 	CN(m_pUserController);
 
 Error:
@@ -45,7 +45,7 @@ RESULT CloudController::InitializeEnvironment(long environmentID) {
 
 	CBM((environmentID != -1), "Environment cannot be -1");
 
-	m_pEnvironmentController = std::unique_ptr<EnvironmentController>(new EnvironmentController(environmentID));
+	m_pEnvironmentController = std::unique_ptr<EnvironmentController>(new EnvironmentController(this, environmentID));
 	CN(m_pEnvironmentController);
 
 Error:
@@ -111,6 +111,14 @@ RESULT CloudController::ConnectToPeer(int peerID) {
 
 Error:
 	return r;
+}
+
+RESULT CloudController::InitializeConnection() {
+	return m_pCloudImp->InitializeConnection();
+}
+
+std::string CloudController::GetSDPOfferString() {
+	return m_pCloudImp->GetSDPOfferString();
 }
 
 RESULT CloudController::SendMessageToPeer(int peerID, std::string& strMessage) {

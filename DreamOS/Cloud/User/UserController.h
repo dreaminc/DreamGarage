@@ -7,11 +7,13 @@
 // DreamOS/Dimension/Cloud/User/UserController.h
 // The User Controller 
 
+#include "Cloud/Controller.h"
+
 #include <string>
 #include "User.h"
 
 // TODO: This is actually a UserController - so change the name of object and file
-class UserController {
+class UserController : public Controller {
 public:
 	enum class UserMethod {
 		LOGIN,
@@ -20,7 +22,7 @@ public:
 	};
 
 public:
-	UserController();
+	UserController(Controller* pParentController);
 	~UserController();
 
 	// Read username and password from file and login, get a token

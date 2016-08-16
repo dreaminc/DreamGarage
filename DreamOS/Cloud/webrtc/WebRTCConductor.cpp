@@ -116,7 +116,7 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 	jmessage[kCandidateSdpName] = sdp;
 
 	//SendMessage(writer.write(jmessage));
-	SendMessageToPeer(&(writer.write(jmessage)), m_WebRTCPeerID);
+	//SendMessageToPeer(&(writer.write(jmessage)), m_WebRTCPeerID);
 }
 
 RESULT WebRTCConductor::SendMessageToPeer(std::string* strMessage, int peerID) {
@@ -449,6 +449,14 @@ RESULT WebRTCConductor::CreateOffer(){
 
 Error:
 	return r;
+}
+
+// TODO: This is not ideal, should be replaced with more robust flag
+bool WebRTCConductor::IsPeerConnectionInitialized() {
+	if (m_pWebRTCPeerConnection.get() == nullptr)
+		return false;
+	else
+		return true;
 }
 
 RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {

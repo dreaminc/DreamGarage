@@ -10,6 +10,8 @@
 #include <string>
 #include <memory>
 
+#include "Cloud/Controller.h"
+
 #include "Environment.h"
 #include "EnvironmentPeer.h"
 
@@ -18,7 +20,7 @@ class Websocket;
 
 
 // TODO: This is actually a UserController - so change the name of object and file
-class EnvironmentController {
+class EnvironmentController : public Controller{
 public:
 	enum class state {
 		SOCKET_UNINITIALIZED,
@@ -33,7 +35,7 @@ public:
 		INVALID
 	};
 public:
-	EnvironmentController(long environmentID);
+	EnvironmentController(Controller* pParentController, long environmentID);
 	~EnvironmentController();
 
 public:

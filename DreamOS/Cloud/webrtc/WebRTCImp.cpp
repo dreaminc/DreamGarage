@@ -99,6 +99,10 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::InitializeConnection() {
+	return InitializePeerConnection(true);
+}
+
 RESULT WebRTCImp::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
@@ -121,20 +125,23 @@ int WebRTCImp::GetFirstPeerID() {
 	return peerID;
 }
 
+// Fill this out and junk
 RESULT WebRTCImp::OnPeerConnectionInitialized() {
 	RESULT r = R_PASS;
 
 	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
 	// TODO: Remove this!
+	/*
 	int peerID = GetFirstPeerID();
 	m_pWebRTCConductor->SetPeerConnectionID(peerID);
 
 	CN(m_pWebRTCConductor);
 
 	CR(m_pWebRTCClient->SendMessageToPeer(peerID, m_pWebRTCConductor->GetSDPJSONString()));
+	*/
 	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
 
-Error:
+//Error:
 	return r;
 }
 
@@ -150,6 +157,15 @@ RESULT WebRTCImp::ConnectToPeer(int peerID) {
 
 Error:
 	return r;
+}
+
+std::string WebRTCImp::GetSDPOfferString() {
+	if (m_pWebRTCConductor->IsPeerConnectionInitialized()) {
+		return m_pWebRTCConductor->GetSDPJSONString();
+	}
+	else {
+		return std::string("");
+	}
 }
 
 std::function<void(int msg_id, void* data)> WebRTCImp::GetUIThreadCallback() {

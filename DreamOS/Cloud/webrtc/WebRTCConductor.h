@@ -89,6 +89,8 @@ protected:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);
 	RESULT ReinitializePeerConnectionForLoopback();
 	cricket::VideoCapturer* OpenVideoCaptureDevice();
+
+	bool IsPeerConnectionInitialized();
 	
 	RESULT AddStreams();
 	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);

@@ -3,11 +3,11 @@
 
 #include <memory>
 
-UserController* UserFactory::MakeUserController(version ver) {
+UserController* UserFactory::MakeUserController(version ver, Controller* pParentController) {
 	RESULT r = R_PASS;
 	UserController *pUser = nullptr;
 
-	pUser = new UserController();
+	pUser = new UserController(pParentController);
 	CN(pUser);
 
 	//Success:

@@ -102,6 +102,16 @@ public:
 		return nullptr;
 	}
 
+	/*
+	virtual std::string GetSDPOfferString() override {
+		return std::string("");
+	}
+	*/
+
+	virtual RESULT InitializeConnection() override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 private:
 	CefRefPtr<CEFApp> m_CEFApp;
 	CefSettings m_CEFSettings;

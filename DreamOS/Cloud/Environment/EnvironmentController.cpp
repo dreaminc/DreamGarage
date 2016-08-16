@@ -1,3 +1,4 @@
+#include "Cloud/CloudController.h"
 #include "EnvironmentController.h"
 #include "Cloud/User/User.h"
 
@@ -6,7 +7,8 @@
 
 #include "Primitives/Types/UID.h"
 
-EnvironmentController::EnvironmentController(long environmentID) :
+EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
+	Controller(pParentController),
 	m_fConnected(false),
 	m_fPendingMessage(false),
 	m_pEnvironmentWebsocket(nullptr),
@@ -71,19 +73,25 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 
 	nlohmann::json jsonData;
 	std::string strData;
+	std::string strSDPOffer;
 	long environmentID = user.GetDefaultEnvironmentID();
+	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
 
+	CNM(pParentCloudController, "Parent CloudController not found or null");
 	CN(m_pEnvironmentWebsocket);
 	CBM((m_fConnected), "Environment socket not connected");
 	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
 	
+	strSDPOffer = pParentCloudController->GetSDPOfferString();
+
 	// Set up the JSON data
 	m_pendingMessageID = UID().GetID();
 	jsonData["id"] = m_pendingMessageID;
 	jsonData["token"] = user.GetToken();
 	jsonData["method"] = "environmentuser.create";
 	jsonData["params"] = {
-		{"sdp_offer", "{'foo': 'bar2'}"},
+		//{"sdp_offer", "{'foo': 'bar2'}"},
+		{ "sdp_offer", strSDPOffer },
 		{"user", user.GetUserID() },
 		{"environment", environmentID}
 	};

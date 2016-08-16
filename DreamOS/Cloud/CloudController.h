@@ -9,12 +9,13 @@
 // DreamOS/Cloud/CloudController.h
 // The base DreamCloud controller 
 
+#include "Controller.h"
 #include "CloudImp.h"
 #include "User/UserFactory.h"
 #include "Environment/EnvironmentController.h"
 #include <memory>
 
-class CloudController {
+class CloudController : public Controller, public std::enable_shared_from_this<CloudController> {
 public:
 	CloudController();
 	~CloudController();
@@ -22,14 +23,13 @@ public:
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
 	RESULT InitializeUser(version ver = 1.0f);
-
 	RESULT InitializeEnvironment(long environmentID = -1);
-
 	RESULT CreateNewURLRequest(std::wstring& strURL);
-
 	RESULT LoginUser();
-	
 	RESULT Update();
+
+	std::string GetSDPOfferString();
+	RESULT InitializeConnection();
 
 	// TODO: This will attempt to connect to the first peer in the list, should make more robust
 	// and expose the available peer list at the CloudController layer
@@ -42,7 +42,7 @@ public:
 	void CallGetUIThreadCallback(int msgID, void* data);
 
 private:
-	UID m_uid;
+	//UID m_uid;
 	std::unique_ptr<CloudImp> m_pCloudImp;
 
 	std::unique_ptr<UserController> m_pUserController;

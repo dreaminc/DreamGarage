@@ -14,7 +14,8 @@
 
 #include <future>
 
-UserController::UserController() :
+UserController::UserController(Controller* pParentController) :
+	Controller(pParentController),
 	m_fLoggedIn(false)
 {
 	// empty
