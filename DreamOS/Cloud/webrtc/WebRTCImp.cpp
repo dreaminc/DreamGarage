@@ -196,7 +196,7 @@ RESULT WebRTCImp::OnSignedIn() {
 
 	DEBUG_LINEOUT("WebRTCImp: OnSignedIn");
 
-Error:
+//Error:
 	return r;
 }
 
@@ -205,7 +205,7 @@ RESULT WebRTCImp::OnDisconnected() {
 
 	DEBUG_LINEOUT("WebRTCImp: OnDisconnected");
 
-Error:
+//Error:
 	return r;
 }
 
@@ -219,7 +219,7 @@ RESULT WebRTCImp::OnPeerConnected(int id, const std::string& name) {
 		DEBUG_LINEOUT("%d: %s", peer.first, peer.second.c_str());
 	}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -228,7 +228,7 @@ RESULT WebRTCImp::OnPeerDisconnected(int peer_id) {
 
 	DEBUG_LINEOUT("WebRTCImp: OnPeerDisconnected");
 
-Error:
+//Error:
 	return r;
 }
 
@@ -250,7 +250,7 @@ RESULT WebRTCImp::OnMessageSent(int err) {
 
 	DEBUG_LINEOUT("WebRTCImp: OnMessageSent");
 
-Error:
+//Error:
 	return r;
 }
 

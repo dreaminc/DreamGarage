@@ -159,13 +159,13 @@ std::string WebRTCConductor::GetSDPJSONString() {
 
 // TODO: This doesn't actually work
 void WebRTCConductor::UIThreadCallback(int msgID, void* data) {
-	RESULT r = R_PASS;
+	//RESULT r = R_PASS;
 
 	// TODO:
 
-	DEBUG_LINEOUT("WebRTCConductor::UIThreadCallback: msg ID %d");
+	DEBUG_LINEOUT("WebRTCConductor::UIThreadCallback: msg ID %d", msgID);
 
-Error:
+//Error:
 	return;
 }
 
@@ -260,7 +260,7 @@ RESULT WebRTCConductor::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 	pMediaStreamInterface->AddTrack(pVideoTrack);
 
-Error:
+//Error:
 	return r;
 }
 
@@ -289,7 +289,7 @@ RESULT WebRTCConductor::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 	//pAudioTrack->GetSource()
 
-Error:
+//Error:
 	return r;
 }
 
@@ -415,7 +415,7 @@ void WebRTCConductor::OnStateChange() {
 	CN(m_pDataChannelInterface);
 
 	//DEBUG_LINEOUT("WebRTCConductor::OnStateChange %d", pWebRTCDataChannel->state());
-	DEBUG_LINEOUT("WebRTCConductor::OnStateChange %d", GetDataStateString(m_pDataChannelInterface->state()).c_str());
+	DEBUG_LINEOUT("WebRTCConductor::OnStateChange %s", GetDataStateString(m_pDataChannelInterface->state()).c_str());
 
 Error:
 	return;
@@ -437,7 +437,7 @@ void WebRTCConductor::OnMessage(const webrtc::DataBuffer& buffer) {
 	//auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
 	//CN(pWebRTCDataChannel);
 
-Error:
+//Error:
 	return;
 }
 
@@ -552,7 +552,7 @@ RESULT WebRTCConductor::DeletePeerConnection() {
 	m_WebRTCPeerID = -1;
 	m_fLoopback = false;
 
-Error:
+//Error:
 	return r;
 }
 

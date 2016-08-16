@@ -31,57 +31,15 @@ public:
 	
 	RESULT Update();
 
-RESULT CreateNewURLRequest(std::wstring& strURL) {
-		RESULT r = R_PASS;
-		
-		CNM(m_pCloudImp, "Cloud Imp not initialized");
-		CRM(m_pCloudImp->CreateNewURLRequest(strURL), "Failed to create CEF URL request for %S", strURL.c_str());
-
-	Error:
-		return r;
-	}
-
 	// TODO: This will attempt to connect to the first peer in the list, should make more robust
 	// and expose the available peer list at the CloudController layer
-	RESULT ConnectToPeer(int peerID) {
-		RESULT r = R_PASS;
+	RESULT ConnectToPeer(int peerID);
 
-		CN(m_pCloudImp);
-		CR(m_pCloudImp->ConnectToPeer(peerID));
+	RESULT SendMessageToPeer(int peerID, std::string& strMessage);
 
-	Error:
-		return r;
-	}
+	std::function<void(int msgID, void* data)> GetUIThreadCallback();
 
-	RESULT SendMessageToPeer(int peerID, std::string& strMessage) {
-		RESULT r = R_PASS;
-
-		CN(m_pCloudImp);
-		CR(m_pCloudImp->SendMessageToPeer(peerID, strMessage));
-
-	Error:
-		return r;
-	}
-
-	std::function<void(int msgID, void* data)> GetUIThreadCallback() {
-		return m_pCloudImp->GetUIThreadCallback();
-	}
-
-	void CallGetUIThreadCallback(int msgID, void* data) {
-		std::function<void(int msg_id, void* data)> fnUIThreadCallback;
-		return fnUIThreadCallback(msgID, data);
-	}
-
-	/* Moved to CPP
-	RESULT Update() {
-		RESULT r = R_PASS;
-
-		CR(m_pCloudImp->Update());
-
-	Error:
-		return r;
-	}
-	*/
+	void CallGetUIThreadCallback(int msgID, void* data);
 
 private:
 	UID m_uid;

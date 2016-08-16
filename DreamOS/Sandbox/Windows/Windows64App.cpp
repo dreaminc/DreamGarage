@@ -20,7 +20,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_hDC(nullptr),
 	m_pHMD(nullptr),
 	m_ThreadID(0),
-	m_fnUIThreadCallback(nullptr)
+	m_fnUIThreadCallback(nullptr),
 	m_pSenseLeapMotion(nullptr)
 {
 	RESULT r = R_PASS;

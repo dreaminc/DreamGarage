@@ -103,7 +103,7 @@ RESULT WebRTCClient::SignOut() {
 		m_WebRTCState = SIGNING_OUT;
 
 		// Can occur if the app is closed before we finish connecting.
-		CB((m_WebRTCID == -1), R_PASS);
+		CBR((m_WebRTCID == -1), R_PASS);
 
 		char buffer[1024];
 		rtc::sprintfn(buffer, sizeof(buffer), "GET /sign_out?peer_id=%i HTTP/1.0\r\n\r\n", m_WebRTCID);
@@ -193,7 +193,7 @@ RESULT WebRTCClient::ParseServerResponse(const std::string& response, size_t con
 	// See comment in peer_channel.cc for why we use the Pragma header and not e.g. "X-Peer-Id".
 	CRM(GetHeaderValue(response, *eoh, "\r\nPragma: ", peer_id), "ParseServerResponse: GetHeaderValue FAILED");
 
-Success:
+//Success:
 	return r;
 
 Error:
@@ -308,7 +308,7 @@ RESULT WebRTCClient::ReadIntoBuffer(rtc::AsyncSocket* socket, std::string* data,
 		}
 	}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -487,7 +487,7 @@ RESULT WebRTCClient::SendMessageToPeer(int peerID, const std::string& message) {
 	m_strOnConnectData = headers;
 	m_strOnConnectData += message;
 	
-	CR(ConnectControlSocket(), "Error: SendMessageToPeer: Control socket connect failed");
+	CRM(ConnectControlSocket(), "Error: SendMessageToPeer: Control socket connect failed");
 
 Error:
 	return r;
@@ -522,7 +522,7 @@ RESULT WebRTCClient::Connect(const std::string& strServer, int port, const std::
 		DoConnect();
 	}
 
-Success:
+//Success:
 	return r;
 
 Error:
@@ -582,6 +582,6 @@ RESULT WebRTCClient::Close() {
 	m_WebRTCID = -1;
 	m_WebRTCState = NOT_CONNECTED;
 
-Error:
+//Error:
 	return r;
 }

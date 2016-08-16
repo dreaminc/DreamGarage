@@ -93,3 +93,37 @@ RESULT CloudController::Update() {
 Error:
 	return r;
 }
+
+
+// TODO: Convert WebRTC Client code to server client code
+
+// TODO: This will attempt to connect to the first peer in the list, should make more robust
+// and expose the available peer list at the CloudController layer
+RESULT CloudController::ConnectToPeer(int peerID) {
+	RESULT r = R_PASS;
+
+	CN(m_pCloudImp);
+	CR(m_pCloudImp->ConnectToPeer(peerID));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::SendMessageToPeer(int peerID, std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_pCloudImp);
+	CR(m_pCloudImp->SendMessageToPeer(peerID, strMessage));
+
+Error:
+	return r;
+}
+
+std::function<void(int msgID, void* data)> CloudController::GetUIThreadCallback() {
+	return m_pCloudImp->GetUIThreadCallback();
+}
+
+void CloudController::CallGetUIThreadCallback(int msgID, void* data) {
+	std::function<void(int msg_id, void* data)> fnUIThreadCallback;
+	return fnUIThreadCallback(msgID, data);
+}

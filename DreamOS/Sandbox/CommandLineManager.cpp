@@ -20,7 +20,7 @@ RESULT CommandLineManager::InitializeFromCommandLine(int argc, const char *argv[
 		m_strCommandLineArguments.push_back(std::string(argv[i]));
 	}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -35,7 +35,7 @@ std::string CommandLineManager::GetCommandLineArgument(int num) {
 }
 
 int CommandLineManager::GetNumCommandLineArguments() {
-	return m_strCommandLineArguments.size();
+	return (int)(m_strCommandLineArguments.size());
 }
 
 bool CommandLineManager::CommandLineArgumentFound(std::string strCommandLineArgument) {
