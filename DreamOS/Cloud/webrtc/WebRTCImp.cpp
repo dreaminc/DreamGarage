@@ -100,8 +100,17 @@ Error:
 }
 
 // TODO: Data channel fucks it up
-RESULT WebRTCImp::InitializeConnection() {
-	return InitializePeerConnection(false);
+RESULT WebRTCImp::InitializeConnection(bool fMaster, bool fAddDataChannel) {
+	RESULT r = R_PASS;
+
+	CRM(m_pWebRTCConductor->InitializePeerConnection(fAddDataChannel), "Failed to initialize WebRTC Peer Connection");
+
+	if (fMaster) {
+		CRM(m_pWebRTCConductor->CreateOffer(), "Failed to create WebRTC Offer");
+	}
+
+Error:
+	return r;
 }
 
 RESULT WebRTCImp::InitializePeerConnection(bool fAddDataChannel) {

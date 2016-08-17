@@ -324,7 +324,14 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
 					//m_pCloudController->ConnectToPeer(NULL);
-					m_pCloudController->InitializeConnection();
+					m_pCloudController->InitializeConnection(true, false);
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('V')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					//m_pCloudController->ConnectToPeer(NULL);
+					m_pCloudController->InitializeConnection(false, false);
 				}
 			}
 			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {

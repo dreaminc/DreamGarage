@@ -108,7 +108,7 @@ public:
 	}
 	*/
 
-	virtual RESULT InitializeConnection() override {
+	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override {
 		return R_NOT_IMPLEMENTED;
 	}
 

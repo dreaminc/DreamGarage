@@ -123,8 +123,8 @@ Error:
 	return r;
 }
 
-RESULT CloudController::InitializeConnection() {
-	return m_pCloudImp->InitializeConnection();
+RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel) {
+	return m_pCloudImp->InitializeConnection(fMaster, fAddDataChannel);
 }
 
 std::string CloudController::GetSDPOfferString() {

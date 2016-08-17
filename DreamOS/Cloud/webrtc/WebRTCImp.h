@@ -45,7 +45,8 @@ public:
 
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);
-	RESULT InitializePeerConnection(bool fAddDataChannel = false);
+	//RESULT InitializeConnection(bool fMaster, bool fAddDataChannel);
+	RESULT InitializePeerConnection(bool fAddDataChannel);
 	int GetFirstPeerID();
 	
 	virtual RESULT ConnectToPeer(int peerID) override;
@@ -58,7 +59,7 @@ public:
 	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
 	static std::string GetPeerName();
 	virtual std::string GetSDPOfferString() override;
-	virtual RESULT InitializeConnection() override;
+	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override;
 	virtual RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) override;
 
 protected:

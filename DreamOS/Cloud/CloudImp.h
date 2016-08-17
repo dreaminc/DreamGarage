@@ -31,7 +31,7 @@ public:
 
 	virtual std::string GetSDPOfferString() { return std::string(""); };
 	virtual RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) { return R_NOT_IMPLEMENTED; };
-	virtual RESULT InitializeConnection() = 0;
+	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) = 0;
 
 	// TODO: Add a handle URL request callback here
 

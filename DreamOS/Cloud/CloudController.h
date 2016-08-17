@@ -30,7 +30,7 @@ public:
 
 	RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON);
 	std::string GetSDPOfferString();
-	RESULT InitializeConnection();
+	RESULT InitializeConnection(bool fMaster, bool fAddDataChannel);
 
 	// TODO: This will attempt to connect to the first peer in the list, should make more robust
 	// and expose the available peer list at the CloudController layer
