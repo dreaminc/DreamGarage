@@ -324,14 +324,14 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
 					//m_pCloudController->ConnectToPeer(NULL);
-					m_pCloudController->InitializeConnection(true, false);
+					m_pCloudController->InitializeConnection(true, true);
 				}
 			}
 			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('V')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
 					//m_pCloudController->ConnectToPeer(NULL);
-					m_pCloudController->InitializeConnection(false, false);
+					m_pCloudController->InitializeConnection(false, true);
 				}
 			}
 			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
@@ -346,7 +346,19 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 					m_pCloudController->LoginUser();
 				}
 			}
-
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('P')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->PrintEnvironmentPeerList();
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('I')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->AddIceCandidates();
+				}
+			}
+			
 			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), true);
 		} break;
 

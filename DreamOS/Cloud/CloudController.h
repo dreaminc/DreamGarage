@@ -28,14 +28,16 @@ public:
 	RESULT LoginUser();
 	RESULT Update();
 
-	RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON);
+	RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
 	std::string GetSDPOfferString();
 	RESULT InitializeConnection(bool fMaster, bool fAddDataChannel);
+	RESULT AddIceCandidates();
 
 	// TODO: This will attempt to connect to the first peer in the list, should make more robust
 	// and expose the available peer list at the CloudController layer
 	// TODO: CLEAN UP MIGHT NOT DO STUFF ANYMORE
 	RESULT ConnectToPeer(int peerID);
+	RESULT PrintEnvironmentPeerList();
 
 	RESULT SendMessageToPeer(int peerID, std::string& strMessage);
 
@@ -43,10 +45,13 @@ public:
 
 	void CallGetUIThreadCallback(int msgID, void* data);
 
+	// WebRTC Callbacks
+	RESULT OnICECandidatesGatheringDone();
+
 private:
 	//UID m_uid;
 	std::unique_ptr<CloudImp> m_pCloudImp;
-
+	
 	std::unique_ptr<UserController> m_pUserController;
 	std::unique_ptr<EnvironmentController> m_pEnvironmentController;
 };

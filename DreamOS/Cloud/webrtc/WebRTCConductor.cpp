@@ -100,8 +100,40 @@ struct ICECandidate {
 
 std::list<ICECandidate> g_iceCandidates;
 
+void WebRTCConductor::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) {
+	DEBUG_OUT("ICE Connection Change: ");
+
+	switch (new_state) {
+		case webrtc::PeerConnectionInterface::kIceConnectionNew:			DEBUG_LINEOUT("ICE Connection New"); break;
+		case webrtc::PeerConnectionInterface::kIceConnectionChecking:		DEBUG_LINEOUT("ICE Connection Checking"); break;
+		case webrtc::PeerConnectionInterface::kIceConnectionConnected:		DEBUG_LINEOUT("ICE Connection Connected"); break;
+		case webrtc::PeerConnectionInterface::kIceConnectionCompleted:		DEBUG_LINEOUT("ICE Connection Completed"); break;
+		case webrtc::PeerConnectionInterface::kIceConnectionFailed:			DEBUG_LINEOUT("ICE Connection Failed"); break;
+		case webrtc::PeerConnectionInterface::kIceConnectionDisconnected:	DEBUG_LINEOUT("ICE Connection Disconnected"); break;
+		case webrtc::PeerConnectionInterface::kIceConnectionClosed:			DEBUG_LINEOUT("ICE Connection Closed"); break;
+		case webrtc::PeerConnectionInterface::kIceConnectionMax:			DEBUG_LINEOUT("ICE Connection Max"); break;
+	}
+}
+
+void WebRTCConductor::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {
+	DEBUG_OUT("ICE Connection Change: ");
+
+	switch (new_state) {
+		case webrtc::PeerConnectionInterface::kIceGatheringNew:					DEBUG_LINEOUT("ICE Gathering New"); break;
+		case webrtc::PeerConnectionInterface::kIceGatheringGathering:			DEBUG_LINEOUT("ICE Garthering"); break;
+		case webrtc::PeerConnectionInterface::kIceGatheringComplete: {
+			DEBUG_LINEOUT("ICE Gathering Complete");
+			m_pParentWebRTCImp->OnICECandidatesGatheringDone();
+		}break;
+	}
+}
+
+void WebRTCConductor::OnIceConnectionReceivingChange(bool receiving) {
+	DEBUG_LINEOUT("ICE Receiving %s", (receiving) ? "true" : "false");
+}
+
 void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
-	DEBUG_LINEOUT("OnIceCandidate: %d", candidate->sdp_mline_index());
+	DEBUG_LINEOUT("OnIceCandidate: %s %d", candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
 	
 	// For loopback test. To save some connecting delay.
 	if (m_fLoopback) {
@@ -244,8 +276,8 @@ Error:
 
 std::string WebRTCConductor::GetPeerConnectionString() {
 	// Issues behind the NAT
-	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:74.125.196.127:19302");
-	//return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	//return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:74.125.196.127:19302");
+	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
 }
 
 void WebRTCConductor::OnFailure(const std::string& error) {
@@ -300,8 +332,6 @@ RESULT WebRTCConductor::AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	return r;
 }
 
-#include "webrtc/api/localaudiosource.h"
-
 RESULT WebRTCConductor::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
 	RESULT r = R_PASS;
 
@@ -310,6 +340,7 @@ RESULT WebRTCConductor::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	// Set up constraints
 	webrtc::FakeConstraints audioSourceConstraints;
 
+	/*
 	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kGoogEchoCancellation, false);
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExtendedFilterEchoCancellation, true);
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kDAEchoCancellation, true);
@@ -317,6 +348,9 @@ RESULT WebRTCConductor::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, true);
 	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kNoiseSuppression, false);
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, true);
+	*/
+
+	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
 
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
 		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints)));
@@ -352,8 +386,6 @@ RESULT WebRTCConductor::AddStreams() {
 		*/
 	
 	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
-	
-	//pMediaStreamInterface->AddTrack(pAudioTrack);
 
 	CR(AddAudioStream(pMediaStreamInterface));
 	//CR(AddVideoStream(pMediaStreamInterface));
@@ -385,14 +417,9 @@ RESULT WebRTCConductor::AddDataChannel() {
 	webrtc::DataChannelInit dataChannelInit;
 
 	CB((m_WebRTCActiveDataChannels.find(kDataLabel) == m_WebRTCActiveDataChannels.end()));
-	//pDataChannelInterface = m_pWebRTCPeerConnection->CreateDataChannel(kDataLabel, &dataChannelInit);
-	m_pDataChannelInterface = m_pWebRTCPeerConnection->CreateDataChannel(kDataLabel, &dataChannelInit);
-	//CN(pDataChannelInterface);
-	CN(m_pDataChannelInterface);
 
-	// Add Channel
-	//pDataChannelInterface->  .connect(this, &PeerConnectionEndToEndTest::OnCallerAddedDataChanel);
-	//m_SignalOnDataChannel.connect(this, &WebRTCConductor::OnDataChannel);
+	m_pDataChannelInterface = m_pWebRTCPeerConnection->CreateDataChannel(kDataLabel, &dataChannelInit);
+	CN(m_pDataChannelInterface);
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataChannelPair;
 	m_WebRTCActiveDataChannels.insert(DataChannelPair(m_pDataChannelInterface->label(), m_pDataChannelInterface));
@@ -460,8 +487,6 @@ Error:
 void WebRTCConductor::OnMessage(const webrtc::DataBuffer& buffer) {
 	RESULT r = R_PASS;
 	
-	
-
 	if (buffer.binary) {
 		DEBUG_LINEOUT("WebRTCConductor::OnMessage (Binary Databuffer)");
 	}
@@ -509,8 +534,8 @@ RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 		return R_FAIL;
 	}
 
-	//if (!CreatePeerConnection(DTLS_OFF)) {
-	if (!CreatePeerConnection(DTLS_ON)) {
+	if (!CreatePeerConnection(DTLS_OFF)) {
+	//if (!CreatePeerConnection(DTLS_ON)) {
 		DEBUG_LINEOUT("Error CreatePeerConnection failed");
 		DeletePeerConnection();
 	}
@@ -519,9 +544,11 @@ RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 
 	CR(AddStreams());
 
+	/*
 	if (fAddDataChannel) {
 		CR(AddDataChannel());
 	}
+	//*/
 
 Error:
 	return r;
@@ -563,24 +590,23 @@ RESULT WebRTCConductor::CreatePeerConnection(bool dtls) {
 	iceServer.uri = GetPeerConnectionString();
 	rtcConfiguration.servers.push_back(iceServer);
 
+	webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
+
 	if (dtls) {
+
 		if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
 			pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
 		}
 
-		webrtcConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
-		webrtcConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
+		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
 
 		m_pWebRTCPeerConnection = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, &webrtcConstraints, NULL, std::move(pCertificateGenerator), this);
 	}
 	else {
-		webrtcConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
-		webrtcConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "false");
-
+		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
+		
 		m_pWebRTCPeerConnection = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, &webrtcConstraints, NULL, NULL, this);
 	}
-
-	
 
 	CNM(m_pWebRTCPeerConnection.get(), "WebRTC Peer Connection failed to initialize");
 
@@ -778,7 +804,29 @@ Error:
 	return;
 }
 
-RESULT WebRTCConductor::AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) {
+std::list<ICECandidate> g_peerICECandidates;
+
+RESULT WebRTCConductor::AddIceCandidates() {
+	RESULT r = R_PASS;
+
+	for (auto &peerICECandidate : g_peerICECandidates) {
+		webrtc::SdpParseError sdpError;
+		//std::unique_ptr<webrtc::IceCandidateInterface> candidate(webrtc::CreateIceCandidate(strSDPMID, sdpMLineIndex, strSDP, &sdpError));
+		std::unique_ptr<webrtc::IceCandidateInterface> candidate(
+			webrtc::CreateIceCandidate(peerICECandidate.m_strSDPMediaID, peerICECandidate.m_SDPMediateLineIndex, 
+									   peerICECandidate.m_strSDPCandidate, &sdpError));
+
+		CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
+		CBM((m_pWebRTCPeerConnection->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
+
+		DEBUG_LINEOUT(" Received candidate : %s", peerICECandidate.m_strSDPCandidate.c_str());
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 	RESULT r = R_PASS;
 
 	Json::Reader jsonReader;
@@ -788,12 +836,10 @@ RESULT WebRTCConductor::AddICECandidateFromSDPOfferStringJSON(std::string strSDP
 	
 	std::string strSDP;
 	
-
 	CBM((jsonReader.parse(strSDPOfferJSON, jsonMessage)), "Failed to parse SDP Offer Message");
-
 	CBM((rtc::GetStringFromJsonObject(jsonMessage, kSessionDescriptionTypeName, &strType)), "Failed to parse message");
 	
-	if (!strType.empty()) {
+	if (!strType.empty() && strType == "offer") {
 		if (strType == "offer-loopback") {
 			// This is a loopback call.
 			// Recreate the peerconnection with DTLS disabled.
@@ -823,30 +869,27 @@ RESULT WebRTCConductor::AddICECandidateFromSDPOfferStringJSON(std::string strSDP
 				m_pWebRTCPeerConnection->CreateAnswer(this, NULL);
 			}
 		}
-	}
+	}  
+	
+	///*
+	//else if (!strType.empty() && strType == "answer") {
+		if (jsonMessage["candidates"].isArray() && jsonMessage["candidates"].size() > 0) {
+			for (auto &jsonCandidate : jsonMessage["candidates"]) {
+				std::string strSDPMID;
+				int sdpMLineIndex = 0;
+				std::string strSDPCandidate;
 
-	if (jsonMessage["candidates"].isArray() && jsonMessage["candidates"].size() > 0) {
-		for (auto &jsonCandidate : jsonMessage["candidates"]) {
-			std::string strSDPMID;
-			int sdpMLineIndex = 0;
-			std::string strSDPCandidate;
+				ICECandidate peerICECandidate;
 
-			CBM((rtc::GetStringFromJsonObject(jsonCandidate, kCandidateSdpMidName, &strSDPMID)), "Failed to parse message");
-			CBM((rtc::GetIntFromJsonObject(jsonCandidate, kCandidateSdpMlineIndexName, &sdpMLineIndex)), "Failed to parse message");
-			CBM((rtc::GetStringFromJsonObject(jsonCandidate, kCandidateSdpName, &strSDPCandidate)), "Failed to parse message");
+				CBM((rtc::GetStringFromJsonObject(jsonCandidate, kCandidateSdpMidName, &(peerICECandidate.m_strSDPMediaID))), "Failed to parse message");
+				CBM((rtc::GetIntFromJsonObject(jsonCandidate, kCandidateSdpMlineIndexName, &(peerICECandidate.m_SDPMediateLineIndex))), "Failed to parse message");
+				CBM((rtc::GetStringFromJsonObject(jsonCandidate, kCandidateSdpName, &(peerICECandidate.m_strSDPCandidate))), "Failed to parse message");
 
-			{
-				webrtc::SdpParseError sdpError;
-				//std::unique_ptr<webrtc::IceCandidateInterface> candidate(webrtc::CreateIceCandidate(strSDPMID, sdpMLineIndex, strSDP, &sdpError));
-				std::unique_ptr<webrtc::IceCandidateInterface> candidate(webrtc::CreateIceCandidate(strSDPMID, sdpMLineIndex, strSDPCandidate, &sdpError));
-
-				CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
-				CBM((m_pWebRTCPeerConnection->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
-
-				DEBUG_LINEOUT(" Received candidate : %s", strSDPOfferJSON.c_str());
+				g_peerICECandidates.push_back(peerICECandidate);
 			}
 		}
-	}
+	//}
+	//*/
 
 Error:
 	return r;

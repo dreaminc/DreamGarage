@@ -7,9 +7,10 @@
 #include "WebRTCConductor.h"
 
 #include "webrtc/base/arraysize.h"
+#include "Cloud/CloudController.h"
 
-WebRTCImp::WebRTCImp() :
-	CloudImp(),
+WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
+	CloudImp(pParentCloudController),
 	m_pWebRTCConductor(nullptr)
 {
 	// empty
@@ -135,6 +136,23 @@ int WebRTCImp::GetFirstPeerID() {
 	return peerID;
 }
 
+RESULT WebRTCImp::AddIceCandidates() {
+	return m_pWebRTCConductor->AddIceCandidates();
+}
+
+RESULT WebRTCImp::OnICECandidatesGatheringDone() {
+	RESULT r = R_PASS;
+
+	// Update the SDP offer with candidates if connected
+	CloudController *pCloudController = GetParentCloudController();
+	CN(pCloudController);
+
+	CR(pCloudController->OnICECandidatesGatheringDone());
+
+Error:
+	return r;
+}
+
 // Fill this out and junk
 RESULT WebRTCImp::OnPeerConnectionInitialized() {
 	RESULT r = R_PASS;
@@ -178,11 +196,11 @@ std::string WebRTCImp::GetSDPOfferString() {
 	}
 }
 
-RESULT WebRTCImp::AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) {
+RESULT WebRTCImp::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebRTCConductor);
-	CR(m_pWebRTCConductor->AddICECandidateFromSDPOfferStringJSON(strSDPOfferJSON));
+	CR(m_pWebRTCConductor->CreateSDPOfferAnswer(strSDPOfferJSON));
 
 Error:
 	return r;

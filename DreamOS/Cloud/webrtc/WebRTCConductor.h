@@ -45,7 +45,8 @@ public:
 	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
 	
 	RESULT SendDataChannel(std::string& strMessage);
-	RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON);
+	RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
+	RESULT AddIceCandidates();
 
 protected:
 	// PeerConnectionObserver implementation.
@@ -56,12 +57,11 @@ protected:
 	void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
 
 	void OnRenegotiationNeeded() override {}
-	void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) override {};
-	void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) override {};
 
+	void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
+	void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state);
+	void OnIceConnectionReceivingChange(bool receiving);
 	void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
-	
-	void OnIceConnectionReceivingChange(bool receiving) override {}
 
 	// PeerConnectionClientObserver implementation.
 	virtual void OnSignedIn();

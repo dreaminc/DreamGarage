@@ -40,6 +40,40 @@ Error:
 	return r;
 }
 
+RESULT CloudController::PrintEnvironmentPeerList() {
+	RESULT r = R_PASS;
+
+	CNM(m_pEnvironmentController, "Environment not set up bro!");
+	CR(m_pEnvironmentController->PrintEnvironmentPeerList());
+
+Error:
+	return r;
+}
+
+RESULT CloudController::AddIceCandidates() {
+	return m_pCloudImp->AddIceCandidates();
+}
+
+RESULT CloudController::OnICECandidatesGatheringDone() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("ICE Gathering Complete");
+	CNM(m_pEnvironmentController, "Environment not set up bro!");
+
+	///*
+	if (m_pEnvironmentController->GetState() == EnvironmentController::state::ENVIRONMENT_CONNECTED_AND_READY) {
+		DEBUG_LINEOUT("Updating the SDP offer");
+		CR(m_pEnvironmentController->UpdateEnvironmentUser());
+	}
+	else {
+		DEBUG_LINEOUT("Environment not ready - need to connect to server bro!");
+	}
+	//*/
+
+Error:
+	return r;
+}
+
 RESULT CloudController::InitializeEnvironment(long environmentID) {
 	RESULT r = R_PASS;
 
@@ -62,11 +96,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) {
+RESULT CloudController::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 	RESULT r = R_PASS;
 
 	CN(m_pCloudImp);
-	CR(m_pCloudImp->AddICECandidateFromSDPOfferStringJSON(strSDPOfferJSON));
+	CR(m_pCloudImp->CreateSDPOfferAnswer(strSDPOfferJSON));
 
 Error:
 	return r;

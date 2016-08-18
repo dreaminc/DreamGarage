@@ -26,6 +26,7 @@ UserController::~UserController() {
 	// 
 }
 
+// TODO: Move to Controller - register methods etc
 std::string UserController::GetMethodURI(UserMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";

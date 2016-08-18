@@ -35,7 +35,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	if(type & CLOUD_CONTROLLER_WEBRTC) {		
 		// Create the CEF implementation			
 
-		std::unique_ptr<WebRTCImp> pWebRTCImp = std::make_unique<WebRTCImp>();
+		std::unique_ptr<WebRTCImp> pWebRTCImp = std::make_unique<WebRTCImp>(pCloudController);
 		CR(pWebRTCImp->Initialize());
 
 		// TOOD: TEST CODE:

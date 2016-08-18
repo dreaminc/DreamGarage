@@ -23,7 +23,7 @@ class Websocket;
 class EnvironmentController : public Controller{
 public:
 	enum class state {
-		SOCKET_UNINITIALIZED,
+		UNINITIALIZED,
 		SOCKET_INITIALIZED,
 		SOCKET_CONNECTING,
 		SOCKET_CONNECTED,
@@ -32,6 +32,12 @@ public:
 		ENVIRONMENT_PEER_LIST_REQUESTED,
 		ENVIRONMENT_PEER_LIST_RECEIVED,
 		ENVIRONMENT_CONNECTED_AND_READY,
+		INVALID
+	};
+
+public:
+	enum class EnvironmentMethod {
+		CONNECT_SOCKET,
 		INVALID
 	};
 public:
@@ -43,6 +49,9 @@ public:
 	RESULT CreateEnvironmentUser(User user);	
 	RESULT GetEnvironmentPeerList(User user);
 
+	RESULT UpdateEnvironmentUser();
+	RESULT PrintEnvironmentPeerList();
+
 private:
 	RESULT InitializeWebsocket(std::string& strURI);
 
@@ -53,12 +62,21 @@ private:
 
 	RESULT ClearPeerList();
 	RESULT AddNewPeer(long userID, long environmentID, const std::string& strSDPOffer);
+	RESULT UpdatePeer(long userID, long environmentID, const std::string& strSDPOffer);
 	bool FindPeerByUserID(long userID);
-	RESULT PrintEnvironmentPeerList();
+	EnvironmentPeer *GetPeerByUserID(long userID);
+	
+
+	std::string GetMethodURI(EnvironmentMethod userMethod);
+
+public:
+	EnvironmentController::state GetState() {
+		return m_state;
+	}
 
 private:
 	bool m_fConnected;
-	state m_state;
+	EnvironmentController::state m_state;
 
 	bool m_fPendingMessage;
 	uint64_t m_pendingMessageID;

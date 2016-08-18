@@ -32,7 +32,7 @@ public:
 	};
 
 public:
-	WebRTCImp();
+	WebRTCImp(CloudController *pParentCloudController);
 	~WebRTCImp();
 
 	friend class WebRTCClient;
@@ -60,7 +60,8 @@ public:
 	static std::string GetPeerName();
 	virtual std::string GetSDPOfferString() override;
 	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override;
-	virtual RESULT AddICECandidateFromSDPOfferStringJSON(std::string strSDPOfferJSON) override;
+	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON) override;
+	virtual RESULT AddIceCandidates() override;
 
 protected:
 	RESULT OnSignedIn();
@@ -71,6 +72,7 @@ protected:
 	RESULT OnMessageSent(int err);
 	RESULT OnServerConnectionFailure();
 	RESULT OnPeerConnectionInitialized();
+	RESULT OnICECandidatesGatheringDone();
 
 protected:
 	// WebRTC Specific

@@ -46,7 +46,8 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CN(m_pCommandLineManager);
 	
 	//CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	CR(m_pCommandLineManager->RegisterParameter("ip", "i", "localhost"));
+	CR(m_pCommandLineManager->RegisterParameter("ip", "i", "192.168.2.41"));
+	//CR(m_pCommandLineManager->RegisterParameter("ip", "i", "localhost"));
 	CR(m_pCommandLineManager->RegisterParameter("port", "P", "8000"));
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
