@@ -340,7 +340,7 @@ RESULT WebRTCConductor::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	// Set up constraints
 	webrtc::FakeConstraints audioSourceConstraints;
 
-	/*
+	///*
 	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kGoogEchoCancellation, false);
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExtendedFilterEchoCancellation, true);
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kDAEchoCancellation, true);
@@ -348,9 +348,9 @@ RESULT WebRTCConductor::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kExperimentalAutoGainControl, true);
 	audioSourceConstraints.AddMandatory(webrtc::MediaConstraintsInterface::kNoiseSuppression, false);
 	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kHighpassFilter, true);
-	*/
+	//*/
 
-	audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
+	//audioSourceConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, true);
 
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
 		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints)));
@@ -534,17 +534,17 @@ RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 		return R_FAIL;
 	}
 
-	if (!CreatePeerConnection(DTLS_OFF)) {
-	//if (!CreatePeerConnection(DTLS_ON)) {
+	//if (!CreatePeerConnection(DTLS_OFF)) {
+	if (!CreatePeerConnection(DTLS_ON)) {
 		DEBUG_LINEOUT("Error CreatePeerConnection failed");
 		DeletePeerConnection();
 	}
 	
 	CN(m_pWebRTCPeerConnection.get());
 
-	CR(AddStreams());
+	//CR(AddStreams());
 
-	/*
+	///*
 	if (fAddDataChannel) {
 		CR(AddDataChannel());
 	}
@@ -590,10 +590,9 @@ RESULT WebRTCConductor::CreatePeerConnection(bool dtls) {
 	iceServer.uri = GetPeerConnectionString();
 	rtcConfiguration.servers.push_back(iceServer);
 
-	webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
+	
 
 	if (dtls) {
-
 		if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
 			pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
 		}
@@ -604,6 +603,7 @@ RESULT WebRTCConductor::CreatePeerConnection(bool dtls) {
 	}
 	else {
 		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "false");
+		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
 		
 		m_pWebRTCPeerConnection = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, &webrtcConstraints, NULL, NULL, this);
 	}
@@ -839,7 +839,7 @@ RESULT WebRTCConductor::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 	CBM((jsonReader.parse(strSDPOfferJSON, jsonMessage)), "Failed to parse SDP Offer Message");
 	CBM((rtc::GetStringFromJsonObject(jsonMessage, kSessionDescriptionTypeName, &strType)), "Failed to parse message");
 	
-	if (!strType.empty() && strType == "offer") {
+	if (!strType.empty()) {
 		if (strType == "offer-loopback") {
 			// This is a loopback call.
 			// Recreate the peerconnection with DTLS disabled.
@@ -865,31 +865,31 @@ RESULT WebRTCConductor::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 
 			// TODO: Not clear why this is failing
 			//if (sessionDescriptionInterface->type() == webrtc::SessionDescriptionInterface::kOffer) {
-			if(strSDPType == webrtc::SessionDescriptionInterface::kOffer) {
+			//if(strSDPType == webrtc::SessionDescriptionInterface::kOffer) {
+			if(strSDPType == "offer") {
 				m_pWebRTCPeerConnection->CreateAnswer(this, NULL);
 			}
 		}
 	}  
 	
-	///*
-	//else if (!strType.empty() && strType == "answer") {
-		if (jsonMessage["candidates"].isArray() && jsonMessage["candidates"].size() > 0) {
-			for (auto &jsonCandidate : jsonMessage["candidates"]) {
-				std::string strSDPMID;
-				int sdpMLineIndex = 0;
-				std::string strSDPCandidate;
+	// Saves the candidates
+	if (jsonMessage["candidates"].isArray() && jsonMessage["candidates"].size() > 0) {
+		for (auto &jsonCandidate : jsonMessage["candidates"]) {
+			std::string strSDPMID;
+			int sdpMLineIndex = 0;
+			std::string strSDPCandidate;
 
-				ICECandidate peerICECandidate;
+			ICECandidate peerICECandidate;
 
-				CBM((rtc::GetStringFromJsonObject(jsonCandidate, kCandidateSdpMidName, &(peerICECandidate.m_strSDPMediaID))), "Failed to parse message");
-				CBM((rtc::GetIntFromJsonObject(jsonCandidate, kCandidateSdpMlineIndexName, &(peerICECandidate.m_SDPMediateLineIndex))), "Failed to parse message");
-				CBM((rtc::GetStringFromJsonObject(jsonCandidate, kCandidateSdpName, &(peerICECandidate.m_strSDPCandidate))), "Failed to parse message");
+			CBM((rtc::GetStringFromJsonObject(jsonCandidate, kCandidateSdpMidName, &(peerICECandidate.m_strSDPMediaID))), "Failed to parse message");
+			CBM((rtc::GetIntFromJsonObject(jsonCandidate, kCandidateSdpMlineIndexName, &(peerICECandidate.m_SDPMediateLineIndex))), "Failed to parse message");
+			CBM((rtc::GetStringFromJsonObject(jsonCandidate, kCandidateSdpName, &(peerICECandidate.m_strSDPCandidate))), "Failed to parse message");
 
-				g_peerICECandidates.push_back(peerICECandidate);
-			}
+			g_peerICECandidates.push_back(peerICECandidate);
 		}
-	//}
-	//*/
+	}
+
+	AddIceCandidates();
 
 Error:
 	return r;
