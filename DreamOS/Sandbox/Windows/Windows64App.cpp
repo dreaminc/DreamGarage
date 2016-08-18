@@ -131,7 +131,8 @@ RESULT Windows64App::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	// Set up the Cloud Controller
-	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 
 Error:
@@ -306,6 +307,13 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 		// Update the Keyboard in WndProc rather than in the run loop
 		// TODO: This should be different arch for native
 		case WM_KEYDOWN: {
+			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->LoginUser();
+				}
+			}
+
 			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), true);
 		} break;
 

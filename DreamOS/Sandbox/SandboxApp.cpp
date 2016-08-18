@@ -1,4 +1,5 @@
 #include "SandboxApp.h"
+#include "Cloud/CloudController.h"
 
 SandboxApp::SandboxApp() :
 	m_pPathManager(NULL),
@@ -12,7 +13,20 @@ SandboxApp::SandboxApp() :
 }
 
 SandboxApp::~SandboxApp() {
-	// empty stub
+	if (m_pCloudController != nullptr) {
+		delete m_pCloudController;
+		m_pCloudController = nullptr;
+	}
+
+	if (m_pHALImp != nullptr) {
+		delete m_pHALImp;
+		m_pHALImp = nullptr;
+	}
+
+	if (m_pOpenGLRenderingContext != nullptr) {
+		delete m_pOpenGLRenderingContext;
+		m_pOpenGLRenderingContext = nullptr;
+	}
 }
 
 inline PathManager * SandboxApp::GetPathManager() {
@@ -30,10 +44,7 @@ RESULT SandboxApp::Initialize() {
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
-
-#ifdef CEF_ENABLED
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
-#endif
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
