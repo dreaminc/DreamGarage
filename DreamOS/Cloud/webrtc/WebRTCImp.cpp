@@ -58,9 +58,9 @@ Error:
 }
 */
 
-RESULT WebRTCImp::SendMessageToPeer(int peerID, std::string& strMessage) {
+// TOOD: peer user id currently not doing anything
+RESULT WebRTCImp::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
-
 
 	// TODO: Remove this!
 	int pid;
@@ -75,9 +75,28 @@ RESULT WebRTCImp::SendMessageToPeer(int peerID, std::string& strMessage) {
 
 	//pid = GetFirstPeerID();
 	pid = m_pWebRTCConductor->GetPeerConnectionID();
-	CR(m_pWebRTCConductor->SendDataChannel(strMessage));
+
+	CR(m_pWebRTCConductor->SendDataChannelStringMessage(strMessage));
 	//CR(m_pWebRTCClient->SendMessageToPeer(pid, strMessage));
 
+Error:
+	return r;
+}
+
+// TOOD: peer user id currently not doing anything
+RESULT WebRTCImp::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	// TODO: Remove this!
+	int pid;
+
+	CN(m_pWebRTCClient);
+	CN(m_pWebRTCConductor);
+
+	DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+
+	pid = m_pWebRTCConductor->GetPeerConnectionID();
+	CR(m_pWebRTCConductor->SendDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
 
 Error:
 	return r;
@@ -148,6 +167,24 @@ RESULT WebRTCImp::OnICECandidatesGatheringDone() {
 	CN(pCloudController);
 
 	CR(pCloudController->OnICECandidatesGatheringDone());
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+	RESULT r = R_PASS;
+
+	CR(GetParentCloudController()->OnDataChannelStringMessage(strDataChannelMessage));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CR(GetParentCloudController()->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
 
 Error:
 	return r;

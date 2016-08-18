@@ -15,7 +15,16 @@
 #include "Environment/EnvironmentController.h"
 #include <memory>
 
+
+
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController> {
+public:
+	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
+	typedef std::function<RESULT(uint8_t *, int)> HandleDataChannelMessageCallback;
+
+	RESULT RegisterDataChannelStringMessageCallback(HandleDataChannelStringMessageCallback fnHandleDataChannelStringMessageCallback);
+	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
+
 public:
 	CloudController();
 	~CloudController();
@@ -39,14 +48,19 @@ public:
 	RESULT ConnectToPeer(int peerID);
 	RESULT PrintEnvironmentPeerList();
 
-	RESULT SendMessageToPeer(int peerID, std::string& strMessage);
 
 	std::function<void(int msgID, void* data)> GetUIThreadCallback();
 
 	void CallGetUIThreadCallback(int msgID, void* data);
 
 	// WebRTC Callbacks
+	// TODO: Convert to observer interface (clean up)
 	RESULT OnICECandidatesGatheringDone();
+	RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage);
+	RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
+	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 private:
 	//UID m_uid;
@@ -54,6 +68,10 @@ private:
 	
 	std::unique_ptr<UserController> m_pUserController;
 	std::unique_ptr<EnvironmentController> m_pEnvironmentController;
+
+private:
+	HandleDataChannelStringMessageCallback m_fnHandleDataChannelStringMessageCallback;
+	HandleDataChannelMessageCallback m_fnHandleDataChannelMessageCallback;
 };
 
 #endif

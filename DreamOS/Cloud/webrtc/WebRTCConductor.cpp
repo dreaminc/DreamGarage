@@ -443,7 +443,7 @@ void WebRTCConductor::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterf
 	channel->RegisterObserver(this);
 }
 
-RESULT WebRTCConductor::SendDataChannel(std::string& strMessage) {
+RESULT WebRTCConductor::SendDataChannelStringMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
 
 	//m_SignalOnDataChannel
@@ -454,6 +454,18 @@ RESULT WebRTCConductor::SendDataChannel(std::string& strMessage) {
 
 	//CB(pWebRTCDataChannel->Send(webrtc::DataBuffer(strMessage)));
 	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(strMessage)));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	CN(m_pDataChannelInterface);
+
+	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)));
 
 Error:
 	return r;
@@ -484,21 +496,36 @@ Error:
 	return;
 }
 
+// Data Channel OnMessage
 void WebRTCConductor::OnMessage(const webrtc::DataBuffer& buffer) {
 	RESULT r = R_PASS;
 	
 	if (buffer.binary) {
 		DEBUG_LINEOUT("WebRTCConductor::OnMessage (Binary Databuffer)");
+		int pDataBuffer_n = (int)(buffer.size());
+		uint8_t *pDataBuffer = new uint8_t[pDataBuffer_n];
+		memset(pDataBuffer, 0, sizeof(char) * pDataBuffer_n);
+		memcpy(pDataBuffer, buffer.data.data<uint8_t>(), buffer.size());
+
+		CR(m_pParentWebRTCImp->OnDataChannelMessage(pDataBuffer, pDataBuffer_n));
 	}
 	else {
-		std::string strData = std::string(buffer.data.data<char>());
-		DEBUG_LINEOUT("WebRTCConductor::OnMessage: %s (String Databuffer)", strData.c_str());
+		//std::string strData = std::string(buffer.data.data<char>());
+		int pszBufferString_n = (int)(buffer.size()) + 1;
+		char *pszBufferString = new char[pszBufferString_n];
+		memset(pszBufferString, 0, sizeof(char) * pszBufferString_n);
+		memcpy(pszBufferString, buffer.data.data<char>(), buffer.size());
+
+		std::string strData = std::string(pszBufferString);
+
+		//DEBUG_LINEOUT("WebRTCConductor::OnMessage: %s (String Databuffer)", strData.c_str());
+		CR(m_pParentWebRTCImp->OnDataChannelStringMessage(strData));
 	}
 
 	//auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
 	//CN(pWebRTCDataChannel);
 
-//Error:
+Error:
 	return;
 }
 

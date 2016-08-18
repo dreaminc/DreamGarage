@@ -5,7 +5,10 @@
 
 CloudController::CloudController() :
 	m_pCloudImp(nullptr),
-	m_pUserController(nullptr)
+	m_pUserController(nullptr),
+	m_pEnvironmentController(nullptr),
+	m_fnHandleDataChannelStringMessageCallback(nullptr),
+	m_fnHandleDataChannelMessageCallback(nullptr)
 {
 	// empty
 }
@@ -17,6 +20,26 @@ CloudController::~CloudController() {
 
 	if (pHTTPController != nullptr) {
 		pHTTPController->Stop();
+	}
+}
+
+RESULT CloudController::RegisterDataChannelStringMessageCallback(HandleDataChannelStringMessageCallback fnHandleDataChannelStringMessageCallback) {
+	if (m_fnHandleDataChannelStringMessageCallback) {
+		return R_FAIL;
+	}
+	else {
+		m_fnHandleDataChannelStringMessageCallback = fnHandleDataChannelStringMessageCallback;
+		return R_PASS;
+	}
+}
+
+RESULT CloudController::RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback) {
+	if (m_fnHandleDataChannelMessageCallback) {
+		return R_FAIL;
+	}
+	else {
+		m_fnHandleDataChannelMessageCallback = fnHandleDataChannelMessageCallback;
+		return R_PASS;
 	}
 }
 
@@ -69,6 +92,26 @@ RESULT CloudController::OnICECandidatesGatheringDone() {
 		DEBUG_LINEOUT("Environment not ready - need to connect to server bro!");
 	}
 	//*/
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_fnHandleDataChannelStringMessageCallback);
+	CR(m_fnHandleDataChannelStringMessageCallback(strDataChannelMessage));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_fnHandleDataChannelMessageCallback);
+	CR(m_fnHandleDataChannelMessageCallback(pDataChannelBuffer, pDataChannelBuffer_n));
 
 Error:
 	return r;
@@ -165,11 +208,21 @@ std::string CloudController::GetSDPOfferString() {
 	return m_pCloudImp->GetSDPOfferString();
 }
 
-RESULT CloudController::SendMessageToPeer(int peerID, std::string& strMessage) {
+RESULT CloudController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
 
 	CN(m_pCloudImp);
-	CR(m_pCloudImp->SendMessageToPeer(peerID, strMessage));
+	CR(m_pCloudImp->SendDataChannelStringMessage(peerID, strMessage));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pCloudImp);
+	CR(m_pCloudImp->SendDataChannelMessage(peerID, pDataChannelBuffer, pDataChannelBuffer_n));
 
 Error:
 	return r;

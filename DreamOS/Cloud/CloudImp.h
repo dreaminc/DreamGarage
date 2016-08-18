@@ -37,7 +37,9 @@ public:
 
 	virtual RESULT ConnectToPeer(int peerID) = 0;
 	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() = 0;
-	virtual RESULT SendMessageToPeer(int peerID, std::string& strMessage) = 0;
+	
+	virtual RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage) = 0;
+	virtual RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 
 	virtual std::string GetSDPOfferString() { return std::string(""); };
 	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON) { return R_NOT_IMPLEMENTED; };

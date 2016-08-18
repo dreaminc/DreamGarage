@@ -44,7 +44,9 @@ public:
 public:
 	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
 	
-	RESULT SendDataChannel(std::string& strMessage);
+	RESULT SendDataChannelStringMessage(std::string& strMessage);
+	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
 	RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
 	RESULT AddIceCandidates();
 

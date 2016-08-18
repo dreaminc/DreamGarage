@@ -52,7 +52,8 @@ public:
 	virtual RESULT ConnectToPeer(int peerID) override;
 	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() override;
 	void QueueUIThreadCallback(int msg_id, void* data);
-	virtual RESULT SendMessageToPeer(int peerID, std::string& strMessage) override;
+	virtual RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage) override;
+	virtual RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 
 public:
 	// Utilities
@@ -73,6 +74,8 @@ protected:
 	RESULT OnServerConnectionFailure();
 	RESULT OnPeerConnectionInitialized();
 	RESULT OnICECandidatesGatheringDone();
+	RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage);
+	RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 protected:
 	// WebRTC Specific

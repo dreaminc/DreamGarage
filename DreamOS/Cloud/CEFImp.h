@@ -94,7 +94,11 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	virtual RESULT SendMessageToPeer(int peerID, std::string& strMessage) override {
+	virtual RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override {
 		return R_NOT_IMPLEMENTED;
 	}
 

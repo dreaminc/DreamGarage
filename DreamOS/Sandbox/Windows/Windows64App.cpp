@@ -337,7 +337,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
-					m_pCloudController->SendMessageToPeer(NULL, std::string("hi"));
+					m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
 				}
 			}
 			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
