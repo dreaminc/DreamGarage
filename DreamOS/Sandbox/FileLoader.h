@@ -19,7 +19,7 @@ public:
 
 	struct mesh_t {
 		std::vector<vertex> vertices;
-		std::vector<size_t> indices;
+		std::vector<dimindex> indices;
 	};
 
 	typedef std::vector < std::pair<material_t, std::vector<vertex>>> multi_mesh_t;

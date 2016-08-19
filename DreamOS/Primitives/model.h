@@ -141,7 +141,7 @@ public:
 		return;
 	}
 
-	model(const std::vector<vertex>& vertices, const std::vector<size_t>& indices) {
+	model(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 		RESULT r = R_PASS;
 
 		m_nIndices = static_cast<unsigned int>(indices.size());		
@@ -157,7 +157,7 @@ public:
 		Cnt = 0;
 
 		for (auto& i : indices) {
-			m_pIndices[Cnt++] = static_cast<dimindex>(i);
+			m_pIndices[Cnt++] = i;
 
 			if (Cnt % 3 == 0) {
 				SetTriangleTangentBitangent(m_pIndices[Cnt - 3], m_pIndices[Cnt - 2], m_pIndices[Cnt - 1]);

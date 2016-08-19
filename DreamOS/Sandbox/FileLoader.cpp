@@ -17,9 +17,9 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 
 	std::ifstream obj_file(obj_file_name, std::ios::binary);
 
-	std::vector<size_t> indices;
-	size_t	index = 0;
-	std::map<int, size_t> objIndexMap;
+	std::vector<dimindex> indices;
+	dimindex	index = 0;
+	std::map<int, dimindex> objIndexMap;
 
 	if (!obj_file.is_open())
 	{

@@ -391,14 +391,14 @@ Error:
 #include "OGLProfiler.h"
 
 // TODO: This convenience function should be put in a model factory
-// TODO: fix this so that it's a composite object
 
-std::vector<model*> OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 	RESULT r = R_PASS;
 
 	FileLoaderHelper::multi_mesh_indices_t v;
 	FileLoaderHelper::LoadOBJFile(strRootFolder + wstrOBJFilename, v);
-	std::vector<model*> pMod{ 0 };
+	
+	composite* pComposite = new composite(this);
 
 	// texture caching
 	std::map<std::wstring, texture*> textureMap;
@@ -408,15 +408,12 @@ std::vector<model*> OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wst
 			continue;
 		}
 
-		OGLModel* pModel = new OGLModel(this, std::move(m.second.vertices), std::move(m.second.indices));
-		
-		// hack. what we should really do is composite the sub models
-		//if (pMod == nullptr)
-		//	pMod = pModel;
-		pMod.push_back(pModel);
-
+		std::shared_ptr<model> pModel(MakeModel(std::move(m.second.vertices), std::move(m.second.indices)));
+				
 		CN(pModel);
-		
+
+		pComposite->AddChild(pModel);
+
 		if (pTexture != nullptr) {
 			pModel->SetColorTexture(pTexture);
 		}
@@ -456,12 +453,12 @@ std::vector<model*> OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wst
 		pModel->Scale(scale);
 		pModel->MoveTo(ptPosition);
 		pModel->RotateYBy(rotateY);
-		pModel->UpdateOGLBuffers();
-		pSceneGraph->PushObject(pModel);
+		//pModel->UpdateOGLBuffers();
+		pSceneGraph->PushObject(pModel.get());
 	}
 
 Error:
-	return pMod;
+	return pComposite;
 }
 
 model *OpenGLImp::MakeModel(wchar_t *pszModelName) {
@@ -503,7 +500,7 @@ model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices, const std::vect
 	RESULT r = R_PASS;
 
 	// Not implemented yet, until size_t <-> dimindex conflict is resolved.
-	model *pModel = nullptr;//new OGLModel(this, vertices, indices);
+	model *pModel = new OGLModel(this, vertices, indices);
 	CN(pModel);
 
 	//Success:

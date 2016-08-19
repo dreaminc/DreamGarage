@@ -93,6 +93,7 @@ RESULT DreamGarage::LoadScene() {
 		0.1f,
 		100.0f);
 
+
 	AddModel(objFile, L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
 		point(-3.0f, -4.2f - 2.5f, 0.0f),

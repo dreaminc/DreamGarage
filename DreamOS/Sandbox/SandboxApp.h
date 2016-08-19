@@ -78,7 +78,7 @@ public:
 	model *AddModel(const std::vector<vertex>& vertices);
 	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
-	std::vector<model*> AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	composite* AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
 public:
 	PathManager *GetPathManager();
