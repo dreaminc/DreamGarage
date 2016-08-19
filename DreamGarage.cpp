@@ -75,7 +75,7 @@ RESULT DreamGarage::LoadScene() {
 	pQuad->SetBillboard(true);
 
 	quad *pQuad2 = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad2->MoveTo(3.0f, 1.0f, 3.0f);
+	pQuad2->MoveTo(5.0f, 5.0f, 0.0f);
 	pQuad2->SetScaledBillboard(true);
 	pQuad2->SetBillboard(true);
 	
@@ -117,11 +117,18 @@ RESULT DreamGarage::LoadScene() {
 	pSphere2->AddChild(pSphere3);
 	//*/
 	
-	/*
-	volume *pVolume = AddVolume(0.5f);
-	pVolume->MoveTo(0.0f, 0.0f, 0.0f);
-	*/
+	text *pText = AddText(L"Arial.fnt", "Hello world", 1.0f, true);
+	pText->MoveTo(1.0f, 1.0f, 0.0f);
 
+	text *pText2 = AddText(L"Arial.fnt", "Hello world", 0.1f, true);
+	pText2->SetPosition(point(5.0f, 5.0f, 0.0f));
+	//pText2->SetScaledBillboard(true);
+
+	// one arg?
+	volume *pVolume = AddVolume(0.5f, 0.5f, 0.5f);
+	pVolume->MoveTo(pText2->GetOrigin());
+
+	///*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
 
@@ -131,7 +138,7 @@ RESULT DreamGarage::LoadScene() {
 	pMgr->GetCurrentPath((wchar_t*&)path);
 	std::wstring objFile(path);
 
-	/*
+	///*
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f, 0.0f),
@@ -157,9 +164,9 @@ RESULT DreamGarage::LoadScene() {
 		1.0f);
 
 	
-	*/
+	//*/
 
-	/*
+	///*
 	AddModel(objFile, L"\\Models\\table\\untitled.obj",
 		nullptr,
 		point(0.0, 13.0, 0.0),

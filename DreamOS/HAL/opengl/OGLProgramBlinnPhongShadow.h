@@ -96,9 +96,18 @@ public:
 
 		m_pUniformObjectCenter->SetUniform(pDimObj->GetOrigin());
 
+		text *pText = dynamic_cast<text *>(pDimObj);
 		quad *pQuad = dynamic_cast<quad *>(pDimObj);
-		m_pUniformfBillboard->SetUniform(pQuad != nullptr && pQuad->IsBillboard());
-		m_pUniformfScale->SetUniform(pQuad != nullptr && pQuad->IsScaledBillboard());
+		if (pText != nullptr)
+		{
+			m_pUniformfBillboard->SetUniform(pText && pText->IsBillboard());
+		}
+		else if (pQuad != nullptr) {
+			m_pUniformfBillboard->SetUniform(pQuad && pQuad->IsBillboard());
+			m_pUniformfScale->SetUniform(pQuad != nullptr && pQuad->IsScaledBillboard());
+		}
+		else
+			m_pUniformfBillboard->SetUniform(false);
 
 		return R_PASS;
 	}

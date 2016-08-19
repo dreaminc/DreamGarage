@@ -24,6 +24,7 @@ in Data {
 
 uniform	bool u_fUseColorTexture;
 uniform sampler2D u_textureColor;
+uniform int u_intTextureChannels;
 
 // Light Structure
 struct Light {
@@ -110,6 +111,10 @@ void main(void) {
 		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 	}
 
-
-	//out_vec4Color = textureColor;
+	if (u_intTextureChannels == 4 && out_vec4Color.a == 0.0f) {
+		gl_FragDepth = 1.0f;
+	}
+	else {
+		gl_FragDepth = gl_FragCoord.z;
+	}
 }

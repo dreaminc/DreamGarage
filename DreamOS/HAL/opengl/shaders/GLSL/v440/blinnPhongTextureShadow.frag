@@ -27,6 +27,8 @@ in Data {
 
 uniform sampler2D u_textureColor;
 uniform sampler2D u_textureDepth;
+uniform int u_intTextureChannels;
+uniform bool u_fUseColorTexture;
 
 // Light Structure
 struct Light {
@@ -132,6 +134,17 @@ void main(void) {
 	
 	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 1.0f);
 	vec4 ambientColor = g_vec4AmbientLightLevel;
-	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
-	//out_vec4Color = textureColor;
+	if(u_fUseColorTexture == true) {
+		out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
+	}
+	else {
+		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
+	}
+
+	if (u_intTextureChannels == 4 && out_vec4Color.a <= 0.01f) {
+		gl_FragDepth = 1.0f;
+	}
+	else {
+		gl_FragDepth = gl_FragCoord.z;
+	}
 }

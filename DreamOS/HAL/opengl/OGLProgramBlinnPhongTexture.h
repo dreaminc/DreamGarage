@@ -42,6 +42,7 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureChannels), std::string("u_intTextureChannels")));
 
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformUseColorTexture), std::string("u_fUseColorTexture")));
 
@@ -62,9 +63,13 @@ public:
 			pTexture->OGLActivateTexture();
 			m_pUniformTextureColor->SetUniform(pTexture);
 			m_pUniformUseColorTexture->SetUniform(true);
+			if (m_pUniformTextureChannels)
+				m_pUniformTextureChannels->SetUniformInteger(pTexture->GetChannels());
 		}
 		else {
 			m_pUniformUseColorTexture->SetUniform(false);
+			if (m_pUniformTextureChannels)
+				m_pUniformTextureChannels->SetUniformInteger(0);
 		}
 
 //	Error:
@@ -148,6 +153,7 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniform *m_pUniformTextureChannels;
 
 	OGLUniformBool *m_pUniformUseColorTexture;
 

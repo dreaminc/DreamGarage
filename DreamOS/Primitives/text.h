@@ -30,9 +30,17 @@ public:
 	inline unsigned int NumberVertices() { return m_nVertices; }
 	inline unsigned int NumberIndices() { return m_nIndices; }
 
+	bool IsBillboard() { return m_fBillboard; }
+	void SetBillboard(bool billboard) { m_fBillboard = billboard; }
+
+	bool IsScaledBillboard() { return m_fScaledBillboard; }
+	void SetScaledBillboard(bool scale) { m_fScaledBillboard = scale; }
+
 private:
 	unsigned int m_nVertices;
 	unsigned int m_nIndices;
+	bool m_fBillboard;
+	bool m_fScaledBillboard = false;
 
 public:
 
@@ -51,7 +59,7 @@ public:
 		m_font(font)
 	{
 		SetText(text, size);
-
+		m_fBillboard = isBillboard;
 		Validate();
 //	Error:
 //		Invalidate();

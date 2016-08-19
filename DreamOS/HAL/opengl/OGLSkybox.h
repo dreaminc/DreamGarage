@@ -48,16 +48,21 @@ public:
 		glDisable(GL_CULL_FACE);
 		glDepthMask(GL_FALSE);
 
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 		CR(OGLObj::Render());
 
 	Error:
 		glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
 
 		if(fCullingEnabled)
 			glEnable(GL_CULL_FACE);
 
 		return r;
 	}
+
 	//*/
 };
 
