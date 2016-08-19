@@ -15,8 +15,6 @@
 #include "Environment/EnvironmentController.h"
 #include <memory>
 
-
-
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController> {
 public:
 	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
