@@ -86,7 +86,7 @@ public:
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
 	model *MakeModel(const std::vector<vertex>& vertices);
-	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<size_t>& indices);
+	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	composite *MakeComposite();
 

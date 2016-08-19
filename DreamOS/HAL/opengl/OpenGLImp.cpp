@@ -499,10 +499,11 @@ Error:
 	return nullptr;
 }
 
-model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices, const std::vector<size_t>& indices) {
+model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
-	model *pModel = new OGLModel(this, vertices, indices);
+	// Not implemented yet, until size_t <-> dimindex conflict is resolved.
+	model *pModel = nullptr;//new OGLModel(this, vertices, indices);
 	CN(pModel);
 
 	//Success:
