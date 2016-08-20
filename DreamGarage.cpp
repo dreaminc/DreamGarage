@@ -5,8 +5,28 @@
 
 light *g_pLight = nullptr;
 
+#include "Cloud/CloudController.h"
+#include "Cloud/Message/UpdateHeadMessage.h"
+#include "Cloud/Message/UpdateHandMessage.h"
+
+// TODO: Should this go into the DreamOS side?
+RESULT DreamGarage::InitializeCloudControllerCallbacks() {
+	RESULT r = R_PASS;
+
+//	CloudController::HandleHeadUpdateMessageCallback fnHeadUpdateMessageCallback = static_cast<CloudController::HandleHeadUpdateMessageCallback>(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2));
+
+	CR(RegisterHeadUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2)));
+	CR(RegisterHandUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHandMessage, this, std::placeholders::_1, std::placeholders::_2)));
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
+
+	// TODO: This should go into an "initialize" function
+	InitializeCloudControllerCallbacks();
 
 	// Add lights
 
@@ -172,6 +192,18 @@ RESULT DreamGarage::LoadScene() {
 	return r;
 }
 
+RESULT DreamGarage::SendHeadPosition() {
+	RESULT r = R_PASS;
+
+	point ptPosition = GetCameraPosition();
+	quaternion qOrientation = GetCameraOrientation();
+
+	CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 
@@ -188,9 +220,32 @@ RESULT DreamGarage::Update(void) {
 
 	m_pSphere->translateX(0.001f);
 
+	SendHeadPosition();
+
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
 	//g_pLight->RotateLightDirectionXAxis(0.0005f * 1.3f);
 
 	//Error:
+	return r;
+}
+
+// Cloud Controller
+RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("HandleUpdateHeadMessage");
+	pUpdateHeadMessage->PrintMessage();
+
+//Error:
+	return r;
+}
+
+RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("HandleUpdateHandMessage");
+	pUpdateHandMessage->PrintMessage();
+
+//Error:
 	return r;
 }

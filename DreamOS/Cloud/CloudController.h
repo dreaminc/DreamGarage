@@ -15,13 +15,31 @@
 #include "Environment/EnvironmentController.h"
 #include <memory>
 
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
+#include "Primitives/quaternion.h"
+#include "Primitives/hand.h"
+
+class UpdateHeadMessage; 
+class UpdateHandMessage;
+
+typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
+typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
+
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController> {
-public:
+protected:
 	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
 	typedef std::function<RESULT(uint8_t *, int)> HandleDataChannelMessageCallback;
 
 	RESULT RegisterDataChannelStringMessageCallback(HandleDataChannelStringMessageCallback fnHandleDataChannelStringMessageCallback);
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
+
+public:
+	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
+	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
+
+	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
 public:
 	CloudController();
@@ -46,7 +64,6 @@ public:
 	RESULT ConnectToPeer(int peerID);
 	RESULT PrintEnvironmentPeerList();
 
-
 	std::function<void(int msgID, void* data)> GetUIThreadCallback();
 
 	void CallGetUIThreadCallback(int msgID, void* data);
@@ -70,6 +87,9 @@ private:
 private:
 	HandleDataChannelStringMessageCallback m_fnHandleDataChannelStringMessageCallback;
 	HandleDataChannelMessageCallback m_fnHandleDataChannelMessageCallback;
+
+	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
+	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
 };
 
 #endif

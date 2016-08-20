@@ -46,6 +46,8 @@ public:
 	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) = 0;
 	virtual RESULT AddIceCandidates() { return R_NOT_IMPLEMENTED; }
 
+	virtual bool IsConnected() = 0;
+
 	// TODO: Add a handle URL request callback here
 
 	CloudController* GetParentCloudController() { return m_pParentCloudController; }

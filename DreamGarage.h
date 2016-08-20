@@ -21,8 +21,15 @@ public:
 		// empty
 	}
 
+	RESULT SendHeadPosition();
+
 	RESULT LoadScene();
 	RESULT Update(void);
+
+	// Cloud Controller
+	RESULT InitializeCloudControllerCallbacks();
+	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
+	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
 
 private:
 	sphere *m_pSphere;

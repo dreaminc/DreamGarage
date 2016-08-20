@@ -334,12 +334,14 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 					m_pCloudController->InitializeConnection(false, true);
 				}
 			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
+			/*else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
-					m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
+					//m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
+
+					m_pCloudController->SendUpdateHeadMessage(NULL, point(1, 2, 3), quaternion(1, 2, 3, 4));
 				}
-			}
+			}*/
 			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list

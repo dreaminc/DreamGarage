@@ -121,8 +121,8 @@ public:
 		return R_PASS;
 	}
 
-	RESULT Print() {
-		DEBUG_LINEOUT("pt(%f, %f, %f, %f)", x(), y(), z(), w());
+	RESULT Print(char *pszOptName = nullptr) {
+		DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", x(), y(), z(), w());
 		return R_PASS;
 	}
 	

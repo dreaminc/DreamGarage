@@ -51,6 +51,8 @@ public:
 		return m_user;
 	}
 
+	long GetUserID() { return m_user.GetUserID(); }
+
 private:
 	bool m_fLoggedIn = false;
 	std::string	m_strToken;

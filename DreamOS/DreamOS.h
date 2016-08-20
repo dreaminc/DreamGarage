@@ -67,6 +67,18 @@ protected:
 
 	RESULT AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
+	camera* GetCamera();
+	point GetCameraPosition();
+	quaternion GetCameraOrientation();
+
+	// Cloud Controller
+protected:
+	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
+	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
+
+	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();

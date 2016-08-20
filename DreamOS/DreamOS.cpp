@@ -43,6 +43,18 @@ Error:
 	return r;
 }
 
+camera* DreamOS::GetCamera() {
+	return m_pSandbox->GetCamera();
+}
+
+point DreamOS::GetCameraPosition() {
+	return m_pSandbox->GetCameraPosition();
+}
+
+quaternion DreamOS::GetCameraOrientation() {
+	return m_pSandbox->GetCameraOrientation();
+}
+
 RESULT DreamOS::Start() {
 	RESULT r = R_PASS;
 
@@ -128,4 +140,21 @@ RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallb
 
 RESULT DreamOS::UnregisterUpdateCallback() {
 	return m_pSandbox->UnregisterUpdateCallback();
+}
+
+// Cloud Controller
+RESULT DreamOS::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
+	return m_pSandbox->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
+}
+
+RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
+	return m_pSandbox->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
+}
+
+RESULT DreamOS::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pSandbox->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
+	return m_pSandbox->SendUpdateHandMessage(userID, handState);
 }

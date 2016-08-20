@@ -46,7 +46,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CN(m_pCommandLineManager);
 	
 	//CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	CR(m_pCommandLineManager->RegisterParameter("ip", "i", "192.168.1.2"));
+	CR(m_pCommandLineManager->RegisterParameter("ip", "i", "ec2-54-175-210-194.compute-1.amazonaws.com"));
 	//CR(m_pCommandLineManager->RegisterParameter("ip", "i", "localhost"));
 	CR(m_pCommandLineManager->RegisterParameter("port", "P", "8000"));
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
@@ -314,6 +314,31 @@ Error:
 	return r;
 }
 
+camera* SandboxApp::GetCamera() {
+	return m_pHALImp->GetCamera();
+}
+
 point SandboxApp::GetCameraPosition() {
 	return m_pHALImp->GetCamera()->GetPosition();
+}
+
+quaternion SandboxApp::GetCameraOrientation() {
+	return m_pHALImp->GetCamera()->GetOrientation();
+}
+
+// Cloud Controller
+RESULT SandboxApp::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
+	return m_pCloudController->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
+}
+
+RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
+	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
+}
+
+RESULT SandboxApp::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pCloudController->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState) {
+	return m_pCloudController->SendUpdateHandMessage(userID, handState);
 }

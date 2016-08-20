@@ -43,6 +43,16 @@ RESULT thumb::Initialize() {
 	return r;
 }
 
+thumb::ThumbState thumb::GetThumbState() {
+	ThumbState thumbState = {
+		m_pTip->GetPosition(),
+		m_pDIP->GetPosition(),
+		m_pPIP->GetPosition()
+	};
+
+	return thumbState;
+}
+
 
 finger::finger(HALImp* pHALImp) :
 	composite(pHALImp),
@@ -93,6 +103,17 @@ RESULT finger::Initialize() {
 
 //Error:
 	return r;
+}
+
+finger::FingerState finger::GetFingerState() {
+	FingerState fingerState = {
+		m_pTip->GetPosition(),
+		m_pMCP->GetPosition(),
+		m_pDIP->GetPosition(),
+		m_pPIP->GetPosition()
+	};
+
+	return fingerState;
 }
 
 RESULT finger::SetJointPosition(point ptJoint, JOINT_TYPE jointType) {
@@ -210,4 +231,18 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 
 //Error:
 	return r;
+}
+
+hand::HandState hand::GetHandState() {
+	hand::HandState handState = {
+		m_handType,
+		m_pPalm->GetPosition(),
+		m_pIndexFinger->GetFingerState(),
+		m_pMiddleFinger->GetFingerState(),
+		m_pRingFinger->GetFingerState(),
+		m_pPinkyFinger->GetFingerState(),
+		m_pThumb->GetThumbState()
+	};
+
+	return handState;
 }

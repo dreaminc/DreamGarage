@@ -83,6 +83,14 @@ Error:
 	return r;
 }
 
+// TODO: This should be a bit more robust
+bool WebRTCImp::IsConnected() {
+	if (m_pWebRTCConductor == nullptr)
+		return false;
+
+	return m_pWebRTCConductor->IsPeerConnectionInitialized();
+}
+
 // TOOD: peer user id currently not doing anything
 RESULT WebRTCImp::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
@@ -93,7 +101,7 @@ RESULT WebRTCImp::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer
 	CN(m_pWebRTCClient);
 	CN(m_pWebRTCConductor);
 
-	DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
 
 	pid = m_pWebRTCConductor->GetPeerConnectionID();
 	CR(m_pWebRTCConductor->SendDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));

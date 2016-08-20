@@ -88,6 +88,11 @@ public:
 		return R_PASS;
 	}
 
+	RESULT Print(char *pszOptName = nullptr) {
+		DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", m_x, m_y, m_z, m_w);
+		return R_PASS;
+	}
+
 	RESULT SetQuaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 		quaternion_precision factor = static_cast<quaternion_precision>(sin(theta / 2.0));
 

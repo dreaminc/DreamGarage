@@ -42,6 +42,7 @@ public:
 	RESULT Initialize();
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT Update();
+	bool IsConnected();
 
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);

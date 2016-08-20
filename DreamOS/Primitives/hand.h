@@ -25,11 +25,29 @@ public:
 		JOINT_INVALID
 	} JOINT_TYPE;
 
+	struct FingerState {
+		point ptTip;
+		point ptMCP;
+		point ptPIP;
+		point ptDIP;
+
+		RESULT PrintState() {
+			DEBUG_LINEOUT("finger state:");
+			ptTip.Print();
+			ptMCP.Print();
+			ptPIP.Print();
+			ptDIP.Print();
+
+			return R_PASS;
+		}
+	};
+
 public:
 	finger(HALImp* pHALImp);
 
 	RESULT Initialize();
 	RESULT SetJointPosition(point ptJoint, JOINT_TYPE jointType);
+	finger::FingerState GetFingerState();
 
 protected:
 	/*
@@ -47,9 +65,26 @@ protected:
 
 class thumb : public finger {
 public:
+	struct ThumbState {
+		point ptTip;
+		point ptPIP;
+		point ptDIP;
+
+		RESULT PrintState() {
+			DEBUG_LINEOUT("thumb state:");
+			ptTip.Print();
+			ptPIP.Print();
+			ptDIP.Print();
+
+			return R_PASS;
+		}
+	};
+
+public:
 	thumb(HALImp* pHALImp);
 
 	RESULT Initialize();
+	thumb::ThumbState GetThumbState();
 };
 
 class hand : public composite {
@@ -61,12 +96,36 @@ public:
 	} HAND_TYPE;
 
 public:
+	struct HandState {
+		hand::HAND_TYPE handType;
+		point ptPalm;
+		finger::FingerState fingerIndex;
+		finger::FingerState fingerMiddle;
+		finger::FingerState fingerRing;
+		finger::FingerState fingerPinky;
+		thumb::ThumbState thumb;
+
+		RESULT PrintState() {
+			ptPalm.Print();
+			fingerIndex.PrintState();
+			fingerMiddle.PrintState();
+			fingerRing.PrintState();
+			fingerPinky.PrintState();
+			thumb.PrintState();
+
+			return R_PASS;
+		}
+	};
+
+public:
 	hand(HALImp* pHALImp);
 
 	RESULT Initialize();
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	RESULT SetFromLeapHand(const Leap::Hand hand);
+
+	hand::HandState GetHandState();
 
 private:
 	HAND_TYPE m_handType;

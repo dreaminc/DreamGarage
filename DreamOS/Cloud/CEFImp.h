@@ -106,6 +106,11 @@ public:
 		return nullptr;
 	}
 
+	// TODO: This should be a bit more robust
+	bool IsConnected() {
+		return false;
+	}
+
 	/*
 	virtual std::string GetSDPOfferString() override {
 		return std::string("");

@@ -147,6 +147,9 @@
     <Filter Include="External\Matrices">
       <UniqueIdentifier>{ac063e77-2be8-4932-a115-19a7ed9fb129}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cloud\Message">
+      <UniqueIdentifier>{a4934822-8fc9-4363-ac78-f660fcfbe16c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -370,6 +373,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h">
+      <Filter>Cloud\Message</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1947,6 +1953,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Model.h">
       <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Message\Message.h">
+      <Filter>Cloud\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h">
+      <Filter>Cloud\Message</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

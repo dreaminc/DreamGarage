@@ -22,7 +22,8 @@
 
 #include <functional>
 
-class CloudController;
+//class CloudController;
+#include "Cloud/CloudController.h"
 
 class light; 
 class quad;
@@ -81,13 +82,24 @@ public:
 
 	RESULT AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
+	// Cloud Controller 
+public:
+
+	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
+	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
+
+	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+
 public:
 	PathManager *GetPathManager();
 	OpenGLRenderingContext *GetOpenGLRenderingContext();
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
 
+	camera* GetCamera();
 	point GetCameraPosition();
+	quaternion GetCameraOrientation();
 
 protected:
 	// TODO: Move to unique_ptr

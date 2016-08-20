@@ -186,6 +186,7 @@
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCClient.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
@@ -265,6 +266,8 @@
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
     <ClInclude Include="..\..\..\Cloud\Controller.h" />
+    <ClInclude Include="..\..\..\Cloud\Message\Message.h" />
+    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
     <ClInclude Include="..\..\..\Cloud\Model.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCClient.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
