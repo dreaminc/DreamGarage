@@ -501,7 +501,7 @@ void WebRTCConductor::OnMessage(const webrtc::DataBuffer& buffer) {
 	RESULT r = R_PASS;
 	
 	if (buffer.binary) {
-		DEBUG_LINEOUT("WebRTCConductor::OnMessage (Binary Databuffer %d bytes)", (int)buffer.size());
+		//DEBUG_LINEOUT("WebRTCConductor::OnMessage (Binary Databuffer %d bytes)", (int)buffer.size());
 
 		int pDataBuffer_n = (int)(buffer.size());
 		uint8_t *pDataBuffer = new uint8_t[pDataBuffer_n];

@@ -89,6 +89,10 @@ sphere* DreamOS::MakeSphere(float radius, int numAngularDivisions, int numVertic
 	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
+volume* DreamOS::AddVolume(double side) {
+	return m_pSandbox->AddVolume(side);
+}
+
 volume* DreamOS::AddVolume(double width, double length, double height) {
 	return m_pSandbox->AddVolume(width, length, height);
 }
@@ -157,4 +161,8 @@ RESULT DreamOS::SendUpdateHeadMessage(long userID, point ptPosition, quaternion 
 
 RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
 	return m_pSandbox->SendUpdateHandMessage(userID, handState);
+}
+
+long DreamOS::GetTickCount() {
+	return m_pSandbox->GetTickCount();
 }

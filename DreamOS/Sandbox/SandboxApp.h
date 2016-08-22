@@ -47,10 +47,23 @@ public:
 	virtual RESULT RecoverDisplayMode() = 0;		// Do all sandboxes need this ultimately? 
 
 public:
+	enum class SANDBOX_WINDOW_POSITION {
+		LEFT,
+		RIGHT,
+		TOP,
+		BOTTOM,
+		CENTER,
+		INVALID
+	};
+
+	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) = 0;
+
+public:
 	virtual RESULT InitializePathManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
 	virtual RESULT InitializeHAL() = 0;
+	virtual long GetTickCount();
 
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe

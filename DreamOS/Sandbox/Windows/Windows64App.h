@@ -47,6 +47,9 @@ public:	// Sandbox Interface
 	RESULT Shutdown();
 	RESULT RecoverDisplayMode();
 
+	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) override;
+	virtual long Windows64App::GetTickCount() override;
+
 public:
 	RESULT InitializePathManager();
 	RESULT InitializeOpenGLRenderingContext();

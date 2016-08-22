@@ -52,7 +52,8 @@ public:
 
 	RESULT PrintMessage() override {
 		DEBUG_LINEOUT("UpdateHeadMessage:");
-		
+		Message::PrintMessage();
+
 		m_body.ptPosition.Print("position");
 		m_body.qOrientation.Print("orientation");
 		m_body.vVelocity.Print("velocity");
@@ -60,6 +61,12 @@ public:
 
 		return R_PASS;
 	}
+
+public:
+	point GetPosition() { return m_body.ptPosition; }
+	quaternion GetOrientation() { return m_body.qOrientation; }
+	vector GetVelocity() { return m_body.vVelocity; }
+	quaternion GetAngularVelocity() { return m_body.qAngularVelocity; }
 };
 
 #endif	// ! UPDATE_HEAD_MESSAGE_H_

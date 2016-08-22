@@ -132,6 +132,42 @@ Error:
 	return r;
 }
 
+RESULT Windows64App::SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) {
+	RESULT r = R_PASS;
+
+	switch (sandboxWindowPosition) {
+		case SANDBOX_WINDOW_POSITION::LEFT: {
+			m_posX = 0;
+			m_posY = m_posY;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::RIGHT: {
+			m_posX = GetSystemMetrics(SM_CXSCREEN) - m_pxWidth;
+			m_posY = m_posY;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::TOP: {
+			m_posX = m_posX;
+			m_posY = 0;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::BOTTOM: {
+			m_posX = m_posX;
+			m_posY = GetSystemMetrics(SM_CYSCREEN) - m_pxHeight;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::CENTER: {
+			m_posX = (GetSystemMetrics(SM_CXSCREEN) / 2) - (m_pxWidth / 2);
+			m_posY = (GetSystemMetrics(SM_CYSCREEN) / 2) - (m_pxHeight / 2);
+		} break;
+	}
+
+	CBM(SetWindowPos(m_hwndWindow, HWND_TOP, m_posX, m_posY, 0, 0, (UINT)(SWP_NOSIZE)), "Failed to position window");
+
+Error:
+	return r;
+}
+
 RESULT Windows64App::InitializeCloudController() {
 	RESULT r = R_PASS;
 
@@ -317,7 +353,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 		// TODO: This should be different arch for native
 		case WM_KEYDOWN: {
 			
-			// TODO: Clean this up / remove it eventually
+			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
 			
 			// DEBUG: Bypass for connect to cloud
 			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('C')) {
@@ -360,12 +396,18 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 					m_pCloudController->AddIceCandidates();
 				}
 			}
-			
-			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), true);
-		} break;
-
-		case WM_KEYUP: {
-			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), false);
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_LEFT) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::LEFT);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_RIGHT) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::RIGHT);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_UP) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::TOP);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_DOWN) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::BOTTOM);
+			}
 		} break;
 
 		default: {
@@ -498,6 +540,10 @@ Error:
 	return r;
 }
 
+long Windows64App::GetTickCount() {
+	return static_cast<long>(GetTickCount());
+}
+
 RESULT Windows64App::InitializeSandbox() {
 	RESULT r = R_PASS;
 
@@ -525,8 +571,9 @@ RESULT Windows64App::InitializeSandbox() {
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
 
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -579,12 +626,24 @@ RESULT Windows64App::Show() {
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-			if (msg.message == WM_QUIT) {
-				fQuit = true;
+			switch (msg.message) {
+				case WM_QUIT: {
+						fQuit = true;
+					} break;
+
+				case Windows64App::WindowMessages::UI_THREAD_CALLBACK: {
+					m_pCloudController->CallGetUIThreadCallback(static_cast<int>(msg.wParam), reinterpret_cast<void*>(msg.lParam));
+				} break;
+
+				case WM_KEYDOWN: {
+					m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(msg.wParam), true);
+				} break;
+
+				case WM_KEYUP: {
+					m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(msg.wParam), false);
+				} break;
 			}
-			else if (msg.message == Windows64App::WindowMessages::UI_THREAD_CALLBACK) {
-				m_pCloudController->CallGetUIThreadCallback(static_cast<int>(msg.wParam), reinterpret_cast<void*>(msg.lParam));
-			} 
+
 
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -607,7 +666,9 @@ RESULT Windows64App::Show() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		//m_pWin64Mouse->UpdateMousePosition();
+		m_pWin64Mouse->UpdateMousePosition();
+
+		// Update the keyboard
 
 		if (m_pHMD != nullptr) {
 			m_pHMD->UpdateHMD();

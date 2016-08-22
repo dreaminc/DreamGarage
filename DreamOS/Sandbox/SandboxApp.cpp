@@ -69,6 +69,10 @@ Error:
 	return r;
 }
 
+long SandboxApp::GetTickCount() {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
+}
+
 // Sandbox Factory Methods
 // TODO: This should all go up into the sandbox
 RESULT SandboxApp::AddObject(VirtualObj *pObject) {

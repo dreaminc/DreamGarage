@@ -28,12 +28,12 @@ RESULT WebRTCImp::Initialize() {
 	rtc::ThreadManager::Instance()->SetCurrentThread(&m_Win32thread);
 	rtc::InitializeSSL();
 
-	m_pWebRTCClient = std::make_shared<WebRTCClient>(this);
-	CN(m_pWebRTCClient);
+	//m_pWebRTCClient = std::make_shared<WebRTCClient>(this);
+	//CN(m_pWebRTCClient);
 
 	m_pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(m_pWebRTCClient.get(), this));
 
-Error:
+//Error:
 	return r;
 }
 
@@ -65,7 +65,6 @@ RESULT WebRTCImp::SendDataChannelStringMessage(int peerID, std::string& strMessa
 	// TODO: Remove this!
 	int pid;
 
-	CN(m_pWebRTCClient);
 	CN(m_pWebRTCConductor);
 
 	// TODO: this is failing
@@ -98,7 +97,6 @@ RESULT WebRTCImp::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer
 	// TODO: Remove this!
 	int pid;
 
-	CN(m_pWebRTCClient);
 	CN(m_pWebRTCConductor);
 
 	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);

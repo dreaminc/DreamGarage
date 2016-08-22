@@ -32,6 +32,8 @@ public:
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
 
 private:
+	volume *m_pPeerUser;
+
 	sphere *m_pSphere;
 	std::shared_ptr<DebugData> m_spherePosition;
 };

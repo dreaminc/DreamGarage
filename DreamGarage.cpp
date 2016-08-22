@@ -35,7 +35,7 @@ RESULT DreamGarage::LoadScene() {
 	// TODO: Special lane for global light
 
 	//vector lightdir = vector(0.0f, 1.0f, -0.5f);
-	vector lightdir = vector(0.0f, -1.0f, 0.5f);
+	vector lightdir = vector(0.7f, -0.5f, -0.6f);
 	lightdir.Normalize();
 
 	/*
@@ -67,6 +67,7 @@ RESULT DreamGarage::LoadScene() {
 	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
 	//*/
 
+	
 	// TODO: Combine this into one call
 	///*
 	texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
@@ -74,6 +75,8 @@ RESULT DreamGarage::LoadScene() {
 	pSkybox->SetCubeMapTexture(pCubeMap);
 	//*/
 /*
+
+
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
 	pQuad->SetColorTexture(pColorTextureCobble);
@@ -88,8 +91,7 @@ RESULT DreamGarage::LoadScene() {
 
 	//pQuad->SetBumpTexture(pBumpTexture);
 	
-	//*/
-
+	/*
 	quad *pQuad = AddQuad(1.0f, 1.0f, 10, 10);
 	pQuad->MoveTo(0.0f, 0.0f, 0.0f);
 	pQuad->SetBillboard(true);
@@ -100,6 +102,8 @@ RESULT DreamGarage::LoadScene() {
 	pQuad2->SetBillboard(true);
 	
 	//tQuad->SetBillboard(true);
+	//*/
+
 /*
 	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
@@ -120,9 +124,16 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	//*
-	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
 
+	// TODO: Replace with model
+	m_pPeerUser = AddVolume(0.25f, 0.5f, 1.0f);
+	//m_pPeerUser = AddVolume(1.0f);
+
+	//m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
+
+	/*
+
+	///*
 	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
@@ -204,10 +215,18 @@ Error:
 	return r;
 }
 
+
+
+
+// 30 FPS update
+#define UPDATE_COUNT_THROTTLE 90	
+#define UPDATE_COUNT_MS ((1000.0f) / UPDATE_COUNT_THROTTLE)
+std::chrono::system_clock::time_point g_lastUpdateTime = std::chrono::system_clock::now();
+
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 
-	//*
+	/*
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
 		//m_pSphere->translateY(0.0005f);
@@ -217,10 +236,20 @@ RESULT DreamGarage::Update(void) {
 			childObj->RotateYBy(0.001f);
 		}
 	}
+	//*/
 
-	m_pSphere->translateX(0.001f);
+	//m_pSphere->translateX(0.001f);
 
-	SendHeadPosition();
+	// TODO: Switch to message queue that runs on own thread
+	// for now just throttle it down
+	//g_updateCount++;
+	//if (g_updateCount != 0 && (g_updateCount % UPDATE_COUNT_THROTTLE) == 0) {
+
+	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastUpdateTime).count() > UPDATE_COUNT_MS) {
+		SendHeadPosition();
+		g_lastUpdateTime = timeNow;
+	}
 
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
 	//g_pLight->RotateLightDirectionXAxis(0.0005f * 1.3f);
@@ -233,10 +262,17 @@ RESULT DreamGarage::Update(void) {
 RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("HandleUpdateHeadMessage");
-	pUpdateHeadMessage->PrintMessage();
+	CN(pUpdateHeadMessage);
 
-//Error:
+	//DEBUG_LINEOUT("HandleUpdateHeadMessage");
+	//pUpdateHeadMessage->PrintMessage();
+
+	//m_pSphere->SetPosition(pUpdateHeadMessage->GetPosition());
+
+	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
+	m_pPeerUser->SetOrientation(pUpdateHeadMessage->GetOrientation().GetReverse());
+
+Error:
 	return r;
 }
 

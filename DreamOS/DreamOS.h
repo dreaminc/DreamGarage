@@ -54,8 +54,10 @@ protected:
 	text *AddText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	
 	volume *MakeVolume(double side);
-	volume *AddVolume(double width, double length, double height);
 	volume *MakeVolume(double width, double length, double height);
+
+	volume* AddVolume(double side);
+	volume *AddVolume(double width, double length, double height);
 	
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	
@@ -70,6 +72,9 @@ protected:
 	camera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
+
+protected:
+	long GetTickCount();
 
 	// Cloud Controller
 protected:

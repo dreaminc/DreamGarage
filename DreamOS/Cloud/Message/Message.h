@@ -53,7 +53,12 @@ public:
 		return m_header.type;
 	}
 
-	virtual RESULT PrintMessage() = 0;
+	virtual RESULT PrintMessage() {
+		DEBUG_LINEOUT("Message from id %d to id %d at %s size:%d", 
+			m_header.senderUserID, m_header.receiverUserID, ctime(&(m_header.timestamp)), m_header.messageSize);
+
+		return R_PASS;
+	}
 };
 
 #endif	// ! USER_H_

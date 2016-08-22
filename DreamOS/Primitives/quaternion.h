@@ -88,6 +88,12 @@ public:
 		return R_PASS;
 	}
 
+	quaternion GetReverse() {
+		quaternion qNew = (*this);
+		qNew.Reverse();
+		return qNew;
+	}
+
 	RESULT Print(char *pszOptName = nullptr) {
 		DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", m_x, m_y, m_z, m_w);
 		return R_PASS;
