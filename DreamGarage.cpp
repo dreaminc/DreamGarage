@@ -11,87 +11,38 @@ RESULT DreamGarage::LoadScene() {
 	// Add lights
 
 	///*
-	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	// TODO: Special lane for global light
-
-	//vector lightdir = vector(0.0f, 1.0f, -0.5f);
-	vector lightdir = vector(0.0f, -1.0f, 0.5f);
-	lightdir.Normalize();
-
-	/*
-	float lightdistance = 10.0f;
-	point lightpoint = -1.0f * lightdir * lightdistance;
-	lightpoint.w() = 1.0f;
+	AddLight(LIGHT_POINT, 1.0f, point(0.0f, 3.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	//*/
 
-	point lightpoint = point(0.0f, 10.0f, 0.0f);
-	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, lightpoint, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
-	g_pLight->EnableShadows();
-	//*/
 
-	/*
-	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
-	AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
-	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f));
-	AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f));
-	//*/
+	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
+	//AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//
 
 	///*
-	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-	texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	//texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	//texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 
-	texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
+	//texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
 	//*/
 
 	// TODO: Combine this into one call
-	///*
 	texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	skybox *pSkybox = AddSkybox();
 	pSkybox->SetCubeMapTexture(pCubeMap);
-	//*/
-/*
-	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
-	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
-	pQuad->SetColorTexture(pColorTextureCobble);
-	pQuad->translateY(-2.0f);
-	*/
-	//pQuad->SetBumpTexture(pBumpTexture);
 
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
-
-	HUD_OUT("Hello World");
-
 	//pQuad->SetBumpTexture(pBumpTexture);
-	
-	//*/
 
-	quad *pQuad = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad->MoveTo(0.0f, 0.0f, 0.0f);
-	pQuad->SetBillboard(true);
 
-	quad *pQuad2 = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad2->MoveTo(3.0f, 1.0f, 3.0f);
-	pQuad2->SetScaledBillboard(true);
-	pQuad2->SetBillboard(true);
-	
-	//tQuad->SetBillboard(true);
-/*
-	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
-	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
-
-	//quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
-	//pQuad->MoveTo(0.0f, -1.0f, 0.0f);
-
-	/*
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
-	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
-	*/
-
+	//m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -100,31 +51,28 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-	//*
-	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
+	/*
+	m_pSphere = AddSphere(0.5f, 40, 40);
+	m_pSphere->SetColorTexture(pColorTexture);
+	m_pSphere->SetBumpTexture(pBumpTexture);
+	//*/
 
-	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
+	/*
+	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
-	pSphere2->translateX(3.0f);
-	m_pSphere->AddChild(pSphere2);
-
-
-	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40, color(COLOR_GREEN)));
-	pSphere3->SetColorTexture(pColorTexture2);
-	pSphere3->SetBumpTexture(pBumpTexture2);
-	pSphere3->translateX(1.0f);
-	pSphere2->AddChild(pSphere3);
+	pSphere2->translateX(5.0f);
 	//*/
-	
+
 	/*
-	volume *pVolume = AddVolume(0.5f);
-	pVolume->MoveTo(0.0f, 0.0f, 0.0f);
+	volume *pVolume = AddVolume(1.0f);
+	pVolume->translateX(5.0f);
 	*/
 
+	/*
 	// TODO: All this should go into Model
 	std::vector<vertex> v;
-
+	*/
 	// TODO: Should move to using path manager
 	PathManager* pMgr = PathManager::instance();
 	wchar_t*	path;
@@ -132,41 +80,49 @@ RESULT DreamGarage::LoadScene() {
 	std::wstring objFile(path);
 
 	/*
+	AddModel(objFile, L"\\Models\\face2\\untitled.obj",
+	MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+	point(-4.5f, -4.8f, 10.0f),
+	0.2f,
+	0);
+	*/
+
 	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
-		point(-4.5f, -4.8f, 0.0f),
+		point(-4.5f, -4.8f - 2.6f, 0.0f),
 		0.1f,
-		1.0f);
+		100.0f);
+
 
 	AddModel(objFile, L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
-		point(-3.0f, -4.2f, 0.0f),
+		point(-3.0f, -4.2f - 2.5f, 0.0f),
 		0.15f,
 		4.0f);
 
 	AddModel(objFile, L"\\Models\\Dwarf\\dwarf_2_low.obj",
 		//new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-		point(0.0f, -4.9f, 0.0f),
+		point(0.0f, -4.9f - 2.1f, 0.0f),
 		20.0f);
 
 	AddModel(objFile, L"\\Models\\car\\untitled.obj",
 		nullptr,
-		point(6.0f, -3.7f, -1.0f),
+		point(10.0f, -3.7f - 4.0f, -1.0f - 6.0f),
 		0.015f,
-		1.0f);
+		80.1f);// ->SetOrientation(quaternion(vector(1.0, 1.0, 1.0)))->RotateZByDeg(90);
 
-	
-	*/
+	AddModel(objFile, L"\\Models\\toys\\poly.obj",
+		MakeTexture(L"..\\Models\\toys\\lego.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+		point(-4.5f, -4.8f - 2.6f, 4.0f),
+		1.0f,
+		100.0f);
 
-	/*
-	AddModel(objFile, L"\\Models\\table\\untitled.obj",
-		nullptr,
-		point(0.0, 13.0, 0.0),
-		10.0,
-		3.14f);
-	//*/
-
+	AddModel(objFile, L"\\Models\\terrain\\untitled.obj",
+		MakeTexture(L"..\\Models\\terrain\\floor.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+		point(0.0f, -10.0f, 0.0f),
+		7.0f,
+		0);
 
 //Error:
 	return r;
@@ -175,7 +131,7 @@ RESULT DreamGarage::LoadScene() {
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 
-	//*
+	/*
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
 		//m_pSphere->translateY(0.0005f);
@@ -190,7 +146,7 @@ RESULT DreamGarage::Update(void) {
 
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
 	//g_pLight->RotateLightDirectionXAxis(0.0005f * 1.3f);
-
+	*/
 	//Error:
 	return r;
 }
