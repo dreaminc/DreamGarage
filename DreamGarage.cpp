@@ -214,9 +214,6 @@ Error:
 	return r;
 }
 
-
-
-
 // 30 FPS update
 #define UPDATE_COUNT_THROTTLE 90	
 #define UPDATE_COUNT_MS ((1000.0f) / UPDATE_COUNT_THROTTLE)
