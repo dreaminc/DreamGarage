@@ -52,11 +52,12 @@ public:
 		return R_PASS;
 	}
 
-	float sunY = 1.0f;
+	float sunY = 0.5f;
 	float theta = 0.0f;
-	//float delta = 0.00005f;
+//	float delta = 0.0005f;
 	float delta = 0.0f;
 
+		
 	RESULT SetCameraUniforms(camera *pCamera) {
 		
 		auto matV = pCamera->GetViewMatrix();
@@ -69,12 +70,16 @@ public:
 
 		vector sunDirection = vector(0.0f, sunY, 0.5f);
 		sunDirection.Normalize();
+
 		//sunY += 0.01f;
 		theta += delta;
 		sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, theta) * sunDirection;
 		sunDirection.Normalize();
 
+		vector skyColor = vector(0.18867780436772762f, 0.4978442963618773f, 0.6616065586417131f);
+
 		m_pUniformSunDirection->SetUniform(sunDirection);
+
 		m_pUniformViewMatrix->SetUniform(matV);
 		m_pUniformProjectionMatrix->SetUniform(matP);
 		m_pUniformViewOrientationMatrix->SetUniform(matVO);
@@ -104,8 +109,11 @@ public:
 		sunDirection.Normalize();
 		//sunY += 0.01f;
 		theta += delta;
+
 		sunDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, theta) * sunDirection;
 		sunDirection.Normalize();
+
+		vector skyColor = vector(0.18867780436772762f, 0.4978442963618773f, 0.6616065586417131f);
 
 		m_pUniformSunDirection->SetUniform(sunDirection);
 
@@ -131,5 +139,6 @@ private:
 	OGLUniform *m_pUniformViewWidth;
 	OGLUniform *m_pUniformViewHeight;
 	OGLUniformVector *m_pUniformSunDirection;
+
 };
 #endif // ! OGLPROGRAM_SKYBOX_SCATTER_H_

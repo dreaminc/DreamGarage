@@ -135,7 +135,6 @@
     <Filter Include="DreamGarage">
       <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
     </Filter>
-
     <Filter Include="Cloud\User">
       <UniqueIdentifier>{e80be9ff-7887-4799-9a5a-ce9fb6cddb54}</UniqueIdentifier>
     </Filter>
@@ -147,7 +146,7 @@
     </Filter>
     <Filter Include="Cloud\Environment">
       <UniqueIdentifier>{8f3dd62d-3f99-4e45-bf9a-5adc56e8a76f}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="HMD\OpenVR">
       <UniqueIdentifier>{0484651f-4677-4432-aa79-1926163bb61b}</UniqueIdentifier>
     </Filter>
@@ -344,7 +343,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp">
       <Filter>Cloud</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\text.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -353,7 +352,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp">
       <Filter>External\Matrices</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp">
       <Filter>Profiler</Filter>
     </ClCompile>
@@ -1873,7 +1872,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
       <Filter>HMD\OpenVR</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h">
       <Filter>Sense</Filter>
     </ClInclude>
@@ -1927,7 +1926,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h">
       <Filter>Cloud\Environment</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Profiler\DebugConsole.h">
       <Filter>Profiler</Filter>
     </ClInclude>
@@ -2049,6 +2048,12 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>

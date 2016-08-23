@@ -630,6 +630,8 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert" />
     <None Include="..\..\..\Makefile" />
