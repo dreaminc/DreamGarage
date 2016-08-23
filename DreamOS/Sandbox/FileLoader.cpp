@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh_indices_t &out) {
+bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mesh_indices_t &out) {
 
 	std::vector<point> all_positions;
 	std::vector<point> all_uvs;
@@ -15,25 +15,26 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 	std::vector<int> uvIndices;
 	std::vector<int> normalIndices;
 
-	std::ifstream obj_file(obj_file_name, std::ios::binary);
+	std::ifstream obj_file(strOBJFilename, std::ios::binary);
 
 	std::vector<dimindex> indices;
 	dimindex	index = 0;
 	std::map<int, dimindex> objIndexMap;
 
-	if (!obj_file.is_open())
-	{
+	if (!obj_file.is_open()) {
 		return false;
 	}
 
 	std::string line;
 
-	std::vector<vertex> current_mesh;
-	material_t current_material;
-	current_material.name = "default";
-	std::string current_material_name = "unknown";
+	std::vector<vertex> vectorMeshVerticies;
+	material_t materialCurrent;
+	materialCurrent.name = "default";
+	std::string strCurrentMaterialName = "unknown";
 
 	std::map<std::string, material_t> material_map;
+
+	DEBUG_LINEOUT("Loading %S from file", strOBJFilename.c_str());
 
 	while (std::getline(obj_file, line)) {
 
@@ -112,6 +113,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 				}
 			}
 
+			// TODO: ?
 			#define CYCLIC_BUFFER(index, buffer) \
 						if (index <= 0)\
 							index = static_cast<int>(buffer.size()) - 1 + index;\
@@ -137,10 +139,11 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 
 			// TODO: now caching vertices is done base only on position.
 			// we need to set a different vertex if either position/normal/uv is different, using a multi map for objIndexMap
+			// TODO: ?
 			#define ADD_VERTEX(i) \
 			if(objIndexMap.find(newPositionIndices[i]) == objIndexMap.end())\
 			{	\
-				current_mesh.emplace_back(all_positions[newPositionIndices[i]],	\
+				vectorMeshVerticies.emplace_back(all_positions[newPositionIndices[i]],	\
 					all_normals[newNormalIndices[i]],	\
 					uvcoord(all_uvs[newUvIndices[i]].x(), all_uvs[newUvIndices[i]].y()));	\
 				indices.push_back(index);	\
@@ -186,7 +189,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 			}
 		}
 		else if (type.compare("usemtl") == 0) {
-			out.push_back(std::make_pair(material_map[current_material_name], mesh_t{ std::move(current_mesh), std::move(indices) }));
+			out.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
 
 			index = 0;
 			objIndexMap.clear();
@@ -195,14 +198,14 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 			std::sscanf(value.c_str(), "%s\n",
 				name);
 
-			current_material_name = std::string(name);
+			strCurrentMaterialName = std::string(name);
 		}
 		else if (type.compare("mtllib") == 0) {
 			char	file[1024];
 			std::sscanf(value.c_str(), "%s\n",
 				file);
 
-			std::wstring path = obj_file_name.substr(0, obj_file_name.rfind('\\')) + L"\\";
+			std::wstring path = strOBJFilename.substr(0, strOBJFilename.rfind('\\')) + L"\\";
 
 			std::string mtl_file_name(file);
 			std::wstring mtl_file_name_w(mtl_file_name.begin(), mtl_file_name.end());
@@ -269,7 +272,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 
 	}
 	*/
-	out.push_back(std::make_pair(material_map[current_material_name], mesh_t{ std::move(current_mesh), std::move(indices) }));
+	out.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
 
 	obj_file.close();
 

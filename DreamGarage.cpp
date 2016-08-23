@@ -144,7 +144,7 @@ RESULT DreamGarage::LoadScene() {
 	///*
 	m_pPeerUser = AddModel(L"\\Models\\face2\\untitled.obj",
 						   MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-						   point(0.0f, 2.0f, 0.0f),
+						   point(0.0f, 0.0f, 0.0f),
 						   0.1f,
 						   (point_precision)(0.0f));
 
@@ -157,7 +157,7 @@ RESULT DreamGarage::LoadScene() {
 		point(0.0f, 2.0f, 5.0f),
 		0.1f,
 		(point_precision)(0.0f));
-		*/
+		
 
 	AddModel(L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
@@ -165,7 +165,6 @@ RESULT DreamGarage::LoadScene() {
 		0.1f,
 		100.0f);
 
-	/*
 	AddModel(L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
 		point(-3.0f, -4.2f - 2.5f, 0.0f),
@@ -190,14 +189,14 @@ RESULT DreamGarage::LoadScene() {
 		1.0f,
 		100.0f);
 
-		*/
+		
 
 	AddModel(L"\\Models\\terrain\\untitled.obj",
 		MakeTexture(L"..\\Models\\terrain\\floor.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(0.0f, -10.0f, 0.0f),
 		7.0f,
 		0);
-		
+		*/
 
 //Error:
 	return r;
@@ -251,18 +250,31 @@ RESULT DreamGarage::Update(void) {
 		g_lastUpdateTime = timeNow;
 	}
 
-	quaternion qOrientation;
-
 	
+	/*
+	static quaternion_precision theta = 0.0f;
+	quaternion qOrientation;
 	//qOrientation = pUpdateHeadMessage->GetOrientation();
-	qOrientation = quaternion((quaternion_precision)0.0f, vector::jVector(1.0f));
 
-	for(int i = 0; i < 4; i++)
-		qOrientation *= quaternion((quaternion_precision)(M_PI_4/2.0f), vector::jVector(1.0f));
-
-	qOrientation.Reverse();
+	qOrientation = quaternion((quaternion_precision)0.0f, vector::kVector(1.0f));
+	//qOrientation.RotateY((theta += 0.0005f));
+	qOrientation.RotateY(((quaternion_precision)(M_PI)));
+	
+	DEBUG_LINEOUT_RETURN("theta %.2f", theta);
 
 	m_pPeerUser->SetOrientation(qOrientation);
+	*/
+
+	/*
+	for(int i = 0; i < 4; i++)
+		qOrientation *= quaternion((quaternion_precision)(M_PI_4/2.0f), vector::jVector(1.0f));
+	*/
+
+
+	//m_pPeerUser->SetOrientation(quaternion((quaternion_precision)0.0f, vector::kVector(1.0f)));
+	//m_pPeerUser->RotateYByDeg(180.0f);
+
+	//qOrientation.Reverse();
 
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
 	//g_pLight->RotateLightDirectionXAxis(0.0005f * 1.3f);
@@ -283,7 +295,10 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	//m_pSphere->SetPosition(pUpdateHeadMessage->GetPosition());
 
 	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
-	m_pPeerUser->SetOrientation(pUpdateHeadMessage->GetOrientation().GetReverse());
+
+	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
+	qOrientation.RotateY(((quaternion_precision)(M_PI)));
+	m_pPeerUser->SetOrientation(qOrientation);
 
 	// Model we're using is reversed apparently
 

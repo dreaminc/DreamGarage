@@ -215,7 +215,7 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Allocate the camera
 	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, -2.0f), 100.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, -2.0f), 60.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -408,6 +408,8 @@ composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wst
 
 	FileLoaderHelper::multi_mesh_indices_t v;
 	FileLoaderHelper::LoadOBJFile(strRootFolder + wstrOBJFilename, v);
+
+	DEBUG_LINEOUT("Loading %S verts and indices", wstrOBJFilename.c_str());
 
 	for (auto& m : v) {
 		if (m.second.indices.size() == 0) {

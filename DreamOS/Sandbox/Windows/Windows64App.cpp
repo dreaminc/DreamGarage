@@ -494,44 +494,14 @@ RESULT Windows64App::UnregisterUIThreadCallback() {
 RESULT Windows64App::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
-	//CR(m_pSenseLeapMotion->RegisterSubscriber(SENSE_LEAPMOTION_EVENT_HAND_LEFT, m_pHALImp));
-
-	//volume *pLeapObj = AddVolume(1.0f, 1.0f, 0.25f);
-	//CR(m_pSenseLeapMotion->AttachVirtualObj(pLeapObj));
-
-	/*
-	composite *pHMDFrameOfReference = new OGLComposite(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-	AddObject(pHMDFrameOfReference);
-	//*/
-
 	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 	
-	/*
-	if (m_pHMD != nullptr) {
-		std::shared_ptr<DimObj> pLeftHandShaderPtr(pLeftHand);
-		m_pHALImp->GetCamera()->AddObject(pLeftHandShaderPtr);
-
-		std::shared_ptr<DimObj> pRightHandShaderPtr(pRightHand);
-		m_pHALImp->GetCamera()->AddObject(pRightHandShaderPtr);
-	}
-	else {
-		AddObject(pLeftHand);
-		AddObject(pRightHand);
-	}
-	*/
-
 	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
 
 	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
-
-	/*
-	sphere *pSphere = MakeSphere(1.0f, 10, 10);
-	pSphere->MoveTo(0.0f, 0.0f, -5.0f);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj>(pSphere));
-	//*/
 
 	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
 	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
@@ -574,7 +544,7 @@ RESULT Windows64App::InitializeSandbox() {
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	
-	m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -667,7 +637,7 @@ RESULT Windows64App::Show() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		//m_pWin64Mouse->UpdateMousePosition();
+		m_pWin64Mouse->UpdateMousePosition();
 
 
 		if (m_pHMD != nullptr) {

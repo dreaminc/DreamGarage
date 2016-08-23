@@ -377,6 +377,9 @@
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h">
       <Filter>Cloud\Message</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\quaternion.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
