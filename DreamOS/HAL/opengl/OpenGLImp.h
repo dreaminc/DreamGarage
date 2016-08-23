@@ -90,8 +90,7 @@ public:
 
 	composite *MakeComposite();
 
-	// TODO: Convert to composite
-	RESULT LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
 public:
 	// TODO: Consolidate all of these (one Render function)

@@ -44,39 +44,33 @@ RESULT DreamGarage::LoadScene() {
 	lightpoint.w() = 1.0f;
 	//*/
 
-	point lightpoint = point(0.0f, 10.0f, 0.0f);
-	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, lightpoint, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
-	g_pLight->EnableShadows();
-	//*/
 
-	/*
-	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.0f;
-	AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_BLUE), color(COLOR_BLUE), vector::jVector(-1.0f));
-	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_RED), color(COLOR_RED), vector::jVector(-1.0f));
-	AddLight(LIGHT_POINT, lightIntensity, point(0.0f, lightHeight, lightSpace), color(COLOR_GREEN), color(COLOR_GREEN), vector::jVector(-1.0f));
-	//*/
+	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
+	point ptLight = point(0.0f, 5.0f, 5.0f);
+	//AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//
 
 	///*
-	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-	texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	//texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	//texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 
-	texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
+	//texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
 	//*/
 
 	
 	// TODO: Combine this into one call
-	///*
-	texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
+	//texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	skybox *pSkybox = AddSkybox();
-	pSkybox->SetCubeMapTexture(pCubeMap);
+	//pSkybox->SetCubeMapTexture(pCubeMap);
 	//*/
-/*
-
-
+	
+	/*
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
 	pQuad->SetColorTexture(pColorTextureCobble);
@@ -86,10 +80,8 @@ RESULT DreamGarage::LoadScene() {
 
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
-
-	HUD_OUT("Hello World");
-
 	//pQuad->SetBumpTexture(pBumpTexture);
+
 	
 	/*
 	quad *pQuad = AddQuad(1.0f, 1.0f, 10, 10);
@@ -104,18 +96,13 @@ RESULT DreamGarage::LoadScene() {
 	//tQuad->SetBillboard(true);
 	//*/
 
-/*
+	/*
 	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
 
-	//quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
-	//pQuad->MoveTo(0.0f, -1.0f, 0.0f);
 
-	/*
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
-	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
-	*/
 
+	//m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 
 	/*
 	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
@@ -124,9 +111,8 @@ RESULT DreamGarage::LoadScene() {
 	pModel->Scale(0.1f);
 	*/
 
-
 	// TODO: Replace with model
-	m_pPeerUser = AddVolume(0.25f, 0.5f, 1.0f);
+	//m_pPeerUser = AddVolume(0.25f, 0.5f, 1.0f);
 	//m_pPeerUser = AddVolume(1.0f);
 
 	//m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
@@ -135,69 +121,83 @@ RESULT DreamGarage::LoadScene() {
 
 	///*
 	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
+
+	/*
+	m_pSphere = AddSphere(0.5f, 40, 40);
+	m_pSphere->SetColorTexture(pColorTexture);
+	m_pSphere->SetBumpTexture(pBumpTexture);
+	//*/
+
+	/*
+	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
-	pSphere2->translateX(3.0f);
-	m_pSphere->AddChild(pSphere2);
-
-
-	std::shared_ptr<sphere> pSphere3(MakeSphere(0.25f, 40, 40, color(COLOR_GREEN)));
-	pSphere3->SetColorTexture(pColorTexture2);
-	pSphere3->SetBumpTexture(pBumpTexture2);
-	pSphere3->translateX(1.0f);
-	pSphere2->AddChild(pSphere3);
+	pSphere2->translateX(5.0f);
 	//*/
-	
+
 	/*
-	volume *pVolume = AddVolume(0.5f);
-	pVolume->MoveTo(0.0f, 0.0f, 0.0f);
+	volume *pVolume = AddVolume(1.0f);
+	pVolume->translateX(5.0f);
 	*/
 
-	// TODO: All this should go into Model
-	std::vector<vertex> v;
+	///*
+	m_pPeerUser = AddModel(L"\\Models\\face2\\untitled.obj",
+						   MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+						   point(0.0f, 2.0f, 0.0f),
+						   0.1f,
+						   (point_precision)(0.0f));
 
-	// TODO: Should move to using path manager
-	PathManager* pMgr = PathManager::instance();
-	wchar_t*	path;
-	pMgr->GetCurrentPath((wchar_t*&)path);
-	std::wstring objFile(path);
+	//*/
 
 	/*
-	AddModel(objFile, L"\\Models\\Bear\\bear-obj.obj",
+	m_pPeerUser = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
+		//MakeTexture(L"..\\Models\\stormtrooper\\Map__7_Raytrace.tga", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		nullptr,
-		point(-4.5f, -4.8f, 0.0f),
+		point(0.0f, 2.0f, 5.0f),
 		0.1f,
-		1.0f);
+		(point_precision)(0.0f));
+		*/
 
-	AddModel(objFile, L"\\Models\\Boar\\boar-obj.obj",
+	AddModel(L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
-		point(-3.0f, -4.2f, 0.0f),
+		point(-4.5f, -4.8f - 2.6f, 0.0f),
+		0.1f,
+		100.0f);
+
+	/*
+	AddModel(L"\\Models\\Boar\\boar-obj.obj",
+		nullptr,
+		point(-3.0f, -4.2f - 2.5f, 0.0f),
 		0.15f,
 		4.0f);
 
-	AddModel(objFile, L"\\Models\\Dwarf\\dwarf_2_low.obj",
+	AddModel(L"\\Models\\Dwarf\\dwarf_2_low.obj",
 		//new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-		point(0.0f, -4.9f, 0.0f),
+		point(0.0f, -4.9f - 2.1f, 0.0f),
 		20.0f);
 
-	AddModel(objFile, L"\\Models\\car\\untitled.obj",
+	AddModel(L"\\Models\\car\\untitled.obj",
 		nullptr,
-		point(6.0f, -3.7f, -1.0f),
+		point(10.0f, -3.7f - 4.0f, -1.0f - 6.0f),
 		0.015f,
-		1.0f);
+		80.1f);// ->SetOrientation(quaternion(vector(1.0, 1.0, 1.0)))->RotateZByDeg(90);
 
-	
-	*/
+	AddModel(L"\\Models\\toys\\poly.obj",
+		MakeTexture(L"..\\Models\\toys\\lego.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+		point(-4.5f, -4.8f - 2.6f, 4.0f),
+		1.0f,
+		100.0f);
 
-	/*
-	AddModel(objFile, L"\\Models\\table\\untitled.obj",
-		nullptr,
-		point(0.0, 13.0, 0.0),
-		10.0,
-		3.14f);
-	//*/
+		*/
 
+	AddModel(L"\\Models\\terrain\\untitled.obj",
+		MakeTexture(L"..\\Models\\terrain\\floor.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
+		point(0.0f, -10.0f, 0.0f),
+		7.0f,
+		0);
+		
 
 //Error:
 	return r;
@@ -251,10 +251,23 @@ RESULT DreamGarage::Update(void) {
 		g_lastUpdateTime = timeNow;
 	}
 
+	quaternion qOrientation;
+
+	
+	//qOrientation = pUpdateHeadMessage->GetOrientation();
+	qOrientation = quaternion((quaternion_precision)0.0f, vector::jVector(1.0f));
+
+	for(int i = 0; i < 4; i++)
+		qOrientation *= quaternion((quaternion_precision)(M_PI_4/2.0f), vector::jVector(1.0f));
+
+	qOrientation.Reverse();
+
+	m_pPeerUser->SetOrientation(qOrientation);
+
 	//g_pLight->RotateLightDirectionYAxis(0.001f);
 	//g_pLight->RotateLightDirectionXAxis(0.0005f * 1.3f);
 
-	//Error:
+//Error:
 	return r;
 }
 
@@ -262,7 +275,7 @@ RESULT DreamGarage::Update(void) {
 RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
-	CN(pUpdateHeadMessage);
+	//CN(pUpdateHeadMessage);
 
 	//DEBUG_LINEOUT("HandleUpdateHeadMessage");
 	//pUpdateHeadMessage->PrintMessage();
@@ -272,7 +285,19 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
 	m_pPeerUser->SetOrientation(pUpdateHeadMessage->GetOrientation().GetReverse());
 
-Error:
+	// Model we're using is reversed apparently
+
+	/*
+	quaternion qOrientation, qAdjust; 
+	
+	qAdjust = quaternion(1.4f, vector::jVector(1.0f));
+	qOrientation = pUpdateHeadMessage->GetOrientation();
+	qOrientation.Reverse();
+
+	m_pPeerUser->SetOrientation(qOrientation * qAdjust);
+	*/
+
+//Error:
 	return r;
 }
 

@@ -216,11 +216,19 @@ public:
 					AddForwardSpeed(DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 
-			case SK_SPACE: {
+			case SK_SPACE: 
+			case (SK_SCAN_CODE)('Q'): {
 				if (kbEvent->KeyState)
 					AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 				else
 					AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED);
+			} break;
+
+			case (SK_SCAN_CODE)('E') : {
+				if (kbEvent->KeyState)
+					AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED);
+				else
+					AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 		}
 
@@ -231,9 +239,17 @@ public:
 	camera UpdateCameraPosition() {
 		camera_precision x, y, z;
 		m_qRotation.GetEulerAngles(&x, &y, &z);
-				
-		m_ptOrigin += GetLookVector() * m_cameraForwardSpeed;
-		m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
+
+		vector lookMove = GetLookVector();
+		lookMove.y() = 0.0f;
+		lookMove.Normalize();
+
+		vector rightMove = GetRightVector();
+		rightMove.y() = 0.0f;
+		rightMove.Normalize();
+
+		m_ptOrigin += lookMove * m_cameraForwardSpeed;
+		m_ptOrigin += rightMove * m_cameraStrafeSpeed;
 		m_ptOrigin += GetUpVector() * m_cameraUpSpeed;
 		m_ptOrigin.SetZeroW();
 

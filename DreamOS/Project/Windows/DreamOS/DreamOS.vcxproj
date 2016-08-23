@@ -120,7 +120,129 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;$(CEFPATH)\Debug\libcef.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\webrtc.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\webrtc_common.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\video_quality_test.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\voice_engine\voice_engine.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\common_audio\common_audio.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\common_audio\common_audio_sse2.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\common_video\common_video.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\api\libjingle_peerconnection.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\media\rtc_media.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base_approved.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base_tests_utils.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_task_queue.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\pc\rtc_pc.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\p2p\rtc_p2p.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log_parser.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log_proto.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\system_wrappers\system_wrappers.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\system_wrappers\field_trial_default.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\system_wrappers\metrics_default.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\rtc_event_log_source.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\rtp_rtcp.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_utility.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_device.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_coding_module.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audioproc_debug_proto.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_processing.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_processing_sse2.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_conference_mixer.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_decoder_interface.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_encoder_interface.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_decoder_factory_interface.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\builtin_audio_decoder_factory.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_video_coding.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_capture.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_processing.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_processing_sse2.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_capture_module.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_capture_module_internal_impl.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\remote_bitrate_estimator.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\cng.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\g722.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\g711.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\ilbc.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\isac.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\isac_common.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\isac_fix.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\pcm16b.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\red.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_opus.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_i420.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_h264.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\congestion_controller.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\paced_sender.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\bitrate_controller.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\neteq.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\rent_a_codec.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\media_file.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\test\metrics.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\test\test_renderer.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\boringssl\boringssl.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\boringssl\boringssl_asm.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\jsoncpp\jsoncpp.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\protobuf\protobuf_lite.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\usrsctp\usrsctplib.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\winsdk_samples\directshow_baseclasses.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\opus\opus.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libsrtp\libsrtp.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\openmax_dl\dl\openmax_dl.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libyuv\libyuv.lib;$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libjpeg_turbo\libjpeg.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\libcurl_imp.lib;$(LEAPMOTIONPATH)\lib\x64\Leap.lib;$(OPENVRPATH)\lib\win64\openvr_api.lib;%(AdditionalDependencies)</AdditionalDependencies>
+	  <AdditionalDependencies>
+		wininet.lib;
+		dnsapi.lib;
+		version.lib;
+		msimg32.lib;
+		ws2_32.lib;
+		usp10.lib;
+		psapi.lib;
+		dbghelp.lib;
+		winmm.lib;
+		shlwapi.lib;
+		kernel32.lib;
+		gdi32.lib;
+		winspool.lib;
+		comdlg32.lib;
+		advapi32.lib;
+		shell32.lib;
+		ole32.lib;
+		oleaut32.lib;
+		user32.lib;
+		uuid.lib;
+		odbc32.lib;
+		odbccp32.lib;
+		delayimp.lib;
+		credui.lib;
+		dmoguids.lib;
+		wmcodecdspuuid.lib;
+		amstrmid.lib;
+		msdmo.lib;
+		crypt32.lib;
+		iphlpapi.lib;
+		secur32.lib;
+		Strmiids.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\webrtc.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\webrtc_common.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\video_quality_test.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\voice_engine\voice_engine.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\common_audio\common_audio.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\common_audio\common_audio_sse2.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\common_video\common_video.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\api\libjingle_peerconnection.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\media\rtc_media.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base_approved.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_base_tests_utils.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\base\rtc_task_queue.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\pc\rtc_pc.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\p2p\rtc_p2p.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log_parser.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\rtc_event_log_proto.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\system_wrappers\system_wrappers.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\system_wrappers\field_trial_default.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\system_wrappers\metrics_default.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\rtc_event_log_source.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\rtp_rtcp.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_utility.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_device.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_coding_module.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audioproc_debug_proto.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_processing.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_processing_sse2.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_conference_mixer.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_decoder_interface.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_encoder_interface.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\audio_decoder_factory_interface.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\builtin_audio_decoder_factory.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_video_coding.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_capture.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_processing.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_processing_sse2.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_capture_module.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_capture_module_internal_impl.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\remote_bitrate_estimator.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\cng.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\g722.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\g711.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\ilbc.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\isac.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\isac_common.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\isac_fix.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\pcm16b.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\red.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_opus.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_i420.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\webrtc_h264.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\congestion_controller.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\paced_sender.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\bitrate_controller.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\neteq.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\rent_a_codec.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\modules\media_file.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\test\metrics.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\webrtc\test\test_renderer.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\boringssl\boringssl.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\boringssl\boringssl_asm.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\jsoncpp\jsoncpp.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\protobuf\protobuf_lite.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\usrsctp\usrsctplib.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\winsdk_samples\directshow_baseclasses.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\opus\opus.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libsrtp\libsrtp.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\openmax_dl\dl\openmax_dl.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libyuv\libyuv.lib;
+		$(WEBRTCSRCPATH)\out\Debug_x64\obj\third_party\libjpeg_turbo\libjpeg.lib;
+		$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;
+		$(CEFPATH)\build\libcef_dll\Debug\libcef_dll_wrapper.lib;
+		$(CEFPATH)\Debug\libcef.lib;
+		$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\libcurl_imp.lib;
+		$(LEAPMOTIONPATH)\lib\x64\Leap.lib;
+		$(OPENVRPATH)\lib\win64\openvr_api.lib;
+		%(AdditionalDependencies)
+	  </AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
@@ -163,7 +285,20 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+	  <AdditionalIncludeDirectories>
+		$(LEAPMOTIONPATH)\include\;
+		$(OPENVRPATH)\headers\;
+		$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;
+		$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;
+		$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;
+		$(ProjectDir)..\..\..\;
+		$(ProjectDir)..\..\..\External\websocketpp\;
+		$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;
+		$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;
+		$(ProjectDir)..\..\..\External\json\include\;
+		$(ProjectDir)..\..\..\;
+		%(AdditionalIncludeDirectories)
+	  </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
@@ -171,12 +306,14 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Release\libcef_dll_wrapper.lib;$(CEFPATH)\Release\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
+      <AdditionalDependencies>$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(CEFPATH)\build\libcef_dll\Release\libcef_dll_wrapper.lib;$(CEFPATH)\Release\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(LEAPMOTIONPATH)\lib\x64\Leap.lib;$(OPENVRPATH)\lib\win64\openvr_api.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
       <Command>
 		xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
 		xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+		xcopy /y "$(LEAPMOTIONPATH)\lib\x64\Leap.dll" "$(TargetDir)" /D
+		xcopy /y "$(OPENVRPATH)\bin\win64\openvr_api.dll" "$(TargetDir)" /D
 	  </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

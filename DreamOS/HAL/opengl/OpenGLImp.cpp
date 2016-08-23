@@ -177,11 +177,11 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pOGLProgramShadowDepth);
 	
 	// TODO(NTH): Add a program / render pipeline arch
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
@@ -391,44 +391,73 @@ Error:
 #include "OGLProfiler.h"
 
 // TODO: This convenience function should be put in a model factory
-// TODO: fix this so that it's a composite object
-RESULT OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
-	RESULT r = R_PASS;
 
-	FileLoaderHelper::multi_mesh_t v;
+composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	RESULT r = R_PASS;
+	
+	composite* pComposite = new composite(this);
+
+	// Texture caching
+	std::map<std::wstring, texture*> textureMap;
+
+	// Root folder
+	PathManager* pPathManager = PathManager::instance();
+	wchar_t* pszPath;
+	pPathManager->GetCurrentPath((wchar_t*&)pszPath);
+	std::wstring strRootFolder(pszPath);
+
+	FileLoaderHelper::multi_mesh_indices_t v;
 	FileLoaderHelper::LoadOBJFile(strRootFolder + wstrOBJFilename, v);
 
 	for (auto& m : v) {
-		if (m.second.size() == 0) {
+		if (m.second.indices.size() == 0) {
 			continue;
 		}
 
-		OGLModel* pModel = new OGLModel(this, std::move(m.second));
+		std::shared_ptr<model> pModel(MakeModel(std::move(m.second.vertices), std::move(m.second.indices)));
+				
 		CN(pModel);
+		pComposite->AddChild(pModel);
 
 		if (pTexture != nullptr) {
 			pModel->SetColorTexture(pTexture);
 		}
 		else {
 			std::string tex = m.first.map_Kd;
-			std::wstring wstr(tex.begin(), tex.end());
-			wstr = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.rfind('\\')) + L"\\" + wstr;
-			
-			texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
-			CN(pTempTexture);
+			if (tex.compare("") != 0) {
+				std::wstring wstr(tex.begin(), tex.end());
+				wstr = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.rfind('\\')) + L"\\" + wstr;
 
-			pModel->SetColorTexture(pTempTexture);
+				if (textureMap.find(wstr) == textureMap.end()) {
+					//OutputDebugStringW((std::wstring(L"DOS::load tex=") + wstr).c_str());
+					texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+					CN(pTempTexture);
+
+					textureMap[wstr] = pTempTexture;
+
+					if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0) {
+						//OutputDebugStringW((std::wstring(L"DOS::tex=") + wstr + L"," + std::to_wstring(pTempTexture->GetWidth()) + L"," + std::to_wstring(pTempTexture->GetHeight())).c_str());
+						pModel->SetColorTexture(pTempTexture);
+					}
+				}
+				else {
+					pModel->SetColorTexture(textureMap[wstr]);
+				}
+			}
+			else {
+				pModel->SetColor(color(m.first.Kd.r(), m.first.Kd.g(), m.first.Kd.b(), m.first.Kd.a()));
+			}
 		}
 
 		pModel->Scale(scale);
 		pModel->MoveTo(ptPosition);
 		pModel->RotateYBy(rotateY);
-		pModel->UpdateOGLBuffers();
-		pSceneGraph->PushObject(pModel);
+		//pModel->UpdateOGLBuffers();
+		pSceneGraph->PushObject(pModel.get());
 	}
 
 Error:
-	return r;
+	return pComposite;
 }
 
 model *OpenGLImp::MakeModel(wchar_t *pszModelName) {
@@ -469,6 +498,7 @@ Error:
 model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
+	// Not implemented yet, until size_t <-> dimindex conflict is resolved.
 	model *pModel = new OGLModel(this, vertices, indices);
 	CN(pModel);
 
