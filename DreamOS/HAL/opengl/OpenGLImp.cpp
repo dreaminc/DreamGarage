@@ -7,6 +7,25 @@
 #include "Primitives/RotationMatrix.h"
 #include <vector>
 
+#include "OGLVolume.h"
+
+#include "OGLModel.h"
+#include "OGLText.h"
+#include "Primitives/font.h"
+#include "OGLTriangle.h"
+#include "OGLQuad.h"
+
+#include "OGLSphere.h"
+#include "OGLComposite.h"
+#include "Primitives/light.h"
+#include "OGLTexture.h"
+#include "OGLSkybox.h"
+#include "OGLUser.h"
+#include "OGLHand.h"
+
+
+#include "OGLProfiler.h"
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
@@ -375,21 +394,6 @@ Error:
 	return r;
 }
 
-#include "OGLVolume.h"
-
-#include "OGLModel.h"
-#include "OGLText.h"
-#include "Primitives/font.h"
-#include "OGLTriangle.h"
-#include "OGLQuad.h"
-
-#include "OGLSphere.h"
-#include "Primitives/light.h"
-#include "OGLTexture.h"
-#include "OGLSkybox.h"
-
-#include "OGLProfiler.h"
-
 // TODO: This convenience function should be put in a model factory
 
 composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
@@ -455,7 +459,9 @@ composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wst
 		pModel->MoveTo(ptPosition);
 		pModel->RotateYBy(rotateY);
 		//pModel->UpdateOGLBuffers();
-		pSceneGraph->PushObject(pModel.get());
+		if (pSceneGraph != nullptr) {
+			pSceneGraph->PushObject(pModel.get());
+		}
 	}
 
 Error:
@@ -515,8 +521,6 @@ Error:
 	return nullptr;
 }
 
-#include "HAL/opengl/OGLComposite.h"
-
 composite *OpenGLImp::MakeComposite() {
 	RESULT r = R_PASS;
 
@@ -530,6 +534,23 @@ Error:
 	if (pComposite != nullptr) {
 		delete pComposite;
 		pComposite = nullptr;
+	}
+	return nullptr;
+}
+
+user *OpenGLImp::MakeUser() {
+	RESULT r = R_PASS;
+
+	user *pUser = new OGLUser(this);
+	CN(pUser);
+
+	//Success:
+	return pUser;
+
+Error:
+	if (pUser != nullptr) {
+		delete pUser;
+		pUser = nullptr;
 	}
 	return nullptr;
 }
@@ -582,6 +603,40 @@ Error:
 	if (pSphere != nullptr) {
 		delete pSphere;
 		pSphere = nullptr;
+	}
+	return nullptr;
+}
+
+composite* OpenGLImp::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	RESULT r = R_PASS;
+
+	composite *pModel = LoadModel(nullptr, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+	CN(pModel);
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+hand* OpenGLImp::MakeHand() {
+	RESULT r = R_PASS;
+
+	hand *pHand = new OGLHand(this);
+	CN(pHand);
+
+	//Success:
+	return pHand;
+
+Error:
+	if (pHand != nullptr) {
+		delete pHand;
+		pHand = nullptr;
 	}
 	return nullptr;
 }

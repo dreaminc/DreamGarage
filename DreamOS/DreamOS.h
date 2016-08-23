@@ -29,6 +29,7 @@
 #include "Primitives/text.h"
 #include "Primitives/texture.h"
 #include "Primitives/skybox.h"
+#include "Primitives/user.h"
 
 class DreamOS : public valid {
 public:
@@ -68,9 +69,14 @@ protected:
 	model *MakeModel(wchar_t *pszModelName);
 	composite *AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
+	user *AddUser();
+
 	camera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
+
+	// Hands
+	hand *GetHand(hand::HAND_TYPE handType);
 
 protected:
 	long GetTickCount();

@@ -693,6 +693,9 @@ Error:
 RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
+	if (pDimObj->IsVisible() == false)
+		return R_PASS;
+
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
 	
 	/* TODO: This should be replaced with a materials store or OGLMaterial that pre-allocates and swaps binding points (Wait for textures)

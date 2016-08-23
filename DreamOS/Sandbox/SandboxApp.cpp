@@ -293,6 +293,25 @@ Error:
 	return nullptr;
 }
 
+user *SandboxApp::AddUser() {
+	RESULT r = R_PASS;
+
+	user* pUser = m_pHALImp->MakeUser();
+	CN(pUser);
+
+	CR(AddObject(pUser));
+
+	//Success:
+	return pUser;
+
+Error:
+	if (pUser != nullptr) {
+		delete pUser;
+		pUser = nullptr;
+	}
+	return nullptr;
+}
+
 composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
 }
@@ -327,6 +346,11 @@ point SandboxApp::GetCameraPosition() {
 
 quaternion SandboxApp::GetCameraOrientation() {
 	return m_pHALImp->GetCamera()->GetOrientation();
+}
+
+// TODO: This should move up to Sandbox
+hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
+	return nullptr;
 }
 
 // Cloud Controller

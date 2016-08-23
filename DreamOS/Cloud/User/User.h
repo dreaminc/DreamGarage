@@ -1,5 +1,7 @@
-#ifndef USER_H_
-#define USER_H_
+#ifndef USER_MODEL_H_
+#define USER_MODEL_H_
+
+// TODO: Rename the file and class
 
 #include "RESULT/EHM.h"
 

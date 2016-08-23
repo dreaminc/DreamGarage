@@ -26,6 +26,7 @@
 #include "Primitives/text.h"
 #include "Primitives/skybox.h"
 #include "Primitives/model.h"
+#include "Primitives/user.h"
 
 class HALImp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent>, public valid {
 public:
@@ -65,11 +66,15 @@ public:
 	virtual model *MakeModel(wchar_t *pszModelName) = 0;
 	virtual model *MakeModel(const std::vector<vertex>& vertices) = 0;
 	virtual model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) = 0;
+	virtual composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) = 0;
 
 	// TODO: Fix this
 	virtual composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0) = 0;
 
+	virtual user *MakeUser() = 0;
+
 	virtual composite *MakeComposite() = 0;
+	virtual hand* MakeHand() = 0;
 
 	/*
 	virtual model* MakeModel(const std::vector<vertex>& vertices) = 0;

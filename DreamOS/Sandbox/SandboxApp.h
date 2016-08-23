@@ -32,6 +32,7 @@ class volume;
 class texture; 
 class skybox;
 class model;
+class user;
 
 class SandboxApp : public valid {
 public:
@@ -94,6 +95,7 @@ public:
 	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	user *AddUser();
 
 	// Cloud Controller 
 public:
@@ -113,6 +115,8 @@ public:
 	camera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
+
+	virtual hand *GetHand(hand::HAND_TYPE handType);
 
 protected:
 	// TODO: Move to unique_ptr

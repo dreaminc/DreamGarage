@@ -22,6 +22,7 @@ public:
 	}
 
 	RESULT SendHeadPosition();
+	RESULT SendHandPosition();
 
 	RESULT LoadScene();
 	RESULT Update(void);
@@ -32,7 +33,9 @@ public:
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
 
 private:
-	composite *m_pPeerUser;
+
+	user *m_pPeerUser;
+	//composite *m_pPeerUser;
 	//volume *m_pPeerUser;
 
 	sphere *m_pSphere;

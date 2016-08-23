@@ -141,7 +141,7 @@ RESULT DreamGarage::LoadScene() {
 	pVolume->translateX(5.0f);
 	*/
 
-	///*
+	/*
 	m_pPeerUser = AddModel(L"\\Models\\face2\\untitled.obj",
 						   MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 						   point(0.0f, 0.0f, 0.0f),
@@ -149,6 +149,9 @@ RESULT DreamGarage::LoadScene() {
 						   (point_precision)(0.0f));
 
 	//*/
+
+	// Add model
+	m_pPeerUser = AddUser();
 
 	/*
 	m_pPeerUser = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
@@ -214,10 +217,33 @@ Error:
 	return r;
 }
 
-// 30 FPS update
-#define UPDATE_COUNT_THROTTLE 90	
-#define UPDATE_COUNT_MS ((1000.0f) / UPDATE_COUNT_THROTTLE)
-std::chrono::system_clock::time_point g_lastUpdateTime = std::chrono::system_clock::now();
+RESULT DreamGarage::SendHandPosition() {
+	RESULT r = R_PASS;
+
+	hand *pLeftHand = GetHand(hand::HAND_LEFT);
+	hand *pRightHand = GetHand(hand::HAND_RIGHT);
+
+	if (pLeftHand != nullptr) {
+		CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
+	}
+
+	if (pRightHand != nullptr) {
+		CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
+	}
+
+Error:
+	return r;
+}
+
+// Head update time
+#define UPDATE_HEAD_COUNT_THROTTLE 90	
+#define UPDATE_HEAD_COUNT_MS ((1000.0f) / UPDATE_HEAD_COUNT_THROTTLE)
+std::chrono::system_clock::time_point g_lastHeadUpdateTime = std::chrono::system_clock::now();
+
+// Hands update time
+#define UPDATE_HAND_COUNT_THROTTLE 30	
+#define UPDATE_HAND_COUNT_MS ((1000.0f) / UPDATE_HAND_COUNT_THROTTLE)
+std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system_clock::now();
 
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
@@ -241,12 +267,21 @@ RESULT DreamGarage::Update(void) {
 	//g_updateCount++;
 	//if (g_updateCount != 0 && (g_updateCount % UPDATE_COUNT_THROTTLE) == 0) {
 
+	// Head update
+	// TODO: this should go up into DreamOS or even sandbox
 	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastUpdateTime).count() > UPDATE_COUNT_MS) {
+
+	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHeadUpdateTime).count() > UPDATE_HEAD_COUNT_MS) {
 		SendHeadPosition();
-		g_lastUpdateTime = timeNow;
+		g_lastHeadUpdateTime = timeNow;
 	}
 
+	// Hand update
+	// TODO: this should go up into DreamOS or even sandbox
+	if (std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHandUpdateTime).count() > UPDATE_HAND_COUNT_MS) {
+		SendHandPosition();
+		g_lastHandUpdateTime = timeNow;
+	}
 	
 	/*
 	static quaternion_precision theta = 0.0f;

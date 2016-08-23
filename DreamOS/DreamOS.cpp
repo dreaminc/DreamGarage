@@ -51,6 +51,10 @@ point DreamOS::GetCameraPosition() {
 	return m_pSandbox->GetCameraPosition();
 }
 
+hand *DreamOS::GetHand(hand::HAND_TYPE handType) {
+	return m_pSandbox->GetHand(handType);
+}
+
 quaternion DreamOS::GetCameraOrientation() {
 	return m_pSandbox->GetCameraOrientation();
 }
@@ -136,6 +140,10 @@ model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	
 composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+}
+
+user *DreamOS::AddUser() {
+	return m_pSandbox->AddUser();
 }
 
 RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {

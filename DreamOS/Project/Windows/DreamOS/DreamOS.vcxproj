@@ -109,7 +109,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-	  <AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
 		C:\dev\webrtc-checkout\src\;
 		$(WEBRTCSRCPATH)\third_party\jsoncpp\source\include;
 		$(WEBRTCSRCPATH)\third_party\jsoncpp\overrides\include;
@@ -135,7 +135,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-	  <AdditionalDependencies>
+      <AdditionalDependencies>
 		wininet.lib;
 		dnsapi.lib;
 		version.lib;
@@ -300,7 +300,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-	  <AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>
 		C:\dev\webrtc-checkout\src\;
 		$(WEBRTCSRCPATH)\third_party\jsoncpp\source\include;
 		$(WEBRTCSRCPATH)\third_party\jsoncpp\overrides\include;
@@ -513,6 +513,7 @@
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
+    <ClCompile Include="..\..\..\Primitives\user.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp" />
@@ -789,6 +790,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLText.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLCommon.h" />
@@ -846,6 +848,7 @@
     <ClInclude Include="..\..\..\Primitives\Types\Types.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h" />
     <ClInclude Include="..\..\..\Primitives\Types\UID.h" />
+    <ClInclude Include="..\..\..\Primitives\user.h" />
     <ClInclude Include="..\..\..\Primitives\uvcoord.h" />
     <ClInclude Include="..\..\..\Primitives\valid.h" />
     <ClInclude Include="..\..\..\Primitives\vector.h" />

@@ -70,6 +70,8 @@ public:
 	RESULT RegisterImpMouseEvents();
 	RESULT RegisterImpLeapMotionEvents();
 
+	virtual hand *GetHand(hand::HAND_TYPE handType) override;
+
 	RESULT RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> m_fnUIThreadCallback);
 	RESULT UnregisterUIThreadCallback();
 
