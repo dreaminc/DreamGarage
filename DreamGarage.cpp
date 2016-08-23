@@ -40,18 +40,6 @@ RESULT DreamGarage::LoadScene() {
 	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	//pQuad->SetColorTexture(pColorTextureCobble);
 	//pQuad->SetBumpTexture(pBumpTexture);
-	//tQuad->SetBillboard(true);
-/*
-	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
-	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
-
-	//quad *pQuad = AddQuad(10.0f, 10.0f, 100, 100);
-	//pQuad->MoveTo(0.0f, -1.0f, 0.0f);
-
-	/*
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
-	pSphere2->MoveTo(0.0f, -1.0f, 0.0f);
-	*/
 
 	//m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 
