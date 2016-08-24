@@ -70,6 +70,11 @@ RESULT DreamGarage::LoadScene() {
 	//pSkybox->SetCubeMapTexture(pCubeMap);
 	//*/
 	
+	// Add Peer User Object
+	m_pPeerUser = AddUser();
+
+	quad *pQuad = AddQuad(100.0f, 100.0f);
+
 	/*
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
@@ -150,9 +155,6 @@ RESULT DreamGarage::LoadScene() {
 
 	//*/
 
-	// Add model
-	m_pPeerUser = AddUser();
-
 	/*
 	m_pPeerUser = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
 		//MakeTexture(L"..\\Models\\stormtrooper\\Map__7_Raytrace.tga", texture::TEXTURE_TYPE::TEXTURE_COLOR),
@@ -193,12 +195,13 @@ RESULT DreamGarage::LoadScene() {
 		100.0f);
 	*/
 		
-
+	/*
 	AddModel(L"\\Models\\terrain\\untitled.obj",
 		MakeTexture(L"..\\Models\\terrain\\floor.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(0.0f, -10.0f, 0.0f),
 		7.0f,
 		0);
+	*/
 
 
 //Error:
