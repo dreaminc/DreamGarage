@@ -121,8 +121,14 @@ public:
 		return R_PASS;
 	}
 
-	RESULT Print(char *pszOptName = nullptr) {
-		DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", x(), y(), z(), w());
+	RESULT Print(char *pszOptName = nullptr, bool fReturn = false) {
+		if (fReturn) {
+			DEBUG_LINEOUT_RETURN("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", x(), y(), z(), w());
+		}
+		else {
+			DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", x(), y(), z(), w());
+		}
+
 		return R_PASS;
 	}
 	

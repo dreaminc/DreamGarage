@@ -53,6 +53,17 @@ thumb::ThumbState thumb::GetThumbState() {
 	return thumbState;
 }
 
+RESULT thumb::SetThumbState(const ThumbState& pThumbState) {
+	RESULT r = R_PASS;
+
+	m_pTip->SetPosition(pThumbState.ptTip);
+	m_pDIP->SetPosition(pThumbState.ptDIP);
+	m_pPIP->SetPosition(pThumbState.ptPIP);
+
+//Error:
+	return r;
+}
+
 
 finger::finger(HALImp* pHALImp) :
 	composite(pHALImp),
@@ -114,6 +125,18 @@ finger::FingerState finger::GetFingerState() {
 	};
 
 	return fingerState;
+}
+
+RESULT finger::SetFingerState(const FingerState& pFingerState) {
+	RESULT r = R_PASS;
+
+	m_pTip->SetPosition(pFingerState.ptTip);
+	m_pMCP->SetPosition(pFingerState.ptMCP);
+	m_pDIP->SetPosition(pFingerState.ptDIP);
+	m_pPIP->SetPosition(pFingerState.ptPIP);
+
+//Error:
+	return r;
 }
 
 RESULT finger::SetJointPosition(point ptJoint, JOINT_TYPE jointType) {
@@ -233,15 +256,45 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	return r;
 }
 
+RESULT hand::SetHandState(const hand::HandState& pHandState) {
+	RESULT r = R_PASS;
+
+	//SetPosition(pHandState.ptPalm + point(0.0f, 0.0f, -1.0f));
+	SetPosition(pHandState.ptPalm + point(0.0f, 0.0f, -0.25f));
+
+	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
+	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);
+	m_pRingFinger->SetFingerState(pHandState.fingerRing);
+	m_pPinkyFinger->SetFingerState(pHandState.fingerPinky);
+	m_pThumb->SetThumbState(pHandState.thumb);
+
+//Error:
+	return r;
+}
+
 hand::HandState hand::GetHandState() {
 	hand::HandState handState = {
 		m_handType,
-		m_pPalm->GetPosition(),
+		GetPosition(),
 		m_pIndexFinger->GetFingerState(),
 		m_pMiddleFinger->GetFingerState(),
 		m_pRingFinger->GetFingerState(),
 		m_pPinkyFinger->GetFingerState(),
 		m_pThumb->GetThumbState()
+	};
+
+	return handState;
+}
+
+hand::HandState hand::GetDebugHandState(hand::HAND_TYPE handType) {
+	hand::HandState handState = {
+		handType,
+		point(1,2,3),
+		finger::FingerState(),
+		finger::FingerState(),
+		finger::FingerState(),
+		finger::FingerState(),
+		thumb::ThumbState()
 	};
 
 	return handState;

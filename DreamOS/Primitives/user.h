@@ -17,6 +17,8 @@ public:
 
 	RESULT Initialize();
 
+	RESULT UpdateHand(const hand::HandState& pHandState);
+
 private:
 	std::shared_ptr<composite> m_pHead;
 	std::shared_ptr<texture> m_pTextureHead;

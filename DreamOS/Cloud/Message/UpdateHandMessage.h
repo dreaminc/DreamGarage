@@ -37,6 +37,11 @@ public:
 		m_body.handState.PrintState();
 		return R_PASS;
 	}
+
+
+	hand::HandState GetHandState() {
+		return m_body.handState;
+	}
 };
 
 #endif	// ! UPDATE_HAND_MESSAGE_H_

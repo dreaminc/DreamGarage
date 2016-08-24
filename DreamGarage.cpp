@@ -191,7 +191,7 @@ RESULT DreamGarage::LoadScene() {
 		point(-4.5f, -4.8f - 2.6f, 4.0f),
 		1.0f,
 		100.0f);
-
+	*/
 		
 
 	AddModel(L"\\Models\\terrain\\untitled.obj",
@@ -199,7 +199,7 @@ RESULT DreamGarage::LoadScene() {
 		point(0.0f, -10.0f, 0.0f),
 		7.0f,
 		0);
-		*/
+
 
 //Error:
 	return r;
@@ -220,6 +220,7 @@ Error:
 RESULT DreamGarage::SendHandPosition() {
 	RESULT r = R_PASS;
 
+	///*
 	hand *pLeftHand = GetHand(hand::HAND_LEFT);
 	hand *pRightHand = GetHand(hand::HAND_RIGHT);
 
@@ -228,8 +229,10 @@ RESULT DreamGarage::SendHandPosition() {
 	}
 
 	if (pRightHand != nullptr) {
-		CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
+		CR(SendUpdateHandMessage(NULL, pRightHand->GetHandState()));
 	}
+
+	//CR(SendUpdateHandMessage(NULL, hand::GetDebugHandState(hand::HAND_LEFT)));
 
 Error:
 	return r;
@@ -241,7 +244,7 @@ Error:
 std::chrono::system_clock::time_point g_lastHeadUpdateTime = std::chrono::system_clock::now();
 
 // Hands update time
-#define UPDATE_HAND_COUNT_THROTTLE 30	
+#define UPDATE_HAND_COUNT_THROTTLE 90	
 #define UPDATE_HAND_COUNT_MS ((1000.0f) / UPDATE_HAND_COUNT_THROTTLE)
 std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system_clock::now();
 
@@ -351,8 +354,11 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("HandleUpdateHandMessage");
-	pUpdateHandMessage->PrintMessage();
+	//DEBUG_LINEOUT("HandleUpdateHandMessage");
+	//pUpdateHandMessage->PrintMessage();
+
+	hand::HandState handState = pUpdateHandMessage->GetHandState();
+	m_pPeerUser->UpdateHand(handState);
 
 //Error:
 	return r;

@@ -314,6 +314,7 @@ RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handS
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	CB(m_pCloudImp->IsConnected());
 	CN(m_pUserController);
 	{
 		// Create the message

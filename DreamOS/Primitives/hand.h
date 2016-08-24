@@ -47,6 +47,7 @@ public:
 
 	RESULT Initialize();
 	RESULT SetJointPosition(point ptJoint, JOINT_TYPE jointType);
+	RESULT SetFingerState(const FingerState& pFingerState);
 	finger::FingerState GetFingerState();
 
 protected:
@@ -84,6 +85,7 @@ public:
 	thumb(HALImp* pHALImp);
 
 	RESULT Initialize();
+	RESULT SetThumbState(const ThumbState& pThumbState);
 	thumb::ThumbState GetThumbState();
 };
 
@@ -124,8 +126,10 @@ public:
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	RESULT SetFromLeapHand(const Leap::Hand hand);
+	RESULT SetHandState(const hand::HandState& pHandState);
 
 	hand::HandState GetHandState();
+	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);
 
 private:
 	HAND_TYPE m_handType;
