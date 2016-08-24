@@ -18,6 +18,8 @@
 #include <tchar.h>
 #include <HMD/HMD.h>
 
+#include <functional>
+
 #define DEFAULT_WIDTH 1920 / 2
 #define DEFAULT_HEIGHT 1080 / 2
 
@@ -31,6 +33,11 @@ class Win64Mouse;
 
 class Windows64App : public SandboxApp {
 public:
+	enum WindowMessages {
+		UI_THREAD_CALLBACK = WM_APP + 1
+	};
+
+public:
 	Windows64App(TCHAR* pszClassName);
 	~Windows64App();
 
@@ -39,6 +46,9 @@ public:	// Sandbox Interface
 	RESULT Show();
 	RESULT Shutdown();
 	RESULT RecoverDisplayMode();
+
+	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) override;
+	virtual long Windows64App::GetTickCount() override;
 
 public:
 	RESULT InitializePathManager();
@@ -60,6 +70,11 @@ public:
 	RESULT RegisterImpMouseEvents();
 	RESULT RegisterImpLeapMotionEvents();
 
+	virtual hand *GetHand(hand::HAND_TYPE handType) override;
+
+	RESULT RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> m_fnUIThreadCallback);
+	RESULT UnregisterUIThreadCallback();
+
 private:
 	bool m_fFullscreen;
 	long m_wndStyle;
@@ -74,14 +89,16 @@ private:
 
 	WNDCLASSEX m_wndclassex; 
 	HWND m_hwndWindow;
+	DWORD m_ThreadID;
 
 	HDC m_hDC;					// Private GDI Device Context
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
 	TimeManager	*m_pTimeManager;
-
 	Profiler	m_profiler;
+
+	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
 
 public:
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;

@@ -19,6 +19,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
 	m_pHMD(nullptr),
+	m_ThreadID(0),
+	m_fnUIThreadCallback(nullptr),
 	m_pSenseLeapMotion(nullptr)
 {
 	RESULT r = R_PASS;
@@ -60,6 +62,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		// TODO: ?
 		//SysSetDisplayMode(screenw, screenh, SCRDEPTH);
 	}
+
+	m_ThreadID = ::GetCurrentThreadId();
+	CB((m_ThreadID != 0));
 
 	m_hwndWindow = CreateWindow(
 		m_pszClassName,										// lpClassName
@@ -127,13 +132,53 @@ Error:
 	return r;
 }
 
+RESULT Windows64App::SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) {
+	RESULT r = R_PASS;
+
+	switch (sandboxWindowPosition) {
+		case SANDBOX_WINDOW_POSITION::LEFT: {
+			m_posX = 0;
+			m_posY = m_posY;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::RIGHT: {
+			m_posX = GetSystemMetrics(SM_CXSCREEN) - m_pxWidth;
+			m_posY = m_posY;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::TOP: {
+			m_posX = m_posX;
+			m_posY = 0;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::BOTTOM: {
+			m_posX = m_posX;
+			m_posY = GetSystemMetrics(SM_CYSCREEN) - m_pxHeight;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::CENTER: {
+			m_posX = (GetSystemMetrics(SM_CXSCREEN) / 2) - (m_pxWidth / 2);
+			m_posY = (GetSystemMetrics(SM_CYSCREEN) / 2) - (m_pxHeight / 2);
+		} break;
+	}
+
+	CBM(SetWindowPos(m_hwndWindow, HWND_TOP, m_posX, m_posY, 0, 0, (UINT)(SWP_NOSIZE)), "Failed to position window");
+
+Error:
+	return r;
+}
+
 RESULT Windows64App::InitializeCloudController() {
 	RESULT r = R_PASS;
 
 	// Set up the Cloud Controller
 	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
-	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
+	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
+
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
+	
+	CR(RegisterUIThreadCallback(m_pCloudController->GetUIThreadCallback()));
 
 Error:
 	return r;
@@ -307,18 +352,62 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 		// Update the Keyboard in WndProc rather than in the run loop
 		// TODO: This should be different arch for native
 		case WM_KEYDOWN: {
-			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
+			
+			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
+			
+			// DEBUG: Bypass for connect to cloud
+			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('C')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					//m_pCloudController->ConnectToPeer(NULL);
+					m_pCloudController->InitializeConnection(true, true);
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('V')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					//m_pCloudController->ConnectToPeer(NULL);
+					m_pCloudController->InitializeConnection(false, true);
+				}
+			}
+			/*else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					//m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
+
+					m_pCloudController->SendUpdateHeadMessage(NULL, point(1, 2, 3), quaternion(1, 2, 3, 4));
+				}
+			}*/
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
 					m_pCloudController->LoginUser();
 				}
 			}
-
-			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), true);
-		} break;
-
-		case WM_KEYUP: {
-			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), false);
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('P')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->PrintEnvironmentPeerList();
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('I')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->AddIceCandidates();
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_LEFT) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::LEFT);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_RIGHT) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::RIGHT);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_UP) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::TOP);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_DOWN) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::BOTTOM);
+			}
 		} break;
 
 		default: {
@@ -378,6 +467,26 @@ Error:
 }
 
 
+RESULT Windows64App::RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> fnUIThreadCallback) {
+	RESULT r = R_PASS;
+
+	CB((m_fnUIThreadCallback == nullptr));
+	m_fnUIThreadCallback = fnUIThreadCallback;
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::UnregisterUIThreadCallback() {
+	RESULT r = R_PASS;
+
+	CN(m_fnUIThreadCallback);
+	m_fnUIThreadCallback = nullptr;
+
+	Error:
+	return r;
+}
+
 // temp
 #include "HAL/opengl/OGLHand.h"
 
@@ -385,50 +494,28 @@ Error:
 RESULT Windows64App::RegisterImpLeapMotionEvents() {
 	RESULT r = R_PASS;
 
-	//CR(m_pSenseLeapMotion->RegisterSubscriber(SENSE_LEAPMOTION_EVENT_HAND_LEFT, m_pHALImp));
-
-	//volume *pLeapObj = AddVolume(1.0f, 1.0f, 0.25f);
-	//CR(m_pSenseLeapMotion->AttachVirtualObj(pLeapObj));
-
-	/*
-	composite *pHMDFrameOfReference = new OGLComposite(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-	AddObject(pHMDFrameOfReference);
-	//*/
-
 	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 	
-	/*
-	if (m_pHMD != nullptr) {
-		std::shared_ptr<DimObj> pLeftHandShaderPtr(pLeftHand);
-		m_pHALImp->GetCamera()->AddObject(pLeftHandShaderPtr);
-
-		std::shared_ptr<DimObj> pRightHandShaderPtr(pRightHand);
-		m_pHALImp->GetCamera()->AddObject(pRightHandShaderPtr);
-	}
-	else {
-		AddObject(pLeftHand);
-		AddObject(pRightHand);
-	}
-	*/
-
 	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
 
 	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
 
-	/*
-	sphere *pSphere = MakeSphere(1.0f, 10, 10);
-	pSphere->MoveTo(0.0f, 0.0f, -5.0f);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj>(pSphere));
-	//*/
-
 	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
 	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
 
 Error:
 	return r;
+}
+
+hand *Windows64App::GetHand(hand::HAND_TYPE handType) {
+	return m_pSenseLeapMotion->GetHand(handType);
+}
+
+long Windows64App::GetTickCount() {
+	return static_cast<long>(GetTickCount());
 }
 
 RESULT Windows64App::InitializeSandbox() {
@@ -458,8 +545,10 @@ RESULT Windows64App::InitializeSandbox() {
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
 
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	
+	m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -512,8 +601,24 @@ RESULT Windows64App::Show() {
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-			if (msg.message == WM_QUIT)
-				fQuit = true;
+			switch (msg.message) {
+				case WM_QUIT: {
+						fQuit = true;
+					} break;
+
+				case Windows64App::WindowMessages::UI_THREAD_CALLBACK: {
+					m_pCloudController->CallGetUIThreadCallback(static_cast<int>(msg.wParam), reinterpret_cast<void*>(msg.lParam));
+				} break;
+
+				case WM_KEYDOWN: {
+					m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(msg.wParam), true);
+				} break;
+
+				case WM_KEYUP: {
+					m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(msg.wParam), false);
+				} break;
+			}
+
 
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
@@ -536,7 +641,8 @@ RESULT Windows64App::Show() {
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		m_pWin64Mouse->UpdateMousePosition();
+		//m_pWin64Mouse->UpdateMousePosition();
+
 
 		if (m_pHMD != nullptr) {
 			m_pHMD->UpdateHMD();

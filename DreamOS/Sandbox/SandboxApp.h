@@ -15,13 +15,15 @@
 #include "HAL/HALImp.h"
 
 #include "Sandbox/PathManager.h"
+#include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
 #include "Scene/SceneGraph.h"
 
 #include <functional>
 
-class CloudController;
+//class CloudController;
+#include "Cloud/CloudController.h"
 
 class light; 
 class quad;
@@ -30,6 +32,7 @@ class volume;
 class texture; 
 class skybox;
 class model;
+class user;
 
 class SandboxApp : public valid {
 public:
@@ -37,7 +40,7 @@ public:
 	~SandboxApp();
 
 public:
-	RESULT Initialize();
+	RESULT SandboxApp::Initialize(int argc = 0, const char *argv[] = nullptr);
 
 	virtual RESULT InitializeSandbox() = 0;
 	virtual RESULT Show() = 0;
@@ -45,10 +48,23 @@ public:
 	virtual RESULT RecoverDisplayMode() = 0;		// Do all sandboxes need this ultimately? 
 
 public:
+	enum class SANDBOX_WINDOW_POSITION {
+		LEFT,
+		RIGHT,
+		TOP,
+		BOTTOM,
+		CENTER,
+		INVALID
+	};
+
+	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) = 0;
+
+public:
 	virtual RESULT InitializePathManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
 	virtual RESULT InitializeHAL() = 0;
+	virtual long GetTickCount();
 
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
@@ -78,7 +94,17 @@ public:
 	model *AddModel(const std::vector<vertex>& vertices);
 	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
-	composite* AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	user *AddUser();
+
+	// Cloud Controller 
+public:
+
+	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
+	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
+
+	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
 public:
 	PathManager *GetPathManager();
@@ -86,10 +112,15 @@ public:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
 
+	camera* GetCamera();
 	point GetCameraPosition();
+	quaternion GetCameraOrientation();
+
+	virtual hand *GetHand(hand::HAND_TYPE handType);
 
 protected:
 	// TODO: Move to unique_ptr
+	CommandLineManager *m_pCommandLineManager;
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	SceneGraph *m_pSceneGraph;

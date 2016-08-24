@@ -117,8 +117,10 @@ public:
 	}
 
 	RESULT RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {	
+
 		m_qRotation.RotateByVector(GetRightVector(), dy * m_cameraRotateSpeed);
 		m_qRotation.RotateByVector(GetUpVector(), dx * m_cameraRotateSpeed);
+
 		m_qRotation.Normalize();
 
 		vector vectorLook = GetLookVector();

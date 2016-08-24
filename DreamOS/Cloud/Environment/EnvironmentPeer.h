@@ -25,6 +25,11 @@ public:
 		return R_PASS;
 	}
 
+	RESULT UpdateSDPOffer(std::string strSDPOffer) {
+		m_strSDPOffer = strSDPOffer;
+		return R_PASS;
+	}
+
 	long GetUserID() { return m_userID; }
 	long GetEnvironmentID() { return m_environmentID; }
 	const std::string& GetSDPOffer() { return m_strSDPOffer; }

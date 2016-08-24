@@ -17,6 +17,8 @@ class HALImp;
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
 
+class hand;
+
 class composite : public DimObj {
 public:
 	composite(HALImp *pHALImp);
@@ -36,6 +38,14 @@ public:
 	std::shared_ptr<volume> AddVolume(double width, double length, double height);
 	std::shared_ptr<volume> MakeVolume(double side);
 	std::shared_ptr<volume> AddVolume(double side);
+
+	std::shared_ptr<composite> MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY);
+	std::shared_ptr<composite> AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY);
+
+	std::shared_ptr<hand> AddHand();
+	std::shared_ptr<hand> MakeHand();
+
+	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 
 protected:
 	HALImp *m_pHALImp;

@@ -21,10 +21,23 @@ public:
 		// empty
 	}
 
+	RESULT SendHeadPosition();
+	RESULT SendHandPosition();
+
 	RESULT LoadScene();
 	RESULT Update(void);
 
+	// Cloud Controller
+	RESULT InitializeCloudControllerCallbacks();
+	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
+	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
+
 private:
+
+	user *m_pPeerUser;
+	//composite *m_pPeerUser;
+	//volume *m_pPeerUser;
+
 	sphere *m_pSphere;
 	std::shared_ptr<DebugData> m_spherePosition;
 };

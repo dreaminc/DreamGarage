@@ -43,6 +43,27 @@ RESULT thumb::Initialize() {
 	return r;
 }
 
+thumb::ThumbState thumb::GetThumbState() {
+	ThumbState thumbState = {
+		m_pTip->GetPosition(),
+		m_pDIP->GetPosition(),
+		m_pPIP->GetPosition()
+	};
+
+	return thumbState;
+}
+
+RESULT thumb::SetThumbState(const ThumbState& pThumbState) {
+	RESULT r = R_PASS;
+
+	m_pTip->SetPosition(pThumbState.ptTip);
+	m_pDIP->SetPosition(pThumbState.ptDIP);
+	m_pPIP->SetPosition(pThumbState.ptPIP);
+
+//Error:
+	return r;
+}
+
 
 finger::finger(HALImp* pHALImp) :
 	composite(pHALImp),
@@ -90,6 +111,29 @@ RESULT finger::Initialize() {
 	m_pMCP = AddSphere(jointRadius, 10, 10);
 	m_pDIP = AddSphere(jointRadius, 10, 10);
 	m_pPIP = AddSphere(jointRadius, 10, 10);
+
+//Error:
+	return r;
+}
+
+finger::FingerState finger::GetFingerState() {
+	FingerState fingerState = {
+		m_pTip->GetPosition(),
+		m_pMCP->GetPosition(),
+		m_pDIP->GetPosition(),
+		m_pPIP->GetPosition()
+	};
+
+	return fingerState;
+}
+
+RESULT finger::SetFingerState(const FingerState& pFingerState) {
+	RESULT r = R_PASS;
+
+	m_pTip->SetPosition(pFingerState.ptTip);
+	m_pMCP->SetPosition(pFingerState.ptMCP);
+	m_pDIP->SetPosition(pFingerState.ptDIP);
+	m_pPIP->SetPosition(pFingerState.ptPIP);
 
 //Error:
 	return r;
@@ -210,4 +254,48 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 
 //Error:
 	return r;
+}
+
+RESULT hand::SetHandState(const hand::HandState& pHandState) {
+	RESULT r = R_PASS;
+
+	//SetPosition(pHandState.ptPalm + point(0.0f, 0.0f, -1.0f));
+	SetPosition(pHandState.ptPalm + point(0.0f, 0.0f, -0.25f));
+
+	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
+	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);
+	m_pRingFinger->SetFingerState(pHandState.fingerRing);
+	m_pPinkyFinger->SetFingerState(pHandState.fingerPinky);
+	m_pThumb->SetThumbState(pHandState.thumb);
+
+//Error:
+	return r;
+}
+
+hand::HandState hand::GetHandState() {
+	hand::HandState handState = {
+		m_handType,
+		GetPosition(),
+		m_pIndexFinger->GetFingerState(),
+		m_pMiddleFinger->GetFingerState(),
+		m_pRingFinger->GetFingerState(),
+		m_pPinkyFinger->GetFingerState(),
+		m_pThumb->GetThumbState()
+	};
+
+	return handState;
+}
+
+hand::HandState hand::GetDebugHandState(hand::HAND_TYPE handType) {
+	hand::HandState handState = {
+		handType,
+		point(1,2,3),
+		finger::FingerState(),
+		finger::FingerState(),
+		finger::FingerState(),
+		finger::FingerState(),
+		thumb::ThumbState()
+	};
+
+	return handState;
 }

@@ -84,13 +84,18 @@ public:
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();
+
 	model *MakeModel(wchar_t *pszModelName);
 	model *MakeModel(const std::vector<vertex>& vertices);
 	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+	composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY);
 
 	composite *MakeComposite();
+	user *MakeUser();
+	hand* MakeHand();
 
-	composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	// TODO: Fix w/ scene graph not here
+	composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
 public:
 	// TODO: Consolidate all of these (one Render function)

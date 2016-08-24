@@ -91,6 +91,11 @@ public:
 		return result;
 	}
 
+	RESULT Print(char *pszOptName = nullptr) {
+		DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "v", x(), y(), z(), w());
+		return R_PASS;
+	}
+
 	// Dot Product
 	// This calculates the dot product as if it is a R3 vector (ignores the w parameter) 
 	vector_precision dot(vector& rhs) {
