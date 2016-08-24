@@ -2,7 +2,8 @@
 #include "Cloud/CloudController.h"
 
 SandboxApp::SandboxApp() :
-	m_pPathManager(NULL),
+	m_pPathManager(nullptr),
+	m_pCommandLineManager(nullptr),
 	m_pOpenGLRenderingContext(NULL),
 	m_pSceneGraph(NULL),
 	m_pCloudController(nullptr),
@@ -29,7 +30,7 @@ SandboxApp::~SandboxApp() {
 	}
 }
 
-inline PathManager * SandboxApp::GetPathManager() {
+inline PathManager* SandboxApp::GetPathManager() {
 	return m_pPathManager; 
 }
 
@@ -37,13 +38,28 @@ inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext; 
 }
 
-RESULT SandboxApp::Initialize() {
+RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
 
+	// Set up command line manager
+	m_pCommandLineManager = CommandLineManager::instance();
+	CN(m_pCommandLineManager);
+	
+	//CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	CR(m_pCommandLineManager->RegisterParameter("ip", "i", "ec2-54-175-210-194.compute-1.amazonaws.com"));
+	//CR(m_pCommandLineManager->RegisterParameter("ip", "i", "localhost"));
+	CR(m_pCommandLineManager->RegisterParameter("port", "P", "8000"));
+	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
+	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
+
+	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
+
+	// Set up Scene Graph
 	m_pSceneGraph = new SceneGraph();
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
+
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
 
 	// TODO: Show this be replaced with individual initialization of each component?
@@ -51,6 +67,10 @@ RESULT SandboxApp::Initialize() {
 
 Error:
 	return r;
+}
+
+long SandboxApp::GetTickCount() {
+	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
 // Sandbox Factory Methods
@@ -273,8 +293,27 @@ Error:
 	return nullptr;
 }
 
-composite* SandboxApp::AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
-	return m_pHALImp->LoadModel(m_pSceneGraph, strRootFolder, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+user *SandboxApp::AddUser() {
+	RESULT r = R_PASS;
+
+	user* pUser = m_pHALImp->MakeUser();
+	CN(pUser);
+
+	CR(AddObject(pUser));
+
+	//Success:
+	return pUser;
+
+Error:
+	if (pUser != nullptr) {
+		delete pUser;
+		pUser = nullptr;
+	}
+	return nullptr;
+}
+
+composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
 }
 
 RESULT SandboxApp::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
@@ -297,6 +336,36 @@ Error:
 	return r;
 }
 
+camera* SandboxApp::GetCamera() {
+	return m_pHALImp->GetCamera();
+}
+
 point SandboxApp::GetCameraPosition() {
 	return m_pHALImp->GetCamera()->GetPosition();
+}
+
+quaternion SandboxApp::GetCameraOrientation() {
+	return m_pHALImp->GetCamera()->GetOrientation();
+}
+
+// TODO: This should move up to Sandbox
+hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
+	return nullptr;
+}
+
+// Cloud Controller
+RESULT SandboxApp::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
+	return m_pCloudController->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
+}
+
+RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
+	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
+}
+
+RESULT SandboxApp::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pCloudController->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState) {
+	return m_pCloudController->SendUpdateHandMessage(userID, handState);
 }

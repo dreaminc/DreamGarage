@@ -80,7 +80,7 @@ public:
 
 	// Rotation
 	VirtualObj* RotateBy(quaternion q);
-	VirtualObj* RotateBy(quaternion_precision x, quaternion_precision y, quaternion_precision z);
+	VirtualObj* RotateBy(quaternion_precision thetaX, quaternion_precision thetaY, quaternion_precision thetaZ);
 	VirtualObj* RotateXBy(quaternion_precision deg);
 	VirtualObj* RotateYBy(quaternion_precision deg);
 	VirtualObj* RotateZBy(quaternion_precision deg);

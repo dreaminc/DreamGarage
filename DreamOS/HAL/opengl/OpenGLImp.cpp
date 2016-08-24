@@ -7,6 +7,25 @@
 #include "Primitives/RotationMatrix.h"
 #include <vector>
 
+#include "OGLVolume.h"
+
+#include "OGLModel.h"
+#include "OGLText.h"
+#include "Primitives/font.h"
+#include "OGLTriangle.h"
+#include "OGLQuad.h"
+
+#include "OGLSphere.h"
+#include "OGLComposite.h"
+#include "Primitives/light.h"
+#include "OGLTexture.h"
+#include "OGLSkybox.h"
+#include "OGLUser.h"
+#include "OGLHand.h"
+
+
+#include "OGLProfiler.h"
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
@@ -215,7 +234,7 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Allocate the camera
 	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, -2.0f), 100.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, -2.0f), 60.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -375,33 +394,26 @@ Error:
 	return r;
 }
 
-#include "OGLVolume.h"
-
-#include "OGLModel.h"
-#include "OGLText.h"
-#include "Primitives/font.h"
-#include "OGLTriangle.h"
-#include "OGLQuad.h"
-
-#include "OGLSphere.h"
-#include "Primitives/light.h"
-#include "OGLTexture.h"
-#include "OGLSkybox.h"
-
-#include "OGLProfiler.h"
-
 // TODO: This convenience function should be put in a model factory
 
-composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 	RESULT r = R_PASS;
-
-	FileLoaderHelper::multi_mesh_indices_t v;
-	FileLoaderHelper::LoadOBJFile(strRootFolder + wstrOBJFilename, v);
 	
 	composite* pComposite = new composite(this);
 
-	// texture caching
+	// Texture caching
 	std::map<std::wstring, texture*> textureMap;
+
+	// Root folder
+	PathManager* pPathManager = PathManager::instance();
+	wchar_t* pszPath;
+	pPathManager->GetCurrentPath((wchar_t*&)pszPath);
+	std::wstring strRootFolder(pszPath);
+
+	FileLoaderHelper::multi_mesh_indices_t v;
+	FileLoaderHelper::LoadOBJFile(strRootFolder + wstrOBJFilename, v);
+
+	DEBUG_LINEOUT("Loading %S verts and indices", wstrOBJFilename.c_str());
 
 	for (auto& m : v) {
 		if (m.second.indices.size() == 0) {
@@ -411,7 +423,6 @@ composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& str
 		std::shared_ptr<model> pModel(MakeModel(std::move(m.second.vertices), std::move(m.second.indices)));
 				
 		CN(pModel);
-
 		pComposite->AddChild(pModel);
 
 		if (pTexture != nullptr) {
@@ -419,33 +430,27 @@ composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& str
 		}
 		else {
 			std::string tex = m.first.map_Kd;
-			if (tex.compare("") != 0)
-			{
+			if (tex.compare("") != 0) {
 				std::wstring wstr(tex.begin(), tex.end());
 				wstr = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.rfind('\\')) + L"\\" + wstr;
 
-				if (textureMap.find(wstr) == textureMap.end())
-				{
+				if (textureMap.find(wstr) == textureMap.end()) {
 					//OutputDebugStringW((std::wstring(L"DOS::load tex=") + wstr).c_str());
 					texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
 					CN(pTempTexture);
 
 					textureMap[wstr] = pTempTexture;
 
-					if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0)
-					{
+					if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0) {
 						//OutputDebugStringW((std::wstring(L"DOS::tex=") + wstr + L"," + std::to_wstring(pTempTexture->GetWidth()) + L"," + std::to_wstring(pTempTexture->GetHeight())).c_str());
-
 						pModel->SetColorTexture(pTempTexture);
 					}
 				}
-				else
-				{
+				else {
 					pModel->SetColorTexture(textureMap[wstr]);
 				}
 			}
-			else
-			{
+			else {
 				pModel->SetColor(color(m.first.Kd.r(), m.first.Kd.g(), m.first.Kd.b(), m.first.Kd.a()));
 			}
 		}
@@ -454,7 +459,9 @@ composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& str
 		pModel->MoveTo(ptPosition);
 		pModel->RotateYBy(rotateY);
 		//pModel->UpdateOGLBuffers();
-		pSceneGraph->PushObject(pModel.get());
+		if (pSceneGraph != nullptr) {
+			pSceneGraph->PushObject(pModel.get());
+		}
 	}
 
 Error:
@@ -514,8 +521,6 @@ Error:
 	return nullptr;
 }
 
-#include "HAL/opengl/OGLComposite.h"
-
 composite *OpenGLImp::MakeComposite() {
 	RESULT r = R_PASS;
 
@@ -529,6 +534,23 @@ Error:
 	if (pComposite != nullptr) {
 		delete pComposite;
 		pComposite = nullptr;
+	}
+	return nullptr;
+}
+
+user *OpenGLImp::MakeUser() {
+	RESULT r = R_PASS;
+
+	user *pUser = new OGLUser(this);
+	CN(pUser);
+
+	//Success:
+	return pUser;
+
+Error:
+	if (pUser != nullptr) {
+		delete pUser;
+		pUser = nullptr;
 	}
 	return nullptr;
 }
@@ -581,6 +603,40 @@ Error:
 	if (pSphere != nullptr) {
 		delete pSphere;
 		pSphere = nullptr;
+	}
+	return nullptr;
+}
+
+composite* OpenGLImp::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	RESULT r = R_PASS;
+
+	composite *pModel = LoadModel(nullptr, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+	CN(pModel);
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+	return nullptr;
+}
+
+hand* OpenGLImp::MakeHand() {
+	RESULT r = R_PASS;
+
+	hand *pHand = new OGLHand(this);
+	CN(pHand);
+
+	//Success:
+	return pHand;
+
+Error:
+	if (pHand != nullptr) {
+		delete pHand;
+		pHand = nullptr;
 	}
 	return nullptr;
 }

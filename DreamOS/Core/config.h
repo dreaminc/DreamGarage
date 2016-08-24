@@ -20,13 +20,21 @@
 #if defined(_WIN32)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_WIN32
 
+	#include <WinSock2.h>
+	#include <WS2tcpip.h>
+	#include <Windows.h>
+
 	#ifdef WIN32_LEAN_AND_MEAN
-		#unfdef WIN32_LEAN_AND_MEAN
+		#undef WIN32_LEAN_AND_MEAN
 	#endif
 
 	#ifndef WIN32
 		#define WIN32
 	#endif
+
+	#pragma warning( disable : 4312)
+	#pragma warning( disable : 4244)	// TODO: WebRTC port.h needs this, it's not a good one though
+
 #elif defined(__APPLE__)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_OSX
 #elif defined (__linux__)
@@ -37,7 +45,9 @@
 
 // MSFT Visual Studio
 #ifdef _MSC_VER
-	#define _CRT_SECURE_NO_WARNINGS		// Remove the errors for using STANDARD C/++ calls (msft jerks...)
+	#ifndef _CRT_SECURE_NO_WARNINGS
+		#define _CRT_SECURE_NO_WARNINGS		// Remove the errors for using STANDARD C/++ calls (msft jerks...)
+	#endif
 #endif
 
 #endif // ! CONFIG_H_

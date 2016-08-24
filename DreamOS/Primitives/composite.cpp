@@ -2,6 +2,8 @@
 
 #include "HAL/HALImp.h"
 
+#include "Primitives/hand.h"
+
 composite::composite(HALImp *pHALImp) :
 	m_pHALImp(pHALImp)
 {
@@ -32,6 +34,69 @@ RESULT composite::AddObject(std::shared_ptr<DimObj> pDimObj) {
 
 RESULT composite::ClearObjects() {
 	return ClearChildren();
+}
+
+std::shared_ptr<texture> composite::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+
+	RESULT r = R_PASS;
+
+	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(pszFilename, type));
+
+	//Success:
+	return pTexture;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<hand> composite::MakeHand() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<hand> pHand(m_pHALImp->MakeHand());
+
+	//Success:
+	return pHand;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<hand> composite::AddHand() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<hand> pHand = MakeHand();
+	CR(AddObject(pHand));
+
+	//Success:
+	return pHand;
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<composite> composite::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<composite> pModel(m_pHALImp->MakeModel(wstrOBJFilename, pTexture, ptPosition, scale, rotateY));
+
+	//Success:
+	return pModel;
+
+//Error:
+	return nullptr;
+}
+
+std::shared_ptr<composite> composite::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<composite> pModel = MakeModel(wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+	CR(AddObject(pModel));
+
+	//Success:
+	return pModel;
+
+Error:
+	return nullptr;
 }
 
 std::shared_ptr<sphere> composite::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {

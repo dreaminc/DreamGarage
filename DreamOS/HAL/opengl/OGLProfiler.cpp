@@ -10,6 +10,7 @@
 
 #include <Windows.h>
 #include <string>
+#include <algorithm>
 
 // OGLRenderContext
 void OGLRenderContext::Init()
@@ -83,7 +84,7 @@ void OGLProfiler::Render() {
 	const int maxRows = 28;
 	float top = 0.6f;
 	float left = -0.7f;
-	float consoleHeight = min(maxRows, Profiler::GetProfiler()->GetConsoleText().size())*0.05f;
+	float consoleHeight = std::min(maxRows, (int)(Profiler::GetProfiler()->GetConsoleText().size()))*0.05f;
 
 	for (auto it = (Profiler::GetProfiler()->GetConsoleText().size() > maxRows) ?
 			Profiler::GetProfiler()->GetConsoleText().end() - maxRows : Profiler::GetProfiler()->GetConsoleText().begin();
@@ -164,8 +165,8 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		currentPoint.x() = right - (float)deltaTime * width / (float)time_scale;
 		currentPoint.y() = YSCALE(static_cast<int>(records[index].first));
 
-		minFPS = min(minFPS, records[index].first);
-		maxFPS = max(maxFPS, records[index].first);
+		minFPS = std::min(minFPS, records[index].first);
+		maxFPS = std::max(maxFPS, records[index].first);
 
 		if (cnt == 0)
 		{

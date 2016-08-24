@@ -1,17 +1,20 @@
+#include "Cloud/CloudController.h"
 #include "EnvironmentController.h"
 #include "Cloud/User/User.h"
 
 #include "Cloud/Websockets/Websocket.h"
+#include "Sandbox/CommandLineManager.h"
 #include "json.hpp"
 
 #include "Primitives/Types/UID.h"
 
-EnvironmentController::EnvironmentController(long environmentID) :
+EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
+	Controller(pParentController),
 	m_fConnected(false),
 	m_fPendingMessage(false),
 	m_pEnvironmentWebsocket(nullptr),
 	m_pendingMessageID(0),
-	m_state(state::SOCKET_UNINITIALIZED)
+	m_state(state::UNINITIALIZED)
 {
 	m_environment = Environment(environmentID);
 }
@@ -20,6 +23,21 @@ EnvironmentController::~EnvironmentController() {
 	if (m_pEnvironmentWebsocket != nullptr) {
 		m_pEnvironmentWebsocket->Stop();
 	}
+}
+
+std::string EnvironmentController::GetMethodURI(EnvironmentMethod userMethod) {
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	std::string strURI = "";
+	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
+	std::string strIP = pCommandLineManager->GetParameterValue("ip");
+
+	switch (userMethod) {
+		case EnvironmentMethod::CONNECT_SOCKET: {
+			strURI = "ws://" + strIP + ":" + std::to_string(port) + "/environment/";
+		} break;
+	}
+
+	return strURI;
 }
 
 RESULT EnvironmentController::InitializeWebsocket(std::string& strURI) {
@@ -48,9 +66,14 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user) {
 
 	m_environment = Environment(user.GetDefaultEnvironmentID());
 
+	std::string strURI = GetMethodURI(EnvironmentMethod::CONNECT_SOCKET);
+	strURI += std::to_string(m_environment.GetEnvironmentID()); 
+	strURI += "/";
+
+	DEBUG_LINEOUT("Connceting to environment socket URL: %s", strURI.c_str());
+
 	// TODO: Not hard coded!
 	if (m_pEnvironmentWebsocket == nullptr) {
-		std::string strURI = "ws://localhost:8000/environment/" + std::to_string(m_environment.GetEnvironmentID()) + "/";
 		CR(InitializeWebsocket(strURI));
 	}
 
@@ -71,19 +94,25 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 
 	nlohmann::json jsonData;
 	std::string strData;
+	std::string strSDPOffer;
 	long environmentID = user.GetDefaultEnvironmentID();
+	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
 
+	CNM(pParentCloudController, "Parent CloudController not found or null");
 	CN(m_pEnvironmentWebsocket);
 	CBM((m_fConnected), "Environment socket not connected");
 	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
 	
+	strSDPOffer = pParentCloudController->GetSDPOfferString();
+
 	// Set up the JSON data
 	m_pendingMessageID = UID().GetID();
 	jsonData["id"] = m_pendingMessageID;
 	jsonData["token"] = user.GetToken();
 	jsonData["method"] = "environmentuser.create";
 	jsonData["params"] = {
-		{"sdp_offer", "{'foo': 'bar2'}"},
+		//{"sdp_offer", "{'foo': 'bar2'}"},
+		{ "sdp_offer", strSDPOffer },
 		{"user", user.GetUserID() },
 		{"environment", environmentID}
 	};
@@ -95,6 +124,16 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	m_fPendingMessage = true;
 	m_state = state::CREATING_ENVIRONMENT_USER;
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+
+Error:
+	return r;
+}
+
+// TODO: Right now this is no different than create user... 
+RESULT EnvironmentController::UpdateEnvironmentUser() {
+	RESULT r = R_PASS;
+
+	CR(CreateEnvironmentUser(s_user));
 
 Error:
 	return r;
@@ -138,6 +177,14 @@ RESULT EnvironmentController::PrintEnvironmentPeerList() {
 	return R_PASS;
 }
 
+EnvironmentPeer *EnvironmentController::GetPeerByUserID(long userID) {
+	for (auto &peer : m_environmentPeers)
+		if (peer.GetUserID() == userID)
+			return &(peer);
+
+	return nullptr;
+}
+
 bool EnvironmentController::FindPeerByUserID(long userID) {
 	for (auto &peer : m_environmentPeers) 
 		if (peer.GetUserID() == userID)
@@ -151,10 +198,23 @@ RESULT EnvironmentController::ClearPeerList() {
 	return R_PASS;
 }
 
+RESULT EnvironmentController::UpdatePeer(long userID, long environmentID, const std::string& strSDPOffer) {
+	RESULT r = R_PASS;
+
+	EnvironmentPeer *pPeer = GetPeerByUserID(userID);
+	CNM(pPeer, "User ID %d not found in peer list", userID);
+
+	CR(pPeer->UpdateSDPOffer(strSDPOffer));
+
+	DEBUG_LINEOUT("Peer %d updated", userID);
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::AddNewPeer(long userID, long environmentID, const std::string& strSDPOffer) {
 	RESULT r = R_PASS;
 
-	CBM((FindPeerByUserID(userID) == false), "User %d already in environment peer list", userID);
 	CBM((s_user.GetUserID() != userID), "User ID %d is self ID - not allowed", userID);
 	
 	{
@@ -216,19 +276,61 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 			} break;
 
-			case state::ENVIRONMENT_CONNECTED_AND_READY: {
-				// TODO: Handle the message here - depending on the type
-			} break;
+			
 		}
 	}
 	else {
-		// Error
+		CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+		if (pParentCloudController != nullptr) {
+			switch (m_state) {
+				case state::ENVIRONMENT_CONNECTED_AND_READY: {
+					// TODO: Message type not implemented
+					DEBUG_LINEOUT("New Environment Peer Connected");
+					
+					/*
+					m_state = state::ENVIRONMENT_CONNECTED_AND_READY;
+					GetEnvironmentPeerList(s_user); // TODO: s_user is dumb
+					//*/
+
+					///*
+					nlohmann::json jsonPeer = jsonCloudResponse["/data"_json_pointer];
+
+					long userID = jsonPeer["/user"_json_pointer].get<long>();
+					long environmentID = jsonPeer["/environment"_json_pointer].get<long>();
+
+					std::string strSDPOffer = jsonPeer["/sdp_offer"_json_pointer].get<std::string>();
+
+					if (FindPeerByUserID(userID)) {
+						UpdatePeer(userID, environmentID, strSDPOffer);
+					}
+					else {
+						AddNewPeer(userID, environmentID, strSDPOffer);
+					}
+
+					PrintEnvironmentPeerList();
+
+
+					pParentCloudController->CreateSDPOfferAnswer(strSDPOffer);
+
+					/*
+					// Attempt to connect here
+					std::string strType = jsonPeer["sdp_offer"]["type"].get<std::string>();
+					if (strType == "offer") {
+						pParentCloudController->CreateSDPOfferAnswer(strSDPOffer);
+					}
+					else if (strType == "answer") {
+						// This is the update to the SDP info - so it's an answer and has the candidates
+						// TODO: ICE Candidates / or change the name to handle SDP offer updates
+						pParentCloudController->CreateSDPOfferAnswer(strSDPOffer);
+					}
+					//*/
+				} break;
+			}
+		}
+		else {
+			DEBUG_LINEOUT("Cannot handle message, cloud controller not found");
+		}
 	}
-
-	// Handle message
-
-
-
 }
 
 void EnvironmentController::HandleWebsocketConnectionOpen() {

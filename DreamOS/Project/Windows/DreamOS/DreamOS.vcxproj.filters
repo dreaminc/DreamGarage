@@ -75,15 +75,6 @@
     <Filter Include="External\OCULUS\v132\Logging">
       <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\OCULUS\v132\Logging\include">
-      <UniqueIdentifier>{f9f3a04d-e419-41ac-988e-59bb38aba634}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\Logging\src">
-      <UniqueIdentifier>{46b485da-652c-4ed2-a379-ddf8a19f9d3c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\Logging\src\internal">
-      <UniqueIdentifier>{cf6c4deb-a89a-47e2-aa2d-10b4412d9151}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HMD">
       <UniqueIdentifier>{e122ce99-434d-454c-a1b9-c035729da930}</UniqueIdentifier>
     </Filter>
@@ -135,7 +126,9 @@
     <Filter Include="DreamGarage">
       <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
     </Filter>
-
+    <Filter Include="Cloud\webrtc">
+      <UniqueIdentifier>{e82ece0f-07c1-4cff-87ab-e214e415001c}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Cloud\User">
       <UniqueIdentifier>{e80be9ff-7887-4799-9a5a-ce9fb6cddb54}</UniqueIdentifier>
     </Filter>
@@ -147,12 +140,15 @@
     </Filter>
     <Filter Include="Cloud\Environment">
       <UniqueIdentifier>{8f3dd62d-3f99-4e45-bf9a-5adc56e8a76f}</UniqueIdentifier>
-	</Filter>
+    </Filter>
     <Filter Include="HMD\OpenVR">
       <UniqueIdentifier>{0484651f-4677-4432-aa79-1926163bb61b}</UniqueIdentifier>
     </Filter>
     <Filter Include="External\Matrices">
       <UniqueIdentifier>{ac063e77-2be8-4932-a115-19a7ed9fb129}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cloud\Message">
+      <UniqueIdentifier>{a4934822-8fc9-4363-ac78-f660fcfbe16c}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -246,15 +242,6 @@
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp">
       <Filter>TimeManager</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
-      <Filter>External\OCULUS\v132\Logging\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
-      <Filter>External\OCULUS\v132\Logging\src</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
-      <Filter>External\OCULUS\v132\Logging\src\internal</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp">
       <Filter>HMD</Filter>
     </ClCompile>
@@ -327,6 +314,18 @@
     <ClCompile Include="..\..\..\..\DreamGarage.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCClient.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp">
+      <Filter>Sandbox</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp">
       <Filter>Cloud\User</Filter>
     </ClCompile>
@@ -344,7 +343,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp">
       <Filter>Cloud</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\text.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -353,7 +352,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp">
       <Filter>External\Matrices</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp">
       <Filter>Profiler</Filter>
     </ClCompile>
@@ -364,6 +363,24 @@
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\hand.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h">
+      <Filter>Cloud\Message</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\quaternion.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\user.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
@@ -640,15 +657,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h">
       <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h">
-      <Filter>External\OCULUS\v132\Logging\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h">
-      <Filter>External\OCULUS\v132\Logging\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h">
-      <Filter>External\OCULUS\v132\Logging\include</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\HMD.h">
       <Filter>HMD</Filter>
@@ -1873,7 +1881,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
       <Filter>HMD\OpenVR</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h">
       <Filter>Sense</Filter>
     </ClInclude>
@@ -1897,6 +1905,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCClient.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\CommandLineManager.h">
+      <Filter>Sandbox</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h">
       <Filter>Cloud\User</Filter>
@@ -1927,9 +1947,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h">
       <Filter>Cloud\Environment</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Profiler\DebugConsole.h">
       <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
+    <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
+    <ClInclude Include="..\..\..\Cloud\Controller.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Model.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Message\Message.h">
+      <Filter>Cloud\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h">
+      <Filter>Cloud\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\user.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

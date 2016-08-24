@@ -13,7 +13,7 @@
 
 class UserFactory : public Factory {
 public:
-	static UserController* MakeUserController(version ver);
+	static UserController* MakeUserController(version ver, Controller* pParentController);
 };
 
 #endif // ! USER_FACTORY_H_

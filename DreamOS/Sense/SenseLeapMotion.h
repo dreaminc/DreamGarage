@@ -84,6 +84,15 @@ public:
 		return R_PASS;
 	}
 
+	hand *GetHand(hand::HAND_TYPE handType) {
+		if (handType == hand::HAND_TYPE::HAND_LEFT)
+			return m_pLeftHand;
+		else if (handType == hand::HAND_TYPE::HAND_RIGHT)
+			return m_pRightHand;
+
+		return nullptr;
+	}
+
 	bool IsConnected();
 	bool IsServiceConnected();
 	bool HasFocus();

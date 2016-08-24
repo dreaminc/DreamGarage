@@ -20,7 +20,7 @@ DreamOS::~DreamOS() {
 }
 
 // This will construct and initialize all of the parts of the DreamOS client
-RESULT DreamOS::Initialize() {
+RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
 
 	srand(static_cast <unsigned> (time(0)));
@@ -31,7 +31,7 @@ RESULT DreamOS::Initialize() {
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 
 	// Initialize the sandbox
-	CRM(m_pSandbox->Initialize(), "Failed to initialize Sandbox");
+	CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
@@ -41,6 +41,22 @@ RESULT DreamOS::Initialize() {
 
 Error:
 	return r;
+}
+
+camera* DreamOS::GetCamera() {
+	return m_pSandbox->GetCamera();
+}
+
+point DreamOS::GetCameraPosition() {
+	return m_pSandbox->GetCameraPosition();
+}
+
+hand *DreamOS::GetHand(hand::HAND_TYPE handType) {
+	return m_pSandbox->GetHand(handType);
+}
+
+quaternion DreamOS::GetCameraOrientation() {
+	return m_pSandbox->GetCameraOrientation();
 }
 
 RESULT DreamOS::Start() {
@@ -75,6 +91,10 @@ sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVertica
 
 sphere* DreamOS::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
+}
+
+volume* DreamOS::AddVolume(double side) {
+	return m_pSandbox->AddVolume(side);
 }
 
 volume* DreamOS::AddVolume(double width, double length, double height) {
@@ -118,8 +138,12 @@ model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
 	
-composite *DreamOS::AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
-	return m_pSandbox->AddModel(strRootFolder, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+}
+
+user *DreamOS::AddUser() {
+	return m_pSandbox->AddUser();
 }
 
 RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
@@ -128,4 +152,25 @@ RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallb
 
 RESULT DreamOS::UnregisterUpdateCallback() {
 	return m_pSandbox->UnregisterUpdateCallback();
+}
+
+// Cloud Controller
+RESULT DreamOS::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
+	return m_pSandbox->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
+}
+
+RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
+	return m_pSandbox->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
+}
+
+RESULT DreamOS::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pSandbox->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
+	return m_pSandbox->SendUpdateHandMessage(userID, handState);
+}
+
+long DreamOS::GetTickCount() {
+	return m_pSandbox->GetTickCount();
 }

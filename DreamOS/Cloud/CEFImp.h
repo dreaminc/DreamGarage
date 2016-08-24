@@ -90,6 +90,37 @@ public:
 		return r;
 	}
 
+	virtual RESULT ConnectToPeer(int peerID) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() override {
+		return nullptr;
+	}
+
+	// TODO: This should be a bit more robust
+	bool IsConnected() {
+		return false;
+	}
+
+	/*
+	virtual std::string GetSDPOfferString() override {
+		return std::string("");
+	}
+	*/
+
+	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
 private:
 	CefRefPtr<CEFApp> m_CEFApp;
 	CefSettings m_CEFSettings;

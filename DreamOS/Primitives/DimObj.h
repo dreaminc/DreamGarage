@@ -39,6 +39,7 @@ protected:
 	// Use this flag to signal the appropriate rendering object (such as OGLObj) that it needs to update the buffer
 	// TODO: This should be encapsulated as a dirty pattern
 	bool m_fDirty;
+	bool m_fVisible;
 
 public:
     DimObj() :
@@ -49,7 +50,8 @@ public:
 		m_pColorTexture(nullptr),
 		m_pBumpTexture(nullptr),
 		m_pObjects(nullptr),
-		m_pParent(nullptr)
+		m_pParent(nullptr),
+		m_fVisible(true)
         //m_aabv()
     {
         /* stub */
@@ -130,6 +132,9 @@ public:
 	virtual RESULT UpdateBuffers() {
 		return R_NOT_IMPLEMENTED;
 	}
+
+	bool IsVisible() { return m_fVisible; }
+	RESULT SetVisible(bool fVisible = true) { m_fVisible = fVisible;  return R_PASS; }
 
 	RESULT SetColor(color c) {
 		for (unsigned int i = 0; i < NumberVertices(); i++)

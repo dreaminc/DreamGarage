@@ -9,11 +9,19 @@
 #include <assert.h>
 
 #include <stdio.h>
+#include <stddef.h>
 
 #define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
 
 #define HUD_ON
+
+/*
+#ifndef NOARRAYSIZE
+template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
+#define arraysize(array) (sizeof(ArraySizeHelper(array)))
+#endif
+*/
 
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system

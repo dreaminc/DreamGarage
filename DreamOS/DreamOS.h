@@ -29,13 +29,14 @@
 #include "Primitives/text.h"
 #include "Primitives/texture.h"
 #include "Primitives/skybox.h"
+#include "Primitives/user.h"
 
 class DreamOS : public valid {
 public:
 	DreamOS();
 	~DreamOS();
 
-	RESULT Initialize();
+	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
 	RESULT Start();
 	RESULT Exit(RESULT exitcode);
 
@@ -54,8 +55,10 @@ protected:
 	text *AddText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	
 	volume *MakeVolume(double side);
-	volume *AddVolume(double width, double length, double height);
 	volume *MakeVolume(double width, double length, double height);
+
+	volume* AddVolume(double side);
+	volume *AddVolume(double width, double length, double height);
 	
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	
@@ -64,8 +67,27 @@ protected:
 
 	model *AddModel(wchar_t *pszModelName);
 	model *MakeModel(wchar_t *pszModelName);
+	composite *AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
-	composite *AddModel(const std::wstring& strRootFolder, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	user *AddUser();
+
+	camera* GetCamera();
+	point GetCameraPosition();
+	quaternion GetCameraOrientation();
+
+	// Hands
+	hand *GetHand(hand::HAND_TYPE handType);
+
+protected:
+	long GetTickCount();
+
+	// Cloud Controller
+protected:
+	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
+	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
+
+	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
