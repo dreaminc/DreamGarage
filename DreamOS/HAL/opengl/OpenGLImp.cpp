@@ -886,6 +886,43 @@ Error:
 }
 */
 
+RESULT OpenGLImp::RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) {
+	RESULT r = R_PASS;
+	SceneGraphStore *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = NULL;
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
+
+	for (int i = 0; i < 2; i++) {
+		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
+
+		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
+
+		pFlatSceneGraph->Reset();
+		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+
+			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+			if (pDimObj == NULL)
+				continue;
+			else {
+				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
+			}
+		}		
+
+		m_pHMD->UnsetRenderSurface(eye);
+		m_pHMD->CommitSwapChain(eye);
+	}
+
+	glFlush();
+
+Error:
+	return r;
+}
+
 // TODO: Naming is kind of lame since this hits the HMD
 // TODO: Shared code should be consolidated
 RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {

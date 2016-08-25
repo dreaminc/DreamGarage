@@ -667,6 +667,7 @@ RESULT Windows64App::Show() {
 		// Send to the HMD
 		if (m_pHMD != nullptr) {
 			m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
+			m_pHALImp->RenderStereoFramebuffersFlat(m_pFlatSceneGraph);
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}

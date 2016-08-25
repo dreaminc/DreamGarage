@@ -106,6 +106,7 @@ public:
 	RESULT Render(SceneGraph *pSceneGraph);
 	RESULT RenderStereo(SceneGraph *pSceneGraph);
 	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
+	RESULT RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph);
 
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT Shutdown();

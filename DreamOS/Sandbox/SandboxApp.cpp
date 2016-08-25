@@ -55,8 +55,11 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
-	m_pSceneGraph = new SceneGraph();
+	m_pSceneGraph = new SceneGraph(OBJECT_STORE_LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
+
+	m_pFlatSceneGraph = new SceneGraph(OBJECT_STORE_FLAT);
+	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 

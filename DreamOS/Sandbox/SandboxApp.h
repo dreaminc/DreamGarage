@@ -123,8 +123,10 @@ protected:
 	CommandLineManager *m_pCommandLineManager;
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
+	
 	SceneGraph *m_pSceneGraph;
 	SceneGraph *m_pFlatSceneGraph;
+
 	CloudController *m_pCloudController;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
