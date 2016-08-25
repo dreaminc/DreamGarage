@@ -302,6 +302,7 @@
 		%(AdditionalIncludeDirectories)
 	  </AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
