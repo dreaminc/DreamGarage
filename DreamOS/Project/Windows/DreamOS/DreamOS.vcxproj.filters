@@ -383,6 +383,9 @@
     <ClCompile Include="..\..\..\Primitives\user.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1971,6 +1974,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamOSWinMain.h">
+      <Filter>Main</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
