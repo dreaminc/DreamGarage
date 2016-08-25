@@ -516,7 +516,9 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraph.cpp" />
+    <ClCompile Include="..\..\..\Scene\SceneGraphFlatList.cpp" />
     <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
@@ -804,6 +806,7 @@
     <ClInclude Include="..\..\..\Primitives\composite.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\dirty.h" />
+    <ClInclude Include="..\..\..\Primitives\FlatObj.h" />
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
     <ClInclude Include="..\..\..\Primitives\hand.h" />
@@ -859,7 +862,9 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h" />
     <ClInclude Include="..\..\..\Scene\SceneGraph.h" />
+    <ClInclude Include="..\..\..\Scene\SceneGraphFlatList.h" />
     <ClInclude Include="..\..\..\Scene\SceneGraphList.h" />
     <ClInclude Include="..\..\..\Scene\SceneGraphStore.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />

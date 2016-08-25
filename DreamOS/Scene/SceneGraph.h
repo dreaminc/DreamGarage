@@ -14,6 +14,8 @@
 
 #include "SceneGraphStore.h"
 
+#include "ObjectStoreFactory.h"
+
 // The different types of stores should be added here 
 enum SCENE_GRAPH_STORE_TYPE {
 	SCENE_GRAPH_STORE_LIST,
@@ -23,7 +25,7 @@ enum SCENE_GRAPH_STORE_TYPE {
 class SceneGraph : public valid {
 public:
 
-	SceneGraph(SCENE_GRAPH_STORE_TYPE type);
+	SceneGraph(OBJECT_STORE_TYPE type);
 	
 	SceneGraph();
 	~SceneGraph();
@@ -34,7 +36,7 @@ public:
 	RESULT RemoveObject(VirtualObj *pObject);
 
 	// Effectively a factory method to set up the object store
-	RESULT InitializeSceneGraphStore(SCENE_GRAPH_STORE_TYPE type);
+	RESULT InitializeSceneGraphStore(OBJECT_STORE_TYPE type);
 
 	RESULT RemoveObjectByUID(UID uid);
 	VirtualObj *FindObjectByUID(UID uid);
@@ -45,8 +47,9 @@ public:
 	RESULT UpdateScene();
 	RESULT LoadScene();
 
-private:
+protected:
 	SceneGraphStore *m_pSceneGraphStore;
+private:
 	UID m_uid;
 };
 

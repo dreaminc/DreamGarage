@@ -1,7 +1,7 @@
 #include "SceneGraph.h"
 #include "SceneGraphList.h"
 
-SceneGraph::SceneGraph(SCENE_GRAPH_STORE_TYPE type) {
+SceneGraph::SceneGraph(OBJECT_STORE_TYPE type) {
 	RESULT r = R_PASS;
 
 	CRM(InitializeSceneGraphStore(type), "Failed to initialize scene graph store");
@@ -14,7 +14,7 @@ Error:
 }
 
 SceneGraph::SceneGraph() :
-	SceneGraph(SCENE_GRAPH_STORE_LIST)
+	SceneGraph(OBJECT_STORE_LIST)
 {
 	// empty 
 }
@@ -23,18 +23,12 @@ SceneGraph::~SceneGraph() {
 	// empty
 }
 
-RESULT SceneGraph::InitializeSceneGraphStore(SCENE_GRAPH_STORE_TYPE type) {
+RESULT SceneGraph::InitializeSceneGraphStore(OBJECT_STORE_TYPE type) {
 	RESULT r = R_PASS;
 
 	CBM((m_pSceneGraphStore == NULL), "Scene Graph Store already initialized");
-	CBM((type < SCENE_GRAPH_STORE_INVALID), "Scene graph type invalid");
 
-	switch (type) {
-		case SCENE_GRAPH_STORE_LIST: {
-			m_pSceneGraphStore = new SceneGraphList();
-			CNM(m_pSceneGraphStore, "Failed to allocate scene graph store list");
-		} break;
-	}
+	m_pSceneGraphStore = ObjectStoreFactory::MakeObjectStore(type);
 
 Error:
 	return r;
