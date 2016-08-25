@@ -40,6 +40,7 @@ protected:
 	// TODO: This should be encapsulated as a dirty pattern
 	bool m_fDirty;
 	bool m_fVisible;
+	bool m_fWireframe;
 
 public:
     DimObj() :
@@ -51,7 +52,8 @@ public:
 		m_pBumpTexture(nullptr),
 		m_pObjects(nullptr),
 		m_pParent(nullptr),
-		m_fVisible(true)
+		m_fVisible(true),
+		m_fWireframe(false)
         //m_aabv()
     {
         /* stub */
@@ -133,8 +135,11 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-	bool IsVisible() { return m_fVisible; }
+	inline bool IsVisible() { return m_fVisible; }
 	RESULT SetVisible(bool fVisible = true) { m_fVisible = fVisible;  return R_PASS; }
+
+	inline bool IsWireframe() { return m_fWireframe; }
+	RESULT SetWireframe(bool fWireframe = true) { m_fWireframe = fWireframe; return R_PASS; }
 
 	RESULT SetColor(color c) {
 		for (unsigned int i = 0; i < NumberVertices(); i++)
