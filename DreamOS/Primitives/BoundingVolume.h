@@ -10,6 +10,9 @@
 
 #include "point.h"
 
+class BoundingSphere;
+class BoundingBox;
+
 class BoundingVolume {
 public:
 	BoundingVolume() :
@@ -24,8 +27,17 @@ public:
 		// Empty
 	}
 
-	virtual bool Intersect(BoundingVolume* boundingVolume) {
-		return false;
+	bool Intersect(BoundingVolume* pRHS);
+
+	virtual bool Intersect(const BoundingSphere& rhs) = 0;
+	virtual bool Intersect(const BoundingBox& rhs) = 0;
+
+	//bool Intersect(const point& pt) {
+	virtual bool Intersect(point& pt) = 0;
+	//TODO: virtual bool Intersect(const line& ln) = 0;
+
+	point GetOrigin() {
+		return m_ptOrigin;
 	}
 
 protected:
