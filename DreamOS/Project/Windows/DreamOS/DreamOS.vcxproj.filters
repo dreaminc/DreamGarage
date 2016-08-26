@@ -383,6 +383,21 @@
     <ClCompile Include="..\..\..\Primitives\user.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\vector.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1973,6 +1988,12 @@
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\BoundingSphere.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\line.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingBox.h">
       <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>

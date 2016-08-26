@@ -488,7 +488,11 @@
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
@@ -499,6 +503,7 @@
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Primitives\user.cpp" />
+    <ClCompile Include="..\..\..\Primitives\vector.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp" />
@@ -797,6 +802,7 @@
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingBox.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingSphere.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingVolume.h" />
     <ClInclude Include="..\..\..\Primitives\BiasMatrix.h" />
@@ -809,6 +815,7 @@
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
     <ClInclude Include="..\..\..\Primitives\hand.h" />
     <ClInclude Include="..\..\..\Primitives\light.h" />
+    <ClInclude Include="..\..\..\Primitives\line.h" />
     <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\model.h" />

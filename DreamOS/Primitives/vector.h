@@ -8,7 +8,6 @@
 // Vector Primitive Object derived from matrix
 
 #include "matrix.h"
-#include "point.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float vector_precision;
@@ -16,40 +15,14 @@
 	typedef double vector_precision;
 #endif
 
+class point;
+
 class vector : public matrix <vector_precision, 4, 1> {
 public:
-	vector() {
-		clear();
-	}
-
-	vector(matrix <vector_precision, 4, 1> &rhs) {
-		this->clear();
-		this->element(0, 0) = rhs.element(0, 0);
-		this->element(1, 0) = rhs.element(1, 0);
-		this->element(2, 0) = rhs.element(2, 0);
-		this->element(3, 0) = 1.0f;
-	}
-
-	vector(vector_precision x, vector_precision y, vector_precision z) {
-		this->clear();
-		this->element(0, 0) = x;
-		this->element(1, 0) = y;
-		this->element(2, 0) = z;
-		this->element(3, 0) = 1.0f;
-	}
-
-	// Calculate the cross product
-	// Not assumed to be normalized
-	vector(vector rhs, vector lhs) {
-		clear();
-
-		x((rhs(1) * lhs(2)) - (rhs(2) * lhs(1)));
-		y((rhs(2) * lhs(0)) - (rhs(0) * lhs(2)));
-		z((rhs(0) * lhs(1)) - (rhs(1) * lhs(0)));
-		
-		// For good measure
-		w(1);
-	}
+	vector();
+	vector(matrix <vector_precision, 4, 1> &rhs);
+	vector(vector_precision x, vector_precision y, vector_precision z);
+	vector(vector rhs, vector lhs);	// Cross product - Not assumed to be normalized
 
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline vector_precision &x() { return this->element(0, 0); }
@@ -62,79 +35,25 @@ public:
 	inline vector_precision &z(vector_precision val) { return this->element(2, 0) = val; }
 	inline vector_precision &w(vector_precision val) { return this->element(3, 0) = val; }
 
-	double magnitude() {
-		double sqaureSum = pow(x(), 2) + pow(y(), 2) + pow(z(), 2);
-		return sqrt(sqaureSum);
-	}
+	double magnitude();
 
-	// Will normalize this vector
-	RESULT Normalize() {
-		vector_precision denom = 0;
+	
+	RESULT Normalize();		// Will normalize this vector
+	vector Normal();		// Return a normalized version of this vector
 
-		for (int i = 0; i < 3; i++)
-			denom += static_cast<vector_precision>(pow(element(i, 0), 2));
+	RESULT Print(char *pszOptName = nullptr);
 
-		denom = static_cast<vector_precision>(sqrt(denom));
+	vector_precision dot(vector& rhs);
+	vector_precision dot(point& rhs);
 
-		for (int i = 0; i < 3; i++)
-			element(i, 0) = element(i, 0) / denom;
-
-		element(3, 0) = 1.0f;
-
-		return R_PASS;
-	}
-
-	// Return a normalized version of this vector
-	vector Normal() {
-		vector result = *this;
-		result.Normalize();
-		return result;
-	}
-
-	RESULT Print(char *pszOptName = nullptr) {
-		DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "v", x(), y(), z(), w());
-		return R_PASS;
-	}
-
-	// Dot Product
-	// This calculates the dot product as if it is a R3 vector (ignores the w parameter) 
-	vector_precision dot(vector& rhs) {
-		vector_precision result = 0;
-
-		for (int i = 0; i < 3; i++)
-			result += element(i, 0) * rhs.element(i, 0);
-
-		return result;
-	}
-
-	vector_precision dot(point& rhs) {
-		vector_precision result = 0;
-
-		for (int i = 0; i < 3; i++)
-			result += element(i, 0) * rhs.element(i, 0);
-
-		return result;
-	}
-
-	// Cross Product
-	vector cross(vector rhs) {
-		return vector(*this, rhs);
-	}
-
-	// Normalized Cross Product
-	vector NormalizedCross(vector rhs) {
-		return vector(this->Normal(), rhs.Normal());
-	}
+	vector cross(vector rhs);
+	vector NormalizedCross(vector rhs);
 
 	// Explicitly specializing the assignment operator
-	vector& operator=(const matrix<vector_precision, 4, 1> &arg) {
-		if (this == &arg)      // Same object?
-			return *this;        // Yes, so skip assignment, and just return *this.
+	vector& operator=(const matrix<vector_precision, 4, 1> &arg);
 
-		memcpy(this->m_data, arg.m_data, sizeof(vector_precision) * 4 * 1);
-
-		return *this;
-	}
+	vector& operator*=(const vector_precision& a);
+	vector operator*(const vector_precision& a) const;
 
 	// Utility
 public:

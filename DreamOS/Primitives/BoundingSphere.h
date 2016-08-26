@@ -27,6 +27,8 @@ public:
 		return m_radius;
 	}
 
+	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
+
 protected:
 	float m_radius;
 };

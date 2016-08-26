@@ -52,3 +52,8 @@ bool BoundingSphere::Intersect(line& ln) {
 	else
 		return true;
 }
+
+RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {
+	m_radius = (ptMax - m_ptOrigin).magnitude();
+	return R_PASS;
+}

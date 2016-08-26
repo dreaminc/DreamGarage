@@ -36,9 +36,24 @@ public:
 	virtual bool Intersect(point& pt) = 0;
 	//TODO: virtual bool Intersect(const line& ln) = 0;
 
-	point GetOrigin() {
-		return m_ptOrigin;
+	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
+
+	RESULT UpdateBoundingVolume(point ptOrigin, point ptMax) {
+		RESULT r = R_PASS;
+
+		CR(SetOrigin(ptOrigin));
+		CR(SetMaxPointFromOrigin(ptMax));
+
+	Error:
+		return r;
 	}
+
+	RESULT SetOrigin(point ptOrigin) {
+		m_ptOrigin = ptOrigin;
+		return R_PASS;
+	}
+
+	point GetOrigin() { return m_ptOrigin; }
 
 protected:
 	point m_ptOrigin;

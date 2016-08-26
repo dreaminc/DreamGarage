@@ -32,6 +32,8 @@ public:
 	//bool Intersect(const point& pt) {
 	bool Intersect(point& pt);
 
+	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
+
 protected:
 	BoundingBox::Type m_type;
 	vector m_vHalfSize;

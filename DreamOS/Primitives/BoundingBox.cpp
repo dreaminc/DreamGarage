@@ -65,3 +65,8 @@ bool BoundingBox::Intersect(point& pt) {
 	else
 		return false;
 }
+
+RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
+	m_vHalfSize = (ptMax - m_ptOrigin);
+	return R_PASS;
+}
