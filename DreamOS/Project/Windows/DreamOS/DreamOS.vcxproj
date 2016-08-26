@@ -797,7 +797,8 @@
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
-    <ClInclude Include="..\..\..\Primitives\AABV.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingSphere.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingVolume.h" />
     <ClInclude Include="..\..\..\Primitives\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
@@ -912,6 +913,7 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Primitives\.DS_Store" />
+    <None Include="..\..\..\Primitives\plane.h" />
     <None Include="..\..\..\Rakefile" />
   </ItemGroup>
   <ItemGroup>

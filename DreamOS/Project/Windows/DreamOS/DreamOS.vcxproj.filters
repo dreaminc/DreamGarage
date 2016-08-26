@@ -400,9 +400,6 @@
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
       <Filter>RESULT</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\AABV.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimObj.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -1972,6 +1969,12 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingVolume.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingSphere.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2097,6 +2100,9 @@
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\Primitives\plane.h">
+      <Filter>Primitives</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -107,6 +107,15 @@ public:
 		return result;
 	}
 
+	vector_precision dot(point& rhs) {
+		vector_precision result = 0;
+
+		for (int i = 0; i < 3; i++)
+			result += element(i, 0) * rhs.element(i, 0);
+
+		return result;
+	}
+
 	// Cross Product
 	vector cross(vector rhs) {
 		return vector(*this, rhs);

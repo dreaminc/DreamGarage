@@ -26,6 +26,8 @@ public:
 		// Empty
 	}
 
+	friend class BoundingVolume;
+
 	// Distance of point from plane
 	point_precision Distance(point ptP) {
 		vector ptAToPoint = ptP - m_ptA;
@@ -49,6 +51,9 @@ public:
 	vector GetVector() {
 		return (m_ptB - m_ptA);
 	}
+
+	inline point &a() { return m_ptA; }
+	inline point &b() { return m_ptB; }
 
 protected:
 	point m_ptA;

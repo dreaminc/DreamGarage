@@ -165,7 +165,21 @@ public:
 	}
 	*/
 
+	// Point addition gives us a new point
+	friend point operator+(point &lhs, point &rhs);
+	point operator+(const point& rhs) const;
+
+	// point subtraction gives us a vector
 	friend vector operator-(point &lhs, point &rhs);
+	vector operator-(const point& rhs) const;
+
+	// Adding a vector to a point gives us a point
+	friend point operator+(point &lhs, vector &rhs);
+	point operator+(const vector& rhs) const;
+
+	// Subtracting a vector from a point gives us a point
+	friend point operator-(point &lhs, vector &rhs);
+	point operator-(const vector& rhs) const;
 
 	// Explicitly specializing the assignment operator
 	point& operator=(const matrix<point_precision, 4, 1> &arg) {
@@ -175,6 +189,68 @@ public:
 		memcpy(this->m_data, arg.m_data, sizeof(point_precision) * 4 * 1);
 
 		return *this;
+	}
+
+	bool operator>(point &rhs) {
+		// Same object?
+		if (this == &rhs)      
+			return false;
+
+		return (
+			(x() > rhs.x()) &&
+			(y() > rhs.y()) && 
+			(z() > rhs.z())
+		);
+	}
+
+	bool operator>=(point &rhs) {
+		// Same object?
+		if (this == &rhs)
+			return true;
+
+		return (
+			(x() >= rhs.x()) &&
+			(y() >= rhs.y()) &&
+			(z() >= rhs.z())
+			);
+	}
+
+	bool operator<(point &rhs) {
+		// Same object?
+		if (this == &rhs)
+			return false;
+
+		return (
+			(x() < rhs.x()) &&
+			(y() < rhs.y()) &&
+			(z() < rhs.z())
+		);
+	}
+
+	bool operator<=(point &rhs) {
+		// Same object?
+		if (this == &rhs)
+			return true;
+
+		return (
+			(x() <= rhs.x()) &&
+			(y() <= rhs.y()) &&
+			(z() <= rhs.z())
+			);
+	}
+
+	static point max(point &lhs, point &rhs) {
+		if (lhs > rhs)
+			return lhs;
+		else
+			return rhs;
+	}
+
+	static point min(point &lhs, point &rhs) {
+		if (lhs < rhs)
+			return lhs;
+		else
+			return rhs;
 	}
 
 	/*
