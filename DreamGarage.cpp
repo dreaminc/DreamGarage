@@ -1,6 +1,8 @@
 #include "DreamGarage.h"
 #include <string>
 
+#include "Profiler\DebugConsole.h"
+
 //quad *g_pQuad;
 
 light *g_pLight = nullptr;
@@ -73,8 +75,13 @@ RESULT DreamGarage::LoadScene() {
 	// Add Peer User Object
 	m_pPeerUser = AddUser();
 
-	quad *pQuad = AddQuad(100.0f, 100.0f);
+	//quad *pQuad = AddQuad(100.0f, 100.0f);
 
+	std::shared_ptr<DebugData> q = DebugConsole::GetDebugConsole()->Register();
+
+	quad *pFQuad = AddFlatQuad(1.0f, 1.0f);
+
+	q->SetValue(std::to_string(pFQuad->GetOrigin().x()));
 	/*
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));

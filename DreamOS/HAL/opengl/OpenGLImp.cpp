@@ -909,7 +909,7 @@ RESULT OpenGLImp::RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) {
 			if (pDimObj == NULL)
 				continue;
 			else {
-				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
+				CR(m_pOGLOverlayProgram->RenderObject(pDimObj));
 			}
 		}		
 

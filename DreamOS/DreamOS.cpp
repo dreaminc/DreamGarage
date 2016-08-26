@@ -113,6 +113,10 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 }
 
+quad *DreamOS::AddFlatQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
+	return m_pSandbox->AddFlatQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+}
+
 text* DreamOS::AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)
 {
 	return m_pSandbox->AddText(fontName, content, size, isBillboard);
