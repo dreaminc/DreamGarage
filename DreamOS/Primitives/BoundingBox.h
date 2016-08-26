@@ -16,15 +16,15 @@
 
 class BoundingBox : public BoundingVolume {
 public:
-	typedef enum class Type {
+	enum class Type {
 		AABB,
 		OBB,
 		INVALID
 	};
 
 public:
-	BoundingBox();
-	BoundingBox(point ptOrigin, vector vHalfSize);
+	BoundingBox(BoundingBox::Type type);
+	BoundingBox(BoundingBox::Type type, point ptOrigin, vector vHalfSize);
 
 	bool Intersect(const BoundingSphere& rhs);
 	bool Intersect(const BoundingBox& rhs);

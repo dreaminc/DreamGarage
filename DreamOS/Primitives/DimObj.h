@@ -1,6 +1,8 @@
 #ifndef DIM_OBJ_H_
 #define DIM_OBJ_H_
 
+#include "RESULT/EHM.h"
+
 // DREAM OS
 // DreamOS/Dimension/Primitives/DimObj.h
 // Dimension Base Object
@@ -23,9 +25,6 @@
 #include <memory>
 
 class BoundingVolume;
-namespace BoundingBox {
-	enum class Type;
-}
 
 class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
 protected:
@@ -108,7 +107,8 @@ private:
 	// Bounding Volume
 public:
 	RESULT UpdateBoundingVolume();
-	RESULT InitializeBoundingBox(BoundingBox::Type boundingBoxType);
+	RESULT InitializeAABB();
+	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();
 
 public:

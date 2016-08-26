@@ -35,6 +35,11 @@ vector::vector(vector rhs, vector lhs) {
 	w(1);
 }
 
+vector::vector(const point& pt) {
+	for (int i = 0; i < 4; i++)
+		m_data[i] = pt.m_data[i];
+}
+
 double vector::magnitude() {
 	double sqaureSum = pow(x(), 2) + pow(y(), 2) + pow(z(), 2);
 	return sqrt(sqaureSum);

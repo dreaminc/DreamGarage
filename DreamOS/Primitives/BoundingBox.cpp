@@ -1,15 +1,17 @@
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
 
-BoundingBox::BoundingBox() :
+BoundingBox::BoundingBox(BoundingBox::Type type) :
 	BoundingVolume(),
+	m_type(type),
 	m_vHalfSize(vector(1.0f, 1.0f, 1.0f))
 {
 	// Empty
 }
 
-BoundingBox::BoundingBox(point ptOrigin, vector vHalfSize) :
+BoundingBox::BoundingBox(BoundingBox::Type type, point ptOrigin, vector vHalfSize) :
 	BoundingVolume(ptOrigin),
+	m_type(type),
 	m_vHalfSize(vHalfSize)
 {
 	// Empty
@@ -33,6 +35,8 @@ bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 
 		return false;
 	}
+
+	return false;
 }
 
 bool BoundingBox::Intersect(const BoundingBox& rhs) {
@@ -53,6 +57,8 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 
 		return false;
 	}
+
+	return false;
 }
 
 //bool Intersect(const point& pt) {

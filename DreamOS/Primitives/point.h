@@ -68,22 +68,20 @@ public:
 	}
 	*/
 
-	// Point addition gives us a new point
-	friend point operator+(point &lhs, point &rhs);
-	point operator+(const point& rhs) const;
-
-	// point subtraction gives us a vector
-	friend vector operator-(point &lhs, point &rhs);
-	vector operator-(const point& rhs) const;
-
+	
 	// Adding a vector to a point gives us a point
 	//friend point operator+(point &lhs, vector &rhs);
+	point operator+(const point& rhs) const;
+	point& operator+=(const point& rhs);
+
 	point operator+(const vector& rhs) const;
 	point& operator+=(const vector& rhs);
 
+	vector operator-(const point& rhs) const;
+
 	// Subtracting a vector from a point gives us a point
-	friend point operator-(point &lhs, vector &rhs);
 	point operator-(const vector& rhs) const;
+	point& operator-=(const vector& rhs);
 
 	// Explicitly specializing the assignment operator
 	point& operator=(const matrix<point_precision, 4, 1> &arg);

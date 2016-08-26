@@ -23,6 +23,7 @@ public:
 	vector(matrix <vector_precision, 4, 1> &rhs);
 	vector(vector_precision x, vector_precision y, vector_precision z);
 	vector(vector rhs, vector lhs);	// Cross product - Not assumed to be normalized
+	vector(const point& pt);
 
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline vector_precision &x() { return this->element(0, 0); }

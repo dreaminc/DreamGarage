@@ -117,51 +117,30 @@ std::string point::toString(bool fW) {
 
 // Operators
 
-vector operator-(point &lhs, point &rhs) {
-	vector rtv;
-
-	rtv.x(rhs.x() - lhs.x());
-	rtv.y(rhs.y() - lhs.y());
-	rtv.z(rhs.z() - lhs.z());
-
-	return rtv;
-}
-
 vector point::operator-(const point& rhs) const {
-	vector retVector = (*this) - rhs;
-	return (retVector);
-}
+	vector retVector(*this);
 
-point operator+(point &lhs, point &rhs) {
-	point rtp;
+	retVector.m_data[0] -= rhs.m_data[0];
+	retVector.m_data[1] -= rhs.m_data[1];
+	retVector.m_data[2] -= rhs.m_data[2];
 
-	rtp.x(rhs.x() + lhs.x());
-	rtp.y(rhs.y() + lhs.y());
-	rtp.z(rhs.z() + lhs.z());
-
-	return rtp;
+	return retVector;
 }
 
 point point::operator+(const point& rhs) const {
-	point retPoint = (*this) + rhs;
-	return (retPoint);
+	return point(*this).operator+=(rhs);
 }
 
-/*
-point operator+(point &lhs, vector &rhs) {
-	point rtp;
+point& point::operator+=(const point& rhs) {
+	m_data[0] = (m_data[0] + rhs.m_data[0]);
+	m_data[1] = (m_data[1] + rhs.m_data[1]);
+	m_data[2] = (m_data[2] + rhs.m_data[2]);
 
-	rtp.x(lhs.x() + rhs.x());
-	rtp.y(lhs.y() + rhs.y());
-	rtp.z(lhs.z() + rhs.z());
-
-	return rtp;
+	return (*this);
 }
-*/
 
 point point::operator+(const vector& rhs) const {
-	point retPoint = (*this) + rhs;
-	return (retPoint);
+	return point(*this).operator+=(rhs);
 }
 
 point& point::operator+=(const vector& rhs) {
@@ -172,19 +151,16 @@ point& point::operator+=(const vector& rhs) {
 	return (*this);
 }
 
-point operator-(point &lhs, vector &rhs) {
-	point rtp;
+point& point::operator-=(const vector& rhs) {
+	m_data[0] = (m_data[0] - rhs.m_data[0]);
+	m_data[1] = (m_data[1] - rhs.m_data[1]);
+	m_data[2] = (m_data[2] - rhs.m_data[2]);
 
-	rtp.x(lhs.x() - rhs.x());
-	rtp.y(lhs.y() - rhs.y());
-	rtp.z(lhs.z() - rhs.z());
-
-	return rtp;
+	return (*this);
 }
 
 point point::operator-(const vector& rhs) const {
-	point retPoint = (*this) - rhs;
-	return (retPoint);
+	return point(*this).operator-=(rhs);
 }
 
 // Explicitly specializing the assignment operator

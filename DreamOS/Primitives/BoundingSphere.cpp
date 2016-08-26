@@ -44,7 +44,7 @@ bool BoundingSphere::Intersect(line& ln) {
 	vector vLineCircle = ln.a() - m_ptOrigin;
 
 	vector_precision dotLineCircleValueSq = pow(vLine.dot(vLineCircle), 2.0f);
-	vector_precision lineCircleMagnitudeSq = pow(vLineCircle.magnitude, 2.0f);
+	vector_precision lineCircleMagnitudeSq = pow(vLineCircle.magnitude(), 2.0f);
 	vector_precision sqRootComponent = dotLineCircleValueSq - lineCircleMagnitudeSq + pow(m_radius, 2.0f);
 
 	if (sqRootComponent < 0)

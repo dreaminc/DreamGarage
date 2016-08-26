@@ -43,7 +43,7 @@ public:
 		vector vAP = ptP - m_ptA;
 		vector vAB = m_ptB - m_ptA;
 
-		point ptResult = m_ptA + ((vAP.dot(vAB)) / (vAB.dot(vAB))) * vAB;
+		point ptResult = m_ptA + (vAB * ((vAP.dot(vAB)) / (vAB.dot(vAB))));
 
 		return ptResult;
 	}

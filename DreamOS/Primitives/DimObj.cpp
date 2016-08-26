@@ -335,11 +335,12 @@ RESULT DimObj::UpdateBoundingVolume() {
 	// This will go through the verts, find the center point and maximum size
 	point ptMax = point(0.0f, 0.0f, 0.0f);
 	point ptMin = point(0.0f, 0.0f, 0.0f);
+	point ptMid;
 
 	CN(m_pVertices);
 	CN(m_pBoundingVolume);
 
-	for (int i = 0; i < NumberIndices(); i++) {
+	for (unsigned int i = 0; i < NumberIndices(); i++) {
 		point ptVert = m_pVertices[i].GetPoint();
 
 		if (ptVert > ptMax)
@@ -348,7 +349,7 @@ RESULT DimObj::UpdateBoundingVolume() {
 			ptMin = ptVert;
 	}
 
-	point ptMid = point::midpoint(ptMax, ptMin);
+	ptMid = point::midpoint(ptMax, ptMin);
 	
 	CR(m_pBoundingVolume->UpdateBoundingVolume(ptMid, ptMax));
 
@@ -356,10 +357,21 @@ Error:
 	return r;
 }
 
-RESULT DimObj::InitializeBoundingBox(BoundingBox::Type boundingBoxType) {
+RESULT DimObj::InitializeAABB() {
 	RESULT r = R_PASS;
 
-	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox());
+	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(BoundingBox::Type::AABB));
+	CN(m_pBoundingVolume);
+
+	CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+RESULT DimObj::InitializeOBB() {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(BoundingBox::Type::OBB));
 	CN(m_pBoundingVolume);
 
 	CR(UpdateBoundingVolume());
