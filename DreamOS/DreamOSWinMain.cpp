@@ -29,11 +29,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	for (int i = 0; i < argc; i++)
 	{
-		argv[i] = new char;
-
 		std::wstring warg(wargv[i]);
 		args.push_back(std::string(warg.begin(), warg.end()));
+	}
 
+	for (int i = 0; i < argc; i++)
+	{
+		argv[i] = new char;
 		argv[i] = (char*)args[i].c_str();
 	}
 	// now argc,argv are available and will get destroyed on exit
