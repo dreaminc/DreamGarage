@@ -483,7 +483,7 @@
 		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
 		xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
 		xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-                                     python $(ProjectDir)..\..\..\Scripts\package_release_build.py $(ProjectDir)..\..\..\ $(TargetDir)
+                                     python $(ProjectDir)..\..\..\Scripts\copy_assets.py $(ProjectDir)..\..\..\ $(TargetDir)
 	  </Command>
     </PostBuildEvent>
     <PreBuildEvent>
