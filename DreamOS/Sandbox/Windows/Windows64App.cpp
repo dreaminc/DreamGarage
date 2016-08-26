@@ -666,14 +666,19 @@ RESULT Windows64App::Show() {
 		///*
 		// Send to the HMD
 		if (m_pHMD != nullptr) {
-			m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->RenderStereoFramebuffersFlat(m_pFlatSceneGraph);
+			//m_pHALImp->RenderStereoFramebuffersFlat(m_pFlatSceneGraph);
+			m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph, m_pFlatSceneGraph);
+			m_pHALImp->RenderFlush();
+			//glFlush();
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}
 		else {
 			// Render Scene
 			m_pHALImp->Render(m_pSceneGraph);
+			m_pHALImp->RenderFlat(m_pFlatSceneGraph);
+			m_pHALImp->RenderFlush();
+			//glFlush();
 			//m_pHALImp->RenderStereo(m_pSceneGraph);
 		}
 		//*/

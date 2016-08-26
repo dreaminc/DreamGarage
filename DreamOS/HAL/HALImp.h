@@ -46,9 +46,13 @@ public:
 	virtual RESULT MakeCurrentContext() = 0;
 
 	virtual RESULT Render(SceneGraph *pSceneGraph) = 0;
+	virtual RESULT RenderFlat(SceneGraph *pFlatSceneGraph) = 0;
+
 	virtual RESULT RenderStereo(SceneGraph *pSceneGraph) = 0;
-	virtual RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph) = 0;
+	virtual RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph, SceneGraph *pFlatSceneGraph) = 0;
 	virtual RESULT RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) = 0;
+
+	virtual RESULT RenderFlush() = 0;
 
 	virtual RESULT Shutdown() = 0;
 

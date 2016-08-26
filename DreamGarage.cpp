@@ -80,6 +80,8 @@ RESULT DreamGarage::LoadScene() {
 	std::shared_ptr<DebugData> q = DebugConsole::GetDebugConsole()->Register();
 
 	quad *pFQuad = AddFlatQuad(1.0f, 1.0f);
+	pFQuad->MoveTo(1.0f, 1.0f, 1.0f);
+	//pFQuad->RotateXByDeg(180.0f);
 
 	q->SetValue(std::to_string(pFQuad->GetOrigin().x()));
 	/*

@@ -104,9 +104,13 @@ public:
 	RESULT SetStereoFramebufferViewTarget(EYE_TYPE eye);
 
 	RESULT Render(SceneGraph *pSceneGraph);
+	RESULT RenderFlat(SceneGraph *pFlatSceneGraph);
+
 	RESULT RenderStereo(SceneGraph *pSceneGraph);
-	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
+	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph, SceneGraph *pFlatSceneGraph);
 	RESULT RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph);
+
+	RESULT RenderFlush();
 
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT Shutdown();
