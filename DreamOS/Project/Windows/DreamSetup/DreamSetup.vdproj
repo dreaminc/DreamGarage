@@ -1388,7 +1388,7 @@
         {
             "{3C67513D-01DD-4637-8A68-80971EB9504F}:_045A0A22BF694330828EBD3043035192"
             {
-            "DefaultLocation" = "8:[ProgramFiles64Folder][Manufacturer]\\[ProductName]"
+            "DefaultLocation" = "8:[ProgramFiles64Folder][ProductName]"
             "Name" = "8:#1925"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -1558,7 +1558,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Dream"
         "ProductCode" = "8:{1B12DA79-854A-42E0-BF48-BA34B968DE95}"
-        "PackageCode" = "8:{B46D6C08-6186-4667-AA5D-D01751D8D4A8}"
+        "PackageCode" = "8:{72C5F9D6-4561-4E99-AFD4-45B3BFE9F7CF}"
         "UpgradeCode" = "8:{9E4013FF-9949-471E-9B8D-67958A95FB31}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1574,7 +1574,7 @@
         "ARPCONTACT" = "8:Dream"
         "Keywords" = "8:"
         "ARPCOMMENTS" = "8:"
-        "ARPURLINFOABOUT" = "8:"
+        "ARPURLINFOABOUT" = "8:www.dreamos.com"
         "ARPPRODUCTICON" = "8:_72BC223C92E442C68E8C6405EA1BF8E2"
         "ARPIconIndex" = "3:0"
         "SearchPath" = "8:"
@@ -1694,7 +1694,7 @@
             }
             "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_F5A4CD90238F4A6199AEA6BBB2B132F1"
             {
-            "Name" = "8:DreamOS (Active)"
+            "Name" = "8:DreamOS"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
@@ -1703,7 +1703,7 @@
             "Target" = "8:_868C7346113A47DF9F72F811305C0086"
             "Folder" = "8:_6050B8DE652048D09CE160CA830F0123"
             "WorkingFolder" = "8:_045A0A22BF694330828EBD3043035192"
-            "Icon" = "8:"
+            "Icon" = "8:_72BC223C92E442C68E8C6405EA1BF8E2"
             "Feature" = "8:"
             }
         }
