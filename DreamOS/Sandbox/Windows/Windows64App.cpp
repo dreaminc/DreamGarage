@@ -1,3 +1,4 @@
+#include "Project/Windows/DreamOS/resource.h"
 #include "Windows64App.h"
 #include "Sandbox/PathManagerFactory.h"
 #include "HAL/opengl/OpenGLRenderingContextFactory.h"
@@ -36,12 +37,12 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_wndclassex.cbClsExtra = NULL;
 	m_wndclassex.cbWndExtra = NULL;
 	m_wndclassex.hInstance = m_hInstance;
-	m_wndclassex.hIcon = LoadIcon(0, IDI_APPLICATION);
+	m_wndclassex.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	m_wndclassex.hCursor = LoadCursor(0, IDC_ARROW);
 	m_wndclassex.hbrBackground = HBRUSH(COLOR_WINDOW + 1);
 	m_wndclassex.lpszMenuName = nullptr;
 	m_wndclassex.lpszClassName = m_pszClassName;
-	m_wndclassex.hIconSm = LoadIcon(0, IDI_APPLICATION);
+	m_wndclassex.hIconSm = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
 
 	if (!RegisterClassEx(&m_wndclassex)) {
 		MessageBox(nullptr, _T("Failed to register sandbox window class"), _T("Dream OS Sandbox Error"), NULL);

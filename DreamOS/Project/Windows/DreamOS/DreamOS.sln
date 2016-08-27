@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DreamOS", "DreamOS.vcxproj", "{E8896328-06EB-43A0-902C-59C3D2F3A3B5}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "DreamSetup", "..\DreamSetup\DreamSetup.vdproj", "{03832278-B839-46F6-880D-3BA6148FDF1F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -45,6 +47,18 @@ Global
 		{E8896328-06EB-43A0-902C-59C3D2F3A3B5}.ReleaseStatic|x64.Build.0 = Release|x64
 		{E8896328-06EB-43A0-902C-59C3D2F3A3B5}.ReleaseStatic|x86.ActiveCfg = Release|Win32
 		{E8896328-06EB-43A0-902C-59C3D2F3A3B5}.ReleaseStatic|x86.Build.0 = Release|Win32
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.Debug|x64.ActiveCfg = Debug
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.Debug|x86.ActiveCfg = Debug
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.DebugSingleProcess|x64.ActiveCfg = Debug
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.DebugSingleProcess|x86.ActiveCfg = Debug
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.DebugStatic|x64.ActiveCfg = Debug
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.DebugStatic|x86.ActiveCfg = Debug
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.Release|x64.ActiveCfg = Release
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.Release|x86.ActiveCfg = Release
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.ReleaseSingleProcess|x64.ActiveCfg = Release
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.ReleaseSingleProcess|x86.ActiveCfg = Release
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.ReleaseStatic|x64.ActiveCfg = Release
+		{03832278-B839-46F6-880D-3BA6148FDF1F}.ReleaseStatic|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

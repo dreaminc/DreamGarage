@@ -12,7 +12,7 @@ src_dir = "../Project/Windows/DreamOS/x64/Release"
 #src_dir = os.path.join(dir, src_dir)
 
 # dest_dir is the target location of Release build
-dest_dir = "../Project/Windows/DreamOS/x64/Production"
+dest_dir = "../Project/Windows/Production"
 #dest_dir = os.path.join(dir, dest_dir)
 
 #if os.path.isdir(dest_dir):
@@ -23,7 +23,10 @@ dest_dir = "../Project/Windows/DreamOS/x64/Production"
 
 # copy only necessary files from Dream root necessary to run
 
-rmtree(dest_dir)
+try:
+    rmtree(dest_dir)
+except FileNotFoundError:
+    print("Already empty")
 
 print("Copying binaries")
 try:
