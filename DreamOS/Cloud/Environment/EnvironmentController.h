@@ -14,6 +14,7 @@
 
 #include "Environment.h"
 #include "EnvironmentPeer.h"
+#include "PeerConnectionController.h"
 
 class User;
 class Websocket;
@@ -45,6 +46,8 @@ public:
 	~EnvironmentController();
 
 public:
+	RESULT Initialize();
+
 	RESULT ConnectToEnvironmentSocket(User user);
 	RESULT CreateEnvironmentUser(User user);	
 	RESULT GetEnvironmentPeerList(User user);
@@ -66,8 +69,11 @@ private:
 	bool FindPeerByUserID(long userID);
 	EnvironmentPeer *GetPeerByUserID(long userID);
 	
-
 	std::string GetMethodURI(EnvironmentMethod userMethod);
+
+public:
+	long GetEnvironmentID() { return m_environment.GetEnvironmentID(); }
+	RESULT SetEnvironmentID(long environmentID) { return m_environment.SetEnvironmentID(environmentID); }
 
 public:
 	EnvironmentController::state GetState() {
@@ -85,6 +91,8 @@ private:
 	std::unique_ptr<Websocket> m_pEnvironmentWebsocket;
 
 	std::vector<EnvironmentPeer> m_environmentPeers;
+
+	std::unique_ptr<PeerConnectionController> m_pPeerConnectionController;
 };
 
 #endif	// ! ENVIRONMENT_CONTROLLER_H_

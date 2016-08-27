@@ -173,12 +173,13 @@ RESULT Windows64App::InitializeCloudController() {
 
 	// Set up the Cloud Controller
 	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
-	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
-	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
+	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
 
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 	
-	CR(RegisterUIThreadCallback(m_pCloudController->GetUIThreadCallback()));
+	// TODO: Remove this code
+	//CR(RegisterUIThreadCallback(m_pCloudController->GetUIThreadCallback()));
 
 Error:
 	return r;
@@ -370,14 +371,14 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 					m_pCloudController->InitializeConnection(false, true);
 				}
 			}
-			/*else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
 					//m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
 
 					m_pCloudController->SendUpdateHeadMessage(NULL, point(1, 2, 3), quaternion(1, 2, 3, 4));
 				}
-			}*/
+			}
 			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list

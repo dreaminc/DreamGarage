@@ -17,12 +17,24 @@ EnvironmentController::EnvironmentController(Controller* pParentController, long
 	m_state(state::UNINITIALIZED)
 {
 	m_environment = Environment(environmentID);
+
+	m_pPeerConnectionController = std::unique_ptr<PeerConnectionController>(new PeerConnectionController(this));
 }
 
 EnvironmentController::~EnvironmentController() {
 	if (m_pEnvironmentWebsocket != nullptr) {
 		m_pEnvironmentWebsocket->Stop();
 	}
+}
+
+RESULT EnvironmentController::Initialize() {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->Initialize());
+
+Error:
+	return r;
 }
 
 std::string EnvironmentController::GetMethodURI(EnvironmentMethod userMethod) {
@@ -226,14 +238,40 @@ Error:
 	return r;
 }
 
+std::vector<std::string> TokenizeString(std::string str, char cDelim) {
+	std::istringstream strStream(str);
+	std::vector<std::string> strTokens;
+	std::string strToken;
+
+	while (std::getline(strStream, strToken, cDelim)) {
+		if (!strToken.empty()) {
+			strTokens.push_back(strToken);
+		}
+	}
+
+	return strTokens;
+}
+
 void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage) {
 	DEBUG_LINEOUT("HandleWebsocketMessage");
 
-	nlohmann::json jsonCloudResponse = nlohmann::json::parse(strMessage);
+	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
 	
-	long id = jsonCloudResponse["/id"_json_pointer].get<long>();
-	long statusCode = jsonCloudResponse["/meta/status_code"_json_pointer].get<long>();
+	std::string strGUID = jsonCloudMessage["/id"_json_pointer].get<std::string>();
+	std::string strType = jsonCloudMessage["/type"_json_pointer].get<std::string>();
+	std::string strMethod = jsonCloudMessage["/method"_json_pointer].get<std::string>();
+	
+	std::vector<std::string> strTokens = TokenizeString(strMethod, '.');
 
+	// Determine who to handle this
+	if (strTokens[0] == "peer_connection") {
+		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];
+		strMethod = strTokens[1];
+
+		m_pPeerConnectionController->HandleEnvironmentSocketMessage(strMethod, jsonPayload);
+	}
+
+	/*
 	DEBUG_LINEOUT("HandleWebsocketMessage id:%d statuscode: %d pending:%d pending id:%d state: 0x%x", 
 		(int)(id), (int)(statusCode), m_fPendingMessage, (int)(m_pendingMessageID), m_state);
 
@@ -290,9 +328,9 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 					/*
 					m_state = state::ENVIRONMENT_CONNECTED_AND_READY;
 					GetEnvironmentPeerList(s_user); // TODO: s_user is dumb
-					//*/
+					//*//*
 
-					///*
+					/*
 					nlohmann::json jsonPeer = jsonCloudResponse["/data"_json_pointer];
 
 					long userID = jsonPeer["/user"_json_pointer].get<long>();
@@ -323,7 +361,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 						// TODO: ICE Candidates / or change the name to handle SDP offer updates
 						pParentCloudController->CreateSDPOfferAnswer(strSDPOffer);
 					}
-					//*/
+					//*//*
 				} break;
 			}
 		}
@@ -331,6 +369,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 			DEBUG_LINEOUT("Cannot handle message, cloud controller not found");
 		}
 	}
+	*/
 }
 
 void EnvironmentController::HandleWebsocketConnectionOpen() {
@@ -341,7 +380,7 @@ void EnvironmentController::HandleWebsocketConnectionOpen() {
 	// Try to Create Environment User
 	// Create Environment User
 	// TODO: This is dumb
-	CreateEnvironmentUser(s_user);
+	//CreateEnvironmentUser(s_user);
 }
 
 void EnvironmentController::HandleWebsocketConnectionClose() {

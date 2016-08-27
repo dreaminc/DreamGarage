@@ -272,6 +272,7 @@ RESULT DreamGarage::Update(void) {
 
 	// Head update
 	// TODO: this should go up into DreamOS or even sandbox
+	/*
 	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHeadUpdateTime).count() > UPDATE_HEAD_COUNT_MS) {
@@ -285,6 +286,7 @@ RESULT DreamGarage::Update(void) {
 		SendHandPosition();
 		g_lastHandUpdateTime = timeNow;
 	}
+	*/
 	
 	/*
 	static quaternion_precision theta = 0.0f;

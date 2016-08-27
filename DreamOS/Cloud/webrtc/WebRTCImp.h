@@ -32,6 +32,15 @@ public:
 	};
 
 public:
+	class WebRTCObserver {
+	public:
+		virtual RESULT OnPeerConnectionInitialized() = 0;
+		virtual RESULT OnICECandidatesGatheringDone() = 0;
+		virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+	};
+
+public:
 	WebRTCImp(CloudController *pParentCloudController);
 	~WebRTCImp();
 
@@ -40,6 +49,7 @@ public:
 
 	// CloudImp Interface
 	RESULT Initialize();
+	RESULT RegisterObserver(WebRTCObserver *pWebRTCObserver);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT Update();
 	bool IsConnected();
@@ -47,7 +57,8 @@ public:
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);
 	//RESULT InitializeConnection(bool fMaster, bool fAddDataChannel);
-	RESULT InitializePeerConnection(bool fAddDataChannel);
+	//RESULT InitializePeerConnection(bool fAddDataChannel);
+	RESULT InitializePeerConnection(bool fCreateOffer, bool fAddDataChannel = true);
 	int GetFirstPeerID();
 	
 	virtual RESULT ConnectToPeer(int peerID) override;
@@ -61,7 +72,7 @@ public:
 	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
 	static std::string GetPeerName();
 	virtual std::string GetSDPOfferString() override;
-	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override;
+	//virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override;
 	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON) override;
 	virtual RESULT AddIceCandidates() override;
 
@@ -93,6 +104,8 @@ private:
 	DWORD m_UIThreadID;
 
 	std::string m_strServer;
+
+	WebRTCObserver *m_pWebRTCObserver;
 };
 
 #endif	// ! WEBRTC_IMP_H_

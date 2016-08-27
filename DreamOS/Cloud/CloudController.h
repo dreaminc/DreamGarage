@@ -47,6 +47,7 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
+	RESULT Initialize();
 	RESULT InitializeUser(version ver = 1.0f);
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);

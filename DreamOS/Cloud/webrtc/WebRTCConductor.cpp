@@ -258,18 +258,6 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDesc
 
 	CR(m_pParentWebRTCImp->OnPeerConnectionInitialized());
 
-	/*
-	Json::StyledWriter JSONWriter;
-	Json::Value JSONMessage;
-
-	JSONMessage[kSessionDescriptionTypeName] = sessionDescription->type();
-	JSONMessage[kSessionDescriptionSdpName] = strSDP;
-
-	DEBUG_LINEOUT("WebRTCConductor: JSON SDP:");
-	DEBUG_LINEOUT("%s", JSONWriter.write(JSONMessage).c_str());
-
-	SendMessage(JSONWriter.write(JSONMessage));
-	*/
 Error:
 	return;
 }
@@ -548,6 +536,7 @@ bool WebRTCConductor::IsPeerConnectionInitialized() {
 		return true;
 }
 
+// TODO: Support many peer connections
 RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
@@ -617,8 +606,6 @@ RESULT WebRTCConductor::CreatePeerConnection(bool dtls) {
 
 	iceServer.uri = GetPeerConnectionString();
 	rtcConfiguration.servers.push_back(iceServer);
-
-	
 
 	if (dtls) {
 		if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {

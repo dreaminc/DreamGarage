@@ -29,6 +29,7 @@ public:
 	}
 
 	long GetEnvironmentID() { return m_environmentID; }
+	RESULT SetEnvironmentID(long environmentID) { m_environmentID = environmentID; return R_PASS; }
 
 private:
 	long m_environmentID;

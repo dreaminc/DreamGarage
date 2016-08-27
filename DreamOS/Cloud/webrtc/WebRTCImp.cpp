@@ -11,7 +11,8 @@
 
 WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 	CloudImp(pParentCloudController),
-	m_pWebRTCConductor(nullptr)
+	m_pWebRTCConductor(nullptr),
+	m_pWebRTCObserver(nullptr)
 {
 	// empty
 }
@@ -34,6 +35,18 @@ RESULT WebRTCImp::Initialize() {
 	m_pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(m_pWebRTCClient.get(), this));
 
 //Error:
+	return r;
+}
+
+RESULT WebRTCImp::RegisterObserver(WebRTCObserver *pWebRTCObserver) {
+	RESULT r = R_PASS;
+
+	CNM(pWebRTCObserver, "Can't register null observer");
+	CBM((m_pWebRTCObserver == nullptr), "Observer already registered");
+
+	m_pWebRTCObserver = pWebRTCObserver;
+
+Error:
 	return r;
 }
 
@@ -126,12 +139,12 @@ Error:
 }
 
 // TODO: Data channel fucks it up
-RESULT WebRTCImp::InitializeConnection(bool fMaster, bool fAddDataChannel) {
+RESULT WebRTCImp::InitializePeerConnection(bool fCreateOffer, bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
 	CRM(m_pWebRTCConductor->InitializePeerConnection(fAddDataChannel), "Failed to initialize WebRTC Peer Connection");
 
-	if (fMaster) {
+	if (fCreateOffer) {
 		CRM(m_pWebRTCConductor->CreateOffer(), "Failed to create WebRTC Offer");
 	}
 
@@ -139,6 +152,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT WebRTCImp::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
@@ -148,6 +162,7 @@ RESULT WebRTCImp::InitializePeerConnection(bool fAddDataChannel) {
 Error:
 	return r;
 }
+*/
 
 int WebRTCImp::GetFirstPeerID() {
 
@@ -168,11 +183,9 @@ RESULT WebRTCImp::AddIceCandidates() {
 RESULT WebRTCImp::OnICECandidatesGatheringDone() {
 	RESULT r = R_PASS;
 
-	// Update the SDP offer with candidates if connected
-	CloudController *pCloudController = GetParentCloudController();
-	CN(pCloudController);
-
-	CR(pCloudController->OnICECandidatesGatheringDone());
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnICECandidatesGatheringDone());
+	}
 
 Error:
 	return r;
@@ -181,7 +194,9 @@ Error:
 RESULT WebRTCImp::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 
-	CR(GetParentCloudController()->OnDataChannelStringMessage(strDataChannelMessage));
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnDataChannelStringMessage(strDataChannelMessage));
+	}
 
 Error:
 	return r;
@@ -190,13 +205,16 @@ Error:
 RESULT WebRTCImp::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
-	CR(GetParentCloudController()->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+	}
 
 Error:
 	return r;
 }
 
 // Fill this out and junk
+// TODO: REMOVE DEAD CODE
 RESULT WebRTCImp::OnPeerConnectionInitialized() {
 	RESULT r = R_PASS;
 

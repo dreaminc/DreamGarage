@@ -76,6 +76,15 @@ Error:
 	return r;
 }
 
+RESULT CloudController::Initialize() {
+	RESULT r = R_PASS;
+
+	CR(InitializeUser());
+	CR(InitializeEnvironment(-1));
+Error:
+	return r;
+}
+
 RESULT CloudController::InitializeUser(version ver) {
 	RESULT r = R_PASS;
 
@@ -167,10 +176,12 @@ Error:
 RESULT CloudController::InitializeEnvironment(long environmentID) {
 	RESULT r = R_PASS;
 
-	CBM((environmentID != -1), "Environment cannot be -1");
+	//CBM((environmentID != -1), "Environment cannot be -1");
 
 	m_pEnvironmentController = std::unique_ptr<EnvironmentController>(new EnvironmentController(this, environmentID));
 	CN(m_pEnvironmentController);
+
+	CR(m_pEnvironmentController->Initialize());
 
 Error:
 	return r;
@@ -213,8 +224,9 @@ RESULT CloudController::LoginUser() {
 	CRM(m_pUserController->LoadProfile(), "Failed to load profile");
 
 	// Set up environment
-	CR(InitializeEnvironment(m_pUserController->GetUserDefaultEnvironmentID()));
+	//CR(InitializeEnvironment(m_pUserController->GetUserDefaultEnvironmentID()));
 	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->SetEnvironmentID(m_pUserController->GetUserDefaultEnvironmentID()));
 
 	// Connect to environment 
 	CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser()));
@@ -248,7 +260,12 @@ Error:
 }
 
 RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel) {
-	return m_pCloudImp->InitializeConnection(fMaster, fAddDataChannel);
+	RESULT r = R_PASS;
+
+	// TODO: ?
+
+//Error:
+	return r;
 }
 
 std::string CloudController::GetSDPOfferString() {
@@ -275,10 +292,12 @@ Error:
 	return r;
 }
 
+// TODO: remove this code
 std::function<void(int msgID, void* data)> CloudController::GetUIThreadCallback() {
 	return m_pCloudImp->GetUIThreadCallback();
 }
 
+// TODO: remove this code
 void CloudController::CallGetUIThreadCallback(int msgID, void* data) {
 	std::function<void(int msg_id, void* data)> fnUIThreadCallback;
 	return fnUIThreadCallback(msgID, data);
@@ -291,6 +310,7 @@ RESULT CloudController::SendUpdateHeadMessage(long userID, point ptPosition, qua
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	// TODO: Fix this
 	CB(m_pCloudImp->IsConnected());
 	CN(m_pUserController);
 	{
@@ -314,6 +334,7 @@ RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handS
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	// TODO: Fix this
 	CB(m_pCloudImp->IsConnected());
 	CN(m_pUserController);
 	{
