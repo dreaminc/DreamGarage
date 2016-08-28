@@ -106,6 +106,18 @@ bool WebRTCImp::IsConnected() {
 	return m_pWebRTCConductor->IsPeerConnectionInitialized();
 }
 
+bool WebRTCImp::IsOfferer() {
+	return (m_pWebRTCConductor->m_fOffer == true);
+}
+
+bool WebRTCImp::IsAnswerer() {
+	return (m_pWebRTCConductor->m_fOffer == false);
+}
+
+std::list<ICECandidate> WebRTCImp::GetCandidates() {
+	return m_pWebRTCConductor->GetCandidates();
+}
+
 // TOOD: peer user id currently not doing anything
 RESULT WebRTCImp::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;

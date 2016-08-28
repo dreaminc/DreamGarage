@@ -24,6 +24,7 @@ const uint16_t kDefaultServerPort = 8888;
 
 class WebRTCClient;
 class WebRTCConductor;
+class ICECandidate;
 
 class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp> {
 public:
@@ -54,6 +55,9 @@ public:
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT Update();
 	bool IsConnected();
+	bool IsOfferer();
+	bool IsAnswerer();
+	std::list<ICECandidate> GetCandidates();
 
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);

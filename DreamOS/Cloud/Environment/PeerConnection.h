@@ -10,6 +10,13 @@
 #include <string>
 #include <vector>
 
+// TODO: This may result in cyclic dependency so might need to move it
+#include "Cloud/webrtc/WebRTCConductor.h"
+
+const char kCandidateSdpMidName[] = "sdpMid";
+const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
+const char kCandidateSdpName[] = "candidate";
+
 class PeerConnection {
 public:
 	PeerConnection(long userID, long peerUserID, long peerConnectionID) :
@@ -36,12 +43,14 @@ public:
 		DEBUG_LINEOUT("SDP Answer: %s", m_strSDPAnswer.c_str());
 
 		DEBUG_LINEOUT("User Candidates:");
-		for (auto &strCandidate : m_strUserCandidates)
-			DEBUG_LINEOUT(strCandidate.c_str());
+		for (auto &iceCandidate : m_offerICECandidates) {
+			iceCandidate.Print();
+		}
 
 		DEBUG_LINEOUT("Peer Candidates:");
-		for (auto &strCandidate : m_strPeerCandidates)
-			DEBUG_LINEOUT(strCandidate.c_str());
+		for (auto &iceCandidate : m_answerICECandidates) {
+			iceCandidate.Print();
+		}
 
 		return R_PASS;
 	}
@@ -57,22 +66,22 @@ public:
 	}
 
 	RESULT ClearUserCandidates() {
-		m_strUserCandidates.clear();
+		m_offerICECandidates.clear();
 		return R_PASS;
 	}
 
 	RESULT AddUserCandidate(std::string strCandidate) {
-		m_strUserCandidates.push_back(strCandidate);
+		m_offerICECandidates.push_back(strCandidate);
 		return R_PASS;
 	}
 
 	RESULT ClearPeerCandidates() {
-		m_strPeerCandidates.clear();
+		m_answerICECandidates.clear();
 		return R_PASS;
 	}
 
 	RESULT AddPeerCandidate(std::string strCandidate) {
-		m_strPeerCandidates.push_back(strCandidate);
+		m_answerICECandidates.push_back(strCandidate);
 		return R_PASS;
 	}
 
@@ -111,8 +120,8 @@ public:
 	const std::string& GetSDPOffer() { return m_strSDPOffer; }
 	const std::string& GetSDPAnswer() { return m_strSDPAnswer; }
 
-	const std::vector<std::string> GetUserCandidates() { return m_strUserCandidates; }
-	const std::vector<std::string> GetPeerCandidates() { return m_strPeerCandidates; }
+	const std::list<ICECandidate> GetUserCandidates() { return m_offerICECandidates; }
+	const std::list<ICECandidate> GetPeerCandidates() { return m_answerICECandidates; }
 
 	RESULT UpdateOfferSocketConnectionFromJSON(nlohmann::json jsonOfferSocketConnection) {
 		RESULT r = R_PASS;
@@ -188,15 +197,59 @@ public:
 
 		// Offer
 		jsonData["offer"] = m_strSDPOffer;
-		jsonData["offer_candidates"] = nullptr;	// TODO: fill this out
+
+		if (m_offerICECandidates.size() > 0)
+			jsonData["offer_candidates"] = GetCandidatesJSON(m_offerICECandidates);
+		else
+			jsonData["offer_candidates"] = nullptr;
+
 		jsonData["offer_socket_connection"] = std::to_string(m_offerSocketConnectionID);
 
 		// Answer
 		jsonData["answer"] = m_strSDPAnswer;
-		jsonData["answer_candidates"] = nullptr;	// TODO: fill this out
+
+		if (m_offerICECandidates.size() > 0)
+			jsonData["answer_candidates"] = GetCandidatesJSON(m_answerICECandidates);
+		else
+			jsonData["answer_candidates"] = nullptr;
+
 		jsonData["answer_socket_connection"] = std::to_string(m_answerSocketConnectionID);
 	
 		return jsonData;
+	}
+
+	nlohmann::json GetCandidatesJSON(std::list<ICECandidate> iceCandidates) {
+		nlohmann::json jsonData = nlohmann::json::array();
+
+		for (auto &iceCandidate : iceCandidates) {
+			nlohmann::json jsonICECandidate;
+
+			jsonICECandidate[kCandidateSdpName] = iceCandidate.m_strSDPCandidate;
+			jsonICECandidate[kCandidateSdpMidName] = iceCandidate.m_strSDPMediaID;
+			jsonICECandidate[kCandidateSdpMlineIndexName] = iceCandidate.m_SDPMediateLineIndex;
+
+			jsonData.push_back(jsonICECandidate);
+		}
+
+		return jsonData;
+	}
+
+	RESULT SetOfferCandidates(std::list<ICECandidate> iceCandidates) {
+		RESULT r = R_PASS;
+
+		m_offerICECandidates = iceCandidates;
+
+	//Error:
+		return r;
+	}
+
+	RESULT SetAnswerCandidates(std::list<ICECandidate> iceCandidates) {
+		RESULT r = R_PASS;
+
+		m_answerICECandidates = iceCandidates;
+
+	//Error:
+		return r;
 	}
 
 private:
@@ -212,8 +265,8 @@ private:
 	std::string m_strSDPOffer;	
 	std::string m_strSDPAnswer;
 
-	std::vector<std::string> m_strUserCandidates;
-	std::vector<std::string> m_strPeerCandidates;
+	std::list<ICECandidate> m_offerICECandidates;
+	std::list<ICECandidate> m_answerICECandidates;
 };
 
 #endif	// !PEER_CONNECTION_H_

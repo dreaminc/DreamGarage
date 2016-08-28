@@ -289,12 +289,19 @@ RESULT PeerConnectionController::OnICECandidatesGatheringDone() {
 	//CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetSDPOfferString()));
 	// TODO: Add ICE Candidates to the peer connection
 
+	if (m_pWebRTCImp->IsOfferer()) {
+		CR(m_pPeerConnectionCurrentHandshake->SetOfferCandidates(m_pWebRTCImp->GetCandidates()));
+	}
+	else {
+		CR(m_pPeerConnectionCurrentHandshake->SetAnswerCandidates(m_pWebRTCImp->GetCandidates()));
+	}
+
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		m_pPeerConnectionControllerObserver->OnICECandidatesGatheringDone(m_pPeerConnectionCurrentHandshake);
 	}
 
 
-//Error:
+Error:
 	return r;
 }
 

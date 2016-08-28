@@ -118,14 +118,9 @@ void WebRTCConductor::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInter
 	// m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
 }
 
-// TODO: Move this into the class
-struct ICECandidate {
-	std::string m_strSDPCandidate;
-	std::string m_strSDPMediaID;
-	int m_SDPMediateLineIndex;
-};
-
-std::list<ICECandidate> g_iceCandidates;
+std::list<ICECandidate> WebRTCConductor::GetCandidates() {
+	return m_iceCandidates;
+}
 
 void WebRTCConductor::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) {
 	DEBUG_OUT("ICE Connection Change: ");
@@ -170,6 +165,7 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 		return;
 	}
 
+	// TODO: remove dead code
 	Json::StyledWriter writer;
 	Json::Value jmessage;
 
@@ -192,7 +188,7 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 		return;
 	}
 
-	g_iceCandidates.push_back(iceCandidate);
+	m_iceCandidates.push_back(iceCandidate);
 
 	//jmessage[kCandidateSdpName] = s_strSDPCandidate;
 
@@ -243,7 +239,7 @@ std::string WebRTCConductor::GetSDPJSONString() {
 	JSONMessage[kSessionDescriptionSdpName] = m_strSessionDescriptionProtocol;
 
 	// Append Candidates
-	for (auto &iceCandidate : g_iceCandidates) {
+	for (auto &iceCandidate : m_iceCandidates) {
 		Json::Value JSONIceCandidate;
 
 		JSONIceCandidate[kCandidateSdpName] = iceCandidate.m_strSDPCandidate;

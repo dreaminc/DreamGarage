@@ -238,7 +238,7 @@ RESULT EnvironmentController::SetOfferCandidates(User user, PeerConnection *pPee
 
 	// TODO: 
 
-Error:
+//Error:
 	return r;
 }
 
@@ -247,7 +247,7 @@ RESULT EnvironmentController::SetAnswerCandidates(User user, PeerConnection *pPe
 
 	// TODO: 
 
-Error:
+//Error:
 	return r;
 }
 
