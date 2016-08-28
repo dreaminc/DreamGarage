@@ -43,7 +43,10 @@ public:
 
 public:
 	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
+	~WebRTCConductor();
 	
+	RESULT Initialize();
+
 	RESULT SendDataChannelStringMessage(std::string& strMessage);
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 

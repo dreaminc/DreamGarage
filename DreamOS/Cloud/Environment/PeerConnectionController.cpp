@@ -27,17 +27,27 @@ PeerConnectionController::PeerConnectionController(Controller* pParentController
 	Controller(pParentController),
 	m_pWebRTCImp(nullptr)
 {
-	m_pWebRTCImp = std::make_unique<WebRTCImp>(GetCloudController());
-
-	int a = 5;
+	// empty
 }
 
 RESULT PeerConnectionController::Initialize() {
 	RESULT r = R_PASS;
 
+	m_pWebRTCImp = std::make_unique<WebRTCImp>(GetCloudController());
 	CN(m_pWebRTCImp);
+
 	CR(m_pWebRTCImp->Initialize());
 	CR(m_pWebRTCImp->RegisterObserver(this));
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCImp);
+	CRM(m_pWebRTCImp->InitializePeerConnection(fCreateOffer, fAddDataChannel), "Failed to initialize WebRTC Peer Connection");
 
 Error:
 	return r;

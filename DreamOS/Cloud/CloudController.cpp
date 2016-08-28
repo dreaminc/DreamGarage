@@ -262,9 +262,11 @@ Error:
 RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
-	// TODO: ?
+	// Test: attempt to establish SDB before socket - maybe issues there
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->InitializeNewPeerConnection(fMaster, fAddDataChannel));
 
-//Error:
+Error:
 	return r;
 }
 

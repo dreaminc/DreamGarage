@@ -67,6 +67,32 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 	ClearSessionDescriptionProtocol();
 }
 
+WebRTCConductor::~WebRTCConductor() {
+	if (m_pWebRTCPeerConnectionFactory != nullptr) {
+		m_pWebRTCPeerConnectionFactory = nullptr;
+	}
+}
+
+RESULT WebRTCConductor::Initialize() {
+	RESULT r = R_PASS;
+
+	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
+	
+	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+
+	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
+
+//Success:
+	return r;
+
+Error:
+	if (m_pWebRTCPeerConnectionFactory != nullptr) {
+		m_pWebRTCPeerConnectionFactory = nullptr;
+	}
+
+	return r;
+}
+
 std::string WebRTCConductor::GetSessionDescriptionString() {
 	return m_strSessionDescriptionProtocol;
 }
@@ -540,9 +566,12 @@ bool WebRTCConductor::IsPeerConnectionInitialized() {
 RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
-	CB((m_pWebRTCPeerConnectionFactory.get() == nullptr));	// ensure peer connection factory uninitialized
+	//CB((m_pWebRTCPeerConnectionFactory.get() == nullptr));	// ensure peer connection factory uninitialized
+	
+	CN(m_pWebRTCPeerConnectionFactory);	// ensure peer connection initialized
 	CB((m_pWebRTCPeerConnection.get() == nullptr));			// ensure peer connection uninitialized
 
+	/*
 	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
 
 	if (!m_pWebRTCPeerConnectionFactory.get()) {
@@ -550,6 +579,7 @@ RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 		DeletePeerConnection();
 		return R_FAIL;
 	}
+	*/
 
 	//if (!CreatePeerConnection(DTLS_OFF)) {
 	if (!CreatePeerConnection(DTLS_ON)) {

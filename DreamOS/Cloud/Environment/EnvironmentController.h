@@ -55,6 +55,9 @@ public:
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
 
+	// TODO: Temporary 
+	RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
+
 private:
 	RESULT InitializeWebsocket(std::string& strURI);
 

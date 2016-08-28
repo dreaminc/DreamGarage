@@ -29,12 +29,15 @@ RESULT WebRTCImp::Initialize() {
 	rtc::ThreadManager::Instance()->SetCurrentThread(&m_Win32thread);
 	rtc::InitializeSSL();
 
+	// TODO: Remove client - not doing anything clearly
 	//m_pWebRTCClient = std::make_shared<WebRTCClient>(this);
 	//CN(m_pWebRTCClient);
 
 	m_pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(m_pWebRTCClient.get(), this));
+	CN(m_pWebRTCConductor);
+	CR(m_pWebRTCConductor->Initialize());
 
-//Error:
+Error:
 	return r;
 }
 

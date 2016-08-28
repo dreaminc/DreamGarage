@@ -252,6 +252,17 @@ std::vector<std::string> TokenizeString(std::string str, char cDelim) {
 	return strTokens;
 }
 
+// TODO: This is temp
+RESULT EnvironmentController::InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->InitializeNewPeerConnection(fCreateOffer, fAddDataChannel));
+
+Error:
+	return r;
+}
+
 void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage) {
 	DEBUG_LINEOUT("HandleWebsocketMessage");
 

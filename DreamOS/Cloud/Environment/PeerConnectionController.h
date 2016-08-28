@@ -43,6 +43,9 @@ public:
 
 	RESULT Initialize();
 	RESULT ClearPeerConnections();
+
+	RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
+
 	PeerConnection *CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID);
 
 	// TODO: This is kind of useless
