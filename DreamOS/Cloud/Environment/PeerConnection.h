@@ -13,8 +13,8 @@
 class PeerConnection {
 public:
 	PeerConnection(long userID, long peerUserID, long peerConnectionID) :
-		m_userID(userID),
-		m_peerUserID(peerUserID),
+		m_offerUserID(userID),
+		m_answerUserID(peerUserID),
 		m_peerConnectionID(peerConnectionID)
 	{
 		// empty
@@ -22,8 +22,8 @@ public:
 
 	PeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) :
 		m_peerConnectionID(-1),
-		m_userID(-1),
-		m_peerUserID(-1)
+		m_offerUserID(-1),
+		m_answerUserID(-1)
 	{
 		UpdatePeerConnectionFromJSON(jsonPeerConnection);
 		UpdateOfferSocketConnectionFromJSON(jsonOfferSocketConnection);
@@ -31,7 +31,7 @@ public:
 	}
 
 	RESULT Print() {
-		DEBUG_LINEOUT("User ID %d Peer ID %d Peer Connection ID %d", m_userID, m_peerUserID, m_peerConnectionID);
+		DEBUG_LINEOUT("User ID %d Peer ID %d Peer Connection ID %d", m_offerUserID, m_answerUserID, m_peerConnectionID);
 		DEBUG_LINEOUT("SDP Offer: %s", m_strSDPOffer.c_str());
 		DEBUG_LINEOUT("SDP Answer: %s", m_strSDPAnswer.c_str());
 
@@ -76,11 +76,11 @@ public:
 		return R_PASS;
 	}
 
-	long GetUserID() { return m_userID; }
-	RESULT SetUserID(long userID) { m_userID = userID; return R_PASS; }
+	long GetOfferUserID() { return m_offerUserID; }
+	RESULT SetOfferUserID(long userID) { m_offerUserID = userID; return R_PASS; }
 
-	long GetPeerUserID() { return m_peerUserID; }
-	RESULT SetPeerUserID(long peerUserID) { m_peerUserID = peerUserID; return R_PASS; }
+	long GetAnswerUserID() { return m_answerUserID; }
+	RESULT SetAnswerUserID(long peerUserID) { m_answerUserID = peerUserID; return R_PASS; }
 
 	long GetEnvironmentID() { return m_environmentID; }
 	RESULT SetEnvironmentID(long environmentID) { m_environmentID = environmentID; return R_PASS; }
@@ -120,7 +120,7 @@ public:
 		long userID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
 		long environmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
 
-		CR(SetUserID(userID));
+		CR(SetOfferUserID(userID));
 		CR(SetEnvironmentID(environmentID));
 
 	Error:
@@ -133,7 +133,7 @@ public:
 		long peerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
 		long environmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
 
-		CR(SetPeerUserID(peerUserId));
+		CR(SetAnswerUserID(peerUserId));
 		CR(SetEnvironmentID(environmentID));
 
 	Error:
@@ -200,8 +200,8 @@ public:
 	}
 
 private:
-	long m_userID;
-	long m_peerUserID;
+	long m_offerUserID;
+	long m_answerUserID;
 	long m_peerConnectionID;
 
 	long m_environmentID;

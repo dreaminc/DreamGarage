@@ -34,7 +34,8 @@ public:
 public:
 	class WebRTCObserver {
 	public:
-		virtual RESULT OnPeerConnectionInitialized() = 0;
+		virtual RESULT OnSDPOfferSuccess() = 0;
+		virtual RESULT OnSDPAnswerSuccess() = 0;
 		virtual RESULT OnICECandidatesGatheringDone() = 0;
 		virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
@@ -69,11 +70,13 @@ public:
 
 public:
 	// Utilities
+	std::string GetSDPString();
+
 	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
 	static std::string GetPeerName();
 	virtual std::string GetSDPOfferString() override;
 	//virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override;
-	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON) override;
+	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOffer) override;
 	virtual RESULT AddIceCandidates() override;
 
 protected:
@@ -84,7 +87,8 @@ protected:
 	RESULT OnMessageFromPeer(int peerID, const std::string& strMessage);
 	RESULT OnMessageSent(int err);
 	RESULT OnServerConnectionFailure();
-	RESULT OnPeerConnectionInitialized();
+	RESULT OnSDPOfferSuccess();
+	RESULT OnSDPAnswerSuccess();
 	RESULT OnICECandidatesGatheringDone();
 	RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage);
 	RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

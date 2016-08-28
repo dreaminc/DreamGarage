@@ -50,7 +50,7 @@ public:
 	RESULT SendDataChannelStringMessage(std::string& strMessage);
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
-	RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
+	RESULT CreateSDPOfferAnswer(std::string strSDPOffer);
 	RESULT AddIceCandidates();
 
 protected:
@@ -114,6 +114,8 @@ private:
 	RESULT ClearSessionDescriptionProtocol();
 	RESULT PrintSDP();
 	std::string GetSDPJSONString();
+	std::string GetSDPString();
+	std::string GetSDPTypeString();
 
 public:
 	RESULT SetPeerConnectionID(int peerID) {
@@ -133,6 +135,8 @@ private:
 
 	int m_WebRTCPeerID;
 	bool m_fLoopback;
+
+	bool m_fOffer;	// TODO: this needs to be generalized
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;

@@ -218,7 +218,7 @@ Error:
 
 // Fill this out and junk
 // TODO: REMOVE DEAD CODE
-RESULT WebRTCImp::OnPeerConnectionInitialized() {
+RESULT WebRTCImp::OnSDPOfferSuccess() {
 	RESULT r = R_PASS;
 
 	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
@@ -234,7 +234,29 @@ RESULT WebRTCImp::OnPeerConnectionInitialized() {
 	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
 
 	CN(m_pWebRTCObserver);
-	CR(m_pWebRTCObserver->OnPeerConnectionInitialized());
+	CR(m_pWebRTCObserver->OnSDPOfferSuccess());
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnSDPAnswerSuccess() {
+	RESULT r = R_PASS;
+
+	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
+	// TODO: Remove this!
+	/*
+	int peerID = GetFirstPeerID();
+	m_pWebRTCConductor->SetPeerConnectionID(peerID);
+
+	CN(m_pWebRTCConductor);
+
+	CR(m_pWebRTCClient->SendMessageToPeer(peerID, m_pWebRTCConductor->GetSDPJSONString()));
+	*/
+	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
+
+	CN(m_pWebRTCObserver);
+	CR(m_pWebRTCObserver->OnSDPAnswerSuccess());
 
 Error:
 	return r;
@@ -254,6 +276,15 @@ Error:
 	return r;
 }
 
+std::string WebRTCImp::GetSDPString() {
+	if (m_pWebRTCConductor->IsPeerConnectionInitialized()) {
+		return m_pWebRTCConductor->GetSDPString();
+	}
+	else {
+		return std::string("");
+	}
+}
+
 std::string WebRTCImp::GetSDPOfferString() {
 	if (m_pWebRTCConductor->IsPeerConnectionInitialized()) {
 		return m_pWebRTCConductor->GetSDPJSONString();
@@ -263,11 +294,11 @@ std::string WebRTCImp::GetSDPOfferString() {
 	}
 }
 
-RESULT WebRTCImp::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
+RESULT WebRTCImp::CreateSDPOfferAnswer(std::string strSDPOffer) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebRTCConductor);
-	CR(m_pWebRTCConductor->CreateSDPOfferAnswer(strSDPOfferJSON));
+	CR(m_pWebRTCConductor->CreateSDPOfferAnswer(strSDPOffer));
 
 Error:
 	return r;

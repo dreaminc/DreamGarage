@@ -60,6 +60,9 @@ public:
 	// TODO: New Server Integration
 	nlohmann::json CreateEnvironmentMessage(User user, PeerConnection *pPeerConnection, std::string strMethod);
 	RESULT SetSDPOffer(User user, PeerConnection *pPeerConnection);
+	RESULT SetSDPAnswer(User user, PeerConnection *pPeerConnection);
+	RESULT SetOfferCandidates(User user, PeerConnection *pPeerConnection);
+	RESULT SetAnswerCandidates(User user, PeerConnection *pPeerConnection);
 
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
@@ -84,7 +87,8 @@ private:
 	std::string GetMethodURI(EnvironmentMethod userMethod);
 
 	// PeerConnectionControllerObserver
-	virtual RESULT OnPeerConnectionInitialized(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
 
 public:

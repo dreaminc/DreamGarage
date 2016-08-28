@@ -25,7 +25,8 @@ class PeerConnectionController : public Controller, public WebRTCImp::WebRTCObse
 public:
 	class PeerConnectionControllerObserver {
 	public:
-		virtual RESULT OnPeerConnectionInitialized(PeerConnection *pPeerConnection) = 0;
+		virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) = 0;
+		virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) = 0;
 	};
 
@@ -60,20 +61,22 @@ public:
 	PeerConnection* CreateNewPeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection);
 
 	// TODO: This is kind of useless
-	bool FindPeerConnectionByUserID(long userID);
-	PeerConnection *GetPeerConnectionByUserID(long userID);
+	bool FindPeerConnectionByOfferUserID(long userID);
+	PeerConnection *GetPeerConnectionByOfferUserID(long userID);
 
 	
-	bool FindPeerConnectionByPeerUserID(long peerUserID);
-	PeerConnection *GetPeerConnectionByPeerUserID(long peerUserID);
+	bool FindPeerConnectionByAnswerUserID(long peerUserID);
+	PeerConnection *GetPeerConnectionByAnswerUserID(long peerUserID);
 
 	bool FindPeerConnectionByID(long peerConnectionID);
 	PeerConnection *GetPeerConnectionByID(long peerConnectionID);
 
-	RESULT HandleEnvironmentSocketMessage(std::string strMethod, nlohmann::json jsonPayload);
+	RESULT HandleEnvironmentSocketRequest(std::string strMethod, nlohmann::json jsonPayload);
+	RESULT HandleEnvironmentSocketResponse(std::string strMethod, nlohmann::json jsonPayload);
 
 	// WebRTCObserver
-	virtual RESULT OnPeerConnectionInitialized() override;
+	virtual RESULT OnSDPOfferSuccess() override;
+	virtual RESULT OnSDPAnswerSuccess() override;
 	virtual RESULT OnICECandidatesGatheringDone() override;
 	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
