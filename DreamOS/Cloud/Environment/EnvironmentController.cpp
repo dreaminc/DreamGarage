@@ -6,7 +6,10 @@
 #include "Sandbox/CommandLineManager.h"
 #include "json.hpp"
 
+#include "PeerConnection.h"
+
 #include "Primitives/Types/UID.h"
+#include "Primitives/Types/guid.h"
 
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
@@ -32,6 +35,7 @@ RESULT EnvironmentController::Initialize() {
 
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->Initialize());
+	CR(m_pPeerConnectionController->RegisterPeerConnectionControllerObserver(this));
 
 Error:
 	return r;
@@ -109,6 +113,7 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	std::string strSDPOffer;
 	long environmentID = user.GetDefaultEnvironmentID();
 	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+	guid guidMessage;
 
 	CNM(pParentCloudController, "Parent CloudController not found or null");
 	CN(m_pEnvironmentWebsocket);
@@ -118,8 +123,11 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	strSDPOffer = pParentCloudController->GetSDPOfferString();
 
 	// Set up the JSON data
-	m_pendingMessageID = UID().GetID();
-	jsonData["id"] = m_pendingMessageID;
+
+	// TODO: change pending ID to guid instead
+	//m_pendingMessageID = guidMessage.GetGUIDString();
+
+	jsonData["id"] = guidMessage.GetGUIDString();
 	jsonData["token"] = user.GetToken();
 	jsonData["method"] = "environmentuser.create";
 	jsonData["params"] = {
@@ -135,6 +143,60 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 
 	m_fPendingMessage = true;
 	m_state = state::CREATING_ENVIRONMENT_USER;
+	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+
+Error:
+	return r;
+}
+
+// TODO: Move to PeerConnection for PeerConnection related calls?
+nlohmann::json EnvironmentController::CreateEnvironmentMessage(User user, PeerConnection *pPeerConnection, std::string strMethod) {
+	nlohmann::json jsonData;
+
+	// Set up the JSON data
+	guid guidMessage = guid();
+	std::string strGUID = guidMessage.GetGUIDString();
+
+	jsonData["id"] = guidMessage.GetGUIDString();
+	jsonData["token"] = user.GetToken();
+	jsonData["type"] = "response";
+
+	//jsonData["method"] = std::string("environmentuser") + strMethod;
+	jsonData["method"] = strMethod;
+
+	jsonData["payload"] = nlohmann::json::object();
+	if (pPeerConnection != nullptr) {
+		jsonData["payload"]["peer_connection"] = pPeerConnection->GetPeerConnectionJSON();
+	}
+
+	jsonData["version"] = user.GetVersion().GetString(false);
+
+	return jsonData;
+}
+
+RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonData;
+	std::string strData;
+	
+	long environmentID = user.GetDefaultEnvironmentID();
+	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+
+	CNM(pParentCloudController, "Parent CloudController not found or null");
+	CN(m_pEnvironmentWebsocket);
+	CBM((m_fConnected), "Environment socket not connected");
+	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
+
+	// Set up the JSON data
+	jsonData = CreateEnvironmentMessage(user, pPeerConnection, "peer_connection.set_offer");
+
+	strData = jsonData.dump();
+	DEBUG_LINEOUT("Set SDP Offer JSON: %s", strData.c_str());
+
+	m_fPendingMessage = true;
+	m_state = state::SET_SDP_OFFER;
+
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 
 Error:
@@ -258,6 +320,26 @@ RESULT EnvironmentController::InitializeNewPeerConnection(bool fCreateOffer, boo
 
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->InitializeNewPeerConnection(fCreateOffer, fAddDataChannel));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnPeerConnectionInitialized(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	// TODO: Fix the s_user bullshit
+	//CR(SetSDPOffer(s_user, pPeerConnection));
+
+//Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	// TODO: Fix the s_user bullshit
+	CR(SetSDPOffer(s_user, pPeerConnection));
 
 Error:
 	return r;

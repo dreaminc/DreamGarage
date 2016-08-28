@@ -23,6 +23,15 @@ class PeerConnection;
 // TODO: This is actually a UserController - so change the name of object and file
 class PeerConnectionController : public Controller, public WebRTCImp::WebRTCObserver {
 public:
+	class PeerConnectionControllerObserver {
+	public:
+		virtual RESULT OnPeerConnectionInitialized(PeerConnection *pPeerConnection) = 0;
+		virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) = 0;
+	};
+
+	RESULT RegisterPeerConnectionControllerObserver(PeerConnectionControllerObserver* pPeerConnectionControllerObserver);
+
+public:
 	enum class PeerConnectionState {
 		INVALID
 	};
@@ -36,6 +45,7 @@ private:
 	};
 
 	std::string GetMethodURI(PeerConnectionMethod method);
+	//nlohmann::json GetPeerConnectionJSON(long peerConnectionID);
 
 public:
 	PeerConnectionController(Controller* pParentController);
@@ -47,6 +57,7 @@ public:
 	RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
 
 	PeerConnection *CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID);
+	PeerConnection* CreateNewPeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection);
 
 	// TODO: This is kind of useless
 	bool FindPeerConnectionByUserID(long userID);
@@ -76,6 +87,9 @@ private:
 	uint64_t m_pendingMessageID;
 
 	std::vector<PeerConnection> m_peerConnections;
+	PeerConnection *m_pPeerConnectionCurrentHandshake;
+
+	PeerConnectionControllerObserver *m_pPeerConnectionControllerObserver;
 };
 
 #endif	// ! ENVIRONMENT_CONTROLLER_H_

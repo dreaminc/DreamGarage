@@ -21,7 +21,7 @@ class Websocket;
 
 
 // TODO: This is actually a UserController - so change the name of object and file
-class EnvironmentController : public Controller{
+class EnvironmentController : public Controller, public PeerConnectionController::PeerConnectionControllerObserver {
 public:
 	enum class state {
 		UNINITIALIZED,
@@ -33,6 +33,11 @@ public:
 		ENVIRONMENT_PEER_LIST_REQUESTED,
 		ENVIRONMENT_PEER_LIST_RECEIVED,
 		ENVIRONMENT_CONNECTED_AND_READY,
+
+		// Peer Connection
+		// TODO: Move to Peer Connection?
+		SET_SDP_OFFER,
+
 		INVALID
 	};
 
@@ -49,8 +54,12 @@ public:
 	RESULT Initialize();
 
 	RESULT ConnectToEnvironmentSocket(User user);
-	RESULT CreateEnvironmentUser(User user);	
+	RESULT CreateEnvironmentUser(User user);	// TODO: This is deprecated
 	RESULT GetEnvironmentPeerList(User user);
+
+	// TODO: New Server Integration
+	nlohmann::json CreateEnvironmentMessage(User user, PeerConnection *pPeerConnection, std::string strMethod);
+	RESULT SetSDPOffer(User user, PeerConnection *pPeerConnection);
 
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
@@ -73,6 +82,10 @@ private:
 	EnvironmentPeer *GetPeerByUserID(long userID);
 	
 	std::string GetMethodURI(EnvironmentMethod userMethod);
+
+	// PeerConnectionControllerObserver
+	virtual RESULT OnPeerConnectionInitialized(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
 
 public:
 	long GetEnvironmentID() { return m_environment.GetEnvironmentID(); }

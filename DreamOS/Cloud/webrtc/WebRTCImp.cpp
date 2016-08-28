@@ -233,7 +233,10 @@ RESULT WebRTCImp::OnPeerConnectionInitialized() {
 	*/
 	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
 
-//Error:
+	CN(m_pWebRTCObserver);
+	CR(m_pWebRTCObserver->OnPeerConnectionInitialized());
+
+Error:
 	return r;
 }
 

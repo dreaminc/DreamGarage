@@ -282,6 +282,7 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDesc
 		return;
 	}
 
+	// TODO: peer ID stuff
 	CR(m_pParentWebRTCImp->OnPeerConnectionInitialized());
 
 Error:

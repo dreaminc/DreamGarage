@@ -497,6 +497,7 @@
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
     <ClCompile Include="..\..\..\Primitives\text.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
+    <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Primitives\user.cpp" />
@@ -831,6 +832,7 @@
     <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
     <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\GUID.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Number.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Types.h" />

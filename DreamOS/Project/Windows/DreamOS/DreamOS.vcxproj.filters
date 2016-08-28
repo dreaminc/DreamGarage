@@ -161,9 +161,6 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp">
       <Filter>Sandbox\Windows</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -385,6 +382,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp">
       <Filter>Cloud\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp">
+      <Filter>Primitives\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
+      <Filter>Primitives\Types</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1980,6 +1983,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnection.h">
       <Filter>Cloud\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
+      <Filter>Primitives\Types</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
