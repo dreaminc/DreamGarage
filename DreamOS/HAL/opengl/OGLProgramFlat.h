@@ -25,16 +25,33 @@ public:
 
 		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
 		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
+		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeUVCoord), std::string("inV_vec2UVCoord")));
 
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTexture), std::string("u_hasTexture")));
 
 	Error:
 		return r;
 	}
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
-		return R_NOT_IMPLEMENTED;
+		RESULT r = R_PASS;
+
+		OGLTexture *pTexture = nullptr;
+
+		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+			pTexture->OGLActivateTexture();
+			m_pUniformTextureColor->SetUniform(pTexture);
+			m_pUniformHasTexture->SetUniform(true);
+		}
+		else
+		{
+			m_pUniformHasTexture->SetUniform(false);
+		}
+
+		return r;
 	}
 
 	RESULT SetObjectUniforms(DimObj *pDimObj) {
@@ -46,14 +63,16 @@ public:
 
 	RESULT SetCameraUniforms(camera *pCamera) {
 		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
+		if (m_pUniformViewProjectionMatrix)
+			m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 		return R_PASS;
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
 		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
+		if (m_pUniformViewProjectionMatrix)
+			m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 		return R_PASS;
 	}
@@ -61,9 +80,13 @@ public:
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
 	OGLVertexAttributeColor *m_pVertexAttributeColor;
+	OGLVertexAttributeUVCoord *m_pVertexAttributeUVCoord;
 
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+
+	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniformBool *m_pUniformHasTexture;
 };
 
 #endif // ! OGLPROGRAM_FLAT_H_

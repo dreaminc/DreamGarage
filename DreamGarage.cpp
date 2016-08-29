@@ -58,10 +58,10 @@ RESULT DreamGarage::LoadScene() {
 	//texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	//texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 
-	//texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	//texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	//texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	//texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
 	//*/
 
@@ -79,8 +79,10 @@ RESULT DreamGarage::LoadScene() {
 
 	std::shared_ptr<DebugData> q = DebugConsole::GetDebugConsole()->Register();
 
+//	quad *pFQuad = AddQuad(1.0f, 1.0f);
 	quad *pFQuad = AddFlatQuad(1.0f, 1.0f);
 	pFQuad->MoveTo(1.0f, 1.0f, 1.0f);
+	pFQuad->SetColorTexture(pColorTextureCobble);
 	//pFQuad->RotateXByDeg(180.0f);
 
 	q->SetValue(std::to_string(pFQuad->GetOrigin().x()));
