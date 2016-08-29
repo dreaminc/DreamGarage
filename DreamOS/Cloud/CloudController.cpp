@@ -182,6 +182,7 @@ RESULT CloudController::InitializeEnvironment(long environmentID) {
 	CN(m_pEnvironmentController);
 
 	CR(m_pEnvironmentController->Initialize());
+	CR(m_pEnvironmentController->RegisterEnvironmentControllerObserver(this));
 
 Error:
 	return r;
@@ -277,8 +278,8 @@ std::string CloudController::GetSDPOfferString() {
 RESULT CloudController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
 
-	CN(m_pCloudImp);
-	CR(m_pCloudImp->SendDataChannelStringMessage(peerID, strMessage));
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->SendDataChannelStringMessage(peerID, strMessage));
 
 Error:
 	return r;
@@ -287,8 +288,8 @@ Error:
 RESULT CloudController::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
-	CN(m_pCloudImp);
-	CR(m_pCloudImp->SendDataChannelMessage(peerID, pDataChannelBuffer, pDataChannelBuffer_n));
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->SendDataChannelMessage(peerID, pDataChannelBuffer, pDataChannelBuffer_n));
 
 Error:
 	return r;
@@ -312,8 +313,9 @@ RESULT CloudController::SendUpdateHeadMessage(long userID, point ptPosition, qua
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
-	// TODO: Fix this
-	CB(m_pCloudImp->IsConnected());
+	// TODO: Fix this - remove m_pCloudImp
+	//CB(m_pCloudImp->IsConnected());
+	CB(m_pEnvironmentController->IsUserIDConnected(userID));
 	CN(m_pUserController);
 	{
 		// Create the message
@@ -336,8 +338,9 @@ RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handS
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
-	// TODO: Fix this
-	CB(m_pCloudImp->IsConnected());
+	// TODO: Fix this - remove m_pCloudImp
+	//CB(m_pCloudImp->IsConnected());
+	CB(m_pEnvironmentController->IsUserIDConnected(userID));
 	CN(m_pUserController);
 	{
 		// Create the message

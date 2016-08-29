@@ -41,6 +41,17 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pEnvironmentControllerObserver), "Observer cannot be nullptr");
+	CBM((m_pEnvironmentControllerObserver == nullptr), "Can't overwrite environment observer");
+	m_pEnvironmentControllerObserver = pEnvironmentControllerObserver;
+
+Error:
+	return r;
+}
+
 std::string EnvironmentController::GetMethodURI(EnvironmentMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
@@ -403,6 +414,10 @@ std::vector<std::string> TokenizeString(std::string str, char cDelim) {
 	return strTokens;
 }
 
+bool EnvironmentController::IsUserIDConnected(long peerUserID) {
+	return m_pPeerConnectionController->IsUserIDConnected(peerUserID);
+}
+
 // TODO: This is temp
 RESULT EnvironmentController::InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel) {
 	RESULT r = R_PASS;
@@ -598,4 +613,46 @@ void EnvironmentController::HandleWebsocketConnectionClose() {
 
 void EnvironmentController::HandleWebsocketConnectionFailed() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionFailed");
+}
+
+RESULT EnvironmentController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->SendDataChannelStringMessage(peerID, strMessage));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->SendDataChannelMessage(peerID, pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(strDataChannelMessage));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+	}
+
+Error:
+	return r;
 }

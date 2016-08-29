@@ -26,7 +26,7 @@ class UpdateHandMessage;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 
-class CloudController : public Controller, public std::enable_shared_from_this<CloudController> {
+class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver {
 protected:
 	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
 	typedef std::function<RESULT(uint8_t *, int)> HandleDataChannelMessageCallback;
@@ -72,8 +72,8 @@ public:
 	// WebRTC Callbacks
 	// TODO: Convert to observer interface (clean up)
 	RESULT OnICECandidatesGatheringDone();
-	RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage);
-	RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

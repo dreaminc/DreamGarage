@@ -22,7 +22,8 @@ public:
 	PeerConnection(long userID, long peerUserID, long peerConnectionID) :
 		m_offerUserID(userID),
 		m_answerUserID(peerUserID),
-		m_peerConnectionID(peerConnectionID)
+		m_peerConnectionID(peerConnectionID),
+		m_fWebRTCConnectionStable(false)
 	{
 		// empty
 	}
@@ -30,7 +31,8 @@ public:
 	PeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) :
 		m_peerConnectionID(-1),
 		m_offerUserID(-1),
-		m_answerUserID(-1)
+		m_answerUserID(-1),
+		m_fWebRTCConnectionStable(false)
 	{
 		UpdatePeerConnectionFromJSON(jsonPeerConnection);
 		UpdateOfferSocketConnectionFromJSON(jsonOfferSocketConnection);
@@ -265,6 +267,20 @@ public:
 		return R_PASS;
 	}
 
+	RESULT SetWebRTCConnectionStable() {
+		m_fWebRTCConnectionStable = true;
+		return R_PASS;
+	}
+
+	RESULT SetWebRTCConnectionClosed() {
+		m_fWebRTCConnectionStable = false;
+		return R_PASS;
+	}
+
+	bool IsWebRTCConnected() {
+		return m_fWebRTCConnectionStable;
+	}
+
 private:
 	long m_offerUserID;
 	long m_answerUserID;
@@ -280,6 +296,8 @@ private:
 
 	std::list<ICECandidate> m_offerICECandidates;
 	std::list<ICECandidate> m_answerICECandidates;
+
+	bool m_fWebRTCConnectionStable;
 };
 
 #endif	// !PEER_CONNECTION_H_

@@ -21,13 +21,15 @@ class Websocket;
 class PeerConnection;
 
 // TODO: This is actually a UserController - so change the name of object and file
-class PeerConnectionController : public Controller, public WebRTCImp::WebRTCObserver {
+class PeerConnectionController : public Controller, public WebRTCImp::WebRTCObserver{
 public:
 	class PeerConnectionControllerObserver {
 	public:
 		virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) = 0;
+		virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 	};
 
 	RESULT RegisterPeerConnectionControllerObserver(PeerConnectionControllerObserver* pPeerConnectionControllerObserver);
@@ -71,6 +73,8 @@ public:
 	bool FindPeerConnectionByID(long peerConnectionID);
 	PeerConnection *GetPeerConnectionByID(long peerConnectionID);
 
+	bool IsUserIDConnected(long peerUserID);
+
 	RESULT HandleEnvironmentSocketRequest(std::string strMethod, nlohmann::json jsonPayload);
 	RESULT HandleEnvironmentSocketResponse(std::string strMethod, nlohmann::json jsonPayload);
 
@@ -82,6 +86,9 @@ public:
 	virtual RESULT OnICECandidatesGatheringDone() override;
 	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+
+	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
+	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 private:
 	std::unique_ptr<WebRTCImp> m_pWebRTCImp;

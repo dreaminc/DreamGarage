@@ -125,6 +125,19 @@ PeerConnection *PeerConnectionController::GetPeerConnectionByID(long peerConnect
 	return nullptr;
 }
 
+bool PeerConnectionController::IsUserIDConnected(long peerUserID) {
+	// TODO: Fix this so it works with user IDs
+	//PeerConnection *pPeerConnection = GetPeerConnectionByAnswerUserID(peerUserID);
+	
+	//if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnected()) {
+	if (m_peerConnections.size() != 0 && (*(m_peerConnections.begin())).IsWebRTCConnected()) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 PeerConnection* PeerConnectionController::CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID) {
 	//RESULT r = R_PASS;
 	PeerConnection *pPeerConnection = nullptr;
@@ -258,6 +271,12 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//CR(m_pWebRTCImp->AddOfferCandidates(pPeerConnection));
 
 		// TODO: Add Candidates
+		///*
+		if (m_pWebRTCImp->IsOfferer() == false) {
+			CBM((m_pPeerConnectionCurrentHandshake->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
+			CRM(m_pWebRTCImp->AddOfferCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
+		}
+		//*/
 	}
 	else if (strMethod == "set_answer_candidates") {
 		// TODO: Reproduction of code above - move to function
@@ -282,7 +301,14 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		CN(m_pWebRTCImp);
 		CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
 
-		// We don't have a gaurantee that the WebRTC connection is stable at this point
+		///*
+		if (m_pWebRTCImp->IsOfferer()) {
+			CBM((m_pPeerConnectionCurrentHandshake->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
+			CRM(m_pWebRTCImp->AddAnswerCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
+		}
+		//*/
+
+		// We don't have a guarantee that the WebRTC connection is stable at this point
 
 		// Initialize SDP Peer Connection Offer and Create Answer
 		//CN(m_pWebRTCImp);
@@ -307,10 +333,12 @@ RESULT PeerConnectionController::OnWebRTCConnectionStable() {
 	RESULT r = R_PASS;
 	
 	CNM(m_pPeerConnectionCurrentHandshake, "WebRTC Connection stable without current peer connection ERROR!");
+	m_pPeerConnectionCurrentHandshake->SetWebRTCConnectionStable();
 
 	// If we're the offerer, we add the answer candidates - if we're the answerer we add the offers candidates
 	// At this point the WebRTC connection is stable so we're guaranteed to have the remote description
 	// TODO: This could in theory be done when we have the remote description - so could be optimized 
+	/*
 	if (m_pWebRTCImp->IsOfferer()) {
 		CBM((m_pPeerConnectionCurrentHandshake->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
 		CRM(m_pWebRTCImp->AddAnswerCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
@@ -319,6 +347,7 @@ RESULT PeerConnectionController::OnWebRTCConnectionStable() {
 		CBM((m_pPeerConnectionCurrentHandshake->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
 		CRM(m_pWebRTCImp->AddOfferCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
 	}
+	*/
 
 Error:
 	return r;
@@ -399,17 +428,41 @@ Error:
 RESULT PeerConnectionController::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
-	// TODO:
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(strDataChannelMessage));
+	}
 
-//Error:
+Error:
 	return r;
 }
 
 RESULT PeerConnectionController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
-	// TODO:
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+	}
 
-//Error:
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCImp);
+	CR(m_pWebRTCImp->SendDataChannelStringMessage(peerID, strMessage));
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCImp);
+	CR(m_pWebRTCImp->SendDataChannelMessage(peerID, pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
 	return r;
 }

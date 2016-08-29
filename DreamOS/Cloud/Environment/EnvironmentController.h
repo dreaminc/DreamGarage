@@ -49,6 +49,16 @@ public:
 		CONNECT_SOCKET,
 		INVALID
 	};
+
+public:
+	class EnvironmentControllerObserver {
+	public:
+		virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+	};
+
+	RESULT RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver);
+
 public:
 	EnvironmentController(Controller* pParentController, long environmentID);
 	~EnvironmentController();
@@ -90,6 +100,8 @@ private:
 	std::string GetMethodURI(EnvironmentMethod userMethod);
 
 	// PeerConnectionControllerObserver
+	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
@@ -97,6 +109,10 @@ private:
 public:
 	long GetEnvironmentID() { return m_environment.GetEnvironmentID(); }
 	RESULT SetEnvironmentID(long environmentID) { return m_environment.SetEnvironmentID(environmentID); }
+	bool IsUserIDConnected(long peerUserID);
+
+	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
+	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 public:
 	EnvironmentController::state GetState() {
@@ -116,6 +132,8 @@ private:
 	std::vector<EnvironmentPeer> m_environmentPeers;
 
 	std::unique_ptr<PeerConnectionController> m_pPeerConnectionController;
+
+	EnvironmentControllerObserver *m_pEnvironmentControllerObserver;
 };
 
 #endif	// ! ENVIRONMENT_CONTROLLER_H_

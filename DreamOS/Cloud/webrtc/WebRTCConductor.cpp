@@ -638,9 +638,9 @@ RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 	
 	CN(m_pWebRTCPeerConnection.get());
 
+	///*
 	CR(AddStreams());
 
-	///*
 	if (fAddDataChannel) {
 		CR(AddDataChannel());
 	}
