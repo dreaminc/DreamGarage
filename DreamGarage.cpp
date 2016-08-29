@@ -307,7 +307,7 @@ RESULT DreamGarage::Update(void) {
 		qOrientation *= quaternion((quaternion_precision)(M_PI_4/2.0f), vector::jVector(1.0f));
 	*/
 
-	///*
+	/*
 	quaternion qOrientation = quaternion((quaternion_precision)0.0f, vector::kVector(1.0f));;
 	qOrientation.RotateX(((quaternion_precision)(M_PI * 1.5f)));
 	m_pPeerUser->SetOrientation(qOrientation);
