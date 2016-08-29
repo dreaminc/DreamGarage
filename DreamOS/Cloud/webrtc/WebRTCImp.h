@@ -25,6 +25,7 @@ const uint16_t kDefaultServerPort = 8888;
 class WebRTCClient;
 class WebRTCConductor;
 class ICECandidate;
+class PeerConnection;
 
 class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp> {
 public:
@@ -35,6 +36,8 @@ public:
 public:
 	class WebRTCObserver {
 	public:
+		virtual RESULT OnWebRTCConnectionStable() = 0;
+		virtual RESULT OnWebRTCConnectionClosed() = 0;
 		virtual RESULT OnSDPOfferSuccess() = 0;
 		virtual RESULT OnSDPAnswerSuccess() = 0;
 		virtual RESULT OnICECandidatesGatheringDone() = 0;
@@ -82,6 +85,9 @@ public:
 	//virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override;
 	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOffer) override;
 	virtual RESULT AddIceCandidates() override;
+	RESULT AddOfferCandidates(PeerConnection *pPeerConnection);
+	RESULT AddAnswerCandidates(PeerConnection *pPeerConnection);
+	RESULT SetSDPAnswer(std::string strSDPAnswer);
 
 protected:
 	RESULT OnSignedIn();
@@ -96,6 +102,9 @@ protected:
 	RESULT OnICECandidatesGatheringDone();
 	RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage);
 	RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT OnWebRTCConnectionStable();
+	RESULT OnWebRTCConnectionClosed();
 
 protected:
 	// WebRTC Specific

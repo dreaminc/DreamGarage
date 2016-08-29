@@ -55,7 +55,8 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 	m_WebRTCPeerID(-1),
 	m_fLoopback(false),
 	m_pDataChannelInterface(nullptr),
-	m_fOffer(false)
+	m_fOffer(false),
+	m_fSDPSet(false)
 {
 	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
 		m_pWebRTCPeerConnectionFactory.release();
@@ -120,6 +121,39 @@ void WebRTCConductor::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInter
 
 std::list<ICECandidate> WebRTCConductor::GetCandidates() {
 	return m_iceCandidates;
+}
+
+// TODO: Add callbacks
+void WebRTCConductor::OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) {
+	DEBUG_OUT("WebRTC Connection Signaling Changed: ");
+
+	switch (new_state) {
+		case webrtc::PeerConnectionInterface::kStable: {
+			DEBUG_LINEOUT("WebRTC Connection Stable");
+			m_pParentWebRTCImp->OnWebRTCConnectionStable();
+		} break;
+
+		case webrtc::PeerConnectionInterface::kHaveLocalOffer: {
+			DEBUG_LINEOUT("WebRTC Connection Has Local Offer");
+		} break;
+
+		case webrtc::PeerConnectionInterface::kHaveLocalPrAnswer: {
+			DEBUG_LINEOUT("WebRTC Connection Has Local Answer");
+		} break;
+
+		case webrtc::PeerConnectionInterface::kHaveRemoteOffer: {
+			DEBUG_LINEOUT("WebRTC Connection has remote offer");
+		} break;
+
+		case webrtc::PeerConnectionInterface::kHaveRemotePrAnswer: {
+			DEBUG_LINEOUT("WebRTC Connection has remote answer");
+		} break;
+
+		case webrtc::PeerConnectionInterface::kClosed: {
+			DEBUG_LINEOUT("WebRTC Connection closed");
+			m_pParentWebRTCImp->OnWebRTCConnectionClosed();
+		} break;
+	}
 }
 
 void WebRTCConductor::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) {
@@ -271,8 +305,9 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDesc
 	RESULT r = R_PASS;
 
 	m_pWebRTCPeerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
-	
 	CR(ClearSessionDescriptionProtocol());
+
+	m_fSDPSet = true;
 	
 	m_strSessionDescriptionType = sessionDescription->type();
 	sessionDescription->ToString(&m_strSessionDescriptionProtocol);
@@ -863,23 +898,44 @@ Error:
 	return;
 }
 
-std::list<ICECandidate> g_peerICECandidates;
+//std::list<ICECandidate> g_peerICECandidates;
 
-RESULT WebRTCConductor::AddIceCandidates() {
+RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
 	RESULT r = R_PASS;
 
-	for (auto &peerICECandidate : g_peerICECandidates) {
+	//for (auto &peerICECandidate : g_peerICECandidates) {
 		webrtc::SdpParseError sdpError;
 		//std::unique_ptr<webrtc::IceCandidateInterface> candidate(webrtc::CreateIceCandidate(strSDPMID, sdpMLineIndex, strSDP, &sdpError));
+
 		std::unique_ptr<webrtc::IceCandidateInterface> candidate(
-			webrtc::CreateIceCandidate(peerICECandidate.m_strSDPMediaID, peerICECandidate.m_SDPMediateLineIndex, 
-									   peerICECandidate.m_strSDPCandidate, &sdpError));
+			webrtc::CreateIceCandidate(iceCandidate.m_strSDPMediaID, iceCandidate.m_SDPMediateLineIndex,
+									   iceCandidate.m_strSDPCandidate, &sdpError));
 
 		CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
 		CBM((m_pWebRTCPeerConnection->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
 
-		DEBUG_LINEOUT(" Received candidate : %s", peerICECandidate.m_strSDPCandidate.c_str());
-	}
+		DEBUG_LINEOUT(" Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
+	//}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::SetSDPAnswer(std::string strSDPAnswer) {
+	RESULT r = R_PASS;
+
+	webrtc::SdpParseError sdpError;
+
+	// TODO: Make this more generic (string)
+	webrtc::SessionDescriptionInterface* sessionDescriptionInterface(webrtc::CreateSessionDescription("answer", strSDPAnswer, &sdpError));
+	std::string strSDPType = sessionDescriptionInterface->type();
+
+	CNM((sessionDescriptionInterface),
+		"Can't parse received session description message. SdpParseError was: %s", sdpError.description.c_str());
+
+	DEBUG_LINEOUT(" Received %s session description: %s", strSDPType.c_str(), strSDPAnswer.c_str());
+
+	m_pWebRTCPeerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescriptionInterface);
 
 Error:
 	return r;

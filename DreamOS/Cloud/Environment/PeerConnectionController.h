@@ -75,6 +75,8 @@ public:
 	RESULT HandleEnvironmentSocketResponse(std::string strMethod, nlohmann::json jsonPayload);
 
 	// WebRTCObserver
+	virtual RESULT OnWebRTCConnectionStable() override;
+	virtual RESULT OnWebRTCConnectionClosed() override;
 	virtual RESULT OnSDPOfferSuccess() override;
 	virtual RESULT OnSDPAnswerSuccess() override;
 	virtual RESULT OnICECandidatesGatheringDone() override;

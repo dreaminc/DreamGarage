@@ -255,6 +255,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		CN(m_pWebRTCImp);
 		//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
 
+		//CR(m_pWebRTCImp->AddOfferCandidates(pPeerConnection));
+
 		// TODO: Add Candidates
 	}
 	else if (strMethod == "set_answer_candidates") {
@@ -275,17 +277,59 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 
-		// Initialize SDP Peer Connection Offer and Create Answer
+		// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
+		// will ultimately signal the WebRTC connection to be complete
 		CN(m_pWebRTCImp);
+		CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
+
+		// We don't have a gaurantee that the WebRTC connection is stable at this point
+
+		// Initialize SDP Peer Connection Offer and Create Answer
+		//CN(m_pWebRTCImp);
+
+		// We can do this now - since we are guaranteed to already have our local SDP 
+		//CR(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection));
+
 		//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
 
 		// TODO: Add Candidates
 		// At this point the whole thing is complete
-		pPeerConnection->Print();
-		int a = 5;
+		//pPeerConnection->Print();
+		
+		//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
 	}
 
 Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnWebRTCConnectionStable() {
+	RESULT r = R_PASS;
+	
+	CNM(m_pPeerConnectionCurrentHandshake, "WebRTC Connection stable without current peer connection ERROR!");
+
+	// If we're the offerer, we add the answer candidates - if we're the answerer we add the offers candidates
+	// At this point the WebRTC connection is stable so we're guaranteed to have the remote description
+	// TODO: This could in theory be done when we have the remote description - so could be optimized 
+	if (m_pWebRTCImp->IsOfferer()) {
+		CBM((m_pPeerConnectionCurrentHandshake->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
+		CRM(m_pWebRTCImp->AddAnswerCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
+	}
+	else {
+		CBM((m_pPeerConnectionCurrentHandshake->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
+		CRM(m_pWebRTCImp->AddOfferCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
+	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnWebRTCConnectionClosed() {
+	RESULT r = R_PASS;
+
+	// TODO: Do something
+
+//Error:
 	return r;
 }
 

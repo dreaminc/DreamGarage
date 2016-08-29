@@ -8,6 +8,7 @@
 
 #include "webrtc/base/arraysize.h"
 #include "Cloud/CloudController.h"
+#include "Cloud/Environment/PeerConnection.h"
 
 WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 	CloudImp(pParentCloudController),
@@ -191,8 +192,56 @@ int WebRTCImp::GetFirstPeerID() {
 	return peerID;
 }
 
+// TODO: this is dead code
 RESULT WebRTCImp::AddIceCandidates() {
-	return m_pWebRTCConductor->AddIceCandidates();
+	//return m_pWebRTCConductor->AddIceCandidates();
+	return R_NOT_IMPLEMENTED;
+}
+
+// TODO: Make sure we're the answerer
+RESULT WebRTCImp::AddOfferCandidates(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	for (auto &iceCandidate : pPeerConnection->GetOfferCandidates()) {
+		CR(m_pWebRTCConductor->AddIceCandidate(iceCandidate));
+	}
+
+Error:
+	return r;
+}
+
+// TODO: Make sure we're the offerer
+RESULT WebRTCImp::AddAnswerCandidates(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	for (auto &iceCandidate : pPeerConnection->GetAnswerCandidates()) {
+		CR(m_pWebRTCConductor->AddIceCandidate(iceCandidate));
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnWebRTCConnectionStable() {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnWebRTCConnectionStable());
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnWebRTCConnectionClosed() {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnWebRTCConnectionClosed());
+	}
+
+Error:
+	return r;
 }
 
 RESULT WebRTCImp::OnICECandidatesGatheringDone() {
@@ -311,6 +360,16 @@ RESULT WebRTCImp::CreateSDPOfferAnswer(std::string strSDPOffer) {
 
 	CN(m_pWebRTCConductor);
 	CR(m_pWebRTCConductor->CreateSDPOfferAnswer(strSDPOffer));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::SetSDPAnswer(std::string strSDPAnswer) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+	CR(m_pWebRTCConductor->SetSDPAnswer(strSDPAnswer));
 
 Error:
 	return r;

@@ -79,11 +79,12 @@ public:
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 	RESULT CreateSDPOfferAnswer(std::string strSDPOffer);
-	RESULT AddIceCandidates();
+	RESULT SetSDPAnswer(std::string strSDPAnswer);
+	RESULT AddIceCandidate(ICECandidate iceCandidate);
 
 protected:
 	// PeerConnectionObserver implementation.
-	void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override {};
+	void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override;
 
 	void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
@@ -165,6 +166,7 @@ private:
 	bool m_fLoopback;
 
 	bool m_fOffer;	// TODO: this needs to be generalized
+	bool m_fSDPSet;	// TODO: temp
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;

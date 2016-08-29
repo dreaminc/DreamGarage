@@ -41,14 +41,14 @@ public:
 		DEBUG_LINEOUT("User ID %d Peer ID %d Peer Connection ID %d", m_offerUserID, m_answerUserID, m_peerConnectionID);
 		
 		DEBUG_LINEOUT("SDP Offer: %s", m_strSDPOffer.c_str());
-		DEBUG_LINEOUT("%d Offer Candidates:", m_offerICECandidates.size());
+		DEBUG_LINEOUT("%d Offer Candidates:", static_cast<int>(m_offerICECandidates.size()));
 		for (auto &iceCandidate : m_offerICECandidates) {
 			iceCandidate.Print();
 		}
 		DEBUG_LINEOUT(" ");
 
 		DEBUG_LINEOUT("SDP Answer: %s", m_strSDPAnswer.c_str());
-		DEBUG_LINEOUT("%d Answer Candidates:", m_offerICECandidates.size());
+		DEBUG_LINEOUT("%d Answer Candidates:", static_cast<int>(m_offerICECandidates.size()));
 		for (auto &iceCandidate : m_answerICECandidates) {
 			iceCandidate.Print();
 		}
@@ -253,22 +253,16 @@ public:
 		return jsonData;
 	}
 
+	std::list<ICECandidate> GetOfferCandidates() { return m_offerICECandidates; }
 	RESULT SetOfferCandidates(std::list<ICECandidate> iceCandidates) {
-		RESULT r = R_PASS;
-
 		m_offerICECandidates = iceCandidates;
-
-	//Error:
-		return r;
+		return R_PASS;
 	}
 
+	std::list<ICECandidate> GetAnswerCandidates() { return m_offerICECandidates; }
 	RESULT SetAnswerCandidates(std::list<ICECandidate> iceCandidates) {
-		RESULT r = R_PASS;
-
 		m_answerICECandidates = iceCandidates;
-
-	//Error:
-		return r;
+		return R_PASS;
 	}
 
 private:
