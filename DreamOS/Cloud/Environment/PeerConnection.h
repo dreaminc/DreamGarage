@@ -39,18 +39,20 @@ public:
 
 	RESULT Print() {
 		DEBUG_LINEOUT("User ID %d Peer ID %d Peer Connection ID %d", m_offerUserID, m_answerUserID, m_peerConnectionID);
+		
 		DEBUG_LINEOUT("SDP Offer: %s", m_strSDPOffer.c_str());
-		DEBUG_LINEOUT("SDP Answer: %s", m_strSDPAnswer.c_str());
-
-		DEBUG_LINEOUT("User Candidates:");
+		DEBUG_LINEOUT("%d Offer Candidates:", m_offerICECandidates.size());
 		for (auto &iceCandidate : m_offerICECandidates) {
 			iceCandidate.Print();
 		}
+		DEBUG_LINEOUT(" ");
 
-		DEBUG_LINEOUT("Peer Candidates:");
+		DEBUG_LINEOUT("SDP Answer: %s", m_strSDPAnswer.c_str());
+		DEBUG_LINEOUT("%d Answer Candidates:", m_offerICECandidates.size());
 		for (auto &iceCandidate : m_answerICECandidates) {
 			iceCandidate.Print();
 		}
+		DEBUG_LINEOUT(" ");
 
 		return R_PASS;
 	}
@@ -163,8 +165,16 @@ public:
 		}
 
 		if (jsonPeerConnection["/offer_candidates"_json_pointer] != nullptr) {
-			//CR(SetSDPOffer(jsonPeerConnection["/offer"_json_pointer].get<std::string>()), "Failed to set SDP offer string");
-			// TODO:
+			m_offerICECandidates.clear();
+
+			for (auto &jsonICECandidate : jsonPeerConnection["/offer_candidates"_json_pointer]) {
+				std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
+				std::string strSDPMediaID = jsonICECandidate[kCandidateSdpMidName].get<std::string>();
+				int SDPMediateLineIndex = jsonICECandidate[kCandidateSdpMlineIndexName].get<int>();
+				
+				ICECandidate iceCandidate(strSDPCandidate, strSDPMediaID, SDPMediateLineIndex);
+				m_offerICECandidates.push_back(iceCandidate);
+			}
 		}
 
 		if (jsonPeerConnection["/offer_socket_connection"_json_pointer] != nullptr) {
@@ -172,14 +182,23 @@ public:
 		}
 
 		// Answer
+		// TODO: Duplicated code per above
 
 		if (jsonPeerConnection["/answer"_json_pointer] != nullptr) {
 			CRM(SetSDPAnswer(jsonPeerConnection["/answer"_json_pointer].get<std::string>()), "Failed to set SDP answer string");
 		}
 
 		if (jsonPeerConnection["/answer_candidates"_json_pointer] != nullptr) {
-			//CR(SetSDPOffer(jsonPeerConnection["/offer"_json_pointer].get<std::string>()), "Failed to set SDP offer string");
-			// TODO:
+			m_answerICECandidates.clear();
+
+			for (auto &jsonICECandidate : jsonPeerConnection["/offer_candidates"_json_pointer]) {
+				std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
+				std::string strSDPMediaID = jsonICECandidate[kCandidateSdpMidName].get<std::string>();
+				int SDPMediateLineIndex = jsonICECandidate[kCandidateSdpMlineIndexName].get<int>();
+
+				ICECandidate iceCandidate(strSDPCandidate, strSDPMediaID, SDPMediateLineIndex);
+				m_answerICECandidates.push_back(iceCandidate);
+			}
 		}
 
 		if (jsonPeerConnection["/answer_socket_connection"_json_pointer] != nullptr) {

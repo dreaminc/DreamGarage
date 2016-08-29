@@ -236,18 +236,59 @@ Error:
 RESULT EnvironmentController::SetOfferCandidates(User user, PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	// TODO: 
+	nlohmann::json jsonData;
+	std::string strData;
 
-//Error:
+	long environmentID = user.GetDefaultEnvironmentID();
+	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+
+	CNM(pParentCloudController, "Parent CloudController not found or null");
+	CN(m_pEnvironmentWebsocket);
+	CBM((m_fConnected), "Environment socket not connected");
+	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
+
+	// Set up the JSON data
+	jsonData = CreateEnvironmentMessage(user, pPeerConnection, "peer_connection.set_offer_candidates");
+
+	strData = jsonData.dump();
+	DEBUG_LINEOUT("Set Offer Candidates JSON: %s", strData.c_str());
+
+	m_fPendingMessage = true;
+	m_state = state::SET_OFFER_CANDIDATES;
+
+	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+
+Error:
 	return r;
 }
 
+// TODO: Lots of duplicated code 
 RESULT EnvironmentController::SetAnswerCandidates(User user, PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	// TODO: 
+	nlohmann::json jsonData;
+	std::string strData;
 
-//Error:
+	long environmentID = user.GetDefaultEnvironmentID();
+	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+
+	CNM(pParentCloudController, "Parent CloudController not found or null");
+	CN(m_pEnvironmentWebsocket);
+	CBM((m_fConnected), "Environment socket not connected");
+	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
+
+	// Set up the JSON data
+	jsonData = CreateEnvironmentMessage(user, pPeerConnection, "peer_connection.set_answer_candidates");
+
+	strData = jsonData.dump();
+	DEBUG_LINEOUT("Set Answer Candidates JSON: %s", strData.c_str());
+
+	m_fPendingMessage = true;
+	m_state = state::SET_ANSWER_CANDIDATES;
+
+	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+
+Error:
 	return r;
 }
 

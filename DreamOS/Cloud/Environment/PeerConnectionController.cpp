@@ -233,8 +233,55 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		CR(m_pWebRTCImp->InitializePeerConnection(false));
 		CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
 	}
-	else {
-		// TODO:
+	else if (strMethod == "set_offer_candidates") {
+		// TODO: Reproduction of code above - move to function
+		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
+		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
+
+		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
+		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
+
+		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+
+		// TODO: Make sure they match
+
+		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+		CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+		
+		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+		// Initialize SDP Peer Connection Offer and Create Answer
+		CN(m_pWebRTCImp);
+		//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+
+		// TODO: Add Candidates
+	}
+	else if (strMethod == "set_answer_candidates") {
+		// TODO: Reproduction of code above - move to function
+		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
+		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
+
+		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
+		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
+
+		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+
+		// TODO: Make sure they match
+
+		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+		CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+		// Initialize SDP Peer Connection Offer and Create Answer
+		CN(m_pWebRTCImp);
+		//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+
+		// TODO: Add Candidates
+		// At this point the whole thing is complete
+		pPeerConnection->Print();
 		int a = 5;
 	}
 

@@ -37,6 +37,9 @@ public:
 		// Peer Connection
 		// TODO: Move to Peer Connection?
 		SET_SDP_OFFER,
+		SET_SDP_ANSWER,
+		SET_OFFER_CANDIDATES,
+		SET_ANSWER_CANDIDATES,
 
 		INVALID
 	};
