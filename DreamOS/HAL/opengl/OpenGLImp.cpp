@@ -221,9 +221,9 @@ RESULT OpenGLImp::PrepareScene() {
 	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
 	CN(m_pOGLOverlayProgram);
 
-	m_pOGLUIProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
-	//m_pOGLUIProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
-	CN(m_pOGLUIProgram);
+	m_pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
+	//m_pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
+	CN(m_pOGLFlatProgram);
 
 	m_pOGLProfiler = std::make_unique<OGLProfiler>(this, m_pOGLOverlayProgram);
 
@@ -825,11 +825,11 @@ RESULT OpenGLImp::RenderFlat(SceneGraph *pFlatSceneGraph) {
 	SceneGraphStore *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
-	CRM(m_pOGLUIProgram->UseProgram(), "Failed to use OGLProgram");
+	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Camera Projection Matrix
 	SetMonoViewTarget();
-	CR(m_pOGLUIProgram->SetCamera(m_pCamera));
+	CR(m_pOGLFlatProgram->SetCamera(m_pCamera));
 
 	// Send SceneGraph objects to shader
 	pFlatSceneGraph->Reset();
@@ -839,7 +839,7 @@ RESULT OpenGLImp::RenderFlat(SceneGraph *pFlatSceneGraph) {
 		if (pDimObj == NULL)
 			continue;
 		else {
-			CR(m_pOGLUIProgram->RenderObject(pDimObj));
+			CR(m_pOGLFlatProgram->RenderObject(pDimObj));
 		}
 	}
 
@@ -929,7 +929,7 @@ RESULT OpenGLImp::RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) {
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
-		CRM(m_pOGLUIProgram->UseProgram(), "Failed to use OGLProgram");
+		CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
 
 		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
 
@@ -941,7 +941,7 @@ RESULT OpenGLImp::RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) {
 			if (pDimObj == NULL)
 				continue;
 			else {
-				CR(m_pOGLUIProgram->RenderObject(pDimObj));
+				CR(m_pOGLFlatProgram->RenderObject(pDimObj));
 			}
 		}		
 

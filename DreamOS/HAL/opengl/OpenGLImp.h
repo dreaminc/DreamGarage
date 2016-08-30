@@ -41,7 +41,7 @@ private:
 	OGLProgram *m_pOGLProgramCapture;		// temp for testing
 	OGLProgram *m_pOGLSkyboxProgram;
 	OGLProgram *m_pOGLOverlayProgram;
-	OGLProgram *m_pOGLUIProgram; // temp for testing
+	OGLProgram *m_pOGLFlatProgram; // temp for testing
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
