@@ -70,9 +70,7 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 }
 
 WebRTCConductor::~WebRTCConductor() {
-	if (m_pWebRTCPeerConnectionFactory != nullptr) {
-		m_pWebRTCPeerConnectionFactory = nullptr;
-	}
+	// empty
 }
 
 RESULT WebRTCConductor::Initialize() {
