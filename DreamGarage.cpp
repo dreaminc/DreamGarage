@@ -340,7 +340,7 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
-	qOrientation.Reverse();
+	//qOrientation.Reverse();
 	qOrientation.RotateY(((quaternion_precision)(M_PI)));
 	m_pPeerUser->SetOrientation(qOrientation);
 
