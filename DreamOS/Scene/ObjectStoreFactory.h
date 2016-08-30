@@ -2,7 +2,7 @@
 #define OBJECT_STORE_FACTORY_H_
 
 #include "RESULT/EHM.h"
-#include "Scene/SceneGraphStore.h"
+#include "Scene/ObjectStoreImp.h"
 #include "Core/Types/Factory.h"
 
 
@@ -14,7 +14,7 @@ typedef enum {
 
 class ObjectStoreFactory : public Factory {
 public:
-	static SceneGraphStore* MakeObjectStore(OBJECT_STORE_TYPE type);
+	static ObjectStoreImp* MakeObjectStore(OBJECT_STORE_TYPE type);
 };
 
 #endif // ! OBJECT_STORE_FACTORY_H_

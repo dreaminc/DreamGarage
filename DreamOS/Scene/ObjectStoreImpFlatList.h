@@ -2,12 +2,12 @@
 #define SCENE_GRAPH_FLAT_LIST_H_
 
 #include "RESULT/EHM.h"
-#include "Scene/SceneGraphList.h"
+#include "Scene/ObjectStoreImpList.h"
 
-class SceneGraphFlatList : public SceneGraphList {
+class ObjectStoreImpFlatList : public ObjectStoreImpList {
 public:
-	SceneGraphFlatList();
-	~SceneGraphFlatList();
+	ObjectStoreImpFlatList();
+	~ObjectStoreImpFlatList();
 
 public:
 

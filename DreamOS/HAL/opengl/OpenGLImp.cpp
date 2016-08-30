@@ -739,7 +739,7 @@ Error:
 
 RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
-	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
 	std::vector<light*> *pLights = NULL;
@@ -822,7 +822,7 @@ Error:
 
 RESULT OpenGLImp::RenderFlat(ObjectStore *pFlatSceneGraph) {
 	RESULT r = R_PASS;
-	SceneGraphStore *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
 	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
@@ -849,7 +849,7 @@ Error:
 
 RESULT OpenGLImp::RenderStereo(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
-	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -921,7 +921,7 @@ Error:
 
 RESULT OpenGLImp::RenderStereoFramebuffersFlat(ObjectStore *pFlatSceneGraph) {
 	RESULT r = R_PASS;
-	SceneGraphStore *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
 	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
@@ -957,7 +957,7 @@ Error:
 // TODO: Shared code should be consolidated
 RESULT OpenGLImp::RenderStereoFramebuffers(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
-	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 	
 	// Send lights to shader

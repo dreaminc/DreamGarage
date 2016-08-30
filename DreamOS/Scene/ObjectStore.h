@@ -12,7 +12,7 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
 
-#include "SceneGraphStore.h"
+#include "ObjectStoreImp.h"
 
 #include "ObjectStoreFactory.h"
 
@@ -37,14 +37,14 @@ public:
 	RESULT RemoveObjectByUID(UID uid);
 	VirtualObj *FindObjectByUID(UID uid);
 
-	SceneGraphStore *GetSceneGraphStore() { return m_pSceneGraphStore; }
+	ObjectStoreImp *GetSceneGraphStore() { return m_pSceneGraphStore; }
 
 	// TODO: Arch here
 	RESULT UpdateScene();
 	RESULT LoadScene();
 
 protected:
-	SceneGraphStore *m_pSceneGraphStore;
+	ObjectStoreImp *m_pSceneGraphStore;
 private:
 	UID m_uid;
 };

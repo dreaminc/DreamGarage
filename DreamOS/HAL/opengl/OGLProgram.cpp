@@ -44,7 +44,7 @@ Error:
 RESULT OGLProgram::SetLights(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 
-	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
@@ -672,7 +672,7 @@ Error:
 RESULT OGLProgram::RenderSceneGraph(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 	
-	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
 	pSceneGraph->Reset();

@@ -4,18 +4,18 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Dimension/Scene/SceneGraphList.h
-// A simple SceneGraphStore utilizing a linked list implementation
+// DreamOS/Dimension/Scene/ObjectStoreImpList.h
+// A simple ObjectStoreImp utilizing a linked list implementation
 
 #include <list>
-#include "SceneGraphStore.h"
+#include "ObjectStoreImp.h"
 
 #include "Primitives/DimObj.h"
 
-class SceneGraphList : public SceneGraphStore {
+class ObjectStoreImpList : public ObjectStoreImp {
 public:
-	SceneGraphList();
-	~SceneGraphList();
+	ObjectStoreImpList();
+	~ObjectStoreImpList();
 
 public:
 	RESULT ResetIterator();

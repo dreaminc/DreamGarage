@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Dimension/Scene/SceneGraphStore.h
+// DreamOS/Dimension/Scene/ObjectStoreImp.h
 // This abstract class simply represents 
 
 #include "Primitives/VirtualObj.h"
@@ -13,7 +13,7 @@
 #include "Primitives/light.h"
 #include "Primitives/skybox.h"
 
-class SceneGraphStore {
+class ObjectStoreImp {
 public:
 	// Objects
 	virtual RESULT ResetIterator() = 0;

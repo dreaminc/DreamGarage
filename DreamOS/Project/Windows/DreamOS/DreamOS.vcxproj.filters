@@ -203,9 +203,6 @@
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp">
       <Filter>Sandbox</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -383,10 +380,13 @@
     <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Scene\SceneGraphFlatList.cpp">
+    <ClCompile Include="..\..\..\Scene\ObjectStore.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Scene\ObjectStore.cpp">
+    <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStoreImpFlatList.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
   </ItemGroup>
@@ -573,12 +573,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h">
       <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraphStore.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraphList.h">
-      <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\quaternion.h">
       <Filter>Primitives</Filter>
@@ -1975,9 +1969,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraphFlatList.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\FlatObj.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -1988,6 +1979,15 @@
       <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Scene\ObjectStore.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImpFlatList.h">
       <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>

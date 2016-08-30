@@ -1,5 +1,5 @@
 #include "ObjectStore.h"
-#include "SceneGraphList.h"
+#include "ObjectStoreImpList.h"
 
 ObjectStore::ObjectStore(OBJECT_STORE_TYPE type) {
 	RESULT r = R_PASS;
@@ -78,7 +78,7 @@ RESULT ObjectStore::UpdateScene() {
 	
 	/*
 	Reset();
-	SceneGraphStore *pObjectStore = GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = GetSceneGraphStore();
 
 	VirtualObj *pVirtualObj = NULL;
 	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {

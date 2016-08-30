@@ -1,20 +1,20 @@
 #include "ObjectStoreFactory.h"
 
-#include "SceneGraphList.h"
-#include "SceneGraphFlatList.h"
+#include "ObjectStoreImpList.h"
+#include "ObjectStoreImpFlatList.h"
 
-SceneGraphStore* ObjectStoreFactory::MakeObjectStore(OBJECT_STORE_TYPE type) {
+ObjectStoreImp* ObjectStoreFactory::MakeObjectStore(OBJECT_STORE_TYPE type) {
 	RESULT r = R_PASS;
-	SceneGraphStore* pObjectStore = nullptr;
+	ObjectStoreImp* pObjectStore = nullptr;
 
 	switch (type) {
 	case OBJECT_STORE_LIST: {
-		pObjectStore = new SceneGraphList();
+		pObjectStore = new ObjectStoreImpList();
 		CNM(pObjectStore, "Failed to initialize object store!");
 	} break;
 
 	case OBJECT_STORE_FLAT: {
-		pObjectStore = new SceneGraphFlatList();
+		pObjectStore = new ObjectStoreImpFlatList();
 		CNM(pObjectStore, "Failed to initialize object store!");
 	} break;
 
