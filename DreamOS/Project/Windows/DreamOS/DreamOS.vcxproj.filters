@@ -200,9 +200,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Scene\SceneGraph.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp">
       <Filter>Sandbox</Filter>
     </ClCompile>
@@ -389,6 +386,9 @@
     <ClCompile Include="..\..\..\Scene\SceneGraphFlatList.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStore.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -573,9 +573,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h">
       <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraph.h">
-      <Filter>Scene</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Scene\SceneGraphStore.h">
       <Filter>Scene</Filter>
@@ -1989,6 +1986,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStore.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

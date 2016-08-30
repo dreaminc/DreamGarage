@@ -402,7 +402,7 @@ Error:
 
 // TODO: This convenience function should be put in a model factory
 
-composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+composite* OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 	RESULT r = R_PASS;
 	
 	composite* pComposite = new composite(this);
@@ -737,7 +737,7 @@ Error:
 	return nullptr;
 }
 
-RESULT OpenGLImp::Render(SceneGraph *pSceneGraph) {
+RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
@@ -820,7 +820,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::RenderFlat(SceneGraph *pFlatSceneGraph) {
+RESULT OpenGLImp::RenderFlat(ObjectStore *pFlatSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
@@ -847,7 +847,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::RenderStereo(SceneGraph *pSceneGraph) {
+RESULT OpenGLImp::RenderStereo(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
@@ -919,7 +919,7 @@ Error:
 }
 */
 
-RESULT OpenGLImp::RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) {
+RESULT OpenGLImp::RenderStereoFramebuffersFlat(ObjectStore *pFlatSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
@@ -955,7 +955,7 @@ Error:
 
 // TODO: Naming is kind of lame since this hits the HMD
 // TODO: Shared code should be consolidated
-RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
+RESULT OpenGLImp::RenderStereoFramebuffers(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;

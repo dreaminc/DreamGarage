@@ -18,7 +18,7 @@
 #include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
-#include "Scene/SceneGraph.h"
+#include "Scene/ObjectStore.h"
 
 #include <functional>
 
@@ -127,8 +127,8 @@ protected:
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	
-	SceneGraph *m_pSceneGraph;
-	SceneGraph *m_pFlatSceneGraph;
+	ObjectStore *m_pSceneGraph;
+	ObjectStore *m_pFlatSceneGraph;
 
 	CloudController *m_pCloudController;
 

@@ -9,7 +9,7 @@
 // The HAL Implementation class  is the parent class for implementations
 // such as the OpenGL implementation and ultimately native ones as well
 
-#include "Scene/SceneGraph.h"
+#include "Scene/ObjectStore.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -45,12 +45,12 @@ public:
 	virtual RESULT Resize(int pxWidth, int pxHeight) = 0;
 	virtual RESULT MakeCurrentContext() = 0;
 
-	virtual RESULT Render(SceneGraph *pSceneGraph) = 0;
-	virtual RESULT RenderFlat(SceneGraph *pFlatSceneGraph) = 0;
+	virtual RESULT Render(ObjectStore *pSceneGraph) = 0;
+	virtual RESULT RenderFlat(ObjectStore *pFlatSceneGraph) = 0;
 
-	virtual RESULT RenderStereo(SceneGraph *pSceneGraph) = 0;
-	virtual RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph) = 0;
-	virtual RESULT RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) = 0;
+	virtual RESULT RenderStereo(ObjectStore *pSceneGraph) = 0;
+	virtual RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph) = 0;
+	virtual RESULT RenderStereoFramebuffersFlat(ObjectStore *pFlatSceneGraph) = 0;
 
 	virtual RESULT RenderFlush() = 0;
 
@@ -74,7 +74,7 @@ public:
 	virtual composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) = 0;
 
 	// TODO: Fix this
-	virtual composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0) = 0;
+	virtual composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0) = 0;
 
 	virtual user *MakeUser() = 0;
 

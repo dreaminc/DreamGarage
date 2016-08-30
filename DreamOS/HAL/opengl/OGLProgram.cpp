@@ -5,7 +5,7 @@
 #include "OGLFramebuffer.h"
 #include "OGLTexture.h"
 
-#include "Scene/SceneGraph.h"
+#include "Scene/ObjectStore.h"
 
 OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
@@ -41,7 +41,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::SetLights(SceneGraph *pSceneGraph) {
+RESULT OGLProgram::SetLights(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
@@ -669,7 +669,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::RenderSceneGraph(SceneGraph *pSceneGraph) {
+RESULT OGLProgram::RenderSceneGraph(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 	
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();

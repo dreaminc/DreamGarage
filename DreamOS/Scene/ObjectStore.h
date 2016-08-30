@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Dimension/Scene/SceneGraph.h
+// DreamOS/Dimension/Scene/ObjectStore.h
 // The Scene Graph contains all of the objects in a given
 // scene and manages what is dispatched to the graphics pipeline
 // or processed by the physics engine
@@ -18,13 +18,13 @@
 
 // The different types of stores should be added here 
 
-class SceneGraph : public valid {
+class ObjectStore : public valid {
 public:
 
-	SceneGraph(OBJECT_STORE_TYPE type);
+	ObjectStore(OBJECT_STORE_TYPE type);
 	
-	SceneGraph();
-	~SceneGraph();
+	ObjectStore();
+	~ObjectStore();
 
 	RESULT Reset();
 

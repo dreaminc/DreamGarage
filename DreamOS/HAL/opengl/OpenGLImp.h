@@ -96,7 +96,7 @@ public:
 	hand* MakeHand();
 
 	// TODO: Fix w/ scene graph not here
-	composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
 
 public:
 	// TODO: Consolidate all of these (one Render function)
@@ -104,12 +104,12 @@ public:
 	RESULT SetStereoViewTarget(EYE_TYPE eye);
 	RESULT SetStereoFramebufferViewTarget(EYE_TYPE eye);
 
-	RESULT Render(SceneGraph *pSceneGraph);
-	RESULT RenderFlat(SceneGraph *pFlatSceneGraph);
+	RESULT Render(ObjectStore *pSceneGraph);
+	RESULT RenderFlat(ObjectStore *pFlatSceneGraph);
 
-	RESULT RenderStereo(SceneGraph *pSceneGraph);
-	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
-	RESULT RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph);
+	RESULT RenderStereo(ObjectStore *pSceneGraph);
+	RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph);
+	RESULT RenderStereoFramebuffersFlat(ObjectStore *pFlatSceneGraph);
 
 	RESULT RenderFlush();
 
