@@ -64,11 +64,30 @@ public:
 		return projMat;
 	}
 
+	virtual point GetOrigin() override {
+		point eyePos = GetEyePosition(EYE_MONO);
+
+		if (m_pHMD != nullptr) {
+			eyePos += m_pHMD->GetHeadPointOrigin();
+		}
+
+		return eyePos;
+	}
+
+	virtual point GetPosition() override {
+		point eyePos = GetEyePosition(EYE_MONO);
+
+		if (m_pHMD != nullptr) {
+			eyePos += m_pHMD->GetHeadPointOrigin();
+		}
+
+		return eyePos;
+	}
+
 	ViewMatrix GetViewMatrix(EYE_TYPE eye) {
 		ViewMatrix mat;
 
 		point eyePos = GetEyePosition(eye);
-
 
 		// TODO: Fix this
 		if (m_pHMD != nullptr) {
