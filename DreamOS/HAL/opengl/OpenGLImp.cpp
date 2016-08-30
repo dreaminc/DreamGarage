@@ -826,12 +826,10 @@ RESULT OpenGLImp::RenderFlat(SceneGraph *pFlatSceneGraph) {
 	VirtualObj *pVirtualObj = NULL;
 
 	CRM(m_pOGLUIProgram->UseProgram(), "Failed to use OGLProgram");
-	//CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
 	// Camera Projection Matrix
 	SetMonoViewTarget();
 	CR(m_pOGLUIProgram->SetCamera(m_pCamera));
-	//CR(m_pOGLRenderProgram->SetCamera(m_pCamera));
 
 	// Send SceneGraph objects to shader
 	pFlatSceneGraph->Reset();
@@ -842,7 +840,6 @@ RESULT OpenGLImp::RenderFlat(SceneGraph *pFlatSceneGraph) {
 			continue;
 		else {
 			CR(m_pOGLUIProgram->RenderObject(pDimObj));
-			//CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 		}
 	}
 
@@ -924,23 +921,16 @@ Error:
 
 RESULT OpenGLImp::RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) {
 	RESULT r = R_PASS;
-//	RenderStereoFramebuffers(pFlatSceneGraph);
 	SceneGraphStore *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
 	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
 
 	for (int i = 0; i < 2; i++) {
 		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
 
-		//CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
-		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+		CRM(m_pOGLUIProgram->UseProgram(), "Failed to use OGLProgram");
 
-		//SetStereoFramebufferViewTarget(eye);
-		//SetCameraMatrix(eye);
 		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
 
 		pFlatSceneGraph->Reset();
@@ -951,8 +941,7 @@ RESULT OpenGLImp::RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) {
 			if (pDimObj == NULL)
 				continue;
 			else {
-				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
-				//CR(m_pOGLOverlayProgram->RenderObject(pDimObj));
+				CR(m_pOGLUIProgram->RenderObject(pDimObj));
 			}
 		}		
 
@@ -960,18 +949,15 @@ RESULT OpenGLImp::RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph) {
 		//m_pHMD->CommitSwapChain(eye);
 	}
 
-	//glFlush();
-
 Error:
 	return r;
 }
 
 // TODO: Naming is kind of lame since this hits the HMD
 // TODO: Shared code should be consolidated
-RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph, SceneGraph *pFlatSceneGraph) {
+RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph) {
 	RESULT r = R_PASS;
 	SceneGraphStore *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	SceneGraphStore *pFlatObjectStore = pFlatSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 	
 	// Send lights to shader
@@ -1038,19 +1024,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph, SceneGraph *
 				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 			}
 		}		
-/*
-		pFlatSceneGraph->Reset();
-		while ((pVirtualObj = pFlatObjectStore->GetNextObject()) != NULL) {
 
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-			if (pDimObj == NULL)
-				continue;
-			else {
-				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
-			}
-		}		
-*/
 		skybox *pSkybox = nullptr;
 		CR(pObjectStore->GetSkybox(pSkybox));
 		if (pSkybox != nullptr) {
@@ -1066,34 +1040,9 @@ RESULT OpenGLImp::RenderStereoFramebuffers(SceneGraph *pSceneGraph, SceneGraph *
 			m_pOGLProfiler->Render();
 		}
 
-		//m_pHMD->UnsetRenderSurface(eye);
-		//m_pHMD->CommitSwapChain(eye);
-	}
-///*
-	for (int i = 0; i < 2; i++) {
-		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
-
-		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
-		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
-		m_pHMD->SetAndClearRenderSurface(eye);
-
-		pFlatSceneGraph->Reset();
-		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-			if (pDimObj == NULL)
-				continue;
-			else {
-				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
-			}
-		}		
 		m_pHMD->UnsetRenderSurface(eye);
 		m_pHMD->CommitSwapChain(eye);
 	}
-//	*/
-//	glFlush();
 
 Error:
 	return r;

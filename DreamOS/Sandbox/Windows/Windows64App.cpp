@@ -665,11 +665,12 @@ RESULT Windows64App::Show() {
 
 		///*
 		// Send to the HMD
+		// TODO reorganize Render functions
+		// need to be re-architected so that the HMD functions are called after all of the 
+		// gl functions per eye.
 		if (m_pHMD != nullptr) {
 			//m_pHALImp->RenderStereoFramebuffersFlat(m_pFlatSceneGraph);
-			m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph, m_pFlatSceneGraph);
-			m_pHALImp->RenderFlush();
-			//glFlush();
+			m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}
@@ -677,11 +678,9 @@ RESULT Windows64App::Show() {
 			// Render Scene
 			m_pHALImp->Render(m_pSceneGraph);
 			m_pHALImp->RenderFlat(m_pFlatSceneGraph);
-			m_pHALImp->RenderFlush();
-			//glFlush();
-			//m_pHALImp->RenderStereo(m_pSceneGraph);
 		}
 		//*/
+		m_pHALImp->RenderFlush();
 	
 		// Swap buffers
 		SwapBuffers(m_hDC);

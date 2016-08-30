@@ -1,8 +1,6 @@
 #include "DreamGarage.h"
 #include <string>
 
-#include "Profiler\DebugConsole.h"
-
 //quad *g_pQuad;
 
 light *g_pLight = nullptr;
@@ -77,15 +75,13 @@ RESULT DreamGarage::LoadScene() {
 
 	//quad *pQuad = AddQuad(100.0f, 100.0f);
 
-	std::shared_ptr<DebugData> q = DebugConsole::GetDebugConsole()->Register();
-
 //	quad *pFQuad = AddQuad(1.0f, 1.0f);
 	quad *pFQuad = AddFlatQuad(1.0f, 1.0f);
-	pFQuad->MoveTo(1.0f, 1.0f, 1.0f);
+	pFQuad->MoveTo(0.0f, 0.0f, 0.0f);
+	pFQuad->RotateXByDeg(90.0f);
 	pFQuad->SetColorTexture(pColorTextureCobble);
 	//pFQuad->RotateXByDeg(180.0f);
 
-	q->SetValue(std::to_string(pFQuad->GetOrigin().x()));
 	/*
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
 	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));

@@ -29,6 +29,7 @@ public:
 
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTexture), std::string("u_hasTexture")));
 
@@ -62,17 +63,23 @@ public:
 	}
 
 	RESULT SetCameraUniforms(camera *pCamera) {
+		auto matP = pCamera->GetProjectionMatrix();
 		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 		if (m_pUniformViewProjectionMatrix)
 			m_pUniformViewProjectionMatrix->SetUniform(matVP);
+		
+		m_pUniformProjectionMatrix->SetUniform(matP);
 
 		return R_PASS;
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
-		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
+		auto matP = pStereoCamera->GetProjectionMatrix(eye);
+		auto matVP = matP * pStereoCamera->GetViewMatrix(eye);
 		if (m_pUniformViewProjectionMatrix)
 			m_pUniformViewProjectionMatrix->SetUniform(matVP);
+
+		m_pUniformProjectionMatrix->SetUniform(matP);
 
 		return R_PASS;
 	}
@@ -84,6 +91,7 @@ private:
 
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+	OGLUniformMatrix4 *m_pUniformProjectionMatrix;
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
 	OGLUniformBool *m_pUniformHasTexture;

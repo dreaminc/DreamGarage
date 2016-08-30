@@ -108,7 +108,7 @@ public:
 	RESULT RenderFlat(SceneGraph *pFlatSceneGraph);
 
 	RESULT RenderStereo(SceneGraph *pSceneGraph);
-	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph, SceneGraph *pFlatSceneGraph);
+	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
 	RESULT RenderStereoFramebuffersFlat(SceneGraph *pFlatSceneGraph);
 
 	RESULT RenderFlush();

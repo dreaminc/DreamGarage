@@ -17,10 +17,6 @@
 #include "ObjectStoreFactory.h"
 
 // The different types of stores should be added here 
-enum SCENE_GRAPH_STORE_TYPE {
-	SCENE_GRAPH_STORE_LIST,
-	SCENE_GRAPH_STORE_INVALID
-};
 
 class SceneGraph : public valid {
 public:
