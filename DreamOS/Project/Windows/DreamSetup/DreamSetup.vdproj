@@ -1688,7 +1688,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Dream"
         "ProductCode" = "8:{EFBBE729-3AB9-4479-AB1B-FA50F935F50B}"
-        "PackageCode" = "8:{CE26D6C8-5C7A-46A1-BBF3-D638A7CA9CCF}"
+        "PackageCode" = "8:{CE845054-25FD-4287-B714-D8CB7FA4B303}"
         "UpgradeCode" = "8:{9E4013FF-9949-471E-9B8D-67958A95FB31}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1788,6 +1788,140 @@
             {
                 "Keys"
                 {
+                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_EFEFE2F54A1344E0A8FFF98275A0AC93"
+                    {
+                    "Name" = "8:dreamos"
+                    "Condition" = "8:"
+                    "AlwaysCreate" = "11:FALSE"
+                    "DeleteAtUninstall" = "11:TRUE"
+                    "Transitive" = "11:FALSE"
+                        "Keys"
+                        {
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_6178169A4BD74E8197A983063DDFB9DE"
+                            {
+                            "Name" = "8:shell"
+                            "Condition" = "8:"
+                            "AlwaysCreate" = "11:FALSE"
+                            "DeleteAtUninstall" = "11:TRUE"
+                            "Transitive" = "11:FALSE"
+                                "Keys"
+                                {
+                                    "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_321BD95A2B5B4F699EC119BA96E46C84"
+                                    {
+                                    "Name" = "8:open"
+                                    "Condition" = "8:"
+                                    "AlwaysCreate" = "11:FALSE"
+                                    "DeleteAtUninstall" = "11:TRUE"
+                                    "Transitive" = "11:FALSE"
+                                        "Keys"
+                                        {
+                                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_F551CBA91B9A447CBC2A081A39C9022E"
+                                            {
+                                            "Name" = "8:command"
+                                            "Condition" = "8:"
+                                            "AlwaysCreate" = "11:FALSE"
+                                            "DeleteAtUninstall" = "11:TRUE"
+                                            "Transitive" = "11:FALSE"
+                                                "Keys"
+                                                {
+                                                }
+                                                "Values"
+                                                {
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_137C216E36E9433EBDCBA757109282E1"
+                                                    {
+                                                    "Name" = "8:works"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:2"
+                                                    "Value" = "8:%DREAMOSPATH%DreamOS.exe \"%1\""
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_481A359198D24FA5B890A3A2A697B5B6"
+                                                    {
+                                                    "Name" = "8:hhhh"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:%DREAMOSPATH%DreamOS.exe \"%1\""
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8624D4E4F32846AF9FC4CA8464981D44"
+                                                    {
+                                                    "Name" = "8:bl"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:2"
+                                                    "Value" = "8:%DREAMOSPATH%"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8DD5F00FB569437F9A5EB21044CC2842"
+                                                    {
+                                                    "Name" = "8:"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:[TARGETDIR]DreamOS.exe \"%1\"'"
+                                                    }
+                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C9984F62720C482EBC3877820C8FD8AA"
+                                                    {
+                                                    "Name" = "8:ff"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "ValueTypes" = "3:1"
+                                                    "Value" = "8:%DREAMOSPATH%"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        "Values"
+                                        {
+                                        }
+                                    }
+                                }
+                                "Values"
+                                {
+                                }
+                            }
+                            "{60EA8692-D2D5-43EB-80DC-7906BF13D6EF}:_709C75103E3148A2AD2127D2A5059AFD"
+                            {
+                            "Name" = "8:DefaultIcon"
+                            "Condition" = "8:"
+                            "AlwaysCreate" = "11:FALSE"
+                            "DeleteAtUninstall" = "11:TRUE"
+                            "Transitive" = "11:FALSE"
+                                "Keys"
+                                {
+                                }
+                                "Values"
+                                {
+                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_A306E631971E41C6BDC6EE16CFD81338"
+                                    {
+                                    "Name" = "8:"
+                                    "Condition" = "8:"
+                                    "Transitive" = "11:FALSE"
+                                    "ValueTypes" = "3:1"
+                                    "Value" = "8:\"dreamos.exe,1\""
+                                    }
+                                }
+                            }
+                        }
+                        "Values"
+                        {
+                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_655D8E939E37482E8B3B2A36747A81DB"
+                            {
+                            "Name" = "8:URL Protocol"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "ValueTypes" = "3:1"
+                            "Value" = "8:\"\""
+                            }
+                            "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_A5DF7DCB82384B69941F5420051DFBBB"
+                            {
+                            "Name" = "8:"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "ValueTypes" = "3:1"
+                            "Value" = "8:\"URL:Dream OS Protocol\""
+                            }
+                        }
+                    }
                 }
             }
             "HKU"
