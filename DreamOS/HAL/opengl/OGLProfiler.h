@@ -55,6 +55,9 @@ public:
 	template<typename T>
 	void Render(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, double vScale = 1.0);
 
+	template<typename T>
+	void Render(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, T minValue, T maxValue);
+
 	void Destroy();
 
 private:
@@ -76,6 +79,10 @@ public:
 
 private:
 	std::unique_ptr<OGLText>	m_OGLConsoleText;
+
+	std::unique_ptr<OGLQuad>	m_OGLTextBackground;
+
+	std::unique_ptr<OGLTriangle>	m_OGLTriangle;
 };
 
 class OGLProfiler : public OGLRenderContext {

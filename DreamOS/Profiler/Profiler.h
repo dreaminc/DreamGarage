@@ -54,7 +54,7 @@ public:
 private:
 
 	TickCounter	m_ticker;
-	FPSGraph_t m_FPSGraph{ 5.0 };
+	FPSGraph_t m_FPSGraph{ 3.0 };
 
 	std::deque<std::string>	m_ConsoleText;
 	const unsigned int console_max_lines = 200;

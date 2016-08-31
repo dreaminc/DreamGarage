@@ -45,6 +45,14 @@ RESULT text::SetText(const std::string& text, double size)
 	m_width = 0.0f;
 	float max_below = 0.0f;
 	float max_above = 0.0f;
+
+	bool  first_char = true;
+
+	float min_left = 0.0f;
+	float max_right = 0.0f;
+	float min_top = 0.0f;
+	float max_bottom = 0.0f;
+
 	for_each(text.begin(), text.end(), [&](char c) {
 		Font::CharacterGlyph glyph;
 		if (m_font->GetGlyphFromChr(c, glyph))
@@ -60,15 +68,30 @@ RESULT text::SetText(const std::string& text, double size)
 			vector_precision dxs = XSCALE_TO_SCREEN(glyph.xoffset);
 			vector_precision dys = YSCALE_TO_SCREEN(glyphBase - glyph.yoffset) - dy / 2.0f;
 
+			if (first_char)
+			{
+				first_char = false;
+
+				min_left = posx + dxs;
+				max_right = dx + posx + dxs;
+				min_top = dys - dy / 2.0f;
+				max_bottom = dys + dy / 2.0f;
+			}
+			else
+			{
+				min_left = std::min(min_left, posx + dxs);
+				max_right = std::max(max_right, dx + posx + dxs);
+				min_top = std::min(min_top, dys - dy / 2.0f);
+				max_bottom = std::min(max_bottom, dys + dy / 2.0f);
+			}
+
 			quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs, dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
 			posx += XSCALE_TO_SCREEN(glyph.xadvance);
-
-			m_width += (c == text.back()) ? XSCALE_TO_SCREEN(glyph.xadvance) :
-				XSCALE_TO_SCREEN(glyph.width);
-
-			m_height = (dys > m_height) ? dys : m_height;
 		}
 	});
+
+	m_width = max_right - min_left;
+	m_height = max_bottom - min_top;
 
 	unsigned int verticesCnt = 0;
 	unsigned int indicesCnt = 0;
