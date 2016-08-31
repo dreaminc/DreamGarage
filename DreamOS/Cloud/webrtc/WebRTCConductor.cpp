@@ -1,7 +1,7 @@
 #include "WebRTCConductor.h"
 
 #include "WebRTCImp.h"
-#include "WebRTCClient.h"
+//#include "WebRTCClient.h"
 
 #include <memory>
 #include <utility>
@@ -17,6 +17,8 @@
 
 #include "webrtc/api/test/fakertccertificategenerator.h"
 #include "webrtc/p2p/base/fakeportallocator.h"
+
+#include "WebRTCPeerConnection.h"
 
 // Names used for a IceCandidate JSON object.
 const char kCandidateSdpMidName[] = "sdpMid";
@@ -47,10 +49,10 @@ protected:
 	~DummySetSessionDescriptionObserver() {}
 };
 
-WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp) :
+WebRTCConductor::WebRTCConductor(WebRTCImp *pParentWebRTCImp) :
 	m_pParentWebRTCImp(pParentWebRTCImp),
-	m_pWebRTCClient(pWebRTCClient),
-	m_pWebRTCPeerConnection(nullptr),
+	//m_pWebRTCClient(pWebRTCClient),
+	//m_pWebRTCPeerConnection(nullptr),
 	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_WebRTCPeerID(-1),
 	m_fLoopback(false),
@@ -62,32 +64,68 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 		m_pWebRTCPeerConnectionFactory.release();
 	}
 
+	/*
 	if (m_pWebRTCPeerConnection.get() != nullptr) {
 		m_pWebRTCPeerConnection.release();
 	}
+	*/
 
 	ClearSessionDescriptionProtocol();
+	ClearPeerConnections();
+}
+
+RESULT WebRTCConductor::ClearPeerConnections() {
+	m_webRTCPeerConnections.clear();
+	return R_PASS;
+}
+
+RESULT WebRTCConductor::AddNewPeerConnection(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	CBM((FindPeerConnectionByID(peerConnectionID) == false), "Peer Conncetion ID %d already present");
+	std::shared_ptr<WebRTCPeerConnection> pWebRTCPeerConnection = std::make_shared<WebRTCPeerConnection>(peerConnectionID, m_pWebRTCPeerConnectionFactory);
+	CNM(pWebRTCPeerConnection, "Failed to allocate new peer connection");
+
+	m_webRTCPeerConnections.push_back(pWebRTCPeerConnection);
+
+Error:
+	return r;
+}
+
+std::shared_ptr<WebRTCPeerConnection> WebRTCConductor::GetPeerConnection(long peerConnectionID) {
+	for (auto &pWebRTCPeerConnection : m_webRTCPeerConnections) 
+		if (pWebRTCPeerConnection->GetPeerConnectionID() == peerConnectionID) 
+			return pWebRTCPeerConnection;
+
+	return nullptr;
+}
+
+bool WebRTCConductor::FindPeerConnectionByID(long peerConnectionID) {
+	if (GetPeerConnection(peerConnectionID) == nullptr) 
+		return false;
+	else 
+		return true;
 }
 
 WebRTCConductor::~WebRTCConductor() {
-	// empty
+	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
+		m_pWebRTCPeerConnectionFactory.release();
+	}
 }
 
 RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
-	
 	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
-
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 
 //Success:
 	return r;
 
 Error:
-	if (m_pWebRTCPeerConnectionFactory != nullptr) {
-		m_pWebRTCPeerConnectionFactory = nullptr;
+	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
+		m_pWebRTCPeerConnectionFactory.release();
 	}
 
 	return r;
@@ -188,32 +226,13 @@ void WebRTCConductor::OnIceConnectionReceivingChange(bool receiving) {
 
 void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
 	DEBUG_LINEOUT("OnIceCandidate: %s %d", candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
-	
-	// For loopback test. To save some connecting delay.
-	if (m_fLoopback) {
-		if (!m_pWebRTCPeerConnection->AddIceCandidate(candidate)) {
-			DEBUG_LINEOUT("Failed to apply the received candidate");
-		}
-		return;
-	}
 
-	// TODO: remove dead code
 	Json::StyledWriter writer;
 	Json::Value jmessage;
 
 	ICECandidate iceCandidate;
 	iceCandidate.m_SDPMediateLineIndex = candidate->sdp_mline_index();
 	iceCandidate.m_strSDPMediaID = candidate->sdp_mid();
-
-	/*
-	s_strSDPMediaID = candidate->sdp_mid();
-	s_SDPMediateLineIndex = candidate->sdp_mline_index();
-
-	jmessage[kCandidateSdpMidName] = s_strSDPMediaID;
-	jmessage[kCandidateSdpMlineIndexName] = s_SDPMediateLineIndex;
-
-	std::string strSDP;
-	*/
 	
 	if (!candidate->ToString(&(iceCandidate.m_strSDPCandidate))) {
 		LOG(LS_ERROR) << "Failed to serialize candidate";
@@ -221,15 +240,11 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 	}
 
 	m_iceCandidates.push_back(iceCandidate);
-
-	//jmessage[kCandidateSdpName] = s_strSDPCandidate;
-
-	//SendMessage(writer.write(jmessage));
-
-	// TODO: was doing this below
-	//SendMessageToPeer(&(writer.write(jmessage)), m_WebRTCPeerID);
 }
 
+// TODO: Should be based on peer connection ID not peer ID
+// This is removed (webrtc client code)
+/*
 RESULT WebRTCConductor::SendMessageToPeer(std::string* strMessage, int peerID) {
 	RESULT r = R_PASS;
 
@@ -243,11 +258,15 @@ RESULT WebRTCConductor::SendMessageToPeer(std::string* strMessage, int peerID) {
 Error:
 	return r;
 }
+*/
 
+/*
+// Also removed, not using the UI Callback anymore
 void WebRTCConductor::SendMessage(const std::string& strJSONObject) {
 	std::string* msg = new std::string(strJSONObject);
 	m_pParentWebRTCImp->QueueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
 }
+*/
 
 RESULT WebRTCConductor::PrintSDP() {
 	DEBUG_LINEOUT("WebRTCConductor: SDP:");
@@ -286,6 +305,8 @@ std::string WebRTCConductor::GetSDPJSONString() {
 	return strReturn;
 }
 
+/*
+// This code removed 
 // TODO: This doesn't actually work
 void WebRTCConductor::UIThreadCallback(int msgID, void* data) {
 	//RESULT r = R_PASS;
@@ -297,6 +318,7 @@ void WebRTCConductor::UIThreadCallback(int msgID, void* data) {
 //Error:
 	return;
 }
+*/
 
 // OnSuccess called when PeerConnection established 
 void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) {
@@ -312,16 +334,7 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDesc
 
 	CR(PrintSDP());
 
-	// For loopback test. To save some connecting delay.
-	if (m_fLoopback) {
-		// Replace message type from "offer" to "answer"
-		webrtc::SessionDescriptionInterface* pWebRTCSessionDescription(webrtc::CreateSessionDescription("answer", m_strSessionDescriptionProtocol, nullptr));
-		m_pWebRTCPeerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), pWebRTCSessionDescription);
-		return;
-	}
-
 	// TODO: peer ID stuff
-
 	if (m_fOffer) {
 		CR(m_pParentWebRTCImp->OnSDPOfferSuccess());
 	}

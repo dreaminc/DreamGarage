@@ -1994,6 +1994,9 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

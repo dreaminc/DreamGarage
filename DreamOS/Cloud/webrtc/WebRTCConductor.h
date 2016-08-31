@@ -22,6 +22,7 @@
 
 class WebRTCImp;
 class WebRTCClient;
+class WebRTCPeerConnection;
 
 // TODO: flesh out the class + move to other file
 class ICECandidate {
@@ -70,7 +71,7 @@ public:
 	std::list<ICECandidate> GetCandidates();
 
 public:
-	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
+	WebRTCConductor(WebRTCImp *pParentWebRTCImp);
 	~WebRTCConductor();
 	
 	RESULT Initialize();
@@ -117,7 +118,7 @@ protected:
 
 protected:
 	// Send a message to the remote peer.
-	void SendMessage(const std::string& json_object);
+	//void SendMessage(const std::string& json_object);
 
 	RESULT CreatePeerConnection(bool dtls);
 	RESULT DeletePeerConnection();
@@ -134,7 +135,7 @@ protected:
 	RESULT AddDataChannel();
 
 	RESULT CreateOffer();
-	RESULT SendMessageToPeer(std::string* strMessage, int peerID);
+	//RESULT SendMessageToPeer(std::string* strMessage, int peerID);
 
 private:
 	// Utility (TODO: Move this elsewhere?)
@@ -147,34 +148,23 @@ private:
 	std::string GetSDPTypeString();
 
 public:
+	RESULT ClearPeerConnections();
+	RESULT AddNewPeerConnection(long peerConnectionID);
+	std::shared_ptr<WebRTCPeerConnection> GetPeerConnection(long peerConnectionID);
+	bool FindPeerConnectionByID(long peerConnectionID);
+
+	// TODO: Replace this with PeerConnection ID
+	int GetPeerConnectionID() { return m_WebRTCPeerID; }
 	RESULT SetPeerConnectionID(int peerID) {
 		m_WebRTCPeerID = peerID;
 		return R_PASS;
 	}
 
-	int GetPeerConnectionID() {
-		return m_WebRTCPeerID;
-	}
-
-	void UIThreadCallback(int msgID, void* data);
-
-private:
-	class WebRTCPeerConnection {
-	public:
-		WebRTCPeerConnection() :
-			m_peerConnectionID(-1),
-			m_pWebRTCPeerConnection(nullptr)
-		{
-			// empty for now
-		}
-
-		long m_peerConnectionID;
-		rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
-	};
+	//void UIThreadCallback(int msgID, void* data);
 
 private:
 	WebRTCImp *m_pParentWebRTCImp;
-	WebRTCClient *m_pWebRTCClient;
+	//WebRTCClient *m_pWebRTCClient;
 
 	int m_WebRTCPeerID;
 	bool m_fLoopback;
@@ -183,13 +173,15 @@ private:
 	bool m_fSDPSet;	// TODO: temp
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
-	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
+	//rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
+
+	// TODO: only use this and remove the above
+	std::vector<std::shared_ptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
 
 	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCActiveStreams;
 	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCActiveDataChannels;
 
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
-
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
 
 	std::string m_strWebRTCServer;

@@ -757,6 +757,7 @@
     <ClInclude Include="..\..\..\Cloud\User\User.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserController.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h" />
     <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
