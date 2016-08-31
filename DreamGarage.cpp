@@ -211,7 +211,7 @@ RESULT DreamGarage::SendHeadPosition() {
 	point ptPosition = GetCameraPosition();
 	
 	// Force a starting height for now since position is getting messed with
-	ptPosition.y() += 2.0f;
+	ptPosition.y() = 0.0f;
 
 	quaternion qOrientation = GetCameraOrientation();
 
