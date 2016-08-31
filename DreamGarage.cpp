@@ -209,9 +209,7 @@ RESULT DreamGarage::SendHeadPosition() {
 	RESULT r = R_PASS;
 
 	point ptPosition = GetCameraPosition();
-	
-	// Force a starting height for now since position is getting messed with
-	ptPosition.y() = 0.0f;
+	ptPosition.y() *= -1.0f;	// TODO: This is an issue with the OVR position 
 
 	quaternion qOrientation = GetCameraOrientation();
 
