@@ -85,6 +85,11 @@ light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOr
 	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
+FlatContext* DreamOS::AddFlatContext()
+{
+	return m_pSandbox->AddFlatContext();
+}
+
 sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }

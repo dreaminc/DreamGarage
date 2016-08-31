@@ -87,13 +87,13 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::AddFlatObject(VirtualObj *pObject) {
+FlatContext* SandboxApp::AddFlatContext() {
 	RESULT r = R_PASS;
 
-	CR(m_pFlatSceneGraph->PushObject(pObject));
-
+	FlatContext* context = m_pHALImp->MakeFlatContext();
+	CR(m_pFlatSceneGraph->PushObject(context));
 Error:
-	return r;
+	return context;
 }
 
 light* SandboxApp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
@@ -146,7 +146,7 @@ quad* SandboxApp::AddFlatQuad(double width, double height, int numHorizontalDivi
 	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 	CN(pQuad);
 
-	CR(AddFlatObject(pQuad));
+	CR(AddObject(pQuad));
 
 //Success:
 	return pQuad;

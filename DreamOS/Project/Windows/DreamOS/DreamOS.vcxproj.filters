@@ -389,6 +389,9 @@
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpFlatList.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\FlatContext.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1969,9 +1972,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\FlatObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -1989,6 +1989,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Scene\ObjectStoreImpFlatList.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\FlatContext.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

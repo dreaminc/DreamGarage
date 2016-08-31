@@ -16,6 +16,7 @@ class HALImp;
 
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
+#include "quad.h"
 
 class hand;
 
@@ -42,8 +43,11 @@ public:
 	std::shared_ptr<composite> MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY);
 	std::shared_ptr<composite> AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY);
 
-	std::shared_ptr<hand> AddHand();
 	std::shared_ptr<hand> MakeHand();
+	std::shared_ptr<hand> AddHand();
+
+	std::shared_ptr<quad> MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
+	std::shared_ptr<quad> AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 
 	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 

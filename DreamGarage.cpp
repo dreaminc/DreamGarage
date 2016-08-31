@@ -76,10 +76,25 @@ RESULT DreamGarage::LoadScene() {
 	//quad *pQuad = AddQuad(100.0f, 100.0f);
 
 //	quad *pFQuad = AddQuad(1.0f, 1.0f);
+	/*
 	quad *pFQuad = AddFlatQuad(1.0f, 1.0f);
 	pFQuad->MoveTo(0.0f, 0.0f, 0.0f);
 	pFQuad->RotateXByDeg(90.0f);
 	pFQuad->SetColorTexture(pColorTextureCobble);
+	*/
+	FlatContext *pContext = AddFlatContext();
+	//pContext->MoveTo(0.5f, 0.5f, 0.0f);
+	std::shared_ptr<quad> pFQuad2 = pContext->AddQuad(0.5f, 0.5f);
+	pFQuad2->MoveTo(0.5f, 0.5f, 0.0f);
+	pFQuad2->RotateXByDeg(90.0f);
+	pFQuad2->SetColorTexture(pColorTexture);
+
+	std::shared_ptr<quad> pFQuad = pContext->AddQuad(1.0f, 1.0f);
+	pFQuad->MoveTo(0.0f, 0.0f, 0.0f);
+	pFQuad->RotateXByDeg(90.0f);
+	pFQuad->SetColorTexture(pColorTextureCobble);
+
+	
 	//pFQuad->RotateXByDeg(180.0f);
 
 	/*

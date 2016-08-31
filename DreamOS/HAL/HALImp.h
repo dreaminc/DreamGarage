@@ -21,6 +21,7 @@
 #include "Primitives/stereocamera.h"
 #include "Primitives/light.h"
 #include "Primitives/quad.h"
+#include "Primitives/FlatContext.h"
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
@@ -79,6 +80,7 @@ public:
 	virtual user *MakeUser() = 0;
 
 	virtual composite *MakeComposite() = 0;
+	virtual FlatContext* MakeFlatContext() = 0;
 	virtual hand* MakeHand() = 0;
 
 	/*

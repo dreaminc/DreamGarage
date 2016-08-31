@@ -92,6 +92,7 @@ public:
 	composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY);
 
 	composite *MakeComposite();
+	FlatContext* MakeFlatContext();
 	user *MakeUser();
 	hand* MakeHand();
 

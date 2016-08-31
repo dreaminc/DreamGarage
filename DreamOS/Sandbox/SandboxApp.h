@@ -27,6 +27,7 @@
 
 class light; 
 class quad;
+class FlatContext;
 class sphere; 
 class volume; 
 class texture; 
@@ -68,7 +69,7 @@ public:
 
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
-	RESULT AddFlatObject(VirtualObj *pObject);
+	FlatContext* AddFlatContext();
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));

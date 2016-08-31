@@ -544,6 +544,23 @@ Error:
 	return nullptr;
 }
 
+FlatContext *OpenGLImp::MakeFlatContext() {
+	RESULT r = R_PASS;
+
+	FlatContext *pFlatContext = new FlatContext(this);
+	CN(pFlatContext);
+
+//Success:
+	return pFlatContext;
+
+Error:
+	if (pFlatContext!= nullptr) {
+		delete pFlatContext;
+		pFlatContext = nullptr;
+	}
+	return nullptr;
+}
+
 user *OpenGLImp::MakeUser() {
 	RESULT r = R_PASS;
 
