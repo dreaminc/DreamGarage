@@ -159,6 +159,20 @@ public:
 	void UIThreadCallback(int msgID, void* data);
 
 private:
+	class WebRTCPeerConnection {
+	public:
+		WebRTCPeerConnection() :
+			m_peerConnectionID(-1),
+			m_pWebRTCPeerConnection(nullptr)
+		{
+			// empty for now
+		}
+
+		long m_peerConnectionID;
+		rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
+	};
+
+private:
 	WebRTCImp *m_pParentWebRTCImp;
 	WebRTCClient *m_pWebRTCClient;
 
