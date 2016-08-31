@@ -73,7 +73,7 @@ RESULT DreamGarage::LoadScene() {
 	// Add Peer User Object
 	m_pPeerUser = AddUser();
 
-	quad *pQuad = AddQuad(100.0f, 100.0f);
+	//quad *pQuad = AddQuad(100.0f, 100.0f);
 
 	/*
 	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
@@ -209,6 +209,8 @@ RESULT DreamGarage::SendHeadPosition() {
 	RESULT r = R_PASS;
 
 	point ptPosition = GetCameraPosition();
+	ptPosition.y() *= -1.0f;	// TODO: This is an issue with the OVR position 
+
 	quaternion qOrientation = GetCameraOrientation();
 
 	CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
@@ -272,6 +274,7 @@ RESULT DreamGarage::Update(void) {
 
 	// Head update
 	// TODO: this should go up into DreamOS or even sandbox
+	///*
 	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHeadUpdateTime).count() > UPDATE_HEAD_COUNT_MS) {
@@ -285,6 +288,7 @@ RESULT DreamGarage::Update(void) {
 		SendHandPosition();
 		g_lastHandUpdateTime = timeNow;
 	}
+	//*/
 	
 	/*
 	static quaternion_precision theta = 0.0f;
@@ -305,6 +309,12 @@ RESULT DreamGarage::Update(void) {
 		qOrientation *= quaternion((quaternion_precision)(M_PI_4/2.0f), vector::jVector(1.0f));
 	*/
 
+	/*
+	quaternion qOrientation = quaternion((quaternion_precision)0.0f, vector::kVector(1.0f));;
+	qOrientation.RotateX(((quaternion_precision)(M_PI * 1.5f)));
+	m_pPeerUser->SetOrientation(qOrientation);
+	m_pPeerUser->SetPosition(point(0.0f, 2.0f, 0.0f));
+	//*/
 
 	//m_pPeerUser->SetOrientation(quaternion((quaternion_precision)0.0f, vector::kVector(1.0f)));
 	//m_pPeerUser->RotateYByDeg(180.0f);
@@ -332,6 +342,7 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
+	//qOrientation.Reverse();
 	qOrientation.RotateY(((quaternion_precision)(M_PI)));
 	m_pPeerUser->SetOrientation(qOrientation);
 

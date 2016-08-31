@@ -65,6 +65,7 @@
     <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -653,6 +654,7 @@
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCClient.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
@@ -701,6 +703,7 @@
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
     <ClCompile Include="..\..\..\Primitives\text.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
+    <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
     <ClCompile Include="..\..\..\Primitives\user.cpp" />
@@ -737,6 +740,8 @@
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
     <ClInclude Include="..\..\..\Cloud\Controller.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\PeerConnection.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h" />
     <ClInclude Include="..\..\..\Cloud\Message\Message.h" />
     <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
     <ClInclude Include="..\..\..\Cloud\Model.h" />
@@ -1035,6 +1040,7 @@
     <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
     <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\GUID.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Number.h" />
     <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h" />
     <ClInclude Include="..\..\..\Primitives\Types\Types.h" />

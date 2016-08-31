@@ -14,13 +14,14 @@
 
 #include "Environment.h"
 #include "EnvironmentPeer.h"
+#include "PeerConnectionController.h"
 
 class User;
 class Websocket;
 
 
 // TODO: This is actually a UserController - so change the name of object and file
-class EnvironmentController : public Controller{
+class EnvironmentController : public Controller, public PeerConnectionController::PeerConnectionControllerObserver {
 public:
 	enum class state {
 		UNINITIALIZED,
@@ -32,6 +33,14 @@ public:
 		ENVIRONMENT_PEER_LIST_REQUESTED,
 		ENVIRONMENT_PEER_LIST_RECEIVED,
 		ENVIRONMENT_CONNECTED_AND_READY,
+
+		// Peer Connection
+		// TODO: Move to Peer Connection?
+		SET_SDP_OFFER,
+		SET_SDP_ANSWER,
+		SET_OFFER_CANDIDATES,
+		SET_ANSWER_CANDIDATES,
+
 		INVALID
 	};
 
@@ -40,17 +49,39 @@ public:
 		CONNECT_SOCKET,
 		INVALID
 	};
+
+public:
+	class EnvironmentControllerObserver {
+	public:
+		virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+	};
+
+	RESULT RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver);
+
 public:
 	EnvironmentController(Controller* pParentController, long environmentID);
 	~EnvironmentController();
 
 public:
+	RESULT Initialize();
+
 	RESULT ConnectToEnvironmentSocket(User user);
-	RESULT CreateEnvironmentUser(User user);	
+	RESULT CreateEnvironmentUser(User user);	// TODO: This is deprecated
 	RESULT GetEnvironmentPeerList(User user);
+
+	// TODO: New Server Integration
+	nlohmann::json CreateEnvironmentMessage(User user, PeerConnection *pPeerConnection, std::string strMethod);
+	RESULT SetSDPOffer(User user, PeerConnection *pPeerConnection);
+	RESULT SetSDPAnswer(User user, PeerConnection *pPeerConnection);
+	RESULT SetOfferCandidates(User user, PeerConnection *pPeerConnection);
+	RESULT SetAnswerCandidates(User user, PeerConnection *pPeerConnection);
 
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
+
+	// TODO: Temporary 
+	RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
 
 private:
 	RESULT InitializeWebsocket(std::string& strURI);
@@ -66,8 +97,22 @@ private:
 	bool FindPeerByUserID(long userID);
 	EnvironmentPeer *GetPeerByUserID(long userID);
 	
-
 	std::string GetMethodURI(EnvironmentMethod userMethod);
+
+	// PeerConnectionControllerObserver
+	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
+
+public:
+	long GetEnvironmentID() { return m_environment.GetEnvironmentID(); }
+	RESULT SetEnvironmentID(long environmentID) { return m_environment.SetEnvironmentID(environmentID); }
+	bool IsUserIDConnected(long peerUserID);
+
+	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
+	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 public:
 	EnvironmentController::state GetState() {
@@ -85,6 +130,10 @@ private:
 	std::unique_ptr<Websocket> m_pEnvironmentWebsocket;
 
 	std::vector<EnvironmentPeer> m_environmentPeers;
+
+	std::unique_ptr<PeerConnectionController> m_pPeerConnectionController;
+
+	EnvironmentControllerObserver *m_pEnvironmentControllerObserver;
 };
 
 #endif	// ! ENVIRONMENT_CONTROLLER_H_

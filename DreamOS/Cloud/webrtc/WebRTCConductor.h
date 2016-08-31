@@ -23,6 +23,30 @@
 class WebRTCImp;
 class WebRTCClient;
 
+// TODO: flesh out the class + move to other file
+class ICECandidate {
+public:
+	ICECandidate(std::string strSDPCandidate = "", std::string strSDPMediaID = "", int sdpMediateLineIndex = -1) :
+		m_strSDPCandidate(strSDPCandidate),
+		m_strSDPMediaID(strSDPMediaID),
+		m_SDPMediateLineIndex(sdpMediateLineIndex)
+	{
+		// empty
+	}
+
+public:
+	std::string m_strSDPCandidate;
+	std::string m_strSDPMediaID;
+	int m_SDPMediateLineIndex;
+
+	RESULT Print() {
+		DEBUG_LINEOUT("candidate: %s", m_strSDPCandidate.c_str());
+		DEBUG_LINEOUT("Media ID: %s", m_strSDPMediaID.c_str());
+		DEBUG_LINEOUT("Media Line Index: %d", m_SDPMediateLineIndex);
+		return R_PASS;
+	}
+};
+
 class WebRTCConductor : 
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::CreateSessionDescriptionObserver,
@@ -42,17 +66,25 @@ public:
 	friend class WebRTCClient;
 
 public:
+	std::list<ICECandidate> m_iceCandidates;
+	std::list<ICECandidate> GetCandidates();
+
+public:
 	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
+	~WebRTCConductor();
 	
+	RESULT Initialize();
+
 	RESULT SendDataChannelStringMessage(std::string& strMessage);
 	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
-	RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
-	RESULT AddIceCandidates();
+	RESULT CreateSDPOfferAnswer(std::string strSDPOffer);
+	RESULT SetSDPAnswer(std::string strSDPAnswer);
+	RESULT AddIceCandidate(ICECandidate iceCandidate);
 
 protected:
 	// PeerConnectionObserver implementation.
-	void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override {};
+	void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override;
 
 	void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
@@ -111,6 +143,8 @@ private:
 	RESULT ClearSessionDescriptionProtocol();
 	RESULT PrintSDP();
 	std::string GetSDPJSONString();
+	std::string GetSDPString();
+	std::string GetSDPTypeString();
 
 public:
 	RESULT SetPeerConnectionID(int peerID) {
@@ -125,11 +159,28 @@ public:
 	void UIThreadCallback(int msgID, void* data);
 
 private:
+	class WebRTCPeerConnection {
+	public:
+		WebRTCPeerConnection() :
+			m_peerConnectionID(-1),
+			m_pWebRTCPeerConnection(nullptr)
+		{
+			// empty for now
+		}
+
+		long m_peerConnectionID;
+		rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
+	};
+
+private:
 	WebRTCImp *m_pParentWebRTCImp;
 	WebRTCClient *m_pWebRTCClient;
 
 	int m_WebRTCPeerID;
 	bool m_fLoopback;
+
+	bool m_fOffer;	// TODO: this needs to be generalized
+	bool m_fSDPSet;	// TODO: temp
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;

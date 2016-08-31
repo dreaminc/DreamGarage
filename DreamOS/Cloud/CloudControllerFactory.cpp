@@ -3,8 +3,6 @@
 #include "CEFImp.h"
 #include "webrtc/WebRTCImp.h"
 
-
-
 #include <memory>
 
 CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TYPE type, void *pContext = nullptr) {
@@ -15,7 +13,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	CN(pCloudController);
 
 	// Initialize the User Object
-	CR(pCloudController->InitializeUser());
+	CR(pCloudController->Initialize());
 
 	// TODO: Create a collection of cloud implementations
 	// or the various ones that can be used
