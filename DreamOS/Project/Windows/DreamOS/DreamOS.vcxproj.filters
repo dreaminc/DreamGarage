@@ -388,6 +388,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
       <Filter>Primitives\Types</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
+      <Filter>Main</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1987,6 +1990,10 @@
     <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
       <Filter>Primitives\Types</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamOSWinMain.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2116,5 +2123,15 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DreamOS.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Dream.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
