@@ -362,15 +362,6 @@
     <ClCompile Include="..\..\..\Primitives\hand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h">
       <Filter>Cloud\Message</Filter>
     </ClCompile>
@@ -388,9 +379,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
       <Filter>Primitives\Types</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
+      <Filter>External\OCULUS\v132\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
+      <Filter>External\OCULUS\v132\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
+      <Filter>External\OCULUS\v132\Logging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
