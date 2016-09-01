@@ -343,6 +343,12 @@
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
+        "Entry"
+        {
+        "MsmKey" = "8:_FE0FF208D8B242FFBCFF699E3CE7E4B8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
     }
     "Configurations"
     {
@@ -1510,6 +1516,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FE0FF208D8B242FFBCFF699E3CE7E4B8"
+            {
+            "SourcePath" = "8:..\\..\\WebLauncher\\DreamLauncher.html"
+            "TargetName" = "8:DreamLauncher.html"
+            "Tag" = "8:"
+            "Folder" = "8:_045A0A22BF694330828EBD3043035192"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
         }
         "FileType"
         {
@@ -1688,7 +1714,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Dream"
         "ProductCode" = "8:{EFBBE729-3AB9-4479-AB1B-FA50F935F50B}"
-        "PackageCode" = "8:{CE845054-25FD-4287-B714-D8CB7FA4B303}"
+        "PackageCode" = "8:{7E45D77C-3FB7-4151-9018-467F3CA3AA12}"
         "UpgradeCode" = "8:{9E4013FF-9949-471E-9B8D-67958A95FB31}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1827,30 +1853,6 @@
                                                 }
                                                 "Values"
                                                 {
-                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_137C216E36E9433EBDCBA757109282E1"
-                                                    {
-                                                    "Name" = "8:works"
-                                                    "Condition" = "8:"
-                                                    "Transitive" = "11:FALSE"
-                                                    "ValueTypes" = "3:2"
-                                                    "Value" = "8:%DREAMOSPATH%DreamOS.exe \"%1\""
-                                                    }
-                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_481A359198D24FA5B890A3A2A697B5B6"
-                                                    {
-                                                    "Name" = "8:hhhh"
-                                                    "Condition" = "8:"
-                                                    "Transitive" = "11:FALSE"
-                                                    "ValueTypes" = "3:1"
-                                                    "Value" = "8:%DREAMOSPATH%DreamOS.exe \"%1\""
-                                                    }
-                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8624D4E4F32846AF9FC4CA8464981D44"
-                                                    {
-                                                    "Name" = "8:bl"
-                                                    "Condition" = "8:"
-                                                    "Transitive" = "11:FALSE"
-                                                    "ValueTypes" = "3:2"
-                                                    "Value" = "8:%DREAMOSPATH%"
-                                                    }
                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_8DD5F00FB569437F9A5EB21044CC2842"
                                                     {
                                                     "Name" = "8:"
@@ -1858,14 +1860,6 @@
                                                     "Transitive" = "11:FALSE"
                                                     "ValueTypes" = "3:1"
                                                     "Value" = "8:[TARGETDIR]DreamOS.exe \"%1\"'"
-                                                    }
-                                                    "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_C9984F62720C482EBC3877820C8FD8AA"
-                                                    {
-                                                    "Name" = "8:ff"
-                                                    "Condition" = "8:"
-                                                    "Transitive" = "11:FALSE"
-                                                    "ValueTypes" = "3:1"
-                                                    "Value" = "8:%DREAMOSPATH%"
                                                     }
                                                 }
                                             }

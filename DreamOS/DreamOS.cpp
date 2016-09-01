@@ -30,8 +30,42 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 
-	// Initialize the sandbox
-	CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
+	// Check if Dream is launching from a web browser url.
+	// a url command from a webpage, to trigger the launch of Dream, woud start with 'dreamos:run' command line.
+	// The following code splites the whitespaces of a single command line param in that case, into a list of commad line arguments.
+	if ((argc > 1) && (std::string(argv[1]).substr(0, 11).compare("dreamos:run") == 0)) {
+		//  Dream is launching from a webpage
+
+		std::vector<std::string> args{argv[0]};
+		int new_argc = 1;
+
+		std::string cmdln = std::string(argv[1]); // The .exe location is the first argument
+
+		std::string arg;
+		std::stringstream ss(cmdln);
+
+		while (ss >> arg)
+		{
+			OutputDebugStringA(arg.c_str());
+			args.push_back(arg);
+			new_argc++;
+		}
+
+		char** new_argv = new char*[new_argc];
+
+		for (int i = 0; i < new_argc; i++)
+		{
+			new_argv[i] = new char;
+			new_argv[i] = (char*)args[i].c_str();
+		}
+
+		CRM(m_pSandbox->Initialize(new_argc, (const char**)new_argv), "Failed to initialize Sandbox");
+	}
+	else
+	{
+		// Initialize the sandbox
+		CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
+	}
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
