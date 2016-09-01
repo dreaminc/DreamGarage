@@ -392,6 +392,9 @@
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStoreImpSet.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1992,6 +1995,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\FlatContext.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImpSet.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

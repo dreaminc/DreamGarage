@@ -32,6 +32,7 @@ void main(void) {
 
 	// Projected Vert Position
 	vec4 transformedPosition = u_mat4Model * vec4(inV_vec4Position.x + xoffset, inV_vec4Position.y + yoffset, inV_vec4Position.z, 1.0f);
-	gl_Position = transformedPosition.xyww;
+	//gl_Position = transformedPosition.xyww;
+	gl_Position = vec4(transformedPosition.xy, 0.0f, 1.0f);
 	//gl_Position = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
 }
