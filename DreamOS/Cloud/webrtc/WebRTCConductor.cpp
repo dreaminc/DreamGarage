@@ -55,7 +55,7 @@ WebRTCConductor::WebRTCConductor(WebRTCImp *pParentWebRTCImp) :
 	//m_pWebRTCPeerConnection(nullptr),
 	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_WebRTCPeerID(-1),
-	m_fLoopback(false),
+	//m_fLoopback(false),
 	m_pDataChannelInterface(nullptr),
 	m_fOffer(false),
 	m_fSDPSet(false)
@@ -661,6 +661,8 @@ Error:
 	return r;
 }
 
+/*
+// This code shouldn't be used
 RESULT WebRTCConductor::ReinitializePeerConnectionForLoopback() {
 	RESULT r = R_PASS;
 
@@ -681,6 +683,7 @@ RESULT WebRTCConductor::ReinitializePeerConnectionForLoopback() {
 Error:
 	return r;
 }
+*/
 
 RESULT WebRTCConductor::CreatePeerConnection(bool dtls) {
 	RESULT r = R_PASS;
@@ -731,7 +734,7 @@ RESULT WebRTCConductor::DeletePeerConnection() {
 	m_pWebRTCPeerConnectionFactory = NULL;
 
 	m_WebRTCPeerID = -1;
-	m_fLoopback = false;
+	//m_fLoopback = false;
 
 //Error:
 	return r;

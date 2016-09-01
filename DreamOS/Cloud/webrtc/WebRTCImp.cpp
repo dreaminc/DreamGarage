@@ -155,7 +155,7 @@ Error:
 }
 
 // TODO: Data channel fucks it up
-RESULT WebRTCImp::InitializePeerConnection(bool fCreateOffer, bool fAddDataChannel) {
+RESULT WebRTCImp::InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer, bool fAddDataChannel /*= true*/) {
 	RESULT r = R_PASS;
 
 	CRM(m_pWebRTCConductor->InitializePeerConnection(fAddDataChannel), "Failed to initialize WebRTC Peer Connection");
@@ -331,7 +331,7 @@ RESULT WebRTCImp::ConnectToPeer(int peerID) {
 	CN(m_pWebRTCClient);
 
 	m_pWebRTCConductor->SetPeerConnectionID(peerID);
-	CRM(InitializePeerConnection(true), "WebRTCImp: ConnectToPeer failed to Initialzie Peer Connection");
+	CRM(InitializeNewPeerConnection(TODO,true), "WebRTCImp: ConnectToPeer failed to Initialzie Peer Connection");
 
 Error:
 	return r;

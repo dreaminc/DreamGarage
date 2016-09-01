@@ -123,7 +123,7 @@ protected:
 	RESULT CreatePeerConnection(bool dtls);
 	RESULT DeletePeerConnection();
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);
-	RESULT ReinitializePeerConnectionForLoopback();
+	//RESULT ReinitializePeerConnectionForLoopback();
 	cricket::VideoCapturer* OpenVideoCaptureDevice();
 
 	bool IsPeerConnectionInitialized();
@@ -167,7 +167,7 @@ private:
 	//WebRTCClient *m_pWebRTCClient;
 
 	int m_WebRTCPeerID;
-	bool m_fLoopback;
+	//bool m_fLoopback;
 
 	bool m_fOffer;	// TODO: this needs to be generalized
 	bool m_fSDPSet;	// TODO: temp
