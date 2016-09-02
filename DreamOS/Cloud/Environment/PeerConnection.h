@@ -261,7 +261,7 @@ public:
 		return R_PASS;
 	}
 
-	std::list<ICECandidate> GetAnswerCandidates() { return m_offerICECandidates; }
+	std::list<ICECandidate> GetAnswerCandidates() { return m_answerICECandidates; }
 	RESULT SetAnswerCandidates(std::list<ICECandidate> iceCandidates) {
 		m_answerICECandidates = iceCandidates;
 		return R_PASS;
