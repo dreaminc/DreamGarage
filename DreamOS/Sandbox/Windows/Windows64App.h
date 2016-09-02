@@ -55,6 +55,8 @@ public:
 	RESULT InitializeOpenGLRenderingContext();
 	RESULT InitializeCloudController();
 	RESULT InitializeHAL();
+	RESULT InitializeKeyboard();
+	RESULT InitializeMouse();
 
 private:
 	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
@@ -102,8 +104,8 @@ private:
 
 public:
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
-	Win64Keyboard *m_pWin64Keyboard;
-	Win64Mouse *m_pWin64Mouse;
+	//Win64Keyboard *m_pWin64Keyboard;
+	//Win64Mouse *m_pWin64Mouse;
 	HMD *m_pHMD;
 };
 

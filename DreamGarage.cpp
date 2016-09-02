@@ -15,6 +15,7 @@ RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 
 //	CloudController::HandleHeadUpdateMessageCallback fnHeadUpdateMessageCallback = static_cast<CloudController::HandleHeadUpdateMessageCallback>(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2));
 
+	CR(RegisterDataMessageCallback(std::bind(&DreamGarage::HandleDataMessage, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterHeadUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterHandUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHandMessage, this, std::placeholders::_1, std::placeholders::_2)));
 
@@ -27,6 +28,9 @@ RESULT DreamGarage::LoadScene() {
 
 	// TODO: This should go into an "initialize" function
 	InitializeCloudControllerCallbacks();
+
+	// IO
+	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
 	// Add lights
 
@@ -240,6 +244,29 @@ Error:
 	return r;
 }
 
+
+class SwitchHeadMessage : public Message {
+public:
+	SwitchHeadMessage(long senderUserID, long receiverUserID) :
+		Message(senderUserID, 
+				receiverUserID, 
+				(Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1), 
+				sizeof(SwitchHeadMessage))
+	{
+		// empty
+	}
+};
+
+RESULT DreamGarage::SendSwitchHeadMessage() {
+	RESULT r = R_PASS;
+
+	SwitchHeadMessage switchHeadMessage(NULL, NULL);
+	CR(SendDataMessage(NULL, &(switchHeadMessage)));
+
+Error:
+	return r;
+}
+
 // Head update time
 #define UPDATE_HEAD_COUNT_THROTTLE 90	
 #define UPDATE_HEAD_COUNT_MS ((1000.0f) / UPDATE_HEAD_COUNT_THROTTLE)
@@ -329,6 +356,19 @@ RESULT DreamGarage::Update(void) {
 }
 
 // Cloud Controller
+RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) {
+	RESULT r = R_PASS;
+
+	Message::MessageType switchHeadModelMessage = (Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1);
+
+	if (pDataMessage->GetType() == switchHeadModelMessage) {
+		CR(m_pPeerUser->SwitchHeadModel());
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
@@ -370,6 +410,21 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 
 	hand::HandState handState = pUpdateHandMessage->GetHandState();
 	m_pPeerUser->UpdateHand(handState);
+
+//Error:
+	return r;
+}
+
+RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
+	RESULT r = R_PASS;
+
+	switch (kbEvent->KeyCode) {
+		case (SK_SCAN_CODE)('C') : {
+			if (kbEvent->KeyState != 0) {
+				SendSwitchHeadMessage();
+			}
+		}
+	}
 
 //Error:
 	return r;

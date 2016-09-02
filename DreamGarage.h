@@ -10,8 +10,10 @@
 // which is the interface to the engine and platform layers for the application
 
 #include "DreamOS/DreamOS.h"
+#include "Sense/SenseKeyboard.h"
+#include "Sense/SenseMouse.h"
 
-class DreamGarage : public DreamOS {
+class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent> {
 public:
 	DreamGarage() {
 		// empty
@@ -24,13 +26,21 @@ public:
 	RESULT SendHeadPosition();
 	RESULT SendHandPosition();
 
+	// TODO: this is just a debug test temp
+	RESULT SendSwitchHeadMessage();
+
 	RESULT LoadScene();
 	RESULT Update(void);
 
 	// Cloud Controller
 	RESULT InitializeCloudControllerCallbacks();
+
+	RESULT HandleDataMessage(long senderUserID, Message *pDataMessage);
 	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
+
+	// SenseKeyboardEventSubscriber
+	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 
 private:
 

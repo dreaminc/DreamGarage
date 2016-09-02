@@ -83,12 +83,14 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	// TODO: Move into Sandbox virtual function
 	// Create the Keyboard and Mouse
+	/*
 	m_pWin64Keyboard = new Win64Keyboard(this);
 	m_pWin64Mouse = new Win64Mouse(this);
 
 	// Initialize Mouse 
 	m_pWin64Mouse->CaptureMouse();
 	m_pWin64Mouse->CenterMousePosition();
+	*/
 
 	// Sense Leap Motion Device (TODO: temporarily here!)
 	m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
@@ -115,6 +117,30 @@ Windows64App::~Windows64App() {
 		delete m_pTimeManager;
 		m_pTimeManager = nullptr;
 	}
+}
+
+RESULT Windows64App::InitializeKeyboard() {
+	RESULT r = R_PASS;
+
+	m_pSenseKeyboard = new Win64Keyboard(this);
+	CNM(m_pSenseKeyboard, "Failed to allocate keyboard");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeMouse() {
+	RESULT r = R_PASS;
+
+	m_pSenseMouse = new Win64Mouse(this);
+	CNM(m_pSenseMouse, "Failed to allocate mouse");
+
+	// Initialize Mouse 
+	CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
+	CRM(m_pSenseMouse->CenterMousePosition(), "Failed to center mouse position");
+
+Error:
+	return r;
 }
 
 RESULT Windows64App::InitializeHAL() {
@@ -299,14 +325,14 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Left mouse button down!");
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 
 		case WM_LBUTTONDBLCLK: {
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Left mouse button dbl click!");
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 		
 		case WM_RBUTTONUP:
@@ -314,7 +340,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Right mouse button down!");
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_RIGHT_BUTTON, xPos, yPos, (int)(wp));
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_RIGHT_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 
 		case WM_RBUTTONDBLCLK: {
@@ -330,7 +356,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Middle mouse button down!");
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_MIDDLE_BUTTON, xPos, yPos, (int)(wp));
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_MIDDLE_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 		
 		case WM_MBUTTONDBLCLK: {
@@ -347,7 +373,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Mousewheel %d!", wheel);
 			//m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, (int)(wp));
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, wheel);
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, wheel);
 		} break;
 
 		// Keyboard
@@ -358,21 +384,7 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
 			
 			// DEBUG: Bypass for connect to cloud
-			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('C')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					//m_pCloudController->ConnectToPeer(NULL);
-					m_pCloudController->InitializeConnection(true, true);
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('V')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					//m_pCloudController->ConnectToPeer(NULL);
-					m_pCloudController->InitializeConnection(false, true);
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
+			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
 					//m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
@@ -437,18 +449,18 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 	}
 	*/
 
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, pCamera));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, pCamera));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, pCamera));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, pCamera));
+	CR(RegisterSubscriber(VK_LEFT, pCamera));
+	CR(RegisterSubscriber(VK_UP, pCamera));
+	CR(RegisterSubscriber(VK_DOWN, pCamera));
+	CR(RegisterSubscriber(VK_RIGHT, pCamera));
 
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_SPACE, pCamera));
+	CR(RegisterSubscriber(VK_SPACE, pCamera));
 
 	for (int i = 0; i < 26; i++) {
-		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
+		CR(RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
 	}
 
-	CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
+	CR(RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
 	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
 
 Error:
@@ -460,9 +472,9 @@ RESULT Windows64App::RegisterImpMouseEvents() {
 
 	//camera *pCamera = m_pOpenGLImp->GetCamera();
 
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pHALImp));
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pHALImp));
 
 Error:
 	return r;
@@ -571,7 +583,11 @@ RESULT Windows64App::InitializeSandbox() {
 	//*/
 
 	// TODO: Move to Sandbox function
+	CRM(InitializeKeyboard(), "Failed to initialize keyboard");
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
+
+	// TODO: Move to Sandbox function
+	CRM(InitializeMouse(), "Failed to initialize mouse");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	// TODO: This will only turn on Leap if connected at boot up
@@ -613,11 +629,11 @@ RESULT Windows64App::Show() {
 				} break;
 
 				case WM_KEYDOWN: {
-					m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(msg.wParam), true);
+					m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(msg.wParam), true);
 				} break;
 
 				case WM_KEYUP: {
-					m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(msg.wParam), false);
+					m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(msg.wParam), false);
 				} break;
 			}
 

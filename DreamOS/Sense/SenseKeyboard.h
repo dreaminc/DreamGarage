@@ -62,6 +62,7 @@ public:
 		// empty stub
 	}
 
+	virtual RESULT UpdateKeyState(SK_SCAN_CODE key, uint8_t keyState) = 0;
 	RESULT SetKeyState(SK_SCAN_CODE KeyCode, uint8_t KeyState) {
 		RESULT r = R_PASS;
 

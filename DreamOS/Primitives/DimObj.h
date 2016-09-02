@@ -381,6 +381,32 @@ public:
 	Error:
 		return r;
 	}
+
+	// TODO: Should this moved up into vertex?
+	RESULT RotateVerticesByEulerVector(vector vEuler) {
+		RESULT r = R_PASS;
+
+		RotationMatrix rotMat(vEuler);
+
+		// point and normal
+		for (unsigned int i = 0; i < NumberVertices(); i++) {
+			m_pVertices[i].m_point = rotMat * m_pVertices[i].m_point;
+			m_pVertices[i].m_normal = rotMat * m_pVertices[i].m_normal;
+		}
+
+		// tangent bitangent
+		/*
+		// TODO:
+		for (unsigned int i = 0; i < NumberIndices(); i++) {
+			if (i % 3 == 0) {
+				SetTriangleTangentBitangent(m_pIndices[i - 3], m_pIndices[i - 2], m_pIndices[i - 1]);
+			}
+		}
+		*/
+
+	//Error:
+		return r;
+	}
 	
 	// TODO: This shoudln't be baked in here ultimately
 	RESULT Notify(TimeEvent *event) {

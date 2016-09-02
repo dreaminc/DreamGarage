@@ -110,6 +110,7 @@ public:
 		return R_PASS;
 	}
 
+	virtual RESULT UpdateMouseState(SenseMouseEventType eventType, int newX, int newY, int state) = 0;
 	RESULT SetMouseState(SenseMouseEventType eventType, int newX, int newY, int state) {
 		RESULT r = R_PASS;
 		static bool fFirst = true;
@@ -167,25 +168,25 @@ private:
 	*/
 
 protected:
-	RESULT SetMousePosition(int x, int y) {
+	virtual RESULT SetMousePosition(int x, int y) {
 		m_MousePosition.xPos = x;
 		m_MousePosition.yPos = y;
 
 		return R_PASS;
 	}
 
-	RESULT CaptureMouse() {
+public:
+	virtual RESULT CaptureMouse() {
 		m_fMouseCaptured = true;
 		return R_PASS;
 	}
 
-	RESULT ReleaseMouse() {
+	virtual RESULT ReleaseMouse() {
 		m_fMouseCaptured = false;
 		return R_PASS;
 	}
 
 	// The SenseMouse interface
-public:
 	virtual RESULT CenterMousePosition() = 0;
 	virtual RESULT UpdateMousePosition() = 0;
 	//virtual RESULT SetMousePosition(int x, int y) = 0;

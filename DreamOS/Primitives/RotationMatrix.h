@@ -59,6 +59,12 @@ public:
 		SetXYZRotationMatrix(thetaX, thetaY, thetaZ);
 	}
 
+	RotationMatrix(vector vEuler) :
+		m_type(XYZ_AXIS)
+	{
+		SetXYZRotationMatrix(vEuler.x(), vEuler.y(), vEuler.z());
+	}
+
 	RotationMatrix(ROTATION_MATRIX_TYPE axis, rotation_precision theta) :
 		m_type(axis)
 	{

@@ -17,12 +17,12 @@ class Win64Mouse : public SenseMouse {
 public:
 	Win64Mouse(Windows64App *pWin64AppParent);
 
-	RESULT UpdateMouseState(SenseMouseEventType eventType, int newX, int newY, int state);
+	virtual RESULT UpdateMouseState(SenseMouseEventType eventType, int newX, int newY, int state) override;
 
-	RESULT CaptureMouse();
-	RESULT ReleaseMouse();
-	RESULT SetMousePosition(int x, int y);
-	RESULT CenterMousePosition();
+	virtual RESULT CaptureMouse() override;
+	virtual RESULT ReleaseMouse() override;
+	virtual RESULT SetMousePosition(int x, int y) override;
+	virtual RESULT CenterMousePosition() override;
 
 	RESULT UpdateMousePosition();
 

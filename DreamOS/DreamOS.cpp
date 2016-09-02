@@ -172,8 +172,8 @@ model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
 	
-composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
-	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
 user *DreamOS::AddUser() {
@@ -189,6 +189,10 @@ RESULT DreamOS::UnregisterUpdateCallback() {
 }
 
 // Cloud Controller
+RESULT DreamOS::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
+	return m_pSandbox->RegisterDataMessageCallback(fnHandleDataMessageCallback);
+}
+
 RESULT DreamOS::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
 	return m_pSandbox->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
 }
@@ -197,12 +201,24 @@ RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallbac
 	return m_pSandbox->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
 }
 
+RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
+	return m_pSandbox->SendDataMessage(userID, pDataMessage);
+}
+
 RESULT DreamOS::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
 	return m_pSandbox->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
 }
 
 RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
 	return m_pSandbox->SendUpdateHandMessage(userID, handState);
+}
+
+RESULT DreamOS::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
+	return m_pSandbox->RegisterSubscriber(keyEvent, pKeyboardSubscriber);
+}
+
+RESULT DreamOS::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
+	return m_pSandbox->RegisterSubscriber(mouseEvent, pMouseSubscriber);
 }
 
 long DreamOS::GetTickCount() {
