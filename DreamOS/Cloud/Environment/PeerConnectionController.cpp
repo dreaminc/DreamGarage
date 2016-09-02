@@ -287,7 +287,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//CR(m_pWebRTCImp->AddOfferCandidates(pPeerConnection));
 
 		// TODO: Add Candidates
-		/*
+		///*
 		if ((m_pWebRTCImp->IsOfferer() == false) && m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()) {
 			CBM((m_pPeerConnectionCurrentHandshake->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
 			CRM(m_pWebRTCImp->AddOfferCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
@@ -356,7 +356,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		CN(m_pWebRTCImp);
 		//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
 
-		/*
+		///*
 		if ((m_pWebRTCImp->IsOfferer() == true) && m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()) {
 			CBM((m_pPeerConnectionCurrentHandshake->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
 			CRM(m_pWebRTCImp->AddAnswerCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
