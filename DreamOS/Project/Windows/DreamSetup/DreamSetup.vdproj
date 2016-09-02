@@ -21,6 +21,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_06EB5687CEE643ED95720A1BE7C93CAA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_07E9BAED08654FEC8C69F166EBB0FE84"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -93,6 +99,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2CB6C3898858449CB112F476536D867F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_3740FA45279A41369D352167BDBD95CB"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -136,6 +148,12 @@
         "Entry"
         {
         "MsmKey" = "8:_5F556EB8E77541B8B06FE47969789EE7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_663D592847584E4A82757687D5FB823F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -456,6 +474,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_06EB5687CEE643ED95720A1BE7C93CAA"
+            {
+            "SourcePath" = "8:..\\..\\..\\Models\\stormtrooper\\Map__7_Raytrace.tga"
+            "TargetName" = "8:Map__7_Raytrace.tga"
+            "Tag" = "8:"
+            "Folder" = "8:_8CAC9FE48A324580BE9DE8AD52B9A181"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_07E9BAED08654FEC8C69F166EBB0FE84"
             {
             "SourcePath" = "8:..\\Production\\openvr_api.dll"
@@ -696,6 +734,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2CB6C3898858449CB112F476536D867F"
+            {
+            "SourcePath" = "8:..\\..\\..\\Models\\stormtrooper\\stormtrooper.obj"
+            "TargetName" = "8:stormtrooper.obj"
+            "Tag" = "8:"
+            "Folder" = "8:_8CAC9FE48A324580BE9DE8AD52B9A181"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3740FA45279A41369D352167BDBD95CB"
             {
             "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\ShadowDepth.frag"
@@ -842,6 +900,26 @@
             "TargetName" = "8:d3dcompiler_47.dll"
             "Tag" = "8:"
             "Folder" = "8:_045A0A22BF694330828EBD3043035192"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_663D592847584E4A82757687D5FB823F"
+            {
+            "SourcePath" = "8:..\\..\\..\\Models\\stormtrooper\\stormtrooper.mtl"
+            "TargetName" = "8:stormtrooper.mtl"
+            "Tag" = "8:"
+            "Folder" = "8:_8CAC9FE48A324580BE9DE8AD52B9A181"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1594,6 +1672,17 @@
                                 {
                                 }
                             }
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_8CAC9FE48A324580BE9DE8AD52B9A181"
+                            {
+                            "Name" = "8:stormtrooper"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_B266FD5591AD4A73835064ADA629CEF4"
+                                "Folders"
+                                {
+                                }
+                            }
                         }
                     }
                     "{9EF0B969-E518-4E46-987F-47570745A589}:_BF534C9AA3BD4B87877248C869D6BC39"
@@ -1713,15 +1802,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Dream"
-        "ProductCode" = "8:{D80CAB7B-DD06-4FA6-8701-F58AFDB36AD9}"
-        "PackageCode" = "8:{C3C93541-732C-4F0A-BBCF-1F51A763D71B}"
+        "ProductCode" = "8:{21EC87FE-5207-4AF8-ABE2-501DEDC91170}"
+        "PackageCode" = "8:{E61FFAB8-520D-4431-84E6-E058BD1F9B8C}"
         "UpgradeCode" = "8:{9E4013FF-9949-471E-9B8D-67958A95FB31}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.0.2"
+        "ProductVersion" = "8:0.0.4"
         "Manufacturer" = "8:Dream"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:www.dreamos.com"
