@@ -129,7 +129,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 // Overlay Debug Console
 #include "Profiler/DebugConsole.h"
-/*_Pragma("warning(suppress: 4533)") \*/
+/* why is this not working? _Pragma("warning(suppress: 4533)") \*/
 #pragma warning(disable:4533)
 
 #define OVERLAY_DEBUG_OUT(str) \
@@ -138,5 +138,8 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 #define OVERLAY_DEBUG_SET(name,str) \
 	DebugConsole::GetDebugConsole()->Get(name)->SetValue(str)
+
+#define SHORT_STR(str) \
+   ((str.length() > 20) ? str.substr(0, 17) + "..." : str)
 
 #endif // ! EHM_H_

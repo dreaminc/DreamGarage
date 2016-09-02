@@ -68,11 +68,6 @@ void OGLProfiler::Render() {
 	float posY = 0.0f;
 	const int maxRows = 28;
 	float top = 0.4f;
-	float left = -0.7f;
-	float consoleHeight = std::min(maxRows, (int)(Profiler::GetProfiler()->GetConsoleText().size()))*0.05f;
-
-	//OGLRenderContext::Render(point(left, top, 0.0f), point(-0.1f, top - consoleHeight, 0.0f));
-
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -96,7 +91,7 @@ void OGLProfiler::Render() {
 		 it < Profiler::GetProfiler()->GetConsoleText().end();
 		 it++)
 	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, m_fontSize)->SetPosition(point(left, top - posY, 0.0f),text::TOP_LEFT));
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, m_fontSize)->SetPosition(point(0.1f, top - posY, 0.0f),text::BOTTOM_RIGHT));
 		posY += 0.05f;
 	}
 
@@ -312,7 +307,6 @@ void OGLDebugConsole::Init()
 void OGLDebugConsole::Render(point& topLeft, point& bottomRight)
 {
 	float consoleHeight = 0;
-	float rowSize = 0.05f;
 
 	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData())
 	{
@@ -320,12 +314,12 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight)
 
 		m_OGLConsoleText->SetText(it->GetValue(), m_fontSize);
 
-		m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(0, -m_OGLConsoleText->m_height, 0)));
-		m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, 0, 0), rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0)));
+		m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(0, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0)));
+		m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, 0, 0)));
+
+		consoleHeight += m_OGLConsoleText->m_height;
 
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetPosition(rowTL, text::BOTTOM_RIGHT));
-
-		consoleHeight += rowSize;
 	}
 
 //	m_OGLTextBackground->SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));

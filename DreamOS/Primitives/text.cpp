@@ -51,8 +51,8 @@ RESULT text::SetText(const std::string& text, double size)
 
 	float min_left = 0.0f;
 	float max_right = 0.0f;
-	float min_top = 0.0f;
-	float max_bottom = 0.0f;
+	float max_top = 0.0f;
+	float min_bottom = 0.0f;
 
 	for_each(text.begin(), text.end(), [&](char c) {
 		Font::CharacterGlyph glyph;
@@ -75,15 +75,15 @@ RESULT text::SetText(const std::string& text, double size)
 
 				min_left = posx + dxs;
 				max_right = dx + posx + dxs;
-				min_top = dys + dy / 2.0f;
-				max_bottom = dys - dy / 2.0f;
+				max_top = dys + dy / 2.0f;
+				min_bottom = dys - dy / 2.0f;
 			}
 			else
 			{
 				min_left = std::min(min_left, posx + dxs);
 				max_right = std::max(max_right, dx + posx + dxs);
-				min_top = std::max(min_top, dys + dy / 2.0f);
-				max_bottom = std::min(max_bottom, dys - dy / 2.0f);
+				max_top = std::max(max_top, dys + dy / 2.0f);
+				min_bottom = std::min(min_bottom, dys - dy / 2.0f);
 			}
 
 			quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs, dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
@@ -92,9 +92,9 @@ RESULT text::SetText(const std::string& text, double size)
 	});
 
 	m_width = max_right - min_left;
-	m_height = max_bottom - min_top;
+	m_height = max_top - min_bottom;
 
-	center_vector = point((min_left + max_right) / 2.0f, (min_top + max_bottom) / 2.0f, 0.0f);
+	center_vector = point((min_left + max_right) / 2.0f, (max_top + min_bottom) / 2.0f, 0.0f);
 
 	unsigned int verticesCnt = 0;
 	unsigned int indicesCnt = 0;

@@ -34,7 +34,8 @@ Profiler::FPSGraph_t& Profiler::GetFPSGraph()
 
 void Profiler::AddConsoleLine(const std::string& text)
 {
-	m_ConsoleText.push_back(text);
+	static int m_lineCnt = 0;
+	m_ConsoleText.push_back(std::to_string(m_lineCnt++) + ")" + text);
 	while (m_ConsoleText.size() > console_max_lines)
 	{
 		m_ConsoleText.pop_front();
