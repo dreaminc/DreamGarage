@@ -339,7 +339,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;WEBRTC_NO_CANDIDATES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>

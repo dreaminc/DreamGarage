@@ -278,7 +278,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		}
 		//*/
 	}
-	else if (strMethod == "set_answer_candidates") {
+	else if (strMethod == "set_answer") {
 		// TODO: Reproduction of code above - move to function
 		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
 		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
@@ -300,6 +300,45 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// will ultimately signal the WebRTC connection to be complete
 		CN(m_pWebRTCImp);
 		CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
+
+		// We don't have a guarantee that the WebRTC connection is stable at this point
+
+		// Initialize SDP Peer Connection Offer and Create Answer
+		//CN(m_pWebRTCImp);
+
+		// We can do this now - since we are guaranteed to already have our local SDP 
+		//CR(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection));
+
+		//CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+
+		// TODO: Add Candidates
+		// At this point the whole thing is complete
+		//pPeerConnection->Print();
+
+		//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
+	}
+	else if (strMethod == "set_answer_candidates") {
+		// TODO: Reproduction of code above - move to function
+		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
+		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
+
+		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
+		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
+
+		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+
+		// TODO: Make sure they match
+
+		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
+		CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
+
+		// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
+		// will ultimately signal the WebRTC connection to be complete
+		CN(m_pWebRTCImp);
+		//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
 
 		///*
 		if (m_pWebRTCImp->IsOfferer()) {
