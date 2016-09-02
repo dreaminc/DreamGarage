@@ -267,6 +267,10 @@ public:
 		return R_PASS;
 	}
 
+	bool IsWebRTCConnectionStable() {
+		return m_fWebRTCConnectionStable;
+	}
+
 	RESULT SetWebRTCConnectionStable() {
 		m_fWebRTCConnectionStable = true;
 		return R_PASS;

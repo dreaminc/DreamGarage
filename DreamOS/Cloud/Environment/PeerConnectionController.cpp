@@ -272,7 +272,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		// TODO: Add Candidates
 		///*
-		if (m_pWebRTCImp->IsOfferer() == false) {
+		if ((m_pWebRTCImp->IsOfferer() == false) && m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()) {
 			CBM((m_pPeerConnectionCurrentHandshake->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
 			CRM(m_pWebRTCImp->AddOfferCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
 		}
@@ -341,7 +341,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
 
 		///*
-		if (m_pWebRTCImp->IsOfferer()) {
+		if ((m_pWebRTCImp->IsOfferer() == true) && m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()) {
 			CBM((m_pPeerConnectionCurrentHandshake->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
 			CRM(m_pWebRTCImp->AddAnswerCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
 		}
@@ -377,7 +377,7 @@ RESULT PeerConnectionController::OnWebRTCConnectionStable() {
 	// If we're the offerer, we add the answer candidates - if we're the answerer we add the offers candidates
 	// At this point the WebRTC connection is stable so we're guaranteed to have the remote description
 	// TODO: This could in theory be done when we have the remote description - so could be optimized 
-	/*
+	///*
 	if (m_pWebRTCImp->IsOfferer()) {
 		CBM((m_pPeerConnectionCurrentHandshake->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
 		CRM(m_pWebRTCImp->AddAnswerCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
@@ -386,7 +386,7 @@ RESULT PeerConnectionController::OnWebRTCConnectionStable() {
 		CBM((m_pPeerConnectionCurrentHandshake->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
 		CRM(m_pWebRTCImp->AddOfferCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
 	}
-	*/
+	//*/
 
 Error:
 	return r;
