@@ -50,7 +50,7 @@ public:
 		DEBUG_LINEOUT(" ");
 
 		DEBUG_LINEOUT("SDP Answer: %s", m_strSDPAnswer.c_str());
-		DEBUG_LINEOUT("%d Answer Candidates:", static_cast<int>(m_offerICECandidates.size()));
+		DEBUG_LINEOUT("%d Answer Candidates:", static_cast<int>(m_answerICECandidates.size()));
 		for (auto &iceCandidate : m_answerICECandidates) {
 			iceCandidate.Print();
 		}
@@ -193,7 +193,7 @@ public:
 		if (jsonPeerConnection["/answer_candidates"_json_pointer] != nullptr) {
 			m_answerICECandidates.clear();
 
-			for (auto &jsonICECandidate : jsonPeerConnection["/offer_candidates"_json_pointer]) {
+			for (auto &jsonICECandidate : jsonPeerConnection["/answer_candidates"_json_pointer]) {
 				std::string strSDPCandidate = jsonICECandidate[kCandidateSdpName].get<std::string>();
 				std::string strSDPMediaID = jsonICECandidate[kCandidateSdpMidName].get<std::string>();
 				int SDPMediateLineIndex = jsonICECandidate[kCandidateSdpMlineIndexName].get<int>();
@@ -229,7 +229,7 @@ public:
 		// Answer
 		jsonData["answer"] = m_strSDPAnswer;
 
-		if (m_offerICECandidates.size() > 0)
+		if (m_answerICECandidates.size() > 0)
 			jsonData["answer_candidates"] = GetCandidatesJSON(m_answerICECandidates);
 		else
 			jsonData["answer_candidates"] = nullptr;
@@ -261,10 +261,14 @@ public:
 		return R_PASS;
 	}
 
-	std::list<ICECandidate> GetAnswerCandidates() { return m_offerICECandidates; }
+	std::list<ICECandidate> GetAnswerCandidates() { return m_answerICECandidates; }
 	RESULT SetAnswerCandidates(std::list<ICECandidate> iceCandidates) {
 		m_answerICECandidates = iceCandidates;
 		return R_PASS;
+	}
+
+	bool IsWebRTCConnectionStable() {
+		return m_fWebRTCConnectionStable;
 	}
 
 	RESULT SetWebRTCConnectionStable() {
