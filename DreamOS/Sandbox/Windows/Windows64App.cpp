@@ -703,6 +703,8 @@ bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
 				}
 			}
 			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
+				HUD_OUT("Key 'L' is pressed");
+
 				if (m_pCloudController != nullptr) {
 					// Attempt to connect to the first peer in the list
 					m_pCloudController->LoginUser();

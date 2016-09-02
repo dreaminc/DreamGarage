@@ -16,7 +16,7 @@
 void OGLRenderContext::Init()
 {
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
-	m_fontSize = 3.0f;
+	m_fontSize = 4.0f;
 
 	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
 	m_Background->SetColor(color(0.0f, 0.0f, 0.0f, 0.2f));
@@ -92,9 +92,12 @@ void OGLProfiler::Render() {
 		 it++)
 	{
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, m_fontSize)->SetPosition(point(0.1f, top - posY, 0.0f),text::BOTTOM_RIGHT));
-		posY += 0.05f;
+		posY += m_OGLConsoleText->m_height;
 	}
 
+	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+	if ((time / 100) % 10 > 5)
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText("_", m_fontSize + 0.02f)->SetPosition(point(0.1f, top - posY, 0.0f), text::BOTTOM_RIGHT));
 	
 	// Render debug console text
 	m_OGLConsole.Render(point(-0.5f, top, 0.0f), point(0.0f, 0.0f, 0.0f));
@@ -300,7 +303,7 @@ void OGLDebugConsole::Init()
 	m_OGLTextBackground = std::make_unique<OGLQuad>(m_OGLImp, 1, 1);
 
 	m_OGLTriangle = std::make_unique<OGLTriangle>(m_OGLImp);
-	m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 1));
+	m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 0.3f));
 
 }
 
