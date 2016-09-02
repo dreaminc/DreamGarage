@@ -69,7 +69,7 @@ Websocket::~Websocket() {
 	}
 }
 
-RESULT Websocket::SetToken(std::string& strToken) {
+RESULT Websocket::SetToken(const std::string& strToken) {
 	m_strToken = strToken;
 	return R_PASS;
 }

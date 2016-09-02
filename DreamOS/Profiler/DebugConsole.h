@@ -10,11 +10,14 @@ class DebugData {
 public:
 	const std::string& GetValue();
 	void SetValue(std::string value);
+	const std::string& GetName();
 
-	DebugData();
+	DebugData(const std::string& uniqueName = "");
 	~DebugData();
 
 private:
+	std::string m_uniqueName;
+
 	std::string m_value;
 };
 
@@ -32,7 +35,8 @@ public:
 
 	const std::vector<std::shared_ptr<DebugData>>& GetConsoleData();
 	void Unregister(std::shared_ptr<DebugData> data);
-	std::shared_ptr<DebugData> Register();
+	std::shared_ptr<DebugData> Register(const std::string& uniqueName = "");
+	std::shared_ptr<DebugData> Get(const std::string& uniqueName);
 
 private:	
 	std::vector<std::shared_ptr<DebugData>> m_data;
