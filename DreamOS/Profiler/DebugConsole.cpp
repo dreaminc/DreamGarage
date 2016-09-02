@@ -17,9 +17,9 @@ const std::vector<std::shared_ptr<DebugData>>& DebugConsole::GetConsoleData()
 	return m_data;
 }
 
-std::shared_ptr<DebugData> DebugConsole::Register()
+std::shared_ptr<DebugData> DebugConsole::Register(const std::string& uniqueName)
 {
-	std::shared_ptr<DebugData> s = std::make_shared<DebugData>();
+	std::shared_ptr<DebugData> s = std::make_shared<DebugData>(uniqueName);
 	m_data.emplace_back(s);
 	return s;
 }
@@ -33,9 +33,24 @@ void DebugConsole::Unregister(std::shared_ptr<DebugData> data)
 	}
 }
 
-DebugData::DebugData() 
+std::shared_ptr<DebugData> DebugConsole::Get(const std::string& uniqueName)
 {
-	m_value = "Set this value";
+	for (auto& p : m_data)
+	{
+		if (p->GetName().compare(uniqueName) == 0)
+		{
+			return p;
+		}
+	}
+
+	return Register(uniqueName);
+}
+
+DebugData::DebugData(const std::string& uniqueName) :
+	m_uniqueName(uniqueName),
+	m_value("Set this value")
+{
+
 }
 
 DebugData::~DebugData()
@@ -50,4 +65,9 @@ const std::string& DebugData::GetValue()
 void DebugData::SetValue(std::string value)
 {
 	m_value = value;
+}
+
+const std::string& DebugData::GetName()
+{
+	return m_uniqueName;
 }

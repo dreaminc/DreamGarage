@@ -252,7 +252,7 @@ std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system
 
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
-
+	/*
 	static std::shared_ptr<DebugData> pX = DebugConsole::GetDebugConsole()->Register();
 	pX->SetValue("nir");
 
@@ -264,7 +264,7 @@ RESULT DreamGarage::Update(void) {
 
 	static std::shared_ptr<DebugData> pZ2 = DebugConsole::GetDebugConsole()->Register();
 	pZ2->SetValue("hello");
-
+	*/
 	/*
 	// Update stuff ...
 	if (m_pSphere != nullptr) {

@@ -126,4 +126,17 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #define CVM(pObject, msg, ...) do{if(!((pObject)->IsValid())) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
 #define CVRM(pObject, failCode, msg, ...) do{if(!((pObject)->IsValid())) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
 
+
+// Overlay Debug Console
+#include "Profiler/DebugConsole.h"
+/*_Pragma("warning(suppress: 4533)") \*/
+#pragma warning(disable:4533)
+
+#define OVERLAY_DEBUG_OUT(str) \
+	static std::shared_ptr<DebugData> pDebugData = DebugConsole::GetDebugConsole()->Register(); \
+	pDebugData->SetValue(str)
+
+#define OVERLAY_DEBUG_SET(name,str) \
+	DebugConsole::GetDebugConsole()->Get(name)->SetValue(str)
+
 #endif // ! EHM_H_

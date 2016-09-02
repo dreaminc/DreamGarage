@@ -34,7 +34,7 @@ protected:
 	OpenGLImp*	m_OGLImp;
 
 	std::unique_ptr<OGLTriangle> m_Background;
-	float m_BackgroundMargin = 0.025f;
+	float m_BackgroundMargin = 0.0f;// 0.025f;
 
 	// A font for the text. TBD: remove and use a font factory
 	std::shared_ptr<Font>	m_OGLFont;

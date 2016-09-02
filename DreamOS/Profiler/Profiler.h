@@ -25,7 +25,7 @@ public:
 	virtual double	GetTicksPerSecond();
 
 private:
-	static const int m_nsamples = 5;
+	static const int m_nsamples = 50;
 	int	m_currentSample = 0;
 	std::vector<std::chrono::time_point<std::chrono::high_resolution_clock>>	m_tickTimes;
 };

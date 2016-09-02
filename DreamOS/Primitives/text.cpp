@@ -6,6 +6,7 @@
 RESULT text::SetText(const std::string& text, double size)
 {
 	std::vector<quad> quads;
+	point center_vector;
 
 	if (m_text.compare(text) == 0)
 	{
@@ -74,15 +75,15 @@ RESULT text::SetText(const std::string& text, double size)
 
 				min_left = posx + dxs;
 				max_right = dx + posx + dxs;
-				min_top = dys - dy / 2.0f;
-				max_bottom = dys + dy / 2.0f;
+				min_top = dys + dy / 2.0f;
+				max_bottom = dys - dy / 2.0f;
 			}
 			else
 			{
 				min_left = std::min(min_left, posx + dxs);
 				max_right = std::max(max_right, dx + posx + dxs);
-				min_top = std::min(min_top, dys - dy / 2.0f);
-				max_bottom = std::min(max_bottom, dys + dy / 2.0f);
+				min_top = std::max(min_top, dys + dy / 2.0f);
+				max_bottom = std::min(max_bottom, dys - dy / 2.0f);
 			}
 
 			quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs, dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
@@ -93,6 +94,8 @@ RESULT text::SetText(const std::string& text, double size)
 	m_width = max_right - min_left;
 	m_height = max_bottom - min_top;
 
+	center_vector = point((min_left + max_right) / 2.0f, (min_top + max_bottom) / 2.0f, 0.0f);
+
 	unsigned int verticesCnt = 0;
 	unsigned int indicesCnt = 0;
 	unsigned int quadCnt = 0;
@@ -100,6 +103,11 @@ RESULT text::SetText(const std::string& text, double size)
 	for (auto& q : quads)
 	{
 		vertex* pVertices = q.VertexData();
+
+		pVertices[0].m_point -= center_vector;
+		pVertices[1].m_point -= center_vector;
+		pVertices[2].m_point -= center_vector;
+		pVertices[3].m_point -= center_vector;
 
 		m_pVertices[verticesCnt++] = pVertices[0];
 		m_pVertices[verticesCnt++] = pVertices[1];
