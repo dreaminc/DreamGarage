@@ -20,6 +20,10 @@ WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 
 WebRTCImp::~WebRTCImp() {
 	rtc::CleanupSSL();
+
+	if (m_pWebRTCConductor != nullptr) {
+		m_pWebRTCConductor.release();
+	}
 }
 
 // CloudImp Interface
