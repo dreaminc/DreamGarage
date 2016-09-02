@@ -344,7 +344,8 @@ Error:
 std::string WebRTCConductor::GetPeerConnectionString() {
 	// Issues behind the NAT
 	//return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:74.125.196.127:19302");
-	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	//return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.ekiga.net");
 }
 
 void WebRTCConductor::OnFailure(const std::string& error) {
