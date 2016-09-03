@@ -70,6 +70,7 @@ public:
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
 	FlatContext* AddFlatContext();
+	RESULT UpdateFlatContexts();
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));

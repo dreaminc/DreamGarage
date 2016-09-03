@@ -18,7 +18,13 @@ public:
 
 	RESULT SetSkybox(skybox *pSkybox) { return R_NOT_IMPLEMENTED; };
 	RESULT GetSkybox(skybox*& pSkybox) { return R_NOT_IMPLEMENTED; };
-};
 
+	RESULT SetMaxZ(std::shared_ptr<DimObj> pObject);
+	RESULT UpdateScene();
+
+private:
+	float m_minZ = 0.99f;
+	float m_maxZ = -0.99f;
+};
 
 #endif // ! SCENE_GRAPH_LIST_H_

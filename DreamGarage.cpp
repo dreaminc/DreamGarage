@@ -82,21 +82,31 @@ RESULT DreamGarage::LoadScene() {
 	pFQuad->RotateXByDeg(90.0f);
 	pFQuad->SetColorTexture(pColorTextureCobble);
 	*/
-	FlatContext *pContext = AddFlatContext();
+	//FlatContext *pContext = AddFlatContext();
 	//pContext->MoveTo(0.5f, 0.5f, 0.0f);
 
-	std::shared_ptr<quad> pFQuad2 = pContext->AddQuad(0.5f, 0.5f);
-	pFQuad2->MoveTo(0.5f, 0.5f, 2.0f);
-	pFQuad2->RotateXByDeg(90.0f);
-	pFQuad2->SetColorTexture(pColorTextureCobble);
+	//std::shared_ptr<quad> pFQuad2 = pContext->MakeQuad(0.5f, 0.5f, point(-0.5f, -0.5f, 100.0f));
+	//pFQuad2->MoveTo(-0.5f, -0.5f, 1.0f);
+	//pFQuad2->RotateXByDeg(90.0f);
+	//pFQuad2->SetColorTexture(pColorTextureCobble);
 
+	//UpdateFlatContexts();
+/*
+	FlatContext *pContext = AddFlatContext();
 	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
-		std::shared_ptr<quad> pFQuad2 = pContext->AddQuad(0.5f, 0.5f);
-		pFQuad2->MoveTo(x/10, x/10, 0.0f);
-		pFQuad2->RotateXByDeg(90.0f);
+		std::shared_ptr<quad> pFQuad2 = pContext->MakeQuad(x/10.0f, x/10.0f, point(x/10.0f, x/10.0f, x/10.0f));
 		pFQuad2->SetColorTexture(pColorTexture);
 	}
+// */
+/*
+	FlatContext *pContext2 = AddFlatContext();
+	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
+		std::shared_ptr<quad> pFQuad2 = pContext2->MakeQuad(0.25f, 0.25f, point(-x/10.0f, -x/10.0f, x/10.0f));
+		pFQuad2->SetColorTexture(pColorTexture);
+	}
+//	*/
 
+	
 
 
 /*

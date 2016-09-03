@@ -96,6 +96,13 @@ Error:
 	return context;
 }
 
+RESULT SandboxApp::UpdateFlatContexts() {
+	RESULT r = R_PASS;
+	CR(m_pFlatSceneGraph->GetSceneGraphStore()->UpdateScene());
+Error:
+	return r;
+}
+
 light* SandboxApp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pHALImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }

@@ -612,6 +612,26 @@ Error:
 	}
 	return nullptr;
 }
+ 
+quad* OpenGLImp::MakeQuad(double width, double height, point origin) {
+	RESULT r = R_PASS;
+
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height));
+	pQuad->RotateXByDeg(90.0f);
+	pQuad->MoveTo(origin);
+
+	CN(pQuad);
+
+//Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+	return nullptr;
+}
 
 sphere* OpenGLImp::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) {
 	RESULT r = R_PASS;

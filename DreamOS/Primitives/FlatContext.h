@@ -8,6 +8,7 @@ public:
 
 	FlatContext(HALImp *pHALImp);
 
+	std::shared_ptr<quad> MakeQuad(double width, double height, point origin);
 };
 
 #endif	// ! FLAT_CONTEXT_H_

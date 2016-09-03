@@ -90,6 +90,11 @@ FlatContext* DreamOS::AddFlatContext()
 	return m_pSandbox->AddFlatContext();
 }
 
+RESULT DreamOS::UpdateFlatContexts()
+{
+	return m_pSandbox->UpdateFlatContexts();
+}
+
 sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }

@@ -36,9 +36,11 @@ public:
 	RESULT SetSkybox(skybox *pSkybox);
 	RESULT GetSkybox(skybox*& pSkybox);
 
-private:
+	RESULT UpdateScene() { return R_PASS; };
+
+protected:
 	std::list<VirtualObj*> m_objects;
-	
+private:	
 	std::vector<light*> m_lights;		
 
 	skybox *m_pSkybox;
