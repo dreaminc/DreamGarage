@@ -66,7 +66,7 @@ void OGLProfiler::Destroy() {
 
 void OGLProfiler::Render() {
 	float posY = 0.0f;
-	const int maxRows = 28;
+	const int maxRows = 18;
 	float top = 0.4f;
 
 	glEnable(GL_BLEND);
