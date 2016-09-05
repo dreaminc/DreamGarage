@@ -30,3 +30,9 @@ RESULT WebRTCPeerConnection::AddStreams() {
 Error:
 	return r;
 }
+
+RESULT WebRTCPeerConnection::ClearSessionDescriptionProtocol() {
+	m_strSessionDescriptionProtocol.clear();
+	m_strSessionDescriptionType.clear();
+	return R_PASS;
+}

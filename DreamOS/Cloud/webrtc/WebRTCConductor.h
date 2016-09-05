@@ -49,7 +49,7 @@ public:
 };
 
 class WebRTCConductor : 
-	public webrtc::PeerConnectionObserver, 
+	public webrtc::PeerConnectionObserver,	// TODO: Move it all into a WebRTC Peer Connection Object
 	public webrtc::CreateSessionDescriptionObserver,
 	public webrtc::DataChannelObserver /*, public PeerConnectionClientObserver, public MainWndCallback */
 {
@@ -99,6 +99,7 @@ protected:
 	void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
 
 	// PeerConnectionClientObserver implementation.
+	// TODO: This is all dead code
 	virtual void OnSignedIn();
 	virtual void OnDisconnected();
 	virtual void OnPeerConnected(int id, const std::string& name);

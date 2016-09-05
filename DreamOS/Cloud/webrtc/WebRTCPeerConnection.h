@@ -9,7 +9,7 @@
 
 #include "webrtc/api/peerconnectioninterface.h"
 
-class WebRTCPeerConnection {
+class WebRTCPeerConnection : public webrtc::PeerConnectionObserver {
 public:
 	WebRTCPeerConnection(long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory) :
 		m_peerConnectionID(peerConnectionID),
@@ -24,9 +24,27 @@ public:
 		return R_PASS;
 	}
 
+	RESULT AddStreams();
+	RESULT ClearSessionDescriptionProtocol();
+
+protected:
+
+	// PeerConnectionObserver implementation.
+	void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override;
+
+	void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
+	void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
+	void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
+
+	void OnRenegotiationNeeded() override {}
+
+	void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
+	void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state);
+	void OnIceConnectionReceivingChange(bool receiving);
+	void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
+
 public:
 	long GetPeerConnectionID() { return m_peerConnectionID; }
-	
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> GetWebRTCPeerConnectionInterface() { return m_pWebRTCPeerConnectionInterface; }
 
 private:
