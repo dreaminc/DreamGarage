@@ -1,6 +1,8 @@
 #include "SandboxApp.h"
 #include "Cloud/CloudController.h"
 
+#include "Cloud/Message/Message.h"
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -312,8 +314,8 @@ Error:
 	return nullptr;
 }
 
-composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
-	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
 RESULT SandboxApp::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
@@ -354,6 +356,10 @@ hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
 }
 
 // Cloud Controller
+RESULT SandboxApp::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
+	return m_pCloudController->RegisterDataMessageCallback(fnHandleDataMessageCallback);
+}
+
 RESULT SandboxApp::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
 	return m_pCloudController->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
 }
@@ -362,10 +368,33 @@ RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCall
 	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
 }
 
+RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
+	return m_pCloudController->SendDataMessage(userID, pDataMessage);
+}
+
 RESULT SandboxApp::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
 	return m_pCloudController->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
 }
 
 RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState) {
 	return m_pCloudController->SendUpdateHandMessage(userID, handState);
+}
+
+// IO
+RESULT SandboxApp::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pSenseKeyboard->RegisterSubscriber(keyEvent, pKeyboardSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pSenseMouse->RegisterSubscriber(mouseEvent, pMouseSubscriber));
+
+Error:
+	return r;
 }

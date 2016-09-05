@@ -30,23 +30,31 @@ const char kSDPName[] = "sdp";
 const char kSessionDescriptionTypeName[] = "type";
 const char kSessionDescriptionSdpName[] = "sdp";
 
+// TODO: Make this more legitimate
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
 public:
 	static DummySetSessionDescriptionObserver* Create() {
 		return new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
 	}
 
-	virtual void OnSuccess() {
-		LOG(INFO) << __FUNCTION__;
-	}
-
-	virtual void OnFailure(const std::string& error) {
-		LOG(INFO) << __FUNCTION__ << " " << error;
-	}
-
 protected:
-	DummySetSessionDescriptionObserver() {}
-	~DummySetSessionDescriptionObserver() {}
+	DummySetSessionDescriptionObserver() {
+		// empty
+	}
+
+	~DummySetSessionDescriptionObserver() {
+		// empty
+	}
+
+public:
+	virtual void OnSuccess() {
+		DEBUG_LINEOUT("DummySetSessionDescriptionObserver On Success");
+	}
+
+	virtual void OnFailure(const std::string& strError) {
+		//LOG(INFO) << __FUNCTION__ << " " << error;
+		DEBUG_LINEOUT("DummySetSessionDescriptionObserver On Failure: %s", strError.c_str());
+	}
 };
 
 WebRTCConductor::WebRTCConductor(WebRTCImp *pParentWebRTCImp) :
@@ -349,7 +357,8 @@ Error:
 std::string WebRTCConductor::GetPeerConnectionString() {
 	// Issues behind the NAT
 	//return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:74.125.196.127:19302");
-	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	//return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.ekiga.net");
 }
 
 void WebRTCConductor::OnFailure(const std::string& error) {
@@ -649,13 +658,13 @@ RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 	
 	CN(m_pWebRTCPeerConnection.get());
 
-	///*
+#ifndef WEBRTC_NO_CANDIDATES
 	CR(AddStreams());
 
 	if (fAddDataChannel) {
 		CR(AddDataChannel());
 	}
-	//*/
+#endif
 
 Error:
 	return r;

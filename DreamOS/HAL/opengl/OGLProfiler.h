@@ -34,7 +34,7 @@ protected:
 	OpenGLImp*	m_OGLImp;
 
 	std::unique_ptr<OGLTriangle> m_Background;
-	float m_BackgroundMargin = 0.025f;
+	float m_BackgroundMargin = 0.0f;// 0.025f;
 
 	// A font for the text. TBD: remove and use a font factory
 	std::shared_ptr<Font>	m_OGLFont;
@@ -54,6 +54,9 @@ public:
 
 	template<typename T>
 	void Render(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, double vScale = 1.0);
+
+	template<typename T>
+	void Render(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, T minValue, T maxValue);
 
 	void Destroy();
 
@@ -76,6 +79,10 @@ public:
 
 private:
 	std::unique_ptr<OGLText>	m_OGLConsoleText;
+
+	std::unique_ptr<OGLQuad>	m_OGLTextBackground;
+
+	std::unique_ptr<OGLTriangle>	m_OGLTriangle;
 };
 
 class OGLProfiler : public OGLRenderContext {

@@ -68,7 +68,7 @@ public:
 	RESULT Start();
 	RESULT Stop();
 
-	RESULT SetToken(std::string& strToken);
+	RESULT SetToken(const std::string& strToken);
 
 	bool IsRunning() {
 		return m_fRunning;

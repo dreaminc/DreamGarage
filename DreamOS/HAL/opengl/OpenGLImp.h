@@ -88,14 +88,14 @@ public:
 	model *MakeModel(wchar_t *pszModelName);
 	model *MakeModel(const std::vector<vertex>& vertices);
 	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
-	composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY);
+	composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation);
 
 	composite *MakeComposite();
 	user *MakeUser();
 	hand* MakeHand();
 
 	// TODO: Fix w/ scene graph not here
-	composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 public:
 	// TODO: Consolidate all of these (one Render function)

@@ -20,9 +20,11 @@
 #include "Primitives/quaternion.h"
 #include "Primitives/hand.h"
 
+class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
 
+typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 
@@ -35,9 +37,11 @@ protected:
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
 
 public:
+	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
 
+	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
@@ -89,6 +93,7 @@ private:
 	HandleDataChannelStringMessageCallback m_fnHandleDataChannelStringMessageCallback;
 	HandleDataChannelMessageCallback m_fnHandleDataChannelMessageCallback;
 
+	HandleDataMessageCallback m_fnHandleDataMessageCallback;
 	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
 	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
 };

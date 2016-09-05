@@ -3,6 +3,7 @@
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
 
+#include "Cloud/Message/Message.h"
 #include "Cloud/Message/UpdateHandMessage.h"
 #include "Cloud/Message/UpdateHeadMessage.h"
 
@@ -42,6 +43,16 @@ RESULT CloudController::RegisterDataChannelMessageCallback(HandleDataChannelMess
 	}
 	else {
 		m_fnHandleDataChannelMessageCallback = fnHandleDataChannelMessageCallback;
+		return R_PASS;
+	}
+}
+
+RESULT CloudController::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
+	if (m_fnHandleDataMessageCallback) {
+		return R_FAIL;
+	}
+	else {
+		m_fnHandleDataMessageCallback = fnHandleDataMessageCallback;
 		return R_PASS;
 	}
 }
@@ -165,6 +176,13 @@ RESULT CloudController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pD
 				CN(pUpdateHandMessage);
 				// TODO: Add peer ID from
 				CR(m_fnHandleHandUpdateMessageCallback(NULL, pUpdateHandMessage));
+			}
+		} break;
+
+		default: {
+			if (m_fnHandleDataMessageCallback != nullptr) {
+				// TODO: Add peer ID from
+				CR(m_fnHandleDataMessageCallback(NULL, pDataChannelMessage));
 			}
 		} break;
 	}
@@ -308,6 +326,30 @@ void CloudController::CallGetUIThreadCallback(int msgID, void* data) {
 
 
 // Send some messages
+// TODO: This is duplicated code - use this in the below functions
+RESULT CloudController::SendDataMessage(long userID, Message *pDataMessage) {
+	RESULT r = R_PASS;
+
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	// TODO: Fix this - remove m_pCloudImp
+	//CB(m_pCloudImp->IsConnected());
+	CB(m_pEnvironmentController->IsUserIDConnected(userID));
+	CN(m_pUserController);
+	{
+		// Create the message
+		pDatachannelBuffer_n = pDataMessage->GetSize();
+		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
+		CN(pDatachannelBuffer);
+		memcpy(pDatachannelBuffer, pDataMessage, pDataMessage->GetSize());
+		CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
 	RESULT r = R_PASS;
 	uint8_t *pDatachannelBuffer = nullptr;

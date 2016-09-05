@@ -16,7 +16,8 @@ public:
 		MESSAGE_UPDATE_HEAD,
 		MESSAGE_UPDATE_HAND,
 		MESSAGE_UPDATE_CHAT,
-		MESSAGE_INVALID
+		MESSAGE_CUSTOM,
+		MESSAGE_INVALID = 0xFFFF
 	} MessageType;
 
 private:
@@ -49,9 +50,11 @@ public:
 		// empty
 	}
 
-	Message::MessageType GetType() {
-		return m_header.type;
-	}
+	Message::MessageType GetType() { return m_header.type; }
+	long GetSize() { return m_header.messageSize; }
+	time_t GetTimeStamp() { return m_header.timestamp; }
+	long GetSenderUserID() { return m_header.senderUserID; }
+	long GetReceiverUserID() { return m_header.receiverUserID; }
 
 	virtual RESULT PrintMessage() {
 		DEBUG_LINEOUT("Message from id %d to id %d at %s size:%d", 

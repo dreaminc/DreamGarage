@@ -7,6 +7,7 @@
 
 #include <chrono>
 #include <vector>
+#include <string>
 
 template<typename T>
 class ProfilerGraph {
@@ -68,6 +69,8 @@ public:
 		m_maxTime = now;
 		m_minTime = m_data[m_currentRecord].second;
 		m_data[m_currentRecord++] = std::make_pair(record, now);
+		
+		OutputDebugStringA((std::string("NIR::data [") + std::to_string(m_currentRecord) + "] = " + std::to_string(record) + "," + std::to_string(now.time_since_epoch().count())).c_str());
 
 		if (m_currentRecord >= m_nRecords)
 			m_currentRecord = 0;
@@ -109,7 +112,7 @@ private:
 	size_t	m_maxIndex;
 
 	// minimum time in seconds between records
-	double	m_recordRate = 0.1;
+	double	m_recordRate = 0.05;
 
 	// recording duration
 	double	m_recordTime;

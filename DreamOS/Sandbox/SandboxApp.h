@@ -25,6 +25,9 @@
 //class CloudController;
 #include "Cloud/CloudController.h"
 
+#include "Sense/SenseKeyboard.h"
+#include "Sense/SenseMouse.h"
+
 class light; 
 class quad;
 class sphere; 
@@ -33,6 +36,7 @@ class texture;
 class skybox;
 class model;
 class user;
+class Message;
 
 class SandboxApp : public valid {
 public:
@@ -64,6 +68,8 @@ public:
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
 	virtual RESULT InitializeHAL() = 0;
+	virtual RESULT InitializeKeyboard() = 0;
+	virtual RESULT InitializeMouse() = 0;
 	virtual long GetTickCount();
 
 public:
@@ -94,17 +100,23 @@ public:
 	model *AddModel(const std::vector<vertex>& vertices);
 	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
-	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 	user *AddUser();
 
 	// Cloud Controller 
 public:
-
+	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
 
+	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+
+	// IO
+public:
+	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
+	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 
 public:
 	PathManager *GetPathManager();
@@ -125,6 +137,9 @@ protected:
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	SceneGraph *m_pSceneGraph;
 	CloudController *m_pCloudController;
+
+	SenseKeyboard *m_pSenseKeyboard;
+	SenseMouse *m_pSenseMouse;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

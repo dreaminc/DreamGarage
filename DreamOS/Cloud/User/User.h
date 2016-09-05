@@ -59,12 +59,12 @@ public:
 	long GetUserID() { return m_userID; }
 	long GetDefaultEnvironmentID() { return m_defaultEnvironmentID; }
 
-	std::string	GetEmail() { return m_strEmail; }
-	std::string	GetFirstName() { return m_strFirstName; }
-	std::string	GetLastName() { return m_strLastName; }
-	std::string	GetScreenName() { return m_strScreenName; }
+	const std::string&	GetEmail() const { return m_strEmail; }
+	const std::string&	GetFirstName() const  { return m_strFirstName; }
+	const std::string&	GetLastName() const  { return m_strLastName; }
+	const std::string&	GetScreenName() const  { return m_strScreenName; }
 	
-	std::string	GetToken() { return m_strToken; }
+	const std::string&	GetToken() const { return m_strToken; }
 
 	RESULT SetToken(std::string strToken) {
 		if (strToken.size() > 0) {
