@@ -136,8 +136,10 @@ RESULT Windows64App::InitializeMouse() {
 	CNM(m_pSenseMouse, "Failed to allocate mouse");
 
 	// Initialize Mouse 
-	CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
-	CRM(m_pSenseMouse->CenterMousePosition(), "Failed to center mouse position");
+	// Remove mouse capture.
+	// This effects the window responsivenes to drag, resize and focus event.
+	//CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
+	//CRM(m_pSenseMouse->CenterMousePosition(), "Failed to center mouse position");
 
 Error:
 	return r;
