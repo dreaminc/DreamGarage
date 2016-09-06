@@ -14,17 +14,12 @@
 
 #include <memory>
 
+#include "WebRTCCommon.h"
 #include "webrtc/base/win32socketserver.h"
-
-const char kAudioLabel[] = "audio_label";
-const char kVideoLabel[] = "video_label";
-const char kStreamLabel[] = "stream_label";
-const char kDataLabel[] = "data_label";
-const uint16_t kDefaultServerPort = 8888;
 
 class WebRTCClient;
 class WebRTCConductor;
-class ICECandidate;
+class WebRTCICECandidate;
 class PeerConnection;
 
 class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp> {
@@ -60,7 +55,7 @@ public:
 	bool IsConnected();
 	bool IsOfferer();
 	bool IsAnswerer();
-	std::list<ICECandidate> GetCandidates();
+	std::list<WebRTCICECandidate> GetCandidates();
 
 	// Functionality
 	RESULT StartLogin(const std::string& server, int port);

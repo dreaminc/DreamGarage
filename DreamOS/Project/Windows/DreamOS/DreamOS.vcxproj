@@ -663,6 +663,7 @@
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
@@ -746,7 +747,9 @@
     <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
     <ClInclude Include="..\..\..\Cloud\Model.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCClient.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\Environment.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h" />

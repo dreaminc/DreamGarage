@@ -119,7 +119,7 @@ bool WebRTCImp::IsAnswerer() {
 	return (m_pWebRTCConductor->m_fOffer == false);
 }
 
-std::list<ICECandidate> WebRTCImp::GetCandidates() {
+std::list<WebRTCICECandidate> WebRTCImp::GetCandidates() {
 	return m_pWebRTCConductor->GetCandidates();
 }
 

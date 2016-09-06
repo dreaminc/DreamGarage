@@ -392,6 +392,9 @@
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
       <Filter>External\OCULUS\v132\Logging</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1995,6 +1998,12 @@
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>
