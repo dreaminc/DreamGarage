@@ -116,6 +116,7 @@ Error:
 	return r;
 }
 
+// TODO: this might be dead code
 RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	RESULT r = R_PASS;
 
@@ -131,7 +132,7 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	CBM((m_fConnected), "Environment socket not connected");
 	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
 	
-	strSDPOffer = pParentCloudController->GetSDPOfferString();
+	//strSDPOffer = pParentCloudController->GetSDPOfferString();
 
 	// Set up the JSON data
 
@@ -418,6 +419,7 @@ bool EnvironmentController::IsUserIDConnected(long peerUserID) {
 	return m_pPeerConnectionController->IsUserIDConnected(peerUserID);
 }
 
+/*
 // TODO: This is temp
 RESULT EnvironmentController::InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel) {
 	RESULT r = R_PASS;
@@ -428,6 +430,7 @@ RESULT EnvironmentController::InitializeNewPeerConnection(bool fCreateOffer, boo
 Error:
 	return r;
 }
+*/
 
 RESULT EnvironmentController::OnSDPOfferSuccess(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;

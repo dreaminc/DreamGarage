@@ -55,6 +55,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT PeerConnectionController::InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
@@ -64,6 +65,7 @@ RESULT PeerConnectionController::InitializeNewPeerConnection(bool fCreateOffer, 
 Error:
 	return r;
 }
+*/
 
 PeerConnectionController::~PeerConnectionController() {
 	// empty
@@ -216,7 +218,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		// Initialize SDP Peer Connection and Offer
 		CN(m_pWebRTCImp);
-		m_pWebRTCImp->InitializePeerConnection(true);
+		//m_pWebRTCImp->InitializePeerConnection(true);
+		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
 	}
 	else if (strMethod == "set_offer") {
 		// TODO: Reproduction of code above - move to function
@@ -259,8 +262,9 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		// Initialize SDP Peer Connection Offer and Create Answer
 		CN(m_pWebRTCImp);
-		CR(m_pWebRTCImp->InitializePeerConnection(false));
-		CR(m_pWebRTCImp->CreateSDPOfferAnswer(strSDPOffer));
+		//CR(m_pWebRTCImp->InitializePeerConnection(false));
+		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
+		CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
 	}
 	else if (strMethod == "set_offer_candidates") {
 		// TODO: Reproduction of code above - move to function
@@ -288,7 +292,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		// TODO: Add Candidates
 		///*
-		if ((m_pWebRTCImp->IsOfferer() == false) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
+		if ((m_pWebRTCImp->IsOfferer(peerConnectionID) == false) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
 			CBM((m_pPeerConnectionCurrentHandshake->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
 			CRM(m_pWebRTCImp->AddOfferCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
 		}
@@ -315,7 +319,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
 		// will ultimately signal the WebRTC connection to be complete
 		CN(m_pWebRTCImp);
-		CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
+		CR(m_pWebRTCImp->SetSDPAnswer(peerConnectionID, pPeerConnection->GetSDPAnswer()));
 
 		// We don't have a guarantee that the WebRTC connection is stable at this point
 
@@ -357,7 +361,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
 
 		///*
-		if ((m_pWebRTCImp->IsOfferer() == true) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
+		if ((m_pWebRTCImp->IsOfferer(peerConnectionID) == true) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
 			CBM((m_pPeerConnectionCurrentHandshake->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
 			CRM(m_pWebRTCImp->AddAnswerCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
 		}
@@ -426,13 +430,17 @@ RESULT PeerConnectionController::HandleEnvironmentSocketResponse(std::string str
 	return r;
 }
 
+// TODO: This might not be needed
+// Handshake moderation might get in the way
 RESULT PeerConnectionController::OnSDPOfferSuccess() {
 	RESULT r = R_PASS;
 
 	// Create SDP offer response
 	// TODO: Multi-peer will need to implement state hold for ID or object
 	//CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetSDPOfferString()));
-	CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetSDPString()));
+
+	long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
+	CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetLocalSDPString(peerConnectionID)));
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		m_pPeerConnectionControllerObserver->OnSDPOfferSuccess(m_pPeerConnectionCurrentHandshake);
@@ -442,13 +450,17 @@ Error:
 	return r;
 }
 
+// TODO: This might not be needed
+// Handshake moderation might get in the way
 RESULT PeerConnectionController::OnSDPAnswerSuccess() {
 	RESULT r = R_PASS;
 
 	// Create SDP offer response
 	// TODO: Multi-peer will need to implement state hold for ID or object
 	//CR(m_pPeerConnectionCurrentHandshake->SetSDPAnswer(m_pWebRTCImp->GetSDPOfferString()));
-	CR(m_pPeerConnectionCurrentHandshake->SetSDPAnswer(m_pWebRTCImp->GetSDPString()));
+
+	long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
+	CR(m_pPeerConnectionCurrentHandshake->SetSDPAnswer(m_pWebRTCImp->GetRemoteSDPString(peerConnectionID)));
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		m_pPeerConnectionControllerObserver->OnSDPAnswerSuccess(m_pPeerConnectionCurrentHandshake);
@@ -464,11 +476,13 @@ RESULT PeerConnectionController::OnICECandidatesGatheringDone() {
 	//CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetSDPOfferString()));
 	// TODO: Add ICE Candidates to the peer connection
 
-	if (m_pWebRTCImp->IsOfferer()) {
-		CR(m_pPeerConnectionCurrentHandshake->SetOfferCandidates(m_pWebRTCImp->GetCandidates()));
+	long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
+
+	if (m_pWebRTCImp->IsOfferer(peerConnectionID)) {
+		CR(m_pPeerConnectionCurrentHandshake->SetOfferCandidates(m_pWebRTCImp->GetCandidates(peerConnectionID)));
 	}
 	else {
-		CR(m_pPeerConnectionCurrentHandshake->SetAnswerCandidates(m_pWebRTCImp->GetCandidates()));
+		CR(m_pPeerConnectionCurrentHandshake->SetAnswerCandidates(m_pWebRTCImp->GetCandidates(peerConnectionID)));
 	}
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {

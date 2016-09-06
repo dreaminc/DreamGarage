@@ -21,7 +21,10 @@
 #define DTLS_OFF false
 
 class WebRTCImp;
-class WebRTCPeerConnection;
+class WebRTCICECandidate;
+class PeerConnection;
+
+#include "WebRTCPeerConnection.h"
 
 class WebRTCConductor : public WebRTCPeerConnection::WebRTCPeerConnectionObserver {
 
@@ -33,34 +36,61 @@ public:
 	~WebRTCConductor();
 	
 	RESULT Initialize();
+	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer, bool fAddDataChannel);
+
+	friend class WebRTCImp;
 
 public:
 	// WebRTCPeerConnectionObserver Interface
-	virtual RESULT OnWebRTCConnectionStable() override;
-	virtual RESULT OnWebRTCConnectionClosed() override;
-	virtual RESULT OnSDPOfferSuccess() override;		// TODO: Consolidate with below
-	virtual RESULT OnSDPAnswerSuccess() override;	// TODO: Consolidate with below
-	virtual RESULT OnSDPSuccess(bool fOffer) override;
-	virtual RESULT OnSDPFailure(bool fOffer) override;
-	virtual RESULT OnICECandidatesGatheringDone() override;
-	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
-	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnWebRTCConnectionStable(long peerConnectionID) override;
+	virtual RESULT OnWebRTCConnectionClosed(long peerConnectionID) override;
+	virtual RESULT OnSDPOfferSuccess(long peerConnectionID) override;		// TODO: Consolidate with below
+	virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) override;	// TODO: Consolidate with below
+	virtual RESULT OnSDPSuccess(long peerConnectionID, bool fOffer) override;
+	virtual RESULT OnSDPFailure(long peerConnectionID, bool fOffer) override;
+	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+
+private:
+	RESULT ClearPeerConnections();
+	rtc::scoped_refptr<WebRTCPeerConnection> AddNewPeerConnection(long peerConnectionID);
+	rtc::scoped_refptr<WebRTCPeerConnection> GetPeerConnection(long peerConnectionID);
+	bool FindPeerConnectionByID(long peerConnectionID);
+
+	rtc::scoped_refptr<WebRTCPeerConnection> GetPeerConnectionByPeerUserID(long peerConnectionID);
+	bool FindPeerConnectionByPeerUserID(long peerUserID);
+
+protected:
+	bool IsPeerConnectionInitialized(long peerConnectionID);
+	bool IsConnected(long peerConnectionID);
+	bool IsOfferer(long peerConnectionID);
+	bool IsAnswerer(long peerConnectionID);
+	std::list<WebRTCICECandidate> GetICECandidates(long peerConnectionID);
+
+	std::string GetLocalSDPString(long peerConnectionID);
+	std::string GetLocalSDPJSONString(long peerConnectionID);
+	std::string GetRemoteSDPString(long peerConnectionID);
+	std::string GetRemoteSDPJSONString(long peerConnectionID);
+
+	RESULT CreateSDPOfferAnswer(long peerConnectionID, std::string strSDPOffer);
+	RESULT SetSDPAnswer(long peerConnectionID, std::string strSDPAnswer);
+
+	RESULT AddOfferCandidates(PeerConnection *pPeerConnection);
+	RESULT AddAnswerCandidates(PeerConnection *pPeerConnection);
 
 public:
-	RESULT ClearPeerConnections();
-	RESULT AddNewPeerConnection(long peerConnectionID);
-	std::shared_ptr<WebRTCPeerConnection> GetPeerConnection(long peerConnectionID);
-	bool FindPeerConnectionByID(long peerConnectionID);
-	bool FindPeerConnectionByUserID(long peerUserID);
+	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);
+	RESULT SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 private:
-	WebRTCImp *m_pParentWebRTCImp;
+	WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
-	std::vector<std::shared_ptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
+	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

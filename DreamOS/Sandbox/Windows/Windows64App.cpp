@@ -404,12 +404,6 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 					m_pCloudController->PrintEnvironmentPeerList();
 				}
 			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('I')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->AddIceCandidates();
-				}
-			}
 			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_LEFT) {
 				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::LEFT);
 			}

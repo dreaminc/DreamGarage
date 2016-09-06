@@ -240,7 +240,7 @@ void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::Si
 	case webrtc::PeerConnectionInterface::kStable: {
 		DEBUG_LINEOUT("WebRTC Connection Stable");
 		if (m_pParentObserver != nullptr) {
-			m_pParentObserver->OnWebRTCConnectionStable();
+			m_pParentObserver->OnWebRTCConnectionStable(m_peerConnectionID);
 		}
 		else {
 			DEBUG_LINEOUT("No WebRTCPeerConnection Observer registered");
@@ -266,7 +266,7 @@ void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::Si
 	case webrtc::PeerConnectionInterface::kClosed: {
 		DEBUG_LINEOUT("WebRTC Connection closed");
 		if (m_pParentObserver != nullptr) {
-			m_pParentObserver->OnWebRTCConnectionClosed();
+			m_pParentObserver->OnWebRTCConnectionClosed(m_peerConnectionID);
 		}
 		else {
 			DEBUG_LINEOUT("No WebRTC Peer Connection Observer registered");
@@ -299,7 +299,7 @@ void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface:
 	case webrtc::PeerConnectionInterface::kIceGatheringComplete: {
 		DEBUG_LINEOUT("ICE Gathering Complete");
 		if (m_pParentObserver != nullptr) {
-			m_pParentObserver->OnICECandidatesGatheringDone();
+			m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
 		}
 		else {
 			DEBUG_LINEOUT("No WebRTC Peer Connection Observer registered");
@@ -331,6 +331,16 @@ void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* c
 }
 
 // DataChannelObserver Implementation
+std::string GetDataStateString(webrtc::DataChannelInterface::DataState state) {
+	switch (state) {
+	case webrtc::DataChannelInterface::DataState::kConnecting: return std::string("connecting"); break;
+	case webrtc::DataChannelInterface::DataState::kOpen: return std::string("open"); break;
+	case webrtc::DataChannelInterface::DataState::kClosing: return std::string("closing"); break;
+	case webrtc::DataChannelInterface::DataState::kClosed: return std::string("closed"); break;
+	default:  return std::string("invalid state"); break;
+	}
+}
+
 void WebRTCPeerConnection::OnStateChange() {
 	RESULT r = R_PASS;
 
@@ -356,7 +366,7 @@ void WebRTCPeerConnection::OnMessage(const webrtc::DataBuffer& buffer) {
 		memcpy(pDataBuffer, buffer.data.data<uint8_t>(), buffer.size());
 
 		if (m_pParentObserver != nullptr) {
-			CR(m_pParentObserver->OnDataChannelMessage(pDataBuffer, pDataBuffer_n));
+			CR(m_pParentObserver->OnDataChannelMessage(m_peerConnectionID, pDataBuffer, pDataBuffer_n));
 		}
 		else {
 			DEBUG_LINEOUT("WebRTCConductor::OnMessage (Binary Databuffer %d bytes)", (int)buffer.size());
@@ -371,7 +381,7 @@ void WebRTCPeerConnection::OnMessage(const webrtc::DataBuffer& buffer) {
 		std::string strData = std::string(pszBufferString);
 
 		if (m_pParentObserver != nullptr) {
-			CR(m_pParentObserver->OnDataChannelStringMessage(strData));
+			CR(m_pParentObserver->OnDataChannelStringMessage(m_peerConnectionID, strData));
 		}
 		else {
 			DEBUG_LINEOUT("WebRTCConductor::OnMessage: %s (String Databuffer)", strData.c_str());
@@ -402,7 +412,7 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 	// TODO: Pass m_fOffer to single call since this can be consolidated
 	if (m_fOffer) {
 		if (m_pParentObserver != nullptr) {
-			CR(m_pParentObserver->OnSDPOfferSuccess());
+			CR(m_pParentObserver->OnSDPOfferSuccess(m_peerConnectionID));
 		}
 		else {
 			DEBUG_LINEOUT("SDP Offer Success");
@@ -410,7 +420,7 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 	}
 	else {
 		if (m_pParentObserver != nullptr) {
-			CR(m_pParentObserver->OnSDPAnswerSuccess());
+			CR(m_pParentObserver->OnSDPAnswerSuccess(m_peerConnectionID));
 		}
 		else {
 			DEBUG_LINEOUT("SDP Answer Success");
@@ -428,7 +438,7 @@ void WebRTCPeerConnection::OnFailure(const std::string& error) {
 	DEBUG_LINEOUT("WebRTC Error: %s", error.c_str());
 
 	if (m_pParentObserver != nullptr) {
-		CR(m_pParentObserver->OnSDPFailure(m_fOffer));
+		CR(m_pParentObserver->OnSDPFailure(m_peerConnectionID, m_fOffer));
 	}
 	else {
 		DEBUG_LINEOUT("SDP %s Failure", m_fOffer ? "offer" : "answer");
@@ -581,6 +591,52 @@ Error:
 	return r;
 }
 
+RESULT WebRTCPeerConnection::AddIceCandidate(WebRTCICECandidate iceCandidate) {
+	RESULT r = R_PASS;
+	
+	webrtc::SdpParseError sdpError;
+
+	std::unique_ptr<webrtc::IceCandidateInterface> candidate(
+		webrtc::CreateIceCandidate(iceCandidate.m_strSDPMediaID, iceCandidate.m_SDPMediateLineIndex,
+			iceCandidate.m_strSDPCandidate, &sdpError));
+
+	CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
+	CBM((m_pWebRTCPeerConnectionInterface->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
+
+	DEBUG_LINEOUT("Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
+	
+Error:
+	return r;
+}
+
+RESULT WebRTCPeerConnection::SendDataChannelStringMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	//m_SignalOnDataChannel
+
+	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	//CN(pWebRTCDataChannel);
+	CN(m_pDataChannelInterface);
+
+	//CB(pWebRTCDataChannel->Send(webrtc::DataBuffer(strMessage)));
+	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(strMessage)));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	CN(m_pDataChannelInterface);
+
+	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)));
+
+Error:
+	return r;
+}
+
 // TODO: This is not ideal, should be replaced with more robust flag
 bool WebRTCPeerConnection::IsPeerConnectionInitialized() {
 	if (m_pWebRTCPeerConnectionInterface.get() == nullptr)
@@ -628,8 +684,9 @@ std::string WebRTCPeerConnection::GetPeerConnectionString() {
 	// Issues behind the NAT
 	//return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:74.125.196.127:19302");
 	//return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	//return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.ekiga.net");
 
-	return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.ekiga.net");
+	return std::string("stun:stun.ekiga.net");
 }
 
 RESULT WebRTCPeerConnection::PrintSDP() {

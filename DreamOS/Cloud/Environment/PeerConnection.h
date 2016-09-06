@@ -13,9 +13,7 @@
 // TODO: This may result in cyclic dependency so might need to move it
 #include "Cloud/webrtc/WebRTCPeerConnection.h"
 
-const char kCandidateSdpMidName[] = "sdpMid";
-const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
-const char kCandidateSdpName[] = "candidate";
+#include "json.hpp"
 
 class PeerConnection {
 public:

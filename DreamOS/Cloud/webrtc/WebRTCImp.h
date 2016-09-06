@@ -52,46 +52,36 @@ public:
 	RESULT RegisterObserver(WebRTCObserver *pWebRTCObserver);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT Update();
-	bool IsConnected();
-	bool IsOfferer();
-	bool IsAnswerer();
-	std::list<WebRTCICECandidate> GetCandidates();
+
+	bool IsConnected(long peerConnectionID);
+	bool IsOfferer(long peerConnectionID);
+	bool IsAnswerer(long peerConnectionID);
+	std::list<WebRTCICECandidate> GetCandidates(long peerConnectionID);
 
 	// Functionality
-	RESULT StartLogin(const std::string& server, int port);
-	//RESULT InitializeConnection(bool fMaster, bool fAddDataChannel);
-	//RESULT InitializePeerConnection(bool fAddDataChannel);
-	RESULT InitializePeerConnection(bool fCreateOffer, bool fAddDataChannel = true);
-	int GetFirstPeerID();
-	
-	virtual RESULT ConnectToPeer(int peerID) override;
-	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() override;
-	void QueueUIThreadCallback(int msg_id, void* data);
-	virtual RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage) override;
-	virtual RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	// TODO: Hand around PeerConnection object instead of peerConnectionID?
+	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer);
+
+	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
+	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);
+	RESULT SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 public:
-	// Utilities
-	std::string GetSDPString();
+	std::string GetLocalSDPString(long peerConnectionID);
+	std::string GetRemoteSDPString(long peerConnectionID);
+	std::string GetLocalSDPJSONString(long peerConnectionID);
+	std::string GetRemoteSDPJSONString(long peerConnectionID);
+	RESULT CreateSDPOfferAnswer(long peerConnectionID, std::string strSDPOffer);
+	RESULT SetSDPAnswer(long peerConnectionID, std::string strSDPAnswer);
 
-	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
-	static std::string GetPeerName();
-	virtual std::string GetSDPOfferString() override;
-	//virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override;
-	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOffer) override;
-	virtual RESULT AddIceCandidates() override;
 	RESULT AddOfferCandidates(PeerConnection *pPeerConnection);
 	RESULT AddAnswerCandidates(PeerConnection *pPeerConnection);
-	RESULT SetSDPAnswer(std::string strSDPAnswer);
+
+	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
 
 protected:
-	RESULT OnSignedIn();
-	RESULT OnDisconnected();
-	RESULT OnPeerConnected(int id, const std::string& name);
-	RESULT OnPeerDisconnected(int peer_id);
-	RESULT OnMessageFromPeer(int peerID, const std::string& strMessage);
-	RESULT OnMessageSent(int err);
-	RESULT OnServerConnectionFailure();
 	RESULT OnSDPOfferSuccess();
 	RESULT OnSDPAnswerSuccess();
 	RESULT OnICECandidatesGatheringDone();
@@ -103,14 +93,10 @@ protected:
 
 protected:
 	// WebRTC Specific
-	//RESULT QueueUIThreadCallback(int msgID, void* data);
 	DWORD GetUIThreadID() { return m_UIThreadID; }
 
 private:
-	std::shared_ptr<WebRTCClient> m_pWebRTCClient;
-//	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
-	rtc::scoped_refptr<WebRTCConductor> m_pWebRTCConductor;
-	//std::shared_ptr<rtc::Win32Thread> m_pWin32thread;
+	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
 	rtc::Win32Thread m_Win32thread;
 
 	DWORD m_UIThreadID;

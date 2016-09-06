@@ -57,7 +57,7 @@ public:
 	RESULT Initialize();
 	RESULT ClearPeerConnections();
 
-	RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
+	//RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
 
 	PeerConnection *CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID);
 	PeerConnection* CreateNewPeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection);

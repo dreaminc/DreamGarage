@@ -116,9 +116,11 @@ Error:
 	return r;
 }
 
+/*
 RESULT CloudController::AddIceCandidates() {
 	return m_pCloudImp->AddIceCandidates();
 }
+*/
 
 RESULT CloudController::OnICECandidatesGatheringDone() {
 	RESULT r = R_PASS;
@@ -216,6 +218,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT CloudController::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 	RESULT r = R_PASS;
 
@@ -225,6 +228,7 @@ RESULT CloudController::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 Error:
 	return r;
 }
+*/
 
 RESULT CloudController::LoginUser() {
 	RESULT r = R_PASS;
@@ -263,21 +267,7 @@ Error:
 	return r;
 }
 
-
-// TODO: Convert WebRTC Client code to server client code
-
-// TODO: This will attempt to connect to the first peer in the list, should make more robust
-// and expose the available peer list at the CloudController layer
-RESULT CloudController::ConnectToPeer(int peerID) {
-	RESULT r = R_PASS;
-
-	CN(m_pCloudImp);
-	CR(m_pCloudImp->ConnectToPeer(peerID));
-
-Error:
-	return r;
-}
-
+/*
 RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
@@ -288,10 +278,13 @@ RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel)
 Error:
 	return r;
 }
+*/
 
+/*
 std::string CloudController::GetSDPOfferString() {
 	return m_pCloudImp->GetSDPOfferString();
 }
+*/
 
 RESULT CloudController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
@@ -311,11 +304,6 @@ RESULT CloudController::SendDataChannelMessage(int peerID, uint8_t *pDataChannel
 
 Error:
 	return r;
-}
-
-// TODO: remove this code
-std::function<void(int msgID, void* data)> CloudController::GetUIThreadCallback() {
-	return m_pCloudImp->GetUIThreadCallback();
 }
 
 // TODO: remove this code
