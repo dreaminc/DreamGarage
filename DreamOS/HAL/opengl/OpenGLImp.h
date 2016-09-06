@@ -41,7 +41,7 @@ private:
 	OGLProgram *m_pOGLProgramCapture;		// temp for testing
 	OGLProgram *m_pOGLSkyboxProgram;
 	OGLProgram *m_pOGLOverlayProgram;
-	OGLProgram *m_pOGLFlatProgram; // temp for testing
+	OGLProgram *m_pOGLFlatProgram; 
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
@@ -111,7 +111,6 @@ public:
 
 	RESULT RenderStereo(ObjectStore *pSceneGraph);
 	RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph);
-	RESULT RenderStereoFramebuffersFlat(ObjectStore *pFlatSceneGraph);
 
 	RESULT RenderFlush();
 

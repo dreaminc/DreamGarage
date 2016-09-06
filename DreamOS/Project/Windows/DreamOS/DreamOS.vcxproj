@@ -519,9 +519,7 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStore.cpp" />
-    <ClCompile Include="..\..\..\Scene\ObjectStoreImpFlatList.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
-    <ClCompile Include="..\..\..\Scene\ObjectStoreImpSet.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
@@ -867,10 +865,8 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStore.h" />
-    <ClInclude Include="..\..\..\Scene\ObjectStoreImpFlatList.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h" />
-    <ClInclude Include="..\..\..\Scene\ObjectStoreImpSet.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />

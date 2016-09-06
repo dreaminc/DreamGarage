@@ -31,8 +31,6 @@ public:
 
 	// Skybox / Sphere
 	virtual RESULT GetSkybox(skybox*& pSkybox) = 0;
-
-	virtual RESULT UpdateScene() = 0;
 };
 
 #endif // ! SCENE_GRAPH_STORE_H_

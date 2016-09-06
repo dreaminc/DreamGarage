@@ -175,3 +175,19 @@ std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHor
 {
 	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 }
+
+/*
+//RESULT Traverse(RESULT (*f)(std::shared_ptr<DimObj>), std::vector<std::shared_ptr<VirtualObj>> objects) {
+RESULT Traverse(std::function<RESULT(std::shared_ptr<DimObj> pObject)> f, std::vector<std::shared_ptr<VirtualObj>> objects) {
+	RESULT r = R_PASS;
+	for (auto& v : objects) {
+		auto d = std::dynamic_pointer_cast<DimObj>(v);
+		if (d && d->HasChildren()) {
+			CR((f)(d));
+			CR(Traverse(f, d->GetChildren()));
+		}
+	}
+Error:
+	return r;
+}
+*/

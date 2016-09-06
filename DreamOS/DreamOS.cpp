@@ -90,11 +90,6 @@ FlatContext* DreamOS::AddFlatContext()
 	return m_pSandbox->AddFlatContext();
 }
 
-RESULT DreamOS::UpdateFlatContexts()
-{
-	return m_pSandbox->UpdateFlatContexts();
-}
-
 sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pSandbox->AddSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
@@ -121,10 +116,6 @@ volume* DreamOS::MakeVolume(double side) {
 	
 quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
-}
-
-quad *DreamOS::AddFlatQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
-	return m_pSandbox->AddFlatQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 }
 
 text* DreamOS::AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)

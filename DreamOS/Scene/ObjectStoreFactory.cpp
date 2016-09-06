@@ -1,7 +1,6 @@
 #include "ObjectStoreFactory.h"
 
 #include "ObjectStoreImpList.h"
-#include "ObjectStoreImpFlatList.h"
 
 ObjectStoreImp* ObjectStoreFactory::MakeObjectStore(OBJECT_STORE_TYPE type) {
 	RESULT r = R_PASS;
@@ -10,11 +9,6 @@ ObjectStoreImp* ObjectStoreFactory::MakeObjectStore(OBJECT_STORE_TYPE type) {
 	switch (type) {
 	case OBJECT_STORE_LIST: {
 		pObjectStore = new ObjectStoreImpList();
-		CNM(pObjectStore, "Failed to initialize object store!");
-	} break;
-
-	case OBJECT_STORE_FLAT: {
-		pObjectStore = new ObjectStoreImpFlatList();
 		CNM(pObjectStore, "Failed to initialize object store!");
 	} break;
 

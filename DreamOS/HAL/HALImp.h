@@ -51,7 +51,6 @@ public:
 
 	virtual RESULT RenderStereo(ObjectStore *pSceneGraph) = 0;
 	virtual RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph) = 0;
-	virtual RESULT RenderStereoFramebuffersFlat(ObjectStore *pFlatSceneGraph) = 0;
 
 	virtual RESULT RenderFlush() = 0;
 

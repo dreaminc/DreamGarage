@@ -58,7 +58,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pSceneGraph = new ObjectStore(OBJECT_STORE_LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
-	m_pFlatSceneGraph = new ObjectStore(OBJECT_STORE_FLAT);
+	m_pFlatSceneGraph = new ObjectStore(OBJECT_STORE_LIST);
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
@@ -96,13 +96,6 @@ Error:
 	return context;
 }
 
-RESULT SandboxApp::UpdateFlatContexts() {
-	RESULT r = R_PASS;
-	CR(m_pFlatSceneGraph->GetSceneGraphStore()->UpdateScene());
-Error:
-	return r;
-}
-
 light* SandboxApp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pHALImp->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
@@ -127,27 +120,6 @@ Error:
 }
 	
 quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) {
-	RESULT r = R_PASS;
-
-	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
-	CN(pQuad);
-
-	CR(AddObject(pQuad));
-
-//Success:
-	return pQuad;
-
-Error:
-	if (pQuad != nullptr) {
-		delete pQuad;
-		pQuad = nullptr;
-	}
-
-	return nullptr;
-}
-
-quad* SandboxApp::AddFlatQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) {
-
 	RESULT r = R_PASS;
 
 	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);

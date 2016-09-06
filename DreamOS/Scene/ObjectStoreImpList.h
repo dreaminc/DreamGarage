@@ -36,8 +36,6 @@ public:
 	RESULT SetSkybox(skybox *pSkybox);
 	RESULT GetSkybox(skybox*& pSkybox);
 
-	RESULT UpdateScene() { return R_PASS; };
-
 protected:
 	std::list<VirtualObj*> m_objects;
 private:	

@@ -850,8 +850,6 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
 		m_pOGLProfiler->Render();
 	}
 
-	//glFlush();
-
 Error:
 	CheckGLError();
 	return r;
@@ -935,55 +933,6 @@ RESULT OpenGLImp::RenderStereo(ObjectStore *pSceneGraph) {
 			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 			m_pOGLProfiler->Render();
 		}
-	}
-
-	glFlush();
-
-Error:
-	return r;
-}
-
-/*
-RESULT OpenGLImp::InitializeStereoFramebuffers(HMD *pHMD) {
-	RESULT r = R_PASS;
-	
-	for (int i = 0; i < 2; i++) {
-		m_pStereoFramebuffers[i] = new OGLFramebuffer(this, pHMD->GetEyeWidth(), pHMD->GetEyeHeight(), 3);
-	}
-
-Error:
-	return r;
-}
-*/
-
-RESULT OpenGLImp::RenderStereoFramebuffersFlat(ObjectStore *pFlatSceneGraph) {
-	RESULT r = R_PASS;
-	ObjectStoreImp *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = NULL;
-
-	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
-
-	for (int i = 0; i < 2; i++) {
-		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
-
-		CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
-
-		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
-
-		pFlatSceneGraph->Reset();
-		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-			if (pDimObj == NULL)
-				continue;
-			else {
-				CR(m_pOGLFlatProgram->RenderObject(pDimObj));
-			}
-		}		
-
-		//m_pHMD->UnsetRenderSurface(eye);
-		//m_pHMD->CommitSwapChain(eye);
 	}
 
 Error:
