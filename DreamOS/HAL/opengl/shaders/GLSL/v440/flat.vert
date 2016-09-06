@@ -1,9 +1,3 @@
-// minimalTexture.vert
-// shadertype=glsl
-
-// This is a minimal texture shader that simply displays
-// a vertex color and position (no lighting)
-
 #version 440 core
 
 layout (location = 0) in vec4 inV_vec4Position;
