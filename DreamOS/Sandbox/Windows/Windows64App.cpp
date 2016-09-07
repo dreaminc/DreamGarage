@@ -694,11 +694,6 @@ RESULT Windows64App::Show() {
 		else {
 			// Render Scene
 			m_pHALImp->Render(m_pSceneGraph);
-
-			//TODO move to function in HALImp (RenderClearLayer?)
-			glClearDepth(1.0f);
-			glClear(GL_DEPTH_BUFFER_BIT);
-
 			m_pHALImp->RenderFlat(m_pFlatSceneGraph);
 		}
 		//*/

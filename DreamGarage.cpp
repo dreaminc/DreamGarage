@@ -104,7 +104,7 @@ RESULT DreamGarage::LoadScene() {
 ///*
 	FlatContext *pContext2 = AddFlatContext();
 	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
-		std::shared_ptr<quad> pFQuad2 = pContext2->MakeQuad(0.25f, 0.25f, point(-x/10.0f, -x/10.0f, x/10.0f));
+		std::shared_ptr<quad> pFQuad2 = pContext2->AddQuad(0.25f, 0.25f, point(-x/10.0f, -x/10.0f, x/10.0f));
 		pFQuad2->SetColorTexture(pColorTexture);
 	}
 //	*/

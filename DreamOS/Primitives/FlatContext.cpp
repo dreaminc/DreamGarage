@@ -11,6 +11,18 @@ std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point o
 	RESULT r = R_PASS;
 
 	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, origin));
+
+//Success:
+	return pQuad;
+
+//Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point origin) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, origin);
 	CR(AddObject(pQuad));
 
 //Success:

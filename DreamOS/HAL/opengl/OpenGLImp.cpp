@@ -403,7 +403,7 @@ Error:
 // TODO: This convenience function should be put in a model factory
 
 //composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
-composite *OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 	
 	composite* pComposite = new composite(this);
@@ -872,6 +872,10 @@ Error:
 
 RESULT OpenGLImp::RenderFlat(ObjectStore *pFlatSceneGraph) {
 	RESULT r = R_PASS;
+
+	glClearDepth(1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
 	ObjectStoreImp *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 

@@ -98,7 +98,7 @@ public:
 	hand* MakeHand();
 
 	// TODO: Fix w/ scene graph not here
-	composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+	composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 public:
 	// TODO: Consolidate all of these (one Render function)
