@@ -21,7 +21,7 @@
 class ObjectStore : public valid {
 public:
 
-	ObjectStore(OBJECT_STORE_TYPE type);
+	ObjectStore(ObjectStoreFactory::TYPE type);
 	
 	ObjectStore();
 	~ObjectStore();
@@ -32,7 +32,7 @@ public:
 	RESULT RemoveObject(VirtualObj *pObject);
 
 	// Effectively a factory method to set up the object store
-	RESULT InitializeSceneGraphStore(OBJECT_STORE_TYPE type);
+	RESULT InitializeSceneGraphStore(ObjectStoreFactory::TYPE type);
 
 	RESULT RemoveObjectByUID(UID uid);
 	VirtualObj *FindObjectByUID(UID uid);

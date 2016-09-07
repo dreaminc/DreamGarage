@@ -5,15 +5,15 @@
 #include "Scene/ObjectStoreImp.h"
 #include "Core/Types/Factory.h"
 
-
-typedef enum {
-	OBJECT_STORE_LIST,
-	OBJECT_STORE_INVALID
-} OBJECT_STORE_TYPE;
-
 class ObjectStoreFactory : public Factory {
 public:
-	static ObjectStoreImp* MakeObjectStore(OBJECT_STORE_TYPE type);
+	enum class TYPE {
+		LIST,
+		INVALID
+	} ;
+
+public:
+	static ObjectStoreImp* MakeObjectStore(ObjectStoreFactory::TYPE type);
 };
 
 #endif // ! OBJECT_STORE_FACTORY_H_

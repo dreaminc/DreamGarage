@@ -1,7 +1,7 @@
 #include "ObjectStore.h"
 #include "ObjectStoreImpList.h"
 
-ObjectStore::ObjectStore(OBJECT_STORE_TYPE type) {
+ObjectStore::ObjectStore(ObjectStoreFactory::TYPE type) {
 	RESULT r = R_PASS;
 
 	CRM(InitializeSceneGraphStore(type), "Failed to initialize scene graph store");
@@ -14,7 +14,7 @@ Error:
 }
 
 ObjectStore::ObjectStore() :
-	ObjectStore(OBJECT_STORE_LIST)
+	ObjectStore(ObjectStoreFactory::TYPE::LIST)
 {
 	// empty 
 }
@@ -23,7 +23,7 @@ ObjectStore::~ObjectStore() {
 	// empty
 }
 
-RESULT ObjectStore::InitializeSceneGraphStore(OBJECT_STORE_TYPE type) {
+RESULT ObjectStore::InitializeSceneGraphStore(ObjectStoreFactory::TYPE type) {
 	RESULT r = R_PASS;
 
 	CBM((m_pSceneGraphStore == NULL), "Scene Graph Store already initialized");
