@@ -380,6 +380,18 @@ RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState)
 	return m_pCloudController->SendUpdateHandMessage(userID, handState);
 }
 
+RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
+	return m_pCloudController->BroadcastDataMessage(pDataMessage);
+}
+
+RESULT SandboxApp::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pCloudController->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT SandboxApp::BroadcastUpdateHandMessage(hand::HandState handState) {
+	return m_pCloudController->BroadcastUpdateHandMessage(handState);
+}
+
 // IO
 RESULT SandboxApp::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	RESULT r = R_PASS;

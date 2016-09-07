@@ -352,6 +352,14 @@ RESULT EnvironmentController::PrintEnvironmentPeerList() {
 	return R_PASS;
 }
 
+long EnvironmentController::GetUserID() {
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		return m_pEnvironmentControllerObserver->GetUserID();
+	}
+
+	return -1;
+}
+
 EnvironmentPeer *EnvironmentController::GetPeerByUserID(long userID) {
 	for (auto &peer : m_environmentPeers)
 		if (peer.GetUserID() == userID)
@@ -638,22 +646,42 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
+RESULT EnvironmentController::BroadcastDataChannelStringMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->BroadcastDataChannelStringMessage(strMessage));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->BroadcastDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnDataChannelStringMessage(long peerUserID, const std::string& strDataChannelMessage) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage));
+		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(peerUserID, strDataChannelMessage));
 	}
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT EnvironmentController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(peerUserID, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 Error:

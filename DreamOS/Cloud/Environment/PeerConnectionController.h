@@ -32,6 +32,8 @@ public:
 		// TODO: Switch to Peer User ID
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+
+		virtual long GetUserID() = 0;
 	};
 
 	RESULT RegisterPeerConnectionControllerObserver(PeerConnectionControllerObserver* pPeerConnectionControllerObserver);
@@ -61,15 +63,18 @@ public:
 
 	//RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
 
-	PeerConnection *CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID);
-	PeerConnection* CreateNewPeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection);
+	//PeerConnection *CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID);	// DEADBEEF: ?
+	PeerConnection* CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection);
 
 	// TODO: This is kind of useless
-	bool FindPeerConnectionByOfferUserID(long userID);
-	PeerConnection *GetPeerConnectionByOfferUserID(long userID);
+	bool FindPeerConnectionByOfferUserID(long offerUserID);
+	PeerConnection *GetPeerConnectionByOfferUserID(long offerUserID);
+
+	bool FindPeerConnectionByPeerUserID(long peerUserID);
+	PeerConnection *GetPeerConnectionByPeerUserID(long peerUserID);
 	
-	bool FindPeerConnectionByAnswerUserID(long peerUserID);
-	PeerConnection *GetPeerConnectionByAnswerUserID(long peerUserID);
+	bool FindPeerConnectionByAnswerUserID(long answerUserID);
+	PeerConnection *GetPeerConnectionByAnswerUserID(long answerUserID);
 
 	bool FindPeerConnectionByID(long peerConnectionID);
 	PeerConnection *GetPeerConnectionByID(long peerConnectionID);
@@ -90,6 +95,11 @@ public:
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
+	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	long GetUserID();
 
 private:
 	std::unique_ptr<WebRTCImp> m_pWebRTCImp;

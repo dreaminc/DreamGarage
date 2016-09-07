@@ -45,6 +45,10 @@ public:
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
+	RESULT BroadcastDataMessage(Message *pDataMessage);
+	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
+
 public:
 	CloudController();
 	~CloudController();
@@ -57,6 +61,8 @@ public:
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT LoginUser();
 	RESULT Update();
+
+	virtual long GetUserID() override;
 
 	//RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
 	//std::string GetSDPOfferString();
@@ -80,6 +86,9 @@ public:
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
+	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 private:
 	//UID m_uid;

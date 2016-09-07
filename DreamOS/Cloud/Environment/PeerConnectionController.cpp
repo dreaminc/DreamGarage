@@ -76,16 +76,16 @@ RESULT PeerConnectionController::ClearPeerConnections() {
 	return R_PASS;
 }
 
-bool PeerConnectionController::FindPeerConnectionByOfferUserID(long userID) {
-	if (GetPeerConnectionByOfferUserID(userID) == nullptr)
+bool PeerConnectionController::FindPeerConnectionByOfferUserID(long offerUserID) {
+	if (GetPeerConnectionByOfferUserID(offerUserID) == nullptr)
 		return false;
 	else
 		return true;
 }
 
-PeerConnection *PeerConnectionController::GetPeerConnectionByOfferUserID(long userID) {
+PeerConnection *PeerConnectionController::GetPeerConnectionByOfferUserID(long offerUserID) {
 	for (auto &peerConnection : m_peerConnections) {
-		if (userID == peerConnection.GetOfferUserID()) {
+		if (offerUserID == peerConnection.GetOfferUserID()) {
 			return &(peerConnection);
 		}
 	}
@@ -93,16 +93,33 @@ PeerConnection *PeerConnectionController::GetPeerConnectionByOfferUserID(long us
 	return nullptr;
 }
 
-bool PeerConnectionController::FindPeerConnectionByAnswerUserID(long peerUserID) {
-	if (GetPeerConnectionByAnswerUserID(peerUserID) == nullptr)
+bool PeerConnectionController::FindPeerConnectionByPeerUserID(long peerUserID) {
+	if (GetPeerConnectionByPeerUserID(peerUserID) == nullptr)
 		return false;
 	else
 		return true;
 }
 
-PeerConnection *PeerConnectionController::GetPeerConnectionByAnswerUserID(long peerUserID) {
+PeerConnection *PeerConnectionController::GetPeerConnectionByPeerUserID(long peerUserID) {
 	for (auto &peerConnection : m_peerConnections) {
-		if (peerUserID == peerConnection.GetAnswerUserID()) {
+		if (peerUserID == peerConnection.GetPeerUserID()) {
+			return &(peerConnection);
+		}
+	}
+
+	return nullptr;
+}
+
+bool PeerConnectionController::FindPeerConnectionByAnswerUserID(long answerUserID) {
+	if (GetPeerConnectionByAnswerUserID(answerUserID) == nullptr)
+		return false;
+	else
+		return true;
+}
+
+PeerConnection *PeerConnectionController::GetPeerConnectionByAnswerUserID(long answerUserID) {
+	for (auto &peerConnection : m_peerConnections) {
+		if (answerUserID == peerConnection.GetAnswerUserID()) {
 			return &(peerConnection);
 		}
 	}
@@ -140,6 +157,8 @@ bool PeerConnectionController::IsUserIDConnected(long peerUserID) {
 	}
 }
 
+// DEADBEEF:?
+/*
 PeerConnection* PeerConnectionController::CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID) {
 	//RESULT r = R_PASS;
 	PeerConnection *pPeerConnection = nullptr;
@@ -154,7 +173,7 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long peerConne
 		return pPeerConnection;
 	}
 
-	PeerConnection peerConnection(userID, peerUserID, peerConnectionID);
+	PeerConnection peerConnection(userID, userID, peerUserID, peerConnectionID);
 	m_peerConnections.push_back(peerConnection);
 
 	pPeerConnection = &(m_peerConnections.back());
@@ -162,10 +181,11 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long peerConne
 //Error:
 	return pPeerConnection;
 }
+*/
 
-PeerConnection* PeerConnectionController::CreateNewPeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) {
+PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) {
 	
-	PeerConnection peerConnection(jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
+	PeerConnection peerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 	PeerConnection *pPeerConnection = nullptr;
 
 	if ((pPeerConnection = GetPeerConnectionByID(peerConnection.GetPeerConnectionID())) != nullptr) {
@@ -193,6 +213,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	long peerConnectionID = jsonPeerConnection["/id"_json_pointer].get<long>();
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	long userID = GetUserID();
 
 	/*
 	// DEADBEEF: No longer true
@@ -214,9 +235,11 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	
 	// TODO: Make sure they match
 
+	CBM((userID != -1), "User does not seem to be signed in");
+
 	if (strMethod == "create_offer") {
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
-		pPeerConnection = CreateNewPeerConnection(jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
+		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;
@@ -236,7 +259,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	}
 	else if (strMethod == "create_answer") {
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
-		pPeerConnection = CreateNewPeerConnection(jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
+		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;	
@@ -478,7 +501,7 @@ RESULT PeerConnectionController::OnDataChannelStringMessage(long peerConnectionI
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage));
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(pPeerConnection->GetPeerUserID(), strDataChannelMessage));
 	}
 
 Error:
@@ -492,19 +515,21 @@ RESULT PeerConnectionController::OnDataChannelMessage(long peerConnectionID, uin
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(pPeerConnection->GetPeerUserID(), pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 Error:
 	return r;
 }
 
-// TODO: Fix the peer user ID shit
 RESULT PeerConnectionController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
 
+	PeerConnection *pPeerConnection = GetPeerConnectionByPeerUserID(peerID);
+	CNM(pPeerConnection, "Peer connection to user %d not found", peerID);
+
 	CN(m_pWebRTCImp);
-	CR(m_pWebRTCImp->SendDataChannelStringMessage(peerID, strMessage));
+	CR(m_pWebRTCImp->SendDataChannelStringMessage(pPeerConnection->GetPeerConnectionID(), strMessage));
 
 Error:
 	return r;
@@ -513,9 +538,50 @@ Error:
 RESULT PeerConnectionController::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
+	PeerConnection *pPeerConnection = GetPeerConnectionByPeerUserID(peerID);
+	CNM(pPeerConnection, "Peer connection to user %d not found", peerID);
+
 	CN(m_pWebRTCImp);
-	CR(m_pWebRTCImp->SendDataChannelMessage(peerID, pDataChannelBuffer, pDataChannelBuffer_n));
+	CR(m_pWebRTCImp->SendDataChannelMessage(pPeerConnection->GetPeerConnectionID(), pDataChannelBuffer, pDataChannelBuffer_n));
 
 Error:
 	return r;
+}
+
+RESULT PeerConnectionController::BroadcastDataChannelStringMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCImp);
+
+	for (auto &pPeerConnection: m_peerConnections) {
+		if (pPeerConnection.IsWebRTCConnectionStable()) {
+			CR(m_pWebRTCImp->SendDataChannelStringMessage(pPeerConnection.GetPeerConnectionID(), strMessage));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCImp);
+
+	for (auto &pPeerConnection : m_peerConnections) {
+		if (pPeerConnection.IsWebRTCConnectionStable()) {
+			CR(m_pWebRTCImp->SendDataChannelMessage(pPeerConnection.GetPeerConnectionID(), pDataChannelBuffer, pDataChannelBuffer_n));
+		}
+	}
+
+Error:
+	return r;
+}
+
+long PeerConnectionController::GetUserID() {
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		return m_pPeerConnectionControllerObserver->GetUserID();
+	}
+
+	return -1;
 }

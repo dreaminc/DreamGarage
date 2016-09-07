@@ -217,7 +217,8 @@ RESULT DreamGarage::SendHeadPosition() {
 
 	quaternion qOrientation = GetCameraOrientation();
 
-	CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
+	//CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
+	CR(BroadcastUpdateHeadMessage(ptPosition, qOrientation));
 
 Error:
 	return r;
@@ -231,11 +232,13 @@ RESULT DreamGarage::SendHandPosition() {
 	hand *pRightHand = GetHand(hand::HAND_RIGHT);
 
 	if (pLeftHand != nullptr) {
-		CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
+		//CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
+		CR(BroadcastUpdateHandMessage(pLeftHand->GetHandState()));
 	}
 
 	if (pRightHand != nullptr) {
-		CR(SendUpdateHandMessage(NULL, pRightHand->GetHandState()));
+		//CR(SendUpdateHandMessage(NULL, pRightHand->GetHandState()));
+		CR(BroadcastUpdateHandMessage(pRightHand->GetHandState()));
 	}
 
 	//CR(SendUpdateHandMessage(NULL, hand::GetDebugHandState(hand::HAND_LEFT)));
@@ -261,7 +264,8 @@ RESULT DreamGarage::SendSwitchHeadMessage() {
 	RESULT r = R_PASS;
 
 	SwitchHeadMessage switchHeadMessage(NULL, NULL);
-	CR(SendDataMessage(NULL, &(switchHeadMessage)));
+	//CR(SendDataMessage(NULL, &(switchHeadMessage)));
+	CR(BroadcastDataMessage(&(switchHeadMessage)));
 
 Error:
 	return r;

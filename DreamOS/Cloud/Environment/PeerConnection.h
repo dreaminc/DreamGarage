@@ -17,8 +17,9 @@
 
 class PeerConnection {
 public:
-	PeerConnection(long userID, long peerUserID, long peerConnectionID) :
-		m_offerUserID(userID),
+	PeerConnection(long userID, long offerUserID, long peerUserID, long peerConnectionID) :
+		m_userID(userID),
+		m_offerUserID(offerUserID),
 		m_answerUserID(peerUserID),
 		m_peerConnectionID(peerConnectionID),
 		m_fWebRTCConnectionStable(false)
@@ -26,7 +27,8 @@ public:
 		// empty
 	}
 
-	PeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) :
+	PeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) :
+		m_userID(userID),
 		m_peerConnectionID(-1),
 		m_offerUserID(-1),
 		m_answerUserID(-1),
@@ -85,6 +87,15 @@ public:
 	RESULT AddPeerCandidate(std::string strCandidate) {
 		m_answerICECandidates.push_back(strCandidate);
 		return R_PASS;
+	}
+
+	// This is a bit redundant
+	long GetUserID() { return m_userID; }
+	long GetPeerUserID() {
+		if (m_userID == m_offerUserID) 
+			return m_answerUserID;
+		else 
+			return m_offerUserID;
 	}
 
 	long GetOfferUserID() { return m_offerUserID; }
@@ -284,6 +295,7 @@ public:
 	}
 
 private:
+	long m_userID;
 	long m_offerUserID;
 	long m_answerUserID;
 	long m_peerConnectionID;
