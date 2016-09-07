@@ -14,6 +14,8 @@ SenseLeapMotion::SenseLeapMotion() :
 
 	m_pLeapController->setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
 
+	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Detected...");
+
 	/*
 	for (int i = 0; i < NUM_SENSE_KEYBOARD_KEYS; i++) {
 	RegisterEvent(i);
@@ -49,18 +51,22 @@ RESULT SenseLeapMotion::Resume() {
 // Leap Motion Callbacks
 void SenseLeapMotion::onInit(const Leap::Controller&) {
 	DEBUG_LINEOUT("SenseLeapMotion: Initialized");
+	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Init...");
 }
 
 void SenseLeapMotion::onConnect(const Leap::Controller&) {
 	DEBUG_LINEOUT("SenseLeapMotion: Connected");
+	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Connected");
 }
 
 void SenseLeapMotion::onDisconnect(const Leap::Controller&) {
 	DEBUG_LINEOUT("SenseLeapMotion: Disconnected");
+	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Disconnected");
 }
 
 void SenseLeapMotion::onExit(const Leap::Controller&) {
 	DEBUG_LINEOUT("SenseLeapMotion: Exited");
+	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Exited");
 }
 
 void SenseLeapMotion::onFrame(const Leap::Controller&) {

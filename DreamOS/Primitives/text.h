@@ -41,7 +41,9 @@ public:
 		TOP_RIGHT,
 		CENTER,
 		BOTTOM_LEFT,
-		BOTTOM_RIGHT
+		BOTTOM_RIGHT,
+		RIGHT,
+		LEFT,
 	};
 
 	uv_precision m_width = 0.0f;
@@ -61,9 +63,9 @@ public:
 	
 	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)
 	{
-		uv_precision dx = (align == BOTTOM_LEFT || align == TOP_LEFT) ? 0.0f : ((align == CENTER) ? m_width / 2 : m_width);
-		uv_precision dy = (align == BOTTOM_LEFT || align == BOTTOM_RIGHT) ? 0.0f : ((align == CENTER) ? m_height / 2 : m_height);
-		return this->MoveTo(p.x() - dx, p.y() - dy, p.z());
+		uv_precision dx = (align == CENTER) ? 0.0f : (align == RIGHT) ? m_width / 2 : (align == LEFT) ? -m_width / 2 : (align == BOTTOM_LEFT || align == TOP_LEFT) ? -m_width / 2 : m_width / 2;
+		uv_precision dy = (align == CENTER || align == RIGHT || align == LEFT) ? 0.0f : (align == TOP_RIGHT || align == TOP_LEFT) ? m_height / 2 : -m_height / 2;
+		return this->MoveTo(p.x() + dx, p.y() + dy, p.z());
 	}
 
 

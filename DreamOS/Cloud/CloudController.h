@@ -20,13 +20,15 @@
 #include "Primitives/quaternion.h"
 #include "Primitives/hand.h"
 
+class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
 
+typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 
-class CloudController : public Controller, public std::enable_shared_from_this<CloudController> {
+class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver {
 protected:
 	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
 	typedef std::function<RESULT(uint8_t *, int)> HandleDataChannelMessageCallback;
@@ -35,9 +37,11 @@ protected:
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
 
 public:
+	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
 
+	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
@@ -47,6 +51,7 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
+	RESULT Initialize();
 	RESULT InitializeUser(version ver = 1.0f);
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
@@ -71,8 +76,8 @@ public:
 	// WebRTC Callbacks
 	// TODO: Convert to observer interface (clean up)
 	RESULT OnICECandidatesGatheringDone();
-	RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage);
-	RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
@@ -88,6 +93,7 @@ private:
 	HandleDataChannelStringMessageCallback m_fnHandleDataChannelStringMessageCallback;
 	HandleDataChannelMessageCallback m_fnHandleDataChannelMessageCallback;
 
+	HandleDataMessageCallback m_fnHandleDataMessageCallback;
 	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
 	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
 };

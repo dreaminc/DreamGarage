@@ -15,6 +15,7 @@ RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 
 //	CloudController::HandleHeadUpdateMessageCallback fnHeadUpdateMessageCallback = static_cast<CloudController::HandleHeadUpdateMessageCallback>(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2));
 
+	CR(RegisterDataMessageCallback(std::bind(&DreamGarage::HandleDataMessage, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterHeadUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterHandUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHandMessage, this, std::placeholders::_1, std::placeholders::_2)));
 
@@ -27,6 +28,9 @@ RESULT DreamGarage::LoadScene() {
 
 	// TODO: This should go into an "initialize" function
 	InitializeCloudControllerCallbacks();
+
+	// IO
+	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
 	// Add lights
 
@@ -73,7 +77,6 @@ RESULT DreamGarage::LoadScene() {
 	// Add Peer User Object
 	m_pPeerUser = AddUser();
 
-	//quad *pQuad = AddQuad(100.0f, 100.0f);
 
 //	quad *pFQuad = AddQuad(1.0f, 1.0f);
 	/*
@@ -153,9 +156,6 @@ RESULT DreamGarage::LoadScene() {
 	/*
 	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
-
-
-
 	//m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 
 	/*
@@ -261,6 +261,8 @@ RESULT DreamGarage::SendHeadPosition() {
 	RESULT r = R_PASS;
 
 	point ptPosition = GetCameraPosition();
+	ptPosition.y() *= -1.0f;	// TODO: This is an issue with the OVR position 
+
 	quaternion qOrientation = GetCameraOrientation();
 
 	CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
@@ -290,6 +292,29 @@ Error:
 	return r;
 }
 
+
+class SwitchHeadMessage : public Message {
+public:
+	SwitchHeadMessage(long senderUserID, long receiverUserID) :
+		Message(senderUserID, 
+				receiverUserID, 
+				(Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1), 
+				sizeof(SwitchHeadMessage))
+	{
+		// empty
+	}
+};
+
+RESULT DreamGarage::SendSwitchHeadMessage() {
+	RESULT r = R_PASS;
+
+	SwitchHeadMessage switchHeadMessage(NULL, NULL);
+	CR(SendDataMessage(NULL, &(switchHeadMessage)));
+
+Error:
+	return r;
+}
+
 // Head update time
 #define UPDATE_HEAD_COUNT_THROTTLE 90	
 #define UPDATE_HEAD_COUNT_MS ((1000.0f) / UPDATE_HEAD_COUNT_THROTTLE)
@@ -302,7 +327,19 @@ std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system
 
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
+	/*
+	static std::shared_ptr<DebugData> pX = DebugConsole::GetDebugConsole()->Register();
+	pX->SetValue("nir");
 
+	static std::shared_ptr<DebugData> pY = DebugConsole::GetDebugConsole()->Register();
+	pY->SetValue("dan");
+
+	static std::shared_ptr<DebugData> pZ = DebugConsole::GetDebugConsole()->Register();
+	pZ->SetValue("nir finkelstein");
+
+	static std::shared_ptr<DebugData> pZ2 = DebugConsole::GetDebugConsole()->Register();
+	pZ2->SetValue("hello");
+	*/
 	/*
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
@@ -324,6 +361,7 @@ RESULT DreamGarage::Update(void) {
 
 	// Head update
 	// TODO: this should go up into DreamOS or even sandbox
+	///*
 	std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
 
 	if(std::chrono::duration_cast<std::chrono::milliseconds>(timeNow - g_lastHeadUpdateTime).count() > UPDATE_HEAD_COUNT_MS) {
@@ -337,6 +375,7 @@ RESULT DreamGarage::Update(void) {
 		SendHandPosition();
 		g_lastHandUpdateTime = timeNow;
 	}
+	//*/
 	
 	/*
 	static quaternion_precision theta = 0.0f;
@@ -357,6 +396,12 @@ RESULT DreamGarage::Update(void) {
 		qOrientation *= quaternion((quaternion_precision)(M_PI_4/2.0f), vector::jVector(1.0f));
 	*/
 
+	/*
+	quaternion qOrientation = quaternion((quaternion_precision)0.0f, vector::kVector(1.0f));;
+	qOrientation.RotateX(((quaternion_precision)(M_PI * 1.5f)));
+	m_pPeerUser->SetOrientation(qOrientation);
+	m_pPeerUser->SetPosition(point(0.0f, 2.0f, 0.0f));
+	//*/
 
 	//m_pPeerUser->SetOrientation(quaternion((quaternion_precision)0.0f, vector::kVector(1.0f)));
 	//m_pPeerUser->RotateYByDeg(180.0f);
@@ -371,6 +416,19 @@ RESULT DreamGarage::Update(void) {
 }
 
 // Cloud Controller
+RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) {
+	RESULT r = R_PASS;
+
+	Message::MessageType switchHeadModelMessage = (Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1);
+
+	if (pDataMessage->GetType() == switchHeadModelMessage) {
+		CR(m_pPeerUser->SwitchHeadModel());
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
@@ -384,6 +442,7 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
+	//qOrientation.Reverse();
 	qOrientation.RotateY(((quaternion_precision)(M_PI)));
 	m_pPeerUser->SetOrientation(qOrientation);
 
@@ -411,6 +470,21 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 
 	hand::HandState handState = pUpdateHandMessage->GetHandState();
 	m_pPeerUser->UpdateHand(handState);
+
+//Error:
+	return r;
+}
+
+RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
+	RESULT r = R_PASS;
+
+	switch (kbEvent->KeyCode) {
+		case (SK_SCAN_CODE)('C') : {
+			if (kbEvent->KeyState != 0) {
+				SendSwitchHeadMessage();
+			}
+		}
+	}
 
 //Error:
 	return r;

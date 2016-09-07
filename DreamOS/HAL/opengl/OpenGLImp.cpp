@@ -402,7 +402,8 @@ Error:
 
 // TODO: This convenience function should be put in a model factory
 
-composite* OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+//composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+composite *OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 	
 	composite* pComposite = new composite(this);
@@ -426,9 +427,18 @@ composite* OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& ws
 			continue;
 		}
 
+		// Rotating here is a bit faster (vs below and update the buffer)
+		RotationMatrix rotMat(vEulerRotation);
+		for (auto &vert: m.second.vertices) {
+			vert.m_point = rotMat * vert.m_point;
+			vert.m_normal = rotMat * vert.m_normal;
+		}
+
 		std::shared_ptr<model> pModel(MakeModel(std::move(m.second.vertices), std::move(m.second.indices)));
-				
+		OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pModel.get());
 		CN(pModel);
+		CN(pOGLObj);
+
 		pComposite->AddChild(pModel);
 
 		if (pTexture != nullptr) {
@@ -463,8 +473,13 @@ composite* OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& ws
 
 		pModel->Scale(scale);
 		pModel->MoveTo(ptPosition);
-		pModel->RotateYBy(rotateY);
+		//pModel->RotateYBy(rotateY);
+		
+		//pModel->RotateVerticesByEulerVector(vEulerRotation);
 		//pModel->UpdateOGLBuffers();
+		//pModel->UpdateBuffers();
+		//pOGLObj->UpdateOGLBuffers();
+
 		if (pSceneGraph != nullptr) {
 			pSceneGraph->PushObject(pModel.get());
 		}
@@ -650,10 +665,10 @@ Error:
 	return nullptr;
 }
 
-composite* OpenGLImp::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+composite* OpenGLImp::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 
-	composite *pModel = LoadModel(nullptr, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+	composite *pModel = LoadModel(nullptr, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 	CN(pModel);
 
 	//Success:

@@ -74,6 +74,8 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
 
+	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
+
 Error:
 	return r;
 }
@@ -230,7 +232,7 @@ RESULT OVRHMD::UpdateHMD() {
 	if (trackingState.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
 		//ovrPosef headPose = trackingState.HeadPose.ThePose;
 		m_ptOrigin = point(reinterpret_cast<float*>(&(trackingState.HeadPose.ThePose.Position)));
-		m_ptOrigin *= -1.0f;
+		m_ptOrigin *= -1.0f;	// TODO: This is an issue with the OVR position 
 
 		m_qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HeadPose.ThePose.Orientation)));
 		m_qOrientation.Reverse();

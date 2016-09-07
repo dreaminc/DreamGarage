@@ -116,6 +116,8 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
 
+	OVERLAY_DEBUG_OUT("HMD Vive - On");
+
 Error:
 	return r;
 }

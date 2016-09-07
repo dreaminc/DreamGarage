@@ -198,6 +198,11 @@ RESULT UserController::LoadProfile() {
 
 		DEBUG_LINEOUT("User Profile Loaded");
 		m_user.PrintUser();
+
+		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
+
+		OVERLAY_DEBUG_SET("User", std::string("User ") + m_user.GetEmail());
+		OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
 	}
 
 Error:
