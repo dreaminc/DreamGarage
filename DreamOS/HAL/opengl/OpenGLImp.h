@@ -102,9 +102,7 @@ public:
 
 public:
 	// TODO: Consolidate all of these (one Render function)
-	RESULT SetMonoViewTarget();
-	RESULT SetStereoViewTarget(EYE_TYPE eye);
-	RESULT SetStereoFramebufferViewTarget(EYE_TYPE eye);
+	RESULT SetViewTarget(EYE_TYPE eye);
 
 	RESULT Render(ObjectStore *pSceneGraph);
 	RESULT RenderFlat(ObjectStore *pFlatSceneGraph);

@@ -267,21 +267,8 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::SetMonoViewTarget() {
-	RESULT r = R_PASS;
-
-	// Render to screen
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
-	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
-
-//Error:
-	return r;
-}
-
 // Assumes Context Current
-RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
+RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
 	// Render to screen
@@ -296,17 +283,15 @@ RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 			glViewport((GLsizei)m_pxViewWidth / 2, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
 		} break;
 
+		case EYE_MONO: {
+			glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
+		} break;
 	}
 
-	m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight);
+	(eye != EYE_MONO) ? m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight) :
+						m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
 	return r;
-}
-
-// Assumes Context Current
-RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
-	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
-	return m_pHMD->BindFramebuffer(eye);
 }
 
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
@@ -818,6 +803,37 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::RenderFlat(ObjectStore *pFlatSceneGraph) {
+	RESULT r = R_PASS;
+
+	glClearDepth(1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	ObjectStoreImp *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = NULL;
+
+	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
+
+	// Camera Projection Matrix
+	SetViewTarget(EYE_MONO);
+	CR(m_pOGLFlatProgram->SetCamera(m_pCamera));
+
+	// Send SceneGraph objects to shader
+	pFlatSceneGraph->Reset();
+	while((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+		if (pDimObj == NULL)
+			continue;
+		else {
+			CR(m_pOGLFlatProgram->RenderObject(pDimObj));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
@@ -865,7 +881,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
 	CR(m_pOGLRenderProgram->SetLights(pLights));
 
 	// Camera Projection Matrix
-	SetMonoViewTarget();
+	SetViewTarget(eye);
 	CR(m_pOGLRenderProgram->SetCamera(m_pCamera));
 
 	// Send SceneGraph objects to shader
@@ -884,37 +900,6 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
 
 Error:
 	CheckGLError();
-	return r;
-}
-
-RESULT OpenGLImp::RenderFlat(ObjectStore *pFlatSceneGraph) {
-	RESULT r = R_PASS;
-
-	glClearDepth(1.0f);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	ObjectStoreImp *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = NULL;
-
-	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
-
-	// Camera Projection Matrix
-	SetMonoViewTarget();
-	CR(m_pOGLFlatProgram->SetCamera(m_pCamera));
-
-	// Send SceneGraph objects to shader
-	pFlatSceneGraph->Reset();
-	while((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-		if (pDimObj == NULL)
-			continue;
-		else {
-			CR(m_pOGLFlatProgram->RenderObject(pDimObj));
-		}
-	}
-
-Error:
 	return r;
 }
 
