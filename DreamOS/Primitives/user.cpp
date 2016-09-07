@@ -36,7 +36,7 @@ RESULT user::Initialize() {
 	m_pHeads.push_back(pHead);
 	//*/
 
-	std::shared_ptr<composite> pHead = AddComposite();
+	pHead = AddComposite();
 	pHead->AddSphere(0.25f, 20, 20);
 	
 	// Hands
