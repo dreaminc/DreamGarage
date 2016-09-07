@@ -109,7 +109,6 @@ public:
 	RESULT Render(ObjectStore *pSceneGraph);
 	RESULT RenderFlat(ObjectStore *pFlatSceneGraph);
 
-	RESULT RenderStereo(ObjectStore *pSceneGraph);
 	RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph);
 
 	RESULT RenderFlush();

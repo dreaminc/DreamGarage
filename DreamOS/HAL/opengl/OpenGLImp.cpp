@@ -918,51 +918,6 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::RenderStereo(ObjectStore *pSceneGraph) {
-	RESULT r = R_PASS;
-	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = NULL;
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
-	// Send lights to shader
-	std::vector<light*> *pLights = NULL;
-	CR(pObjectStore->GetLights(pLights));
-	CN(pLights);
-	CR(m_pOGLRenderProgram->SetLights(pLights));
-
-	for (int i = 0; i < 2; i++) {
-		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
-
-		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
-		SetStereoViewTarget(eye);
-		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
-
-		// Send SceneGraph objects to shader
-		pSceneGraph->Reset();
-		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-			if (pDimObj == NULL)
-				continue;
-			else {
-				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
-			}
-
-		}
-
-		CR(RenderSkybox(pObjectStore, eye));
-		CR(RenderProfiler(eye));
-	}
-
-Error:
-	return r;
-}
-
 // TODO: Naming is kind of lame since this hits the HMD
 // TODO: Shared code should be consolidated
 RESULT OpenGLImp::RenderStereoFramebuffers(ObjectStore *pSceneGraph) {
@@ -1034,22 +989,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(ObjectStore *pSceneGraph) {
 				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 			}
 		}		
-/*
-		skybox *pSkybox = nullptr;
-		CR(pObjectStore->GetSkybox(pSkybox));
-		if (pSkybox != nullptr) {
-			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
-			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
-		}
-		
-		// Render profiler overlay
-		if (GetRenderProfiler()) {
-			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
-			m_pOGLProfiler->Render();
-		}
-		*/
+
 		CR(RenderSkybox(pObjectStore, eye));
 		CR(RenderProfiler(eye));
 
