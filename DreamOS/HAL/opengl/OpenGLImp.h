@@ -113,7 +113,11 @@ public:
 	RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph);
 
 	RESULT RenderFlush();
+private:
+	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
+	RESULT RenderProfiler(EYE_TYPE eye);
 
+public:
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT Shutdown();
 

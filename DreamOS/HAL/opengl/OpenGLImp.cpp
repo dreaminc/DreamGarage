@@ -789,10 +789,40 @@ Error:
 	return nullptr;
 }
 
+RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
+
+	RESULT r = R_PASS;
+	skybox *pSkybox = nullptr;
+	CR(pObjectStore->GetSkybox(pSkybox));
+	if (pSkybox != nullptr) {
+		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
+		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
+
+	RESULT r = R_PASS;
+	// Render profiler overlay
+	if (GetRenderProfiler()) {
+		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
+		m_pOGLProfiler->Render();
+	}
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
 	RESULT r = R_PASS;
 	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
+	EYE_TYPE eye = EYE_MONO;
 
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
@@ -849,21 +879,8 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
 			CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 		}
 	}
-	
-	skybox *pSkybox = nullptr;
-	CR(pObjectStore->GetSkybox(pSkybox));
-	if (pSkybox != nullptr) {
-		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLSkyboxProgram->SetCamera(m_pCamera));
-		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
-	}
-	
-	// Render profiler overlay
-	if (GetRenderProfiler()) {
-		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLProfiler->m_OGLProgram->SetCamera(m_pCamera));
-		m_pOGLProfiler->Render();
-	}
+	CR(RenderSkybox(pObjectStore, eye));
+	CR(RenderProfiler(eye));
 
 Error:
 	CheckGLError();
@@ -938,20 +955,8 @@ RESULT OpenGLImp::RenderStereo(ObjectStore *pSceneGraph) {
 
 		}
 
-		skybox *pSkybox = nullptr;
-		CR(pObjectStore->GetSkybox(pSkybox));
-		if (pSkybox != nullptr) {
-			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
-			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
-		}
-
-		// Render profiler overlay
-		if (GetRenderProfiler()) {
-			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
-			m_pOGLProfiler->Render();
-		}
+		CR(RenderSkybox(pObjectStore, eye));
+		CR(RenderProfiler(eye));
 	}
 
 Error:
@@ -1029,7 +1034,7 @@ RESULT OpenGLImp::RenderStereoFramebuffers(ObjectStore *pSceneGraph) {
 				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
 			}
 		}		
-
+/*
 		skybox *pSkybox = nullptr;
 		CR(pObjectStore->GetSkybox(pSkybox));
 		if (pSkybox != nullptr) {
@@ -1044,6 +1049,9 @@ RESULT OpenGLImp::RenderStereoFramebuffers(ObjectStore *pSceneGraph) {
 			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 			m_pOGLProfiler->Render();
 		}
+		*/
+		CR(RenderSkybox(pObjectStore, eye));
+		CR(RenderProfiler(eye));
 
 		m_pHMD->UnsetRenderSurface(eye);
 		m_pHMD->CommitSwapChain(eye);

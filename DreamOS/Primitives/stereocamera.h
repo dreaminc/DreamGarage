@@ -104,7 +104,8 @@ public:
 			} break;
 
 			case EYE_MONO: {
-				mat = ViewMatrix(m_ptOrigin, m_qRotation);
+				//mat = ViewMatrix(m_ptOrigin, m_qRotation);
+				mat = camera::GetViewMatrix();
 			} break;
 		}
 			
