@@ -16,7 +16,7 @@ RESULT user::Initialize() {
 
 	///*
 
-	/*
+	///*
 	std::shared_ptr<texture> pHeadTexture = MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	std::shared_ptr<composite> pHead = AddModel(L"\\Models\\face2\\untitled.obj",
 					   pHeadTexture.get(),
