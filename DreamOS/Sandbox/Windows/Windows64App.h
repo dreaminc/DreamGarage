@@ -64,6 +64,11 @@ private:
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
+	// Handle a mouse event from a window's message. Return true if the message is handled, and false otherwise.
+	bool	HandleMouseEvent(const MSG&	windowMassage);
+	// Handle a key event from a window's message. Return true if the message is handled, and false otherwise.
+	bool	HandleKeyEvent(const MSG&	windowMassage);
+
 public:
 	HDC GetDeviceContext();
 	HWND GetWindowHandle();
