@@ -638,22 +638,22 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+RESULT EnvironmentController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(strDataChannelMessage));
+		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage));
 	}
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT EnvironmentController::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 Error:

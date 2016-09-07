@@ -27,12 +27,22 @@ class PeerConnection;
 #include "WebRTCPeerConnection.h"
 
 class WebRTCConductor : public WebRTCPeerConnection::WebRTCPeerConnectionObserver {
-
 public:
+	class WebRTCConductorObserver {
+	public:
+		virtual RESULT OnWebRTCConnectionStable(long peerConnectionID) = 0;
+		virtual RESULT OnWebRTCConnectionClosed(long peerConnectionID) = 0;
+		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;		// TODO: Consolidate with below
+		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;	// TODO: Consolidate with below
+		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+	};
+
 	friend class WebRTCImp;
 
 public:
-	WebRTCConductor(WebRTCImp *pParentWebRTCImp);
+	WebRTCConductor(WebRTCConductorObserver *pParentObserver);
 	~WebRTCConductor();
 	
 	RESULT Initialize();
@@ -87,7 +97,8 @@ public:
 	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 private:
-	WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
+	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
+	WebRTCConductorObserver *m_pParentObserver;
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;

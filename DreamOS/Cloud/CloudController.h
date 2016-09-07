@@ -30,8 +30,8 @@ typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageC
 
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver {
 protected:
-	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
-	typedef std::function<RESULT(uint8_t *, int)> HandleDataChannelMessageCallback;
+	typedef std::function<RESULT(long, const std::string&)> HandleDataChannelStringMessageCallback;
+	typedef std::function<RESULT(long, uint8_t *, int)> HandleDataChannelMessageCallback;
 
 	RESULT RegisterDataChannelStringMessageCallback(HandleDataChannelStringMessageCallback fnHandleDataChannelStringMessageCallback);
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
@@ -73,8 +73,10 @@ public:
 	// WebRTC Callbacks
 	// TODO: Convert to observer interface (clean up)
 	RESULT OnICECandidatesGatheringDone();
-	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
-	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+
+	// EnvironmentControllerObserver
+	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

@@ -36,8 +36,8 @@ Error:
 
 PeerConnectionController::PeerConnectionController(Controller* pParentController) :
 	Controller(pParentController),
-	m_pWebRTCImp(nullptr),
-	m_pPeerConnectionCurrentHandshake(nullptr)
+	m_pWebRTCImp(nullptr)
+	//DEADBEEF: m_pPeerConnectionCurrentHandshake(nullptr)
 {
 	// empty
 }
@@ -194,9 +194,12 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 
+	/*
+	// DEADBEEF: No longer true
 	if (m_pPeerConnectionCurrentHandshake != nullptr) {
 		CBM((m_pPeerConnectionCurrentHandshake->GetPeerConnectionID() == peerConnectionID), "Can't negotiate multiple peers at same time");
 	}
+	*/
 	
 	// The below will create it if it doesn't exist
 
@@ -214,7 +217,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 
-		m_pPeerConnectionCurrentHandshake = pPeerConnection;
+		// DEADBEEF: No longer true
+		//m_pPeerConnectionCurrentHandshake = pPeerConnection;
 
 		// Initialize SDP Peer Connection and Offer
 		CN(m_pWebRTCImp);
@@ -234,7 +238,9 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		// TODO: Make sure they match
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-		CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+		// DEADBEEF: No longer true
+		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 
 		//pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 
@@ -256,7 +262,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 
-		m_pPeerConnectionCurrentHandshake = pPeerConnection;
+		// DEADBEEF: No longer true
+		//m_pPeerConnectionCurrentHandshake = pPeerConnection;	
 
 		std::string strSDPOffer = pPeerConnection->GetSDPOffer();
 
@@ -280,7 +287,9 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// TODO: Make sure they match
 
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-		CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+		
+		// DEADBEEF: No longer true
+		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 		
 		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 
@@ -293,8 +302,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// TODO: Add Candidates
 		///*
 		if ((m_pWebRTCImp->IsOfferer(peerConnectionID) == false) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
-			CBM((m_pPeerConnectionCurrentHandshake->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
-			CRM(m_pWebRTCImp->AddOfferCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
+			CBM((pPeerConnection->GetOfferCandidates().size() > 0), "Can't add answer candidates since there are none");
+			CRM(m_pWebRTCImp->AddOfferCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
 		}
 		//*/
 	}
@@ -312,7 +321,9 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// TODO: Make sure they match
 
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-		CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+		// DEADBEEF:
+		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 
 		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 
@@ -351,7 +362,9 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// TODO: Make sure they match
 
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
-		CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
+
+		// DEADBEEF:
+		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 
 		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 
@@ -362,8 +375,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		///*
 		if ((m_pWebRTCImp->IsOfferer(peerConnectionID) == true) /*&& m_pPeerConnectionCurrentHandshake->IsWebRTCConnectionStable()*/) {
-			CBM((m_pPeerConnectionCurrentHandshake->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
-			CRM(m_pWebRTCImp->AddAnswerCandidates(m_pPeerConnectionCurrentHandshake), "Failed to add Peer Connection answer candidates");
+			CBM((pPeerConnection->GetAnswerCandidates().size() > 0), "Can't add answer candidates since there are none");
+			CRM(m_pWebRTCImp->AddAnswerCandidates(pPeerConnection), "Failed to add Peer Connection answer candidates");
 		}
 		//*/
 
@@ -388,11 +401,18 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnWebRTCConnectionStable() {
+RESULT PeerConnectionController::OnWebRTCConnectionStable(long peerConnectionID) {
 	RESULT r = R_PASS;
 	
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	CR(pPeerConnection->SetWebRTCConnectionStable());
+
+	/*
 	CNM(m_pPeerConnectionCurrentHandshake, "WebRTC Connection stable without current peer connection ERROR!");
 	m_pPeerConnectionCurrentHandshake->SetWebRTCConnectionStable();
+	*/
 
 	// If we're the offerer, we add the answer candidates - if we're the answerer we add the offers candidates
 	// At this point the WebRTC connection is stable so we're guaranteed to have the remote description
@@ -412,15 +432,6 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnWebRTCConnectionClosed() {
-	RESULT r = R_PASS;
-
-	// TODO: Do something
-
-//Error:
-	return r;
-}
-
 RESULT PeerConnectionController::HandleEnvironmentSocketResponse(std::string strMethod, nlohmann::json jsonPayload) {
 	RESULT r = R_PASS;
 
@@ -430,20 +441,37 @@ RESULT PeerConnectionController::HandleEnvironmentSocketResponse(std::string str
 	return r;
 }
 
+RESULT PeerConnectionController::OnWebRTCConnectionClosed(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	DEBUG_LINEOUT("Peer Connection %d Closed", peerConnectionID);
+
+	// TODO: Remove peer connection from list here
+
+Error:
+	return r;
+}
+
 // TODO: This might not be needed
 // Handshake moderation might get in the way
-RESULT PeerConnectionController::OnSDPOfferSuccess() {
+RESULT PeerConnectionController::OnSDPOfferSuccess(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	// Create SDP offer response
 	// TODO: Multi-peer will need to implement state hold for ID or object
 	//CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetSDPOfferString()));
+	//long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
+	
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
-	long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
-	CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetLocalSDPString(peerConnectionID)));
+	CR(pPeerConnection->SetSDPOffer(m_pWebRTCImp->GetLocalSDPString(peerConnectionID)));
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		m_pPeerConnectionControllerObserver->OnSDPOfferSuccess(m_pPeerConnectionCurrentHandshake);
+		m_pPeerConnectionControllerObserver->OnSDPOfferSuccess(pPeerConnection);
 	}
 
 Error:
@@ -452,41 +480,49 @@ Error:
 
 // TODO: This might not be needed
 // Handshake moderation might get in the way
-RESULT PeerConnectionController::OnSDPAnswerSuccess() {
+RESULT PeerConnectionController::OnSDPAnswerSuccess(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	// Create SDP offer response
 	// TODO: Multi-peer will need to implement state hold for ID or object
 	//CR(m_pPeerConnectionCurrentHandshake->SetSDPAnswer(m_pWebRTCImp->GetSDPOfferString()));
 
-	long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
-	CR(m_pPeerConnectionCurrentHandshake->SetSDPAnswer(m_pWebRTCImp->GetRemoteSDPString(peerConnectionID)));
+	//long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
+	//CR(m_pPeerConnectionCurrentHandshake->SetSDPAnswer(m_pWebRTCImp->GetRemoteSDPString(peerConnectionID)));
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	CR(pPeerConnection->SetSDPAnswer(m_pWebRTCImp->GetRemoteSDPString(peerConnectionID)));
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		m_pPeerConnectionControllerObserver->OnSDPAnswerSuccess(m_pPeerConnectionCurrentHandshake);
+		m_pPeerConnectionControllerObserver->OnSDPAnswerSuccess(pPeerConnection);
 	}
 
 Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnICECandidatesGatheringDone() {
+RESULT PeerConnectionController::OnICECandidatesGatheringDone(long peerConnectionID) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	//CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetSDPOfferString()));
 	// TODO: Add ICE Candidates to the peer connection
 
-	long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
+	//long peerConnectionID = m_pPeerConnectionCurrentHandshake->GetPeerConnectionID();
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pWebRTCImp->IsOfferer(peerConnectionID)) {
-		CR(m_pPeerConnectionCurrentHandshake->SetOfferCandidates(m_pWebRTCImp->GetCandidates(peerConnectionID)));
+		CR(pPeerConnection->SetOfferCandidates(m_pWebRTCImp->GetCandidates(peerConnectionID)));
 	}
 	else {
-		CR(m_pPeerConnectionCurrentHandshake->SetAnswerCandidates(m_pWebRTCImp->GetCandidates(peerConnectionID)));
+		CR(pPeerConnection->SetAnswerCandidates(m_pWebRTCImp->GetCandidates(peerConnectionID)));
 	}
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		m_pPeerConnectionControllerObserver->OnICECandidatesGatheringDone(m_pPeerConnectionCurrentHandshake);
+		m_pPeerConnectionControllerObserver->OnICECandidatesGatheringDone(pPeerConnection);
 	}
 
 
@@ -494,28 +530,35 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+RESULT PeerConnectionController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(strDataChannelMessage));
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage));
 	}
 
 Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT PeerConnectionController::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 Error:
 	return r;
 }
 
+// TODO: Fix the peer user ID shit
 RESULT PeerConnectionController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
 

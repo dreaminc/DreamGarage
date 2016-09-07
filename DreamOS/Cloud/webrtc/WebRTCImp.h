@@ -17,12 +17,13 @@
 #include "WebRTCCommon.h"
 #include "webrtc/base/win32socketserver.h"
 
+#include "WebRTCConductor.h"
+
 class WebRTCClient;
-class WebRTCConductor;
 class WebRTCICECandidate;
 class PeerConnection;
 
-class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp> {
+class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp>, public WebRTCConductor::WebRTCConductorObserver {
 public:
 	enum WindowMessages {
 		UI_THREAD_CALLBACK = WM_APP + 1,
@@ -31,13 +32,13 @@ public:
 public:
 	class WebRTCObserver {
 	public:
-		virtual RESULT OnWebRTCConnectionStable() = 0;
-		virtual RESULT OnWebRTCConnectionClosed() = 0;
-		virtual RESULT OnSDPOfferSuccess() = 0;
-		virtual RESULT OnSDPAnswerSuccess() = 0;
-		virtual RESULT OnICECandidatesGatheringDone() = 0;
-		virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) = 0;
-		virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnWebRTCConnectionStable(long peerConnectionID) = 0;
+		virtual RESULT OnWebRTCConnectionClosed(long peerConnectionID) = 0;
+		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;
+		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;
+		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 	};
 
 public:
@@ -82,14 +83,14 @@ public:
 	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
 
 protected:
-	RESULT OnSDPOfferSuccess();
-	RESULT OnSDPAnswerSuccess();
-	RESULT OnICECandidatesGatheringDone();
-	RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage);
-	RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-
-	RESULT OnWebRTCConnectionStable();
-	RESULT OnWebRTCConnectionClosed();
+	// WebRTCConductorObserver 
+	RESULT OnWebRTCConnectionStable(long peerConnectionID);
+	RESULT OnWebRTCConnectionClosed(long peerConnectionID);
+	RESULT OnSDPOfferSuccess(long peerConnectionID);
+	RESULT OnSDPAnswerSuccess(long peerConnectionID);
+	RESULT OnICECandidatesGatheringDone(long peerConnectionID);
+	RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage);
+	RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 protected:
 	// WebRTC Specific

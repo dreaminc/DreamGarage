@@ -206,55 +206,55 @@ Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnWebRTCConnectionStable() {
+RESULT WebRTCImp::OnWebRTCConnectionStable(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnWebRTCConnectionStable());
+		CR(m_pWebRTCObserver->OnWebRTCConnectionStable(peerConnectionID));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnWebRTCConnectionClosed() {
+RESULT WebRTCImp::OnWebRTCConnectionClosed(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnWebRTCConnectionClosed());
+		CR(m_pWebRTCObserver->OnWebRTCConnectionClosed(peerConnectionID));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnICECandidatesGatheringDone() {
+RESULT WebRTCImp::OnICECandidatesGatheringDone(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnICECandidatesGatheringDone());
+		CR(m_pWebRTCObserver->OnICECandidatesGatheringDone(peerConnectionID));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+RESULT WebRTCImp::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnDataChannelStringMessage(strDataChannelMessage));
+		CR(m_pWebRTCObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT WebRTCImp::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pWebRTCObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 Error:
@@ -263,7 +263,7 @@ Error:
 
 // Fill this out and junk
 // TODO: REMOVE DEAD CODE
-RESULT WebRTCImp::OnSDPOfferSuccess() {
+RESULT WebRTCImp::OnSDPOfferSuccess(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
@@ -279,13 +279,13 @@ RESULT WebRTCImp::OnSDPOfferSuccess() {
 	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
 
 	CN(m_pWebRTCObserver);
-	CR(m_pWebRTCObserver->OnSDPOfferSuccess());
+	CR(m_pWebRTCObserver->OnSDPOfferSuccess(peerConnectionID));
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnSDPAnswerSuccess() {
+RESULT WebRTCImp::OnSDPAnswerSuccess(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
@@ -301,7 +301,7 @@ RESULT WebRTCImp::OnSDPAnswerSuccess() {
 	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
 
 	CN(m_pWebRTCObserver);
-	CR(m_pWebRTCObserver->OnSDPAnswerSuccess());
+	CR(m_pWebRTCObserver->OnSDPAnswerSuccess(peerConnectionID));
 
 Error:
 	return r;

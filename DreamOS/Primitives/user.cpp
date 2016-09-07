@@ -16,7 +16,7 @@ RESULT user::Initialize() {
 
 	///*
 
-	///*
+	/*
 	std::shared_ptr<texture> pHeadTexture = MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	std::shared_ptr<composite> pHead = AddModel(L"\\Models\\face2\\untitled.obj",
 					   pHeadTexture.get(),
@@ -26,9 +26,7 @@ RESULT user::Initialize() {
 
 	m_pHeads.push_back(pHead);
 	m_pHeadTextures.push_back(pHeadTexture);
-	//*/
-
-	///*
+	
 	pHead = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
 						nullptr,
 						point(0.0f, 0.0f, 0.0f),
@@ -37,6 +35,9 @@ RESULT user::Initialize() {
 	pHead->SetVisible(false);
 	m_pHeads.push_back(pHead);
 	//*/
+
+	std::shared_ptr<composite> pHead = AddComposite();
+	pHead->AddSphere(0.25f, 20, 20);
 	
 	// Hands
 	m_pLeftHand = AddHand();

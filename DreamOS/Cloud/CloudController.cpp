@@ -142,21 +142,21 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+RESULT CloudController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 
 	CN(m_fnHandleDataChannelStringMessageCallback);
-	CR(m_fnHandleDataChannelStringMessageCallback(strDataChannelMessage));
+	CR(m_fnHandleDataChannelStringMessageCallback(peerConnectionID, strDataChannelMessage));
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT CloudController::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
 	if (m_fnHandleDataChannelMessageCallback != nullptr) {
-		CR(m_fnHandleDataChannelMessageCallback(pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_fnHandleDataChannelMessageCallback(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 	Message *pDataChannelMessage = reinterpret_cast<Message*>(pDataChannelBuffer);
@@ -168,7 +168,7 @@ RESULT CloudController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pD
 				UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDataChannelBuffer);
 				CN(pUpdateHeadMessage);
 				// TODO: Add peer ID from
-				CR(m_fnHandleHeadUpdateMessageCallback(NULL, pUpdateHeadMessage));
+				CR(m_fnHandleHeadUpdateMessageCallback(peerConnectionID, pUpdateHeadMessage));
 			}
 		} break;
 
@@ -177,14 +177,14 @@ RESULT CloudController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pD
 				UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDataChannelBuffer);
 				CN(pUpdateHandMessage);
 				// TODO: Add peer ID from
-				CR(m_fnHandleHandUpdateMessageCallback(NULL, pUpdateHandMessage));
+				CR(m_fnHandleHandUpdateMessageCallback(peerConnectionID, pUpdateHandMessage));
 			}
 		} break;
 
 		default: {
 			if (m_fnHandleDataMessageCallback != nullptr) {
 				// TODO: Add peer ID from
-				CR(m_fnHandleDataMessageCallback(NULL, pDataChannelMessage));
+				CR(m_fnHandleDataMessageCallback(peerConnectionID, pDataChannelMessage));
 			}
 		} break;
 	}

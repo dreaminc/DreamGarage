@@ -1,6 +1,6 @@
 #include "CloudControllerFactory.h"
 
-#include "CEFImp.h"
+//#include "CEFImp.h"
 #include "webrtc/WebRTCImp.h"
 
 #include <memory>
@@ -18,6 +18,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	// TODO: Create a collection of cloud implementations
 	// or the various ones that can be used
 
+	/*
 	if(type & CLOUD_CONTROLLER_CEF) {
 
 		// Create the CEF implementation			
@@ -29,6 +30,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 		
 		pCloudController->SetCloudImp(std::move(pCEFImp));
 	}
+	*/
 
 	if(type & CLOUD_CONTROLLER_WEBRTC) {		
 		// Create the CEF implementation			

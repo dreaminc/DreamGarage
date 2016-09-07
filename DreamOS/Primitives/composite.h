@@ -42,6 +42,9 @@ public:
 	std::shared_ptr<composite> MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation);
 	std::shared_ptr<composite> AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation);
 
+	std::shared_ptr<composite> MakeComposite();
+	std::shared_ptr<composite> AddComposite();
+
 	std::shared_ptr<hand> AddHand();
 	std::shared_ptr<hand> MakeHand();
 

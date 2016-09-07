@@ -18,8 +18,8 @@
 #include "WebRTCICECandidate.h"
 #include "Cloud/Environment/PeerConnection.h"
 
-WebRTCConductor::WebRTCConductor(WebRTCImp *pParentWebRTCImp) :
-	m_pParentWebRTCImp(pParentWebRTCImp),
+WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
+	m_pParentObserver(pParetObserver),
 	m_pWebRTCPeerConnectionFactory(nullptr)
 {
 	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
@@ -278,39 +278,77 @@ Error:
 // WebRTCPeerConnectionObserver Interface
 // TODO: implement these and pass back the right vars
 RESULT WebRTCConductor::OnWebRTCConnectionStable(long peerConnectionID) {
-	return R_NOT_IMPLEMENTED;
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnWebRTCConnectionStable(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
 }
 
 RESULT WebRTCConductor::OnWebRTCConnectionClosed(long peerConnectionID) {
-	return R_NOT_IMPLEMENTED;
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnWebRTCConnectionClosed(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
 }
 
 RESULT WebRTCConductor::OnSDPOfferSuccess(long peerConnectionID) {		// TODO: Consolidate with below
-	return R_NOT_IMPLEMENTED;
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnSDPOfferSuccess(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
 }
 
 RESULT WebRTCConductor::OnSDPAnswerSuccess(long peerConnectionID) {	// TODO: Consolidate with below
-	return R_NOT_IMPLEMENTED;
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnSDPAnswerSuccess(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
 }
 
 RESULT WebRTCConductor::OnSDPSuccess(long peerConnectionID, bool fOffer) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("SDP Success on peer connection ID %d %s", peerConnectionID, fOffer ? "offerer" : "answerer");
+
+//Error:
+	return r;
 }
 
 RESULT WebRTCConductor::OnSDPFailure(long peerConnectionID, bool fOffer) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("SDP Failure on peer connection ID %d %s", peerConnectionID, fOffer ? "offerer" : "answerer");
+
+	//Error:
+	return r;
 }
 
 RESULT WebRTCConductor::OnICECandidatesGatheringDone(long peerConnectionID) {
-	return R_NOT_IMPLEMENTED;
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnICECandidatesGatheringDone(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
 }
 
 RESULT WebRTCConductor::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
-	return R_NOT_IMPLEMENTED;
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage);
+	}
+
+	return R_NOT_HANDLED;
 }
 
 RESULT WebRTCConductor::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
-	return R_NOT_IMPLEMENTED;
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n);
+	}
+
+	return R_NOT_HANDLED;
 }
 
 RESULT WebRTCConductor::SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage) {
