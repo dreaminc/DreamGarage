@@ -51,20 +51,21 @@ RESULT DreamGarage::LoadScene() {
 
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
 	point ptLight = point(0.0f, 5.0f, 5.0f);
-	//AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//pLight->EnableShadows();
 	//AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	//
 
 	///*
-	//texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-	//texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 
 	texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	//texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	//texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
+	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
 	//*/
 
 	
@@ -135,9 +136,10 @@ RESULT DreamGarage::LoadScene() {
 	*/
 	//pQuad->SetBumpTexture(pBumpTexture);
 
-	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
-	//pQuad->SetColorTexture(pColorTextureCobble);
-	//pQuad->SetBumpTexture(pBumpTexture);
+	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200);// , pHeightTextureCobble);
+	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
+	pQuad->SetColorTexture(pColorTextureCobble);
+	pQuad->SetBumpTexture(pBumpTexture);
 
 	
 	/*
@@ -151,7 +153,7 @@ RESULT DreamGarage::LoadScene() {
 	pQuad2->SetBillboard(true);
 	
 	//tQuad->SetBillboard(true);
-	//*/
+	/*/
 
 	/*
 	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
@@ -169,31 +171,28 @@ RESULT DreamGarage::LoadScene() {
 	//m_pPeerUser = AddVolume(0.25f, 0.5f, 1.0f);
 	//m_pPeerUser = AddVolume(1.0f);
 
-	//m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
-
-	/*
-
-	///*
-	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
+	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
 
 	/*
 	m_pSphere = AddSphere(0.5f, 40, 40);
 	m_pSphere->SetColorTexture(pColorTexture);
+	m_pSphere->MoveTo(2.0f, 2.0f, 0.0f);
 	m_pSphere->SetBumpTexture(pBumpTexture);
-	//*/
+	*/
 
-	/*
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	///*
+	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
+	//sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
 	pSphere2->translateX(5.0f);
 	//*/
 
-	/*
+	///*
 	volume *pVolume = AddVolume(1.0f);
 	pVolume->translateX(5.0f);
-	*/
+	//*/
 
 	/*
 	m_pPeerUser = AddModel(L"\\Models\\face2\\untitled.obj",
@@ -211,25 +210,25 @@ RESULT DreamGarage::LoadScene() {
 		point(0.0f, 2.0f, 5.0f),
 		0.1f,
 		(point_precision)(0.0f));
-		
-
+*/		
+///*
 	AddModel(L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f - 2.6f, 0.0f),
 		0.1f,
-		100.0f);
+		vector(0.0f, 0.0f, 0.0f));
 
 	AddModel(L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
 		point(-3.0f, -4.2f - 2.5f, 0.0f),
 		0.15f,
-		4.0f);
-
+		vector(0.0f, 0.0f, 0.0f));
+/*
 	AddModel(L"\\Models\\Dwarf\\dwarf_2_low.obj",
 		//new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(0.0f, -4.9f - 2.1f, 0.0f),
-		20.0f);
+		vector(0.0f, 0.0f, 0.0f));
 
 	AddModel(L"\\Models\\car\\untitled.obj",
 		nullptr,
@@ -250,7 +249,7 @@ RESULT DreamGarage::LoadScene() {
 		point(0.0f, -10.0f, 0.0f),
 		7.0f,
 		0);
-	*/
+//	*/
 
 
 //Error:
