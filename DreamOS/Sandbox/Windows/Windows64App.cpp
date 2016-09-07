@@ -505,18 +505,18 @@ RESULT Windows64App::Show() {
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-			bool isHandled = false;
+			bool fHandled = false;
 
 			if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
-				isHandled = HandleMouseEvent(msg);
+				fHandled = HandleMouseEvent(msg);
 			}
 			else if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) {
-				isHandled = HandleKeyEvent(msg);
+				fHandled = HandleKeyEvent(msg);
 			}
 			else if (WM_QUIT == msg.message)
 				break;
 
-			if (!isHandled)
+			if (!fHandled)
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -594,7 +594,7 @@ Error:
 
 bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 {
-	bool isHandled = false;
+	bool fHandled = false;
 
 	LPARAM lp = windowMassage.lParam;
 	WPARAM wp = windowMassage.wParam;
@@ -606,7 +606,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 
 		case WM_LBUTTONUP:
 		case WM_LBUTTONDOWN: {
-			isHandled = true;
+			fHandled = true;
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Left mouse button down!");
@@ -614,7 +614,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 		} break;
 
 		case WM_LBUTTONDBLCLK: {
-			isHandled = true;
+			fHandled = true;
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Left mouse button dbl click!");
@@ -623,7 +623,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 
 		case WM_RBUTTONUP:
 		case WM_RBUTTONDOWN: {
-			isHandled = true;
+			fHandled = true;
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Right mouse button down!");
@@ -631,7 +631,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 		} break;
 
 		case WM_RBUTTONDBLCLK: {
-			isHandled = true;
+			fHandled = true;
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 
@@ -641,7 +641,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 
 		case WM_MBUTTONUP:
 		case WM_MBUTTONDOWN: {
-			isHandled = true;
+			fHandled = true;
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Middle mouse button down!");
@@ -649,7 +649,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 		} break;
 
 		case WM_MBUTTONDBLCLK: {
-			isHandled = true;
+			fHandled = true;
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 
@@ -658,7 +658,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 		} break;
 
 		case WM_MOUSEWHEEL: {
-			isHandled = true;
+			fHandled = true;
 			int wheel = static_cast<int>((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
@@ -668,24 +668,24 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 		} break;
 	}
 
-	return isHandled;
+	return fHandled;
 }
 
 bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
 {
-	bool isHandled = false;
+	bool fHandled = false;
 
 	LPARAM lp = windowMassage.lParam;
 	WPARAM wp = windowMassage.wParam;
 
 	switch (windowMassage.message) {
 		case WM_KEYUP: {
-			isHandled = true;
+			fHandled = true;
 			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), false);
 		} break;
 
 		case WM_KEYDOWN: {
-			isHandled = true;
+			fHandled = true;
 			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), true);
 			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
 
@@ -731,7 +731,7 @@ bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
 		} break;
 	}
 	
-	return isHandled;
+	return fHandled;
 }
 
 RESULT Windows64App::Shutdown() {
