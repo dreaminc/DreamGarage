@@ -203,17 +203,18 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	
 	// The below will create it if it doesn't exist
 
+	nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
+	long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
+
+	nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
+	long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
+
+	long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+	long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+	
+	// TODO: Make sure they match
+
 	if (strMethod == "create_offer") {
-		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
-		long userID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-
-		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
-		long peerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-
-		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-
-		// TODO: Make sure they match
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 
@@ -226,39 +227,14 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
 	}
 	else if (strMethod == "set_offer") {
-		// TODO: Reproduction of code above - move to function
-		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
-		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-
-		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
-		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-
-		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-
-		// TODO: Make sure they match
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 
 		// DEADBEEF: No longer true
 		//CBM((m_pPeerConnectionCurrentHandshake == pPeerConnection), "Peer connection mis matches current handshake connection");
 
 		//pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
-
-		CN(m_pWebRTCImp);
-
 	}
 	else if (strMethod == "create_answer") {
-		// TODO: Reproduction of code above - move to function
-		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
-		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-
-		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
-		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-
-		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-
-		// TODO: Make sure they match
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 
@@ -270,22 +246,10 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// Initialize SDP Peer Connection Offer and Create Answer
 		CN(m_pWebRTCImp);
 		//CR(m_pWebRTCImp->InitializePeerConnection(false));
-		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
+		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, false);
 		CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
 	}
 	else if (strMethod == "set_offer_candidates") {
-		// TODO: Reproduction of code above - move to function
-		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
-		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-
-		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
-		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-
-		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-
-		// TODO: Make sure they match
-
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 		
 		// DEADBEEF: No longer true
@@ -308,18 +272,6 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//*/
 	}
 	else if (strMethod == "set_answer") {
-		// TODO: Reproduction of code above - move to function
-		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
-		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-
-		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
-		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-
-		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-
-		// TODO: Make sure they match
-
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 
 		// DEADBEEF:
@@ -349,18 +301,6 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
 	}
 	else if (strMethod == "set_answer_candidates") {
-		// TODO: Reproduction of code above - move to function
-		nlohmann::json jsonOfferSocketConnection = jsonPayload["/offer_socket_connection"_json_pointer];
-		long offerUserID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
-
-		nlohmann::json jsonAnswerSocketConnection = jsonPayload["/answer_socket_connection"_json_pointer];
-		long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
-
-		long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-		long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-
-		// TODO: Make sure they match
-
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 
 		// DEADBEEF:
@@ -493,7 +433,8 @@ RESULT PeerConnectionController::OnSDPAnswerSuccess(long peerConnectionID) {
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
-	CR(pPeerConnection->SetSDPAnswer(m_pWebRTCImp->GetRemoteSDPString(peerConnectionID)));
+	//CR(pPeerConnection->SetSDPAnswer(m_pWebRTCImp->GetRemoteSDPString(peerConnectionID)));
+	CR(pPeerConnection->SetSDPAnswer(m_pWebRTCImp->GetLocalSDPString(peerConnectionID)));
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
 		m_pPeerConnectionControllerObserver->OnSDPAnswerSuccess(pPeerConnection);
