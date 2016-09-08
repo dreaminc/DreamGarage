@@ -888,12 +888,14 @@ RESULT OpenGLImp::RenderCombined(ObjectStore *pSceneGraph, ObjectStore *pFlatSce
 
 	//SetViewTarget(eye);
 	CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
-	if (m_pHMD != nullptr)
+	if (m_pHMD != nullptr) {
 		m_pHMD->SetAndClearRenderSurface(eye);
-
-	// Render layers
-	if (m_pHMD == nullptr)
+	}
+	else {
 		SetViewTarget(eye);
+	}
+
+	// Render Layers
 	// 3D Object / skybox
 	pSceneGraph->Reset();
 	CR(m_pOGLRenderProgram->RenderSceneGraph(pSceneGraph));

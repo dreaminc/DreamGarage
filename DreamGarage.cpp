@@ -1,8 +1,7 @@
 #include "DreamGarage.h"
 #include <string>
 
-//quad *g_pQuad;
-
+#define TESTING
 light *g_pLight = nullptr;
 
 #include "Cloud/CloudController.h"
@@ -32,33 +31,37 @@ RESULT DreamGarage::LoadScene() {
 	// IO
 	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
+	// Add Peer User Object
+	m_pPeerUser = AddUser();
+
+	// TODO: Combine this into one call
+	//texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
+	skybox *pSkybox = AddSkybox();
+	//pSkybox->SetCubeMapTexture(pCubeMap);
+
+#ifdef TESTING
+// Test Scene
+// 
+
 	// Add lights
 
-	///*
-	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	// TODO: Special lane for global light
-
-	//vector lightdir = vector(0.0f, 1.0f, -0.5f);
+///*
+	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
+	point ptLight = point(0.0f, 5.0f, 5.0f);
+	point ptLight2 = point(0.0f, 10.0f, 0.0f);
 	vector lightdir = vector(0.7f, -0.5f, -0.6f);
 	lightdir.Normalize();
 
-	/*
-	float lightdistance = 10.0f;
-	point lightpoint = -1.0f * lightdir * lightdistance;
-	lightpoint.w() = 1.0f;
-	//*/
-
-
-	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
-	point ptLight = point(0.0f, 5.0f, 5.0f);
+	// TODO: Special lane for global light
 	light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	point lightpoint = point(0.0f, 10.0f, 0.0f);
-	light* g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, lightpoint, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
+	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, ptLight2, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
 	g_pLight->EnableShadows();
-	//pLight->EnableShadows();
 	//AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	//AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	//
+
+//*/
+
+	// Add textures
 	///*
 	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
@@ -70,78 +73,31 @@ RESULT DreamGarage::LoadScene() {
 	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
 	//*/
 
-	
-	// TODO: Combine this into one call
-	//texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
-	skybox *pSkybox = AddSkybox();
-	//pSkybox->SetCubeMapTexture(pCubeMap);
-	//*/
-	
-	// Add Peer User Object
-	m_pPeerUser = AddUser();
-
-
-//	quad *pFQuad = AddQuad(1.0f, 1.0f);
-	/*
-	quad *pFQuad = AddFlatQuad(1.0f, 1.0f);
-	pFQuad->MoveTo(0.0f, 0.0f, 0.0f);
-	pFQuad->RotateXByDeg(90.0f);
-	pFQuad->SetColorTexture(pColorTextureCobble);
-	*/
-	//FlatContext *pContext = AddFlatContext();
-	//pContext->MoveTo(0.5f, 0.5f, 0.0f);
-
-	//std::shared_ptr<quad> pFQuad2 = pContext->MakeQuad(0.5f, 0.5f, point(-0.5f, -0.5f, 100.0f));
-	//pFQuad2->MoveTo(-0.5f, -0.5f, 1.0f);
-	//pFQuad2->RotateXByDeg(90.0f);
-	//pFQuad2->SetColorTexture(pColorTextureCobble);
-
-	//UpdateFlatContexts();
-/*
-	FlatContext *pContext = AddFlatContext();
-	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
-		std::shared_ptr<quad> pFQuad2 = pContext->MakeQuad(x/10.0f, x/10.0f, point(x/10.0f, x/10.0f, x/10.0f));
-		pFQuad2->SetColorTexture(pColorTexture);
-	}
-// */
+	// Add Flat Objects
 ///*
 	FlatContext *pContext2 = AddFlatContext();
 	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
 		std::shared_ptr<quad> pFQuad2 = pContext2->AddQuad(0.25f, 0.25f, point(-x/10.0f, -x/10.0f, x/10.0f));
 		pFQuad2->SetColorTexture(pColorTexture);
 	}
-//	*/
-
 /*
-	std::shared_ptr<quad> pFQuad = pContext->AddQuad(1.0f, 1.0f);
-	pFQuad->MoveTo(0.0f, 0.0f, 0.0f);
-	pFQuad->RotateXByDeg(90.0f);
-	pFQuad->SetColorTexture(pColorTextureCobble);
-*/
-/*
-	std::shared_ptr<quad> pFQuad3 = pContext->AddQuad(0.5f, 0.5f);
-	pFQuad3->MoveTo(0.1f, 0.1f, 0.0f);
-	pFQuad3->RotateXByDeg(90.0f);
-	pFQuad3->SetColorTexture(pColorTextureCobble);
-*/
+	FlatContext *pContext = AddFlatContext();
+	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
+		std::shared_ptr<quad> pFQuad2 = pContext->MakeQuad(x/10.0f, x/10.0f, point(x/10.0f, x/10.0f, x/10.0f));
+		pFQuad2->SetColorTexture(pColorTexture);
+	}
+//*/
+
+	// Add base plane
+///*
+	quad *pBQuad = AddQuad(10.0f, 5.0f, 200, 200);// , pHeightTextureCobble);
+	//pBQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
+	//pBQuad->SetColorTexture(pColorTextureCobble);
+	//pBQuad->SetBumpTexture(pBumpTexture);
+//*/
 	
-	//pFQuad->RotateXByDeg(180.0f);
-
-	/*
-	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
-	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
-	pQuad->SetColorTexture(pColorTextureCobble);
-	pQuad->translateY(-2.0f);
-	*/
-	//pQuad->SetBumpTexture(pBumpTexture);
-
-	quad *pQuad = AddQuad(10.0f, 5.0f, 200, 200);// , pHeightTextureCobble);
-	//pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
-	//pQuad->SetColorTexture(pColorTextureCobble);
-	//pQuad->SetBumpTexture(pBumpTexture);
-
-	
-	/*
+	// Add billboards
+///*
 	quad *pQuad = AddQuad(1.0f, 1.0f, 10, 10);
 	pQuad->MoveTo(0.0f, 0.0f, 0.0f);
 	pQuad->SetBillboard(true);
@@ -150,34 +106,12 @@ RESULT DreamGarage::LoadScene() {
 	pQuad2->MoveTo(3.0f, 1.0f, 3.0f);
 	pQuad2->SetScaledBillboard(true);
 	pQuad2->SetBillboard(true);
-	
-	//tQuad->SetBillboard(true);
-	/*/
+//*/
 
-	/*
-	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
-	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
-	//m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
-
-	/*
-	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
-	pModel->SetColorTexture(pColorTexture);
-	pModel->SetBumpTexture(pBumpTexture);
-	pModel->Scale(0.1f);
-	*/
-
-	// TODO: Replace with model
-	//m_pPeerUser = AddVolume(0.25f, 0.5f, 1.0f);
-	//m_pPeerUser = AddVolume(1.0f);
-
+	// Add spheres
+///*
 	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
-
-	/*
-	m_pSphere = AddSphere(0.5f, 40, 40);
-	m_pSphere->SetColorTexture(pColorTexture);
-	m_pSphere->MoveTo(2.0f, 2.0f, 0.0f);
-	m_pSphere->SetBumpTexture(pBumpTexture);
-	*/
+	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
 
 	/*
 	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
@@ -186,31 +120,16 @@ RESULT DreamGarage::LoadScene() {
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
 	pSphere2->translateX(5.0f);
-	//*/
+//*/
 
-	///*
-	//volume *pVolume = AddVolume(1.0f);
-	//pVolume->translateX(5.0f);
-	//*/
+	// Add volumes
+///*
+	volume *pVolume = AddVolume(1.0f);
+	pVolume->translateX(5.0f);
+//*/
 
-	/*
-	m_pPeerUser = AddModel(L"\\Models\\face2\\untitled.obj",
-						   MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-						   point(0.0f, 0.0f, 0.0f),
-						   0.1f,
-						   (point_precision)(0.0f));
-
-	//*/
-
-	/*
-	m_pPeerUser = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
-		//MakeTexture(L"..\\Models\\stormtrooper\\Map__7_Raytrace.tga", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-		nullptr,
-		point(0.0f, 2.0f, 5.0f),
-		0.1f,
-		(point_precision)(0.0f));
-*/		
-/*
+	// Add models
+///*
 	AddModel(L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f - 2.6f, 0.0f),
@@ -222,34 +141,34 @@ RESULT DreamGarage::LoadScene() {
 		point(-3.0f, -4.2f - 2.5f, 0.0f),
 		0.15f,
 		vector(0.0f, 0.0f, 0.0f));
-/*
+///*
 	AddModel(L"\\Models\\Dwarf\\dwarf_2_low.obj",
 		//new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(0.0f, -4.9f - 2.1f, 0.0f),
+		0.1f,
 		vector(0.0f, 0.0f, 0.0f));
 
 	AddModel(L"\\Models\\car\\untitled.obj",
 		nullptr,
 		point(10.0f, -3.7f - 4.0f, -1.0f - 6.0f),
 		0.015f,
-		80.1f);// ->SetOrientation(quaternion(vector(1.0, 1.0, 1.0)))->RotateZByDeg(90);
+		vector(0.0f, 0.0f, 0.0f));// ->SetOrientation(quaternion(vector(1.0, 1.0, 1.0)))->RotateZByDeg(90);
 
 	AddModel(L"\\Models\\toys\\poly.obj",
 		MakeTexture(L"..\\Models\\toys\\lego.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(-4.5f, -4.8f - 2.6f, 4.0f),
 		1.0f,
-		100.0f);
-	*/
+		vector(0.0f, 0.0f, 0.0f));
 		
-	/*
+/*
 	AddModel(L"\\Models\\terrain\\untitled.obj",
 		MakeTexture(L"..\\Models\\terrain\\floor.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(0.0f, -10.0f, 0.0f),
 		7.0f,
-		0);
-//	*/
-
+		vector(0.0f, 0.0f, 0.0f));
+//*/
+#endif
 
 //Error:
 	return r;
