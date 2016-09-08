@@ -52,11 +52,13 @@ RESULT DreamGarage::LoadScene() {
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
 	point ptLight = point(0.0f, 5.0f, 5.0f);
 	light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	point lightpoint = point(0.0f, 10.0f, 0.0f);
+	light* g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, lightpoint, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
+	g_pLight->EnableShadows();
 	//pLight->EnableShadows();
 	//AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	//AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	//
-
 	///*
 	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
@@ -110,9 +112,6 @@ RESULT DreamGarage::LoadScene() {
 	}
 //	*/
 
-	
-
-
 /*
 	std::shared_ptr<quad> pFQuad = pContext->AddQuad(1.0f, 1.0f);
 	pFQuad->MoveTo(0.0f, 0.0f, 0.0f);
@@ -136,10 +135,10 @@ RESULT DreamGarage::LoadScene() {
 	*/
 	//pQuad->SetBumpTexture(pBumpTexture);
 
-	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200);// , pHeightTextureCobble);
-	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
-	pQuad->SetColorTexture(pColorTextureCobble);
-	pQuad->SetBumpTexture(pBumpTexture);
+	quad *pQuad = AddQuad(10.0f, 5.0f, 200, 200);// , pHeightTextureCobble);
+	//pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
+	//pQuad->SetColorTexture(pColorTextureCobble);
+	//pQuad->SetBumpTexture(pBumpTexture);
 
 	
 	/*
@@ -180,9 +179,9 @@ RESULT DreamGarage::LoadScene() {
 	m_pSphere->SetBumpTexture(pBumpTexture);
 	*/
 
-	///*
+	/*
 	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
-	//sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
@@ -190,8 +189,8 @@ RESULT DreamGarage::LoadScene() {
 	//*/
 
 	///*
-	volume *pVolume = AddVolume(1.0f);
-	pVolume->translateX(5.0f);
+	//volume *pVolume = AddVolume(1.0f);
+	//pVolume->translateX(5.0f);
 	//*/
 
 	/*
@@ -211,7 +210,7 @@ RESULT DreamGarage::LoadScene() {
 		0.1f,
 		(point_precision)(0.0f));
 */		
-///*
+/*
 	AddModel(L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f - 2.6f, 0.0f),

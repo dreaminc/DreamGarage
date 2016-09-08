@@ -109,10 +109,13 @@ public:
 
 	RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph);
 
+	RESULT RenderCombined(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
+
 	RESULT RenderFlush();
 private:
 	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
 	RESULT RenderProfiler(EYE_TYPE eye);
+	RESULT RenderShadows(ObjectStore* pSceneGraph, EYE_TYPE eye);
 
 public:
 	RESULT Resize(int pxWidth, int pxHeight);

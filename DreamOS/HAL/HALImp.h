@@ -48,6 +48,7 @@ public:
 
 	virtual RESULT Render(ObjectStore *pSceneGraph) = 0;
 	virtual RESULT RenderFlat(ObjectStore *pFlatSceneGraph) = 0;
+	virtual RESULT RenderCombined(ObjectStore* pSceneGraph, ObjectStore* pFlatSceneGraph, EYE_TYPE eye) = 0;
 
 	virtual RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph) = 0;
 
