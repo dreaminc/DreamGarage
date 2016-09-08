@@ -322,6 +322,9 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 RESULT Windows64App::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
+	// Register Dream Console to keyboard events
+	CR(RegisterSubscriber(SK_ALL, DreamConsole::GetConsole()));
+
 	camera *pCamera = m_pHALImp->GetCamera();
 
 	/*
@@ -583,7 +586,7 @@ RESULT Windows64App::Show() {
 		// Swap buffers
 		SwapBuffers(m_hDC);
 
-		Profiler::GetProfiler()->OnFrameRendered();
+		DreamConsole::GetConsole()->OnFrameRendered();
 
 		if (GetAsyncKeyState(VK_ESCAPE)) {
 			Shutdown();

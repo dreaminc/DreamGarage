@@ -2,6 +2,7 @@
 #define SENSE_KEYBOARD_H_
 
 #include <string.h>
+#include <functional>
 
 #include "RESULT/EHM.h"
 
@@ -16,6 +17,7 @@
 
 // TODO: Complete the scan codes, ensure they make sense 
 typedef enum SenseKeyboardScanCodes {
+	SK_ALL = 0x0,
 	SK_SPACE = 0x20,
 	SK_PRIOR = 0x21,
 	SK_NEXT = 0x22,
@@ -35,12 +37,16 @@ typedef enum SenseKeyboardScanCodes {
 	SK_INVALID
 } SK_SCAN_CODE;
 
+class SenseKeyboard;
+
 typedef struct SenseKeyboardEvent : SenseDevice::SenseDeviceEvent {
 	SK_SCAN_CODE KeyCode;
 	uint8_t KeyState;
+	SenseKeyboard* m_pSenseKeyboard = nullptr;
 
-	SenseKeyboardEvent(SK_SCAN_CODE key, uint8_t state) :
-		SenseDeviceEvent()
+	SenseKeyboardEvent(SK_SCAN_CODE key, uint8_t state, SenseKeyboard* pSenseKeyboard = nullptr) :
+		SenseDeviceEvent(),
+		m_pSenseKeyboard(pSenseKeyboard)
 	{
 		SenseEventSize = sizeof(SenseKeyboardEvent);
 		KeyCode = key;
@@ -50,44 +56,19 @@ typedef struct SenseKeyboardEvent : SenseDevice::SenseDeviceEvent {
 
 class SenseKeyboard : public SenseDevice, public Publisher<int, SenseKeyboardEvent> {
 public:
-	SenseKeyboard() {
-		memset(m_KeyStates, 0, sizeof(uint8_t) * NUM_SENSE_KEYBOARD_KEYS);
+	SenseKeyboard();
 
-		for (int i = 0; i < NUM_SENSE_KEYBOARD_KEYS; i++) {
-			RegisterEvent(i);
-		}
-	}
-
-	~SenseKeyboard() {
-		// empty stub
-	}
+	~SenseKeyboard();
 
 	virtual RESULT UpdateKeyState(SK_SCAN_CODE key, uint8_t keyState) = 0;
-	RESULT SetKeyState(SK_SCAN_CODE KeyCode, uint8_t KeyState) {
-		RESULT r = R_PASS;
 
-		if (KeyState != m_KeyStates[KeyCode]) {
-			m_KeyStates[KeyCode] = KeyState;
+	RESULT SetKeyState(SK_SCAN_CODE KeyCode, uint8_t KeyState);
 
-			//DEBUG_LINEOUT("Key %d state: %x", KeyCode, KeyState);
+	uint8_t GetKeyState(SK_SCAN_CODE KeyCode);
 
-			// Notify Observers
-			SenseKeyboardEvent kbEvent(KeyCode, KeyState);
-			CR(NotifySubscribers(KeyCode, &kbEvent));
-		}
+	RESULT SetKeyStates(uint8_t KeyStates[NUM_SENSE_KEYBOARD_KEYS]);
 
-	Error:
-		return r;
-	}
-
-	uint8_t GetKeyState(SK_SCAN_CODE KeyCode) {
-		return m_KeyStates[(int)KeyCode];
-	}
-
-	RESULT SetKeyStates(uint8_t KeyStates[NUM_SENSE_KEYBOARD_KEYS]) {
-		memcpy(m_KeyStates, KeyStates, sizeof(uint8_t) * NUM_SENSE_KEYBOARD_KEYS);
-		return R_PASS;
-	}
+	void ForEachKeyPressed(std::function<void(SK_SCAN_CODE)> func);
 	
 	// The SenseKeyboard interface
 public:

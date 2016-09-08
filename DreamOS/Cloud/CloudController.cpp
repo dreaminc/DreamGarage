@@ -7,6 +7,8 @@
 #include "Cloud/Message/UpdateHandMessage.h"
 #include "Cloud/Message/UpdateHeadMessage.h"
 
+#include "Profiler/DreamConsole.h"
+
 CloudController::CloudController() :
 	m_pCloudImp(nullptr),
 	m_pUserController(nullptr),

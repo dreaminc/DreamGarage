@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#include "Profiler/DreamConsole.h"
+
 OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),

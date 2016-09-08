@@ -11,6 +11,8 @@
 
 #include "Extras/OVR_Math.h"
 
+#include "Profiler/DreamConsole.h"
+
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_ovrSession(nullptr),

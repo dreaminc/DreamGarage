@@ -6,7 +6,7 @@
 #include "OGLTriangle.h"
 #include "OGLText.h"
 
-#include "Profiler/Profiler.h"
+#include "DreamConsole/Console.h"
 
 #include <Windows.h>
 #include <string>
@@ -76,7 +76,7 @@ void OGLProfiler::Render() {
 //	glDisable(GL_BLEND);
 
 	// Render FPS graph
-	m_OGLGraph.Render(point(-0.5f, -0.4f + 0.2f, 0), point(-0.5f + 0.4f, -0.4f, 0), Profiler::GetProfiler()->GetFPSGraph(), static_cast<uint16_t>(0), static_cast<uint16_t>(200));
+	m_OGLGraph.Render(point(-0.5f, -0.4f + 0.2f, 0), point(-0.5f + 0.4f, -0.4f, 0), DreamConsole::GetConsole()->GetFPSGraph(), static_cast<uint16_t>(0), static_cast<uint16_t>(200));
 
 	// Revert to 'default' render state. TODO: refactor rendering states
 	glEnable(GL_CULL_FACE);
@@ -86,18 +86,22 @@ void OGLProfiler::Render() {
 
 	// Render hud text
 
-	for (auto it = (Profiler::GetProfiler()->GetConsoleText().size() > maxRows) ?
-			Profiler::GetProfiler()->GetConsoleText().end() - maxRows : Profiler::GetProfiler()->GetConsoleText().begin();
-		 it < Profiler::GetProfiler()->GetConsoleText().end();
+	for (auto it = (DreamConsole::GetConsole()->GetConsoleText().size() > maxRows) ?
+			DreamConsole::GetConsole()->GetConsoleText().end() - maxRows : DreamConsole::GetConsole()->GetConsoleText().begin();
+		 it < DreamConsole::GetConsole()->GetConsoleText().end();
 		 it++)
 	{
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, m_fontSize)->SetPosition(point(0.1f, top - posY, 0.0f),text::BOTTOM_RIGHT));
 		posY += m_OGLConsoleText->m_height;
 	}
 
+	std::string cmdText = ">" + DreamConsole::GetConsole()->GetCmdText();
+
 	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 	if ((time / 100) % 10 > 5)
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText("_", m_fontSize + 0.02f)->SetPosition(point(0.1f, top - posY, 0.0f), text::BOTTOM_RIGHT));
+		cmdText += "_";
+
+	m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(cmdText, m_fontSize + 0.02f)->SetPosition(point(0.1f, -0.4f, 0.0f), text::BOTTOM_RIGHT));
 	
 	// Render debug console text
 	m_OGLConsole.Render(point(-0.5f, top, 0.0f), point(0.0f, 0.0f, 0.0f));
