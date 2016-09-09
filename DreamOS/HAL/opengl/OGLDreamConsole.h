@@ -1,5 +1,5 @@
-#ifndef OGLPROFILER_H_
-#define OGLPROFILER_H_
+#ifndef OGLDREAMCONSOLE_H_
+#define OGLDREAMCONSOLE_H_
 
 #include "HAL/opengl/OGLProgram.h"
 
@@ -13,8 +13,8 @@
 #include "DreamConsole/DebugConsole.h"
 
 // Dream OS
-// DreamOS/HAL/opengl/OGLProfiler.h
-// OGLProfiler renders the profiler to an OGL program
+// DreamOS/HAL/opengl/OGLDreamConsole.h
+// OGLDreamConsole renders the profiler to an OGL program
 
 class OGLRenderContext {
 public:
@@ -85,10 +85,10 @@ private:
 	std::unique_ptr<OGLTriangle>	m_OGLTriangle;
 };
 
-class OGLProfiler : public OGLRenderContext {
+class OGLDreamConsole : public OGLRenderContext {
 public:
-	OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
-	~OGLProfiler();
+	OGLDreamConsole(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
+	~OGLDreamConsole();
 
 	void Init();
 	void Render();
@@ -105,4 +105,4 @@ private:
 
 };
 
-#endif // ! OGLPROFILER_H
+#endif // ! OGLDREAMCONSOLE_H_

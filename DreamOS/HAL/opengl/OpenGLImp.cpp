@@ -23,8 +23,8 @@
 #include "OGLUser.h"
 #include "OGLHand.h"
 
-
-#include "OGLProfiler.h"
+#include "DreamConsole/DreamConsole.h"
+#include "OGLDreamConsole.h"
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
@@ -50,7 +50,7 @@ Error:
 }
 
 OpenGLImp::~OpenGLImp() {
-	m_pOGLProfiler.release();
+	m_pOGLDreamConsole.release();
 
 	if (m_pOGLRenderProgram != nullptr) {
 		delete m_pOGLRenderProgram;
@@ -225,7 +225,7 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 	CN(m_pOGLFlatProgram);
 
-	m_pOGLProfiler = std::make_unique<OGLProfiler>(this, m_pOGLOverlayProgram);
+	m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, m_pOGLOverlayProgram);
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
@@ -296,13 +296,6 @@ RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye) {
 
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
-
-	switch (kbEvent->KeyCode) {
-		case (SK_SCAN_CODE)('F') : {
-			if(kbEvent->KeyState != 0)
-				SetRenderProfiler(!GetRenderProfiler());
-		}
-	}
 
 	/* This has been moved to the camera 
 	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
@@ -792,11 +785,12 @@ Error:
 RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
 
 	RESULT r = R_PASS;
+
 	// Render profiler overlay
-	if (GetRenderProfiler()) {
-		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
-		m_pOGLProfiler->Render();
+	if (DreamConsole::GetConsole()->IsInForeground()) {
+		CRM(m_pOGLDreamConsole->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLDreamConsole->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
+		m_pOGLDreamConsole->Render();
 	}
 
 Error:
