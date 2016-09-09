@@ -777,13 +777,6 @@ RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
 		CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 	}
-	
-	// Render profiler overlay
-	if (DreamConsole::GetConsole()->IsInForeground()) {
-		CRM(m_pOGLDreamConsole->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLDreamConsole->m_OGLProgram->SetCamera(m_pCamera));
-		m_pOGLDreamConsole->Render();
-	}
 
 Error:
 	return r;
