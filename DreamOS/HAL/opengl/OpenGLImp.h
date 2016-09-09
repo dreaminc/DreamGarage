@@ -30,7 +30,7 @@
 
 class SandboxApp; 
 class Windows64App;
-class OGLProfiler;
+class OGLDreamConsole;
 
 class OpenGLImp : public HALImp {
 private:
@@ -49,7 +49,7 @@ private:
 	version m_versionOGL;
 	version m_versionGLSL;
 
-	std::unique_ptr<OGLProfiler>	m_pOGLProfiler;
+	std::unique_ptr<OGLDreamConsole>	m_pOGLDreamConsole;
 
 	// Viewport
 	// TODO: Move this into an object?

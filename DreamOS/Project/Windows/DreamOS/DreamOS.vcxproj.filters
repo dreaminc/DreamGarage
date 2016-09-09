@@ -281,9 +281,6 @@
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProfiler.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
@@ -400,6 +397,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp">
       <Filter>DreamConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp">
+      <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1303,9 +1303,6 @@
     <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProfiler.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
       <Filter>Sense</Filter>
     </ClInclude>
@@ -2014,6 +2011,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h">
       <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

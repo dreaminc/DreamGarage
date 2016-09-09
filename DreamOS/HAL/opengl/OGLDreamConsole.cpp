@@ -1,4 +1,4 @@
-#include "OGLProfiler.h"
+#include "OGLDreamConsole.h"
 
 #include "RESULT/EHM.h"
 
@@ -34,9 +34,9 @@ void OGLRenderContext::Render(point& topLeft, point& bottomRight)
 	m_OGLProgram->RenderObject(m_Background->Set(tl, br, tr));
 }
 
-// OGLProfiler
+// OGLDreamConsole
 
-OGLProfiler::OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
+OGLDreamConsole::OGLDreamConsole(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
 	OGLRenderContext(pOGL, pOGLProgram),
 	m_OGLGraph(pOGL, pOGLProgram),
 	m_OGLConsole(pOGL, pOGLProgram)
@@ -44,12 +44,12 @@ OGLProfiler::OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
 	Init();
 }
 
-OGLProfiler::~OGLProfiler()
+OGLDreamConsole::~OGLDreamConsole()
 {
 	Destroy();
 }
 
-void OGLProfiler::Init()
+void OGLDreamConsole::Init()
 {
 	OGLRenderContext::Init();
 
@@ -60,11 +60,11 @@ void OGLProfiler::Init()
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 }
 
-void OGLProfiler::Destroy() {
+void OGLDreamConsole::Destroy() {
 
 }
 
-void OGLProfiler::Render() {
+void OGLDreamConsole::Render() {
 	float posY = 0.0f;
 	const int maxRows = 18;
 	float top = 0.4f;
