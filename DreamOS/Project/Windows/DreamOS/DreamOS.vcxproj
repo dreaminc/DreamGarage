@@ -664,6 +664,8 @@
     <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
+    <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
+    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
@@ -710,8 +712,6 @@
     <ClCompile Include="..\..\..\Primitives\user.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
-    <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp" />
-    <ClCompile Include="..\..\..\Profiler\Profiler.cpp" />
     <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
@@ -729,6 +729,7 @@
     <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStore.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
@@ -763,6 +764,10 @@
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
+    <ClInclude Include="..\..\..\DreamConsole\Console.h" />
+    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
+    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h" />
+    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
@@ -1059,9 +1064,6 @@
     <ClInclude Include="..\..\..\Primitives\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
     <ClInclude Include="..\..\..\Primitives\volume.h" />
-    <ClInclude Include="..\..\..\Profiler\DebugConsole.h" />
-    <ClInclude Include="..\..\..\Profiler\ProfilerGraph.h" />
-    <ClInclude Include="..\..\..\Profiler\Profiler.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />

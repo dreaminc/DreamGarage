@@ -70,7 +70,7 @@ public:
 		m_minTime = m_data[m_currentRecord].second;
 		m_data[m_currentRecord++] = std::make_pair(record, now);
 		
-		OutputDebugStringA((std::string("NIR::data [") + std::to_string(m_currentRecord) + "] = " + std::to_string(record) + "," + std::to_string(now.time_since_epoch().count())).c_str());
+		//OutputDebugStringA((std::string("NIR::data [") + std::to_string(m_currentRecord) + "] = " + std::to_string(record) + "," + std::to_string(now.time_since_epoch().count())).c_str());
 
 		if (m_currentRecord >= m_nRecords)
 			m_currentRecord = 0;

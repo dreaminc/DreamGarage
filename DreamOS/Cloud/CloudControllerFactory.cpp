@@ -50,7 +50,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 		*/
 
 		pCloudController->SetCloudImp(std::move(pWebRTCImp));
-	} 
+	}
 
 	// default: {
 		// pCloudController = nullptr;

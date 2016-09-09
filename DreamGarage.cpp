@@ -347,6 +347,7 @@ RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) 
 	Message::MessageType switchHeadModelMessage = (Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1);
 
 	if (pDataMessage->GetType() == switchHeadModelMessage) {
+		HUD_OUT("Other user changed the head model");
 		CR(m_pPeerUser->SwitchHeadModel());
 	}
 
@@ -406,6 +407,7 @@ RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('C') : {
 			if (kbEvent->KeyState != 0) {
+				HUD_OUT("Key 'C' is pressed - switch model");
 				SendSwitchHeadMessage();
 			}
 		}

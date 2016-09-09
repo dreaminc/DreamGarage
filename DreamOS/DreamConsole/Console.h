@@ -2,8 +2,11 @@
 #define PROFILER_H_
 
 // DREAM OS
-// DreamOS/Dimension/Primitives/Profiler.h
-// Profiler
+// DreamOS/Dimension/Primitives/Console.h
+// DreamConsole
+
+#include "RESULT/EHM.h"
+#include "Sense/SenseKeyboard.h"
 
 #include "Primitives/valid.h"
 #include <chrono>
@@ -30,16 +33,16 @@ private:
 	std::vector<std::chrono::time_point<std::chrono::high_resolution_clock>>	m_tickTimes;
 };
 
-class Profiler : public valid {
+class DreamConsole : public valid, public Subscriber<SenseKeyboardEvent> {
 public:
-	static Profiler* GetProfiler()
+	static DreamConsole* GetConsole()
 	{
-		static Profiler profiler;
+		static DreamConsole profiler;
 		return &profiler;
 	}
 
-	Profiler();
-	~Profiler();
+	DreamConsole();
+	~DreamConsole();
 
 	void OnFrameRendered();
 
@@ -51,6 +54,11 @@ public:
 
 	const std::deque<std::string>& GetConsoleText();
 
+	const std::string& GetCmdText();
+
+	// SenseKeyboardEventSubscriber
+	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
+
 private:
 
 	TickCounter	m_ticker;
@@ -58,6 +66,10 @@ private:
 
 	std::deque<std::string>	m_ConsoleText;
 	const unsigned int console_max_lines = 200;
+
+	long long	m_lineCnt = 0;
+
+	std::string	m_cmdText;
 };
 
 #endif // !PROFILER_H_

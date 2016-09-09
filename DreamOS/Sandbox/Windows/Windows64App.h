@@ -5,7 +5,7 @@
 #include "Sandbox/SandboxApp.h"
 
 #include "TimeManager/TimeManager.h"
-#include "Profiler/Profiler.h"
+#include "DreamConsole/Console.h"
 
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
@@ -103,7 +103,7 @@ private:
 
 private:
 	TimeManager	*m_pTimeManager;
-	Profiler	m_profiler;
+	DreamConsole	m_profiler;
 
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
 
