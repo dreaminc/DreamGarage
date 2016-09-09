@@ -196,14 +196,14 @@ RESULT OpenGLImp::PrepareScene() {
 	CN(m_pOGLProgramShadowDepth);
 	
 	// TODO(NTH): Add a program / render pipeline arch
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
 	
@@ -267,21 +267,8 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::SetMonoViewTarget() {
-	RESULT r = R_PASS;
-
-	// Render to screen
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
-	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
-
-//Error:
-	return r;
-}
-
 // Assumes Context Current
-RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
+RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
 	// Render to screen
@@ -296,17 +283,15 @@ RESULT OpenGLImp::SetStereoViewTarget(EYE_TYPE eye) {
 			glViewport((GLsizei)m_pxViewWidth / 2, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
 		} break;
 
+		case EYE_MONO: {
+			glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
+		} break;
 	}
 
-	m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight);
+	(eye != EYE_MONO) ? m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight) :
+						m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
 	return r;
-}
-
-// Assumes Context Current
-RESULT OpenGLImp::SetStereoFramebufferViewTarget(EYE_TYPE eye) {
-	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
-	return m_pHMD->BindFramebuffer(eye);
 }
 
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
@@ -789,275 +774,106 @@ Error:
 	return nullptr;
 }
 
-RESULT OpenGLImp::Render(ObjectStore *pSceneGraph) {
+RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
+
 	RESULT r = R_PASS;
-	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = NULL;
-
-	std::vector<light*> *pLights = NULL;
-	CR(pObjectStore->GetLights(pLights));
-	CN(pLights);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	CheckFramebufferStatus(GL_FRAMEBUFFER);
-
-	// TODO: Temporary go through scene graph again
-	/*
-	m_pOGLProgramCapture->UseProgram();
-	CR(m_pOGLProgramCapture->SetLights(pLights));
-	m_pOGLProgramCapture->BindToFramebuffer();
-	CR(m_pOGLProgramCapture->SetCamera(m_pCamera));
-
-	pSceneGraph->Reset();
-	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-		if (pDimObj == NULL)
-			continue;
-		else {
-			CR(m_pOGLProgramCapture->RenderObject(pDimObj));
-		}
-	}
-
-	CR(m_pOGLProgramCapture->UnbindFramebuffer());
-	//*/
-
-	m_pOGLProgramShadowDepth->UseProgram();
-	m_pOGLProgramShadowDepth->BindToDepthBuffer();
-	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
-	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
-	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
-	m_pOGLProgramShadowDepth->UnbindFramebuffer();
-
-	///*
-	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-	CR(m_pOGLRenderProgram->SetLights(pLights));
-
-	// Camera Projection Matrix
-	SetMonoViewTarget();
-	CR(m_pOGLRenderProgram->SetCamera(m_pCamera));
-
-	// Send SceneGraph objects to shader
-	pSceneGraph->Reset();
-	while((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-		if (pDimObj == NULL)
-			continue;
-		else {
-			CR(m_pOGLRenderProgram->RenderObject(pDimObj));
-		}
-	}
-	
 	skybox *pSkybox = nullptr;
 	CR(pObjectStore->GetSkybox(pSkybox));
 	if (pSkybox != nullptr) {
 		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLSkyboxProgram->SetCamera(m_pCamera));
+		CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 	}
-	
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
+
+	RESULT r = R_PASS;
 	// Render profiler overlay
 	if (GetRenderProfiler()) {
 		CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLProfiler->m_OGLProgram->SetCamera(m_pCamera));
+		CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 		m_pOGLProfiler->Render();
 	}
 
 Error:
-	CheckGLError();
 	return r;
 }
-
-RESULT OpenGLImp::RenderFlat(ObjectStore *pFlatSceneGraph) {
-	RESULT r = R_PASS;
-
-	glClearDepth(1.0f);
-	glClear(GL_DEPTH_BUFFER_BIT);
-
-	ObjectStoreImp *pObjectStore = pFlatSceneGraph->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = NULL;
-
-	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
-
-	// Camera Projection Matrix
-	SetMonoViewTarget();
-	CR(m_pOGLFlatProgram->SetCamera(m_pCamera));
-
-	// Send SceneGraph objects to shader
-	pFlatSceneGraph->Reset();
-	while((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-		if (pDimObj == NULL)
-			continue;
-		else {
-			CR(m_pOGLFlatProgram->RenderObject(pDimObj));
-		}
-	}
-
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::RenderStereo(ObjectStore *pSceneGraph) {
+RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
-	// Send lights to shader
-	std::vector<light*> *pLights = NULL;
-	CR(pObjectStore->GetLights(pLights));
-	CN(pLights);
-	CR(m_pOGLRenderProgram->SetLights(pLights));
-
-	for (int i = 0; i < 2; i++) {
-		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
-
-		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-
-		SetStereoViewTarget(eye);
-		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
-
-		// Send SceneGraph objects to shader
-		pSceneGraph->Reset();
-		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-			if (pDimObj == NULL)
-				continue;
-			else {
-				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
-			}
-
-		}
-
-		skybox *pSkybox = nullptr;
-		CR(pObjectStore->GetSkybox(pSkybox));
-		if (pSkybox != nullptr) {
-			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, EYE_MONO));
-			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
-		}
-
-		// Render profiler overlay
-		if (GetRenderProfiler()) {
-			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
-			m_pOGLProfiler->Render();
-		}
-	}
-
-Error:
-	return r;
-}
-
-// TODO: Naming is kind of lame since this hits the HMD
-// TODO: Shared code should be consolidated
-RESULT OpenGLImp::RenderStereoFramebuffers(ObjectStore *pSceneGraph) {
-	RESULT r = R_PASS;
-	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = NULL;
-	
-	// Send lights to shader
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// TODO: Temporary go through scene graph again
-	/*
-	m_pOGLProgramCapture->UseProgram();
-	CR(m_pOGLProgramCapture->SetLights(pLights));
-	//SetMonoViewTarget();
-	//m_pOGLProgramCapture->BindToDepthBuffer();
-	m_pOGLProgramCapture->BindToFramebuffer();
-	CR(m_pOGLProgramCapture->SetCamera(m_pCamera));
+	if (m_pHMD == nullptr)
+		CheckFramebufferStatus(GL_FRAMEBUFFER);
 
-	pSceneGraph->Reset();
-	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-		if (pDimObj == NULL)
-			continue;
-		else {
-			CR(m_pOGLProgramCapture->RenderObject(pDimObj));
-		}
-	}
-
-	CR(m_pOGLProgramCapture->UnbindFramebuffer());
-	//*/
-
+	// Render Shadows
 	m_pOGLProgramShadowDepth->UseProgram();
 	m_pOGLProgramShadowDepth->BindToDepthBuffer();
 	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
 	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
 	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
-
+	
+	// 
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 	CR(m_pOGLRenderProgram->SetLights(pLights));
 
-	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
-
-
-	for (int i = 0; i < 2; i++) {
-		EYE_TYPE eye = (i == 0) ? EYE_LEFT : EYE_RIGHT;
+	// Camera Projection Matrix
+	if (m_pHMD != nullptr) {
+		m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
 		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+	}
 
-		//SetStereoFramebufferViewTarget(eye);
-		//SetCameraMatrix(eye);
-		CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
+	//SetViewTarget(eye);
+	CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
+	if (m_pHMD != nullptr) {
 		m_pHMD->SetAndClearRenderSurface(eye);
+	}
+	else {
+		SetViewTarget(eye);
+	}
 
-		// Send SceneGraph objects to shader
-		pSceneGraph->Reset();
-		while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+	// Render Layers
+	// 3D Object / skybox
+	pSceneGraph->Reset();
+	CR(m_pOGLRenderProgram->RenderSceneGraph(pSceneGraph));
+	CR(RenderSkybox(pObjectStore, eye));
 
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+	// Flat object layer
+	glClearDepth(1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT);
+	
+	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
+	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, eye));
+	pFlatSceneGraph->Reset();
+	CR(m_pOGLFlatProgram->RenderSceneGraph(pFlatSceneGraph));
 
-			if (pDimObj == NULL)
-				continue;
-			else {
-				CR(m_pOGLRenderProgram->RenderObject(pDimObj));
-			}
-		}		
+	// Profiler
+	glClearDepth(1.0f);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
-		skybox *pSkybox = nullptr;
-		CR(pObjectStore->GetSkybox(pSkybox));
-		if (pSkybox != nullptr) {
-			CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
-			CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
-		}
-		
-		// Render profiler overlay
-		if (GetRenderProfiler()) {
-			CRM(m_pOGLProfiler->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-			CR(m_pOGLProfiler->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
-			m_pOGLProfiler->Render();
-		}
+	CR(RenderProfiler(eye));
 
+	// Commit frame to HMD
+	if (m_pHMD) {
 		m_pHMD->UnsetRenderSurface(eye);
 		m_pHMD->CommitSwapChain(eye);
 	}
 
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::RenderFlush() {
-	RESULT r = R_PASS;
 	glFlush();
-	CRM(CheckGLError(), "glFlush failed");
+
 Error:
+	CheckGLError();
 	return r;
 }
 

@@ -46,13 +46,7 @@ public:
 	virtual RESULT Resize(int pxWidth, int pxHeight) = 0;
 	virtual RESULT MakeCurrentContext() = 0;
 
-	virtual RESULT Render(ObjectStore *pSceneGraph) = 0;
-	virtual RESULT RenderFlat(ObjectStore *pFlatSceneGraph) = 0;
-
-	virtual RESULT RenderStereo(ObjectStore *pSceneGraph) = 0;
-	virtual RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph) = 0;
-
-	virtual RESULT RenderFlush() = 0;
+	virtual RESULT Render(ObjectStore* pSceneGraph, ObjectStore* pFlatSceneGraph, EYE_TYPE eye) = 0;
 
 	virtual RESULT Shutdown() = 0;
 
