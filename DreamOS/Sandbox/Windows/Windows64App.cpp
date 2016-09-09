@@ -574,19 +574,16 @@ RESULT Windows64App::Show() {
 		// gl functions per eye.
 		if (m_pHMD != nullptr) {
 			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->RenderCombined(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
-			m_pHALImp->RenderCombined(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}
 		else {
 			// Render Scene
-			m_pHALImp->RenderCombined(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
-			//m_pHALImp->Render(m_pSceneGraph);
-			//m_pHALImp->RenderFlat(m_pFlatSceneGraph);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
 		}
 		//*/
-		m_pHALImp->RenderFlush();
 	
 		// Swap buffers
 		SwapBuffers(m_hDC);

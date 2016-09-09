@@ -170,7 +170,7 @@ RESULT DreamGarage::LoadScene() {
 		7.0f,
 		vector(0.0f, 0.0f, 0.0f));
 //*/
-#endif
+#endif // ! TESTING
 
 //Error:
 	return r;

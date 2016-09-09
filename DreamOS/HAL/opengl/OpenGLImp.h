@@ -101,21 +101,11 @@ public:
 	composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 public:
-	// TODO: Consolidate all of these (one Render function)
 	RESULT SetViewTarget(EYE_TYPE eye);
-
-	RESULT Render(ObjectStore *pSceneGraph);
-	RESULT RenderFlat(ObjectStore *pFlatSceneGraph);
-
-	RESULT RenderStereoFramebuffers(ObjectStore *pSceneGraph);
-
-	RESULT RenderCombined(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
-
-	RESULT RenderFlush();
+	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
 private:
 	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
 	RESULT RenderProfiler(EYE_TYPE eye);
-	RESULT RenderShadows(ObjectStore* pSceneGraph, EYE_TYPE eye);
 
 public:
 	RESULT Resize(int pxWidth, int pxHeight);
