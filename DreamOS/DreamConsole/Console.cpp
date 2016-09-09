@@ -89,6 +89,9 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 						HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
 						m_cmdText.erase();
 					} break;
+					case VK_ESCAPE: {
+						m_cmdText.erase();
+					} break;
 					default: {
 						m_cmdText.append(std::string("") + static_cast<char>(keyCode));
 					} break;
