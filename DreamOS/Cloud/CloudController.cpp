@@ -7,6 +7,8 @@
 #include "Cloud/Message/UpdateHandMessage.h"
 #include "Cloud/Message/UpdateHeadMessage.h"
 
+#include "DreamConsole/DreamConsole.h"
+
 CloudController::CloudController() :
 	m_pCloudImp(nullptr),
 	m_pUserController(nullptr),
@@ -235,9 +237,14 @@ RESULT CloudController::LoginUser() {
 	std::string strUsername = pCommandLineManager->GetParameterValue("username");
 	std::string strPassword = pCommandLineManager->GetParameterValue("password");
 
+	HUD_OUT(("Login user " + strUsername + "...").c_str());
+	HUD_OUT(("Login ip " + strURI + "...").c_str());
+
 	// TODO: command line / config file - right now hard coded
 	CN(m_pUserController);
 	CRM(m_pUserController->Login(strUsername, strPassword), "Failed to login");
+
+	HUD_OUT("Loading user profile...");
 
 	// Get user profile
 	CRM(m_pUserController->LoadProfile(), "Failed to load profile");
@@ -247,8 +254,12 @@ RESULT CloudController::LoginUser() {
 	CN(m_pEnvironmentController);
 	CR(m_pEnvironmentController->SetEnvironmentID(m_pUserController->GetUserDefaultEnvironmentID()));
 
+	HUD_OUT("Connectint to Environment...");
+
 	// Connect to environment 
 	CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser()));
+
+	HUD_OUT("User is loaded and logged in");
 
 Error:
 	return r;

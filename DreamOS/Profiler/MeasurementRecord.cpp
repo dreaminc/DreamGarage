@@ -1,7 +1,0 @@
-#include "MeasurementRecord.h"
-
-// MeasurementRecord
-
-
-
-

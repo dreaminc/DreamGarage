@@ -14,8 +14,6 @@
 #define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
 
-#define HUD_ON
-
 /*
 #ifndef NOARRAYSIZE
 template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
@@ -45,19 +43,6 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 	#define DEBUG_OUT(str, ...)
 	#define DEBUG_LINEOUT(str, ...)
 	#define DEBUG_LINEOUT_RETURN(str, ...) 
-#endif
-
-#if defined(HUD_ON)
-	#include "Profiler/Profiler.h"
-	#include <string>
-
-	#define	HUDOUT_MAX_SIZE	1024
-	
-	#define HUD_OUT(str, ...) do { \
-	static char outstr[HUDOUT_MAX_SIZE];\
-	sprintf_s(outstr, HUDOUT_MAX_SIZE, str, ##__VA_ARGS__); if (outstr[0] != '\n' && outstr[0] != '\r') Profiler::GetProfiler()->AddConsoleLine(std::string(outstr)); } while(0);
-#else
-	#define HUD_OUT(str, ...)
 #endif
 
 #define DEBUG_FILE_LINE
@@ -126,20 +111,5 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #define CVM(pObject, msg, ...) do{if(!((pObject)->IsValid())) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
 #define CVRM(pObject, failCode, msg, ...) do{if(!((pObject)->IsValid())) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
 
-
-// Overlay Debug Console
-#include "Profiler/DebugConsole.h"
-/* why is this not working? _Pragma("warning(suppress: 4533)") \*/
-#pragma warning(disable:4533)
-
-#define OVERLAY_DEBUG_OUT(str) \
-	static std::shared_ptr<DebugData> pDebugData = DebugConsole::GetDebugConsole()->Register(); \
-	pDebugData->SetValue(str)
-
-#define OVERLAY_DEBUG_SET(name,str) \
-	DebugConsole::GetDebugConsole()->Get(name)->SetValue(str)
-
-#define SHORT_STR(str) \
-   ((str.length() > 20) ? str.substr(0, 17) + "..." : str)
 
 #endif // ! EHM_H_

@@ -9,8 +9,8 @@
 
 #include <memory>
 
-#include "Profiler/ProfilerGraph.h"
-#include "Profiler/DebugConsole.h"
+#include "DreamConsole/ProfilerGraph.h"
+#include "DreamConsole/DebugConsole.h"
 
 // Dream OS
 // DreamOS/HAL/opengl/OGLProfiler.h

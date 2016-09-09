@@ -1,0 +1,114 @@
+#include "Console.h"
+#include "ProfilerGraph.h"
+
+#include <algorithm>
+
+#include "windows.h"
+
+#include "DreamConsole/DreamConsole.h"
+
+// DreamConsole
+
+DreamConsole::DreamConsole()
+{
+	Validate();
+	return;
+}
+
+DreamConsole::~DreamConsole()
+{
+
+}
+
+void DreamConsole::OnFrameRendered()
+{
+	m_ticker.Tick();
+
+	m_FPSGraph.AddMeasurement(static_cast<uint16_t>(m_ticker.GetTicksPerSecond()));
+
+	return;
+}
+
+DreamConsole::FPSGraph_t& DreamConsole::GetFPSGraph()
+{
+	return m_FPSGraph;
+}
+
+void DreamConsole::AddConsoleLine(const std::string& text)
+{
+	m_ConsoleText.push_back(std::to_string(m_lineCnt++) + " " + text);
+	while (m_ConsoleText.size() > console_max_lines)
+	{
+		m_ConsoleText.pop_front();
+	}
+}
+
+const std::deque<std::string>& DreamConsole::GetConsoleText()
+{
+	return m_ConsoleText;
+}
+
+const std::string& DreamConsole::GetCmdText()
+{
+	return m_cmdText;
+}
+
+RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
+	RESULT r = R_PASS;
+
+	if (kbEvent->m_pSenseKeyboard)
+	{
+		kbEvent->m_pSenseKeyboard->ForEachKeyPressed([&](SK_SCAN_CODE keyCode) {
+			switch (keyCode)
+			{
+				case VK_BACK: {
+					if (!m_cmdText.empty())
+						m_cmdText.pop_back();
+				} break;
+				case VK_RETURN: {
+					HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+					m_cmdText.erase();
+				} break;
+				default: {
+					m_cmdText.append(std::string("") + static_cast<char>(keyCode));
+				} break;
+			}
+		});
+	}
+
+	//Error:
+	return r;
+}
+
+// TickCounter
+TickCounter::TickCounter()
+{
+	m_tickTimes.resize(m_nsamples);
+}
+
+TickCounter::~TickCounter()
+{
+
+}
+
+void TickCounter::Tick()
+{
+	m_tickTimes[m_currentSample++] = std::chrono::high_resolution_clock::now();
+
+	if (m_currentSample >= m_nsamples)
+	{
+		m_currentSample = 0;
+	}
+}
+
+double	TickCounter::GetTicksPerSecond()
+{
+	auto result = std::minmax_element(m_tickTimes.begin(), m_tickTimes.end());
+
+	double elapsedTime = std::chrono::duration<double>(m_tickTimes[result.second - m_tickTimes.begin()] 
+		- m_tickTimes[result.first - m_tickTimes.begin()]).count();
+
+	return (m_nsamples - 1) / elapsedTime;
+}
+
+

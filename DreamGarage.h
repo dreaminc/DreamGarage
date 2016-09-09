@@ -2,7 +2,7 @@
 #define DREAM_GARAGE_H_
 
 #include "RESULT/EHM.h"
-#include "Profiler/DebugConsole.h"
+#include "DreamConsole/DreamConsole.h"
 
 // DREAM GARAGE
 // DreamGarage.h
