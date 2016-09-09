@@ -25,7 +25,7 @@ void main(void) {
 	// Vert Color
 	DataOut.color = inV_vec4Color;
 
-	float xoffset = u_mat4Projection[2][0]*1;
+	float xoffset = u_mat4Projection[2][0]*-1;
 	float yoffset = u_mat4Projection[2][1]*-1;
 
 	// Projected Vert Position
