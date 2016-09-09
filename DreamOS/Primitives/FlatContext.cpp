@@ -31,3 +31,23 @@ std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point or
 Error:
 	return nullptr;
 }
+
+std::shared_ptr<text> FlatContext::MakeText(const std::wstring& fontName, const std::string& content, double size) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<text> pText(m_pHALImp->MakeText(fontName, content, size));
+	return pText;
+}
+
+std::shared_ptr<text> FlatContext::AddText(const std::wstring& fontName, const std::string& content, double size) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<text> pText = MakeText(fontName, content, size);
+	CR(AddObject(pText));
+
+//Success:
+	return pText;
+
+Error:
+	return nullptr;
+}
