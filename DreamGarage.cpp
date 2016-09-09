@@ -1,7 +1,9 @@
 #include "DreamGarage.h"
 #include <string>
 
+// TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
 #define TESTING
+
 light *g_pLight = nullptr;
 
 #include "Cloud/CloudController.h"
@@ -42,9 +44,7 @@ RESULT DreamGarage::LoadScene() {
 #ifdef TESTING
 // Test Scene
 // 
-
 	// Add lights
-
 ///*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
 	point ptLight = point(0.0f, 5.0f, 5.0f);
@@ -56,13 +56,13 @@ RESULT DreamGarage::LoadScene() {
 	light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, ptLight2, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
 	g_pLight->EnableShadows();
-	//AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	//AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-
+/*
+	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 //*/
 
 	// Add textures
-	///*
+///*
 	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 	texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
 
@@ -71,7 +71,7 @@ RESULT DreamGarage::LoadScene() {
 
 	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
-	//*/
+//*/
 
 	// Add Flat Objects
 ///*
@@ -99,7 +99,7 @@ RESULT DreamGarage::LoadScene() {
 	// Add billboards
 ///*
 	quad *pQuad = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad->MoveTo(0.0f, 0.0f, 0.0f);
+	pQuad->MoveTo(1.0f, 1.0f, 0.0f);
 	pQuad->SetBillboard(true);
 
 	quad *pQuad2 = AddQuad(1.0f, 1.0f, 10, 10);
@@ -113,13 +113,15 @@ RESULT DreamGarage::LoadScene() {
 	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
 
-	/*
+///*
 	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	//sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
 	pSphere2->translateX(5.0f);
+///*
+	m_pSphere->AddChild(pSphere2);
 //*/
 
 	// Add volumes
@@ -257,19 +259,25 @@ RESULT DreamGarage::Update(void) {
 	static std::shared_ptr<DebugData> pZ2 = DebugConsole::GetDebugConsole()->Register();
 	pZ2->SetValue("hello");
 	*/
-	/*
+
+#ifdef TESTING
+///*
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
 		//m_pSphere->translateY(0.0005f);
 		//m_pSphere->RotateBy(0.001f, 0.002f, 0.001f);
 		m_pSphere->RotateYBy(0.001f);
-		for (auto &childObj : m_pSphere->GetChildren()) {
-			childObj->RotateYBy(0.001f);
+		if (m_pSphere->HasChildren()) {
+			for (auto &childObj : m_pSphere->GetChildren()) {
+				childObj->RotateYBy(0.001f);
+			}
 		}
 	}
-	//*/
+///*
+	m_pSphere->translateX(0.001f);
+//*/
 
-	//m_pSphere->translateX(0.001f);
+#endif
 
 	// TODO: Switch to message queue that runs on own thread
 	// for now just throttle it down
