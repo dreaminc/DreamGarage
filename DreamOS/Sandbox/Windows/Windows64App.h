@@ -5,7 +5,7 @@
 #include "Sandbox/SandboxApp.h"
 
 #include "TimeManager/TimeManager.h"
-#include "Profiler/Console.h"
+#include "DreamConsole/Console.h"
 
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h

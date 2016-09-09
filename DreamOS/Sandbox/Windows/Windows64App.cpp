@@ -12,6 +12,8 @@
 
 #include <string>
 
+#include "DreamConsole/DreamConsole.h"
+
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
 	m_pxWidth(DEFAULT_WIDTH),
