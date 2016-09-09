@@ -790,7 +790,7 @@ RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
 	if (DreamConsole::GetConsole()->IsInForeground()) {
 		CRM(m_pOGLDreamConsole->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
 		CR(m_pOGLDreamConsole->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
-		m_pOGLDreamConsole->Render();
+		m_pOGLDreamConsole->Render(eye == EYE_MONO);
 	}
 
 Error:

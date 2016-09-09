@@ -91,7 +91,9 @@ public:
 	~OGLDreamConsole();
 
 	void Init();
-	void Render();
+	
+	// A mono view is an extended view in case the scene is not stereoscopicly rendered for an HMD.
+	void Render(bool isMonoView = false);
 	void Destroy();
 
 private:
