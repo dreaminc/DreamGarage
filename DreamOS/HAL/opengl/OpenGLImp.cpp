@@ -23,7 +23,7 @@
 #include "OGLUser.h"
 #include "OGLHand.h"
 
-
+#include "DreamConsole/DreamConsole.h"
 #include "OGLDreamConsole.h"
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
@@ -296,13 +296,6 @@ RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye) {
 
 RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
-
-	switch (kbEvent->KeyCode) {
-		case (SK_SCAN_CODE)('F') : {
-			if(kbEvent->KeyState != 0)
-				SetRenderProfiler(!GetRenderProfiler());
-		}
-	}
 
 	/* This has been moved to the camera 
 	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
@@ -786,7 +779,7 @@ RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
 	}
 	
 	// Render profiler overlay
-	if (GetRenderProfiler()) {
+	if (DreamConsole::GetConsole()->IsInForeground()) {
 		CRM(m_pOGLDreamConsole->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
 		CR(m_pOGLDreamConsole->m_OGLProgram->SetCamera(m_pCamera));
 		m_pOGLDreamConsole->Render();
@@ -801,7 +794,7 @@ RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
 	// Render profiler overlay
-	if (GetRenderProfiler()) {
+	if (DreamConsole::GetConsole()->IsInForeground()) {
 		CRM(m_pOGLDreamConsole->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
 		CR(m_pOGLDreamConsole->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
 		m_pOGLDreamConsole->Render();

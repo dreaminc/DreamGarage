@@ -44,6 +44,8 @@ public:
 	DreamConsole();
 	~DreamConsole();
 
+	bool IsInForeground();
+
 	void OnFrameRendered();
 
 	typedef ProfilerGraph<uint16_t>	FPSGraph_t;
@@ -60,6 +62,10 @@ public:
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 
 private:
+
+	// when DreamConsole is in foreground, it is to be displayed as an overlay
+	// and capture key input for the console command.
+	bool m_isInForeground = false;
 
 	TickCounter	m_ticker;
 	FPSGraph_t m_FPSGraph{ 3.0 };

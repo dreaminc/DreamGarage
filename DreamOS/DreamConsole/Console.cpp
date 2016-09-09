@@ -20,6 +20,11 @@ DreamConsole::~DreamConsole()
 
 }
 
+bool DreamConsole::IsInForeground()
+{
+	return m_isInForeground;
+}
+
 void DreamConsole::OnFrameRendered()
 {
 	m_ticker.Tick();
@@ -59,19 +64,36 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 	if (kbEvent->m_pSenseKeyboard)
 	{
 		kbEvent->m_pSenseKeyboard->ForEachKeyPressed([&](SK_SCAN_CODE keyCode) {
-			switch (keyCode)
+			if (!IsInForeground())
 			{
-				case VK_BACK: {
-					if (!m_cmdText.empty())
-						m_cmdText.pop_back();
-				} break;
-				case VK_RETURN: {
-					HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
-					m_cmdText.erase();
-				} break;
-				default: {
-					m_cmdText.append(std::string("") + static_cast<char>(keyCode));
-				} break;
+				if (keyCode == VK_TAB)
+				{
+					m_isInForeground = true;
+				}
+			}
+			else
+			{
+				if (keyCode == VK_TAB)
+				{
+					m_isInForeground = false;
+				}
+				else
+				{
+					switch (keyCode)
+					{
+					case VK_BACK: {
+						if (!m_cmdText.empty())
+							m_cmdText.pop_back();
+					} break;
+					case VK_RETURN: {
+						HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+						m_cmdText.erase();
+					} break;
+					default: {
+						m_cmdText.append(std::string("") + static_cast<char>(keyCode));
+					} break;
+					}
+				}
 			}
 		});
 	}
