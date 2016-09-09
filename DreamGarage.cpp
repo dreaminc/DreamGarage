@@ -2,7 +2,7 @@
 #include <string>
 
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
-#define TESTING
+//#define TESTING
 
 light *g_pLight = nullptr;
 
@@ -41,11 +41,6 @@ RESULT DreamGarage::LoadScene() {
 	skybox *pSkybox = AddSkybox();
 	//pSkybox->SetCubeMapTexture(pCubeMap);
 
-#ifdef TESTING
-// Test Scene
-// 
-	// Add lights
-///*
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
 	point ptLight = point(0.0f, 5.0f, 5.0f);
 	point ptLight2 = point(0.0f, 10.0f, 0.0f);
@@ -56,6 +51,13 @@ RESULT DreamGarage::LoadScene() {
 	light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, ptLight2, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
 	g_pLight->EnableShadows();
+
+#ifdef TESTING
+// Test Scene
+// 
+	// Add lights
+///*
+
 /*
 	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
