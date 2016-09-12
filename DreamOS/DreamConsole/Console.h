@@ -7,6 +7,7 @@
 
 #include "RESULT/EHM.h"
 #include "Sense/SenseKeyboard.h"
+#include "DreamConsole/CmdPrompt.h"
 
 #include "Primitives/valid.h"
 #include <chrono>
@@ -33,16 +34,19 @@ private:
 	std::vector<std::chrono::time_point<std::chrono::high_resolution_clock>>	m_tickTimes;
 };
 
-class DreamConsole : public valid, public Subscriber<SenseKeyboardEvent> {
+class DreamConsole : public valid, public Subscriber<SenseKeyboardEvent>, public Subscriber<CmdPromptEvent> {
 public:
 	static DreamConsole* GetConsole()
 	{
-		static DreamConsole profiler;
-		return &profiler;
+		static DreamConsole console;
+		console.Init();
+		return &console;
 	}
 
 	DreamConsole();
 	~DreamConsole();
+
+	void Init();
 
 	bool IsInForeground();
 
@@ -61,7 +65,11 @@ public:
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 
+	// CmdPromptEventSubscriber
+	virtual RESULT Notify(CmdPromptEvent *kbEvent) override;
+
 private:
+	bool m_isInit = false;
 
 	// when DreamConsole is in foreground, it is to be displayed as an overlay
 	// and capture key input for the console command.

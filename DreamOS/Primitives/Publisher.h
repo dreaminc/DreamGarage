@@ -3,6 +3,7 @@
 
 #include <list>
 #include <map>
+#include <string>
 
 #include <math.h>
 
@@ -25,6 +26,10 @@ public:
 
 	// Forward declaration for template
 	struct MAP_COMPARE_FUNCTION_STRUCT {
+		bool operator()(std::string a, std::string b) const {
+			return a.compare(b) < 0;
+		}
+
 		bool operator()(char const *a, char const *b) const {
 			return std::strcmp(a, b) < 0;
 		}
@@ -59,6 +64,15 @@ public:
 		char *pszString = new char[strLength];
 		memset(pszString, 0, sizeof(char) * strLength);
 		memcpy(pszString, keyEvent, sizeof(char) * (strLength - 1));
+
+		return pszString;
+	}
+
+	char* GetEventKeyString(const std::string& keyEvent) {
+		int strLength = static_cast<int>(keyEvent.length());// strlen(keyEvent) + 1;
+		char *pszString = new char[strLength];
+		memset(pszString, 0, sizeof(char) * strLength);
+		memcpy(pszString, keyEvent.c_str(), sizeof(char) * (strLength - 1));
 
 		return pszString;
 	}

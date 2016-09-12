@@ -1,4 +1,6 @@
 #include "DreamConsole/Console.h"
+#include "DreamConsole/CmdPrompt.h"
+
 #include <string>
 
 #define	HUDOUT_MAX_SIZE	1024
@@ -6,6 +8,8 @@
 #define HUD_OUT(str, ...) do { \
 	static char outstr[HUDOUT_MAX_SIZE];\
 	sprintf_s(outstr, HUDOUT_MAX_SIZE, str, ##__VA_ARGS__); if (outstr[0] != '\n' && outstr[0] != '\r') DreamConsole::GetConsole()->AddConsoleLine(std::string(outstr)); } while(0);
+
+#define CMDPROMPT_EXECUTE(str) CmdPrompt::GetCmdPrompt()->Execute(str);
 
 // Overlay Debug Console
 #include "DreamConsole/DebugConsole.h"

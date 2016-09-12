@@ -20,6 +20,19 @@ DreamConsole::~DreamConsole()
 
 }
 
+void DreamConsole::Init()
+{
+	if (m_isInit)
+	{
+		return;
+	}
+
+	// Initialize singleton
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamConsole, this);
+
+	m_isInit = true;
+}
+
 bool DreamConsole::IsInForeground()
 {
 	return m_isInForeground;
@@ -87,6 +100,7 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 					} break;
 					case VK_RETURN: {
 						HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+						CMDPROMPT_EXECUTE(m_cmdText);
 						m_cmdText.erase();
 					} break;
 					case VK_ESCAPE: {
@@ -102,6 +116,14 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 	}
 
 	//Error:
+	return r;
+}
+
+RESULT DreamConsole::Notify(CmdPromptEvent *kbEvent) {
+	RESULT r = R_PASS;
+
+	HUD_OUT("DreamConsole command");
+
 	return r;
 }
 

@@ -64,10 +64,15 @@ void OGLDreamConsole::Destroy() {
 
 }
 
-void OGLDreamConsole::Render() {
+void OGLDreamConsole::Render(bool isMonoView) {
+	const float viewTop = (isMonoView)? 0.7 : 0.4f;
+	const float viewBottom = -viewTop;
+	const float viewRight = (isMonoView) ? 0.8 : 0.5f;
+	const float viewLeft = -viewRight;
+
+	const int maxRows = (isMonoView) ? 36 : 19;
+
 	float posY = 0.0f;
-	const int maxRows = 18;
-	float top = 0.4f;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -76,7 +81,7 @@ void OGLDreamConsole::Render() {
 //	glDisable(GL_BLEND);
 
 	// Render FPS graph
-	m_OGLGraph.Render(point(-0.5f, -0.4f + 0.2f, 0), point(-0.5f + 0.4f, -0.4f, 0), DreamConsole::GetConsole()->GetFPSGraph(), static_cast<uint16_t>(0), static_cast<uint16_t>(200));
+	m_OGLGraph.Render(point(viewLeft, viewBottom + 0.2f, 0), point(viewLeft + 0.4f, viewBottom, 0), DreamConsole::GetConsole()->GetFPSGraph(), static_cast<uint16_t>(0), static_cast<uint16_t>(200));
 
 	// Revert to 'default' render state. TODO: refactor rendering states
 	glEnable(GL_CULL_FACE);
@@ -91,7 +96,7 @@ void OGLDreamConsole::Render() {
 		 it < DreamConsole::GetConsole()->GetConsoleText().end();
 		 it++)
 	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, m_fontSize)->SetPosition(point(0.1f, top - posY, 0.0f),text::BOTTOM_RIGHT));
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, m_fontSize)->SetPosition(point(0.1f, viewTop - posY, 0.0f), text::BOTTOM_RIGHT));
 		posY += m_OGLConsoleText->m_height;
 	}
 
@@ -101,10 +106,10 @@ void OGLDreamConsole::Render() {
 	if ((time / 100) % 10 > 5)
 		cmdText += "_";
 
-	m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(cmdText, m_fontSize + 0.02f)->SetPosition(point(0.1f, -0.4f, 0.0f), text::BOTTOM_RIGHT));
-	
+	m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(cmdText, m_fontSize + 0.02f)->SetPosition(point(0.1f, viewBottom, 0.0f), text::BOTTOM_RIGHT));
+
 	// Render debug console text
-	m_OGLConsole.Render(point(-0.5f, top, 0.0f), point(0.0f, 0.0f, 0.0f));
+	m_OGLConsole.Render(point(viewLeft, viewTop, 0.0f), point(0.0f, 0.0f, 0.0f));
 }
 
 // OGLProfilerGraph

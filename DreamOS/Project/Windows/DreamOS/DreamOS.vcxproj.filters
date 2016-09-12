@@ -401,6 +401,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp">
+      <Filter>DreamConsole</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2014,6 +2017,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h">
+      <Filter>DreamConsole</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

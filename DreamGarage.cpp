@@ -33,6 +33,8 @@ RESULT DreamGarage::LoadScene() {
 	// IO
 	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
+
 	// Add Peer User Object
 	m_pPeerUser = AddUser();
 
@@ -421,5 +423,13 @@ RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	}
 
 //Error:
+	return r;
+}
+
+RESULT DreamGarage::Notify(CmdPromptEvent *kbEvent) {
+	RESULT r = R_PASS;
+
+	HUD_OUT("DreamAPP command");
+
 	return r;
 }
