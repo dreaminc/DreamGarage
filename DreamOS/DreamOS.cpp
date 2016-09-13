@@ -1,5 +1,7 @@
 #include "DreamOS.h"
 
+#include "Logger/Logger.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -24,6 +26,9 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
 
 	srand(static_cast <unsigned> (time(0)));
+
+	// Initialize logger
+	Logger::InitializeLogger();
 
 	// Create the Sandbox
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
