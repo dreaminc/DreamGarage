@@ -61,7 +61,7 @@ RESULT	Logger::InitializeLogger()
 	defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
 	el::Loggers::reconfigureLogger("default", defaultConf);
 	
-	LOG(INFO) << "Process " << getexepath() << " launched";
+	LOG(INFO) << "Process launched " << getexepath();
 	LOG(INFO) << "Process args " << getcommandline();
 
 	return R_PASS;
