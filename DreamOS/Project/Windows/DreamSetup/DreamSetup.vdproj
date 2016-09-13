@@ -15,12 +15,6 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_011818415C404306B0AA57A450F3F7B8"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_06EB5687CEE643ED95720A1BE7C93CAA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -45,7 +39,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0F4340BAD4E04EACAECE7EEBF795119D"
+        "MsmKey" = "8:_0E8B6FBCF5E6408EBBC86315372962A6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_0FAF61027C3444089770C7E9DE5E9FAC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -57,7 +57,43 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_160CEFA454D44757A0D0CD7A1D4B2549"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_16EC6B2F2D1341EF820367BC5EB09877"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_173D4862BAA045CA9C7CACEBAA974745"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_18DC4B8BEA074AA0AB45A843672C2878"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_1978822D69B447D582955ABB009FF40A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1B87584616204837A6C7284447E08CF6"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_1BDEE4E10479425D94778C0954EBF1B9"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -75,13 +111,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_26FF93126C5F4CB784E528EAB5662209"
+        "MsmKey" = "8:_24D35A317B7D47B397B1401A7A93FB46"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_298D526316764CC39CAA44DB77CA9313"
+        "MsmKey" = "8:_263A0BC2377C4B2A97281CEF9AF6AC7E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -99,25 +135,43 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_2C63AFBCA98C4807BFDBF41B75F2E04E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_2CB6C3898858449CB112F476536D867F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_3740FA45279A41369D352167BDBD95CB"
+        "MsmKey" = "8:_2F3CB526FFDE48C7A7CA98C0954C821E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_471501DD7CE947D4A116757DFD31C50A"
+        "MsmKey" = "8:_3CE1A54E834846AB949EAB1024C729D2"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_476481A9DFFF43BDB2D042EF37F7E249"
+        "MsmKey" = "8:_4168B0B7BD1242E598DA28663AFABF66"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4381634C994F4A1AAE113BA26779950A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_43D7CA566ED14610BDA7EAB587FE6ED7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -129,13 +183,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_5035457B5BFE4BB68A10AF133B3D0528"
+        "MsmKey" = "8:_4F2836AE61F44378B055EAD4C4BAFA4C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_5AC6A285270645E5B02752C32CAAAAAA"
+        "MsmKey" = "8:_563C91A34DCF41CF9D836F75A4A7E85A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -147,7 +201,31 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_5D0A4B15547249788D9FF9C9A24FE678"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5D8E3CF922364CEBBD75DAE13440F653"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_5DEF7529BA014C3AAE0272E5479E86AD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_5F556EB8E77541B8B06FE47969789EE7"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6119EDF155144F699159AFBD71BBA57E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -159,13 +237,19 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_67BE21823EEB4D65918CCEEA41A2531A"
+        "MsmKey" = "8:_6647F64D9ACB4A2C94437823EC3D7650"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_6B237C02320A4AAFA5FA9508AC7CA1BB"
+        "MsmKey" = "8:_67D652D05BFC4182A0C6CE7B219E30AD"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_6A127362D490442F9E39BC6D3CEE5BD3"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -177,19 +261,31 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_72FA320A32254455A401CD4250D96651"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_76686447F6B44F7791B7C2E2FA16C29A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_76FEA1D6ABC240189C5B7EE94EE265F1"
+        "MsmKey" = "8:_7B1E969C7BA7443DB28B2AE95712B98E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_829D9CA477824C7496ED4B44FA1549FB"
+        "MsmKey" = "8:_7FAE70F9EA3C4A959A2FA7EA8EAA381E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_804B04DE92F0482FA09A455F4C23311A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -207,19 +303,25 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_95E0B4D85AFF485E8A9F2E16D2702F59"
+        "MsmKey" = "8:_8A34935ACD8F4E11AFE08FFB1354B0F0"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_96E802ABA3AC400EBC723ED3A4532007"
+        "MsmKey" = "8:_8ACAAD0E4F9D4268A90FEAF12F7619BA"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_9710B70D66F04304913BBFAAFC71B480"
+        "MsmKey" = "8:_90403E9761F74DD79EC33068A270A039"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_959309F9E30F4A3FBE0A891DF1785C4A"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -231,25 +333,25 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_9EACBD1B4D2941FCA67F39962F8EFC63"
+        "MsmKey" = "8:_9ABAE49D1ED04CA5AA9E7B64EB283AE7"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_A232375895174EE1A87558401FA5F9BF"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_A2B291E9E55C4BD0859147BBDB5F53A9"
+        "MsmKey" = "8:_A2EFC68BDD534D9AA1745D8DDCD6EC3F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_A439C8840A0B404794C7CE8415D3AA31"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AA24B595FB354847849E27059E8F917D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -262,6 +364,12 @@
         "Entry"
         {
         "MsmKey" = "8:_AA66FE9FB4554473ADA529506C8D3437"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_AB688D5C76B04BCDBEBA6640C9926B69"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -291,6 +399,24 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_BE43BB305EDB45E2991588E129228CC2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BEBB075214574867A051B4DFE19725CA"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BFE0E0435F664D98B247876E10D7036E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_C08A5F982D5B492589076FEA7D258902"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -309,25 +435,43 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_C6246084436944648C0F642683B6103B"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_C868C6E146444C22B55C15BD2A342711"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_CC49604014894AEC947CBA8A5C1B1BF2"
+        "MsmKey" = "8:_C9495867E56F4D09B4B88443A6F24EAF"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_E4A109FECAF241BAA503A1BCBE57CE21"
+        "MsmKey" = "8:_CE04FE0C93E74D3C999B4DFBB8E9080F"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_CE8753D676A3426D88289E49600D6B95"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D14576FF1616458DB5E06E7422A30182"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_D6FEBB66C8EB4792A3851B8100548C82"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_E0D9FCE0FFEE419298B99DFA1EBB91F1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -351,6 +495,18 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_F2CF1C253CD0484B8689BDF25DE5635E"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_F4378EFC7EC04740AD35D4E06185DE3A"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_F85FC34FAE2D4572AC77B12BD57D64B1"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -364,6 +520,12 @@
         "Entry"
         {
         "MsmKey" = "8:_FE0FF208D8B242FFBCFF699E3CE7E4B8"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_FE66B5CD286744449DD08C2C7C1AF636"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -454,26 +616,6 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_011818415C404306B0AA57A450F3F7B8"
-            {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTextureShadow.frag"
-            "TargetName" = "8:blinnPhongTextureShadow.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_06EB5687CEE643ED95720A1BE7C93CAA"
             {
             "SourcePath" = "8:..\\..\\..\\Models\\stormtrooper\\Map__7_Raytrace.tga"
@@ -554,12 +696,32 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0F4340BAD4E04EACAECE7EEBF795119D"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0E8B6FBCF5E6408EBBC86315372962A6"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhong.frag"
-            "TargetName" = "8:blinnPhong.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhong.vert"
+            "TargetName" = "8:blinnPhong.vert"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0FAF61027C3444089770C7E9DE5E9FAC"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\minimalTexture.frag"
+            "TargetName" = "8:minimalTexture.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -594,12 +756,132 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_160CEFA454D44757A0D0CD7A1D4B2549"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\minimalTexture.vert"
+            "TargetName" = "8:minimalTexture.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_16EC6B2F2D1341EF820367BC5EB09877"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTexture.vert"
+            "TargetName" = "8:blinnPhongTexture.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_173D4862BAA045CA9C7CACEBAA974745"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhong.frag"
+            "TargetName" = "8:blinnPhong.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_18DC4B8BEA074AA0AB45A843672C2878"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhongTextureBump.vert"
+            "TargetName" = "8:blinnPhongTextureBump.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1978822D69B447D582955ABB009FF40A"
             {
             "SourcePath" = "8:..\\Production\\libcurl.dll"
             "TargetName" = "8:libcurl.dll"
             "Tag" = "8:"
             "Folder" = "8:_045A0A22BF694330828EBD3043035192"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1B87584616204837A6C7284447E08CF6"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\minimal.vert"
+            "TargetName" = "8:minimal.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_1BDEE4E10479425D94778C0954EBF1B9"
+            {
+            "SourcePath" = "8:..\\..\\..\\Texture\\Fonts\\Arial.png"
+            "TargetName" = "8:Arial.png"
+            "Tag" = "8:"
+            "Folder" = "8:_FB8C2C0C07074822860446F35C8266B6"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -654,10 +936,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_26FF93126C5F4CB784E528EAB5662209"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_24D35A317B7D47B397B1401A7A93FB46"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTextureShadow.vert"
-            "TargetName" = "8:blinnPhongTextureShadow.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongShadow.frag"
+            "TargetName" = "8:blinnPhongShadow.frag"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
@@ -674,10 +956,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_298D526316764CC39CAA44DB77CA9313"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_263A0BC2377C4B2A97281CEF9AF6AC7E"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\skyboxScatter.frag"
-            "TargetName" = "8:skyboxScatter.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\skybox.frag"
+            "TargetName" = "8:skybox.frag"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
@@ -734,6 +1016,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2C63AFBCA98C4807BFDBF41B75F2E04E"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhongTexture.frag"
+            "TargetName" = "8:blinnPhongTexture.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2CB6C3898858449CB112F476536D867F"
             {
             "SourcePath" = "8:..\\..\\..\\Models\\stormtrooper\\stormtrooper.obj"
@@ -754,9 +1056,69 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3740FA45279A41369D352167BDBD95CB"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_2F3CB526FFDE48C7A7CA98C0954C821E"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\ShadowDepth.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\skyboxScatter.vert"
+            "TargetName" = "8:skyboxScatter.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_3CE1A54E834846AB949EAB1024C729D2"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\minimal.vert"
+            "TargetName" = "8:minimal.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4168B0B7BD1242E598DA28663AFABF66"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\TextureBitBlit.vert"
+            "TargetName" = "8:TextureBitBlit.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4381634C994F4A1AAE113BA26779950A"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\ShadowDepth.frag"
             "TargetName" = "8:ShadowDepth.frag"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
@@ -774,32 +1136,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_471501DD7CE947D4A116757DFD31C50A"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_43D7CA566ED14610BDA7EAB587FE6ED7"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTexture.frag"
-            "TargetName" = "8:blinnPhongTexture.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\ShadowDepth.frag"
+            "TargetName" = "8:ShadowDepth.frag"
             "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_476481A9DFFF43BDB2D042EF37F7E249"
-            {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\TextureBitBlit.vert"
-            "TargetName" = "8:TextureBitBlit.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -834,10 +1176,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5035457B5BFE4BB68A10AF133B3D0528"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_4F2836AE61F44378B055EAD4C4BAFA4C"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhong.vert"
-            "TargetName" = "8:blinnPhong.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\skybox.vert"
+            "TargetName" = "8:skybox.vert"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
@@ -854,12 +1196,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5AC6A285270645E5B02752C32CAAAAAA"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_563C91A34DCF41CF9D836F75A4A7E85A"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTexture.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhongTexture.vert"
             "TargetName" = "8:blinnPhongTexture.vert"
             "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -894,12 +1236,92 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5D0A4B15547249788D9FF9C9A24FE678"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongShadow.vert"
+            "TargetName" = "8:blinnPhongShadow.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5D8E3CF922364CEBBD75DAE13440F653"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\minimalTexture.vert"
+            "TargetName" = "8:minimalTexture.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5DEF7529BA014C3AAE0272E5479E86AD"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\flat.vert"
+            "TargetName" = "8:flat.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_5F556EB8E77541B8B06FE47969789EE7"
             {
             "SourcePath" = "8:..\\Production\\d3dcompiler_47.dll"
             "TargetName" = "8:d3dcompiler_47.dll"
             "Tag" = "8:"
             "Folder" = "8:_045A0A22BF694330828EBD3043035192"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6119EDF155144F699159AFBD71BBA57E"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhongShadow.frag"
+            "TargetName" = "8:blinnPhongShadow.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -934,10 +1356,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_67BE21823EEB4D65918CCEEA41A2531A"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6647F64D9ACB4A2C94437823EC3D7650"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTextureBump.vert"
-            "TargetName" = "8:blinnPhongTextureBump.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhong.frag"
+            "TargetName" = "8:blinnPhong.frag"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
@@ -954,12 +1376,32 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6B237C02320A4AAFA5FA9508AC7CA1BB"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_67D652D05BFC4182A0C6CE7B219E30AD"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\skybox.frag"
-            "TargetName" = "8:skybox.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\flat.frag"
+            "TargetName" = "8:flat.frag"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_6A127362D490442F9E39BC6D3CEE5BD3"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhongTextureShadow.vert"
+            "TargetName" = "8:blinnPhongTextureShadow.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -994,6 +1436,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_72FA320A32254455A401CD4250D96651"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTextureBump.frag"
+            "TargetName" = "8:blinnPhongTextureBump.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_76686447F6B44F7791B7C2E2FA16C29A"
             {
             "SourcePath" = "8:..\\Production\\Resources\\Fonts\\Arial.fnt"
@@ -1014,12 +1476,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_76FEA1D6ABC240189C5B7EE94EE265F1"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7B1E969C7BA7443DB28B2AE95712B98E"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\ShadowDepth.vert"
-            "TargetName" = "8:ShadowDepth.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\flat.frag"
+            "TargetName" = "8:flat.frag"
             "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1034,10 +1496,30 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_829D9CA477824C7496ED4B44FA1549FB"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_7FAE70F9EA3C4A959A2FA7EA8EAA381E"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongShadow.vert"
-            "TargetName" = "8:blinnPhongShadow.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhongTextureShadow.frag"
+            "TargetName" = "8:blinnPhongTextureShadow.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_804B04DE92F0482FA09A455F4C23311A"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\TextureBitBlit.vert"
+            "TargetName" = "8:TextureBitBlit.vert"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
@@ -1074,10 +1556,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_95E0B4D85AFF485E8A9F2E16D2702F59"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8A34935ACD8F4E11AFE08FFB1354B0F0"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\skyboxScatter.vert"
-            "TargetName" = "8:skyboxScatter.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTextureShadow.vert"
+            "TargetName" = "8:blinnPhongTextureShadow.vert"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
@@ -1094,12 +1576,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_96E802ABA3AC400EBC723ED3A4532007"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8ACAAD0E4F9D4268A90FEAF12F7619BA"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\minimalTexture.vert"
-            "TargetName" = "8:minimalTexture.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\TextureBitBlit.frag"
+            "TargetName" = "8:TextureBitBlit.frag"
             "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1114,12 +1596,32 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9710B70D66F04304913BBFAAFC71B480"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_90403E9761F74DD79EC33068A270A039"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\minimal.vert"
-            "TargetName" = "8:minimal.vert"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\ShadowDepth.vert"
+            "TargetName" = "8:ShadowDepth.vert"
             "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_959309F9E30F4A3FBE0A891DF1785C4A"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\minimal.frag"
+            "TargetName" = "8:minimal.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1154,12 +1656,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9EACBD1B4D2941FCA67F39962F8EFC63"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_9ABAE49D1ED04CA5AA9E7B64EB283AE7"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongShadow.frag"
-            "TargetName" = "8:blinnPhongShadow.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\skybox.vert"
+            "TargetName" = "8:skybox.vert"
             "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1174,32 +1676,12 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A232375895174EE1A87558401FA5F9BF"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A2EFC68BDD534D9AA1745D8DDCD6EC3F"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\minimalTexture.frag"
-            "TargetName" = "8:minimalTexture.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhong.vert"
+            "TargetName" = "8:blinnPhong.vert"
             "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A2B291E9E55C4BD0859147BBDB5F53A9"
-            {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\TextureBitBlit.frag"
-            "TargetName" = "8:TextureBitBlit.frag"
-            "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1220,6 +1702,26 @@
             "TargetName" = "8:reflect2.jpg"
             "Tag" = "8:"
             "Folder" = "8:_53C9B81A51134452B9C536DFA7241E31"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AA24B595FB354847849E27059E8F917D"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\skyboxScatter.vert"
+            "TargetName" = "8:skyboxScatter.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1260,6 +1762,26 @@
             "TargetName" = "8:facePB.jpg"
             "Tag" = "8:"
             "Folder" = "8:_53C9B81A51134452B9C536DFA7241E31"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AB688D5C76B04BCDBEBA6640C9926B69"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\skyboxScatter.frag"
+            "TargetName" = "8:skyboxScatter.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1354,6 +1876,66 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BE43BB305EDB45E2991588E129228CC2"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\skybox.frag"
+            "TargetName" = "8:skybox.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BEBB075214574867A051B4DFE19725CA"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTextureBump.vert"
+            "TargetName" = "8:blinnPhongTextureBump.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BFE0E0435F664D98B247876E10D7036E"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhongShadow.vert"
+            "TargetName" = "8:blinnPhongShadow.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C08A5F982D5B492589076FEA7D258902"
             {
             "SourcePath" = "8:..\\Production\\d3dcompiler_43.dll"
@@ -1414,26 +1996,6 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C6246084436944648C0F642683B6103B"
-            {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\skybox.vert"
-            "TargetName" = "8:skybox.vert"
-            "Tag" = "8:"
-            "Folder" = "8:_221329DB61E94714A813107839FD1974"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C868C6E146444C22B55C15BD2A342711"
             {
             "SourcePath" = "8:..\\Production\\libcef.dll"
@@ -1454,10 +2016,10 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CC49604014894AEC947CBA8A5C1B1BF2"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C9495867E56F4D09B4B88443A6F24EAF"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTextureBump.frag"
-            "TargetName" = "8:blinnPhongTextureBump.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTexture.frag"
+            "TargetName" = "8:blinnPhongTexture.frag"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
@@ -1474,10 +2036,90 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E4A109FECAF241BAA503A1BCBE57CE21"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CE04FE0C93E74D3C999B4DFBB8E9080F"
             {
-            "SourcePath" = "8:..\\Production\\HAL\\opengl\\shaders\\GLSL\\v440\\minimal.frag"
-            "TargetName" = "8:minimal.frag"
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\minimalTexture.frag"
+            "TargetName" = "8:minimalTexture.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CE8753D676A3426D88289E49600D6B95"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\skyboxScatter.frag"
+            "TargetName" = "8:skyboxScatter.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D14576FF1616458DB5E06E7422A30182"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\blinnPhongTextureBump.frag"
+            "TargetName" = "8:blinnPhongTextureBump.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D6FEBB66C8EB4792A3851B8100548C82"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\TextureBitBlit.frag"
+            "TargetName" = "8:TextureBitBlit.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E0D9FCE0FFEE419298B99DFA1EBB91F1"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\blinnPhongTextureShadow.frag"
+            "TargetName" = "8:blinnPhongTextureShadow.frag"
             "Tag" = "8:"
             "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
@@ -1554,6 +2196,46 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F2CF1C253CD0484B8689BDF25DE5635E"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\ShadowDepth.vert"
+            "TargetName" = "8:ShadowDepth.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F4378EFC7EC04740AD35D4E06185DE3A"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v400\\flat.vert"
+            "TargetName" = "8:flat.vert"
+            "Tag" = "8:"
+            "Folder" = "8:_6B66B339A5934680993DEAAFFECD36DD"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_F85FC34FAE2D4572AC77B12BD57D64B1"
             {
             "SourcePath" = "8:Redist\\msvcr120.dll"
@@ -1600,6 +2282,26 @@
             "TargetName" = "8:DreamLauncher.html"
             "Tag" = "8:"
             "Folder" = "8:_045A0A22BF694330828EBD3043035192"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FE66B5CD286744449DD08C2C7C1AF636"
+            {
+            "SourcePath" = "8:..\\..\\..\\HAL\\opengl\\shaders\\GLSL\\v440\\minimal.frag"
+            "TargetName" = "8:minimal.frag"
+            "Tag" = "8:"
+            "Folder" = "8:_221329DB61E94714A813107839FD1974"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
@@ -1732,6 +2434,17 @@
                                                         {
                                                         }
                                                     }
+                                                    "{9EF0B969-E518-4E46-987F-47570745A589}:_6B66B339A5934680993DEAAFFECD36DD"
+                                                    {
+                                                    "Name" = "8:v400"
+                                                    "AlwaysCreate" = "11:FALSE"
+                                                    "Condition" = "8:"
+                                                    "Transitive" = "11:FALSE"
+                                                    "Property" = "8:_5E8E97F79D2C433FABB484898E0F6608"
+                                                        "Folders"
+                                                        {
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -1749,6 +2462,17 @@
                     "Property" = "8:_BC502167C6A2421A92427EC8C51AC51A"
                         "Folders"
                         {
+                            "{9EF0B969-E518-4E46-987F-47570745A589}:_FB8C2C0C07074822860446F35C8266B6"
+                            {
+                            "Name" = "8:Fonts"
+                            "AlwaysCreate" = "11:FALSE"
+                            "Condition" = "8:"
+                            "Transitive" = "11:FALSE"
+                            "Property" = "8:_E8D3CCFB4BDE4BA7B9FB26EDA0059F24"
+                                "Folders"
+                                {
+                                }
+                            }
                         }
                     }
                 }
@@ -1803,7 +2527,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Dream"
         "ProductCode" = "8:{21EC87FE-5207-4AF8-ABE2-501DEDC91170}"
-        "PackageCode" = "8:{E61FFAB8-520D-4431-84E6-E058BD1F9B8C}"
+        "PackageCode" = "8:{EC6355DA-1824-499E-B52B-EF4358F39EF3}"
         "UpgradeCode" = "8:{9E4013FF-9949-471E-9B8D-67958A95FB31}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"

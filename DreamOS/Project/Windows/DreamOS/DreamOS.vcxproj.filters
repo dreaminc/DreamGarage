@@ -150,6 +150,9 @@
     <Filter Include="DreamConsole">
       <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -403,6 +406,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp">
       <Filter>DreamConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Logger\Logger.cpp">
+      <Filter>Logger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2020,6 +2026,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h">
       <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Logger\Logger.h">
+      <Filter>Logger</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
