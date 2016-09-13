@@ -7,6 +7,7 @@
 // All objects in Dimension should derive from this base class
 
 #include "valid.h"
+#include "dirty.h"
 #include "Primitives/Types/UID.h"
 
 #include "VirtualObj.h"
@@ -18,7 +19,10 @@
 #include "material.h"
 #include "texture.h"
 
-class DimObj : public VirtualObj, public Subscriber<TimeEvent> {
+#include <vector>
+#include <memory>
+
+class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
     //AABV m_aabv;        // Axis Aligned Bounding Volume
@@ -32,6 +36,11 @@ protected:
 	texture *m_pColorTexture;
 	texture *m_pBumpTexture;
 
+	// Use this flag to signal the appropriate rendering object (such as OGLObj) that it needs to update the buffer
+	// TODO: This should be encapsulated as a dirty pattern
+	bool m_fDirty;
+	bool m_fVisible;
+
 public:
     DimObj() :
         VirtualObj(),	// velocity, origin
@@ -39,7 +48,10 @@ public:
 		m_pIndices(nullptr),
 		m_material(),
 		m_pColorTexture(nullptr),
-		m_pBumpTexture(nullptr)
+		m_pBumpTexture(nullptr),
+		m_pObjects(nullptr),
+		m_pParent(nullptr),
+		m_fVisible(true)
         //m_aabv()
     {
         /* stub */
@@ -69,7 +81,7 @@ public:
 		return R_PASS;
 	}
 
-	virtual inline int NumberVertices() = 0;
+	virtual inline unsigned int NumberVertices() = 0;
 	inline vertex *VertexData() {
 		return m_pVertices;
 	}
@@ -78,7 +90,7 @@ public:
 		return NumberVertices() * sizeof(vertex);
 	}
 
-	virtual inline int NumberIndices() = 0;
+	virtual inline unsigned int NumberIndices() = 0;
 	inline dimindex *IndexData() {
 		return m_pIndices;
 	}
@@ -117,9 +129,18 @@ public:
 		return r;
 	}
 
+	virtual RESULT UpdateBuffers() {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	bool IsVisible() { return m_fVisible; }
+	RESULT SetVisible(bool fVisible = true) { m_fVisible = fVisible;  return R_PASS; }
+
 	RESULT SetColor(color c) {
-		for (int i = 0; i < NumberVertices(); i++)
+		for (unsigned int i = 0; i < NumberVertices(); i++)
 			m_pVertices[i].SetColor(c);
+
+		SetDirty();
 
 		return R_PASS;
 	}
@@ -175,12 +196,48 @@ public:
 	}
 
 	RESULT SetRandomColor() {
-		for (int i = 0; i < NumberVertices(); i++)
+		for (unsigned int i = 0; i < NumberVertices(); i++)
 			m_pVertices[i].SetRandomColor();
 
 		return R_PASS;
 	}
 
+	// Children (composite objects)
+	RESULT AddChild(std::shared_ptr<DimObj> pDimObj) {
+		if (m_pObjects == nullptr) {
+			m_pObjects = std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>>(new std::vector<std::shared_ptr<VirtualObj>>);
+		}
+
+		m_pObjects->push_back(pDimObj);
+		pDimObj->SetParent(this);
+
+		return R_PASS;
+	}
+
+	RESULT ClearChildren() {
+		m_pObjects->clear();
+		return R_PASS;
+	}
+
+	bool HasChildren() {
+		return (m_pObjects != nullptr) && (m_pObjects->size() != 0);
+	}
+
+	std::vector<std::shared_ptr<VirtualObj>> GetChildren() {
+		return *(m_pObjects.get());
+	}
+
+protected:
+	RESULT SetParent(DimObj* pParent) {
+		m_pParent = pParent;
+		return R_PASS;
+	}
+
+private:
+	DimObj* m_pParent;
+	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
+
+public:
 	// This assumes the other vertices have a valid position and uv mapping
 	// This will set the tangents/bi-tangents for all three vertices
 	// Source: http://learnopengl.com/#!Advanced-Lighting/Normal-Mapping
@@ -195,15 +252,15 @@ public:
 		point_precision factor = 0.0f;
 
 		// TODO: More eloquent way than this
-		CB((i1 < NumberIndices()));
+		CB((i1 < static_cast<unsigned int>(NumberIndices())));
 		pV1 = &(m_pVertices[i1]);
 		CN(pV1);
 
-		CB((i2 < NumberIndices()));
+		CB((i2 < static_cast<unsigned int>(NumberIndices())));
 		pV2 = &(m_pVertices[i2]);
 		CN(pV2);
 
-		CB((i3 < NumberIndices()));
+		CB((i3 < static_cast<unsigned int>(NumberIndices())));
 		pV3 = &(m_pVertices[i3]);
 		CN(pV3);
 
@@ -229,16 +286,51 @@ public:
 		return r;
 	}
 
+	// This will not take into consideration surfaces that are continuous 
+	// TODO: Create surface based normal calculation function (this works at the vertex level rather the triangle one)
+	RESULT SetTriangleNormal(dimindex i1, dimindex i2, dimindex i3) {
+		RESULT r = R_PASS;
+		
+		vertex *pV1 = nullptr, *pV2 = nullptr, *pV3 = nullptr;
+		vector deltaPos1, deltaPos2;
+		vector normalVector;
+
+		// TODO: More eloquent way than this
+		CB((i1 < NumberIndices()));
+		pV1 = &(m_pVertices[i1]);
+		CN(pV1);
+
+		CB((i2 < NumberIndices()));
+		pV2 = &(m_pVertices[i2]);
+		CN(pV2);
+
+		CB((i3 < NumberIndices()));
+		pV3 = &(m_pVertices[i3]);
+		CN(pV3);
+
+		deltaPos1 = pV2->GetPoint() - pV1->GetPoint();
+		deltaPos2 = pV3->GetPoint() - pV1->GetPoint();
+
+		normalVector = deltaPos1.NormalizedCross(deltaPos2);
+
+		pV1->SetNormal(normalVector);
+		pV2->SetNormal(normalVector);
+		pV3->SetNormal(normalVector);
+
+	Error:
+		return r;
+	}
+
 	RESULT SetQuadTangentBitangent(dimindex TL, dimindex TR, dimindex BL, dimindex BR) {
 		RESULT r = R_PASS;
 		vertex *pVTR = nullptr, *pVBL = nullptr;
 
 		// TODO: More eloquent way than this
-		CB((TR < NumberIndices()));
+		CB((TR < static_cast<unsigned int>(NumberIndices())));
 		pVTR = &(m_pVertices[TR]);
 		CN(pVTR);
 
-		CB((BL < NumberIndices()));
+		CB((BL < static_cast<unsigned int>(NumberIndices())));
 		pVBL = &(m_pVertices[BL]);
 		CN(pVBL);
 
@@ -289,15 +381,41 @@ public:
 	Error:
 		return r;
 	}
+
+	// TODO: Should this moved up into vertex?
+	RESULT RotateVerticesByEulerVector(vector vEuler) {
+		RESULT r = R_PASS;
+
+		RotationMatrix rotMat(vEuler);
+
+		// point and normal
+		for (unsigned int i = 0; i < NumberVertices(); i++) {
+			m_pVertices[i].m_point = rotMat * m_pVertices[i].m_point;
+			m_pVertices[i].m_normal = rotMat * m_pVertices[i].m_normal;
+		}
+
+		// tangent bitangent
+		/*
+		// TODO:
+		for (unsigned int i = 0; i < NumberIndices(); i++) {
+			if (i % 3 == 0) {
+				SetTriangleTangentBitangent(m_pIndices[i - 3], m_pIndices[i - 2], m_pIndices[i - 1]);
+			}
+		}
+		*/
+
+	//Error:
+		return r;
+	}
 	
 	// TODO: This shoudln't be baked in here ultimately
 	RESULT Notify(TimeEvent *event) {
-		quaternion_precision factor = 0.05;
-		quaternion_precision filter = 0.1;
+		quaternion_precision factor = 0.05f;
+		quaternion_precision filter = 0.1f;
 
-		static quaternion_precision x = 1.0;
-		static quaternion_precision y = 1.0;
-		static quaternion_precision z = 1.0;
+		static quaternion_precision x = 1.0f;
+		static quaternion_precision y = 1.0f;
+		static quaternion_precision z = 1.0f;
 
 		//x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
 		//y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
@@ -311,6 +429,17 @@ public:
 	material *GetMaterial() {
 		return (&m_material);
 	}
+
+	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f)) {
+		if (m_pParent != nullptr) {
+			auto modelMatrix = VirtualObj::GetModelMatrix(childMat);
+			return m_pParent->GetModelMatrix(modelMatrix);
+		}
+		else {
+			return VirtualObj::GetModelMatrix(childMat);
+		}
+	}
+
 };
 
 #endif // !DIM_OBJ_H_

@@ -75,6 +75,21 @@ RESULT version::SetVersion(long lVer) {
 	return r;
 }
 
+std::string version::GetString(bool fShowMinorMinor) {
+	std::string strRet = "";
+	
+	strRet += std::to_string(m_major);
+	strRet += '.';
+	strRet += std::to_string(m_minor);
+
+	if (fShowMinorMinor) {
+		strRet += '.';
+		strRet += std::to_string(m_doubleminor);
+	}
+
+	return strRet;
+}
+
 version& version::operator=(const version &arg) {
 	if (this == &arg)      // Same object?
 		return *this;        // Yes, so skip assignment, and just return *this.

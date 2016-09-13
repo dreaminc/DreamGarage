@@ -29,6 +29,11 @@ public:
 		clear();
 	}
 	
+	ViewMatrix(point ptPosition) {
+		clear();
+		SetViewMatrixPitchYawRoll(ptPosition, 0.0f, 0.0f, 0.0f);
+	}
+
 	// This will start with i, j, k vectors and effectively rotate them about the appropriate axes 
 	// pitch is about the x axis, yaw is about the y axis and roll is about the z axis
 	ViewMatrix(point ptPosition, view_precision pitch, view_precision yaw, view_precision roll) {
@@ -62,10 +67,44 @@ public:
 		// empty stub
 	}
 
+	RotationMatrix GetRotationMatrix() {
+		RotationMatrix matRotation;
+
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 3; j++)
+				matRotation.element(i, j) = this->element(i, j);
+
+		return matRotation;
+	}
+
+	point GetPosition() {
+		view_precision x = this->element(0, 3);
+		view_precision y = this->element(1, 3);
+		view_precision z = this->element(2, 3);
+		//view_precision w = this->element(3, 3);
+		view_precision w = 1.0f;
+
+		return point(x, y, z, 1.0f);
+	}
+
+	quaternion GetOrientation() {
+		return GetRotationMatrix().GetQuaternion();
+	}
+
 	RESULT PrintMatrix() {
 		DEBUG_LINEOUT("View Matrix");
 		return matrix<view_precision, 4, 4>::PrintMatrix();
 	}	
+
+	// Explicitly specializing the assignment operator
+	ViewMatrix& operator=(const matrix<view_precision, 4, 4> &arg) {
+		if (this == &arg)      // Same object?
+			return *this;        // Yes, so skip assignment, and just return *this.
+
+		memcpy(this->m_data, arg.m_data, sizeof(view_precision) * 4 * 4);
+
+		return *this;
+	}
 };
 
 #endif // ! VIEW_MATRIX_H_

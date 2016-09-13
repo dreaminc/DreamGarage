@@ -9,7 +9,7 @@ OpenGLShader::OpenGLShader(OGLProgram *pParentProgram, GLenum shaderType) :
 	//m_pParentImp(pParentImp),
 	GLSLObject(pParentProgram),
 	m_shaderType(shaderType),
-	m_pszShaderCode(NULL),
+	m_pszShaderCode(nullptr),
 	m_shaderID(NULL)
 {
 	RESULT r = R_PASS;
@@ -25,9 +25,9 @@ Error:
 }
 
 OpenGLShader::~OpenGLShader(void) {
-	if (m_pszShaderCode != NULL) {
+	if (m_pszShaderCode != nullptr) {
 		delete [] m_pszShaderCode;
-		m_pszShaderCode = NULL;
+		m_pszShaderCode = nullptr;
 	}
 }
 
@@ -51,7 +51,7 @@ RESULT OpenGLShader::LoadShaderCodeFromFile(const wchar_t *pszFilename, version 
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
-	wchar_t *pFilePath = NULL;
+	wchar_t *pFilePath = nullptr;
 
 	if (versionFile == 0) {
 		CRM(pPathManager->GetFilePath(PATH_SHADERS, pszFilename, pFilePath), "Failed to get path for %S shader", pszFilename);
@@ -70,9 +70,9 @@ RESULT OpenGLShader::LoadShaderCodeFromFile(const wchar_t *pszFilename, version 
 	DEBUG_LINEOUT("Loaded new shader %S", pFilePath);
 
 Error:
-	if (pFilePath != NULL) {
+	if (pFilePath != nullptr) {
 		delete[] pFilePath;
-		pFilePath = NULL;
+		pFilePath = nullptr;
 	}
 
 	return r;
@@ -106,9 +106,9 @@ RESULT OpenGLShader::LoadShaderCodeFromString(const char* pszSource) {
 
 	return r;
 Error:
-	if (m_pszShaderCode != NULL) {
+	if (m_pszShaderCode != nullptr) {
 		delete m_pszShaderCode;
-		m_pszShaderCode = NULL;
+		m_pszShaderCode = nullptr;
 	}
 	return r;
 }
@@ -121,7 +121,7 @@ RESULT OpenGLShader::Compile(void) {
 	const char *pszShaderCode = m_pszShaderCode;
 	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
-	CR(pParentImp->ShaderSource(m_shaderID, 1, &pszShaderCode, NULL));
+	CR(pParentImp->ShaderSource(m_shaderID, 1, &pszShaderCode, nullptr));
 	CR(pParentImp->CompileShader(m_shaderID));
 
 	int param;
@@ -157,7 +157,7 @@ RESULT OpenGLShader::PrintInfoLog() {
 char* OpenGLShader::GetInfoLog() {
 	RESULT r = R_PASS;
 
-	char *pszInfoLog = NULL;
+	char *pszInfoLog = nullptr;
 	int pszInfoLog_n = -1;
 	int charsWritten_n = -1;
 
@@ -178,8 +178,8 @@ Error:
 char* OpenGLShader::FileRead(wchar_t *pszFileName) {
 	RESULT r = R_PASS;
 	errno_t err;
-	char *pszFileContent = NULL;
-	FILE *pFile = NULL;
+	char *pszFileContent = nullptr;
+	FILE *pFile = nullptr;
 
 	CNM(pszFileName, "Filename cannot be NULL");
 	
@@ -200,9 +200,9 @@ char* OpenGLShader::FileRead(wchar_t *pszFileName) {
 	pszFileContent[pFile_n] = '\0';
 
 Error:
-	if (pFile != NULL) {
+	if (pFile != nullptr) {
 		fclose(pFile);
-		pFile = NULL;
+		pFile = nullptr;
 	}
 
 	return pszFileContent;

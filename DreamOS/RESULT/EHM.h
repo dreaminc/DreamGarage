@@ -8,15 +8,18 @@
 #include "RESULT.h"
 #include <assert.h>
 
-// _DEBUG macro define
-#ifndef _DEBUG
-	#define _DEBUG // TODO: Put into env
-#endif
-
 #include <stdio.h>
+#include <stddef.h>
 
 #define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
+
+/*
+#ifndef NOARRAYSIZE
+template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
+#define arraysize(array) (sizeof(ArraySizeHelper(array)))
+#endif
+*/
 
 #if defined(DEBUG_OUT_TO_CONSOLE)
 	// TODO: Tie into the official console/interface system
@@ -32,14 +35,13 @@
 	#define CONSOLE_OUT(str, ...) do { sprintf_s(outstr + DEBUGGER_SIGNATURE_SIZE, OUTPUT_MAX_SIZE - DEBUGGER_SIGNATURE_SIZE, str, ##__VA_ARGS__); if (outstr[DEBUGGER_SIGNATURE_SIZE] != '\n' && outstr[DEBUGGER_SIGNATURE_SIZE] != '\r') OutputDebugStringA(outstr); } while(0);
 #endif
 
-
 #ifdef _DEBUG
     #define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
     #define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0); 
 	#define DEBUG_LINEOUT_RETURN(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\r"); } while(0); 
 #else
-    #define DEBUG_OUT(str, ...)
-    #define DEBUG_LINEOUT(str, ...)
+	#define DEBUG_OUT(str, ...)
+	#define DEBUG_LINEOUT(str, ...)
 	#define DEBUG_LINEOUT_RETURN(str, ...) 
 #endif
 
@@ -108,5 +110,6 @@
 #define CVR(pObject, failCode) do{if(!((pObject)->IsValid())) {r = failCode; goto Error;}}while(0);
 #define CVM(pObject, msg, ...) do{if(!((pObject)->IsValid())) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
 #define CVRM(pObject, failCode, msg, ...) do{if(!((pObject)->IsValid())) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
+
 
 #endif // ! EHM_H_

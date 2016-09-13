@@ -30,12 +30,15 @@ public:
 	RESULT SetUniformInteger(GLint value);
 	RESULT Set44MatrixUniform(matrix<float, 4, 4> mat);		// TODO: Generalize this in the lower specialized class more
 
+	RESULT SetUniform(bool flag) { return R_NOT_IMPLEMENTED; }
 	RESULT SetUniform(point pt) { return R_NOT_IMPLEMENTED; }
 	RESULT SetUniform(vector v) { return R_NOT_IMPLEMENTED; }
 	RESULT SetUniform(quaternion q) { return R_NOT_IMPLEMENTED; }
 	RESULT SetUniform(matrix<float, 4, 4> mat) { return R_NOT_IMPLEMENTED; }
 
 	std::string GetName() { return m_strUniformName; }
+
+	GLint GetUniformIndex() { return m_uniformIndex; }
 
 private:
 	std::string m_strUniformName;
@@ -44,6 +47,11 @@ private:
 };
 
 // Explicit class based specialization (instead of a template based approach)
+class OGLUniformBool : public OGLUniform {
+public:
+	RESULT SetUniform(bool flag);
+};
+
 class OGLUniformPoint : public OGLUniform {
 public:
 	RESULT SetUniform(point pt);
@@ -68,6 +76,7 @@ public:
 class OGLUniformSampler2D : public OGLUniform {
 public:
 	RESULT SetUniform(OGLTexture *pTexture);
+	RESULT SetUniform(GLint textureIndex);
 };
 
 class OGLUniformSamplerCube : public OGLUniform {

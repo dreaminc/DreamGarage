@@ -19,6 +19,16 @@ texture::texture() :
 	Validate();
 }
 
+texture::texture(texture::TEXTURE_TYPE type) :
+	m_pImageBuffer(nullptr),
+	m_width(NULL),
+	m_height(NULL),
+	m_channels(NULL),
+	m_type(type)
+{
+	Validate();
+}
+
 texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels) :
 	m_pImageBuffer(nullptr),
 	m_width(width),
@@ -27,6 +37,24 @@ texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels
 	m_type(type)
 {
 	Validate();
+}
+
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) :
+	m_pImageBuffer(nullptr),
+	m_width(width),
+	m_height(height),
+	m_channels(channels),
+	m_type(type) 
+{
+	RESULT r = R_PASS;
+
+	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n))
+	
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
 }
 
 texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_INVALID) :
@@ -142,7 +170,7 @@ RESULT texture::GetCubeMapFiles(const wchar_t *pszName, std::vector<std::wstring
 		std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> StringConverter;
 		std::string strFilenameConverted = StringConverter.to_bytes(strFilename);
 
-		std::regex strRegEx("((pos|neg)(x|y|z))\.(([a-z]){3,3})");
+		std::regex strRegEx("((pos|neg)(x|y|z))\\.(([a-z]){3,3})");
 
 		if(std::regex_match(strFilenameConverted, strRegEx))
 			vstrFiles.push_back(strFilename);
@@ -180,6 +208,23 @@ Error:
 	return r;
 }
 
+double texture::GetValueAtUV(double uValue, double vValue) {
+	int pxValueX = static_cast<int>(uValue * m_width);
+	int pxValueY = static_cast<int>(vValue * m_height);
+
+	int lookUp = pxValueX * (sizeof(unsigned char) * m_channels) + (pxValueY * (sizeof(unsigned char) * m_channels * m_width));
+	
+	int accum = 0;
+	for (int i = 0; i < m_channels; i++) {
+		accum += m_pImageBuffer[lookUp + i];
+	}
+
+	double retVal = (double)((double)accum / (double)m_channels);
+	retVal /= 255.0f;
+
+	return retVal;
+}
+
 RESULT texture::LoadTextureFromPath(wchar_t *pszFilepath) {
 	RESULT r = R_PASS;
 
@@ -189,6 +234,22 @@ RESULT texture::LoadTextureFromPath(wchar_t *pszFilepath) {
 
 	m_pImageBuffer = SOIL_load_image(strFilepath.c_str(), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 	CN(m_pImageBuffer);
+
+Error:
+	return r;
+}
+
+RESULT texture::CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n) {
+	RESULT r = R_PASS;
+
+	// TODO: May need to add size of stuff
+
+	// TODO: Move to member?
+	long pImageBuffer_n = sizeof(unsigned char) * pBuffer_n;
+	m_pImageBuffer = (unsigned char*)malloc(pImageBuffer_n);
+	CN(m_pImageBuffer);
+
+	memcpy(m_pImageBuffer, pBuffer, pImageBuffer_n);
 
 Error:
 	return r;

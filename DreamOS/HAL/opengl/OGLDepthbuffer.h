@@ -23,7 +23,34 @@ public:
 		// Empty
 	}
 
-	RESULT OGLInitialize() {
+	// TODO: This is a temporary approach
+	RESULT OGLInitializeRenderBuffer() {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->glGenRenderbuffers(1, &m_depthbufferIndex));
+		CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufferIndex));
+		CR(m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height));
+		CR(m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex));
+
+	Error:
+		return r;
+	}
+
+	// TODO: Potentially combine with the upper function - use mutlisample or not based on multisample value
+	RESULT OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample = 4) {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->glGenRenderbuffers(1, &m_depthbufferIndex));
+		CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufferIndex));
+		//CR(m_pParentImp->glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisample, GL_DEPTH_COMPONENT, m_width, m_height));
+		CR(m_pParentImp->glRenderbufferStorageMultisample(GL_RENDERBUFFER, multisample, GL_DEPTH_COMPONENT, m_width, m_height));
+		CR(m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex));
+
+	Error:
+		return r;
+	}
+
+	RESULT OGLInitialize(GLenum internalFormat = GL_DEPTH_COMPONENT24, GLenum type = GL_UNSIGNED_INT) {
 		RESULT r = R_PASS;
 
 		// TODO: Replace with texture object instead?
@@ -35,27 +62,21 @@ public:
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
 		CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
-		GLenum internalFormat = GL_DEPTH_COMPONENT24;
-		GLenum type = GL_UNSIGNED_INT;
-
 		/*
 		if (GLE_ARB_depth_buffer_float) {
 		internalFormat = GL_DEPTH_COMPONENT32F;
 		type = GL_FLOAT;
 		}
 		*/
+		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, GL_DEPTH_COMPONENT, type, NULL);
 
-		/*
 		// The depth buffer
 		// Implement OGLRenderbuffer
 		// TODO: Create a depth buffer object (like OGLTexture / Framebuffer
-		CR(m_pParentImp->glGenRenderbuffers(1, &m_renderbufferIndex));
-		CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_renderbufferIndex));
-		CR(m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height));
-		CR(m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_renderbufferIndex));
-		*/
-
-		glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, GL_DEPTH_COMPONENT, type, NULL);
+		//m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufferIndex);
+		//m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
+		//m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex);
+		
 
 	Error:
 		return r;

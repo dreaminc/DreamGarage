@@ -50,7 +50,8 @@ public:
 		m_cameraForwardSpeed(0.0f),
 		m_cameraStrafeSpeed(0.0f),
 		m_cameraUpSpeed(0.0f),
-		m_vDeviation()
+		m_vDeviation(),
+		m_pCameraFrameOfReference(nullptr)
 	{
 		m_ptOrigin = ptOrigin;
 		m_qRotation = quaternion(0.0f, 0.0f, 0.0f, 0.0f);
@@ -68,6 +69,14 @@ public:
 
 	vector GetUpVector() {
 		return vector::jVector();
+	}
+
+	int GetPXWidth() {
+		return m_pxScreenWidth;
+	}
+
+	int GetPXHeight() {
+		return m_pxScreenHeight;
 	}
 
 	vector GetRightVector() {
@@ -96,7 +105,9 @@ public:
 	}
 
 	ViewMatrix GetViewMatrix() { 
-		point ptOrigin = m_ptOrigin + m_vDeviation;
+		point ptOrigin = m_ptOrigin;
+		ptOrigin.SetZeroW();
+		ptOrigin += m_vDeviation;
 		ViewMatrix mat = ViewMatrix(ptOrigin, m_qRotation);
 		return mat;
 	}
@@ -106,8 +117,10 @@ public:
 	}
 
 	RESULT RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {	
+
 		m_qRotation.RotateByVector(GetRightVector(), dy * m_cameraRotateSpeed);
 		m_qRotation.RotateByVector(GetUpVector(), dx * m_cameraRotateSpeed);
+
 		m_qRotation.Normalize();
 
 		vector vectorLook = GetLookVector();
@@ -162,7 +175,7 @@ public:
 
 		DEBUG_LINEOUT("Cam hmd event");//, kbEvent->KeyCode, kbEvent->KeyState);
 
-	Error:
+//	Error:
 		return r;
 	}
 
@@ -204,11 +217,19 @@ public:
 					AddForwardSpeed(DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 
-			case SK_SPACE: {
+			case SK_SPACE: 
+			case (SK_SCAN_CODE)('Q'): {
 				if (kbEvent->KeyState)
 					AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 				else
 					AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED);
+			} break;
+
+			case (SK_SCAN_CODE)('E') : {
+				if (kbEvent->KeyState)
+					AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED);
+				else
+					AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
 			} break;
 		}
 
@@ -219,10 +240,41 @@ public:
 	camera UpdateCameraPosition() {
 		camera_precision x, y, z;
 		m_qRotation.GetEulerAngles(&x, &y, &z);
-				
-		m_ptOrigin += GetLookVector() * m_cameraForwardSpeed;
-		m_ptOrigin += GetRightVector() * m_cameraStrafeSpeed;
+
+		vector lookMove = GetLookVector();
+		lookMove.y() = 0.0f;
+		lookMove.Normalize();
+
+		vector rightMove = GetRightVector();
+		rightMove.y() = 0.0f;
+		rightMove.Normalize();
+
+		m_ptOrigin += lookMove * m_cameraForwardSpeed;
+		m_ptOrigin += rightMove * m_cameraStrafeSpeed;
 		m_ptOrigin += GetUpVector() * m_cameraUpSpeed;
+		m_ptOrigin.SetZeroW();
+
+		///*
+		// Update frame of reference
+		quaternion qRotation = m_qRotation;
+		qRotation.Reverse();
+
+		if (m_pHMD != nullptr) {
+			point ptOrigin = m_ptOrigin + m_pHMD->GetHeadPointOrigin();
+			ptOrigin.Reverse();
+
+			m_pCameraFrameOfReference->SetPosition(ptOrigin);
+			//m_pCameraFrameOfReference->SetPosition(m_pHMD->GetHeadPointOrigin());
+		}
+		else {
+			point ptOrigin = m_ptOrigin;
+			ptOrigin.Reverse();
+
+			m_pCameraFrameOfReference->SetPosition(ptOrigin);
+		}
+		
+		m_pCameraFrameOfReference->SetOrientation(qRotation);
+		//*/
 
 		return (*this);
 	}
@@ -264,7 +316,46 @@ public:
 		return r;
 	}
 
-private:
+	composite *GetFrameOfReferenceComposite() {
+		return m_pCameraFrameOfReference;
+	}
+
+	RESULT AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj> pDimObj) {
+		RESULT r = R_PASS;
+
+		CN(m_pCameraFrameOfReference);
+		CR(m_pCameraFrameOfReference->AddObject(pDimObj));
+
+	Error:
+		return r;
+	}
+
+	RESULT SetFrameOfReferenceComposite(composite *pComposite) {
+		RESULT r = R_PASS;
+		
+		m_pCameraFrameOfReference = pComposite;
+		CN(m_pCameraFrameOfReference);
+
+	Error:
+		return r;
+	}
+
+	RESULT SetHMD(HMD *pHMD) {
+		m_pHMD = pHMD;
+		return R_PASS;
+	}
+
+	int GetScreenWidth() {
+		return m_pxScreenWidth;
+	}
+
+	int GetScreenHeight() {
+		return m_pxScreenHeight;
+	}
+
+protected:
+	HMD *m_pHMD;
+
 	// Projection
 	int m_pxScreenWidth;
 	int m_pxScreenHeight;
@@ -280,6 +371,9 @@ private:
 	camera_precision m_cameraUpSpeed;
 
 	vector m_vDeviation;
+
+	// Set up HMD frame of reference 
+	composite *m_pCameraFrameOfReference;
 };
 
 #endif // ! CAMERA_H_

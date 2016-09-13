@@ -44,6 +44,9 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureBump")));
 
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformUseColorTexture), std::string("u_fUseColorTexture")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformUseBumpTexture), std::string("u_fUseBumpTexture")));
+
 		// Uniform Blocks
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
@@ -60,14 +63,22 @@ public:
 		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
 			pTexture->OGLActivateTexture();
 			m_pUniformTextureColor->SetUniform(pTexture);
+			m_pUniformUseColorTexture->SetUniform(true);
+		}
+		else {
+			m_pUniformUseColorTexture->SetUniform(false);
 		}
 
 		if ((pTexture = pOGLObj->GetBumpTexture()) != nullptr) {
 			pTexture->OGLActivateTexture();
 			m_pUniformTextureBump->SetUniform(pTexture);
+			m_pUniformUseBumpTexture->SetUniform(true);
+		}
+		else {
+			m_pUniformUseBumpTexture->SetUniform(false);
 		}
 
-	Error:
+//	Error:
 		return r;
 	}
 
@@ -120,8 +131,8 @@ public:
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
 		auto ptEye = pStereoCamera->GetEyePosition(eye);
 		auto matV = pStereoCamera->GetViewMatrix(eye);
-		auto matP = pStereoCamera->GetProjectionMatrix();
-		auto matVP = pStereoCamera->GetProjectionMatrix() * pStereoCamera->GetViewMatrix(eye);
+		auto matP = pStereoCamera->GetProjectionMatrix(eye);
+		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
 		m_pUniformViewMatrix->SetUniform(matV);
 		//m_pUniformProjectionMatrix->SetUniform(matP);
@@ -149,6 +160,9 @@ private:
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
 	OGLUniformSampler2D *m_pUniformTextureBump;
+
+	OGLUniformBool *m_pUniformUseColorTexture;
+	OGLUniformBool *m_pUniformUseBumpTexture;
 
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock;

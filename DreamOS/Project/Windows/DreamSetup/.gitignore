@@ -1,0 +1,8 @@
+# Ignore a lot of the Visual Studio files
+*.sdf
+/.vs/*
+/Debug/*
+/Release/*
+/x64/*
+*.opendb
+*.opensdf

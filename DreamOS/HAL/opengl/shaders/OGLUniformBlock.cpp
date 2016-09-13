@@ -69,7 +69,7 @@ RESULT OGLUniformBlock::ReleaseOGLUniformBlockBuffers() {
 
 	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
-	if (pParentImp != NULL) {
+	if (pParentImp != nullptr) {
 		if (m_uniformBlockBufferIndex != NULL) {
 			CR(pParentImp->glDeleteBuffers(1, &m_uniformBlockBufferIndex));
 			m_uniformBlockBufferIndex = NULL;

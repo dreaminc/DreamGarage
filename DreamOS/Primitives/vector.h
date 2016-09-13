@@ -74,8 +74,7 @@ public:
 		for (int i = 0; i < 3; i++)
 			denom += static_cast<vector_precision>(pow(element(i, 0), 2));
 
-		denom = static_cast<vector_precision>(denom);
-		denom = sqrt(denom);
+		denom = static_cast<vector_precision>(sqrt(denom));
 
 		for (int i = 0; i < 3; i++)
 			element(i, 0) = element(i, 0) / denom;
@@ -90,6 +89,11 @@ public:
 		vector result = *this;
 		result.Normalize();
 		return result;
+	}
+
+	RESULT Print(char *pszOptName = nullptr) {
+		DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "v", x(), y(), z(), w());
+		return R_PASS;
 	}
 
 	// Dot Product

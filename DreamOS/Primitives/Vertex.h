@@ -99,32 +99,32 @@ public:
 	}
 
 	static void *GetVertexOffset() {
-		int offset = NULL;
+		int64_t offset = NULL;
 		return (void*)(offset);
 	}
 
 	static void* GetColorOffset() {
-		int offset = (int)(GetVertexOffset()) + sizeof(point);
+		int64_t offset = (int64_t)(GetVertexOffset()) + sizeof(point);
 		return (void*)(offset);
 	}
 
 	static void* GetNormalOffset() {
-		int offset = (int)(GetColorOffset()) + sizeof(color);
+		int64_t offset = (int64_t)(GetColorOffset()) + sizeof(color);
 		return (void*)(offset);
 	}
 
 	static void* GetUVOffset() {
-		int offset = (int)(GetNormalOffset()) + sizeof(vector);
+		int64_t offset = (int64_t)(GetNormalOffset()) + sizeof(vector);
 		return (void*)(offset);
 	}
 
 	static void* GetTangentOffset() {
-		int offset = (int)(GetUVOffset()) + sizeof(uvcoord);
+		int64_t offset = (int64_t)(GetUVOffset()) + sizeof(uvcoord);
 		return (void*)(offset);
 	}
 
 	static void* GetBitangentOffset() {
-		int offset = (int)(GetTangentOffset()) + sizeof(vector);
+		int64_t offset = (int64_t)(GetTangentOffset()) + sizeof(vector);
 		return (void*)(offset);
 	}
 

@@ -33,7 +33,7 @@ public:
 	RESULT ReleaseOGLBuffers() {
 		RESULT r = R_PASS;
 
-		if (m_pParentImp != NULL) {
+		if (m_pParentImp != nullptr) {
 			if (m_hVBO != NULL) {
 				CR(m_pParentImp->glDeleteBuffers(1, &m_hVBO));
 				m_hVBO = NULL;
@@ -161,6 +161,7 @@ public:
 
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
+	//virtual RESULT Render() {
 	virtual RESULT Render() {
 		RESULT r = R_PASS;
 
@@ -172,6 +173,7 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
 		glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+		//glDrawElements(GL_LINES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 		//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
 
 	Error:

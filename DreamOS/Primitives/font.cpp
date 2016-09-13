@@ -20,7 +20,7 @@ Font::~Font()
 }
 
 template <typename T>
-T Font::GetValue(const std::wstring& line, const std::wstring& valueName)
+T Font::GetValue(const std::wstring& line, const std::wstring& valueName, const char breaker)
 {
 	T value;
 
@@ -29,7 +29,7 @@ T Font::GetValue(const std::wstring& line, const std::wstring& valueName)
 	if (pos < line.size())
 	{
 		pos += valueName.size();
-		std::wstring valueString = line.substr(pos, line.find(' ', pos) - pos);
+		std::wstring valueString = line.substr(pos, line.find(breaker, pos) - pos);
 		std::wistringstream iss(valueString);
 		iss >> value;
 	}
@@ -90,7 +90,7 @@ bool Font::LoadFontFromFile(const std::wstring& fnt_file)
 			GetValue<uint32_t>(m_glyphBase, line, L"base=");
 
 		if (m_glyphImageFileName.length() == 0)
-			m_glyphImageFileName = GetValue<std::wstring>(line, L"file=");
+			m_glyphImageFileName = GetValue<std::wstring>(line, L"file=\"", '\"');
 
 		uint32_t ascii_id = 0;
 
@@ -110,8 +110,8 @@ bool Font::LoadFontFromFile(const std::wstring& fnt_file)
 
 	return true;
 
-Error:
-	return false;
+//Error:
+//	return false;
 }
 
 const std::wstring& Font::GetGlyphImageFile() const

@@ -16,39 +16,40 @@
 #include "TimeManager/TimeManager.h"
 
 //#include "Primitives/camera.h"
-
-#include "Primitives/valid.h"
 #include "Primitives/version.h"
-
-#include "HMD/HMD.h"
 
 
 #include "OpenGLExtensions.h"
-
-#include "Scene/SceneGraph.h"
 #include "Primitives/DimObj.h"
 #include "Primitives/material.h"
 
 //#include "OGLProgram.h"
 #include "OGLProgramFactory.h"
 
+#include <memory>
+
 class SandboxApp; 
 class Windows64App;
+class OGLDreamConsole;
 
-class OpenGLImp : public HALImp, public valid {
+class OpenGLImp : public HALImp {
 private:
-
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
 	OGLProgram *m_pOGLRenderProgram;
+	OGLProgram *m_pOGLProgramShadowDepth;
+	OGLProgram *m_pOGLProgramCapture;		// temp for testing
 	OGLProgram *m_pOGLSkyboxProgram;
 	OGLProgram *m_pOGLOverlayProgram;
+	OGLProgram *m_pOGLFlatProgram; 
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
 
 	version m_versionOGL;
 	version m_versionGLSL;
+
+	std::unique_ptr<OGLDreamConsole>	m_pOGLDreamConsole;
 
 	// Viewport
 	// TODO: Move this into an object?
@@ -60,31 +61,54 @@ public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
 
+private:
+	bool m_fRenderProfiler = false;
+
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
 
+	// Object Factory Methods
 public:
-	// TODO: Consolidate all of these (one Render function)
-	RESULT SetMonoViewTarget();
-	RESULT SetStereoViewTarget(EYE_TYPE eye);
-	RESULT SetStereoFramebufferViewTarget(EYE_TYPE eye);
+	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+	quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
+	quad* MakeQuad(double width, double height, point origin);
 
-	RESULT Render(SceneGraph *pSceneGraph);
-	RESULT RenderStereo(SceneGraph *pSceneGraph);
-	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
-
-	RESULT Resize(int pxWidth, int pxHeight);
-	RESULT ShutdownImplementaiton();
+	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
+	volume* MakeVolume(double width, double length, double height);
 	
-	camera *GetCamera();
-	RESULT UpdateCamera();
-	RESULT SetCameraOrientation(quaternion qOrientation);
-	RESULT SetCameraPositionDeviation(vector vDeviation);
+	volume* MakeVolume(double side);
+	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
+	skybox *MakeSkybox();
 
-	RESULT LoadScene(SceneGraph *pSceneGraph, TimeManager *pTimeObj);
+	model *MakeModel(wchar_t *pszModelName);
+	model *MakeModel(const std::vector<vertex>& vertices);
+	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+	composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation);
+
+	composite *MakeComposite();
+	FlatContext* MakeFlatContext();
+	user *MakeUser();
+	hand* MakeHand();
+
+	// TODO: Fix w/ scene graph not here
+	composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+
+public:
+	RESULT SetViewTarget(EYE_TYPE eye);
+	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
+private:
+	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
+	RESULT RenderProfiler(EYE_TYPE eye);
+
+public:
+	RESULT Resize(int pxWidth, int pxHeight);
+	RESULT Shutdown();
+
 	//RESULT InitializeStereoFramebuffers(HMD *pHMD);
-	RESULT SetHMD(HMD *pHMD);
+	//RESULT SetHMD(HMD *pHMD);
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();
@@ -98,8 +122,6 @@ private:
 	RESULT PrepareScene();
 
 private:
-	stereocamera *m_pCamera;
-	HMD *m_pHMD;
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
@@ -135,6 +157,7 @@ public:
 	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);
 	RESULT glBindRenderbuffer(GLenum target, GLuint renderbuffer);
 	RESULT glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
+	RESULT glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
 	RESULT glFramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
 	RESULT glFramebufferTexture(GLenum target, GLenum attachment, GLuint texture, GLint level);
 	RESULT CheckFramebufferStatus(GLenum target);
@@ -191,6 +214,7 @@ public:
 	RESULT glBindTextures(GLuint first, GLsizei count, const GLuint *textures);
 	RESULT BindTexture(GLenum target, GLuint texture);
 	RESULT glTexStorage2D(GLenum target, GLsizei levels, GLenum internalformat, GLsizei width, GLsizei height);
+	RESULT glTexImage2DMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height, GLboolean fixedsamplelocations);
 	//RESULT glTexParamteri(GLenum target, GLenum pname, GLint param);
 	RESULT TexParameteri(GLenum target, GLenum pname, GLint param);
 	//RESULT glTexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);

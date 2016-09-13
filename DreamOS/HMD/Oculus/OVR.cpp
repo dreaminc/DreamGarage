@@ -1,26 +1,34 @@
 #include "OVR.h"
 #include <math.h>
 
+#include "Sandbox/SandboxApp.h"
+
 // TODO: Fix this encapsulation
 #include "HAL/opengl/OpenGLImp.h"
 
 #include "Primitives/stereocamera.h"
 #include "Primitives/rectangle.h"
 
-OVR::OVR() :
+#include "Extras/OVR_Math.h"
+
+#include "DreamConsole/DreamConsole.h"
+
+OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
+	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
 	m_ovrMirrorTexture(nullptr)
 {
 	// empty stub
 }
 
-OVR::~OVR() {
+OVRHMD::~OVRHMD() {
 	// empty stub
 }
 
-RESULT OVR::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
+RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	RESULT r = R_PASS;
 	ovrGraphicsLuid luid;
+	m_pHALImp = halimp;
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
 
 	// Initializes LibOVR, and the Rift
@@ -36,18 +44,15 @@ RESULT OVR::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	for (unsigned int i = 0; i < trackerCount; ++i)
 		m_TrackerDescriptions.push_back(ovr_GetTrackerDesc(m_ovrSession, i));
 
-	// Turn off vsync to let the compositor do its magic
-	//wglSwapIntervalEXT(0);
-
 	// FloorLevel will give tracking poses where the floor height is 0
 	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_FloorLevel));
-
-	m_eyeWidth = m_ovrHMDDescription.Resolution.w / 2;
-	m_eyeHeight = m_ovrHMDDescription.Resolution.h;
 
 	for (int i = 0; i < HMD_NUM_EYES; i++) {
 		ovrSizei idealTextureSize = ovr_GetFovTextureSize(m_ovrSession, ovrEyeType(i), m_ovrHMDDescription.DefaultEyeFov[i], 1);
 		
+		m_eyeWidth = idealTextureSize.w;
+		m_eyeHeight = idealTextureSize.h;
+
 		m_ovrTextureSwapChains[i] = new OVRTextureSwapChain(oglimp, m_ovrSession, idealTextureSize.w, idealTextureSize.h, 1, NULL, 1);
 		CR(m_ovrTextureSwapChains[i]->OVRInitialize());
 	}
@@ -68,43 +73,115 @@ RESULT OVR::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	CN(m_ovrMirrorTexture);
 	CR(m_ovrMirrorTexture->OVRInitialize());
 	
+	// Turn off vsync to let the compositor do its magic
+	oglimp->wglSwapIntervalEXT(0);
+
+	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
+
 Error:
 	return r;
 }
 
-RESULT OVR::SetUpFrame() {
+// temp (testing)
+ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
+	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
+	
+	ovrMatrix4f OVRProjMatrix = ovrMatrix4f_Projection(m_ovrHMDDescription.DefaultEyeFov[eyeType], znear, zfar, ovrProjection_None);
+
+	ProjectionMatrix projMat;
+	//memcpy(&projMat, &OVRProjMatrix, sizeof(ovrMatrix4f));
+	for (int i = 0; i < 4; i++)
+		for (int j = 0; j < 4; j++)
+			projMat(i, j) = OVRProjMatrix.M[i][j];
+
+	return projMat;
+}
+
+ViewMatrix OVRHMD::GetViewMatrix(EYE_TYPE eye) {
+	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
+
+	ovrEyeRenderDesc eyeRenderDesc[2];
+	eyeRenderDesc[0] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[0]);
+	eyeRenderDesc[1] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Right, m_ovrHMDDescription.DefaultEyeFov[1]);
+
+	// Get eye poses, feeding in correct IPD offset
+	ovrPosef EyeRenderPose[2];
+	ovrVector3f HmdToEyeOffset[2] = { eyeRenderDesc[0].HmdToEyeOffset, eyeRenderDesc[1].HmdToEyeOffset };
+
+	double sensorSampleTime;    // sensorSampleTime is fed into the layer later
+	ovr_GetEyePoses(m_ovrSession, 0, ovrTrue, HmdToEyeOffset, EyeRenderPose, &sensorSampleTime);
+
+	point ptPosition = point(reinterpret_cast<float*>(&(EyeRenderPose[eyeType].Position)));
+	quaternion qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(EyeRenderPose[eyeType].Orientation)));
+	qOrientation.Reverse();
+	ptPosition *= -1.0f;
+
+	//return ViewMatrix(ptPosition, qOrientation);
+
+	/*
+	// Get view and projection matrices
+	OVR::Matrix4f rollPitchYaw = OVR::Matrix4f::RotationY(0);
+	OVR::Matrix4f finalRollPitchYaw = rollPitchYaw * OVR::Matrix4f(EyeRenderPose[eyeType].Orientation);
+	OVR::Vector3f finalUp = finalRollPitchYaw.Transform(OVR::Vector3f(0, 1, 0));
+	OVR::Vector3f finalForward = finalRollPitchYaw.Transform(OVR::Vector3f(0, 0, -1));
+	OVR::Vector3f shiftedEyePos = rollPitchYaw.Transform(EyeRenderPose[eyeType].Position);
+
+	OVR::Matrix4f view = OVR::Matrix4f::LookAtLH(shiftedEyePos, shiftedEyePos + finalForward, finalUp);
+
+	ViewMatrix vewMat;
+	memcpy(&vewMat, &view, sizeof(ovrMatrix4f));
+	return vewMat;
+	*/
+
+	
+	//return ViewMatrix(point(), qOrientation);
+	
+	///*
+	static float yaw = 0.15f;
+	//yaw += 0.001f;
+
+	if (eye != EYE_LEFT)
+		return ViewMatrix(ptPosition, 0.0f, -yaw, 0.0f);
+	else
+		return ViewMatrix(ptPosition, 0.0f, yaw, 0.0f);
+	//*/
+}
+
+RESULT OVRHMD::SetUpFrame() {
 	RESULT r = R_PASS;
 
 	// TODO: Set up frame
 
-Error:
+//Error:
 	return r;
 }
 
-RESULT OVR::RenderHMDMirror() {
+RESULT OVRHMD::RenderHMDMirror() {
 	return m_ovrMirrorTexture->RenderMirrorToBackBuffer();
 }
 
-RESULT OVR::BindFramebuffer(EYE_TYPE eye) {
+RESULT OVRHMD::BindFramebuffer(EYE_TYPE eye) {
 	return R_NOT_IMPLEMENTED;
 }
 
 // Commit the changes to the texture swap chain
-RESULT OVR::CommitSwapChain(EYE_TYPE eye) {
+RESULT OVRHMD::CommitSwapChain(EYE_TYPE eye) {
 	return m_ovrTextureSwapChains[eye]->Commit();
 }
 
-RESULT OVR::SetAndClearRenderSurface(EYE_TYPE eye) {
-	m_ovrEyeRenderDescription[eye] = ovr_GetRenderDesc(m_ovrSession, ovrEye_Left, m_ovrHMDDescription.DefaultEyeFov[eye]);
+RESULT OVRHMD::SetAndClearRenderSurface(EYE_TYPE eye) {
+	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
+
+	m_ovrEyeRenderDescription[eyeType] = ovr_GetRenderDesc(m_ovrSession, eyeType, m_ovrHMDDescription.DefaultEyeFov[eyeType]);
 
 	return m_ovrTextureSwapChains[eye]->SetAndClearRenderSurface();
 }
 
-RESULT OVR::UnsetRenderSurface(EYE_TYPE eye) {
+RESULT OVRHMD::UnsetRenderSurface(EYE_TYPE eye) {
 	return m_ovrTextureSwapChains[eye]->UnsetRenderSurface();
 }
 
-RESULT OVR::SubmitFrame() {
+RESULT OVRHMD::SubmitFrame() {
 	RESULT r = R_PASS;
 
 	// TODO: Split this across the eyes 
@@ -115,7 +192,7 @@ RESULT OVR::SubmitFrame() {
 	double sensorSampleTime;    // sensorSampleTime is fed into the layer later
 	ovr_GetEyePoses(m_ovrSession, frameIndex, ovrTrue, HmdToEyeOffset, EyeRenderPose, &sensorSampleTime);
 
-	for (int eye = 0; eye < 2; ++eye) {
+	for (int eye = 0; eye < 2; eye++) {
 		m_ovrLayer.ColorTexture[eye] = m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain();
 		m_ovrLayer.Viewport[eye] = m_ovrTextureSwapChains[eye]->GetOVRViewportRecti();
 		m_ovrLayer.Fov[eye] = m_ovrHMDDescription.DefaultEyeFov[eye];
@@ -142,8 +219,10 @@ Error:
 // TODO: Better way?
 #define HMD_OVR_USE_PREDICTED_TIMING
 
-RESULT OVR::UpdateHMD() {
+RESULT OVRHMD::UpdateHMD() {
 	RESULT r = R_PASS;
+
+	//ovr_RecenterTrackingOrigin(m_ovrSession);
 
 #ifdef HMD_OVR_USE_PREDICTED_TIMING
 	double fTiming = ovr_GetPredictedDisplayTime(m_ovrSession, 0);
@@ -155,15 +234,17 @@ RESULT OVR::UpdateHMD() {
 	if (trackingState.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
 		//ovrPosef headPose = trackingState.HeadPose.ThePose;
 		m_ptOrigin = point(reinterpret_cast<float*>(&(trackingState.HeadPose.ThePose.Position)));
+		m_ptOrigin *= -1.0f;	// TODO: This is an issue with the OVR position 
+
 		m_qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HeadPose.ThePose.Orientation)));
 		m_qOrientation.Reverse();
 	}
 
-Error:
+//Error:
 	return r;
 }
 
-RESULT OVR::ReleaseHMD() {
+RESULT OVRHMD::ReleaseHMD() {
 	RESULT r = R_PASS;
 
 	if (m_ovrSession != nullptr) {
@@ -187,6 +268,6 @@ RESULT OVR::ReleaseHMD() {
 
 	ovr_Shutdown();
 
-Error:
+//Error:
 	return r;
 }

@@ -13,13 +13,17 @@
 
 #include "Primitives/Publisher.h"
 
+#include "Primitives/ViewMatrix.h"
+#include "Primitives/ProjectionMatrix.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/quaternion.h"
 #include "Primitives/point.h"
-
-#include "HAL/HALImp.h"
+#include "Primitives/composite.h"
 
 #define HMD_NUM_EYES 2
+
+class HALImp;
+class SandboxApp;
 
 typedef enum HMDEventType {
 	HMD_EVENT_ORIENTATION,
@@ -63,9 +67,16 @@ typedef struct HMDEvent {
 	}
 } HMD_EVENT;
 
+
+
 class HMD : public Publisher<HMDEventType, HMDEvent> {
 public:
-	HMD() {
+	HMD(SandboxApp *pParentSandbox) :
+		m_pHALImp(nullptr),
+		m_pParentSandbox(pParentSandbox),
+		m_eyeWidth(0),
+		m_eyeHeight(0)
+	{
 		// empty stub
 	}
 
@@ -97,15 +108,26 @@ public:
 	inline point GetHMDOrigin() { return m_ptOrigin; }
 	inline vector GetHMDTrackerDeviation() { return GetHMDOrigin(); }
 
+	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) = 0;
+	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) = 0;
+
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
+
+	point GetHeadPointOrigin() {
+		return m_ptOrigin;
+	}
 
 protected:
 	point m_ptOrigin;
 	quaternion m_qOrientation;
 
-	int m_eyeWidth;
-	int m_eyeHeight;
+	uint32_t m_eyeWidth;
+	uint32_t m_eyeHeight;
+
+	HALImp *m_pHALImp;	// TODO: This may not be needed if Sandbox parent is kept
+
+	SandboxApp *m_pParentSandbox;
 
 private:
 	UID m_uid;

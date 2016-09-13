@@ -30,10 +30,10 @@
 
 class OGLFramebuffer;
 
-class OVR : public HMD {
+class OVRHMD : public HMD {
 public:
-	OVR();
-	~OVR();
+	OVRHMD(SandboxApp *pParentSandbox);
+	~OVRHMD();
 
 	//RESULT InitializeHMD(HALImp *halimp);
 	RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
@@ -49,6 +49,9 @@ public:
 	RESULT UnsetRenderSurface(EYE_TYPE eye);
 
 	RESULT RenderHMDMirror();
+
+	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
+	ViewMatrix GetViewMatrix(EYE_TYPE eye);
 
 public:
 	ovrSession m_ovrSession;

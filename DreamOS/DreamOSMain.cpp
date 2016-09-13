@@ -3,34 +3,26 @@
 
 #include <ctime>
 #include "RESULT/EHM.h"
-#include "Sandbox/SandboxFactory.h"
 
-#define DREAM_OS_VERSION_STR "V0.1"
+// TODO: Eventually this should be a DreamGarage / Application specific main
+// and should likely sit in the same dir as the DreamOS derivation
+#include "../DreamGarage.h"
 
 int main(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
-    SandboxApp *pSandbox = NULL;
-
-	srand(static_cast <unsigned> (time(0)));
+    
+	DreamGarage dreamGarageApp;
+	CRM(dreamGarageApp.Initialize(argc, argv), "Failed to initialize Dream Garage");
 	
 	// This is the entry point for the DreamOS Engine
-    DEBUG_LINEOUT("DREAM OS %s Starting ...", DREAM_OS_VERSION_STR);
-    
-    //CRM(InitializeOSXWindow(), "Failed to launch OSX Window");
-	
-	// Create the Sandbox
-    pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
-    CNM(pSandbox, "Failed to create sandbox");
-    CVM(pSandbox, "Sandbox is Invalid!");
+	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");
 
-    // This will start the application
-    CRM(pSandbox->ShowSandbox(), "Failed to show sandbox window");
-	
-	DEBUG_LINEOUT("DREAM OS %s Exiting with 0x%x result", DREAM_OS_VERSION_STR, r);
+//Success:
 	return (int)(r);
 
 Error:
-	DEBUG_LINEOUT("DREAM OS %s Exiting with Error 0x%x result", DREAM_OS_VERSION_STR, r);
+	DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
 	system("pause");
+
 	return (int)(r);
 }

@@ -5,16 +5,20 @@
 #include "Sandbox/SandboxApp.h"
 
 #include "TimeManager/TimeManager.h"
+#include "DreamConsole/Console.h"
 
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
 // Dream OS Windows 64 Sandbox
 
 #include <windows.h>
+#include <memory>
 #include <stdlib.h>
 #include <string.h>
 #include <tchar.h>
 #include <HMD/HMD.h>
+
+#include <functional>
 
 #define DEFAULT_WIDTH 1920 / 2
 #define DEFAULT_HEIGHT 1080 / 2
@@ -25,19 +29,34 @@ class OpenGLImp;
 class Win64Keyboard;
 class Win64Mouse;
 
+#include "Sense/SenseLeapMotion.h"
+
 class Windows64App : public SandboxApp {
+public:
+	enum WindowMessages {
+		UI_THREAD_CALLBACK = WM_APP + 1
+	};
+
 public:
 	Windows64App(TCHAR* pszClassName);
 	~Windows64App();
 
 public:	// Sandbox Interface
-	RESULT ShowSandbox();
-	RESULT ShutdownSandbox();
+	RESULT InitializeSandbox();
+	RESULT Show();
+	RESULT Shutdown();
 	RESULT RecoverDisplayMode();
+
+	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) override;
+	virtual long Windows64App::GetTickCount() override;
 
 public:
 	RESULT InitializePathManager();
 	RESULT InitializeOpenGLRenderingContext();
+	RESULT InitializeCloudController();
+	RESULT InitializeHAL();
+	RESULT InitializeKeyboard();
+	RESULT InitializeMouse();
 
 private:
 	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
@@ -45,11 +64,23 @@ private:
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
+	// Handle a mouse event from a window's message. Return true if the message is handled, and false otherwise.
+	bool	HandleMouseEvent(const MSG&	windowMassage);
+	// Handle a key event from a window's message. Return true if the message is handled, and false otherwise.
+	bool	HandleKeyEvent(const MSG&	windowMassage);
+
 public:
 	HDC GetDeviceContext();
 	HWND GetWindowHandle();
+
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
+	RESULT RegisterImpLeapMotionEvents();
+
+	virtual hand *GetHand(hand::HAND_TYPE handType) override;
+
+	RESULT RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> m_fnUIThreadCallback);
+	RESULT UnregisterUIThreadCallback();
 
 private:
 	bool m_fFullscreen;
@@ -65,19 +96,21 @@ private:
 
 	WNDCLASSEX m_wndclassex; 
 	HWND m_hwndWindow;
+	DWORD m_ThreadID;
 
 	HDC m_hDC;					// Private GDI Device Context
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
-	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
-	OpenGLImp *m_pOpenGLImp;	
-
 	TimeManager	*m_pTimeManager;
+	DreamConsole	m_profiler;
+
+	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
 
 public:
-	Win64Keyboard *m_pWin64Keyboard;
-	Win64Mouse *m_pWin64Mouse;
+	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
+	//Win64Keyboard *m_pWin64Keyboard;
+	//Win64Mouse *m_pWin64Mouse;
 	HMD *m_pHMD;
 };
 

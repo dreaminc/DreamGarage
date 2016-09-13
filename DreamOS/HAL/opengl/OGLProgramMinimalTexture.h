@@ -49,7 +49,7 @@ public:
 			m_pUniformTextureColor->SetUniform(pTexture);
 		}
 
-	Error:
+//	Error:
 		return r;
 	}
 
@@ -68,7 +68,7 @@ public:
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
-		auto matVP = pStereoCamera->GetProjectionMatrix() * pStereoCamera->GetViewMatrix(eye);
+		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 		return R_PASS;

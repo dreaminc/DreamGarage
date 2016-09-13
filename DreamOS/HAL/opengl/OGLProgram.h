@@ -30,6 +30,9 @@
 class OpenGLImp;
 class OGLVertexAttribute;
 class OGLUniform;
+class OGLFramebuffer;
+class OGLTexture;
+class ObjectStore;
 
 class OGLProgram {
 public:
@@ -63,8 +66,13 @@ public:
 	RESULT MakeVertexShader(const wchar_t *pszFilename);
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
 
+	// TODO: Likely more eloquent way to do this
+	RESULT RenderSceneGraph(ObjectStore *pSceneGraph);
 	RESULT RenderObject(DimObj *pDimObj);
+	RESULT RenderChildren(DimObj *pDimObj);	
+	RESULT RenderObject(VirtualObj *pVirtualObj);
 	
+	RESULT SetLights(ObjectStore *pSceneGraph);
 	virtual RESULT SetLights(std::vector<light*> *pLights);
 	virtual RESULT SetMaterial(material *pMaterial);
 	
@@ -104,10 +112,35 @@ public:
 
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 
+	RESULT BindToDepthBuffer();
+	RESULT BindToFramebuffer();
+	RESULT UnbindFramebuffer();
+	RESULT BindToScreen(int pxWidth, int pxHeight);
+
+	RESULT InitializeRenderToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeDepthToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
+	GLuint GetOGLDepthbufferIndex();
+	RESULT SetDepthTexture(int textureNumber);
+
+	// TODO: Is this the right way to do it?  It's better than feeding the texture directly in
+	// This may be better with an OGLProgram hierarchy - children/dependents etc
+	RESULT SetOGLProgramDepth(OGLProgram *pOGLProgramDepth);
+protected:
+	OGLProgram *m_pOGLProgramDepth;
+
 protected:
 	OpenGLImp *m_pParentImp;
 	version m_versionOGL;
 	GLuint m_OGLProgramIndex;
+
+	// OGL Framebuffer
+	// This can be used to render the program to a texture / framebuffer
+	OGLFramebuffer *m_pOGLFramebuffer;
+	OGLTexture *m_pOGLRenderTexture;
+	//RESULT BindToFrameBuffer();
+	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
 
 	// Shaders
 	OGLVertexShader *m_pVertexShader;

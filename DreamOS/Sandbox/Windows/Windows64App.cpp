@@ -1,12 +1,18 @@
+#include "Project/Windows/DreamOS/resource.h"
 #include "Windows64App.h"
 #include "Sandbox/PathManagerFactory.h"
 #include "HAL/opengl/OpenGLRenderingContextFactory.h"
+#include "Cloud/CloudControllerFactory.h"
 
 #include "./HAL/opengl/OpenGLImp.h"
 
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
 #include <HMD/HMDFactory.h>
+
+#include <string>
+
+#include "DreamConsole/DreamConsole.h"
 
 Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_pszClassName(pszClassName),
@@ -15,7 +21,10 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr)
+	m_pHMD(nullptr),
+	m_ThreadID(0),
+	m_fnUIThreadCallback(nullptr),
+	m_pSenseLeapMotion(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -30,12 +39,12 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_wndclassex.cbClsExtra = NULL;
 	m_wndclassex.cbWndExtra = NULL;
 	m_wndclassex.hInstance = m_hInstance;
-	m_wndclassex.hIcon = LoadIcon(0, IDI_APPLICATION);
+	m_wndclassex.hIcon = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
 	m_wndclassex.hCursor = LoadCursor(0, IDC_ARROW);
 	m_wndclassex.hbrBackground = HBRUSH(COLOR_WINDOW + 1);
 	m_wndclassex.lpszMenuName = nullptr;
 	m_wndclassex.lpszClassName = m_pszClassName;
-	m_wndclassex.hIconSm = LoadIcon(0, IDI_APPLICATION);
+	m_wndclassex.hIconSm = LoadIcon(m_hInstance, MAKEINTRESOURCE(IDI_ICON1));
 
 	if (!RegisterClassEx(&m_wndclassex)) {
 		MessageBox(nullptr, _T("Failed to register sandbox window class"), _T("Dream OS Sandbox Error"), NULL);
@@ -57,6 +66,9 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 		//SysSetDisplayMode(screenw, screenh, SCRDEPTH);
 	}
 
+	m_ThreadID = ::GetCurrentThreadId();
+	CB((m_ThreadID != 0));
+
 	m_hwndWindow = CreateWindow(
 		m_pszClassName,										// lpClassName
 		m_pszWindowTitle,									// lpWindowName
@@ -73,20 +85,27 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	// TODO: Move into Sandbox virtual function
 	// Create the Keyboard and Mouse
+	/*
 	m_pWin64Keyboard = new Win64Keyboard(this);
 	m_pWin64Mouse = new Win64Mouse(this);
 
 	// Initialize Mouse 
 	m_pWin64Mouse->CaptureMouse();
 	m_pWin64Mouse->CenterMousePosition();
+	*/
+
+	// Sense Leap Motion Device (TODO: temporarily here!)
+	m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
+	CN(m_pSenseLeapMotion);
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
 	// Initialize Time Manager
 	m_pTimeManager = new TimeManager();
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
-	CV(m_pTimeManager, "Failed to validate Time Manager");
-
+	CVM(m_pTimeManager, "Failed to validate Time Manager");
+//TODO: use this label
+//Success:
 	Validate();
 	return;
 
@@ -100,6 +119,101 @@ Windows64App::~Windows64App() {
 		delete m_pTimeManager;
 		m_pTimeManager = nullptr;
 	}
+}
+
+RESULT Windows64App::InitializeKeyboard() {
+	RESULT r = R_PASS;
+
+	m_pSenseKeyboard = new Win64Keyboard(this);
+	CNM(m_pSenseKeyboard, "Failed to allocate keyboard");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeMouse() {
+	RESULT r = R_PASS;
+
+	m_pSenseMouse = new Win64Mouse(this);
+	CNM(m_pSenseMouse, "Failed to allocate mouse");
+
+	// Initialize Mouse 
+	// Remove mouse capture.
+	// This effects the window responsivenes to drag, resize and focus event.
+	//CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
+	//CRM(m_pSenseMouse->CenterMousePosition(), "Failed to center mouse position");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeHAL() {
+	RESULT r = R_PASS;
+
+	// Setup OpenGL and Resize Windows etc
+	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
+
+	// Create and initialize OpenGL Imp
+	// TODO: HAL factory pattern
+	m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
+	CNM(m_pHALImp, "Failed to create HAL Implementation");
+	CVM(m_pHALImp, "HAL Implementation Invalid");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) {
+	RESULT r = R_PASS;
+
+	switch (sandboxWindowPosition) {
+		case SANDBOX_WINDOW_POSITION::LEFT: {
+			m_posX = 0;
+			m_posY = m_posY;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::RIGHT: {
+			m_posX = GetSystemMetrics(SM_CXSCREEN) - m_pxWidth;
+			m_posY = m_posY;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::TOP: {
+			m_posX = m_posX;
+			m_posY = 0;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::BOTTOM: {
+			m_posX = m_posX;
+			m_posY = GetSystemMetrics(SM_CYSCREEN) - m_pxHeight;
+		} break;
+
+		case SANDBOX_WINDOW_POSITION::CENTER: {
+			m_posX = (GetSystemMetrics(SM_CXSCREEN) / 2) - (m_pxWidth / 2);
+			m_posY = (GetSystemMetrics(SM_CYSCREEN) / 2) - (m_pxHeight / 2);
+		} break;
+	}
+
+	CBM(SetWindowPos(m_hwndWindow, HWND_TOP, m_posX, m_posY, 0, 0, (UINT)(SWP_NOSIZE)), "Failed to position window");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeCloudController() {
+	RESULT r = R_PASS;
+
+	// Set up the Cloud Controller
+	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
+	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
+	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
+
+	CNM(m_pCloudController, "Cloud Controller failed to initialize");
+	
+	// TODO: Remove this code
+	//CR(RegisterUIThreadCallback(m_pCloudController->GetUIThreadCallback()));
+
+Error:
+	return r;
 }
 
 HDC Windows64App::GetDeviceContext() {
@@ -148,7 +262,7 @@ RESULT Windows64App::SetDimensions(int pxWidth, int pxHeight) {
 	m_pxHeight = pxHeight;
 
 	// OpenGL Resize the view after the window had been resized
-	CRM(m_pOpenGLImp->Resize(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	CRM(m_pHALImp->Resize(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
@@ -198,85 +312,6 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 			SetDimensions(LOWORD(lp), HIWORD(lp));
 		} break;
 
-		// Mouse
-		/*
-		// This needs to go into the event loop apparently
-		// TODO: Alternative approaches welcome
-		case WM_MOUSEMOVE: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Mouse move %d %d!", xPos, yPos);
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_MOVE, xPos, yPos, (int)(wp));
-		} break;
-		*/
-		
-		case WM_LBUTTONUP:
-		case WM_LBUTTONDOWN: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Left mouse button down!");
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
-		} break;
-
-		case WM_LBUTTONDBLCLK: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Left mouse button dbl click!");
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
-		} break;
-		
-		case WM_RBUTTONUP:
-		case WM_RBUTTONDOWN: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Right mouse button down!");
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_RIGHT_BUTTON, xPos, yPos, (int)(wp));
-		} break;
-
-		case WM_RBUTTONDBLCLK: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-
-			//DEBUG_LINEOUT("Right mouse button dbl click!");
-			// TODO: Add this to the SenseMouse
-		} break;
-		
-		case WM_MBUTTONUP:
-		case WM_MBUTTONDOWN: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Middle mouse button down!");
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_MIDDLE_BUTTON, xPos, yPos, (int)(wp));
-		} break;
-		
-		case WM_MBUTTONDBLCLK: {
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-
-			//DEBUG_LINEOUT("Middle mouse button dbl click!");
-			// TODO: Add this to the SenseMouse
-		} break;
-			
-		case WM_MOUSEWHEEL: {
-			int wheel = static_cast<int>((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Mousewheel %d!", wheel);
-			//m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, (int)(wp));
-			m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, wheel);
-		} break;
-
-		// Keyboard
-		// Update the Keyboard in WndProc rather than in the run loop
-		// TODO: This should be different arch for native
-		case WM_KEYDOWN: {
-			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), true);
-		} break;
-
-		case WM_KEYUP: {
-			m_pWin64Keyboard->UpdateKeyState((SK_SCAN_CODE)(wp), false);
-		} break;
-
 		default: {
 			// Empty stub
 		} break;
@@ -289,7 +324,10 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 RESULT Windows64App::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
-	camera *pCamera = m_pOpenGLImp->GetCamera();
+	// Register Dream Console to keyboard events
+	CR(RegisterSubscriber(SK_ALL, DreamConsole::GetConsole()));
+
+	camera *pCamera = m_pHALImp->GetCamera();
 
 	/*
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
@@ -302,16 +340,19 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 	}
 	*/
 
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, pCamera));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, pCamera));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, pCamera));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, pCamera));
+	CR(RegisterSubscriber(VK_LEFT, pCamera));
+	CR(RegisterSubscriber(VK_UP, pCamera));
+	CR(RegisterSubscriber(VK_DOWN, pCamera));
+	CR(RegisterSubscriber(VK_RIGHT, pCamera));
 
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_SPACE, pCamera));
+	CR(RegisterSubscriber(VK_SPACE, pCamera));
 
 	for (int i = 0; i < 26; i++) {
-		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
+		CR(RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
 	}
+
+	CR(RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
+	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
 
 Error:
 	return r;
@@ -322,20 +363,71 @@ RESULT Windows64App::RegisterImpMouseEvents() {
 
 	//camera *pCamera = m_pOpenGLImp->GetCamera();
 
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_MOVE, m_pOpenGLImp));
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pOpenGLImp));
-	CR(m_pWin64Mouse->RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pOpenGLImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pHALImp));
 
 Error:
 	return r;
 }
 
-#include "HAL/opengl/OGLVolume.h"
 
-// Note this call will never return and will actually run the event loop
-// TODO: Thread it?
-RESULT Windows64App::ShowSandbox() {
+RESULT Windows64App::RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> fnUIThreadCallback) {
 	RESULT r = R_PASS;
+
+	CB((m_fnUIThreadCallback == nullptr));
+	m_fnUIThreadCallback = fnUIThreadCallback;
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::UnregisterUIThreadCallback() {
+	RESULT r = R_PASS;
+
+	CN(m_fnUIThreadCallback);
+	m_fnUIThreadCallback = nullptr;
+
+	Error:
+	return r;
+}
+
+// temp
+#include "HAL/opengl/OGLHand.h"
+
+// TODO: shouldn't be this way ultimately 
+RESULT Windows64App::RegisterImpLeapMotionEvents() {
+	RESULT r = R_PASS;
+
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	
+	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
+
+	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
+
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
+
+Error:
+	return r;
+}
+
+hand *Windows64App::GetHand(hand::HAND_TYPE handType) {
+	return m_pSenseLeapMotion->GetHand(handType);
+}
+
+long Windows64App::GetTickCount() {
+	return static_cast<long>(GetTickCount());
+}
+
+RESULT Windows64App::InitializeSandbox() {
+	RESULT r = R_PASS;
+
+	// TODO: remove
+	std::shared_ptr<DimObj> pSphere = nullptr;
 
 	// TODO: Use EHM for this
 	if (!m_hwndWindow) {
@@ -343,73 +435,133 @@ RESULT Windows64App::ShowSandbox() {
 		return R_FAIL;
 	}
 
-	// Setup OpenGL and Resize Windows etc
-	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
-	//m_pOpenGLImp = new OpenGLImp(m_hDC);
-	
-	m_pOpenGLImp = new OpenGLImp(m_pOpenGLRenderingContext);
-	CNM(m_pOpenGLImp, "Failed to create OpenGL Implementation");
-	CVM(m_pOpenGLImp, "OpenGL Implementation Invalid");
-
-	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
-
-	DEBUG_LINEOUT("Launching Win64App Sandbox ...");
-
+	/*
 	// TODO: Move to Sandbox function
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
-	// Show the window
-	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
-	UpdateWindow(m_hwndWindow);
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	*/
+
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
 
 	// HMD
 	// TODO: This should go into (as well as the above) into the Sandbox
 	// This needs to be done after GL set up
-	m_pHMD = HMDFactory::MakeHMD(HMD_OVR, m_pOpenGLImp, m_pxWidth, m_pxHeight);
 
-	// TODO: Should replace this with a proper scene loader
-	CRM(m_pOpenGLImp->LoadScene(m_pSceneGraph, m_pTimeManager), "Failed to load scene");
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	
+	m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
-		CRM(m_pOpenGLImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+	}
+	//*/
+
+	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
+	m_pHALImp->GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
+	CRM(AddObject(pCameraFrameOfReferenceComposite), "Failed to add composite camera frame of reference");
+
+	/*
+	pSphere = std::shared_ptr<DimObj>(MakeSphere(0.25f, 30, 30, color(COLOR_RED)));
+	pSphere->SetPosition(point(0.0f, 0.0f, -1.0f));
+	pCameraFrameOfReferenceComposite->AddObject(pSphere);
+
+	sphere *pSphere2 = AddSphere(0.25f, 30, 30, color(COLOR_GREEN));
+	pSphere2->SetPosition(point(0.0f, 0.0f, 9.0f));
+	//*/
+
+	// TODO: Move to Sandbox function
+	CRM(InitializeKeyboard(), "Failed to initialize keyboard");
+	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
+
+	// TODO: Move to Sandbox function
+	CRM(InitializeMouse(), "Failed to initialize mouse");
+	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
+
+	// TODO: This will only turn on Leap if connected at boot up
+	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected()) {
+		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
 	}
 
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+
+Error:
+	return r;
+}
+
+// Note this call will never return and will actually run the event loop
+// TODO: Thread it?
+RESULT Windows64App::Show() {
+	RESULT r = R_PASS;
+
+	// Show the window
+	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
+	UpdateWindow(m_hwndWindow);
+	
 	// Launch main message loop
 	MSG msg;
 	bool fQuit = false;
 
-	CN(m_pOpenGLImp);
-	CR(m_pOpenGLImp->MakeCurrentContext());
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-			if (msg.message == WM_QUIT)
-				fQuit = true;
+			bool fHandled = false;
 
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
+			if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
+				fHandled = HandleMouseEvent(msg);
+			}
+			else if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) {
+				fHandled = HandleKeyEvent(msg);
+			}
+			else if (WM_QUIT == msg.message)
+				break;
+
+			if (!fHandled)
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+			}
 		}
 
-		m_pTimeManager->Update();
+#ifdef CEF_ENABLED
+		// Update Network
+		CR(m_pCloudController->Update());
+#endif
+
+		// Time Manager
+		CR(m_pTimeManager->Update());
+
+		// Update Callback
+		if (m_fnUpdateCallback != nullptr) {
+			CR(m_fnUpdateCallback());
+		}
 
 		// Update the mouse
 		// TODO: This is wrong architecture, this should
 		// be parallel 
 		// TODO: Update Sense etc
-		m_pWin64Mouse->UpdateMousePosition();
+		//m_pWin64Mouse->UpdateMousePosition();
+
+
+		if (m_pHMD != nullptr) {
+			m_pHMD->UpdateHMD();
+		}
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
 
 		// Update Camera
-		m_pOpenGLImp->UpdateCamera();
+		m_pHALImp->UpdateCamera();
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
-			m_pOpenGLImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
-			m_pOpenGLImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
+			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
+			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
 		}
 
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
@@ -417,22 +569,29 @@ RESULT Windows64App::ShowSandbox() {
 
 		///*
 		// Send to the HMD
+		// TODO reorganize Render functions
+		// need to be re-architected so that the HMD functions are called after all of the 
+		// gl functions per eye.
 		if (m_pHMD != nullptr) {
-			m_pOpenGLImp->RenderStereoFramebuffers(m_pSceneGraph);
+			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}
 		else {
 			// Render Scene
-			m_pOpenGLImp->Render(m_pSceneGraph);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
 		}
 		//*/
 	
 		// Swap buffers
 		SwapBuffers(m_hDC);
 
+		DreamConsole::GetConsole()->OnFrameRendered();
+
 		if (GetAsyncKeyState(VK_ESCAPE)) {
-			ShutdownSandbox();
+			Shutdown();
 			fQuit = true;
 		}
 	}
@@ -442,17 +601,166 @@ Error:
 	return r;
 }
 
-RESULT Windows64App::ShutdownSandbox() {
+bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
+{
+	bool fHandled = false;
+
+	LPARAM lp = windowMassage.lParam;
+	WPARAM wp = windowMassage.wParam;
+
+	switch (windowMassage.message) {
+		case Windows64App::WindowMessages::UI_THREAD_CALLBACK: {
+			//m_pCloudController->CallGetUIThreadCallback(static_cast<int>(windowMassage.wParam), reinterpret_cast<void*>(windowMassage.lParam));
+		} break;
+
+		case WM_LBUTTONUP:
+		case WM_LBUTTONDOWN: {
+			fHandled = true;
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+			//DEBUG_LINEOUT("Left mouse button down!");
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
+		} break;
+
+		case WM_LBUTTONDBLCLK: {
+			fHandled = true;
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+			//DEBUG_LINEOUT("Left mouse button dbl click!");
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
+		} break;
+
+		case WM_RBUTTONUP:
+		case WM_RBUTTONDOWN: {
+			fHandled = true;
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+			//DEBUG_LINEOUT("Right mouse button down!");
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_RIGHT_BUTTON, xPos, yPos, (int)(wp));
+		} break;
+
+		case WM_RBUTTONDBLCLK: {
+			fHandled = true;
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			//DEBUG_LINEOUT("Right mouse button dbl click!");
+			// TODO: Add this to the SenseMouse
+		} break;
+
+		case WM_MBUTTONUP:
+		case WM_MBUTTONDOWN: {
+			fHandled = true;
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+			//DEBUG_LINEOUT("Middle mouse button down!");
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_MIDDLE_BUTTON, xPos, yPos, (int)(wp));
+		} break;
+
+		case WM_MBUTTONDBLCLK: {
+			fHandled = true;
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+
+			//DEBUG_LINEOUT("Middle mouse button dbl click!");
+			// TODO: Add this to the SenseMouse
+		} break;
+
+		case WM_MOUSEWHEEL: {
+			fHandled = true;
+			int wheel = static_cast<int>((int16_t)((wp >> 16) & 0xFFFF) / 120.0f);
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+			//DEBUG_LINEOUT("Mousewheel %d!", wheel);
+			//m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, (int)(wp));
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, wheel);
+		} break;
+	}
+
+	return fHandled;
+}
+
+bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
+{
+	bool fHandled = false;
+
+	LPARAM lp = windowMassage.lParam;
+	WPARAM wp = windowMassage.wParam;
+
+	switch (windowMassage.message) {
+		case WM_KEYUP: {
+			fHandled = true;
+			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), false);
+		} break;
+
+		case WM_KEYDOWN: {
+			fHandled = true;
+			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), true);
+			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
+
+			// DEBUG: Bypass for connect to cloud
+			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					//m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
+
+					m_pCloudController->SendUpdateHeadMessage(NULL, point(1, 2, 3), quaternion(1, 2, 3, 4));
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
+				HUD_OUT("Key 'L' is pressed");
+
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->LoginUser();
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('P')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->PrintEnvironmentPeerList();
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('I')) {
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->AddIceCandidates();
+				}
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_LEFT) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::LEFT);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_RIGHT) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::RIGHT);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_UP) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::TOP);
+			}
+			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_DOWN) {
+				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::BOTTOM);
+			}
+		} break;
+	}
+	
+	return fHandled;
+}
+
+RESULT Windows64App::Shutdown() {
 	RESULT r = R_PASS;
 
 	// Release device context in use by rc
 	wglMakeCurrent(m_hDC, nullptr);
 
+	if (m_pCloudController != nullptr) {
+		delete m_pCloudController;
+		m_pCloudController = nullptr;
+	}
+
 	// Shutdown and delete GL Rendering Context
-	if (m_pOpenGLImp != nullptr) {
-		CRM(m_pOpenGLImp->ShutdownImplementaiton(), "Failed to shutdown opengl implemenation");
-		delete m_pOpenGLImp;
-		m_pOpenGLImp = nullptr;
+	if (m_pHALImp != nullptr) {
+		CRM(m_pHALImp->Shutdown(), "Failed to shutdown HAL implemenation");
+		delete m_pHALImp;
+		m_pHALImp = nullptr;
 	}
 
 	wglMakeCurrent(nullptr, nullptr);
@@ -475,3 +783,5 @@ RESULT Windows64App::RecoverDisplayMode() {
 
 	return r;
 }
+
+

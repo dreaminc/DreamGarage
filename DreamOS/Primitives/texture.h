@@ -20,6 +20,7 @@ public:
 		TEXTURE_COLOR = 0,
 		TEXTURE_BUMP = 1,
 		TEXTURE_CUBE = 2,
+		TEXTURE_HEIGHT = 3,
 		TEXTURE_INVALID = 32
 	};
 
@@ -35,7 +36,9 @@ public:
 
 public:
 	texture();
+	texture(texture::TEXTURE_TYPE type);
 	texture(texture::TEXTURE_TYPE type, int width, int height, int channels);
+	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture(wchar_t * pszName, std::vector<std::wstring> cubeMapFiles);
 	~texture();
@@ -62,8 +65,53 @@ public:
 	//RESULT LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
 	RESULT LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
 	RESULT LoadCubeMapByName(wchar_t * pszName);
+	RESULT CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n);
 
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
+
+	double GetValueAtUV(double uValue, double vValue);
+
+	int GetWidth() {
+		return m_width;
+	}
+
+	int GetHeight() {
+		return m_height;
+	}
+
+	int GetChannels() {
+		return m_channels;
+	}
+
+	RESULT SetWidth(int width) {
+		if (m_width != NULL) {
+			return R_FAIL;
+		}
+		else {
+			m_width = width;
+			return R_PASS;
+		}
+	}
+
+	RESULT SetHeight(int height) {
+		if (m_height != NULL) {
+			return R_FAIL;
+		}
+		else {
+			m_height = height;
+			return R_PASS;
+		}
+	}
+
+	RESULT SetChannels(int channels) {
+		if (m_channels != NULL) {
+			return R_FAIL;
+		}
+		else {
+			m_channels = channels;
+			return R_PASS;
+		}
+	}
 
 protected:
 	int m_width;

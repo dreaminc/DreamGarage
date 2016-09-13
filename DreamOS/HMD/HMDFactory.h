@@ -11,15 +11,18 @@
 
 typedef enum {
 	HMD_OVR,
+	HMD_OPENVR,
+	HMD_ANY_AVAILABLE,
 	HMD_INVALID
 } HMD_TYPE;
 
 #include "HAL\HALImp.h"
+#include "Sandbox/SandboxApp.h"
 
 class HMDFactory : public Factory {
 public:
 	//static HMD* MakeHMD(HMD_TYPE type, HALImp *halimp);
-	static HMD* MakeHMD(HMD_TYPE type, HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
+	static HMD* MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
 };
 
 #endif // ! PATH_MANAGER_FACTORY_H_

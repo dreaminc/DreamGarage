@@ -3,6 +3,7 @@
 
 #include <list>
 #include <map>
+#include <string>
 
 #include <math.h>
 
@@ -25,11 +26,15 @@ public:
 
 	// Forward declaration for template
 	struct MAP_COMPARE_FUNCTION_STRUCT {
-		bool operator()(char const *a, char const *b) {
+		bool operator()(std::string a, std::string b) const {
+			return a.compare(b) < 0;
+		}
+
+		bool operator()(char const *a, char const *b) const {
 			return std::strcmp(a, b) < 0;
 		}
 
-		bool operator()(int lhs, int rhs) {
+		bool operator()(int lhs, int rhs) const {
 			return lhs < rhs;
 		}
 	};
@@ -59,6 +64,15 @@ public:
 		char *pszString = new char[strLength];
 		memset(pszString, 0, sizeof(char) * strLength);
 		memcpy(pszString, keyEvent, sizeof(char) * (strLength - 1));
+
+		return pszString;
+	}
+
+	char* GetEventKeyString(const std::string& keyEvent) {
+		int strLength = static_cast<int>(keyEvent.length());// strlen(keyEvent) + 1;
+		char *pszString = new char[strLength];
+		memset(pszString, 0, sizeof(char) * strLength);
+		memcpy(pszString, keyEvent.c_str(), sizeof(char) * (strLength - 1));
 
 		return pszString;
 	}
@@ -115,7 +129,7 @@ protected:
 		pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
 		m_events[keyEvent] = pNewSubscriberList;
 
-		DEBUG_LINEOUT("%s Registered event %s", GetPublisherName(), pszEvent);
+		//DEBUG_LINEOUT("%s Registered event %s", GetPublisherName(), pszEvent);
 
 	Error:
 		if (pszEvent != NULL) {
