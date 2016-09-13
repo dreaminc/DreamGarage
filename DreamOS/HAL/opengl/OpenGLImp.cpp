@@ -224,6 +224,7 @@ RESULT OpenGLImp::PrepareScene() {
 	m_pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 	//m_pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 	CN(m_pOGLFlatProgram);
+	CR(m_pOGLFlatProgram->InitializeRenderToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3));
 
 	m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, m_pOGLOverlayProgram);
 
@@ -818,6 +819,22 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
 	
+	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
+
+	CR(m_pOGLFlatProgram->BindToFramebuffer());
+	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, eye));
+	pFlatSceneGraph->Reset();
+	CR(m_pOGLFlatProgram->RenderSceneGraph(pFlatSceneGraph));
+
+	OGLTexture *pTexture = m_pOGLFlatProgram->GetOGLFramebuffer()->GetOGLTexture();
+	quad* pQuad = MakeQuad(10.0f, 10.0f);
+	pQuad->MoveTo(1.0f, 2.0f, 1.0f);
+	pQuad->SetColorTexture(pTexture);
+
+	CR(m_pOGLFlatProgram->UnbindFramebuffer());
+
+//	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+
 	// 
 	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 	CR(m_pOGLRenderProgram->SetLights(pLights));
@@ -840,6 +857,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	// Render Layers
 	// 3D Object / skybox
 	pSceneGraph->Reset();
+	CR(m_pOGLRenderProgram->RenderObject(pQuad));
 	CR(m_pOGLRenderProgram->RenderSceneGraph(pSceneGraph));
 	CR(RenderSkybox(pObjectStore, eye));
 
@@ -848,10 +866,22 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	glClear(GL_DEPTH_BUFFER_BIT);
 	
 	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
+
+//	CR(m_pOGLFlatProgram->BindToFramebuffer());
 	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, eye));
 	pFlatSceneGraph->Reset();
 	CR(m_pOGLFlatProgram->RenderSceneGraph(pFlatSceneGraph));
+/*
+	OGLTexture *pTexture = m_pOGLFlatProgram->GetOGLFramebuffer()->GetOGLTexture();
+	quad* pQuad = MakeQuad(10.0f, 10.0f);
+	pQuad->MoveTo(10.0f, 10.0f, 10.0f);
+	pQuad->SetColorTexture(pTexture);
 
+	CR(m_pOGLFlatProgram->UnbindFramebuffer());
+
+	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+	CR(m_pOGLRenderProgram->RenderObject(pQuad));	
+//*/
 	// Profiler
 	glClearDepth(1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);

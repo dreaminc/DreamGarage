@@ -2,7 +2,7 @@
 #include <string>
 
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
-//#define TESTING
+#define TESTING
 
 light *g_pLight = nullptr;
 

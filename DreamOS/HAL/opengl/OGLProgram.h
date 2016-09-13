@@ -128,6 +128,9 @@ public:
 protected:
 	OGLProgram *m_pOGLProgramDepth;
 
+public:
+	OGLFramebuffer *GetOGLFramebuffer();
+
 protected:
 	OpenGLImp *m_pParentImp;
 	version m_versionOGL;

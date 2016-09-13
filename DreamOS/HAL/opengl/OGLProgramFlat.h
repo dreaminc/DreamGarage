@@ -57,14 +57,16 @@ public:
 
 	RESULT SetCameraUniforms(camera *pCamera) {
 		auto matP = pCamera->GetProjectionMatrix();
-		m_pUniformProjectionMatrix->SetUniform(matP);
+		if (m_pUniformProjectionMatrix)
+			m_pUniformProjectionMatrix->SetUniform(matP);
 
 		return R_PASS;
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
 		auto matP = pStereoCamera->GetProjectionMatrix(eye);
-		m_pUniformProjectionMatrix->SetUniform(matP);
+		if (m_pUniformProjectionMatrix)
+			m_pUniformProjectionMatrix->SetUniform(matP);
 
 		return R_PASS;
 	}

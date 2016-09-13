@@ -683,6 +683,7 @@ RESULT OGLProgram::RenderSceneGraph(ObjectStore *pSceneGraph) {
 			continue;
 		else {
 			CR(RenderObject(pDimObj));
+
 		}
 	}
 
@@ -830,7 +831,9 @@ Error:
 	return r;
 }
 
-
+OGLFramebuffer *OGLProgram::GetOGLFramebuffer() {
+	return m_pOGLFramebuffer;
+}
 
 // Set Matrix Functions
 /*
