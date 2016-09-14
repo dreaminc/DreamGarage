@@ -542,6 +542,9 @@ FlatContext *OpenGLImp::MakeFlatContext() {
 	RESULT r = R_PASS;
 
 	FlatContext *pFlatContext = new FlatContext(this);
+	framebuffer *pFramebuffer = new OGLFramebuffer(this, 1024, 1024, 4);
+	pFlatContext->SetFramebuffer(pFramebuffer);
+
 	CN(pFlatContext);
 
 //Success:
@@ -797,6 +800,28 @@ RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
 Error:
 	return r;
 }
+
+RESULT OpenGLImp::RenderToTexture(FlatContext* pContext) {
+	RESULT r = R_PASS;
+
+	// Create framebuffer
+#pragma message ("bad code")
+	OGLFramebuffer* pFramebuffer = dynamic_cast<OGLFramebuffer*>(pContext->GetFramebuffer());
+	CN(pFramebuffer);
+
+	m_pOGLFlatProgram->SetFrameBuffer(pFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
+	CR(m_pOGLFlatProgram->UseProgram());
+	CR(m_pOGLFlatProgram->BindToFramebuffer(pFramebuffer));
+	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, EYE_MONO));
+
+	CR(m_pOGLFlatProgram->RenderObject(pContext));
+
+	CR(m_pOGLFlatProgram->UnbindFramebuffer());
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
@@ -818,20 +843,21 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
 	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
-	
+/*
 	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
 
 	CR(m_pOGLFlatProgram->BindToFramebuffer());
 	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, eye));
 	pFlatSceneGraph->Reset();
 	CR(m_pOGLFlatProgram->RenderSceneGraph(pFlatSceneGraph));
-
+///*
 	OGLTexture *pTexture = m_pOGLFlatProgram->GetOGLFramebuffer()->GetOGLTexture();
 	quad* pQuad = MakeQuad(10.0f, 10.0f);
 	pQuad->MoveTo(1.0f, 2.0f, 1.0f);
 	pQuad->SetColorTexture(pTexture);
 
 	CR(m_pOGLFlatProgram->UnbindFramebuffer());
+//*/
 
 //	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
 
@@ -857,10 +883,10 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	// Render Layers
 	// 3D Object / skybox
 	pSceneGraph->Reset();
-	CR(m_pOGLRenderProgram->RenderObject(pQuad));
+	//CR(m_pOGLRenderProgram->RenderObject(pQuad));
 	CR(m_pOGLRenderProgram->RenderSceneGraph(pSceneGraph));
 	CR(RenderSkybox(pObjectStore, eye));
-
+/*
 	// Flat object layer
 	glClearDepth(1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);

@@ -47,6 +47,7 @@ public:
 	virtual RESULT MakeCurrentContext() = 0;
 
 	virtual RESULT Render(ObjectStore* pSceneGraph, ObjectStore* pFlatSceneGraph, EYE_TYPE eye) = 0;
+	virtual RESULT RenderToTexture(FlatContext* pContext) = 0;
 
 	virtual RESULT Shutdown() = 0;
 

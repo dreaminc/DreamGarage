@@ -113,7 +113,7 @@ public:
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 
 	RESULT BindToDepthBuffer();
-	RESULT BindToFramebuffer();
+	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer = nullptr);
 	RESULT UnbindFramebuffer();
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
@@ -130,6 +130,7 @@ protected:
 
 public:
 	OGLFramebuffer *GetOGLFramebuffer();
+	RESULT SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 protected:
 	OpenGLImp *m_pParentImp;

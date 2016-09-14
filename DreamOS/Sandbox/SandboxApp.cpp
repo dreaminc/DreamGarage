@@ -94,8 +94,17 @@ FlatContext* SandboxApp::AddFlatContext() {
 
 	FlatContext* context = m_pHALImp->MakeFlatContext();
 	CR(m_pFlatSceneGraph->PushObject(context));
+
 Error:
 	return context;
+}
+
+RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
+	RESULT r = R_PASS;
+	
+	CR(m_pHALImp->RenderToTexture(pContext));
+Error:
+	return r;
 }
 
 light* SandboxApp::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {

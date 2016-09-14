@@ -69,7 +69,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
-
+	
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
@@ -122,6 +122,11 @@ light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOr
 FlatContext* DreamOS::AddFlatContext()
 {
 	return m_pSandbox->AddFlatContext();
+}
+
+RESULT DreamOS::RenderToTexture(FlatContext *pContext) 
+{
+	return m_pSandbox->RenderToTexture(pContext);
 }
 
 sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {

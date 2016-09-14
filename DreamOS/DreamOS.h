@@ -49,6 +49,7 @@ protected:
 	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
 	FlatContext *AddFlatContext();
+	RESULT RenderToTexture(FlatContext* pContext);
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 

@@ -64,6 +64,10 @@ OGLTexture* OGLFramebuffer::GetOGLTexture() {
 	return m_pOGLTexture;
 }
 
+texture* OGLFramebuffer::GetTexture() {
+	return m_pOGLTexture;
+}
+
 RESULT OGLFramebuffer::MakeOGLTextureMultisample() {
 	RESULT r = R_PASS;
 

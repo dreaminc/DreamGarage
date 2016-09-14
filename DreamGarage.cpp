@@ -77,10 +77,25 @@ RESULT DreamGarage::LoadScene() {
 
 	// Add Flat Objects
 ///*
-	FlatContext *pContext2 = AddFlatContext();
-	std::shared_ptr<text> pText = pContext2->AddText(L"Arial.fnt", "Hello World", 1.0);
+	m_pContext = AddFlatContext();
+	std::shared_ptr<text> pText = m_pContext->AddText(L"Arial.fnt", "Hello World", 1.0);
 	pText->MoveTo(0.5f, 0.5f, 0.5f);
-	std::shared_ptr<text> pText2 = pContext2->AddText(L"Arial.fnt", "Sababa", 1.0);
+	std::shared_ptr<text> pText2 = m_pContext->AddText(L"Arial.fnt", "Sababa", 1.0);
+//	texture target;
+	RenderToTexture(m_pContext); 
+
+	m_pQuad = AddQuad(10.0f, 10.0f);
+	m_pQuad->MoveTo(0.0f, 2.0f, 0.0f);
+	m_pQuad->SetColorTexture(m_pContext->GetFramebuffer()->GetTexture());
+
+	FlatContext* pContext2 = AddFlatContext();
+	std::shared_ptr<text> pText3 = pContext2->AddText(L"Arial.fnt", "a new context dawns", 1.5f);
+
+	quad* pQuad2 = AddQuad(5.0f, 5.0f);
+	pQuad2->MoveTo(0.0f, 3.0f, 0.0f);
+	RenderToTexture(pContext2);
+	pQuad2->SetColorTexture(pContext2->GetFramebuffer()->GetTexture());
+
 /*
 	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
 		std::shared_ptr<quad> pFQuad2 = pContext2->AddQuad(0.25f, 0.25f, point(-x/10.0f, -x/10.0f, x/10.0f));
@@ -96,7 +111,7 @@ RESULT DreamGarage::LoadScene() {
 //*/
 
 	// Add base plane
-///*
+/*
 	quad *pBQuad = AddQuad(10.0f, 5.0f, 200, 200);// , pHeightTextureCobble);
 	//pBQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
 	//pBQuad->SetColorTexture(pColorTextureCobble);
@@ -104,7 +119,7 @@ RESULT DreamGarage::LoadScene() {
 //*/
 	
 	// Add billboards
-///*
+/*
 	quad *pQuad = AddQuad(1.0f, 1.0f, 10, 10);
 	pQuad->MoveTo(1.0f, 1.0f, 0.0f);
 	pQuad->SetBillboard(true);
@@ -282,6 +297,12 @@ RESULT DreamGarage::Update(void) {
 	}
 ///*
 	m_pSphere->translateX(0.001f);
+/*
+	if (m_pContext != nullptr) {
+		texture target;
+		RenderToTexture(target, m_pContext);
+		m_pQuad->SetColorTexture(&target);
+	}
 //*/
 
 #endif

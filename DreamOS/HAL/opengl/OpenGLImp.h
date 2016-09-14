@@ -99,6 +99,7 @@ public:
 public:
 	RESULT SetViewTarget(EYE_TYPE eye);
 	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
+	RESULT RenderToTexture(FlatContext* pContext);
 private:
 	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
 	RESULT RenderProfiler(EYE_TYPE eye);

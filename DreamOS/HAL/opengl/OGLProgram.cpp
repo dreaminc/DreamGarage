@@ -84,13 +84,15 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::BindToFramebuffer() {
+RESULT OGLProgram::BindToFramebuffer(OGLFramebuffer* pFramebuffer) {
 	RESULT r = R_PASS;
 
 	//CR(m_pOGLFramebuffer->BindOGLFramebuffer());
 
 	// Render to our framebuffer
-	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebuffer->GetFramebufferIndex()));
+	// By default, uses the member framebuffer
+	OGLFramebuffer* pfb = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, pfb->GetFramebufferIndex()));
 	CR(m_pOGLFramebuffer->SetAndClearViewport());
 
 	// Check framebuffer
@@ -188,6 +190,31 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(1));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	//pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
+	CN(pFramebuffer);
+	
+	CR(pFramebuffer->OGLInitialize());	
+	CR(pFramebuffer->BindOGLFramebuffer());
+
+	CR(pFramebuffer->MakeOGLTexture());
+
+	CR(pFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(pFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
+
+	CR(pFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(pFramebuffer->SetOGLDrawBuffers(1));
 
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
