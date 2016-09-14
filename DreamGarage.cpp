@@ -412,7 +412,7 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
-
+	/*
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('C') : {
 			if (kbEvent->KeyState != 0) {
@@ -421,7 +421,7 @@ RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 			}
 		}
 	}
-
+	*/
 //Error:
 	return r;
 }

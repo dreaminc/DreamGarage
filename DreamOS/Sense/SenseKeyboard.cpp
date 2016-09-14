@@ -45,7 +45,23 @@ Error:
 }
 
 uint8_t SenseKeyboard::GetKeyState(SK_SCAN_CODE KeyCode) {
-	return m_KeyStates[(int)KeyCode];
+	switch (KeyCode)
+	{
+		case SK_SHIFT:
+		case SK_CONTROL: {
+#if defined(_WIN32) || defined(_WIN64)
+			return ::GetKeyState(KeyCode);// ((::GetKeyState(KeyCode) & 0x80) > 0) ? 1 : 0;
+#else
+			// Not Implemented.
+			#pragma message ("GetKeyState not implemented for Shift/Control keys")
+			return 0;
+#endif
+		} break;
+
+		default: {
+			return m_KeyStates[(int)KeyCode];
+		} break;
+	};
 }
 
 RESULT SenseKeyboard::SetKeyStates(uint8_t KeyStates[NUM_SENSE_KEYBOARD_KEYS]) {

@@ -16,6 +16,7 @@ CloudController::CloudController() :
 	m_fnHandleDataChannelStringMessageCallback(nullptr),
 	m_fnHandleDataChannelMessageCallback(nullptr)
 {
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::CloudController, this);
 	// empty
 }
 
@@ -408,5 +409,15 @@ RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handS
 	}
 
 Error:
+	return r;
+}
+
+RESULT CloudController::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("login") == 0) {
+		LoginUser();
+	}
+
 	return r;
 }

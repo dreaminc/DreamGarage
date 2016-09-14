@@ -51,7 +51,6 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 		while (ss >> arg)
 		{
-			OutputDebugStringA(arg.c_str());
 			args.push_back(arg);
 			new_argc++;
 		}

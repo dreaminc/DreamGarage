@@ -45,7 +45,7 @@ RESULT CmdPrompt::Execute(const std::string& command)
 
 	if (type.compare("") != 0)
 	{
-		CmdPromptEvent event;
+		CmdPromptEvent event(command);
 		NotifySubscribers(type, &event);
 	}
 

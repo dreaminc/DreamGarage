@@ -16,6 +16,8 @@
 void OGLRenderContext::Init()
 {
 	m_OGLFont = std::make_shared<Font>(L"Arial.fnt");
+	
+	// Default font size
 	m_fontSize = 4.0f;
 
 	m_Background = std::make_unique<OGLTriangle>(m_OGLImp);
@@ -65,18 +67,18 @@ void OGLDreamConsole::Destroy() {
 }
 
 void OGLDreamConsole::Render(bool isMonoView) {
-	const float viewTop = (isMonoView)? 0.7 : 0.4f;
+	const float viewTop = (isMonoView)? 0.8 : 0.4f;
 	const float viewBottom = -viewTop;
 	const float viewRight = (isMonoView) ? 0.8 : 0.5f;
 	const float viewLeft = -viewRight;
 
 	const int maxRows = (isMonoView) ? 36 : 19;
 
-	float posY = 0.0f;
+	float fontSize = (isMonoView) ? 3.0f : 4.0f;
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
+				
 	glDisable(GL_CULL_FACE);
 //	glDisable(GL_BLEND);
 
@@ -91,13 +93,17 @@ void OGLDreamConsole::Render(bool isMonoView) {
 
 	// Render hud text
 
-	for (auto it = (DreamConsole::GetConsole()->GetConsoleText().size() > maxRows) ?
-			DreamConsole::GetConsole()->GetConsoleText().end() - maxRows : DreamConsole::GetConsole()->GetConsoleText().begin();
-		 it < DreamConsole::GetConsole()->GetConsoleText().end();
-		 it++)
+	float posY = viewBottom;
+
+	for (auto it = DreamConsole::GetConsole()->GetConsoleText().rbegin();
+		it != DreamConsole::GetConsole()->GetConsoleText().rend();
+		++it)
 	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, m_fontSize)->SetPosition(point(0.1f, viewTop - posY, 0.0f), text::BOTTOM_RIGHT));
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, fontSize)->SetPosition(point(0.1f, posY, 0.0f), text::TOP_RIGHT));
 		posY += m_OGLConsoleText->m_height;
+
+		if (posY > viewTop)
+			break;
 	}
 
 	std::string cmdText = ">" + DreamConsole::GetConsole()->GetCmdText();
@@ -106,10 +112,10 @@ void OGLDreamConsole::Render(bool isMonoView) {
 	if ((time / 100) % 10 > 5)
 		cmdText += "_";
 
-	m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(cmdText, m_fontSize + 0.02f)->SetPosition(point(0.1f, viewBottom, 0.0f), text::BOTTOM_RIGHT));
+	m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->SetPosition(point(0.1f, viewBottom, 0.0f), text::BOTTOM_RIGHT));
 
 	// Render debug console text
-	m_OGLConsole.Render(point(viewLeft, viewTop, 0.0f), point(0.0f, 0.0f, 0.0f));
+	m_OGLConsole.Render(point(viewLeft, viewTop, 0.0f), point(0.0f, 0.0f, 0.0f), fontSize);
 }
 
 // OGLProfilerGraph
@@ -316,7 +322,7 @@ void OGLDebugConsole::Init()
 
 }
 
-void OGLDebugConsole::Render(point& topLeft, point& bottomRight)
+void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 {
 	float consoleHeight = 0;
 
@@ -324,7 +330,7 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight)
 	{
 		point rowTL = point(topLeft.x(), topLeft.y() - consoleHeight, 0.0f);
 
-		m_OGLConsoleText->SetText(it->GetValue(), m_fontSize);
+		m_OGLConsoleText->SetText(it->GetValue(), fontSize);
 
 		m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(0, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0)));
 		m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, 0, 0)));
@@ -333,13 +339,6 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight)
 
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetPosition(rowTL, text::BOTTOM_RIGHT));
 	}
-
-//	m_OGLTextBackground->SetColor(color(1.0f, 1.0f, 1.0f, 1.0f));
-//	m_OGLProgram->RenderObject(m_OGLTextBackground->Set(->SetPosition(point(0, 0, 0)));
-
-	
-//	OGLRenderContext::Render(topLeft, point(bottomRight.x(), topLeft.y() - consoleHeight, 0.0f));
-
 }
 
 void OGLDebugConsole::Destroy()
