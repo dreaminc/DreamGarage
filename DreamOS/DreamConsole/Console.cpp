@@ -2,8 +2,7 @@
 #include "ProfilerGraph.h"
 
 #include <algorithm>
-
-#include "windows.h"
+#include <locale>
 
 #include "DreamConsole/DreamConsole.h"
 
@@ -107,7 +106,8 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 						m_cmdText.erase();
 					} break;
 					default: {
-						m_cmdText.append(std::string("") + static_cast<char>(keyCode));
+						std::locale	loc;
+						m_cmdText.append(std::string("") + std::tolower(static_cast<char>(keyCode), loc));
 					} break;
 					}
 				}

@@ -5,6 +5,8 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
 
+#include "DreamConsole/DreamConsole.h"
+
 // DREAM OS
 // DreamOS/Cloud/CloudController.h
 // The base DreamCloud controller 
@@ -28,7 +30,8 @@ typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 
-class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver {
+class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver,
+						public Subscriber<CmdPromptEvent> {
 protected:
 	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
 	typedef std::function<RESULT(uint8_t *, int)> HandleDataChannelMessageCallback;
@@ -81,6 +84,9 @@ public:
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	// CmdPromptEventSubscriber
+	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 private:
 	//UID m_uid;

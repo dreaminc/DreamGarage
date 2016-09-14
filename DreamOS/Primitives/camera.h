@@ -2,6 +2,7 @@
 #define CAMERA_H_
 
 #include "RESULT/EHM.h"
+#include "DreamConsole/DreamConsole.h"
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/camera.h
@@ -183,55 +184,26 @@ public:
 		RESULT r = R_PASS;
 
 		DEBUG_LINEOUT("Cam Key %d state: %x", kbEvent->KeyCode, kbEvent->KeyState);
+		
+		bool disableAWDS = DreamConsole::GetConsole()->IsInForeground();
 
-		switch (kbEvent->KeyCode) {
-			case (SK_SCAN_CODE)('A') :
-			case SK_LEFT: {
-				if (kbEvent->KeyState)
-					AddStrafeSpeed(DEFAULT_CAMERA_MOVE_SPEED);
-				else
-					AddStrafeSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
-			} break;
+		bool shiftKey	 = (kbEvent->m_pSenseKeyboard->GetKeyState(SK_SHIFT) & 0x80) > 0;
 
-			case (SK_SCAN_CODE)('D') :
-			case SK_RIGHT: {
-				if (kbEvent->KeyState)
-					AddStrafeSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
-				else
-					AddStrafeSpeed(DEFAULT_CAMERA_MOVE_SPEED);
-			} break;
+		bool leftKey	 = (kbEvent->KeyCode == SK_LEFT)  || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('A'));
+		bool rightKey	 = (kbEvent->KeyCode == SK_RIGHT) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('D'));
+		bool forwardKey  = (kbEvent->KeyCode == SK_UP   && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('W'));
+		bool backwardKey = (kbEvent->KeyCode == SK_DOWN && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('S'));
+		bool upKey		 = (kbEvent->KeyCode == SK_UP   && shiftKey)  || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('Q'));
+		bool downKey	 = (kbEvent->KeyCode == SK_DOWN && shiftKey)  || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('E'));
 
-			case (SK_SCAN_CODE)('W') :
-			case SK_UP: {
-				if (kbEvent->KeyState)
-					AddForwardSpeed(DEFAULT_CAMERA_MOVE_SPEED);
-				else
-					AddForwardSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
-			} break;
+		#define	MOVE_DIRECTION ((kbEvent->KeyState) ? 1.0f : -1.0f)
 
-			case (SK_SCAN_CODE)('S') :
-			case SK_DOWN: {
-				if (kbEvent->KeyState)
-					AddForwardSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
-				else
-					AddForwardSpeed(DEFAULT_CAMERA_MOVE_SPEED);
-			} break;
-
-			case SK_SPACE: 
-			case (SK_SCAN_CODE)('Q'): {
-				if (kbEvent->KeyState)
-					AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
-				else
-					AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED);
-			} break;
-
-			case (SK_SCAN_CODE)('E') : {
-				if (kbEvent->KeyState)
-					AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED);
-				else
-					AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED);
-			} break;
-		}
+		if (leftKey) AddStrafeSpeed(DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
+		else if (rightKey) AddStrafeSpeed(-DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
+		else if (forwardKey) AddForwardSpeed(DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
+		else if (backwardKey) AddForwardSpeed(-DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
+		else if (upKey) AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
+		else if (downKey) AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED* MOVE_DIRECTION);
 
 		return r;
 	}

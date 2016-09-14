@@ -590,7 +590,7 @@ RESULT Windows64App::Show() {
 
 		DreamConsole::GetConsole()->OnFrameRendered();
 
-		if (GetAsyncKeyState(VK_ESCAPE)) {
+		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
 			Shutdown();
 			fQuit = true;
 		}
@@ -697,7 +697,7 @@ bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
 			fHandled = true;
 			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), true);
 			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
-
+			/*
 			// DEBUG: Bypass for connect to cloud
 			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
 				if (m_pCloudController != nullptr) {
@@ -739,6 +739,7 @@ bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
 			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_DOWN) {
 				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::BOTTOM);
 			}
+			*/
 		} break;
 	}
 	
