@@ -538,12 +538,14 @@ Error:
 	return nullptr;
 }
 
-FlatContext *OpenGLImp::MakeFlatContext() {
+FlatContext *OpenGLImp::MakeFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 
 	FlatContext *pFlatContext = new FlatContext(this);
-	framebuffer *pFramebuffer = new OGLFramebuffer(this, 1024, 1024, 4);
-	pFlatContext->SetFramebuffer(pFramebuffer);
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, width, height, channels);
+	CN(pOGLFramebuffer);
+
+	pFlatContext->SetFramebuffer(pOGLFramebuffer);
 
 	CN(pFlatContext);
 

@@ -75,7 +75,7 @@ public:
 	virtual user *MakeUser() = 0;
 
 	virtual composite *MakeComposite() = 0;
-	virtual FlatContext* MakeFlatContext() = 0;
+	virtual FlatContext* MakeFlatContext(int width, int height, int channels) = 0;
 	virtual hand* MakeHand() = 0;
 
 	/*

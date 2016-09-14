@@ -75,7 +75,7 @@ public:
 
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
-	FlatContext* AddFlatContext();
+	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);

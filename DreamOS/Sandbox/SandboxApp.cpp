@@ -89,10 +89,10 @@ Error:
 	return r;
 }
 
-FlatContext* SandboxApp::AddFlatContext() {
+FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 
-	FlatContext* context = m_pHALImp->MakeFlatContext();
+	FlatContext* context = m_pHALImp->MakeFlatContext(width, height, channels);
 	CR(m_pFlatSceneGraph->PushObject(context));
 
 Error:

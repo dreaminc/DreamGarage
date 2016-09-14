@@ -81,7 +81,6 @@ RESULT DreamGarage::LoadScene() {
 	std::shared_ptr<text> pText = m_pContext->AddText(L"Arial.fnt", "Hello World", 1.0);
 	pText->MoveTo(0.5f, 0.5f, 0.5f);
 	std::shared_ptr<text> pText2 = m_pContext->AddText(L"Arial.fnt", "Sababa", 1.0);
-//	texture target;
 	RenderToTexture(m_pContext); 
 
 	m_pQuad = AddQuad(10.0f, 10.0f);
