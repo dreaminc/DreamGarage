@@ -74,7 +74,7 @@ public:
 	~OGLDebugConsole();
 
 	void Init();
-	void Render(point& topLeft, point& bottomRight);
+	void Render(point& topLeft, point& bottomRight, float fontSize = 4.0f);
 	void Destroy();
 
 private:
