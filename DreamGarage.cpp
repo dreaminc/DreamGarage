@@ -2,7 +2,7 @@
 #include <string>
 
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
-#define TESTING
+//#define TESTING
 
 light *g_pLight = nullptr;
 
@@ -300,12 +300,6 @@ RESULT DreamGarage::Update(void) {
 	}
 ///*
 	m_pSphere->translateX(0.001f);
-/*
-	if (m_pContext != nullptr) {
-		texture target;
-		RenderToTexture(target, m_pContext);
-		m_pQuad->SetColorTexture(&target);
-	}
 //*/
 
 #endif

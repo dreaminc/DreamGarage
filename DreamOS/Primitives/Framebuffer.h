@@ -39,13 +39,11 @@ public:
 	int GetHeight() { return m_height; }
 	int GetChannels() { return m_channels; }
 	virtual texture* GetTexture() { return nullptr; };
-	//void SetTexture(texture* pTexture) { m_pTexture = pTexture; }
 
 protected:
 	int m_width;
 	int m_height;
 	int m_channels;
-	//texture* m_pTexture;
 
 public:
 	UID getID() { return m_uid; }
