@@ -145,7 +145,7 @@ public:
 
 				m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, static_cast<float>(yValue), (heightInc * j) - halfHeight),
 												  vector(0.0f, 1.0f, 0.0f), 
-												  uvcoord(uValue, vValue));	
+												  uvcoord(uValue, 1-vValue));	
 
 				// TODO: Calculate normal (based on geometry)
 

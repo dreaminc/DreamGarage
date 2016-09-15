@@ -73,6 +73,8 @@ RESULT DreamGarage::LoadScene() {
 
 	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
+
+	texture *pColorTextureTest = MakeTexture(L"asymmetrical.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 //*/
 
 	// Add Flat Objects
@@ -86,7 +88,9 @@ RESULT DreamGarage::LoadScene() {
 	m_pQuad = AddQuad(10.0f, 10.0f);
 	m_pQuad->MoveTo(0.0f, 2.0f, 0.0f);
 	m_pQuad->SetColorTexture(m_pContext->GetFramebuffer()->GetTexture());
-
+//	m_pQuad->SetColorTexture(pColorTextureTest);
+	m_pQuad->RotateXByDeg(90.0f);
+/*
 	FlatContext* pContext2 = AddFlatContext();
 	std::shared_ptr<text> pText3 = pContext2->AddText(L"Arial.fnt", "a new context dawns", 1.5f);
 
