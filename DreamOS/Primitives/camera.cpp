@@ -1,5 +1,16 @@
 #include "camera.h"
 
+#include "Logger/Logger.h"
+
+#define DEFAULT_NEAR_PLANE 0.1f
+#define DEFAULT_FAR_PLANE 1000.0f
+#define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
+#define DEFAULT_CAMERA_MOVE_SPEED 2.0f
+
+#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
+//#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_ORTHOGRAPHIC
+
+
 camera::camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
 	m_FielfOfViewAngle(FOV),
 	m_ProjectionType(DEFAULT_PROJECTION_TYPE),
@@ -136,7 +147,7 @@ RESULT camera::Notify(HMDEvent *hmdEvent) {
 
 	DEBUG_LINEOUT("Cam hmd event");//, kbEvent->KeyCode, kbEvent->KeyState);
 
-								   //	Error:
+//	Error:
 	return r;
 }
 
@@ -169,41 +180,23 @@ RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 }
 
 RESULT camera::Notify(TimeEvent *event) {
+	//LOG(INFO) << "time";
+
+	double dt = event->m_deltaTime;
+
 	camera_precision x, y, z;
 	m_qRotation.GetEulerAngles(&x, &y, &z);
 
 	vector lookMove = GetLookVector();
-	lookMove.y() = 0.0f;
 	lookMove.Normalize();
 
 	vector rightMove = GetRightVector();
 	rightMove.y() = 0.0f;
 	rightMove.Normalize();
 
-	m_ptOrigin += lookMove * m_cameraForwardSpeed;// *event->m_deltaTime;
-	m_ptOrigin += rightMove * m_cameraStrafeSpeed;// *event->m_deltaTime;
-	m_ptOrigin += GetUpVector() * m_cameraUpSpeed;// *event->m_deltaTime;
-	m_ptOrigin.SetZeroW();
-
-	return R_PASS;
-}
-
-// Update Functions
-camera camera::UpdateCameraPosition() {
-	camera_precision x, y, z;
-	m_qRotation.GetEulerAngles(&x, &y, &z);
-
-	vector lookMove = GetLookVector();
-	//lookMove.y() = 0.0f;
-	lookMove.Normalize();
-
-	vector rightMove = GetRightVector();
-	rightMove.y() = 0.0f;
-	rightMove.Normalize();
-
-	m_ptOrigin += lookMove * m_cameraForwardSpeed;
-	m_ptOrigin += rightMove * m_cameraStrafeSpeed;
-	m_ptOrigin += GetUpVector() * m_cameraUpSpeed;
+	m_ptOrigin += lookMove * m_cameraForwardSpeed * dt;
+	m_ptOrigin += rightMove * m_cameraStrafeSpeed * dt;
+	m_ptOrigin += GetUpVector() * m_cameraUpSpeed * dt;
 	m_ptOrigin.SetZeroW();
 
 	///*
@@ -228,7 +221,7 @@ camera camera::UpdateCameraPosition() {
 	m_pCameraFrameOfReference->SetOrientation(qRotation);
 	//*/
 
-	return (*this);
+	return R_PASS;
 }
 
 // Deviation vector is a vector of deviation from the origin point

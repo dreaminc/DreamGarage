@@ -327,6 +327,8 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 
 	camera *pCamera = m_pHALImp->GetCamera();
 
+	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
+
 	/*
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
@@ -555,9 +557,6 @@ RESULT Windows64App::Show() {
 
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
-
-		// Update Camera
-		m_pHALImp->UpdateCamera();
 
 		// Update HMD
 		if (m_pHMD != nullptr) {

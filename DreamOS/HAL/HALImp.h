@@ -36,7 +36,6 @@ public:
 
 public:
 	camera *GetCamera();
-	RESULT UpdateCamera();
 	RESULT SetCameraOrientation(quaternion qOrientation);
 	RESULT SetCameraPositionDeviation(vector vDeviation);
 

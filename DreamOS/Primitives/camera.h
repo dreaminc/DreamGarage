@@ -26,13 +26,6 @@
 	typedef double camera_precision;
 #endif
 
-#define DEFAULT_NEAR_PLANE 0.1f
-#define DEFAULT_FAR_PLANE 1000.0f
-#define DEFAULT_CAMERA_ROTATE_SPEED 0.002f
-#define DEFAULT_CAMERA_MOVE_SPEED 0.05f
-
-#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
-//#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_ORTHOGRAPHIC
 
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseKeyboard.h"
@@ -85,9 +78,6 @@ public:
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 
 	RESULT Notify(TimeEvent *event);
-
-	// Update Functions
-	camera UpdateCameraPosition();
 
 	// Deviation vector is a vector of deviation from the origin point
 	// So resulting point = ptOrigin + vDeviation
