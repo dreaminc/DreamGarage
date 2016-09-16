@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "Project/Windows/DreamOS/resource.h"
 #include "Windows64App.h"
 #include "Sandbox/PathManagerFactory.h"
@@ -202,10 +203,7 @@ Error:
 RESULT Windows64App::InitializeCloudController() {
 	RESULT r = R_PASS;
 
-	// Set up the Cloud Controller
-	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
-	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
 
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 	
@@ -329,6 +327,8 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 
 	camera *pCamera = m_pHALImp->GetCamera();
 
+	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
+
 	/*
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
 	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
@@ -364,8 +364,11 @@ RESULT Windows64App::RegisterImpMouseEvents() {
 	//camera *pCamera = m_pOpenGLImp->GetCamera();
 
 	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
-	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON, m_pHALImp));
-	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_DOWN, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_UP, m_pHALImp));
 
 Error:
 	return r;
@@ -555,9 +558,6 @@ RESULT Windows64App::Show() {
 		// Update Scene 
 		CR(m_pSceneGraph->UpdateScene());
 
-		// Update Camera
-		m_pHALImp->UpdateCamera();
-
 		// Update HMD
 		if (m_pHMD != nullptr) {
 			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
@@ -590,7 +590,7 @@ RESULT Windows64App::Show() {
 
 		DreamConsole::GetConsole()->OnFrameRendered();
 
-		if (GetAsyncKeyState(VK_ESCAPE)) {
+		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
 			Shutdown();
 			fQuit = true;
 		}
@@ -613,13 +613,21 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 			//m_pCloudController->CallGetUIThreadCallback(static_cast<int>(windowMassage.wParam), reinterpret_cast<void*>(windowMassage.lParam));
 		} break;
 
+		case WM_MOUSEMOVE: {
+			fHandled = true;
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+			//DEBUG_LINEOUT("Middle mouse button down!");
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_MOVE, xPos, yPos, (int)(wp));
+		} break;
+
 		case WM_LBUTTONUP:
 		case WM_LBUTTONDOWN: {
 			fHandled = true;
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Left mouse button down!");
-			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
+			m_pSenseMouse->UpdateMouseState((windowMassage.message == WM_LBUTTONUP) ? SENSE_MOUSE_LEFT_BUTTON_UP : SENSE_MOUSE_LEFT_BUTTON_DOWN, xPos, yPos, (int)(wp));
 		} break;
 
 		case WM_LBUTTONDBLCLK: {
@@ -627,7 +635,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Left mouse button dbl click!");
-			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
+			//m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_LEFT_BUTTON, xPos, yPos, (int)(wp));
 		} break;
 
 		case WM_RBUTTONUP:
@@ -636,7 +644,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Right mouse button down!");
-			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_RIGHT_BUTTON, xPos, yPos, (int)(wp));
+			m_pSenseMouse->UpdateMouseState((windowMassage.message == WM_RBUTTONUP) ? SENSE_MOUSE_RIGHT_BUTTON_UP : SENSE_MOUSE_RIGHT_BUTTON_DOWN, xPos, yPos, (int)(wp));
 		} break;
 
 		case WM_RBUTTONDBLCLK: {
@@ -654,7 +662,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 			int xPos = (lp >> 0) & 0xFFFF;
 			int yPos = (lp >> 16) & 0xFFFF;
 			//DEBUG_LINEOUT("Middle mouse button down!");
-			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_MIDDLE_BUTTON, xPos, yPos, (int)(wp));
+			m_pSenseMouse->UpdateMouseState((windowMassage.message == WM_MBUTTONUP) ? SENSE_MOUSE_MIDDLE_BUTTON_UP : SENSE_MOUSE_MIDDLE_BUTTON_DOWN, xPos, yPos, (int)(wp));
 		} break;
 
 		case WM_MBUTTONDBLCLK: {
@@ -697,7 +705,7 @@ bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
 			fHandled = true;
 			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), true);
 			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
-
+			/*
 			// DEBUG: Bypass for connect to cloud
 			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
 				if (m_pCloudController != nullptr) {
@@ -739,6 +747,7 @@ bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
 			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_DOWN) {
 				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::BOTTOM);
 			}
+			*/
 		} break;
 	}
 	
@@ -752,6 +761,7 @@ RESULT Windows64App::Shutdown() {
 	wglMakeCurrent(m_hDC, nullptr);
 
 	if (m_pCloudController != nullptr) {
+		m_pCloudController->Stop();
 		delete m_pCloudController;
 		m_pCloudController = nullptr;
 	}

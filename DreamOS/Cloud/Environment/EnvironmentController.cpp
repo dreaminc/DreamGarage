@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "Cloud/CloudController.h"
 #include "EnvironmentController.h"
 #include "Cloud/User/User.h"
@@ -32,7 +33,7 @@ EnvironmentController::~EnvironmentController() {
 
 RESULT EnvironmentController::Initialize() {
 	RESULT r = R_PASS;
-
+	
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->Initialize());
 	CR(m_pPeerConnectionController->RegisterPeerConnectionControllerObserver(this));
@@ -488,9 +489,13 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		strMethod = strTokens[1];
 
 		if (strType == "request") {
+			LOG(INFO) << "HandleSocketMessage REQUEST " << strMethod << "," << jsonPayload;
+			
 			m_pPeerConnectionController->HandleEnvironmentSocketRequest(strMethod, jsonPayload);
 		}
 		else if (strType == "response") {
+			LOG(INFO) << "HandleSocketMessage RESPONSE " << strMethod << "," << jsonPayload;
+			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
 	}

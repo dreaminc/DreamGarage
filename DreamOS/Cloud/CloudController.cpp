@@ -1,4 +1,5 @@
 #include "CloudController.h"
+#include "Logger/Logger.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
@@ -9,6 +10,14 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include <chrono>
+#include <thread>
+
+#if (defined(_WIN32) || defined(_WIN64))
+#include "Sandbox/Windows/Win32Helper.h"
+#else
+#endif
+
 CloudController::CloudController() :
 	m_pCloudImp(nullptr),
 	m_pUserController(nullptr),
@@ -16,17 +25,80 @@ CloudController::CloudController() :
 	m_fnHandleDataChannelStringMessageCallback(nullptr),
 	m_fnHandleDataChannelMessageCallback(nullptr)
 {
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::CloudController, this);
+
 	// empty
 }
 
 CloudController::~CloudController() {
-
 	// TODO: Maybe this should not be a singleton
 	HTTPController *pHTTPController = HTTPController::instance();
 
 	if (pHTTPController != nullptr) {
 		pHTTPController->Stop();
 	}
+}
+
+RESULT CloudController::ProcessingThread() {
+	RESULT r = R_PASS;
+
+	LOG(INFO) << "ProcessingThread start";
+
+	m_fRunning = true;
+
+	CR(Initialize());
+
+	//std::this_thread::sleep_for(std::chrono::seconds(3));
+
+	CR(LoginUser());
+
+	// Message pump goes here
+#if (defined(_WIN32) || defined(_WIN64))
+	Win32Helper::ThreadBlockingMessageLoop();
+#else
+#pragma message ("not implemented message loop")
+	while (m_fRunning) {
+
+	}
+#endif
+
+	LOG(INFO) << "ProcessingThread end";
+
+Error:
+	return r;
+}
+
+RESULT CloudController::Start() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CloudController::Start");
+
+	m_thread = std::thread(&CloudController::ProcessingThread, this);
+
+//Error:
+	return r;
+}
+
+RESULT CloudController::Stop() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CloudController::Stop");
+
+	m_fRunning = false;
+
+#if (defined(_WIN32) || defined(_WIN64))
+	Win32Helper::PostQuitMessage(m_thread);
+#else
+#pragma message ("not implemented post quit to thread")
+	while (m_fRunning) {
+
+	}
+#endif
+
+	m_thread.join();
+
+//Error:
+	return r;
 }
 
 RESULT CloudController::RegisterDataChannelStringMessageCallback(HandleDataChannelStringMessageCallback fnHandleDataChannelStringMessageCallback) {
@@ -228,6 +300,11 @@ Error:
 	return r;
 }
 
+void CloudController::Login()
+{
+	LoginUser();
+}
+
 RESULT CloudController::LoginUser() {
 	RESULT r = R_PASS;
 
@@ -408,5 +485,20 @@ RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handS
 	}
 
 Error:
+	return r;
+}
+
+RESULT CloudController::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("login") == 0) {
+		//
+	}
+
+	if (event->GetArg(1).compare("msg") == 0) {
+		std::string st(event->GetArg(2));
+		SendDataChannelStringMessage(NULL, st);
+	}
+
 	return r;
 }

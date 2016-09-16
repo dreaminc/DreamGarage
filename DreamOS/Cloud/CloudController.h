@@ -5,6 +5,8 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
 
+#include "DreamConsole/DreamConsole.h"
+
 // DREAM OS
 // DreamOS/Cloud/CloudController.h
 // The base DreamCloud controller 
@@ -14,6 +16,7 @@
 #include "User/UserFactory.h"
 #include "Environment/EnvironmentController.h"
 #include <memory>
+#include <thread>
 
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
@@ -28,7 +31,8 @@ typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 
-class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver {
+class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver,
+						public Subscriber<CmdPromptEvent> {
 protected:
 	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
 	typedef std::function<RESULT(uint8_t *, int)> HandleDataChannelMessageCallback;
@@ -51,12 +55,17 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
+
+	RESULT Start();
+	RESULT Stop();
+
 	RESULT Initialize();
 	RESULT InitializeUser(version ver = 1.0f);
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT LoginUser();
 	RESULT Update();
+	void Login();
 
 	RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
 	std::string GetSDPOfferString();
@@ -82,6 +91,9 @@ public:
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
+	// CmdPromptEventSubscriber
+	virtual RESULT Notify(CmdPromptEvent *event) override;
+
 private:
 	//UID m_uid;
 	std::unique_ptr<CloudImp> m_pCloudImp;
@@ -96,6 +108,10 @@ private:
 	HandleDataMessageCallback m_fnHandleDataMessageCallback;
 	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
 	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
+
+	std::thread	m_thread;
+	bool m_fRunning;
+	RESULT ProcessingThread();
 };
 
 #endif

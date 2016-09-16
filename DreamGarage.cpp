@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "DreamGarage.h"
 #include <string>
 
@@ -33,6 +34,8 @@ RESULT DreamGarage::LoadScene() {
 	// IO
 	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
+
 	// Add Peer User Object
 	m_pPeerUser = AddUser();
 
@@ -44,14 +47,19 @@ RESULT DreamGarage::LoadScene() {
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
 	point ptLight = point(0.0f, 5.0f, 5.0f);
 	point ptLight2 = point(0.0f, 10.0f, 0.0f);
-	vector lightdir = vector(0.7f, -0.5f, -0.6f);
+	vector lightdir = vector(0.0f, -0.5f, 0.0f);
 	lightdir.Normalize();
 
 	// TODO: Special lane for global light
 	light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	
+	//AddLight(LIGHT_POINT, lightIntensity, point(0, 0.0f, 1.0), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+
 	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, ptLight2, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
 	g_pLight->EnableShadows();
 
+	//sphere* p = AddSphere();
+	//p->MoveTo(point(0, 0, 1));
 #ifdef TESTING
 // Test Scene
 // 
@@ -372,7 +380,11 @@ RESULT DreamGarage::Update(void) {
 // Cloud Controller
 RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) {
 	RESULT r = R_PASS;
-
+	LOG(INFO) << "data received";
+	std::string st((char*)pDataMessage);
+	st = "<- " + st;
+	HUD_OUT(st.c_str());
+	/*
 	Message::MessageType switchHeadModelMessage = (Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1);
 
 	if (pDataMessage->GetType() == switchHeadModelMessage) {
@@ -381,6 +393,7 @@ RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) 
 	}
 
 Error:
+*/
 	return r;
 }
 
@@ -432,7 +445,7 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
-
+	/*
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('C') : {
 			if (kbEvent->KeyState != 0) {
@@ -441,7 +454,15 @@ RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 			}
 		}
 	}
-
+	*/
 //Error:
+	return r;
+}
+
+RESULT DreamGarage::Notify(CmdPromptEvent *kbEvent) {
+	RESULT r = R_PASS;
+
+	HUD_OUT("DreamAPP command");
+
 	return r;
 }

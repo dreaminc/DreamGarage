@@ -401,6 +401,16 @@ RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState)
 	return m_pCloudController->SendUpdateHandMessage(userID, handState);
 }
 
+// TimeManager
+RESULT SandboxApp::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pTimeManager->RegisterSubscriber(timeEvent, pTimeSubscriber));
+
+Error:
+	return r;
+}
+
 // IO
 RESULT SandboxApp::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	RESULT r = R_PASS;

@@ -2,8 +2,7 @@
 #include "ProfilerGraph.h"
 
 #include <algorithm>
-
-#include "windows.h"
+#include <locale>
 
 #include "DreamConsole/DreamConsole.h"
 
@@ -18,6 +17,19 @@ DreamConsole::DreamConsole()
 DreamConsole::~DreamConsole()
 {
 
+}
+
+void DreamConsole::Init()
+{
+	if (m_isInit)
+	{
+		return;
+	}
+
+	// Initialize singleton
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamConsole, this);
+
+	m_isInit = true;
 }
 
 bool DreamConsole::IsInForeground()
@@ -63,7 +75,10 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 
 	if (kbEvent->m_pSenseKeyboard)
 	{
-		kbEvent->m_pSenseKeyboard->ForEachKeyPressed([&](SK_SCAN_CODE keyCode) {
+		SK_SCAN_CODE keyCode = kbEvent->KeyCode;
+
+		if (kbEvent->KeyState)
+		{
 			if (!IsInForeground())
 			{
 				if (keyCode == VK_TAB)
@@ -87,21 +102,37 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 					} break;
 					case VK_RETURN: {
 						HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+						CMDPROMPT_EXECUTE(m_cmdText);
 						m_cmdText.erase();
 					} break;
 					case VK_ESCAPE: {
 						m_cmdText.erase();
 					} break;
+					case VK_LEFT:
+					case VK_RIGHT:
+					case VK_UP:
+					case VK_DOWN: {
+
+					} break;
 					default: {
-						m_cmdText.append(std::string("") + static_cast<char>(keyCode));
+						std::locale	loc;
+						m_cmdText.append(std::string("") + std::tolower(static_cast<char>(keyCode), loc));
 					} break;
 					}
 				}
 			}
-		});
+		}
 	}
 
 	//Error:
+	return r;
+}
+
+RESULT DreamConsole::Notify(CmdPromptEvent *kbEvent) {
+	RESULT r = R_PASS;
+
+	HUD_OUT("DreamConsole command");
+
 	return r;
 }
 

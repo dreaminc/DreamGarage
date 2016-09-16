@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "PeerConnectionController.h"
 #include "PeerConnection.h"
 
@@ -46,8 +47,8 @@ RESULT PeerConnectionController::Initialize() {
 	RESULT r = R_PASS;
 
 	m_pWebRTCImp = std::make_unique<WebRTCImp>(GetCloudController());
-	CN(m_pWebRTCImp);
 
+	CN(m_pWebRTCImp);
 	CR(m_pWebRTCImp->Initialize());
 	CR(m_pWebRTCImp->RegisterObserver(this));
 

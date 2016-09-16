@@ -74,7 +74,7 @@ public:
 	~OGLDebugConsole();
 
 	void Init();
-	void Render(point& topLeft, point& bottomRight);
+	void Render(point& topLeft, point& bottomRight, float fontSize = 4.0f);
 	void Destroy();
 
 private:
@@ -91,7 +91,9 @@ public:
 	~OGLDreamConsole();
 
 	void Init();
-	void Render();
+	
+	// A mono view is an extended view in case the scene is not stereoscopicly rendered for an HMD.
+	void Render(bool isMonoView = false);
 	void Destroy();
 
 private:
