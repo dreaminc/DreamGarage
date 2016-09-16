@@ -12,8 +12,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	pCloudController = new CloudController();
 	CN(pCloudController);
 
-	// Initialize the User Object
-	CR(pCloudController->Initialize());
+	CR(pCloudController->Start());
 
 	// TODO: Create a collection of cloud implementations
 	// or the various ones that can be used

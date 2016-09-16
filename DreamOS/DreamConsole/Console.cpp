@@ -75,7 +75,10 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 
 	if (kbEvent->m_pSenseKeyboard)
 	{
-		kbEvent->m_pSenseKeyboard->ForEachKeyPressed([&](SK_SCAN_CODE keyCode) {
+		SK_SCAN_CODE keyCode = kbEvent->KeyCode;
+
+		if (kbEvent->KeyState)
+		{
 			if (!IsInForeground())
 			{
 				if (keyCode == VK_TAB)
@@ -118,7 +121,7 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 					}
 				}
 			}
-		});
+		}
 	}
 
 	//Error:

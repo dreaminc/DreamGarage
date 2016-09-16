@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "Project/Windows/DreamOS/resource.h"
 #include "Windows64App.h"
 #include "Sandbox/PathManagerFactory.h"
@@ -202,10 +203,7 @@ Error:
 RESULT Windows64App::InitializeCloudController() {
 	RESULT r = R_PASS;
 
-	// Set up the Cloud Controller
-	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_CEF, (void*)(m_hInstance));
 	m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_NULL, (void*)(m_hInstance));
-	//m_pCloudController = CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_WEBRTC, nullptr);
 
 	CNM(m_pCloudController, "Cloud Controller failed to initialize");
 	
@@ -753,6 +751,7 @@ RESULT Windows64App::Shutdown() {
 	wglMakeCurrent(m_hDC, nullptr);
 
 	if (m_pCloudController != nullptr) {
+		m_pCloudController->Stop();
 		delete m_pCloudController;
 		m_pCloudController = nullptr;
 	}

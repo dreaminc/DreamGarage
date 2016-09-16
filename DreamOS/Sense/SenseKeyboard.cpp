@@ -36,7 +36,7 @@ RESULT SenseKeyboard::SetKeyState(SK_SCAN_CODE KeyCode, uint8_t KeyState) {
 		SenseKeyboardEvent kbEvent(KeyCode, KeyState, this);
 		CR(NotifySubscribers(KeyCode, &kbEvent));
 
-		SenseKeyboardEvent kbEventAll(SK_ALL, 0, this);
+		SenseKeyboardEvent kbEventAll(KeyCode, KeyState, this);
 		CR(NotifySubscribers(SK_ALL, &kbEventAll));
 	}
 
