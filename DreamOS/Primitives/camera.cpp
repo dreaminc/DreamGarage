@@ -194,7 +194,7 @@ camera camera::UpdateCameraPosition() {
 	m_qRotation.GetEulerAngles(&x, &y, &z);
 
 	vector lookMove = GetLookVector();
-	lookMove.y() = 0.0f;
+	//lookMove.y() = 0.0f;
 	lookMove.Normalize();
 
 	vector rightMove = GetRightVector();

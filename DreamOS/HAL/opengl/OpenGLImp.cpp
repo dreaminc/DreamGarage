@@ -1,4 +1,6 @@
 #include "OpenGLImp.h"
+#include "Logger/Logger.h"
+
 #include "OGLObj.h"
 #include "OGLFramebuffer.h"
 
@@ -360,17 +362,9 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 	float MouseMoveFactor = 0.1f;
 
 	switch (mEvent->EventType) {
-		case SENSE_MOUSE_MOVE: {
+		case SENSE_MOUSE_LEFT_DRAG_MOVE: {
 			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx), 
 				static_cast<camera_precision>(mEvent->dy)));
-		} break;
-
-		case SENSE_MOUSE_LEFT_BUTTON: {
-			// TODO: Do something?
-		} break;
-
-		case SENSE_MOUSE_RIGHT_BUTTON: {
-			// TODO: Do something?
 		} break;
 	}
 
