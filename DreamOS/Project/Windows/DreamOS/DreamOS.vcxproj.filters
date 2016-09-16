@@ -413,6 +413,12 @@
     <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp">
       <Filter>Sandbox\Windows</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\camera.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseMouse.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

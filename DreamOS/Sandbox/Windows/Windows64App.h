@@ -102,7 +102,7 @@ private:
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
-	TimeManager	*m_pTimeManager;
+	//TimeManager	*m_pTimeManager;
 	DreamConsole	m_profiler;
 
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;

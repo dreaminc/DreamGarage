@@ -118,6 +118,7 @@ public:
 
 	// IO
 public:
+	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);
 	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 
@@ -146,6 +147,8 @@ protected:
 
 	SenseKeyboard *m_pSenseKeyboard;
 	SenseMouse *m_pSenseMouse;
+
+	TimeManager* m_pTimeManager;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

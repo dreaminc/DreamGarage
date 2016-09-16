@@ -48,12 +48,40 @@ RESULT Win64Mouse::UpdateMouseState(SenseMouseEventType eventType, int newX, int
 RESULT Win64Mouse::SetMousePosition(int x, int y) {
 	RESULT r = R_PASS;
 
+	// need to convert to screen coordinates
+
 	CN(m_pWin64AppParent);
 	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
 	CN(hwnd);
 
-	//CR(SenseMouse::SetMousePosition(x, y));
-	CB(SetCursorPos(x, y));
+	RECT rect{ 0 };
+	GetClientRect(hwnd, &rect);
+	ClientToScreen(hwnd, reinterpret_cast<LPPOINT>(&rect.left));
+
+	CB(SetCursorPos(rect.left + x, rect.top + y));
+
+Error:
+	return r;
+}
+
+RESULT Win64Mouse::GetMousePosition(int& x, int& y) {
+	RESULT r = R_PASS;
+
+	// need to convert to window coordinates
+
+	CN(m_pWin64AppParent);
+	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
+	CN(hwnd);
+
+	RECT rect{ 0 };
+	GetClientRect(hwnd, &rect);
+	ClientToScreen(hwnd, reinterpret_cast<LPPOINT>(&rect.left));
+
+	POINT pos;
+	CB(GetCursorPos(&pos));
+
+	x = pos.x - rect.left;
+	y = pos.y - rect.top;
 
 Error:
 	return r;
@@ -66,7 +94,7 @@ RESULT Win64Mouse::CenterMousePosition() {
 
 	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
 	CN(hwnd);
-
+/*
 	RECT wndRect;
 	CB(GetWindowRect(hwnd, &wndRect));
 	MapWindowPoints(HWND_DESKTOP, GetParent(hwnd), (LPPOINT)&wndRect, 2);
@@ -74,8 +102,50 @@ RESULT Win64Mouse::CenterMousePosition() {
 	int centerX = static_cast<int>(wndRect.left + ((wndRect.right - wndRect.left) / 2.0f));
 	int centerY = static_cast<int>(wndRect.top + ((wndRect.bottom - wndRect.top) / 2.0f));
 	SenseMouse::SetMousePosition(centerX, centerY);
+*/
 
-	CR(SetMousePosition(centerX, centerY));
+	RECT rect{ 0 };
+	CB(GetClientRect(hwnd, &rect));
+
+	POINT centerScreen = { (rect.left + rect.right) / 2, (rect.top + rect.bottom) / 2 };
+
+	CR(SetMousePosition(centerScreen.x, centerScreen.y));
+
+Error:
+	return r;
+}
+
+RESULT Win64Mouse::GetCenterPosition(int& x, int& y) {
+	RESULT r = R_PASS;
+
+	CN(m_pWin64AppParent);
+
+	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
+	CN(hwnd);
+	/*
+	RECT wndRect;
+	CB(GetWindowRect(hwnd, &wndRect));
+	MapWindowPoints(HWND_DESKTOP, GetParent(hwnd), (LPPOINT)&wndRect, 2);
+
+	int centerX = static_cast<int>(wndRect.left + ((wndRect.right - wndRect.left) / 2.0f));
+	int centerY = static_cast<int>(wndRect.top + ((wndRect.bottom - wndRect.top) / 2.0f));
+	SenseMouse::SetMousePosition(centerX, centerY);
+	*/
+
+	RECT rect{ 0 };
+	CB(GetClientRect(hwnd, &rect));
+
+	x = (rect.left + rect.right) / 2;
+	y = (rect.top + rect.bottom) / 2;
+
+Error:
+	return r;
+}
+
+RESULT Win64Mouse::ShowCursor(bool show) {
+	RESULT r = R_PASS;
+
+	CB(::ShowCursor(show ? TRUE : FALSE));
 
 Error:
 	return r;

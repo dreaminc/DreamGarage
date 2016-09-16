@@ -699,6 +699,7 @@
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\Logger\Logger.cpp" />
+    <ClCompile Include="..\..\..\Primitives\camera.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
@@ -734,6 +735,7 @@
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
