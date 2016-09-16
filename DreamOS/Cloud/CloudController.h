@@ -16,6 +16,7 @@
 #include "User/UserFactory.h"
 #include "Environment/EnvironmentController.h"
 #include <memory>
+#include <thread>
 
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
@@ -54,12 +55,17 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
+
+	RESULT Start();
+	RESULT Stop();
+
 	RESULT Initialize();
 	RESULT InitializeUser(version ver = 1.0f);
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT LoginUser();
 	RESULT Update();
+	void Login();
 
 	RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
 	std::string GetSDPOfferString();
@@ -102,6 +108,10 @@ private:
 	HandleDataMessageCallback m_fnHandleDataMessageCallback;
 	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
 	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
+
+	std::thread	m_thread;
+	bool m_fRunning;
+	RESULT ProcessingThread();
 };
 
 #endif

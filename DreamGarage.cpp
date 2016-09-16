@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "DreamGarage.h"
 #include <string>
 
@@ -352,7 +353,11 @@ RESULT DreamGarage::Update(void) {
 // Cloud Controller
 RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) {
 	RESULT r = R_PASS;
-
+	LOG(INFO) << "data received";
+	std::string st((char*)pDataMessage);
+	st = "<- " + st;
+	HUD_OUT(st.c_str());
+	/*
 	Message::MessageType switchHeadModelMessage = (Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1);
 
 	if (pDataMessage->GetType() == switchHeadModelMessage) {
@@ -361,6 +366,7 @@ RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) 
 	}
 
 Error:
+*/
 	return r;
 }
 

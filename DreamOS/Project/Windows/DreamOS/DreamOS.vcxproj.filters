@@ -410,6 +410,9 @@
     <ClCompile Include="..\..\..\Logger\Logger.cpp">
       <Filter>Logger</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2029,6 +2032,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Logger\Logger.h">
       <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
+      <Filter>Sandbox\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
