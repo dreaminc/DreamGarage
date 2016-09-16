@@ -212,10 +212,16 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalD
 	CR(pFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
 	CR(pFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
 
+
 	CR(pFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-	CR(pFramebuffer->SetOGLDrawBuffers(1));
-
+	//CR(pFramebuffer->SetOGLDrawBuffers(1));
+/*
+	glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_TRUE);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+*/
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 

@@ -69,7 +69,7 @@ public:
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 
-		glDisable(GL_BLEND);
+		//glDisable(GL_BLEND);
 
 	Error:
 		return r;

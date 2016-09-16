@@ -2,7 +2,7 @@
 #include <string>
 
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
-//#define TESTING
+#define TESTING
 
 light *g_pLight = nullptr;
 
@@ -74,22 +74,26 @@ RESULT DreamGarage::LoadScene() {
 	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
 
-	texture *pColorTextureTest = MakeTexture(L"asymmetrical.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//texture *pColorTextureTest = MakeTexture(L"asymmetrical.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 //*/
 
 	// Add Flat Objects
 ///*
 	m_pContext = AddFlatContext();
+	std::shared_ptr<quad> background = m_pContext->AddQuad(1.5, 1.5, point(0.0f, 0.0f, 0.5f));
+	background->SetColorTexture(pColorTexture);
 	std::shared_ptr<text> pText = m_pContext->AddText(L"Arial.fnt", "Hello World", 1.0);
-	pText->MoveTo(0.5f, 0.5f, 0.5f);
+	pText->MoveTo(0.5f, 0.5f, 0.0f);
 	std::shared_ptr<text> pText2 = m_pContext->AddText(L"Arial.fnt", "Sababa", 1.0);
 	RenderToTexture(m_pContext); 
 
 	m_pQuad = AddQuad(10.0f, 10.0f);
 	m_pQuad->MoveTo(0.0f, 2.0f, 0.0f);
+	texture* test = m_pContext->GetFramebuffer()->GetTexture();
 	m_pQuad->SetColorTexture(m_pContext->GetFramebuffer()->GetTexture());
+	//m_pQuad->SetColor(color(0.0f, 1.0f, 0.0f, 0.5f));
 //	m_pQuad->SetColorTexture(pColorTextureTest);
-	m_pQuad->RotateXByDeg(90.0f);
+	m_pQuad->RotateXByDeg(45.0f);
 /*
 	FlatContext* pContext2 = AddFlatContext();
 	std::shared_ptr<text> pText3 = pContext2->AddText(L"Arial.fnt", "a new context dawns", 1.5f);

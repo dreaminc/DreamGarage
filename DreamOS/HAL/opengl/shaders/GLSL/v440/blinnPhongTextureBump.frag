@@ -127,6 +127,7 @@ void main(void) {
 		vec4 ambientColor = g_vec4AmbientLightLevel;
 		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 	}
+	out_vec4Color = out_vec4Color * 0.01f + vec4(1.0f, 0.0f, 1.0f, 0.5f);
 	
 	/*
 	vec3 directionEye = DataIn.TangentBitangentNormalMatrix * (-normalize(DataIn.vertViewSpace.xyz));
