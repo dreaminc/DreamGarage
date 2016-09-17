@@ -39,6 +39,8 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 {
 	RESULT r = R_PASS;
 
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::OpenGL, this);
+
 	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
 	CRM(PrepareScene(), "Failed to prepare GL Scene");
 
@@ -801,6 +803,9 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	if (m_drawWireframe)
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
 	if (m_pHMD == nullptr)
 		CheckFramebufferStatus(GL_FRAMEBUFFER);
 
@@ -1509,5 +1514,15 @@ RESULT OpenGLImp::wglSwapIntervalEXT(int interval) {
 	CRM(CheckGLError(), "wglSwapIntervalEXT failed");
 
 Error:
+	return r;
+}
+
+RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("wire") == 0) {
+		m_drawWireframe = !m_drawWireframe;
+	}
+
 	return r;
 }

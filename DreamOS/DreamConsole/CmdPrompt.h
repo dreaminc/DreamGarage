@@ -39,7 +39,8 @@ public:
 	enum class method {
 		DreamApp,
 		DreamConsole,
-		CloudController
+		CloudController,
+		OpenGL
 	};
 
 private:
@@ -47,6 +48,7 @@ private:
 		{ method::DreamApp, "app"},
 		{ method::DreamConsole, "console" },
 		{ method::CloudController, "cloud" },
+		{ method::OpenGL, "ogl" },
 	};
 
 public:
