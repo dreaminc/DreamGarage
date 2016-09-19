@@ -374,12 +374,12 @@ Error:
 	return r;
 }
 
-// TODO: This convenience function should be put in a model factory
-
 //composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 	
+	LOG(INFO) << "Loading model " << wstrOBJFilename << " pos:" << LOG_xyz(ptPosition) << " scale:" << scale << " rotation:" << LOG_xyz(vEulerRotation) << " ...";
+
 	composite* pComposite = new composite(this);
 
 	// Texture caching
@@ -415,49 +415,54 @@ composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& ws
 
 		pComposite->AddChild(pModel);
 
-		if (pTexture != nullptr) {
-			pModel->SetColorTexture(pTexture);
-		}
-		else {
-			std::string tex = m.first.map_Kd;
-			if (tex.compare("") != 0) {
-				std::wstring wstr(tex.begin(), tex.end());
-				wstr = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.rfind('\\')) + L"\\" + wstr;
+		auto GetTexture = [&](const std::string& file) -> texture* {
+			std::wstring wstr(file.begin(), file.end());
+			wstr = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.find_last_of(L"/\\")) + L"\\" + wstr;
 
-				if (textureMap.find(wstr) == textureMap.end()) {
-					//OutputDebugStringW((std::wstring(L"DOS::load tex=") + wstr).c_str());
-					texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
-					CN(pTempTexture);
+			if (textureMap.find(wstr) == textureMap.end()) {
+				texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-					textureMap[wstr] = pTempTexture;
-
-					if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0) {
-						//OutputDebugStringW((std::wstring(L"DOS::tex=") + wstr + L"," + std::to_wstring(pTempTexture->GetWidth()) + L"," + std::to_wstring(pTempTexture->GetHeight())).c_str());
-						pModel->SetColorTexture(pTempTexture);
-					}
+				if (!pTempTexture) {
+					LOG(ERROR) << "Failed to load model texture : " << wstr;
+					return nullptr;
 				}
-				else {
-					pModel->SetColorTexture(textureMap[wstr]);
+
+				textureMap[wstr] = pTempTexture;
+
+				if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0) {
+					return pTempTexture;
 				}
 			}
 			else {
-				pModel->SetColor(color(m.first.Kd.r(), m.first.Kd.g(), m.first.Kd.b(), m.first.Kd.a()));
+				return textureMap[wstr];
 			}
-		}
+
+			return nullptr;
+		};
+
+		if (m.first.map_Ka.compare("") != 0)
+			pModel->SetMaterialTexture(DimObj::MaterialTexture::Ambient, GetTexture(m.first.map_Ka));
+
+		if (m.first.map_Kd.compare("") != 0)
+			pModel->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, GetTexture(m.first.map_Kd));
+
+		if (m.first.map_Ks.compare("") != 0)
+			pModel->SetMaterialTexture(DimObj::MaterialTexture::Specular, GetTexture(m.first.map_Ks));
+
+		pModel->GetMaterial()->Set(m.first.Ka, m.first.Kd, m.first.Ks);
+		pModel->SetColor(color(COLOR_WHITE));
 
 		pModel->Scale(scale);
 		pModel->MoveTo(ptPosition);
-		//pModel->RotateYBy(rotateY);
-		
-		//pModel->RotateVerticesByEulerVector(vEulerRotation);
-		//pModel->UpdateOGLBuffers();
-		//pModel->UpdateBuffers();
-		//pOGLObj->UpdateOGLBuffers();
+
+		LOG(INFO) << "Loaded sub-model:" << m.first.name << " vertices:" << pModel->VertexDataSize() << " indices:" << pModel->IndexDataSize();
 
 		if (pSceneGraph != nullptr) {
 			pSceneGraph->PushObject(pModel.get());
 		}
 	}
+
+	LOG(INFO) << "Loading model " << wstrOBJFilename << " - OK";
 
 Error:
 	return pComposite;
