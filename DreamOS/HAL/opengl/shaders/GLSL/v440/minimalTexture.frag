@@ -19,7 +19,5 @@ vec4 g_ambient = vec4(0.1);
 
 void main(void) {  
 	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 1.0f);
-	out_vec4Color = DataIn.color * textureColor;// + g_ambient;
-	//out_vec4Color = vec4(1.0f, 0.0f, 1.0f, 0.5f);
-	//out_vec4Color = out_vec4Color * vec4(1.0, 1.0, 1.0, 0.5);
+	out_vec4Color = DataIn.color * textureColor + g_ambient;
 }

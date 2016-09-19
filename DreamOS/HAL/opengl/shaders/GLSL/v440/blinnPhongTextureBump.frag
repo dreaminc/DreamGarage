@@ -127,7 +127,15 @@ void main(void) {
 		vec4 ambientColor = g_vec4AmbientLightLevel;
 		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 	}
-	out_vec4Color = out_vec4Color * 0.01f + vec4(1.0f, 0.0f, 1.0f, 0.5f);
+
+	// Fakes blending by moving clear fragments behind the skybox
+	// Remove once blending is fully supported
+	if (out_vec4Color.a == 0.0f) {
+		gl_FragDepth = 1.0f;
+	} 
+	else {
+		gl_FragDepth = gl_FragCoord.z;
+	}
 	
 	/*
 	vec3 directionEye = DataIn.TangentBitangentNormalMatrix * (-normalize(DataIn.vertViewSpace.xyz));

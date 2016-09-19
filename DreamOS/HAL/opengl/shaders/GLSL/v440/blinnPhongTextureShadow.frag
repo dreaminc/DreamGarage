@@ -134,4 +134,13 @@ void main(void) {
 	vec4 ambientColor = g_vec4AmbientLightLevel;
 	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
 	//out_vec4Color = textureColor;
+
+	// Fakes blending by moving clear fragments behind the skybox
+	// Remove once blending is fully supported
+	if (out_vec4Color.a < 0.1f) {
+		gl_FragDepth = 1.0f;
+	} 
+	else {
+		gl_FragDepth = gl_FragCoord.z;
+	}
 }

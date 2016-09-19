@@ -3,7 +3,7 @@
 #include <string>
 
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
-#define TESTING
+//#define TESTING
 
 light *g_pLight = nullptr;
 
@@ -99,12 +99,10 @@ RESULT DreamGarage::LoadScene() {
 	m_pQuad->MoveTo(0.0f, 2.0f, 0.0f);
 	texture* test = m_pContext->GetFramebuffer()->GetTexture();
 	m_pQuad->SetColorTexture(m_pContext->GetFramebuffer()->GetTexture());
-	//m_pQuad->SetColor(color(0.0f, 1.0f, 0.0f, 0.5f));
-//	m_pQuad->SetColorTexture(pColorTextureTest);
 	m_pQuad->RotateXByDeg(45.0f);
-/*
+///*
 	FlatContext* pContext2 = AddFlatContext();
-	std::shared_ptr<text> pText3 = pContext2->AddText(L"Arial.fnt", "a new context dawns", 1.5f);
+	std::shared_ptr<text> pText3 = pContext2->AddText(L"Arial.fnt", "second context", 1.5f);
 
 	quad* pQuad2 = AddQuad(5.0f, 5.0f);
 	pQuad2->MoveTo(0.0f, 3.0f, 0.0f);

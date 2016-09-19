@@ -203,20 +203,12 @@ RESULT OpenGLImp::PrepareScene() {
 
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	//m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
 	
-	/*
-	m_pOGLProgramCapture = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
-	//m_pOGLProgramCapture = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	CN(m_pOGLProgramCapture);
-	m_pOGLProgramCapture->InitializeRenderToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
-	//m_pOGLProgramCapture->InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 3);
-	*/
-
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
 
@@ -809,12 +801,6 @@ RESULT OpenGLImp::RenderToTexture(FlatContext* pContext) {
 	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, EYE_MONO));
 
 	CR(m_pOGLFlatProgram->RenderObject(pContext));
-/*
-	CR(pFramebuffer->MakeOGLTexture());
-	CR(pFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-	CR(pFramebuffer->InitializeRenderBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
-	CR(pFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
-*/
 	CR(m_pOGLFlatProgram->UnbindFramebuffer());
 
 
@@ -869,8 +855,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	// 3D Object / skybox
 	pSceneGraph->Reset();
 	CR(m_pOGLRenderProgram->RenderSceneGraph(pSceneGraph));
-	//CR(RenderSkybox(pObjectStore, eye));
-	glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+	CR(RenderSkybox(pObjectStore, eye));
 
 //TODO either remove FlatSceneGraph or create a seperate AddFlatContext for overlays
 /*
@@ -1519,8 +1504,6 @@ RESULT OpenGLImp::TexImage2D(GLenum target, GLint level, GLint internalformat, G
 	RESULT r = R_PASS;
 
 	//m_OpenGLExtensions.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
-	//std::vector<GLubyte> emptyData(width * height * 4, 0);
-	//glTexImage2D(target, level, internalformat, width, height, border, format, type, &emptyData[0]);
 	glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	CRM(CheckGLError(), "glTexImage2D failed");
 
