@@ -8,12 +8,10 @@ import os, shutil, sys
 dir = os.path.dirname(__file__)
 
 # src_dir is the root for Dream
-src_dir = "../Project/Windows/DreamOS/x64/Production"
-#src_dir = os.path.join(dir, src_dir)
+src_dir = sys.argv[1] 
 
 # dest_dir is the target location of Production build
-dest_dir = "../Project/Windows/Production"
-#dest_dir = os.path.join(dir, dest_dir)
+dest_dir = sys.argv[2]
 
 #if os.path.isdir(dest_dir):
 #   print(dest_dir + ' exists.')
