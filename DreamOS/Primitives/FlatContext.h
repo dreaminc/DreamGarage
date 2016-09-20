@@ -12,8 +12,8 @@ public:
 	std::shared_ptr<quad> MakeQuad(double width, double height, point origin);
 	std::shared_ptr<quad> AddQuad(double width, double height, point origin);
 
-	std::shared_ptr<text> MakeText(const std::wstring& fontName, const std::string& content, double size);
-	std::shared_ptr<text> AddText(const std::wstring& fontName, const std::string& content, double size);
+	std::shared_ptr<text> MakeText(Font::TYPE type, const std::string& content, double size);
+	std::shared_ptr<text> AddText(Font::TYPE type, const std::string& content, double size);
 };
 
 #endif	// ! FLAT_CONTEXT_H_

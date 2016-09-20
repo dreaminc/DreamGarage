@@ -202,11 +202,11 @@ volume* SandboxApp::AddVolume(double side) {
 	return AddVolume(side, side, side);
 }
 
-text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard)
+text* SandboxApp::AddText(Font::TYPE type, const std::string & content, double size, bool isBillboard)
 {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(fontName, content, size, isBillboard);
+	text *pText = m_pHALImp->MakeText(type, content, size, isBillboard);
 	CN(pText);
 
 	CR(AddObject(pText));

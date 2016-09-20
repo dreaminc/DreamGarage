@@ -25,6 +25,7 @@
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
+#include "Primitives/font.h"
 #include "Primitives/skybox.h"
 #include "Primitives/model.h"
 #include "Primitives/user.h"
@@ -58,7 +59,7 @@ public:
 	virtual volume* MakeVolume(double width, double length, double height) = 0;
 
 	virtual volume* MakeVolume(double side) = 0;
-	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false) = 0;
+	virtual text* MakeText(Font::TYPE type, const std::string& content, double size = 1.0f, bool isBillboard = false) = 0;
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) = 0;
 	virtual skybox *MakeSkybox() = 0;
@@ -83,6 +84,11 @@ public:
 protected:
 	stereocamera *m_pCamera;
 	HMD *m_pHMD;
+
+	std::map<Font::TYPE, std::shared_ptr<Font>> m_pFontStore = std::map<Font::TYPE, std::shared_ptr<Font>>();
+	std::map<Font::TYPE, const std::wstring> fontDictionary {
+		{ Font::TYPE::Arial, L"Arial.fnt" }
+	};
 
 private:
 	UID m_uid;

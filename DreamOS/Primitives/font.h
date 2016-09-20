@@ -15,6 +15,11 @@
 class Font {
 public:
 
+	enum class TYPE {
+		Arial
+	};
+
+public:
 	struct CharacterGlyph {
 		uint8_t		ascii_id;
 		uint32_t	x;

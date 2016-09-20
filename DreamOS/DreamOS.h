@@ -55,7 +55,7 @@ protected:
 	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	sphere *MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 
-	text *AddText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text *AddText(Font::TYPE type, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	
 	volume *MakeVolume(double side);
 	volume *MakeVolume(double width, double length, double height);
