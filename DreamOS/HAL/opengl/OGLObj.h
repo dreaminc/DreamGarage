@@ -192,6 +192,24 @@ public:
 		return pTexture;
 	}
 
+	OGLTexture *GetTextureAmbient() {
+		DimObj *pDimObj = GetDimObj();
+		OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetTextureAmbient());
+		return pTexture;
+	}
+
+	OGLTexture *GetTextureDiffuse() {
+		DimObj *pDimObj = GetDimObj();
+		OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetTextureDiffuse());
+		return pTexture;
+	}
+
+	OGLTexture *GetTextureSpecular() {
+		DimObj *pDimObj = GetDimObj();
+		OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetTextureSpecular());
+		return pTexture;
+	}
+
 protected:
 	GLuint m_hVAO;		// vertex array object
 	GLuint m_hVBO;		// vertex buffer object

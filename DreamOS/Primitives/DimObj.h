@@ -36,6 +36,15 @@ protected:
 	texture *m_pColorTexture;
 	texture *m_pBumpTexture;
 
+	// textures need to go into material once we figure out how we put a sampler2D into a uniform block
+public:
+	enum class MaterialTexture { Ambient, Diffuse, Specular };
+
+private:
+	texture *m_pTextureAmbient = nullptr;
+	texture *m_pTextureDiffuse = nullptr;
+	texture *m_pTextureSpecular = nullptr;
+
 	// Use this flag to signal the appropriate rendering object (such as OGLObj) that it needs to update the buffer
 	// TODO: This should be encapsulated as a dirty pattern
 	bool m_fDirty;
@@ -156,6 +165,28 @@ public:
 		return r;
 	}
 
+	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture) {
+		RESULT r = R_PASS;
+
+		texture* pTargetTexture = nullptr;
+
+		#define SET_TEXTURE(type, texture) case DimObj::MaterialTexture::type: pTargetTexture = texture; break
+
+		switch (type) {
+			SET_TEXTURE(Ambient, m_pTextureAmbient);
+			SET_TEXTURE(Diffuse, m_pTextureDiffuse);
+			SET_TEXTURE(Specular, m_pTextureSpecular);
+		}
+
+		CBM((pTargetTexture == nullptr), "Cannot overwrite color texture");
+
+		pTargetTexture = pTexture;
+		pTargetTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+	Error:
+		return r;
+	}
+
 	RESULT ClearColorTexture() {
 		RESULT r = R_PASS;
 
@@ -193,6 +224,18 @@ public:
 
 	texture *GetBumpTexture() {
 		return m_pBumpTexture;
+	}
+
+	texture *GetTextureAmbient() {
+		return m_pTextureAmbient;
+	}
+
+	texture *GetTextureDiffuse() {
+		return m_pTextureDiffuse;
+	}
+
+	texture *GetTextureSpecular() {
+		return m_pTextureSpecular;
 	}
 
 	RESULT SetRandomColor() {

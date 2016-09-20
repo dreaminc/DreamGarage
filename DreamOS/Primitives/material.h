@@ -8,6 +8,7 @@
 // Base type for material
 
 #include "color.h"
+#include "texture.h"
 
 class material {
 public:
@@ -49,6 +50,12 @@ public:
 
 	~material() {
 		// empty
+	}
+
+	void Set(color colorAmbient, color colorDiffuse, color colorSpecular) {
+		m_colorAmbient = colorAmbient;
+		m_colorDiffuse = colorDiffuse;
+		m_colorSpecular = colorSpecular;
 	}
 
 private:
