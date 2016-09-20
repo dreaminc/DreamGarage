@@ -22,7 +22,7 @@ RESULT user::Initialize() {
 					   nullptr,//pHeadTexture.get(),
 					   point(0.0f, 0.0f, 0.0f),
 					   0.02f,
-					   vector(0.0f, 3.14f, 0.0f));
+					   vector(0.0f, 0.0f, 0.0f));
 
 	m_pHeads.push_back(pHead);
 	//m_pHeadTextures.push_back(pHeadTexture);
