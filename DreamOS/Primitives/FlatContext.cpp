@@ -32,17 +32,17 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<text> FlatContext::MakeText(const std::wstring& fontName, const std::string& content, double size) {
+std::shared_ptr<text> FlatContext::MakeText(const std::wstring& fontName, const std::string& content, double size, bool fDistanceMap) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<text> pText(m_pHALImp->MakeText(fontName, content, size));
+	std::shared_ptr<text> pText(m_pHALImp->MakeText(fontName, content, size, fDistanceMap));
 	return pText;
 }
 
-std::shared_ptr<text> FlatContext::AddText(const std::wstring& fontName, const std::string& content, double size) {
+std::shared_ptr<text> FlatContext::AddText(const std::wstring& fontName, const std::string& content, double size, bool fDistanceMap) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<text> pText = MakeText(fontName, content, size);
+	std::shared_ptr<text> pText = MakeText(fontName, content, size, fDistanceMap);
 	CR(AddObject(pText));
 
 //Success:

@@ -33,6 +33,24 @@ Error:
 	return r;
 }
 
+RESULT OGLUniform::SetUniformFloat(GLfloat *pVal1fv) {
+	RESULT r = R_PASS;
+
+	GLuint oglProgramID = m_pParentProgram->GetOGLProgramIndex();
+	OpenGLImp *pParentImp = GetParentOGLImplementation();
+
+	GLint location = -1;
+	pParentImp->glGetUniformLocation(oglProgramID, m_strUniformName.c_str(), &location);
+
+	CB((location >= 0));
+	pParentImp->glUniform1fv(location, 1, pVal1fv);
+
+Error:
+	return r;
+
+}
+
+
 RESULT OGLUniform::SetUniformInteger(GLint value) {
 	RESULT r = R_PASS;
 

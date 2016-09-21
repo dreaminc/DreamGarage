@@ -87,12 +87,12 @@ RESULT DreamGarage::LoadScene() {
 
 	// Add Flat Objects
 ///*
-	m_pContext = AddFlatContext();
+	m_pContext = AddFlatContext(8192, 8192);
 	std::shared_ptr<quad> background = m_pContext->AddQuad(1.5, 1.5, point(0.0f, 0.0f, 0.5f));
 	background->SetColorTexture(pColorTexture);
-	std::shared_ptr<text> pText = m_pContext->AddText(L"Arial.fnt", "Hello World", 1.0);
+	std::shared_ptr<text> pText = m_pContext->AddText(L"ArialDistance.fnt", "Hello World", 1.0, true);
 	pText->MoveTo(0.5f, 0.5f, 0.0f);
-	std::shared_ptr<text> pText2 = m_pContext->AddText(L"Arial.fnt", "Sababa", 1.0);
+	std::shared_ptr<text> pText2 = m_pContext->AddText(L"ArialDistance.fnt", "Sababa", 1.0, true);
 	RenderToTexture(m_pContext); 
 
 	m_pQuad = AddQuad(10.0f, 10.0f);
@@ -102,7 +102,7 @@ RESULT DreamGarage::LoadScene() {
 	m_pQuad->RotateXByDeg(45.0f);
 ///*
 	FlatContext* pContext2 = AddFlatContext();
-	std::shared_ptr<text> pText3 = pContext2->AddText(L"Arial.fnt", "second context", 1.5f);
+	std::shared_ptr<text> pText3 = pContext2->AddText(L"ArialDistance.fnt", "second context", 1.5f, true);
 
 	quad* pQuad2 = AddQuad(5.0f, 5.0f);
 	pQuad2->MoveTo(0.0f, 3.0f, 0.0f);

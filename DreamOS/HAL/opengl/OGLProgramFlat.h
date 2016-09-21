@@ -26,6 +26,10 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTexture), std::string("u_hasTexture")));
 
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfDistanceMap), std::string("u_fDistanceMap")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformBuffer), std::string("u_buffer")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformGamma), std::string("u_gamma")));
+
 	Error:
 		return r;
 	}
@@ -51,6 +55,16 @@ public:
 	RESULT SetObjectUniforms(DimObj *pDimObj) {
 		auto matModel = pDimObj->GetModelMatrix();
 		m_pUniformModelMatrix->SetUniform(matModel);
+
+		text *pText = dynamic_cast<text*>(pDimObj);
+		
+		m_pUniformfDistanceMap->SetUniform(pText != nullptr && pText->GetFont()->HasDistanceMap());
+		if (pText != nullptr) {
+			float buffer = pText->GetFont()->GetBuffer();
+			float gamma = pText->GetFont()->GetGamma();
+			m_pUniformBuffer->SetUniformFloat(&buffer);
+			m_pUniformGamma->SetUniformFloat(&gamma);
+		}
 
 		return R_PASS;
 	}
@@ -81,6 +95,11 @@ private:
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
 	OGLUniformBool *m_pUniformHasTexture;
+
+	OGLUniform *m_pUniformBuffer;
+	OGLUniform *m_pUniformGamma;
+	OGLUniformBool *m_pUniformfDistanceMap;
+
 };
 
 #endif // ! OGLPROGRAM_FLAT_H_
