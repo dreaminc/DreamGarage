@@ -17,15 +17,15 @@ RESULT user::Initialize() {
 	///*
 
 	///*
-	std::shared_ptr<texture> pHeadTexture = MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	std::shared_ptr<composite> pHead = AddModel(L"\\Models\\face2\\untitled.obj",
-					   pHeadTexture.get(),
+	//std::shared_ptr<texture> pHeadTexture = MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	std::shared_ptr<composite> pHead = AddModel(L"\\Models\\face4\\untitled.obj",
+					   nullptr,//pHeadTexture.get(),
 					   point(0.0f, 0.0f, 0.0f),
 					   0.02f,
 					   vector(0.0f, 0.0f, 0.0f));
 
 	m_pHeads.push_back(pHead);
-	m_pHeadTextures.push_back(pHeadTexture);
+	//m_pHeadTextures.push_back(pHeadTexture);
 	//*/
 
 	///*

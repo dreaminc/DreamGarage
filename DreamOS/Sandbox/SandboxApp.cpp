@@ -54,6 +54,9 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
 
+	// for auto login, use '-l auto'
+	CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
+
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
@@ -69,6 +72,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
+
+	CommandLineManager::instance()->ForEach([](const std::string& arg) {
+		HUD_OUT(("arg :" + arg).c_str());
+	});
 
 Error:
 	return r;

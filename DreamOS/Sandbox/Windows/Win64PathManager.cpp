@@ -123,8 +123,8 @@ RESULT Win64PathManager::InitializePaths() {
 	char *pszDreamPath = NULL;
 	size_t pszDreamPath_n = 0;
 
-#ifdef _DEBUG
-	// Dream path is derived from environment variable in Debug build
+#ifndef NOT_USE_DREAM_OS_PATH_ENV
+	// Dream path is derived from environment variable in Debug/Release build
 
 	errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
 	if (pszDreamPath != NULL) {
@@ -139,7 +139,7 @@ RESULT Win64PathManager::InitializePaths() {
 		DEBUG_LINEOUT("Please define the %s env to point at the root directory of DreamOS", DREAM_OS_PATH_ENV);
 	}
 #else
-	// Dream path is derived from the running .exe path
+	// Dream path is derived from the running .exe path in Production build
 
 	HMODULE hModule = GetModuleHandleW(NULL);
 	WCHAR path[MAX_PATH];

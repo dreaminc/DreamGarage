@@ -419,6 +419,9 @@
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

@@ -1,4 +1,4 @@
-
+#include "Logger/Logger.h"
 #include "FileLoader.h"
 #include "PathManager.h"
 
@@ -223,7 +223,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			current_material.name = "unknown";
 
 			while (std::getline(mtl_file, mtl_line)) {
-				while (mtl_line[0] == ' ')
+				while (mtl_line[0] == ' ' || mtl_line[0] == '\t')
 				{
 					mtl_line = mtl_line.substr(1);
 				}
@@ -245,10 +245,24 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 					material_map[current_material.name] = std::move(current_material);
 					current_material.name = value;
 				}
-				else if (type.compare("\tmap_Kd") == 0 || type.compare("map_Kd") == 0) {
+				else if (type.compare("map_Ka") == 0) {
+					current_material.map_Ka = value;
+				}
+				else if (type.compare("map_Kd") == 0) {
 					current_material.map_Kd = value;
 				}
-				else if (type.compare("\tKd") == 0 || type.compare("Kd") == 0) {
+				else if (type.compare("map_Ks") == 0) {
+					current_material.map_Ks = value;
+				}
+				else if (type.compare("Ka") == 0) {
+					int num_matches = std::sscanf(value.c_str(), "%f %f %f",
+						&current_material.Ka.r(),
+						&current_material.Ka.g(),
+						&current_material.Ka.b());
+
+					current_material.Ka.a() = 1.0f;
+				}
+				else if (type.compare("Kd") == 0) {
 					int num_matches = std::sscanf(value.c_str(), "%f %f %f",
 						&current_material.Kd.r(),
 						&current_material.Kd.g(),
@@ -256,22 +270,31 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 
 					current_material.Kd.a() = 1.0f;
 				}
+				else if (type.compare("Ks") == 0) {
+					int num_matches = std::sscanf(value.c_str(), "%f %f %f",
+						&current_material.Ks.r(),
+						&current_material.Ks.g(),
+						&current_material.Ks.b());
+
+					current_material.Ks.a() = 1.0f;
+				}
 			}
 
 			material_map[current_material.name] = std::move(current_material);
 		}
 	}
-	/*
+	
 	for (auto i : material_map)
 	{
-		OutputDebugStringA((std::string("DOS::Material ") + i.first + ":" + std::to_string(i.second.Kd.r())
-			+ "," + std::to_string(i.second.Kd.g())
-			+ "," + std::to_string(i.second.Kd.b())
-			+ "," + std::to_string(i.second.Kd.a())
-			+ ";" + i.second.map_Kd).c_str());
-
+		LOG(INFO) << "Loaded material for model " << strOBJFilename.substr(strOBJFilename.find_last_of(L"/\\")+1) << ":" << i.first
+			<< ":Ka=" << LOG_rgba(i.second.Ka)
+			<< ":Kd=" << LOG_rgba(i.second.Kd)
+			<< ":Ks=" << LOG_rgba(i.second.Ks)
+			<< ":map_Ka=" << i.second.map_Ka
+			<< ":map_Kd=" << i.second.map_Kd
+			<< ":map_Ks=" << i.second.map_Ks;
 	}
-	*/
+	
 	out.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
 
 	obj_file.close();
@@ -280,7 +303,10 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 }
 
 bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh_t &out) {
+	return false;
 
+	// obsolete
+#if 0
 	std::vector<point> all_positions;
 	std::vector<point> all_uvs;
 	std::vector<vector> all_normals;
@@ -535,6 +561,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name, multi_mesh
 	obj_file.close();
 
 	return true;
+#endif
 }
 bool FileLoaderHelper::LoadOBJFile(const std::wstring& obj_file_name,
 	std::vector<vertex> &out_vertices) {

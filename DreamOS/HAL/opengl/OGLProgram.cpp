@@ -722,6 +722,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	
 	if (pOGLObj != nullptr) {
 		SetObjectUniforms(pDimObj);
+		SetMaterial(pDimObj->GetMaterial());
 		SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
 	
 		CR(pOGLObj->Render());

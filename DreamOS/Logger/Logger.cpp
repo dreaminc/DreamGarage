@@ -57,6 +57,7 @@ RESULT	Logger::InitializeLogger()
 
 	defaultConf.setToDefault();
 	defaultConf.set(el::Level::Info, el::ConfigurationType::Format, "%datetime [DOS] %level %msg");
+	defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime [DOS] %level %msg");
 	defaultConf.setGlobally(el::ConfigurationType::Filename, path);
 	defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
 	el::Loggers::reconfigureLogger("default", defaultConf);

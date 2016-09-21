@@ -12,6 +12,9 @@
 // DREAM OS
 // DreamOS/Logger/Logger.h
 
+// LOG helper shortcuts
+#define LOG_xyz(xyz) "(" << xyz.x() << "," << xyz.y() << "," << xyz.z() << ")"
+#define LOG_rgba(rgba) "[" << rgba.r() << "," << rgba.g() << "," << rgba.b() << rgba.a() << "]"
 
 class Logger {
 public:

@@ -32,7 +32,7 @@ class SandboxApp;
 class Windows64App;
 class OGLDreamConsole;
 
-class OpenGLImp : public HALImp {
+class OpenGLImp : public HALImp, public Subscriber<CmdPromptEvent> {
 private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
@@ -56,6 +56,8 @@ private:
 private:
 	int m_pxViewWidth;
 	int m_pxViewHeight;
+
+	bool	m_drawWireframe = false;
 
 public:
 	int GetViewWidth() { return m_pxViewWidth; }
@@ -123,6 +125,8 @@ private:
 	RESULT PrepareScene();
 
 private:
+	RESULT Notify(CmdPromptEvent *event);
+
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
