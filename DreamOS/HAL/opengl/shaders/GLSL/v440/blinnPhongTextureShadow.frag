@@ -97,6 +97,18 @@ void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 d
 	//*/
 }
 
+void EnableBlending(float ambientAlpha, float diffuseAlpha) {
+	// 
+	// Fakes blending by moving clear fragments behind the skybox
+	// Remove once blending is fully supported
+	if (ambientAlpha < 0.1f || diffuseAlpha < 0.1f) {
+		gl_FragDepth = 1.0f;
+	} 
+	else {
+		gl_FragDepth = gl_FragCoord.z;
+	}
+}
+
 void main(void) {  
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -137,6 +149,7 @@ void main(void) {
 	vec4 colorDiffuse = material.m_colorDiffuse * ((u_hasTextureDiffuse) ? texture(u_textureDiffuse, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
 	vec4 colorSpecular = material.m_colorSpecular * ((u_hasTextureSpecular) ? texture(u_textureSpecular, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
 	
+	
 	// TODO: light.m_colorAmbient now hardcoded, needs to be part of the light property
 	vec4 lightColorAmbient = 0.2 * vec4(1,1,1,1);
 
@@ -154,16 +167,8 @@ void main(void) {
 		}
 	}
 
-	vec4LightValue[3] = 1.0f;
-
 	out_vec4Color = vec4LightValue;
 
-	// Fakes blending by moving clear fragments behind the skybox
-	// Remove once blending is fully supported
-	if (out_vec4Color.a < 0.1f) {
-		gl_FragDepth = 1.0f;
-	} 
-	else {
-		gl_FragDepth = gl_FragCoord.z;
-	}
+	// opaque/fully transparent blending without reordering
+	EnableBlending(colorAmbient.a, colorDiffuse.a);
 }
