@@ -154,7 +154,7 @@ RESULT camera::Notify(HMDEvent *hmdEvent) {
 RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("Cam Key %d state: %x", kbEvent->KeyCode, kbEvent->KeyState);
+	//DEBUG_LINEOUT("Cam Key %d state: %x", kbEvent->KeyCode, kbEvent->KeyState);
 
 	bool disableAWDS = DreamConsole::GetConsole()->IsInForeground();
 
