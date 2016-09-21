@@ -13,6 +13,7 @@
 #include <chrono>
 #include <vector>
 #include <deque>
+#include <mutex>
 
 #include "ProfilerGraph.h"
 
@@ -60,6 +61,8 @@ public:
 
 	const std::deque<std::string>& GetConsoleText();
 
+	void ForEach(std::function<bool(const std::string)> pred);
+
 	const std::string& GetCmdText();
 
 	// SenseKeyboardEventSubscriber
@@ -83,6 +86,7 @@ private:
 
 	long long	m_lineCnt = 0;
 
+	std::mutex m_mutex;
 	std::string	m_cmdText;
 };
 

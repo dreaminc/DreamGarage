@@ -476,7 +476,16 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	DEBUG_LINEOUT("HandleWebsocketMessage");
 
 	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
-	
+
+	if (jsonCloudMessage["/method"_json_pointer] == nullptr) {
+		// message error
+
+		LOG(ERROR) << "websocket msg error (could be a user already logged in)";
+		HUD_OUT("websocket msg error (could be a user already logged in)");
+
+		return;
+	}
+
 	std::string strGUID = jsonCloudMessage["/id"_json_pointer].get<std::string>();
 	std::string strType = jsonCloudMessage["/type"_json_pointer].get<std::string>();
 	std::string strMethod = jsonCloudMessage["/method"_json_pointer].get<std::string>();

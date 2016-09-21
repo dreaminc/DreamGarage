@@ -359,7 +359,7 @@ RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
 RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 	RESULT r = R_PASS;
 
-	SenseMouse::PrintEvent(mEvent);
+	//SenseMouse::PrintEvent(mEvent);
 
 	float MouseMoveFactor = 0.1f;
 

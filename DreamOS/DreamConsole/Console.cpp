@@ -53,11 +53,21 @@ DreamConsole::FPSGraph_t& DreamConsole::GetFPSGraph()
 
 void DreamConsole::AddConsoleLine(const std::string& text)
 {
+	std::lock_guard<std::mutex> lock(m_mutex);
+
 	m_ConsoleText.push_back(std::to_string(m_lineCnt++) + " " + text);
+
 	while (m_ConsoleText.size() > console_max_lines)
 	{
 		m_ConsoleText.pop_front();
 	}
+}
+
+void DreamConsole::ForEach(std::function<bool(const std::string)> pred)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	std::for_each(m_ConsoleText.rbegin(), m_ConsoleText.rend(), pred);
 }
 
 const std::deque<std::string>& DreamConsole::GetConsoleText()
