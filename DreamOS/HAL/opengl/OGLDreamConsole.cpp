@@ -95,18 +95,13 @@ void OGLDreamConsole::Render(bool isMonoView) {
 
 	float posY = viewBottom;
 
-	const std::deque<std::string>& consoleText = DreamConsole::GetConsole()->GetConsoleText();
-	for (auto it = consoleText.rbegin();
-		it != consoleText.rend();
-		++it)
-	{
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(*it, fontSize)->SetPosition(point(0.1f, posY, 0.0f), text::TOP_RIGHT));
+	DreamConsole::GetConsole()->ForEach([&](const std::string& consoleText) {
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(consoleText, fontSize)->SetPosition(point(0.1f, posY, 0.0f), text::TOP_RIGHT));
 		posY += m_OGLConsoleText->m_height;
 
-		if (posY > viewTop)
-			break;
-	}
-	
+		return !(posY > viewTop);
+	});
+
 	std::string cmdText = ">" + DreamConsole::GetConsole()->GetCmdText();
 
 	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
