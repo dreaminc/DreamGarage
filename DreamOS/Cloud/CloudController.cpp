@@ -27,7 +27,11 @@ CloudController::CloudController() :
 {
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::CloudController, this);
 
-	// empty
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	if (CommandLineManager::instance()->GetParameterValue("login").compare("auto") == 0) {
+		// auto login
+		Start();
+	}
 }
 
 CloudController::~CloudController() {
@@ -71,6 +75,12 @@ Error:
 RESULT CloudController::Start() {
 	RESULT r = R_PASS;
 
+	if (m_fRunning) {
+		// cloud already running
+		HUD_OUT("cloud trying to start but already running");
+		return R_FAIL;
+	}
+
 	DEBUG_LINEOUT("CloudController::Start");
 
 	m_thread = std::thread(&CloudController::ProcessingThread, this);
@@ -84,6 +94,8 @@ RESULT CloudController::Stop() {
 
 	DEBUG_LINEOUT("CloudController::Stop");
 
+	HUD_OUT("login into Relativity ...");
+
 	m_fRunning = false;
 
 #if (defined(_WIN32) || defined(_WIN64))
@@ -95,7 +107,9 @@ RESULT CloudController::Stop() {
 	}
 #endif
 
-	m_thread.join();
+	if (m_thread.joinable()) {
+		m_thread.join();
+	}
 
 //Error:
 	return r;
@@ -443,6 +457,8 @@ RESULT CloudController::SendUpdateHeadMessage(long userID, point ptPosition, qua
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	CB(m_fRunning);
+
 	// TODO: Fix this - remove m_pCloudImp
 	//CB(m_pCloudImp->IsConnected());
 	CB(m_pEnvironmentController->IsUserIDConnected(userID));
@@ -467,6 +483,8 @@ RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handS
 	RESULT r = R_PASS;
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
+
+	CB(m_fRunning);
 
 	// TODO: Fix this - remove m_pCloudImp
 	//CB(m_pCloudImp->IsConnected());
@@ -493,6 +511,7 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 
 	if (event->GetArg(1).compare("login") == 0) {
 		//
+		Start();
 	}
 
 	if (event->GetArg(1).compare("msg") == 0) {
