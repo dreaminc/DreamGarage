@@ -207,7 +207,7 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
 	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
-	//m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
+	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
 	
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
@@ -230,6 +230,11 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Dithering 
 	glEnable(GL_DITHER);
+
+	// Blending
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Allocate the camera
 	// TODO: Wire this up directly to HMD
@@ -791,7 +796,6 @@ RESULT OpenGLImp::RenderToTexture(FlatContext* pContext) {
 	RESULT r = R_PASS;
 
 	// Create framebuffer
-//#pragma message ("bad code")
 	OGLFramebuffer* pFramebuffer = dynamic_cast<OGLFramebuffer*>(pContext->GetFramebuffer());
 	CN(pFramebuffer);
 
@@ -816,10 +820,6 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	std::vector<light*> *pLights = NULL;
 	CR(pObjectStore->GetLights(pLights));
 	CN(pLights);
-
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	if (m_pHMD == nullptr)
 		CheckFramebufferStatus(GL_FRAMEBUFFER);

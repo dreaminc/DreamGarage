@@ -177,22 +177,7 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 	RESULT r = R_PASS;
 
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
-	CN(m_pOGLFramebuffer);
-	
-	CR(m_pOGLFramebuffer->OGLInitialize());	
-	CR(m_pOGLFramebuffer->BindOGLFramebuffer());
-
-	CR(m_pOGLFramebuffer->MakeOGLTexture());
-
-	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-	CR(m_pOGLFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
-
-	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
-
-	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(1));
-
-	// Always check that our framebuffer is ok
-	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+	CR(SetFrameBuffer(m_pOGLFramebuffer, internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
@@ -201,7 +186,6 @@ Error:
 RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
-	//pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
 	CN(pFramebuffer);
 	
 	CR(pFramebuffer->OGLInitialize());	
