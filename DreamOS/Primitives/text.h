@@ -68,6 +68,7 @@ public:
 		return this->MoveTo(p.x() + dx, p.y() + dy, p.z());
 	}
 
+	std::shared_ptr<Font> GetFont() { return m_font; }
 
 private:
 

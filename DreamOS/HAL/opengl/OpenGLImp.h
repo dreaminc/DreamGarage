@@ -80,7 +80,7 @@ public:
 	volume* MakeVolume(double width, double length, double height);
 	
 	volume* MakeVolume(double side);
-	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();
@@ -196,6 +196,7 @@ public:
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
 	RESULT glUniform1i(GLint location, GLint v0);
+	RESULT glUniform1fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniform4fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 

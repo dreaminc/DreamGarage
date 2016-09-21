@@ -59,7 +59,7 @@ public:
 	virtual volume* MakeVolume(double width, double length, double height) = 0;
 
 	virtual volume* MakeVolume(double side) = 0;
-	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false) = 0;
+	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) = 0;
 	virtual skybox *MakeSkybox() = 0;

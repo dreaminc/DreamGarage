@@ -700,11 +700,11 @@ volume* OpenGLImp::MakeVolume(double side) {
 	return MakeVolume(side, side, side);
 }
 
-text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)
+text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
 {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, std::make_shared<Font>(fontName), content, size, isBillboard);
+	text *pText = new OGLText(this, std::make_shared<Font>(fontName, fDistanceMap), content, size, isBillboard);
 	CN(pText);
 
 //Success:
@@ -1311,6 +1311,16 @@ RESULT OpenGLImp::glUniform1i(GLint location, GLint v0) {
 
 	m_OpenGLExtensions.glUniform1i(location, v0);
 	CRM(CheckGLError(), "glUniform1i failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glUniform1fv(GLint location, GLsizei count, const GLfloat *value) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glUniform1fv(location, count, value);
+	CRM(CheckGLError(), "glUniform1fv failed");
 
 Error:
 	return r;
