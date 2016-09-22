@@ -80,7 +80,7 @@ public:
 	volume* MakeVolume(double width, double length, double height);
 	
 	volume* MakeVolume(double side);
-	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text* MakeText(Font::TYPE type, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();

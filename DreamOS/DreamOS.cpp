@@ -156,9 +156,9 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 }
 
-text* DreamOS::AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)
+text* DreamOS::AddText(Font::TYPE type, const std::string& content, double size, bool isBillboard)
 {
-	return m_pSandbox->AddText(fontName, content, size, isBillboard);
+	return m_pSandbox->AddText(type, content, size, isBillboard);
 }
 
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {

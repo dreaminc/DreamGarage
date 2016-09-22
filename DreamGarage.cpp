@@ -86,9 +86,9 @@ RESULT DreamGarage::LoadScene() {
 	// Add Flat Objects
 ///*
 	FlatContext *pContext2 = AddFlatContext();
-	std::shared_ptr<text> pText = pContext2->AddText(L"Arial.fnt", "Hello World", 1.0);
+	std::shared_ptr<text> pText = pContext2->AddText(Font::TYPE::Arial, "Hello World", 1.0);
 	pText->MoveTo(0.5f, 0.5f, 0.5f);
-	std::shared_ptr<text> pText2 = pContext2->AddText(L"Arial.fnt", "Sababa", 1.0);
+	std::shared_ptr<text> pText2 = pContext2->AddText(Font::TYPE::Arial, "Sababa", 1.0);
 /*
 	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
 		std::shared_ptr<quad> pFQuad2 = pContext2->AddQuad(0.25f, 0.25f, point(-x/10.0f, -x/10.0f, x/10.0f));

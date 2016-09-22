@@ -699,11 +699,15 @@ volume* OpenGLImp::MakeVolume(double side) {
 	return MakeVolume(side, side, side);
 }
 
-text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)
+text* OpenGLImp::MakeText(Font::TYPE type, const std::string& content, double size, bool isBillboard)
 {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, std::make_shared<Font>(fontName), content, size, isBillboard);
+	if (m_pFontStore.find(type) == m_pFontStore.end()) {
+		m_pFontStore[type] = std::make_shared<Font>(fontDictionary.find(type)->second);
+	}
+
+	text *pText = new OGLText(this, m_pFontStore[type], content, size, isBillboard);
 	CN(pText);
 
 //Success:
