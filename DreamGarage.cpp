@@ -6,6 +6,7 @@
 //#define TESTING
 
 light *g_pLight = nullptr;
+light *g_pLight2 = nullptr;
 
 #include "Cloud/CloudController.h"
 #include "Cloud/Message/UpdateHeadMessage.h"
@@ -55,8 +56,11 @@ RESULT DreamGarage::LoadScene() {
 	
 	//AddLight(LIGHT_POINT, 0.1f, point(0, 0.3f, 1.0), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 
-	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, ptLight2, color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
+	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -0.5f, 0.0f));
 	g_pLight->EnableShadows();
+
+	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, -10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.5f, 0.0f));
+	g_pLight2->EnableShadows();
 
 	//sphere* p = AddSphere();
 	//p->MoveTo(point(0, 0, 1));
