@@ -461,7 +461,7 @@ RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	return r;
 }
 
-RESULT DreamGarage::Notify(CmdPromptEvent *kbEvent) {
+RESULT DreamGarage::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
 	HUD_OUT("DreamAPP command");

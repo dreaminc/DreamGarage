@@ -43,7 +43,7 @@ public:
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 
 	// CmdPromptEventSubscriber
-	virtual RESULT Notify(CmdPromptEvent *kbEvent) override;
+	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 private:
 

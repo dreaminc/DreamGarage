@@ -83,7 +83,15 @@ void OGLDreamConsole::Render(bool isMonoView) {
 //	glDisable(GL_BLEND);
 
 	// Render FPS graph
-	m_OGLGraph.Render(point(viewLeft, viewBottom + 0.2f, 0), point(viewLeft + 0.4f, viewBottom, 0), DreamConsole::GetConsole()->GetFPSGraph(), static_cast<uint16_t>(0), static_cast<uint16_t>(200));
+	switch (DreamConsole::GetConsole()->GetConfiguration().graph)
+	{
+	case DreamConsole::GraphConfiguration::FPS:
+		m_OGLGraph.Render(point(viewLeft, viewBottom + 0.2f, 0), point(viewLeft + 0.4f, viewBottom, 0), DreamConsole::GetConsole()->GetFPSGraph(), static_cast<uint16_t>(0), static_cast<uint16_t>(200));
+		break;
+	case DreamConsole::GraphConfiguration::FPSMinimal:
+		m_OGLGraph.RenderMinimal(point(viewLeft, viewBottom + 0.2f, 0), point(viewLeft + 0.4f, viewBottom, 0), DreamConsole::GetConsole()->GetFPSGraph(), static_cast<uint16_t>(0), static_cast<uint16_t>(200));
+		break;
+	}	
 
 	// Revert to 'default' render state. TODO: refactor rendering states
 	glEnable(GL_CULL_FACE);
@@ -92,7 +100,7 @@ void OGLDreamConsole::Render(bool isMonoView) {
 	//m_OGLProgram->RenderObject(m_OGLTitleText.get());
 
 	// Render hud text
-
+	//return;
 	float posY = viewBottom;
 
 	DreamConsole::GetConsole()->ForEach([&](const std::string& consoleText) {
@@ -281,6 +289,65 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		point pr = point(prevPoint.x(), prevPoint.y() - YSCALE(minFPS) + bottom, 0.0f);
 		m_OGLProgram->RenderObject(m_OGLTriangle->Set(cr, pr, pr));
 
+	}
+
+	// Draw local min/max bars
+	int fpsDiff = static_cast<int>(maxFPS) - static_cast<int>(minFPS);
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(0), 0), point(right, YSCALE(0), 0), point(right, YSCALE(0), 0)));
+	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0)));
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize)->SetPosition(point(left, YSCALE(0), 0), text::TOP_RIGHT));
+	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::BOTTOM_RIGHT));
+}
+
+template<typename T>
+void OGLProfilerGraph::RenderMinimal(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, T minValue, T maxValue)
+{
+	auto& records = graph.GetData();
+	double time_scale = graph.GetRecordTime();
+
+	auto currentTime = std::chrono::high_resolution_clock::now();
+
+	const float left = topLeft.x();
+	const float bottom = bottomRight.y();
+	const float right = bottomRight.x();
+	const float top = topLeft.y();
+
+	float width = right - left;
+	float height = top - bottom;
+
+	size_t index = graph.GetNewestIndex();
+
+	float vScale = static_cast<float>((top - bottom)) / (maxValue - minValue);
+
+	uint16_t minFPS = static_cast<uint16_t>(minValue);
+	uint16_t maxFPS = static_cast<uint16_t>(maxValue);
+
+#define YSCALE_CAP(y) (y > maxFPS) ? YSCALE(maxFPS) : YSCALE(y)
+
+	point prevPoint(right, YSCALE_CAP(records[index].first), 0);
+	point currentPoint = prevPoint;
+
+	OGLRenderContext::Render(point(left, top, 0.0f), point(right, bottom, 0.0f));
+
+	size_t cnt = 0;
+
+	{
+		prevPoint = currentPoint;
+		auto deltaTime = std::chrono::duration<double>(currentTime - records[index].second).count();
+
+		currentPoint.x() = right - (float)deltaTime * width / (float)time_scale;
+		currentPoint.y() = YSCALE_CAP(static_cast<int>(records[index].first));
+
+		if (cnt == 0)
+		{
+			// draw current FPS
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			//m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize)->MoveTo(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0));
+			m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), 3.0f)->SetPosition(point((left+right)/2, currentPoint.y() - YSCALE(minFPS) + bottom, 0), text::CENTER));
+		}
 	}
 
 	// Draw local min/max bars
