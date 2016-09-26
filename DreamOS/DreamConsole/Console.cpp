@@ -121,7 +121,12 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 						m_cmdText.erase();
 					} break;
 					case VK_ESCAPE: {
-						m_cmdText.erase();
+						if (!m_cmdText.empty()) {
+							m_cmdText.erase();
+						}
+						else {
+							m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
+						}
 					} break;
 					case VK_LEFT:
 					case VK_RIGHT:
