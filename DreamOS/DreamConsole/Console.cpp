@@ -19,6 +19,11 @@ DreamConsole::~DreamConsole()
 
 }
 
+const DreamConsole::Configuration& DreamConsole::GetConfiguration()
+{
+	return m_configuration;
+}
+
 void DreamConsole::Init()
 {
 	if (m_isInit)
@@ -138,10 +143,19 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 	return r;
 }
 
-RESULT DreamConsole::Notify(CmdPromptEvent *kbEvent) {
+RESULT DreamConsole::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
-	HUD_OUT("DreamConsole command");
+	if (event->GetArg(1).compare("graph") == 0) {
+		if (event->GetArg(2).compare("fps") == 0) {
+			m_configuration.graph = GraphConfiguration::FPS;
+			HUD_OUT("consol graph <- fps");
+		}
+		else if (event->GetArg(2).compare("off") == 0) {
+			m_configuration.graph = GraphConfiguration::FPSMinimal;
+			HUD_OUT("consol graph <- off");
+		}
+	}
 
 	return r;
 }

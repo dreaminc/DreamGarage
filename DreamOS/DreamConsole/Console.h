@@ -47,6 +47,19 @@ public:
 	DreamConsole();
 	~DreamConsole();
 
+public:
+	enum class GraphConfiguration {
+		FPS,
+		FPSMinimal
+	};
+
+	struct Configuration {
+		GraphConfiguration	graph{ GraphConfiguration::FPSMinimal };
+	};
+
+	const Configuration& GetConfiguration();
+
+public:
 	void Init();
 
 	bool IsInForeground();
@@ -69,7 +82,7 @@ public:
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 
 	// CmdPromptEventSubscriber
-	virtual RESULT Notify(CmdPromptEvent *kbEvent) override;
+	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 private:
 	bool m_isInit = false;
@@ -88,6 +101,8 @@ private:
 
 	std::mutex m_mutex;
 	std::string	m_cmdText;
+
+	Configuration m_configuration;
 };
 
 #endif // !PROFILER_H_

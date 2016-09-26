@@ -40,7 +40,9 @@ public:
 
 	OGLText* SetText(const std::string& text, double size = 1.0)
 	{
-		text::SetText(text, size);
+		bool hasChanged = false;
+
+		text::SetText(text, size, &hasChanged);
 
 		// TODO: need to be able to deal with changing vertex amounts automatically
 		if (CheckAndCleanDirty())
@@ -48,8 +50,9 @@ public:
 			ReleaseOGLBuffers();
 			OGLInitialize();
 		}
-
-		SetDirty();
+		
+		if (hasChanged)
+			SetDirty();
 
 		return this;
 	}

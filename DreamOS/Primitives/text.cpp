@@ -3,7 +3,7 @@
 #include <vector>
 #include <algorithm>
 
-RESULT text::SetText(const std::string& text, double size)
+RESULT text::SetText(const std::string& text, double size, bool* isChanged)
 {
 	std::vector<quad> quads;
 	point center_vector;
@@ -11,8 +11,13 @@ RESULT text::SetText(const std::string& text, double size)
 	if (m_text.compare(text) == 0)
 	{
 		// no need to update the text
+		if (isChanged)
+			*isChanged = false;
 		return R_SUCCESS;
 	}
+
+	if (isChanged)
+		*isChanged = true;
 
 	if (m_text.length() != text.length())
 	{
