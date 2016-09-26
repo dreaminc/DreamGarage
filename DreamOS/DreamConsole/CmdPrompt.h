@@ -66,11 +66,15 @@ public:
 
 	RESULT Execute(const std::string& command);
 
+	const std::string& GetLastCommand();
+
 private:
 	void	Init();
 
 private:
 	bool	m_isInit = false;
+
+	std::string	m_lastExecutedCommand;
 };
 
 

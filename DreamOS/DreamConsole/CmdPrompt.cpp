@@ -39,6 +39,8 @@ RESULT CmdPrompt::RegisterMethod(CmdPrompt::method method, Subscriber<CmdPromptE
 
 RESULT CmdPrompt::Execute(const std::string& command)
 {
+	m_lastExecutedCommand = command;
+
 	std::string type = command.substr(0, command.find(' '));
 	
 	//HUD_OUT(("Executing " + command + " (" + type + ")").c_str());
@@ -50,4 +52,8 @@ RESULT CmdPrompt::Execute(const std::string& command)
 	}
 
 	return R_PASS;
+}
+
+const std::string& CmdPrompt::GetLastCommand() {
+	return m_lastExecutedCommand;
 }
