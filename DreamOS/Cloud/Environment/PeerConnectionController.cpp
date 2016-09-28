@@ -314,10 +314,10 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 
 		// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
-		// will ultimately signal the WebRTC connection to be complete
+		// will ultimately signal the WebRTC connection to be complete	
 		CN(m_pWebRTCImp);
 		CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
-
+	
 		// We don't have a guarantee that the WebRTC connection is stable at this point
 
 		// Initialize SDP Peer Connection Offer and Create Answer
