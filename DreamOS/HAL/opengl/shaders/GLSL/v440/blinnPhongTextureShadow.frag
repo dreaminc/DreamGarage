@@ -151,7 +151,7 @@ void main(void) {
 	
 	
 	// TODO: light.m_colorAmbient now hardcoded, needs to be part of the light property
-	vec4 lightColorAmbient = 0.2 * vec4(1,1,1,1);
+	vec4 lightColorAmbient = g_ambient * vec4(1,1,1,1);
 
 	vec4 ambientValue = vec4(1,1,1,1);
 

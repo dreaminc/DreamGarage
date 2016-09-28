@@ -131,8 +131,8 @@ public:
 		
 		vector zAxis = -1.0f * v.Normal();
 		vector xAxis; 
-		
-		if ((zAxis * up) != 0.0f)
+	
+		if (((zAxis * up) != 0.0f) && (zAxis != up))
 			xAxis = up.cross(zAxis);
 		else
 			xAxis = vector(-zAxis.y(), zAxis.x(), zAxis.z());
