@@ -353,13 +353,12 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDesc
 	}
 
 	m_pWebRTCPeerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
-	CR(ClearSessionDescriptionProtocol());
-
 	m_fSDPSet = true;
 
 	LOG(INFO) << "OnSuccess " << m_strSessionDescriptionProtocol;
 	CR(PrintSDP());
 
+	CR(ClearSessionDescriptionProtocol());
 	/*
 	// For loopback test. To save some connecting delay.
 	if (m_fLoopback) {

@@ -54,8 +54,9 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
 
-	// for auto login, use '-l auto'
-	CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
+	// For auto login, use '-l auto'
+	//CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
+	CR(m_pCommandLineManager->RegisterParameter("login", "l", "auto"));
 
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
@@ -76,6 +77,12 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CommandLineManager::instance()->ForEach([](const std::string& arg) {
 		HUD_OUT(("arg :" + arg).c_str());
 	});
+
+	// Auto Login Handling
+	if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
+		// auto login
+		m_pCloudController->Start();
+	}
 
 Error:
 	return r;

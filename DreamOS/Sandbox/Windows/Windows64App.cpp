@@ -601,8 +601,7 @@ Error:
 	return r;
 }
 
-bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
-{
+bool Windows64App::HandleMouseEvent(const MSG&	windowMassage) {
 	bool fHandled = false;
 
 	LPARAM lp = windowMassage.lParam;
@@ -688,8 +687,7 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage)
 	return fHandled;
 }
 
-bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
-{
+bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
 	bool fHandled = false;
 
 	LPARAM lp = windowMassage.lParam;
@@ -704,6 +702,18 @@ bool Windows64App::HandleKeyEvent(const MSG&	windowMassage)
 		case WM_KEYDOWN: {
 			fHandled = true;
 			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), true);
+
+			/*
+			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
+				HUD_OUT("Key 'L' is pressed");
+
+				if (m_pCloudController != nullptr) {
+					// Attempt to connect to the first peer in the list
+					m_pCloudController->LoginUser();
+				}
+			}
+			*/
+
 			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
 			/*
 			// DEBUG: Bypass for connect to cloud
