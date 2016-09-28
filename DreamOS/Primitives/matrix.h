@@ -602,6 +602,24 @@ TMat4x4 operator*(const matrix<TMat4x4, N, 1>& lhs, const matrix<TMat4x4, N, 1>&
 	return result;
 }
 
+// EQUALITY
+// 
+template <typename TMat4x4, int N, int M>
+bool operator==(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, N, M>& rhs) {
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			if (lhs.element(i, j) != rhs.element(i, j))
+				return false;
+		}
+	}
+	return true;
+}
+
+template <typename TMat4x4, int N, int M>
+bool operator!=(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, N, M>& rhs) {
+	return !(lhs==rhs);
+}
+
 
 /*
 template <typename TMat4x4>
