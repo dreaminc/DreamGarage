@@ -144,27 +144,34 @@ void WebRTCConductor::OnSignalingChange(webrtc::PeerConnectionInterface::Signali
 	switch (new_state) {
 		case webrtc::PeerConnectionInterface::kStable: {
 			DEBUG_LINEOUT("WebRTC Connection Stable");
+			LOG(INFO) << "WebRTC Connection Stable";
 			m_pParentWebRTCImp->OnWebRTCConnectionStable();
 		} break;
 
 		case webrtc::PeerConnectionInterface::kHaveLocalOffer: {
 			DEBUG_LINEOUT("WebRTC Connection Has Local Offer");
+			LOG(INFO) << "WebRTC Connection Has Local Offer";
 		} break;
 
 		case webrtc::PeerConnectionInterface::kHaveLocalPrAnswer: {
 			DEBUG_LINEOUT("WebRTC Connection Has Local Answer");
+			LOG(INFO) << "WebRTC Connection Has Local Answer";
 		} break;
 
 		case webrtc::PeerConnectionInterface::kHaveRemoteOffer: {
 			DEBUG_LINEOUT("WebRTC Connection has remote offer");
+			LOG(INFO) << "WebRTC Connection Has remote Offer";
 		} break;
 
 		case webrtc::PeerConnectionInterface::kHaveRemotePrAnswer: {
 			DEBUG_LINEOUT("WebRTC Connection has remote answer");
+			LOG(INFO) << "WebRTC Connection Has remote answer";
 		} break;
 
 		case webrtc::PeerConnectionInterface::kClosed: {
 			DEBUG_LINEOUT("WebRTC Connection closed");
+			LOG(INFO) << "WebRTC Connection closed";
+
 			m_pParentWebRTCImp->OnWebRTCConnectionClosed();
 		} break;
 	}
@@ -335,18 +342,24 @@ void WebRTCConductor::UIThreadCallback(int msgID, void* data) {
 void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) {
 	RESULT r = R_PASS;
 
-	m_pWebRTCPeerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
-	CR(ClearSessionDescriptionProtocol());
-
-	m_fSDPSet = true;
-	
 	m_strSessionDescriptionType = sessionDescription->type();
 	sessionDescription->ToString(&m_strSessionDescriptionProtocol);
 
-	LOG(INFO) << "OnSuccess " << m_strSessionDescriptionProtocol;
+	if (m_fOffer) {
+		CR(m_pParentWebRTCImp->OnSDPOfferSuccess());
+	}
+	else {
+		CR(m_pParentWebRTCImp->OnSDPAnswerSuccess());
+	}
 
+	m_pWebRTCPeerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
+	m_fSDPSet = true;
+
+	LOG(INFO) << "OnSuccess " << m_strSessionDescriptionProtocol;
 	CR(PrintSDP());
 
+	CR(ClearSessionDescriptionProtocol());
+	/*
 	// For loopback test. To save some connecting delay.
 	if (m_fLoopback) {
 		// Replace message type from "offer" to "answer"
@@ -356,13 +369,8 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDesc
 	}
 
 	// TODO: peer ID stuff
-
-	if (m_fOffer) {
-		CR(m_pParentWebRTCImp->OnSDPOfferSuccess());
-	}
-	else {
-		CR(m_pParentWebRTCImp->OnSDPAnswerSuccess());
-	}
+	*/
+	
 
 Error:
 	return;
@@ -947,10 +955,15 @@ RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
 		CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
 		CBM((m_pWebRTCPeerConnection->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
 
-		DEBUG_LINEOUT(" Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
+		DEBUG_LINEOUT("Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
+		LOG(INFO) << "Received candidate : " << iceCandidate.m_strSDPCandidate.c_str();
 	//}
 
+// Success:
+	return r;
+
 Error:
+	LOG(INFO) << "Candidate " << iceCandidate.m_strSDPCandidate.c_str() << " failed with error: " << sdpError.description.c_str();
 	return r;
 }
 

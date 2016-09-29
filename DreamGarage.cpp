@@ -409,6 +409,8 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 
 	//m_pSphere->SetPosition(pUpdateHeadMessage->GetPosition());
 
+	WCN(m_pPeerUser);
+
 	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
@@ -428,7 +430,7 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	m_pPeerUser->SetOrientation(qOrientation * qAdjust);
 	*/
 
-//Error:
+Error:
 	return r;
 }
 
@@ -438,10 +440,14 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
 	//pUpdateHandMessage->PrintMessage();
 
-	hand::HandState handState = pUpdateHandMessage->GetHandState();
+	hand::HandState handState;
+
+	WCN(m_pPeerUser);
+
+	handState = pUpdateHandMessage->GetHandState();
 	m_pPeerUser->UpdateHand(handState);
 
-//Error:
+Error:
 	return r;
 }
 

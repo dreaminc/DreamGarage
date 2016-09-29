@@ -26,12 +26,6 @@ CloudController::CloudController() :
 	m_fnHandleDataChannelMessageCallback(nullptr)
 {
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::CloudController, this);
-
-	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	if (CommandLineManager::instance()->GetParameterValue("login").compare("auto") == 0) {
-		// auto login
-		Start();
-	}
 }
 
 CloudController::~CloudController() {
