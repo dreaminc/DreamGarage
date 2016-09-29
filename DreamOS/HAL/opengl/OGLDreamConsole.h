@@ -1,5 +1,5 @@
-#ifndef OGLPROFILER_H_
-#define OGLPROFILER_H_
+#ifndef OGLDREAMCONSOLE_H_
+#define OGLDREAMCONSOLE_H_
 
 #include "HAL/opengl/OGLProgram.h"
 
@@ -9,12 +9,12 @@
 
 #include <memory>
 
-#include "Profiler/ProfilerGraph.h"
-#include "Profiler/DebugConsole.h"
+#include "DreamConsole/ProfilerGraph.h"
+#include "DreamConsole/DebugConsole.h"
 
 // Dream OS
-// DreamOS/HAL/opengl/OGLProfiler.h
-// OGLProfiler renders the profiler to an OGL program
+// DreamOS/HAL/opengl/OGLDreamConsole.h
+// OGLDreamConsole renders the profiler to an OGL program
 
 class OGLRenderContext {
 public:
@@ -58,6 +58,9 @@ public:
 	template<typename T>
 	void Render(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, T minValue, T maxValue);
 
+	template<typename T>
+	void RenderMinimal(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, T minValue, T maxValue);
+
 	void Destroy();
 
 private:
@@ -74,7 +77,7 @@ public:
 	~OGLDebugConsole();
 
 	void Init();
-	void Render(point& topLeft, point& bottomRight);
+	void Render(point& topLeft, point& bottomRight, float fontSize = 4.0f);
 	void Destroy();
 
 private:
@@ -85,13 +88,15 @@ private:
 	std::unique_ptr<OGLTriangle>	m_OGLTriangle;
 };
 
-class OGLProfiler : public OGLRenderContext {
+class OGLDreamConsole : public OGLRenderContext {
 public:
-	OGLProfiler(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
-	~OGLProfiler();
+	OGLDreamConsole(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
+	~OGLDreamConsole();
 
 	void Init();
-	void Render();
+	
+	// A mono view is an extended view in case the scene is not stereoscopicly rendered for an HMD.
+	void Render(bool isMonoView = false);
 	void Destroy();
 
 private:
@@ -105,4 +110,4 @@ private:
 
 };
 
-#endif // ! OGLPROFILER_H
+#endif // ! OGLDREAMCONSOLE_H_

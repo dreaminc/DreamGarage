@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "Cloud/CloudController.h"
 #include "EnvironmentController.h"
 #include "Cloud/User/User.h"
@@ -32,7 +33,7 @@ EnvironmentController::~EnvironmentController() {
 
 RESULT EnvironmentController::Initialize() {
 	RESULT r = R_PASS;
-
+	
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->Initialize());
 	CR(m_pPeerConnectionController->RegisterPeerConnectionControllerObserver(this));
@@ -486,7 +487,16 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	DEBUG_LINEOUT("HandleWebsocketMessage");
 
 	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
-	
+
+	if (jsonCloudMessage["/method"_json_pointer] == nullptr) {
+		// message error
+
+		LOG(ERROR) << "websocket msg error (could be a user already logged in)";
+		HUD_OUT("websocket msg error (could be a user already logged in)");
+
+		return;
+	}
+
 	std::string strGUID = jsonCloudMessage["/id"_json_pointer].get<std::string>();
 	std::string strType = jsonCloudMessage["/type"_json_pointer].get<std::string>();
 	std::string strMethod = jsonCloudMessage["/method"_json_pointer].get<std::string>();
@@ -499,9 +509,13 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		strMethod = strTokens[1];
 
 		if (strType == "request") {
+			LOG(INFO) << "HandleSocketMessage REQUEST " << strMethod << "," << jsonPayload;
+			
 			m_pPeerConnectionController->HandleEnvironmentSocketRequest(strMethod, jsonPayload);
 		}
 		else if (strType == "response") {
+			LOG(INFO) << "HandleSocketMessage RESPONSE " << strMethod << "," << jsonPayload;
+			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
 	}

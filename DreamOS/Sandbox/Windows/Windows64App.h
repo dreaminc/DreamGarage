@@ -5,7 +5,7 @@
 #include "Sandbox/SandboxApp.h"
 
 #include "TimeManager/TimeManager.h"
-#include "Profiler/Profiler.h"
+#include "DreamConsole/Console.h"
 
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
@@ -64,6 +64,11 @@ private:
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
 
+	// Handle a mouse event from a window's message. Return true if the message is handled, and false otherwise.
+	bool	HandleMouseEvent(const MSG&	windowMassage);
+	// Handle a key event from a window's message. Return true if the message is handled, and false otherwise.
+	bool	HandleKeyEvent(const MSG&	windowMassage);
+
 public:
 	HDC GetDeviceContext();
 	HWND GetWindowHandle();
@@ -97,8 +102,8 @@ private:
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
-	TimeManager	*m_pTimeManager;
-	Profiler	m_profiler;
+	//TimeManager	*m_pTimeManager;
+	DreamConsole	m_profiler;
 
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
 

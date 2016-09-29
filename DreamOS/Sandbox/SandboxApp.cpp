@@ -54,11 +54,18 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
 
+	// For auto login, use '-l auto'
+	//CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
+	CR(m_pCommandLineManager->RegisterParameter("login", "l", "auto"));
+
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
-	m_pSceneGraph = new SceneGraph();
+	m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
+
+	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
@@ -66,6 +73,16 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
+
+	CommandLineManager::instance()->ForEach([](const std::string& arg) {
+		HUD_OUT(("arg :" + arg).c_str());
+	});
+
+	// Auto Login Handling
+	if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
+		// auto login
+		m_pCloudController->Start();
+	}
 
 Error:
 	return r;
@@ -82,6 +99,24 @@ RESULT SandboxApp::AddObject(VirtualObj *pObject) {
 
 	CR(m_pSceneGraph->PushObject(pObject));
 
+Error:
+	return r;
+}
+
+FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
+	RESULT r = R_PASS;
+
+	FlatContext* context = m_pHALImp->MakeFlatContext(width, height, channels);
+	CR(m_pFlatSceneGraph->PushObject(context));
+
+Error:
+	return context;
+}
+
+RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
+	RESULT r = R_PASS;
+	
+	CR(m_pHALImp->RenderToTexture(pContext));
 Error:
 	return r;
 }
@@ -380,6 +415,7 @@ RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState)
 	return m_pCloudController->SendUpdateHandMessage(userID, handState);
 }
 
+
 RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
 }
@@ -390,6 +426,16 @@ RESULT SandboxApp::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrie
 
 RESULT SandboxApp::BroadcastUpdateHandMessage(hand::HandState handState) {
 	return m_pCloudController->BroadcastUpdateHandMessage(handState);
+}
+
+// TimeManager
+RESULT SandboxApp::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pTimeManager->RegisterSubscriber(timeEvent, pTimeSubscriber));
+
+Error:
+	return r;
 }
 
 // IO

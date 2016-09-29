@@ -1,4 +1,5 @@
 #include "CloudController.h"
+#include "Logger/Logger.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
@@ -7,6 +8,16 @@
 #include "Cloud/Message/UpdateHandMessage.h"
 #include "Cloud/Message/UpdateHeadMessage.h"
 
+#include "DreamConsole/DreamConsole.h"
+
+#include <chrono>
+#include <thread>
+
+#if (defined(_WIN32) || defined(_WIN64))
+#include "Sandbox/Windows/Win32Helper.h"
+#else
+#endif
+
 CloudController::CloudController() :
 	m_pCloudImp(nullptr),
 	m_pUserController(nullptr),
@@ -14,17 +25,88 @@ CloudController::CloudController() :
 	m_fnHandleDataChannelStringMessageCallback(nullptr),
 	m_fnHandleDataChannelMessageCallback(nullptr)
 {
-	// empty
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::CloudController, this);
 }
 
 CloudController::~CloudController() {
-
 	// TODO: Maybe this should not be a singleton
 	HTTPController *pHTTPController = HTTPController::instance();
 
 	if (pHTTPController != nullptr) {
 		pHTTPController->Stop();
 	}
+}
+
+RESULT CloudController::ProcessingThread() {
+	RESULT r = R_PASS;
+
+	LOG(INFO) << "ProcessingThread start";
+
+	m_fRunning = true;
+
+	CR(Initialize());
+
+	//std::this_thread::sleep_for(std::chrono::seconds(3));
+
+	CR(LoginUser());
+
+	// Message pump goes here
+#if (defined(_WIN32) || defined(_WIN64))
+	Win32Helper::ThreadBlockingMessageLoop();
+#else
+#pragma message ("not implemented message loop")
+	while (m_fRunning) {
+
+	}
+#endif
+
+	LOG(INFO) << "ProcessingThread end";
+
+Error:
+	return r;
+}
+
+RESULT CloudController::Start() {
+	RESULT r = R_PASS;
+
+	if (m_fRunning) {
+		// cloud already running
+		HUD_OUT("cloud trying to start but already running");
+		return R_FAIL;
+	}
+
+	DEBUG_LINEOUT("CloudController::Start");
+
+	m_thread = std::thread(&CloudController::ProcessingThread, this);
+
+//Error:
+	return r;
+}
+
+RESULT CloudController::Stop() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CloudController::Stop");
+
+	HUD_OUT("login into Relativity ...");
+
+	m_fRunning = false;
+
+#if (defined(_WIN32) || defined(_WIN64))
+	Win32Helper::PostQuitMessage(m_thread);
+#else
+#pragma message ("not implemented post quit to thread")
+	while (m_fRunning) {
+
+	}
+#endif
+
+	if (m_thread.joinable()) {
+		m_thread.join();
+	}
+
+//Error:
+	return r;
 }
 
 RESULT CloudController::RegisterDataChannelStringMessageCallback(HandleDataChannelStringMessageCallback fnHandleDataChannelStringMessageCallback) {
@@ -230,6 +312,11 @@ Error:
 }
 */
 
+void CloudController::Login()
+{
+	LoginUser();
+}
+
 RESULT CloudController::LoginUser() {
 	RESULT r = R_PASS;
 
@@ -239,9 +326,14 @@ RESULT CloudController::LoginUser() {
 	std::string strUsername = pCommandLineManager->GetParameterValue("username");
 	std::string strPassword = pCommandLineManager->GetParameterValue("password");
 
+	HUD_OUT(("Login user " + strUsername + "...").c_str());
+	HUD_OUT(("Login ip " + strURI + "...").c_str());
+
 	// TODO: command line / config file - right now hard coded
 	CN(m_pUserController);
 	CRM(m_pUserController->Login(strUsername, strPassword), "Failed to login");
+
+	HUD_OUT("Loading user profile...");
 
 	// Get user profile
 	CRM(m_pUserController->LoadProfile(), "Failed to load profile");
@@ -251,8 +343,12 @@ RESULT CloudController::LoginUser() {
 	CN(m_pEnvironmentController);
 	CR(m_pEnvironmentController->SetEnvironmentID(m_pUserController->GetUserDefaultEnvironmentID()));
 
+	HUD_OUT("Connectint to Environment...");
+
 	// Connect to environment 
 	CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser()));
+
+	HUD_OUT("User is loaded and logged in");
 
 Error:
 	return r;
@@ -371,6 +467,8 @@ RESULT CloudController::SendUpdateHeadMessage(long userID, point ptPosition, qua
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	CB(m_fRunning);
+
 	// TODO: Fix this - remove m_pCloudImp
 	//CB(m_pCloudImp->IsConnected());
 	CB(m_pEnvironmentController->IsUserIDConnected(userID));
@@ -396,6 +494,8 @@ RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handS
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	CB(m_fRunning);
+
 	// TODO: Fix this - remove m_pCloudImp
 	//CB(m_pCloudImp->IsConnected());
 	CB(m_pEnvironmentController->IsUserIDConnected(userID));
@@ -415,7 +515,6 @@ RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handS
 Error:
 	return r;
 }
-
 
 // Broadcast some messages
 // TODO: This is duplicated code - use this in the below functions
@@ -478,6 +577,23 @@ RESULT CloudController::BroadcastUpdateHandMessage(hand::HandState handState) {
 		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
 
 		CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("login") == 0) {
+		//
+		Start();
+	}
+
+	if (event->GetArg(1).compare("msg") == 0) {
+		std::string st(event->GetArg(2));
+		SendDataChannelStringMessage(NULL, st);
 	}
 
 Error:

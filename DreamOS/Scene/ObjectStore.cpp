@@ -1,7 +1,7 @@
-#include "SceneGraph.h"
-#include "SceneGraphList.h"
+#include "ObjectStore.h"
+#include "ObjectStoreImpList.h"
 
-SceneGraph::SceneGraph(SCENE_GRAPH_STORE_TYPE type) {
+ObjectStore::ObjectStore(ObjectStoreFactory::TYPE type) {
 	RESULT r = R_PASS;
 
 	CRM(InitializeSceneGraphStore(type), "Failed to initialize scene graph store");
@@ -13,42 +13,36 @@ Error:
 	return;
 }
 
-SceneGraph::SceneGraph() :
-	SceneGraph(SCENE_GRAPH_STORE_LIST)
+ObjectStore::ObjectStore() :
+	ObjectStore(ObjectStoreFactory::TYPE::LIST)
 {
 	// empty 
 }
 
-SceneGraph::~SceneGraph() {
+ObjectStore::~ObjectStore() {
 	// empty
 }
 
-RESULT SceneGraph::InitializeSceneGraphStore(SCENE_GRAPH_STORE_TYPE type) {
+RESULT ObjectStore::InitializeSceneGraphStore(ObjectStoreFactory::TYPE type) {
 	RESULT r = R_PASS;
 
 	CBM((m_pSceneGraphStore == NULL), "Scene Graph Store already initialized");
-	CBM((type < SCENE_GRAPH_STORE_INVALID), "Scene graph type invalid");
 
-	switch (type) {
-		case SCENE_GRAPH_STORE_LIST: {
-			m_pSceneGraphStore = new SceneGraphList();
-			CNM(m_pSceneGraphStore, "Failed to allocate scene graph store list");
-		} break;
-	}
+	m_pSceneGraphStore = ObjectStoreFactory::MakeObjectStore(type);
 
 Error:
 	return r;
 }
 
-RESULT SceneGraph::Reset() {
+RESULT ObjectStore::Reset() {
 	return m_pSceneGraphStore->ResetIterator();
 }
 
-RESULT SceneGraph::PushObject(VirtualObj *pObject) {
+RESULT ObjectStore::PushObject(VirtualObj *pObject) {
 	return m_pSceneGraphStore->PushObject(pObject);
 }
 
-RESULT SceneGraph::RemoveObject(VirtualObj *pObject) {
+RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	CN(m_pSceneGraphStore);
@@ -58,7 +52,7 @@ Error:
 	return r;
 }
 
-RESULT SceneGraph::RemoveObjectByUID(UID uid) {
+RESULT ObjectStore::RemoveObjectByUID(UID uid) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	CN(m_pSceneGraphStore);
@@ -68,7 +62,7 @@ Error:
 	return r;
 }
 
-VirtualObj *SceneGraph::FindObjectByUID(UID uid) {
+VirtualObj *ObjectStore::FindObjectByUID(UID uid) {
 	RESULT r = R_PASS;
 
 	CN(m_pSceneGraphStore);
@@ -79,12 +73,12 @@ Error:
 }
 
 // TODO: Perhaps pass this to a scene graph handler (like physics etc)
-RESULT SceneGraph::UpdateScene() {
+RESULT ObjectStore::UpdateScene() {
 	RESULT r = R_PASS;
 	
 	/*
 	Reset();
-	SceneGraphStore *pObjectStore = GetSceneGraphStore();
+	ObjectStoreImp *pObjectStore = GetSceneGraphStore();
 
 	VirtualObj *pVirtualObj = NULL;
 	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {

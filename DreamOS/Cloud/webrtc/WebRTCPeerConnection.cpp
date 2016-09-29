@@ -205,6 +205,7 @@ std::list<WebRTCICECandidate> WebRTCPeerConnection::GetICECandidates() {
 // PeerConnectionObserver Interface
 void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
 	DEBUG_LINEOUT("OnAddStream: %s", stream->label().c_str());
+	LOG(INFO) << "OnAddStream: " << stream->label();
 
 	// TODO:
 	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_STREAM_ADDED, stream.release());
@@ -212,6 +213,7 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
 	DEBUG_LINEOUT("OnRemoveStream: %s", stream->label().c_str());
+	LOG(INFO) << "OnRemoveStream: " << stream->label();
 
 	// TODO:
 	// m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
@@ -239,6 +241,7 @@ void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::Si
 	switch (new_state) {
 	case webrtc::PeerConnectionInterface::kStable: {
 		DEBUG_LINEOUT("WebRTC Connection Stable");
+		LOG(INFO) << "WebRTC Connection Stable";
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnWebRTCConnectionStable(m_peerConnectionID);
 		}
@@ -249,22 +252,28 @@ void WebRTCPeerConnection::OnSignalingChange(webrtc::PeerConnectionInterface::Si
 
 	case webrtc::PeerConnectionInterface::kHaveLocalOffer: {
 		DEBUG_LINEOUT("WebRTC Connection Has Local Offer");
+		LOG(INFO) << "WebRTC Connection Has Local Offer";
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveLocalPrAnswer: {
 		DEBUG_LINEOUT("WebRTC Connection Has Local Answer");
+		LOG(INFO) << "WebRTC Connection Has Local Answer";
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveRemoteOffer: {
 		DEBUG_LINEOUT("WebRTC Connection has remote offer");
+		LOG(INFO) << "WebRTC Connection Has remote Offer";
 	} break;
 
 	case webrtc::PeerConnectionInterface::kHaveRemotePrAnswer: {
 		DEBUG_LINEOUT("WebRTC Connection has remote answer");
+		LOG(INFO) << "WebRTC Connection Has remote answer";
 	} break;
 
 	case webrtc::PeerConnectionInterface::kClosed: {
 		DEBUG_LINEOUT("WebRTC Connection closed");
+		LOG(INFO) << "WebRTC Connection closed";
+
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnWebRTCConnectionClosed(m_peerConnectionID);
 		}
@@ -279,25 +288,68 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	DEBUG_OUT("ICE Connection Change: ");
 
 	switch (new_state) {
-	case webrtc::PeerConnectionInterface::kIceConnectionNew:			DEBUG_LINEOUT("ICE Connection New"); break;
-	case webrtc::PeerConnectionInterface::kIceConnectionChecking:		DEBUG_LINEOUT("ICE Connection Checking"); break;
-	case webrtc::PeerConnectionInterface::kIceConnectionConnected:		DEBUG_LINEOUT("ICE Connection Connected"); break;
-	case webrtc::PeerConnectionInterface::kIceConnectionCompleted:		DEBUG_LINEOUT("ICE Connection Completed"); break;
-	case webrtc::PeerConnectionInterface::kIceConnectionFailed:			DEBUG_LINEOUT("ICE Connection Failed"); break;
-	case webrtc::PeerConnectionInterface::kIceConnectionDisconnected:	DEBUG_LINEOUT("ICE Connection Disconnected"); break;
-	case webrtc::PeerConnectionInterface::kIceConnectionClosed:			DEBUG_LINEOUT("ICE Connection Closed"); break;
-	case webrtc::PeerConnectionInterface::kIceConnectionMax:			DEBUG_LINEOUT("ICE Connection Max"); break;
+	case webrtc::PeerConnectionInterface::kIceConnectionNew: {
+		DEBUG_LINEOUT("ICE Connection New");
+		LOG(INFO) << "ICE Connection New";
+	} break;
+
+	case webrtc::PeerConnectionInterface::kIceConnectionChecking: {
+		DEBUG_LINEOUT("ICE Connection Checking");
+		LOG(INFO) << "ICE Connection Checking";
+	} break;
+
+	case webrtc::PeerConnectionInterface::kIceConnectionConnected: {
+		DEBUG_LINEOUT("ICE Connection Connected");
+		LOG(INFO) << "ICE Connection Connected";
+	} break;
+
+	case webrtc::PeerConnectionInterface::kIceConnectionCompleted: {
+		DEBUG_LINEOUT("ICE Connection Completed");
+		LOG(INFO) << "ICE Connection Completed";
+	} break;
+
+	case webrtc::PeerConnectionInterface::kIceConnectionFailed: {
+		DEBUG_LINEOUT("ICE Connection Failed");
+		LOG(INFO) << "ICE Connection Failed";
+	} break;
+
+	case webrtc::PeerConnectionInterface::kIceConnectionDisconnected: {
+		DEBUG_LINEOUT("ICE Connection Disconnected");
+		LOG(INFO) << "ICE Connection Disconnected";
+	} break;
+
+	case webrtc::PeerConnectionInterface::kIceConnectionClosed: {
+		DEBUG_LINEOUT("ICE Connection Closed");
+		LOG(INFO) << "ICE Connection Closed";
+	} break;
+
+	case webrtc::PeerConnectionInterface::kIceConnectionMax: {
+		DEBUG_LINEOUT("ICE Connection Max");
+		LOG(INFO) << "ICE Connection Max";
+	} break;
+
 	}
 }
 
 void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {
 	DEBUG_OUT("ICE Connection Change: ");
+	LOG(INFO) << "OnIceGatheringChange";
 
 	switch (new_state) {
-	case webrtc::PeerConnectionInterface::kIceGatheringNew:					DEBUG_LINEOUT("ICE Gathering New"); break;
-	case webrtc::PeerConnectionInterface::kIceGatheringGathering:			DEBUG_LINEOUT("ICE Garthering"); break;
+	case webrtc::PeerConnectionInterface::kIceGatheringNew: {
+		DEBUG_LINEOUT("ICE Gathering New");
+		LOG(INFO) << "ICE Gathering New";
+	} break;
+
+	case webrtc::PeerConnectionInterface::kIceGatheringGathering: {
+		DEBUG_LINEOUT("ICE Garthering");
+		LOG(INFO) << "ICE Gathering";
+	} break;
+
 	case webrtc::PeerConnectionInterface::kIceGatheringComplete: {
 		DEBUG_LINEOUT("ICE Gathering Complete");
+		LOG(INFO) << "ICE Gathering Complete";
+
 		if (m_pParentObserver != nullptr) {
 			m_pParentObserver->OnICECandidatesGatheringDone(m_peerConnectionID);
 		}
@@ -310,13 +362,15 @@ void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface:
 
 void WebRTCPeerConnection::OnIceConnectionReceivingChange(bool receiving) {
 	DEBUG_LINEOUT("ICE Receiving %s", (receiving) ? "true" : "false");
+	LOG(INFO) << "OnIceConnectionReceivingChange: " << ((receiving) ? "true" : "false");
 }
 
 void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
 	DEBUG_LINEOUT("OnIceCandidate: %s %d", candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
+	LOG(INFO) << "OnIceCandidate: " << candidate->sdp_mid() << " " << candidate->sdp_mline_index();
 
-	Json::StyledWriter writer;
-	Json::Value jmessage;
+	//Json::StyledWriter writer;
+	//Json::Value jmessage;
 
 	WebRTCICECandidate iceCandidate;
 	iceCandidate.m_SDPMediateLineIndex = candidate->sdp_mline_index();

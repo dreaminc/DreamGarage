@@ -18,7 +18,7 @@
 #include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
-#include "Scene/SceneGraph.h"
+#include "Scene/ObjectStore.h"
 
 #include <functional>
 
@@ -30,6 +30,7 @@
 
 class light; 
 class quad;
+class FlatContext;
 class sphere; 
 class volume; 
 class texture; 
@@ -74,6 +75,8 @@ public:
 
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
+	FlatContext* AddFlatContext(int width, int height, int channels);
+	RESULT RenderToTexture(FlatContext* pContext);
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
@@ -83,6 +86,7 @@ public:
 	model *MakeModel(wchar_t *pszModelName);
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
+
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
 
 	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
@@ -119,6 +123,7 @@ public:
 
 	// IO
 public:
+	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);
 	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 
@@ -139,11 +144,16 @@ protected:
 	CommandLineManager *m_pCommandLineManager;
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
-	SceneGraph *m_pSceneGraph;
+	
+	ObjectStore *m_pSceneGraph;
+	ObjectStore *m_pFlatSceneGraph;
+
 	CloudController *m_pCloudController;
 
 	SenseKeyboard *m_pSenseKeyboard;
 	SenseMouse *m_pSenseMouse;
+
+	TimeManager* m_pTimeManager;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

@@ -3,6 +3,8 @@
 //#include "CEFImp.h"
 #include "webrtc/WebRTCImp.h"
 
+#include "Sandbox/CommandLineManager.h"
+
 #include <memory>
 
 CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TYPE type, void *pContext = nullptr) {
@@ -11,9 +13,6 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 
 	pCloudController = new CloudController();
 	CN(pCloudController);
-
-	// Initialize the User Object
-	CR(pCloudController->Initialize());
 
 	// TODO: Create a collection of cloud implementations
 	// or the various ones that can be used
@@ -52,7 +51,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 		*/
 
 		pCloudController->SetCloudImp(std::move(pWebRTCImp));
-	} 
+	}
 
 	// default: {
 		// pCloudController = nullptr;
@@ -64,6 +63,14 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	//CLOUD_CONTROLLER_WEBSOCKET = (1u << 2),
 	//CLOUD_CONTROLLER_CURL = (1u << 3),
 
+	/*
+	// Auto Login Handling
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
+		// auto login
+		pCloudController->Start();
+	}
+	*/
 
 //Success:
 	return pCloudController;

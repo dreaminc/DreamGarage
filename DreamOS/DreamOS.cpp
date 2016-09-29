@@ -1,5 +1,7 @@
 #include "DreamOS.h"
 
+#include "Logger/Logger.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -25,6 +27,9 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	srand(static_cast <unsigned> (time(0)));
 
+	// Initialize logger
+	Logger::InitializeLogger();
+
 	// Create the Sandbox
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
 	CNM(m_pSandbox, "Failed to create sandbox");
@@ -46,7 +51,6 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 		while (ss >> arg)
 		{
-			OutputDebugStringA(arg.c_str());
 			args.push_back(arg);
 			new_argc++;
 		}
@@ -69,7 +73,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
-
+	
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
@@ -117,6 +121,16 @@ light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOri
 
 light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+}
+
+FlatContext* DreamOS::AddFlatContext(int width, int height, int channels)
+{
+	return m_pSandbox->AddFlatContext(width, height, channels);
+}
+
+RESULT DreamOS::RenderToTexture(FlatContext *pContext) 
+{
+	return m_pSandbox->RenderToTexture(pContext);
 }
 
 sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {

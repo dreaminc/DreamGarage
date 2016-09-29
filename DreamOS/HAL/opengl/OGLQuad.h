@@ -48,19 +48,6 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
-
-	/*
-	// Now handled in OGLObj
-	RESULT Render() {
-		RESULT r = R_PASS;
-
-		CR(m_pParentImp->glBindVertexArray(m_hVAO));
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
-	Error:
-		return r;
-	}
-	*/
 };
 
 #endif // ! OGL_QUAD_H_

@@ -1,9 +1,12 @@
+#include "Logger/Logger.h"
 #include "DreamGarage.h"
 #include <string>
 
-//quad *g_pQuad;
+// TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
+//#define TESTING
 
 light *g_pLight = nullptr;
+light *g_pLight2 = nullptr;
 
 #include "Cloud/CloudController.h"
 #include "Cloud/Message/UpdateHeadMessage.h"
@@ -32,178 +35,181 @@ RESULT DreamGarage::LoadScene() {
 	// IO
 	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
-	// Add lights
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
-	///*
-	//AddLight(LIGHT_POINT, 1.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	// TODO: Special lane for global light
+	// Add Peer User Object
+	m_pPeerUser = AddUser();
 
-	//vector lightdir = vector(0.0f, 1.0f, -0.5f);
-	vector lightdir = vector(0.7f, -0.5f, -0.6f);
-	lightdir.Normalize();
-
-	/*
-	float lightdistance = 10.0f;
-	point lightpoint = -1.0f * lightdir * lightdistance;
-	lightpoint.w() = 1.0f;
-	//*/
-
-
-	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
-	point ptLight = point(0.0f, 5.0f, 5.0f);
-	//AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	//AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	//
-
-	///*
-	//texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-	//texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
-
-	//texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	//texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-	//texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	//texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
-	//*/
-
-	
 	// TODO: Combine this into one call
 	//texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
 	skybox *pSkybox = AddSkybox();
 	//pSkybox->SetCubeMapTexture(pCubeMap);
-	//*/
+
+	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
+	point ptLight = point(0.0f, 5.0f, 5.0f);
+	point ptLight2 = point(0.0f, 10.0f, 0.0f);
+	vector lightdir = vector(0.0f, -0.5f, 0.0f);
+	lightdir.Normalize();
+
+	// TODO: Special lane for global light
+	light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	
-	// Add Peer User Object
-	m_pPeerUser = AddUser();
+	//AddLight(LIGHT_POINT, 0.1f, point(0, 0.3f, 1.0), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 
-	//quad *pQuad = AddQuad(100.0f, 100.0f);
+	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -0.5f, 0.0f));
+	g_pLight->EnableShadows();
 
-	/*
-	quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
-	pQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
-	pQuad->SetColorTexture(pColorTextureCobble);
-	pQuad->translateY(-2.0f);
-	*/
-	//pQuad->SetBumpTexture(pBumpTexture);
+	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, -10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.5f, 0.0f));
+	g_pLight2->EnableShadows();
 
-	//quad *pQuad = AddQuad(10.0f, 15.0f, 200, 200, pHeightTextureCobble);
-	//pQuad->SetColorTexture(pColorTextureCobble);
-	//pQuad->SetBumpTexture(pBumpTexture);
+	//sphere* p = AddSphere();
+	//p->MoveTo(point(0, 0, 1));
+#ifdef TESTING
+// Test Scene
+// 
+	// Add lights
+///*
 
+/*
+	AddLight(LIGHT_POINT, lightIntensity, point(-lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	AddLight(LIGHT_POINT, lightIntensity, ptLight, color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+//*/
+
+	// Add textures
+///*
+	texture *pBumpTexture = MakeTexture(L"brickwall_bump.jpg", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+	texture *pBumpTexture2 = MakeTexture(L"crate_bump.png", texture::TEXTURE_TYPE::TEXTURE_BUMP);
+
+	texture *pColorTexture = MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pColorTexture2 = MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
+
+	//texture *pColorTextureTest = MakeTexture(L"asymmetrical.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+//*/
+
+	// Add Flat Objects
+///*
+	m_pContext = AddFlatContext(8192, 8192);
+	std::shared_ptr<quad> background = m_pContext->AddQuad(1.5, 1.5, point(0.0f, 0.0f, 0.5f));
+	background->SetColorTexture(pColorTexture);
+	std::shared_ptr<text> pText = m_pContext->AddText(L"ArialDistance.fnt", "Hello World", 1.0, true);
+	pText->MoveTo(0.5f, 0.5f, 0.0f);
+	std::shared_ptr<text> pText2 = m_pContext->AddText(L"ArialDistance.fnt", "Sababa", 1.0, true);
+	RenderToTexture(m_pContext); 
+
+	m_pQuad = AddQuad(10.0f, 10.0f);
+	m_pQuad->MoveTo(0.0f, 2.0f, 0.0f);
+	texture* test = m_pContext->GetFramebuffer()->GetTexture();
+	m_pQuad->SetColorTexture(m_pContext->GetFramebuffer()->GetTexture());
+	m_pQuad->RotateXByDeg(45.0f);
+///*
+	FlatContext* pContext2 = AddFlatContext();
+	std::shared_ptr<text> pText3 = pContext2->AddText(L"ArialDistance.fnt", "second context", 1.5f, true);
+
+	quad* pQuad2 = AddQuad(5.0f, 5.0f);
+	pQuad2->MoveTo(0.0f, 3.0f, 0.0f);
+	RenderToTexture(pContext2);
+	pQuad2->SetColorTexture(pContext2->GetFramebuffer()->GetTexture());
+
+/*
+	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
+		std::shared_ptr<quad> pFQuad2 = pContext2->AddQuad(0.25f, 0.25f, point(-x/10.0f, -x/10.0f, x/10.0f));
+		pFQuad2->SetColorTexture(pColorTexture);
+	}
+
+/*
+	FlatContext *pContext = AddFlatContext();
+	for (float x = 0.0f; x < 5.0f; x += 1.0f) {
+		std::shared_ptr<quad> pFQuad2 = pContext->MakeQuad(x/10.0f, x/10.0f, point(x/10.0f, x/10.0f, x/10.0f));
+		pFQuad2->SetColorTexture(pColorTexture);
+	}
+//*/
+
+	// Add base plane
+/*
+	quad *pBQuad = AddQuad(10.0f, 5.0f, 200, 200);// , pHeightTextureCobble);
+	//pBQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
+	//pBQuad->SetColorTexture(pColorTextureCobble);
+	//pBQuad->SetBumpTexture(pBumpTexture);
+//*/
 	
-	/*
+	// Add billboards
+/*
 	quad *pQuad = AddQuad(1.0f, 1.0f, 10, 10);
-	pQuad->MoveTo(0.0f, 0.0f, 0.0f);
+	pQuad->MoveTo(1.0f, 1.0f, 0.0f);
 	pQuad->SetBillboard(true);
 
 	quad *pQuad2 = AddQuad(1.0f, 1.0f, 10, 10);
 	pQuad2->MoveTo(3.0f, 1.0f, 3.0f);
 	pQuad2->SetScaledBillboard(true);
 	pQuad2->SetBillboard(true);
-	
-	//tQuad->SetBillboard(true);
-	//*/
+//*/
 
-	/*
-	m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
+	// Add spheres
+///*
+	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
-	//m_pSphere = AddSphere(0.5f, 30, 30, color(COLOR_RED));
 
-	/*
-	model* pModel = AddModel(L"\\Models\\Bear\\bear-obj.obj");
-	pModel->SetColorTexture(pColorTexture);
-	pModel->SetBumpTexture(pBumpTexture);
-	pModel->Scale(0.1f);
-	*/
-
-	// TODO: Replace with model
-	//m_pPeerUser = AddVolume(0.25f, 0.5f, 1.0f);
-	//m_pPeerUser = AddVolume(1.0f);
-
-	//m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
-
-	/*
-
-	///*
+///*
 	std::shared_ptr<sphere> pSphere2(MakeSphere(0.5f, 40, 40, color(COLOR_BLUE)));
-
-	/*
-	m_pSphere = AddSphere(0.5f, 40, 40);
-	m_pSphere->SetColorTexture(pColorTexture);
-	m_pSphere->SetBumpTexture(pBumpTexture);
-	//*/
-
-	/*
-	sphere *pSphere2 = AddSphere(0.5f, 40, 40);
+	//sphere *pSphere2 = AddSphere(0.5f, 40, 40);
 
 	pSphere2->SetColorTexture(pColorTexture2);
 	pSphere2->SetBumpTexture(pBumpTexture2);
 	pSphere2->translateX(5.0f);
-	//*/
+///*
+	m_pSphere->AddChild(pSphere2);
+//*/
 
-	/*
+	// Add volumes
+///*
 	volume *pVolume = AddVolume(1.0f);
 	pVolume->translateX(5.0f);
-	*/
+//*/
 
-	/*
-	m_pPeerUser = AddModel(L"\\Models\\face2\\untitled.obj",
-						   MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-						   point(0.0f, 0.0f, 0.0f),
-						   0.1f,
-						   (point_precision)(0.0f));
-
-	//*/
-
-	/*
-	m_pPeerUser = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
-		//MakeTexture(L"..\\Models\\stormtrooper\\Map__7_Raytrace.tga", texture::TEXTURE_TYPE::TEXTURE_COLOR),
-		nullptr,
-		point(0.0f, 2.0f, 5.0f),
-		0.1f,
-		(point_precision)(0.0f));
-		
-
+	// Add models
+///*
 	AddModel(L"\\Models\\Bear\\bear-obj.obj",
 		nullptr,
 		point(-4.5f, -4.8f - 2.6f, 0.0f),
 		0.1f,
-		100.0f);
+		vector(0.0f, 0.0f, 0.0f));
 
 	AddModel(L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
 		point(-3.0f, -4.2f - 2.5f, 0.0f),
 		0.15f,
-		4.0f);
-
+		vector(0.0f, 0.0f, 0.0f));
+///*
 	AddModel(L"\\Models\\Dwarf\\dwarf_2_low.obj",
 		//new OGLTexture(this, L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(0.0f, -4.9f - 2.1f, 0.0f),
-		20.0f);
+		0.1f,
+		vector(0.0f, 0.0f, 0.0f));
 
 	AddModel(L"\\Models\\car\\untitled.obj",
 		nullptr,
 		point(10.0f, -3.7f - 4.0f, -1.0f - 6.0f),
 		0.015f,
-		80.1f);// ->SetOrientation(quaternion(vector(1.0, 1.0, 1.0)))->RotateZByDeg(90);
+		vector(0.0f, 0.0f, 0.0f));// ->SetOrientation(quaternion(vector(1.0, 1.0, 1.0)))->RotateZByDeg(90);
 
 	AddModel(L"\\Models\\toys\\poly.obj",
 		MakeTexture(L"..\\Models\\toys\\lego.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(-4.5f, -4.8f - 2.6f, 4.0f),
 		1.0f,
-		100.0f);
-	*/
+		vector(0.0f, 0.0f, 0.0f));
 		
-	/*
+/*
 	AddModel(L"\\Models\\terrain\\untitled.obj",
 		MakeTexture(L"..\\Models\\terrain\\floor.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR),
 		point(0.0f, -10.0f, 0.0f),
 		7.0f,
-		0);
-	*/
-
+		vector(0.0f, 0.0f, 0.0f));
+//*/
+#endif // ! TESTING
 
 //Error:
 	return r;
@@ -296,19 +302,25 @@ RESULT DreamGarage::Update(void) {
 	static std::shared_ptr<DebugData> pZ2 = DebugConsole::GetDebugConsole()->Register();
 	pZ2->SetValue("hello");
 	*/
-	/*
+
+#ifdef TESTING
+///*
 	// Update stuff ...
 	if (m_pSphere != nullptr) {
 		//m_pSphere->translateY(0.0005f);
 		//m_pSphere->RotateBy(0.001f, 0.002f, 0.001f);
 		m_pSphere->RotateYBy(0.001f);
-		for (auto &childObj : m_pSphere->GetChildren()) {
-			childObj->RotateYBy(0.001f);
+		if (m_pSphere->HasChildren()) {
+			for (auto &childObj : m_pSphere->GetChildren()) {
+				childObj->RotateYBy(0.001f);
+			}
 		}
 	}
-	//*/
+///*
+	m_pSphere->translateX(0.001f);
+//*/
 
-	//m_pSphere->translateX(0.001f);
+#endif
 
 	// TODO: Switch to message queue that runs on own thread
 	// for now just throttle it down
@@ -374,14 +386,20 @@ RESULT DreamGarage::Update(void) {
 // Cloud Controller
 RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) {
 	RESULT r = R_PASS;
-
+	LOG(INFO) << "data received";
+	std::string st((char*)pDataMessage);
+	st = "<- " + st;
+	HUD_OUT(st.c_str());
+	/*
 	Message::MessageType switchHeadModelMessage = (Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1);
 
 	if (pDataMessage->GetType() == switchHeadModelMessage) {
+		HUD_OUT("Other user changed the head model");
 		CR(m_pPeerUser->SwitchHeadModel());
 	}
 
 Error:
+*/
 	return r;
 }
 
@@ -394,6 +412,8 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	//pUpdateHeadMessage->PrintMessage();
 
 	//m_pSphere->SetPosition(pUpdateHeadMessage->GetPosition());
+
+	WCN(m_pPeerUser);
 
 	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
 
@@ -414,7 +434,7 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	m_pPeerUser->SetOrientation(qOrientation * qAdjust);
 	*/
 
-//Error:
+Error:
 	return r;
 }
 
@@ -424,24 +444,37 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
 	//pUpdateHandMessage->PrintMessage();
 
-	hand::HandState handState = pUpdateHandMessage->GetHandState();
+	hand::HandState handState;
+
+	WCN(m_pPeerUser);
+
+	handState = pUpdateHandMessage->GetHandState();
 	m_pPeerUser->UpdateHand(handState);
 
-//Error:
+Error:
 	return r;
 }
 
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
-
+	/*
 	switch (kbEvent->KeyCode) {
 		case (SK_SCAN_CODE)('C') : {
 			if (kbEvent->KeyState != 0) {
+				HUD_OUT("Key 'C' is pressed - switch model");
 				SendSwitchHeadMessage();
 			}
 		}
 	}
-
+	*/
 //Error:
+	return r;
+}
+
+RESULT DreamGarage::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	HUD_OUT("DreamAPP command");
+
 	return r;
 }

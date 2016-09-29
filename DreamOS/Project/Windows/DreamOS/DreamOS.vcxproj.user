@@ -9,7 +9,7 @@
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'">
-    <LocalDebuggerCommandArguments>-i ec2-54-175-210-194.compute-1.amazonaws.com -P 8000 -u nightmare@dreamos.com -p dreamy</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-i ec2-54-175-210-194.compute-1.amazonaws.com -P 8000 -u nightmare@dreamos.com -p dreamy -l auto</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

@@ -39,6 +39,11 @@ uniform mat4 u_mat4Normal;
 
 uniform mat4 u_mat4DepthVP;
 
+// when no bump texture is set -> we don't need to use TBN coordinates.
+// this is important for some models which set uv coordinates incorrectly (for colored materials with no textures) and makes the
+// whole lighting wrong by the shader.
+uniform	bool u_hasTextureBump;
+
 // Light Structure
 // TODO: Create a parsing system to create shader GLSL code
 struct Light {
@@ -77,9 +82,11 @@ void main(void) {
 	// TODO: Calc this CPU side?  Understand tradeoffs 
 	mat3 TBNTransformMatrix = mat3(g_mat4InvTransposeModelView);
 
-	vec3 ModelTangent = normalize(TBNTransformMatrix * inV_vec4Tangent.xyz);
+	vec3 tangent = (u_hasTextureBump) ? inV_vec4Tangent.xyz : vec3(1.0, 0.0, 0.0);
+
+	vec3 ModelTangent = normalize(TBNTransformMatrix * tangent);
 	//vec3 ModelBitangent = normalize(TBNTransformMatrix * inV_vec4Bitangent.xyz);
-	vec3 ModelBitangent = normalize(TBNTransformMatrix * (cross(inV_vec4Normal.xyz, inV_vec4Tangent.xyz) * -1.0f));
+	vec3 ModelBitangent = normalize(TBNTransformMatrix * (cross(inV_vec4Normal.xyz, tangent) * -1.0f));
 	vec3 ModelNormal = normalize(TBNTransformMatrix * inV_vec4Normal.xyz);
 
 	DataOut.TangentBitangentNormalMatrix = transpose(mat3(ModelTangent, ModelBitangent, ModelNormal));

@@ -147,7 +147,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
@@ -342,7 +342,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -484,7 +484,7 @@
 		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
 		xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
 		xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-                                     python $(ProjectDir)..\..\..\Scripts\copy_assets.py $(ProjectDir)..\..\..\ $(TargetDir)
+
 	  </Command>
     </PostBuildEvent>
     <PreBuildEvent>
@@ -500,10 +500,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;NOT_USE_DREAM_OS_PATH_ENV;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -645,7 +645,8 @@
 		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
 		xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
 		xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-	  </Command>
+	                   python $(ProjectDir)..\..\..\Scripts\copy_assets.py $(ProjectDir)..\..\..\ $(TargetDir)
+	                   python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDir)..\..\..\Project\Windows\Production\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -664,6 +665,9 @@
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
+    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
+    <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
+    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
@@ -680,7 +684,7 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProfiler.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
@@ -695,7 +699,11 @@
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
+    <ClCompile Include="..\..\..\Logger\Logger.cpp" />
+    <ClCompile Include="..\..\..\Primitives\camera.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp" />
+    <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
@@ -709,8 +717,6 @@
     <ClCompile Include="..\..\..\Primitives\user.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
-    <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp" />
-    <ClCompile Include="..\..\..\Profiler\Profiler.cpp" />
     <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
@@ -720,14 +726,18 @@
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
-    <ClCompile Include="..\..\..\Scene\SceneGraph.cpp" />
-    <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStore.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -763,6 +773,11 @@
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
+    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h" />
+    <ClInclude Include="..\..\..\DreamConsole\Console.h" />
+    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
+    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h" />
+    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
@@ -969,7 +984,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProfiler.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h" />
@@ -977,6 +992,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h" />
@@ -1011,6 +1027,7 @@
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
+    <ClInclude Include="..\..\..\Logger\Logger.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
     <ClInclude Include="..\..\..\Primitives\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
@@ -1018,6 +1035,7 @@
     <ClInclude Include="..\..\..\Primitives\composite.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\dirty.h" />
+    <ClInclude Include="..\..\..\Primitives\FlatContext.h" />
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
     <ClInclude Include="..\..\..\Primitives\hand.h" />
@@ -1057,9 +1075,6 @@
     <ClInclude Include="..\..\..\Primitives\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
     <ClInclude Include="..\..\..\Primitives\volume.h" />
-    <ClInclude Include="..\..\..\Profiler\DebugConsole.h" />
-    <ClInclude Include="..\..\..\Profiler\ProfilerGraph.h" />
-    <ClInclude Include="..\..\..\Profiler\Profiler.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
@@ -1069,14 +1084,16 @@
     <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
-    <ClInclude Include="..\..\..\Scene\SceneGraph.h" />
-    <ClInclude Include="..\..\..\Scene\SceneGraphList.h" />
-    <ClInclude Include="..\..\..\Scene\SceneGraphStore.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStore.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />
@@ -1114,6 +1131,8 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag" />

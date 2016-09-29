@@ -12,6 +12,7 @@
 #include <list>
 #include <map>
 #include <vector>
+#include <functional>
 
 class CommandLineManager : public valid {
 private:
@@ -37,6 +38,8 @@ public:
 	RESULT RegisterParameter(std::string strParamName, std::string strParamTag, std::string strDefaultValue);
 	RESULT SetParameterValue(std::string strParamName, std::string strParamValue);
 	std::string GetParameterValue(std::string strParamName);
+
+	void ForEach(std::function<void(const std::string&)> func);
 
 private:
 	std::vector<std::string> m_strCommandLineArguments;

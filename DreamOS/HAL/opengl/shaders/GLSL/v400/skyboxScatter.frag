@@ -83,6 +83,14 @@ vec3 absorb(float dist, vec3 color, vec3 Kr, float factor) {
 }
 
 
+vec3 attenuate(float dist, vec3 color, vec3 Kr, float factor) {
+	float radius = 1.0f;
+	float denom = ((dist)/radius) + 1.0f;
+	float att = 1/(denom*denom);
+	return (att)*color;
+}
+
+
 void main(void) {  
 
 	vec3 lightDirection = normalize(u_vecSunDirection.xyz);
@@ -90,16 +98,16 @@ void main(void) {
 	float theta = dot(eyeDirection, lightDirection);
 	
 	float rayleighBrightness = 1.0;
-	float mieBrightness = 1.0;
+	float mieBrightness = 4.0;
 	float spotBrightness = (cos(theta) < 0.0f) ? 0.0f : 1.0f;
 
-	float rayleighFactor = phase(theta, 0.0)*rayleighBrightness;
+	float rayleighFactor = phase(theta+1.25, 0.0)*rayleighBrightness;
 	float mieFactor = phase(theta, 0.9995)*mieBrightness;
 
 	float sunSize = 0.9995f;
 	float spotFactor = smoothstep(0.0, 15.0, phase(theta, sunSize))*spotBrightness;
 
-	float surfaceHeight = 0.75;
+	float surfaceHeight = 0.85;
 	int stepCount = 15;
 	vec3 eyePosition = vec3(0.0, surfaceHeight, 0.0);
 	float eyeDepth = atmosphericDepth(eyePosition, eyeDirection);
@@ -111,12 +119,13 @@ void main(void) {
 	vec3 Kr = vec3(
 		0.18867780436772762, 0.4978442963618773, 0.6616065586417131
 	);
+	//vec3 Kr = u_vecSkyColor;
 	
 	vec3 rayleighCollected = vec3(0.0, 0.0, 0.0);
 	vec3 mieCollected = vec3(0.0, 0.0, 0.0);
 
-	vec4 intensity = vec4(1.0, 1.0, 1.0, 1.0);
-	float rayleighStrength = 1.0f;
+	vec4 intensity = vec4(1.1, 1.1, 1.1, 1.0);
+	float rayleighStrength = 0.0f;
 	float mieStrength = 0.5f;
 	float scatterStrength = 0.5f;
 
@@ -128,10 +137,11 @@ void main(void) {
 		float extinction = horizonExtinction(position, lightDirection, surfaceHeight-0.35);
 		float sampleDepth = atmosphericDepth(position, lightDirection);
 
-		vec3 influx = absorb(sampleDepth, intensity.xyz, Kr, scatterStrength)*extinction;
+		vec3 influxRayleigh = attenuate(sampleDepth, intensity.xyz, Kr, scatterStrength)*extinction;
+		rayleighCollected += (attenuate(sampleDistance, Kr*influxRayleigh, Kr, rayleighStrength));
 
-		rayleighCollected += (absorb(sampleDistance, Kr*influx, Kr, rayleighStrength));
-		mieCollected += (absorb(sampleDistance, influx, Kr, mieStrength));
+		vec3 influxMie = absorb(sampleDepth, intensity.xyz, Kr, scatterStrength)*extinction;
+		mieCollected += (absorb(sampleDistance, influxMie, Kr, mieStrength));
 	}	
 
 	float rayleighCollectionPower = 1.0f;

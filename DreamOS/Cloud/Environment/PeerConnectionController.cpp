@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "PeerConnectionController.h"
 #include "PeerConnection.h"
 
@@ -46,8 +47,8 @@ RESULT PeerConnectionController::Initialize() {
 	RESULT r = R_PASS;
 
 	m_pWebRTCImp = std::make_unique<WebRTCImp>(GetCloudController());
-	CN(m_pWebRTCImp);
 
+	CN(m_pWebRTCImp);
 	CR(m_pWebRTCImp->Initialize());
 	CR(m_pWebRTCImp->RegisterObserver(this));
 
@@ -303,9 +304,11 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 
 		// TODO: This is a bit of a hack - but setting the answer description here from the Answer SDP 
-		// will ultimately signal the WebRTC connection to be complete
+		// will ultimately signal the WebRTC connection to be complete	
 		CN(m_pWebRTCImp);
 		CR(m_pWebRTCImp->SetSDPAnswer(peerConnectionID, pPeerConnection->GetSDPAnswer()));
+		//CR(m_pWebRTCImp->SetSDPAnswer(pPeerConnection->GetSDPAnswer()));
+	
 
 		// We don't have a guarantee that the WebRTC connection is stable at this point
 

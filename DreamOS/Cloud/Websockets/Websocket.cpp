@@ -151,6 +151,8 @@ RESULT Websocket::Stop() {
 	websocketpp::lib::error_code websocketError;
 	m_websocketClient.close(m_pWebsocketConnection->get_handle(), websocketpp::close::status::going_away, "", websocketError);
 	
+	m_pWebsocketConnection.reset();
+	
 	// TODO: This is causing some kind of error on exit still
 	m_fRunning = false;
 	m_thread.join();

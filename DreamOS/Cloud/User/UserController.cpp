@@ -14,6 +14,8 @@
 
 #include <future>
 
+#include "DreamConsole/DreamConsole.h"
+
 UserController::UserController(Controller* pParentController) :
 	Controller(pParentController),
 	m_fLoggedIn(false)

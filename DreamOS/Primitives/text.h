@@ -59,7 +59,7 @@ public:
 //		Invalidate();
 	}
 
-	RESULT SetText(const std::string& text, double size);
+	RESULT SetText(const std::string& text, double size, bool* isChanged = nullptr);
 	
 	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)
 	{
@@ -68,6 +68,7 @@ public:
 		return this->MoveTo(p.x() + dx, p.y() + dy, p.z());
 	}
 
+	std::shared_ptr<Font> GetFont() { return m_font; }
 
 private:
 

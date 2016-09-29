@@ -1,21 +1,21 @@
-#include "SceneGraphList.h"
+#include "ObjectStoreImpList.h"
 
-SceneGraphList::SceneGraphList() :
+ObjectStoreImpList::ObjectStoreImpList() :
 	m_pSkybox(nullptr)
 {
 	ResetIterator();
 }
 
-SceneGraphList::~SceneGraphList() {
+ObjectStoreImpList::~ObjectStoreImpList() {
 	// empty
 }
 
-RESULT SceneGraphList::ResetIterator() {
+RESULT ObjectStoreImpList::ResetIterator() {
 	m_objectIterator = m_objects.begin();
 	return R_PASS;
 }
 
-VirtualObj *SceneGraphList::GetNextObject() {
+VirtualObj *ObjectStoreImpList::GetNextObject() {
 	if (m_objectIterator == m_objects.end())
 		return nullptr;
 
@@ -28,17 +28,17 @@ VirtualObj *SceneGraphList::GetNextObject() {
 }
 
 
-RESULT SceneGraphList::PushDimensionObject(DimObj *pDimObj) {
+RESULT ObjectStoreImpList::PushDimensionObject(DimObj *pDimObj) {
 	m_objects.push_back(pDimObj);
 	return R_PASS;
 }
 
-RESULT SceneGraphList::PushLight(light *pLight) {
+RESULT ObjectStoreImpList::PushLight(light *pLight) {
 	m_lights.push_back(pLight);
 	return R_PASS;
 }
 
-RESULT SceneGraphList::PushObject(VirtualObj *pObject) {
+RESULT ObjectStoreImpList::PushObject(VirtualObj *pObject) {
 	
 	light *pLight = dynamic_cast<light*>(pObject);
 	if (pLight != nullptr)
@@ -55,12 +55,12 @@ RESULT SceneGraphList::PushObject(VirtualObj *pObject) {
 	return R_INVALID_OBJECT;
 }
 
-RESULT SceneGraphList::RemoveObject(VirtualObj *pObject) {
+RESULT ObjectStoreImpList::RemoveObject(VirtualObj *pObject) {
 	m_objects.remove(pObject);
 	return R_PASS;
 }
 
-RESULT SceneGraphList::RemoveObjectByUID(UID uid) {
+RESULT ObjectStoreImpList::RemoveObjectByUID(UID uid) {
 	RESULT r = R_PASS;
 
 	for (std::list<VirtualObj*>::iterator it = m_objects.begin(); it != m_objects.end(); it++) {
@@ -75,7 +75,7 @@ RESULT SceneGraphList::RemoveObjectByUID(UID uid) {
 
 // Note: This memory location is not guaranteed and needs to be collected each time
 // Caller should create a copy if needed
-RESULT SceneGraphList::GetLights(std::vector<light*>*& pLights) {
+RESULT ObjectStoreImpList::GetLights(std::vector<light*>*& pLights) {
 	RESULT r = R_PASS;
 
 	pLights = &(m_lights);
@@ -83,17 +83,17 @@ RESULT SceneGraphList::GetLights(std::vector<light*>*& pLights) {
 	return r;
 }
 
-RESULT SceneGraphList::SetSkybox(skybox *pSkybox) {
+RESULT ObjectStoreImpList::SetSkybox(skybox *pSkybox) {
 	m_pSkybox = pSkybox;
 	return R_PASS;
 }
 
-RESULT SceneGraphList::GetSkybox(skybox*& pSkybox) {
+RESULT ObjectStoreImpList::GetSkybox(skybox*& pSkybox) {
 	pSkybox = m_pSkybox;
 	return R_PASS;
 }
 
-VirtualObj *SceneGraphList::FindObjectByUID(UID uid) {
+VirtualObj *ObjectStoreImpList::FindObjectByUID(UID uid) {
 	for (std::list<VirtualObj*>::iterator it = m_objects.begin(); it != m_objects.end(); it++)
 		if ((*it)->getID() == uid) 
 			return (*it);
@@ -101,7 +101,7 @@ VirtualObj *SceneGraphList::FindObjectByUID(UID uid) {
 	return nullptr;
 }
 
-VirtualObj *SceneGraphList::FindObject(VirtualObj *pObject) {
+VirtualObj *ObjectStoreImpList::FindObject(VirtualObj *pObject) {
 	for (std::list<VirtualObj*>::iterator it = m_objects.begin(); it != m_objects.end(); it++)
 		if ((*it) == pObject)
 			return (*it);

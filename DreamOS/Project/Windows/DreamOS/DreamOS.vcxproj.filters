@@ -81,9 +81,6 @@
     <Filter Include="HMD\Oculus">
       <UniqueIdentifier>{a53afd0a-b5a4-4b9b-80ab-050429f6f805}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Profiler">
-      <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HAL\opengl\shaders">
       <UniqueIdentifier>{e0da08a9-31cd-4af0-98a1-edfdec0ab066}</UniqueIdentifier>
     </Filter>
@@ -150,6 +147,12 @@
     <Filter Include="Cloud\Message">
       <UniqueIdentifier>{a4934822-8fc9-4363-ac78-f660fcfbe16c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamConsole">
+      <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -197,14 +200,8 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Scene\SceneGraph.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp">
       <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp">
-      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
       <Filter>Primitives</Filter>
@@ -248,9 +245,6 @@
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp">
       <Filter>HMD\Oculus</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Profiler\Profiler.cpp">
-      <Filter>Profiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -289,9 +283,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProfiler.cpp">
-      <Filter>HAL\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
       <Filter>Cloud</Filter>
@@ -347,9 +338,6 @@
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp">
       <Filter>External\Matrices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp">
-      <Filter>Profiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
@@ -366,6 +354,18 @@
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\user.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStore.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\FlatContext.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp">
@@ -391,6 +391,36 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
       <Filter>Cloud\webrtc</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamConsole\Console.cpp">
+      <Filter>DreamConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp">
+      <Filter>DreamConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp">
+      <Filter>DreamConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Logger\Logger.cpp">
+      <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\camera.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseMouse.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
+      <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -577,15 +607,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraph.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraphStore.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraphList.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\quaternion.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -693,9 +714,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h">
       <Filter>HMD\Oculus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Profiler\Profiler.h">
-      <Filter>Profiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h">
       <Filter>HAL\opengl</Filter>
@@ -1305,12 +1323,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Profiler\ProfilerGraph.h">
-      <Filter>Profiler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProfiler.h">
-      <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
       <Filter>Sense</Filter>
@@ -1954,9 +1966,6 @@
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h">
       <Filter>Cloud\Environment</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Profiler\DebugConsole.h">
-      <Filter>Profiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
@@ -1977,6 +1986,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStore.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\FlatContext.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h">
       <Filter>Cloud\Environment</Filter>
@@ -1999,6 +2026,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h">
       <Filter>Cloud\webrtc</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\Console.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Logger\Logger.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
+      <Filter>Sandbox\Windows</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2118,6 +2169,12 @@
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">

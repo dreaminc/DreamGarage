@@ -30,9 +30,9 @@
 
 class SandboxApp; 
 class Windows64App;
-class OGLProfiler;
+class OGLDreamConsole;
 
-class OpenGLImp : public HALImp {
+class OpenGLImp : public HALImp, public Subscriber<CmdPromptEvent> {
 private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
@@ -41,6 +41,7 @@ private:
 	OGLProgram *m_pOGLProgramCapture;		// temp for testing
 	OGLProgram *m_pOGLSkyboxProgram;
 	OGLProgram *m_pOGLOverlayProgram;
+	OGLProgram *m_pOGLFlatProgram; 
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
@@ -48,13 +49,15 @@ private:
 	version m_versionOGL;
 	version m_versionGLSL;
 
-	std::unique_ptr<OGLProfiler>	m_pOGLProfiler;
+	std::unique_ptr<OGLDreamConsole>	m_pOGLDreamConsole;
 
 	// Viewport
 	// TODO: Move this into an object?
 private:
 	int m_pxViewWidth;
 	int m_pxViewHeight;
+
+	bool	m_drawWireframe = false;
 
 public:
 	int GetViewWidth() { return m_pxViewWidth; }
@@ -64,10 +67,6 @@ private:
 	bool m_fRenderProfiler = false;
 
 public:
-	bool GetRenderProfiler() { return m_fRenderProfiler; }
-	void SetRenderProfiler(bool render) { m_fRenderProfiler = render; }
-
-public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
 
@@ -75,12 +74,13 @@ public:
 public:
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
+	quad* MakeQuad(double width, double height, point origin);
 
 	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
 	volume* MakeVolume(double width, double length, double height);
 	
 	volume* MakeVolume(double side);
-	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();
@@ -91,22 +91,22 @@ public:
 	composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation);
 
 	composite *MakeComposite();
+	FlatContext* MakeFlatContext(int width, int height, int channels);
 	user *MakeUser();
 	hand* MakeHand();
 
 	// TODO: Fix w/ scene graph not here
-	composite *LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+	composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 public:
-	// TODO: Consolidate all of these (one Render function)
-	RESULT SetMonoViewTarget();
-	RESULT SetStereoViewTarget(EYE_TYPE eye);
-	RESULT SetStereoFramebufferViewTarget(EYE_TYPE eye);
+	RESULT SetViewTarget(EYE_TYPE eye);
+	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
+	RESULT RenderToTexture(FlatContext* pContext);
+private:
+	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
+	RESULT RenderProfiler(EYE_TYPE eye);
 
-	RESULT Render(SceneGraph *pSceneGraph);
-	RESULT RenderStereo(SceneGraph *pSceneGraph);
-	RESULT RenderStereoFramebuffers(SceneGraph *pSceneGraph);
-
+public:
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT Shutdown();
 
@@ -125,6 +125,8 @@ private:
 	RESULT PrepareScene();
 
 private:
+	RESULT Notify(CmdPromptEvent *event);
+
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
@@ -194,6 +196,7 @@ public:
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
 	RESULT glUniform1i(GLint location, GLint v0);
+	RESULT glUniform1fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniform4fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 

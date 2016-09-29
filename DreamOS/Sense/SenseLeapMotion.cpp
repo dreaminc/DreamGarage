@@ -1,5 +1,7 @@
 #include "SenseLeapMotion.h"
 
+#include "DreamConsole/DreamConsole.h"
+
 SenseLeapMotion::SenseLeapMotion() :
 	m_pLeapController(nullptr),
 	m_pLeftHand(nullptr),
