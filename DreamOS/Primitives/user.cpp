@@ -25,8 +25,6 @@ RESULT user::Initialize() {
 					   vector(0.0f, (float)M_PI, 0.0f));
 
 	m_pHeads.push_back(pHead);
-	m_pHeadTextures.push_back(pHeadTexture);
-	
 	//m_pHeadTextures.push_back(pHeadTexture);
 	//*/
 
