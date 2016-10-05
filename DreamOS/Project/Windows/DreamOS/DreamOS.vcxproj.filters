@@ -409,7 +409,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
       <Filter>Cloud\webrtc</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
@@ -2044,7 +2044,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h">
       <Filter>Cloud\webrtc</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\DreamConsole\Console.h">
       <Filter>DreamConsole</Filter>
     </ClInclude>
@@ -2092,9 +2092,6 @@
     </None>
     <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
       <Filter>Resources\Fonts</Filter>
-    </None>
-    <None Include="..\..\..\Models\face4\untitled.mtl">
-      <Filter>Models\face4</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
@@ -2259,19 +2256,5 @@
     <Image Include="..\..\..\Texture\Fonts\ArialDistance.png">
       <Filter>Texture\Fonts</Filter>
     </Image>
-    <Image Include="..\..\..\Models\face4\eye.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj">
-      <Filter>Models\face4</Filter>
-    </Object>
   </ItemGroup>
 </Project>

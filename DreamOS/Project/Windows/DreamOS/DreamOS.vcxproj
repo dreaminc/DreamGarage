@@ -1252,9 +1252,6 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\Makefile" />
-    <None Include="..\..\..\Models\face4\untitled.mtl">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />
     <None Include="..\..\..\Resources\Fonts\Arial.fnt">
@@ -1273,15 +1270,6 @@
     <ResourceCompile Include="DreamOS.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\Models\face4\eye.tga">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
-      <DeploymentContent>true</DeploymentContent>
-    </Image>
     <Image Include="..\..\..\Texture\Fonts\Arial.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
@@ -1289,14 +1277,6 @@
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="Dream.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</DeploymentContent>
-    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
