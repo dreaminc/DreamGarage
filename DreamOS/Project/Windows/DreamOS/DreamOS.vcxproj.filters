@@ -153,6 +153,24 @@
     <Filter Include="Logger">
       <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{451be8f2-6fb4-4145-9e8c-1bc687711a45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture\Fonts">
+      <UniqueIdentifier>{c0308159-cdcb-4990-9db2-489d8ce4a640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{064cde94-bbe7-418c-8746-c82ed21a2885}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Fonts">
+      <UniqueIdentifier>{47aac8d7-21b7-41d9-86f4-dc30eebed8c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models">
+      <UniqueIdentifier>{9a748425-2cc2-4f36-8890-7f0968562c06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models\face4">
+      <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -2056,11 +2074,21 @@
     <None Include="..\..\..\Primitives\.DS_Store">
       <Filter>Primitives</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin">
+      <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Fonts\Arial.fnt">
+      <Filter>Resources\Fonts</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
+      <Filter>Resources\Fonts</Filter>
+    </None>
+    <None Include="..\..\..\Models\face4\untitled.mtl">
+      <Filter>Models\face4</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
@@ -2068,22 +2096,10 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert">
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag">
@@ -2098,28 +2114,64 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
@@ -2134,48 +2186,53 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -2190,5 +2247,25 @@
     <Image Include="Dream.ico">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\Texture\Fonts\Arial.png">
+      <Filter>Texture\Fonts</Filter>
+    </Image>
+    <Image Include="..\..\..\Texture\Fonts\ArialDistance.png">
+      <Filter>Texture\Fonts</Filter>
+    </Image>
+    <Image Include="..\..\..\Models\face4\eye.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.obj">
+      <Filter>Models\face4</Filter>
+    </Object>
   </ItemGroup>
 </Project>

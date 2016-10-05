@@ -48,18 +48,19 @@ RESULT DreamGarage::LoadScene() {
 	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
 	point ptLight = point(0.0f, 5.0f, 5.0f);
 	point ptLight2 = point(0.0f, 10.0f, 0.0f);
-	vector lightdir = vector(0.0f, -0.5f, 0.0f);
+	vector lightdir = vector(0.0f, -1.0f, 0.0f);
+//	vector lightdir = vector(0.0f, -1.0f, 0.000001f);
 	lightdir.Normalize();
 
 	// TODO: Special lane for global light
-	light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
+	//light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 	
 	//AddLight(LIGHT_POINT, 0.1f, point(0, 0.3f, 1.0), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
 
-	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -0.5f, 0.0f));
-	g_pLight->EnableShadows();
+//	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -0.5f, 0.0f));
+//	g_pLight->EnableShadows();
 
-	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, -10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.5f, 0.0f));
+	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
 	g_pLight2->EnableShadows();
 
 	//sphere* p = AddSphere();
@@ -90,7 +91,7 @@ RESULT DreamGarage::LoadScene() {
 //*/
 
 	// Add Flat Objects
-///*
+/*
 	m_pContext = AddFlatContext(8192, 8192);
 	std::shared_ptr<quad> background = m_pContext->AddQuad(1.5, 1.5, point(0.0f, 0.0f, 0.5f));
 	background->SetColorTexture(pColorTexture);
@@ -104,7 +105,7 @@ RESULT DreamGarage::LoadScene() {
 	texture* test = m_pContext->GetFramebuffer()->GetTexture();
 	m_pQuad->SetColorTexture(m_pContext->GetFramebuffer()->GetTexture());
 	m_pQuad->RotateXByDeg(45.0f);
-///*
+/*
 	FlatContext* pContext2 = AddFlatContext();
 	std::shared_ptr<text> pText3 = pContext2->AddText(L"ArialDistance.fnt", "second context", 1.5f, true);
 
@@ -128,9 +129,9 @@ RESULT DreamGarage::LoadScene() {
 //*/
 
 	// Add base plane
-/*
-	quad *pBQuad = AddQuad(10.0f, 5.0f, 200, 200);// , pHeightTextureCobble);
-	//pBQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
+///*
+	quad *pBQuad = AddQuad(10.0f, 20.0f, 200, 200);// , pHeightTextureCobble);
+	pBQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
 	//pBQuad->SetColorTexture(pColorTextureCobble);
 	//pBQuad->SetBumpTexture(pBumpTexture);
 //*/

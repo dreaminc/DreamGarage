@@ -1102,59 +1102,199 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\Makefile" />
+    <None Include="..\..\..\Models\face4\untitled.mtl">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />
+    <None Include="..\..\..\Resources\Fonts\Arial.fnt">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\dreampaths.txt" />
+    <Text Include="..\..\..\dreampaths.txt">
+      <DeploymentContent>true</DeploymentContent>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DreamOS.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\Models\face4\eye.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Texture\Fonts\Arial.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Texture\Fonts\ArialDistance.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
     <Image Include="Dream.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</DeploymentContent>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
