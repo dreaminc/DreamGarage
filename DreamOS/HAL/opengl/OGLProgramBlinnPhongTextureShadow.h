@@ -157,6 +157,7 @@ public:
 
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
+			m_pUniformHasTextureDepth->SetUniform(true);
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
 
 			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform

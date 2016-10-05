@@ -69,19 +69,23 @@ public:
 
 	// Will normalize this vector
 	RESULT Normalize() {
+		RESULT r = R_PASS;
+
 		vector_precision denom = 0;
 
 		for (int i = 0; i < 3; i++)
 			denom += static_cast<vector_precision>(pow(element(i, 0), 2));
 
 		denom = static_cast<vector_precision>(sqrt(denom));
+		CBM(denom != 0.0f, "Zero magnitude vector");
 
 		for (int i = 0; i < 3; i++)
 			element(i, 0) = element(i, 0) / denom;
 
 		element(3, 0) = 1.0f;
 
-		return R_PASS;
+	Error:
+		return r;
 	}
 
 	// Return a normalized version of this vector
