@@ -99,6 +99,7 @@ RESULT WebRTCPeerConnection::AddStreams() {
 	// Add streams
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
 		LOG(LS_ERROR) << "Adding stream to PeerConnection failed";
+		LOG(INFO) << "Adding stream to PeerConnection failed";
 	}
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
@@ -451,16 +452,8 @@ Error:
 void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) {
 	RESULT r = R_PASS;
 
-	// TODO: Add a better thing than DummySetSessionDescriptionObserver 
-	m_pWebRTCPeerConnectionInterface->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
-	CR(ClearLocalSessionDescriptionProtocol());
-
-	m_fSDPSet = true;
-
 	m_strLocalSessionDescriptionType = sessionDescription->type();
 	sessionDescription->ToString(&m_strLocalSessionDescriptionProtocol);
-
-	CR(PrintSDP());
 
 	// TODO: peer ID stuff
 	// TODO: Pass m_fOffer to single call since this can be consolidated
@@ -470,6 +463,7 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 		}
 		else {
 			DEBUG_LINEOUT("SDP Offer Success");
+			LOG(INFO) << "SDP Offer Success";
 		}
 	}
 	else {
@@ -478,8 +472,16 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 		}
 		else {
 			DEBUG_LINEOUT("SDP Answer Success");
+			LOG(INFO) << "SDP Answer Success";
 		}
 	}
+
+	// TODO: Add a better thing than DummySetSessionDescriptionObserver 
+	m_pWebRTCPeerConnectionInterface->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
+	m_fSDPSet = true;
+	CR(PrintSDP());	
+
+	CR(ClearLocalSessionDescriptionProtocol());
 
 Error:
 	return;
@@ -490,12 +492,14 @@ void WebRTCPeerConnection::OnFailure(const std::string& error) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("WebRTC Error: %s", error.c_str());
+	LOG(INFO) << "WebRTC Error: " << error.c_str();
 
 	if (m_pParentObserver != nullptr) {
 		CR(m_pParentObserver->OnSDPFailure(m_peerConnectionID, m_fOffer));
 	}
 	else {
 		DEBUG_LINEOUT("SDP %s Failure", m_fOffer ? "offer" : "answer");
+		LOG(INFO) << "SDP " << (m_fOffer ? "offer" : "answer") << " failure";
 	}
 
 Error:
@@ -538,6 +542,7 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	CN(m_pWebRTCPeerConnectionFactory.get());		// ensure factory is valid
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));	// ensure peer connection is nullptr
 
+	// TODO: thisssss
 	iceServer.uri = GetPeerConnectionString();
 	rtcConfiguration.servers.push_back(iceServer);
 
@@ -658,8 +663,13 @@ RESULT WebRTCPeerConnection::AddIceCandidate(WebRTCICECandidate iceCandidate) {
 	CBM((m_pWebRTCPeerConnectionInterface->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
 
 	DEBUG_LINEOUT("Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
+	LOG(INFO) << "Received candidate : " << iceCandidate.m_strSDPCandidate.c_str();
 	
+// Success:
+	return r;
+
 Error:
+	LOG(INFO) << "Candidate " << iceCandidate.m_strSDPCandidate.c_str() << " failed with error: " << sdpError.description.c_str();
 	return r;
 }
 
@@ -673,7 +683,8 @@ RESULT WebRTCPeerConnection::SendDataChannelStringMessage(std::string& strMessag
 	CN(m_pDataChannelInterface);
 
 	//CB(pWebRTCDataChannel->Send(webrtc::DataBuffer(strMessage)));
-	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(strMessage)));
+	//CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(strMessage)));
+	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(strMessage.c_str(), strMessage.length()), true)));
 
 Error:
 	return r;
@@ -740,7 +751,8 @@ std::string WebRTCPeerConnection::GetPeerConnectionString() {
 	//return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
 	//return GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.ekiga.net");
 
-	return std::string("stun:stun.ekiga.net");
+	return std::string("stun:stun.l.google.com:19302");
+	//return std::string("stun:stun.ekiga.net");
 }
 
 RESULT WebRTCPeerConnection::PrintSDP() {
@@ -778,7 +790,11 @@ std::string WebRTCPeerConnection::GetSDPJSONString(std::string strSessionDescrip
 
 RESULT WebRTCPeerConnection::PrintLocalSDP() {
 	DEBUG_LINEOUT("WebRTCConductor: Local SDP:");
+	LOG(INFO) << "WebRTCConductor: Local SDP:";
+
 	DEBUG_LINEOUT("%s", m_strLocalSessionDescriptionProtocol.c_str());
+	LOG(INFO) << m_strLocalSessionDescriptionProtocol.c_str();
+
 	return R_PASS;
 }
 
@@ -796,7 +812,11 @@ std::string WebRTCPeerConnection::GetLocalSDPJSONString() {
 
 RESULT WebRTCPeerConnection::PrintRemoteSDP() {
 	DEBUG_LINEOUT("WebRTCConductor: Remote SDP:");
+	LOG(INFO) << "WebRTCConductor: Remote SDP:";
+
 	DEBUG_LINEOUT("%s", m_strRemoteSessionDescriptionProtocol.c_str());
+	LOG(INFO) << m_strRemoteSessionDescriptionProtocol.c_str();
+
 	return R_PASS;
 }
 

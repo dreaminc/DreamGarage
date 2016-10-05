@@ -596,6 +596,6 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 		SendDataChannelStringMessage(NULL, st);
 	}
 
-Error:
+//Error:
 	return r;
 }
