@@ -2063,6 +2063,9 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

@@ -239,6 +239,17 @@ public:
 		return R_PASS;
 	}
 
+	RESULT SetTangentBitangentFromNormal() {
+		// Set random normal vectors for t,b in the perpendicuar plane of the normal
+		vector n = GetNormal();
+
+		vector tangent = vector(n.z(), n.z(), -n.x() - n.y());
+
+		vector bitangent = n.cross(tangent);
+
+		return SetTangentBitangent(tangent.Normal(), bitangent.Normal());
+	}
+
 	RESULT SetBitangent(vector b) {
 		m_bitangent = b;
 		return R_PASS;
