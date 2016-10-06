@@ -47,42 +47,16 @@ private:
 
 		for (auto& v : vertices) {
 			m_pIndices[verticesCnt] = verticesCnt;
-			m_pVertices[verticesCnt++] = vertex(v);
+			m_pVertices[verticesCnt] = vertex(v);
+			m_pVertices[verticesCnt].SetTangentBitangentFromNormal();
 
-			if (verticesCnt % 3 == 0) {
-				SetTriangleTangentBitangent(verticesCnt - 3, verticesCnt - 2, verticesCnt - 1);
-			}
+			verticesCnt++;
 		}
 
 	Error:
 		return r;
 	}
 
-	RESULT SetVerticesIndices(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
-		RESULT r = R_PASS;
-
-		m_nVertices = static_cast<unsigned int>(vertices.size());
-		m_nIndices = static_cast<unsigned int>(indices.size());
-		CR(Allocate());
-
-		unsigned int verticesCnt = 0;
-		unsigned int indexCnt = 0;
-
-		for (auto& v : vertices) {
-			m_pVertices[verticesCnt++] = vertex(v);
-
-			if (verticesCnt % 3 == 0) {
-				SetTriangleTangentBitangent(verticesCnt - 3, verticesCnt - 2, verticesCnt - 1);
-			}
-		}
-
-		for (auto& ind : indices) {
-			m_pIndices[indexCnt++] = (dimindex)(ind);
-		}
-
-	Error:
-		return r;
-	}
 
 public:
 	model(wchar_t *pszModelName) {
@@ -151,17 +125,18 @@ public:
 		unsigned int Cnt = 0;
 
 		for (auto& v : vertices) {
-			m_pVertices[Cnt++] = vertex(v);
+			m_pVertices[Cnt] = vertex(v);
+			m_pVertices[Cnt].SetTangentBitangentFromNormal();
+
+			Cnt++;
 		}
+
 
 		Cnt = 0;
 
-		for (auto& i : indices) {
+		for (auto& i : indices)
+		{
 			m_pIndices[Cnt++] = i;
-
-			if (Cnt % 3 == 0) {
-				SetTriangleTangentBitangent(m_pIndices[Cnt - 3], m_pIndices[Cnt - 2], m_pIndices[Cnt - 1]);
-			}
 		}
 
 		Validate();

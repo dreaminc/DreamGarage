@@ -40,31 +40,16 @@ RESULT DreamGarage::LoadScene() {
 	// Add Peer User Object
 	m_pPeerUser = AddUser();
 
-	// TODO: Combine this into one call
-	//texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
-	skybox *pSkybox = AddSkybox();
-	//pSkybox->SetCubeMapTexture(pCubeMap);
+	AddSkybox();
 
-	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
-	point ptLight = point(0.0f, 5.0f, 5.0f);
-	point ptLight2 = point(0.0f, 10.0f, 0.0f);
-	vector lightdir = vector(0.0f, -1.0f, 0.0f);
-//	vector lightdir = vector(0.0f, -1.0f, 0.000001f);
-	lightdir.Normalize();
-
-	// TODO: Special lane for global light
-	//light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	
-	//AddLight(LIGHT_POINT, 0.1f, point(0, 0.3f, 1.0), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-
-//	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -0.5f, 0.0f));
-//	g_pLight->EnableShadows();
-
-	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
+	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 	g_pLight2->EnableShadows();
 
-	//sphere* p = AddSphere();
-	//p->MoveTo(point(0, 0, 1));
+	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+
 #ifdef TESTING
 // Test Scene
 // 
