@@ -110,7 +110,8 @@ void OGLDreamConsole::Render(bool isMonoView) {
 		return !(posY > viewTop);
 	});
 
-	std::string cmdText = ">" + DreamConsole::GetConsole()->GetCmdText();
+	auto currentCmdTxt = DreamConsole::GetConsole()->GetCmdText();
+	std::string cmdText = ">" + currentCmdTxt;
 
 	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 	if ((time / 100) % 10 > 5)
@@ -389,6 +390,8 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 {
 	float consoleHeight = 0;
 
+	m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 0.3f));
+
 	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData())
 	{
 		point rowTL = point(topLeft.x(), topLeft.y() - consoleHeight, 0.0f);
@@ -401,6 +404,32 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 		consoleHeight += m_OGLConsoleText->m_height;
 
 		m_OGLProgram->RenderObject(m_OGLConsoleText->SetPosition(rowTL, text::BOTTOM_RIGHT));
+	}
+
+	auto currentCmdText = DreamConsole::GetConsole()->GetCmdText();
+	
+	if (currentCmdText.length() > 0)
+	{
+		m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 0.8f));
+
+		point rowTL = point(topLeft.x(), topLeft.y() - consoleHeight, 0.0f);
+
+		m_OGLConsoleText->SetText(currentCmdText, 1.0);
+
+		m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(-m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0), point(-m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0)));
+		m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(-m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0)));
+		//m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, 0, 0)));
+
+		m_OGLProgram->RenderObject(m_OGLConsoleText->SetPosition(point(0, 0, 0), text::CENTER));
+
+		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+		if ((time / 100) % 10 > 5)
+		{
+			//currentCmdText += "|";
+			point pt = point(m_OGLConsoleText->m_width / 2, 0, 0);
+
+			m_OGLProgram->RenderObject(m_OGLConsoleText->SetText("|", 1.0)->SetPosition(pt, text::RIGHT));
+		}
 	}
 }
 

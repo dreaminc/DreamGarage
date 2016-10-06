@@ -2056,6 +2056,9 @@
     <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
       <Filter>Primitives\Types</Filter>
     </ClInclude>
+	<ClInclude Include="..\..\..\Primitives\AABV.h">
+	  <Filter>Primitives</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\DreamOSWinMain.h">
       <Filter>Main</Filter>
     </ClInclude>
@@ -2084,7 +2087,9 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\AABV.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2258,6 +2263,12 @@
     </None>
     <None Include="..\..\..\Primitives\plane.h">
       <Filter>Primitives</Filter>
+	</None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
