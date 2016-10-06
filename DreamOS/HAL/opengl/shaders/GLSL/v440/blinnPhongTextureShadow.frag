@@ -25,8 +25,20 @@ in Data {
 	vec3 directionShadowCastingLight;
 } DataIn;
 
+uniform bool	u_hasTextureColor;
 uniform sampler2D u_textureColor;
+
+uniform bool	u_hasTextureDepth;
 uniform sampler2D u_textureDepth;
+
+uniform bool	u_hasTextureAmbient;
+uniform sampler2D u_textureAmbient;
+
+uniform bool	u_hasTextureDiffuse;
+uniform sampler2D u_textureDiffuse;
+
+uniform bool	u_hasTextureSpecular;
+uniform sampler2D u_textureSpecular;
 
 // Light Structure
 struct Light {
@@ -85,6 +97,18 @@ void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 d
 	//*/
 }
 
+void EnableBlending(float ambientAlpha, float diffuseAlpha) {
+	// 
+	// Fakes blending by moving clear fragments behind the skybox
+	// Remove once blending is fully supported
+	if (ambientAlpha < 0.1f || diffuseAlpha < 0.1f) {
+		gl_FragDepth = 1.0f;
+	} 
+	else {
+		gl_FragDepth = gl_FragCoord.z;
+	}
+}
+
 void main(void) {  
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
@@ -102,8 +126,10 @@ void main(void) {
 	bias = 0.0f;
 
 	///*
-	if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy).x  <  (DataIn.vertShadowCoordinate.z - bias)) {
-		lightVisibility = 0.5;
+	if (u_hasTextureDepth) {
+		if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy).x  <  (DataIn.vertShadowCoordinate.z - bias)) {
+			lightVisibility = 0.5;
+		}
 	}
 	//*/
 
@@ -119,19 +145,30 @@ void main(void) {
 	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	//TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
 
+	vec4 colorAmbient = material.m_colorAmbient * ((u_hasTextureAmbient) ? texture(u_textureAmbient, DataIn.uvCoord * 1.0f) : (u_hasTextureColor) ? texture(u_textureColor, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
+	vec4 colorDiffuse = material.m_colorDiffuse * ((u_hasTextureDiffuse) ? texture(u_textureDiffuse, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
+	vec4 colorSpecular = material.m_colorSpecular * ((u_hasTextureSpecular) ? texture(u_textureSpecular, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
+	
+	
+	// TODO: light.m_colorAmbient now hardcoded, needs to be part of the light property
+	vec4 lightColorAmbient = g_ambient * vec4(1,1,1,1);
+
+	vec4 ambientValue = vec4(1,1,1,1);
+
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
+		
+		vec4LightValue += lightVisibility * ambientValue * lightColorAmbient /*lights[i].m_colorDiffuse*/ * colorAmbient;
 
 		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, DataIn.distanceLight[i], diffuseValue, specularValue);
-			vec4LightValue += lightVisibility * diffuseValue * lights[i].m_colorDiffuse * material.m_colorDiffuse;
-			vec4LightValue += lightVisibility * specularValue * lights[i].m_colorSpecular * material.m_colorSpecular;
+			vec4LightValue += lightVisibility * diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
+			vec4LightValue += lightVisibility * specularValue * lights[i].m_colorSpecular * colorSpecular;
 		}
 	}
-	vec4LightValue[3] = 1.0f;
-	
-	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 1.0f);
-	vec4 ambientColor = g_vec4AmbientLightLevel;
-	out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
-	//out_vec4Color = textureColor;
+
+	out_vec4Color = vec4LightValue;
+
+	// opaque/fully transparent blending without reordering
+	EnableBlending(colorAmbient.a, colorDiffuse.a);
 }

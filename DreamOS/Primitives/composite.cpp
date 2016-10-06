@@ -36,6 +36,7 @@ RESULT composite::ClearObjects() {
 	return ClearChildren();
 }
 
+
 std::shared_ptr<texture> composite::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 
 	RESULT r = R_PASS;
@@ -74,10 +75,10 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<composite> composite::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+std::shared_ptr<composite> composite::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<composite> pModel(m_pHALImp->MakeModel(wstrOBJFilename, pTexture, ptPosition, scale, rotateY));
+	std::shared_ptr<composite> pModel(m_pHALImp->MakeModel(wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation));
 
 	//Success:
 	return pModel;
@@ -86,10 +87,10 @@ std::shared_ptr<composite> composite::MakeModel(const std::wstring& wstrOBJFilen
 	return nullptr;
 }
 
-std::shared_ptr<composite> composite::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+std::shared_ptr<composite> composite::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<composite> pModel = MakeModel(wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+	std::shared_ptr<composite> pModel = MakeModel(wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 	CR(AddObject(pModel));
 
 	//Success:
@@ -156,3 +157,37 @@ Error:
 std::shared_ptr<volume> composite::AddVolume(double side) {
 	return AddVolume(side, side, side);
 }
+
+std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight));
+	CR(AddObject(pQuad));
+
+//Success:
+	return pQuad;
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight)
+{
+	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+}
+
+/*
+//RESULT Traverse(RESULT (*f)(std::shared_ptr<DimObj>), std::vector<std::shared_ptr<VirtualObj>> objects) {
+RESULT Traverse(std::function<RESULT(std::shared_ptr<DimObj> pObject)> f, std::vector<std::shared_ptr<VirtualObj>> objects) {
+	RESULT r = R_PASS;
+	for (auto& v : objects) {
+		auto d = std::dynamic_pointer_cast<DimObj>(v);
+		if (d && d->HasChildren()) {
+			CR((f)(d));
+			CR(Traverse(f, d->GetChildren()));
+		}
+	}
+Error:
+	return r;
+}
+*/

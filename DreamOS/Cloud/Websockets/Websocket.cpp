@@ -69,7 +69,7 @@ Websocket::~Websocket() {
 	}
 }
 
-RESULT Websocket::SetToken(std::string& strToken) {
+RESULT Websocket::SetToken(const std::string& strToken) {
 	m_strToken = strToken;
 	return R_PASS;
 }
@@ -150,6 +150,8 @@ RESULT Websocket::Stop() {
 	m_websocketClient.stop_perpetual();
 	websocketpp::lib::error_code websocketError;
 	m_websocketClient.close(m_pWebsocketConnection->get_handle(), websocketpp::close::status::going_away, "", websocketError);
+	
+	m_pWebsocketConnection.reset();
 	
 	// TODO: This is causing some kind of error on exit still
 	m_fRunning = false;

@@ -24,6 +24,7 @@
 
 #include "Primitives/light.h"
 #include "Primitives/quad.h"
+#include "Primitives/FlatContext.h"
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
@@ -47,6 +48,9 @@ protected:
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
+	FlatContext *AddFlatContext(int width = 1024, int height = 1024, int channels = 4);
+	RESULT RenderToTexture(FlatContext* pContext);
+
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 
 	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
@@ -67,7 +71,7 @@ protected:
 
 	model *AddModel(wchar_t *pszModelName);
 	model *MakeModel(wchar_t *pszModelName);
-	composite *AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, point_precision rotateY = 0);
+	composite *AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 	user *AddUser();
 
@@ -83,11 +87,18 @@ protected:
 
 	// Cloud Controller
 protected:
+	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
 
+	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+
+	// IO
+protected:
+	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
+	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);

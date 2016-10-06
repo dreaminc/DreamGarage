@@ -59,6 +59,12 @@ public:
 		SetXYZRotationMatrix(thetaX, thetaY, thetaZ);
 	}
 
+	RotationMatrix(vector vEuler) :
+		m_type(XYZ_AXIS)
+	{
+		SetXYZRotationMatrix(vEuler.x(), vEuler.y(), vEuler.z());
+	}
+
 	RotationMatrix(ROTATION_MATRIX_TYPE axis, rotation_precision theta) :
 		m_type(axis)
 	{
@@ -125,8 +131,8 @@ public:
 		
 		vector zAxis = -1.0f * v.Normal();
 		vector xAxis; 
-		
-		if ((zAxis * up) != 0.0f)
+	
+		if (((zAxis * up) != 0.0f) && (zAxis != up))
 			xAxis = up.cross(zAxis);
 		else
 			xAxis = vector(-zAxis.y(), zAxis.x(), zAxis.z());

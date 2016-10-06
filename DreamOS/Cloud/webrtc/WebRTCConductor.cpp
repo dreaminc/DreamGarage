@@ -1,3 +1,5 @@
+#include "Logger/Logger.h"
+
 #include "WebRTCConductor.h"
 
 #include "WebRTCImp.h"
@@ -28,23 +30,31 @@ const char kSDPName[] = "sdp";
 const char kSessionDescriptionTypeName[] = "type";
 const char kSessionDescriptionSdpName[] = "sdp";
 
+// TODO: Make this more legitimate
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
 public:
 	static DummySetSessionDescriptionObserver* Create() {
 		return new rtc::RefCountedObject<DummySetSessionDescriptionObserver>();
 	}
 
-	virtual void OnSuccess() {
-		LOG(INFO) << __FUNCTION__;
-	}
-
-	virtual void OnFailure(const std::string& error) {
-		LOG(INFO) << __FUNCTION__ << " " << error;
-	}
-
 protected:
-	DummySetSessionDescriptionObserver() {}
-	~DummySetSessionDescriptionObserver() {}
+	DummySetSessionDescriptionObserver() {
+		// empty
+	}
+
+	~DummySetSessionDescriptionObserver() {
+		// empty
+	}
+
+public:
+	virtual void OnSuccess() {
+		DEBUG_LINEOUT("DummySetSessionDescriptionObserver On Success");
+	}
+
+	virtual void OnFailure(const std::string& strError) {
+		//LOG(INFO) << __FUNCTION__ << " " << error;
+		DEBUG_LINEOUT("DummySetSessionDescriptionObserver On Failure: %s", strError.c_str());
+	}
 };
 
 WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp) :
@@ -54,7 +64,9 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_WebRTCPeerID(-1),
 	m_fLoopback(false),
-	m_pDataChannelInterface(nullptr)
+	m_pDataChannelInterface(nullptr),
+	m_fOffer(false),
+	m_fSDPSet(false)
 {
 	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
 		m_pWebRTCPeerConnectionFactory.release();
@@ -65,6 +77,30 @@ WebRTCConductor::WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParent
 	}
 
 	ClearSessionDescriptionProtocol();
+}
+
+WebRTCConductor::~WebRTCConductor() {
+	// empty
+}
+
+RESULT WebRTCConductor::Initialize() {
+	RESULT r = R_PASS;
+
+	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
+	
+	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+
+	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
+
+//Success:
+	return r;
+
+Error:
+	if (m_pWebRTCPeerConnectionFactory != nullptr) {
+		m_pWebRTCPeerConnectionFactory = nullptr;
+	}
+
+	return r;
 }
 
 std::string WebRTCConductor::GetSessionDescriptionString() {
@@ -80,49 +116,94 @@ RESULT WebRTCConductor::ClearSessionDescriptionProtocol() {
 void WebRTCConductor::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
 	DEBUG_LINEOUT("OnAddStream: %s", stream->label().c_str());
 
+	LOG(INFO) << "OnAddStream: " << stream->label();
+
 	// TODO:
 	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_STREAM_ADDED, stream.release());
 }
 
 void WebRTCConductor::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
 	DEBUG_LINEOUT("OnRemoveStream: %s", stream->label().c_str());
-	
+
+	LOG(INFO) << "OnRemoveStream: " << stream->label();
+
 	// TODO:
 	// m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
 }
 
-// TODO: Move this into the class
-struct ICECandidate {
-	std::string m_strSDPCandidate;
-	std::string m_strSDPMediaID;
-	int m_SDPMediateLineIndex;
-};
+std::list<ICECandidate> WebRTCConductor::GetCandidates() {
+	return m_iceCandidates;
+}
 
-std::list<ICECandidate> g_iceCandidates;
+// TODO: Add callbacks
+void WebRTCConductor::OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) {
+	DEBUG_OUT("WebRTC Connection Signaling Changed: ");
+
+	LOG(INFO) << "OnSignalingChange";
+
+	switch (new_state) {
+		case webrtc::PeerConnectionInterface::kStable: {
+			DEBUG_LINEOUT("WebRTC Connection Stable");
+			LOG(INFO) << "WebRTC Connection Stable";
+			m_pParentWebRTCImp->OnWebRTCConnectionStable();
+		} break;
+
+		case webrtc::PeerConnectionInterface::kHaveLocalOffer: {
+			DEBUG_LINEOUT("WebRTC Connection Has Local Offer");
+			LOG(INFO) << "WebRTC Connection Has Local Offer";
+		} break;
+
+		case webrtc::PeerConnectionInterface::kHaveLocalPrAnswer: {
+			DEBUG_LINEOUT("WebRTC Connection Has Local Answer");
+			LOG(INFO) << "WebRTC Connection Has Local Answer";
+		} break;
+
+		case webrtc::PeerConnectionInterface::kHaveRemoteOffer: {
+			DEBUG_LINEOUT("WebRTC Connection has remote offer");
+			LOG(INFO) << "WebRTC Connection Has remote Offer";
+		} break;
+
+		case webrtc::PeerConnectionInterface::kHaveRemotePrAnswer: {
+			DEBUG_LINEOUT("WebRTC Connection has remote answer");
+			LOG(INFO) << "WebRTC Connection Has remote answer";
+		} break;
+
+		case webrtc::PeerConnectionInterface::kClosed: {
+			DEBUG_LINEOUT("WebRTC Connection closed");
+			LOG(INFO) << "WebRTC Connection closed";
+
+			m_pParentWebRTCImp->OnWebRTCConnectionClosed();
+		} break;
+	}
+}
 
 void WebRTCConductor::OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state) {
 	DEBUG_OUT("ICE Connection Change: ");
 
+	LOG(INFO) << "OnIceConnectionChange";
+
 	switch (new_state) {
-		case webrtc::PeerConnectionInterface::kIceConnectionNew:			DEBUG_LINEOUT("ICE Connection New"); break;
-		case webrtc::PeerConnectionInterface::kIceConnectionChecking:		DEBUG_LINEOUT("ICE Connection Checking"); break;
-		case webrtc::PeerConnectionInterface::kIceConnectionConnected:		DEBUG_LINEOUT("ICE Connection Connected"); break;
-		case webrtc::PeerConnectionInterface::kIceConnectionCompleted:		DEBUG_LINEOUT("ICE Connection Completed"); break;
-		case webrtc::PeerConnectionInterface::kIceConnectionFailed:			DEBUG_LINEOUT("ICE Connection Failed"); break;
-		case webrtc::PeerConnectionInterface::kIceConnectionDisconnected:	DEBUG_LINEOUT("ICE Connection Disconnected"); break;
-		case webrtc::PeerConnectionInterface::kIceConnectionClosed:			DEBUG_LINEOUT("ICE Connection Closed"); break;
-		case webrtc::PeerConnectionInterface::kIceConnectionMax:			DEBUG_LINEOUT("ICE Connection Max"); break;
+		case webrtc::PeerConnectionInterface::kIceConnectionNew:			LOG(INFO) << "ICE Connection New"; break;
+		case webrtc::PeerConnectionInterface::kIceConnectionChecking:		LOG(INFO) << "ICE Connection Checking"; break;
+		case webrtc::PeerConnectionInterface::kIceConnectionConnected:		LOG(INFO) << "ICE Connection Connected"; break;
+		case webrtc::PeerConnectionInterface::kIceConnectionCompleted:		LOG(INFO) << "ICE Connection Completed"; break;
+		case webrtc::PeerConnectionInterface::kIceConnectionFailed:			LOG(INFO) << "ICE Connection Failed"; break;
+		case webrtc::PeerConnectionInterface::kIceConnectionDisconnected:	LOG(INFO) << "ICE Connection Disconnected"; break;
+		case webrtc::PeerConnectionInterface::kIceConnectionClosed:			LOG(INFO) << "ICE Connection Closed"; break;
+		case webrtc::PeerConnectionInterface::kIceConnectionMax:			LOG(INFO) << "ICE Connection Max"; break;
 	}
 }
 
 void WebRTCConductor::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {
 	DEBUG_OUT("ICE Connection Change: ");
 
+	LOG(INFO) << "OnIceGatheringChange";
+
 	switch (new_state) {
-		case webrtc::PeerConnectionInterface::kIceGatheringNew:					DEBUG_LINEOUT("ICE Gathering New"); break;
-		case webrtc::PeerConnectionInterface::kIceGatheringGathering:			DEBUG_LINEOUT("ICE Garthering"); break;
+		case webrtc::PeerConnectionInterface::kIceGatheringNew:					LOG(INFO) << "ICE Gathering New"; break;
+		case webrtc::PeerConnectionInterface::kIceGatheringGathering:			LOG(INFO) << "ICE Garthering"; break;
 		case webrtc::PeerConnectionInterface::kIceGatheringComplete: {
-			DEBUG_LINEOUT("ICE Gathering Complete");
+			LOG(INFO) << "ICE Gathering Complete";
 			m_pParentWebRTCImp->OnICECandidatesGatheringDone();
 		}break;
 	}
@@ -130,19 +211,25 @@ void WebRTCConductor::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceG
 
 void WebRTCConductor::OnIceConnectionReceivingChange(bool receiving) {
 	DEBUG_LINEOUT("ICE Receiving %s", (receiving) ? "true" : "false");
+
+	LOG(INFO) << "OnIceConnectionReceivingChange: " << ((receiving) ? "true" : "false");
+
 }
 
 void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
 	DEBUG_LINEOUT("OnIceCandidate: %s %d", candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
 	
+	LOG(INFO) << "OnIceCandidate: " << candidate->sdp_mid() << " " << candidate->sdp_mline_index();
+
 	// For loopback test. To save some connecting delay.
 	if (m_fLoopback) {
 		if (!m_pWebRTCPeerConnection->AddIceCandidate(candidate)) {
-			DEBUG_LINEOUT("Failed to apply the received candidate");
+			LOG(ERROR) << "Failed to apply the received candidate";
 		}
 		return;
 	}
 
+	// TODO: remove dead code
 	Json::StyledWriter writer;
 	Json::Value jmessage;
 
@@ -161,11 +248,11 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 	*/
 	
 	if (!candidate->ToString(&(iceCandidate.m_strSDPCandidate))) {
-		LOG(LS_ERROR) << "Failed to serialize candidate";
+		LOG(ERROR) << "Failed to serialize candidate";
 		return;
 	}
 
-	g_iceCandidates.push_back(iceCandidate);
+	m_iceCandidates.push_back(iceCandidate);
 
 	//jmessage[kCandidateSdpName] = s_strSDPCandidate;
 
@@ -177,6 +264,8 @@ void WebRTCConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candid
 
 RESULT WebRTCConductor::SendMessageToPeer(std::string* strMessage, int peerID) {
 	RESULT r = R_PASS;
+
+	LOG(INFO) << "SendMessageToPeer peerID=" << peerID << " msg=" << strMessage;
 
 	// TODO: Add a queue here for messages, this is not correct
 
@@ -190,6 +279,8 @@ Error:
 }
 
 void WebRTCConductor::SendMessage(const std::string& strJSONObject) {
+	LOG(INFO) << "SendMessage " << strJSONObject;
+
 	std::string* msg = new std::string(strJSONObject);
 	m_pParentWebRTCImp->QueueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
 }
@@ -197,7 +288,17 @@ void WebRTCConductor::SendMessage(const std::string& strJSONObject) {
 RESULT WebRTCConductor::PrintSDP() {
 	DEBUG_LINEOUT("WebRTCConductor: SDP:");
 	DEBUG_LINEOUT("%s", m_strSessionDescriptionProtocol.c_str());
+	LOG(INFO) << "PrintSDP " << m_strSessionDescriptionProtocol.c_str();
+
 	return R_PASS;
+}
+
+std::string WebRTCConductor::GetSDPTypeString() {
+	return m_strSessionDescriptionType;
+}
+
+std::string WebRTCConductor::GetSDPString() {
+	return m_strSessionDescriptionProtocol;
 }
 
 std::string WebRTCConductor::GetSDPJSONString() {
@@ -208,7 +309,7 @@ std::string WebRTCConductor::GetSDPJSONString() {
 	JSONMessage[kSessionDescriptionSdpName] = m_strSessionDescriptionProtocol;
 
 	// Append Candidates
-	for (auto &iceCandidate : g_iceCandidates) {
+	for (auto &iceCandidate : m_iceCandidates) {
 		Json::Value JSONIceCandidate;
 
 		JSONIceCandidate[kCandidateSdpName] = iceCandidate.m_strSDPCandidate;
@@ -231,6 +332,8 @@ void WebRTCConductor::UIThreadCallback(int msgID, void* data) {
 
 	DEBUG_LINEOUT("WebRTCConductor::UIThreadCallback: msg ID %d", msgID);
 
+	LOG(INFO) << "UIThreadCallback msgID=" << msgID;
+
 //Error:
 	return;
 }
@@ -239,15 +342,24 @@ void WebRTCConductor::UIThreadCallback(int msgID, void* data) {
 void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) {
 	RESULT r = R_PASS;
 
-	m_pWebRTCPeerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
-	
-	CR(ClearSessionDescriptionProtocol());
-	
 	m_strSessionDescriptionType = sessionDescription->type();
 	sessionDescription->ToString(&m_strSessionDescriptionProtocol);
 
+	if (m_fOffer) {
+		CR(m_pParentWebRTCImp->OnSDPOfferSuccess());
+	}
+	else {
+		CR(m_pParentWebRTCImp->OnSDPAnswerSuccess());
+	}
+
+	m_pWebRTCPeerConnection->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
+	m_fSDPSet = true;
+
+	LOG(INFO) << "OnSuccess " << m_strSessionDescriptionProtocol;
 	CR(PrintSDP());
 
+	CR(ClearSessionDescriptionProtocol());
+	/*
 	// For loopback test. To save some connecting delay.
 	if (m_fLoopback) {
 		// Replace message type from "offer" to "answer"
@@ -256,20 +368,10 @@ void WebRTCConductor::OnSuccess(webrtc::SessionDescriptionInterface* sessionDesc
 		return;
 	}
 
-	CR(m_pParentWebRTCImp->OnPeerConnectionInitialized());
-
-	/*
-	Json::StyledWriter JSONWriter;
-	Json::Value JSONMessage;
-
-	JSONMessage[kSessionDescriptionTypeName] = sessionDescription->type();
-	JSONMessage[kSessionDescriptionSdpName] = strSDP;
-
-	DEBUG_LINEOUT("WebRTCConductor: JSON SDP:");
-	DEBUG_LINEOUT("%s", JSONWriter.write(JSONMessage).c_str());
-
-	SendMessage(JSONWriter.write(JSONMessage));
+	// TODO: peer ID stuff
 	*/
+	
+
 Error:
 	return;
 }
@@ -277,11 +379,13 @@ Error:
 std::string WebRTCConductor::GetPeerConnectionString() {
 	// Issues behind the NAT
 	//return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:74.125.196.127:19302");
-	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	//return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.l.google.com:19302");
+	return WebRTCImp::GetEnvVarOrDefault("WEBRTC_CONNECT", "stun:stun.ekiga.net");
 }
 
 void WebRTCConductor::OnFailure(const std::string& error) {
 	DEBUG_LINEOUT("WebRTC Error: %s", error.c_str());
+	LOG(ERROR) << "OnFailure " << error.c_str();
 }
 
 cricket::VideoCapturer* WebRTCConductor::OpenVideoCaptureDevice() {
@@ -396,7 +500,7 @@ RESULT WebRTCConductor::AddStreams() {
 
 	// Add streams
 	if (!m_pWebRTCPeerConnection->AddStream(pMediaStreamInterface)) {
-		LOG(LS_ERROR) << "Adding stream to PeerConnection failed";
+		LOG(INFO) << "Adding stream to PeerConnection failed";
 	}
 	
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
@@ -453,7 +557,7 @@ RESULT WebRTCConductor::SendDataChannelStringMessage(std::string& strMessage) {
 	CN(m_pDataChannelInterface);
 
 	//CB(pWebRTCDataChannel->Send(webrtc::DataBuffer(strMessage)));
-	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(strMessage)));
+	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(strMessage.c_str(), strMessage.length()), true)));//webrtc::DataBuffer(strMessage)));
 
 Error:
 	return r;
@@ -532,10 +636,10 @@ Error:
 
 RESULT WebRTCConductor::CreateOffer(){
 	RESULT r = R_PASS;
-
 	CN(m_pWebRTCPeerConnection);
+	
+	m_fOffer = true;
 	m_pWebRTCPeerConnection->CreateOffer(this, NULL);
-
 Error:
 	return r;
 }
@@ -548,12 +652,16 @@ bool WebRTCConductor::IsPeerConnectionInitialized() {
 		return true;
 }
 
+// TODO: Support many peer connections
 RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
-	CB((m_pWebRTCPeerConnectionFactory.get() == nullptr));	// ensure peer connection factory uninitialized
+	//CB((m_pWebRTCPeerConnectionFactory.get() == nullptr));	// ensure peer connection factory uninitialized
+	
+	CN(m_pWebRTCPeerConnectionFactory);	// ensure peer connection initialized
 	CB((m_pWebRTCPeerConnection.get() == nullptr));			// ensure peer connection uninitialized
 
+	/*
 	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
 
 	if (!m_pWebRTCPeerConnectionFactory.get()) {
@@ -561,22 +669,23 @@ RESULT WebRTCConductor::InitializePeerConnection(bool fAddDataChannel) {
 		DeletePeerConnection();
 		return R_FAIL;
 	}
-
+	*/
 	//if (!CreatePeerConnection(DTLS_OFF)) {
 	if (!CreatePeerConnection(DTLS_ON)) {
 		DEBUG_LINEOUT("Error CreatePeerConnection failed");
+		LOG(ERROR) << "Error CreatePeerConnection failed";
 		DeletePeerConnection();
 	}
-	
+
 	CN(m_pWebRTCPeerConnection.get());
 
+#ifndef WEBRTC_NO_CANDIDATES
 	CR(AddStreams());
 
-	///*
 	if (fAddDataChannel) {
 		CR(AddDataChannel());
 	}
-	//*/
+#endif
 
 Error:
 	return r;
@@ -618,15 +727,13 @@ RESULT WebRTCConductor::CreatePeerConnection(bool dtls) {
 	iceServer.uri = GetPeerConnectionString();
 	rtcConfiguration.servers.push_back(iceServer);
 
-	
-
 	if (dtls) {
+
 		if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {
 			pCertificateGenerator = std::unique_ptr<rtc::RTCCertificateGeneratorInterface>(new FakeRTCCertificateGenerator());
 		}
 
 		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
-
 		m_pWebRTCPeerConnection = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, &webrtcConstraints, NULL, std::move(pCertificateGenerator), this);
 	}
 	else {
@@ -637,7 +744,6 @@ RESULT WebRTCConductor::CreatePeerConnection(bool dtls) {
 	}
 
 	CNM(m_pWebRTCPeerConnection.get(), "WebRTC Peer Connection failed to initialize");
-
 Error:
 	return r;
 }
@@ -725,7 +831,8 @@ void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& strMessag
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("WebRTCConductor:OnMessageFromPeer: %d: %s", peerID, strMessage.c_str());
-	
+	LOG(INFO) << "WebRTCConductor:OnMessageFromPeer: " << peerID << "," << strMessage.c_str();
+
 	CBM(((m_WebRTCPeerID == peerID) || (m_WebRTCPeerID == -1)), "PeerID mismatch %d not %d", peerID, m_WebRTCPeerID);
 	CBM((!strMessage.empty()), "Message cannot be empty for OnMessageOnPeer");
 	
@@ -736,7 +843,7 @@ void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& strMessag
 
 			if (!InitializePeerConnection()) {
 
-				LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
+				LOG(INFO) << "Failed to initialize our PeerConnection instance";
 				m_pWebRTCClient->SignOut();
 
 				return;
@@ -766,7 +873,7 @@ void WebRTCConductor::OnMessageFromPeer(int peerID, const std::string& strMessag
 				// This is a loopback call.
 				// Recreate the peerconnection with DTLS disabled.
 				if (!ReinitializePeerConnectionForLoopback()) {
-					LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
+					LOG(INFO) << "Failed to initialize our PeerConnection instance";
 					DeletePeerConnection();
 					m_pWebRTCClient->SignOut();
 				}
@@ -832,75 +939,92 @@ Error:
 	return;
 }
 
-std::list<ICECandidate> g_peerICECandidates;
+//std::list<ICECandidate> g_peerICECandidates;
 
-RESULT WebRTCConductor::AddIceCandidates() {
+RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
 	RESULT r = R_PASS;
 
-	for (auto &peerICECandidate : g_peerICECandidates) {
+	//for (auto &peerICECandidate : g_peerICECandidates) {
 		webrtc::SdpParseError sdpError;
 		//std::unique_ptr<webrtc::IceCandidateInterface> candidate(webrtc::CreateIceCandidate(strSDPMID, sdpMLineIndex, strSDP, &sdpError));
+
 		std::unique_ptr<webrtc::IceCandidateInterface> candidate(
-			webrtc::CreateIceCandidate(peerICECandidate.m_strSDPMediaID, peerICECandidate.m_SDPMediateLineIndex, 
-									   peerICECandidate.m_strSDPCandidate, &sdpError));
+			webrtc::CreateIceCandidate(iceCandidate.m_strSDPMediaID, iceCandidate.m_SDPMediateLineIndex,
+									   iceCandidate.m_strSDPCandidate, &sdpError));
 
 		CBM((candidate.get()), "Can't parse received candidate message. SdpParseError was: %s", sdpError.description.c_str());
 		CBM((m_pWebRTCPeerConnection->AddIceCandidate(candidate.get())), "Failed to apply the received candidate");
 
-		DEBUG_LINEOUT(" Received candidate : %s", peerICECandidate.m_strSDPCandidate.c_str());
-	}
+		DEBUG_LINEOUT("Received candidate : %s", iceCandidate.m_strSDPCandidate.c_str());
+		LOG(INFO) << "Received candidate : " << iceCandidate.m_strSDPCandidate.c_str();
+	//}
+
+// Success:
+	return r;
+
+Error:
+	LOG(INFO) << "Candidate " << iceCandidate.m_strSDPCandidate.c_str() << " failed with error: " << sdpError.description.c_str();
+	return r;
+}
+
+RESULT WebRTCConductor::SetSDPAnswer(std::string strSDPAnswer) {
+	RESULT r = R_PASS;
+
+	webrtc::SdpParseError sdpError;
+
+	// TODO: Make this more generic (string)
+	webrtc::SessionDescriptionInterface* sessionDescriptionInterface(webrtc::CreateSessionDescription("answer", strSDPAnswer, &sdpError));
+	std::string strSDPType = sessionDescriptionInterface->type();
+
+	CNM((sessionDescriptionInterface),
+		"Can't parse received session description message. SdpParseError was: %s", sdpError.description.c_str());
+
+	DEBUG_LINEOUT(" Received %s session description: %s", strSDPType.c_str(), strSDPAnswer.c_str());
+
+	m_pWebRTCPeerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescriptionInterface);
 
 Error:
 	return r;
 }
 
-RESULT WebRTCConductor::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
+RESULT WebRTCConductor::CreateSDPOfferAnswer(std::string strSDPOffer) {
 	RESULT r = R_PASS;
 
-	Json::Reader jsonReader;
-	Json::Value jsonMessage;
-	std::string strType;
-	std::string strJSONObject;
+	m_fOffer = false;
 	
-	std::string strSDP;
-	
-	CBM((jsonReader.parse(strSDPOfferJSON, jsonMessage)), "Failed to parse SDP Offer Message");
-	CBM((rtc::GetStringFromJsonObject(jsonMessage, kSessionDescriptionTypeName, &strType)), "Failed to parse message");
-	
-	if (!strType.empty()) {
-		if (strType == "offer-loopback") {
-			// This is a loopback call.
-			// Recreate the peerconnection with DTLS disabled.
-			if (!ReinitializePeerConnectionForLoopback()) {
-				DEBUG_LINEOUT("Failed to initialize our PeerConnection instance");
-				DeletePeerConnection();
-				m_pWebRTCClient->SignOut();
-			}
+	/* TODO: Handle robust / bounce back
+	if (strType == "offer-loopback") {
+		// This is a loopback call.
+		// Recreate the peer connection with DTLS disabled.
+		if (!ReinitializePeerConnectionForLoopback()) {
+			DEBUG_LINEOUT("Failed to initialize our PeerConnection instance");
+			DeletePeerConnection();
+			m_pWebRTCClient->SignOut();
 		}
-		else {
-			CBM((rtc::GetStringFromJsonObject(jsonMessage, kSessionDescriptionSdpName, &strSDP)),
-				"Can't parse received session description message.");
+	}
+	*/
 
-			webrtc::SdpParseError sdpError;
-			webrtc::SessionDescriptionInterface* sessionDescriptionInterface(webrtc::CreateSessionDescription(strType, strSDP, &sdpError));
+	webrtc::SdpParseError sdpError;
+	webrtc::SessionDescriptionInterface* sessionDescriptionInterface(webrtc::CreateSessionDescription("offer", strSDPOffer, &sdpError));
+	std::string strSDPType;
 
-			CNM((sessionDescriptionInterface),
-				"Can't parse received session description message. SdpParseError was: %s", sdpError.description.c_str());
+	CNM((sessionDescriptionInterface),
+		"Can't parse received session description message. SdpParseError was: %s", sdpError.description.c_str());
 
-			DEBUG_LINEOUT(" Received session description: %s", strSDPOfferJSON.c_str());
-			std::string strSDPType = sessionDescriptionInterface->type();
-			m_pWebRTCPeerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescriptionInterface);
+	strSDPType = sessionDescriptionInterface->type();
 
-			// TODO: Not clear why this is failing
-			//if (sessionDescriptionInterface->type() == webrtc::SessionDescriptionInterface::kOffer) {
-			//if(strSDPType == webrtc::SessionDescriptionInterface::kOffer) {
-			if(strSDPType == "offer") {
-				m_pWebRTCPeerConnection->CreateAnswer(this, NULL);
-			}
-		}
-	}  
+	DEBUG_LINEOUT(" Received %s session description: %s", strSDPType.c_str(), strSDPOffer.c_str());
+
+	m_pWebRTCPeerConnection->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), sessionDescriptionInterface);
+
+	//if (sessionDescriptionInterface->type() == webrtc::SessionDescriptionInterface::kOffer) {
+	//if(strSDPType == webrtc::SessionDescriptionInterface::kOffer) {
+	if(strSDPType == "offer") {
+		m_pWebRTCPeerConnection->CreateAnswer(this, NULL);
+	}
 	
 	// Saves the candidates
+	/*  TODO: Move to candidates and handle them
 	if (jsonMessage["candidates"].isArray() && jsonMessage["candidates"].size() > 0) {
 		for (auto &jsonCandidate : jsonMessage["candidates"]) {
 			std::string strSDPMID;
@@ -916,8 +1040,8 @@ RESULT WebRTCConductor::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 			g_peerICECandidates.push_back(peerICECandidate);
 		}
 	}
-
 	AddIceCandidates();
+	*/
 
 Error:
 	return r;

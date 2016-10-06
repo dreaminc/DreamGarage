@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#include "DreamConsole/DreamConsole.h"
+
 OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),
@@ -115,6 +117,8 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	CNM(m_pCompositor, "Failed to initialize IVR compositor");
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
+
+	OVERLAY_DEBUG_OUT("HMD Vive - On");
 
 Error:
 	return r;

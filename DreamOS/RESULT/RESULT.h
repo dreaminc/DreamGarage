@@ -52,6 +52,7 @@ typedef enum {
 	R_INVALID_PARAM,		// invalid parameter 
 	R_PATH_NOT_FOUND,		// path not found
 	R_INVALID_OBJECT,		// Wrong Object passed to function
+	R_OVERFLOW,				// Overflow error of some kind
 
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,

@@ -32,7 +32,7 @@ class OGLVertexAttribute;
 class OGLUniform;
 class OGLFramebuffer;
 class OGLTexture;
-class SceneGraph;
+class ObjectStore;
 
 class OGLProgram {
 public:
@@ -67,12 +67,12 @@ public:
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
 
 	// TODO: Likely more eloquent way to do this
-	RESULT RenderSceneGraph(SceneGraph *pSceneGraph);
+	RESULT RenderSceneGraph(ObjectStore *pSceneGraph);
 	RESULT RenderObject(DimObj *pDimObj);
 	RESULT RenderChildren(DimObj *pDimObj);	
 	RESULT RenderObject(VirtualObj *pVirtualObj);
 	
-	RESULT SetLights(SceneGraph *pSceneGraph);
+	RESULT SetLights(ObjectStore *pSceneGraph);
 	virtual RESULT SetLights(std::vector<light*> *pLights);
 	virtual RESULT SetMaterial(material *pMaterial);
 	
@@ -113,7 +113,7 @@ public:
 	RESULT AttachShader(OpenGLShader *pOpenGLShader);
 
 	RESULT BindToDepthBuffer();
-	RESULT BindToFramebuffer();
+	RESULT BindToFramebuffer(OGLFramebuffer* pFramebuffer = nullptr);
 	RESULT UnbindFramebuffer();
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
@@ -127,6 +127,10 @@ public:
 	RESULT SetOGLProgramDepth(OGLProgram *pOGLProgramDepth);
 protected:
 	OGLProgram *m_pOGLProgramDepth;
+
+public:
+	OGLFramebuffer *GetOGLFramebuffer();
+	RESULT SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 protected:
 	OpenGLImp *m_pParentImp;

@@ -42,8 +42,10 @@ public:
 	virtual RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 
 	virtual std::string GetSDPOfferString() { return std::string(""); };
+	
 	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON) { return R_NOT_IMPLEMENTED; };
-	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) = 0;
+	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) { return R_NOT_IMPLEMENTED; };
+
 	virtual RESULT AddIceCandidates() { return R_NOT_IMPLEMENTED; }
 
 	virtual bool IsConnected() = 0;

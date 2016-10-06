@@ -8,6 +8,8 @@
 // Dimension Base Object
 // All objects in Dimension should derive from this base class
 
+#include "RESULT/EHM.h"
+
 #include "valid.h"
 #include "dirty.h"
 #include "Primitives/Types/UID.h"
@@ -36,24 +38,38 @@ protected:
 	dimindex *m_pIndices;
 	material m_material;
 
-	// TODO: Multiple textures (one for now)
-	texture *m_pColorTexture;
-	texture *m_pBumpTexture;
-
 	// Bounding Volume
 	std::shared_ptr<BoundingVolume> m_pBoundingVolume;
 
 	// Use this flag to signal the appropriate rendering object (such as OGLObj) that it needs to update the buffer
 	// TODO: This should be encapsulated as a dirty pattern
 	bool m_fDirty;
+	
+	// TODO: textures need to go into material once we figure out how we put a sampler2D into a uniform block
+	// TODO: Multiple textures (one for now)
+	texture *m_pColorTexture;
+	texture *m_pBumpTexture;
+	texture *m_pTextureAmbient = nullptr;
+	texture *m_pTextureDiffuse = nullptr;
+	texture *m_pTextureSpecular = nullptr;
+
+private:
 	bool m_fVisible;
 	bool m_fWireframe;
 
 public:
+
 	DimObj();
 	~DimObj();
 
-	virtual OBJECT_TYPE GetType() { return OBJECT_DIMENSION; }
+	// TODO: rename
+	enum class MaterialTexture { 
+		Ambient, 
+		Diffuse, 
+		Specular 
+	};
+
+	virtual OBJECT_TYPE GetType();
 
 	virtual RESULT Allocate() = 0;
 
@@ -88,6 +104,13 @@ public:
 	RESULT SetBumpTexture(texture *pBumpTexture);
 	RESULT ClearBumpTexture();
 	texture *GetBumpTexture() { return m_pBumpTexture; }
+	
+	// TODO: Above accessors / create texture store
+	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
+	
+	texture* GetTextureAmbient();
+	texture* GetTextureDiffuse();
+	texture* GetTextureSpecular();
 
 	RESULT SetRandomColor();
 
@@ -119,10 +142,13 @@ public:
 
 	RESULT CopyVertices(vertex pVerts[], int pVerts_n);
 	
+	// TODO: Should this moved up into vertex?
+	RESULT RotateVerticesByEulerVector(vector vEuler);
+	
 	// TODO: This shouldn't be baked in here ultimately
 	RESULT Notify(TimeEvent *event);
 
-	material *GetMaterial() { return (&m_material); }
+	material* GetMaterial();
 
 	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 };

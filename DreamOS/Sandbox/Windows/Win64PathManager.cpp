@@ -122,21 +122,40 @@ RESULT Win64PathManager::InitializePaths() {
 	// Dream Root Path - Try to find environment variable to set paths
 	char *pszDreamPath = NULL;
 	size_t pszDreamPath_n = 0;
+
+#ifndef NOT_USE_DREAM_OS_PATH_ENV
+	// Dream path is derived from environment variable in Debug/Release build
+
 	errno_t err = _dupenv_s(&pszDreamPath, &pszDreamPath_n, DREAM_OS_PATH_ENV);
 	if (pszDreamPath != NULL) {
 		DEBUG_LINEOUT("Found %s env variable: %s", DREAM_OS_PATH_ENV, pszDreamPath);
 
 		//mbstowcs(m_pszDreamRootPath, pszDreamPath, pszDreamPath_n);
 		mbstowcs_s(&m_pszDreamRootPath_n, m_pszDreamRootPath, pszDreamPath, pszDreamPath_n);
-		CRM(SetCurrentPath(m_pszDreamRootPath), "Failed to set current path to dream root");
-
-		CRM(OpenDreamPathsFile(), "Failed to find Dream Paths file");
 	}
 	else {
 		// Try to back pedal to find dreampaths.txt
 		DEBUG_LINEOUT("%s env variable not found", DREAM_OS_PATH_ENV);
 		DEBUG_LINEOUT("Please define the %s env to point at the root directory of DreamOS", DREAM_OS_PATH_ENV);
 	}
+#else
+	// Dream path is derived from the running .exe path in Production build
+
+	HMODULE hModule = GetModuleHandleW(NULL);
+	WCHAR path[MAX_PATH];
+	std::wstring exeFolder;
+
+	CB(GetModuleFileNameW(hModule, path, MAX_PATH) != 0);
+
+	exeFolder = std::wstring(path);
+	exeFolder = exeFolder.substr(0, exeFolder.rfind('\\'));
+
+	std::copy(exeFolder.begin(), exeFolder.end(), m_pszDreamRootPath);
+#endif
+
+	CRM(SetCurrentPath(m_pszDreamRootPath), "Failed to set current path to dream root");
+
+	CRM(OpenDreamPathsFile(), "Failed to find Dream Paths file");
 
 Error:
 	return r;

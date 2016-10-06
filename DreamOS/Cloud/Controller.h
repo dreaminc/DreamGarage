@@ -11,27 +11,43 @@
 
 #include <memory>
 
+class CloudController;
+
 class Controller {
 public:
-	Controller() :
-		m_pParentController(nullptr)
-	{
-		// empty
-	}
-
-	Controller(Controller *pParentController) :
-		m_pParentController(pParentController)
+	Controller(Controller *pParentController = nullptr, CloudController *pParentCloudController = nullptr) :
+		m_pParentController(pParentController),
+		m_pParentCloudController(pParentCloudController)
 	{
 		// empty
 	}
 
 	virtual ~Controller() {}
 
+	virtual RESULT Initialize() = 0;
+
+	friend class Controller;
+
 protected:
-	Controller* GetParentController() { return m_pParentController; }
+	Controller* GetParentController() { 
+		return m_pParentController; 
+	}
+
+	CloudController *GetCloudController() {
+		if (m_pParentCloudController != nullptr) {
+			return m_pParentCloudController;
+		}
+		else if (m_pParentController != nullptr) {
+			return m_pParentController->GetCloudController();
+		}
+		else {
+			return nullptr;
+		}
+	}
 
 private:
 	Controller* m_pParentController;
+	CloudController *m_pParentCloudController;
 
 private:
 	UID m_uid;

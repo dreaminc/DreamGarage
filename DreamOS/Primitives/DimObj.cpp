@@ -1,5 +1,6 @@
 #include "DimObj.h"
 
+
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
 
@@ -22,6 +23,10 @@ DimObj::DimObj() :
 
 DimObj::~DimObj() {
 	Destroy();
+}
+
+OBJECT_TYPE DimObj::GetType() {
+	return OBJECT_DIMENSION;
 }
 
 RESULT DimObj::Destroy() {
@@ -68,6 +73,19 @@ Error:
 	return r;
 }
 
+RESULT DimObj::UpdateBuffers() {
+	return R_NOT_IMPLEMENTED;
+}
+
+bool DimObj::IsVisible() { 
+	return m_fVisible;
+}
+
+RESULT DimObj::SetVisible(bool fVisible) { 
+	m_fVisible = fVisible;
+	return R_PASS;
+}
+
 RESULT DimObj::SetColor(color c) {
 	for (unsigned int i = 0; i < NumberVertices(); i++)
 		m_pVertices[i].SetColor(c);
@@ -85,6 +103,23 @@ RESULT DimObj::SetColorTexture(texture *pTexture) {
 	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
+	RESULT r = R_PASS;
+
+	#define SET_TEXTURE(type, texture) case DimObj::MaterialTexture::type: texture = pTexture; break
+
+	switch (type) {
+		SET_TEXTURE(Ambient, m_pTextureAmbient);
+		SET_TEXTURE(Diffuse, m_pTextureDiffuse);
+		SET_TEXTURE(Specular, m_pTextureSpecular);
+	}
+
+	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+//Error:
 	return r;
 }
 
@@ -117,6 +152,26 @@ RESULT DimObj::ClearBumpTexture() {
 
 Error:
 	return r;
+}
+
+texture* DimObj::GetColorTexture() {
+	return m_pColorTexture;
+}
+
+texture* DimObj::GetBumpTexture() {
+	return m_pBumpTexture;
+}
+
+texture* DimObj::GetTextureAmbient() {
+	return m_pTextureAmbient;
+}
+
+texture* DimObj::GetTextureDiffuse() {
+	return m_pTextureDiffuse;
+}
+
+texture* DimObj::GetTextureSpecular() {
+	return m_pTextureSpecular;
 }
 
 RESULT DimObj::SetRandomColor() {
@@ -300,7 +355,32 @@ Error:
 	return r;
 }
 
-// TODO: This shouldn't be baked in here ultimately
+// TODO: Should this moved up into vertex?
+RESULT DimObj::RotateVerticesByEulerVector(vector vEuler) {
+	RESULT r = R_PASS;
+
+	RotationMatrix rotMat(vEuler);
+
+	// point and normal
+	for (unsigned int i = 0; i < NumberVertices(); i++) {
+		m_pVertices[i].m_point = rotMat * m_pVertices[i].m_point;
+		m_pVertices[i].m_normal = rotMat * m_pVertices[i].m_normal;
+	}
+
+	// tangent bitangent
+	/*
+	// TODO:
+	for (unsigned int i = 0; i < NumberIndices(); i++) {
+	if (i % 3 == 0) {
+	SetTriangleTangentBitangent(m_pIndices[i - 3], m_pIndices[i - 2], m_pIndices[i - 1]);
+	}
+	}
+	*/
+
+	//Error:
+	return r;
+}
+
 RESULT DimObj::Notify(TimeEvent *event) {
 	quaternion_precision factor = 0.05f;
 	quaternion_precision filter = 0.1f;
@@ -316,6 +396,11 @@ RESULT DimObj::Notify(TimeEvent *event) {
 	RotateBy(x * factor, y * factor, z * factor);
 
 	return R_PASS;
+}
+
+// TODO: This shoudln't be baked in here ultimately
+material* DimObj::GetMaterial() {
+	return (&m_material);
 }
 
 matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
@@ -368,6 +453,7 @@ RESULT DimObj::InitializeAABB() {
 Error:
 	return r;
 }
+
 RESULT DimObj::InitializeOBB() {
 	RESULT r = R_PASS;
 

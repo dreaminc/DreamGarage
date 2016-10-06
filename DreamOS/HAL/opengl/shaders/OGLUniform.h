@@ -27,6 +27,7 @@ public:
 	~OGLUniform();
 
 	RESULT SetUniform4fv(GLfloat *pVal4fv);
+	RESULT SetUniformFloat(GLfloat *pVal1fv);
 	RESULT SetUniformInteger(GLint value);
 	RESULT Set44MatrixUniform(matrix<float, 4, 4> mat);		// TODO: Generalize this in the lower specialized class more
 

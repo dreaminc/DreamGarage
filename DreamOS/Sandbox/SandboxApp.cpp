@@ -1,6 +1,8 @@
 #include "SandboxApp.h"
 #include "Cloud/CloudController.h"
 
+#include "Cloud/Message/Message.h"
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -52,11 +54,18 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
 
+	// For auto login, use '-l auto'
+	//CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
+	CR(m_pCommandLineManager->RegisterParameter("login", "l", "auto"));
+
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
-	m_pSceneGraph = new SceneGraph();
+	m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
+
+	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
@@ -64,6 +73,16 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
+
+	CommandLineManager::instance()->ForEach([](const std::string& arg) {
+		HUD_OUT(("arg :" + arg).c_str());
+	});
+
+	// Auto Login Handling
+	if (m_pCommandLineManager->GetParameterValue("login").compare("auto") == 0) {
+		// auto login
+		m_pCloudController->Start();
+	}
 
 Error:
 	return r;
@@ -80,6 +99,24 @@ RESULT SandboxApp::AddObject(VirtualObj *pObject) {
 
 	CR(m_pSceneGraph->PushObject(pObject));
 
+Error:
+	return r;
+}
+
+FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
+	RESULT r = R_PASS;
+
+	FlatContext* context = m_pHALImp->MakeFlatContext(width, height, channels);
+	CR(m_pFlatSceneGraph->PushObject(context));
+
+Error:
+	return context;
+}
+
+RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
+	RESULT r = R_PASS;
+	
+	CR(m_pHALImp->RenderToTexture(pContext));
 Error:
 	return r;
 }
@@ -312,8 +349,8 @@ Error:
 	return nullptr;
 }
 
-composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
-	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
 RESULT SandboxApp::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
@@ -354,6 +391,10 @@ hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
 }
 
 // Cloud Controller
+RESULT SandboxApp::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
+	return m_pCloudController->RegisterDataMessageCallback(fnHandleDataMessageCallback);
+}
+
 RESULT SandboxApp::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
 	return m_pCloudController->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
 }
@@ -362,10 +403,43 @@ RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCall
 	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
 }
 
+RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
+	return m_pCloudController->SendDataMessage(userID, pDataMessage);
+}
+
 RESULT SandboxApp::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
 	return m_pCloudController->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
 }
 
 RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState) {
 	return m_pCloudController->SendUpdateHandMessage(userID, handState);
+}
+
+// TimeManager
+RESULT SandboxApp::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pTimeManager->RegisterSubscriber(timeEvent, pTimeSubscriber));
+
+Error:
+	return r;
+}
+
+// IO
+RESULT SandboxApp::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pSenseKeyboard->RegisterSubscriber(keyEvent, pKeyboardSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pSenseMouse->RegisterSubscriber(mouseEvent, pMouseSubscriber));
+
+Error:
+	return r;
 }

@@ -25,6 +25,10 @@ public:
 	UserController(Controller* pParentController);
 	~UserController();
 
+	RESULT Initialize() {
+		return R_NOT_IMPLEMENTED;
+	}
+
 	// Read username and password from file and login, get a token
 	RESULT LoginFromFilename(const std::wstring& file);
 	RESULT LoginFromCommandline();

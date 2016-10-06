@@ -5,7 +5,7 @@
 #include "Sandbox/SandboxApp.h"
 
 #include "TimeManager/TimeManager.h"
-#include "Profiler/Profiler.h"
+#include "DreamConsole/Console.h"
 
 // DREAM OS
 // DreamOS/Sandbox/Windows/Windows64App.h
@@ -55,12 +55,19 @@ public:
 	RESULT InitializeOpenGLRenderingContext();
 	RESULT InitializeCloudController();
 	RESULT InitializeHAL();
+	RESULT InitializeKeyboard();
+	RESULT InitializeMouse();
 
 private:
 	static LRESULT __stdcall StaticWndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
 	LRESULT __stdcall WndProc(HWND hWindow, unsigned int msg, WPARAM wp, LPARAM lp);
 	RESULT SetDeviceContext(HDC hDC);
 	RESULT SetDimensions(int pxWidth, int pxHeight);
+
+	// Handle a mouse event from a window's message. Return true if the message is handled, and false otherwise.
+	bool	HandleMouseEvent(const MSG&	windowMassage);
+	// Handle a key event from a window's message. Return true if the message is handled, and false otherwise.
+	bool	HandleKeyEvent(const MSG&	windowMassage);
 
 public:
 	HDC GetDeviceContext();
@@ -95,15 +102,15 @@ private:
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
-	TimeManager	*m_pTimeManager;
-	Profiler	m_profiler;
+	//TimeManager	*m_pTimeManager;
+	DreamConsole	m_profiler;
 
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;
 
 public:
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
-	Win64Keyboard *m_pWin64Keyboard;
-	Win64Mouse *m_pWin64Mouse;
+	//Win64Keyboard *m_pWin64Keyboard;
+	//Win64Mouse *m_pWin64Mouse;
 	HMD *m_pHMD;
 };
 

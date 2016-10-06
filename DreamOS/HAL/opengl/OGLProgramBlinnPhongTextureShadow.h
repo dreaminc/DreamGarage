@@ -42,8 +42,20 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformDepthViewProjectionMatrix), std::string("u_mat4DepthVP")));
 
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureBump), std::string("u_hasTextureBump")));
+		//CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureBump), std::string("u_textureBump")));
+
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureDepth), std::string("u_hasTextureDepth")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
+
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureAmbient), std::string("u_hasTextureAmbient")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureAmbient), std::string("u_textureAmbient")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureDiffuse), std::string("u_hasTextureDiffuse")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDiffuse), std::string("u_textureDiffuse")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureSpecular), std::string("u_hasTextureSpecular")));
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureSpecular), std::string("u_textureSpecular")));
 
 		// Uniform Blocks
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
@@ -56,12 +68,17 @@ public:
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
 		RESULT r = R_PASS;
 
-		OGLTexture *pTexture = nullptr;
+		// color texture
+		SetTextureUniform(pOGLObj->GetColorTexture(), m_pUniformTextureColor, m_pUniformHasTextureColor);
 
-		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-			pTexture->OGLActivateTexture();
-			m_pUniformTextureColor->SetUniform(pTexture);
-		}
+		// material textures
+		SetTextureUniform(pOGLObj->GetTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient);
+		SetTextureUniform(pOGLObj->GetTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse);
+		SetTextureUniform(pOGLObj->GetTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular);
+
+		// bump texture
+		// TODO: add bump texture to shader
+		m_pUniformHasTextureBump->SetUniform(pOGLObj->GetBumpTexture() != nullptr);
 
 //	Error:
 		return r;
@@ -112,11 +129,16 @@ public:
 
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
+			m_pUniformHasTextureDepth->SetUniform(true);
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
 
 			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
 			pOGLProgramShadowDepth->SetDepthTexture(1);
 			m_pUniformTextureDepth->SetUniform(1);
+		}
+		else
+		{
+			m_pUniformHasTextureDepth->SetUniform(false);
 		}
 
 		return R_PASS;
@@ -135,6 +157,7 @@ public:
 
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
+			m_pUniformHasTextureDepth->SetUniform(true);
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
 
 			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
@@ -144,6 +167,22 @@ public:
 
 		return R_PASS;
 	}
+
+private:
+
+	void SetTextureUniform(OGLTexture* pTexture,
+		OGLUniformSampler2D* pTextureUniform,
+		OGLUniformBool* pBoolUniform) {
+		if (pTexture) {
+			pBoolUniform->SetUniform(true);
+			pTexture->OGLActivateTexture();
+			pTextureUniform->SetUniform(pTexture);
+		}
+		else
+		{
+			pBoolUniform->SetUniform(false);
+		}
+	};
 
 private:
 	// Vertex Attribute
@@ -162,8 +201,19 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 	OGLUniformMatrix4 *m_pUniformDepthViewProjectionMatrix;
 
+	OGLUniformBool *m_pUniformHasTextureBump;
+
+	OGLUniformBool *m_pUniformHasTextureColor;
 	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniformBool *m_pUniformHasTextureDepth;
 	OGLUniformSampler2D *m_pUniformTextureDepth;
+
+	OGLUniformBool *m_pUniformHasTextureAmbient;
+	OGLUniformSampler2D *m_pUniformTextureAmbient;
+	OGLUniformBool *m_pUniformHasTextureDiffuse;
+	OGLUniformSampler2D *m_pUniformTextureDiffuse;
+	OGLUniformBool *m_pUniformHasTextureSpecular;
+	OGLUniformSampler2D *m_pUniformTextureSpecular;
 
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock;

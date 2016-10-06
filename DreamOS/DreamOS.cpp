@@ -1,5 +1,7 @@
 #include "DreamOS.h"
 
+#include "Logger/Logger.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -25,17 +27,53 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	srand(static_cast <unsigned> (time(0)));
 
+	// Initialize logger
+	Logger::InitializeLogger();
+
 	// Create the Sandbox
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 
-	// Initialize the sandbox
-	CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
+	// Check if Dream is launching from a web browser url.
+	// a url command from a webpage, to trigger the launch of Dream, woud start with 'dreamos:run' command line.
+	// The following code splites the whitespaces of a single command line param in that case, into a list of commad line arguments.
+	if ((argc > 1) && (std::string(argv[1]).substr(0, 11).compare("dreamos:run") == 0)) {
+		//  Dream is launching from a webpage
+
+		std::vector<std::string> args{argv[0]};
+		int new_argc = 1;
+
+		std::string cmdln = std::string(argv[1]); // The .exe location is the first argument
+
+		std::string arg;
+		std::stringstream ss(cmdln);
+
+		while (ss >> arg)
+		{
+			args.push_back(arg);
+			new_argc++;
+		}
+
+		char** new_argv = new char*[new_argc];
+
+		for (int i = 0; i < new_argc; i++)
+		{
+			new_argv[i] = new char;
+			new_argv[i] = (char*)args[i].c_str();
+		}
+
+		CRM(m_pSandbox->Initialize(new_argc, (const char**)new_argv), "Failed to initialize Sandbox");
+	}
+	else
+	{
+		// Initialize the sandbox
+		CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
+	}
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
-
+	
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
@@ -83,6 +121,16 @@ light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOri
 
 light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
+}
+
+FlatContext* DreamOS::AddFlatContext(int width, int height, int channels)
+{
+	return m_pSandbox->AddFlatContext(width, height, channels);
+}
+
+RESULT DreamOS::RenderToTexture(FlatContext *pContext) 
+{
+	return m_pSandbox->RenderToTexture(pContext);
 }
 
 sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
@@ -138,8 +186,8 @@ model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
 	
-composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
-	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, rotateY);
+composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
 user *DreamOS::AddUser() {
@@ -155,6 +203,10 @@ RESULT DreamOS::UnregisterUpdateCallback() {
 }
 
 // Cloud Controller
+RESULT DreamOS::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
+	return m_pSandbox->RegisterDataMessageCallback(fnHandleDataMessageCallback);
+}
+
 RESULT DreamOS::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
 	return m_pSandbox->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
 }
@@ -163,12 +215,24 @@ RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallbac
 	return m_pSandbox->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
 }
 
+RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
+	return m_pSandbox->SendDataMessage(userID, pDataMessage);
+}
+
 RESULT DreamOS::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
 	return m_pSandbox->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
 }
 
 RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
 	return m_pSandbox->SendUpdateHandMessage(userID, handState);
+}
+
+RESULT DreamOS::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
+	return m_pSandbox->RegisterSubscriber(keyEvent, pKeyboardSubscriber);
+}
+
+RESULT DreamOS::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
+	return m_pSandbox->RegisterSubscriber(mouseEvent, pMouseSubscriber);
 }
 
 long DreamOS::GetTickCount() {

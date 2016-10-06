@@ -81,9 +81,6 @@
     <Filter Include="HMD\Oculus">
       <UniqueIdentifier>{a53afd0a-b5a4-4b9b-80ab-050429f6f805}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Profiler">
-      <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HAL\opengl\shaders">
       <UniqueIdentifier>{e0da08a9-31cd-4af0-98a1-edfdec0ab066}</UniqueIdentifier>
     </Filter>
@@ -150,6 +147,30 @@
     <Filter Include="Cloud\Message">
       <UniqueIdentifier>{a4934822-8fc9-4363-ac78-f660fcfbe16c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamConsole">
+      <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Logger">
+      <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture">
+      <UniqueIdentifier>{451be8f2-6fb4-4145-9e8c-1bc687711a45}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Texture\Fonts">
+      <UniqueIdentifier>{c0308159-cdcb-4990-9db2-489d8ce4a640}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{064cde94-bbe7-418c-8746-c82ed21a2885}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources\Fonts">
+      <UniqueIdentifier>{47aac8d7-21b7-41d9-86f4-dc30eebed8c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models">
+      <UniqueIdentifier>{9a748425-2cc2-4f36-8890-7f0968562c06}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Models\face4">
+      <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -160,9 +181,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp">
       <Filter>Sandbox\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
-      <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp">
       <Filter>HAL\opengl</Filter>
@@ -200,14 +218,8 @@
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Scene\SceneGraph.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp">
       <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Scene\SceneGraphList.cpp">
-      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
       <Filter>Primitives</Filter>
@@ -251,9 +263,6 @@
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp">
       <Filter>HMD\Oculus</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Profiler\Profiler.cpp">
-      <Filter>Profiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -292,9 +301,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProfiler.cpp">
-      <Filter>HAL\opengl</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
       <Filter>Cloud</Filter>
@@ -353,9 +359,6 @@
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp">
       <Filter>External\Matrices</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Profiler\DebugConsole.cpp">
-      <Filter>Profiler</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
@@ -365,15 +368,6 @@
     <ClCompile Include="..\..\..\Primitives\hand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h">
       <Filter>Cloud\Message</Filter>
     </ClCompile>
@@ -381,6 +375,69 @@
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\user.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStore.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\FlatContext.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp">
+      <Filter>Cloud\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp">
+      <Filter>Primitives\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
+      <Filter>Primitives\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
+      <Filter>External\OCULUS\v132\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
+      <Filter>External\OCULUS\v132\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
+      <Filter>External\OCULUS\v132\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamConsole\Console.cpp">
+      <Filter>DreamConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp">
+      <Filter>DreamConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp">
+      <Filter>DreamConsole</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Logger\Logger.cpp">
+      <Filter>Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp">
+      <Filter>Sandbox\Windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\camera.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseMouse.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp">
@@ -580,15 +637,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraph.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraphStore.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\SceneGraphList.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\quaternion.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -696,9 +744,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h">
       <Filter>HMD\Oculus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Profiler\Profiler.h">
-      <Filter>Profiler</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h">
       <Filter>HAL\opengl</Filter>
@@ -1308,12 +1353,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Profiler\ProfilerGraph.h">
-      <Filter>Profiler</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProfiler.h">
-      <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
       <Filter>Sense</Filter>
@@ -1960,9 +1999,6 @@
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h">
       <Filter>Cloud\Environment</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Profiler\DebugConsole.h">
-      <Filter>Profiler</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
@@ -1996,6 +2032,61 @@
     <ClInclude Include="..\..\..\Primitives\BoundingBox.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStore.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\FlatContext.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h">
+      <Filter>Cloud\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\PeerConnection.h">
+      <Filter>Cloud\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
+      <Filter>Primitives\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamOSWinMain.h">
+      <Filter>Main</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\..\DreamConsole\Console.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h">
+      <Filter>DreamConsole</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Logger\Logger.h">
+      <Filter>Logger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
+      <Filter>Sandbox\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2007,11 +2098,21 @@
     <None Include="..\..\..\Primitives\.DS_Store">
       <Filter>Primitives</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin">
+      <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Fonts\Arial.fnt">
+      <Filter>Resources\Fonts</Filter>
+    </None>
+    <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
+      <Filter>Resources\Fonts</Filter>
+    </None>
+    <None Include="..\..\..\Models\face4\untitled.mtl">
+      <Filter>Models\face4</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
@@ -2019,22 +2120,10 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert">
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag">
@@ -2049,28 +2138,64 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
@@ -2085,42 +2210,53 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin">
-      <Filter>Resource Files</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
     <None Include="..\..\..\Primitives\plane.h">
       <Filter>Primitives</Filter>
@@ -2128,5 +2264,35 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="DreamOS.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Dream.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="..\..\..\Texture\Fonts\Arial.png">
+      <Filter>Texture\Fonts</Filter>
+    </Image>
+    <Image Include="..\..\..\Texture\Fonts\ArialDistance.png">
+      <Filter>Texture\Fonts</Filter>
+    </Image>
+    <Image Include="..\..\..\Models\face4\eye.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.obj">
+      <Filter>Models\face4</Filter>
+    </Object>
   </ItemGroup>
 </Project>

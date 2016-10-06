@@ -37,7 +37,6 @@ public:
 	inline vector_precision &w(vector_precision val) { return this->element(3, 0) = val; }
 
 	double magnitude();
-
 	
 	RESULT Normalize();		// Will normalize this vector
 	vector Normal();		// Return a normalized version of this vector

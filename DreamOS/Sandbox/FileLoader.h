@@ -13,8 +13,12 @@ class FileLoaderHelper {
 public:
 	struct material_t {
 		std::string	name;
+		std::string	map_Ka;
 		std::string	map_Kd;
+		std::string	map_Ks;
+		color		Ka;
 		color		Kd;
+		color		Ks;
 	};
 
 	struct mesh_t {

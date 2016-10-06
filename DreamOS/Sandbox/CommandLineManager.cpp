@@ -115,3 +115,9 @@ std::string CommandLineManager::GetParameterValue(std::string strParamName) {
 	else
 		return regParam.m_strDefaultValue;
 }
+
+void CommandLineManager::ForEach(std::function<void(const std::string&)> func) {
+	for (auto& arg : m_strCommandLineArguments) {
+		func(arg);
+	}
+}
