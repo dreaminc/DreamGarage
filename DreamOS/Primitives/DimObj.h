@@ -87,23 +87,23 @@ public:
 	RESULT AllocateIndices(uint32_t numIndices);
 	RESULT AllocateTriangleIndexGroups(uint32_t numTriangles);
 
-	virtual RESULT UpdateBuffers() { return R_NOT_IMPLEMENTED; }
+	virtual RESULT UpdateBuffers();
 
-	inline bool IsVisible() { return m_fVisible; }
-	RESULT SetVisible(bool fVisible = true) { m_fVisible = fVisible;  return R_PASS; }
+	bool IsVisible();
+	RESULT SetVisible(bool fVisible = true);
 
-	inline bool IsWireframe() { return m_fWireframe; }
-	RESULT SetWireframe(bool fWireframe = true) { m_fWireframe = fWireframe; return R_PASS; }
+	bool IsWireframe();
+	RESULT SetWireframe(bool fWireframe = true);
 
 	RESULT SetColor(color c);
 
 	RESULT SetColorTexture(texture *pTexture);
 	RESULT ClearColorTexture();
-	texture *GetColorTexture() { return m_pColorTexture; }
+	texture *GetColorTexture();
 
 	RESULT SetBumpTexture(texture *pBumpTexture);
 	RESULT ClearBumpTexture();
-	texture *GetBumpTexture() { return m_pBumpTexture; }
+	texture *GetBumpTexture();
 	
 	// TODO: Above accessors / create texture store
 	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);

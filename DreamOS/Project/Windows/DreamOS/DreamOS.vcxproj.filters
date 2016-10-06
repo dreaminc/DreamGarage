@@ -362,9 +362,6 @@
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\composite.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\hand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -437,9 +434,6 @@
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -449,10 +443,13 @@
     <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
+    <ClCompile Include="..\..\..\Primitives\vector.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\vector.cpp">
+    <ClCompile Include="..\..\..\Primitives\composite.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2087,6 +2084,7 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\AABV.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2289,10 +2287,5 @@
     <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
       <Filter>Models\face4</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj">
-      <Filter>Models\face4</Filter>
-    </Object>
   </ItemGroup>
 </Project>

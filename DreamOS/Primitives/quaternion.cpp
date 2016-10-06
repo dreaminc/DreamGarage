@@ -159,7 +159,7 @@ RESULT quaternion::RotateByVector(vector v, quaternion_precision theta, quaterni
 	bool fPositive = (theta > 0.0f) ? true : false;
 	quaternion_precision thetaLeft = theta;
 
-	while(abs(thetaLeft) != 0.0f) {
+	while(fabs((double)(thetaLeft)) != 0.0f) {
 		if (thetaLeft > slerpLimitValue) {
 			quaternion localRotation(slerpLimitValue, v);
 			(*this) *= localRotation;

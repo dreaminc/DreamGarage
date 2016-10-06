@@ -1,6 +1,5 @@
 #include "DimObj.h"
 
-
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
 
@@ -77,13 +76,22 @@ RESULT DimObj::UpdateBuffers() {
 	return R_NOT_IMPLEMENTED;
 }
 
-bool DimObj::IsVisible() { 
+bool DimObj::IsVisible() {
 	return m_fVisible;
 }
 
 RESULT DimObj::SetVisible(bool fVisible) { 
 	m_fVisible = fVisible;
 	return R_PASS;
+}
+
+bool DimObj::IsWireframe() {
+	return m_fWireframe; 
+}
+
+RESULT DimObj::SetWireframe(bool fWireframe) {
+	m_fWireframe = fWireframe; 
+	return R_PASS; 
 }
 
 RESULT DimObj::SetColor(color c) {
@@ -93,17 +101,6 @@ RESULT DimObj::SetColor(color c) {
 	SetDirty();
 
 	return R_PASS;
-}
-
-RESULT DimObj::SetColorTexture(texture *pTexture) {
-	RESULT r = R_PASS;
-
-	CBM((m_pColorTexture == nullptr), "Cannot overwrite color texture");
-	m_pColorTexture = pTexture;
-	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-Error:
-	return r;
 }
 
 RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
@@ -123,6 +120,17 @@ RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 	return r;
 }
 
+RESULT DimObj::SetColorTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	CBM((m_pColorTexture == nullptr), "Cannot overwrite color texture");
+	m_pColorTexture = pTexture;
+	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+Error:
+	return r;
+}
+
 RESULT DimObj::ClearColorTexture() {
 	RESULT r = R_PASS;
 
@@ -131,6 +139,10 @@ RESULT DimObj::ClearColorTexture() {
 
 Error:
 	return r;
+}
+
+texture* DimObj::GetColorTexture() {
+	return m_pColorTexture;
 }
 
 RESULT DimObj::SetBumpTexture(texture *pBumpTexture) {
@@ -152,10 +164,6 @@ RESULT DimObj::ClearBumpTexture() {
 
 Error:
 	return r;
-}
-
-texture* DimObj::GetColorTexture() {
-	return m_pColorTexture;
 }
 
 texture* DimObj::GetBumpTexture() {

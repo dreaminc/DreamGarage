@@ -702,8 +702,6 @@
     <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp" />
-    <ClCompile Include="..\..\..\Primitives\composite.cpp" />
-    <ClCompile Include="..\..\..\Primitives\DimObj.cpp" />
     <ClCompile Include="..\..\..\Logger\Logger.cpp" />
     <ClCompile Include="..\..\..\Primitives\camera.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
@@ -1262,6 +1260,7 @@
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Models\face4\untitled.mtl">
       <DeploymentContent>true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Primitives\plane.h" />
@@ -1298,14 +1297,6 @@
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="Dream.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</DeploymentContent>
-    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
