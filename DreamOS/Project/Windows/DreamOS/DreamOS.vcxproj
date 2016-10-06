@@ -651,6 +651,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
+    <ClCompile Include="..\..\..\..\DreamTestApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CEFApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
@@ -746,6 +747,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamGarage.h" />
+    <ClInclude Include="..\..\..\..\DreamTestApp.h" />
     <ClInclude Include="..\..\..\Cloud\CEFApp.h" />
     <ClInclude Include="..\..\..\Cloud\CEFHandler.h" />
     <ClInclude Include="..\..\..\Cloud\CEFImp.h" />

@@ -55,8 +55,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
 
 	// For auto login, use '-l auto'
-	//CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
-	CR(m_pCommandLineManager->RegisterParameter("login", "l", "auto"));
+	CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
 
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 

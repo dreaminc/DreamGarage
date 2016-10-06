@@ -171,6 +171,9 @@
     <Filter Include="Models\face4">
       <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DreamTestApp">
+      <UniqueIdentifier>{570eeaa3-0e10-44bf-aa0c-8a76c79f6592}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -451,6 +454,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamTestApp.cpp">
+      <Filter>DreamTestApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2056,8 +2062,8 @@
     <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
       <Filter>Primitives\Types</Filter>
     </ClInclude>
-	<ClInclude Include="..\..\..\Primitives\AABV.h">
-	  <Filter>Primitives</Filter>
+    <ClInclude Include="..\..\..\Primitives\AABV.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamOSWinMain.h">
       <Filter>Main</Filter>
@@ -2089,6 +2095,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamTestApp.h">
+      <Filter>DreamTestApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2263,7 +2272,7 @@
     </None>
     <None Include="..\..\..\Primitives\plane.h">
       <Filter>Primitives</Filter>
-	</None>
+    </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
@@ -2298,5 +2307,8 @@
     <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
       <Filter>Models\face4</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.obj" />
   </ItemGroup>
 </Project>
