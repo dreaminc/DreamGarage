@@ -2237,6 +2237,12 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />

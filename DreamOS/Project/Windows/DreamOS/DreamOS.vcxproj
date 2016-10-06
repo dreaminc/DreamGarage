@@ -1208,6 +1208,12 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>
