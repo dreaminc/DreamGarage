@@ -62,6 +62,16 @@ Error:
 	return r;
 }
 
+RESULT DimObj::AllocateQuadIndexGroups(uint32_t numQuads) {
+	RESULT r = R_PASS;
+
+	m_pIndices = (dimindex*)(new QuadIndexGroup[numQuads]);
+	CN(m_pIndices);
+
+Error:
+	return r;
+}
+
 RESULT DimObj::AllocateTriangleIndexGroups(uint32_t numTriangles) {
 	RESULT r = R_PASS;
 

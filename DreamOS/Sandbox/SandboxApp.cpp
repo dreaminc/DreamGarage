@@ -186,18 +186,18 @@ Error:
 	return nullptr;
 }
 
-volume* SandboxApp::MakeVolume(double width, double length, double height) {
-	return m_pHALImp->MakeVolume(width, length, height);
+volume* SandboxApp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
+	return m_pHALImp->MakeVolume(width, length, height, fTriangleBased);
 }
 
-volume* SandboxApp::MakeVolume(double side) {
-	return m_pHALImp->MakeVolume(side);
+volume* SandboxApp::MakeVolume(double side, bool fTriangleBased) {
+	return m_pHALImp->MakeVolume(side, fTriangleBased);
 }
 
-volume* SandboxApp::AddVolume(double width, double length, double height) {
+volume* SandboxApp::AddVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = MakeVolume(width, length, height);
+	volume *pVolume = MakeVolume(width, length, height, fTriangleBased);
 	CN(pVolume);
 
 	CR(AddObject(pVolume));
@@ -213,8 +213,8 @@ Error:
 	return nullptr;
 }
 
-volume* SandboxApp::AddVolume(double side) {
-	return AddVolume(side, side, side);
+volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
+	return AddVolume(side, side, side, fTriangleBased);
 }
 
 text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard)

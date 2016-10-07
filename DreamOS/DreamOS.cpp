@@ -141,20 +141,20 @@ sphere* DreamOS::MakeSphere(float radius, int numAngularDivisions, int numVertic
 	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
-volume* DreamOS::AddVolume(double side) {
-	return m_pSandbox->AddVolume(side);
+volume* DreamOS::AddVolume(double side, bool fTriangleBased) {
+	return m_pSandbox->AddVolume(side, fTriangleBased);
 }
 
-volume* DreamOS::AddVolume(double width, double length, double height) {
-	return m_pSandbox->AddVolume(width, length, height);
+volume* DreamOS::AddVolume(double width, double length, double height, bool fTriangleBased) {
+	return m_pSandbox->AddVolume(width, length, height, fTriangleBased);
 }
 
-volume* DreamOS::MakeVolume(double width, double length, double height) {
-	return m_pSandbox->MakeVolume(width, length, height);
+volume* DreamOS::MakeVolume(double width, double length, double height, bool fTriangleBased) {
+	return m_pSandbox->MakeVolume(width, length, height, fTriangleBased);
 }
 
-volume* DreamOS::MakeVolume(double side) {
-	return m_pSandbox->AddVolume(side);
+volume* DreamOS::MakeVolume(double side, bool fTriangleBased) {
+	return m_pSandbox->AddVolume(side, fTriangleBased);
 }
 	
 quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {

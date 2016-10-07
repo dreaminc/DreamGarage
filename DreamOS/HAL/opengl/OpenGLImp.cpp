@@ -680,10 +680,10 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double width, double length, double height) {
+volume* OpenGLImp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, width, length, height);
+	volume *pVolume = new OGLVolume(this, width, length, height, fTriangleBased);
 	CN(pVolume);
 
 //Success:
@@ -697,8 +697,8 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double side) {
-	return MakeVolume(side, side, side);
+volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {
+	return MakeVolume(side, side, side, fTriangleBased);
 }
 
 text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
@@ -831,11 +831,13 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (m_drawWireframe)
+	if (m_fDrawWireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
 
-	if (m_pHMD == nullptr)
+	if (m_pHMD == nullptr) {
 		CheckFramebufferStatus(GL_FRAMEBUFFER);
+	}
 
 	// Render Shadows
 	m_pOGLProgramShadowDepth->UseProgram();
@@ -1022,6 +1024,16 @@ RESULT OpenGLImp::glGetProgramInterfaceiv(GLuint program, GLenum programInterfac
 
 	m_OpenGLExtensions.glGetProgramInterfaceiv(program, programInterface, pname, params);  
 	CRM(CheckGLError(), "glGetProgramInterfaceiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDrawRangeElements(mode, start, end, count, type, indices);
+	CRM(CheckGLError(), "glDrawRangeElements failed");
 
 Error:
 	return r;
@@ -1568,7 +1580,7 @@ RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
 	if (event->GetArg(1).compare("wire") == 0) {
-		m_drawWireframe = !m_drawWireframe;
+		m_fDrawWireframe = !m_fDrawWireframe;
 	}
 
 	return r;

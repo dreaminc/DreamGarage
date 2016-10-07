@@ -458,6 +458,9 @@
     <ClCompile Include="..\..\..\..\DreamTestApp.cpp">
       <Filter>DreamTestApp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\volume.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2098,6 +2101,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\DreamTestApp.h">
       <Filter>DreamTestApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

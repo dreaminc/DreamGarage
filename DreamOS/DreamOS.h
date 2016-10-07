@@ -58,11 +58,11 @@ protected:
 
 	text *AddText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	
-	volume *MakeVolume(double side);
-	volume *MakeVolume(double width, double length, double height);
+	volume *MakeVolume(double side, bool fTriangleBased = true);
+	volume *MakeVolume(double width, double length, double height, bool fTriangleBased = true);
 
-	volume* AddVolume(double side);
-	volume *AddVolume(double width, double length, double height);
+	volume* AddVolume(double side, bool fTriangleBased = true);
+	volume *AddVolume(double width, double length, double height, bool fTriangleBased = true);
 	
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	

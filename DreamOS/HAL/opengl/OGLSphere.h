@@ -103,7 +103,7 @@ public:
 
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
-	RESULT Render() {
+	virtual RESULT Render() override {
 		RESULT r = R_PASS;
 
 		// TODO: Rethink this since it's in the critical path
@@ -113,27 +113,18 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
-		/*
-		int numVerts = pDimObj->NumberVertices();
-		glDrawArrays(GL_POINTS, 0, numVerts);
-		return r;
-		//*/
-		
-		
-		//void *pOffset = (void*)(sizeof(dimindex) * indexCount);
+		GLint previousPolygonMode;
+		glGetIntegerv(GL_POLYGON_MODE, &previousPolygonMode);
 
-		// Top Fan
-		/*
-		int numFanVerts = m_numAngularDivisions + 2;
-		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
-		indexCount += numFanVerts;
-		*/
+		if (pDimObj->IsWireframe()) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
 		
 		// Strips
+		// TODO: quad strip?
 		int indexCount = 0;
 		int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
 		int numStrips = m_numVerticalDivisions - 1;
-		//numStrips = 2;
 
 		for (int i = 0; i < numStrips; i++) {
 			void *pOffset = (void*)(sizeof(dimindex) * indexCount);
@@ -141,12 +132,9 @@ public:
 			indexCount += numTriangleStripVerts;
 		}
 		
-		/*
-		// Bottom Fan
-		pOffset = (void*)(sizeof(dimindex) * indexCount);
-		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
-		indexCount += numFanVerts;
-		//*/
+		if (pDimObj->IsWireframe()) {
+			glPolygonMode(GL_FRONT_AND_BACK, previousPolygonMode);
+		}
 
 
 	Error:

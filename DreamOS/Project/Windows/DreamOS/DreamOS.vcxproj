@@ -722,6 +722,7 @@
     <ClCompile Include="..\..\..\Primitives\vector.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
+    <ClCompile Include="..\..\..\Primitives\volume.cpp" />
     <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
@@ -1053,6 +1054,7 @@
     <ClInclude Include="..\..\..\Primitives\matrix.h" />
     <ClInclude Include="..\..\..\Primitives\model.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
+    <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
     <ClInclude Include="..\..\..\Primitives\rectangle.h" />
     <ClInclude Include="..\..\..\Primitives\skybox.h" />

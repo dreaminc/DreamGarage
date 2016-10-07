@@ -511,6 +511,7 @@ RESULT Windows64App::Show() {
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
 
+	// TODO: This should be moved to the sandbox
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
 			bool fHandled = false;

@@ -17,6 +17,7 @@
 #include "VirtualObj.h"
 #include "point.h"
 #include "TriangleIndexGroup.h"
+#include "QuadIndexGroup.h"
 #include "Vertex.h"
 
 #include "TimeManager/TimeManager.h"
@@ -86,6 +87,7 @@ public:
 	RESULT AllocateVertices(uint32_t numVerts);
 	RESULT AllocateIndices(uint32_t numIndices);
 	RESULT AllocateTriangleIndexGroups(uint32_t numTriangles);
+	RESULT AllocateQuadIndexGroups(uint32_t numQuads);
 
 	virtual RESULT UpdateBuffers();
 
