@@ -713,6 +713,7 @@
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
+    <ClCompile Include="..\..\..\Primitives\sphere.cpp" />
     <ClCompile Include="..\..\..\Primitives\text.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp" />
@@ -1042,6 +1043,7 @@
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\composite.h" />
+    <ClInclude Include="..\..\..\Primitives\cylinder.h" />
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\dirty.h" />
     <ClInclude Include="..\..\..\Primitives\FlatContext.h" />
