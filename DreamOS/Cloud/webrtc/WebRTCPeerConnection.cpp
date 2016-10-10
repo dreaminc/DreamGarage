@@ -479,6 +479,9 @@ void WebRTCPeerConnection::OnSuccess(webrtc::SessionDescriptionInterface* sessio
 	// TODO: Add a better thing than DummySetSessionDescriptionObserver 
 	m_pWebRTCPeerConnectionInterface->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), sessionDescription);
 	m_fSDPSet = true;
+
+	LOG(INFO) << "(cloud) set local description for " << (m_fOffer?"offer":"answer");
+
 	CR(PrintSDP());	
 
 	CR(ClearLocalSessionDescriptionProtocol());
@@ -492,7 +495,7 @@ void WebRTCPeerConnection::OnFailure(const std::string& error) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("WebRTC Error: %s", error.c_str());
-	LOG(INFO) << "WebRTC Error: " << error.c_str();
+	LOG(INFO) << "(cloud) WebRTC Error: " << error.c_str();
 
 	if (m_pParentObserver != nullptr) {
 		CR(m_pParentObserver->OnSDPFailure(m_peerConnectionID, m_fOffer));

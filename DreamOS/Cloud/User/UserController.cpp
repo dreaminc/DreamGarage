@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "UserController.h"
 
 #include "Cloud/HTTP/HTTPController.h"
@@ -75,6 +76,8 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 
 	DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
 	m_fLoggedIn = true;
+
+	LOG(INFO) << "(Cloud) user logged in:user=" << strUsername;
 
 Error:
 	return r;

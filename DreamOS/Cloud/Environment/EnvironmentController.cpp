@@ -113,6 +113,8 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user) {
 
 	m_fConnected = true;
 
+	LOG(INFO) << "(Cloud) user connected to socket:user=" << user;
+
 Error:
 	return r;
 }
@@ -212,6 +214,8 @@ RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnec
 	m_state = state::SET_SDP_OFFER;
 
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+
+	LOG(INFO) << "(cloud) offer was sent to cloud, msg=" << strData;
 
 Error:
 	return r;
@@ -486,12 +490,14 @@ Error:
 void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage) {
 	DEBUG_LINEOUT("HandleWebsocketMessage");
 
+	LOG(INFO) << "(Cloud) websocket msg" << strMessage;
+
 	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
 
 	if (jsonCloudMessage["/method"_json_pointer] == nullptr) {
 		// message error
 
-		LOG(ERROR) << "websocket msg error (could be a user already logged in)";
+		LOG(ERROR) << "(cloud) websocket msg error (could be a user already logged in)";
 		HUD_OUT("websocket msg error (could be a user already logged in)");
 
 		return;
@@ -509,15 +515,23 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		strMethod = strTokens[1];
 
 		if (strType == "request") {
-			LOG(INFO) << "HandleSocketMessage REQUEST " << strMethod << "," << jsonPayload;
+			LOG(INFO) << "(cloud) HandleSocketMessage REQUEST " << strMethod << "," << jsonPayload;
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketRequest(strMethod, jsonPayload);
 		}
 		else if (strType == "response") {
-			LOG(INFO) << "HandleSocketMessage RESPONSE " << strMethod << "," << jsonPayload;
+			LOG(INFO) << "(cloud) HandleSocketMessage RESPONSE " << strMethod << "," << jsonPayload;
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
+		else
+		{
+			LOG(ERROR) << "(cloud) websocket msg type unknown";
+		}
+	}
+	else
+	{
+		LOG(ERROR) << "(cloud) websocket msg method unknown";
 	}
 
 	/*

@@ -38,33 +38,24 @@ RESULT DreamGarage::LoadScene() {
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
 	// Add Peer User Object
-	m_pPeerUser = AddUser();
+	//m_pPeerUser = AddUser();
 
-	// TODO: Combine this into one call
-	//texture *pCubeMap = MakeTexture(L"HornstullsStrand2", texture::TEXTURE_TYPE::TEXTURE_CUBE);
-	skybox *pSkybox = AddSkybox();
-	//pSkybox->SetCubeMapTexture(pCubeMap);
+	for (auto x : std::array<int, 5>()) {
+		user* pNewUser = AddUser();
+		pNewUser->SetVisible(false);
+		m_usersPool.push_back(pNewUser);
+	}
 
-	float lightHeight = 5.0f, lightSpace = 5.0f, lightIntensity = 1.3f;
-	point ptLight = point(0.0f, 5.0f, 5.0f);
-	point ptLight2 = point(0.0f, 10.0f, 0.0f);
-	vector lightdir = vector(0.0f, -1.0f, 0.0f);
-//	vector lightdir = vector(0.0f, -1.0f, 0.000001f);
-	lightdir.Normalize();
+	AddSkybox();
 
-	// TODO: Special lane for global light
-	//light* pLight = AddLight(LIGHT_POINT, lightIntensity, point(lightSpace, lightHeight, -(lightSpace / 2.0f)), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-	
-	//AddLight(LIGHT_POINT, 0.1f, point(0, 0.3f, 1.0), color(COLOR_WHITE), color(COLOR_WHITE), vector::jVector(-1.0f));
-
-//	g_pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -0.5f, 0.0f));
-//	g_pLight->EnableShadows();
-
-	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), lightdir);
+	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 	g_pLight2->EnableShadows();
 
-	//sphere* p = AddSphere();
-	//p->MoveTo(point(0, 0, 1));
+	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+
 #ifdef TESTING
 // Test Scene
 // 
@@ -290,19 +281,6 @@ std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system
 
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
-	/*
-	static std::shared_ptr<DebugData> pX = DebugConsole::GetDebugConsole()->Register();
-	pX->SetValue("nir");
-
-	static std::shared_ptr<DebugData> pY = DebugConsole::GetDebugConsole()->Register();
-	pY->SetValue("dan");
-
-	static std::shared_ptr<DebugData> pZ = DebugConsole::GetDebugConsole()->Register();
-	pZ->SetValue("nir finkelstein");
-
-	static std::shared_ptr<DebugData> pZ2 = DebugConsole::GetDebugConsole()->Register();
-	pZ2->SetValue("hello");
-	*/
 
 #ifdef TESTING
 ///*
@@ -404,9 +382,22 @@ Error:
 	return r;
 }
 
+user*	DreamGarage::ActivateUser(long userId) {
+	if (m_peerUsers.find(userId) == m_peerUsers.end()) {
+		m_peerUsers[userId] = m_usersPool.back();
+		m_usersPool.pop_back();
+
+		if (m_peerUsers[userId] != nullptr) {
+			m_peerUsers[userId]->SetVisible(true);
+		}
+	}
+
+	return m_peerUsers[userId];
+}
+
 RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
-
+	//LOG(INFO) << "(cloud) head=" << senderUserID;
 	//CN(pUpdateHeadMessage);
 
 	//DEBUG_LINEOUT("HandleUpdateHeadMessage");
@@ -414,14 +405,16 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 
 	//m_pSphere->SetPosition(pUpdateHeadMessage->GetPosition());
 
-	WCN(m_pPeerUser);
+	user* pUser = ActivateUser(senderUserID);
 
-	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
+	WCN(pUser);
+
+	pUser->SetPosition(pUpdateHeadMessage->GetPosition());
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
 	//qOrientation.Reverse();
 	qOrientation.RotateY(((quaternion_precision)(M_PI)));
-	m_pPeerUser->SetOrientation(qOrientation);
+	pUser->SetOrientation(qOrientation);
 
 	// Model we're using is reversed apparently
 
@@ -445,12 +438,14 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
 	//pUpdateHandMessage->PrintMessage();
 
+	user* pUser = ActivateUser(senderUserID);
+
 	hand::HandState handState;
 
-	WCN(m_pPeerUser);
+	WCN(pUser);
 
 	handState = pUpdateHandMessage->GetHandState();
-	m_pPeerUser->UpdateHand(handState);
+	pUser->UpdateHand(handState);
 
 Error:
 	return r;

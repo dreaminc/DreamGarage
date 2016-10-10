@@ -500,7 +500,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;NOT_USE_DREAM_OS_PATH_ENV;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;PRODUCTION_BUILD;_WINDOWS;NOT_USE_DREAM_OS_PATH_ENV;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -657,6 +657,7 @@
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
+    <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
@@ -991,6 +992,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
@@ -1209,6 +1211,12 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -1252,6 +1260,9 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\Makefile" />
+    <None Include="..\..\..\Models\face4\untitled.mtl">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />
     <None Include="..\..\..\Resources\Fonts\Arial.fnt">
@@ -1270,6 +1281,15 @@
     <ResourceCompile Include="DreamOS.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\Models\face4\eye.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
     <Image Include="..\..\..\Texture\Fonts\Arial.png">
       <DeploymentContent>true</DeploymentContent>
     </Image>
@@ -1277,6 +1297,14 @@
       <DeploymentContent>true</DeploymentContent>
     </Image>
     <Image Include="Dream.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</DeploymentContent>
+      <DeploymentContent>true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

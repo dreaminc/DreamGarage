@@ -440,6 +440,9 @@
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp">
+      <Filter>Cloud\User</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2069,6 +2072,9 @@
     <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
       <Filter>Sandbox\Windows</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2237,6 +2243,15 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\Models\face4\untitled.mtl">
+      <Filter>Models\face4</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
@@ -2256,5 +2271,19 @@
     <Image Include="..\..\..\Texture\Fonts\ArialDistance.png">
       <Filter>Texture\Fonts</Filter>
     </Image>
+    <Image Include="..\..\..\Models\face4\eye.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
+      <Filter>Models\face4</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.obj">
+      <Filter>Models\face4</Filter>
+    </Object>
   </ItemGroup>
 </Project>

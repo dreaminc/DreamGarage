@@ -190,12 +190,8 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, n
 	PeerConnection *pPeerConnection = nullptr;
 
 	if ((pPeerConnection = GetPeerConnectionByID(peerConnection.GetPeerConnectionID())) != nullptr) {
+		LOG(INFO) << "(cloud) creating a peer already found by connection";
 		DEBUG_LINEOUT("Peer Connection %d already exists", peerConnection.GetPeerConnectionID());
-		return pPeerConnection;
-	}
-
-	if ((pPeerConnection = GetPeerConnectionByAnswerUserID(peerConnection.GetAnswerUserID())) != nullptr) {
-		DEBUG_LINEOUT("Peer conncetion to peer %d already exists", peerConnection.GetAnswerUserID());
 		return pPeerConnection;
 	}
 
@@ -232,13 +228,20 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 	long answerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
 
 	long offerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
-	long answerEnvironmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+	long answerEnvironmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
 	
 	// TODO: Make sure they match
 
 	CBM((userID != -1), "User does not seem to be signed in");
 
 	if (strMethod == "create_offer") {
+		if (userID != offerUserID) {
+			LOG(ERROR) << "(cloud) requested offer for wrong user. payload=" << jsonPayload;
+			return R_FAIL;
+		}
+
+		LOG(INFO) << "(cloud) creating a new peer (id=" << peerConnectionID << ") between user ids (" << userID << "[offeror,self]->" << answerUserId << "[answerer])";
+
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 
@@ -251,6 +254,7 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
 	}
 	else if (strMethod == "set_offer") {
+		LOG(ERROR) << "(cloud) set offer should not be a request";
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
 
 		// DEADBEEF: No longer true
@@ -259,6 +263,13 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//pPeerConnection->UpdatePeerConnectionFromJSON(jsonPeerConnection);
 	}
 	else if (strMethod == "create_answer") {
+		if (userID != answerUserId) {
+			LOG(ERROR) << "(cloud) requested answer for wrong user. payload=" << jsonPayload;
+			return R_FAIL;
+		}
+
+		LOG(INFO) << "(cloud) creating a new peer (id=" << peerConnectionID << ") between user ids (" << offerUserID << "[offeror]->" << answerUserId << "[answerer,self])";
+
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 
@@ -361,6 +372,10 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//pPeerConnection->Print();
 		
 		//RESULT WebRTCConductor::AddIceCandidate(ICECandidate iceCandidate) {
+	}
+	else
+	{
+		LOG(ERROR) << "(cloud) method unknown";
 	}
 
 Error:
@@ -527,7 +542,7 @@ Error:
 
 RESULT PeerConnectionController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
-
+	
 	PeerConnection *pPeerConnection = GetPeerConnectionByPeerUserID(peerID);
 	CNM(pPeerConnection, "Peer connection to user %d not found", peerID);
 
