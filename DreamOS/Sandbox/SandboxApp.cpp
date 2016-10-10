@@ -415,6 +415,19 @@ RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState)
 	return m_pCloudController->SendUpdateHandMessage(userID, handState);
 }
 
+
+RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
+	return m_pCloudController->BroadcastDataMessage(pDataMessage);
+}
+
+RESULT SandboxApp::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pCloudController->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT SandboxApp::BroadcastUpdateHandMessage(hand::HandState handState) {
+	return m_pCloudController->BroadcastUpdateHandMessage(handState);
+}
+
 // TimeManager
 RESULT SandboxApp::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
 	RESULT r = R_PASS;

@@ -39,6 +39,8 @@ public:
 	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
 
+	user*	ActivateUser(long userId);
+
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 
@@ -47,7 +49,11 @@ public:
 
 private:
 
-	user *m_pPeerUser;
+	//user *m_pPeerUser;
+
+	std::map<long, user*> m_peerUsers;
+	std::vector<user*> m_usersPool;
+
 	//composite *m_pPeerUser;
 	//volume *m_pPeerUser;
 

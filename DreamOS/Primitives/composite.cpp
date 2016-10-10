@@ -100,6 +100,31 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<composite> composite::MakeComposite() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<composite> pComposite(m_pHALImp->MakeComposite());
+
+	//Success:
+	return pComposite;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<composite> composite::AddComposite() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<composite> pComposite = MakeComposite();
+	CR(AddObject(pComposite));
+
+	//Success:
+	return pComposite;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<sphere> composite::MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3) {
 	RESULT r = R_PASS;
 

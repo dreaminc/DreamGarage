@@ -37,8 +37,11 @@ RESULT DreamGarage::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
-	// Add Peer User Object
-	m_pPeerUser = AddUser();
+	for (auto x : std::array<int, 5>()) {
+		user* pNewUser = AddUser();
+		pNewUser->SetVisible(false);
+		m_usersPool.push_back(pNewUser);
+	}
 
 	AddSkybox();
 
@@ -209,7 +212,8 @@ RESULT DreamGarage::SendHeadPosition() {
 
 	quaternion qOrientation = GetCameraOrientation();
 
-	CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
+	//CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
+	CR(BroadcastUpdateHeadMessage(ptPosition, qOrientation));
 
 Error:
 	return r;
@@ -223,11 +227,13 @@ RESULT DreamGarage::SendHandPosition() {
 	hand *pRightHand = GetHand(hand::HAND_RIGHT);
 
 	if (pLeftHand != nullptr) {
-		CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
+		//CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
+		CR(BroadcastUpdateHandMessage(pLeftHand->GetHandState()));
 	}
 
 	if (pRightHand != nullptr) {
-		CR(SendUpdateHandMessage(NULL, pRightHand->GetHandState()));
+		//CR(SendUpdateHandMessage(NULL, pRightHand->GetHandState()));
+		CR(BroadcastUpdateHandMessage(pRightHand->GetHandState()));
 	}
 
 	//CR(SendUpdateHandMessage(NULL, hand::GetDebugHandState(hand::HAND_LEFT)));
@@ -253,7 +259,8 @@ RESULT DreamGarage::SendSwitchHeadMessage() {
 	RESULT r = R_PASS;
 
 	SwitchHeadMessage switchHeadMessage(NULL, NULL);
-	CR(SendDataMessage(NULL, &(switchHeadMessage)));
+	//CR(SendDataMessage(NULL, &(switchHeadMessage)));
+	CR(BroadcastDataMessage(&(switchHeadMessage)));
 
 Error:
 	return r;
@@ -271,19 +278,6 @@ std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system
 
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
-	/*
-	static std::shared_ptr<DebugData> pX = DebugConsole::GetDebugConsole()->Register();
-	pX->SetValue("nir");
-
-	static std::shared_ptr<DebugData> pY = DebugConsole::GetDebugConsole()->Register();
-	pY->SetValue("dan");
-
-	static std::shared_ptr<DebugData> pZ = DebugConsole::GetDebugConsole()->Register();
-	pZ->SetValue("nir finkelstein");
-
-	static std::shared_ptr<DebugData> pZ2 = DebugConsole::GetDebugConsole()->Register();
-	pZ2->SetValue("hello");
-	*/
 
 #ifdef TESTING
 ///*
@@ -385,9 +379,22 @@ Error:
 	return r;
 }
 
+user*	DreamGarage::ActivateUser(long userId) {
+	if (m_peerUsers.find(userId) == m_peerUsers.end()) {
+		m_peerUsers[userId] = m_usersPool.back();
+		m_usersPool.pop_back();
+
+		if (m_peerUsers[userId] != nullptr) {
+			m_peerUsers[userId]->SetVisible(true);
+		}
+	}
+
+	return m_peerUsers[userId];
+}
+
 RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
-
+	//LOG(INFO) << "(cloud) head=" << senderUserID;
 	//CN(pUpdateHeadMessage);
 
 	//DEBUG_LINEOUT("HandleUpdateHeadMessage");
@@ -395,14 +402,16 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 
 	//m_pSphere->SetPosition(pUpdateHeadMessage->GetPosition());
 
-	WCN(m_pPeerUser);
+	user* pUser = ActivateUser(senderUserID);
 
-	m_pPeerUser->SetPosition(pUpdateHeadMessage->GetPosition());
+	WCN(pUser);
+
+	pUser->SetPosition(pUpdateHeadMessage->GetPosition());
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
 	//qOrientation.Reverse();
 	qOrientation.RotateY(((quaternion_precision)(M_PI)));
-	m_pPeerUser->SetOrientation(qOrientation);
+	pUser->SetOrientation(qOrientation);
 
 	// Model we're using is reversed apparently
 
@@ -426,12 +435,14 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
 	//pUpdateHandMessage->PrintMessage();
 
+	user* pUser = ActivateUser(senderUserID);
+
 	hand::HandState handState;
 
-	WCN(m_pPeerUser);
+	WCN(pUser);
 
 	handState = pUpdateHandMessage->GetHandState();
-	m_pPeerUser->UpdateHand(handState);
+	pUser->UpdateHand(handState);
 
 Error:
 	return r;

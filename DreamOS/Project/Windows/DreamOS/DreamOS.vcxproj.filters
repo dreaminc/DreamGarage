@@ -323,9 +323,6 @@
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCClient.cpp">
-      <Filter>Cloud\webrtc</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
@@ -410,6 +407,9 @@
     <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
       <Filter>External\OCULUS\v132\Logging</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
+      <Filter>Cloud\webrtc</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
@@ -439,6 +439,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp">
+      <Filter>Cloud\User</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1951,9 +1954,6 @@
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCClient.h">
-      <Filter>Cloud\webrtc</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Sandbox\CommandLineManager.h">
       <Filter>Sandbox</Filter>
     </ClInclude>
@@ -2039,6 +2039,15 @@
       <Filter>Main</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\DreamConsole\Console.h">
       <Filter>DreamConsole</Filter>
     </ClInclude>
@@ -2089,9 +2098,6 @@
     </None>
     <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
       <Filter>Resources\Fonts</Filter>
-    </None>
-    <None Include="..\..\..\Models\face4\untitled.mtl">
-      <Filter>Models\face4</Filter>
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
@@ -2273,6 +2279,9 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.mtl">
+      <Filter>Models\face4</Filter>
+    </Object>
     <Object Include="..\..\..\Models\face4\untitled.obj">
       <Filter>Models\face4</Filter>
     </Object>

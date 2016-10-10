@@ -37,6 +37,9 @@ RESULT user::Initialize() {
 	pHead->SetVisible(false);
 	m_pHeads.push_back(pHead);
 	//*/
+
+	//pHead = AddComposite();
+	//pHead->AddSphere(0.25f, 20, 20);
 	
 	// Hands
 	m_pLeftHand = AddHand();

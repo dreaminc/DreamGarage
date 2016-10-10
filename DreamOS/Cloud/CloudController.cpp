@@ -198,9 +198,11 @@ Error:
 	return r;
 }
 
+/*
 RESULT CloudController::AddIceCandidates() {
 	return m_pCloudImp->AddIceCandidates();
 }
+*/
 
 RESULT CloudController::OnICECandidatesGatheringDone() {
 	RESULT r = R_PASS;
@@ -222,21 +224,21 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+RESULT CloudController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 
 	CN(m_fnHandleDataChannelStringMessageCallback);
-	CR(m_fnHandleDataChannelStringMessageCallback(strDataChannelMessage));
+	CR(m_fnHandleDataChannelStringMessageCallback(peerConnectionID, strDataChannelMessage));
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT CloudController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
 	if (m_fnHandleDataChannelMessageCallback != nullptr) {
-		CR(m_fnHandleDataChannelMessageCallback(pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_fnHandleDataChannelMessageCallback(peerUserID, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 	Message *pDataChannelMessage = reinterpret_cast<Message*>(pDataChannelBuffer);
@@ -248,7 +250,7 @@ RESULT CloudController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pD
 				UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDataChannelBuffer);
 				CN(pUpdateHeadMessage);
 				// TODO: Add peer ID from
-				CR(m_fnHandleHeadUpdateMessageCallback(NULL, pUpdateHeadMessage));
+				CR(m_fnHandleHeadUpdateMessageCallback(peerUserID, pUpdateHeadMessage));
 			}
 		} break;
 
@@ -257,14 +259,14 @@ RESULT CloudController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pD
 				UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDataChannelBuffer);
 				CN(pUpdateHandMessage);
 				// TODO: Add peer ID from
-				CR(m_fnHandleHandUpdateMessageCallback(NULL, pUpdateHandMessage));
+				CR(m_fnHandleHandUpdateMessageCallback(peerUserID, pUpdateHandMessage));
 			}
 		} break;
 
 		default: {
 			if (m_fnHandleDataMessageCallback != nullptr) {
 				// TODO: Add peer ID from
-				CR(m_fnHandleDataMessageCallback(NULL, pDataChannelMessage));
+				CR(m_fnHandleDataMessageCallback(peerUserID, pDataChannelMessage));
 			}
 		} break;
 	}
@@ -298,6 +300,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT CloudController::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 	RESULT r = R_PASS;
 
@@ -307,6 +310,7 @@ RESULT CloudController::CreateSDPOfferAnswer(std::string strSDPOfferJSON) {
 Error:
 	return r;
 }
+*/
 
 void CloudController::Login()
 {
@@ -359,21 +363,15 @@ Error:
 	return r;
 }
 
+long CloudController::GetUserID() {
+	if (m_pUserController != nullptr) {
+		return m_pUserController->GetUserID();
+	}
 
-// TODO: Convert WebRTC Client code to server client code
-
-// TODO: This will attempt to connect to the first peer in the list, should make more robust
-// and expose the available peer list at the CloudController layer
-RESULT CloudController::ConnectToPeer(int peerID) {
-	RESULT r = R_PASS;
-
-	CN(m_pCloudImp);
-	CR(m_pCloudImp->ConnectToPeer(peerID));
-
-Error:
-	return r;
+	return -1;
 }
 
+/*
 RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel) {
 	RESULT r = R_PASS;
 
@@ -384,10 +382,13 @@ RESULT CloudController::InitializeConnection(bool fMaster, bool fAddDataChannel)
 Error:
 	return r;
 }
+*/
 
+/*
 std::string CloudController::GetSDPOfferString() {
 	return m_pCloudImp->GetSDPOfferString();
 }
+*/
 
 RESULT CloudController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
@@ -409,9 +410,24 @@ Error:
 	return r;
 }
 
-// TODO: remove this code
-std::function<void(int msgID, void* data)> CloudController::GetUIThreadCallback() {
-	return m_pCloudImp->GetUIThreadCallback();
+RESULT CloudController::BroadcastDataChannelStringMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->BroadcastDataChannelStringMessage(strMessage));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->BroadcastDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
 }
 
 // TODO: remove this code
@@ -500,6 +516,73 @@ Error:
 	return r;
 }
 
+// Broadcast some messages
+// TODO: This is duplicated code - use this in the below functions
+RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
+	RESULT r = R_PASS;
+
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	CN(m_pUserController);
+	{
+		// Create the message
+		pDatachannelBuffer_n = pDataMessage->GetSize();
+		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
+		CN(pDatachannelBuffer);
+		memcpy(pDatachannelBuffer, pDataMessage, pDataMessage->GetSize());
+
+		CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	RESULT r = R_PASS;
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	CN(m_pUserController);
+	{
+		// Create the message
+		UpdateHeadMessage updateHeadMessage(m_pUserController->GetUserID(), -1, ptPosition, qOrientation, vVelocity, qAngularVelocity);
+
+		pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
+		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
+		CN(pDatachannelBuffer);
+		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
+
+		CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::BroadcastUpdateHandMessage(hand::HandState handState) {
+	RESULT r = R_PASS;
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	CN(m_pUserController);
+	{
+		// Create the message
+		UpdateHandMessage updateHeadMessage(m_pUserController->GetUserID(), -1, handState);
+
+		pDatachannelBuffer_n = sizeof(UpdateHandMessage);
+		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
+		CN(pDatachannelBuffer);
+		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
+
+		CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
@@ -513,5 +596,6 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 		SendDataChannelStringMessage(NULL, st);
 	}
 
+//Error:
 	return r;
 }

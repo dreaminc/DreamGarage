@@ -11,16 +11,15 @@
 #include <vector>
 
 // TODO: This may result in cyclic dependency so might need to move it
-#include "Cloud/webrtc/WebRTCConductor.h"
+#include "Cloud/webrtc/WebRTCPeerConnection.h"
 
-const char kCandidateSdpMidName[] = "sdpMid";
-const char kCandidateSdpMlineIndexName[] = "sdpMLineIndex";
-const char kCandidateSdpName[] = "candidate";
+#include "json.hpp"
 
 class PeerConnection {
 public:
-	PeerConnection(long userID, long peerUserID, long peerConnectionID) :
-		m_offerUserID(userID),
+	PeerConnection(long userID, long offerUserID, long peerUserID, long peerConnectionID) :
+		m_userID(userID),
+		m_offerUserID(offerUserID),
 		m_answerUserID(peerUserID),
 		m_peerConnectionID(peerConnectionID),
 		m_fWebRTCConnectionStable(false)
@@ -28,7 +27,8 @@ public:
 		// empty
 	}
 
-	PeerConnection(nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) :
+	PeerConnection(long userID, nlohmann::json &jsonPeerConnection, nlohmann::json &jsonOfferSocketConnection, nlohmann::json &jsonAnswerSocketConnection) :
+		m_userID(userID),
 		m_peerConnectionID(-1),
 		m_offerUserID(-1),
 		m_answerUserID(-1),
@@ -89,6 +89,15 @@ public:
 		return R_PASS;
 	}
 
+	// This is a bit redundant
+	long GetUserID() { return m_userID; }
+	long GetPeerUserID() {
+		if (m_userID == m_offerUserID) 
+			return m_answerUserID;
+		else 
+			return m_offerUserID;
+	}
+
 	long GetOfferUserID() { return m_offerUserID; }
 	RESULT SetOfferUserID(long userID) { m_offerUserID = userID; return R_PASS; }
 
@@ -124,8 +133,8 @@ public:
 	const std::string& GetSDPOffer() { return m_strSDPOffer; }
 	const std::string& GetSDPAnswer() { return m_strSDPAnswer; }
 
-	const std::list<ICECandidate> GetUserCandidates() { return m_offerICECandidates; }
-	const std::list<ICECandidate> GetPeerCandidates() { return m_answerICECandidates; }
+	const std::list<WebRTCICECandidate>& GetUserCandidates() { return m_offerICECandidates; }
+	const std::list<WebRTCICECandidate>& GetPeerCandidates() { return m_answerICECandidates; }
 
 	RESULT UpdateOfferSocketConnectionFromJSON(nlohmann::json jsonOfferSocketConnection) {
 		RESULT r = R_PASS;
@@ -174,7 +183,7 @@ public:
 				std::string strSDPMediaID = jsonICECandidate[kCandidateSdpMidName].get<std::string>();
 				int SDPMediateLineIndex = jsonICECandidate[kCandidateSdpMlineIndexName].get<int>();
 				
-				ICECandidate iceCandidate(strSDPCandidate, strSDPMediaID, SDPMediateLineIndex);
+				WebRTCICECandidate iceCandidate(strSDPCandidate, strSDPMediaID, SDPMediateLineIndex);
 				m_offerICECandidates.push_back(iceCandidate);
 			}
 		}
@@ -198,7 +207,7 @@ public:
 				std::string strSDPMediaID = jsonICECandidate[kCandidateSdpMidName].get<std::string>();
 				int SDPMediateLineIndex = jsonICECandidate[kCandidateSdpMlineIndexName].get<int>();
 
-				ICECandidate iceCandidate(strSDPCandidate, strSDPMediaID, SDPMediateLineIndex);
+				WebRTCICECandidate iceCandidate(strSDPCandidate, strSDPMediaID, SDPMediateLineIndex);
 				m_answerICECandidates.push_back(iceCandidate);
 			}
 		}
@@ -219,28 +228,40 @@ public:
 		// Offer
 		jsonData["offer"] = m_strSDPOffer;
 
-		if (m_offerICECandidates.size() > 0)
-			jsonData["offer_candidates"] = GetCandidatesJSON(m_offerICECandidates);
-		else
+		if (m_offerICECandidates.size() > 0) {
+			//jsonData["offer_candidates"] = GetCandidatesJSON(m_offerICECandidates);
+			// TODO: Add RESULT handling
+			GetCandidatesJSON(m_offerICECandidates, jsonData["offer_candidates"]);
+		}
+		else {
 			jsonData["offer_candidates"] = nullptr;
+		}
 
 		jsonData["offer_socket_connection"] = std::to_string(m_offerSocketConnectionID);
 
 		// Answer
 		jsonData["answer"] = m_strSDPAnswer;
 
-		if (m_answerICECandidates.size() > 0)
-			jsonData["answer_candidates"] = GetCandidatesJSON(m_answerICECandidates);
-		else
+		if (m_answerICECandidates.size() > 0) {
+			//jsonData["answer_candidates"] = GetCandidatesJSON(m_answerICECandidates);
+			// TODO: Add RESULT handling
+			GetCandidatesJSON(m_answerICECandidates, jsonData["answer_candidates"]);
+		}
+		else {
 			jsonData["answer_candidates"] = nullptr;
+		}
 
 		jsonData["answer_socket_connection"] = std::to_string(m_answerSocketConnectionID);
 	
 		return jsonData;
 	}
 
-	nlohmann::json GetCandidatesJSON(std::list<ICECandidate> iceCandidates) {
-		nlohmann::json jsonData = nlohmann::json::array();
+	//nlohmann::json GetCandidatesJSON(std::list<WebRTCICECandidate> iceCandidates, nlohmann::json &jsonCandidates) {
+	RESULT GetCandidatesJSON(std::list<WebRTCICECandidate> iceCandidates, nlohmann::json &jsonCandidates) {
+		RESULT r = R_PASS;
+
+		//nlohmann::json jsonCandidiates = nlohmann::json::array();
+		jsonCandidates = nlohmann::json::array();
 
 		for (auto &iceCandidate : iceCandidates) {
 			nlohmann::json jsonICECandidate;
@@ -249,20 +270,27 @@ public:
 			jsonICECandidate[kCandidateSdpMidName] = iceCandidate.m_strSDPMediaID;
 			jsonICECandidate[kCandidateSdpMlineIndexName] = iceCandidate.m_SDPMediateLineIndex;
 
-			jsonData.push_back(jsonICECandidate);
+			jsonCandidates.push_back(jsonICECandidate);
 		}
 
-		return jsonData;
+	//Error:
+		return r;
 	}
 
-	std::list<ICECandidate> GetOfferCandidates() { return m_offerICECandidates; }
-	RESULT SetOfferCandidates(std::list<ICECandidate> iceCandidates) {
+	const std::list<WebRTCICECandidate>& GetOfferCandidates() { 
+		return m_offerICECandidates; 
+	}
+
+	RESULT SetOfferCandidates(std::list<WebRTCICECandidate>& iceCandidates) {
 		m_offerICECandidates = iceCandidates;
 		return R_PASS;
 	}
 
-	std::list<ICECandidate> GetAnswerCandidates() { return m_answerICECandidates; }
-	RESULT SetAnswerCandidates(std::list<ICECandidate> iceCandidates) {
+	const std::list<WebRTCICECandidate>& GetAnswerCandidates() { 
+		return m_answerICECandidates; 
+	}
+
+	RESULT SetAnswerCandidates(std::list<WebRTCICECandidate>& iceCandidates) {
 		m_answerICECandidates = iceCandidates;
 		return R_PASS;
 	}
@@ -286,6 +314,7 @@ public:
 	}
 
 private:
+	long m_userID;
 	long m_offerUserID;
 	long m_answerUserID;
 	long m_peerConnectionID;
@@ -298,8 +327,8 @@ private:
 	std::string m_strSDPOffer;	
 	std::string m_strSDPAnswer;
 
-	std::list<ICECandidate> m_offerICECandidates;
-	std::list<ICECandidate> m_answerICECandidates;
+	std::list<WebRTCICECandidate> m_offerICECandidates;
+	std::list<WebRTCICECandidate> m_answerICECandidates;
 
 	bool m_fWebRTCConnectionStable;
 };

@@ -19,7 +19,6 @@
 class User;
 class Websocket;
 
-
 // TODO: This is actually a UserController - so change the name of object and file
 class EnvironmentController : public Controller, public PeerConnectionController::PeerConnectionControllerObserver {
 public:
@@ -53,8 +52,9 @@ public:
 public:
 	class EnvironmentControllerObserver {
 	public:
-		virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) = 0;
-		virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual long GetUserID() = 0;
 	};
 
 	RESULT RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver);
@@ -80,8 +80,10 @@ public:
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
 
+	long GetUserID();
+
 	// TODO: Temporary 
-	RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
+	//RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
 
 private:
 	RESULT InitializeWebsocket(std::string& strURI);
@@ -100,8 +102,8 @@ private:
 	std::string GetMethodURI(EnvironmentMethod userMethod);
 
 	// PeerConnectionControllerObserver
-	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
-	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnDataChannelStringMessage(long peerUserID, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
@@ -113,6 +115,9 @@ public:
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
+	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 public:
 	EnvironmentController::state GetState() {

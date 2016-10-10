@@ -34,8 +34,8 @@ typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageC
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver,
 						public Subscriber<CmdPromptEvent> {
 protected:
-	typedef std::function<RESULT(const std::string&)> HandleDataChannelStringMessageCallback;
-	typedef std::function<RESULT(uint8_t *, int)> HandleDataChannelMessageCallback;
+	typedef std::function<RESULT(long, const std::string&)> HandleDataChannelStringMessageCallback;
+	typedef std::function<RESULT(long, uint8_t *, int)> HandleDataChannelMessageCallback;
 
 	RESULT RegisterDataChannelStringMessageCallback(HandleDataChannelStringMessageCallback fnHandleDataChannelStringMessageCallback);
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
@@ -48,6 +48,10 @@ public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+
+	RESULT BroadcastDataMessage(Message *pDataMessage);
+	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
 
 public:
 	CloudController();
@@ -67,29 +71,34 @@ public:
 	RESULT Update();
 	void Login();
 
-	RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
-	std::string GetSDPOfferString();
-	RESULT InitializeConnection(bool fMaster, bool fAddDataChannel);
-	RESULT AddIceCandidates();
+	virtual long GetUserID() override;
 
-	// TODO: This will attempt to connect to the first peer in the list, should make more robust
-	// and expose the available peer list at the CloudController layer
-	// TODO: CLEAN UP MIGHT NOT DO STUFF ANYMORE
-	RESULT ConnectToPeer(int peerID);
+	//RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON);
+	//std::string GetSDPOfferString();
+	//RESULT InitializeConnection(bool fMaster, bool fAddDataChannel);
+	
+	//RESULT AddIceCandidates();
+
 	RESULT PrintEnvironmentPeerList();
 
-	std::function<void(int msgID, void* data)> GetUIThreadCallback();
+	//std::function<void(int msgID, void* data)> GetUIThreadCallback();
 
 	void CallGetUIThreadCallback(int msgID, void* data);
 
 	// WebRTC Callbacks
 	// TODO: Convert to observer interface (clean up)
 	RESULT OnICECandidatesGatheringDone();
-	virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) override;
-	virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+
+	// EnvironmentControllerObserver
+	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+
+	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
+	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;

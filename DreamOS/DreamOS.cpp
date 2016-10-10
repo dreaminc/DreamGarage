@@ -227,6 +227,18 @@ RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
 	return m_pSandbox->SendUpdateHandMessage(userID, handState);
 }
 
+RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
+	return m_pSandbox->BroadcastDataMessage(pDataMessage);
+}
+
+RESULT DreamOS::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pSandbox->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT DreamOS::BroadcastUpdateHandMessage(hand::HandState handState) {
+	return m_pSandbox->BroadcastUpdateHandMessage(handState);
+}
+
 RESULT DreamOS::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	return m_pSandbox->RegisterSubscriber(keyEvent, pKeyboardSubscriber);
 }

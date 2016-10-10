@@ -117,6 +117,10 @@ public:
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
+	RESULT BroadcastDataMessage(Message *pDataMessage);
+	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
+
 	// IO
 public:
 	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);

@@ -500,7 +500,7 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;NOT_USE_DREAM_OS_PATH_ENV;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;PRODUCTION_BUILD;_WINDOWS;NOT_USE_DREAM_OS_PATH_ENV;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -657,13 +657,14 @@
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
-    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCClient.cpp" />
+    <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
@@ -755,8 +756,9 @@
     <ClInclude Include="..\..\..\Cloud\Message\Message.h" />
     <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
     <ClInclude Include="..\..\..\Cloud\Model.h" />
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCClient.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\Environment.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h" />
@@ -767,6 +769,7 @@
     <ClInclude Include="..\..\..\Cloud\User\User.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserController.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h" />
     <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
@@ -1297,10 +1300,10 @@
   </ItemGroup>
   <ItemGroup>
     <Object Include="..\..\..\Models\face4\untitled.obj">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</ExcludedFromBuild>
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</DeploymentContent>
+      <DeploymentContent>true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>

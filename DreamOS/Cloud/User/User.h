@@ -13,6 +13,7 @@
 
 #include <string>
 #include "Primitives/version.h"
+#include <iostream>
 
 class User {
 public:
@@ -56,8 +57,8 @@ public:
 		return R_PASS;
 	}
 	
-	long GetUserID() { return m_userID; }
-	long GetDefaultEnvironmentID() { return m_defaultEnvironmentID; }
+	long GetUserID() const { return m_userID; }
+	long GetDefaultEnvironmentID() const { return m_defaultEnvironmentID; }
 
 	const std::string&	GetEmail() const { return m_strEmail; }
 	const std::string&	GetFirstName() const  { return m_strFirstName; }
@@ -77,6 +78,8 @@ public:
 
 	version GetVersion() { return m_version; }
 
+	friend std::ostream& operator<<(std::ostream& os, const User& user);
+
 private:
 	long m_userID;
 	long m_defaultEnvironmentID;
@@ -90,5 +93,7 @@ private:
 
 	version m_version;
 };
+
+std::ostream& operator<<(std::ostream& os, const User& user);
 
 #endif	// ! USER_H_
