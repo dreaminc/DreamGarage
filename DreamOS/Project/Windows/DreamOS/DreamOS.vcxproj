@@ -1260,9 +1260,7 @@
       <DeploymentContent>true</DeploymentContent>
     </None>
     <None Include="..\..\..\Makefile" />
-    <None Include="..\..\..\Models\face4\untitled.mtl">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
+    <None Include="..\..\..\Models\face4\untitled.mtl" />
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />
     <None Include="..\..\..\Resources\Fonts\Arial.fnt">
