@@ -2249,9 +2249,6 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\Models\face4\untitled.mtl">
-      <Filter>Models\face4</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
@@ -2282,6 +2279,9 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.mtl">
+      <Filter>Models\face4</Filter>
+    </Object>
     <Object Include="..\..\..\Models\face4\untitled.obj">
       <Filter>Models\face4</Filter>
     </Object>

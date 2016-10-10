@@ -37,9 +37,6 @@ RESULT DreamGarage::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
-	// Add Peer User Object
-	//m_pPeerUser = AddUser();
-
 	for (auto x : std::array<int, 5>()) {
 		user* pNewUser = AddUser();
 		pNewUser->SetVisible(false);
