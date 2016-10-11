@@ -17,6 +17,13 @@
 //
 #ifndef EASYLOGGINGPP_H
 #define EASYLOGGINGPP_H
+
+// Dream custom code
+#ifndef PRODUCTION_BUILD
+#include "Sandbox/CommandLineManager.h"
+#endif
+// End of Dream custom code.
+
 // Compilers and C++0x/C++11 Evaluation
 #if (defined(__GNUC__))
 #   define ELPP_COMPILER_GCC 1
@@ -4521,8 +4528,10 @@ inline void FUNCTION_NAME(const T&);
                         callback->acquireLock();
                         callback->handle(&data);
 
-						// Dream custom code for OutputDebugString goes here:
-						OutputDebugStringA((std::string("[DOS] ") + LevelHelper::convertToString(data.logMessage()->level()) + " " + data.logMessage()->message()).c_str());
+						// Dream custom code
+#ifndef PRODUCTION_BUILD
+						OutputDebugStringA((std::string("[DOS] ") + CommandLineManager::instance()->GetParameterValue("username") + " " + LevelHelper::convertToString(data.logMessage()->level()) + " " + data.logMessage()->message()).c_str());
+#endif
 						// End of Dream custom code.
 
                         callback->releaseLock();

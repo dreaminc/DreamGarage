@@ -129,6 +129,16 @@ RESULT CloudController::RegisterDataChannelMessageCallback(HandleDataChannelMess
 	}
 }
 
+RESULT CloudController::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
+	if (m_fnHandlePeersUpdateCallback) {
+		return R_FAIL;
+	}
+	else {
+		m_fnHandlePeersUpdateCallback = fnHandlePeersUpdateCallback;
+		return R_PASS;
+	}
+}
+
 RESULT CloudController::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
 	if (m_fnHandleDataMessageCallback) {
 		return R_FAIL;
@@ -229,6 +239,17 @@ RESULT CloudController::OnDataChannelStringMessage(long peerConnectionID, const 
 
 	CN(m_fnHandleDataChannelStringMessageCallback);
 	CR(m_fnHandleDataChannelStringMessageCallback(peerConnectionID, strDataChannelMessage));
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnPeersUpdate(long index) {
+	RESULT r = R_PASS;
+
+	if (m_fnHandlePeersUpdateCallback != nullptr) {
+		CR(m_fnHandlePeersUpdateCallback(index));
+	}
 
 Error:
 	return r;

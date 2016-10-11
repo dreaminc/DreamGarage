@@ -18,6 +18,7 @@ RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 
 //	CloudController::HandleHeadUpdateMessageCallback fnHeadUpdateMessageCallback = static_cast<CloudController::HandleHeadUpdateMessageCallback>(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2));
 
+	CR(RegisterPeersUpdateCallback(std::bind(&DreamGarage::HandlePeersUpdate, this, std::placeholders::_1)));
 	CR(RegisterDataMessageCallback(std::bind(&DreamGarage::HandleDataMessage, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterHeadUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterHandUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHandMessage, this, std::placeholders::_1, std::placeholders::_2)));
@@ -52,6 +53,11 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
 	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
 	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+
+
+	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.5f, -1.0f, 0));
+	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
+	AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
 
 #ifdef TESTING
 // Test Scene
@@ -360,6 +366,45 @@ RESULT DreamGarage::Update(void) {
 }
 
 // Cloud Controller
+RESULT DreamGarage::HandlePeersUpdate(long index) {
+	RESULT r = R_PASS;
+
+	if (m_isSeated) {
+		LOG(INFO) << "HandlePeersUpdate olready seated" << index;
+		return R_PASS;
+	}
+
+	LOG(INFO) << "HandlePeersUpdate " << index;
+	
+	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(index)).c_str());
+
+	if (!m_isSeated) {
+		// an initial imp for seating. would be change once we decide final seating configurations
+		camera* cam = GetCamera();
+		const float rad = 2.0f;
+
+		auto setCameraRoundtablePos = [&](uint16_t angle) {
+			cam->SetPosition(point(+rad*sin(angle*M_PI / 180.0f), 0.0f, -rad*cos(angle*M_PI / 180.0f)));
+			cam->RotateYByDeg(angle);
+		};
+
+		switch (index) {
+			case 0: setCameraRoundtablePos(180); break;
+			case 1: setCameraRoundtablePos(0); break;
+			case 2: setCameraRoundtablePos(270); break;
+			case 3: setCameraRoundtablePos(90); break;
+			case 4: setCameraRoundtablePos(180 + 45); break;
+			case 5: setCameraRoundtablePos(270 + 45); break;
+			case 6: setCameraRoundtablePos(45); break;
+			case 7: setCameraRoundtablePos(90 + 45); break;
+		}
+
+		m_isSeated = true;
+	}
+
+	return r;
+}
+
 RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) {
 	RESULT r = R_PASS;
 	LOG(INFO) << "data received";
@@ -394,36 +439,28 @@ user*	DreamGarage::ActivateUser(long userId) {
 
 RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
-	//LOG(INFO) << "(cloud) head=" << senderUserID;
-	//CN(pUpdateHeadMessage);
-
-	//DEBUG_LINEOUT("HandleUpdateHeadMessage");
-	//pUpdateHeadMessage->PrintMessage();
-
-	//m_pSphere->SetPosition(pUpdateHeadMessage->GetPosition());
 
 	user* pUser = ActivateUser(senderUserID);
 
-	WCN(pUser);
+	point headPos = pUpdateHeadMessage->GetPosition();
 
-	pUser->SetPosition(pUpdateHeadMessage->GetPosition());
+	std::string st = "pos" + std::to_string(senderUserID);
+
+	WCN(pUser);
+	
+	// camera coordinate system is reversed from world coordinate system.
+	// TODO: fix camera coordinate sysmte
+	headPos.x() = -headPos.x();
+	headPos.z() = -headPos.z();
+
+	pUser->SetPosition(headPos);
+
+	OVERLAY_DEBUG_SET(st, (st + "=" + std::to_string(headPos.x()) + "," + std::to_string(headPos.y()) + "," + std::to_string(headPos.z())).c_str());
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
-	//qOrientation.Reverse();
-	qOrientation.RotateY(((quaternion_precision)(M_PI)));
-	pUser->SetOrientation(qOrientation);
-
-	// Model we're using is reversed apparently
-
-	/*
-	quaternion qOrientation, qAdjust; 
-	
-	qAdjust = quaternion(1.4f, vector::jVector(1.0f));
-	qOrientation = pUpdateHeadMessage->GetOrientation();
 	qOrientation.Reverse();
 
-	m_pPeerUser->SetOrientation(qOrientation * qAdjust);
-	*/
+	pUser->SetOrientation(qOrientation);
 
 Error:
 	return r;

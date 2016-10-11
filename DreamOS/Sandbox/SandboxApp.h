@@ -109,6 +109,7 @@ public:
 
 	// Cloud Controller 
 public:
+	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandleEnvironmentConnectionCallback);
 	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);

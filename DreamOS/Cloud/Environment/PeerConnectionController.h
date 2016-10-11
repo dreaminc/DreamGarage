@@ -30,6 +30,7 @@ public:
 		virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) = 0;
 
 		// TODO: Switch to Peer User ID
+		virtual RESULT OnPeersUpdate(long index) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 
@@ -65,7 +66,7 @@ public:
 
 	//PeerConnection *CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID);	// DEADBEEF: ?
 	PeerConnection* CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection);
-
+	
 	// TODO: This is kind of useless
 	bool FindPeerConnectionByOfferUserID(long offerUserID);
 	PeerConnection *GetPeerConnectionByOfferUserID(long offerUserID);
@@ -100,6 +101,10 @@ public:
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 	long GetUserID();
+
+private:
+	// called when peer connections is changed
+	void OnUpdatePeerConnections();
 
 private:
 	std::unique_ptr<WebRTCImp> m_pWebRTCImp;

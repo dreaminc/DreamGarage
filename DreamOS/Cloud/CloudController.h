@@ -27,6 +27,8 @@ class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
 
+typedef std::function<RESULT(long)> HandlePeersUpdateCallback;
+
 typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
@@ -41,6 +43,8 @@ protected:
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
 
 public:
+	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);
+
 	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
@@ -90,6 +94,7 @@ public:
 	RESULT OnICECandidatesGatheringDone();
 
 	// EnvironmentControllerObserver
+	virtual RESULT OnPeersUpdate(long index) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 
@@ -113,6 +118,8 @@ private:
 private:
 	HandleDataChannelStringMessageCallback m_fnHandleDataChannelStringMessageCallback;
 	HandleDataChannelMessageCallback m_fnHandleDataChannelMessageCallback;
+
+	HandlePeersUpdateCallback m_fnHandlePeersUpdateCallback;
 
 	HandleDataMessageCallback m_fnHandleDataMessageCallback;
 	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
