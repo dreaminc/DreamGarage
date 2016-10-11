@@ -35,6 +35,7 @@ public:
 	// Cloud Controller
 	RESULT InitializeCloudControllerCallbacks();
 
+	RESULT HandlePeersUpdate(long index);
 	RESULT HandleDataMessage(long senderUserID, Message *pDataMessage);
 	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
@@ -61,6 +62,8 @@ private:
 	FlatContext *m_pContext;
 	quad *m_pQuad;
 	std::shared_ptr<DebugData> m_spherePosition;
+
+	bool	m_isSeated = false;
 };
 
 

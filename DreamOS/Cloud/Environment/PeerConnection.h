@@ -98,10 +98,10 @@ public:
 			return m_offerUserID;
 	}
 
-	long GetOfferUserID() { return m_offerUserID; }
+	long GetOfferUserID() const { return m_offerUserID; }
 	RESULT SetOfferUserID(long userID) { m_offerUserID = userID; return R_PASS; }
 
-	long GetAnswerUserID() { return m_answerUserID; }
+	long GetAnswerUserID() const { return m_answerUserID; }
 	RESULT SetAnswerUserID(long peerUserID) { m_answerUserID = peerUserID; return R_PASS; }
 
 	long GetEnvironmentID() { return m_environmentID; }
@@ -110,7 +110,7 @@ public:
 	// We can't change a peer connection ID once it's been set
 	// TODO: Should also be done for userID, peerUser, and environmentID
 	// TODO: Create generic way to do this (more robust model logic)
-	long GetPeerConnectionID() { return m_peerConnectionID; }
+	long GetPeerConnectionID() const { return m_peerConnectionID; }
 	RESULT SetPeerConnectionID(long peerConnectionID) { 
 		RESULT r = R_PASS;
 
@@ -124,10 +124,10 @@ public:
 		return r; 
 	}
 
-	long GetOfferSocketConnectionID() { return m_offerSocketConnectionID; }
+	long GetOfferSocketConnectionID() const { return m_offerSocketConnectionID; }
 	RESULT SetOfferSocketConnectionID(long offerSocketConnectionID) { m_offerSocketConnectionID = offerSocketConnectionID; return R_PASS; }
 
-	long GetAnswerSocketConnectionID() { return m_answerSocketConnectionID; }
+	long GetAnswerSocketConnectionID() const { return m_answerSocketConnectionID; }
 	RESULT SetAnswerSocketConnectionID(long answerSocketConnectionID) { m_answerSocketConnectionID = answerSocketConnectionID; return R_PASS; }
 
 	const std::string& GetSDPOffer() { return m_strSDPOffer; }
@@ -312,6 +312,8 @@ public:
 	bool IsWebRTCConnected() {
 		return m_fWebRTCConnectionStable;
 	}
+
+	
 
 private:
 	long m_userID;

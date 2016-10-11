@@ -52,6 +52,7 @@ public:
 public:
 	class EnvironmentControllerObserver {
 	public:
+		virtual RESULT OnPeersUpdate(long index) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 		virtual long GetUserID() = 0;
@@ -102,6 +103,7 @@ private:
 	std::string GetMethodURI(EnvironmentMethod userMethod);
 
 	// PeerConnectionControllerObserver
+	virtual RESULT OnPeersUpdate(long index) override;
 	virtual RESULT OnDataChannelStringMessage(long peerUserID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;

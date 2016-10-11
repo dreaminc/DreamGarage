@@ -198,8 +198,57 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, n
 	m_peerConnections.push_back(peerConnection);
 	pPeerConnection = &(m_peerConnections.back());
 
+	OnUpdatePeerConnections();
+
 	//Error:
 	return pPeerConnection;
+}
+
+void PeerConnectionController::OnUpdatePeerConnections() {
+	if (m_peerConnections.empty()) {
+		// do nothing
+		return;
+	}
+
+	/* This code was removed until an appropriate msg from the server will decide about where the user
+	// would be seated in an env.
+	std::sort(m_peerConnections.begin(), m_peerConnections.end(), 
+		[](const PeerConnection& p1, const PeerConnection& p2) -> bool {
+		return p1.GetPeerConnectionID() <= p2.GetPeerConnectionID();
+	});
+
+	std::vector<long> orderedPeers;
+
+	for (const auto& peer : m_peerConnections) {
+
+		long user = peer.GetOfferUserID();
+		if (std::find(orderedPeers.begin(), orderedPeers.end(), user) == orderedPeers.end())
+			orderedPeers.push_back(user);
+		
+		user = peer.GetAnswerUserID();
+		if (std::find(orderedPeers.begin(), orderedPeers.end(), user) == orderedPeers.end())
+			orderedPeers.push_back(user);	
+	}
+	*/
+
+	long mySocketID = 0;
+	long uid = GetUserID();
+
+	for (const auto& peer : m_peerConnections) {
+		if (uid == peer.GetOfferUserID()) {
+			mySocketID = peer.GetOfferSocketConnectionID();
+			break;
+		}
+		if (uid == peer.GetAnswerUserID()) {
+			mySocketID = peer.GetAnswerSocketConnectionID();
+			break;
+		}
+	}
+
+	// Temp: sending a mod 8 number to DreamApp to set position of the user in a round-table seating configuration.
+	// This would be change once the server will send the seating position.
+	LOG(INFO) << "Peer update: userID=" << uid << ", socketID=" << mySocketID << ", socketID%%8" << mySocketID % 8;
+	m_pPeerConnectionControllerObserver->OnPeersUpdate(mySocketID % 8);
 }
 
 RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strMethod, nlohmann::json jsonPayload) {

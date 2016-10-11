@@ -297,6 +297,8 @@ RESULT WebRTCConductor::OnWebRTCConnectionClosed(long peerConnectionID) {
 }
 
 RESULT WebRTCConductor::OnSDPOfferSuccess(long peerConnectionID) {		// TODO: Consolidate with below
+	LOG(INFO) << "OnSDPOfferSuccess";
+
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnSDPOfferSuccess(peerConnectionID);
 	}
@@ -306,6 +308,8 @@ RESULT WebRTCConductor::OnSDPOfferSuccess(long peerConnectionID) {		// TODO: Con
 
 
 RESULT WebRTCConductor::OnSDPAnswerSuccess(long peerConnectionID) {	// TODO: Consolidate with below
+	LOG(INFO) << "OnSDPAnswerSuccess"; 
+	
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnSDPAnswerSuccess(peerConnectionID);
 	}
@@ -317,6 +321,8 @@ RESULT WebRTCConductor::OnSDPSuccess(long peerConnectionID, bool fOffer) {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("SDP Success on peer connection ID %d %s", peerConnectionID, fOffer ? "offerer" : "answerer");
+
+	LOG(INFO) << "SDP Success on peer connection ID " << peerConnectionID << " " << (fOffer ? "offerer" : "answerer");
 
 //Error:
 	return r;

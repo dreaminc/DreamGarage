@@ -453,6 +453,8 @@ RESULT EnvironmentController::OnSDPOfferSuccess(PeerConnection *pPeerConnection)
 	CBM((pPeerConnection->GetOfferUserID() == s_user.GetUserID()), "User ID mismatch offer user ID of peer connection");
 	CR(SetSDPOffer(s_user, pPeerConnection));
 
+	LOG(INFO) << "OnSDPOfferSuccess";
+
 	// TOOD: based on pPeerConnection vs username answer or answer
 
 Error:
@@ -465,6 +467,8 @@ RESULT EnvironmentController::OnSDPAnswerSuccess(PeerConnection *pPeerConnection
 	// TODO: Fix the s_user bullshit
 	CBM((pPeerConnection->GetAnswerUserID() == s_user.GetUserID()), "User ID mismatch answer user ID of peer connection");
 	CR(SetSDPAnswer(s_user, pPeerConnection));
+
+	LOG(INFO) << "OnSDPAnswerSuccess";
 
 	// TOOD: based on pPeerConnection vs username answer or answer
 
@@ -689,6 +693,17 @@ RESULT EnvironmentController::BroadcastDataChannelMessage(uint8_t *pDataChannelB
 
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->BroadcastDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnPeersUpdate(long index) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnPeersUpdate(index));
+	}
 
 Error:
 	return r;

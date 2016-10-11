@@ -203,6 +203,10 @@ RESULT DreamOS::UnregisterUpdateCallback() {
 }
 
 // Cloud Controller
+RESULT DreamOS::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
+	return m_pSandbox->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
+}
+
 RESULT DreamOS::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
 	return m_pSandbox->RegisterDataMessageCallback(fnHandleDataMessageCallback);
 }

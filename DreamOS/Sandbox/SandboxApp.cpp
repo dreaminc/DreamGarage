@@ -391,6 +391,10 @@ hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
 }
 
 // Cloud Controller
+RESULT SandboxApp::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
+	return m_pCloudController->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
+}
+
 RESULT SandboxApp::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
 	return m_pCloudController->RegisterDataMessageCallback(fnHandleDataMessageCallback);
 }

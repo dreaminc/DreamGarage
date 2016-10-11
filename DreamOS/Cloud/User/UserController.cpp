@@ -206,7 +206,7 @@ RESULT UserController::LoadProfile() {
 
 		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
 
-		OVERLAY_DEBUG_SET("User", std::string("User ") + m_user.GetEmail());
+		OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
 		OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
 	}
 
