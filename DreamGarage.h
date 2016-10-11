@@ -64,6 +64,7 @@ private:
 	std::shared_ptr<DebugData> m_spherePosition;
 
 	bool	m_isSeated = false;
+	float tick = 0.0f;
 };
 
 

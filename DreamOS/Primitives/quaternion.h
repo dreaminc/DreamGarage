@@ -55,18 +55,22 @@ public:
 	quaternion Normalize();
 	quaternion_precision Magnitude();
 
-	RESULT RotateByVector(vector v, quaternion_precision theta, quaternion_precision slerpLimitValue = DEFAULT_SLERP_LIMIT_VALUE);
+	RESULT RotateByVector(vector v, quaternion_precision theta);
+	RESULT RotateByVectorSlerp(vector v, quaternion_precision theta, quaternion_precision slerpLimitValue = DEFAULT_SLERP_LIMIT_VALUE);
 
 	RESULT RotateX(quaternion_precision theta);
 	RESULT RotateY(quaternion_precision theta);
 	RESULT RotateZ(quaternion_precision theta);
+	RESULT RotateXYZ(quaternion_precision phi, quaternion_precision theta, quaternion_precision psi);
 
+	// Currently Unstable
 	// Euler Conversions: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-	quaternion_precision GetEulerAngelZ();
-	quaternion_precision GetEulerAngelX();
-	quaternion_precision GetEulerAngelY();
-
+	quaternion_precision GetEulerAngleZ();
+	quaternion_precision GetEulerAngleX();
+	quaternion_precision GetEulerAngleY();
 	RESULT GetEulerAngles(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z);
+
+	static quaternion MakeQuaternionWithEuler(quaternion_precision x, quaternion_precision y, quaternion_precision z);
 
 	RESULT Reverse();
 	quaternion GetReverse();

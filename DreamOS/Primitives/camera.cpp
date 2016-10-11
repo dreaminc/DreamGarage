@@ -90,8 +90,8 @@ matrix<camera_precision, 4, 4> camera::GetProjectionViewMatrix() {
 
 RESULT camera::RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {
 
-	m_qRotation.RotateByVector(GetRightVector(), dy * m_cameraRotateSpeed);
-	m_qRotation.RotateByVector(GetUpVector(), dx * m_cameraRotateSpeed);
+	m_qRotation *= quaternion(dy * m_cameraRotateSpeed, GetRightVector());
+	m_qRotation *= quaternion(dx * m_cameraRotateSpeed, GetUpVector());
 
 	m_qRotation.Normalize();
 
