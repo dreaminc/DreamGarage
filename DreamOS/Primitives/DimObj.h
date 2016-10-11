@@ -135,6 +135,7 @@ public:
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();
+	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 
 public:
 	RESULT SetTriangleNormal(dimindex i1, dimindex i2, dimindex i3);

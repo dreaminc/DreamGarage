@@ -72,6 +72,7 @@ public:
 		CR(m_pParentImp->MakeCurrentContext());
 
 		// Set up the Vertex Array Object (VAO)
+		// TODO: Do we need to do this only one time?
 		CR(m_pParentImp->glGenVertexArrays(1, &m_hVAO));
 		CR(m_pParentImp->glBindVertexArray(m_hVAO));
 
@@ -177,7 +178,7 @@ public:
 		glGetIntegerv(GL_POLYGON_MODE, &previousPolygonMode);
 		previousCullFaceEnabled = glIsEnabled(GL_CULL_FACE);
 
-		// TODO: This should be made more uniform (funcitons / caps struct etc)
+		// TODO: This should be made more uniform (functions / caps struct etc)
 		if (pDimObj->IsWireframe()) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			if (previousCullFaceEnabled) {
@@ -195,6 +196,25 @@ public:
 		}
 
 		//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
+
+	Error:
+		return r;
+	}
+
+	virtual RESULT RenderBoundingVolume() {
+		RESULT r = R_PASS;
+
+		// TODO: Rethink this since it's in the critical path
+		DimObj *pDimObj = GetDimObj();
+		std::shared_ptr<BoundingVolume> pBoundingVolume = pDimObj->GetBoundingVolume();
+		CN(pBoundingVolume);
+
+		CR(m_pParentImp->glBindVertexArray(m_hVAO));
+		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
+		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
+
+		//glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+		//TODO: render from buffer instead
 
 	Error:
 		return r;

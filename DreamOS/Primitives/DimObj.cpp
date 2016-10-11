@@ -495,3 +495,7 @@ RESULT DimObj::InitializeBoundingSphere() {
 Error:
 	return r;
 }
+
+std::shared_ptr<BoundingVolume> DimObj::GetBoundingVolume() {
+	return std::shared_ptr<BoundingVolume>(m_pBoundingVolume);
+}
