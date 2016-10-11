@@ -72,14 +72,16 @@ public:
 
 	// Object Factory Methods
 public:
-	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
-	quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
-	quad* MakeQuad(double width, double height, point origin);
+	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
+	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) override;
+	virtual quad* MakeQuad(double width, double height, point origin) override;
 
-	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
+	virtual sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) override;
+
+	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) override;
 	
-	volume* MakeVolume(double side, bool fTriangleBased = true);
-	volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true);
+	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
+	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
 	
 	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);

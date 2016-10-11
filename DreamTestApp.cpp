@@ -18,7 +18,7 @@ RESULT DreamTestApp::LoadScene() {
 	light *pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 	//pLight->EnableShadows();
 
-
+	/*
 	quad *pBQuad = AddQuad(10.0f, 20.0f, 200, 200);// , pHeightTextureCobble);
 	pBQuad->MoveTo(point(0.0f, -1.0f, 0.0f));
 
@@ -28,6 +28,10 @@ RESULT DreamTestApp::LoadScene() {
 	volume *pVolume = AddVolume(0.5f, false);
 	pVolume->MoveTo(-1.5f, 0.5f, 0.0f);
 	pVolume->SetWireframe(true);
+	*/
+
+	cylinder *pCylinder = AddCylinder(0.5f, 1.0f, 20, 5);
+	//pCylinder->SetWireframe(true);
 
 	//Error:
 	return r;

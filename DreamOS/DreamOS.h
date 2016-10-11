@@ -26,6 +26,7 @@
 #include "Primitives/quad.h"
 #include "Primitives/FlatContext.h"
 #include "Primitives/sphere.h"
+#include "Primitives/cylinder.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/texture.h"
@@ -64,6 +65,8 @@ protected:
 	volume* AddVolume(double side, bool fTriangleBased = true);
 	volume *AddVolume(double width, double length, double height, bool fTriangleBased = true);
 	
+	cylinder* AddCylinder(double radius, double height, int numAngularDivisions = 3, int numVerticalDivisions = 3);
+
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	
 	skybox *AddSkybox();

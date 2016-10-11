@@ -149,6 +149,10 @@ volume* DreamOS::AddVolume(double width, double length, double height, bool fTri
 	return m_pSandbox->AddVolume(width, length, height, fTriangleBased);
 }
 
+cylinder* DreamOS::AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+	return m_pSandbox->AddCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
+}
+
 volume* DreamOS::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	return m_pSandbox->MakeVolume(width, length, height, fTriangleBased);
 }

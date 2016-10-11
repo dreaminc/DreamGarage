@@ -163,6 +163,29 @@ Error:
 	return nullptr;
 }
 
+cylinder* SandboxApp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+	return m_pHALImp->MakeCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
+}
+
+cylinder* SandboxApp::AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+	RESULT r = R_PASS;
+
+	cylinder *pCylinder = m_pHALImp->MakeCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
+	CN(pCylinder);
+
+	CR(AddObject(pCylinder));
+
+	//Success:
+	return pCylinder;
+
+Error:
+	if (pCylinder != nullptr) {
+		delete pCylinder;
+		pCylinder = nullptr;
+	}
+	return nullptr;
+}
+
 sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }

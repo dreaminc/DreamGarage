@@ -32,6 +32,7 @@ class light;
 class quad;
 class FlatContext;
 class sphere; 
+class cylinder;
 class volume; 
 class texture; 
 class skybox;
@@ -82,6 +83,7 @@ public:
 	sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	volume* MakeVolume(double side, bool fTriangleBased = true);
 	volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true);
+	cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
 
@@ -93,6 +95,8 @@ public:
 
 	volume* AddVolume(double side, bool fTriangleBased = true);
 	volume* AddVolume(double width, double length, double height, bool fTriangleBased = true);
+
+	cylinder* AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
 
 	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
 

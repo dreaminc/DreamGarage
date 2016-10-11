@@ -706,6 +706,7 @@
     <ClCompile Include="..\..\..\Logger\Logger.cpp" />
     <ClCompile Include="..\..\..\Primitives\camera.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
+    <ClCompile Include="..\..\..\Primitives\cylinder.cpp" />
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
@@ -983,6 +984,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLCylinder.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h" />

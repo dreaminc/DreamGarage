@@ -18,6 +18,7 @@
 #include "OGLQuad.h"
 
 #include "OGLSphere.h"
+#include "OGLCylinder.h"
 #include "OGLComposite.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
@@ -204,11 +205,11 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
 	
@@ -625,6 +626,23 @@ Error:
 	if (pQuad != nullptr) {
 		delete pQuad;
 		pQuad = nullptr;
+	}
+	return nullptr;
+}
+
+cylinder* OpenGLImp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+	RESULT r = R_PASS;
+
+	cylinder *pCylinder = new OGLCylinder(this, radius, height, numAngularDivisions, numVerticalDivisions);
+	CN(pCylinder);
+
+	//Success:
+	return pCylinder;
+
+Error:
+	if (pCylinder != nullptr) {
+		delete pCylinder;
+		pCylinder = nullptr;
 	}
 	return nullptr;
 }

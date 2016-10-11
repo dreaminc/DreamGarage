@@ -23,6 +23,7 @@
 #include "Primitives/quad.h"
 #include "Primitives/FlatContext.h"
 #include "Primitives/sphere.h"
+#include "Primitives/cylinder.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/skybox.h"
@@ -56,6 +57,7 @@ public:
 	virtual quad* MakeQuad(double width, double height, point origin) = 0;
 
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
+	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) = 0;
 	
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) = 0;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;
