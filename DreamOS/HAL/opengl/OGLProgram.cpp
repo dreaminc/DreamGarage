@@ -680,21 +680,43 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::RenderSceneGraph(ObjectStore *pSceneGraph) {
+RESULT OGLProgram::RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
-	
-	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
+
+	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
-	pSceneGraph->Reset();
-	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+	pObjectStore->Reset();
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != NULL) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
 
-		if (pDimObj == NULL)
+		if (pDimObj == NULL) {
 			continue;
+		}
 		else {
 			CR(RenderObject(pDimObj));
+		}
+	}
 
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
+	RESULT r = R_PASS;
+	
+	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = NULL;
+
+	pObjectStore->Reset();
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+		if (pDimObj == NULL) {
+			continue;
+		}
+		else {
+			CR(RenderObject(pDimObj));
 		}
 	}
 

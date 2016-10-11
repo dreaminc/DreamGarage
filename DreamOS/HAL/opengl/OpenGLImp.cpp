@@ -212,7 +212,11 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
-	
+
+	// Reference Geometry Shader Program
+	m_pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	CN(m_pOGLReferenceGeometryProgram);
+
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
 
@@ -803,6 +807,19 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, EYE_TYPE eye) {
+	RESULT r = R_PASS;
+	
+	if (IsRenderReferenceGeometry()) {
+		CR(m_pOGLReferenceGeometryProgram->UseProgram());
+		CR(m_pOGLReferenceGeometryProgram->SetStereoCamera(m_pCamera, eye));
+		CR(m_pOGLReferenceGeometryProgram->RenderObjectStoreBoundingVolumes(pObjectStore));
+	}
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
 
 	RESULT r = R_PASS;
@@ -862,7 +879,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	m_pOGLProgramShadowDepth->BindToDepthBuffer();
 	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
 	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
-	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
+	CR(m_pOGLProgramShadowDepth->RenderObjectStore(pSceneGraph));
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
 
 	// 
@@ -886,11 +903,11 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 
 	// Render Layers
 	// 3D Object / skybox
-	pSceneGraph->Reset();
-	CR(m_pOGLRenderProgram->RenderSceneGraph(pSceneGraph));
+	CR(m_pOGLRenderProgram->RenderObjectStore(pSceneGraph));
+	CR(RenderReferenceGeometry(pSceneGraph, eye));
 	CR(RenderSkybox(pObjectStore, eye));
 
-//TODO either remove FlatSceneGraph or create a seperate AddFlatContext for overlays
+//TODO either remove FlatSceneGraph or create a separate AddFlatContext for overlays
 /*
 	// Flat object layer
 	glClearDepth(1.0f);
@@ -963,7 +980,48 @@ RESULT OpenGLImp::Shutdown() {
 	return r;
 }
 
+RESULT OpenGLImp::SetDrawWireframe(bool fDrawWireframe) {
+	m_fDrawWireframe = fDrawWireframe;
+	return R_PASS;
+}
+
+bool OpenGLImp::IsDrawWireframe() {
+	return m_fDrawWireframe;
+}
+
+RESULT OpenGLImp::SetRenderProfiler(bool fRenderProfiler) {
+	m_fRenderProfiler = fRenderProfiler;
+	return R_PASS;
+}
+
+bool OpenGLImp::IsRenderProfiler() {
+	return m_fRenderProfiler;
+}
+
+RESULT OpenGLImp::SetRenderReferenceGeometry(bool fRenderReferenceGeometry) {
+	m_fRenderReferenceGeometry = fRenderReferenceGeometry;
+	return R_PASS;
+}
+
+bool OpenGLImp::IsRenderReferenceGeometry() {
+	return m_fRenderReferenceGeometry;
+}
+
+RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("wire") == 0) {
+		SetDrawWireframe(!IsDrawWireframe()); 
+	}
+	else if (event->GetArg(1).compare("refgeo") == 0) {
+		SetRenderReferenceGeometry(!IsRenderReferenceGeometry());
+	}
+
+	return r;
+}
+
 // Open GL / Wrappers
+// TODO: Remove in turn of extensions or something else, right now hitting two context switches and it's non-optimal
 
 // OpenGL Program
 
@@ -1591,15 +1649,5 @@ RESULT OpenGLImp::wglSwapIntervalEXT(int interval) {
 	CRM(CheckGLError(), "wglSwapIntervalEXT failed");
 
 Error:
-	return r;
-}
-
-RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	if (event->GetArg(1).compare("wire") == 0) {
-		m_fDrawWireframe = !m_fDrawWireframe;
-	}
-
 	return r;
 }

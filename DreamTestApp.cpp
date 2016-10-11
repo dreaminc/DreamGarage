@@ -30,7 +30,7 @@ RESULT DreamTestApp::LoadScene() {
 	pVolume->SetWireframe(true);
 	*/
 
-	cylinder *pCylinder = AddCylinder(0.5f, 1.0f, 20, 5);
+	cylinder *pCylinder = AddCylinder(0.5f, 10.0f, 20, 5);
 	//pCylinder->SetWireframe(true);
 
 	//Error:

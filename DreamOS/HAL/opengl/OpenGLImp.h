@@ -40,6 +40,7 @@ private:
 	OGLProgram *m_pOGLProgramShadowDepth;
 	OGLProgram *m_pOGLProgramCapture;		// temp for testing
 	OGLProgram *m_pOGLSkyboxProgram;
+	OGLProgram *m_pOGLReferenceGeometryProgram;
 	OGLProgram *m_pOGLOverlayProgram;
 	OGLProgram *m_pOGLFlatProgram; 
 
@@ -57,14 +58,23 @@ private:
 	int m_pxViewWidth;
 	int m_pxViewHeight;
 
-	bool m_fDrawWireframe = false;
 
 public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
 
 private:
+	// TODO: Potentially replace this with a :1 bit field struct
+	bool m_fDrawWireframe = false;
 	bool m_fRenderProfiler = false;
+	bool m_fRenderReferenceGeometry = false;
+
+	RESULT SetDrawWireframe(bool fDrawWireframe);
+	bool IsDrawWireframe();
+	RESULT SetRenderProfiler(bool fRenderProfiler);
+	bool IsRenderProfiler();
+	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
+	bool IsRenderReferenceGeometry();
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
@@ -103,11 +113,12 @@ public:
 
 public:
 	RESULT SetViewTarget(EYE_TYPE eye);
-	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
+	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatObjectStore, EYE_TYPE eye); // temporary name
 	RESULT RenderToTexture(FlatContext* pContext);
 private:
 	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
 	RESULT RenderProfiler(EYE_TYPE eye);
+	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, EYE_TYPE eye);
 
 public:
 	RESULT Resize(int pxWidth, int pxHeight);
@@ -129,7 +140,6 @@ private:
 
 private:
 	RESULT Notify(CmdPromptEvent *event);
-
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
