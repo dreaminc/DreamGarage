@@ -34,6 +34,14 @@ public:
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
+	virtual BoundingVolume::Type GetType() override {
+		return BoundingVolume::Type::BOX;
+	}
+
+	double GetWidth();
+	double GetHeight();
+	double GetLength();
+
 protected:
 	BoundingBox::Type m_type;
 	vector m_vHalfSize;

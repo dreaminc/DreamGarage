@@ -29,6 +29,10 @@ public:
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
+	virtual BoundingVolume::Type GetType() override {
+		return BoundingVolume::Type::SPHERE;
+	}
+
 protected:
 	float m_radius;
 };

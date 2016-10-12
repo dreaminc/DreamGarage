@@ -21,6 +21,7 @@
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
+#include "BoundingBox.h"
 
 class volume : public DimObj {
 public:
@@ -35,6 +36,7 @@ public:
 public:
 	volume(double width, double length, double height, bool fTriangleBased = true);
 	volume(double side, bool fTriangleBased = true);
+	volume(BoundingBox* pBoundingBox, bool fTriangleBased = true);
 
 	virtual RESULT Allocate() override;
 	virtual unsigned int NumberVertices() override;

@@ -41,6 +41,14 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	OGLVolume(OpenGLImp *pParentImp, BoundingBox* pBoundingBox, bool fTriangleBased) :
+		volume(pBoundingBox, fTriangleBased),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
+
 	// TODO: Need to make this better
 	RESULT UpdateBuffers() override {
 		return UpdateOGLBuffers();

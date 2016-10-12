@@ -15,6 +15,13 @@ class BoundingBox;
 
 class BoundingVolume {
 public:
+	enum class Type {
+		BOX,
+		SPHERE,
+		INVALID
+	};
+
+public:
 	BoundingVolume() :
 		m_ptOrigin()
 	{
@@ -54,6 +61,8 @@ public:
 	}
 
 	point GetOrigin() { return m_ptOrigin; }
+
+	virtual BoundingVolume::Type GetType() = 0;
 
 protected:
 	point m_ptOrigin;

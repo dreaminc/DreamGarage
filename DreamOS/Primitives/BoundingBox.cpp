@@ -76,3 +76,15 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 	m_vHalfSize = (ptMax - m_ptOrigin);
 	return R_PASS;
 }
+
+double BoundingBox::GetWidth() {
+	return static_cast<double>(m_vHalfSize.x() * 2.0f);
+}
+
+double BoundingBox::GetHeight() {
+	return static_cast<double>(m_vHalfSize.y() * 2.0f);
+}
+
+double BoundingBox::GetLength() {
+	return static_cast<double>(m_vHalfSize.z() * 2.0f);
+}

@@ -37,6 +37,31 @@ Error:
 	return;
 }
 
+volume::volume(BoundingBox* pBoundingBox, bool fTriangleBased) :
+	m_volumeType(RECTANGULAR_CUBOID),
+	m_fTriangleBased(fTriangleBased)
+{
+	RESULT r = R_PASS;
+	CR(Allocate());
+
+	double width = pBoundingBox->GetWidth(); 
+	double height = pBoundingBox->GetHeight(); 
+	double length = pBoundingBox->GetLength();
+
+	if (width == length &&
+		width == height &&
+		length == height)
+		m_volumeType = CUBE;
+
+	CR(SetVolumeVertices(width, length, height, m_fTriangleBased));
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
 RESULT volume::Allocate() {
 	RESULT r = R_PASS;
 

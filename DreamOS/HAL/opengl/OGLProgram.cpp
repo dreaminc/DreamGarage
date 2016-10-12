@@ -689,12 +689,19 @@ RESULT OGLProgram::RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore) {
 	pObjectStore->Reset();
 	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != NULL) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
+		
 		if (pDimObj == NULL) {
 			continue;
 		}
 		else {
-			CR(RenderObject(pDimObj));
+			OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pVirtualObj);
+
+			if (pOGLObj != nullptr) {
+				SetObjectUniforms(pDimObj);
+				CR(pOGLObj->RenderBoundingVolume());
+			}
+
+			// TODO: Children bounding boxes
 		}
 	}
 
