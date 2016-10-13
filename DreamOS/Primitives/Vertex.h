@@ -187,6 +187,11 @@ public:
 		m_point = point(x, y, z);
 		return R_PASS;
 	}
+
+	RESULT TranslatePoint(point pt) {
+		m_point += pt;
+		return R_PASS;
+	}
 	
 	//RESULT SetColorA(float x, float y, float z);
 	RESULT SetColor(color_precision r, color_precision g, color_precision b) {

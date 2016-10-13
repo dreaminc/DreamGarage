@@ -53,7 +53,7 @@ volume::volume(BoundingBox* pBoundingBox, bool fTriangleBased) :
 		length == height)
 		m_volumeType = CUBE;
 
-	CR(SetVolumeVertices(width, length, height, m_fTriangleBased));
+	CR(SetVolumeVertices(width, length, height, m_fTriangleBased, pBoundingBox->GetOrigin()));
 
 	Validate();
 	return;
@@ -92,7 +92,7 @@ unsigned int volume::NumberIndices() {
 	}
 }
 
-RESULT volume::SetVolumeVertices(double width, double length, double height, bool fTriangleBased) {
+RESULT volume::SetVolumeVertices(double width, double length, double height, bool fTriangleBased, point ptOrigin) {
 	RESULT r = R_PASS;
 
 	point_precision halfWidth = static_cast<point_precision>(length / 2.0f);
@@ -247,6 +247,13 @@ RESULT volume::SetVolumeVertices(double width, double length, double height, boo
 
 	//SetQuadTangentBitangent(TL, TR, BL, BR);
 	//*/
+
+	// Adjust for center point
+	if (!ptOrigin.IsZero()) {
+		for (unsigned int i = 0; i < NumberVertices(); i++) {
+			m_pVertices[i].TranslatePoint(ptOrigin);
+		}
+	}
 
 	//	Error:
 	return r;

@@ -5,6 +5,8 @@
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
 //#define TESTING
 
+cylinder *g_pCylinder = nullptr;
+
 RESULT DreamTestApp::LoadScene() {
 	RESULT r = R_PASS;
 
@@ -30,7 +32,7 @@ RESULT DreamTestApp::LoadScene() {
 	pVolume->SetWireframe(true);
 	*/
 
-	cylinder *pCylinder = AddCylinder(0.5f, 10.0f, 20, 5);
+	g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
 	//pCylinder->SetWireframe(true);
 
 	//Error:
@@ -40,6 +42,9 @@ RESULT DreamTestApp::LoadScene() {
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
+	if (g_pCylinder != nullptr) {
+		g_pCylinder->RotateByDeg(0.01f, 0.01f, 0.01f);
+	}
 
 	//Error:
 	return r;

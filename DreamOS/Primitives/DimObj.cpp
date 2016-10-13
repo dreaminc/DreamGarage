@@ -436,20 +436,33 @@ RESULT DimObj::UpdateBoundingVolume() {
 	RESULT r = R_PASS;
 
 	// This will go through the verts, find the center point and maximum size
-	point ptMax = point(0.0f, 0.0f, 0.0f);
-	point ptMin = point(0.0f, 0.0f, 0.0f);
+	point ptMax = m_pVertices[0].GetPoint();;
+	point ptMin = m_pVertices[0].GetPoint();;
 	point ptMid;
 
 	CN(m_pVertices);
 	CN(m_pBoundingVolume);
 
-	for (unsigned int i = 0; i < NumberIndices(); i++) {
+	for (unsigned int i = 0; i < NumberVertices(); i++) {
 		point ptVert = m_pVertices[i].GetPoint();
 
-		if (ptVert > ptMax)
-			ptMax = ptVert;
-		else if (ptVert < ptMin)
-			ptMin = ptVert;
+		// X
+		if (ptVert.x() > ptMax.x())
+			ptMax.x() = ptVert.x();
+		else if (ptVert.x() < ptMin.x())
+			ptMin.x() = ptVert.x();
+
+		// Y
+		if (ptVert.y() > ptMax.y())
+			ptMax.y() = ptVert.y();
+		else if (ptVert.y() < ptMin.y())
+			ptMin.y() = ptVert.y();
+
+		// Z
+		if (ptVert.z() > ptMax.z())
+			ptMax.z() = ptVert.z();
+		else if (ptVert.z() < ptMin.z())
+			ptMin.z() = ptVert.z();
 	}
 
 	ptMid = point::midpoint(ptMax, ptMin);

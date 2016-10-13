@@ -42,7 +42,7 @@ public:
 	virtual unsigned int NumberVertices() override;
 	virtual unsigned int NumberIndices() override;
 
-	RESULT SetVolumeVertices(double width, double length, double height, bool fTriangleBased = true);
+	RESULT SetVolumeVertices(double width, double length, double height, bool fTriangleBased = true, point ptOrigin = point(0.0f, 0.0f, 0.0f));
 	bool IsTriangleBased();
 
 private:
