@@ -4,49 +4,44 @@
 
 // CmdPrompt
 
-CmdPrompt::CmdPrompt()
-{
+CmdPrompt::CmdPrompt() {
 	Validate();
 	return;
 }
 
-CmdPrompt::~CmdPrompt()
-{
-
+CmdPrompt::~CmdPrompt() {
+	// empty
 }
 
-void CmdPrompt::Init()
-{
-	if (m_isInit)
-	{
-		return;
-	}
+RESULT CmdPrompt::Initialize() {
+	RESULT r = R_PASS;
+
+	CBM((m_fInit == false), "CMD Prompt already initialized");
 
 	// Initialize singleton
-
-	for (auto& m : methodDictionary)
-	{
+	for (auto& m : methodDictionary) {
 		RegisterEvent(m.second);
 	}
 
-	m_isInit = true;
+	m_fInit = true;
+
+Error:
+	return r;
 }
 
-RESULT CmdPrompt::RegisterMethod(CmdPrompt::method method, Subscriber<CmdPromptEvent>* pSubscriber)
-{
+// TODO: Generalize
+RESULT CmdPrompt::RegisterMethod(CmdPrompt::method method, Subscriber<CmdPromptEvent>* pSubscriber) {
 	return RegisterSubscriber(methodDictionary.at(method), pSubscriber);
 }
 
-RESULT CmdPrompt::Execute(const std::string& command)
-{
-	m_lastExecutedCommand = command;
+RESULT CmdPrompt::Execute(const std::string& command) {
+	m_strLastExecutedCommand = command;
 
 	std::string type = command.substr(0, command.find(' '));
 	
 	//HUD_OUT(("Executing " + command + " (" + type + ")").c_str());
 
-	if (type.compare("") != 0)
-	{
+	if (type.compare("") != 0) {
 		CmdPromptEvent event(command);
 		NotifySubscribers(type, &event);
 	}
@@ -55,5 +50,5 @@ RESULT CmdPrompt::Execute(const std::string& command)
 }
 
 const std::string& CmdPrompt::GetLastCommand() {
-	return m_lastExecutedCommand;
+	return m_strLastExecutedCommand;
 }

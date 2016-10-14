@@ -40,6 +40,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 {
 	RESULT r = R_PASS;
 
+	// TODO: Generalize 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::OpenGL, this);
 
 	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
@@ -187,6 +188,7 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 }
 
 // TODO: This should be moved to OpenGL Program arch/design
+// TODO: rename this
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -367,8 +369,7 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 
 	switch (mEvent->EventType) {
 		case SENSE_MOUSE_LEFT_DRAG_MOVE: {
-			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx), 
-				static_cast<camera_precision>(mEvent->dy)));
+			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx),  static_cast<camera_precision>(mEvent->dy)));
 		} break;
 	}
 
@@ -996,15 +997,6 @@ RESULT OpenGLImp::SetRenderProfiler(bool fRenderProfiler) {
 
 bool OpenGLImp::IsRenderProfiler() {
 	return m_fRenderProfiler;
-}
-
-RESULT OpenGLImp::SetRenderReferenceGeometry(bool fRenderReferenceGeometry) {
-	m_fRenderReferenceGeometry = fRenderReferenceGeometry;
-	return R_PASS;
-}
-
-bool OpenGLImp::IsRenderReferenceGeometry() {
-	return m_fRenderReferenceGeometry;
 }
 
 RESULT OpenGLImp::Notify(CmdPromptEvent *event) {

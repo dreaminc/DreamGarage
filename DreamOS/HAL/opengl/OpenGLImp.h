@@ -67,14 +67,13 @@ private:
 	// TODO: Potentially replace this with a :1 bit field struct
 	bool m_fDrawWireframe = false;
 	bool m_fRenderProfiler = false;
-	bool m_fRenderReferenceGeometry = false;
 
+protected:
 	RESULT SetDrawWireframe(bool fDrawWireframe);
 	bool IsDrawWireframe();
+	
 	RESULT SetRenderProfiler(bool fRenderProfiler);
 	bool IsRenderProfiler();
-	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
-	bool IsRenderReferenceGeometry();
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);

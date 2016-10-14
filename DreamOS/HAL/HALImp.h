@@ -30,10 +30,19 @@
 #include "Primitives/model.h"
 #include "Primitives/user.h"
 
+class SandboxApp;
+
 class HALImp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent>, public valid {
+private:
+	struct HALConfiguration {
+		unsigned fRenderReferenceGeometry : 1;
+	} m_HALConfiguration;
+
 public:
 	HALImp();
 	~HALImp();
+
+	friend class SandboxApp;
 
 public:
 	camera *GetCamera();
@@ -50,6 +59,10 @@ public:
 	virtual RESULT RenderToTexture(FlatContext* pContext) = 0;
 
 	virtual RESULT Shutdown() = 0;
+
+protected:
+	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
+	bool IsRenderReferenceGeometry();
 
 public:
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;

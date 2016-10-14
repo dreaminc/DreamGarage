@@ -10,7 +10,8 @@ SandboxApp::SandboxApp() :
 	m_pSceneGraph(NULL),
 	m_pCloudController(nullptr),
 	m_pHALImp(nullptr),
-	m_fnUpdateCallback(nullptr)
+	m_fnUpdateCallback(nullptr),
+	m_pSenseLeapMotion(nullptr)
 {
 	// empty
 }
@@ -30,6 +31,133 @@ SandboxApp::~SandboxApp() {
 		delete m_pOpenGLRenderingContext;
 		m_pOpenGLRenderingContext = nullptr;
 	}
+}
+
+RESULT SandboxApp::SetMouseIntersectObjects(bool fMouseIntersectObjects) {
+	m_fMouseIntersectObjects = fMouseIntersectObjects;
+	return R_PASS;
+}
+
+bool SandboxApp::IsMouseIntersectObjects() {
+	return m_fMouseIntersectObjects;
+}
+
+RESULT SandboxApp::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("intersect") == 0) {
+		m_pHALImp->SetRenderReferenceGeometry(true);
+		SetMouseIntersectObjects(!IsMouseIntersectObjects());
+	}
+
+	return r;
+}
+
+RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
+	RESULT r = R_PASS;
+
+	switch (mEvent->EventType) {
+		case SENSE_MOUSE_MOVE: {
+			// For object intersection testing
+			SenseMouse::PrintEvent(mEvent);
+			
+			if (m_fMouseIntersectObjects) {
+				// Create ray
+				
+
+				// intersect ray
+			}
+		} break;
+	}
+
+//Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterImpKeyboardEvents() {
+	RESULT r = R_PASS;
+
+	// Register Dream Console to keyboard events
+	CR(RegisterSubscriber(SK_ALL, DreamConsole::GetConsole()));
+
+	camera *pCamera = m_pHALImp->GetCamera();
+
+	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
+
+	/*
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, m_pOpenGLImp));
+
+	for (int i = 0; i < 26; i++) {
+	CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), m_pOpenGLImp));
+	}
+	*/
+
+	CR(RegisterSubscriber(VK_LEFT, pCamera));
+	CR(RegisterSubscriber(VK_UP, pCamera));
+	CR(RegisterSubscriber(VK_DOWN, pCamera));
+	CR(RegisterSubscriber(VK_RIGHT, pCamera));
+
+	CR(RegisterSubscriber(VK_SPACE, pCamera));
+
+	for (int i = 0; i < 26; i++) {
+		CR(RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
+	}
+
+	CR(RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
+	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterImpMouseEvents() {
+	RESULT r = R_PASS;
+
+	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, this));
+
+	//camera *pCamera = m_pOpenGLImp->GetCamera();
+
+	// TODO: Should either be moved up to the sandbox or into the Imp itself
+	//CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_DOWN, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_UP, m_pHALImp));
+
+
+Error:
+	return r;
+}
+
+// temp
+#include "HAL/opengl/OGLHand.h"
+
+// TODO: shouldn't be this way ultimately 
+RESULT SandboxApp::RegisterImpLeapMotionEvents() {
+	RESULT r = R_PASS;
+
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+
+	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
+
+	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
+
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
+
+Error:
+	return r;
 }
 
 inline PathManager* SandboxApp::GetPathManager() {
@@ -82,6 +210,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 		// auto login
 		m_pCloudController->Start();
 	}
+
+	// Register with command prompt
+	// TODO: This should be changed to a command pattern
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Sandbox, this);
 
 Error:
 	return r;
@@ -409,7 +541,7 @@ quaternion SandboxApp::GetCameraOrientation() {
 
 // TODO: This should move up to Sandbox
 hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
-	return nullptr;
+	return m_pSenseLeapMotion->GetHand(handType);
 }
 
 // Cloud Controller

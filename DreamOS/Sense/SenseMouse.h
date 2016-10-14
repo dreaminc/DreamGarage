@@ -65,6 +65,9 @@ protected:
 	int m_dragOriginX = 0;
 	int m_dragOriginY = 0;
 
+	int m_lastX = 0;
+	int m_lastY = 0;
+
 private:
 	typedef struct SenseMousePosition {
 		int xPos;

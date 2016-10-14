@@ -40,7 +40,9 @@ public:
 		DreamApp,
 		DreamConsole,
 		CloudController,
-		OpenGL
+		OpenGL,		// should be renamed to HAL / HALImp
+		Sandbox,
+		Invalid
 	};
 
 private:
@@ -49,13 +51,14 @@ private:
 		{ method::DreamConsole, "console" },
 		{ method::CloudController, "cloud" },
 		{ method::OpenGL, "ogl" },
+		{ method::Sandbox, "sandbox" }
 	};
 
 public:
 	static CmdPrompt* GetCmdPrompt()
 	{
 		static CmdPrompt cmdPrompt;
-		cmdPrompt.Init();
+		cmdPrompt.Initialize();
 		return &cmdPrompt;
 	}
 
@@ -69,12 +72,11 @@ public:
 	const std::string& GetLastCommand();
 
 private:
-	void	Init();
+	RESULT Initialize();
 
 private:
-	bool	m_isInit = false;
-
-	std::string	m_lastExecutedCommand;
+	bool m_fInit = false;
+	std::string	m_strLastExecutedCommand;
 };
 
 

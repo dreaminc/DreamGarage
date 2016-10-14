@@ -27,6 +27,7 @@
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
+#include "Sense/SenseLeapMotion.h"
 
 class light; 
 class quad;
@@ -40,7 +41,7 @@ class model;
 class user;
 class Message;
 
-class SandboxApp : public valid {
+class SandboxApp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent>, public Subscriber<CmdPromptEvent>, public valid {
 public:
 	SandboxApp();
 	~SandboxApp();
@@ -72,7 +73,23 @@ public:
 	virtual RESULT InitializeHAL() = 0;
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
+	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
+
+private:
+	// TODO: Move this up to sandbox
+	bool m_fMouseIntersectObjects = false;
+	RESULT SetMouseIntersectObjects(bool fMouseIntersectObjects);
+	bool IsMouseIntersectObjects();
+
+	RESULT Notify(CmdPromptEvent *event);
+	RESULT Notify(SenseKeyboardEvent *kbEvent);
+	RESULT Notify(SenseMouseEvent *mEvent);
+
+protected:
+	RESULT RegisterImpKeyboardEvents();
+	RESULT RegisterImpMouseEvents();
+	RESULT RegisterImpLeapMotionEvents();
 
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
@@ -137,7 +154,8 @@ public:
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
 
-	virtual hand *GetHand(hand::HAND_TYPE handType);
+	hand *GetHand(hand::HAND_TYPE handType);
+
 
 protected:
 	// TODO: Move to unique_ptr
@@ -150,6 +168,8 @@ protected:
 
 	CloudController *m_pCloudController;
 
+	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
+	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
 	SenseKeyboard *m_pSenseKeyboard;
 	SenseMouse *m_pSenseMouse;
 
