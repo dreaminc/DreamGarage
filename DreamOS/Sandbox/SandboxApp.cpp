@@ -3,6 +3,8 @@
 
 #include "Cloud/Message/Message.h"
 
+#include "Primitives/ray.h"
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -63,11 +65,13 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 	switch (mEvent->EventType) {
 		case SENSE_MOUSE_MOVE: {
 			// For object intersection testing
-			SenseMouse::PrintEvent(mEvent);
+			//SenseMouse::PrintEvent(mEvent);
 			
 			if (m_fMouseIntersectObjects) {
 				// Create ray
-				
+				// TODO: This will only work for non-HMD camera 
+				camera *pCamera = m_pHALImp->GetCamera();
+				ray rayCamera = pCamera->GetRay(mEvent->xPos, mEvent->yPos);
 
 				// intersect ray
 			}

@@ -86,6 +86,16 @@ public:
 		return r;
 	}
 
+	matrix<TMatrix, N, M> MakeIdentity(TMatrix val = 1.0f) {
+		matrix<TMatrix, N, M> retMatrix;
+		
+		retMatrix.identity(1.0f);
+		
+		return retMatrix;
+	}
+
+	matrix<TMatrix, (N - 1), (M - 1)> minor(unsigned i, unsigned j);
+
 public:
 	// Constructors
 	matrix() {
@@ -360,25 +370,9 @@ public:
 		return matrix<TMatrix, N, M>(*this).operator/=(a);
 	}
 
-
-	/*
-	// TODO: Implement determinant (not critical atm)
-	// Only applicable for square matrices
-	// TODO: Not using Leibniz / Laplace 
-	// Using recursive formula
-	TMatrix determinant() {
-		TMat4x4 result = 0;
-		
-		if (!IsSquare()) {
-			DEBUG_LINEOUT("Cannot calculate determinant for %d x %d matrix", N, M);
-			return NULL;
-		}
-
-		
-
-		return result;
-	}
-	*/
+	// This is specialized 
+	TMatrix determinant();
+	matrix<TMatrix, N, M> inverse();
 
 	/*
 	matrix<TMatrix, N, M>& operator-( const matrix<TMatrix, N, M>&arg ) const {

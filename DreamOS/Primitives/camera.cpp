@@ -297,3 +297,26 @@ int camera::GetScreenWidth() {
 int camera::GetScreenHeight() {
 	return m_pxScreenHeight;
 }
+
+ray camera::GetRay(double xPos, double yPos) {
+	ray retRay;
+
+	double x = ((2.0f * xPos) / m_pxScreenWidth) - 1.0f;
+	double y = 1.0f - ((2.0f * yPos) / m_pxScreenHeight);
+	double z = 1.0f;
+
+	retRay.ptOrigin() = point(x, y, z);
+
+	matrix<camera_precision, 4, 4> matProjection = GetProjectionMatrix();
+	camera_precision det = matProjection.determinant();
+
+	// TODO: need inverse matrix now
+
+	retRay.Print();
+
+	return retRay;
+}
+
+ray camera::GetRay(int xPos, int yPos) {
+	return GetRay(static_cast<double>(xPos), static_cast<double>(yPos));
+}

@@ -712,6 +712,7 @@
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />

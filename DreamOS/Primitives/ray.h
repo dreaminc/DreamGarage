@@ -37,8 +37,18 @@ public:
 		return m_ptOrigin;
 	}
 
-	inline point &origin() { return m_ptOrigin; }
-	inline vector &direction() { return m_vDirection; }
+	RESULT Print(const char *pszName = "ray") {
+		DEBUG_LINEOUT("%s(pt(%f, %f, %f), v(%f, %f, %f))",
+			pszName,
+			m_ptOrigin.x(), m_ptOrigin.y(), m_ptOrigin.z(),
+			m_vDirection.x(), m_vDirection.y(), m_vDirection.z()
+		);
+
+		return R_PASS;
+	}
+
+	inline point &ptOrigin() { return m_ptOrigin; }
+	inline vector &vDirection() { return m_vDirection; }
 
 protected:
 	point m_ptOrigin;

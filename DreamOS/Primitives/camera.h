@@ -19,6 +19,7 @@
 #include "matrix.h"
 #include "ProjectionMatrix.h"
 #include "ViewMatrix.h"
+#include "ray.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float camera_precision;
@@ -34,49 +35,37 @@
 class camera : public VirtualObj, public Subscriber<SenseKeyboardEvent>, public Subscriber<HMDEvent>, public Subscriber<TimeEvent> {
 public:
 	camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight);
-
 	~camera();
+
+	// TODO: which one ey?
+	int GetPXWidth();
+	int GetPXHeight();
+	int GetScreenWidth();
+	int GetScreenHeight();
 
 	RESULT ResizeCamera(int pxWidth, int pxHeight);
 
+	vector GetRightVector();
+	vector GetLookVector();
 	vector GetUpVector();
 
-	int GetPXWidth();
-
-	int GetPXHeight();
-
-	vector GetRightVector();
-
-	vector GetLookVector();
-
 	ProjectionMatrix GetProjectionMatrix();
-
 	ViewMatrix GetViewMatrix();
-
 	matrix<camera_precision, 4, 4> GetProjectionViewMatrix();
 
 	RESULT RotateCameraByDiffXY(camera_precision dx, camera_precision dy);
-
 	RESULT MoveForward(camera_precision amt);
-
 	RESULT Strafe(camera_precision amt);
 
 	RESULT SetStrafeSpeed(camera_precision speed);
-
 	RESULT AddStrafeSpeed(camera_precision speed);
-
 	RESULT SetForwardSpeed(camera_precision speed);
-
 	RESULT AddForwardSpeed(camera_precision speed);
-
 	RESULT SetUpSpeed(camera_precision speed);
-
 	RESULT AddUpSpeed(camera_precision speed);
 
 	RESULT Notify(HMDEvent *hmdEvent);
-
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
-
 	RESULT Notify(TimeEvent *event);
 
 	// Deviation vector is a vector of deviation from the origin point
@@ -88,16 +77,15 @@ public:
 	RESULT UpdateFromKeyboardState(SenseKeyboard *pSK);
 
 	composite *GetFrameOfReferenceComposite();
-
 	RESULT AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj> pDimObj);
-
 	RESULT SetFrameOfReferenceComposite(composite *pComposite);
 
 	RESULT SetHMD(HMD *pHMD);
 
-	int GetScreenWidth();
+	ray GetRay(double xPos, double yPos);
+	// TODO: update this with a time delta / delta movement 
+	ray GetRay(int xPos, int yPos);			// This is assuming an integer screen position but really just calls the one above
 
-	int GetScreenHeight();
 
 protected:
 	HMD *m_pHMD;
