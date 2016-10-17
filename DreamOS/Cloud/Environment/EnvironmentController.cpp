@@ -56,12 +56,11 @@ Error:
 std::string EnvironmentController::GetMethodURI(EnvironmentMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
-	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
-	std::string strIP = pCommandLineManager->GetParameterValue("ip");
+	std::string ip = pCommandLineManager->GetParameterValue("ws.ip");
 
 	switch (userMethod) {
 		case EnvironmentMethod::CONNECT_SOCKET: {
-			strURI = "ws://" + strIP + ":" + std::to_string(port) + "/environment/";
+			strURI = ip + "/environment/";
 		} break;
 	}
 

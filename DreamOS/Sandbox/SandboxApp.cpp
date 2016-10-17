@@ -47,12 +47,15 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pCommandLineManager = CommandLineManager::instance();
 	CN(m_pCommandLineManager);
 	
-	//CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	CR(m_pCommandLineManager->RegisterParameter("ip", "i", "ec2-54-175-210-194.compute-1.amazonaws.com"));
-	//CR(m_pCommandLineManager->RegisterParameter("ip", "i", "localhost"));
-	CR(m_pCommandLineManager->RegisterParameter("port", "P", "8000"));
-	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
-	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
+	// previous AWS server
+	//CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "http://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
+	//CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
+
+	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
+	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+
+	CR(m_pCommandLineManager->RegisterParameter("username", "u", "DefaultTestUser@dreamos.com"));
+	CR(m_pCommandLineManager->RegisterParameter("password", "p", "nightmare"));
 
 	// For auto login, use '-l auto'
 	//CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
