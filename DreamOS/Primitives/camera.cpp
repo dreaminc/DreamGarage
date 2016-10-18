@@ -308,7 +308,7 @@ ray camera::GetRay(double xPos, double yPos) {
 	retRay.ptOrigin() = point(x, y, z);
 
 	matrix<camera_precision, 4, 4> matProjection = GetProjectionMatrix();
-	camera_precision det = matProjection.determinant();
+	camera_precision det = determinant(matProjection);
 
 	// TODO: need inverse matrix now
 

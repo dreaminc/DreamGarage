@@ -22,7 +22,7 @@
 #define C_B 2 
 #define C_A 3 
 
-#include "matrix.h"
+#include "matrix/matrix.h"
 #include "vector.h"
 #include "point.h"
 #include "uvcoord.h"

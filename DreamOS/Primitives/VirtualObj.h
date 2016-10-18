@@ -13,10 +13,10 @@
 #include "Primitives/Types/UID.h"
 #include "quaternion.h"
 
-#include "matrix.h"
-#include "RotationMatrix.h"
-#include "TranslationMatrix.h"
-#include "ScalingMatrix.h"
+#include "matrix/matrix.h"
+#include "matrix/RotationMatrix.h"
+#include "matrix/TranslationMatrix.h"
+#include "matrix/ScalingMatrix.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float virtual_precision;

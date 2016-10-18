@@ -9,7 +9,7 @@
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
-#include "Primitives/BiasMatrix.h"
+#include "Primitives/matrix/BiasMatrix.h"
 #include "OpenGLImp.h"
 #include "OGLProgramShadowDepth.h"
 

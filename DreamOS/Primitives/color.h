@@ -9,7 +9,7 @@
 // DreamOS/Dimension/Primitives/color.h
 // Color Primitive Object derived from matrix
 
-#include "matrix.h"
+#include "matrix/matrix.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float color_precision;

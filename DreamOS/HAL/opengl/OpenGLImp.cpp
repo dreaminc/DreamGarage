@@ -4,9 +4,9 @@
 #include "OGLObj.h"
 #include "OGLFramebuffer.h"
 
-#include "Primitives/ProjectionMatrix.h"
-#include "Primitives/TranslationMatrix.h"
-#include "Primitives/RotationMatrix.h"
+#include "Primitives/matrix/ProjectionMatrix.h"
+#include "Primitives/matrix/TranslationMatrix.h"
+#include "Primitives/matrix/RotationMatrix.h"
 #include <vector>
 
 #include "OGLVolume.h"

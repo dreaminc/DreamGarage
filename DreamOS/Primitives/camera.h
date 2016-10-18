@@ -16,9 +16,9 @@
 #include "point.h"
 #include "color.h"
 
-#include "matrix.h"
-#include "ProjectionMatrix.h"
-#include "ViewMatrix.h"
+#include "matrix/matrix.h"
+#include "matrix/ProjectionMatrix.h"
+#include "matrix/ViewMatrix.h"
 #include "ray.h"
 
 #ifdef FLOAT_PRECISION

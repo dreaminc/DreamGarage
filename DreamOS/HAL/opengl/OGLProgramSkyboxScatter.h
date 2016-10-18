@@ -9,7 +9,7 @@
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
-#include "Primitives/RotationMatrix.h"
+#include "Primitives/matrix/RotationMatrix.h"
 
 class OGLProgramSkyboxScatter : public OGLProgram {
 public:

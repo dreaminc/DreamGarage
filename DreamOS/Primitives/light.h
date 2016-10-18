@@ -10,7 +10,7 @@
 
 #include "VirtualObj.h"
 #include "color.h"
-#include "ProjectionMatrix.h"
+#include "matrix/ProjectionMatrix.h"
 
 typedef float light_precision;
 

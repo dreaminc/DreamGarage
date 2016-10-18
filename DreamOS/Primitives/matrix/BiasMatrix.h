@@ -9,7 +9,7 @@
 // A general purpose bias matrix
 
 #include "matrix.h"
-#include "point.h"
+#include "Primitives/point.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float bias_precision;

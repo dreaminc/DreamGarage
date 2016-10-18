@@ -371,8 +371,8 @@ public:
 	}
 
 	// This is specialized 
-	TMatrix determinant();
-	matrix<TMatrix, N, M> inverse();
+	//TMatrix determinant();
+	//matrix<TMatrix, N, M> inverse();
 
 	/*
 	matrix<TMatrix, N, M>& operator-( const matrix<TMatrix, N, M>&arg ) const {
@@ -597,7 +597,6 @@ TMat4x4 operator*(const matrix<TMat4x4, N, 1>& lhs, const matrix<TMat4x4, N, 1>&
 }
 
 // EQUALITY
-// 
 template <typename TMat4x4, int N, int M>
 bool operator==(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, N, M>& rhs) {
 	for (int i = 0; i < N; i++) {
@@ -614,6 +613,56 @@ bool operator!=(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, N, M>& r
 	return !(lhs==rhs);
 }
 
+// DETERMINANT
+
+// Formulas from or derived based on: https://en.wikipedia.org/wiki/Determinant
+template <typename TMat2x2>
+TMat2x2 determinant(matrix<TMat2x2, 2, 2>) {
+	return (m_data[0] * m_data[3]) - (m_data[1] * m_data[2]);
+}
+
+template <typename TMat3x3>
+TMat3x3 determinant(matrix<TMat3x3, 3, 3>) {
+	TMat3x3 result = -1;
+
+	result = (m_data[0] * m_data[4] * m_data[8]);
+	result += (m_data[1] * m_data[5] * m_data[6]);
+	result += (m_data[2] * m_data[3] * m_data[7]);
+
+	result -= (m_data[2] * m_data[4] * m_data[6]);
+	result -= (m_data[1] * m_data[3] * m_data[8]);
+	result -= (m_data[0] * m_data[5] * m_data[7]);
+
+	return result;
+}
+
+template <typename TMat4x4>
+TMat4x4 determinant(matrix<TMat4x4, 4, 4>) {
+	TMat4x4 result = -1;
+
+	// TODO:
+
+	return result;
+}
+
+/*
+// TODO: Implement determinant (not critical atm)
+// Only applicable for square matrices
+// TODO: Not using Leibniz / Laplace
+template <typename TMat4x4, int N, int M>
+TMat4x4 matrix<TMat4x4, N, M>::determinant() {
+TMat4x4 result = -1;
+
+if (!IsSquare()) {
+DEBUG_LINEOUT("Cannot calculate determinant for %d x %d matrix", N, M);
+return NULL;
+}
+
+// TODO: This is not working generally
+
+return result;
+}
+*/
 
 /*
 template <typename TMat4x4>

@@ -9,7 +9,7 @@
 // DreamOS/Dimension/Primitives/point.h
 // Point Primitive Object derived from matrix
 
-#include "matrix.h"
+#include "matrix/matrix.h"
 
 class vector;
 

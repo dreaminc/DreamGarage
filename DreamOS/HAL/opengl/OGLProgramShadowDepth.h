@@ -8,8 +8,8 @@
 
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
-#include "Primitives/ProjectionMatrix.h"
-#include "Primitives/ViewMatrix.h"
+#include "Primitives/matrix/ProjectionMatrix.h"
+#include "Primitives/matrix/ViewMatrix.h"
 
 #define SHADOW_MAP_WIDTH 1024
 #define SHADOW_MAP_HEIGHT 1024

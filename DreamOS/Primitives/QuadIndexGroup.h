@@ -7,7 +7,7 @@
 // DreamOS/Dimension/Primitives/QuadIndexGroup.h
 // This is a quad index group
 
-#include "matrix.h"
+#include "matrix/matrix.h"
 
 typedef uint32_t dimindex;
 

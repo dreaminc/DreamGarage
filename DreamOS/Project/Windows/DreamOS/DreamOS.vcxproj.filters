@@ -174,6 +174,9 @@
     <Filter Include="DreamTestApp">
       <UniqueIdentifier>{570eeaa3-0e10-44bf-aa0c-8a76c79f6592}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Primitives\matrix">
+      <UniqueIdentifier>{9ecd8ad4-8dee-4052-a0e9-2f164281aa96}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -196,9 +199,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp">
       <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp">
-      <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\point.cpp">
       <Filter>Primitives</Filter>
@@ -470,8 +470,17 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\matrix.cpp">
-      <Filter>Primitives</Filter>
+    <ClCompile Include="..\..\..\Test\TestObject.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\TestSuite.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -491,9 +500,6 @@
       <Filter>RESULT</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\point.h">
@@ -556,9 +562,6 @@
     <ClInclude Include="..\..\..\Primitives\Vertex.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\Shader.h">
       <Filter>HAL</Filter>
     </ClInclude>
@@ -586,22 +589,10 @@
     <ClInclude Include="..\..\..\Core\config.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\RotationMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\camera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ViewMatrix.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseDevice.h">
@@ -1963,9 +1954,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\BiasMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\External\Matrices\Matrices.h">
       <Filter>External\Matrices</Filter>
     </ClInclude>
@@ -2125,6 +2113,30 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\ray.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\TestSuite.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\matrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ProjectionMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\RotationMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h">
+      <Filter>Primitives\matrix</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

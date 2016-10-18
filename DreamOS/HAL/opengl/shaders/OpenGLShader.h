@@ -11,7 +11,7 @@
 
 #include "../OpenGLCommon.h"
 #include "Primitives/version.h"
-#include "Primitives/matrix.h"
+#include "Primitives/matrix/matrix.h"
 
 #include "../GLSLObject.h"
 

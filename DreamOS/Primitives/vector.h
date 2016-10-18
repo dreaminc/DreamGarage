@@ -7,7 +7,7 @@
 // DreamOS/Dimension/Primitives/vector.h
 // Vector Primitive Object derived from matrix
 
-#include "matrix.h"
+#include "matrix/matrix.h"
 
 #ifdef FLOAT_PRECISION
 	typedef float vector_precision;

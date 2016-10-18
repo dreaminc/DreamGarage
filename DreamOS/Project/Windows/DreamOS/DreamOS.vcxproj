@@ -712,9 +712,9 @@
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
-    <ClCompile Include="..\..\..\Primitives\matrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
-    <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
     <ClCompile Include="..\..\..\Primitives\sphere.cpp" />
     <ClCompile Include="..\..\..\Primitives\text.cpp" />
@@ -748,6 +748,8 @@
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
+    <ClCompile Include="..\..\..\Test\TestObject.cpp" />
+    <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1043,7 +1045,6 @@
     <ClInclude Include="..\..\..\Primitives\BoundingVolume.h" />
     <ClInclude Include="..\..\..\Logger\Logger.h" />
     <ClInclude Include="..\..\..\Primitives\AABV.h" />
-    <ClInclude Include="..\..\..\Primitives\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\camera.h" />
     <ClInclude Include="..\..\..\Primitives\color.h" />
     <ClInclude Include="..\..\..\Primitives\composite.h" />
@@ -1057,7 +1058,13 @@
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\line.h" />
     <ClInclude Include="..\..\..\Primitives\material.h" />
-    <ClInclude Include="..\..\..\Primitives\matrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\matrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\ProjectionMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\RotationMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\model.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h" />
@@ -1068,14 +1075,10 @@
     <ClInclude Include="..\..\..\Primitives\sphere.h" />
     <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
-    <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\point.h" />
     <ClInclude Include="..\..\..\Primitives\quad.h" />
-    <ClInclude Include="..\..\..\Primitives\RotationMatrix.h" />
-    <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\text.h" />
     <ClInclude Include="..\..\..\Primitives\texture.h" />
-    <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\Triangle.h" />
     <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />
     <ClInclude Include="..\..\..\Primitives\Types\GUID.h" />
@@ -1090,7 +1093,6 @@
     <ClInclude Include="..\..\..\Primitives\vector.h" />
     <ClInclude Include="..\..\..\Primitives\version.h" />
     <ClInclude Include="..\..\..\Primitives\Vertex.h" />
-    <ClInclude Include="..\..\..\Primitives\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
     <ClInclude Include="..\..\..\Primitives\volume.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
@@ -1118,6 +1120,7 @@
     <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h" />
     <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
+    <ClInclude Include="..\..\..\Test\TestSuite.h" />
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
