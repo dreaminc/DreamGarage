@@ -8,16 +8,14 @@ std::string PeerConnectionController::GetMethodURI(PeerConnectionMethod method) 
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	
 	std::string strURI = "";
-	
-	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
-	std::string strIP = pCommandLineManager->GetParameterValue("ip");
+	std::string ip = pCommandLineManager->GetParameterValue("ws.ip");
 
 	// TODO:
 	switch (method) {
 		case PeerConnectionMethod::INVALID:
 		default: {
 			//strURI = "ws://" + strIP + ":" + std::to_string(port) + "/environment/";
-			strURI = "ws://" + strIP + ":" + std::to_string(port);
+			strURI = ip;
 		} break;
 	}
 

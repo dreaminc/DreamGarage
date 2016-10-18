@@ -342,8 +342,7 @@ RESULT CloudController::LoginUser() {
 	RESULT r = R_PASS;
 
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
-	std::string strURI = pCommandLineManager->GetParameterValue("ip");
+	std::string strURI = pCommandLineManager->GetParameterValue("api.ip");
 	std::string strUsername = pCommandLineManager->GetParameterValue("username");
 	std::string strPassword = pCommandLineManager->GetParameterValue("password");
 

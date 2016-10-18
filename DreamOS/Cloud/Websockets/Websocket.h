@@ -10,6 +10,7 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <iostream>
 
 // Use asio standalone instead of boost
 #define ASIO_STANDALONE
@@ -21,10 +22,17 @@
 #define ASIO_HAS_STD_SHARED_PTR
 #define ASIO_HAS_STD_TYPE_TRAITS
 
-#include <websocketpp/config/asio_no_tls_client.hpp>
+// remove worning for asio dev release
+#pragma warning(push, 0)
+
+#include <websocketpp/config/asio_client.hpp>
 #include <websocketpp/client.hpp>
 
-typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
+#pragma warning(pop)
+
+//typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
+typedef websocketpp::client<websocketpp::config::asio_tls_client> WebsocketClient;
+typedef websocketpp::lib::shared_ptr<websocketpp::lib::asio::ssl::context> context_ptr;
 
 using websocketpp::lib::placeholders::_1;
 using websocketpp::lib::placeholders::_2;
@@ -32,10 +40,12 @@ using websocketpp::lib::placeholders::_3;
 using websocketpp::lib::bind;
 
 // pull out the type of messages sent by our config
-typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
+typedef websocketpp::config::asio_tls_client::message_type::ptr message_ptr;
+//typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 
 class Websocket {
 public:
+
 	// Websocket Side callbacks
 	typedef std::function<void(WebsocketClient*, websocketpp::connection_hdl, message_ptr)> OnWebsocketMessageCallback;
 	typedef std::function<void(websocketpp::connection_hdl)> OnWebsocketConnectionOpenCallback;
@@ -47,14 +57,6 @@ public:
 	typedef std::function<void(void)> HandleWebsocketConnectionOpenCallback;
 	typedef std::function<void(void)> HandleWebsocketConnectionCloseCallback;
 	typedef std::function<void(void)> HandleWebsocketConnectionFailCallback;
-
-	//Websocket(const std::string& strURI, const OnWebsocketMessageCallback& fnOnWebsocketMessageCallback);
-	/*
-	Websocket(const std::string& strURI, const OnWebsocketMessageCallback& fnOnWebsocketMessageCallback,
-			  const OnWebsocketConnectionOpenCallback& fnOnWebsocketConnectionOpenCallback,
-			  const OnWebsocketConnectionCloseCallback& fnOnWebsocketConnectionCloseCallback,
-			  const OnWebsocketConnectionFailCallback& fnOnWebsocketConnectionFailCallback);
-			  */
 
 	Websocket(const std::string& strURI, const HandleWebsocketMessageCallback& fnHandleWebsocketMessageCallback,
 			  const HandleWebsocketConnectionOpenCallback&	fnHandleWebsocketConnectionOpenCallback,

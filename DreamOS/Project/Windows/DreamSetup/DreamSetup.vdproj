@@ -63,6 +63,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_A6DE309FA474432184F05C11E355EAF2"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_B4EAF020D1A84442A95D7AC6FA57149D"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -70,6 +76,12 @@
         "Entry"
         {
         "MsmKey" = "8:_BB6391CE11154F379AF78087E78BF136"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_BDC46636650A4274A9E9C477C00A4365"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -374,6 +386,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_A6DE309FA474432184F05C11E355EAF2"
+            {
+            "SourcePath" = "8:..\\Production\\libssl-1_1-x64.dll"
+            "TargetName" = "8:libssl-1_1-x64.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_045A0A22BF694330828EBD3043035192"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_B4EAF020D1A84442A95D7AC6FA57149D"
             {
             "SourcePath" = "8:Redist\\msvcp140.dll"
@@ -398,6 +430,26 @@
             {
             "SourcePath" = "8:..\\Production\\widevinecdmadapter.dll"
             "TargetName" = "8:widevinecdmadapter.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_045A0A22BF694330828EBD3043035192"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_BDC46636650A4274A9E9C477C00A4365"
+            {
+            "SourcePath" = "8:..\\Production\\libcrypto-1_1-x64.dll"
+            "TargetName" = "8:libcrypto-1_1-x64.dll"
             "Tag" = "8:"
             "Folder" = "8:_045A0A22BF694330828EBD3043035192"
             "Condition" = "8:"
@@ -621,15 +673,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Dream"
-        "ProductCode" = "8:{049D696D-BA15-4F65-9FEC-0C0774BDFC43}"
-        "PackageCode" = "8:{C11B8046-7909-4753-A9FE-228139F11559}"
+        "ProductCode" = "8:{69CBC358-4FF5-48F8-B7DC-95C100F936AC}"
+        "PackageCode" = "8:{18A8A18E-243B-45AA-8A13-05BADC7125F5}"
         "UpgradeCode" = "8:{9E4013FF-9949-471E-9B8D-67958A95FB31}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:0.0.12"
+        "ProductVersion" = "8:0.0.13"
         "Manufacturer" = "8:Dream"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:www.dreamos.com"

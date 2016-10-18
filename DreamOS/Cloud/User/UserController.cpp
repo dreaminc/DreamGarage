@@ -33,16 +33,15 @@ UserController::~UserController() {
 std::string UserController::GetMethodURI(UserMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
-	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
-	std::string strIP = pCommandLineManager->GetParameterValue("ip");
+	std::string ip = pCommandLineManager->GetParameterValue("api.ip");
 
 	switch (userMethod) {
 		case UserMethod::LOGIN: {
-			strURI = "http://" + strIP + ":" + std::to_string(port) + "/token/";
+			strURI = ip + "/token/";
 		} break;
 
 		case UserMethod::LOAD_PROFILE: {	
-			strURI = "http://" + strIP + ":" + std::to_string(port) + "/user/";
+			strURI = ip + "/user/";
 		} break;
 	}
 
@@ -59,7 +58,7 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 	std::string strURI = GetMethodURI(UserMethod::LOGIN);
 
 	HTTPController *pHTTPController = HTTPController::instance();
-
+	
 	// TODO: Not hard coded!
 	CRM(pHTTPController->POST(strURI, HTTPController::ContentHttp(), strHTTPRequest, httpResponse), "User login failed to post request");
 	
