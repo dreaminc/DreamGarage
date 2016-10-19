@@ -482,6 +482,9 @@
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp">
       <Filter>Primitives\matrix</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2136,6 +2139,9 @@
       <Filter>Primitives\matrix</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\MatrixTestSuite.h">
       <Filter>Primitives\matrix</Filter>
     </ClInclude>
   </ItemGroup>

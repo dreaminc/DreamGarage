@@ -1,0 +1,25 @@
+#ifndef MATRIX_TEST_SUITE_H_
+#define MATRIX_TEST_SUITE_H_
+
+#include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/Primitices/matrix/MatrixTestSuite.h
+
+#include "Test/TestSuite.h"
+
+#include <functional>
+#include <memory>
+
+class MatrixTestSuite : public TestSuite {
+public:
+	MatrixTestSuite();
+	~MatrixTestSuite();
+
+	// Tests
+	RESULT TestMatrixCreate();
+
+	virtual RESULT AddTests() override;
+};
+
+#endif // ! TEST_OBJECT_H_

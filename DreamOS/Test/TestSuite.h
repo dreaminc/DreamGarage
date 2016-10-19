@@ -18,10 +18,13 @@ public:
 	TestSuite();
 	~TestSuite();
 
+	RESULT Initialize();
+
 	RESULT ClearTests();
 	RESULT RunTests();
 	RESULT AddTest(std::function<RESULT()> fnTestFunction);
-
+	
+	virtual RESULT AddTests() = 0;
 };
 
 #endif // ! TEST_SUITE_H_

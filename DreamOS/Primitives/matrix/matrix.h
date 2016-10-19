@@ -8,6 +8,8 @@
 #include "RESULT/EHM.h"
 #include <cstring>
 #include <math.h>
+#include <stdlib.h>     
+#include <time.h>       
 
 //#define RANGE_CHECK 
 
@@ -86,11 +88,42 @@ public:
 		return r;
 	}
 
+	RESULT randomize(TMatrix maxval = 10.0f) {
+		srand(time(nullptr));
+
+		for (int i = 0; i < (N * M); i++) {
+			float randval = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+			m_data[i] = maxval * randval;
+		}
+
+		return R_PASS;
+	}
+
+	RESULT range(TMatrix start = 0.0f) {
+		for (int i = 0; i < (N * M); i++) {
+			m_data[i] = start + static_cast<TMatrix>(i);			 
+		}
+
+		return R_PASS;
+	}
+
 	matrix<TMatrix, N, M> MakeIdentity(TMatrix val = 1.0f) {
 		matrix<TMatrix, N, M> retMatrix;
 		
 		retMatrix.identity(1.0f);
 		
+		return retMatrix;
+	}
+
+	static matrix<TMatrix, N, M> MakeRandom(TMatrix maxval = 10.0f) {
+		matrix<TMatrix, N, M> retMatrix;
+		retMatrix.randomize(maxval);
+		return retMatrix;
+	}
+
+	static matrix<TMatrix, N, M> MakeRange(TMatrix start = 0.0f) {
+		matrix<TMatrix, N, M> retMatrix;
+		retMatrix.range(start);
 		return retMatrix;
 	}
 
@@ -143,12 +176,16 @@ public:
 	}
 
 	RESULT PrintMatrix() {
+		DEBUG_LINEOUT("matrix %d x %d | N: %d  M:%d ", rows(), cols(), N, M);
+
 		for (int i = 0; i < N; i++) {
+			DEBUG_OUT("| ");
 			for (int j = 0; j < M; j++) {
 				DEBUG_OUT("%02f ", m_data[(j * N) + i]);
 			}
-			DEBUG_LINEOUT("");
+			DEBUG_LINEOUT(" |");
 		}
+
 		return R_PASS;
 	}
 

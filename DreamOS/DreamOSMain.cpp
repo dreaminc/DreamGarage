@@ -9,13 +9,27 @@
 #include "../DreamGarage.h"
 #include "../DreamTestApp.h"
 
+#include "test/MatrixTestSuite.h"
+
 // TODO: some other better way?
 #define _USE_TEST_APP	
+#define _UNIT_TESTING
 
 int main(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
     
-#ifdef _USER_TEST_APP
+#if defined(_UNIT_TESTING)
+	// TODO: Replace this with a real unit testing framework in testing filter
+	MatrixTestSuite matrixTestSuite;
+
+	matrixTestSuite.Initialize();
+	CRM(matrixTestSuite.RunTests(), "Failed to run matrix test suite tests");
+
+	DEBUG_LINEOUT("Unit tests complete 0x%x result", r);
+	system("pause");
+
+	return (int)(r);
+#elif defined(_USER_TEST_APP)
 	DreamGarage dreamGarageApp;
 	CRM(dreamGarageApp.Initialize(argc, argv), "Failed to initialize Dream Garage");
 	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine

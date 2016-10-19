@@ -34,3 +34,13 @@ RESULT TestSuite::ClearTests() {
 	m_tests.clear();
 	return R_PASS;
 }
+
+RESULT TestSuite::Initialize() {
+	RESULT r = R_PASS;
+
+	CR(ClearTests());
+	CRM(AddTests(), "Failed to add tests");
+
+Error:
+	return r;
+}
