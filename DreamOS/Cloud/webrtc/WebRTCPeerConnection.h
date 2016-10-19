@@ -20,7 +20,8 @@ class WebRTConductor;
 class WebRTCPeerConnection : 
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::DataChannelObserver,
-	public webrtc::CreateSessionDescriptionObserver
+	public webrtc::CreateSessionDescriptionObserver,
+	public webrtc::AudioTrackSinkInterface
 {
 public:
 	class WebRTCPeerConnectionObserver {
@@ -34,6 +35,12 @@ public:
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID,
+			const void* audio_data,
+			int bits_per_sample,
+			int sample_rate,
+			size_t number_of_channels,
+			size_t number_of_frames) = 0;
 	};
 
 	friend class WebRTCPeerConnectionObserver;
@@ -75,6 +82,13 @@ protected:
 	// CreateSessionDescriptionObserver implementation.
 	virtual void OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription) override;
 	virtual void OnFailure(const std::string& error) override;
+
+	// webrtc::AudioTrackSinkInterface
+	virtual void OnData(const void* audio_data,
+		int bits_per_sample,
+		int sample_rate,
+		size_t number_of_channels,
+		size_t number_of_frames) override;
 
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);

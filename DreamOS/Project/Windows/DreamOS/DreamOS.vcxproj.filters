@@ -2075,6 +2075,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
+      <Filter>Cloud\Message</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -2279,6 +2282,9 @@
     </Image>
     <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
       <Filter>Models\face4</Filter>
+    </Image>
+    <Image Include="..\..\..\Texture\mouth.png">
+      <Filter>Texture</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

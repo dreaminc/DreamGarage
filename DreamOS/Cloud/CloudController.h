@@ -26,12 +26,14 @@
 class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
+class AudioDataMessage;
 
 typedef std::function<RESULT(long)> HandlePeersUpdateCallback;
 
 typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
+typedef std::function<RESULT(long, AudioDataMessage*)> HandleAudioDataCallback;
 
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver,
 						public Subscriber<CmdPromptEvent> {
@@ -48,6 +50,7 @@ public:
 	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
+	RESULT RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
@@ -97,6 +100,12 @@ public:
 	virtual RESULT OnPeersUpdate(long index) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnAudioData(long peerConnectionID,
+		const void* audio_data,
+		int bits_per_sample,
+		int sample_rate,
+		size_t number_of_channels,
+		size_t number_of_frames) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
@@ -124,6 +133,7 @@ private:
 	HandleDataMessageCallback m_fnHandleDataMessageCallback;
 	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
 	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
+	HandleAudioDataCallback m_fnHandleAudioDataCallback;
 
 	std::thread	m_thread;
 	bool m_fRunning;

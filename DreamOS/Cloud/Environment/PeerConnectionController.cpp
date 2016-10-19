@@ -587,6 +587,30 @@ Error:
 	return r;
 }
 
+RESULT PeerConnectionController::OnAudioData(long peerConnectionID,
+	const void* audio_data,
+	int bits_per_sample,
+	int sample_rate,
+	size_t number_of_channels,
+	size_t number_of_frames) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		CR(m_pPeerConnectionControllerObserver->OnAudioData(pPeerConnection->GetPeerUserID(),
+			audio_data,
+			bits_per_sample,
+			sample_rate,
+			number_of_channels,
+			number_of_frames));
+	}
+
+Error:
+	return r;
+}
+
 RESULT PeerConnectionController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
 	RESULT r = R_PASS;
 	
