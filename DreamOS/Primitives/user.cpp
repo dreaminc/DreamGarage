@@ -20,13 +20,16 @@ RESULT user::Initialize() {
 
 	// for now the mouth is in a hardcoded position attached to the face model
 	m_pMouth = AddQuad(0.3, 1.0);
-	m_pMouth->SetColorTexture(MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR).get());
 
 	m_pMouth->RotateXByDeg(270);
 	m_pMouth->MoveTo(0, 0.25f - 0.35f, -0.17f);
-	m_pMouth->Scale(0.1f);
+
+	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pMouth->SetColorTexture(m_pMouthTexture.get());
+
 
 	pHead->AddChild(m_pMouth);
+	m_pMouth->Scale(0.1f);
 
 	m_pHeads.push_back(pHead);
 	

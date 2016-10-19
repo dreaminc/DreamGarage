@@ -34,6 +34,7 @@ private:
 	std::shared_ptr<hand> m_pRightHand;
 
 	std::shared_ptr<quad> m_pMouth = nullptr;
+	std::shared_ptr<texture> m_pMouthTexture = nullptr;
 };
 
 #endif	// ! PRIMITIVE_USER_H_
