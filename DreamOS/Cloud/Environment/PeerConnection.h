@@ -107,6 +107,9 @@ public:
 	long GetEnvironmentID() { return m_environmentID; }
 	RESULT SetEnvironmentID(long environmentID) { m_environmentID = environmentID; return R_PASS; }
 
+	long GetOfferorPosition() { return m_offerPosition; }
+	long GetAnswererPosition() { return m_answerPosition; }
+
 	// We can't change a peer connection ID once it's been set
 	// TODO: Should also be done for userID, peerUser, and environmentID
 	// TODO: Create generic way to do this (more robust model logic)
@@ -141,6 +144,7 @@ public:
 
 		long userID = jsonOfferSocketConnection["/user"_json_pointer].get<long>();
 		long environmentID = jsonOfferSocketConnection["/environment"_json_pointer].get<long>();
+		m_offerPosition = jsonOfferSocketConnection["/position"_json_pointer].get<long>();
 
 		CR(SetOfferUserID(userID));
 		CR(SetEnvironmentID(environmentID));
@@ -154,6 +158,7 @@ public:
 
 		long peerUserId = jsonAnswerSocketConnection["/user"_json_pointer].get<long>();
 		long environmentID = jsonAnswerSocketConnection["/environment"_json_pointer].get<long>();
+		m_answerPosition = jsonAnswerSocketConnection["/position"_json_pointer].get<long>();
 
 		CR(SetAnswerUserID(peerUserId));
 		CR(SetEnvironmentID(environmentID));
@@ -325,6 +330,11 @@ private:
 
 	long m_offerSocketConnectionID;
 	long m_answerSocketConnectionID;
+
+	// position (also known as seating position) is only here for consistency with socket connection object.
+	// TODO: position should be part of a different websocket connection for user's enviroment data (as opposed to being related to a peer connection).
+	long m_offerPosition = 0;
+	long m_answerPosition = 0;
 
 	std::string m_strSDPOffer;	
 	std::string m_strSDPAnswer;

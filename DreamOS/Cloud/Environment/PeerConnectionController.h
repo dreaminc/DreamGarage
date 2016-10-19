@@ -116,7 +116,7 @@ public:
 
 private:
 	// called when peer connections is changed
-	void OnUpdatePeerConnections();
+	RESULT OnNewPeerConnection(long myUserID, long peerUserID, bool isOfferor, PeerConnection* pPeerConnection);
 
 private:
 	std::unique_ptr<WebRTCImp> m_pWebRTCImp;

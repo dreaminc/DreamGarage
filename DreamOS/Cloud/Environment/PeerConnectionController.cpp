@@ -196,57 +196,21 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, n
 	m_peerConnections.push_back(peerConnection);
 	pPeerConnection = &(m_peerConnections.back());
 
-	OnUpdatePeerConnections();
-
 	//Error:
 	return pPeerConnection;
 }
 
-void PeerConnectionController::OnUpdatePeerConnections() {
-	if (m_peerConnections.empty()) {
-		// do nothing
-		return;
-	}
+RESULT PeerConnectionController::OnNewPeerConnection(long myUserID, long peerUserID, bool isOfferor, PeerConnection* pPeerConnection) {//, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) {
+	long position = (isOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
+	
+	LOG(INFO) << "myUserID" << (isOfferor ? "(Offeror)" : "(Answerer)") << "=" << myUserID << " peerUserID=" << peerUserID << " position=" << position;// << " socketID=" << mySocketID << " socket=" << jsonOfferSocketConnection;
+	
+	// position is given by the server for each user as a unique number, 1 to 8.
+	// it represents the seating position should be taken by each user (a round-table seating configuration).
 
-	/* This code was removed until an appropriate msg from the server will decide about where the user
-	// would be seated in an env.
-	std::sort(m_peerConnections.begin(), m_peerConnections.end(), 
-		[](const PeerConnection& p1, const PeerConnection& p2) -> bool {
-		return p1.GetPeerConnectionID() <= p2.GetPeerConnectionID();
-	});
+	LOG(INFO) << "Peer update: userID=" << myUserID << ", position=" << position;
 
-	std::vector<long> orderedPeers;
-
-	for (const auto& peer : m_peerConnections) {
-
-		long user = peer.GetOfferUserID();
-		if (std::find(orderedPeers.begin(), orderedPeers.end(), user) == orderedPeers.end())
-			orderedPeers.push_back(user);
-		
-		user = peer.GetAnswerUserID();
-		if (std::find(orderedPeers.begin(), orderedPeers.end(), user) == orderedPeers.end())
-			orderedPeers.push_back(user);	
-	}
-	*/
-
-	long mySocketID = 0;
-	long uid = GetUserID();
-
-	for (const auto& peer : m_peerConnections) {
-		if (uid == peer.GetOfferUserID()) {
-			mySocketID = peer.GetOfferSocketConnectionID();
-			break;
-		}
-		if (uid == peer.GetAnswerUserID()) {
-			mySocketID = peer.GetAnswerSocketConnectionID();
-			break;
-		}
-	}
-
-	// Temp: sending a mod 8 number to DreamApp to set position of the user in a round-table seating configuration.
-	// This would be change once the server will send the seating position.
-	LOG(INFO) << "Peer update: userID=" << uid << ", socketID=" << mySocketID << ", socketID%%8" << mySocketID % 8;
-	m_pPeerConnectionControllerObserver->OnPeersUpdate(mySocketID % 8);
+	return m_pPeerConnectionControllerObserver->OnPeersUpdate(position - 1);
 }
 
 RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strMethod, nlohmann::json jsonPayload) {
@@ -291,7 +255,6 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
-
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;
 
@@ -299,6 +262,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		CN(m_pWebRTCImp);
 		//m_pWebRTCImp->InitializePeerConnection(true);
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
+
+		OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection);
 	}
 	else if (strMethod == "set_offer") {
 		LOG(ERROR) << "(cloud) set offer should not be a request";
@@ -319,7 +284,6 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 
 		CBM((pPeerConnection == nullptr), "Peer Connection %d already exists", peerConnectionID);
 		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
-
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;	
 
@@ -330,6 +294,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//CR(m_pWebRTCImp->InitializePeerConnection(false));
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, false);
 		CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
+
+		OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection);
 	}
 	else if (strMethod == "set_offer_candidates") {
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);

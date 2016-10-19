@@ -40,7 +40,7 @@ RESULT DreamGarage::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
-	for (auto x : std::array<int, 5>()) {
+	for (auto x : std::array<int, 8>()) {
 		user* pNewUser = AddUser();
 		pNewUser->SetVisible(false);
 		m_usersPool.push_back(pNewUser);
@@ -433,6 +433,11 @@ Error:
 
 user*	DreamGarage::ActivateUser(long userId) {
 	if (m_peerUsers.find(userId) == m_peerUsers.end()) {
+		if (m_usersPool.empty()) {
+			LOG(ERROR) << "cannot activate a new user, no reserved users exist";
+			return nullptr;
+		}
+
 		m_peerUsers[userId] = m_usersPool.back();
 		m_usersPool.pop_back();
 
