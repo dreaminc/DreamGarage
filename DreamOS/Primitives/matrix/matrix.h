@@ -12,6 +12,10 @@
 #include <time.h>       
 
 //#define RANGE_CHECK 
+#define MATRIX_ROW_MAJOR
+#ifndef MATRIX_ROW_MAJOR
+	#define MATRIX_COLUMN_MAJOR
+#endif
 
 // BIG TODO: Create Matrix testing suite
 
@@ -64,10 +68,13 @@ public:
 	}
 
 	bool IsZero() {
-		for (int i = 0; i < N; i++)
-			for (int j = 0; j < M; i++)
-				if (element(i, j) != 0)
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; i++) {
+				if (element(i, j) != 0) {
 					return false;
+				}
+			}
+		}
 
 		return true;
 	}
@@ -81,8 +88,9 @@ public:
 
 		clear();
 
-		for (int i = 0; i < N; i++)
+		for (int i = 0; i < N; i++) {
 			this->element(i, i) = val;
+		}
 
 	Error:
 		return r;
@@ -132,18 +140,18 @@ public:
 	}
 
 	RESULT NumbersByElement(TMatrix start, TMatrix increment) {
-		for (int i = 0; i < N; i++)
-			for (int j = 0; j < M; j++)
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
 				this->element(i, j) = start + ((i * N) + j) * increment;
+			}
+		}
 
 		return R_PASS;
 	}
 
 	matrix<TMatrix, N, M> MakeIdentity(TMatrix val = 1.0f) {
 		matrix<TMatrix, N, M> retMatrix;
-		
 		retMatrix.identity(1.0f);
-		
 		return retMatrix;
 	}
 
@@ -618,10 +626,13 @@ matrix<TMat4x4, N, N> operator*(const matrix<TMat4x4, N, N>& lhs, const matrix<T
 	matrix<TMat4x4, N, N> result;
 	result.clear();
 
-	for (int i = 0; i < N; i++) 
-		for (int j = 0; j < N; j++) 
-			for (int k = 0; k < N; k++)
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			for (int k = 0; k < N; k++) {
 				result.element(i, j) += lhs.element(i, k) * rhs.element(k, j);
+			}
+		}
+	}
 
 	return result;
 }

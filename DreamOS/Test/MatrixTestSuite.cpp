@@ -14,6 +14,7 @@ RESULT MatrixTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixCreate, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixMultiply, this))));
 
 Error:
 	return r;
@@ -58,6 +59,76 @@ Error:
 	return r;
 }
 
+template <typename typeMatrix, int N, int M>
+RESULT TestMatrixMultiplication() {
+	RESULT r = R_PASS;
+	
+	DEBUG_LINEOUT("TEST MATRIX MULTIPLICATION %d x %d", N, M);
+
+	matrix<typeMatrix, N, M> rangeMat = matrix<typeMatrix, N, M>::MakeRange();
+	matrix<typeMatrix, N, M> rangeByElementMat = matrix<typeMatrix, N, M>::MakeRangeByElement();
+
+	matrix<typeMatrix, N, M> resultMatrixRange = rangeMat * rangeMat;
+	matrix<typeMatrix, N, M> resultMatrixRangeByElement = rangeByElementMat * rangeByElementMat;
+	matrix<typeMatrix, N, M> resultMatrixRangeByElementFirst = rangeByElementMat * rangeMat;
+	matrix<typeMatrix, N, M> resultMatrixRangeByElementSecond = rangeMat * rangeByElementMat;
+
+	if (resultMatrixRange != resultMatrixRangeByElement) {
+		DEBUG_LINEOUT("Failed Range and Range Element Mismatch");
+		
+		DEBUG_LINEOUT("Range:");
+		resultMatrixRange.PrintMatrix();
+
+		DEBUG_LINEOUT("Range by Element:");
+		resultMatrixRangeByElement.PrintMatrix();
+
+		CB((false));
+	}
+	else if (resultMatrixRange != resultMatrixRangeByElementFirst) {
+		DEBUG_LINEOUT("Failed Range and Range Element First Mismatch");
+
+		DEBUG_LINEOUT("Range:");
+		resultMatrixRange.PrintMatrix();
+
+		DEBUG_LINEOUT("Range by Element First:");
+		resultMatrixRangeByElementFirst.PrintMatrix();
+
+		CB((false));
+	}
+	else if (resultMatrixRange != resultMatrixRangeByElementSecond) {
+		DEBUG_LINEOUT("Failed Range and Range Element Second Mismatch");
+
+		DEBUG_LINEOUT("Range:");
+		resultMatrixRange.PrintMatrix();
+
+		DEBUG_LINEOUT("Range by Element Second:");
+		resultMatrixRangeByElementSecond.PrintMatrix();
+
+		CB((false));
+	}
+	else if (resultMatrixRangeByElementFirst != resultMatrixRangeByElementSecond) {
+		DEBUG_LINEOUT("Failed Range and Range Element Order Mismatch");
+
+		DEBUG_LINEOUT("Range by Element First:");
+		resultMatrixRangeByElementFirst.PrintMatrix();
+
+		DEBUG_LINEOUT("Range by Element Second:");
+		resultMatrixRangeByElementSecond.PrintMatrix();
+
+		CB((false));
+	}
+
+	resultMatrixRange.PrintMatrix();
+
+	// Success:
+	DEBUG_LINEOUT("Matrix Multiply Test Success: %d x %d", N, M);
+	return r;
+
+Error:
+	DEBUG_LINEOUT("Matrix Multiply Test Failed: %d x %d", N, M);
+	return r;
+}
+
 // This will simply create a bunch of matrices of various
 // sizes and confirm parameters 
 RESULT MatrixTestSuite::TestMatrixCreate() {
@@ -89,3 +160,17 @@ Error:
 	return r;
 }
 
+// TODO: Add the N x M variants
+RESULT MatrixTestSuite::TestMatrixMultiply() {
+	RESULT r = R_PASS;
+
+	int numIterations = 5;
+
+	//CRM((TestMatrixMultiplication<float, 1, 1>()), "Test Matrix Multiply failed for float 1x1");
+	CRM((TestMatrixMultiplication<float, 2, 2>()), "Test Matrix Multiply failed for float 2x2");
+	CRM((TestMatrixMultiplication<float, 3, 3>()), "Test Matrix Multiply failed for float 3x3");
+	CRM((TestMatrixMultiplication<float, 4, 4>()), "Test Matrix Multiply failed for float 4x4");
+
+Error:
+	return r;
+}

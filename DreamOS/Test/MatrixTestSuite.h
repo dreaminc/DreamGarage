@@ -18,6 +18,7 @@ public:
 
 	// Tests
 	RESULT TestMatrixCreate();
+	RESULT TestMatrixMultiply();
 
 	virtual RESULT AddTests() override;
 };
