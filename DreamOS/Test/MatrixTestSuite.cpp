@@ -1,6 +1,7 @@
 #include "MatrixTestSuite.h"
 
 #include "Primitives/matrix/matrix.h"
+#include "Primitives/matrix/TranslationMatrix.h"
 
 MatrixTestSuite::MatrixTestSuite() {
 	// empty 
@@ -15,6 +16,11 @@ RESULT MatrixTestSuite::AddTests() {
 
 	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixCreate, this))));
 	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixMultiply, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestTranslateMatrix, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestRotateMatrix, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestViewMatrix, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestProjectionMatrix, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestScaleMatrix, this))));
 
 Error:
 	return r;
@@ -173,4 +179,42 @@ RESULT MatrixTestSuite::TestMatrixMultiply() {
 
 Error:
 	return r;
+}
+
+RESULT MatrixTestSuite::TestTranslateMatrix() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("TEST TRANSLATION MATRIX");
+
+	matrix<translate_precision, 4, 4> matIdentity = matrix<translate_precision, 4, 4>::MakeIdentity(1.0f);
+
+	TranslationMatrix matTranslationStart = TranslationMatrix(0.0f, 0.0f, 0.0f);
+	TranslationMatrix matTranslationIncrement = TranslationMatrix(1.0f, 2.0f, 3.0f);
+
+	auto matTranslationResult = matTranslationStart * matTranslationIncrement;
+
+	matTranslationResult.PrintMatrix();
+
+//Error:
+	return r;
+}
+
+RESULT MatrixTestSuite::TestRotateMatrix() {
+	// TODO:
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT MatrixTestSuite::TestScaleMatrix() {
+	// TODO:
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT MatrixTestSuite::TestViewMatrix() {
+	// TODO:
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT MatrixTestSuite::TestProjectionMatrix() {
+	// TODO:
+	return R_NOT_IMPLEMENTED;
 }

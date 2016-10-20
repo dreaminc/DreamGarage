@@ -149,7 +149,7 @@ public:
 		return R_PASS;
 	}
 
-	matrix<TMatrix, N, M> MakeIdentity(TMatrix val = 1.0f) {
+	static matrix<TMatrix, N, M> MakeIdentity(TMatrix val = 1.0f) {
 		matrix<TMatrix, N, M> retMatrix;
 		retMatrix.identity(1.0f);
 		return retMatrix;

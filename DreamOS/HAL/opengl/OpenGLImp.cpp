@@ -206,8 +206,8 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
@@ -905,11 +905,8 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	// Render Layers
 	// 3D Object / skybox
 	CR(m_pOGLRenderProgram->RenderObjectStore(pSceneGraph));
-	
-	/*
 	CR(RenderReferenceGeometry(pSceneGraph, eye));
 	CR(RenderSkybox(pObjectStore, eye));
-	*/
 
 //TODO either remove FlatSceneGraph or create a separate AddFlatContext for overlays
 /*

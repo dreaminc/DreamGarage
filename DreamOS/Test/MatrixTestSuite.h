@@ -20,6 +20,12 @@ public:
 	RESULT TestMatrixCreate();
 	RESULT TestMatrixMultiply();
 
+	RESULT TestTranslateMatrix();
+	RESULT TestRotateMatrix();
+	RESULT TestScaleMatrix();
+	RESULT TestViewMatrix();
+	RESULT TestProjectionMatrix();
+
 	virtual RESULT AddTests() override;
 };
 

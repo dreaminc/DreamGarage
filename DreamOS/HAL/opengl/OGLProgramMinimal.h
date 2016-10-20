@@ -38,22 +38,30 @@ public:
 	}
 
 	RESULT SetObjectUniforms(DimObj *pDimObj) {
-		auto matModel = pDimObj->GetModelMatrix();
-		m_pUniformModelMatrix->SetUniform(matModel);
+		if (m_pUniformModelMatrix != nullptr) {
+			auto matModel = pDimObj->GetModelMatrix();
+			m_pUniformModelMatrix->SetUniform(matModel);
+		}
 
 		return R_PASS;
 	}
 
 	RESULT SetCameraUniforms(camera *pCamera) {
-		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
+		if (m_pUniformViewProjectionMatrix != nullptr) {
+			auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
+			//auto matVP = pCamera->GetProjectionMatrix();
+			m_pUniformViewProjectionMatrix->SetUniform(matVP);
+		}
 
 		return R_PASS;
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
-		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
+		if (m_pUniformViewProjectionMatrix != nullptr) {
+			auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
+			//auto matVP = pStereoCamera->GetProjectionMatrix(eye);
+			m_pUniformViewProjectionMatrix->SetUniform(matVP);
+		}
 
 		return R_PASS;
 	}
