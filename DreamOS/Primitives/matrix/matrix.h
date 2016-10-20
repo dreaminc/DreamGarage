@@ -99,10 +99,42 @@ public:
 		return R_PASS;
 	}
 
+	RESULT rangeByElement(TMatrix start = 0.0f) {
+		TMatrix counter = start;
+
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				this->element(i, j) = counter; 
+				counter += static_cast<TMatrix>(1.0f);
+			}
+		}
+
+		return R_PASS;
+	}
+
 	RESULT range(TMatrix start = 0.0f) {
 		for (int i = 0; i < (N * M); i++) {
-			m_data[i] = start + static_cast<TMatrix>(i);			 
+			m_data[i] = start + static_cast<TMatrix>(i);
 		}
+
+		return R_PASS;
+	}
+
+	// TODO: Consolidate range vs 'numbers'
+	RESULT Numbers(TMatrix start, TMatrix increment) {
+		clear();
+
+		for (int i = 0; i < N * M; i++) {
+			m_data[i] = start + i * increment;
+		}
+
+		return R_PASS;
+	}
+
+	RESULT NumbersByElement(TMatrix start, TMatrix increment) {
+		for (int i = 0; i < N; i++)
+			for (int j = 0; j < M; j++)
+				this->element(i, j) = start + ((i * N) + j) * increment;
 
 		return R_PASS;
 	}
@@ -124,6 +156,12 @@ public:
 	static matrix<TMatrix, N, M> MakeRange(TMatrix start = 0.0f) {
 		matrix<TMatrix, N, M> retMatrix;
 		retMatrix.range(start);
+		return retMatrix;
+	}
+
+	static matrix<TMatrix, N, M> MakeRangeByElement(TMatrix start = 0.0f) {
+		matrix<TMatrix, N, M> retMatrix;
+		retMatrix.rangeByElement(start);
 		return retMatrix;
 	}
 
@@ -158,33 +196,21 @@ public:
 		return R_PASS;
 	}
 
-	RESULT Numbers(TMatrix start, TMatrix increment) {
-		clear();
-
-		for (int i = 0; i < N * M; i++)
-			m_data[i] = start + i * increment;
-
-		return R_PASS;
-	}
-
-	RESULT NumbersByElement(TMatrix start, TMatrix increment) {
-		for (int i = 0; i < N; i++)
-			for (int j = 0; j < M; j++) 
-				this->element(i, j) = start + ((i * N) + j) * increment;
-
-		return R_PASS;
-	}
-
 	RESULT PrintMatrix() {
 		DEBUG_LINEOUT("matrix %d x %d | N: %d  M:%d ", rows(), cols(), N, M);
 
-		for (int i = 0; i < N; i++) {
-			DEBUG_OUT("| ");
-			for (int j = 0; j < M; j++) {
-				DEBUG_OUT("%02f ", m_data[(j * N) + i]);
+		DEBUG_OUT("| ");
+
+		for (int i = 0; i < (N * M); i++) {
+			if((i != 0) && (i % M) == 0) {
+				DEBUG_LINEOUT(" |");
+				DEBUG_OUT("| ");
 			}
-			DEBUG_LINEOUT(" |");
+
+			DEBUG_OUT("%02f ", m_data[i]);
 		}
+
+		DEBUG_LINEOUT("| ");
 
 		return R_PASS;
 	}
@@ -242,8 +268,9 @@ public:
 	}
 
     inline void copyData(TMatrix *data) {
-        for(int i = 0; i < (N * M); i++)
-            m_data[i] = data[i];
+		for (int i = 0; i < (N * M); i++) {
+			m_data[i] = data[i];
+		}
     }
 
     inline void addData(TMatrix *data) {
@@ -257,13 +284,21 @@ public:
     }
 
     inline void divData(const TMatrix& a) {
-        for(int i = 0; i < (N * M); i++)
-            m_data[i] /= a;
+		for (int i = 0; i < (N * M); i++) {
+			m_data[i] /= a;
+		}
     }
 
     // Look up
     // -------------------------------------------------------------------------
 public:
+
+#if defined(MATRIX_ROW_MAJOR)
+	#define MATRIX_LOOK_UP(i, j) (m_data[(i * M) + j])
+#else 
+	#define MATRIX_LOOK_UP(i, j) (m_data[(j * N) + i])
+#endif
+
 	TMatrix& operator()(unsigned i) {
 		#ifdef RANGE_CHECK
 			rangeCheck(i);
@@ -276,28 +311,28 @@ public:
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-		return m_data[(j * N) + i];
+		return MATRIX_LOOK_UP(i, j);
      }
 
      const TMatrix& operator()( unsigned i, unsigned j ) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-		return m_data[(j * N) + i];
+		return MATRIX_LOOK_UP(i, j);
      }
 
      inline const TMatrix& element(unsigned i, unsigned j) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-		return m_data[(j * N) + i];
+		return MATRIX_LOOK_UP(i, j);
      }
 
 	 inline TMatrix& element(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
             rangeCheck(i, j);
         #endif
-        return m_data[(j * N) + i];
+        return MATRIX_LOOK_UP(i, j);
      }
 
     // Assignment Operators

@@ -25,12 +25,18 @@ template <typename typeMatrix, int N, int M>
 RESULT TestMatrix(int numIterations) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("Range Matrix %d x %d", N, M);
+	DEBUG_LINEOUT("Range Matrix By Value %d x %d", N, M);
 
 	matrix<typeMatrix, N, M> rangeMat = matrix<typeMatrix, N, M>::MakeRange();
+	matrix<typeMatrix, N, M> rangeByElementMat = matrix<typeMatrix, N, M>::MakeRangeByElement();
+	
 	CBM((rangeMat.rows() == N), "Rows %d mismatch N value %d", rangeMat.rows(), N);
 	CBM((rangeMat.cols() == M), "Columns %d mismatch M value %d", rangeMat.cols(), M);
+	
+	DEBUG_LINEOUT("Range Matrix By Element %d x %d", N, M);
+
 	rangeMat.PrintMatrix();
+	rangeByElementMat.PrintMatrix();
 
 	DEBUG_LINEOUT("Random Matrix %d x %d", N, M);
 
