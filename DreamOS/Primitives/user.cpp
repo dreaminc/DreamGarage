@@ -25,7 +25,9 @@ RESULT user::Initialize() {
 	m_pMouth->MoveTo(0, 0.25f - 0.35f, -0.17f);
 
 	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_pMouth->SetColorTexture(m_pMouthTexture.get());
+	
+	m_pMouth->SetMaterialTexture(MaterialTexture::Ambient, m_pMouthTexture.get());
+	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
 
 
 	pHead->AddChild(m_pMouth);
