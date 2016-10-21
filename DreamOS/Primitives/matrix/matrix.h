@@ -173,6 +173,21 @@ public:
 		return retMatrix;
 	}
 
+	// http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
+	matrix<TMatrix, N, M> inverse() {
+		RESULT r = R_PASS;
+		matrix<TMatrix, N - 1, M - 1> retMatrix;
+		retMatrix.clear();
+
+		TMatrix matDeterminant = determinant((*this));
+		CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
+
+
+
+	Error:
+		return retMatrix;
+	}
+
 	matrix<TMatrix, (N - 1), (M - 1)> minormatrix(unsigned i, unsigned j) {
 		RESULT r = R_PASS;
 		matrix<TMatrix, N - 1, M - 1> retMatrix;
