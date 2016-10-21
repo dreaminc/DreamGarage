@@ -16,6 +16,9 @@ RESULT MatrixTestSuite::AddTests() {
 
 	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixCreate, this))));
 	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixMultiply, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixDeterminant, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixMinor, this))));
+
 	CR((AddTest(std::bind(&MatrixTestSuite::TestTranslateMatrix, this))));
 	CR((AddTest(std::bind(&MatrixTestSuite::TestRotateMatrix, this))));
 	CR((AddTest(std::bind(&MatrixTestSuite::TestViewMatrix, this))));
@@ -62,6 +65,37 @@ RESULT TestMatrix(int numIterations) {
 
 Error:
 	DEBUG_LINEOUT("Matrix Test Failed: %d x %d", N, M);
+	return r;
+}
+
+// This will simply create a bunch of matrices of various
+// sizes and confirm parameters 
+RESULT MatrixTestSuite::TestMatrixCreate() {
+	RESULT r = R_PASS;
+
+	int numIterations = 5;
+
+	CRM((TestMatrix<float, 1, 1>(numIterations)), "Test Matrix Create failed for float 1x1");
+	CRM((TestMatrix<float, 1, 2>(numIterations)), "Test Matrix Create failed for float 1x2");
+	CRM((TestMatrix<float, 1, 3>(numIterations)), "Test Matrix Create failed for float 1x3");
+	CRM((TestMatrix<float, 1, 4>(numIterations)), "Test Matrix Create failed for float 1x4");
+
+	CRM((TestMatrix<float, 2, 1>(numIterations)), "Test Matrix Create failed for float 2x1");
+	CRM((TestMatrix<float, 2, 2>(numIterations)), "Test Matrix Create failed for float 2x2");
+	CRM((TestMatrix<float, 2, 3>(numIterations)), "Test Matrix Create failed for float 2x3");
+	CRM((TestMatrix<float, 2, 4>(numIterations)), "Test Matrix Create failed for float 2x4");
+
+	CRM((TestMatrix<float, 3, 1>(numIterations)), "Test Matrix Create failed for float 3x1");
+	CRM((TestMatrix<float, 3, 2>(numIterations)), "Test Matrix Create failed for float 3x2");
+	CRM((TestMatrix<float, 3, 3>(numIterations)), "Test Matrix Create failed for float 3x3");
+	CRM((TestMatrix<float, 3, 4>(numIterations)), "Test Matrix Create failed for float 3x4");
+
+	CRM((TestMatrix<float, 4, 1>(numIterations)), "Test Matrix Create failed for float 4x1");
+	CRM((TestMatrix<float, 4, 2>(numIterations)), "Test Matrix Create failed for float 4x2");
+	CRM((TestMatrix<float, 4, 3>(numIterations)), "Test Matrix Create failed for float 4x3");
+	CRM((TestMatrix<float, 4, 4>(numIterations)), "Test Matrix Create failed for float 4x4");
+
+Error:
 	return r;
 }
 
@@ -135,37 +169,6 @@ Error:
 	return r;
 }
 
-// This will simply create a bunch of matrices of various
-// sizes and confirm parameters 
-RESULT MatrixTestSuite::TestMatrixCreate() {
-	RESULT r = R_PASS;
-
-	int numIterations = 5;
-
-	CRM((TestMatrix<float, 1, 1>(numIterations)), "Test Matrix Create failed for float 1x1");
-	CRM((TestMatrix<float, 1, 2>(numIterations)), "Test Matrix Create failed for float 1x2");
-	CRM((TestMatrix<float, 1, 3>(numIterations)), "Test Matrix Create failed for float 1x3");
-	CRM((TestMatrix<float, 1, 4>(numIterations)), "Test Matrix Create failed for float 1x4");
-
-	CRM((TestMatrix<float, 2, 1>(numIterations)), "Test Matrix Create failed for float 2x1");
-	CRM((TestMatrix<float, 2, 2>(numIterations)), "Test Matrix Create failed for float 2x2");
-	CRM((TestMatrix<float, 2, 3>(numIterations)), "Test Matrix Create failed for float 2x3");
-	CRM((TestMatrix<float, 2, 4>(numIterations)), "Test Matrix Create failed for float 2x4");
-
-	CRM((TestMatrix<float, 3, 1>(numIterations)), "Test Matrix Create failed for float 3x1");
-	CRM((TestMatrix<float, 3, 2>(numIterations)), "Test Matrix Create failed for float 3x2");
-	CRM((TestMatrix<float, 3, 3>(numIterations)), "Test Matrix Create failed for float 3x3");
-	CRM((TestMatrix<float, 3, 4>(numIterations)), "Test Matrix Create failed for float 3x4");
-
-	CRM((TestMatrix<float, 4, 1>(numIterations)), "Test Matrix Create failed for float 4x1");
-	CRM((TestMatrix<float, 4, 2>(numIterations)), "Test Matrix Create failed for float 4x2");
-	CRM((TestMatrix<float, 4, 3>(numIterations)), "Test Matrix Create failed for float 4x3");
-	CRM((TestMatrix<float, 4, 4>(numIterations)), "Test Matrix Create failed for float 4x4");
-
-Error:
-	return r;
-}
-
 // TODO: Add the N x M variants
 RESULT MatrixTestSuite::TestMatrixMultiply() {
 	RESULT r = R_PASS;
@@ -176,6 +179,78 @@ RESULT MatrixTestSuite::TestMatrixMultiply() {
 	CRM((TestMatrixMultiplication<float, 2, 2>()), "Test Matrix Multiply failed for float 2x2");
 	CRM((TestMatrixMultiplication<float, 3, 3>()), "Test Matrix Multiply failed for float 3x3");
 	CRM((TestMatrixMultiplication<float, 4, 4>()), "Test Matrix Multiply failed for float 4x4");
+
+Error:
+	return r;
+}
+
+template <typename typeMatrix, int N, int M>
+RESULT TestMatrixDeterminants(int numIterations) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("TEST DETERMINANT MATRIX %d x %d", N, M);
+
+	matrix<typeMatrix, N, M> rangeMat = matrix<typeMatrix, N, M>::MakeRange();
+	matrix<typeMatrix, N, M> randomMat = matrix<typeMatrix, N, M>::MakeRandom();
+	typeMatrix detValue = determinant(rangeMat);
+
+	if (N > 2) {
+		CBM((detValue == 0), "Co-dependent matrix should have a determinant of zero but %f found", detValue);
+	}
+
+	detValue = determinant(randomMat);
+
+	DEBUG_LINEOUT("Matrix Determinant Found: %f", detValue);
+	randomMat.PrintMatrix();
+
+	// TODO: Test using inverse 
+
+Error:
+	return r;
+}
+
+RESULT MatrixTestSuite::TestMatrixDeterminant() {
+	RESULT r = R_PASS;
+
+	int numIterations = 5;
+
+	CRM((TestMatrixDeterminants<float, 4, 4>(numIterations)), "Test Matrix Determinant failed for float 4x4");
+	CRM((TestMatrixDeterminants<float, 3, 3>(numIterations)), "Test Matrix Determinant failed for float 3x3");
+	CRM((TestMatrixDeterminants<float, 2, 2>(numIterations)), "Test Matrix Determinant failed for float 2x2");
+
+Error:
+	return r;
+}
+
+template <typename typeMatrix, int N, int M>
+RESULT TestMatrixMinors() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("TEST DETERMINANT MATRIX %d x %d", N, M);
+
+	matrix<typeMatrix, N, M> rangeMat = matrix<typeMatrix, N, M>::MakeRange();
+	rangeMat.PrintMatrix();
+
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < M; j++) {
+			DEBUG_LINEOUT("Minor Matrix %d %d", i, j);
+
+			auto minorMat = rangeMat.minormatrix(i, j);
+			minorMat.PrintMatrix();
+
+			DEBUG_LINEOUT("Matrix minor value: %f with cofactor %f", rangeMat.minor(i, j), rangeMat.cofactor(i, j));
+		}
+	}
+
+//Error:
+	return r;
+}
+
+RESULT MatrixTestSuite::TestMatrixMinor() {
+	RESULT r = R_PASS;
+
+	CRM((TestMatrixMinors<float, 3, 3>()), "Test Matrix Minor failed for float 3x3");
+	CRM((TestMatrixMinors<float, 4, 4>()), "Test Matrix Minor failed for float 4x4");
 
 Error:
 	return r;
@@ -194,6 +269,8 @@ RESULT MatrixTestSuite::TestTranslateMatrix() {
 	auto matTranslationResult = matTranslationStart * matTranslationIncrement;
 
 	matTranslationResult.PrintMatrix();
+
+	// TODO: Test outcome
 
 //Error:
 	return r;

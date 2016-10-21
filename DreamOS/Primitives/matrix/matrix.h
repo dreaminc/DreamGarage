@@ -173,7 +173,59 @@ public:
 		return retMatrix;
 	}
 
-	matrix<TMatrix, (N - 1), (M - 1)> minor(unsigned i, unsigned j);
+	matrix<TMatrix, (N - 1), (M - 1)> minormatrix(unsigned i, unsigned j) {
+		RESULT r = R_PASS;
+		matrix<TMatrix, N - 1, M - 1> retMatrix;
+		retMatrix.clear();
+
+		CRM(RangeCheck(i, j), "%d %d minor not possible in %d x %d matrix", i, j, N, M);
+
+		int rowCount = 0;
+		int colCount = 0;
+
+		for (int x = 0; x < (N - 1); x++) {
+			
+			if (rowCount == i) {
+				rowCount += 1;
+			}
+
+			colCount = 0;
+			for (int y = 0; y < (M - 1); y++) {
+
+				if (colCount == j) {
+					colCount += 1;
+				}
+
+				retMatrix.element(x, y) = element(rowCount, colCount);
+
+				colCount += 1;
+			}
+
+			rowCount += 1;
+		}
+
+	Error:
+		return retMatrix;
+	}
+
+	TMatrix minor(unsigned i, unsigned j) {
+		matrix<TMatrix, N - 1, M - 1> retMatrix = minormatrix(i, j);
+		return determinant(retMatrix);
+	}
+
+	// This is a zero based matrix, so adding one for the power (but -1^0 == 1 so the math should actually work regardless)
+	TMatrix cofactor(unsigned i, unsigned j) {
+		TMatrix signVal = pow(-1, ((i+1) + (j+1)));		
+		return (signVal * minor(i, j));
+	}
+
+	RESULT RangeCheck(unsigned i, unsigned j) {
+		ACBM((i < N), "i index greater than %d", N);
+		ACBM((j < M), "j index greater than %d", M);
+
+		return R_PASS;
+	}
+
 
 public:
 	// Constructors
@@ -700,32 +752,35 @@ bool operator!=(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, N, M>& r
 
 // Formulas from or derived based on: https://en.wikipedia.org/wiki/Determinant
 template <typename TMat2x2>
-TMat2x2 determinant(matrix<TMat2x2, 2, 2>) {
-	return (m_data[0] * m_data[3]) - (m_data[1] * m_data[2]);
+TMat2x2 determinant(matrix<TMat2x2, 2, 2> mat) {
+	return (mat.m_data[0] * mat.m_data[3]) - (mat.m_data[1] * mat.m_data[2]);
 }
 
 template <typename TMat3x3>
-TMat3x3 determinant(matrix<TMat3x3, 3, 3>) {
+TMat3x3 determinant(matrix<TMat3x3, 3, 3> mat) {
 	TMat3x3 result = -1;
 
-	result = (m_data[0] * m_data[4] * m_data[8]);
-	result += (m_data[1] * m_data[5] * m_data[6]);
-	result += (m_data[2] * m_data[3] * m_data[7]);
+	result = (mat.m_data[0] * mat.m_data[4] * mat.m_data[8]);
+	result += (mat.m_data[1] * mat.m_data[5] * mat.m_data[6]);
+	result += (mat.m_data[2] * mat.m_data[3] * mat.m_data[7]);
 
-	result -= (m_data[2] * m_data[4] * m_data[6]);
-	result -= (m_data[1] * m_data[3] * m_data[8]);
-	result -= (m_data[0] * m_data[5] * m_data[7]);
+	result -= (mat.m_data[2] * mat.m_data[4] * mat.m_data[6]);
+	result -= (mat.m_data[1] * mat.m_data[3] * mat.m_data[8]);
+	result -= (mat.m_data[0] * mat.m_data[5] * mat.m_data[7]);
 
 	return result;
 }
 
+// TODO: This could likely be generalized to a M M method
 template <typename TMat4x4>
-TMat4x4 determinant(matrix<TMat4x4, 4, 4>) {
-	TMat4x4 result = -1;
+TMat4x4 determinant(matrix<TMat4x4, 4, 4> mat) {
+	TMat4x4 determinantResult = 0.0f;
 
-	// TODO:
+	for (int j = 0; j < 4; j++) {
+		determinantResult += (mat.element(0, j) * mat.cofactor(0, j));
+	}
 
-	return result;
+	return determinantResult;
 }
 
 /*

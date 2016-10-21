@@ -1,10 +1,5 @@
 #include "matrix.h"
 
-template <typename TMatrix, int N, int M>
-matrix<TMatrix, (N - 1), (M - 1)> matrix<TMatrix, N, M>::minor(unsigned i, unsigned j) {
-	// TODO: create minor
-}
-
 /*
 template <typename TMat4x4, int N, int M>
 matrix<TMat4x4, N, M> matrix<TMat4x4, N, M>::inverse() {

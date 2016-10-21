@@ -19,6 +19,8 @@ public:
 	// Tests
 	RESULT TestMatrixCreate();
 	RESULT TestMatrixMultiply();
+	RESULT TestMatrixDeterminant();
+	RESULT TestMatrixMinor();
 
 	RESULT TestTranslateMatrix();
 	RESULT TestRotateMatrix();

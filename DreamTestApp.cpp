@@ -32,6 +32,10 @@ RESULT DreamTestApp::LoadScene() {
 	pVolume->SetWireframe(true);
 	*/
 
+	// TODO: sphere AABB
+	sphere *pSphere = AddSphere(0.5f, 10, 10, color(COLOR_RED));
+	pSphere->MoveTo(1.5f, 0.5f, 0.0f);
+
 	g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
 	g_pCylinder->MoveTo(0.0f, -1.0f, -2.0f);
 	//pCylinder->SetWireframe(true);
