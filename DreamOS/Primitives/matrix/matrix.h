@@ -17,6 +17,9 @@
 	#define MATRIX_COLUMN_MAJOR
 #endif
 
+// TODO: Not sure how best to set this (external config, or based on data type?)
+#define MAX_MATRIX_INVERSE_ERROR 0.0001f
+
 // BIG TODO: Create Matrix testing suite
 
 // TODO: Implement Kahan addition flag for better precision
@@ -77,6 +80,28 @@ public:
 		}
 
 		return true;
+	}
+
+	TMatrix max() {
+		TMatrix maxVal = m_data[0];
+		
+		for (int i = 0; i < (N * M); i++) {
+			if (m_data[i] > maxVal)
+				maxVal = m_data[i];
+		}
+		
+		return maxVal;
+	}
+
+	TMatrix min() {
+		TMatrix maxVal = m_data[0];
+
+		for (int i = 0; i < (N * M); i++) {
+			if (m_data[i] > maxVal)
+				maxVal = m_data[i];
+		}
+		
+		return maxVal;
 	}
 
 	// Sets up an identity matrix
@@ -795,12 +820,12 @@ matrix<TMat2x2, 2, 2> inverse(matrix<TMat2x2, 2, 2> mat) {
 	CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
 	
 	// 0
-	retMatrix.element(0, 0) = mat.element(1, 1);
-	retMatrix.element(0, 1) = -1 * mat.element(0, 1);
+	retMatrix.element(0, 0) = mat(1, 1);
+	retMatrix.element(0, 1) = -1 * mat(0, 1);
 
 	// 1
-	retMatrix.element(1, 0) = -1 * mat.element(1, 0);
-	retMatrix.element(1, 1) = mat.element(0, 0);
+	retMatrix.element(1, 0) = -1 * mat(1, 0);
+	retMatrix.element(1, 1) = mat(0, 0);
 
 	retMatrix *= (1.0f / matDeterminant);
 
@@ -818,13 +843,29 @@ matrix<TMat3x3, 3, 3> inverse(matrix<TMat3x3, 3, 3> mat) {
 
 	TMat3x3 matDeterminant = determinant(mat);
 	CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
-
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			matrix<TMat3x3, 2, 2> minorMat = mat.minormatrix(i, j);
-			retMatrix.element(i, j) = determinant(minorMat);
-		}
-	}
+	/*
+	// TODO: hard coding suuuuuuuuuuuuuuuucks (but it works really well)
+	(0, 0) = (1, 1)(2, 2) - (1, 2)(2, 1)
+	(0, 1) = (0, 2)(2, 1) - (0, 1)(2, 2)
+	(0, 2) = (0, 1)(1, 2) - (0, 2)(1, 1)
+	(0, 0) = (1, 2)(2, 0) - (1, 0)(2, 2)
+	(1, 1) = (0, 0)(2, 2) - (0, 2)(2, 0)
+	(1, 2) = (0, 2)(1, 0) - (0, 0)(1, 2)
+	(0, 0) = (1, 0)(2, 1) - (1, 1)(2, 0)
+	(1, 1) = (0, 1)(2, 0) - (0, 0)(2, 1)
+	(2, 2) = (0, 0)(1, 1) - (0, 1)(1, 0)
+	*/
+	
+	retMatrix.element(0, 0) = mat(1, 1)*mat(2, 2) - mat(1, 2)*mat(2, 1);
+	retMatrix.element(0, 1) = mat(0, 2)*mat(2, 1) - mat(0, 1)*mat(2, 2);
+	retMatrix.element(0, 2) = mat(0, 1)*mat(1, 2) - mat(0, 2)*mat(1, 1);
+	retMatrix.element(1, 0) = mat(1, 2)*mat(2, 0) - mat(1, 0)*mat(2, 2);
+	retMatrix.element(1, 1) = mat(0, 0)*mat(2, 2) - mat(0, 2)*mat(2, 0);
+	retMatrix.element(1, 2) = mat(0, 2)*mat(1, 0) - mat(0, 0)*mat(1, 2);
+	retMatrix.element(2, 0) = mat(1, 0)*mat(2, 1) - mat(1, 1)*mat(2, 0);
+	retMatrix.element(2, 1) = mat(0, 1)*mat(2, 0) - mat(0, 0)*mat(2, 1);
+	retMatrix.element(2, 2) = mat(0, 0)*mat(1, 1) - mat(0, 1)*mat(1, 0);
+	
 
 	retMatrix *= (1.0f / matDeterminant);
 

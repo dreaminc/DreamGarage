@@ -285,10 +285,11 @@ RESULT TestMatrixInverses(int numIterations) {
 		DEBUG_LINEOUT("RESULT Error Against Identity %d x %d: ", N, M);
 		multResultError.PrintMatrix();
 
-		// TODO: Calculate error against identity
+		DEBUG_LINEOUT("Max error: %f", multResultError.max());
+		CBM((multResultError.max() < MAX_MATRIX_INVERSE_ERROR), "Max error %f exceeds set threshold %f", multResultError.max(), MAX_MATRIX_INVERSE_ERROR);
 	}
 
-	//Error:
+Error:
 	return r;
 }
 
