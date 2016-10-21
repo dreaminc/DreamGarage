@@ -16,11 +16,15 @@ public:
 	MatrixTestSuite();
 	~MatrixTestSuite();
 
+	// TODO: Needed tests
+	// element() vs operator () and operator []
+
 	// Tests
 	RESULT TestMatrixCreate();
 	RESULT TestMatrixMultiply();
 	RESULT TestMatrixDeterminant();
 	RESULT TestMatrixMinor();
+	RESULT TestMatrixInverse();
 
 	RESULT TestTranslateMatrix();
 	RESULT TestRotateMatrix();

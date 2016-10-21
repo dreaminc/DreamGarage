@@ -18,6 +18,8 @@ RESULT MatrixTestSuite::AddTests() {
 	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixMultiply, this))));
 	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixDeterminant, this))));
 	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixMinor, this))));
+	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixInverse, this))));
+	
 
 	CR((AddTest(std::bind(&MatrixTestSuite::TestTranslateMatrix, this))));
 	CR((AddTest(std::bind(&MatrixTestSuite::TestRotateMatrix, this))));
@@ -251,6 +253,53 @@ RESULT MatrixTestSuite::TestMatrixMinor() {
 
 	CRM((TestMatrixMinors<float, 3, 3>()), "Test Matrix Minor failed for float 3x3");
 	CRM((TestMatrixMinors<float, 4, 4>()), "Test Matrix Minor failed for float 4x4");
+
+Error:
+	return r;
+}
+
+
+template <typename typeMatrix, int N, int M>
+RESULT TestMatrixInverses(int numIterations) {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("TEST INVERSE MATRIX %d x %d", N, M);
+
+	matrix<typeMatrix, N, M> matIdentity = matrix<typeMatrix, N, M>::MakeIdentity(1.0f);
+
+	for (int i = 0; i < numIterations; i++) {
+		matrix<typeMatrix, N, M> randomMat = matrix<typeMatrix, N, M>::MakeRandom();
+		matrix<typeMatrix, N, M> randomMatInverse = inverse(randomMat);
+		matrix<typeMatrix, N, M> multResult = randomMat * randomMatInverse;
+		matrix<typeMatrix, N, M> multResultError = matIdentity - multResult;
+		
+		DEBUG_LINEOUT("Matrix %d x %d: ", N, M);
+		randomMat.PrintMatrix();
+
+		DEBUG_LINEOUT("Matrix Inverse %d x %d: ", N, M);
+		randomMatInverse.PrintMatrix();
+
+		DEBUG_LINEOUT(" M X M^-1 Result %d x %d: ", N, M);
+		multResult.PrintMatrix();
+
+		DEBUG_LINEOUT("RESULT Error Against Identity %d x %d: ", N, M);
+		multResultError.PrintMatrix();
+
+		// TODO: Calculate error against identity
+	}
+
+	//Error:
+	return r;
+}
+
+RESULT MatrixTestSuite::TestMatrixInverse() {
+	RESULT r = R_PASS;
+
+	int numIterations = 5;
+
+	CRM((TestMatrixInverses<float, 2, 2>(numIterations)), "Test Matrix Inverse failed for float 3x3");
+	CRM((TestMatrixInverses<float, 3, 3>(numIterations)), "Test Matrix Inverse failed for float 3x3");
+	CRM((TestMatrixInverses<float, 4, 4>(numIterations)), "Test Matrix Inverse failed for float 4x4");
 
 Error:
 	return r;

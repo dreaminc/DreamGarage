@@ -173,21 +173,6 @@ public:
 		return retMatrix;
 	}
 
-	// http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
-	matrix<TMatrix, N, M> inverse() {
-		RESULT r = R_PASS;
-		matrix<TMatrix, N - 1, M - 1> retMatrix;
-		retMatrix.clear();
-
-		TMatrix matDeterminant = determinant((*this));
-		CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
-
-
-
-	Error:
-		return retMatrix;
-	}
-
 	matrix<TMatrix, (N - 1), (M - 1)> minormatrix(unsigned i, unsigned j) {
 		RESULT r = R_PASS;
 		matrix<TMatrix, N - 1, M - 1> retMatrix;
@@ -310,7 +295,7 @@ public:
 
 	// TODO: Check bounds
 	MatrixProxyObject& operator[](const int index) {
-		int lookUpValue = index * M;
+		int lookUpValue = (index * M);
 		MatrixProxyObject retProxy(&(m_data[lookUpValue]));
 		return retProxy;
 	}
@@ -796,6 +781,111 @@ TMat4x4 determinant(matrix<TMat4x4, 4, 4> mat) {
 	}
 
 	return determinantResult;
+}
+
+// http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
+template <typename TMat2x2>
+matrix<TMat2x2, 2, 2> inverse(matrix<TMat2x2, 2, 2> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat2x2, 2, 2> retMatrix;
+	retMatrix.clear();
+
+	TMat2x2 matDeterminant = determinant(mat);
+	CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
+	
+	// 0
+	retMatrix.element(0, 0) = mat.element(1, 1);
+	retMatrix.element(0, 1) = -1 * mat.element(0, 1);
+
+	// 1
+	retMatrix.element(1, 0) = -1 * mat.element(1, 0);
+	retMatrix.element(1, 1) = mat.element(0, 0);
+
+	retMatrix *= (1.0f / matDeterminant);
+
+Error:
+	return retMatrix;
+}
+
+// http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
+template <typename TMat3x3>
+matrix<TMat3x3, 3, 3> inverse(matrix<TMat3x3, 3, 3> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat3x3, 3, 3> retMatrix;
+	retMatrix.clear();
+
+	TMat3x3 matDeterminant = determinant(mat);
+	CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			matrix<TMat3x3, 2, 2> minorMat = mat.minormatrix(i, j);
+			retMatrix.element(i, j) = determinant(minorMat);
+		}
+	}
+
+	retMatrix *= (1.0f / matDeterminant);
+
+Error:
+	return retMatrix;
+}
+
+// http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
+template <typename TMat4x4>
+matrix<TMat4x4, 4, 4> inverse(matrix<TMat4x4, 4, 4> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat4x4, 4, 4> retMatrix;
+	retMatrix.clear();
+
+	TMat4x4 matDeterminant = determinant(mat);
+	CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
+
+	// TODO: hard coding suuuuuuuuuuuuuuuucks
+	/*
+	// This is here to inspect the ordering / indices - use this as a template to redo the below
+	(0,0) = (1,1)(2,2)(3,3) + (1,2)(2,3)(3,1) + (1,3)(2,1)(3,2) - (1,1)(2,3)(3,2) - (1,2)(2,1)(3,3) - (1,3)(2,2)(3,1)
+	(0,1) = (0,1)(2,3)(3,2) + (0,2)(2,1)(3,3) + (0,3)(2,2)(3,1) - (0,1)(2,2)(3,3) - (0,2)(2,3)(3,1) - (0,3)(2,1)(3,2)
+	(0,2) = (0,1)(1,2)(3,3) + (0,2)(1,3)(3,1) + (0,3)(1,1)(3,2) - (0,1)(1,3)(3,2) - (0,2)(1,1)(3,3) - (0,3)(1,2)(3,1)
+	(0,3) = (0,1)(1,3)(2,2) + (0,2)(1,1)(2,3) + (0,3)(1,2)(2,1) - (0,1)(1,2)(2,3) - (0,2)(1,3)(2,1) - (0,3)(1,1)(2,2)
+	(1,0) = (1,0)(2,3)(3,2) + (1,2)(2,0)(3,3) + (1,3)(2,2)(3,0) - (1,0)(2,2)(3,3) - (1,2)(2,3)(3,0) - (1,3)(2,0)(3,2)
+	(1,1) = (0,0)(2,2)(3,3) + (0,2)(2,3)(3,0) + (0,3)(2,0)(3,2) - (0,0)(2,3)(3,2) - (0,2)(2,0)(3,3) - (0,3)(2,2)(3,0)
+	(1,2) = (0,0)(1,3)(3,2) + (0,2)(1,0)(3,3) + (0,3)(1,2)(3,0) - (0,0)(1,2)(3,3) - (0,2)(1,3)(3,0) - (0,3)(1,0)(3,2)
+	(1,3) = (0,0)(1,2)(2,3) + (0,2)(1,3)(2,0) + (0,3)(1,0)(2,2) - (0,0)(1,3)(2,2) - (0,2)(1,0)(2,3) - (0,3)(1,2)(2,0)
+	(2,0) = (1,0)(2,1)(3,3) + (1,1)(2,3)(3,0) + (1,3)(2,0)(3,1) - (1,0)(2,3)(3,1) - (1,1)(2,0)(3,3) - (1,3)(2,1)(3,0)
+	(2,1) = (0,0)(2,3)(3,1) + (0,1)(2,0)(3,3) + (0,3)(2,1)(3,0) - (0,0)(2,1)(3,3) - (0,1)(2,3)(3,0) - (0,3)(2,0)(3,1)
+	(2,2) = (0,0)(1,1)(3,3) + (0,1)(1,3)(3,0) + (0,4)(1,0)(3,1) - (0,0)(1,3)(3,1) - (0,1)(1,0)(3,3) - (0,3)(1,1)(3,0)
+	(2,3) = (0,0)(1,3)(2,1) + (0,1)(1,0)(2,3) + (0,3)(1,1)(2,0) - (0,0)(1,1)(2,3) - (0,1)(1,3)(2,0) - (0,3)(1,0)(2,1)
+	(3,0) = (1,0)(2,2)(3,1) + (1,1)(2,0)(3,2) + (1,2)(2,1)(3,0) - (1,0)(2,1)(3,2) - (1,1)(2,2)(3,0) - (1,2)(2,0)(3,1)
+	(3,1) = (0,0)(2,1)(3,2) + (0,1)(2,2)(3,0) + (0,2)(2,0)(3,1) - (0,0)(2,2)(3,1) - (0,1)(2,0)(3,2) - (0,3)(2,1)(3,0)
+	(3,2) = (0,0)(1,2)(3,1) + (0,1)(1,0)(3,2) + (0,2)(1,1)(3,0) - (0,0)(1,1)(3,2) - (0,1)(1,2)(3,0) - (0,3)(1,0)(3,1)
+	(3,3) = (0,0)(1,1)(2,2) + (0,1)(1,2)(2,0) + (0,2)(1,0)(2,1) - (0,0)(1,2)(2,1) - (0,1)(1,0)(2,2) - (0,3)(1,1)(2,0)
+	*/
+	
+	retMatrix.element(0, 0) = mat(1, 1)*mat(2, 2)*mat(3, 3) + mat(1, 2)*mat(2, 3)*mat(3, 1) + mat(1, 3)*mat(2, 1)*mat(3, 2) - mat(1, 1)*mat(2, 3)*mat(3, 2) - mat(1, 2)*mat(2, 1)*mat(3, 3) - mat(1, 3)*mat(2, 2)*mat(3, 1);
+	retMatrix.element(0, 1) = mat(0, 1)*mat(2, 3)*mat(3, 2) + mat(0, 2)*mat(2, 1)*mat(3, 3) + mat(0, 3)*mat(2, 2)*mat(3, 1) - mat(0, 1)*mat(2, 2)*mat(3, 3) - mat(0, 2)*mat(2, 3)*mat(3, 1) - mat(0, 3)*mat(2, 1)*mat(3, 2);
+	retMatrix.element(0, 2) = mat(0, 1)*mat(1, 2)*mat(3, 3) + mat(0, 2)*mat(1, 3)*mat(3, 1) + mat(0, 3)*mat(1, 1)*mat(3, 2) - mat(0, 1)*mat(1, 3)*mat(3, 2) - mat(0, 2)*mat(1, 1)*mat(3, 3) - mat(0, 3)*mat(1, 2)*mat(3, 1);
+	retMatrix.element(0, 3) = mat(0, 1)*mat(1, 3)*mat(2, 2) + mat(0, 2)*mat(1, 1)*mat(2, 3) + mat(0, 3)*mat(1, 2)*mat(2, 1) - mat(0, 1)*mat(1, 2)*mat(2, 3) - mat(0, 2)*mat(1, 3)*mat(2, 1) - mat(0, 3)*mat(1, 1)*mat(2, 2);
+	retMatrix.element(1, 0) = mat(1, 0)*mat(2, 3)*mat(3, 2) + mat(1, 2)*mat(2, 0)*mat(3, 3) + mat(1, 3)*mat(2, 2)*mat(3, 0) - mat(1, 0)*mat(2, 2)*mat(3, 3) - mat(1, 2)*mat(2, 3)*mat(3, 0) - mat(1, 3)*mat(2, 0)*mat(3, 2);
+	retMatrix.element(1, 1) = mat(0, 0)*mat(2, 2)*mat(3, 3) + mat(0, 2)*mat(2, 3)*mat(3, 0) + mat(0, 3)*mat(2, 0)*mat(3, 2) - mat(0, 0)*mat(2, 3)*mat(3, 2) - mat(0, 2)*mat(2, 0)*mat(3, 3) - mat(0, 3)*mat(2, 2)*mat(3, 0);
+	retMatrix.element(1, 2) = mat(0, 0)*mat(1, 3)*mat(3, 2) + mat(0, 2)*mat(1, 0)*mat(3, 3) + mat(0, 3)*mat(1, 2)*mat(3, 0) - mat(0, 0)*mat(1, 2)*mat(3, 3) - mat(0, 2)*mat(1, 3)*mat(3, 0) - mat(0, 3)*mat(1, 0)*mat(3, 2);
+	retMatrix.element(1, 3) = mat(0, 0)*mat(1, 2)*mat(2, 3) + mat(0, 2)*mat(1, 3)*mat(2, 0) + mat(0, 3)*mat(1, 0)*mat(2, 2) - mat(0, 0)*mat(1, 3)*mat(2, 2) - mat(0, 2)*mat(1, 0)*mat(2, 3) - mat(0, 3)*mat(1, 2)*mat(2, 0);
+	retMatrix.element(2, 0) = mat(1, 0)*mat(2, 1)*mat(3, 3) + mat(1, 1)*mat(2, 3)*mat(3, 0) + mat(1, 3)*mat(2, 0)*mat(3, 1) - mat(1, 0)*mat(2, 3)*mat(3, 1) - mat(1, 1)*mat(2, 0)*mat(3, 3) - mat(1, 3)*mat(2, 1)*mat(3, 0);
+	retMatrix.element(2, 1) = mat(0, 0)*mat(2, 3)*mat(3, 1) + mat(0, 1)*mat(2, 0)*mat(3, 3) + mat(0, 3)*mat(2, 1)*mat(3, 0) - mat(0, 0)*mat(2, 1)*mat(3, 3) - mat(0, 1)*mat(2, 3)*mat(3, 0) - mat(0, 3)*mat(2, 0)*mat(3, 1);
+	retMatrix.element(2, 2) = mat(0, 0)*mat(1, 1)*mat(3, 3) + mat(0, 1)*mat(1, 3)*mat(3, 0) + mat(0, 4)*mat(1, 0)*mat(3, 1) - mat(0, 0)*mat(1, 3)*mat(3, 1) - mat(0, 1)*mat(1, 0)*mat(3, 3) - mat(0, 3)*mat(1, 1)*mat(3, 0);
+	retMatrix.element(2, 3) = mat(0, 0)*mat(1, 3)*mat(2, 1) + mat(0, 1)*mat(1, 0)*mat(2, 3) + mat(0, 3)*mat(1, 1)*mat(2, 0) - mat(0, 0)*mat(1, 1)*mat(2, 3) - mat(0, 1)*mat(1, 3)*mat(2, 0) - mat(0, 3)*mat(1, 0)*mat(2, 1);
+	retMatrix.element(3, 0) = mat(1, 0)*mat(2, 2)*mat(3, 1) + mat(1, 1)*mat(2, 0)*mat(3, 2) + mat(1, 2)*mat(2, 1)*mat(3, 0) - mat(1, 0)*mat(2, 1)*mat(3, 2) - mat(1, 1)*mat(2, 2)*mat(3, 0) - mat(1, 2)*mat(2, 0)*mat(3, 1);
+	retMatrix.element(3, 1) = mat(0, 0)*mat(2, 1)*mat(3, 2) + mat(0, 1)*mat(2, 2)*mat(3, 0) + mat(0, 2)*mat(2, 0)*mat(3, 1) - mat(0, 0)*mat(2, 2)*mat(3, 1) - mat(0, 1)*mat(2, 0)*mat(3, 2) - mat(0, 3)*mat(2, 1)*mat(3, 0);
+	retMatrix.element(3, 2) = mat(0, 0)*mat(1, 2)*mat(3, 1) + mat(0, 1)*mat(1, 0)*mat(3, 2) + mat(0, 2)*mat(1, 1)*mat(3, 0) - mat(0, 0)*mat(1, 1)*mat(3, 2) - mat(0, 1)*mat(1, 2)*mat(3, 0) - mat(0, 3)*mat(1, 0)*mat(3, 1);
+	retMatrix.element(3, 3) = mat(0, 0)*mat(1, 1)*mat(2, 2) + mat(0, 1)*mat(1, 2)*mat(2, 0) + mat(0, 2)*mat(1, 0)*mat(2, 1) - mat(0, 0)*mat(1, 2)*mat(2, 1) - mat(0, 1)*mat(1, 0)*mat(2, 2) - mat(0, 3)*mat(1, 1)*mat(2, 0);
+
+
+	retMatrix *= (1.0f / matDeterminant);
+
+Error:
+	return retMatrix;
 }
 
 /*
