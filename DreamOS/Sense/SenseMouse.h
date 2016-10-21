@@ -22,6 +22,7 @@ typedef enum SenseMouseEventType {
 	SENSE_MOUSE_WHEEL,
 	SENSE_MOUSE_MOVE,
 	SENSE_MOUSE_LEFT_DRAG_MOVE,
+	SENSE_MOUSE_RIGHT_DRAG_MOVE,
 	SENSE_MOUSE_INVALID
 } SENSE_MOUSE_EVENT_TYPE;
 
@@ -61,7 +62,8 @@ protected:
 	bool m_fMouseCaptured;
 
 	// Mouse dragging states
-	bool m_isDragging = false;
+	enum class MouseDrag { None, Left, Right };
+	MouseDrag m_dragState = MouseDrag::None;
 	int m_dragOriginX = 0;
 	int m_dragOriginY = 0;
 
