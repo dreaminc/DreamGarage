@@ -48,7 +48,7 @@ RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
 	if (g_pCylinder != nullptr) {
-		//g_pCylinder->RotateByDeg(0.01f, 0.01f, 0.01f);
+		g_pCylinder->RotateByDeg(0.01f, 0.01f, 0.01f);
 	}
 
 	//Error:
