@@ -305,12 +305,26 @@ ray camera::GetRay(double xPos, double yPos) {
 	double y = 1.0f - ((2.0f * yPos) / m_pxScreenHeight);
 	double z = 1.0f;
 
-	retRay.ptOrigin() = point(x, y, z);
+	retRay.ptOrigin() = point(m_ptOrigin);
+	retRay.vDirection() = point(x, y, -1.0f);
+
+	point ptOrigin = m_ptOrigin;
+	ptOrigin.SetZeroW();
+	ptOrigin += m_vDeviation;
+	ViewMatrix matView = ViewMatrix(ptOrigin, m_qRotation);
 
 	matrix<camera_precision, 4, 4> matProjection = GetProjectionMatrix();
-	camera_precision det = determinant(matProjection);
+	//matrix<camera_precision, 4, 4> matView = GetViewMatrix();
 
-	// TODO: need inverse matrix now
+	matrix<camera_precision, 4, 4> matProjectionInverse = inverse(matProjection);
+	matrix<camera_precision, 4, 4> matViewInverse = inverse(matView);
+
+	retRay.vDirection() = matProjectionInverse * retRay.vDirection();
+	retRay.vDirection().z() = -1.0f;
+	retRay.vDirection().w() = 0.0f;
+
+	retRay.vDirection() = matViewInverse * retRay.vDirection();
+	retRay.vDirection().Normalize();
 
 	retRay.Print();
 

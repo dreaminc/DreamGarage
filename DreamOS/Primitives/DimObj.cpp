@@ -476,7 +476,7 @@ Error:
 RESULT DimObj::InitializeAABB() {
 	RESULT r = R_PASS;
 
-	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(BoundingBox::Type::AABB));
+	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(this, BoundingBox::Type::AABB));
 	CN(m_pBoundingVolume);
 
 	CR(UpdateBoundingVolume());
@@ -488,7 +488,7 @@ Error:
 RESULT DimObj::InitializeOBB() {
 	RESULT r = R_PASS;
 
-	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(BoundingBox::Type::OBB));
+	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(this, BoundingBox::Type::OBB));
 	CN(m_pBoundingVolume);
 
 	CR(UpdateBoundingVolume());
@@ -500,7 +500,7 @@ Error:
 RESULT DimObj::InitializeBoundingSphere() {
 	RESULT r = R_PASS;
 
-	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingSphere());
+	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingSphere(this));
 	CN(m_pBoundingVolume);
 
 	CR(UpdateBoundingVolume());

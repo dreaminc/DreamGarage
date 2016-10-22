@@ -1,16 +1,19 @@
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
+#include <algorithm>
 
-BoundingBox::BoundingBox(BoundingBox::Type type) :
-	BoundingVolume(),
+#include "VirtualObj.h"
+
+BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type) :
+	BoundingVolume(pParentObject),
 	m_type(type),
 	m_vHalfSize(vector(1.0f, 1.0f, 1.0f))
 {
 	// Empty
 }
 
-BoundingBox::BoundingBox(BoundingBox::Type type, point ptOrigin, vector vHalfSize) :
-	BoundingVolume(ptOrigin),
+BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptOrigin, vector vHalfSize) :
+	BoundingVolume(pParentObject, ptOrigin),
 	m_type(type),
 	m_vHalfSize(vHalfSize)
 {
@@ -63,13 +66,33 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 
 //bool Intersect(const point& pt) {
 bool BoundingBox::Intersect(point& pt) {
-	point ptMax = m_ptOrigin + m_vHalfSize;
-	point ptMin = m_ptOrigin - m_vHalfSize;
+	point ptMin = GetMinPoint();
+	point ptMax = GetMaxPoint();
 
-	if ((pt > ptMin) && (pt < ptMax))
+	if ((pt > ptMin) && (pt < ptMax)) {
 		return true;
-	else
+	}
+	else {
 		return false;
+	}
+}
+
+// https://tavianator.com/fast-branchless-raybounding-box-intersections/
+bool BoundingBox::Intersect(ray& r) {
+	double tmin = -INFINITY, tmax = INFINITY;
+	
+	point ptMin = GetMinPoint();
+	point ptMax = GetMaxPoint();
+
+	for (int i = 0; i < 3; i++) {
+		double t1 = (ptMin(i) - r.ptOrigin()(i)) / r.vDirection()(i);
+		double t2 = (ptMax(i) - r.ptOrigin()(i)) / r.vDirection()(i);
+
+		tmin = std::max(tmin, std::min(t1, t2));
+		tmax = std::min(tmax, std::max(t1, t2));
+	}
+
+	return (tmax >= tmin);
 }
 
 RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
@@ -87,4 +110,13 @@ double BoundingBox::GetHeight() {
 
 double BoundingBox::GetLength() {
 	return static_cast<double>(m_vHalfSize.z() * 2.0f);
+}
+
+// TODO: Why do we need to invert the point?
+point BoundingBox::GetMinPoint() {
+	return ((-1.0f * m_pParent->GetOrigin() - m_ptOrigin) - m_vHalfSize);
+}
+
+point BoundingBox::GetMaxPoint() {
+	return ((-1.0f * m_pParent->GetOrigin() - m_ptOrigin) + m_vHalfSize);
 }

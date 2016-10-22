@@ -74,6 +74,20 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 				ray rayCamera = pCamera->GetRay(mEvent->xPos, mEvent->yPos);
 
 				// intersect ray
+				auto intersectedObjects = m_pSceneGraph->GetObjects(rayCamera);
+
+				// TODO: Junk code:
+				for (auto &pObject : m_pSceneGraph->GetObjects()) {
+					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+					if (pDimObj != nullptr) {
+						pDimObj->SetColor(color(COLOR_WHITE));
+					}
+				}
+
+				for (auto &pObject : intersectedObjects) {
+					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+					pDimObj->SetColor(color(COLOR_RED));
+				}
 			}
 		} break;
 	}

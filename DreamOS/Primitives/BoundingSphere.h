@@ -12,16 +12,19 @@
 #include "vector.h"
 #include "line.h"
 
+class VirtualObj;
+
 class BoundingSphere : public BoundingVolume {
 public:
-	BoundingSphere();
-	BoundingSphere(point ptOrigin, float radius);
+	BoundingSphere(VirtualObj *pParentObject);
+	BoundingSphere(VirtualObj *pParentObject, point ptOrigin, float radius);
 
 	bool Intersect(const BoundingSphere& rhs);
 	bool Intersect(const BoundingBox& rhs);
 
 	bool Intersect(point& pt);
 	bool Intersect(line& ln);
+	virtual bool Intersect(ray& r) override;
 
 	float GetRadius() {
 		return m_radius;

@@ -1,4 +1,5 @@
 #include "ObjectStoreImpList.h"
+#include "Primitives/ray.h"
 
 ObjectStoreImpList::ObjectStoreImpList() :
 	m_pSkybox(nullptr)
@@ -107,4 +108,27 @@ VirtualObj *ObjectStoreImpList::FindObject(VirtualObj *pObject) {
 			return (*it);
 
 	return nullptr;
+}
+
+std::vector<VirtualObj*> ObjectStoreImpList::GetObjects() {
+	std::vector<VirtualObj*> objects = { std::begin(m_objects), std::end(m_objects) };
+	return objects;
+}
+
+std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(ray rCast) {
+	std::vector<VirtualObj*> intersectedObjects;
+
+	for (auto &object: m_objects) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(object);
+		
+		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr) {
+			continue; 
+		}
+
+		if (pDimObj->GetBoundingVolume()->Intersect(rCast)) {
+			intersectedObjects.push_back(pDimObj);
+		}
+	}
+
+	return intersectedObjects;
 }

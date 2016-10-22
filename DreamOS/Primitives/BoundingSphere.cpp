@@ -1,15 +1,15 @@
 #include "BoundingSphere.h"
 #include "BoundingBox.h"
 
-BoundingSphere::BoundingSphere() :
-	BoundingVolume(),
+BoundingSphere::BoundingSphere(VirtualObj *pParentObject) :
+	BoundingVolume(pParentObject),
 	m_radius(1.0f)
 {
 	// Empty
 }
 
-BoundingSphere::BoundingSphere(point ptOrigin, float radius) :
-	BoundingVolume(ptOrigin),
+BoundingSphere::BoundingSphere(VirtualObj *pParentObject, point ptOrigin, float radius) :
+	BoundingVolume(pParentObject, ptOrigin),
 	m_radius(radius)
 {
 	// Empty
@@ -51,6 +51,29 @@ bool BoundingSphere::Intersect(line& ln) {
 		return false;
 	else
 		return true;
+}
+
+// https://capnramses.github.io//opengl/raycasting.html
+bool BoundingSphere::Intersect(ray& r) {
+	vector vRayCircle = r.ptOrigin() - m_ptOrigin;
+	
+	float bValue = r.vDirection().dot(vRayCircle);
+	float cValue = vRayCircle.dot(vRayCircle) - pow(m_radius, 2.0f);
+	float resultValue = pow(bValue, 2.0f) - cValue;
+
+	if (resultValue < 0.0f) {
+		return false;
+	}
+	else if (resultValue == 0.0f) {
+		// TODO: return single intersection pt
+		return true;
+	}
+	else if (resultValue > 0.0f) {
+		// TODO: return double intersection pt
+		return true;
+	}
+
+	return false;
 }
 
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {

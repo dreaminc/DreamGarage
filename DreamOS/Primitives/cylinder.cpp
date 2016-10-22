@@ -31,6 +31,8 @@ cylinder::cylinder(double radius, double height, int numAngularDivisions, int nu
 	RESULT r = R_PASS;
 
 	CR(SetCylinderVertices(radius, height, numAngularDivisions, numVerticalDivisions));
+
+	// TODO: Allow for changing this - put it into a factory
 	CR(InitializeAABB());
 
 // Success:

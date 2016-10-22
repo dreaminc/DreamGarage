@@ -13,6 +13,8 @@
 #include "Primitives/light.h"
 #include "Primitives/skybox.h"
 
+class ray;
+
 class ObjectStoreImp {
 public:
 	// Objects
@@ -31,6 +33,9 @@ public:
 
 	// Skybox / Sphere
 	virtual RESULT GetSkybox(skybox*& pSkybox) = 0;
+
+	virtual std::vector<VirtualObj*> GetObjects() = 0;
+	virtual std::vector<VirtualObj*> GetObjects(ray rCast) = 0;
 };
 
 #endif // ! SCENE_GRAPH_STORE_H_

@@ -32,6 +32,9 @@ sphere::sphere(float radius, int numAngularDivisions, int numVerticalDivisions, 
 
 	CR(SetSphereVertices(radius, numAngularDivisions, numVerticalDivisions, c));
 
+	// TODO: Allow for changing this - put it into a factory
+	CR(InitializeAABB());
+
 // Success:
 	Validate();
 	return;

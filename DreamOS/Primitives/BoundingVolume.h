@@ -6,10 +6,12 @@
 // DREAM OS
 // DreamOS/Dimension/Primitives/BoundingVolume.h
 // Bounding Volume Generic Class - this can be sub-classed by specific versions of volumes like Boxes, Spheres or otherwise
-// TODO: bounding volume suggests volume as in volume in the engine, whcih is a rectilinear volume - but this is more general
+// TODO: bounding volume suggests volume as in volume in the engine, which is a rectilinear volume - but this is more general
 
 #include "point.h"
+#include "ray.h"
 
+class VirtualObj;
 class BoundingSphere;
 class BoundingBox;
 
@@ -22,13 +24,15 @@ public:
 	};
 
 public:
-	BoundingVolume() :
+	BoundingVolume(VirtualObj *pParentObject) :
+		m_pParent(pParentObject),
 		m_ptOrigin()
 	{
 		// Empty
 	}
 
-	BoundingVolume(point ptOrigin) :
+	BoundingVolume(VirtualObj *pParentObject, point ptOrigin) :
+		m_pParent(pParentObject),
 		m_ptOrigin(ptOrigin)
 	{
 		// Empty
@@ -41,6 +45,7 @@ public:
 
 	//bool Intersect(const point& pt) {
 	virtual bool Intersect(point& pt) = 0;
+	virtual bool Intersect(ray& r) = 0;
 	//TODO: virtual bool Intersect(const line& ln) = 0;
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
@@ -65,7 +70,8 @@ public:
 	virtual BoundingVolume::Type GetType() = 0;
 
 protected:
-	point m_ptOrigin;
+	point m_ptOrigin;	// TODO: rename to center point instead of origin?
+	VirtualObj *m_pParent;
 };
 
 #endif // !BOUNDING_VOLUME_H_

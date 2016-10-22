@@ -23,14 +23,15 @@ public:
 	};
 
 public:
-	BoundingBox(BoundingBox::Type type);
-	BoundingBox(BoundingBox::Type type, point ptOrigin, vector vHalfSize);
+	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type);
+	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptOrigin, vector vHalfSize);
 
 	bool Intersect(const BoundingSphere& rhs);
 	bool Intersect(const BoundingBox& rhs);
 
 	//bool Intersect(const point& pt) {
 	bool Intersect(point& pt);
+	virtual bool Intersect(ray& r) override;
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
@@ -41,6 +42,9 @@ public:
 	double GetWidth();
 	double GetHeight();
 	double GetLength();
+
+	point GetMinPoint();
+	point GetMaxPoint();
 
 protected:
 	BoundingBox::Type m_type;

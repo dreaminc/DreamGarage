@@ -1,6 +1,8 @@
 #include "ObjectStore.h"
 #include "ObjectStoreImpList.h"
 
+#include "Primitives/ray.h"
+
 ObjectStore::ObjectStore(ObjectStoreFactory::TYPE type) {
 	RESULT r = R_PASS;
 
@@ -70,6 +72,14 @@ VirtualObj *ObjectStore::FindObjectByUID(UID uid) {
 	return m_pSceneGraphStore->FindObjectByUID(uid);
 Error:
 	return NULL;
+}
+
+std::vector<VirtualObj*> ObjectStore::GetObjects() {
+	return m_pSceneGraphStore->GetObjects();
+}
+
+std::vector<VirtualObj*> ObjectStore::GetObjects(ray rCast) {
+	return m_pSceneGraphStore->GetObjects(rCast);
 }
 
 // TODO: Perhaps pass this to a scene graph handler (like physics etc)

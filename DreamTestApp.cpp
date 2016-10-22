@@ -33,7 +33,7 @@ RESULT DreamTestApp::LoadScene() {
 	*/
 
 	// TODO: sphere AABB
-	sphere *pSphere = AddSphere(0.5f, 10, 10, color(COLOR_RED));
+	sphere *pSphere = AddSphere(0.5f, 10, 10);
 	pSphere->MoveTo(1.5f, 0.5f, 0.0f);
 
 	g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
