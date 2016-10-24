@@ -89,6 +89,8 @@ public:
 
 	composite *GetFrameOfReferenceComposite();
 
+	quaternion GetWorldOrientation();
+
 	RESULT AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj> pDimObj);
 
 	RESULT SetFrameOfReferenceComposite(composite *pComposite);
@@ -108,7 +110,7 @@ protected:
 	camera_precision m_NearPlane;
 	camera_precision m_FarPlane;
 	PROJECTION_MATRIX_TYPE m_ProjectionType;
-	camera_precision m_FielfOfViewAngle;		// Note this is in degrees, not radians
+	camera_precision m_FieldOfViewAngle;		// Note this is in degrees, not radians
 
 	// TODO: Move to virtual object?
 	camera_precision m_cameraRotateSpeed;
