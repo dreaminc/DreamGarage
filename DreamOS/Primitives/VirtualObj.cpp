@@ -126,27 +126,29 @@ VirtualObj* VirtualObj::RotateBy(quaternion q) {
 	return this;
 }
 
-// TODO: This is not working
 VirtualObj* VirtualObj::RotateBy(quaternion_precision thetaX, quaternion_precision thetaY, quaternion_precision thetaZ) {
-	m_qRotation.RotateX(thetaX);
-	m_qRotation.RotateY(thetaY);
-	m_qRotation.RotateZ(thetaZ);
-	
+//	m_qRotation.RotateXYZ(thetaX, thetaY, thetaZ);
+	RotateXBy(thetaX);
+	RotateYBy(thetaY);
+	RotateZBy(thetaZ);
 	return this;
 }
 
 VirtualObj* VirtualObj::RotateXBy(quaternion_precision theta) {
-	m_qRotation.RotateX(theta);
+	m_qRotation.RotateByVector(vector::iVector(), theta);
+	m_qRotation.Normalize();
 	return this;
 }
 
 VirtualObj* VirtualObj::RotateYBy(quaternion_precision theta) {
-	m_qRotation.RotateY(theta);
+	m_qRotation.RotateByVector(vector::jVector(), theta);
+	m_qRotation.Normalize();
 	return this;
 }
 
 VirtualObj* VirtualObj::RotateZBy(quaternion_precision theta) {
-	m_qRotation.RotateZ(theta);
+	m_qRotation.RotateByVector(vector::kVector(), theta);
+	m_qRotation.Normalize();
 	return this;
 }
 
@@ -170,41 +172,20 @@ VirtualObj* VirtualObj::RotateZByDeg(quaternion_precision deg) {
 	return RotateZBy(deg * (M_PI / 180.f));
 }
 		   
-// TODO: This is reproduced, choose one
 VirtualObj* VirtualObj::SetRotate(quaternion q) {
 	m_qRotation = q;
 	m_qRotation.Normalize();
-
 	return this;
 }
 
 VirtualObj* VirtualObj::SetOrientation(quaternion qOrientation) {
 	m_qRotation = qOrientation;
 	m_qRotation.Normalize();
-
 	return this;
 }
 
 VirtualObj* VirtualObj::SetRotate(quaternion_precision x, quaternion_precision y, quaternion_precision z) {
-	m_qRotation = quaternion::iQuaternion(x) * quaternion::jQuaternion(y) * quaternion::kQuaternion(z);
-	return this;
-}
-
-VirtualObj* VirtualObj::SetRotateX(quaternion_precision theta) {
-	m_qRotation = quaternion::iQuaternion(theta) * quaternion::jQuaternion(m_qRotation.GetEulerAngelY()) * quaternion::kQuaternion(m_qRotation.GetEulerAngelZ());
-	m_qRotation.Normalize();
-	return this;
-}
-
-VirtualObj* VirtualObj::SetRotateY(quaternion_precision theta) {
-	m_qRotation = quaternion::iQuaternion(m_qRotation.GetEulerAngelX()) * quaternion::jQuaternion(theta) * quaternion::kQuaternion(m_qRotation.GetEulerAngelZ());
-	m_qRotation.Normalize();
-	return this;
-}
-
-VirtualObj* VirtualObj::SetRotateZ(quaternion_precision theta) {
-	m_qRotation = quaternion::iQuaternion(m_qRotation.GetEulerAngelX()) * quaternion::jQuaternion(m_qRotation.GetEulerAngelY()) * quaternion::kQuaternion(theta);
-	m_qRotation.Normalize();
+	m_qRotation = quaternion::MakeQuaternionWithEuler(x, y, z);
 	return this;
 }
 
@@ -214,6 +195,39 @@ VirtualObj* VirtualObj::SetRotateDeg(quaternion_precision degX, quaternion_preci
 	quaternion_precision thetaZ = degZ * (M_PI / 180.f);
 
 	return SetRotate(degX, degY, degZ);
+}
+
+VirtualObj* VirtualObj::ResetRotation() {
+	m_qRotation.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
+	return this;
+}
+
+/* Unsupported
+VirtualObj* VirtualObj::SetRotateX(quaternion_precision theta) {
+	//m_qRotation = quaternion::iQuaternion(theta) * quaternion::jQuaternion(m_qRotation.GetEulerAngleY()) * quaternion::kQuaternion(m_qRotation.GetEulerAngleZ());
+	quaternion_precision x, y, z;
+	m_qRotation.GetEulerAngles(&x, &y, &z);
+	m_qRotation = quaternion::MakeQuaternionWithEuler(theta, y, z);
+	m_qRotation.Normalize();
+	return this;
+}
+
+VirtualObj* VirtualObj::SetRotateY(quaternion_precision theta) {
+//	m_qRotation = quaternion::iQuaternion(m_qRotation.GetEulerAngleX()) * quaternion::jQuaternion(theta) * quaternion::kQuaternion(m_qRotation.GetEulerAngleZ());
+	quaternion_precision x, y, z;
+	m_qRotation.GetEulerAngles(&x, &y, &z);
+	m_qRotation = quaternion::MakeQuaternionWithEuler(x, theta, z);
+	m_qRotation.Normalize();
+	return this;
+}
+
+VirtualObj* VirtualObj::SetRotateZ(quaternion_precision theta) {
+	//m_qRotation = quaternion::iQuaternion(m_qRotation.GetEulerAngleX()) * quaternion::jQuaternion(m_qRotation.GetEulerAngleY()) * quaternion::kQuaternion(theta);
+	quaternion_precision x, y, z;
+	m_qRotation.GetEulerAngles(&x, &y, &z);
+	m_qRotation = quaternion::MakeQuaternionWithEuler(x, y, theta);
+	m_qRotation.Normalize();
+	return this;
 }
 
 VirtualObj* VirtualObj::SetRotateXDeg(quaternion_precision deg) {
@@ -227,6 +241,7 @@ VirtualObj* VirtualObj::SetRotateYDeg(quaternion_precision deg) {
 VirtualObj* VirtualObj::SetRotateZDeg(quaternion_precision deg) {
 	return SetRotateZ(deg * (M_PI / 180.f));
 }
+//*/
 
 quaternion VirtualObj::GetOrientation() {
 	return m_qRotation;

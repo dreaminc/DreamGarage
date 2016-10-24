@@ -27,6 +27,15 @@ Error:
 	return r;
 }
 
+// Rotation testing TODO: move to seperate app
+/*
+volume *pVolume;
+composite *pVolume2;
+volume *pVolume3;
+volume *pVolume4;
+std::vector<composite*> bears;
+//*/
+
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
@@ -80,6 +89,8 @@ RESULT DreamGarage::LoadScene() {
 
 	texture *pColorTextureCobble = MakeTexture(L"cobblestone_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	texture *pHeightTextureCobble = MakeTexture(L"cobblestone_height.jpg", texture::TEXTURE_TYPE::TEXTURE_HEIGHT);
+	
+//	texture *dwarf = MakeTexture(L"..\\Models\\Dwarf\\dwarf_2_1K_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	//texture *pColorTextureTest = MakeTexture(L"asymmetrical.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 //*/
@@ -128,6 +139,55 @@ RESULT DreamGarage::LoadScene() {
 	pBQuad->MoveTo(point(0.0f, -1.5f, 0.0f));
 	//pBQuad->SetColorTexture(pColorTextureCobble);
 	//pBQuad->SetBumpTexture(pBumpTexture);
+
+// Rotation testing TODO: move to seperate app
+/*
+	pVolume = AddVolume(0.5f, 1.5f, 0.7f);
+	pVolume->MoveTo(point(0.0f, 1.0f, 0.0f));
+	
+	pVolume->RotateXBy(10000.0f*float(M_PI));
+/*
+	pVolume2 = AddVolume(0.5f, 1.5f, 0.7f);
+	pVolume2->MoveTo(point(0.0f, 2.0f, 0.0f));
+	pVolume2->SetColorTexture(dwarf);
+	//pVolume2->SetRotateX(float(M_PI) / 2.0f);
+
+	pVolume2 = AddModel(L"\\Models\\Bear\\bear-obj.obj",
+		nullptr,
+		point(-0.0f, -1.0f, 1.0f),
+		0.1f,
+		vector(0.0f, 0.0f, 0.0f));
+
+	//pVolume2->RotateXByDeg(90.0f);
+	//pVolume2->RotateYBy(2.0f*(float)M_PI_2);
+	//pVolume2->RotateZByDeg(90.0f);
+	//pVolume2->RotateXByDeg(90.0f);
+	//pVolume2->RotateZByDeg(90.0f);
+//	pVolume2->RotateYByDeg(45.0f);
+	//pVolume2->RotateByDeg(90.0f, 90.0f, 90.0f);
+	quaternion_precision pi2 = (quaternion_precision)M_PI_2;
+	pVolume2->RotateBy(pi2, pi2, pi2);
+
+	//pVolume2->SetRotate((float)M_PI_2, 0.0f, 0.0f);
+	//pVolume2->RotateZByDeg(90.0f);
+
+
+	pVolume3 = AddVolume(0.5f, 1.5f, 0.7f);
+	pVolume3->MoveTo(point(0.0f, 3.0f, 0.0f));
+
+	quaternion q = pVolume3->GetOrientation();
+	quaternion_precision x, y, z;
+	q.GetEulerAngles(&x, &y, &z);
+	quaternion q2 = quaternion::MakeQuaternionWithEuler(x, y, z);
+
+	pVolume4 = AddVolume(0.5f, 1.5f, 0.7f);
+	pVolume4->MoveTo(point(0.0f, 4.0f, 0.0f));
+
+	//pVolume2->SetRotateY(2.0f*float(M_PI_4));
+	//pVolume2->SetRotateX(1.0f*float(M_PI_4));
+	//pVolume2->SetRotateZ(2.0f*float(M_PI_4));
+	//pVolume2->SetRotateY(1.0f*float(M_PI_4));
+
 //*/
 	
 	// Add billboards
@@ -143,7 +203,7 @@ RESULT DreamGarage::LoadScene() {
 //*/
 
 	// Add spheres
-///*
+/*
 	m_pSphere = AddSphere(1.0f, 30, 30, color(COLOR_RED));
 	m_pSphere->MoveTo(0.0f, 2.0f, 0.0f);
 
@@ -159,19 +219,13 @@ RESULT DreamGarage::LoadScene() {
 //*/
 
 	// Add volumes
-///*
+/*
 	volume *pVolume = AddVolume(1.0f);
 	pVolume->translateX(5.0f);
 //*/
 
 	// Add models
 ///*
-	AddModel(L"\\Models\\Bear\\bear-obj.obj",
-		nullptr,
-		point(-4.5f, -4.8f - 2.6f, 0.0f),
-		0.1f,
-		vector(0.0f, 0.0f, 0.0f));
-
 	AddModel(L"\\Models\\Boar\\boar-obj.obj",
 		nullptr,
 		point(-3.0f, -4.2f - 2.5f, 0.0f),
@@ -297,9 +351,45 @@ RESULT DreamGarage::Update(void) {
 				childObj->RotateYBy(0.001f);
 			}
 		}
-	}
 ///*
-	m_pSphere->translateX(0.001f);
+		m_pSphere->translateX(0.001f);
+	}
+// Rotation testing TODO: move to seperate app
+/*
+//	pVolume->RotateXBy(0.01f);
+//	pVolume->RotateYBy(0.01f);
+	quaternion q = pVolume->GetOrientation();
+//	DEBUG_LINEOUT("%f %f %f %f", q.w(), q.x(), q.y(), q.z());
+//	pVolume->RotateZBy(0.01f);
+	tick += 0.002f;
+	//pVolume2->SetRotateY(float(3.0f*M_PI_4));
+//	pVolume2->SetRotateY(tick);
+	//pVolume2->SetRotateZ((float)M_PI_4);
+//	pVolume2->SetRotateX(tick*10.0f);
+	//pVolume2->SetRotateZ(-1.0f*(float)M_PI_4);
+	//pVolume2->SetRotateZ((float)M_PI_4);
+//	pVolume2->SetRotateY((float)M_PI_4);
+	//pVolume2->SetRotateY(tick);
+	//pVolume2->SetRotateX((float)M_PI_4);
+	float fpi4 = (float)M_PI_4;
+
+//	pVolume2->RotateXBy(0.002f);
+//	pVolume2->RotateZBy(0.002f);
+	//pVolume2->SetRotate(0.0f, tick, fpi4);
+	//pVolume2->SetRotateX(fpi4);
+	//pVolume2->SetRotateY(tick);
+	//pVolume2->SetRotateZ(fpi4);
+	//pVolume2->SetRotateZ(tick);
+	//pVolume2->SetRotateX(10000.0f*float(M_PI));
+	//pVolume2->SetRotateZ(-1.0f*(float)M_PI_4);
+
+	//pVolume2->SetRotateZ((float)M_PI_2);
+//	pVolume2->SetRotateZ(tick*1.0f);
+	//pVolume2->SetRotateX(0.5f);
+	//pVolume2->SetRotateZ(0.5f);
+//	quaternion q2 = pVolume2->GetOrientation();
+	//DEBUG_LINEOUT("%f %f %f %f         %f %f %f %f", q.w(), q.x(), q.y(), q.z(), q2.w(), q2.x(), q2.y(), q2.z());
+//	pVolume2->SetRotateZ(tick);
 //*/
 
 #endif
