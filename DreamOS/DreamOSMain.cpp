@@ -29,14 +29,14 @@ int main(int argc, const char *argv[]) {
 	system("pause");
 
 	return (int)(r);
-#elif defined(_USER_TEST_APP)
-	DreamGarage dreamGarageApp;
-	CRM(dreamGarageApp.Initialize(argc, argv), "Failed to initialize Dream Garage");
-	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine
-#else
+#elif defined(_USE_TEST_APP)
 	DreamTestApp dreamTestApp;
 	CRM(dreamTestApp.Initialize(argc, argv), "Failed to initialize Dream Test App");
 	CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+#else
+	DreamGarage dreamGarageApp;
+	CRM(dreamGarageApp.Initialize(argc, argv), "Failed to initialize Dream Garage");
+	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine
 #endif
 
 //Success:

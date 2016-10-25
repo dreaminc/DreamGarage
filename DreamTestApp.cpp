@@ -18,6 +18,7 @@ RESULT DreamTestApp::LoadScene() {
 	AddSkybox();
 
 	light *pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+
 	//pLight->EnableShadows();
 
 	/*
@@ -39,6 +40,14 @@ RESULT DreamTestApp::LoadScene() {
 	g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
 	g_pCylinder->MoveTo(0.0f, -1.0f, -2.0f);
 	//pCylinder->SetWireframe(true);
+
+	/*
+	AddModel(L"\\Models\\the-hague-apartment\\the-hague-apartment-fix.obj",
+		nullptr,
+		point(0.0f, 0.0f, 0.0f),
+		0.1f,
+		vector((float)(M_PI_2), 0.0f, 0.0f));
+	//*/
 
 	//Error:
 	return r;

@@ -94,6 +94,7 @@ void main(void) {
 
 	// Vert Color
 	DataOut.color = inV_vec4Color;
+	//DataOut.color = vec4(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// Projected Vert Position
 	gl_Position = u_mat4ViewProjection * vertWorldSpace;

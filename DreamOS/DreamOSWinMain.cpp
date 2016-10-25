@@ -4,10 +4,16 @@
 #include "RESULT/EHM.h"
 
 #include "../DreamGarage.h"
+#include "../DreamTestApp.h"
+#include "test/MatrixTestSuite.h"
 
 #include <string>
 
-// we use window subsystem in PRODUCTION build to allow Dream to run without a console window
+// We use window subsystem in PRODUCTION build to allow Dream to run without a console window
+
+// TODO: some other better way?
+#define _USE_TEST_APP	
+//#define _UNIT_TESTING
 
 #ifdef _WINDOWS
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -22,30 +28,41 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	int argc;
 
 	wargv = CommandLineToArgvW(GetCommandLine(), &argc);
-	
 	char** argv = new char*[argc];
-
 	std::vector<std::string> args;
 
-	for (int i = 0; i < argc; i++)
-	{
+	for (int i = 0; i < argc; i++) {
 		std::wstring warg(wargv[i]);
 		args.push_back(std::string(warg.begin(), warg.end()));
 	}
 
-	for (int i = 0; i < argc; i++)
-	{
+	for (int i = 0; i < argc; i++) {
 		argv[i] = new char;
 		argv[i] = (char*)args[i].c_str();
 	}
 	// now argc,argv are available and will get destroyed on exit
 
-	DreamGarage dreamGarageApp;
+#if defined(_UNIT_TESTING)
+	// TODO: Replace this with a real unit testing framework in testing filter
+	MatrixTestSuite matrixTestSuite;
 
-	CRM(dreamGarageApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+	matrixTestSuite.Initialize();
+	CRM(matrixTestSuite.RunTests(), "Failed to run matrix test suite tests");
 
+	DEBUG_LINEOUT("Unit tests complete 0x%x result", r);
+	system("pause");
+
+	return (int)(r);
+#elif defined(_USE_TEST_APP)
+	DreamTestApp dreamTestApp;
+	CRM(dreamTestApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+	CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+#else
 	// This is the entry point for the DreamOS Engine
-	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");
+	DreamGarage dreamGarageApp;
+	CRM(dreamGarageApp.Initialize(argc, (const char**)argv), "Failed to initialize Dream Garage");
+	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine
+#endif
 
 	//Success:
 	return (int)(r);
