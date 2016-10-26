@@ -12,6 +12,7 @@
 #include "Cloud/Environment/PeerConnection.h"
 
 #include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
 
 WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 	CloudImp(pParentCloudController),
@@ -74,11 +75,21 @@ RESULT WebRTCImp::Update() {
 }
 
 User WebRTCImp::GetUser() {
-	return GetParentCloudController()->GetUser();
+	return m_currentUser;
 }
 
 TwilioNTSInformation WebRTCImp::GetTwilioNTSInformation() {
-	return GetParentCloudController()->GetTwilioNTSInformation();
+	return m_twilioNTSInformation;
+}
+
+RESULT WebRTCImp::SetUser(User currentUser) {
+	m_currentUser = currentUser;
+	return R_PASS;
+}
+
+RESULT WebRTCImp::SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) {
+	m_twilioNTSInformation = twilioNTSInformation;
+	return R_PASS;
 }
 
 // WebRTC Specific

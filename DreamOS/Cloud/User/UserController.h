@@ -10,8 +10,9 @@
 #include "Cloud/Controller.h"
 
 #include <string>
-#include "User.h"
-#include "TwilioNTSInformation.h"
+
+#include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
 
 // TODO: This is actually a UserController - so change the name of object and file
 class UserController : public Controller {
@@ -50,17 +51,9 @@ private:
 public:
 	RESULT Login(std::string& strUsername, std::string& strPassword);
 
-	long GetUserDefaultEnvironmentID() {
-		return m_user.GetDefaultEnvironmentID();
-	}
-
-	User GetUser() {
-		return m_user;
-	}
-
-	TwilioNTSInformation GetTwilioNTSInformation() {
-		return m_twilioNTSInformation;
-	}
+	long GetUserDefaultEnvironmentID();
+	User GetUser();
+	TwilioNTSInformation GetTwilioNTSInformation();
 
 	long GetUserID() { return m_user.GetUserID(); }
 

@@ -19,11 +19,12 @@
 
 #include "WebRTCConductor.h"
 
+#include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
+
 class WebRTCClient;
 class WebRTCICECandidate;
 class PeerConnection;
-class user;
-class TwilioNTSInformation;
 
 class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp>, public WebRTCConductor::WebRTCConductorObserver {
 public:
@@ -57,6 +58,9 @@ public:
 	RESULT Update();
 	virtual User GetUser() override;
 	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
+
+	virtual RESULT SetUser(User currentUser) override;
+	virtual RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) override;
 
 	bool IsConnected(long peerConnectionID);
 	bool IsOfferer(long peerConnectionID);
@@ -105,10 +109,11 @@ private:
 	rtc::Win32Thread m_Win32thread;
 
 	DWORD m_UIThreadID;
-
 	std::string m_strServer;
-
 	WebRTCObserver *m_pWebRTCObserver;
+
+	User m_currentUser;
+	TwilioNTSInformation m_twilioNTSInformation;
 };
 
 #endif	// ! WEBRTC_IMP_H_

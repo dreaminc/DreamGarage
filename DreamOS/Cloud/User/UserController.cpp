@@ -86,6 +86,18 @@ Error:
 	return r;
 }
 
+long UserController::GetUserDefaultEnvironmentID() {
+	return m_user.GetDefaultEnvironmentID();
+}
+
+User UserController::GetUser() {
+	return m_user;
+}
+
+TwilioNTSInformation UserController::GetTwilioNTSInformation() {
+	return m_twilioNTSInformation;
+}
+
 RESULT UserController::LoginFromCommandline() {
 	RESULT r = R_PASS;
 

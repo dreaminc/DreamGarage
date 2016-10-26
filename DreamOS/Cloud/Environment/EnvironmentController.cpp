@@ -697,6 +697,14 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::SetUser(User currentUser) {
+	return m_pPeerConnectionController->SetUser(currentUser);
+}
+
+RESULT EnvironmentController::SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) {
+	return m_pPeerConnectionController->SetTwilioNTSInformation(twilioNTSInformation);
+}
+
 RESULT EnvironmentController::OnPeersUpdate(long index) {
 	RESULT r = R_NOT_IMPLEMENTED;
 

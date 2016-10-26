@@ -65,7 +65,6 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
-
 	RESULT Start();
 	RESULT Stop();
 
@@ -105,7 +104,6 @@ public:
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-
 
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

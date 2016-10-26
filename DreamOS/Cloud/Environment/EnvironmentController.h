@@ -16,7 +16,9 @@
 #include "EnvironmentPeer.h"
 #include "PeerConnectionController.h"
 
-class User;
+#include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
+
 class Websocket;
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -120,6 +122,9 @@ public:
 
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT SetUser(User currentUser);
+	RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation);
 
 public:
 	EnvironmentController::state GetState() {

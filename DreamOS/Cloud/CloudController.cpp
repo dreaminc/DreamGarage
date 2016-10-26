@@ -366,10 +366,13 @@ RESULT CloudController::LoginUser() {
 	HUD_OUT("Loading user profile...");
 
 	// Get user profile
-	CRM(m_pUserController->LoadProfile(), "Failed to load profile");
-
 	// TODO: This should go into an API controller
+	CRM(m_pUserController->LoadProfile(), "Failed to load profile");
 	CRM(m_pUserController->LoadTwilioNTSInformation(), "Failed to load Twilio NTS information");
+
+	// Set this in the cloud implementation
+	m_pEnvironmentController->SetTwilioNTSInformation(m_pUserController->GetTwilioNTSInformation());
+	m_pEnvironmentController->SetUser(m_pUserController->GetUser());
 
 	// Set up environment
 	//CR(InitializeEnvironment(m_pUserController->GetUserDefaultEnvironmentID()));
