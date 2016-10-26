@@ -1,3 +1,5 @@
+#include "Logger/Logger.h"
+
 #include "WebRTCPeerConnection.h"
 
 #include "WebRTCConductor.h"
@@ -100,8 +102,7 @@ RESULT WebRTCPeerConnection::AddStreams() {
 
 	// Add streams
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
-		LOG(LS_ERROR) << "Adding stream to PeerConnection failed";
-		LOG(INFO) << "Adding stream to PeerConnection failed";
+		LOG(ERROR) << "Adding stream to PeerConnection failed";
 	}
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
@@ -208,7 +209,26 @@ std::list<WebRTCICECandidate> WebRTCPeerConnection::GetICECandidates() {
 // PeerConnectionObserver Interface
 void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
 	DEBUG_LINEOUT("OnAddStream: %s", stream->label().c_str());
-	LOG(INFO) << "OnAddStream: " << stream->label();
+	LOG(INFO) << "added " << stream->label() << " me=" << m_peerConnectionID;
+
+	if (!stream) {
+		LOG(ERROR) << "cannot add stream";
+		return;
+	}
+
+	if (!stream->FindAudioTrack(kAudioLabel)) {
+		LOG(ERROR) << "cannot FindAudioTrack";
+		return;
+	}
+
+	if (!stream->FindAudioTrack(kAudioLabel)->GetSource()) {
+		LOG(ERROR) << "cannot GetSource";
+		return;
+	}
+
+	stream->FindAudioTrack(kAudioLabel)->GetSource()->AddSink(this);
+
+	LOG(INFO) << "added sink";
 
 	// TODO:
 	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_STREAM_ADDED, stream.release());
@@ -235,6 +255,22 @@ void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelI
 	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_DATA, stream.release());
 
 	channel->RegisterObserver(this);
+}
+
+void WebRTCPeerConnection::OnData(const void* audio_data,
+	int bits_per_sample,
+	int sample_rate,
+	size_t number_of_channels,
+	size_t number_of_frames)
+{
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnAudioData(m_peerConnectionID,
+			audio_data,
+			bits_per_sample,
+			sample_rate,
+			number_of_channels,
+			number_of_frames);
+	}
 }
 
 // TODO: Add callbacks
@@ -380,7 +416,7 @@ void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* c
 	iceCandidate.m_strSDPMediaID = candidate->sdp_mid();
 
 	if (!candidate->ToString(&(iceCandidate.m_strSDPCandidate))) {
-		LOG(LS_ERROR) << "Failed to serialize candidate";
+		LOG(ERROR) << "Failed to serialize candidate";
 		return;
 	}
 

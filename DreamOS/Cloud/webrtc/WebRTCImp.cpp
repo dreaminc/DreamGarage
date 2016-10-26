@@ -283,6 +283,22 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::OnAudioData(long peerConnectionID,
+	const void* audio_data,
+	int bits_per_sample,
+	int sample_rate,
+	size_t number_of_channels,
+	size_t number_of_frames) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnAudioData(peerConnectionID, audio_data, bits_per_sample, sample_rate, number_of_channels, number_of_frames));
+	}
+
+Error:
+	return r;
+}
+
 // Fill this out and junk
 // TODO: REMOVE DEAD CODE
 RESULT WebRTCImp::OnSDPOfferSuccess(long peerConnectionID) {

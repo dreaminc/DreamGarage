@@ -2077,6 +2077,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
       <Filter>Cloud\User</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
+      <Filter>Cloud\Message</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2282,6 +2285,9 @@
     </Image>
     <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
       <Filter>Models\face4</Filter>
+    </Image>
+    <Image Include="..\..\..\Texture\mouth.png">
+      <Filter>Texture</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

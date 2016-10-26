@@ -57,6 +57,12 @@ public:
 		virtual RESULT OnPeersUpdate(long index) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID,
+			const void* audio_data,
+			int bits_per_sample,
+			int sample_rate,
+			size_t number_of_channels,
+			size_t number_of_frames) = 0;
 		virtual long GetUserID() = 0;
 	};
 
@@ -108,6 +114,12 @@ private:
 	virtual RESULT OnPeersUpdate(long index) override;
 	virtual RESULT OnDataChannelStringMessage(long peerUserID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnAudioData(long peerConnectionID,
+		const void* audio_data,
+		int bits_per_sample,
+		int sample_rate,
+		size_t number_of_channels,
+		size_t number_of_frames) override;
 	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;

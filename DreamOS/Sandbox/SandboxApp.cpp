@@ -410,6 +410,10 @@ RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCall
 	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
 }
 
+RESULT SandboxApp::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
+	return m_pCloudController->RegisterAudioDataCallback(fnHandleAudioDataCallback);
+}
+
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pCloudController->SendDataMessage(userID, pDataMessage);
 }

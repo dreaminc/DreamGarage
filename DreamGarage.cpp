@@ -11,6 +11,7 @@ light *g_pLight2 = nullptr;
 #include "Cloud/CloudController.h"
 #include "Cloud/Message/UpdateHeadMessage.h"
 #include "Cloud/Message/UpdateHandMessage.h"
+#include "Cloud/Message/AudioDataMessage.h"
 
 // TODO: Should this go into the DreamOS side?
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
@@ -22,6 +23,7 @@ RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 	CR(RegisterDataMessageCallback(std::bind(&DreamGarage::HandleDataMessage, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterHeadUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHeadMessage, this, std::placeholders::_1, std::placeholders::_2)));
 	CR(RegisterHandUpdateMessageCallback(std::bind(&DreamGarage::HandleUpdateHandMessage, this, std::placeholders::_1, std::placeholders::_2)));
+	CR(RegisterAudioDataCallback(std::bind(&DreamGarage::HandleAudioData, this, std::placeholders::_1, std::placeholders::_2)));
 
 Error:
 	return r;
@@ -47,7 +49,7 @@ RESULT DreamGarage::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
-	for (auto x : std::array<int, 5>()) {
+	for (auto x : std::array<int, 8>()) {
 		user* pNewUser = AddUser();
 		pNewUser->SetVisible(false);
 		m_usersPool.push_back(pNewUser);
@@ -336,9 +338,10 @@ std::chrono::system_clock::time_point g_lastHeadUpdateTime = std::chrono::system
 #define UPDATE_HAND_COUNT_MS ((1000.0f) / UPDATE_HAND_COUNT_THROTTLE)
 std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system_clock::now();
 
+
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
-
+	
 #ifdef TESTING
 ///*
 	// Update stuff ...
@@ -498,9 +501,13 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) {
 	RESULT r = R_PASS;
 	LOG(INFO) << "data received";
-	std::string st((char*)pDataMessage);
-	st = "<- " + st;
-	HUD_OUT(st.c_str());
+
+	if (pDataMessage) {
+		std::string st((char*)pDataMessage);
+		st = "<- " + st;
+		HUD_OUT(st.c_str());
+	}
+
 	/*
 	Message::MessageType switchHeadModelMessage = (Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1);
 
@@ -516,6 +523,11 @@ Error:
 
 user*	DreamGarage::ActivateUser(long userId) {
 	if (m_peerUsers.find(userId) == m_peerUsers.end()) {
+		if (m_usersPool.empty()) {
+			LOG(ERROR) << "cannot activate a new user, no reserved users exist";
+			return nullptr;
+		}
+
 		m_peerUsers[userId] = m_usersPool.back();
 		m_usersPool.pop_back();
 
@@ -570,6 +582,35 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 
 	handState = pUpdateHandMessage->GetHandState();
 	pUser->UpdateHand(handState);
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::HandleAudioData(long senderUserID, AudioDataMessage *pAudioDataMessage) {
+	RESULT r = R_PASS;
+
+	user* pUser = ActivateUser(senderUserID);
+
+	WCN(pUser);
+
+	auto msg = pAudioDataMessage->GetAudioData();
+
+	size_t size = msg.number_of_channels * msg.number_of_frames;
+	float average = 0;
+
+	for (int i = 0; i < size; ++i) {
+		int16_t val = *(static_cast<const int16_t*>(msg.audio_data) + i);
+		if (abs(val) > 10)
+			average += abs(val);
+	}
+
+	float mouthScale = average / size / 1000.0f;
+
+	if (mouthScale > 1.0f) mouthScale = 1.0f;
+	if (mouthScale < 0.1f) mouthScale = 0.0f;
+
+	pUser->UpdateMouth(mouthScale);
 
 Error:
 	return r;

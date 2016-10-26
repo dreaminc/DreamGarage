@@ -107,7 +107,12 @@ RESULT camera::MoveForward(camera_precision amt) {
 	return R_PASS;
 }
 
-RESULT camera::Strafe(camera_precision amt) {
+RESULT camera::MoveUp(camera_precision amt) {
+	m_ptOrigin += GetUpVector() * amt;
+	return R_PASS;
+}
+
+RESULT camera::MoveStrafe(camera_precision amt) {
 	m_ptOrigin += GetRightVector() * amt;
 	return R_PASS;
 }
@@ -239,13 +244,13 @@ RESULT camera::UpdateFromKeyboardState(SenseKeyboard *pSK) {
 	uint8_t state = pSK->GetKeyState(SK_LEFT);
 	if (state) {
 		DEBUG_LINEOUT("strafe");
-		Strafe(0.1f);
+		MoveStrafe(0.1f);
 	}
 
 	state = pSK->GetKeyState(SK_RIGHT);
 	//pSK->CheckKeyState((SK_SCAN_CODE)('D'))
 	if (state) {
-		Strafe(-0.1f);
+		MoveStrafe(-0.1f);
 	}
 
 	state = pSK->GetKeyState(SK_UP);

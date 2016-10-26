@@ -39,8 +39,16 @@ public:
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
+		
+		virtual RESULT OnAudioData(long peerConnectionID,
+			const void* audio_data,
+			int bits_per_sample,
+			int sample_rate,
+			size_t number_of_channels,
+			size_t number_of_frames) = 0;
 	};
 
 	friend class WebRTCImp;
@@ -65,8 +73,16 @@ public:
 	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+
 	virtual User GetUser() override;
 	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
+
+	virtual RESULT OnAudioData(long peerConnectionID,
+		const void* audio_data,
+		int bits_per_sample,
+		int sample_rate,
+		size_t number_of_channels,
+		size_t number_of_frames) override;
 
 private:
 	RESULT ClearPeerConnections();
