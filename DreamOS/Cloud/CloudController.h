@@ -26,6 +26,8 @@
 class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
+class User;
+class TwilioNTSInformation;
 
 typedef std::function<RESULT(long)> HandlePeersUpdateCallback;
 
@@ -74,6 +76,9 @@ public:
 	RESULT LoginUser();
 	RESULT Update();
 	void Login();
+
+	User GetUser();
+	TwilioNTSInformation GetTwilioNTSInformation();
 
 	virtual long GetUserID() override;
 

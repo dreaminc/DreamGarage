@@ -16,6 +16,8 @@
 #include "WebRTCICECandidate.h"
 
 class WebRTConductor;
+class User;
+class TwilioNTSInformation;
 
 class WebRTCPeerConnection : 
 	public webrtc::PeerConnectionObserver, 
@@ -34,6 +36,9 @@ public:
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+
+		virtual User GetUser() = 0;
+		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 	};
 
 	friend class WebRTCPeerConnectionObserver;

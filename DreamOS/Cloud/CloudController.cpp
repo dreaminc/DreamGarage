@@ -10,6 +10,9 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include "User/User.h"
+#include "User/TwilioNTSInformation.h"
+
 #include <chrono>
 #include <thread>
 
@@ -44,7 +47,7 @@ RESULT CloudController::ProcessingThread() {
 
 	m_fRunning = true;
 
-	CR(Initialize());
+	//CR(Initialize());
 
 	//std::this_thread::sleep_for(std::chrono::seconds(3));
 
@@ -333,9 +336,16 @@ Error:
 }
 */
 
-void CloudController::Login()
-{
+void CloudController::Login() {
 	LoginUser();
+}
+
+User CloudController::GetUser() {
+	return m_pUserController->GetUser();
+}
+
+TwilioNTSInformation CloudController::GetTwilioNTSInformation() {
+	return m_pUserController->GetTwilioNTSInformation();
 }
 
 RESULT CloudController::LoginUser() {
@@ -357,6 +367,9 @@ RESULT CloudController::LoginUser() {
 
 	// Get user profile
 	CRM(m_pUserController->LoadProfile(), "Failed to load profile");
+
+	// TODO: This should go into an API controller
+	CRM(m_pUserController->LoadTwilioNTSInformation(), "Failed to load Twilio NTS information");
 
 	// Set up environment
 	//CR(InitializeEnvironment(m_pUserController->GetUserDefaultEnvironmentID()));

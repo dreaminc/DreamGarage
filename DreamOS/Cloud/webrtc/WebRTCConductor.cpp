@@ -20,6 +20,9 @@
 #include "WebRTCICECandidate.h"
 #include "Cloud/Environment/PeerConnection.h"
 
+#include "Cloud/User/User.h"
+#include "Cloud//User/TwilioNTSInformation.h"
+
 WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 	m_pParentObserver(pParetObserver),
 	m_pWebRTCPeerConnectionFactory(nullptr)
@@ -359,6 +362,14 @@ RESULT WebRTCConductor::OnDataChannelMessage(long peerConnectionID, uint8_t *pDa
 	}
 
 	return R_NOT_HANDLED;
+}
+
+User WebRTCConductor::GetUser() {
+	return m_pParentObserver->GetUser();
+}
+
+TwilioNTSInformation WebRTCConductor::GetTwilioNTSInformation() {
+	return m_pParentObserver->GetTwilioNTSInformation();
 }
 
 RESULT WebRTCConductor::SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage) {

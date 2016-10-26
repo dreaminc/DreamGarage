@@ -37,6 +37,7 @@ public:
 
 	CloudController* GetParentCloudController() { return m_pParentCloudController; }
 
+
 private:
 	CloudController *m_pParentCloudController;
 	UID m_uid;

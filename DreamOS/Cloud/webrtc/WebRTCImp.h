@@ -22,6 +22,8 @@
 class WebRTCClient;
 class WebRTCICECandidate;
 class PeerConnection;
+class user;
+class TwilioNTSInformation;
 
 class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp>, public WebRTCConductor::WebRTCConductorObserver {
 public:
@@ -53,6 +55,8 @@ public:
 	RESULT RegisterObserver(WebRTCObserver *pWebRTCObserver);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT Update();
+	virtual User GetUser() override;
+	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
 
 	bool IsConnected(long peerConnectionID);
 	bool IsOfferer(long peerConnectionID);

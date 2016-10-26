@@ -11,6 +11,8 @@
 #include "Cloud/CloudController.h"
 #include "Cloud/Environment/PeerConnection.h"
 
+#include "Cloud/User/User.h"
+
 WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 	CloudImp(pParentCloudController),
 	m_pWebRTCConductor(nullptr),
@@ -69,6 +71,14 @@ RESULT WebRTCImp::CreateNewURLRequest(std::wstring& strURL) {
 // Will simply update the message loop as needed
 RESULT WebRTCImp::Update() {
 	return R_NOT_IMPLEMENTED;
+}
+
+User WebRTCImp::GetUser() {
+	return GetParentCloudController()->GetUser();
+}
+
+TwilioNTSInformation WebRTCImp::GetTwilioNTSInformation() {
+	return GetParentCloudController()->GetTwilioNTSInformation();
 }
 
 // WebRTC Specific

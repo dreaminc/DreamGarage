@@ -11,6 +11,7 @@
 
 #include <string>
 #include "User.h"
+#include "TwilioNTSInformation.h"
 
 // TODO: This is actually a UserController - so change the name of object and file
 class UserController : public Controller {
@@ -18,6 +19,7 @@ public:
 	enum class UserMethod {
 		LOGIN,
 		LOAD_PROFILE,
+		LOAD_TWILIO_NTS_INFO,
 		INVALID
 	};
 
@@ -38,6 +40,7 @@ public:
 	
 	// Loads the user profile using the token
 	RESULT LoadProfile();
+	RESULT LoadTwilioNTSInformation();
 
 private:
 	std::string GetMethodURI(UserMethod userMethod);
@@ -55,6 +58,10 @@ public:
 		return m_user;
 	}
 
+	TwilioNTSInformation GetTwilioNTSInformation() {
+		return m_twilioNTSInformation;
+	}
+
 	long GetUserID() { return m_user.GetUserID(); }
 
 private:
@@ -62,6 +69,7 @@ private:
 	std::string	m_strToken;
 
 	User m_user;
+	TwilioNTSInformation m_twilioNTSInformation;
 };
 
 #endif	// ! USER_CONTROLLER_H_

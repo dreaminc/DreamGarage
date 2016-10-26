@@ -28,7 +28,7 @@ RESULT user::Initialize() {
 	//m_pHeadTextures.push_back(pHeadTexture);
 	//*/
 
-	///*
+	/*
 	pHead = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
 						nullptr,
 						point(0.0f, 0.0f, 0.0f),
