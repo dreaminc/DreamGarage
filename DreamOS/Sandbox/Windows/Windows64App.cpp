@@ -365,6 +365,7 @@ RESULT Windows64App::RegisterImpMouseEvents() {
 
 	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_DRAG_MOVE, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_DOWN, m_pHALImp));

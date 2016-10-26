@@ -361,6 +361,19 @@ RESULT WebRTCConductor::OnDataChannelMessage(long peerConnectionID, uint8_t *pDa
 	return R_NOT_HANDLED;
 }
 
+RESULT WebRTCConductor::OnAudioData(long peerConnectionID,
+	const void* audio_data,
+	int bits_per_sample,
+	int sample_rate,
+	size_t number_of_channels,
+	size_t number_of_frames) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnAudioData(peerConnectionID, audio_data, bits_per_sample, sample_rate, number_of_channels, number_of_frames);
+	}
+
+	return R_NOT_HANDLED;
+}
+
 RESULT WebRTCConductor::SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage) {
 	RESULT r = R_PASS;
 

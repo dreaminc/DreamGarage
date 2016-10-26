@@ -33,6 +33,12 @@ public:
 		virtual RESULT OnPeersUpdate(long index) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID,
+			const void* audio_data,
+			int bits_per_sample,
+			int sample_rate,
+			size_t number_of_channels,
+			size_t number_of_frames) = 0;
 
 		virtual long GetUserID() = 0;
 	};
@@ -93,6 +99,12 @@ public:
 	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnAudioData(long peerConnectionID,
+		const void* audio_data,
+		int bits_per_sample,
+		int sample_rate,
+		size_t number_of_channels,
+		size_t number_of_frames) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
@@ -104,7 +116,7 @@ public:
 
 private:
 	// called when peer connections is changed
-	void OnUpdatePeerConnections();
+	RESULT OnNewPeerConnection(long myUserID, long peerUserID, bool isOfferor, PeerConnection* pPeerConnection);
 
 private:
 	std::unique_ptr<WebRTCImp> m_pWebRTCImp;

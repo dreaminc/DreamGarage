@@ -729,3 +729,24 @@ RESULT EnvironmentController::OnDataChannelMessage(long peerUserID, uint8_t *pDa
 Error:
 	return r;
 }
+
+RESULT EnvironmentController::OnAudioData(long peerConnectionID,
+	const void* audio_data,
+	int bits_per_sample,
+	int sample_rate,
+	size_t number_of_channels,
+	size_t number_of_frames) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnAudioData(peerConnectionID,
+			audio_data,
+			bits_per_sample,
+			sample_rate,
+			number_of_channels,
+			number_of_frames));
+	}
+
+Error:
+	return r;
+}

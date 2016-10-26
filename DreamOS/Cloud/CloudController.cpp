@@ -7,6 +7,7 @@
 #include "Cloud/Message/Message.h"
 #include "Cloud/Message/UpdateHandMessage.h"
 #include "Cloud/Message/UpdateHeadMessage.h"
+#include "Cloud/Message/AudioDataMessage.h"
 
 #include "DreamConsole/DreamConsole.h"
 
@@ -169,6 +170,16 @@ RESULT CloudController::RegisterHandUpdateMessageCallback(HandleHandUpdateMessag
 	}
 }
 
+RESULT CloudController::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
+	if (m_fnHandleAudioDataCallback) {
+		return R_FAIL;
+	}
+	else {
+		m_fnHandleAudioDataCallback = fnHandleAudioDataCallback;
+		return R_PASS;
+	}
+}
+
 RESULT CloudController::SetCloudImp(std::unique_ptr<CloudImp> pCloudImp) {
 	RESULT r = R_PASS;
 
@@ -290,6 +301,30 @@ RESULT CloudController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChan
 				CR(m_fnHandleDataMessageCallback(peerUserID, pDataChannelMessage));
 			}
 		} break;
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnAudioData(long peerConnectionID,
+	const void* audio_data,
+	int bits_per_sample,
+	int sample_rate,
+	size_t number_of_channels,
+	size_t number_of_frames) {
+	RESULT r = R_PASS;
+
+	if (m_fnHandleAudioDataCallback != nullptr) {
+		AudioDataMessage audioDataMessage(peerConnectionID,
+			peerConnectionID,
+			audio_data,
+			bits_per_sample,
+			sample_rate,
+			number_of_channels,
+			number_of_frames);
+
+		CR(m_fnHandleAudioDataCallback(peerConnectionID, &audioDataMessage));
 	}
 
 Error:
@@ -613,7 +648,7 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 
 	if (event->GetArg(1).compare("msg") == 0) {
 		std::string st(event->GetArg(2));
-		SendDataChannelStringMessage(NULL, st);
+		BroadcastDataChannelStringMessage(st);
 	}
 
 //Error:

@@ -39,6 +39,7 @@ public:
 	RESULT HandleDataMessage(long senderUserID, Message *pDataMessage);
 	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
+	RESULT HandleAudioData(long senderUserID, AudioDataMessage *pAudioDataMessage);
 
 	user*	ActivateUser(long userId);
 

@@ -219,6 +219,10 @@ RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallbac
 	return m_pSandbox->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
 }
 
+RESULT DreamOS::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
+	return m_pSandbox->RegisterAudioDataCallback(fnHandleAudioDataCallback);
+}
+
 RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pSandbox->SendDataMessage(userID, pDataMessage);
 }
