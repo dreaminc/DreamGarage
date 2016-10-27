@@ -193,12 +193,15 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pCommandLineManager = CommandLineManager::instance();
 	CN(m_pCommandLineManager);
 	
-	//CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	CR(m_pCommandLineManager->RegisterParameter("ip", "i", "ec2-54-175-210-194.compute-1.amazonaws.com"));
-	//CR(m_pCommandLineManager->RegisterParameter("ip", "i", "localhost"));
-	CR(m_pCommandLineManager->RegisterParameter("port", "P", "8000"));
-	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
-	CR(m_pCommandLineManager->RegisterParameter("password", "p", "dreamy"));
+	// previous AWS server
+	//CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "http://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
+	//CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
+
+	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
+	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+
+	CR(m_pCommandLineManager->RegisterParameter("username", "u", "DefaultTestUser@dreamos.com"));
+	CR(m_pCommandLineManager->RegisterParameter("password", "p", "nightmare"));
 
 	// For auto login, use '-l auto'
 	CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
@@ -563,6 +566,10 @@ hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
 }
 
 // Cloud Controller
+RESULT SandboxApp::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
+	return m_pCloudController->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
+}
+
 RESULT SandboxApp::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
 	return m_pCloudController->RegisterDataMessageCallback(fnHandleDataMessageCallback);
 }
@@ -575,6 +582,10 @@ RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCall
 	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
 }
 
+RESULT SandboxApp::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
+	return m_pCloudController->RegisterAudioDataCallback(fnHandleAudioDataCallback);
+}
+
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pCloudController->SendDataMessage(userID, pDataMessage);
 }
@@ -585,6 +596,19 @@ RESULT SandboxApp::SendUpdateHeadMessage(long userID, point ptPosition, quaterni
 
 RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState) {
 	return m_pCloudController->SendUpdateHandMessage(userID, handState);
+}
+
+
+RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
+	return m_pCloudController->BroadcastDataMessage(pDataMessage);
+}
+
+RESULT SandboxApp::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pCloudController->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT SandboxApp::BroadcastUpdateHandMessage(hand::HandState handState) {
+	return m_pCloudController->BroadcastUpdateHandMessage(handState);
 }
 
 // TimeManager

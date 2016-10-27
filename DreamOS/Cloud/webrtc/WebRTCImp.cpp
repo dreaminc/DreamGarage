@@ -23,7 +23,8 @@ WebRTCImp::~WebRTCImp() {
 	rtc::CleanupSSL();
 
 	if (m_pWebRTCConductor != nullptr) {
-		m_pWebRTCConductor.release();
+		//m_pWebRTCConductor.release();
+		m_pWebRTCConductor = nullptr;
 	}
 }
 
@@ -39,7 +40,9 @@ RESULT WebRTCImp::Initialize() {
 	//m_pWebRTCClient = std::make_shared<WebRTCClient>(this);
 	//CN(m_pWebRTCClient);
 
-	m_pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(m_pWebRTCClient.get(), this));
+	//m_pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(this));
+	m_pWebRTCConductor = std::make_shared<WebRTCConductor>(this);
+
 	CN(m_pWebRTCConductor);
 	CR(m_pWebRTCConductor->Initialize());
 
@@ -80,94 +83,95 @@ Error:
 }
 */
 
-// TOOD: peer user id currently not doing anything
-RESULT WebRTCImp::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
-	RESULT r = R_PASS;
-
-	// TODO: Remove this!
-	int pid;
-
-	CN(m_pWebRTCConductor);
-
-	// TODO: this is failing
-	//CB(m_pWebRTCClient->IsConnected());
-
-	DEBUG_LINEOUT("WebRTCImp::SendMessageToPeer: Sending %s to peer on data channel", strMessage.c_str());
-
-	//pid = GetFirstPeerID();
-	pid = m_pWebRTCConductor->GetPeerConnectionID();
-
-	CR(m_pWebRTCConductor->SendDataChannelStringMessage(strMessage));
-	//CR(m_pWebRTCClient->SendMessageToPeer(pid, strMessage));
-
-Error:
-	return r;
-}
-
 // TODO: This should be a bit more robust
-bool WebRTCImp::IsConnected() {
-	if (m_pWebRTCConductor == nullptr)
-		return false;
+bool WebRTCImp::IsConnected(long peerConnectionID) {
+	if (m_pWebRTCConductor != nullptr)
+		return m_pWebRTCConductor->IsConnected(peerConnectionID);
 
-	return m_pWebRTCConductor->IsPeerConnectionInitialized();
+	return false;
 }
 
-bool WebRTCImp::IsOfferer() {
-	return (m_pWebRTCConductor->m_fOffer == true);
+bool WebRTCImp::IsOfferer(long peerConnectionID) {
+	if (m_pWebRTCConductor != nullptr) 
+		return (m_pWebRTCConductor->IsOfferer(peerConnectionID) == true);
+
+	return false;
 }
 
-bool WebRTCImp::IsAnswerer() {
-	return (m_pWebRTCConductor->m_fOffer == false);
+bool WebRTCImp::IsAnswerer(long peerConnectionID) {
+	if (m_pWebRTCConductor != nullptr) 
+		return (m_pWebRTCConductor->IsAnswerer(peerConnectionID) == false);
+
+	return false;
 }
 
-std::list<ICECandidate> WebRTCImp::GetCandidates() {
-	return m_pWebRTCConductor->GetCandidates();
+std::list<WebRTCICECandidate> WebRTCImp::GetCandidates(long peerConnectionID) {
+	if (m_pWebRTCConductor != nullptr)
+		return m_pWebRTCConductor->GetICECandidates(peerConnectionID);
+	
+	return std::list<WebRTCICECandidate>();
 }
 
-// TOOD: peer user id currently not doing anything
-RESULT WebRTCImp::SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT WebRTCImp::SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage) {
 	RESULT r = R_PASS;
-
-	// TODO: Remove this!
-	int pid;
 
 	CN(m_pWebRTCConductor);
 
 	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
 
-	pid = m_pWebRTCConductor->GetPeerConnectionID();
-	CR(m_pWebRTCConductor->SendDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+	CR(m_pWebRTCConductor->SendDataChannelStringMessageByPeerUserID(peerUserID, strMessage));
 
 Error:
 	return r;
 }
 
-void WebRTCImp::QueueUIThreadCallback(int msgID, void* data) {
-	::PostThreadMessage(m_UIThreadID, UI_THREAD_CALLBACK, static_cast<WPARAM>(msgID), reinterpret_cast<LPARAM>(data));
+RESULT WebRTCImp::SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+
+	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+	DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessageByUserID: Sending %d bytes peer on data channel to user %d", pDataChannelBuffer_n, peerUserID);
+
+	CR(m_pWebRTCConductor->SendDataChannelMessageByPeerUserID(peerUserID, pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+
+	//DEBUG_LINEOUT("WebRTCImp::SendDataChannelMessage: Sending %d bytes peer on data channel", pDataChannelBuffer_n);
+
+	CR(m_pWebRTCConductor->SendDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCConductor);
+
+	DEBUG_LINEOUT("WebRTCImp::SendMessageToPeer: Sending %s to peer on data channel", strMessage.c_str());
+
+	CR(m_pWebRTCConductor->SendDataChannelStringMessage(peerConnectionID, strMessage));
+
+Error:
+	return r;
 }
 
 // Functionality
-RESULT WebRTCImp::StartLogin(const std::string& strServer, int port) {
-	RESULT r = R_PASS;
-
-	CB((m_pWebRTCClient->IsConnected() != true));
-
-	m_strServer = strServer;
-	m_pWebRTCClient->Connect(strServer, port, GetPeerName());
-
-Error:
-	return r;
-}
 
 // TODO: Data channel fucks it up
-RESULT WebRTCImp::InitializePeerConnection(bool fCreateOffer, bool fAddDataChannel) {
+RESULT WebRTCImp::InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer) {
 	RESULT r = R_PASS;
 
-	CRM(m_pWebRTCConductor->InitializePeerConnection(fAddDataChannel), "Failed to initialize WebRTC Peer Connection");
-
-	if (fCreateOffer) {
-		CRM(m_pWebRTCConductor->CreateOffer(), "Failed to create WebRTC Offer");
-	}
+	CRM(m_pWebRTCConductor->InitializeNewPeerConnection(peerConnectionID, fCreateOffer, true), "Failed to initialize WebRTC Peer Connection");
 
 Error:
 	return r;
@@ -185,97 +189,89 @@ Error:
 }
 */
 
-int WebRTCImp::GetFirstPeerID() {
-
-	int peerID = -1;
-	std::map<int, std::string> peers = m_pWebRTCClient->GetPeers();
-	
-	if (peers.size() > 0) {
-		peerID = peers.begin()->first;
-	}
-
-	return peerID;
-}
-
-// TODO: this is dead code
-RESULT WebRTCImp::AddIceCandidates() {
-	//return m_pWebRTCConductor->AddIceCandidates();
-	return R_NOT_IMPLEMENTED;
-}
-
-// TODO: Make sure we're the answerer
 RESULT WebRTCImp::AddOfferCandidates(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	for (auto &iceCandidate : pPeerConnection->GetOfferCandidates()) {
-		CR(m_pWebRTCConductor->AddIceCandidate(iceCandidate));
-	}
+	CR(m_pWebRTCConductor->AddOfferCandidates(pPeerConnection));
 
 Error:
 	return r;
 }
 
-// TODO: Make sure we're the offerer
 RESULT WebRTCImp::AddAnswerCandidates(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
-	for (auto &iceCandidate : pPeerConnection->GetAnswerCandidates()) {
-		CR(m_pWebRTCConductor->AddIceCandidate(iceCandidate));
+	CR(m_pWebRTCConductor->AddAnswerCandidates(pPeerConnection));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnWebRTCConnectionStable(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnWebRTCConnectionStable(peerConnectionID));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnWebRTCConnectionStable() {
+RESULT WebRTCImp::OnWebRTCConnectionClosed(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnWebRTCConnectionStable());
+		CR(m_pWebRTCObserver->OnWebRTCConnectionClosed(peerConnectionID));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnWebRTCConnectionClosed() {
+RESULT WebRTCImp::OnICECandidatesGatheringDone(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnWebRTCConnectionClosed());
+		CR(m_pWebRTCObserver->OnICECandidatesGatheringDone(peerConnectionID));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnICECandidatesGatheringDone() {
+RESULT WebRTCImp::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnICECandidatesGatheringDone());
+		CR(m_pWebRTCObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+RESULT WebRTCImp::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnDataChannelStringMessage(strDataChannelMessage));
+		CR(m_pWebRTCObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT WebRTCImp::OnAudioData(long peerConnectionID,
+	const void* audio_data,
+	int bits_per_sample,
+	int sample_rate,
+	size_t number_of_channels,
+	size_t number_of_frames) {
 	RESULT r = R_PASS;
 
 	if (m_pWebRTCObserver != nullptr) {
-		CR(m_pWebRTCObserver->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pWebRTCObserver->OnAudioData(peerConnectionID, audio_data, bits_per_sample, sample_rate, number_of_channels, number_of_frames));
 	}
 
 Error:
@@ -284,7 +280,7 @@ Error:
 
 // Fill this out and junk
 // TODO: REMOVE DEAD CODE
-RESULT WebRTCImp::OnSDPOfferSuccess() {
+RESULT WebRTCImp::OnSDPOfferSuccess(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
@@ -300,13 +296,13 @@ RESULT WebRTCImp::OnSDPOfferSuccess() {
 	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
 
 	CN(m_pWebRTCObserver);
-	CR(m_pWebRTCObserver->OnSDPOfferSuccess());
+	CR(m_pWebRTCObserver->OnSDPOfferSuccess(peerConnectionID));
 
 Error:
 	return r;
 }
 
-RESULT WebRTCImp::OnSDPAnswerSuccess() {
+RESULT WebRTCImp::OnSDPAnswerSuccess(long peerConnectionID) {
 	RESULT r = R_PASS;
 
 	//int peerID = m_pWebRTCConductor->GetPeerConnectionID();
@@ -322,90 +318,67 @@ RESULT WebRTCImp::OnSDPAnswerSuccess() {
 	//m_pWebRTCConductor->SendMessage(m_pWebRTCConductor->GetSDPJSONString());
 
 	CN(m_pWebRTCObserver);
-	CR(m_pWebRTCObserver->OnSDPAnswerSuccess());
+	CR(m_pWebRTCObserver->OnSDPAnswerSuccess(peerConnectionID));
 
 Error:
 	return r;
 }
 
-// Connect to peer will set up the data channel from the initiator
-RESULT WebRTCImp::ConnectToPeer(int peerID) {
+std::string WebRTCImp::GetLocalSDPString(long peerConnectionID) {
+	if (m_pWebRTCConductor->IsPeerConnectionInitialized(peerConnectionID)) {
+		return m_pWebRTCConductor->GetLocalSDPString(peerConnectionID);
+	}
+	
+	return std::string("");
+}
+
+std::string WebRTCImp::GetRemoteSDPString(long peerConnectionID) {
+	if (m_pWebRTCConductor->IsPeerConnectionInitialized(peerConnectionID)) {
+		return m_pWebRTCConductor->GetRemoteSDPString(peerConnectionID);
+	}
+
+	return std::string("");
+}
+
+std::string WebRTCImp::GetLocalSDPJSONString(long peerConnectionID) {
+	if (m_pWebRTCConductor->IsPeerConnectionInitialized(peerConnectionID)) {
+		return m_pWebRTCConductor->GetLocalSDPJSONString(peerConnectionID);
+	}
+	
+	return std::string("");
+}
+
+std::string WebRTCImp::GetRemoteSDPJSONString(long peerConnectionID) {
+	if (m_pWebRTCConductor->IsPeerConnectionInitialized(peerConnectionID)) {
+		return m_pWebRTCConductor->GetRemoteSDPJSONString(peerConnectionID);
+	}
+
+	return std::string("");
+}
+
+RESULT WebRTCImp::CreateSDPOfferAnswer(long peerConnectionID, std::string strSDPOffer) {
+	RESULT r = R_PASS;
+	
+	CBM((m_pWebRTCConductor->IsPeerConnectionInitialized(peerConnectionID)), "Peer connection %d not initialized", peerConnectionID);
+	CN(m_pWebRTCConductor);
+
+	CR(m_pWebRTCConductor->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::SetSDPAnswer(long peerConnectionID, std::string strSDPAnswer) {
 	RESULT r = R_PASS;
 
 	CN(m_pWebRTCConductor);
-	CN(m_pWebRTCClient);
-
-	m_pWebRTCConductor->SetPeerConnectionID(peerID);
-	CRM(InitializePeerConnection(true), "WebRTCImp: ConnectToPeer failed to Initialzie Peer Connection");
+	CR(m_pWebRTCConductor->SetSDPAnswer(peerConnectionID, strSDPAnswer));
 
 Error:
 	return r;
-}
-
-std::string WebRTCImp::GetSDPString() {
-	if (m_pWebRTCConductor->IsPeerConnectionInitialized()) {
-		return m_pWebRTCConductor->GetSDPString();
-	}
-	else {
-		return std::string("");
-	}
-}
-
-std::string WebRTCImp::GetSDPOfferString() {
-	if (m_pWebRTCConductor->IsPeerConnectionInitialized()) {
-		return m_pWebRTCConductor->GetSDPJSONString();
-	}
-	else {
-		return std::string("");
-	}
-}
-
-RESULT WebRTCImp::CreateSDPOfferAnswer(std::string strSDPOffer) {
-	RESULT r = R_PASS;
-
-	CN(m_pWebRTCConductor);
-	CR(m_pWebRTCConductor->CreateSDPOfferAnswer(strSDPOffer));
-
-Error:
-	return r;
-}
-
-RESULT WebRTCImp::SetSDPAnswer(std::string strSDPAnswer) {
-	RESULT r = R_PASS;
-
-	CN(m_pWebRTCConductor);
-	CR(m_pWebRTCConductor->SetSDPAnswer(strSDPAnswer));
-
-Error:
-	return r;
-}
-
-std::function<void(int msg_id, void* data)> WebRTCImp::GetUIThreadCallback() {
-	using std::placeholders::_1;
-	using std::placeholders::_2;
-
-	std::function<void(int msg_id, void* data)> fnUIThreadCallback = std::bind (&WebRTCConductor::UIThreadCallback, m_pWebRTCConductor, _1, _2);
-
-	return fnUIThreadCallback;
 }
 
 // Utilities
-std::string WebRTCImp::GetPeerName() {
-	char computer_name[256];
-
-	std::string ret(GetEnvVarOrDefault("USERNAME", "user"));
-	ret += '@';
-
-	if (gethostname(computer_name, arraysize(computer_name)) == 0) {
-		ret += computer_name;
-	}
-	else {
-		ret += "host";
-	}
-
-	return ret;
-}
-
 std::string WebRTCImp::GetEnvVarOrDefault(const char* env_var_name, const char* default_value) {
 	std::string value;
 	const char* env_var = getenv(env_var_name);
@@ -417,72 +390,4 @@ std::string WebRTCImp::GetEnvVarOrDefault(const char* env_var_name, const char* 
 		value = default_value;
 
 	return value;
-}
-
-RESULT WebRTCImp::OnSignedIn() {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("WebRTCImp: OnSignedIn");
-
-//Error:
-	return r;
-}
-
-RESULT WebRTCImp::OnDisconnected() {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("WebRTCImp: OnDisconnected");
-
-//Error:
-	return r;
-}
-
-RESULT WebRTCImp::OnPeerConnected(int id, const std::string& name) {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("WebRTCImp:OnPeerConnected:");
-
-	std::map<int, std::string> peers = m_pWebRTCClient->GetPeers();
-	for (auto &peer : peers) {
-		DEBUG_LINEOUT("%d: %s", peer.first, peer.second.c_str());
-	}
-
-//Error:
-	return r;
-}
-
-RESULT WebRTCImp::OnPeerDisconnected(int peer_id) {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("WebRTCImp: OnPeerDisconnected");
-
-//Error:
-	return r;
-}
-
-RESULT WebRTCImp::OnMessageFromPeer(int peerID, const std::string& strMessage) {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("WebRTCImp: OnMessageFromPeer");
-
-	CN(m_pWebRTCConductor);
-
-	m_pWebRTCConductor->OnMessageFromPeer(peerID, strMessage);
-
-Error:
-	return r;
-}
-
-RESULT WebRTCImp::OnMessageSent(int err) {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("WebRTCImp: OnMessageSent");
-
-//Error:
-	return r;
-}
-
-RESULT WebRTCImp::OnServerConnectionFailure() {
-	DEBUG_LINEOUT("WebRTCImp Error: Failed to connect to %s", m_strServer.c_str());
-	return R_PASS;
 }

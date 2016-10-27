@@ -1,7 +1,7 @@
 #include "quaternion.h"
 
 quaternion::quaternion() {
-	SetQuaternion(0.0f, 0.0f, 0.0f, -1.0f);
+	SetQuaternion(1.0f, 0.0f, 0.0f, 0.0f);
 	Normalize();
 }
 
@@ -152,7 +152,18 @@ quaternion_precision quaternion::Magnitude() {
 	return static_cast<quaternion_precision>(pow(m_w, 2) + pow(m_x, 2) + pow(m_y, 2) + pow(m_z, 2));
 }
 
-RESULT quaternion::RotateByVector(vector v, quaternion_precision theta, quaternion_precision slerpLimitValue) {
+// multiplication order is set so that rotation is relative to global axes
+// for local rotation, call (*this) *= quaternion(theta, v)
+RESULT quaternion::RotateByVector(vector v, quaternion_precision theta) {
+
+	quaternion r = quaternion(theta, v);
+	r *= (*this);
+	(*this) = r;
+
+	return R_PASS;
+}
+
+RESULT quaternion::RotateByVectorSlerp(vector v, quaternion_precision theta, quaternion_precision slerpLimitValue) {
 	
 	// Slerping to get this to work for arbitrary angles
 	
@@ -187,38 +198,86 @@ RESULT quaternion::RotateByVector(vector v, quaternion_precision theta, quaterni
 }
 
 RESULT quaternion::RotateX(quaternion_precision theta) {
-	return RotateByVector(vector::iVector(), theta);
+	quaternion q = MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
+	(*this) *= q;
+	Normalize();
+	return R_PASS;
 }
 
 RESULT quaternion::RotateY(quaternion_precision theta) {
-	return RotateByVector(vector::jVector(), theta);
+	quaternion q = MakeQuaternionWithEuler(0.0f, theta, 0.0f);
+	(*this) *= q;
+	Normalize();
+	return R_PASS;
 }
 
 RESULT quaternion::RotateZ(quaternion_precision theta) {
-	return RotateByVector(vector::kVector(), theta);
+	quaternion q = MakeQuaternionWithEuler(0.0f, 0.0f, theta);
+	(*this) *= q;
+	Normalize();
+	return R_PASS;
+}
+
+RESULT quaternion::RotateXYZ(quaternion_precision phi, quaternion_precision theta, quaternion_precision psi) {
+	quaternion q = MakeQuaternionWithEuler(phi, theta, psi);
+	(*this) *= q;
+	Normalize();
+	return R_PASS;
 }
 
 // Euler Conversions: https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-quaternion_precision quaternion::GetEulerAngelZ() {
-	quaternion_precision phi = static_cast<quaternion_precision>(atan2((2.0f * ((m_w * m_x) + (m_y * m_z))), (1 - 2.0f * (m_x*m_x + m_y*m_y))));
+///*
+quaternion_precision quaternion::GetEulerAngleX() {
+	quaternion_precision phi = static_cast<quaternion_precision>(atan2((2.0f * ((m_w * m_x) + (m_y * m_z))), (m_w*m_w)-(m_x*m_x)-(m_y*m_y)+(m_z*m_z)));
+	//quaternion_precision phi = static_cast<quaternion_precision>(atan2((2.0f * ((m_w * m_x) + (m_y * m_z))), (1 + (-2.0f * ((m_x*m_x) + (m_y*m_y))))));
 	return phi;
 }
 
-quaternion_precision quaternion::GetEulerAngelX() {
-	quaternion_precision theta = static_cast<quaternion_precision>(asin((2.0f * ((m_w * m_y) - (m_z * m_x)))));
+quaternion_precision quaternion::GetEulerAngleY() {
+	quaternion_precision t2 = 2.0f * ((m_w * m_y) - (m_z * m_x));
+	t2 = t2 > 1.0f ? 1.0f : t2;
+	t2 = t2 < -1.0f ? -1.0f : t2;
+	quaternion_precision theta = static_cast<quaternion_precision>(asin(t2));
 	return theta;
 }
 
-quaternion_precision quaternion::GetEulerAngelY() {
-	quaternion_precision psi = static_cast<quaternion_precision>(atan2((2.0f * ((m_w * m_z) + (m_x * m_y))), (1 - 2.0f * (m_y*m_y + m_z*m_z))));
+quaternion_precision quaternion::GetEulerAngleZ() {
+	quaternion_precision psi = static_cast<quaternion_precision>(atan2((2.0f * ((m_w * m_z) + (m_x * m_y))), (m_w*m_w)+(m_x*m_x)-(m_y*m_y)-(m_z*m_z)));
+	//quaternion_precision psi = static_cast<quaternion_precision>(atan2((2.0f * ((m_w * m_z) + (m_x * m_y))), (1 + (-2.0f * ((m_y*m_y) + (m_z*m_z))))));
 	return psi;
 }
+//*/
 
+//Unstable
 RESULT quaternion::GetEulerAngles(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z) {
-	*x = GetEulerAngelX();
-	*y = GetEulerAngelY();
-	*z = GetEulerAngelZ();
+	*y = GetEulerAngleY();
+	*x = GetEulerAngleX();
+	*z = GetEulerAngleZ();
 	return R_PASS;
+}
+
+//quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quaternion_precision psi, quaternion_precision theta) {
+quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quaternion_precision theta, quaternion_precision psi) {
+
+	quaternion_precision c1 = cos(phi / 2);		//t2
+	quaternion_precision s1 = sin(phi / 2);		//t3
+	quaternion_precision c2 = cos(theta / 2);	//t4
+	quaternion_precision s2 = sin(theta / 2);	//t5
+	quaternion_precision c3 = cos(psi / 2);		//t0
+	quaternion_precision s3 = sin(psi / 2);		//t1
+
+	quaternion_precision q_x = (s1 * c2 * c3) - (c1 * s2 * s3);
+	//							t3 * t4 * t0  -  t2 * t5 * t1
+	quaternion_precision q_y = (c1 * s2 * c3) + (s1 * c2 * s3);
+	//							t2 * t5 * t0  +  t3 * t4 * t1
+	quaternion_precision q_z = (c1 * c2 * s3) - (s1 * s2 * c3);
+	//							t2 * t4 * t1  -  t3 * t5 * t0
+	quaternion_precision q_w = (c1 * c2 * c3) + (s1 * s2 * s3);
+	//							t2 * t4 * t0  +  t3 * t5 * t1
+
+	quaternion q; 
+	q.SetValues(q_w, q_x, q_y, q_z);
+	return q;
 }
 
 quaternion quaternion::GetConjugate() {
@@ -264,19 +323,16 @@ vector quaternion::RotateVector(vector v) {
 
 // http://www.mathworks.com/help/aeroblks/quaternionmultiplication.html
 quaternion& quaternion::operator*=(const quaternion& r) {
-	/*
-	m_w = m_w * r.m_w - m_x*r.m_x - m_y*r.m_y - m_z*r.m_z;
-	m_x = m_w * r.m_x + m_x*r.m_w - m_y*r.m_z + m_z*r.m_y;
-	m_y = m_w * r.m_y + m_x*r.m_z + m_y*r.m_w - m_z*r.m_x;
-	m_z = m_w * r.m_z - m_x*r.m_y + m_y*r.m_x + m_z*r.m_w;
-	//*/
 
-	///*
-	m_w = r.m_w * m_w - r.m_x * m_x - r.m_y * m_y - r.m_z * m_z;
-	m_x = r.m_w * m_x + r.m_x * m_w - r.m_y * m_z + r.m_z * m_y;
-	m_y = r.m_w * m_y + r.m_x * m_z + r.m_y * m_w - r.m_z * m_x;
-	m_z = r.m_w * m_z - r.m_x * m_y + r.m_y * m_x + r.m_z * m_w;
-	//*/
+	quaternion_precision w, x, y, z;
+	w = r.m_w * m_w - r.m_x * m_x - r.m_y * m_y - r.m_z * m_z;
+	x = r.m_w * m_x + r.m_x * m_w - r.m_y * m_z + r.m_z * m_y;
+	y = r.m_w * m_y + r.m_x * m_z + r.m_y * m_w - r.m_z * m_x;
+	z = r.m_w * m_z - r.m_x * m_y + r.m_y * m_x + r.m_z * m_w;
+	m_w = w;
+	m_x = x;
+	m_y = y;
+	m_z = z;
 
 	return (*this);
 }

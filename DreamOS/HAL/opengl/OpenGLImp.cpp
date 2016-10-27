@@ -248,7 +248,7 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Allocate the camera
 	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, -2.0f), 60.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, 0.0f), 60.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -365,11 +365,14 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 
 	//SenseMouse::PrintEvent(mEvent);
 
-	float MouseMoveFactor = 0.1f;
-
 	switch (mEvent->EventType) {
 		case SENSE_MOUSE_LEFT_DRAG_MOVE: {
 			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx),  static_cast<camera_precision>(mEvent->dy)));
+		} break;
+		case SENSE_MOUSE_RIGHT_DRAG_MOVE: {
+			const float mouseMoveFactor = 0.002f;
+			m_pCamera->MoveStrafe(-mEvent->dx * mouseMoveFactor);
+			m_pCamera->MoveUp(mEvent->dy * mouseMoveFactor);
 		} break;
 	}
 

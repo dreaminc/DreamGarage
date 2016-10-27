@@ -21,181 +21,99 @@
 #define DTLS_OFF false
 
 class WebRTCImp;
-class WebRTCClient;
+class WebRTCICECandidate;
+class PeerConnection;
 
-// TODO: flesh out the class + move to other file
-class ICECandidate {
+#include "WebRTCPeerConnection.h"
+
+class WebRTCConductor : public WebRTCPeerConnection::WebRTCPeerConnectionObserver {
 public:
-	ICECandidate(std::string strSDPCandidate = "", std::string strSDPMediaID = "", int sdpMediateLineIndex = -1) :
-		m_strSDPCandidate(strSDPCandidate),
-		m_strSDPMediaID(strSDPMediaID),
-		m_SDPMediateLineIndex(sdpMediateLineIndex)
-	{
-		// empty
-	}
-
-public:
-	std::string m_strSDPCandidate;
-	std::string m_strSDPMediaID;
-	int m_SDPMediateLineIndex;
-
-	RESULT Print() {
-		DEBUG_LINEOUT("candidate: %s", m_strSDPCandidate.c_str());
-		DEBUG_LINEOUT("Media ID: %s", m_strSDPMediaID.c_str());
-		DEBUG_LINEOUT("Media Line Index: %d", m_SDPMediateLineIndex);
-		return R_PASS;
-	}
-};
-
-class WebRTCConductor : 
-	public webrtc::PeerConnectionObserver, 
-	public webrtc::CreateSessionDescriptionObserver,
-	public webrtc::DataChannelObserver /*, public PeerConnectionClientObserver, public MainWndCallback */
-{
-
-public:
-	enum CallbackID {
-		MEDIA_CHANNELS_INITIALIZED = 1,
-		PEER_CONNECTION_CLOSED,
-		SEND_MESSAGE_TO_PEER,
-		NEW_STREAM_ADDED,
-		STREAM_REMOVED,
+	class WebRTCConductorObserver {
+	public:
+		virtual RESULT OnWebRTCConnectionStable(long peerConnectionID) = 0;
+		virtual RESULT OnWebRTCConnectionClosed(long peerConnectionID) = 0;
+		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;		// TODO: Consolidate with below
+		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;	// TODO: Consolidate with below
+		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID,
+			const void* audio_data,
+			int bits_per_sample,
+			int sample_rate,
+			size_t number_of_channels,
+			size_t number_of_frames) = 0;
 	};
 
 	friend class WebRTCImp;
-	friend class WebRTCClient;
 
 public:
-	std::list<ICECandidate> m_iceCandidates;
-	std::list<ICECandidate> GetCandidates();
-
-public:
-	WebRTCConductor(WebRTCClient *pWebRTCClient, WebRTCImp *pParentWebRTCImp);
+	WebRTCConductor(WebRTCConductorObserver *pParentObserver);
 	~WebRTCConductor();
 	
 	RESULT Initialize();
+	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer, bool fAddDataChannel);
 
-	RESULT SendDataChannelStringMessage(std::string& strMessage);
-	RESULT SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-
-	RESULT CreateSDPOfferAnswer(std::string strSDPOffer);
-	RESULT SetSDPAnswer(std::string strSDPAnswer);
-	RESULT AddIceCandidate(ICECandidate iceCandidate);
-
-protected:
-	// PeerConnectionObserver implementation.
-	void OnSignalingChange(webrtc::PeerConnectionInterface::SignalingState new_state) override;
-
-	void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
-	void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
-	void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
-
-	void OnRenegotiationNeeded() override {}
-
-	void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
-	void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state);
-	void OnIceConnectionReceivingChange(bool receiving);
-	void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
-
-	// PeerConnectionClientObserver implementation.
-	virtual void OnSignedIn();
-	virtual void OnDisconnected();
-	virtual void OnPeerConnected(int id, const std::string& name);
-	virtual void OnPeerDisconnected(int id);
-	virtual void OnMessageFromPeer(int peerID, const std::string& strMessage);
-	virtual void OnMessageSent(int err);
-	virtual void OnServerConnectionFailure();
-
-	// DataChannelObserver Implementation
-	virtual void OnStateChange() override;
-	virtual void OnMessage(const webrtc::DataBuffer& buffer) override;
-	virtual void OnBufferedAmountChange(uint64_t previous_amount) override  {/* empty */};
-
-	// CreateSessionDescriptionObserver implementation.
-	void OnSuccess(webrtc::SessionDescriptionInterface* sessionDescription);
-	virtual void OnFailure(const std::string& error);
-
-protected:
-	// Send a message to the remote peer.
-	void SendMessage(const std::string& json_object);
-
-	RESULT CreatePeerConnection(bool dtls);
-	RESULT DeletePeerConnection();
-	RESULT InitializePeerConnection(bool fAddDataChannel = false);
-	RESULT ReinitializePeerConnectionForLoopback();
-	cricket::VideoCapturer* OpenVideoCaptureDevice();
-
-	bool IsPeerConnectionInitialized();
-	
-	RESULT AddStreams();
-	RESULT AddVideoStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	RESULT AddAudioStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface);
-	//RESULT AddDataStream();
-	RESULT AddDataChannel();
-
-	RESULT CreateOffer();
-	RESULT SendMessageToPeer(std::string* strMessage, int peerID);
-
-private:
-	// Utility (TODO: Move this elsewhere?)
-	std::string GetPeerConnectionString();
-	std::string GetSessionDescriptionString();
-	RESULT ClearSessionDescriptionProtocol();
-	RESULT PrintSDP();
-	std::string GetSDPJSONString();
-	std::string GetSDPString();
-	std::string GetSDPTypeString();
+	friend class WebRTCImp;
 
 public:
-	RESULT SetPeerConnectionID(int peerID) {
-		m_WebRTCPeerID = peerID;
-		return R_PASS;
-	}
-
-	int GetPeerConnectionID() {
-		return m_WebRTCPeerID;
-	}
-
-	void UIThreadCallback(int msgID, void* data);
-
-private:
-	class WebRTCPeerConnection {
-	public:
-		WebRTCPeerConnection() :
-			m_peerConnectionID(-1),
-			m_pWebRTCPeerConnection(nullptr)
-		{
-			// empty for now
-		}
-
-		long m_peerConnectionID;
-		rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
-	};
+	// WebRTCPeerConnectionObserver Interface
+	virtual RESULT OnWebRTCConnectionStable(long peerConnectionID) override;
+	virtual RESULT OnWebRTCConnectionClosed(long peerConnectionID) override;
+	virtual RESULT OnSDPOfferSuccess(long peerConnectionID) override;		// TODO: Consolidate with below
+	virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) override;	// TODO: Consolidate with below
+	virtual RESULT OnSDPSuccess(long peerConnectionID, bool fOffer) override;
+	virtual RESULT OnSDPFailure(long peerConnectionID, bool fOffer) override;
+	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnAudioData(long peerConnectionID,
+		const void* audio_data,
+		int bits_per_sample,
+		int sample_rate,
+		size_t number_of_channels,
+		size_t number_of_frames) override;
 
 private:
-	WebRTCImp *m_pParentWebRTCImp;
-	WebRTCClient *m_pWebRTCClient;
+	RESULT ClearPeerConnections();
+	rtc::scoped_refptr<WebRTCPeerConnection> AddNewPeerConnection(long peerConnectionID);
+	rtc::scoped_refptr<WebRTCPeerConnection> GetPeerConnection(long peerConnectionID);
+	bool FindPeerConnectionByID(long peerConnectionID);
 
-	int m_WebRTCPeerID;
-	bool m_fLoopback;
+	rtc::scoped_refptr<WebRTCPeerConnection> GetPeerConnectionByPeerUserID(long peerConnectionID);
+	bool FindPeerConnectionByPeerUserID(long peerUserID);
 
-	bool m_fOffer;	// TODO: this needs to be generalized
-	bool m_fSDPSet;	// TODO: temp
+protected:
+	bool IsPeerConnectionInitialized(long peerConnectionID);
+	bool IsConnected(long peerConnectionID);
+	bool IsOfferer(long peerConnectionID);
+	bool IsAnswerer(long peerConnectionID);
+	std::list<WebRTCICECandidate> GetICECandidates(long peerConnectionID);
+
+	std::string GetLocalSDPString(long peerConnectionID);
+	std::string GetLocalSDPJSONString(long peerConnectionID);
+	std::string GetRemoteSDPString(long peerConnectionID);
+	std::string GetRemoteSDPJSONString(long peerConnectionID);
+
+	RESULT CreateSDPOfferAnswer(long peerConnectionID, std::string strSDPOffer);
+	RESULT SetSDPAnswer(long peerConnectionID, std::string strSDPAnswer);
+
+	RESULT AddOfferCandidates(PeerConnection *pPeerConnection);
+	RESULT AddAnswerCandidates(PeerConnection *pPeerConnection);
+
+public:
+	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);
+	RESULT SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
+	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+private:
+	//WebRTCImp *m_pParentWebRTCImp;	// TODO: Replace this with observer interface
+	WebRTCConductorObserver *m_pParentObserver;
 
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
-	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnection;
-
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCActiveStreams;
-	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCActiveDataChannels;
-
-	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
-
-	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
-
-	std::string m_strWebRTCServer;
-
-	std::string m_strSessionDescriptionProtocol;
-	std::string m_strSessionDescriptionType;
+	std::vector<rtc::scoped_refptr<WebRTCPeerConnection>> m_webRTCPeerConnections;
 };
 
 #endif	// ! WEBRTC_CONDUCTOR_H_

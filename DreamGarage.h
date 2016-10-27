@@ -35,9 +35,13 @@ public:
 	// Cloud Controller
 	RESULT InitializeCloudControllerCallbacks();
 
+	RESULT HandlePeersUpdate(long index);
 	RESULT HandleDataMessage(long senderUserID, Message *pDataMessage);
 	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
+	RESULT HandleAudioData(long senderUserID, AudioDataMessage *pAudioDataMessage);
+
+	user*	ActivateUser(long userId);
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
@@ -47,7 +51,11 @@ public:
 
 private:
 
-	user *m_pPeerUser;
+	//user *m_pPeerUser;
+
+	std::map<long, user*> m_peerUsers;
+	std::vector<user*> m_usersPool;
+
 	//composite *m_pPeerUser;
 	//volume *m_pPeerUser;
 
@@ -55,6 +63,9 @@ private:
 	FlatContext *m_pContext;
 	quad *m_pQuad;
 	std::shared_ptr<DebugData> m_spherePosition;
+
+	bool	m_isSeated = false;
+	float tick = 0.0f;
 };
 
 

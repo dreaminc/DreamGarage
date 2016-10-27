@@ -55,7 +55,10 @@ public:
 
 	RESULT RotateCameraByDiffXY(camera_precision dx, camera_precision dy);
 	RESULT MoveForward(camera_precision amt);
+
 	RESULT Strafe(camera_precision amt);
+	RESULT MoveUp(camera_precision amt);
+	RESULT MoveStrafe(camera_precision amt);
 
 	RESULT SetStrafeSpeed(camera_precision speed);
 	RESULT AddStrafeSpeed(camera_precision speed);

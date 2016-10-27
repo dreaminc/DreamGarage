@@ -54,8 +54,8 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 
 	SenseMouseEvent mEvent(eventType, newX, newY, m_MousePosition.xPos, m_MousePosition.yPos, state);
 
-	if (!m_isDragging && eventType == SENSE_MOUSE_LEFT_BUTTON_DOWN) {
-		m_isDragging = true;
+	if (m_dragState == MouseDrag::None && (eventType == SENSE_MOUSE_LEFT_BUTTON_DOWN || eventType == SENSE_MOUSE_RIGHT_BUTTON_DOWN)) {
+		m_dragState = (eventType == SENSE_MOUSE_LEFT_BUTTON_DOWN) ? MouseDrag::Left : MouseDrag::Right;
 
 		m_dragOriginX = newX;
 		m_dragOriginY = newY;
@@ -65,16 +65,23 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 		CenterMousePosition();
 	}
 
-	if (m_isDragging && eventType == SENSE_MOUSE_LEFT_BUTTON_UP) {
-		m_isDragging = false;
+	if ((m_dragState == MouseDrag::Left && eventType == SENSE_MOUSE_LEFT_BUTTON_UP) ||
+		(m_dragState == MouseDrag::Right && eventType == SENSE_MOUSE_RIGHT_BUTTON_UP) ){
+		m_dragState = MouseDrag::None;
 
 		SetMousePosition(m_dragOriginX, m_dragOriginY);
 		ShowCursor(true);
 	}
 
-	if (m_isDragging && eventType == SENSE_MOUSE_MOVE) {
-		eventType = SENSE_MOUSE_LEFT_DRAG_MOVE;
-		mEvent.EventType = SENSE_MOUSE_LEFT_DRAG_MOVE;
+	if (m_dragState != MouseDrag::None && eventType == SENSE_MOUSE_MOVE) {
+		if (m_dragState == MouseDrag::Left) {
+			eventType = SENSE_MOUSE_LEFT_DRAG_MOVE;
+			mEvent.EventType = SENSE_MOUSE_LEFT_DRAG_MOVE;
+		}
+		else {
+			eventType = SENSE_MOUSE_RIGHT_DRAG_MOVE;
+			mEvent.EventType = SENSE_MOUSE_RIGHT_DRAG_MOVE;
+		}
 
 		int xCenter = 0, yCenter = 0;
 		GetCenterPosition(xCenter, yCenter);
@@ -88,7 +95,7 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 		CenterMousePosition();
 	}
 
-	if (eventType == SENSE_MOUSE_LEFT_DRAG_MOVE && (mEvent.dx != 0 || mEvent.dy != 0)) {
+	if ((eventType == SENSE_MOUSE_LEFT_DRAG_MOVE || eventType == SENSE_MOUSE_RIGHT_DRAG_MOVE) && (mEvent.dx != 0 || mEvent.dy != 0)) {
 		CR(NotifySubscribers(eventType, &mEvent));
 	}
 	else if (eventType == SENSE_MOUSE_MOVE) {

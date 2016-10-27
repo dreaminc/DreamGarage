@@ -328,6 +328,61 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 	return DefWindowProc(hWindow, msg, wp, lp);
 }
 
+RESULT Windows64App::RegisterImpKeyboardEvents() {
+	RESULT r = R_PASS;
+
+	// Register Dream Console to keyboard events
+	CR(RegisterSubscriber(SK_ALL, DreamConsole::GetConsole()));
+
+	camera *pCamera = m_pHALImp->GetCamera();
+
+	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
+
+	/*
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, m_pOpenGLImp));
+
+	for (int i = 0; i < 26; i++) {
+		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), m_pOpenGLImp));
+	}
+	*/
+
+	CR(RegisterSubscriber(VK_LEFT, pCamera));
+	CR(RegisterSubscriber(VK_UP, pCamera));
+	CR(RegisterSubscriber(VK_DOWN, pCamera));
+	CR(RegisterSubscriber(VK_RIGHT, pCamera));
+
+	CR(RegisterSubscriber(VK_SPACE, pCamera));
+
+	for (int i = 0; i < 26; i++) {
+		CR(RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
+	}
+
+	CR(RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
+	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::RegisterImpMouseEvents() {
+	RESULT r = R_PASS;
+
+	//camera *pCamera = m_pOpenGLImp->GetCamera();
+
+	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_DRAG_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_DOWN, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_UP, m_pHALImp));
+
+Error:
+	return r;
+}
 
 RESULT Windows64App::RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> fnUIThreadCallback) {
 	RESULT r = R_PASS;

@@ -8,6 +8,9 @@
 // DreamOS/Cloud/webrtc/WebRTCClient.h
 // The WebRTC Client that handles all WebRTC messages 
 
+// NOTE: This code is defunct - only keeping it since we may want to move over to the WebRTC Websocket implementation 
+// and remove the Websocket++ dependencies since we get this regardless when using WebRTC
+
 #include <map>
 #include <memory>
 #include <string>
