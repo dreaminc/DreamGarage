@@ -37,9 +37,12 @@ RESULT DreamTestApp::LoadScene() {
 	//sphere *pSphere = AddSphere(0.5f, 10, 10);
 	//pSphere->MoveTo(1.5f, 0.5f, 0.0f);
 
-	g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
-	g_pCylinder->RotateZBy((float)(M_PI_4));
-	//g_pCylinder->MoveTo(0.0f, -1.0f, -2.0f);
+	g_pCylinder = AddCylinder(1.0f, 2.0f, 20, 5);
+	//g_pCylinder->MoveTo(0.0f, -1.0f, 0.0f);
+
+	//g_pCylinder->RotateZBy((float)(M_PI_4));
+
+
 	//pCylinder->SetWireframe(true);
 
 	/*
@@ -57,11 +60,14 @@ RESULT DreamTestApp::LoadScene() {
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
-	/*
+	///*
 	if (g_pCylinder != nullptr) {
-		g_pCylinder->RotateByDeg(0.01f, 0.01f, 0.01f);
+		g_pCylinder->RotateByDeg(0.01f, 0.00f, 0.01f);
+		//g_pCylinder->RotateZBy(0.001f);
+		//g_pCylinder->RotateYBy(0.001f);
+		//g_pCylinder->RotateXBy(0.001f);
 	}
-	*/
+	//*/
 
 	//Error:
 	return r;

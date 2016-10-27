@@ -70,6 +70,11 @@ public:
 	quaternion_precision GetEulerAngleY();
 	RESULT GetEulerAngles(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z);
 
+	quaternion_precision GetEulerAngleXDeg();
+	quaternion_precision GetEulerAngleYDeg();
+	quaternion_precision GetEulerAngleZDeg();
+	RESULT GetEulerAnglesDeg(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z);
+
 	static quaternion MakeQuaternionWithEuler(quaternion_precision x, quaternion_precision y, quaternion_precision z);
 
 	RESULT Reverse();

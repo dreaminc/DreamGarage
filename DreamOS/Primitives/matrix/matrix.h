@@ -714,6 +714,7 @@ matrix<TMat4x4, N, N> operator*(const matrix<TMat4x4, N, N>& lhs, const matrix<T
 	return result;
 }
 
+///*
 // N x M multiplied by M x 1, should work for all N, M
 // This is technically an optimized of the below
 template <typename TMat4x4, int N, int M>
@@ -727,6 +728,7 @@ matrix<TMat4x4, N, 1> operator*(const matrix<TMat4x4, N, M>& lhs, const matrix<T
 
 	return result;
 }
+//*/
 
 // N x M multiplied by M x W, should work for all N, M, W
 template <typename TMat4x4, int N, int M, int W>

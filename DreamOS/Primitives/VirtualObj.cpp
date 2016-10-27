@@ -163,6 +163,7 @@ VirtualObj* VirtualObj::RotateYBy(quaternion_precision theta) {
 VirtualObj* VirtualObj::RotateZBy(quaternion_precision theta) {
 	m_qRotation.RotateByVector(vector::kVector(), theta);
 	m_qRotation.Normalize();
+	OnManipulation();
 	return this;
 }
 

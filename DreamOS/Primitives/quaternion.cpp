@@ -256,6 +256,25 @@ RESULT quaternion::GetEulerAngles(quaternion_precision *x, quaternion_precision 
 	return R_PASS;
 }
 
+quaternion_precision quaternion::GetEulerAngleXDeg() {
+	return (GetEulerAngleX() * (180.f / M_PI));
+}
+
+quaternion_precision quaternion::GetEulerAngleYDeg() {
+	return (GetEulerAngleY() * (180.f / M_PI));
+}
+
+quaternion_precision quaternion::GetEulerAngleZDeg() {
+	return (GetEulerAngleZ() * (180.f / M_PI));
+}
+
+RESULT quaternion::GetEulerAnglesDeg(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z) {
+	*x = GetEulerAngleXDeg();
+	*y = GetEulerAngleYDeg();
+	*z = GetEulerAngleZDeg();
+	return R_PASS;
+}
+
 //quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quaternion_precision psi, quaternion_precision theta) {
 quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quaternion_precision theta, quaternion_precision psi) {
 

@@ -100,37 +100,77 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 	return R_PASS;
 }
 
-// TODO: Add rotation
+// http://www.willperone.net/Code/coderr.php
 vector BoundingBox::GetHalfVector() {
-	//vector vHalfSize = GetOrientation().RotateVector(m_vHalfSize);
-	vector vHalfSize = RotationMatrix(GetOrientation()) * m_vHalfSize;
-
-	m_vHalfSize.Print("halfsize before");
-	vHalfSize.Print("halfsize after");
-
-	return vHalfSize;
+	return m_vHalfSize;
 }
 
 point BoundingBox::GetOrigin() {
 	if (!m_ptOrigin.IsZero()) {
-		point ptRotated = point(GetOrientation().RotateVector(vector(m_ptOrigin)));
-		return (-1.0f * m_pParent->GetOrigin() - ptRotated);
+		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptOrigin);
+		return (-1.0f * m_pParent->GetOrigin() + ptRotated);
 	}
 	else {
 		return (-1.0f * m_pParent->GetOrigin());
 	}
+
+	//return (-1.0f * m_pParent->GetOrigin() - m_ptOrigin);
 }
 
 double BoundingBox::GetWidth() {
-	return static_cast<double>(GetHalfVector().x() * 2.0f);
+	quaternion_precision phi, theta, psi; 
+	GetOrientation().GetEulerAngles(&phi, &theta, &psi);
+
+	rotation_precision cosPhi = static_cast<rotation_precision>(cos(phi));
+	rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(phi));
+
+	rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
+	rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
+
+	rotation_precision cosPsi = static_cast<rotation_precision>(cos(psi));
+	rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(psi));
+
+	//double width = GetHalfVector().x() * fabs(cosTheta * cosPsi) + GetHalfVector().y() * fabs(cosTheta * sinPsi) + GetHalfVector().y() * fabs(sinTheta);
+	double width = GetHalfVector().x() * fabs((sinPhi * sinPsi) - (cosPhi * sinTheta * cosPsi)) + GetHalfVector().y() * fabs((sinPhi * cosPsi) + (cosPhi * sinTheta * sinPsi)) + GetHalfVector().y() * fabs(cosPhi * cosTheta);
+
+	return static_cast<double>(width * 2.0f);
 }
 
 double BoundingBox::GetHeight() {
-	return static_cast<double>(GetHalfVector().y() * 2.0f);
+	quaternion_precision phi, theta, psi;
+	GetOrientation().GetEulerAngles(&phi, &theta, &psi);
+
+	rotation_precision cosPhi = static_cast<rotation_precision>(cos(phi));
+	rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(phi));
+
+	rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
+	rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
+
+	rotation_precision cosPsi = static_cast<rotation_precision>(cos(psi));
+	rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(psi));
+
+	double height = GetHalfVector().x() * fabs((cosPhi * sinPsi) + (sinPhi * sinTheta * cosPsi)) + GetHalfVector().y() * fabs((cosPhi * cosPsi) - (sinPhi * sinTheta * sinPsi)) + GetHalfVector().y() * fabs(-sinPhi * cosTheta);
+
+	return static_cast<double>(height * 2.0f);
 }
 
 double BoundingBox::GetLength() {
-	return static_cast<double>(GetHalfVector().z() * 2.0f);
+	quaternion_precision phi, theta, psi;
+	GetOrientation().GetEulerAngles(&phi, &theta, &psi);
+
+	rotation_precision cosPhi = static_cast<rotation_precision>(cos(phi));
+	rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(phi));
+
+	rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
+	rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
+
+	rotation_precision cosPsi = static_cast<rotation_precision>(cos(psi));
+	rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(psi));
+
+	//double length = GetHalfVector().x() * fabs((sinPhi * sinPsi) - fabs(cosPhi * sinTheta * cosPsi)) + GetHalfVector().y() * fabs((sinPhi * cosPsi) + (cosPhi * sinTheta * sinPsi)) + GetHalfVector().y() * fabs(cosPhi * cosTheta);
+	double length = GetHalfVector().x() * fabs(cosTheta * cosPsi) + GetHalfVector().y() * fabs(cosTheta * sinPsi) + GetHalfVector().y() * fabs(sinTheta);
+
+	return static_cast<double>(length * 2.0f);
 }
 
 // TODO: Why do we need to invert the point?
