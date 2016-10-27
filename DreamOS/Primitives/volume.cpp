@@ -14,6 +14,10 @@ volume::volume(double width, double length, double height, bool fTriangleBased) 
 
 	CR(SetVolumeVertices(width, length, height, m_fTriangleBased));
 
+	// TODO: Allow for changing this - put it into a factory
+	CR(InitializeAABB());
+
+	//Success:
 	Validate();
 	return;
 Error:
@@ -29,7 +33,11 @@ volume::volume(double side, bool fTriangleBased) :
 	CR(Allocate());
 
 	CR(SetVolumeVertices(side, side, side, m_fTriangleBased));
+	
+	// TODO: Allow for changing this - put it into a factory
+	CR(InitializeAABB());
 
+//Success:
 	Validate();
 	return;
 Error:
@@ -46,6 +54,10 @@ volume::volume(BoundingBox* pBoundingBox, bool fTriangleBased) :
 
 	CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
 
+	// TODO: Allow for changing this - put it into a factory
+	CR(InitializeAABB());
+
+//Success:
 	Validate();
 	return;
 Error:

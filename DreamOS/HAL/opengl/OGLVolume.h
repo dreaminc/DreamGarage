@@ -60,6 +60,20 @@ public:
 		return r;
 	}
 
+	RESULT UpdateFromVertices(DimObj *pDimObj) {
+		RESULT r = R_PASS;
+
+		// TODO: Update the bounding box from verts
+
+		volume *pVolume = (volume*)(GetDimObj());
+		//CR(pVolume->UpdateFromVertices(pDimObj));
+
+		CR(UpdateOGLBuffers());
+
+	Error:
+		return r;
+	}
+
 	// TODO: Need to make this better
 	RESULT UpdateBuffers() override {
 		return UpdateOGLBuffers();

@@ -218,6 +218,7 @@ RESULT OGLObj::RenderBoundingVolume() {
 		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
 
 		if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
+			//pOGLBoundingBox->UpdateFromVertices();
 			pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox);
 		}
 	}
