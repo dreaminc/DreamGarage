@@ -49,6 +49,17 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	RESULT UpdateFromBoundingBox(BoundingBox* pBoundingBox) {
+		RESULT r = R_PASS;
+
+		volume *pVolume = (volume*)(GetDimObj());
+		CR(pVolume->UpdateFromBoundingBox(pBoundingBox));
+		CR(UpdateOGLBuffers());
+
+	Error:
+		return r;
+	}
+
 	// TODO: Need to make this better
 	RESULT UpdateBuffers() override {
 		return UpdateOGLBuffers();

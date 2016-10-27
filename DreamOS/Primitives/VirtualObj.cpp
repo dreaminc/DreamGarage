@@ -35,41 +35,49 @@ point VirtualObj::GetPosition() {
 
 VirtualObj* VirtualObj::translate(matrix <point_precision, 4, 1> v) {
 	m_ptOrigin.translate(v);
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::translate(point_precision x, point_precision y, point_precision z) {
 	m_ptOrigin.translate(x, y, z);
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::translateX(point_precision x) {
 	m_ptOrigin.translateX(x);
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::translateY(point_precision y) {
 	m_ptOrigin.translateY(y);
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::translateZ(point_precision z) {
 	m_ptOrigin.translateZ(z);
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetPosition(point p) {
 	m_ptOrigin = p;
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::MoveTo(point p) {
 	m_ptOrigin = p;
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::Scale(point_precision scale) {
 	m_vScale.x() = m_vScale.y() = m_vScale.z() = scale;
+	OnManipulation();
 	return this;
 }
 
@@ -77,18 +85,20 @@ VirtualObj* VirtualObj::MoveTo(point_precision x, point_precision y, point_preci
 	m_ptOrigin.x() = x;
 	m_ptOrigin.y() = y;
 	m_ptOrigin.z() = z;
-
+	OnManipulation();
 	return this;
 }
 
 // Pivot Point
 RESULT VirtualObj::SetPivotPoint(point ptPivot) {
 	m_ptPivot = ptPivot;
+	OnManipulation();
 	return R_PASS;
 }
 
 RESULT VirtualObj::SetPivotPoint(point_precision x, point_precision y, point_precision z) {
 	m_ptPivot = point(x, y, z);
+	OnManipulation();
 	return R_PASS;
 }
 
@@ -122,7 +132,7 @@ VirtualObj* VirtualObj::SetVelocity(point_precision x, point_precision y, point_
 VirtualObj* VirtualObj::RotateBy(quaternion q) {
 	m_qRotation *= q;
 	m_qRotation.Normalize();
-
+	OnManipulation();
 	return this;
 }
 
@@ -131,17 +141,19 @@ VirtualObj* VirtualObj::RotateBy(quaternion_precision thetaX, quaternion_precisi
 	m_qRotation.RotateX(thetaX);
 	m_qRotation.RotateY(thetaY);
 	m_qRotation.RotateZ(thetaZ);
-	
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::RotateXBy(quaternion_precision theta) {
 	m_qRotation.RotateX(theta);
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::RotateYBy(quaternion_precision theta) {
 	m_qRotation.RotateY(theta);
+	OnManipulation();
 	return this;
 }
 
@@ -174,37 +186,41 @@ VirtualObj* VirtualObj::RotateZByDeg(quaternion_precision deg) {
 VirtualObj* VirtualObj::SetRotate(quaternion q) {
 	m_qRotation = q;
 	m_qRotation.Normalize();
-
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetOrientation(quaternion qOrientation) {
 	m_qRotation = qOrientation;
 	m_qRotation.Normalize();
-
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetRotate(quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 	m_qRotation = quaternion::iQuaternion(x) * quaternion::jQuaternion(y) * quaternion::kQuaternion(z);
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetRotateX(quaternion_precision theta) {
 	m_qRotation = quaternion::iQuaternion(theta) * quaternion::jQuaternion(m_qRotation.GetEulerAngelY()) * quaternion::kQuaternion(m_qRotation.GetEulerAngelZ());
 	m_qRotation.Normalize();
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetRotateY(quaternion_precision theta) {
 	m_qRotation = quaternion::iQuaternion(m_qRotation.GetEulerAngelX()) * quaternion::jQuaternion(theta) * quaternion::kQuaternion(m_qRotation.GetEulerAngelZ());
 	m_qRotation.Normalize();
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::SetRotateZ(quaternion_precision theta) {
 	m_qRotation = quaternion::iQuaternion(m_qRotation.GetEulerAngelX()) * quaternion::jQuaternion(m_qRotation.GetEulerAngelY()) * quaternion::kQuaternion(theta);
 	m_qRotation.Normalize();
+	OnManipulation();
 	return this;
 }
 
@@ -251,16 +267,22 @@ VirtualObj* VirtualObj::SetAngularMomentum(quaternion am) {
 // Update Functions
 VirtualObj* VirtualObj::UpdatePosition() {
 	m_ptOrigin += m_vVelocity;
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::UpdateRotation() {
 	m_qRotation *= m_qAngularMomentum;
+	OnManipulation();
 	return this;
 }
 
 VirtualObj* VirtualObj::Update() {
 	return UpdatePosition()->UpdateRotation();
+}
+
+RESULT VirtualObj::OnManipulation() {
+	return R_SKIPPED;
 }
 
 // Matrix Functions

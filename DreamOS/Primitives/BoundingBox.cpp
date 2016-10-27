@@ -100,23 +100,44 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 	return R_PASS;
 }
 
+// TODO: Add rotation
+vector BoundingBox::GetHalfVector() {
+	//vector vHalfSize = GetOrientation().RotateVector(m_vHalfSize);
+	vector vHalfSize = RotationMatrix(GetOrientation()) * m_vHalfSize;
+
+	m_vHalfSize.Print("halfsize before");
+	vHalfSize.Print("halfsize after");
+
+	return vHalfSize;
+}
+
+point BoundingBox::GetOrigin() {
+	if (!m_ptOrigin.IsZero()) {
+		point ptRotated = point(GetOrientation().RotateVector(vector(m_ptOrigin)));
+		return (-1.0f * m_pParent->GetOrigin() - ptRotated);
+	}
+	else {
+		return (-1.0f * m_pParent->GetOrigin());
+	}
+}
+
 double BoundingBox::GetWidth() {
-	return static_cast<double>(m_vHalfSize.x() * 2.0f);
+	return static_cast<double>(GetHalfVector().x() * 2.0f);
 }
 
 double BoundingBox::GetHeight() {
-	return static_cast<double>(m_vHalfSize.y() * 2.0f);
+	return static_cast<double>(GetHalfVector().y() * 2.0f);
 }
 
 double BoundingBox::GetLength() {
-	return static_cast<double>(m_vHalfSize.z() * 2.0f);
+	return static_cast<double>(GetHalfVector().z() * 2.0f);
 }
 
 // TODO: Why do we need to invert the point?
 point BoundingBox::GetMinPoint() {
-	return ((-1.0f * m_pParent->GetOrigin() - m_ptOrigin) - m_vHalfSize);
+	return (GetOrigin() - m_vHalfSize);
 }
 
 point BoundingBox::GetMaxPoint() {
-	return ((-1.0f * m_pParent->GetOrigin() - m_ptOrigin) + m_vHalfSize);
+	return (GetOrigin() + m_vHalfSize);
 }

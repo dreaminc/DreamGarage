@@ -697,7 +697,11 @@ RESULT OGLProgram::RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore) {
 			OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pVirtualObj);
 
 			if (pOGLObj != nullptr) {
-				SetObjectUniforms(pDimObj);
+				// TODO: This is a bit wonky, RenderBoundingVolume creates the OGL Bounding volume 
+				// which might not be the right flow
+				if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
+					SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
+				}
 				CR(pOGLObj->RenderBoundingVolume());
 			}
 

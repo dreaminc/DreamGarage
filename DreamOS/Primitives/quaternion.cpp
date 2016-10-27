@@ -245,17 +245,17 @@ vector quaternion::GetVector() {
 vector quaternion::RotateVector(vector v) {
 	vector retVal;
 
-	retVal.x() = v.x() * (1.0f - 2 * (y2() + z2())) +
-		v.y() * (2 * (x()*y() + w()*z())) +
-		v.z() * (2 * (x()*z() - w()*y()));
+	retVal.x() =	v.x() * (1.0f - 2.0f * (y2() + z2())) +
+					v.y() * (2.0f * (x()*y() + w()*z())) +
+					v.z() * (2.0f * (x()*z() - w()*y()));
 
-	retVal.y() = v.x() * (2 * (x()*y() - w()*z())) +
-		v.y() * (1.0f - 2 * (x2() + z2())) +
-		v.z() * (2 * (y()*z() + w()*x()));
+	retVal.y() =	v.x() * (2.0f * (x()*y() - w()*z())) +
+					v.y() * (1.0f - 2.0f * (x2() + z2())) +
+					v.z() * (2.0f * (y()*z() + w()*x()));
 
-	retVal.z() = v.x() * (2 * (x()*z() + w()*y())) +
-		v.y() * (2 * (y()*z() - w()*x())) +
-		v.z() * (1.0f - 2 * (x2() + y2()));
+	retVal.z() =	v.x() * (2.0f * (x()*z() + w()*y())) +
+					v.y() * (2.0f * (y()*z() - w()*x())) +
+					v.z() * (1.0f - 2.0f * (x2() + y2()));
 
 	return retVal;
 }

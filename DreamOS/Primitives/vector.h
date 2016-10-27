@@ -16,6 +16,7 @@
 #endif
 
 class point;
+class quaternion;
 
 class vector : public matrix <vector_precision, 4, 1> {
 public:
@@ -48,6 +49,8 @@ public:
 
 	vector cross(vector rhs);
 	vector NormalizedCross(vector rhs);
+
+	vector RotateByQuaternion(quaternion q);
 
 	// Explicitly specializing the assignment operator
 	vector& operator=(const matrix<vector_precision, 4, 1> &arg);

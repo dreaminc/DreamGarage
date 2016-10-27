@@ -34,11 +34,12 @@ RESULT DreamTestApp::LoadScene() {
 	*/
 
 	// TODO: sphere AABB
-	sphere *pSphere = AddSphere(0.5f, 10, 10);
-	pSphere->MoveTo(1.5f, 0.5f, 0.0f);
+	//sphere *pSphere = AddSphere(0.5f, 10, 10);
+	//pSphere->MoveTo(1.5f, 0.5f, 0.0f);
 
 	g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
-	g_pCylinder->MoveTo(0.0f, -1.0f, -2.0f);
+	g_pCylinder->RotateZBy((float)(M_PI_4));
+	//g_pCylinder->MoveTo(0.0f, -1.0f, -2.0f);
 	//pCylinder->SetWireframe(true);
 
 	/*
@@ -56,9 +57,11 @@ RESULT DreamTestApp::LoadScene() {
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
+	/*
 	if (g_pCylinder != nullptr) {
 		g_pCylinder->RotateByDeg(0.01f, 0.01f, 0.01f);
 	}
+	*/
 
 	//Error:
 	return r;

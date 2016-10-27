@@ -211,7 +211,15 @@ RESULT OGLObj::RenderBoundingVolume() {
 				return R_NOT_IMPLEMENTED;
 			} break;
 		}
+	}
+	else {
+		DimObj *pDimObj = GetDimObj();
+		BoundingBox* pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get());
+		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
 
+		if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
+			pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox);
+		}
 	}
 	
 	CR(m_pOGLBoundingVolume->Render());
@@ -250,3 +258,6 @@ OGLTexture* OGLObj::GetTextureSpecular() {
 	return pTexture;
 }
 
+OGLObj *OGLObj::GetOGLBoundingVolume() {
+	return m_pOGLBoundingVolume;
+}

@@ -43,6 +43,9 @@ public:
 	double GetHeight();
 	double GetLength();
 
+	vector GetHalfVector();
+	point GetOrigin();
+
 	point GetMinPoint();
 	point GetMaxPoint();
 

@@ -1,6 +1,7 @@
 #include "vector.h"
 
 #include "point.h"
+#include "quaternion.h"
 
 vector::vector() {
 	clear();
@@ -102,6 +103,11 @@ vector vector::cross(vector rhs) {
 // Normalized Cross Product
 vector vector::NormalizedCross(vector rhs) {
 	return vector(this->Normal(), rhs.Normal());
+}
+
+// http://gamedev.stackexchange.com/questions/28395/rotating-vector3-by-a-quaternion
+vector vector::RotateByQuaternion(quaternion q) {
+	return q.RotateVector(*this);
 }
 
 // Explicitly specializing the assignment operator

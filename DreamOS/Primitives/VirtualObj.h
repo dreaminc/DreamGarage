@@ -114,6 +114,11 @@ public:
 	VirtualObj* UpdatePosition();
 	VirtualObj* UpdateRotation();
 
+	// OnManipulation is called any time an object is manipulated in some way
+	// since some objects may need to update certain things, like reference geometry 
+	// or to test for collisions on update etc
+	virtual RESULT OnManipulation();
+
 	// Matrix Functions
 	//matrix<virtual_precision, 4, 4> GetModelMatrix();
 	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));

@@ -5,6 +5,8 @@ HALImp::HALImp() :
 	m_pHMD(nullptr)
 {
 	memset(&m_HALConfiguration, 0, sizeof(HALImp::HALConfiguration));
+	
+	m_HALConfiguration.fRenderReferenceGeometry = true;
 }
 
 HALImp::~HALImp() {

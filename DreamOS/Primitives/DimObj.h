@@ -137,6 +137,10 @@ public:
 	RESULT InitializeBoundingSphere();
 	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 
+	// OnManipulation is called by VirtualObj every time a manipulation occurs - this is a chance for
+	// DimObj to update the bounding volume
+	virtual RESULT OnManipulation() override;
+
 public:
 	RESULT SetTriangleNormal(dimindex i1, dimindex i2, dimindex i3);
 	RESULT SetTriangleTangentBitangent(dimindex i1, dimindex i2, dimindex i3);

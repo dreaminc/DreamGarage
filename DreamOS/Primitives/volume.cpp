@@ -44,8 +44,29 @@ volume::volume(BoundingBox* pBoundingBox, bool fTriangleBased) :
 	RESULT r = R_PASS;
 	CR(Allocate());
 
-	double width = pBoundingBox->GetWidth(); 
-	double height = pBoundingBox->GetHeight(); 
+	CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
+RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBased) {
+	RESULT r = R_PASS;
+
+	CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
+
+Error:
+	return r;
+}
+
+RESULT volume::SetVolumeVertices(BoundingBox* pBoundingBox, bool fTriangleBased) {
+	RESULT r = R_PASS;
+
+	double width = pBoundingBox->GetWidth();
+	double height = pBoundingBox->GetHeight();
 	double length = pBoundingBox->GetLength();
 
 	if (width == length &&
@@ -55,11 +76,8 @@ volume::volume(BoundingBox* pBoundingBox, bool fTriangleBased) :
 
 	CR(SetVolumeVertices(width, length, height, m_fTriangleBased, pBoundingBox->GetOrigin()));
 
-	Validate();
-	return;
 Error:
-	Invalidate();
-	return;
+	return r;
 }
 
 RESULT volume::Allocate() {

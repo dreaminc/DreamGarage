@@ -512,3 +512,14 @@ Error:
 std::shared_ptr<BoundingVolume> DimObj::GetBoundingVolume() {
 	return std::shared_ptr<BoundingVolume>(m_pBoundingVolume);
 }
+
+RESULT DimObj::OnManipulation() {
+	RESULT r = R_PASS;
+
+	if (m_pBoundingVolume != nullptr) {
+		CR(m_pBoundingVolume->SetDirty());
+	}
+
+Error:
+	return r;
+}

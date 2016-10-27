@@ -9,13 +9,15 @@
 // TODO: bounding volume suggests volume as in volume in the engine, which is a rectilinear volume - but this is more general
 
 #include "point.h"
+#include "quaternion.h"
 #include "ray.h"
+#include "dirty.h"
 
 class VirtualObj;
 class BoundingSphere;
 class BoundingBox;
 
-class BoundingVolume {
+class BoundingVolume : public dirty {
 public:
 	enum class Type {
 		BOX,
@@ -65,7 +67,8 @@ public:
 		return R_PASS;
 	}
 
-	point GetOrigin() { return m_ptOrigin; }
+	point GetOrigin() { return m_ptOrigin; }	// TODO: move to the origin of the parent object
+	quaternion GetOrientation();
 
 	virtual BoundingVolume::Type GetType() = 0;
 

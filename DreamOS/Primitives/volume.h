@@ -38,6 +38,9 @@ public:
 	volume(double side, bool fTriangleBased = true);
 	volume(BoundingBox* pBoundingBox, bool fTriangleBased = true);
 
+	RESULT UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBased = true);
+	RESULT SetVolumeVertices(BoundingBox* pBoundingBox, bool fTriangleBased);
+
 	virtual RESULT Allocate() override;
 	virtual unsigned int NumberVertices() override;
 	virtual unsigned int NumberIndices() override;

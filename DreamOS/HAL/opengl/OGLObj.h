@@ -43,6 +43,8 @@ public:
 	OGLTexture *GetTextureDiffuse();
 	OGLTexture *GetTextureSpecular();
 
+	OGLObj *GetOGLBoundingVolume();
+
 protected:
 	GLuint m_hVAO;		// vertex array object
 	GLuint m_hVBO;		// vertex buffer object

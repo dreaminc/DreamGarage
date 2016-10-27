@@ -3,6 +3,8 @@
 #include "BoundingSphere.h"
 #include "BoundingBox.h"
 
+#include "VirtualObj.h"
+
 bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 	BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pRHS);
 	if (pBoundingBox != nullptr)
@@ -13,4 +15,8 @@ bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 		return Intersect(*pBoundingSphere);
 
 	return false;
+}
+
+quaternion BoundingVolume::GetOrientation() { 
+	return m_pParent->GetOrientation(); 
 }
