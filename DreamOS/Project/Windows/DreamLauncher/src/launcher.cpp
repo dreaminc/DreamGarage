@@ -130,34 +130,36 @@ bool ExecuteUpdate(int argc, char *argv[])
 --squirrel-uninstall x.y.z.m - called when your app is uninstalled. Exit as soon as you're finished.
 */
 
-enum class SquirrelCmdEventType
+enum class CmdEventType
 {
-	// not a squirrel event
+	// not an event
 	None,
 
+	// squirrel.windows events
 	Install,
 	FirstRun,
 	Updated,
 	Obsolete,
 	Uninstall,
 
+	// custom events
 	Registry
 };
 
-std::map<std::string, SquirrelCmdEventType> squirrelCmdlnEventDictionary
+std::map<std::string, CmdEventType> squirrelCmdlnEventDictionary
 {
-	{ "--squirrel-install",		SquirrelCmdEventType::Install },
-	{ "--squirrel-firstrun",	SquirrelCmdEventType::FirstRun },
-	{ "--squirrel-updated",		SquirrelCmdEventType::Updated },
-	{ "--squirrel-obsolete",	SquirrelCmdEventType::Obsolete },
-	{ "--squirrel-uninstall",	SquirrelCmdEventType::Uninstall },
-	{ "--registry",				SquirrelCmdEventType::Registry },
+	{ "--squirrel-install",		CmdEventType::Install },
+	{ "--squirrel-firstrun",	CmdEventType::FirstRun },
+	{ "--squirrel-updated",		CmdEventType::Updated },
+	{ "--squirrel-obsolete",	CmdEventType::Obsolete },
+	{ "--squirrel-uninstall",	CmdEventType::Uninstall },
+	{ "--registry",				CmdEventType::Registry },
 };
 
-SquirrelCmdEventType CheckSquirrelCmdlnEvent(int argc, char *argv[])
+CmdEventType CheckSquirrelCmdlnEvent(int argc, char *argv[])
 {
 	if (argc < 2)
-		return SquirrelCmdEventType::None;
+		return CmdEventType::None;
 
 	std::string arg(argv[1]);
 
@@ -166,7 +168,7 @@ SquirrelCmdEventType CheckSquirrelCmdlnEvent(int argc, char *argv[])
 		return squirrelCmdlnEventDictionary[arg];
 	}
 
-	return SquirrelCmdEventType::None;
+	return CmdEventType::None;
 }
 
 bool InstallShortcuts()
@@ -263,24 +265,24 @@ int main(int argc, char *argv[])
 
 	auto squirrelCmdlnEvent = CheckSquirrelCmdlnEvent(argc, argv);
 
-	if (squirrelCmdlnEvent != SquirrelCmdEventType::None)
+	if (squirrelCmdlnEvent != CmdEventType::None)
 	{
-		if (squirrelCmdlnEvent == SquirrelCmdEventType::FirstRun)
+		if (squirrelCmdlnEvent == CmdEventType::FirstRun)
 		{
 			InstallShortcuts();
 
 			// open in external browser (for now used as an indication updated completed)
-			std::system("start C:\\Users\\Folder\\chrome.exe https://www.develop.dreamos.com/");
+			ShellExecute(0, 0, L"https://www.develop.dreamos.com/", 0, 0, SW_SHOW);
 		}
-		else if (squirrelCmdlnEvent == SquirrelCmdEventType::Updated)
+		else if (squirrelCmdlnEvent == CmdEventType::Updated)
 		{
 			InstallShortcuts();
 		}
-		else if (squirrelCmdlnEvent == SquirrelCmdEventType::Registry)
+		else if (squirrelCmdlnEvent == CmdEventType::Registry)
 		{
 			InstallRegistryVars();
 		}
-		else if (squirrelCmdlnEvent == SquirrelCmdEventType::Install)
+		else if (squirrelCmdlnEvent == CmdEventType::Install)
 		{
 			if (!InstallRegistry())
 			{
