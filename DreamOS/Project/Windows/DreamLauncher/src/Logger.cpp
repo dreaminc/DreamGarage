@@ -41,7 +41,7 @@ std::string getcommandline()
 #endif
 
 
-RESULT	Logger::InitializeLogger()
+bool	Logger::InitializeLogger()
 {
 	// TODO: garbage-collect older logs
 
@@ -56,8 +56,8 @@ RESULT	Logger::InitializeLogger()
 	el::Configurations defaultConf;
 
 	defaultConf.setToDefault();
-	defaultConf.set(el::Level::Info, el::ConfigurationType::Format, "%datetime [DOS] %level %msg");
-	defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime [DOS] %level %msg");
+	defaultConf.set(el::Level::Info, el::ConfigurationType::Format, "%datetime [DOSLAUNCHER] %level %msg");
+	defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime [DOSLAUNCHER] %level %msg");
 	defaultConf.setGlobally(el::ConfigurationType::Filename, path);
 	defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
 	el::Loggers::reconfigureLogger("default", defaultConf);
@@ -65,5 +65,5 @@ RESULT	Logger::InitializeLogger()
 	LOG(INFO) << "Process launched " << getexepath();
 	LOG(INFO) << "Process args " << getcommandline();
 
-	return R_PASS;
+	return true;
 }
