@@ -29,8 +29,20 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 {
 	RESULT r = R_PASS;
 
-	// Default title
-	m_pszWindowTitle = _T("Dream OS Sandbox");
+	// for now, the title includes the running folder for the purposes of debugging the updater.
+	// TODO: once we make Dream versioning we will take this out
+	WCHAR tmp[MAX_PATH];
+
+	std::wstring title(tmp, GetModuleFileNameW(NULL, tmp, MAX_PATH));
+	if (title.find_last_of(L"/\\") != std::wstring::npos) {
+
+		title = title.substr(0, title.find_last_of(L"/\\"));
+
+		if (title.find_last_of(L"/\\") != std::wstring::npos)
+			title = title.substr(title.find_last_of(L"/\\") + 1);
+	}
+
+	title = L"Dream " + title;
 
 	m_hInstance = GetModuleHandle(0);
 
@@ -72,7 +84,7 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	m_hwndWindow = CreateWindow(
 		m_pszClassName,										// lpClassName
-		m_pszWindowTitle,									// lpWindowName
+		title.c_str(),									// lpWindowName
 		m_wndStyle | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,		// dwStyle
 		m_posX,												// X
 		m_posY,												// Y
