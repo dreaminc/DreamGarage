@@ -49,7 +49,7 @@ public:
 		CharacterGlyph() { }
 	};
 
-	Font(const std::wstring& fnt_file);
+	Font(const std::wstring& fnt_file, bool distanceMap = false);
 	~Font();
 
 	// Get a glyph structure from an ascii.
@@ -81,6 +81,18 @@ private:
 
 	// A glyph base defines the number of pixels in the y-axis above the virtual line of drawing a text
 	uint32_t m_glyphBase = 0;
+
+// Distance Mapping
+public:
+	bool HasDistanceMap() { return m_fDistanceMap; }
+	float GetBuffer() { return m_buffer; }
+	float GetGamma() { return m_gamma; }
+
+
+private:
+	bool m_fDistanceMap;
+	float m_buffer = 0.5f;
+	float m_gamma = 0.02f;
 };
 
 #endif // ! FONT_H_

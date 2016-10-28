@@ -64,6 +64,9 @@ public:
 	RESULT InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth);
 	RESULT InitializeRenderBufferMultisample(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT, int multisample = 4);
 
+public:
+	texture *GetTexture();
+
 private:
 	OpenGLImp *m_pParentImp;
 

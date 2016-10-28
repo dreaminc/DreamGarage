@@ -19,6 +19,7 @@ public:
 
 	RESULT Initialize();
 	RESULT UpdateHand(const hand::HandState& pHandState);
+	RESULT UpdateMouth(float mouthScale);	// used for scaling the user mouth
 	RESULT SwitchHeadModel();
 
 private:
@@ -31,6 +32,9 @@ private:
 
 	std::shared_ptr<hand> m_pLeftHand;
 	std::shared_ptr<hand> m_pRightHand;
+
+	std::shared_ptr<quad> m_pMouth = nullptr;
+	std::shared_ptr<texture> m_pMouthTexture = nullptr;
 };
 
 #endif	// ! PRIMITIVE_USER_H_

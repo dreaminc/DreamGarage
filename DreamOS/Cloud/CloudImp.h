@@ -32,25 +32,8 @@ public:
 		// empty
 	}
 
-	virtual RESULT Update() = 0;
-	virtual RESULT CreateNewURLRequest(std::wstring& strURL) = 0;
-
-	virtual RESULT ConnectToPeer(int peerID) = 0;
-	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() = 0;
-	
-	virtual RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage) = 0;
-	virtual RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
-
-	virtual std::string GetSDPOfferString() { return std::string(""); };
-	
-	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOfferJSON) { return R_NOT_IMPLEMENTED; };
-	virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) { return R_NOT_IMPLEMENTED; };
-
-	virtual RESULT AddIceCandidates() { return R_NOT_IMPLEMENTED; }
-
-	virtual bool IsConnected() = 0;
-
-	// TODO: Add a handle URL request callback here
+	virtual RESULT Update() { return R_NOT_IMPLEMENTED; }
+	virtual RESULT CreateNewURLRequest(std::wstring& strURL) { return R_NOT_IMPLEMENTED; }
 
 	CloudController* GetParentCloudController() { return m_pParentCloudController; }
 

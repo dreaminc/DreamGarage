@@ -3,6 +3,7 @@
 /.vs/*
 /Debug/*
 /Release/*
+/Production/*
 /x64/*
 *.opendb
 *.opensdf

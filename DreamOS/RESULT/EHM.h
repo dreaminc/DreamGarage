@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <stddef.h>
 
+
+
 #define DEBUG_OUT_TO_CONSOLE
 //#define DEBUG_OUT_TO_WIN_DEBUGGER
 
@@ -72,6 +74,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 // Check Boolean Result
 // Ensures that condition evaluates to true
 #define CB(condition) do{if(!(condition)) {r = R_FAIL; goto Error;}}while(0);
+#define WCB(condition) do{if(!(condition)) {r = R_WARNING; goto Error;}}while(0);
 #define CBR(condition, failCode) do{if(!(condition)) {r = failCode; goto Error;}}while(0);
 #define CBM(condition, msg, ...) do{if(!(condition)) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_FAIL; goto Error; }}while(0);
 #define CBRM(condition, failCode, msg, ...) do{if(!(condition)) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
@@ -82,6 +85,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 // Check NULL Result
 // Ensures that the pointer is not a NULL
 #define CN(pointer) do{if((pointer) == NULL) {r = R_ERROR; goto Error;}}while(0);
+#define WCN(pointer) do{if((pointer) == NULL) {r = R_WARNING; goto Error;}}while(0);
 #define CNR(pointer, failCode) do{if((pointer) == NULL) {r = failCode; goto Error;}}while(0);
 #define CNM(pointer, msg, ...) do{if((pointer) == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_ERROR; goto Error; }}while(0);
 #define CNMW(pointer, msg, ...) do{if((pointer) == NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING; }}while(0);
@@ -93,6 +97,7 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 // Check Pointer Result
 // Ensures that the pointer is not a NULL
 #define CP(pointer) CN(pointer)
+#define WCP(pointer) WCN(pointer)
 #define CPR(pointer, failCode) CNR(pointer, failCode)
 #define CPM(pointer, msg, ...) CNM(pointer, msg, ##__VA_ARGS__)
 #define CPRM(pointer, msg, ...) CNRM(pointer, failCode, msg, ##__VA_ARGS__)

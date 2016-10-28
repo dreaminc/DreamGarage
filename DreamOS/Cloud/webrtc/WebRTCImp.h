@@ -14,20 +14,16 @@
 
 #include <memory>
 
+#include "WebRTCCommon.h"
 #include "webrtc/base/win32socketserver.h"
 
-const char kAudioLabel[] = "audio_label";
-const char kVideoLabel[] = "video_label";
-const char kStreamLabel[] = "stream_label";
-const char kDataLabel[] = "data_label";
-const uint16_t kDefaultServerPort = 8888;
+#include "WebRTCConductor.h"
 
 class WebRTCClient;
-class WebRTCConductor;
-class ICECandidate;
+class WebRTCICECandidate;
 class PeerConnection;
 
-class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp> {
+class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp>, public WebRTCConductor::WebRTCConductorObserver {
 public:
 	enum WindowMessages {
 		UI_THREAD_CALLBACK = WM_APP + 1,
@@ -36,13 +32,19 @@ public:
 public:
 	class WebRTCObserver {
 	public:
-		virtual RESULT OnWebRTCConnectionStable() = 0;
-		virtual RESULT OnWebRTCConnectionClosed() = 0;
-		virtual RESULT OnSDPOfferSuccess() = 0;
-		virtual RESULT OnSDPAnswerSuccess() = 0;
-		virtual RESULT OnICECandidatesGatheringDone() = 0;
-		virtual RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage) = 0;
-		virtual RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnWebRTCConnectionStable(long peerConnectionID) = 0;
+		virtual RESULT OnWebRTCConnectionClosed(long peerConnectionID) = 0;
+		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;
+		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;
+		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID,
+			const void* audio_data,
+			int bits_per_sample,
+			int sample_rate,
+			size_t number_of_channels,
+			size_t number_of_frames) = 0;
 	};
 
 public:
@@ -57,65 +59,57 @@ public:
 	RESULT RegisterObserver(WebRTCObserver *pWebRTCObserver);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
 	RESULT Update();
-	bool IsConnected();
-	bool IsOfferer();
-	bool IsAnswerer();
-	std::list<ICECandidate> GetCandidates();
+
+	bool IsConnected(long peerConnectionID);
+	bool IsOfferer(long peerConnectionID);
+	bool IsAnswerer(long peerConnectionID);
+	std::list<WebRTCICECandidate> GetCandidates(long peerConnectionID);
 
 	// Functionality
-	RESULT StartLogin(const std::string& server, int port);
-	//RESULT InitializeConnection(bool fMaster, bool fAddDataChannel);
-	//RESULT InitializePeerConnection(bool fAddDataChannel);
-	RESULT InitializePeerConnection(bool fCreateOffer, bool fAddDataChannel = true);
-	int GetFirstPeerID();
-	
-	virtual RESULT ConnectToPeer(int peerID) override;
-	virtual std::function<void(int msg_id, void* data)> GetUIThreadCallback() override;
-	void QueueUIThreadCallback(int msg_id, void* data);
-	virtual RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage) override;
-	virtual RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	// TODO: Hand around PeerConnection object instead of peerConnectionID?
+	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer);
+
+	RESULT SendDataChannelStringMessage(long peerConnectionID, std::string& strMessage);
+	RESULT SendDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+
+	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);
+	RESULT SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 public:
-	// Utilities
-	std::string GetSDPString();
+	std::string GetLocalSDPString(long peerConnectionID);
+	std::string GetRemoteSDPString(long peerConnectionID);
+	std::string GetLocalSDPJSONString(long peerConnectionID);
+	std::string GetRemoteSDPJSONString(long peerConnectionID);
+	RESULT CreateSDPOfferAnswer(long peerConnectionID, std::string strSDPOffer);
+	RESULT SetSDPAnswer(long peerConnectionID, std::string strSDPAnswer);
 
-	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
-	static std::string GetPeerName();
-	virtual std::string GetSDPOfferString() override;
-	//virtual RESULT InitializeConnection(bool fMaster, bool fAddDataChannel) override;
-	virtual RESULT CreateSDPOfferAnswer(std::string strSDPOffer) override;
-	virtual RESULT AddIceCandidates() override;
 	RESULT AddOfferCandidates(PeerConnection *pPeerConnection);
 	RESULT AddAnswerCandidates(PeerConnection *pPeerConnection);
-	RESULT SetSDPAnswer(std::string strSDPAnswer);
+
+	static std::string GetEnvVarOrDefault(const char* env_var_name, const char* default_value);
 
 protected:
-	RESULT OnSignedIn();
-	RESULT OnDisconnected();
-	RESULT OnPeerConnected(int id, const std::string& name);
-	RESULT OnPeerDisconnected(int peer_id);
-	RESULT OnMessageFromPeer(int peerID, const std::string& strMessage);
-	RESULT OnMessageSent(int err);
-	RESULT OnServerConnectionFailure();
-	RESULT OnSDPOfferSuccess();
-	RESULT OnSDPAnswerSuccess();
-	RESULT OnICECandidatesGatheringDone();
-	RESULT OnDataChannelStringMessage(const std::string& strDataChannelMessage);
-	RESULT OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-
-	RESULT OnWebRTCConnectionStable();
-	RESULT OnWebRTCConnectionClosed();
+	// WebRTCConductorObserver 
+	RESULT OnWebRTCConnectionStable(long peerConnectionID);
+	RESULT OnWebRTCConnectionClosed(long peerConnectionID);
+	RESULT OnSDPOfferSuccess(long peerConnectionID);
+	RESULT OnSDPAnswerSuccess(long peerConnectionID);
+	RESULT OnICECandidatesGatheringDone(long peerConnectionID);
+	RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage);
+	RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
+	RESULT OnAudioData(long peerConnectionID,
+		const void* audio_data,
+		int bits_per_sample,
+		int sample_rate,
+		size_t number_of_channels,
+		size_t number_of_frames);
 
 protected:
 	// WebRTC Specific
-	//RESULT QueueUIThreadCallback(int msgID, void* data);
 	DWORD GetUIThreadID() { return m_UIThreadID; }
 
 private:
-	std::shared_ptr<WebRTCClient> m_pWebRTCClient;
-//	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
-	rtc::scoped_refptr<WebRTCConductor> m_pWebRTCConductor;
-	//std::shared_ptr<rtc::Win32Thread> m_pWin32thread;
+	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
 	rtc::Win32Thread m_Win32thread;
 
 	DWORD m_UIThreadID;

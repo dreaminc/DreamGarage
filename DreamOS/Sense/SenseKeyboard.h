@@ -18,6 +18,8 @@
 // TODO: Complete the scan codes, ensure they make sense 
 typedef enum SenseKeyboardScanCodes {
 	SK_ALL = 0x0,
+	SK_SHIFT = 0x10,
+	SK_CONTROL = 0x11,
 	SK_SPACE = 0x20,
 	SK_PRIOR = 0x21,
 	SK_NEXT = 0x22,

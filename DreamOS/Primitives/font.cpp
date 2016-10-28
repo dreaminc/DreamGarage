@@ -6,10 +6,10 @@
 
 #include "Sandbox/PathManager.h"
 
-Font::Font(const std::wstring& fnt_file)
+Font::Font(const std::wstring& fnt_file, bool distanceMap)
 {
 	LoadFontFromFile(fnt_file);
-
+	m_fDistanceMap = distanceMap;
 	// Error:
 	// return false;
 }

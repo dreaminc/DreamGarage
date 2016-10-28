@@ -32,7 +32,7 @@ class SandboxApp;
 class Windows64App;
 class OGLDreamConsole;
 
-class OpenGLImp : public HALImp {
+class OpenGLImp : public HALImp, public Subscriber<CmdPromptEvent> {
 private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
@@ -57,6 +57,8 @@ private:
 	int m_pxViewWidth;
 	int m_pxViewHeight;
 
+	bool	m_drawWireframe = false;
+
 public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
@@ -78,7 +80,7 @@ public:
 	volume* MakeVolume(double width, double length, double height);
 	
 	volume* MakeVolume(double side);
-	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();
@@ -89,7 +91,7 @@ public:
 	composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation);
 
 	composite *MakeComposite();
-	FlatContext* MakeFlatContext();
+	FlatContext* MakeFlatContext(int width, int height, int channels);
 	user *MakeUser();
 	hand* MakeHand();
 
@@ -99,6 +101,7 @@ public:
 public:
 	RESULT SetViewTarget(EYE_TYPE eye);
 	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
+	RESULT RenderToTexture(FlatContext* pContext);
 private:
 	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
 	RESULT RenderProfiler(EYE_TYPE eye);
@@ -122,6 +125,8 @@ private:
 	RESULT PrepareScene();
 
 private:
+	RESULT Notify(CmdPromptEvent *event);
+
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
@@ -191,6 +196,7 @@ public:
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
 	RESULT glUniform1i(GLint location, GLint v0);
+	RESULT glUniform1fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniform4fv(GLint location, GLsizei count, const GLfloat *value);
 	RESULT glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
 

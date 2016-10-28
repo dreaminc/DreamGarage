@@ -84,14 +84,16 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::BindToFramebuffer() {
+RESULT OGLProgram::BindToFramebuffer(OGLFramebuffer* pFramebuffer) {
 	RESULT r = R_PASS;
 
 	//CR(m_pOGLFramebuffer->BindOGLFramebuffer());
 
 	// Render to our framebuffer
-	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_pOGLFramebuffer->GetFramebufferIndex()));
-	CR(m_pOGLFramebuffer->SetAndClearViewport());
+	// By default, uses the member framebuffer
+	OGLFramebuffer* pfb = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, pfb->GetFramebufferIndex()));
+	CR(pfb->SetAndClearViewport());
 
 	// Check framebuffer
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -175,19 +177,28 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 	RESULT r = R_PASS;
 
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
-	CN(m_pOGLFramebuffer);
+	CR(SetFrameBuffer(m_pOGLFramebuffer, internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	RESULT r = R_PASS;
+
+	CN(pFramebuffer);
 	
-	CR(m_pOGLFramebuffer->OGLInitialize());	
-	CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+	CR(pFramebuffer->OGLInitialize());	
+	CR(pFramebuffer->BindOGLFramebuffer());
 
-	CR(m_pOGLFramebuffer->MakeOGLTexture());
+	CR(pFramebuffer->MakeOGLTexture());
 
-	CR(m_pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-	CR(m_pOGLFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
+	CR(pFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
+	CR(pFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
 
-	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(pFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-	CR(m_pOGLFramebuffer->SetOGLDrawBuffers(1));
+	CR(pFramebuffer->SetOGLDrawBuffers(1));
 
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -683,6 +694,7 @@ RESULT OGLProgram::RenderSceneGraph(ObjectStore *pSceneGraph) {
 			continue;
 		else {
 			CR(RenderObject(pDimObj));
+
 		}
 	}
 
@@ -710,6 +722,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	
 	if (pOGLObj != nullptr) {
 		SetObjectUniforms(pDimObj);
+		SetMaterial(pDimObj->GetMaterial());
 		SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
 	
 		CR(pOGLObj->Render());
@@ -830,7 +843,9 @@ Error:
 	return r;
 }
 
-
+OGLFramebuffer *OGLProgram::GetOGLFramebuffer() {
+	return m_pOGLFramebuffer;
+}
 
 // Set Matrix Functions
 /*

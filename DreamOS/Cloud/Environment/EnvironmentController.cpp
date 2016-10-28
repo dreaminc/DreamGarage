@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "Cloud/CloudController.h"
 #include "EnvironmentController.h"
 #include "Cloud/User/User.h"
@@ -32,7 +33,7 @@ EnvironmentController::~EnvironmentController() {
 
 RESULT EnvironmentController::Initialize() {
 	RESULT r = R_PASS;
-
+	
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->Initialize());
 	CR(m_pPeerConnectionController->RegisterPeerConnectionControllerObserver(this));
@@ -55,12 +56,11 @@ Error:
 std::string EnvironmentController::GetMethodURI(EnvironmentMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
-	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
-	std::string strIP = pCommandLineManager->GetParameterValue("ip");
+	std::string ip = pCommandLineManager->GetParameterValue("ws.ip");
 
 	switch (userMethod) {
 		case EnvironmentMethod::CONNECT_SOCKET: {
-			strURI = "ws://" + strIP + ":" + std::to_string(port) + "/environment/";
+			strURI = ip + "/environment/";
 		} break;
 	}
 
@@ -112,10 +112,13 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user) {
 
 	m_fConnected = true;
 
+	LOG(INFO) << "(Cloud) user connected to socket:user=" << user;
+
 Error:
 	return r;
 }
 
+// TODO: this might be dead code
 RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	RESULT r = R_PASS;
 
@@ -131,7 +134,7 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	CBM((m_fConnected), "Environment socket not connected");
 	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
 	
-	strSDPOffer = pParentCloudController->GetSDPOfferString();
+	//strSDPOffer = pParentCloudController->GetSDPOfferString();
 
 	// Set up the JSON data
 
@@ -210,6 +213,8 @@ RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnec
 	m_state = state::SET_SDP_OFFER;
 
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+
+	LOG(INFO) << "(cloud) offer was sent to cloud, msg=" << strData;
 
 Error:
 	return r;
@@ -351,6 +356,14 @@ RESULT EnvironmentController::PrintEnvironmentPeerList() {
 	return R_PASS;
 }
 
+long EnvironmentController::GetUserID() {
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		return m_pEnvironmentControllerObserver->GetUserID();
+	}
+
+	return -1;
+}
+
 EnvironmentPeer *EnvironmentController::GetPeerByUserID(long userID) {
 	for (auto &peer : m_environmentPeers)
 		if (peer.GetUserID() == userID)
@@ -418,6 +431,7 @@ bool EnvironmentController::IsUserIDConnected(long peerUserID) {
 	return m_pPeerConnectionController->IsUserIDConnected(peerUserID);
 }
 
+/*
 // TODO: This is temp
 RESULT EnvironmentController::InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel) {
 	RESULT r = R_PASS;
@@ -428,6 +442,7 @@ RESULT EnvironmentController::InitializeNewPeerConnection(bool fCreateOffer, boo
 Error:
 	return r;
 }
+*/
 
 RESULT EnvironmentController::OnSDPOfferSuccess(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
@@ -436,6 +451,8 @@ RESULT EnvironmentController::OnSDPOfferSuccess(PeerConnection *pPeerConnection)
 
 	CBM((pPeerConnection->GetOfferUserID() == s_user.GetUserID()), "User ID mismatch offer user ID of peer connection");
 	CR(SetSDPOffer(s_user, pPeerConnection));
+
+	LOG(INFO) << "OnSDPOfferSuccess";
 
 	// TOOD: based on pPeerConnection vs username answer or answer
 
@@ -449,6 +466,8 @@ RESULT EnvironmentController::OnSDPAnswerSuccess(PeerConnection *pPeerConnection
 	// TODO: Fix the s_user bullshit
 	CBM((pPeerConnection->GetAnswerUserID() == s_user.GetUserID()), "User ID mismatch answer user ID of peer connection");
 	CR(SetSDPAnswer(s_user, pPeerConnection));
+
+	LOG(INFO) << "OnSDPAnswerSuccess";
 
 	// TOOD: based on pPeerConnection vs username answer or answer
 
@@ -474,8 +493,19 @@ Error:
 void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage) {
 	DEBUG_LINEOUT("HandleWebsocketMessage");
 
+	LOG(INFO) << "(Cloud) websocket msg" << strMessage;
+
 	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
-	
+
+	if (jsonCloudMessage["/method"_json_pointer] == nullptr) {
+		// message error
+
+		LOG(ERROR) << "(cloud) websocket msg error (could be a user already logged in)";
+		HUD_OUT("websocket msg error (could be a user already logged in)");
+
+		return;
+	}
+
 	std::string strGUID = jsonCloudMessage["/id"_json_pointer].get<std::string>();
 	std::string strType = jsonCloudMessage["/type"_json_pointer].get<std::string>();
 	std::string strMethod = jsonCloudMessage["/method"_json_pointer].get<std::string>();
@@ -488,11 +518,23 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 		strMethod = strTokens[1];
 
 		if (strType == "request") {
+			LOG(INFO) << "(cloud) HandleSocketMessage REQUEST " << strMethod << "," << jsonPayload;
+			
 			m_pPeerConnectionController->HandleEnvironmentSocketRequest(strMethod, jsonPayload);
 		}
 		else if (strType == "response") {
+			LOG(INFO) << "(cloud) HandleSocketMessage RESPONSE " << strMethod << "," << jsonPayload;
+			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
+		else
+		{
+			LOG(ERROR) << "(cloud) websocket msg type unknown";
+		}
+	}
+	else
+	{
+		LOG(ERROR) << "(cloud) websocket msg method unknown";
 	}
 
 	/*
@@ -635,22 +677,74 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnDataChannelStringMessage(const std::string& strDataChannelMessage) {
+RESULT EnvironmentController::BroadcastDataChannelStringMessage(std::string& strMessage) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->BroadcastDataChannelStringMessage(strMessage));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(m_pPeerConnectionController);
+	CR(m_pPeerConnectionController->BroadcastDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnPeersUpdate(long index) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(strDataChannelMessage));
+		CR(m_pEnvironmentControllerObserver->OnPeersUpdate(index));
 	}
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT EnvironmentController::OnDataChannelStringMessage(long peerUserID, const std::string& strDataChannelMessage) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(peerUserID, strDataChannelMessage));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(peerUserID, pDataChannelBuffer, pDataChannelBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnAudioData(long peerConnectionID,
+	const void* audio_data,
+	int bits_per_sample,
+	int sample_rate,
+	size_t number_of_channels,
+	size_t number_of_frames) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnAudioData(peerConnectionID,
+			audio_data,
+			bits_per_sample,
+			sample_rate,
+			number_of_channels,
+			number_of_frames));
 	}
 
 Error:

@@ -1,3 +1,4 @@
+#include "Logger/Logger.h"
 #include "UserController.h"
 
 #include "Cloud/HTTP/HTTPController.h"
@@ -32,16 +33,15 @@ UserController::~UserController() {
 std::string UserController::GetMethodURI(UserMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
-	int port = std::stoi(pCommandLineManager->GetParameterValue("port"));
-	std::string strIP = pCommandLineManager->GetParameterValue("ip");
+	std::string ip = pCommandLineManager->GetParameterValue("api.ip");
 
 	switch (userMethod) {
 		case UserMethod::LOGIN: {
-			strURI = "http://" + strIP + ":" + std::to_string(port) + "/token/";
+			strURI = ip + "/token/";
 		} break;
 
 		case UserMethod::LOAD_PROFILE: {	
-			strURI = "http://" + strIP + ":" + std::to_string(port) + "/user/";
+			strURI = ip + "/user/";
 		} break;
 	}
 
@@ -58,7 +58,7 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 	std::string strURI = GetMethodURI(UserMethod::LOGIN);
 
 	HTTPController *pHTTPController = HTTPController::instance();
-
+	
 	// TODO: Not hard coded!
 	CRM(pHTTPController->POST(strURI, HTTPController::ContentHttp(), strHTTPRequest, httpResponse), "User login failed to post request");
 	
@@ -75,6 +75,8 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 
 	DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
 	m_fLoggedIn = true;
+
+	LOG(INFO) << "(Cloud) user logged in:user=" << strUsername;
 
 Error:
 	return r;
@@ -203,7 +205,7 @@ RESULT UserController::LoadProfile() {
 
 		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
 
-		OVERLAY_DEBUG_SET("User", std::string("User ") + m_user.GetEmail());
+		OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
 		OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
 	}
 

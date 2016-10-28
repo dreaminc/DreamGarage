@@ -51,7 +51,6 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 		while (ss >> arg)
 		{
-			OutputDebugStringA(arg.c_str());
 			args.push_back(arg);
 			new_argc++;
 		}
@@ -74,7 +73,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
-
+	
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
@@ -124,9 +123,14 @@ light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOr
 	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
-FlatContext* DreamOS::AddFlatContext()
+FlatContext* DreamOS::AddFlatContext(int width, int height, int channels)
 {
-	return m_pSandbox->AddFlatContext();
+	return m_pSandbox->AddFlatContext(width, height, channels);
+}
+
+RESULT DreamOS::RenderToTexture(FlatContext *pContext) 
+{
+	return m_pSandbox->RenderToTexture(pContext);
 }
 
 sphere* DreamOS::AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
@@ -199,6 +203,10 @@ RESULT DreamOS::UnregisterUpdateCallback() {
 }
 
 // Cloud Controller
+RESULT DreamOS::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
+	return m_pSandbox->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
+}
+
 RESULT DreamOS::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
 	return m_pSandbox->RegisterDataMessageCallback(fnHandleDataMessageCallback);
 }
@@ -211,6 +219,10 @@ RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallbac
 	return m_pSandbox->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
 }
 
+RESULT DreamOS::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
+	return m_pSandbox->RegisterAudioDataCallback(fnHandleAudioDataCallback);
+}
+
 RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pSandbox->SendDataMessage(userID, pDataMessage);
 }
@@ -221,6 +233,18 @@ RESULT DreamOS::SendUpdateHeadMessage(long userID, point ptPosition, quaternion 
 
 RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
 	return m_pSandbox->SendUpdateHandMessage(userID, handState);
+}
+
+RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
+	return m_pSandbox->BroadcastDataMessage(pDataMessage);
+}
+
+RESULT DreamOS::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	return m_pSandbox->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
+}
+
+RESULT DreamOS::BroadcastUpdateHandMessage(hand::HandState handState) {
+	return m_pSandbox->BroadcastUpdateHandMessage(handState);
 }
 
 RESULT DreamOS::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {

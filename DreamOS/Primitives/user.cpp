@@ -12,31 +12,28 @@ user::user(HALImp* pHALImp) :
 RESULT user::Initialize() {
 	RESULT r = R_PASS;
 	
-	// TODO: Make this programmatic 
-
-	///*
-
-	///*
-	std::shared_ptr<texture> pHeadTexture = MakeTexture(L"..\\Models\\face2\\faceP.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	std::shared_ptr<composite> pHead = AddModel(L"\\Models\\face2\\untitled.obj",
-					   pHeadTexture.get(),
-					   point(0.0f, 0.0f, 0.0f),
+	std::shared_ptr<composite> pHead = AddModel(L"\\Models\\face4\\untitled.obj",
+					   nullptr,
+					   point(0.0f, 0.0f - 0.35f, 0.0f),
 					   0.02f,
-					   vector(0.0f, 0.0f, 0.0f));
+					   vector(0.0f, (float)M_PI, 0.0f));
+
+	// for now the mouth is in a hardcoded position attached to the face model
+	m_pMouth = AddQuad(0.3, 1.0);
+
+	m_pMouth->RotateXByDeg(270);
+	m_pMouth->MoveTo(0, 0.25f - 0.35f, -0.17f);
+
+	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	
+	m_pMouth->SetMaterialTexture(MaterialTexture::Ambient, m_pMouthTexture.get());
+	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
+
+
+	pHead->AddChild(m_pMouth);
+	m_pMouth->Scale(0.1f);
 
 	m_pHeads.push_back(pHead);
-	m_pHeadTextures.push_back(pHeadTexture);
-	//*/
-
-	///*
-	pHead = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
-						nullptr,
-						point(0.0f, 0.0f, 0.0f),
-						0.003f,
-						vector((float)M_PI_2, (float)M_PI, 0.0f));
-	pHead->SetVisible(false);
-	m_pHeads.push_back(pHead);
-	//*/
 	
 	// Hands
 	m_pLeftHand = AddHand();
@@ -86,6 +83,14 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 		m_pRightHand->SetHandState(pHandState);
 	}
 
+//Error:
+	return r;
+}
+
+RESULT user::UpdateMouth(float mouthScale) {
+	RESULT r = R_PASS;
+
+	m_pMouth->Scale(0.01f + 0.1f * mouthScale);
 //Error:
 	return r;
 }

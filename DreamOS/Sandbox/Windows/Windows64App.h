@@ -87,7 +87,6 @@ private:
 	long m_wndStyle;
 
 	TCHAR* m_pszClassName;
-	TCHAR* m_pszWindowTitle;
 
 	int m_pxWidth;
 	int m_pxHeight;
@@ -102,7 +101,7 @@ private:
 	HINSTANCE m_hInstance;		// Holds The Instance Of The Application
 
 private:
-	TimeManager	*m_pTimeManager;
+	//TimeManager	*m_pTimeManager;
 	DreamConsole	m_profiler;
 
 	std::function<void(int msg_id, void* data)> m_fnUIThreadCallback;

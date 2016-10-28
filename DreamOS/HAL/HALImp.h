@@ -36,7 +36,6 @@ public:
 
 public:
 	camera *GetCamera();
-	RESULT UpdateCamera();
 	RESULT SetCameraOrientation(quaternion qOrientation);
 	RESULT SetCameraPositionDeviation(vector vDeviation);
 
@@ -47,6 +46,7 @@ public:
 	virtual RESULT MakeCurrentContext() = 0;
 
 	virtual RESULT Render(ObjectStore* pSceneGraph, ObjectStore* pFlatSceneGraph, EYE_TYPE eye) = 0;
+	virtual RESULT RenderToTexture(FlatContext* pContext) = 0;
 
 	virtual RESULT Shutdown() = 0;
 
@@ -59,7 +59,7 @@ public:
 	virtual volume* MakeVolume(double width, double length, double height) = 0;
 
 	virtual volume* MakeVolume(double side) = 0;
-	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false) = 0;
+	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) = 0;
 	virtual skybox *MakeSkybox() = 0;
@@ -74,7 +74,7 @@ public:
 	virtual user *MakeUser() = 0;
 
 	virtual composite *MakeComposite() = 0;
-	virtual FlatContext* MakeFlatContext() = 0;
+	virtual FlatContext* MakeFlatContext(int width, int height, int channels) = 0;
 	virtual hand* MakeHand() = 0;
 
 	/*

@@ -12,6 +12,7 @@
 #include "OGLProgramBlinnPhongTextureBump.h"
 #include "OGLProgramTextureBitBlit.h"
 #include "OGLProgramShadowDepth.h"
+#include "OGLProgramEnvironmentObjects.h"
 
 OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL) {
 	OGLProgram *pOGLProgram = nullptr;
@@ -88,7 +89,13 @@ OGLProgram *OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *p
 			pOGLProgram = new OGLProgramShadowDepth(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"ShadowDepth.vert", L"ShadowDepth.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
-		}
+		} break;
+
+		case OGLPROGRAM_ENVIRONMENT_OBJECTS: {
+			pOGLProgram = new OGLProgramEnvironmentObjects(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"EnvironmentObjects.vert", L"EnvironmentObjects.frag", versionOGL), "Failed to initialize OGL EnvironmentObjects Program");
+		} break;
 
 		case OGLPROGRAM_CUSTOM:
 		case OGLPROGRAM_INVALID: 

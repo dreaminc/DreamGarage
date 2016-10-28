@@ -75,7 +75,8 @@ public:
 
 public:
 	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
-	FlatContext* AddFlatContext();
+	FlatContext* AddFlatContext(int width, int height, int channels);
+	RESULT RenderToTexture(FlatContext* pContext);
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
@@ -108,16 +109,23 @@ public:
 
 	// Cloud Controller 
 public:
+	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandleEnvironmentConnectionCallback);
 	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
+	RESULT RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
+	RESULT BroadcastDataMessage(Message *pDataMessage);
+	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
+
 	// IO
 public:
+	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);
 	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 
@@ -146,6 +154,8 @@ protected:
 
 	SenseKeyboard *m_pSenseKeyboard;
 	SenseMouse *m_pSenseMouse;
+
+	TimeManager* m_pTimeManager;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;

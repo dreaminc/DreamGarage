@@ -48,7 +48,8 @@ protected:
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
-	FlatContext *AddFlatContext();
+	FlatContext *AddFlatContext(int width = 1024, int height = 1024, int channels = 4);
+	RESULT RenderToTexture(FlatContext* pContext);
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 
@@ -86,13 +87,19 @@ protected:
 
 	// Cloud Controller
 protected:
+	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);
 	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
+	RESULT RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+
+	RESULT BroadcastDataMessage(Message *pDataMessage);
+	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
 
 	// IO
 protected:

@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerCommandArguments>-i ec2-54-175-210-194.compute-1.amazonaws.com -P 8000 -u nightmare@dreamos.com -p dreamy</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-u DefaultTestUser@dreamos.com -p nightmare</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerCommandArguments>-i ec2-54-175-210-194.compute-1.amazonaws.com -P 8000 -u nightmare@dreamos.com -p dreamy</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-u DefaultTestUser@dreamos.com -p nightmare</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'">
-    <LocalDebuggerCommandArguments>-i ec2-54-175-210-194.compute-1.amazonaws.com -P 8000 -u nightmare@dreamos.com -p dreamy</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-u DefaultTestUser@dreamos.com -p nightmare</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

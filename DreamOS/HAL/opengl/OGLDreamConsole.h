@@ -58,6 +58,9 @@ public:
 	template<typename T>
 	void Render(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, T minValue, T maxValue);
 
+	template<typename T>
+	void RenderMinimal(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, T minValue, T maxValue);
+
 	void Destroy();
 
 private:
@@ -74,7 +77,7 @@ public:
 	~OGLDebugConsole();
 
 	void Init();
-	void Render(point& topLeft, point& bottomRight);
+	void Render(point& topLeft, point& bottomRight, float fontSize = 4.0f);
 	void Destroy();
 
 private:

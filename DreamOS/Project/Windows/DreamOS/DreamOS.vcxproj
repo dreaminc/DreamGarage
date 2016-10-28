@@ -147,7 +147,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
@@ -158,141 +158,20 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>
-		wininet.lib;
-		dnsapi.lib;
-		version.lib;
-		msimg32.lib;
-		ws2_32.lib;
-		usp10.lib;
-		psapi.lib;
-		dbghelp.lib;
-		winmm.lib;
-		shlwapi.lib;
-		kernel32.lib;
-		gdi32.lib;
-		winspool.lib;
-		comdlg32.lib;
-		advapi32.lib;
-		shell32.lib;
-		ole32.lib;
-		oleaut32.lib;
-		user32.lib;
-		uuid.lib;
-		odbc32.lib;
-		odbccp32.lib;
-		delayimp.lib;
-		credui.lib;
-		dmoguids.lib;
-		wmcodecdspuuid.lib;
-		amstrmid.lib;
-		msdmo.lib;
-		crypt32.lib;
-		iphlpapi.lib;
-		secur32.lib;
-		Strmiids.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\webrtc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\webrtc_common.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\video_quality_test.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\voice_engine\voice_engine.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_audio\common_audio.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_audio\common_audio_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_video\common_video.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\api\libjingle_peerconnection.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\media\rtc_media.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base_approved.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base_tests_utils.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_task_queue.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\pc\rtc_pc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\p2p\rtc_p2p.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log_parser.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log_proto.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\system_wrappers.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\field_trial_default.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\metrics_default.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rtc_event_log_source.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rtp_rtcp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_utility.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_device.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_coding_module.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audioproc_debug_proto.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_processing.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_processing_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_conference_mixer.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_decoder_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_encoder_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_decoder_factory_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\builtin_audio_decoder_factory.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_video_coding.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_processing.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_processing_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture_module.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture_module_internal_impl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\remote_bitrate_estimator.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\cng.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\g722.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\g711.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\ilbc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac_common.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac_fix.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\pcm16b.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\red.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_opus.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_i420.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_h264.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\congestion_controller.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\paced_sender.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\bitrate_controller.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\neteq.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rent_a_codec.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\media_file.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\test\metrics.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\test\test_renderer.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\boringssl\boringssl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\boringssl\boringssl_asm.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\jsoncpp\jsoncpp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\protobuf\protobuf_lite.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\usrsctp\usrsctplib.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\winsdk_samples\directshow_baseclasses.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\opus\opus.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libsrtp\libsrtp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\openmax_dl\dl\openmax_dl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libyuv\libyuv.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libjpeg_turbo\libjpeg.lib;
-		$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;
-		$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.lib;
-		$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.lib;
-		$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\libcurl_imp.lib;
-		$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;
-		$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;
-		%(AdditionalDependencies)
-	  </AdditionalDependencies>
+      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\video_quality_test.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\voice_engine\voice_engine.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_audio\common_audio.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_audio\common_audio_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_video\common_video.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\api\libjingle_peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\media\rtc_media.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base_approved.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base_tests_utils.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_task_queue.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\pc\rtc_pc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log_parser.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\field_trial_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\metrics_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rtc_event_log_source.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rtp_rtcp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_device.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_coding_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audioproc_debug_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_conference_mixer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_decoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_encoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_decoder_factory_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\builtin_audio_decoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_video_coding.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture_module_internal_impl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\remote_bitrate_estimator.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\cng.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\g722.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\g711.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\ilbc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac_fix.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\pcm16b.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\red.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_i420.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_h264.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\congestion_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\paced_sender.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\bitrate_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\neteq.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rent_a_codec.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\media_file.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\test\metrics.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\test\test_renderer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\jsoncpp\jsoncpp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\protobuf\protobuf_lite.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\usrsctp\usrsctplib.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\winsdk_samples\directshow_baseclasses.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\opus\opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libsrtp\libsrtp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\openmax_dl\dl\openmax_dl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libyuv\libyuv.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libjpeg_turbo\libjpeg.lib;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>
-			xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
-			xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
-			xcopy /y "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" /D
-			xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
-			xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
-			xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
-			xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-		</Command>
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
+xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D		
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -342,7 +221,7 @@
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -351,140 +230,20 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>
-		wininet.lib;
-		dnsapi.lib;
-		version.lib;
-		msimg32.lib;
-		ws2_32.lib;
-		usp10.lib;
-		psapi.lib;
-		dbghelp.lib;
-		winmm.lib;
-		shlwapi.lib;
-		kernel32.lib;
-		gdi32.lib;
-		winspool.lib;
-		comdlg32.lib;
-		advapi32.lib;
-		shell32.lib;
-		ole32.lib;
-		oleaut32.lib;
-		user32.lib;
-		uuid.lib;
-		odbc32.lib;
-		odbccp32.lib;
-		delayimp.lib;
-		credui.lib;
-		dmoguids.lib;
-		wmcodecdspuuid.lib;
-		amstrmid.lib;
-		msdmo.lib;
-		crypt32.lib;
-		iphlpapi.lib;
-		secur32.lib;
-		Strmiids.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc_common.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\video_quality_test.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\voice_engine\voice_engine.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_video\common_video.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\api\libjingle_peerconnection.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\media\rtc_media.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_approved.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_tests_utils.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_task_queue.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\pc\rtc_pc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\p2p\rtc_p2p.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_parser.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_proto.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\system_wrappers.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\field_trial_default.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\metrics_default.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtc_event_log_source.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtp_rtcp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_utility.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_device.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_coding_module.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audioproc_debug_proto.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_conference_mixer.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_encoder_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_factory_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\builtin_audio_decoder_factory.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_video_coding.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module_internal_impl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\remote_bitrate_estimator.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\cng.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g722.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g711.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\ilbc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_common.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_fix.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\pcm16b.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\red.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_opus.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_i420.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_h264.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\congestion_controller.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\paced_sender.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\bitrate_controller.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\neteq.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rent_a_codec.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\media_file.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\metrics.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\test_renderer.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\jsoncpp\jsoncpp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\protobuf\protobuf_lite.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\usrsctp\usrsctplib.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\winsdk_samples\directshow_baseclasses.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\opus\opus.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libsrtp\libsrtp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\openmax_dl\dl\openmax_dl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libyuv\libyuv.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libjpeg_turbo\libjpeg.lib;
-		$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;
-		$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef_dll_wrapper.lib;
-		$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef.lib;
-		$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;
-		$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;
-		$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;
-		%(AdditionalDependencies)
-	  </AdditionalDependencies>
+      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\video_quality_test.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\voice_engine\voice_engine.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_video\common_video.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\api\libjingle_peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\media\rtc_media.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_approved.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_tests_utils.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_task_queue.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\pc\rtc_pc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_parser.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\field_trial_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\metrics_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtc_event_log_source.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtp_rtcp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_device.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_coding_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audioproc_debug_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_conference_mixer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_encoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_factory_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\builtin_audio_decoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_video_coding.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module_internal_impl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\remote_bitrate_estimator.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\cng.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g722.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g711.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\ilbc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_fix.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\pcm16b.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\red.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_i420.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_h264.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\congestion_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\paced_sender.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\bitrate_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\neteq.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rent_a_codec.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\media_file.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\metrics.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\test_renderer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\jsoncpp\jsoncpp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\protobuf\protobuf_lite.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\usrsctp\usrsctplib.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\winsdk_samples\directshow_baseclasses.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\opus\opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libsrtp\libsrtp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\openmax_dl\dl\openmax_dl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libyuv\libyuv.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libjpeg_turbo\libjpeg.lib;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>		xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
-		xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Release\*" "$(TargetDir)" /D
-		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
-		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
-		xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
-		xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-                                     python $(ProjectDir)..\..\..\Scripts\copy_assets.py $(ProjectDir)..\..\..\ $(TargetDir)
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Release\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
+xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
+
 	  </Command>
     </PostBuildEvent>
     <PreBuildEvent>
@@ -500,10 +259,10 @@
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;PRODUCTION_BUILD;_WINDOWS;NOT_USE_DREAM_OS_PATH_ENV;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.10.6\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <TreatWarningAsError>true</TreatWarningAsError>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -512,140 +271,21 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>
-		wininet.lib;
-		dnsapi.lib;
-		version.lib;
-		msimg32.lib;
-		ws2_32.lib;
-		usp10.lib;
-		psapi.lib;
-		dbghelp.lib;
-		winmm.lib;
-		shlwapi.lib;
-		kernel32.lib;
-		gdi32.lib;
-		winspool.lib;
-		comdlg32.lib;
-		advapi32.lib;
-		shell32.lib;
-		ole32.lib;
-		oleaut32.lib;
-		user32.lib;
-		uuid.lib;
-		odbc32.lib;
-		odbccp32.lib;
-		delayimp.lib;
-		credui.lib;
-		dmoguids.lib;
-		wmcodecdspuuid.lib;
-		amstrmid.lib;
-		msdmo.lib;
-		crypt32.lib;
-		iphlpapi.lib;
-		secur32.lib;
-		Strmiids.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc_common.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\video_quality_test.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\voice_engine\voice_engine.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_video\common_video.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\api\libjingle_peerconnection.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\media\rtc_media.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_approved.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_tests_utils.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_task_queue.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\pc\rtc_pc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\p2p\rtc_p2p.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_parser.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_proto.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\system_wrappers.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\field_trial_default.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\metrics_default.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtc_event_log_source.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtp_rtcp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_utility.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_device.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_coding_module.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audioproc_debug_proto.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_conference_mixer.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_encoder_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_factory_interface.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\builtin_audio_decoder_factory.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_video_coding.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module_internal_impl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\remote_bitrate_estimator.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\cng.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g722.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g711.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\ilbc.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_common.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_fix.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\pcm16b.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\red.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_opus.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_i420.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_h264.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\congestion_controller.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\paced_sender.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\bitrate_controller.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\neteq.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rent_a_codec.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\media_file.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\metrics.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\test_renderer.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\jsoncpp\jsoncpp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\protobuf\protobuf_lite.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\usrsctp\usrsctplib.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\winsdk_samples\directshow_baseclasses.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\opus\opus.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libsrtp\libsrtp.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\openmax_dl\dl\openmax_dl.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libyuv\libyuv.lib;
-		$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libjpeg_turbo\libjpeg.lib;
-		$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;
-		$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef_dll_wrapper.lib;
-		$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef.lib;
-		$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;
-		$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;
-		$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;
-		%(AdditionalDependencies)
-	  </AdditionalDependencies>
+      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\video_quality_test.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\voice_engine\voice_engine.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_video\common_video.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\api\libjingle_peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\media\rtc_media.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_approved.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_tests_utils.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_task_queue.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\pc\rtc_pc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_parser.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\field_trial_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\metrics_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtc_event_log_source.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtp_rtcp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_device.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_coding_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audioproc_debug_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_conference_mixer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_encoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_factory_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\builtin_audio_decoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_video_coding.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module_internal_impl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\remote_bitrate_estimator.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\cng.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g722.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g711.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\ilbc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_fix.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\pcm16b.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\red.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_i420.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_h264.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\congestion_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\paced_sender.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\bitrate_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\neteq.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rent_a_codec.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\media_file.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\metrics.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\test_renderer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\jsoncpp\jsoncpp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\protobuf\protobuf_lite.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\usrsctp\usrsctplib.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\winsdk_samples\directshow_baseclasses.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\opus\opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libsrtp\libsrtp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\openmax_dl\dl\openmax_dl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libyuv\libyuv.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libjpeg_turbo\libjpeg.lib;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
     </Link>
     <PostBuildEvent>
-      <Command>		xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
-		xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Release\*" "$(TargetDir)" /D
-		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
-		xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
-		xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
-		xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
-	  </Command>
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Release\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
+xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D
+python $(ProjectDir)..\..\..\Scripts\copy_assets.py $(ProjectDir)..\..\..\ $(TargetDir)
+python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDir)..\..\..\Project\Windows\Production\</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -656,13 +296,14 @@
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
-    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCClient.cpp" />
+    <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
@@ -699,7 +340,9 @@
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\Logger\Logger.cpp" />
+    <ClCompile Include="..\..\..\Primitives\camera.cpp" />
     <ClCompile Include="..\..\..\Primitives\composite.cpp" />
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
@@ -723,6 +366,7 @@
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp" />
@@ -733,6 +377,7 @@
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -749,9 +394,11 @@
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h" />
     <ClInclude Include="..\..\..\Cloud\Message\Message.h" />
     <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
+    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\Cloud\Model.h" />
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCClient.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\Environment.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h" />
@@ -762,6 +409,7 @@
     <ClInclude Include="..\..\..\Cloud\User\User.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserController.h" />
     <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h" />
     <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
@@ -984,6 +632,7 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
@@ -1077,6 +726,7 @@
     <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h" />
@@ -1096,59 +746,209 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\Makefile" />
+    <None Include="..\..\..\Models\face4\untitled.mtl">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Rakefile" />
+    <None Include="..\..\..\Resources\Fonts\Arial.fnt">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
+    <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
+      <DeploymentContent>true</DeploymentContent>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\..\..\dreampaths.txt" />
+    <Text Include="..\..\..\dreampaths.txt">
+      <DeploymentContent>true</DeploymentContent>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DreamOS.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="..\..\..\Models\face4\eye.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Texture\Fonts\Arial.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Texture\Fonts\ArialDistance.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
+    <Image Include="..\..\..\Texture\mouth.png">
+      <DeploymentContent>true</DeploymentContent>
+    </Image>
     <Image Include="Dream.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="..\..\..\Models\face4\untitled.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</ExcludedFromBuild>
+      <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='Production|x64'">true</DeploymentContent>
+      <DeploymentContent>true</DeploymentContent>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
