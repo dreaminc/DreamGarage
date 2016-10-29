@@ -16,7 +16,12 @@ bool CheckForUpdate(bool& updated)
 {
 	SquirrelEvent res;
 
-	if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Update.exe", L"--checkForUpdate=\"" + updatesUrl + L"\"",
+	std::wstring loadingGif;
+	//loadingGif += L"--loadingGif=\"";
+	//loadingGif += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
+	//loadingGif += L"loading.gif\"";
+
+	if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Update.exe", L"--checkForUpdate=\"" + updatesUrl + L"\" " + loadingGif,
 		ProcessExecutor::ProcessDir::ParentDir,
 		false,
 		false,
@@ -51,7 +56,13 @@ bool Update()
 {
 	SquirrelEvent res;
 
-	if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Update.exe", L"--update=\"" + updatesUrl + L"\"",
+	std::wstring loadingGif;
+	//loadingGif += L"--loadingGif=\"";
+	//loadingGif += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
+	//loadingGif += L"loading.gif\"";
+
+
+	if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Update.exe", L"--update=\"" + updatesUrl + L"\" " + loadingGif,
 		ProcessExecutor::ProcessDir::ParentDir,
 		false,
 		true,
@@ -272,7 +283,16 @@ int main(int argc, char *argv[])
 			InstallShortcuts();
 
 			// open in external browser (for now used as an indication updated completed)
-			ShellExecute(0, 0, L"https://www.develop.dreamos.com/", 0, 0, SW_SHOW);
+			//ShellExecute(0, 0, L"https://www.develop.dreamos.com/", 0, 0, SW_SHOW);
+			if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Dream.html",
+				L"",
+				ProcessExecutor::ProcessDir::CurrentDir,
+				false,
+				false))
+			{
+				LOG(ERROR) << "error loading Dream.html";
+			}
+
 		}
 		else if (squirrelCmdlnEvent == CmdEventType::Updated)
 		{
