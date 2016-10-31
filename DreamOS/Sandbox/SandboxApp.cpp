@@ -385,7 +385,7 @@ point SandboxApp::GetCameraPosition() {
 }
 
 quaternion SandboxApp::GetCameraOrientation() {
-	return m_pHALImp->GetCamera()->GetOrientation();
+	return m_pHALImp->GetCamera()->GetWorldOrientation();
 }
 
 // TODO: This should move up to Sandbox
