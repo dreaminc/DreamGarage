@@ -217,6 +217,7 @@ RESULT camera::Notify(TimeEvent *event) {
 	point ptOrigin;
 	ptOrigin = m_ptOrigin - ((m_pHMD) ? m_pHMD->GetHeadPointOrigin() : point(0.0f, 0.0f, 0.0f, 0.0f));
 	ptOrigin.SetZeroW();
+	ptOrigin.Reverse();
 
 	m_pCameraFrameOfReference->SetPosition(ptOrigin);
 	m_pCameraFrameOfReference->SetOrientation(qRotation);

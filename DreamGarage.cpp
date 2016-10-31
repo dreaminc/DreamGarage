@@ -66,9 +66,9 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
 
 
-	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.5f, -0.5f, -3.0f));
-	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, 0.0f, -2.5f));
-	AddVolume(0.2f)->MoveTo(point(0.0f, -0.0f, -3.0f));
+	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.5f, -1.0f, 0.0f));
+	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
+	AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
 
 #ifdef TESTING
 // Test Scene
