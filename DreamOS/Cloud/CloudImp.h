@@ -7,10 +7,13 @@
 
 // DREAM OS
 // DreamOS/Cloud/CloudImp.h
-// The base DreamCloud Implementation intefrace
+// The base DreamCloud Implementation interface
 
 #include <string>
 #include <functional>
+
+#include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
 
 class CloudController;
 
@@ -36,6 +39,10 @@ public:
 	virtual RESULT CreateNewURLRequest(std::wstring& strURL) { return R_NOT_IMPLEMENTED; }
 
 	CloudController* GetParentCloudController() { return m_pParentCloudController; }
+
+	virtual RESULT SetUser(User currentUser) { return R_NOT_IMPLEMENTED; };
+	virtual RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) { return R_NOT_IMPLEMENTED; };
+
 
 private:
 	CloudController *m_pParentCloudController;

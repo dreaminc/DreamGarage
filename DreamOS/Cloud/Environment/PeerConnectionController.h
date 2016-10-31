@@ -16,7 +16,9 @@
 
 #include "Cloud/webrtc/WebRTCImp.h"
 
-class User;
+#include "Cloud/User/User.h"
+#include "Cloud/User/TwilioNTSInformation.h"
+
 class Websocket;
 class PeerConnection;
 
@@ -113,6 +115,9 @@ public:
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
 
 	long GetUserID();
+
+	RESULT SetUser(User currentUser);
+	RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation);
 
 private:
 	// called when peer connections is changed

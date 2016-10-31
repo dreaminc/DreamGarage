@@ -54,7 +54,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
 
-	CR(m_pCommandLineManager->RegisterParameter("username", "u", "DefaultTestUser@dreamos.com"));
+	CR(m_pCommandLineManager->RegisterParameter("username", "u", "dream@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "nightmare"));
 
 	// For auto login, use '-l auto'

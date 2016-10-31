@@ -13,6 +13,7 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 
 	pCloudController = new CloudController();
 	CN(pCloudController);
+	CR(pCloudController->Initialize());
 
 	// TODO: Create a collection of cloud implementations
 	// or the various ones that can be used
@@ -34,7 +35,9 @@ CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TY
 	if(type & CLOUD_CONTROLLER_WEBRTC) {		
 		// Create the CEF implementation			
 
+		// TODO: this is dead code, peer controller now owns WebRTCImp and the rest
 		std::unique_ptr<WebRTCImp> pWebRTCImp = std::make_unique<WebRTCImp>(pCloudController);
+		CN(pWebRTCImp);
 		CR(pWebRTCImp->Initialize());
 
 		// TOOD: TEST CODE:

@@ -17,6 +17,19 @@ RESULT user::Initialize() {
 					   point(0.0f, 0.0f - 0.35f, 0.0f),
 					   0.02f,
 					   vector(0.0f, (float)M_PI, 0.0f));
+	m_pHeads.push_back(pHead);
+	//m_pHeadTextures.push_back(pHeadTexture);
+	//*/
+
+	/*
+	pHead = AddModel(L"\\Models\\stormtrooper\\stormtrooper.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.003f,
+						vector((float)M_PI_2, (float)M_PI, 0.0f));
+	pHead->SetVisible(false);
+	m_pHeads.push_back(pHead);
+	//*/
 
 	// for now the mouth is in a hardcoded position attached to the face model
 	m_pMouth = AddQuad(0.3, 1.0);
@@ -28,7 +41,6 @@ RESULT user::Initialize() {
 	
 	m_pMouth->SetMaterialTexture(MaterialTexture::Ambient, m_pMouthTexture.get());
 	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
-
 
 	pHead->AddChild(m_pMouth);
 	m_pMouth->Scale(0.1f);
