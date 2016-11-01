@@ -420,8 +420,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 					//m_ptOrigin = viewMat.GetPosition();
 
-					m_ptOrigin = point(viewMat(12), viewMat(13), viewMat(14));
-					//m_ptOrigin = -1.0f * point(viewMat(12), viewMat(13), viewMat(14));
+					m_ptOrigin = -1.0f * point(viewMat(12), viewMat(13), viewMat(14));
 
 					//m_ptOrigin = viewMat.GetPosition();
 
