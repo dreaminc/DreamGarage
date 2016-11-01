@@ -25,6 +25,14 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	OGLSphere(OpenGLImp *pParentImp, BoundingSphere* pBoundingSphere, bool fTriangleBased) :
+		sphere(pBoundingSphere, fTriangleBased),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
+
 	// This needs to be called from the sub-class constructor
 	// or externally from the object (TODO: factory class needed)
 	// TODO: Move this back to OGLObj
@@ -95,7 +103,7 @@ public:
 		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)5));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)5, vertex::GetBitangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetBitangentOffset()));
 
-		CR(m_pParentImp->ReleaseCurrentContext());
+		//CR(m_pParentImp->ReleaseCurrentContext());
 
 	Error:
 		return r;

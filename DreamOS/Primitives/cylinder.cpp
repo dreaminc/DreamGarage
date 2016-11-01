@@ -33,7 +33,8 @@ cylinder::cylinder(double radius, double height, int numAngularDivisions, int nu
 	CR(SetCylinderVertices(radius, height, numAngularDivisions, numVerticalDivisions));
 
 	// TODO: Allow for changing this - put it into a factory
-	CR(InitializeAABB());
+	//CR(InitializeAABB());
+	CR(InitializeBoundingSphere());
 
 // Success:
 	Validate();

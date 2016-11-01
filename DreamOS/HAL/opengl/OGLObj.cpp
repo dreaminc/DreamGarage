@@ -1,6 +1,8 @@
 #include "OGLObj.h"
 #include "Primitives/BoundingVolume.h"
+#include "Primitives/BoundingSphere.h"
 #include "OGLVolume.h"
+#include "OGLSphere.h"
 
 OGLObj::OGLObj(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
@@ -201,23 +203,25 @@ RESULT OGLObj::RenderBoundingVolume() {
 			case BoundingVolume::Type::BOX: {
 				BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pBoundingVolume);
 				m_pOGLBoundingVolume = new OGLVolume(m_pParentImp, pBoundingBox, false);
-				CN(m_pOGLBoundingVolume);
-				m_pOGLBoundingVolume->GetDimObj()->SetWireframe(true);
 			} break;
 
 			case BoundingVolume::Type::SPHERE: {
-				//std::shared_ptr<BoundingSphere> pBoundingSphere = std::dynamic_pointer_cast<BoundingSphere>(pBoundingVolume);
-				// TODO:
-				return R_NOT_IMPLEMENTED;
+				BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pBoundingVolume);
+				m_pOGLBoundingVolume = new OGLSphere(m_pParentImp, pBoundingSphere, false);
 			} break;
 		}
+
+		CN(m_pOGLBoundingVolume);
+		m_pOGLBoundingVolume->GetDimObj()->SetWireframe(true);
 	}
 	else {
+		// TODO: Sphere
 		DimObj *pDimObj = GetDimObj();
 		BoundingBox* pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get());
 		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
 
-		if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
+		// TODO: Better handling of different bounding volumes (or do it in BoundingVolume)
+		if (pBoundingBox != nullptr && pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
 			//pOGLBoundingBox->UpdateFromVertices();
 			pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox);
 		}

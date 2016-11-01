@@ -132,6 +132,8 @@ vector BoundingBox::GetHalfVector() {
 	return vector(width, height, length);
 }
 
+
+// TODO: Move up to BoundingVolume
 point BoundingBox::GetOrigin() {
 	if (!m_ptOrigin.IsZero()) {
 		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptOrigin);
@@ -140,8 +142,6 @@ point BoundingBox::GetOrigin() {
 	else {
 		return (m_pParent->GetOrigin());
 	}
-
-	//return (-1.0f * m_pParent->GetOrigin() - m_ptOrigin);
 }
 
 double BoundingBox::GetWidth() {

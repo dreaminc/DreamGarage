@@ -43,6 +43,38 @@ Error:
 	return;
 }
 
+sphere::sphere(BoundingSphere *pBoundingSphere, bool fTriangleBased) :
+	m_radius(1.0f),
+	m_numAngularDivisions(MIN_SPHERE_DIVISIONS * 10),
+	m_numVerticalDivisions(MIN_SPHERE_DIVISIONS * 10)
+{
+	RESULT r = R_PASS;
+
+	CR(SetSphereVertices(pBoundingSphere, fTriangleBased));
+
+	// TODO: Allow for changing this - put it into a factory
+	CR(InitializeAABB());
+
+	// Success:
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
+// TODO: Add non triangle based for sphere
+RESULT sphere::SetSphereVertices(BoundingSphere* pBoundingSphere, bool fTriangleBased) {
+	RESULT r = R_PASS;
+
+	m_radius = pBoundingSphere->GetRadius();
+
+	CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions));
+
+Error:
+	return r;
+}
+
 RESULT sphere::SetSphereVertices(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	RESULT r = R_PASS;
 

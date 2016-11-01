@@ -13,6 +13,7 @@
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
+#include "BoundingSphere.h"
 
 #define MIN_SPHERE_DIVISIONS 3
 
@@ -23,11 +24,13 @@ public:
 
 public:
 	sphere(float radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, color c = color(COLOR_WHITE));
+	sphere(BoundingSphere *pBoundingSphere, bool fTriangleBased = true);
 
 	virtual unsigned int NumberIndices() override;
 	virtual unsigned int NumberVertices() override;
 	virtual RESULT Allocate() override;
 
+	RESULT SetSphereVertices(BoundingSphere* pBoundingSphere, bool fTriangleBased = true);
 	RESULT SetSphereVertices(float radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, color c = color(COLOR_WHITE));
 
 private:

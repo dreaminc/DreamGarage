@@ -64,7 +64,7 @@ RESULT DreamTestApp::LoadScene() {
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
-	///*
+	/*
 	if (g_pCylinder != nullptr) {
 		g_pCylinder->RotateByDeg(0.01f, 0.00f, 0.01f);
 		//g_pCylinder->RotateZBy(0.001f);
@@ -74,6 +74,7 @@ RESULT DreamTestApp::Update(void) {
 	}
 	//*/
 
+	/*
 	if (g_pVolume != nullptr) {
 		g_pVolume->RotateByDeg(0.01f, 0.01f, 0.01f);
 		//g_pVolume->RotateXBy(0.001f);
@@ -81,6 +82,7 @@ RESULT DreamTestApp::Update(void) {
 		//g_pVolume->RotateZBy(0.001f);
 		g_pVolume->translateX(0.0001f);
 	}
+	//*/
 
 	//Error:
 	return r;
