@@ -48,7 +48,7 @@ RESULT CloudController::ProcessingThread() {
 
 	m_fRunning = true;
 
-	//CR(Initialize());
+	CR(Initialize());
 
 	//std::this_thread::sleep_for(std::chrono::seconds(3));
 
