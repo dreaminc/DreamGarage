@@ -135,10 +135,10 @@ vector BoundingBox::GetHalfVector() {
 point BoundingBox::GetOrigin() {
 	if (!m_ptOrigin.IsZero()) {
 		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptOrigin);
-		return (-1.0f * m_pParent->GetOrigin() + ptRotated);
+		return (m_pParent->GetOrigin() + ptRotated);
 	}
 	else {
-		return (-1.0f * m_pParent->GetOrigin());
+		return (m_pParent->GetOrigin());
 	}
 
 	//return (-1.0f * m_pParent->GetOrigin() - m_ptOrigin);
