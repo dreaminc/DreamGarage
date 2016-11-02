@@ -6,13 +6,35 @@
 #include "tchar.h"
 
 // TODO: remove all this hard coded vars and make it more generic
-
+/*
 std::multimap<std::wstring, std::pair<std::wstring, std::wstring>> registry
 {
-	{ L"dreamos",							{ L"", L"\"URL:Dream OS Protocol\"" } },
-	{ L"dreamos",							{ L"URL Protocol", L"\"\"" } },
-	{ L"dreamos\\DefaultIcon",				{ L"", L"\"dreamos.exe,1\"" } },
-	{ L"dreamos\\shell\\open\\command",		{ L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
+	{ L"dreamos",{ L"", L"\"URL:Dream OS Protocol\"" } },
+	{ L"dreamos",{ L"URL Protocol", L"\"\"" } },
+	{ L"dreamos\\DefaultIcon",{ L"", L"\"dreamos.exe,1\"" } },
+	{ L"dreamos\\shell\\open\\command",{ L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
+};
+*/
+typedef struct {
+	HKEY		 key;
+	std::wstring value;
+	std::wstring data;
+} registryData;
+
+std::multimap<std::wstring, registryData> registry
+{
+	{ L"dreamos",							registryData{ HKEY_CLASSES_ROOT, L"", L"\"URL:Dream OS Protocol\"" } },
+	{ L"dreamos",							registryData{ HKEY_CLASSES_ROOT, L"URL Protocol", L"\"\"" } },
+	{ L"dreamos\\DefaultIcon",				registryData{ HKEY_CLASSES_ROOT, L"", L"\"dreamos.exe,1\"" } },
+	{ L"dreamos\\shell\\open\\command",		registryData{ HKEY_CLASSES_ROOT, L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
+//	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_CURRENT_USER, L"", L"\"URL:Dream OS Protocol\"" } },
+//	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_CURRENT_USER, L"URL Protocol", L"\"\"" } },
+//	{ L"SOFTWARE\\Classes\\dreamos\\DefaultIcon",				registryData{ HKEY_CURRENT_USER, L"", L"\"dreamos.exe,1\"" } },
+//	{ L"SOFTWARE\\Classes\\dreamos\\shell\\open\\command",		registryData{ HKEY_CURRENT_USER, L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
+//	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_LOCAL_MACHINE, L"", L"\"URL:Dream OS Protocol\"" } },
+//	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_LOCAL_MACHINE, L"URL Protocol", L"\"\"" } },
+//	{ L"SOFTWARE\\Classes\\dreamos\\DefaultIcon",				registryData{ HKEY_LOCAL_MACHINE, L"", L"\"dreamos.exe,1\"" } },
+//	{ L"SOFTWARE\\Classes\\dreamos\\shell\\open\\command",		registryData{ HKEY_LOCAL_MACHINE, L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
 };
 
 bool InitRegistry()
@@ -22,11 +44,11 @@ bool InitRegistry()
 
 	for (auto& reg : registry)
 	{
-		size_t pos = reg.second.second.find(L"[UPDATEPATH]");
+		size_t pos = reg.second.data.find(L"[UPDATEPATH]");
 
 		if (pos != std::wstring::npos)
 		{
-			reg.second.second.replace(pos, std::wstring(L"[UPDATEPATH]").length(), squirrelUpdateProcess);
+			reg.second.data.replace(pos, std::wstring(L"[UPDATEPATH]").length(), squirrelUpdateProcess);
 		}
 	}
 
@@ -43,7 +65,7 @@ bool InstallRegistryVars()
 
 	for (const auto& reg : registry)
 	{
-		HKEY hKey = RegistryHelper::OpenKey(HKEY_CLASSES_ROOT, (wchar_t*)reg.first.c_str());
+		HKEY hKey = RegistryHelper::OpenKey(reg.second.key, (wchar_t*)reg.first.c_str());
 
 		if (hKey == NULL)
 		{
@@ -51,13 +73,13 @@ bool InstallRegistryVars()
 			return false;
 		}
 
-		if (!RegistryHelper::SetVal(hKey, (wchar_t*)reg.second.first.c_str()/*L""*/, reg.second.second))
+		if (!RegistryHelper::SetVal(hKey, (wchar_t*)reg.second.value.c_str(), reg.second.data))
 		{
-			LOG(ERROR) << "registry failed setting - " << reg.first << " value " << reg.second.first << " " << reg.second.second;
+			LOG(ERROR) << "registry failed setting - " << reg.second.key << " " << reg.first << " value " << reg.second.value << " " << reg.second.data;
 			return false;
 		}
 
-		LOG(INFO) << "registry set - " << reg.first << " to " << reg.second.first << " " << reg.second.second;;
+		LOG(INFO) << "registry set - " << reg.first << " to " << reg.second.key << " " << reg.second.value << " " << reg.second.data;
 	}
 
 	return true;
@@ -77,20 +99,20 @@ bool CheckRegistryVars()
 
 	for (const auto& reg : registry)
 	{
-		if (!RegistryHelper::ReadRegValue(HKEY_CLASSES_ROOT, reg.first, reg.second.first/*L""*/, res))
+		if (!RegistryHelper::ReadRegValue(reg.second.key, reg.first, reg.second.value, res))
 		{
 			LOG(ERROR) << "registry failed on key - " << reg.first;
 			return false;
 		}
 
-		if (res.compare(reg.second.second) != 0)
+		if (res.compare(reg.second.data) != 0)
 		{
-			LOG(ERROR) << "registry failed - value of " << reg.second.second << " for key " << reg.first;
+			LOG(ERROR) << "registry failed - value of " << reg.second.value << " for key " << reg.first;
 			return false;
 		}
 	}
 
-	LOG(ERROR) << "registry ok";
+	LOG(INFO) << "registry ok";
 
 	return true;
 }

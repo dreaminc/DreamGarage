@@ -524,6 +524,17 @@ RESULT Windows64App::Show() {
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
 
+	HANDLE hCloseSplashScreenEvent = CreateEvent(NULL,        // no security
+		TRUE,       // manual-reset event
+		FALSE,      // not signaled
+		(LPTSTR)L"CloseSplashScreenEvent"); // event name
+
+	BOOL res = SetEvent(hCloseSplashScreenEvent);
+
+	LOG(INFO) << "signaling splash to close " << (res ? "ok" : "failed");
+
+	CloseHandle(hCloseSplashScreenEvent);
+
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
 			bool fHandled = false;

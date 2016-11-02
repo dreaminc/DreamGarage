@@ -1,5 +1,7 @@
 #include "Logger.h"
 
+#include "launcher.h"
+
 #include "ProcessExecutor.h"
 #include "callback.h"
 #include "registry.h"
@@ -264,7 +266,7 @@ bool RunDream(int argc, char *argv[])
 	return true;
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char *argv[], WindowController* pSplashWindow)
 {
 	Logger::InitializeLogger();
 
@@ -361,15 +363,35 @@ int main(int argc, char *argv[])
 		return false;
 	}
 
+	LOG(INFO) << "running Dream -> wait for signal";
+
+	HANDLE hCloseSplashScreenEvent = CreateEvent(NULL,        // no security
+		TRUE,       // manual-reset event
+		FALSE,      // not signaled
+		(LPTSTR)L"CloseSplashScreenEvent"); // event name
+
+	DWORD res = WaitForSingleObject(hCloseSplashScreenEvent, 50000);
+
+	switch (res)
+	{
+	case WAIT_ABANDONED:
+	case WAIT_FAILED:
+	case WAIT_TIMEOUT:{
+		LOG(INFO) << "waiting for Dream failed = " << res;
+	}break;
+	case WAIT_OBJECT_0: {
+		LOG(INFO) << "waiting for Dream ok";
+	}break;
+	}
+
+	CloseHandle(hCloseSplashScreenEvent);
+
 	LOG(INFO) << "running Dream done -> exit";
 
 	return 0;
 }
 
-int WINAPI WinMain(HINSTANCE hInstance,
-	HINSTANCE hPrevInstance,
-	LPSTR lpCmdLine,
-	int nCmdShow)
+int run(WindowController* pSplashWindow)
 {
 	// get cmdln args and put them on the stack in argc,argv format
 	LPWSTR *wargv;
@@ -394,7 +416,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	}
 	// now argc,argv are available and will get destroyed on exit
 
-	main(argc, argv);
+	return main(argc, argv, pSplashWindow);
+}
 
-	return 0;
+void launcher::EntryPoint(WindowController* pSplashWindow)
+{
+	int ret = run(pSplashWindow);
+	exit(ret);
 }
