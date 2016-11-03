@@ -204,6 +204,26 @@ bool InstallShortcuts()
 	return true;
 }
 
+bool RemoveShortcuts()
+{
+	std::wstring exe(L"Update.exe");
+	std::wstring args(L"--removeShortcut=\"Dream.html\" --icon=\"");
+	args += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
+	args += L"Dream.ico\"";
+
+	if (!ProcessExecutor::GetProcessExecutor()->Execute(exe.c_str(),
+		args.c_str(),
+		ProcessExecutor::ProcessDir::ParentDir,
+		false,
+		false))
+	{
+		LOG(ERROR) << "process execute failed";
+		return false;
+	}
+
+	return true;
+}
+
 bool InstallRegistry()
 {
 	if (!CheckRegistryVars())
@@ -310,6 +330,13 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 			{
 				LOG(ERROR) << "process registry failed";
 				return -1;
+			}
+		}
+		else if (squirrelCmdlnEvent == CmdEventType::Uninstall)
+		{
+			if (!RemoveShortcuts())
+			{
+				LOG(ERROR) << "RemoveShortcuts failed";
 			}
 		}
 
