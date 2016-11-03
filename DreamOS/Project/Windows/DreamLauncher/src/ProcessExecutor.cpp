@@ -20,8 +20,8 @@ bool ProcessExecutor::Init()
 	
 	m_parentDir = m_currentProcessDir.substr(0, m_currentProcessDir.find_last_of(L"\\/"));
 	
-	m_currentProcessDir += L"/";
-	m_parentDir += L"/";
+	m_currentProcessDir += L"\\";
+	m_parentDir += L"\\";
 
 	LOG(INFO) << "current dir = " << m_currentProcessDir;
 	LOG(INFO) << "parent dir (update.exe) = " << m_parentDir;

@@ -26,7 +26,7 @@ std::multimap<std::wstring, registryData> registry
 	{ L"dreamos",							registryData{ HKEY_CLASSES_ROOT, L"", L"\"URL:Dream OS Protocol\"" } },
 	{ L"dreamos",							registryData{ HKEY_CLASSES_ROOT, L"URL Protocol", L"\"\"" } },
 	{ L"dreamos\\DefaultIcon",				registryData{ HKEY_CLASSES_ROOT, L"", L"\"dreamos.exe,1\"" } },
-	{ L"dreamos\\shell\\open\\command",		registryData{ HKEY_CLASSES_ROOT, L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
+	{ L"dreamos\\shell\\open\\command",		registryData{ HKEY_CLASSES_ROOT, L"", L"\"[UPDATEPATH]Update.exe\" --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
 //	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_CURRENT_USER, L"", L"\"URL:Dream OS Protocol\"" } },
 //	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_CURRENT_USER, L"URL Protocol", L"\"\"" } },
 //	{ L"SOFTWARE\\Classes\\dreamos\\DefaultIcon",				registryData{ HKEY_CURRENT_USER, L"", L"\"dreamos.exe,1\"" } },
