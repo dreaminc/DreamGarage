@@ -51,9 +51,24 @@ bool ProcessExecutor::ExecuteProcess(const std::wstring& processFullPath, const 
 		ShExecInfo.nShow = SW_SHOWNORMAL;
 		ShExecInfo.hInstApp = NULL;
 		if (ShellExecuteEx(&ShExecInfo) == TRUE)
-		{
-			WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
-			return true;
+		{	
+			DWORD res = WaitForSingleObject(ShExecInfo.hProcess, 5000);// INFINITE);
+
+			switch (res)
+			{
+			case WAIT_ABANDONED:
+			case WAIT_FAILED:
+			case WAIT_TIMEOUT: {
+				LOG(INFO) << "create process failed = " << res;
+				return false;
+			}break;
+			case WAIT_OBJECT_0: {
+				LOG(INFO) << "create process ok";
+				return true;
+			}break;
+			}
+
+			return false;
 		}
 		else
 			return false;
@@ -124,9 +139,23 @@ bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstrin
 
 			if (ret)
 			{
-				WaitForSingleObject(pi.hProcess, INFINITE);
+				DWORD res = WaitForSingleObject(pi.hProcess, 5000/*INFINITE*/);
 
-				exeSuccess = true;
+				exeSuccess = false;
+
+				switch (res)
+				{
+				case WAIT_ABANDONED:
+				case WAIT_FAILED:
+				case WAIT_TIMEOUT: {
+					LOG(INFO) << "create process failed = " << res;
+					exeSuccess = false;
+				}break;
+				case WAIT_OBJECT_0: {
+					LOG(INFO) << "create process ok";
+					exeSuccess = true;
+				}break;
+				}
 			}
 			else
 				exeSuccess = false;

@@ -422,5 +422,11 @@ int run(WindowController* pSplashWindow)
 void launcher::EntryPoint(WindowController* pSplashWindow)
 {
 	int ret = run(pSplashWindow);
+
+	if (ret != 0)
+	{
+		MessageBox(NULL, L"Dream failed to load :( Please try to reinstall Dream client.\n", L"Dream Message", MB_OK);
+	}
+
 	exit(ret);
 }
