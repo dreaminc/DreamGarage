@@ -228,27 +228,39 @@ bool InstallRegistry()
 {
 	if (!CheckRegistryVars())
 	{
-		LOG(ERROR) << "registry mismatch - install vars";
-
-		std::wstring exe(L"DreamLauncher.exe");
-		std::wstring args(L"--registry");
-
-		if (!ProcessExecutor::GetProcessExecutor()->Execute(exe.c_str(),
-			args.c_str(),
-			ProcessExecutor::ProcessDir::CurrentDir,
-			true,
-			true))
+		if (InstallRegistryVars())
 		{
-			LOG(ERROR) << "process execute failed " << exe;
-			return false;
+			LOG(INFO) << "InstallRegistryVars ok";
 		}
-
-		LOG(INFO) << "process execute completed as admin " << exe;
+		else
+		{
+			LOG(INFO) << "InstallRegistryVars failed";
+		}
 
 		if (!CheckRegistryVars())
 		{
-			LOG(ERROR) << "registry still mismatching. exit";
-			return false;
+			LOG(ERROR) << "registry mismatch - install vars";
+
+			std::wstring exe(L"DreamLauncher.exe");
+			std::wstring args(L"--registry");
+
+			if (!ProcessExecutor::GetProcessExecutor()->Execute(exe.c_str(),
+				args.c_str(),
+				ProcessExecutor::ProcessDir::CurrentDir,
+				true,
+				true))
+			{
+				LOG(ERROR) << "process execute failed " << exe;
+				return false;
+			}
+
+			LOG(INFO) << "process execute completed as admin " << exe;
+
+			if (!CheckRegistryVars())
+			{
+				LOG(ERROR) << "registry still mismatching. exit";
+				return false;
+			}
 		}
 	}
 
@@ -302,6 +314,12 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 	{
 		if (squirrelCmdlnEvent == CmdEventType::FirstRun)
 		{
+			if (!InstallRegistry())
+			{
+				LOG(ERROR) << "process registry failed";
+				return -1;
+			}
+
 			InstallShortcuts();
 
 			// open in external browser (for now used as an indication updated completed)
@@ -326,11 +344,7 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 		}
 		else if (squirrelCmdlnEvent == CmdEventType::Install)
 		{
-			if (!InstallRegistry())
-			{
-				LOG(ERROR) << "process registry failed";
-				return -1;
-			}
+
 		}
 		else if (squirrelCmdlnEvent == CmdEventType::Uninstall)
 		{
