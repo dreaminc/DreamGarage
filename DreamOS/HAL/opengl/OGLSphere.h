@@ -109,6 +109,17 @@ public:
 		return r;
 	}
 
+	RESULT UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere) {
+		RESULT r = R_PASS;
+
+		sphere *pSphere = (sphere*)(GetDimObj());
+		CR(pSphere->UpdateFromBoundingSphere(pBoundingSphere));
+		CR(UpdateOGLBuffers());
+
+	Error:
+		return r;
+	}
+
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
 	virtual RESULT Render() override {

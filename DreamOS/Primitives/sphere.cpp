@@ -45,8 +45,8 @@ Error:
 
 sphere::sphere(BoundingSphere *pBoundingSphere, bool fTriangleBased) :
 	m_radius(1.0f),
-	m_numAngularDivisions(MIN_SPHERE_DIVISIONS * 10),
-	m_numVerticalDivisions(MIN_SPHERE_DIVISIONS * 10)
+	m_numAngularDivisions(MIN_SPHERE_DIVISIONS * 5),
+	m_numVerticalDivisions(MIN_SPHERE_DIVISIONS * 5)
 {
 	RESULT r = R_PASS;
 
@@ -63,13 +63,28 @@ Error:
 	return;
 }
 
+RESULT sphere::UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere, bool fTriangleBased) {
+	RESULT r = R_PASS;
+
+	if (pBoundingSphere->GetRadius() != m_radius) {
+		CR(SetSphereVertices(pBoundingSphere, fTriangleBased));
+	}
+
+	m_ptOrigin = pBoundingSphere->GetOrigin();
+
+Error:
+	return r;
+}
+
 // TODO: Add non triangle based for sphere
 RESULT sphere::SetSphereVertices(BoundingSphere* pBoundingSphere, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
 	m_radius = pBoundingSphere->GetRadius();
+	m_ptOrigin = pBoundingSphere->GetOrigin();
 
-	CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions, pBoundingSphere->GetOrigin()));
+	//CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions, pBoundingSphere->GetOrigin()));
+	CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions));
 
 Error:
 	return r;

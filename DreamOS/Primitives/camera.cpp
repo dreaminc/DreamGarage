@@ -12,7 +12,7 @@
 
 
 camera::camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
-	m_FielfOfViewAngle(FOV),
+	m_FieldOfViewAngle(FOV),
 	m_ProjectionType(DEFAULT_PROJECTION_TYPE),
 	m_NearPlane(DEFAULT_NEAR_PLANE),
 	m_FarPlane(DEFAULT_FAR_PLANE),
@@ -26,7 +26,7 @@ camera::camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxSc
 	m_pCameraFrameOfReference(nullptr)
 {
 	m_ptOrigin = ptOrigin;
-	m_qRotation = quaternion(0.0f, 0.0f, 0.0f, 0.0f);
+	m_qRotation = quaternion();
 }
 
 camera::~camera() {
@@ -63,7 +63,7 @@ vector camera::GetLookVector() {
 	quaternion temp = m_qRotation;
 	temp.Normalize();
 
-	vector vectorLook = temp.RotateVector(vector::kVector());
+	vector vectorLook = temp.RotateVector(vector(0.0f, 0.0f, -1.0f));
 	return vectorLook.Normal();
 }
 
@@ -73,14 +73,20 @@ ProjectionMatrix camera::GetProjectionMatrix() {
 		static_cast<projection_precision>(m_pxScreenHeight),
 		static_cast<projection_precision>(m_NearPlane),
 		static_cast<projection_precision>(m_FarPlane),
-		static_cast<projection_precision>(m_FielfOfViewAngle));
+		static_cast<projection_precision>(m_FieldOfViewAngle));
 }
 
 ViewMatrix camera::GetViewMatrix() {
+
+	// View Matrix requires the opposite of the camera's world position and rotation
 	point ptOrigin = m_ptOrigin;
 	ptOrigin.SetZeroW();
+	ptOrigin.Reverse();
+
+	quaternion q = m_qRotation;
+
 	ptOrigin += m_vDeviation;
-	ViewMatrix mat = ViewMatrix(ptOrigin, m_qRotation);
+	ViewMatrix mat = ViewMatrix(ptOrigin, q);
 	return mat;
 }
 
@@ -174,12 +180,13 @@ RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 
 #define	MOVE_DIRECTION ((kbEvent->KeyState) ? 1.0f : -1.0f)
 
-	if (leftKey) AddStrafeSpeed(DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
-	else if (rightKey) AddStrafeSpeed(-DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
+	// applies movement along vectors described by Get(Right/Look/Up)Vector
+	if (leftKey) AddStrafeSpeed(-DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
+	else if (rightKey) AddStrafeSpeed(DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
 	else if (forwardKey) AddForwardSpeed(DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
 	else if (backwardKey) AddForwardSpeed(-DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
-	else if (upKey) AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
-	else if (downKey) AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED* MOVE_DIRECTION);
+	else if (upKey) AddUpSpeed(DEFAULT_CAMERA_MOVE_SPEED * MOVE_DIRECTION);
+	else if (downKey) AddUpSpeed(-DEFAULT_CAMERA_MOVE_SPEED* MOVE_DIRECTION);
 
 	return r;
 }
@@ -188,9 +195,6 @@ RESULT camera::Notify(TimeEvent *event) {
 	//LOG(INFO) << "time";
 
 	double dt = event->m_deltaTime;
-
-	camera_precision x, y, z;
-	m_qRotation.GetEulerAngles(&x, &y, &z);
 
 	vector lookMove = GetLookVector();
 	lookMove.Normalize();
@@ -204,27 +208,18 @@ RESULT camera::Notify(TimeEvent *event) {
 	m_ptOrigin += GetUpVector() * m_cameraUpSpeed * dt;
 	m_ptOrigin.SetZeroW();
 
-	///*
 	// Update frame of reference
 	quaternion qRotation = m_qRotation;
-	qRotation.Reverse();
+	qRotation.Reverse(); 
 
-	if (m_pHMD != nullptr) {
-		point ptOrigin = m_ptOrigin + m_pHMD->GetHeadPointOrigin();
-		ptOrigin.Reverse();
+	point ptOrigin;
+	ptOrigin = m_ptOrigin;
+	if(m_pHMD != nullptr)
+		ptOrigin += m_pHMD->GetHeadPointOrigin();
+	ptOrigin.SetZeroW();
 
-		m_pCameraFrameOfReference->SetPosition(ptOrigin);
-		//m_pCameraFrameOfReference->SetPosition(m_pHMD->GetHeadPointOrigin());
-	}
-	else {
-		point ptOrigin = m_ptOrigin;
-		ptOrigin.Reverse();
-
-		m_pCameraFrameOfReference->SetPosition(ptOrigin);
-	}
-
+	m_pCameraFrameOfReference->SetPosition(ptOrigin);
 	m_pCameraFrameOfReference->SetOrientation(qRotation);
-	//*/
 
 	return R_PASS;
 }
@@ -268,6 +263,14 @@ RESULT camera::UpdateFromKeyboardState(SenseKeyboard *pSK) {
 
 composite* camera::GetFrameOfReferenceComposite() {
 	return m_pCameraFrameOfReference;
+}
+
+// Potentially could be removed if orientations from headsets, mouse inputs,
+// and in GetViewMatrix are also reversed
+quaternion camera::GetWorldOrientation() {
+	quaternion q = m_qRotation;
+	q.Reverse();
+	return q;
 }
 
 RESULT camera::AddObjectToFrameOfReferenceComposite(std::shared_ptr<DimObj> pDimObj) {

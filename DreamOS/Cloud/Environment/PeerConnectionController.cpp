@@ -640,3 +640,11 @@ long PeerConnectionController::GetUserID() {
 
 	return -1;
 }
+
+RESULT PeerConnectionController::SetUser(User currentUser) {
+	return m_pWebRTCImp->SetUser(currentUser);
+}
+
+RESULT PeerConnectionController::SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) {
+	return m_pWebRTCImp->SetTwilioNTSInformation(twilioNTSInformation);
+}

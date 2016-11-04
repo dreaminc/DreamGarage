@@ -43,8 +43,8 @@ RESULT DreamTestApp::LoadScene() {
 
 	//g_pCylinder->RotateZBy((float)(M_PI_4));
 
-	//g_pVolume = AddVolume(1.0f);
-	//g_pVolume->MoveTo(point(0.0f, 0.0f, 1.0f));
+	g_pVolume = AddVolume(1.0f);
+	g_pVolume->MoveTo(point(-3.0f, 0.0f, 1.0f));
 	//g_pVolume->RotateZBy((float)(M_PI_4));
 
 	//pCylinder->SetWireframe(true);
@@ -72,23 +72,23 @@ RESULT DreamTestApp::LoadScene() {
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
-	/*
+	///*
 	if (g_pCylinder != nullptr) {
 		g_pCylinder->RotateByDeg(0.01f, 0.00f, 0.01f);
 		//g_pCylinder->RotateZBy(0.001f);
 		//g_pCylinder->RotateYBy(0.001f);
 		//g_pCylinder->RotateXBy(0.001f);
-		g_pCylinder->translate(point(0.0001f, 0.0001f, 0.001f));
+		//g_pCylinder->translate(point(0.0001f, 0.0001f, 0.001f));
 	}
 	//*/
 
-	/*
+	///*
 	if (g_pVolume != nullptr) {
 		g_pVolume->RotateByDeg(0.01f, 0.01f, 0.01f);
 		//g_pVolume->RotateXBy(0.001f);
 		//g_pVolume->RotateYBy(0.001f);
 		//g_pVolume->RotateZBy(0.001f);
-		g_pVolume->translateX(0.0001f);
+		//g_pVolume->translateX(0.0001f);
 	}
 	//*/
 

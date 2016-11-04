@@ -34,6 +34,8 @@ public:
 	//RESULT SetSphereVertices(float radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, color c = color(COLOR_WHITE));
 	RESULT SetSphereVertices(float radius = 1.0f, int numAngularDivisions = MIN_SPHERE_DIVISIONS, int numVerticalDivisions = MIN_SPHERE_DIVISIONS, point ptOrigin = point(0.0f, 0.0f, 0.0f), color c = color(COLOR_WHITE));
 
+	RESULT UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere, bool fTriangleBased = true);
+
 private:
 	float m_radius;
 };

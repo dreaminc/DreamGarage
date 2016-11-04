@@ -80,7 +80,6 @@ private:
 	long m_wndStyle;
 
 	TCHAR* m_pszClassName;
-	TCHAR* m_pszWindowTitle;
 
 	int m_pxWidth;
 	int m_pxHeight;

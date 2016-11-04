@@ -105,8 +105,8 @@ public:
 	virtual RESULT RenderHMDMirror() = 0;
 
 	inline quaternion GetHMDOrientation() { return m_qOrientation; }
-	inline point GetHMDOrigin() { return m_ptOrigin; }
-	inline vector GetHMDTrackerDeviation() { return GetHMDOrigin(); }
+	inline point GetHeadPointOrigin() { return m_ptOrigin; }
+	inline vector GetHMDTrackerDeviation() { return GetHeadPointOrigin(); }
 
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) = 0;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) = 0;
@@ -114,9 +114,6 @@ public:
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
 
-	point GetHeadPointOrigin() {
-		return m_ptOrigin;
-	}
 
 protected:
 	point m_ptOrigin;

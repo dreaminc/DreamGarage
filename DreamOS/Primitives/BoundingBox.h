@@ -22,6 +22,18 @@ public:
 		INVALID
 	};
 
+	enum class BoxPoint {
+		TOP_RIGHT_FAR,
+		TOP_RIGHT_NEAR,
+		TOP_LEFT_FAR,
+		TOP_LEFT_NEAR,
+		BOTTOM_RIGHT_FAR,
+		BOTTOM_RIGHT_NEAR,
+		BOTTOM_LEFT_FAR,
+		BOTTOM_LEFT_NEAR,
+		INVALID
+	};
+
 public:
 	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type);
 	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptOrigin, vector vHalfSize);
@@ -47,6 +59,8 @@ public:
 
 	point GetMinPoint();
 	point GetMaxPoint();
+
+	point GetBoxPoint(BoxPoint ptType);
 
 protected:
 	BoundingBox::Type m_type;

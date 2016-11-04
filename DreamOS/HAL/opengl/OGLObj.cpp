@@ -215,15 +215,26 @@ RESULT OGLObj::RenderBoundingVolume() {
 		m_pOGLBoundingVolume->GetDimObj()->SetWireframe(true);
 	}
 	else {
-		// TODO: Sphere
 		DimObj *pDimObj = GetDimObj();
-		BoundingBox* pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get());
-		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
-
+		
 		// TODO: Better handling of different bounding volumes (or do it in BoundingVolume)
-		if (pBoundingBox != nullptr && pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
-			//pOGLBoundingBox->UpdateFromVertices();
-			pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox);
+		BoundingBox *pBoundingBox = nullptr;
+		if ((pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+			OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
+			
+			if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
+				pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox);
+			}
+		}
+		else {
+			BoundingSphere *pBoundingSphere = nullptr;
+			if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+				OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
+
+				if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
+					pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere);
+				}
+			}
 		}
 	}
 	

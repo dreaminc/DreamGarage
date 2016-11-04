@@ -112,80 +112,63 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 
 // http://www.willperone.net/Code/coderr.php
 vector BoundingBox::GetHalfVector() {
+	RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	quaternion_precision phi, theta, psi;
-	GetOrientation().GetEulerAngles(&phi, &theta, &psi);
+	double width = 0.0f;
+	double height = 0.0f;
+	double length = 0.0f;
 
-	rotation_precision cosPhi = static_cast<rotation_precision>(cos(phi));
-	rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(phi));
+	for (int i = 0; i < 8; i++) {
+		point pt = rotMat * GetBoxPoint((BoxPoint)(i));
 
-	rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
-	rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
+		if (pt.x() > width)
+			width = pt.x();
 
-	rotation_precision cosPsi = static_cast<rotation_precision>(cos(psi));
-	rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(psi));
+		if (pt.y() > height)
+			height = pt.y();
 
-	double width = m_vHalfSize.x() * fabs(fabs(sinPhi * sinPsi) - fabs(cosPhi * sinTheta * cosPsi)) + m_vHalfSize.y() * fabs(fabs(sinPhi * cosPsi) + fabs(cosPhi * sinTheta * sinPsi)) + m_vHalfSize.z() * fabs(cosPhi * cosTheta);
-	double height = m_vHalfSize.x() * fabs(fabs(cosPhi * sinPsi) + fabs(sinPhi * sinTheta * cosPsi)) + m_vHalfSize.y() * fabs(fabs(cosPhi * cosPsi) - fabs(sinPhi * sinTheta * sinPsi)) + m_vHalfSize.z() * fabs(sinPhi * cosTheta);
-	double length = m_vHalfSize.x() * fabs(cosTheta * cosPsi) + m_vHalfSize.y() * fabs(cosTheta * sinPsi) + m_vHalfSize.z() * fabs(sinTheta);
+		if (pt.z() > length)
+			length = pt.z();
+	}
 
 	return vector(width, height, length);
 }
 
 double BoundingBox::GetWidth() {
-	quaternion_precision phi, theta, psi; 
-	GetOrientation().GetEulerAngles(&phi, &theta, &psi);
+	RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	rotation_precision cosPhi = static_cast<rotation_precision>(cos(phi));
-	rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(phi));
-
-	rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
-	rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
-
-	rotation_precision cosPsi = static_cast<rotation_precision>(cos(psi));
-	rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(psi));
-
-	//double width = GetHalfVector().x() * fabs(cosTheta * cosPsi) + GetHalfVector().y() * fabs(cosTheta * sinPsi) + GetHalfVector().y() * fabs(sinTheta);
-	//double width = GetHalfVector().x() * fabs((sinPhi * sinPsi) - (cosPhi * sinTheta * cosPsi)) + GetHalfVector().y() * fabs((sinPhi * cosPsi) + (cosPhi * sinTheta * sinPsi)) + GetHalfVector().y() * fabs(cosPhi * cosTheta);
-	double width = m_vHalfSize.x() * fabs(fabs(sinPhi * sinPsi) - fabs(cosPhi * sinTheta * cosPsi)) + m_vHalfSize.y() * fabs(fabs(sinPhi * cosPsi) + fabs(cosPhi * sinTheta * sinPsi)) + m_vHalfSize.z() * fabs(cosPhi * cosTheta);
+	double width = 0.0f;
+	for (int i = 0; i < 8; i++) {
+		point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+		if (pt.x() > width)
+			width = pt.x();
+	}
 
 	return static_cast<double>(width * 2.0f);
 }
 
 double BoundingBox::GetHeight() {
-	quaternion_precision phi, theta, psi;
-	GetOrientation().GetEulerAngles(&phi, &theta, &psi);
+	RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	rotation_precision cosPhi = static_cast<rotation_precision>(cos(phi));
-	rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(phi));
-
-	rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
-	rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
-
-	rotation_precision cosPsi = static_cast<rotation_precision>(cos(psi));
-	rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(psi));
-
-	//double height = GetHalfVector().x() * fabs((cosPhi * sinPsi) + (sinPhi * sinTheta * cosPsi)) + GetHalfVector().y() * fabs((cosPhi * cosPsi) - (sinPhi * sinTheta * sinPsi)) + GetHalfVector().y() * fabs(-sinPhi * cosTheta);
-	double height = m_vHalfSize.x() * fabs(fabs(cosPhi * sinPsi) + fabs(sinPhi * sinTheta * cosPsi)) + m_vHalfSize.y() * fabs(fabs(cosPhi * cosPsi) - fabs(sinPhi * sinTheta * sinPsi)) + m_vHalfSize.z() * fabs(sinPhi * cosTheta);
+	double height = 0.0f;
+	for (int i = 0; i < 8; i++) {
+		point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+		if (pt.y() > height)
+			height = pt.y();
+	}
 
 	return static_cast<double>(height * 2.0f);
 }
 
 double BoundingBox::GetLength() {
-	quaternion_precision phi, theta, psi;
-	GetOrientation().GetEulerAngles(&phi, &theta, &psi);
+	RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	rotation_precision cosPhi = static_cast<rotation_precision>(cos(phi));
-	rotation_precision sinPhi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(phi));
-
-	rotation_precision cosTheta = static_cast<rotation_precision>(cos(theta));
-	rotation_precision sinTheta = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(theta));
-
-	rotation_precision cosPsi = static_cast<rotation_precision>(cos(psi));
-	rotation_precision sinPsi = ROTATION_HAND_SIGN * static_cast<rotation_precision>(sin(psi));
-
-	//double length = GetHalfVector().x() * fabs((sinPhi * sinPsi) - fabs(cosPhi * sinTheta * cosPsi)) + GetHalfVector().y() * fabs((sinPhi * cosPsi) + (cosPhi * sinTheta * sinPsi)) + GetHalfVector().y() * fabs(cosPhi * cosTheta);
-	double length = m_vHalfSize.x() * fabs(cosTheta * cosPsi) + m_vHalfSize.y() * fabs(cosTheta * sinPsi) + m_vHalfSize.z() * fabs(sinTheta);
+	double length = 0.0f;
+	for (int i = 0; i < 8; i++) {
+		point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+		if (pt.z() > length)
+			length = pt.z();
+	}
 
 	return static_cast<double>(length * 2.0f);
 }
@@ -197,4 +180,20 @@ point BoundingBox::GetMinPoint() {
 
 point BoundingBox::GetMaxPoint() {
 	return (GetOrigin() + GetHalfVector());
+}
+
+point BoundingBox::GetBoxPoint(BoxPoint ptType) {
+	point retPoint = point(m_vHalfSize);
+	switch (ptType) {
+		case BoxPoint::TOP_RIGHT_FAR: break;// nothing 
+		case BoxPoint::TOP_RIGHT_NEAR: retPoint.z() *= -1; break;
+		case BoxPoint::TOP_LEFT_FAR: retPoint.x() *= -1; break;
+		case BoxPoint::TOP_LEFT_NEAR: retPoint.x() *= -1; retPoint.z() *= -1; break;
+		case BoxPoint::BOTTOM_RIGHT_FAR: retPoint.y() *= -1; break;
+		case BoxPoint::BOTTOM_RIGHT_NEAR: retPoint.y() *= -1; retPoint.z() *= -1; break;
+		case BoxPoint::BOTTOM_LEFT_FAR: retPoint.y() *= -1; retPoint.z() *= -1; break;
+		case BoxPoint::BOTTOM_LEFT_NEAR: retPoint.Reverse();
+	}
+
+	return retPoint;
 }

@@ -2153,6 +2153,9 @@
     <ClInclude Include="..\..\..\Test\MatrixTestSuite.h">
       <Filter>Primitives\matrix</Filter>
 	</ClInclude>
+    <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
+      <Filter>Cloud\User</Filter>
+	</ClInclude>
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
       <Filter>Cloud\Message</Filter>
     </ClInclude>
