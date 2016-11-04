@@ -159,6 +159,7 @@ protected:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
+	bool m_fCheckHMD;
 
 protected:
 	std::function<RESULT(void)> m_fnUpdateCallback;

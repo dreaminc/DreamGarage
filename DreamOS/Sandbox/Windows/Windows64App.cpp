@@ -456,7 +456,8 @@ RESULT Windows64App::InitializeSandbox() {
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	
-	m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	if (m_fCheckHMD)
+		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
