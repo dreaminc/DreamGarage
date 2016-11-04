@@ -259,8 +259,8 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
-	//SetPosition(pHandState.ptPalm + point(0.0f, 0.0f, -1.0f));
-	SetPosition(pHandState.ptPalm + point(0.0f, 0.0f, -0.25f));
+	point pt = pHandState.ptPalm - point(0.0f, 0.0f, 0.25f);
+	SetPosition(pt);
 
 	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
 	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);

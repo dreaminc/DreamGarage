@@ -56,6 +56,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "DefaultTestUser@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "nightmare"));
+	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
 
 	// For auto login, use '-l auto'
 	//CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
@@ -73,6 +74,8 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
+
+	m_fCheckHMD = (m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0);
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
@@ -385,7 +388,7 @@ point SandboxApp::GetCameraPosition() {
 }
 
 quaternion SandboxApp::GetCameraOrientation() {
-	return m_pHALImp->GetCamera()->GetOrientation();
+	return m_pHALImp->GetCamera()->GetWorldOrientation();
 }
 
 // TODO: This should move up to Sandbox
