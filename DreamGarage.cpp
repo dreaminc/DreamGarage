@@ -70,6 +70,7 @@ RESULT DreamGarage::LoadScene() {
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
 	AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
 
+	/*
 	auto env = AddModel(L"\\Models\\Env\\industrial_style_interior.obj",
 		nullptr,
 		point(0, 0, 0),// -4.5f, -4.8f - 2.6f, 0.0f),
@@ -77,7 +78,7 @@ RESULT DreamGarage::LoadScene() {
 		vector(3.14f/2.0f, 0.0f, 0.0f));
 
 	env->MoveTo(0.0f, -1.0f, 4.0f);
-
+	*/
 #ifdef TESTING
 // Test Scene
 // 
