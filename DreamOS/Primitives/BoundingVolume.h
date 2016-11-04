@@ -67,7 +67,7 @@ public:
 		return R_PASS;
 	}
 
-	point GetOrigin() { return m_ptOrigin; }	// TODO: move to the origin of the parent object
+	point GetOrigin();
 	quaternion GetOrientation();
 
 	virtual BoundingVolume::Type GetType() = 0;

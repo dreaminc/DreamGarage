@@ -35,8 +35,8 @@ RESULT DreamTestApp::LoadScene() {
 	*/
 
 	// TODO: sphere AABB
-	//sphere *pSphere = AddSphere(0.5f, 10, 10);
-	//pSphere->MoveTo(1.5f, 0.5f, 0.0f);
+	sphere *pSphere = AddSphere(0.5f, 10, 10);
+	pSphere->MoveTo(1.5f, 0.5f, 0.0f);
 
 	g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
 	//g_pCylinder->MoveTo(0.0f, -1.0f, 0.0f);
@@ -51,6 +51,14 @@ RESULT DreamTestApp::LoadScene() {
 
 	/*
 	AddModel(L"\\Models\\the-hague-apartment\\the-hague-apartment-fix.obj",
+		nullptr,
+		point(0.0f, 0.0f, 0.0f),
+		0.1f,
+		vector((float)(M_PI_2), 0.0f, 0.0f));
+	//*/
+
+	/*
+	AddModel(L"\\Models\\warehouse\\industrial_style_interior.obj",
 		nullptr,
 		point(0.0f, 0.0f, 0.0f),
 		0.1f,

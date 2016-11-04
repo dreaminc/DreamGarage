@@ -20,3 +20,13 @@ bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 quaternion BoundingVolume::GetOrientation() { 
 	return m_pParent->GetOrientation(); 
 }
+
+point BoundingVolume::GetOrigin() {
+	if (!m_ptOrigin.IsZero()) {
+		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptOrigin);
+		return (m_pParent->GetOrigin() + ptRotated);
+	}
+	else {
+		return (m_pParent->GetOrigin());
+	}
+}

@@ -78,6 +78,7 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 
 				// TODO: Junk code:
 				for (auto &pObject : m_pSceneGraph->GetObjects()) {
+
 					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 					if (pDimObj != nullptr) {
 						pDimObj->SetColor(color(COLOR_WHITE));

@@ -22,8 +22,8 @@ BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, poin
 
 bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 	if (m_type == Type::AABB) {
-		point ptMax = m_ptOrigin + m_vHalfSize;
-		point ptMin = m_ptOrigin - m_vHalfSize;
+		point ptMax = GetOrigin() + m_vHalfSize;
+		point ptMin = GetOrigin() - m_vHalfSize;
 
 		point ptClosestPoint = point::min(point::max(static_cast<BoundingSphere>(rhs).GetOrigin(), ptMin), ptMax);
 		double distanceSquared = pow((ptClosestPoint - static_cast<BoundingSphere>(rhs).GetOrigin()).magnitude(), 2.0f);
@@ -44,11 +44,11 @@ bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 
 bool BoundingBox::Intersect(const BoundingBox& rhs) {
 	if (m_type == Type::AABB) {
-		point ptMaxA = m_ptOrigin + m_vHalfSize;
-		point ptMinA = m_ptOrigin - m_vHalfSize;
+		point ptMaxA = GetOrigin() + m_vHalfSize;
+		point ptMinA = GetOrigin() - m_vHalfSize;
 
-		point ptMaxB = rhs.m_ptOrigin + rhs.m_vHalfSize;
-		point ptMinB = rhs.m_ptOrigin - rhs.m_vHalfSize;
+		point ptMaxB = const_cast<BoundingBox&>(rhs).GetOrigin() + rhs.m_vHalfSize;
+		point ptMinB = const_cast<BoundingBox&>(rhs).GetOrigin() - rhs.m_vHalfSize;
 
 		if ((ptMaxA > ptMinB) && (ptMaxB > ptMinA))
 			return true;
@@ -106,7 +106,7 @@ bool BoundingBox::Intersect(ray& r) {
 }
 
 RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
-	m_vHalfSize = (ptMax - m_ptOrigin);
+	m_vHalfSize = (ptMax - GetOrigin());
 	return R_PASS;
 }
 
@@ -130,18 +130,6 @@ vector BoundingBox::GetHalfVector() {
 	double length = m_vHalfSize.x() * fabs(cosTheta * cosPsi) + m_vHalfSize.y() * fabs(cosTheta * sinPsi) + m_vHalfSize.z() * fabs(sinTheta);
 
 	return vector(width, height, length);
-}
-
-
-// TODO: Move up to BoundingVolume
-point BoundingBox::GetOrigin() {
-	if (!m_ptOrigin.IsZero()) {
-		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptOrigin);
-		return (m_pParent->GetOrigin() + ptRotated);
-	}
-	else {
-		return (m_pParent->GetOrigin());
-	}
 }
 
 double BoundingBox::GetWidth() {

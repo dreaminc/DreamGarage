@@ -69,13 +69,13 @@ RESULT sphere::SetSphereVertices(BoundingSphere* pBoundingSphere, bool fTriangle
 
 	m_radius = pBoundingSphere->GetRadius();
 
-	CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions));
+	CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions, pBoundingSphere->GetOrigin()));
 
 Error:
 	return r;
 }
 
-RESULT sphere::SetSphereVertices(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
+RESULT sphere::SetSphereVertices(float radius, int numAngularDivisions, int numVerticalDivisions, point ptOrigin, color c) {
 	RESULT r = R_PASS;
 
 	if (m_numAngularDivisions < MIN_SPHERE_DIVISIONS) m_numAngularDivisions = MIN_SPHERE_DIVISIONS;
@@ -150,6 +150,13 @@ RESULT sphere::SetSphereVertices(float radius, int numAngularDivisions, int numV
 				m_pIndices[indexCount] = indexStripBottom++;
 
 			indexCount++;
+		}
+	}
+
+	// Adjust for center point
+	if (!ptOrigin.IsZero()) {
+		for (unsigned int i = 0; i < NumberVertices(); i++) {
+			m_pVertices[i].TranslatePoint(ptOrigin);
 		}
 	}
 

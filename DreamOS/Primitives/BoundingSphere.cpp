@@ -16,7 +16,7 @@ BoundingSphere::BoundingSphere(VirtualObj *pParentObject, point ptOrigin, float 
 }
 
 bool BoundingSphere::Intersect(const BoundingSphere& rhs) {
-	float distance = (rhs.m_ptOrigin - m_ptOrigin).magnitude();
+	float distance = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin()).magnitude();
 
 	if (abs(distance) <= (rhs.m_radius + m_radius))
 		return true;
@@ -24,13 +24,13 @@ bool BoundingSphere::Intersect(const BoundingSphere& rhs) {
 		return false;
 }
 
-// TODO: Propagate this up to BoundingVolume src instead?
+// TODO: Propagate this up to BoundingVolume instead?
 bool BoundingSphere::Intersect(const BoundingBox& rhs) {
 	return static_cast<BoundingBox>(rhs).Intersect(*this);
 }
 
 bool BoundingSphere::Intersect(point& pt) {
-	float distance = (pt - m_ptOrigin).magnitude();
+	float distance = (pt - GetOrigin()).magnitude();
 
 	if (abs(distance) <= m_radius)
 		return true;
@@ -41,7 +41,7 @@ bool BoundingSphere::Intersect(point& pt) {
 // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 bool BoundingSphere::Intersect(line& ln) {
 	vector vLine = ln.GetVector();
-	vector vLineCircle = ln.a() - m_ptOrigin;
+	vector vLineCircle = ln.a() - GetOrigin();
 
 	vector_precision dotLineCircleValueSq = pow(vLine.dot(vLineCircle), 2.0f);
 	vector_precision lineCircleMagnitudeSq = pow(vLineCircle.magnitude(), 2.0f);
@@ -55,7 +55,7 @@ bool BoundingSphere::Intersect(line& ln) {
 
 // https://capnramses.github.io//opengl/raycasting.html
 bool BoundingSphere::Intersect(ray& r) {
-	vector vRayCircle = r.ptOrigin() - m_ptOrigin;
+	vector vRayCircle = r.ptOrigin() - GetOrigin();
 	
 	float bValue = r.vDirection().dot(vRayCircle);
 	float cValue = vRayCircle.dot(vRayCircle) - pow(m_radius, 2.0f);
@@ -77,6 +77,6 @@ bool BoundingSphere::Intersect(ray& r) {
 }
 
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {
-	m_radius = (ptMax - m_ptOrigin).magnitude();
+	m_radius = (ptMax - GetOrigin()).magnitude();
 	return R_PASS;
 }
