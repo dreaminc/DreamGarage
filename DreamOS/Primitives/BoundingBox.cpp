@@ -112,65 +112,85 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 
 // http://www.willperone.net/Code/coderr.php
 vector BoundingBox::GetHalfVector() {
-	RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+	if (m_type == Type::AABB) {
+		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	double width = 0.0f;
-	double height = 0.0f;
-	double length = 0.0f;
+		double width = 0.0f;
+		double height = 0.0f;
+		double length = 0.0f;
 
-	for (int i = 0; i < 8; i++) {
-		point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+		for (int i = 0; i < 8; i++) {
+			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
 
-		if (pt.x() > width)
-			width = pt.x();
+			if (pt.x() > width)
+				width = pt.x();
 
-		if (pt.y() > height)
-			height = pt.y();
+			if (pt.y() > height)
+				height = pt.y();
 
-		if (pt.z() > length)
-			length = pt.z();
+			if (pt.z() > length)
+				length = pt.z();
+		}
+
+		return vector(width, height, length);
 	}
-
-	return vector(width, height, length);
+	
+	// Otherwise it's OBB
+	return m_vHalfSize;
 }
 
 double BoundingBox::GetWidth() {
-	RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+	if (m_type == Type::AABB) {
+		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	double width = 0.0f;
-	for (int i = 0; i < 8; i++) {
-		point pt = rotMat * GetBoxPoint((BoxPoint)(i));
-		if (pt.x() > width)
-			width = pt.x();
+		double width = 0.0f;
+		for (int i = 0; i < 8; i++) {
+			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			if (pt.x() > width)
+				width = pt.x();
+		}
+
+		return static_cast<double>(width * 2.0f);
 	}
-
-	return static_cast<double>(width * 2.0f);
+	
+	// Otherwise it's OBB
+	return static_cast<double>(m_vHalfSize.x() * 2.0f);
 }
 
 double BoundingBox::GetHeight() {
-	RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+	if (m_type == Type::AABB) {
+		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	double height = 0.0f;
-	for (int i = 0; i < 8; i++) {
-		point pt = rotMat * GetBoxPoint((BoxPoint)(i));
-		if (pt.y() > height)
-			height = pt.y();
+		double height = 0.0f;
+		for (int i = 0; i < 8; i++) {
+			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			if (pt.y() > height)
+				height = pt.y();
+		}
+
+		return static_cast<double>(height * 2.0f);
 	}
-
-	return static_cast<double>(height * 2.0f);
+	
+	// Otherwise it's OBB
+	return static_cast<double>(m_vHalfSize.y() * 2.0f);
 }
 
 double BoundingBox::GetLength() {
-	RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+	if (m_type == Type::AABB) {
+		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	double length = 0.0f;
-	for (int i = 0; i < 8; i++) {
-		point pt = rotMat * GetBoxPoint((BoxPoint)(i));
-		if (pt.z() > length)
-			length = pt.z();
+		double length = 0.0f;
+		for (int i = 0; i < 8; i++) {
+			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			if (pt.z() > length)
+				length = pt.z();
+		}
+
+		return static_cast<double>(length * 2.0f);
 	}
-
-	return static_cast<double>(length * 2.0f);
+	
+	// Otherwise it's OBB
+	return static_cast<double>(m_vHalfSize.z() * 2.0f);
 }
 
 // TODO: Why do we need to invert the point?

@@ -700,9 +700,13 @@ RESULT OGLProgram::RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore) {
 				// TODO: This is a bit wonky, RenderBoundingVolume creates the OGL Bounding volume 
 				// which might not be the right flow
 				if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
+					// Update bounding volume:
+					pOGLObj->UpdateBoundingVolume();
 					SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
 				}
+
 				CR(pOGLObj->RenderBoundingVolume());
+				
 			}
 
 			// TODO: Children bounding boxes

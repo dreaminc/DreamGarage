@@ -68,7 +68,13 @@ Error:
 RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
+	if (pBoundingBox->GetBoxType() == BoundingBox::Type::AABB) {
+		CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
+	}
+	else if (pBoundingBox->GetBoxType() == BoundingBox::Type::OBB) {
+		m_ptOrigin = pBoundingBox->GetParentOrigin();
+		m_qRotation = pBoundingBox->GetOrientation();
+	}
 
 Error:
 	return r;

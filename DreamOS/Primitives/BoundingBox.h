@@ -51,6 +51,10 @@ public:
 		return BoundingVolume::Type::BOX;
 	}
 
+	BoundingBox::Type GetBoxType() {
+		return m_type;
+	}
+
 	double GetWidth();
 	double GetHeight();
 	double GetLength();

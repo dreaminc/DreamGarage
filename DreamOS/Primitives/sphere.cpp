@@ -33,7 +33,8 @@ sphere::sphere(float radius, int numAngularDivisions, int numVerticalDivisions, 
 	CR(SetSphereVertices(radius, numAngularDivisions, numVerticalDivisions, c));
 
 	// TODO: Allow for changing this - put it into a factory
-	CR(InitializeAABB());
+	//CR(InitializeAABB());
+	CR(InitializeBoundingSphere());
 
 // Success:
 	Validate();
@@ -53,7 +54,8 @@ sphere::sphere(BoundingSphere *pBoundingSphere, bool fTriangleBased) :
 	CR(SetSphereVertices(pBoundingSphere, fTriangleBased));
 
 	// TODO: Allow for changing this - put it into a factory
-	CR(InitializeAABB());
+	//CR(InitializeAABB());
+	CR(InitializeBoundingSphere());
 
 	// Success:
 	Validate();

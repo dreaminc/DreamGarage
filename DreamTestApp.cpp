@@ -35,8 +35,8 @@ RESULT DreamTestApp::LoadScene() {
 	*/
 
 	// TODO: sphere AABB
-	sphere *pSphere = AddSphere(0.5f, 10, 10);
-	pSphere->MoveTo(1.5f, 0.5f, 0.0f);
+	//sphere *pSphere = AddSphere(0.5f, 10, 10);
+	//pSphere->MoveTo(1.5f, 0.5f, 0.0f);
 
 	g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
 	//g_pCylinder->MoveTo(0.0f, -1.0f, 0.0f);
@@ -78,7 +78,7 @@ RESULT DreamTestApp::Update(void) {
 		//g_pCylinder->RotateZBy(0.001f);
 		//g_pCylinder->RotateYBy(0.001f);
 		//g_pCylinder->RotateXBy(0.001f);
-		//g_pCylinder->translate(point(0.0001f, 0.0001f, 0.001f));
+		g_pCylinder->translate(point(0.0005f, 0.000f, 0.000f));
 	}
 	//*/
 

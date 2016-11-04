@@ -186,6 +186,35 @@ Error:
 	return r;
 }
 
+RESULT OGLObj::UpdateBoundingVolume() {
+	RESULT r = R_PASS;
+
+	DimObj *pDimObj = GetDimObj();
+
+	// TODO: Better handling of different bounding volumes (or do it in BoundingVolume)
+	BoundingBox *pBoundingBox = nullptr;
+	if ((pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
+
+		if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
+			CR(pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox));
+		}
+	}
+	else {
+		BoundingSphere *pBoundingSphere = nullptr;
+		if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+			OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
+
+			if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
+				CR(pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere));
+			}
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT OGLObj::RenderBoundingVolume() {
 	RESULT r = R_PASS;
 
@@ -213,29 +242,6 @@ RESULT OGLObj::RenderBoundingVolume() {
 
 		CN(m_pOGLBoundingVolume);
 		m_pOGLBoundingVolume->GetDimObj()->SetWireframe(true);
-	}
-	else {
-		DimObj *pDimObj = GetDimObj();
-		
-		// TODO: Better handling of different bounding volumes (or do it in BoundingVolume)
-		BoundingBox *pBoundingBox = nullptr;
-		if ((pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
-			OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
-			
-			if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
-				pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox);
-			}
-		}
-		else {
-			BoundingSphere *pBoundingSphere = nullptr;
-			if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
-				OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
-
-				if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
-					pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere);
-				}
-			}
-		}
 	}
 	
 	CR(m_pOGLBoundingVolume->Render());

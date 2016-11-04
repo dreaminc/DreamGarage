@@ -34,7 +34,8 @@ cylinder::cylinder(double radius, double height, int numAngularDivisions, int nu
 
 	// TODO: Allow for changing this - put it into a factory
 	//CR(InitializeAABB());
-	CR(InitializeBoundingSphere());
+	//CR(InitializeBoundingSphere());
+	CR(InitializeOBB());
 
 // Success:
 	Validate();

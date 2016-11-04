@@ -36,6 +36,7 @@ public:
 	//virtual RESULT Render() {
 	virtual RESULT Render();
 	virtual RESULT RenderBoundingVolume();
+	virtual RESULT UpdateBoundingVolume();
 
 	OGLTexture *GetColorTexture();
 	OGLTexture *GetBumpTexture();
