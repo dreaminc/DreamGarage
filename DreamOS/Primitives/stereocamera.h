@@ -32,11 +32,11 @@ public:
 		
 		switch (eye) {
 			case EYE_LEFT: {
-				ptEye = m_ptOrigin + (GetRightVector() * (m_pupillaryDistance / 2.0f));
+				ptEye = m_ptOrigin + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
 			} break;
 
 			case EYE_RIGHT: {
-				ptEye = m_ptOrigin + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
+				ptEye = m_ptOrigin + (GetRightVector() * (m_pupillaryDistance / 2.0f));
 			} break;
 
 			case EYE_MONO: {
@@ -93,22 +93,13 @@ public:
 		if (m_pHMD != nullptr) {
 			eyePos += m_pHMD->GetHeadPointOrigin();
 		}
+		// View Matrix requires the opposite of the camera's world position
+		eyePos.Reverse();
+		quaternion q = m_qRotation;
+//		q.Reverse();
 
-		switch (eye) {
-			case EYE_LEFT: {
-				mat = ViewMatrix(eyePos, m_qRotation);
-			} break;
 
-			case EYE_RIGHT: {
-				mat = ViewMatrix(eyePos, m_qRotation);
-			} break;
-
-			case EYE_MONO: {
-				//mat = ViewMatrix(m_ptOrigin, m_qRotation);
-				mat = camera::GetViewMatrix();
-			} break;
-		}
-			
+		mat = ViewMatrix(eyePos, q);
 		return mat;
 	}
 
