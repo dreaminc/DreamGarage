@@ -85,8 +85,6 @@ RESULT OGLUniformBlock::UpdateOGLUniformBlockBuffers() {
 
 	OpenGLImp *pParentImp = GetParentOGLImplementation();
 
-	CR(pParentImp->MakeCurrentContext());
-
 	CR(pParentImp->glBindBuffer(GL_UNIFORM_BUFFER, m_uniformBlockBufferIndex));
 	//CR(m_pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 
