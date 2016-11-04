@@ -52,7 +52,7 @@ bool ProcessExecutor::ExecuteProcess(const std::wstring& processFullPath, const 
 		ShExecInfo.hInstApp = NULL;
 		if (ShellExecuteEx(&ShExecInfo) == TRUE)
 		{	
-			DWORD res = WaitForSingleObject(ShExecInfo.hProcess, 5000);// INFINITE);
+			DWORD res = WaitForSingleObject(ShExecInfo.hProcess, INFINITE);
 
 			switch (res)
 			{
@@ -139,7 +139,7 @@ bool ProcessExecutor::Execute(const std::wstring& processPath, const std::wstrin
 
 			if (ret)
 			{
-				DWORD res = WaitForSingleObject(pi.hProcess, 5000/*INFINITE*/);
+				DWORD res = WaitForSingleObject(pi.hProcess, INFINITE);
 
 				exeSuccess = false;
 
