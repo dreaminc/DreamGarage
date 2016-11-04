@@ -1,5 +1,4 @@
 #include "Logger.h"
-#include "splashscreen.h"
 #include "launcher.h"
 
 #include <wx/wxprec.h>
