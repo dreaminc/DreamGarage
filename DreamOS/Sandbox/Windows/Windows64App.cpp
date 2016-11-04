@@ -469,7 +469,8 @@ RESULT Windows64App::InitializeSandbox() {
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	
-	m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
+	if (m_fCheckHMD)
+		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
 
 	if (m_pHMD != nullptr) {
 		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
@@ -523,6 +524,17 @@ RESULT Windows64App::Show() {
 
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
+
+	HANDLE hCloseSplashScreenEvent = CreateEvent(NULL,        // no security
+		TRUE,       // manual-reset event
+		FALSE,      // not signaled
+		(LPTSTR)L"CloseSplashScreenEvent"); // event name
+
+	BOOL res = SetEvent(hCloseSplashScreenEvent);
+
+	LOG(INFO) << "signaling splash to close " << (res ? "ok" : "failed");
+
+	CloseHandle(hCloseSplashScreenEvent);
 
 	while (!fQuit) {
 		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {

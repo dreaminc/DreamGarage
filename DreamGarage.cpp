@@ -70,6 +70,14 @@ RESULT DreamGarage::LoadScene() {
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
 	AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
 
+	auto env = AddModel(L"\\Models\\Env\\industrial_style_interior.obj",
+		nullptr,
+		point(0, 0, 0),// -4.5f, -4.8f - 2.6f, 0.0f),
+    	0.01f,
+		vector(3.14f/2.0f, 0.0f, 0.0f));
+
+	env->MoveTo(0.0f, -1.0f, 4.0f);
+
 #ifdef TESTING
 // Test Scene
 // 
@@ -270,8 +278,6 @@ RESULT DreamGarage::SendHeadPosition() {
 	RESULT r = R_PASS;
 
 	point ptPosition = GetCameraPosition();
-	ptPosition.y() *= -1.0f;	// TODO: This is an issue with the OVR position 
-
 	quaternion qOrientation = GetCameraOrientation();
 
 	//CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
@@ -463,7 +469,7 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 	RESULT r = R_PASS;
 
 	if (m_isSeated) {
-		LOG(INFO) << "HandlePeersUpdate olready seated" << index;
+		LOG(INFO) << "HandlePeersUpdate already seated" << index;
 		return R_PASS;
 	}
 
@@ -472,12 +478,12 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(index)).c_str());
 
 	if (!m_isSeated) {
-		// an initial imp for seating. would be change once we decide final seating configurations
+		// an initial imp for seating. would be changed once we decide final seating configurations
 		camera* cam = GetCamera();
 		const float rad = 2.0f;
 
 		auto setCameraRoundtablePos = [&](uint16_t angle) {
-			cam->SetPosition(point(+rad*sin(angle*M_PI / 180.0f), 0.0f, -rad*cos(angle*M_PI / 180.0f)));
+			cam->SetPosition(point(-rad*sin(angle*M_PI / 180.0f), 0.0f, +rad*cos(angle*M_PI / 180.0f)));
 			cam->RotateYByDeg(angle);
 		};
 
@@ -549,18 +555,13 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 	std::string st = "pos" + std::to_string(senderUserID);
 
 	WCN(pUser);
-	
-	// camera coordinate system is reversed from world coordinate system.
-	// TODO: fix camera coordinate sysmte
-	headPos.x() = -headPos.x();
-	headPos.z() = -headPos.z();
+
+	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
 
 	pUser->SetPosition(headPos);
 
 	OVERLAY_DEBUG_SET(st, (st + "=" + std::to_string(headPos.x()) + "," + std::to_string(headPos.y()) + "," + std::to_string(headPos.z())).c_str());
 
-	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
-	qOrientation.Reverse();
 
 	pUser->SetOrientation(qOrientation);
 

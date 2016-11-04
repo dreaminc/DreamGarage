@@ -2075,6 +2075,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
+      <Filter>Cloud\User</Filter>
+	</ClInclude>
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
       <Filter>Cloud\Message</Filter>
     </ClInclude>

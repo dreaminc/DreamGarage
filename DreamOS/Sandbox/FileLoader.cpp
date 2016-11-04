@@ -15,6 +15,8 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 	std::vector<int> uvIndices;
 	std::vector<int> normalIndices;
 
+	multi_mesh_indices_t unordered_map;
+
 	std::ifstream obj_file(strOBJFilename, std::ios::binary);
 
 	std::vector<dimindex> indices;
@@ -189,7 +191,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			}
 		}
 		else if (type.compare("usemtl") == 0) {
-			out.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
+			unordered_map.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
 
 			index = 0;
 			objIndexMap.clear();
@@ -295,7 +297,32 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			<< ":map_Ks=" << i.second.map_Ks;
 	}
 	
-	out.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
+	unordered_map.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
+
+	// combine materials
+
+	//typedef std::vector < std::pair<material_t, mesh_t>> multi_mesh_indices_t;
+
+	while (!unordered_map.empty())
+	{
+		std::string materialName = unordered_map.front().first.name;
+
+		auto iter = unordered_map.begin();
+		while (iter != unordered_map.end())
+		{
+			if (iter->first.name == materialName)
+			{
+				out.push_back(std::move(*iter));
+				iter = unordered_map.erase(iter);
+			}
+			else
+			{
+				++iter;
+			}
+		}
+	}
+
+	////
 
 	obj_file.close();
 

@@ -390,10 +390,8 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 					vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(nDevice);
 						
-					//point ptControllerPosition = viewMat.GetPosition();
 					point ptControllerPosition = point(centerVec4.x, centerVec4.y, centerVec4.z);
-					//ptControllerPosition += point(0.0f, 0.0f, 2.0f);
-					ptControllerPosition -= m_pParentSandbox->GetCameraPosition();
+					ptControllerPosition += m_pParentSandbox->GetCameraPosition();
 					ptControllerPosition.w() = 1.0f;
 
 					quaternion qOrientation = viewMat.GetOrientation();
@@ -420,7 +418,8 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 					//m_ptOrigin = viewMat.GetPosition();
 
-					m_ptOrigin = -1.0f * point(viewMat(12), viewMat(13), viewMat(14));
+					m_ptOrigin = point(viewMat(12), viewMat(13), viewMat(14));
+					//m_ptOrigin = -1.0f * point(viewMat(12), viewMat(13), viewMat(14));
 
 					//m_ptOrigin = viewMat.GetPosition();
 

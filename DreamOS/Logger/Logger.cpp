@@ -18,6 +18,11 @@ std::string getcommandline()
 	return std::string(GetCommandLineA());
 }
 
+uint32_t getprocessid()
+{
+	return GetCurrentProcessId();
+}
+
 #endif
 
 #if (defined(__linux) || defined(__linux__))
@@ -38,6 +43,12 @@ std::string getcommandline()
 	return "";
 }
 
+uint32_t getprocessid()
+{
+	// TODO: Not imp.
+	return 0;
+}
+
 #endif
 
 
@@ -56,13 +67,14 @@ RESULT	Logger::InitializeLogger()
 	el::Configurations defaultConf;
 
 	defaultConf.setToDefault();
-	defaultConf.set(el::Level::Info, el::ConfigurationType::Format, "%datetime [DOS] %level %msg");
-	defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime [DOS] %level %msg");
+	defaultConf.set(el::Level::Info, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
+	defaultConf.set(el::Level::Error, el::ConfigurationType::Format, "%datetime %thread [DOS] %level %msg");
 	defaultConf.setGlobally(el::ConfigurationType::Filename, path);
-	defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "true");
+	defaultConf.setGlobally(el::ConfigurationType::ToStandardOutput, "false");
 	el::Loggers::reconfigureLogger("default", defaultConf);
 	
 	LOG(INFO) << "Process launched " << getexepath();
+	LOG(INFO) << "Process id " << getprocessid();
 	LOG(INFO) << "Process args " << getcommandline();
 
 	return R_PASS;

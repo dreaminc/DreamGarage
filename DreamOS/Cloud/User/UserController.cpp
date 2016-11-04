@@ -43,6 +43,10 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 		case UserMethod::LOAD_PROFILE: {	
 			strURI = ip + "/user/";
 		} break;
+
+		case UserMethod::LOAD_TWILIO_NTS_INFO: {
+			strURI = ip + "/twilio/nts/token/";
+		} break;
 	}
 
 	return strURI;
@@ -80,6 +84,18 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 
 Error:
 	return r;
+}
+
+long UserController::GetUserDefaultEnvironmentID() {
+	return m_user.GetDefaultEnvironmentID();
+}
+
+User UserController::GetUser() {
+	return m_user;
+}
+
+TwilioNTSInformation UserController::GetTwilioNTSInformation() {
+	return m_twilioNTSInformation;
 }
 
 RESULT UserController::LoginFromCommandline() {
@@ -202,6 +218,57 @@ RESULT UserController::LoadProfile() {
 
 		DEBUG_LINEOUT("User Profile Loaded");
 		m_user.PrintUser();
+
+		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
+
+		OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
+		OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
+	}
+
+Error:
+	return r;
+}
+
+// TODO: This may want to move to an API controller object instead
+RESULT UserController::LoadTwilioNTSInformation() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("Load Twilio NTS Information...");
+	CBM(m_fLoggedIn, "User not logged in yet");
+
+	{
+		HTTPResponse httpResponse;
+		std::string strAuthorizationToken = "Authorization: Token " + m_strToken;
+		std::string strURI = GetMethodURI(UserMethod::LOAD_TWILIO_NTS_INFO);
+		HTTPController *pHTTPController = HTTPController::instance();
+
+		auto headers = HTTPController::ContentAcceptJson();
+		headers.push_back(strAuthorizationToken);
+
+		CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadTwilioNTSInformation failed to post request");
+
+		DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+
+		std::string strHttpResponse(httpResponse.PullResponse());
+		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
+		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
+
+		m_twilioNTSInformation = TwilioNTSInformation(
+			jsonResponse["/data/date_created"_json_pointer].get<std::string>(),
+			jsonResponse["/data/date_updated"_json_pointer].get<std::string>(),
+			jsonResponse["/data/ttl"_json_pointer].get<int>(),
+			jsonResponse["/data/username"_json_pointer].get<std::string>(),
+			jsonResponse["/data/password"_json_pointer].get<std::string>()
+		);
+
+		// Ice Server URIs
+		for (auto &jsonICEServer : jsonResponse["/data/ice_servers"_json_pointer]) {
+			std::string strSDPCandidate = jsonICEServer["url"].get<std::string>();
+			m_twilioNTSInformation.AddICEServerURI(strSDPCandidate);
+		}
+
+		DEBUG_LINEOUT("Twilio NTS Information Loaded");
+		m_twilioNTSInformation.Print();
 
 		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
 

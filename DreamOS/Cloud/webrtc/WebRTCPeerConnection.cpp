@@ -22,6 +22,8 @@
 #include "webrtc/api/test/fakertccertificategenerator.h"
 #include "webrtc/p2p/base/fakeportallocator.h"
 
+#include "Cloud/User/TwilioNTSInformation.h"
+
 // TODO: Make this more legitimate + put in different file
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
 public:
@@ -577,13 +579,17 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	webrtc::PeerConnectionInterface::IceServer iceServer;
 	webrtc::FakeConstraints webrtcConstraints;
 	std::unique_ptr<rtc::RTCCertificateGeneratorInterface> pCertificateGenerator = nullptr;
+	TwilioNTSInformation twilioNTSInformation = m_pParentObserver->GetTwilioNTSInformation();
 
 	CN(m_pWebRTCPeerConnectionFactory.get());		// ensure factory is valid
 	CB((m_pWebRTCPeerConnectionInterface.get() == nullptr));	// ensure peer connection is nullptr
 
-	// TODO: thisssss
-	iceServer.uri = GetPeerConnectionString();
-	rtcConfiguration.servers.push_back(iceServer);
+	for (auto &strICEServerURI : twilioNTSInformation.m_ICEServerURIs) {
+		iceServer.uri = strICEServerURI;
+		iceServer.username = twilioNTSInformation.GetUsername();
+		iceServer.password = twilioNTSInformation.GetPassword();
+		rtcConfiguration.servers.push_back(iceServer);
+	}
 
 	if (dtls) {
 		if (rtc::SSLStreamAdapter::HaveDtlsSrtp()) {

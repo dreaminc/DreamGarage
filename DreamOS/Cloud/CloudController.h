@@ -28,6 +28,9 @@ class UpdateHeadMessage;
 class UpdateHandMessage;
 class AudioDataMessage;
 
+class User;
+class TwilioNTSInformation;
+
 typedef std::function<RESULT(long)> HandlePeersUpdateCallback;
 
 typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
@@ -66,7 +69,6 @@ public:
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 
-
 	RESULT Start();
 	RESULT Stop();
 
@@ -77,6 +79,9 @@ public:
 	RESULT LoginUser();
 	RESULT Update();
 	void Login();
+
+	User GetUser();
+	TwilioNTSInformation GetTwilioNTSInformation();
 
 	virtual long GetUserID() override;
 
@@ -109,7 +114,6 @@ public:
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-
 
 	RESULT BroadcastDataChannelStringMessage(std::string& strMessage);
 	RESULT BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
