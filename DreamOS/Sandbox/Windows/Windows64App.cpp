@@ -22,7 +22,6 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr),
 	m_ThreadID(0),
 	m_fnUIThreadCallback(nullptr)
 {
@@ -426,111 +425,58 @@ Error:
 	return r;
 }
 
+RESULT Windows64App::HandleMessages() {
+	RESULT r = R_PASS;
+
+	MSG msg;
+
+	if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
+		bool fHandled = false;
+
+		if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
+			fHandled = HandleMouseEvent(msg);
+		}
+		else if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) {
+			fHandled = HandleKeyEvent(msg);
+		}
+		else if (WM_QUIT == msg.message) {
+			CBR(false, (RESULT)(msg.wParam));
+		}
+
+		if (!fHandled)
+		{
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+	}
+
+Error:
+	return r;
+}
+
 // Note this call will never return and will actually run the event loop
 // TODO: Thread it?
 RESULT Windows64App::Show() {
 	RESULT r = R_PASS;
 
 	// Show the window
+	//CBM(ShowWindow(m_hwndWindow, SW_SHOWDEFAULT), "Failed to show win64app window");
+	//CBM(UpdateWindow(m_hwndWindow), "Faield to update win64app window");
+
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
 	
-	// Launch main message loop
-	MSG msg;
-	bool fQuit = false;
+	//return (RESULT)(msg.wParam);
 
-	CN(m_pHALImp);
-	CR(m_pHALImp->MakeCurrentContext());
-
-	// TODO: This should be moved to the sandbox
-	while (!fQuit) {
-		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-			bool fHandled = false;
-
-			if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
-				fHandled = HandleMouseEvent(msg);
-			}
-			else if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) {
-				fHandled = HandleKeyEvent(msg);
-			}
-			else if (WM_QUIT == msg.message)
-				break;
-
-			if (!fHandled)
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-
-#ifdef CEF_ENABLED
-		// Update Network
-		CR(m_pCloudController->Update());
-#endif
-
-		// Time Manager
-		CR(m_pTimeManager->Update());
-
-		// Update Callback
-		if (m_fnUpdateCallback != nullptr) {
-			CR(m_fnUpdateCallback());
-		}
-
-		// Update the mouse
-		// TODO: This is wrong architecture, this should
-		// be parallel 
-		// TODO: Update Sense etc
-		//m_pWin64Mouse->UpdateMousePosition();
-
-
-		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
-		}
-
-		// Update Scene 
-		CR(m_pSceneGraph->UpdateScene());
-
-		// Update HMD
-		if (m_pHMD != nullptr) {
-			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
-			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
-		}
-
-		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
-		//m_pOpenGLImp->Render(m_pSceneGraph);
-
-		///*
-		// Send to the HMD
-		// TODO reorganize Render functions
-		// need to be re-architected so that the HMD functions are called after all of the 
-		// GL functions per eye.
-		if (m_pHMD != nullptr) {
-			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
-			m_pHMD->SubmitFrame();
-			m_pHMD->RenderHMDMirror();
-		}
-		else {
-			// Render Scene
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
-		}
-		//*/
-	
-		// Swap buffers
-		SwapBuffers(m_hDC);
-
-		DreamConsole::GetConsole()->OnFrameRendered();
-
-		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
-			Shutdown();
-			fQuit = true;
-		}
-	}
-
-	return (RESULT)(msg.wParam);
-Error:
+//Error:
 	return r;
+}
+
+RESULT Windows64App::SwapDisplayBuffers() {
+	if (SwapBuffers(m_hDC))
+		return R_PASS;
+	else
+		return R_FAIL;
 }
 
 bool Windows64App::HandleMouseEvent(const MSG&	windowMassage) {

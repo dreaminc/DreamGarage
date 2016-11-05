@@ -114,6 +114,7 @@ RESULT DreamOS::Start() {
 
 	// This will start the application
 	CRM(m_pSandbox->Show(), "Failed to show sandbox window");
+	CR(m_pSandbox->RunAppLoop());
 
 Error:
 	return r;

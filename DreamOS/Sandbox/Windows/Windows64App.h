@@ -40,10 +40,12 @@ public:
 	~Windows64App();
 
 public:	// Sandbox Interface
-	RESULT InitializeSandbox();
-	RESULT Show();
-	RESULT Shutdown();
-	RESULT RecoverDisplayMode();
+	virtual RESULT InitializeSandbox() override;
+	virtual RESULT Show() override;
+	virtual RESULT Shutdown() override;
+	virtual RESULT RecoverDisplayMode() override;
+	virtual RESULT HandleMessages() override;
+	virtual RESULT SwapDisplayBuffers() override;
 
 	virtual RESULT SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) override;
 	virtual long Windows64App::GetTickCount() override;
@@ -103,7 +105,7 @@ public:
 	//std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
 	//Win64Keyboard *m_pWin64Keyboard;
 	//Win64Mouse *m_pWin64Mouse;
-	HMD *m_pHMD;
+	//HMD *m_pHMD;
 };
 
 #endif // ! WINDOWS_64_APP_H_

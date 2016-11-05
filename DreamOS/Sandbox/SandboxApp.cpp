@@ -12,6 +12,7 @@ SandboxApp::SandboxApp() :
 	m_pSceneGraph(NULL),
 	m_pCloudController(nullptr),
 	m_pHALImp(nullptr),
+	m_pHMD(nullptr),
 	m_fnUpdateCallback(nullptr),
 	m_pSenseLeapMotion(nullptr)
 {
@@ -185,6 +186,87 @@ inline PathManager* SandboxApp::GetPathManager() {
 
 inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext; 
+}
+
+RESULT SandboxApp::RunAppLoop() {
+	RESULT r = R_PASS;
+
+	// Launch main message loop
+	bool fQuit = false;
+
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
+
+	// TODO: This should be moved to the sandbox
+	while (!fQuit) {
+		CR(HandleMessages());	// Handle windows messages
+
+#ifdef CEF_ENABLED
+		// Update Network
+		CR(m_pCloudController->Update());
+#endif
+
+		// Time Manager
+		CR(m_pTimeManager->Update());
+
+		// Update Callback
+		if (m_fnUpdateCallback != nullptr) {
+			CR(m_fnUpdateCallback());
+		}
+
+		// Update the mouse
+		// TODO: This is wrong architecture, this should
+		// be parallel 
+		// TODO: Update Sense etc
+		//m_pWin64Mouse->UpdateMousePosition();
+
+		if (m_pHMD != nullptr) {
+			m_pHMD->UpdateHMD();
+		}
+
+		// Update Scene 
+		CR(m_pSceneGraph->UpdateScene());
+
+		// Update HMD
+		if (m_pHMD != nullptr) {
+			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
+			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
+		}
+
+		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
+		//m_pOpenGLImp->Render(m_pSceneGraph);
+
+		///*
+		// Send to the HMD
+		// TODO reorganize Render functions
+		// need to be re-architected so that the HMD functions are called after all of the 
+		// GL functions per eye.
+		if (m_pHMD != nullptr) {
+			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
+			m_pHMD->SubmitFrame();
+			m_pHMD->RenderHMDMirror();
+		}
+		else {
+			// Render Scene
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
+		}
+		//*/
+
+		// Swap buffers
+		SwapDisplayBuffers();
+
+		DreamConsole::GetConsole()->OnFrameRendered();
+
+		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
+			Shutdown();
+			fQuit = true;
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
