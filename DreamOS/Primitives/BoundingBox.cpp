@@ -79,30 +79,27 @@ bool BoundingBox::Intersect(point& pt) {
 
 // https://tavianator.com/fast-branchless-raybounding-box-intersections/
 bool BoundingBox::Intersect(ray& r) {
+	double tmin = -INFINITY, tmax = INFINITY;
 
-	if (m_type == Type::AABB) {
-		double tmin = -INFINITY, tmax = INFINITY;
-
-		point ptMin = GetMinPoint();
-		point ptMax = GetMaxPoint();
-
-		for (int i = 0; i < 3; i++) {
-			double t1 = (ptMin(i) - r.ptOrigin()(i)) / r.vDirection()(i);
-			double t2 = (ptMax(i) - r.ptOrigin()(i)) / r.vDirection()(i);
-
-			tmin = std::max(tmin, std::min(t1, t2));
-			tmax = std::min(tmax, std::max(t1, t2));
-		}
-
-		return (tmax >= tmin);
-	}
-	else if (m_type == Type::OBB) {
-		// TODO:
-
-		return false;
+	// Rotate the ray by the Rotation Matrix
+	// Get origin in reference to object
+	if (m_type == Type::OBB) {
+		r.vDirection() = inverse(RotationMatrix(GetOrientation())) * r.GetVector();
+		r.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - r.GetOrigin()));
 	}
 
-	return false;
+	point ptMin = GetMinPoint();
+	point ptMax = GetMaxPoint();
+
+	for (int i = 0; i < 3; i++) {
+		double t1 = (ptMin(i) - r.ptOrigin()(i)) / r.vDirection()(i);
+		double t2 = (ptMax(i) - r.ptOrigin()(i)) / r.vDirection()(i);
+
+		tmin = std::max(tmin, std::min(t1, t2));
+		tmax = std::min(tmax, std::max(t1, t2));
+	}
+
+	return (tmax >= tmin);
 }
 
 RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {

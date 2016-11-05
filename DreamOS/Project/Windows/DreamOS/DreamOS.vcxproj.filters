@@ -484,9 +484,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp">
       <Filter>Primitives\matrix</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp">
       <Filter>Cloud\User</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2152,10 +2155,10 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Test\MatrixTestSuite.h">
       <Filter>Primitives\matrix</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
       <Filter>Cloud\User</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
       <Filter>Cloud\Message</Filter>
     </ClInclude>

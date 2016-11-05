@@ -67,6 +67,7 @@ public:
 		return R_PASS;
 	}
 
+	point GetBoundingVolumeOrigin();
 	point GetParentOrigin();
 	point GetOrigin();
 	quaternion GetOrientation();

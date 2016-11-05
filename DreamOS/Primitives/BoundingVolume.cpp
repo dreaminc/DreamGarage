@@ -25,6 +25,10 @@ point BoundingVolume::GetParentOrigin() {
 	return (m_pParent->GetOrigin());
 }
 
+point BoundingVolume::GetBoundingVolumeOrigin() {
+	return (RotationMatrix(GetOrientation()) * vector(m_ptOrigin));
+}
+
 point BoundingVolume::GetOrigin() {
 	if (!m_ptOrigin.IsZero()) {
 		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptOrigin);

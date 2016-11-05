@@ -50,6 +50,16 @@ public:
 	inline point &ptOrigin() { return m_ptOrigin; }
 	inline vector &vDirection() { return m_vDirection; }
 
+	template <typename TMatrix>
+	friend ray operator*(matrix<TMatrix, 4, 4>& lhs, const ray& rhs) {
+		ray retRay;
+
+		retRay.ptOrigin() = lhs * const_cast<ray&>(rhs).ptOrigin();
+		retRay.vDirection() = lhs * const_cast<ray&>(rhs).vDirection();
+
+		return retRay;
+	}
+
 protected:
 	point m_ptOrigin;
 	vector m_vDirection;
