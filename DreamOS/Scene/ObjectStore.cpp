@@ -82,30 +82,28 @@ std::vector<VirtualObj*> ObjectStore::GetObjects(ray rCast) {
 	return m_pSceneGraphStore->GetObjects(rCast);
 }
 
-// TODO: Perhaps pass this to a scene graph handler (like physics etc)
+// TODO: This is holding the collide functionality here temporarily 
 RESULT ObjectStore::UpdateScene() {
 	RESULT r = R_PASS;
 	
-	/*
-	Reset();
-	ObjectStoreImp *pObjectStore = GetSceneGraphStore();
+	for (auto &pObject : GetObjects()) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 
-	VirtualObj *pVirtualObj = NULL;
-	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-		quaternion_precision factor = 0.05;
-		quaternion_precision filter = 0.1;
-
-		static quaternion_precision x = 0;
-		static quaternion_precision y = 0;
-		static quaternion_precision z = 0;
-
-		//x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		//y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		//z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-
-		pVirtualObj->RotateBy(x * factor, y * factor, z * factor);
+		if (pDimObj != nullptr) {
+			pDimObj->SetColor(color(COLOR_WHITE));
+		}
 	}
-	//*/
+
+	for (auto &objCollisionGroup : m_pSceneGraphStore->GetObjectCollisionGroups()) {
+		// Handle collisions
+
+		for (auto &pObject : objCollisionGroup) {
+			DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+			pDimObj->SetColor(color(COLOR_RED));
+		}
+	}
+
+	
 
 	return r;
 }

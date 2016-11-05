@@ -36,6 +36,8 @@ public:
 
 	virtual std::vector<VirtualObj*> GetObjects() = 0;
 	virtual std::vector<VirtualObj*> GetObjects(ray rCast) = 0;
+	virtual std::vector<VirtualObj*> GetObjects(DimObj *pDimObj) = 0;
+	virtual std::vector<std::vector<VirtualObj*>> GetObjectCollisionGroups() = 0;		// This returns groups of objects that are collided 
 };
 
 #endif // ! SCENE_GRAPH_STORE_H_

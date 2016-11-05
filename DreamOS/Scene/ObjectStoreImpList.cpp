@@ -132,3 +132,41 @@ std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(ray rCast) {
 
 	return intersectedObjects;
 }
+
+std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(DimObj *pDimObj) {
+	std::vector<VirtualObj*> intersectedObjects;
+
+	for (auto &object : m_objects) {
+		DimObj *pDimObject = dynamic_cast<DimObj*>(object);
+
+		// Don't intersect self
+		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || pDimObj == pDimObject || pDimObject->GetBoundingVolume() == nullptr) {
+			continue;
+		}
+
+		if (pDimObject->GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get())) {
+			intersectedObjects.push_back(pDimObj);
+		}
+	}
+
+	return intersectedObjects;
+}
+
+// TODO: This will return redundant groups right now
+std::vector<std::vector<VirtualObj*>> ObjectStoreImpList::GetObjectCollisionGroups() {
+	std::vector<std::vector<VirtualObj*>> collisionGroups;
+
+	for (auto &object : m_objects) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(object);
+
+		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr) {
+			continue;
+		}
+
+		auto collisionGroup = GetObjects(pDimObj);
+		if (collisionGroup.size() > 0)
+			collisionGroups.push_back(collisionGroup);
+	}
+
+	return collisionGroups;
+}

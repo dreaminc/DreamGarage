@@ -38,6 +38,8 @@ public:
 
 	virtual std::vector<VirtualObj*> GetObjects() override;
 	virtual std::vector<VirtualObj*> GetObjects(ray rCast) override;
+	virtual std::vector<VirtualObj*> GetObjects(DimObj *pDimObj) override;
+	virtual std::vector<std::vector<VirtualObj*>> GetObjectCollisionGroups() override;
 
 protected:
 	std::list<VirtualObj*> m_objects;

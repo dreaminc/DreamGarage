@@ -472,7 +472,7 @@ RESULT Windows64App::Show() {
 	return r;
 }
 
-RESULT Windows64App::SwapDisplayBuffers() {
+inline RESULT Windows64App::SwapDisplayBuffers() {
 	if (SwapBuffers(m_hDC))
 		return R_PASS;
 	else

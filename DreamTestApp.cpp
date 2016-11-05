@@ -7,6 +7,7 @@
 
 cylinder *g_pCylinder = nullptr;
 volume *g_pVolume = nullptr;
+volume *g_pVolume2 = nullptr;
 
 RESULT DreamTestApp::LoadScene() {
 	RESULT r = R_PASS;
@@ -39,12 +40,15 @@ RESULT DreamTestApp::LoadScene() {
 	//pSphere->MoveTo(1.5f, 0.5f, 0.0f);
 
 	//g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
-	//g_pCylinder->MoveTo(0.0f, -1.0f, 0.0f);
+	//g_pCylinder->MoveTo(2.0f, 0.0f, 0.0f);
 
 	//g_pCylinder->RotateZBy((float)(M_PI_4));
 
 	g_pVolume = AddVolume(0.5f, 0.5f, 2.0f);
-	g_pVolume->MoveTo(point(-1.0f, 0.0f, 0.0f));
+	g_pVolume->MoveTo(point(-2.0f, 0.0f, 0.0f));
+
+	g_pVolume2 = AddVolume(0.5f, 0.5f, 2.0f);
+	g_pVolume2->MoveTo(point(2.0f, 0.0f, 0.0f));
 	//g_pVolume->RotateZBy((float)(M_PI_4));
 
 	//pCylinder->SetWireframe(true);
@@ -79,16 +83,25 @@ RESULT DreamTestApp::Update(void) {
 		//g_pCylinder->RotateYBy(0.001f);
 		//g_pCylinder->RotateXBy(0.001f);
 		//g_pCylinder->translate(point(0.0005f, 0.000f, 0.000f));
+		g_pCylinder->translateX(-0.0002f);
 	}
 	//*/
 
 	///*
 	if (g_pVolume != nullptr) {
-		g_pVolume->RotateByDeg(0.01f, 0.01f, 0.01f);
+		//g_pVolume->RotateByDeg(0.01f, 0.01f, 0.01f);
 		//g_pVolume->RotateXBy(0.001f);
 		//g_pVolume->RotateYBy(0.001f);
 		//g_pVolume->RotateZBy(0.001f);
-		g_pVolume->translateX(0.0002f);
+		g_pVolume->translateX(0.0003f);
+	}
+
+	if (g_pVolume2 != nullptr) {
+		//g_pVolume2->RotateByDeg(0.01f, 0.01f, 0.01f);
+		//g_pVolume->RotateXBy(0.001f);
+		//g_pVolume->RotateYBy(0.001f);
+		//g_pVolume->RotateZBy(0.001f);
+		g_pVolume2->translateX(-0.0003f);
 	}
 	//*/
 

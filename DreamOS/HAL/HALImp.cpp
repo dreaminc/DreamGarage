@@ -6,7 +6,7 @@ HALImp::HALImp() :
 {
 	memset(&m_HALConfiguration, 0, sizeof(HALImp::HALConfiguration));
 	
-	//m_HALConfiguration.fRenderReferenceGeometry = true;
+	m_HALConfiguration.fRenderReferenceGeometry = true;
 }
 
 HALImp::~HALImp() {

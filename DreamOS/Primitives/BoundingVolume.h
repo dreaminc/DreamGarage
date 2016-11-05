@@ -41,7 +41,6 @@ public:
 	}
 
 	bool Intersect(BoundingVolume* pRHS);
-
 	virtual bool Intersect(const BoundingSphere& rhs) = 0;
 	virtual bool Intersect(const BoundingBox& rhs) = 0;
 
