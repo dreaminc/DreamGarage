@@ -37,7 +37,39 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 
 	std::map<std::string, material_t> material_map;
 
+	int newPositionIndices[4]{ 0 }, newUvIndices[4]{ 0 }, newNormalIndices[4]{ 0 };
+
 	DEBUG_LINEOUT("Loading %S from file", strOBJFilename.c_str());
+
+	// converts a Wavefront obj index into an index in buffer (std::vector, cyclic and starting in 0)
+	auto ConvertIndex = [](int& index, size_t bufferSize) {
+		if (index == 0)
+			index = static_cast<int>(bufferSize) - 1;
+		else if (index > 0)
+			index = (index - 1) % bufferSize;
+		else // index < 0
+			index = static_cast<int>(bufferSize - 1 - ((-index) % bufferSize));
+	};
+
+	// add new index to the mesh using cached vertices
+	auto AddVertex = [&](int i) {
+		std::array<int, 3> indicesKey { newPositionIndices[i], newNormalIndices[i], newUvIndices[i] };
+
+		if (vertexCache.find(indicesKey) == vertexCache.end())
+		{
+			vectorMeshVerticies.emplace_back(all_positions[newPositionIndices[i]],
+				all_normals[newNormalIndices[i]],
+				uvcoord(all_uvs[newUvIndices[i]].x(), all_uvs[newUvIndices[i]].y()));
+
+			indices.push_back(index);
+			vertexCache[indicesKey] = index;
+			++index;
+		}
+		else
+		{
+			indices.push_back(vertexCache[indicesKey]);
+		}
+	};
 
 	while (std::getline(obj_file, line)) {
 
@@ -65,8 +97,6 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			all_normals.emplace_back(x, y, z);
 		}
 		else if (type.compare("f") == 0) {
-			int newPositionIndices[4]{ 0 }, newUvIndices[4]{ 0 }, newNormalIndices[4]{ 0 };
-
 			// TODO: support >4 poligons
 			enum class FaceType {
 				PTN4,
@@ -126,9 +156,9 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			
 			for (int i = 0; i < 4; ++i)
 			{
-				CYCLIC_BUFFER(newPositionIndices[i], all_positions);
-				CYCLIC_BUFFER(newUvIndices[i], all_uvs);
-				CYCLIC_BUFFER(newNormalIndices[i], all_normals);
+				ConvertIndex(newPositionIndices[i], all_positions.size());
+				ConvertIndex(newUvIndices[i], all_uvs.size());
+				ConvertIndex(newNormalIndices[i], all_normals.size());
 			}
 
 			#define ADD_VERTEX(i) \
@@ -152,30 +182,30 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			case FaceType::PTN3:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : 3 - j;
-					ADD_VERTEX(i);
+					AddVertex(i);
 				}
 				break;
 			case FaceType::PTN4:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : 3 - j;
-					ADD_VERTEX(i);
+					AddVertex(i);
 				}
 				for (int j = 0; j < 3; ++j) {
 					// triangle order 0, 3, 2
 					int i = (j == 1) ? j + 2 : j;
-					ADD_VERTEX(i);
+					AddVertex(i);
 				}
 				break;
 			case FaceType::PN3:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : j + 1;
-					ADD_VERTEX(i);
+					AddVertex(i);
 				}
 				break;
 			case FaceType::PT3:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : 3 - j;
-					ADD_VERTEX(i);
+					AddVertex(i);
 				}
 				break;
 			}
