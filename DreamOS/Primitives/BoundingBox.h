@@ -34,6 +34,13 @@ public:
 		INVALID
 	};
 
+	enum class BoxAxis {
+		X_AXIS,
+		Y_AXIS,
+		Z_AXIS,
+		INVALID
+	};
+
 public:
 	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type);
 	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptOrigin, vector vHalfSize);
@@ -54,6 +61,11 @@ public:
 	BoundingBox::Type GetBoxType() {
 		return m_type;
 	}
+
+	// Separating Axis Theorem (SAT) early test
+	double TransformToAxis(const vector &vAxis);
+	vector GetAxis(BoxAxis boxAxis);
+	bool OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis);
 
 	double GetWidth();
 	double GetHeight();

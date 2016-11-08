@@ -22,8 +22,8 @@ BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, poin
 
 bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 	if (m_type == Type::AABB) {
-		point ptMax = GetOrigin() + m_vHalfSize;
-		point ptMin = GetOrigin() - m_vHalfSize;
+		point ptMax = GetOrigin() + GetHalfVector();
+		point ptMin = GetOrigin() - GetHalfVector();
 
 		point ptClosestPoint = point::min(point::max(static_cast<BoundingSphere>(rhs).GetOrigin(), ptMin), ptMax);
 		double distanceSquared = pow((ptClosestPoint - static_cast<BoundingSphere>(rhs).GetOrigin()).magnitude(), 2.0f);
@@ -44,11 +44,11 @@ bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 
 bool BoundingBox::Intersect(const BoundingBox& rhs) {
 	if (m_type == Type::AABB) {
-		point ptMaxA = GetOrigin() + m_vHalfSize;
-		point ptMinA = GetOrigin() - m_vHalfSize;
+		point ptMaxA = GetOrigin() + GetHalfVector();
+		point ptMinA = GetOrigin() - GetHalfVector();
 
-		point ptMaxB = const_cast<BoundingBox&>(rhs).GetOrigin() + rhs.m_vHalfSize;
-		point ptMinB = const_cast<BoundingBox&>(rhs).GetOrigin() - rhs.m_vHalfSize;
+		point ptMaxB = const_cast<BoundingBox&>(rhs).GetOrigin() + static_cast<BoundingBox>(rhs).GetHalfVector();
+		point ptMinB = const_cast<BoundingBox&>(rhs).GetOrigin() - static_cast<BoundingBox>(rhs).GetHalfVector();
 
 		if ((ptMaxA > ptMinB) && (ptMaxB > ptMinA))
 			return true;
@@ -56,9 +56,21 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 			return false;
 	}
 	else if (m_type == Type::OBB) {
-		// TODO:
+		for (int i = 0; i < 3; i++) {
+			// Self Box Axes
+			if (!OverlapOnAxis(rhs, GetAxis(BoundingBox::BoxAxis(i)))) {
+				return false;
+			}
 
-		return false;
+			// The other box Axes (todo: test if it's an OBB)
+			if (!OverlapOnAxis(rhs, static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i)))) {
+				return false;
+			}
+
+			// TODO: Do the cross etc
+		}
+
+		return true;
 	}
 
 	return false;
@@ -134,6 +146,47 @@ vector BoundingBox::GetHalfVector() {
 	
 	// Otherwise it's OBB
 	return m_vHalfSize;
+}
+
+bool BoundingBox::OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis) {
+	// Project the half-size of one onto axis
+	double selfProject = TransformToAxis(vAxis);
+	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
+
+	vector vToCenter = static_cast<BoundingBox>(rhs).GetOrigin() - GetOrigin();
+
+	double distance = std::abs(vToCenter.dot(vAxis));
+
+	return (distance <= (selfProject + rhsProject));
+}
+
+// Project half size onto vector axis
+double BoundingBox::TransformToAxis(const vector &vAxis) {
+	double retVal = 0.0f;
+
+	retVal += GetHalfVector().x() * std::abs(vAxis.dot(GetAxis(BoxAxis::X_AXIS)));
+	retVal += GetHalfVector().y() * std::abs(vAxis.dot(GetAxis(BoxAxis::Y_AXIS)));
+	retVal += GetHalfVector().z() * std::abs(vAxis.dot(GetAxis(BoxAxis::Z_AXIS)));
+
+	return retVal;
+}
+
+vector BoundingBox::GetAxis(BoxAxis boxAxis) {
+	vector retVector = vector(0.0f, 0.0f, 0.0f);
+
+	switch (boxAxis) {
+		case BoxAxis::X_AXIS: retVector = vector::iVector(1.0f); break;
+		case BoxAxis::Y_AXIS: retVector = vector::jVector(1.0f); break;
+		case BoxAxis::Z_AXIS: retVector = vector::kVector(1.0f); break;
+	}
+
+	// Rotate by OBB if so
+	if (m_type == Type::OBB) {
+		retVector = RotationMatrix(GetOrientation()) * retVector;
+		retVector.Normalize();
+	}
+
+	return retVector;
 }
 
 double BoundingBox::GetWidth() {

@@ -44,8 +44,8 @@ public:
 
 	RESULT Print(char *pszOptName = nullptr);
 
-	vector_precision dot(vector& rhs);
-	vector_precision dot(point& rhs);
+	vector_precision dot(const vector& rhs) const;
+	vector_precision dot(const point& rhs) const;
 
 	vector cross(vector rhs);
 	vector NormalizedCross(vector rhs);

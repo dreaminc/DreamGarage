@@ -16,8 +16,8 @@ volume::volume(double width, double length, double height, bool fTriangleBased) 
 
 	// TODO: Allow for changing this - put it into a factory
 	//CR(InitializeAABB());
-	//CR(InitializeOBB());
-	CR(InitializeBoundingSphere());
+	CR(InitializeOBB());
+	//CR(InitializeBoundingSphere());
 
 	//Success:
 	Validate();

@@ -45,6 +45,7 @@ RESULT DreamTestApp::LoadScene() {
 	//g_pCylinder->RotateZBy((float)(M_PI_4));
 
 	g_pVolume = AddVolume(0.5f, 0.5f, 2.0f);
+	g_pVolume->RotateZByDeg(45.0f);
 	g_pVolume->MoveTo(point(-2.0f, 0.0f, 0.0f));
 
 	g_pVolume2 = AddVolume(0.5f, 0.5f, 2.0f);

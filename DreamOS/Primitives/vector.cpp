@@ -77,7 +77,7 @@ RESULT vector::Print(char *pszOptName) {
 
 // Dot Product
 // This calculates the dot product as if it is a R3 vector (ignores the w parameter) 
-vector_precision vector::dot(vector& rhs) {
+vector_precision vector::dot(const vector& rhs) const {
 	vector_precision result = 0;
 
 	for (int i = 0; i < 3; i++)
@@ -86,7 +86,7 @@ vector_precision vector::dot(vector& rhs) {
 	return result;
 }
 
-vector_precision vector::dot(point& rhs) {
+vector_precision vector::dot(const point& rhs) const {
 	vector_precision result = 0;
 
 	for (int i = 0; i < 3; i++)
