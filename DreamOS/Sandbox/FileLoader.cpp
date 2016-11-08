@@ -4,6 +4,7 @@
 
 #include <fstream>
 #include <sstream>
+#include <array>
 
 bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mesh_indices_t &out) {
 
@@ -21,7 +22,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 
 	std::vector<dimindex> indices;
 	dimindex	index = 0;
-	std::map<int, dimindex> objIndexMap;
+	std::map<std::array<int, 3>, dimindex> vertexCache;
 
 	if (!obj_file.is_open()) {
 		return false;
@@ -115,46 +116,35 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 				}
 			}
 
-			// TODO: ?
 			#define CYCLIC_BUFFER(index, buffer) \
-						if (index <= 0)\
-							index = static_cast<int>(buffer.size()) - 1 + index;\
-						else\
-							index--
-
-			/*
-			#define CYCLIC_BUFFER(index, buffer) \
-						if (buffer.size() > 0) \
-							index = (index - 1) % buffer.size()
-			*/
-
+						if (index == 0)\
+							index = static_cast<int>(buffer.size()) - 1;\
+						else if (index > 0)\
+							index = (index - 1) % buffer.size();\
+						else if (index < 0)\
+							index = buffer.size() - 1 - ((-index) % buffer.size())
+			
 			for (int i = 0; i < 4; ++i)
 			{
 				CYCLIC_BUFFER(newPositionIndices[i], all_positions);
-				while (newPositionIndices[i] < 0)
-				{
-					CYCLIC_BUFFER(newPositionIndices[i], all_positions);
-				}
 				CYCLIC_BUFFER(newUvIndices[i], all_uvs);
 				CYCLIC_BUFFER(newNormalIndices[i], all_normals);
 			}
 
-			// TODO: now caching vertices is done base only on position.
-			// we need to set a different vertex if either position/normal/uv is different, using a multi map for objIndexMap
-			// TODO: ?
 			#define ADD_VERTEX(i) \
-			if(objIndexMap.find(newPositionIndices[i]) == objIndexMap.end())\
+			std::array<int, 3> ind {newPositionIndices[i], newNormalIndices[i], newUvIndices[i]};\
+			if(vertexCache.find(ind) == vertexCache.end())\
 			{	\
 				vectorMeshVerticies.emplace_back(all_positions[newPositionIndices[i]],	\
 					all_normals[newNormalIndices[i]],	\
 					uvcoord(all_uvs[newUvIndices[i]].x(), all_uvs[newUvIndices[i]].y()));	\
 				indices.push_back(index);	\
-				objIndexMap[newPositionIndices[i]] = index;	\
+				vertexCache[ind] = index;	\
 				++index;	\
 			}	\
 			else    \
 			{	\
-				indices.push_back(objIndexMap[newPositionIndices[i]]);	\
+				indices.push_back(vertexCache[ind]);	\
 			}
 
 			switch (face)
@@ -194,7 +184,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			unordered_map.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
 
 			index = 0;
-			objIndexMap.clear();
+			vertexCache.clear();
 
 			char	name[1024];
 			std::sscanf(value.c_str(), "%s\n",
