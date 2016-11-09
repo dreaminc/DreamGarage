@@ -10,8 +10,12 @@
 
 #include <map>
 
-std::wstring	updatesUrl{L"https://github.com/dreaminc/Dream/releases/download/Releases/"};
-std::wstring	updatesDevUrl{ L"https://github.com/dreaminc/Dream/releases/download/DevReleases/" };
+
+#ifdef DEV_ENVIRONMANT
+std::wstring	updatesUrl{ L"https://github.com/dreaminc/Dream/releases/download/DevReleases/" };
+#else
+std::wstring	updatesUrl{ L"https://github.com/dreaminc/Dream/releases/download/Releases/" };
+#endif
 
 // the following methods need a bit of organizing into a class
 
@@ -188,31 +192,14 @@ CmdEventType CheckCmdlnEvent(int argc, char *argv[])
 // checks for dev releases
 bool CheckAccess(int argc, char *argv[])
 {
-	if (argc < 2)
-		return true;
-
-	for (int i = 1; i < argc; ++i)
+	if (!CheckDev())
 	{
-		std::string arg(argv[i]);
-
-		if (arg.compare("-dev") == 0)
-		{
-			LOG(INFO) << "checking access";
-
-			if (!CheckDev())
-			{
-				LOG(ERROR) << "access denied";
-				MessageBox(NULL, L"Access denied. contact www.dreamos.com for dev access.\n", L"Dream Message", MB_OK);
-				return false;
-			}
-
-			updatesUrl = updatesDevUrl;
-
-			LOG(INFO) << "dev access succeded";
-			return true;
-		}
+		LOG(ERROR) << "access denied";
+		MessageBox(NULL, L"Access denied. contact www.dreamos.com for dev access.\n", L"Dream Message", MB_OK);
+		return false;
 	}
 
+	LOG(INFO) << "dev access succeded";
 	return true;
 }
 
@@ -340,11 +327,17 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 		return -1;
 	}
 
+#ifdef DEV_ENVIRONMANT
+	LOG(INFO) << "dev environment";
+
 	if (!CheckAccess(argc, argv))
 	{
 		LOG(ERROR) << "process executor init failed";
 		return -1;
 	}
+#else
+	LOG(INFO) << "production environment";
+#endif
 
 	LOG(INFO) << "access ok";
 

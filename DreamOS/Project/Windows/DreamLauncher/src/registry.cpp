@@ -5,6 +5,8 @@
 
 #include "tchar.h"
 
+extern bool g_userDevEnv;
+
 // TODO: remove all this hard coded vars and make it more generic
 /*
 std::multimap<std::wstring, std::pair<std::wstring, std::wstring>> registry
@@ -15,27 +17,30 @@ std::multimap<std::wstring, std::pair<std::wstring, std::wstring>> registry
 	{ L"dreamos\\shell\\open\\command",{ L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
 };
 */
+
 typedef struct {
 	HKEY		 key;
 	std::wstring value;
 	std::wstring data;
 } registryData;
 
+#ifdef DEV_ENVIRONMANT
+std::multimap<std::wstring, registryData> registry
+{
+	{ L"dreamosdev",							registryData{ HKEY_CLASSES_ROOT, L"", L"\"URL:Dream OS Protocol\"" } },
+	{ L"dreamosdev",							registryData{ HKEY_CLASSES_ROOT, L"URL Protocol", L"\"\"" } },
+	{ L"dreamosdev\\DefaultIcon",				registryData{ HKEY_CLASSES_ROOT, L"", L"\"dreamos.exe,1\"" } },
+	{ L"dreamosdev\\shell\\open\\command",		registryData{ HKEY_CLASSES_ROOT, L"", L"\"[UPDATEPATH]Update.exe\" --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
+};
+#else
 std::multimap<std::wstring, registryData> registry
 {
 	{ L"dreamos",							registryData{ HKEY_CLASSES_ROOT, L"", L"\"URL:Dream OS Protocol\"" } },
 	{ L"dreamos",							registryData{ HKEY_CLASSES_ROOT, L"URL Protocol", L"\"\"" } },
 	{ L"dreamos\\DefaultIcon",				registryData{ HKEY_CLASSES_ROOT, L"", L"\"dreamos.exe,1\"" } },
 	{ L"dreamos\\shell\\open\\command",		registryData{ HKEY_CLASSES_ROOT, L"", L"\"[UPDATEPATH]Update.exe\" --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
-//	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_CURRENT_USER, L"", L"\"URL:Dream OS Protocol\"" } },
-//	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_CURRENT_USER, L"URL Protocol", L"\"\"" } },
-//	{ L"SOFTWARE\\Classes\\dreamos\\DefaultIcon",				registryData{ HKEY_CURRENT_USER, L"", L"\"dreamos.exe,1\"" } },
-//	{ L"SOFTWARE\\Classes\\dreamos\\shell\\open\\command",		registryData{ HKEY_CURRENT_USER, L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
-//	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_LOCAL_MACHINE, L"", L"\"URL:Dream OS Protocol\"" } },
-//	{ L"SOFTWARE\\Classes\\dreamos",							registryData{ HKEY_LOCAL_MACHINE, L"URL Protocol", L"\"\"" } },
-//	{ L"SOFTWARE\\Classes\\dreamos\\DefaultIcon",				registryData{ HKEY_LOCAL_MACHINE, L"", L"\"dreamos.exe,1\"" } },
-//	{ L"SOFTWARE\\Classes\\dreamos\\shell\\open\\command",		registryData{ HKEY_LOCAL_MACHINE, L"", L"[UPDATEPATH]Update.exe --processStart \"DreamLauncher.exe\" --process-start-args \"%1\"'" } },
 };
+#endif
 
 bool InitRegistry()
 {
