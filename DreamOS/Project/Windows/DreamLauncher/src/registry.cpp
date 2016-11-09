@@ -117,6 +117,27 @@ bool CheckRegistryVars()
 	return true;
 }
 
+bool CheckDev()
+{
+	std::wstring res;
+
+	if (!RegistryHelper::ReadRegValue(HKEY_CLASSES_ROOT, L"dreamos", L"Dev", res))
+	{
+		LOG(ERROR) << "registry failed ro read";
+		return false;
+	}
+
+	if (res.compare(L"dream") != 0)
+	{
+		LOG(ERROR) << "registry failed - value";
+		return false;
+	}
+
+	LOG(INFO) << "registry ok";
+
+	return true;
+}
+
 HKEY RegistryHelper::OpenKey(HKEY hRootKey, wchar_t* strKey, DWORD access)
 {
 	HKEY hKey;
