@@ -19,3 +19,4 @@ namespace RegistryHelper
 
 bool InstallRegistryVars();
 bool CheckRegistryVars();
+bool CheckDev();
