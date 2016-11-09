@@ -4,6 +4,49 @@
 
 #include <fstream>
 #include <sstream>
+#include <array>
+#include <algorithm>
+
+#include <vector>
+#include <iterator>
+#include <utility>
+
+template <typename T>
+typename std::vector<T>::iterator append(const std::vector<T>& src, std::vector<T>& dest)
+{
+	typename std::vector<T>::iterator result;
+
+	if (dest.empty()) {
+		dest = src;
+		result = std::begin(dest);
+	}
+	else {
+		result = dest.insert(std::end(dest), std::cbegin(src), std::cend(src));
+	}
+
+	return result;
+}
+
+template <typename T>
+typename std::vector<T>::iterator append(std::vector<T>&& src, std::vector<T>& dest)
+{
+	typename std::vector<T>::iterator result;
+
+	if (dest.empty()) {
+		dest = std::move(src);
+		result = std::begin(dest);
+	}
+	else {
+		result = dest.insert(std::end(dest),
+			std::make_move_iterator(std::begin(src)),
+			std::make_move_iterator(std::end(src)));
+	}
+
+	src.clear();
+	src.shrink_to_fit();
+
+	return result;
+}
 
 bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mesh_indices_t &out) {
 
@@ -21,7 +64,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 
 	std::vector<dimindex> indices;
 	dimindex	index = 0;
-	std::map<int, dimindex> objIndexMap;
+	std::map<std::array<int, 3>, dimindex> vertexCache;
 
 	if (!obj_file.is_open()) {
 		return false;
@@ -36,10 +79,50 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 
 	std::map<std::string, material_t> material_map;
 
+	int newPositionIndices[4]{ 0 }, newUvIndices[4]{ 0 }, newNormalIndices[4]{ 0 };
+
 	DEBUG_LINEOUT("Loading %S from file", strOBJFilename.c_str());
 
-	while (std::getline(obj_file, line)) {
+	// converts a Wavefront obj index into an index in buffer (std::vector, cyclic and starting in 0)
+	auto ConvertIndex = [](int& index, size_t bufferSize) {
+		if (bufferSize == 0)
+			// indicates no index
+			index = -1;
+		else if (index == 0)
+			index = static_cast<int>(bufferSize) - 1;
+		else if (index > 0)
+			index = (index - 1) % bufferSize;
+		else // index < 0
+			index = static_cast<int>(bufferSize - 1 - ((-index) % bufferSize));
+	};
 
+	// add new index to the mesh using cached vertices
+	auto AddVertex = [&](int positionIndex, int normalIndex, int uvIndex) {
+		std::array<int, 3> indicesKey{ positionIndex, normalIndex, uvIndex };
+
+		if (positionIndex == -1) {
+			// error in position indexing
+			LOG(ERROR) << "position vertex error " << positionIndex << "," << normalIndex << "," << uvIndex;
+			return;
+		}
+
+		if (vertexCache.find(indicesKey) == vertexCache.end())
+		{
+			vectorMeshVerticies.emplace_back(all_positions[positionIndex],
+				(normalIndex != -1) ? all_normals[normalIndex] : vector(0, 0, 0),
+				(uvIndex != -1) ? uvcoord(all_uvs[uvIndex].x(), all_uvs[uvIndex].y()) : uvcoord(0, 0));
+
+			indices.push_back(index);
+			vertexCache[indicesKey] = index;
+			++index;
+		}
+		else
+		{
+			indices.push_back(vertexCache[indicesKey]);
+		}
+	};
+
+	while (std::getline(obj_file, line)) {
 		auto space = line.find(' ');
 		if (space == line.size()) {
 			continue;
@@ -64,8 +147,6 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			all_normals.emplace_back(x, y, z);
 		}
 		else if (type.compare("f") == 0) {
-			int newPositionIndices[4]{ 0 }, newUvIndices[4]{ 0 }, newNormalIndices[4]{ 0 };
-
 			// TODO: support >4 poligons
 			enum class FaceType {
 				PTN4,
@@ -114,47 +195,12 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 					}
 				}
 			}
-
-			// TODO: ?
-			#define CYCLIC_BUFFER(index, buffer) \
-						if (index <= 0)\
-							index = static_cast<int>(buffer.size()) - 1 + index;\
-						else\
-							index--
-
-			/*
-			#define CYCLIC_BUFFER(index, buffer) \
-						if (buffer.size() > 0) \
-							index = (index - 1) % buffer.size()
-			*/
-
+		
 			for (int i = 0; i < 4; ++i)
 			{
-				CYCLIC_BUFFER(newPositionIndices[i], all_positions);
-				while (newPositionIndices[i] < 0)
-				{
-					CYCLIC_BUFFER(newPositionIndices[i], all_positions);
-				}
-				CYCLIC_BUFFER(newUvIndices[i], all_uvs);
-				CYCLIC_BUFFER(newNormalIndices[i], all_normals);
-			}
-
-			// TODO: now caching vertices is done base only on position.
-			// we need to set a different vertex if either position/normal/uv is different, using a multi map for objIndexMap
-			// TODO: ?
-			#define ADD_VERTEX(i) \
-			if(objIndexMap.find(newPositionIndices[i]) == objIndexMap.end())\
-			{	\
-				vectorMeshVerticies.emplace_back(all_positions[newPositionIndices[i]],	\
-					all_normals[newNormalIndices[i]],	\
-					uvcoord(all_uvs[newUvIndices[i]].x(), all_uvs[newUvIndices[i]].y()));	\
-				indices.push_back(index);	\
-				objIndexMap[newPositionIndices[i]] = index;	\
-				++index;	\
-			}	\
-			else    \
-			{	\
-				indices.push_back(objIndexMap[newPositionIndices[i]]);	\
+				ConvertIndex(newPositionIndices[i], (!all_positions.empty())? all_positions.size() : 0);
+				ConvertIndex(newNormalIndices[i],	(!all_normals.empty())	? all_normals.size() : 0);
+				ConvertIndex(newUvIndices[i],		(!all_uvs.empty())		? all_uvs.size() : 0);
 			}
 
 			switch (face)
@@ -162,30 +208,30 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			case FaceType::PTN3:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : 3 - j;
-					ADD_VERTEX(i);
+					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
 				}
 				break;
 			case FaceType::PTN4:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : 3 - j;
-					ADD_VERTEX(i);
+					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
 				}
 				for (int j = 0; j < 3; ++j) {
 					// triangle order 0, 3, 2
 					int i = (j == 1) ? j + 2 : j;
-					ADD_VERTEX(i);
+					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
 				}
 				break;
 			case FaceType::PN3:
 				for (int j = 0; j < 3; ++j) {
-					int i = (j == 0) ? j : j + 1;
-					ADD_VERTEX(i);
+					int i = (j == 0) ? j : 3 - j;
+					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
 				}
 				break;
 			case FaceType::PT3:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : 3 - j;
-					ADD_VERTEX(i);
+					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
 				}
 				break;
 			}
@@ -194,7 +240,7 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			unordered_map.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
 
 			index = 0;
-			objIndexMap.clear();
+			vertexCache.clear();
 
 			char	name[1024];
 			std::sscanf(value.c_str(), "%s\n",
@@ -298,11 +344,8 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 	}
 	
 	unordered_map.push_back(std::make_pair(material_map[strCurrentMaterialName], mesh_t{ std::move(vectorMeshVerticies), std::move(indices) }));
-
-	// combine materials
-
-	//typedef std::vector < std::pair<material_t, mesh_t>> multi_mesh_indices_t;
-
+	
+	// just order by material for now. TODO: batching
 	while (!unordered_map.empty())
 	{
 		std::string materialName = unordered_map.front().first.name;
@@ -322,7 +365,43 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 		}
 	}
 
-	////
+	/*
+	// no ordering of sub-models
+	{
+		auto iter = unordered_map.begin();
+		while (iter != unordered_map.end())
+		{
+			out.push_back(std::move(*iter));
+			iter = unordered_map.erase(iter);
+		}
+	}
+
+	// experimental batching
+	while (!unordered_map.empty())
+	{
+		std::string materialName = unordered_map.front().first.name;
+		
+		std::pair<material_t, mesh_t> submodel;
+		submodel.first = unordered_map.front().first;
+
+		auto iter = unordered_map.begin();
+		while (iter != unordered_map.end())
+		{
+			if (iter->first.name == materialName)
+			{
+				append(std::move(iter->second.indices), submodel.second.indices);
+				append(std::move(iter->second.vertices), submodel.second.vertices);
+				iter = unordered_map.erase(iter);
+			}
+			else
+			{
+				++iter;
+			}
+		}
+
+		out.push_back(std::move(submodel));
+	}
+	*/
 
 	obj_file.close();
 
