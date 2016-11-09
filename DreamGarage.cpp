@@ -287,21 +287,16 @@ Error:
 RESULT DreamGarage::SendHandPosition() {
 	RESULT r = R_PASS;
 
-	///*
 	hand *pLeftHand = GetHand(hand::HAND_LEFT);
 	hand *pRightHand = GetHand(hand::HAND_RIGHT);
 
 	if (pLeftHand != nullptr) {
-		//CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
 		CR(BroadcastUpdateHandMessage(pLeftHand->GetHandState()));
 	}
 
 	if (pRightHand != nullptr) {
-		//CR(SendUpdateHandMessage(NULL, pRightHand->GetHandState()));
 		CR(BroadcastUpdateHandMessage(pRightHand->GetHandState()));
 	}
-
-	//CR(SendUpdateHandMessage(NULL, hand::GetDebugHandState(hand::HAND_LEFT)));
 
 Error:
 	return r;
@@ -480,7 +475,8 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 		const float rad = 2.0f;
 
 		auto setCameraRoundtablePos = [&](uint16_t angle) {
-			cam->SetPosition(point(-rad*sin(angle*M_PI / 180.0f), 0.0f, +rad*cos(angle*M_PI / 180.0f)));
+			point offset = point(-rad*sin(angle*M_PI / 180.0f), 0.0f, +rad*cos(angle*M_PI / 180.0f));
+			cam->SetPosition(offset);
 			cam->RotateYByDeg(angle);
 		};
 
@@ -555,12 +551,11 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
 
-	pUser->SetPosition(headPos);
+	pUser->GetHead()->SetPosition(headPos);
 
 	OVERLAY_DEBUG_SET(st, (st + "=" + std::to_string(headPos.x()) + "," + std::to_string(headPos.y()) + "," + std::to_string(headPos.z())).c_str());
 
-
-	pUser->SetOrientation(qOrientation);
+	pUser->GetHead()->SetOrientation(qOrientation);
 
 Error:
 	return r;

@@ -18,6 +18,7 @@ public:
 	user(HALImp* pHALImp);
 
 	RESULT Initialize();
+	std::shared_ptr<composite> GetHead();
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);	// used for scaling the user mouth
 	RESULT SwitchHeadModel();
@@ -30,8 +31,11 @@ private:
 	std::vector<std::shared_ptr<composite>> m_pHeads;
 	std::vector<std::shared_ptr<texture>>m_pHeadTextures;
 
-	std::shared_ptr<hand> m_pLeftHand;
-	std::shared_ptr<hand> m_pRightHand;
+	std::shared_ptr<hand> m_pLeapLeftHand;
+	std::shared_ptr<hand> m_pLeapRightHand;
+
+	std::shared_ptr<hand> m_pViveLeftHand;
+	std::shared_ptr<hand> m_pViveRightHand;
 
 	std::shared_ptr<quad> m_pMouth = nullptr;
 	std::shared_ptr<texture> m_pMouthTexture = nullptr;

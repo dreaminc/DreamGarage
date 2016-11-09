@@ -67,6 +67,11 @@ void DebugData::SetValue(std::string value)
 	m_value = value;
 }
 
+void DebugData::SetValue(point pt)
+{
+	m_value = (GetName() + ": " + std::to_string(pt.x()) + ", " + std::to_string(pt.y()) + ", " + std::to_string(pt.z())).c_str();
+}
+
 const std::string& DebugData::GetName()
 {
 	return m_uniqueName;

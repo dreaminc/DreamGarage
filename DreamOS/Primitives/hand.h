@@ -101,6 +101,7 @@ public:
 	struct HandState {
 		hand::HAND_TYPE handType;
 		point ptPalm;
+		bool fOriented;
 		finger::FingerState fingerIndex;
 		finger::FingerState fingerMiddle;
 		finger::FingerState fingerRing;
@@ -126,7 +127,11 @@ public:
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	RESULT SetFromLeapHand(const Leap::Hand hand);
+	RESULT SetHandType(hand::HAND_TYPE type);
 	RESULT SetHandState(const hand::HandState& pHandState);
+
+	RESULT SetOriented(bool attach);
+	bool IsOriented();
 
 	hand::HandState GetHandState();
 	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);
@@ -142,6 +147,8 @@ private:
 	std::shared_ptr<finger> m_pPinkyFinger;
 
 	std::shared_ptr<thumb> m_pThumb;
+
+	bool m_fOriented;
 };
 
 #endif	// ! HAND_H_

@@ -42,19 +42,27 @@ RESULT user::Initialize() {
 	m_pMouth->SetMaterialTexture(MaterialTexture::Ambient, m_pMouthTexture.get());
 	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
 
-	pHead->AddChild(m_pMouth);
 	m_pMouth->Scale(0.1f);
 
 	m_pHeads.push_back(pHead);
 	
 	// Hands
-	m_pLeftHand = AddHand();
-	m_pRightHand = AddHand();
+	m_pLeapLeftHand = AddHand();
+	m_pLeapRightHand = AddHand();
+	pHead->AddChild(m_pLeapLeftHand);
+	pHead->AddChild(m_pLeapRightHand);
+
+	m_pViveLeftHand = AddHand();
+	m_pViveRightHand = AddHand();
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 
 	//Error:
 	return r;
+}
+
+std::shared_ptr<composite> user::GetHead() {
+	return m_pHeads[0];
 }
 
 RESULT user::SwitchHeadModel() {
@@ -88,11 +96,17 @@ Error:
 RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
-	if (pHandState.handType == hand::HAND_LEFT) {
-		m_pLeftHand->SetHandState(pHandState);
+	if (pHandState.handType == hand::HAND_LEFT && pHandState.fOriented) {
+		m_pLeapLeftHand->SetHandState(pHandState);
 	}
-	else if (pHandState.handType == hand::HAND_RIGHT) {
-		m_pRightHand->SetHandState(pHandState);
+	else if (pHandState.handType == hand::HAND_RIGHT && pHandState.fOriented) {
+		m_pLeapRightHand->SetHandState(pHandState);
+	}
+	else if (pHandState.handType == hand::HAND_LEFT && !pHandState.fOriented) {
+		m_pViveLeftHand->SetHandState(pHandState);
+	}
+	else if (pHandState.handType == hand::HAND_RIGHT && !pHandState.fOriented) {
+		m_pViveRightHand->SetHandState(pHandState);
 	}
 
 //Error:
