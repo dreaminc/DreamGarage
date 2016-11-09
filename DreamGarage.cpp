@@ -48,13 +48,13 @@ RESULT DreamGarage::LoadScene() {
 	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
-
+	
 	for (auto x : std::array<int, 8>()) {
 		user* pNewUser = AddUser();
 		pNewUser->SetVisible(false);
 		m_usersPool.push_back(pNewUser);
 	}
-
+	
 	AddSkybox();
 
 	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
@@ -65,20 +65,16 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
 	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
 
-
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.5f, -1.0f, 0));
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
 	AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
 
-	/*
-	auto env = AddModel(L"\\Models\\Env\\industrial_style_interior.obj",
+	AddModel(L"\\Models\\FloatingIsland\\FloatingIsland.obj",
 		nullptr,
-		point(0, 0, 0),// -4.5f, -4.8f - 2.6f, 0.0f),
-    	0.01f,
-		vector(3.14f/2.0f, 0.0f, 0.0f));
+		point(90, -5, -25),
+		0.1f,
+		vector(0.0f, 0.0f, 0.0f));
 
-	env->MoveTo(0.0f, -1.0f, 4.0f);
-	*/
 #ifdef TESTING
 // Test Scene
 // 
