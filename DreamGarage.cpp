@@ -69,13 +69,11 @@ RESULT DreamGarage::LoadScene() {
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
 	AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
 
-	/*
 	AddModel(L"\\Models\\FloatingIsland\\FloatingIsland.obj",
 		nullptr,
 		point(90, -5, -25),
 		0.1f,
 		vector(0.0f, 0.0f, 0.0f));
-	*/
 
 #ifdef TESTING
 // Test Scene
