@@ -35,7 +35,7 @@ public:
 	virtual RESULT GetSkybox(skybox*& pSkybox) = 0;
 
 	virtual std::vector<VirtualObj*> GetObjects() = 0;
-	virtual std::vector<VirtualObj*> GetObjects(ray rCast) = 0;
+	virtual std::vector<VirtualObj*> GetObjects(const ray &rCast) = 0;
 	virtual std::vector<VirtualObj*> GetObjects(DimObj *pDimObj) = 0;
 	virtual std::vector<std::vector<VirtualObj*>> GetObjectCollisionGroups() = 0;		// This returns groups of objects that are collided 
 };

@@ -54,10 +54,10 @@ bool BoundingSphere::Intersect(line& ln) {
 }
 
 // https://capnramses.github.io//opengl/raycasting.html
-bool BoundingSphere::Intersect(ray& r) {
-	vector vRayCircle = r.ptOrigin() - GetOrigin();
+bool BoundingSphere::Intersect(const ray &r) {
+	vector vRayCircle = static_cast<ray>(r).ptOrigin() - GetOrigin();
 	
-	float bValue = r.vDirection().dot(vRayCircle);
+	float bValue = static_cast<ray>(r).vDirection().dot(vRayCircle);
 	float cValue = vRayCircle.dot(vRayCircle) - pow(m_radius, 2.0f);
 	float resultValue = pow(bValue, 2.0f) - cValue;
 

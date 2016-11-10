@@ -29,11 +29,11 @@ public:
 
 	friend class BoundingVolume;
 
-	vector GetVector() {
+	vector GetVector() const {
 		return m_vDirection;
 	}
 
-	point GetOrigin() {
+	point GetOrigin() const {
 		return m_ptOrigin;
 	}
 

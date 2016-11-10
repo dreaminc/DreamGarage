@@ -46,7 +46,7 @@ public:
 
 	//bool Intersect(const point& pt) {
 	virtual bool Intersect(point& pt) = 0;
-	virtual bool Intersect(ray& r) = 0;
+	virtual bool Intersect(const ray &rCast) = 0;
 	//TODO: virtual bool Intersect(const line& ln) = 0;
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;

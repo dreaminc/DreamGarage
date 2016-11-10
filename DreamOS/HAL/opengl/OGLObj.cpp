@@ -128,7 +128,7 @@ RESULT OGLObj::UpdateOGLBuffers() {
 	DimObj *pDimObj = GetDimObj();
 	CNM(pDimObj, "Failed to acquire Dimension Object");
 
-	CR(m_pParentImp->MakeCurrentContext());
+	//CR(m_pParentImp->MakeCurrentContext());
 	CR(m_pParentImp->glBindVertexArray(m_hVAO));
 	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 

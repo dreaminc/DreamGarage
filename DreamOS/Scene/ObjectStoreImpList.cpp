@@ -115,7 +115,7 @@ std::vector<VirtualObj*> ObjectStoreImpList::GetObjects() {
 	return objects;
 }
 
-std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(ray rCast) {
+std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(const ray &rCast) {
 	std::vector<VirtualObj*> intersectedObjects;
 
 	for (auto &object: m_objects) {

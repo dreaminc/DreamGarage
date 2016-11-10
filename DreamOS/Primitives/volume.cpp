@@ -7,10 +7,9 @@ volume::volume(double width, double length, double height, bool fTriangleBased) 
 	RESULT r = R_PASS;
 	CR(Allocate());
 
-	if (width == length &&
-		width == height &&
-		length == height)
+	if (width == length && width == height && length == height) {
 		m_volumeType = CUBE;
+	}
 
 	CR(SetVolumeVertices(width, length, height, m_fTriangleBased));
 

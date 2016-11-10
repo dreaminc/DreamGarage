@@ -50,7 +50,7 @@ public:
 
 	//bool Intersect(const point& pt) {
 	bool Intersect(point& pt);
-	virtual bool Intersect(ray& r) override;
+	virtual bool Intersect(const ray& r) override;
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 

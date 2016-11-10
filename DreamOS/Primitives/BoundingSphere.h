@@ -24,7 +24,7 @@ public:
 
 	bool Intersect(point& pt);
 	bool Intersect(line& ln);
-	virtual bool Intersect(ray& r) override;
+	virtual bool Intersect(const ray &r) override;
 
 	float GetRadius() {
 		return m_radius;

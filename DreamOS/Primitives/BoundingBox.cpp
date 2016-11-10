@@ -67,7 +67,14 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 				return false;
 			}
 
-			// TODO: Do the cross etc
+			// Go through the cross product of each of the axes
+			///*
+			for (int j = 0; j < 3; j++) {
+				if (!OverlapOnAxis(rhs, GetAxis(BoundingBox::BoxAxis(i)).cross(static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(j))))) {
+					return false;
+				}
+			}
+			//*/
 		}
 
 		return true;
@@ -90,22 +97,24 @@ bool BoundingBox::Intersect(point& pt) {
 }
 
 // https://tavianator.com/fast-branchless-raybounding-box-intersections/
-bool BoundingBox::Intersect(ray& r) {
+bool BoundingBox::Intersect(const ray& r) {
 	double tmin = -INFINITY, tmax = INFINITY;
 
 	// Rotate the ray by the Rotation Matrix
 	// Get origin in reference to object
+	ray adjRay;
+
 	if (m_type == Type::OBB) {
-		r.vDirection() = inverse(RotationMatrix(GetOrientation())) * r.GetVector();
-		r.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - r.GetOrigin()));
+		adjRay.vDirection() = inverse(RotationMatrix(GetOrientation())) * r.GetVector();
+		adjRay.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - r.GetOrigin()));
 	}
 
 	point ptMin = GetMinPoint();
 	point ptMax = GetMaxPoint();
 
 	for (int i = 0; i < 3; i++) {
-		double t1 = (ptMin(i) - r.ptOrigin()(i)) / r.vDirection()(i);
-		double t2 = (ptMax(i) - r.ptOrigin()(i)) / r.vDirection()(i);
+		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
+		double t2 = (ptMax(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
 
 		tmin = std::max(tmin, std::min(t1, t2));
 		tmax = std::min(tmax, std::max(t1, t2));

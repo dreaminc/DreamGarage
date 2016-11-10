@@ -44,15 +44,31 @@ RESULT DreamTestApp::LoadScene() {
 
 	//g_pCylinder->RotateZBy((float)(M_PI_4));
 
+	///*
 	g_pVolume = AddVolume(0.5f, 0.5f, 2.0f);
 	g_pVolume->RotateZByDeg(45.0f);
 	g_pVolume->MoveTo(point(-2.0f, 0.0f, 0.0f));
-
+	//*/
+	
+	///*
 	g_pVolume2 = AddVolume(0.5f, 0.5f, 2.0f);
 	g_pVolume2->MoveTo(point(2.0f, 0.0f, 0.0f));
-	//g_pVolume->RotateZBy((float)(M_PI_4));
+	g_pVolume2->RotateZBy((float)(M_PI_4));
+	//*/
 
 	//pCylinder->SetWireframe(true);
+
+	/*
+	float radius = 0.5f;
+	int width = 10;
+	int length = 10;
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < length; j++) {
+			volume *pVolume = AddVolume(radius);
+			pVolume->MoveTo(point(1.0f * radius * i, 0.0f, 1.0f * radius * j));
+		}
+	}
+	*/
 
 	/*
 	AddModel(L"\\Models\\the-hague-apartment\\the-hague-apartment-fix.obj",
@@ -91,17 +107,17 @@ RESULT DreamTestApp::Update(void) {
 	///*
 	if (g_pVolume != nullptr) {
 		//g_pVolume->RotateByDeg(0.01f, 0.01f, 0.01f);
-		//g_pVolume->RotateXBy(0.001f);
-		//g_pVolume->RotateYBy(0.001f);
-		//g_pVolume->RotateZBy(0.001f);
+		g_pVolume->RotateXBy(0.003f);
+		g_pVolume->RotateYBy(-0.001f);
+		g_pVolume->RotateZBy(-0.003f);
 		g_pVolume->translateX(0.0003f);
 	}
 
 	if (g_pVolume2 != nullptr) {
 		//g_pVolume2->RotateByDeg(0.01f, 0.01f, 0.01f);
-		//g_pVolume->RotateXBy(0.001f);
-		//g_pVolume->RotateYBy(0.001f);
-		//g_pVolume->RotateZBy(0.001f);
+		g_pVolume2->RotateXBy(0.002f);
+		g_pVolume2->RotateYBy(0.001f);
+		g_pVolume2->RotateZBy(0.005f);
 		g_pVolume2->translateX(-0.0003f);
 	}
 	//*/
