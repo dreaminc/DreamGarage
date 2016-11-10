@@ -25,6 +25,8 @@
 //class CloudController;
 #include "Cloud/CloudController.h"
 
+#include "PhysicsEngine/PhysicsEngine.h"
+
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseLeapMotion.h"
@@ -176,6 +178,7 @@ protected:
 	ObjectStore *m_pFlatSceneGraph;
 
 	CloudController *m_pCloudController;
+	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;
 
 	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;

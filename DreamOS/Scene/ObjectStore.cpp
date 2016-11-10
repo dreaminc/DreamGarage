@@ -84,27 +84,6 @@ std::vector<VirtualObj*> ObjectStore::GetObjects(ray rCast) {
 
 // TODO: This is holding the collide functionality here temporarily 
 RESULT ObjectStore::UpdateScene() {
-	RESULT r = R_PASS;
-	
-	for (auto &pObject : GetObjects()) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
-
-		if (pDimObj != nullptr) {
-			pDimObj->SetColor(color(COLOR_WHITE));
-		}
-	}
-
-	for (auto &objCollisionGroup : m_pSceneGraphStore->GetObjectCollisionGroups()) {
-		// Handle collisions
-
-		for (auto &pObject : objCollisionGroup) {
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
-			pDimObj->SetColor(color(COLOR_RED));
-		}
-	}
-
-	
-
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 

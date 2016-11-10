@@ -14,7 +14,8 @@ SandboxApp::SandboxApp() :
 	m_pHALImp(nullptr),
 	m_pHMD(nullptr),
 	m_fnUpdateCallback(nullptr),
-	m_pSenseLeapMotion(nullptr)
+	m_pSenseLeapMotion(nullptr),
+	m_pPhysicsEngine(nullptr)
 {
 	// empty
 }
@@ -225,7 +226,9 @@ RESULT SandboxApp::RunAppLoop() {
 		}
 
 		// Update Scene 
-		CR(m_pSceneGraph->UpdateScene());
+		//CR(m_pSceneGraph->UpdateScene());
+
+		CR(m_pPhysicsEngine->UpdateObjectStore(m_pSceneGraph));
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
@@ -302,6 +305,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
+
+	// Initialize Physics Engine
+	m_pPhysicsEngine = PhysicsEngine::MakePhysicsEngine();
+	CNMW(m_pPhysicsEngine, "Physics Engine failed to initialize");
 
 	m_fCheckHMD = (m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0);
 
