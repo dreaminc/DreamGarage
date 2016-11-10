@@ -79,7 +79,9 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 
 	std::map<std::string, material_t> material_map;
 
-	int newPositionIndices[4]{ 0 }, newUvIndices[4]{ 0 }, newNormalIndices[4]{ 0 };
+	std::array<int, 4> newPositionIndices{ -1 };
+	std::array<int, 4> newUvIndices{ -1 };
+	std::array<int, 4> newNormalIndices{ -1 };
 
 	DEBUG_LINEOUT("Loading %S from file", strOBJFilename.c_str());
 
@@ -147,71 +149,100 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 			all_normals.emplace_back(x, y, z);
 		}
 		else if (type.compare("f") == 0) {
-			// TODO: support >4 poligons
 			enum class FaceType {
-				PTN4,
-				PTN3,
-				PN3,
-				PT3
+				NotSupported,
+				Quad,
+				Triangle
 			};
 
-			FaceType face;
-			// Read as vertex/uv/normal quad format
-			face = FaceType::PTN4;
-			int num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
-						&newPositionIndices[3], &newUvIndices[3], &newNormalIndices[3],
-						&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
-						&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
-						&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]);
+			typedef struct {
+				bool position;
+				bool uv;
+				bool normal;
+			} VertexType;
 
-			if (num_matches != 12) {
-				// Read as vertex/uv/normal tri format
-				face = FaceType::PTN3;
-				num_matches = std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d\n",
+			FaceType face{ FaceType::NotSupported };
+			VertexType	vertex{ false, false, false };
+
+			newPositionIndices.fill(-1);
+			newUvIndices.fill(-1);
+			newNormalIndices.fill(-1);
+
+			for (;;)
+			{
+				face = FaceType::Quad;
+				vertex = VertexType{ true, true, true };
+				if (12 == std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d %d/%d/%d\n",
+					&newPositionIndices[3], &newUvIndices[3], &newNormalIndices[3],
 					&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
 					&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
-					&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]);
+					&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]))
+					break;
 
-				if (num_matches != 9) {
+				face = FaceType::Triangle;
+				vertex = VertexType{ true, true, true };
+				if (9 == std::sscanf(value.c_str(), "%d/%d/%d %d/%d/%d %d/%d/%d\n",
+					&newPositionIndices[2], &newUvIndices[2], &newNormalIndices[2],
+					&newPositionIndices[1], &newUvIndices[1], &newNormalIndices[1],
+					&newPositionIndices[0], &newUvIndices[0], &newNormalIndices[0]))
+					break;
 
-					// Read as vertex//normal format
-					face = FaceType::PN3;
-					num_matches = std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d\n",
-						&newPositionIndices[2], &newNormalIndices[2],
-						&newPositionIndices[1], &newNormalIndices[1],
-						&newPositionIndices[0], &newNormalIndices[0]);
+				face = FaceType::Quad;
+				vertex = VertexType{ true, false, true };
+				if (8 == std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d %d//%d\n",
+					&newPositionIndices[3], &newNormalIndices[3],
+					&newPositionIndices[2], &newNormalIndices[2],
+					&newPositionIndices[1], &newNormalIndices[1],
+					&newPositionIndices[0], &newNormalIndices[0]))
+					break;
 
-					if (num_matches != 6) {
-						// Read as vertex//normal format
-						face = FaceType::PT3;
-						num_matches = std::sscanf(value.c_str(), "%d/%d %d/%d %d/%d\n",
-							&newPositionIndices[2], &newUvIndices[2],
-							&newPositionIndices[1], &newUvIndices[1],
-							&newPositionIndices[0], &newUvIndices[0]);
+				face = FaceType::Triangle;
+				vertex = VertexType{ true, false, true };
+				if (6 == std::sscanf(value.c_str(), "%d//%d %d//%d %d//%d\n",
+					&newPositionIndices[2], &newNormalIndices[2],
+					&newPositionIndices[1], &newNormalIndices[1],
+					&newPositionIndices[0], &newNormalIndices[0]))
+					break;
 
-						// Cannot read face format.
-						//return false;
-//						continue;
-					}
-				}
+				face = FaceType::Triangle;
+				vertex = VertexType{ true, true, false };
+				if (6 == std::sscanf(value.c_str(), "%d/%d %d/%d %d/%d\n",
+					&newPositionIndices[2], &newUvIndices[2],
+					&newPositionIndices[1], &newUvIndices[1],
+					&newPositionIndices[0], &newUvIndices[0]))
+					break;
+
+				face = FaceType::NotSupported;
+				break;
 			}
-		
+
+			if (face == FaceType::NotSupported)
+			{
+				LOG(ERROR) << "unsupported face type " << value;
+				continue;
+			}
+
 			for (int i = 0; i < 4; ++i)
 			{
-				ConvertIndex(newPositionIndices[i], (!all_positions.empty())? all_positions.size() : 0);
-				ConvertIndex(newNormalIndices[i],	(!all_normals.empty())	? all_normals.size() : 0);
-				ConvertIndex(newUvIndices[i],		(!all_uvs.empty())		? all_uvs.size() : 0);
+				if (vertex.position)
+					ConvertIndex(newPositionIndices[i], (!all_positions.empty())? all_positions.size() : 0);
+
+				if (vertex.normal)
+					ConvertIndex(newNormalIndices[i],	(!all_normals.empty())	? all_normals.size() : 0);
+
+				if (vertex.uv)
+					ConvertIndex(newUvIndices[i],		(!all_uvs.empty())		? all_uvs.size() : 0);
 			}
 
 			switch (face)
 			{
-			case FaceType::PTN3:
+			case FaceType::Triangle:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : 3 - j;
 					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
 				}
 				break;
-			case FaceType::PTN4:
+			case FaceType::Quad:
 				for (int j = 0; j < 3; ++j) {
 					int i = (j == 0) ? j : 3 - j;
 					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
@@ -219,18 +250,6 @@ bool FileLoaderHelper::LoadOBJFile(const std::wstring& strOBJFilename, multi_mes
 				for (int j = 0; j < 3; ++j) {
 					// triangle order 0, 3, 2
 					int i = (j == 1) ? j + 2 : j;
-					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
-				}
-				break;
-			case FaceType::PN3:
-				for (int j = 0; j < 3; ++j) {
-					int i = (j == 0) ? j : 3 - j;
-					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
-				}
-				break;
-			case FaceType::PT3:
-				for (int j = 0; j < 3; ++j) {
-					int i = (j == 0) ? j : 3 - j;
 					AddVertex(newPositionIndices[i], newNormalIndices[i], newUvIndices[i]);
 				}
 				break;
