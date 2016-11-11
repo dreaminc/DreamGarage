@@ -117,7 +117,7 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 
 	DEBUG_LINEOUT(jsonResponse.dump().c_str());
 
-	CBM((jsonResponse["/token"_json_pointer].is_null()), "Token is missing from JSON");
+	//CBM((jsonResponse["/token"_json_pointer].is_null()), "Token is missing from JSON");
 
 	m_strToken = jsonResponse["/token"_json_pointer].get<std::string>();
 
