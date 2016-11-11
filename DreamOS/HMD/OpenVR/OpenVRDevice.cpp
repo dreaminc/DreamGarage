@@ -162,6 +162,36 @@ Error:
 	return r;
 }
 
+RESULT OpenVRDevice::AttachHand(hand *pHand, hand::HAND_TYPE type) {
+	hand::HandState state;
+	state.handType = type;
+	state.ptPalm = point(0.0f, 0.0f, 0.0f);
+	if (type == hand::HAND_TYPE::HAND_LEFT) {
+		m_pLeftHand = pHand;
+		m_pLeftHand->SetHandState(state);
+	}
+	else if (type == hand::HAND_TYPE::HAND_RIGHT) {
+		m_pRightHand = pHand;
+		m_pRightHand->SetHandState(state);
+	}
+	else {
+		return R_FAIL;
+	}
+	return R_PASS;
+}
+
+hand *OpenVRDevice::GetHand(hand::HAND_TYPE type) {
+	if (type == hand::HAND_TYPE::HAND_LEFT) {
+		return m_pLeftHand;
+	}
+	else if (type == hand::HAND_TYPE::HAND_RIGHT) {
+		return m_pRightHand;
+	}
+	else {
+		return nullptr;
+	}
+}
+
 RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	RESULT r = R_PASS;
 
@@ -391,8 +421,16 @@ RESULT OpenVRDevice::UpdateHMD() {
 					vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(nDevice);
 						
 					point ptControllerPosition = point(centerVec4.x, centerVec4.y, centerVec4.z);
-					ptControllerPosition += m_pParentSandbox->GetCameraPosition();
+
+					// stereocamera::GetPosition() incorporates the hmd position
+					// vive controllers are separate from the hmd position, so camera::GetPosition() is used
+					point offset = m_pParentSandbox->GetCamera()->camera::GetPosition();
+
+					ptControllerPosition += offset;
 					ptControllerPosition.w() = 1.0f;
+
+					// SetHandState has an additional constant that needs to be nullified for vive controllers
+					point setHandConstant = point(0.0f, 0.0f, 0.25f);
 
 					quaternion qOrientation = viewMat.GetOrientation();
 					qOrientation.Reverse();
@@ -400,10 +438,19 @@ RESULT OpenVRDevice::UpdateHMD() {
 					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerModelLeft != nullptr) {
 						m_pControllerModelLeft->SetPosition(ptControllerPosition);
 						m_pControllerModelLeft->SetOrientation(qOrientation);
+
+						m_pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
+						m_pLeftHand->SetPosition(ptControllerPosition + setHandConstant);
+						m_pLeftHand->SetOrientation(qOrientation);
+							
 					}
 					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerModelRight != nullptr) {
 						m_pControllerModelRight->SetPosition(ptControllerPosition);
 						m_pControllerModelRight->SetOrientation(qOrientation);
+
+						m_pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
+						m_pRightHand->SetPosition(ptControllerPosition + setHandConstant);
+						m_pRightHand->SetOrientation(qOrientation);
 					}
 
 				} break;

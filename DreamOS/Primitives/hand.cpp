@@ -1,5 +1,6 @@
 #include "hand.h"
 #include "Sense/SenseLeapMotionHand.h"
+#include "DreamConsole/DreamConsole.h"
 
 
 thumb::thumb(HALImp* pHALImp) :
@@ -206,8 +207,19 @@ RESULT hand::Initialize() {
 
 	SetPosition(point(0.0f, 0.0f, -1.0f));
 
+	m_fOriented = false;
+
 //Error:
 	return r;
+}
+
+RESULT hand::SetOriented(bool attach) {
+	m_fOriented = attach;
+	return R_PASS;
+}
+
+bool hand::IsOriented() {
+	return m_fOriented;
 }
 
 RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
@@ -256,11 +268,17 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	return r;
 }
 
+RESULT hand::SetHandType(hand::HAND_TYPE type) {
+	m_handType = type;
+	return R_PASS;
+}
+
 RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
 	point pt = pHandState.ptPalm - point(0.0f, 0.0f, 0.25f);
 	SetPosition(pt);
+	//SetOrientation(pHandState.qOrientation);
 
 	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
 	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);
@@ -276,6 +294,8 @@ hand::HandState hand::GetHandState() {
 	hand::HandState handState = {
 		m_handType,
 		GetPosition(),
+		GetOrientation(),
+		m_fOriented,
 		m_pIndexFinger->GetFingerState(),
 		m_pMiddleFinger->GetFingerState(),
 		m_pRingFinger->GetFingerState(),
@@ -290,6 +310,8 @@ hand::HandState hand::GetDebugHandState(hand::HAND_TYPE handType) {
 	hand::HandState handState = {
 		handType,
 		point(1,2,3),
+		quaternion(),
+		false,
 		finger::FingerState(),
 		finger::FingerState(),
 		finger::FingerState(),
