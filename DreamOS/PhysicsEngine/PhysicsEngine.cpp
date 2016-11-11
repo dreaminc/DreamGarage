@@ -3,8 +3,8 @@
 #include "Scene/ObjectStore.h"
 
 PhysicsEngine::PhysicsEngine() :
-	m_collisionDetector(nullptr),
-	m_collisionResolver(nullptr)
+	m_pCollisionDetector(nullptr),
+	m_pCollisionResolver(nullptr)
 {
 	 // empty
 }
@@ -12,7 +12,21 @@ PhysicsEngine::PhysicsEngine() :
 RESULT PhysicsEngine::Initialize() {
 	RESULT r = R_PASS;
 
-//Error:
+	// Collision Detector
+	m_pCollisionDetector = std::unique_ptr<CollisionDetector>(new CollisionDetector());
+	CNM(m_pCollisionDetector, "Failed to create collision detector module");
+	
+	CRM(m_pCollisionDetector->Initialize(), "Failed to initialize Collision Detector");
+
+	// Collision Resolver
+	m_pCollisionResolver = std::unique_ptr<CollisionResolver>(new CollisionResolver());
+	CNM(m_pCollisionResolver, "Failed to create collision resolver module");
+
+	CRM(m_pCollisionResolver->Initialize(), "Failed to initialize Collision Resolver");
+
+	// TODO: Physics integrator
+
+Error:
 	return r;
 }
 
@@ -34,24 +48,10 @@ Error:
 RESULT PhysicsEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	for (auto &pObject : pObjectStore->GetObjects()) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+	CR(m_pCollisionDetector->UpdateObjectStore(pObjectStore));
 
-		if (pDimObj != nullptr) {
-			pDimObj->SetColor(color(COLOR_WHITE));
-		}
-	}
+	// TODO: Resolver, integrator 
 
-	for (auto &objCollisionGroup : pObjectStore->GetSceneGraphStore()->GetObjectCollisionGroups()) {
-		// Handle collisions
-
-		for (auto &pObject : objCollisionGroup) {
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
-			pDimObj->SetColor(color(COLOR_RED));
-		}
-	}
-
-
-//Error:
+Error:
 	return r;
 }

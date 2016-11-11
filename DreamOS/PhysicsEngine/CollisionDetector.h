@@ -10,11 +10,17 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
 
+class ObjectStore;
+
 class CollisionDetector : public valid {
+	friend class PhysicsEngine;
+
 private:
 	CollisionDetector();
 
-	// TODO: Do stuff
+protected:
+	RESULT Initialize();
+	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
 
 private:
 	UID m_uid;

@@ -48,8 +48,8 @@ public:
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
 
 private:
-	std::unique_ptr<CollisionDetector> m_collisionDetector;
-	std::unique_ptr<CollisionResolver> m_collisionResolver;
+	std::unique_ptr<CollisionDetector> m_pCollisionDetector;
+	std::unique_ptr<CollisionResolver> m_pCollisionResolver;
 
 private:
 	UID m_uid;

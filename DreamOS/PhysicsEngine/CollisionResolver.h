@@ -10,10 +10,13 @@
 #include "Primitives/valid.h"
 
 class CollisionResolver : public valid {
+	friend class PhysicsEngine;
+
 private:
 	CollisionResolver();
 
-	// TODO: Do stuff
+protected:
+	RESULT Initialize();
 
 private:
 	UID m_uid;
