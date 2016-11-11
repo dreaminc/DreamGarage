@@ -12,6 +12,8 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/Types/guid.h"
 
+#include "DreamConsole/DreamConsole.h"
+
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
 	m_fConnected(false),
@@ -88,10 +90,13 @@ Error:
 // TODO: FIX THIS ITS REALLY BAD (for testing)
 static User s_user;
 
-RESULT EnvironmentController::ConnectToEnvironmentSocket(User user) {
+RESULT EnvironmentController::ConnectToEnvironmentSocket(User user, long environmentID) {
 	RESULT r = R_PASS;
 
-	m_environment = Environment(user.GetDefaultEnvironmentID());
+	//m_environment = Environment(user.GetDefaultEnvironmentID());
+
+	SetEnvironmentID(environmentID);
+	m_environment = Environment(environmentID);
 
 	std::string strURI = GetMethodURI(EnvironmentMethod::CONNECT_SOCKET);
 	strURI += std::to_string(m_environment.GetEnvironmentID()); 
@@ -113,6 +118,7 @@ RESULT EnvironmentController::ConnectToEnvironmentSocket(User user) {
 	m_fConnected = true;
 
 	LOG(INFO) << "(Cloud) user connected to socket:user=" << user;
+	OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(environmentID));
 
 Error:
 	return r;
@@ -640,6 +646,7 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 void EnvironmentController::HandleWebsocketConnectionOpen() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionOpen");
+	HUD_OUT("HandleWebsocketConnectionOpen");
 
 	m_state = state::SOCKET_CONNECTED;
 
@@ -651,10 +658,12 @@ void EnvironmentController::HandleWebsocketConnectionOpen() {
 
 void EnvironmentController::HandleWebsocketConnectionClose() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionClose");
+	HUD_OUT("HandleWebsocketConnectionClose");
 }
 
 void EnvironmentController::HandleWebsocketConnectionFailed() {
 	DEBUG_LINEOUT("HandleWebsocketConnectionFailed");
+	HUD_OUT("HandleWebsocketConnectionFailed");
 }
 
 RESULT EnvironmentController::SendDataChannelStringMessage(int peerID, std::string& strMessage) {
