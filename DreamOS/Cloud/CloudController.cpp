@@ -387,16 +387,30 @@ RESULT CloudController::LoginUser() {
 	RESULT r = R_PASS;
 
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	
 	std::string strURI = pCommandLineManager->GetParameterValue("api.ip");
 	std::string strUsername = pCommandLineManager->GetParameterValue("username");
 	std::string strPassword = pCommandLineManager->GetParameterValue("password");
+	std::string strOTK = pCommandLineManager->GetParameterValue("otk.id"); 
+	
+	std::string strEnvironment = pCommandLineManager->GetParameterValue("environment");
+	long environmentID;
 
-	HUD_OUT(("Login user " + strUsername + "...").c_str());
-	HUD_OUT(("Login ip " + strURI + "...").c_str());
+	if (strOTK == "INVALIDONETIMEKEY") {
+		HUD_OUT(("Login user " + strUsername + "...").c_str());
+		HUD_OUT(("Login ip " + strURI + "...").c_str());
 
-	// TODO: command line / config file - right now hard coded
-	CN(m_pUserController);
-	CRM(m_pUserController->Login(strUsername, strPassword), "Failed to login");
+		// TODO: command line / config file - right now hard coded
+		CN(m_pUserController);
+		CRM(m_pUserController->Login(strUsername, strPassword), "Failed to login");
+	}
+	else {
+		// TODO: If OTK provided log in with that instead
+		HUD_OUT(("Login with OTK " + strOTK + "...").c_str());
+		HUD_OUT(("Login ip " + strURI + "...").c_str());
+
+	}
+
 
 	HUD_OUT("Loading user profile...");
 
@@ -411,13 +425,18 @@ RESULT CloudController::LoginUser() {
 
 	// Set up environment
 	//CR(InitializeEnvironment(m_pUserController->GetUserDefaultEnvironmentID()));
-	CN(m_pEnvironmentController);
-	CR(m_pEnvironmentController->SetEnvironmentID(m_pUserController->GetUserDefaultEnvironmentID()));
+	if (strEnvironment == "default") {
+		environmentID = m_pUserController->GetUserDefaultEnvironmentID();
+	}
+	else {
+		environmentID = (long)(atoi(strEnvironment.c_str()));
+	}
 
-	HUD_OUT("Connectint to Environment...");
+	HUD_OUT("Connecting to Environment ID %d", environmentID);
 
 	// Connect to environment 
-	CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser()));
+	CN(m_pEnvironmentController);
+	CR(m_pEnvironmentController->ConnectToEnvironmentSocket(m_pUserController->GetUser(), environmentID));
 
 	HUD_OUT("User is loaded and logged in");
 

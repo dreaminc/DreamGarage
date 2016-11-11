@@ -53,11 +53,15 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+	CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
 
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "DefaultTestUser@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "nightmare"));
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
 	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
+
+	// This can attempt to connect to a given environment
+	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
 
 	// For auto login, use '-l auto'
 	//CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));

@@ -50,6 +50,7 @@ private:
 //private:
 public:
 	RESULT Login(std::string& strUsername, std::string& strPassword);
+	RESULT LoginWithOTK(std::string& strOTK);
 
 	long GetUserDefaultEnvironmentID();
 	User GetUser();

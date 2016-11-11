@@ -52,6 +52,11 @@ std::string UserController::GetMethodURI(UserMethod userMethod) {
 	return strURI;
 }
 
+RESULT UserController::LoginWithOTK(std::string& strOTK) {
+	// TODO: do this
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT UserController::Login(std::string& strUsername, std::string& strPassword) {
 	RESULT r = R_PASS;
 
@@ -222,7 +227,7 @@ RESULT UserController::LoadProfile() {
 		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
 
 		OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
-		OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
+		//OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
 	}
 
 Error:
@@ -269,11 +274,6 @@ RESULT UserController::LoadTwilioNTSInformation() {
 
 		DEBUG_LINEOUT("Twilio NTS Information Loaded");
 		m_twilioNTSInformation.Print();
-
-		HUD_OUT((std::string("User ") + m_user.GetEmail() + " is connected.").c_str());
-
-		OVERLAY_DEBUG_SET("User", std::string("User (") + std::to_string(m_user.GetUserID()) + ") " + m_user.GetEmail());
-		OVERLAY_DEBUG_SET("Env", "Env " + std::to_string(m_user.GetDefaultEnvironmentID()));
 	}
 
 Error:
