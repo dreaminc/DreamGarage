@@ -19,6 +19,7 @@ class UserController : public Controller {
 public:
 	enum class UserMethod {
 		LOGIN,
+		OTK_LOGIN,
 		LOAD_PROFILE,
 		LOAD_TWILIO_NTS_INFO,
 		INVALID

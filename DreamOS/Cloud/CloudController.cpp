@@ -409,8 +409,9 @@ RESULT CloudController::LoginUser() {
 		HUD_OUT(("Login with OTK " + strOTK + "...").c_str());
 		HUD_OUT(("Login ip " + strURI + "...").c_str());
 
+		CN(m_pUserController);
+		CRM(m_pUserController->LoginWithOTK(strOTK), "Failed to login with OTK");
 	}
-
 
 	HUD_OUT("Loading user profile...");
 

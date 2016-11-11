@@ -33,28 +33,68 @@ UserController::~UserController() {
 std::string UserController::GetMethodURI(UserMethod userMethod) {
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	std::string strURI = "";
-	std::string ip = pCommandLineManager->GetParameterValue("api.ip");
+	std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
+	std::string strWWWURL = pCommandLineManager->GetParameterValue("www.ip");
 
 	switch (userMethod) {
 		case UserMethod::LOGIN: {
-			strURI = ip + "/token/";
+			strURI = strAPIURL + "/token/";
+		} break;
+
+		case UserMethod::OTK_LOGIN: {
+			strURI = strAPIURL + "/one-time-key/";
+			//strURI = strWWWURL + "/one-time-key/";
 		} break;
 
 		case UserMethod::LOAD_PROFILE: {	
-			strURI = ip + "/user/";
+			strURI = strAPIURL + "/user/";
 		} break;
 
 		case UserMethod::LOAD_TWILIO_NTS_INFO: {
-			strURI = ip + "/twilio/nts/token/";
+			strURI = strAPIURL + "/twilio/nts/token/";
 		} break;
 	}
 
 	return strURI;
 }
 
+// //https://api.develop.dreamos.com/one-time-key/404d642e34e74d68a401f126f5b327c2
 RESULT UserController::LoginWithOTK(std::string& strOTK) {
-	// TODO: do this
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("Login using OTK");
+	
+	HTTPResponse httpResponse;
+	std::string strURI = GetMethodURI(UserMethod::OTK_LOGIN) + strOTK;
+	HTTPController *pHTTPController = HTTPController::instance();
+
+	auto headers = HTTPController::ContentAcceptJson();
+
+	CBM((pHTTPController->GET(strURI, headers, httpResponse)), "User LoadTwilioNTSInformation failed to post request");
+	DEBUG_LINEOUT("GET returned %s", httpResponse.PullResponse().c_str());
+	{
+		std::string strHttpResponse(httpResponse.PullResponse());
+		strHttpResponse = strHttpResponse.substr(0, strHttpResponse.find('\r'));
+		nlohmann::json jsonResponse = nlohmann::json::parse(strHttpResponse);
+
+		// Check for error/failure
+		if (jsonResponse["/meta/status_code"_json_pointer].get<int>() != 200) {
+			std::string strErrorDetail = jsonResponse["/meta/status_code"_json_pointer].get<std::string>();
+			DEBUG_LINEOUT("OTK failed with error: %s", strErrorDetail.c_str());
+		}
+
+		// Get the token
+		//CBM((jsonResponse["/data/token"_json_pointer].is_null()), "Token is missing from JSON");
+		m_strToken = jsonResponse["/data/token"_json_pointer].get<std::string>();
+
+		DEBUG_LINEOUT("User Login got token: %s", m_strToken.c_str());
+		m_fLoggedIn = true;
+
+		LOG(INFO) << "(Cloud) user logged in with OTK";
+	}
+
+Error:
+	return r;
 }
 
 RESULT UserController::Login(std::string& strUsername, std::string& strPassword) {
@@ -77,8 +117,7 @@ RESULT UserController::Login(std::string& strUsername, std::string& strPassword)
 
 	DEBUG_LINEOUT(jsonResponse.dump().c_str());
 
-	CBM(("/token"_json_pointer.to_string() != ""), "Token missing from JSON");
-	//CBM((jsonResponse["/token"_json_pointer].is_null()), "Token is missing from JSON");
+	CBM((jsonResponse["/token"_json_pointer].is_null()), "Token is missing from JSON");
 
 	m_strToken = jsonResponse["/token"_json_pointer].get<std::string>();
 
