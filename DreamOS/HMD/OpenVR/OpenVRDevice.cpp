@@ -435,15 +435,13 @@ RESULT OpenVRDevice::UpdateHMD() {
 					quaternion qOrientation = viewMat.GetOrientation();
 					qOrientation.Reverse();
 
-					quaternion controllerOrientation = viewMat.GetOrientation();
-
 					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerModelLeft != nullptr) {
 						m_pControllerModelLeft->SetPosition(ptControllerPosition);
 						m_pControllerModelLeft->SetOrientation(qOrientation);
 
 						m_pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
 						m_pLeftHand->SetPosition(ptControllerPosition + setHandConstant);
-						m_pLeftHand->SetOrientation(controllerOrientation);
+						m_pLeftHand->SetOrientation(qOrientation);
 							
 					}
 					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerModelRight != nullptr) {
@@ -452,7 +450,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 						m_pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
 						m_pRightHand->SetPosition(ptControllerPosition + setHandConstant);
-						m_pRightHand->SetOrientation(controllerOrientation);
+						m_pRightHand->SetOrientation(qOrientation);
 					}
 
 				} break;

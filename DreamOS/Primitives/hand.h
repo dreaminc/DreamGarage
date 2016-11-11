@@ -101,6 +101,7 @@ public:
 	struct HandState {
 		hand::HAND_TYPE handType;
 		point ptPalm;
+		quaternion qOrientation;
 		bool fOriented;
 		finger::FingerState fingerIndex;
 		finger::FingerState fingerMiddle;

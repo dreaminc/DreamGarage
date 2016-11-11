@@ -278,6 +278,7 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 
 	point pt = pHandState.ptPalm - point(0.0f, 0.0f, 0.25f);
 	SetPosition(pt);
+	//SetOrientation(pHandState.qOrientation);
 
 	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
 	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);
@@ -293,6 +294,7 @@ hand::HandState hand::GetHandState() {
 	hand::HandState handState = {
 		m_handType,
 		GetPosition(),
+		GetOrientation(),
 		m_fOriented,
 		m_pIndexFinger->GetFingerState(),
 		m_pMiddleFinger->GetFingerState(),
@@ -308,6 +310,7 @@ hand::HandState hand::GetDebugHandState(hand::HAND_TYPE handType) {
 	hand::HandState handState = {
 		handType,
 		point(1,2,3),
+		quaternion(),
 		false,
 		finger::FingerState(),
 		finger::FingerState(),

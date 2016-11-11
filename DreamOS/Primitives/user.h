@@ -34,8 +34,8 @@ private:
 	std::shared_ptr<hand> m_pLeapLeftHand;
 	std::shared_ptr<hand> m_pLeapRightHand;
 
-	std::shared_ptr<hand> m_pViveLeftHand;
-	std::shared_ptr<hand> m_pViveRightHand;
+	std::shared_ptr<composite> m_pViveLeftModel;
+	std::shared_ptr<composite> m_pViveRightModel;
 
 	std::shared_ptr<quad> m_pMouth = nullptr;
 	std::shared_ptr<texture> m_pMouthTexture = nullptr;

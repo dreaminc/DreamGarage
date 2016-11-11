@@ -43,17 +43,34 @@ RESULT user::Initialize() {
 	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
 
 	m_pMouth->Scale(0.1f);
+	pHead->AddChild(m_pMouth);
 
 	m_pHeads.push_back(pHead);
 	
 	// Hands
 	m_pLeapLeftHand = AddHand();
 	m_pLeapRightHand = AddHand();
+
+	m_pLeapLeftHand->SetVisible(false);
+	m_pLeapRightHand->SetVisible(false);
+
 	pHead->AddChild(m_pLeapLeftHand);
 	pHead->AddChild(m_pLeapRightHand);
 
-	m_pViveLeftHand = AddHand();
-	m_pViveRightHand = AddHand();
+	m_pViveLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+	
+	m_pViveRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
+
+	m_pViveLeftModel->SetVisible(false);
+	m_pViveRightModel->SetVisible(false);
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 
@@ -95,18 +112,31 @@ Error:
 
 RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
+	point setHandConstant = point(0.0f, 0.0f, -0.25f);
+	point ptModel = pHandState.ptPalm;
+	ptModel += setHandConstant;
 
 	if (pHandState.handType == hand::HAND_LEFT && pHandState.fOriented) {
+		if (!m_pLeapLeftHand->IsVisible())
+			m_pLeapLeftHand->SetVisible();
 		m_pLeapLeftHand->SetHandState(pHandState);
 	}
 	else if (pHandState.handType == hand::HAND_RIGHT && pHandState.fOriented) {
+		if (!m_pLeapRightHand->IsVisible())
+			m_pLeapRightHand->SetVisible();
 		m_pLeapRightHand->SetHandState(pHandState);
 	}
 	else if (pHandState.handType == hand::HAND_LEFT && !pHandState.fOriented) {
-		m_pViveLeftHand->SetHandState(pHandState);
+		if (!m_pViveLeftModel->IsVisible())
+			m_pViveLeftModel->SetVisible();
+		m_pViveLeftModel->SetPosition(ptModel);
+		m_pViveLeftModel->SetOrientation(pHandState.qOrientation);
 	}
 	else if (pHandState.handType == hand::HAND_RIGHT && !pHandState.fOriented) {
-		m_pViveRightHand->SetHandState(pHandState);
+		if (!m_pViveRightModel->IsVisible())
+			m_pViveRightModel->SetVisible();
+		m_pViveRightModel->SetPosition(ptModel);
+		m_pViveRightModel->SetOrientation(pHandState.qOrientation);
 	}
 
 //Error:
