@@ -103,6 +103,8 @@ public:
 
 	int GetScreenHeight();
 
+	bool	IsAllowedMoveByKeys();
+
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;
 
