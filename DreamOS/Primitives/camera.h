@@ -108,6 +108,11 @@ public:
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;
 
+	quaternion GetOffsetOrientation();
+	RESULT SetOffsetOrientation(quaternion qOffset);
+
+	bool HasHMD();
+
 protected:
 	HMD *m_pHMD;
 
@@ -132,6 +137,8 @@ protected:
 
 	// allow camera movements using keyboard
 	bool	m_allowMoveByKeys = false;
+	
+	quaternion m_qOffsetOrientation;
 };
 
 #endif // ! CAMERA_H_

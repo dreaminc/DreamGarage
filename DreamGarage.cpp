@@ -479,7 +479,13 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 		auto setCameraRoundtablePos = [&](uint16_t angle) {
 			point offset = point(-rad*sin(angle*M_PI / 180.0f), 0.0f, +rad*cos(angle*M_PI / 180.0f));
 			cam->SetPosition(offset);
-			cam->RotateYByDeg(angle);
+
+			if (!cam->HasHMD()) 
+				cam->RotateYByDeg(angle);
+
+			quaternion qOffset = quaternion::MakeQuaternionWithEuler(0.0f, angle * M_PI / 180.0f, 0.0f);
+			cam->SetOffsetOrientation(qOffset);
+
 		};
 
 		switch (index) {

@@ -27,6 +27,7 @@ camera::camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxSc
 {
 	m_ptOrigin = ptOrigin;
 	m_qRotation = quaternion();
+	m_qOffsetOrientation = quaternion();
 }
 
 camera::~camera() {
@@ -322,4 +323,17 @@ RESULT camera::Notify(CmdPromptEvent *event) {
 	}
 
 	return r;
+}
+
+quaternion camera::GetOffsetOrientation() {
+	return m_qOffsetOrientation;
+}
+
+RESULT camera::SetOffsetOrientation(quaternion qOffset) {
+	m_qOffsetOrientation = qOffset;
+	return R_PASS;
+}
+
+bool camera::HasHMD() {
+	return m_pHMD != nullptr;
 }
