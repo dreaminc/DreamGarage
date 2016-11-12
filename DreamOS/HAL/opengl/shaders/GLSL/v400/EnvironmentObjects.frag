@@ -1,8 +1,8 @@
-// minimal.vert
+// blinnPhoneTexTBNBump.vert
 // shadertype=glsl
 
-// This is a minimal shader that simply displays
-// a vertex color and position (no lighting, no textures)
+// This shader implements Blinn Phong lighting with color and bump textures
+// using a BTN matrix
 
 #version 400 core
 
@@ -20,25 +20,8 @@ in Data {
 	vec4 vertWorldSpace;
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
-	
-	vec4 vertShadowCoordinate;
-	vec3 directionShadowCastingLight;
+	vec3 vertTBNSpace;
 } DataIn;
-
-uniform bool	u_hasTextureColor;
-uniform sampler2D u_textureColor;
-
-uniform bool	u_hasTextureDepth;
-uniform sampler2D u_textureDepth;
-
-uniform bool	u_hasTextureAmbient;
-uniform sampler2D u_textureAmbient;
-
-uniform bool	u_hasTextureDiffuse;
-uniform sampler2D u_textureDiffuse;
-
-uniform bool	u_hasTextureSpecular;
-uniform sampler2D u_textureSpecular;
 
 // Light Structure
 struct Light {
@@ -72,23 +55,39 @@ layout(std140) uniform ub_Lights {
 	int numLights;	
 };
 
+uniform	bool u_hasBumpTexture;
+uniform sampler2D u_textureBump;
+
+uniform bool	u_hasTextureColor;
+uniform sampler2D u_textureColor;
+
+uniform bool	u_hasTextureAmbient;
+uniform sampler2D u_textureAmbient;
+
+uniform bool	u_hasTextureDiffuse;
+uniform sampler2D u_textureDiffuse;
+
+uniform bool	u_hasTextureSpecular;
+uniform sampler2D u_textureSpecular;
+
 layout (location = 0) out vec4 out_vec4Color;
 
-float g_ambient = 0.01f;
+float g_ambient = 0.03f;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
-void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in float distanceLight, out float diffuseValue, out float specularValue) {
+void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue) {
 	//float attenuation = 1 / pow(distanceLight, 2);
 	float attenuation = 1.0 / (1.0 + 0.1*distanceLight + 0.01*distanceLight*distanceLight);
 	//float attenuation = 1.0f;
 
 	float cosThetaOfLightToVert = max(0.0f, dot(vectorNormal, directionLight));
 	diffuseValue = (power * attenuation) * cosThetaOfLightToVert;
-	
+
 	///*
 	if(diffuseValue > 0.0f) {
-		vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
+		//vec3 halfVector = normalize(directionLight + normalize(DataIn.directionEye));
+		vec3 halfVector = normalize(directionLight + directionEye);
 		specularValue = pow(max(0.0f, dot(halfVector, vectorNormal.xyz)), material.m_shine) * attenuation;
 	}
 	else {
@@ -113,57 +112,34 @@ void main(void) {
 	
 	vec4 vec4LightValue = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 	float diffuseValue = 0.0f, specularValue = 0.0f;
-
-	vec3 normal = normalize(DataIn.normal.xyz);
-	//vec3 directionEye = normalize(DataIn.directionEye);
-	vec3 directionEye = -normalize(DataIn.vertViewSpace.xyz);
-
-	// TODO: This is a hack, currently hard coded values
-	float lightVisibility = 1.0f;
-	float cosTheta = dot(normal, DataIn.directionShadowCastingLight);
-	float bias = 0.005f * tan(acos(cosTheta)); // cosTheta is dot( n,l ), clamped between 0 and 1
-	bias = clamp(bias, 0.0f, 0.01f);
-	bias = 0.0f;
-
-	///*
-	if (u_hasTextureDepth) {
-		if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy).x  <  (DataIn.vertShadowCoordinate.z - bias)) {
-			lightVisibility = 0.5;
-		}
-	}
-	//*/
-
-	/*
-	for (int i=0; i < 4; i++){
-		if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy + poissonDisk[i]/700.0).x  <  (DataIn.vertShadowCoordinate.z - bias)){
-			//lightVisibility = 0.5;
-			lightVisibility -= 0.2;
-		}
-	}
-	//*/
 	
-	vec3 TBNNormal = vec3(0.0f, 0.0f, 1.0f);
-	//TBNNormal = normalize(DataIn.TangentBitangentNormalMatrix * TBNNormal);
+	vec3 TBNNormal;
+	
+	if(u_hasBumpTexture == true) {
+		TBNNormal = texture(u_textureBump, DataIn.uvCoord).rgb;
+		TBNNormal = normalize(TBNNormal * 2.0f - vec3(1.0f));   
+	}
+	else {
+		TBNNormal = vec3(0.0f, 0.0f, 1.0f);
+	}
 
 	vec4 colorAmbient = material.m_colorAmbient * ((u_hasTextureAmbient) ? texture(u_textureAmbient, DataIn.uvCoord * 1.0f) : (u_hasTextureColor) ? texture(u_textureColor, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
 	vec4 colorDiffuse = material.m_colorDiffuse * ((u_hasTextureDiffuse) ? texture(u_textureDiffuse, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
 	vec4 colorSpecular = material.m_colorSpecular * ((u_hasTextureSpecular) ? texture(u_textureSpecular, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
-	
-	
-	// TODO: light.m_colorAmbient now hardcoded, needs to be part of the light property
+
 	vec4 lightColorAmbient = g_ambient * vec4(1,1,1,1);
 
-	vec4 ambientValue = vec4(1,1,1,1);
+	vec3 directionEye = normalize(-DataIn.vertTBNSpace);
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
-		
-		vec4LightValue += lightVisibility * ambientValue * lightColorAmbient /*lights[i].m_colorDiffuse*/ * colorAmbient;
+
+		vec4LightValue += lightColorAmbient * colorAmbient;
 
 		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
-			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, DataIn.distanceLight[i], diffuseValue, specularValue);
-			vec4LightValue += lightVisibility * diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
-			vec4LightValue += lightVisibility * specularValue * lights[i].m_colorSpecular * colorSpecular;
+			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
+			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
+			vec4LightValue += specularValue * lights[i].m_colorSpecular * colorSpecular;
 		}
 	}
 
