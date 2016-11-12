@@ -17,6 +17,9 @@ camera *HALImp::GetCamera() {
 
 RESULT HALImp::SetCameraOrientation(quaternion qOrientation) {
 	m_pCamera->SetOrientation(qOrientation);
+
+	m_pCamera->RotateBy(m_pCamera->GetOffsetOrientation());
+	
 	return R_PASS;
 }
 

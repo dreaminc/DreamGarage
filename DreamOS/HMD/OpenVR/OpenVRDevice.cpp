@@ -426,6 +426,13 @@ RESULT OpenVRDevice::UpdateHMD() {
 					// vive controllers are separate from the hmd position, so camera::GetPosition() is used
 					point offset = m_pParentSandbox->GetCamera()->camera::GetPosition();
 
+					RotationMatrix qOffset = RotationMatrix();
+					quaternion qRotation = m_pParentSandbox->GetCamera()->GetOffsetOrientation();
+					qRotation.Reverse();
+					qOffset.SetQuaternionRotationMatrix(qRotation);
+
+					ptControllerPosition = qOffset * ptControllerPosition;
+
 					ptControllerPosition += offset;
 					ptControllerPosition.w() = 1.0f;
 
@@ -433,6 +440,8 @@ RESULT OpenVRDevice::UpdateHMD() {
 					point setHandConstant = point(0.0f, 0.0f, 0.25f);
 
 					quaternion qOrientation = viewMat.GetOrientation();
+					qRotation.Reverse();
+					qOrientation *= qRotation;
 					qOrientation.Reverse();
 
 					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerModelLeft != nullptr) {
@@ -459,6 +468,11 @@ RESULT OpenVRDevice::UpdateHMD() {
 					ViewMatrix viewMat;
 					viewMat.identity();
 
+					RotationMatrix qOffset = RotationMatrix();
+					quaternion qRotation = m_pParentSandbox->GetCamera()->GetOffsetOrientation();
+					qRotation.Reverse();
+					qOffset.SetQuaternionRotationMatrix(qRotation);
+
 					for (int i = 0; i < 4; i++)
 						for (int j = 0; j < 4; j++)
 							viewMat(j, i) = poseMat4[i * 4 + j];
@@ -466,6 +480,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 					//m_ptOrigin = viewMat.GetPosition();
 
 					m_ptOrigin = point(viewMat(12), viewMat(13), viewMat(14));
+					m_ptOrigin = qOffset * m_ptOrigin;
 					//m_ptOrigin = -1.0f * point(viewMat(12), viewMat(13), viewMat(14));
 
 					//m_ptOrigin = viewMat.GetPosition();
