@@ -24,7 +24,7 @@ typedef struct {
 	std::wstring data;
 } registryData;
 
-#ifdef DEV_ENVIRONMANT
+#ifdef DEV_ENVIRONMENT
 std::multimap<std::wstring, registryData> registry
 {
 	{ L"dreamosdev",							registryData{ HKEY_CLASSES_ROOT, L"", L"\"URL:Dream OS Protocol\"" } },

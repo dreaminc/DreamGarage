@@ -11,7 +11,7 @@
 #include <map>
 
 
-#ifdef DEV_ENVIRONMANT
+#ifdef DEV_ENVIRONMENT
 std::wstring	updatesUrl{ L"https://github.com/dreaminc/Dream/releases/download/DevReleases/" };
 #else
 std::wstring	updatesUrl{ L"https://github.com/dreaminc/Dream/releases/download/Releases/" };
@@ -205,6 +205,8 @@ bool CheckAccess(int argc, char *argv[])
 
 bool InstallShortcuts()
 {
+	// installing shortcuts only in dev releases
+#ifdef DEV_ENVIRONMENT
 	std::wstring exe(L"Update.exe");
 	std::wstring args(L"--createShortcut=\"Dream.html\" --icon=\"");
 	args += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
@@ -219,12 +221,14 @@ bool InstallShortcuts()
 		LOG(ERROR) << "process execute failed";
 		return false;
 	}
-
+#else
+#endif // DEV_ENVIRONMENT
 	return true;
 }
 
 bool RemoveShortcuts()
 {
+#ifdef DEV_ENVIRONMENT
 	std::wstring exe(L"Update.exe");
 	std::wstring args(L"--removeShortcut=\"Dream.html\" --icon=\"");
 	args += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
@@ -239,7 +243,8 @@ bool RemoveShortcuts()
 		LOG(ERROR) << "process execute failed";
 		return false;
 	}
-
+#else
+#endif // DEV_ENVIRONMENT
 	return true;
 }
 
@@ -327,7 +332,7 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 		return -1;
 	}
 
-#ifdef DEV_ENVIRONMANT
+#ifdef DEV_ENVIRONMENT
 	LOG(INFO) << "dev environment";
 
 	if (!CheckAccess(argc, argv))
@@ -355,6 +360,7 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 
 			InstallShortcuts();
 
+#ifdef DEV_ENVIRONMENT
 			// open in external browser (for now used as an indication updated completed)
 			//ShellExecute(0, 0, L"https://www.develop.dreamos.com/", 0, 0, SW_SHOW);
 			if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Dream.html",
@@ -365,7 +371,7 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 			{
 				LOG(ERROR) << "error loading Dream.html";
 			}
-
+#endif
 		}
 		else if (squirrelCmdlnEvent == CmdEventType::Updated)
 		{
