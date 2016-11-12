@@ -91,7 +91,8 @@ public:
 
 		// TODO: Fix this
 		if (m_pHMD != nullptr) {
-			eyePos += m_pHMD->GetHeadPointOrigin();
+			point offset = m_pHMD->GetHeadPointOrigin();
+			eyePos += offset;
 		}
 		// View Matrix requires the opposite of the camera's world position
 		eyePos.Reverse();

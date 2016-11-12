@@ -234,6 +234,13 @@ RESULT OVRHMD::UpdateHMD() {
 	if (trackingState.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked)) {
 		//ovrPosef headPose = trackingState.HeadPose.ThePose;
 		m_ptOrigin = point(reinterpret_cast<float*>(&(trackingState.HeadPose.ThePose.Position)));
+
+		RotationMatrix qOffset = RotationMatrix();
+		quaternion qRotation = m_pHALImp->GetCamera()->GetOffsetOrientation();
+		qRotation.Reverse();
+		qOffset.SetQuaternionRotationMatrix(qRotation);
+		m_ptOrigin = qOffset * m_ptOrigin;
+
 		//m_ptOrigin *= -1.0f;	// TODO: This is an issue with the OVR position 
 
 		m_qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HeadPose.ThePose.Orientation)));

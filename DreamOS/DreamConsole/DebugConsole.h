@@ -3,6 +3,7 @@
 
 #include "Primitives/valid.h"
 #include "Primitives/point.h"
+#include "Primitives/quaternion.h"
 #include <vector>
 #include <memory>
 
@@ -12,6 +13,7 @@ public:
 	const std::string& GetValue();
 	void SetValue(std::string value);
 	void SetValue(point pt);
+	void SetValue(quaternion q);
 	const std::string& GetName();
 
 	DebugData(const std::string& uniqueName = "");
