@@ -43,7 +43,13 @@ class model;
 class user;
 class Message;
 
-class SandboxApp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent>, public Subscriber<CmdPromptEvent>, public valid {
+class SandboxApp : 
+	public Subscriber<SenseKeyboardEvent>, 
+	public Subscriber<SenseMouseEvent>, 
+	public Subscriber<CmdPromptEvent>, 
+	public Subscriber<CollisionGroupEvent>, 
+	public Subscriber<CollisionObjectEvent>,
+	public valid {
 public:
 	SandboxApp();
 	~SandboxApp();
@@ -58,6 +64,9 @@ public:
 	virtual RESULT RecoverDisplayMode() = 0;		// Do all sandboxes need this ultimately? 
 	virtual RESULT HandleMessages() = 0;
 	virtual RESULT SwapDisplayBuffers() = 0;
+
+private:
+	RESULT InitializePhysicsEngine();
 
 public:
 	enum class SANDBOX_WINDOW_POSITION {
@@ -90,6 +99,9 @@ private:
 	RESULT Notify(CmdPromptEvent *event);
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
+
+	RESULT Notify(CollisionObjectEvent *oEvent);
+	RESULT Notify(CollisionGroupEvent* gEvent);
 
 protected:
 	RESULT RegisterImpKeyboardEvents();
@@ -201,3 +213,4 @@ private:
 };
 
 #endif // ! SANDBOX_APP_H_
+

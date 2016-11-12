@@ -55,3 +55,22 @@ RESULT PhysicsEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 Error:
 	return r;
 }
+
+
+RESULT PhysicsEngine::RegisterSubscriber(CollisionGroupEventType collisionGroupEvent, Subscriber<CollisionGroupEvent>* pCollisionDetectorSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pCollisionDetector->RegisterSubscriber(collisionGroupEvent, pCollisionDetectorSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngine::RegisterSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pCollisionDetector->RegisterSubscriber(pVirtualObject, pCollisionDetectorSubscriber));
+
+Error:
+	return r;
+}

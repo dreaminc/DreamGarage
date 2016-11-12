@@ -99,6 +99,39 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 	return r;
 }
 
+RESULT SandboxApp::Notify(CollisionObjectEvent *oEvent) {
+	RESULT r = R_PASS;
+
+
+
+//Error:
+	return r;
+}
+
+RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
+	RESULT r = R_PASS;
+
+	for (auto &pObject : gEvent->m_collisionGroup) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+
+		if (pDimObj != nullptr) {
+			pDimObj->SetColor(color(COLOR_WHITE));
+		}
+	}
+
+	for (auto &pObject : gEvent->m_collisionGroup) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+		
+		if (pDimObj != nullptr) {
+			pDimObj->SetColor(color(COLOR_RED));
+		}
+	}
+	
+
+//Error:
+	return r;
+}
+
 RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
@@ -307,8 +340,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
 
 	// Initialize Physics Engine
-	m_pPhysicsEngine = PhysicsEngine::MakePhysicsEngine();
-	CNMW(m_pPhysicsEngine, "Physics Engine failed to initialize");
+	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
 
 	m_fCheckHMD = (m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0);
 
@@ -328,6 +360,19 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// Register with command prompt
 	// TODO: This should be changed to a command pattern
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Sandbox, this);
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializePhysicsEngine() {
+	RESULT r = R_PASS;
+
+	m_pPhysicsEngine = PhysicsEngine::MakePhysicsEngine();
+	CNMW(m_pPhysicsEngine, "Physics Engine failed to initialize");
+
+	// Register OBJECT_GROUP_COLLISION
+	CR(m_pPhysicsEngine->RegisterSubscriber(OBJECT_GROUP_COLLISION, this));
 
 Error:
 	return r;
