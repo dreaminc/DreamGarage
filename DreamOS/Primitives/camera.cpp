@@ -309,6 +309,10 @@ int camera::GetScreenHeight() {
 	return m_pxScreenHeight;
 }
 
+bool camera::IsAllowedMoveByKeys() {
+	return m_allowMoveByKeys;
+}
+
 RESULT camera::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 

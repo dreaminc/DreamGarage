@@ -364,9 +364,11 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 				static_cast<camera_precision>(mEvent->dy)));
 		} break;
 		case SENSE_MOUSE_RIGHT_DRAG_MOVE: {
-			const float mouseMoveFactor = 0.002f;
-			m_pCamera->MoveStrafe(mEvent->dx * mouseMoveFactor);
-			m_pCamera->MoveUp(-mEvent->dy * mouseMoveFactor);
+			if (m_pCamera->IsAllowedMoveByKeys()) {
+				const float mouseMoveFactor = 0.002f;
+				m_pCamera->MoveStrafe(mEvent->dx * mouseMoveFactor);
+				m_pCamera->MoveUp(-mEvent->dy * mouseMoveFactor);
+			}
 		} break;
 	}
 
