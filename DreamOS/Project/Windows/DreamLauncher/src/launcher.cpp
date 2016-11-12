@@ -10,7 +10,12 @@
 
 #include <map>
 
-const std::wstring	updatesUrl{L"https://github.com/dreaminc/Dream/releases/download/Releases/"};
+
+#ifdef DEV_ENVIRONMENT
+std::wstring	updatesUrl{ L"https://github.com/dreaminc/Dream/releases/download/DevReleases/" };
+#else
+std::wstring	updatesUrl{ L"https://github.com/dreaminc/Dream/releases/download/Releases/" };
+#endif
 
 // the following methods need a bit of organizing into a class
 
@@ -169,7 +174,7 @@ std::map<std::string, CmdEventType> squirrelCmdlnEventDictionary
 	{ "--registry",				CmdEventType::Registry },
 };
 
-CmdEventType CheckSquirrelCmdlnEvent(int argc, char *argv[])
+CmdEventType CheckCmdlnEvent(int argc, char *argv[])
 {
 	if (argc < 2)
 		return CmdEventType::None;
@@ -184,8 +189,24 @@ CmdEventType CheckSquirrelCmdlnEvent(int argc, char *argv[])
 	return CmdEventType::None;
 }
 
+// checks for dev releases
+bool CheckAccess(int argc, char *argv[])
+{
+	if (!CheckDev())
+	{
+		LOG(ERROR) << "access denied";
+		MessageBox(NULL, L"Access denied. contact www.dreamos.com for dev access.\n", L"Dream Message", MB_OK);
+		return false;
+	}
+
+	LOG(INFO) << "dev access succeded";
+	return true;
+}
+
 bool InstallShortcuts()
 {
+	// installing shortcuts only in dev releases
+#ifdef DEV_ENVIRONMENT
 	std::wstring exe(L"Update.exe");
 	std::wstring args(L"--createShortcut=\"Dream.html\" --icon=\"");
 	args += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
@@ -200,12 +221,14 @@ bool InstallShortcuts()
 		LOG(ERROR) << "process execute failed";
 		return false;
 	}
-
+#else
+#endif // DEV_ENVIRONMENT
 	return true;
 }
 
 bool RemoveShortcuts()
 {
+#ifdef DEV_ENVIRONMENT
 	std::wstring exe(L"Update.exe");
 	std::wstring args(L"--removeShortcut=\"Dream.html\" --icon=\"");
 	args += ProcessExecutor::GetProcessExecutor()->GetCurrentProcessDir();
@@ -220,7 +243,8 @@ bool RemoveShortcuts()
 		LOG(ERROR) << "process execute failed";
 		return false;
 	}
-
+#else
+#endif // DEV_ENVIRONMENT
 	return true;
 }
 
@@ -308,7 +332,21 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 		return -1;
 	}
 
-	auto squirrelCmdlnEvent = CheckSquirrelCmdlnEvent(argc, argv);
+#ifdef DEV_ENVIRONMENT
+	LOG(INFO) << "dev environment";
+
+	if (!CheckAccess(argc, argv))
+	{
+		LOG(ERROR) << "process executor init failed";
+		return -1;
+	}
+#else
+	LOG(INFO) << "production environment";
+#endif
+
+	LOG(INFO) << "access ok";
+
+	auto squirrelCmdlnEvent = CheckCmdlnEvent(argc, argv);
 
 	if (squirrelCmdlnEvent != CmdEventType::None)
 	{
@@ -322,6 +360,7 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 
 			InstallShortcuts();
 
+#ifdef DEV_ENVIRONMENT
 			// open in external browser (for now used as an indication updated completed)
 			//ShellExecute(0, 0, L"https://www.develop.dreamos.com/", 0, 0, SW_SHOW);
 			if (!ProcessExecutor::GetProcessExecutor()->Execute(L"Dream.html",
@@ -332,7 +371,7 @@ int main(int argc, char *argv[], WindowController* pSplashWindow)
 			{
 				LOG(ERROR) << "error loading Dream.html";
 			}
-
+#endif
 		}
 		else if (squirrelCmdlnEvent == CmdEventType::Updated)
 		{

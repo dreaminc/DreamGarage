@@ -364,9 +364,11 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 				static_cast<camera_precision>(mEvent->dy)));
 		} break;
 		case SENSE_MOUSE_RIGHT_DRAG_MOVE: {
-			const float mouseMoveFactor = 0.002f;
-			m_pCamera->MoveStrafe(-mEvent->dx * mouseMoveFactor);
-			m_pCamera->MoveUp(mEvent->dy * mouseMoveFactor);
+			if (m_pCamera->IsAllowedMoveByKeys()) {
+				const float mouseMoveFactor = 0.002f;
+				m_pCamera->MoveStrafe(mEvent->dx * mouseMoveFactor);
+				m_pCamera->MoveUp(-mEvent->dy * mouseMoveFactor);
+			}
 		} break;
 	}
 
@@ -1529,6 +1531,12 @@ Error:
 RESULT OpenGLImp::TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels) {
 	RESULT r = R_PASS;
 
+	// fix alightment for odd value width size
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
+
 	//m_OpenGLExtensions.glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 	CRM(CheckGLError(), "glTexImage2D failed");
@@ -1539,6 +1547,12 @@ Error:
 
 RESULT OpenGLImp::TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels) {
 	RESULT r = R_PASS;
+
+	// fix alightment for odd value width size
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+	glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+	glPixelStorei(GL_UNPACK_SKIP_PIXELS, 0);
+	glPixelStorei(GL_UNPACK_SKIP_ROWS, 0);
 
 	glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
 	CRM(CheckGLError(), "glTexSubImage2D failed");

@@ -10,6 +10,7 @@
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
 #include <HMD/HMDFactory.h>
+#include <HMD/OpenVR/OpenVRDevice.h>
 
 #include <string>
 
@@ -339,6 +340,8 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 
 	camera *pCamera = m_pHALImp->GetCamera();
 
+	CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
+
 	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
 
 	/*
@@ -424,6 +427,9 @@ RESULT Windows64App::RegisterImpLeapMotionEvents() {
 	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
 
+	pLeftHand->SetOriented(true);
+	pRightHand->SetOriented(true);
+
 	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
 	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
 
@@ -431,7 +437,41 @@ Error:
 	return r;
 }
 
+RESULT Windows64App::RegisterImpViveControllerEvents() {
+	RESULT r = R_PASS;
+
+	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
+
+	if (pVive) {
+		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+/*
+		std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
+		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
+
+		std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
+		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
+//*/
+		pLeftHand->SetOriented(false);
+		pRightHand->SetOriented(false);
+
+		pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
+		pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
+		CR(pVive->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
+		CR(pVive->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
+	}
+Error:
+	return r;
+}
+
+//hand *Windows64App::AttachHand
+
 hand *Windows64App::GetHand(hand::HAND_TYPE handType) {
+	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
+
+	if (pVive != nullptr) {
+		return pVive->GetHand(handType);
+	}
 	return m_pSenseLeapMotion->GetHand(handType);
 }
 
@@ -499,9 +539,11 @@ RESULT Windows64App::InitializeSandbox() {
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	// TODO: This will only turn on Leap if connected at boot up
-	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected()) {
+	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected() && m_fCheckLeap) {
 		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
 	}
+
+	CRM(RegisterImpViveControllerEvents(), "Failed to register vive controller events");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 

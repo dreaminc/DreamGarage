@@ -76,6 +76,7 @@ public:
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
 	RESULT RegisterImpLeapMotionEvents();
+	RESULT RegisterImpViveControllerEvents();
 
 	virtual hand *GetHand(hand::HAND_TYPE handType) override;
 

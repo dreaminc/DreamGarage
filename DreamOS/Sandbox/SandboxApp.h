@@ -161,6 +161,7 @@ protected:
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
 	bool m_fCheckHMD;
+	bool m_fCheckLeap;
 
 protected:
 	std::function<RESULT(void)> m_fnUpdateCallback;

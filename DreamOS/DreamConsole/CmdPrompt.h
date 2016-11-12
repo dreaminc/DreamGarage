@@ -40,7 +40,8 @@ public:
 		DreamApp,
 		DreamConsole,
 		CloudController,
-		OpenGL
+		OpenGL,
+		Camera
 	};
 
 private:
@@ -49,6 +50,7 @@ private:
 		{ method::DreamConsole, "console" },
 		{ method::CloudController, "cloud" },
 		{ method::OpenGL, "ogl" },
+		{ method::Camera, "cam" }, 
 	};
 
 public:
