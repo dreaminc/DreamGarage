@@ -165,6 +165,9 @@ RESULT camera::Notify(HMDEvent *hmdEvent) {
 RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
+	if (!m_allowMoveByKeys)
+		return r;
+
 	//DEBUG_LINEOUT("Cam Key %d state: %x", kbEvent->KeyCode, kbEvent->KeyState);
 
 	bool disableAWDS = DreamConsole::GetConsole()->IsInForeground();
@@ -304,4 +307,15 @@ int camera::GetScreenWidth() {
 
 int camera::GetScreenHeight() {
 	return m_pxScreenHeight;
+}
+
+RESULT camera::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("move") == 0) {
+		m_allowMoveByKeys = !m_allowMoveByKeys;
+		HUD_OUT((std::string("allow move by keys <- ") + ((m_allowMoveByKeys) ? "on" : "off")).c_str());
+	}
+
+	return r;
 }

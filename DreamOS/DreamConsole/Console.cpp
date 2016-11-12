@@ -98,7 +98,15 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 			{
 				if (keyCode == VK_TAB)
 				{
+					// quick hack to enable dream console in production but only using several tab hits
+#ifdef PRODUCTION_BUILD
+					static int hits = 0;
+					hits++;
+					if (hits > 7)
+						m_isInForeground = true;
+#else
 					m_isInForeground = true;
+#endif // PRODUCTION_BUILD
 				}
 			}
 			else

@@ -58,9 +58,9 @@ bool LoadDataFromResource(char*& t_data, DWORD& t_dataSize, const wxString& t_na
 
 bool SplashApp::OnInit()
 {
-	m_frame = new wxFrame(NULL, wxID_ANY, "DreamSplash", wxDefaultPosition, wxSize(350, 350), wxSYSTEM_MENU);
+	m_frame = new wxFrame(NULL, wxID_ANY, "DreamSplash", wxDefaultPosition, wxSize(483, 312), wxSYSTEM_MENU);
 
-	wxAnimationCtrl* animation = new wxAnimationCtrl(m_frame, wxID_ANY, wxNullAnimation, wxPoint(-225, -125));
+	wxAnimationCtrl* animation = new wxAnimationCtrl(m_frame, wxID_ANY, wxNullAnimation);
 
 	char* data = nullptr;
 	DWORD	size = 0;
