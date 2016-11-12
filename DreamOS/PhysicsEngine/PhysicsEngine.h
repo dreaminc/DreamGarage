@@ -48,7 +48,7 @@ public:
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
 
 	RESULT RegisterSubscriber(CollisionGroupEventType collisionGroupEvent, Subscriber<CollisionGroupEvent>* pCollisionDetectorSubscriber);
-	RESULT RegisterSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
+	RESULT RegisterObjectCollisionSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
 
 private:
 	std::unique_ptr<CollisionDetector> m_pCollisionDetector;

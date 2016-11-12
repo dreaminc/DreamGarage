@@ -66,10 +66,10 @@ Error:
 	return r;
 }
 
-RESULT PhysicsEngine::RegisterSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
+RESULT PhysicsEngine::RegisterObjectCollisionSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
 	RESULT r = R_PASS;
 
-	CR(m_pCollisionDetector->RegisterSubscriber(pVirtualObject, pCollisionDetectorSubscriber));
+	CR(m_pCollisionDetector->RegisterObjectAndSubscriber(pVirtualObject, pCollisionDetectorSubscriber));
 
 Error:
 	return r;

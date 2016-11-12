@@ -28,6 +28,7 @@ public:
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
+	virtual RESULT Notify(CollisionObjectEvent *oEvent) override;
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;

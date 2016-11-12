@@ -54,6 +54,7 @@ RESULT DreamTestApp::LoadScene() {
 	g_pVolume2 = AddVolume(0.5f, 0.5f, 2.0f);
 	g_pVolume2->MoveTo(point(2.0f, 0.0f, 0.0f));
 	g_pVolume2->RotateZBy((float)(M_PI_4));
+	RegisterObjectCollision(g_pVolume2);
 	//*/
 
 	//pCylinder->SetWireframe(true);
@@ -139,6 +140,20 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	}
 	*/
 	//Error:
+	return r;
+}
+
+RESULT DreamTestApp::Notify(CollisionObjectEvent *oEvent) {
+	RESULT r = R_PASS;
+
+	dynamic_cast<DimObj*>(oEvent->m_pCollisionObject)->SetColor(color(COLOR_RED));
+
+	for (auto &pObj : oEvent->m_collisionGroup) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
+		pDimObj->SetColor(color(COLOR_PINK));
+	}
+
+//Error:
 	return r;
 }
 

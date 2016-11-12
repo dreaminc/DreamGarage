@@ -217,6 +217,17 @@ RESULT DreamOS::UnregisterUpdateCallback() {
 	return m_pSandbox->UnregisterUpdateCallback();
 }
 
+// Physics Engine
+RESULT DreamOS::RegisterObjectCollision(VirtualObj *pVirtualObject) {
+	RESULT r = R_PASS;
+
+	r = m_pSandbox->RegisterObjectAndSubscriber(pVirtualObject, this);
+	CR(r);
+
+Error:
+	return r;
+}
+
 // Cloud Controller
 RESULT DreamOS::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
 	return m_pSandbox->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);

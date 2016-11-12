@@ -54,6 +54,8 @@ public:
 	SandboxApp();
 	~SandboxApp();
 
+	friend class DreamOS;
+
 public:
 	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
 	RESULT RunAppLoop();
@@ -67,6 +69,9 @@ public:
 
 private:
 	RESULT InitializePhysicsEngine();
+
+protected:
+	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
 
 public:
 	enum class SANDBOX_WINDOW_POSITION {

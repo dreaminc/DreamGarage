@@ -154,6 +154,10 @@ public:
 		auto it = m_events.find(keyEvent);
 		return (!(it == m_events.end()));
 	}
+
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
+		return m_events;
+	}
 	
 public:
 	// This requires the event to be registered 

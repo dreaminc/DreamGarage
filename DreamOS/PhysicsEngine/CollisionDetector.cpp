@@ -12,22 +12,32 @@ CollisionDetector::CollisionDetector() {
 RESULT CollisionDetector::Initialize() {
 	RESULT r = R_PASS;
 
-	r = Publisher<CollisionGroupEventType, CollisionGroupEvent>::RegisterEvent(OBJECT_GROUP_COLLISION);
-	CR(r);
+	// r = Publisher<CollisionGroupEventType, CollisionGroupEvent>::RegisterEvent(OBJECT_GROUP_COLLISION);
+	// CR(r);
 
-Error:
+//Error:
 	return r;
 }
 
 RESULT CollisionDetector::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	for (auto &objCollisionGroup : pObjectStore->GetSceneGraphStore()->GetObjectCollisionGroups()) {
-		// Handle group collisions
-		CollisionGroupEvent event(OBJECT_GROUP_COLLISION, objCollisionGroup);
+	// Handle group collisions if registered 
+	if (Publisher<CollisionGroupEventType, CollisionGroupEvent>::IsEventRegistered(OBJECT_GROUP_COLLISION)) {
+		for (auto &objCollisionGroup : pObjectStore->GetSceneGraphStore()->GetObjectCollisionGroups()) {
+			CollisionGroupEvent collisionGroupEvent(OBJECT_GROUP_COLLISION, objCollisionGroup);
+			Publisher<CollisionGroupEventType, CollisionGroupEvent>::NotifySubscribers(OBJECT_GROUP_COLLISION, &collisionGroupEvent);
+		}
+	}
 
-		if (Publisher<CollisionGroupEventType, CollisionGroupEvent > ::IsEventRegistered(OBJECT_GROUP_COLLISION)) {
-			Publisher<CollisionGroupEventType, CollisionGroupEvent>::NotifySubscribers(OBJECT_GROUP_COLLISION, &event);
+	// Handle object collisions
+	for (auto &objectEvent : Publisher<VirtualObj*, CollisionObjectEvent>::GetEvents()) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(objectEvent.first);
+		auto objCollisionGroup = pObjectStore->GetSceneGraphStore()->GetObjects(reinterpret_cast<DimObj*>(pDimObj));
+		
+		if (objCollisionGroup.size() > 0) {
+			CollisionObjectEvent collisionObjectEvent(objectEvent.first, objCollisionGroup);
+			Publisher<VirtualObj*, CollisionObjectEvent>::NotifySubscribers(objectEvent.first, &collisionObjectEvent);
 		}
 	}
 	
@@ -45,8 +55,13 @@ Error:
 	return r;
 }
 
-RESULT CollisionDetector::RegisterSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
+RESULT CollisionDetector::RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
 	RESULT r = R_PASS;
+
+	if (Publisher<VirtualObj*, CollisionObjectEvent>::IsEventRegistered(pVirtualObject) == false) {
+		r = Publisher<VirtualObj*, CollisionObjectEvent>::RegisterEvent(pVirtualObject);
+		CR(r);
+	}
 
 	r = Publisher<VirtualObj*, CollisionObjectEvent>::RegisterSubscriber(pVirtualObject, pCollisionDetectorSubscriber);
 	CR(r);

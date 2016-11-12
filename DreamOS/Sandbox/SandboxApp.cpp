@@ -372,7 +372,17 @@ RESULT SandboxApp::InitializePhysicsEngine() {
 	CNMW(m_pPhysicsEngine, "Physics Engine failed to initialize");
 
 	// Register OBJECT_GROUP_COLLISION
-	CR(m_pPhysicsEngine->RegisterSubscriber(OBJECT_GROUP_COLLISION, this));
+	// CR(m_pPhysicsEngine->RegisterSubscriber(OBJECT_GROUP_COLLISION, this));
+
+//Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
+	RESULT r = R_PASS;
+
+	r = m_pPhysicsEngine->RegisterObjectCollisionSubscriber(pVirtualObject, pCollisionDetectorSubscriber);
+	CR(r);
 
 Error:
 	return r;

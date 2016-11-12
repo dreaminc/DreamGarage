@@ -33,7 +33,9 @@
 #include "Primitives/skybox.h"
 #include "Primitives/user.h"
 
-class DreamOS : public valid {
+#include "PhysicsEngine/PhysicsEngine.h"
+
+class DreamOS : public Subscriber<CollisionObjectEvent>, public valid {
 public:
 	DreamOS();
 	~DreamOS();
@@ -87,6 +89,11 @@ protected:
 
 protected:
 	long GetTickCount();
+
+	// Physics Engine
+protected:
+	RESULT RegisterObjectCollision(VirtualObj *pVirtualObject);
+	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
 
 	// Cloud Controller
 protected:

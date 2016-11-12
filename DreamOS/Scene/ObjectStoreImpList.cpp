@@ -136,8 +136,8 @@ std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(const ray &rCast) {
 std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(DimObj *pDimObj) {
 	std::vector<VirtualObj*> intersectedObjects;
 
-	for (auto &object : m_objects) {
-		DimObj *pDimObject = dynamic_cast<DimObj*>(object);
+	for (auto &pObject : m_objects) {
+		DimObj *pDimObject = dynamic_cast<DimObj*>(pObject);
 
 		// Don't intersect self
 		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || pDimObj == pDimObject || pDimObject->GetBoundingVolume() == nullptr) {
@@ -145,7 +145,7 @@ std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(DimObj *pDimObj) {
 		}
 
 		if (pDimObject->GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get())) {
-			intersectedObjects.push_back(pDimObj);
+			intersectedObjects.push_back(pDimObject);
 		}
 	}
 
