@@ -31,7 +31,7 @@
 #include "Sense/SenseKeyboard.h"
 #include "HMD/HMD.h"
 
-class camera : public VirtualObj, public Subscriber<SenseKeyboardEvent>, public Subscriber<HMDEvent>, public Subscriber<TimeEvent> {
+class camera : public VirtualObj, public Subscriber<CmdPromptEvent>, public Subscriber<SenseKeyboardEvent>, public Subscriber<HMDEvent>, public Subscriber<TimeEvent> {
 public:
 	camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight);
 
@@ -103,6 +103,9 @@ public:
 
 	int GetScreenHeight();
 
+	// CmdPromptEventSubscriber
+	virtual RESULT Notify(CmdPromptEvent *event) override;
+
 protected:
 	HMD *m_pHMD;
 
@@ -124,6 +127,9 @@ protected:
 
 	// Set up HMD frame of reference 
 	composite *m_pCameraFrameOfReference;
+
+	// allow camera movements using keyboard
+	bool	m_allowMoveByKeys = false;
 };
 
 #endif // ! CAMERA_H_

@@ -340,6 +340,8 @@ RESULT Windows64App::RegisterImpKeyboardEvents() {
 
 	camera *pCamera = m_pHALImp->GetCamera();
 
+	CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
+
 	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
 
 	/*
