@@ -480,12 +480,13 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 			point offset = point(-rad*sin(angle*M_PI / 180.0f), 0.0f, +rad*cos(angle*M_PI / 180.0f));
 			cam->SetPosition(offset);
 
-			if (!cam->HasHMD()) 
+			if (!cam->HasHMD()) {
 				cam->RotateYByDeg(angle);
-
-			quaternion qOffset = quaternion::MakeQuaternionWithEuler(0.0f, angle * M_PI / 180.0f, 0.0f);
-			cam->SetOffsetOrientation(qOffset);
-
+			}
+			else {
+				quaternion qOffset = quaternion::MakeQuaternionWithEuler(0.0f, angle * M_PI / 180.0f, 0.0f);
+				cam->SetOffsetOrientation(qOffset);
+			}
 		};
 
 		switch (index) {
