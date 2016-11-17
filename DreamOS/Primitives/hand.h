@@ -150,6 +150,8 @@ private:
 	std::shared_ptr<thumb> m_pThumb;
 
 	bool m_fOriented;
+
+	quaternion m_qRotation;
 };
 
 #endif	// ! HAND_H_

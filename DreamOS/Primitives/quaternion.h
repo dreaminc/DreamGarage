@@ -46,6 +46,7 @@ public:
 
 	RESULT SetQuaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z);
 	RESULT SetQuaternion(vector i, vector j, vector k);
+	RESULT SetQuaternionBasis(vector i, vector j, vector k);
 
 	RESULT SetValues(quaternion_precision w, quaternion_precision x, quaternion_precision y, quaternion_precision z);
 	RESULT SetValues(quaternion_precision values[4]);

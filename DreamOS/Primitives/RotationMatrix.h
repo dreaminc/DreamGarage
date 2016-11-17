@@ -115,7 +115,8 @@ public:
 		q.w() = sqrt(1.0f + this->element(0, 0) + this->element(1, 1) + this->element(2, 2)) / 2.0f;
 		
 		float w4 = q.w() * 4.0f;
-		
+	
+		//TODO seems like this is reversed, not sure about the implications of switching this back
 		q.x() = (this->element(1, 2) - this->element(2, 1)) / w4;
 		q.y() = (this->element(2, 0) - this->element(0, 2)) / w4;
 		q.z() = (this->element(0, 1) - this->element(1, 0)) / w4;

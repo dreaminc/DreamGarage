@@ -89,6 +89,10 @@ RESULT quaternion::SetQuaternion(vector i, vector j, vector k) {
 	return R_PASS;
 }
 
+RESULT quaternion::SetQuaternionBasis(vector i, vector j, vector k) {
+	return SetQuaternion(i, j, k);
+}
+
 RESULT quaternion::SetValues(quaternion_precision w, quaternion_precision x, quaternion_precision y, quaternion_precision z) {
 	m_w = w;
 	m_x = x;
