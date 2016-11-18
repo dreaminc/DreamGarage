@@ -102,7 +102,10 @@ public:
 		hand::HAND_TYPE handType;
 		point ptPalm;
 		quaternion qOrientation;
+
 		bool fOriented;
+		bool fSkeleton;
+
 		finger::FingerState fingerIndex;
 		finger::FingerState fingerMiddle;
 		finger::FingerState fingerRing;
@@ -133,6 +136,8 @@ public:
 
 	RESULT SetOriented(bool attach);
 	bool IsOriented();
+	RESULT SetSkeleton(bool fSkeleton);
+	bool IsSkeleton();
 
 	hand::HandState GetHandState();
 	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);
@@ -150,8 +155,10 @@ private:
 	std::shared_ptr<thumb> m_pThumb;
 
 	bool m_fOriented;
+	bool m_fSkeleton;
 
 	quaternion m_qRotation;
+
 };
 
 #endif	// ! HAND_H_

@@ -24,6 +24,8 @@ SenseLeapMotion::SenseLeapMotion() :
 	}
 	*/
 
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Leap, this);
+
 //Success:
 	Validate();
 	return;
@@ -77,6 +79,11 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 	//DEBUG_LINEOUT("Frame id:%d timestamp:%d hands:%d fingers:%d", leapFrame.id(), leapFrame.timestamp(), leapFrame.hands().count(), leapFrame.fingers().count());
 
 	Leap::HandList hands = leapFrame.hands();
+	quaternion baseRight = quaternion();
+	baseRight *= quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
+
+	quaternion baseLeft = quaternion();
+	baseLeft *= quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI_2);
 
 	for (auto hl = hands.begin(); hl != hands.end(); ++hl) {
 		// Get the first hand
@@ -85,11 +92,15 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 		if ((hand.isLeft())) {
 			if (m_pLeftHand != nullptr) {
 				m_pLeftHand->SetFromLeapHand(hand);
+				m_pLeftModel->SetPosition(m_pLeftHand->GetHandState().ptPalm);
+				m_pLeftModel->SetOrientation(m_pLeftHand->GetHandState().qOrientation * baseLeft);
 			}
 		}
 		else {
 			if (m_pRightHand != nullptr) {
 				m_pRightHand->SetFromLeapHand(hand);
+				m_pRightModel->SetPosition(m_pRightHand->GetHandState().ptPalm);
+				m_pRightModel->SetOrientation(m_pRightHand->GetHandState().qOrientation * baseRight);
 			}
 		}
 	}
@@ -184,4 +195,22 @@ bool SenseLeapMotion::HasFocus() {
 		return m_pLeapController->hasFocus();
 	else
 		return false;
+}
+
+RESULT SenseLeapMotion::Notify(CmdPromptEvent *event) {
+	RESULT r =  R_PASS;
+	if (event->GetArg(1).compare("swap") == 0) {
+		m_pLeftHand->SetVisible(!m_pLeftHand->IsVisible());
+		m_pRightHand->SetVisible(!m_pRightHand->IsVisible());
+
+		std::dynamic_pointer_cast<DimObj>(m_pLeftModel->GetChildren()[0])->SetVisible(!m_pLeftHand->IsVisible());
+		std::dynamic_pointer_cast<DimObj>(m_pRightModel->GetChildren()[0])->SetVisible(!m_pRightHand->IsVisible());
+
+		m_pLeftHand->SetSkeleton(m_pLeftHand->IsVisible());
+		m_pRightHand->SetSkeleton(m_pRightHand->IsVisible());
+
+	}
+
+
+	return r;
 }

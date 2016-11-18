@@ -208,6 +208,7 @@ RESULT hand::Initialize() {
 	SetPosition(point(0.0f, 0.0f, -1.0f));
 
 	m_fOriented = false;
+	m_fSkeleton = false;
 
 	m_qRotation = quaternion();
 
@@ -224,8 +225,15 @@ bool hand::IsOriented() {
 	return m_fOriented;
 }
 
-//TODO coordinates seem to be in x,z,y
-//that has got to be a hack
+RESULT hand::SetSkeleton(bool fSkeleton) {
+	m_fSkeleton = fSkeleton;
+	return R_PASS;
+}
+
+bool hand::IsSkeleton() {
+	return m_fSkeleton;
+}
+
 
 RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	RESULT r = R_PASS;
@@ -239,86 +247,27 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 
 	SetPosition(ptPalmPosition * -1.0f);
 
-	float pitch = hand.direction().pitch();
-	float yaw = hand.direction().yaw();
-	float roll = hand.palmNormal().roll();
-//	quaternion qRotation = quaternion::MakeQuaternionWithEuler(pitch, yaw, roll);
-//	qRotation.Reverse();
-
 	Leap::Matrix mBasis = hand.basis();
-//	Leap::Matrix mBasis = hand.basis().rigidInverse();
 	Leap::Vector xAxis = mBasis.xBasis;
 	Leap::Vector yAxis = mBasis.yBasis;
 	Leap::Vector zAxis = mBasis.zBasis;
-/*
-	vector vx = vector(-xAxis.x, -xAxis.y, -xAxis.z);
-	vector vy = vector(-yAxis.x, -yAxis.y, -yAxis.z);
-	vector vz = vector(-zAxis.x, -zAxis.y, -zAxis.z);
-//*/
-/*	
-	vector vx = vector(xAxis.x, xAxis.y, xAxis.z);
-	vector vy = vector(yAxis.x, yAxis.y, yAxis.z);
-	vector vz = vector(zAxis.x, zAxis.y, zAxis.z);
-//*/
 
-/*	
-	vector vx = vector(xAxis.x, xAxis.z, xAxis.y);
-	vector vy = vector(yAxis.x, yAxis.z, yAxis.y);
-	vector vz = vector(zAxis.x, zAxis.z, zAxis.y);
-//*/
-
-///*	
 	vector vx = vector(-xAxis.x, -xAxis.z, -xAxis.y);
 	vector vy = vector(-yAxis.x, -yAxis.z, -yAxis.y);
 	vector vz = vector(-zAxis.x, -zAxis.z, -zAxis.y);
 	
+	// the x-axis is positive in the direction from the palm to the pinky,
+	// so it must be reversed for the left hand
 	if (hand.isLeft()) {
 		vx = vector(xAxis.x, xAxis.z, xAxis.y);
 	}
-//*/
-
-/*	
-	vector vx = vector(-xAxis.z, -xAxis.x, -xAxis.y);
-	vector vy = vector(-yAxis.z, -yAxis.x, -yAxis.y);
-	vector vz = vector(-zAxis.z, -zAxis.x, -zAxis.y);
-//*/
-
-	RotationMatrix qOffset = RotationMatrix();
-	//quaternion q = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
-	quaternion q = quaternion::MakeQuaternionWithEuler(0.0f, (float)M_PI_2, 0.0f);
-	qOffset.SetQuaternionRotationMatrix(q);
-/*
-	vx = qOffset * vx;
-	vy = qOffset * vy;
-	vz = qOffset * vz;
-//*/	
-	Leap::FingerList indexList = hand.fingers().fingerType(Leap::Finger::TYPE_INDEX);
-	Leap::Finger indexFinger = indexList[0];
 
 	quaternion qRotation = quaternion();
 	qRotation.SetQuaternion(vx, vy, vz);
 	qRotation.Reverse();
-//	qRotation *= q;
-	/*
-	if (!hand.isLeft()) {
-		OVERLAY_DEBUG_SET("vx", point(vx.x(), vx.y(), vx.z()));
-		OVERLAY_DEBUG_SET("vy", point(vy.x(), vy.y(), vy.z()));
-		OVERLAY_DEBUG_SET("vz", point(vz.x(), vz.y(), vz.z()));
-		OVERLAY_DEBUG_SET("q", qRotation);
-	}
-
-	if (hand.isLeft()) {
-		OVERLAY_DEBUG_SET("lvx", point(vx.x(), vx.y(), vx.z()));
-		OVERLAY_DEBUG_SET("lvy", point(vy.x(), vy.y(), vy.z()));
-		OVERLAY_DEBUG_SET("lvz", point(vz.x(), vz.y(), vz.z()));
-		OVERLAY_DEBUG_SET("lq", qRotation);
-	}
-	//*/
 
 	m_qRotation = qRotation;
-	//SetOrientation(qRotation);
 
-	// = hand.basis();
 	Leap::Matrix handTransform;
 	handTransform.origin = hand.palmPosition();
 	handTransform = handTransform.rigidInverse();
@@ -347,33 +296,6 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 			pFinger->SetJointPosition(ptPosition, (finger::JOINT_TYPE)(jt));
 		}
 	}
-/*
-	point palmToMiddle = m_pMiddleFinger->GetFingerState().ptMCP - m_ptOrigin;
-	point palmToRing = m_pRingFinger->GetFingerState().ptMCP - m_ptOrigin;
-
-	OVERLAY_DEBUG_SET("ptm", palmToMiddle);
-	OVERLAY_DEBUG_SET("ptr", palmToRing);
-	OVERLAY_DEBUG_SET("mcp", m_pMiddleFinger->GetFingerState().ptMCP);
-	OVERLAY_DEBUG_SET("dip", m_pMiddleFinger->GetFingerState().ptDIP);
-	OVERLAY_DEBUG_SET("pip", m_pMiddleFinger->GetFingerState().ptPIP);
-	OVERLAY_DEBUG_SET("tip", m_pMiddleFinger->GetFingerState().ptTip);
-	/*
-	vector ptm = vector(palmToMiddle.x(), palmToMiddle.y(), palmToMiddle.z());
-	vector ptr = vector(palmToRing.x(), palmToRing.y(), palmToRing.z());
-
-	vector up = vector();
-	if (hand.isLeft()) {
-		up = ptm.cross(ptr);
-	}
-	else {
-		up = ptr.cross(ptm);
-	}
-
-	vector right = ptm.cross(up);
-
-	qRotation.SetQuaternion(right, up, ptm);
-	//*/	
-	//m_qRotation = qRotation;
 	
 //Error:
 	return r;
@@ -407,6 +329,7 @@ hand::HandState hand::GetHandState() {
 		GetPosition(),
 		m_qRotation,
 		m_fOriented,
+		m_fSkeleton,
 		m_pIndexFinger->GetFingerState(),
 		m_pMiddleFinger->GetFingerState(),
 		m_pRingFinger->GetFingerState(),
@@ -422,6 +345,7 @@ hand::HandState hand::GetDebugHandState(hand::HAND_TYPE handType) {
 		handType,
 		point(1,2,3),
 		quaternion(),
+		false,
 		false,
 		finger::FingerState(),
 		finger::FingerState(),

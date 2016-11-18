@@ -136,32 +136,24 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 
 	quaternion baseRight = quaternion();
 	baseRight *= quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
-	//baseRight *= quaternion::MakeQuaternionWithEuler(0.0f, -(float)M_PI_2, 0.0f);
-
-	quaternion baseLeft = quaternion();
-	baseLeft *= quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI_2);
-
 	
 	if (pHandState.handType == hand::HAND_LEFT && pHandState.fOriented) {
-		/*
-		if (!m_pLeapLeftHand->IsVisible())
-			m_pLeapLeftHand->SetVisible();
+		m_pLeapLeftHand->SetVisible(pHandState.fSkeleton);
 		m_pLeapLeftHand->SetHandState(pHandState);
-		//*/
-		if (!m_pLeapLeftModel->IsVisible())
-			m_pLeapLeftModel->SetVisible();
+
+		m_pLeapLeftModel->SetVisible(!pHandState.fSkeleton);
 		m_pLeapLeftModel->SetPosition(ptModel);
-		m_pLeapLeftModel->SetOrientation(pHandState.qOrientation * baseLeft);
+
+		baseRight.Reverse();
+		m_pLeapLeftModel->SetOrientation(pHandState.qOrientation * baseRight);
 	}
 	else if (pHandState.handType == hand::HAND_RIGHT && pHandState.fOriented) {
-		/*
-		if (!m_pLeapRightHand->IsVisible())
-			m_pLeapRightHand->SetVisible();
+		m_pLeapRightHand->SetVisible(pHandState.fSkeleton);
 		m_pLeapRightHand->SetHandState(pHandState);
-		//*/
-		if (!m_pLeapRightModel->IsVisible())
-			m_pLeapRightModel->SetVisible();
+
+		m_pLeapRightModel->SetVisible(!pHandState.fSkeleton);
 		m_pLeapRightModel->SetPosition(ptModel);
+
 		m_pLeapRightModel->SetOrientation(pHandState.qOrientation * baseRight);
 	}
 	else if (pHandState.handType == hand::HAND_LEFT && !pHandState.fOriented) {
