@@ -8,8 +8,10 @@
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
-	m_pOpenGLRenderingContext(NULL),
-	m_pSceneGraph(NULL),
+	m_pOpenGLRenderingContext(nullptr),
+	m_pSceneGraph(nullptr),
+	m_pPhysicsGraph(nullptr),
+	m_pFlatSceneGraph(nullptr),
 	m_pCloudController(nullptr),
 	m_pHALImp(nullptr),
 	m_pHMD(nullptr),
@@ -261,7 +263,8 @@ RESULT SandboxApp::RunAppLoop() {
 		// Update Scene 
 		//CR(m_pSceneGraph->UpdateScene());
 
-		CR(m_pPhysicsEngine->UpdateObjectStore(m_pSceneGraph));
+		//CR(m_pPhysicsEngine->Update());
+		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
@@ -332,8 +335,13 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
+	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
+
+	// Set up physics graph
+	m_pPhysicsGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pPhysicsGraph, "Failed to allocate Physics Graph");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
@@ -393,11 +401,20 @@ long SandboxApp::GetTickCount() {
 }
 
 // Sandbox Factory Methods
-// TODO: This should all go up into the sandbox
 RESULT SandboxApp::AddObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pSceneGraph->PushObject(pObject));
+
+Error:
+	return r;
+}
+
+// This adds the object to the physics graph (otherwise it will not get integrated / operated on)
+RESULT SandboxApp::AddPhysicsObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsGraph->PushObject(pObject));
 
 Error:
 	return r;

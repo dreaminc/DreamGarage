@@ -3,6 +3,7 @@
 VirtualObj::VirtualObj() :
 	m_ptOrigin(),
 	m_vVelocity(),
+	m_vAcceleration(),
 	m_vScale(1.0, 1.0, 1.0),
 	m_qRotation(),
 	m_qAngularMomentum()
@@ -13,6 +14,7 @@ VirtualObj::VirtualObj() :
 VirtualObj::VirtualObj(point ptOrigin) : 
 	m_ptOrigin(ptOrigin),
 	m_vVelocity(),
+	m_vAcceleration(),
 	m_vScale(1.0, 1.0, 1.0),
 	m_qRotation(),
 	m_qAngularMomentum()

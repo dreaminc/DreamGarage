@@ -114,7 +114,8 @@ protected:
 	RESULT RegisterImpLeapMotionEvents();
 
 public:
-	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
+	RESULT AddPhysicsObject(VirtualObj *pObject);
+	RESULT AddObject(VirtualObj *pObject);	
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);
 
@@ -191,6 +192,7 @@ protected:
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	
+	ObjectStore *m_pPhysicsGraph;	
 	ObjectStore *m_pSceneGraph;
 	ObjectStore *m_pFlatSceneGraph;
 

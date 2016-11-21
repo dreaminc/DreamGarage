@@ -32,8 +32,9 @@ typedef enum ObjectType {
 
 class VirtualObj : public valid {
 protected:
-	point m_ptOrigin;			// Origin
-	vector m_vVelocity;			// Velocity
+	point m_ptOrigin;			// Origin			(P)
+	vector m_vVelocity;			// Velocity			(dP/dT)
+	vector m_vAcceleration;		// Acceleration		(dV/dT)
 
 	vector m_vScale;			// Scale
 

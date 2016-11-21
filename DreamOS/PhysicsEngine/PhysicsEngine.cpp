@@ -44,6 +44,37 @@ Error:
 	return nullptr;
 }
 
+RESULT PhysicsEngine::SetTimeStep(double msTimeStep) {
+	RESULT r = R_PASS;
+
+	CBM((msTimeStep > MINIMUM_TIME_STEP), "Cannot set time step below minimum %f", MINIMUM_TIME_STEP);
+
+	// Convert to ms
+	m_timeStep = (msTimeStep / 1000.0f);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngine::Update() {
+	RESULT r = R_PASS;
+
+	auto timeNow = std::chrono::high_resolution_clock::now();
+	auto timeDelta = std::chrono::duration<double>(timeNow - m_lastUpdateTime).count();
+	m_lastUpdateTime = timeNow;
+
+	m_elapsedTime += timeDelta;
+
+	while (m_elapsedTime >= m_timeStep) {
+		m_elapsedTime = m_elapsedTime - m_timeStep;
+
+		// TODO: Evaluate
+	}
+
+//Error:
+	return r;
+}
+
 // TODO: This is temporary
 RESULT PhysicsEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;

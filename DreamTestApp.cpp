@@ -48,12 +48,15 @@ RESULT DreamTestApp::LoadScene() {
 	g_pVolume = AddVolume(0.5f, 0.5f, 2.0f);
 	g_pVolume->RotateZByDeg(45.0f);
 	g_pVolume->MoveTo(point(-2.0f, 0.0f, 0.0f));
+	AddPhysicsObject(g_pVolume);
 	//*/
 	
 	///*
 	g_pVolume2 = AddVolume(0.5f, 0.5f, 2.0f);
 	g_pVolume2->MoveTo(point(2.0f, 0.0f, 0.0f));
 	g_pVolume2->RotateZBy((float)(M_PI_4));
+	AddPhysicsObject(g_pVolume2);
+
 	RegisterObjectCollision(g_pVolume2);
 	//*/
 
@@ -93,6 +96,9 @@ RESULT DreamTestApp::LoadScene() {
 
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
+
+	g_pVolume->SetColor(color(COLOR_WHITE));
+	g_pVolume2->SetColor(color(COLOR_WHITE));
 
 	///*
 	if (g_pCylinder != nullptr) {

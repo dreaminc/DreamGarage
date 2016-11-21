@@ -26,6 +26,7 @@
 // to be ramped up/down to ensure timing requirements.  
 
 #include <memory>
+#include <chrono>
 
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
@@ -34,6 +35,9 @@
 #include "CollisionResolver.h"
 
 class ObjectStore;
+
+#define MINIMUM_TIME_STEP 5
+#define DEFUALT_TIMESTEP_MS 20
 
 class PhysicsEngine : public valid {
 public:
@@ -45,10 +49,18 @@ private:
 	RESULT Initialize();
 
 public:
+	RESULT SetTimeStep(double msTimeStep);
+	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
 
 	RESULT RegisterSubscriber(CollisionGroupEventType collisionGroupEvent, Subscriber<CollisionGroupEvent>* pCollisionDetectorSubscriber);
 	RESULT RegisterObjectCollisionSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
+
+private:
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_lastUpdateTime;
+	
+	double m_timeStep = 0.010f;
+	double m_elapsedTime;
 
 private:
 	std::unique_ptr<CollisionDetector> m_pCollisionDetector;

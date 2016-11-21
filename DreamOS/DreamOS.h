@@ -48,6 +48,8 @@ public:
 	virtual RESULT Update(void) = 0;
 
 protected:
+	RESULT AddPhysicsObject(VirtualObj *pObject);
+
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 

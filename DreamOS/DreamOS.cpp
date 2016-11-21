@@ -125,6 +125,10 @@ RESULT DreamOS::Exit(RESULT exitcode) {
 	return exitcode;
 }
 
+// This is a pass-thru at the moment
+RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
+	return m_pSandbox->AddPhysicsObject(pObject);
+}
 
 light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
