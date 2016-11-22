@@ -13,6 +13,7 @@
 
 #define MINIMUM_TIME_STEP 5
 #define DEFUALT_TIMESTEP_MS 20
+#define DEFAULT_GRAVITY_ACCEL -9.8f
 
 class ObjectStore;
 
@@ -34,7 +35,7 @@ private:
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_lastUpdateTime;
 
-	double m_timeStep = 0.010f;
+	double m_sTimeStep = 0.010f;		// time step in seconds 
 	double m_elapsedTime;
 
 private:

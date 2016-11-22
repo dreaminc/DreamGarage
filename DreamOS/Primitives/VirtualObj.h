@@ -31,6 +31,9 @@ typedef enum ObjectType {
 } OBJECT_TYPE;
 
 class VirtualObj : public valid {
+public:
+	friend class PhysicsIntegrator;		// TODO: move physics stuff into state/derivative for RK4
+
 protected:
 	point m_ptOrigin;			// Origin			(P)
 	vector m_vVelocity;			// Velocity			(dP/dT)

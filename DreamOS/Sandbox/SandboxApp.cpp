@@ -263,7 +263,7 @@ RESULT SandboxApp::RunAppLoop() {
 		// Update Scene 
 		//CR(m_pSceneGraph->UpdateScene());
 
-		//CR(m_pPhysicsEngine->Update());
+		CR(m_pPhysicsEngine->Update());
 		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
 
 		// Update HMD

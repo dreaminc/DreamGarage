@@ -685,7 +685,8 @@ public:
 // TODO: Fix const-ness?
 template <typename TMat4x4, int N, int M>
 matrix<TMat4x4, N, M> operator* (TMat4x4 val, matrix<TMat4x4, N, M>& arg) {
-	return arg *= (val);
+	matrix<TMat4x4, N, M> result(arg);
+	return (result *= (val));
 }
 
 /*

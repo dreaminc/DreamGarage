@@ -22,8 +22,9 @@ VirtualObj *ObjectStoreImpList::GetNextObject() {
 
 	VirtualObj *pVirtualObj = (*m_objectIterator);
 
-	if (m_objectIterator != m_objects.end())
+	if (m_objectIterator != m_objects.end()) {
 		m_objectIterator++;
+	}
 
 	return pVirtualObj;
 }

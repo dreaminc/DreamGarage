@@ -17,10 +17,33 @@ RESULT PhysicsIntegrator::Update() {
 
 	m_elapsedTime += timeDelta;
 
-	while (m_elapsedTime >= m_timeStep) {
-		m_elapsedTime = m_elapsedTime - m_timeStep;
+	if (m_elapsedTime >= m_sTimeStep) {
+		//m_elapsedTime = m_elapsedTime - m_sTimeStep;
 
-		// TODO: Evaluate
+		ObjectStoreImp *pObjectStoreImp = m_pPhysicsObjectStore->GetSceneGraphStore();
+		VirtualObj *pVirtualObj = nullptr;
+
+		m_pPhysicsObjectStore->Reset();
+		while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
+			//DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+			// Euler Integration 
+			// TODO: switch to RK4)
+			vector vPositionInc = static_cast<float>(m_sTimeStep) * (pVirtualObj->m_vVelocity);
+			vector vAccelInc = static_cast<float>(m_sTimeStep) * (pVirtualObj->m_vAcceleration);
+
+			// TODO: Legitimize gravity force generator later
+			// TODO: Add drag too
+			vAccelInc += static_cast<float>(m_sTimeStep) * (vector(0.0f, DEFAULT_GRAVITY_ACCEL, 0.0f));
+
+			point ptNewPosition = pVirtualObj->m_ptOrigin + vPositionInc;
+			vector vNewVelocity = pVirtualObj->m_vVelocity + vAccelInc;
+
+			pVirtualObj->SetPosition(ptNewPosition);
+			pVirtualObj->SetVelocity(vNewVelocity);
+		}
+
+		m_elapsedTime = 0.0f;
 	}
 
 //Error:
@@ -30,7 +53,7 @@ RESULT PhysicsIntegrator::Update() {
 RESULT PhysicsIntegrator::Initialize() {
 	RESULT r = R_PASS;
 
-	// TODO: 
+	m_lastUpdateTime = std::chrono::high_resolution_clock::now();
 
 //Error:
 	return r;
@@ -42,7 +65,7 @@ RESULT PhysicsIntegrator::SetTimeStep(double msTimeStep) {
 	CBM((msTimeStep > MINIMUM_TIME_STEP), "Cannot set time step below minimum %f", (float)(MINIMUM_TIME_STEP));
 
 	// Convert to ms
-	m_timeStep = (msTimeStep / 1000.0f);
+	m_sTimeStep = (msTimeStep / 1000.0f);
 
 Error:
 	return r;
