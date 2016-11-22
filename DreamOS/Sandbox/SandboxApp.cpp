@@ -339,10 +339,6 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
-	// Set up physics graph
-	m_pPhysicsGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
-	CNM(m_pPhysicsGraph, "Failed to allocate Physics Graph");
-
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
@@ -379,10 +375,16 @@ RESULT SandboxApp::InitializePhysicsEngine() {
 	m_pPhysicsEngine = PhysicsEngine::MakePhysicsEngine();
 	CNMW(m_pPhysicsEngine, "Physics Engine failed to initialize");
 
+	// Set up physics graph
+	m_pPhysicsGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pPhysicsGraph, "Failed to allocate Physics Graph");
+
+	CRM(m_pPhysicsEngine->SetPhysicsGraph(m_pPhysicsGraph), "Failed to set physics object store");
+
 	// Register OBJECT_GROUP_COLLISION
 	// CR(m_pPhysicsEngine->RegisterSubscriber(OBJECT_GROUP_COLLISION, this));
 
-//Error:
+Error:
 	return r;
 }
 

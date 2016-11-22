@@ -42,7 +42,7 @@ vector::vector(const point& pt) {
 }
 
 double vector::magnitude() {
-	double sqaureSum = pow(x(), 2) + pow(y(), 2) + pow(z(), 2);
+	double sqaureSum = std::pow(x(), 2.0f) + std::pow(y(), 2.0f) + std::pow(z(), 2.0f);
 	return sqrt(sqaureSum);
 }
 

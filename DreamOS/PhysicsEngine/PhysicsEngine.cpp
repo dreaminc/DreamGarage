@@ -24,7 +24,11 @@ RESULT PhysicsEngine::Initialize() {
 
 	CRM(m_pCollisionResolver->Initialize(), "Failed to initialize Collision Resolver");
 
-	// TODO: Physics integrator
+	// Physics integrator
+	m_pPhysicsIntegrator = std::unique_ptr<PhysicsIntegrator>(new PhysicsIntegrator());
+	CNM(m_pPhysicsIntegrator, "Failed to create phystics integrator module");
+
+	CRM(m_pPhysicsIntegrator->Initialize(), "Failed to initialize Physics Integrator");
 
 Error:
 	return r;
@@ -44,13 +48,10 @@ Error:
 	return nullptr;
 }
 
-RESULT PhysicsEngine::SetTimeStep(double msTimeStep) {
+RESULT PhysicsEngine::SetPhysicsGraph(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	CBM((msTimeStep > MINIMUM_TIME_STEP), "Cannot set time step below minimum %f", MINIMUM_TIME_STEP);
-
-	// Convert to ms
-	m_timeStep = (msTimeStep / 1000.0f);
+	CR(m_pPhysicsIntegrator->SetPhysicsStore(pObjectStore));
 
 Error:
 	return r;
@@ -58,20 +59,12 @@ Error:
 
 RESULT PhysicsEngine::Update() {
 	RESULT r = R_PASS;
+	
+	// TODO: add the cascade here
 
-	auto timeNow = std::chrono::high_resolution_clock::now();
-	auto timeDelta = std::chrono::duration<double>(timeNow - m_lastUpdateTime).count();
-	m_lastUpdateTime = timeNow;
+	CR(m_pPhysicsIntegrator->Update());
 
-	m_elapsedTime += timeDelta;
-
-	while (m_elapsedTime >= m_timeStep) {
-		m_elapsedTime = m_elapsedTime - m_timeStep;
-
-		// TODO: Evaluate
-	}
-
-//Error:
+Error:
 	return r;
 }
 

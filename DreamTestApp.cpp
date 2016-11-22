@@ -44,14 +44,12 @@ RESULT DreamTestApp::LoadScene() {
 
 	//g_pCylinder->RotateZBy((float)(M_PI_4));
 
-	///*
+	/*
 	g_pVolume = AddVolume(0.5f, 0.5f, 2.0f);
 	g_pVolume->RotateZByDeg(45.0f);
 	g_pVolume->MoveTo(point(-2.0f, 0.0f, 0.0f));
 	AddPhysicsObject(g_pVolume);
-	//*/
 	
-	///*
 	g_pVolume2 = AddVolume(0.5f, 0.5f, 2.0f);
 	g_pVolume2->MoveTo(point(2.0f, 0.0f, 0.0f));
 	g_pVolume2->RotateZBy((float)(M_PI_4));
@@ -59,6 +57,11 @@ RESULT DreamTestApp::LoadScene() {
 
 	RegisterObjectCollision(g_pVolume2);
 	//*/
+
+
+	sphere *pSphere = AddSphere(0.25f, 10, 10);
+	pSphere->SetMass(1.0f);
+	AddPhysicsObject(pSphere);
 
 	//pCylinder->SetWireframe(true);
 
@@ -97,9 +100,6 @@ RESULT DreamTestApp::LoadScene() {
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
-	g_pVolume->SetColor(color(COLOR_WHITE));
-	g_pVolume2->SetColor(color(COLOR_WHITE));
-
 	///*
 	if (g_pCylinder != nullptr) {
 		//g_pCylinder->RotateByDeg(0.01f, 0.00f, 0.01f);
@@ -113,6 +113,8 @@ RESULT DreamTestApp::Update(void) {
 
 	///*
 	if (g_pVolume != nullptr) {
+		g_pVolume->SetColor(color(COLOR_WHITE));
+
 		//g_pVolume->RotateByDeg(0.01f, 0.01f, 0.01f);
 		g_pVolume->RotateXBy(0.003f);
 		g_pVolume->RotateYBy(-0.001f);
@@ -121,6 +123,8 @@ RESULT DreamTestApp::Update(void) {
 	}
 
 	if (g_pVolume2 != nullptr) {
+		g_pVolume2->SetColor(color(COLOR_WHITE));
+
 		//g_pVolume2->RotateByDeg(0.01f, 0.01f, 0.01f);
 		g_pVolume2->RotateXBy(0.002f);
 		g_pVolume2->RotateYBy(0.001f);

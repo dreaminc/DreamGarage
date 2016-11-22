@@ -35,6 +35,7 @@ protected:
 	point m_ptOrigin;			// Origin			(P)
 	vector m_vVelocity;			// Velocity			(dP/dT)
 	vector m_vAcceleration;		// Acceleration		(dV/dT)
+	double m_kgMass;				// Mass (kg)
 
 	vector m_vScale;			// Scale
 
@@ -73,12 +74,6 @@ public:
 	RESULT SetPivotPoint(point ptPivot);
 	RESULT SetPivotPoint(point_precision x, point_precision y, point_precision z);
 
-	// Velocity
-	VirtualObj* AddVelocity(matrix <point_precision, 4, 1> v);
-	VirtualObj* AddVelocity(point_precision x, point_precision y, point_precision z);
-	VirtualObj* SetVelocity(matrix <point_precision, 4, 1> v);
-	VirtualObj* SetVelocity(point_precision x, point_precision y, point_precision z);
-
 	// Rotation
 	VirtualObj* RotateBy(quaternion q);
 	VirtualObj* RotateBy(quaternion_precision thetaX, quaternion_precision thetaY, quaternion_precision thetaZ);
@@ -110,9 +105,24 @@ public:
 	quaternion GetOrientation();
 	matrix<virtual_precision, 4, 4> GetOrientationMatrix();
 
+	// Velocity
+	VirtualObj* AddVelocity(matrix <point_precision, 4, 1> vVelocity);
+	VirtualObj* AddVelocity(point_precision x, point_precision y, point_precision z);
+	VirtualObj* SetVelocity(matrix <point_precision, 4, 1> vVelocity);
+	VirtualObj* SetVelocity(point_precision x, point_precision y, point_precision z);
+
+	// Acceleration
+	VirtualObj* AddAcceleration(matrix <point_precision, 4, 1> vAccel);
+	VirtualObj* AddAcceleration(point_precision x, point_precision y, point_precision z);
+	VirtualObj* SetAcceleration(matrix <point_precision, 4, 1> vAccel);
+	VirtualObj* SetAcceleration(point_precision x, point_precision y, point_precision z);
+
 	// Angular Momentum
 	VirtualObj* AddAngularMomentum(quaternion q);
 	VirtualObj* SetAngularMomentum(quaternion am);
+
+	RESULT SetMass(double kgMass);
+	double GetMass();
 
 	// Update functions
 	VirtualObj* Update();

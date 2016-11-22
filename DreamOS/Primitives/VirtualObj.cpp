@@ -105,8 +105,8 @@ RESULT VirtualObj::SetPivotPoint(point_precision x, point_precision y, point_pre
 }
 
 // Velocity
-VirtualObj* VirtualObj::AddVelocity(matrix <point_precision, 4, 1> v) {
-	m_vVelocity += v;
+VirtualObj* VirtualObj::AddVelocity(matrix <point_precision, 4, 1> vVelocity) {
+	m_vVelocity += vVelocity;
 	return this;
 }
 
@@ -118,8 +118,8 @@ VirtualObj* VirtualObj::AddVelocity(point_precision x, point_precision y, point_
 	return this;
 }
 
-VirtualObj* VirtualObj::SetVelocity(matrix <point_precision, 4, 1> v) {
-	m_vVelocity = v;
+VirtualObj* VirtualObj::SetVelocity(matrix <point_precision, 4, 1> vVelocity) {
+	m_vVelocity = vVelocity;
 	return this;
 }
 
@@ -127,6 +127,33 @@ VirtualObj* VirtualObj::SetVelocity(point_precision x, point_precision y, point_
 	m_vVelocity.x() = x;
 	m_vVelocity.y() = y;
 	m_vVelocity.z() = z;
+	return this;
+}
+
+VirtualObj* VirtualObj::AddAcceleration(matrix <point_precision, 4, 1> vAccel) {
+	m_vAcceleration += vAccel;
+	return this;
+}
+
+VirtualObj* VirtualObj::AddAcceleration(point_precision x, point_precision y, point_precision z) {
+	m_vAcceleration.x() += x;
+	m_vAcceleration.y() += y;
+	m_vAcceleration.z() += z;
+
+	return this;
+}
+
+// Acceleration
+VirtualObj* VirtualObj::SetAcceleration(matrix <point_precision, 4, 1> vAccel) {
+	m_vAcceleration = vAccel;
+	return this;
+}
+
+VirtualObj* VirtualObj::SetAcceleration(point_precision x, point_precision y, point_precision z) {
+	m_vAcceleration.x() = x;
+	m_vAcceleration.y() = y;
+	m_vAcceleration.z() = z;
+
 	return this;
 }
 
@@ -284,6 +311,19 @@ VirtualObj* VirtualObj::AddAngularMomentum(quaternion q) {
 VirtualObj* VirtualObj::SetAngularMomentum(quaternion am) {
 	m_qAngularMomentum = am;
 	return this;
+}
+
+RESULT VirtualObj::SetMass(double kgMass) {
+	// Negative mass not allowed
+	if (kgMass < 0.0f)
+		return R_FAIL;
+
+	m_kgMass = kgMass;
+	return R_PASS;
+}
+
+double VirtualObj::GetMass() {
+	return m_kgMass;
 }
 
 // Update Functions

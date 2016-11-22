@@ -77,6 +77,15 @@ bool BoundingSphere::Intersect(const ray &r) {
 }
 
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {
-	m_radius = (ptMax - GetOrigin()).magnitude();
+	vector vDiff = (ptMax - GetOrigin());
+	//m_radius = vDiff.magnitude();
+	
+	m_radius = ptMax.x();
+	
+	if (ptMax.y() > m_radius)
+		m_radius = ptMax.y();
+
+	if (ptMax.z() > m_radius)
+		m_radius = ptMax.z();
 	return R_PASS;
 }

@@ -30,7 +30,7 @@ sphere::sphere(float radius, int numAngularDivisions, int numVerticalDivisions, 
 {
 	RESULT r = R_PASS;
 
-	CR(SetSphereVertices(radius, numAngularDivisions, numVerticalDivisions, c));
+	CR(SetSphereVertices(radius, numAngularDivisions, numVerticalDivisions, point(), c));
 
 	// TODO: Allow for changing this - put it into a factory
 	//CR(InitializeAABB());
