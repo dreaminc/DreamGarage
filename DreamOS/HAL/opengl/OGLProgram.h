@@ -7,6 +7,7 @@
 // DreamOS/HAL/opengl/OGLProgram.h
 // OpenGL Program class
 
+#include <functional>
 #include <vector>
 #include <map>
 
