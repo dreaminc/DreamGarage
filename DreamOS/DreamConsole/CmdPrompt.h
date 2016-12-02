@@ -41,7 +41,8 @@ public:
 		DreamConsole,
 		CloudController,
 		OpenGL,
-		Camera
+		Camera,
+		Leap
 	};
 
 private:
@@ -51,6 +52,7 @@ private:
 		{ method::CloudController, "cloud" },
 		{ method::OpenGL, "ogl" },
 		{ method::Camera, "cam" }, 
+		{ method::Leap, "leap"}
 	};
 
 public:

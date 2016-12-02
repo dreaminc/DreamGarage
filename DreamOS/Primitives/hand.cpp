@@ -208,6 +208,9 @@ RESULT hand::Initialize() {
 	SetPosition(point(0.0f, 0.0f, -1.0f));
 
 	m_fOriented = false;
+	m_fSkeleton = false;
+
+	m_qRotation = quaternion();
 
 //Error:
 	return r;
@@ -222,6 +225,16 @@ bool hand::IsOriented() {
 	return m_fOriented;
 }
 
+RESULT hand::SetSkeleton(bool fSkeleton) {
+	m_fSkeleton = fSkeleton;
+	return R_PASS;
+}
+
+bool hand::IsSkeleton() {
+	return m_fSkeleton;
+}
+
+
 RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	RESULT r = R_PASS;
 
@@ -234,7 +247,27 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 
 	SetPosition(ptPalmPosition * -1.0f);
 
-	// = hand.basis();
+	Leap::Matrix mBasis = hand.basis();
+	Leap::Vector xAxis = mBasis.xBasis;
+	Leap::Vector yAxis = mBasis.yBasis;
+	Leap::Vector zAxis = mBasis.zBasis;
+
+	vector vx = vector(-xAxis.x, -xAxis.z, -xAxis.y);
+	vector vy = vector(-yAxis.x, -yAxis.z, -yAxis.y);
+	vector vz = vector(-zAxis.x, -zAxis.z, -zAxis.y);
+	
+	// the x-axis is positive in the direction from the palm to the pinky,
+	// so it must be reversed for the left hand
+	if (hand.isLeft()) {
+		vx = vector(xAxis.x, xAxis.z, xAxis.y);
+	}
+
+	quaternion qRotation = quaternion();
+	qRotation.SetQuaternion(vx, vy, vz);
+	qRotation.Reverse();
+
+	m_qRotation = qRotation;
+
 	Leap::Matrix handTransform;
 	handTransform.origin = hand.palmPosition();
 	handTransform = handTransform.rigidInverse();
@@ -263,7 +296,7 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 			pFinger->SetJointPosition(ptPosition, (finger::JOINT_TYPE)(jt));
 		}
 	}
-
+	
 //Error:
 	return r;
 }
@@ -294,8 +327,9 @@ hand::HandState hand::GetHandState() {
 	hand::HandState handState = {
 		m_handType,
 		GetPosition(),
-		GetOrientation(),
+		m_qRotation,
 		m_fOriented,
+		m_fSkeleton,
 		m_pIndexFinger->GetFingerState(),
 		m_pMiddleFinger->GetFingerState(),
 		m_pRingFinger->GetFingerState(),
@@ -311,6 +345,7 @@ hand::HandState hand::GetDebugHandState(hand::HAND_TYPE handType) {
 		handType,
 		point(1,2,3),
 		quaternion(),
+		false,
 		false,
 		finger::FingerState(),
 		finger::FingerState(),

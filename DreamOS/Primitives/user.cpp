@@ -69,8 +69,26 @@ RESULT user::Initialize() {
 						0.015f,
 						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
 
+	m_pLeapLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+	
+	m_pLeapRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
+	
+	pHead->AddChild(m_pLeapLeftModel);
+	pHead->AddChild(m_pLeapRightModel);
+
 	m_pViveLeftModel->SetVisible(false);
 	m_pViveRightModel->SetVisible(false);
+
+	m_pLeapLeftModel->SetVisible(false);
+	m_pLeapRightModel->SetVisible(false);
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 
@@ -116,15 +134,27 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	point ptModel = pHandState.ptPalm;
 	ptModel += setHandConstant;
 
+	quaternion baseRight = quaternion();
+	baseRight *= quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
+	
 	if (pHandState.handType == hand::HAND_LEFT && pHandState.fOriented) {
-		if (!m_pLeapLeftHand->IsVisible())
-			m_pLeapLeftHand->SetVisible();
+		m_pLeapLeftHand->SetVisible(pHandState.fSkeleton);
 		m_pLeapLeftHand->SetHandState(pHandState);
+
+		m_pLeapLeftModel->SetVisible(!pHandState.fSkeleton);
+		m_pLeapLeftModel->SetPosition(ptModel);
+
+		baseRight.Reverse();
+		m_pLeapLeftModel->SetOrientation(pHandState.qOrientation * baseRight);
 	}
 	else if (pHandState.handType == hand::HAND_RIGHT && pHandState.fOriented) {
-		if (!m_pLeapRightHand->IsVisible())
-			m_pLeapRightHand->SetVisible();
+		m_pLeapRightHand->SetVisible(pHandState.fSkeleton);
 		m_pLeapRightHand->SetHandState(pHandState);
+
+		m_pLeapRightModel->SetVisible(!pHandState.fSkeleton);
+		m_pLeapRightModel->SetPosition(ptModel);
+
+		m_pLeapRightModel->SetOrientation(pHandState.qOrientation * baseRight);
 	}
 	else if (pHandState.handType == hand::HAND_LEFT && !pHandState.fOriented) {
 		if (!m_pViveLeftModel->IsVisible())
