@@ -83,6 +83,9 @@ public:
 	VirtualObj* MoveTo(point_precision x, point_precision y, point_precision z);
 
 	VirtualObj* Scale(point_precision scale);
+	VirtualObj* ScaleX(point_precision scale);
+	VirtualObj* ScaleY(point_precision scale);
+	VirtualObj* ScaleZ(point_precision scale);
 
 	// Pivot Point
 	point GetPivotPoint();
