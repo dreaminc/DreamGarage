@@ -29,7 +29,7 @@ out Data {
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
 	vec3 vertTBNSpace;
-	float oscillateDisplacement;
+	float riverAnimationDisplacement;
 } DataOut;
 
 uniform vec4 u_vec4Eye;
@@ -39,7 +39,7 @@ uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
 
-uniform bool u_fOscillate;
+uniform bool u_fRiverAnimation;
 uniform float u_time;
 
 // Light Structure
@@ -76,7 +76,7 @@ vec4 RiverAnimation(vec4 position, vec4 vertWorldSpace) {
 	displacement += scale * sin(4.6f * arg + 8.94f);
 	displacement *= 0.25f;
 	displacement -= 0.1f;
-	DataOut.oscillateDisplacement = displacement;
+	DataOut.riverAnimationDisplacement = displacement;
 	//*/
 
 	return vec4(position.x, position.y + displacement, position.z, position.w);
@@ -125,7 +125,7 @@ void main(void) {
 	// Projected Vert Position
 	vec4 position = u_mat4ViewProjection * vertWorldSpace;
 
-	if (u_fOscillate) {
+	if (u_fRiverAnimation) {
 		gl_Position = RiverAnimation(position, vertWorldSpace);
 	} 
 	else {

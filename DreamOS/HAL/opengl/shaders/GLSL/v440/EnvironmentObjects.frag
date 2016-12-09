@@ -21,7 +21,7 @@ in Data {
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
 	vec3 vertTBNSpace;
-	float oscillateDisplacement;
+	float riverAnimationDisplacement;
 } DataIn;
 
 // Light Structure
@@ -71,7 +71,7 @@ uniform sampler2D u_textureDiffuse;
 uniform bool	u_hasTextureSpecular;
 uniform sampler2D u_textureSpecular;
 
-uniform bool	u_fOscillate;
+uniform bool	u_fRiverAnimation;
 
 layout (location = 0) out vec4 out_vec4Color;
 
@@ -116,16 +116,12 @@ void EnableBlending(float ambientAlpha, float diffuseAlpha) {
 //vec4 darkColor  = vec4(24.0f / 255.0f,  77.0f / 255.0f, 174.0f / 255.0f, 1.0f);
 vec4 lightColor = vec4(76.0f / 255.0f, 203.0f / 255.0f, 247.0f / 255.0f, 1.0f);
 vec4 darkColor  = vec4(21.0f / 255.0f,  50.0f / 255.0f, 115.0f / 255.0f, 1.0f);
-vec4 black		= vec4(0.0f, 0.0f, 0.0f, 0.0f);
-vec4 EnableOscillation(vec4 colorIn) {
-	if (u_fOscillate) {
-		float color = ((1.5f * DataIn.oscillateDisplacement) + 1.0f) / 2.0f;
+//vec4 black		= vec4(0.0f, 0.0f, 0.0f, 0.0f);
 
-		vec4 guess = (color*lightColor) + ((1.0f - color)*darkColor);
-
-		 return vec4(guess.xyz, 1.0f);
-	}
-	return colorIn;
+vec4 EnableRiverAnimation() {
+	float color = ((1.5f * DataIn.riverAnimationDisplacement) + 1.0f) / 2.0f;
+	vec4 guess = (color*lightColor) + ((1.0f - color)*darkColor);
+	return vec4(guess.xyz, 1.0f);
 }
 //*/
 
@@ -148,8 +144,10 @@ void main(void) {
 	vec4 colorDiffuse = material.m_colorDiffuse * ((u_hasTextureDiffuse) ? texture(u_textureDiffuse, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
 	vec4 colorSpecular = material.m_colorSpecular * ((u_hasTextureSpecular) ? texture(u_textureSpecular, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
 
-	colorAmbient = EnableOscillation(colorAmbient);	
-	colorDiffuse = EnableOscillation(colorDiffuse);	
+	if (u_fRiverAnimation) {
+		colorAmbient = EnableRiverAnimation();	
+		colorDiffuse = EnableRiverAnimation();	
+	}
 
 	vec4 lightColorAmbient = g_ambient * vec4(1,1,1,1);
 

@@ -101,7 +101,7 @@ RESULT DreamGarage::LoadScene() {
 				// Do some stuff pre
 				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
 				if (pOGLEnvironmentProgram != nullptr) {
-					pOGLEnvironmentProgram->SetOscillation(true);
+					pOGLEnvironmentProgram->SetRiverAnimation(true);
 				}
 				return R_PASS;
 			}
@@ -113,7 +113,7 @@ RESULT DreamGarage::LoadScene() {
 			
 				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
 				if (pOGLEnvironmentProgram != nullptr) {
-					pOGLEnvironmentProgram->SetOscillation(false);
+					pOGLEnvironmentProgram->SetRiverAnimation(false);
 				}
 				//*/
 				return R_PASS;
