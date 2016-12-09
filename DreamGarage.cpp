@@ -74,21 +74,34 @@ RESULT DreamGarage::LoadScene() {
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
 	auto *pVolume = AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
 
+	point sceneOffset = point(90, -5, -25);
+	float sceneScale = 0.1f;
+	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+
 	AddModel(L"\\Models\\FloatingIsland\\env.obj",
 		nullptr,
-		point(90, -5, -25),
-		0.1f,
-		vector(0.0f, 0.0f, 0.0f));
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+	composite* pRiver = AddModel(L"\\Models\\FloatingIsland\\river.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+	AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
 
-	// Example!
-	OGLObj* pOGLObj = dynamic_cast<OGLObj*>(pVolume);
+	std::shared_ptr<OGLObj> pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
 	if (pOGLObj != nullptr) {
 		pOGLObj->SetOGLProgramPreCallback(
 			[](OGLProgram* pOGLProgram, void *pContext) {
 				// Do some stuff pre
 				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
-				if (pOGLEnvironmentProgram == nullptr) {
-					int a = 5;
+				if (pOGLEnvironmentProgram != nullptr) {
+					pOGLEnvironmentProgram->SetRiverAnimation(true);
 				}
 				return R_PASS;
 			}
@@ -96,13 +109,15 @@ RESULT DreamGarage::LoadScene() {
 
 		pOGLObj->SetOGLProgramPostCallback(
 			[](OGLProgram* pOGLProgram, void *pContext) {
-			// Do some stuff post
-			OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
-			if (pOGLEnvironmentProgram == nullptr) {
-				int a = 5;
+				// Do some stuff post
+			
+				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				if (pOGLEnvironmentProgram != nullptr) {
+					pOGLEnvironmentProgram->SetRiverAnimation(false);
+				}
+				//*/
+				return R_PASS;
 			}
-			return R_PASS;
-		}
 		);
 	}
 

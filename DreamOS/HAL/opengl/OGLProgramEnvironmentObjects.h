@@ -10,6 +10,8 @@
 #include "OGLObj.h"
 #include "OGLTexture.h"
 
+#include <chrono>
+
 class OGLProgramEnvironmentObjects : public OGLProgram {
 public:
 	OGLProgramEnvironmentObjects(OpenGLImp *pParentImp) :
@@ -53,9 +55,16 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureSpecular), std::string("u_hasTextureSpecular")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureSpecular), std::string("u_textureSpecular")));
 
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformRiverAnimation), std::string("u_fRiverAnimation")));
+
+		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTime), std::string("u_time")));
+
 		// Uniform Blocks
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 		CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
+
+		m_deltaTime = 0.0f;
+		m_startTime = std::chrono::high_resolution_clock::now();
 
 	Error:
 		return r;
@@ -127,6 +136,12 @@ public:
 	}
 
 	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+
+		auto deltaTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
+		m_deltaTime = (float)deltaTime;
+		m_deltaTime *= 0.5f;
+		m_pUniformTime->SetUniformFloat(reinterpret_cast<GLfloat*>(&m_deltaTime));
+
 		auto ptEye = pStereoCamera->GetEyePosition(eye);
 		auto matV = pStereoCamera->GetViewMatrix(eye);
 		auto matP = pStereoCamera->GetProjectionMatrix(eye);
@@ -137,6 +152,11 @@ public:
 		//m_pUniformModelViewMatrix->SetUniform(matM)
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
+		return R_PASS;
+	}
+
+	RESULT SetRiverAnimation(bool riverAnimation) {
+		m_pUniformRiverAnimation->SetUniform(riverAnimation);
 		return R_PASS;
 	}
 
@@ -185,9 +205,18 @@ private:
 	OGLUniformBool *m_pUniformHasTextureSpecular;
 	OGLUniformSampler2D *m_pUniformTextureSpecular;
 
+	OGLUniformBool *m_pUniformRiverAnimation;
+
+	OGLUniform *m_pUniformTime;
+
 	// Uniform Blocks
 	OGLLightsBlock *m_pLightsBlock;
 	OGLMaterialBlock *m_pMaterialsBlock;
+
+	std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
+
+	float m_deltaTime; 
+
 };
 
 #endif // ! OGLPROGRAM_ENVIRONMENT_OBJECTS_H_
