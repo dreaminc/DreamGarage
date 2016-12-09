@@ -241,7 +241,7 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	m_handType = (hand.isLeft()) ? HAND_LEFT : HAND_RIGHT;
 	//m_leapHandID = hand.id();
 
-	Leap::Vector leapPalmPosition = hand.stabilizedPalmPosition();
+	Leap::Vector leapPalmPosition = hand.palmPosition();
 	leapPalmPosition /= 1000.0f;	// Leap outputs in mm, and our engine is in meters
 	point ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.z, leapPalmPosition.y);
 
