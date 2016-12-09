@@ -94,6 +94,7 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 				m_pLeftHand->SetFromLeapHand(hand);
 				m_pLeftModel->SetPosition(m_pLeftHand->GetHandState().ptPalm);
 				m_pLeftModel->SetOrientation(m_pLeftHand->GetHandState().qOrientation * baseLeft);
+				m_pLeftModel->SetVisible(true);
 			}
 		}
 		else {
@@ -101,6 +102,7 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 				m_pRightHand->SetFromLeapHand(hand);
 				m_pRightModel->SetPosition(m_pRightHand->GetHandState().ptPalm);
 				m_pRightModel->SetOrientation(m_pRightHand->GetHandState().qOrientation * baseRight);
+				m_pRightModel->SetVisible(true);
 			}
 		}
 	}
