@@ -84,6 +84,9 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 
 	quaternion baseLeft = quaternion();
 	baseLeft *= quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI_2);
+	
+	bool fLeftHandTracked = false;
+	bool fRightHandTracked = false;
 
 	for (auto hl = hands.begin(); hl != hands.end(); ++hl) {
 		// Get the first hand
@@ -95,6 +98,7 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 				m_pLeftModel->SetPosition(m_pLeftHand->GetHandState().ptPalm);
 				m_pLeftModel->SetOrientation(m_pLeftHand->GetHandState().qOrientation * baseLeft);
 				m_pLeftModel->SetVisible(true);
+				fLeftHandTracked = true;
 			}
 		}
 		else {
@@ -103,7 +107,26 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 				m_pRightModel->SetPosition(m_pRightHand->GetHandState().ptPalm);
 				m_pRightModel->SetOrientation(m_pRightHand->GetHandState().qOrientation * baseRight);
 				m_pRightModel->SetVisible(true);
+				fRightHandTracked = true;
 			}
+		}
+	}
+	
+	if (!fLeftHandTracked) {
+		if (m_pLeftHand != nullptr) {
+			m_pLeftHand->OnLostTrack();
+		}
+		if (m_pLeftModel != nullptr) {
+			m_pLeftModel->SetVisible(false);
+		}
+	}
+
+	if (!fRightHandTracked) {
+		if (m_pRightHand != nullptr) {
+			m_pRightHand->OnLostTrack();
+		}
+		if (m_pRightModel != nullptr) {
+			m_pRightModel->SetVisible(false);
 		}
 	}
 }

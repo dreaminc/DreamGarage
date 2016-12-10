@@ -138,20 +138,20 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	baseRight *= quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
 	
 	if (pHandState.handType == hand::HAND_LEFT && pHandState.fOriented) {
-		m_pLeapLeftHand->SetVisible(pHandState.fSkeleton);
+		m_pLeapLeftHand->SetVisible(pHandState.fTracked && pHandState.fSkeleton);
 		m_pLeapLeftHand->SetHandState(pHandState);
 
-		m_pLeapLeftModel->SetVisible(!pHandState.fSkeleton);
+		m_pLeapLeftModel->SetVisible(pHandState.fTracked && !pHandState.fSkeleton);
 		m_pLeapLeftModel->SetPosition(ptModel);
 
 		baseRight.Reverse();
 		m_pLeapLeftModel->SetOrientation(pHandState.qOrientation * baseRight);
 	}
 	else if (pHandState.handType == hand::HAND_RIGHT && pHandState.fOriented) {
-		m_pLeapRightHand->SetVisible(pHandState.fSkeleton);
+		m_pLeapRightHand->SetVisible(pHandState.fTracked && pHandState.fSkeleton);
 		m_pLeapRightHand->SetHandState(pHandState);
 
-		m_pLeapRightModel->SetVisible(!pHandState.fSkeleton);
+		m_pLeapRightModel->SetVisible(pHandState.fTracked && !pHandState.fSkeleton);
 		m_pLeapRightModel->SetPosition(ptModel);
 
 		m_pLeapRightModel->SetOrientation(pHandState.qOrientation * baseRight);

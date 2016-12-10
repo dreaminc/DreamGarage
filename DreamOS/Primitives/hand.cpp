@@ -212,6 +212,8 @@ RESULT hand::Initialize() {
 
 	m_qRotation = quaternion();
 
+	m_fTracked = false;
+
 //Error:
 	return r;
 }
@@ -234,9 +236,19 @@ bool hand::IsSkeleton() {
 	return m_fSkeleton;
 }
 
+bool hand::IsTracked() {
+	return m_fTracked;
+}
+
+RESULT hand::OnLostTrack() {
+	m_fTracked = false;
+	return R_PASS;
+}
 
 RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	RESULT r = R_PASS;
+
+	m_fTracked = true;
 
 	m_handType = (hand.isLeft()) ? HAND_LEFT : HAND_RIGHT;
 	//m_leapHandID = hand.id();
@@ -309,6 +321,8 @@ RESULT hand::SetHandType(hand::HAND_TYPE type) {
 RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
+	m_fTracked = true;
+
 	point pt = pHandState.ptPalm - point(0.0f, 0.0f, 0.25f);
 	SetPosition(pt);
 	//SetOrientation(pHandState.qOrientation);
@@ -330,6 +344,7 @@ hand::HandState hand::GetHandState() {
 		m_qRotation,
 		m_fOriented,
 		m_fSkeleton,
+		m_fTracked,
 		m_pIndexFinger->GetFingerState(),
 		m_pMiddleFinger->GetFingerState(),
 		m_pRingFinger->GetFingerState(),
@@ -345,6 +360,7 @@ hand::HandState hand::GetDebugHandState(hand::HAND_TYPE handType) {
 		handType,
 		point(1,2,3),
 		quaternion(),
+		false,
 		false,
 		false,
 		finger::FingerState(),
