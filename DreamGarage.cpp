@@ -13,6 +13,9 @@ light *g_pLight2 = nullptr;
 #include "Cloud/Message/UpdateHandMessage.h"
 #include "Cloud/Message/AudioDataMessage.h"
 
+#include "HAL/opengl/OGLObj.h"
+#include "HAL/opengl/OGLProgramEnvironmentObjects.h"
+
 // TODO: Should this go into the DreamOS side?
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 	RESULT r = R_PASS;
@@ -69,13 +72,54 @@ RESULT DreamGarage::LoadScene() {
 
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.5f, -1.0f, 0));
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
-	AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
+	auto *pVolume = AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
+
+	point sceneOffset = point(90, -5, -25);
+	float sceneScale = 0.1f;
+	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
 
 	AddModel(L"\\Models\\FloatingIsland\\env.obj",
 		nullptr,
-		point(90, -5, -25),
-		0.1f,
-		vector(0.0f, 0.0f, 0.0f));
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+	composite* pRiver = AddModel(L"\\Models\\FloatingIsland\\river.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+	AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+
+	std::shared_ptr<OGLObj> pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
+	if (pOGLObj != nullptr) {
+		pOGLObj->SetOGLProgramPreCallback(
+			[](OGLProgram* pOGLProgram, void *pContext) {
+				// Do some stuff pre
+				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				if (pOGLEnvironmentProgram != nullptr) {
+					pOGLEnvironmentProgram->SetRiverAnimation(true);
+				}
+				return R_PASS;
+			}
+		);
+
+		pOGLObj->SetOGLProgramPostCallback(
+			[](OGLProgram* pOGLProgram, void *pContext) {
+				// Do some stuff post
+			
+				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				if (pOGLEnvironmentProgram != nullptr) {
+					pOGLEnvironmentProgram->SetRiverAnimation(false);
+				}
+				//*/
+				return R_PASS;
+			}
+		);
+	}
 
 #ifdef TESTING
 // Test Scene
@@ -540,7 +584,8 @@ user*	DreamGarage::ActivateUser(long userId) {
 		m_usersPool.pop_back();
 
 		if (m_peerUsers[userId] != nullptr) {
-			m_peerUsers[userId]->SetVisible(true);
+			user *u = m_peerUsers[userId];
+			m_peerUsers[userId]->Activate();
 		}
 	}
 

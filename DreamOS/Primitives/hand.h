@@ -102,7 +102,11 @@ public:
 		hand::HAND_TYPE handType;
 		point ptPalm;
 		quaternion qOrientation;
+
 		bool fOriented;
+		bool fSkeleton;
+		bool fTracked;
+
 		finger::FingerState fingerIndex;
 		finger::FingerState fingerMiddle;
 		finger::FingerState fingerRing;
@@ -128,11 +132,16 @@ public:
 
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	RESULT SetFromLeapHand(const Leap::Hand hand);
+	RESULT OnLostTrack();
 	RESULT SetHandType(hand::HAND_TYPE type);
 	RESULT SetHandState(const hand::HandState& pHandState);
 
 	RESULT SetOriented(bool attach);
 	bool IsOriented();
+	RESULT SetSkeleton(bool fSkeleton);
+	bool IsSkeleton();
+	bool IsTracked();
+	RESULT SetLocalOrientation(quaternion qRotation);
 
 	hand::HandState GetHandState();
 	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);
@@ -150,6 +159,13 @@ private:
 	std::shared_ptr<thumb> m_pThumb;
 
 	bool m_fOriented;
+	bool m_fSkeleton;
+
+	quaternion m_qRotation;
+
+	// this is a state of the hand to represent whether the hand is tracked or not.
+	// For example when using a leap motion, a hand is not tracked when it goes out of the sensor.
+	bool	m_fTracked;
 };
 
 #endif	// ! HAND_H_

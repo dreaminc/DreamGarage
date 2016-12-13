@@ -15,10 +15,13 @@
 
 #include "SenseDevice.h"
 #include "Primitives/Publisher.h"
+#include "Primitives/Subscriber.h"
+#include "DreamConsole/DreamConsole.h"
 
 #include "Primitives/valid.h"
 
 #include "Primitives/VirtualObj.h"
+#include "Primitives/composite.h"
 
 #include "SenseLeapMotionHand.h"
 
@@ -39,7 +42,7 @@ typedef struct SenseLeapMotionEvent : SenseDevice::SenseDeviceEvent {
 	}
 } SENSE_LEAPMOTION_EVENT;
 
-class SenseLeapMotion : public SenseDevice, public Publisher<int, SenseLeapMotionEvent>, public Leap::Listener, public valid {
+class SenseLeapMotion : public SenseDevice, public Publisher<int, SenseLeapMotionEvent>, public Subscriber<CmdPromptEvent>, public Leap::Listener, public valid {
 public:
 	SenseLeapMotion();
 	~SenseLeapMotion();
@@ -74,10 +77,22 @@ public:
 	*/
 
 	RESULT AttachHand(hand *pHand, hand::HAND_TYPE handType) {
+		pHand->SetVisible(false);
 		if(handType == hand::HAND_TYPE::HAND_LEFT)
 			m_pLeftHand = pHand;
 		else if (handType == hand::HAND_TYPE::HAND_RIGHT)
 			m_pRightHand = pHand;
+		else
+			return R_FAIL;
+
+		return R_PASS;
+	}
+
+	RESULT AttachModel(composite *pModel, hand::HAND_TYPE handType) {
+		if(handType == hand::HAND_TYPE::HAND_LEFT)
+			m_pLeftModel = pModel;
+		else if (handType == hand::HAND_TYPE::HAND_RIGHT)
+			m_pRightModel = pModel;
 		else
 			return R_FAIL;
 
@@ -99,6 +114,7 @@ public:
 
 private:
 	RESULT SetPause(bool fPauseState);
+	RESULT Notify(CmdPromptEvent *event);
 
 public:
 	RESULT Pause();
@@ -109,6 +125,9 @@ private:
 	//VirtualObj *m_pVirtualObj;	// temp
 	hand *m_pLeftHand;
 	hand *m_pRightHand;
+
+	composite *m_pLeftModel;
+	composite *m_pRightModel;
 };
 
 #endif // ! SENSE_LEAPMOTION_H_

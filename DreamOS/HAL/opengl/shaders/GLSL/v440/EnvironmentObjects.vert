@@ -29,6 +29,7 @@ out Data {
 	vec4 vertViewSpace;
 	mat3 TangentBitangentNormalMatrix;
 	vec3 vertTBNSpace;
+	float riverAnimationDisplacement;
 } DataOut;
 
 uniform vec4 u_vec4Eye;
@@ -37,6 +38,9 @@ uniform mat4 u_mat4View;
 uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
+
+uniform bool u_fRiverAnimation;
+uniform float u_time;
 
 // Light Structure
 struct Light {
@@ -60,6 +64,23 @@ layout(std140) uniform ub_Lights {
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 //mat4 g_mat4InvTransposeModel = transpose(inverse(u_mat4Model));
+
+vec4 RiverAnimation(vec4 position, vec4 vertWorldSpace) {
+	float arg = vertWorldSpace.x + vertWorldSpace.z + u_time;		
+	
+	float scale = 0.1f;
+	float displacement = scale * sin(arg);
+	///*
+	displacement += scale * sin(2.2f * arg + 5.52f);
+	displacement += scale * sin(2.9f * arg + 0.93f);
+	displacement += scale * sin(4.6f * arg + 8.94f);
+	displacement *= 0.25f;
+	displacement -= 0.1f;
+	DataOut.riverAnimationDisplacement = displacement;
+	//*/
+
+	return vec4(position.x, position.y + displacement, position.z, position.w);
+}
 
 void main(void) {	
 	vec4 vertWorldSpace = u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f);
@@ -100,6 +121,14 @@ void main(void) {
 	// Vert Color
 	DataOut.color = inV_vec4Color;
 
+
 	// Projected Vert Position
-	gl_Position = u_mat4ViewProjection * vertWorldSpace;
+	vec4 position = u_mat4ViewProjection * vertWorldSpace;
+
+	if (u_fRiverAnimation) {
+		gl_Position = RiverAnimation(position, vertWorldSpace);
+	} 
+	else {
+		gl_Position = position;
+	}
 }

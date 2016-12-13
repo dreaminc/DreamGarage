@@ -430,8 +430,33 @@ RESULT Windows64App::RegisterImpLeapMotionEvents() {
 	pLeftHand->SetOriented(true);
 	pRightHand->SetOriented(true);
 
+	composite* pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+	
+	composite* pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
+
+	std::shared_ptr<DimObj> pLeftModelSharedPtr(pLeftModel);
+	pLeftModelSharedPtr->SetVisible(true);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftModelSharedPtr);
+
+	std::shared_ptr<DimObj> pRightModelSharedPtr(pRightModel);
+	pRightModelSharedPtr->SetVisible(true);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightModelSharedPtr);
+
+
 	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
 	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
+
+	CR(m_pSenseLeapMotion->AttachModel(pLeftModel, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachModel(pRightModel, hand::HAND_RIGHT));
+
 
 Error:
 	return r;

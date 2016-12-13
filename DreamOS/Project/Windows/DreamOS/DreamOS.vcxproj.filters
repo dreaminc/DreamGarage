@@ -443,6 +443,9 @@
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp">
       <Filter>Cloud\User</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2077,7 +2080,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
       <Filter>Cloud\User</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
       <Filter>Cloud\Message</Filter>
     </ClInclude>

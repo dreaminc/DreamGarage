@@ -724,8 +724,17 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 		SetObjectUniforms(pDimObj);
 		SetMaterial(pDimObj->GetMaterial());
 		SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
-	
+		
+		std::function<RESULT(OGLProgram*, void*)> fnObjectCallback = nullptr;
+		if ((fnObjectCallback = pOGLObj->GetOGLProgramPreCallback()) != nullptr) {
+			CR(fnObjectCallback(this, nullptr));
+		}
+
 		CR(pOGLObj->Render());
+
+		if ((fnObjectCallback = pOGLObj->GetOGLProgramPostCallback()) != nullptr) {
+			CR(fnObjectCallback(this, nullptr));
+		}
 	}
 
 	if (pDimObj->HasChildren()) {
