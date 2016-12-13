@@ -443,11 +443,11 @@ RESULT Windows64App::RegisterImpLeapMotionEvents() {
 						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
 
 	std::shared_ptr<DimObj> pLeftModelSharedPtr(pLeftModel);
-	pLeftModelSharedPtr->SetVisible(false);
+	pLeftModelSharedPtr->SetVisible(true);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftModelSharedPtr);
 
 	std::shared_ptr<DimObj> pRightModelSharedPtr(pRightModel);
-	pRightModelSharedPtr->SetVisible(false);
+	pRightModelSharedPtr->SetVisible(true);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightModelSharedPtr);
 
 

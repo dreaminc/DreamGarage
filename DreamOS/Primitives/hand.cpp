@@ -210,7 +210,8 @@ RESULT hand::Initialize() {
 	m_fOriented = false;
 	m_fSkeleton = false;
 
-	m_qRotation = quaternion();
+	//m_qRotation = quaternion();
+	m_qRotation = GetOrientation();
 
 	m_fTracked = false;
 
@@ -242,6 +243,11 @@ bool hand::IsTracked() {
 
 RESULT hand::OnLostTrack() {
 	m_fTracked = false;
+	return R_PASS;
+}
+
+RESULT hand::SetLocalOrientation(quaternion qRotation) {
+	m_qRotation = qRotation;
 	return R_PASS;
 }
 

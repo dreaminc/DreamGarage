@@ -15,6 +15,14 @@
 
 class user : public composite {
 public:
+	typedef enum ControllerType {
+		LEAP_SKELETON,
+		LEAP_MODEL,
+		VIVE_MODEL,
+		CONTROLLER_INVALID
+	} CONTROLLER_TYPE;
+
+public:
 	user(HALImp* pHALImp);
 
 	RESULT Initialize();
@@ -22,6 +30,9 @@ public:
 	RESULT UpdateHand(const hand::HandState& pHandState);
 	RESULT UpdateMouth(float mouthScale);	// used for scaling the user mouth
 	RESULT SwitchHeadModel();
+	RESULT Activate(user::ControllerType type = user::ControllerType::CONTROLLER_INVALID);
+	std::shared_ptr<composite> GetHandModel(hand::HAND_TYPE type);
+	std::shared_ptr<composite> GetViveModel(hand::HAND_TYPE type);
 
 private:
 	//std::shared_ptr<composite> m_pHead;
