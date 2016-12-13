@@ -141,6 +141,7 @@ public:
 	RESULT SetSkeleton(bool fSkeleton);
 	bool IsSkeleton();
 	bool IsTracked();
+	RESULT SetLocalOrientation(quaternion qRotation);
 
 	hand::HandState GetHandState();
 	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);

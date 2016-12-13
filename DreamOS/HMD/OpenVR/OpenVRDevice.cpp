@@ -450,7 +450,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 						m_pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
 						m_pLeftHand->SetPosition(ptControllerPosition + setHandConstant);
-						m_pLeftHand->SetOrientation(qOrientation);
+						m_pLeftHand->SetLocalOrientation(qOrientation);
 							
 					}
 					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerModelRight != nullptr) {
@@ -459,7 +459,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 						m_pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
 						m_pRightHand->SetPosition(ptControllerPosition + setHandConstant);
-						m_pRightHand->SetOrientation(qOrientation);
+						m_pRightHand->SetLocalOrientation(qOrientation);
 					}
 
 				} break;

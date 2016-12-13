@@ -97,7 +97,10 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 				m_pLeftHand->SetFromLeapHand(hand);
 				m_pLeftModel->SetPosition(m_pLeftHand->GetHandState().ptPalm);
 				m_pLeftModel->SetOrientation(m_pLeftHand->GetHandState().qOrientation * baseLeft);
-				m_pLeftModel->SetVisible(true);
+
+				if (!m_pLeftHand->IsVisible() && m_pLeftHand->IsOriented())
+					m_pLeftModel->SetVisible(true);
+
 				fLeftHandTracked = true;
 			}
 		}
@@ -106,7 +109,9 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 				m_pRightHand->SetFromLeapHand(hand);
 				m_pRightModel->SetPosition(m_pRightHand->GetHandState().ptPalm);
 				m_pRightModel->SetOrientation(m_pRightHand->GetHandState().qOrientation * baseRight);
-				m_pRightModel->SetVisible(true);
+
+				if (!m_pRightHand->IsVisible() && m_pRightHand->IsOriented())
+					m_pRightModel->SetVisible(true);
 				fRightHandTracked = true;
 			}
 		}
@@ -129,6 +134,7 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 			m_pRightModel->SetVisible(false);
 		}
 	}
+
 }
 
 void SenseLeapMotion::onFocusGained(const Leap::Controller&) {
@@ -225,14 +231,23 @@ bool SenseLeapMotion::HasFocus() {
 RESULT SenseLeapMotion::Notify(CmdPromptEvent *event) {
 	RESULT r =  R_PASS;
 	if (event->GetArg(1).compare("swap") == 0) {
-		m_pLeftHand->SetVisible(!m_pLeftHand->IsVisible());
-		m_pRightHand->SetVisible(!m_pRightHand->IsVisible());
+		if (m_pLeftHand != nullptr) {
+			m_pLeftHand->SetVisible(!m_pLeftHand->IsVisible());
+			m_pLeftHand->SetSkeleton(m_pLeftHand->IsVisible());
+		}
+		if (m_pRightHand != nullptr) {
+			m_pRightHand->SetVisible(!m_pRightHand->IsVisible());
+			m_pRightHand->SetSkeleton(m_pRightHand->IsVisible());
+		}
+		//std::dynamic_pointer_cast<DimObj>(m_pLeftModel->GetChildren()[0])->SetVisible(!m_pLeftHand->IsVisible());
+		//std::dynamic_pointer_cast<DimObj>(m_pRightModel->GetChildren()[0])->SetVisible(!m_pRightHand->IsVisible());
+		
+		if (m_pLeftModel != nullptr)
+			m_pLeftModel->SetVisible(!m_pLeftHand->IsVisible());
 
-		std::dynamic_pointer_cast<DimObj>(m_pLeftModel->GetChildren()[0])->SetVisible(!m_pLeftHand->IsVisible());
-		std::dynamic_pointer_cast<DimObj>(m_pRightModel->GetChildren()[0])->SetVisible(!m_pRightHand->IsVisible());
+		if (m_pRightModel != nullptr)
+			m_pRightModel->SetVisible(!m_pRightHand->IsVisible());
 
-		m_pLeftHand->SetSkeleton(m_pLeftHand->IsVisible());
-		m_pRightHand->SetSkeleton(m_pRightHand->IsVisible());
 
 	}
 

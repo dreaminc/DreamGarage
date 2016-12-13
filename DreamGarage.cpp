@@ -584,7 +584,8 @@ user*	DreamGarage::ActivateUser(long userId) {
 		m_usersPool.pop_back();
 
 		if (m_peerUsers[userId] != nullptr) {
-			m_peerUsers[userId]->SetVisible(true);
+			user *u = m_peerUsers[userId];
+			m_peerUsers[userId]->Activate();
 		}
 	}
 
