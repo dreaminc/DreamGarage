@@ -178,6 +178,15 @@ hand::hand(HALImp* pHALImp) :
 	Initialize();
 }
 
+hand::hand(HALImp* pHALImp, DimObj* pParent) :
+	composite(pHALImp)
+{
+	if (pParent != nullptr) {
+		pParent->AddChild(std::shared_ptr<DimObj>(this));
+	}
+	Initialize();
+}
+
 RESULT hand::Initialize() {
 	RESULT r = R_PASS;
 

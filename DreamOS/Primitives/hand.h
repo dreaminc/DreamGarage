@@ -127,6 +127,7 @@ public:
 
 public:
 	hand(HALImp* pHALImp);
+	hand(HALImp* pHALImp, DimObj* pParent);
 
 	RESULT Initialize();
 

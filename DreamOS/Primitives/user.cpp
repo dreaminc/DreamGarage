@@ -69,6 +69,10 @@ RESULT user::Initialize() {
 						0.015f,
 						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
 
+	m_pViveLeftModel->SetVisible(false);
+	m_pViveRightModel->SetVisible(false);
+
+/*
 	m_pLeapLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
 						nullptr,
 						point(0.0f, 0.0f, 0.0f),
@@ -80,15 +84,13 @@ RESULT user::Initialize() {
 						point(0.0f, 0.0f, 0.0f),
 						0.015f,
 						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
-	
 	pHead->AddChild(m_pLeapLeftModel);
 	pHead->AddChild(m_pLeapRightModel);
 
-	m_pViveLeftModel->SetVisible(false);
-	m_pViveRightModel->SetVisible(false);
 
 	m_pLeapLeftModel->SetVisible(false);
 	m_pLeapRightModel->SetVisible(false);
+//*/	
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 
@@ -127,7 +129,7 @@ RESULT user::SwitchHeadModel() {
 Error:
 	return r;
 }
-
+/*
 std::shared_ptr<composite> user::GetHandModel(hand::HAND_TYPE type) {
 	if (type == hand::HAND_LEFT) {
 		return m_pLeapLeftModel;
@@ -137,6 +139,7 @@ std::shared_ptr<composite> user::GetHandModel(hand::HAND_TYPE type) {
 	}
 	return nullptr;
 }
+//*/
 
 std::shared_ptr<composite> user::GetViveModel(hand::HAND_TYPE type) {
 	if (type == hand::HAND_LEFT) {
@@ -156,13 +159,13 @@ RESULT user::Activate(user::CONTROLLER_TYPE type) {
 	m_pLeapLeftHand->SetVisible(setController);
 	m_pLeapRightHand->SetVisible(setController);
 
-	setController = (type == user::CONTROLLER_TYPE::LEAP_MODEL);
-	m_pViveLeftModel->SetVisible(setController);
-	m_pViveRightModel->SetVisible(setController);
+//	setController = (type == user::CONTROLLER_TYPE::LEAP_MODEL);
+//	m_pLeapLeftModel->SetVisible(setController);
+//	m_pLeapRightModel->SetVisible(setController);
 
 	setController = (type == user::CONTROLLER_TYPE::VIVE_MODEL);
-	m_pLeapLeftModel->SetVisible(setController);
-	m_pLeapRightModel->SetVisible(setController);
+	m_pViveLeftModel->SetVisible(setController);
+	m_pViveRightModel->SetVisible(setController);
 
 	return R_PASS;
 }
@@ -180,11 +183,11 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 	bool fModel = !pHandState.fSkeleton && pHandState.fTracked;
 
 	if (pHandState.handType == hand::HAND_LEFT && pHandState.fOriented) {
+		m_pLeapLeftHand->SetHandState(pHandState);
+/*
 		if (fHand != m_pLeapLeftHand->IsVisible()) {
 			m_pLeapLeftHand->SetVisible(fHand);
 		}
-		m_pLeapLeftHand->SetHandState(pHandState);
-
 		if (fModel != m_pLeapLeftModel->IsVisible()) {
 			m_pLeapLeftModel->SetVisible(fModel);
 		}
@@ -192,8 +195,11 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 
 		baseRight.Reverse();
 		m_pLeapLeftModel->SetOrientation(pHandState.qOrientation * baseRight);
+//*/
 	}
 	else if (pHandState.handType == hand::HAND_RIGHT && pHandState.fOriented) {
+		m_pLeapRightHand->SetHandState(pHandState);
+/*
 		if (fHand != m_pLeapRightHand->IsVisible()) {
 			m_pLeapRightHand->SetVisible(fHand);
 		}
@@ -205,6 +211,8 @@ RESULT user::UpdateHand(const hand::HandState& pHandState) {
 		m_pLeapRightModel->SetPosition(ptModel);
 
 		m_pLeapRightModel->SetOrientation(pHandState.qOrientation * baseRight);
+//*/
+
 	}
 	else if (pHandState.handType == hand::HAND_LEFT && !pHandState.fOriented) {
 		if (!m_pViveLeftModel->IsVisible())

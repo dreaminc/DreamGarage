@@ -31,7 +31,7 @@ public:
 	RESULT UpdateMouth(float mouthScale);	// used for scaling the user mouth
 	RESULT SwitchHeadModel();
 	RESULT Activate(user::ControllerType type = user::ControllerType::CONTROLLER_INVALID);
-	std::shared_ptr<composite> GetHandModel(hand::HAND_TYPE type);
+//	std::shared_ptr<composite> GetHandModel(hand::HAND_TYPE type);
 	std::shared_ptr<composite> GetViveModel(hand::HAND_TYPE type);
 
 private:
@@ -44,10 +44,10 @@ private:
 
 	std::shared_ptr<hand> m_pLeapLeftHand;
 	std::shared_ptr<hand> m_pLeapRightHand;
-
+	/*
 	std::shared_ptr<composite> m_pLeapLeftModel;
 	std::shared_ptr<composite> m_pLeapRightModel;
-
+//*/
 	std::shared_ptr<composite> m_pViveLeftModel;
 	std::shared_ptr<composite> m_pViveRightModel;
 
