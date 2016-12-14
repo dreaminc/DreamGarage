@@ -207,6 +207,26 @@ RESULT hand::Initialize() {
 
 	SetPosition(point(0.0f, 0.0f, -1.0f));
 
+	point ptModel = point(0.0f, 0.0f, 0.0f);
+	float scaleModel = 0.015f;
+	m_pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
+						nullptr,
+						ptModel,
+						scaleModel,
+						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+	
+	m_pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
+						nullptr,
+						ptModel,
+						scaleModel,
+						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
+
+	//m_pLeftModel->SetVisible(false);
+	//m_pRightModel->SetVisible(false);
+
+	m_qLeftModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI_2);
+	m_qRightModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
+	
 	m_fOriented = false;
 	m_fSkeleton = false;
 
@@ -243,6 +263,15 @@ bool hand::IsTracked() {
 
 RESULT hand::OnLostTrack() {
 	m_fTracked = false;
+	m_pLeftModel->SetVisible(m_fTracked);
+	m_pRightModel->SetVisible(m_fTracked);
+	
+	m_pPalm->SetVisible(m_fTracked);
+	m_pIndexFinger->SetVisible(m_fTracked);
+	m_pMiddleFinger->SetVisible(m_fTracked);
+	m_pRingFinger->SetVisible(m_fTracked);
+	m_pPinkyFinger->SetVisible(m_fTracked);
+	m_pThumb->SetVisible(m_fTracked);
 	return R_PASS;
 }
 
@@ -259,6 +288,7 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	m_handType = (hand.isLeft()) ? HAND_LEFT : HAND_RIGHT;
 	//m_leapHandID = hand.id();
 
+	// update skeleton
 	Leap::Vector leapPalmPosition = hand.palmPosition();
 	leapPalmPosition /= 1000.0f;	// Leap outputs in mm, and our engine is in meters
 	point ptPalmPosition = point(leapPalmPosition.x, leapPalmPosition.z, leapPalmPosition.y);
@@ -314,13 +344,38 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 			pFinger->SetJointPosition(ptPosition, (finger::JOINT_TYPE)(jt));
 		}
 	}
+
+	// update model
+	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_INVALID : m_handType;
+	SetHandModel(modelType);
+	m_pLeftModel->SetOrientation(m_qRotation * m_qLeftModel);
+	m_pRightModel->SetOrientation(m_qRotation * m_qRightModel);
 	
 //Error:
 	return r;
 }
 
-RESULT hand::SetHandType(hand::HAND_TYPE type) {
-	m_handType = type;
+RESULT hand::SetHandModel(hand::HAND_TYPE type) {
+	//SetVisible();
+	m_pLeftModel->SetVisible(type == hand::HAND_TYPE::HAND_LEFT);
+	m_pRightModel->SetVisible(type == hand::HAND_TYPE::HAND_RIGHT);
+	
+	bool showSkeleton = type == hand::HAND_TYPE::HAND_INVALID;
+	m_pPalm->SetVisible(showSkeleton);
+	m_pIndexFinger->SetVisible(showSkeleton);
+	m_pMiddleFinger->SetVisible(showSkeleton);
+	m_pRingFinger->SetVisible(showSkeleton);
+	m_pPinkyFinger->SetVisible(showSkeleton);
+	m_pThumb->SetVisible(showSkeleton);
+
+	return R_PASS;
+}
+
+RESULT hand::ToggleRenderType() {
+	m_fSkeleton = !m_fSkeleton;
+	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_INVALID : m_handType;
+	SetHandModel(modelType);
+
 	return R_PASS;
 }
 
@@ -332,6 +387,10 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	point pt = pHandState.ptPalm - point(0.0f, 0.0f, 0.25f);
 	SetPosition(pt);
 	//SetOrientation(pHandState.qOrientation);
+
+	m_handType = pHandState.handType;
+	hand::HandType modelType = (pHandState.fSkeleton) ? hand::HandType::HAND_INVALID : m_handType;
+	SetHandModel(modelType);
 
 	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
 	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);

@@ -77,7 +77,7 @@ public:
 	*/
 
 	RESULT AttachHand(hand *pHand, hand::HAND_TYPE handType) {
-		pHand->SetVisible(false);
+		//pHand->SetVisible(false);
 		if(handType == hand::HAND_TYPE::HAND_LEFT)
 			m_pLeftHand = pHand;
 		else if (handType == hand::HAND_TYPE::HAND_RIGHT)

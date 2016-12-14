@@ -133,7 +133,6 @@ public:
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	RESULT SetFromLeapHand(const Leap::Hand hand);
 	RESULT OnLostTrack();
-	RESULT SetHandType(hand::HAND_TYPE type);
 	RESULT SetHandState(const hand::HandState& pHandState);
 
 	RESULT SetOriented(bool attach);
@@ -145,9 +144,19 @@ public:
 
 	hand::HandState GetHandState();
 	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);
+	RESULT ToggleRenderType();
 
 private:
+
+	RESULT SetHandModel(hand::HAND_TYPE type);
+
 	HAND_TYPE m_handType;
+
+	std::shared_ptr<composite> m_pLeftModel;
+	std::shared_ptr<composite> m_pRightModel;
+
+	quaternion m_qLeftModel;
+	quaternion m_qRightModel;
 
 	std::shared_ptr<sphere> m_pPalm;
 
