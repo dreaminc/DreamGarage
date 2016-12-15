@@ -317,6 +317,10 @@ bool camera::IsAllowedMoveByKeys() {
 RESULT camera::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("move : toggle move around using key / mouse");
+	}
+
 	if (event->GetArg(1).compare("move") == 0) {
 		m_allowMoveByKeys = !m_allowMoveByKeys;
 		HUD_OUT((std::string("allow move by keys <- ") + ((m_allowMoveByKeys) ? "on" : "off")).c_str());

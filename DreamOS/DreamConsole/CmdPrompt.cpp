@@ -30,11 +30,19 @@ void CmdPrompt::Init()
 	}
 
 	m_isInit = true;
+
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Cmd, this);
 }
 
 RESULT CmdPrompt::RegisterMethod(CmdPrompt::method method, Subscriber<CmdPromptEvent>* pSubscriber)
 {
-	return RegisterSubscriber(methodDictionary.at(method), pSubscriber);
+	RESULT r = RegisterSubscriber(methodDictionary.at(method), pSubscriber);
+
+	if (r == R_PASS) {
+		m_registeredCommands.push_back(methodDictionary.at(method));
+	}
+
+	return r;
 }
 
 RESULT CmdPrompt::Execute(const std::string& command)
@@ -56,4 +64,17 @@ RESULT CmdPrompt::Execute(const std::string& command)
 
 const std::string& CmdPrompt::GetLastCommand() {
 	return m_lastExecutedCommand;
+}
+
+RESULT CmdPrompt::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("list") == 0) {
+		// list of registered commands
+		for (auto& cmd : m_registeredCommands) {
+			HUD_OUT(cmd.c_str());
+		}
+	}
+
+	return r;
 }

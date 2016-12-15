@@ -34,9 +34,10 @@ typedef struct CmdPromptEvent {
 	std::vector<std::string>	m_args;
 } CMD_PROMPT_EVENT;
 
-class CmdPrompt : public valid, public Publisher<std::string, CmdPromptEvent> {
+class CmdPrompt : public valid, public Publisher<std::string, CmdPromptEvent>, public Subscriber<CmdPromptEvent> {
 public:
 	enum class method {
+		Cmd,
 		DreamApp,
 		DreamConsole,
 		CloudController,
@@ -47,6 +48,7 @@ public:
 
 private:
 	const std::map<method, std::string> methodDictionary {
+		{ method::Cmd, "cmd" },
 		{ method::DreamApp, "app"},
 		{ method::DreamConsole, "console" },
 		{ method::CloudController, "cloud" },
@@ -72,6 +74,8 @@ public:
 
 	const std::string& GetLastCommand();
 
+	RESULT Notify(CmdPromptEvent *event);
+
 private:
 	void	Init();
 
@@ -79,6 +83,8 @@ private:
 	bool	m_isInit = false;
 
 	std::string	m_lastExecutedCommand;
+
+	std::vector<std::string> m_registeredCommands;
 };
 
 

@@ -230,6 +230,11 @@ bool SenseLeapMotion::HasFocus() {
 
 RESULT SenseLeapMotion::Notify(CmdPromptEvent *event) {
 	RESULT r =  R_PASS;
+
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("swap : toggle leap motion skeleton hands / hand model");
+	}
+
 	if (event->GetArg(1).compare("swap") == 0) {
 		if (m_pLeftHand != nullptr) {
 			m_pLeftHand->SetVisible(!m_pLeftHand->IsVisible());

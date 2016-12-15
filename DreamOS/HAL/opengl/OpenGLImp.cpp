@@ -1584,6 +1584,10 @@ Error:
 RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("wire : toggle wireframe on / off");
+	}
+
 	if (event->GetArg(1).compare("wire") == 0) {
 		m_drawWireframe = !m_drawWireframe;
 	}

@@ -166,6 +166,10 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 RESULT DreamConsole::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("graph fps/off : show / hide fps graph");
+	}
+
 	if (event->GetArg(1).compare("graph") == 0) {
 		if (event->GetArg(2).compare("fps") == 0) {
 			m_configuration.graph = GraphConfiguration::FPS;

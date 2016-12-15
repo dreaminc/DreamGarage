@@ -677,6 +677,11 @@ Error:
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("login : login to Dream");
+		HUD_OUT("msg <msg> : broadcast a text msg, <msg>, to connected users");
+	}
+
 	if (event->GetArg(1).compare("login") == 0) {
 		//
 		Start();
