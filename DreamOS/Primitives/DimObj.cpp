@@ -239,6 +239,16 @@ RESULT DimObj::SetParent(DimObj* pParent) {
 	return R_PASS;
 }
 
+bool DimObj::HasParent() {
+	return (m_pParent != nullptr);
+}
+
+bool DimObj::CompareParent(DimObj* pParent) {
+	if (m_pParent == nullptr)
+		return false;
+	return pParent == m_pParent;
+}
+
 // This assumes the other vertices have a valid position and uv mapping
 // This will set the tangents/bi-tangents for all three vertices
 // Source: http://learnopengl.com/#!Advanced-Lighting/Normal-Mapping

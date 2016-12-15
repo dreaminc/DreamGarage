@@ -187,6 +187,15 @@ hand::hand(HALImp* pHALImp, DimObj* pParent) :
 	Initialize();
 }
 
+RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState) {
+
+	//if (pParent != nullptr && !HasParent() && m_fOriented) {
+	if (!CompareParent(pParent.get()) && pHandState.fOriented)
+		pParent->AddChild(std::shared_ptr<DimObj>(this));
+	//}
+	return R_PASS;
+}
+
 RESULT hand::Initialize() {
 	RESULT r = R_PASS;
 
@@ -243,13 +252,15 @@ RESULT hand::Initialize() {
 	m_qRotation = GetOrientation();
 
 	m_fTracked = false;
+	//Start all visibility at false
+	OnLostTrack();
 
 //Error:
 	return r;
 }
 
-RESULT hand::SetOriented(bool attach) {
-	m_fOriented = attach;
+RESULT hand::SetOriented(bool fOriented) {
+	m_fOriented = fOriented;
 	return R_PASS;
 }
 
@@ -264,6 +275,11 @@ RESULT hand::SetSkeleton(bool fSkeleton) {
 
 bool hand::IsSkeleton() {
 	return m_fSkeleton;
+}
+
+RESULT hand::SetTracked(bool fTracked) {
+	m_fTracked = fTracked;
+	return R_PASS;
 }
 
 bool hand::IsTracked() {
@@ -365,7 +381,7 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 }
 
 RESULT hand::SetHandModel(hand::HAND_TYPE type) {
-	//SetVisible();
+	SetVisible();
 	m_pLeftModel->SetVisible(type == hand::HAND_TYPE::HAND_LEFT);
 	m_pRightModel->SetVisible(type == hand::HAND_TYPE::HAND_RIGHT);
 	
@@ -391,8 +407,6 @@ RESULT hand::ToggleRenderType() {
 RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
-	m_fTracked = true;
-
 	point pt = pHandState.ptPalm - point(0.0f, 0.0f, 0.25f);
 	SetPosition(pt);
 	//SetOrientation(pHandState.qOrientation);
@@ -401,11 +415,29 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	hand::HandType modelType = (pHandState.fSkeleton) ? hand::HandType::HAND_INVALID : m_handType;
 	SetHandModel(modelType);
 
+	m_fTracked = pHandState.fTracked;
+	//m_fOriented = pHandState.fOriented;
+	//*
+	if (!m_fTracked)// && pHandState.fOriented)
+		OnLostTrack();
+	//*/
+
 	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
 	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);
 	m_pRingFinger->SetFingerState(pHandState.fingerRing);
 	m_pPinkyFinger->SetFingerState(pHandState.fingerPinky);
 	m_pThumb->SetThumbState(pHandState.thumb);
+	
+//*
+	if (pHandState.fOriented) {
+		m_pLeftModel->SetOrientation(pHandState.qOrientation * m_qLeftModel);
+		m_pRightModel->SetOrientation(pHandState.qOrientation * m_qRightModel);
+	}
+	else {
+		m_pLeftModel->SetOrientation(pHandState.qOrientation);
+		m_pRightModel->SetOrientation(pHandState.qOrientation);
+	}
+	//*/
 
 //Error:
 	return r;

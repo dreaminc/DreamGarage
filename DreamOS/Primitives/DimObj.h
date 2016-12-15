@@ -120,6 +120,9 @@ public:
 	RESULT AddChild(std::shared_ptr<DimObj> pDimObj);
 	RESULT ClearChildren();
 	bool HasChildren();
+	bool HasParent();
+	bool CompareParent(DimObj* pParent);
+
 	std::vector<std::shared_ptr<VirtualObj>> GetChildren();
 
 protected:
