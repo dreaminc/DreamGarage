@@ -1,3 +1,4 @@
+#include "easylogging++.h"
 #include "Console.h"
 #include "ProfilerGraph.h"
 
@@ -144,7 +145,13 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 					} break;
 					default: {
 						std::locale	loc;
-						m_cmdText.append(std::string("") + std::tolower(static_cast<char>(keyCode), loc));
+						
+						if (std::use_facet<std::ctype<char>>(loc).is(std::ctype<char>::alpha, static_cast<char>(keyCode))) {
+							m_cmdText.append(std::string("") + std::tolower(static_cast<char>(keyCode), loc));
+						}
+						else if ((keyCode == VK_SPACE) || (static_cast<char>(keyCode) >= '0' && static_cast<char>(keyCode) <= '9')) {
+							m_cmdText.append(std::string("") + static_cast<char>(keyCode));
+						}
 					} break;
 					}
 				}
