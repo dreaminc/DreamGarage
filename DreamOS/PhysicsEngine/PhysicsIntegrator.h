@@ -11,6 +11,10 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
 
+#include "ForceGenerator.h"
+#include <list>
+#include <memory>
+
 #define MINIMUM_TIME_STEP 5
 #define DEFUALT_TIMESTEP_MS 20
 #define DEFAULT_GRAVITY_ACCEL -9.8f
@@ -29,6 +33,10 @@ protected:
 	RESULT SetPhysicsStore(ObjectStore *pObjectStore);
 	RESULT SetTimeStep(double msTimeStep);
 
+protected:
+	RESULT AddGlobalForceGenerator(std::unique_ptr<ForceGenerator> pForceGenerator);
+	RESULT ClearForceGenerators();
+
 private:
 	ObjectStore *m_pPhysicsObjectStore;		
 
@@ -37,6 +45,9 @@ private:
 
 	double m_sTimeStep = 0.010f;		// time step in seconds 
 	double m_elapsedTime;
+
+	// Add force generators 
+	std::list<std::unique_ptr<ForceGenerator>> m_globalForceGenerators;
 
 private:
 	UID m_uid;

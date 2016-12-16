@@ -506,6 +506,12 @@
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp">
       <Filter>PhysicsEngine</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2187,6 +2193,15 @@
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
   </ItemGroup>

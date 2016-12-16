@@ -1,6 +1,7 @@
 #include "PhysicsIntegrator.h"
 
 #include "Scene/ObjectStore.h"
+#include "ForceGeneratorFactory.h"
 
 PhysicsIntegrator::PhysicsIntegrator() :
 	m_pPhysicsObjectStore(nullptr)
@@ -8,6 +9,8 @@ PhysicsIntegrator::PhysicsIntegrator() :
 	// empty
 }
 
+
+// This actually integrates the time step
 RESULT PhysicsIntegrator::Update() {
 	RESULT r = R_PASS;
 
@@ -55,7 +58,10 @@ RESULT PhysicsIntegrator::Initialize() {
 
 	m_lastUpdateTime = std::chrono::high_resolution_clock::now();
 
-//Error:
+	// Set up Gravity by default
+	CR(AddGlobalForceGenerator(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY)));
+
+Error:
 	return r;
 }
 
@@ -69,6 +75,21 @@ RESULT PhysicsIntegrator::SetTimeStep(double msTimeStep) {
 
 Error:
 	return r;
+}
+
+RESULT PhysicsIntegrator::AddGlobalForceGenerator(std::unique_ptr<ForceGenerator> pForceGenerator) {
+	RESULT r = R_SUCCESS;
+
+	m_globalForceGenerators.push_back(std::move(pForceGenerator));
+	CB((pForceGenerator == nullptr));
+
+Error:
+	return r;
+}
+
+RESULT PhysicsIntegrator::ClearForceGenerators() {
+	m_globalForceGenerators.clear();
+	return R_SUCCESS;
 }
 
 RESULT PhysicsIntegrator::SetPhysicsStore(ObjectStore *pObjectStore) {

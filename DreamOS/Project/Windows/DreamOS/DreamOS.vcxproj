@@ -343,6 +343,8 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
@@ -692,6 +694,9 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingBox.h" />
