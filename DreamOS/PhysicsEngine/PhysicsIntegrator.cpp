@@ -32,15 +32,15 @@ RESULT PhysicsIntegrator::Update() {
 
 			// Euler Integration 
 			// TODO: switch to RK4)
-			vector vPositionInc = static_cast<float>(m_sTimeStep) * (pVirtualObj->m_vVelocity);
-			vector vAccelInc = static_cast<float>(m_sTimeStep) * (pVirtualObj->m_vAcceleration);
+			vector vPositionInc = static_cast<float>(m_sTimeStep) * (pVirtualObj->GetState().GetVelocity());
+			vector vAccelInc = static_cast<float>(m_sTimeStep) * (pVirtualObj->GetState().GetAcceleration());
 
 			// TODO: Legitimize gravity force generator later
 			// TODO: Add drag too
 			vAccelInc += static_cast<float>(m_sTimeStep) * (vector(0.0f, DEFAULT_GRAVITY_ACCEL, 0.0f));
 
-			point ptNewPosition = pVirtualObj->m_ptOrigin + vPositionInc;
-			vector vNewVelocity = pVirtualObj->m_vVelocity + vAccelInc;
+			point ptNewPosition = pVirtualObj->GetState().GetOrigin() + vPositionInc;
+			vector vNewVelocity = pVirtualObj->GetState().GetVelocity() + vAccelInc;
 
 			pVirtualObj->SetPosition(ptNewPosition);
 			pVirtualObj->SetVelocity(vNewVelocity);

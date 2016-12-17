@@ -72,7 +72,7 @@ RESULT sphere::UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere, bool fT
 		CR(SetSphereVertices(pBoundingSphere, fTriangleBased));
 	}
 
-	m_ptOrigin = pBoundingSphere->GetOrigin();
+	SetOrigin(pBoundingSphere->GetOrigin());
 
 Error:
 	return r;
@@ -83,7 +83,7 @@ RESULT sphere::SetSphereVertices(BoundingSphere* pBoundingSphere, bool fTriangle
 	RESULT r = R_PASS;
 
 	m_radius = pBoundingSphere->GetRadius();
-	m_ptOrigin = pBoundingSphere->GetOrigin();
+	SetOrigin(pBoundingSphere->GetOrigin());
 
 	//CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions, pBoundingSphere->GetOrigin()));
 	CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions));

@@ -35,15 +35,40 @@ public:
 	friend class PhysicsIntegrator;		// TODO: move physics stuff into state/derivative for RK4
 
 protected:
-	point m_ptOrigin;			// Origin			(P)
-	vector m_vVelocity;			// Velocity			(dP/dT)
-	vector m_vAcceleration;		// Acceleration		(dV/dT)
+	// TODO: Move to another file?
+	class state {
+		friend class VirtualObj;
+	protected:
+		state() : m_ptOrigin(), m_vVelocity(), m_vAcceleration(), m_qRotation(), m_qAngularMomentum()
+		{ /*empty*/}
+
+		state(point ptOrigin) : m_ptOrigin(ptOrigin), m_vVelocity(), m_vAcceleration(), m_qRotation(), m_qAngularMomentum()
+		{ /*empty*/}
+
+		point m_ptOrigin;					// Origin			
+		vector m_vVelocity;					// Velocity			
+		vector m_vAcceleration;				// Acceleration		
+		quaternion m_qRotation;				// Rotation
+		quaternion m_qAngularMomentum;		// Angular Momentum
+
+	public:
+		point GetOrigin() { return m_ptOrigin; }
+		vector GetVelocity() { return m_vVelocity; }
+		vector GetAcceleration() { return m_vAcceleration; }
+		quaternion GetRotation() { return m_qRotation; }
+		quaternion GetAngularMoment() { return m_qAngularMomentum; }
+	} m_state;
+
+	class derivative {
+		vector m_vRateOfChangeOrigin;			// Rate of change of origin			
+		vector m_vRateOfChangeVelocity;			// Rate of change of Velocity			
+		vector m_vRateOfChangeAcceleration;		// Rate of change ofAcceleration		
+		quaternion m_qRateOfChangeRotation;					// Rate of change of Rotation
+		quaternion m_qRateOfChangeAngularMomentum;			// Rate of change of Angular Momentum
+	} m_derivative;
+
 	double m_kgMass;				// Mass (kg)
-
-	vector m_vScale;			// Scale
-
-	quaternion m_qRotation;				// Rotation
-	quaternion m_qAngularMomentum;		// Angular Momentum
+	vector m_vScale;				// Scale vector
 
 	// The pivot point
 	point m_ptPivot;
@@ -57,6 +82,14 @@ public:
 		return OBJECT_VIRTUAL;
 	}
 
+	// State
+	VirtualObj::state GetState();
+	RESULT SetState(VirtualObj::state virtualObjState);
+
+	// Derivative
+	VirtualObj::derivative GetDerivative();
+	RESULT SetDerivative(VirtualObj::derivative virtualObjDerivative);
+
 	// Position
 	virtual point GetOrigin();
 	virtual point GetPosition();
@@ -67,6 +100,7 @@ public:
 	VirtualObj* translateY(point_precision y);
 	VirtualObj* translateZ(point_precision z);
 
+	VirtualObj* SetOrigin(point p);
 	VirtualObj* SetPosition(point p);
 	VirtualObj* MoveTo(point p);
 	VirtualObj* MoveTo(point_precision x, point_precision y, point_precision z);
@@ -79,6 +113,7 @@ public:
 
 	// Rotation
 	VirtualObj* RotateBy(quaternion q);
+	VirtualObj* RotateBy(vector v, quaternion_precision theta);
 	VirtualObj* RotateBy(quaternion_precision thetaX, quaternion_precision thetaY, quaternion_precision thetaZ);
 	VirtualObj* RotateXBy(quaternion_precision deg);
 	VirtualObj* RotateYBy(quaternion_precision deg);

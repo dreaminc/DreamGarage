@@ -71,12 +71,12 @@ RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBa
 
 	if (pBoundingBox->GetBoxType() == BoundingBox::Type::AABB) {
 		CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
-		m_ptOrigin = pBoundingBox->GetOrigin();
+		SetOrigin(pBoundingBox->GetOrigin());
 	}
 	else if (pBoundingBox->GetBoxType() == BoundingBox::Type::OBB) {
 		//m_ptOrigin = RotationMatrix(pBoundingBox->GetOrientation()) * vector(pBoundingBox->GetBoundingVolumeOrigin());
-		m_ptOrigin = pBoundingBox->GetOrigin();
-		m_qRotation = pBoundingBox->GetOrientation();
+		SetOrigin(pBoundingBox->GetOrigin());
+		SetOrientation(pBoundingBox->GetOrientation());
 	}
 
 Error:

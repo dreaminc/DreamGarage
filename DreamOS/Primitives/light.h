@@ -68,7 +68,7 @@ public:
 			matVP = ProjectionMatrix(width, height, nearPlane, farPlane, m_spotAngle);
 		}
 
-		matVP = matVP * RotationMatrix(m_vectorDirection, vector::jVector(1.0f)) * TranslationMatrix(m_ptOrigin);
+		matVP = matVP * RotationMatrix(m_vectorDirection, vector::jVector(1.0f)) * TranslationMatrix(GetOrigin());
 
 		return matVP;
 	}
