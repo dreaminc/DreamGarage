@@ -38,13 +38,16 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// Check if Dream is launching from a web browser url.
 	// a url command from a webpage, to trigger the launch of Dream, woud start with 'dreamos:run' command line.
 	// The following code splites the whitespaces of a single command line param in that case, into a list of commad line arguments.
-	if ((argc > 1) && (std::string(argv[1]).substr(0, 11).compare("dreamos:run") == 0)) {
+	if ((argc > 1) && 
+		((std::string(argv[1]).substr(0, 11).compare("dreamos:run") == 0) ||
+		 (std::string(argv[1]).substr(0, 14).compare("dreamosdev:run") == 0))) {
 		//  Dream is launching from a webpage
 		
 		LOG(INFO) << "Dream runs from a webpage ";
 
 		// decide if to split args or not
-		if (std::string(argv[1]).compare("dreamos:run") != 0) {
+		if ((std::string(argv[1]).compare("dreamos:run") != 0) &&
+			(std::string(argv[1]).compare("dreamosdev:run") != 0)) {
 			std::vector<std::string> args{ argv[0] };
 			int new_argc = 1;
 

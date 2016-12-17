@@ -34,23 +34,29 @@ typedef struct CmdPromptEvent {
 	std::vector<std::string>	m_args;
 } CMD_PROMPT_EVENT;
 
-class CmdPrompt : public valid, public Publisher<std::string, CmdPromptEvent> {
+class CmdPrompt : public valid, public Publisher<std::string, CmdPromptEvent>, public Subscriber<CmdPromptEvent> {
 public:
 	enum class method {
+		Cmd,
 		DreamApp,
 		DreamConsole,
 		CloudController,
 		OpenGL,		// should be renamed to HAL / HALImp
+		Camera,
+		Leap,
 		Sandbox,
 		Invalid
 	};
 
 private:
 	const std::map<method, std::string> methodDictionary {
+		{ method::Cmd, "cmd" },
 		{ method::DreamApp, "app"},
 		{ method::DreamConsole, "console" },
 		{ method::CloudController, "cloud" },
 		{ method::OpenGL, "ogl" },
+		{ method::Camera, "cam" }, 
+		{ method::Leap, "leap"},
 		{ method::Sandbox, "sandbox" }
 	};
 
@@ -71,12 +77,16 @@ public:
 
 	const std::string& GetLastCommand();
 
+	RESULT Notify(CmdPromptEvent *event);
+
 private:
 	RESULT Initialize();
 
 private:
 	bool m_fInit = false;
 	std::string	m_strLastExecutedCommand;
+	
+	std::vector<std::string> m_registeredCommands;
 };
 
 

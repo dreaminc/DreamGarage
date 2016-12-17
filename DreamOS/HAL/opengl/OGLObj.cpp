@@ -6,7 +6,9 @@
 
 OGLObj::OGLObj(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
-	m_pOGLBoundingVolume(nullptr)
+	m_pOGLBoundingVolume(nullptr),
+	m_fnOGLProgramPreCallback(nullptr),
+	m_fnOGLProgramPostCallback(nullptr)
 {
 	/* empty stub */
 }
@@ -57,6 +59,7 @@ RESULT OGLObj::OGLInitialize() {
 	CR(m_pParentImp->MakeCurrentContext());
 
 	// Set up the Vertex Array Object (VAO)
+	
 	// TODO: Do we need to do this only one time?
 	CR(m_pParentImp->glGenVertexArrays(1, &m_hVAO));
 	CR(m_pParentImp->glBindVertexArray(m_hVAO));
@@ -129,6 +132,7 @@ RESULT OGLObj::UpdateOGLBuffers() {
 	CNM(pDimObj, "Failed to acquire Dimension Object");
 
 	//CR(m_pParentImp->MakeCurrentContext());
+
 	CR(m_pParentImp->glBindVertexArray(m_hVAO));
 	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
@@ -180,6 +184,8 @@ RESULT OGLObj::Render() {
 		}
 	}
 
+	//glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+	//glDrawElements(GL_LINES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 	//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
 
 Error:
@@ -282,4 +288,22 @@ OGLTexture* OGLObj::GetTextureSpecular() {
 
 OGLObj *OGLObj::GetOGLBoundingVolume() {
 	return m_pOGLBoundingVolume;
+}
+
+RESULT OGLObj::SetOGLProgramPreCallback(std::function<RESULT(OGLProgram*, void*)> fnOGLProgramPreCallback) {
+	m_fnOGLProgramPreCallback = fnOGLProgramPreCallback;
+	return R_PASS;
+}
+
+std::function<RESULT(OGLProgram*, void*)> OGLObj::GetOGLProgramPreCallback() {
+	return m_fnOGLProgramPreCallback;
+}
+
+RESULT OGLObj::SetOGLProgramPostCallback(std::function<RESULT(OGLProgram*, void*)> fnOGLProgramPostCallback) {
+	m_fnOGLProgramPostCallback = fnOGLProgramPostCallback;
+	return R_PASS;
+}
+
+std::function<RESULT(OGLProgram*, void*)> OGLObj::GetOGLProgramPostCallback() {
+	return m_fnOGLProgramPostCallback;
 }

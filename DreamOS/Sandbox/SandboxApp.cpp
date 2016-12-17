@@ -5,6 +5,8 @@
 
 #include "Primitives/ray.h"
 
+#include <HMD/OpenVR/OpenVRDevice.h>
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -202,18 +204,85 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 
 	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-
+	
 	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
 
 	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
 
+	pLeftHand->SetOriented(true);
+	pRightHand->SetOriented(true);
+
+	composite* pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+	
+	composite* pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
+
+	std::shared_ptr<DimObj> pLeftModelSharedPtr(pLeftModel);
+	pLeftModelSharedPtr->SetVisible(true);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftModelSharedPtr);
+
+	std::shared_ptr<DimObj> pRightModelSharedPtr(pRightModel);
+	pRightModelSharedPtr->SetVisible(true);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightModelSharedPtr);
+
+
 	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
 	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
 
+	CR(m_pSenseLeapMotion->AttachModel(pLeftModel, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachModel(pRightModel, hand::HAND_RIGHT));
+
+
 Error:
 	return r;
+}
+
+RESULT SandboxApp::RegisterImpViveControllerEvents() {
+	RESULT r = R_PASS;
+
+	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
+
+	if (pVive) {
+		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+/*
+		std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
+		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
+
+		std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
+		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
+//*/
+		pLeftHand->SetOriented(false);
+		pRightHand->SetOriented(false);
+
+		pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
+		pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
+		CR(pVive->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
+		CR(pVive->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
+	}
+Error:
+	return r;
+}
+
+//hand *Windows64App::AttachHand
+
+hand* SandboxApp::GetHand(hand::HAND_TYPE handType) {
+	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
+
+	if (pVive != nullptr) {
+		return pVive->GetHand(handType);
+	}
+	
+	return m_pSenseLeapMotion->GetHand(handType);
 }
 
 inline PathManager* SandboxApp::GetPathManager() {
@@ -319,16 +388,26 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	//CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "http://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
 	//CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "ws://ec2-54-175-210-194.compute-1.amazonaws.com:8000"));
 
+	CR(m_pCommandLineManager->RegisterParameter("www.ip", "www.ip", "https://www.develop.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("api.ip", "api.ip", "https://api.develop.dreamos.com:443"));
 	CR(m_pCommandLineManager->RegisterParameter("ws.ip", "ws.ip", "wss://ws.develop.dreamos.com:443"));
+	CR(m_pCommandLineManager->RegisterParameter("otk.id", "otk.id", "INVALIDONETIMEKEY"));
 
 	CR(m_pCommandLineManager->RegisterParameter("username", "u", "DefaultTestUser@dreamos.com"));
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "nightmare"));
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
+	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
+
+	// This can attempt to connect to a given environment
+	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
 
 	// For auto login, use '-l auto'
+#if defined(_USE_TEST_APP) || defined(_UNIT_TESTING)
 	CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
-
+#else
+	CR(m_pCommandLineManager->RegisterParameter("login", "l", "auto"));
+#endif
+	
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
@@ -347,6 +426,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
 
 	m_fCheckHMD = (m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0);
+	m_fCheckLeap = (m_pCommandLineManager->GetParameterValue("leap").compare("") == 0);
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
@@ -725,11 +805,6 @@ point SandboxApp::GetCameraPosition() {
 
 quaternion SandboxApp::GetCameraOrientation() {
 	return m_pHALImp->GetCamera()->GetWorldOrientation();
-}
-
-// TODO: This should move up to Sandbox
-hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
-	return m_pSenseLeapMotion->GetHand(handType);
 }
 
 // Cloud Controller

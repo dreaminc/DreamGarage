@@ -13,6 +13,9 @@ light *g_pLight2 = nullptr;
 #include "Cloud/Message/UpdateHandMessage.h"
 #include "Cloud/Message/AudioDataMessage.h"
 
+#include "HAL/opengl/OGLObj.h"
+#include "HAL/opengl/OGLProgramEnvironmentObjects.h"
+
 // TODO: Should this go into the DreamOS side?
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 	RESULT r = R_PASS;
@@ -48,27 +51,75 @@ RESULT DreamGarage::LoadScene() {
 	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
-
+	
 	for (auto x : std::array<int, 8>()) {
 		user* pNewUser = AddUser();
 		pNewUser->SetVisible(false);
 		m_usersPool.push_back(pNewUser);
 	}
-
+	
 	AddSkybox();
 
-	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
+	g_pLight2 = AddLight(LIGHT_DIRECITONAL, 2.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f));
 	g_pLight2->EnableShadows();
 
-	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
-	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
-	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
-	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.3f, -1.0f, 0.2f));
+	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
+	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.5f, -1.0f, 0));
 	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
-	AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
+	auto *pVolume = AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
+
+	point sceneOffset = point(90, -5, -25);
+	float sceneScale = 0.1f;
+	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+
+	AddModel(L"\\Models\\FloatingIsland\\env.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+	composite* pRiver = AddModel(L"\\Models\\FloatingIsland\\river.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+	AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+
+	std::shared_ptr<OGLObj> pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
+	if (pOGLObj != nullptr) {
+		pOGLObj->SetOGLProgramPreCallback(
+			[](OGLProgram* pOGLProgram, void *pContext) {
+				// Do some stuff pre
+				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				if (pOGLEnvironmentProgram != nullptr) {
+					pOGLEnvironmentProgram->SetRiverAnimation(true);
+				}
+				return R_PASS;
+			}
+		);
+
+		pOGLObj->SetOGLProgramPostCallback(
+			[](OGLProgram* pOGLProgram, void *pContext) {
+				// Do some stuff post
+			
+				OGLProgramEnvironmentObjects *pOGLEnvironmentProgram = dynamic_cast<OGLProgramEnvironmentObjects*>(pOGLProgram);
+				if (pOGLEnvironmentProgram != nullptr) {
+					pOGLEnvironmentProgram->SetRiverAnimation(false);
+				}
+				//*/
+				return R_PASS;
+			}
+		);
+	}
 
 #ifdef TESTING
 // Test Scene
@@ -282,21 +333,16 @@ Error:
 RESULT DreamGarage::SendHandPosition() {
 	RESULT r = R_PASS;
 
-	///*
 	hand *pLeftHand = GetHand(hand::HAND_LEFT);
 	hand *pRightHand = GetHand(hand::HAND_RIGHT);
 
 	if (pLeftHand != nullptr) {
-		//CR(SendUpdateHandMessage(NULL, pLeftHand->GetHandState()));
 		CR(BroadcastUpdateHandMessage(pLeftHand->GetHandState()));
 	}
 
 	if (pRightHand != nullptr) {
-		//CR(SendUpdateHandMessage(NULL, pRightHand->GetHandState()));
 		CR(BroadcastUpdateHandMessage(pRightHand->GetHandState()));
 	}
-
-	//CR(SendUpdateHandMessage(NULL, hand::GetDebugHandState(hand::HAND_LEFT)));
 
 Error:
 	return r;
@@ -475,8 +521,16 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 		const float rad = 2.0f;
 
 		auto setCameraRoundtablePos = [&](uint16_t angle) {
-			cam->SetPosition(point(-rad*sin(angle*M_PI / 180.0f), 0.0f, +rad*cos(angle*M_PI / 180.0f)));
-			cam->RotateYByDeg(angle);
+			point offset = point(-rad*sin(angle*M_PI / 180.0f), 0.0f, +rad*cos(angle*M_PI / 180.0f));
+			cam->SetPosition(offset);
+
+			if (!cam->HasHMD()) {
+				cam->RotateYByDeg(angle);
+			}
+			else {
+				quaternion qOffset = quaternion::MakeQuaternionWithEuler(0.0f, angle * M_PI / 180.0f, 0.0f);
+				cam->SetOffsetOrientation(qOffset);
+			}
 		};
 
 		switch (index) {
@@ -530,7 +584,8 @@ user*	DreamGarage::ActivateUser(long userId) {
 		m_usersPool.pop_back();
 
 		if (m_peerUsers[userId] != nullptr) {
-			m_peerUsers[userId]->SetVisible(true);
+			user *u = m_peerUsers[userId];
+			m_peerUsers[userId]->Activate();
 		}
 	}
 
@@ -550,12 +605,11 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 
 	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
 
-	pUser->SetPosition(headPos);
+	pUser->GetHead()->SetPosition(headPos);
 
 	OVERLAY_DEBUG_SET(st, (st + "=" + std::to_string(headPos.x()) + "," + std::to_string(headPos.y()) + "," + std::to_string(headPos.z())).c_str());
 
-
-	pUser->SetOrientation(qOrientation);
+	pUser->GetHead()->SetOrientation(qOrientation);
 
 Error:
 	return r;
@@ -628,7 +682,9 @@ RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 RESULT DreamGarage::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
-	HUD_OUT("DreamAPP command");
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("<blank>");
+	}
 
 	return r;
 }

@@ -11,10 +11,6 @@
 
 // We use window subsystem in PRODUCTION build to allow Dream to run without a console window
 
-// TODO: some other better way?
-#define _USE_TEST_APP	
-//#define _UNIT_TESTING
-
 #ifdef _WINDOWS
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,

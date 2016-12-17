@@ -32,7 +32,7 @@
 #include "Sense/SenseKeyboard.h"
 #include "HMD/HMD.h"
 
-class camera : public VirtualObj, public Subscriber<SenseKeyboardEvent>, public Subscriber<HMDEvent>, public Subscriber<TimeEvent> {
+class camera : public VirtualObj, public Subscriber<CmdPromptEvent>, public Subscriber<SenseKeyboardEvent>, public Subscriber<HMDEvent>, public Subscriber<TimeEvent> {
 public:
 	camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight);
 	~camera();
@@ -93,6 +93,16 @@ public:
 	ray GetRay(int xPos, int yPos);			// This is assuming an integer screen position but really just calls the one above
 
 
+	bool	IsAllowedMoveByKeys();
+
+	// CmdPromptEventSubscriber
+	virtual RESULT Notify(CmdPromptEvent *event) override;
+
+	quaternion GetOffsetOrientation();
+	RESULT SetOffsetOrientation(quaternion qOffset);
+
+	bool HasHMD();
+
 protected:
 	HMD *m_pHMD;
 
@@ -114,6 +124,11 @@ protected:
 
 	// Set up HMD frame of reference 
 	composite *m_pCameraFrameOfReference;
+
+	// allow camera movements using keyboard
+	bool	m_allowMoveByKeys = false;
+	
+	quaternion m_qOffsetOrientation;
 };
 
 #endif // ! CAMERA_H_

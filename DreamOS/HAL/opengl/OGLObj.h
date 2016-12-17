@@ -10,6 +10,8 @@
 #include "OpenGLImp.h"
 #include "Primitives/DimObj.h"
 
+#include <functional>
+
 #define NUM_VBO 2
 
 class OGLObj {
@@ -35,6 +37,7 @@ public:
 	// Many objects will not need to though. 
 	//virtual RESULT Render() {
 	virtual RESULT Render();
+
 	virtual RESULT RenderBoundingVolume();
 	virtual RESULT UpdateBoundingVolume();
 
@@ -43,8 +46,15 @@ public:
 	OGLTexture *GetTextureAmbient();
 	OGLTexture *GetTextureDiffuse();
 	OGLTexture *GetTextureSpecular();
-
+	
 	OGLObj *GetOGLBoundingVolume();
+
+	// TODO: Do we want to keep this - maybe move upstream
+	RESULT SetOGLProgramPreCallback(std::function<RESULT(OGLProgram*, void*)> fnOGLProgramPreCallback);
+	std::function<RESULT(OGLProgram*, void*)> GetOGLProgramPreCallback();
+
+	RESULT SetOGLProgramPostCallback(std::function<RESULT(OGLProgram*, void*)> fnOGLProgramPostCallback);
+	std::function<RESULT(OGLProgram*, void*)> GetOGLProgramPostCallback();
 
 protected:
 	GLuint m_hVAO;		// vertex array object
@@ -55,6 +65,9 @@ protected:
 
 private:
 	OGLObj *m_pOGLBoundingVolume;
+
+	std::function<RESULT(OGLProgram*, void*)> m_fnOGLProgramPreCallback;
+	std::function<RESULT(OGLProgram*, void*)> m_fnOGLProgramPostCallback;
 };
 
 #endif // ! OGL_OBJ_H_

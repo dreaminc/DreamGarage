@@ -148,13 +148,15 @@ void main(void) {
 	float mieCollectionPower = 1.0f;
 	rayleighCollected = (rayleighCollected * eyeExtinction * pow(eyeDepth, rayleighCollectionPower))/float(stepCount);
 	mieCollected = (mieCollected * eyeExtinction * pow(eyeDepth, mieCollectionPower))/float(stepCount);
-///*
-	out_vec4Color = vec4(
+
+	vec3 outColor = vec3(
 		spotFactor*mieCollected +
 		mieFactor*mieCollected +
-		rayleighFactor*rayleighCollected,
-		1.0);
-	//	*/
+		rayleighFactor*rayleighCollected);
+
+	// make it a bit brighter. couldn't find an easier way to do this.
+	out_vec4Color = vec4(1.08 * outColor, 1.0);
+
 	//out_vec4Color = vec4(theta, theta, theta, 1.0);
 	//out_vec4Color = displayAsColor(eyeDirection);
 }

@@ -511,6 +511,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp">
       <Filter>PhysicsEngine</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
+      <Filter>HAL\opengl</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

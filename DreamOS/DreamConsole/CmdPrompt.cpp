@@ -24,6 +24,7 @@ RESULT CmdPrompt::Initialize() {
 	}
 
 	m_fInit = true;
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Cmd, this);
 
 Error:
 	return r;
@@ -31,7 +32,13 @@ Error:
 
 // TODO: Generalize
 RESULT CmdPrompt::RegisterMethod(CmdPrompt::method method, Subscriber<CmdPromptEvent>* pSubscriber) {
-	return RegisterSubscriber(methodDictionary.at(method), pSubscriber);
+	RESULT r = R_PASS;
+	
+	CR(RegisterSubscriber(methodDictionary.at(method), pSubscriber));
+	m_registeredCommands.push_back(methodDictionary.at(method));
+
+Error:
+	return r;
 }
 
 RESULT CmdPrompt::Execute(const std::string& command) {
@@ -51,4 +58,17 @@ RESULT CmdPrompt::Execute(const std::string& command) {
 
 const std::string& CmdPrompt::GetLastCommand() {
 	return m_strLastExecutedCommand;
+}
+
+RESULT CmdPrompt::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("list") == 0) {
+		// list of registered commands
+		for (auto& cmd : m_registeredCommands) {
+			HUD_OUT(cmd.c_str());
+		}
+	}
+
+	return r;
 }

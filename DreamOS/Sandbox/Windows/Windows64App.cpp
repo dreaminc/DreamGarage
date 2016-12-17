@@ -415,9 +415,11 @@ RESULT Windows64App::InitializeSandbox() {
 
 	// This will only turn on Leap if connected at boot up
 	CRM(InitializeLeapMotion(), "Failed to initialize leap motion");
-	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected()) {
+	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected() && m_fCheckLeap) {
 		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
 	}
+
+	CRM(RegisterImpViveControllerEvents(), "Failed to register vive controller events");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 
@@ -429,10 +431,10 @@ RESULT Windows64App::HandleMessages() {
 	RESULT r = R_PASS;
 
 	MSG msg;
-
+	
 	if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
 		bool fHandled = false;
-
+		
 		if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
 			fHandled = HandleMouseEvent(msg);
 		}
@@ -465,6 +467,18 @@ RESULT Windows64App::Show() {
 
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
+	
+	// TODO: Move this into it's own function
+	HANDLE hCloseSplashScreenEvent = CreateEvent(NULL,        // no security
+		TRUE,       // manual-reset event
+		FALSE,      // not signaled
+		(LPTSTR)L"CloseSplashScreenEvent"); // event name
+
+	BOOL res = SetEvent(hCloseSplashScreenEvent);
+
+	LOG(INFO) << "signaling splash to close " << (res ? "ok" : "failed");
+
+	CloseHandle(hCloseSplashScreenEvent);
 	
 	//return (RESULT)(msg.wParam);
 

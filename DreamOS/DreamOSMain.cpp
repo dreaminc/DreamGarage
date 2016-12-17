@@ -11,10 +11,6 @@
 
 #include "test/MatrixTestSuite.h"
 
-// TODO: some other better way?
-#define _USE_TEST_APP	
-//#define _UNIT_TESTING
-
 int main(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
     

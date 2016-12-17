@@ -1,3 +1,4 @@
+#include "easylogging++.h"
 #include "Console.h"
 #include "ProfilerGraph.h"
 
@@ -98,7 +99,15 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 			{
 				if (keyCode == VK_TAB)
 				{
+					// quick hack to enable dream console in production but only using several tab hits
+#ifdef PRODUCTION_BUILD
+					static int hits = 0;
+					hits++;
+					if (hits > 7)
+						m_isInForeground = true;
+#else
 					m_isInForeground = true;
+#endif // PRODUCTION_BUILD
 				}
 			}
 			else
@@ -136,7 +145,13 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 					} break;
 					default: {
 						std::locale	loc;
-						m_cmdText.append(std::string("") + std::tolower(static_cast<char>(keyCode), loc));
+						
+						if (std::use_facet<std::ctype<char>>(loc).is(std::ctype<char>::alpha, static_cast<char>(keyCode))) {
+							m_cmdText.append(std::string("") + std::tolower(static_cast<char>(keyCode), loc));
+						}
+						else if ((keyCode == VK_SPACE) || (static_cast<char>(keyCode) >= '0' && static_cast<char>(keyCode) <= '9')) {
+							m_cmdText.append(std::string("") + static_cast<char>(keyCode));
+						}
 					} break;
 					}
 				}
@@ -150,6 +165,10 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 
 RESULT DreamConsole::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("graph fps/off : show / hide fps graph");
+	}
 
 	if (event->GetArg(1).compare("graph") == 0) {
 		if (event->GetArg(2).compare("fps") == 0) {

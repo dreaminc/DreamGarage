@@ -94,7 +94,7 @@ public:
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
-
+	
 private:
 	// TODO: Move this up to sandbox
 	bool m_fMouseIntersectObjects = false;
@@ -112,6 +112,7 @@ protected:
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
 	RESULT RegisterImpLeapMotionEvents();
+	RESULT RegisterImpViveControllerEvents();
 
 public:
 	RESULT AddPhysicsObject(VirtualObj *pObject);
@@ -211,6 +212,7 @@ protected:
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
 	bool m_fCheckHMD;
+	bool m_fCheckLeap;
 
 protected:
 	std::function<RESULT(void)> m_fnUpdateCallback;

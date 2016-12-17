@@ -27,6 +27,7 @@ camera::camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxSc
 {
 	m_ptOrigin = ptOrigin;
 	m_qRotation = quaternion();
+	m_qOffsetOrientation = quaternion();
 }
 
 camera::~camera() {
@@ -164,6 +165,9 @@ RESULT camera::Notify(HMDEvent *hmdEvent) {
 
 RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
+
+	if (!m_allowMoveByKeys)
+		return r;
 
 	//DEBUG_LINEOUT("Cam Key %d state: %x", kbEvent->KeyCode, kbEvent->KeyState);
 
@@ -341,4 +345,36 @@ ray camera::GetRay(double xPos, double yPos) {
 
 ray camera::GetRay(int xPos, int yPos) {
 	return GetRay(static_cast<double>(xPos), static_cast<double>(yPos));
+}
+	
+bool camera::IsAllowedMoveByKeys() {
+	return m_allowMoveByKeys;
+}
+
+RESULT camera::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("move : toggle move around using key / mouse");
+	}
+
+	if (event->GetArg(1).compare("move") == 0) {
+		m_allowMoveByKeys = !m_allowMoveByKeys;
+		HUD_OUT((std::string("allow move by keys <- ") + ((m_allowMoveByKeys) ? "on" : "off")).c_str());
+	}
+
+	return r;
+}
+
+quaternion camera::GetOffsetOrientation() {
+	return m_qOffsetOrientation;
+}
+
+RESULT camera::SetOffsetOrientation(quaternion qOffset) {
+	m_qOffsetOrientation = qOffset;
+	return R_PASS;
+}
+
+bool camera::HasHMD() {
+	return m_pHMD != nullptr;
 }
