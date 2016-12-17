@@ -45,8 +45,6 @@ RESULT user::Initialize() {
 	m_pMouth->Scale(0.1f);
 	m_pHead->AddChild(m_pMouth);
 
-	//m_pHeads.push_back(pHead);
-	
 	// Hands
 	m_pLeapLeftHand = AddHand();
 	m_pLeapRightHand = AddHand();

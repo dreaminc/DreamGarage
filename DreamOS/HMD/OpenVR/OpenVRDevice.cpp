@@ -169,12 +169,10 @@ RESULT OpenVRDevice::AttachHand(hand *pHand, hand::HAND_TYPE type) {
 	if (type == hand::HAND_TYPE::HAND_LEFT) {
 		m_pLeftHand = pHand;
 		m_pLeftHand->SetHandState(state);
-		//m_pLeftHand->SetVisible(false);
 	}
 	else if (type == hand::HAND_TYPE::HAND_RIGHT) {
 		m_pRightHand = pHand;
 		m_pRightHand->SetHandState(state);
-		//m_pLeftHand->SetVisible(false);
 	}
 	else {
 		return R_FAIL;
@@ -515,15 +513,13 @@ RESULT OpenVRDevice::UpdateHMD() {
 			}
 			
 		}
-		///*
+
 		if (!fLeftHandTracked && m_pLeftHand != nullptr) {
-		//	m_pLeftHand->OnLostTrack();
 			m_pLeftHand->SetTracked(fLeftHandTracked);
 		}
 		if (!fRightHandTracked && m_pRightHand != nullptr) {
 			m_pRightHand->SetTracked(fRightHandTracked);
 		}
-		//*/
 	}
 
 Error:

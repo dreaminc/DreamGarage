@@ -178,21 +178,10 @@ hand::hand(HALImp* pHALImp) :
 	Initialize();
 }
 
-hand::hand(HALImp* pHALImp, DimObj* pParent) :
-	composite(pHALImp)
-{
-	if (pParent != nullptr) {
-		pParent->AddChild(std::shared_ptr<DimObj>(this));
-	}
-	Initialize();
-}
-
 RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState) {
 
-	//if (pParent != nullptr && !HasParent() && m_fOriented) {
 	if (!CompareParent(pParent.get()) && pHandState.fOriented)
 		pParent->AddChild(std::shared_ptr<DimObj>(this));
-	//}
 	return R_PASS;
 }
 
@@ -239,16 +228,12 @@ RESULT hand::Initialize() {
 						scaleModel,
 						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
 
-	//m_pLeftModel->SetVisible(false);
-	//m_pRightModel->SetVisible(false);
-
 	m_qLeftModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI_2);
 	m_qRightModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
 	
 	m_fOriented = false;
 	m_fSkeleton = false;
 
-	//m_qRotation = quaternion();
 	m_qRotation = GetOrientation();
 
 	m_fTracked = false;
@@ -416,11 +401,8 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	SetHandModel(modelType);
 
 	m_fTracked = pHandState.fTracked;
-	//m_fOriented = pHandState.fOriented;
-	//*
-	if (!m_fTracked)// && pHandState.fOriented)
+	if (!m_fTracked)
 		OnLostTrack();
-	//*/
 
 	m_pIndexFinger->SetFingerState(pHandState.fingerIndex);
 	m_pMiddleFinger->SetFingerState(pHandState.fingerMiddle);
@@ -428,7 +410,6 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	m_pPinkyFinger->SetFingerState(pHandState.fingerPinky);
 	m_pThumb->SetThumbState(pHandState.thumb);
 	
-//*
 	if (pHandState.fOriented) {
 		m_pLeftModel->SetOrientation(pHandState.qOrientation * m_qLeftModel);
 		m_pRightModel->SetOrientation(pHandState.qOrientation * m_qRightModel);
@@ -437,7 +418,6 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 		m_pLeftModel->SetOrientation(pHandState.qOrientation);
 		m_pRightModel->SetOrientation(pHandState.qOrientation);
 	}
-	//*/
 
 //Error:
 	return r;

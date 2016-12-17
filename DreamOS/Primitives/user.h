@@ -31,13 +31,8 @@ public:
 	RESULT UpdateMouth(float mouthScale);	// used for scaling the user mouth
 	RESULT SwitchHeadModel();
 	RESULT Activate(user::ControllerType type = user::ControllerType::CONTROLLER_INVALID);
-//	std::shared_ptr<composite> GetHandModel(hand::HAND_TYPE type);
-//	std::shared_ptr<composite> GetViveModel(hand::HAND_TYPE type);
 
 private:
-	//std::shared_ptr<composite> m_pHead;
-	//std::shared_ptr<texture> m_pTextureHead;
-
 	// Storage of models and textures for head
 	std::vector<std::shared_ptr<composite>> m_pHeads;
 	std::shared_ptr<composite> m_pHead;
@@ -45,18 +40,9 @@ private:
 
 	std::shared_ptr<hand> m_pLeapLeftHand;
 	std::shared_ptr<hand> m_pLeapRightHand;
-	/*
-	std::shared_ptr<composite> m_pLeapLeftModel;
-	std::shared_ptr<composite> m_pLeapRightModel;
-
-	std::shared_ptr<composite> m_pViveLeftModel;
-	std::shared_ptr<composite> m_pViveRightModel;
-//*/
 
 	std::shared_ptr<quad> m_pMouth = nullptr;
 	std::shared_ptr<texture> m_pMouthTexture = nullptr;
-	bool stupidLeft = false;
-	bool stupidRight = false;
 };
 
 #endif	// ! PRIMITIVE_USER_H_
