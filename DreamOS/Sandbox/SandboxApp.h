@@ -186,6 +186,11 @@ public:
 
 	hand *GetHand(hand::HAND_TYPE handType);
 
+public:
+	bool IsSandboxRunning();
+
+protected:
+	RESULT SetSandboxRunning(bool fRunning);
 
 protected:
 	// TODO: Move to unique_ptr
@@ -216,6 +221,9 @@ protected:
 
 protected:
 	std::function<RESULT(void)> m_fnUpdateCallback;
+
+private:
+	bool m_fRunning = false;
 
 private:
 	UID m_uid;

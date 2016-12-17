@@ -285,6 +285,15 @@ hand* SandboxApp::GetHand(hand::HAND_TYPE handType) {
 	return m_pSenseLeapMotion->GetHand(handType);
 }
 
+bool SandboxApp::IsSandboxRunning() {
+	return m_fRunning;
+}
+
+RESULT SandboxApp::SetSandboxRunning(bool fRunning) {
+	m_fRunning = fRunning;
+	return R_SUCCESS;
+}
+
 inline PathManager* SandboxApp::GetPathManager() {
 	return m_pPathManager; 
 }
@@ -297,14 +306,17 @@ RESULT SandboxApp::RunAppLoop() {
 	RESULT r = R_PASS;
 
 	// Launch main message loop
-	bool fQuit = false;
-
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
 
+	SetSandboxRunning(true);
+
 	// TODO: This should be moved to the sandbox
-	while (!fQuit) {
+	while (IsSandboxRunning()) {
 		CR(HandleMessages());	// Handle windows messages
+		
+		if (!IsSandboxRunning()) 
+			break;
 
 #ifdef CEF_ENABLED
 		// Update Network
@@ -369,7 +381,6 @@ RESULT SandboxApp::RunAppLoop() {
 
 		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
 			Shutdown();
-			fQuit = true;
 		}
 	}
 

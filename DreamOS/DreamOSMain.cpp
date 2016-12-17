@@ -40,7 +40,7 @@ int main(int argc, const char *argv[]) {
 
 Error:
 	DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
-	system("pause");
+	//system("pause");
 
 	return (int)(r);
 }

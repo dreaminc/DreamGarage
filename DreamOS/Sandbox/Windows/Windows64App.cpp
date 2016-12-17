@@ -313,7 +313,8 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 
 			if (hDC == nullptr) {
 				DEBUG_LINEOUT("Failed to capture Device Context");
-				PostQuitMessage(0);
+				//PostQuitMessage(0);
+				Shutdown();
 				return 0L;
 			}
 
@@ -322,7 +323,8 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 
 		case WM_DESTROY: {
 			DEBUG_LINEOUT("Windows Sandbox being destroyed");
-			PostQuitMessage(0);
+			//PostQuitMessage(0);
+			Shutdown();
 			return 0L;
 		} break;
 
@@ -442,11 +444,11 @@ RESULT Windows64App::HandleMessages() {
 			fHandled = HandleKeyEvent(msg);
 		}
 		else if (WM_QUIT == msg.message) {
+			Shutdown();
 			CBR(false, (RESULT)(msg.wParam));
 		}
 
-		if (!fHandled)
-		{
+		if (!fHandled) {
 			TranslateMessage(&msg);
 			DispatchMessage(&msg);
 		}
@@ -654,6 +656,8 @@ bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
 
 RESULT Windows64App::Shutdown() {
 	RESULT r = R_PASS;
+
+	CR(SetSandboxRunning(false));
 
 	// Release device context in use by rc
 	wglMakeCurrent(m_hDC, nullptr);
