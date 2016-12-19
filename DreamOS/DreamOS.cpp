@@ -117,6 +117,7 @@ RESULT DreamOS::Start() {
 
 	// This will start the application
 	CRM(m_pSandbox->Show(), "Failed to show sandbox window");
+	CR(m_pSandbox->RunAppLoop());
 
 Error:
 	return r;
@@ -127,6 +128,10 @@ RESULT DreamOS::Exit(RESULT exitcode) {
 	return exitcode;
 }
 
+// This is a pass-thru at the moment
+RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
+	return m_pSandbox->AddPhysicsObject(pObject);
+}
 
 light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
@@ -154,20 +159,24 @@ sphere* DreamOS::MakeSphere(float radius, int numAngularDivisions, int numVertic
 	return m_pSandbox->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
 
-volume* DreamOS::AddVolume(double side) {
-	return m_pSandbox->AddVolume(side);
+volume* DreamOS::AddVolume(double side, bool fTriangleBased) {
+	return m_pSandbox->AddVolume(side, fTriangleBased);
 }
 
-volume* DreamOS::AddVolume(double width, double length, double height) {
-	return m_pSandbox->AddVolume(width, length, height);
+volume* DreamOS::AddVolume(double width, double length, double height, bool fTriangleBased) {
+	return m_pSandbox->AddVolume(width, length, height, fTriangleBased);
 }
 
-volume* DreamOS::MakeVolume(double width, double length, double height) {
-	return m_pSandbox->MakeVolume(width, length, height);
+cylinder* DreamOS::AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+	return m_pSandbox->AddCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
 }
 
-volume* DreamOS::MakeVolume(double side) {
-	return m_pSandbox->AddVolume(side);
+volume* DreamOS::MakeVolume(double width, double length, double height, bool fTriangleBased) {
+	return m_pSandbox->MakeVolume(width, length, height, fTriangleBased);
+}
+
+volume* DreamOS::MakeVolume(double side, bool fTriangleBased) {
+	return m_pSandbox->AddVolume(side, fTriangleBased);
 }
 	
 quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
@@ -213,6 +222,17 @@ RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallb
 
 RESULT DreamOS::UnregisterUpdateCallback() {
 	return m_pSandbox->UnregisterUpdateCallback();
+}
+
+// Physics Engine
+RESULT DreamOS::RegisterObjectCollision(VirtualObj *pVirtualObject) {
+	RESULT r = R_PASS;
+
+	r = m_pSandbox->RegisterObjectAndSubscriber(pVirtualObject, this);
+	CR(r);
+
+Error:
+	return r;
 }
 
 // Cloud Controller

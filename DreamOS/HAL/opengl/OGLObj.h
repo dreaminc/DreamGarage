@@ -24,16 +24,9 @@ public:
 
 	//virtual RESULT Render() = 0;
 	virtual DimObj *GetDimObj() = 0;
-	RESULT ReleaseOGLBuffers();
 
-	// This should be used in the OGLInitialize function
-	inline GLushort GetOGLPrecision() {
-		#ifdef FLOAT_PRECISION
-			return GL_FLOAT;
-		#elif defined(DOUBLE_PRECISION)
-			return GL_DOUBLE;
-		#endif
-	}
+	RESULT ReleaseOGLBuffers();
+	GLushort GetOGLPrecision();
 
 	// This needs to be called from the sub-class constructor
 	// or externally from the object (TODO: factory class needed)
@@ -45,12 +38,18 @@ public:
 	//virtual RESULT Render() {
 	virtual RESULT Render();
 
+	virtual RESULT RenderBoundingVolume();
+	virtual RESULT UpdateBoundingVolume();
+
 	OGLTexture *GetColorTexture();
 	OGLTexture *GetBumpTexture();
 	OGLTexture *GetTextureAmbient();
 	OGLTexture *GetTextureDiffuse();
 	OGLTexture *GetTextureSpecular();
+	
+	OGLObj *GetOGLBoundingVolume();
 
+	// TODO: Do we want to keep this - maybe move upstream
 	RESULT SetOGLProgramPreCallback(std::function<RESULT(OGLProgram*, void*)> fnOGLProgramPreCallback);
 	std::function<RESULT(OGLProgram*, void*)> GetOGLProgramPreCallback();
 
@@ -61,9 +60,12 @@ protected:
 	GLuint m_hVAO;		// vertex array object
 	GLuint m_hVBO;		// vertex buffer object
 	GLuint m_hIBO;		// index buffer object
+
 	OpenGLImp *m_pParentImp;
 
 private:
+	OGLObj *m_pOGLBoundingVolume;
+
 	std::function<RESULT(OGLProgram*, void*)> m_fnOGLProgramPreCallback;
 	std::function<RESULT(OGLProgram*, void*)> m_fnOGLProgramPostCallback;
 };

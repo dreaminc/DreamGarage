@@ -1,4 +1,5 @@
 #include "ObjectStoreImpList.h"
+#include "Primitives/ray.h"
 
 ObjectStoreImpList::ObjectStoreImpList() :
 	m_pSkybox(nullptr)
@@ -21,8 +22,9 @@ VirtualObj *ObjectStoreImpList::GetNextObject() {
 
 	VirtualObj *pVirtualObj = (*m_objectIterator);
 
-	if (m_objectIterator != m_objects.end())
+	if (m_objectIterator != m_objects.end()) {
 		m_objectIterator++;
+	}
 
 	return pVirtualObj;
 }
@@ -107,4 +109,65 @@ VirtualObj *ObjectStoreImpList::FindObject(VirtualObj *pObject) {
 			return (*it);
 
 	return nullptr;
+}
+
+std::vector<VirtualObj*> ObjectStoreImpList::GetObjects() {
+	std::vector<VirtualObj*> objects = { std::begin(m_objects), std::end(m_objects) };
+	return objects;
+}
+
+std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(const ray &rCast) {
+	std::vector<VirtualObj*> intersectedObjects;
+
+	for (auto &object: m_objects) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(object);
+		
+		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr) {
+			continue; 
+		}
+
+		if (pDimObj->GetBoundingVolume()->Intersect(rCast)) {
+			intersectedObjects.push_back(pDimObj);
+		}
+	}
+
+	return intersectedObjects;
+}
+
+std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(DimObj *pDimObj) {
+	std::vector<VirtualObj*> intersectedObjects;
+
+	for (auto &pObject : m_objects) {
+		DimObj *pDimObject = dynamic_cast<DimObj*>(pObject);
+
+		// Don't intersect self
+		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || pDimObj == pDimObject || pDimObject->GetBoundingVolume() == nullptr) {
+			continue;
+		}
+
+		if (pDimObject->GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get())) {
+			intersectedObjects.push_back(pDimObject);
+		}
+	}
+
+	return intersectedObjects;
+}
+
+// TODO: This will return redundant groups right now
+std::vector<std::vector<VirtualObj*>> ObjectStoreImpList::GetObjectCollisionGroups() {
+	std::vector<std::vector<VirtualObj*>> collisionGroups;
+
+	for (auto &object : m_objects) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(object);
+
+		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr) {
+			continue;
+		}
+
+		auto collisionGroup = GetObjects(pDimObj);
+		if (collisionGroup.size() > 0)
+			collisionGroups.push_back(collisionGroup);
+	}
+
+	return collisionGroups;
 }

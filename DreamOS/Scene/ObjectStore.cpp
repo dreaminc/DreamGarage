@@ -1,6 +1,8 @@
 #include "ObjectStore.h"
 #include "ObjectStoreImpList.h"
 
+#include "Primitives/ray.h"
+
 ObjectStore::ObjectStore(ObjectStoreFactory::TYPE type) {
 	RESULT r = R_PASS;
 
@@ -72,31 +74,16 @@ Error:
 	return NULL;
 }
 
-// TODO: Perhaps pass this to a scene graph handler (like physics etc)
+std::vector<VirtualObj*> ObjectStore::GetObjects() {
+	return m_pSceneGraphStore->GetObjects();
+}
+
+std::vector<VirtualObj*> ObjectStore::GetObjects(ray rCast) {
+	return m_pSceneGraphStore->GetObjects(rCast);
+}
+
+// TODO: This is holding the collide functionality here temporarily 
 RESULT ObjectStore::UpdateScene() {
-	RESULT r = R_PASS;
-	
-	/*
-	Reset();
-	ObjectStoreImp *pObjectStore = GetSceneGraphStore();
-
-	VirtualObj *pVirtualObj = NULL;
-	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
-		quaternion_precision factor = 0.05;
-		quaternion_precision filter = 0.1;
-
-		static quaternion_precision x = 0;
-		static quaternion_precision y = 0;
-		static quaternion_precision z = 0;
-
-		//x = ((1.0f - filter) * x) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		//y = ((1.0f - filter) * y) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-		//z = ((1.0f - filter) * z) + filter * (static_cast <color_precision> (rand()) / static_cast <color_precision> (RAND_MAX));
-
-		pVirtualObj->RotateBy(x * factor, y * factor, z * factor);
-	}
-	//*/
-
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 

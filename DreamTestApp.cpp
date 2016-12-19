@@ -1,0 +1,179 @@
+#include "Logger/Logger.h"
+#include "DreamTestApp.h"
+#include <string>
+
+// TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
+//#define TESTING
+
+cylinder *g_pCylinder = nullptr;
+volume *g_pVolume = nullptr;
+volume *g_pVolume2 = nullptr;
+
+RESULT DreamTestApp::LoadScene() {
+	RESULT r = R_PASS;
+
+	// IO
+	//RegisterSubscriber((SK_SCAN_CODE)('C'), this);
+
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
+
+	AddSkybox();
+
+	light *pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+
+	//pLight->EnableShadows();
+
+	/*
+	quad *pBQuad = AddQuad(10.0f, 20.0f, 200, 200);// , pHeightTextureCobble);
+	pBQuad->MoveTo(point(0.0f, -1.0f, 0.0f));
+
+	sphere *pSphere = AddSphere(0.5f, 10, 10, color(COLOR_RED));
+	pSphere->MoveTo(1.5f, 0.5f, 0.0f);
+	
+	volume *pVolume = AddVolume(0.5f, false);
+	pVolume->MoveTo(-1.5f, 0.5f, 0.0f);
+	pVolume->SetWireframe(true);
+	*/
+
+	// TODO: sphere AABB
+	//sphere *pSphere = AddSphere(0.5f, 10, 10);
+	//pSphere->MoveTo(1.5f, 0.5f, 0.0f);
+
+	//g_pCylinder = AddCylinder(0.5f, 2.0f, 20, 5);
+	//g_pCylinder->MoveTo(2.0f, 0.0f, 0.0f);
+
+	//g_pCylinder->RotateZBy((float)(M_PI_4));
+
+	/*
+	g_pVolume = AddVolume(0.5f, 0.5f, 2.0f);
+	g_pVolume->RotateZByDeg(45.0f);
+	g_pVolume->MoveTo(point(-2.0f, 0.0f, 0.0f));
+	AddPhysicsObject(g_pVolume);
+	
+	g_pVolume2 = AddVolume(0.5f, 0.5f, 2.0f);
+	g_pVolume2->MoveTo(point(2.0f, 0.0f, 0.0f));
+	g_pVolume2->RotateZBy((float)(M_PI_4));
+	AddPhysicsObject(g_pVolume2);
+
+	RegisterObjectCollision(g_pVolume2);
+	//*/
+
+
+	sphere *pSphere = AddSphere(0.25f, 10, 10);
+	pSphere->SetPosition(point(-3.0f, 0.0f, 0.0f));
+	pSphere->SetMass(1.0f);
+	pSphere->SetVelocity(3.0f, 10.0f, 0.0f);
+	AddPhysicsObject(pSphere);
+
+	//pCylinder->SetWireframe(true);
+
+	/*
+	float radius = 0.5f;
+	int width = 10;
+	int length = 10;
+	for (int i = 0; i < width; i++) {
+		for (int j = 0; j < length; j++) {
+			volume *pVolume = AddVolume(radius);
+			pVolume->MoveTo(point(1.0f * radius * i, 0.0f, 1.0f * radius * j));
+		}
+	}
+	*/
+
+	/*
+	AddModel(L"\\Models\\the-hague-apartment\\the-hague-apartment-fix.obj",
+		nullptr,
+		point(0.0f, 0.0f, 0.0f),
+		0.1f,
+		vector((float)(M_PI_2), 0.0f, 0.0f));
+	//*/
+
+	/*
+	AddModel(L"\\Models\\warehouse\\industrial_style_interior.obj",
+		nullptr,
+		point(0.0f, 0.0f, 0.0f),
+		0.1f,
+		vector((float)(M_PI_2), 0.0f, 0.0f));
+	//*/
+
+	//Error:
+	return r;
+}
+
+RESULT DreamTestApp::Update(void) {
+	RESULT r = R_PASS;
+
+	///*
+	if (g_pCylinder != nullptr) {
+		//g_pCylinder->RotateByDeg(0.01f, 0.00f, 0.01f);
+		//g_pCylinder->RotateZBy(0.001f);
+		//g_pCylinder->RotateYBy(0.001f);
+		//g_pCylinder->RotateXBy(0.001f);
+		//g_pCylinder->translate(point(0.0005f, 0.000f, 0.000f));
+		g_pCylinder->translateX(-0.0002f);
+	}
+	//*/
+
+	///*
+	if (g_pVolume != nullptr) {
+		g_pVolume->SetColor(color(COLOR_WHITE));
+
+		//g_pVolume->RotateByDeg(0.01f, 0.01f, 0.01f);
+		g_pVolume->RotateXBy(0.003f);
+		g_pVolume->RotateYBy(-0.001f);
+		g_pVolume->RotateZBy(-0.003f);
+		g_pVolume->translateX(0.0003f);
+	}
+
+	if (g_pVolume2 != nullptr) {
+		g_pVolume2->SetColor(color(COLOR_WHITE));
+
+		//g_pVolume2->RotateByDeg(0.01f, 0.01f, 0.01f);
+		g_pVolume2->RotateXBy(0.002f);
+		g_pVolume2->RotateYBy(0.001f);
+		g_pVolume2->RotateZBy(0.005f);
+		g_pVolume2->translateX(-0.0003f);
+	}
+	//*/
+
+	//Error:
+	return r;
+}
+
+RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
+	RESULT r = R_PASS;
+	/*
+	switch (kbEvent->KeyCode) {
+	case (SK_SCAN_CODE)('C') : {
+	if (kbEvent->KeyState != 0) {
+	HUD_OUT("Key 'C' is pressed - switch model");
+	SendSwitchHeadMessage();
+	}
+	}
+	}
+	*/
+	//Error:
+	return r;
+}
+
+RESULT DreamTestApp::Notify(CollisionObjectEvent *oEvent) {
+	RESULT r = R_PASS;
+
+	dynamic_cast<DimObj*>(oEvent->m_pCollisionObject)->SetColor(color(COLOR_RED));
+
+	for (auto &pObj : oEvent->m_collisionGroup) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
+		pDimObj->SetColor(color(COLOR_PINK));
+	}
+
+//Error:
+	return r;
+}
+
+RESULT DreamTestApp::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	HUD_OUT("DreamAPP command");
+
+//Error:
+	return r;
+}

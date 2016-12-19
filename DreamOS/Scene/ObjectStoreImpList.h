@@ -24,17 +24,22 @@ public:
 	RESULT PushDimensionObject(DimObj *pDimObj);
 	RESULT PushLight(light *pLight);
 
-	RESULT PushObject(VirtualObj *pObject);
-	RESULT RemoveObject(VirtualObj *pObject);
+	virtual RESULT PushObject(VirtualObj *pObject) override;
+	virtual RESULT RemoveObject(VirtualObj *pObject) override;
 
-	RESULT RemoveObjectByUID(UID uid);
-	VirtualObj *FindObjectByUID(UID uid);
-	VirtualObj *FindObject(VirtualObj *pObject);
+	virtual RESULT RemoveObjectByUID(UID uid) override;
+	virtual VirtualObj *FindObjectByUID(UID uid) override;
+	virtual VirtualObj *FindObject(VirtualObj *pObject) override;
 
-	RESULT GetLights(std::vector<light*>*& pLights);
+	virtual RESULT GetLights(std::vector<light*>*& pLights) override;
 
 	RESULT SetSkybox(skybox *pSkybox);
 	RESULT GetSkybox(skybox*& pSkybox);
+
+	virtual std::vector<VirtualObj*> GetObjects() override;
+	virtual std::vector<VirtualObj*> GetObjects(const ray &rCast) override;
+	virtual std::vector<VirtualObj*> GetObjects(DimObj *pDimObj) override;
+	virtual std::vector<std::vector<VirtualObj*>> GetObjectCollisionGroups() override;
 
 protected:
 	std::list<VirtualObj*> m_objects;

@@ -13,8 +13,8 @@
 
 #include "Primitives/Publisher.h"
 
-#include "Primitives/ViewMatrix.h"
-#include "Primitives/ProjectionMatrix.h"
+#include "Primitives/matrix/ViewMatrix.h"
+#include "Primitives/matrix/ProjectionMatrix.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/quaternion.h"
 #include "Primitives/point.h"

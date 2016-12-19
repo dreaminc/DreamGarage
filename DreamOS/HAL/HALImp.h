@@ -23,16 +23,26 @@
 #include "Primitives/quad.h"
 #include "Primitives/FlatContext.h"
 #include "Primitives/sphere.h"
+#include "Primitives/cylinder.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/skybox.h"
 #include "Primitives/model.h"
 #include "Primitives/user.h"
 
+class SandboxApp;
+
 class HALImp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent>, public valid {
+private:
+	struct HALConfiguration {
+		unsigned fRenderReferenceGeometry : 1;
+	} m_HALConfiguration;
+
 public:
 	HALImp();
 	~HALImp();
+
+	friend class SandboxApp;
 
 public:
 	camera *GetCamera();
@@ -50,15 +60,21 @@ public:
 
 	virtual RESULT Shutdown() = 0;
 
+protected:
+	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
+	bool IsRenderReferenceGeometry();
+
 public:
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) = 0;
 	virtual quad* MakeQuad(double width, double height, point origin) = 0;
 
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
-	virtual volume* MakeVolume(double width, double length, double height) = 0;
+	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) = 0;
+	
+	virtual volume* MakeVolume(double side, bool fTriangleBased = true) = 0;
+	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;
 
-	virtual volume* MakeVolume(double side) = 0;
 	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) = 0;

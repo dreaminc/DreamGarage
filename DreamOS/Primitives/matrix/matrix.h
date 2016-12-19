@@ -8,8 +8,17 @@
 #include "RESULT/EHM.h"
 #include <cstring>
 #include <math.h>
+#include <stdlib.h>     
+#include <time.h>       
 
 //#define RANGE_CHECK 
+#define MATRIX_ROW_MAJOR
+#ifndef MATRIX_ROW_MAJOR
+	#define MATRIX_COLUMN_MAJOR
+#endif
+
+// TODO: Not sure how best to set this (external config, or based on data type?)
+#define MAX_MATRIX_INVERSE_ERROR 0.0001f
 
 // BIG TODO: Create Matrix testing suite
 
@@ -62,12 +71,37 @@ public:
 	}
 
 	bool IsZero() {
-		for (int i = 0; i < N; i++)
-			for (int j = 0; j < M; i++)
-				if (element(i, j) != 0)
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; i++) {
+				if (element(i, j) != 0) {
 					return false;
+				}
+			}
+		}
 
 		return true;
+	}
+
+	TMatrix max() {
+		TMatrix maxVal = m_data[0];
+		
+		for (int i = 0; i < (N * M); i++) {
+			if (m_data[i] > maxVal)
+				maxVal = m_data[i];
+		}
+		
+		return maxVal;
+	}
+
+	TMatrix min() {
+		TMatrix maxVal = m_data[0];
+
+		for (int i = 0; i < (N * M); i++) {
+			if (m_data[i] > maxVal)
+				maxVal = m_data[i];
+		}
+		
+		return maxVal;
 	}
 
 	// Sets up an identity matrix
@@ -79,12 +113,144 @@ public:
 
 		clear();
 
-		for (int i = 0; i < N; i++)
+		for (int i = 0; i < N; i++) {
 			this->element(i, i) = val;
+		}
 
 	Error:
 		return r;
 	}
+
+	RESULT randomize(TMatrix maxval = 10.0f) {
+		srand(time(nullptr));
+
+		for (int i = 0; i < (N * M); i++) {
+			float randval = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+			m_data[i] = maxval * randval;
+		}
+
+		return R_PASS;
+	}
+
+	RESULT rangeByElement(TMatrix start = 0.0f) {
+		TMatrix counter = start;
+
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				this->element(i, j) = counter; 
+				counter += static_cast<TMatrix>(1.0f);
+			}
+		}
+
+		return R_PASS;
+	}
+
+	RESULT range(TMatrix start = 0.0f) {
+		for (int i = 0; i < (N * M); i++) {
+			m_data[i] = start + static_cast<TMatrix>(i);
+		}
+
+		return R_PASS;
+	}
+
+	// TODO: Consolidate range vs 'numbers'
+	RESULT Numbers(TMatrix start, TMatrix increment) {
+		clear();
+
+		for (int i = 0; i < N * M; i++) {
+			m_data[i] = start + i * increment;
+		}
+
+		return R_PASS;
+	}
+
+	RESULT NumbersByElement(TMatrix start, TMatrix increment) {
+		for (int i = 0; i < N; i++) {
+			for (int j = 0; j < M; j++) {
+				this->element(i, j) = start + ((i * N) + j) * increment;
+			}
+		}
+
+		return R_PASS;
+	}
+
+	static matrix<TMatrix, N, M> MakeIdentity(TMatrix val = 1.0f) {
+		matrix<TMatrix, N, M> retMatrix;
+		retMatrix.identity(1.0f);
+		return retMatrix;
+	}
+
+	static matrix<TMatrix, N, M> MakeRandom(TMatrix maxval = 10.0f) {
+		matrix<TMatrix, N, M> retMatrix;
+		retMatrix.randomize(maxval);
+		return retMatrix;
+	}
+
+	static matrix<TMatrix, N, M> MakeRange(TMatrix start = 0.0f) {
+		matrix<TMatrix, N, M> retMatrix;
+		retMatrix.range(start);
+		return retMatrix;
+	}
+
+	static matrix<TMatrix, N, M> MakeRangeByElement(TMatrix start = 0.0f) {
+		matrix<TMatrix, N, M> retMatrix;
+		retMatrix.rangeByElement(start);
+		return retMatrix;
+	}
+
+	matrix<TMatrix, (N - 1), (M - 1)> minormatrix(unsigned i, unsigned j) {
+		RESULT r = R_PASS;
+		matrix<TMatrix, N - 1, M - 1> retMatrix;
+		retMatrix.clear();
+
+		CRM(RangeCheck(i, j), "%d %d minor not possible in %d x %d matrix", i, j, N, M);
+
+		int rowCount = 0;
+		int colCount = 0;
+
+		for (int x = 0; x < (N - 1); x++) {
+			
+			if (rowCount == i) {
+				rowCount += 1;
+			}
+
+			colCount = 0;
+			for (int y = 0; y < (M - 1); y++) {
+
+				if (colCount == j) {
+					colCount += 1;
+				}
+
+				retMatrix.element(x, y) = element(rowCount, colCount);
+
+				colCount += 1;
+			}
+
+			rowCount += 1;
+		}
+
+	Error:
+		return retMatrix;
+	}
+
+	TMatrix minor(unsigned i, unsigned j) {
+		matrix<TMatrix, N - 1, M - 1> retMatrix = minormatrix(i, j);
+		return determinant(retMatrix);
+	}
+
+	// This is a zero based matrix, so adding one for the power (but -1^0 == 1 so the math should actually work regardless)
+	TMatrix cofactor(unsigned i, unsigned j) {
+		TMatrix signVal = pow(-1, ((i+1) + (j+1)));		
+		return (signVal * minor(i, j));
+	}
+
+	RESULT RangeCheck(unsigned i, unsigned j) {
+		ACBM((i < N), "i index greater than %d", N);
+		ACBM((j < M), "j index greater than %d", M);
+
+		return R_PASS;
+	}
+
 
 public:
 	// Constructors
@@ -115,30 +281,22 @@ public:
 		return R_PASS;
 	}
 
-	RESULT Numbers(TMatrix start, TMatrix increment) {
-		clear();
-
-		for (int i = 0; i < N * M; i++)
-			m_data[i] = start + i * increment;
-
-		return R_PASS;
-	}
-
-	RESULT NumbersByElement(TMatrix start, TMatrix increment) {
-		for (int i = 0; i < N; i++)
-			for (int j = 0; j < M; j++) 
-				this->element(i, j) = start + ((i * N) + j) * increment;
-
-		return R_PASS;
-	}
-
 	RESULT PrintMatrix() {
-		for (int i = 0; i < N; i++) {
-			for (int j = 0; j < M; j++) {
-				DEBUG_OUT("%02f ", m_data[(j * N) + i]);
+		DEBUG_LINEOUT("matrix %d x %d | N: %d  M:%d ", rows(), cols(), N, M);
+
+		DEBUG_OUT("| ");
+
+		for (int i = 0; i < (N * M); i++) {
+			if((i != 0) && (i % M) == 0) {
+				DEBUG_LINEOUT(" |");
+				DEBUG_OUT("| ");
 			}
-			DEBUG_LINEOUT("");
+
+			DEBUG_OUT("%02f ", m_data[i]);
 		}
+
+		DEBUG_LINEOUT("| ");
+
 		return R_PASS;
 	}
 
@@ -162,7 +320,7 @@ public:
 
 	// TODO: Check bounds
 	MatrixProxyObject& operator[](const int index) {
-		int lookUpValue = index * M;
+		int lookUpValue = (index * M);
 		MatrixProxyObject retProxy(&(m_data[lookUpValue]));
 		return retProxy;
 	}
@@ -195,8 +353,9 @@ public:
 	}
 
     inline void copyData(TMatrix *data) {
-        for(int i = 0; i < (N * M); i++)
-            m_data[i] = data[i];
+		for (int i = 0; i < (N * M); i++) {
+			m_data[i] = data[i];
+		}
     }
 
     inline void addData(TMatrix *data) {
@@ -210,13 +369,21 @@ public:
     }
 
     inline void divData(const TMatrix& a) {
-        for(int i = 0; i < (N * M); i++)
-            m_data[i] /= a;
+		for (int i = 0; i < (N * M); i++) {
+			m_data[i] /= a;
+		}
     }
 
     // Look up
     // -------------------------------------------------------------------------
 public:
+
+#if defined(MATRIX_ROW_MAJOR)
+	#define MATRIX_LOOK_UP(i, j) (m_data[(i * M) + j])
+#else 
+	#define MATRIX_LOOK_UP(i, j) (m_data[(j * N) + i])
+#endif
+
 	TMatrix& operator()(unsigned i) {
 		#ifdef RANGE_CHECK
 			rangeCheck(i);
@@ -229,28 +396,28 @@ public:
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-		return m_data[(j * N) + i];
+		return MATRIX_LOOK_UP(i, j);
      }
 
      const TMatrix& operator()( unsigned i, unsigned j ) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-		return m_data[(j * N) + i];
+		return MATRIX_LOOK_UP(i, j);
      }
 
      inline const TMatrix& element(unsigned i, unsigned j) const {
         #ifdef RANGE_CHECK
             rangeCheck(i,j);
         #endif
-		return m_data[(j * N) + i];
+		return MATRIX_LOOK_UP(i, j);
      }
 
 	 inline TMatrix& element(unsigned i, unsigned j) {
         #ifdef RANGE_CHECK
             rangeCheck(i, j);
         #endif
-        return m_data[(j * N) + i];
+        return MATRIX_LOOK_UP(i, j);
      }
 
     // Assignment Operators
@@ -360,25 +527,9 @@ public:
 		return matrix<TMatrix, N, M>(*this).operator/=(a);
 	}
 
-
-	/*
-	// TODO: Implement determinant (not critical atm)
-	// Only applicable for square matrices
-	// TODO: Not using Leibniz / Laplace 
-	// Using recursive formula
-	TMatrix determinant() {
-		TMat4x4 result = 0;
-		
-		if (!IsSquare()) {
-			DEBUG_LINEOUT("Cannot calculate determinant for %d x %d matrix", N, M);
-			return NULL;
-		}
-
-		
-
-		return result;
-	}
-	*/
+	// This is specialized 
+	//TMatrix determinant();
+	//matrix<TMatrix, N, M> inverse();
 
 	/*
 	matrix<TMatrix, N, M>& operator-( const matrix<TMatrix, N, M>&arg ) const {
@@ -534,7 +685,8 @@ public:
 // TODO: Fix const-ness?
 template <typename TMat4x4, int N, int M>
 matrix<TMat4x4, N, M> operator* (TMat4x4 val, matrix<TMat4x4, N, M>& arg) {
-	return arg *= (val);
+	matrix<TMat4x4, N, M> result(arg);
+	return (result *= (val));
 }
 
 /*
@@ -552,14 +704,18 @@ matrix<TMat4x4, N, N> operator*(const matrix<TMat4x4, N, N>& lhs, const matrix<T
 	matrix<TMat4x4, N, N> result;
 	result.clear();
 
-	for (int i = 0; i < N; i++) 
-		for (int j = 0; j < N; j++) 
-			for (int k = 0; k < N; k++)
+	for (int i = 0; i < N; i++) {
+		for (int j = 0; j < N; j++) {
+			for (int k = 0; k < N; k++) {
 				result.element(i, j) += lhs.element(i, k) * rhs.element(k, j);
+			}
+		}
+	}
 
 	return result;
 }
 
+///*
 // N x M multiplied by M x 1, should work for all N, M
 // This is technically an optimized of the below
 template <typename TMat4x4, int N, int M>
@@ -573,6 +729,7 @@ matrix<TMat4x4, N, 1> operator*(const matrix<TMat4x4, N, M>& lhs, const matrix<T
 
 	return result;
 }
+//*/
 
 // N x M multiplied by M x W, should work for all N, M, W
 template <typename TMat4x4, int N, int M, int W>
@@ -603,7 +760,6 @@ TMat4x4 operator*(const matrix<TMat4x4, N, 1>& lhs, const matrix<TMat4x4, N, 1>&
 }
 
 // EQUALITY
-// 
 template <typename TMat4x4, int N, int M>
 bool operator==(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, N, M>& rhs) {
 	for (int i = 0; i < N; i++) {
@@ -620,6 +776,179 @@ bool operator!=(const matrix<TMat4x4, N, M>& lhs, const matrix<TMat4x4, N, M>& r
 	return !(lhs==rhs);
 }
 
+// DETERMINANT
+
+// Formulas from or derived based on: https://en.wikipedia.org/wiki/Determinant
+template <typename TMat2x2>
+TMat2x2 determinant(matrix<TMat2x2, 2, 2> mat) {
+	return (mat.m_data[0] * mat.m_data[3]) - (mat.m_data[1] * mat.m_data[2]);
+}
+
+template <typename TMat3x3>
+TMat3x3 determinant(matrix<TMat3x3, 3, 3> mat) {
+	TMat3x3 result = -1;
+
+	result = (mat.m_data[0] * mat.m_data[4] * mat.m_data[8]);
+	result += (mat.m_data[1] * mat.m_data[5] * mat.m_data[6]);
+	result += (mat.m_data[2] * mat.m_data[3] * mat.m_data[7]);
+
+	result -= (mat.m_data[2] * mat.m_data[4] * mat.m_data[6]);
+	result -= (mat.m_data[1] * mat.m_data[3] * mat.m_data[8]);
+	result -= (mat.m_data[0] * mat.m_data[5] * mat.m_data[7]);
+
+	return result;
+}
+
+// TODO: This could likely be generalized to a M M method
+template <typename TMat4x4>
+TMat4x4 determinant(matrix<TMat4x4, 4, 4> mat) {
+	TMat4x4 determinantResult = 0.0f;
+
+	for (int j = 0; j < 4; j++) {
+		determinantResult += (mat.element(0, j) * mat.cofactor(0, j));
+	}
+
+	return determinantResult;
+}
+
+// http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
+template <typename TMat2x2>
+matrix<TMat2x2, 2, 2> inverse(matrix<TMat2x2, 2, 2> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat2x2, 2, 2> retMatrix;
+	retMatrix.clear();
+
+	TMat2x2 matDeterminant = determinant(mat);
+	CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
+	
+	// 0
+	retMatrix.element(0, 0) = mat(1, 1);
+	retMatrix.element(0, 1) = -1 * mat(0, 1);
+
+	// 1
+	retMatrix.element(1, 0) = -1 * mat(1, 0);
+	retMatrix.element(1, 1) = mat(0, 0);
+
+	retMatrix *= (1.0f / matDeterminant);
+
+Error:
+	return retMatrix;
+}
+
+// http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
+template <typename TMat3x3>
+matrix<TMat3x3, 3, 3> inverse(matrix<TMat3x3, 3, 3> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat3x3, 3, 3> retMatrix;
+	retMatrix.clear();
+
+	TMat3x3 matDeterminant = determinant(mat);
+	CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
+	/*
+	// TODO: hard coding suuuuuuuuuuuuuuuucks (but it works really well)
+	(0, 0) = (1, 1)(2, 2) - (1, 2)(2, 1)
+	(0, 1) = (0, 2)(2, 1) - (0, 1)(2, 2)
+	(0, 2) = (0, 1)(1, 2) - (0, 2)(1, 1)
+	(0, 0) = (1, 2)(2, 0) - (1, 0)(2, 2)
+	(1, 1) = (0, 0)(2, 2) - (0, 2)(2, 0)
+	(1, 2) = (0, 2)(1, 0) - (0, 0)(1, 2)
+	(0, 0) = (1, 0)(2, 1) - (1, 1)(2, 0)
+	(1, 1) = (0, 1)(2, 0) - (0, 0)(2, 1)
+	(2, 2) = (0, 0)(1, 1) - (0, 1)(1, 0)
+	*/
+	
+	retMatrix.element(0, 0) = mat(1, 1)*mat(2, 2) - mat(1, 2)*mat(2, 1);
+	retMatrix.element(0, 1) = mat(0, 2)*mat(2, 1) - mat(0, 1)*mat(2, 2);
+	retMatrix.element(0, 2) = mat(0, 1)*mat(1, 2) - mat(0, 2)*mat(1, 1);
+	retMatrix.element(1, 0) = mat(1, 2)*mat(2, 0) - mat(1, 0)*mat(2, 2);
+	retMatrix.element(1, 1) = mat(0, 0)*mat(2, 2) - mat(0, 2)*mat(2, 0);
+	retMatrix.element(1, 2) = mat(0, 2)*mat(1, 0) - mat(0, 0)*mat(1, 2);
+	retMatrix.element(2, 0) = mat(1, 0)*mat(2, 1) - mat(1, 1)*mat(2, 0);
+	retMatrix.element(2, 1) = mat(0, 1)*mat(2, 0) - mat(0, 0)*mat(2, 1);
+	retMatrix.element(2, 2) = mat(0, 0)*mat(1, 1) - mat(0, 1)*mat(1, 0);
+	
+
+	retMatrix *= (1.0f / matDeterminant);
+
+Error:
+	return retMatrix;
+}
+
+// http://www.cg.info.hiroshima-cu.ac.jp/~miyazaki/knowledge/teche23.html
+template <typename TMat4x4>
+matrix<TMat4x4, 4, 4> inverse(matrix<TMat4x4, 4, 4> mat) {
+	RESULT r = R_PASS;
+
+	matrix<TMat4x4, 4, 4> retMatrix;
+	retMatrix.clear();
+
+	TMat4x4 matDeterminant = determinant(mat);
+	CBM((matDeterminant != 0), "Matrix cannot be inverted, determinant is zero");
+
+	// TODO: hard coding suuuuuuuuuuuuuuuucks
+	/*
+	// This is here to inspect the ordering / indices - use this as a template to redo the below
+	(0,0) = (1,1)(2,2)(3,3) + (1,2)(2,3)(3,1) + (1,3)(2,1)(3,2) - (1,1)(2,3)(3,2) - (1,2)(2,1)(3,3) - (1,3)(2,2)(3,1)
+	(0,1) = (0,1)(2,3)(3,2) + (0,2)(2,1)(3,3) + (0,3)(2,2)(3,1) - (0,1)(2,2)(3,3) - (0,2)(2,3)(3,1) - (0,3)(2,1)(3,2)
+	(0,2) = (0,1)(1,2)(3,3) + (0,2)(1,3)(3,1) + (0,3)(1,1)(3,2) - (0,1)(1,3)(3,2) - (0,2)(1,1)(3,3) - (0,3)(1,2)(3,1)
+	(0,3) = (0,1)(1,3)(2,2) + (0,2)(1,1)(2,3) + (0,3)(1,2)(2,1) - (0,1)(1,2)(2,3) - (0,2)(1,3)(2,1) - (0,3)(1,1)(2,2)
+	(1,0) = (1,0)(2,3)(3,2) + (1,2)(2,0)(3,3) + (1,3)(2,2)(3,0) - (1,0)(2,2)(3,3) - (1,2)(2,3)(3,0) - (1,3)(2,0)(3,2)
+	(1,1) = (0,0)(2,2)(3,3) + (0,2)(2,3)(3,0) + (0,3)(2,0)(3,2) - (0,0)(2,3)(3,2) - (0,2)(2,0)(3,3) - (0,3)(2,2)(3,0)
+	(1,2) = (0,0)(1,3)(3,2) + (0,2)(1,0)(3,3) + (0,3)(1,2)(3,0) - (0,0)(1,2)(3,3) - (0,2)(1,3)(3,0) - (0,3)(1,0)(3,2)
+	(1,3) = (0,0)(1,2)(2,3) + (0,2)(1,3)(2,0) + (0,3)(1,0)(2,2) - (0,0)(1,3)(2,2) - (0,2)(1,0)(2,3) - (0,3)(1,2)(2,0)
+	(2,0) = (1,0)(2,1)(3,3) + (1,1)(2,3)(3,0) + (1,3)(2,0)(3,1) - (1,0)(2,3)(3,1) - (1,1)(2,0)(3,3) - (1,3)(2,1)(3,0)
+	(2,1) = (0,0)(2,3)(3,1) + (0,1)(2,0)(3,3) + (0,3)(2,1)(3,0) - (0,0)(2,1)(3,3) - (0,1)(2,3)(3,0) - (0,3)(2,0)(3,1)
+	(2,2) = (0,0)(1,1)(3,3) + (0,1)(1,3)(3,0) + (0,3)(1,0)(3,1) - (0,0)(1,3)(3,1) - (0,1)(1,0)(3,3) - (0,3)(1,1)(3,0)
+	(2,3) = (0,0)(1,3)(2,1) + (0,1)(1,0)(2,3) + (0,3)(1,1)(2,0) - (0,0)(1,1)(2,3) - (0,1)(1,3)(2,0) - (0,3)(1,0)(2,1)
+	(3,0) = (1,0)(2,2)(3,1) + (1,1)(2,0)(3,2) + (1,2)(2,1)(3,0) - (1,0)(2,1)(3,2) - (1,1)(2,2)(3,0) - (1,2)(2,0)(3,1)
+	(3,1) = (0,0)(2,1)(3,2) + (0,1)(2,2)(3,0) + (0,2)(2,0)(3,1) - (0,0)(2,2)(3,1) - (0,1)(2,0)(3,2) - (0,2)(2,1)(3,0)
+	(3,2) = (0,0)(1,2)(3,1) + (0,1)(1,0)(3,2) + (0,2)(1,1)(3,0) - (0,0)(1,1)(3,2) - (0,1)(1,2)(3,0) - (0,2)(1,0)(3,1)
+	(3,3) = (0,0)(1,1)(2,2) + (0,1)(1,2)(2,0) + (0,2)(1,0)(2,1) - (0,0)(1,2)(2,1) - (0,1)(1,0)(2,2) - (0,2)(1,1)(2,0)
+	*/
+	
+	retMatrix.element(0, 0) = mat(1, 1)*mat(2, 2)*mat(3, 3) + mat(1, 2)*mat(2, 3)*mat(3, 1) + mat(1, 3)*mat(2, 1)*mat(3, 2) - mat(1, 1)*mat(2, 3)*mat(3, 2) - mat(1, 2)*mat(2, 1)*mat(3, 3) - mat(1, 3)*mat(2, 2)*mat(3, 1);
+	retMatrix.element(0, 1) = mat(0, 1)*mat(2, 3)*mat(3, 2) + mat(0, 2)*mat(2, 1)*mat(3, 3) + mat(0, 3)*mat(2, 2)*mat(3, 1) - mat(0, 1)*mat(2, 2)*mat(3, 3) - mat(0, 2)*mat(2, 3)*mat(3, 1) - mat(0, 3)*mat(2, 1)*mat(3, 2);
+	retMatrix.element(0, 2) = mat(0, 1)*mat(1, 2)*mat(3, 3) + mat(0, 2)*mat(1, 3)*mat(3, 1) + mat(0, 3)*mat(1, 1)*mat(3, 2) - mat(0, 1)*mat(1, 3)*mat(3, 2) - mat(0, 2)*mat(1, 1)*mat(3, 3) - mat(0, 3)*mat(1, 2)*mat(3, 1);
+	retMatrix.element(0, 3) = mat(0, 1)*mat(1, 3)*mat(2, 2) + mat(0, 2)*mat(1, 1)*mat(2, 3) + mat(0, 3)*mat(1, 2)*mat(2, 1) - mat(0, 1)*mat(1, 2)*mat(2, 3) - mat(0, 2)*mat(1, 3)*mat(2, 1) - mat(0, 3)*mat(1, 1)*mat(2, 2);
+	retMatrix.element(1, 0) = mat(1, 0)*mat(2, 3)*mat(3, 2) + mat(1, 2)*mat(2, 0)*mat(3, 3) + mat(1, 3)*mat(2, 2)*mat(3, 0) - mat(1, 0)*mat(2, 2)*mat(3, 3) - mat(1, 2)*mat(2, 3)*mat(3, 0) - mat(1, 3)*mat(2, 0)*mat(3, 2);
+	retMatrix.element(1, 1) = mat(0, 0)*mat(2, 2)*mat(3, 3) + mat(0, 2)*mat(2, 3)*mat(3, 0) + mat(0, 3)*mat(2, 0)*mat(3, 2) - mat(0, 0)*mat(2, 3)*mat(3, 2) - mat(0, 2)*mat(2, 0)*mat(3, 3) - mat(0, 3)*mat(2, 2)*mat(3, 0);
+	retMatrix.element(1, 2) = mat(0, 0)*mat(1, 3)*mat(3, 2) + mat(0, 2)*mat(1, 0)*mat(3, 3) + mat(0, 3)*mat(1, 2)*mat(3, 0) - mat(0, 0)*mat(1, 2)*mat(3, 3) - mat(0, 2)*mat(1, 3)*mat(3, 0) - mat(0, 3)*mat(1, 0)*mat(3, 2);
+	retMatrix.element(1, 3) = mat(0, 0)*mat(1, 2)*mat(2, 3) + mat(0, 2)*mat(1, 3)*mat(2, 0) + mat(0, 3)*mat(1, 0)*mat(2, 2) - mat(0, 0)*mat(1, 3)*mat(2, 2) - mat(0, 2)*mat(1, 0)*mat(2, 3) - mat(0, 3)*mat(1, 2)*mat(2, 0);
+	retMatrix.element(2, 0) = mat(1, 0)*mat(2, 1)*mat(3, 3) + mat(1, 1)*mat(2, 3)*mat(3, 0) + mat(1, 3)*mat(2, 0)*mat(3, 1) - mat(1, 0)*mat(2, 3)*mat(3, 1) - mat(1, 1)*mat(2, 0)*mat(3, 3) - mat(1, 3)*mat(2, 1)*mat(3, 0);
+	retMatrix.element(2, 1) = mat(0, 0)*mat(2, 3)*mat(3, 1) + mat(0, 1)*mat(2, 0)*mat(3, 3) + mat(0, 3)*mat(2, 1)*mat(3, 0) - mat(0, 0)*mat(2, 1)*mat(3, 3) - mat(0, 1)*mat(2, 3)*mat(3, 0) - mat(0, 3)*mat(2, 0)*mat(3, 1);
+	retMatrix.element(2, 2) = mat(0, 0)*mat(1, 1)*mat(3, 3) + mat(0, 1)*mat(1, 3)*mat(3, 0) + mat(0, 3)*mat(1, 0)*mat(3, 1) - mat(0, 0)*mat(1, 3)*mat(3, 1) - mat(0, 1)*mat(1, 0)*mat(3, 3) - mat(0, 3)*mat(1, 1)*mat(3, 0);
+	retMatrix.element(2, 3) = mat(0, 0)*mat(1, 3)*mat(2, 1) + mat(0, 1)*mat(1, 0)*mat(2, 3) + mat(0, 3)*mat(1, 1)*mat(2, 0) - mat(0, 0)*mat(1, 1)*mat(2, 3) - mat(0, 1)*mat(1, 3)*mat(2, 0) - mat(0, 3)*mat(1, 0)*mat(2, 1);
+	retMatrix.element(3, 0) = mat(1, 0)*mat(2, 2)*mat(3, 1) + mat(1, 1)*mat(2, 0)*mat(3, 2) + mat(1, 2)*mat(2, 1)*mat(3, 0) - mat(1, 0)*mat(2, 1)*mat(3, 2) - mat(1, 1)*mat(2, 2)*mat(3, 0) - mat(1, 2)*mat(2, 0)*mat(3, 1);
+	retMatrix.element(3, 1) = mat(0, 0)*mat(2, 1)*mat(3, 2) + mat(0, 1)*mat(2, 2)*mat(3, 0) + mat(0, 2)*mat(2, 0)*mat(3, 1) - mat(0, 0)*mat(2, 2)*mat(3, 1) - mat(0, 1)*mat(2, 0)*mat(3, 2) - mat(0, 2)*mat(2, 1)*mat(3, 0);
+	retMatrix.element(3, 2) = mat(0, 0)*mat(1, 2)*mat(3, 1) + mat(0, 1)*mat(1, 0)*mat(3, 2) + mat(0, 2)*mat(1, 1)*mat(3, 0) - mat(0, 0)*mat(1, 1)*mat(3, 2) - mat(0, 1)*mat(1, 2)*mat(3, 0) - mat(0, 2)*mat(1, 0)*mat(3, 1);
+	retMatrix.element(3, 3) = mat(0, 0)*mat(1, 1)*mat(2, 2) + mat(0, 1)*mat(1, 2)*mat(2, 0) + mat(0, 2)*mat(1, 0)*mat(2, 1) - mat(0, 0)*mat(1, 2)*mat(2, 1) - mat(0, 1)*mat(1, 0)*mat(2, 2) - mat(0, 2)*mat(1, 1)*mat(2, 0);
+
+	retMatrix *= (1.0f / matDeterminant);
+
+Error:
+	return retMatrix;
+}
+
+/*
+// TODO: Implement determinant (not critical atm)
+// Only applicable for square matrices
+// TODO: Not using Leibniz / Laplace
+template <typename TMat4x4, int N, int M>
+TMat4x4 matrix<TMat4x4, N, M>::determinant() {
+TMat4x4 result = -1;
+
+if (!IsSquare()) {
+DEBUG_LINEOUT("Cannot calculate determinant for %d x %d matrix", N, M);
+return NULL;
+}
+
+// TODO: This is not working generally
+
+return result;
+}
+*/
 
 /*
 template <typename TMat4x4>

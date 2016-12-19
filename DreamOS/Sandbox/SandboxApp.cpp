@@ -3,14 +3,23 @@
 
 #include "Cloud/Message/Message.h"
 
+#include "Primitives/ray.h"
+
+#include <HMD/OpenVR/OpenVRDevice.h>
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
-	m_pOpenGLRenderingContext(NULL),
-	m_pSceneGraph(NULL),
+	m_pOpenGLRenderingContext(nullptr),
+	m_pSceneGraph(nullptr),
+	m_pPhysicsGraph(nullptr),
+	m_pFlatSceneGraph(nullptr),
 	m_pCloudController(nullptr),
 	m_pHALImp(nullptr),
-	m_fnUpdateCallback(nullptr)
+	m_pHMD(nullptr),
+	m_fnUpdateCallback(nullptr),
+	m_pSenseLeapMotion(nullptr),
+	m_pPhysicsEngine(nullptr)
 {
 	// empty
 }
@@ -32,12 +41,351 @@ SandboxApp::~SandboxApp() {
 	}
 }
 
+RESULT SandboxApp::SetMouseIntersectObjects(bool fMouseIntersectObjects) {
+	m_fMouseIntersectObjects = fMouseIntersectObjects;
+	return R_PASS;
+}
+
+bool SandboxApp::IsMouseIntersectObjects() {
+	return m_fMouseIntersectObjects;
+}
+
+RESULT SandboxApp::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	if (event->GetArg(1).compare("intersect") == 0) {
+		m_pHALImp->SetRenderReferenceGeometry(true);
+		SetMouseIntersectObjects(!IsMouseIntersectObjects());
+	}
+
+	return r;
+}
+
+RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
+	RESULT r = R_PASS;
+
+	switch (mEvent->EventType) {
+		case SENSE_MOUSE_MOVE: {
+			// For object intersection testing
+			//SenseMouse::PrintEvent(mEvent);
+			
+			if (m_fMouseIntersectObjects) {
+				// Create ray
+				// TODO: This will only work for non-HMD camera 
+				camera *pCamera = m_pHALImp->GetCamera();
+				ray rayCamera = pCamera->GetRay(mEvent->xPos, mEvent->yPos);
+
+				// intersect ray
+				auto intersectedObjects = m_pSceneGraph->GetObjects(rayCamera);
+
+				// TODO: Junk code:
+				for (auto &pObject : m_pSceneGraph->GetObjects()) {
+
+					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+					if (pDimObj != nullptr) {
+						pDimObj->SetColor(color(COLOR_WHITE));
+					}
+				}
+
+				for (auto &pObject : intersectedObjects) {
+					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+					pDimObj->SetColor(color(COLOR_RED));
+				}
+			}
+		} break;
+	}
+
+//Error:
+	return r;
+}
+
+RESULT SandboxApp::Notify(CollisionObjectEvent *oEvent) {
+	RESULT r = R_PASS;
+
+
+
+//Error:
+	return r;
+}
+
+RESULT SandboxApp::Notify(CollisionGroupEvent* gEvent) {
+	RESULT r = R_PASS;
+
+	for (auto &pObject : gEvent->m_collisionGroup) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+
+		if (pDimObj != nullptr) {
+			pDimObj->SetColor(color(COLOR_WHITE));
+		}
+	}
+
+	for (auto &pObject : gEvent->m_collisionGroup) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+		
+		if (pDimObj != nullptr) {
+			pDimObj->SetColor(color(COLOR_RED));
+		}
+	}
+	
+
+//Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterImpKeyboardEvents() {
+	RESULT r = R_PASS;
+
+	// Register Dream Console to keyboard events
+	CR(RegisterSubscriber(SK_ALL, DreamConsole::GetConsole()));
+
+	camera *pCamera = m_pHALImp->GetCamera();
+
+	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
+
+	/*
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, m_pOpenGLImp));
+	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, m_pOpenGLImp));
+
+	for (int i = 0; i < 26; i++) {
+	CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), m_pOpenGLImp));
+	}
+	*/
+
+	CR(RegisterSubscriber(VK_LEFT, pCamera));
+	CR(RegisterSubscriber(VK_UP, pCamera));
+	CR(RegisterSubscriber(VK_DOWN, pCamera));
+	CR(RegisterSubscriber(VK_RIGHT, pCamera));
+
+	CR(RegisterSubscriber(VK_SPACE, pCamera));
+
+	for (int i = 0; i < 26; i++) {
+		CR(RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
+	}
+
+	CR(RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
+	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterImpMouseEvents() {
+	RESULT r = R_PASS;
+
+	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, this));
+
+	//camera *pCamera = m_pOpenGLImp->GetCamera();
+
+	// TODO: Should either be moved up to the sandbox or into the Imp itself
+	//CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_DOWN, m_pHALImp));
+	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_UP, m_pHALImp));
+
+
+Error:
+	return r;
+}
+
+// temp
+#include "HAL/opengl/OGLHand.h"
+
+// TODO: shouldn't be this way ultimately 
+RESULT SandboxApp::RegisterImpLeapMotionEvents() {
+	RESULT r = R_PASS;
+
+	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+	
+	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
+
+	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
+
+	pLeftHand->SetOriented(true);
+	pRightHand->SetOriented(true);
+
+	composite* pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+	
+	composite* pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
+						nullptr,
+						point(0.0f, 0.0f, 0.0f),
+						0.015f,
+						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
+
+	std::shared_ptr<DimObj> pLeftModelSharedPtr(pLeftModel);
+	pLeftModelSharedPtr->SetVisible(true);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftModelSharedPtr);
+
+	std::shared_ptr<DimObj> pRightModelSharedPtr(pRightModel);
+	pRightModelSharedPtr->SetVisible(true);
+	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightModelSharedPtr);
+
+
+	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
+
+	CR(m_pSenseLeapMotion->AttachModel(pLeftModel, hand::HAND_LEFT));
+	CR(m_pSenseLeapMotion->AttachModel(pRightModel, hand::HAND_RIGHT));
+
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterImpViveControllerEvents() {
+	RESULT r = R_PASS;
+
+	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
+
+	if (pVive) {
+		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
+/*
+		std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
+		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
+
+		std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
+		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
+//*/
+		pLeftHand->SetOriented(false);
+		pRightHand->SetOriented(false);
+
+		pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
+		pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
+		CR(pVive->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
+		CR(pVive->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
+	}
+Error:
+	return r;
+}
+
+//hand *Windows64App::AttachHand
+
+hand* SandboxApp::GetHand(hand::HAND_TYPE handType) {
+	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
+
+	if (pVive != nullptr) {
+		return pVive->GetHand(handType);
+	}
+	
+	return m_pSenseLeapMotion->GetHand(handType);
+}
+
+bool SandboxApp::IsSandboxRunning() {
+	return m_fRunning;
+}
+
+RESULT SandboxApp::SetSandboxRunning(bool fRunning) {
+	m_fRunning = fRunning;
+	return R_SUCCESS;
+}
+
 inline PathManager* SandboxApp::GetPathManager() {
 	return m_pPathManager; 
 }
 
 inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext; 
+}
+
+RESULT SandboxApp::RunAppLoop() {
+	RESULT r = R_PASS;
+
+	// Launch main message loop
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
+
+	SetSandboxRunning(true);
+
+	// TODO: This should be moved to the sandbox
+	while (IsSandboxRunning()) {
+		CR(HandleMessages());	// Handle windows messages
+		
+		if (!IsSandboxRunning()) 
+			break;
+
+#ifdef CEF_ENABLED
+		// Update Network
+		CR(m_pCloudController->Update());
+#endif
+
+		// Time Manager
+		CR(m_pTimeManager->Update());
+
+		// Update Callback
+		if (m_fnUpdateCallback != nullptr) {
+			CR(m_fnUpdateCallback());
+		}
+
+		// Update the mouse
+		// TODO: This is wrong architecture, this should
+		// be parallel 
+		// TODO: Update Sense etc
+		//m_pWin64Mouse->UpdateMousePosition();
+
+		if (m_pHMD != nullptr) {
+			m_pHMD->UpdateHMD();
+		}
+
+		// Update Scene 
+		//CR(m_pSceneGraph->UpdateScene());
+
+		CR(m_pPhysicsEngine->Update());
+		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
+
+		// Update HMD
+		if (m_pHMD != nullptr) {
+			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
+			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
+		}
+
+		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
+		//m_pOpenGLImp->Render(m_pSceneGraph);
+
+		///*
+		// Send to the HMD
+		// TODO reorganize Render functions
+		// need to be re-architected so that the HMD functions are called after all of the 
+		// GL functions per eye.
+		if (m_pHMD != nullptr) {
+			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
+			m_pHMD->SubmitFrame();
+			m_pHMD->RenderHMDMirror();
+		}
+		else {
+			// Render Scene
+			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
+		}
+		//*/
+
+		// Swap buffers
+		SwapDisplayBuffers();
+
+		DreamConsole::GetConsole()->OnFrameRendered();
+
+		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
+			Shutdown();
+		}
+	}
+
+Error:
+	return r;
 }
 
 RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
@@ -65,8 +413,11 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
 
 	// For auto login, use '-l auto'
-	//CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
+#if defined(_USE_TEST_APP) || defined(_UNIT_TESTING)
+	CR(m_pCommandLineManager->RegisterParameter("login", "l", "no"));
+#else
 	CR(m_pCommandLineManager->RegisterParameter("login", "l", "auto"));
+#endif
 	
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
@@ -74,12 +425,16 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
+	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
+
+	// Initialize Physics Engine
+	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
 
 	m_fCheckHMD = (m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0);
 	m_fCheckLeap = (m_pCommandLineManager->GetParameterValue("leap").compare("") == 0);
@@ -97,6 +452,39 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 		m_pCloudController->Start();
 	}
 
+	// Register with command prompt
+	// TODO: This should be changed to a command pattern
+	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Sandbox, this);
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializePhysicsEngine() {
+	RESULT r = R_PASS;
+
+	m_pPhysicsEngine = PhysicsEngine::MakePhysicsEngine();
+	CNMW(m_pPhysicsEngine, "Physics Engine failed to initialize");
+
+	// Set up physics graph
+	m_pPhysicsGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pPhysicsGraph, "Failed to allocate Physics Graph");
+
+	CRM(m_pPhysicsEngine->SetPhysicsGraph(m_pPhysicsGraph), "Failed to set physics object store");
+
+	// Register OBJECT_GROUP_COLLISION
+	// CR(m_pPhysicsEngine->RegisterSubscriber(OBJECT_GROUP_COLLISION, this));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
+	RESULT r = R_PASS;
+
+	r = m_pPhysicsEngine->RegisterObjectCollisionSubscriber(pVirtualObject, pCollisionDetectorSubscriber);
+	CR(r);
+
 Error:
 	return r;
 }
@@ -106,11 +494,20 @@ long SandboxApp::GetTickCount() {
 }
 
 // Sandbox Factory Methods
-// TODO: This should all go up into the sandbox
 RESULT SandboxApp::AddObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pSceneGraph->PushObject(pObject));
+
+Error:
+	return r;
+}
+
+// This adds the object to the physics graph (otherwise it will not get integrated / operated on)
+RESULT SandboxApp::AddPhysicsObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsGraph->PushObject(pObject));
 
 Error:
 	return r;
@@ -177,6 +574,29 @@ Error:
 	return nullptr;
 }
 
+cylinder* SandboxApp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+	return m_pHALImp->MakeCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
+}
+
+cylinder* SandboxApp::AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+	RESULT r = R_PASS;
+
+	cylinder *pCylinder = m_pHALImp->MakeCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
+	CN(pCylinder);
+
+	CR(AddObject(pCylinder));
+
+	//Success:
+	return pCylinder;
+
+Error:
+	if (pCylinder != nullptr) {
+		delete pCylinder;
+		pCylinder = nullptr;
+	}
+	return nullptr;
+}
+
 sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
@@ -200,18 +620,18 @@ Error:
 	return nullptr;
 }
 
-volume* SandboxApp::MakeVolume(double width, double length, double height) {
-	return m_pHALImp->MakeVolume(width, length, height);
+volume* SandboxApp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
+	return m_pHALImp->MakeVolume(width, length, height, fTriangleBased);
 }
 
-volume* SandboxApp::MakeVolume(double side) {
-	return m_pHALImp->MakeVolume(side);
+volume* SandboxApp::MakeVolume(double side, bool fTriangleBased) {
+	return m_pHALImp->MakeVolume(side, fTriangleBased);
 }
 
-volume* SandboxApp::AddVolume(double width, double length, double height) {
+volume* SandboxApp::AddVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = MakeVolume(width, length, height);
+	volume *pVolume = MakeVolume(width, length, height, fTriangleBased);
 	CN(pVolume);
 
 	CR(AddObject(pVolume));
@@ -227,8 +647,8 @@ Error:
 	return nullptr;
 }
 
-volume* SandboxApp::AddVolume(double side) {
-	return AddVolume(side, side, side);
+volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
+	return AddVolume(side, side, side, fTriangleBased);
 }
 
 text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard)
@@ -396,11 +816,6 @@ point SandboxApp::GetCameraPosition() {
 
 quaternion SandboxApp::GetCameraOrientation() {
 	return m_pHALImp->GetCamera()->GetWorldOrientation();
-}
-
-// TODO: This should move up to Sandbox
-hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
-	return nullptr;
 }
 
 // Cloud Controller

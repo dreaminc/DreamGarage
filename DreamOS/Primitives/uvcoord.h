@@ -7,7 +7,7 @@
 // DreamOS/Dimension/Primitives/uvcoord.h
 // UV Coordinate
 
-#include "matrix.h"
+#include "matrix/matrix.h"
 
 
 #ifdef FLOAT_PRECISION

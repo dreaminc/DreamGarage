@@ -48,6 +48,11 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)wglGetProcAddress("glGetShaderInfoLog")),
 		"Failed to initialize glGetShaderInfoLog extension");
 
+	// Draw
+	CNMW((m_glDrawRangeElements = (PFNGLDRAWRANGEELEMENTSPROC)wglGetProcAddress("glDrawRangeElements")),
+		"Failed to initialize glDrawRangeElements extension");
+
+	// Uniform
 	CNMW((m_glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)wglGetProcAddress("glGetUniformLocation")),
 		"Failed to initialize glGetUniformLocation extension");
 

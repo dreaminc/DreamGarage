@@ -40,6 +40,7 @@ private:
 	OGLProgram *m_pOGLProgramShadowDepth;
 	OGLProgram *m_pOGLProgramCapture;		// temp for testing
 	OGLProgram *m_pOGLSkyboxProgram;
+	OGLProgram *m_pOGLReferenceGeometryProgram;
 	OGLProgram *m_pOGLOverlayProgram;
 	OGLProgram *m_pOGLFlatProgram; 
 
@@ -57,14 +58,22 @@ private:
 	int m_pxViewWidth;
 	int m_pxViewHeight;
 
-	bool	m_drawWireframe = false;
 
 public:
 	int GetViewWidth() { return m_pxViewWidth; }
 	int GetViewHeight() { return m_pxViewHeight; }
 
 private:
+	// TODO: Potentially replace this with a :1 bit field struct
+	bool m_fDrawWireframe = false;
 	bool m_fRenderProfiler = false;
+
+protected:
+	RESULT SetDrawWireframe(bool fDrawWireframe);
+	bool IsDrawWireframe();
+	
+	RESULT SetRenderProfiler(bool fRenderProfiler);
+	bool IsRenderProfiler();
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
@@ -72,14 +81,17 @@ public:
 
 	// Object Factory Methods
 public:
-	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
-	quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
-	quad* MakeQuad(double width, double height, point origin);
+	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
+	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) override;
+	virtual quad* MakeQuad(double width, double height, point origin) override;
 
-	sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c);
-	volume* MakeVolume(double width, double length, double height);
+	virtual sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) override;
+
+	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) override;
 	
-	volume* MakeVolume(double side);
+	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
+	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
+	
 	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
@@ -100,11 +112,12 @@ public:
 
 public:
 	RESULT SetViewTarget(EYE_TYPE eye);
-	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye); // temporary name
+	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatObjectStore, EYE_TYPE eye); // temporary name
 	RESULT RenderToTexture(FlatContext* pContext);
 private:
 	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
 	RESULT RenderProfiler(EYE_TYPE eye);
+	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, EYE_TYPE eye);
 
 public:
 	RESULT Resize(int pxWidth, int pxHeight);
@@ -126,7 +139,6 @@ private:
 
 private:
 	RESULT Notify(CmdPromptEvent *event);
-
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
@@ -149,6 +161,8 @@ public:
 	RESULT UseProgram(GLuint OGLProgramIndex);
 	RESULT LinkProgram(GLuint OGLProgramIndex);
 	RESULT glGetProgramInfoLog(GLuint programID, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+
+	RESULT glDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices);
 
 	RESULT glGetProgramiv(GLuint programID, GLenum pname, GLint *params);
 	RESULT glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params);

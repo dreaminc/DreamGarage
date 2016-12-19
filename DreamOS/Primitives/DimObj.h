@@ -1,6 +1,8 @@
 #ifndef DIM_OBJ_H_
 #define DIM_OBJ_H_
 
+#include "RESULT/EHM.h"
+
 // DREAM OS
 // DreamOS/Dimension/Primitives/DimObj.h
 // Dimension Base Object
@@ -15,6 +17,7 @@
 #include "VirtualObj.h"
 #include "point.h"
 #include "TriangleIndexGroup.h"
+#include "QuadIndexGroup.h"
 #include "Vertex.h"
 
 #include "TimeManager/TimeManager.h"
@@ -23,6 +26,8 @@
 
 #include <vector>
 #include <memory>
+
+class BoundingVolume;
 
 class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
 protected:
@@ -34,23 +39,36 @@ protected:
 	dimindex *m_pIndices;
 	material m_material;
 
+	// Bounding Volume
+	std::shared_ptr<BoundingVolume> m_pBoundingVolume;
+
+	// Use this flag to signal the appropriate rendering object (such as OGLObj) that it needs to update the buffer
+	// TODO: This should be encapsulated as a dirty pattern
+	bool m_fDirty;
+	
+	// TODO: textures need to go into material once we figure out how we put a sampler2D into a uniform block
 	// TODO: Multiple textures (one for now)
 	texture *m_pColorTexture;
 	texture *m_pBumpTexture;
-
-	// textures need to go into material once we figure out how we put a sampler2D into a uniform block
 	texture *m_pTextureAmbient = nullptr;
 	texture *m_pTextureDiffuse = nullptr;
 	texture *m_pTextureSpecular = nullptr;
 
 private:
 	bool m_fVisible;
+	bool m_fWireframe;
 
 public:
-	enum class MaterialTexture { Ambient, Diffuse, Specular };
 
 	DimObj();
 	~DimObj();
+
+	// TODO: rename
+	enum class MaterialTexture { 
+		Ambient, 
+		Diffuse, 
+		Specular 
+	};
 
 	virtual OBJECT_TYPE GetType();
 
@@ -59,68 +77,49 @@ public:
 	virtual RESULT Destroy();
 
 	virtual inline unsigned int NumberVertices() = 0;
+	inline vertex *VertexData() { return m_pVertices; }
+	inline int VertexDataSize() { return NumberVertices() * sizeof(vertex); }
 
 	virtual inline unsigned int NumberIndices() = 0;
-
-	inline vertex* VertexData() {
-		return m_pVertices;
-	}
-
-	inline int VertexDataSize() {
-		return NumberVertices() * sizeof(vertex);
-	}
-
-	inline dimindex* IndexData() {
-		return m_pIndices;
-	}
-
-	inline int IndexDataSize() {
-		return NumberIndices() * sizeof(dimindex);
-	}
+	inline dimindex *IndexData() { return m_pIndices; }
+	inline int IndexDataSize() { return NumberIndices() * sizeof(dimindex); }
 
 	RESULT AllocateVertices(uint32_t numVerts);
-
 	RESULT AllocateIndices(uint32_t numIndices);
-
 	RESULT AllocateTriangleIndexGroups(uint32_t numTriangles);
+	RESULT AllocateQuadIndexGroups(uint32_t numQuads);
 
 	virtual RESULT UpdateBuffers();
 
 	bool IsVisible();
-
 	RESULT SetVisible(bool fVisible = true);
+
+	bool IsWireframe();
+	RESULT SetWireframe(bool fWireframe = true);
 
 	RESULT SetColor(color c);
 
 	RESULT SetColorTexture(texture *pTexture);
-
-	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
-
 	RESULT ClearColorTexture();
+	texture *GetColorTexture();
 
 	RESULT SetBumpTexture(texture *pBumpTexture);
-
 	RESULT ClearBumpTexture();
-
-	texture* GetColorTexture();
-
-	texture* GetBumpTexture();
-
+	texture *GetBumpTexture();
+	
+	// TODO: Above accessors / create texture store
+	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
+	
 	texture* GetTextureAmbient();
-
 	texture* GetTextureDiffuse();
-
 	texture* GetTextureSpecular();
 
 	RESULT SetRandomColor();
 
 	// Children (composite objects)
 	RESULT AddChild(std::shared_ptr<DimObj> pDimObj);
-
 	RESULT ClearChildren();
-
 	bool HasChildren();
-
 	std::vector<std::shared_ptr<VirtualObj>> GetChildren();
 
 protected:
@@ -130,28 +129,30 @@ private:
 	DimObj* m_pParent;
 	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
 
+	// Bounding Volume
 public:
-	// This assumes the other vertices have a valid position and uv mapping
-	// This will set the tangents/bi-tangents for all three vertices
-	// Source: http://learnopengl.com/#!Advanced-Lighting/Normal-Mapping
-	// TODO: Use matrix to simplify logic
-	//RESULT SetTangentBitangent(vertex v1, vertex v2, vertex v3) {
-	RESULT SetTriangleTangentBitangent(dimindex i1, dimindex i2, dimindex i3);
+	RESULT UpdateBoundingVolume();
+	RESULT InitializeAABB();
+	RESULT InitializeOBB();
+	RESULT InitializeBoundingSphere();
+	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 
-	// This will not take into consideration surfaces that are continuous 
-	// TODO: Create surface based normal calculation function (this works at the vertex level rather the triangle one)
+	// OnManipulation is called by VirtualObj every time a manipulation occurs - this is a chance for
+	// DimObj to update the bounding volume
+	virtual RESULT OnManipulation() override;
+
+public:
 	RESULT SetTriangleNormal(dimindex i1, dimindex i2, dimindex i3);
-
+	RESULT SetTriangleTangentBitangent(dimindex i1, dimindex i2, dimindex i3);
 	RESULT SetQuadTangentBitangent(dimindex TL, dimindex TR, dimindex BL, dimindex BR);
-
 	RESULT SetQuadTangentBitangent(dimindex TL, dimindex TR, dimindex BL, dimindex BR, vector tangent, vector bitangent);
 
 	RESULT CopyVertices(vertex pVerts[], int pVerts_n);
-
+	
 	// TODO: Should this moved up into vertex?
 	RESULT RotateVerticesByEulerVector(vector vEuler);
 	
-	// TODO: This shoudln't be baked in here ultimately
+	// TODO: This shouldn't be baked in here ultimately
 	RESULT Notify(TimeEvent *event);
 
 	material* GetMaterial();

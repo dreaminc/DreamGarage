@@ -10,9 +10,9 @@
 // by way of a view matrix
 
 #include "matrix.h"
-#include "vector.h"
-#include "point.h"
-#include "quaternion.h"
+#include "Primitives/vector.h"
+#include "Primitives/point.h"
+#include "Primitives/quaternion.h"
 
 #include "RotationMatrix.h"
 #include "TranslationMatrix.h"

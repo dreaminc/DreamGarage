@@ -26,13 +26,16 @@
 #include "Primitives/quad.h"
 #include "Primitives/FlatContext.h"
 #include "Primitives/sphere.h"
+#include "Primitives/cylinder.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/texture.h"
 #include "Primitives/skybox.h"
 #include "Primitives/user.h"
 
-class DreamOS : public valid {
+#include "PhysicsEngine/PhysicsEngine.h"
+
+class DreamOS : public Subscriber<CollisionObjectEvent>, public valid {
 public:
 	DreamOS();
 	~DreamOS();
@@ -45,6 +48,8 @@ public:
 	virtual RESULT Update(void) = 0;
 
 protected:
+	RESULT AddPhysicsObject(VirtualObj *pObject);
+
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
@@ -58,12 +63,14 @@ protected:
 
 	text *AddText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	
-	volume *MakeVolume(double side);
-	volume *MakeVolume(double width, double length, double height);
+	volume *MakeVolume(double side, bool fTriangleBased = true);
+	volume *MakeVolume(double width, double length, double height, bool fTriangleBased = true);
 
-	volume* AddVolume(double side);
-	volume *AddVolume(double width, double length, double height);
+	volume* AddVolume(double side, bool fTriangleBased = true);
+	volume *AddVolume(double width, double length, double height, bool fTriangleBased = true);
 	
+	cylinder* AddCylinder(double radius, double height, int numAngularDivisions = 3, int numVerticalDivisions = 3);
+
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	
 	skybox *AddSkybox();
@@ -84,6 +91,11 @@ protected:
 
 protected:
 	long GetTickCount();
+
+	// Physics Engine
+protected:
+	RESULT RegisterObjectCollision(VirtualObj *pVirtualObject);
+	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
 
 	// Cloud Controller
 protected:

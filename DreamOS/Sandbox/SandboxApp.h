@@ -25,13 +25,17 @@
 //class CloudController;
 #include "Cloud/CloudController.h"
 
+#include "PhysicsEngine/PhysicsEngine.h"
+
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
+#include "Sense/SenseLeapMotion.h"
 
 class light; 
 class quad;
 class FlatContext;
 class sphere; 
+class cylinder;
 class volume; 
 class texture; 
 class skybox;
@@ -39,18 +43,35 @@ class model;
 class user;
 class Message;
 
-class SandboxApp : public valid {
+class SandboxApp : 
+	public Subscriber<SenseKeyboardEvent>, 
+	public Subscriber<SenseMouseEvent>, 
+	public Subscriber<CmdPromptEvent>, 
+	public Subscriber<CollisionGroupEvent>, 
+	public Subscriber<CollisionObjectEvent>,
+	public valid {
 public:
 	SandboxApp();
 	~SandboxApp();
 
+	friend class DreamOS;
+
 public:
-	RESULT SandboxApp::Initialize(int argc = 0, const char *argv[] = nullptr);
+	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
+	RESULT RunAppLoop();
 
 	virtual RESULT InitializeSandbox() = 0;
 	virtual RESULT Show() = 0;
 	virtual RESULT Shutdown() = 0;
 	virtual RESULT RecoverDisplayMode() = 0;		// Do all sandboxes need this ultimately? 
+	virtual RESULT HandleMessages() = 0;
+	virtual RESULT SwapDisplayBuffers() = 0;
+
+private:
+	RESULT InitializePhysicsEngine();
+
+protected:
+	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
 
 public:
 	enum class SANDBOX_WINDOW_POSITION {
@@ -71,17 +92,39 @@ public:
 	virtual RESULT InitializeHAL() = 0;
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
+	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
+	
+private:
+	// TODO: Move this up to sandbox
+	bool m_fMouseIntersectObjects = false;
+	RESULT SetMouseIntersectObjects(bool fMouseIntersectObjects);
+	bool IsMouseIntersectObjects();
+
+	RESULT Notify(CmdPromptEvent *event);
+	RESULT Notify(SenseKeyboardEvent *kbEvent);
+	RESULT Notify(SenseMouseEvent *mEvent);
+
+	RESULT Notify(CollisionObjectEvent *oEvent);
+	RESULT Notify(CollisionGroupEvent* gEvent);
+
+protected:
+	RESULT RegisterImpKeyboardEvents();
+	RESULT RegisterImpMouseEvents();
+	RESULT RegisterImpLeapMotionEvents();
+	RESULT RegisterImpViveControllerEvents();
 
 public:
-	RESULT AddObject(VirtualObj *pObject);	// TODO: This may be unsafe
+	RESULT AddPhysicsObject(VirtualObj *pObject);
+	RESULT AddObject(VirtualObj *pObject);	
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);
 
 	light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
-	volume* MakeVolume(double width, double length, double height);
-	volume* MakeVolume(double side);
+	volume* MakeVolume(double side, bool fTriangleBased = true);
+	volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true);
+	cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
 
@@ -90,9 +133,11 @@ public:
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
 
 	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
-	volume* AddVolume(double width, double length, double height);
 
-	volume* AddVolume(double side);
+	volume* AddVolume(double side, bool fTriangleBased = true);
+	volume* AddVolume(double width, double length, double height, bool fTriangleBased = true);
+
+	cylinder* AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
 
 	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
 
@@ -139,7 +184,13 @@ public:
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
 
-	virtual hand *GetHand(hand::HAND_TYPE handType);
+	hand *GetHand(hand::HAND_TYPE handType);
+
+public:
+	bool IsSandboxRunning();
+
+protected:
+	RESULT SetSandboxRunning(bool fRunning);
 
 protected:
 	// TODO: Move to unique_ptr
@@ -147,13 +198,18 @@ protected:
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	
+	ObjectStore *m_pPhysicsGraph;	
 	ObjectStore *m_pSceneGraph;
 	ObjectStore *m_pFlatSceneGraph;
 
 	CloudController *m_pCloudController;
+	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;
 
+	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
+	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
 	SenseKeyboard *m_pSenseKeyboard;
 	SenseMouse *m_pSenseMouse;
+	HMD *m_pHMD;
 
 	TimeManager* m_pTimeManager;
 
@@ -167,7 +223,11 @@ protected:
 	std::function<RESULT(void)> m_fnUpdateCallback;
 
 private:
+	bool m_fRunning = false;
+
+private:
 	UID m_uid;
 };
 
 #endif // ! SANDBOX_APP_H_
+

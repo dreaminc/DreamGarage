@@ -22,7 +22,7 @@
 #define C_B 2 
 #define C_A 3 
 
-#include "matrix.h"
+#include "matrix/matrix.h"
 #include "vector.h"
 #include "point.h"
 #include "uvcoord.h"
@@ -185,6 +185,11 @@ public:
 	//RESULT SetPointW(float x, float y, float z, float w);
 	RESULT SetPoint(point_precision x, point_precision y, point_precision z) {
 		m_point = point(x, y, z);
+		return R_PASS;
+	}
+
+	RESULT TranslatePoint(point pt) {
+		m_point += pt;
 		return R_PASS;
 	}
 	

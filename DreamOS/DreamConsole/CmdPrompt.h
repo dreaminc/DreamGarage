@@ -41,9 +41,11 @@ public:
 		DreamApp,
 		DreamConsole,
 		CloudController,
-		OpenGL,
+		OpenGL,		// should be renamed to HAL / HALImp
 		Camera,
-		Leap
+		Leap,
+		Sandbox,
+		Invalid
 	};
 
 private:
@@ -54,14 +56,15 @@ private:
 		{ method::CloudController, "cloud" },
 		{ method::OpenGL, "ogl" },
 		{ method::Camera, "cam" }, 
-		{ method::Leap, "leap"}
+		{ method::Leap, "leap"},
+		{ method::Sandbox, "sandbox" }
 	};
 
 public:
 	static CmdPrompt* GetCmdPrompt()
 	{
 		static CmdPrompt cmdPrompt;
-		cmdPrompt.Init();
+		cmdPrompt.Initialize();
 		return &cmdPrompt;
 	}
 
@@ -77,13 +80,12 @@ public:
 	RESULT Notify(CmdPromptEvent *event);
 
 private:
-	void	Init();
+	RESULT Initialize();
 
 private:
-	bool	m_isInit = false;
-
-	std::string	m_lastExecutedCommand;
-
+	bool m_fInit = false;
+	std::string	m_strLastExecutedCommand;
+	
 	std::vector<std::string> m_registeredCommands;
 };
 

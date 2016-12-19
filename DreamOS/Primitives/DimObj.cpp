@@ -1,16 +1,21 @@
 #include "DimObj.h"
 
+#include "BoundingBox.h"
+#include "BoundingSphere.h"
+
 DimObj::DimObj() :
-		VirtualObj(),	// velocity, origin
-		m_pVertices(nullptr),
-		m_pIndices(nullptr),
-		m_material(),
-		m_pColorTexture(nullptr),
-		m_pBumpTexture(nullptr),
-		m_pObjects(nullptr),
-		m_pParent(nullptr),
-		m_fVisible(true)
-		//m_aabv()
+	VirtualObj(),	// velocity, origin
+	m_pVertices(nullptr),
+	m_pIndices(nullptr),
+	m_material(),
+	m_pColorTexture(nullptr),
+	m_pBumpTexture(nullptr),
+	m_pObjects(nullptr),
+	m_pParent(nullptr),
+	m_fVisible(true),
+	m_fWireframe(false),
+	m_pBoundingVolume(nullptr)
+	//m_aabv()
 {
 	/* stub */
 }
@@ -57,6 +62,16 @@ Error:
 	return r;
 }
 
+RESULT DimObj::AllocateQuadIndexGroups(uint32_t numQuads) {
+	RESULT r = R_PASS;
+
+	m_pIndices = (dimindex*)(new QuadIndexGroup[numQuads]);
+	CN(m_pIndices);
+
+Error:
+	return r;
+}
+
 RESULT DimObj::AllocateTriangleIndexGroups(uint32_t numTriangles) {
 	RESULT r = R_PASS;
 
@@ -71,7 +86,7 @@ RESULT DimObj::UpdateBuffers() {
 	return R_NOT_IMPLEMENTED;
 }
 
-bool DimObj::IsVisible() { 
+bool DimObj::IsVisible() {
 	return m_fVisible;
 }
 
@@ -90,6 +105,15 @@ RESULT DimObj::SetVisible(bool fVisible) {
 	return R_PASS;
 }
 
+bool DimObj::IsWireframe() {
+	return m_fWireframe; 
+}
+
+RESULT DimObj::SetWireframe(bool fWireframe) {
+	m_fWireframe = fWireframe; 
+	return R_PASS; 
+}
+
 RESULT DimObj::SetColor(color c) {
 	for (unsigned int i = 0; i < NumberVertices(); i++)
 		m_pVertices[i].SetColor(c);
@@ -97,17 +121,6 @@ RESULT DimObj::SetColor(color c) {
 	SetDirty();
 
 	return R_PASS;
-}
-
-RESULT DimObj::SetColorTexture(texture *pTexture) {
-	RESULT r = R_PASS;
-
-	CBM((m_pColorTexture == nullptr), "Cannot overwrite color texture");
-	m_pColorTexture = pTexture;
-	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-Error:
-	return r;
 }
 
 RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
@@ -127,6 +140,17 @@ RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 	return r;
 }
 
+RESULT DimObj::SetColorTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	CBM((m_pColorTexture == nullptr), "Cannot overwrite color texture");
+	m_pColorTexture = pTexture;
+	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+Error:
+	return r;
+}
+
 RESULT DimObj::ClearColorTexture() {
 	RESULT r = R_PASS;
 
@@ -135,6 +159,10 @@ RESULT DimObj::ClearColorTexture() {
 
 Error:
 	return r;
+}
+
+texture* DimObj::GetColorTexture() {
+	return m_pColorTexture;
 }
 
 RESULT DimObj::SetBumpTexture(texture *pBumpTexture) {
@@ -156,10 +184,6 @@ RESULT DimObj::ClearBumpTexture() {
 
 Error:
 	return r;
-}
-
-texture* DimObj::GetColorTexture() {
-	return m_pColorTexture;
 }
 
 texture* DimObj::GetBumpTexture() {
@@ -385,7 +409,6 @@ RESULT DimObj::RotateVerticesByEulerVector(vector vEuler) {
 	return r;
 }
 
-// TODO: This shoudln't be baked in here ultimately
 RESULT DimObj::Notify(TimeEvent *event) {
 	quaternion_precision factor = 0.05f;
 	quaternion_precision filter = 0.1f;
@@ -403,6 +426,7 @@ RESULT DimObj::Notify(TimeEvent *event) {
 	return R_PASS;
 }
 
+// TODO: This shoudln't be baked in here ultimately
 material* DimObj::GetMaterial() {
 	return (&m_material);
 }
@@ -417,3 +441,95 @@ matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision,
 	}
 }
 
+// Bounding Box
+RESULT DimObj::UpdateBoundingVolume() {
+	RESULT r = R_PASS;
+
+	// This will go through the verts, find the center point and maximum size
+	point ptMax = m_pVertices[0].GetPoint();;
+	point ptMin = m_pVertices[0].GetPoint();;
+	point ptMid;
+
+	CN(m_pVertices);
+	CN(m_pBoundingVolume);
+
+	for (unsigned int i = 0; i < NumberVertices(); i++) {
+		point ptVert = m_pVertices[i].GetPoint();
+
+		// X
+		if (ptVert.x() > ptMax.x())
+			ptMax.x() = ptVert.x();
+		else if (ptVert.x() < ptMin.x())
+			ptMin.x() = ptVert.x();
+
+		// Y
+		if (ptVert.y() > ptMax.y())
+			ptMax.y() = ptVert.y();
+		else if (ptVert.y() < ptMin.y())
+			ptMin.y() = ptVert.y();
+
+		// Z
+		if (ptVert.z() > ptMax.z())
+			ptMax.z() = ptVert.z();
+		else if (ptVert.z() < ptMin.z())
+			ptMin.z() = ptVert.z();
+	}
+
+	ptMid = point::midpoint(ptMax, ptMin);
+	
+	CR(m_pBoundingVolume->UpdateBoundingVolume(ptMid, ptMax));
+
+Error:
+	return r;
+}
+
+RESULT DimObj::InitializeAABB() {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(this, BoundingBox::Type::AABB));
+	CN(m_pBoundingVolume);
+
+	CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
+RESULT DimObj::InitializeOBB() {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(this, BoundingBox::Type::OBB));
+	CN(m_pBoundingVolume);
+
+	CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
+RESULT DimObj::InitializeBoundingSphere() {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingSphere(this));
+	CN(m_pBoundingVolume);
+
+	CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
+std::shared_ptr<BoundingVolume> DimObj::GetBoundingVolume() {
+	return std::shared_ptr<BoundingVolume>(m_pBoundingVolume);
+}
+
+RESULT DimObj::OnManipulation() {
+	RESULT r = R_PASS;
+
+	if (m_pBoundingVolume != nullptr) {
+		CR(m_pBoundingVolume->SetDirty());
+	}
+
+Error:
+	return r;
+}

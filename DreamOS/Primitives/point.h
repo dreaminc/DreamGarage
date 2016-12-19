@@ -9,10 +9,8 @@
 // DreamOS/Dimension/Primitives/point.h
 // Point Primitive Object derived from matrix
 
-#include "matrix.h"
-//#include "vector.h"
+#include "matrix/matrix.h"
 
-class point;
 class vector;
 
 #ifdef FLOAT_PRECISION
@@ -26,60 +24,15 @@ class vector;
 
 class point : public matrix <point_precision, 4, 1> {
 public:
-	point() {
-		clear();
-	}
+	point();
+	point(point_precision x, point_precision y, point_precision z);
+	point(point_precision values[3]);
+	point(point_precision x, point_precision y, point_precision z, point_precision w);
+	point(const matrix<point_precision, 4, 1>& arg);
 
-	point(point_precision x, point_precision y, point_precision z) {
-		this->clear();
-		this->element(0, 0) = x;
-		this->element(1, 0) = y;
-		this->element(2, 0) = z;
-		this->element(3, 0) = 1.0f;
-	}
-
-	point(point_precision values[3]) {
-		this->clear();
-		this->element(0, 0) = values[0];
-		this->element(1, 0) = values[1];
-		this->element(2, 0) = values[2];
-		this->element(3, 0) = 1.0f;
-	}
-
-	point(point_precision x, point_precision y, point_precision z, point_precision w) {
-		this->clear();
-
-		this->element(0, 0) = x;
-		this->element(1, 0) = y;
-		this->element(2, 0) = z;
-		this->element(3, 0) = w;
-	}
-
-	point(const matrix<point_precision, 4, 1>& arg) :
-		matrix<point_precision, 4, 1>(arg)
-	{
-		// empty
-	}
-
-	RESULT SetZeroW() {
-		this->element(3, 0) = 1.0f;
-		return R_PASS;
-	}
-
-	RESULT Reverse() {
-		
-		x() = -x();
-		y() = -y(); 
-		z() = -z();
-
-		return R_PASS;
-	}
-
-	bool IsZero() {
-		if ((x() != 0) || (y() != 0) || (z() != 0))
-			return false;
-		return true;
-	}
+	RESULT SetZeroW();
+	RESULT Reverse();
+	bool IsZero();
 
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline point_precision &x() { return this->element(0, 0); }
@@ -92,64 +45,14 @@ public:
 	inline point_precision &z(point_precision val) { return this->element(2, 0) = val; }
 	inline point_precision &w(point_precision val) { return this->element(3, 0) = val; }
 
-	RESULT translate(point_precision x, point_precision y, point_precision z) {
-		this->x() += x;
-		this->y() += y;
-		this->z() += z;
+	RESULT translate(point_precision x, point_precision y, point_precision z);
+	RESULT translate(vector v);
+	RESULT translateX(point_precision x);
+	RESULT translateY(point_precision y);
+	RESULT translateZ(point_precision z);
 
-		return R_PASS;
-	}
-
-	RESULT translateX(point_precision x) {
-		this->x() += x;
-		return R_PASS;
-	}
-
-	RESULT translateY(point_precision y) {
-		this->y() += y;
-		return R_PASS;
-	}
-
-	RESULT translateZ(point_precision z) {
-		this->z() += z;
-		return R_PASS;
-	}
-
-	// This should also work with vector
-	RESULT translate(matrix <point_precision, 4, 1> v) {
-		(*this).operator+=((matrix <point_precision, 4, 1>&)v);
-		return R_PASS;
-	}
-
-	RESULT Print(char *pszOptName = nullptr, bool fReturn = false) {
-		if (fReturn) {
-			DEBUG_LINEOUT_RETURN("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", x(), y(), z(), w());
-		}
-		else {
-			DEBUG_LINEOUT("%s(%f, %f, %f, %f)", (pszOptName != nullptr) ? pszOptName : "pt", x(), y(), z(), w());
-		}
-
-		return R_PASS;
-	}
-	
-	std::string toString(bool fW = false) {
-		std::string strRet = "(";
-
-		strRet += std::to_string(x()); 
-		strRet += ",";
-		strRet += std::to_string(y());
-		strRet += ",";
-		strRet += std::to_string(z());
-
-		if (fW) {
-			strRet += ",";
-			strRet += std::to_string(w());
-		}
-
-		strRet += ")";
-
-		return strRet;
-	}
+	RESULT Print(char *pszOptName = nullptr, bool fReturn = false);
+	std::string toString(bool fW = false);
 
 	// Subtracting points results in vector
 	/*
@@ -165,17 +68,32 @@ public:
 	}
 	*/
 
-	friend vector operator-(point &lhs, point &rhs);
+	
+	// Adding a vector to a point gives us a point
+	//friend point operator+(point &lhs, vector &rhs);
+	point operator+(const point& rhs) const;
+	point& operator+=(const point& rhs);
+
+	point operator+(const vector& rhs) const;
+	point& operator+=(const vector& rhs);
+
+	vector operator-(const point& rhs) const;
+
+	// Subtracting a vector from a point gives us a point
+	point operator-(const vector& rhs) const;
+	point& operator-=(const vector& rhs);
 
 	// Explicitly specializing the assignment operator
-	point& operator=(const matrix<point_precision, 4, 1> &arg) {
-		if (this == &arg)      // Same object?
-			return *this;        // Yes, so skip assignment, and just return *this.
+	point& operator=(const matrix<point_precision, 4, 1> &arg);
 
-		memcpy(this->m_data, arg.m_data, sizeof(point_precision) * 4 * 1);
+	bool operator>(point &rhs);
+	bool operator>=(point &rhs);
+	bool operator<(point &rhs);
+	bool operator<=(point &rhs);
 
-		return *this;
-	}
+	static point max(point &lhs, point &rhs);
+	static point min(point &lhs, point &rhs);
+	static point midpoint(point &lhs, point &rhs);
 
 	/*
 	point& operator+=(const matrix<point_precision, 4, 1>& arg) {
