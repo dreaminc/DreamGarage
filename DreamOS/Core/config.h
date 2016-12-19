@@ -18,7 +18,7 @@
 //#define LEFT_HANDED
 
 // Comment out to use production
-#define _USE_TEST_APP	
+//#define _USE_TEST_APP	
 //#define _UNIT_TESTING
 
 #if defined(_WIN32)
