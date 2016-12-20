@@ -29,6 +29,8 @@
 // TODO: Temp for testing
 #include "External/Matrices/Matrices.h"
 
+#include "Sense/SenseController.h"
+
 // IVR EHM extension
 
 #define CIVR(ivrr) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){goto Error;}}while(0);
@@ -72,6 +74,8 @@ private:
 	RESULT InitializeRenderModel(uint32_t deviceID);	// This sets up a given model
 	RESULT SetControllerModelTexture(model *pModel, texture *pTexture, vr::ETrackedControllerRole controllerRole);
 
+	RESULT UpdateSenseController(vr::ETrackedControllerRole controllerRole, vr::VRControllerState_t state);
+
 public:
 	vr::IVRSystem *m_pIVRHMD;
 	vr::IVRCompositor *m_pCompositor;
@@ -101,10 +105,14 @@ public:
 	model *m_pControllerModelLeft;
 	texture *m_pControllerModelLeftTexture;
 	hand *m_pLeftHand;
+	SenseController *m_pLeftSenseController;
 	
 	model *m_pControllerModelRight;
 	texture *m_pControllerModelRightTexture;
 	hand *m_pRightHand;
+	SenseController *m_pRightSenseController;
+
+	uint32_t ovrFrame;
 
 	model *m_pHMDModel;
 };

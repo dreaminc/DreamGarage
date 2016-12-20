@@ -375,6 +375,28 @@ ViewMatrix OpenVRDevice::ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_
 	return viewMat;
 }
 
+RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controllerRole, vr::VRControllerState_t state) {
+
+	ControllerState cState;
+
+	cState.trigger = state.rAxis[1].x;
+	cState.ptTouchpad = point(state.rAxis[0].x, state.rAxis[0].y, 0.0f);
+
+	cState.fGrip = state.ulButtonPressed == 4;
+	cState.fMenu = state.ulButtonPressed == 2;
+
+	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+		cState.type = CONTROLLER_LEFT;
+		m_pLeftSenseController->SetControllerState(cState);
+	} 
+	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+		cState.type = CONTROLLER_RIGHT;
+		m_pRightSenseController->SetControllerState(cState); 
+	}
+
+	return R_PASS;
+}
+
 RESULT OpenVRDevice::UpdateHMD() {
 	RESULT r = R_PASS;
 
@@ -401,38 +423,45 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 		if (m_pIVRHMD->GetControllerState(unDevice, &state)) {
 			if (m_pIVRHMD->GetTrackedDeviceClass(unDevice) == vr::TrackedDeviceClass_Controller) {
-				vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(unDevice);
-				if (controllerRole == vr::TrackedControllerRole_LeftHand) {
-					/*
-					OVERLAY_DEBUG_SET("LunDevice", unDevice);
-					OVERLAY_DEBUG_SET("LbPress", state.ulButtonPressed);
-					OVERLAY_DEBUG_SET("LbTouch", state.ulButtonTouched);
-					OVERLAY_DEBUG_SET("LbPacket", state.unPacketNum);
+				uint32_t currentFrame = state.unPacketNum;
 
-					for (int a = 0; a < 5; a++) {
-						vr::VRControllerAxis_t axis = state.rAxis[a];
-						point pt = point(axis.x, axis.y, 0.0f);
-						std::string name = "LAxis" + std::to_string(a);
-						OVERLAY_DEBUG_SET(name, pt);
-					}
-					//*/
-				}
-				else if (controllerRole == vr::TrackedControllerRole_RightHand) {
-					/*
-					OVERLAY_DEBUG_SET("RunDevice", unDevice);
-					OVERLAY_DEBUG_SET("RbPress", state.ulButtonPressed);
-					OVERLAY_DEBUG_SET("RbTouch", state.ulButtonTouched);
-					OVERLAY_DEBUG_SET("RbPacket", state.unPacketNum);
-
-					for (int a = 0; a < 5; a++) {
-						vr::VRControllerAxis_t axis = state.rAxis[a];
-						point pt = point(axis.x, axis.y, 0.0f);
-						std::string name = "RAxis" + std::to_string(a);
-						OVERLAY_DEBUG_SET(name, pt);
-					}
-					//*/
+				if (currentFrame != ovrFrame) {
+					ovrFrame = currentFrame;
+					vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(unDevice);
+					UpdateSenseController(controllerRole, state);
 				}
 			}
+				/*
+					if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+						
+						/*
+						OVERLAY_DEBUG_SET("LunDevice", unDevice);
+						OVERLAY_DEBUG_SET("LbPress", state.ulButtonPressed);
+						OVERLAY_DEBUG_SET("LbTouch", state.ulButtonTouched);
+						OVERLAY_DEBUG_SET("LbPacket", state.unPacketNum);
+
+						for (int a = 0; a < 5; a++) {
+							vr::VRControllerAxis_t axis = state.rAxis[a];
+							point pt = point(axis.x, axis.y, 0.0f);
+							std::string name = "LAxis" + std::to_string(a);
+							OVERLAY_DEBUG_SET(name, pt);
+						}
+					}
+					else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+						/*
+						OVERLAY_DEBUG_SET("RunDevice", unDevice);
+						OVERLAY_DEBUG_SET("RbPress", state.ulButtonPressed);
+						OVERLAY_DEBUG_SET("RbTouch", state.ulButtonTouched);
+						OVERLAY_DEBUG_SET("RbPacket", state.unPacketNum);
+
+						for (int a = 0; a < 5; a++) {
+							vr::VRControllerAxis_t axis = state.rAxis[a];
+							point pt = point(axis.x, axis.y, 0.0f);
+							std::string name = "RAxis" + std::to_string(a);
+							OVERLAY_DEBUG_SET(name, pt);
+						}
+					}
+						//*/
 
 			//m_rbShowTrackedDevice[unDevice] = state.ulButtonPressed == 0;
 			// TODO: do stuff
