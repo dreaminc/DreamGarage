@@ -817,6 +817,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\model.h" />
+    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
@@ -824,6 +825,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Primitives\rectangle.h" />
     <ClInclude Include="..\..\..\Primitives\skybox.h" />
     <ClInclude Include="..\..\..\Primitives\sphere.h" />
+    <ClInclude Include="..\..\..\Primitives\ObjectState.h" />
     <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
     <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
     <ClInclude Include="..\..\..\Primitives\point.h" />

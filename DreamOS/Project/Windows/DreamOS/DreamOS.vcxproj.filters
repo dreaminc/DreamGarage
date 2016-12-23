@@ -511,7 +511,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp">
       <Filter>PhysicsEngine</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -2206,6 +2206,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h">
       <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ObjectState.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
