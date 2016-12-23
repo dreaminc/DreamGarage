@@ -16,32 +16,15 @@ class ObjectState {
 	friend class VirtualObj;
 
 public:
-	ObjectState() : 
-		m_ptOrigin(), 
-		m_vVelocity(), 
-		m_vAcceleration(), 
-		m_qRotation(), 
-		m_qAngularMomentum()
-	{ 
-		/*empty*/
-	}
-
-	ObjectState(point ptOrigin) : 
-		m_ptOrigin(ptOrigin), 
-		m_vVelocity(), 
-		m_vAcceleration(), 
-		m_qRotation(), 
-		m_qAngularMomentum()
-	{ 
-		/*empty*/
-	}
+	ObjectState();
+	ObjectState(point ptOrigin);
 
 public:
-	point GetOrigin() { return m_ptOrigin; }
-	vector GetVelocity() { return m_vVelocity; }
-	vector GetAcceleration() { return m_vAcceleration; }
-	quaternion GetRotation() { return m_qRotation; }
-	quaternion GetAngularMoment() { return m_qAngularMomentum; }
+	point GetOrigin();
+	vector GetVelocity();
+	vector GetAcceleration();
+	quaternion GetRotation();
+	quaternion GetAngularMoment();
 
 protected:
 	point m_ptOrigin;					// Origin			
