@@ -41,6 +41,7 @@ protected:
 	ObjectState m_objectState;
 	ObjectDerivative m_objectDerivative;
 
+
 	double m_kgMass;				// Mass (kg)
 	vector m_vScale;				// Scale vector
 
@@ -63,6 +64,9 @@ public:
 	// Derivative
 	ObjectDerivative GetDerivative();
 	RESULT SetDerivative(ObjectDerivative virtualObjDerivative);
+
+	template <ObjectState::IntegrationType IT>
+	RESULT IntegrateState(float timeStart, float timeDelta);
 
 	// Position
 	virtual point GetOrigin();

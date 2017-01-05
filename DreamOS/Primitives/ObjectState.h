@@ -12,19 +12,37 @@
 #include "vector.h"
 #include "quaternion.h"
 
+class ObjectDerivative;
+
 class ObjectState {
 	friend class VirtualObj;
+	friend class ObjectDerivative;
+
+public:
+	enum class IntegrationType {
+		EUCLID,
+		RK4,
+		INVALID
+	};
 
 public:
 	ObjectState();
 	ObjectState(point ptOrigin);
 
 public:
-	point GetOrigin();
-	vector GetVelocity();
-	vector GetAcceleration();
-	quaternion GetRotation();
-	quaternion GetAngularMoment();
+	RESULT Clear();
+
+	const point GetOrigin();
+	const vector GetVelocity();
+	const vector GetAcceleration();
+	const quaternion GetRotation();
+	const quaternion GetAngularMoment();
+
+	ObjectDerivative Evaluate(float timeStart, float timeDelta, const ObjectDerivative &objectDerivative);
+	
+	template <ObjectState::IntegrationType IT>
+	RESULT Integrate(float timeStart, float timeDelta);
+	
 
 protected:
 	point m_ptOrigin;					// Origin			

@@ -452,6 +452,8 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp" />
+    <ClCompile Include="..\..\..\Primitives\ObjectState.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
     <ClCompile Include="..\..\..\Primitives\sphere.cpp" />

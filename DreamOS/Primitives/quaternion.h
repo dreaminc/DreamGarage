@@ -52,6 +52,8 @@ public:
 	RESULT SetValues(quaternionXYZW qXYZW);
 	RESULT SetValuesXYZW(quaternion_precision values[4]);
 
+	RESULT clear();
+
 	quaternion Normalize();
 	quaternion_precision Magnitude();
 

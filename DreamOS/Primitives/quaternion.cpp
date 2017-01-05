@@ -148,6 +148,15 @@ quaternion quaternion::Normalize() {
 	return (*this);
 }
 
+RESULT quaternion::clear() {
+	m_w = 0.0f;
+	m_x = 0.0f;
+	m_y = 0.0f;
+	m_z = 0.0f;
+
+	return R_PASS;
+}
+
 quaternion_precision quaternion::Magnitude() {
 	return static_cast<quaternion_precision>(pow(m_w, 2) + pow(m_x, 2) + pow(m_y, 2) + pow(m_z, 2));
 }

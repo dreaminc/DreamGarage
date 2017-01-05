@@ -11,22 +11,31 @@ ObjectDerivative::ObjectDerivative() :
 }
 
 
-vector ObjectDerivative::GetRateOfChangeOrigin() {
+RESULT ObjectDerivative::Clear() {
+	m_vRateOfChangeOrigin.clear();
+	m_vRateOfChangeVelocity.clear();
+	m_vRateOfChangeAcceleration.clear();
+	m_qRateOfChangeRotation.clear();
+	m_qRateOfChangeAngularMomentum.clear();
+	return R_SUCCESS;
+}
+
+const vector ObjectDerivative::GetRateOfChangeOrigin() {
 	return m_vRateOfChangeOrigin;
 }
 
-vector ObjectDerivative::GetRateOfChangeVelocity() {
+const vector ObjectDerivative::GetRateOfChangeVelocity() {
 	return m_vRateOfChangeVelocity;
 }
 
-vector ObjectDerivative::GetRateOfChangeAcceleration() {
+const vector ObjectDerivative::GetRateOfChangeAcceleration() {
 	return m_vRateOfChangeAcceleration;
 }
 
-quaternion ObjectDerivative::GetRateOfChangeRotation() {
+const quaternion ObjectDerivative::GetRateOfChangeRotation() {
 	return m_qRateOfChangeRotation;
 }
 
-quaternion ObjectDerivative::GetRateOfChangeAngularMomentun() {
+const quaternion ObjectDerivative::GetRateOfChangeAngularMomentun() {
 	return m_qRateOfChangeAngularMomentum;
 }

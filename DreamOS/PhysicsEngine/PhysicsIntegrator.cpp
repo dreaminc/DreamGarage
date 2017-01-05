@@ -28,22 +28,7 @@ RESULT PhysicsIntegrator::Update() {
 
 		m_pPhysicsObjectStore->Reset();
 		while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
-			//DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-			// Euler Integration 
-			// TODO: switch to RK4)
-			vector vPositionInc = static_cast<float>(m_sTimeStep) * (pVirtualObj->GetState().GetVelocity());
-			vector vAccelInc = static_cast<float>(m_sTimeStep) * (pVirtualObj->GetState().GetAcceleration());
-
-			// TODO: Legitimize gravity force generator later
-			// TODO: Add drag too
-			vAccelInc += static_cast<float>(m_sTimeStep) * (vector(0.0f, DEFAULT_GRAVITY_ACCEL, 0.0f));
-
-			point ptNewPosition = pVirtualObj->GetState().GetOrigin() + vPositionInc;
-			vector vNewVelocity = pVirtualObj->GetState().GetVelocity() + vAccelInc;
-
-			pVirtualObj->SetPosition(ptNewPosition);
-			pVirtualObj->SetVelocity(vNewVelocity);
+			pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, m_sTimeStep);
 		}
 
 		m_elapsedTime = 0.0f;

@@ -40,6 +40,21 @@ RESULT VirtualObj::SetDerivative(ObjectDerivative virtualObjDerivative) {
 	return R_SUCCESS;
 }
 
+template <ObjectState::IntegrationType IT>
+RESULT VirtualObj::IntegrateState(float timeStart, float timeDelta) {
+	RESULT r = R_SUCCESS;
+
+	CR(m_objectState.Integrate<IT>(timeStart, timeDelta));
+	OnManipulation();	// TODO: we might want to skip this if there is no manipulation
+
+Error:
+	return r;
+}
+
+// Meta-Template Requirement
+template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::RK4>(float timeStart, float timeDelta);
+template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::EUCLID>(float timeStart, float timeDelta);
+
 // Position
 point VirtualObj::GetOrigin() {
 	return m_objectState.m_ptOrigin;
