@@ -356,7 +356,7 @@ RESULT hand::SetFromLeapHand(const Leap::Hand hand) {
 	}
 
 	// update model
-	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_INVALID : m_handType;
+	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_SKELETON : m_handType;
 	SetHandModel(modelType);
 	m_pLeftModel->SetOrientation(m_qRotation * m_qLeftModel);
 	m_pRightModel->SetOrientation(m_qRotation * m_qRightModel);
@@ -370,7 +370,7 @@ RESULT hand::SetHandModel(hand::HAND_TYPE type) {
 	m_pLeftModel->SetVisible(type == hand::HAND_TYPE::HAND_LEFT);
 	m_pRightModel->SetVisible(type == hand::HAND_TYPE::HAND_RIGHT);
 	
-	bool showSkeleton = type == hand::HAND_TYPE::HAND_INVALID;
+	bool showSkeleton = type == hand::HAND_TYPE::HAND_SKELETON;
 	m_pPalm->SetVisible(showSkeleton);
 	m_pIndexFinger->SetVisible(showSkeleton);
 	m_pMiddleFinger->SetVisible(showSkeleton);
@@ -383,7 +383,7 @@ RESULT hand::SetHandModel(hand::HAND_TYPE type) {
 
 RESULT hand::ToggleRenderType() {
 	m_fSkeleton = !m_fSkeleton;
-	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_INVALID : m_handType;
+	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_SKELETON : m_handType;
 	SetHandModel(modelType);
 
 	return R_PASS;
@@ -397,7 +397,7 @@ RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	//SetOrientation(pHandState.qOrientation);
 
 	m_handType = pHandState.handType;
-	hand::HandType modelType = (pHandState.fSkeleton) ? hand::HandType::HAND_INVALID : m_handType;
+	hand::HandType modelType = (pHandState.fSkeleton) ? hand::HandType::HAND_SKELETON : m_handType;
 	SetHandModel(modelType);
 
 	m_fTracked = pHandState.fTracked;

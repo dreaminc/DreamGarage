@@ -94,6 +94,7 @@ public:
 	typedef enum HandType {
 		HAND_LEFT,
 		HAND_RIGHT,
+		HAND_SKELETON,
 		HAND_INVALID
 	} HAND_TYPE;
 
