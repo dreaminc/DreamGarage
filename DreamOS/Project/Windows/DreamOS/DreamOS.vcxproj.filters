@@ -511,7 +511,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp">
       <Filter>PhysicsEngine</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
@@ -2094,9 +2094,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
       <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\AABV.h">
-      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamOSWinMain.h">
       <Filter>Main</Filter>
