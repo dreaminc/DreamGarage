@@ -13,14 +13,20 @@
 class GravityGenerator : public ForceGenerator {
 	friend class ForceGeneratorFactory;
 
-protected:
-	GravityGenerator();
-
 public:
-	~GravityGenerator();
+	GravityGenerator() {
+		// empty
+	}
+
+	~GravityGenerator() {
+		// empty
+	}
 
 protected:
 	virtual RESULT Update() override;
+
+public:
+	virtual vector GenerateForce(ObjectState *pObjectState, double startTime, double deltaTime) override;
 };
 
 #endif // ! GRAVITY_GENERATOR_H_

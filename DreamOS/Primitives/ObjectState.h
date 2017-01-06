@@ -12,7 +12,11 @@
 #include "vector.h"
 #include "quaternion.h"
 
+#include <list>
+#include <memory>
+
 class ObjectDerivative;
+class ForceGenerator;
 
 class ObjectState {
 	friend class VirtualObj;
@@ -31,23 +35,40 @@ public:
 
 public:
 	RESULT Clear();
+	RESULT Recalculate();
+
+	RESULT AddForceGenerator(ForceGenerator *pForceGenerator);
+	RESULT ClearForceGenerators();
+
+	RESULT SetMass(double kgMass);
+	const double GetMass();
+	const double GetInverseMass();
+
+	RESULT SetVelocity(vector vVelocity);
+	const vector GetVelocity();
 
 	const point GetOrigin();
-	const vector GetVelocity();
-	const vector GetAcceleration();
+
 	const quaternion GetRotation();
 	const quaternion GetAngularMoment();
 
-	ObjectDerivative Evaluate(float timeStart, float timeDelta, const ObjectDerivative &objectDerivative);
+	ObjectDerivative Evaluate(float timeStart, float timeDelta, const ObjectDerivative &objectDerivative, const std::list<ForceGenerator*> &externalForceGenerators);
 	
 	template <ObjectState::IntegrationType IT>
-	RESULT Integrate(float timeStart, float timeDelta);
+	RESULT Integrate(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
 	
+private:
+	double m_kgMass;				// Mass (kg)
+	double m_inverseMass;			// Inverse mass (1/kg)
+
+	vector m_vVelocity;					// Velocity			
+
+	std::list<ForceGenerator*> m_forceGenerators;
 
 protected:
 	point m_ptOrigin;					// Origin			
-	vector m_vVelocity;					// Velocity			
-	vector m_vAcceleration;				// Acceleration		
+	vector m_vMomentum;					// Momentum
+
 	quaternion m_qRotation;				// Rotation
 	quaternion m_qAngularMomentum;		// Angular Momentum
 };

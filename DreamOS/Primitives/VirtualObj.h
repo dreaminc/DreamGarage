@@ -42,7 +42,6 @@ protected:
 	ObjectDerivative m_objectDerivative;
 
 
-	double m_kgMass;				// Mass (kg)
 	vector m_vScale;				// Scale vector
 
 	// The pivot point
@@ -66,7 +65,7 @@ public:
 	RESULT SetDerivative(ObjectDerivative virtualObjDerivative);
 
 	template <ObjectState::IntegrationType IT>
-	RESULT IntegrateState(float timeStart, float timeDelta);
+	RESULT IntegrateState(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
 
 	// Position
 	virtual point GetOrigin();
@@ -128,10 +127,12 @@ public:
 	VirtualObj* SetVelocity(point_precision x, point_precision y, point_precision z);
 
 	// Acceleration
+	/*
 	VirtualObj* AddAcceleration(matrix <point_precision, 4, 1> vAccel);
 	VirtualObj* AddAcceleration(point_precision x, point_precision y, point_precision z);
 	VirtualObj* SetAcceleration(matrix <point_precision, 4, 1> vAccel);
 	VirtualObj* SetAcceleration(point_precision x, point_precision y, point_precision z);
+	*/
 
 	// Angular Momentum
 	VirtualObj* AddAngularMomentum(quaternion q);

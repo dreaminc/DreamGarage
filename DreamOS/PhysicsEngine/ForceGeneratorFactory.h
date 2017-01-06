@@ -15,7 +15,7 @@ typedef enum {
 
 class ForceGeneratorFactory {
 public:
-	static std::unique_ptr<ForceGenerator> MakeForceGenerator(FORCE_GENERATOR_TYPE type);
+	static ForceGenerator* MakeForceGenerator(FORCE_GENERATOR_TYPE type);
 };
 
 #endif // ! FORCE_GENERATOR_FACTORY_H_

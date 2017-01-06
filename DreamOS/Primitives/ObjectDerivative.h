@@ -23,15 +23,16 @@ public:
 	RESULT Clear();
 
 	const vector GetRateOfChangeOrigin();
-	const vector GetRateOfChangeVelocity();
-	const vector GetRateOfChangeAcceleration();
+	//const vector GetRateOfChangeVelocity();
+	
 	const quaternion GetRateOfChangeRotation();
 	const quaternion GetRateOfChangeAngularMomentun();
 
 protected:
-	vector m_vRateOfChangeOrigin;						// Rate of change of origin			
-	vector m_vRateOfChangeVelocity;						// Rate of change of Velocity			
-	vector m_vRateOfChangeAcceleration;					// Rate of change ofAcceleration		
+	vector m_vRateOfChangeOrigin;						// Rate of change of origin (velocity)
+	//vector m_vRateOfChangeVelocity;					// Rate of change of Velocity			
+	vector m_vForce;									// Force 
+		
 	quaternion m_qRateOfChangeRotation;					// Rate of change of Rotation
 	quaternion m_qRateOfChangeAngularMomentum;			// Rate of change of Angular Momentum
 };

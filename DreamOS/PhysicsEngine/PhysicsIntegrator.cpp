@@ -28,7 +28,8 @@ RESULT PhysicsIntegrator::Update() {
 
 		m_pPhysicsObjectStore->Reset();
 		while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
-			pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, m_sTimeStep);
+
+			pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, m_sTimeStep, m_globalForceGenerators);
 		}
 
 		m_elapsedTime = 0.0f;
@@ -62,19 +63,32 @@ Error:
 	return r;
 }
 
-RESULT PhysicsIntegrator::AddGlobalForceGenerator(std::unique_ptr<ForceGenerator> pForceGenerator) {
+RESULT PhysicsIntegrator::AddGlobalForceGenerator(ForceGenerator *pForceGenerator) {
 	RESULT r = R_SUCCESS;
 
-	m_globalForceGenerators.push_back(std::move(pForceGenerator));
-	CB((pForceGenerator == nullptr));
+	CN(pForceGenerator);
+
+	m_globalForceGenerators.push_back(pForceGenerator);
+	//CB((pForceGenerator == nullptr));
 
 Error:
 	return r;
 }
 
 RESULT PhysicsIntegrator::ClearForceGenerators() {
+	RESULT r = R_SUCCESS;
+
+	for (auto &pForceGenerator : m_globalForceGenerators) {
+		if (pForceGenerator != nullptr) {
+			delete pForceGenerator;
+			pForceGenerator = nullptr;
+		}
+	}
+
 	m_globalForceGenerators.clear();
-	return R_SUCCESS;
+
+	//Error:
+	return r;
 }
 
 RESULT PhysicsIntegrator::SetPhysicsStore(ObjectStore *pObjectStore) {

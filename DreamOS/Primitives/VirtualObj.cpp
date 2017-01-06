@@ -41,10 +41,10 @@ RESULT VirtualObj::SetDerivative(ObjectDerivative virtualObjDerivative) {
 }
 
 template <ObjectState::IntegrationType IT>
-RESULT VirtualObj::IntegrateState(float timeStart, float timeDelta) {
+RESULT VirtualObj::IntegrateState(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators) {
 	RESULT r = R_SUCCESS;
 
-	CR(m_objectState.Integrate<IT>(timeStart, timeDelta));
+	CR(m_objectState.Integrate<IT>(timeStart, timeDelta, externalForceGenerators));
 	OnManipulation();	// TODO: we might want to skip this if there is no manipulation
 
 Error:
@@ -52,8 +52,8 @@ Error:
 }
 
 // Meta-Template Requirement
-template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::RK4>(float timeStart, float timeDelta);
-template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::EUCLID>(float timeStart, float timeDelta);
+template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::RK4>(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
+template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::EUCLID>(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
 
 // Position
 point VirtualObj::GetOrigin() {
@@ -141,30 +141,26 @@ RESULT VirtualObj::SetPivotPoint(point_precision x, point_precision y, point_pre
 
 // Velocity
 VirtualObj* VirtualObj::AddVelocity(matrix <point_precision, 4, 1> vVelocity) {
-	m_objectState.m_vVelocity += vVelocity;
+	m_objectState.SetVelocity(m_objectState.GetVelocity() + vVelocity);
 	return this;
 }
 
 VirtualObj* VirtualObj::AddVelocity(point_precision x, point_precision y, point_precision z) {
-	m_objectState.m_vVelocity.x() += x;
-	m_objectState.m_vVelocity.y() += y;
-	m_objectState.m_vVelocity.z() += z;
-
+	m_objectState.SetVelocity(m_objectState.GetVelocity() + vector(x, y, z));
 	return this;
 }
 
 VirtualObj* VirtualObj::SetVelocity(matrix <point_precision, 4, 1> vVelocity) {
-	m_objectState.m_vVelocity = vVelocity;
+	m_objectState.SetVelocity(vVelocity);
 	return this;
 }
 
 VirtualObj* VirtualObj::SetVelocity(point_precision x, point_precision y, point_precision z) {
-	m_objectState.m_vVelocity.x() = x;
-	m_objectState.m_vVelocity.y() = y;
-	m_objectState.m_vVelocity.z() = z;
+	m_objectState.SetVelocity(vector(x, y, z));
 	return this;
 }
 
+/*
 VirtualObj* VirtualObj::AddAcceleration(matrix <point_precision, 4, 1> vAccel) {
 	m_objectState.m_vAcceleration += vAccel;
 	return this;
@@ -191,6 +187,7 @@ VirtualObj* VirtualObj::SetAcceleration(point_precision x, point_precision y, po
 
 	return this;
 }
+*/
 
 // Rotation
 VirtualObj* VirtualObj::RotateBy(quaternion q) {
@@ -360,12 +357,12 @@ RESULT VirtualObj::SetMass(double kgMass) {
 	if (kgMass < 0.0f)
 		return R_FAIL;
 
-	m_kgMass = kgMass;
+	m_objectState.SetMass(kgMass);
 	return R_PASS;
 }
 
 double VirtualObj::GetMass() {
-	return m_kgMass;
+	return m_objectState.GetMass();
 }
 
 // Update Functions 

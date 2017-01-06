@@ -34,7 +34,7 @@ protected:
 	RESULT SetTimeStep(double msTimeStep);
 
 protected:
-	RESULT AddGlobalForceGenerator(std::unique_ptr<ForceGenerator> pForceGenerator);
+	RESULT AddGlobalForceGenerator(ForceGenerator *pForceGenerator);
 	RESULT ClearForceGenerators();
 
 private:
@@ -47,7 +47,7 @@ private:
 	double m_elapsedTime;
 
 	// Add force generators 
-	std::list<std::unique_ptr<ForceGenerator>> m_globalForceGenerators;
+	std::list<ForceGenerator*> m_globalForceGenerators;
 
 private:
 	UID m_uid;
