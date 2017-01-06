@@ -165,8 +165,12 @@ std::vector<std::vector<VirtualObj*>> ObjectStoreImpList::GetObjectCollisionGrou
 		}
 
 		auto collisionGroup = GetObjects(pDimObj);
-		if (collisionGroup.size() > 0)
+		if (collisionGroup.size() > 0) {
+			collisionGroup.push_back(pDimObj);
 			collisionGroups.push_back(collisionGroup);
+		}
+
+		// TODO: We need to add logic to remove double hits / ensure unique groups
 	}
 
 	return collisionGroups;

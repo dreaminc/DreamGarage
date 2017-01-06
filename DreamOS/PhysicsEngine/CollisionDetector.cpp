@@ -12,10 +12,15 @@ CollisionDetector::CollisionDetector() {
 RESULT CollisionDetector::Initialize() {
 	RESULT r = R_PASS;
 
-	// r = Publisher<CollisionGroupEventType, CollisionGroupEvent>::RegisterEvent(OBJECT_GROUP_COLLISION);
-	// CR(r);
+	r = Publisher<CollisionGroupEventType, CollisionGroupEvent>::RegisterEvent(OBJECT_GROUP_COLLISION);
+	CR(r);
 
-//Error:
+	/*
+	r = Publisher<CollisionGroupEventType, CollisionGroupEvent>::RegisterEvent(ALL_COLLISIONS);
+	CR(r);
+	*/
+
+Error:
 	return r;
 }
 
