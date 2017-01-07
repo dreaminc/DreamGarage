@@ -66,8 +66,20 @@ RESULT ObjectState::SetVelocity(vector vVelocity) {
 	return R_SUCCESS;
 }
 
+RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
+	// Actually this sets the momentum p = mv
+	m_vMomentum += vImplulse;
+	Recalculate();
+
+	return R_SUCCESS;
+}
+
 const vector ObjectState::GetVelocity() { 
 	return m_vVelocity; 
+}
+
+const vector ObjectState::GetMomentum() {
+	return m_vMomentum;
 }
 
 const quaternion ObjectState::GetRotation() { 

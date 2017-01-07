@@ -365,6 +365,22 @@ double VirtualObj::GetMass() {
 	return m_objectState.GetMass();
 }
 
+double VirtualObj::GetInverseMass() {
+	return m_objectState.GetInverseMass();
+}
+
+vector VirtualObj::GetVelocity() {
+	return m_objectState.GetVelocity();
+}
+
+vector VirtualObj::GetMomentum() {
+	return m_objectState.GetMomentum();
+}
+
+RESULT VirtualObj::Impulse(vector vImpulse) {
+	return m_objectState.AddMomentumImpulse(vImpulse);
+}
+
 // Update Functions 
 // TODO: These should be removed in lieu of physics engine
 VirtualObj* VirtualObj::UpdatePosition() {

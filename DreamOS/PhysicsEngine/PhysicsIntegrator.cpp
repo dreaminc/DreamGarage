@@ -46,6 +46,7 @@ RESULT PhysicsIntegrator::Initialize() {
 
 	// Set up Gravity by default TODO: Move to engine?
 	//CR(AddGlobalForceGenerator(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY)));
+
 //Error:
 	return r;
 }

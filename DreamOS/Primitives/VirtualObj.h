@@ -140,6 +140,11 @@ public:
 
 	RESULT SetMass(double kgMass);
 	double GetMass();
+	double GetInverseMass();
+
+	vector GetVelocity();
+	vector GetMomentum();
+	RESULT Impulse(vector vImpulse);
 
 	// Update functions
 	VirtualObj* Update();

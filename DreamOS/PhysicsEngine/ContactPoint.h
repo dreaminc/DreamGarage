@@ -22,6 +22,8 @@ public:
 	ContactPoint();
 	ContactPoint(point ptContact, vector vNormal, double penetrationDepth);
 
+	vector GetNormal();
+
 private:
 	point m_ptContact;
 	vector m_vNormal;

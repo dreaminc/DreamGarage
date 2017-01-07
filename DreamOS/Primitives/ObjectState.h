@@ -46,6 +46,9 @@ public:
 
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
+	RESULT AddMomentumImpulse(vector vImplulse);
+
+	const vector GetMomentum();
 
 	const point GetOrigin();
 

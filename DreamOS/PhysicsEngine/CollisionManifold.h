@@ -22,10 +22,13 @@ public:
 	RESULT Clear();
 
 	int NumContacts();
+	double MaxPenetrationDepth();
+	vector GetNormal();
 
 private:
 	ContactPoint m_contactPoints[MAX_CONTACT_POINTS];	// Use a static array for cache coherency 
 	int m_numContacts = 0;
+	double m_maxPenetrationDepth = 0.0f;
 
 	DimObj *m_pDimObjA = nullptr;
 	DimObj *m_pDimObjB = nullptr;

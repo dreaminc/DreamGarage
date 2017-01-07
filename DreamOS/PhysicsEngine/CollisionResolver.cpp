@@ -5,6 +5,8 @@
 #include "CollisionManifold.h"
 #include "Primitives/BoundingVolume.h"
 
+#include <algorithm>
+
 CollisionResolver::CollisionResolver() {
 	// empty
 }
@@ -36,7 +38,11 @@ RESULT CollisionResolver::Notify(CollisionGroupEvent *oEvent) {
 			}
 
 			CR(ResolveCollision(pDimObjA, pDimObjB));
+
+			break;
 		}
+
+		break;
 	}
 
 Error:
@@ -52,8 +58,40 @@ RESULT CollisionResolver::ResolveCollision(DimObj *pDimObjA, DimObj *pDimObjB) {
 	CollisionManifold manifold = pBoundingVolumeA->Collide(pBoundingVolumeB.get());
 
 	if (manifold.NumContacts() > 0) {
-		// Do that stuff
-		int a = 5;
+		// Resolve the penetration as well
+		const double penetrationThreshold = 0.01f;		// Penetration percentage to correct
+
+		double kgMassA = pDimObjA->GetMass();
+		double kgMassB = pDimObjB->GetMass();
+		double kgInverseMassA = pDimObjA->GetInverseMass();
+		double kgInverseMassB = pDimObjB->GetInverseMass();
+		double totalMass = kgMassA + kgMassB;
+
+		if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
+			const double percentCorrection = 0.2f;		// Penetration percentage to correct
+			vector vCorrection = manifold.GetNormal() * (std::max((percentCorrection - penetrationThreshold), (double)(0.0f)) / (kgInverseMassA + kgInverseMassB)) * percentCorrection;
+			
+			pDimObjA->translate(vCorrection * -kgMassA);
+			pDimObjB->translate(vCorrection * kgMassB);
+		}
+
+		// Resolve the impulses
+		vector vVelocityBeforeA = pDimObjA->GetVelocity();
+		vector vVelocityBeforeB = pDimObjB->GetVelocity();
+
+		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
+		
+		vector vImpulseA = manifold.GetNormal() * (-kgMassA / (kgInverseMassA + kgInverseMassB));
+		vector vImpulseB = manifold.GetNormal() * (kgMassB / (kgInverseMassA + kgInverseMassB));
+
+		vector vVelocityAfterA = vVelocityBeforeA * ((kgMassA - kgMassB) / totalMass) + vVelocityBeforeB * ((kgMassB * 2.0f) / totalMass);
+		vector vVelocityAfterB = vVelocityBeforeB * ((kgMassA - kgMassB) / totalMass) + vVelocityBeforeA * ((kgMassA * 2.0f) / totalMass);
+
+		//pDimObjA->SetVelocity(vVelocityAfterA);
+		//pDimObjB->SetVelocity(vVelocityAfterB);
+
+		pDimObjA->Impulse(vImpulseA);
+		pDimObjB->Impulse(vImpulseB);
 	}
 
 //Error:

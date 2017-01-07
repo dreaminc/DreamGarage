@@ -15,3 +15,7 @@ ContactPoint::ContactPoint(point ptContact, vector vNormal, double penetrationDe
 {
 	// empty 
 }
+
+vector ContactPoint::GetNormal() {
+	return m_vNormal;
+}
