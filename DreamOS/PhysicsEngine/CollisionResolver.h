@@ -11,6 +11,11 @@
 #include "Primitives/Subscriber.h"
 
 struct CollisionGroupEvent;
+class ContactPoint;
+class CollisionManifold;
+
+class DimObj;
+class BoundingVolume;
 
 class CollisionResolver : Subscriber<CollisionGroupEvent>, public valid {
 	friend class PhysicsEngine;
@@ -22,6 +27,9 @@ protected:
 	RESULT Initialize();
 
 	virtual RESULT Notify(CollisionGroupEvent *oEvent) override;
+
+private:
+	RESULT ResolveCollision(DimObj *pDimObjA, DimObj *pDimObjB);
 
 private:
 	UID m_uid;

@@ -17,6 +17,8 @@ class VirtualObj;
 class BoundingSphere;
 class BoundingBox;
 
+class CollisionManifold;
+
 class BoundingVolume : public dirty {
 public:
 	enum class Type {
@@ -44,10 +46,13 @@ public:
 	virtual bool Intersect(const BoundingSphere& rhs) = 0;
 	virtual bool Intersect(const BoundingBox& rhs) = 0;
 
-	//bool Intersect(const point& pt) {
 	virtual bool Intersect(point& pt) = 0;
 	virtual bool Intersect(const ray &rCast) = 0;
-	//TODO: virtual bool Intersect(const line& ln) = 0;
+	//TODO: virtual bool Intersect(line& ln) = 0;
+	// TODO: virtual bool Intersect(const plane& pl) = 0;
+
+	CollisionManifold Collide(BoundingVolume* pRHS);
+	virtual CollisionManifold Collide(const BoundingSphere& rhs) = 0;
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
 

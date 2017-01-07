@@ -62,14 +62,14 @@ RESULT DreamTestApp::LoadScene() {
 	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
 	pSphere1->SetPosition(point(-3.0f, 0.0f, 0.0f));
 	pSphere1->SetMass(1.0f);
-	pSphere1->SetVelocity(3.0f, 5.0f, 0.0f);
+	pSphere1->SetVelocity(1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere1);
 	RegisterObjectCollision(pSphere1);
 
 	sphere *pSphere2 = AddSphere(0.25f, 10, 10);
 	pSphere2->SetPosition(point(3.0f, 0.0f, 0.0f));
 	pSphere2->SetMass(1.0f);
-	pSphere2->SetVelocity(-3.0f, 5.0f, 0.0f);
+	pSphere2->SetVelocity(-1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere2);
 
 	//pCylinder->SetWireframe(true);

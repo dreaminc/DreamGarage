@@ -19,12 +19,14 @@ public:
 	BoundingSphere(VirtualObj *pParentObject);
 	BoundingSphere(VirtualObj *pParentObject, point ptOrigin, float radius);
 
-	bool Intersect(const BoundingSphere& rhs);
-	bool Intersect(const BoundingBox& rhs);
+	virtual bool Intersect(const BoundingSphere& rhs) override;
+	virtual bool Intersect(const BoundingBox& rhs) override;
 
-	bool Intersect(point& pt);
-	bool Intersect(line& ln);
+	virtual bool Intersect(point& pt) override;
 	virtual bool Intersect(const ray &r) override;
+	bool Intersect(line& ln);
+
+	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 
 	float GetRadius() {
 		return m_radius;

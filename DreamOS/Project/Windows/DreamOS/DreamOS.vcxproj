@@ -433,7 +433,9 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
@@ -787,7 +789,9 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h" />

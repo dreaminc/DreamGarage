@@ -3,6 +3,7 @@
 #include <algorithm>
 
 #include "VirtualObj.h"
+#include "PhysicsEngine/CollisionManifold.h"
 
 BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type) :
 	BoundingVolume(pParentObject),
@@ -121,6 +122,11 @@ bool BoundingBox::Intersect(const ray& r) {
 	}
 
 	return (tmax >= tmin);
+}
+
+CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
+	// TODO: do it
+	return CollisionManifold();
 }
 
 RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {

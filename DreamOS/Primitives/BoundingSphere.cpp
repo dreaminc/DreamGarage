@@ -1,6 +1,8 @@
 #include "BoundingSphere.h"
 #include "BoundingBox.h"
 
+#include "PhysicsEngine/CollisionManifold.h"
+
 BoundingSphere::BoundingSphere(VirtualObj *pParentObject) :
 	BoundingVolume(pParentObject),
 	m_radius(1.0f)
@@ -74,6 +76,26 @@ bool BoundingSphere::Intersect(const ray &r) {
 	}
 
 	return false;
+}
+
+CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
+	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin());
+	float distance = vMidLine.magnitude();
+
+	CollisionManifold manifold = CollisionManifold();
+
+	if (abs(distance) <= (rhs.m_radius + m_radius)) {
+		// Find the contact point and normal
+		vector vNormal = vMidLine.Normal();
+		point ptContact = const_cast<BoundingSphere&>(rhs).GetOrigin() + (vMidLine * 0.5f);
+		double penetration = (rhs.m_radius + m_radius) - abs(distance);
+
+		manifold.AddContactPoint(ptContact, vNormal, penetration);
+
+		// TODO: Friction / Restitution?
+	}
+
+	return manifold;
 }
 
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {

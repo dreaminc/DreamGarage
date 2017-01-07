@@ -45,9 +45,8 @@ RESULT PhysicsIntegrator::Initialize() {
 	m_lastUpdateTime = std::chrono::high_resolution_clock::now();
 
 	// Set up Gravity by default TODO: Move to engine?
-	CR(AddGlobalForceGenerator(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY)));
-
-Error:
+	//CR(AddGlobalForceGenerator(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY)));
+//Error:
 	return r;
 }
 

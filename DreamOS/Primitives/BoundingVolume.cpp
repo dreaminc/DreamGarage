@@ -5,6 +5,8 @@
 
 #include "VirtualObj.h"
 
+#include "PhysicsEngine/CollisionManifold.h"
+
 bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 	BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pRHS);
 	if (pBoundingBox != nullptr)
@@ -15,6 +17,16 @@ bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 		return Intersect(*pBoundingSphere);
 
 	return false;
+}
+
+CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
+	BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pRHS);
+	
+	if (pBoundingSphere != nullptr) {
+		return Collide(*pBoundingSphere);
+	}
+
+	return CollisionManifold();
 }
 
 quaternion BoundingVolume::GetOrientation() { 

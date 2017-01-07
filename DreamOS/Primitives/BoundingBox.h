@@ -52,6 +52,8 @@ public:
 	bool Intersect(point& pt);
 	virtual bool Intersect(const ray& r) override;
 
+	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
+
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
 	virtual BoundingVolume::Type GetType() override {
