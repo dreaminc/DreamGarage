@@ -20,6 +20,8 @@
 #include "Primitives/point.h"
 #include "Primitives/composite.h"
 
+#include "Sense/SenseController.h"
+
 #define HMD_NUM_EYES 2
 
 class HALImp;
@@ -114,6 +116,7 @@ public:
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
 
+	SenseController* GetSenseController() { return m_pSenseController; };
 
 protected:
 	point m_ptOrigin;
@@ -125,6 +128,8 @@ protected:
 	HALImp *m_pHALImp;	// TODO: This may not be needed if Sandbox parent is kept
 
 	SandboxApp *m_pParentSandbox;
+
+	SenseController *m_pSenseController;
 
 private:
 	UID m_uid;

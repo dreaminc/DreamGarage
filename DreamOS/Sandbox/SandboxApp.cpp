@@ -894,3 +894,12 @@ RESULT SandboxApp::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber
 Error:
 	return r;
 }
+
+RESULT SandboxApp::RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(m_pHMD->GetSenseController()->RegisterSubscriber(controllerEvent, pControllerSubscriber));
+
+Error:
+	return r;
+}

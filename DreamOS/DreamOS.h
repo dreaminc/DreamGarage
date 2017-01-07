@@ -117,6 +117,7 @@ protected:
 protected:
 	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
+	RESULT RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);

@@ -76,6 +76,8 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
 
+	m_pSenseController = new SenseController();
+
 	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
 
 Error:

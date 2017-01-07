@@ -30,6 +30,7 @@
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseLeapMotion.h"
+#include "Sense/SenseController.h"
 
 class light; 
 class quad;
@@ -173,6 +174,7 @@ public:
 	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);
 	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
+	RESULT RegisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 
 public:
 	PathManager *GetPathManager();

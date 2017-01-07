@@ -105,12 +105,10 @@ public:
 	model *m_pControllerModelLeft;
 	texture *m_pControllerModelLeftTexture;
 	hand *m_pLeftHand;
-	SenseController *m_pLeftSenseController;
 	
 	model *m_pControllerModelRight;
 	texture *m_pControllerModelRightTexture;
 	hand *m_pRightHand;
-	SenseController *m_pRightSenseController;
 
 	uint32_t ovrFrame;
 

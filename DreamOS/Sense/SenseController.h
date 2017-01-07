@@ -8,6 +8,16 @@
 #include "Primitives/point.h"
 #include "SenseDevice.h"
 
+typedef enum SenseControllerEventType {
+	SENSE_CONTROLLER_GRIP_DOWN,
+	SENSE_CONTROLLER_GRIP_UP,
+	SENSE_CONTROLLER_MENU_DOWN,
+	SENSE_CONTROLLER_MENU_UP,
+	SENSE_CONTROLLER_TRIGGER_MOVE,
+	SENSE_CONTROLLER_PAD_MOVE,
+	SENSE_CONTROLLER_INVALID
+} SENSE_CONTROLLER_EVENT_TYPE;
+
 typedef enum ControllerType {
 	CONTROLLER_LEFT,
 	CONTROLLER_RIGHT,
@@ -23,17 +33,19 @@ typedef struct ControllerState {
 } CONTROLLER_STATE;
 
 typedef struct SenseControllerEvent : SenseDevice::SenseDeviceEvent {
+	SenseControllerEventType type;
 	ControllerState state;
 
-	SenseControllerEvent(ControllerState controllerState) :
+	SenseControllerEvent(SenseControllerEventType eventType, ControllerState controllerState) :
 		SenseDeviceEvent(),
+		type(eventType),
 		state(controllerState)
 	{
 		SenseEventSize = sizeof(SenseControllerEvent);
 	}
 } SENSE_CONTROLLER_EVENT;
 
-class SenseController : public SenseDevice, public Publisher<int, SenseControllerEvent>, public valid {
+class SenseController : public SenseDevice, public Publisher<SenseControllerEventType, SenseControllerEvent>, public valid {
 
 public:
 	SenseController();

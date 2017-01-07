@@ -12,8 +12,9 @@
 #include "DreamOS/DreamOS.h"
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
+#include "Sense/SenseController.h"
 
-class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<CmdPromptEvent> {
+class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
 public:
 	DreamGarage() {
 		// empty
@@ -45,6 +46,9 @@ public:
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
+
+	// SenseControllerEventSubscriber
+	virtual RESULT Notify(SenseControllerEvent *event) override;
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;
