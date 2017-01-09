@@ -26,7 +26,7 @@ typedef enum ControllerType {
 
 typedef struct ControllerState {
 	CONTROLLER_TYPE type;
-	float trigger;
+	float triggerRange;
 	point ptTouchpad;
 	bool fGrip;
 	bool fMenu;
@@ -57,11 +57,7 @@ public:
 
 private:
 
-	CONTROLLER_TYPE m_type;
-	float m_trigger;
-	point m_touchpad;
-	bool m_grip;
-	bool m_menu;
+	ControllerState m_controllerState;
 };
 
 #endif // ! SENSE_CONTROLLER_H_

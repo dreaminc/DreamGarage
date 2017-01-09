@@ -53,6 +53,8 @@ public:
 	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
 	ViewMatrix GetViewMatrix(EYE_TYPE eye);
 
+	SenseController* GetSenseController();
+
 public:
 	ovrSession m_ovrSession;
 	ovrHmdDesc m_ovrHMDDescription;

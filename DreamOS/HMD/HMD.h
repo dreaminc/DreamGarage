@@ -116,7 +116,7 @@ public:
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
 
-	SenseController* GetSenseController() { return m_pSenseController; };
+	virtual SenseController* GetSenseController() = 0;
 
 protected:
 	point m_ptOrigin;
@@ -128,8 +128,6 @@ protected:
 	HALImp *m_pHALImp;	// TODO: This may not be needed if Sandbox parent is kept
 
 	SandboxApp *m_pParentSandbox;
-
-	SenseController *m_pSenseController;
 
 private:
 	UID m_uid;

@@ -193,6 +193,10 @@ hand *OpenVRDevice::GetHand(hand::HAND_TYPE type) {
 	}
 }
 
+SenseController* OpenVRDevice::GetSenseController() {
+	return m_pSenseController;
+}
+
 RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	RESULT r = R_PASS;
 
@@ -380,7 +384,7 @@ RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controller
 
 	ControllerState cState;
 
-	cState.trigger = state.rAxis[1].x;
+	cState.triggerRange = state.rAxis[1].x;
 	cState.ptTouchpad = point(state.rAxis[0].x, state.rAxis[0].y, 0.0f);
 
 	cState.fMenu = (state.ulButtonPressed & (1<<1)) != 0;
