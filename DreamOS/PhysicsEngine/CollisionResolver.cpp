@@ -79,16 +79,24 @@ RESULT CollisionResolver::ResolveCollision(DimObj *pDimObjA, DimObj *pDimObjB) {
 		vector vVelocityBeforeA = pDimObjA->GetVelocity();
 		vector vVelocityBeforeB = pDimObjB->GetVelocity();
 
+		double restitutionConstant = 1.0f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
-		
+		double j = -(1.0f + restitutionConstant) * (vRelativeVelocity.dot(manifold.GetNormal()));
+		j *= 1.0f / (kgInverseMassA + kgInverseMassB);
+
+		vector vImpulseA = manifold.GetNormal() * (j);
+		vector vImpulseB = manifold.GetNormal() * (-j);
+
+		/*
 		vector vImpulseA = manifold.GetNormal() * (-kgMassA / (kgInverseMassA + kgInverseMassB));
 		vector vImpulseB = manifold.GetNormal() * (kgMassB / (kgInverseMassA + kgInverseMassB));
 
 		vector vVelocityAfterA = vVelocityBeforeA * ((kgMassA - kgMassB) / totalMass) + vVelocityBeforeB * ((kgMassB * 2.0f) / totalMass);
 		vector vVelocityAfterB = vVelocityBeforeB * ((kgMassA - kgMassB) / totalMass) + vVelocityBeforeA * ((kgMassA * 2.0f) / totalMass);
 
-		//pDimObjA->SetVelocity(vVelocityAfterA);
-		//pDimObjB->SetVelocity(vVelocityAfterB);
+		pDimObjA->SetVelocity(vVelocityAfterA);
+		pDimObjB->SetVelocity(vVelocityAfterB);
+		*/
 
 		pDimObjA->Impulse(vImpulseA);
 		pDimObjB->Impulse(vImpulseB);

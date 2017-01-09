@@ -60,17 +60,30 @@ RESULT DreamTestApp::LoadScene() {
 
 
 	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
-	pSphere1->SetPosition(point(-3.0f, 0.0f, 0.0f));
+	pSphere1->SetPosition(point(-3.0f, 0.001f, 0.0f));
 	pSphere1->SetMass(1.0f);
-	pSphere1->SetVelocity(3.0f, 0.0f, 0.0f);
+	pSphere1->SetVelocity(10.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere1);
-	RegisterObjectCollision(pSphere1);
+	//RegisterObjectCollision(pSphere1);
 
 	sphere *pSphere2 = AddSphere(0.25f, 10, 10);
-	pSphere2->SetPosition(point(3.0f, 0.25f, 0.0f));
+	pSphere2->SetPosition(point(3.0f, -0.001f, 0.0f));
 	pSphere2->SetMass(1.0f);
-	pSphere2->SetVelocity(-3.0f, 0.0f, 0.0f);
+	//pSphere2->SetVelocity(-3.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere2);
+
+	sphere *pSphere3 = AddSphere(0.25f, 10, 10);
+	pSphere3->SetPosition(point(1.0f, 0.01f, 0.0f));
+	pSphere3->SetMass(1.0f);
+	//pSphere2->SetVelocity(-3.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pSphere3);
+
+	sphere *pSphere4 = AddSphere(0.25f, 10, 10);
+	pSphere4->SetPosition(point(-1.0f, -0.01f, 0.0f));
+	pSphere4->SetMass(1.0f);
+	//pSphere2->SetVelocity(-3.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pSphere4);
+	//RegisterObjectCollision(pSphere4);
 
 	//pCylinder->SetWireframe(true);
 
