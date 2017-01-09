@@ -401,6 +401,9 @@ RESULT OpenVRDevice::UpdateHMD() {
 	m_validPoseCount = 0;
 	m_strPoseClasses = "";
 
+	bool fLeftHandTracked = false;
+	bool fRightHandTracked = false;
+
 	for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice) {
 		if (m_rTrackedDevicePose[nDevice].bPoseIsValid) {
 			
@@ -448,18 +451,21 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pControllerModelLeft->SetPosition(ptControllerPosition);
 						m_pControllerModelLeft->SetOrientation(qOrientation);
 
-						m_pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
 						m_pLeftHand->SetPosition(ptControllerPosition + setHandConstant);
 						m_pLeftHand->SetLocalOrientation(qOrientation);
-							
+
+						fLeftHandTracked = true;
+						m_pLeftHand->SetTracked(true);
 					}
 					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerModelRight != nullptr) {
 						m_pControllerModelRight->SetPosition(ptControllerPosition);
 						m_pControllerModelRight->SetOrientation(qOrientation);
 
-						m_pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
 						m_pRightHand->SetPosition(ptControllerPosition + setHandConstant);
 						m_pRightHand->SetLocalOrientation(qOrientation);
+
+						fRightHandTracked = true;
+						m_pRightHand->SetTracked(true);
 					}
 
 				} break;
@@ -506,6 +512,13 @@ RESULT OpenVRDevice::UpdateHMD() {
 				} break;
 			}
 			
+		}
+
+		if (!fLeftHandTracked && m_pLeftHand != nullptr) {
+			m_pLeftHand->SetTracked(fLeftHandTracked);
+		}
+		if (!fRightHandTracked && m_pRightHand != nullptr) {
+			m_pRightHand->SetTracked(fRightHandTracked);
 		}
 	}
 

@@ -206,7 +206,7 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 
 	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-	
+
 	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
 
@@ -216,33 +216,8 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	pLeftHand->SetOriented(true);
 	pRightHand->SetOriented(true);
 
-	composite* pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
-						nullptr,
-						point(0.0f, 0.0f, 0.0f),
-						0.015f,
-						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
-	
-	composite* pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
-						nullptr,
-						point(0.0f, 0.0f, 0.0f),
-						0.015f,
-						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
-
-	std::shared_ptr<DimObj> pLeftModelSharedPtr(pLeftModel);
-	pLeftModelSharedPtr->SetVisible(true);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftModelSharedPtr);
-
-	std::shared_ptr<DimObj> pRightModelSharedPtr(pRightModel);
-	pRightModelSharedPtr->SetVisible(true);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightModelSharedPtr);
-
-
 	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
 	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
-
-	CR(m_pSenseLeapMotion->AttachModel(pLeftModel, hand::HAND_LEFT));
-	CR(m_pSenseLeapMotion->AttachModel(pRightModel, hand::HAND_RIGHT));
-
 
 Error:
 	return r;
@@ -256,18 +231,10 @@ RESULT SandboxApp::RegisterImpViveControllerEvents() {
 	if (pVive) {
 		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-/*
-		std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
-		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
 
-		std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
-		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
-//*/
 		pLeftHand->SetOriented(false);
 		pRightHand->SetOriented(false);
 
-		pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
-		pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
 		CR(pVive->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
 		CR(pVive->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
 	}
@@ -277,15 +244,15 @@ Error:
 
 //hand *Windows64App::AttachHand
 
-hand* SandboxApp::GetHand(hand::HAND_TYPE handType) {
+hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
 	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
 
 	if (pVive != nullptr) {
 		return pVive->GetHand(handType);
 	}
-	
 	return m_pSenseLeapMotion->GetHand(handType);
 }
+
 
 bool SandboxApp::IsSandboxRunning() {
 	return m_fRunning;
