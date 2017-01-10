@@ -515,6 +515,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseController.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2203,6 +2206,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h">
       <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseController.h">
+      <Filter>Sense</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

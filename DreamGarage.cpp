@@ -50,6 +50,14 @@ RESULT DreamGarage::LoadScene() {
 	// IO
 	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 
+	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
+	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);
+	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, this);
+	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this);
+	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, this);
+	RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, this);
+	//RegisterSubscriber()
+
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 	
 	for (auto x : std::array<int, 8>()) {
@@ -677,6 +685,34 @@ RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	}
 	*/
 //Error:
+	return r;
+}
+
+RESULT DreamGarage::Notify(SenseControllerEvent *event) {
+	RESULT r = R_PASS;
+
+	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
+	OVERLAY_DEBUG_SET("event", "none");
+
+	if (eventType == SENSE_CONTROLLER_TRIGGER_MOVE) {
+		OVERLAY_DEBUG_SET("event", "trigger move");
+	}
+	if (eventType == SENSE_CONTROLLER_PAD_MOVE) {
+		OVERLAY_DEBUG_SET("event", "pad move");
+	}
+	if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
+		OVERLAY_DEBUG_SET("event", "grip down");
+	}
+	if (eventType == SENSE_CONTROLLER_GRIP_UP) {
+		OVERLAY_DEBUG_SET("event", "grip up");
+	}
+	if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
+		OVERLAY_DEBUG_SET("event", "menu down");
+	}
+	if (eventType == SENSE_CONTROLLER_MENU_UP) {
+		OVERLAY_DEBUG_SET("event", "menu up");
+	}
+
 	return r;
 }
 

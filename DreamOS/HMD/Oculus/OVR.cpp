@@ -147,6 +147,10 @@ ViewMatrix OVRHMD::GetViewMatrix(EYE_TYPE eye) {
 	//*/
 }
 
+SenseController* OVRHMD::GetSenseController() {
+	return nullptr;
+}
+
 RESULT OVRHMD::SetUpFrame() {
 	RESULT r = R_PASS;
 

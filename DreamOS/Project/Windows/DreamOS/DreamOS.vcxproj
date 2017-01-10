@@ -484,6 +484,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStore.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseController.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
@@ -864,6 +865,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Scene\ObjectStore.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h" />
+    <ClInclude Include="..\..\..\Sense\SenseController.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />

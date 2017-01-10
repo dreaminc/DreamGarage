@@ -288,6 +288,10 @@ RESULT DreamOS::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<Se
 	return m_pSandbox->RegisterSubscriber(mouseEvent, pMouseSubscriber);
 }
 
+RESULT DreamOS::RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+	return m_pSandbox->RegisterSubscriber(controllerEvent, pControllerSubscriber);
+}
+
 long DreamOS::GetTickCount() {
 	return m_pSandbox->GetTickCount();
 }
