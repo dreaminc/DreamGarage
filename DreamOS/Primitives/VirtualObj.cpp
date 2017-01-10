@@ -381,6 +381,22 @@ RESULT VirtualObj::Impulse(vector vImpulse) {
 	return m_objectState.AddMomentumImpulse(vImpulse);
 }
 
+RESULT VirtualObj::AddPendingImpulse(vector vImpulse) {
+	return m_objectState.AddPendingMomentumImpulse(vImpulse);
+}
+
+RESULT VirtualObj::CommitPendingImpulses() {
+	return m_objectState.CommitPendingMomentum();
+}
+
+RESULT VirtualObj::AddPendingTranslation(vector vTranslation) {
+	return m_objectState.AddPendingTranslation(vTranslation);
+}
+
+RESULT VirtualObj::CommitPendingTranslation() {
+	return m_objectState.CommitPendingTranslation();
+}
+
 // Update Functions 
 // TODO: These should be removed in lieu of physics engine
 VirtualObj* VirtualObj::UpdatePosition() {

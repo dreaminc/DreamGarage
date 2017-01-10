@@ -74,6 +74,49 @@ RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
 	return R_SUCCESS;
 }
 
+RESULT ObjectState::AddPendingMomentumImpulse(vector vImplulse) {
+	m_pendingMomentumVectors.push_back(vImplulse);
+	return R_SUCCESS;
+}
+
+RESULT ObjectState::CommitPendingMomentum() {
+	if (m_pendingMomentumVectors.size() == 0)
+		return R_SUCCESS;
+
+	vector vMomentumAccumulator = vector();
+	for (auto &vMomentum : m_pendingMomentumVectors) {
+		vMomentumAccumulator += vMomentum;
+	}
+
+	m_pendingMomentumVectors.clear();
+
+	return AddMomentumImpulse(vMomentumAccumulator);
+}
+
+RESULT ObjectState::AddPendingTranslation(vector vTranslation) {
+	m_pendingTranslationVectors.push_back(vTranslation);
+	return R_SUCCESS;
+}
+
+RESULT ObjectState::CommitPendingTranslation() {
+	if (m_pendingTranslationVectors.size() == 0)
+		return R_SUCCESS;
+
+	vector vTranslationAccumulator = vector();
+	for (auto &vTranslation : m_pendingTranslationVectors) {
+		vTranslationAccumulator += vTranslation;
+	}
+
+	m_pendingTranslationVectors.clear();
+
+	return Translate(vTranslationAccumulator);
+}
+
+RESULT ObjectState::Translate(vector vTranslation) {
+	m_ptOrigin += vTranslation;
+	return R_SUCCESS;
+}
+
 const vector ObjectState::GetVelocity() { 
 	return m_vVelocity; 
 }

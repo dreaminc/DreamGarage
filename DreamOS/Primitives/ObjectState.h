@@ -47,10 +47,19 @@ public:
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
 	RESULT AddMomentumImpulse(vector vImplulse);
+	
+	// These functions are meant to represent a moment in a simulation
+	// to avoid changing velocity during a particular point of a simulation
+	RESULT AddPendingMomentumImpulse(vector vImplulse);
+	RESULT CommitPendingMomentum();
+
+	RESULT AddPendingTranslation(vector vTranslation);
+	RESULT CommitPendingTranslation();
 
 	const vector GetMomentum();
 
 	const point GetOrigin();
+	RESULT Translate(vector vTranslation);
 
 	const quaternion GetRotation();
 	const quaternion GetAngularMoment();
@@ -67,6 +76,8 @@ private:
 	vector m_vVelocity;					// Velocity			
 
 	std::list<ForceGenerator*> m_forceGenerators;
+	std::list<vector> m_pendingMomentumVectors;
+	std::list<vector> m_pendingTranslationVectors;
 
 protected:
 	point m_ptOrigin;					// Origin			

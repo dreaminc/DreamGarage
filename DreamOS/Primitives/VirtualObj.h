@@ -145,6 +145,10 @@ public:
 	vector GetVelocity();
 	vector GetMomentum();
 	RESULT Impulse(vector vImpulse);
+	RESULT AddPendingImpulse(vector vImpulse);
+	RESULT CommitPendingImpulses();
+	RESULT AddPendingTranslation(vector vTranslation);
+	RESULT CommitPendingTranslation();
 
 	// Update functions
 	VirtualObj* Update();
