@@ -126,7 +126,9 @@ bool BoundingBox::Intersect(const ray& r) {
 
 CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 	// TODO: do it
-	return CollisionManifold();
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	return manifold;
 }
 
 RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {

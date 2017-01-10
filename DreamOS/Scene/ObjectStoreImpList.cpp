@@ -172,6 +172,7 @@ std::vector<std::vector<VirtualObj*>> ObjectStoreImpList::GetObjectCollisionGrou
 			continue;
 		}
 
+		///*
 		// Check that this object is not already in a collision group
 		bool fObjectDuplicate = false;
 		for (auto &group : collisionGroups) {
@@ -187,6 +188,7 @@ std::vector<std::vector<VirtualObj*>> ObjectStoreImpList::GetObjectCollisionGrou
 		// Object already in a collision group - so continue
 		if (fObjectDuplicate)
 			continue;
+		//*/
 
 		auto collisionGroup = GetObjects(pDimObj);
 

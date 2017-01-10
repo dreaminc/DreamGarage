@@ -68,7 +68,7 @@ RESULT DreamTestApp::LoadScene() {
 	//*/
 
 	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
-	pSphere1->SetPosition(point(-3.0f, 0.0f, 0.0f));
+	pSphere1->SetPosition(point(-1.0f, 0.0f, 0.0f));
 	pSphere1->SetMass(1.0f);
 	pSphere1->SetVelocity(1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere1);
@@ -76,7 +76,7 @@ RESULT DreamTestApp::LoadScene() {
 
 	///*
 	sphere *pSphere2 = AddSphere(0.25f, 10, 10);
-	pSphere2->SetPosition(point(3.0f, -0.0f, 0.0f));
+	pSphere2->SetPosition(point(1.0f, -0.0f, 0.0f));
 	pSphere2->SetMass(1.0f);
 	pSphere2->SetVelocity(-1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere2);
@@ -84,7 +84,7 @@ RESULT DreamTestApp::LoadScene() {
 
 	///*
 	sphere *pSphere3 = AddSphere(0.25f, 10, 10);
-	pSphere3->SetPosition(point(0.0f, 3.0f, 0.0f));
+	pSphere3->SetPosition(point(0.0f, 1.0f, 0.0f));
 	pSphere3->SetMass(1.0f);
 	pSphere3->SetVelocity(0.0f, -1.0f, 0.0f);
 	AddPhysicsObject(pSphere3);
@@ -92,7 +92,7 @@ RESULT DreamTestApp::LoadScene() {
 
 	///*
 	sphere *pSphere4 = AddSphere(0.25f, 10, 10);
-	pSphere4->SetPosition(point(0.0f, -3.0f, 0.0f));
+	pSphere4->SetPosition(point(0.0f, -1.0f, 0.0f));
 	pSphere4->SetMass(1.0f);
 	pSphere4->SetVelocity(0.0f, 1.0f, 0.0f);
 	AddPhysicsObject(pSphere4);
@@ -101,7 +101,7 @@ RESULT DreamTestApp::LoadScene() {
 
 	///*
 	sphere *pSphere6 = AddSphere(0.25f, 10, 10);
-	pSphere6->SetPosition(point(0.0f, 0.0f, 3.0f));
+	pSphere6->SetPosition(point(0.0f, 0.0f, 1.0f));
 	pSphere6->SetMass(1.0f);
 	pSphere6->SetVelocity(0.0f, 0.0f, -1.0f);
 	AddPhysicsObject(pSphere6);
@@ -109,7 +109,7 @@ RESULT DreamTestApp::LoadScene() {
 
 	///*
 	sphere *pSphere7 = AddSphere(0.25f, 10, 10);
-	pSphere7->SetPosition(point(0.0f, 0.0f, -3.0f));
+	pSphere7->SetPosition(point(0.0f, 0.0f, -1.0f));
 	pSphere7->SetMass(1.0f);
 	pSphere7->SetVelocity(0.0f, 0.0f, 1.0f);
 	AddPhysicsObject(pSphere7);

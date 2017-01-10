@@ -15,6 +15,7 @@ RESULT CollisionResolver::Initialize() {
 	return R_PASS;
 }
 
+// TODO: We want all of the collision groups at once - fix collision group event
 RESULT CollisionResolver::Notify(CollisionGroupEvent *oEvent) {
 	RESULT r = R_PASS;
 
@@ -24,11 +25,41 @@ RESULT CollisionResolver::Notify(CollisionGroupEvent *oEvent) {
 	// We have a group of objects that have collided 
 	// Resolve the point of collision for each object with the other and update it's momentum accordingly
 	//std::list<VirtualObj*> affectedObjects;
+	std::list<CollisionManifold> collisions;
 
-	for (auto &objA : oEvent->m_collisionGroup) {
-	//for(auto it = oEvent->m_collisionGroup.begin(); it != oEvent->m_collisionGroup.end(); it++) {
+	for (auto it = oEvent->m_collisionGroup.begin(); it != oEvent->m_collisionGroup.end(); it++) {
+		DimObj *pDimObjA = dynamic_cast<DimObj*>(*it);
+		std::shared_ptr<BoundingVolume> pBoundingVolumeA = nullptr;
+
+		if (pDimObjA == nullptr || (pBoundingVolumeA = pDimObjA->GetBoundingVolume()) == nullptr) {
+			continue;
+		}
+
+		for (auto &objB : std::list<VirtualObj*>(it + 1, oEvent->m_collisionGroup.end())) {
+			DimObj *pDimObjB = dynamic_cast<DimObj*>(objB);
+			std::shared_ptr<BoundingVolume> pBoundingVolumeB = nullptr;
+
+			if (pDimObjA == pDimObjB || pDimObjB == nullptr || (pBoundingVolumeB = pDimObjB->GetBoundingVolume()) == nullptr) {
+				continue;
+			}
+
+			CollisionManifold manifold = pBoundingVolumeA->Collide(pBoundingVolumeB.get());
+			
+			if (manifold.NumContacts() > 0) {
+				collisions.push_back(manifold);
+			}
+		}
+	}
+
+	for (auto &manifold : collisions) {
+		CR(ResolveCollision(manifold));
+	}
+
+	/*
+	//for (auto &objA : oEvent->m_collisionGroup) {
+	for(auto it = oEvent->m_collisionGroup.begin(); it != oEvent->m_collisionGroup.end(); it++) {
 		// Resolve collision point for each object
-		//VirtualObj *objA = (*it);
+		VirtualObj *objA = (*it);
 		DimObj *pDimObjA = dynamic_cast<DimObj*>(objA);
 		std::shared_ptr<BoundingVolume> pBoundingVolumeA = nullptr;
 
@@ -36,8 +67,8 @@ RESULT CollisionResolver::Notify(CollisionGroupEvent *oEvent) {
 			continue;
 		}
 
-		//for (auto &objB : std::list<VirtualObj*>(it + 1, oEvent->m_collisionGroup.end())) {
-		for (auto &objB : oEvent->m_collisionGroup) {
+		for (auto &objB : std::list<VirtualObj*>(it + 1, oEvent->m_collisionGroup.end())) {
+		//for (auto &objB : oEvent->m_collisionGroup) {
 			DimObj *pDimObjB = dynamic_cast<DimObj*>(objB);
 			std::shared_ptr<BoundingVolume> pBoundingVolumeB = nullptr;
 
@@ -54,63 +85,79 @@ RESULT CollisionResolver::Notify(CollisionGroupEvent *oEvent) {
 
 			if ((std::find(affectedObjects.begin(), affectedObjects.end(), objB) == affectedObjects.end()))
 				affectedObjects.push_back(objB);
-			*/
-		}
-	}
+			//*/
+		//}
 
-	/*
-	// Commit pending impulse changes
-	for (auto &obj : affectedObjects) {
-		obj->CommitPendingTranslation();
-		obj->CommitPendingImpulses();
-	}
-	*/
+		/*
+		// Commit pending impulse changes
+		for (auto &obj : affectedObjects) {
+			obj->CommitPendingTranslation();
+			obj->CommitPendingImpulses();
+		}
+		affectedObjects.clear();
+		//*/
+	//}
+
+	
 
 Error:
 	return r;
 }
 
-RESULT CollisionResolver::ResolveCollision(DimObj *pDimObjA, DimObj *pDimObjB) {
+RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<BoundingVolume> pBoundingVolumeA = pDimObjA->GetBoundingVolume();
-	std::shared_ptr<BoundingVolume> pBoundingVolumeB = pDimObjB->GetBoundingVolume();
-
-	CollisionManifold manifold = pBoundingVolumeA->Collide(pBoundingVolumeB.get());
-
-	if (manifold.NumContacts() > 0) {
 		// Resolve the penetration as well
 		const double penetrationThreshold = 0.001f;		// Penetration percentage to correct
 
-		double kgMassA = pDimObjA->GetMass();
-		double kgMassB = pDimObjB->GetMass();
-		double kgInverseMassA = pDimObjA->GetInverseMass();
-		double kgInverseMassB = pDimObjB->GetInverseMass();
+		VirtualObj *pObjA = manifold.GetObjectA();
+		VirtualObj *pObjB = manifold.GetObjectB();
+
+		double kgMassA = pObjA->GetMass();
+		double kgMassB = pObjB->GetMass();
+		
+		double kgInverseMassA = 1.0f / kgMassA;
+		double kgInverseMassB = 1.0f / kgMassB;
+
 		double totalMass = kgMassA + kgMassB;
 
-		if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
-			const double percentCorrection = 0.2f;		// Penetration percentage to correct
-			vector vCorrection = manifold.GetNormal() * (std::max((manifold.MaxPenetrationDepth() - penetrationThreshold), (double)(0.0f)) / (kgInverseMassA + kgInverseMassB)) * percentCorrection;
-			
+		/*else {
+			const double fudgeFactor = 0.01f;		// Penetration percentage to correct
+			vector vCorrection = manifold.GetNormal() * fudgeFactor;
+			//vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth();//  *percentCorrection;
+
 			//pDimObjA->translate(vCorrection * -kgMassA);
 			//pDimObjB->translate(vCorrection * kgMassB);
-			pDimObjA->AddPendingTranslation(vCorrection * -kgMassA);
-			pDimObjB->AddPendingTranslation(vCorrection * kgMassB);
-			//pDimObjA->AddPendingTranslation(vCorrection * -1.0f);
-			//pDimObjB->AddPendingTranslation(vCorrection * 1.0f);
-		}
+			pObjA->AddPendingTranslation(vCorrection);
+			pObjB->AddPendingTranslation(vCorrection);
+		}*/
 
 		// Resolve the impulses
-		vector vVelocityBeforeA = pDimObjA->GetVelocity();
-		vector vVelocityBeforeB = pDimObjB->GetVelocity();
+		vector vVelocityBeforeA = pObjA->GetVelocity();
+		vector vVelocityBeforeB = pObjB->GetVelocity();
 
 		double restitutionConstant = 1.0f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
 		double j = -(1.0f + restitutionConstant) * (vRelativeVelocity.dot(manifold.GetNormal()));
-		j *= 1.0f / (kgInverseMassA + kgInverseMassB);
+		j /= (kgInverseMassA + kgInverseMassB);
 
-		vector vImpulseA = manifold.GetNormal() * (j);
-		vector vImpulseB = manifold.GetNormal() * (-j);
+		vector vImpulseA = manifold.GetNormal() * (j) * kgInverseMassA;
+		vector vImpulseB = manifold.GetNormal() * (-j) * kgInverseMassB;
+
+		if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
+			const double percentCorrection = 1.0f + 0.01f;		// Penetration percentage to correct
+			vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth() * (percentCorrection);
+			//vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth();//  *percentCorrection;
+
+			pObjA->translate(vCorrection * -(1) * kgInverseMassA);
+			pObjB->translate(vCorrection * (1) * kgInverseMassB);
+
+			//pObjA->AddPendingTranslation(vCorrection * -kgMassA);
+			//pObjB->AddPendingTranslation(vCorrection * kgMassB);
+
+			//pObjA->AddPendingTranslation(vCorrection * -1.0f);
+			//pObjB->AddPendingTranslation(vCorrection * 1.0f);
+		}
 
 		/*
 		vector vImpulseA = manifold.GetNormal() * (-kgMassA / (kgInverseMassA + kgInverseMassB));
@@ -123,9 +170,12 @@ RESULT CollisionResolver::ResolveCollision(DimObj *pDimObjA, DimObj *pDimObjB) {
 		pDimObjB->SetVelocity(vVelocityAfterB);
 		*/
 
-		pDimObjA->AddPendingImpulse(vImpulseA);
-		pDimObjB->AddPendingImpulse(vImpulseB);
-	}
+		//pObjA->AddPendingImpulse(vImpulseA);
+		//pObjB->AddPendingImpulse(vImpulseB);
+		
+		pObjA->Impulse(vImpulseA);
+		pObjB->Impulse(vImpulseB);
+	
 
 //Error:
 	return r;

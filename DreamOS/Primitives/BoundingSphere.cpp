@@ -82,7 +82,7 @@ CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
 	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin());
 	float distance = vMidLine.magnitude();
 
-	CollisionManifold manifold = CollisionManifold();
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
 	if (abs(distance) <= (rhs.m_radius + m_radius)) {
 		// Find the contact point and normal

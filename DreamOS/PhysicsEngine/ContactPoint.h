@@ -22,7 +22,7 @@ public:
 	ContactPoint();
 	ContactPoint(point ptContact, vector vNormal, double penetrationDepth);
 
-	vector GetNormal();
+	vector GetNormal() const;
 
 private:
 	point m_ptContact;

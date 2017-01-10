@@ -29,7 +29,8 @@ protected:
 	virtual RESULT Notify(CollisionGroupEvent *oEvent) override;
 
 private:
-	RESULT ResolveCollision(DimObj *pDimObjA, DimObj *pDimObjB);
+	//RESULT ResolveCollision(DimObj *pDimObjA, DimObj *pDimObjB);
+	RESULT ResolveCollision(const CollisionManifold &manifold);
 
 private:
 	UID m_uid;

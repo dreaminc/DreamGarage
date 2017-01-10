@@ -26,7 +26,7 @@ CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 		return Collide(*pBoundingSphere);
 	}
 
-	return CollisionManifold();
+	return CollisionManifold(this->m_pParent, pRHS->GetParentObject());
 }
 
 quaternion BoundingVolume::GetOrientation() { 
@@ -49,4 +49,8 @@ point BoundingVolume::GetOrigin() {
 	else {
 		return (m_pParent->GetOrigin());
 	}
+}
+
+VirtualObj* BoundingVolume::GetParentObject() const {
+	return m_pParent;
 }

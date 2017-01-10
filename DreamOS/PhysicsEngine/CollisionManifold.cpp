@@ -1,16 +1,18 @@
 #include "CollisionManifold.h"
 
+/*
 CollisionManifold::CollisionManifold() :
-	m_pDimObjA(nullptr),
-	m_pDimObjB(nullptr),
+	m_pObjA(nullptr),
+	m_pObjB(nullptr),
 	m_numContacts(0)
 {
 	Clear();
 }
+*/
 
-CollisionManifold::CollisionManifold(DimObj *pDimObjA, DimObj *pDimObjB) :
-	m_pDimObjA(pDimObjA),
-	m_pDimObjB(pDimObjB),
+CollisionManifold::CollisionManifold(VirtualObj *pObjA, VirtualObj *pObjB) :
+	m_pObjA(pObjA),
+	m_pObjB(pObjB),
 	m_numContacts(0)
 {
 	Clear();
@@ -25,8 +27,8 @@ RESULT CollisionManifold::AddContactPoint(point ptContact, vector vNormal, doubl
 		ptContact, vNormal, penetrationDepth
 	};
 
-	if (penetrationDepth > m_maxPenetrationDepth) {
-		m_maxPenetrationDepth = penetrationDepth;
+	if (std::abs(penetrationDepth) > m_maxPenetrationDepth) {
+		m_maxPenetrationDepth = std::abs(penetrationDepth);
 	}
 
 	// Average Normal
@@ -44,15 +46,15 @@ RESULT CollisionManifold::Clear() {
 	return R_PASS;
 }
 
-int CollisionManifold::NumContacts() {
+int CollisionManifold::NumContacts() const {
 	return m_numContacts;
 }
 
-double CollisionManifold::MaxPenetrationDepth() {
+double CollisionManifold::MaxPenetrationDepth() const {
 	return m_maxPenetrationDepth;
 }
 
-vector CollisionManifold::GetNormal() {
+vector CollisionManifold::GetNormal() const {
 	vector vNormal = vector();
 
 	for (int i = 0; i < m_numContacts; i++) {
@@ -62,4 +64,12 @@ vector CollisionManifold::GetNormal() {
 	vNormal.Normalize();
 
 	return vNormal;
+}
+
+VirtualObj* CollisionManifold::GetObjectA() const {
+	return m_pObjA;
+}
+
+VirtualObj* CollisionManifold::GetObjectB() const {
+	return m_pObjB;
 }

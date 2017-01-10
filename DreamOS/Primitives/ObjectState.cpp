@@ -30,7 +30,8 @@ RESULT ObjectState::Clear() {
 
 // p = mv or v = p/m
 RESULT ObjectState::Recalculate() {
-	m_vVelocity = m_vMomentum * m_inverseMass;
+	//m_vVelocity = m_vMomentum * m_inverseMass;
+	m_vVelocity = m_vMomentum * (1.0f / m_kgMass);
 	return R_SUCCESS;
 }
 

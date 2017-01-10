@@ -12,26 +12,28 @@
 
 #define MAX_CONTACT_POINTS 4
 
-class DimObj;
+class VirtualObj;
 
 class CollisionManifold {
 public:
-	CollisionManifold();
-	CollisionManifold(DimObj *pDimObjA, DimObj *pDimObjB);
+	//CollisionManifold();
+	CollisionManifold(VirtualObj *pObjA, VirtualObj *pObjB);
 	RESULT AddContactPoint(point ptContact, vector vNormal, double penetrationDepth);
 	RESULT Clear();
 
-	int NumContacts();
-	double MaxPenetrationDepth();
-	vector GetNormal();
+	int NumContacts() const;
+	double MaxPenetrationDepth() const;
+	vector GetNormal() const;
+	VirtualObj *GetObjectA() const;
+	VirtualObj *GetObjectB() const;
 
 private:
 	ContactPoint m_contactPoints[MAX_CONTACT_POINTS];	// Use a static array for cache coherency 
 	int m_numContacts = 0;
 	double m_maxPenetrationDepth = 0.0f;
 
-	DimObj *m_pDimObjA = nullptr;
-	DimObj *m_pDimObjB = nullptr;
+	VirtualObj *m_pObjA = nullptr;
+	VirtualObj *m_pObjB = nullptr;
 };
 
 #endif	// !COLLISION_MANIFOLD_H_

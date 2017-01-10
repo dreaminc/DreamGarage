@@ -73,6 +73,7 @@ public:
 
 	point GetBoundingVolumeOrigin();
 	point GetParentOrigin();
+	VirtualObj *GetParentObject() const;
 	point GetOrigin();
 	quaternion GetOrientation();
 
