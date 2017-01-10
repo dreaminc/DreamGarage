@@ -87,3 +87,7 @@ RESULT ObjectStore::UpdateScene() {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT ObjectStore::CommitObjects() {
+	return m_pSceneGraphStore->CommitObjects();
+}
+

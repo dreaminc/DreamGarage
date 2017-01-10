@@ -75,6 +75,14 @@ RESULT ObjectStoreImpList::RemoveObjectByUID(UID uid) {
 	return R_NOT_FOUND;
 }
 
+RESULT ObjectStoreImpList::CommitObjects() {
+	for (auto &obj : m_objects) {
+		obj->CommitPendingTranslation();
+		obj->CommitPendingImpulses();
+	}
+	return R_SUCCESS;
+}
+
 // Note: This memory location is not guaranteed and needs to be collected each time
 // Caller should create a copy if needed
 RESULT ObjectStoreImpList::GetLights(std::vector<light*>*& pLights) {

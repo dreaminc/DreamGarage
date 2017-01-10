@@ -31,6 +31,8 @@ public:
 	virtual VirtualObj *FindObjectByUID(UID uid) override;
 	virtual VirtualObj *FindObject(VirtualObj *pObject) override;
 
+	virtual RESULT CommitObjects() override;
+
 	virtual RESULT GetLights(std::vector<light*>*& pLights) override;
 
 	RESULT SetSkybox(skybox *pSkybox);

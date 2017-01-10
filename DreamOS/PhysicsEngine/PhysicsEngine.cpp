@@ -77,11 +77,11 @@ Error:
 RESULT PhysicsEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	// Update current states
-	CR(m_pPhysicsIntegrator->Update());
-
 	// Detect Collisions
 	CR(m_pCollisionDetector->UpdateObjectStore(pObjectStore));
+
+	// Update current states
+	CR(m_pPhysicsIntegrator->Update());
 
 	// Resolver will be automatically notified per the pub-sub design
 	// TODO: We might want to rethink this for performance reasons

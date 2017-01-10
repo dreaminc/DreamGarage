@@ -45,8 +45,12 @@ RESULT CollisionDetector::UpdateObjectStore(ObjectStore *pObjectStore) {
 			Publisher<VirtualObj*, CollisionObjectEvent>::NotifySubscribers(objectEvent.first, &collisionObjectEvent);
 		}
 	}
+
+	// All events should have fired 
+	// TODO: This isn't too great performance wise - should add "dirty bit" somewhere
+	CR(pObjectStore->CommitObjects());
 	
-	//Error:
+Error:
 	return r;
 }
 

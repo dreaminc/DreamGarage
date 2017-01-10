@@ -50,6 +50,8 @@ public:
 	RESULT UpdateScene();
 	RESULT LoadScene();
 
+	RESULT CommitObjects();
+
 
 protected:
 	ObjectStoreImp *m_pSceneGraphStore;

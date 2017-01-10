@@ -8,6 +8,7 @@
 cylinder *g_pCylinder = nullptr;
 volume *g_pVolume = nullptr;
 volume *g_pVolume2 = nullptr;
+sphere *pSphere5 = nullptr;
 
 RESULT DreamTestApp::LoadScene() {
 	RESULT r = R_PASS;
@@ -58,6 +59,13 @@ RESULT DreamTestApp::LoadScene() {
 	RegisterObjectCollision(g_pVolume2);
 	//*/
 
+	///*
+	pSphere5 = AddSphere(0.25f, 10, 10);
+	pSphere5->SetPosition(point(0.0f, 0.0f, 0.0f));
+	pSphere5->SetMass(1.0f);
+	AddPhysicsObject(pSphere5);
+	//RegisterObjectCollision(pSphere4);
+	//*/
 
 	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
 	pSphere1->SetPosition(point(-3.0f, 0.0f, 0.0f));
@@ -90,6 +98,24 @@ RESULT DreamTestApp::LoadScene() {
 	AddPhysicsObject(pSphere4);
 	//RegisterObjectCollision(pSphere4);
 	//*/
+
+	///*
+	sphere *pSphere6 = AddSphere(0.25f, 10, 10);
+	pSphere6->SetPosition(point(0.0f, 0.0f, 3.0f));
+	pSphere6->SetMass(1.0f);
+	pSphere6->SetVelocity(0.0f, 0.0f, -1.0f);
+	AddPhysicsObject(pSphere6);
+	//*/
+
+	///*
+	sphere *pSphere7 = AddSphere(0.25f, 10, 10);
+	pSphere7->SetPosition(point(0.0f, 0.0f, -3.0f));
+	pSphere7->SetMass(1.0f);
+	pSphere7->SetVelocity(0.0f, 0.0f, 1.0f);
+	AddPhysicsObject(pSphere7);
+	//RegisterObjectCollision(pSphere4);
+	//*/
+
 
 	//pCylinder->SetWireframe(true);
 
