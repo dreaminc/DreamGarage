@@ -47,6 +47,8 @@ public:
 	SenseLeapMotion();
 	~SenseLeapMotion();
 
+	RESULT InitLeapMotion();
+
 private:
 	const std::string FingerNames[5] = { "Thumb", "Index", "Middle", "Ring", "Pinky" };
 	const std::string BoneNames[5] = { "Metacarpal", "Proximal", "Middle", "Distal" };
