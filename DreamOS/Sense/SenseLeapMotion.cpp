@@ -7,32 +7,28 @@ SenseLeapMotion::SenseLeapMotion() :
 	m_pLeftHand(nullptr),
 	m_pRightHand(nullptr)
 {
+//Success:
+	Validate();
+	return;
+}
+
+RESULT SenseLeapMotion::InitLeapMotion() {
 	RESULT r = R_PASS;
 
 	m_pLeapController = std::make_unique<Leap::Controller>();
 	CNM(m_pLeapController, "Failed to create leap motion controller");
 
+	// this determines if a user has leap motion installed or not
 	CBM((m_pLeapController->addListener(*this)), "Failed to add SenseLeapMotion as listener device");
 
 	m_pLeapController->setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
 
 	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Detected...");
 
-	/*
-	for (int i = 0; i < NUM_SENSE_KEYBOARD_KEYS; i++) {
-	RegisterEvent(i);
-	}
-	*/
-
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Leap, this);
 
-//Success:
-	Validate();
-	return;
-
 Error:
-	Invalidate();
-	return;
+	return r;
 }
 
 SenseLeapMotion::~SenseLeapMotion() {

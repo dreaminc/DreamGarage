@@ -250,7 +250,12 @@ hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
 	if (pVive != nullptr) {
 		return pVive->GetHand(handType);
 	}
-	return m_pSenseLeapMotion->GetHand(handType);
+
+	if (m_pSenseLeapMotion != nullptr) {
+		return m_pSenseLeapMotion->GetHand(handType);
+	}
+	
+	return nullptr;
 }
 
 

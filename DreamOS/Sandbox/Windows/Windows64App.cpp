@@ -164,6 +164,11 @@ RESULT Windows64App::InitializeLeapMotion() {
 	m_pSenseLeapMotion = std::unique_ptr<SenseLeapMotion>(new SenseLeapMotion());
 	CNM(m_pSenseLeapMotion, "Failed to allocate leap motion");
 
+	if (R_PASS == m_pSenseLeapMotion->InitLeapMotion()) {
+		// Leap Motion successfully initialized
+		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
+	}
+
 Error:
 	return r;
 }
@@ -416,9 +421,8 @@ RESULT Windows64App::InitializeSandbox() {
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	// This will only turn on Leap if connected at boot up
-	CRM(InitializeLeapMotion(), "Failed to initialize leap motion");
-	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected() && m_fCheckLeap) {
-		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
+	if (m_fCheckLeap) {
+		CRM(InitializeLeapMotion(), "Failed to initialize leap motion");
 	}
 
 	CRM(RegisterImpViveControllerEvents(), "Failed to register vive controller events");
