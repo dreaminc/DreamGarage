@@ -98,6 +98,13 @@ CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
 	return manifold;
 }
 
+CollisionManifold BoundingSphere::Collide(const BoundingVolume& rhs) {
+	// TODO: do it
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	return manifold;
+}
+
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {
 	vector vDiff = (ptMax - GetOrigin());
 	//m_radius = vDiff.magnitude();

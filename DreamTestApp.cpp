@@ -59,14 +59,91 @@ RESULT DreamTestApp::LoadScene() {
 	RegisterObjectCollision(g_pVolume2);
 	//*/
 
+	// Volume vs Sphere
 	///*
+	volume *pVolume1 = AddVolume(0.5f);
+	pVolume1->SetPosition(point(-1.0f, 0.0f, 0.0f));
+	pVolume1->SetRotateDeg(0.0f, 0.0f, 0.25f);
+	pVolume1->SetMass(1.0f);
+	pVolume1->SetVelocity(1.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pVolume1);
+
+	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
+	pSphere1->SetPosition(point(1.0f, 0.0f, 0.0f));
+	pSphere1->SetMass(1.0f);
+	pSphere1->SetVelocity(-1.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pSphere1);
+	//*/
+
+	// Volume vs Volume
+	/*
+	volume *pVolume1 = AddVolume(0.5f);
+	pVolume1->SetPosition(point(-1.0f, 0.0f, 0.0f));
+	pVolume1->SetMass(1.0f);
+	pVolume1->SetVelocity(1.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pVolume1);
+
+	volume *pVolume2 = AddVolume(0.5f);
+	pVolume2->SetPosition(point(1.0f, 0.0f, 0.0f));
+	pVolume2->SetMass(1.0f);
+	pVolume2->SetVelocity(-1.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pVolume2);
+	//*/
+
+	/*
+	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
+	pSphere1->SetPosition(point(1.0f, -0.0f, 0.0f));
+	pSphere1->SetMass(1.0f);
+	pSphere1->SetVelocity(-1.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pSphere1);
+	//*/
+
+	// Sphere vs Sphere
+	/*
+	float radius = 0.1f;
+	float padding = 0.01f;
+	int num = 6;
+	for (int i = 0; i < num; i++) {
+		float startY = (((radius * 2.0) + padding) * (num));
+		startY /= -2.0f;
+
+		//for (int j = 0; j < (i + 1); j++) {
+		for (int j = 0; j < num; j++) {
+			sphere *pSphereTemp = AddSphere(radius, 10, 10);
+			pSphereTemp->SetPosition(point(((2.0f * radius) + padding) * i, startY + (((radius * 2.0) + padding) * j), 0.0f));
+			pSphereTemp->SetMass(1.0f);
+			AddPhysicsObject(pSphereTemp);
+		}
+	}
+
+	sphere *pSphere1 = AddSphere(6.0f, 10, 10);
+	pSphere1->SetPosition(point(-7.0f, 0.0f, 0.0f));
+	pSphere1->SetMass(10.0f);
+	pSphere1->SetVelocity(1.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pSphere1);
+	//RegisterObjectCollision(pSphere1);
+
+	//*/
+
+	/*
+	sphere *pSphereTemp = AddSphere(0.25f, 10, 10);
+	pSphereTemp->SetPosition(point(0.0f, 0.0f, 0.0f));
+	pSphereTemp->SetMass(1.0f);
+	AddPhysicsObject(pSphereTemp);
+
+	pSphereTemp = AddSphere(0.25f, 10, 10);
+	pSphereTemp->SetPosition(point(0.5f, 0.0f, 0.0f));
+	pSphereTemp->SetMass(1.0f);
+	AddPhysicsObject(pSphereTemp);
+	//*/
+
+	/*
 	pSphere5 = AddSphere(0.25f, 10, 10);
 	pSphere5->SetPosition(point(0.0f, 0.0f, 0.0f));
 	pSphere5->SetMass(1.0f);
 	AddPhysicsObject(pSphere5);
 	//RegisterObjectCollision(pSphere4);
-	//*/
-
+	
 	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
 	pSphere1->SetPosition(point(-1.0f, 0.0f, 0.0f));
 	pSphere1->SetMass(1.0f);
@@ -74,40 +151,31 @@ RESULT DreamTestApp::LoadScene() {
 	AddPhysicsObject(pSphere1);
 	//RegisterObjectCollision(pSphere1);
 
-	///*
 	sphere *pSphere2 = AddSphere(0.25f, 10, 10);
 	pSphere2->SetPosition(point(1.0f, -0.0f, 0.0f));
 	pSphere2->SetMass(1.0f);
 	pSphere2->SetVelocity(-1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere2);
-	//*/
-
-	///*
+	
 	sphere *pSphere3 = AddSphere(0.25f, 10, 10);
 	pSphere3->SetPosition(point(0.0f, 1.0f, 0.0f));
 	pSphere3->SetMass(1.0f);
 	pSphere3->SetVelocity(0.0f, -1.0f, 0.0f);
 	AddPhysicsObject(pSphere3);
-	//*/
-
-	///*
+	
 	sphere *pSphere4 = AddSphere(0.25f, 10, 10);
 	pSphere4->SetPosition(point(0.0f, -1.0f, 0.0f));
 	pSphere4->SetMass(1.0f);
 	pSphere4->SetVelocity(0.0f, 1.0f, 0.0f);
 	AddPhysicsObject(pSphere4);
 	//RegisterObjectCollision(pSphere4);
-	//*/
-
-	///*
+	
 	sphere *pSphere6 = AddSphere(0.25f, 10, 10);
 	pSphere6->SetPosition(point(0.0f, 0.0f, 1.0f));
 	pSphere6->SetMass(1.0f);
 	pSphere6->SetVelocity(0.0f, 0.0f, -1.0f);
 	AddPhysicsObject(pSphere6);
-	//*/
-
-	///*
+	
 	sphere *pSphere7 = AddSphere(0.25f, 10, 10);
 	pSphere7->SetPosition(point(0.0f, 0.0f, -1.0f));
 	pSphere7->SetMass(1.0f);

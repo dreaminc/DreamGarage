@@ -22,25 +22,33 @@ BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, poin
 }
 
 bool BoundingBox::Intersect(const BoundingSphere& rhs) {
-	if (m_type == Type::AABB) {
-		point ptMax = GetOrigin() + GetHalfVector();
-		point ptMin = GetOrigin() - GetHalfVector();
 
-		point ptClosestPoint = point::min(point::max(static_cast<BoundingSphere>(rhs).GetOrigin(), ptMin), ptMax);
-		double distanceSquared = pow((ptClosestPoint - static_cast<BoundingSphere>(rhs).GetOrigin()).magnitude(), 2.0f);
+	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin();
 
-		if (distanceSquared < pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f))
-			return true;
-		else
-			return false;
+	if (m_type == Type::OBB) {
+		point ptSphereOrigin = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
 	}
-	else if (m_type == Type::OBB) {
-		// TODO:
 
+	point ptMax = GetMaxPoint();
+	point ptMin = GetMinPoint();
+
+	float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
+	float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
+	float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
+
+	//point ptClosestPoint = point::min(point::max(ptSphereOrigin, ptMin), ptMax);
+	point ptClosestPoint = point(closestX, closestY, closestZ);
+
+	double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
+	double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
+
+	if (distanceSquared < sphereRadiusSquared) {
+		DEBUG_LINEOUT("ds %f ss %f", distanceSquared, sphereRadiusSquared);
+		return true;
+	}
+	else {
 		return false;
 	}
-
-	return false;
 }
 
 bool BoundingBox::Intersect(const BoundingBox& rhs) {
@@ -122,6 +130,30 @@ bool BoundingBox::Intersect(const ray& r) {
 	}
 
 	return (tmax >= tmin);
+}
+
+CollisionManifold BoundingBox::Collide(const BoundingVolume& rhs) {
+	
+	/*
+	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin());
+	float distance = vMidLine.magnitude();
+
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	if (abs(distance) <= (rhs.m_radius + m_radius)) {
+		// Find the contact point and normal
+		vector vNormal = vMidLine.Normal();
+		point ptContact = const_cast<BoundingSphere&>(rhs).GetOrigin() + (vMidLine * 0.5f);
+		double penetration = (rhs.m_radius + m_radius) - abs(distance);
+
+		manifold.AddContactPoint(ptContact, vNormal, penetration);
+
+		// TODO: Friction / Restitution?
+	}
+	
+	return manifold;*/
+
+	return CollisionManifold(this->m_pParent, rhs.GetParentObject());
 }
 
 CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
