@@ -98,11 +98,8 @@ CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
 	return manifold;
 }
 
-CollisionManifold BoundingSphere::Collide(const BoundingVolume& rhs) {
-	// TODO: do it
-	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-
-	return manifold;
+CollisionManifold BoundingSphere::Collide(const BoundingBox& rhs) {
+	return static_cast<BoundingBox>(rhs).Collide(*this);
 }
 
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {

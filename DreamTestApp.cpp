@@ -61,15 +61,15 @@ RESULT DreamTestApp::LoadScene() {
 
 	// Volume vs Sphere
 	///*
-	volume *pVolume1 = AddVolume(0.5f);
-	pVolume1->SetPosition(point(-1.0f, 0.0f, 0.0f));
-	pVolume1->SetRotateDeg(0.0f, 0.0f, 0.25f);
+	volume *pVolume1 = AddVolume(1.0f);
+	pVolume1->SetPosition(point(-1.0f, -0.0f, 0.0f));
+	pVolume1->RotateZByDeg(45.0f);
 	pVolume1->SetMass(1.0f);
-	pVolume1->SetVelocity(1.0f, 0.0f, 0.0f);
+	//pVolume1->SetVelocity(1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pVolume1);
 
 	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
-	pSphere1->SetPosition(point(1.0f, 0.0f, 0.0f));
+	pSphere1->SetPosition(point(1.0f, std::sqrt(2.0f)/2.0f, 0.0f));
 	pSphere1->SetMass(1.0f);
 	pSphere1->SetVelocity(-1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere1);
@@ -116,7 +116,7 @@ RESULT DreamTestApp::LoadScene() {
 		}
 	}
 
-	sphere *pSphere1 = AddSphere(6.0f, 10, 10);
+	sphere *pSphere1 = AddSphere(3.0f, 10, 10);
 	pSphere1->SetPosition(point(-7.0f, 0.0f, 0.0f));
 	pSphere1->SetMass(10.0f);
 	pSphere1->SetVelocity(1.0f, 0.0f, 0.0f);

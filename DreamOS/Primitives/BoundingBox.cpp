@@ -26,11 +26,17 @@ bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin();
 
 	if (m_type == Type::OBB) {
-		point ptSphereOrigin = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
+		//ptSphereOrigin = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
+		ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (ptSphereOrigin - GetOrigin()));
 	}
 
-	point ptMax = GetMaxPoint();
-	point ptMin = GetMinPoint();
+	// TODO: We may want to replace this with SAT as a coarse early test instead
+
+	//point ptMax = GetMaxPoint();
+	//point ptMin = GetMinPoint();
+
+	point ptMax = m_vHalfSize;
+	point ptMin = m_vHalfSize * -1.0f;
 
 	float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
 	float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
@@ -43,7 +49,6 @@ bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 	double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
 
 	if (distanceSquared < sphereRadiusSquared) {
-		DEBUG_LINEOUT("ds %f ss %f", distanceSquared, sphereRadiusSquared);
 		return true;
 	}
 	else {
@@ -132,8 +137,7 @@ bool BoundingBox::Intersect(const ray& r) {
 	return (tmax >= tmin);
 }
 
-CollisionManifold BoundingBox::Collide(const BoundingVolume& rhs) {
-	
+CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 	/*
 	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin());
 	float distance = vMidLine.magnitude();
@@ -150,15 +154,53 @@ CollisionManifold BoundingBox::Collide(const BoundingVolume& rhs) {
 
 		// TODO: Friction / Restitution?
 	}
-	
-	return manifold;*/
+	*/
 
 	return CollisionManifold(this->m_pParent, rhs.GetParentObject());
 }
 
 CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
-	// TODO: do it
+	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin();
+	point ptBoxOrigin = GetOrigin();
+	
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+	//CollisionManifold manifold = CollisionManifold(rhs.GetParentObject(), this->m_pParent);
+
+	if (m_type == Type::OBB) {
+		//point ptRelativeOrigin = GetOrigin() - ptSphereOrigin;
+		//ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
+		//ptSphereOrigin = (point)(inverse(this->m_pParent->GetModelMatrix()) * ptSphereOrigin);
+		ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (ptSphereOrigin - GetOrigin()));
+	}
+
+	//point ptMax = GetMaxPoint();
+	//point ptMin = GetMinPoint();
+
+	point ptMax = m_vHalfSize;
+	point ptMin = m_vHalfSize * -1.0f;
+	
+	float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
+	float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
+	float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
+
+	point ptClosestPoint = point(closestX, closestY, closestZ);
+
+	double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
+	double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
+
+	if (distanceSquared < sphereRadiusSquared) {
+		// Convert back to world coordinates
+		ptClosestPoint = (RotationMatrix(GetOrientation()) * ptClosestPoint) + GetOrigin();
+		//ptClosestPoint = (this->m_pParent->GetModelMatrix() * ptClosestPoint);
+
+		vector vNormal = static_cast<BoundingSphere>(rhs).GetOrigin() - ptClosestPoint;
+		vNormal.Normalize();
+
+		point ptContact = ptClosestPoint;
+		float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - std::sqrt(distanceSquared);
+
+		manifold.AddContactPoint(ptContact, vNormal, -penetration);
+	}
 
 	return manifold;
 }

@@ -27,7 +27,7 @@ public:
 	bool Intersect(line& ln);
 
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
-	virtual CollisionManifold Collide(const BoundingVolume& rhs) override;
+	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
 
 	float GetRadius() {
 		return m_radius;

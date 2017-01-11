@@ -26,11 +26,10 @@ CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 		return Collide(*pBoundingSphere);
 	}
 
-	// Volume
-	// Sphere
-	BoundingVolume *pBoundingVolume = dynamic_cast<BoundingVolume*>(pRHS);
-	if (pBoundingVolume != nullptr) {
-		return Collide(*pBoundingVolume);
+	// Box
+	BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pRHS);
+	if (pBoundingBox != nullptr) {
+		return Collide(*pBoundingBox);
 	}
 
 	return CollisionManifold(this->m_pParent, pRHS->GetParentObject());

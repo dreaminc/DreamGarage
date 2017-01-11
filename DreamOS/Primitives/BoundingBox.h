@@ -52,7 +52,7 @@ public:
 	bool Intersect(point& pt);
 	virtual bool Intersect(const ray& r) override;
 
-	virtual CollisionManifold Collide(const BoundingVolume& rhs) override;
+	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;

@@ -53,7 +53,7 @@ public:
 
 	CollisionManifold Collide(BoundingVolume* pRHS);
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) = 0;
-	virtual CollisionManifold Collide(const BoundingVolume& rhs) = 0;
+	virtual CollisionManifold Collide(const BoundingBox& rhs) = 0;
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
 
