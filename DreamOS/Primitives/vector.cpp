@@ -46,6 +46,11 @@ double vector::magnitude() {
 	return sqrt(sqaureSum);
 }
 
+double vector::magnitudeSquared() {
+	double sqaureSum = std::pow(x(), 2.0f) + std::pow(y(), 2.0f) + std::pow(z(), 2.0f);
+	return sqaureSum;
+}
+
 // Will normalize this vector
 RESULT vector::Normalize() {
 	vector_precision denom = 0;

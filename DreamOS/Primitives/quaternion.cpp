@@ -10,6 +10,16 @@ quaternion::quaternion(vector v) {
 	Normalize();
 }
 
+// This will result in a quaternion representing the shortest
+// arc between two vectors
+quaternion::quaternion(vector v1, vector v2) {
+	vector vCross = v1.cross(v2);
+	quaternion_precision w = sqrt(v1.magnitudeSquared() * v2.magnitudeSquared()) + v1.dot(v2);
+
+	SetValues(w, vCross.x(), vCross.y(), vCross.z());
+	Normalize();
+}
+
 quaternion::quaternion(quaternion_precision theta, vector vectorAxis) {
 	SetQuaternion(theta, vectorAxis.x(), vectorAxis.y(), vectorAxis.z());
 }

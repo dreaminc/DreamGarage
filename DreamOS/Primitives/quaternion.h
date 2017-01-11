@@ -36,6 +36,7 @@ class quaternion {
 public:
 	quaternion();
 	quaternion(vector v);
+	quaternion(vector v1, vector v2);
 	quaternion(quaternion_precision theta, vector vectorAxis);
 	quaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z);
 	quaternion(quaternion_precision values[4]);

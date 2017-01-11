@@ -141,6 +141,8 @@ public:
 	RESULT SetMass(double kgMass);
 	double GetMass();
 	double GetInverseMass();
+	RESULT SetImmovable(bool fImmovable);
+	bool IsImmovable();
 
 	vector GetVelocity();
 	vector GetMomentum();

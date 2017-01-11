@@ -59,17 +59,34 @@ RESULT DreamTestApp::LoadScene() {
 	RegisterObjectCollision(g_pVolume2);
 	//*/
 
-	// Volume vs Sphere
+	// TODO: Plane vs Sphere
+
+	// Quad vs Sphere
 	///*
+	// TODO: Add normal for quad
+	quad *pQuad1 = AddQuad(4.0f, 4.0f, 1, 1, nullptr, vector(1.0f, 1.0f, 0.0f));
+	pQuad1->SetPosition(point(0.0f, -1.0f, 0.0f));
+	pQuad1->SetImmovable(true);
+	//AddPhysicsObject(pVolume1);
+
+	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
+	pSphere1->SetPosition(point(3.0f, std::sqrt(2.0f)/2.0f, 0.0f));
+	pSphere1->SetMass(1.0f);
+	pSphere1->SetVelocity(-1.0f, 0.0f, 0.0f);
+	//AddPhysicsObject(pSphere1);
+	//*/
+
+	// Volume vs Sphere
+	/*
 	volume *pVolume1 = AddVolume(1.0f);
 	pVolume1->SetPosition(point(-1.0f, -0.0f, 0.0f));
 	pVolume1->RotateZByDeg(45.0f);
 	pVolume1->SetMass(1.0f);
-	//pVolume1->SetVelocity(1.0f, 0.0f, 0.0f);
+	pVolume1->SetVelocity(1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pVolume1);
 
 	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
-	pSphere1->SetPosition(point(1.0f, std::sqrt(2.0f)/2.0f, 0.0f));
+	pSphere1->SetPosition(point(3.0f, std::sqrt(2.0f)/2.0f, 0.0f));
 	pSphere1->SetMass(1.0f);
 	pSphere1->SetVelocity(-1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere1);

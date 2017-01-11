@@ -554,10 +554,10 @@ Error:
 	return nullptr;
 }
 	
-quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) {
+quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) {
 	RESULT r = R_PASS;
 
-	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 	CN(pQuad);
 
 	CR(AddObject(pQuad));
@@ -651,8 +651,7 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
-text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard)
-{
+text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = m_pHALImp->MakeText(fontName, content, size, isBillboard);

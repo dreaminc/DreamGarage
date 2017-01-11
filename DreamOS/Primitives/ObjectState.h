@@ -44,6 +44,9 @@ public:
 	const double GetMass();
 	const double GetInverseMass();
 
+	RESULT SetImmovable(bool fImmovable);
+	bool IsImmovable();
+
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
 	RESULT AddMomentumImpulse(vector vImplulse);
@@ -72,6 +75,7 @@ public:
 private:
 	double m_kgMass;				// Mass (kg)
 	double m_inverseMass;			// Inverse mass (1/kg)
+	bool m_fImmovable = false;		// Immovable means the object will not respond to forces of any kind (effectively infinite mass, and no volume)
 
 	vector m_vVelocity;					// Velocity			
 

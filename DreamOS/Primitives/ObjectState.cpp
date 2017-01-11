@@ -59,6 +59,14 @@ const point ObjectState::GetOrigin() {
 	return m_ptOrigin; 
 }
 
+RESULT ObjectState::SetImmovable(bool fImmovable) {
+	m_fImmovable = fImmovable;
+	return R_SUCCESS;
+}
+bool ObjectState::IsImmovable() {
+	return m_fImmovable;
+}
+
 RESULT ObjectState::SetVelocity(vector vVelocity) {
 	// Actually this sets the momentum p = mv
 	m_vMomentum = vVelocity * m_kgMass;

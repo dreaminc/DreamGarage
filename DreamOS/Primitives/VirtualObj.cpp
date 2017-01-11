@@ -373,6 +373,13 @@ vector VirtualObj::GetVelocity() {
 	return m_objectState.GetVelocity();
 }
 
+RESULT VirtualObj::SetImmovable(bool fImmovable) {
+	return m_objectState.SetImmovable(fImmovable);
+}
+bool VirtualObj::IsImmovable() {
+	return m_objectState.IsImmovable();
+}
+
 vector VirtualObj::GetMomentum() {
 	return m_objectState.GetMomentum();
 }
