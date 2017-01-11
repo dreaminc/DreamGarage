@@ -1,5 +1,6 @@
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
+#include "BoundingQuad.h"
 #include <algorithm>
 
 #include "VirtualObj.h"

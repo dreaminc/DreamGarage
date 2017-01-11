@@ -48,6 +48,14 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
+
+	OGLQuad(OpenGLImp *pParentImp, BoundingQuad* pBoundingQuad, bool fTriangleBased) :
+		quad(pBoundingQuad, fTriangleBased),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
 };
 
 #endif // ! OGL_QUAD_H_

@@ -1,8 +1,12 @@
 #include "OGLObj.h"
+
 #include "Primitives/BoundingVolume.h"
 #include "Primitives/BoundingSphere.h"
+#include "Primitives/BoundingQuad.h"
+
 #include "OGLVolume.h"
 #include "OGLSphere.h"
+#include "OGLQuad.h"
 
 OGLObj::OGLObj(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
@@ -243,6 +247,11 @@ RESULT OGLObj::RenderBoundingVolume() {
 			case BoundingVolume::Type::SPHERE: {
 				BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pBoundingVolume);
 				m_pOGLBoundingVolume = new OGLSphere(m_pParentImp, pBoundingSphere, false);
+			} break;
+
+			case BoundingVolume::Type::QUAD: {
+				BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pBoundingVolume);
+				m_pOGLBoundingVolume = new OGLQuad(m_pParentImp, pBoundingQuad, false);
 			} break;
 		}
 

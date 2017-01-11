@@ -18,6 +18,8 @@
 #include "color.h"
 #include "texture.h"
 
+class BoundingQuad;
+
 class quad : public DimObj {
 public:
 	typedef enum {
@@ -37,8 +39,10 @@ public:
 	quad(float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	quad(float height, float width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright, vector vNormal = vector::jVector());
+	quad(BoundingQuad *pBoundingQuad, bool fTriangleBased);
 
 	RESULT SetVertices(float width, float height, vector vNormal);
+	RESULT SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased);
 	
 	QUAD_TYPE EvaluatePoints(point a, point b, point c);
 

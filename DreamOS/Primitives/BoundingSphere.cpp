@@ -1,5 +1,6 @@
 #include "BoundingSphere.h"
 #include "BoundingBox.h"
+#include "BoundingQuad.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 

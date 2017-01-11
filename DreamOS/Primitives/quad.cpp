@@ -1,4 +1,5 @@
 #include "quad.h"
+#include "BoundingQuad.h"
 
 // copy ctor
 quad::quad(quad& q) :
@@ -41,7 +42,14 @@ quad::quad(float side, int numHorizontalDivisions, int numVerticalDivisions, tex
 	RESULT r = R_PASS;
 
 	CR(SetVertices(side, side, vNormal));
+	
+	//CR(InitializeOBB());
+	//CR(InitializeBoundingSphere());
 
+	CR(InitializeBoundingQuad(GetOrigin(), side, side, vNormal));
+	//TODO: CR(InitializeBoundingPlane());
+
+	// Success:
 	Validate();
 	return;
 
@@ -62,6 +70,14 @@ quad::quad(float height, float width, int numHorizontalDivisions, int numVertica
 
 	CR(SetVertices(width, height, vNormal));
 
+	//CR(InitializeAABB());
+	//CR(InitializeOBB());
+	//CR(InitializeBoundingSphere());
+	
+	CR(InitializeBoundingQuad(GetOrigin(), width, height, vNormal));
+	//TODO: CR(InitializeBoundingPlane());
+
+// Success:
 	Validate();
 	return;
 
@@ -98,9 +114,31 @@ quad::quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uv
 	pTriIndices[indexCount++] = TriangleIndexGroup(A, C, B);
 	pTriIndices[indexCount++] = TriangleIndexGroup(B, C, D);
 
+//Success:
 	Validate();
+	return;
 Error:
 	Invalidate();
+	return;
+}
+
+quad::quad(BoundingQuad *pBoundingQuad, bool fTriangleBased) :
+	m_quadType(RECTANGLE),
+	m_numHorizontalDivisions(1),
+	m_numVerticalDivisions(1),
+	m_pTextureHeight(nullptr),
+	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
+{
+	RESULT r = R_PASS;
+
+	CR(SetVertices(pBoundingQuad, fTriangleBased));
+	
+//Success:
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
 }
 
 RESULT quad::Allocate() {
@@ -145,6 +183,22 @@ bool quad::IsScaledBillboard() {
 
 void quad::SetScaledBillboard(bool fScale) {
 	m_fScaledBillboard = fScale; 
+}
+
+RESULT quad::SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased) {
+	RESULT r = R_PASS;
+
+	//m_radius = pBoundingQuad->GetRadius();
+
+	SetOrigin(pBoundingQuad->GetOrigin());
+	float width = pBoundingQuad->GetWidth();
+	float height = pBoundingQuad->GetHeight();
+	vector vNormal = pBoundingQuad->GetNormal();
+
+	CR(SetVertices(width, height, vNormal));
+
+Error:
+	return r;
 }
 
 RESULT quad::SetVertices(float width, float height, vector vNormal) {

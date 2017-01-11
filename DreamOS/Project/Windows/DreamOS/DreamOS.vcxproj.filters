@@ -530,6 +530,9 @@
     <ClCompile Include="..\..\..\Primitives\quad.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2233,6 +2236,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h">
       <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

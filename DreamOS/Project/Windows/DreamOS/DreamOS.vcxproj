@@ -441,6 +441,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp" />
     <ClCompile Include="..\..\..\Logger\Logger.cpp" />
@@ -799,6 +800,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingBox.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingSphere.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingVolume.h" />
     <ClInclude Include="..\..\..\Logger\Logger.h" />

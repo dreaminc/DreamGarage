@@ -24,6 +24,9 @@ public:
 	enum class Type {
 		BOX,
 		SPHERE,
+		QUAD,
+		PLANE,
+		CYLINDER,
 		INVALID
 	};
 
