@@ -48,11 +48,17 @@ RESULT ObjectState::SetMass(double kgMass) {
 }
 
 const double ObjectState::GetMass() {
-	return m_kgMass;
+	if (m_fImmovable == false)
+		return m_kgMass;
+	else
+		return std::numeric_limits<double>::infinity();
 }
 
 const double ObjectState::GetInverseMass() {
-	return m_inverseMass;
+	if (m_fImmovable == false)
+		return m_inverseMass;
+	else
+		return 0.0f;
 }
 
 const point ObjectState::GetOrigin() { 
@@ -63,6 +69,7 @@ RESULT ObjectState::SetImmovable(bool fImmovable) {
 	m_fImmovable = fImmovable;
 	return R_SUCCESS;
 }
+
 bool ObjectState::IsImmovable() {
 	return m_fImmovable;
 }
@@ -77,8 +84,10 @@ RESULT ObjectState::SetVelocity(vector vVelocity) {
 
 RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
 	// Actually this sets the momentum p = mv
-	m_vMomentum += vImplulse;
-	Recalculate();
+	if (m_fImmovable == false) {
+		m_vMomentum += vImplulse;
+		Recalculate();
+	}
 
 	return R_SUCCESS;
 }
@@ -122,7 +131,16 @@ RESULT ObjectState::CommitPendingTranslation() {
 }
 
 RESULT ObjectState::Translate(vector vTranslation) {
-	m_ptOrigin += vTranslation;
+	if(m_fImmovable == false)
+		m_ptOrigin += vTranslation;
+
+	return R_SUCCESS;
+}
+
+RESULT ObjectState::translate(vector v) {
+	if (m_fImmovable == false)
+		m_ptOrigin.translate(v);
+
 	return R_SUCCESS;
 }
 
@@ -161,17 +179,21 @@ ObjectDerivative ObjectState::Evaluate(float timeStart, float timeDelta, const O
 	//const float b = 1;
 	//derivativeOutput.m_vForce  = -k * m_ptOrigin - b * derivativeOutput.m_vRateOfChangeOrigin;
 
-	// External Forces
-	if (externalForceGenerators.size() > 0) {
-		for (auto &forceGenerator : externalForceGenerators) {
-			derivativeOutput.m_vForce += forceGenerator->GenerateForce(this, timeStart, timeDelta);
-		}
-	}
+	// Forces will not get applied to immovable objects
+	if (m_fImmovable == false) {
 
-	// Internal Forces
-	if (m_forceGenerators.size() > 0) {
-		for (auto &forceGenerator : m_forceGenerators) {
-			derivativeOutput.m_vForce += forceGenerator->GenerateForce(this, timeStart, timeDelta);
+		// External Forces
+		if (externalForceGenerators.size() > 0) {
+			for (auto &forceGenerator : externalForceGenerators) {
+				derivativeOutput.m_vForce += forceGenerator->GenerateForce(this, timeStart, timeDelta);
+			}
+		}
+
+		// Internal Forces
+		if (m_forceGenerators.size() > 0) {
+			for (auto &forceGenerator : m_forceGenerators) {
+				derivativeOutput.m_vForce += forceGenerator->GenerateForce(this, timeStart, timeDelta);
+			}
 		}
 	}
 	

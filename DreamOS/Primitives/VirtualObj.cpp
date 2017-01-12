@@ -65,7 +65,7 @@ point VirtualObj::GetPosition() {
 }
 
 VirtualObj* VirtualObj::translate(matrix <point_precision, 4, 1> v) {
-	m_objectState.m_ptOrigin.translate(v);
+	m_objectState.translate(v);
 	OnManipulation();
 	return this;
 }

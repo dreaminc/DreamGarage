@@ -27,16 +27,19 @@ BoundingQuad::BoundingQuad(VirtualObj *pParentObject, point ptOrigin, vector vNo
 bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
 	// First calculate rotation per normal and re-orient
 	
-	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin() - GetOrigin();
-	double distance = vector(ptSphereOrigin).dot(m_vNormal);
+	quaternion qOrientation = quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix rotMat = RotationMatrix(qOrientation);
+
+	point ptSphereOrigin = inverse(rotMat) * (static_cast<BoundingSphere>(rhs).GetOrigin() - GetOrigin());
+	double distance = ptSphereOrigin.y();
 
 	if (std::abs(distance) < static_cast<BoundingSphere>(rhs).GetRadius()) {
 		//point ptMax = GetMaxPoint();
 		//point ptMin = GetMinPoint();
 
 		///*
-		point ptMax = GetHalfVector();
-		point ptMin = GetHalfVector() * -1.0f;
+		point ptMax = point(m_width, m_height, 0.0f);
+		point ptMin = point(-m_width, -m_height, 0.0f);
 
 		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
 		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
@@ -96,8 +99,11 @@ CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 	// First calculate rotation per normal and re-orient
 
-	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin() - GetOrigin();
-	double distance = vector(ptSphereOrigin).dot(m_vNormal);
+	quaternion qOrientation = quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix rotMat = RotationMatrix(qOrientation);
+
+	point ptSphereOrigin = inverse(rotMat) * (static_cast<BoundingSphere>(rhs).GetOrigin() - GetOrigin());
+	double distance = ptSphereOrigin.y();
 
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
@@ -106,29 +112,43 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 		//point ptMin = GetMinPoint();
 
 		///*
-		point ptMax = GetHalfVector();
-		point ptMin = GetHalfVector() * -1.0f;
+		point ptMax = point(m_width/2.0f, m_height/2.0f, 0.0f);
+		point ptMin = point(-m_width/2.0f, -m_height/2.0f, 0.0f);
 
 		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
 		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
 		float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
 		//*/
 
+		//if(ptSphereOrigin.x() )
+
 		//point ptClosestPoint = ptSphereOrigin - (m_vNormal * distance);
-		point ptClosestPoint = point(closestX, closestY, closestZ);
+		//point ptClosestPoint = point(closestX, closestY, closestZ);
+		point ptClosestPoint = point(closestX, 0.0f, closestZ);
 
 		double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
 		double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
 
-		if (distanceSquared < sphereRadiusSquared) {
-			vector vNormal = ptClosestPoint - static_cast<BoundingSphere>(rhs).GetOrigin();
+		//if (closestX <= 0.0f && closestZ < 0.0f) {
+		if (distanceSquared <= sphereRadiusSquared) {
+			// This is a plane-point collision
+
+			ptClosestPoint = (rotMat * ptClosestPoint) + GetOrigin();
+			
+			//vector vNormal = rotMat * vector::jVector(1.0f);
+			//vNormal.Normalize();
+
+			vector vNormal = static_cast<BoundingSphere>(rhs).GetOrigin() - ptClosestPoint;
 			vNormal.Normalize();
 
 			point ptContact = ptClosestPoint;
-			float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - distance;
+			float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - std::sqrt(distanceSquared);
 
 			manifold.AddContactPoint(ptContact, vNormal, -penetration);
 		}
+		/*else if (distanceSquared <= sphereRadiusSquared) {
+			// Otherwise it's a point edge collision
+		}*/
 		
 	}
 	

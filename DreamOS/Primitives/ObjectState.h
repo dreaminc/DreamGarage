@@ -47,6 +47,7 @@ public:
 	RESULT SetImmovable(bool fImmovable);
 	bool IsImmovable();
 
+
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
 	RESULT AddMomentumImpulse(vector vImplulse);
@@ -63,6 +64,7 @@ public:
 
 	const point GetOrigin();
 	RESULT Translate(vector vTranslation);
+	RESULT translate(vector v);
 
 	const quaternion GetRotation();
 	const quaternion GetAngularMoment();
