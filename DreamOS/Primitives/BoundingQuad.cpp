@@ -52,13 +52,9 @@ bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
 		if (distanceSquared < sphereRadiusSquared) {
 			return true;
 		}
-		else {
-			return false;
-		}
 	}
-	else {
-		return false;
-	}
+
+	return false;
 }
 
 bool BoundingQuad::Intersect(const BoundingBox& rhs) {

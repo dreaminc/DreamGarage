@@ -64,7 +64,7 @@ RESULT DreamTestApp::LoadScene() {
 	// Quad vs Sphere
 	///*
 	// TODO: Add normal for quad
-	quad *pQuad1 = AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+	quad *pQuad1 = AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(1.0f, 1.0f, 0.0f));
 	pQuad1->SetPosition(point(0.0f, -1.0f, 0.0f));
 	pQuad1->SetMass(1.0f);
 	pQuad1->SetImmovable(true);
