@@ -25,14 +25,49 @@ BoundingQuad::BoundingQuad(VirtualObj *pParentObject, point ptOrigin, vector vNo
 }
 
 bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
-	point ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (ptSphereOrigin - GetOrigin()));
+	// First calculate rotation per normal and re-orient
 	
+	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin() - GetOrigin();
+	double distance = vector(ptSphereOrigin).dot(m_vNormal);
+
+	if (std::abs(distance) < static_cast<BoundingSphere>(rhs).GetRadius()) {
+		//point ptMax = GetMaxPoint();
+		//point ptMin = GetMinPoint();
+
+		///*
+		point ptMax = GetHalfVector();
+		point ptMin = GetHalfVector() * -1.0f;
+
+		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
+		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
+		float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
+		//*/
+
+		//point ptClosestPoint = ptSphereOrigin - (m_vNormal * distance);
+		point ptClosestPoint = point(closestX, closestY, closestZ);
+
+		double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
+		double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
+
+		if (distanceSquared < sphereRadiusSquared) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+	else {
+		return false;
+	}
+}
+
+bool BoundingQuad::Intersect(const BoundingBox& rhs) {
 	// TODO:
 
 	return false;
 }
 
-bool BoundingQuad::Intersect(const BoundingBox& rhs) {
+bool BoundingQuad::Intersect(const BoundingQuad& rhs) {
 	// TODO:
 
 	return false;
@@ -50,6 +85,12 @@ bool BoundingQuad::Intersect(const ray& r) {
 	return false;
 }
 
+CollisionManifold BoundingQuad::Collide(const BoundingQuad& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	return manifold;
+}
+
 CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
@@ -57,8 +98,44 @@ CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 }
 
 CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
+	// First calculate rotation per normal and re-orient
+
+	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin() - GetOrigin();
+	double distance = vector(ptSphereOrigin).dot(m_vNormal);
+
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
+	if (std::abs(distance) < static_cast<BoundingSphere>(rhs).GetRadius()) {
+		//point ptMax = GetMaxPoint();
+		//point ptMin = GetMinPoint();
+
+		///*
+		point ptMax = GetHalfVector();
+		point ptMin = GetHalfVector() * -1.0f;
+
+		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
+		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
+		float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
+		//*/
+
+		//point ptClosestPoint = ptSphereOrigin - (m_vNormal * distance);
+		point ptClosestPoint = point(closestX, closestY, closestZ);
+
+		double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
+		double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
+
+		if (distanceSquared < sphereRadiusSquared) {
+			vector vNormal = ptClosestPoint - static_cast<BoundingSphere>(rhs).GetOrigin();
+			vNormal.Normalize();
+
+			point ptContact = ptClosestPoint;
+			float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - distance;
+
+			manifold.AddContactPoint(ptContact, vNormal, -penetration);
+		}
+		
+	}
+	
 	return manifold;
 }
 
@@ -77,6 +154,24 @@ double BoundingQuad::GetHeight() {
 
 vector BoundingQuad::GetNormal() {
 	return m_vNormal;
+}
+
+vector BoundingQuad::GetHalfVector() {
+	vector vReturn = vector(m_width/2.0f, m_height/2.0f, 0.0f);
+
+	quaternion qOrientation = quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix rotMat(qOrientation);
+	vReturn = rotMat * vReturn;
+
+	return vReturn;
+}
+
+point BoundingQuad::GetMinPoint() {
+	return (GetHalfVector() * -1.0f) + GetOrigin();
+}
+
+point BoundingQuad::GetMaxPoint() {
+	return GetHalfVector() + GetOrigin();
 }
 
 point BoundingQuad::GetQuadPoint(QuadPoint ptType) {

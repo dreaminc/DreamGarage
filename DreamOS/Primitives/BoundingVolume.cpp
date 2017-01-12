@@ -2,6 +2,7 @@
 
 #include "BoundingSphere.h"
 #include "BoundingBox.h"
+#include "BoundingQuad.h"
 
 #include "VirtualObj.h"
 
@@ -15,6 +16,10 @@ bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 	BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pRHS);
 	if (pBoundingSphere != nullptr)
 		return Intersect(*pBoundingSphere);
+
+	BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pRHS);
+	if (pBoundingQuad != nullptr)
+		return Intersect(*pBoundingQuad);
 
 	return false;
 }
@@ -30,6 +35,12 @@ CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 	BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pRHS);
 	if (pBoundingBox != nullptr) {
 		return Collide(*pBoundingBox);
+	}
+
+	// Quad
+	BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pRHS);
+	if (pBoundingQuad != nullptr) {
+		return Collide(*pBoundingQuad);
 	}
 
 	return CollisionManifold(this->m_pParent, pRHS->GetParentObject());

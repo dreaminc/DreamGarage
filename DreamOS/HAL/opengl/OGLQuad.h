@@ -56,6 +56,17 @@ public:
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
+
+	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad) {
+		RESULT r = R_PASS;
+
+		quad *pQuad = (quad*)(GetDimObj());
+		CR(pQuad->UpdateFromBoundingQuad(pBoundingQuad));
+		CR(UpdateOGLBuffers());
+
+	Error:
+		return r;
+	}
 };
 
 #endif // ! OGL_QUAD_H_

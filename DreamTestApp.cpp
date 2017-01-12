@@ -64,16 +64,17 @@ RESULT DreamTestApp::LoadScene() {
 	// Quad vs Sphere
 	///*
 	// TODO: Add normal for quad
-	quad *pQuad1 = AddQuad(4.0f, 4.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+	quad *pQuad1 = AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
 	pQuad1->SetPosition(point(0.0f, -1.0f, 0.0f));
+	pQuad1->SetMass(1.0f);
 	pQuad1->SetImmovable(true);
-	//AddPhysicsObject(pVolume1);
+	AddPhysicsObject(pQuad1);
 
 	sphere *pSphere1 = AddSphere(0.25f, 10, 10);
-	pSphere1->SetPosition(point(3.0f, std::sqrt(2.0f)/2.0f, 0.0f));
+	pSphere1->SetPosition(point(0.0f, 2.0f, 0.0f));
 	pSphere1->SetMass(1.0f);
-	pSphere1->SetVelocity(-1.0f, 0.0f, 0.0f);
-	//AddPhysicsObject(pSphere1);
+	pSphere1->SetVelocity(0.0f, -1.0f, 0.0f);
+	AddPhysicsObject(pSphere1);
 	//*/
 
 	// Volume vs Sphere

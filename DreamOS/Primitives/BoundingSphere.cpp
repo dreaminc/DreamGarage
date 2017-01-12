@@ -32,6 +32,10 @@ bool BoundingSphere::Intersect(const BoundingBox& rhs) {
 	return static_cast<BoundingBox>(rhs).Intersect(*this);
 }
 
+bool BoundingSphere::Intersect(const BoundingQuad& rhs) {
+	return static_cast<BoundingQuad>(rhs).Intersect(*this);
+}
+
 bool BoundingSphere::Intersect(point& pt) {
 	float distance = (pt - GetOrigin()).magnitude();
 
@@ -101,6 +105,10 @@ CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
 
 CollisionManifold BoundingSphere::Collide(const BoundingBox& rhs) {
 	return static_cast<BoundingBox>(rhs).Collide(*this);
+}
+
+CollisionManifold BoundingSphere::Collide(const BoundingQuad& rhs) {
+	return static_cast<BoundingQuad>(rhs).Collide(*this);
 }
 
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {

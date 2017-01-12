@@ -28,14 +28,17 @@ public:
 	BoundingQuad(VirtualObj *pParentObject);
 	BoundingQuad(VirtualObj *pParentObject, point ptOrigin, vector vNormal, double width, double height);
 
-	bool Intersect(const BoundingSphere& rhs);
-	bool Intersect(const BoundingBox& rhs);
+	virtual bool Intersect(const BoundingSphere& rhs) override;
+	virtual bool Intersect(const BoundingBox& rhs) override;
+	virtual bool Intersect(const BoundingQuad& rhs) override;
 
 	bool Intersect(point& pt);
 	virtual bool Intersect(const ray& r) override;
 
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
+	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
+	
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
@@ -46,7 +49,10 @@ public:
 	double GetWidth();
 	double GetHeight();
 	vector GetNormal();
+	vector GetHalfVector();
 
+	point GetMinPoint();
+	point GetMaxPoint();
 	point GetQuadPoint(QuadPoint ptType);
 
 protected:

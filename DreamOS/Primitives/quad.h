@@ -57,6 +57,8 @@ public:
 	bool IsScaledBillboard();
 	void SetScaledBillboard(bool fScale);
 
+	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleBased = true);
+
 private:
 	QUAD_TYPE m_quadType;
 
@@ -65,6 +67,10 @@ private:
 
 	texture *m_pTextureHeight;
 	double m_heightMapScale;
+
+	float m_width;
+	float m_height;
+	vector m_vNormal;
 
 	bool m_fBillboard = false;
 	bool m_fScaledBillboard = false;

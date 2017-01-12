@@ -95,6 +95,10 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 	return false;
 }
 
+bool BoundingBox::Intersect(const BoundingQuad& rhs) {
+	return static_cast<BoundingQuad>(rhs).Intersect(*this);
+}
+
 //bool Intersect(const point& pt) {
 bool BoundingBox::Intersect(point& pt) {
 	point ptMin = GetMinPoint();
@@ -201,6 +205,10 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 	}
 
 	return manifold;
+}
+
+CollisionManifold BoundingBox::Collide(const BoundingQuad& rhs) {
+	return static_cast<BoundingQuad>(rhs).Collide(*this);
 }
 
 RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {

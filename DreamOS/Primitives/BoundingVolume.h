@@ -16,6 +16,7 @@
 class VirtualObj;
 class BoundingSphere;
 class BoundingBox;
+class BoundingQuad;
 
 class CollisionManifold;
 
@@ -26,7 +27,7 @@ public:
 		SPHERE,
 		QUAD,
 		PLANE,
-		CYLINDER,
+
 		INVALID
 	};
 
@@ -48,6 +49,7 @@ public:
 	bool Intersect(BoundingVolume* pRHS);
 	virtual bool Intersect(const BoundingSphere& rhs) = 0;
 	virtual bool Intersect(const BoundingBox& rhs) = 0;
+	virtual bool Intersect(const BoundingQuad& rhs) = 0;
 
 	virtual bool Intersect(point& pt) = 0;
 	virtual bool Intersect(const ray &rCast) = 0;
@@ -57,6 +59,7 @@ public:
 	CollisionManifold Collide(BoundingVolume* pRHS);
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) = 0;
 	virtual CollisionManifold Collide(const BoundingBox& rhs) = 0;
+	virtual CollisionManifold Collide(const BoundingQuad& rhs) = 0;
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
 

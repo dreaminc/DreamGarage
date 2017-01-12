@@ -209,16 +209,30 @@ RESULT OGLObj::UpdateBoundingVolume() {
 		if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
 			CR(pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox));
 		}
-	}
-	else {
-		BoundingSphere *pBoundingSphere = nullptr;
-		if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
-			OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
 
-			if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
-				CR(pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere));
-			}
+		return r;
+	}
+	
+	BoundingSphere *pBoundingSphere = nullptr;
+	if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+		OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
+
+		if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
+			CR(pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere));
 		}
+
+		return r;
+	}
+
+	BoundingQuad *pBoundingQuad = nullptr;
+	if ((pBoundingQuad = dynamic_cast<BoundingQuad*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+		OGLQuad *pOGLBoundingQuad = dynamic_cast<OGLQuad*>(m_pOGLBoundingVolume);
+
+		if (pBoundingQuad->CheckAndCleanDirty() && pOGLBoundingQuad != nullptr) {
+			CR(pOGLBoundingQuad->UpdateFromBoundingQuad(pBoundingQuad));
+		}
+
+		return r;
 	}
 
 Error:
