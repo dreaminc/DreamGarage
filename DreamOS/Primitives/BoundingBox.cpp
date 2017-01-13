@@ -95,6 +95,147 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 	return false;
 }
 
+CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	// Do a point vs face first
+	// Do for both objects
+	// TODO: Assumes OBB - can be optimized for AABB and OBB-AABB certainly
+	for (int j = 0; j < 2; j++) {
+		// Do this early to improve perf
+		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
+		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
+
+		for (int i = 0; i < 8; i++) {
+			point ptBox = pBoxB->GetBoxPoint((BoundingBox::BoxPoint)(i));
+			ptBox = (point)(inverse(RotationMatrix(pBoxA->GetOrientation())) * (ptBox - pBoxA->GetOrigin()));
+
+			point ptMax = m_vHalfSize;
+			point ptMin = m_vHalfSize * -1.0f;
+
+			// Early out as quickly as possible
+			if ((ptBox <= ptMax && ptBox >= ptMin) == false) {
+				continue;
+			}
+
+			float closestX = std::max(ptMin.x(), std::min(ptBox.x(), ptMax.x()));
+			float closestY = std::max(ptMin.y(), std::min(ptBox.y(), ptMax.y()));
+			float closestZ = std::max(ptMin.z(), std::min(ptBox.z(), ptMax.z()));
+
+			point ptClosestPoint = point(closestX, closestY, closestZ);
+
+			BoundingBox::BoxFace boxFace;
+			double distanceX = m_vHalfSize.x() - std::abs(ptBox.x());
+			double distanceY = m_vHalfSize.y() - std::abs(ptBox.y());;
+			double distanceZ = m_vHalfSize.z() - std::abs(ptBox.z());;
+
+			double minDistance = std::numeric_limits<double>::max();
+
+			if (distanceX < minDistance) {
+				minDistance = distanceX;
+
+				if(ptBox.x() > 0.0f)
+					boxFace = BoundingBox::BoxFace::RIGHT;
+				else 
+					boxFace = BoundingBox::BoxFace::LEFT;
+			}
+			if (distanceY < minDistance) {
+				minDistance = distanceY;
+
+				if (ptBox.y() > 0.0f)
+					boxFace = BoundingBox::BoxFace::TOP;
+				else
+					boxFace = BoundingBox::BoxFace::BOTTOM;
+			}
+			if (distanceZ < minDistance) {
+				minDistance = distanceZ;
+
+				if (ptBox.z() > 0.0f)
+					boxFace = BoundingBox::BoxFace::FRONT;
+				else
+					boxFace = BoundingBox::BoxFace::BACK;
+			}
+
+			ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptClosestPoint) + pBoxA->GetOrigin();
+
+			vector vNormal = pBoxA->GetBoxFaceNormal(boxFace) * -1.0f;
+			vNormal = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
+			vNormal.Normalize();
+
+			point ptContact = ptClosestPoint;
+			float penetration = std::abs(minDistance);
+
+			manifold.AddContactPoint(ptContact, vNormal, penetration);
+		}
+	}
+	
+	return manifold;
+}
+
+vector BoundingBox::GetBoxFaceNormal(BoxFace faceType) {
+	vector vNormal;
+
+	switch (faceType) {
+	case BoxFace::TOP: vNormal = vector::jVector(1.0f); break;
+	case BoxFace::BOTTOM: vNormal = vector::jVector(-1.0f); break;
+	case BoxFace::RIGHT: vNormal = vector::iVector(1.0f); break;
+	case BoxFace::LEFT: vNormal = vector::iVector(-1.0f); break;
+	case BoxFace::FRONT: vNormal = vector::kVector(1.0f); break;
+	case BoxFace::BACK: vNormal = vector::kVector(-1.0f); break;
+	}
+
+	vNormal = RotationMatrix(GetOrientation()) * vNormal;
+	vNormal.Normalize();
+
+	return vNormal;
+}
+
+CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
+	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin();
+	point ptBoxOrigin = GetOrigin();
+	point ptMax = GetMaxPoint();
+	point ptMin = GetMinPoint();
+
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+	//CollisionManifold manifold = CollisionManifold(rhs.GetParentObject(), this->m_pParent);
+
+	if (m_type == Type::OBB) {
+		//point ptRelativeOrigin = GetOrigin() - ptSphereOrigin;
+		//ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
+		//ptSphereOrigin = (point)(inverse(this->m_pParent->GetModelMatrix()) * ptSphereOrigin);
+		ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (ptSphereOrigin - GetOrigin()));
+		ptMax = m_vHalfSize;
+		ptMin = m_vHalfSize * -1.0f;
+	}
+
+	float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
+	float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
+	float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
+
+	point ptClosestPoint = point(closestX, closestY, closestZ);
+
+	double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
+	double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
+
+	if (distanceSquared < sphereRadiusSquared) {
+		// Convert back to world coordinates
+		if (m_type == Type::OBB) {
+			ptClosestPoint = (RotationMatrix(GetOrientation()) * ptClosestPoint) + GetOrigin();
+		}
+		//ptClosestPoint = (this->m_pParent->GetModelMatrix() * ptClosestPoint);
+
+		vector vNormal = static_cast<BoundingSphere>(rhs).GetOrigin() - ptClosestPoint;
+		vNormal.Normalize();
+
+		point ptContact = ptClosestPoint;
+		float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - std::sqrt(distanceSquared);
+
+		manifold.AddContactPoint(ptContact, vNormal, -penetration);
+	}
+
+	return manifold;
+}
+
 bool BoundingBox::Intersect(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Intersect(*this);
 }
@@ -137,74 +278,6 @@ bool BoundingBox::Intersect(const ray& r) {
 	}
 
 	return (tmax >= tmin);
-}
-
-CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
-	/*
-	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin());
-	float distance = vMidLine.magnitude();
-
-	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-
-	if (abs(distance) <= (rhs.m_radius + m_radius)) {
-		// Find the contact point and normal
-		vector vNormal = vMidLine.Normal();
-		point ptContact = const_cast<BoundingSphere&>(rhs).GetOrigin() + (vMidLine * 0.5f);
-		double penetration = (rhs.m_radius + m_radius) - abs(distance);
-
-		manifold.AddContactPoint(ptContact, vNormal, penetration);
-
-		// TODO: Friction / Restitution?
-	}
-	*/
-
-	return CollisionManifold(this->m_pParent, rhs.GetParentObject());
-}
-
-CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
-	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin();
-	point ptBoxOrigin = GetOrigin();
-	point ptMax = GetMaxPoint();
-	point ptMin = GetMinPoint();
-	
-	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-	//CollisionManifold manifold = CollisionManifold(rhs.GetParentObject(), this->m_pParent);
-
-	if (m_type == Type::OBB) {
-		//point ptRelativeOrigin = GetOrigin() - ptSphereOrigin;
-		//ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
-		//ptSphereOrigin = (point)(inverse(this->m_pParent->GetModelMatrix()) * ptSphereOrigin);
-		ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (ptSphereOrigin - GetOrigin()));
-		ptMax = m_vHalfSize;
-		ptMin = m_vHalfSize * -1.0f;
-	}
-	
-	float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
-	float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
-	float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
-
-	point ptClosestPoint = point(closestX, closestY, closestZ);
-
-	double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
-	double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
-
-	if (distanceSquared < sphereRadiusSquared) {
-		// Convert back to world coordinates
-		if (m_type == Type::OBB) {
-			ptClosestPoint = (RotationMatrix(GetOrientation()) * ptClosestPoint) + GetOrigin();
-		}
-		//ptClosestPoint = (this->m_pParent->GetModelMatrix() * ptClosestPoint);
-
-		vector vNormal = static_cast<BoundingSphere>(rhs).GetOrigin() - ptClosestPoint;
-		vNormal.Normalize();
-
-		point ptContact = ptClosestPoint;
-		float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - std::sqrt(distanceSquared);
-
-		manifold.AddContactPoint(ptContact, vNormal, -penetration);
-	}
-
-	return manifold;
 }
 
 CollisionManifold BoundingBox::Collide(const BoundingQuad& rhs) {
@@ -362,5 +435,60 @@ point BoundingBox::GetBoxPoint(BoxPoint ptType) {
 		case BoxPoint::BOTTOM_LEFT_NEAR: retPoint.Reverse();
 	}
 
+	// Transform point accordingly
+	retPoint = RotationMatrix(GetOrientation()) * retPoint;
+	retPoint = retPoint + GetOrigin();
+
 	return retPoint;
+}
+
+BoundingBox::face BoundingBox::GetFace(BoxFace faceType) {
+	BoundingBox::face faceBox;
+	faceBox.m_type = faceType;
+
+	switch (faceType) {
+		case BoxFace::TOP: {
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR);
+		} break;
+
+		case BoxFace::BOTTOM: {
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR);
+		} break;
+
+		case BoxFace::LEFT: {
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR);
+		} break;
+
+		case BoxFace::RIGHT: {
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR);
+		} break;
+
+		case BoxFace::FRONT: {
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_NEAR);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_NEAR);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_NEAR);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_NEAR);
+		} break;
+
+		case BoxFace::BACK: {
+			faceBox.m_points[0] = GetBoxPoint(BoxPoint::TOP_LEFT_FAR);
+			faceBox.m_points[1] = GetBoxPoint(BoxPoint::TOP_RIGHT_FAR);
+			faceBox.m_points[2] = GetBoxPoint(BoxPoint::BOTTOM_LEFT_FAR);
+			faceBox.m_points[3] = GetBoxPoint(BoxPoint::BOTTOM_RIGHT_FAR);
+		} break;
+	}
+
+	return faceBox;
 }

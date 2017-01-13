@@ -34,11 +34,26 @@ public:
 		INVALID
 	};
 
+	enum class BoxFace {
+		TOP,
+		BOTTOM,
+		LEFT,
+		RIGHT,
+		FRONT,
+		BACK,
+		INVALID
+	};
+
 	enum class BoxAxis {
 		X_AXIS,
 		Y_AXIS,
 		Z_AXIS,
 		INVALID
+	};
+
+	struct face {
+		BoxFace m_type;
+		point m_points[4];
 	};
 
 public:
@@ -82,6 +97,8 @@ public:
 	point GetMaxPoint();
 
 	point GetBoxPoint(BoxPoint ptType);
+	BoundingBox::face GetFace(BoxFace faceType);
+	vector GetBoxFaceNormal(BoxFace faceType);
 
 protected:
 	BoundingBox::Type m_type;

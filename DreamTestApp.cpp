@@ -62,7 +62,7 @@ RESULT DreamTestApp::LoadScene() {
 	// TODO: Plane vs Sphere
 
 	// Quad vs Sphere
-	///*
+	/*
 	double spacing = 2.0f;
 	double angleFactor = 0.2f;
 	
@@ -102,18 +102,24 @@ RESULT DreamTestApp::LoadScene() {
 	//*/
 
 	// Volume vs Volume
-	/*
-	volume *pVolume1 = AddVolume(0.5f);
-	pVolume1->SetPosition(point(-1.0f, 0.0f, 0.0f));
-	pVolume1->SetMass(1.0f);
-	pVolume1->SetVelocity(1.0f, 0.0f, 0.0f);
-	AddPhysicsObject(pVolume1);
+	///*
+	volume *pVolume = nullptr;
+	
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	pVolume->RotateYByDeg(45.0f);
+	AddPhysicsObject(pVolume);
 
-	volume *pVolume2 = AddVolume(0.5f);
-	pVolume2->SetPosition(point(1.0f, 0.0f, 0.0f));
-	pVolume2->SetMass(1.0f);
-	pVolume2->SetVelocity(-1.0f, 0.0f, 0.0f);
-	AddPhysicsObject(pVolume2);
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+	//pVolume->RotateYByDeg(45.0f);
+	pVolume->RotateZByDeg(45.0f);
+	pVolume->SetMass(1.0f);
+	pVolume->SetVelocity(-1.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pVolume);
+
+	
 	//*/
 
 	/*
