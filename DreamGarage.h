@@ -13,6 +13,7 @@
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseController.h"
+#include "UIBar.h"
 
 #include "Cloud/WebBrowser/browser.h"
 
@@ -45,6 +46,7 @@ private:
 };
 
 class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
+
 public:
 
 	DreamGarage() {
@@ -112,6 +114,7 @@ private:
 	int		m_selectedIndex = -1;
 	int		m_numButtons;
 
+	UIBar *m_UIBar;
 
 	Browsers m_browsers;
 };
