@@ -101,25 +101,116 @@ RESULT DreamTestApp::LoadScene() {
 	AddPhysicsObject(pSphere1);
 	//*/
 
-	// Volume vs Volume
+	// Volume vs Volume edge edge
 	///*
 	volume *pVolume = nullptr;
 	
-	pVolume = AddVolume(0.5f);
-	pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
-	pVolume->SetMass(1.0f);
-	pVolume->RotateYByDeg(45.0f);
-	AddPhysicsObject(pVolume);
-
+	// edge to edge
+	/*
 	pVolume = AddVolume(0.5f);
 	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 	//pVolume->RotateYByDeg(45.0f);
+	pVolume->RotateZByDeg(15.0f);
+	pVolume->SetMass(1.0f);
+	pVolume->SetVelocity(-1.0f, 0.0f, 0.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	pVolume->RotateYByDeg(135.0f);
+	//pVolume->RotateZByDeg(45.0f);
+	AddPhysicsObject(pVolume);
+	*/
+
+	pVolume = AddVolume(1.0f);
+	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+	pVolume->RotateYByDeg(45.0f);
+	pVolume->RotateZByDeg(55.0f);
+	pVolume->SetMass(1.0f);
+	pVolume->SetVelocity(-0.5f, 0.0f, 0.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(1.0f);
+	pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	pVolume->RotateYByDeg(145.0f);
+	//pVolume->RotateZByDeg(45.0f);
+	AddPhysicsObject(pVolume);
+
+	/*
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+	//pVolume->RotateYByDeg(45.0f);
+	pVolume->RotateZByDeg(35.0f);
+	pVolume->SetMass(1.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	pVolume->RotateYByDeg(45.0f);
+	//pVolume->RotateZByDeg(45.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(-3.0f, 0.0f, 0.0f));
+	//pVolume->RotateYByDeg(45.0f);
+	pVolume->RotateZByDeg(55.0f);
+	pVolume->SetMass(1.0f);
+	AddPhysicsObject(pVolume);
+	//*/
+
+	// Volume vs Volume point - face
+	/*
+	volume *pVolume = nullptr;
+
+	// edge to edge
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+	pVolume->RotateYByDeg(45.0f);
 	pVolume->RotateZByDeg(45.0f);
 	pVolume->SetMass(1.0f);
 	pVolume->SetVelocity(-1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pVolume);
 
-	
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	//pVolume->RotateYByDeg(45.0f);
+	//pVolume->RotateZByDeg(45.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+	pVolume->RotateYByDeg(45.0f);
+	pVolume->RotateZByDeg(45.0f);
+	pVolume->SetMass(1.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+	pVolume->RotateYByDeg(45.0f);
+	pVolume->RotateZByDeg(45.0f);
+	pVolume->SetMass(1.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(-3.0f, 0.0f, 0.0f));
+	pVolume->RotateYByDeg(45.0f);
+	pVolume->RotateZByDeg(45.0f);
+	pVolume->SetMass(1.0f);
+	AddPhysicsObject(pVolume);
 	//*/
 
 	/*

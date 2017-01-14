@@ -44,6 +44,22 @@ public:
 		INVALID
 	};
 
+	enum class BoxEdge {
+		TOP_LEFT,
+		TOP_RIGHT,
+		TOP_NEAR,
+		TOP_FAR,
+		BOTTOM_LEFT,
+		BOTTOM_RIGHT,
+		BOTTOM_NEAR,
+		BOTTOM_FAR,
+		LEFT_NEAR,
+		LEFT_FAR,
+		RIGHT_NEAR,
+		RIGHT_FAR,
+		INVALID
+	};
+
 	enum class BoxAxis {
 		X_AXIS,
 		Y_AXIS,
@@ -99,6 +115,7 @@ public:
 	point GetBoxPoint(BoxPoint ptType);
 	BoundingBox::face GetFace(BoxFace faceType);
 	vector GetBoxFaceNormal(BoxFace faceType);
+	line GetBoxEdge(BoxEdge edgeType);
 
 protected:
 	BoundingBox::Type m_type;

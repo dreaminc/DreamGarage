@@ -49,7 +49,23 @@ public:
 	}
 
 	vector GetVector() {
-		return (m_ptB - m_ptA);
+		vector v = (m_ptB - m_ptA);
+		//return v.Normal();
+		return v;
+	}
+
+	RESULT Translate(vector vTranslate) {
+		m_ptA += vTranslate;
+		m_ptB += vTranslate;
+
+		return R_SUCCESS;
+	}
+
+	RESULT ApplyMatrix(matrix<point_precision, 4, 4> mat) {
+		m_ptA = mat * m_ptA;
+		m_ptB = mat * m_ptB;
+
+		return R_SUCCESS;
 	}
 
 	inline point &a() { return m_ptA; }
@@ -61,3 +77,4 @@ protected:
 };
 
 #endif // !BOUNDING_VOLUME_H_
+
