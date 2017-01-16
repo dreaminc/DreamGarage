@@ -17,6 +17,8 @@ light *g_pLight2 = nullptr;
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
 
+#include "Primitives/ray.h"
+
 // TODO: Should this go into the DreamOS side?
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 	RESULT r = R_PASS;
@@ -414,7 +416,11 @@ RESULT DreamGarage::Update(void) {
 	
 	if (pRightHand != nullptr) {
 		quaternion q = pRightHand->GetHandState().qOrientation;
-		m_UIBar->Update(q.ProjectedYRotationDeg());
+		vector v = q.RotateVector(vector::kVector());
+		vector vp = vector(v.x(), 0.0f, v.z());
+		point p0 = point(pRightHand->GetPosition().x(), 0.0f, pRightHand->GetPosition().z());
+		ray handRay = ray(p0, vp);
+		m_UIBar->Update(handRay);
 	}
 
 #ifdef TESTING

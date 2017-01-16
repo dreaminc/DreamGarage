@@ -330,7 +330,8 @@ float quaternion::ProjectedYRotationDeg() {
 	float degX = acos(vXZ.x());
 
 	float degY = (degZSign * degX + (float)M_PI_2) * 180.0f / M_PI;
-	return degY > 0.0f ? degY + 360.0f : degY;
+
+	return degY < 0.0f ? degY + 360.0f : degY;
 }
 
 quaternion quaternion::GetConjugate() {
