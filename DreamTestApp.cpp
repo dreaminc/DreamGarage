@@ -104,11 +104,12 @@ RESULT DreamTestApp::LoadScene() {
 	volume *pVolume = nullptr;
 	
 	// Rotational Intertia
-	pVolume = AddVolume(0.5f);
+	pVolume = AddVolume(0.5, 0.5, 1.5f);
 	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 	pVolume->SetMass(1.0f);
-	pVolume->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
 	//pVolume->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
+	pVolume->ApplyTorqueImpulse(vector(0.0f, 0.0f, 1.0f));
+	pVolume->ApplyTorqueImpulse(vector(0.0f, 0.1f, 0.0f));
 	AddPhysicsObject(pVolume);
 
 	// Volume vs Volume edge edge

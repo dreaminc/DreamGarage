@@ -342,13 +342,18 @@ matrix<virtual_precision, 4, 4> VirtualObj::GetOrientationMatrix() {
 }
 
 // Angular Momentum
-VirtualObj* VirtualObj::AddAngularMomentum(quaternion q) {
-	m_objectState.m_qAngularMomentum *= q;
+VirtualObj* VirtualObj::AddAngularMomentum(vector vAngularMomentum) {
+	m_objectState.m_vAngularMomentum += vAngularMomentum;
 	return this;
 }
 
-VirtualObj* VirtualObj::SetAngularMomentum(quaternion am) {
-	m_objectState.m_qAngularMomentum = am;
+VirtualObj* VirtualObj::SetAngularMomentum(vector vAngularMomentum) {
+	m_objectState.m_vAngularMomentum = vAngularMomentum;
+	return this;
+}
+
+VirtualObj* VirtualObj::ApplyTorqueImpulse(vector vTorque) {
+	m_objectState.AddTorqueImpulse(vTorque);
 	return this;
 }
 
@@ -411,24 +416,6 @@ RESULT VirtualObj::AddPendingTranslation(vector vTranslation) {
 
 RESULT VirtualObj::CommitPendingTranslation() {
 	return m_objectState.CommitPendingTranslation();
-}
-
-// Update Functions 
-// TODO: These should be removed in lieu of physics engine
-VirtualObj* VirtualObj::UpdatePosition() {
-	m_objectState.m_ptOrigin += m_objectState.m_vVelocity;
-	OnManipulation();
-	return this;
-}
-
-VirtualObj* VirtualObj::UpdateRotation() {
-	m_objectState.m_qRotation *= m_objectState.m_qAngularMomentum;
-	OnManipulation();
-	return this;
-}
-
-VirtualObj* VirtualObj::Update() {
-	return UpdatePosition()->UpdateRotation();
 }
 
 RESULT VirtualObj::OnManipulation() {

@@ -42,7 +42,8 @@ public:
 
 public:
 	RESULT Clear();
-	RESULT Recalculate();
+	RESULT RecalculateLinearVelocity();
+	RESULT RecalculateAngularVelocity();
 
 	RESULT AddForceGenerator(ForceGenerator *pForceGenerator);
 	RESULT ClearForceGenerators();
@@ -58,7 +59,8 @@ public:
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
 	RESULT AddMomentumImpulse(vector vImplulse);
-	RESULT AddTorque(vector vTorque);
+	
+	RESULT AddTorqueImpulse(vector vTorque);
 
 	RESULT SetRotationalVelocity(vector vRotationalVelocity);
 	vector GetRotationalVelocity();
@@ -87,7 +89,7 @@ public:
 	RESULT translate(vector v);
 
 	const quaternion GetRotation();
-	const quaternion GetAngularMoment();
+	const vector GetAngularMomentum();
 
 	ObjectDerivative Evaluate(float timeStart, float timeDelta, const ObjectDerivative &objectDerivative, const std::list<ForceGenerator*> &externalForceGenerators);
 	
@@ -112,16 +114,18 @@ protected:
 	vector m_vMomentum;					// Momentum
 
 	point m_ptCenterOfMass;									// Center of Mass
+	matrix<point_precision, 4, 4> m_matIntertiaTensor;				// Intertia tensor
 	matrix<point_precision, 4, 4> m_matInverseIntertiaTensor;		// Inverse inertia tensor
 	MassDistributionType m_massDistributionType;			// Mass distribution type
 
 	double m_angularDamping = 0.0f;							// Angular Damping
 	vector m_vTorque;										// Torque
 	vector m_vAngularVelocity;								// Angular Velocity
+	vector m_vAngularMomentum;							// Angular Momentum
+
 	quaternion m_qSpin;										// Spin Quantity
 
 	quaternion m_qRotation;									// Rotation
-	quaternion m_qAngularMomentum;							// Angular Momentum
 
 private:
 	VirtualObj *m_pParentObj = nullptr;						// This as a reference to parent

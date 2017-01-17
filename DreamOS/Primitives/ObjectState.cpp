@@ -13,7 +13,7 @@ ObjectState::ObjectState(VirtualObj *pParentObj) :
 	m_vVelocity(),
 	//m_qRotation(0, vector::jVector(1.0f)),
 	m_vTorque(),
-	m_qAngularMomentum(),
+	m_vAngularMomentum(),
 	m_ptCenterOfMass(),
 	m_massDistributionType(ObjectState::MassDistributionType::INVALID)
 {
@@ -26,7 +26,7 @@ ObjectState::ObjectState(VirtualObj *pParentObj, point ptOrigin) :
 	m_vVelocity(),
 	//m_qRotation(0, vector::jVector(1.0f)),
 	m_vTorque(),
-	m_qAngularMomentum(),
+	m_vAngularMomentum(),
 	m_ptCenterOfMass(),
 	m_massDistributionType(ObjectState::MassDistributionType::INVALID)
 {
@@ -37,14 +37,35 @@ RESULT ObjectState::Clear() {
 	m_ptOrigin.clear();
 	m_vVelocity.clear();
 	m_qRotation.clear();
-	m_qAngularMomentum.clear();
+	m_vAngularMomentum.clear();
 	return R_SUCCESS;
 }
 
 // p = mv or v = p/m
-RESULT ObjectState::Recalculate() {
+RESULT ObjectState::RecalculateLinearVelocity() {
 	//m_vVelocity = m_vMomentum * m_inverseMass;
 	m_vVelocity = m_vMomentum * (1.0f / m_kgMass);
+	return R_SUCCESS;
+}
+
+RESULT ObjectState::RecalculateAngularVelocity() {
+	m_vAngularVelocity = m_matInverseIntertiaTensor * m_vAngularMomentum;
+
+	m_qRotation.Normalize();
+
+	quaternion_precision vals[] = {
+		0.0f,
+		m_vAngularVelocity.x(),
+		m_vAngularVelocity.y(),
+		m_vAngularVelocity.z()
+	};
+
+	quaternion qW = quaternion(vals);
+
+	// Try this out TODO: Move to recalc of rotational quantities, move to eval func
+	m_qSpin = qW * m_qRotation;
+	m_qSpin = m_qSpin * 0.5f;
+
 	return R_SUCCESS;
 }
 
@@ -55,7 +76,8 @@ RESULT ObjectState::SetMass(double kgMass) {
 
 	m_kgMass = kgMass;
 	m_inverseMass = 1.0f / kgMass;
-	Recalculate();
+	
+	RecalculateLinearVelocity();
 	RecalculateInertialTensor();
 
 	return R_SUCCESS;
@@ -89,9 +111,10 @@ bool ObjectState::IsImmovable() {
 }
 
 RESULT ObjectState::SetRotationalVelocity(vector vRotationalVelocity) {
-	m_vAngularVelocity = vRotationalVelocity;
+	//m_vAngularVelocity = vRotationalVelocity;
+	m_vAngularMomentum = m_matIntertiaTensor * vRotationalVelocity;
 
-	// TODO: Recalc Angular stuff
+	RecalculateAngularVelocity();
 	return R_SUCCESS;
 }
 
@@ -102,7 +125,7 @@ vector ObjectState::GetRotationalVelocity() {
 RESULT ObjectState::SetVelocity(vector vVelocity) {
 	// Actually this sets the momentum p = mv
 	m_vMomentum = vVelocity * m_kgMass;
-	Recalculate();
+	RecalculateLinearVelocity();
 
 	return R_SUCCESS;
 }
@@ -111,16 +134,17 @@ RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
 	// Actually this sets the momentum p = mv
 	if (m_fImmovable == false) {
 		m_vMomentum += vImplulse;
-		Recalculate();
+		RecalculateLinearVelocity();
 	}
 
 	return R_SUCCESS;
 }
 
-RESULT ObjectState::AddTorque(vector vTorque) {
+// 
+RESULT ObjectState::AddTorqueImpulse(vector vTorque) {
 	if (m_fImmovable == false) {
-		m_vTorque += vTorque;
-		//Recalculate();
+		m_vAngularMomentum += vTorque;
+		RecalculateAngularVelocity();
 	}
 
 	return R_SUCCESS;
@@ -161,7 +185,7 @@ RESULT ObjectState::CommitPendingTorque() {
 
 	m_pendingTorqueVectors.clear();
 
-	return AddTorque(vTorqueAccumulator);
+	return AddTorqueImpulse(vTorqueAccumulator);
 }
 
 RESULT ObjectState::AddPendingTranslation(vector vTranslation) {
@@ -200,11 +224,14 @@ RESULT ObjectState::SetInertiaTensor(MassDistributionType type, const matrix<poi
 	m_massDistributionType = type;
 
 	auto matInverseIntertiaTensor3x3 = inverse(matInertiaTensor);
+
+	m_matIntertiaTensor.identity(1.0f);
 	m_matInverseIntertiaTensor.identity(1.0f);
 
 	// Convert to an identity 4x4 matrix to make transforms easy with our data types
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
+			m_matIntertiaTensor.element(i, j) = matInertiaTensor.element(i, j);
 			m_matInverseIntertiaTensor.element(i, j) = matInverseIntertiaTensor3x3.element(i, j);
 		}
 	}
@@ -304,8 +331,9 @@ const quaternion ObjectState::GetRotation() {
 	return m_qRotation; 
 }
 
-const quaternion ObjectState::GetAngularMoment() { 
-	return m_qAngularMomentum; 
+const vector ObjectState::GetAngularMomentum()
+{ 
+	return m_vAngularMomentum; 
 }
 
 // This will evaluate the derivative to this state, and update the derivative
@@ -370,29 +398,16 @@ RESULT ObjectState::Integrate<ObjectState::IntegrationType::RK4>(float timeStart
 
 	// Position
 	m_vMomentum += force * timeDelta;
-	Recalculate();
+	RecalculateLinearVelocity();
 
 	m_ptOrigin += m_vVelocity * timeDelta;
 	
 	// Angular
-	vector angularAcceleration = m_matInverseIntertiaTensor * m_vTorque;
-	m_vAngularVelocity = m_vAngularVelocity + angularAcceleration * timeDelta;
-	vector angVel = m_vAngularVelocity * timeDelta;
+	// TODO: Add rotational momentum
 	
-	quaternion_precision vals[] = {
-		0.0f, 
-		angVel.x(), 
-		angVel.y(), 
-		angVel.z()
-	};
-
-	quaternion qW = quaternion(vals);
-
-	// Try this out TODO: Move to recalc of rotational quantities, move to eval func
-	m_qSpin = qW * m_qRotation;
-	m_qSpin = m_qSpin * 0.5f;
-	
-	m_qRotation = m_qRotation + m_qSpin;
+	RecalculateAngularVelocity();
+	quaternion qSpin = (m_qSpin * timeDelta);
+	m_qRotation = m_qRotation + qSpin;
 	m_qRotation.Normalize();
 
 	//m_qRotation = m_qSpin;
@@ -412,7 +427,7 @@ RESULT ObjectState::Integrate<ObjectState::IntegrationType::EUCLID>(float timeSt
 	objDerivative = Evaluate(timeStart, 0.0f, ObjectDerivative(), externalForceGenerators);
 
 	m_vMomentum += objDerivative.m_vForce * timeDelta;
-	Recalculate();
+	RecalculateLinearVelocity();
 
 	m_ptOrigin += m_vVelocity * timeDelta;
 

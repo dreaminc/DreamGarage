@@ -135,8 +135,10 @@ public:
 	*/
 
 	// Angular Momentum
-	VirtualObj* AddAngularMomentum(quaternion q);
-	VirtualObj* SetAngularMomentum(quaternion am);
+	VirtualObj* AddAngularMomentum(vector vAngularMomentum);
+	VirtualObj* SetAngularMomentum(vector vAngularMomentum);
+
+	VirtualObj* ApplyTorqueImpulse(vector vTorque);
 
 	RESULT SetMass(double kgMass);
 	double GetMass();
@@ -154,12 +156,6 @@ public:
 	RESULT CommitPendingImpulses();
 	RESULT AddPendingTranslation(vector vTranslation);
 	RESULT CommitPendingTranslation();
-
-
-	// Update functions
-	VirtualObj* Update();
-	VirtualObj* UpdatePosition();
-	VirtualObj* UpdateRotation();
 
 	// OnManipulation is called any time an object is manipulated in some way
 	// since some objects may need to update certain things, like reference geometry 
