@@ -106,6 +106,9 @@ public:
 	inline quaternion_precision &y(quaternion_precision val) { return m_y = val; }
 	inline quaternion_precision &z(quaternion_precision val) { return m_z = val; }
 
+	quaternion& operator*=(const quaternion_precision& arg);
+	const quaternion& operator*(const quaternion_precision& arg) const;
+
 	quaternion& operator*=(const quaternion& r);
 	const quaternion& operator*(const quaternion& arg) const;
 

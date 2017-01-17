@@ -58,6 +58,7 @@ public:
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
 	RESULT AddMomentumImpulse(vector vImplulse);
+	RESULT AddTorque(vector vTorque);
 
 	RESULT SetRotationalVelocity(vector vRotationalVelocity);
 	vector GetRotationalVelocity();
@@ -66,6 +67,9 @@ public:
 	// to avoid changing velocity during a particular point of a simulation
 	RESULT AddPendingMomentumImpulse(vector vImplulse);
 	RESULT CommitPendingMomentum();
+
+	RESULT AddPendingTorque(vector vTorque);
+	RESULT CommitPendingTorque();
 
 	RESULT AddPendingTranslation(vector vTranslation);
 	RESULT CommitPendingTranslation();
@@ -98,6 +102,8 @@ private:
 	vector m_vVelocity;					// Velocity			
 
 	std::list<ForceGenerator*> m_forceGenerators;
+
+	std::list<vector> m_pendingTorqueVectors;
 	std::list<vector> m_pendingMomentumVectors;
 	std::list<vector> m_pendingTranslationVectors;
 
@@ -106,11 +112,15 @@ protected:
 	vector m_vMomentum;					// Momentum
 
 	point m_ptCenterOfMass;									// Center of Mass
-	matrix<point_precision, 3, 3> m_matInverseIntertiaTensor;		// Inverse inertia tensor
+	matrix<point_precision, 4, 4> m_matInverseIntertiaTensor;		// Inverse inertia tensor
 	MassDistributionType m_massDistributionType;			// Mass distribution type
 
-	quaternion m_qRotation;									// Rotation
+	double m_angularDamping = 0.0f;							// Angular Damping
+	vector m_vTorque;										// Torque
 	vector m_vAngularVelocity;								// Angular Velocity
+	quaternion m_qSpin;										// Spin Quantity
+
+	quaternion m_qRotation;									// Rotation
 	quaternion m_qAngularMomentum;							// Angular Momentum
 
 private:

@@ -108,6 +108,7 @@ RESULT DreamTestApp::LoadScene() {
 	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 	pVolume->SetMass(1.0f);
 	pVolume->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
+	//pVolume->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
 	AddPhysicsObject(pVolume);
 
 	// Volume vs Volume edge edge

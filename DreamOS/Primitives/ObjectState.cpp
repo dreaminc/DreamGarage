@@ -11,7 +11,8 @@ ObjectState::ObjectState(VirtualObj *pParentObj) :
 	m_pParentObj(pParentObj),
 	m_ptOrigin(),
 	m_vVelocity(),
-	m_qRotation(),
+	//m_qRotation(0, vector::jVector(1.0f)),
+	m_vTorque(),
 	m_qAngularMomentum(),
 	m_ptCenterOfMass(),
 	m_massDistributionType(ObjectState::MassDistributionType::INVALID)
@@ -23,7 +24,8 @@ ObjectState::ObjectState(VirtualObj *pParentObj, point ptOrigin) :
 	m_pParentObj(pParentObj),
 	m_ptOrigin(ptOrigin),
 	m_vVelocity(),
-	m_qRotation(),
+	//m_qRotation(0, vector::jVector(1.0f)),
+	m_vTorque(),
 	m_qAngularMomentum(),
 	m_ptCenterOfMass(),
 	m_massDistributionType(ObjectState::MassDistributionType::INVALID)
@@ -87,8 +89,9 @@ bool ObjectState::IsImmovable() {
 }
 
 RESULT ObjectState::SetRotationalVelocity(vector vRotationalVelocity) {
-	// TODO:
-	
+	m_vAngularVelocity = vRotationalVelocity;
+
+	// TODO: Recalc Angular stuff
 	return R_SUCCESS;
 }
 
@@ -114,6 +117,15 @@ RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
 	return R_SUCCESS;
 }
 
+RESULT ObjectState::AddTorque(vector vTorque) {
+	if (m_fImmovable == false) {
+		m_vTorque += vTorque;
+		//Recalculate();
+	}
+
+	return R_SUCCESS;
+}
+
 RESULT ObjectState::AddPendingMomentumImpulse(vector vImplulse) {
 	m_pendingMomentumVectors.push_back(vImplulse);
 	return R_SUCCESS;
@@ -131,6 +143,25 @@ RESULT ObjectState::CommitPendingMomentum() {
 	m_pendingMomentumVectors.clear();
 
 	return AddMomentumImpulse(vMomentumAccumulator);
+}
+
+RESULT ObjectState::AddPendingTorque(vector vTorque) {
+	m_pendingTorqueVectors.push_back(vTorque);
+	return R_SUCCESS;
+}
+
+RESULT ObjectState::CommitPendingTorque() {
+	if (m_pendingTorqueVectors.size() == 0)
+		return R_SUCCESS;
+
+	vector vTorqueAccumulator = vector();
+	for (auto &vTorque : m_pendingTorqueVectors) {
+		vTorqueAccumulator += vTorque;
+	}
+
+	m_pendingTorqueVectors.clear();
+
+	return AddTorque(vTorqueAccumulator);
 }
 
 RESULT ObjectState::AddPendingTranslation(vector vTranslation) {
@@ -167,7 +198,16 @@ Error:
 
 RESULT ObjectState::SetInertiaTensor(MassDistributionType type, const matrix<point_precision, 3, 3> &matInertiaTensor) {
 	m_massDistributionType = type;
-	m_matInverseIntertiaTensor = inverse(matInertiaTensor);
+
+	auto matInverseIntertiaTensor3x3 = inverse(matInertiaTensor);
+	m_matInverseIntertiaTensor.identity(1.0f);
+
+	// Convert to an identity 4x4 matrix to make transforms easy with our data types
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			m_matInverseIntertiaTensor.element(i, j) = matInverseIntertiaTensor3x3.element(i, j);
+		}
+	}
 
 	return R_SUCCESS;
 }
@@ -328,13 +368,34 @@ RESULT ObjectState::Integrate<ObjectState::IntegrationType::RK4>(float timeStart
 	//vector rateOfChangeOrigin = (1.0f / 6.0f) * (derivativeA.m_vRateOfChangeOrigin + 2.0f * (derivativeB.m_vRateOfChangeOrigin + derivativeC.m_vRateOfChangeOrigin) + derivativeD.m_vRateOfChangeOrigin);
 	vector force = (1.0f / 6.0f) * (derivativeA.m_vForce + 2.0f * (derivativeB.m_vForce + derivativeC.m_vForce) + derivativeD.m_vForce);
 
-	//Clear();
+	// Position
 	m_vMomentum += force * timeDelta;
 	Recalculate();
 
 	m_ptOrigin += m_vVelocity * timeDelta;
-	//m_ptOrigin += rateOfChangeOrigin * timeDelta;
-	//m_vVelocity += (force * m_inverseMass) * timeDelta;
+	
+	// Angular
+	vector angularAcceleration = m_matInverseIntertiaTensor * m_vTorque;
+	m_vAngularVelocity = m_vAngularVelocity + angularAcceleration * timeDelta;
+	vector angVel = m_vAngularVelocity * timeDelta;
+	
+	quaternion_precision vals[] = {
+		0.0f, 
+		angVel.x(), 
+		angVel.y(), 
+		angVel.z()
+	};
+
+	quaternion qW = quaternion(vals);
+
+	// Try this out TODO: Move to recalc of rotational quantities, move to eval func
+	m_qSpin = qW * m_qRotation;
+	m_qSpin = m_qSpin * 0.5f;
+	
+	m_qRotation = m_qRotation + m_qSpin;
+	m_qRotation.Normalize();
+
+	//m_qRotation = m_qSpin;
 
 // Error:
 	return r;
@@ -354,11 +415,6 @@ RESULT ObjectState::Integrate<ObjectState::IntegrationType::EUCLID>(float timeSt
 	Recalculate();
 
 	m_ptOrigin += m_vVelocity * timeDelta;
-
-	//m_ptOrigin += objDerivative.m_vRateOfChangeOrigin * timeDelta;
-	//m_vVelocity += objDerivative.m_vRateOfChangeVelocity * timeDelta;
-
-	Recalculate();
 
 	// Error:
 	return r;

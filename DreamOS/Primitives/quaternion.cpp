@@ -30,7 +30,7 @@ quaternion::quaternion(quaternion_precision theta, quaternion_precision x, quate
 
 quaternion::quaternion(quaternion_precision values[4]) {
 	SetValues(values);
-	Normalize();
+	//Normalize();
 }
 
 quaternion::quaternion(quaternionXYZW qXYZW) {
@@ -358,6 +358,18 @@ vector quaternion::RotateVector(vector v) {
 }
 
 
+quaternion& quaternion::operator*=(const quaternion_precision& arg) {
+	m_w *= arg;
+	m_x *= arg;
+	m_y *= arg;
+	m_z *= arg;
+
+	return (*this);
+}
+
+const quaternion& quaternion::operator*(const quaternion_precision& arg) const {
+	return quaternion(*this).operator*=(arg);
+}
 
 // http://www.mathworks.com/help/aeroblks/quaternionmultiplication.html
 quaternion& quaternion::operator*=(const quaternion& r) {
