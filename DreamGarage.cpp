@@ -50,7 +50,17 @@ RESULT DreamGarage::LoadScene() {
 	// TODO: This should go into an "initialize" function
 	InitializeCloudControllerCallbacks();
 
-	m_UIBar = new UIBar(AddComposite());
+	UIBarInfo info;
+	info.maxNumButtons = 4;
+	info.yPosition = -0.5f;
+	info.menuDepth = -1.5f;
+	info.itemAngleX = 60.0f;
+	info.itemAngleY = 20.0f;
+	info.itemScale = vector(0.5f, 1.0f, 0.25f);
+	info.enlargedScale = 1.25;
+	info.words = { "lorem", "ipsum", "dolor", "sit" };
+	m_UIBar = new UIBar(AddComposite(), info);
+	//m_UIBar = new UIBar(AddComposite()); // Use parameter defaults
 
 	// IO
 	RegisterSubscriber(SVK_ALL, this);

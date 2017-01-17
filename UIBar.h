@@ -6,9 +6,21 @@
 
 #include "Sense/SenseController.h"
 
+typedef struct UIBarInfo {
+	int maxNumButtons;
+	float yPosition;
+	float menuDepth;
+	float itemAngleX;
+	float itemAngleY;
+	vector itemScale;
+	float enlargedScale;
+	std::vector<std::string> words;
+} UI_BAR_INFO;
+
 class UIBar : public Subscriber<SenseControllerEvent> {
 public:
 	UIBar(composite* c);
+	UIBar(composite* c, UIBarInfo info);
 	~UIBar();
 
 	RESULT Initialize();
@@ -28,14 +40,9 @@ private:
 private:
 	bool m_UIDirty;
 	float m_rotationY;
-	vector m_UIScale;
-	float m_enlargedScale;
 	int m_selectedIndex;
-	int m_numButtons;
-	
-	float m_depth;
 
-	float m_angleY;
+	UIBarInfo m_info;
 
 };
 

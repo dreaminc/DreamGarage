@@ -7,6 +7,26 @@
 UIBar::UIBar(composite* c) :
 	m_context(c)
 {
+	//VARIABLES FOR DOUG
+	m_info.maxNumButtons = 5;			// number of buttons in the arc 
+
+	m_info.yPosition = -0.5f;	// y position of buttons on the screen, 0.0f is the center
+	m_info.menuDepth = -1.5f;	// distance between the screen and a button (z position)
+
+	m_info.itemAngleY = 20.0f;	// angle between buttons on the arc
+	m_info.itemAngleX = 60.0f;	// upward tilt of the buttons
+
+	m_info.itemScale = vector(0.5f, 1.0f, 0.25f); // 
+	m_info.enlargedScale = 1.25f;	// this value is multiplied to the scale when the menu item is selected
+
+	m_info.words = { "Watch", "Listen", "Play", "Whisper", "Present" }; //words display from left to right
+	Initialize();
+}
+
+UIBar::UIBar(composite* c, UIBarInfo info) :
+	m_context(c),
+	m_info(info)
+{
 	Initialize();
 }
 
@@ -18,45 +38,32 @@ RESULT UIBar::Initialize() {
 
 	RESULT r = R_PASS;
 
-	//VARIABLES FOR DOUG
-	m_numButtons = 5;			// number of buttons in the arc 
-
-	float height = -0.5f;	// y position of buttons on the screen, 0.0f is the center
-	m_depth = -1.5f;	// distance between the screen and a button (z position)
-
-	m_angleY = 20.0f;	// angle between buttons on the arc
-	float angleX = 60.0f;	// upward tilt of the buttons
-
-	m_UIScale = vector(0.5f, 1.0f, 0.25f); // 
-	m_enlargedScale = 1.25f;	// this value is multiplied to the scale when the menu item is selected
-
-	std::vector<std::string> words = { "Watch", "Listen", "Play", "Whisper", "Present" }; //words display from left to right
 
 	//other ones
-	int shift = m_numButtons / 2;
-	float odd = (m_numButtons % 2 == 0) ? 0.5f : 0.0f;
+	int shift = m_info.maxNumButtons / 2;
+	float odd = (m_info.maxNumButtons % 2 == 0) ? 0.5f : 0.0f;
 
-	for (int i = 0; i < m_numButtons; i++) {
+	for (int i = 0; i < m_info.maxNumButtons; i++) {
 		std::shared_ptr<composite> pButton = m_context->AddComposite();
 		std::shared_ptr<quad> q = pButton->AddQuad(1.0f, 1.0f);
 
 		std::shared_ptr<FlatContext> pContext = m_context->MakeFlatContext();
-		const std::string str = (i < words.size()) ? words[words.size() - 1 - i] : "";
+		const std::string str = (i < m_info.words.size()) ? m_info.words[m_info.words.size() - 1 - i] : "";
 		std::shared_ptr<text> pText = pContext->AddText(L"ArialDistance.fnt", str, 0.1f, true);
 		m_context->RenderToTexture(pContext);
 
 		q->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 
-		float rad = (m_angleY * M_PI / 180.0f) * (i - shift + odd);
+		float rad = (m_info.itemAngleY * M_PI / 180.0f) * (i - shift + odd);
 		quaternion rot = quaternion::MakeQuaternionWithEuler(0.0f, rad, 0.0f);
 
-		pButton->MoveTo(0.0f, height, 0.0f);
+		pButton->MoveTo(0.0f, m_info.yPosition, 0.0f);
 		pButton->SetOrientation(rot);
 
-		q->MoveTo(0.0f, 0.0f, m_depth);
-		q->RotateXByDeg(angleX);
-		q->ScaleX(m_UIScale.x());
-		q->ScaleZ(m_UIScale.z());
+		q->MoveTo(0.0f, 0.0f, m_info.menuDepth);
+		q->RotateXByDeg(m_info.itemAngleX);
+		q->ScaleX(m_info.itemScale.x());
+		q->ScaleZ(m_info.itemScale.z());
 	}
 	
 	m_context->SetVisible(false);
@@ -111,30 +118,30 @@ RESULT UIBar::Update(ray handRay) {
 	vector vIntersect = vector(intersect);
 	vIntersect.Normalize();
 
-	int shift = m_numButtons / 2;
-	int numSections = m_numButtons != 0 ? 360 / int(m_angleY) : 1;
+	int shift = m_info.maxNumButtons / 2;
+	int numSections = m_info.maxNumButtons != 0 ? 360 / int(m_info.itemAngleY) : 1;
 	float deg = float(-atan2(vIntersect.x(), vIntersect.z()) * 180.0f / M_PI);
 	deg -= m_rotationY;
-	int index = (numSections - int((deg) / m_angleY) + shift) % numSections;
+	int index = (numSections - int((deg) / m_info.itemAngleY) + shift) % numSections;
 
 	if (m_selectedIndex != index) {
 		// swap enlarged menu item
-		if (0 <= index && index < m_numButtons) {
-			auto p = m_context->GetChildren()[m_numButtons - 1 - index];
+		if (0 <= index && index < m_info.maxNumButtons) {
+			auto p = m_context->GetChildren()[m_info.maxNumButtons - 1 - index];
 			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
 			if (pButton != nullptr) {
 				auto q = pButton->GetChildren()[0];
-				q->ScaleX(m_UIScale.x() * m_enlargedScale);
-				q->ScaleZ(m_UIScale.z() * m_enlargedScale);
+				q->ScaleX(m_info.itemScale.x() * m_info.enlargedScale);
+				q->ScaleZ(m_info.itemScale.z() * m_info.enlargedScale);
 			}
 		}
-		if (0 <= m_selectedIndex && m_selectedIndex < m_numButtons) {
-			auto p = m_context->GetChildren()[m_numButtons - 1 - m_selectedIndex];
+		if (0 <= m_selectedIndex && m_selectedIndex < m_info.maxNumButtons) {
+			auto p = m_context->GetChildren()[m_info.maxNumButtons - 1 - m_selectedIndex];
 			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
 			if (pButton != nullptr) {
 				auto q = pButton->GetChildren()[0];
-				q->ScaleX(m_UIScale.x());
-				q->ScaleZ(m_UIScale.z());
+				q->ScaleX(m_info.itemScale.x());
+				q->ScaleZ(m_info.itemScale.z());
 			}
 		}
 		m_selectedIndex = index;
@@ -147,7 +154,7 @@ point UIBar::FurthestRaySphereIntersect(const ray &r, point center) {
 	vector vRayCircle = static_cast<ray>(r).ptOrigin() - center;
 
 	float bValue = static_cast<ray>(r).vDirection().dot(vRayCircle);
-	float cValue = vRayCircle.dot(vRayCircle) - pow(m_depth, 2.0f);
+	float cValue = vRayCircle.dot(vRayCircle) - pow(m_info.menuDepth, 2.0f);
 	float resultValue = pow(bValue, 2.0f) - cValue;
 
 	OVERLAY_DEBUG_SET("res", resultValue);
