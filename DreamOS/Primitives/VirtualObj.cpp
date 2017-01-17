@@ -1,7 +1,7 @@
 #include "VirtualObj.h"
 
 VirtualObj::VirtualObj() :
-	m_objectState(),
+	m_objectState(this),
 	m_objectDerivative(),
 	m_vScale(1.0, 1.0, 1.0)
 {
@@ -9,7 +9,7 @@ VirtualObj::VirtualObj() :
 }
 
 VirtualObj::VirtualObj(point ptOrigin) : 
-	m_objectState(ptOrigin),
+	m_objectState(this, ptOrigin),
 	m_objectDerivative(),
 	m_vScale(1.0, 1.0, 1.0)
 {
@@ -367,6 +367,15 @@ double VirtualObj::GetMass() {
 
 double VirtualObj::GetInverseMass() {
 	return m_objectState.GetInverseMass();
+}
+
+VirtualObj* VirtualObj::SetRotationalVelocity(vector vRotationalVelocity) {
+	m_objectState.SetRotationalVelocity(vRotationalVelocity);
+	return this;
+}
+
+vector VirtualObj::GetRotationalVelocity() {
+	return m_objectState.GetRotationalVelocity();
 }
 
 vector VirtualObj::GetVelocity() {

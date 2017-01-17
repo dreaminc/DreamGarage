@@ -101,10 +101,16 @@ RESULT DreamTestApp::LoadScene() {
 	AddPhysicsObject(pSphere1);
 	//*/
 
-	// Volume vs Volume edge edge
-	///*
 	volume *pVolume = nullptr;
 	
+	// Rotational Intertia
+	pVolume = AddVolume(0.5f);
+	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	pVolume->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
+	AddPhysicsObject(pVolume);
+
+	// Volume vs Volume edge edge
 	// edge to edge
 	/*
 	pVolume = AddVolume(0.5f);
@@ -122,7 +128,9 @@ RESULT DreamTestApp::LoadScene() {
 	//pVolume->RotateZByDeg(45.0f);
 	AddPhysicsObject(pVolume);
 	*/
-
+	
+	// Edge Edge case 2
+	/*
 	pVolume = AddVolume(1.0f);
 	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 	pVolume->RotateYByDeg(45.0f);
@@ -137,6 +145,7 @@ RESULT DreamTestApp::LoadScene() {
 	pVolume->RotateYByDeg(145.0f);
 	//pVolume->RotateZByDeg(45.0f);
 	AddPhysicsObject(pVolume);
+	*/
 
 	/*
 	pVolume = AddVolume(0.5f);

@@ -29,9 +29,16 @@ public:
 		INVALID
 	};
 
+	enum class MassDistributionType {
+		VOLUME,
+		SPHERE,
+		CUSTOM,
+		INVALID
+	};
+
 public:
-	ObjectState();
-	ObjectState(point ptOrigin);
+	ObjectState(VirtualObj *pParentObj);
+	ObjectState(VirtualObj *pParentObj, point ptOrigin);
 
 public:
 	RESULT Clear();
@@ -51,6 +58,9 @@ public:
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
 	RESULT AddMomentumImpulse(vector vImplulse);
+
+	RESULT SetRotationalVelocity(vector vRotationalVelocity);
+	vector GetRotationalVelocity();
 	
 	// These functions are meant to represent a moment in a simulation
 	// to avoid changing velocity during a particular point of a simulation
@@ -59,6 +69,12 @@ public:
 
 	RESULT AddPendingTranslation(vector vTranslation);
 	RESULT CommitPendingTranslation();
+
+	RESULT SetMassDistributionType(ObjectState::MassDistributionType type);
+	RESULT RecalculateInertialTensor();
+	RESULT SetInertiaTensorSphere(point_precision radius);
+	RESULT SetInertiaTensorVolume(point_precision width, point_precision height, point_precision depth);
+	RESULT SetInertiaTensor(MassDistributionType type, const matrix<point_precision, 3, 3> &matInertiaTensor);
 
 	const vector GetMomentum();
 
@@ -89,8 +105,16 @@ protected:
 	point m_ptOrigin;					// Origin			
 	vector m_vMomentum;					// Momentum
 
-	quaternion m_qRotation;				// Rotation
-	quaternion m_qAngularMomentum;		// Angular Momentum
+	point m_ptCenterOfMass;									// Center of Mass
+	matrix<point_precision, 3, 3> m_matInverseIntertiaTensor;		// Inverse inertia tensor
+	MassDistributionType m_massDistributionType;			// Mass distribution type
+
+	quaternion m_qRotation;									// Rotation
+	vector m_vAngularVelocity;								// Angular Velocity
+	quaternion m_qAngularMomentum;							// Angular Momentum
+
+private:
+	VirtualObj *m_pParentObj = nullptr;						// This as a reference to parent
 };
 
 #endif	// OBJECT_STATE_H_

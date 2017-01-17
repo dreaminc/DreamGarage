@@ -490,6 +490,8 @@ RESULT DimObj::InitializeAABB() {
 	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(this, BoundingBox::Type::AABB));
 	CN(m_pBoundingVolume);
 
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::VOLUME);
+
 	CR(UpdateBoundingVolume());
 
 Error:
@@ -501,6 +503,8 @@ RESULT DimObj::InitializeOBB() {
 
 	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(this, BoundingBox::Type::OBB));
 	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::VOLUME);
 
 	CR(UpdateBoundingVolume());
 
@@ -514,6 +518,8 @@ RESULT DimObj::InitializeBoundingSphere() {
 	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingSphere(this));
 	CN(m_pBoundingVolume);
 
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::SPHERE);
+
 	CR(UpdateBoundingVolume());
 
 Error:
@@ -525,6 +531,8 @@ RESULT DimObj::InitializeBoundingQuad(point ptOrigin, float width, float height,
 
 	m_pBoundingVolume = std::shared_ptr<BoundingQuad>(new BoundingQuad(this, ptOrigin, vNormal, width, height));
 	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::INVALID);
 
 	//CR(UpdateBoundingVolume());
 

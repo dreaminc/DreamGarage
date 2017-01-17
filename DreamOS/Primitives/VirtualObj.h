@@ -144,6 +144,9 @@ public:
 	RESULT SetImmovable(bool fImmovable);
 	bool IsImmovable();
 
+	VirtualObj* SetRotationalVelocity(vector vRotationalVelocity);
+	vector GetRotationalVelocity();
+
 	vector GetVelocity();
 	vector GetMomentum();
 	RESULT Impulse(vector vImpulse);
@@ -151,6 +154,7 @@ public:
 	RESULT CommitPendingImpulses();
 	RESULT AddPendingTranslation(vector vTranslation);
 	RESULT CommitPendingTranslation();
+
 
 	// Update functions
 	VirtualObj* Update();

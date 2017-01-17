@@ -2,20 +2,31 @@
 #include "ObjectDerivative.h"
 #include "PhysicsEngine/ForceGenerator.h"
 
-ObjectState::ObjectState() :
+#include "DimObj.h"
+#include "BoundingVolume.h"
+#include "BoundingBox.h"
+#include "BoundingSphere.h"
+
+ObjectState::ObjectState(VirtualObj *pParentObj) :
+	m_pParentObj(pParentObj),
 	m_ptOrigin(),
 	m_vVelocity(),
 	m_qRotation(),
-	m_qAngularMomentum()
+	m_qAngularMomentum(),
+	m_ptCenterOfMass(),
+	m_massDistributionType(ObjectState::MassDistributionType::INVALID)
 {
 	/*empty*/
 }
 
-ObjectState::ObjectState(point ptOrigin) :
+ObjectState::ObjectState(VirtualObj *pParentObj, point ptOrigin) :
+	m_pParentObj(pParentObj),
 	m_ptOrigin(ptOrigin),
 	m_vVelocity(),
 	m_qRotation(),
-	m_qAngularMomentum()
+	m_qAngularMomentum(),
+	m_ptCenterOfMass(),
+	m_massDistributionType(ObjectState::MassDistributionType::INVALID)
 {
 	/*empty*/
 }
@@ -43,6 +54,7 @@ RESULT ObjectState::SetMass(double kgMass) {
 	m_kgMass = kgMass;
 	m_inverseMass = 1.0f / kgMass;
 	Recalculate();
+	RecalculateInertialTensor();
 
 	return R_SUCCESS;
 }
@@ -72,6 +84,16 @@ RESULT ObjectState::SetImmovable(bool fImmovable) {
 
 bool ObjectState::IsImmovable() {
 	return m_fImmovable;
+}
+
+RESULT ObjectState::SetRotationalVelocity(vector vRotationalVelocity) {
+	// TODO:
+	
+	return R_SUCCESS;
+}
+
+vector ObjectState::GetRotationalVelocity() {
+	return m_vAngularVelocity;
 }
 
 RESULT ObjectState::SetVelocity(vector vVelocity) {
@@ -128,6 +150,92 @@ RESULT ObjectState::CommitPendingTranslation() {
 	m_pendingTranslationVectors.clear();
 
 	return Translate(vTranslationAccumulator);
+}
+
+RESULT ObjectState::SetMassDistributionType(ObjectState::MassDistributionType type) {
+	RESULT r = R_SUCCESS;
+
+	m_massDistributionType = type;
+
+	if (m_kgMass > 0.0f) {
+		CR(RecalculateInertialTensor());
+	}
+	
+Error:
+	return r;
+}
+
+RESULT ObjectState::SetInertiaTensor(MassDistributionType type, const matrix<point_precision, 3, 3> &matInertiaTensor) {
+	m_massDistributionType = type;
+	m_matInverseIntertiaTensor = inverse(matInertiaTensor);
+
+	return R_SUCCESS;
+}
+
+RESULT ObjectState::RecalculateInertialTensor() {
+	RESULT r = R_SUCCESS;
+
+	CB((m_massDistributionType != ObjectState::MassDistributionType::INVALID));
+	CN(m_pParentObj);
+	DimObj *pDimObj = dynamic_cast<DimObj*>(m_pParentObj);
+	CN(pDimObj);
+
+	switch (m_massDistributionType) {
+		case ObjectState::MassDistributionType::VOLUME: {
+			BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get());
+			CN(pBoundingBox);
+
+			return SetInertiaTensorVolume(pBoundingBox->GetWidth(), pBoundingBox->GetHeight(), pBoundingBox->GetLength());
+		} break;
+
+		case ObjectState::MassDistributionType::SPHERE: {
+			BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get());
+			CN(pBoundingSphere);
+
+			return SetInertiaTensorSphere(pBoundingSphere->GetRadius());
+		} break;
+
+		case ObjectState::MassDistributionType::CUSTOM: {
+			// TODO: ?
+		} break;
+	}
+
+Error:
+	return r;
+}
+
+RESULT ObjectState::SetInertiaTensorSphere(point_precision radius) {
+	RESULT r = R_SUCCESS;
+
+	matrix<point_precision, 3, 3> matInertiaTensor;
+	matInertiaTensor.clear();
+
+	point_precision momentOfIntertia = (2.0f / 5.0f)* m_kgMass * radius;
+
+	matInertiaTensor.element(0, 0) = momentOfIntertia;
+	matInertiaTensor.element(1, 1) = momentOfIntertia;
+	matInertiaTensor.element(2, 2) = momentOfIntertia;
+
+	CR(SetInertiaTensor(ObjectState::MassDistributionType::SPHERE, matInertiaTensor));
+
+Error:
+	return r;
+}
+
+RESULT ObjectState::SetInertiaTensorVolume(point_precision width, point_precision height, point_precision depth) {
+	RESULT r = R_SUCCESS;
+
+	matrix<point_precision, 3, 3> matInertiaTensor;
+	matInertiaTensor.clear();
+
+	matInertiaTensor.element(0, 0) = (1.0f / 12.0f) * m_kgMass * ((height * height) + (depth * depth));
+	matInertiaTensor.element(1, 1) = (1.0f / 12.0f) * m_kgMass * ((width * width) + (depth * depth));
+	matInertiaTensor.element(2, 2) = (1.0f / 12.0f) * m_kgMass * ((width * width) + (height * height));
+
+	CR(SetInertiaTensor(ObjectState::MassDistributionType::VOLUME, matInertiaTensor));
+
+Error:
+	return r;
 }
 
 RESULT ObjectState::Translate(vector vTranslation) {
