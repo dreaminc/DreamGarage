@@ -4,6 +4,8 @@
 
 #include "DreamConsole\DreamConsole.h"
 
+#include <algorithm>
+
 UIBar::UIBar(composite* c) :
 	m_context(c)
 {
@@ -19,7 +21,7 @@ UIBar::UIBar(composite* c) :
 	m_info.itemScale = vector(0.5f, 1.0f, 0.25f); // 
 	m_info.enlargedScale = 1.25f;	// this value is multiplied to the scale when the menu item is selected
 
-	m_info.words = { "Watch", "Listen", "Play", "Whisper", "Present" }; //words display from left to right
+	m_info.menu[""] = { "Watch", "Listen", "Play", "Whisper", "Present" }; //words display from left to right
 	Initialize();
 }
 
@@ -38,21 +40,42 @@ RESULT UIBar::Initialize() {
 
 	RESULT r = R_PASS;
 
-
-	//other ones
-	int shift = m_info.maxNumButtons / 2;
-	float odd = (m_info.maxNumButtons % 2 == 0) ? 0.5f : 0.0f;
-
 	for (int i = 0; i < m_info.maxNumButtons; i++) {
 		std::shared_ptr<composite> pButton = m_context->AddComposite();
 		std::shared_ptr<quad> q = pButton->AddQuad(1.0f, 1.0f);
+		q->RotateXByDeg(m_info.itemAngleX);
+		m_buttons.emplace_back(pButton);
+	}
+	
+	m_context->SetVisible(false);
 
+	return r;
+}
+
+RESULT UIBar::DisplayFromMenuTitle(std::string title) {
+	RESULT r = R_PASS;
+	if (m_info.menu.count(title) == 0) return r;
+
+	std::vector<std::string> items = m_info.menu[title];
+	m_visibleMenuItems = std::min(m_info.maxNumButtons, items.size());
+
+	//other ones
+	int shift = (int)m_info.maxNumButtons / 2;
+	float odd = (m_info.maxNumButtons % 2 == 0) ? 0.5f : 0.0f;
+
+	for (int i = 0; i < m_visibleMenuItems; i++) {
+		std::shared_ptr<composite> pButton = m_buttons[i];
+		std::shared_ptr<quad> q = std::dynamic_pointer_cast<quad>(pButton->GetChildren()[0]);
+
+		// TODO: could it be possible to reuse this object?
+		// Currently, if the object is reused, the new texture is composed with the old texture
 		std::shared_ptr<FlatContext> pContext = m_context->MakeFlatContext();
-		const std::string str = (i < m_info.words.size()) ? m_info.words[m_info.words.size() - 1 - i] : "";
+		const std::string str = (i < items.size()) ? items[items.size() - 1 - i] : "";
 		std::shared_ptr<text> pText = pContext->AddText(L"ArialDistance.fnt", str, 0.1f, true);
 		m_context->RenderToTexture(pContext);
 
 		q->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
+		pContext->GetFramebuffer();
 
 		float rad = (m_info.itemAngleY * M_PI / 180.0f) * (i - shift + odd);
 		quaternion rot = quaternion::MakeQuaternionWithEuler(0.0f, rad, 0.0f);
@@ -61,13 +84,9 @@ RESULT UIBar::Initialize() {
 		pButton->SetOrientation(rot);
 
 		q->MoveTo(0.0f, 0.0f, m_info.menuDepth);
-		q->RotateXByDeg(m_info.itemAngleX);
 		q->ScaleX(m_info.itemScale.x());
 		q->ScaleZ(m_info.itemScale.z());
 	}
-	
-	m_context->SetVisible(false);
-
 	return r;
 }
 
@@ -85,6 +104,9 @@ RESULT UIBar::ToggleVisible() {
 
 		m_context->SetPosition(m_context->GetCamera()->GetPosition());
 		m_context->SetOrientation(q2);
+
+		// When the Menu becomes visible, open the root node
+		DisplayFromMenuTitle("");
 	}
 
 	return r;
@@ -95,14 +117,28 @@ RESULT UIBar::Notify(SenseControllerEvent *event) {
 	SENSE_CONTROLLER_EVENT_TYPE type = event->type;
 	int cType = event->state.type;
 
-	if (type == SENSE_CONTROLLER_MENU_DOWN && cType == 1) {
-		if (m_UIDirty) {
-			ToggleVisible();
-			m_UIDirty = false;
+	// Currently, only uses the right controller
+	// The left controller sends the exact same kinds of events, confounding results
+	if (cType == 1) {
+		if (type == SENSE_CONTROLLER_MENU_DOWN) {
+			if (m_UIDirty) {
+				ToggleVisible();
+				m_UIDirty = false;
+			}
 		}
-	}
-	else if (type == SENSE_CONTROLLER_MENU_UP && cType == 1) {
-		m_UIDirty = true;
+		else if (type == SENSE_CONTROLLER_MENU_UP) {
+			m_UIDirty = true;
+		}
+
+		else if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange == 1.0f) {
+			if (m_UISelect) {
+				ToggleVisible();
+				m_UISelect = false;
+			}
+		}
+		else if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange != 1.0f) {
+			m_UISelect = true;
+		}
 	}
 
 	return R_PASS;
@@ -118,7 +154,7 @@ RESULT UIBar::Update(ray handRay) {
 	vector vIntersect = vector(intersect);
 	vIntersect.Normalize();
 
-	int shift = m_info.maxNumButtons / 2;
+	int shift = (int)m_info.maxNumButtons / 2;
 	int numSections = m_info.maxNumButtons != 0 ? 360 / int(m_info.itemAngleY) : 1;
 	float deg = float(-atan2(vIntersect.x(), vIntersect.z()) * 180.0f / M_PI);
 	deg -= m_rotationY;

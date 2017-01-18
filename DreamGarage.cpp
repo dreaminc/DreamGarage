@@ -58,7 +58,12 @@ RESULT DreamGarage::LoadScene() {
 	info.itemAngleY = 20.0f;
 	info.itemScale = vector(0.5f, 1.0f, 0.25f);
 	info.enlargedScale = 1.25;
-	info.words = { "lorem", "ipsum", "dolor", "sit" };
+
+	info.menu[""] = { "lorem", "ipsum", "dolor", "sit" };
+	info.menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
+	info.menu["ipsum"] = { "1", "2", "3" };
+	info.menu["1"] = { "a", "b", "c" };
+
 	m_UIBar = new UIBar(AddComposite(), info);
 	//m_UIBar = new UIBar(AddComposite()); // Use parameter defaults
 
