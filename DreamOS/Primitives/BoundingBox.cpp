@@ -187,8 +187,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 		}
 	}
 
-	if (manifold.NumContacts() > 0)
-		return manifold;
+	//if (manifold.NumContacts() > 0)
+	//	return manifold;
 
 	for (int j = 0; j < 2; j++) {
 		// Do this early to improve perf
@@ -246,10 +246,20 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				double distanceX = m_vHalfSize.x() - std::abs(ptEdgeMid.x());
 				double distanceY = m_vHalfSize.y() - std::abs(ptEdgeMid.y());;
 				double distanceZ = m_vHalfSize.z() - std::abs(ptEdgeMid.z());;
+				double penetration = 0.0f;
 
+				point ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMid) + pBoxA->GetOrigin();
+
+				vector vNormal = vector(ptEdgeMid);
+				vNormal = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
+				vNormal.Normalize();
+
+				// Project minimum plane penetration along collision normal
 				if (distanceX < minDistance1) {
 					minDistance2 = minDistance1;
 					minDistance1 = distanceX;
+
+					penetration = (distanceX * vNormal.magnitude()) / vNormal.x();
 				}
 				else if (distanceX < minDistance2) {
 					minDistance2 = distanceX;
@@ -258,6 +268,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				if (distanceY < minDistance1) {
 					minDistance2 = minDistance1;
 					minDistance1 = distanceY;
+
+					penetration = (distanceY * vNormal.magnitude()) / vNormal.y();
 				}
 				else if (distanceY < minDistance2) {
 					minDistance2 = distanceY;
@@ -266,21 +278,18 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				if (distanceZ < minDistance1) {
 					minDistance2 = minDistance1;
 					minDistance1 = distanceZ;
+
+					penetration = (distanceZ * vNormal.magnitude()) / vNormal.z();
 				}
 				else if (distanceZ < minDistance2) {
 					minDistance2 = distanceZ;
 				}
 
-				point ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMid) + pBoxA->GetOrigin();
-
-				vector vNormal = vector(ptEdgeMid);
-				vNormal = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
-				vNormal.Normalize();
-
 				point ptContact = ptClosestPoint;
 
 				// TODO: this is wrong
-				float penetration = std::sqrt((minDistance1 * minDistance1) + (minDistance2 * minDistance2));
+				//float penetration = std::sqrt((minDistance1 * minDistance1) + (minDistance2 * minDistance2));
+				//float penetration = minDistance1;
 
 				if (j == 1) {
 					vNormal = vNormal * -1.0f;
@@ -291,8 +300,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			}
 		}
 
-		if (manifold.NumContacts() > 0)
-			return manifold;
+		//if (manifold.NumContacts() > 0)
+		//	return manifold;
 	}
 	
 	return manifold;

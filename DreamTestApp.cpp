@@ -153,7 +153,7 @@ RESULT DreamTestApp::LoadScene() {
 	//*/
 
 	pSphere = AddSphere(0.25f, 10, 10);
-	pSphere->SetPosition(point(-1.5f, 1.0f, 0.0f));
+	pSphere->SetPosition(point(-1.5f, 1.0f, 0.05f));
 	pSphere->SetMass(1.0f);
 	pSphere->SetVelocity(vector(1.0f, 0.0f, 0.0f));
 	AddPhysicsObject(pSphere);

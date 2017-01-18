@@ -161,8 +161,9 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		//vector vTorqueB = vRefB.cross(manifold.GetNormal()) * (1.0f);// *(-j) * kgInverseMassB;
 
 
-		if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
-			const double percentCorrection = 1.0f + 0.02f;		// Penetration percentage to correct
+		//if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
+		{
+			const double percentCorrection = 1.0f + 0.01f;		// Penetration percentage to correct
 			vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth() * (percentCorrection);
 			//vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth();//  *percentCorrection;
 
