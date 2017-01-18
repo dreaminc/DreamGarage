@@ -28,8 +28,8 @@ RESULT PhysicsIntegrator::Update() {
 
 		m_pPhysicsObjectStore->Reset();
 		while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
-
-			pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, m_sTimeStep, m_globalForceGenerators);
+			double adjTimestep = m_sTimeStep / 1.0f;	// This allows us to slow/speed it up without frame rate issues
+			pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, adjTimestep, m_globalForceGenerators);
 		}
 
 		m_elapsedTime = 0.0f;

@@ -142,7 +142,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vVelocityBeforeA = vAngularVelocityOfPointA;
 		vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
-		double restitutionConstant = 1.0f;	// TODO: put into object states, then use min
+		double restitutionConstant = 0.9f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
 		double j = -(1.0f + restitutionConstant) * (vRelativeVelocity.dot(manifold.GetNormal()));
 		j /= (kgInverseMassA + kgInverseMassB);
@@ -154,16 +154,23 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vRefA = (ptContact - pObjA->GetOrigin());
 		vector vRefB = (ptContact - pObjB->GetOrigin());
 
-		vector vTorqueA = vRefA.cross(manifold.GetNormal()) * (j);// * kgInverseMassA;
-		vector vTorqueB = vRefB.cross(manifold.GetNormal()) * (-j);// * * kgInverseMassB;
+		vector vTorqueA = vRefA.cross(vImpulseA);
+		vector vTorqueB = vRefB.cross(vImpulseB);
+
+		//vector vTorqueA = vRefA.cross(manifold.GetNormal()) * (-1.0f);// *(j)* kgInverseMassA;
+		//vector vTorqueB = vRefB.cross(manifold.GetNormal()) * (1.0f);// *(-j) * kgInverseMassB;
+
 
 		if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
-			const double percentCorrection = 1.0f + 0.01f;		// Penetration percentage to correct
+			const double percentCorrection = 1.0f + 0.02f;		// Penetration percentage to correct
 			vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth() * (percentCorrection);
 			//vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth();//  *percentCorrection;
 
-			pObjA->translate(vCorrection * -(1) * kgInverseMassA);
-			pObjB->translate(vCorrection * (1) * kgInverseMassB);
+			pObjA->translate(vCorrection * -(1.0f) * kgInverseMassA);
+			pObjB->translate(vCorrection * (1.0f) * kgInverseMassB);
+
+			//pObjA->translate(vCorrection * -(1.0f));
+			//pObjB->translate(vCorrection * (1.0f));
 
 			//pObjA->AddPendingTranslation(vCorrection * -kgMassA);
 			//pObjB->AddPendingTranslation(vCorrection * kgMassB);

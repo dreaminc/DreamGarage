@@ -97,7 +97,7 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 
 CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-	
+
 	// Point vs Face
 	// Do for both objects
 	// TODO: Assumes OBB - can be optimized for AABB and OBB-AABB certainly
@@ -108,7 +108,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 		// Point - Face Detection
 		for (int i = 0; i < 8; i++) {
-			point ptBox = pBoxB->GetBoxPoint((BoundingBox::BoxPoint)(i));
+			BoundingBox::BoxPoint boxPoint = (BoundingBox::BoxPoint)(i);
+			point ptBox = pBoxB->GetBoxPoint(boxPoint);
 			ptBox = (point)(inverse(RotationMatrix(pBoxA->GetOrientation())) * (ptBox - pBoxA->GetOrigin()));
 
 			point ptMax = pBoxA->m_vHalfSize;
@@ -184,11 +185,10 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 			manifold.AddContactPoint(ptContact, vNormal, penetration);
 		}
-
-		if (manifold.NumContacts() > 0) {
-			return manifold;
-		}
 	}
+
+	if (manifold.NumContacts() > 0)
+		return manifold;
 
 	for (int j = 0; j < 2; j++) {
 		// Do this early to improve perf
@@ -551,14 +551,42 @@ point BoundingBox::GetMaxPoint() {
 point BoundingBox::GetBoxPoint(BoxPoint ptType) {
 	point retPoint = point(m_vHalfSize);
 	switch (ptType) {
-		case BoxPoint::TOP_RIGHT_FAR: break;// nothing 
-		case BoxPoint::TOP_RIGHT_NEAR: retPoint.z() *= -1; break;
-		case BoxPoint::TOP_LEFT_FAR: retPoint.x() *= -1; break;
-		case BoxPoint::TOP_LEFT_NEAR: retPoint.x() *= -1; retPoint.z() *= -1; break;
-		case BoxPoint::BOTTOM_RIGHT_FAR: retPoint.y() *= -1; break;
-		case BoxPoint::BOTTOM_RIGHT_NEAR: retPoint.y() *= -1; retPoint.z() *= -1; break;
-		case BoxPoint::BOTTOM_LEFT_FAR: retPoint.y() *= -1; retPoint.z() *= -1; break;
-		case BoxPoint::BOTTOM_LEFT_NEAR: retPoint.Reverse();
+		case BoxPoint::TOP_RIGHT_FAR: {
+			// nothing 
+		} break;
+
+		case BoxPoint::TOP_RIGHT_NEAR: {
+			retPoint.z() *= -1.0f;
+		} break;
+
+		case BoxPoint::TOP_LEFT_FAR: {
+			retPoint.x() *= -1.0f;
+		} break;
+
+		case BoxPoint::TOP_LEFT_NEAR: {
+			retPoint.x() *= -1.0f; 
+			retPoint.z() *= -1.0f;
+		} break;
+
+		case BoxPoint::BOTTOM_RIGHT_FAR: {
+			retPoint.y() *= -1;
+		} break;
+		
+		case BoxPoint::BOTTOM_RIGHT_NEAR: {
+			retPoint.y() *= -1.0f; 
+			retPoint.z() *= -1.0f;
+		} break;
+
+		case BoxPoint::BOTTOM_LEFT_FAR: {
+			retPoint.x() *= -1.0f;
+			retPoint.y() *= -1.0f;
+		} break;
+
+		case BoxPoint::BOTTOM_LEFT_NEAR: {
+			retPoint.x() *= -1.0f;
+			retPoint.y() *= -1.0f;
+			retPoint.z() *= -1.0f;
+		} break;
 	}
 
 	// Transform point accordingly

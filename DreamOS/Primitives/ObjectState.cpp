@@ -142,7 +142,7 @@ RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
 
 RESULT ObjectState::AddTorqueImpulse(vector vTorque) {
 	if (m_fImmovable == false) {
-		m_vAngularMomentum += vTorque;
+		m_vAngularMomentum += m_matIntertiaTensor * vTorque;
 		RecalculateAngularVelocity();
 	}
 
