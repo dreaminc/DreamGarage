@@ -139,6 +139,7 @@ public:
 	VirtualObj* SetAngularMomentum(vector vAngularMomentum);
 
 	VirtualObj* ApplyTorqueImpulse(vector vTorque);
+	VirtualObj* ApplyForceAtPoint(vector vForce, point ptRefObj, double msDeltaTime);
 
 	RESULT SetMass(double kgMass);
 	double GetMass();

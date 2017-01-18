@@ -61,6 +61,7 @@ public:
 	RESULT AddMomentumImpulse(vector vImplulse);
 	
 	RESULT AddTorqueImpulse(vector vTorque);
+	RESULT ApplyForceAtPoint(vector vForce, point ptRefObj, double msDeltaTime);
 
 	RESULT SetRotationalVelocity(vector vRotationalVelocity);
 	vector GetRotationalVelocity();

@@ -357,6 +357,13 @@ VirtualObj* VirtualObj::ApplyTorqueImpulse(vector vTorque) {
 	return this;
 }
 
+// Note that the point will be relative to the center of mass of the object
+// This function should really only be used by the physics engine or for testing/fun
+VirtualObj* VirtualObj::ApplyForceAtPoint(vector vForce, point ptRefObj, double msDeltaTime) {
+	m_objectState.ApplyForceAtPoint(vForce, ptRefObj, msDeltaTime);
+	return this;
+}
+
 RESULT VirtualObj::SetMass(double kgMass) {
 	// Negative mass not allowed
 	if (kgMass < 0.0f)

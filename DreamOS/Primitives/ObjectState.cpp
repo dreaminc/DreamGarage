@@ -140,7 +140,6 @@ RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
 	return R_SUCCESS;
 }
 
-// 
 RESULT ObjectState::AddTorqueImpulse(vector vTorque) {
 	if (m_fImmovable == false) {
 		m_vAngularMomentum += vTorque;
@@ -377,6 +376,18 @@ ObjectDerivative ObjectState::Evaluate(float timeStart, float timeDelta, const O
 	return derivativeOutput;
 }
 
+
+RESULT ObjectState::ApplyForceAtPoint(vector vForce, point ptRefObj, double msDeltaTime) {
+	vector vRefObjCenterOfMass = ptRefObj - m_ptCenterOfMass;
+
+	m_vMomentum += vForce * msDeltaTime;
+	m_vAngularMomentum += vForce.cross(vRefObjCenterOfMass) * msDeltaTime;
+	
+	RecalculateLinearVelocity();
+	RecalculateAngularVelocity();
+
+	return R_SUCCESS;
+}
 
 // This is the core of the RK4 integration method for object state - we might want to have alternative ways
 // https://en.wikipedia.org/wiki/Runge%E2%80%93Kutta_methods

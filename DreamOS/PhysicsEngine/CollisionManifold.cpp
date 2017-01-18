@@ -31,7 +31,7 @@ RESULT CollisionManifold::AddContactPoint(point ptContact, vector vNormal, doubl
 		m_maxPenetrationDepth = std::abs(penetrationDepth);
 	}
 
-	// Average Normal
+	// Average Normal happens in GetNormal
 
 	m_numContacts += 1;
 

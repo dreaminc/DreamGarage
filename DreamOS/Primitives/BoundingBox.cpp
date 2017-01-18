@@ -97,8 +97,8 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 
 CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
-
-	// Do a point vs face first
+	
+	// Point vs Face
 	// Do for both objects
 	// TODO: Assumes OBB - can be optimized for AABB and OBB-AABB certainly
 	for (int j = 0; j < 2; j++) {
@@ -125,6 +125,16 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 			point ptClosestPoint = point(closestX, closestY, closestZ);
 
+			// TODO:  There is a bug with this that needs to be resolved
+			// Basically, if the verts are exactly equal to the width/height/depth or if
+			// they are within the depth threshold (0.001) where the depth of penetration
+			// is greater than this offet, then the correct box-face is not identified
+			// That can be resolved with appropriate implementation of SAT to determine
+			// the correct plane of overlap
+
+			// The EPSILON hack below helps a bit - as it will disqualify a distance
+			// too low to be reasonable within the current constraints
+
 			BoundingBox::BoxFace boxFace;
 			double distanceX = pBoxA->m_vHalfSize.x() - std::abs(ptBox.x());
 			double distanceY = pBoxA->m_vHalfSize.y() - std::abs(ptBox.y());;
@@ -132,15 +142,15 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 			double minDistance = std::numeric_limits<double>::max();
 
-			if (distanceX < minDistance) {
+			if ((distanceX < minDistance) && distanceX > DREAM_EPSILON) {
 				minDistance = distanceX;
 
-				if(ptBox.x() > 0.0f)
+				if (ptBox.x() > 0.0f)
 					boxFace = BoundingBox::BoxFace::RIGHT;
-				else 
+				else
 					boxFace = BoundingBox::BoxFace::LEFT;
 			}
-			if (distanceY < minDistance) {
+			if ((distanceY < minDistance) && distanceY > DREAM_EPSILON) {
 				minDistance = distanceY;
 
 				if (ptBox.y() > 0.0f)
@@ -148,7 +158,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				else
 					boxFace = BoundingBox::BoxFace::BOTTOM;
 			}
-			if (distanceZ < minDistance) {
+			if ((distanceZ < minDistance) && distanceZ > DREAM_EPSILON) {
 				minDistance = distanceZ;
 
 				if (ptBox.z() > 0.0f)
@@ -160,7 +170,6 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptClosestPoint) + pBoxA->GetOrigin();
 
 			vector vNormal = pBoxA->GetBoxFaceNormal(boxFace);
-			vNormal = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
 			vNormal.Normalize();
 
 			point ptContact = ptClosestPoint;
@@ -175,6 +184,16 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 			manifold.AddContactPoint(ptContact, vNormal, penetration);
 		}
+
+		if (manifold.NumContacts() > 0) {
+			return manifold;
+		}
+	}
+
+	for (int j = 0; j < 2; j++) {
+		// Do this early to improve perf
+		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
+		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
 
 		// Edge - Edge Detection
 		for (int i = 0; i < 12; i++) {
@@ -270,6 +289,10 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 				manifold.AddContactPoint(ptContact, vNormal, penetration);
 			}
+		}
+
+		if (manifold.NumContacts() > 0) {
+			return manifold;
 		}
 	}
 	

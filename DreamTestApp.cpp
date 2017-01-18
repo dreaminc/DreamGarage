@@ -107,9 +107,23 @@ RESULT DreamTestApp::LoadScene() {
 	pVolume = AddVolume(0.5, 0.5, 1.5f);
 	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 	pVolume->SetMass(1.0f);
-	//pVolume->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
-	pVolume->ApplyTorqueImpulse(vector(0.0f, 0.0f, 1.0f));
-	pVolume->ApplyTorqueImpulse(vector(0.0f, 0.1f, 0.0f));
+	pVolume->SetRotationalVelocity(vector(0.0f, 0.0f, 2.0f));
+	//pVolume->RotateZByDeg(-135.0f);
+	pVolume->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+	//pVolume->ApplyTorqueImpulse(vector(0.0f, 0.0f, 1.0f));
+	//pVolume->ApplyTorqueImpulse(vector(0.0f, 0.1f, 0.0f));
+	//pVolume->ApplyForceAtPoint(vector(-10.0f, 0.0f, 10.0f), point(0.5f, 1.5f, 0.5f), 0.02f);
+	AddPhysicsObject(pVolume);
+
+	pVolume = AddVolume(0.5, 0.5, 1.5f);
+	pVolume->SetPosition(point(-3.0f, 0.0f, 0.0f));
+	pVolume->SetMass(1.0f);
+	pVolume->RotateZByDeg(90.0f);
+	//pVolume->SetRotationalVelocity(vector(0.0f, 0.0f, 2.0f));
+	//pVolume->SetVelocity(vector(-0.25f, 0.0f, 0.0f));
+	//pVolume->ApplyTorqueImpulse(vector(0.0f, 0.0f, 1.0f));
+	//pVolume->ApplyTorqueImpulse(vector(0.0f, 0.1f, 0.0f));
+	//pVolume->ApplyForceAtPoint(vector(-10.0f, 0.0f, 10.0f), point(0.5f, 1.5f, 0.5f), 0.02f);
 	AddPhysicsObject(pVolume);
 
 	// Volume vs Volume edge edge

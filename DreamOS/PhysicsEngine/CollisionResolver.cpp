@@ -108,7 +108,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 	RESULT r = R_PASS;
 
 		// Resolve the penetration as well
-		const double penetrationThreshold = 0.001f;		// Penetration percentage to correct
+		const double penetrationThreshold = 0.0001f;		// Penetration percentage to correct
 
 		VirtualObj *pObjA = manifold.GetObjectA();
 		VirtualObj *pObjB = manifold.GetObjectB();
