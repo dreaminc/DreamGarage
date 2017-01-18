@@ -103,12 +103,12 @@ RESULT DreamTestApp::LoadScene() {
 
 	volume *pVolume = nullptr;
 	
-	// Rotational Intertia
+	// Rotational Inertia
 	pVolume = AddVolume(0.5, 0.5, 1.5f);
 	pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 	pVolume->SetMass(1.0f);
-	pVolume->SetRotationalVelocity(vector(0.0f, 0.0f, 2.0f));
-	//pVolume->RotateZByDeg(-135.0f);
+	//pVolume->SetRotationalVelocity(vector(0.0f, 0.0f, 2.6f));
+	pVolume->RotateZByDeg(-135.0f);
 	pVolume->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
 	//pVolume->ApplyTorqueImpulse(vector(0.0f, 0.0f, 1.0f));
 	//pVolume->ApplyTorqueImpulse(vector(0.0f, 0.1f, 0.0f));

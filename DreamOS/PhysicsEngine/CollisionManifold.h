@@ -24,6 +24,8 @@ public:
 	int NumContacts() const;
 	double MaxPenetrationDepth() const;
 	vector GetNormal() const;
+	point GetContactPoint() const;
+
 	VirtualObj *GetObjectA() const;
 	VirtualObj *GetObjectB() const;
 

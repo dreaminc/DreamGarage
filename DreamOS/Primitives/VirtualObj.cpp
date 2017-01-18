@@ -394,6 +394,11 @@ vector VirtualObj::GetVelocity() {
 	return m_objectState.GetVelocity();
 }
 
+vector VirtualObj::GetVelocityOfPoint(point pt) {
+	point ptRefObj = pt - GetOrigin();
+	return m_objectState.GetVelocityAtPoint(ptRefObj);
+}
+
 RESULT VirtualObj::SetImmovable(bool fImmovable) {
 	return m_objectState.SetImmovable(fImmovable);
 }

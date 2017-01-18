@@ -322,6 +322,12 @@ const vector ObjectState::GetVelocity() {
 	return m_vVelocity; 
 }
 
+const vector ObjectState::GetVelocityAtPoint(point ptRefObj) {
+	vector vRefObjCenterOfMass = ptRefObj - m_ptCenterOfMass;
+	vector vAtPoint = m_vVelocity + m_vAngularVelocity.cross(vRefObjCenterOfMass);
+	return vAtPoint;
+}
+
 const vector ObjectState::GetMomentum() {
 	return m_vMomentum;
 }

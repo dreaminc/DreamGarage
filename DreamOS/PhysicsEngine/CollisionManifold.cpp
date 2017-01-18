@@ -22,6 +22,13 @@ RESULT CollisionManifold::AddContactPoint(point ptContact, vector vNormal, doubl
 	RESULT r = R_PASS;
 
 	CB((m_numContacts < MAX_CONTACT_POINTS));
+
+	// Ensure this contact is not near anything
+	for (int i = 0; i < m_numContacts; i++) {
+		if ((ptContact - m_contactPoints[i].GetPoint()).magnitude() < DREAM_EPSILON) {
+			return R_SKIPPED;
+		}
+	}
 	
 	m_contactPoints[m_numContacts] = {
 		ptContact, vNormal, penetrationDepth
@@ -52,6 +59,27 @@ int CollisionManifold::NumContacts() const {
 
 double CollisionManifold::MaxPenetrationDepth() const {
 	return m_maxPenetrationDepth;
+}
+
+//vector vAngularVelocityOfPointA = pObjA->GetVelocityOfPoint(manifold.GetContactPoint());
+
+point CollisionManifold::GetContactPoint() const {
+	if (m_numContacts == 1) {
+		return m_contactPoints[0].GetPoint();
+	}
+	else if (m_numContacts > 1) {
+		point ptContact = point();
+
+		for (int i = 0; i < m_numContacts; i++) {
+			ptContact += m_contactPoints[i].GetPoint();
+		}
+
+		ptContact = ptContact * (1.0f / (point_precision)(m_numContacts));
+
+		return ptContact;
+	}
+
+	return point();
 }
 
 vector CollisionManifold::GetNormal() const {

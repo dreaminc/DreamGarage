@@ -58,6 +58,7 @@ public:
 
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
+	const vector GetVelocityAtPoint(point ptRefObj);
 	RESULT AddMomentumImpulse(vector vImplulse);
 	
 	RESULT AddTorqueImpulse(vector vTorque);

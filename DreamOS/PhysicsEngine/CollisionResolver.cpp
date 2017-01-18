@@ -133,8 +133,14 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		}*/
 
 		// Resolve the impulses
-		vector vVelocityBeforeA = pObjA->GetVelocity();
-		vector vVelocityBeforeB = pObjB->GetVelocity();
+		vector vAngularVelocityOfPointA = pObjA->GetVelocityOfPoint(manifold.GetContactPoint());
+		vector vAngularVelocityOfPointB = pObjB->GetVelocityOfPoint(manifold.GetContactPoint());
+
+		//vector vVelocityBeforeA = pObjA->GetVelocity();
+		//vector vVelocityBeforeB = pObjB->GetVelocity();
+
+		vector vVelocityBeforeA = vAngularVelocityOfPointA;
+		vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
 		double restitutionConstant = 1.0f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
@@ -143,6 +149,13 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 
 		vector vImpulseA = manifold.GetNormal() * (j) * kgInverseMassA;
 		vector vImpulseB = manifold.GetNormal() * (-j) * kgInverseMassB;
+
+		point ptContact = manifold.GetContactPoint();
+		vector vRefA = (ptContact - pObjA->GetOrigin());
+		vector vRefB = (ptContact - pObjB->GetOrigin());
+
+		vector vTorqueA = vRefA.cross(manifold.GetNormal()) * (j);// * kgInverseMassA;
+		vector vTorqueB = vRefB.cross(manifold.GetNormal()) * (-j);// * * kgInverseMassB;
 
 		if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
 			const double percentCorrection = 1.0f + 0.01f;		// Penetration percentage to correct
@@ -173,8 +186,12 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		//pObjA->AddPendingImpulse(vImpulseA);
 		//pObjB->AddPendingImpulse(vImpulseB);
 		
+		// Linear
 		pObjA->Impulse(vImpulseA);
 		pObjB->Impulse(vImpulseB);
+
+		pObjA->ApplyTorqueImpulse(vTorqueA);
+		pObjB->ApplyTorqueImpulse(vTorqueB);
 	
 
 //Error:

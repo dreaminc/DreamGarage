@@ -151,6 +151,7 @@ public:
 	vector GetRotationalVelocity();
 
 	vector GetVelocity();
+	vector GetVelocityOfPoint(point pt);
 	vector GetMomentum();
 	RESULT Impulse(vector vImpulse);
 	RESULT AddPendingImpulse(vector vImpulse);

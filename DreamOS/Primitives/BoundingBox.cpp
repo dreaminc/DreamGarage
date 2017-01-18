@@ -291,9 +291,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			}
 		}
 
-		if (manifold.NumContacts() > 0) {
+		if (manifold.NumContacts() > 0)
 			return manifold;
-		}
 	}
 	
 	return manifold;
