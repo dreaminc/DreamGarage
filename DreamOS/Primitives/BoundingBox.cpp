@@ -187,8 +187,9 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 		}
 	}
 
-	//if (manifold.NumContacts() > 0)
-	//	return manifold;
+	if (manifold.NumContacts() > 0) {
+		return manifold;
+	}
 
 	for (int j = 0; j < 2; j++) {
 		// Do this early to improve perf

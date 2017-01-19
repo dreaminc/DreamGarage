@@ -74,6 +74,9 @@ RESULT sphere::UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere, bool fT
 
 	SetOrigin(pBoundingSphere->GetOrigin());
 
+	// TODO: This is optional
+	SetOrientation(pBoundingSphere->GetOrientation());
+
 Error:
 	return r;
 }

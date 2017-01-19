@@ -21,6 +21,7 @@ class ForceGenerator;
 class ObjectState {
 	friend class VirtualObj;
 	friend class ObjectDerivative;
+	friend class CollisionResolver;
 
 public:
 	enum class IntegrationType {
@@ -58,6 +59,7 @@ public:
 
 	RESULT SetVelocity(vector vVelocity);
 	const vector GetVelocity();
+	const vector GetAngularVelocity();
 	const vector GetVelocityAtPoint(point ptRefObj);
 	RESULT AddMomentumImpulse(vector vImplulse);
 	

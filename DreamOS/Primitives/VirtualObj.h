@@ -152,6 +152,8 @@ public:
 
 	vector GetVelocity();
 	vector GetVelocityOfPoint(point pt);
+	vector GetAngularVelocity();
+	point GetPointRefCenterOfMass(point pt);
 	vector GetMomentum();
 	RESULT Impulse(vector vImpulse);
 	RESULT AddPendingImpulse(vector vImpulse);

@@ -143,6 +143,7 @@ RESULT ObjectState::AddMomentumImpulse(vector vImplulse) {
 RESULT ObjectState::AddTorqueImpulse(vector vTorque) {
 	if (m_fImmovable == false) {
 		m_vAngularMomentum += m_matIntertiaTensor * vTorque;
+		//m_vAngularMomentum += vTorque;
 		RecalculateAngularVelocity();
 	}
 
@@ -320,6 +321,10 @@ RESULT ObjectState::translate(vector v) {
 
 const vector ObjectState::GetVelocity() { 
 	return m_vVelocity; 
+}
+
+const vector ObjectState::GetAngularVelocity() {
+	return m_vAngularVelocity;
 }
 
 const vector ObjectState::GetVelocityAtPoint(point ptRefObj) {

@@ -108,7 +108,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 	RESULT r = R_PASS;
 
 		// Resolve the penetration as well
-		const double penetrationThreshold = 0.0001f;		// Penetration percentage to correct
+		const double penetrationThreshold = 0.01f;		// Penetration percentage to correct
 
 		VirtualObj *pObjA = manifold.GetObjectA();
 		VirtualObj *pObjB = manifold.GetObjectB();
@@ -136,42 +136,73 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vAngularVelocityOfPointA = pObjA->GetVelocityOfPoint(manifold.GetContactPoint());
 		vector vAngularVelocityOfPointB = pObjB->GetVelocityOfPoint(manifold.GetContactPoint());
 
-		//vector vVelocityBeforeA = pObjA->GetVelocity();
-		//vector vVelocityBeforeB = pObjB->GetVelocity();
+		vAngularVelocityOfPointA.w() = 0.0f;
+		vAngularVelocityOfPointB.w() = 0.0f;
 
-		vector vVelocityBeforeA = vAngularVelocityOfPointA;
-		vector vVelocityBeforeB = vAngularVelocityOfPointB;
+		vector vVelocityBeforeA = pObjA->GetVelocity();
+		vector vVelocityBeforeB = pObjB->GetVelocity();
+
+		//vector vVelocityBeforeA = vAngularVelocityOfPointA;
+		//vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
 		double restitutionConstant = 0.9f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
-		double j = -(1.0f + restitutionConstant) * (vRelativeVelocity.dot(manifold.GetNormal()));
-		j /= (kgInverseMassA + kgInverseMassB);
-
-		vector vImpulseA = manifold.GetNormal() * (j) * kgInverseMassA;
-		vector vImpulseB = manifold.GetNormal() * (-j) * kgInverseMassB;
-
+		point ptRefA = pObjA->GetPointRefCenterOfMass(manifold.GetContactPoint());
+		point ptRefB = pObjB->GetPointRefCenterOfMass(manifold.GetContactPoint());
 		point ptContact = manifold.GetContactPoint();
 		vector vRefA = (ptContact - pObjA->GetOrigin());
 		vector vRefB = (ptContact - pObjB->GetOrigin());
+		vector vNormal = manifold.GetNormal();
 
-		vector vTorqueA = vRefA.cross(vImpulseA);
-		vector vTorqueB = vRefB.cross(vImpulseB);
+		// http://www.euclideanspace.com/physics/dynamics/collision/threed/ - For impulse equation below
+		double j = -(1.0f + restitutionConstant);
+
+		vector vRefCrossNormalA = vector(vRefA.cross(vNormal));
+		vector vRefCrossNormalB = vector(vRefB.cross(vNormal));
+
+		j *= (vRelativeVelocity.dot(vNormal)) + vRefCrossNormalA.dot(pObjA->GetAngularVelocity()) - vRefCrossNormalB.dot(pObjB->GetAngularVelocity());
+		//j *= (vRelativeVelocity.dot(vNormal)) + vRefCrossNormalA.dot(vAngularVelocityOfPointA) - vRefCrossNormalB.dot(vAngularVelocityOfPointB);
+		
+		double denom = (kgInverseMassA + kgInverseMassB);
+		double angularInertiaA = vRefCrossNormalA.dot(vector((pObjA->GetState().m_matInverseIntertiaTensor) * vRefCrossNormalA));
+		double angularInertiaB = vRefCrossNormalB.dot(vector((pObjB->GetState().m_matInverseIntertiaTensor) * vRefCrossNormalB));
+
+		denom += angularInertiaA;
+		denom += angularInertiaB;
+
+		j /= denom;
+
+		vector vImpulse = vNormal * (j);
+
+		vector vImpulseA = vImpulse * kgInverseMassA;
+		vector vImpulseB = vImpulse * -kgInverseMassB;
+
+		vImpulseA.w() = 0.0f;
+		vImpulseB.w() = 0.0f;
+		
+		//vector vTorqueA = vRefA.cross(manifold.GetNormal()) * (j) * angularInertiaA;
+		//vector vTorqueB = vRefB.cross(manifold.GetNormal()) * (-j) * angularInertiaB;
+
+		vector vTorqueA = vImpulse.cross(vRefA) * (-1.0f) * angularInertiaA;
+		vector vTorqueB = vImpulse.cross(vRefB) * (1.0f) * angularInertiaB;
+
+		vTorqueA.w() = 0.0f;
+		vTorqueB.w() = 0.0f;
 
 		//vector vTorqueA = vRefA.cross(manifold.GetNormal()) * (-1.0f);// *(j)* kgInverseMassA;
 		//vector vTorqueB = vRefB.cross(manifold.GetNormal()) * (1.0f);// *(-j) * kgInverseMassB;
 
 
-		//if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
-		{
-			const double percentCorrection = 1.0f + 0.01f;		// Penetration percentage to correct
-			vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth() * (percentCorrection);
+		if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
+			const double percentCorrection = 1.0f - 0.30f;		// Penetration percentage to correct
+			vector vCorrection = vNormal * manifold.MaxPenetrationDepth() * (percentCorrection);
 			//vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth();//  *percentCorrection;
 
-			pObjA->translate(vCorrection * -(1.0f) * kgInverseMassA);
-			pObjB->translate(vCorrection * (1.0f) * kgInverseMassB);
+			//pObjA->translate(vCorrection * -(1.0f) * kgInverseMassA);
+			//pObjB->translate(vCorrection * (1.0f) * kgInverseMassB);
 
-			//pObjA->translate(vCorrection * -(1.0f));
-			//pObjB->translate(vCorrection * (1.0f));
+			pObjA->translate(vCorrection * -(1.0f));
+			pObjB->translate(vCorrection * (1.0f));
 
 			//pObjA->AddPendingTranslation(vCorrection * -kgMassA);
 			//pObjB->AddPendingTranslation(vCorrection * kgMassB);
@@ -205,3 +236,5 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 //Error:
 	return r;
 }
+
+

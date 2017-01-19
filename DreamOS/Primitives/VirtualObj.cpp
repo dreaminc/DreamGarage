@@ -394,6 +394,15 @@ vector VirtualObj::GetVelocity() {
 	return m_objectState.GetVelocity();
 }
 
+point VirtualObj::GetPointRefCenterOfMass(point pt) {
+	point ptRefObj = (pt - GetOrigin()) - m_objectState.m_ptCenterOfMass;
+	return ptRefObj;
+}
+
+vector VirtualObj::GetAngularVelocity() {
+	return m_objectState.GetAngularVelocity();
+}
+
 vector VirtualObj::GetVelocityOfPoint(point pt) {
 	point ptRefObj = pt - GetOrigin();
 	return m_objectState.GetVelocityAtPoint(ptRefObj);
