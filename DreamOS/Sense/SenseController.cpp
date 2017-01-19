@@ -62,7 +62,6 @@ RESULT SenseController::SetControllerState(ControllerState controllerState) {
 	else if (currentState->fMenu && !controllerState.fMenu) {
 		eventType = SENSE_CONTROLLER_MENU_UP;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
-		//OVERLAY_DEBUG_SET("menuUp", )
 	}
 	currentState->fMenu = controllerState.fMenu;
 

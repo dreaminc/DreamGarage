@@ -18,7 +18,6 @@ class HALImp;
 #include "Primitives/volume.h"
 #include "Primitives/DimRay.h"
 #include "quad.h"
-//#include "Primitives/FlatContext.h"
 
 class hand;
 class camera;

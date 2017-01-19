@@ -378,8 +378,6 @@ RESULT DreamGarage::SendHandPosition() {
 	if (pRightHand != nullptr) {
 		CR(BroadcastUpdateHandMessage(pRightHand->GetHandState()));
 		quaternion q = pRightHand->GetHandState().qOrientation;
-
-		OVERLAY_DEBUG_SET("orientUpdate2", q);
 	}
 
 Error:
@@ -566,6 +564,7 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 	LOG(INFO) << "HandlePeersUpdate " << index;
 	
 	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(index)).c_str());
+
 	if (!m_isSeated) {
 		// an initial imp for seating. would be changed once we decide final seating configurations
 		camera* cam = GetCamera();

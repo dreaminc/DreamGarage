@@ -69,14 +69,14 @@ RESULT UIBar::DisplayFromMenuTitle(std::string title) {
 		// TODO: could it be possible to reuse this object?
 		// Currently, if the object is reused, the new texture is composed with the old texture
 		std::shared_ptr<FlatContext> pContext = m_context->MakeFlatContext();
-		const std::string str = (i < items.size()) ? items[items.size() - 1 - i] : "";
+		const std::string str = (i < items.size()) ? items[i] : "";
 		std::shared_ptr<text> pText = pContext->AddText(L"ArialDistance.fnt", str, 0.1f, true);
 		m_context->RenderToTexture(pContext);
 
 		q->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 		pContext->GetFramebuffer();
 
-		float rad = (m_info.itemAngleY * M_PI / 180.0f) * (i - shift + odd);
+		float rad = (m_info.itemAngleY * M_PI / 180.0f) * -(i - shift + odd);
 		quaternion rot = quaternion::MakeQuaternionWithEuler(0.0f, rad, 0.0f);
 
 		pButton->MoveTo(0.0f, m_info.yPosition, 0.0f);
@@ -143,8 +143,8 @@ RESULT UIBar::Notify(SenseControllerEvent *event) {
 		else if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange == 1.0f) {
 			if (m_UISelect && !m_menuPath.empty()) {
 				std::vector<std::string> currentMenu = m_info.menu[m_menuPath.top()];
-				std::string title = currentMenu[m_selectedIndex];
-				if (m_selectedIndex >= 0 && m_selectedIndex < (int)currentMenu.size() && m_info.menu.count(title) > 0) {
+				if (m_selectedIndex >= 0 && m_selectedIndex < (int)currentMenu.size() && m_info.menu.count(currentMenu[m_selectedIndex]) > 0) {
+					std::string title = currentMenu[m_selectedIndex];
 
 					m_menuPath.push(title);
 					DisplayFromMenuTitle(title);
@@ -176,12 +176,12 @@ RESULT UIBar::Update(ray handRay) {
 	int numSections = m_info.maxNumButtons != 0 ? 360 / int(m_info.itemAngleY) : 1;
 	float deg = float(-atan2(vIntersect.x(), vIntersect.z()) * 180.0f / M_PI);
 	deg -= m_rotationY;
-	int index = (numSections - int((deg) / m_info.itemAngleY - odd) + shift) % numSections;
+	int index = (-int((deg) / m_info.itemAngleY - odd) + shift) % numSections;
 
 	if (m_selectedIndex != index) {
 		// swap enlarged menu item
 		if (0 <= index && index < m_visibleMenuItems) {
-			auto p = m_context->GetChildren()[m_visibleMenuItems - 1 - index];
+			auto p = m_context->GetChildren()[index];
 			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
 			if (pButton != nullptr) {
 				auto q = pButton->GetChildren()[0];
@@ -190,7 +190,7 @@ RESULT UIBar::Update(ray handRay) {
 			}
 		}
 		if (0 <= m_selectedIndex && m_selectedIndex < m_visibleMenuItems) {
-			auto p = m_context->GetChildren()[m_visibleMenuItems - 1 - m_selectedIndex];
+			auto p = m_context->GetChildren()[m_selectedIndex];
 			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
 			if (pButton != nullptr) {
 				auto q = pButton->GetChildren()[0];
