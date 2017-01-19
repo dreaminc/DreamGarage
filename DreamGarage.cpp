@@ -51,7 +51,7 @@ RESULT DreamGarage::LoadScene() {
 	InitializeCloudControllerCallbacks();
 
 	UIBarInfo info;
-	info.maxNumButtons = 4;
+	info.maxNumButtons = 5;
 	info.yPosition = -0.5f;
 	info.menuDepth = -1.5f;
 	info.itemAngleX = 60.0f;
@@ -62,7 +62,7 @@ RESULT DreamGarage::LoadScene() {
 	info.menu[""] = { "lorem", "ipsum", "dolor", "sit" };
 	info.menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
 	info.menu["ipsum"] = { "1", "2", "3" };
-	info.menu["1"] = { "a", "b", "c" };
+	info.menu["Play"] = { "a", "b", "c" };
 
 	m_UIBar = new UIBar(AddComposite(), info);
 	//m_UIBar = new UIBar(AddComposite()); // Use parameter defaults

@@ -10,7 +10,7 @@
 #include <stack>
 
 typedef struct UIBarInfo {
-	size_t maxNumButtons;
+	int maxNumButtons;		
 	float yPosition;
 	float menuDepth;
 	float itemAngleX;
@@ -52,7 +52,7 @@ private:
 	int m_selectedIndex;
 
 	std::vector<std::shared_ptr<composite>> m_buttons;
-	size_t m_visibleMenuItems;
+	int m_visibleMenuItems;
 
 	UIBarInfo m_info;
 	std::stack<std::string> m_menuPath;

@@ -54,16 +54,15 @@ RESULT UIBar::Initialize() {
 
 RESULT UIBar::DisplayFromMenuTitle(std::string title) {
 	RESULT r = R_PASS;
-	if (m_info.menu.count(title) == 0) return r;
 
 	std::vector<std::string> items = m_info.menu[title];
-	m_visibleMenuItems = std::min(m_info.maxNumButtons, items.size());
+	m_visibleMenuItems = std::min(m_info.maxNumButtons, (int)items.size());
 
 	//other ones
-	int shift = (int)m_info.maxNumButtons / 2;
-	float odd = (m_info.maxNumButtons % 2 == 0) ? 0.5f : 0.0f;
+	int shift = m_visibleMenuItems / 2;
+	float odd = (m_visibleMenuItems % 2 == 0) ? 0.5f : 0.0f;
 
-	for (int i = 0; i < m_visibleMenuItems; i++) {
+	for (int i = 0; i < m_info.maxNumButtons; i++) {
 		std::shared_ptr<composite> pButton = m_buttons[i];
 		std::shared_ptr<quad> q = std::dynamic_pointer_cast<quad>(pButton->GetChildren()[0]);
 
@@ -106,6 +105,7 @@ RESULT UIBar::ToggleVisible() {
 		m_context->SetOrientation(q2);
 
 		// When the Menu becomes visible, open the root node
+		m_menuPath.push("");
 		DisplayFromMenuTitle("");
 	}
 
@@ -122,8 +122,18 @@ RESULT UIBar::Notify(SenseControllerEvent *event) {
 	if (cType == 1) {
 		if (type == SENSE_CONTROLLER_MENU_DOWN) {
 			if (m_UIDirty) {
-				ToggleVisible();
 				m_UIDirty = false;
+				if (m_menuPath.empty()) {
+					ToggleVisible();
+					return R_PASS;
+				}
+				m_menuPath.pop();
+				if (m_menuPath.empty()) {
+					ToggleVisible();
+					return R_PASS;
+				}
+				std::string str = m_menuPath.top();
+				DisplayFromMenuTitle(str);
 			}
 		}
 		else if (type == SENSE_CONTROLLER_MENU_UP) {
@@ -131,9 +141,16 @@ RESULT UIBar::Notify(SenseControllerEvent *event) {
 		}
 
 		else if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange == 1.0f) {
-			if (m_UISelect) {
-				ToggleVisible();
-				m_UISelect = false;
+			if (m_UISelect && !m_menuPath.empty()) {
+				std::vector<std::string> currentMenu = m_info.menu[m_menuPath.top()];
+				std::string title = currentMenu[m_selectedIndex];
+				if (m_selectedIndex >= 0 && m_selectedIndex < (int)currentMenu.size() && m_info.menu.count(title) > 0) {
+
+					m_menuPath.push(title);
+					DisplayFromMenuTitle(title);
+					
+					m_UISelect = false;
+				}
 			}
 		}
 		else if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange != 1.0f) {
@@ -154,16 +171,17 @@ RESULT UIBar::Update(ray handRay) {
 	vector vIntersect = vector(intersect);
 	vIntersect.Normalize();
 
-	int shift = (int)m_info.maxNumButtons / 2;
+	int shift = (int)m_visibleMenuItems / 2;
+	float odd = (m_visibleMenuItems % 2 != 0) ? 0.5f : 0.0f;
 	int numSections = m_info.maxNumButtons != 0 ? 360 / int(m_info.itemAngleY) : 1;
 	float deg = float(-atan2(vIntersect.x(), vIntersect.z()) * 180.0f / M_PI);
 	deg -= m_rotationY;
-	int index = (numSections - int((deg) / m_info.itemAngleY) + shift) % numSections;
+	int index = (numSections - int((deg) / m_info.itemAngleY - odd) + shift) % numSections;
 
 	if (m_selectedIndex != index) {
 		// swap enlarged menu item
-		if (0 <= index && index < m_info.maxNumButtons) {
-			auto p = m_context->GetChildren()[m_info.maxNumButtons - 1 - index];
+		if (0 <= index && index < m_visibleMenuItems) {
+			auto p = m_context->GetChildren()[m_visibleMenuItems - 1 - index];
 			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
 			if (pButton != nullptr) {
 				auto q = pButton->GetChildren()[0];
@@ -171,8 +189,8 @@ RESULT UIBar::Update(ray handRay) {
 				q->ScaleZ(m_info.itemScale.z() * m_info.enlargedScale);
 			}
 		}
-		if (0 <= m_selectedIndex && m_selectedIndex < m_info.maxNumButtons) {
-			auto p = m_context->GetChildren()[m_info.maxNumButtons - 1 - m_selectedIndex];
+		if (0 <= m_selectedIndex && m_selectedIndex < m_visibleMenuItems) {
+			auto p = m_context->GetChildren()[m_visibleMenuItems - 1 - m_selectedIndex];
 			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
 			if (pButton != nullptr) {
 				auto q = pButton->GetChildren()[0];
@@ -182,6 +200,7 @@ RESULT UIBar::Update(ray handRay) {
 		}
 		m_selectedIndex = index;
 	}
+	OVERLAY_DEBUG_SET("selected", m_selectedIndex);
 	return R_PASS;
 }
 
