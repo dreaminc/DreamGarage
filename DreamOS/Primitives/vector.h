@@ -47,6 +47,8 @@ public:
 
 	vector_precision dot(const vector& rhs) const;
 	vector_precision dot(const point& rhs) const;
+	bool IsParallel(const vector &rhs);
+	bool IsValid();
 
 	vector cross(vector rhs);
 	vector NormalizedCross(vector rhs);

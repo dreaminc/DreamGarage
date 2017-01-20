@@ -133,8 +133,9 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			// That can be resolved with appropriate implementation of SAT to determine
 			// the correct plane of overlap
 
-			// The EPSILON hack below helps a bit - as it will disqualify a distance
-			// too low to be reasonable within the current constraints
+			// The EPSILON hack was removed as it was creating arbitrary jumps
+			// there should be a separate test done for situations where the penetration is
+			// exactly zero 
 
 			BoundingBox::BoxFace boxFace;
 			double distanceX = pBoxA->m_vHalfSize.x() - std::abs(ptBox.x());
@@ -143,7 +144,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 			double minDistance = std::numeric_limits<double>::max();
 
-			if ((distanceX < minDistance) && distanceX > DREAM_EPSILON) {
+			if ((distanceX < minDistance)) {
 				minDistance = distanceX;
 
 				if (ptBox.x() > 0.0f)
@@ -151,7 +152,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				else
 					boxFace = BoundingBox::BoxFace::LEFT;
 			}
-			if ((distanceY < minDistance) && distanceY > DREAM_EPSILON) {
+			if ((distanceY < minDistance)) {
 				minDistance = distanceY;
 
 				if (ptBox.y() > 0.0f)
@@ -159,7 +160,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				else
 					boxFace = BoundingBox::BoxFace::BOTTOM;
 			}
-			if ((distanceZ < minDistance) && distanceZ > DREAM_EPSILON) {
+			if ((distanceZ < minDistance)) {
 				minDistance = distanceZ;
 
 				if (ptBox.z() > 0.0f)

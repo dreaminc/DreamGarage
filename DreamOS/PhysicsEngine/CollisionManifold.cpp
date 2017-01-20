@@ -91,6 +91,10 @@ vector CollisionManifold::GetNormal() const {
 
 	vNormal.Normalize();
 
+	if (!vNormal.IsValid()) {
+		int a = 5; 
+	}
+
 	return vNormal;
 }
 

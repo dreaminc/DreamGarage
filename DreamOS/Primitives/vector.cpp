@@ -100,6 +100,25 @@ vector_precision vector::dot(const point& rhs) const {
 	return result;
 }
 
+// If vectors are parallel then x1 = k * x2, y1 = k * y2, z1 = k * z2
+// and so x1/x2 == y1/y2 == z1/z2
+bool vector::IsParallel(const vector &rhs) {
+	vector vNormalA = Normal();
+	vector vNormalB = static_cast<vector>(rhs).Normal();
+	if (vNormalA == vNormalB || vNormalA == (vNormalB * -1.0f)) {
+		return true;
+	}
+
+	return false;
+}
+
+bool vector::IsValid() {
+	if (std::isnan(x()) || std::isnan(y()) || std::isnan(z()) || std::isnan(w()))
+		return false;
+
+	return true;
+}
+
 // Cross Product
 vector vector::cross(vector rhs) {
 	return vector(*this, rhs);

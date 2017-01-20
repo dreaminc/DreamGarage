@@ -120,47 +120,61 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		double kgInverseMassB = 1.0f / kgMassB;
 
 		double totalMass = kgMassA + kgMassB;
+		vector vNormal = manifold.GetNormal();
+		point ptContact = manifold.GetContactPoint();
+		
+		// Resolve Penetration
+		ptContact += vNormal * manifold.MaxPenetrationDepth();
 
-		/*else {
-			const double fudgeFactor = 0.01f;		// Penetration percentage to correct
-			vector vCorrection = manifold.GetNormal() * fudgeFactor;
-			//vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth();//  *percentCorrection;
+		//if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
+			const double percentCorrection = 1.0f;		// Penetration percentage to correct
+			vector vCorrection = vNormal * manifold.MaxPenetrationDepth() * (percentCorrection);
+			
+			pObjA->translate(vCorrection * -(1.0f) * kgInverseMassA);
+			pObjB->translate(vCorrection * (1.0f) * kgInverseMassB);
 
-			//pDimObjA->translate(vCorrection * -kgMassA);
-			//pDimObjB->translate(vCorrection * kgMassB);
-			pObjA->AddPendingTranslation(vCorrection);
-			pObjB->AddPendingTranslation(vCorrection);
-		}*/
+			//pObjA->translate(vCorrection * -(1.0f));
+			//pObjB->translate(vCorrection * (1.0f));
+
+			// TODO: Add rotation to penetration resolution
+
+
+
+			//pObjA->AddPendingTranslation(vCorrection * -kgMassA);
+			//pObjB->AddPendingTranslation(vCorrection * kgMassB);
+
+			//pObjA->AddPendingTranslation(vCorrection * -1.0f);
+			//pObjB->AddPendingTranslation(vCorrection * 1.0f);
+		//}
 
 		// Resolve the impulses
-		vector vAngularVelocityOfPointA = pObjA->GetVelocityOfPoint(manifold.GetContactPoint());
-		vector vAngularVelocityOfPointB = pObjB->GetVelocityOfPoint(manifold.GetContactPoint());
+		vector vAngularVelocityOfPointA = pObjA->GetVelocityOfPoint(ptContact);
+		vector vAngularVelocityOfPointB = pObjB->GetVelocityOfPoint(ptContact);
 
 		vAngularVelocityOfPointA.w() = 0.0f;
 		vAngularVelocityOfPointB.w() = 0.0f;
 
-		vector vVelocityBeforeA = pObjA->GetVelocity();
-		vector vVelocityBeforeB = pObjB->GetVelocity();
+		//vector vVelocityBeforeA = pObjA->GetVelocity();
+		//vector vVelocityBeforeB = pObjB->GetVelocity();
 
-		//vector vVelocityBeforeA = vAngularVelocityOfPointA;
-		//vector vVelocityBeforeB = vAngularVelocityOfPointB;
+		vector vVelocityBeforeA = vAngularVelocityOfPointA;
+		vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
-		double restitutionConstant = 0.9f;	// TODO: put into object states, then use min
+		double restitutionConstant = 0.7f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
-		point ptRefA = pObjA->GetPointRefCenterOfMass(manifold.GetContactPoint());
-		point ptRefB = pObjB->GetPointRefCenterOfMass(manifold.GetContactPoint());
-		point ptContact = manifold.GetContactPoint();
+		point ptRefA = pObjA->GetPointRefCenterOfMass(ptContact);
+		point ptRefB = pObjB->GetPointRefCenterOfMass(ptContact);
+		
 		vector vRefA = (ptContact - pObjA->GetOrigin());
 		vector vRefB = (ptContact - pObjB->GetOrigin());
-		vector vNormal = manifold.GetNormal();
 
 		// http://www.euclideanspace.com/physics/dynamics/collision/threed/ - For impulse equation below
-		double j = -(1.0f + restitutionConstant);
+		double jImpulse = -(1.0f + restitutionConstant);
 
 		vector vRefCrossNormalA = vector(vRefA.cross(vNormal));
 		vector vRefCrossNormalB = vector(vRefB.cross(vNormal));
 
-		j *= (vRelativeVelocity.dot(vNormal)) + vRefCrossNormalA.dot(pObjA->GetAngularVelocity()) - vRefCrossNormalB.dot(pObjB->GetAngularVelocity());
+		jImpulse *= (vRelativeVelocity.dot(vNormal));// +vRefCrossNormalA.dot(pObjA->GetAngularVelocity()) - vRefCrossNormalB.dot(pObjB->GetAngularVelocity());
 		//j *= (vRelativeVelocity.dot(vNormal)) + vRefCrossNormalA.dot(vAngularVelocityOfPointA) - vRefCrossNormalB.dot(vAngularVelocityOfPointB);
 		
 		double denom = (kgInverseMassA + kgInverseMassB);
@@ -170,9 +184,9 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		denom += angularInertiaA;
 		denom += angularInertiaB;
 
-		j /= denom;
+		jImpulse /= denom;
 
-		vector vImpulse = vNormal * (j);
+		vector vImpulse = vNormal * (jImpulse);
 
 		vector vImpulseA = vImpulse * kgInverseMassA;
 		vector vImpulseB = vImpulse * -kgInverseMassB;
@@ -191,25 +205,6 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 
 		//vector vTorqueA = vRefA.cross(manifold.GetNormal()) * (-1.0f);// *(j)* kgInverseMassA;
 		//vector vTorqueB = vRefB.cross(manifold.GetNormal()) * (1.0f);// *(-j) * kgInverseMassB;
-
-
-		if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
-			const double percentCorrection = 1.0f - 0.30f;		// Penetration percentage to correct
-			vector vCorrection = vNormal * manifold.MaxPenetrationDepth() * (percentCorrection);
-			//vector vCorrection = manifold.GetNormal() * manifold.MaxPenetrationDepth();//  *percentCorrection;
-
-			//pObjA->translate(vCorrection * -(1.0f) * kgInverseMassA);
-			//pObjB->translate(vCorrection * (1.0f) * kgInverseMassB);
-
-			pObjA->translate(vCorrection * -(1.0f));
-			pObjB->translate(vCorrection * (1.0f));
-
-			//pObjA->AddPendingTranslation(vCorrection * -kgMassA);
-			//pObjB->AddPendingTranslation(vCorrection * kgMassB);
-
-			//pObjA->AddPendingTranslation(vCorrection * -1.0f);
-			//pObjB->AddPendingTranslation(vCorrection * 1.0f);
-		}
 
 		/*
 		vector vImpulseA = manifold.GetNormal() * (-kgMassA / (kgInverseMassA + kgInverseMassB));
@@ -231,6 +226,28 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 
 		pObjA->ApplyTorqueImpulse(vTorqueA);
 		pObjB->ApplyTorqueImpulse(vTorqueB);
+
+		// Friction
+		double uConstant = 0.4f;
+		vector vTangent = vNormal.cross((vNormal.cross(vRelativeVelocity))).Normal();
+		double jFrictionImpulse = vRelativeVelocity.dot(vTangent) * -1.0f;
+		jFrictionImpulse /= denom;
+
+		if (vTangent.IsValid() && jFrictionImpulse != 0.0f) {
+			vector vFrictionImpulse = vTangent * jFrictionImpulse * uConstant;
+
+			vector vFrictionImpulseA = vFrictionImpulse * (1.0f);				// *kgInverseMassA;
+			vector vFrictionImpulseB = vFrictionImpulse * (-1.0f);				// *-kgInverseMassB;
+			vector vFrictionTorqueA = vFrictionImpulse.cross(vRefA) * (-1.0f);	// *angularInertiaA;
+			vector vFrictionTorqueB = vFrictionImpulse.cross(vRefB) * (1.0f);	// *angularInertiaB;
+
+			pObjA->Impulse(vFrictionImpulseA);
+			pObjB->Impulse(vFrictionImpulseB);
+
+			pObjA->ApplyTorqueImpulse(vFrictionTorqueA);
+			pObjB->ApplyTorqueImpulse(vFrictionTorqueB);
+		}
+		
 	
 
 //Error:
