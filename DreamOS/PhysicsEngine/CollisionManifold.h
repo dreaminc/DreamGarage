@@ -18,11 +18,12 @@ class CollisionManifold {
 public:
 	//CollisionManifold();
 	CollisionManifold(VirtualObj *pObjA, VirtualObj *pObjB);
-	RESULT AddContactPoint(point ptContact, vector vNormal, double penetrationDepth);
+	RESULT AddContactPoint(point ptContact, vector vNormal, double penetrationDepth, int weight);
 	RESULT Clear();
 
 	int NumContacts() const;
 	double MaxPenetrationDepth() const;
+	double MinPenetrationDepth() const;
 	vector GetNormal() const;
 	point GetContactPoint() const;
 
@@ -33,6 +34,7 @@ private:
 	ContactPoint m_contactPoints[MAX_CONTACT_POINTS];	// Use a static array for cache coherency 
 	int m_numContacts = 0;
 	double m_maxPenetrationDepth = 0.0f;
+	double m_minPenetrationDepth = std::numeric_limits<double>::infinity();
 
 	VirtualObj *m_pObjA = nullptr;
 	VirtualObj *m_pObjB = nullptr;

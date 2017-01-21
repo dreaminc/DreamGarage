@@ -20,15 +20,18 @@
 class ContactPoint {
 public:
 	ContactPoint();
-	ContactPoint(point ptContact, vector vNormal, double penetrationDepth);
+	ContactPoint(point ptContact, vector vNormal, double penetrationDepth, int weight);
 
 	vector GetNormal() const;
 	point GetPoint() const;
+	int GetWeight() const;
+	double GetPenetration() const;
 
 private:
 	point m_ptContact;
 	vector m_vNormal;
 	double m_penetrationDepth;
+	int m_weight = 1;
 
 };
 

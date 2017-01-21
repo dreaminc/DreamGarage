@@ -144,7 +144,7 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 			point ptContact = ptClosestPoint;
 			float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - std::sqrt(distanceSquared);
 
-			manifold.AddContactPoint(ptContact, vNormal, -penetration);
+			manifold.AddContactPoint(ptContact, vNormal, -penetration, 1);
 		}
 		/*else if (distanceSquared <= sphereRadiusSquared) {
 			// Otherwise it's a point edge collision

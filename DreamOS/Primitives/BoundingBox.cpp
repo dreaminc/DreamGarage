@@ -184,11 +184,12 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				penetration *= -1.0f;
 			}
 
-			manifold.AddContactPoint(ptContact, vNormal, penetration);
+			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 		}
 	}
 
-	if (manifold.NumContacts() > 0) {
+	// Skip the rest if we found four points already
+	if (manifold.NumContacts() == 4) {
 		return manifold;
 	}
 
@@ -216,20 +217,28 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			bool fMiss = false;
 
 			for (int i = 0; i < 3; i++) {
-				double t1 = (ptMin(i) - lineBoxEdge.a()(i)) / vRay(i);
-				double t2 = (ptMax(i) - lineBoxEdge.a()(i)) / vRay(i);
 
-				double tMin = std::min(t1, t2);
-				double tMax = std::max(t1, t2);
+				if (std::abs(vRay(i)) < DREAM_EPSILON) {
+					if (ptMin(i) - lineBoxEdge.a()(i) > 0 || ptMax(i) - lineBoxEdge.a()(i) < 0) {
+						fMiss = true;
+					}
+				}
+				else {
+					double t1 = (ptMin(i) - lineBoxEdge.a()(i)) / vRay(i);
+					double t2 = (ptMax(i) - lineBoxEdge.a()(i)) / vRay(i);
 
-				if (tMin > tNear)
-					tNear = tMin;
+					double tMin = std::min(t1, t2);
+					double tMax = std::max(t1, t2);
 
-				if (tMax < tFar)
-					tFar = tMax;
+					if (tMin > tNear)
+						tNear = tMin;
 
-				if (tNear > tFar || tFar < 0)
-					fMiss = true;
+					if (tMax < tFar)
+						tFar = tMax;
+
+					if (tNear > tFar || tFar < 0)
+						fMiss = true;
+				}
 			}
 
 			if (fMiss)
@@ -241,20 +250,32 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				point ptEdgeMin = lineBoxEdge.a() + (vRay * tNear);
 				point ptEdgeMax = lineBoxEdge.a() + (vRay * tFar);
 				point ptEdgeMid = point::midpoint(ptEdgeMin, ptEdgeMax);
+				int weight = 1;
+
+				// Test for situations where the magnitude of min-max is equivalent 
+				// to a dimension of one of the boxes
+				for (int i = 0; i < 3; i++) {
+					auto axisMagnitude = (ptEdgeMax(i) - ptEdgeMin(i));
+					if (axisMagnitude - (pBoxA->m_vHalfSize(i) * 2.0f) >= -DREAM_EPSILON) {
+						weight = 2;
+					}
+					else if (axisMagnitude - (pBoxB->m_vHalfSize(i) * 2.0f) >= -DREAM_EPSILON) {
+						weight = 2;
+					}
+				}
 
 				double minDistance1 = std::numeric_limits<double>::max();
 				double minDistance2 = std::numeric_limits<double>::max();
 
-				double distanceX = m_vHalfSize.x() - std::abs(ptEdgeMid.x());
-				double distanceY = m_vHalfSize.y() - std::abs(ptEdgeMid.y());;
-				double distanceZ = m_vHalfSize.z() - std::abs(ptEdgeMid.z());;
+				double distanceX = pBoxA->m_vHalfSize.x() - std::abs(ptEdgeMid.x());
+				double distanceY = pBoxA->m_vHalfSize.y() - std::abs(ptEdgeMid.y());;
+				double distanceZ = pBoxA->m_vHalfSize.z() - std::abs(ptEdgeMid.z());;
 				double penetration = 0.0f;
 
 				point ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMid) + pBoxA->GetOrigin();
 
-				vector vNormal = vector(ptEdgeMid);
-				vNormal = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
-				vNormal.Normalize();
+				vector vNormal = vector(ptEdgeMax);
+				BoundingBox::BoxFace boxFace;
 
 				// Project minimum plane penetration along collision normal
 				if (distanceX < minDistance1) {
@@ -262,6 +283,11 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					minDistance1 = distanceX;
 
 					penetration = (distanceX * vNormal.magnitude()) / vNormal.x();
+					
+					if (ptEdgeMid.x() > 0.0f)
+						boxFace = BoundingBox::BoxFace::RIGHT;
+					else
+						boxFace = BoundingBox::BoxFace::LEFT;
 				}
 				else if (distanceX < minDistance2) {
 					minDistance2 = distanceX;
@@ -272,6 +298,11 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					minDistance1 = distanceY;
 
 					penetration = (distanceY * vNormal.magnitude()) / vNormal.y();
+
+					if (ptEdgeMid.y() > 0.0f)
+						boxFace = BoundingBox::BoxFace::TOP;
+					else
+						boxFace = BoundingBox::BoxFace::BOTTOM;
 				}
 				else if (distanceY < minDistance2) {
 					minDistance2 = distanceY;
@@ -282,28 +313,58 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					minDistance1 = distanceZ;
 
 					penetration = (distanceZ * vNormal.magnitude()) / vNormal.z();
+
+					if (ptEdgeMid.z() > 0.0f)
+						boxFace = BoundingBox::BoxFace::FRONT;
+					else
+						boxFace = BoundingBox::BoxFace::BACK;
 				}
 				else if (distanceZ < minDistance2) {
 					minDistance2 = distanceZ;
 				}
 
 				point ptContact = ptClosestPoint;
+				
+				point ptBoxBOriginRefA = inverse(RotationMatrix(pBoxA->GetOrientation())) * (pBoxB->GetOrigin() - pBoxA->GetOrigin());
+				
+				/*
+				vNormal = ptEdgeMid - ptBoxBOriginRefA;
+				vNormal = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
+				vNormal = vNormal * -1.0f;
+				vNormal.Normalize();
+				*/
+
+				vNormal = pBoxA->GetBoxFaceNormal(boxFace);
+				//vNormal = vNormal * -1.0f;
+				vNormal.Normalize();
 
 				// TODO: this is wrong
 				//float penetration = std::sqrt((minDistance1 * minDistance1) + (minDistance2 * minDistance2));
-				//float penetration = minDistance1;
+				penetration = minDistance1;
 
 				if (j == 1) {
 					vNormal = vNormal * -1.0f;
 					penetration *= -1.0f;
 				}
 
-				manifold.AddContactPoint(ptContact, vNormal, penetration);
+				//manifold.Clear();
+				if (weight == 2) {
+					point ptContactPointA = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMin) + pBoxA->GetOrigin();
+					point ptContactPointB = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMax) + pBoxA->GetOrigin();
+
+					manifold.AddContactPoint(ptContactPointA, vNormal, penetration, 1);
+					manifold.AddContactPoint(ptContactPointB, vNormal, penetration, 1);
+				}
+				else {
+					manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+				}
 			}
 		}
 
-		//if (manifold.NumContacts() > 0)
-		//	return manifold;
+		if (manifold.NumContacts() > 0) {
+			//return manifold;
+			//break;
+		}
 	}
 	
 	return manifold;
@@ -394,7 +455,7 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 		point ptContact = ptClosestPoint;
 		float penetration = static_cast<BoundingSphere>(rhs).GetRadius() - std::sqrt(distanceSquared);
 
-		manifold.AddContactPoint(ptContact, vNormal, -penetration);
+		manifold.AddContactPoint(ptContact, vNormal, -penetration, 1);
 	}
 
 	return manifold;

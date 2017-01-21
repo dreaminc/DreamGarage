@@ -95,7 +95,7 @@ CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
 		point ptContact = const_cast<BoundingSphere&>(rhs).GetOrigin() + (vMidLine * 0.5f);
 		double penetration = (rhs.m_radius + m_radius) - abs(distance);
 
-		manifold.AddContactPoint(ptContact, vNormal, penetration);
+		manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 
 		// TODO: Friction / Restitution?
 	}
