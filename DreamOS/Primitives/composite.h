@@ -16,6 +16,7 @@ class HALImp;
 
 #include "Primitives/sphere.h"
 #include "Primitives/volume.h"
+#include "Primitives/DimRay.h"
 #include "quad.h"
 
 class hand;
@@ -51,6 +52,9 @@ public:
 
 	std::shared_ptr<quad> MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
 	std::shared_ptr<quad> AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
+
+	std::shared_ptr<DimRay> MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
+	std::shared_ptr<DimRay> AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
 	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 

@@ -29,6 +29,7 @@
 #include "Primitives/skybox.h"
 #include "Primitives/model.h"
 #include "Primitives/user.h"
+#include "Primitives/DimRay.h"
 
 class SandboxApp;
 
@@ -71,6 +72,7 @@ public:
 
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) = 0;
+	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) = 0;
 	
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) = 0;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;

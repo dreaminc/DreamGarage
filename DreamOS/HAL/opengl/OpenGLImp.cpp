@@ -25,6 +25,7 @@
 #include "OGLSkybox.h"
 #include "OGLUser.h"
 #include "OGLHand.h"
+#include "OGLRay.h"
 
 #include "DreamConsole/DreamConsole.h"
 #include "OGLDreamConsole.h"
@@ -654,6 +655,23 @@ Error:
 		delete pCylinder;
 		pCylinder = nullptr;
 	}
+	return nullptr;
+}
+
+DimRay* OpenGLImp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	RESULT r = R_PASS;
+
+	DimRay *pRay = new OGLRay(this, ptOrigin, vDirection, step, fDirectional);
+	CN(pRay);
+
+	//Success:
+	return pRay;
+
+Error:
+	if (pRay != nullptr) {
+			delete pRay;
+			pRay = nullptr;
+		}
 	return nullptr;
 }
 
