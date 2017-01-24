@@ -27,6 +27,7 @@
 #include "Primitives/FlatContext.h"
 #include "Primitives/sphere.h"
 #include "Primitives/cylinder.h"
+#include "Primitives/DimRay.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/texture.h"
@@ -68,8 +69,10 @@ protected:
 
 	volume* AddVolume(double side, bool fTriangleBased = true);
 	volume *AddVolume(double width, double length, double height, bool fTriangleBased = true);
-	
+
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions = 3, int numVerticalDivisions = 3);
+
+	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	

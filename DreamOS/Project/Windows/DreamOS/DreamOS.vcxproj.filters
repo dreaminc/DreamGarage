@@ -518,6 +518,12 @@
     <ClCompile Include="..\..\..\Sense\SenseController.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2209,6 +2215,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseController.h">
       <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimRay.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -171,6 +171,10 @@ cylinder* DreamOS::AddCylinder(double radius, double height, int numAngularDivis
 	return m_pSandbox->AddCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
 }
 
+DimRay* DreamOS::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	return m_pSandbox->AddRay(ptOrigin, vDirection, step, fDirectional);
+}
+
 volume* DreamOS::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	return m_pSandbox->MakeVolume(width, length, height, fTriangleBased);
 }

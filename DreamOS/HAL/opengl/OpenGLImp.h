@@ -88,6 +88,7 @@ public:
 	virtual sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) override;
 
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) override;
+	virtual DimRay* MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) override;
 	
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;

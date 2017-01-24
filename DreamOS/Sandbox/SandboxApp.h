@@ -37,6 +37,7 @@ class quad;
 class FlatContext;
 class sphere; 
 class cylinder;
+class DimRay;
 class volume; 
 class texture; 
 class skybox;
@@ -126,6 +127,7 @@ public:
 	volume* MakeVolume(double side, bool fTriangleBased = true);
 	volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true);
 	cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
+	DimRay* MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
 
@@ -139,6 +141,8 @@ public:
 	volume* AddVolume(double width, double length, double height, bool fTriangleBased = true);
 
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
+
+	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
 	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
 

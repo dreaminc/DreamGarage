@@ -571,6 +571,30 @@ Error:
 	return nullptr;
 }
 
+DimRay* SandboxApp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	return m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional); 
+}
+
+DimRay* SandboxApp::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	RESULT r = R_PASS;
+	DimRay* pRay = m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional); 
+	CN(pRay);
+
+	CR(AddObject(pRay));
+
+	//Success:
+	return pRay;
+
+Error:
+	if (pRay != nullptr) {
+		delete pRay;
+		pRay = nullptr;
+	}
+	return nullptr;
+}
+
+
+
 sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
