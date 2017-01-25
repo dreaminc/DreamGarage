@@ -239,15 +239,37 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
 		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
 
+		// Test all edges
+		double minDistanceTemp = std::numeric_limits<double>::infinity();
+		vector vNormalTemp;
+
+		for (int i = 0; i < 12; i++) {
+			BoundingBox::BoxEdge boxEdgeB = (BoundingBox::BoxEdge)(i);
+			line lineBoxEdgeB = pBoxB->GetBoxEdge(boxEdgeB);
+
+			for (int k = 0; k < 12; k++) {
+				BoundingBox::BoxEdge boxEdgeA = (BoundingBox::BoxEdge)(k);
+				line lineBoxEdgeA = pBoxA->GetBoxEdge(boxEdgeA);
+
+				double lineDistance = lineBoxEdgeA.Distance(lineBoxEdgeB);
+				if (std::abs(lineDistance) < std::abs(minDistanceTemp)) {
+					minDistanceTemp = lineDistance;
+					vNormalTemp = lineBoxEdgeA.GetVector().cross(lineBoxEdgeB.GetVector());
+					vNormalTemp = vNormalTemp * -1.0f;
+					vNormalTemp.Normalize();
+				}
+			}
+		}
+
 		// Edge - Edge Detection
 		for (int i = 0; i < 12; i++) {
 			//BoundingBox::BoxEdge boxEdge = BoundingBox::BoxEdge::LEFT_NEAR;
 			BoundingBox::BoxEdge boxEdgeB = (BoundingBox::BoxEdge)(i);
-			line lineBoxEdge = pBoxB->GetBoxEdge(boxEdgeB);
+			line lineBoxEdgeB = pBoxB->GetBoxEdge(boxEdgeB);			
 
-			lineBoxEdge.Translate(pBoxA->GetOrigin() * -1.0f);
-			lineBoxEdge.ApplyMatrix(inverse(RotationMatrix(pBoxA->GetOrientation())));
-			vector vRay = lineBoxEdge.GetVector();
+			lineBoxEdgeB.Translate(pBoxA->GetOrigin() * -1.0f);
+			lineBoxEdgeB.ApplyMatrix(inverse(RotationMatrix(pBoxA->GetOrientation())));
+			vector vRay = lineBoxEdgeB.GetVector();
 
 			// We can now test intersection as if it's an AABB
 			point ptMax = pBoxA->m_vHalfSize;
@@ -260,13 +282,13 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			for (int i = 0; i < 3; i++) {
 
 				if (std::abs(vRay(i)) < DREAM_EPSILON) {
-					if (ptMin(i) - lineBoxEdge.a()(i) > 0 || ptMax(i) - lineBoxEdge.a()(i) < 0) {
+					if (ptMin(i) - lineBoxEdgeB.a()(i) > 0 || ptMax(i) - lineBoxEdgeB.a()(i) < 0) {
 						fMiss = true;
 					}
 				}
 				else {
-					double t1 = (ptMin(i) - lineBoxEdge.a()(i)) / vRay(i);
-					double t2 = (ptMax(i) - lineBoxEdge.a()(i)) / vRay(i);
+					double t1 = (ptMin(i) - lineBoxEdgeB.a()(i)) / vRay(i);
+					double t2 = (ptMax(i) - lineBoxEdgeB.a()(i)) / vRay(i);
 
 					double tMin = std::min(t1, t2);
 					double tMax = std::max(t1, t2);
@@ -288,8 +310,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			// NOTE: This is only designed to find an edge edge collision which means that 
 			// there should be an entry-exit point
 			if ((tNear >= 0 && tNear <= 1) && (tFar >= 0 && tFar <= 1)) {
-				point ptEdgeMin = lineBoxEdge.a() + (vRay * tNear);
-				point ptEdgeMax = lineBoxEdge.a() + (vRay * tFar);
+				point ptEdgeMin = lineBoxEdgeB.a() + (vRay * tNear);
+				point ptEdgeMax = lineBoxEdgeB.a() + (vRay * tFar);
 				point ptEdgeMid = point::midpoint(ptEdgeMin, ptEdgeMax);
 
 				int weight = 1;
@@ -369,7 +391,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					//vNormal.Print("Normal");
 					//penetration = std::min(minAxisDistance, std::min(distanceXabs, std::min(distanceYabs, distanceZabs)));
 					//penetration = std::min(distanceXabs, std::min(distanceYabs, distanceZabs));
-					break;
+					//break;
 				}
 
 				//DEBUG_LINEOUT("%f %f %f", distanceXabs, distanceYabs, distanceZabs);
@@ -459,6 +481,9 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					vNormalOriented = vNormalOriented * -1.0f;
 					penetration *= -1.0f;
 				}
+
+				// Test
+				vNormalOriented = vNormalTemp;
 
 				//manifold.Clear();
 				if (weight == 2) {

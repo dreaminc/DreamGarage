@@ -452,6 +452,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
+    <ClCompile Include="..\..\..\Primitives\line.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />
