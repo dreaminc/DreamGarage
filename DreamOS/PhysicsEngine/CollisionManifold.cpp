@@ -23,6 +23,8 @@ RESULT CollisionManifold::AddContactPoint(point ptContact, vector vNormal, doubl
 
 	CB((m_numContacts < MAX_CONTACT_POINTS));
 
+	//CBA((vNormal.IsValid()), "Normal is not valid");
+
 	// Ensure this contact is not near anything
 	for (int i = 0; i < m_numContacts; i++) {
 		if ((ptContact - m_contactPoints[i].GetPoint()).magnitude() < DREAM_EPSILON ) {

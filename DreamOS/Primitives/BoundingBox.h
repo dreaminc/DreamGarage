@@ -102,6 +102,7 @@ public:
 	double TransformToAxis(const vector &vAxis);
 	vector GetAxis(BoxAxis boxAxis);
 	bool OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis);
+	double OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis);
 
 	double GetWidth();
 	double GetHeight();

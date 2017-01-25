@@ -127,6 +127,13 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		// Resolve Penetration
 		ptContact += vNormal * penetration;
 
+		if (!vNormal.IsValid()) {
+			int a = 5;
+		}
+
+		vNormal.Print("normal");
+		DEBUG_LINEOUT("%f", penetration);
+
 		//if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
 			const double percentCorrection = 1.05f;		// Penetration percentage to correct
 			vector vCorrection = vNormal * penetration * (percentCorrection);
@@ -138,8 +145,6 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 			//pObjB->translate(vCorrection * (1.0f));
 
 			// TODO: Add rotation to penetration resolution
-
-
 
 			//pObjA->AddPendingTranslation(vCorrection * -kgMassA);
 			//pObjB->AddPendingTranslation(vCorrection * kgMassB);
@@ -161,7 +166,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vVelocityBeforeA = vAngularVelocityOfPointA;
 		vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
-		double restitutionConstant = 0.9f;	// TODO: put into object states, then use min
+		double restitutionConstant = 0.5f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
 		point ptRefA = pObjA->GetPointRefCenterOfMass(ptContact);
 		point ptRefB = pObjB->GetPointRefCenterOfMass(ptContact);
@@ -248,8 +253,6 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 			pObjA->ApplyTorqueImpulse(vFrictionTorqueA);
 			pObjB->ApplyTorqueImpulse(vFrictionTorqueB);
 		}
-		
-	
 
 //Error:
 	return r;

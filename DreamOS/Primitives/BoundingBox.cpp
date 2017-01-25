@@ -98,6 +98,41 @@ bool BoundingBox::Intersect(const BoundingBox& rhs) {
 CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
+	// SAT to get contact normal 
+	double temp;
+	double minAxisDistance = std::numeric_limits<double>::infinity();
+	vector vAxis, vAxisTemp;
+	for (int i = 0; i < 3; i++) {
+		// Self Box Axes
+		if (temp = OverlapOnAxisDistance(rhs, vAxisTemp = GetAxis(BoundingBox::BoxAxis(i)))) {
+			if (temp < minAxisDistance) {
+				minAxisDistance = temp;
+				vAxis = vAxisTemp;
+			}
+			//break;
+		}
+
+		// The other box Axes (todo: test if it's an OBB)
+		if (temp = OverlapOnAxisDistance(rhs, vAxisTemp = static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(i)))) {
+			if (temp < minAxisDistance) {
+				minAxisDistance = temp;
+				vAxis = vAxisTemp;
+			}
+			//break;
+		}
+
+		// Go through the cross product of each of the axes
+		for (int j = 0; j < 3; j++) {
+			if (temp = OverlapOnAxisDistance(rhs, vAxisTemp = GetAxis(BoundingBox::BoxAxis(i)).cross(static_cast<BoundingBox>(rhs).GetAxis(BoundingBox::BoxAxis(j))))) {
+				if (temp < minAxisDistance) {
+					minAxisDistance = temp;
+					vAxis = vAxisTemp;
+				}
+				break;
+			}
+		}
+	}
+
 	// Point vs Face
 	// Do for both objects
 	// TODO: Assumes OBB - can be optimized for AABB and OBB-AABB certainly
@@ -184,6 +219,10 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				penetration *= -1.0f;
 			}
 
+			if (vNormal.IsValid() == false) {
+				int a = 5;
+			}
+
 			manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
 		}
 	}
@@ -193,16 +232,18 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 		return manifold;
 	}
 
-	for (int j = 0; j < 2; j++) {
+	//for (int j = 0; j < 2; j++) {
 		// Do this early to improve perf
+		int j = 0;
+
 		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
 		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
 
 		// Edge - Edge Detection
 		for (int i = 0; i < 12; i++) {
 			//BoundingBox::BoxEdge boxEdge = BoundingBox::BoxEdge::LEFT_NEAR;
-			BoundingBox::BoxEdge boxEdge = (BoundingBox::BoxEdge)(i);
-			line lineBoxEdge = pBoxB->GetBoxEdge(boxEdge);
+			BoundingBox::BoxEdge boxEdgeB = (BoundingBox::BoxEdge)(i);
+			line lineBoxEdge = pBoxB->GetBoxEdge(boxEdgeB);
 
 			lineBoxEdge.Translate(pBoxA->GetOrigin() * -1.0f);
 			lineBoxEdge.ApplyMatrix(inverse(RotationMatrix(pBoxA->GetOrientation())));
@@ -250,12 +291,14 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				point ptEdgeMin = lineBoxEdge.a() + (vRay * tNear);
 				point ptEdgeMax = lineBoxEdge.a() + (vRay * tFar);
 				point ptEdgeMid = point::midpoint(ptEdgeMin, ptEdgeMax);
+
 				int weight = 1;
 
 				// Test for situations where the magnitude of min-max is equivalent 
 				// to a dimension of one of the boxes
 				for (int i = 0; i < 3; i++) {
 					auto axisMagnitude = (ptEdgeMax(i) - ptEdgeMin(i));
+
 					if (axisMagnitude - (pBoxA->m_vHalfSize(i) * 2.0f) >= -DREAM_EPSILON) {
 						weight = 2;
 					}
@@ -268,13 +311,74 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				double minDistance2 = std::numeric_limits<double>::max();
 
 				double distanceX = pBoxA->m_vHalfSize.x() - std::abs(ptEdgeMid.x());
+				double distanceXabs = std::abs(distanceX);
+
 				double distanceY = pBoxA->m_vHalfSize.y() - std::abs(ptEdgeMid.y());;
+				double distanceYabs = std::abs(distanceY);
+
 				double distanceZ = pBoxA->m_vHalfSize.z() - std::abs(ptEdgeMid.z());;
+				double distanceZabs = std::abs(distanceZ);
+
 				double penetration = 0.0f;
 
-				point ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMid) + pBoxA->GetOrigin();
+				// Figure out BoxEdge A
+				
+				vector vNormal;
 
-				vector vNormal = vector(ptEdgeMax);
+				if (distanceXabs > distanceYabs && distanceXabs > distanceZabs && (vRay.z() != 0.0f || vRay.y() != 0.0f)) {
+					// We're in the YZ plane
+					vNormal = vector(0.0f, -vRay.z(), vRay.y());
+					vNormal.Normalize();
+
+					// Calculate penetration
+					if (distanceYabs < distanceZabs) 
+						penetration = (vNormal.y() > DREAM_EPSILON) ? distanceYabs / vNormal.y() : distanceYabs;
+					else 
+						penetration = (vNormal.z() > DREAM_EPSILON) ? distanceZabs / vNormal.z() : distanceZabs;
+				}
+				else if (distanceYabs > distanceXabs && distanceYabs > distanceZabs && (vRay.x() != 0.0f || vRay.z() != 0.0f)) {
+					// We're in the XZ plane
+					vNormal = vector(-vRay.z(), 0.0f, vRay.x());
+					vNormal.Normalize();
+
+					// Calculate penetration
+					if (distanceXabs < distanceZabs)
+						penetration = (vNormal.x() > DREAM_EPSILON) ? distanceXabs / vNormal.x() : distanceXabs;
+					else
+						penetration = (vNormal.z() > DREAM_EPSILON) ? distanceZabs / vNormal.z() : distanceZabs;
+				}
+				else if (distanceZabs > distanceXabs && distanceZabs > distanceYabs && (vRay.x() != 0.0f || vRay.y() != 0.0f)) {
+					// We're in the XY plane
+					vNormal = vector(vRay.y(), -vRay.x(), 0.0f);
+					vNormal.Normalize();
+
+					// Calculate penetration
+					if (distanceYabs < distanceXabs)
+						penetration = (vNormal.y() > DREAM_EPSILON) ? distanceYabs / vNormal.y() : distanceYabs;
+					else
+						penetration = (vNormal.x() > DREAM_EPSILON) ? distanceXabs / vNormal.x() : distanceXabs;
+				}
+
+				//CBA((vNormal.IsValid()), "Invalid Normal");
+
+				// Invalid normal, must be parallel 
+				// TODO: This needs to be handled
+				if (vNormal.magnitude() < 1.0f) {
+					//vNormal = inverse(RotationMatrix(pBoxA->GetOrientation())) * vAxis;
+					//vNormal = vAxis;
+					//vNormal.Print("Normal");
+					//penetration = std::min(minAxisDistance, std::min(distanceXabs, std::min(distanceYabs, distanceZabs)));
+					//penetration = std::min(distanceXabs, std::min(distanceYabs, distanceZabs));
+					break;
+				}
+
+				//DEBUG_LINEOUT("%f %f %f", distanceXabs, distanceYabs, distanceZabs);
+				//DEBUG_LINEOUT("%f", penetration);
+
+				point ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMid) + pBoxA->GetOrigin();				
+
+				/*
+				//vector vNormal = vector(ptEdgeMax);
 				BoundingBox::BoxFace boxFace;
 
 				// Project minimum plane penetration along collision normal
@@ -322,9 +426,9 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				else if (distanceZ < minDistance2) {
 					minDistance2 = distanceZ;
 				}
+				*/
 
 				point ptContact = ptClosestPoint;
-				
 				point ptBoxBOriginRefA = inverse(RotationMatrix(pBoxA->GetOrientation())) * (pBoxB->GetOrigin() - pBoxA->GetOrigin());
 				
 				/*
@@ -332,18 +436,27 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				vNormal = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
 				vNormal = vNormal * -1.0f;
 				vNormal.Normalize();
-				*/
+				//*/
 
-				vNormal = pBoxA->GetBoxFaceNormal(boxFace);
+				if (vNormal.IsValid() == false) {
+					int a = 5;
+				}
+
+				vector vNormalOriented = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
 				//vNormal = vNormal * -1.0f;
+				vNormalOriented.Normalize();
+
+				/*
+				vNormal = pBoxA->GetBoxFaceNormal(boxFace);				
 				vNormal.Normalize();
+				//*/
 
 				// TODO: this is wrong
 				//float penetration = std::sqrt((minDistance1 * minDistance1) + (minDistance2 * minDistance2));
-				penetration = minDistance1;
+				//penetration = minDistance1;
 
 				if (j == 1) {
-					vNormal = vNormal * -1.0f;
+					vNormalOriented = vNormalOriented * -1.0f;
 					penetration *= -1.0f;
 				}
 
@@ -352,20 +465,21 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					point ptContactPointA = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMin) + pBoxA->GetOrigin();
 					point ptContactPointB = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMax) + pBoxA->GetOrigin();
 
-					manifold.AddContactPoint(ptContactPointA, vNormal, penetration, 1);
-					manifold.AddContactPoint(ptContactPointB, vNormal, penetration, 1);
+					manifold.AddContactPoint(ptContactPointA, vNormalOriented, penetration, 1);
+					manifold.AddContactPoint(ptContactPointB, vNormalOriented, penetration, 1);
 				}
 				else {
-					manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+					manifold.AddContactPoint(ptContact, vNormalOriented, penetration, 1);
 				}
 			}
 		}
 
+	/*
 		if (manifold.NumContacts() > 0) {
 			//return manifold;
 			//break;
 		}
-	}
+	}*/
 	
 	return manifold;
 }
@@ -516,16 +630,22 @@ vector BoundingBox::GetHalfVector() {
 	return m_vHalfSize;
 }
 
-bool BoundingBox::OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis) {
+double BoundingBox::OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
 	// Project the half-size of one onto axis
 	double selfProject = TransformToAxis(vAxis);
 	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
 
 	vector vToCenter = static_cast<BoundingBox>(rhs).GetOrigin() - GetOrigin();
 
-	double distance = std::abs(vToCenter.dot(vAxis));
+	return std::abs(vToCenter.dot(vAxis));
+}
 
-	return (distance <= (selfProject + rhsProject));
+bool BoundingBox::OverlapOnAxis(const BoundingBox& rhs, const vector &vAxis) {
+	// Project the half-size of one onto axis
+	double selfProject = TransformToAxis(vAxis);
+	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
+
+	return (OverlapOnAxisDistance(rhs, vAxis) <= (selfProject + rhsProject));
 }
 
 // Project half size onto vector axis
