@@ -104,7 +104,22 @@ RESULT DreamTestApp::LoadScene() {
 	volume *pVolume = nullptr;
 	sphere *pSphere = nullptr;
 	quad *pQuad = nullptr;
+	composite *pComposite = nullptr;
 	
+	// Composite vs plane
+	
+	/*
+	pVolume = AddVolume(5.0, 5.0, 1.0f);
+	pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
+	pVolume->SetMass(100000.0f);
+	pVolume->SetImmovable(true);
+	AddPhysicsObject(pVolume);
+
+	pComposite = AddModel(L"\\Models\\Boar\\boar-obj.obj", nullptr, point(0.0f, 0.0f, 0.0f), 0.15f, vector(0.0f, 0.0f, 0.0f));
+	pComposite->SetMass(1.0f);
+	AddPhysicsObject(pComposite);
+	*/
+
 	// Rotational Inertia
 
 	// Sphere - Sphere
@@ -127,20 +142,19 @@ RESULT DreamTestApp::LoadScene() {
 	//*/
 
 
+	// Volume to "plane"
+
 	///*
 	pVolume = AddVolume(5.0, 5.0, 1.0f);
 	pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
 	pVolume->SetMass(100000.0f);
 	pVolume->SetImmovable(true);
 	AddPhysicsObject(pVolume);
-	//*/
-
-
-	///*
+	
 	pVolume = AddVolume(0.5, 0.5, 2.0f);
-	pVolume->SetPosition(point(1.9f, 1.0f, 0.0f));
+	pVolume->SetPosition(point(2.5f, 1.0f, 0.0f));
 	pVolume->SetMass(1.0f);
-	pVolume->RotateZByDeg(16.0f);
+	pVolume->RotateZByDeg(45.0f);
 	AddPhysicsObject(pVolume);
 	//*/
 

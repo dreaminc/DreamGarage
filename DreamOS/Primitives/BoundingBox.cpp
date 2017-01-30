@@ -242,6 +242,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 		// Test all edges
 		double minDistanceTemp = std::numeric_limits<double>::infinity();
 		vector vNormalTemp;
+		point ptA, ptB;
 
 		for (int i = 0; i < 12; i++) {
 			BoundingBox::BoxEdge boxEdgeB = (BoundingBox::BoxEdge)(i);
@@ -252,14 +253,36 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				line lineBoxEdgeA = pBoxA->GetBoxEdge(boxEdgeA);
 
 				double lineDistance = lineBoxEdgeA.Distance(lineBoxEdgeB);
+
 				if (std::abs(lineDistance) < std::abs(minDistanceTemp)) {
 					minDistanceTemp = lineDistance;
 					vNormalTemp = lineBoxEdgeA.GetVector().cross(lineBoxEdgeB.GetVector());
 					vNormalTemp = vNormalTemp * -1.0f;
 					vNormalTemp.Normalize();
+
+					// Find the closest respective points
+					// TODO: Replace with the code in line.cpp
+					// https://en.wikipedia.org/wiki/Skew_lines#Distance_between_two_skew_lines
+					vector vNormalA = lineBoxEdgeA.GetVector().cross(vNormalTemp);
+					vector vNormalB = lineBoxEdgeB.GetVector().cross(vNormalTemp);
+
+					double dotProdDiffNormalA = (lineBoxEdgeB.a() - lineBoxEdgeA.a()).dot(vNormalB);
+					double dotProdDiffNormalB = (lineBoxEdgeA.a() - lineBoxEdgeB.a()).dot(vNormalA);
+
+					double dotProdNormalA = lineBoxEdgeA.GetVector().dot(vNormalB);
+					double dotProdNormalB = lineBoxEdgeB.GetVector().dot(vNormalA);
+
+					double tA = dotProdDiffNormalA / dotProdNormalA;
+					double tB = dotProdDiffNormalB / dotProdNormalB;
+
+					// Getting the valid point
+					ptA = lineBoxEdgeA.a() + lineBoxEdgeA.GetVector() * tA;
+					ptB = lineBoxEdgeB.a() + lineBoxEdgeB.GetVector() * tB;
 				}
 			}
 		}
+
+		// TODO: Eliminate the bottom code, replace with the above test
 
 		// Edge - Edge Detection
 		for (int i = 0; i < 12; i++) {
