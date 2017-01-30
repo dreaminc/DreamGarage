@@ -784,6 +784,20 @@ composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pT
 	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
+composite* SandboxApp::AddComposite() {
+	RESULT r = R_PASS;
+	composite *pComposite = m_pHALImp->MakeComposite();
+	CN(pComposite);
+	CR(AddObject(pComposite));
+	return pComposite;
+Error:
+	if (pComposite != nullptr) {
+		delete pComposite;
+		pComposite = nullptr;
+	}
+	return nullptr;
+}
+
 RESULT SandboxApp::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
 	RESULT r = R_PASS;
 
