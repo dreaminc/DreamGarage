@@ -393,3 +393,7 @@ Error:
 
 	return r;
 }
+
+RESULT texture::Update(unsigned char* pixels, int width, int height, texture::PixelFormat format) {
+	return R_NOT_IMPLEMENTED;
+}

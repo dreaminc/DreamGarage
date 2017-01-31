@@ -34,6 +34,14 @@ public:
 		CUBE_MAP_INVALID 
 	};
 
+	enum class PixelFormat {
+		Unspecified, // this will generate an RGB/RGBA based on the number of channels
+		RGB,
+		RGBA,
+		BGR,
+		BGRA
+	};
+
 public:
 	texture();
 	texture(texture::TEXTURE_TYPE type);
@@ -67,6 +75,8 @@ public:
 	RESULT LoadCubeMapByName(wchar_t * pszName);
 	RESULT CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n);
 
+	virtual RESULT Update(unsigned char* pixels, int width, int height, texture::PixelFormat format);
+
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
 
 	double GetValueAtUV(double uValue, double vValue);
@@ -81,6 +91,10 @@ public:
 
 	int GetChannels() {
 		return m_channels;
+	}
+
+	PixelFormat GetPixelFormat() {
+		return m_format;
 	}
 
 	RESULT SetWidth(int width) {
@@ -113,10 +127,16 @@ public:
 		}
 	}
 
+	RESULT SetFormat(PixelFormat format) {
+		m_format = format;
+		return R_PASS;
+	}
+
 protected:
 	int m_width;
 	int m_height;
 	int m_channels;
+	PixelFormat	m_format = PixelFormat::Unspecified;
 
 	unsigned char *m_pImageBuffer;
 

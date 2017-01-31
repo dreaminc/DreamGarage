@@ -162,26 +162,15 @@ public:
 		//CR(m_pParentImp->glActiveTexture(textureNumber));
 		CR(m_pParentImp->BindTexture(textureTarget, *pTextureIndex));
 
+		GLenum	format = GetOGLPixelFormat(m_format, m_channels);
+		GLint	internalFormat = static_cast<GLint>(format);
+
 		// TODO: Pull deeper settings from texture object
 		if (m_pImageBuffer != NULL) {
-			// This code needs to change. We need to store the texture format when loading the texture and loading with the right format here.
-			switch (m_channels) {
-				case 3: {
-					CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, m_pImageBuffer));
-				} break;
-
-				case 4: {
-					CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, m_pImageBuffer));
-				} break;
-			}
+			CR(m_pParentImp->TexImage2D(textureTarget, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, m_pImageBuffer));
 		}
 		else {
-			if (m_channels == 3) {
-				CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL));
-			}
-			else if (m_channels == 4) {
-				CR(m_pParentImp->TexImage2D(textureTarget, 0, GL_RGBA, m_width, m_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL));
-			}
+			CR(m_pParentImp->TexImage2D(textureTarget, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, NULL));
 		}
 
 		// Texture params TODO: Add controls for these 
@@ -308,6 +297,32 @@ public:
 
 	GLuint GetOGLTextureIndex() {
 		return m_textureIndex;
+	}
+
+	RESULT Update(unsigned char* pixels, int width, int height, texture::PixelFormat format) override {
+		RESULT r = R_PASS;
+
+		CR(m_pParentImp->MakeCurrentContext());
+
+		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_textureIndex));
+
+		m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GetOGLPixelFormat(format), GL_UNSIGNED_BYTE, pixels);
+
+	Error:
+		return r;
+	}
+
+private:
+	GLenum GetOGLPixelFormat(texture::PixelFormat format, int channels = 3) {
+		switch (format) {
+		case texture::PixelFormat::Unspecified: return (channels == 3) ? GL_RGB : GL_RGBA;
+		case texture::PixelFormat::RGB:			return GL_RGB;
+		case texture::PixelFormat::RGBA:		return GL_RGBA;
+		case texture::PixelFormat::BGR:			return GL_BGR;
+		case texture::PixelFormat::BGRA:		return GL_BGRA;
+		}
+
+		return 0; // no format for unknown
 	}
 
 private:
