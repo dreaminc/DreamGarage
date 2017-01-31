@@ -201,6 +201,25 @@ std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHor
 	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
 }
 
+std::shared_ptr<DimRay> composite::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<DimRay> pRay(m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional));
+
+	return pRay;
+}
+
+std::shared_ptr<DimRay> composite::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<DimRay> pRay(m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional));
+	CR(AddObject(pRay));
+
+	return pRay;
+Error:
+	return nullptr;
+}
+
 /*
 //RESULT Traverse(RESULT (*f)(std::shared_ptr<DimObj>), std::vector<std::shared_ptr<VirtualObj>> objects) {
 RESULT Traverse(std::function<RESULT(std::shared_ptr<DimObj> pObject)> f, std::vector<std::shared_ptr<VirtualObj>> objects) {

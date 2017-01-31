@@ -117,6 +117,7 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	CNM(m_pCompositor, "Failed to initialize IVR compositor");
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
+	m_pSenseController = new SenseController();
 
 	OVERLAY_DEBUG_OUT("HMD Vive - On");
 
@@ -190,6 +191,10 @@ hand *OpenVRDevice::GetHand(hand::HAND_TYPE type) {
 	else {
 		return nullptr;
 	}
+}
+
+SenseController* OpenVRDevice::GetSenseController() {
+	return m_pSenseController;
 }
 
 RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
@@ -375,6 +380,27 @@ ViewMatrix OpenVRDevice::ConvertSteamVRMatrixToViewMatrix(const vr::HmdMatrix34_
 	return viewMat;
 }
 
+RESULT OpenVRDevice::UpdateSenseController(vr::ETrackedControllerRole controllerRole, vr::VRControllerState_t state) {
+
+	ControllerState cState;
+
+	cState.triggerRange = state.rAxis[1].x;
+	cState.ptTouchpad = point(state.rAxis[0].x, state.rAxis[0].y, 0.0f);
+
+	cState.fMenu = (state.ulButtonPressed & (1<<1)) != 0;
+	cState.fGrip = (state.ulButtonPressed & (1<<2)) != 0;
+
+	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
+		cState.type = CONTROLLER_LEFT;
+	} 
+	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
+		cState.type = CONTROLLER_RIGHT;
+	}
+	m_pSenseController->SetControllerState(cState); 
+
+	return R_PASS;
+}
+
 RESULT OpenVRDevice::UpdateHMD() {
 	RESULT r = R_PASS;
 
@@ -388,7 +414,28 @@ RESULT OpenVRDevice::UpdateHMD() {
 	for (vr::TrackedDeviceIndex_t unDevice = 0; unDevice < vr::k_unMaxTrackedDeviceCount; unDevice++) {
 		vr::VRControllerState_t state;
 
+		// state.ulButtonPressed/Touched
+		// menu button  - 2
+		// grip buttons - 4
+
+		// state.rAxis
+		// touch pad    - 0 (x,y from [-1,1])
+		// trigger      - 1 (x from [0,1])
+
+		// TODO: currently not getting click events from touch pad or trigger
+		// more info: https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetControllerState
+
 		if (m_pIVRHMD->GetControllerState(unDevice, &state)) {
+			if (m_pIVRHMD->GetTrackedDeviceClass(unDevice) == vr::TrackedDeviceClass_Controller) {
+				uint32_t currentFrame = state.unPacketNum;
+
+				if (currentFrame != ovrFrame) {
+					ovrFrame = currentFrame;
+					vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(unDevice);
+					UpdateSenseController(controllerRole, state);
+				}
+			}
+
 			//m_rbShowTrackedDevice[unDevice] = state.ulButtonPressed == 0;
 			// TODO: do stuff
 		}
@@ -400,6 +447,9 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 	m_validPoseCount = 0;
 	m_strPoseClasses = "";
+
+	bool fLeftHandTracked = false;
+	bool fRightHandTracked = false;
 
 	for (int nDevice = 0; nDevice < vr::k_unMaxTrackedDeviceCount; ++nDevice) {
 		if (m_rTrackedDevicePose[nDevice].bPoseIsValid) {
@@ -448,18 +498,21 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pControllerModelLeft->SetPosition(ptControllerPosition);
 						m_pControllerModelLeft->SetOrientation(qOrientation);
 
-						m_pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
 						m_pLeftHand->SetPosition(ptControllerPosition + setHandConstant);
 						m_pLeftHand->SetLocalOrientation(qOrientation);
-							
+
+						fLeftHandTracked = true;
+						m_pLeftHand->SetTracked(true);
 					}
 					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerModelRight != nullptr) {
 						m_pControllerModelRight->SetPosition(ptControllerPosition);
 						m_pControllerModelRight->SetOrientation(qOrientation);
 
-						m_pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
 						m_pRightHand->SetPosition(ptControllerPosition + setHandConstant);
 						m_pRightHand->SetLocalOrientation(qOrientation);
+
+						fRightHandTracked = true;
+						m_pRightHand->SetTracked(true);
 					}
 
 				} break;
@@ -506,6 +559,13 @@ RESULT OpenVRDevice::UpdateHMD() {
 				} break;
 			}
 			
+		}
+
+		if (!fLeftHandTracked && m_pLeftHand != nullptr) {
+			m_pLeftHand->SetTracked(fLeftHandTracked);
+		}
+		if (!fRightHandTracked && m_pRightHand != nullptr) {
+			m_pRightHand->SetTracked(fRightHandTracked);
 		}
 	}
 

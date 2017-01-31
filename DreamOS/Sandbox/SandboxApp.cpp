@@ -144,6 +144,8 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 
 	camera *pCamera = m_pHALImp->GetCamera();
 
+	CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
+
 	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
 
 	/*
@@ -204,7 +206,7 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 
 	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-	
+
 	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
 	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
 
@@ -214,33 +216,8 @@ RESULT SandboxApp::RegisterImpLeapMotionEvents() {
 	pLeftHand->SetOriented(true);
 	pRightHand->SetOriented(true);
 
-	composite* pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
-						nullptr,
-						point(0.0f, 0.0f, 0.0f),
-						0.015f,
-						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
-	
-	composite* pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
-						nullptr,
-						point(0.0f, 0.0f, 0.0f),
-						0.015f,
-						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
-
-	std::shared_ptr<DimObj> pLeftModelSharedPtr(pLeftModel);
-	pLeftModelSharedPtr->SetVisible(true);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftModelSharedPtr);
-
-	std::shared_ptr<DimObj> pRightModelSharedPtr(pRightModel);
-	pRightModelSharedPtr->SetVisible(true);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightModelSharedPtr);
-
-
 	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
 	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
-
-	CR(m_pSenseLeapMotion->AttachModel(pLeftModel, hand::HAND_LEFT));
-	CR(m_pSenseLeapMotion->AttachModel(pRightModel, hand::HAND_RIGHT));
-
 
 Error:
 	return r;
@@ -254,18 +231,10 @@ RESULT SandboxApp::RegisterImpViveControllerEvents() {
 	if (pVive) {
 		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-/*
-		std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
-		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
 
-		std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
-		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
-//*/
 		pLeftHand->SetOriented(false);
 		pRightHand->SetOriented(false);
 
-		pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
-		pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
 		CR(pVive->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
 		CR(pVive->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
 	}
@@ -275,15 +244,20 @@ Error:
 
 //hand *Windows64App::AttachHand
 
-hand* SandboxApp::GetHand(hand::HAND_TYPE handType) {
+hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
 	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
 
 	if (pVive != nullptr) {
 		return pVive->GetHand(handType);
 	}
+
+	if (m_pSenseLeapMotion != nullptr) {
+		return m_pSenseLeapMotion->GetHand(handType);
+	}
 	
-	return m_pSenseLeapMotion->GetHand(handType);
+	return nullptr;
 }
+
 
 bool SandboxApp::IsSandboxRunning() {
 	return m_fRunning;
@@ -597,6 +571,30 @@ Error:
 	return nullptr;
 }
 
+DimRay* SandboxApp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	return m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional); 
+}
+
+DimRay* SandboxApp::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	RESULT r = R_PASS;
+	DimRay* pRay = m_pHALImp->MakeRay(ptOrigin, vDirection, step, fDirectional); 
+	CN(pRay);
+
+	CR(AddObject(pRay));
+
+	//Success:
+	return pRay;
+
+Error:
+	if (pRay != nullptr) {
+		delete pRay;
+		pRay = nullptr;
+	}
+	return nullptr;
+}
+
+
+
 sphere* SandboxApp::MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) {
 	return m_pHALImp->MakeSphere(radius, numAngularDivisions, numVerticalDivisions, c);
 }
@@ -785,6 +783,20 @@ composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pT
 	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
+composite* SandboxApp::AddComposite() {
+	RESULT r = R_PASS;
+	composite *pComposite = m_pHALImp->MakeComposite();
+	CN(pComposite);
+	CR(AddObject(pComposite));
+	return pComposite;
+Error:
+	if (pComposite != nullptr) {
+		delete pComposite;
+		pComposite = nullptr;
+	}
+	return nullptr;
+}
+
 RESULT SandboxApp::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback) {
 	RESULT r = R_PASS;
 
@@ -887,6 +899,16 @@ RESULT SandboxApp::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber
 	RESULT r = R_PASS;
 
 	CR(m_pSenseMouse->RegisterSubscriber(mouseEvent, pMouseSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+	RESULT r = R_PASS;
+	if (m_pHMD != nullptr) {
+		CR(m_pHMD->GetSenseController()->RegisterSubscriber(controllerEvent, pControllerSubscriber));
+	}
 
 Error:
 	return r;

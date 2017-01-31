@@ -20,6 +20,8 @@
 #include "Primitives/point.h"
 #include "Primitives/composite.h"
 
+#include "Sense/SenseController.h"
+
 #define HMD_NUM_EYES 2
 
 class HALImp;
@@ -114,6 +116,7 @@ public:
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
 
+	virtual SenseController* GetSenseController() = 0;
 
 protected:
 	point m_ptOrigin;

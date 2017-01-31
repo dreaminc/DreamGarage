@@ -27,6 +27,7 @@
 #include "Primitives/FlatContext.h"
 #include "Primitives/sphere.h"
 #include "Primitives/cylinder.h"
+#include "Primitives/DimRay.h"
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/texture.h"
@@ -68,8 +69,10 @@ protected:
 
 	volume* AddVolume(double side, bool fTriangleBased = true);
 	volume *AddVolume(double width, double length, double height, bool fTriangleBased = true);
-	
+
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions = 3, int numVerticalDivisions = 3);
+
+	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	
@@ -79,6 +82,7 @@ protected:
 	model *AddModel(wchar_t *pszModelName);
 	model *MakeModel(wchar_t *pszModelName);
 	composite *AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+	composite *AddComposite();
 
 	user *AddUser();
 
@@ -117,6 +121,7 @@ protected:
 protected:
 	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
+	RESULT RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);

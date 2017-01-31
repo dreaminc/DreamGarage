@@ -14,6 +14,7 @@ public:
 	void SetValue(std::string value);
 	void SetValue(point pt);
 	void SetValue(quaternion q);
+	void SetValue(int i);
 	const std::string& GetName();
 
 	DebugData(const std::string& uniqueName = "");

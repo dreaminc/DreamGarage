@@ -171,6 +171,10 @@ cylinder* DreamOS::AddCylinder(double radius, double height, int numAngularDivis
 	return m_pSandbox->AddCylinder(radius, height, numAngularDivisions, numVerticalDivisions);
 }
 
+DimRay* DreamOS::AddRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	return m_pSandbox->AddRay(ptOrigin, vDirection, step, fDirectional);
+}
+
 volume* DreamOS::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	return m_pSandbox->MakeVolume(width, length, height, fTriangleBased);
 }
@@ -209,6 +213,10 @@ model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	
 composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
+}
+
+composite *DreamOS::AddComposite() {
+	return m_pSandbox->AddComposite();
 }
 
 user *DreamOS::AddUser() {
@@ -285,6 +293,10 @@ RESULT DreamOS::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>*
 
 RESULT DreamOS::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
 	return m_pSandbox->RegisterSubscriber(mouseEvent, pMouseSubscriber);
+}
+
+RESULT DreamOS::RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
+	return m_pSandbox->RegisterSubscriber(controllerEvent, pControllerSubscriber);
 }
 
 long DreamOS::GetTickCount() {

@@ -30,12 +30,14 @@
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseLeapMotion.h"
+#include "Sense/SenseController.h"
 
 class light; 
 class quad;
 class FlatContext;
 class sphere; 
 class cylinder;
+class DimRay;
 class volume; 
 class texture; 
 class skybox;
@@ -125,6 +127,7 @@ public:
 	volume* MakeVolume(double side, bool fTriangleBased = true);
 	volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true);
 	cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
+	DimRay* MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	skybox *MakeSkybox();
 	model *MakeModel(wchar_t *pszModelName);
 
@@ -139,6 +142,8 @@ public:
 
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
 
+	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
+
 	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
@@ -150,6 +155,9 @@ public:
 	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+
+	composite* AddComposite();
+
 	user *AddUser();
 
 	// Cloud Controller 
@@ -173,6 +181,7 @@ public:
 	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);
 	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
+	RESULT RegisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 
 public:
 	PathManager *GetPathManager();

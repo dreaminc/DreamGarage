@@ -157,7 +157,7 @@ RESULT DreamTestApp::LoadScene() {
 	AddPhysicsObject(pVolume);
 	
 	pVolume = AddVolume(0.5, 0.5, 2.0f);
-	pVolume->SetPosition(point(2.5f, 1.0f, 0.0f));
+	pVolume->SetPosition(point(0.5f, 1.0f, 0.0f));
 	pVolume->SetMass(1.0f);
 	pVolume->RotateZByDeg(45.0f);
 	AddPhysicsObject(pVolume);

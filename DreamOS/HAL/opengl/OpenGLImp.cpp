@@ -25,6 +25,7 @@
 #include "OGLSkybox.h"
 #include "OGLUser.h"
 #include "OGLHand.h"
+#include "OGLRay.h"
 
 #include "DreamConsole/DreamConsole.h"
 #include "OGLDreamConsole.h"
@@ -207,11 +208,11 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
 
@@ -654,6 +655,23 @@ Error:
 		delete pCylinder;
 		pCylinder = nullptr;
 	}
+	return nullptr;
+}
+
+DimRay* OpenGLImp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	RESULT r = R_PASS;
+
+	DimRay *pRay = new OGLRay(this, ptOrigin, vDirection, step, fDirectional);
+	CN(pRay);
+
+	//Success:
+	return pRay;
+
+Error:
+	if (pRay != nullptr) {
+			delete pRay;
+			pRay = nullptr;
+		}
 	return nullptr;
 }
 

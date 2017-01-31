@@ -515,23 +515,32 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp">
-      <Filter>Primitives</Filter>
+    <ClCompile Include="..\..\..\Sense\SenseController.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
+      <Filter>Main</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\ObjectState.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp">
-      <Filter>PhysicsEngine</Filter>
+    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp">
+      <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\quad.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp">
+      <Filter>PhysicsEngine</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\line.cpp">
       <Filter>Primitives</Filter>
@@ -2116,9 +2125,6 @@
     <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
       <Filter>Primitives\Types</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\AABV.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\DreamOSWinMain.h">
       <Filter>Main</Filter>
     </ClInclude>
@@ -2228,20 +2234,29 @@
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseController.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimRay.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\ObjectState.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
-      <Filter>PhysicsEngine</Filter>
+    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
-      <Filter>Primitives</Filter>
+    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
+      <Filter>PhysicsEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
