@@ -95,7 +95,7 @@ public:
 	
 	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();
 
 	model *MakeModel(wchar_t *pszModelName);

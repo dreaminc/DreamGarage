@@ -40,6 +40,14 @@ public:
 		// This constructor should be used when deeper configuration is sought 
 	}
 
+	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) :
+		texture(type, width, height, format, channels, pBuffer, pBuffer_n),
+		m_textureIndex(0),
+		m_pParentImp(pParentImp)
+	{
+		RESULT r = OGLInitialize();
+	}
+
 	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) :
 		texture(type, width, height, channels, pBuffer, pBuffer_n),
 		m_textureIndex(0),

@@ -147,7 +147,7 @@ public:
 	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);

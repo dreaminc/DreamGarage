@@ -57,6 +57,25 @@ Error:
 	return;
 }
 
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) :
+	m_pImageBuffer(nullptr),
+	m_width(width),
+	m_height(height),
+	m_channels(channels),
+	m_format(format),
+	m_type(type)
+{
+	RESULT r = R_PASS;
+
+	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n))
+
+		Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
 texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_INVALID) :
 	m_pImageBuffer(nullptr),
 	m_width(0),

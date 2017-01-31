@@ -75,7 +75,8 @@ protected:
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+
 	skybox *AddSkybox();
 	skybox *MakeSkybox();
 
