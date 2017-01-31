@@ -216,6 +216,10 @@ composite *DreamOS::AddModel(const std::wstring& wstrOBJFilename, texture* pText
 	return m_pSandbox->AddModel(wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
+composite *DreamOS::AddComposite() {
+	return m_pSandbox->AddComposite();
+}
+
 user *DreamOS::AddUser() {
 	return m_pSandbox->AddUser();
 }

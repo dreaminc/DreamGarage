@@ -155,6 +155,9 @@ public:
 	model *AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+
+	composite* AddComposite();
+
 	user *AddUser();
 
 	// Cloud Controller 
