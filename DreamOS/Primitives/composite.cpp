@@ -29,11 +29,61 @@ inline unsigned int composite::NumberIndices() {
 }
 
 RESULT composite::AddObject(std::shared_ptr<DimObj> pDimObj) {
-	return AddChild(pDimObj);
+	RESULT r = R_PASS;
+
+	CR(AddChild(pDimObj));
+
+	if (m_pBoundingVolume != nullptr) {
+		UpdateBoundingVolume();
+	}
+
+Error:
+	return r;
 }
 
 RESULT composite::ClearObjects() {
 	return ClearChildren();
+}
+
+RESULT composite::UpdateBoundingVolume() {
+	RESULT r = R_PASS;
+
+	point ptMax, ptMin, ptMid, ptMinTemp, ptMaxTemp;
+
+	CN(m_pBoundingVolume);
+
+	if (HasChildren()) {
+		for (auto &childObj : GetChildren()) {
+			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(childObj);
+			if (pDimObj != nullptr) {
+				ptMaxTemp = pDimObj->GetBoundingVolume()->GetMaxPoint();
+				ptMinTemp = pDimObj->GetBoundingVolume()->GetMinPoint();
+
+				// X
+				if (ptMaxTemp.x() > ptMax.x())
+					ptMax.x() = ptMaxTemp.x();
+				else if (ptMinTemp.x() < ptMin.x())
+					ptMin.x() = ptMinTemp.x();
+
+				// Y
+				if (ptMaxTemp.y() > ptMax.y())
+					ptMax.y() = ptMaxTemp.y();
+				else if (ptMinTemp.y() < ptMin.y())
+					ptMin.y() = ptMinTemp.y();
+
+				// Z
+				if (ptMaxTemp.z() > ptMax.z())
+					ptMax.z() = ptMaxTemp.z();
+				else if (ptMinTemp.z() < ptMin.z())
+					ptMin.z() = ptMinTemp.z();
+			}
+		}
+
+		CR(m_pBoundingVolume->UpdateBoundingVolume(ptMid, ptMax));
+	}
+
+Error:
+	return r;
 }
 
 

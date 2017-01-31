@@ -71,7 +71,9 @@ public:
 	RESULT RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore);
 	RESULT RenderObjectStore(ObjectStore *pObjectStore);
 	RESULT RenderObject(DimObj *pDimObj);
+	RESULT RenderObjectBoundingVolume(DimObj *pDimObj);
 	RESULT RenderChildren(DimObj *pDimObj);	
+	RESULT RenderChildrenBoundingVolumes(DimObj *pDimObj);
 	RESULT RenderObject(VirtualObj *pVirtualObj);
 	
 	RESULT SetLights(ObjectStore *pSceneGraph);

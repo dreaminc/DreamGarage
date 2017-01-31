@@ -694,22 +694,7 @@ RESULT OGLProgram::RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore) {
 			continue;
 		}
 		else {
-			OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pVirtualObj);
-
-			if (pOGLObj != nullptr) {
-				// TODO: This is a bit wonky, RenderBoundingVolume creates the OGL Bounding volume 
-				// which might not be the right flow
-				if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
-					// Update bounding volume:
-					pOGLObj->UpdateBoundingVolume();
-					SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
-				}
-
-				CR(pOGLObj->RenderBoundingVolume());
-				
-			}
-
-			// TODO: Children bounding boxes
+			CR(RenderObjectBoundingVolume(pDimObj));
 		}
 	}
 
@@ -733,6 +718,31 @@ RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
 		else {
 			CR(RenderObject(pDimObj));
 		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderObjectBoundingVolume(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+
+	if (pOGLObj != nullptr) {
+		// TODO: This is a bit wonky, RenderBoundingVolume creates the OGL Bounding volume 
+		// which might not be the right flow
+		if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
+			// Update bounding volume:
+			pOGLObj->UpdateBoundingVolume();
+			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
+		}
+
+		CR(pOGLObj->RenderBoundingVolume());
+	}
+
+	if (pDimObj->HasChildren()) {
+		CR(RenderChildrenBoundingVolumes(pDimObj));
 	}
 
 Error:
@@ -776,6 +786,24 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 
 	if (pDimObj->HasChildren()) {
 		CR(RenderChildren(pDimObj));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderChildrenBoundingVolumes(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Rethink this since it's in the critical path
+	auto objects = pDimObj->GetChildren();
+
+	for (auto &pVirtualObj : objects) {
+		DimObj *pChildDimObj = dynamic_cast<DimObj*>(pVirtualObj.get());
+
+		if (pChildDimObj != nullptr) {
+			CR(RenderObjectBoundingVolume(pChildDimObj));
+		}
 	}
 
 Error:

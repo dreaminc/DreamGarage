@@ -133,7 +133,7 @@ private:
 
 	// Bounding Volume
 public:
-	RESULT UpdateBoundingVolume();
+	virtual RESULT UpdateBoundingVolume();
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();

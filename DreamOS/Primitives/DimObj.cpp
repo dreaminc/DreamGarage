@@ -96,9 +96,9 @@ RESULT DimObj::SetVisible(bool fVisible) {
 
 	if (HasChildren()) {
 		for (auto& child : GetChildren()) {
-			std::shared_ptr<DimObj> dimObj = std::dynamic_pointer_cast<DimObj>(child);
-			if (dimObj) {
-				dimObj->SetVisible(fVisible);
+			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(child);
+			if (pDimObj) {
+				pDimObj->SetVisible(fVisible);
 			}
 		}
 	}
@@ -453,9 +453,12 @@ RESULT DimObj::UpdateBoundingVolume() {
 	RESULT r = R_PASS;
 
 	// This will go through the verts, find the center point and maximum size
-	point ptMax = m_pVertices[0].GetPoint();;
-	point ptMin = m_pVertices[0].GetPoint();;
-	point ptMid;
+	point ptMax, ptMin, ptMid;
+
+	CB((NumberVertices() > 0));
+
+	ptMax = m_pVertices[0].GetPoint();
+	ptMin = m_pVertices[0].GetPoint();
 
 	CN(m_pVertices);
 	CN(m_pBoundingVolume);

@@ -110,8 +110,8 @@ public:
 
 	vector GetHalfVector();
 
-	point GetMinPoint();
-	point GetMaxPoint();
+	virtual point GetMinPoint() override;
+	virtual point GetMaxPoint() override;
 
 	point GetBoxPoint(BoxPoint ptType);
 	BoundingBox::face GetFace(BoxFace faceType);

@@ -21,6 +21,7 @@ class quaternion;
 class vector : public matrix <vector_precision, 4, 1> {
 public:
 	vector();
+	vector(vector_precision val);
 	vector(matrix <vector_precision, 4, 1> &rhs);
 	vector(vector_precision x, vector_precision y, vector_precision z);
 	vector(vector rhs, vector lhs);	// Cross product - Not assumed to be normalized

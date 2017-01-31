@@ -33,6 +33,8 @@ public:
 	RESULT AddObject(std::shared_ptr<DimObj> pDimObj);
 	RESULT ClearObjects();
 
+	virtual RESULT UpdateBoundingVolume() override;
+
 	std::shared_ptr<sphere> MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	std::shared_ptr<sphere> AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 

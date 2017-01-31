@@ -7,6 +7,15 @@ vector::vector() {
 	clear();
 }
 
+// This sets each element of the vector to val
+vector::vector(vector_precision val) {
+	this->clear();
+	this->element(0, 0) = val;
+	this->element(1, 0) = val;
+	this->element(2, 0) = val;
+	this->element(3, 0) = 1.0f;
+}
+
 vector::vector(matrix <vector_precision, 4, 1> &rhs) {
 	this->clear();
 	this->element(0, 0) = rhs.element(0, 0);

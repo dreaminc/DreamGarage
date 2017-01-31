@@ -39,7 +39,6 @@ public:
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
 	
-
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
 	virtual BoundingVolume::Type GetType() override {
@@ -51,8 +50,9 @@ public:
 	vector GetNormal();
 	vector GetHalfVector();
 
-	point GetMinPoint();
-	point GetMaxPoint();
+	virtual point GetMinPoint() override;
+	virtual point GetMaxPoint() override;
+	
 	point GetQuadPoint(QuadPoint ptType);
 
 protected:

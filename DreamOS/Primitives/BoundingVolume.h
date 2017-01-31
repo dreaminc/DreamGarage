@@ -61,6 +61,8 @@ public:
 	virtual CollisionManifold Collide(const BoundingBox& rhs) = 0;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) = 0;
 
+	virtual point GetMinPoint() = 0;
+	virtual point GetMaxPoint() = 0;
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
 
 	RESULT UpdateBoundingVolume(point ptOrigin, point ptMax) {

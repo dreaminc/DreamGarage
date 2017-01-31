@@ -111,6 +111,19 @@ CollisionManifold BoundingSphere::Collide(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Collide(*this);
 }
 
+vector BoundingSphere::GetHalfVector() {
+	//point_precision vecRadiusValue = m_radius / std::sqrt(3);
+	return vector(m_radius);
+}
+
+point BoundingSphere::GetMinPoint() {
+	return (GetOrigin() - GetHalfVector());
+}
+
+point BoundingSphere::GetMaxPoint() {
+	return (GetOrigin() + GetHalfVector());
+}
+
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {
 	vector vDiff = (ptMax - GetOrigin());
 	//m_radius = vDiff.magnitude();

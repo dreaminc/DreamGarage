@@ -102,7 +102,7 @@ RESULT DreamTestApp::LoadScene() {
 	//*/
 
 	volume *pVolume = nullptr;
-	sphere *pSphere = nullptr;
+	//sphere *pSphere = nullptr;
 	quad *pQuad = nullptr;
 	composite *pComposite = nullptr;
 	
@@ -115,7 +115,23 @@ RESULT DreamTestApp::LoadScene() {
 	pVolume->SetImmovable(true);
 	AddPhysicsObject(pVolume);
 
+	/*
 	pComposite = AddComposite();
+	pComposite->InitializeOBB();
+
+	auto pSphere = pComposite->AddSphere(0.25f, 10, 10);
+	//pSphere->SetVisible(false);
+	pSphere->SetMass(1.0f);
+	pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+	pSphere = pComposite->AddSphere(0.25f, 10, 10);
+	pSphere->SetMass(1.0f);
+	pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
+	*/
+
+	//AddPhysicsObject(pComposite);
 
 	/*
 	pComposite = AddModel(L"\\Models\\Boar\\boar-obj.obj", nullptr, point(0.0f, 0.0f, 0.0f), 0.15f, vector(0.0f, 0.0f, 0.0f));

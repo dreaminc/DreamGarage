@@ -35,6 +35,10 @@ public:
 		return m_radius;
 	}
 
+	vector GetHalfVector();
+
+	virtual point GetMinPoint() override;
+	virtual point GetMaxPoint() override;
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
 	virtual BoundingVolume::Type GetType() override {
