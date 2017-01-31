@@ -785,10 +785,14 @@ composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pT
 
 composite* SandboxApp::AddComposite() {
 	RESULT r = R_PASS;
+	
 	composite *pComposite = m_pHALImp->MakeComposite();
 	CN(pComposite);
 	CR(AddObject(pComposite));
+	
+	//Success:
 	return pComposite;
+
 Error:
 	if (pComposite != nullptr) {
 		delete pComposite;

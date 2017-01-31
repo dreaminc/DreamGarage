@@ -150,7 +150,7 @@ RESULT Windows64App::InitializeMouse() {
 
 	// Initialize Mouse 
 	// Remove mouse capture.
-	// This effects the window responsivenes to drag, resize and focus event.
+	// This effects the window responsiveness to drag, resize and focus event.
 	//CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
 	//CRM(m_pSenseMouse->CenterMousePosition(), "Failed to center mouse position");
 

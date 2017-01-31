@@ -115,7 +115,6 @@ RESULT DreamTestApp::LoadScene() {
 	pVolume->SetImmovable(true);
 	AddPhysicsObject(pVolume);
 
-	/*
 	pComposite = AddComposite();
 	pComposite->InitializeOBB();
 
@@ -129,7 +128,6 @@ RESULT DreamTestApp::LoadScene() {
 	pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
 
 	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
-	*/
 
 	//AddPhysicsObject(pComposite);
 

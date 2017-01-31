@@ -727,6 +727,10 @@ Error:
 RESULT OGLProgram::RenderObjectBoundingVolume(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
+	// TODO: Temp - this might want to be a separate flag
+	if (pDimObj->IsVisible() == false)
+		return R_PASS;
+
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
 
 	if (pOGLObj != nullptr) {
