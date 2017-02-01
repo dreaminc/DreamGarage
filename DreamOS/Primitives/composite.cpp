@@ -62,22 +62,34 @@ RESULT composite::UpdateBoundingVolume() {
 				// X
 				if (ptMaxTemp.x() > ptMax.x())
 					ptMax.x() = ptMaxTemp.x();
+				else if (ptMaxTemp.x() < ptMin.x())
+					ptMin.x() = ptMaxTemp.x();
 				
-				if (ptMinTemp.x() < ptMin.x())
+				if (ptMinTemp.x() > ptMax.x())
+					ptMax.x() = ptMinTemp.x();
+				else if (ptMinTemp.x() < ptMin.x())
 					ptMin.x() = ptMinTemp.x();
 
 				// Y
 				if (ptMaxTemp.y() > ptMax.y())
 					ptMax.y() = ptMaxTemp.y();
-				
-				if (ptMinTemp.y() < ptMin.y())
+				else if (ptMaxTemp.y() < ptMin.y())
+					ptMin.y() = ptMaxTemp.y();
+
+				if (ptMinTemp.y() > ptMax.y())
+					ptMax.y() = ptMinTemp.y();
+				else if (ptMinTemp.y() < ptMin.y())
 					ptMin.y() = ptMinTemp.y();
 
 				// Z
 				if (ptMaxTemp.z() > ptMax.z())
 					ptMax.z() = ptMaxTemp.z();
-				
-				if (ptMinTemp.z() < ptMin.z())
+				else if (ptMaxTemp.z() < ptMin.z())
+					ptMin.z() = ptMaxTemp.z();
+
+				if (ptMinTemp.z() > ptMax.z())
+					ptMax.z() = ptMinTemp.z();
+				else if (ptMinTemp.z() < ptMin.z())
 					ptMin.z() = ptMinTemp.z();
 			}
 		}

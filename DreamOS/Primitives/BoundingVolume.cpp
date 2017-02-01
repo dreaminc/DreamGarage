@@ -8,6 +8,20 @@
 
 #include "PhysicsEngine/CollisionManifold.h"
 
+BoundingVolume::BoundingVolume(VirtualObj *pParentObject) :
+	m_pParent(pParentObject),
+	m_ptCenter()
+{
+	// Empty
+}
+
+BoundingVolume::BoundingVolume(VirtualObj *pParentObject, point ptOrigin) :
+	m_pParent(pParentObject),
+	m_ptCenter(ptOrigin)
+{
+	// Empty
+}
+
 bool BoundingVolume::Intersect(BoundingVolume* pRHS) {
 	BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pRHS);
 	if (pBoundingBox != nullptr)
@@ -55,12 +69,16 @@ point BoundingVolume::GetParentOrigin() {
 }
 
 point BoundingVolume::GetBoundingVolumeOrigin() {
-	return (RotationMatrix(GetOrientation()) * vector(m_ptOrigin));
+	return (RotationMatrix(GetOrientation()) * vector(m_ptCenter));
+}
+
+point BoundingVolume::GetCenter() {
+	return m_ptCenter;
 }
 
 point BoundingVolume::GetOrigin() {
-	if (!m_ptOrigin.IsZero()) {
-		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptOrigin);
+	if (!m_ptCenter.IsZero()) {
+		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptCenter);
 		return (m_pParent->GetOrigin() + ptRotated);
 	}
 	else {
@@ -70,4 +88,32 @@ point BoundingVolume::GetOrigin() {
 
 VirtualObj* BoundingVolume::GetParentObject() const {
 	return m_pParent;
+}
+
+RESULT BoundingVolume::UpdateBoundingVolume(point ptOrigin, point ptMax) {
+	RESULT r = R_PASS;
+
+	CR(SetCenter(ptOrigin));
+	CR(SetMaxPointFromOrigin(ptMax));
+
+Error:
+	return r;
+}
+
+RESULT BoundingVolume::UpdateBoundingVolumeMinMax(point ptMin, point ptMax) {
+	RESULT r = R_PASS;
+
+	point ptMid = point::midpoint(ptMax, ptMin);
+	vector vHalfVector = ptMax - ptMid;
+
+	CR(SetCenter(ptMid));
+	CR(SetHalfVector(vHalfVector));
+
+Error:
+	return r;
+}
+
+RESULT BoundingVolume::SetCenter(point ptOrigin) {
+	m_ptCenter = ptOrigin;
+	return R_PASS;
 }

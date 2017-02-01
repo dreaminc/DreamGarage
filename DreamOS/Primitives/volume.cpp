@@ -76,7 +76,11 @@ RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBa
 	}
 	else if (pBoundingBox->GetBoxType() == BoundingBox::Type::OBB) {
 		//m_ptOrigin = RotationMatrix(pBoundingBox->GetOrientation()) * vector(pBoundingBox->GetBoundingVolumeOrigin());
-		SetOrigin(pBoundingBox->GetOrigin());
+		
+		// TODO: There is more to this 
+		CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
+
+		SetOrigin(pBoundingBox->GetParentOrigin());
 		SetOrientation(pBoundingBox->GetOrientation());
 	}
 

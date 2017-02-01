@@ -32,19 +32,8 @@ public:
 	};
 
 public:
-	BoundingVolume(VirtualObj *pParentObject) :
-		m_pParent(pParentObject),
-		m_ptOrigin()
-	{
-		// Empty
-	}
-
-	BoundingVolume(VirtualObj *pParentObject, point ptOrigin) :
-		m_pParent(pParentObject),
-		m_ptOrigin(ptOrigin)
-	{
-		// Empty
-	}
+	BoundingVolume(VirtualObj *pParentObject);
+	BoundingVolume(VirtualObj *pParentObject, point ptOrigin);
 
 	bool Intersect(BoundingVolume* pRHS);
 	virtual bool Intersect(const BoundingSphere& rhs) = 0;
@@ -66,33 +55,11 @@ public:
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
 	virtual RESULT SetHalfVector(vector vHalfVector) = 0;
 
-	RESULT UpdateBoundingVolume(point ptOrigin, point ptMax) {
-		RESULT r = R_PASS;
+	RESULT UpdateBoundingVolume(point ptOrigin, point ptMax);
+	RESULT UpdateBoundingVolumeMinMax(point ptMin, point ptMax);
 
-		CR(SetOrigin(ptOrigin));
-		CR(SetMaxPointFromOrigin(ptMax));
-
-	Error:
-		return r;
-	}
-
-	RESULT UpdateBoundingVolumeMinMax(point ptMin, point ptMax) {
-		RESULT r = R_PASS;
-
-		point ptMid = point::midpoint(ptMax, ptMin);
-		vector vHalfVector = ptMax - ptMid;
-
-		CR(SetOrigin(ptMid / 2.0f));
-		CR(SetHalfVector(vHalfVector));
-
-	Error:
-		return r;
-	}
-
-	RESULT SetOrigin(point ptOrigin) {
-		m_ptOrigin = ptOrigin;
-		return R_PASS;
-	}
+	point GetCenter();
+	RESULT SetCenter(point ptOrigin);
 
 	point GetBoundingVolumeOrigin();
 	point GetParentOrigin();
@@ -103,7 +70,7 @@ public:
 	virtual BoundingVolume::Type GetType() = 0;
 
 protected:
-	point m_ptOrigin;	// TODO: rename to center point instead of origin?
+	point m_ptCenter;	// TODO: rename to center point instead of origin?
 	VirtualObj *m_pParent;
 };
 
