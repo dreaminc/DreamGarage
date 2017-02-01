@@ -30,6 +30,8 @@
 class BoundingVolume;
 
 class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
+	friend class OGLObj;
+
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
     //AABV m_aabv;        // Axis Aligned Bounding Volume

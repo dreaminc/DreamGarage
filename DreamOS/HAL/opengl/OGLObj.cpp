@@ -271,6 +271,10 @@ RESULT OGLObj::RenderBoundingVolume() {
 
 		CN(m_pOGLBoundingVolume);
 		m_pOGLBoundingVolume->GetDimObj()->SetWireframe(true);
+
+		if (pDimObj->GetParent() != nullptr) {
+			m_pOGLBoundingVolume->GetDimObj()->SetParent(pDimObj->GetParent());
+		}
 	}
 	
 	CR(m_pOGLBoundingVolume->Render());
