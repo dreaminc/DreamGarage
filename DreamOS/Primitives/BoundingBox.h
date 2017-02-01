@@ -109,6 +109,7 @@ public:
 	double GetLength();
 
 	vector GetHalfVector();
+	virtual RESULT SetHalfVector(vector vHalfVector) override;
 
 	virtual point GetMinPoint() override;
 	virtual point GetMaxPoint() override;

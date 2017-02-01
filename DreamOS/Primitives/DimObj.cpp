@@ -235,9 +235,37 @@ std::vector<std::shared_ptr<VirtualObj>> DimObj::GetChildren() {
 	return *(m_pObjects.get());
 }
 
+double DimObj::GetMass() {
+	double mass = m_objectState.GetMass();
+	
+	if (m_pObjects != nullptr) {
+		for (auto it = m_pObjects->begin(); it < m_pObjects->end(); it++) {
+			mass += (*it)->GetMass();
+		}
+	}
+
+	return mass;
+}
+
+double DimObj::GetInverseMass() {
+	double invmass = m_objectState.GetInverseMass();
+	
+	if (m_pObjects != nullptr) {
+		for (auto it = m_pObjects->begin(); it < m_pObjects->end(); it++) {
+			invmass += (*it)->GetInverseMass();
+		}
+	}
+
+	return invmass;
+}
+
 RESULT DimObj::SetParent(DimObj* pParent) {
 	m_pParent = pParent;
 	return R_PASS;
+}
+
+DimObj* DimObj::GetParent() {
+	return m_pParent;
 }
 
 bool DimObj::CompareParent(DimObj* pParent) {
@@ -488,6 +516,11 @@ RESULT DimObj::UpdateBoundingVolume() {
 	ptMid = point::midpoint(ptMax, ptMin);
 	
 	CR(m_pBoundingVolume->UpdateBoundingVolume(ptMid, ptMax));
+	CR(m_pBoundingVolume->SetDirty());
+
+	if (m_pParent != nullptr) {
+		m_pParent->UpdateBoundingVolume();
+	}
 
 Error:
 	return r;
@@ -558,6 +591,12 @@ RESULT DimObj::OnManipulation() {
 
 	if (m_pBoundingVolume != nullptr) {
 		CR(m_pBoundingVolume->SetDirty());
+
+		// Update parent
+		if (m_pParent != nullptr) {
+			//CR(m_pParent->OnManipulation());
+			CR(m_pParent->UpdateBoundingVolume());
+		}
 	}
 
 Error:

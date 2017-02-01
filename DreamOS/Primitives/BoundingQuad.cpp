@@ -160,6 +160,10 @@ RESULT BoundingQuad::SetMaxPointFromOrigin(point ptMax) {
 	return R_SUCCESS;
 }
 
+RESULT BoundingQuad::SetHalfVector(vector vHalfVector) {
+	return R_NOT_IMPLEMENTED;
+}
+
 double BoundingQuad::GetWidth() {
 	return m_width;
 }

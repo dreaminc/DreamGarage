@@ -64,12 +64,26 @@ public:
 	virtual point GetMinPoint() = 0;
 	virtual point GetMaxPoint() = 0;
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
+	virtual RESULT SetHalfVector(vector vHalfVector) = 0;
 
 	RESULT UpdateBoundingVolume(point ptOrigin, point ptMax) {
 		RESULT r = R_PASS;
 
 		CR(SetOrigin(ptOrigin));
 		CR(SetMaxPointFromOrigin(ptMax));
+
+	Error:
+		return r;
+	}
+
+	RESULT UpdateBoundingVolumeMinMax(point ptMin, point ptMax) {
+		RESULT r = R_PASS;
+
+		point ptMid = point::midpoint(ptMax, ptMin);
+		vector vHalfVector = ptMax - ptMid;
+
+		CR(SetOrigin(ptMid / 2.0f));
+		CR(SetHalfVector(vHalfVector));
 
 	Error:
 		return r;

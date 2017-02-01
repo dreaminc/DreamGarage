@@ -142,8 +142,8 @@ public:
 	VirtualObj* ApplyForceAtPoint(vector vForce, point ptRefObj, double msDeltaTime);
 
 	RESULT SetMass(double kgMass);
-	double GetMass();
-	double GetInverseMass();
+	virtual double GetMass();
+	virtual double GetInverseMass();
 	RESULT SetImmovable(bool fImmovable);
 	bool IsImmovable();
 

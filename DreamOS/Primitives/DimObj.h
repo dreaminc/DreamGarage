@@ -124,10 +124,19 @@ public:
 
 	std::vector<std::shared_ptr<VirtualObj>> GetChildren();
 
+	// Composites will accumulate mass
+	virtual double GetMass() override;
+	virtual double GetInverseMass() override;
+
+	// TODO: Intertial momentum 
+
 protected:
 	RESULT SetParent(DimObj* pParent);
 
-private:
+public:
+	DimObj *GetParent();
+
+protected:
 	DimObj* m_pParent;
 	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
 

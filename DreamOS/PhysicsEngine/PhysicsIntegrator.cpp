@@ -9,7 +9,6 @@ PhysicsIntegrator::PhysicsIntegrator() :
 	// empty
 }
 
-
 // This actually integrates the time step
 RESULT PhysicsIntegrator::Update() {
 	RESULT r = R_PASS;
@@ -29,25 +28,45 @@ RESULT PhysicsIntegrator::Update() {
 		m_pPhysicsObjectStore->Reset();
 		while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
 			double adjTimestep = m_sTimeStep / 1.0f;	// This allows us to slow/speed it up without frame rate issues
-			pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, adjTimestep, m_globalForceGenerators);
+			CR(UpdateObject(pVirtualObj, adjTimestep));
 		}
 
 		m_elapsedTime = 0.0f;
 	}
 
-//Error:
+Error:
 	return r;
 }
 
+RESULT PhysicsIntegrator::UpdateObject(VirtualObj *pVirtualObj, double msTimeStep) {
+	RESULT r = R_PASS;
+
+	// Handle Children
+	DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+
+	if (pDimObj != nullptr && pDimObj->HasChildren()) {
+		for (auto &pVirtualChildObj : pDimObj->GetChildren()) {
+			CR(UpdateObject(pVirtualChildObj.get(), msTimeStep));
+		}
+	}
+	else {
+		pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators);
+	}
+
+Error:
+	return r;
+}
+
+// TODO: Expose gravity to DreamOS
 RESULT PhysicsIntegrator::Initialize() {
 	RESULT r = R_PASS;
 
 	m_lastUpdateTime = std::chrono::high_resolution_clock::now();
 
 	// Set up Gravity by default TODO: Move to engine?
-	CR(AddGlobalForceGenerator(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY)));
+	//CR(AddGlobalForceGenerator(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY)));
 
-Error:
+//Error:
 	return r;
 }
 

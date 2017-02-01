@@ -61,6 +61,7 @@ volume::volume(BoundingBox* pBoundingBox, bool fTriangleBased) :
 //Success:
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;

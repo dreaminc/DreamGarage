@@ -20,6 +20,7 @@
 #define DEFAULT_GRAVITY_ACCEL -9.8f
 
 class ObjectStore;
+class VirtualObj;
 
 class PhysicsIntegrator : public valid {
 	friend class PhysicsEngine;
@@ -30,6 +31,7 @@ private:
 protected:
 	RESULT Initialize();
 	RESULT Update();
+	RESULT UpdateObject(VirtualObj *pVirtualObj, double msTimeStep);
 	RESULT SetPhysicsStore(ObjectStore *pObjectStore);
 	RESULT SetTimeStep(double msTimeStep);
 

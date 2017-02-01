@@ -203,37 +203,37 @@ RESULT OGLObj::UpdateBoundingVolume() {
 
 	// TODO: Better handling of different bounding volumes (or do it in BoundingVolume)
 	BoundingBox *pBoundingBox = nullptr;
+	BoundingSphere *pBoundingSphere = nullptr;
+	BoundingQuad *pBoundingQuad = nullptr;
+
 	if ((pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
 		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
 
 		if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
 			CR(pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox));
 		}
-
-		return r;
 	}
-	
-	BoundingSphere *pBoundingSphere = nullptr;
-	if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+	else if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
 		OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
 
 		if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
 			CR(pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere));
 		}
-
-		return r;
 	}
-
-	BoundingQuad *pBoundingQuad = nullptr;
-	if ((pBoundingQuad = dynamic_cast<BoundingQuad*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+	else if ((pBoundingQuad = dynamic_cast<BoundingQuad*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
 		OGLQuad *pOGLBoundingQuad = dynamic_cast<OGLQuad*>(m_pOGLBoundingVolume);
 
 		if (pBoundingQuad->CheckAndCleanDirty() && pOGLBoundingQuad != nullptr) {
 			CR(pOGLBoundingQuad->UpdateFromBoundingQuad(pBoundingQuad));
 		}
-
-		return r;
 	}
+
+	// If this is a child, we should let the parent know
+	/*
+	if (pDimObj->GetParent() != nullptr) {
+		pDimObj->GetParent()->UpdateBoundingVolume();
+	}
+	*/
 
 Error:
 	return r;

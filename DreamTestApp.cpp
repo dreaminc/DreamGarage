@@ -107,8 +107,7 @@ RESULT DreamTestApp::LoadScene() {
 	composite *pComposite = nullptr;
 	
 	// Composite vs plane
-	
-	///*
+
 	pVolume = AddVolume(5.0, 5.0, 1.0f);
 	pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
 	pVolume->SetMass(100000.0f);
@@ -117,19 +116,26 @@ RESULT DreamTestApp::LoadScene() {
 
 	pComposite = AddComposite();
 	pComposite->InitializeOBB();
+	pComposite->SetMass(1.0f);
+	//pComposite->RotateZByDeg(45.0f);
 
 	auto pSphere = pComposite->AddSphere(0.25f, 10, 10);
 	//pSphere->SetVisible(false);
 	pSphere->SetMass(1.0f);
-	pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+	pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
+	pSphere->SetVelocity(vector(1.0f, 0.0f, 0.0f));
 
+	/*
 	pSphere = pComposite->AddSphere(0.25f, 10, 10);
 	pSphere->SetMass(1.0f);
 	pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
+	pSphere->SetVelocity(vector(1.0f, 0.0f, 0.0f));
+	*/
+	
 
-	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
+	//pComposite->SetPosition(point(2.0f, 0.0f, 0.0f));
 
-	//AddPhysicsObject(pComposite);
+	AddPhysicsObject(pComposite);
 
 	/*
 	pComposite = AddModel(L"\\Models\\Boar\\boar-obj.obj", nullptr, point(0.0f, 0.0f, 0.0f), 0.15f, vector(0.0f, 0.0f, 0.0f));
@@ -429,20 +435,21 @@ RESULT DreamTestApp::LoadScene() {
 	//RegisterObjectCollision(pSphere4);
 	
 	sphere *pSphere6 = AddSphere(0.25f, 10, 10);
-	pSphere6->SetPosition(point(0.0f, 0.0f, 1.0f));
+	pSphere6->SetPosition(point(-2.0f, 0.0f, 0.0f));
 	pSphere6->SetMass(1.0f);
-	pSphere6->SetVelocity(0.0f, 0.0f, -1.0f);
+	pSphere6->SetVelocity(1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere6);
-	
+
 	sphere *pSphere7 = AddSphere(0.25f, 10, 10);
-	pSphere7->SetPosition(point(0.0f, 0.0f, -1.0f));
+	pSphere7->SetPosition(point(2.0f, 0.0f, 0.0f));
 	pSphere7->SetMass(1.0f);
-	pSphere7->SetVelocity(0.0f, 0.0f, 1.0f);
+	pSphere7->SetVelocity(-1.0f, 0.0f, 0.0f);
 	AddPhysicsObject(pSphere7);
-	//RegisterObjectCollision(pSphere4);
+	RegisterObjectCollision(pSphere7);
+	
 	//*/
 
-
+	
 	//pCylinder->SetWireframe(true);
 
 	/*

@@ -111,6 +111,10 @@ CollisionManifold BoundingSphere::Collide(const BoundingQuad& rhs) {
 	return static_cast<BoundingQuad>(rhs).Collide(*this);
 }
 
+RESULT BoundingSphere::SetHalfVector(vector vHalfVector) {
+	return R_NOT_IMPLEMENTED;
+}
+
 vector BoundingSphere::GetHalfVector() {
 	//point_precision vecRadiusValue = m_radius / std::sqrt(3);
 	return vector(m_radius);

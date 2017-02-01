@@ -5,6 +5,14 @@ point::point() {
 	clear();
 }
 
+point::point(point_precision val) {
+	this->clear();
+	this->element(0, 0) = val;
+	this->element(1, 0) = val;
+	this->element(2, 0) = val;
+	this->element(3, 0) = 1.0f;
+}
+
 point::point(point_precision x, point_precision y, point_precision z) {
 	this->clear();
 	this->element(0, 0) = x;

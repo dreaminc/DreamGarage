@@ -48,7 +48,7 @@ RESULT composite::ClearObjects() {
 RESULT composite::UpdateBoundingVolume() {
 	RESULT r = R_PASS;
 
-	point ptMax, ptMin, ptMid, ptMinTemp, ptMaxTemp;
+	point ptMax, ptMin, ptMid, ptMinTemp = GetOrigin(), ptMaxTemp = GetOrigin();
 
 	CN(m_pBoundingVolume);
 
@@ -56,30 +56,41 @@ RESULT composite::UpdateBoundingVolume() {
 		for (auto &childObj : GetChildren()) {
 			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(childObj);
 			if (pDimObj != nullptr) {
-				ptMaxTemp = pDimObj->GetBoundingVolume()->GetMaxPoint();
-				ptMinTemp = pDimObj->GetBoundingVolume()->GetMinPoint();
+				ptMaxTemp = GetOrigin() + pDimObj->GetBoundingVolume()->GetMaxPoint();
+				ptMinTemp = GetOrigin() + pDimObj->GetBoundingVolume()->GetMinPoint();
 
 				// X
 				if (ptMaxTemp.x() > ptMax.x())
 					ptMax.x() = ptMaxTemp.x();
-				else if (ptMinTemp.x() < ptMin.x())
+				
+				if (ptMinTemp.x() < ptMin.x())
 					ptMin.x() = ptMinTemp.x();
 
 				// Y
 				if (ptMaxTemp.y() > ptMax.y())
 					ptMax.y() = ptMaxTemp.y();
-				else if (ptMinTemp.y() < ptMin.y())
+				
+				if (ptMinTemp.y() < ptMin.y())
 					ptMin.y() = ptMinTemp.y();
 
 				// Z
 				if (ptMaxTemp.z() > ptMax.z())
 					ptMax.z() = ptMaxTemp.z();
-				else if (ptMinTemp.z() < ptMin.z())
+				
+				if (ptMinTemp.z() < ptMin.z())
 					ptMin.z() = ptMinTemp.z();
 			}
 		}
 
-		CR(m_pBoundingVolume->UpdateBoundingVolume(ptMid, ptMax));
+		// TODO: Composite is not calculating pivot (Center of mass) vs origin 
+		// there needs to be more work here, especially if we want these to respond physically
+		CR(m_pBoundingVolume->UpdateBoundingVolumeMinMax(ptMin, ptMax));
+		CR(m_pBoundingVolume->SetDirty());
+
+		// Handle nested composites
+		if (m_pParent != nullptr) {
+			m_pParent->UpdateBoundingVolume();
+		}
 	}
 
 Error:
