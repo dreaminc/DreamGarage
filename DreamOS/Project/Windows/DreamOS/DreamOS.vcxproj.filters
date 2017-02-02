@@ -180,6 +180,9 @@
     <Filter Include="PhysicsEngine">
       <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cloud\WebBrowser">
+      <UniqueIdentifier>{d8051eb4-4d18-4c14-8db2-24de64018e8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -523,6 +526,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowser.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2221,6 +2230,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimRay.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowser.h">
+      <Filter>Cloud\WebBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -389,6 +389,8 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowser.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
@@ -513,6 +515,8 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\Cloud\Model.h" />
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowser.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
