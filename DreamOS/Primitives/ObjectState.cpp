@@ -434,6 +434,10 @@ RESULT ObjectState::Integrate<ObjectState::IntegrationType::RK4>(float timeStart
 
 	//m_qRotation = m_qSpin;
 
+	if (force.IsZero() == false || m_vVelocity.IsZero() == false || m_qSpin.IsZero() == false) {
+		SetDirty();
+	}
+
 // Error:
 	return r;
 }
@@ -452,6 +456,10 @@ RESULT ObjectState::Integrate<ObjectState::IntegrationType::EUCLID>(float timeSt
 	RecalculateLinearVelocity();
 
 	m_ptOrigin += m_vVelocity * timeDelta;
+
+	if (!objDerivative.m_vForce.IsZero() || !m_vVelocity.IsZero()) {
+		SetDirty();
+	}
 
 	// Error:
 	return r;

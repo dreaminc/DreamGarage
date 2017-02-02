@@ -11,6 +11,7 @@
 #include "point.h"
 #include "vector.h"
 #include "quaternion.h"
+#include "dirty.h"
 
 #include <list>
 #include <memory>
@@ -18,7 +19,7 @@
 class ObjectDerivative;
 class ForceGenerator;
 
-class ObjectState {
+class ObjectState : public dirty {
 	friend class VirtualObj;
 	friend class ObjectDerivative;
 	friend class CollisionResolver;

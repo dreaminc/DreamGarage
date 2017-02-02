@@ -330,6 +330,13 @@ quaternion quaternion::GetConjugate() {
 	return q;
 }
 
+bool quaternion::IsZero() {
+	if (m_w == 0.0f && m_x == 0.0f && m_y == 0.0f && m_z == 0.0f)
+		return true;
+	else
+		return false;
+}
+
 quaternion quaternion::Conjugate(quaternion arg) {
 	return arg.GetConjugate();
 }

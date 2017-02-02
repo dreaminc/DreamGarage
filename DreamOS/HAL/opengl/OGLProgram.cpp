@@ -742,6 +742,7 @@ RESULT OGLProgram::RenderObjectBoundingVolume(DimObj *pDimObj) {
 			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
 		}
 
+		// This is called even when bounding volume is null since it'll create the refgeo
 		CR(pOGLObj->RenderBoundingVolume());
 	}
 

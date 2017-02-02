@@ -41,6 +41,9 @@ Error:
 RESULT PhysicsIntegrator::UpdateObject(VirtualObj *pVirtualObj, double msTimeStep) {
 	RESULT r = R_PASS;
 
+	CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators));
+
+	/*
 	// Handle Children
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
 
@@ -50,8 +53,9 @@ RESULT PhysicsIntegrator::UpdateObject(VirtualObj *pVirtualObj, double msTimeSte
 		}
 	}
 	else {
-		pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators);
+		CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators));
 	}
+	*/
 
 Error:
 	return r;

@@ -90,6 +90,8 @@ public:
 	// http://www.mathworks.com/help/aeroblks/quaternionrotation.html
 	vector RotateVector(vector v);
 
+	bool IsZero();
+
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline quaternion_precision &w() { return m_w; }
 	inline quaternion_precision &x() { return m_x; }

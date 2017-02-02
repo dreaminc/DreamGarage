@@ -45,7 +45,11 @@ RESULT VirtualObj::IntegrateState(float timeStart, float timeDelta, const std::l
 	RESULT r = R_SUCCESS;
 
 	CR(m_objectState.Integrate<IT>(timeStart, timeDelta, externalForceGenerators));
-	OnManipulation();	// TODO: we might want to skip this if there is no manipulation
+
+	// Skip this if there is no manipulation
+	if (m_objectState.CheckAndCleanDirty()) {
+		OnManipulation();
+	}
 
 Error:
 	return r;

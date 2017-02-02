@@ -128,6 +128,13 @@ bool vector::IsValid() {
 	return true;
 }
 
+bool vector::IsZero() {
+	if (m_data[0] == 0.0f && m_data[1] == 0.0f && m_data[2] == 0.0f)
+		return true;
+
+	return false;
+}
+
 // Cross Product
 vector vector::cross(vector rhs) {
 	return vector(*this, rhs);

@@ -80,7 +80,7 @@ RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBa
 		// TODO: There is more to this 
 		CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
 
-		SetOrigin(pBoundingBox->GetParentOrigin());
+		SetOrigin(pBoundingBox->GetParentOrigin() - pBoundingBox->GetCenter());
 		SetOrientation(pBoundingBox->GetOrientation());
 	}
 
