@@ -13,10 +13,15 @@ typedef struct UIBarInfo {
 	int maxNumButtons;		
 	float yPosition;
 	float menuDepth;
+
 	float itemAngleX;
 	float itemAngleY;
 	vector itemScale;
 	float enlargedScale;
+
+	float headerAngleX;
+	float headerYPos;
+
 	std::map<std::string, std::vector<std::string>> menu;
 } UI_BAR_INFO;
 
@@ -39,6 +44,8 @@ private:
 	// Update visible menu based on menu title
 	// Access the menu map, where currently title is the key and menu items are the values
 	RESULT DisplayFromMenuTitle(std::string title);
+
+	RESULT UpdateSelectedItem(int index);
 
 	// returns location of furthest point in ray/sphere collision
 	// this code should be in boundingsphere, but it is written here to avoid conflicts for now

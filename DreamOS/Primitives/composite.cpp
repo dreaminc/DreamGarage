@@ -317,6 +317,9 @@ std::shared_ptr<DimRay> composite::AddRay(point ptOrigin, vector vDirection, flo
 	CR(AddObject(pRay));
 
 	return pRay;
+Error:
+	return nullptr;
+}
 
 std::shared_ptr<FlatContext> composite::MakeFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;

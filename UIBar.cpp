@@ -21,6 +21,9 @@ UIBar::UIBar(composite* c) :
 	m_info.itemScale = vector(0.5f, 1.0f, 0.25f); // 
 	m_info.enlargedScale = 1.25f;	// this value is multiplied to the scale when the menu item is selected
 
+	m_info.headerAngleX = 75.0f;	// values for menu item header
+	m_info.headerYPos = -0.25f;
+
 	m_info.menu[""] = { "Watch", "Listen", "Play", "Whisper", "Present" }; //words display from left to right
 	Initialize();
 }
@@ -40,12 +43,20 @@ RESULT UIBar::Initialize() {
 
 	RESULT r = R_PASS;
 
+	// menu items
 	for (int i = 0; i < m_info.maxNumButtons; i++) {
 		std::shared_ptr<composite> pButton = m_context->AddComposite();
 		std::shared_ptr<quad> q = pButton->AddQuad(1.0f, 1.0f);
 		q->RotateXByDeg(m_info.itemAngleX);
+
 		m_buttons.emplace_back(pButton);
 	}
+
+	// title
+	std::shared_ptr<composite> pButton = m_context->AddComposite();
+	std::shared_ptr<quad> q = pButton->AddQuad(1.0f, 1.0f);
+	q->RotateXByDeg(m_info.headerAngleX);
+	m_buttons.emplace_back(pButton);
 	
 	m_context->SetVisible(false);
 
@@ -61,31 +72,46 @@ RESULT UIBar::DisplayFromMenuTitle(std::string title) {
 	//other ones
 	int shift = m_visibleMenuItems / 2;
 	float odd = (m_visibleMenuItems % 2 == 0) ? 0.5f : 0.0f;
+	std::shared_ptr<texture> pColorTexture = m_context->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	for (int i = 0; i < m_info.maxNumButtons; i++) {
+	for (int i = 0; i <= m_info.maxNumButtons; i++) {
+
+		bool fTitle = i == m_info.maxNumButtons;
+
 		std::shared_ptr<composite> pButton = m_buttons[i];
 		std::shared_ptr<quad> q = std::dynamic_pointer_cast<quad>(pButton->GetChildren()[0]);
 
 		// TODO: could it be possible to reuse this object?
 		// Currently, if the object is reused, the new texture is composed with the old texture
 		std::shared_ptr<FlatContext> pContext = m_context->MakeFlatContext();
-		const std::string str = (i < items.size()) ? items[i] : "";
-		std::shared_ptr<text> pText = pContext->AddText(L"ArialDistance.fnt", str, 0.1f, true);
+		const std::string str = i < items.size() ? items[i] : (fTitle ? title : "");
+		std::shared_ptr<text> pText = pContext->AddText(L"ArialDistance.fnt", str, 0.2f, true);
+
+		if (str != "") { // placeholder; there could be an instance where we only want an icon displayed
+			std::shared_ptr<quad> pQuad2 = pContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.5f, 0.0f));
+			pQuad2->SetColorTexture(pColorTexture.get());
+		}
+
 		m_context->RenderToTexture(pContext);
 
 		q->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 		pContext->GetFramebuffer();
 
-		float rad = (m_info.itemAngleY * M_PI / 180.0f) * -(i - shift + odd);
+		int radIndex = fTitle ? 0 : i;
+		float rad = (m_info.itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
 		quaternion rot = quaternion::MakeQuaternionWithEuler(0.0f, rad, 0.0f);
 
-		pButton->MoveTo(0.0f, m_info.yPosition, 0.0f);
+		float yPos = fTitle ? m_info.headerYPos : m_info.yPosition;
+		pButton->MoveTo(0.0f, yPos, 0.0f);
 		pButton->SetOrientation(rot);
 
 		q->MoveTo(0.0f, 0.0f, m_info.menuDepth);
-		q->ScaleX(m_info.itemScale.x());
-		q->ScaleZ(m_info.itemScale.z());
+		// hack
+		float scaleFactor = i == m_selectedIndex ? m_info.enlargedScale : 1;
+		q->ScaleX(m_info.itemScale.x() * scaleFactor);
+		q->ScaleZ(m_info.itemScale.z() * scaleFactor);
 	}
+
 	return r;
 }
 
@@ -140,7 +166,7 @@ RESULT UIBar::Notify(SenseControllerEvent *event) {
 			m_UIDirty = true;
 		}
 
-		else if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange == 1.0f) {
+		if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange == 1.0f) {
 			if (m_UISelect && !m_menuPath.empty()) {
 				std::vector<std::string> currentMenu = m_info.menu[m_menuPath.top()];
 				if (m_selectedIndex >= 0 && m_selectedIndex < (int)currentMenu.size() && m_info.menu.count(currentMenu[m_selectedIndex]) > 0) {
@@ -161,22 +187,7 @@ RESULT UIBar::Notify(SenseControllerEvent *event) {
 	return R_PASS;
 }
 
-RESULT UIBar::Update(ray handRay) {
-	
-	// convert ray into context's space
-	point ptContext = handRay.GetOrigin() - m_context->GetOrigin();
-	ptContext = point(ptContext.x(), 0.0f, ptContext.z());
-	ray contextRay = ray(ptContext, handRay.GetVector());
-	point intersect = FurthestRaySphereIntersect(contextRay, point(0.0f, 0.0f, 0.0f));
-	vector vIntersect = vector(intersect);
-	vIntersect.Normalize();
-
-	int shift = (int)m_visibleMenuItems / 2;
-	float odd = (m_visibleMenuItems % 2 != 0) ? 0.5f : 0.0f;
-	int numSections = m_info.maxNumButtons != 0 ? 360 / int(m_info.itemAngleY) : 1;
-	float deg = float(-atan2(vIntersect.x(), vIntersect.z()) * 180.0f / M_PI);
-	deg -= m_rotationY;
-	int index = (-int((deg) / m_info.itemAngleY - odd) + shift) % numSections;
+RESULT UIBar::UpdateSelectedItem(int index) {
 
 	if (m_selectedIndex != index) {
 		// swap enlarged menu item
@@ -200,6 +211,28 @@ RESULT UIBar::Update(ray handRay) {
 		}
 		m_selectedIndex = index;
 	}
+
+	return R_PASS;
+}
+
+RESULT UIBar::Update(ray handRay) {
+	
+	// convert ray into context's space
+	point ptContext = handRay.GetOrigin() - m_context->GetOrigin();
+	ptContext = point(ptContext.x(), 0.0f, ptContext.z());
+	ray contextRay = ray(ptContext, handRay.GetVector());
+	point intersect = FurthestRaySphereIntersect(contextRay, point(0.0f, 0.0f, 0.0f));
+	vector vIntersect = vector(intersect);
+	vIntersect.Normalize();
+
+	int shift = (int)m_visibleMenuItems / 2;
+	float odd = (m_visibleMenuItems % 2 != 0) ? 0.5f : 0.0f;
+	int numSections = m_info.maxNumButtons != 0 ? 360 / int(m_info.itemAngleY) : 1;
+	float deg = float(-atan2(vIntersect.x(), vIntersect.z()) * 180.0f / M_PI);
+	deg -= m_rotationY;
+	int index = (-int((deg) / m_info.itemAngleY - odd) + shift) % numSections;
+	UpdateSelectedItem(index);
+
 	OVERLAY_DEBUG_SET("selected", m_selectedIndex);
 	return R_PASS;
 }
