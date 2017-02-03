@@ -85,6 +85,7 @@ public:
 	VirtualObj* Scale(point_precision scale);
 
 	// Pivot Point
+	point GetPivotPoint();
 	RESULT SetPivotPoint(point ptPivot);
 	RESULT SetPivotPoint(point_precision x, point_precision y, point_precision z);
 

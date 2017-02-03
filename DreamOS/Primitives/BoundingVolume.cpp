@@ -68,8 +68,13 @@ point BoundingVolume::GetParentOrigin() {
 	return (m_pParent->GetOrigin());
 }
 
+point BoundingVolume::GetParentPivot() {
+	return (m_pParent->GetPivotPoint());
+}
+
 point BoundingVolume::GetBoundingVolumeOrigin() {
-	return (RotationMatrix(GetOrientation()) * vector(m_ptCenter));
+	//return (RotationMatrix(GetOrientation()) * vector(m_ptCenter));
+	return m_ptCenter;
 }
 
 point BoundingVolume::GetCenter() {
@@ -106,7 +111,10 @@ RESULT BoundingVolume::UpdateBoundingVolumeMinMax(point ptMin, point ptMax) {
 	point ptMid = point::midpoint(ptMax, ptMin);
 	vector vHalfVector = ptMax - ptMid;
 
+	ptMid.Print("midpoint");
+
 	CR(SetCenter(ptMid));
+	m_pParent->SetPivotPoint(ptMid);
 	CR(SetHalfVector(vHalfVector));
 
 Error:

@@ -545,6 +545,12 @@
     <ClCompile Include="..\..\..\Primitives\line.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

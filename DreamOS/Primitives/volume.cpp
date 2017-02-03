@@ -81,8 +81,8 @@ RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBa
 		CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
 
 		SetOrigin(pBoundingBox->GetParentOrigin());
-		SetPivotPoint(pBoundingBox->GetCenter());
-		//SetOrigin(pBoundingBox->GetParentOrigin() - pBoundingBox->GetCenter());
+		SetPivotPoint(pBoundingBox->GetParentPivot());
+		//SetOrigin(pBoundingBox->GetParentOrigin() + pBoundingBox->GetCenter());
 		SetOrientation(pBoundingBox->GetOrientation());
 	}
 
