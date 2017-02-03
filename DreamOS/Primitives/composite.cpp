@@ -48,7 +48,17 @@ RESULT composite::ClearObjects() {
 RESULT composite::UpdateBoundingVolume() {
 	RESULT r = R_PASS;
 
-	point ptMax, ptMin, ptMid, ptMinTemp = GetOrigin(), ptMaxTemp = GetOrigin();
+	point ptMax; 
+	point ptMin; 
+	point ptMid; 
+
+	/*
+	point ptMinTemp = GetOrigin();
+	point ptMaxTemp = GetOrigin();
+	*/
+
+	point ptMinTemp = point();
+	point ptMaxTemp = point();
 
 	CN(m_pBoundingVolume);
 
@@ -56,8 +66,8 @@ RESULT composite::UpdateBoundingVolume() {
 		for (auto &childObj : GetChildren()) {
 			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(childObj);
 			if (pDimObj != nullptr) {
-				ptMaxTemp = GetOrigin() + pDimObj->GetBoundingVolume()->GetMaxPoint();
-				ptMinTemp = GetOrigin() + pDimObj->GetBoundingVolume()->GetMinPoint();
+				ptMaxTemp = pDimObj->GetBoundingVolume()->GetMaxPoint();
+				ptMinTemp = pDimObj->GetBoundingVolume()->GetMinPoint();
 
 				// X
 				if (ptMaxTemp.x() > ptMax.x())

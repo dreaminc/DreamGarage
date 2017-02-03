@@ -117,20 +117,21 @@ RESULT DreamTestApp::LoadScene() {
 	pComposite = AddComposite();
 	pComposite->InitializeOBB();
 	pComposite->SetMass(1.0f);
-	//pComposite->RotateZByDeg(45.0f);
+	
 
 	auto pSphere = pComposite->AddSphere(0.25f, 10, 10);
 	//pSphere->SetVisible(false);
 	pSphere->SetMass(1.0f);
 	pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
-	//pSphere->SetVelocity(vector(1.0f, 0.0f, 0.0f));
+	//pSphere->SetVelocity(vector(0.25f, 0.0f, 0.0f));
 
 	pSphere = pComposite->AddSphere(0.25f, 10, 10);
 	pSphere->SetMass(1.0f);
 	pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
-	//pSphere->SetVelocity(vector(0.25f, 0.0f, 0.0f));
-		
-	pComposite->SetPosition(point(1.0f, 0.0f, 0.0f));
+	//pSphere->SetVelocity(vector(-0.25f, 0.0f, 0.0f));
+	
+	pComposite->RotateZByDeg(45.0f);
+	//pComposite->SetPosition(point(1.0f, 0.0f, 0.0f));
 	//pComposite->SetVelocity(point(0.2f, 0.0f, 0.0f));
 
 	AddPhysicsObject(pComposite);
