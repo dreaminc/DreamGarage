@@ -102,7 +102,7 @@ RESULT volume::SetVolumeVertices(BoundingBox* pBoundingBox, bool fTriangleBased)
 		length == height)
 		m_volumeType = CUBE;
 
-	CR(SetVolumeVertices(width, length, height, m_fTriangleBased, pBoundingBox->GetBoundingVolumeOrigin()));
+	CR(SetVolumeVertices(width, length, height, m_fTriangleBased, pBoundingBox->GetCenter()));
 
 Error:
 	return r;

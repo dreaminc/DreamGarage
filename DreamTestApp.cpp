@@ -123,7 +123,7 @@ RESULT DreamTestApp::LoadScene() {
 	//pSphere->SetVisible(false);
 	pSphere->SetMass(1.0f);
 	pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
-	//pSphere->SetVelocity(vector(0.25f, 0.0f, 0.0f));
+	pSphere->SetVelocity(vector(0.25f, 0.0f, 0.0f));
 
 	pSphere = pComposite->AddSphere(0.2f, 10, 10);
 	pSphere->SetMass(1.0f);
