@@ -46,16 +46,20 @@ RESULT PhysicsIntegrator::UpdateObject(VirtualObj *pVirtualObj, double msTimeSte
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
 
 	if (pDimObj != nullptr && pDimObj->HasChildren()) {
-
-		// Null out force generators for composites 
-		CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, std::list<ForceGenerator*>()));
+		CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators));
 
 		for (auto &pVirtualChildObj : pDimObj->GetChildren()) {
 			CR(UpdateObject(pVirtualChildObj.get(), msTimeStep));
 		}
 	}
 	else {
-		CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators));
+		if (pDimObj->GetParent() != nullptr) {
+			// Null out force generators for children
+			CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, std::list<ForceGenerator*>()));
+		}
+		else {
+			CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators));
+		}
 	}
 	//*/
 
@@ -70,9 +74,9 @@ RESULT PhysicsIntegrator::Initialize() {
 	m_lastUpdateTime = std::chrono::high_resolution_clock::now();
 
 	// Set up Gravity by default TODO: Move to engine?
-	//CR(AddGlobalForceGenerator(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY)));
+	CR(AddGlobalForceGenerator(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY)));
 
-//Error:
+Error:
 	return r;
 }
 

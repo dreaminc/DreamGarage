@@ -101,21 +101,29 @@ RESULT DreamTestApp::LoadScene() {
 	AddPhysicsObject(pSphere1);
 	//*/
 
-	volume *pVolume = nullptr;
+	//volume *pVolume = nullptr;
 	//sphere *pSphere = nullptr;
 	quad *pQuad = nullptr;
 	composite *pComposite = nullptr;
 	
 	// Composite vs plane
 
-	/*
-	pVolume = AddVolume(5.0, 5.0, 1.0f);
+	///*
+	auto pVolume = AddVolume(5.0, 5.0, 1.0f);
 	pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
 	pVolume->SetMass(100000.0f);
 	pVolume->SetImmovable(true);
 	AddPhysicsObject(pVolume);
-	*/
+	//*/
 
+	auto pSphere = AddSphere(0.5f, 10, 10);
+	pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
+	pSphere->SetMass(1.0f);
+	pSphere->SetVelocity(vector(0.2f, 0.0f, 0.0f));
+	pSphere->SetRotationalVelocity(vector(0.0f, 0.0f, 2.0f));
+	AddPhysicsObject(pSphere);
+
+	/*
 	pComposite = AddComposite();
 
 	//pComposite->InitializeOBB();
@@ -141,7 +149,7 @@ RESULT DreamTestApp::LoadScene() {
 	//pSphere->SetVelocity(vector(-0.25f, 0.0f, 0.0f));
 	//*/
 	
-	///*
+	/*
 	auto pCompositeChild = pComposite->AddComposite();
 	pCompositeChild->InitializeOBB();
 	//pCompositeChild->InitializeAABB();
@@ -155,15 +163,15 @@ RESULT DreamTestApp::LoadScene() {
 	pSphere->SetMass(1.0f);
 	pSphere->SetPosition(point(0.5f, 0.0f, 0.0f));
 	pCompositeChild->SetPosition(point(1.0f, 0.0f, 0.0f));
-	pCompositeChild->SetRotationalVelocity(vector(0.0f, 0.0f, 0.25f));
+	//pCompositeChild->SetRotationalVelocity(vector(0.0f, 0.0f, 0.25f));
 	//*/
 	
 	//pComposite->SetPosition(point(1.0f, 0.0f, 0.0f));
 	//pComposite->RotateZByDeg(45.0f);
-	pComposite->SetVelocity(point(0.2f, 0.0f, 0.0f));
-	pComposite->SetRotationalVelocity(vector(0.0f, 0.0f, 0.25f));
+	//pComposite->SetVelocity(point(0.2f, 0.0f, 0.0f));
+	//pComposite->SetRotationalVelocity(vector(0.0f, 0.0f, 0.25f));
 
-	AddPhysicsObject(pComposite);
+	//AddPhysicsObject(pComposite);
 
 	/*
 	pComposite = AddModel(L"\\Models\\Boar\\boar-obj.obj", nullptr, point(0.0f, 0.0f, 0.0f), 0.15f, vector(0.0f, 0.0f, 0.0f));
