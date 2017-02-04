@@ -111,10 +111,7 @@ RESULT BoundingVolume::UpdateBoundingVolumeMinMax(point ptMin, point ptMax) {
 	point ptMid = point::midpoint(ptMax, ptMin);
 	vector vHalfVector = ptMax - ptMid;
 
-	ptMid.Print("midpoint");
-
 	CR(SetCenter(ptMid));
-	//m_pParent->SetPivotPoint(ptMid);
 	CR(SetHalfVector(vHalfVector));
 
 Error:

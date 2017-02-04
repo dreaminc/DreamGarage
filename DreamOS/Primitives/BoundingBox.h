@@ -75,6 +75,7 @@ public:
 public:
 	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type);
 	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptOrigin, vector vHalfSize);
+	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptMin, point ptMax);
 
 	bool Intersect(const BoundingSphere& rhs);
 	bool Intersect(const BoundingBox& rhs);
@@ -113,6 +114,10 @@ public:
 
 	virtual point GetMinPoint() override;
 	virtual point GetMaxPoint() override;
+	virtual point GetMinPointOriented() override;
+	virtual point GetMaxPointOriented() override;
+
+	BoundingBox GetBoundingAABB();
 
 	point GetBoxPoint(BoxPoint ptType);
 	BoundingBox::face GetFace(BoxFace faceType);

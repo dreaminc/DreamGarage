@@ -71,8 +71,13 @@ RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBa
 	RESULT r = R_PASS;
 
 	if (pBoundingBox->GetBoxType() == BoundingBox::Type::AABB) {
+		//CR(SetVolumeVertices(&(pBoundingBox->GetBoundingAABB()), fTriangleBased));
 		CR(SetVolumeVertices(pBoundingBox, fTriangleBased));
-		SetOrigin(pBoundingBox->GetOrigin());
+
+		SetOrigin(pBoundingBox->GetOrigin() - pBoundingBox->GetCenter());
+		//SetPivotPoint(pBoundingBox->GetCenter());
+
+		//SetOrientation(pBoundingBox->GetOrientation());
 	}
 	else if (pBoundingBox->GetBoxType() == BoundingBox::Type::OBB) {
 		//m_ptOrigin = RotationMatrix(pBoundingBox->GetOrientation()) * vector(pBoundingBox->GetBoundingVolumeOrigin());
@@ -82,6 +87,7 @@ RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBa
 
 		SetOrigin(pBoundingBox->GetParentOrigin());
 		SetPivotPoint(pBoundingBox->GetParentPivot());
+		
 		//SetOrigin(pBoundingBox->GetParentOrigin() + pBoundingBox->GetCenter());
 		SetOrientation(pBoundingBox->GetOrientation());
 	}

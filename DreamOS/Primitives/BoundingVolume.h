@@ -52,6 +52,11 @@ public:
 
 	virtual point GetMinPoint() = 0;
 	virtual point GetMaxPoint() = 0;
+
+	// This will only apply to certain bounding volumes - otherwise use the above methods 
+	virtual point GetMinPointOriented() { return GetMinPoint(); };
+	virtual point GetMaxPointOriented() { return GetMaxPoint(); };
+
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
 	virtual RESULT SetHalfVector(vector vHalfVector) = 0;
 

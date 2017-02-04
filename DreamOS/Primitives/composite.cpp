@@ -65,44 +65,50 @@ RESULT composite::UpdateBoundingVolume() {
 	if (HasChildren()) {
 		for (auto &childObj : GetChildren()) {
 			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(childObj);
+			
+
 			if (pDimObj != nullptr) {
-				ptMaxTemp = pDimObj->GetBoundingVolume()->GetMaxPoint();
-				ptMinTemp = pDimObj->GetBoundingVolume()->GetMinPoint();
+				auto pObjBoundingVolume = pDimObj->GetBoundingVolume();
 
-				// X
-				if (ptMaxTemp.x() > ptMax.x())
-					ptMax.x() = ptMaxTemp.x();
-				else if (ptMaxTemp.x() < ptMin.x())
-					ptMin.x() = ptMaxTemp.x();
-				
-				if (ptMinTemp.x() > ptMax.x())
-					ptMax.x() = ptMinTemp.x();
-				else if (ptMinTemp.x() < ptMin.x())
-					ptMin.x() = ptMinTemp.x();
+				if (pObjBoundingVolume != nullptr) {
+					ptMinTemp = pObjBoundingVolume->GetMinPointOriented();
+					ptMaxTemp = pObjBoundingVolume->GetMaxPointOriented();
 
-				// Y
-				if (ptMaxTemp.y() > ptMax.y())
-					ptMax.y() = ptMaxTemp.y();
-				else if (ptMaxTemp.y() < ptMin.y())
-					ptMin.y() = ptMaxTemp.y();
+					// X
+					if (ptMaxTemp.x() > ptMax.x())
+						ptMax.x() = ptMaxTemp.x();
+					else if (ptMaxTemp.x() < ptMin.x())
+						ptMin.x() = ptMaxTemp.x();
 
-				if (ptMinTemp.y() > ptMax.y())
-					ptMax.y() = ptMinTemp.y();
-				else if (ptMinTemp.y() < ptMin.y())
-					ptMin.y() = ptMinTemp.y();
+					if (ptMinTemp.x() > ptMax.x())
+						ptMax.x() = ptMinTemp.x();
+					else if (ptMinTemp.x() < ptMin.x())
+						ptMin.x() = ptMinTemp.x();
 
-				// Z
-				if (ptMaxTemp.z() > ptMax.z())
-					ptMax.z() = ptMaxTemp.z();
-				else if (ptMaxTemp.z() < ptMin.z())
-					ptMin.z() = ptMaxTemp.z();
+					// Y
+					if (ptMaxTemp.y() > ptMax.y())
+						ptMax.y() = ptMaxTemp.y();
+					else if (ptMaxTemp.y() < ptMin.y())
+						ptMin.y() = ptMaxTemp.y();
 
-				if (ptMinTemp.z() > ptMax.z())
-					ptMax.z() = ptMinTemp.z();
-				else if (ptMinTemp.z() < ptMin.z())
-					ptMin.z() = ptMinTemp.z();
-			}
-		}
+					if (ptMinTemp.y() > ptMax.y())
+						ptMax.y() = ptMinTemp.y();
+					else if (ptMinTemp.y() < ptMin.y())
+						ptMin.y() = ptMinTemp.y();
+
+					// Z
+					if (ptMaxTemp.z() > ptMax.z())
+						ptMax.z() = ptMaxTemp.z();
+					else if (ptMaxTemp.z() < ptMin.z())
+						ptMin.z() = ptMaxTemp.z();
+
+					if (ptMinTemp.z() > ptMax.z())
+						ptMax.z() = ptMinTemp.z();
+					else if (ptMinTemp.z() < ptMin.z())
+						ptMin.z() = ptMinTemp.z();
+				}	// pBoundingVolume
+			}	// pDimObj
+		} // FOR
 
 		// TODO: Composite is not calculating pivot (Center of mass) vs origin 
 		// there needs to be more work here, especially if we want these to respond physically
@@ -113,7 +119,7 @@ RESULT composite::UpdateBoundingVolume() {
 		if (m_pParent != nullptr) {
 			m_pParent->UpdateBoundingVolume();
 		}
-	}
+	}  // HasChildren()
 
 Error:
 	return r;

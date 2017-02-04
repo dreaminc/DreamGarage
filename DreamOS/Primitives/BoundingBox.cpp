@@ -22,6 +22,13 @@ BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, poin
 	// Empty
 }
 
+BoundingBox::BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptMin, point ptMax) :
+	BoundingVolume(pParentObject),
+	m_type(type)
+{
+	BoundingVolume::UpdateBoundingVolumeMinMax(ptMin, ptMax);
+}
+
 bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 
 	point ptSphereOrigin = static_cast<BoundingSphere>(rhs).GetOrigin();
@@ -731,18 +738,25 @@ vector BoundingBox::GetAxis(BoxAxis boxAxis) {
 	return retVector;
 }
 
+// TODO: Replace with Transform to AABB function - in volume as well
 double BoundingBox::GetWidth() {
-	if (m_type == Type::AABB) {
+	if (m_type == Type::AABB && m_pParent != nullptr) {
 		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-		double width = 0.0f;
+		double min = std::numeric_limits<double>::max();
+		double max = std::numeric_limits<double>::min();
+
 		for (int i = 0; i < 8; i++) {
 			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
-			if (pt.x() > width)
-				width = pt.x();
+
+			if (pt.x() > max)
+				max = pt.x();
+			else if (pt.x() < min)
+				min = pt.x();
 		}
 
-		return static_cast<double>(width * 2.0f);
+		double width = (max - min);
+		return static_cast<double>(width);
 	}
 	
 	// Otherwise it's OBB
@@ -750,17 +764,23 @@ double BoundingBox::GetWidth() {
 }
 
 double BoundingBox::GetHeight() {
-	if (m_type == Type::AABB) {
+	if (m_type == Type::AABB && m_pParent != nullptr) {
 		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-		double height = 0.0f;
+		double min = std::numeric_limits<double>::max();
+		double max = std::numeric_limits<double>::min();
+
 		for (int i = 0; i < 8; i++) {
 			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
-			if (pt.y() > height)
-				height = pt.y();
+			
+			if (pt.y() > max)
+				max = pt.y();
+			else if (pt.y() < min)
+				min = pt.y();
 		}
 
-		return static_cast<double>(height * 2.0f);
+		double height = (max - min);
+		return static_cast<double>(height);
 	}
 	
 	// Otherwise it's OBB
@@ -768,17 +788,23 @@ double BoundingBox::GetHeight() {
 }
 
 double BoundingBox::GetLength() {
-	if (m_type == Type::AABB) {
+	if (m_type == Type::AABB && m_pParent != nullptr) {
 		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-		double length = 0.0f;
+		double min = std::numeric_limits<double>::max();
+		double max = std::numeric_limits<double>::min();
+
 		for (int i = 0; i < 8; i++) {
 			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
-			if (pt.z() > length)
-				length = pt.z();
+			
+			if (pt.z() > max)
+				max = pt.z();
+			else if (pt.z() < min)
+				min = pt.z();
 		}
 
-		return static_cast<double>(length * 2.0f);
+		double length = (max - min);
+		return static_cast<double>(length);
 	}
 	
 	// Otherwise it's OBB
@@ -792,6 +818,54 @@ point BoundingBox::GetMinPoint() {
 
 point BoundingBox::GetMaxPoint() {
 	return (GetOrigin() + GetHalfVector());
+}
+
+point BoundingBox::GetMinPointOriented() {
+	if (m_type == Type::AABB) {
+		return GetMinPoint();
+	}
+	else {
+		auto aabb = GetBoundingAABB();
+		return GetOrigin() - aabb.m_vHalfSize;
+	}
+}
+
+point BoundingBox::GetMaxPointOriented() {
+	if (m_type == Type::AABB) {
+		return GetMaxPoint();
+	}
+	else {
+		auto aabb = GetBoundingAABB();
+		return GetOrigin() + aabb.m_vHalfSize;
+	}
+}
+
+// Original reference: http://www.realtimerendering.com/resources/GraphicsGems/gems/TransBox.c
+BoundingBox BoundingBox::GetBoundingAABB() {
+	point ptMinA = GetMinPoint();
+	point ptMaxA = GetMaxPoint();
+
+	point ptMinB = GetOrigin(); 
+	point ptMaxB = GetOrigin();
+
+	auto matRot = RotationMatrix(GetOrientation());
+
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			auto a = matRot(i, j) * ptMinA(j);
+			auto b = matRot(i, j) * ptMaxA(j);
+			if (a < b) {
+				ptMinB(i) += a;
+				ptMaxB(i) += b;
+			}
+			else {
+				ptMinB(i) += b;
+				ptMaxB(i) += a;
+			}
+		}
+	}
+
+	return BoundingBox(nullptr, Type::AABB, ptMinB, ptMaxB);
 }
 
 point BoundingBox::GetBoxPoint(BoxPoint ptType) {

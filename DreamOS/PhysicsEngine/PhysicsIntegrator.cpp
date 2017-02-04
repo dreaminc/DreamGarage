@@ -41,12 +41,15 @@ Error:
 RESULT PhysicsIntegrator::UpdateObject(VirtualObj *pVirtualObj, double msTimeStep) {
 	RESULT r = R_PASS;
 
-	CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators));
-
 	// Handle Children
+	//*
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
 
 	if (pDimObj != nullptr && pDimObj->HasChildren()) {
+
+		// Null out force generators for composites 
+		CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, std::list<ForceGenerator*>()));
+
 		for (auto &pVirtualChildObj : pDimObj->GetChildren()) {
 			CR(UpdateObject(pVirtualChildObj.get(), msTimeStep));
 		}
@@ -54,6 +57,7 @@ RESULT PhysicsIntegrator::UpdateObject(VirtualObj *pVirtualObj, double msTimeSte
 	else {
 		CR(pVirtualObj->IntegrateState<ObjectState::IntegrationType::RK4>(0.0f, msTimeStep, m_globalForceGenerators));
 	}
+	//*/
 
 Error:
 	return r;

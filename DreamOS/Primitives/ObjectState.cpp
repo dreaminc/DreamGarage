@@ -432,8 +432,6 @@ RESULT ObjectState::Integrate<ObjectState::IntegrationType::RK4>(float timeStart
 	m_qRotation = m_qRotation + qSpin;
 	m_qRotation.Normalize();
 
-	//m_qRotation = m_qSpin;
-
 	if (force.IsZero() == false || m_vVelocity.IsZero() == false || m_qSpin.IsZero() == false) {
 		SetDirty();
 	}
