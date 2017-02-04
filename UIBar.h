@@ -7,6 +7,8 @@
 #include "Sense/SenseController.h"
 #include "Primitives/Publisher.h"
 
+#include "UIModule.h"
+
 #include <stack>
 
 typedef struct UIBarInfo {
@@ -25,7 +27,7 @@ typedef struct UIBarInfo {
 	std::map<std::string, std::vector<std::string>> menu;
 } UI_BAR_INFO;
 
-class UIBar : public Subscriber<SenseControllerEvent> {
+class UIBar : public UIModule {
 public:
 	UIBar(composite* c);
 	UIBar(composite* c, UIBarInfo info);
@@ -39,7 +41,7 @@ public:
 	RESULT ToggleVisible();
 
 private:
-	composite *m_context;
+//	composite *m_context;
 
 	// Update visible menu based on menu title
 	// Access the menu map, where currently title is the key and menu items are the values
@@ -58,7 +60,7 @@ private:
 	float m_rotationY;
 	int m_selectedIndex;
 
-	std::vector<std::shared_ptr<composite>> m_buttons;
+//	std::vector<std::shared_ptr<composite>> m_buttons;
 	int m_visibleMenuItems;
 
 	UIBarInfo m_info;

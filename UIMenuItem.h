@@ -11,9 +11,15 @@ public:
 
 	RESULT Initialize();
 
+	std::shared_ptr<composite> GetButton();
+	std::shared_ptr<quad> GetQuad();
+
 private:
 	composite *m_context;
-	FlatContext *m_pFlatContext;
+
+	std::shared_ptr<composite> m_pButton;
+	std::shared_ptr<quad> m_pQuad;
+
 };
 
 

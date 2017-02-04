@@ -18,10 +18,16 @@ RESULT UIMenuLayer::Initialize()
 
 std::shared_ptr<UIMenuItem> UIMenuLayer::CreateMenuItem()
 {
-	return nullptr;
+	std::shared_ptr<UIMenuItem> pMenuItem = std::make_shared<UIMenuItem>(UIMenuItem(m_context));
+	m_pMenuItems.emplace_back(pMenuItem);
+	return pMenuItem;
 }
 
 RESULT UIMenuLayer::Clear()
 {
 	return R_PASS;
+}
+
+std::vector<std::shared_ptr<UIMenuItem>> UIMenuLayer::GetMenuItems() {
+	return m_pMenuItems;
 }

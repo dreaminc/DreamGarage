@@ -7,7 +7,7 @@
 #include <algorithm>
 
 UIBar::UIBar(composite* c) :
-	m_context(c)
+	UIModule(c)
 {
 	//VARIABLES FOR DOUG
 	m_info.maxNumButtons = 5;			// number of buttons in the arc 
@@ -29,7 +29,7 @@ UIBar::UIBar(composite* c) :
 }
 
 UIBar::UIBar(composite* c, UIBarInfo info) :
-	m_context(c),
+	UIModule(c),
 	m_info(info)
 {
 	Initialize();
@@ -42,7 +42,7 @@ UIBar::~UIBar() {
 RESULT UIBar::Initialize() {
 
 	RESULT r = R_PASS;
-
+/*
 	// menu items
 	for (int i = 0; i < m_info.maxNumButtons; i++) {
 		std::shared_ptr<composite> pButton = m_context->AddComposite();
@@ -57,6 +57,19 @@ RESULT UIBar::Initialize() {
 	std::shared_ptr<quad> q = pButton->AddQuad(1.0f, 1.0f);
 	q->RotateXByDeg(m_info.headerAngleX);
 	m_buttons.emplace_back(pButton);
+
+//*/
+
+
+	CreateMenuLayer(m_info.maxNumButtons + 1); // + 1 for header item
+	std::vector<std::shared_ptr<UIMenuItem>> pItems = m_pLayers[0]->GetMenuItems();
+
+	// Static layout
+	for (int i = 0; i < m_info.maxNumButtons; i++) {
+		pItems[i]->GetQuad()->RotateXByDeg(m_info.itemAngleX);
+	}
+
+	pItems[m_info.maxNumButtons]->GetQuad()->RotateXByDeg(m_info.headerAngleX);
 	
 	m_context->SetVisible(false);
 
@@ -73,13 +86,15 @@ RESULT UIBar::DisplayFromMenuTitle(std::string title) {
 	int shift = m_visibleMenuItems / 2;
 	float odd = (m_visibleMenuItems % 2 == 0) ? 0.5f : 0.0f;
 	std::shared_ptr<texture> pColorTexture = m_context->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	std::vector<std::shared_ptr<UIMenuItem>> pItems = m_pLayers[0]->GetMenuItems();
 
 	for (int i = 0; i <= m_info.maxNumButtons; i++) {
 
 		bool fTitle = i == m_info.maxNumButtons;
 
-		std::shared_ptr<composite> pButton = m_buttons[i];
-		std::shared_ptr<quad> q = std::dynamic_pointer_cast<quad>(pButton->GetChildren()[0]);
+		std::shared_ptr<composite> pButton = pItems[i]->GetButton();
+		std::shared_ptr<quad> q = pItems[i]->GetQuad();
+		//std::shared_ptr<quad> q = std::dynamic_pointer_cast<quad>(pButton->GetChildren()[0]);
 
 		// TODO: could it be possible to reuse this object?
 		// Currently, if the object is reused, the new texture is composed with the old texture
