@@ -119,7 +119,7 @@ public:
 
 	BoundingBox GetBoundingAABB();
 
-	point GetBoxPoint(BoxPoint ptType);
+	point GetBoxPoint(BoxPoint ptType, bool fOriented = true);
 	BoundingBox::face GetFace(BoxFace faceType);
 	vector GetBoxFaceNormal(BoxFace faceType);
 	line GetBoxEdge(BoxEdge edgeType);

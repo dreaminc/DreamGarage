@@ -741,13 +741,14 @@ vector BoundingBox::GetAxis(BoxAxis boxAxis) {
 // TODO: Replace with Transform to AABB function - in volume as well
 double BoundingBox::GetWidth() {
 	if (m_type == Type::AABB && m_pParent != nullptr) {
-		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+		//RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
 		double min = std::numeric_limits<double>::max();
 		double max = std::numeric_limits<double>::min();
 
 		for (int i = 0; i < 8; i++) {
-			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			//point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			point pt = GetBoxPoint((BoxPoint)(i));
 
 			if (pt.x() > max)
 				max = pt.x();
@@ -765,13 +766,14 @@ double BoundingBox::GetWidth() {
 
 double BoundingBox::GetHeight() {
 	if (m_type == Type::AABB && m_pParent != nullptr) {
-		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+		//RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
 		double min = std::numeric_limits<double>::max();
 		double max = std::numeric_limits<double>::min();
 
 		for (int i = 0; i < 8; i++) {
-			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			//point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			point pt = GetBoxPoint((BoxPoint)(i));
 			
 			if (pt.y() > max)
 				max = pt.y();
@@ -789,13 +791,14 @@ double BoundingBox::GetHeight() {
 
 double BoundingBox::GetLength() {
 	if (m_type == Type::AABB && m_pParent != nullptr) {
-		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+		//RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
 		double min = std::numeric_limits<double>::max();
 		double max = std::numeric_limits<double>::min();
 
 		for (int i = 0; i < 8; i++) {
-			point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			//point pt = rotMat * GetBoxPoint((BoxPoint)(i));
+			point pt = GetBoxPoint((BoxPoint)(i));
 			
 			if (pt.z() > max)
 				max = pt.z();
@@ -868,7 +871,7 @@ BoundingBox BoundingBox::GetBoundingAABB() {
 	return BoundingBox(nullptr, Type::AABB, ptMinB, ptMaxB);
 }
 
-point BoundingBox::GetBoxPoint(BoxPoint ptType) {
+point BoundingBox::GetBoxPoint(BoxPoint ptType, bool fOriented) {
 	point retPoint = point(m_vHalfSize);
 	switch (ptType) {
 		case BoxPoint::TOP_RIGHT_FAR: {
@@ -910,8 +913,10 @@ point BoundingBox::GetBoxPoint(BoxPoint ptType) {
 	}
 
 	// Transform point accordingly
-	retPoint = RotationMatrix(GetOrientation()) * retPoint;
-	retPoint = retPoint + GetOrigin();
+	if (fOriented) {
+		retPoint = RotationMatrix(GetOrientation()) * retPoint;
+		retPoint = retPoint + GetOrigin();
+	}
 
 	return retPoint;
 }
