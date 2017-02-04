@@ -112,7 +112,8 @@ CollisionManifold BoundingSphere::Collide(const BoundingQuad& rhs) {
 }
 
 RESULT BoundingSphere::SetHalfVector(vector vHalfVector) {
-	return R_NOT_IMPLEMENTED;
+	m_radius = vHalfVector.magnitude();
+	return R_PASS;
 }
 
 vector BoundingSphere::GetHalfVector() {
