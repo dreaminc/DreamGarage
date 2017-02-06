@@ -171,14 +171,14 @@
     <Filter Include="Models\face4">
       <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DreamTestApp">
-      <UniqueIdentifier>{570eeaa3-0e10-44bf-aa0c-8a76c79f6592}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Primitives\matrix">
       <UniqueIdentifier>{9ecd8ad4-8dee-4052-a0e9-2f164281aa96}</UniqueIdentifier>
     </Filter>
     <Filter Include="PhysicsEngine">
       <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamTestApp">
+      <UniqueIdentifier>{66c11b48-50d3-4aa7-8ee2-d78e07c15c0e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -458,9 +458,6 @@
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamTestApp.cpp">
-      <Filter>DreamTestApp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\volume.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -550,6 +547,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp">
       <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
+      <Filter>DreamTestApp</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2171,9 +2171,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamTestApp.h">
-      <Filter>DreamTestApp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -2263,6 +2260,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
       <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
+      <Filter>DreamTestApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
