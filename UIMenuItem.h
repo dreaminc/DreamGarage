@@ -14,6 +14,40 @@ public:
 	std::shared_ptr<composite> GetButton();
 	std::shared_ptr<quad> GetQuad();
 
+	struct IconFormat
+	{
+		std::shared_ptr<texture> pTexture;
+		float height;
+		float width;
+		point position;
+
+		IconFormat() :
+			pTexture(nullptr),
+			height(0.5f),
+			width(0.5f),
+			position(0.0f, 0.0f, 0.0f)
+		{}
+	};
+
+	struct LabelFormat
+	{
+		const std::wstring font;
+		std::string label;
+		float fontSize;
+		point position;
+		vector scale;
+
+		LabelFormat() :
+			font(L"ArialDistance.fnt"),
+			label(""),
+			fontSize(0.2f),
+			position(0.0f, 0.0f, 0.0f),
+			scale(1.0f, 1.0f, 1.0f)
+		{}
+	};
+
+	RESULT Update(IconFormat iconFormat = IconFormat(), LabelFormat labelFormat = LabelFormat());
+
 private:
 	composite *m_context;
 

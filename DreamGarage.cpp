@@ -50,18 +50,7 @@ RESULT DreamGarage::LoadScene() {
 	// TODO: This should go into an "initialize" function
 	InitializeCloudControllerCallbacks();
 
-	UIBarInfo info;
-	info.maxNumButtons = 5;
-	info.yPosition = -0.5f;
-	info.menuDepth = -1.5f;
-	info.itemAngleX = 60.0f;
-	info.itemAngleY = 20.0f;
-	info.itemScale = vector(1.0f, 1.0f, 1.0f);
-	//info.itemScale = vector(0.5f, 1.0f, 0.25f);
-	info.enlargedScale = 1.25;
-
-	info.headerAngleX = 75.0f;
-	info.headerYPos = -0.0f;
+	UIBarFormat info = UIBarFormat();
 
 	info.menu[""] = { "lorem", "ipsum", "dolor", "sit" };
 	info.menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };

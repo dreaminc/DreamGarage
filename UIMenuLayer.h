@@ -9,7 +9,6 @@ public:
 	UIMenuLayer(composite* c);
 	~UIMenuLayer();
 
-	RESULT Initialize();
 	std::shared_ptr<UIMenuItem> CreateMenuItem();
 	RESULT Clear();
 

@@ -11,7 +11,7 @@
 
 #include <stack>
 
-typedef struct UIBarInfo {
+typedef struct UIBarFormat {
 	int maxNumButtons;		
 	float yPosition;
 	float menuDepth;
@@ -25,12 +25,25 @@ typedef struct UIBarInfo {
 	float headerYPos;
 
 	std::map<std::string, std::vector<std::string>> menu;
+
+	UIBarFormat() :
+		maxNumButtons(5),
+		yPosition(-0.5f),
+		menuDepth(-1.5f),
+		itemAngleX(60.0f),
+		itemAngleY(20.0f),
+		itemScale(vector(1.0f, 1.0f, 1.0f)),
+		enlargedScale(1.25f),
+		headerAngleX(75.0f),
+		headerYPos(0.0f),
+		menu({})
+	{}
+
 } UI_BAR_INFO;
 
 class UIBar : public UIModule {
 public:
-	UIBar(composite* c);
-	UIBar(composite* c, UIBarInfo info);
+	UIBar(composite* c, UIBarFormat info = UIBarFormat());
 	~UIBar();
 
 	RESULT Initialize();
@@ -47,6 +60,10 @@ private:
 	// Access the menu map, where currently title is the key and menu items are the values
 	RESULT DisplayFromMenuTitle(std::string title);
 
+	// Places MenuItem along a circular arc based on index
+	RESULT UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index);
+
+	// Updates MenuItem scale based on a new selected index
 	RESULT UpdateSelectedItem(int index);
 
 	// returns location of furthest point in ray/sphere collision
@@ -54,16 +71,16 @@ private:
 	point FurthestRaySphereIntersect(const ray &r, point center);
 
 private:
+	// these flags help detect controller 'up' events
 	bool m_UIDirty;
 	bool m_UISelect;
 
 	float m_rotationY;
 	int m_selectedIndex;
 
-//	std::vector<std::shared_ptr<composite>> m_buttons;
 	int m_visibleMenuItems;
 
-	UIBarInfo m_info;
+	UIBarFormat m_info;
 	std::stack<std::string> m_menuPath;
 };
 

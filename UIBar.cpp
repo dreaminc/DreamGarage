@@ -6,29 +6,7 @@
 
 #include <algorithm>
 
-UIBar::UIBar(composite* c) :
-	UIModule(c)
-{
-	//VARIABLES FOR DOUG
-	m_info.maxNumButtons = 5;			// number of buttons in the arc 
-
-	m_info.yPosition = -0.5f;	// y position of buttons on the screen, 0.0f is the center
-	m_info.menuDepth = -1.5f;	// distance between the screen and a button (z position)
-
-	m_info.itemAngleY = 20.0f;	// angle between buttons on the arc
-	m_info.itemAngleX = 60.0f;	// upward tilt of the buttons
-
-	m_info.itemScale = vector(0.5f, 1.0f, 0.25f); // 
-	m_info.enlargedScale = 1.25f;	// this value is multiplied to the scale when the menu item is selected
-
-	m_info.headerAngleX = 75.0f;	// values for menu item header
-	m_info.headerYPos = -0.25f;
-
-	m_info.menu[""] = { "Watch", "Listen", "Play", "Whisper", "Present" }; //words display from left to right
-	Initialize();
-}
-
-UIBar::UIBar(composite* c, UIBarInfo info) :
+UIBar::UIBar(composite* c, UIBarFormat info) :
 	UIModule(c),
 	m_info(info)
 {
@@ -42,38 +20,46 @@ UIBar::~UIBar() {
 RESULT UIBar::Initialize() {
 
 	RESULT r = R_PASS;
-/*
-	// menu items
-	for (int i = 0; i < m_info.maxNumButtons; i++) {
-		std::shared_ptr<composite> pButton = m_context->AddComposite();
-		std::shared_ptr<quad> q = pButton->AddQuad(1.0f, 1.0f);
-		q->RotateXByDeg(m_info.itemAngleX);
 
-		m_buttons.emplace_back(pButton);
-	}
+	std::vector<std::shared_ptr<UIMenuItem>> pItems;
+	CR(CreateMenuLayer(m_info.maxNumButtons + 1)); // + 1 for header item
+	pItems = m_pLayers[0]->GetMenuItems();
+	CR(m_context->SetVisible(false));
 
-	// title
-	std::shared_ptr<composite> pButton = m_context->AddComposite();
-	std::shared_ptr<quad> q = pButton->AddQuad(1.0f, 1.0f);
-	q->RotateXByDeg(m_info.headerAngleX);
-	m_buttons.emplace_back(pButton);
-
-//*/
-
-
-	CreateMenuLayer(m_info.maxNumButtons + 1); // + 1 for header item
-	std::vector<std::shared_ptr<UIMenuItem>> pItems = m_pLayers[0]->GetMenuItems();
-
-	// Static layout
-	for (int i = 0; i < m_info.maxNumButtons; i++) {
-		pItems[i]->GetQuad()->RotateXByDeg(m_info.itemAngleX);
-	}
-
-	pItems[m_info.maxNumButtons]->GetQuad()->RotateXByDeg(m_info.headerAngleX);
-	
-	m_context->SetVisible(false);
-
+Error:
 	return r;
+}
+
+RESULT UIBar::UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index) {
+
+	std::shared_ptr<composite> pButton = pItem->GetButton();
+	std::shared_ptr<quad> q = pItem->GetQuad();
+
+	// used to center the UIBar
+	int shift = m_visibleMenuItems / 2;
+	float odd = (m_visibleMenuItems % 2 == 0) ? 0.5f : 0.0f;
+
+	bool fHeader = index == m_info.maxNumButtons;
+
+	// Radial layout
+	int radIndex = fHeader ? 0 : index;
+	float radY = (m_info.itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
+	quaternion rotY = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
+	float yPos = fHeader ? m_info.headerYPos : m_info.yPosition;
+	pButton->MoveTo(0.0f, yPos, 0.0f);
+	pButton->SetOrientation(rotY);
+
+	float radX = (fHeader ? m_info.headerAngleX : m_info.itemAngleX) * M_PI / 180.0f;
+	quaternion rotX = quaternion::MakeQuaternionWithEuler(radX, 0.0f, 0.0f);
+	q->MoveTo(0.0f, 0.0f, m_info.menuDepth);
+	q->SetOrientation(rotX);
+
+	//could be wrong at first controller update
+	float scaleFactor = index == m_selectedIndex ? m_info.enlargedScale : 1;
+	q->ScaleX(m_info.itemScale.x() * scaleFactor);
+	q->ScaleZ(m_info.itemScale.z() * scaleFactor);
+
+	return R_PASS;
 }
 
 RESULT UIBar::DisplayFromMenuTitle(std::string title) {
@@ -82,49 +68,28 @@ RESULT UIBar::DisplayFromMenuTitle(std::string title) {
 	std::vector<std::string> items = m_info.menu[title];
 	m_visibleMenuItems = std::min(m_info.maxNumButtons, (int)items.size());
 
-	//other ones
-	int shift = m_visibleMenuItems / 2;
-	float odd = (m_visibleMenuItems % 2 == 0) ? 0.5f : 0.0f;
 	std::shared_ptr<texture> pColorTexture = m_context->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+	// Layout currently only uses one layer
 	std::vector<std::shared_ptr<UIMenuItem>> pItems = m_pLayers[0]->GetMenuItems();
 
 	for (int i = 0; i <= m_info.maxNumButtons; i++) {
 
 		bool fTitle = i == m_info.maxNumButtons;
 
-		std::shared_ptr<composite> pButton = pItems[i]->GetButton();
-		std::shared_ptr<quad> q = pItems[i]->GetQuad();
-		//std::shared_ptr<quad> q = std::dynamic_pointer_cast<quad>(pButton->GetChildren()[0]);
+		UIMenuItem::LabelFormat labelFormat = UIMenuItem::LabelFormat();
+		labelFormat.label = i < items.size() ? items[i] : (fTitle ? title : "");
 
-		// TODO: could it be possible to reuse this object?
-		// Currently, if the object is reused, the new texture is composed with the old texture
-		std::shared_ptr<FlatContext> pContext = m_context->MakeFlatContext();
-		const std::string str = i < items.size() ? items[i] : (fTitle ? title : "");
-		std::shared_ptr<text> pText = pContext->AddText(L"ArialDistance.fnt", str, 0.2f, true);
-
-		if (str != "") { // placeholder; there could be an instance where we only want an icon displayed
-			std::shared_ptr<quad> pQuad2 = pContext->AddQuad(0.5f, 0.5f, point(0.0f, 0.5f, 0.0f));
-			pQuad2->SetColorTexture(pColorTexture.get());
+		UIMenuItem::IconFormat iconFormat = UIMenuItem::IconFormat();
+		if (labelFormat.label != "") { // placeholder; there could be an instance where only an icon is displayed
+			iconFormat.pTexture = pColorTexture;
+			iconFormat.position = point(0.0f, 0.5f, 0.0f);
 		}
 
-		m_context->RenderToTexture(pContext);
+		pItems[i]->Update(iconFormat, labelFormat);
 
-		q->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
-		pContext->GetFramebuffer();
-
-		int radIndex = fTitle ? 0 : i;
-		float rad = (m_info.itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
-		quaternion rot = quaternion::MakeQuaternionWithEuler(0.0f, rad, 0.0f);
-
-		float yPos = fTitle ? m_info.headerYPos : m_info.yPosition;
-		pButton->MoveTo(0.0f, yPos, 0.0f);
-		pButton->SetOrientation(rot);
-
-		q->MoveTo(0.0f, 0.0f, m_info.menuDepth);
-		// hack
-		float scaleFactor = i == m_selectedIndex ? m_info.enlargedScale : 1;
-		q->ScaleX(m_info.itemScale.x() * scaleFactor);
-		q->ScaleZ(m_info.itemScale.z() * scaleFactor);
+		// can be swapped with a future layout
+		UpdateWithRadialLayout(pItems[i], i);
 	}
 
 	return r;

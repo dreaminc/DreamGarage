@@ -11,11 +11,6 @@ UIMenuLayer::~UIMenuLayer()
 	// empty
 }
 
-RESULT UIMenuLayer::Initialize()
-{
-	return R_PASS;
-}
-
 std::shared_ptr<UIMenuItem> UIMenuLayer::CreateMenuItem()
 {
 	std::shared_ptr<UIMenuItem> pMenuItem = std::make_shared<UIMenuItem>(UIMenuItem(m_context));
@@ -25,6 +20,7 @@ std::shared_ptr<UIMenuItem> UIMenuLayer::CreateMenuItem()
 
 RESULT UIMenuLayer::Clear()
 {
+	m_pMenuItems.clear();
 	return R_PASS;
 }
 

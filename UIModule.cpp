@@ -10,11 +10,6 @@ UIModule::~UIModule()
 	// empty
 }
 
-RESULT UIModule::Initialize()
-{
-	return R_PASS;
-}
-
 RESULT UIModule::CreateMenuLayer(int numButtons) {
 	RESULT r = R_PASS;
 

@@ -11,8 +11,6 @@ public:
 	UIModule(composite* c);
 	~UIModule();
 
-	RESULT Initialize();
-
 	virtual RESULT Notify(SenseControllerEvent *event) override = 0;
 
 	RESULT CreateMenuLayer(int numButtons);
