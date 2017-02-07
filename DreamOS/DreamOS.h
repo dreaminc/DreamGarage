@@ -50,7 +50,10 @@ public:
 
 //protected:
 public:
+	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
+	RESULT SetGravityAcceleration(double acceleration);
+	RESULT SetGravityState(bool fEnabled);
 
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
@@ -101,7 +104,7 @@ protected:
 protected:
 	RESULT RegisterObjectCollision(VirtualObj *pVirtualObject);
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
-
+	
 	// Cloud Controller
 protected:
 	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);

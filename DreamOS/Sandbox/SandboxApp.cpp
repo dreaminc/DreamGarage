@@ -487,6 +487,24 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::SetGravityAcceleration(double acceleration) {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsEngine->SetGravityAccelration(acceleration));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::SetGravityState(bool fEnabled) {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsEngine->SetGravityState(fEnabled));
+
+Error:
+	return r;
+}
+
 FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 

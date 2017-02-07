@@ -11,6 +11,15 @@ RESULT GravityGenerator::Update() {
 }
 
 vector GravityGenerator::GenerateForce(ObjectState *pObjectState, double startTime, double deltaTime) {
-	vector gravityForce = vector(0.0f, -9.8f, 0.0f) * const_cast<ObjectState *>(pObjectState)->GetMass();
+	vector gravityForce = vector(0.0f, m_gravityAcceleration, 0.0f) * const_cast<ObjectState *>(pObjectState)->GetMass();
 	return gravityForce;
+}
+
+double GravityGenerator::GetGravityAcceleration() {
+	return m_gravityAcceleration;
+}
+
+RESULT GravityGenerator::SetGravityAcceleration(double gravityAcceleration) {
+	m_gravityAcceleration = gravityAcceleration;
+	return R_PASS;
 }

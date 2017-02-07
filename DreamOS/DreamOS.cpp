@@ -133,6 +133,14 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
+RESULT DreamOS::SetGravityAcceleration(double acceleration) {
+	return m_pSandbox->SetGravityAcceleration(acceleration);
+}
+
+RESULT DreamOS::SetGravityState(bool fEnabled) {
+	return m_pSandbox->SetGravityState(fEnabled);
+}
+
 light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }

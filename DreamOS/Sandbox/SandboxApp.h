@@ -117,7 +117,11 @@ protected:
 	RESULT RegisterImpViveControllerEvents();
 
 public:
+	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
+	RESULT SetGravityAcceleration(double acceleration);
+	RESULT SetGravityState(bool fEnabled);
+
 	RESULT AddObject(VirtualObj *pObject);	
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);

@@ -371,14 +371,16 @@ ObjectDerivative ObjectState::Evaluate(float timeStart, float timeDelta, const O
 		// External Forces
 		if (externalForceGenerators.size() > 0) {
 			for (auto &forceGenerator : externalForceGenerators) {
-				derivativeOutput.m_vForce += forceGenerator->GenerateForce(this, timeStart, timeDelta);
+				if(forceGenerator->IsEnabled())
+					derivativeOutput.m_vForce += forceGenerator->GenerateForce(this, timeStart, timeDelta);
 			}
 		}
 
 		// Internal Forces
 		if (m_forceGenerators.size() > 0) {
 			for (auto &forceGenerator : m_forceGenerators) {
-				derivativeOutput.m_vForce += forceGenerator->GenerateForce(this, timeStart, timeDelta);
+				if (forceGenerator->IsEnabled())
+					derivativeOutput.m_vForce += forceGenerator->GenerateForce(this, timeStart, timeDelta);
 			}
 		}
 	}

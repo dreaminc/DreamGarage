@@ -1,6 +1,8 @@
 #include "PhysicsEngine.h"
 
 #include "Scene/ObjectStore.h"
+#include "ForceGeneratorFactory.h"
+#include "GravityGenerator.h"
 
 PhysicsEngine::PhysicsEngine() :
 	m_pCollisionDetector(nullptr),
@@ -33,6 +35,11 @@ RESULT PhysicsEngine::Initialize() {
 	CNM(m_pPhysicsIntegrator, "Failed to create phystics integrator module");
 
 	CRM(m_pPhysicsIntegrator->Initialize(), "Failed to initialize Physics Integrator");
+
+	// Add Physics
+	m_pGravityForceGenerator = dynamic_cast<GravityGenerator*>(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY));
+	CN(m_pGravityForceGenerator);
+	CR(m_pPhysicsIntegrator->AddGlobalForceGenerator(m_pGravityForceGenerator));
 
 Error:
 	return r;
@@ -104,6 +111,26 @@ RESULT PhysicsEngine::RegisterObjectCollisionSubscriber(VirtualObj *pVirtualObje
 	RESULT r = R_PASS;
 
 	CR(m_pCollisionDetector->RegisterObjectAndSubscriber(pVirtualObject, pCollisionDetectorSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngine::SetGravityAccelration(float accel) {
+	RESULT r = R_PASS;
+
+	CN(m_pGravityForceGenerator);
+	CR(m_pGravityForceGenerator->SetGravityAcceleration(accel));
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngine::SetGravityState(bool fEnabled) {
+	RESULT r = R_PASS;
+
+	CN(m_pGravityForceGenerator);
+	CR(m_pGravityForceGenerator->SetGeneratorState(fEnabled));
 
 Error:
 	return r;

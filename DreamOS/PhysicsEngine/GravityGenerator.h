@@ -22,11 +22,17 @@ public:
 		// empty
 	}
 
+	double GetGravityAcceleration();
+	RESULT SetGravityAcceleration(double gravityAcceleration);
+
 protected:
 	virtual RESULT Update() override;
 
 public:
 	virtual vector GenerateForce(ObjectState *pObjectState, double startTime, double deltaTime) override;
+
+private:
+	double m_gravityAcceleration = DEFAULT_GRAVITY_ACCEL;
 };
 
 #endif // ! GRAVITY_GENERATOR_H_

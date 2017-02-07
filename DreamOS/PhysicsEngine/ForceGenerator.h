@@ -30,8 +30,18 @@ protected:
 public:
 	virtual vector GenerateForce(ObjectState *pObjectState, double startTime, double deltaTime) = 0;
 
+	RESULT SetGeneratorState(bool fEnabled) {
+		m_fEnabled = fEnabled;
+		return R_PASS;
+	}
+
+	bool IsEnabled() {
+		return m_fEnabled;
+	}
+
 private:
 	UID m_uid;
+	bool m_fEnabled = true;
 };
 
 #endif // ! FORCE_GENERATOR_H_

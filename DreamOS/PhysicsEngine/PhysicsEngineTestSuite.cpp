@@ -29,11 +29,13 @@ RESULT PhysicsEngineTestSuite::TestBallVolume(void *pContext) {
 
 	// Initialize
 	{
+		pDreamOS->SetGravityState(false);
+
 		// Ball to Volume
 		auto pVolume = pDreamOS->AddVolume(0.5, 0.5, 2.0f);
 
 		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
-		pVolume->SetMass(1.0f);
+		pVolume->SetMass(10.0f);
 		//pVolume->SetRotationalVelocity(vector(0.0f, 0.0f, 5.6f));
 		//pVolume->RotateZByDeg(-135.0f);
 		//pVolume->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
@@ -43,7 +45,7 @@ RESULT PhysicsEngineTestSuite::TestBallVolume(void *pContext) {
 		pDreamOS->AddPhysicsObject(pVolume);
 
 		auto pSphere = pDreamOS->AddSphere(0.25f, 10, 10);
-		pSphere->SetPosition(point(3.0f, 0.75f, 0.1f));
+		pSphere->SetPosition(point(3.0f, 0.75f, 0.0f));
 		pSphere->SetMass(1.0f);
 		pSphere->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
 		pDreamOS->AddPhysicsObject(pSphere);
