@@ -19,6 +19,12 @@ public:
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.
 	virtual int PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> pred) = 0;
+
+	// Resize the browser.
+	virtual void Resize(unsigned int width, unsigned int height) = 0;
+
+	// Sending a key sequence one at a time from the collection of chars in keys
+	virtual void SendKeySequence(const std::string& keys) = 0;
 };
 
 class WebBrowserService {
@@ -27,7 +33,7 @@ public:
 	virtual RESULT Initialize() = 0;
 
 	// creates new web browser
-	virtual std::shared_ptr<WebBrowserController> CreateNewWebBrowser(const std::string& url, unsigned int width, unsigned int height) = 0;
+	virtual WebBrowserController* CreateNewWebBrowser(const std::string& url, unsigned int width, unsigned int height) = 0;
 
 	virtual ~WebBrowserService() = 0;
 }; 
@@ -35,7 +41,7 @@ public:
 namespace WebBrowser {
 	// creates new web browser service
 	// returns nullptr when fails
-	std::unique_ptr<WebBrowserService> CreateNewWebBrowserService();
+	std::unique_ptr<WebBrowserService> CreateNewCefBrowserService();
 }
 
 #endif // !BROWSER_H_

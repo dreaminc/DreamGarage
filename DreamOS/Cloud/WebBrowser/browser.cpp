@@ -1,5 +1,5 @@
 #include "browser.h"
-#include "CefBrowser.h"
+#include "CefBrowserService.h"
 
 #include "easylogging++.h"
 
@@ -10,8 +10,8 @@ WebBrowserService::~WebBrowserService() {
 
 namespace WebBrowser {
 
-std::unique_ptr<WebBrowserService> WebBrowser::CreateNewWebBrowserService() {
-	auto service = std::unique_ptr<WebBrowserService>(new CefBrowserServiceImp());
+std::unique_ptr<WebBrowserService> WebBrowser::CreateNewCefBrowserService() {
+	auto service = std::unique_ptr<WebBrowserService>(new CefBrowserService());
 	
 	// init service
 	if (service->Initialize() == R_FAIL) {

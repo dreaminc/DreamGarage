@@ -382,15 +382,15 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
     <ClCompile Include="..\..\..\..\DreamTestApp.cpp" />
-    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp" />
-    <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp" />
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowser.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserService.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
@@ -500,10 +500,6 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamGarage.h" />
     <ClInclude Include="..\..\..\..\DreamTestApp.h" />
-    <ClInclude Include="..\..\..\Cloud\CEFApp.h" />
-    <ClInclude Include="..\..\..\Cloud\CEFHandler.h" />
-    <ClInclude Include="..\..\..\Cloud\CEFImp.h" />
-    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
@@ -516,7 +512,9 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Cloud\Model.h" />
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h" />
     <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h" />
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowser.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserController.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserService.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefHandler.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
