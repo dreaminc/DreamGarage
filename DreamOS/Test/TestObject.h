@@ -17,15 +17,18 @@
 class TestObject {
 public:
 	TestObject(std::function<RESULT()> fnTestFunction);
+	TestObject(std::function<RESULT(void*)> fnTestFunction, void *pContext = nullptr);
 	~TestObject();
 
-	RESULT RunTest();
+	RESULT RunTest(void* pContext = nullptr);
 	RESULT ResetTest();
 	bool DidTestPass();
 
 private:
-	std::function<RESULT()> m_fnTestFunction;
+	std::function<RESULT(void*)> m_fnTestFunction;
 	RESULT m_returnResult;
+
+	void* m_pContext;
 };
 
 #endif // ! TEST_OBJECT_H_

@@ -2,6 +2,8 @@
 #include "DreamTestApp.h"
 #include <string>
 
+#include "PhysicsEngine/PhysicsEngineTestSuite.h"
+
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
 //#define TESTING
 
@@ -18,11 +20,16 @@ RESULT DreamTestApp::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
+	m_pPhysicsEngineTestSuite = std::make_shared<PhysicsEngineTestSuite>(this);
+	CN(m_pPhysicsEngineTestSuite);
+	CR(m_pPhysicsEngineTestSuite->Initialize());
+
 	AddSkybox();
 
 	light *pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+	pLight->EnableShadows();
 
-	//pLight->EnableShadows();
+	m_pPhysicsEngineTestSuite->RunTests();
 
 	/*
 	quad *pBQuad = AddQuad(10.0f, 20.0f, 200, 200);// , pHeightTextureCobble);
@@ -108,7 +115,7 @@ RESULT DreamTestApp::LoadScene() {
 	
 	// Composite vs plane
 
-	///*
+	/*
 	auto pVolume = AddVolume(5.0, 5.0, 1.0f);
 	pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
 	pVolume->SetMass(100000.0f);
@@ -116,6 +123,7 @@ RESULT DreamTestApp::LoadScene() {
 	AddPhysicsObject(pVolume);
 	//*/
 
+	/*
 	auto pSphere = AddSphere(0.5f, 10, 10);
 	pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
 	pSphere->SetMass(1.0f);
@@ -516,7 +524,7 @@ RESULT DreamTestApp::LoadScene() {
 		vector((float)(M_PI_2), 0.0f, 0.0f));
 	//*/
 
-	//Error:
+Error:
 	return r;
 }
 

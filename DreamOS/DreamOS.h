@@ -48,7 +48,8 @@ public:
 	virtual RESULT LoadScene() = 0;
 	virtual RESULT Update(void) = 0;
 
-protected:
+//protected:
+public:
 	RESULT AddPhysicsObject(VirtualObj *pObject);
 
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);

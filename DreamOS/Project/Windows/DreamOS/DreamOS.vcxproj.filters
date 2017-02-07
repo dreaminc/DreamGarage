@@ -551,6 +551,9 @@
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
       <Filter>DreamTestApp</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2263,6 +2266,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
       <Filter>DreamTestApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h">
+      <Filter>PhysicsEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
