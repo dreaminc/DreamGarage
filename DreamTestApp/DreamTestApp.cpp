@@ -29,8 +29,6 @@ RESULT DreamTestApp::LoadScene() {
 	light *pLight = AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 	pLight->EnableShadows();
 
-	m_pPhysicsEngineTestSuite->RunTests();
-
 	/*
 	quad *pBQuad = AddQuad(10.0f, 20.0f, 200, 200);// , pHeightTextureCobble);
 	pBQuad->MoveTo(point(0.0f, -1.0f, 0.0f));
@@ -531,40 +529,9 @@ Error:
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
-	///*
-	if (g_pCylinder != nullptr) {
-		//g_pCylinder->RotateByDeg(0.01f, 0.00f, 0.01f);
-		//g_pCylinder->RotateZBy(0.001f);
-		//g_pCylinder->RotateYBy(0.001f);
-		//g_pCylinder->RotateXBy(0.001f);
-		//g_pCylinder->translate(point(0.0005f, 0.000f, 0.000f));
-		g_pCylinder->translateX(-0.0002f);
-	}
-	//*/
+	CR(m_pPhysicsEngineTestSuite->UpdateAndRunTests());
 
-	///*
-	if (g_pVolume != nullptr) {
-		g_pVolume->SetColor(color(COLOR_WHITE));
-
-		//g_pVolume->RotateByDeg(0.01f, 0.01f, 0.01f);
-		g_pVolume->RotateXBy(0.003f);
-		g_pVolume->RotateYBy(-0.001f);
-		g_pVolume->RotateZBy(-0.003f);
-		g_pVolume->translateX(0.0003f);
-	}
-
-	if (g_pVolume2 != nullptr) {
-		g_pVolume2->SetColor(color(COLOR_WHITE));
-
-		//g_pVolume2->RotateByDeg(0.01f, 0.01f, 0.01f);
-		g_pVolume2->RotateXBy(0.002f);
-		g_pVolume2->RotateYBy(0.001f);
-		g_pVolume2->RotateZBy(0.005f);
-		g_pVolume2->translateX(-0.0003f);
-	}
-	//*/
-
-	//Error:
+Error:
 	return r;
 }
 

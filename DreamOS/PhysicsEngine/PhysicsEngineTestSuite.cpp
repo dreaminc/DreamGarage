@@ -14,25 +14,29 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR((AddTest((std::function<RESULT(void*)>)std::bind(&PhysicsEngineTestSuite::TestBallVolume, this, std::placeholders::_1), 
-		reinterpret_cast<void*>(m_pDreamOS))));
+	//CR((AddTest((std::function<RESULT(void*)>)std::bind(&PhysicsEngineTestSuite::TestBallVolume, this, std::placeholders::_1), 
+	//	reinterpret_cast<void*>(m_pDreamOS))));
+
+	CR(AddTestBallVolume());
 
 Error:
 	return r;
 }
 
-RESULT PhysicsEngineTestSuite::TestBallVolume(void *pContext) {
+RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 	RESULT r = R_PASS;
 
-	DreamOS *pDreamOS = reinterpret_cast<DreamOS*>(pContext);
-	CVM(pDreamOS, "DreamOS instance handle is invalid");
+	double sTestTime = 20.0f;
+	int nRepeats = 10;
 
-	// Initialize
-	{
-		pDreamOS->SetGravityState(false);
+	volume *pVolume = nullptr;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext){
+		m_pDreamOS->SetGravityState(false);
 
 		// Ball to Volume
-		auto pVolume = pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
 
 		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
 		pVolume->SetMass(10.0f);
@@ -42,14 +46,35 @@ RESULT PhysicsEngineTestSuite::TestBallVolume(void *pContext) {
 		//pVolume->ApplyTorqueImpulse(vector(0.0f, 0.0f, 1.0f));
 		//pVolume->ApplyTorqueImpulse(vector(0.0f, 0.1f, 0.0f));
 		//pVolume->ApplyForceAtPoint(vector(-10.0f, 0.0f, 10.0f), point(0.5f, 1.5f, 0.5f), 0.02f);
-		pDreamOS->AddPhysicsObject(pVolume);
+		m_pDreamOS->AddPhysicsObject(pVolume);
 
-		auto pSphere = pDreamOS->AddSphere(0.25f, 10, 10);
+		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
 		pSphere->SetPosition(point(3.0f, 0.75f, 0.0f));
 		pSphere->SetMass(1.0f);
 		pSphere->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
-		pDreamOS->AddPhysicsObject(pSphere);
-	}
+		m_pDreamOS->AddPhysicsObject(pSphere);
+
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs OBB");
+	pNewTest->SetTestDescription("Sphere colliding with an OBB with various orientations");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

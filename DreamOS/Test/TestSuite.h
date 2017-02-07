@@ -25,8 +25,12 @@ public:
 	RESULT RunTests();
 	RESULT RunTest();
 	RESULT NextTest();
-	RESULT AddTest(std::function<RESULT()> fnTestFunction);
-	RESULT AddTest(std::function<RESULT(void*)> fnTestFunction, void *pContext = nullptr);
+
+	RESULT UpdateAndRunTests();
+
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT()> fnTestFunction);
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnUpdate, std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
 	
 	virtual RESULT AddTests() = 0;
 

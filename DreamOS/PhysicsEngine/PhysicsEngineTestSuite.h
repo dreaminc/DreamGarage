@@ -20,22 +20,7 @@ public:
 
 	virtual RESULT AddTests() override;
 
-	RESULT TestBallVolume(void *pContext);
-
-	// Tests
-	/*
-	RESULT TestMatrixCreate();
-	RESULT TestMatrixMultiply();
-	RESULT TestMatrixDeterminant();
-	RESULT TestMatrixMinor();
-	RESULT TestMatrixInverse();
-
-	RESULT TestTranslateMatrix();
-	RESULT TestRotateMatrix();
-	RESULT TestScaleMatrix();
-	RESULT TestViewMatrix();
-	RESULT TestProjectionMatrix();
-	*/
+	RESULT AddTestBallVolume();
 
 private:
 	DreamOS *m_pDreamOS;

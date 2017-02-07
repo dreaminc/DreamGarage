@@ -24,6 +24,18 @@ Error:
 	return r;
 }
 
+// This will run tests per the update loop, for the given duration 
+// zero duration indicates no duration
+
+RESULT TestSuite::UpdateAndRunTests() {
+	RESULT r = R_PASS;
+
+	CB((m_currentTest != m_tests.end()));
+
+Error:
+	return r;
+}
+
 // This will run all tests consecutively 
 RESULT TestSuite::RunTests() {
 	RESULT r = R_PASS;
@@ -63,18 +75,33 @@ std::shared_ptr<TestObject> TestSuite::GetCurrenTest() {
 		return nullptr;
 }
 
-RESULT TestSuite::AddTest(std::function<RESULT(void*)> fnTestFunction, void *pContext) {
+std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnUpdate, std::function<RESULT(void*)> fnTest, void *pContext) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTestFunction, pContext);
+	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnUpdate, fnTest, pContext);
+	CNM(pNewTest, "Failed to allocate new test");
+	m_tests.push_back(pNewTest);
+	
+	return pNewTest;
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnTest, void *pContext) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTest, pContext);
 	CNM(pNewTest, "Failed to allocate new test");
 	m_tests.push_back(pNewTest);
 
+	return pNewTest;
+
 Error:
-	return r;
+	return nullptr;
 }
 
-RESULT TestSuite::AddTest(std::function<RESULT()> fnTestFunction) {
+std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT()> fnTestFunction) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTestFunction);
@@ -82,8 +109,10 @@ RESULT TestSuite::AddTest(std::function<RESULT()> fnTestFunction) {
 
 	m_tests.push_back(pNewTest);
 
+	return pNewTest;
+
 Error:
-	return r;
+	return nullptr;
 }
 
 RESULT TestSuite::ClearTests() {
