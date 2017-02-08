@@ -40,7 +40,7 @@ public:
 		LabelFormat() :
 			font(L"ArialDistance.fnt"),
 			label(""),
-			fontSize(0.2f),
+			fontSize(0.4f),
 			position(0.0f, 0.0f, 0.0f),
 			scale(1.0f, 1.0f, 1.0f)
 		{}
