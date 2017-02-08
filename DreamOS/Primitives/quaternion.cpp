@@ -375,7 +375,7 @@ quaternion& quaternion::operator*=(const quaternion_precision& arg) {
 }
 
 const quaternion& quaternion::operator*(const quaternion_precision& arg) const {
-	return quaternion(*this).operator*=(arg);
+	return (new quaternion(*this))->operator*=(arg);
 }
 
 // http://www.mathworks.com/help/aeroblks/quaternionmultiplication.html
@@ -408,7 +408,7 @@ quaternion& quaternion::operator+=(const quaternion& rhs) {
 }
 
 const quaternion& quaternion::operator+(const quaternion& arg) const {
-	return quaternion(*this).operator+=(arg);
+	return (new quaternion(*this))->operator+=(arg);
 }
 
 quaternion& quaternion::operator-=(const quaternion& rhs) {

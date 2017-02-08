@@ -131,8 +131,10 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 			int a = 5;
 		}
 
+		/*
 		vNormal.Print("normal");
 		DEBUG_LINEOUT("%f", penetration);
+		*/
 
 		//if (manifold.MaxPenetrationDepth() > penetrationThreshold) {
 			const double percentCorrection = 1.05f;		// Penetration percentage to correct
@@ -234,7 +236,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		pObjB->ApplyTorqueImpulse(vTorqueB);
 
 		// Friction
-		double uConstant = 0.5f;
+		double uConstant = 0.4f;
 		vector vTangent = vNormal.cross((vNormal.cross(vRelativeVelocity))).Normal();
 		double jFrictionImpulse = vRelativeVelocity.dot(vTangent) * -1.0f * uConstant;
 		jFrictionImpulse /= denom;

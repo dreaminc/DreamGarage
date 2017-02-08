@@ -16,7 +16,12 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 
 	//CR((AddTest((std::function<RESULT(void*)>)std::bind(&PhysicsEngineTestSuite::TestBallVolume, this, std::placeholders::_1), 
 	//	reinterpret_cast<void*>(m_pDreamOS))));
-
+	
+	CR(AddTestSphereGenerator());
+	CR(AddTestSphereVsSphere());
+	CR(AddTestSphereVsSphereArray());
+	CR(AddTestVolumeToPlaneVolume());
+	CR(AddTestVolumeVolumePointFace());
 	CR(AddTestBallVolume());
 
 Error:
@@ -37,8 +42,8 @@ Error:
 RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 3.0f;
-	int nRepeats = 2;
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
 
 	volume *pVolume = nullptr;
 
@@ -89,6 +94,461 @@ RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 
 	pNewTest->SetTestName("Sphere vs OBB");
 	pNewTest->SetTestDescription("Sphere colliding with an OBB with various orientations");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+
+	volume *pVolume = nullptr;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		m_pDreamOS->SetGravityState(false);
+
+		// Volume vs Volume point - face
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->SetVelocity(-1.0f/2, 0.0f, 0.0f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		//pVolume->RotateYByDeg(45.0f);
+		//pVolume->RotateZByDeg(45.0f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		pVolume->SetPosition(point(-3.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Volume vs Volume Pt Face");
+	pNewTest->SetTestDescription("Volume colliding with volume pt to face");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+
+RESULT PhysicsEngineTestSuite::AddTestVolumeToPlaneVolume() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(true);
+
+		// Volume to "plane"
+		auto pVolume = m_pDreamOS->AddVolume(5.0, 5.0, 1.0f);
+		CN(pVolume);
+
+		pVolume->SetPosition(point(0.0f, -3.0f, 0.0f));
+		pVolume->SetMass(100000.0f);
+		pVolume->SetImmovable(true);
+
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+		CN(pVolume);
+
+		pVolume->SetPosition(point(0.5f, 1.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->RotateZByDeg(45.0f);
+
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		//pQuad = AddQuad(10.0f, 10.0f, 1, 1, nullptr, vector::jVector(1.0f));
+		//pQuad->SetPosition(point(0.0f, -3.0f, 0.0f));
+		//pQuad->SetMass(1.0f);
+		//pQuad->SetImmovable(true);
+		//AddPhysicsObject(pQuad);
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Volume vs Volume Plane");
+	pNewTest->SetTestDescription("Volume colliding with immovable volume");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestSphereVsSphereArray() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Sphere vs Sphere
+		float radius = 0.2f;
+		float padding = 0.1f;
+		int num = 6;
+		for (int i = 0; i < num; i++) {
+			float startY = (((radius * 2.0) + padding) * (num));
+			startY /= -2.0f;
+
+			for (int j = 0; j < num; j++) {
+				sphere *pSphereTemp = m_pDreamOS->AddSphere(radius, 10, 10);
+				CN(pSphereTemp);
+
+				pSphereTemp->SetPosition(point(((2.0f * radius) + padding) * i, startY + (((radius * 2.0) + padding) * j), 0.0f));
+				pSphereTemp->SetMass(1.0f);
+				CR(m_pDreamOS->AddPhysicsObject(pSphereTemp));
+			}
+		}
+
+		sphere *pSphere1 = m_pDreamOS->AddSphere(2.0f, 10, 10);
+		CN(pSphere1);
+
+		pSphere1->SetPosition(point(-4.0f, 0.0f, 0.0f));
+		pSphere1->SetMass(10.0f);
+		pSphere1->SetVelocity(1.0f, 0.0f, 0.0f);
+		
+		CR(m_pDreamOS->AddPhysicsObject(pSphere1));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs Sphere Array");
+	pNewTest->SetTestDescription("Larger sphere colliding with an array of spheres of lesser mass");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestSphereVsSphere() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		sphere *pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, -0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.5f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);		
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(1.0f, 0.0f, 0.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+		
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, -0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 1.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(0.0f, -1.0f, 0.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, -1.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(0.0f, 1.0f, 0.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(1.0f, 0.0f, 0.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs Sphere");
+	pNewTest->SetTestDescription("Spheres colliding with one another in a chain");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestSphereGenerator() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 220.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(true);
+
+		float width = 5.0f;
+		float wallThickness = 0.25f;
+		float wallHeight = 1.0f;
+		float posY = -3.0f;
+
+		auto pVolume = m_pDreamOS->AddVolume(width, width, 1.0f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, posY, 0.0f));
+		pVolume->SetMass(100000.0f);
+		pVolume->SetImmovable(true);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		// left wall
+		pVolume = m_pDreamOS->AddVolume(width, wallThickness, wallHeight);
+		CN(pVolume);
+		pVolume->SetPosition(point(-width/2.0f + wallThickness/2.0f, posY + wallHeight + DREAM_EPSILON, 0.0f));
+		pVolume->SetMass(100000.0f);
+		pVolume->SetImmovable(true);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		// right wall
+		pVolume = m_pDreamOS->AddVolume(width, wallThickness, wallHeight);
+		CN(pVolume);
+		pVolume->SetPosition(point(width / 2.0f - wallThickness / 2.0f, posY + wallHeight + DREAM_EPSILON, 0.0f));
+		pVolume->SetMass(100000.0f);
+		pVolume->SetImmovable(true);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		// front wall
+		pVolume = m_pDreamOS->AddVolume(wallThickness, width - wallThickness*2.1f, wallHeight);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, posY + wallHeight + DREAM_EPSILON, width / 2.0f - wallThickness / 2.0f));
+		pVolume->SetMass(100000.0f);
+		pVolume->SetImmovable(true);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		// back wall
+		pVolume = m_pDreamOS->AddVolume(wallThickness, width - wallThickness*2.1f, wallHeight);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, posY + wallHeight + DREAM_EPSILON, -width / 2.0f + wallThickness / 2.0f));
+		pVolume->SetMass(100000.0f);
+		pVolume->SetImmovable(true);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		sphere *pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 1.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		static int counter = 0;
+		static int j = 1;
+		static int k = 1;
+
+		if (counter >= 100) {
+			sphere *pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+			CN(pSphere);
+			pSphere->SetPosition(point(0.0f + (j) * DREAM_EPSILON * std::pow(-1.0f, j), 1.0f, 0.0f + (k) * DREAM_EPSILON * std::pow(-1.0f, k)));
+			pSphere->SetMass(1.0f);
+			CR(m_pDreamOS->AddPhysicsObject(pSphere));
+			
+			counter = 0;
+			j++;
+			if (j % 2)
+				k++;
+		}
+		else {
+			counter++;
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs Sphere");
+	pNewTest->SetTestDescription("Spheres colliding with one another in a chain");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

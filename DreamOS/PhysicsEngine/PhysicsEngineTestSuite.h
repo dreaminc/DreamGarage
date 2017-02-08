@@ -21,6 +21,11 @@ public:
 	virtual RESULT AddTests() override;
 
 	RESULT AddTestBallVolume();
+	RESULT AddTestVolumeVolumePointFace();
+	RESULT AddTestVolumeToPlaneVolume();
+	RESULT AddTestSphereVsSphereArray();
+	RESULT AddTestSphereVsSphere();
+	RESULT AddTestSphereGenerator();
 
 	RESULT ResetTest(void *pContext);
 
