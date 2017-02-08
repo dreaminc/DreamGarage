@@ -36,7 +36,7 @@ private:
 	struct MaterialBlock {
 		float m_shine;
 		float reserved1;
-		float reserved2;
+		float m_ambient;
 		float reserved3;
 
 		color m_colorAmbient;
