@@ -43,7 +43,7 @@ public:
 	
 	virtual RESULT AddTests() = 0;
 
-	std::shared_ptr<TestObject> GetCurrenTest();
+	std::shared_ptr<TestObject> GetCurrentTest();
 
 private:
 	std::vector<std::shared_ptr<TestObject>> m_tests;

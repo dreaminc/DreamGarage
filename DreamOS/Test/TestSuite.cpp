@@ -106,13 +106,17 @@ RESULT TestSuite::NextTest() {
 	RESULT r = R_PASS;
 
 	CB((m_currentTest != m_tests.end()));
-	m_currentTest++;
+	{
+		auto pTest = (*m_currentTest);
+		CR(pTest->ResetTest());
+		m_currentTest++;
+	}
 
 Error:
 	return r;
 }
 
-std::shared_ptr<TestObject> TestSuite::GetCurrenTest() {
+std::shared_ptr<TestObject> TestSuite::GetCurrentTest() {
 	if (m_currentTest != m_tests.end())
 		return (*m_currentTest);
 	else

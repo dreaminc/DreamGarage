@@ -168,7 +168,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vVelocityBeforeA = vAngularVelocityOfPointA;
 		vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
-		double restitutionConstant = 0.5f;	// TODO: put into object states, then use min
+		double restitutionConstant = 0.8f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
 		point ptRefA = pObjA->GetPointRefCenterOfMass(ptContact);
 		point ptRefB = pObjB->GetPointRefCenterOfMass(ptContact);
@@ -236,7 +236,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		pObjB->ApplyTorqueImpulse(vTorqueB);
 
 		// Friction
-		double uConstant = 0.4f;
+		double uConstant = 0.5f;
 		vector vTangent = vNormal.cross((vNormal.cross(vRelativeVelocity))).Normal();
 		double jFrictionImpulse = vRelativeVelocity.dot(vTangent) * -1.0f * uConstant;
 		jFrictionImpulse /= denom;
