@@ -40,7 +40,7 @@ struct Light {
 struct Material {
 	float m_shine;
 	float m_bump;
-	float reserved2;
+	float m_ambient;
 	float reserved3;
     vec4 m_colorAmbient;
     vec4 m_colorDiffuse;
@@ -75,7 +75,7 @@ uniform bool	u_fRiverAnimation;
 
 layout (location = 0) out vec4 out_vec4Color;
 
-float g_ambient = 0.03f;
+float g_ambient = material.m_ambient;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
@@ -140,8 +140,9 @@ void main(void) {
 		TBNNormal = vec3(0.0f, 0.0f, 1.0f);
 	}
 
+	// TODO: move this logic outside of the shader
 	vec4 colorAmbient = material.m_colorAmbient * ((u_hasTextureAmbient) ? texture(u_textureAmbient, DataIn.uvCoord * 1.0f) : (u_hasTextureColor) ? texture(u_textureColor, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
-	vec4 colorDiffuse = material.m_colorDiffuse * ((u_hasTextureDiffuse) ? texture(u_textureDiffuse, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
+	vec4 colorDiffuse = material.m_colorDiffuse * ((u_hasTextureDiffuse) ? texture(u_textureDiffuse, DataIn.uvCoord * 1.0f) : (u_hasTextureColor) ? texture(u_textureColor, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
 	vec4 colorSpecular = material.m_colorSpecular * ((u_hasTextureSpecular) ? texture(u_textureSpecular, DataIn.uvCoord * 1.0f) : vec4(1, 1, 1, 1));
 
 	if (u_fRiverAnimation) {
@@ -156,8 +157,6 @@ void main(void) {
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);
 
-		vec4LightValue += lightColorAmbient * colorAmbient;
-
 		if(dot(vec3(0.0f, 0.0f, 1.0f), directionLight) > 0.0f) {
 			CalculateFragmentLightValue(lights[i].m_power, TBNNormal, directionLight, directionEye, DataIn.distanceLight[i], diffuseValue, specularValue);
 			vec4LightValue += diffuseValue * lights[i].m_colorDiffuse * colorDiffuse;
@@ -166,6 +165,10 @@ void main(void) {
 	}
 
 	out_vec4Color = vec4LightValue;
+
+	// keeping the alpha value outside max() helps with distance-mapped fonts;
+	// max() is component-wise, and some alpha values currently default to one
+	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.w);
 
 	// opaque/fully transparent blending without reordering
 	EnableBlending(colorAmbient.a, colorDiffuse.a);

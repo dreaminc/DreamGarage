@@ -140,6 +140,11 @@ RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 	return r;
 }
 
+RESULT DimObj::SetMaterialAmbient(float ambient) {
+	m_material.SetAmbientIntensity(ambient);
+	return R_PASS;
+}
+
 RESULT DimObj::SetColorTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
