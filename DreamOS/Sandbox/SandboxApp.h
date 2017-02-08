@@ -122,6 +122,8 @@ public:
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
 
+	RESULT RemoveAllObjects();
+
 	RESULT AddObject(VirtualObj *pObject);	
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);

@@ -24,6 +24,7 @@ public:
 	virtual RESULT PushObject(VirtualObj *pObject) = 0;
 	virtual RESULT RemoveObject(VirtualObj *pObject) = 0;
 
+	virtual RESULT RemoveAllObjects() = 0;
 	virtual RESULT RemoveObjectByUID(UID uid) = 0;
 	virtual VirtualObj *FindObjectByUID(UID uid) = 0;
 	virtual VirtualObj *FindObject(VirtualObj *pObject) = 0;

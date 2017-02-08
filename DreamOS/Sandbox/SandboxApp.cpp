@@ -487,6 +487,17 @@ Error:
 	return r;
 }
 
+// This is the nuclear option - it will flush all objects out
+RESULT SandboxApp::RemoveAllObjects() {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsGraph->RemoveAllObjects());
+	CR(m_pSceneGraph->RemoveAllObjects());
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::SetGravityAcceleration(double acceleration) {
 	RESULT r = R_PASS;
 

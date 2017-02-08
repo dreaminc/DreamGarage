@@ -54,6 +54,16 @@ Error:
 	return r;
 }
 
+RESULT ObjectStore::RemoveAllObjects() {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	CN(m_pSceneGraphStore);
+	CR(m_pSceneGraphStore->RemoveAllObjects());
+
+Error:
+	return r;
+}
+
 RESULT ObjectStore::RemoveObjectByUID(UID uid) {
 	RESULT r = R_NOT_IMPLEMENTED;
 

@@ -529,7 +529,7 @@ Error:
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
-	CR(m_pPhysicsEngineTestSuite->UpdateAndRunTests());
+	CR(m_pPhysicsEngineTestSuite->UpdateAndRunTests((void*)(this)));
 
 Error:
 	return r;

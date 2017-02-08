@@ -1,6 +1,10 @@
 #include "TestObject.h"
 
 TestObject::TestObject(std::function<RESULT()> fnTestFunction) :
+	m_fnInitialize(nullptr),
+	m_fnUpdate(nullptr),
+	m_fnTest(nullptr),
+	m_fnReset(nullptr),
 	m_pContext(nullptr)
 {
 	// Wrap it up
@@ -10,7 +14,10 @@ TestObject::TestObject(std::function<RESULT()> fnTestFunction) :
 }
 
 TestObject::TestObject(std::function<RESULT(void*)> fnTest, void *pContext) :
+	m_fnInitialize(nullptr),
+	m_fnUpdate(nullptr),
 	m_fnTest(fnTest),
+	m_fnReset(nullptr),
 	m_pContext(pContext)
 {
 	// empty
@@ -23,6 +30,21 @@ TestObject::TestObject(std::function<RESULT(void*)> fnInitialize,
 	m_fnInitialize(fnInitialize),
 	m_fnUpdate(fnUpdate),
 	m_fnTest(fnTest),
+	m_fnReset(nullptr),
+	m_pContext(pContext)
+{
+	// empty
+}
+
+TestObject::TestObject(std::function<RESULT(void*)> fnInitialize,
+					   std::function<RESULT(void*)> fnUpdate,
+					   std::function<RESULT(void*)> fnTest,
+					   std::function<RESULT(void*)> fnReset,
+					   void *pContext) :
+	m_fnInitialize(fnInitialize),
+	m_fnUpdate(fnUpdate),
+	m_fnTest(fnTest),
+	m_fnReset(fnReset),
 	m_pContext(pContext)
 {
 	// empty
@@ -35,13 +57,20 @@ TestObject::~TestObject() {
 RESULT TestObject::RunTest(void* pContext) {
 	RESULT r = R_PASS;
 
-	// allow for override 
-	if(pContext == nullptr)
-		m_testResult = m_fnTest(m_pContext);
-	else 
-		m_testResult = m_fnTest(pContext);
+	// Allow for override 
+	m_timeStartRunTest = std::chrono::high_resolution_clock::now();
+	{
+		if (pContext == nullptr)
+			m_testResult = m_fnTest(m_pContext);
+		else
+			m_testResult = m_fnTest(pContext);
+	}
+	m_timeDurationRunTest = std::chrono::high_resolution_clock::now() - m_timeStartRunTest;
 
 	CRM(m_testResult, "Test Failed");
+
+	m_testState = TestObject::state::COMPLETE;
+	m_nCurrentRepetition++;
 
 Error:
 	return r;
@@ -50,13 +79,19 @@ Error:
 RESULT TestObject::InitializeTest(void* pContext) {
 	RESULT r = R_PASS;
 
-	// allow for override 
-	if (pContext == nullptr)
-		m_initializeResult = m_fnInitialize(m_pContext);
-	else
-		m_initializeResult = m_fnInitialize(pContext);
+	// Allow for override 
+	m_timeStartInitialize = std::chrono::high_resolution_clock::now();
+	{
+		if (pContext == nullptr)
+			m_initializeResult = m_fnInitialize(m_pContext);
+		else
+			m_initializeResult = m_fnInitialize(pContext);
+	}
+	m_timeDurationInitialize = std::chrono::high_resolution_clock::now() - m_timeStartInitialize;
 
 	CRM(m_initializeResult, "Test Initialization Failed");
+
+	m_testState = TestObject::state::INITIALIZED;
 
 Error:
 	return r;
@@ -65,11 +100,21 @@ Error:
 RESULT TestObject::UpdateTest(void* pContext) {
 	RESULT r = R_PASS;
 
-	// allow for override 
-	if (pContext == nullptr)
-		m_updateResult = m_fnUpdate(m_pContext);
-	else
-		m_updateResult = m_fnUpdate(pContext);
+	m_timeStartUpdate = std::chrono::high_resolution_clock::now();
+	{
+		// Allow for override 
+		if (pContext == nullptr)
+			m_updateResult = m_fnUpdate(m_pContext);
+		else
+			m_updateResult = m_fnUpdate(pContext);
+	}
+	m_timeDurationUpdate = std::chrono::high_resolution_clock::now() - m_timeStartUpdate;
+	m_timeDurationTotal = std::chrono::high_resolution_clock::now() - m_timeStartTest;
+
+	// This will set the test to done
+	if (std::chrono::duration_cast<std::chrono::seconds>(m_timeDurationTotal).count() > m_sDuration) {
+		CR(CompleteTest());
+	}
 
 	CRM(m_updateResult, "Test Update Failed");
 
@@ -77,10 +122,51 @@ Error:
 	return r;
 }
 
-RESULT TestObject::ResetTest() {
-	m_testResult = R_RESET;
-	m_testState = TestObject::state::NOT_INITIALIZED;
+RESULT TestObject::StartTest() {
+	m_testState = TestObject::state::RUNNING;
+	m_timeStartTest = std::chrono::high_resolution_clock::now();
+	return R_PASS;
+}
 
+RESULT TestObject::ContinueTest() {
+	m_testState = TestObject::state::RUNNING;
+	return R_PASS;
+}
+
+RESULT TestObject::CompleteTest() {
+	m_testState = TestObject::state::DONE;
+	return R_PASS;
+}
+
+RESULT TestObject::StopTest() {
+	m_testState = TestObject::state::STOPPED;
+	return R_PASS;
+}
+
+TestObject::state TestObject::GetTestState() {
+	return m_testState;
+}
+
+int TestObject::CurrentRepetition() {
+	return m_nCurrentRepetition;
+}
+
+int TestObject::Repetitions() {
+	return m_nRepeats;
+}
+
+RESULT TestObject::ResetTest(void *pContext) {
+	RESULT r = R_PASS;
+
+	// Allow for override 
+	if (pContext == nullptr)
+		m_resetResult = m_fnReset(m_pContext);
+	else
+		m_resetResult = m_fnReset(pContext);
+	
+	CRM(m_resetResult, "Test Reset Failed");
+
+Error:
 	return R_PASS;
 }
 

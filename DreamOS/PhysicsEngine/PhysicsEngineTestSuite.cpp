@@ -23,11 +23,22 @@ Error:
 	return r;
 }
 
+RESULT PhysicsEngineTestSuite::ResetTest(void *pContext) {
+	RESULT r = R_PASS;
+
+	// Will reset the sandbox as needed between tests
+	CN(m_pDreamOS);
+	CR(m_pDreamOS->RemoveAllObjects());
+
+Error:
+	return r;
+}
+
 RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 20.0f;
-	int nRepeats = 10;
+	double sTestTime = 3.0f;
+	int nRepeats = 2;
 
 	volume *pVolume = nullptr;
 
@@ -67,8 +78,13 @@ RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 		return R_PASS;
 	};
 
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Sphere vs OBB");

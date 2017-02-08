@@ -27,10 +27,54 @@ Error:
 // This will run tests per the update loop, for the given duration 
 // zero duration indicates no duration
 
-RESULT TestSuite::UpdateAndRunTests() {
+RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 	RESULT r = R_PASS;
 
 	CB((m_currentTest != m_tests.end()));
+
+	{
+		auto pTest = (*m_currentTest);
+
+		switch (pTest->GetTestState()) {
+			case TestObject::state::NOT_INITIALIZED: {
+				// Initialize the test
+				CR(pTest->InitializeTest(pContext));
+			} break;
+
+			case TestObject::state::INITIALIZED: {
+				// Kick off the test
+				CR(pTest->StartTest());
+			} break;
+
+			case TestObject::state::RUNNING: {
+				// Update the test
+				CR(pTest->UpdateTest(pContext));
+			} break;
+
+			case TestObject::state::STOPPED: {
+				// Do nothing for now
+				// TODO: Support this
+			} break;
+
+			case TestObject::state::DONE: {
+				// Run the final test
+				CR(pTest->RunTest(pContext));
+			} break;
+
+			case TestObject::state::COMPLETE: {
+				// Reset and load next test
+				CR(pTest->ResetTest());
+				
+				// Repeat the number of repeats as needed - otherwise increment test
+				if (pTest->CurrentRepetition() < pTest->Repetitions()) {
+					CR(pTest->InitializeTest(pContext));
+				}
+				else {
+					m_currentTest++;
+				}
+			} break;
+		}
+	}
 
 Error:
 	return r;
@@ -75,7 +119,29 @@ std::shared_ptr<TestObject> TestSuite::GetCurrenTest() {
 		return nullptr;
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnUpdate, std::function<RESULT(void*)> fnTest, void *pContext) {
+std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize,
+	std::function<RESULT(void*)> fnUpdate,
+	std::function<RESULT(void*)> fnTest,
+	std::function<RESULT(void*)> fnReset,
+	void *pContext)
+{
+	RESULT r = R_PASS;
+
+	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnUpdate, fnTest, fnReset, pContext);
+	CNM(pNewTest, "Failed to allocate new test");
+	m_tests.push_back(pNewTest);
+
+	return pNewTest;
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, 
+	std::function<RESULT(void*)> fnUpdate, 
+	std::function<RESULT(void*)> fnTest, 
+	void *pContext) 
+{
 	RESULT r = R_PASS;
 
 	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnUpdate, fnTest, pContext);

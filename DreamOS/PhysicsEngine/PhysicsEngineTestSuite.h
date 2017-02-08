@@ -22,6 +22,8 @@ public:
 
 	RESULT AddTestBallVolume();
 
+	RESULT ResetTest(void *pContext);
+
 private:
 	DreamOS *m_pDreamOS;
 

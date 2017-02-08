@@ -141,6 +141,10 @@ RESULT DreamOS::SetGravityState(bool fEnabled) {
 	return m_pSandbox->SetGravityState(fEnabled);
 }
 
+RESULT DreamOS::RemoveAllObjects() {
+	return m_pSandbox->RemoveAllObjects();
+}
+
 light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }

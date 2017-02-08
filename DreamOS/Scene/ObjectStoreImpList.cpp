@@ -62,6 +62,23 @@ RESULT ObjectStoreImpList::RemoveObject(VirtualObj *pObject) {
 	return R_PASS;
 }
 
+RESULT ObjectStoreImpList::RemoveAllObjects() {
+	RESULT r = R_PASS;
+
+	while(m_objects.size() > 0) {
+		auto pObj = m_objects.back();
+		m_objects.remove(pObj);
+	}
+
+	// Clear this out just in case
+	m_objects.clear();
+
+	CB((m_objects.size() == 0));
+
+Error:
+	return r;
+}
+
 RESULT ObjectStoreImpList::RemoveObjectByUID(UID uid) {
 	RESULT r = R_PASS;
 
