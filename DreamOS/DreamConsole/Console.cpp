@@ -152,6 +152,13 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 						else if ((keyCode == VK_SPACE) || (static_cast<char>(keyCode) >= '0' && static_cast<char>(keyCode) <= '9')) {
 							m_cmdText.append(std::string("") + static_cast<char>(keyCode));
 						}
+						// the following is of course nonsense. until we capture the keyboard properly.
+						else if (static_cast<unsigned char>(keyCode) == 190) {
+							m_cmdText.append(std::string("") + ".");
+						}
+						else if (static_cast<unsigned char>(keyCode) == 191) {
+							m_cmdText.append(std::string("") + "/");
+						}
 					} break;
 					}
 				}
