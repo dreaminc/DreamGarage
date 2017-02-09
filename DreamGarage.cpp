@@ -1,6 +1,7 @@
 #include "Logger/Logger.h"
 #include "DreamGarage.h"
 #include <string>
+#include <array>
 
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
 //#define TESTING
@@ -48,7 +49,8 @@ RESULT DreamGarage::LoadScene() {
 	InitializeCloudControllerCallbacks();
 
 	// IO
-	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
+	//RegisterSubscriber((SK_SCAN_CODE)('C'), this);
+	RegisterSubscriber(SK_ALL, this);
 
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);
@@ -60,6 +62,8 @@ RESULT DreamGarage::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 	
+	m_browsers.Init(AddComposite());
+
 	for (auto x : std::array<int, 8>()) {
 		user* pNewUser = AddUser();
 		pNewUser->SetVisible(false);
@@ -394,6 +398,8 @@ std::chrono::system_clock::time_point g_lastHandUpdateTime = std::chrono::system
 RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 	
+	m_browsers.Update();
+
 #ifdef TESTING
 ///*
 	// Update stuff ...
@@ -674,16 +680,11 @@ Error:
 
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
-	/*
-	switch (kbEvent->KeyCode) {
-		case (SK_SCAN_CODE)('C') : {
-			if (kbEvent->KeyState != 0) {
-				HUD_OUT("Key 'C' is pressed - switch model");
-				SendSwitchHeadMessage();
-			}
-		}
+
+	if (kbEvent->KeyState != 0) {
+		m_browsers.OnKey(kbEvent->KeyCode);
 	}
-	*/
+
 //Error:
 	return r;
 }
@@ -723,5 +724,154 @@ RESULT DreamGarage::Notify(CmdPromptEvent *event) {
 		HUD_OUT("<blank>");
 	}
 
+	if (event->GetArg(1).compare("cef") == 0) {
+		if (event->GetArg(2).compare("new") == 0) {
+			// defaults
+			std::string url{ "www.dreamos.com" };
+			unsigned int width = 800;
+			unsigned int height = 600;
+
+			if (event->GetArg(3) != "")
+				url = event->GetArg(3);
+			if (event->GetArg(4) != "")
+				width = std::stoi(event->GetArg(4));
+			if (event->GetArg(5) != "")
+				height = std::stoi(event->GetArg(5));
+
+			m_browsers.CreateNewBrowser(width, height, url);
+		}
+		else {
+			auto browser = m_browsers.GetBrowser(event->GetArg(2));
+
+			if (!browser) {
+				HUD_OUT("browser id does not exist");
+			}
+			else {
+				if (event->GetArg(3).compare("type") == 0) {
+					browser->SendKeySequence(event->GetArg(4));
+				}
+				else if (event->GetArg(3).compare("control") == 0) {
+					m_browsers.SetKeyFocus(event->GetArg(2));
+					HUD_OUT(("controling browser " + event->GetArg(2) + " (hit 'esc' to release control)").c_str());
+				}
+				else {
+					browser->LoadURL(event->GetArg(3));
+				}
+			}
+		}
+	}
+
 	return r;
+}
+
+
+// Browsers
+
+void Browsers::Init(composite* composite) {
+	m_composite = composite;
+	m_BrowserService = WebBrowser::CreateNewCefBrowserService();
+}
+
+void Browsers::Update() {
+	for (auto& b : m_Browsers) {
+		// TODO: optimize with actual dirty rects copy
+		if (b.second.controller->PollNewDirtyFrames([&](unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom) -> bool {
+			b.second.texture->Update(output, width, height, texture::PixelFormat::BGRA);
+			// poll whole frame and stop iterations
+			return false;
+		})) {
+		}
+	}
+}
+
+std::string Browsers::CreateNewBrowser(unsigned int width, unsigned int height, const std::string& url) {
+	static int id = 0;
+	id++;
+
+	Browser browser{
+		m_BrowserService->CreateNewWebBrowser(url, width, height),
+		nullptr,
+		nullptr
+	};
+
+	if (browser.controller == nullptr) {
+		return "";
+	}
+
+	std::vector<unsigned char>	buffer(width * height * 4, 0);
+
+	browser.texture = m_composite->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, texture::PixelFormat::RGBA, 4, &buffer[0], width * height * 4);
+
+	float quadWidth	 = 4.0f * width / 512;
+	float quadHeight = 4.0f * width / 512;
+
+	std::shared_ptr<quad> quad = m_composite->AddQuad(quadWidth, quadHeight);
+
+	// vertical flip
+	quad->TransformUV({{ 0, 0 }}, {{ 1, 0, 0, -1 }});
+
+	quad->ResetRotation();
+	quad->RotateXBy(0.3f);
+
+	static float xOffset = -quadWidth / 2;
+	
+	quad->MoveTo(xOffset + quadWidth / 2, -0.3f + 0.8f, 0);
+	
+	xOffset += quadWidth;
+
+	quad->GetMaterial()->Set(color(0.5f, 0.5f, 0.5f, 1.0f), color(0.5f, 0.5f, 0.5f, 1.0f), color(0.0f, 0.0f, 0.0f, 1.0f));
+
+	quad->SetMaterialTexture(DimObj::MaterialTexture::Ambient, browser.texture.get());
+	quad->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, browser.texture.get());
+	
+	m_Browsers[std::to_string(id)] = browser;
+
+	HUD_OUT("created browser id = %d (%dx%d)", id, width, height);
+
+	return std::to_string(id);
+}
+
+WebBrowserController*	Browsers::GetBrowser(const std::string& id) {
+	if (m_Browsers.find(id) != m_Browsers.end()) {
+		return m_Browsers[id].controller;
+	}
+
+	return nullptr;
+}
+
+void Browsers::SetKeyFocus(const std::string& id) {
+	m_browserInKeyFocus = GetBrowser(id);
+}
+
+void Browsers::OnKey(unsigned int scanCode) {
+	if (m_browserInKeyFocus) {
+		if (scanCode == VK_ESCAPE) {
+			m_browserInKeyFocus = nullptr;
+			HUD_OUT("browser control is released");
+		}
+		else {
+			std::string chr;
+
+			std::locale	loc;
+
+			if (std::use_facet<std::ctype<char>>(loc).is(std::ctype<char>::alpha, static_cast<char>(scanCode))) {
+				chr.append(std::string("") + std::tolower(static_cast<char>(scanCode), loc));
+			}
+			else if ((scanCode == VK_SPACE) || (static_cast<char>(scanCode) >= '0' && static_cast<char>(scanCode) <= '9')) {
+				chr.append(std::string("") + static_cast<char>(scanCode));
+			}
+			// the following is of course nonsense. until we capture the keyboard properly.
+			else if (static_cast<unsigned char>(scanCode) == 190) {
+				chr.append(std::string("") + ".");
+			}
+			else if (static_cast<unsigned char>(scanCode) == 191) {
+				chr.append(std::string("") + "/");
+			}
+
+			if (chr.compare("") == 0)
+				m_browserInKeyFocus->SendKeySequence(std::string("") + static_cast<char>(scanCode));
+			else
+				m_browserInKeyFocus->SendKeySequence(chr);
+		}
+	}
 }
