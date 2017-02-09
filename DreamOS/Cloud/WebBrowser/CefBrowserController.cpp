@@ -58,6 +58,10 @@ void CefBrowserController::Resize(unsigned int width, unsigned int height) {
 	m_browser->GetHost()->WasResized();
 }
 
+void CefBrowserController::LoadURL(const std::string& url) {
+	m_browser->GetFocusedFrame()->LoadURL(url);
+}
+
 void CefBrowserController::SendKeySequence(const std::string& keys) {
 	size_t word_length = keys.length();
 	CefKeyEvent eventToTest;

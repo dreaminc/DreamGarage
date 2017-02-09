@@ -23,6 +23,9 @@ public:
 	// Resize the browser.
 	virtual void Resize(unsigned int width, unsigned int height) = 0;
 
+	// Loads a url
+	virtual void LoadURL(const std::string& url) = 0;
+
 	// Sending a key sequence one at a time from the collection of chars in keys
 	virtual void SendKeySequence(const std::string& keys) = 0;
 };

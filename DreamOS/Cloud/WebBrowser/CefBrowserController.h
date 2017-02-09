@@ -36,6 +36,7 @@ public:
 	virtual int PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> pred) override;
 	virtual void Resize(unsigned int width, unsigned int height) override;
 	virtual void SendKeySequence(const std::string& keys) override;
+	virtual void LoadURL(const std::string& url) override;
 
 	// CefRenderHandler
 	virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
