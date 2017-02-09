@@ -6,80 +6,56 @@
 
 #include <algorithm>
 
-UIBar::UIBar(composite* pComposite, UIBarFormat info) :
+UIBar::UIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat) :
 	UIModule(pComposite),
-	m_info(info)
+	m_iconFormat(iconFormat),
+	m_labelFormat(labelFormat)
 {
-	Initialize();
+	// empty
 }
 
 UIBar::~UIBar() {
 	// empty
 }
 
-RESULT UIBar::UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index) {
+RESULT UIBar::UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index, int size, bool fHeader) {
 
 	std::shared_ptr<composite> pButton = pItem->GetButton();
 	std::shared_ptr<quad> q = pItem->GetQuad();
 
 	// used to center the UIBar
-	int shift = m_visibleMenuItems / 2;
-	float odd = (m_visibleMenuItems % 2 == 0) ? 0.5f : 0.0f;
+	int shift = (size-1) / 2;
+	float odd = ((size-1) % 2 == 0) ? 0.5f : 0.0f;
 
-	bool fHeader = index == m_info.maxNumButtons;
+	// temp
+	float itemAngleX = 60.0f;
+	float itemAngleY = 20.0f;
+	float headerAngleX = 75.0f;
+	float headerYPos = 0.0f;
+	float yPosition = -0.5f;
+	float menuDepth = -1.5f;
+	vector itemScale = vector(1.0f, 1.0f, 1.0f);
+	float enlargedScale = 1.25f;
 
 	// Radial layout
 	int radIndex = fHeader ? 0 : index;
-	float radY = (m_info.itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
+	float radY = (itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
 	quaternion rotY = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
-	float yPos = fHeader ? m_info.headerYPos : m_info.yPosition;
+	float yPos = fHeader ? headerYPos : yPosition;
 	pButton->MoveTo(0.0f, yPos, 0.0f);
 	pButton->SetOrientation(rotY);
 
-	float radX = (fHeader ? m_info.headerAngleX : m_info.itemAngleX) * M_PI / 180.0f;
+	float radX = (fHeader ? headerAngleX : itemAngleX) * M_PI / 180.0f;
 	quaternion rotX = quaternion::MakeQuaternionWithEuler(radX, 0.0f, 0.0f);
-	q->MoveTo(0.0f, 0.0f, m_info.menuDepth);
+	q->MoveTo(0.0f, 0.0f, menuDepth);
 	q->SetOrientation(rotX);
 
 	//could be wrong at first controller update
-	float scaleFactor = index == m_selectedIndex ? m_info.enlargedScale : 1;
-	q->ScaleX(m_info.itemScale.x() * scaleFactor);
-	q->ScaleZ(m_info.itemScale.z() * scaleFactor);
+	float scaleFactor = index == m_selectedIndex ? enlargedScale : 1;
+	q->ScaleX(itemScale.x() * scaleFactor);
+	q->ScaleZ(itemScale.z() * scaleFactor);
 
 	return R_PASS;
-}
-
-RESULT UIBar::DisplayFromMenuTitle(std::string title) {
-	RESULT r = R_PASS;
-
-	std::vector<std::string> items = m_info.menu[title];
-	m_visibleMenuItems = std::min(m_info.maxNumButtons, (int)items.size());
-
-	std::shared_ptr<texture> pColorTexture = m_pContext->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-
-	// Layout currently only uses one layer
-	std::vector<std::shared_ptr<UIMenuItem>> pItems = m_layers[0]->GetMenuItems();
-
-	for (int i = 0; i <= m_info.maxNumButtons; i++) {
-
-		bool fTitle = i == m_info.maxNumButtons;
-
-		UIMenuItem::LabelFormat labelFormat = UIMenuItem::LabelFormat();
-		labelFormat.label = i < items.size() ? items[i] : (fTitle ? title : "");
-
-		UIMenuItem::IconFormat iconFormat = UIMenuItem::IconFormat();
-		if (labelFormat.label != "") { // placeholder; there could be an instance where only an icon is displayed
-			iconFormat.pTexture = pColorTexture;
-			iconFormat.position = point(0.0f, 0.5f, 0.0f);
-		}
-
-		pItems[i]->Update(iconFormat, labelFormat);
-
-		// can be swapped with a future layout
-		UpdateWithRadialLayout(pItems[i], i);
-	}
-
-	return r;
 }
 
 RESULT UIBar::ToggleVisible() {
@@ -91,124 +67,104 @@ RESULT UIBar::ToggleVisible() {
 	// if the context has become visible, reset its position to match the camera
 	if (m_pContext->IsVisible()) {
 		quaternion q = m_pContext->GetCamera()->GetOrientation();
-		m_rotationY = q.ProjectedYRotationDeg();
-		quaternion q2 = quaternion::MakeQuaternionWithEuler(0.0f, m_rotationY * M_PI / 180.0f, 0.0f);
+		m_headRotationYDeg = q.ProjectedYRotationDeg();
+		quaternion q2 = quaternion::MakeQuaternionWithEuler(0.0f, m_headRotationYDeg * M_PI / 180.0f, 0.0f);
 
 		m_pContext->SetPosition(m_pContext->GetCamera()->GetPosition());
 		m_pContext->SetOrientation(q2);
-
-		// When the Menu becomes visible, open the root node
-		m_menuPath.push("");
-		DisplayFromMenuTitle("");
 	}
 
 	return r;
 }
 
-RESULT UIBar::Notify(SenseControllerEvent *event) {
+RESULT UIBar::HandleMenuUp(UILayerInfo info) {
+	RESULT r = R_PASS;
 
-	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
-	CONTROLLER_TYPE cType = event->state.type;
-
-	// Currently, only uses the right controller
-	// The left controller sends the exact same kinds of events, confounding results
-	if (cType == CONTROLLER_RIGHT) {
-		switch (eventType) {
-			case SENSE_CONTROLLER_MENU_UP: {
-				if (m_menuPath.empty()) {
-					ToggleVisible();
-					return R_PASS;
-				}
-				m_menuPath.pop();
-				if (m_menuPath.empty()) {
-					ToggleVisible();
-					return R_PASS;
-				}
-				std::string str = m_menuPath.top();
-				DisplayFromMenuTitle(str);
-			} break;
-
-			//TODO: Create Trigger up and down events
-			case SENSE_CONTROLLER_TRIGGER_MOVE: {
-				if (event->state.triggerRange == 1.0f) {
-					if (m_UISelect && !m_menuPath.empty()) {
-						std::vector<std::string> currentMenu = m_info.menu[m_menuPath.top()];
-						if (m_selectedIndex >= 0 && m_selectedIndex < (int)currentMenu.size() && m_info.menu.count(currentMenu[m_selectedIndex]) > 0) {
-							std::string title = currentMenu[m_selectedIndex];
-
-							m_menuPath.push(title);
-							DisplayFromMenuTitle(title);
-
-							m_UISelect = false;
-						}
-					}
-				}
-				else {
-					m_UISelect = true;
-				}
-			} break;
-		}
+	if (info.icons.size() == 0 && info.labels.size() == 0) {
+		ToggleVisible();
+		return r;
 	}
+	UpdateCurrentUILayer(info);
 
-	return R_PASS;
+	return r;
 }
 
-RESULT UIBar::UpdateSelectedItem(int index) {
+RESULT UIBar::HandleTriggerUp(UILayerInfo info) {
+	RESULT r = R_PASS;
+
+	if (info.icons.size() == 0 && info.labels.size() == 0) {
+		return r;
+	}
+	UpdateCurrentUILayer(info);
+
+	return r;
+}
+
+RESULT UIBar::UpdateSelectedItem(int index, int size) {
+	//*
+	vector itemScale = vector(1.0f, 1.0f, 1.0f);
+	float enlargedScale = 1.25f;
 
 	if (m_selectedIndex != index) {
 		// swap enlarged menu item
-		if (0 <= index && index < m_visibleMenuItems) {
-			auto p = m_pContext->GetChildren()[index];
-			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
+		if (0 <= index && index < size) {
+			auto p = m_currentUILayer->GetMenuItems()[index];
+			auto pButton = p->GetButton();
+			auto q = p->GetQuad();
 			if (pButton != nullptr) {
-				auto q = pButton->GetChildren()[0];
-				q->ScaleX(m_info.itemScale.x() * m_info.enlargedScale);
-				q->ScaleZ(m_info.itemScale.z() * m_info.enlargedScale);
+				q->ScaleX(itemScale.x() * enlargedScale);
+				q->ScaleZ(itemScale.z() * enlargedScale);
 			}
 		}
-		if (0 <= m_selectedIndex && m_selectedIndex < m_visibleMenuItems) {
-			auto p = m_pContext->GetChildren()[m_selectedIndex];
-			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
+		if (0 <= m_selectedIndex && m_selectedIndex < size) {
+			auto p = m_currentUILayer->GetMenuItems()[m_selectedIndex];
+			auto pButton = p->GetButton();
+			auto q = p->GetQuad();
 			if (pButton != nullptr) {
-				auto q = pButton->GetChildren()[0];
-				q->ScaleX(m_info.itemScale.x());
-				q->ScaleZ(m_info.itemScale.z());
+				q->ScaleX(itemScale.x());
+				q->ScaleZ(itemScale.z());
 			}
 		}
 		m_selectedIndex = index;
 	}
-
+//*/
 	return R_PASS;
 }
 
 RESULT UIBar::Update(ray handRay) {
 	
 	// convert ray into context's space
+	//*
+	
 	point ptContext = handRay.GetOrigin() - m_pContext->GetOrigin();
 	ptContext = point(ptContext.x(), 0.0f, ptContext.z());
 	ray contextRay = ray(ptContext, handRay.GetVector());
-	point intersect = FurthestRaySphereIntersect(contextRay, point(0.0f, 0.0f, 0.0f));
+	point intersect = FurthestRaySphereIntersect(contextRay, point(0.0f, 0.0f, 0.0f), 1.5f); // menuDepth
 	vector vIntersect = vector(intersect);
 	vIntersect.Normalize();
 
-	int shift = (int)m_visibleMenuItems / 2;
-	float odd = (m_visibleMenuItems % 2 != 0) ? 0.5f : 0.0f;
-	int numSections = m_info.maxNumButtons != 0 ? 360 / int(m_info.itemAngleY) : 1;
+	//itemAngleY needed
+	int size = (m_currentUILayer) ? int(m_currentUILayer->GetMenuItems().size())-1 : 0;
+	int shift = (int)size / 2;
+	float odd = (size % 2 != 0) ? 0.5f : 0.0f;
+	int numSections = size != 0 ? 360 / int(20.0f) : 1; //itemAngle
 	float deg = float(-atan2(vIntersect.x(), vIntersect.z()) * 180.0f / M_PI);
-	deg -= m_rotationY;
-	int index = (-int((deg) / m_info.itemAngleY - odd) + shift) % numSections;
-	UpdateSelectedItem(index);
+	deg -= m_headRotationYDeg;
+	int index = (-int((deg) / 20.0f - odd) + shift) % numSections; //itemAngle
+	OVERLAY_DEBUG_SET("index", index);
+	UpdateSelectedItem(index, size);
 
 	OVERLAY_DEBUG_SET("selected", m_selectedIndex);
+	//*/
 	return R_PASS;
 }
 
-point UIBar::FurthestRaySphereIntersect(const ray &r, point center) {
-
+point UIBar::FurthestRaySphereIntersect(const ray &r, point center, float radius) {
+//*
 	vector vRayCircle = static_cast<ray>(r).ptOrigin() - center;
 
 	float bValue = static_cast<ray>(r).vDirection().dot(vRayCircle);
-	float cValue = vRayCircle.dot(vRayCircle) - pow(m_info.menuDepth, 2.0f);
+	float cValue = vRayCircle.dot(vRayCircle) - pow(radius, 2.0f); 
 	float resultValue = pow(bValue, 2.0f) - cValue;
 
 	OVERLAY_DEBUG_SET("res", resultValue);
@@ -220,9 +176,35 @@ point UIBar::FurthestRaySphereIntersect(const ray &r, point center) {
 		//float t2 = (-1.0f) * bValue - term;
 		return r.GetOrigin() + point(t1 * r.GetVector());
 	}
+	//*/
 	return point(0.0f, 0.0f, 0.0f);
 }
 
-RESULT UIBar::UpdateCurrentUILayer() {
+RESULT UIBar::UpdateCurrentUILayer(UILayerInfo info) {
+
+	m_pContext->ClearChildren(); //:O
+	auto pLayer = CreateMenuLayer();
+
+	int size = int(std::max(info.icons.size(), info.labels.size()));
+
+	for (int i = 0; i < size; i++) {
+		auto iconFormat = m_iconFormat;
+		auto labelFormat = m_labelFormat;
+		if (i < info.icons.size()) {
+			iconFormat.pTexture = info.icons[i];
+			iconFormat.position = point(0.0f, 0.5f, 0.5f);
+		}
+		if (i < info.labels.size())
+			labelFormat.label = info.labels[i];
+		auto pItem = pLayer->CreateMenuItem();
+		pItem->Update(iconFormat, labelFormat);
+
+		UpdateWithRadialLayout(pItem, i, size, i == size-1);
+	}
+
 	return R_PASS;
+}
+
+int UIBar::GetSelectedIndex() {
+	return m_selectedIndex;
 }

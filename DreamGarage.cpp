@@ -49,16 +49,23 @@ RESULT DreamGarage::LoadScene() {
 
 	// TODO: This should go into an "initialize" function
 	InitializeCloudControllerCallbacks();
+	m_pTestIcon = std::shared_ptr<texture>(MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
-	UIBarFormat info = UIBarFormat();
+	composite* pComposite = AddComposite();
+	//CN(pComposite);
+	UIMenuItem::IconFormat iconFormat = UIMenuItem::IconFormat();
+	UIMenuItem::LabelFormat labelFormat = UIMenuItem::LabelFormat();
+	m_pDreamUIBar = new DreamUIBar(pComposite, iconFormat, labelFormat);
 
-	info.menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-	info.menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
-	info.menu["ipsum"] = { "1", "2", "3" };
-	info.menu["Play"] = { "a", "b", "c" };
+	//Hardcoded menu for now, will be replaced with api requests
+	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
+	m_menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
+	m_menu["ipsum"] = { "1", "2", "3" };
+	m_menu["Play"] = { "a", "b", "c" };
 
-	m_UIBar = new UIBar(AddComposite(), info);
-	//m_UIBar = new UIBar(AddComposite()); // Use parameter defaults
+	m_menuPath = {};
+
+	//CN(m_pDreamUIBar);
 
 	// IO
 	RegisterSubscriber(SVK_ALL, this);
@@ -67,8 +74,11 @@ RESULT DreamGarage::LoadScene() {
 //*
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, m_UIBar);
-	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, m_UIBar);
+	//RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, m_pDreamUIBar);
+	//RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, m_pDreamUIBar);
+	//RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, m_pDreamUIBar);
+	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, this);
+	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this);
 	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, this);
 	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, this);
@@ -149,25 +159,6 @@ RESULT DreamGarage::LoadScene() {
 		);
 	}
 
-	composite* pComposite = AddComposite();
-	CN(pComposite);
-	m_pDreamUIBar = new DreamUIBar(pComposite);
-	
-	CN(m_pDreamUIBar);
-
-	//m_pDreamUIBar = new UIBar(AddComposite()); // Use parameter defaults
-
-	// IO
-	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
-//*
-	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
-	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, m_pDreamUIBar);
-	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, m_pDreamUIBar);
-	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, m_pDreamUIBar);
-	RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, this);
-	//*/
-	//RegisterSubscriber()
 
 #ifdef TESTING
 // Test Scene
@@ -361,7 +352,7 @@ RESULT DreamGarage::LoadScene() {
 //*/
 #endif // ! TESTING
 
-Error:
+//Error:
 	return r;
 }
 
@@ -749,35 +740,85 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 	RESULT r = R_PASS;
 
 	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
-	CONTROLLER_TYPE ctype = event->state.type;
 	OVERLAY_DEBUG_SET("event", "none");
 
-	if (ctype == CONTROLLER_LEFT) {
-		if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
-			OVERLAY_DEBUG_SET("event", "menu down");
-		}
-		if (eventType == SENSE_CONTROLLER_MENU_UP) {
-			OVERLAY_DEBUG_SET("event", "menu up");
-		}
-		if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
-			OVERLAY_DEBUG_SET("event", "grip down");
-		}
-		if (eventType == SENSE_CONTROLLER_GRIP_UP) {
-			OVERLAY_DEBUG_SET("event", "grip up");
-		}
+	if (event->state.type == CONTROLLER_RIGHT) {
 		if (eventType == SENSE_CONTROLLER_TRIGGER_MOVE) {
 			OVERLAY_DEBUG_SET("event", "trigger move");
 		}
-		if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-			OVERLAY_DEBUG_SET("event", "trigger down");
-		}
-		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
-			OVERLAY_DEBUG_SET("event", "trigger up");
-		}
-		if (eventType == SENSE_CONTROLLER_PAD_MOVE) {
+		else if (eventType == SENSE_CONTROLLER_PAD_MOVE) {
 			OVERLAY_DEBUG_SET("event", "pad move");
 		}
+
+		else if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+			OVERLAY_DEBUG_SET("event", "trigger down");
+		}
+
+		// TODO:  soon this code will be replaced with api requests, 
+		// as opposed to accessing the hardcoded local data structures
+		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
+			OVERLAY_DEBUG_SET("event", "trigger up");
+			// select item
+			std::string current = "";
+			UILayerInfo info = UILayerInfo();
+			if (!m_menuPath.empty()) {
+				std::vector<std::string> currentMenu = m_menu[m_menuPath.top()];
+				//check bounds	
+				int selectedIndex = m_pDreamUIBar->GetSelectedIndex(); // fix with real collision code
+				int count = int(m_menu.count(currentMenu[selectedIndex]));
+				if (count > 0) {
+					std::string title = currentMenu[selectedIndex];
+
+					m_menuPath.push(title);
+					info.labels = m_menu[currentMenu[selectedIndex]];
+					info.labels.emplace_back(title);
+					for (int i = 0; i < (int)info.labels.size(); i++) {
+						info.icons.emplace_back(m_pTestIcon);
+					}
+				}
+			}
+			m_pDreamUIBar->HandleTriggerUp(info);
+		}
+		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
+			OVERLAY_DEBUG_SET("event", "menu up");
+			// pull up menu
+			UILayerInfo info = UILayerInfo();
+			// go back
+			if (!m_menuPath.empty()) {
+				m_menuPath.pop();
+				if (!m_menuPath.empty()) {
+					std::string str = m_menuPath.top();
+					info.labels = m_menu[str];
+					info.labels.emplace_back(str);
+					for (int i = 0; i < info.labels.size(); i++) {
+						info.icons.emplace_back(m_pTestIcon);
+					}
+				}
+			}
+			// open menu
+			else {
+				info.labels = m_menu[""];
+				info.labels.emplace_back(""); // fake header for root menu
+				for (int i = 0; i < info.labels.size(); i++) {
+					info.icons.emplace_back(m_pTestIcon);
+				}
+				m_pDreamUIBar->ToggleVisible();
+				m_menuPath.push("");
+			}
+			m_pDreamUIBar->HandleMenuUp(info);
+		}
 	}
+	//*
+	else if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
+		OVERLAY_DEBUG_SET("event", "grip down");
+	}
+	else if (eventType == SENSE_CONTROLLER_GRIP_UP) {
+		OVERLAY_DEBUG_SET("event", "grip up");
+	}
+	else if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
+		OVERLAY_DEBUG_SET("event", "menu down");
+	}
+	//*/
 
 	return r;
 }

@@ -14,7 +14,6 @@
 #include <stack>
 
 typedef struct UIBarFormat {
-	int maxNumButtons;		
 	float yPosition;
 	float menuDepth;
 
@@ -26,10 +25,7 @@ typedef struct UIBarFormat {
 	float headerAngleX;
 	float headerYPos;
 
-	std::map<std::string, std::vector<std::string>> menu;
-
 	UIBarFormat() :
-		maxNumButtons(5),
 		yPosition(-0.5f),
 		menuDepth(-1.5f),
 		itemAngleX(60.0f),
@@ -37,53 +33,51 @@ typedef struct UIBarFormat {
 		itemScale(vector(1.0f, 1.0f, 1.0f)),
 		enlargedScale(1.25f),
 		headerAngleX(75.0f),
-		headerYPos(0.0f),
-		menu({})
+		headerYPos(0.0f)
 	{}
 
 } UI_BAR_INFO;
 
 class UIBar : public UIModule {
 public:
-	UIBar(composite* pComposite, UIBarFormat info = UIBarFormat());
+	UIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat);
 	~UIBar();
 
-	RESULT Initialize();
+	virtual RESULT HandleMenuUp(UILayerInfo info) override;
+	virtual RESULT HandleTriggerUp(UILayerInfo info) override;
 
-	virtual RESULT Notify(SenseControllerEvent *event) override;
 	RESULT Update(ray handRay);
 
-	virtual RESULT UpdateCurrentUILayer() override;
+	virtual RESULT UpdateCurrentUILayer(UILayerInfo info) override;
 
 	RESULT ToggleVisible();
+	int GetSelectedIndex();
 
 private:
-//	composite *m_context;
-
-	// Update visible menu based on menu title
-	// Access the menu map, where currently title is the key and menu items are the values
-	RESULT DisplayFromMenuTitle(std::string title);
 
 	// Places MenuItem along a circular arc based on index
-	RESULT UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index);
+	RESULT UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index, int size, bool fHeader);
 
 	// Updates MenuItem scale based on a new selected index
-	RESULT UpdateSelectedItem(int index);
+	RESULT UpdateSelectedItem(int index, int size);
 
 	// returns location of furthest point in ray/sphere collision
 	// this code should be in boundingsphere, but it is written here to avoid conflicts for now
-	point FurthestRaySphereIntersect(const ray &r, point center);
+	point FurthestRaySphereIntersect(const ray &r, point center, float radius);
+
 
 private:
 	// these flags help detect controller 'up' events
 	bool m_UISelect;
 
-	float m_rotationY;
+	float m_headRotationYDeg;
 	int m_selectedIndex;
 
 	int m_visibleMenuItems;
 
-	UIBarFormat m_info;
+	UIMenuItem::IconFormat m_iconFormat;
+	UIMenuItem::LabelFormat m_labelFormat;
+
 	std::stack<std::string> m_menuPath;
 };
 

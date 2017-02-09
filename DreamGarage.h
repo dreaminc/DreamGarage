@@ -108,6 +108,11 @@ private:
 	
 
 	DreamUIBar *m_pDreamUIBar;
+	//
+	//temporarily hardcoded
+	std::map<std::string, std::vector<std::string>> m_menu;
+	std::stack<std::string> m_menuPath;
+	std::shared_ptr<texture> m_pTestIcon;
 
 	Browsers m_browsers;
 };

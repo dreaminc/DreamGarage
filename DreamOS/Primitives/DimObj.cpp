@@ -245,7 +245,8 @@ RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
 }
 
 RESULT DimObj::ClearChildren() {
-	m_pObjects->clear();
+	if (m_pObjects != nullptr)
+		m_pObjects->clear();
 	return R_PASS;
 }
 

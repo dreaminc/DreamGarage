@@ -1,9 +1,9 @@
 #include "DreamUIBar.h"
 
-DreamUIBar::DreamUIBar(composite* pComposite) :
-	UIBar(pComposite, UIBarFormat()) 
+DreamUIBar::DreamUIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat) :
+	UIBar(pComposite, iconFormat, labelFormat) 
 {
-	//Initialize();
+	Initialize();
 }
 
 DreamUIBar::~DreamUIBar() 
@@ -18,24 +18,10 @@ RESULT DreamUIBar::RegisterEvent(UIMenuItemEvent type, std::function<RESULT(void
 RESULT DreamUIBar::Initialize() {
 
 	RESULT r = R_PASS;
-/*
-	UIBarFormat info = UIBarFormat();
 
-	info.menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-	info.menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
-	info.menu["ipsum"] = { "1", "2", "3" };
-	info.menu["Play"] = { "a", "b", "c" };
+//	std::shared_ptr<UIMenuLayer> pMenuLayer = CreateMenuLayer();
 
-	m_info = info;
-	//*/
-
-	std::shared_ptr<UIMenuLayer> pMenuLayer = CreateMenuLayer();
-	CN(pMenuLayer);
-
-	std::shared_ptr<UIMenuItem> pMenuItem = nullptr;
-
-	pMenuItem = pMenuLayer->CreateMenuItem();
-
+//	CN(pMenuLayer);
 	CR(m_pContext->SetVisible(false));
 
 Error:

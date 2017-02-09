@@ -17,8 +17,11 @@ std::shared_ptr<UIMenuLayer> UIModule::CreateMenuLayer() {
 	std::shared_ptr<UIMenuLayer> pUIMenuLayer = nullptr;
 	CN(pComposite);
 
+	//pUIMenuLayer = std::make_shared<UIMenuLayer>(m_pContext);
 	pUIMenuLayer = std::make_shared<UIMenuLayer>(pComposite);
-	m_layers.emplace_back();
+	m_layers.emplace_back(pUIMenuLayer);
+
+	m_currentUILayer = pUIMenuLayer;
 
 Error:
 	return pUIMenuLayer;

@@ -40,7 +40,7 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 		true // force distance fields
 	);
 	pText->MoveTo(labelFormat.position);
-
+//*
 	std::shared_ptr<quad> pIcon = pContext->AddQuad(
 		iconFormat.width,
 		iconFormat.height,
@@ -50,7 +50,7 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 		pIcon->SetColorTexture(iconFormat.pTexture.get());
 	else
 		pIcon->SetVisible(false);
-
+//*/
 	m_context->RenderToTexture(pContext);
 	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 
