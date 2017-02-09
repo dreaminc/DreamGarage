@@ -78,9 +78,10 @@ void CefHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 		}
 	}
 
-	if (m_browsers.empty()) {
-		CefQuitMessageLoop();
-	}
+	// don't quit cef when browsers are destroyed to keep the browser service running
+	//if (m_browsers.empty()) {
+	//	CefQuitMessageLoop();
+	//}
 }
 
 void CefHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
@@ -101,11 +102,17 @@ void CefHandler::CloseAllBrowsers(bool force_close) {
 		return;
 	}
 
-	if (m_browsers.empty())
+	if (m_browsers.empty()) {
+		CefQuitMessageLoop();
 		return;
+	}
 
 	for (BrowserList::const_iterator it = m_browsers.begin(); it != m_browsers.end(); ++it)
 		(*it)->GetHost()->CloseBrowser(force_close);
+
+	if (m_browsers.empty()) {
+		CefQuitMessageLoop();
+	}
 }
 
 WebBrowserController*	CefHandler::CreateBrowser(unsigned int width, unsigned int height, const std::string& url) {
