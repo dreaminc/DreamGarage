@@ -115,6 +115,11 @@ public:
 	texture* GetTextureSpecular();
 
 	RESULT SetRandomColor();
+	
+	// linear transformation for uv vector = a + b * uv
+	// this is a slow operation, use it only for initialization
+	// should not be used for transforming uv in real time
+	RESULT TransformUV(matrix<uv_precision, 2, 1> a, matrix<uv_precision, 2, 2> b);
 
 	// Children (composite objects)
 	RESULT AddChild(std::shared_ptr<DimObj> pDimObj);
