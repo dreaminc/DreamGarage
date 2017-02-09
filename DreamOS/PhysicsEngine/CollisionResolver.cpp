@@ -168,13 +168,13 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		vector vVelocityBeforeA = vAngularVelocityOfPointA;
 		vector vVelocityBeforeB = vAngularVelocityOfPointB;
 
-		double restitutionConstant = 0.8f;	// TODO: put into object states, then use min
+		double restitutionConstant = 0.9f;	// TODO: put into object states, then use min
 		vector vRelativeVelocity = vVelocityBeforeA - vVelocityBeforeB;
 		point ptRefA = pObjA->GetPointRefCenterOfMass(ptContact);
 		point ptRefB = pObjB->GetPointRefCenterOfMass(ptContact);
 		
-		vector vRefA = (ptContact - pObjA->GetOrigin());
-		vector vRefB = (ptContact - pObjB->GetOrigin());
+		vector vRefA = (ptContact - pObjA->GetOrigin(true));
+		vector vRefB = (ptContact - pObjB->GetOrigin(true));
 
 		// http://www.euclideanspace.com/physics/dynamics/collision/threed/ - For impulse equation below
 		double jImpulse = -(1.0f + restitutionConstant);

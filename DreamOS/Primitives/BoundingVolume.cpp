@@ -81,6 +81,20 @@ point BoundingVolume::GetCenter() {
 	return m_ptCenter;
 }
 
+quaternion BoundingVolume::GetAbsoluteOrientation() {
+	return m_pParent->GetOrientation(true);
+}
+
+point BoundingVolume::GetAbsoluteOrigin() {
+	if (!m_ptCenter.IsZero()) {
+		point ptRotated = RotationMatrix(GetAbsoluteOrientation()) * vector(m_ptCenter);
+		return (m_pParent->GetOrigin(true) + ptRotated);
+	}
+	else {
+		return (m_pParent->GetOrigin(true));
+	}
+}
+
 point BoundingVolume::GetOrigin() {
 	if (!m_ptCenter.IsZero()) {
 		point ptRotated = RotationMatrix(GetOrientation()) * vector(m_ptCenter);

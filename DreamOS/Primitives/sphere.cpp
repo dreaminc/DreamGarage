@@ -46,8 +46,8 @@ Error:
 
 sphere::sphere(BoundingSphere *pBoundingSphere, bool fTriangleBased) :
 	m_radius(1.0f),
-	m_numAngularDivisions(MIN_SPHERE_DIVISIONS * 5),
-	m_numVerticalDivisions(MIN_SPHERE_DIVISIONS * 5)
+	m_numAngularDivisions(MIN_SPHERE_DIVISIONS * 3),
+	m_numVerticalDivisions(MIN_SPHERE_DIVISIONS * 3)
 {
 	RESULT r = R_PASS;
 
@@ -85,7 +85,7 @@ Error:
 RESULT sphere::SetSphereVertices(BoundingSphere* pBoundingSphere, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	m_radius = pBoundingSphere->GetRadius();
+	m_radius = pBoundingSphere->GetRadius() * 1.05f;	// Add a buffer so we can see the reference geometry 
 	SetOrigin(pBoundingSphere->GetOrigin());
 
 	//CR(SetSphereVertices(m_radius, m_numAngularDivisions, m_numVerticalDivisions, pBoundingSphere->GetOrigin()));

@@ -13,6 +13,8 @@
 #include "ray.h"
 #include "dirty.h"
 
+#include <memory>
+
 class VirtualObj;
 class BoundingSphere;
 class BoundingBox;
@@ -27,7 +29,6 @@ public:
 		SPHERE,
 		QUAD,
 		PLANE,
-
 		INVALID
 	};
 
@@ -72,6 +73,10 @@ public:
 	VirtualObj *GetParentObject() const;
 	point GetOrigin();
 	quaternion GetOrientation();
+
+	// These provide the absolute orientation/origin of the object
+	point GetAbsoluteOrigin();
+	quaternion GetAbsoluteOrientation();
 
 	virtual BoundingVolume::Type GetType() = 0;
 

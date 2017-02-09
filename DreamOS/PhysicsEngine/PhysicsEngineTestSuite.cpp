@@ -14,10 +14,9 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	//CR((AddTest((std::function<RESULT(void*)>)std::bind(&PhysicsEngineTestSuite::TestBallVolume, this, std::placeholders::_1), 
-	//	reinterpret_cast<void*>(m_pDreamOS))));
-	
-	CR(AddTestComposite());
+	CR(AddTestCompositeCollisionSphereVolume());
+	CR(AddTestCompositeCollisionSpheres());
+	CR(AddTestCompositeComposition());
 	CR(AddTestVolumeVolumeEdge());
 	CR(AddTestQuadVsSphere());
 	CR(AddTestSphereGenerator());
@@ -752,7 +751,7 @@ Error:
 }
 
 
-RESULT PhysicsEngineTestSuite::AddTestComposite() {
+RESULT PhysicsEngineTestSuite::AddTestCompositeComposition() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 15.0f;
@@ -843,8 +842,199 @@ RESULT PhysicsEngineTestSuite::AddTestComposite() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Composite Test");
-	pNewTest->SetTestDescription("Testing composite");
+	pNewTest->SetTestName("Composite Composition");
+	pNewTest->SetTestDescription("Testing composite composition along with internal rotations and active external transformations");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+
+RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSpheres() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+	static int nRepeatCounter = 0;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Composite vs plane
+
+		std::shared_ptr<sphere> pSphere = nullptr;
+		composite *pComposite = nullptr;
+		std::shared_ptr<composite> pCompositeChild = nullptr;
+
+		pComposite = m_pDreamOS->AddComposite();
+		CN(pComposite);
+
+		// Test the various types
+		switch (nRepeatCounter) {
+		case 0: pComposite->InitializeOBB(); break;
+		case 1: pComposite->InitializeAABB(); break;
+		case 2: pComposite->InitializeBoundingSphere(); break;
+		}
+
+		pComposite->SetMass(1.0f);
+
+		pSphere = pComposite->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetMass(1.0f);
+		pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+		pSphere = pComposite->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetMass(1.0f);
+		pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+		pSphere = pComposite->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetMass(1.0f);
+		pSphere->SetPosition(point(0.0f, 1.0f, 0.0f));
+
+		pSphere = pComposite->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetMass(1.0f);
+		pSphere->SetPosition(point(0.0f, -1.0f, 0.0f));
+
+		pComposite->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pComposite->RotateZByDeg(45.0f);
+
+		CR(m_pDreamOS->AddPhysicsObject(pComposite));
+
+		auto pSphereCollide = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphereCollide);
+		pSphereCollide->SetMass(1.0f);
+		pSphereCollide->SetPosition(point(3.0f, 1.0f, 0.0f));
+		pSphereCollide->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pSphereCollide));
+
+		nRepeatCounter++;
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Composite Sphere Collision");
+	pNewTest->SetTestDescription("Testing composite collisions with spheres");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSphereVolume() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+	static int nRepeatCounter = 0;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Composite vs plane
+
+		std::shared_ptr<volume> pVolume = nullptr;
+		composite *pComposite = nullptr;
+		std::shared_ptr<composite> pCompositeChild = nullptr;
+
+		pComposite = m_pDreamOS->AddComposite();
+		CN(pComposite);
+
+		// Test the various types
+		switch (nRepeatCounter) {
+		case 0: pComposite->InitializeOBB(); break;
+		case 1: pComposite->InitializeAABB(); break;
+		case 2: pComposite->InitializeBoundingSphere(); break;
+		}
+
+		pComposite->SetMass(1.0f);
+
+		pVolume = pComposite->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetMass(1.0f);
+		pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+		pVolume = pComposite->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetMass(1.0f);
+		pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+		pVolume = pComposite->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetMass(1.0f);
+		pVolume->SetPosition(point(0.0f, 1.0f, 0.0f));
+
+		pVolume = pComposite->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetMass(1.0f);
+		pVolume->SetPosition(point(0.0f, -1.0f, 0.0f));
+
+		pComposite->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pComposite->RotateZByDeg(45.0f);
+
+		CR(m_pDreamOS->AddPhysicsObject(pComposite));
+
+		auto pSphereCollide = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphereCollide);
+		pSphereCollide->SetMass(1.0f);
+		pSphereCollide->SetPosition(point(3.0f, 1.0f, 0.0f));
+		pSphereCollide->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pSphereCollide));
+
+		nRepeatCounter++;
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Composite Sphere Volume");
+	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

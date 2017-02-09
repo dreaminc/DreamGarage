@@ -235,6 +235,29 @@ std::vector<std::shared_ptr<VirtualObj>> DimObj::GetChildren() {
 	return *(m_pObjects.get());
 }
 
+point DimObj::GetOrigin(bool fAbsolute) {
+	point ptOrigin = m_objectState.m_ptOrigin;
+
+	if (fAbsolute && m_pParent != nullptr) {
+		ptOrigin = m_pParent->GetModelMatrix() * ptOrigin;
+	}
+
+	return ptOrigin;
+}
+
+point DimObj::GetPosition(bool fAbsolute) {
+	return GetOrigin(fAbsolute);
+}
+
+quaternion DimObj::GetOrientation(bool fAbsolute) {
+	quaternion qOrientation = m_objectState.m_qRotation;
+
+	if (fAbsolute && m_pParent != nullptr)
+		qOrientation *= m_pParent->GetOrientation();
+
+	return qOrientation;
+}
+
 double DimObj::GetMass() {
 	double mass = m_objectState.GetMass();
 	

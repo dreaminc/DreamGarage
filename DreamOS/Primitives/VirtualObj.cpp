@@ -60,12 +60,13 @@ template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::RK4>(fl
 template RESULT VirtualObj::IntegrateState<ObjectState::IntegrationType::EUCLID>(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
 
 // Position
-point VirtualObj::GetOrigin() {
+point VirtualObj::GetOrigin(bool fAbsolute) {
 	return m_objectState.m_ptOrigin;
 }
 
-point VirtualObj::GetPosition() {
-	return m_objectState.m_ptOrigin;
+// TODO: Remove this, it's redundant 
+point VirtualObj::GetPosition(bool fAbsolute) {
+	return GetOrigin(fAbsolute);
 }
 
 VirtualObj* VirtualObj::translate(matrix <point_precision, 4, 1> v) {
@@ -340,7 +341,7 @@ VirtualObj* VirtualObj::SetRotateZDeg(quaternion_precision deg) {
 }
 //*/
 
-quaternion VirtualObj::GetOrientation() {
+quaternion VirtualObj::GetOrientation(bool fAbsolute) {
 	return m_objectState.m_qRotation;
 }
 

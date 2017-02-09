@@ -21,6 +21,7 @@ class ForceGenerator;
 
 class ObjectState : public dirty {
 	friend class VirtualObj;
+	friend class DimObj;
 	friend class ObjectDerivative;
 	friend class CollisionResolver;
 

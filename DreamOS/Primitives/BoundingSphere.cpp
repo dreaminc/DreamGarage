@@ -19,7 +19,7 @@ BoundingSphere::BoundingSphere(VirtualObj *pParentObject, point ptOrigin, float 
 }
 
 bool BoundingSphere::Intersect(const BoundingSphere& rhs) {
-	float distance = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin()).magnitude();
+	float distance = (const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin()).magnitude();
 
 	if (abs(distance) <= (rhs.m_radius + m_radius))
 		return true;
@@ -84,7 +84,7 @@ bool BoundingSphere::Intersect(const ray &r) {
 }
 
 CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
-	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin());
+	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
 	float distance = vMidLine.magnitude();
 
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
@@ -92,12 +92,10 @@ CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
 	if (abs(distance) <= (rhs.m_radius + m_radius)) {
 		// Find the contact point and normal
 		vector vNormal = vMidLine.Normal();
-		point ptContact = const_cast<BoundingSphere&>(rhs).GetOrigin() + (vMidLine * 0.5f);
+		point ptContact = const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() + (vMidLine * 0.5f);
 		double penetration = (rhs.m_radius + m_radius) - abs(distance);
 
 		manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
-
-		// TODO: Friction / Restitution?
 	}
 
 	return manifold;

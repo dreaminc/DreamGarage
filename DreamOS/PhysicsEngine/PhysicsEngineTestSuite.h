@@ -28,7 +28,9 @@ public:
 	RESULT AddTestSphereGenerator();
 	RESULT AddTestQuadVsSphere();
 	RESULT AddTestVolumeVolumeEdge();
-	RESULT AddTestComposite();
+	RESULT AddTestCompositeComposition();
+	RESULT AddTestCompositeCollisionSpheres();
+	RESULT AddTestCompositeCollisionSphereVolume();
 
 	RESULT ResetTest(void *pContext);
 

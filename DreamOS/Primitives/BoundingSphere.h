@@ -12,6 +12,8 @@
 #include "vector.h"
 #include "line.h"
 
+#include <memory>
+
 class VirtualObj;
 
 class BoundingSphere : public BoundingVolume {

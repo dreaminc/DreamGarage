@@ -126,6 +126,11 @@ public:
 
 	std::vector<std::shared_ptr<VirtualObj>> GetChildren();
 
+	// Composites will have absolute vs. frame of reference position/orientation
+	virtual point GetOrigin(bool fAbsolute = false) override;
+	virtual point GetPosition(bool fAbsolute = false) override;
+	virtual quaternion GetOrientation(bool fAbsolute = false) override;
+
 	// Composites will accumulate mass
 	virtual double GetMass() override;
 	virtual double GetInverseMass() override;

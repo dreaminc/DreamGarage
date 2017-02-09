@@ -68,8 +68,8 @@ public:
 	RESULT IntegrateState(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
 
 	// Position
-	virtual point GetOrigin();
-	virtual point GetPosition();
+	virtual point GetOrigin(bool fAbsolute = false);
+	virtual point GetPosition(bool fAbsolute = false);
 
 	VirtualObj* translate(matrix <point_precision, 4, 1> v);
 	VirtualObj* translate(point_precision x, point_precision y, point_precision z);
@@ -118,7 +118,7 @@ public:
 	//*/
 
 	VirtualObj* SetOrientation(quaternion qOrientation);
-	quaternion GetOrientation();
+	virtual quaternion GetOrientation(bool fAbsolute = false);
 	matrix<virtual_precision, 4, 4> GetOrientationMatrix();
 
 	// Velocity

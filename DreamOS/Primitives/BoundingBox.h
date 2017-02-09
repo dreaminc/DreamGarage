@@ -77,9 +77,9 @@ public:
 	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptOrigin, vector vHalfSize);
 	BoundingBox(VirtualObj *pParentObject, BoundingBox::Type type, point ptMin, point ptMax);
 
-	bool Intersect(const BoundingSphere& rhs);
-	bool Intersect(const BoundingBox& rhs);
-	bool Intersect(const BoundingQuad& rhs);
+	virtual bool Intersect(const BoundingSphere& rhs) override;
+	virtual bool Intersect(const BoundingBox& rhs) override;
+	virtual bool Intersect(const BoundingQuad& rhs) override;
 
 	//bool Intersect(const point& pt) {
 	bool Intersect(point& pt);

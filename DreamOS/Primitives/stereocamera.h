@@ -64,7 +64,7 @@ public:
 		return projMat;
 	}
 
-	virtual point GetOrigin() override {
+	virtual point GetOrigin(bool fAbsolute = false) override {
 		point eyePos = GetEyePosition(EYE_MONO);
 
 		if (m_pHMD != nullptr) {
@@ -74,7 +74,7 @@ public:
 		return eyePos;
 	}
 
-	virtual point GetPosition() override {
+	virtual point GetPosition(bool fAbsolute = false) override {
 		point eyePos = GetEyePosition(EYE_MONO);
 
 		if (m_pHMD != nullptr) {
