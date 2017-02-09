@@ -14,16 +14,18 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestCompositeCollisionVolumes());
+	CR(AddTestCompositeCollisionVolumeSphere());
 	CR(AddTestCompositeCollisionSphereVolume());
 	CR(AddTestCompositeCollisionSpheres());
-	CR(AddTestCompositeComposition());
 	CR(AddTestVolumeVolumeEdge());
+	CR(AddTestVolumeVolumePointFace());
+	CR(AddTestCompositeComposition());
 	CR(AddTestQuadVsSphere());
 	CR(AddTestSphereGenerator());
 	CR(AddTestSphereVsSphere());
 	CR(AddTestSphereVsSphereArray());
 	CR(AddTestVolumeToPlaneVolume());
-	CR(AddTestVolumeVolumePointFace());
 	CR(AddTestBallVolume());
 
 Error:
@@ -631,7 +633,7 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 10.0f;
-	int nRepeats = 2;
+	int nRepeats = 5;
 	static int nRepeatCounter = 0;
 
 	// Initialize Code 
@@ -645,6 +647,38 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 
 		switch (nRepeatCounter) {
 			case 0: {
+				// case 1
+				pVolume = m_pDreamOS->AddVolume(1.0f);
+				pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+				pVolume->RotateZByDeg(45.0f);
+				pVolume->SetMass(1.0f);
+				pVolume->SetVelocity(-1.0f, 0.0f, 0.0f);
+				m_pDreamOS->AddPhysicsObject(pVolume);
+
+				pVolume = m_pDreamOS->AddVolume(1.0f);
+				pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+				pVolume->SetMass(1.0f);
+				pVolume->RotateYByDeg(45.0f);
+				m_pDreamOS->AddPhysicsObject(pVolume);
+			} break;
+
+			case 1: {
+				// case 1 - reversed
+				pVolume = m_pDreamOS->AddVolume(1.0f);
+				pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+				pVolume->SetMass(1.0f);
+				pVolume->RotateYByDeg(45.0f);
+				m_pDreamOS->AddPhysicsObject(pVolume);
+
+				pVolume = m_pDreamOS->AddVolume(1.0f);
+				pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+				pVolume->RotateZByDeg(45.0f);
+				pVolume->SetMass(1.0f);
+				pVolume->SetVelocity(-1.0f, 0.0f, 0.0f);
+				m_pDreamOS->AddPhysicsObject(pVolume);
+			} break;
+
+			case 2: {
 				// case 2
 				pVolume = m_pDreamOS->AddVolume(1.0f);
 				pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
@@ -660,9 +694,26 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 				m_pDreamOS->AddPhysicsObject(pVolume);
 			} break;
 
+			case 3: {
+				// case 2 - reversed 
+				pVolume = m_pDreamOS->AddVolume(1.0f);
+				pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+				pVolume->SetMass(1.0f);
+				pVolume->RotateZByDeg(45.0f);
+				m_pDreamOS->AddPhysicsObject(pVolume);
+
+				pVolume = m_pDreamOS->AddVolume(1.0f);
+				pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+				pVolume->RotateYByDeg(45.0f);
+				pVolume->SetMass(1.0f);
+				pVolume->SetVelocity(-1.0f, 0.0f, 0.0f);
+				m_pDreamOS->AddPhysicsObject(pVolume);
+
+			} break;
+
 			// TODO: Edge to parallel edge
 
-			case 1: {
+			case 4: {
 				// case 3
 				pVolume = m_pDreamOS->AddVolume(0.5f);
 				CN(pVolume);
@@ -749,7 +800,6 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 Error:
 	return r;
 }
-
 
 RESULT PhysicsEngineTestSuite::AddTestCompositeComposition() {
 	RESULT r = R_PASS;
@@ -1005,9 +1055,198 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionSphereVolume() {
 		auto pSphereCollide = m_pDreamOS->AddSphere(0.25f, 10, 10);
 		CN(pSphereCollide);
 		pSphereCollide->SetMass(1.0f);
-		pSphereCollide->SetPosition(point(3.0f, 1.0f, 0.0f));
+		pSphereCollide->SetPosition(point(3.0f, 1.25f, 0.0f));
 		pSphereCollide->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
 		CR(m_pDreamOS->AddPhysicsObject(pSphereCollide));
+
+		nRepeatCounter++;
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Composite Sphere Volume");
+	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionVolumeSphere() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+	static int nRepeatCounter = 0;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Composite vs plane
+
+		std::shared_ptr<sphere> pSphere = nullptr;
+		composite *pComposite = nullptr;
+		std::shared_ptr<composite> pCompositeChild = nullptr;
+
+		pComposite = m_pDreamOS->AddComposite();
+		CN(pComposite);
+
+		// Test the various types
+		switch (nRepeatCounter) {
+		case 0: pComposite->InitializeOBB(); break;
+		case 1: pComposite->InitializeAABB(); break;
+		case 2: pComposite->InitializeBoundingSphere(); break;
+		}
+
+		pComposite->SetMass(1.0f);
+
+		pSphere = pComposite->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetMass(1.0f);
+		pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+		pSphere = pComposite->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetMass(1.0f);
+		pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+		pSphere = pComposite->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetMass(1.0f);
+		pSphere->SetPosition(point(0.0f, 1.0f, 0.0f));
+
+		pSphere = pComposite->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetMass(1.0f);
+		pSphere->SetPosition(point(0.0f, -1.0f, 0.0f));
+
+		pComposite->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pComposite->RotateZByDeg(45.0f);
+
+		CR(m_pDreamOS->AddPhysicsObject(pComposite));
+
+		auto pVolumeCollide = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolumeCollide);
+		pVolumeCollide->SetMass(1.0f);
+		pVolumeCollide->SetPosition(point(3.0f, 1.0f, 0.0f));
+		pVolumeCollide->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pVolumeCollide));
+
+		nRepeatCounter++;
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Composite Sphere Volume");
+	pNewTest->SetTestDescription("Testing composite collisions with spheres and volumes");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionVolumes() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+	static int nRepeatCounter = 0;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Composite vs plane
+
+		std::shared_ptr<volume> pVolume = nullptr;
+		composite *pComposite = nullptr;
+
+		pComposite = m_pDreamOS->AddComposite();
+		CN(pComposite);
+
+		// Test the various types
+		switch (nRepeatCounter) {
+		case 0: pComposite->InitializeOBB(); break;
+		case 1: pComposite->InitializeAABB(); break;
+		case 2: pComposite->InitializeBoundingSphere(); break;
+		}
+
+		pComposite->SetMass(1.0f);
+
+		pVolume = pComposite->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetMass(1.0f);
+		pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+		pVolume = pComposite->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetMass(1.0f);
+		pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+		pVolume = pComposite->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetMass(1.0f);
+		pVolume->SetPosition(point(0.0f, 1.0f, 0.0f));
+
+		pVolume = pComposite->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetMass(1.0f);
+		pVolume->SetPosition(point(0.0f, -1.0f, 0.0f));
+
+		pComposite->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pComposite->RotateZByDeg(45.0f);
+
+		CR(m_pDreamOS->AddPhysicsObject(pComposite));
+
+		auto pVolumeCollide = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolumeCollide);
+		pVolumeCollide->SetMass(1.0f);
+		pVolumeCollide->SetPosition(point(3.0f, 1.0f, 0.0f));
+		pVolumeCollide->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pVolumeCollide));
 
 		nRepeatCounter++;
 	Error:

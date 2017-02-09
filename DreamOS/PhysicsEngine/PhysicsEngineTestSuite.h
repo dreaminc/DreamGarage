@@ -30,7 +30,9 @@ public:
 	RESULT AddTestVolumeVolumeEdge();
 	RESULT AddTestCompositeComposition();
 	RESULT AddTestCompositeCollisionSpheres();
+	RESULT AddTestCompositeCollisionVolumes();
 	RESULT AddTestCompositeCollisionSphereVolume();
+	RESULT AddTestCompositeCollisionVolumeSphere();
 
 	RESULT ResetTest(void *pContext);
 

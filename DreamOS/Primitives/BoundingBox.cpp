@@ -553,18 +553,18 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				//float penetration = std::sqrt((minDistance1 * minDistance1) + (minDistance2 * minDistance2));
 				//penetration = minDistance1;
 
-				if (j == 1) {
+				//if (j == 1) {
 					vNormalOriented = vNormalOriented * -1.0f;
 					penetration *= -1.0f;
-				}
-
-				// Test
-				vNormalOriented = vNormalTemp;
+				//}
 
 				//manifold.Clear();
 				if (weight == 2) {
 					point ptContactPointA = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMin) + pBoxA->GetOrigin();
 					point ptContactPointB = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMax) + pBoxA->GetOrigin();
+
+					// TODO: THIS IS NOT GENERAL
+					vNormalOriented = vNormalTemp;
 
 					manifold.AddContactPoint(ptContactPointA, vNormalOriented, penetration, 1);
 					manifold.AddContactPoint(ptContactPointB, vNormalOriented, penetration, 1);
