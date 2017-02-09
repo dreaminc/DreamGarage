@@ -15,11 +15,11 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestCompositeCollisionVolumes());
+	CR(AddTestVolumeVolumeEdge());
+	CR(AddTestVolumeVolumePointFace());
 	CR(AddTestCompositeCollisionVolumeSphere());
 	CR(AddTestCompositeCollisionSphereVolume());
 	CR(AddTestCompositeCollisionSpheres());
-	CR(AddTestVolumeVolumeEdge());
-	CR(AddTestVolumeVolumePointFace());
 	CR(AddTestCompositeComposition());
 	CR(AddTestQuadVsSphere());
 	CR(AddTestSphereGenerator());
@@ -108,7 +108,7 @@ Error:
 RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 15.0f;
+	double sTestTime = 6.0f;
 	int nRepeats = 1;
 
 	volume *pVolume = nullptr;
@@ -632,7 +632,7 @@ Error:
 RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 10.0f;
+	double sTestTime = 6.0f;
 	int nRepeats = 5;
 	static int nRepeatCounter = 0;
 
