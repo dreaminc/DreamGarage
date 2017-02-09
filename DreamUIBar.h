@@ -8,28 +8,30 @@
 
 class DreamUIBar : public UIBar {
 
-	DreamUIBar(composite* c, UIBarFormat info = UIBarFormat());
+public:
+	DreamUIBar(composite* pComposite);
 	~DreamUIBar();
 
-	typedef enum UI_EVENT_TYPE {
-		MENU,
+	typedef enum UI_MENU_ITEM_EVENT {
+		FORWARD,
 		FILE,
 		INVALID
-	} UIEventType;
+	} UIMenuItemEvent;
 
 	struct UIEventInfo {
-		UI_EVENT_TYPE type;
+		UIMenuItemEvent type;
 
 		UIEventInfo() :
 			type(INVALID)
 		{}
 	};
 
+	RESULT Initialize();
+
 	// Callback signature
 	// RESULT fnEventCallback(struct (opt) pEventInfo, void* pContext)
 
-	RESULT RegisterEvent(UI_EVENT_TYPE type, std::function<RESULT(void*)> fnCallback, void* pContext = nullptr);
-
+	RESULT RegisterEvent(UIMenuItemEvent type, std::function<RESULT(void*)> fnCallback, void* pContext = nullptr);
 };
 
 

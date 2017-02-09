@@ -4,6 +4,8 @@
 #include "Primitives/FlatContext.h"
 #include "Primitives/composite.h"
 
+//#include "UIMenuItemSubscriber.h"
+
 class UIMenuItem {
 public:
 	UIMenuItem(composite* c);
@@ -54,6 +56,7 @@ private:
 	std::shared_ptr<composite> m_pButton;
 	std::shared_ptr<quad> m_pQuad;
 
+//	std::vector<UIMenuItemSubscriber*> m_callbacks;
 };
 
 

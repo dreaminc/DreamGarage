@@ -8,17 +8,24 @@
 
 class UIModule : public Subscriber<SenseControllerEvent> {
 public:
-	UIModule(composite* c);
+	UIModule(composite* pComposite);
 	~UIModule();
 
-	virtual RESULT Notify(SenseControllerEvent *event) override = 0;
+	virtual RESULT Notify(SenseControllerEvent *event) = 0;
 
-	RESULT CreateMenuLayer(int numButtons);
+	std::shared_ptr<UIMenuLayer> CreateMenuLayer();
+
+	virtual RESULT UpdateCurrentUILayer() = 0;
+
+	RESULT SetCurrentLayer(std::shared_ptr<UIMenuLayer> pLayer);
+	RESULT NextLayer();
+	RESULT PreviousLayer();
 
 protected:
-	composite* m_context;
+	composite* m_pContext;
 
-	std::vector<UIMenuLayer*> m_pLayers;
+	std::vector<std::shared_ptr<UIMenuLayer>> m_layers;
+	std::vector<std::shared_ptr<UIMenuLayer>>::iterator m_currentUILayer;
 };
 
 #endif // ! UI_MODULE_H_

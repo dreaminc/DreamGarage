@@ -6,8 +6,8 @@
 
 #include <algorithm>
 
-UIBar::UIBar(composite* c, UIBarFormat info) :
-	UIModule(c),
+UIBar::UIBar(composite* pComposite, UIBarFormat info) :
+	UIModule(pComposite),
 	m_info(info)
 {
 	Initialize();
@@ -15,19 +15,6 @@ UIBar::UIBar(composite* c, UIBarFormat info) :
 
 UIBar::~UIBar() {
 	// empty
-}
-
-RESULT UIBar::Initialize() {
-
-	RESULT r = R_PASS;
-
-	std::vector<std::shared_ptr<UIMenuItem>> pItems;
-	CR(CreateMenuLayer(m_info.maxNumButtons + 1)); // + 1 for header item
-	pItems = m_pLayers[0]->GetMenuItems();
-	CR(m_context->SetVisible(false));
-
-Error:
-	return r;
 }
 
 RESULT UIBar::UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index) {
@@ -68,10 +55,10 @@ RESULT UIBar::DisplayFromMenuTitle(std::string title) {
 	std::vector<std::string> items = m_info.menu[title];
 	m_visibleMenuItems = std::min(m_info.maxNumButtons, (int)items.size());
 
-	std::shared_ptr<texture> pColorTexture = m_context->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	std::shared_ptr<texture> pColorTexture = m_pContext->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	// Layout currently only uses one layer
-	std::vector<std::shared_ptr<UIMenuItem>> pItems = m_pLayers[0]->GetMenuItems();
+	std::vector<std::shared_ptr<UIMenuItem>> pItems = m_layers[0]->GetMenuItems();
 
 	for (int i = 0; i <= m_info.maxNumButtons; i++) {
 
@@ -99,16 +86,16 @@ RESULT UIBar::ToggleVisible() {
 
 	RESULT r = R_PASS;
 
-	m_context->SetVisible(!m_context->IsVisible());
+	m_pContext->SetVisible(!m_pContext->IsVisible());
 
 	// if the context has become visible, reset its position to match the camera
-	if (m_context->IsVisible()) {
-		quaternion q = m_context->GetCamera()->GetOrientation();
+	if (m_pContext->IsVisible()) {
+		quaternion q = m_pContext->GetCamera()->GetOrientation();
 		m_rotationY = q.ProjectedYRotationDeg();
 		quaternion q2 = quaternion::MakeQuaternionWithEuler(0.0f, m_rotationY * M_PI / 180.0f, 0.0f);
 
-		m_context->SetPosition(m_context->GetCamera()->GetPosition());
-		m_context->SetOrientation(q2);
+		m_pContext->SetPosition(m_pContext->GetCamera()->GetPosition());
+		m_pContext->SetOrientation(q2);
 
 		// When the Menu becomes visible, open the root node
 		m_menuPath.push("");
@@ -120,15 +107,14 @@ RESULT UIBar::ToggleVisible() {
 
 RESULT UIBar::Notify(SenseControllerEvent *event) {
 
-	SENSE_CONTROLLER_EVENT_TYPE type = event->type;
-	int cType = event->state.type;
+	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
+	CONTROLLER_TYPE cType = event->state.type;
 
 	// Currently, only uses the right controller
 	// The left controller sends the exact same kinds of events, confounding results
-	if (cType == 1) {
-		if (type == SENSE_CONTROLLER_MENU_DOWN) {
-			if (m_UIDirty) {
-				m_UIDirty = false;
+	if (cType == CONTROLLER_RIGHT) {
+		switch (eventType) {
+			case SENSE_CONTROLLER_MENU_UP: {
 				if (m_menuPath.empty()) {
 					ToggleVisible();
 					return R_PASS;
@@ -140,27 +126,27 @@ RESULT UIBar::Notify(SenseControllerEvent *event) {
 				}
 				std::string str = m_menuPath.top();
 				DisplayFromMenuTitle(str);
-			}
-		}
-		else if (type == SENSE_CONTROLLER_MENU_UP) {
-			m_UIDirty = true;
-		}
+			} break;
 
-		if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange == 1.0f) {
-			if (m_UISelect && !m_menuPath.empty()) {
-				std::vector<std::string> currentMenu = m_info.menu[m_menuPath.top()];
-				if (m_selectedIndex >= 0 && m_selectedIndex < (int)currentMenu.size() && m_info.menu.count(currentMenu[m_selectedIndex]) > 0) {
-					std::string title = currentMenu[m_selectedIndex];
+			//TODO: Create Trigger up and down events
+			case SENSE_CONTROLLER_TRIGGER_MOVE: {
+				if (event->state.triggerRange == 1.0f) {
+					if (m_UISelect && !m_menuPath.empty()) {
+						std::vector<std::string> currentMenu = m_info.menu[m_menuPath.top()];
+						if (m_selectedIndex >= 0 && m_selectedIndex < (int)currentMenu.size() && m_info.menu.count(currentMenu[m_selectedIndex]) > 0) {
+							std::string title = currentMenu[m_selectedIndex];
 
-					m_menuPath.push(title);
-					DisplayFromMenuTitle(title);
-					
-					m_UISelect = false;
+							m_menuPath.push(title);
+							DisplayFromMenuTitle(title);
+
+							m_UISelect = false;
+						}
+					}
 				}
-			}
-		}
-		else if (type == SENSE_CONTROLLER_TRIGGER_MOVE && event->state.triggerRange != 1.0f) {
-			m_UISelect = true;
+				else {
+					m_UISelect = true;
+				}
+			} break;
 		}
 	}
 
@@ -172,7 +158,7 @@ RESULT UIBar::UpdateSelectedItem(int index) {
 	if (m_selectedIndex != index) {
 		// swap enlarged menu item
 		if (0 <= index && index < m_visibleMenuItems) {
-			auto p = m_context->GetChildren()[index];
+			auto p = m_pContext->GetChildren()[index];
 			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
 			if (pButton != nullptr) {
 				auto q = pButton->GetChildren()[0];
@@ -181,7 +167,7 @@ RESULT UIBar::UpdateSelectedItem(int index) {
 			}
 		}
 		if (0 <= m_selectedIndex && m_selectedIndex < m_visibleMenuItems) {
-			auto p = m_context->GetChildren()[m_selectedIndex];
+			auto p = m_pContext->GetChildren()[m_selectedIndex];
 			std::shared_ptr<composite> pButton = std::dynamic_pointer_cast<composite>(p);
 			if (pButton != nullptr) {
 				auto q = pButton->GetChildren()[0];
@@ -198,7 +184,7 @@ RESULT UIBar::UpdateSelectedItem(int index) {
 RESULT UIBar::Update(ray handRay) {
 	
 	// convert ray into context's space
-	point ptContext = handRay.GetOrigin() - m_context->GetOrigin();
+	point ptContext = handRay.GetOrigin() - m_pContext->GetOrigin();
 	ptContext = point(ptContext.x(), 0.0f, ptContext.z());
 	ray contextRay = ray(ptContext, handRay.GetVector());
 	point intersect = FurthestRaySphereIntersect(contextRay, point(0.0f, 0.0f, 0.0f));
@@ -235,4 +221,8 @@ point UIBar::FurthestRaySphereIntersect(const ray &r, point center) {
 		return r.GetOrigin() + point(t1 * r.GetVector());
 	}
 	return point(0.0f, 0.0f, 0.0f);
+}
+
+RESULT UIBar::UpdateCurrentUILayer() {
+	return R_PASS;
 }

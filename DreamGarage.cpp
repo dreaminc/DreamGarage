@@ -149,24 +149,22 @@ RESULT DreamGarage::LoadScene() {
 		);
 	}
 
-	UIBarFormat info = UIBarFormat();
+	composite* pComposite = AddComposite();
+	CN(pComposite);
+	m_pDreamUIBar = new DreamUIBar(pComposite);
+	
+	CN(m_pDreamUIBar);
 
-	info.menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-	info.menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
-	info.menu["ipsum"] = { "1", "2", "3" };
-	info.menu["Play"] = { "a", "b", "c" };
-
-	m_UIBar = new UIBar(AddComposite(), info);
-	//m_UIBar = new UIBar(AddComposite()); // Use parameter defaults
+	//m_pDreamUIBar = new UIBar(AddComposite()); // Use parameter defaults
 
 	// IO
 	RegisterSubscriber((SK_SCAN_CODE)('C'), this);
 //*
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, m_UIBar);
-	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, m_UIBar);
-	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, m_UIBar);
+	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, m_pDreamUIBar);
+	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, m_pDreamUIBar);
+	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, m_pDreamUIBar);
 	RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, this);
 	//*/
 	//RegisterSubscriber()
@@ -363,7 +361,7 @@ RESULT DreamGarage::LoadScene() {
 //*/
 #endif // ! TESTING
 
-//Error:
+Error:
 	return r;
 }
 
@@ -448,7 +446,7 @@ RESULT DreamGarage::Update(void) {
 		vector vp = vector(v.x(), 0.0f, v.z());
 		point p0 = point(pRightHand->GetPosition().x(), 0.0f, pRightHand->GetPosition().z());
 		ray handRay = ray(p0, vp);
-		m_UIBar->Update(handRay);
+		m_pDreamUIBar->Update(handRay);
 	}
 
 #ifdef TESTING

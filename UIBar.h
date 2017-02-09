@@ -9,6 +9,8 @@
 
 #include "UIModule.h"
 
+#include "Primitives/dirty.h"
+
 #include <stack>
 
 typedef struct UIBarFormat {
@@ -43,13 +45,15 @@ typedef struct UIBarFormat {
 
 class UIBar : public UIModule {
 public:
-	UIBar(composite* c, UIBarFormat info = UIBarFormat());
+	UIBar(composite* pComposite, UIBarFormat info = UIBarFormat());
 	~UIBar();
 
 	RESULT Initialize();
 
 	virtual RESULT Notify(SenseControllerEvent *event) override;
 	RESULT Update(ray handRay);
+
+	virtual RESULT UpdateCurrentUILayer() override;
 
 	RESULT ToggleVisible();
 
@@ -72,7 +76,6 @@ private:
 
 private:
 	// these flags help detect controller 'up' events
-	bool m_UIDirty;
 	bool m_UISelect;
 
 	float m_rotationY;

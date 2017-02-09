@@ -13,7 +13,8 @@
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseController.h"
-#include "UIBar.h"
+
+#include "DreamUIBar.h"
 
 #include "Cloud/WebBrowser/browser.h"
 
@@ -105,16 +106,8 @@ private:
 	bool	m_isSeated = false;
 	float tick = 0.0f;
 	
-	// UI
-	composite *m_pUserInterface;
-	bool	m_UIDirty = true;
-	float m_rotationY;
 
-	vector	m_UIScale;
-	int		m_selectedIndex = -1;
-	int		m_numButtons;
-
-	UIBar *m_UIBar;
+	DreamUIBar *m_pDreamUIBar;
 
 	Browsers m_browsers;
 };
