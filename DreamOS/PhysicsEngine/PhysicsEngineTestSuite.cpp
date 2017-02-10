@@ -15,8 +15,8 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestCompositeCollisionVolumes());
-	CR(AddTestVolumeVolumeEdge());
 	CR(AddTestVolumeVolumePointFace());
+	CR(AddTestVolumeVolumeEdge());
 	CR(AddTestCompositeCollisionVolumeSphere());
 	CR(AddTestCompositeCollisionSphereVolume());
 	CR(AddTestCompositeCollisionSpheres());
@@ -111,60 +111,65 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumePointFace() {
 	double sTestTime = 6.0f;
 	int nRepeats = 1;
 
-	volume *pVolume = nullptr;
-
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
 		// Volume vs Volume point - face
 
-		pVolume = m_pDreamOS->AddVolume(0.5f);
+		auto pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
 		pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
 		pVolume->RotateYByDeg(45.0f);
 		pVolume->RotateZByDeg(45.0f);
 		pVolume->SetMass(1.0f);
 		pVolume->SetVelocity(-1.0f/2, 0.0f, 0.0f);
-		m_pDreamOS->AddPhysicsObject(pVolume);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
 		pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
 		pVolume->SetMass(1.0f);
-		//pVolume->RotateYByDeg(45.0f);
-		//pVolume->RotateZByDeg(45.0f);
-		m_pDreamOS->AddPhysicsObject(pVolume);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
 		pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
 		pVolume->RotateYByDeg(45.0f);
 		pVolume->RotateZByDeg(45.0f);
 		pVolume->SetMass(1.0f);
-		m_pDreamOS->AddPhysicsObject(pVolume);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
 		pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
 		pVolume->SetMass(1.0f);
-		m_pDreamOS->AddPhysicsObject(pVolume);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
 		pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
 		pVolume->RotateYByDeg(45.0f);
 		pVolume->RotateZByDeg(45.0f);
 		pVolume->SetMass(1.0f);
-		m_pDreamOS->AddPhysicsObject(pVolume);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
 		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
 		pVolume->SetMass(1.0f);
-		m_pDreamOS->AddPhysicsObject(pVolume);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
 
 		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
 		pVolume->SetPosition(point(-3.0f, 0.0f, 0.0f));
 		pVolume->RotateYByDeg(45.0f);
 		pVolume->RotateZByDeg(45.0f);
 		pVolume->SetMass(1.0f);
-		m_pDreamOS->AddPhysicsObject(pVolume);
-
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+	
+	Error:
 		return R_PASS;
 	};
 
@@ -1237,13 +1242,15 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCollisionVolumes() {
 		pVolume->SetPosition(point(0.0f, -1.0f, 0.0f));
 
 		pComposite->SetPosition(point(-1.0f, 0.0f, 0.0f));
-		pComposite->RotateZByDeg(45.0f);
+		//pComposite->RotateZByDeg(45.0f);
 
 		CR(m_pDreamOS->AddPhysicsObject(pComposite));
 
 		auto pVolumeCollide = m_pDreamOS->AddVolume(0.5f);
 		CN(pVolumeCollide);
 		pVolumeCollide->SetMass(1.0f);
+		pVolumeCollide->RotateYByDeg(45.0f);
+		pVolumeCollide->RotateZByDeg(45.0f);
 		pVolumeCollide->SetPosition(point(3.0f, 1.0f, 0.0f));
 		pVolumeCollide->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
 		CR(m_pDreamOS->AddPhysicsObject(pVolumeCollide));

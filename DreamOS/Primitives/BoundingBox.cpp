@@ -109,11 +109,11 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 
 bool BoundingBox::Intersect(const BoundingBox& rhs) {
 	if (m_type == Type::AABB) {
-		point ptMaxA = GetOrigin() + GetHalfVector();
-		point ptMinA = GetOrigin() - GetHalfVector();
+		point ptMaxA = GetAbsoluteOrigin() + GetHalfVector();
+		point ptMinA = GetAbsoluteOrigin() - GetHalfVector();
 
-		point ptMaxB = const_cast<BoundingBox&>(rhs).GetOrigin() + static_cast<BoundingBox>(rhs).GetHalfVector();
-		point ptMinB = const_cast<BoundingBox&>(rhs).GetOrigin() - static_cast<BoundingBox>(rhs).GetHalfVector();
+		point ptMaxB = const_cast<BoundingBox&>(rhs).GetAbsoluteOrigin() + static_cast<BoundingBox>(rhs).GetHalfVector();
+		point ptMinB = const_cast<BoundingBox&>(rhs).GetAbsoluteOrigin() - static_cast<BoundingBox>(rhs).GetHalfVector();
 
 		if ((ptMaxA > ptMinB) && (ptMaxB > ptMinA))
 			return true;
@@ -152,6 +152,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
 	// SAT to get contact normal 
+	// TODO: Push to contained function, repeated from above
 	double temp;
 	double minAxisDistance = std::numeric_limits<double>::infinity();
 	vector vAxis, vAxisTemp;
@@ -194,11 +195,18 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
 		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
 
+		point ptBoxAOrigin = pBoxA->GetAbsoluteOrigin();
+		quaternion qBoxAOrientation = pBoxA->GetAbsoluteOrientation();
+
+		point ptBoxBOrigin = pBoxB->GetAbsoluteOrigin();
+		quaternion qBoxBOrientation = pBoxB->GetAbsoluteOrientation();
+
+
 		// Point - Face Detection
 		for (int i = 0; i < 8; i++) {
 			BoundingBox::BoxPoint boxPoint = (BoundingBox::BoxPoint)(i);
 			point ptBox = pBoxB->GetBoxPoint(boxPoint);
-			ptBox = (point)(inverse(RotationMatrix(pBoxA->GetOrientation())) * (ptBox - pBoxA->GetOrigin()));
+			ptBox = (point)(inverse(RotationMatrix(qBoxAOrientation)) * (ptBox - ptBoxAOrigin));
 
 			point ptMax = pBoxA->m_vHalfSize;
 			point ptMin = pBoxA->m_vHalfSize * -1.0f;
@@ -257,7 +265,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					boxFace = BoundingBox::BoxFace::BACK;
 			}
 
-			ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptClosestPoint) + pBoxA->GetOrigin();
+			ptClosestPoint = (RotationMatrix(qBoxAOrientation) * ptClosestPoint) + ptBoxAOrigin;
 
 			vector vNormal = pBoxA->GetBoxFaceNormal(boxFace);
 			vNormal.Normalize();
@@ -291,6 +299,12 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 		BoundingBox *pBoxA = (j == 0) ? this : &(static_cast<BoundingBox>(rhs));
 		BoundingBox *pBoxB = (j == 0) ? &(static_cast<BoundingBox>(rhs)) : this;
+
+		point ptBoxAOrigin = pBoxA->GetAbsoluteOrigin();
+		quaternion qBoxAOrientation = pBoxA->GetAbsoluteOrientation();
+
+		point ptBoxBOrigin = pBoxB->GetAbsoluteOrigin();
+		quaternion qBoxBOrientation = pBoxB->GetAbsoluteOrientation();
 
 		// Test all edges
 		double minDistanceTemp = std::numeric_limits<double>::infinity();
@@ -336,6 +350,7 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 		}
 
 		// TODO: Eliminate the bottom code, replace with the above test
+		// TODO: The above code is not always returning the right thing
 
 		// Edge - Edge Detection
 		for (int i = 0; i < 12; i++) {
@@ -343,8 +358,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			BoundingBox::BoxEdge boxEdgeB = (BoundingBox::BoxEdge)(i);
 			line lineBoxEdgeB = pBoxB->GetBoxEdge(boxEdgeB);			
 
-			lineBoxEdgeB.Translate(pBoxA->GetOrigin() * -1.0f);
-			lineBoxEdgeB.ApplyMatrix(inverse(RotationMatrix(pBoxA->GetOrientation())));
+			lineBoxEdgeB.Translate(ptBoxAOrigin * -1.0f);
+			lineBoxEdgeB.ApplyMatrix(inverse(RotationMatrix(qBoxAOrientation)));
 			vector vRay = lineBoxEdgeB.GetVector();
 
 			// We can now test intersection as if it's an AABB
@@ -473,85 +488,18 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				//DEBUG_LINEOUT("%f %f %f", distanceXabs, distanceYabs, distanceZabs);
 				//DEBUG_LINEOUT("%f", penetration);
 
-				point ptClosestPoint = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMid) + pBoxA->GetOrigin();				
-
-				/*
-				//vector vNormal = vector(ptEdgeMax);
-				BoundingBox::BoxFace boxFace;
-
-				// Project minimum plane penetration along collision normal
-				if (distanceX < minDistance1) {
-					minDistance2 = minDistance1;
-					minDistance1 = distanceX;
-
-					penetration = (distanceX * vNormal.magnitude()) / vNormal.x();
-					
-					if (ptEdgeMid.x() > 0.0f)
-						boxFace = BoundingBox::BoxFace::RIGHT;
-					else
-						boxFace = BoundingBox::BoxFace::LEFT;
-				}
-				else if (distanceX < minDistance2) {
-					minDistance2 = distanceX;
-				}
-
-				if (distanceY < minDistance1) {
-					minDistance2 = minDistance1;
-					minDistance1 = distanceY;
-
-					penetration = (distanceY * vNormal.magnitude()) / vNormal.y();
-
-					if (ptEdgeMid.y() > 0.0f)
-						boxFace = BoundingBox::BoxFace::TOP;
-					else
-						boxFace = BoundingBox::BoxFace::BOTTOM;
-				}
-				else if (distanceY < minDistance2) {
-					minDistance2 = distanceY;
-				}
-
-				if (distanceZ < minDistance1) {
-					minDistance2 = minDistance1;
-					minDistance1 = distanceZ;
-
-					penetration = (distanceZ * vNormal.magnitude()) / vNormal.z();
-
-					if (ptEdgeMid.z() > 0.0f)
-						boxFace = BoundingBox::BoxFace::FRONT;
-					else
-						boxFace = BoundingBox::BoxFace::BACK;
-				}
-				else if (distanceZ < minDistance2) {
-					minDistance2 = distanceZ;
-				}
-				*/
+				point ptClosestPoint = (RotationMatrix(qBoxAOrientation) * ptEdgeMid) + ptBoxAOrigin;				
 
 				point ptContact = ptClosestPoint;
-				point ptBoxBOriginRefA = inverse(RotationMatrix(pBoxA->GetOrientation())) * (pBoxB->GetOrigin() - pBoxA->GetOrigin());
-				
-				/*
-				vNormal = ptEdgeMid - ptBoxBOriginRefA;
-				vNormal = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
-				vNormal = vNormal * -1.0f;
-				vNormal.Normalize();
-				//*/
+				point ptBoxBOriginRefA = inverse(RotationMatrix(qBoxAOrientation)) * (ptBoxBOrigin - ptBoxAOrigin);
 
 				if (vNormal.IsValid() == false) {
 					int a = 5;
 				}
 
-				vector vNormalOriented = RotationMatrix(pBoxA->GetOrientation()) * vNormal;
+				vector vNormalOriented = RotationMatrix(qBoxAOrientation) * vNormal;
 				//vNormal = vNormal * -1.0f;
 				vNormalOriented.Normalize();
-
-				/*
-				vNormal = pBoxA->GetBoxFaceNormal(boxFace);				
-				vNormal.Normalize();
-				//*/
-
-				// TODO: this is wrong
-				//float penetration = std::sqrt((minDistance1 * minDistance1) + (minDistance2 * minDistance2));
-				//penetration = minDistance1;
 
 				//if (j == 1) {
 					vNormalOriented = vNormalOriented * -1.0f;
@@ -560,8 +508,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 
 				//manifold.Clear();
 				if (weight == 2) {
-					point ptContactPointA = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMin) + pBoxA->GetOrigin();
-					point ptContactPointB = (RotationMatrix(pBoxA->GetOrientation()) * ptEdgeMax) + pBoxA->GetOrigin();
+					point ptContactPointA = (RotationMatrix(qBoxAOrientation) * ptEdgeMin) + ptBoxAOrigin;
+					point ptContactPointB = (RotationMatrix(qBoxAOrientation) * ptEdgeMax) + ptBoxAOrigin;
 
 					// TODO: THIS IS NOT GENERAL
 					vNormalOriented = vNormalTemp;
@@ -624,7 +572,7 @@ vector BoundingBox::GetBoxFaceNormal(BoxFace faceType) {
 	case BoxFace::BACK: vNormal = vector::kVector(-1.0f); break;
 	}
 
-	vNormal = RotationMatrix(GetOrientation()) * vNormal;
+	vNormal = RotationMatrix(GetAbsoluteOrientation()) * vNormal;
 	vNormal.Normalize();
 
 	return vNormal;
@@ -665,7 +613,7 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 // http://www.willperone.net/Code/coderr.php
 vector BoundingBox::GetHalfVector() {
 	if (m_type == Type::AABB) {
-		RotationMatrix rotMat = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+		RotationMatrix rotMat = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
 		double width = 0.0f;
 		double height = 0.0f;
@@ -696,7 +644,7 @@ double BoundingBox::OverlapOnAxisDistance(const BoundingBox& rhs, const vector &
 	double selfProject = TransformToAxis(vAxis);
 	double rhsProject = static_cast<BoundingBox>(rhs).TransformToAxis(vAxis);
 
-	vector vToCenter = static_cast<BoundingBox>(rhs).GetOrigin() - GetOrigin();
+	vector vToCenter = static_cast<BoundingBox>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin();
 
 	return std::abs(vToCenter.dot(vAxis));
 }
@@ -731,7 +679,7 @@ vector BoundingBox::GetAxis(BoxAxis boxAxis) {
 
 	// Rotate by OBB if so
 	if (m_type == Type::OBB) {
-		retVector = RotationMatrix(GetOrientation()) * retVector;
+		retVector = RotationMatrix(GetAbsoluteOrientation()) * retVector;
 		retVector.Normalize();
 	}
 
@@ -914,8 +862,8 @@ point BoundingBox::GetBoxPoint(BoxPoint ptType, bool fOriented) {
 
 	// Transform point accordingly
 	if (fOriented) {
-		retPoint = RotationMatrix(GetOrientation()) * retPoint;
-		retPoint = retPoint + GetOrigin();
+		retPoint = RotationMatrix(GetAbsoluteOrientation()) * retPoint;
+		retPoint = retPoint + GetAbsoluteOrigin();
 	}
 
 	return retPoint;
