@@ -29,6 +29,7 @@ public:
 	RESULT AddTestQuadVsSphere();
 	RESULT AddTestVolumeVolumeEdge();
 	RESULT AddTestCompositeComposition();
+	RESULT AddTestCompositeCompositionQuads();
 	RESULT AddTestCompositeCollisionSpheres();
 	RESULT AddTestCompositeCollisionVolumes();
 	RESULT AddTestCompositeCollisionSphereVolume();

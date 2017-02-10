@@ -177,7 +177,7 @@ vector BoundingQuad::GetNormal() {
 }
 
 vector BoundingQuad::GetHalfVector() {
-	vector vReturn = vector(m_width/2.0f, m_height/2.0f, 0.0f);
+	vector vReturn = vector(m_width/2.0f, 0.0f, m_height / 2.0f);
 
 	quaternion qOrientation = quaternion(vector::jVector(1.0f), m_vNormal);
 	RotationMatrix rotMat(qOrientation);

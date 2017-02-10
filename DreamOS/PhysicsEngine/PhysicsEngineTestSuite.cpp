@@ -15,6 +15,7 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestCompositeCollisionSphereQuads());
+	CR(AddTestCompositeCompositionQuads());
 	CR(AddTestCompositeCollisionVolumes());
 	CR(AddTestVolumeVolumePointFace());
 	CR(AddTestVolumeVolumeEdge());
@@ -800,6 +801,99 @@ RESULT PhysicsEngineTestSuite::AddTestVolumeVolumeEdge() {
 
 	pNewTest->SetTestName("Volume vs Volume - Edges");
 	pNewTest->SetTestDescription("Testing edge - edge for volume collisions");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestCompositeCompositionQuads() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 3;
+	static int nRepeatCounter = 0;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Composite vs plane
+
+		std::shared_ptr<quad> pQuad = nullptr;
+		composite *pComposite = nullptr;
+
+		pComposite = m_pDreamOS->AddComposite();
+		CN(pComposite);
+
+		// Test the various types
+		switch (nRepeatCounter) {
+		case 0: pComposite->InitializeOBB(); break;
+		case 1: pComposite->InitializeAABB(); break;
+		case 2: pComposite->InitializeBoundingSphere(); break;
+		}
+
+		pComposite->SetMass(1.0f);
+
+		pQuad = pComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector::kVector(1.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+
+		pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector::kVector(1.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+		pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector::kVector(1.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+		/*
+		pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector::kVector(1.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(0.0f, -1.0f, 0.0f));
+
+		pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector::kVector(1.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(0.0f, 1.0f, 0.0f));
+		*/
+
+		pComposite->SetVelocity(point(0.2f, 0.0f, 0.0f));
+		pComposite->SetRotationalVelocity(vector(0.0f, 0.0f, 0.25f));
+
+		CR(m_pDreamOS->AddPhysicsObject(pComposite));
+
+		nRepeatCounter++;
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Composite Composition");
+	pNewTest->SetTestDescription("Testing composite composition along with internal rotations and active external transformations");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
