@@ -33,6 +33,7 @@ public:
 	RESULT AddTestCompositeCollisionVolumes();
 	RESULT AddTestCompositeCollisionSphereVolume();
 	RESULT AddTestCompositeCollisionVolumeSphere();
+	RESULT AddTestCompositeCollisionSphereQuads();
 
 	RESULT ResetTest(void *pContext);
 

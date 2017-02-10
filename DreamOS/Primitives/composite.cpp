@@ -272,10 +272,10 @@ std::shared_ptr<volume> composite::AddVolume(double side) {
 	return AddVolume(side, side, side);
 }
 
-std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight) {
+std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight));
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal));
 	CR(AddObject(pQuad));
 
 //Success:
@@ -285,9 +285,9 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight)
+std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal)
 {
-	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
 std::shared_ptr<DimRay> composite::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {

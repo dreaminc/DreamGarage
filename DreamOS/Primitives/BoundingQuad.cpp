@@ -24,42 +24,6 @@ BoundingQuad::BoundingQuad(VirtualObj *pParentObject, point ptOrigin, vector vNo
 	// empty
 }
 
-bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
-	// First calculate rotation per normal and re-orient
-	
-	quaternion qOrientation = quaternion(vector::jVector(1.0f), m_vNormal);
-	RotationMatrix rotMat = RotationMatrix(qOrientation);
-
-	point ptSphereOrigin = inverse(rotMat) * (static_cast<BoundingSphere>(rhs).GetOrigin() - GetOrigin());
-	double distance = ptSphereOrigin.y();
-
-	if (std::abs(distance) < static_cast<BoundingSphere>(rhs).GetRadius()) {
-		//point ptMax = GetMaxPoint();
-		//point ptMin = GetMinPoint();
-
-		///*
-		point ptMax = point(m_width, m_height, 0.0f);
-		point ptMin = point(-m_width, -m_height, 0.0f);
-
-		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
-		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
-		float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
-		//*/
-
-		//point ptClosestPoint = ptSphereOrigin - (m_vNormal * distance);
-		point ptClosestPoint = point(closestX, closestY, closestZ);
-
-		double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
-		double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
-
-		if (distanceSquared < sphereRadiusSquared) {
-			return true;
-		}
-	}
-
-	return false;
-}
-
 bool BoundingQuad::Intersect(const BoundingBox& rhs) {
 	// TODO:
 
@@ -96,13 +60,49 @@ CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 	return manifold;
 }
 
+bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
+	// First calculate rotation per normal and re-orient
+
+	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix rotMat = RotationMatrix(qOrientation);
+
+	point ptSphereOrigin = inverse(rotMat) * (static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
+	double distance = ptSphereOrigin.y();
+
+	if (std::abs(distance) < static_cast<BoundingSphere>(rhs).GetRadius()) {
+		//point ptMax = GetMaxPoint();
+		//point ptMin = GetMinPoint();
+
+		///*
+		point ptMax = point(m_width, m_height, 0.0f);
+		point ptMin = point(-m_width, -m_height, 0.0f);
+
+		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
+		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
+		float closestZ = std::max(ptMin.z(), std::min(ptSphereOrigin.z(), ptMax.z()));
+		//*/
+
+		//point ptClosestPoint = ptSphereOrigin - (m_vNormal * distance);
+		point ptClosestPoint = point(closestX, closestY, closestZ);
+
+		double sphereRadiusSquared = pow(static_cast<BoundingSphere>(rhs).GetRadius(), 2.0f);
+		double distanceSquared = pow((ptClosestPoint - ptSphereOrigin).magnitude(), 2.0f);
+
+		if (distanceSquared < sphereRadiusSquared) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 	// First calculate rotation per normal and re-orient
 
-	quaternion qOrientation = quaternion(vector::jVector(1.0f), m_vNormal);
+	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
 	RotationMatrix rotMat = RotationMatrix(qOrientation);
 
-	point ptSphereOrigin = inverse(rotMat) * (static_cast<BoundingSphere>(rhs).GetOrigin() - GetOrigin());
+	point ptSphereOrigin = inverse(rotMat) * (static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
 	double distance = ptSphereOrigin.y();
 
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
@@ -133,12 +133,12 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 		if (distanceSquared <= sphereRadiusSquared) {
 			// This is a plane-point collision
 
-			ptClosestPoint = (rotMat * ptClosestPoint) + GetOrigin();
+			ptClosestPoint = (rotMat * ptClosestPoint) + GetAbsoluteOrigin();
 			
 			//vector vNormal = rotMat * vector::jVector(1.0f);
 			//vNormal.Normalize();
 
-			vector vNormal = static_cast<BoundingSphere>(rhs).GetOrigin() - ptClosestPoint;
+			vector vNormal = static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - ptClosestPoint;
 			vNormal.Normalize();
 
 			point ptContact = ptClosestPoint;

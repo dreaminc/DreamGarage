@@ -518,6 +518,10 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 					manifold.AddContactPoint(ptContactPointB, vNormalOriented, penetration, 1);
 				}
 				else {
+
+					// TODO: THIS IS NOT GENERAL
+					vNormalOriented = vNormalTemp;
+
 					manifold.AddContactPoint(ptContact, vNormalOriented, penetration, 1);
 				}
 			}
