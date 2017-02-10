@@ -55,6 +55,8 @@ RESULT DreamGarage::LoadScene() {
 	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this);
 	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, this);
+	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, this);
+	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, this);
 	RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, this);
 	//RegisterSubscriber()
 
@@ -692,25 +694,34 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 	RESULT r = R_PASS;
 
 	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
+	CONTROLLER_TYPE ctype = event->state.type;
 	OVERLAY_DEBUG_SET("event", "none");
 
-	if (eventType == SENSE_CONTROLLER_TRIGGER_MOVE) {
-		OVERLAY_DEBUG_SET("event", "trigger move");
-	}
-	if (eventType == SENSE_CONTROLLER_PAD_MOVE) {
-		OVERLAY_DEBUG_SET("event", "pad move");
-	}
-	if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
-		OVERLAY_DEBUG_SET("event", "grip down");
-	}
-	if (eventType == SENSE_CONTROLLER_GRIP_UP) {
-		OVERLAY_DEBUG_SET("event", "grip up");
-	}
-	if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
-		OVERLAY_DEBUG_SET("event", "menu down");
-	}
-	if (eventType == SENSE_CONTROLLER_MENU_UP) {
-		OVERLAY_DEBUG_SET("event", "menu up");
+	if (ctype == CONTROLLER_LEFT) {
+		if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
+			OVERLAY_DEBUG_SET("event", "menu down");
+		}
+		if (eventType == SENSE_CONTROLLER_MENU_UP) {
+			OVERLAY_DEBUG_SET("event", "menu up");
+		}
+		if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
+			OVERLAY_DEBUG_SET("event", "grip down");
+		}
+		if (eventType == SENSE_CONTROLLER_GRIP_UP) {
+			OVERLAY_DEBUG_SET("event", "grip up");
+		}
+		if (eventType == SENSE_CONTROLLER_TRIGGER_MOVE) {
+			OVERLAY_DEBUG_SET("event", "trigger move");
+		}
+		if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+			OVERLAY_DEBUG_SET("event", "trigger down");
+		}
+		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
+			OVERLAY_DEBUG_SET("event", "trigger up");
+		}
+		if (eventType == SENSE_CONTROLLER_PAD_MOVE) {
+			OVERLAY_DEBUG_SET("event", "pad move");
+		}
 	}
 
 	return r;
