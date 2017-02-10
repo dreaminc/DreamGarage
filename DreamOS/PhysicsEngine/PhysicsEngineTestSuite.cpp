@@ -14,6 +14,8 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestRay());
+	CR(AddTestSphereVsSphereArray());
 	CR(AddTestCompositeCollisionSphereQuads());
 	CR(AddTestCompositeCompositionQuads());
 	CR(AddTestCompositeCollisionVolumes());
@@ -26,7 +28,6 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	CR(AddTestQuadVsSphere());
 	CR(AddTestSphereGenerator());
 	CR(AddTestSphereVsSphere());
-	CR(AddTestSphereVsSphereArray());
 	CR(AddTestVolumeToPlaneVolume());
 	CR(AddTestBallVolume());
 
@@ -77,6 +78,77 @@ RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 		m_pDreamOS->AddPhysicsObject(pSphere);
 
 		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sphere vs OBB");
+	pNewTest->SetTestDescription("Sphere colliding with an OBB with various orientations");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestRay() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Ball to Volume
+		auto pVolume = m_pDreamOS->AddVolume(0.5);
+		CN(pVolume);
+		pVolume->SetPosition(point(-1.0f, -1.0f, 0.0f));
+		pVolume->SetMass(10.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, -1.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		auto pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetPosition(point(0.0f, -1.0f, 0.0f));
+		pQuad->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pQuad));
+
+		auto pRay = m_pDreamOS->AddRay(point(-2.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f));
+		CN(pRay);
+		///*
+		pRay->SetMass(1.0f);
+		pRay->SetVelocity(vector(0.5f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pRay));
+		
+		//*/
+
+	Error:
+		return r;
 	};
 
 	// Test Code (this evaluates the test upon completion)
@@ -302,11 +374,9 @@ RESULT PhysicsEngineTestSuite::AddTestSphereVsSphereArray() {
 
 		sphere *pSphere1 = m_pDreamOS->AddSphere(2.0f, 10, 10);
 		CN(pSphere1);
-
 		pSphere1->SetPosition(point(-4.0f, 0.0f, 0.0f));
 		pSphere1->SetMass(10.0f);
 		pSphere1->SetVelocity(1.0f, 0.0f, 0.0f);
-		
 		CR(m_pDreamOS->AddPhysicsObject(pSphere1));
 
 	Error:

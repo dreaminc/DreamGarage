@@ -6,13 +6,6 @@ OGLRay::OGLRay(OpenGLImp *pParentImp, point ptOrigin, vector vDirection, float s
 	OGLObj(pParentImp) {
 
 	RESULT r = OGLInitialize();
-	if (fDirectional) {
-		//TODO: Nested object does not fit with usual pattern of primitives
-		// move to native arrow tip implementation
-		m_rayTip = std::shared_ptr<volume>(new OGLVolume(pParentImp, 0.01f, true));
-		AddChild(m_rayTip);
-		m_rayTip->SetPosition(point(ptOrigin + point(step * vDirection)));
-	}
 }
 
 RESULT OGLRay::Render() {
@@ -24,7 +17,12 @@ RESULT OGLRay::Render() {
 	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 	CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
-	glDrawElements(GL_LINE_STRIP, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+	int numLines = pDimObj->NumberIndices() / 2;
+
+	for (int i = 0; i < numLines; i++) {
+		void *pOffset = (void*)(sizeof(dimindex) * i * 2);
+		glDrawElements(GL_LINES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, pOffset);
+	}
 
 Error:
 	return R_PASS;

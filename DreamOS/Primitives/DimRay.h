@@ -21,7 +21,7 @@ public:
 
 	//TODO: Nested object does not fit with usual pattern of primitives
 	// move to native arrow tip implementation
-	std::shared_ptr<volume> m_rayTip;
+	//std::shared_ptr<volume> m_rayTip;
 };
 
 #endif // ! DIM_RAY_H_

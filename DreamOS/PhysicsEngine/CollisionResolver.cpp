@@ -236,7 +236,7 @@ RESULT CollisionResolver::ResolveCollision(const CollisionManifold &manifold) {
 		pObjB->ApplyTorqueImpulse(vTorqueB);
 
 		// Friction
-		double uConstant = 0.5f;
+		double uConstant = 0.3f;
 		vector vTangent = vNormal.cross((vNormal.cross(vRelativeVelocity))).Normal();
 		double jFrictionImpulse = vRelativeVelocity.dot(vTangent) * -1.0f * uConstant;
 		jFrictionImpulse /= denom;
