@@ -1,7 +1,7 @@
 #include "UIMenuLayer.h"
 
-UIMenuLayer::UIMenuLayer(composite* c) :
-	m_context(c)
+UIMenuLayer::UIMenuLayer(composite* pContext) :
+	m_pContext(pContext)
 {
 	// empty
 }
@@ -13,7 +13,7 @@ UIMenuLayer::~UIMenuLayer()
 
 std::shared_ptr<UIMenuItem> UIMenuLayer::CreateMenuItem()
 {
-	std::shared_ptr<UIMenuItem> pMenuItem = std::make_shared<UIMenuItem>(UIMenuItem(m_context));
+	std::shared_ptr<UIMenuItem> pMenuItem = std::make_shared<UIMenuItem>(UIMenuItem(m_pContext->AddComposite().get()));
 	m_pMenuItems.emplace_back(pMenuItem);
 	return pMenuItem;
 }

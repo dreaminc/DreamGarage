@@ -9,7 +9,7 @@
 class DreamUIBar : public UIBar {
 
 public:
-	DreamUIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat);
+	DreamUIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat, UIBarFormat barFormat);
 	~DreamUIBar();
 
 	typedef enum UI_MENU_ITEM_EVENT {

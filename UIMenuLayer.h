@@ -6,7 +6,7 @@
 
 class UIMenuLayer {
 public:
-	UIMenuLayer(composite* c);
+	UIMenuLayer(composite* pContext);
 	~UIMenuLayer();
 
 	std::shared_ptr<UIMenuItem> CreateMenuItem();
@@ -15,7 +15,7 @@ public:
 	std::vector<std::shared_ptr<UIMenuItem>> GetMenuItems();
 
 private:
-	composite *m_context; // composite for creation of Menu Items
+	composite *m_pContext; // composite for creation of Menu Items
 	std::vector<std::shared_ptr<UIMenuItem>> m_pMenuItems;
 };
 

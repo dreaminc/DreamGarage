@@ -6,10 +6,11 @@
 
 #include <algorithm>
 
-UIBar::UIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat) :
+UIBar::UIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat, UIBarFormat barFormat) :
 	UIModule(pComposite),
 	m_iconFormat(iconFormat),
-	m_labelFormat(labelFormat)
+	m_labelFormat(labelFormat),
+	m_barFormat(barFormat)
 {
 	// empty
 }
@@ -20,40 +21,25 @@ UIBar::~UIBar() {
 
 RESULT UIBar::UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index, int size, bool fHeader) {
 
-	std::shared_ptr<composite> pButton = pItem->GetButton();
-	std::shared_ptr<quad> q = pItem->GetQuad();
+	std::shared_ptr<composite> pContext = pItem->GetContext();
+	std::shared_ptr<quad> pQuad = pItem->GetQuad();
 
 	// used to center the UIBar
 	int shift = (size-1) / 2;
 	float odd = ((size-1) % 2 == 0) ? 0.5f : 0.0f;
 
-	// temp
-	float itemAngleX = 60.0f;
-	float itemAngleY = 20.0f;
-	float headerAngleX = 75.0f;
-	float headerYPos = 0.0f;
-	float yPosition = -0.5f;
-	float menuDepth = -1.5f;
-	vector itemScale = vector(1.0f, 1.0f, 1.0f);
-	float enlargedScale = 1.25f;
-
 	// Radial layout
 	int radIndex = fHeader ? 0 : index;
-	float radY = (itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
+	float radY = (m_barFormat.itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
 	quaternion rotY = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
-	float yPos = fHeader ? headerYPos : yPosition;
-	pButton->MoveTo(0.0f, yPos, 0.0f);
-	pButton->SetOrientation(rotY);
+	float yPos = fHeader ? m_barFormat.headerPosY : m_barFormat.itemPosY;
+	pContext->MoveTo(0.0f, yPos, 0.0f);
+	pContext->SetOrientation(rotY);
 
-	float radX = (fHeader ? headerAngleX : itemAngleX) * M_PI / 180.0f;
+	float radX = (fHeader ? m_barFormat.headerAngleX : m_barFormat.itemAngleX) * M_PI / 180.0f;
 	quaternion rotX = quaternion::MakeQuaternionWithEuler(radX, 0.0f, 0.0f);
-	q->MoveTo(0.0f, 0.0f, menuDepth);
-	q->SetOrientation(rotX);
-
-	//could be wrong at first controller update
-	float scaleFactor = index == m_selectedIndex ? enlargedScale : 1;
-	q->ScaleX(itemScale.x() * scaleFactor);
-	q->ScaleZ(itemScale.z() * scaleFactor);
+	pQuad->MoveTo(0.0f, 0.0f, m_barFormat.menuPosZ);
+	pQuad->SetOrientation(rotX);
 
 	return R_PASS;
 }
@@ -102,27 +88,24 @@ RESULT UIBar::HandleTriggerUp(UILayerInfo info) {
 
 RESULT UIBar::UpdateSelectedItem(int index, int size) {
 	//*
-	vector itemScale = vector(1.0f, 1.0f, 1.0f);
-	float enlargedScale = 1.25f;
-
 	if (m_selectedIndex != index) {
 		// swap enlarged menu item
 		if (0 <= index && index < size) {
 			auto p = m_currentUILayer->GetMenuItems()[index];
-			auto pButton = p->GetButton();
-			auto q = p->GetQuad();
-			if (pButton != nullptr) {
-				q->ScaleX(itemScale.x() * enlargedScale);
-				q->ScaleZ(itemScale.z() * enlargedScale);
+			auto pItemContext = p->GetContext();
+			auto pItemQuad = p->GetQuad();
+			if (pItemContext != nullptr) {
+				pItemQuad->ScaleX(m_barFormat.itemScale.x() * m_barFormat.itemScaleSelected);
+				pItemQuad->ScaleZ(m_barFormat.itemScale.z() * m_barFormat.itemScaleSelected);
 			}
 		}
 		if (0 <= m_selectedIndex && m_selectedIndex < size) {
 			auto p = m_currentUILayer->GetMenuItems()[m_selectedIndex];
-			auto pButton = p->GetButton();
-			auto q = p->GetQuad();
-			if (pButton != nullptr) {
-				q->ScaleX(itemScale.x());
-				q->ScaleZ(itemScale.z());
+			auto pItemContext = p->GetContext();
+			auto pItemQuad = p->GetQuad();
+			if (pItemContext != nullptr) {
+				pItemQuad->ScaleX(m_barFormat.itemScale.x());
+				pItemQuad->ScaleZ(m_barFormat.itemScale.z());
 			}
 		}
 		m_selectedIndex = index;
@@ -139,7 +122,7 @@ RESULT UIBar::Update(ray handRay) {
 	point ptContext = handRay.GetOrigin() - m_pContext->GetOrigin();
 	ptContext = point(ptContext.x(), 0.0f, ptContext.z());
 	ray contextRay = ray(ptContext, handRay.GetVector());
-	point intersect = FurthestRaySphereIntersect(contextRay, point(0.0f, 0.0f, 0.0f), 1.5f); // menuDepth
+	point intersect = FurthestRaySphereIntersect(contextRay, point(0.0f, 0.0f, 0.0f), m_barFormat.menuPosZ); 
 	vector vIntersect = vector(intersect);
 	vIntersect.Normalize();
 
@@ -147,10 +130,10 @@ RESULT UIBar::Update(ray handRay) {
 	int size = (m_currentUILayer) ? int(m_currentUILayer->GetMenuItems().size())-1 : 0;
 	int shift = (int)size / 2;
 	float odd = (size % 2 != 0) ? 0.5f : 0.0f;
-	int numSections = size != 0 ? 360 / int(20.0f) : 1; //itemAngle
+	int numSections = size != 0 ? 360 / int(m_barFormat.itemAngleY) : 1; 
 	float deg = float(-atan2(vIntersect.x(), vIntersect.z()) * 180.0f / M_PI);
 	deg -= m_headRotationYDeg;
-	int index = (-int((deg) / 20.0f - odd) + shift) % numSections; //itemAngle
+	int index = (-int((deg) / m_barFormat.itemAngleY - odd) + shift) % numSections; 
 	OVERLAY_DEBUG_SET("index", index);
 	UpdateSelectedItem(index, size);
 
@@ -182,7 +165,7 @@ point UIBar::FurthestRaySphereIntersect(const ray &r, point center, float radius
 
 RESULT UIBar::UpdateCurrentUILayer(UILayerInfo info) {
 
-	m_pContext->ClearChildren(); //:O
+	m_pContext->ClearChildren(); //always removes all layers
 	auto pLayer = CreateMenuLayer();
 
 	int size = int(std::max(info.icons.size(), info.labels.size()));

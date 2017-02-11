@@ -1,7 +1,7 @@
 #include "DreamUIBar.h"
 
-DreamUIBar::DreamUIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat) :
-	UIBar(pComposite, iconFormat, labelFormat) 
+DreamUIBar::DreamUIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat, UIBarFormat barFormat) :
+	UIBar(pComposite, iconFormat, labelFormat, barFormat) 
 {
 	Initialize();
 }

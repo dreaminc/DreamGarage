@@ -55,7 +55,8 @@ RESULT DreamGarage::LoadScene() {
 	//CN(pComposite);
 	UIMenuItem::IconFormat iconFormat = UIMenuItem::IconFormat();
 	UIMenuItem::LabelFormat labelFormat = UIMenuItem::LabelFormat();
-	m_pDreamUIBar = new DreamUIBar(pComposite, iconFormat, labelFormat);
+	UIBarFormat barFormat = UIBarFormat();
+	m_pDreamUIBar = new DreamUIBar(pComposite, iconFormat, labelFormat, barFormat);
 
 	//Hardcoded menu for now, will be replaced with api requests
 	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
@@ -74,17 +75,12 @@ RESULT DreamGarage::LoadScene() {
 //*
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);
-	//RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, m_pDreamUIBar);
-	//RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, m_pDreamUIBar);
-	//RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, m_pDreamUIBar);
 	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this);
 	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, this);
 	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, this);
 	RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, this);
-	//*/
-	//RegisterSubscriber()
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 	

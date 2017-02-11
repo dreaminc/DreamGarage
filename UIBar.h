@@ -14,43 +14,48 @@
 #include <stack>
 
 typedef struct UIBarFormat {
-	float yPosition;
-	float menuDepth;
 
+	float menuPosZ;
+
+	// item
 	float itemAngleX;
-	float itemAngleY;
+	float itemAngleY; // angle between items
+	float itemPosY;
 	vector itemScale;
-	float enlargedScale;
+	float itemScaleSelected;
 
+	// header 
 	float headerAngleX;
-	float headerYPos;
+	float headerPosY;
 
 	UIBarFormat() :
-		yPosition(-0.5f),
-		menuDepth(-1.5f),
+		menuPosZ(-1.5f),
 		itemAngleX(60.0f),
 		itemAngleY(20.0f),
+		itemPosY(-0.5f),
 		itemScale(vector(1.0f, 1.0f, 1.0f)),
-		enlargedScale(1.25f),
+		itemScaleSelected(1.25f),
 		headerAngleX(75.0f),
-		headerYPos(0.0f)
+		headerPosY(0.0f)
 	{}
 
 } UI_BAR_INFO;
 
 class UIBar : public UIModule {
 public:
-	UIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat);
+	UIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat, UIBarFormat barFormat);
 	~UIBar();
 
 	virtual RESULT HandleMenuUp(UILayerInfo info) override;
 	virtual RESULT HandleTriggerUp(UILayerInfo info) override;
 
-	RESULT Update(ray handRay);
 
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo info) override;
 
 	RESULT ToggleVisible();
+
+	// TODO: these functions can be removed/replaced once there is composite collision code
+	RESULT Update(ray handRay);
 	int GetSelectedIndex();
 
 private:
@@ -58,11 +63,11 @@ private:
 	// Places MenuItem along a circular arc based on index
 	RESULT UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index, int size, bool fHeader);
 
+	// TODO: these functions can be removed/replaced once there is composite collision code
 	// Updates MenuItem scale based on a new selected index
 	RESULT UpdateSelectedItem(int index, int size);
 
 	// returns location of furthest point in ray/sphere collision
-	// this code should be in boundingsphere, but it is written here to avoid conflicts for now
 	point FurthestRaySphereIntersect(const ray &r, point center, float radius);
 
 
@@ -77,6 +82,7 @@ private:
 
 	UIMenuItem::IconFormat m_iconFormat;
 	UIMenuItem::LabelFormat m_labelFormat;
+	UIBarFormat m_barFormat;
 
 	std::stack<std::string> m_menuPath;
 };

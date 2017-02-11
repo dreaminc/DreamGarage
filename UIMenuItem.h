@@ -13,7 +13,7 @@ public:
 
 	RESULT Initialize();
 
-	std::shared_ptr<composite> GetButton();
+	std::shared_ptr<composite> GetContext();
 	std::shared_ptr<quad> GetQuad();
 
 	struct IconFormat
@@ -51,9 +51,7 @@ public:
 	RESULT Update(IconFormat iconFormat = IconFormat(), LabelFormat labelFormat = LabelFormat());
 
 private:
-	composite *m_context;
-
-	std::shared_ptr<composite> m_pButton;
+	std::shared_ptr<composite> m_pContext;
 	std::shared_ptr<quad> m_pQuad;
 
 //	std::vector<UIMenuItemSubscriber*> m_callbacks;

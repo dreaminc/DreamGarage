@@ -1,7 +1,7 @@
 #include "UIMenuItem.h"
 
 UIMenuItem::UIMenuItem(composite* c) :
-m_context(c) 
+m_pContext(c) 
 {
 	Initialize();
 }
@@ -13,14 +13,13 @@ UIMenuItem::~UIMenuItem() {
 RESULT UIMenuItem::Initialize() {
 	RESULT r = R_PASS;
 
-	m_pButton = m_context->AddComposite();
-	m_pQuad = m_pButton->AddQuad(1.0f, 1.0f);
+	m_pQuad = m_pContext->AddQuad(1.0f, 1.0f);
 
 	return r;
 }
 
-std::shared_ptr<composite> UIMenuItem::GetButton() {
-	return m_pButton;
+std::shared_ptr<composite> UIMenuItem::GetContext() {
+	return m_pContext;
 }
 
 std::shared_ptr<quad> UIMenuItem::GetQuad() {
@@ -31,7 +30,7 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 	RESULT r = R_PASS;
 
 	// TODO: reuse this object?
-	std::shared_ptr<FlatContext> pContext = m_context->MakeFlatContext();
+	std::shared_ptr<FlatContext> pContext = m_pContext->MakeFlatContext();
 
 	std::shared_ptr<text> pText = pContext->AddText(
 		labelFormat.font,
@@ -51,7 +50,7 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 	else
 		pIcon->SetVisible(false);
 //*/
-	m_context->RenderToTexture(pContext);
+	m_pContext->RenderToTexture(pContext);
 	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 
 	return r;
