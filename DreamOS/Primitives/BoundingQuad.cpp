@@ -197,10 +197,7 @@ CollisionManifold BoundingQuad::Collide(const ray &rCast) {
 	t /= rCast.GetVector().Normal().dot(vNormal);
 
 	if (t > 0) {
-		//point ptContact = adjRay.GetOrigin() + adjRay.GetVector() * tNear;
 		point ptContact = rCast.GetOrigin() + rCast.GetVector() * t;
-		//vector vNormal = rotMat * vector::jVector(1.0f);
-		//ptContact = (rotMat * ptContact) + GetAbsoluteOrigin();
 		
 		// TODO: Handle normal correctly 
 

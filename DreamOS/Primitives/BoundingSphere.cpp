@@ -82,7 +82,37 @@ bool BoundingSphere::Intersect(const ray &r) {
 CollisionManifold BoundingSphere::Collide(const ray &rCast) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
 
-	// TODO:
+	vector vRayCircle = rCast.GetOrigin() - GetAbsoluteOrigin();
+
+	double bVal = rCast.GetVector().dot(vector(vRayCircle));
+	double cVal = vRayCircle.dot(vRayCircle) - (m_radius * m_radius);
+	float sqrtVal = bVal * bVal - cVal;
+	
+	if (sqrtVal == 0) {
+		double t1 = -bVal;
+		point ptContact = rCast.GetOrigin() + rCast.GetVector() * t1;
+		vector vNormal = vector();
+
+		// TODO: NORMAL!!
+
+		manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
+	}
+	else if (sqrtVal > 0) {
+		double t1 = -bVal + std::sqrt(sqrtVal);
+		double t2 = -bVal - std::sqrt(sqrtVal);
+
+		point ptContact1 = rCast.GetOrigin() + rCast.GetVector() * t1;
+		point ptContact2 = rCast.GetOrigin() + rCast.GetVector() * t2;
+		vector vNormal = vector();
+
+		// TODO: NORMAL!!
+
+		manifold.AddContactPoint(ptContact1, vNormal, 0.0f, 1);
+		manifold.AddContactPoint(ptContact2, vNormal, 0.0f, 1);
+	}
+	else {
+		// TODO: error?
+	}
 
 	return manifold;
 }

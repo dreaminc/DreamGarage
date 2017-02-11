@@ -190,7 +190,6 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 
 		// Check for object collisions using the ray
 		if (pTestContext->pRay->Intersect(pTestContext->pQuad)) {
-			//pTestContext->pCollidePoint[0]->SetVisible(true);
 			CollisionManifold manifold = pTestContext->pRay->Collide(pTestContext->pQuad);
 
 			if (manifold.NumContacts() > 0) {
@@ -204,7 +203,14 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 			pTestContext->pCollidePoint[0]->SetVisible(true);
 		}
 		else if (pTestContext->pRay->Intersect(pTestContext->pSphere)) {
-			pTestContext->pCollidePoint[0]->SetVisible(true);
+			CollisionManifold manifold = pTestContext->pRay->Collide(pTestContext->pSphere);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
 		}
 		else {
 			for(int i = 0; i < 4; i++)
