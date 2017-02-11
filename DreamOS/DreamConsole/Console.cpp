@@ -121,8 +121,7 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 					switch (keyCode)
 					{
 					case SVK_BACK: {
-						if (!m_cmdText.empty())
-							m_cmdText.pop_back();
+
 					} break;
 					case SVK_RETURN: {
 						HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
@@ -166,6 +165,8 @@ RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 		switch (kbEvent->u16character) {
 		case 0x08:
 			// Process a backspace. 
+			if (!m_cmdText.empty())
+				m_cmdText.pop_back();
 			break;
 
 		case 0x0A:
