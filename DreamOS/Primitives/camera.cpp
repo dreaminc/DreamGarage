@@ -179,14 +179,14 @@ RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 
 	bool disableAWDS = DreamConsole::GetConsole()->IsInForeground();
 
-	bool shiftKey = (kbEvent->m_pSenseKeyboard->GetKeyState(SK_SHIFT) & 0x80) > 0;
+	bool shiftKey = (kbEvent->m_pSenseKeyboard->GetKeyState(SVK_SHIFT) & 0x80) > 0;
 
-	bool leftKey = (kbEvent->KeyCode == SK_LEFT) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('A'));
-	bool rightKey = (kbEvent->KeyCode == SK_RIGHT) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('D'));
-	bool forwardKey = (kbEvent->KeyCode == SK_UP && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('W'));
-	bool backwardKey = (kbEvent->KeyCode == SK_DOWN && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('S'));
-	bool upKey = (kbEvent->KeyCode == SK_UP   && shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('Q'));
-	bool downKey = (kbEvent->KeyCode == SK_DOWN && shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('E'));
+	bool leftKey = (kbEvent->KeyCode == SVK_LEFT) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('A'));
+	bool rightKey = (kbEvent->KeyCode == SVK_RIGHT) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('D'));
+	bool forwardKey = (kbEvent->KeyCode == SVK_UP && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('W'));
+	bool backwardKey = (kbEvent->KeyCode == SVK_DOWN && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('S'));
+	bool upKey = (kbEvent->KeyCode == SVK_UP   && shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('Q'));
+	bool downKey = (kbEvent->KeyCode == SVK_DOWN && shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('E'));
 
 #define	MOVE_DIRECTION ((kbEvent->KeyState) ? 1.0f : -1.0f)
 
@@ -250,24 +250,23 @@ RESULT camera::SetCameraPositionDeviation(vector vDeviation) {
 RESULT camera::UpdateFromKeyboardState(SenseKeyboard *pSK) {
 	RESULT r = R_PASS;
 
-	uint8_t state = pSK->GetKeyState(SK_LEFT);
+	uint8_t state = pSK->GetKeyState(SVK_LEFT);
 	if (state) {
 		DEBUG_LINEOUT("strafe");
 		MoveStrafe(0.1f);
 	}
 
-	state = pSK->GetKeyState(SK_RIGHT);
-	//pSK->CheckKeyState((SK_SCAN_CODE)('D'))
+	state = pSK->GetKeyState(SVK_RIGHT);
 	if (state) {
 		MoveStrafe(-0.1f);
 	}
 
-	state = pSK->GetKeyState(SK_UP);
+	state = pSK->GetKeyState(SVK_UP);
 	if (state) {
 		MoveForward(0.1f);
 	}
 
-	state = pSK->GetKeyState(SK_DOWN);
+	state = pSK->GetKeyState(SVK_DOWN);
 	if (state) {
 		MoveForward(-0.1f);
 	}

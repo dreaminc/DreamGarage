@@ -49,8 +49,7 @@ RESULT DreamGarage::LoadScene() {
 	InitializeCloudControllerCallbacks();
 
 	// IO
-	//RegisterSubscriber((SK_SCAN_CODE)('C'), this);
-	RegisterSubscriber(SK_ALL, this);
+	RegisterSubscriber(SVK_ALL, this);
 
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);

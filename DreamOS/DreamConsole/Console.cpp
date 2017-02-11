@@ -3,9 +3,9 @@
 #include "ProfilerGraph.h"
 
 #include <algorithm>
-#include <locale>
 
 #include "DreamConsole/DreamConsole.h"
+
 
 // DreamConsole
 
@@ -91,13 +91,13 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 
 	if (kbEvent->m_pSenseKeyboard)
 	{
-		SK_SCAN_CODE keyCode = kbEvent->KeyCode;
+		SenseVirtualKey keyCode = kbEvent->KeyCode;
 
 		if (kbEvent->KeyState)
 		{
 			if (!IsInForeground())
 			{
-				if (keyCode == VK_TAB)
+				if (keyCode == SVK_TAB)
 				{
 					// quick hack to enable dream console in production but only using several tab hits
 #ifdef PRODUCTION_BUILD
@@ -112,7 +112,7 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 			}
 			else
 			{
-				if (keyCode == VK_TAB)
+				if (keyCode == SVK_TAB)
 				{
 					m_isInForeground = false;
 				}
@@ -120,16 +120,16 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 				{
 					switch (keyCode)
 					{
-					case VK_BACK: {
+					case SVK_BACK: {
 						if (!m_cmdText.empty())
 							m_cmdText.pop_back();
 					} break;
-					case VK_RETURN: {
+					case SVK_RETURN: {
 						HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
 						CMDPROMPT_EXECUTE(m_cmdText);
 						m_cmdText.erase();
 					} break;
-					case VK_ESCAPE: {
+					case SVK_ESCAPE: {
 						if (!m_cmdText.empty()) {
 							m_cmdText.erase();
 						}
@@ -137,28 +137,14 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 							m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
 						}
 					} break;
-					case VK_LEFT:
-					case VK_RIGHT:
-					case VK_UP:
-					case VK_DOWN: {
+					case SVK_LEFT:
+					case SVK_RIGHT:
+					case SVK_UP:
+					case SVK_DOWN: {
 
 					} break;
 					default: {
-						std::locale	loc;
-						
-						if (std::use_facet<std::ctype<char>>(loc).is(std::ctype<char>::alpha, static_cast<char>(keyCode))) {
-							m_cmdText.append(std::string("") + std::tolower(static_cast<char>(keyCode), loc));
-						}
-						else if ((keyCode == VK_SPACE) || (static_cast<char>(keyCode) >= '0' && static_cast<char>(keyCode) <= '9')) {
-							m_cmdText.append(std::string("") + static_cast<char>(keyCode));
-						}
-						// the following is of course nonsense. until we capture the keyboard properly.
-						else if (static_cast<unsigned char>(keyCode) == 190) {
-							m_cmdText.append(std::string("") + ".");
-						}
-						else if (static_cast<unsigned char>(keyCode) == 191) {
-							m_cmdText.append(std::string("") + "/");
-						}
+						// don't process type character here. look for SenseTypingEvent
 					} break;
 					}
 				}
@@ -167,6 +153,45 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 	}
 
 	//Error:
+	return r;
+}
+
+RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
+	RESULT r = R_PASS;
+
+	if (IsInForeground())
+	{
+		volatile char16_t c = kbEvent->u16character;
+
+		switch (kbEvent->u16character) {
+		case 0x08:
+			// Process a backspace. 
+			break;
+
+		case 0x0A:
+			// Process a linefeed. 
+			break;
+
+		case 0x1B:
+			// Process an escape. 
+			break;
+
+		case 0x09:
+			// Process a tab. 
+			break;
+
+		case 0x0D:
+			// Process a carriage return. 
+			break;
+
+		default:
+			// Process displayable characters. 
+			std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, kbEvent->u16character));
+			m_cmdText.append(nonUnicodeChar);
+			break;
+		}
+	}
+
 	return r;
 }
 

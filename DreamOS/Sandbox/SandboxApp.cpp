@@ -65,6 +65,10 @@ RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT SandboxApp::Notify(SenseTypingEvent *kbEvent) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 	RESULT r = R_PASS;
 
@@ -140,7 +144,8 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	RESULT r = R_PASS;
 
 	// Register Dream Console to keyboard events
-	CR(RegisterSubscriber(SK_ALL, DreamConsole::GetConsole()));
+	CR(RegisterSubscriber(SVK_ALL, DreamConsole::GetConsole()));
+	CR(RegisterSubscriber(CHARACTER_TYPING, DreamConsole::GetConsole()));
 
 	camera *pCamera = m_pHALImp->GetCamera();
 
@@ -148,29 +153,18 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 
 	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
 
-	/*
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, m_pOpenGLImp));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, m_pOpenGLImp));
+	CR(RegisterSubscriber(SVK_LEFT, pCamera));
+	CR(RegisterSubscriber(SVK_UP, pCamera));
+	CR(RegisterSubscriber(SVK_DOWN, pCamera));
+	CR(RegisterSubscriber(SVK_RIGHT, pCamera));
+	
+	CR(RegisterSubscriber(SVK_SPACE, pCamera));
 
 	for (int i = 0; i < 26; i++) {
-	CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), m_pOpenGLImp));
-	}
-	*/
-
-	CR(RegisterSubscriber(VK_LEFT, pCamera));
-	CR(RegisterSubscriber(VK_UP, pCamera));
-	CR(RegisterSubscriber(VK_DOWN, pCamera));
-	CR(RegisterSubscriber(VK_RIGHT, pCamera));
-
-	CR(RegisterSubscriber(VK_SPACE, pCamera));
-
-	for (int i = 0; i < 26; i++) {
-		CR(RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
+		CR(RegisterSubscriber((SenseVirtualKey)('A' + i), pCamera));
 	}
 
-	CR(RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
+	CR(RegisterSubscriber((SenseVirtualKey)('F'), m_pHALImp));
 	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
 
 Error:
@@ -887,10 +881,19 @@ Error:
 }
 
 // IO
-RESULT SandboxApp::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
+RESULT SandboxApp::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	RESULT r = R_PASS;
 
-	CR(m_pSenseKeyboard->RegisterSubscriber(keyEvent, pKeyboardSubscriber));
+	CR(((Publisher<SenseVirtualKey, SenseKeyboardEvent>*)m_pSenseKeyboard)->RegisterSubscriber(keyEvent, pKeyboardSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(((Publisher<SenseTypingEventType, SenseTypingEvent>*)m_pSenseKeyboard)->RegisterSubscriber(typingEvent, pTypingSubscriber));
 
 Error:
 	return r;

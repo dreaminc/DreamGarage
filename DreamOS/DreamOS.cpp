@@ -292,7 +292,7 @@ RESULT DreamOS::BroadcastUpdateHandMessage(hand::HandState handState) {
 	return m_pSandbox->BroadcastUpdateHandMessage(handState);
 }
 
-RESULT DreamOS::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
+RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	return m_pSandbox->RegisterSubscriber(keyEvent, pKeyboardSubscriber);
 }
 

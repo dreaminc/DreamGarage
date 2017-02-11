@@ -12,9 +12,6 @@ volume *g_pVolume2 = nullptr;
 RESULT DreamTestApp::LoadScene() {
 	RESULT r = R_PASS;
 
-	// IO
-	//RegisterSubscriber((SK_SCAN_CODE)('C'), this);
-
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
 	AddSkybox();

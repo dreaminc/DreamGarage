@@ -35,7 +35,7 @@ private:
 	std::vector<std::chrono::time_point<std::chrono::high_resolution_clock>>	m_tickTimes;
 };
 
-class DreamConsole : public valid, public Subscriber<SenseKeyboardEvent>, public Subscriber<CmdPromptEvent> {
+class DreamConsole : public valid, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<CmdPromptEvent> {
 public:
 	static DreamConsole* GetConsole()
 	{
@@ -80,6 +80,7 @@ public:
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
+	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;

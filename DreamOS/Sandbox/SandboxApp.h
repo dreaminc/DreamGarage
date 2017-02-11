@@ -47,7 +47,8 @@ class Message;
 
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
-	public Subscriber<SenseMouseEvent>, 
+	public Subscriber<SenseTypingEvent>,
+	public Subscriber<SenseMouseEvent>,
 	public Subscriber<CmdPromptEvent>, 
 	public Subscriber<CollisionGroupEvent>, 
 	public Subscriber<CollisionObjectEvent>,
@@ -105,6 +106,7 @@ private:
 
 	RESULT Notify(CmdPromptEvent *event);
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
+	RESULT Notify(SenseTypingEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
 	RESULT Notify(CollisionObjectEvent *oEvent);
@@ -179,7 +181,8 @@ public:
 	// IO
 public:
 	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);
-	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
+	RESULT RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
+	RESULT RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 	RESULT RegisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 
