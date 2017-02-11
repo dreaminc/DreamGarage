@@ -77,6 +77,7 @@ public:
 	void ForEach(std::function<bool(const std::string)> pred);
 
 	const std::string& GetCmdText();
+	unsigned int GetCmtTextCursorPos();
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
@@ -84,6 +85,12 @@ public:
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;
+
+private:
+	void TextCursorMoveFront();
+	void TextCursorMoveBack();
+	void TextCursorMoveBackward();
+	void TextCursorMoveForward();
 
 private:
 	bool m_isInit = false;
@@ -102,6 +109,7 @@ private:
 
 	std::mutex m_mutex;
 	std::string	m_cmdText;
+	unsigned int m_cmdTextCursorPos = 0;
 
 	Configuration m_configuration;
 };

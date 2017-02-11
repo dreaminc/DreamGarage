@@ -86,6 +86,29 @@ const std::string& DreamConsole::GetCmdText()
 	return m_cmdText;
 }
 
+unsigned int DreamConsole::GetCmtTextCursorPos()
+{
+	return m_cmdTextCursorPos;
+}
+
+void DreamConsole::TextCursorMoveFront() {
+	m_cmdTextCursorPos = static_cast<unsigned int>(m_cmdText.length());
+}
+
+void DreamConsole::TextCursorMoveBack() {
+	m_cmdTextCursorPos = 0;
+}
+
+void DreamConsole::TextCursorMoveBackward() {
+	if (m_cmdTextCursorPos > 0)
+		m_cmdTextCursorPos--;
+}
+
+void DreamConsole::TextCursorMoveForward() {
+	if (m_cmdTextCursorPos < m_cmdText.length())
+		m_cmdTextCursorPos++;
+}
+
 RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
@@ -118,7 +141,7 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 				}
 				else
 				{
-					/*** old way
+					///*** old way
 					switch (keyCode)
 					{
 					case SVK_BACK: {
@@ -127,8 +150,12 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 					} break;
 					case SVK_ESCAPE: {
 					} break;
-					case SVK_LEFT:
-					case SVK_RIGHT:
+					case SVK_LEFT: {
+						TextCursorMoveBackward();
+					} break;
+					case SVK_RIGHT: {
+						TextCursorMoveForward();
+					} break;
 					case SVK_UP:
 					case SVK_DOWN: {
 
@@ -137,7 +164,7 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 						// don't process type character here. look for SenseTypingEvent
 					} break;
 					}
-					*/
+					//*/
 				}
 			}
 		}
@@ -152,13 +179,14 @@ RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 
 	if (IsInForeground())
 	{
-		volatile char16_t c = kbEvent->u16character;
-
 		switch (kbEvent->u16character) {
 		case SVK_BACK:
 			// Process a backspace. 
-			if (!m_cmdText.empty())
-				m_cmdText.pop_back();
+			if (!m_cmdText.empty() && GetCmtTextCursorPos() > 0) {
+				m_cmdText.erase(GetCmtTextCursorPos() - 1, 1);
+				TextCursorMoveBackward();
+			}
+
 			break;
 
 		case 0x0A:
@@ -169,9 +197,11 @@ RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 			// Process an escape. 
 			if (!m_cmdText.empty()) {
 				m_cmdText.erase();
+				TextCursorMoveBack();
 			}
 			else {
 				m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
+				TextCursorMoveFront();
 			}
 			break;
 
@@ -184,12 +214,15 @@ RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 			HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
 			CMDPROMPT_EXECUTE(m_cmdText);
 			m_cmdText.erase();
+			TextCursorMoveBack();
 			break;
 
 		default:
 			// Process displayable characters. 
 			std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, kbEvent->u16character));
-			m_cmdText.append(nonUnicodeChar);
+			//m_cmdText.append(nonUnicodeChar, GetCmtTextCursorPos(), 1);
+			m_cmdText.insert(GetCmtTextCursorPos(), 1, nonUnicodeChar[0]);
+			TextCursorMoveForward();
 			break;
 		}
 	}
