@@ -52,39 +52,25 @@ bool BoundingQuad::Intersect(const ray& r) {
 	ray adjRay;
 	adjRay.vDirection() = inverse(RotationMatrix(GetOrientation())) * r.GetVector();
 	adjRay.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - r.GetOrigin()));
+	//adjRay.ptOrigin() = inverse(rotMat) * (r.GetOrigin() - GetAbsoluteOrigin());
 
 	point ptMin = GetMinPoint();
 	point ptMax = GetMaxPoint();
 
 	// Only check X and Z since we've re-oriented the ray in terms of the up vector (and quads have no height)
-
-	{
-		int i = 0;
+	for (int i = 0; i < 3; i++) {
 		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
 		double t2 = (ptMax(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
 
 		tmin = std::max(tmin, std::min(t1, t2));
 		tmax = std::min(tmax, std::max(t1, t2));
-	}
 
-	{
-		int i = 2;
-		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
-		double t2 = (ptMax(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
-
-		tmin = std::max(tmin, std::min(t1, t2));
-		tmax = std::min(tmax, std::max(t1, t2));
+		// skip Y
+		if (i == 0)
+			i++;
 	}
 
 	return (tmax >= tmin);
-}
-
-CollisionManifold BoundingQuad::Collide(const ray &rCast) {
-	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
-
-	// TODO:
-
-	return manifold;
 }
 
 CollisionManifold BoundingQuad::Collide(const BoundingQuad& rhs) {
@@ -195,6 +181,32 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 		
 	}
 	
+	return manifold;
+}
+
+// https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
+CollisionManifold BoundingQuad::Collide(const ray &rCast) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
+
+	double t = -1.0f;
+
+	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vNormal.Normalize();
+	
+	t = ((vector)(GetAbsoluteOrigin() - rCast.GetOrigin())).dot(vNormal);
+	t /= rCast.GetVector().Normal().dot(vNormal);
+
+	if (t > 0) {
+		//point ptContact = adjRay.GetOrigin() + adjRay.GetVector() * tNear;
+		point ptContact = rCast.GetOrigin() + rCast.GetVector() * t;
+		//vector vNormal = rotMat * vector::jVector(1.0f);
+		//ptContact = (rotMat * ptContact) + GetAbsoluteOrigin();
+		
+		// TODO: Handle normal correctly 
+
+		manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
+	}
+
 	return manifold;
 }
 

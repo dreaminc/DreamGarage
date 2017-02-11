@@ -72,6 +72,10 @@ double CollisionManifold::MinPenetrationDepth() const {
 }
 
 //vector vAngularVelocityOfPointA = pObjA->GetVelocityOfPoint(manifold.GetContactPoint());
+ContactPoint CollisionManifold::GetContactPoint(int contactPoint) const {
+	return m_contactPoints[contactPoint];
+}
+
 
 point CollisionManifold::GetContactPoint() const {
 	if (m_numContacts == 1) {

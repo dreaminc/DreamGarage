@@ -25,7 +25,9 @@ public:
 	double MaxPenetrationDepth() const;
 	double MinPenetrationDepth() const;
 	vector GetNormal() const;
+	
 	point GetContactPoint() const;
+	ContactPoint GetContactPoint(int contactPoint) const;
 
 	VirtualObj *GetObjectA() const;
 	VirtualObj *GetObjectB() const;

@@ -1,6 +1,8 @@
 #include "PhysicsEngineTestSuite.h"
 #include "DreamOS.h"
 
+#include "PhysicsEngine/CollisionManifold.h"
+
 PhysicsEngineTestSuite::PhysicsEngineTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -119,7 +121,7 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 		volume *pVolume = nullptr;
 		sphere *pSphere = nullptr;
 		quad *pQuad = nullptr;
-		sphere *pCollidePoint = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
 	};
 
 	RayTestContext *pTestContext = new RayTestContext();
@@ -151,11 +153,13 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 		//pTestContext->pQuad->RotateZByDeg(45.0f);
 		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad));
 
-		pTestContext->pCollidePoint = m_pDreamOS->AddSphere(0.025f, 10, 10);
-		CN(pTestContext->pCollidePoint);
-		pTestContext->pCollidePoint->SetVisible(false);
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
 
-		pTestContext->pRay = m_pDreamOS->AddRay(point(-2.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f));
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-2.0f, 1.0f, 0.0f), vector(0.0f, -1.0f, 0.0f));
 		CN(pTestContext->pRay);
 		
 		///*
@@ -185,17 +189,26 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 		CN(pTestContext->pQuad);
 
 		// Check for object collisions using the ray
-		if (pTestContext->pRay->Intersect(pTestContext->pVolume)) {
-			pTestContext->pCollidePoint->SetVisible(true);
+		if (pTestContext->pRay->Intersect(pTestContext->pQuad)) {
+			//pTestContext->pCollidePoint[0]->SetVisible(true);
+			CollisionManifold manifold = pTestContext->pRay->Collide(pTestContext->pQuad);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+		}
+		else if (pTestContext->pRay->Intersect(pTestContext->pVolume)) {
+			pTestContext->pCollidePoint[0]->SetVisible(true);
 		}
 		else if (pTestContext->pRay->Intersect(pTestContext->pSphere)) {
-			pTestContext->pCollidePoint->SetVisible(true);
-		}
-		else if (pTestContext->pRay->Intersect(pTestContext->pQuad)) {
-			pTestContext->pCollidePoint->SetVisible(true);
+			pTestContext->pCollidePoint[0]->SetVisible(true);
 		}
 		else {
-			pTestContext->pCollidePoint->SetVisible(false);
+			for(int i = 0; i < 4; i++)
+				pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
 	Error:
