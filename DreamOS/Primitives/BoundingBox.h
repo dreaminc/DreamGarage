@@ -89,6 +89,8 @@ public:
 	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
 
+	virtual CollisionManifold Collide(const ray &rCast) override;
+
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
 	virtual BoundingVolume::Type GetType() override {

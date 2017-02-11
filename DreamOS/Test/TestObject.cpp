@@ -60,7 +60,7 @@ RESULT TestObject::RunTest(void* pContext) {
 	// Allow for override 
 	m_timeStartRunTest = std::chrono::high_resolution_clock::now();
 	{
-		if (pContext == nullptr)
+		if (m_pContext != nullptr)
 			m_testResult = m_fnTest(m_pContext);
 		else
 			m_testResult = m_fnTest(pContext);
@@ -82,7 +82,7 @@ RESULT TestObject::InitializeTest(void* pContext) {
 	// Allow for override 
 	m_timeStartInitialize = std::chrono::high_resolution_clock::now();
 	{
-		if (pContext == nullptr)
+		if (m_pContext != nullptr)
 			m_initializeResult = m_fnInitialize(m_pContext);
 		else
 			m_initializeResult = m_fnInitialize(pContext);
@@ -103,7 +103,7 @@ RESULT TestObject::UpdateTest(void* pContext) {
 	m_timeStartUpdate = std::chrono::high_resolution_clock::now();
 	{
 		// Allow for override 
-		if (pContext == nullptr)
+		if (m_pContext != nullptr)
 			m_updateResult = m_fnUpdate(m_pContext);
 		else
 			m_updateResult = m_fnUpdate(pContext);

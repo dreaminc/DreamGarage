@@ -114,37 +114,54 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 	double sTestTime = 15.0f;
 	int nRepeats = 1;
 
+	struct RayTestContext {
+		DimRay *pRay = nullptr;
+		volume *pVolume = nullptr;
+		sphere *pSphere = nullptr;
+		quad *pQuad = nullptr;
+		sphere *pCollidePoint = nullptr;
+	};
+
+	RayTestContext *pTestContext = new RayTestContext();
+
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		m_pDreamOS->SetGravityState(false);
 
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
 		// Ball to Volume
-		auto pVolume = m_pDreamOS->AddVolume(0.5);
-		CN(pVolume);
-		pVolume->SetPosition(point(-1.0f, -1.0f, 0.0f));
-		pVolume->SetMass(10.0f);
-		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+		pTestContext->pVolume = m_pDreamOS->AddVolume(0.5);
+		CN(pTestContext->pVolume);
+		pTestContext->pVolume->SetPosition(point(-1.0f, -1.0f, 0.0f));
+		pTestContext->pVolume->SetMass(10.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pVolume));
 
-		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
-		CN(pSphere);
-		pSphere->SetPosition(point(1.0f, -1.0f, 0.0f));
-		pSphere->SetMass(1.0f);
-		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+		pTestContext->pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pTestContext->pSphere);
+		pTestContext->pSphere->SetPosition(point(1.0f, -1.0f, 0.0f));
+		pTestContext->pSphere->SetMass(1.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pSphere));
 
-		auto pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
-		CN(pQuad);
-		pQuad->SetPosition(point(0.0f, -1.0f, 0.0f));
-		pQuad->SetMass(1.0f);
-		CR(m_pDreamOS->AddPhysicsObject(pQuad));
+		pTestContext->pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(1.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad);
+		pTestContext->pQuad->SetPosition(point(0.0f, -1.0f, 0.0f));
+		pTestContext->pQuad->SetMass(1.0f);
+		//pTestContext->pQuad->RotateZByDeg(45.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad));
 
-		auto pRay = m_pDreamOS->AddRay(point(-2.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f));
-		CN(pRay);
-		///*
-		pRay->SetMass(1.0f);
-		pRay->SetVelocity(vector(0.5f, 0.0f, 0.0f));
-		CR(m_pDreamOS->AddPhysicsObject(pRay));
+		pTestContext->pCollidePoint = m_pDreamOS->AddSphere(0.025f, 10, 10);
+		CN(pTestContext->pCollidePoint);
+		pTestContext->pCollidePoint->SetVisible(false);
+
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-2.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f));
+		CN(pTestContext->pRay);
 		
+		///*
+		pTestContext->pRay->SetMass(1.0f);
+		pTestContext->pRay->SetVelocity(vector(0.5f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pRay));
 		//*/
 
 	Error:
@@ -157,17 +174,48 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 	};
 
 	// Update Code 
-	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		CN(pTestContext->pRay);
+		CN(pTestContext->pVolume);
+		CN(pTestContext->pSphere);
+		CN(pTestContext->pQuad);
+
+		// Check for object collisions using the ray
+		if (pTestContext->pRay->Intersect(pTestContext->pVolume)) {
+			pTestContext->pCollidePoint->SetVisible(true);
+		}
+		else if (pTestContext->pRay->Intersect(pTestContext->pSphere)) {
+			pTestContext->pCollidePoint->SetVisible(true);
+		}
+		else if (pTestContext->pRay->Intersect(pTestContext->pQuad)) {
+			pTestContext->pCollidePoint->SetVisible(true);
+		}
+		else {
+			pTestContext->pCollidePoint->SetVisible(false);
+		}
+
+	Error:
+		return r;
 	};
 
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
 		return ResetTest(pContext);
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Sphere vs OBB");

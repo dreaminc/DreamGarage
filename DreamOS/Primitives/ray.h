@@ -10,6 +10,7 @@
 
 #include "point.h"
 #include "vector.h"
+#include "VirtualObj.h"
 
 class ray {
 public:

@@ -79,6 +79,14 @@ bool BoundingSphere::Intersect(const ray &r) {
 	return false;
 }
 
+CollisionManifold BoundingSphere::Collide(const ray &rCast) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
+
+	// TODO:
+
+	return manifold;
+}
+
 CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
 	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
 	float distance = vMidLine.magnitude();

@@ -33,6 +33,8 @@ public:
 	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
 
+	virtual CollisionManifold Collide(const ray &rCast) override;
+
 	float GetRadius() {
 		return m_radius;
 	}

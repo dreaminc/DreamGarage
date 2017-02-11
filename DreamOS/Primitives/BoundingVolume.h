@@ -51,6 +51,8 @@ public:
 	virtual CollisionManifold Collide(const BoundingBox& rhs) = 0;
 	virtual CollisionManifold Collide(const BoundingQuad& rhs) = 0;
 
+	virtual CollisionManifold Collide(const ray &rCast) = 0;
+
 	virtual point GetMinPoint() = 0;
 	virtual point GetMaxPoint() = 0;
 

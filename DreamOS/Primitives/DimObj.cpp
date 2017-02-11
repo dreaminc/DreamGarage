@@ -4,6 +4,8 @@
 #include "BoundingSphere.h"
 #include "BoundingQuad.h"
 
+#include "PhysicsEngine/CollisionManifold.h"
+
 DimObj::DimObj() :
 	VirtualObj(),	// velocity, origin
 	m_pVertices(nullptr),
@@ -233,6 +235,29 @@ bool DimObj::HasChildren() {
 
 std::vector<std::shared_ptr<VirtualObj>> DimObj::GetChildren() {
 	return *(m_pObjects.get());
+}
+
+// Intersections and Collision
+bool DimObj::Intersect(VirtualObj* pObj) {
+	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
+
+	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
+		return false;
+	}
+	else {
+		return GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get());
+	}
+}
+
+CollisionManifold DimObj::Collide(VirtualObj* pObj) {
+	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
+
+	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
+		return CollisionManifold(this, pObj);
+	}
+	else {
+		return GetBoundingVolume()->Collide(pDimObj->GetBoundingVolume().get());
+	}
 }
 
 point DimObj::GetOrigin(bool fAbsolute) {

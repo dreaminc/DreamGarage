@@ -564,6 +564,14 @@ bool BoundingBox::Intersect(const ray& r) {
 	return (tmax >= tmin);
 }
 
+CollisionManifold BoundingBox::Collide(const ray &rCast) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
+
+	// TODO:
+
+	return manifold;
+}
+
 vector BoundingBox::GetBoxFaceNormal(BoxFace faceType) {
 	vector vNormal;
 

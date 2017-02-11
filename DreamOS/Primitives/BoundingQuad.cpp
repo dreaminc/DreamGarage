@@ -43,19 +43,62 @@ bool BoundingQuad::Intersect(point& pt) {
 }
 
 bool BoundingQuad::Intersect(const ray& r) {
+	double tmin = std::numeric_limits <double>::min(); 
+	double tmax = std::numeric_limits <double>::max();
+
+	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+	RotationMatrix rotMat = RotationMatrix(qOrientation);
+
+	ray adjRay;
+	adjRay.vDirection() = inverse(RotationMatrix(GetOrientation())) * r.GetVector();
+	adjRay.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - r.GetOrigin()));
+
+	point ptMin = GetMinPoint();
+	point ptMax = GetMaxPoint();
+
+	// Only check X and Z since we've re-oriented the ray in terms of the up vector (and quads have no height)
+
+	{
+		int i = 0;
+		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
+		double t2 = (ptMax(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
+
+		tmin = std::max(tmin, std::min(t1, t2));
+		tmax = std::min(tmax, std::max(t1, t2));
+	}
+
+	{
+		int i = 2;
+		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
+		double t2 = (ptMax(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
+
+		tmin = std::max(tmin, std::min(t1, t2));
+		tmax = std::min(tmax, std::max(t1, t2));
+	}
+
+	return (tmax >= tmin);
+}
+
+CollisionManifold BoundingQuad::Collide(const ray &rCast) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
+
 	// TODO:
 
-	return false;
+	return manifold;
 }
 
 CollisionManifold BoundingQuad::Collide(const BoundingQuad& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	// TODO:
 
 	return manifold;
 }
 
 CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	// TODO:
 
 	return manifold;
 }

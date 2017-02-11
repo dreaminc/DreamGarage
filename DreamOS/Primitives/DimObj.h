@@ -28,6 +28,7 @@
 #include <memory>
 
 class BoundingVolume;
+class CollisionManifold;
 
 class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
 	friend class OGLObj;
@@ -125,6 +126,10 @@ public:
 	bool CompareParent(DimObj* pParent);
 
 	std::vector<std::shared_ptr<VirtualObj>> GetChildren();
+
+	// Intersections and Collision
+	bool Intersect(VirtualObj* pObj);
+	CollisionManifold Collide(VirtualObj* pObj);
 
 	// Composites will have absolute vs. frame of reference position/orientation
 	virtual point GetOrigin(bool fAbsolute = false) override;
