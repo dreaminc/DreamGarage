@@ -118,23 +118,14 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 				}
 				else
 				{
+					/*** old way
 					switch (keyCode)
 					{
 					case SVK_BACK: {
-
 					} break;
 					case SVK_RETURN: {
-						HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
-						CMDPROMPT_EXECUTE(m_cmdText);
-						m_cmdText.erase();
 					} break;
 					case SVK_ESCAPE: {
-						if (!m_cmdText.empty()) {
-							m_cmdText.erase();
-						}
-						else {
-							m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
-						}
 					} break;
 					case SVK_LEFT:
 					case SVK_RIGHT:
@@ -146,6 +137,7 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 						// don't process type character here. look for SenseTypingEvent
 					} break;
 					}
+					*/
 				}
 			}
 		}
@@ -163,7 +155,7 @@ RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 		volatile char16_t c = kbEvent->u16character;
 
 		switch (kbEvent->u16character) {
-		case 0x08:
+		case SVK_BACK:
 			// Process a backspace. 
 			if (!m_cmdText.empty())
 				m_cmdText.pop_back();
@@ -173,16 +165,25 @@ RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 			// Process a linefeed. 
 			break;
 
-		case 0x1B:
+		case SVK_ESCAPE:
 			// Process an escape. 
+			if (!m_cmdText.empty()) {
+				m_cmdText.erase();
+			}
+			else {
+				m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
+			}
 			break;
 
-		case 0x09:
+		case SVK_TAB:
 			// Process a tab. 
 			break;
 
-		case 0x0D:
+		case SVK_RETURN:
 			// Process a carriage return. 
+			HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+			CMDPROMPT_EXECUTE(m_cmdText);
+			m_cmdText.erase();
 			break;
 
 		default:
