@@ -543,7 +543,7 @@ bool BoundingBox::Intersect(const ray& r) {
 
 	// Rotate the ray by the Rotation Matrix
 	// Get origin in reference to object
-	ray adjRay;
+	ray adjRay = r;
 
 	if (m_type == Type::OBB) {
 		adjRay.vDirection() = inverse(RotationMatrix(GetOrientation())) * r.GetVector();
@@ -561,13 +561,49 @@ bool BoundingBox::Intersect(const ray& r) {
 		tmax = std::min(tmax, std::max(t1, t2));
 	}
 
-	return (tmax >= tmin);
+	return (tmax >= tmin) && (tmax >= 0) && (tmin >= 0);
 }
 
 CollisionManifold BoundingBox::Collide(const ray &rCast) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
+	double tmin = -INFINITY, tmax = INFINITY;
 
-	// TODO:
+	// Rotate the ray by the Rotation Matrix
+	// Get origin in reference to object
+	ray adjRay;
+
+	if (m_type == Type::OBB) {
+		adjRay.vDirection() = inverse(RotationMatrix(GetOrientation())) * rCast.GetVector();
+		adjRay.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - rCast.GetOrigin()));
+	}
+
+	point ptMin = GetMinPoint();
+	point ptMax = GetMaxPoint();
+
+	for (int i = 0; i < 3; i++) {
+		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
+		double t2 = (ptMax(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
+
+		tmin = std::max(tmin, std::min(t1, t2));
+		tmax = std::min(tmax, std::max(t1, t2));
+	}
+
+	// TODO: Do the normals
+	if (tmax == tmin) {
+		point ptContactMin = rCast.GetOrigin() + rCast.GetVector() * tmin;
+		vector vNormal = vector();
+
+		manifold.AddContactPoint(ptContactMin, vNormal, 0.0f, 1);
+	}
+	else if (tmax > tmin) {
+		point ptContactMin = rCast.GetOrigin() + rCast.GetVector() * tmin;
+		point ptContactMax = rCast.GetOrigin() + rCast.GetVector() * tmax;
+		vector vNormalMin = vector();
+		vector vNormalMax = vector();
+
+		manifold.AddContactPoint(ptContactMin, vNormalMin, 0.0f, 1);
+		manifold.AddContactPoint(ptContactMax, vNormalMax, 0.0f, 1);
+	}
 
 	return manifold;
 }

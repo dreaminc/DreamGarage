@@ -43,34 +43,35 @@ bool BoundingQuad::Intersect(point& pt) {
 }
 
 bool BoundingQuad::Intersect(const ray& r) {
-	double tmin = std::numeric_limits <double>::min(); 
-	double tmax = std::numeric_limits <double>::max();
+	double t = -1.0f;
+	
+	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vNormal.Normalize();
 
-	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
-	RotationMatrix rotMat = RotationMatrix(qOrientation);
+	t = ((vector)(GetAbsoluteOrigin() - r.GetOrigin())).dot(vNormal);
+	double denom = r.GetVector().Normal().dot(vNormal);
 
-	ray adjRay;
-	adjRay.vDirection() = inverse(RotationMatrix(GetOrientation())) * r.GetVector();
-	adjRay.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - r.GetOrigin()));
-	//adjRay.ptOrigin() = inverse(rotMat) * (r.GetOrigin() - GetAbsoluteOrigin());
+	if (denom != 0) {
+		t /= denom;
 
-	point ptMin = GetMinPoint();
-	point ptMax = GetMaxPoint();
+		if (t >= 0) {
+			quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+			RotationMatrix rotMat = RotationMatrix(qOrientation);
 
-	// Only check X and Z since we've re-oriented the ray in terms of the up vector (and quads have no height)
-	for (int i = 0; i < 3; i++) {
-		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
-		double t2 = (ptMax(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
+			point ptPlane = inverse(rotMat) * ((r.GetOrigin() + r.GetVector() * t) - GetAbsoluteOrigin());
 
-		tmin = std::max(tmin, std::min(t1, t2));
-		tmax = std::min(tmax, std::max(t1, t2));
-
-		// skip Y
-		if (i == 0)
-			i++;
+			if (ptPlane.x() < GetWidth() / 2.0f && ptPlane.x() > -GetWidth() / 2.0f &&
+				ptPlane.z() < GetHeight() / 2.0f && ptPlane.z() > -GetHeight() / 2.0f)
+			{
+				return true;
+			}
+		}
+	}
+	else {
+		// parallel 
 	}
 
-	return (tmax >= tmin);
+	return false;
 }
 
 CollisionManifold BoundingQuad::Collide(const BoundingQuad& rhs) {
@@ -194,14 +195,18 @@ CollisionManifold BoundingQuad::Collide(const ray &rCast) {
 	vNormal.Normalize();
 	
 	t = ((vector)(GetAbsoluteOrigin() - rCast.GetOrigin())).dot(vNormal);
-	t /= rCast.GetVector().Normal().dot(vNormal);
+	double denom = rCast.GetVector().Normal().dot(vNormal);
 
-	if (t > 0) {
-		point ptContact = rCast.GetOrigin() + rCast.GetVector() * t;
-		
-		// TODO: Handle normal correctly 
+	if (denom != 0) {
+		t /= denom;
 
-		manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
+		if (t > 0) {
+			point ptContact = rCast.GetOrigin() + rCast.GetVector() * t;
+			manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
+		}
+	}
+	else {
+		// parallel 
 	}
 
 	return manifold;

@@ -90,25 +90,29 @@ CollisionManifold BoundingSphere::Collide(const ray &rCast) {
 	
 	if (sqrtVal == 0) {
 		double t1 = -bVal;
-		point ptContact = rCast.GetOrigin() + rCast.GetVector() * t1;
-		vector vNormal = vector();
+		if (t1 >= 0) {
+			point ptContact = rCast.GetOrigin() + rCast.GetVector() * t1;
+			vector vNormal = (ptContact - GetOrigin()).Normal();
 
-		// TODO: NORMAL!!
-
-		manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
+			manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
+		}
 	}
 	else if (sqrtVal > 0) {
 		double t1 = -bVal + std::sqrt(sqrtVal);
 		double t2 = -bVal - std::sqrt(sqrtVal);
 
-		point ptContact1 = rCast.GetOrigin() + rCast.GetVector() * t1;
-		point ptContact2 = rCast.GetOrigin() + rCast.GetVector() * t2;
-		vector vNormal = vector();
+		if (t1 >= 0) {
+			point ptContact1 = rCast.GetOrigin() + rCast.GetVector() * t1;
+			vector vNormal1 = (ptContact1 - GetOrigin()).Normal();
+			manifold.AddContactPoint(ptContact1, vNormal1, 0.0f, 1);
+		}
+		
+		if (t2 >= 0) {
+			point ptContact2 = rCast.GetOrigin() + rCast.GetVector() * t2;
+			vector vNormal2 = (ptContact2 - GetOrigin()).Normal();
+			manifold.AddContactPoint(ptContact2, vNormal2, 0.0f, 1);
+		}
 
-		// TODO: NORMAL!!
-
-		manifold.AddContactPoint(ptContact1, vNormal, 0.0f, 1);
-		manifold.AddContactPoint(ptContact2, vNormal, 0.0f, 1);
 	}
 	else {
 		// TODO: error?
