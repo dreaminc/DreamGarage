@@ -857,15 +857,10 @@ void Browsers::OnKey(unsigned int scanCode, char16_t chr) {
 			HUD_OUT("browser control is released");
 		}
 		else {
-			switch (chr) {
-			default:
-				// Process displayable characters. 
-				std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, chr));
+			// Process displayable characters. 
+			std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, chr));
 
-				m_browserInKeyFocus->SendKeySequence(nonUnicodeChar);
-
-				break;
-			}
+			m_browserInKeyFocus->SendKeySequence(nonUnicodeChar);
 		}
 	}
 }
