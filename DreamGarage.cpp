@@ -50,6 +50,7 @@ RESULT DreamGarage::LoadScene() {
 
 	// IO
 	RegisterSubscriber(SVK_ALL, this);
+	RegisterSubscriber(CHARACTER_TYPING, this);
 
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);
@@ -680,11 +681,18 @@ Error:
 RESULT DreamGarage::Notify(SenseKeyboardEvent *kbEvent)  {
 	RESULT r = R_PASS;
 
+//Error:
+	return r;
+}
+
+RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
+	RESULT r = R_PASS;
+
 	if (kbEvent->KeyState != 0) {
-		m_browsers.OnKey(kbEvent->KeyCode);
+		m_browsers.OnKey(kbEvent->KeyCode, kbEvent->u16character);
 	}
 
-//Error:
+	//Error:
 	return r;
 }
 
@@ -842,35 +850,22 @@ void Browsers::SetKeyFocus(const std::string& id) {
 	m_browserInKeyFocus = GetBrowser(id);
 }
 
-void Browsers::OnKey(unsigned int scanCode) {
+void Browsers::OnKey(unsigned int scanCode, char16_t chr) {
 	if (m_browserInKeyFocus) {
 		if (scanCode == VK_ESCAPE) {
 			m_browserInKeyFocus = nullptr;
 			HUD_OUT("browser control is released");
 		}
 		else {
-			std::string chr;
+			switch (chr) {
+			default:
+				// Process displayable characters. 
+				std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, chr));
 
-			std::locale	loc;
+				m_browserInKeyFocus->SendKeySequence(nonUnicodeChar);
 
-			if (std::use_facet<std::ctype<char>>(loc).is(std::ctype<char>::alpha, static_cast<char>(scanCode))) {
-				chr.append(std::string("") + std::tolower(static_cast<char>(scanCode), loc));
+				break;
 			}
-			else if ((scanCode == VK_SPACE) || (static_cast<char>(scanCode) >= '0' && static_cast<char>(scanCode) <= '9')) {
-				chr.append(std::string("") + static_cast<char>(scanCode));
-			}
-			// the following is of course nonsense. until we capture the keyboard properly.
-			else if (static_cast<unsigned char>(scanCode) == 190) {
-				chr.append(std::string("") + ".");
-			}
-			else if (static_cast<unsigned char>(scanCode) == 191) {
-				chr.append(std::string("") + "/");
-			}
-
-			if (chr.compare("") == 0)
-				m_browserInKeyFocus->SendKeySequence(std::string("") + static_cast<char>(scanCode));
-			else
-				m_browserInKeyFocus->SendKeySequence(chr);
 		}
 	}
 }

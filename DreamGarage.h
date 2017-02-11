@@ -25,7 +25,7 @@ public:
 	WebBrowserController*	GetBrowser(const std::string& id);
 	void SetKeyFocus(const std::string& id);
 
-	void OnKey(unsigned int scanCode);
+	void OnKey(unsigned int scanCode, char16_t chr);
 
 private:
 	composite*	m_composite;
@@ -44,7 +44,7 @@ private:
 	WebBrowserController* m_browserInKeyFocus = nullptr;
 };
 
-class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
+class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
 public:
 
 	DreamGarage() {
@@ -77,6 +77,7 @@ public:
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
+	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
 
 	// SenseControllerEventSubscriber
 	virtual RESULT Notify(SenseControllerEvent *event) override;

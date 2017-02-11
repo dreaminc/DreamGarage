@@ -296,6 +296,10 @@ RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKey
 	return m_pSandbox->RegisterSubscriber(keyEvent, pKeyboardSubscriber);
 }
 
+RESULT DreamOS::RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber) {
+	return m_pSandbox->RegisterSubscriber(typingEvent, pTypingSubscriber);
+}
+
 RESULT DreamOS::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
 	return m_pSandbox->RegisterSubscriber(mouseEvent, pMouseSubscriber);
 }

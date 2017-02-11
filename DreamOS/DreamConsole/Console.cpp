@@ -220,7 +220,6 @@ RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 		default:
 			// Process displayable characters. 
 			std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, kbEvent->u16character));
-			//m_cmdText.append(nonUnicodeChar, GetCmtTextCursorPos(), 1);
 			m_cmdText.insert(GetCmtTextCursorPos(), 1, nonUnicodeChar[0]);
 			TextCursorMoveForward();
 			break;
