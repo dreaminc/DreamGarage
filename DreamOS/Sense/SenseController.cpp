@@ -1,4 +1,5 @@
 #include "SenseController.h"
+#include "DreamConsole/DreamConsole.h"
 
 SenseController::SenseController()
 {
@@ -11,50 +12,58 @@ SenseController::~SenseController()
 {
 }
 
-ControllerState SenseController::GetControllerState() {
-	return m_controllerState;
+ControllerState SenseController::GetControllerState(ControllerType type) {
+	return m_controllerStates[type];
 }
 
 RESULT SenseController::SetControllerState(ControllerState controllerState) {
-	
-	m_controllerState.type = controllerState.type;
+
+	ControllerState* currentState = &m_controllerStates[controllerState.type];
 
 	SENSE_CONTROLLER_EVENT_TYPE eventType;
 
-	if (m_controllerState.triggerRange != controllerState.triggerRange) {
+	if (currentState->triggerRange != controllerState.triggerRange) {
 		eventType = SENSE_CONTROLLER_TRIGGER_MOVE;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
+		if (controllerState.triggerRange == 1.0f) {
+			eventType = SENSE_CONTROLLER_TRIGGER_DOWN;
+			NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
+		}
+		if (controllerState.triggerRange != 1.0f && currentState->triggerRange == 1.0f) {
+			eventType = SENSE_CONTROLLER_TRIGGER_UP;
+			NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
+		}
 	}
-	m_controllerState.triggerRange = controllerState.triggerRange;
+	currentState->triggerRange = controllerState.triggerRange;
 
 
-	if (m_controllerState.ptTouchpad != controllerState.ptTouchpad) {
+	if (currentState->ptTouchpad != controllerState.ptTouchpad) {
 		eventType = SENSE_CONTROLLER_PAD_MOVE;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
-	m_controllerState.ptTouchpad = controllerState.ptTouchpad;
+	currentState->ptTouchpad = controllerState.ptTouchpad;
 
 
-	if (!m_controllerState.fGrip && controllerState.fGrip) {
+	if (!currentState->fGrip && controllerState.fGrip) {
 		eventType = SENSE_CONTROLLER_GRIP_DOWN;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
-	else if (m_controllerState.fGrip && !controllerState.fGrip) {
+	else if (currentState->fGrip && !controllerState.fGrip) {
 		eventType = SENSE_CONTROLLER_GRIP_UP;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
-	m_controllerState.fGrip = controllerState.fGrip;
+	currentState->fGrip = controllerState.fGrip;
 
 
-	if (!m_controllerState.fMenu && controllerState.fMenu) {
+	if (!currentState->fMenu && controllerState.fMenu) {
 		eventType = SENSE_CONTROLLER_MENU_DOWN;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
-	else if (m_controllerState.fMenu && !controllerState.fMenu) {
+	else if (currentState->fMenu && !controllerState.fMenu) {
 		eventType = SENSE_CONTROLLER_MENU_UP;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
-	m_controllerState.fMenu = controllerState.fMenu;
+	currentState->fMenu = controllerState.fMenu;
 
 
 	return R_PASS;

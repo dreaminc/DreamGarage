@@ -14,6 +14,8 @@ typedef enum SenseControllerEventType {
 	SENSE_CONTROLLER_MENU_DOWN,
 	SENSE_CONTROLLER_MENU_UP,
 	SENSE_CONTROLLER_TRIGGER_MOVE,
+	SENSE_CONTROLLER_TRIGGER_DOWN,
+	SENSE_CONTROLLER_TRIGGER_UP,
 	SENSE_CONTROLLER_PAD_MOVE,
 	SENSE_CONTROLLER_INVALID
 } SENSE_CONTROLLER_EVENT_TYPE;
@@ -52,12 +54,12 @@ public:
 	~SenseController();
 
 public:
-	ControllerState GetControllerState();
+	ControllerState GetControllerState(ControllerType type);
 	RESULT SetControllerState(ControllerState controllerState);
 
 private:
 
-	ControllerState m_controllerState;
+	std::map<ControllerType, ControllerState> m_controllerStates;
 };
 
 #endif // ! SENSE_CONTROLLER_H_

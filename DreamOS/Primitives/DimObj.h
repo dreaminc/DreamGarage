@@ -112,6 +112,7 @@ public:
 	
 	// TODO: Above accessors / create texture store
 	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
+	RESULT SetMaterialAmbient(float ambient);
 	
 	texture* GetTextureAmbient();
 	texture* GetTextureDiffuse();

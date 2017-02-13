@@ -940,7 +940,10 @@ Error:
 RESULT SandboxApp::RegisterSubscriber(SenseControllerEventType controllerEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber) {
 	RESULT r = R_PASS;
 	if (m_pHMD != nullptr) {
-		CR(m_pHMD->GetSenseController()->RegisterSubscriber(controllerEvent, pControllerSubscriber));
+		SenseController *pSenseController = m_pHMD->GetSenseController();
+		if (pSenseController != nullptr) {
+			CR(pSenseController->RegisterSubscriber(controllerEvent, pControllerSubscriber));
+		}
 	}
 
 Error:

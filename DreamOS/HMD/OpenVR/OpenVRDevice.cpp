@@ -261,6 +261,8 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 
 	model *pModel = m_pParentSandbox->AddModel(verts, indices);
 
+	pModel->SetMaterialAmbient(1.0f);
+
 	/*
 	uint16_t unWidth, unHeight; // width and height of the texture map in pixels
 	const uint8_t *rubTextureMapData;	// Map texture data. All textures are RGBA with 8 bits per channel per pixel. Data size is width * height * 4ub
