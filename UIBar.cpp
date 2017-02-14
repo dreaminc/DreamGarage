@@ -19,8 +19,8 @@ UIBar::~UIBar() {
 
 RESULT UIBar::UpdateWithRadialLayout(size_t index) {
 
-	auto currentMenu = m_currentUILayer->GetMenuItems();
-	auto pItem = currentMenu[index];
+	auto& currentMenu = m_currentUILayer->GetMenuItems();
+	auto& pItem = currentMenu[index];
 	int size = static_cast<int>(currentMenu.size());
 	bool fHeader = (index == size - 1);
 
@@ -98,7 +98,7 @@ RESULT UIBar::UpdateSelectedItem(size_t index) {
 	return R_PASS;
 }
 
-int UIBar::GetIndexFromRay(ray handRay) {
+int UIBar::GetIndexFromRay(ray& handRay) {
 	point ptContext = handRay.GetOrigin() - m_pContext->GetOrigin();
 	ptContext = point(ptContext.x(), 0.0f, ptContext.z());
 	ray contextRay = ray(ptContext, handRay.GetVector());
@@ -121,7 +121,7 @@ int UIBar::GetIndexFromRay(ray handRay) {
 	return index;
 }
 
-RESULT UIBar::Update(ray handRay) {
+RESULT UIBar::Update(ray& handRay) {
 	
 	// convert ray into context's space
 	UpdateSelectedItem(GetIndexFromRay(handRay));
@@ -130,7 +130,6 @@ RESULT UIBar::Update(ray handRay) {
 }
 
 point UIBar::FurthestRaySphereIntersect(const ray &r, point center, float radius) {
-//*
 	vector vRayCircle = static_cast<ray>(r).ptOrigin() - center;
 
 	float bValue = static_cast<ray>(r).vDirection().dot(vRayCircle);
@@ -146,7 +145,7 @@ point UIBar::FurthestRaySphereIntersect(const ray &r, point center, float radius
 		//float t2 = (-1.0f) * bValue - term;
 		return r.GetOrigin() + point(t1 * r.GetVector());
 	}
-	//*/
+
 	return point(0.0f, 0.0f, 0.0f);
 }
 

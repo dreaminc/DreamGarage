@@ -781,7 +781,7 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 			if (!m_menuPath.empty()) {
 				m_menuPath.pop();
 				if (!m_menuPath.empty()) {
-					std::string str = m_menuPath.top();
+					std::string& str = m_menuPath.top();
 					info.labels = m_menu[str];
 					info.labels.emplace_back(str);
 					for (int i = 0; i < info.labels.size(); i++) {
@@ -802,7 +802,6 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 			m_pDreamUIBar->HandleMenuUp(info);
 		}
 	}
-	//*
 	else if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
 		OVERLAY_DEBUG_SET("event", "grip down");
 	}
@@ -812,7 +811,6 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 	else if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
 		OVERLAY_DEBUG_SET("event", "menu down");
 	}
-	//*/
 
 	return r;
 }

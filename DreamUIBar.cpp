@@ -11,6 +11,7 @@ DreamUIBar::~DreamUIBar()
 	// empty
 }
 
+// TODO: Will be implemented or moved once registration architecture is fleshed out
 RESULT DreamUIBar::RegisterEvent(UIMenuItemEvent type, std::function<RESULT(void*)> fnCallback, void* pContext) {
 	return R_NOT_IMPLEMENTED;
 }

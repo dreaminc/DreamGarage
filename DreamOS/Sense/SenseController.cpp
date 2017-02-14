@@ -17,7 +17,6 @@ ControllerState SenseController::GetControllerState(ControllerType type) {
 }
 
 RESULT SenseController::SetControllerState(ControllerState controllerState) {
-
 	ControllerState* currentState = &m_controllerStates[controllerState.type];
 
 	SENSE_CONTROLLER_EVENT_TYPE eventType;

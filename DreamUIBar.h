@@ -12,7 +12,8 @@ public:
 	DreamUIBar(composite* pComposite, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
 	~DreamUIBar();
 
-	typedef enum UI_MENU_ITEM_EVENT {
+	//TODO: may be moved depending on implementation of registration architecture
+	typedef enum class UI_MENU_ITEM_EVENT {
 		FORWARD,
 		FILE,
 		INVALID
@@ -22,7 +23,7 @@ public:
 		UIMenuItemEvent type;
 
 		UIEventInfo() :
-			type(INVALID)
+			type(UIMenuItemEvent::INVALID)
 		{}
 	};
 

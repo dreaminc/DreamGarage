@@ -27,6 +27,10 @@ public:
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) = 0;
 
 	RESULT ToggleVisible();
+	RESULT Show();
+	RESULT Hide();
+	RESULT SetVisibile(bool fVisible);
+
 
 protected:
 	composite* m_pContext;

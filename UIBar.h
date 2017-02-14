@@ -53,12 +53,12 @@ public:
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
 
 	// TODO: these functions can be removed/replaced once there is composite collision code
-	RESULT Update(ray handRay);
+	RESULT Update(ray& handRay);
 	size_t GetSelectedIndex();
 
 private:
 
-	int GetIndexFromRay(ray handRay);
+	int GetIndexFromRay(ray& handRay);
 
 	// Places MenuItem along a circular arc based on index
 	RESULT UpdateWithRadialLayout(size_t index);

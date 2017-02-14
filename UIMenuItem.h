@@ -39,7 +39,6 @@ struct LabelFormat
 class UIMenuItem {
 public:
 	UIMenuItem(composite* c);
-	~UIMenuItem();
 
 	RESULT Initialize();
 
@@ -47,7 +46,7 @@ public:
 	std::shared_ptr<quad> GetQuad();
 
 
-	RESULT Update(IconFormat iconFormat = IconFormat(), LabelFormat labelFormat = LabelFormat());
+	RESULT Update(IconFormat& iconFormat, LabelFormat& labelFormat);
 
 private:
 	std::shared_ptr<composite> m_pContext;

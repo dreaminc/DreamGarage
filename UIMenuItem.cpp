@@ -6,10 +6,6 @@ m_pContext(c)
 	Initialize();
 }
 
-UIMenuItem::~UIMenuItem() {
-	// empty
-}
-
 RESULT UIMenuItem::Initialize() {
 	RESULT r = R_PASS;
 
@@ -26,7 +22,7 @@ std::shared_ptr<quad> UIMenuItem::GetQuad() {
 	return m_pQuad;
 }
 
-RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
+RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	RESULT r = R_PASS;
 
 	// TODO: reuse this object?
@@ -42,7 +38,7 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 		true // force distance fields
 	);
 	pText->MoveTo(labelFormat.position);
-//*
+
 	pIcon = pContext->AddQuad(
 		iconFormat.width,
 		iconFormat.height,
@@ -52,7 +48,7 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 		pIcon->SetColorTexture(iconFormat.pTexture.get());
 	else
 		pIcon->SetVisible(false);
-//*/
+
 	m_pContext->RenderToTexture(pContext);
 	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 

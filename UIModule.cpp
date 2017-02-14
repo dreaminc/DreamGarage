@@ -45,3 +45,18 @@ RESULT UIModule::ToggleVisible() {
 
 	return r;
 }
+
+RESULT UIModule::Show() {
+	m_pContext->SetVisible(true);
+	return R_PASS;
+}
+
+RESULT UIModule::Hide() {
+	m_pContext->SetVisible(false);
+	return R_PASS;
+}
+
+RESULT UIModule::SetVisibile(bool fVisible) {
+	m_pContext->SetVisible(fVisible);
+	return R_PASS;
+}
