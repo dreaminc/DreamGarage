@@ -21,6 +21,7 @@ class quaternion;
 class vector : public matrix <vector_precision, 4, 1> {
 public:
 	vector();
+	vector(vector_precision val);
 	vector(matrix <vector_precision, 4, 1> &rhs);
 	vector(vector_precision x, vector_precision y, vector_precision z);
 	vector(vector rhs, vector lhs);	// Cross product - Not assumed to be normalized
@@ -38,6 +39,7 @@ public:
 	inline vector_precision &w(vector_precision val) { return this->element(3, 0) = val; }
 
 	double magnitude();
+	double magnitudeSquared();
 	
 	RESULT Normalize();		// Will normalize this vector
 	vector Normal();		// Return a normalized version of this vector
@@ -46,6 +48,9 @@ public:
 
 	vector_precision dot(const vector& rhs) const;
 	vector_precision dot(const point& rhs) const;
+	bool IsParallel(const vector &rhs);
+	bool IsValid();
+	bool IsZero();
 
 	vector cross(vector rhs);
 	vector NormalizedCross(vector rhs);

@@ -313,7 +313,7 @@ RESULT SandboxApp::RunAppLoop() {
 		// Update Scene 
 		//CR(m_pSceneGraph->UpdateScene());
 
-		CR(m_pPhysicsEngine->Update());
+		//CR(m_pPhysicsEngine->Update());
 		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
 
 		// Update HMD
@@ -482,6 +482,35 @@ Error:
 	return r;
 }
 
+// This is the nuclear option - it will flush all objects out
+RESULT SandboxApp::RemoveAllObjects() {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsGraph->RemoveAllObjects());
+	CR(m_pSceneGraph->RemoveAllObjects());
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::SetGravityAcceleration(double acceleration) {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsEngine->SetGravityAccelration(acceleration));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::SetGravityState(bool fEnabled) {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsEngine->SetGravityState(fEnabled));
+
+Error:
+	return r;
+}
+
 FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 
@@ -523,10 +552,10 @@ Error:
 	return nullptr;
 }
 	
-quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) {
+quad* SandboxApp::AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) {
 	RESULT r = R_PASS;
 
-	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+	quad *pQuad = m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 	CN(pQuad);
 
 	CR(AddObject(pQuad));
@@ -644,8 +673,7 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
-text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard)
-{
+text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = m_pHALImp->MakeText(fontName, content, size, isBillboard);
@@ -781,10 +809,14 @@ composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pT
 
 composite* SandboxApp::AddComposite() {
 	RESULT r = R_PASS;
+	
 	composite *pComposite = m_pHALImp->MakeComposite();
 	CN(pComposite);
 	CR(AddObject(pComposite));
+	
+	//Success:
 	return pComposite;
+
 Error:
 	if (pComposite != nullptr) {
 		delete pComposite;

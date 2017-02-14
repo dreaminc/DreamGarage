@@ -7,7 +7,7 @@
 // TODO: Eventually this should be a DreamGarage / Application specific main
 // and should likely sit in the same dir as the DreamOS derivation
 #include "../DreamGarage.h"
-#include "../DreamTestApp.h"
+#include "../DreamTestApp/DreamTestApp.h"
 
 #include "test/MatrixTestSuite.h"
 

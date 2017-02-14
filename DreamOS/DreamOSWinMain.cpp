@@ -4,7 +4,7 @@
 #include "RESULT/EHM.h"
 
 #include "../DreamGarage.h"
-#include "../DreamTestApp.h"
+#include "../DreamTestApp/DreamTestApp.h"
 #include "test/MatrixTestSuite.h"
 
 #include <string>

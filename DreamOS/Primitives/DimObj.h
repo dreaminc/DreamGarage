@@ -28,8 +28,11 @@
 #include <memory>
 
 class BoundingVolume;
+class CollisionManifold;
 
 class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
+	friend class OGLObj;
+
 protected:
     //point m_ptOrigin;   // origin > now in virtual object
     //AABV m_aabv;        // Axis Aligned Bounding Volume
@@ -130,19 +133,38 @@ public:
 
 	std::vector<std::shared_ptr<VirtualObj>> GetChildren();
 
+	// Intersections and Collision
+	bool Intersect(VirtualObj* pObj);
+	CollisionManifold Collide(VirtualObj* pObj);
+
+	// Composites will have absolute vs. frame of reference position/orientation
+	virtual point GetOrigin(bool fAbsolute = false) override;
+	virtual point GetPosition(bool fAbsolute = false) override;
+	virtual quaternion GetOrientation(bool fAbsolute = false) override;
+
+	// Composites will accumulate mass
+	virtual double GetMass() override;
+	virtual double GetInverseMass() override;
+
+	// TODO: Intertial momentum 
+
 protected:
 	RESULT SetParent(DimObj* pParent);
 
-private:
+public:
+	DimObj *GetParent();
+
+protected:
 	DimObj* m_pParent;
 	std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>> m_pObjects;
 
 	// Bounding Volume
 public:
-	RESULT UpdateBoundingVolume();
+	virtual RESULT UpdateBoundingVolume();
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();
+	RESULT InitializeBoundingQuad(point ptOrigin, float width, float height, vector vNormal);
 	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 
 	// OnManipulation is called by VirtualObj every time a manipulation occurs - this is a chance for

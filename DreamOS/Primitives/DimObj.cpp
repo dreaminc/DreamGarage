@@ -2,6 +2,9 @@
 
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
+#include "BoundingQuad.h"
+
+#include "PhysicsEngine/CollisionManifold.h"
 
 DimObj::DimObj() :
 	VirtualObj(),	// velocity, origin
@@ -95,9 +98,9 @@ RESULT DimObj::SetVisible(bool fVisible) {
 
 	if (HasChildren()) {
 		for (auto& child : GetChildren()) {
-			std::shared_ptr<DimObj> dimObj = std::dynamic_pointer_cast<DimObj>(child);
-			if (dimObj) {
-				dimObj->SetVisible(fVisible);
+			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(child);
+			if (pDimObj) {
+				pDimObj->SetVisible(fVisible);
 			}
 		}
 	}
@@ -251,9 +254,83 @@ std::vector<std::shared_ptr<VirtualObj>> DimObj::GetChildren() {
 	return *(m_pObjects.get());
 }
 
+// Intersections and Collision
+bool DimObj::Intersect(VirtualObj* pObj) {
+	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
+
+	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
+		return false;
+	}
+	else {
+		return GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get());
+	}
+}
+
+CollisionManifold DimObj::Collide(VirtualObj* pObj) {
+	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
+
+	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
+		return CollisionManifold(this, pObj);
+	}
+	else {
+		return GetBoundingVolume()->Collide(pDimObj->GetBoundingVolume().get());
+	}
+}
+
+point DimObj::GetOrigin(bool fAbsolute) {
+	point ptOrigin = m_objectState.m_ptOrigin;
+
+	if (fAbsolute && m_pParent != nullptr) {
+		ptOrigin = m_pParent->GetModelMatrix() * ptOrigin;
+	}
+
+	return ptOrigin;
+}
+
+point DimObj::GetPosition(bool fAbsolute) {
+	return GetOrigin(fAbsolute);
+}
+
+quaternion DimObj::GetOrientation(bool fAbsolute) {
+	quaternion qOrientation = m_objectState.m_qRotation;
+
+	if (fAbsolute && m_pParent != nullptr)
+		qOrientation *= m_pParent->GetOrientation();
+
+	return qOrientation;
+}
+
+double DimObj::GetMass() {
+	double mass = m_objectState.GetMass();
+	
+	if (m_pObjects != nullptr) {
+		for (auto it = m_pObjects->begin(); it < m_pObjects->end(); it++) {
+			mass += (*it)->GetMass();
+		}
+	}
+
+	return mass;
+}
+
+double DimObj::GetInverseMass() {
+	double invmass = m_objectState.GetInverseMass();
+	
+	if (m_pObjects != nullptr) {
+		for (auto it = m_pObjects->begin(); it < m_pObjects->end(); it++) {
+			invmass += (*it)->GetInverseMass();
+		}
+	}
+
+	return invmass;
+}
+
 RESULT DimObj::SetParent(DimObj* pParent) {
 	m_pParent = pParent;
 	return R_PASS;
+}
+
+DimObj* DimObj::GetParent() {
+	return m_pParent;
 }
 
 bool DimObj::CompareParent(DimObj* pParent) {
@@ -469,9 +546,12 @@ RESULT DimObj::UpdateBoundingVolume() {
 	RESULT r = R_PASS;
 
 	// This will go through the verts, find the center point and maximum size
-	point ptMax = m_pVertices[0].GetPoint();;
-	point ptMin = m_pVertices[0].GetPoint();;
-	point ptMid;
+	point ptMax, ptMin, ptMid;
+
+	CB((NumberVertices() > 0));
+
+	ptMax = m_pVertices[0].GetPoint();
+	ptMin = m_pVertices[0].GetPoint();
 
 	CN(m_pVertices);
 	CN(m_pBoundingVolume);
@@ -501,6 +581,11 @@ RESULT DimObj::UpdateBoundingVolume() {
 	ptMid = point::midpoint(ptMax, ptMin);
 	
 	CR(m_pBoundingVolume->UpdateBoundingVolume(ptMid, ptMax));
+	CR(m_pBoundingVolume->SetDirty());
+
+	if (m_pParent != nullptr) {
+		m_pParent->UpdateBoundingVolume();
+	}
 
 Error:
 	return r;
@@ -511,6 +596,8 @@ RESULT DimObj::InitializeAABB() {
 
 	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(this, BoundingBox::Type::AABB));
 	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::VOLUME);
 
 	CR(UpdateBoundingVolume());
 
@@ -524,6 +611,8 @@ RESULT DimObj::InitializeOBB() {
 	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingBox(this, BoundingBox::Type::OBB));
 	CN(m_pBoundingVolume);
 
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::VOLUME);
+
 	CR(UpdateBoundingVolume());
 
 Error:
@@ -536,7 +625,23 @@ RESULT DimObj::InitializeBoundingSphere() {
 	m_pBoundingVolume = std::shared_ptr<BoundingVolume>(new BoundingSphere(this));
 	CN(m_pBoundingVolume);
 
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::SPHERE);
+
 	CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
+RESULT DimObj::InitializeBoundingQuad(point ptOrigin, float width, float height, vector vNormal) {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingQuad>(new BoundingQuad(this, ptOrigin, vNormal, width, height));
+	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::INVALID);
+
+	//CR(UpdateBoundingVolume());
 
 Error:
 	return r;
@@ -551,6 +656,12 @@ RESULT DimObj::OnManipulation() {
 
 	if (m_pBoundingVolume != nullptr) {
 		CR(m_pBoundingVolume->SetDirty());
+
+		// Update parent
+		if (m_pParent != nullptr) {
+			//CR(m_pParent->OnManipulation());
+			CR(m_pParent->UpdateBoundingVolume());
+		}
 	}
 
 Error:

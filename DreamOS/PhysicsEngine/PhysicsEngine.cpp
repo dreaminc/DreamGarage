@@ -1,6 +1,8 @@
 #include "PhysicsEngine.h"
 
 #include "Scene/ObjectStore.h"
+#include "ForceGeneratorFactory.h"
+#include "GravityGenerator.h"
 
 PhysicsEngine::PhysicsEngine() :
 	m_pCollisionDetector(nullptr),
@@ -24,11 +26,20 @@ RESULT PhysicsEngine::Initialize() {
 
 	CRM(m_pCollisionResolver->Initialize(), "Failed to initialize Collision Resolver");
 
+	// Register the collisions for the resolver
+	// TODO: Do we want this over hard coding?
+	CR(m_pCollisionDetector->RegisterSubscriber(OBJECT_GROUP_COLLISION, m_pCollisionResolver.get()));
+
 	// Physics integrator
 	m_pPhysicsIntegrator = std::unique_ptr<PhysicsIntegrator>(new PhysicsIntegrator());
 	CNM(m_pPhysicsIntegrator, "Failed to create phystics integrator module");
 
 	CRM(m_pPhysicsIntegrator->Initialize(), "Failed to initialize Physics Integrator");
+
+	// Add Physics
+	m_pGravityForceGenerator = dynamic_cast<GravityGenerator*>(ForceGeneratorFactory::MakeForceGenerator(FORCE_GENERATOR_GRAVITY));
+	CN(m_pGravityForceGenerator);
+	CR(m_pPhysicsIntegrator->AddGlobalForceGenerator(m_pGravityForceGenerator));
 
 Error:
 	return r;
@@ -57,6 +68,7 @@ Error:
 	return r;
 }
 
+// TODO: This is deprecated
 RESULT PhysicsEngine::Update() {
 	RESULT r = R_PASS;
 	
@@ -72,9 +84,14 @@ Error:
 RESULT PhysicsEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
+	// Update current states
+	CR(m_pPhysicsIntegrator->Update());
+
+	// Detect Collisions
 	CR(m_pCollisionDetector->UpdateObjectStore(pObjectStore));
 
-	// TODO: Resolver, integrator 
+	// Resolver will be automatically notified per the pub-sub design
+	// TODO: We might want to rethink this for performance reasons
 
 Error:
 	return r;
@@ -94,6 +111,26 @@ RESULT PhysicsEngine::RegisterObjectCollisionSubscriber(VirtualObj *pVirtualObje
 	RESULT r = R_PASS;
 
 	CR(m_pCollisionDetector->RegisterObjectAndSubscriber(pVirtualObject, pCollisionDetectorSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngine::SetGravityAccelration(float accel) {
+	RESULT r = R_PASS;
+
+	CN(m_pGravityForceGenerator);
+	CR(m_pGravityForceGenerator->SetGravityAcceleration(accel));
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngine::SetGravityState(bool fEnabled) {
+	RESULT r = R_PASS;
+
+	CN(m_pGravityForceGenerator);
+	CR(m_pGravityForceGenerator->SetGeneratorState(fEnabled));
 
 Error:
 	return r;

@@ -5,6 +5,14 @@ point::point() {
 	clear();
 }
 
+point::point(point_precision val) {
+	this->clear();
+	this->element(0, 0) = val;
+	this->element(1, 0) = val;
+	this->element(2, 0) = val;
+	this->element(3, 0) = 1.0f;
+}
+
 point::point(point_precision x, point_precision y, point_precision z) {
 	this->clear();
 	this->element(0, 0) = x;
@@ -51,9 +59,10 @@ RESULT point::Reverse() {
 }
 
 bool point::IsZero() {
-	if ((x() != 0) || (y() != 0) || (z() != 0))
-		return false;
-	return true;
+	if (m_data[0] == 0.0f && m_data[1] == 0.0f && m_data[2] == 0.0f)
+		return true;
+
+	return false;
 }
 
 RESULT point::translate(point_precision x, point_precision y, point_precision z) {

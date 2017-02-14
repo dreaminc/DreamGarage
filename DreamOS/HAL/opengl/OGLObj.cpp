@@ -1,8 +1,12 @@
 #include "OGLObj.h"
+
 #include "Primitives/BoundingVolume.h"
 #include "Primitives/BoundingSphere.h"
+#include "Primitives/BoundingQuad.h"
+
 #include "OGLVolume.h"
 #include "OGLSphere.h"
+#include "OGLQuad.h"
 
 OGLObj::OGLObj(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
@@ -199,6 +203,9 @@ RESULT OGLObj::UpdateBoundingVolume() {
 
 	// TODO: Better handling of different bounding volumes (or do it in BoundingVolume)
 	BoundingBox *pBoundingBox = nullptr;
+	BoundingSphere *pBoundingSphere = nullptr;
+	BoundingQuad *pBoundingQuad = nullptr;
+
 	if ((pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
 		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
 
@@ -206,16 +213,27 @@ RESULT OGLObj::UpdateBoundingVolume() {
 			CR(pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox));
 		}
 	}
-	else {
-		BoundingSphere *pBoundingSphere = nullptr;
-		if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
-			OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
+	else if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+		OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
 
-			if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
-				CR(pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere));
-			}
+		if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
+			CR(pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere));
 		}
 	}
+	else if ((pBoundingQuad = dynamic_cast<BoundingQuad*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+		OGLQuad *pOGLBoundingQuad = dynamic_cast<OGLQuad*>(m_pOGLBoundingVolume);
+
+		if (pBoundingQuad->CheckAndCleanDirty() && pOGLBoundingQuad != nullptr) {
+			CR(pOGLBoundingQuad->UpdateFromBoundingQuad(pBoundingQuad));
+		}
+	}
+
+	// If this is a child, we should let the parent know
+	/*
+	if (pDimObj->GetParent() != nullptr) {
+		pDimObj->GetParent()->UpdateBoundingVolume();
+	}
+	*/
 
 Error:
 	return r;
@@ -244,10 +262,19 @@ RESULT OGLObj::RenderBoundingVolume() {
 				BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pBoundingVolume);
 				m_pOGLBoundingVolume = new OGLSphere(m_pParentImp, pBoundingSphere, false);
 			} break;
+
+			case BoundingVolume::Type::QUAD: {
+				BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pBoundingVolume);
+				m_pOGLBoundingVolume = new OGLQuad(m_pParentImp, pBoundingQuad, false);
+			} break;
 		}
 
 		CN(m_pOGLBoundingVolume);
 		m_pOGLBoundingVolume->GetDimObj()->SetWireframe(true);
+
+		if (pDimObj->GetParent() != nullptr) {
+			m_pOGLBoundingVolume->GetDimObj()->SetParent(pDimObj->GetParent());
+		}
 	}
 	
 	CR(m_pOGLBoundingVolume->Render());

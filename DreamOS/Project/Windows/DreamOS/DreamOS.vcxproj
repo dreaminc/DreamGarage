@@ -33,6 +33,22 @@
       <Configuration>Release</Configuration>
       <Platform>x64</Platform>
     </ProjectConfiguration>
+    <ProjectConfiguration Include="TestingRelease|Win32">
+      <Configuration>TestingRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="TestingRelease|x64">
+      <Configuration>TestingRelease</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing|Win32">
+      <Configuration>Testing</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Testing|x64">
+      <Configuration>Testing</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{E8896328-06EB-43A0-902C-59C3D2F3A3B5}</ProjectGuid>
@@ -47,7 +63,20 @@
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
@@ -74,7 +103,21 @@
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+    <UseOfMfc>false</UseOfMfc>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
@@ -105,7 +148,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PropertySheet.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PropertySheet.props" />
   </ImportGroup>
@@ -121,7 +172,15 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PropertySheet.props" />
   </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="PropertySheet.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="PropertySheet.props" />
   </ImportGroup>
@@ -137,10 +196,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|Win32'">
@@ -153,6 +221,10 @@
     <LinkIncremental>false</LinkIncremental>
     <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <PostBuildEventUseInBuild>true</PostBuildEventUseInBuild>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
@@ -160,6 +232,22 @@
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>"Core/config.h";%(ForcedIncludeFiles)</ForcedIncludeFiles>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing|Win32'">
     <ClCompile>
       <PrecompiledHeader>
       </PrecompiledHeader>
@@ -210,7 +298,60 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcr
 xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'">
+    <ClCompile>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>_DEBUG;_USE_TEST_APP;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedUsingFiles>
+      </ForcedUsingFiles>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <TreatWarningAsError>true</TreatWarningAsError>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\video_quality_test.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\voice_engine\voice_engine.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_audio\common_audio.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_audio\common_audio_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\common_video\common_video.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\api\libjingle_peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\media\rtc_media.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base_approved.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_base_tests_utils.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\base\rtc_task_queue.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\pc\rtc_pc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log_parser.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\rtc_event_log_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\field_trial_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\system_wrappers\metrics_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rtc_event_log_source.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rtp_rtcp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_device.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_coding_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audioproc_debug_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_conference_mixer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_decoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_encoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\audio_decoder_factory_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\builtin_audio_decoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_video_coding.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_capture_module_internal_impl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\remote_bitrate_estimator.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\cng.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\g722.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\g711.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\ilbc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\isac_fix.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\pcm16b.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\red.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_i420.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\webrtc_h264.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\congestion_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\paced_sender.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\bitrate_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\neteq.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\rent_a_codec.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\modules\media_file.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\test\metrics.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\webrtc\test\test_renderer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\jsoncpp\jsoncpp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\protobuf\protobuf_lite.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\usrsctp\usrsctplib.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\winsdk_samples\directshow_baseclasses.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\opus\opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libsrtp\libsrtp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\openmax_dl\dl\openmax_dl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libyuv\libyuv.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Debug\obj\third_party\libjpeg_turbo\libjpeg.lib;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Debug\*.dll" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Debug\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
+xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D		
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D		</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <PrecompiledHeader>
@@ -273,6 +414,47 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libss
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <SDLCheck>true</SDLCheck>
+      <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>wininet.lib;dnsapi.lib;version.lib;msimg32.lib;ws2_32.lib;usp10.lib;psapi.lib;dbghelp.lib;winmm.lib;shlwapi.lib;kernel32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;user32.lib;uuid.lib;odbc32.lib;odbccp32.lib;delayimp.lib;credui.lib;dmoguids.lib;wmcodecdspuuid.lib;amstrmid.lib;msdmo.lib;crypt32.lib;iphlpapi.lib;secur32.lib;Strmiids.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\webrtc_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\video_quality_test.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\voice_engine\voice_engine.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_audio\common_audio_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\common_video\common_video.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\api\libjingle_peerconnection.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\media\rtc_media.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_approved.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_base_tests_utils.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\base\rtc_task_queue.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\pc\rtc_pc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\p2p\rtc_p2p.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_parser.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\rtc_event_log_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\system_wrappers.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\field_trial_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\system_wrappers\metrics_default.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtc_event_log_source.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rtp_rtcp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_device.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_coding_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audioproc_debug_proto.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_conference_mixer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_encoder_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\audio_decoder_factory_interface.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\builtin_audio_decoder_factory.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_video_coding.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_processing_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_capture_module_internal_impl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\remote_bitrate_estimator.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\utility\video_coding_utility.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp8\webrtc_vp8.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\video_coding\codecs\vp9\webrtc_vp9.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\cng.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g722.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\g711.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\ilbc.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_common.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\isac_fix.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\pcm16b.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\red.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_i420.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\webrtc_h264.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\congestion_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\paced_sender.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\bitrate_controller.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\neteq.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\rent_a_codec.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\modules\media_file.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\metrics.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\webrtc\test\test_renderer.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\boringssl\boringssl_asm.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\jsoncpp\jsoncpp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\protobuf\protobuf_lite.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\usrsctp\usrsctplib.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_ssse3.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_sse4_1.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_mmx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libvpx\libvpx_intrinsics_avx2.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\winsdk_samples\directshow_baseclasses.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\opus\opus.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libsrtp\libsrtp.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\openmax_dl\dl\openmax_dl.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libyuv\libyuv.lib;$(ProjectDir)..\..\..\External\webrtc\lib\x64\Release\obj\third_party\libjpeg_turbo\libjpeg.lib;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Lib\Windows\x64\Release\VS2015\LibOVR.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef_dll_wrapper.lib;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\libcef.lib;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\libcurl_imp.lib;$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.lib;$(ProjectDir)..\..\..\External\openvr\lib\win64\openvr_api.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl.lib;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalOptions>/ignore:4099 %(AdditionalOptions)</AdditionalOptions>
+    </Link>
+    <PostBuildEvent>
+      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Release\*" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Release\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
+xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.dll" "$(TargetDir)" /D
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" /D		
+xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
+
+	  </Command>
+    </PostBuildEvent>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>NDEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS;NOMINMAX;WEBRTC_WIN;_USE_TEST_APP;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <ForcedIncludeFiles>$(ProjectDir)..\..\..\Core\config.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>$(ProjectDir)..\..\..\External\webrtc\include\;$(ProjectDir)..\..\..\External\webrtc\include\jsoncpp\;$(ProjectDir)..\..\..\;$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2556.1368\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVRKernel\Src\;$(ProjectDir)..\..\..\External\OCULUS\v132\LibOVR\Include\;$(ProjectDir)..\..\..\External\websocketpp\;$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\include\;$(ProjectDir)..\..\..\External\asio\asio-1.11.0\include\;$(ProjectDir)..\..\..\External\json\include\;$(ProjectDir)..\..\..\External\openvr\headers\;$(ProjectDir)..\..\..\External\leapSDK\include\;$(ProjectDir)..\..\..\External\easyloggingpp\include\;$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -381,7 +563,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
-    <ClCompile Include="..\..\..\..\DreamTestApp.cpp" />
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
@@ -436,12 +618,16 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp" />
     <ClCompile Include="..\..\..\Logger\Logger.cpp" />
@@ -453,10 +639,16 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
+    <ClCompile Include="..\..\..\Primitives\line.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp" />
+    <ClCompile Include="..\..\..\Primitives\ObjectState.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
+    <ClCompile Include="..\..\..\Primitives\quad.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
     <ClCompile Include="..\..\..\Primitives\sphere.cpp" />
     <ClCompile Include="..\..\..\Primitives\text.cpp" />
@@ -472,6 +664,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
+      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Production|x64'">false</TreatWarningAsError>
       <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">false</TreatWarningAsError>
     </ClCompile>
@@ -499,7 +692,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamGarage.h" />
-    <ClInclude Include="..\..\..\..\DreamTestApp.h" />
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
@@ -791,13 +984,17 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingBox.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingSphere.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingVolume.h" />
     <ClInclude Include="..\..\..\Logger\Logger.h" />
@@ -823,6 +1020,8 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\model.h" />
+    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h" />
+    <ClInclude Include="..\..\..\Primitives\ObjectState.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
@@ -1041,6 +1240,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <None Include="..\..\..\Models\face4\untitled.mtl">
       <DeploymentContent>true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">true</ExcludedFromBuild>
     </None>
     <None Include="..\..\..\Primitives\.DS_Store" />
     <None Include="..\..\..\Primitives\plane.h" />
@@ -1089,7 +1289,9 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
       <DeploymentContent Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">true</DeploymentContent>
       <DeploymentContent>true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Testing|x64'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

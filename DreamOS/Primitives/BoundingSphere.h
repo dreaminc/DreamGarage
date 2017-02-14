@@ -12,6 +12,8 @@
 #include "vector.h"
 #include "line.h"
 
+#include <memory>
+
 class VirtualObj;
 
 class BoundingSphere : public BoundingVolume {
@@ -19,17 +21,29 @@ public:
 	BoundingSphere(VirtualObj *pParentObject);
 	BoundingSphere(VirtualObj *pParentObject, point ptOrigin, float radius);
 
-	bool Intersect(const BoundingSphere& rhs);
-	bool Intersect(const BoundingBox& rhs);
+	virtual bool Intersect(const BoundingSphere& rhs) override;
+	virtual bool Intersect(const BoundingBox& rhs) override;
+	virtual bool Intersect(const BoundingQuad& rhs) override;
 
-	bool Intersect(point& pt);
-	bool Intersect(line& ln);
+	virtual bool Intersect(point& pt) override;
 	virtual bool Intersect(const ray &r) override;
+	bool Intersect(line& ln);
+
+	virtual CollisionManifold Collide(const BoundingSphere& rhs) override;
+	virtual CollisionManifold Collide(const BoundingBox& rhs) override;
+	virtual CollisionManifold Collide(const BoundingQuad& rhs) override;
+
+	virtual CollisionManifold Collide(const ray &rCast) override;
 
 	float GetRadius() {
 		return m_radius;
 	}
 
+	vector GetHalfVector();
+	virtual RESULT SetHalfVector(vector vHalfVector) override;
+
+	virtual point GetMinPoint() override;
+	virtual point GetMaxPoint() override;
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) override;
 
 	virtual BoundingVolume::Type GetType() override {

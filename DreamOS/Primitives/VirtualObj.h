@@ -13,6 +13,9 @@
 #include "Primitives/Types/UID.h"
 #include "quaternion.h"
 
+#include "ObjectState.h"
+#include "ObjectDerivative.h"
+
 #include "matrix/matrix.h"
 #include "matrix/RotationMatrix.h"
 #include "matrix/TranslationMatrix.h"
@@ -35,39 +38,10 @@ public:
 	friend class PhysicsIntegrator;		// TODO: move physics stuff into state/derivative for RK4
 
 protected:
-	// TODO: Move to another file?
-	class state {
-		friend class VirtualObj;
-	protected:
-		state() : m_ptOrigin(), m_vVelocity(), m_vAcceleration(), m_qRotation(), m_qAngularMomentum()
-		{ /*empty*/}
+	ObjectState m_objectState;
+	ObjectDerivative m_objectDerivative;
 
-		state(point ptOrigin) : m_ptOrigin(ptOrigin), m_vVelocity(), m_vAcceleration(), m_qRotation(), m_qAngularMomentum()
-		{ /*empty*/}
 
-		point m_ptOrigin;					// Origin			
-		vector m_vVelocity;					// Velocity			
-		vector m_vAcceleration;				// Acceleration		
-		quaternion m_qRotation;				// Rotation
-		quaternion m_qAngularMomentum;		// Angular Momentum
-
-	public:
-		point GetOrigin() { return m_ptOrigin; }
-		vector GetVelocity() { return m_vVelocity; }
-		vector GetAcceleration() { return m_vAcceleration; }
-		quaternion GetRotation() { return m_qRotation; }
-		quaternion GetAngularMoment() { return m_qAngularMomentum; }
-	} m_state;
-
-	class derivative {
-		vector m_vRateOfChangeOrigin;			// Rate of change of origin			
-		vector m_vRateOfChangeVelocity;			// Rate of change of Velocity			
-		vector m_vRateOfChangeAcceleration;		// Rate of change ofAcceleration		
-		quaternion m_qRateOfChangeRotation;					// Rate of change of Rotation
-		quaternion m_qRateOfChangeAngularMomentum;			// Rate of change of Angular Momentum
-	} m_derivative;
-
-	double m_kgMass;				// Mass (kg)
 	vector m_vScale;				// Scale vector
 
 	// The pivot point
@@ -83,16 +57,19 @@ public:
 	}
 
 	// State
-	VirtualObj::state GetState();
-	RESULT SetState(VirtualObj::state virtualObjState);
+	ObjectState GetState();
+	RESULT SetState(ObjectState virtualObjState);
 
 	// Derivative
-	VirtualObj::derivative GetDerivative();
-	RESULT SetDerivative(VirtualObj::derivative virtualObjDerivative);
+	ObjectDerivative GetDerivative();
+	RESULT SetDerivative(ObjectDerivative virtualObjDerivative);
+
+	template <ObjectState::IntegrationType IT>
+	RESULT IntegrateState(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
 
 	// Position
-	virtual point GetOrigin();
-	virtual point GetPosition();
+	virtual point GetOrigin(bool fAbsolute = false);
+	virtual point GetPosition(bool fAbsolute = false);
 
 	VirtualObj* translate(matrix <point_precision, 4, 1> v);
 	VirtualObj* translate(point_precision x, point_precision y, point_precision z);
@@ -108,6 +85,7 @@ public:
 	VirtualObj* Scale(point_precision scale);
 
 	// Pivot Point
+	point GetPivotPoint();
 	RESULT SetPivotPoint(point ptPivot);
 	RESULT SetPivotPoint(point_precision x, point_precision y, point_precision z);
 
@@ -140,7 +118,7 @@ public:
 	//*/
 
 	VirtualObj* SetOrientation(quaternion qOrientation);
-	quaternion GetOrientation();
+	virtual quaternion GetOrientation(bool fAbsolute = false);
 	matrix<virtual_precision, 4, 4> GetOrientationMatrix();
 
 	// Velocity
@@ -150,22 +128,39 @@ public:
 	VirtualObj* SetVelocity(point_precision x, point_precision y, point_precision z);
 
 	// Acceleration
+	/*
 	VirtualObj* AddAcceleration(matrix <point_precision, 4, 1> vAccel);
 	VirtualObj* AddAcceleration(point_precision x, point_precision y, point_precision z);
 	VirtualObj* SetAcceleration(matrix <point_precision, 4, 1> vAccel);
 	VirtualObj* SetAcceleration(point_precision x, point_precision y, point_precision z);
+	*/
 
 	// Angular Momentum
-	VirtualObj* AddAngularMomentum(quaternion q);
-	VirtualObj* SetAngularMomentum(quaternion am);
+	VirtualObj* AddAngularMomentum(vector vAngularMomentum);
+	VirtualObj* SetAngularMomentum(vector vAngularMomentum);
+
+	VirtualObj* ApplyTorqueImpulse(vector vTorque);
+	VirtualObj* ApplyForceAtPoint(vector vForce, point ptRefObj, double msDeltaTime);
 
 	RESULT SetMass(double kgMass);
-	double GetMass();
+	virtual double GetMass();
+	virtual double GetInverseMass();
+	RESULT SetImmovable(bool fImmovable);
+	bool IsImmovable();
 
-	// Update functions
-	VirtualObj* Update();
-	VirtualObj* UpdatePosition();
-	VirtualObj* UpdateRotation();
+	VirtualObj* SetRotationalVelocity(vector vRotationalVelocity);
+	vector GetRotationalVelocity();
+
+	vector GetVelocity();
+	vector GetVelocityOfPoint(point pt);
+	vector GetAngularVelocity();
+	point GetPointRefCenterOfMass(point pt);
+	vector GetMomentum();
+	RESULT Impulse(vector vImpulse);
+	RESULT AddPendingImpulse(vector vImpulse);
+	RESULT CommitPendingImpulses();
+	RESULT AddPendingTranslation(vector vTranslation);
+	RESULT CommitPendingTranslation();
 
 	// OnManipulation is called any time an object is manipulated in some way
 	// since some objects may need to update certain things, like reference geometry 

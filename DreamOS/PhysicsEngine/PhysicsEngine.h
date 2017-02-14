@@ -35,6 +35,7 @@
 #include "PhysicsIntegrator.h"
 
 class ObjectStore;
+class GravityGenerator;
 
 class PhysicsEngine : public valid {
 public:
@@ -53,6 +54,12 @@ public:
 	RESULT RegisterSubscriber(CollisionGroupEventType collisionGroupEvent, Subscriber<CollisionGroupEvent>* pCollisionDetectorSubscriber);
 	RESULT RegisterObjectCollisionSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
 
+public:
+	RESULT SetGravityAccelration(float accel);
+	RESULT SetGravityState(bool fEnabled);
+
+private:
+	GravityGenerator *m_pGravityForceGenerator = nullptr;
 
 private:
 	std::unique_ptr<CollisionDetector> m_pCollisionDetector;

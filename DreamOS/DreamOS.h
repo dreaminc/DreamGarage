@@ -48,8 +48,14 @@ public:
 	virtual RESULT LoadScene() = 0;
 	virtual RESULT Update(void) = 0;
 
-protected:
+//protected:
+public:
+	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
+	RESULT SetGravityAcceleration(double acceleration);
+	RESULT SetGravityState(bool fEnabled);
+
+	RESULT RemoveAllObjects();
 
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 	light *MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
@@ -57,7 +63,7 @@ protected:
 	FlatContext *AddFlatContext(int width = 1024, int height = 1024, int channels = 4);
 	RESULT RenderToTexture(FlatContext* pContext);
 
-	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr);
+	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
 	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	sphere *MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
@@ -101,7 +107,7 @@ protected:
 protected:
 	RESULT RegisterObjectCollision(VirtualObj *pVirtualObject);
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
-
+	
 	// Cloud Controller
 protected:
 	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);

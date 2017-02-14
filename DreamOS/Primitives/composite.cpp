@@ -29,11 +29,100 @@ inline unsigned int composite::NumberIndices() {
 }
 
 RESULT composite::AddObject(std::shared_ptr<DimObj> pDimObj) {
-	return AddChild(pDimObj);
+	RESULT r = R_PASS;
+
+	CR(AddChild(pDimObj));
+
+	if (m_pBoundingVolume != nullptr) {
+		UpdateBoundingVolume();
+	}
+
+Error:
+	return r;
 }
 
 RESULT composite::ClearObjects() {
 	return ClearChildren();
+}
+
+RESULT composite::UpdateBoundingVolume() {
+	RESULT r = R_PASS;
+
+	point ptMax; 
+	point ptMin; 
+	point ptMid; 
+
+	/*
+	point ptMinTemp = GetOrigin();
+	point ptMaxTemp = GetOrigin();
+	*/
+
+	point ptMinTemp = point();
+	point ptMaxTemp = point();
+
+	CN(m_pBoundingVolume);
+
+	if (HasChildren()) {
+		for (auto &childObj : GetChildren()) {
+			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(childObj);
+			
+
+			if (pDimObj != nullptr) {
+				auto pObjBoundingVolume = pDimObj->GetBoundingVolume();
+
+				if (pObjBoundingVolume != nullptr) {
+					ptMinTemp = pObjBoundingVolume->GetMinPointOriented();
+					ptMaxTemp = pObjBoundingVolume->GetMaxPointOriented();
+
+					// X
+					if (ptMaxTemp.x() > ptMax.x())
+						ptMax.x() = ptMaxTemp.x();
+					else if (ptMaxTemp.x() < ptMin.x())
+						ptMin.x() = ptMaxTemp.x();
+
+					if (ptMinTemp.x() > ptMax.x())
+						ptMax.x() = ptMinTemp.x();
+					else if (ptMinTemp.x() < ptMin.x())
+						ptMin.x() = ptMinTemp.x();
+
+					// Y
+					if (ptMaxTemp.y() > ptMax.y())
+						ptMax.y() = ptMaxTemp.y();
+					else if (ptMaxTemp.y() < ptMin.y())
+						ptMin.y() = ptMaxTemp.y();
+
+					if (ptMinTemp.y() > ptMax.y())
+						ptMax.y() = ptMinTemp.y();
+					else if (ptMinTemp.y() < ptMin.y())
+						ptMin.y() = ptMinTemp.y();
+
+					// Z
+					if (ptMaxTemp.z() > ptMax.z())
+						ptMax.z() = ptMaxTemp.z();
+					else if (ptMaxTemp.z() < ptMin.z())
+						ptMin.z() = ptMaxTemp.z();
+
+					if (ptMinTemp.z() > ptMax.z())
+						ptMax.z() = ptMinTemp.z();
+					else if (ptMinTemp.z() < ptMin.z())
+						ptMin.z() = ptMinTemp.z();
+				}	// pBoundingVolume
+			}	// pDimObj
+		} // FOR
+
+		// TODO: Composite is not calculating pivot (Center of mass) vs origin 
+		// there needs to be more work here, especially if we want these to respond physically
+		CR(m_pBoundingVolume->UpdateBoundingVolumeMinMax(ptMin, ptMax));
+		CR(m_pBoundingVolume->SetDirty());
+
+		// Handle nested composites
+		if (m_pParent != nullptr) {
+			m_pParent->UpdateBoundingVolume();
+		}
+	}  // HasChildren()
+
+Error:
+	return r;
 }
 
 
@@ -192,10 +281,10 @@ std::shared_ptr<volume> composite::AddVolume(double side) {
 	return AddVolume(side, side, side);
 }
 
-std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight) {
+std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight));
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal));
 	CR(AddObject(pQuad));
 
 //Success:
@@ -205,9 +294,9 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight)
+std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal)
 {
-	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
 std::shared_ptr<DimRay> composite::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {

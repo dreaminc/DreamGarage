@@ -119,7 +119,13 @@ protected:
 	RESULT RegisterImpViveControllerEvents();
 
 public:
+	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
+	RESULT SetGravityAcceleration(double acceleration);
+	RESULT SetGravityState(bool fEnabled);
+
+	RESULT RemoveAllObjects();
+
 	RESULT AddObject(VirtualObj *pObject);	
 	FlatContext* AddFlatContext(int width, int height, int channels);
 	RESULT RenderToTexture(FlatContext* pContext);
@@ -135,7 +141,7 @@ public:
 
 	light* AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
-	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight);
+	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal);
 
 	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 

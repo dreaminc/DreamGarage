@@ -10,6 +10,7 @@
 // Point Primitive Object derived from matrix
 
 #include "matrix/matrix.h"
+#include <limits>
 
 class vector;
 
@@ -25,6 +26,7 @@ class vector;
 class point : public matrix <point_precision, 4, 1> {
 public:
 	point();
+	point(point_precision val);
 	point(point_precision x, point_precision y, point_precision z);
 	point(point_precision values[3]);
 	point(point_precision x, point_precision y, point_precision z, point_precision w);
@@ -94,6 +96,9 @@ public:
 	static point max(point &lhs, point &rhs);
 	static point min(point &lhs, point &rhs);
 	static point midpoint(point &lhs, point &rhs);
+
+	static point maxpoint() { return point(std::numeric_limits<point_precision>::max()); }
+	static point minpoint() { return point(std::numeric_limits<point_precision>::min()); }
 
 	/*
 	point& operator+=(const matrix<point_precision, 4, 1>& arg) {

@@ -171,9 +171,6 @@
     <Filter Include="Models\face4">
       <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="DreamTestApp">
-      <UniqueIdentifier>{570eeaa3-0e10-44bf-aa0c-8a76c79f6592}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Primitives\matrix">
       <UniqueIdentifier>{9ecd8ad4-8dee-4052-a0e9-2f164281aa96}</UniqueIdentifier>
     </Filter>
@@ -182,6 +179,9 @@
     </Filter>
     <Filter Include="Cloud\WebBrowser">
       <UniqueIdentifier>{d8051eb4-4d18-4c14-8db2-24de64018e8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamTestApp">
+      <UniqueIdentifier>{921ea31d-7767-45b3-8296-bb5f9e9725eb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -305,13 +305,7 @@
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamOS.cpp">
@@ -455,9 +449,6 @@
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamTestApp.cpp">
-      <Filter>DreamTestApp</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\volume.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -532,6 +523,39 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserController.cpp">
       <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
+      <Filter>DreamTestApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\ObjectState.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\quad.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\line.cpp">
+      <Filter>Primitives</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1423,9 +1447,6 @@
     <ClInclude Include="..\..\..\Cloud\CloudImp.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFImp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_app.h">
       <Filter>External\CEF\v3.2556\include</Filter>
     </ClInclude>
@@ -1957,16 +1978,7 @@
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_thread_checker_impl.h">
       <Filter>External\CEF\v3.2556\include\base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFApp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFHandler.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamOS.h">
@@ -2141,9 +2153,6 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamTestApp.h">
-      <Filter>DreamTestApp</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -2230,6 +2239,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserController.h">
       <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
+      <Filter>DreamTestApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ObjectState.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
+      <Filter>PhysicsEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

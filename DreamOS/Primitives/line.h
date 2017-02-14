@@ -11,46 +11,22 @@
 #include "vector.h"
 
 class line {
-public:
-	line() :
-		m_ptA(),
-		m_ptB()
-	{
-		// Empty
-	}
-
-	line(point ptA, point ptB) :
-		m_ptA(ptA),
-		m_ptB(ptB)
-	{
-		// Empty
-	}
-
 	friend class BoundingVolume;
 
+public:
+	line();
+	line(point ptA, point ptB);
+
+
 	// Distance of point from plane
-	point_precision Distance(point ptP) {
-		vector ptAToPoint = ptP - m_ptA;
-		vector ptBToPoint = ptP - m_ptB;
+	point_precision Distance(point ptP);
+	point_precision Distance(line l, point *pptClosestLineA = nullptr, point *pptClosestLineB = nullptr, vector *pvNormal = nullptr);
+	point ProjectedPoint(point ptP);
 
-		vector_precision planeMagnitude = GetVector().magnitude();
-		vector_precision pointMagnitude = (ptAToPoint.cross(ptBToPoint)).magnitude();
+	vector GetVector();
 
-		return ((pointMagnitude) / (planeMagnitude));
-	}
-
-	point ProjectedPoint(point ptP) {
-		vector vAP = ptP - m_ptA;
-		vector vAB = m_ptB - m_ptA;
-
-		point ptResult = m_ptA + (vAB * ((vAP.dot(vAB)) / (vAB.dot(vAB))));
-
-		return ptResult;
-	}
-
-	vector GetVector() {
-		return (m_ptB - m_ptA);
-	}
+	RESULT Translate(vector vTranslate);
+	RESULT ApplyMatrix(matrix<point_precision, 4, 4> mat);
 
 	inline point &a() { return m_ptA; }
 	inline point &b() { return m_ptB; }
@@ -61,3 +37,4 @@ protected:
 };
 
 #endif // !BOUNDING_VOLUME_H_
+

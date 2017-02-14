@@ -1,5 +1,8 @@
 #include "BoundingSphere.h"
 #include "BoundingBox.h"
+#include "BoundingQuad.h"
+
+#include "PhysicsEngine/CollisionManifold.h"
 
 BoundingSphere::BoundingSphere(VirtualObj *pParentObject) :
 	BoundingVolume(pParentObject),
@@ -16,7 +19,7 @@ BoundingSphere::BoundingSphere(VirtualObj *pParentObject, point ptOrigin, float 
 }
 
 bool BoundingSphere::Intersect(const BoundingSphere& rhs) {
-	float distance = (const_cast<BoundingSphere&>(rhs).GetOrigin() - GetOrigin()).magnitude();
+	float distance = (const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin()).magnitude();
 
 	if (abs(distance) <= (rhs.m_radius + m_radius))
 		return true;
@@ -74,6 +77,96 @@ bool BoundingSphere::Intersect(const ray &r) {
 	}
 
 	return false;
+}
+
+CollisionManifold BoundingSphere::Collide(const ray &rCast) {
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
+
+	vector vRayCircle = rCast.GetOrigin() - GetAbsoluteOrigin();
+
+	double bVal = rCast.GetVector().dot(vector(vRayCircle));
+	double cVal = vRayCircle.dot(vRayCircle) - (m_radius * m_radius);
+	float sqrtVal = bVal * bVal - cVal;
+	
+	if (sqrtVal == 0) {
+		double t1 = -bVal;
+		if (t1 >= 0) {
+			point ptContact = rCast.GetOrigin() + rCast.GetVector() * t1;
+			vector vNormal = (ptContact - GetOrigin()).Normal();
+
+			manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
+		}
+	}
+	else if (sqrtVal > 0) {
+		double t1 = -bVal + std::sqrt(sqrtVal);
+		double t2 = -bVal - std::sqrt(sqrtVal);
+
+		if (t1 >= 0) {
+			point ptContact1 = rCast.GetOrigin() + rCast.GetVector() * t1;
+			vector vNormal1 = (ptContact1 - GetOrigin()).Normal();
+			manifold.AddContactPoint(ptContact1, vNormal1, 0.0f, 1);
+		}
+		
+		if (t2 >= 0) {
+			point ptContact2 = rCast.GetOrigin() + rCast.GetVector() * t2;
+			vector vNormal2 = (ptContact2 - GetOrigin()).Normal();
+			manifold.AddContactPoint(ptContact2, vNormal2, 0.0f, 1);
+		}
+
+	}
+	else {
+		// TODO: error?
+	}
+
+	return manifold;
+}
+
+CollisionManifold BoundingSphere::Collide(const BoundingSphere& rhs) {
+	vector vMidLine = (const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
+	float distance = vMidLine.magnitude();
+
+	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
+
+	if (abs(distance) <= (rhs.m_radius + m_radius)) {
+		// Find the contact point and normal
+		vector vNormal = vMidLine.Normal();
+		point ptContact = const_cast<BoundingSphere&>(rhs).GetAbsoluteOrigin() + (vMidLine * 0.5f);
+		double penetration = (rhs.m_radius + m_radius) - abs(distance);
+
+		manifold.AddContactPoint(ptContact, vNormal, penetration, 1);
+	}
+
+	return manifold;
+}
+
+CollisionManifold BoundingSphere::Collide(const BoundingBox& rhs) {
+	return static_cast<BoundingBox>(rhs).Collide(*this);
+}
+
+bool BoundingSphere::Intersect(const BoundingQuad& rhs) {
+	return static_cast<BoundingQuad>(rhs).Intersect(*this);
+}
+
+CollisionManifold BoundingSphere::Collide(const BoundingQuad& rhs) {
+	return static_cast<BoundingQuad>(rhs).Collide(*this);
+}
+
+RESULT BoundingSphere::SetHalfVector(vector vHalfVector) {
+	m_radius = vHalfVector.magnitude();
+	return R_PASS;
+}
+
+vector BoundingSphere::GetHalfVector() {
+	//point_precision vecRadiusValue = m_radius / std::sqrt(3);
+	return vector(m_radius);
+}
+
+point BoundingSphere::GetMinPoint() {
+	return (GetOrigin() - GetHalfVector());
+}
+
+point BoundingSphere::GetMaxPoint() {
+	return (GetOrigin() + GetHalfVector());
 }
 
 RESULT BoundingSphere::SetMaxPointFromOrigin(point ptMax) {

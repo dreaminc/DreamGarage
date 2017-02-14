@@ -11,8 +11,7 @@
 #include <vector>
 
 class TestSuite {
-private:
-	std::vector<std::shared_ptr<TestObject>> m_tests;
+
 
 public:
 	TestSuite();
@@ -21,10 +20,34 @@ public:
 	RESULT Initialize();
 
 	RESULT ClearTests();
+	RESULT ResetTests();
+	RESULT EndCurrentTest();
 	RESULT RunTests();
-	RESULT AddTest(std::function<RESULT()> fnTestFunction);
+	RESULT RunTest();
+	RESULT NextTest();
+
+	RESULT UpdateAndRunTests(void *pContext);
+
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT()> fnTestFunction);
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize, 
+										std::function<RESULT(void*)> fnUpdate, 
+										std::function<RESULT(void*)> fnTest, 
+										void *pContext = nullptr);
+
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize, 
+										std::function<RESULT(void*)> fnUpdate, 
+										std::function<RESULT(void*)> fnTest, 
+										std::function<RESULT(void*)> fnReset, 
+										void *pContext = nullptr);
 	
 	virtual RESULT AddTests() = 0;
+
+	std::shared_ptr<TestObject> GetCurrentTest();
+
+private:
+	std::vector<std::shared_ptr<TestObject>> m_tests;
+	std::vector<std::shared_ptr<TestObject>>::iterator m_currentTest;
 };
 
 #endif // ! TEST_SUITE_H_

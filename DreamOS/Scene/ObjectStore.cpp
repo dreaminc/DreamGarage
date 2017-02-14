@@ -54,6 +54,16 @@ Error:
 	return r;
 }
 
+RESULT ObjectStore::RemoveAllObjects() {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	CN(m_pSceneGraphStore);
+	CR(m_pSceneGraphStore->RemoveAllObjects());
+
+Error:
+	return r;
+}
+
 RESULT ObjectStore::RemoveObjectByUID(UID uid) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
@@ -85,5 +95,9 @@ std::vector<VirtualObj*> ObjectStore::GetObjects(ray rCast) {
 // TODO: This is holding the collide functionality here temporarily 
 RESULT ObjectStore::UpdateScene() {
 	return R_NOT_IMPLEMENTED;
+}
+
+RESULT ObjectStore::CommitObjects() {
+	return m_pSceneGraphStore->CommitObjects();
 }
 

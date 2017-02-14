@@ -7,6 +7,15 @@ vector::vector() {
 	clear();
 }
 
+// This sets each element of the vector to val
+vector::vector(vector_precision val) {
+	this->clear();
+	this->element(0, 0) = val;
+	this->element(1, 0) = val;
+	this->element(2, 0) = val;
+	this->element(3, 0) = 1.0f;
+}
+
 vector::vector(matrix <vector_precision, 4, 1> &rhs) {
 	this->clear();
 	this->element(0, 0) = rhs.element(0, 0);
@@ -44,6 +53,11 @@ vector::vector(const point& pt) {
 double vector::magnitude() {
 	double sqaureSum = std::pow(x(), 2.0f) + std::pow(y(), 2.0f) + std::pow(z(), 2.0f);
 	return sqrt(sqaureSum);
+}
+
+double vector::magnitudeSquared() {
+	double sqaureSum = std::pow(x(), 2.0f) + std::pow(y(), 2.0f) + std::pow(z(), 2.0f);
+	return sqaureSum;
 }
 
 // Will normalize this vector
@@ -93,6 +107,32 @@ vector_precision vector::dot(const point& rhs) const {
 		result += element(i, 0) * rhs.element(i, 0);
 
 	return result;
+}
+
+// If vectors are parallel then x1 = k * x2, y1 = k * y2, z1 = k * z2
+// and so x1/x2 == y1/y2 == z1/z2
+bool vector::IsParallel(const vector &rhs) {
+	vector vNormalA = Normal();
+	vector vNormalB = static_cast<vector>(rhs).Normal();
+	if (vNormalA == vNormalB || vNormalA == (vNormalB * -1.0f)) {
+		return true;
+	}
+
+	return false;
+}
+
+bool vector::IsValid() {
+	if (std::isnan(x()) || std::isnan(y()) || std::isnan(z()) || std::isnan(w()))
+		return false;
+
+	return true;
+}
+
+bool vector::IsZero() {
+	if (m_data[0] == 0.0f && m_data[1] == 0.0f && m_data[2] == 0.0f)
+		return true;
+
+	return false;
 }
 
 // Cross Product

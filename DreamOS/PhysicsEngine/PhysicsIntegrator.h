@@ -20,6 +20,7 @@
 #define DEFAULT_GRAVITY_ACCEL -9.8f
 
 class ObjectStore;
+class VirtualObj;
 
 class PhysicsIntegrator : public valid {
 	friend class PhysicsEngine;
@@ -30,11 +31,12 @@ private:
 protected:
 	RESULT Initialize();
 	RESULT Update();
+	RESULT UpdateObject(VirtualObj *pVirtualObj, double msTimeStep);
 	RESULT SetPhysicsStore(ObjectStore *pObjectStore);
 	RESULT SetTimeStep(double msTimeStep);
 
 protected:
-	RESULT AddGlobalForceGenerator(std::unique_ptr<ForceGenerator> pForceGenerator);
+	RESULT AddGlobalForceGenerator(ForceGenerator *pForceGenerator);
 	RESULT ClearForceGenerators();
 
 private:
@@ -47,7 +49,7 @@ private:
 	double m_elapsedTime;
 
 	// Add force generators 
-	std::list<std::unique_ptr<ForceGenerator>> m_globalForceGenerators;
+	std::list<ForceGenerator*> m_globalForceGenerators;
 
 private:
 	UID m_uid;

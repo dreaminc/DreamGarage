@@ -12,10 +12,15 @@ CollisionDetector::CollisionDetector() {
 RESULT CollisionDetector::Initialize() {
 	RESULT r = R_PASS;
 
-	// r = Publisher<CollisionGroupEventType, CollisionGroupEvent>::RegisterEvent(OBJECT_GROUP_COLLISION);
-	// CR(r);
+	r = Publisher<CollisionGroupEventType, CollisionGroupEvent>::RegisterEvent(OBJECT_GROUP_COLLISION);
+	CR(r);
 
-//Error:
+	/*
+	r = Publisher<CollisionGroupEventType, CollisionGroupEvent>::RegisterEvent(ALL_COLLISIONS);
+	CR(r);
+	*/
+
+Error:
 	return r;
 }
 
@@ -40,8 +45,12 @@ RESULT CollisionDetector::UpdateObjectStore(ObjectStore *pObjectStore) {
 			Publisher<VirtualObj*, CollisionObjectEvent>::NotifySubscribers(objectEvent.first, &collisionObjectEvent);
 		}
 	}
+
+	// All events should have fired 
+	// TODO: This isn't too great performance wise - should add "dirty bit" somewhere
+	CR(pObjectStore->CommitObjects());
 	
-	//Error:
+Error:
 	return r;
 }
 

@@ -62,6 +62,23 @@ RESULT ObjectStoreImpList::RemoveObject(VirtualObj *pObject) {
 	return R_PASS;
 }
 
+RESULT ObjectStoreImpList::RemoveAllObjects() {
+	RESULT r = R_PASS;
+
+	while(m_objects.size() > 0) {
+		auto pObj = m_objects.back();
+		m_objects.remove(pObj);
+	}
+
+	// Clear this out just in case
+	m_objects.clear();
+
+	CB((m_objects.size() == 0));
+
+Error:
+	return r;
+}
+
 RESULT ObjectStoreImpList::RemoveObjectByUID(UID uid) {
 	RESULT r = R_PASS;
 
@@ -73,6 +90,14 @@ RESULT ObjectStoreImpList::RemoveObjectByUID(UID uid) {
 	}
 
 	return R_NOT_FOUND;
+}
+
+RESULT ObjectStoreImpList::CommitObjects() {
+	for (auto &obj : m_objects) {
+		obj->CommitPendingTranslation();
+		obj->CommitPendingImpulses();
+	}
+	return R_SUCCESS;
 }
 
 // Note: This memory location is not guaranteed and needs to be collected each time
@@ -126,6 +151,7 @@ std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(const ray &rCast) {
 			continue; 
 		}
 
+		// TODO: Children / composites
 		if (pDimObj->GetBoundingVolume()->Intersect(rCast)) {
 			intersectedObjects.push_back(pDimObj);
 		}
@@ -141,12 +167,31 @@ std::vector<VirtualObj*> ObjectStoreImpList::GetObjects(DimObj *pDimObj) {
 		DimObj *pDimObject = dynamic_cast<DimObj*>(pObject);
 
 		// Don't intersect self
-		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || pDimObj == pDimObject || pDimObject->GetBoundingVolume() == nullptr) {
+		if (pDimObj == nullptr || 
+			pDimObj->GetBoundingVolume() == nullptr || 
+			pDimObj == pDimObject || 
+			pDimObj->HasChildren() || 
+			pDimObject->GetBoundingVolume() == nullptr ) 
+		{
 			continue;
 		}
 
+		// TODO: Add parent objects to intersect method for proper composite placement adjustment
+		// TODO: Move this code into DimObj / make it more general
 		if (pDimObject->GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get())) {
-			intersectedObjects.push_back(pDimObject);
+			if (pDimObject->HasChildren()) {
+				for (auto &pChild : pDimObject->GetChildren()) {
+					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
+
+					// Bounding Volume is oriented correctly using the DimObj overloads
+					if (pDimChild->GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get())) {
+						intersectedObjects.push_back(pDimChild);
+					}
+				}
+			}
+			else {
+				intersectedObjects.push_back(pDimObject);
+			}
 		}
 	}
 
@@ -160,13 +205,41 @@ std::vector<std::vector<VirtualObj*>> ObjectStoreImpList::GetObjectCollisionGrou
 	for (auto &object : m_objects) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(object);
 
-		if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr) {
+		// TODO: For now skip composites (just test inside of them)
+		// TODO: We'll add a flag to treat composites as transparent or not
+		if (pDimObj == nullptr || 
+			pDimObj->GetBoundingVolume() == nullptr || 
+			pDimObj->HasChildren()) 
+		{
 			continue;
 		}
 
+		///*
+		// Check that this object is not already in a collision group
+		bool fObjectDuplicate = false;
+		for (auto &group : collisionGroups) {
+			for (auto &pObj : group) {
+				if (pDimObj == pObj) {
+					fObjectDuplicate = true;
+					break;
+				}
+			}
+			if (fObjectDuplicate)
+				break;
+		}
+		// Object already in a collision group - so continue
+		if (fObjectDuplicate)
+			continue;
+		//*/
+
 		auto collisionGroup = GetObjects(pDimObj);
-		if (collisionGroup.size() > 0)
+
+		if (collisionGroup.size() > 0) {
+			collisionGroup.push_back(pDimObj);
 			collisionGroups.push_back(collisionGroup);
+		}
+
+		// TODO: We need to add logic to remove double hits / ensure unique groups
 	}
 
 	return collisionGroups;

@@ -32,6 +32,7 @@ public:
 
 	RESULT PushObject(VirtualObj *pObject);
 	RESULT RemoveObject(VirtualObj *pObject);
+	RESULT RemoveAllObjects();
 
 	// Effectively a factory method to set up the object store
 	RESULT InitializeSceneGraphStore(ObjectStoreFactory::TYPE type);
@@ -49,6 +50,8 @@ public:
 	// TODO: Arch here
 	RESULT UpdateScene();
 	RESULT LoadScene();
+
+	RESULT CommitObjects();
 
 
 protected:

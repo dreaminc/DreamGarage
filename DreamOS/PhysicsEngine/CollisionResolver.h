@@ -8,8 +8,16 @@
 
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
+#include "Primitives/Subscriber.h"
 
-class CollisionResolver : public valid {
+struct CollisionGroupEvent;
+class ContactPoint;
+class CollisionManifold;
+
+class DimObj;
+class BoundingVolume;
+
+class CollisionResolver : Subscriber<CollisionGroupEvent>, public valid {
 	friend class PhysicsEngine;
 
 private:
@@ -17,6 +25,12 @@ private:
 
 protected:
 	RESULT Initialize();
+
+	virtual RESULT Notify(CollisionGroupEvent *oEvent) override;
+
+private:
+	//RESULT ResolveCollision(DimObj *pDimObjA, DimObj *pDimObjB);
+	RESULT ResolveCollision(const CollisionManifold &manifold);
 
 private:
 	UID m_uid;

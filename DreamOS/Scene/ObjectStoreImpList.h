@@ -27,9 +27,12 @@ public:
 	virtual RESULT PushObject(VirtualObj *pObject) override;
 	virtual RESULT RemoveObject(VirtualObj *pObject) override;
 
+	virtual RESULT RemoveAllObjects() override;
 	virtual RESULT RemoveObjectByUID(UID uid) override;
 	virtual VirtualObj *FindObjectByUID(UID uid) override;
 	virtual VirtualObj *FindObject(VirtualObj *pObject) override;
+
+	virtual RESULT CommitObjects() override;
 
 	virtual RESULT GetLights(std::vector<light*>*& pLights) override;
 

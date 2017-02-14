@@ -13,68 +13,77 @@
 #include "ray.h"
 #include "dirty.h"
 
+#include <memory>
+
 class VirtualObj;
 class BoundingSphere;
 class BoundingBox;
+class BoundingQuad;
+
+class CollisionManifold;
 
 class BoundingVolume : public dirty {
 public:
 	enum class Type {
 		BOX,
 		SPHERE,
+		QUAD,
+		PLANE,
 		INVALID
 	};
 
 public:
-	BoundingVolume(VirtualObj *pParentObject) :
-		m_pParent(pParentObject),
-		m_ptOrigin()
-	{
-		// Empty
-	}
-
-	BoundingVolume(VirtualObj *pParentObject, point ptOrigin) :
-		m_pParent(pParentObject),
-		m_ptOrigin(ptOrigin)
-	{
-		// Empty
-	}
+	BoundingVolume(VirtualObj *pParentObject);
+	BoundingVolume(VirtualObj *pParentObject, point ptOrigin);
 
 	bool Intersect(BoundingVolume* pRHS);
 	virtual bool Intersect(const BoundingSphere& rhs) = 0;
 	virtual bool Intersect(const BoundingBox& rhs) = 0;
+	virtual bool Intersect(const BoundingQuad& rhs) = 0;
 
-	//bool Intersect(const point& pt) {
 	virtual bool Intersect(point& pt) = 0;
 	virtual bool Intersect(const ray &rCast) = 0;
-	//TODO: virtual bool Intersect(const line& ln) = 0;
+	//TODO: virtual bool Intersect(line& ln) = 0;
+	// TODO: virtual bool Intersect(const plane& pl) = 0;
+
+	CollisionManifold Collide(BoundingVolume* pRHS);
+	virtual CollisionManifold Collide(const BoundingSphere& rhs) = 0;
+	virtual CollisionManifold Collide(const BoundingBox& rhs) = 0;
+	virtual CollisionManifold Collide(const BoundingQuad& rhs) = 0;
+
+	virtual CollisionManifold Collide(const ray &rCast) = 0;
+
+	virtual point GetMinPoint() = 0;
+	virtual point GetMaxPoint() = 0;
+
+	// This will only apply to certain bounding volumes - otherwise use the above methods 
+	virtual point GetMinPointOriented() { return GetMinPoint(); };
+	virtual point GetMaxPointOriented() { return GetMaxPoint(); };
 
 	virtual RESULT SetMaxPointFromOrigin(point ptMax) = 0;
+	virtual RESULT SetHalfVector(vector vHalfVector) = 0;
 
-	RESULT UpdateBoundingVolume(point ptOrigin, point ptMax) {
-		RESULT r = R_PASS;
+	RESULT UpdateBoundingVolume(point ptOrigin, point ptMax);
+	RESULT UpdateBoundingVolumeMinMax(point ptMin, point ptMax);
 
-		CR(SetOrigin(ptOrigin));
-		CR(SetMaxPointFromOrigin(ptMax));
-
-	Error:
-		return r;
-	}
-
-	RESULT SetOrigin(point ptOrigin) {
-		m_ptOrigin = ptOrigin;
-		return R_PASS;
-	}
+	point GetCenter();
+	RESULT SetCenter(point ptOrigin);
 
 	point GetBoundingVolumeOrigin();
 	point GetParentOrigin();
+	point GetParentPivot();
+	VirtualObj *GetParentObject() const;
 	point GetOrigin();
 	quaternion GetOrientation();
+
+	// These provide the absolute orientation/origin of the object
+	point GetAbsoluteOrigin();
+	quaternion GetAbsoluteOrientation();
 
 	virtual BoundingVolume::Type GetType() = 0;
 
 protected:
-	point m_ptOrigin;	// TODO: rename to center point instead of origin?
+	point m_ptCenter;	// TODO: rename to center point instead of origin?
 	VirtualObj *m_pParent;
 };
 

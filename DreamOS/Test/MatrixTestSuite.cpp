@@ -14,20 +14,19 @@ MatrixTestSuite::~MatrixTestSuite() {
 RESULT MatrixTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixCreate, this))));
-	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixMultiply, this))));
-	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixDeterminant, this))));
-	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixMinor, this))));
-	CR((AddTest(std::bind(&MatrixTestSuite::TestMatrixInverse, this))));
-	
+	auto pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixCreate, this));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixMultiply, this));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixDeterminant, this));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixMinor, this));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestMatrixInverse, this));
 
-	CR((AddTest(std::bind(&MatrixTestSuite::TestTranslateMatrix, this))));
-	CR((AddTest(std::bind(&MatrixTestSuite::TestRotateMatrix, this))));
-	CR((AddTest(std::bind(&MatrixTestSuite::TestViewMatrix, this))));
-	CR((AddTest(std::bind(&MatrixTestSuite::TestProjectionMatrix, this))));
-	CR((AddTest(std::bind(&MatrixTestSuite::TestScaleMatrix, this))));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestTranslateMatrix, this));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestRotateMatrix, this));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestViewMatrix, this));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestProjectionMatrix, this));
+	pNewTest = AddTest((std::function<RESULT()>)std::bind(&MatrixTestSuite::TestScaleMatrix, this));
 
-Error:
+//Error:
 	return r;
 }
 

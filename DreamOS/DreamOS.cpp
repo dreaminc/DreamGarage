@@ -133,6 +133,18 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
+RESULT DreamOS::SetGravityAcceleration(double acceleration) {
+	return m_pSandbox->SetGravityAcceleration(acceleration);
+}
+
+RESULT DreamOS::SetGravityState(bool fEnabled) {
+	return m_pSandbox->SetGravityState(fEnabled);
+}
+
+RESULT DreamOS::RemoveAllObjects() {
+	return m_pSandbox->RemoveAllObjects();
+}
+
 light* DreamOS::AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) {
 	return m_pSandbox->AddLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
@@ -183,12 +195,11 @@ volume* DreamOS::MakeVolume(double side, bool fTriangleBased) {
 	return m_pSandbox->AddVolume(side, fTriangleBased);
 }
 	
-quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
-	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
-text* DreamOS::AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard)
-{
+text* DreamOS::AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard) {
 	return m_pSandbox->AddText(fontName, content, size, isBillboard);
 }
 
