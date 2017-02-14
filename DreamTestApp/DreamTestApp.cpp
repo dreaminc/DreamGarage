@@ -16,7 +16,7 @@ RESULT DreamTestApp::LoadScene() {
 	RESULT r = R_PASS;
 
 	// IO
-	RegisterSubscriber((SK_SCAN_CODE)('N'), this);
+	RegisterSubscriber((SenseVirtualKey)('N'), this);
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
@@ -66,7 +66,7 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 	
 	switch (kbEvent->KeyCode) {
-		case (SK_SCAN_CODE)('N') : {
+		case (SenseVirtualKey)('N') : {
 			if (kbEvent->KeyState != 0) {
 				HUD_OUT("Key 'N' is pressed - next test");
 				m_pPhysicsEngineTestSuite->NextTest();

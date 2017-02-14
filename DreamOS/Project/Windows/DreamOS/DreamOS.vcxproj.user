@@ -12,6 +12,10 @@
     <LocalDebuggerCommandArguments>-u DefaultTestUser@dreamos.com -p nightmare </LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">
+    <LocalDebuggerCommandArguments>-u DefaultTestUser@dreamos.com -p nightmare </LocalDebuggerCommandArguments>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Production|x64'">
     <LocalDebuggerCommandArguments>-u DefaultTestUser@dreamos.com -p nightmare</LocalDebuggerCommandArguments>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>

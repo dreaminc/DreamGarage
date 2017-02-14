@@ -33,7 +33,7 @@ Error:
 	return r;
 }
 
-// Rotation testing TODO: move to seperate app
+// Rotation testing TODO: move to separate app
 /*
 volume *pVolume;
 composite *pVolume2;
