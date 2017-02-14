@@ -20,6 +20,7 @@ public:
 
 	virtual RESULT AddTests() override;
 
+	RESULT AddTestCompositeRay();
 	RESULT AddTestRay();
 	RESULT AddTestBallVolume();
 	RESULT AddTestVolumeVolumePointFace();
