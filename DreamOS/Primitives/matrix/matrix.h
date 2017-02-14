@@ -10,6 +10,7 @@
 #include <math.h>
 #include <stdlib.h>     
 #include <time.h>       
+#include <array>
 
 //#define RANGE_CHECK 
 #define MATRIX_ROW_MAJOR
@@ -261,6 +262,10 @@ public:
 	// Warning: This is a pretty vulnerable function
 	matrix(TMatrix *pInitArray) {
 		copyData((TMatrix *)pInitArray);
+	}
+
+	matrix(const std::array<TMatrix, N*M>& initArray) {
+		copyData((TMatrix *)initArray.data());
 	}
 
 	matrix(const matrix<TMatrix, N, M> &cp) {

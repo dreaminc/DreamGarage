@@ -17,11 +17,11 @@ Error:
 	return r;
 }
 
-RESULT Win64Keyboard::UpdateKeyState(SK_SCAN_CODE key, uint8_t keyState) {
+RESULT Win64Keyboard::UpdateKeyState(SenseVirtualKey key, uint8_t keyState) {
 	return SetKeyState(key, keyState);
 }
 
-RESULT Win64Keyboard::CheckKeyState(SK_SCAN_CODE key) {
+RESULT Win64Keyboard::CheckKeyState(SenseVirtualKey key) {
 	RESULT r = R_PASS;
 
 	uint16_t keyState = GetAsyncKeyState(key);

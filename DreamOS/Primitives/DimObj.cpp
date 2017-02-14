@@ -126,6 +126,18 @@ RESULT DimObj::SetColor(color c) {
 	return R_PASS;
 }
 
+RESULT DimObj::TransformUV(matrix<uv_precision, 2, 1> a, matrix<uv_precision, 2, 2> b) {
+	for (unsigned int i = 0; i < NumberVertices(); i++) {
+		uvcoord uv = m_pVertices[i].GetUV();
+		uv = a + b * uv;
+		m_pVertices[i].SetUV(uv);
+	}
+
+	SetDirty();
+
+	return R_PASS;
+}
+
 RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 	RESULT r = R_PASS;
 

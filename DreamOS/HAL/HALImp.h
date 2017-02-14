@@ -79,7 +79,7 @@ public:
 
 	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
-	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) = 0;
+	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) = 0;
 	virtual skybox *MakeSkybox() = 0;
 	virtual model *MakeModel(wchar_t *pszModelName) = 0;
 	virtual model *MakeModel(const std::vector<vertex>& vertices) = 0;

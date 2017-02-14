@@ -3,9 +3,9 @@
 #include "ProfilerGraph.h"
 
 #include <algorithm>
-#include <locale>
 
 #include "DreamConsole/DreamConsole.h"
+
 
 // DreamConsole
 
@@ -86,18 +86,41 @@ const std::string& DreamConsole::GetCmdText()
 	return m_cmdText;
 }
 
+unsigned int DreamConsole::GetCmtTextCursorPos()
+{
+	return m_cmdTextCursorPos;
+}
+
+void DreamConsole::TextCursorMoveFront() {
+	m_cmdTextCursorPos = static_cast<unsigned int>(m_cmdText.length());
+}
+
+void DreamConsole::TextCursorMoveBack() {
+	m_cmdTextCursorPos = 0;
+}
+
+void DreamConsole::TextCursorMoveBackward() {
+	if (m_cmdTextCursorPos > 0)
+		m_cmdTextCursorPos--;
+}
+
+void DreamConsole::TextCursorMoveForward() {
+	if (m_cmdTextCursorPos < m_cmdText.length())
+		m_cmdTextCursorPos++;
+}
+
 RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
 	if (kbEvent->m_pSenseKeyboard)
 	{
-		SK_SCAN_CODE keyCode = kbEvent->KeyCode;
+		SenseVirtualKey keyCode = kbEvent->KeyCode;
 
 		if (kbEvent->KeyState)
 		{
 			if (!IsInForeground())
 			{
-				if (keyCode == VK_TAB)
+				if (keyCode == SVK_TAB)
 				{
 					// quick hack to enable dream console in production but only using several tab hits
 #ifdef PRODUCTION_BUILD
@@ -112,54 +135,97 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 			}
 			else
 			{
-				if (keyCode == VK_TAB)
+				if (keyCode == SVK_TAB)
 				{
 					m_isInForeground = false;
 				}
 				else
 				{
+					///*** old way
 					switch (keyCode)
 					{
-					case VK_BACK: {
-						if (!m_cmdText.empty())
-							m_cmdText.pop_back();
+					case SVK_BACK: {
 					} break;
-					case VK_RETURN: {
-						HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
-						CMDPROMPT_EXECUTE(m_cmdText);
-						m_cmdText.erase();
+					case SVK_RETURN: {
 					} break;
-					case VK_ESCAPE: {
-						if (!m_cmdText.empty()) {
-							m_cmdText.erase();
-						}
-						else {
-							m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
-						}
+					case SVK_ESCAPE: {
 					} break;
-					case VK_LEFT:
-					case VK_RIGHT:
-					case VK_UP:
-					case VK_DOWN: {
+					case SVK_LEFT: {
+						TextCursorMoveBackward();
+					} break;
+					case SVK_RIGHT: {
+						TextCursorMoveForward();
+					} break;
+					case SVK_UP:
+					case SVK_DOWN: {
 
 					} break;
 					default: {
-						std::locale	loc;
-						
-						if (std::use_facet<std::ctype<char>>(loc).is(std::ctype<char>::alpha, static_cast<char>(keyCode))) {
-							m_cmdText.append(std::string("") + std::tolower(static_cast<char>(keyCode), loc));
-						}
-						else if ((keyCode == VK_SPACE) || (static_cast<char>(keyCode) >= '0' && static_cast<char>(keyCode) <= '9')) {
-							m_cmdText.append(std::string("") + static_cast<char>(keyCode));
-						}
+						// don't process type character here. look for SenseTypingEvent
 					} break;
 					}
+					//*/
 				}
 			}
 		}
 	}
 
 	//Error:
+	return r;
+}
+
+RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
+	RESULT r = R_PASS;
+
+	if (IsInForeground())
+	{
+		switch (kbEvent->u16character) {
+		case SVK_BACK:
+			// Process a backspace. 
+			if (!m_cmdText.empty() && GetCmtTextCursorPos() > 0) {
+				m_cmdText.erase(GetCmtTextCursorPos() - 1, 1);
+				TextCursorMoveBackward();
+			}
+
+			break;
+
+		case 0x0A:
+			// Process a linefeed. 
+			break;
+
+		case SVK_ESCAPE:
+			// Process an escape. 
+			if (!m_cmdText.empty()) {
+				m_cmdText.erase();
+				TextCursorMoveBack();
+			}
+			else {
+				m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
+				TextCursorMoveFront();
+			}
+			break;
+
+		case SVK_TAB:
+			// Process a tab. 
+			break;
+
+		case SVK_RETURN:
+			// Process a carriage return. 
+			HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+			CMDPROMPT_EXECUTE(m_cmdText);
+			m_cmdText.erase();
+			TextCursorMoveBack();
+			break;
+
+		default:
+			// Process displayable characters. 
+			std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, kbEvent->u16character));
+			m_cmdText.insert(GetCmtTextCursorPos(), 1, nonUnicodeChar[0]);
+			TextCursorMoveForward();
+			break;
+		}
+	}
+
 	return r;
 }
 

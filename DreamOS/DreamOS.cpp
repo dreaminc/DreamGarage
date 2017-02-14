@@ -207,6 +207,10 @@ texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) 
 	return m_pSandbox->MakeTexture(pszFilename, type);
 }
 
+texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
+	return m_pSandbox->MakeTexture(type, width, height, format, channels, pBuffer, pBuffer_n);
+}
+
 skybox *DreamOS::AddSkybox() {
 	return m_pSandbox->AddSkybox();
 }
@@ -299,8 +303,12 @@ RESULT DreamOS::BroadcastUpdateHandMessage(hand::HandState handState) {
 	return m_pSandbox->BroadcastUpdateHandMessage(handState);
 }
 
-RESULT DreamOS::RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
+RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	return m_pSandbox->RegisterSubscriber(keyEvent, pKeyboardSubscriber);
+}
+
+RESULT DreamOS::RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber) {
+	return m_pSandbox->RegisterSubscriber(typingEvent, pTypingSubscriber);
 }
 
 RESULT DreamOS::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {

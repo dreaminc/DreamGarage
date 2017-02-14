@@ -466,14 +466,16 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
-    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp" />
-    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp" />
-    <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp" />
+    <ClCompile Include="..\..\..\..\DreamTestApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserService.cpp" />
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
@@ -519,16 +521,12 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
-    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
-    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
-    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
-    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp" />
     <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp" />
     <ClCompile Include="..\..\..\Logger\Logger.cpp" />
@@ -540,16 +538,10 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
-    <ClCompile Include="..\..\..\Primitives\line.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />
-    <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp" />
-    <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp" />
-    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp" />
-    <ClCompile Include="..\..\..\Primitives\ObjectState.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
-    <ClCompile Include="..\..\..\Primitives\quad.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
     <ClCompile Include="..\..\..\Primitives\sphere.cpp" />
     <ClCompile Include="..\..\..\Primitives\text.cpp" />
@@ -592,11 +584,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamGarage.h" />
-    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h" />
-    <ClInclude Include="..\..\..\Cloud\CEFApp.h" />
-    <ClInclude Include="..\..\..\Cloud\CEFHandler.h" />
-    <ClInclude Include="..\..\..\Cloud\CEFImp.h" />
-    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h" />
+    <ClInclude Include="..\..\..\..\DreamTestApp.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
@@ -608,6 +596,10 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\Cloud\Model.h" />
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserController.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserService.h" />
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefHandler.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
@@ -884,17 +876,13 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
-    <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />
-    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h" />
-    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingBox.h" />
-    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingSphere.h" />
     <ClInclude Include="..\..\..\Primitives\BoundingVolume.h" />
     <ClInclude Include="..\..\..\Logger\Logger.h" />
@@ -920,8 +908,6 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\model.h" />
-    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h" />
-    <ClInclude Include="..\..\..\Primitives\ObjectState.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h" />
     <ClInclude Include="..\..\..\Primitives\quaternion.h" />
@@ -1189,7 +1175,6 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
       <DeploymentContent>true</DeploymentContent>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Testing|x64'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
