@@ -439,23 +439,19 @@ RESULT Windows64App::HandleMessages() {
 	MSG msg;
 	
 	if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-		bool fHandled = false;
-		
 		if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
-			fHandled = HandleMouseEvent(msg);
+			HandleMouseEvent(msg);
 		}
 		else if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) {
-			fHandled = HandleKeyEvent(msg);
+			HandleKeyEvent(msg);
 		}
 		else if (WM_QUIT == msg.message) {
 			Shutdown();
 			CBR(false, (RESULT)(msg.wParam));
 		}
 
-		if (!fHandled) {
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
 	}
 
 Error:
@@ -590,68 +586,20 @@ bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
 	switch (windowMassage.message) {
 		case WM_KEYUP: {
 			fHandled = true;
-			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), false);
+			m_pSenseKeyboard->UpdateKeyState((SenseVirtualKey)(windowMassage.wParam), false);
 		} break;
 
 		case WM_KEYDOWN: {
 			fHandled = true;
-			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), true);
+			m_pSenseKeyboard->UpdateKeyState((SenseVirtualKey)(windowMassage.wParam), true);
+		} break;
 
-			/*
-			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
-				HUD_OUT("Key 'L' is pressed");
+		case WM_CHAR: {
+			unsigned int lparam = windowMassage.lParam;
+			unsigned char scanCode = (lparam >> 16);
 
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->LoginUser();
-				}
-			}
-			*/
-
-			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
-			/*
-			// DEBUG: Bypass for connect to cloud
-			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					//m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
-
-					m_pCloudController->SendUpdateHeadMessage(NULL, point(1, 2, 3), quaternion(1, 2, 3, 4));
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
-				HUD_OUT("Key 'L' is pressed");
-
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->LoginUser();
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('P')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->PrintEnvironmentPeerList();
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('I')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->AddIceCandidates();
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_LEFT) {
-				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::LEFT);
-			}
-			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_RIGHT) {
-				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::RIGHT);
-			}
-			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_UP) {
-				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::TOP);
-			}
-			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_DOWN) {
-				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::BOTTOM);
-			}
-			*/
+			fHandled = true;
+			m_pSenseKeyboard->NotifyTextTyping(static_cast<SenseVirtualKey>(MapVirtualKey(scanCode, MAPVK_VSC_TO_VK)), windowMassage.wParam, true);			
 		} break;
 	}
 	

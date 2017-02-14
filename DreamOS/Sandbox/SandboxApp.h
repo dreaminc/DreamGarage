@@ -47,7 +47,8 @@ class Message;
 
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
-	public Subscriber<SenseMouseEvent>, 
+	public Subscriber<SenseTypingEvent>,
+	public Subscriber<SenseMouseEvent>,
 	public Subscriber<CmdPromptEvent>, 
 	public Subscriber<CollisionGroupEvent>, 
 	public Subscriber<CollisionObjectEvent>,
@@ -105,6 +106,7 @@ private:
 
 	RESULT Notify(CmdPromptEvent *event);
 	RESULT Notify(SenseKeyboardEvent *kbEvent);
+	RESULT Notify(SenseTypingEvent *kbEvent);
 	RESULT Notify(SenseMouseEvent *mEvent);
 
 	RESULT Notify(CollisionObjectEvent *oEvent);
@@ -147,7 +149,7 @@ public:
 	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
-	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
+	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);
@@ -179,7 +181,8 @@ public:
 	// IO
 public:
 	RESULT RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber);
-	RESULT RegisterSubscriber(int keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
+	RESULT RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber);
+	RESULT RegisterSubscriber(SenseTypingEventType typingEvent, Subscriber<SenseTypingEvent>* pTypingSubscriber);
 	RESULT RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber);
 	RESULT RegisterSubscriber(SenseControllerEventType mouseEvent, Subscriber<SenseControllerEvent>* pControllerSubscriber);
 

@@ -782,10 +782,10 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) {
+texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, type, width, height, channels, pBuffer, pBuffer_n);
+	texture *pTexture = new OGLTexture(this, type, width, height, format, channels, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:

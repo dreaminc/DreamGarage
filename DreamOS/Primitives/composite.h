@@ -57,6 +57,7 @@ public:
 	std::shared_ptr<DimRay> AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
 	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
+	std::shared_ptr<texture> MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 
 protected:
 	HALImp *m_pHALImp;

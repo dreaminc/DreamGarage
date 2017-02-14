@@ -180,6 +180,9 @@
     <Filter Include="PhysicsEngine">
       <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Cloud\WebBrowser">
+      <UniqueIdentifier>{d8051eb4-4d18-4c14-8db2-24de64018e8a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -299,13 +302,7 @@
     <ClCompile Include="..\..\..\Primitives\font.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
@@ -523,6 +520,18 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
       <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserService.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefHandler.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserController.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -857,9 +866,6 @@
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudImp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFImp.h">
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_app.h">
@@ -1393,16 +1399,7 @@
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_thread_checker_impl.h">
       <Filter>External\CEF\v3.2556\include\base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFApp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFHandler.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
@@ -2221,6 +2218,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimRay.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserService.h">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefHandler.h">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserController.h">
+      <Filter>Cloud\WebBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

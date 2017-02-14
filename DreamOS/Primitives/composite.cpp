@@ -50,6 +50,15 @@ std::shared_ptr<texture> composite::MakeTexture(wchar_t *pszFilename, texture::T
 	return nullptr;
 }
 
+std::shared_ptr<texture> composite::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<texture> pTexture(m_pHALImp->MakeTexture(type, width, height, format, channels, pBuffer, pBuffer_n));
+
+	//Success:
+	return pTexture;
+}
+
 std::shared_ptr<hand> composite::MakeHand() {
 	RESULT r = R_PASS;
 

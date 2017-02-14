@@ -35,7 +35,7 @@ private:
 	std::vector<std::chrono::time_point<std::chrono::high_resolution_clock>>	m_tickTimes;
 };
 
-class DreamConsole : public valid, public Subscriber<SenseKeyboardEvent>, public Subscriber<CmdPromptEvent> {
+class DreamConsole : public valid, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<CmdPromptEvent> {
 public:
 	static DreamConsole* GetConsole()
 	{
@@ -77,12 +77,20 @@ public:
 	void ForEach(std::function<bool(const std::string)> pred);
 
 	const std::string& GetCmdText();
+	unsigned int GetCmtTextCursorPos();
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
+	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;
+
+private:
+	void TextCursorMoveFront();
+	void TextCursorMoveBack();
+	void TextCursorMoveBackward();
+	void TextCursorMoveForward();
 
 private:
 	bool m_isInit = false;
@@ -101,6 +109,7 @@ private:
 
 	std::mutex m_mutex;
 	std::string	m_cmdText;
+	unsigned int m_cmdTextCursorPos = 0;
 
 	Configuration m_configuration;
 };

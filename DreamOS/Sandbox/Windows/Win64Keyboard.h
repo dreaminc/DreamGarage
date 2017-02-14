@@ -17,8 +17,8 @@ class Win64Keyboard : public SenseKeyboard {
 public:
 	Win64Keyboard(Windows64App *pWin64AppParent);
 	RESULT UpdateKeyStates();
-	virtual RESULT UpdateKeyState(SK_SCAN_CODE key, uint8_t keyState) override;
-	RESULT CheckKeyState(SK_SCAN_CODE key);
+	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) override;
+	RESULT CheckKeyState(SenseVirtualKey key);
 
 private:
 	Windows64App *m_pWin64AppParent;
