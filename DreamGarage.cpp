@@ -17,8 +17,6 @@ light *g_pLight2 = nullptr;
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
 
-#include "Primitives/ray.h"
-
 // TODO: Should this go into the DreamOS side?
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 	RESULT r = R_PASS;
@@ -49,24 +47,6 @@ RESULT DreamGarage::LoadScene() {
 
 	// TODO: This should go into an "initialize" function
 	InitializeCloudControllerCallbacks();
-	m_pTestIcon = std::shared_ptr<texture>(MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-
-	composite* pComposite = AddComposite();
-	//CN(pComposite);
-	UIMenuItem::IconFormat iconFormat = UIMenuItem::IconFormat();
-	UIMenuItem::LabelFormat labelFormat = UIMenuItem::LabelFormat();
-	UIBarFormat barFormat = UIBarFormat();
-	m_pDreamUIBar = new DreamUIBar(pComposite, iconFormat, labelFormat, barFormat);
-
-	//Hardcoded menu for now, will be replaced with api requests
-	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-	m_menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
-	m_menu["ipsum"] = { "1", "2", "3" };
-	m_menu["Play"] = { "a", "b", "c" };
-
-	m_menuPath = {};
-
-	//CN(m_pDreamUIBar);
 
 	// IO
 	RegisterSubscriber(SVK_ALL, this);
@@ -154,7 +134,6 @@ RESULT DreamGarage::LoadScene() {
 			}
 		);
 	}
-
 
 #ifdef TESTING
 // Test Scene
@@ -348,7 +327,27 @@ RESULT DreamGarage::LoadScene() {
 //*/
 #endif // ! TESTING
 
-//Error:
+	m_pTestIcon = std::shared_ptr<texture>(MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+
+	composite* pComposite = AddComposite();
+	IconFormat iconFormat;
+	LabelFormat labelFormat;
+	UIBarFormat barFormat;
+	
+	CN(pComposite);
+	m_pDreamUIBar = std::shared_ptr<DreamUIBar>(new DreamUIBar(pComposite, iconFormat, labelFormat, barFormat));
+
+	//Hardcoded menu for now, will be replaced with api requests
+	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
+	m_menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
+	m_menu["ipsum"] = { "1", "2", "3" };
+	m_menu["Play"] = { "a", "b", "c" };
+
+	m_menuPath = {};
+
+	CN(m_pDreamUIBar);
+
+Error:
 	return r;
 }
 
@@ -377,7 +376,6 @@ RESULT DreamGarage::SendHandPosition() {
 
 	if (pRightHand != nullptr) {
 		CR(BroadcastUpdateHandMessage(pRightHand->GetHandState()));
-		quaternion q = pRightHand->GetHandState().qOrientation;
 	}
 
 Error:
@@ -427,6 +425,7 @@ RESULT DreamGarage::Update(void) {
 	// Update UI	
 	hand *pRightHand = GetHand(hand::HAND_TYPE::HAND_RIGHT);
 	
+	//TODO: replace with ray/composite collision code 
 	if (pRightHand != nullptr) {
 		quaternion q = pRightHand->GetHandState().qOrientation;
 		vector v = q.RotateVector(vector::kVector());
@@ -755,20 +754,19 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
 			// select item
-			std::string current = "";
-			UILayerInfo info = UILayerInfo();
+			UILayerInfo info;
 			if (!m_menuPath.empty()) {
-				std::vector<std::string> currentMenu = m_menu[m_menuPath.top()];
+				std::vector<std::string>& currentMenu = m_menu[m_menuPath.top()];
 				//check bounds	
-				int selectedIndex = m_pDreamUIBar->GetSelectedIndex(); // fix with real collision code
-				int count = int(m_menu.count(currentMenu[selectedIndex]));
+				size_t selectedIndex = m_pDreamUIBar->GetSelectedIndex(); // fix with real collision code
+				size_t count = m_menu.count(currentMenu[selectedIndex]);
 				if (count > 0) {
-					std::string title = currentMenu[selectedIndex];
+					std::string& title = currentMenu[selectedIndex];
 
 					m_menuPath.push(title);
 					info.labels = m_menu[currentMenu[selectedIndex]];
 					info.labels.emplace_back(title);
-					for (int i = 0; i < (int)info.labels.size(); i++) {
+					for (size_t i = 0; i < info.labels.size(); i++) {
 						info.icons.emplace_back(m_pTestIcon);
 					}
 				}
@@ -778,7 +776,7 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
 			OVERLAY_DEBUG_SET("event", "menu up");
 			// pull up menu
-			UILayerInfo info = UILayerInfo();
+			UILayerInfo info;
 			// go back
 			if (!m_menuPath.empty()) {
 				m_menuPath.pop();

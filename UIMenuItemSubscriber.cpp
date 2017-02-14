@@ -1,6 +1,8 @@
 #include "UIMenuItemSubscriber.h"
 
-UIMenuItemSubscriber::UIMenuItemSubscriber()
+UIMenuItemSubscriber::UIMenuItemSubscriber() :
+	m_pContext(nullptr),
+	m_fnCallback(nullptr)
 {
 	// empty
 }

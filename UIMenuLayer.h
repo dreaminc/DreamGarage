@@ -16,7 +16,7 @@ public:
 
 private:
 	composite *m_pContext; // composite for creation of Menu Items
-	std::vector<std::shared_ptr<UIMenuItem>> m_pMenuItems;
+	std::vector<std::shared_ptr<UIMenuItem>> m_menuItems;
 };
 
 

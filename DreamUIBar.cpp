@@ -1,6 +1,6 @@
 #include "DreamUIBar.h"
 
-DreamUIBar::DreamUIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat, UIBarFormat barFormat) :
+DreamUIBar::DreamUIBar(composite* pComposite, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat) :
 	UIBar(pComposite, iconFormat, labelFormat, barFormat) 
 {
 	Initialize();
@@ -12,16 +12,13 @@ DreamUIBar::~DreamUIBar()
 }
 
 RESULT DreamUIBar::RegisterEvent(UIMenuItemEvent type, std::function<RESULT(void*)> fnCallback, void* pContext) {
-	return R_PASS;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT DreamUIBar::Initialize() {
 
 	RESULT r = R_PASS;
 
-//	std::shared_ptr<UIMenuLayer> pMenuLayer = CreateMenuLayer();
-
-//	CN(pMenuLayer);
 	CR(m_pContext->SetVisible(false));
 
 Error:

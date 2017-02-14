@@ -31,8 +31,11 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 
 	// TODO: reuse this object?
 	std::shared_ptr<FlatContext> pContext = m_pContext->MakeFlatContext();
+	std::shared_ptr<text> pText;
+	std::shared_ptr<quad> pIcon;
+	CN(pContext);
 
-	std::shared_ptr<text> pText = pContext->AddText(
+	pText = pContext->AddText(
 		labelFormat.font,
 		labelFormat.label,
 		labelFormat.fontSize,
@@ -40,7 +43,7 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 	);
 	pText->MoveTo(labelFormat.position);
 //*
-	std::shared_ptr<quad> pIcon = pContext->AddQuad(
+	pIcon = pContext->AddQuad(
 		iconFormat.width,
 		iconFormat.height,
 		iconFormat.position
@@ -53,5 +56,6 @@ RESULT UIMenuItem::Update(IconFormat iconFormat, LabelFormat labelFormat) {
 	m_pContext->RenderToTexture(pContext);
 	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 
+Error:
 	return r;
 }

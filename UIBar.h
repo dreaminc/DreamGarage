@@ -43,29 +43,29 @@ typedef struct UIBarFormat {
 
 class UIBar : public UIModule {
 public:
-	UIBar(composite* pComposite, UIMenuItem::IconFormat iconFormat, UIMenuItem::LabelFormat labelFormat, UIBarFormat barFormat);
+	UIBar(composite* pComposite, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
 	~UIBar();
 
-	virtual RESULT HandleMenuUp(UILayerInfo info) override;
-	virtual RESULT HandleTriggerUp(UILayerInfo info) override;
+	virtual RESULT HandleMenuUp(UILayerInfo& info) override;
+	virtual RESULT HandleTriggerUp(UILayerInfo& info) override;
 
 
-	virtual RESULT UpdateCurrentUILayer(UILayerInfo info) override;
-
-	RESULT ToggleVisible();
+	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
 
 	// TODO: these functions can be removed/replaced once there is composite collision code
 	RESULT Update(ray handRay);
-	int GetSelectedIndex();
+	size_t GetSelectedIndex();
 
 private:
 
+	int GetIndexFromRay(ray handRay);
+
 	// Places MenuItem along a circular arc based on index
-	RESULT UpdateWithRadialLayout(std::shared_ptr<UIMenuItem> pItem, int index, int size, bool fHeader);
+	RESULT UpdateWithRadialLayout(size_t index);
 
 	// TODO: these functions can be removed/replaced once there is composite collision code
 	// Updates MenuItem scale based on a new selected index
-	RESULT UpdateSelectedItem(int index, int size);
+	RESULT UpdateSelectedItem(size_t index);
 
 	// returns location of furthest point in ray/sphere collision
 	point FurthestRaySphereIntersect(const ray &r, point center, float radius);
@@ -75,13 +75,10 @@ private:
 	// these flags help detect controller 'up' events
 	bool m_UISelect;
 
-	float m_headRotationYDeg;
-	int m_selectedIndex;
+	size_t m_selectedIndex;
 
-	int m_visibleMenuItems;
-
-	UIMenuItem::IconFormat m_iconFormat;
-	UIMenuItem::LabelFormat m_labelFormat;
+	IconFormat m_iconFormat;
+	LabelFormat m_labelFormat;
 	UIBarFormat m_barFormat;
 
 	std::stack<std::string> m_menuPath;

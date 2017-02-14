@@ -3,8 +3,6 @@
 
 #include "Primitives/composite.h"
 #include "UIMenuLayer.h"
-//#include "Sense/SenseController.h"
-//#include "Primitives/Publisher.h"
 
 typedef struct UILayerInfo {
 	std::vector<std::shared_ptr<texture>> icons;
@@ -15,28 +13,31 @@ typedef struct UILayerInfo {
 	{}
 } UI_LAYER_INFO;
 
-class UIModule {// : public Subscriber<SenseControllerEvent> {
+class UIModule {
 public:
 	UIModule(composite* pComposite);
+	// using virtual here causes crash on exit
 	~UIModule();
 
-	virtual RESULT HandleMenuUp(UILayerInfo info) = 0;
-	virtual RESULT HandleTriggerUp(UILayerInfo info) = 0;
+	virtual RESULT HandleMenuUp(UILayerInfo& info) = 0;
+	virtual RESULT HandleTriggerUp(UILayerInfo& info) = 0;
 
 	std::shared_ptr<UIMenuLayer> CreateMenuLayer();
 
-	virtual RESULT UpdateCurrentUILayer(UILayerInfo info) = 0;
+	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) = 0;
 
-//	RESULT SetCurrentLayer(std::shared_ptr<UIMenuLayer> pLayer);
-//	RESULT NextLayer();
-//	RESULT PreviousLayer();
+	RESULT ToggleVisible();
 
 protected:
 	composite* m_pContext;
 
 	std::vector<std::shared_ptr<UIMenuLayer>> m_layers;
-//	std::vector<std::shared_ptr<UIMenuLayer>>::iterator m_currentUILayer;
+
+	//TODO: when multiple layers are needed, implement currentUILayer 
+	// as an iterator with public Set/Previous/Next functions
 	std::shared_ptr<UIMenuLayer> m_currentUILayer;
+
+	float m_headRotationYDeg;  // can be removed with composite collision code
 };
 
 #endif // ! UI_MODULE_H_

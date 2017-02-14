@@ -11,7 +11,7 @@ public:
 	~UIMenuItemSubscriber();
 private:
 //	UIMenuItemEvent type;
-	void* pContext;
+	void* m_pContext;
 	//std::function<RESULT(UIModule::UIMenuItemEvent type, void* pContext)> m_fnCallback;
 	std::function<RESULT()> m_fnCallback;
 };

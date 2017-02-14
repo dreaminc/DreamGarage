@@ -106,8 +106,8 @@ private:
 	bool	m_isSeated = false;
 	float tick = 0.0f;
 	
-
-	DreamUIBar *m_pDreamUIBar;
+	// UI
+	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
 	//
 	//temporarily hardcoded
 	std::map<std::string, std::vector<std::string>> m_menu;
