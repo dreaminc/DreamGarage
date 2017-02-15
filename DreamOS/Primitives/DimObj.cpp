@@ -277,6 +277,61 @@ CollisionManifold DimObj::Collide(VirtualObj* pObj) {
 	}
 }
 
+bool DimObj::Intersect(const ray &rCast) {
+	if (GetBoundingVolume() == nullptr) {
+		return false;
+	}
+	else {
+		if (GetBoundingVolume()->Intersect(rCast)) {
+			if (HasChildren()) {
+				for (auto &pChild : GetChildren()) {
+					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
+
+					// Bounding Volume is oriented correctly using the DimObj overloads
+					if (pDimChild->GetBoundingVolume()->Intersect(rCast)) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
+CollisionManifold DimObj::Collide(const ray &rCast) {
+	if (GetBoundingVolume() == nullptr) {
+		return CollisionManifold(this, nullptr);
+	}
+	else {
+		if (GetBoundingVolume()->Intersect(rCast)) {
+			if (HasChildren()) {
+				for (auto &pChild : GetChildren()) {
+					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
+
+					// Bounding Volume is oriented correctly using the DimObj overloads
+					if (pDimChild->GetBoundingVolume()->Intersect(rCast)) {
+						// TODO: This does not support multiple simultaneous objects
+						return pDimChild->GetBoundingVolume()->Collide(rCast);
+					}
+				}
+
+				return CollisionManifold(this, nullptr);
+			}
+			else {
+				return GetBoundingVolume()->Collide(rCast);
+			}
+		}
+	}
+
+	return CollisionManifold(this, nullptr);
+}
+
 point DimObj::GetOrigin(bool fAbsolute) {
 	point ptOrigin = m_objectState.m_ptOrigin;
 

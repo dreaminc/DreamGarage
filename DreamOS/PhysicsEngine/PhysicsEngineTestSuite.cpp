@@ -1096,12 +1096,12 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 		pTestContext->pVolume = pComposite->AddVolume(0.5);
 		CN(pTestContext->pVolume);
 		pTestContext->pVolume->SetMass(1.0f);
-		pTestContext->pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pTestContext->pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
 
 		pTestContext->pSphere = pComposite->AddSphere(0.25f, 10, 10);
 		CN(pTestContext->pSphere);
 		pTestContext->pSphere->SetMass(1.0f);
-		pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
+		pTestContext->pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
 
 		pTestContext->pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(-1.0f, 1.0f, 0.0f));
 		CN(pTestContext->pQuad);
@@ -1159,8 +1159,10 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 
 		// Check for composite collisions using the ray
 
-		if (pTestContext->pRay->Intersect(pTestContext->pComposite)) {
-			CollisionManifold manifold = pTestContext->pRay->Collide(pTestContext->pComposite);
+		//if (pTestContext->pRay->Intersect(pTestContext->pComposite)) {
+		if (pTestContext->pComposite->Intersect(pTestContext->pRay->GetRay())) {
+			//CollisionManifold manifold = pTestContext->pRay->Collide(pTestContext->pComposite);
+			CollisionManifold manifold = pTestContext->pComposite->Collide(pTestContext->pRay->GetRay());
 
 			if (manifold.NumContacts() > 0) {
 				for (int i = 0; i < manifold.NumContacts(); i++) {
