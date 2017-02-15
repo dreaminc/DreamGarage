@@ -288,7 +288,7 @@ bool DimObj::Intersect(const ray &rCast) {
 					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
 
 					// Bounding Volume is oriented correctly using the DimObj overloads
-					if (pDimChild->GetBoundingVolume()->Intersect(rCast)) {
+					if (pDimChild->Intersect(rCast)) {
 						return true;
 					}
 				}
@@ -309,15 +309,14 @@ CollisionManifold DimObj::Collide(const ray &rCast) {
 		return CollisionManifold(this, nullptr);
 	}
 	else {
-		if (GetBoundingVolume()->Intersect(rCast)) {
+		if (Intersect(rCast)) {
 			if (HasChildren()) {
 				for (auto &pChild : GetChildren()) {
 					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
 
 					// Bounding Volume is oriented correctly using the DimObj overloads
-					if (pDimChild->GetBoundingVolume()->Intersect(rCast)) {
-						// TODO: This does not support multiple simultaneous objects
-						return pDimChild->GetBoundingVolume()->Collide(rCast);
+					if (pDimChild->Intersect(rCast)) {
+						return pDimChild->Collide(rCast);
 					}
 				}
 
@@ -350,7 +349,7 @@ quaternion DimObj::GetOrientation(bool fAbsolute) {
 	quaternion qOrientation = m_objectState.m_qRotation;
 
 	if (fAbsolute && m_pParent != nullptr)
-		qOrientation *= m_pParent->GetOrientation();
+		qOrientation *= m_pParent->GetOrientation(fAbsolute);
 
 	return qOrientation;
 }

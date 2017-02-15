@@ -21,6 +21,7 @@ public:
 	virtual RESULT AddTests() override;
 
 	RESULT AddTestCompositeRay();
+	RESULT AddTestMultiCompositeRayQuad();
 	RESULT AddTestRay();
 	RESULT AddTestBallVolume();
 	RESULT AddTestVolumeVolumePointFace();

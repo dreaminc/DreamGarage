@@ -16,6 +16,7 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMultiCompositeRayQuad());
 	CR(AddTestCompositeRay());
 	CR(AddTestRay());
 	CR(AddTestSphereVsSphereArray());
@@ -1049,6 +1050,172 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCompositionQuads() {
 Error:
 	return r;
 }
+RESULT PhysicsEngineTestSuite::AddTestMultiCompositeRayQuad() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+	static int nRepeatCounter = 0;
+
+	struct RayTestContext {
+		composite *pComposite = nullptr;
+		DimRay *pRay = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	};
+
+	RayTestContext *pTestContext = new RayTestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+		std::shared_ptr<composite> pCompositeChild = nullptr;
+		std::shared_ptr<quad> pQuad = nullptr;
+
+		double yPos = -1.0f;
+
+		// Ray to composite
+
+		pTestContext->pComposite = m_pDreamOS->AddComposite();
+		CN(pTestContext->pComposite);
+
+		composite *pComposite = pTestContext->pComposite;
+		CN(pComposite);
+
+		// Test the various bounding types
+		switch (nRepeatCounter) {
+		case 0: pComposite->InitializeOBB(); break;
+		case 1: pComposite->InitializeAABB(); break;
+		case 2: pComposite->InitializeBoundingSphere(); break;
+		}
+		pComposite->SetMass(1.0f);
+
+		pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
+
+		pCompositeChild = pComposite->AddComposite();
+		CN(pCompositeChild);
+		pCompositeChild->InitializeOBB();
+		pCompositeChild->SetMass(1.0f);
+		pCompositeChild->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+		pQuad = pCompositeChild->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(-0.5f, 0.0f, 0.0f));
+
+		pQuad = pCompositeChild->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(0.5f, 0.0f, 0.0f));
+
+		pCompositeChild = pComposite->AddComposite();
+		CN(pCompositeChild);
+		pCompositeChild->InitializeOBB();
+		pCompositeChild->SetMass(1.0f);
+		pCompositeChild->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+		pQuad = pCompositeChild->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(-0.5f, 0.0f, 0.0f));
+
+		pQuad = pCompositeChild->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->SetPosition(point(0.5f, 0.0f, 0.0f));
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		pComposite->SetPosition(point(0.0f, yPos, 0.0f));
+		pComposite->RotateZByDeg(45.0f);
+
+		// Add physics composite
+		CR(m_pDreamOS->AddPhysicsObject(pComposite));
+
+		// The Ray
+		///*
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-4.0f, 2.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
+		CN(pTestContext->pRay);
+
+		///*
+		pTestContext->pRay->SetMass(1.0f);
+		pTestContext->pRay->SetVelocity(vector(0.4f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pRay));
+		//*/
+
+		nRepeatCounter++;
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		CN(pTestContext->pComposite);
+		CN(pTestContext->pRay);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		// Check for composite collisions using the ray
+		{
+			CollisionManifold manifold = pTestContext->pComposite->Collide(pTestContext->pRay->GetRay());
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+		}
+		
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Ray vs Nested Composite Quads");
+	pNewTest->SetTestDescription("Ray intersection of multiple layers of nested quads in a composite and resolving those points, also returning the object");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
 
 RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 	RESULT r = R_PASS;
@@ -1096,17 +1263,17 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 		pTestContext->pVolume = pComposite->AddVolume(0.5);
 		CN(pTestContext->pVolume);
 		pTestContext->pVolume->SetMass(1.0f);
-		pTestContext->pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pTestContext->pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
 
 		pTestContext->pSphere = pComposite->AddSphere(0.25f, 10, 10);
 		CN(pTestContext->pSphere);
 		pTestContext->pSphere->SetMass(1.0f);
 		pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
 
-		pTestContext->pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(-1.0f, 1.0f, 0.0f));
+		pTestContext->pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
 		CN(pTestContext->pQuad);
 		pTestContext->pQuad->SetMass(1.0f);
-		pTestContext->pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pTestContext->pQuad->SetPosition(point(-1.0f, 0.0f, 0.0f));
 
 		for (int i = 0; i < 4; i++) {
 			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
