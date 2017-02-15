@@ -564,6 +564,12 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
   <ItemGroup>
     <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp" />
+    <ClCompile Include="..\..\..\..\DreamUIBar.cpp" />
+    <ClCompile Include="..\..\..\..\UIBar.cpp" />
+    <ClCompile Include="..\..\..\..\UIMenuItem.cpp" />
+    <ClCompile Include="..\..\..\..\UIMenuItemSubscriber.cpp" />
+    <ClCompile Include="..\..\..\..\UIMenuLayer.cpp" />
+    <ClCompile Include="..\..\..\..\UIModule.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
@@ -693,6 +699,12 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamGarage.h" />
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h" />
+    <ClInclude Include="..\..\..\..\DreamUIBar.h" />
+    <ClInclude Include="..\..\..\..\UIBar.h" />
+    <ClInclude Include="..\..\..\..\UIMenuItem.h" />
+    <ClInclude Include="..\..\..\..\UIMenuItemSubscriber.h" />
+    <ClInclude Include="..\..\..\..\UIMenuLayer.h" />
+    <ClInclude Include="..\..\..\..\UIModule.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
