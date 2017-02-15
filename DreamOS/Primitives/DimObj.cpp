@@ -163,7 +163,9 @@ RESULT DimObj::SetMaterialAmbient(float ambient) {
 RESULT DimObj::SetColorTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
-	CBM((m_pColorTexture == nullptr), "Cannot overwrite color texture");
+	// TODO: Currently, this will destroy the texture that is currently used
+	// A different path will be needed to re-use textures
+	CR(ClearColorTexture());
 	m_pColorTexture = pTexture;
 	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
@@ -174,10 +176,11 @@ Error:
 RESULT DimObj::ClearColorTexture() {
 	RESULT r = R_PASS;
 
-	CB((m_pColorTexture != nullptr));
-	m_pColorTexture = nullptr;
-
-Error:
+	if (m_pColorTexture != nullptr) {
+		delete m_pColorTexture;
+		m_pColorTexture = nullptr;
+	}
+//Error:
 	return r;
 }
 
@@ -242,7 +245,8 @@ RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
 }
 
 RESULT DimObj::ClearChildren() {
-	m_pObjects->clear();
+	if (m_pObjects != nullptr)
+		m_pObjects->clear();
 	return R_PASS;
 }
 

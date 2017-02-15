@@ -82,6 +82,11 @@ void DebugData::SetValue(int i)
 	m_value = (GetName() + ": " + std::to_string(i));
 }
 
+void DebugData::SetValue(float f)
+{
+	m_value = (GetName() + ":" + std::to_string(f));
+}
+
 const std::string& DebugData::GetName()
 {
 	return m_uniqueName;

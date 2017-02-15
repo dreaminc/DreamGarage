@@ -1,0 +1,23 @@
+#ifndef UI_MENU_LAYER_H_
+#define UI_MENU_LAYER_H_
+
+#include "Primitives/composite.h"
+#include "UIMenuItem.h"
+
+class UIMenuLayer {
+public:
+	UIMenuLayer(composite* pContext);
+	~UIMenuLayer();
+
+	std::shared_ptr<UIMenuItem> CreateMenuItem();
+	RESULT Clear();
+
+	std::vector<std::shared_ptr<UIMenuItem>> GetMenuItems();
+
+private:
+	composite *m_pContext; // composite for creation of Menu Items
+	std::vector<std::shared_ptr<UIMenuItem>> m_menuItems;
+};
+
+
+#endif // ! UI_MENU_LAYER_H_

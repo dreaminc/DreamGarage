@@ -557,6 +557,24 @@
     <ClCompile Include="..\..\..\Primitives\line.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\UIBar.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\UIMenuItem.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\UIMenuItemSubscriber.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\UIMenuLayer.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\UIModule.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamUIBar.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2260,6 +2278,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
       <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\UIBar.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\UIMenuItem.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\UIMenuItemSubscriber.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\UIMenuLayer.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\UIModule.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamUIBar.h">
+      <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

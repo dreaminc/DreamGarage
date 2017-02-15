@@ -14,6 +14,8 @@
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseController.h"
 
+#include "DreamUIBar.h"
+
 #include "Cloud/WebBrowser/browser.h"
 
 // temporary browser management for testring
@@ -45,6 +47,7 @@ private:
 };
 
 class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
+
 public:
 
 	DreamGarage() {
@@ -102,6 +105,14 @@ private:
 
 	bool	m_isSeated = false;
 	float tick = 0.0f;
+	
+	// UI
+	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
+	//
+	//temporarily hardcoded
+	std::map<std::string, std::vector<std::string>> m_menu;
+	std::stack<std::string> m_menuPath;
+	std::shared_ptr<texture> m_pTestIcon;
 
 	Browsers m_browsers;
 };

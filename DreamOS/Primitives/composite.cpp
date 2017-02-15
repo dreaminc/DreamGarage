@@ -4,6 +4,9 @@
 
 #include "Primitives/hand.h"
 
+#include "Primitives/FlatContext.h"
+#include "Primitives/camera.h"
+
 composite::composite(HALImp *pHALImp) :
 	m_pHALImp(pHALImp)
 {
@@ -316,6 +319,36 @@ std::shared_ptr<DimRay> composite::AddRay(point ptOrigin, vector vDirection, flo
 	return pRay;
 Error:
 	return nullptr;
+}
+
+std::shared_ptr<FlatContext> composite::MakeFlatContext(int width, int height, int channels) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<FlatContext> pContext(m_pHALImp->MakeFlatContext(width, height, channels));
+
+	return pContext;
+}
+
+std::shared_ptr<FlatContext> composite::AddFlatContext(int width, int height, int channels) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<FlatContext> pContext(m_pHALImp->MakeFlatContext(width, height, channels));
+	CR(AddObject(pContext));
+
+	return pContext;
+Error:
+	return nullptr;
+}
+
+RESULT composite::RenderToTexture(std::shared_ptr<FlatContext> pContext) {
+	RESULT r = R_PASS;
+	CR(m_pHALImp->RenderToTexture(pContext.get()));
+Error:
+	return r;
+}
+
+camera *composite::GetCamera() {
+	return m_pHALImp->GetCamera();
 }
 
 /*
