@@ -128,6 +128,14 @@ RESULT DreamOS::Exit(RESULT exitcode) {
 	return exitcode;
 }
 
+RESULT DreamOS::SetHALConfiguration(HALImp::HALConfiguration halconf) {
+	return m_pSandbox->SetHALConfiguration(halconf);
+}
+
+HALImp::HALConfiguration DreamOS::GetHALConfiguration() {
+	return m_pSandbox->GetHALConfiguration();
+}
+
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);

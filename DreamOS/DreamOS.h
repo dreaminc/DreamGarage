@@ -48,6 +48,10 @@ public:
 	virtual RESULT LoadScene() = 0;
 	virtual RESULT Update(void) = 0;
 
+protected:
+	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
+	HALImp::HALConfiguration GetHALConfiguration();
+
 //protected:
 public:
 	// Physics

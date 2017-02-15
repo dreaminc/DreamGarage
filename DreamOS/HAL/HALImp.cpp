@@ -13,6 +13,15 @@ HALImp::~HALImp() {
 	// empty stub
 }
 
+RESULT HALImp::SetHALConfiguration(HALConfiguration halconf) {
+	m_HALConfiguration = halconf;
+	return R_PASS;
+}
+
+HALImp::HALConfiguration HALImp::GetHALConfiguration() {
+	return m_HALConfiguration;
+}
+
 RESULT HALImp::SetRenderReferenceGeometry(bool fRenderReferenceGeometry) {
 	m_HALConfiguration.fRenderReferenceGeometry = fRenderReferenceGeometry;
 	return R_PASS;

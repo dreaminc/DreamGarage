@@ -34,16 +34,21 @@
 class SandboxApp;
 
 class HALImp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent>, public valid {
-private:
+	friend class SandboxApp;
+public:
 	struct HALConfiguration {
 		unsigned fRenderReferenceGeometry : 1;
-	} m_HALConfiguration;
+	};
+
+private:
+	HALConfiguration m_HALConfiguration;
 
 public:
 	HALImp();
 	~HALImp();
 
-	friend class SandboxApp;
+	RESULT SetHALConfiguration(HALConfiguration halconf);
+	HALImp::HALConfiguration GetHALConfiguration();
 
 public:
 	camera *GetCamera();

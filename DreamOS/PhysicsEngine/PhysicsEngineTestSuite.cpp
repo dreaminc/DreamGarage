@@ -1096,17 +1096,17 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 		pTestContext->pVolume = pComposite->AddVolume(0.5);
 		CN(pTestContext->pVolume);
 		pTestContext->pVolume->SetMass(1.0f);
-		pTestContext->pVolume->SetPosition(point(-1.0f, yPos, 0.0f));
+		pTestContext->pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
 
 		pTestContext->pSphere = pComposite->AddSphere(0.25f, 10, 10);
 		CN(pTestContext->pSphere);
 		pTestContext->pSphere->SetMass(1.0f);
-		pTestContext->pSphere->SetPosition(point(1.0f, yPos, 0.0f));
+		pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
 
 		pTestContext->pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(-1.0f, 1.0f, 0.0f));
 		CN(pTestContext->pQuad);
 		pTestContext->pQuad->SetMass(1.0f);
-		pTestContext->pQuad->SetPosition(point(0.0f, yPos, 0.0f));
+		pTestContext->pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
 
 		for (int i = 0; i < 4; i++) {
 			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
@@ -1114,10 +1114,13 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
+		pComposite->SetPosition(point(0.0f, yPos, 0.0f));
+
 		// Add physics composite
 		CR(m_pDreamOS->AddPhysicsObject(pComposite));
 
 		// The Ray
+		///*
 		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 0.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
 		CN(pTestContext->pRay);
 
