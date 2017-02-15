@@ -134,7 +134,7 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 
 		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
 
-		double yPos = 0.0f;
+		double yPos = -1.0f;
 
 		// Ray to objects 
 
@@ -163,7 +163,7 @@ RESULT PhysicsEngineTestSuite::AddTestRay() {
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
-		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 0.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 2.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
 		CN(pTestContext->pRay);
 		
 		///*
@@ -1096,12 +1096,12 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 		pTestContext->pVolume = pComposite->AddVolume(0.5);
 		CN(pTestContext->pVolume);
 		pTestContext->pVolume->SetMass(1.0f);
-		pTestContext->pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+		pTestContext->pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
 
 		pTestContext->pSphere = pComposite->AddSphere(0.25f, 10, 10);
 		CN(pTestContext->pSphere);
 		pTestContext->pSphere->SetMass(1.0f);
-		pTestContext->pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pTestContext->pSphere->SetPosition(point(1.0f, 0.0f, 0.0f));
 
 		pTestContext->pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(-1.0f, 1.0f, 0.0f));
 		CN(pTestContext->pQuad);
@@ -1121,7 +1121,7 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeRay() {
 
 		// The Ray
 		///*
-		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 0.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 2.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
 		CN(pTestContext->pRay);
 
 		///*
