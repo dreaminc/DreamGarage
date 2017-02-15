@@ -100,7 +100,7 @@ public:
 
 public:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
-	HALImp::HALConfiguration GetHALConfiguration();
+	const HALImp::HALConfiguration& GetHALConfiguration();
 	
 private:
 	// TODO: Move this up to sandbox

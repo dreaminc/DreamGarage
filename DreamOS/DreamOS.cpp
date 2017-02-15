@@ -132,7 +132,7 @@ RESULT DreamOS::SetHALConfiguration(HALImp::HALConfiguration halconf) {
 	return m_pSandbox->SetHALConfiguration(halconf);
 }
 
-HALImp::HALConfiguration DreamOS::GetHALConfiguration() {
+const HALImp::HALConfiguration& DreamOS::GetHALConfiguration() {
 	return m_pSandbox->GetHALConfiguration();
 }
 

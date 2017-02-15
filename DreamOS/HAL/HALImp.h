@@ -48,7 +48,7 @@ public:
 	~HALImp();
 
 	RESULT SetHALConfiguration(HALConfiguration halconf);
-	HALImp::HALConfiguration GetHALConfiguration();
+	const HALImp::HALConfiguration& GetHALConfiguration();
 
 public:
 	camera *GetCamera();

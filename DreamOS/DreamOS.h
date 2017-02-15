@@ -50,7 +50,7 @@ public:
 
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
-	HALImp::HALConfiguration GetHALConfiguration();
+	const HALImp::HALConfiguration& GetHALConfiguration();
 
 //protected:
 public:

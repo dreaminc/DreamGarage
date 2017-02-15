@@ -18,7 +18,7 @@ RESULT HALImp::SetHALConfiguration(HALConfiguration halconf) {
 	return R_PASS;
 }
 
-HALImp::HALConfiguration HALImp::GetHALConfiguration() {
+const HALImp::HALConfiguration& HALImp::GetHALConfiguration() {
 	return m_HALConfiguration;
 }
 

@@ -466,7 +466,7 @@ RESULT SandboxApp::SetHALConfiguration(HALImp::HALConfiguration halconf) {
 	return m_pHALImp->SetHALConfiguration(halconf);
 }
 
-HALImp::HALConfiguration SandboxApp::GetHALConfiguration() {
+const HALImp::HALConfiguration& SandboxApp::GetHALConfiguration() {
 	return m_pHALImp->GetHALConfiguration();
 }
 
