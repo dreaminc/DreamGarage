@@ -97,6 +97,10 @@ public:
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
+
+public:
+	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
+	const HALImp::HALConfiguration& GetHALConfiguration();
 	
 private:
 	// TODO: Move this up to sandbox

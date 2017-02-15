@@ -42,38 +42,6 @@ bool BoundingQuad::Intersect(point& pt) {
 	return false;
 }
 
-bool BoundingQuad::Intersect(const ray& r) {
-	double t = -1.0f;
-	
-	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
-	vNormal.Normalize();
-
-	t = ((vector)(GetAbsoluteOrigin() - r.GetOrigin())).dot(vNormal);
-	double denom = r.GetVector().Normal().dot(vNormal);
-
-	if (denom != 0) {
-		t /= denom;
-
-		if (t >= 0) {
-			quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
-			RotationMatrix rotMat = RotationMatrix(qOrientation);
-
-			point ptPlane = inverse(rotMat) * ((r.GetOrigin() + r.GetVector() * t) - GetAbsoluteOrigin());
-
-			if (ptPlane.x() < GetWidth() / 2.0f && ptPlane.x() > -GetWidth() / 2.0f &&
-				ptPlane.z() < GetHeight() / 2.0f && ptPlane.z() > -GetHeight() / 2.0f)
-			{
-				return true;
-			}
-		}
-	}
-	else {
-		// parallel 
-	}
-
-	return false;
-}
-
 CollisionManifold BoundingQuad::Collide(const BoundingQuad& rhs) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, rhs.GetParentObject());
 
@@ -183,6 +151,38 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 	}
 	
 	return manifold;
+}
+
+bool BoundingQuad::Intersect(const ray& r) {
+	double t = -1.0f;
+
+	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
+	vNormal.Normalize();
+
+	t = ((vector)(GetAbsoluteOrigin() - r.GetOrigin())).dot(vNormal);
+	double denom = r.GetVector().Normal().dot(vNormal);
+
+	if (denom != 0) {
+		t /= denom;
+
+		if (t >= 0) {
+			quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
+			RotationMatrix rotMat = RotationMatrix(qOrientation);
+
+			point ptPlane = inverse(rotMat) * ((r.GetOrigin() + r.GetVector() * t) - GetAbsoluteOrigin());
+
+			if (ptPlane.x() < GetWidth() / 2.0f && ptPlane.x() > -GetWidth() / 2.0f &&
+				ptPlane.z() < GetHeight() / 2.0f && ptPlane.z() > -GetHeight() / 2.0f)
+			{
+				return true;
+			}
+		}
+	}
+	else {
+		// parallel 
+	}
+
+	return false;
 }
 
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection

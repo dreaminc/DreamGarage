@@ -58,7 +58,7 @@ bool BoundingSphere::Intersect(line& ln) {
 
 // https://capnramses.github.io//opengl/raycasting.html
 bool BoundingSphere::Intersect(const ray &r) {
-	vector vRayCircle = static_cast<ray>(r).ptOrigin() - GetOrigin();
+	vector vRayCircle = static_cast<ray>(r).ptOrigin() - GetAbsoluteOrigin();
 	
 	float bValue = static_cast<ray>(r).vDirection().dot(vRayCircle);
 	float cValue = vRayCircle.dot(vRayCircle) - pow(m_radius, 2.0f);
@@ -92,7 +92,7 @@ CollisionManifold BoundingSphere::Collide(const ray &rCast) {
 		double t1 = -bVal;
 		if (t1 >= 0) {
 			point ptContact = rCast.GetOrigin() + rCast.GetVector() * t1;
-			vector vNormal = (ptContact - GetOrigin()).Normal();
+			vector vNormal = (ptContact - GetAbsoluteOrigin()).Normal();
 
 			manifold.AddContactPoint(ptContact, vNormal, 0.0f, 1);
 		}
@@ -103,19 +103,19 @@ CollisionManifold BoundingSphere::Collide(const ray &rCast) {
 
 		if (t1 >= 0) {
 			point ptContact1 = rCast.GetOrigin() + rCast.GetVector() * t1;
-			vector vNormal1 = (ptContact1 - GetOrigin()).Normal();
+			vector vNormal1 = (ptContact1 - GetAbsoluteOrigin()).Normal();
 			manifold.AddContactPoint(ptContact1, vNormal1, 0.0f, 1);
 		}
 		
 		if (t2 >= 0) {
 			point ptContact2 = rCast.GetOrigin() + rCast.GetVector() * t2;
-			vector vNormal2 = (ptContact2 - GetOrigin()).Normal();
+			vector vNormal2 = (ptContact2 - GetAbsoluteOrigin()).Normal();
 			manifold.AddContactPoint(ptContact2, vNormal2, 0.0f, 1);
 		}
 
 	}
 	else {
-		// TODO: error?
+		// No collision
 	}
 
 	return manifold;

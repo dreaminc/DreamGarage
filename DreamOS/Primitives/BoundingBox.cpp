@@ -546,12 +546,12 @@ bool BoundingBox::Intersect(const ray& r) {
 	ray adjRay = r;
 
 	if (m_type == Type::OBB) {
-		adjRay.vDirection() = inverse(RotationMatrix(GetOrientation())) * r.GetVector();
-		adjRay.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - r.GetOrigin()));
+		adjRay.vDirection() = inverse(RotationMatrix(GetAbsoluteOrientation())) * r.GetVector();
+		adjRay.ptOrigin() = GetAbsoluteOrigin() - (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (GetAbsoluteOrigin() - r.GetOrigin()));
 	}
 
-	point ptMin = GetMinPoint();
-	point ptMax = GetMaxPoint();
+	point ptMin = (GetAbsoluteOrigin() - m_vHalfSize);
+	point ptMax = (GetAbsoluteOrigin() + m_vHalfSize);
 
 	for (int i = 0; i < 3; i++) {
 		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
@@ -573,12 +573,12 @@ CollisionManifold BoundingBox::Collide(const ray &rCast) {
 	ray adjRay;
 
 	if (m_type == Type::OBB) {
-		adjRay.vDirection() = inverse(RotationMatrix(GetOrientation())) * rCast.GetVector();
-		adjRay.ptOrigin() = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - rCast.GetOrigin()));
+		adjRay.vDirection() = inverse(RotationMatrix(GetAbsoluteOrientation())) * rCast.GetVector();
+		adjRay.ptOrigin() = GetAbsoluteOrigin() - (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (GetAbsoluteOrigin() - rCast.GetOrigin()));
 	}
 
-	point ptMin = GetMinPoint();
-	point ptMax = GetMaxPoint();
+	point ptMin = (GetAbsoluteOrigin() - m_vHalfSize);
+	point ptMax = (GetAbsoluteOrigin() + m_vHalfSize);
 
 	for (int i = 0; i < 3; i++) {
 		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);

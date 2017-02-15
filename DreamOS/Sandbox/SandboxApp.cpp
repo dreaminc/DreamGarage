@@ -462,6 +462,14 @@ long SandboxApp::GetTickCount() {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
 
+RESULT SandboxApp::SetHALConfiguration(HALImp::HALConfiguration halconf) {
+	return m_pHALImp->SetHALConfiguration(halconf);
+}
+
+const HALImp::HALConfiguration& SandboxApp::GetHALConfiguration() {
+	return m_pHALImp->GetHALConfiguration();
+}
+
 // Sandbox Factory Methods
 RESULT SandboxApp::AddObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;

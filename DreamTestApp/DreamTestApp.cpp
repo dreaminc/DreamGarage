@@ -20,6 +20,11 @@ RESULT DreamTestApp::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
+	// Set up the HAL Conf as needed
+	HALImp::HALConfiguration halconf;
+	halconf.fRenderReferenceGeometry = true;
+	SetHALConfiguration(halconf);
+
 	m_pPhysicsEngineTestSuite = std::make_shared<PhysicsEngineTestSuite>(this);
 	CN(m_pPhysicsEngineTestSuite);
 	CR(m_pPhysicsEngineTestSuite->Initialize());
