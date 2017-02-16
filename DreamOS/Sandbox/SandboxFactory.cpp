@@ -1,6 +1,10 @@
 #include "SandboxFactory.h"
 
 #if defined(_WIN32) 
+	// 'Add an optimus prime comment' - Idan
+	extern "C" {
+		_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+	}
     #if defined(_WIN64)
         #include "./Sandbox/Windows/Windows64App.h"
     #else
