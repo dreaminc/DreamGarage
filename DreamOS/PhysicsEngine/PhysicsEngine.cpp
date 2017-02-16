@@ -62,7 +62,7 @@ Error:
 RESULT PhysicsEngine::SetPhysicsGraph(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	CR(m_pPhysicsIntegrator->SetPhysicsStore(pObjectStore));
+	CR(m_pPhysicsIntegrator->SetObjectStore(pObjectStore));
 
 Error:
 	return r;
