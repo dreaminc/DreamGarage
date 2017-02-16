@@ -20,6 +20,12 @@ RESULT DreamTestApp::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
+	int a = sizeof(ObjectState);
+	a = sizeof(ObjectDerivative);
+	a = sizeof(point);
+	a = sizeof(vector);
+	a = sizeof(quaternion);
+
 	// Set up the HAL Conf as needed
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = true;
