@@ -19,6 +19,7 @@ class BoundingVolume;
 
 class CollisionResolver : Subscriber<CollisionGroupEvent>, public valid {
 	friend class PhysicsEngine;
+	friend class InteractionEngine;
 
 private:
 	CollisionResolver();

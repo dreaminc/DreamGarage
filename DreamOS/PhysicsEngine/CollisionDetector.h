@@ -58,6 +58,7 @@ typedef struct CollisionObjectEvent {
 
 class CollisionDetector : public Publisher<CollisionGroupEventType, CollisionGroupEvent>, public Publisher<VirtualObj*, CollisionObjectEvent>, public valid {
 	friend class PhysicsEngine;
+	friend class InteractionEngine;
 
 private:
 	CollisionDetector();
