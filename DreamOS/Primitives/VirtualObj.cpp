@@ -66,7 +66,7 @@ point VirtualObj::GetOrigin(bool fAbsolute) {
 
 // TODO: Remove this, it's redundant 
 point VirtualObj::GetPosition(bool fAbsolute) {
-	return GetOrigin(fAbsolute);
+	return VirtualObj::GetOrigin(fAbsolute);
 }
 
 VirtualObj* VirtualObj::translate(matrix <point_precision, 4, 1> v) {
