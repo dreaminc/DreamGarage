@@ -12,6 +12,7 @@
 #include <memory>
 
 class DreamOS;
+class composite;
 
 class InteractionEngineTestSuite : public TestSuite {
 public:
@@ -23,6 +24,7 @@ public:
 	RESULT AddTestCompositeRay();
 
 	RESULT ResetTest(void *pContext);
+	RESULT AddNestedCompositeQuads(int nestingLevel, float size, std::shared_ptr<composite> pCompositeParent);
 
 private:
 	DreamOS *m_pDreamOS;
