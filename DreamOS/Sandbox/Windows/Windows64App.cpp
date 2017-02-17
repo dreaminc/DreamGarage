@@ -252,6 +252,8 @@ RESULT Windows64App::InitializePathManager() {
 
 	// Initialize Path Manager
 	m_pPathManager = PathManagerFactory::MakePathManager(PATH_MANAGER_WIN32);
+
+	CNM(m_pPathManager, "Failed to allocated path manager");
 	CVM(m_pPathManager, "Failed to initialize path manager");
 
 	m_pPathManager->PrintPaths();
