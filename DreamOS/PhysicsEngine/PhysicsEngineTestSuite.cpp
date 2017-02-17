@@ -1050,6 +1050,7 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCompositionQuads() {
 Error:
 	return r;
 }
+
 RESULT PhysicsEngineTestSuite::AddTestMultiCompositeRayQuad() {
 	RESULT r = R_PASS;
 

@@ -25,7 +25,6 @@ RESULT DreamTestApp::LoadScene() {
 	halconf.fRenderReferenceGeometry = true;
 	SetHALConfiguration(halconf);
 
-
 	// Push to a test suite factory in testing
 	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this);
 	CN(m_pTestSuite);
