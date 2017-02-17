@@ -13,12 +13,12 @@
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
 
-class PhysicsEngineTestSuite;
+class TestSuite;
 
 class DreamTestApp : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<CmdPromptEvent> {
 public:
 	DreamTestApp() :
-		m_pPhysicsEngineTestSuite(nullptr)
+		m_pTestSuite(nullptr)
 	{
 		// empty
 	}
@@ -41,7 +41,7 @@ private:
 	user *m_pPeerUser;
 
 private:
-	std::shared_ptr<PhysicsEngineTestSuite> m_pPhysicsEngineTestSuite;
+	std::shared_ptr<TestSuite> m_pTestSuite;
 };
 
 

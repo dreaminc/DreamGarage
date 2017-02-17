@@ -697,6 +697,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestObject.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
+    <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -1097,6 +1098,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Test\MatrixTestSuite.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
     <ClInclude Include="..\..\..\Test\TestSuite.h" />
+    <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
