@@ -116,13 +116,20 @@ RESULT composite::UpdateBoundingVolume() {
 		// TODO: Composite is not calculating pivot (Center of mass) vs origin 
 		// there needs to be more work here, especially if we want these to respond physically
 		CR(m_pBoundingVolume->UpdateBoundingVolumeMinMax(ptMin, ptMax));
-		CR(m_pBoundingVolume->SetDirty());
-
-		// Handle nested composites
-		if (m_pParent != nullptr) {
-			m_pParent->UpdateBoundingVolume();
-		}
 	}  // HasChildren()
+	else {
+
+		// TODO: Composite is not calculating pivot (Center of mass) vs origin 
+		// there needs to be more work here, especially if we want these to respond physically
+		CR(m_pBoundingVolume->UpdateBoundingVolumeMinMax(point(), point()));	
+	}
+
+	CR(m_pBoundingVolume->SetDirty());
+
+	// Handle nested composites
+	if (m_pParent != nullptr) {
+		m_pParent->UpdateBoundingVolume();
+	}
 
 Error:
 	return r;
