@@ -132,8 +132,8 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
-		GLint previousPolygonMode;
-		glGetIntegerv(GL_POLYGON_MODE, &previousPolygonMode);
+		GLint previousPolygonMode[2]{ 0 };
+		glGetIntegerv(GL_POLYGON_MODE, &previousPolygonMode[0]);
 
 		if (pDimObj->IsWireframe()) {
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -152,7 +152,8 @@ public:
 		}
 		
 		if (pDimObj->IsWireframe()) {
-			glPolygonMode(GL_FRONT_AND_BACK, previousPolygonMode);
+			glPolygonMode(GL_FRONT, previousPolygonMode[0]);
+			glPolygonMode(GL_BACK,	previousPolygonMode[1]);
 		}
 
 
