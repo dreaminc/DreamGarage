@@ -631,6 +631,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\Integrator.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\InteractionEngine.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\InteractionEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp" />
@@ -1006,6 +1007,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\Integrator.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\InteractionEngine.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\InteractionEngineTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h" />
