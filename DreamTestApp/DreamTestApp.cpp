@@ -2,7 +2,7 @@
 #include "DreamTestApp.h"
 #include <string>
 
-#include "PhysicsEngine/PhysicsEngineTestSuite.h"
+#include "Test/TestSuiteFactory.h"
 
 // TODO make it possible to have different Dream Applications, then split the TESTING code into a new app
 //#define TESTING
@@ -20,20 +20,15 @@ RESULT DreamTestApp::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
-	int a = sizeof(ObjectState);
-	a = sizeof(ObjectDerivative);
-	a = sizeof(point);
-	a = sizeof(vector);
-	a = sizeof(quaternion);
-
 	// Set up the HAL Conf as needed
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = true;
 	SetHALConfiguration(halconf);
 
-	m_pPhysicsEngineTestSuite = std::make_shared<PhysicsEngineTestSuite>(this);
-	CN(m_pPhysicsEngineTestSuite);
-	CR(m_pPhysicsEngineTestSuite->Initialize());
+
+	// Push to a test suite factory in testing
+	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this);
+	CN(m_pTestSuite);
 
 	AddSkybox();
 
@@ -67,7 +62,7 @@ Error:
 RESULT DreamTestApp::Update(void) {
 	RESULT r = R_PASS;
 
-	CR(m_pPhysicsEngineTestSuite->UpdateAndRunTests((void*)(this)));
+	CR(m_pTestSuite->UpdateAndRunTests((void*)(this)));
 
 Error:
 	return r;
@@ -80,7 +75,7 @@ RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 		case (SenseVirtualKey)('N') : {
 			if (kbEvent->KeyState != 0) {
 				HUD_OUT("Key 'N' is pressed - next test");
-				m_pPhysicsEngineTestSuite->NextTest();
+				m_pTestSuite->NextTest();
 			}
 		} break;
 	}
