@@ -228,8 +228,6 @@ RESULT camera::Notify(TimeEvent *event) {
 
 	point ptOrigin;
 	ptOrigin = GetOrigin();
-	if(m_pHMD != nullptr)
-		ptOrigin += m_pHMD->GetHeadPointOrigin();
 	ptOrigin.SetZeroW();
 
 	m_pCameraFrameOfReference->SetPosition(ptOrigin);
