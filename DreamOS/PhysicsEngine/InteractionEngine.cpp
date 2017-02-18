@@ -61,8 +61,6 @@ RESULT InteractionEngine::Update() {
 
 	// TODO: add the cascade here
 
-	//CR(m_pPhysicsIntegrator->Update());
-
 //Error:
 	return r;
 }

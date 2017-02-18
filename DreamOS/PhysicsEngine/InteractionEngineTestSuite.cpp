@@ -160,8 +160,11 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 		pTestContext->pRay = m_pDreamOS->AddRay(point(-size/2, size/2, 2.0f), vector(0.0f, 0.0f, -1.0f).Normal());
 		CN(pTestContext->pRay);
 
-		// Add physics composite
-		//CR(m_pDreamOS->AddPhysicsObject(pComposite));
+		// Add composite to interaction
+		CR(m_pDreamOS->AddInteractionObject(pComposite));
+
+		// Add Ray to interaction
+		//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay));
 		
 	Error:
 		return r;
