@@ -56,6 +56,7 @@ protected:
 public:
 	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
+	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
 

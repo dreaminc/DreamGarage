@@ -13,13 +13,15 @@ SandboxApp::SandboxApp() :
 	m_pOpenGLRenderingContext(nullptr),
 	m_pSceneGraph(nullptr),
 	m_pPhysicsGraph(nullptr),
+	m_pInteractionGraph(nullptr),
 	m_pFlatSceneGraph(nullptr),
 	m_pCloudController(nullptr),
 	m_pHALImp(nullptr),
 	m_pHMD(nullptr),
 	m_fnUpdateCallback(nullptr),
 	m_pSenseLeapMotion(nullptr),
-	m_pPhysicsEngine(nullptr)
+	m_pPhysicsEngine(nullptr),
+	m_pInteractionEngine(nullptr)
 {
 	// empty
 }
@@ -313,8 +315,14 @@ RESULT SandboxApp::RunAppLoop() {
 		// Update Scene 
 		//CR(m_pSceneGraph->UpdateScene());
 
-		//CR(m_pPhysicsEngine->Update());
+		// TODO: Do these need to be wired up this way?
+		// Why not just do an Update with retained graph
+
+		// Update Physics
 		CR(m_pPhysicsEngine->UpdateObjectStore(m_pPhysicsGraph));
+
+		// Update Interaction Engine
+		CR(m_pInteractionEngine->UpdateObjectStore(m_pInteractionGraph));
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
@@ -405,6 +413,9 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// Initialize Physics Engine
 	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
 
+	// Initialize Interaction Engine
+	CRM(InitializeInteractionEngine(), "Failed to initialize intetraction engine");
+
 	m_fCheckHMD = (m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0);
 	m_fCheckLeap = (m_pCommandLineManager->GetParameterValue("leap").compare("") == 0);
 
@@ -448,6 +459,22 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::InitializeInteractionEngine() {
+	RESULT r = R_PASS;
+
+	m_pInteractionEngine = InteractionEngine::MakeEngine();
+	CNMW(m_pInteractionEngine, "Interaction Engine failed to initialize");
+
+	// Set up interaction graph
+	m_pInteractionGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pInteractionGraph, "Failed to allocate interaction Graph");
+
+	CRM(m_pInteractionEngine->SetInteractionGraph(m_pInteractionGraph), "Failed to set interaction object store");
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
 	RESULT r = R_PASS;
 
@@ -485,6 +512,16 @@ RESULT SandboxApp::AddPhysicsObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pPhysicsGraph->PushObject(pObject));
+
+Error:
+	return r;
+}
+
+// This adds the object to the interaction graph (otherwise it will not be included in event handling)
+RESULT SandboxApp::AddInteractionObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pInteractionGraph->PushObject(pObject));
 
 Error:
 	return r;

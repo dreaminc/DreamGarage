@@ -141,6 +141,11 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
 }
 
+// This is a pass-thru at the moment
+RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
+	return m_pSandbox->AddInteractionObject(pObject);
+}
+
 RESULT DreamOS::SetGravityAcceleration(double acceleration) {
 	return m_pSandbox->SetGravityAcceleration(acceleration);
 }
