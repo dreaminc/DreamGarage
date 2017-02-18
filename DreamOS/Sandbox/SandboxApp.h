@@ -26,6 +26,7 @@
 #include "Cloud/CloudController.h"
 
 #include "PhysicsEngine/PhysicsEngine.h"
+#include "PhysicsEngine/InteractionEngine.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -72,6 +73,7 @@ public:
 
 private:
 	RESULT InitializePhysicsEngine();
+	RESULT InitializeInteractionEngine();
 
 protected:
 	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
@@ -125,6 +127,7 @@ protected:
 public:
 	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
+	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
 
@@ -220,12 +223,15 @@ protected:
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	
+	// TODO: Should these be in their respective "engine" objects?
 	ObjectStore *m_pPhysicsGraph;	
+	ObjectStore *m_pInteractionGraph;
 	ObjectStore *m_pSceneGraph;
 	ObjectStore *m_pFlatSceneGraph;
 
 	CloudController *m_pCloudController;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;
+	std::unique_ptr<InteractionEngine> m_pInteractionEngine;
 
 	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;
