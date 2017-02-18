@@ -1,7 +1,7 @@
 #include "TestSuiteFactory.h"
 
 #include "PhysicsEngine/PhysicsEngineTestSuite.h"
-#include "PhysicsEngine/InteractionEngineTestSuite.h"
+#include "InteractionEngine/InteractionEngineTestSuite.h"
 
 std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pContext) {
 	RESULT r = R_PASS;
