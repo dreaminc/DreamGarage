@@ -26,7 +26,7 @@
 #include "Cloud/CloudController.h"
 
 #include "PhysicsEngine/PhysicsEngine.h"
-#include "PhysicsEngine/InteractionEngine.h"
+#include "InteractionEngine/InteractionEngine.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
