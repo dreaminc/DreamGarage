@@ -626,6 +626,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp" />
     <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
@@ -1003,6 +1004,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h" />
     <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h" />
     <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />

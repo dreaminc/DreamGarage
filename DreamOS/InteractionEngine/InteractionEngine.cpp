@@ -2,6 +2,8 @@
 
 #include "Scene/ObjectStore.h"
 
+#include "PhysicsEngine/CollisionManifold.h"
+
 InteractionEngine::InteractionEngine() {
 	// empty
 }
@@ -9,7 +11,10 @@ InteractionEngine::InteractionEngine() {
 RESULT InteractionEngine::Initialize() {
 	RESULT r = R_PASS;
 
-//Error:
+	m_pInteractionRay = std::make_shared<ray>();
+	CN(m_pInteractionRay);
+
+Error:
 	return r;
 }
 
@@ -36,6 +41,19 @@ RESULT InteractionEngine::SetInteractionGraph(ObjectStore *pObjectStore) {
 	return r;
 }
 
+RESULT InteractionEngine::UpdateInteractionPrimitive(const ray &rCast) {
+	RESULT r = R_PASS;
+
+	CN(m_pInteractionRay);
+
+	// Copy the ray in
+	m_pInteractionRay = std::make_shared<ray>(rCast);
+	CN(m_pInteractionRay);
+
+Error:
+	return r;
+}
+
 // TODO: This is deprecated
 RESULT InteractionEngine::Update() {
 	RESULT r = R_PASS;
@@ -50,17 +68,37 @@ RESULT InteractionEngine::Update() {
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-//Error:
-	return r;
-}
+	// Check interaction primitives against object store
+	/*
+	if (IsEventRegistered(ELEMENT_INTERSECT_BEGAN)) {
+		for (auto &objCollisionGroup : pObjectStore->GetSceneGraphStore()->GetObjectCollisionGroups()) {
+			CollisionGroupEvent collisionGroupEvent(OBJECT_GROUP_COLLISION, objCollisionGroup);
+			Publisher<CollisionGroupEventType, CollisionGroupEvent>::NotifySubscribers(OBJECT_GROUP_COLLISION, &collisionGroupEvent);
+		}
+	}
+	*/
 
+	// TODO: First pass (no state tracking yet)
+	if (m_pInteractionRay != nullptr) {
+		for (auto &pObject : pObjectStore->GetObjects()) {
+			DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 
-RESULT InteractionEngine::RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
-	RESULT r = R_PASS;
+			if (pDimObj->Intersect(*m_pInteractionRay.get())) {
+				CollisionManifold manifold = pDimObj->Collide(*m_pInteractionRay.get());
+				int numContacts = 0;
+				if ((numContacts = manifold.NumContacts()) > 0) {
 
-	//CR(m_pCollisionDetector->RegisterSubscriber(collisionGroupEvent, pCollisionDetectorSubscriber));
+					InteractionObjectEvent interactionEvent(ELEMENT_INTERSECT_BEGAN, m_pInteractionRay, pObject);
+					for (int i = 0; i < numContacts; i++)
+						interactionEvent.AddPoint(manifold.GetContactPoint(i));
 
-//Error:
+					CR(NotifySubscribers(ELEMENT_INTERSECT_BEGAN, &interactionEvent));
+				}
+			}
+		}
+	}
+
+Error:
 	return r;
 }
 
