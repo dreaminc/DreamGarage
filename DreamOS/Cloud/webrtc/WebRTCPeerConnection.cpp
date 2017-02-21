@@ -230,9 +230,6 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 	}
 
 	stream->FindAudioTrack(kAudioLabel)->GetSource()->AddSink(this);
-	stream->FindAudioTrack(kAudioLabel)->GetSource()->RemoveSink(this);
-	//pASI = stream->FindAudioTrack(kAudioLabel);
-	//m_pAudioTrack = stream->FindAudioTrack(kAudioLabel)->GetSource();
 
 	LOG(INFO) << "added sink";
 
