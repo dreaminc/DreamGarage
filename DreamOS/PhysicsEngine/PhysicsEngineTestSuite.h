@@ -24,6 +24,7 @@ public:
 	RESULT AddTestMultiCompositeRayQuad();
 	RESULT AddTestRay();
 	RESULT AddTestRayQuads();
+	RESULT AddTestRayQuadsComposite();
 	RESULT AddTestBallVolume();
 	RESULT AddTestVolumeVolumePointFace();
 	RESULT AddTestVolumeToPlaneVolume();

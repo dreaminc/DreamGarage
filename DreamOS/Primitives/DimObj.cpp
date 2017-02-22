@@ -281,7 +281,7 @@ CollisionManifold DimObj::Collide(VirtualObj* pObj) {
 	}
 }
 
-bool DimObj::Intersect(const ray &rCast) {
+bool DimObj::Intersect(const ray &rCast, int depth) {
 	if (GetBoundingVolume() == nullptr) {
 		return false;
 	}
@@ -292,7 +292,7 @@ bool DimObj::Intersect(const ray &rCast) {
 					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
 
 					// Bounding Volume is oriented correctly using the DimObj overloads
-					if (pDimChild->Intersect(rCast)) {
+					if (pDimChild->Intersect(rCast, (depth + 1))) {
 						return true;
 					}
 				}
@@ -308,7 +308,7 @@ bool DimObj::Intersect(const ray &rCast) {
 	return false;
 }
 
-CollisionManifold DimObj::Collide(const ray &rCast) {
+CollisionManifold DimObj::Collide(const ray &rCast, int depth) {
 	if (GetBoundingVolume() == nullptr) {
 		return CollisionManifold(this, nullptr);
 	}
@@ -318,9 +318,8 @@ CollisionManifold DimObj::Collide(const ray &rCast) {
 				for (auto &pChild : GetChildren()) {
 					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
 
-					// Bounding Volume is oriented correctly using the DimObj overloads
 					if (pDimChild->Intersect(rCast)) {
-						return pDimChild->Collide(rCast);
+						return pDimChild->Collide(rCast, (depth + 1));
 					}
 				}
 
@@ -339,7 +338,9 @@ point DimObj::GetOrigin(bool fAbsolute) {
 	point ptOrigin = m_objectState.m_ptOrigin;
 
 	if (fAbsolute && m_pParent != nullptr) {
-		ptOrigin = m_pParent->GetModelMatrix() * ptOrigin;
+		ptOrigin.w() = 1.0f;
+		auto mat = m_pParent->GetModelMatrix();
+		ptOrigin = mat * ptOrigin;
 	}
 
 	return ptOrigin;

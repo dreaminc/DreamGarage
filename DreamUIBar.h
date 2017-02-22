@@ -9,7 +9,7 @@
 class DreamUIBar : public UIBar {
 
 public:
-	DreamUIBar(composite* pComposite, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
+	DreamUIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
 	~DreamUIBar();
 
 	//TODO: may be moved depending on implementation of registration architecture

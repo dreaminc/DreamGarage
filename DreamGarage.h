@@ -46,7 +46,7 @@ private:
 	WebBrowserController* m_browserInKeyFocus = nullptr;
 };
 
-class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
+class DreamGarage : public DreamOS, public Subscriber<SenseMouseEvent>, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
 
 public:
 
@@ -76,11 +76,14 @@ public:
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
 	RESULT HandleAudioData(long senderUserID, AudioDataMessage *pAudioDataMessage);
 
-	user*	ActivateUser(long userId);
+	user* ActivateUser(long userId);
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
+
+	// SenseMouseEvent
+	virtual RESULT Notify(SenseMouseEvent *mEvent) override;
 
 	// SenseControllerEventSubscriber
 	virtual RESULT Notify(SenseControllerEvent *event) override;
@@ -112,7 +115,13 @@ private:
 	//temporarily hardcoded
 	std::map<std::string, std::vector<std::string>> m_menu;
 	std::stack<std::string> m_menuPath;
-	std::shared_ptr<texture> m_pTestIcon;
+	std::shared_ptr<texture> m_pIconTexture;
+
+	//
+	DimRay *m_pUIRay = nullptr;
+	VirtualObj *m_pPrevSelected = nullptr;
+	sphere *pSphere1 = nullptr;
+	sphere *pSphere2 = nullptr;
 
 	Browsers m_browsers;
 };

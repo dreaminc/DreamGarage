@@ -1,9 +1,19 @@
 #include "DreamUIBar.h"
 
-DreamUIBar::DreamUIBar(composite* pComposite, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat) :
-	UIBar(pComposite, iconFormat, labelFormat, barFormat) 
+DreamUIBar::DreamUIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat) :
+	UIBar(pDreamOS, iconFormat, labelFormat, barFormat)
 {
-	Initialize();
+	RESULT r = R_PASS;
+
+	CR(DreamUIBar::Initialize());
+
+//Success:
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
 }
 
 DreamUIBar::~DreamUIBar() 
@@ -17,10 +27,9 @@ RESULT DreamUIBar::RegisterEvent(UIMenuItemEvent type, std::function<RESULT(void
 }
 
 RESULT DreamUIBar::Initialize() {
-
 	RESULT r = R_PASS;
 
-	CR(m_pContext->SetVisible(false));
+	CR(SetVisible(false));
 
 Error:
 	return r;

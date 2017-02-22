@@ -11,7 +11,7 @@ user::user(HALImp* pHALImp) :
 
 RESULT user::Initialize() {
 	RESULT r = R_PASS;
-	
+
 	m_pHead = AddModel(L"\\Models\\face4\\untitled.obj",
 					   nullptr,
 					   point(0.0f, 0.0f - 0.35f, 0.0f),

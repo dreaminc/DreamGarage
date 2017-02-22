@@ -137,8 +137,8 @@ public:
 	bool Intersect(VirtualObj* pObj);
 	CollisionManifold Collide(VirtualObj* pObj);
 
-	bool Intersect(const ray &rCast);
-	CollisionManifold Collide(const ray &rCast);
+	bool Intersect(const ray &rCast, int depth = 0);
+	CollisionManifold Collide(const ray &rCast, int depth = 0);
 
 	// Composites will have absolute vs. frame of reference position/orientation
 	virtual point GetOrigin(bool fAbsolute = false) override;
