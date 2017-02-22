@@ -50,8 +50,8 @@ public:
 	//RESULT RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	// TODO: Register element events etc
 
-public:
 	// Active Objects
+public:
 	RESULT ClearActiveObjects();
 	RESULT AddActiveObject(VirtualObj *pVirtualObject);
 	RESULT RemoveActiveObject(VirtualObj *pVirtualObject);
@@ -61,6 +61,14 @@ public:
 private:
 	std::shared_ptr<ray> m_pInteractionRay = nullptr;
 	std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
+
+/*private:
+	// Animation Queue
+public:
+	RESULT ClearAnimationQueue();
+
+	std::map<VirtualObj *pObject, std::shared_ptr<ActiveObject>> m_activeObjects;
+	*/
 
 private:
 	UID m_uid;

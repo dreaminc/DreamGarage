@@ -109,6 +109,31 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 	return r;
 }
 
+RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
+	RESULT r = R_PASS;
+	int mouseX = 0; 
+	int mouseY = 0;
+	int pxWidth = 0;
+	int pxHeight = 0;
+
+	// Get mouse position
+	CR(m_pSenseMouse->GetMousePosition(mouseX, mouseY));
+	CR(GetSandboxWindowSize(pxWidth, pxHeight));
+	
+	if (mouseX >= 0 && mouseY >= 0 && mouseX <= pxWidth && mouseY <= pxHeight) {
+		camera *pCamera = m_pHALImp->GetCamera();
+		CN(pCamera);
+
+		rCast = pCamera->GetRay(mouseX, mouseY, t);
+
+		//DEBUG_LINEOUT("mouse: (%d, %d)", mouseX, mouseY);
+		//rCast.Print();
+	}
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::Notify(CollisionObjectEvent *oEvent) {
 	RESULT r = R_PASS;
 

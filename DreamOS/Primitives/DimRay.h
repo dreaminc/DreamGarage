@@ -26,6 +26,7 @@ public:
 	CollisionManifold Collide(VirtualObj* pObj);
 
 	ray GetRay();
+	RESULT UpdateFromRay(const ray &rCast);
 
 	//TODO: Nested object does not fit with usual pattern of primitives
 	// move to native arrow tip implementation

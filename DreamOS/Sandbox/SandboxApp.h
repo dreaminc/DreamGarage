@@ -99,6 +99,7 @@ public:
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
+	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
 
 public:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
@@ -123,6 +124,9 @@ protected:
 	RESULT RegisterImpMouseEvents();
 	RESULT RegisterImpLeapMotionEvents();
 	RESULT RegisterImpViveControllerEvents();
+
+public:
+	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
 
 public:
 	// Physics

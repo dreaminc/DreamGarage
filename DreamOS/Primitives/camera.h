@@ -88,7 +88,7 @@ public:
 
 	RESULT SetHMD(HMD *pHMD);
 
-	ray GetRay(double xPos, double yPos);
+	ray GetRay(double xPos, double yPos, double t = 0.0f);
 	// TODO: update this with a time delta / delta movement 
 	ray GetRay(int xPos, int yPos);			// This is assuming an integer screen position but really just calls the one above
 

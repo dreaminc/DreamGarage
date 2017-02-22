@@ -163,6 +163,13 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 		// Add composite to interaction
 		CR(m_pDreamOS->AddInteractionObject(pComposite));
 
+		// Collide point spheres
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
 		// Add Ray to interaction
 		//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay));
 		
@@ -180,8 +187,30 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 		RESULT r = R_PASS;
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		ray rCast;
 
 		CN(pTestContext->pComposite);
+		CN(pTestContext->pRay);
+		
+		// Get ray from mouse
+		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
+		pTestContext->pRay->UpdateFromRay(rCast);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		// Check for composite collisions using the ray
+		{
+			CollisionManifold manifold = pTestContext->pComposite->Collide(rCast);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+		}
 
 	Error:
 		return r;

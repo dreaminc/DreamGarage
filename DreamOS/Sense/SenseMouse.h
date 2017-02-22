@@ -106,11 +106,10 @@ private:
 protected:
 	// x,y are in window screen coordinates!
 	virtual RESULT SetMousePosition(int x, int y);
-	virtual RESULT GetMousePosition(int& x, int& y);
-
 	virtual RESULT ShowCursor(bool show);
 
 public:
+	virtual RESULT GetMousePosition(int& x, int& y);
 
 	virtual RESULT CaptureMouse();
 	virtual RESULT ReleaseMouse();

@@ -317,7 +317,7 @@ int camera::GetScreenHeight() {
 	return m_pxScreenHeight;
 }
 
-ray camera::GetRay(double xPos, double yPos) {
+ray camera::GetRay(double xPos, double yPos, double t) {
 	ray retRay;
 
 	double x = ((2.0f * xPos) / m_pxScreenWidth) - 1.0f;
@@ -326,6 +326,10 @@ ray camera::GetRay(double xPos, double yPos) {
 
 	retRay.ptOrigin() = point(GetOrigin());
 	retRay.vDirection() = point(x, y, -1.0f);
+	
+	if (t != 0.0f) {
+		retRay.ptOrigin() += retRay.vDirection() * t;
+	}
 
 	point ptOrigin = GetOrigin();
 	ptOrigin.SetZeroW();
@@ -345,7 +349,7 @@ ray camera::GetRay(double xPos, double yPos) {
 	retRay.vDirection() = matViewInverse * retRay.vDirection();
 	retRay.vDirection().Normalize();
 
-	retRay.Print();
+	//retRay.Print();
 
 	return retRay;
 }

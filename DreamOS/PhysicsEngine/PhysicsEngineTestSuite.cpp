@@ -16,8 +16,9 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestCompositeCompositionQuads());
 	CR(AddTestMultiCompositeRayQuad());
+	CR(AddTestCompositeComposition());
+	CR(AddTestCompositeCompositionQuads());
 	CR(AddTestCompositeRay());
 	CR(AddTestRay());
 	CR(AddTestSphereVsSphereArray());
@@ -28,7 +29,6 @@ RESULT PhysicsEngineTestSuite::AddTests() {
 	CR(AddTestCompositeCollisionVolumeSphere());
 	CR(AddTestCompositeCollisionSphereVolume());
 	CR(AddTestCompositeCollisionSpheres());
-	CR(AddTestCompositeComposition());
 	CR(AddTestQuadVsSphere());
 	CR(AddTestSphereGenerator());
 	CR(AddTestSphereVsSphere());

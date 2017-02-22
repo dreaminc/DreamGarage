@@ -48,6 +48,8 @@ public:
 	virtual RESULT LoadScene() = 0;
 	virtual RESULT Update(void) = 0;
 
+	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
+
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
