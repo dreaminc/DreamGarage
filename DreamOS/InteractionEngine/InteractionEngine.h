@@ -25,7 +25,6 @@
 #include "ActiveObject.h"
 
 class ObjectStore;
-
 /*
 class InteractionObject {
 
