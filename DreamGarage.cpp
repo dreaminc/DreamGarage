@@ -859,6 +859,45 @@ RESULT DreamGarage::Notify(CmdPromptEvent *event) {
 		}
 	}
 
+	// app ui add <title> - adds ui menu item to the current menu layer
+	// app ui remove - removes the last menu item
+	// app ui list - lists current menu items in menu layer
+	// TODO: these events still use the hardcoded menu/path
+	if (event->GetArg(1).compare("ui") == 0) {
+		if (event->GetArg(2).compare("add") == 0) {
+			if (!m_menuPath.empty()) {
+				m_menu[m_menuPath.top()].emplace_back(event->GetArg(3));
+				UILayerInfo info;
+				info.labels = m_menu[m_menuPath.top()];
+				info.labels.emplace_back(m_menuPath.top());
+				for (size_t i = 0; i < info.labels.size(); i++) {
+					info.icons.emplace_back(m_pTestIcon);
+				}
+				HUD_OUT(("added item " + event->GetArg(3)).c_str());
+				m_pDreamUIBar->HandleTriggerUp(info);
+			}
+		}
+		else if (event->GetArg(2).compare("remove") == 0) {
+			if (!m_menuPath.empty() && m_menu[m_menuPath.top()].size() > 0) {
+				HUD_OUT(("removed item " + m_menu[m_menuPath.top()].back()).c_str());
+				m_menu[m_menuPath.top()].pop_back();
+				UILayerInfo info;
+				info.labels = m_menu[m_menuPath.top()];
+				info.labels.emplace_back(m_menuPath.top());
+				for (size_t i = 0; i < info.labels.size(); i++) {
+					info.icons.emplace_back(m_pTestIcon);
+				}
+				m_pDreamUIBar->HandleTriggerUp(info);
+			}
+		}
+		else if (event->GetArg(2).compare("list") == 0) {
+			HUD_OUT(("current menu: " + m_menuPath.top()).c_str());
+			for (auto& s : m_menu[m_menuPath.top()]) {
+				HUD_OUT(("\t + " + s).c_str());
+			}
+		}
+	}
+
 	return r;
 }
 
