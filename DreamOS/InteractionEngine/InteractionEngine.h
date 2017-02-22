@@ -26,11 +26,43 @@
 
 class ObjectStore;
 
+typedef enum InteractionEventType {
+	ELEMENT_INTERSECT_BEGAN,
+	ELEMENT_INTERSECT_MOVED,
+	ELEMENT_INTERSECT_ENDED,
+	ELEMENT_INTERSECT_CANCELLED,
+	INTERACTION_EVENT_INVALID
+} INTERACTION_EVENT_TYPE;
+
+// Object Interaction Event
+typedef struct InteractionObjectEvent {
+
+	InteractionEventType m_eventType;
+	VirtualObj *m_pInteractionObject;
+	VirtualObj *m_pObject;
+	point m_ptContact;
+	vector m_vNormal;
+
+	// TODO: Add time of collision
+
+	InteractionObjectEvent(InteractionEventType eventType, VirtualObj *pInteractionObject, VirtualObj *pObject, point ptContact, vector vNormal) :
+		m_eventType(eventType),
+		m_pInteractionObject(pInteractionObject),
+		m_pObject(pObject),
+		m_ptContact(ptContact),
+		m_vNormal(vNormal)
+	{
+		// empty
+	}
+
+} INTERACTION_OBJECT_EVENT;
+
 /*
 class InteractionObject {
 
 };
 */
+
 
 class InteractionEngine : public valid, public Publisher<InteractionEventType, InteractionObjectEvent> {
 public:
@@ -45,7 +77,7 @@ public:
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
 	RESULT SetInteractionGraph(ObjectStore *pObjectStore);
-
+	
 	RESULT UpdateInteractionPrimitive(const ray &r);
 
 	//RESULT RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
