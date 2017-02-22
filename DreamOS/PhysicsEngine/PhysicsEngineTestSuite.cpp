@@ -16,12 +16,12 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestCompositeCompositionQuads());
 	CR(AddTestMultiCompositeRayQuad());
 	CR(AddTestCompositeRay());
 	CR(AddTestRay());
 	CR(AddTestSphereVsSphereArray());
 	CR(AddTestCompositeCollisionSphereQuads());
-	CR(AddTestCompositeCompositionQuads());
 	CR(AddTestCompositeCollisionVolumes());
 	CR(AddTestVolumeVolumePointFace());
 	CR(AddTestVolumeVolumeEdge());
@@ -984,7 +984,7 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCompositionQuads() {
 		case 1: pComposite->InitializeAABB(); break;
 		case 2: pComposite->InitializeBoundingSphere(); break;
 		}
-
+		
 		pComposite->SetMass(1.0f);
 
 		pQuad = pComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector::kVector(1.0f));
@@ -1012,6 +1012,7 @@ RESULT PhysicsEngineTestSuite::AddTestCompositeCompositionQuads() {
 		pQuad->SetMass(1.0f);
 		pQuad->SetPosition(point(0.0f, 1.0f, 0.0f));
 		*/
+
 
 		pComposite->SetVelocity(point(0.2f, 0.0f, 0.0f));
 		pComposite->SetRotationalVelocity(vector(0.0f, 0.0f, 0.25f));
