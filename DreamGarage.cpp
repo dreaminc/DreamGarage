@@ -1,5 +1,5 @@
-#include "Logger/Logger.h"
 #include "DreamGarage.h"
+#include "Logger/Logger.h"
 #include <string>
 #include <array>
 
@@ -16,6 +16,8 @@ light *g_pLight2 = nullptr;
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
+
+#include "PhysicsEngine/CollisionManifold.h"
 
 // TODO: Should this go into the DreamOS side?
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
@@ -48,20 +50,25 @@ RESULT DreamGarage::LoadScene() {
 	// TODO: This should go into an "initialize" function
 	InitializeCloudControllerCallbacks();
 
-	// IO
-	RegisterSubscriber(SVK_ALL, this);
-	RegisterSubscriber(CHARACTER_TYPING, this);
+	// Keyboard
+	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
+	RegisterSubscriber(SENSE_TYPING_EVENT_TYPE::CHARACTER_TYPING, this);
 
-//*
-	RegisterSubscriber(SENSE_CONTROLLER_GRIP_DOWN, this);
-	RegisterSubscriber(SENSE_CONTROLLER_GRIP_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_MENU_DOWN, this);
-	RegisterSubscriber(SENSE_CONTROLLER_MENU_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_MOVE, this);
-	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_DOWN, this);
-	RegisterSubscriber(SENSE_CONTROLLER_TRIGGER_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_PAD_MOVE, this);
+	// Mouse 
+	RegisterSubscriber(SENSE_MOUSE_EVENT_TYPE::SENSE_MOUSE_MOVE, this);
+	RegisterSubscriber(SENSE_MOUSE_EVENT_TYPE::SENSE_MOUSE_LEFT_BUTTON_UP, this);
 
+	// Controller
+	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_GRIP_DOWN, this);
+	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_GRIP_UP, this);
+	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_DOWN, this);
+	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
+	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_MOVE, this);
+	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this);
+	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
+	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_PAD_MOVE, this);
+
+	// Console
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 	
 	m_browsers.Init(AddComposite());
@@ -83,10 +90,6 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-
-	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.5f, -1.0f, 0));
-	AddSphere(0.2f, 30, 30, color(COLOR_RED))->MoveTo(point(0.0f, -1.0f, 0.5f));
-	auto *pVolume = AddVolume(0.2f)->MoveTo(point(0.0f, -1.0f, 0.0f));
 
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
@@ -129,7 +132,6 @@ RESULT DreamGarage::LoadScene() {
 				if (pOGLEnvironmentProgram != nullptr) {
 					pOGLEnvironmentProgram->SetRiverAnimation(false);
 				}
-				//*/
 				return R_PASS;
 			}
 		);
@@ -327,15 +329,15 @@ RESULT DreamGarage::LoadScene() {
 //*/
 #endif // ! TESTING
 
-	m_pTestIcon = std::shared_ptr<texture>(MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pIconTexture = std::shared_ptr<texture>(MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
-	composite* pComposite = AddComposite();
 	IconFormat iconFormat;
 	LabelFormat labelFormat;
 	UIBarFormat barFormat;
 	
-	CN(pComposite);
-	m_pDreamUIBar = std::shared_ptr<DreamUIBar>(new DreamUIBar(pComposite, iconFormat, labelFormat, barFormat));
+	m_pDreamUIBar = std::make_shared<DreamUIBar>(this, iconFormat, labelFormat, barFormat);
+	CN(m_pDreamUIBar);
+	CV(m_pDreamUIBar);
 
 	//Hardcoded menu for now, will be replaced with api requests
 	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
@@ -344,8 +346,17 @@ RESULT DreamGarage::LoadScene() {
 	m_menu["Play"] = { "a", "b", "c" };
 
 	m_menuPath = {};
+	
+	m_pUIRay = AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
+	CN(m_pUIRay);
+	m_pUIRay->SetVisible(false);
 
-	CN(m_pDreamUIBar);
+	pSphere1 = AddSphere(0.02f, 10, 10);
+	pSphere1->SetVisible(false);
+
+	pSphere2 = AddSphere(0.02f, 10, 10);
+	pSphere2->SetVisible(false);
+
 
 Error:
 	return r;
@@ -426,13 +437,90 @@ RESULT DreamGarage::Update(void) {
 	hand *pRightHand = GetHand(hand::HAND_TYPE::HAND_RIGHT);
 	
 	//TODO: replace with ray/composite collision code 
-	if (pRightHand != nullptr) {
+	if (pRightHand != nullptr && m_pDreamUIBar->IsVisible() && m_pUIRay != nullptr) {
+
+		m_pUIRay->SetPosition(pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f));// -GetCamera()->camera::GetPosition());
+		m_pUIRay->SetOrientation(pRightHand->GetHandState().qOrientation);
+
+		point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);
 		quaternion q = pRightHand->GetHandState().qOrientation;
-		vector v = q.RotateVector(vector::kVector());
-		vector vp = vector(v.x(), 0.0f, v.z());
-		point p0 = point(pRightHand->GetPosition().x(), 0.0f, pRightHand->GetPosition().z());
-		ray handRay = ray(p0, vp);
-		m_pDreamUIBar->Update(handRay);
+		q.Normalize();
+
+		//TODO: this isn't perfectly accurate, especially when the head is rotated
+		vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+		vector v2 = vector(-v.x(), -v.y(), v.z());
+
+		// hack to avoid composite collision issue
+		// TODO: remove once ray/composite collision registers if ray is inside composite
+		p0 = p0 + point(-10.0f * v2);
+		ray rcast = ray(p0, v2);
+
+		CollisionManifold manifold = m_pDreamUIBar->GetComposite()->Collide(rcast);
+
+		if (manifold.NumContacts() > 0) {
+			int numContacts = manifold.NumContacts();
+
+			if (numContacts > 2)
+				numContacts = 2;
+/*
+			for (int i = 0; i < numContacts; i++) {
+				sphere *pSphere = (i == 0) ? pSphere1 : pSphere2;
+
+				pSphere->SetVisible(true);
+				pSphere->SetPosition(manifold.GetContactPoint(i).GetPoint());
+			}
+			//*/
+		}
+		OVERLAY_DEBUG_SET("contacts", manifold.NumContacts());
+
+		float large = 1.25f;
+
+		if (manifold.NumContacts() > 0) {
+			VirtualObj* a = manifold.GetObjectA();
+			VirtualObj* b = manifold.GetObjectB();
+
+			if (a && (!m_pPrevSelected || a != m_pPrevSelected)) {
+				a->ScaleX(large);
+				a->ScaleZ(large);
+
+				if (m_pPrevSelected) {
+					m_pPrevSelected->ScaleX(1.0f);
+					m_pPrevSelected->ScaleZ(1.0f);
+				}
+
+				m_pPrevSelected = a;
+			}
+			else if (b && (!m_pPrevSelected || b != m_pPrevSelected)) {
+				b->ScaleX(large);
+				b->ScaleZ(large);
+
+				if (m_pPrevSelected) {
+					m_pPrevSelected->ScaleX(1.0f);
+					m_pPrevSelected->ScaleZ(1.0f);
+				}
+
+				m_pPrevSelected = b;
+			}
+			/*
+			pSphere1->SetVisible(true);
+			pSphere2->SetVisible(true);
+
+			pSphere1->SetPosition(manifold.GetContactPoint(0).GetPoint());
+			pSphere2->SetPosition(manifold.GetContactPoint(1).GetPoint());
+			//*/
+		}
+		else if (manifold.NumContacts() == 0) {
+			if (m_pPrevSelected) {
+				m_pPrevSelected->ScaleX(1.0f);
+				m_pPrevSelected->ScaleZ(1.0f);
+			}
+
+			m_pPrevSelected = nullptr;
+
+			//pSphere1->SetVisible(false);
+			//pSphere2->SetVisible(false);
+		}
+		OVERLAY_DEBUG_SET("contacts", manifold.NumContacts());
 	}
 
 #ifdef TESTING
@@ -731,6 +819,54 @@ RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 	return r;
 }
 
+RESULT DreamGarage::Notify(SenseMouseEvent *mEvent) {
+	RESULT r = R_PASS;
+
+	switch (mEvent->EventType) {
+		case SENSE_MOUSE_EVENT_TYPE::SENSE_MOUSE_LEFT_BUTTON_UP: {
+
+			OVERLAY_DEBUG_SET("event", "mouse left up");
+			
+			CR(m_pDreamUIBar->HandleMenuUp(m_menu, m_menuPath));
+		} break;
+
+		//TODO: Currently broken
+		case SENSE_MOUSE_EVENT_TYPE::SENSE_MOUSE_MOVE: {
+			// TODO:
+			OVERLAY_DEBUG_SET("event", "mouse move");
+
+			if (m_pDreamUIBar->IsVisible()) {
+
+				// update ray / test stuff
+				//m_pUIRay
+				//CR(GetMouseRay(*m_pUIRay, 0.0f));
+				ray rCast;
+				CR(GetMouseRay(rCast, 0.0f));
+
+				CollisionManifold manifold = m_pDreamUIBar->GetComposite()->Collide(rCast);
+
+				if (manifold.NumContacts() > 0) {
+					int numContacts = manifold.NumContacts();
+
+					if (numContacts > 2)
+						numContacts = 2;
+
+					for (int i = 0; i < numContacts; i++) {
+						sphere *pSphere = (i == 0) ? pSphere1 : pSphere2;
+
+						pSphere->SetVisible(true);
+						pSphere->SetPosition(manifold.GetContactPoint(i).GetPoint());
+					}
+				}
+			}
+			
+		} break;
+	}
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 	RESULT r = R_PASS;
 
@@ -753,53 +889,11 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 		// as opposed to accessing the hardcoded local data structures
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
-			// select item
-			UILayerInfo info;
-			if (!m_menuPath.empty()) {
-				std::vector<std::string>& currentMenu = m_menu[m_menuPath.top()];
-				//check bounds	
-				size_t selectedIndex = m_pDreamUIBar->GetSelectedIndex(); // fix with real collision code
-				size_t count = m_menu.count(currentMenu[selectedIndex]);
-				if (count > 0) {
-					std::string& title = currentMenu[selectedIndex];
-
-					m_menuPath.push(title);
-					info.labels = m_menu[currentMenu[selectedIndex]];
-					info.labels.emplace_back(title);
-					for (size_t i = 0; i < info.labels.size(); i++) {
-						info.icons.emplace_back(m_pTestIcon);
-					}
-				}
-			}
-			m_pDreamUIBar->HandleTriggerUp(info);
+			CR(m_pDreamUIBar->HandleTriggerUp(m_pPrevSelected, m_menu, m_menuPath));
 		}
 		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
 			OVERLAY_DEBUG_SET("event", "menu up");
-			// pull up menu
-			UILayerInfo info;
-			// go back
-			if (!m_menuPath.empty()) {
-				m_menuPath.pop();
-				if (!m_menuPath.empty()) {
-					std::string& str = m_menuPath.top();
-					info.labels = m_menu[str];
-					info.labels.emplace_back(str);
-					for (int i = 0; i < info.labels.size(); i++) {
-						info.icons.emplace_back(m_pTestIcon);
-					}
-				}
-			}
-			// open menu
-			else {
-				info.labels = m_menu[""];
-				info.labels.emplace_back(""); // fake header for root menu
-				for (int i = 0; i < info.labels.size(); i++) {
-					info.icons.emplace_back(m_pTestIcon);
-				}
-				m_pDreamUIBar->ToggleVisible();
-				m_menuPath.push("");
-			}
-			m_pDreamUIBar->HandleMenuUp(info);
+			CR(m_pDreamUIBar->HandleMenuUp(m_menu, m_menuPath));
 		}
 	}
 	else if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
@@ -811,7 +905,7 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 	else if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
 		OVERLAY_DEBUG_SET("event", "menu down");
 	}
-
+Error:
 	return r;
 }
 
@@ -871,10 +965,10 @@ RESULT DreamGarage::Notify(CmdPromptEvent *event) {
 				info.labels = m_menu[m_menuPath.top()];
 				info.labels.emplace_back(m_menuPath.top());
 				for (size_t i = 0; i < info.labels.size(); i++) {
-					info.icons.emplace_back(m_pTestIcon);
+					info.icons.emplace_back(m_pIconTexture);
 				}
 				HUD_OUT(("added item " + event->GetArg(3)).c_str());
-				m_pDreamUIBar->HandleTriggerUp(info);
+				m_pDreamUIBar->UpdateCurrentUILayer(info);
 			}
 		}
 		else if (event->GetArg(2).compare("remove") == 0) {
@@ -885,9 +979,9 @@ RESULT DreamGarage::Notify(CmdPromptEvent *event) {
 				info.labels = m_menu[m_menuPath.top()];
 				info.labels.emplace_back(m_menuPath.top());
 				for (size_t i = 0; i < info.labels.size(); i++) {
-					info.icons.emplace_back(m_pTestIcon);
+					info.icons.emplace_back(m_pIconTexture);
 				}
-				m_pDreamUIBar->HandleTriggerUp(info);
+				m_pDreamUIBar->UpdateCurrentUILayer(info);
 			}
 		}
 		else if (event->GetArg(2).compare("list") == 0) {

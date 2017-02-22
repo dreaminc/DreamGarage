@@ -1,25 +1,53 @@
 #include "UIMenuLayer.h"
 
-UIMenuLayer::UIMenuLayer(composite* pContext) :
-	m_pContext(pContext)
+UIMenuLayer::UIMenuLayer(composite* pParentContext) :
+	m_pParentContext(pParentContext),
+	m_pContextComposite(nullptr)
 {
+	RESULT r = R_PASS;
+
+	CR(Initialize());
+
+// Success:
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
+UIMenuLayer::~UIMenuLayer() {
 	// empty
 }
 
-UIMenuLayer::~UIMenuLayer() 
-{
-	// empty
+RESULT UIMenuLayer::Initialize() {
+	RESULT r = R_PASS;
+
+	CN(m_pParentContext);
+	m_pContextComposite = m_pParentContext->AddComposite();
+	CN(m_pContextComposite);
+
+	CR(m_pContextComposite->InitializeOBB());
+
+Error:
+	return r;
 }
 
-std::shared_ptr<UIMenuItem> UIMenuLayer::CreateMenuItem()
-{
-	std::shared_ptr<UIMenuItem> pMenuItem = std::make_shared<UIMenuItem>(UIMenuItem(m_pContext->AddComposite().get()));
+std::shared_ptr<UIMenuItem> UIMenuLayer::CreateMenuItem() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIMenuItem> pMenuItem = std::make_shared<UIMenuItem>(m_pContextComposite);
+	CN(pMenuItem);
+	CV(pMenuItem);
+
 	m_menuItems.emplace_back(pMenuItem);
+	
+Error:
 	return pMenuItem;
 }
 
-RESULT UIMenuLayer::Clear()
-{
+RESULT UIMenuLayer::Clear() {
 	m_menuItems.clear();
 	return R_PASS;
 }

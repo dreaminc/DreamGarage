@@ -1,13 +1,16 @@
 #ifndef UI_MENU_LAYER_H_
 #define UI_MENU_LAYER_H_
 
+#include "Primitives/valid.h"
 #include "Primitives/composite.h"
 #include "UIMenuItem.h"
 
-class UIMenuLayer {
+class UIMenuLayer : public valid{
 public:
-	UIMenuLayer(composite* pContext);
+	UIMenuLayer(composite* pParentContext);
 	~UIMenuLayer();
+
+	RESULT Initialize();
 
 	std::shared_ptr<UIMenuItem> CreateMenuItem();
 	RESULT Clear();
@@ -15,8 +18,11 @@ public:
 	std::vector<std::shared_ptr<UIMenuItem>> GetMenuItems();
 
 private:
-	composite *m_pContext; // composite for creation of Menu Items
+	std::shared_ptr<composite> m_pContextComposite; // composite for creation of Menu Items
 	std::vector<std::shared_ptr<UIMenuItem>> m_menuItems;
+
+private:
+	composite *m_pParentContext = nullptr;
 };
 
 

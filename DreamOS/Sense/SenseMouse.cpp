@@ -105,6 +105,10 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 			CR(NotifySubscribers(eventType, &mEvent));
 		//}
 	}
+	else {
+		// TODO: Why any different than drag above or otherwise. 
+		CR(NotifySubscribers(eventType, &mEvent));
+	}
 
 Error:
 	m_lastX = newX;

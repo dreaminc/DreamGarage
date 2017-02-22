@@ -89,6 +89,7 @@ RESULT InteractionEngineTestSuite::AddNestedCompositeQuads(int nestingLevel, flo
 	float size2 = size / 2.0f;
 	float size4 = size2 / 2.0f;
 	float padding = 0.8f;
+	float depth = 0.1f;
 
 	if (nestingLevel > 0) {
 		for (int i = 0; i < 4; i++) {
@@ -181,6 +182,7 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		std::shared_ptr<composite> pChildComposite = nullptr;
 		composite *pComposite = nullptr;
+		std::shared_ptr<sphere> pSphere = nullptr;
 
 		// Create a complex composite
 		pComposite = m_pDreamOS->AddComposite();
@@ -197,10 +199,14 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 		CR(pChildComposite->InitializeOBB());
 		//*/
 
+		pSphere = pChildComposite->AddSphere(0.5f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(2.0f, 2.0f, 0.0f));
+
 		// Create the nested composites / quads
 		CR(AddNestedCompositeQuads(nNesting, size, pChildComposite));
 
-		//pComposite->SetPosition(point(0.0f, yPos, 0.0f));
+		pComposite->SetPosition(point(0.0f, yPos, 0.0f));
 		pComposite->RotateXByDeg(90.0f);
 
 		// The Ray
@@ -242,10 +248,9 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 		// Get ray from mouse
 		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
 		//pTestContext->pRay->UpdateFromRay(rCast);
-		CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+		//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
 
-		/*
-
+		///*
 		for (int i = 0; i < 4; i++) {
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}

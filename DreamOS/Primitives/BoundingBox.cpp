@@ -550,8 +550,8 @@ bool BoundingBox::Intersect(const ray& r) {
 		adjRay.ptOrigin() = GetAbsoluteOrigin() - (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (GetAbsoluteOrigin() - r.GetOrigin()));
 	}
 
-	point ptMin = (GetAbsoluteOrigin() - m_vHalfSize);
-	point ptMax = (GetAbsoluteOrigin() + m_vHalfSize);
+	point ptMin = (GetAbsoluteOrigin() - GetHalfVector());
+	point ptMax = (GetAbsoluteOrigin() + GetHalfVector());
 
 	for (int i = 0; i < 3; i++) {
 		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
@@ -577,8 +577,8 @@ CollisionManifold BoundingBox::Collide(const ray &rCast) {
 		adjRay.ptOrigin() = GetAbsoluteOrigin() - (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (GetAbsoluteOrigin() - rCast.GetOrigin()));
 	}
 
-	point ptMin = (GetAbsoluteOrigin() - m_vHalfSize);
-	point ptMax = (GetAbsoluteOrigin() + m_vHalfSize);
+	point ptMin = (GetAbsoluteOrigin() - GetHalfVector());
+	point ptMax = (GetAbsoluteOrigin() + GetHalfVector());
 
 	for (int i = 0; i < 3; i++) {
 		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);

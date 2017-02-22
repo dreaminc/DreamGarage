@@ -43,45 +43,28 @@ typedef struct UIBarFormat {
 
 class UIBar : public UIModule {
 public:
-	UIBar(composite* pComposite, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
+	UIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
 	~UIBar();
 
-	virtual RESULT HandleMenuUp(UILayerInfo& info) override;
-	virtual RESULT HandleTriggerUp(UILayerInfo& info) override;
+	virtual RESULT HandleMenuUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
+	virtual RESULT HandleTriggerUp(VirtualObj* prev, std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
 
 
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
 
-	// TODO: these functions can be removed/replaced once there is composite collision code
-	RESULT Update(ray& handRay);
-	size_t GetSelectedIndex();
-
 private:
-
-	int GetIndexFromRay(ray& handRay);
-
 	// Places MenuItem along a circular arc based on index
 	RESULT UpdateWithRadialLayout(size_t index);
-
-	// TODO: these functions can be removed/replaced once there is composite collision code
-	// Updates MenuItem scale based on a new selected index
-	RESULT UpdateSelectedItem(size_t index);
-
-	// returns location of furthest point in ray/sphere collision
-	point FurthestRaySphereIntersect(const ray &r, point center, float radius);
-
 
 private:
 	// these flags help detect controller 'up' events
 	bool m_UISelect;
 
-	size_t m_selectedIndex;
-
 	IconFormat m_iconFormat;
 	LabelFormat m_labelFormat;
 	UIBarFormat m_barFormat;
 
-	std::stack<std::string> m_menuPath;
+	std::shared_ptr<texture> m_pIconTexture;
 };
 
 
