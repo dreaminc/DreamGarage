@@ -168,7 +168,7 @@ RESULT OGLObj::Render() {
 
 	GLint previousPolygonMode[2]{ 0 };
 	GLboolean previousCullFaceEnabled;
-	glGetIntegerv(GL_POLYGON_MODE, &previousPolygonMode[0]);
+	glGetIntegerv(GL_POLYGON_MODE, previousPolygonMode);
 	previousCullFaceEnabled = glIsEnabled(GL_CULL_FACE);
 
 	// TODO: This should be made more uniform (functions / caps struct etc)
@@ -182,8 +182,14 @@ RESULT OGLObj::Render() {
 	glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 
 	if (pDimObj->IsWireframe()) {
-		glPolygonMode(GL_FRONT, previousPolygonMode[0]);
-		glPolygonMode(GL_BACK,  previousPolygonMode[1]);
+		if (previousPolygonMode[1] != 0) {
+			glPolygonMode(GL_FRONT, previousPolygonMode[0]);
+			glPolygonMode(GL_BACK, previousPolygonMode[1]);
+		}
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, previousPolygonMode[0]);
+		}
+
 		if (previousCullFaceEnabled) {
 			glEnable(GL_CULL_FACE);
 		}
