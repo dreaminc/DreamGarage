@@ -58,9 +58,11 @@ protected:
 public:
 	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
-	RESULT AddInteractionObject(VirtualObj *pObject);
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
+
+	RESULT AddInteractionObject(VirtualObj *pObject);
+	RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT RemoveAllObjects();
 

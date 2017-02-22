@@ -41,7 +41,7 @@ RESULT InteractionEngineTestSuite::AddNestedCompositeQuads(int nestingLevel, flo
 
 	float size2 = size / 2.0f;
 	float size4 = size2 / 2.0f;
-	float padding = 0.9f;
+	float padding = 0.8f;
 
 	if (nestingLevel > 0) {
 		for (int i = 0; i < 4; i++) {
@@ -194,7 +194,10 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 		
 		// Get ray from mouse
 		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
-		pTestContext->pRay->UpdateFromRay(rCast);
+		//pTestContext->pRay->UpdateFromRay(rCast);
+		CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+
+		/*
 
 		for (int i = 0; i < 4; i++) {
 			pTestContext->pCollidePoint[i]->SetVisible(false);
@@ -211,6 +214,7 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 				}
 			}
 		}
+		//*/
 
 	Error:
 		return r;

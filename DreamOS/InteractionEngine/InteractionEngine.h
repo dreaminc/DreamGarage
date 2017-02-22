@@ -53,9 +53,12 @@ public:
 	// Active Objects
 public:
 	RESULT ClearActiveObjects();
-	RESULT AddActiveObject(VirtualObj *pVirtualObject);
+	std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject);
+	RESULT SetAllActiveObjectStates(ActiveObject::state newState);
 	RESULT RemoveActiveObject(VirtualObj *pVirtualObject);
+	RESULT RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
 	std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject);
+	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
 	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
 
 private:

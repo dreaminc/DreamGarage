@@ -68,6 +68,8 @@ RESULT InteractionEngine::Update() {
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
+	std::vector<std::shared_ptr<ActiveObject>> activeObjectsToRemove;
+
 	// Check interaction primitives against object store
 	/*
 	if (IsEventRegistered(ELEMENT_INTERSECT_BEGAN)) {
@@ -79,6 +81,10 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	*/
 
 	// TODO: First pass (no state tracking yet)
+	// Set all objects to non-intersected - below will set it to intersected, then remaining
+	// non-intersected objects are clearly no longer in the active set
+	CR(SetAllActiveObjectStates(ActiveObject::state::NOT_INTERSECTED));
+
 	if (m_pInteractionRay != nullptr) {
 		for (auto &pObject : pObjectStore->GetObjects()) {
 			DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
@@ -86,16 +92,73 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 			if (pDimObj->Intersect(*m_pInteractionRay.get())) {
 				CollisionManifold manifold = pDimObj->Collide(*m_pInteractionRay.get());
 				int numContacts = 0;
+				VirtualObj *pObj = nullptr;
+
 				if ((numContacts = manifold.NumContacts()) > 0) {
 
+					/*
 					InteractionObjectEvent interactionEvent(ELEMENT_INTERSECT_BEGAN, m_pInteractionRay, pObject);
 					for (int i = 0; i < numContacts; i++)
 						interactionEvent.AddPoint(manifold.GetContactPoint(i));
 
 					CR(NotifySubscribers(ELEMENT_INTERSECT_BEGAN, &interactionEvent));
+					*/
+					
+					// Manifold should return only one object, one will be nullptr
+					pObj = manifold.GetObjectA();
+					if(pObj == nullptr)
+						pObj = manifold.GetObjectB();
+					CN(pObj);
+
+					// Check for active object
+					auto pActiveObject = FindActiveObject(pObj);
+
+					if (pActiveObject == nullptr) {
+						pActiveObject = AddActiveObject(manifold.GetObjectA());
+						CN(pActiveObject)
+						// Notify element intersect begin
+					}
+					
+					switch (pActiveObject->GetState()) {
+						case ActiveObject::state::NOT_INTERSECTED: {
+							// Notify start
+							pActiveObject->SetState(ActiveObject::state::INTERSECTED);
+						} break;
+
+						case ActiveObject::state::INTERSECTED: {
+							// Notify continue
+							pActiveObject->SetState(ActiveObject::state::INTERSECTED);
+						} break;
+					}
+					
 				}
 			}
 		}
+	}
+	
+	
+	for (auto &pActiveObject : m_activeObjects) {
+		if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
+			// Add to remove list
+			activeObjectsToRemove.push_back(pActiveObject);
+		}
+	}
+
+	for (auto &pActiveObject : activeObjectsToRemove) {
+		// Notify no longer intersected
+		CR(RemoveActiveObject(pActiveObject));
+	}
+	
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::SetAllActiveObjectStates(ActiveObject::state newState) {
+	RESULT r = R_PASS;
+
+	for (auto &pActiveObject : m_activeObjects) {
+		CR(pActiveObject->SetState(newState));
 	}
 
 Error:
@@ -108,7 +171,7 @@ RESULT InteractionEngine::ClearActiveObjects() {
 	return R_PASS;
 }
 
-RESULT InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject) {
+std::shared_ptr<ActiveObject>  InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<ActiveObject> pNewActiveObject = nullptr;
@@ -117,8 +180,24 @@ RESULT InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject) {
 
 	pNewActiveObject = std::make_shared<ActiveObject>(pVirtualObject);
 	CN(pNewActiveObject);
+	pNewActiveObject->SetState(ActiveObject::state::NOT_INTERSECTED);
 
 	m_activeObjects.push_back(pNewActiveObject);
+
+// Success:
+	return pNewActiveObject;
+
+Error:
+	return nullptr;
+}
+
+RESULT InteractionEngine::RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pActiveObject);
+	CNM(pNewActiveObject, "Active object not found");
+
+	m_activeObjects.remove(pNewActiveObject);
 
 Error:
 	return r;
@@ -134,6 +213,16 @@ RESULT InteractionEngine::RemoveActiveObject(VirtualObj *pVirtualObject) {
 
 Error:
 	return r;
+}
+
+std::shared_ptr<ActiveObject> InteractionEngine::FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject) {
+	for (auto it = m_activeObjects.begin(); it != m_activeObjects.end(); it++) {
+		if ((*it) == pActiveObject) {
+			return (*it);
+		}
+	}
+
+	return nullptr;
 }
 
 std::shared_ptr<ActiveObject> InteractionEngine::FindActiveObject(VirtualObj *pVirtualObject) {

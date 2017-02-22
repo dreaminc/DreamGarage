@@ -150,6 +150,10 @@ RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->AddInteractionObject(pObject);
 }
 
+RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
+	return m_pSandbox->UpdateInteractionPrimitive(rCast);
+}
+
 RESULT DreamOS::SetGravityAcceleration(double acceleration) {
 	return m_pSandbox->SetGravityAcceleration(acceleration);
 }

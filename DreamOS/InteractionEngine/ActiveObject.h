@@ -24,7 +24,10 @@ public:
 	ActiveObject(VirtualObj *pObject);
 
 	RESULT UpdateObject(const point &ptIntersection, const vector &vNormal, ActiveObject::state newState);
+	
 	ActiveObject::state GetState();
+	RESULT SetState(ActiveObject::state newstate);
+
 	point GetIntersectionPoint();
 	vector GetIntersectionNormal();
 	VirtualObj *GetObject();

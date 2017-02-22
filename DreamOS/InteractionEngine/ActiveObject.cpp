@@ -15,6 +15,11 @@ RESULT ActiveObject::UpdateObject(const point &ptIntersection, const vector &vNo
 	return R_PASS;
 }
 
+RESULT ActiveObject::SetState(ActiveObject::state newState) {
+	m_state = newState;
+	return R_PASS;
+}
+
 ActiveObject::state ActiveObject::GetState() {
 	return m_state;
 }

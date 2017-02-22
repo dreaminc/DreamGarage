@@ -552,6 +552,15 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::UpdateInteractionPrimitive(const ray &rCast) {
+	RESULT r = R_PASS;
+
+	CR(m_pInteractionEngine->UpdateInteractionPrimitive(rCast));
+
+Error:
+	return r;
+}
+
 // This is the nuclear option - it will flush all objects out
 RESULT SandboxApp::RemoveAllObjects() {
 	RESULT r = R_PASS;
