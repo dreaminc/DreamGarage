@@ -24,6 +24,8 @@
 #include "InteractionObjectEvent.h"
 #include "ActiveObject.h"
 
+#define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
+
 class ObjectStore;
 /*
 class InteractionObject {
@@ -46,6 +48,8 @@ public:
 	RESULT SetInteractionGraph(ObjectStore *pObjectStore);
 
 	RESULT UpdateInteractionPrimitive(const ray &r);
+
+	RESULT SetInteractionDiffThreshold(double thresh);
 
 	//RESULT RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	// TODO: Register element events etc
@@ -72,6 +76,9 @@ public:
 
 	std::map<VirtualObj *pObject, std::shared_ptr<ActiveObject>> m_activeObjects;
 	*/
+
+private:
+	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;
 
 private:
 	UID m_uid;
