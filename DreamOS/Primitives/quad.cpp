@@ -193,6 +193,7 @@ RESULT quad::UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleB
 	}
 
 	SetOrigin(pBoundingQuad->GetOrigin());
+	SetOrientation(pBoundingQuad->GetOrientation());
 
 Error:
 	return r;
@@ -205,7 +206,7 @@ RESULT quad::SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased) {
 
 	m_width = pBoundingQuad->GetWidth();
 	m_height = pBoundingQuad->GetHeight();
-	m_vNormal = pBoundingQuad->GetNormal();	
+	m_vNormal = pBoundingQuad->GetNormal();
 
 	CR(SetVertices(m_width, m_height, m_vNormal));
 

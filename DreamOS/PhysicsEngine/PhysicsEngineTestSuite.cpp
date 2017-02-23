@@ -16,13 +16,14 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestRayQuads());
+	CR(AddTestRay());
 	CR(AddTestCompositeCollisionSphereQuads());
 	CR(AddTestCompositeCollisionVolumes());
 	CR(AddTestMultiCompositeRayQuad());
 	CR(AddTestCompositeComposition());
 	CR(AddTestCompositeCompositionQuads());
 	CR(AddTestCompositeRay());
-	CR(AddTestRay());
 	CR(AddTestSphereVsSphereArray());
 	CR(AddTestVolumeVolumePointFace());
 	CR(AddTestVolumeVolumeEdge());
@@ -105,6 +106,152 @@ RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
 
 	pNewTest->SetTestName("Sphere vs OBB");
 	pNewTest->SetTestDescription("Sphere colliding with an OBB with various orientations");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestRayQuads() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+	const int numQuads = 4;
+
+	struct RayTestContext {
+		DimRay *pRay = nullptr;
+		quad *pQuad[numQuads] = { nullptr };
+		sphere *pCollidePoint[4] = { nullptr };
+	};
+
+	RayTestContext *pTestContext = new RayTestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		double yPos = -1.0f;
+		double xPos = 2.0f;
+
+		// Ray to quads 
+		int quadCount = 0;
+
+		// Normal Quad
+
+		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad[quadCount]);
+		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetMass(1.0f);
+		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
+		xPos -= 1.0f;
+
+		// Rotated by orientation
+		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad[quadCount]);
+		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetMass(1.0f);
+		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		pTestContext->pQuad[quadCount]->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
+		xPos -= 1.0f;
+
+		///*
+		// Rotated by normal
+		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(1.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad[quadCount]);
+		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetMass(1.0f);
+		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
+		xPos -= 1.0f;
+
+		// Rotated by normal and orientation (should be flat)
+		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(-1.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad[quadCount]);
+		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetMass(1.0f);
+		pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
+		xPos -= 1.0f;
+		//*/
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 2.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
+		CN(pTestContext->pRay);
+
+		///*
+		pTestContext->pRay->SetMass(1.0f);
+		pTestContext->pRay->SetVelocity(vector(0.4f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pRay));
+		//*/
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		CN(pTestContext->pRay);
+
+		for (int i = 0; i < 4; i++)
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for quad collisions using the ray
+		for (int i = 0; i < numQuads; i++) {
+			if (pTestContext->pRay->Intersect(pTestContext->pQuad[i])) {
+				CollisionManifold manifold = pTestContext->pRay->Collide(pTestContext->pQuad[i]);
+
+				if (manifold.NumContacts() > 0) {
+					for (int i = 0; i < manifold.NumContacts(); i++) {
+						pTestContext->pCollidePoint[i]->SetVisible(true);
+						pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+					}
+				}
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Ray vs Quads");
+	pNewTest->SetTestDescription("Ray intersection of quads oriented in various fashion");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

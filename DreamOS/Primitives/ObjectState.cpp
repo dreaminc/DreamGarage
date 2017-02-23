@@ -6,6 +6,7 @@
 #include "BoundingVolume.h"
 #include "BoundingBox.h"
 #include "BoundingSphere.h"
+#include "BoundingQuad.h"
 
 ObjectState::ObjectState(VirtualObj *pParentObj) :
 	m_pParentObj(pParentObj),
@@ -262,6 +263,13 @@ RESULT ObjectState::RecalculateInertialTensor() {
 			return SetInertiaTensorSphere(pBoundingSphere->GetRadius());
 		} break;
 
+		case ObjectState::MassDistributionType::QUAD: {
+			BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pDimObj->GetBoundingVolume().get());
+			CN(pBoundingQuad);
+
+			return SetInertiaTensorQuad(pBoundingQuad->GetWidth(), pBoundingQuad->GetHeight());
+		} break;
+
 		case ObjectState::MassDistributionType::CUSTOM: {
 			// TODO: ?
 		} break;
@@ -300,6 +308,22 @@ RESULT ObjectState::SetInertiaTensorVolume(point_precision width, point_precisio
 	matInertiaTensor.element(2, 2) = (1.0f / 12.0f) * m_kgMass * ((width * width) + (height * height));
 
 	CR(SetInertiaTensor(ObjectState::MassDistributionType::VOLUME, matInertiaTensor));
+
+Error:
+	return r;
+}
+
+RESULT ObjectState::SetInertiaTensorQuad(point_precision width, point_precision height) {
+	RESULT r = R_SUCCESS;
+
+	matrix<point_precision, 3, 3> matInertiaTensor;
+	matInertiaTensor.clear();
+
+	matInertiaTensor.element(0, 0) = (1.0f / 12.0f) * m_kgMass * (height * height);
+	matInertiaTensor.element(1, 1) = (1.0f / 12.0f) * m_kgMass * (width * width);
+	matInertiaTensor.element(2, 2) = (1.0f / 12.0f) * m_kgMass * ((width * width) + (height * height));
+
+	CR(SetInertiaTensor(ObjectState::MassDistributionType::QUAD, matInertiaTensor));
 
 Error:
 	return r;

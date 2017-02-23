@@ -303,12 +303,13 @@ VirtualObj* VirtualObj::SetRotateDeg(quaternion_precision degX, quaternion_preci
 	quaternion_precision thetaX = degX * (M_PI / 180.f);
 	quaternion_precision thetaY = degY * (M_PI / 180.f);
 	quaternion_precision thetaZ = degZ * (M_PI / 180.f);
-
+	OnManipulation();
 	return SetRotate(degX, degY, degZ);
 }
 
 VirtualObj* VirtualObj::ResetRotation() {
 	m_objectState.m_qRotation.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
+	OnManipulation();
 	return this;
 }
 

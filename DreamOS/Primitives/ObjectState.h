@@ -36,6 +36,7 @@ public:
 		VOLUME,
 		SPHERE,
 		CUSTOM,
+		QUAD,
 		INVALID
 	};
 
@@ -86,6 +87,7 @@ public:
 	RESULT RecalculateInertialTensor();
 	RESULT SetInertiaTensorSphere(point_precision radius);
 	RESULT SetInertiaTensorVolume(point_precision width, point_precision height, point_precision depth);
+	RESULT SetInertiaTensorQuad(point_precision width, point_precision height);
 	RESULT SetInertiaTensor(MassDistributionType type, const matrix<point_precision, 3, 3> &matInertiaTensor);
 
 	const vector GetMomentum();

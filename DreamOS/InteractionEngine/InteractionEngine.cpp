@@ -60,6 +60,16 @@ Error:
 	return r;
 }
 
+RESULT InteractionEngine::SetInteractionDiffThreshold(double thresh) {
+	RESULT r = R_PASS;
+
+	CRANGE(thresh, 0.0f, 1.0f);
+	m_diffThreshold = thresh;
+
+Error:
+	return r;
+}
+
 // TODO: This is deprecated
 RESULT InteractionEngine::Update() {
 	RESULT r = R_PASS;
@@ -124,14 +134,17 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 						NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_BEGAN, &interactionEvent);
 					}
 					else {
-						// TODO: diff against previous point
-						pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
+						vector vDiff = manifold.GetContactPoint(0).GetPoint() - pActiveObject->GetIntersectionPoint();
 
-						// Notify element intersect continue
-						InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_MOVED, m_pInteractionRay, pObj);
-						for (int i = 0; i < manifold.NumContacts(); i++)
-							interactionEvent.AddPoint(manifold.GetContactPoint(i));
-						NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
+						if (vDiff.magnitude() > m_diffThreshold) {
+							pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
+
+							// Notify element intersect continue
+							InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_MOVED, m_pInteractionRay, pObj);
+							for (int i = 0; i < manifold.NumContacts(); i++)
+								interactionEvent.AddPoint(manifold.GetContactPoint(i));
+							NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
+						}
 					}
 					
 					pActiveObject->SetState(ActiveObject::state::INTERSECTED);
