@@ -161,7 +161,7 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuads() {
 		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
 		xPos -= 1.0f;
 
-		/*
+		///*
 		// Rotated by normal
 		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(1.0f, 1.0f, 0.0f));
 		CN(pTestContext->pQuad[quadCount]);
@@ -179,7 +179,7 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuads() {
 		pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
 		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
 		xPos -= 1.0f;
-		*/
+		//*/
 
 		for (int i = 0; i < 4; i++) {
 			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
