@@ -60,6 +60,10 @@ CollisionManifold BoundingVolume::Collide(BoundingVolume* pRHS) {
 	return CollisionManifold(this->m_pParent, pRHS->GetParentObject());
 }
 
+vector BoundingVolume::GetScale() {
+	return m_pParent->GetScale();
+}
+
 quaternion BoundingVolume::GetOrientation() { 
 	return m_pParent->GetOrientation(); 
 }

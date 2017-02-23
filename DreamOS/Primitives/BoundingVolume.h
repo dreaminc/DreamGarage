@@ -75,6 +75,7 @@ public:
 	VirtualObj *GetParentObject() const;
 	point GetOrigin();
 	quaternion GetOrientation();
+	vector GetScale();
 
 	// These provide the absolute orientation/origin of the object
 	point GetAbsoluteOrigin();

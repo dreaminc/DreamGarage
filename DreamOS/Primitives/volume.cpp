@@ -92,6 +92,8 @@ RESULT volume::UpdateFromBoundingBox(BoundingBox* pBoundingBox, bool fTriangleBa
 		SetOrientation(pBoundingBox->GetOrientation());
 	}
 
+	SetScale(pBoundingBox->GetScale());
+
 Error:
 	return r;
 }
