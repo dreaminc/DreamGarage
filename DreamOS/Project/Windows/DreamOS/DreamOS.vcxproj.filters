@@ -183,6 +183,9 @@
     <Filter Include="DreamTestApp">
       <UniqueIdentifier>{921ea31d-7767-45b3-8296-bb5f9e9725eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="InteractionEngine">
+      <UniqueIdentifier>{4bf81ee4-33cb-4648-aeeb-4c7752abaad8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -574,6 +577,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\DreamUIBar.cpp">
       <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\Integrator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp">
+      <Filter>InteractionEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2296,6 +2317,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\DreamUIBar.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\Integrator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\TestSuiteFactory.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h">
+      <Filter>InteractionEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

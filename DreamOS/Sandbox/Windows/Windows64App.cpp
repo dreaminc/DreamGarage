@@ -252,6 +252,8 @@ RESULT Windows64App::InitializePathManager() {
 
 	// Initialize Path Manager
 	m_pPathManager = PathManagerFactory::MakePathManager(PATH_MANAGER_WIN32);
+
+	CNM(m_pPathManager, "Failed to allocated path manager");
 	CVM(m_pPathManager, "Failed to initialize path manager");
 
 	m_pPathManager->PrintPaths();
@@ -368,6 +370,13 @@ RESULT Windows64App::UnregisterUIThreadCallback() {
 
 long Windows64App::GetTickCount() {
 	return static_cast<long>(GetTickCount());
+}
+
+RESULT Windows64App::GetSandboxWindowSize(int &width, int &height) {
+	width = m_pxWidth;
+	height = m_pxHeight;
+
+	return R_PASS;
 }
 
 RESULT Windows64App::InitializeSandbox() {

@@ -26,6 +26,7 @@
 #include "Cloud/CloudController.h"
 
 #include "PhysicsEngine/PhysicsEngine.h"
+#include "InteractionEngine/InteractionEngine.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -72,9 +73,11 @@ public:
 
 private:
 	RESULT InitializePhysicsEngine();
+	RESULT InitializeInteractionEngine();
 
 protected:
 	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
+	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 
 public:
 	enum class SANDBOX_WINDOW_POSITION {
@@ -97,6 +100,7 @@ public:
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
+	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
 
 public:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
@@ -123,10 +127,16 @@ protected:
 	RESULT RegisterImpViveControllerEvents();
 
 public:
+	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
+
+public:
 	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
+
+	RESULT AddInteractionObject(VirtualObj *pObject);
+	RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT RemoveAllObjects();
 
@@ -220,12 +230,15 @@ protected:
 	PathManager *m_pPathManager;
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;		// TODO: fix it!
 	
+	// TODO: Should these be in their respective "engine" objects?
 	ObjectStore *m_pPhysicsGraph;	
+	ObjectStore *m_pInteractionGraph;
 	ObjectStore *m_pSceneGraph;
 	ObjectStore *m_pFlatSceneGraph;
 
 	CloudController *m_pCloudController;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;
+	std::unique_ptr<InteractionEngine> m_pInteractionEngine;
 
 	// TODO: Generalize to hands controller or something like that (should cover all of the various sensors)
 	std::unique_ptr<SenseLeapMotion> m_pSenseLeapMotion;

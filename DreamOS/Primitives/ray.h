@@ -28,6 +28,13 @@ public:
 		// Empty
 	}
 
+	ray(const ray &r) :
+		m_ptOrigin(r.m_ptOrigin),
+		m_vDirection(r.m_vDirection)
+	{
+		// Empty
+	}
+
 	friend class BoundingVolume;
 
 	vector GetVector() const {

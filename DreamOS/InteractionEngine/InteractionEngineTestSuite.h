@@ -1,0 +1,41 @@
+#ifndef INTERACTION_ENGINE_TEST_SUITE_H_
+#define INTERACTION_ENGINE_TEST_SUITE_H_
+
+#include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/Primitives/matrix/MatrixTestSuite.h
+
+#include "Primitives/valid.h"
+#include "Primitives/Subscriber.h"
+#include "Test/TestSuite.h"
+
+#include <functional>
+#include <memory>
+
+class DreamOS;
+class composite;
+struct InteractionObjectEvent;
+
+// TODO: Consider moving valid up to TestSuite
+class InteractionEngineTestSuite : public valid, public TestSuite, public Subscriber<InteractionObjectEvent> {
+public:
+	InteractionEngineTestSuite(DreamOS *pDreamOS);
+	~InteractionEngineTestSuite();
+
+	virtual RESULT AddTests() override;
+
+	RESULT AddTestCompositeRay();
+
+	RESULT ResetTest(void *pContext);
+	RESULT AddNestedCompositeQuads(int nestingLevel, float size, std::shared_ptr<composite> pCompositeParent);
+
+public:
+	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
+
+private:
+	DreamOS *m_pDreamOS;
+
+};
+
+#endif // ! INTERACTION_ENGINE_TEST_SUITE_H_

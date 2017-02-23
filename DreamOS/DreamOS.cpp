@@ -128,6 +128,10 @@ RESULT DreamOS::Exit(RESULT exitcode) {
 	return exitcode;
 }
 
+RESULT DreamOS::GetMouseRay(ray &rCast, double t) {
+	return m_pSandbox->GetMouseRay(rCast, t);
+}
+
 RESULT DreamOS::SetHALConfiguration(HALImp::HALConfiguration halconf) {
 	return m_pSandbox->SetHALConfiguration(halconf);
 }
@@ -139,6 +143,15 @@ const HALImp::HALConfiguration& DreamOS::GetHALConfiguration() {
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
+}
+
+// This is a pass-thru at the moment
+RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
+	return m_pSandbox->AddInteractionObject(pObject);
+}
+
+RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
+	return m_pSandbox->UpdateInteractionPrimitive(rCast);
 }
 
 RESULT DreamOS::SetGravityAcceleration(double acceleration) {
@@ -260,6 +273,16 @@ RESULT DreamOS::RegisterObjectCollision(VirtualObj *pVirtualObject) {
 	RESULT r = R_PASS;
 
 	r = m_pSandbox->RegisterObjectAndSubscriber(pVirtualObject, this);
+	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	RESULT r = R_PASS;
+
+	r = m_pSandbox->RegisterEventSubscriber(eventType, pInteractionSubscriber);
 	CR(r);
 
 Error:

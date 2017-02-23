@@ -135,3 +135,14 @@ ray DimRay::GetRay() {
 
 	return ray(ptOrigin, vDirection);
 }
+
+RESULT DimRay::UpdateFromRay(const ray &rCast) {
+	RESULT r = R_PASS;
+
+	SetOrigin(rCast.GetOrigin());
+
+	// TODO: Handle orientation etc 
+
+//Error:
+	return r;
+}

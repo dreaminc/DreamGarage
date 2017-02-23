@@ -48,6 +48,8 @@ public:
 	virtual RESULT LoadScene() = 0;
 	virtual RESULT Update(void) = 0;
 
+	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
+
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
@@ -58,6 +60,9 @@ public:
 	RESULT AddPhysicsObject(VirtualObj *pObject);
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
+
+	RESULT AddInteractionObject(VirtualObj *pObject);
+	RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT RemoveAllObjects();
 
@@ -110,8 +115,12 @@ protected:
 	// Physics Engine
 protected:
 	RESULT RegisterObjectCollision(VirtualObj *pVirtualObject);
+
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
 	
+public:
+	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+
 	// Cloud Controller
 protected:
 	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);
