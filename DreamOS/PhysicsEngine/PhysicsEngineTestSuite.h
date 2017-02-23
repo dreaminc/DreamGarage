@@ -24,7 +24,6 @@ public:
 	RESULT AddTestMultiCompositeRayQuad();
 	RESULT AddTestRay();
 	RESULT AddTestRayQuads();
-	RESULT AddTestBoundingScale();
 	RESULT AddTestBallVolume();
 	RESULT AddTestVolumeVolumePointFace();
 	RESULT AddTestVolumeToPlaneVolume();
@@ -40,6 +39,12 @@ public:
 	RESULT AddTestCompositeCollisionSphereVolume();
 	RESULT AddTestCompositeCollisionVolumeSphere();
 	RESULT AddTestCompositeCollisionSphereQuads();
+	
+	RESULT AddTestBoundingScale();
+	RESULT AddTestBoundingScaleSphereVolume();
+	RESULT AddTestBoundingScaleSphereQuad();
+	RESULT AddTestBoundingScaleSpheres();
+	RESULT AddTestBoundingScaleVolumes();
 
 	RESULT ResetTest(void *pContext);
 

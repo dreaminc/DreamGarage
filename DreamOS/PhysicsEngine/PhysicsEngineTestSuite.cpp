@@ -16,6 +16,7 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBoundingScaleSphereVolume());
 	CR(AddTestBoundingScale());
 
 	CR(AddTestRayQuads());
@@ -107,12 +108,87 @@ RESULT PhysicsEngineTestSuite::AddTestBoundingScale() {
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Bounding scale test");
-	pNewTest->SetTestDescription("Bounding scale test");
+	pNewTest->SetTestDescription("Bounding scale test to see that all bounding volume reference geometry is scaled correctly");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereVolume() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 25.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		m_pDreamOS->SetGravityState(false);
+
+		// Ball to Volume
+		auto pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+
+		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(10.0f);
+		pVolume->Scale(0.5f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		auto pSphere1 = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		pSphere1->SetPosition(point(3.0f, 0.75f, 0.0f));
+		pSphere1->SetMass(1.0f);
+		pSphere1->Scale(0.5f);
+		pSphere1->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		m_pDreamOS->AddPhysicsObject(pSphere1);
+
+		auto pSphere2 = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		pSphere2->SetPosition(point(3.0f, -0.5f, 0.0f));
+		pSphere2->SetMass(1.0f);
+		pSphere2->Scale(0.5f);
+		pSphere2->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		m_pDreamOS->AddPhysicsObject(pSphere2);
+
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Scaled Sphere Volume");
+	pNewTest->SetTestDescription("Collision of scaled sphere and volume");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSpheres() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereQuad() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScaleVolumes() {
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT PhysicsEngineTestSuite::AddTestBallVolume() {

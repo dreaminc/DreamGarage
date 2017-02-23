@@ -38,8 +38,8 @@ bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 	if (m_type == Type::OBB) {
 		//ptSphereOrigin = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
 		ptSphereOrigin = (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (ptSphereOrigin - GetAbsoluteOrigin()));
-		ptMax = m_vHalfSize;
-		ptMin = m_vHalfSize * -1.0f;
+		ptMax = GetHalfVector();
+		ptMin = GetHalfVector() * -1.0f;
 	}
 
 	// TODO: We may want to replace this with SAT as a coarse early test instead
@@ -75,8 +75,8 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 		//ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
 		//ptSphereOrigin = (point)(inverse(this->m_pParent->GetModelMatrix()) * ptSphereOrigin);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (ptSphereOrigin - GetAbsoluteOrigin()));
-		ptMax = m_vHalfSize;
-		ptMin = m_vHalfSize * -1.0f;
+		ptMax = GetHalfVector();
+		ptMin = GetHalfVector() * -1.0f;
 	}
 
 	float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
@@ -660,6 +660,8 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 
 // http://www.willperone.net/Code/coderr.php
 vector BoundingBox::GetHalfVector() {
+	vector vScale = GetScale();
+
 	if (m_type == Type::AABB) {
 		RotationMatrix rotMat = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
@@ -680,11 +682,12 @@ vector BoundingBox::GetHalfVector() {
 				length = pt.z();
 		}
 
-		return vector(width, height, length);
+		return vector(width * vScale.x(), height * vScale.y(), length * vScale.z());
 	}
 	
 	// Otherwise it's OBB
-	return m_vHalfSize;
+	//return m_vHalfSize;
+	return vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());
 }
 
 double BoundingBox::OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
