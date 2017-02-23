@@ -6,7 +6,19 @@
 InteractionEngineTestSuite::InteractionEngineTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
-	// empty
+	RESULT r = R_PASS;
+
+	// Subscribers
+	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+		CR(m_pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), this));
+	}
+
+//Success:
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
 }
 
 InteractionEngineTestSuite::~InteractionEngineTestSuite() {
@@ -30,6 +42,45 @@ RESULT InteractionEngineTestSuite::ResetTest(void *pContext) {
 	CR(m_pDreamOS->RemoveAllObjects());
 
 Error:
+	return r;
+}
+
+RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
+	RESULT r = R_PASS;
+
+	// handle event
+	switch (mEvent->m_eventType) {
+		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
+			DEBUG_LINEOUT("began");
+
+			/*
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+			
+			if (pDimObj != nullptr) {
+				pDimObj->RotateYByDeg(45.0f);
+			}
+			*/
+
+		} break;
+
+		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
+			DEBUG_LINEOUT("moved");
+		} break;
+
+		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
+			DEBUG_LINEOUT("ended");
+
+			/*
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				pDimObj->ResetRotation();
+			}
+			*/
+		} break;
+	}
+
+//Error:
 	return r;
 }
 

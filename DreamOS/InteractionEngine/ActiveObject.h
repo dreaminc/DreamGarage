@@ -11,6 +11,7 @@
 #include "Primitives/vector.h"
 
 class VirtualObj;
+class ContactPoint;
 
 class ActiveObject {
 public:
@@ -27,6 +28,10 @@ public:
 	
 	ActiveObject::state GetState();
 	RESULT SetState(ActiveObject::state newstate);
+
+	RESULT SetContactPoint(ContactPoint contactPoint);
+	RESULT SetInteractionPoint(point ptIntersection);
+	RESULT SetIntersectionNormal(vector vNormal);
 
 	point GetIntersectionPoint();
 	vector GetIntersectionNormal();

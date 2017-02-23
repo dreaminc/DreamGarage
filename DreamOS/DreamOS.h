@@ -115,8 +115,12 @@ protected:
 	// Physics Engine
 protected:
 	RESULT RegisterObjectCollision(VirtualObj *pVirtualObject);
+
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
 	
+public:
+	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+
 	// Cloud Controller
 protected:
 	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);

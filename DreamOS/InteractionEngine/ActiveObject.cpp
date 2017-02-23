@@ -1,4 +1,5 @@
 #include "ActiveObject.h"
+#include "PhysicsEngine/ContactPoint.h"
 
 ActiveObject::ActiveObject(VirtualObj *pObject) :
 	m_pObject(pObject),
@@ -34,4 +35,21 @@ vector ActiveObject::GetIntersectionNormal() {
 
 VirtualObj* ActiveObject::GetObject() {
 	return m_pObject;
+}
+
+RESULT ActiveObject::SetInteractionPoint(point ptIntersection) {
+	m_ptIntersection = ptIntersection;
+	return R_PASS;
+}
+
+RESULT ActiveObject::SetIntersectionNormal(vector vNormal) {
+	m_vNormal = vNormal;
+	return R_PASS;
+}
+
+RESULT ActiveObject::SetContactPoint(ContactPoint contactPoint) {
+	m_ptIntersection = contactPoint.GetPoint();
+	m_vNormal = contactPoint.GetNormal();
+
+	return R_PASS;
 }

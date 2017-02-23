@@ -279,6 +279,16 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	RESULT r = R_PASS;
+
+	r = m_pSandbox->RegisterEventSubscriber(eventType, pInteractionSubscriber);
+	CR(r);
+
+Error:
+	return r;
+}
+
 // Cloud Controller
 RESULT DreamOS::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
 	return m_pSandbox->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);

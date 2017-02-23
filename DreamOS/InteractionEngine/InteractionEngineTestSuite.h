@@ -6,6 +6,8 @@
 // DREAM OS
 // DreamOS/Primitives/matrix/MatrixTestSuite.h
 
+#include "Primitives/valid.h"
+#include "Primitives/Subscriber.h"
 #include "Test/TestSuite.h"
 
 #include <functional>
@@ -13,8 +15,10 @@
 
 class DreamOS;
 class composite;
+struct InteractionObjectEvent;
 
-class InteractionEngineTestSuite : public TestSuite {
+// TODO: Consider moving valid up to TestSuite
+class InteractionEngineTestSuite : public valid, public TestSuite, public Subscriber<InteractionObjectEvent> {
 public:
 	InteractionEngineTestSuite(DreamOS *pDreamOS);
 	~InteractionEngineTestSuite();
@@ -25,6 +29,9 @@ public:
 
 	RESULT ResetTest(void *pContext);
 	RESULT AddNestedCompositeQuads(int nestingLevel, float size, std::shared_ptr<composite> pCompositeParent);
+
+public:
+	virtual RESULT Notify(InteractionObjectEvent *mEvent) override;
 
 private:
 	DreamOS *m_pDreamOS;

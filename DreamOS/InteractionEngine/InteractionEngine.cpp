@@ -11,6 +11,12 @@ InteractionEngine::InteractionEngine() {
 RESULT InteractionEngine::Initialize() {
 	RESULT r = R_PASS;
 
+	// Register Events
+	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+		RegisterEvent((InteractionEventType)(i));
+	}
+
+	// Ray
 	m_pInteractionRay = std::make_shared<ray>();
 	CN(m_pInteractionRay);
 
@@ -96,14 +102,6 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 				if ((numContacts = manifold.NumContacts()) > 0) {
 
-					/*
-					InteractionObjectEvent interactionEvent(ELEMENT_INTERSECT_BEGAN, m_pInteractionRay, pObject);
-					for (int i = 0; i < numContacts; i++)
-						interactionEvent.AddPoint(manifold.GetContactPoint(i));
-
-					CR(NotifySubscribers(ELEMENT_INTERSECT_BEGAN, &interactionEvent));
-					*/
-					
 					// Manifold should return only one object, one will be nullptr
 					pObj = manifold.GetObjectA();
 					if(pObj == nullptr)
@@ -115,22 +113,28 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 					if (pActiveObject == nullptr) {
 						pActiveObject = AddActiveObject(manifold.GetObjectA());
-						CN(pActiveObject)
-						// Notify element intersect begin
-					}
-					
-					switch (pActiveObject->GetState()) {
-						case ActiveObject::state::NOT_INTERSECTED: {
-							// Notify start
-							pActiveObject->SetState(ActiveObject::state::INTERSECTED);
-						} break;
+						CN(pActiveObject);
 
-						case ActiveObject::state::INTERSECTED: {
-							// Notify continue
-							pActiveObject->SetState(ActiveObject::state::INTERSECTED);
-						} break;
+						pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
+
+						// Notify element intersect begin
+						InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN, m_pInteractionRay, pObj);
+						for(int i = 0; i < manifold.NumContacts(); i++)
+							interactionEvent.AddPoint(manifold.GetContactPoint(i));
+						NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_BEGAN, &interactionEvent);
+					}
+					else {
+						// TODO: diff against previous point
+						pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
+
+						// Notify element intersect continue
+						InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_MOVED, m_pInteractionRay, pObj);
+						for (int i = 0; i < manifold.NumContacts(); i++)
+							interactionEvent.AddPoint(manifold.GetContactPoint(i));
+						NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
 					}
 					
+					pActiveObject->SetState(ActiveObject::state::INTERSECTED);
 				}
 			}
 		}
@@ -138,8 +142,8 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	
 	
 	for (auto &pActiveObject : m_activeObjects) {
+		// Add to remove list if not intersected in current frame
 		if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
-			// Add to remove list
 			activeObjectsToRemove.push_back(pActiveObject);
 		}
 	}
@@ -147,6 +151,13 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	for (auto &pActiveObject : activeObjectsToRemove) {
 		// Notify no longer intersected
 		CR(RemoveActiveObject(pActiveObject));
+
+		// Notify element intersect continue
+		// This uses the last available point 
+		// TODO: Add projection , find exit point, do we need that?
+		InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED, m_pInteractionRay, pActiveObject->GetObject());
+		interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
+		NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_ENDED, &interactionEvent);
 	}
 	
 

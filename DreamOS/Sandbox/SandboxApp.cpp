@@ -510,6 +510,16 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	RESULT r = R_PASS;
+
+	r = m_pInteractionEngine->RegisterSubscriber(eventType, pInteractionSubscriber);
+	CR(r);
+
+Error:
+	return r;
+}
+
 long SandboxApp::GetTickCount() {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
