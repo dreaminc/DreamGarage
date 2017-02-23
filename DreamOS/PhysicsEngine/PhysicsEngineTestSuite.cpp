@@ -156,7 +156,8 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuads() {
 		CN(pTestContext->pQuad[quadCount]);
 		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
 		pTestContext->pQuad[quadCount]->SetMass(1.0f);
-		pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		pTestContext->pQuad[quadCount]->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
 		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
 		xPos -= 1.0f;
 

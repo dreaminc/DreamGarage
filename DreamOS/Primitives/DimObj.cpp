@@ -697,7 +697,7 @@ RESULT DimObj::InitializeBoundingQuad(point ptOrigin, float width, float height,
 	m_pBoundingVolume = std::shared_ptr<BoundingQuad>(new BoundingQuad(this, ptOrigin, vNormal, width, height));
 	CN(m_pBoundingVolume);
 
-	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::INVALID);
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);
 
 	//CR(UpdateBoundingVolume());
 
