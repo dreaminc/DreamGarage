@@ -53,13 +53,11 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
 			DEBUG_LINEOUT("began");
 
-			/*
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 			
 			if (pDimObj != nullptr) {
 				pDimObj->RotateYByDeg(45.0f);
 			}
-			*/
 
 		} break;
 
@@ -70,13 +68,11 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
 			DEBUG_LINEOUT("ended");
 
-			/*
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 
 			if (pDimObj != nullptr) {
 				pDimObj->ResetRotation();
 			}
-			*/
 		} break;
 	}
 
