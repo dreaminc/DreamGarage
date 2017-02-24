@@ -16,6 +16,7 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBoundingScaleSphereQuad());
 	CR(AddTestBoundingScaleSpheres());
 	CR(AddTestBoundingScaleSphereVolume());
 	CR(AddTestBoundingScale());
@@ -303,7 +304,74 @@ Error:
 }
 
 RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereQuad() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	double sTestTime = 10.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(true);
+
+		// Quad vs Sphere
+		double spacing = 1.75f;
+		double angleFactor = 0.2f;
+
+		quad *pQuad1 = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(angleFactor, 1.0f, 0.0f));
+		CN(pQuad1);
+		pQuad1->SetPosition(point(-spacing, -1.0f, 0.0f));
+		pQuad1->SetMass(1.0f);
+		pQuad1->SetImmovable(true);
+		pQuad1->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pQuad1));
+
+		quad *pQuad2 = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(-angleFactor, 1.0f, 0.0f));
+		CN(pQuad2);
+		pQuad2->SetPosition(point(spacing, -1.0f, 0.0f));
+		pQuad2->SetMass(1.0f);
+		pQuad2->SetImmovable(true);
+		pQuad2->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pQuad2));
+
+		sphere *pSphere1 = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere1);
+		pSphere1->SetPosition(point(-spacing, 2.0f, 0.0f));
+		pSphere1->SetMass(1.0f);
+		//pSphere1->SetVelocity(0.0f, -1.0f, 0.0f);
+		pSphere1->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere1));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Scaled Quad vs Sphere");
+	pNewTest->SetTestDescription("Scaled Sphere colliding with quads");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
 }
 
 RESULT PhysicsEngineTestSuite::AddTestBoundingScaleVolumes() {

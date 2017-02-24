@@ -72,8 +72,8 @@ bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
 		//point ptMin = GetMinPoint();
 
 		///*
-		point ptMax = point(m_width, m_height, 0.0f);
-		point ptMin = point(-m_width, -m_height, 0.0f);
+		point ptMax = point(GetWidth() / 2.0f, GetHeight() / 2.0f, 0.0f);
+		point ptMin = point((-1.0f * GetWidth()) / 2.0f, (-1.0f * GetHeight()) / 2.0f, 0.0f);
 
 		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
 		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
@@ -110,8 +110,8 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 		//point ptMin = GetMinPoint();
 
 		///*
-		point ptMax = point(m_width/2.0f, m_height/2.0f, 0.0f);
-		point ptMin = point(-m_width/2.0f, -m_height/2.0f, 0.0f);
+		point ptMax = point(GetWidth() / 2.0f, GetHeight() / 2.0f, 0.0f);
+		point ptMin = point((-1.0f * GetWidth()) / 2.0f, (-1.0f * GetHeight())/2.0f, 0.0f);
 
 		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
 		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
@@ -186,6 +186,7 @@ bool BoundingQuad::Intersect(const ray& r) {
 }
 
 // https://www.scratchapixel.com/lessons/3d-basic-rendering/minimal-ray-tracer-rendering-simple-shapes/ray-plane-and-ray-disk-intersection
+// Note this does not check bounds like intersect
 CollisionManifold BoundingQuad::Collide(const ray &rCast) {
 	CollisionManifold manifold = CollisionManifold(this->m_pParent, nullptr);
 
@@ -222,11 +223,11 @@ RESULT BoundingQuad::SetHalfVector(vector vHalfVector) {
 }
 
 double BoundingQuad::GetWidth() {
-	return m_width;
+	return m_width * GetScale().x();
 }
 
 double BoundingQuad::GetHeight() {
-	return m_height;
+	return m_height* GetScale().y();
 }
 
 vector BoundingQuad::GetNormal() {
