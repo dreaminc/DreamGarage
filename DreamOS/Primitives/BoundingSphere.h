@@ -36,7 +36,7 @@ public:
 	virtual CollisionManifold Collide(const ray &rCast) override;
 
 	// TODO: Bounding sphere does not work with scale where not all equal
-	float GetRadius() {
+	float GetRadius() const {
 		return m_radius * GetScale().x();
 	}
 

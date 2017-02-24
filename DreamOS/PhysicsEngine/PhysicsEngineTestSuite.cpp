@@ -16,6 +16,7 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBoundingScaleSpheres());
 	CR(AddTestBoundingScaleSphereVolume());
 	CR(AddTestBoundingScale());
 
@@ -180,7 +181,125 @@ Error:
 }
 
 RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSpheres() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	double sTestTime = 20.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		sphere *pSphere = nullptr;
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, -0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.5f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, -0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 1.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(0.0f, -1.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, -1.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(0.0f, 1.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Scaled Sphere vs Sphere");
+	pNewTest->SetTestDescription("Scaled spheres colliding with one another in a chain");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
 }
 
 RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereQuad() {
