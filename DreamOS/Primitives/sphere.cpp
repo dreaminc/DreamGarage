@@ -77,6 +77,8 @@ RESULT sphere::UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere, bool fT
 	// TODO: This is optional
 	SetOrientation(pBoundingSphere->GetOrientation());
 
+	//SetScale(pBoundingSphere->GetScale());
+
 Error:
 	return r;
 }

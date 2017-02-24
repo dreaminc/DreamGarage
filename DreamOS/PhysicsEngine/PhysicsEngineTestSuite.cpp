@@ -16,6 +16,14 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMultiCompositeRayScaledQuad());
+	CR(AddTestRayScaledQuads());
+	CR(AddTestBoundingScaleVolumes());
+	CR(AddTestBoundingScaleSphereQuad());
+	CR(AddTestBoundingScaleSpheres());
+	CR(AddTestBoundingScaleSphereVolume());
+	CR(AddTestBoundingScale());
+
 	CR(AddTestRayQuads());
 	CR(AddTestRay());
 	CR(AddTestCompositeCollisionSphereQuads());
@@ -46,6 +54,749 @@ RESULT PhysicsEngineTestSuite::ResetTest(void *pContext) {
 	// Will reset the sandbox as needed between tests
 	CN(m_pDreamOS);
 	CR(m_pDreamOS->RemoveAllObjects());
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScale() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 25.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		m_pDreamOS->SetGravityState(false);
+
+		// Ball to Volume
+		auto pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+
+		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		auto pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		pSphere->SetPosition(point(3.0f, 0.75f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->Scale(0.5f);
+		//pSphere->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		m_pDreamOS->AddPhysicsObject(pSphere);
+
+		auto pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
+		pQuad->SetPosition(point(0.0f, -1.0f, 0.0f));
+		pQuad->SetMass(1.0f);
+		pQuad->Scale(0.5f);
+		m_pDreamOS->AddPhysicsObject(pQuad);
+
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Bounding scale test");
+	pNewTest->SetTestDescription("Bounding scale test to see that all bounding volume reference geometry is scaled correctly");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereVolume() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 25.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		m_pDreamOS->SetGravityState(false);
+
+		// Ball to Volume
+		auto pVolume = m_pDreamOS->AddVolume(0.5, 0.5, 2.0f);
+
+		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(10.0f);
+		pVolume->Scale(0.5f);
+		m_pDreamOS->AddPhysicsObject(pVolume);
+
+		auto pSphere1 = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		pSphere1->SetPosition(point(3.0f, 0.75f, 0.0f));
+		pSphere1->SetMass(1.0f);
+		pSphere1->Scale(0.5f);
+		pSphere1->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		m_pDreamOS->AddPhysicsObject(pSphere1);
+
+		auto pSphere2 = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		pSphere2->SetPosition(point(3.0f, -0.5f, 0.0f));
+		pSphere2->SetMass(1.0f);
+		pSphere2->Scale(0.5f);
+		pSphere2->SetVelocity(vector(-1.0f, 0.0f, 0.0f));
+		m_pDreamOS->AddPhysicsObject(pSphere2);
+
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Scaled Sphere Volume");
+	pNewTest->SetTestDescription("Collision of scaled sphere and volume");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSpheres() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 20.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		sphere *pSphere = nullptr;
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, -0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.5f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, -0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, 1.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(0.0f, -1.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(0.0f, -1.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(0.0f, 1.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+		pSphere = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
+		pSphere->SetMass(1.0f);
+		pSphere->SetVelocity(-1.0f, 0.0f, 0.0f);
+		pSphere->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Scaled Sphere vs Sphere");
+	pNewTest->SetTestDescription("Scaled spheres colliding with one another in a chain");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScaleSphereQuad() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(true);
+
+		// Quad vs Sphere
+		double spacing = 1.75f;
+		double angleFactor = 0.2f;
+
+		quad *pQuad1 = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(angleFactor, 1.0f, 0.0f));
+		CN(pQuad1);
+		pQuad1->SetPosition(point(-spacing, -1.0f, 0.0f));
+		pQuad1->SetMass(1.0f);
+		pQuad1->SetImmovable(true);
+		pQuad1->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pQuad1));
+
+		quad *pQuad2 = m_pDreamOS->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(-angleFactor, 1.0f, 0.0f));
+		CN(pQuad2);
+		pQuad2->SetPosition(point(spacing, -1.0f, 0.0f));
+		pQuad2->SetMass(1.0f);
+		pQuad2->SetImmovable(true);
+		pQuad2->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pQuad2));
+
+		sphere *pSphere1 = m_pDreamOS->AddSphere(0.25f, 10, 10);
+		CN(pSphere1);
+		pSphere1->SetPosition(point(-spacing, 2.0f, 0.0f));
+		pSphere1->SetMass(1.0f);
+		//pSphere1->SetVelocity(0.0f, -1.0f, 0.0f);
+		pSphere1->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pSphere1));
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Scaled Quad vs Sphere");
+	pNewTest->SetTestDescription("Scaled Sphere colliding with quads");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestBoundingScaleVolumes() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Volume vs Volume point - face
+
+		auto pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->SetVelocity(-1.0f / 2, 0.0f, 0.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-3.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Scaled Volume vs Volume Pt Face");
+	pNewTest->SetTestDescription("Scaled Volume colliding with volume pt to face");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestRayScaledQuads() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 25.0f;
+	int nRepeats = 1;
+	const int numQuads = 4;
+
+	struct RayTestContext {
+		DimRay *pRay = nullptr;
+		quad *pQuad[numQuads] = { nullptr };
+		sphere *pCollidePoint[4] = { nullptr };
+	};
+
+	RayTestContext *pTestContext = new RayTestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		double yPos = -1.0f;
+		double xPos = 2.0f;
+
+		// Ray to quads 
+		int quadCount = 0;
+
+		// Normal Quad
+
+		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad[quadCount]);
+		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetMass(1.0f);
+		pTestContext->pQuad[quadCount]->Scale(0.5f);
+		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
+		xPos -= 1.0f;
+
+		// Rotated by orientation
+		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad[quadCount]);
+		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetMass(1.0f);
+		pTestContext->pQuad[quadCount]->Scale(0.5f);
+		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		pTestContext->pQuad[quadCount]->SetRotationalVelocity(vector(0.0f, 1.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
+		xPos -= 1.0f;
+
+		///*
+		// Rotated by normal
+		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(1.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad[quadCount]);
+		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetMass(1.0f);
+		pTestContext->pQuad[quadCount]->Scale(0.5f);
+		//pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
+		xPos -= 1.0f;
+
+		// Rotated by normal and orientation (should be flat)
+		pTestContext->pQuad[quadCount] = m_pDreamOS->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(-1.0f, 1.0f, 0.0f));
+		CN(pTestContext->pQuad[quadCount]);
+		pTestContext->pQuad[quadCount]->SetPosition(point(xPos, yPos, 0.0f));
+		pTestContext->pQuad[quadCount]->SetMass(1.0f);
+		pTestContext->pQuad[quadCount]->Scale(0.5f);
+		pTestContext->pQuad[quadCount]->RotateZByDeg(45.0f);
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pQuad[quadCount++]));
+		xPos -= 1.0f;
+		//*/
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 2.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
+		CN(pTestContext->pRay);
+
+		///*
+		pTestContext->pRay->SetMass(1.0f);
+		pTestContext->pRay->SetVelocity(vector(0.4f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pRay));
+		//*/
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		CN(pTestContext->pRay);
+
+		for (int i = 0; i < 4; i++)
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+
+		// Check for quad collisions using the ray
+		for (int i = 0; i < numQuads; i++) {
+			if (pTestContext->pRay->Intersect(pTestContext->pQuad[i])) {
+				CollisionManifold manifold = pTestContext->pRay->Collide(pTestContext->pQuad[i]);
+
+				if (manifold.NumContacts() > 0) {
+					for (int i = 0; i < manifold.NumContacts(); i++) {
+						pTestContext->pCollidePoint[i]->SetVisible(true);
+						pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+					}
+				}
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Ray vs Scaled Quads");
+	pNewTest->SetTestDescription("Ray intersection of scaled quads oriented in various fashion");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT PhysicsEngineTestSuite::AddTestMultiCompositeRayScaledQuad() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 15.0f;
+	int nRepeats = 1;
+	static int nRepeatCounter = 0;
+
+	struct RayTestContext {
+		composite *pComposite = nullptr;
+		DimRay *pRay = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	};
+
+	RayTestContext *pTestContext = new RayTestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+		std::shared_ptr<composite> pCompositeChild = nullptr;
+		std::shared_ptr<quad> pQuad = nullptr;
+
+		double yPos = -1.0f;
+
+		// Ray to composite
+
+		pTestContext->pComposite = m_pDreamOS->AddComposite();
+		CN(pTestContext->pComposite);
+
+		composite *pComposite = pTestContext->pComposite;
+		CN(pComposite);
+
+		// Test the various bounding types
+		switch (nRepeatCounter) {
+		case 0: pComposite->InitializeOBB(); break;
+		case 1: pComposite->InitializeAABB(); break;
+		case 2: pComposite->InitializeBoundingSphere(); break;
+		}
+		pComposite->SetMass(1.0f);
+
+		pQuad = pComposite->AddQuad(0.5f, 0.5f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->Scale(0.5f);
+		pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
+
+		pCompositeChild = pComposite->AddComposite();
+		CN(pCompositeChild);
+		pCompositeChild->InitializeOBB();
+		pCompositeChild->SetMass(1.0f);
+		pCompositeChild->SetPosition(point(1.0f, 0.0f, 0.0f));
+
+		pQuad = pCompositeChild->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->Scale(0.5f);
+		pQuad->SetPosition(point(-0.5f, 0.0f, 0.0f));
+
+		pQuad = pCompositeChild->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->Scale(0.5f);
+		pQuad->SetPosition(point(0.5f, 0.0f, 0.0f));
+
+		pCompositeChild = pComposite->AddComposite();
+		CN(pCompositeChild);
+		pCompositeChild->InitializeOBB();
+		pCompositeChild->SetMass(1.0f);
+		pCompositeChild->SetPosition(point(-1.0f, 0.0f, 0.0f));
+
+		pQuad = pCompositeChild->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->Scale(0.5f);
+		pQuad->SetPosition(point(-0.5f, 0.0f, 0.0f));
+
+		pQuad = pCompositeChild->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f));
+		CN(pQuad);
+		pQuad->SetMass(1.0f);
+		pQuad->Scale(0.5f);
+		pQuad->SetPosition(point(0.5f, 0.0f, 0.0f));
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+			CN(pTestContext->pCollidePoint[i]);
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		pComposite->SetPosition(point(0.0f, yPos, 0.0f));
+		pComposite->RotateZByDeg(45.0f);
+
+		// Add physics composite
+		CR(m_pDreamOS->AddPhysicsObject(pComposite));
+
+		// The Ray
+		///*
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-4.0f, 2.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
+		CN(pTestContext->pRay);
+
+		///*
+		pTestContext->pRay->SetMass(1.0f);
+		pTestContext->pRay->SetVelocity(vector(0.4f, 0.0f, 0.0f));
+		CR(m_pDreamOS->AddPhysicsObject(pTestContext->pRay));
+		//*/
+
+		nRepeatCounter++;
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		CN(pTestContext->pComposite);
+		CN(pTestContext->pRay);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		// Check for composite collisions using the ray
+		{
+			CollisionManifold manifold = pTestContext->pComposite->Collide(pTestContext->pRay->GetRay());
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		RayTestContext *pTestContext = reinterpret_cast<RayTestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Ray vs Nested Composite Scaled Quads");
+	pNewTest->SetTestDescription("Ray intersection of multiple layers of nested scaled quads in a composite and resolving those points, also returning the object");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;

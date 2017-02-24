@@ -38,8 +38,8 @@ bool BoundingBox::Intersect(const BoundingSphere& rhs) {
 	if (m_type == Type::OBB) {
 		//ptSphereOrigin = GetOrigin() - (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
 		ptSphereOrigin = (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (ptSphereOrigin - GetAbsoluteOrigin()));
-		ptMax = m_vHalfSize;
-		ptMin = m_vHalfSize * -1.0f;
+		ptMax = GetHalfVector();
+		ptMin = GetHalfVector() * -1.0f;
 	}
 
 	// TODO: We may want to replace this with SAT as a coarse early test instead
@@ -75,8 +75,8 @@ CollisionManifold BoundingBox::Collide(const BoundingSphere& rhs) {
 		//ptSphereOrigin = (point)(inverse(RotationMatrix(GetOrientation())) * (GetOrigin() - ptSphereOrigin));
 		//ptSphereOrigin = (point)(inverse(this->m_pParent->GetModelMatrix()) * ptSphereOrigin);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(GetAbsoluteOrientation())) * (ptSphereOrigin - GetAbsoluteOrigin()));
-		ptMax = m_vHalfSize;
-		ptMin = m_vHalfSize * -1.0f;
+		ptMax = GetHalfVector();
+		ptMin = GetHalfVector() * -1.0f;
 	}
 
 	float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
@@ -208,8 +208,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			point ptBox = pBoxB->GetBoxPoint(boxPoint);
 			ptBox = (point)(inverse(RotationMatrix(qBoxAOrientation)) * (ptBox - ptBoxAOrigin));
 
-			point ptMax = pBoxA->m_vHalfSize;
-			point ptMin = pBoxA->m_vHalfSize * -1.0f;
+			point ptMax = pBoxA->GetHalfVector();
+			point ptMin = pBoxA->GetHalfVector() * -1.0f;
 
 			// Early out as quickly as possible
 			if ((ptBox <= ptMax && ptBox >= ptMin) == false) {
@@ -234,9 +234,9 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			// exactly zero 
 
 			BoundingBox::BoxFace boxFace;
-			double distanceX = pBoxA->m_vHalfSize.x() - std::abs(ptBox.x());
-			double distanceY = pBoxA->m_vHalfSize.y() - std::abs(ptBox.y());;
-			double distanceZ = pBoxA->m_vHalfSize.z() - std::abs(ptBox.z());;
+			double distanceX = pBoxA->GetHalfVector().x() - std::abs(ptBox.x());
+			double distanceY = pBoxA->GetHalfVector().y() - std::abs(ptBox.y());;
+			double distanceZ = pBoxA->GetHalfVector().z() - std::abs(ptBox.z());;
 
 			double minDistance = std::numeric_limits<double>::max();
 
@@ -363,8 +363,8 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 			vector vRay = lineBoxEdgeB.GetVector();
 
 			// We can now test intersection as if it's an AABB
-			point ptMax = pBoxA->m_vHalfSize;
-			point ptMin = pBoxA->m_vHalfSize * -1.0f;
+			point ptMax = pBoxA->GetHalfVector();
+			point ptMin = pBoxA->GetHalfVector() * -1.0f;
 
 			double tNear = -INFINITY;
 			double tFar = INFINITY;
@@ -412,10 +412,10 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				for (int i = 0; i < 3; i++) {
 					auto axisMagnitude = (ptEdgeMax(i) - ptEdgeMin(i));
 
-					if (axisMagnitude - (pBoxA->m_vHalfSize(i) * 2.0f) >= -DREAM_EPSILON) {
+					if (axisMagnitude - (pBoxA->GetHalfVector()(i) * 2.0f) >= -DREAM_EPSILON) {
 						weight = 2;
 					}
-					else if (axisMagnitude - (pBoxB->m_vHalfSize(i) * 2.0f) >= -DREAM_EPSILON) {
+					else if (axisMagnitude - (pBoxB->GetHalfVector()(i) * 2.0f) >= -DREAM_EPSILON) {
 						weight = 2;
 					}
 				}
@@ -423,13 +423,13 @@ CollisionManifold BoundingBox::Collide(const BoundingBox& rhs) {
 				double minDistance1 = std::numeric_limits<double>::max();
 				double minDistance2 = std::numeric_limits<double>::max();
 
-				double distanceX = pBoxA->m_vHalfSize.x() - std::abs(ptEdgeMid.x());
+				double distanceX = pBoxA->GetHalfVector().x() - std::abs(ptEdgeMid.x());
 				double distanceXabs = std::abs(distanceX);
 
-				double distanceY = pBoxA->m_vHalfSize.y() - std::abs(ptEdgeMid.y());;
+				double distanceY = pBoxA->GetHalfVector().y() - std::abs(ptEdgeMid.y());;
 				double distanceYabs = std::abs(distanceY);
 
-				double distanceZ = pBoxA->m_vHalfSize.z() - std::abs(ptEdgeMid.z());;
+				double distanceZ = pBoxA->GetHalfVector().z() - std::abs(ptEdgeMid.z());;
 				double distanceZabs = std::abs(distanceZ);
 
 				double penetration = 0.0f;
@@ -660,6 +660,8 @@ RESULT BoundingBox::SetMaxPointFromOrigin(point ptMax) {
 
 // http://www.willperone.net/Code/coderr.php
 vector BoundingBox::GetHalfVector() {
+	vector vScale = GetScale();
+
 	if (m_type == Type::AABB) {
 		RotationMatrix rotMat = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
@@ -680,11 +682,12 @@ vector BoundingBox::GetHalfVector() {
 				length = pt.z();
 		}
 
-		return vector(width, height, length);
+		return vector(width * vScale.x(), height * vScale.y(), length * vScale.z());
 	}
 	
 	// Otherwise it's OBB
-	return m_vHalfSize;
+	//return m_vHalfSize;
+	return vector(m_vHalfSize.x() * vScale.x(), m_vHalfSize.y() * vScale.y(), m_vHalfSize.z() * vScale.z());
 }
 
 double BoundingBox::OverlapOnAxisDistance(const BoundingBox& rhs, const vector &vAxis) {
@@ -868,7 +871,7 @@ BoundingBox BoundingBox::GetBoundingAABB() {
 }
 
 point BoundingBox::GetBoxPoint(BoxPoint ptType, bool fOriented) {
-	point retPoint = point(m_vHalfSize);
+	point retPoint = point(GetHalfVector());
 	switch (ptType) {
 		case BoxPoint::TOP_RIGHT_FAR: {
 			// nothing 

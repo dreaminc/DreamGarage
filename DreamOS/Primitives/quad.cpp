@@ -194,7 +194,7 @@ RESULT quad::UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleB
 
 	SetOrigin(pBoundingQuad->GetOrigin());
 	SetOrientation(pBoundingQuad->GetOrientation());
-
+	//SetScale(pBoundingQuad->GetScale());
 Error:
 	return r;
 }

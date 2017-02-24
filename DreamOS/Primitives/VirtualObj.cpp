@@ -117,6 +117,16 @@ VirtualObj* VirtualObj::MoveTo(point p) {
 	return this;
 }
 
+VirtualObj* VirtualObj::SetScale(vector vScale) {
+	m_vScale = vScale;
+	OnManipulation();
+	return this;
+}
+
+vector VirtualObj::GetScale() {
+	return m_vScale;
+}
+
 VirtualObj* VirtualObj::Scale(point_precision scale) {
 	m_vScale.x() = m_vScale.y() = m_vScale.z() = scale;
 	OnManipulation();
