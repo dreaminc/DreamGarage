@@ -16,6 +16,7 @@ PhysicsEngineTestSuite::~PhysicsEngineTestSuite() {
 RESULT PhysicsEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBoundingScaleVolumes());
 	CR(AddTestBoundingScaleSphereQuad());
 	CR(AddTestBoundingScaleSpheres());
 	CR(AddTestBoundingScaleSphereVolume());
@@ -375,7 +376,106 @@ Error:
 }
 
 RESULT PhysicsEngineTestSuite::AddTestBoundingScaleVolumes() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	double sTestTime = 6.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Volume vs Volume point - face
+
+		auto pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(3.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->SetVelocity(-1.0f / 2, 0.0f, 0.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(1.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(0.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+		pVolume = m_pDreamOS->AddVolume(0.5f);
+		CN(pVolume);
+		pVolume->SetPosition(point(-3.0f, 0.0f, 0.0f));
+		pVolume->RotateYByDeg(45.0f);
+		pVolume->RotateZByDeg(45.0f);
+		pVolume->SetMass(1.0f);
+		pVolume->Scale(0.5f);
+		CR(m_pDreamOS->AddPhysicsObject(pVolume));
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Scaled Volume vs Volume Pt Face");
+	pNewTest->SetTestDescription("Scaled Volume colliding with volume pt to face");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
 }
 
 RESULT PhysicsEngineTestSuite::AddTestBallVolume() {
