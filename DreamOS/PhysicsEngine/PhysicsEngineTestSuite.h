@@ -45,6 +45,8 @@ public:
 	RESULT AddTestBoundingScaleSphereQuad();
 	RESULT AddTestBoundingScaleSpheres();
 	RESULT AddTestBoundingScaleVolumes();
+	RESULT AddTestRayScaledQuads();
+	RESULT AddTestMultiCompositeRayScaledQuad();
 
 	RESULT ResetTest(void *pContext);
 
