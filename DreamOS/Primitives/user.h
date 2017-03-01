@@ -13,6 +13,8 @@
 
 #include <vector>
 
+#define HEAD_POS 0.25f
+
 class user : public composite {
 public:
 	typedef enum ControllerType {

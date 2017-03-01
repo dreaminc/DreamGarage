@@ -454,8 +454,6 @@ RESULT OpenVRDevice::UpdateHMD() {
 					ptControllerPosition += offset;
 					ptControllerPosition.w() = 1.0f;
 
-					// SetHandState has an additional constant that needs to be nullified for vive controllers
-					point setHandConstant = point(0.0f, 0.0f, 0.25f);
 
 					quaternion qOrientation = viewMat.GetOrientation();
 					qRotation.Reverse();
@@ -466,7 +464,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pControllerModelLeft->SetPosition(ptControllerPosition);
 						m_pControllerModelLeft->SetOrientation(qOrientation);
 
-						m_pLeftHand->SetPosition(ptControllerPosition + setHandConstant);
+						m_pLeftHand->SetPosition(ptControllerPosition);
 						m_pLeftHand->SetLocalOrientation(qOrientation);
 
 						fLeftHandTracked = true;
@@ -476,7 +474,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pControllerModelRight->SetPosition(ptControllerPosition);
 						m_pControllerModelRight->SetOrientation(qOrientation);
 
-						m_pRightHand->SetPosition(ptControllerPosition + setHandConstant);
+						m_pRightHand->SetPosition(ptControllerPosition);
 						m_pRightHand->SetLocalOrientation(qOrientation);
 
 						fRightHandTracked = true;

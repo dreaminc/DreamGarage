@@ -14,9 +14,10 @@ RESULT user::Initialize() {
 
 	m_pHead = AddModel(L"\\Models\\face4\\untitled.obj",
 					   nullptr,
-					   point(0.0f, 0.0f - 0.35f, 0.0f),
-					   0.02f,
+					   point(0.0f, 0.0f - 0.35f, HEAD_POS),
+					   0.018f,
 					   vector(0.0f, (float)M_PI, 0.0f));
+
 	m_pHeads.push_back(m_pHead);
 	//m_pHeadTextures.push_back(pHeadTexture);
 	//*/
