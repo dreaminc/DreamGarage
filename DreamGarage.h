@@ -46,7 +46,7 @@ private:
 	WebBrowserController* m_browserInKeyFocus = nullptr;
 };
 
-class DreamGarage : public DreamOS, public Subscriber<SenseMouseEvent>, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
+class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
 
 public:
 
@@ -82,9 +82,6 @@ public:
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
 
-	// SenseMouseEvent
-	virtual RESULT Notify(SenseMouseEvent *mEvent) override;
-
 	// SenseControllerEventSubscriber
 	virtual RESULT Notify(SenseControllerEvent *event) override;
 
@@ -117,12 +114,9 @@ private:
 	std::stack<std::string> m_menuPath;
 	std::shared_ptr<texture> m_pIconTexture;
 
-	//
-	DimRay *m_pUIRay = nullptr;
 	VirtualObj *m_pPrevSelected = nullptr;
-	sphere *pSphere1 = nullptr;
-	sphere *pSphere2 = nullptr;
 
+	// CEF
 	Browsers m_browsers;
 };
 
