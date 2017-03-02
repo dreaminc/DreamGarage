@@ -570,6 +570,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\..\UIMenuItemSubscriber.cpp" />
     <ClCompile Include="..\..\..\..\UIMenuLayer.cpp" />
     <ClCompile Include="..\..\..\..\UIModule.cpp" />
+    <ClCompile Include="..\..\..\..\UITestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
@@ -711,6 +712,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\..\UIMenuItemSubscriber.h" />
     <ClInclude Include="..\..\..\..\UIMenuLayer.h" />
     <ClInclude Include="..\..\..\..\UIModule.h" />
+    <ClInclude Include="..\..\..\..\UITestSuite.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />

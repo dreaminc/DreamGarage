@@ -54,19 +54,9 @@ RESULT DreamGarage::LoadScene() {
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
 	RegisterSubscriber(SENSE_TYPING_EVENT_TYPE::CHARACTER_TYPING, this);
 
-	// Mouse 
-	RegisterSubscriber(SENSE_MOUSE_EVENT_TYPE::SENSE_MOUSE_MOVE, this);
-	RegisterSubscriber(SENSE_MOUSE_EVENT_TYPE::SENSE_MOUSE_LEFT_BUTTON_UP, this);
-
 	// Controller
-	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_GRIP_DOWN, this);
-	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_GRIP_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_MOVE, this);
-	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this);
 	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_PAD_MOVE, this);
 
 	// Console
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
@@ -346,17 +336,6 @@ RESULT DreamGarage::LoadScene() {
 	m_menu["Play"] = { "a", "b", "c" };
 
 	m_menuPath = {};
-	
-	m_pUIRay = AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
-	CN(m_pUIRay);
-	m_pUIRay->SetVisible(false);
-
-	pSphere1 = AddSphere(0.02f, 10, 10);
-	pSphere1->SetVisible(false);
-
-	pSphere2 = AddSphere(0.02f, 10, 10);
-	pSphere2->SetVisible(false);
-
 
 Error:
 	return r;
@@ -436,11 +415,7 @@ RESULT DreamGarage::Update(void) {
 	// Update UI	
 	hand *pRightHand = GetHand(hand::HAND_TYPE::HAND_RIGHT);
 	
-	//TODO: replace with ray/composite collision code 
-	if (pRightHand != nullptr && m_pDreamUIBar->IsVisible() && m_pUIRay != nullptr) {
-
-		m_pUIRay->SetPosition(pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f));// -GetCamera()->camera::GetPosition());
-		m_pUIRay->SetOrientation(pRightHand->GetHandState().qOrientation);
+	if (pRightHand != nullptr && m_pDreamUIBar->IsVisible()) {
 
 		point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);
 		quaternion q = pRightHand->GetHandState().qOrientation;
@@ -458,30 +433,12 @@ RESULT DreamGarage::Update(void) {
 		CollisionManifold manifold = m_pDreamUIBar->GetComposite()->Collide(rcast);
 
 		if (manifold.NumContacts() > 0) {
-			int numContacts = manifold.NumContacts();
-
-			if (numContacts > 2)
-				numContacts = 2;
-/*
-			for (int i = 0; i < numContacts; i++) {
-				sphere *pSphere = (i == 0) ? pSphere1 : pSphere2;
-
-				pSphere->SetVisible(true);
-				pSphere->SetPosition(manifold.GetContactPoint(i).GetPoint());
-			}
-			//*/
-		}
-		OVERLAY_DEBUG_SET("contacts", manifold.NumContacts());
-
-		float large = 1.25f;
-
-		if (manifold.NumContacts() > 0) {
 			VirtualObj* a = manifold.GetObjectA();
 			VirtualObj* b = manifold.GetObjectB();
 
 			if (a && (!m_pPrevSelected || a != m_pPrevSelected)) {
-				a->ScaleX(large);
-				a->ScaleZ(large);
+				a->ScaleX(m_pDreamUIBar->GetLargeItemScale());
+				a->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
 
 				if (m_pPrevSelected) {
 					m_pPrevSelected->ScaleX(1.0f);
@@ -491,8 +448,8 @@ RESULT DreamGarage::Update(void) {
 				m_pPrevSelected = a;
 			}
 			else if (b && (!m_pPrevSelected || b != m_pPrevSelected)) {
-				b->ScaleX(large);
-				b->ScaleZ(large);
+				b->ScaleX(m_pDreamUIBar->GetLargeItemScale());
+				b->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
 
 				if (m_pPrevSelected) {
 					m_pPrevSelected->ScaleX(1.0f);
@@ -501,13 +458,6 @@ RESULT DreamGarage::Update(void) {
 
 				m_pPrevSelected = b;
 			}
-			/*
-			pSphere1->SetVisible(true);
-			pSphere2->SetVisible(true);
-
-			pSphere1->SetPosition(manifold.GetContactPoint(0).GetPoint());
-			pSphere2->SetPosition(manifold.GetContactPoint(1).GetPoint());
-			//*/
 		}
 		else if (manifold.NumContacts() == 0) {
 			if (m_pPrevSelected) {
@@ -516,9 +466,6 @@ RESULT DreamGarage::Update(void) {
 			}
 
 			m_pPrevSelected = nullptr;
-
-			//pSphere1->SetVisible(false);
-			//pSphere2->SetVisible(false);
 		}
 		OVERLAY_DEBUG_SET("contacts", manifold.NumContacts());
 	}
@@ -819,54 +766,6 @@ RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 	return r;
 }
 
-RESULT DreamGarage::Notify(SenseMouseEvent *mEvent) {
-	RESULT r = R_PASS;
-
-	switch (mEvent->EventType) {
-		case SENSE_MOUSE_EVENT_TYPE::SENSE_MOUSE_LEFT_BUTTON_UP: {
-
-			OVERLAY_DEBUG_SET("event", "mouse left up");
-			
-			CR(m_pDreamUIBar->HandleMenuUp(m_menu, m_menuPath));
-		} break;
-
-		//TODO: Currently broken
-		case SENSE_MOUSE_EVENT_TYPE::SENSE_MOUSE_MOVE: {
-			// TODO:
-			OVERLAY_DEBUG_SET("event", "mouse move");
-
-			if (m_pDreamUIBar->IsVisible()) {
-
-				// update ray / test stuff
-				//m_pUIRay
-				//CR(GetMouseRay(*m_pUIRay, 0.0f));
-				ray rCast;
-				CR(GetMouseRay(rCast, 0.0f));
-
-				CollisionManifold manifold = m_pDreamUIBar->GetComposite()->Collide(rCast);
-
-				if (manifold.NumContacts() > 0) {
-					int numContacts = manifold.NumContacts();
-
-					if (numContacts > 2)
-						numContacts = 2;
-
-					for (int i = 0; i < numContacts; i++) {
-						sphere *pSphere = (i == 0) ? pSphere1 : pSphere2;
-
-						pSphere->SetVisible(true);
-						pSphere->SetPosition(manifold.GetContactPoint(i).GetPoint());
-					}
-				}
-			}
-			
-		} break;
-	}
-
-Error:
-	return r;
-}
-
 RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 	RESULT r = R_PASS;
 
@@ -874,20 +773,9 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 	OVERLAY_DEBUG_SET("event", "none");
 
 	if (event->state.type == CONTROLLER_RIGHT) {
-		if (eventType == SENSE_CONTROLLER_TRIGGER_MOVE) {
-			OVERLAY_DEBUG_SET("event", "trigger move");
-		}
-		else if (eventType == SENSE_CONTROLLER_PAD_MOVE) {
-			OVERLAY_DEBUG_SET("event", "pad move");
-		}
-
-		else if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
-			OVERLAY_DEBUG_SET("event", "trigger down");
-		}
-
 		// TODO:  soon this code will be replaced with api requests, 
 		// as opposed to accessing the hardcoded local data structures
-		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
+		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
 			CR(m_pDreamUIBar->HandleTriggerUp(m_pPrevSelected, m_menu, m_menuPath));
 		}
@@ -895,15 +783,6 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 			OVERLAY_DEBUG_SET("event", "menu up");
 			CR(m_pDreamUIBar->HandleMenuUp(m_menu, m_menuPath));
 		}
-	}
-	else if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
-		OVERLAY_DEBUG_SET("event", "grip down");
-	}
-	else if (eventType == SENSE_CONTROLLER_GRIP_UP) {
-		OVERLAY_DEBUG_SET("event", "grip up");
-	}
-	else if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
-		OVERLAY_DEBUG_SET("event", "menu down");
 	}
 Error:
 	return r;

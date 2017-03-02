@@ -12,6 +12,7 @@ public:
 	enum class TEST_SUITE_TYPE : std::uint32_t {
 		PHYSICS,
 		INTERACTION,
+		UI,
 		INVALID
 	} ;
 

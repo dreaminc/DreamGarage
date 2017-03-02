@@ -65,6 +65,9 @@ private:
 	UIBarFormat m_barFormat;
 
 	std::shared_ptr<texture> m_pIconTexture;
+
+public:
+	float GetLargeItemScale();
 };
 
 

@@ -167,3 +167,7 @@ RESULT UIBar::UpdateCurrentUILayer(UILayerInfo& info) {
 Error:
 	return R_PASS;
 }
+
+float UIBar::GetLargeItemScale() {
+	return m_barFormat.itemScaleSelected;
+}
