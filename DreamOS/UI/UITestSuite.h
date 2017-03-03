@@ -27,6 +27,8 @@ public:
 	UITestSuite(DreamOS *pDreamOS);
 	~UITestSuite();
 
+	RESULT Initialize();
+
 	RESULT AddTestUI();
 
 	virtual RESULT AddTests() override;

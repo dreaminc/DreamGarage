@@ -2,7 +2,7 @@
 
 #include "PhysicsEngine/PhysicsEngineTestSuite.h"
 #include "InteractionEngine/InteractionEngineTestSuite.h"
-#include "../UITestSuite.h" //??
+#include "UI/UITestSuite.h"
 
 std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pContext) {
 	RESULT r = R_PASS;

@@ -1,7 +1,7 @@
 #include "UIModule.h"
 #include "Primitives/camera.h"
 
-#include "DreamOS/DreamOS.h"
+#include "DreamOS.h"
 
 UIModule::UIModule(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS),

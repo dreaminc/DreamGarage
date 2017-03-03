@@ -1,7 +1,7 @@
 #ifndef DREAM_UI_BAR_H_
 #define DREAM_UI_BAR_H_
 
-#include "UIBar.h"
+#include "UI/UIBar.h"
 #include "Primitives/composite.h"
 
 #include <functional>

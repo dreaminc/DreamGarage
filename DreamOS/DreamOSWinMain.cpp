@@ -3,7 +3,7 @@
 #include <ctime>
 #include "RESULT/EHM.h"
 
-#include "../DreamGarage.h"
+#include "DreamGarage/DreamGarage.h"
 #include "../DreamTestApp/DreamTestApp.h"
 #include "test/MatrixTestSuite.h"
 
