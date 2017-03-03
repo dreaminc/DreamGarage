@@ -562,15 +562,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\DreamGarage.cpp" />
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp" />
-    <ClCompile Include="..\..\..\..\DreamUIBar.cpp" />
-    <ClCompile Include="..\..\..\..\UIBar.cpp" />
-    <ClCompile Include="..\..\..\..\UIMenuItem.cpp" />
-    <ClCompile Include="..\..\..\..\UIMenuItemSubscriber.cpp" />
-    <ClCompile Include="..\..\..\..\UIMenuLayer.cpp" />
-    <ClCompile Include="..\..\..\..\UIModule.cpp" />
-    <ClCompile Include="..\..\..\..\UITestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
@@ -591,6 +583,8 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
@@ -702,17 +696,15 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
+    <ClCompile Include="..\..\..\UI\UIBar.cpp" />
+    <ClCompile Include="..\..\..\UI\UIMenuItem.cpp" />
+    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp" />
+    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp" />
+    <ClCompile Include="..\..\..\UI\UIModule.cpp" />
+    <ClCompile Include="..\..\..\UI\UITestSuite.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\DreamGarage.h" />
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h" />
-    <ClInclude Include="..\..\..\..\DreamUIBar.h" />
-    <ClInclude Include="..\..\..\..\UIBar.h" />
-    <ClInclude Include="..\..\..\..\UIMenuItem.h" />
-    <ClInclude Include="..\..\..\..\UIMenuItemSubscriber.h" />
-    <ClInclude Include="..\..\..\..\UIMenuLayer.h" />
-    <ClInclude Include="..\..\..\..\UIModule.h" />
-    <ClInclude Include="..\..\..\..\UITestSuite.h" />
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
@@ -751,6 +743,8 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
     <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h" />
     <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
@@ -1106,6 +1100,12 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Test\TestSuite.h" />
     <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
+    <ClInclude Include="..\..\..\UI\UIBar.h" />
+    <ClInclude Include="..\..\..\UI\UIMenuItem.h" />
+    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h" />
+    <ClInclude Include="..\..\..\UI\UIMenuLayer.h" />
+    <ClInclude Include="..\..\..\UI\UIModule.h" />
+    <ClInclude Include="..\..\..\UI\UITestSuite.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

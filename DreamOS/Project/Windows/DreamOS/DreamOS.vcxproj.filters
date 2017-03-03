@@ -186,6 +186,9 @@
     <Filter Include="InteractionEngine">
       <UniqueIdentifier>{4bf81ee4-33cb-4648-aeeb-4c7752abaad8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{28d7c94b-81c3-4992-85e4-1dabd8aad4d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -316,9 +319,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\HALImp.cpp">
       <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamGarage.cpp">
-      <Filter>DreamGarage</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp">
       <Filter>Cloud\webrtc</Filter>
@@ -560,24 +560,6 @@
     <ClCompile Include="..\..\..\Primitives\line.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\UIBar.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\UIMenuItem.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\UIMenuItemSubscriber.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\UIMenuLayer.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\UIModule.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamUIBar.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\PhysicsEngine\Integrator.cpp">
       <Filter>PhysicsEngine</Filter>
     </ClCompile>
@@ -596,7 +578,28 @@
     <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\UITestSuite.cpp">
+    <ClCompile Include="..\..\..\UI\UIBar.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuItem.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIModule.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2026,9 +2029,6 @@
     <ClInclude Include="..\..\..\DreamOS.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamGarage.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
@@ -2303,24 +2303,6 @@
     <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\UIBar.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\UIMenuItem.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\UIMenuItemSubscriber.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\UIMenuLayer.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\UIModule.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamUIBar.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\Integrator.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
@@ -2339,7 +2321,28 @@
     <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h">
       <Filter>InteractionEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\UITestSuite.h">
+    <ClInclude Include="..\..\..\UI\UIBar.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuItem.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuLayer.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIModule.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UITestSuite.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>

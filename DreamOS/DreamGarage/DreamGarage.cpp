@@ -433,30 +433,30 @@ RESULT DreamGarage::Update(void) {
 		CollisionManifold manifold = m_pDreamUIBar->GetComposite()->Collide(rcast);
 
 		if (manifold.NumContacts() > 0) {
-			VirtualObj* a = manifold.GetObjectA();
-			VirtualObj* b = manifold.GetObjectB();
+			VirtualObj* pObjA = manifold.GetObjectA();
+			VirtualObj* pObjB = manifold.GetObjectB();
 
-			if (a && (!m_pPrevSelected || a != m_pPrevSelected)) {
-				a->ScaleX(m_pDreamUIBar->GetLargeItemScale());
-				a->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
+			if (pObjA && (!m_pPrevSelected || pObjA != m_pPrevSelected)) {
+				pObjA->ScaleX(m_pDreamUIBar->GetLargeItemScale());
+				pObjA->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
 
 				if (m_pPrevSelected) {
 					m_pPrevSelected->ScaleX(1.0f);
 					m_pPrevSelected->ScaleZ(1.0f);
 				}
 
-				m_pPrevSelected = a;
+				m_pPrevSelected = pObjA;
 			}
-			else if (b && (!m_pPrevSelected || b != m_pPrevSelected)) {
-				b->ScaleX(m_pDreamUIBar->GetLargeItemScale());
-				b->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
+			else if (pObjB && (!m_pPrevSelected || pObjB != m_pPrevSelected)) {
+				pObjB->ScaleX(m_pDreamUIBar->GetLargeItemScale());
+				pObjB->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
 
 				if (m_pPrevSelected) {
 					m_pPrevSelected->ScaleX(1.0f);
 					m_pPrevSelected->ScaleZ(1.0f);
 				}
 
-				m_pPrevSelected = b;
+				m_pPrevSelected = pObjB;
 			}
 		}
 		else if (manifold.NumContacts() == 0) {

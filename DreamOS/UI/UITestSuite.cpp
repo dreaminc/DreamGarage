@@ -1,7 +1,7 @@
 #include "UITestSuite.h"
 #include "DreamOS.h"
-#include "../UIMenuItem.h"
-#include "../DreamUIBar.h"
+#include "UI/UIMenuItem.h"
+#include "DreamGarage/DreamUIBar.h"
 #include "PhysicsEngine/CollisionManifold.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
@@ -9,20 +9,7 @@ UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 {
 	RESULT r = R_PASS;
 
-	for (int i = 0; i < SenseControllerEventType::SENSE_CONTROLLER_INVALID; i++) {
-		CR(m_pDreamOS->RegisterSubscriber((SenseControllerEventType)(i), this));
-	}
-
-	for (int i = 0; i < SenseMouseEventType::SENSE_MOUSE_INVALID; i++) {
-		CR(m_pDreamOS->RegisterSubscriber((SenseMouseEventType)(i), this));
-	}
-	
-	pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-	pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-
-	pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	CR(Initialize());
 
 	Validate();
 	return;
@@ -33,6 +20,28 @@ Error:
 
 UITestSuite::~UITestSuite() {
 	// empty
+}
+
+RESULT UITestSuite::Initialize() {
+	RESULT r = R_PASS;
+
+	for (int i = 0; i < SenseControllerEventType::SENSE_CONTROLLER_INVALID; i++) {
+		CR(m_pDreamOS->RegisterSubscriber((SenseControllerEventType)(i), this));
+	}
+
+	for (int i = 0; i < SenseMouseEventType::SENSE_MOUSE_INVALID; i++) {
+		CR(m_pDreamOS->RegisterSubscriber((SenseMouseEventType)(i), this));
+	}
+	
+	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+
+	m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+
+Error:
+	return r;
 }
 
 RESULT UITestSuite::AddTestUI() {
@@ -115,30 +124,30 @@ RESULT UITestSuite::AddTestUI() {
 			}
 
 			if (manifold.NumContacts() > 0) {
-				VirtualObj* a = manifold.GetObjectA();
-				VirtualObj* b = manifold.GetObjectB();
+				VirtualObj* pObjA = manifold.GetObjectA();
+				VirtualObj* pObjB = manifold.GetObjectB();
 
-				if (a && (!m_pPrevSelected || a != m_pPrevSelected)) {
-					a->ScaleX(m_pDreamUIBar->GetLargeItemScale());
-					a->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
+				if (pObjA && (!m_pPrevSelected || pObjA != m_pPrevSelected)) {
+					pObjA->ScaleX(m_pDreamUIBar->GetLargeItemScale());
+					pObjA->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
 
 					if (m_pPrevSelected) {
 						m_pPrevSelected->ScaleX(1.0f);
 						m_pPrevSelected->ScaleZ(1.0f);
 					}
 
-					m_pPrevSelected = a;
+					m_pPrevSelected = pObjA;
 				}
-				else if (b && (!m_pPrevSelected || b != m_pPrevSelected)) {
-					b->ScaleX(m_pDreamUIBar->GetLargeItemScale());
-					b->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
+				else if (pObjB && (!m_pPrevSelected || pObjB != m_pPrevSelected)) {
+					pObjB->ScaleX(m_pDreamUIBar->GetLargeItemScale());
+					pObjB->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
 
 					if (m_pPrevSelected) {
 						m_pPrevSelected->ScaleX(1.0f);
 						m_pPrevSelected->ScaleZ(1.0f);
 					}
 
-					m_pPrevSelected = b;
+					m_pPrevSelected = pObjB;
 				}
 				m_pSphere1->SetVisible(true);
 				m_pSphere2->SetVisible(true);
