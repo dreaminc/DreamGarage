@@ -316,6 +316,7 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		CR(InitializeRayCompositeTest(pContext));
+
 	Error:
 		return r;
 	};
