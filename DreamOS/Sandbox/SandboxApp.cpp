@@ -324,7 +324,11 @@ RESULT SandboxApp::RunAppLoop() {
 
 		// Update Callback
 		if (m_fnUpdateCallback != nullptr) {
-			CR(m_fnUpdateCallback());
+			r = m_fnUpdateCallback();
+			CR(r);
+
+			if(r == R_COMPLETE)
+				return R_COMPLETE;
 		}
 
 		// Update the mouse

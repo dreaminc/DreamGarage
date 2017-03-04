@@ -273,6 +273,10 @@ Error:
 	return r;
 }
 
+bool UserController::IsLoggedIn() {
+	return m_fLoggedIn;
+}
+
 // TODO: This may want to move to an API controller object instead
 RESULT UserController::LoadTwilioNTSInformation() {
 	RESULT r = R_PASS;

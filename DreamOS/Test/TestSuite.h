@@ -28,8 +28,13 @@ public:
 
 	RESULT UpdateAndRunTests(void *pContext);
 
-	std::shared_ptr<TestObject> AddTest(std::function<RESULT()> fnTestFunction);
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT()> fnTestFunction, void *pContext = nullptr);
 	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
+
+	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize, 
+									    std::function<RESULT(void*)> fnTest, 
+										void *pContext = nullptr);
+
 	std::shared_ptr<TestObject> AddTest(std::function<RESULT(void*)> fnInitialize, 
 										std::function<RESULT(void*)> fnUpdate, 
 										std::function<RESULT(void*)> fnTest, 

@@ -138,6 +138,8 @@ public:
 	RESULT SetUser(User currentUser);
 	RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation);
 
+	bool IsEnvironmentSocketConnected();
+
 public:
 	EnvironmentController::state GetState() {
 		return m_state;

@@ -29,13 +29,24 @@ int main(int argc, const char *argv[]) {
 	DreamTestApp dreamTestApp;
 	CRM(dreamTestApp.Initialize(argc, argv), "Failed to initialize Dream Test App");
 	CRM(dreamTestApp.Start(), "Failed to start Dream Test App");	// This is the entry point for the DreamOS Engine
+
+//Success:
+	DEBUG_LINEOUT("DREAM OS Exiting");
+	return (int)(r);
+
+Error:
+	DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
+	system("pause");
+
+	return (int)(r);
+
 #else
 	DreamGarage dreamGarageApp;
 	CRM(dreamGarageApp.Initialize(argc, argv), "Failed to initialize Dream Garage");
 	CRM(dreamGarageApp.Start(), "Failed to start Dream Garage");	// This is the entry point for the DreamOS Engine
-#endif
 
 //Success:
+	DEBUG_LINEOUT("DREAM OS Exiting");
 	return (int)(r);
 
 Error:
@@ -43,4 +54,5 @@ Error:
 	//system("pause");
 
 	return (int)(r);
+#endif
 }

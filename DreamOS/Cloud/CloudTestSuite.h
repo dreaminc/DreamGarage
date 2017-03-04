@@ -12,6 +12,7 @@
 #include <memory>
 
 class DreamOS;
+class CloudController;
 
 class CloudTestSuite : public TestSuite {
 public:
@@ -22,6 +23,9 @@ public:
 
 public:
 	RESULT AddTestConnectLogin();
+
+private:
+	CloudController *GetCloudController();
 
 private:
 	DreamOS *m_pDreamOS;

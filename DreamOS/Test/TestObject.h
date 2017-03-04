@@ -27,8 +27,12 @@ public:
 	};
 
 public:
-	TestObject(std::function<RESULT()> fnTestFunction);
+	TestObject(std::function<RESULT()> fnTestFunction, void *pContext = nullptr);
 	TestObject(std::function<RESULT(void*)> fnTest, void *pContext = nullptr);
+
+	TestObject(std::function<RESULT(void*)> fnInitialize, 
+			   std::function<RESULT(void*)> fnTest, 
+			   void *pContext = nullptr);
 	
 	TestObject(std::function<RESULT(void*)> fnInitialize, 
 			   std::function<RESULT(void*)> fnUpdate, 

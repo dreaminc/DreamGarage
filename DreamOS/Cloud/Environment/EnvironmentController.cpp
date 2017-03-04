@@ -714,6 +714,10 @@ RESULT EnvironmentController::SetTwilioNTSInformation(TwilioNTSInformation twili
 	return m_pPeerConnectionController->SetTwilioNTSInformation(twilioNTSInformation);
 }
 
+bool EnvironmentController::IsEnvironmentSocketConnected() {
+	return m_fConnected;
+}
+
 RESULT EnvironmentController::OnPeersUpdate(long index) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
