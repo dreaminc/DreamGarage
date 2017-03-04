@@ -1,6 +1,12 @@
 #include "MenuController.h"
 
+#include "Cloud/CloudController.h"
+
 #include "Sandbox/CommandLineManager.h"
+
+#include "json.hpp"
+#include "Primitives/Types/UID.h"
+#include "Primitives/Types/guid.h"
 
 MenuController::MenuController(Controller* pParentController) :
 	Controller(pParentController)
@@ -34,7 +40,9 @@ std::string MenuController::GetMethodURI(MenuMethod menuMethod) {
 RESULT MenuController::GetSubMenu() {
 	RESULT r = R_PASS;
 
-
+	nlohmann::json jsonData;
+	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetParentController());
+	guid guidMessage;
 
 //Error:
 	return r;

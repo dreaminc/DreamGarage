@@ -96,6 +96,7 @@ public:
 
 private:
 	RESULT InitializeWebsocket(std::string& strURI);
+	RESULT SendEnvironmentSocket(const std::string& strData, state newState);
 
 	void HandleWebsocketMessage(const std::string& strMessage);
 	void HandleWebsocketConnectionOpen();
