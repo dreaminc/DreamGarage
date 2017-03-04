@@ -188,6 +188,9 @@
     </Filter>
     <Filter Include="UI">
       <UniqueIdentifier>{28d7c94b-81c3-4992-85e4-1dabd8aad4d9}</UniqueIdentifier>
+	</Filter
+    <Filter Include="Cloud\Menu">
+      <UniqueIdentifier>{ae8879dc-1260-4bae-97f6-1266681d851d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -601,6 +604,12 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp">
       <Filter>DreamGarage</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp">
+      <Filter>Cloud\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp">
+      <Filter>Cloud</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2344,6 +2353,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h">
+      <Filter>Cloud\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h">
+      <Filter>Cloud</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

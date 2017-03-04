@@ -13,6 +13,7 @@ public:
 		PHYSICS,
 		INTERACTION,
 		UI,
+		CLOUD,
 		INVALID
 	} ;
 
