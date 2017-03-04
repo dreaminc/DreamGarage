@@ -94,33 +94,23 @@ RESULT UIBar::HandleTriggerUp(VirtualObj* prev, std::map<std::string, std::vecto
 	RESULT r = R_PASS;
 
 	UILayerInfo info;
-	if (!path.empty() && prev != nullptr) {
-		
-		//TODO: the collision currently returns a quad, which is not enough
-		// information to know what menu item is selected
-		quad* temp = dynamic_cast<quad*>(prev);
-		CN(temp);
-		std::shared_ptr<UIMenuItem> pSelected = nullptr;
+	std::shared_ptr<UIMenuItem> pSelected = GetCurrentItem();
+	CB(!path.empty());
+	CB(pSelected);
 
-		for (auto& p : GetCurrentLayer()->GetMenuItems()) {
-			if (p->GetQuad().get() == temp) {
-				pSelected = p;
-			}
-		}
+	CB(menu.count(pSelected->GetName()) > 0);
 
-		if (pSelected != nullptr && menu.count(pSelected->GetName()) > 0) {
-			std::string& title = pSelected->GetName();
-			//TODO: seperate title object into different layer
-			//currently title object is selectable
-			CB(title != path.top()); 
-			path.push(title);
-			info.labels = menu[title];
-			info.labels.emplace_back(title);
-			for (size_t i = 0; i < info.labels.size(); i++) {
-				info.icons.emplace_back(m_pIconTexture);
-			}
-		}
+	std::string& title = pSelected->GetName();
+	//TODO: seperate title object into different layer
+	//currently title object is selectable
+	CB(title != path.top()); 
+	path.push(title);
+	info.labels = menu[title];
+	info.labels.emplace_back(title);
+	for (size_t i = 0; i < info.labels.size(); i++) {
+		info.icons.emplace_back(m_pIconTexture);
 	}
+
 	CB((info.icons.size() != 0)); 
 	CB((info.labels.size() != 0));
 

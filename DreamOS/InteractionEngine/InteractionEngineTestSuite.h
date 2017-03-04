@@ -16,7 +16,14 @@
 class DreamOS;
 class composite;
 struct InteractionObjectEvent;
+class DimRay;
+class sphere;
 
+struct RayCompositeTestContext {
+	composite *pComposite = nullptr;
+	DimRay *pRay = nullptr;
+	sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+};
 // TODO: Consider moving valid up to TestSuite
 class InteractionEngineTestSuite : public valid, public TestSuite, public Subscriber<InteractionObjectEvent> {
 public:
@@ -26,7 +33,9 @@ public:
 	virtual RESULT AddTests() override;
 
 	RESULT AddTestCompositeRay();
+	RESULT AddTestCompositeRayController();
 
+	RESULT InitializeRayCompositeTest(void *pContext);
 	RESULT ResetTest(void *pContext);
 	RESULT AddNestedCompositeQuads(int nestingLevel, float size, std::shared_ptr<composite> pCompositeParent);
 

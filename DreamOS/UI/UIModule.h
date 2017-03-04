@@ -4,6 +4,8 @@
 #include "Primitives/valid.h"
 #include "Primitives/composite.h"
 #include "UIMenuLayer.h"
+#include "Primitives/Subscriber.h"
+#include "InteractionEngine/InteractionObjectEvent.h"
 
 #include <stack>
 
@@ -18,13 +20,15 @@ typedef struct UILayerInfo {
 	{}
 } UI_LAYER_INFO;
 
-class UIModule : public valid {
+class UIModule : public valid, public Subscriber<InteractionObjectEvent> {
 public:
 	// using virtual here causes crash on exit
 	UIModule(DreamOS *pDreamOS);
 	~UIModule();
 
 	RESULT Initialize();
+	ray GetHandRay();
+	RESULT UpdateInteractionPrimitive(ray rCast);
 
 	virtual RESULT HandleMenuUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) = 0;
 	virtual RESULT HandleTriggerUp(VirtualObj* prev, std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) = 0;
@@ -34,6 +38,9 @@ public:
 
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) = 0;
 
+	std::shared_ptr<UIMenuItem> GetMenuItem(VirtualObj* pObj);
+	std::shared_ptr<UIMenuItem> GetCurrentItem();
+
 	RESULT ToggleVisible();
 	RESULT Show();
 	RESULT Hide();
@@ -41,6 +48,8 @@ public:
 	bool IsVisible();
 
 	composite* GetComposite();
+
+	virtual RESULT Notify(InteractionObjectEvent *event) override;
 
 protected:
 	composite* m_pCompositeContext;
@@ -50,6 +59,8 @@ protected:
 	//TODO: when multiple layers are needed, implement currentUILayer 
 	// as an iterator with public Set/Previous/Next functions
 	std::shared_ptr<UIMenuLayer> m_pCurrentUILayer;
+
+	std::shared_ptr<UIMenuItem> m_pCurrentItem;
 
 	float m_headRotationYDeg;  // can be removed with composite collision code
 

@@ -28,7 +28,8 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestCompositeRay());
+	CR(AddTestCompositeRayController());
+	//CR(AddTestCompositeRay());
 
 Error:
 	return r;
@@ -154,6 +155,154 @@ RESULT InteractionEngineTestSuite::AddNestedCompositeQuads(int nestingLevel, flo
 Error:
 	return r;
 }
+RESULT InteractionEngineTestSuite::InitializeRayCompositeTest(void* pContext) {
+	RESULT r = R_PASS;
+	m_pDreamOS->SetGravityState(false);
+
+	// Params for this test
+	int nNesting = 2;
+	float size = 5.0f;
+	double yPos = -2.0f;
+
+	RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+	std::shared_ptr<composite> pChildComposite = nullptr;
+	composite *pComposite = nullptr;
+	std::shared_ptr<sphere> pSphere = nullptr;
+
+	// Create a complex composite
+	pComposite = m_pDreamOS->AddComposite();
+	CN(pComposite);
+
+	pTestContext->pComposite = pComposite;
+
+	pComposite->InitializeOBB();
+	//pComposite->SetMass(1.0f);
+
+	///*
+	pChildComposite = pComposite->AddComposite();
+	CN(pChildComposite);
+	CR(pChildComposite->InitializeOBB());
+	//*/
+
+	pSphere = pChildComposite->AddSphere(0.5f, 10, 10);
+	CN(pSphere);
+	pSphere->SetPosition(point(2.0f, 2.0f, 0.0f));
+
+	// Create the nested composites / quads
+	CR(AddNestedCompositeQuads(nNesting, size, pChildComposite));
+
+	pComposite->SetPosition(point(0.0f, yPos, 0.0f));
+	pComposite->RotateXByDeg(90.0f);
+
+	// The Ray
+	pTestContext->pRay = m_pDreamOS->AddRay(point(-size / 2, size / 2, 2.0f), vector(0.0f, 0.0f, -1.0f).Normal());
+	CN(pTestContext->pRay);
+
+	// Add composite to interaction
+	CR(m_pDreamOS->AddInteractionObject(pComposite));
+
+	// Collide point spheres
+	for (int i = 0; i < 4; i++) {
+		pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+		CN(pTestContext->pCollidePoint[i]);
+		pTestContext->pCollidePoint[i]->SetVisible(false);
+	}
+
+	// Add Ray to interaction
+	//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay));
+Error:
+	return r;
+}
+
+RESULT InteractionEngineTestSuite::AddTestCompositeRayController() {
+	RESULT r = R_PASS;
+
+	RayCompositeTestContext *pTestContext = new RayCompositeTestContext();
+
+	auto fnInitialize = [&](void* pContext) {
+		RESULT r = R_PASS;
+		CR(InitializeRayCompositeTest(pContext));
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void* pContext) {
+		RESULT r = R_PASS;
+
+		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+		ray rCast;
+
+		CN(pTestContext->pComposite);
+		CN(pTestContext->pRay);
+
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		// Get Ray from controller
+
+		hand *pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+
+		if (pRightHand != nullptr) {
+			point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);
+			quaternion q = pRightHand->GetHandState().qOrientation;
+			q.Normalize();
+
+			//TODO: this isn't perfectly accurate, especially when the head is rotated
+			vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+			vector v2 = vector(-v.x(), -v.y(), v.z());
+			rCast = ray(p0, v2);
+
+			CollisionManifold manifold = pTestContext->pComposite->Collide(rCast);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+
+			pTestContext->pRay->UpdateFromRay(rCast);
+			CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+
+		}
+
+
+	Error:
+		return r;
+	};
+
+	auto fnTest = [&](void* pContext) {
+		return R_PASS;
+	};
+
+	auto fnReset = [&](void* pContext) {
+		RESULT r = R_PASS;
+
+		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		CR(ResetTest(pContext));
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Ray Events Controller Test");
+	pNewTest->SetTestDescription("Event handling test");
+	pNewTest->SetTestDuration(10000.0);
+	pNewTest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
 
 RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 	RESULT r = R_PASS;
@@ -161,71 +310,12 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 	double sTestTime = 60.0f;
 	int nRepeats = 1;
 
-	struct TestContext {
-		composite *pComposite = nullptr;
-		DimRay *pRay = nullptr;
-		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
-	};
-
-	TestContext *pTestContext = new TestContext();
+	RayCompositeTestContext *pTestContext = new RayCompositeTestContext();
 
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		m_pDreamOS->SetGravityState(false);
-
-		// Params for this test
-		int nNesting = 2;
-		float size = 5.0f;
-		double yPos = -2.0f;
-
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-		std::shared_ptr<composite> pChildComposite = nullptr;
-		composite *pComposite = nullptr;
-		std::shared_ptr<sphere> pSphere = nullptr;
-
-		// Create a complex composite
-		pComposite = m_pDreamOS->AddComposite();
-		CN(pComposite);
-
-		pTestContext->pComposite = pComposite;
-
-		pComposite->InitializeOBB(); 
-		//pComposite->SetMass(1.0f);
-
-		///*
-		pChildComposite = pComposite->AddComposite();
-		CN(pChildComposite);
-		CR(pChildComposite->InitializeOBB());
-		//*/
-
-		pSphere = pChildComposite->AddSphere(0.5f, 10, 10);
-		CN(pSphere);
-		pSphere->SetPosition(point(2.0f, 2.0f, 0.0f));
-
-		// Create the nested composites / quads
-		CR(AddNestedCompositeQuads(nNesting, size, pChildComposite));
-
-		pComposite->SetPosition(point(0.0f, yPos, 0.0f));
-		pComposite->RotateXByDeg(90.0f);
-
-		// The Ray
-		pTestContext->pRay = m_pDreamOS->AddRay(point(-size/2, size/2, 2.0f), vector(0.0f, 0.0f, -1.0f).Normal());
-		CN(pTestContext->pRay);
-
-		// Add composite to interaction
-		CR(m_pDreamOS->AddInteractionObject(pComposite));
-
-		// Collide point spheres
-		for (int i = 0; i < 4; i++) {
-			pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
-			CN(pTestContext->pCollidePoint[i]);
-			pTestContext->pCollidePoint[i]->SetVisible(false);
-		}
-
-		// Add Ray to interaction
-		//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay));
-		
+		CR(InitializeRayCompositeTest(pContext));
 	Error:
 		return r;
 	};
@@ -239,7 +329,7 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 	auto fnUpdate = [=](void *pContext) {
 		RESULT r = R_PASS;
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
 		ray rCast;
 
 		CN(pTestContext->pComposite);
@@ -276,7 +366,7 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 	auto fnReset = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
 
 		if (pTestContext != nullptr) {
 			delete pTestContext;

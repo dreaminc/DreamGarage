@@ -411,64 +411,7 @@ RESULT DreamGarage::Update(void) {
 	RESULT r = R_PASS;
 	
 	m_browsers.Update();
-
-	// Update UI	
-	hand *pRightHand = GetHand(hand::HAND_TYPE::HAND_RIGHT);
-	
-	if (pRightHand != nullptr && m_pDreamUIBar->IsVisible()) {
-
-		point p0 = pRightHand->GetPosition() - point(0.0f, 0.0f, 0.25f);
-		quaternion q = pRightHand->GetHandState().qOrientation;
-		q.Normalize();
-
-		//TODO: this isn't perfectly accurate, especially when the head is rotated
-		vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
-		vector v2 = vector(-v.x(), -v.y(), v.z());
-
-		// hack to avoid composite collision issue
-		// TODO: remove once ray/composite collision registers if ray is inside composite
-		p0 = p0 + point(-10.0f * v2);
-		ray rcast = ray(p0, v2);
-
-		CollisionManifold manifold = m_pDreamUIBar->GetComposite()->Collide(rcast);
-
-		if (manifold.NumContacts() > 0) {
-			VirtualObj* pObjA = manifold.GetObjectA();
-			VirtualObj* pObjB = manifold.GetObjectB();
-
-			if (pObjA && (!m_pPrevSelected || pObjA != m_pPrevSelected)) {
-				pObjA->ScaleX(m_pDreamUIBar->GetLargeItemScale());
-				pObjA->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
-
-				if (m_pPrevSelected) {
-					m_pPrevSelected->ScaleX(1.0f);
-					m_pPrevSelected->ScaleZ(1.0f);
-				}
-
-				m_pPrevSelected = pObjA;
-			}
-			else if (pObjB && (!m_pPrevSelected || pObjB != m_pPrevSelected)) {
-				pObjB->ScaleX(m_pDreamUIBar->GetLargeItemScale());
-				pObjB->ScaleZ(m_pDreamUIBar->GetLargeItemScale());
-
-				if (m_pPrevSelected) {
-					m_pPrevSelected->ScaleX(1.0f);
-					m_pPrevSelected->ScaleZ(1.0f);
-				}
-
-				m_pPrevSelected = pObjB;
-			}
-		}
-		else if (manifold.NumContacts() == 0) {
-			if (m_pPrevSelected) {
-				m_pPrevSelected->ScaleX(1.0f);
-				m_pPrevSelected->ScaleZ(1.0f);
-			}
-
-			m_pPrevSelected = nullptr;
-		}
-		OVERLAY_DEBUG_SET("contacts", manifold.NumContacts());
-	}
+	m_pDreamUIBar->Update();
 
 #ifdef TESTING
 ///*
