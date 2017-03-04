@@ -140,6 +140,10 @@ const HALImp::HALConfiguration& DreamOS::GetHALConfiguration() {
 	return m_pSandbox->GetHALConfiguration();
 }
 
+CloudController *DreamOS::GetCloudController() {
+	return m_pSandbox->m_pCloudController;
+}
+
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);

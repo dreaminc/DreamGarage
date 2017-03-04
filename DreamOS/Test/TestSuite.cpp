@@ -30,9 +30,8 @@ Error:
 RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 	RESULT r = R_PASS;
 
-	CB((m_currentTest != m_tests.end()));
+	if(m_currentTest != m_tests.end())  {
 
-	{
 		auto pTest = (*m_currentTest);
 
 		switch (pTest->GetTestState()) {
@@ -74,6 +73,9 @@ RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 				}
 			} break;
 		}
+	}
+	else {
+		return R_COMPLETE;
 	}
 
 Error:
@@ -158,6 +160,19 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnInitialize, std::function<RESULT(void*)> fnTest, void *pContext) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnInitialize, fnTest, pContext);
+	CNM(pNewTest, "Failed to allocate new test");
+	m_tests.push_back(pNewTest);
+
+	return pNewTest;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT(void*)> fnTest, void *pContext) {
 	RESULT r = R_PASS;
 
@@ -171,12 +186,11 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT()> fnTestFunction) {
+std::shared_ptr<TestObject> TestSuite::AddTest(std::function<RESULT()> fnTestFunction, void *pContext) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTestFunction);
+	std::shared_ptr<TestObject> pNewTest = std::make_shared<TestObject>(fnTestFunction, pContext);
 	CNM(pNewTest, "Failed to allocate new test");
-
 	m_tests.push_back(pNewTest);
 
 	return pNewTest;

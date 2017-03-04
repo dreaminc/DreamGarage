@@ -37,6 +37,8 @@
 #include "PhysicsEngine/PhysicsEngine.h"
 
 class DreamOS : public Subscriber<CollisionObjectEvent>, public valid {
+	friend class CloudTestSuite;
+
 public:
 	DreamOS();
 	~DreamOS();
@@ -53,6 +55,7 @@ public:
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
+	CloudController *GetCloudController();
 
 //protected:
 public:

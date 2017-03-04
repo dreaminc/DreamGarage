@@ -1,11 +1,11 @@
 #include "TestObject.h"
 
-TestObject::TestObject(std::function<RESULT()> fnTestFunction) :
+TestObject::TestObject(std::function<RESULT()> fnTestFunction, void *pContext) :
 	m_fnInitialize(nullptr),
 	m_fnUpdate(nullptr),
 	m_fnTest(nullptr),
 	m_fnReset(nullptr),
-	m_pContext(nullptr)
+	m_pContext(pContext)
 {
 	// Wrap it up
 	m_fnTest = [=](void *pContext) {
@@ -15,6 +15,18 @@ TestObject::TestObject(std::function<RESULT()> fnTestFunction) :
 
 TestObject::TestObject(std::function<RESULT(void*)> fnTest, void *pContext) :
 	m_fnInitialize(nullptr),
+	m_fnUpdate(nullptr),
+	m_fnTest(fnTest),
+	m_fnReset(nullptr),
+	m_pContext(pContext)
+{
+	// empty
+}
+
+TestObject::TestObject(std::function<RESULT(void*)> fnInitialize, 
+					   std::function<RESULT(void*)> fnTest, 
+					   void *pContext) :
+	m_fnInitialize(fnInitialize),
 	m_fnUpdate(nullptr),
 	m_fnTest(fnTest),
 	m_fnReset(nullptr),
@@ -110,19 +122,24 @@ Error:
 RESULT TestObject::UpdateTest(void* pContext) {
 	RESULT r = R_PASS;
 
-	if (m_fnUpdate == nullptr || m_sDuration <= 0.0f) {
+	if (m_sDuration <= 0.0f) {
 		CR(CompleteTest());
 		return r;
 	}
 
 	m_timeStartUpdate = std::chrono::high_resolution_clock::now();
-	{
+	
+	if(m_fnUpdate != nullptr) {
 		// Allow for override 
 		if (m_pContext != nullptr)
 			m_updateResult = m_fnUpdate(m_pContext);
 		else
 			m_updateResult = m_fnUpdate(pContext);
 	}
+	else {
+		m_updateResult = R_SKIPPED;
+	}
+
 	m_timeDurationUpdate = std::chrono::high_resolution_clock::now() - m_timeStartUpdate;
 	m_timeDurationTotal = std::chrono::high_resolution_clock::now() - m_timeStartTest;
 

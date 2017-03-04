@@ -50,6 +50,7 @@ typedef enum {
 	R_PATH_FOUND,
 
 	R_OBJECT_NOT_FOUND,
+	R_COMPLETE,
     
     R_FAIL = RESULT_START_FAIL,
     R_ERROR,

@@ -1,6 +1,8 @@
 #include "CloudTestSuite.h"
 #include "DreamOS.h"
 
+#include "Sandbox/CommandLineManager.h"
+
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -23,25 +25,61 @@ Error:
 RESULT CloudTestSuite::AddTestConnectLogin() {
 	RESULT r = R_PASS;
 
-	// Test Code (this evaluates the test upon completion)
-	auto fnTest = [&](void *pContext) {
+	double sTestTime = 5.0f;
+
+	// Initialize the test
+	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		// 
-		CR(r);
-		DEBUG_LINEOUT("TEST: hi");
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCloudController);
+		CN(pCommandLineManager);
+
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+		// Log in 
+		{
+			std::string strUsername = pCommandLineManager->GetParameterValue("username");
+			std::string strPassword = pCommandLineManager->GetParameterValue("password");
+			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+			CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+		}
 
 	Error:
 		return R_PASS;
 	};
 
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+	Error:
+		return r;
+	};
+
 	// Add the test
-	auto pNewTest = AddTest(fnTest);
+	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Test Connect and Login");
 	pNewTest->SetTestDescription("Test connect and log into service");
+	pNewTest->SetTestDuration(sTestTime);
 
 Error:
 	return r;
+}
+
+CloudController *CloudTestSuite::GetCloudController() {
+	return m_pDreamOS->GetCloudController();
 }

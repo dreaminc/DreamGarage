@@ -76,12 +76,15 @@ public:
 	RESULT InitializeUser(version ver = 1.0f);
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
-	RESULT LoginUser();
+	//RESULT LoginUser();
+	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK);
 	RESULT Update();
-	void Login();
+	RESULT Login();
 
 	User GetUser();
 	TwilioNTSInformation GetTwilioNTSInformation();
+	bool IsUserLoggedIn();
+	bool IsEnvironmentConnected();
 
 	virtual long GetUserID() override;
 

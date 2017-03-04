@@ -44,6 +44,8 @@ public:
 	RESULT LoadProfile();
 	RESULT LoadTwilioNTSInformation();
 
+	bool IsLoggedIn();
+
 private:
 	std::string GetMethodURI(UserMethod userMethod);
 

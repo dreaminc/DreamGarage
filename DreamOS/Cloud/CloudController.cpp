@@ -52,7 +52,7 @@ RESULT CloudController::ProcessingThread() {
 
 	//std::this_thread::sleep_for(std::chrono::seconds(3));
 
-	CR(LoginUser());
+	CR(Login());
 
 	// Message pump goes here
 #if (defined(_WIN32) || defined(_WIN64))
@@ -198,6 +198,7 @@ RESULT CloudController::Initialize() {
 
 	CR(InitializeUser());
 	CR(InitializeEnvironment(-1));
+
 Error:
 	return r;
 }
@@ -371,8 +372,19 @@ Error:
 }
 */
 
-void CloudController::Login() {
-	LoginUser();
+RESULT CloudController::Login() {
+	RESULT r = R_PASS;
+
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+
+	std::string strUsername = pCommandLineManager->GetParameterValue("username");
+	std::string strPassword = pCommandLineManager->GetParameterValue("password");
+	std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+	CR(LoginUser(strUsername, strPassword, strOTK));
+
+Error:
+	return r;
 }
 
 User CloudController::GetUser() {
@@ -383,22 +395,27 @@ TwilioNTSInformation CloudController::GetTwilioNTSInformation() {
 	return m_pUserController->GetTwilioNTSInformation();
 }
 
-RESULT CloudController::LoginUser() {
+bool CloudController::IsUserLoggedIn() {
+	return m_pUserController->IsLoggedIn();
+}
+
+bool CloudController::IsEnvironmentConnected() {
+	return m_pEnvironmentController->IsEnvironmentSocketConnected();
+}
+
+RESULT CloudController::LoginUser(std::string strUsername, std::string strPassword, std::string strOTK) {
 	RESULT r = R_PASS;
 
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	
-	std::string strURI = pCommandLineManager->GetParameterValue("api.ip");
-	std::string strUsername = pCommandLineManager->GetParameterValue("username");
-	std::string strPassword = pCommandLineManager->GetParameterValue("password");
-	std::string strOTK = pCommandLineManager->GetParameterValue("otk.id"); 
+	//std::string strURI = pCommandLineManager->GetParameterValue("api.ip");
 	
 	std::string strEnvironment = pCommandLineManager->GetParameterValue("environment");
 	long environmentID;
 
 	if (strOTK == "INVALIDONETIMEKEY") {
 		HUD_OUT(("Login user " + strUsername + "...").c_str());
-		HUD_OUT(("Login ip " + strURI + "...").c_str());
+		HUD_OUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
 		// TODO: command line / config file - right now hard coded
 		CN(m_pUserController);
@@ -407,7 +424,7 @@ RESULT CloudController::LoginUser() {
 	else {
 		// TODO: If OTK provided log in with that instead
 		HUD_OUT(("Login with OTK " + strOTK + "...").c_str());
-		HUD_OUT(("Login ip " + strURI + "...").c_str());
+		HUD_OUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
 		CN(m_pUserController);
 		CRM(m_pUserController->LoginWithOTK(strOTK), "Failed to login with OTK");
