@@ -57,6 +57,11 @@ TestObject::~TestObject() {
 RESULT TestObject::RunTest(void* pContext) {
 	RESULT r = R_PASS;
 
+	if (m_fnTest == nullptr) {
+		m_testState = TestObject::state::COMPLETE;
+		return r;
+	}
+
 	// Allow for override 
 	m_timeStartRunTest = std::chrono::high_resolution_clock::now();
 	{
@@ -79,6 +84,11 @@ Error:
 RESULT TestObject::InitializeTest(void* pContext) {
 	RESULT r = R_PASS;
 
+	if (m_fnInitialize == nullptr) {
+		m_testState = TestObject::state::INITIALIZED;
+		return r;
+	}
+
 	// Allow for override 
 	m_timeStartInitialize = std::chrono::high_resolution_clock::now();
 	{
@@ -99,6 +109,11 @@ Error:
 
 RESULT TestObject::UpdateTest(void* pContext) {
 	RESULT r = R_PASS;
+
+	if (m_fnUpdate == nullptr || m_sDuration <= 0.0f) {
+		CR(CompleteTest());
+		return r;
+	}
 
 	m_timeStartUpdate = std::chrono::high_resolution_clock::now();
 	{
@@ -157,6 +172,8 @@ int TestObject::Repetitions() {
 
 RESULT TestObject::ResetTest(void *pContext) {
 	RESULT r = R_PASS;
+
+	CNR(m_fnReset, R_SKIPPED);
 
 	// Allow for override 
 	if (pContext == nullptr)

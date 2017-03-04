@@ -3,6 +3,7 @@
 #include "PhysicsEngine/PhysicsEngineTestSuite.h"
 #include "InteractionEngine/InteractionEngineTestSuite.h"
 #include "UI/UITestSuite.h"
+#include "Cloud/CloudTestSuite.h"
 
 std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pContext) {
 	RESULT r = R_PASS;
@@ -21,6 +22,14 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
 
 			pTestSuite = std::make_shared<InteractionEngineTestSuite>((DreamOS*)pContext);
+			CNM(pTestSuite, "Failed to allocate test suite");
+			CRM(pTestSuite->Initialize(), "Failed to initialize test suite");
+		} break;
+
+		case TEST_SUITE_TYPE::CLOUD: {
+			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+
+			pTestSuite = std::make_shared<CloudTestSuite>((DreamOS*)pContext);
 			CNM(pTestSuite, "Failed to allocate test suite");
 			CRM(pTestSuite->Initialize(), "Failed to initialize test suite");
 		} break;

@@ -1,5 +1,5 @@
-#include "Logger/Logger.h"
 #include "UserController.h"
+#include "Logger/Logger.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"

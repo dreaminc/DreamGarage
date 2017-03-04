@@ -18,7 +18,7 @@
 
 class Logger {
 public:
-	static RESULT	InitializeLogger();
+	static RESULT InitializeLogger();
 };
 
 #endif	// ! LOGGER_H_
