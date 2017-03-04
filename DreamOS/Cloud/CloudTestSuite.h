@@ -23,6 +23,7 @@ public:
 
 public:
 	RESULT AddTestConnectLogin();
+	RESULT AddTestMenuAPI();
 
 private:
 	CloudController *GetCloudController();

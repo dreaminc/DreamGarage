@@ -17,6 +17,7 @@ RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 	CR(AddTestConnectLogin());
+	CR(AddTestMenuAPI());
 
 Error:
 	return r;
@@ -74,6 +75,52 @@ RESULT CloudTestSuite::AddTestConnectLogin() {
 
 	pNewTest->SetTestName("Test Connect and Login");
 	pNewTest->SetTestDescription("Test connect and log into service");
+	pNewTest->SetTestDuration(sTestTime);
+
+Error:
+	return r;
+}
+
+RESULT CloudTestSuite::AddTestMenuAPI() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10.0f;
+
+	// Initialize the test
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+		CBM(pCloudController->IsUserLoggedIn(), "User not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
+		
+		// Set up menu stuff
+		
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Test Menu API");
+	pNewTest->SetTestDescription("Test Menu API");
 	pNewTest->SetTestDuration(sTestTime);
 
 Error:
