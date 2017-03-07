@@ -26,7 +26,7 @@ Error:
 RESULT CloudTestSuite::AddTestConnectLogin() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 5.0f;
+	double sTestTime = 3.0f;
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
@@ -84,7 +84,7 @@ Error:
 RESULT CloudTestSuite::AddTestMenuAPI() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 10.0f;
+	double sTestTime = 30.0f;
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
@@ -92,12 +92,17 @@ RESULT CloudTestSuite::AddTestMenuAPI() {
 
 		// Cloud Controller
 		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		MenuControllerProxy *pMenuControllerProxy = nullptr;
 		CN(pCloudController);
 		CBM(pCloudController->IsUserLoggedIn(), "User not logged in");
 		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 		
 		// Set up menu stuff
-		
+		DEBUG_LINEOUT("Requesting Menu");
+		pMenuControllerProxy = (MenuControllerProxy*)(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_PROXY_TYPE::MENU));
+		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
+
+		CRM(pMenuControllerProxy->RequestSubMenu(), "Failed to request sub menu");
 
 	Error:
 		return R_PASS;

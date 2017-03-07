@@ -712,6 +712,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
     <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h" />
     <ClInclude Include="..\..\..\Cloud\Controller.h" />
+    <ClInclude Include="..\..\..\Cloud\ControllerProxy.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnection.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h" />
     <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h" />

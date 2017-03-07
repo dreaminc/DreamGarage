@@ -23,6 +23,7 @@
 #include "Primitives/quaternion.h"
 #include "Primitives/hand.h"
 
+class ControllerProxy;
 class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
@@ -38,8 +39,17 @@ typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageC
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 typedef std::function<RESULT(long, AudioDataMessage*)> HandleAudioDataCallback;
 
+enum class CLOUD_CONTROLLER_PROXY_TYPE {
+	CLOUD,
+	ENVIRONMENT,
+	MENU,
+	USER,
+	INVALID
+};
+
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver,
-						public Subscriber<CmdPromptEvent> {
+						public Subscriber<CmdPromptEvent> 
+{
 protected:
 	typedef std::function<RESULT(long, const std::string&)> HandleDataChannelStringMessageCallback;
 	typedef std::function<RESULT(long, uint8_t *, int)> HandleDataChannelMessageCallback;
@@ -123,6 +133,14 @@ public:
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;
+
+	
+	// Proxy Objects
+public:
+	ControllerProxy* GetControllerProxy(CLOUD_CONTROLLER_PROXY_TYPE controllerType);
+
+private:
+	MenuControllerProxy* GetMenuControllerProxy();
 
 private:
 	//UID m_uid;
