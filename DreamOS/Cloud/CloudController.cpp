@@ -14,6 +14,8 @@
 #include "User/User.h"
 #include "User/TwilioNTSInformation.h"
 
+#include "ControllerProxy.h"
+
 #include <chrono>
 #include <thread>
 
@@ -23,6 +25,7 @@
 #endif
 
 CloudController::CloudController() :
+	Controller(nullptr, this),
 	m_pCloudImp(nullptr),
 	m_pUserController(nullptr),
 	m_pEnvironmentController(nullptr),
@@ -711,4 +714,20 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 
 //Error:
 	return r;
+}
+
+ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_PROXY_TYPE controllerType) {
+	ControllerProxy *pProxy = nullptr;
+
+	switch (controllerType) {
+		case CLOUD_CONTROLLER_PROXY_TYPE::MENU: {
+			pProxy = (ControllerProxy*)(GetMenuControllerProxy());
+		} break;
+	}
+
+	return pProxy;
+}
+
+MenuControllerProxy* CloudController::GetMenuControllerProxy() {
+	return m_pEnvironmentController->GetMenuControllerProxy();
 }

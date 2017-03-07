@@ -23,8 +23,6 @@ EnvironmentController::EnvironmentController(Controller* pParentController, long
 	m_state(state::UNINITIALIZED)
 {
 	m_environment = Environment(environmentID);
-
-	m_pPeerConnectionController = std::unique_ptr<PeerConnectionController>(new PeerConnectionController(this));
 }
 
 EnvironmentController::~EnvironmentController() {
@@ -36,9 +34,18 @@ EnvironmentController::~EnvironmentController() {
 RESULT EnvironmentController::Initialize() {
 	RESULT r = R_PASS;
 	
+	// Peer Connection Controller
+	m_pPeerConnectionController = std::unique_ptr<PeerConnectionController>(new PeerConnectionController(this));
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->Initialize());
 	CR(m_pPeerConnectionController->RegisterPeerConnectionControllerObserver(this));
+
+	// Menu Controller
+	m_pMenuController = std::make_unique<MenuController>(this);
+	//m_pMenuController = std::unique_ptr<MenuController>(new MenuController(this));
+	CN(m_pMenuController);
+	CR(m_pMenuController->Initialize());
+	//CR(m_pMenuController->RegisterPeerConnectionControllerObserver(this));
 
 Error:
 	return r;
@@ -755,6 +762,10 @@ RESULT EnvironmentController::SetTwilioNTSInformation(TwilioNTSInformation twili
 
 bool EnvironmentController::IsEnvironmentSocketConnected() {
 	return m_fConnected;
+}
+
+MenuControllerProxy* EnvironmentController::GetMenuControllerProxy() {
+	return m_pMenuController->GetMenuControllerProxy();
 }
 
 RESULT EnvironmentController::OnPeersUpdate(long index) {
