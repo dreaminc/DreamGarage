@@ -62,7 +62,7 @@ std::shared_ptr<CloudMessage> CloudMessage::CreateRequest(CloudController *pPare
 
 	pCloudMessage->m_type = CloudMessage::type::REQUEST;
 
-	
+	CR(pCloudMessage->SetPayload(jsonPayload));
 
 //Success:
 	return pCloudMessage;
@@ -74,4 +74,28 @@ Error:
 RESULT CloudMessage::SetMethod(std::string strMethod) {
 	m_strMethod = strMethod;
 	return R_PASS;
+}
+
+RESULT CloudMessage::SetPayload(nlohmann::json jsonPayload) {
+	m_jsonPayload = jsonPayload;
+	return R_PASS;
+}
+
+std::string CloudMessage::GetJSONDataString() {
+	nlohmann::json jsonData;
+
+	jsonData["id"] = m_GUID.GetGUIDString();
+	jsonData["token"] = m_strToken;
+	
+	switch (m_type) {
+		case type::REQUEST:		jsonData["type"] = "request"; break;
+		case type::RESPONSE:	jsonData["type"] = "response"; break;
+		default:				jsonData["type"] = "invalid"; break;
+	}
+
+	jsonData["method"] = m_strMethod;
+	jsonData["version"] = m_version.GetString(false);
+	jsonData["payload"] = m_jsonPayload;
+
+	return jsonData.dump();
 }
