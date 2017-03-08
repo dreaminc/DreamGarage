@@ -565,6 +565,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp" />
@@ -710,6 +711,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Cloud\CloudController.h" />
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
     <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudMessage.h" />
     <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h" />
     <ClInclude Include="..\..\..\Cloud\Controller.h" />
     <ClInclude Include="..\..\..\Cloud\ControllerProxy.h" />
