@@ -90,7 +90,7 @@ Error:
 	return r;
 }
 
-RESULT UIBar::HandleTriggerUp(VirtualObj* prev, std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) {
+RESULT UIBar::HandleTriggerUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) {
 	RESULT r = R_PASS;
 
 	UILayerInfo info;
@@ -100,13 +100,13 @@ RESULT UIBar::HandleTriggerUp(VirtualObj* prev, std::map<std::string, std::vecto
 
 	CB(menu.count(pSelected->GetName()) > 0);
 
-	std::string& title = pSelected->GetName();
+	const std::string& strTitle = pSelected->GetName();
 	//TODO: seperate title object into different layer
 	//currently title object is selectable
-	CB(title != path.top()); 
-	path.push(title);
-	info.labels = menu[title];
-	info.labels.emplace_back(title);
+	CB(strTitle != path.top()); 
+	path.push(strTitle);
+	info.labels = menu[strTitle];
+	info.labels.emplace_back(strTitle);
 	for (size_t i = 0; i < info.labels.size(); i++) {
 		info.icons.emplace_back(m_pIconTexture);
 	}

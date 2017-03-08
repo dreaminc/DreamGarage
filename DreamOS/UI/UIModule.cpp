@@ -48,22 +48,26 @@ ray UIModule::GetHandRay() {
 	
 	RESULT r = R_PASS;
 
-	ray rcast;
+	ray rCast;
 	hand *pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
-	CB(IsVisible());
-	CB(pRightHand != nullptr) {
-		point p0 = pRightHand->GetPosition();
+
+	CBR(IsVisible(), R_SKIPPED); 
+	CBR(pRightHand != nullptr, R_OBJECT_NOT_FOUND)
+	{
+		point ptHand = pRightHand->GetPosition();
 		//GetLookVector
-		quaternion q = pRightHand->GetHandState().qOrientation;
-		q.Normalize();
+		quaternion qHand = pRightHand->GetHandState().qOrientation;
+		qHand.Normalize();
 
-		vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
-		vector v2 = vector(-v.x(), -v.y(), v.z());
+		//TODO: investigate how to properly get look vector for controllers
+		vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
 
-		p0 = p0 + point(-10.0f * v2);
-		rcast = ray(p0, v2);
+		// Accomodate for composite collision bug
+		ptHand = ptHand + point(-10.0f * vCast);
+		rCast = ray(ptHand, vCast);
 	}
-	return rcast;
+	return rCast;
 
 Error:
 	return ray(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, 0.0f));
@@ -158,7 +162,7 @@ RESULT UIModule::Notify(InteractionObjectEvent *event) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<UIMenuItem> pItem = GetMenuItem(event->m_pObject);
-	CB(pItem != nullptr);
+	CBR(pItem != nullptr, R_OBJECT_NOT_FOUND);
 
 	//TODO stupid hack, can be fixed by incorporating 
 	// SenseController into the Interaction Engine

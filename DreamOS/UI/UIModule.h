@@ -31,7 +31,7 @@ public:
 	RESULT UpdateInteractionPrimitive(ray rCast);
 
 	virtual RESULT HandleMenuUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) = 0;
-	virtual RESULT HandleTriggerUp(VirtualObj* prev, std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) = 0;
+	virtual RESULT HandleTriggerUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) = 0;
 
 	std::shared_ptr<UIMenuLayer> CreateMenuLayer();
 	std::shared_ptr<UIMenuLayer> GetCurrentLayer();

@@ -47,7 +47,7 @@ public:
 	~UIBar();
 
 	virtual RESULT HandleMenuUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
-	virtual RESULT HandleTriggerUp(VirtualObj* prev, std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
+	virtual RESULT HandleTriggerUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
 
 
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
