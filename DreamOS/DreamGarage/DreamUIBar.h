@@ -28,6 +28,7 @@ public:
 	};
 
 	RESULT Initialize();
+	RESULT Update();
 
 	// Callback signature
 	// RESULT fnEventCallback(struct (opt) pEventInfo, void* pContext)

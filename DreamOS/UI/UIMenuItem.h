@@ -4,6 +4,7 @@
 #include "Primitives/valid.h"
 #include "Primitives/FlatContext.h"
 #include "Primitives/composite.h"
+#include "InteractionEngine/InteractionObjectEvent.h"
 
 // IconFormat defaults
 #define ICON_HEIGHT 1.5f
@@ -54,6 +55,10 @@ public:
 
 
 	RESULT Update(IconFormat& iconFormat, LabelFormat& labelFormat);
+
+	RESULT HandleEvent(InteractionObjectEvent *event);
+
+	bool Contains(VirtualObj* pObj);
 
 	std::string& GetName();
 

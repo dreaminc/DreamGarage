@@ -114,8 +114,6 @@ private:
 	std::stack<std::string> m_menuPath;
 	std::shared_ptr<texture> m_pIconTexture;
 
-	VirtualObj *m_pPrevSelected = nullptr;
-
 	// CEF
 	Browsers m_browsers;
 };

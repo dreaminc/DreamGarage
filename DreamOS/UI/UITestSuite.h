@@ -21,6 +21,7 @@ class sphere;
 struct SenseControllerEvent;
 struct SenseKeyboardEvent;
 struct SenseMouseEvent;
+struct InteractionObjectEvent;
 
 class UITestSuite : public valid, public TestSuite, public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent> {
 public:
@@ -28,8 +29,10 @@ public:
 	~UITestSuite();
 
 	RESULT Initialize();
+	RESULT InitializeUI();
 
 	RESULT AddTestUI();
+	RESULT AddTestInteractionUI();
 
 	virtual RESULT AddTests() override;
 

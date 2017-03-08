@@ -55,3 +55,12 @@ RESULT UIMenuLayer::Clear() {
 std::vector<std::shared_ptr<UIMenuItem>> UIMenuLayer::GetMenuItems() {
 	return m_menuItems;
 }
+
+std::shared_ptr<UIMenuItem> UIMenuLayer::GetMenuItem(VirtualObj *pObj) {
+	for (auto& pItem : m_menuItems) {
+		if (pItem->Contains(pObj)) {
+			return pItem;
+		}
+	}
+	return nullptr;
+}

@@ -3,6 +3,7 @@
 #include "UI/UIMenuItem.h"
 #include "DreamGarage/DreamUIBar.h"
 #include "PhysicsEngine/CollisionManifold.h"
+#include "InteractionEngine/InteractionObjectEvent.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -44,6 +45,115 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::InitializeUI() {
+	RESULT r = R_PASS;
+
+	IconFormat iconFormat;
+	LabelFormat labelFormat;
+	UIBarFormat barFormat;
+
+	m_pDreamUIBar = std::make_shared<DreamUIBar>(m_pDreamOS,iconFormat,labelFormat,barFormat);
+	m_pDreamUIBar->SetVisible(false);
+
+	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
+	m_menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
+	m_menu["ipsum"] = { "1", "2", "3" };
+	m_menu["Play"] = { "a", "b", "c" };
+
+	m_path = {};
+
+	m_pSphere1 = m_pDreamOS->AddSphere(0.02f, 10, 10);
+	m_pSphere2 = m_pDreamOS->AddSphere(0.02f, 10, 10);
+
+//Error:
+	return r;
+}
+
+RESULT UITestSuite::AddTestInteractionUI() {
+	RESULT r = R_PASS;
+
+	struct TestContext {
+
+		DimRay *pRay = nullptr;
+	};
+
+	TestContext *pTestContext = new TestContext();
+
+	//TODO: once there are multiple tests, may want to share some of this code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		pTestContext->pRay = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
+
+		CR(InitializeUI());
+	Error:
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		hand* pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+
+		if (pRightHand != nullptr && m_pDreamUIBar->IsVisible() && pTestContext->pRay != nullptr) {
+			pTestContext->pRay->SetPosition(pRightHand->GetPosition());
+			pTestContext->pRay->SetOrientation(pRightHand->GetHandState().qOrientation);
+
+			point p0 = pRightHand->GetPosition();
+			//GetLookVector
+			quaternion q = pRightHand->GetHandState().qOrientation;
+			q.Normalize();
+
+			vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+			vector v2 = vector(-v.x(), -v.y(), v.z());
+
+			p0 = p0 + point(-10.0f * v2);
+			ray rcast = ray(p0, v2);
+
+
+			CollisionManifold manifold = m_pDreamUIBar->GetComposite()->Collide(rcast);
+
+			if (manifold.NumContacts() > 0) {
+				int numContacts = manifold.NumContacts();
+
+				if (numContacts > 2)
+					numContacts = 2;
+				for (int i = 0; i < numContacts; i++) {
+					sphere *pSphere = (i == 0) ? m_pSphere1 : m_pSphere2;
+
+					pSphere->SetVisible(true);
+					pSphere->SetPosition(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+
+			m_pDreamOS->UpdateInteractionPrimitive(rcast);
+
+		}
+		return r;
+	};
+
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("UI Menu Interaction Engine Test");
+	pUITest->SetTestDescription("UI Basic Testing Environment");
+	pUITest->SetTestDuration(10000.0);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestUI() {
 	RESULT r = R_PASS;
 
@@ -57,27 +167,11 @@ RESULT UITestSuite::AddTestUI() {
 	//TODO: once there are multiple tests, may want to share some of this code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
-	
-		IconFormat iconFormat;
-		LabelFormat labelFormat;
-		UIBarFormat barFormat;
-
-		m_pDreamUIBar = std::make_shared<DreamUIBar>(m_pDreamOS,iconFormat,labelFormat,barFormat);
-		m_pDreamUIBar->SetVisible(false);
-
-		m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-		m_menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
-		m_menu["ipsum"] = { "1", "2", "3" };
-		m_menu["Play"] = { "a", "b", "c" };
-
-		m_path = {};
-
 		pTestContext->pRay = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
-		m_pSphere1 = m_pDreamOS->AddSphere(0.02f, 10, 10);
-		m_pSphere2 = m_pDreamOS->AddSphere(0.02f, 10, 10);
 
+		CR(InitializeUI());
+	Error:
 		return r;
 	};
 
@@ -186,7 +280,8 @@ Error:
 
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
-	CR(AddTestUI());
+	//CR(AddTestUI());
+	CR(AddTestInteractionUI());
 Error:
 	return r;
 }
@@ -213,7 +308,7 @@ RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 		// as opposed to accessing the hardcoded local data structures
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
-			CR(m_pDreamUIBar->HandleTriggerUp(m_pPrevSelected, m_menu, m_path));
+			CR(m_pDreamUIBar->HandleTriggerUp(m_menu, m_path));
 		}
 		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
 			OVERLAY_DEBUG_SET("event", "menu up");

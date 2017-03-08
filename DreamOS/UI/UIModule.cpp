@@ -26,14 +26,55 @@ UIModule::~UIModule() {
 RESULT UIModule::Initialize() {
 	RESULT r = R_PASS;
 
+	// Subscribers
+	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+		CR(m_pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), this));
+	}
+
 	CN(m_pDreamOS);
 	m_pCompositeContext = m_pDreamOS->AddComposite();
 	CN(m_pCompositeContext);
 
 	CR(m_pCompositeContext->InitializeOBB());
+	CR(m_pDreamOS->AddInteractionObject(m_pCompositeContext));
+
+	m_pCurrentItem = nullptr;
 
 Error:
 	return r;
+}
+
+ray UIModule::GetHandRay() {
+	
+	RESULT r = R_PASS;
+
+	ray rCast;
+	hand *pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+
+	CBR(IsVisible(), R_SKIPPED); 
+	CBR(pRightHand != nullptr, R_OBJECT_NOT_FOUND)
+	{
+		point ptHand = pRightHand->GetPosition();
+		//GetLookVector
+		quaternion qHand = pRightHand->GetHandState().qOrientation;
+		qHand.Normalize();
+
+		//TODO: investigate how to properly get look vector for controllers
+		vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
+
+		// Accomodate for composite collision bug
+		ptHand = ptHand + point(-10.0f * vCast);
+		rCast = ray(ptHand, vCast);
+	}
+	return rCast;
+
+Error:
+	return ray(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, 0.0f));
+}
+
+RESULT UIModule::UpdateInteractionPrimitive(ray rCast) {
+	return m_pDreamOS->UpdateInteractionPrimitive(rCast);
 }
 
 std::shared_ptr<UIMenuLayer> UIModule::CreateMenuLayer() {
@@ -52,6 +93,21 @@ Error:
 
 std::shared_ptr<UIMenuLayer> UIModule::GetCurrentLayer() {
 	return m_pCurrentUILayer;
+}
+
+std::shared_ptr<UIMenuItem> UIModule::GetMenuItem(VirtualObj *pObj) {
+	for (auto& pLayer : m_layers) {
+		auto pItem = pLayer->GetMenuItem(pObj);
+		if (pItem != nullptr) {
+			return pItem;
+
+		}
+	}
+	return nullptr;
+}
+
+std::shared_ptr<UIMenuItem> UIModule::GetCurrentItem() {
+	return m_pCurrentItem;
 }
 
 RESULT UIModule::ToggleVisible() {
@@ -100,4 +156,23 @@ bool UIModule::IsVisible() {
 
 composite *UIModule::GetComposite() {
 	return m_pCompositeContext;
+}
+
+RESULT UIModule::Notify(InteractionObjectEvent *event) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIMenuItem> pItem = GetMenuItem(event->m_pObject);
+	CBR(pItem != nullptr, R_OBJECT_NOT_FOUND);
+
+	//TODO stupid hack, can be fixed by incorporating 
+	// SenseController into the Interaction Engine
+	if (event->m_eventType == InteractionEventType::ELEMENT_INTERSECT_ENDED)
+		m_pCurrentItem = nullptr;
+	else
+		m_pCurrentItem = pItem;
+
+	CR(pItem->HandleEvent(event));
+
+Error:
+	return r;
 }

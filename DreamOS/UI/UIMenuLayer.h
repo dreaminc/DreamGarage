@@ -17,6 +17,9 @@ public:
 
 	std::vector<std::shared_ptr<UIMenuItem>> GetMenuItems();
 
+	//Returns the first instance of a MenuItem that contains the argument 
+	std::shared_ptr<UIMenuItem> GetMenuItem(VirtualObj *pObj);
+
 private:
 	std::shared_ptr<composite> m_pContextComposite; // composite for creation of Menu Items
 	std::vector<std::shared_ptr<UIMenuItem>> m_menuItems;

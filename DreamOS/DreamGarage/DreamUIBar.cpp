@@ -1,4 +1,5 @@
 #include "DreamUIBar.h"
+#include "DreamOS.h"
 
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat) :
 	UIBar(pDreamOS, iconFormat, labelFormat, barFormat)
@@ -31,6 +32,13 @@ RESULT DreamUIBar::Initialize() {
 
 	CR(SetVisible(false));
 
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::Update() {
+	RESULT r = R_PASS;
+	CR(UpdateInteractionPrimitive(GetHandRay()));
 Error:
 	return r;
 }
