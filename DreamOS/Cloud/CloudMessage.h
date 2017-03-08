@@ -23,10 +23,9 @@ public:
 		INVALID
 	};
 
-private:
-	CloudMessage();
 
 public:
+	CloudMessage();
 	~CloudMessage();
 
 public:
@@ -36,6 +35,9 @@ public:
 
 public:
 	RESULT SetMethod(std::string strMethod);
+	RESULT SetPayload(nlohmann::json jsonPayload);
+
+	std::string GetJSONDataString();
 
 private:
 	CloudMessage::type m_type;
@@ -44,7 +46,7 @@ private:
 	std::string m_strToken;
 	std::string m_strMethod;
 
-	nlohmann::json jsonData;
+	nlohmann::json m_jsonPayload;
 };
 
 #endif // ! CLOUD_MESSAGE_H_

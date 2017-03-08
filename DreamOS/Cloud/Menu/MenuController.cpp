@@ -8,6 +8,8 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/Types/guid.h"
 
+#include "Cloud/CloudMessage.h"
+
 MenuController::MenuController(Controller* pParentController) :
 	Controller(pParentController)
 {
@@ -48,33 +50,26 @@ CLOUD_CONTROLLER_PROXY_TYPE MenuController::GetControllerType() {
 RESULT MenuController::RequestSubMenu() {
 	RESULT r = R_PASS;
 
-	nlohmann::json jsonData;
+	nlohmann::json jsonPayload;
 	std::string strData;
 	CloudController *pParentCloudController = dynamic_cast<CloudController*>(GetCloudController());
 	EnvironmentController *pParentEnvironmentController = dynamic_cast<EnvironmentController*>(GetParentController());
 	guid guidMessage;
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
 
 	CNM(pParentCloudController, "Parent CloudController not found or null");
 	CNM(pParentEnvironmentController, "Parent Environment Controller not found or null");
 
-	// TODO: Wrap in request class
-	jsonData["id"] = guidMessage.GetGUIDString();
-	jsonData["method"] = "menu.get_submenu";
+	jsonPayload["menu"] = nlohmann::json::object();
+	jsonPayload["menu"]["node_type"] = "NodeType.Folder";
+	jsonPayload["menu"]["path"] = "";
+	jsonPayload["menu"]["scope"] = "";
 
-	jsonData["payload"] = nlohmann::json::object();
-	jsonData["payload"]["menu"] = nlohmann::json::object();
-	jsonData["payload"]["menu"]["node_type"] = "NodeType.Folder";
-	jsonData["payload"]["menu"]["path"] = "";
-	jsonData["payload"]["menu"]["scope"] = "";
+	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetMethod("menu.get_submenu"));
 
-	jsonData["token"] = pParentCloudController->GetUser().GetToken();
-	jsonData["type"] = "request";
-	jsonData["version"] = pParentCloudController->GetUser().GetVersion().GetString(false);
-
-	strData = jsonData.dump();
-	DEBUG_LINEOUT("Create Environment User JSON: %s", strData.c_str());
-
-	CR(pParentEnvironmentController->SendEnvironmentSocket(strData, EnvironmentController::state::MENU_API_REQUEST));
+	CR(pParentEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::MENU_API_REQUEST));
 
 Error:
 	return r;

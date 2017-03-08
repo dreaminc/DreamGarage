@@ -14,6 +14,8 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include "Cloud/CloudMessage.h"
+
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
 	m_fConnected(false),
@@ -94,7 +96,16 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::SendEnvironmentSocket(const std::string& strData, state newState) {
+RESULT EnvironmentController::SendEnvironmentSocketMessage(std::shared_ptr<CloudMessage> pCloudRequest, state newState) {
+	RESULT r = R_PASS;
+
+	CR(SendEnvironmentSocketData(pCloudRequest->GetJSONDataString(), newState));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::SendEnvironmentSocketData(const std::string& strData, state newState) {
 	RESULT r = R_PASS;
 
 	CN(m_pEnvironmentWebsocket);
@@ -103,6 +114,8 @@ RESULT EnvironmentController::SendEnvironmentSocket(const std::string& strData, 
 
 	m_fPendingMessage = true;
 	m_state = newState;
+
+	DEBUG_LINEOUT("SendEnvironmentSocketData JSON: %s", strData.c_str());
 
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 
@@ -192,7 +205,7 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 	*/
 
-	CR(SendEnvironmentSocket(strData, state::CREATING_ENVIRONMENT_USER));
+	CR(SendEnvironmentSocketData(strData, state::CREATING_ENVIRONMENT_USER));
 
 Error:
 	return r;
@@ -250,7 +263,7 @@ RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnec
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 	*/
 
-	CR(SendEnvironmentSocket(strData, state::SET_SDP_OFFER));
+	CR(SendEnvironmentSocketData(strData, state::SET_SDP_OFFER));
 
 	LOG(INFO) << "(cloud) offer was sent to cloud, msg=" << strData;
 
@@ -284,7 +297,7 @@ RESULT EnvironmentController::SetSDPAnswer(User user, PeerConnection *pPeerConne
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 	*/
 
-	CR(SendEnvironmentSocket(strData, state::SET_SDP_ANSWER));
+	CR(SendEnvironmentSocketData(strData, state::SET_SDP_ANSWER));
 
 Error:
 	return r;
@@ -316,7 +329,7 @@ RESULT EnvironmentController::SetOfferCandidates(User user, PeerConnection *pPee
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 	*/
 
-	CR(SendEnvironmentSocket(strData, state::SET_OFFER_CANDIDATES));
+	CR(SendEnvironmentSocketData(strData, state::SET_OFFER_CANDIDATES));
 
 Error:
 	return r;
@@ -349,7 +362,7 @@ RESULT EnvironmentController::SetAnswerCandidates(User user, PeerConnection *pPe
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 	*/
 
-	CR(SendEnvironmentSocket(strData, state::SET_ANSWER_CANDIDATES));
+	CR(SendEnvironmentSocketData(strData, state::SET_ANSWER_CANDIDATES));
 
 Error:
 	return r;
@@ -394,7 +407,7 @@ RESULT EnvironmentController::GetEnvironmentPeerList(User user) {
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 	*/
 
-	CR(SendEnvironmentSocket(strData, state::ENVIRONMENT_PEER_LIST_REQUESTED));
+	CR(SendEnvironmentSocketData(strData, state::ENVIRONMENT_PEER_LIST_REQUESTED));
 
 Error:
 	return r;

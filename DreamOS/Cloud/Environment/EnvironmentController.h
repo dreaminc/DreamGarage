@@ -21,6 +21,7 @@
 #include "Cloud/User/TwilioNTSInformation.h"
 
 class Websocket;
+class CloudMessage;
 
 // TODO: This is actually a UserController - so change the name of object and file
 class EnvironmentController : public Controller, public PeerConnectionController::PeerConnectionControllerObserver {
@@ -100,9 +101,10 @@ public:
 	//RESULT InitializeNewPeerConnection(bool fCreateOffer, bool fAddDataChannel);
 
 protected:
-	RESULT SendEnvironmentSocket(const std::string& strData, state newState);
+	RESULT SendEnvironmentSocketMessage(std::shared_ptr<CloudMessage> pCloudRequest, state newState);
 
 private:
+	RESULT SendEnvironmentSocketData(const std::string& strData, state newState);
 	RESULT InitializeWebsocket(std::string& strURI);
 
 	void HandleWebsocketMessage(const std::string& strMessage);
