@@ -40,6 +40,23 @@ std::string guid::GetGUIDString() {
 	return strReturn;
 }
 
+RESULT guid::SetGUIDFromString(std::string strGUID) {
+	RESULT r = R_PASS;
+
+	// Ensure valid string (16 bytes (2 chars x 32))
+	CB((strGUID.length() == 32));
+	{
+		std::string strUpper = strGUID.substr(0, 16);
+		std::string strLower = strGUID.substr(16);
+
+		m_uiIDUpper = std::stoul(strUpper, nullptr, 16);
+		m_uiIDLower = std::stoul(strLower, nullptr, 16);;
+	}
+
+Error:
+	return r;
+}
+
 RESULT guid::IncrementUID() {
 	RESULT r = R_PASS;
 	

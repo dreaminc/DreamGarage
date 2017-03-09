@@ -614,6 +614,12 @@
     <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp">
       <Filter>Main</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Core\Utilities.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Controller.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2368,6 +2374,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudMessage.h">
       <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Utilities.h">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

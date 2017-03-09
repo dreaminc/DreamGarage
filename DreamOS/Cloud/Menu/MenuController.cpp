@@ -18,7 +18,17 @@ MenuController::MenuController(Controller* pParentController) :
 
 
 MenuController::~MenuController() {
-	// 
+	// empty
+}
+
+RESULT MenuController::Initialize() {
+	RESULT r = R_PASS;
+
+	// Register Methods
+	CR(RegisterMethod("get_submenu", std::bind(&MenuController::OnGetSubMenu, this, std::placeholders::_1)));
+
+Error:
+	return r;
 }
 
 // TODO: Move to Controller - register methods etc
@@ -37,6 +47,25 @@ std::string MenuController::GetMethodURI(MenuMethod menuMethod) {
 	*/
 
 	return strURI;
+}
+
+RESULT MenuController::HandleEnvironmentSocketMessage(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	CR(HandleOnMethodCallback(pCloudMessage));
+
+Error:
+	return r;
+}
+
+RESULT MenuController::OnGetSubMenu(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	CR(r);
+	pCloudMessage->PrintPayload(2);
+
+Error:
+	return r;
 }
 
 MenuControllerProxy* MenuController::GetMenuControllerProxy() {
@@ -67,7 +96,7 @@ RESULT MenuController::RequestSubMenu() {
 
 	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
 	CN(pCloudRequest);
-	CR(pCloudRequest->SetMethod("menu.get_submenu"));
+	CR(pCloudRequest->SetControllerMethod("menu.get_submenu"));
 
 	CR(pParentEnvironmentController->SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::MENU_API_REQUEST));
 

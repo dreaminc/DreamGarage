@@ -9,18 +9,30 @@
 // DreamOS/Cloud/Controller.h
 // The base controller object
 
+#include <map>
 #include <memory>
+#include <string>
+#include <functional>
 
 class CloudController;
+class CloudMessage;
+
+class ControllerMethod {
+	friend class Controller;
+public:
+	ControllerMethod();
+	ControllerMethod(std::string strMethodName, std::function<RESULT(std::shared_ptr<CloudMessage>)> m_fnOnMethod);
+	~ControllerMethod();
+
+protected:
+	std::string m_strMethodName;
+	std::function<RESULT(std::shared_ptr<CloudMessage>)> m_fnOnMethod;
+	UID m_uid;
+};
 
 class Controller {
 public:
-	Controller(Controller *pParentController = nullptr, CloudController *pParentCloudController = nullptr) :
-		m_pParentController(pParentController),
-		m_pParentCloudController(pParentCloudController)
-	{
-		// empty
-	}
+	Controller(Controller *pParentController = nullptr, CloudController *pParentCloudController = nullptr);
 
 	virtual ~Controller() {}
 
@@ -29,25 +41,20 @@ public:
 	friend class Controller;
 
 protected:
-	Controller* GetParentController() { 
-		return m_pParentController; 
-	}
+	Controller* GetParentController();
+	CloudController *GetCloudController();
 
-	CloudController *GetCloudController() {
-		if (m_pParentCloudController != nullptr) {
-			return m_pParentCloudController;
-		}
-		else if (m_pParentController != nullptr) {
-			return m_pParentController->GetCloudController();
-		}
-		else {
-			return nullptr;
-		}
-	}
+protected:
+	RESULT RegisterMethod(std::string strMethodName, std::function<RESULT(std::shared_ptr<CloudMessage>)> fnOnMethod);
+	RESULT HandleOnMethodCallback(std::shared_ptr<CloudMessage> pCloudMessage);
 
 private:
 	Controller* m_pParentController;
 	CloudController *m_pParentCloudController;
+
+	// Map of Response Methods
+private:
+	std::map<std::string, ControllerMethod> m_methods;
 
 private:
 	UID m_uid;

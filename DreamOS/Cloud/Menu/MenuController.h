@@ -14,6 +14,8 @@
 
 //#include "Cloud/Menu/Menu.h"
 
+class CloudMessage;
+
 class MenuControllerProxy : ControllerProxy {
 public:
 	virtual CLOUD_CONTROLLER_PROXY_TYPE GetControllerType() = 0;
@@ -37,10 +39,11 @@ public:
 	MenuController(Controller* pParentController);
 	~MenuController();
 
-	RESULT Initialize() {
-		return R_NOT_IMPLEMENTED;
-	}
+	RESULT Initialize();
 
+	RESULT HandleEnvironmentSocketMessage(std::shared_ptr<CloudMessage> pCloudMessage);
+
+	RESULT OnGetSubMenu(std::shared_ptr<CloudMessage> pCloudMessage);
 
 private:
 	std::string GetMethodURI(MenuMethod menuMethod);
