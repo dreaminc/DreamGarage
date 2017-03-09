@@ -16,6 +16,8 @@
 
 #include "Cloud/CloudMessage.h"
 
+#include "Core/Utilities.h"
+
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
 	m_fConnected(false),
@@ -478,20 +480,6 @@ Error:
 	return r;
 }
 
-std::vector<std::string> TokenizeString(std::string str, char cDelim) {
-	std::istringstream strStream(str);
-	std::vector<std::string> strTokens;
-	std::string strToken;
-
-	while (std::getline(strStream, strToken, cDelim)) {
-		if (!strToken.empty()) {
-			strTokens.push_back(strToken);
-		}
-	}
-
-	return strTokens;
-}
-
 bool EnvironmentController::IsUserIDConnected(long peerUserID) {
 	return m_pPeerConnectionController->IsUserIDConnected(peerUserID);
 }
@@ -562,6 +550,8 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
 
+	std::shared_ptr<CloudMessage> pCloudMessage = CloudMessage::Create(GetCloudController(), strMessage);
+
 	if (jsonCloudMessage["/method"_json_pointer] == nullptr) {
 		// message error
 
@@ -575,9 +565,11 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	std::string strType = jsonCloudMessage["/type"_json_pointer].get<std::string>();
 	std::string strMethod = jsonCloudMessage["/method"_json_pointer].get<std::string>();
 	
-	std::vector<std::string> strTokens = TokenizeString(strMethod, '.');
+	std::vector<std::string> strTokens = util::TokenizeString(strMethod, '.');
 
 	// Determine who to handle this
+	// TODO: Move this over to CloudMessage instead
+
 	if (strTokens[0] == "peer_connection") {
 		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];
 		strMethod = strTokens[1];
@@ -592,14 +584,16 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
-		else
-		{
+		else {
 			LOG(ERROR) << "(cloud) websocket msg type unknown";
 		}
 	}
-	else
-	{
+	else {
 		LOG(ERROR) << "(cloud) websocket msg method unknown";
+	}
+
+	if (pCloudMessage->GetController() == "menu") {
+		m_pMenuController->HandleEnvironmentSocketMessage(pCloudMessage);
 	}
 
 	/*

@@ -567,6 +567,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Controller.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
@@ -583,6 +584,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
+    <ClCompile Include="..\..\..\Core\Utilities.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
@@ -745,6 +747,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Core\config.h" />
     <ClInclude Include="..\..\..\Core\Types\Factory.h" />
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
+    <ClInclude Include="..\..\..\Core\Utilities.h" />
     <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h" />
     <ClInclude Include="..\..\..\DreamConsole\Console.h" />
     <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
