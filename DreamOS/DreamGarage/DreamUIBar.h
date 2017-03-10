@@ -12,28 +12,21 @@ public:
 	DreamUIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
 	~DreamUIBar();
 
-	//TODO: may be moved depending on implementation of registration architecture
-	typedef enum class UI_MENU_ITEM_EVENT {
-		FORWARD,
-		FILE,
-		INVALID
-	} UIMenuItemEvent;
-
-	struct UIEventInfo {
-		UIMenuItemEvent type;
-
-		UIEventInfo() :
-			type(UIMenuItemEvent::INVALID)
-		{}
-	};
-
 	RESULT Initialize();
 	RESULT Update();
+
+	RESULT OnTouchStart(void* pContext);
+	RESULT OnTouchMove(void* pContext);
+	RESULT OnTouchEnd(void* pContext);
 
 	// Callback signature
 	// RESULT fnEventCallback(struct (opt) pEventInfo, void* pContext)
 
-	RESULT RegisterEvent(UIMenuItemEvent type, std::function<RESULT(void*)> fnCallback, void* pContext = nullptr);
+	RESULT RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback);
+
+	std::map<InteractionEventType, std::function<RESULT(void*)>> m_callbacks;
+
+	RESULT Notify(InteractionObjectEvent *event) override;
 };
 
 

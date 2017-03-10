@@ -49,20 +49,18 @@ public:
 	virtual RESULT HandleMenuUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
 	virtual RESULT HandleTriggerUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
 
-
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
 
 private:
 	// Places MenuItem along a circular arc based on index
 	RESULT UpdateWithRadialLayout(size_t index);
 
-private:
-	// these flags help detect controller 'up' events
-	bool m_UISelect;
-
+protected:
 	IconFormat m_iconFormat;
 	LabelFormat m_labelFormat;
 	UIBarFormat m_barFormat;
+
+private:
 
 	std::shared_ptr<texture> m_pIconTexture;
 
