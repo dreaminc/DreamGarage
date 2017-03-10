@@ -23,11 +23,29 @@ MenuController::~MenuController() {
 	// empty
 }
 
+CLOUD_CONTROLLER_TYPE MenuController::observer::GetControllerType() {
+	return CLOUD_CONTROLLER_TYPE::MENU;
+}
+
 RESULT MenuController::Initialize() {
 	RESULT r = R_PASS;
 
 	// Register Methods
 	CR(RegisterMethod("get_submenu", std::bind(&MenuController::OnGetSubMenu, this, std::placeholders::_1)));
+
+Error:
+	return r;
+}
+
+//RESULT MenuController::RegisterMenuControllerObserver(MenuController::observer* pMenuControllerObserver) {
+RESULT MenuController::RegisterControllerObserver(ControllerObserver* pControllerObserver) {
+	RESULT r = R_PASS;
+
+	MenuController::observer *pMenuControllerObserver = dynamic_cast<MenuController::observer*>(pControllerObserver);
+	
+	CNM((pMenuControllerObserver), "Observer invalidf or cannot be nullptr");
+	CBM((m_pMenuControllerObserver == nullptr), "Can't overwrite menu observer");
+	m_pMenuControllerObserver = pMenuControllerObserver;
 
 Error:
 	return r;
@@ -65,11 +83,13 @@ RESULT MenuController::OnGetSubMenu(std::shared_ptr<CloudMessage> pCloudMessage)
 
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
 	nlohmann::json jsonMenu = jsonPayload["/menu"_json_pointer];
-	CB((jsonMenu.size() != 0));
-	
-	{
-		std::shared_ptr<MenuNode> pMenuNode = std::make_shared<MenuNode>(jsonMenu);
-		pMenuNode->PrintMenuNode();
+
+	if (m_pMenuControllerObserver != nullptr) {
+		std::shared_ptr<MenuNode> pMenuNode = nullptr;
+		if (jsonMenu.size() != 0) 
+			pMenuNode = std::make_shared<MenuNode>(jsonMenu);
+			
+		CR(m_pMenuControllerObserver->OnMenuData(pMenuNode));
 	}
 
 Error:
@@ -80,8 +100,8 @@ MenuControllerProxy* MenuController::GetMenuControllerProxy() {
 	return (MenuControllerProxy*)(this);
 }
 
-CLOUD_CONTROLLER_PROXY_TYPE MenuController::GetControllerType() {
-	return CLOUD_CONTROLLER_PROXY_TYPE::MENU;
+CLOUD_CONTROLLER_TYPE MenuController::GetControllerType() {
+	return CLOUD_CONTROLLER_TYPE::MENU;
 }
 
 RESULT MenuController::RequestSubMenu() {

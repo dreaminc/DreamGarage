@@ -2,6 +2,7 @@
 #include "DreamOS.h"
 
 #include "Sandbox/CommandLineManager.h"
+#include "Cloud/Menu/MenuNode.h"
 
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -81,6 +82,15 @@ Error:
 	return r;
 }
 
+RESULT CloudTestSuite::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
+	RESULT r = R_PASS;
+
+	CR(pMenuNode->PrintMenuNode());
+
+Error:
+	return r;
+}
+
 RESULT CloudTestSuite::AddTestMenuAPI() {
 	RESULT r = R_PASS;
 
@@ -99,9 +109,10 @@ RESULT CloudTestSuite::AddTestMenuAPI() {
 		
 		// Set up menu stuff
 		DEBUG_LINEOUT("Requesting Menu");
-		pMenuControllerProxy = (MenuControllerProxy*)(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_PROXY_TYPE::MENU));
+		pMenuControllerProxy = (MenuControllerProxy*)(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
 		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
 
+		CRM(pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
 		CRM(pMenuControllerProxy->RequestSubMenu(), "Failed to request sub menu");
 
 	Error:

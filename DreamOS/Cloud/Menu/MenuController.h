@@ -9,16 +9,18 @@
 
 #include "Cloud/Controller.h"
 #include "Cloud/ControllerProxy.h"
+#include "Cloud/ControllerObserver.h"
 
 #include <string>
 
 //#include "Cloud/Menu/Menu.h"
 
 class CloudMessage;
+class MenuNode;
 
-class MenuControllerProxy : ControllerProxy {
+class MenuControllerProxy : public ControllerProxy {
 public:
-	virtual CLOUD_CONTROLLER_PROXY_TYPE GetControllerType() = 0;
+	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
 	virtual RESULT RequestSubMenu() = 0;
 };
 
@@ -30,10 +32,15 @@ public:
 	};
 
 public:
-	class MenuControllerObserver {
+	// TODO: Convert to a proper controller observer pattern?
+	class observer : public ControllerObserver {
 	public:
-		virtual RESULT OnMenuData() = 0;
+		virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
+		
+		virtual RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode) = 0;
 	};
+
+	//RESULT RegisterMenuControllerObserver(MenuController::observer* pMenuControllerObserver);
 
 public:
 	MenuController(Controller* pParentController);
@@ -54,11 +61,14 @@ public:
 	MenuControllerProxy* GetMenuControllerProxy();
 
 	// Menu Controller Proxy
-	virtual CLOUD_CONTROLLER_PROXY_TYPE GetControllerType() override;
+	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RequestSubMenu() override;
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override;
 
 private:
 	//Menu m_menu;
+
+	MenuController::observer *m_pMenuControllerObserver;
 };
 
 #endif	// ! USER_CONTROLLER_H_

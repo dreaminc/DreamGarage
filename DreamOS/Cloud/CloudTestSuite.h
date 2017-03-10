@@ -11,10 +11,12 @@
 #include <functional>
 #include <memory>
 
+#include "Cloud/Menu/MenuController.h"
+
 class DreamOS;
 class CloudController;
 
-class CloudTestSuite : public TestSuite {
+class CloudTestSuite : public TestSuite, public MenuController::observer {
 public:
 	CloudTestSuite(DreamOS *pDreamOS);
 	~CloudTestSuite();
@@ -24,6 +26,9 @@ public:
 public:
 	RESULT AddTestConnectLogin();
 	RESULT AddTestMenuAPI();
+
+// Menu Controller Observer
+	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
 
 private:
 	CloudController *GetCloudController();

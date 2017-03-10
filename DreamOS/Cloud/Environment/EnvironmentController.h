@@ -58,6 +58,7 @@ public:
 	};
 
 public:
+	// TODO: Convert to a proper controller observer pattern?
 	class EnvironmentControllerObserver {
 	public:
 		virtual RESULT OnPeersUpdate(long index) = 0;
