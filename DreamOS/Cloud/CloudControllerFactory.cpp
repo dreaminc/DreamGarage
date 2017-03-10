@@ -7,7 +7,7 @@
 
 #include <memory>
 
-CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_TYPE type, void *pContext = nullptr) {
+CloudController* CloudControllerFactory::MakeCloudController(CLOUD_CONTROLLER_IMP_TYPE type, void *pContext = nullptr) {
 	RESULT r = R_PASS;
 	CloudController *pCloudController = nullptr;
 

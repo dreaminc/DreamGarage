@@ -39,7 +39,7 @@ typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageC
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 typedef std::function<RESULT(long, AudioDataMessage*)> HandleAudioDataCallback;
 
-enum class CLOUD_CONTROLLER_PROXY_TYPE {
+enum class CLOUD_CONTROLLER_TYPE {
 	CLOUD,
 	ENVIRONMENT,
 	MENU,
@@ -137,7 +137,8 @@ public:
 	
 	// Proxy Objects
 public:
-	ControllerProxy* GetControllerProxy(CLOUD_CONTROLLER_PROXY_TYPE controllerType);
+	ControllerProxy* GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
+	RESULT RegisterControllerObserver(CLOUD_CONTROLLER_TYPE controllerType, ControllerObserver *pControllerObserver);
 
 private:
 	MenuControllerProxy* GetMenuControllerProxy();

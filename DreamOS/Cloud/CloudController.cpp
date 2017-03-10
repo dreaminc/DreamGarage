@@ -716,16 +716,34 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 	return r;
 }
 
-ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_PROXY_TYPE controllerType) {
+// TODO: Fill out pattern for other controllers
+ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
 	ControllerProxy *pProxy = nullptr;
 
 	switch (controllerType) {
-		case CLOUD_CONTROLLER_PROXY_TYPE::MENU: {
+		case CLOUD_CONTROLLER_TYPE::MENU: {
 			pProxy = (ControllerProxy*)(GetMenuControllerProxy());
 		} break;
 	}
 
 	return pProxy;
+}
+
+RESULT CloudController::RegisterControllerObserver(CLOUD_CONTROLLER_TYPE controllerType, ControllerObserver *pControllerObserver) {
+	RESULT r = R_PASS;
+
+	ControllerProxy *pProxy = nullptr;
+
+	switch (controllerType) {
+		case CLOUD_CONTROLLER_TYPE::MENU: {
+			pProxy = (ControllerProxy*)(GetMenuControllerProxy());
+			CN(pProxy);
+			CR(pProxy->RegisterControllerObserver(pControllerObserver));
+		} break;
+	}
+
+Error:
+	return r;
 }
 
 MenuControllerProxy* CloudController::GetMenuControllerProxy() {
