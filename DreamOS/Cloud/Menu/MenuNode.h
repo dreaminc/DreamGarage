@@ -27,6 +27,12 @@ public:
 	MenuNode::type NodeTypeFromString(std::string strNodeType);
 
 	RESULT PrintMenuNode();
+	size_t NumSubMenuNodes();
+
+	const std::string& GetPath();
+	const std::string& GetScope();
+
+	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 
 private:
 	MenuNode::type m_nodeType;

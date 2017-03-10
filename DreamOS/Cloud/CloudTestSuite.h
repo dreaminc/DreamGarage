@@ -35,6 +35,7 @@ private:
 
 private:
 	DreamOS *m_pDreamOS;
+	CloudController *m_pCloudController = nullptr;
 };
 
 #endif // ! MENU_CONTROLLER_TEST_SUITE_H_

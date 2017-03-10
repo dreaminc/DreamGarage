@@ -21,7 +21,7 @@ class MenuNode;
 class MenuControllerProxy : public ControllerProxy {
 public:
 	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
-	virtual RESULT RequestSubMenu() = 0;
+	virtual RESULT RequestSubMenu(std::string strScope = "", std::string strPath = "") = 0;
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
@@ -62,7 +62,7 @@ public:
 
 	// Menu Controller Proxy
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
-	virtual RESULT RequestSubMenu() override;
+	virtual RESULT RequestSubMenu(std::string strScope = "", std::string strPath = "") override;
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override;
 
 private:

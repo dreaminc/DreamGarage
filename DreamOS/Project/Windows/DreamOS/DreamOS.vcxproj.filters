@@ -188,7 +188,7 @@
     </Filter>
     <Filter Include="UI">
       <UniqueIdentifier>{28d7c94b-81c3-4992-85e4-1dabd8aad4d9}</UniqueIdentifier>
-	</Filter
+	</Filter>
     <Filter Include="Cloud\Menu">
       <UniqueIdentifier>{ae8879dc-1260-4bae-97f6-1266681d851d}</UniqueIdentifier>
     </Filter>
