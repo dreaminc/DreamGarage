@@ -570,6 +570,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Cloud\Controller.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp" />
@@ -720,10 +721,11 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnection.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h" />
     <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h" />
+    <ClInclude Include="..\..\..\Cloud\Menu\MenuNode.h" />
     <ClInclude Include="..\..\..\Cloud\Message\Message.h" />
     <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h" />
-    <ClInclude Include="..\..\..\Cloud\Model.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudModel.h" />
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h" />
     <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h" />
     <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserController.h" />

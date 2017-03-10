@@ -133,6 +133,10 @@ RESULT CloudMessage::SetPayload(nlohmann::json jsonPayload) {
 	return R_PASS;
 }
 
+nlohmann::json CloudMessage::GetJSONPayload() {
+	return m_jsonPayload;
+}
+
 std::string CloudMessage::GetJSONDataString(int indent) {
 	nlohmann::json jsonData;
 

@@ -10,6 +10,8 @@
 
 #include "Cloud/CloudMessage.h"
 
+#include "Cloud/Menu/MenuNode.h"
+
 MenuController::MenuController(Controller* pParentController) :
 	Controller(pParentController)
 {
@@ -61,8 +63,14 @@ Error:
 RESULT MenuController::OnGetSubMenu(std::shared_ptr<CloudMessage> pCloudMessage) {
 	RESULT r = R_PASS;
 
-	CR(r);
-	pCloudMessage->PrintPayload(2);
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonMenu = jsonPayload["/menu"_json_pointer];
+	CB((jsonMenu.size() != 0));
+	
+	{
+		std::shared_ptr<MenuNode> pMenuNode = std::make_shared<MenuNode>(jsonMenu);
+		pMenuNode->PrintMenuNode();
+	}
 
 Error:
 	return r;

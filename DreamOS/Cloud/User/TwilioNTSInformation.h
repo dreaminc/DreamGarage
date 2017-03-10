@@ -9,7 +9,7 @@
 // DreamOS/Dimension/Cloud/User/User.h
 // Base User object
 
-#include "Cloud/Model.h"
+#include "Cloud/CloudModel.h"
 
 #include <string>
 #include "Primitives/version.h"

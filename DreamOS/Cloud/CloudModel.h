@@ -1,5 +1,5 @@
-#ifndef MODEL_H_
-#define MODEL_H_
+#ifndef CLOUD_MODEL_H_
+#define CLOUD_MODEL_H_
 
 #include "RESULT/EHM.h"
 #include "Primitives/Types/UID.h"
@@ -12,15 +12,15 @@
 #include "Controller.h"
 #include <memory>
 
-class Model {
+class CloudModel {
 public:
-	Model() :
+	CloudModel() :
 		m_pParentController(nullptr)
 	{
 		// empty
 	}
 
-	Model(std::shared_ptr<Controller> pParentController) :
+	CloudModel(std::shared_ptr<Controller> pParentController) :
 		m_pParentController(std::shared_ptr<Controller>(pParentController))
 	{
 		// empty
@@ -33,4 +33,4 @@ private:
 	std::shared_ptr<Controller> m_pParentController;
 };
 
-#endif	// ! MODEL_H_
+#endif	// ! CLOUD_MODEL_H_
