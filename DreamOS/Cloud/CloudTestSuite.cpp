@@ -39,6 +39,9 @@ RESULT CloudTestSuite::AddTestConnectLogin() {
 		CN(pCloudController);
 		CN(pCommandLineManager);
 
+		// For later
+		m_pCloudController = pCloudController;
+
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
 
@@ -86,6 +89,16 @@ RESULT CloudTestSuite::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
 	CR(pMenuNode->PrintMenuNode());
+
+	if (pMenuNode->NumSubMenuNodes() > 0) {
+		auto pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
+		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
+
+		std::string strScope = pMenuNode->GetSubMenuNodes()[0]->GetScope();
+		std::string strPath = pMenuNode->GetSubMenuNodes()[0]->GetPath();
+
+		CRM(pMenuControllerProxy->RequestSubMenu(strScope, strPath), "Failed to request sub menu");
+	}
 
 Error:
 	return r;

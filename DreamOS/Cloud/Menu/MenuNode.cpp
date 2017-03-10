@@ -75,3 +75,19 @@ MenuNode::type MenuNode::NodeTypeFromString(std::string strNodeType) {
 
 	return MenuNode::type::INVALID;
 }
+
+size_t MenuNode::NumSubMenuNodes() {
+	return m_menuNodes.size();
+}
+
+std::vector<std::shared_ptr<MenuNode>> MenuNode::GetSubMenuNodes() {
+	return m_menuNodes;
+}
+
+const std::string& MenuNode::GetPath() {
+	return m_strPath;
+}
+
+const std::string& MenuNode::GetScope() {
+	return m_strScope;
+}

@@ -104,7 +104,7 @@ CLOUD_CONTROLLER_TYPE MenuController::GetControllerType() {
 	return CLOUD_CONTROLLER_TYPE::MENU;
 }
 
-RESULT MenuController::RequestSubMenu() {
+RESULT MenuController::RequestSubMenu(std::string strScope, std::string strPath) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
@@ -119,8 +119,8 @@ RESULT MenuController::RequestSubMenu() {
 
 	jsonPayload["menu"] = nlohmann::json::object();
 	jsonPayload["menu"]["node_type"] = "NodeType.Folder";
-	jsonPayload["menu"]["path"] = "";
-	jsonPayload["menu"]["scope"] = "";
+	jsonPayload["menu"]["path"] = strPath;
+	jsonPayload["menu"]["scope"] = strScope;
 
 	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
 	CN(pCloudRequest);
