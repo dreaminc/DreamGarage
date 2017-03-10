@@ -42,6 +42,7 @@ public:
 	RESULT SetController(std::string strController);
 
 	RESULT SetPayload(nlohmann::json jsonPayload);
+	nlohmann::json GetJSONPayload();
 
 	RESULT SetGUID(std::string strGUID);
 	RESULT SetType(std::string strType);
