@@ -43,7 +43,8 @@ std::shared_ptr<CloudMessage> CloudMessage::Create(CloudController *pParentCloud
 
 	pCloudMessage = CloudMessage::Create(pParentCloudController);
 	CN(pCloudMessage); 
-	{
+
+	if(strJSONData.empty() == false) {
 
 		nlohmann::json jsonData = nlohmann::json::parse(strJSONData);
 

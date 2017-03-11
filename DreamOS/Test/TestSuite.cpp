@@ -30,8 +30,9 @@ Error:
 RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 	RESULT r = R_PASS;
 
-	if(m_currentTest != m_tests.end())  {
+	CBR((m_currentTest != m_tests.end()), R_COMPLETE);
 
+	{
 		auto pTest = (*m_currentTest);
 
 		switch (pTest->GetTestState()) {
@@ -73,9 +74,6 @@ RESULT TestSuite::UpdateAndRunTests(void *pContext) {
 				}
 			} break;
 		}
-	}
-	else {
-		return R_COMPLETE;
 	}
 
 Error:
