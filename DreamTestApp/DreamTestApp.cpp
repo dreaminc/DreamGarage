@@ -30,8 +30,8 @@ RESULT DreamTestApp::LoadScene() {
 	// Push to a test suite factory in testing
 
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
-	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
-	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
+	m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::UI, this);
+	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::CLOUD, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::PHYSICS, this);
 	//m_pTestSuite = TestSuiteFactory::Make(TestSuiteFactory::TEST_SUITE_TYPE::INTERACTION, this);
 

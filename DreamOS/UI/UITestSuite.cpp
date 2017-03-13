@@ -26,13 +26,6 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::Initialize() {
 	RESULT r = R_PASS;
 
-	for (int i = 0; i < SenseControllerEventType::SENSE_CONTROLLER_INVALID; i++) {
-		CR(m_pDreamOS->RegisterSubscriber((SenseControllerEventType)(i), this));
-	}
-
-	for (int i = 0; i < SenseMouseEventType::SENSE_MOUSE_INVALID; i++) {
-		CR(m_pDreamOS->RegisterSubscriber((SenseMouseEventType)(i), this));
-	}
 	
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
@@ -40,6 +33,34 @@ RESULT UITestSuite::Initialize() {
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+
+	point sceneOffset = point(90, -5, -25);
+	float sceneScale = 0.1f;
+	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+
+	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+	composite* pRiver = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\river.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+
+	for (int i = 0; i < SenseControllerEventType::SENSE_CONTROLLER_INVALID; i++) {
+		CR(m_pDreamOS->RegisterSubscriber((SenseControllerEventType)(i), this));
+	}
+
+	for (int i = 0; i < SenseMouseEventType::SENSE_MOUSE_INVALID; i++) {
+		CR(m_pDreamOS->RegisterSubscriber((SenseMouseEventType)(i), this));
+	}
 
 Error:
 	return r;
