@@ -63,18 +63,6 @@
     <Filter Include="External\OCULUS">
       <UniqueIdentifier>{3686233d-96d6-4810-ab2d-ff06312c2946}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\OCULUS\v132">
-      <UniqueIdentifier>{9fb38d30-c91d-44ad-b826-0bc9b067ae01}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\LibOVR">
-      <UniqueIdentifier>{352f8ae7-d31f-45c0-afc6-c334b01431cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\LibOVRKernel">
-      <UniqueIdentifier>{9b76fa23-0019-42ac-9157-f11820e16332}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\Logging">
-      <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HMD">
       <UniqueIdentifier>{e122ce99-434d-454c-a1b9-c035729da930}</UniqueIdentifier>
     </Filter>
@@ -191,6 +179,18 @@
     </Filter>
     <Filter Include="Cloud\Menu">
       <UniqueIdentifier>{ae8879dc-1260-4bae-97f6-1266681d851d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0">
+      <UniqueIdentifier>{9fb38d30-c91d-44ad-b826-0bc9b067ae01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\LibOVR">
+      <UniqueIdentifier>{352f8ae7-d31f-45c0-afc6-c334b01431cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\LibOVRKernel">
+      <UniqueIdentifier>{9b76fa23-0019-42ac-9157-f11820e16332}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\Logging">
+      <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -397,15 +397,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
       <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
       <Filter>Cloud\webrtc</Filter>
@@ -622,6 +613,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp">
       <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_OutputPlugins.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

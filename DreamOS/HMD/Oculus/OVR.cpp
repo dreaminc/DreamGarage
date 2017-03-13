@@ -32,6 +32,8 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
 
 	// Initializes LibOVR, and the Rift
+	// TODO: may be important to make an OVR Logger.  
+	// use it as an arg to ovr_Initialize
 	CRM((RESULT)ovr_Initialize(nullptr), "Failed to initialize libOVR.");
 
 	// Attempt to create OVR session
