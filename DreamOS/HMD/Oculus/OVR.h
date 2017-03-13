@@ -14,7 +14,7 @@
 #include "HAL/opengl/OGLDepthbuffer.h"
 
 // TODO: Better way?
-#define HMD_OVR_USE_PREDICTED_TIMNIG
+#define HMD_OVR_USE_PREDICTED_TIMING
 
 //#include "External\OCULUS\v132\LibOVR\Include\OVR_CAPI.h"
 //#pragma comment(lib, "External/OCULUS/v132/LibOVR/Lib/Windows/x64/Release/VS2015/LibOVR.lib")
@@ -53,7 +53,17 @@ public:
 	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
 	ViewMatrix GetViewMatrix(EYE_TYPE eye);
 
-	SenseController* GetSenseController();
+	//RESULT AttachHand(hand *pHand, hand::HAND_TYPE type);
+	//hand* GetHand(hand::HAND_TYPE type);
+
+private:
+	RESULT InitializeRenderModels();
+	RESULT InitializeRenderModel(uint32_t deviceID);
+	RESULT SetControllerModelTexture(model *pModel, texture *pTexture);
+
+	RESULT UpdateSenseController(ovrControllerType type, ovrInputState& inputState);
+
+	RESULT UpdateFromPose(ovrPoseStatef& pose, VirtualObj* pObj);
 
 public:
 	ovrSession m_ovrSession;
@@ -66,6 +76,10 @@ public:
 	OVRTextureSwapChain *m_ovrTextureSwapChains[HMD_NUM_EYES];
 	OVRMirrorTexture *m_ovrMirrorTexture;
 	//OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
+
+	quaternion m_pLeftRotation;
+	quaternion m_pRightRotation;
+	
 };
 
 #endif // ! HMD_IMP_H_

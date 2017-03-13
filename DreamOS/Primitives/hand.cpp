@@ -381,6 +381,16 @@ RESULT hand::SetHandModel(hand::HAND_TYPE type) {
 	return R_PASS;
 }
 
+RESULT hand::SetHandModelOrientation(quaternion q) {
+	if (m_handType == HAND_LEFT) {
+		m_pLeftModel->SetOrientation(q * m_qLeftModel);
+	}
+	if (m_handType == HAND_RIGHT) {
+		m_pRightModel->SetOrientation(q * m_qRightModel);
+	}
+	return R_PASS;
+}
+
 RESULT hand::ToggleRenderType() {
 	m_fSkeleton = !m_fSkeleton;
 	hand::HandType modelType = (m_fSkeleton) ? hand::HandType::HAND_SKELETON : m_handType;

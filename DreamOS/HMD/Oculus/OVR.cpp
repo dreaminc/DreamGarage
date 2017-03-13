@@ -78,13 +78,38 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
 
+	CR(InitializeRenderModels());
+	m_pSenseController = new SenseController();
+
+	m_pLeftRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(M_PI / 2.0f));
+	m_pRightRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(-M_PI / 2.0f));
+
 	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
 
 Error:
 	return r;
 }
 
-// temp (testing)
+RESULT OVRHMD::InitializeRenderModels() {
+	RESULT r = R_PASS;
+
+//	ovrControllerType type = ovrControllerType_Active;
+
+	CN(m_pHALImp);
+
+Error:
+	return r;
+}
+
+RESULT OVRHMD::InitializeRenderModel(uint32_t deviceID) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT OVRHMD::SetControllerModelTexture(model *pModel, texture *pTexture) {
+	return R_NOT_IMPLEMENTED;
+}
+
+
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
 	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
 	
@@ -147,10 +172,6 @@ ViewMatrix OVRHMD::GetViewMatrix(EYE_TYPE eye) {
 	else
 		return ViewMatrix(ptPosition, 0.0f, yaw, 0.0f);
 	//*/
-}
-
-SenseController* OVRHMD::GetSenseController() {
-	return nullptr;
 }
 
 RESULT OVRHMD::SetUpFrame() {
@@ -253,7 +274,121 @@ RESULT OVRHMD::UpdateHMD() {
 		m_qOrientation.Reverse();
 	}
 
+	if (trackingState.HandStatusFlags) {
+		OVERLAY_DEBUG_SET("pLeft", (int)trackingState.HandStatusFlags[0]);
+		OVERLAY_DEBUG_SET("pRight", (int)trackingState.HandStatusFlags[1]);
+
+		ovrInputState inputState;
+		ovr_GetInputState(m_ovrSession, ovrControllerType::ovrControllerType_Touch, &inputState);
+
+		point offset = m_pParentSandbox->GetCamera()->camera::GetPosition();
+
+		RotationMatrix qOffset = RotationMatrix();
+		quaternion qRotation = m_pParentSandbox->GetCamera()->GetOffsetOrientation();
+		qRotation.Reverse();
+		qOffset.SetQuaternionRotationMatrix(qRotation);
+
+		// SetHandState has an additional constant that needs to be nullified for OVR controllers
+		point setHandConstant = point(0.0f, 0.0f, 0.25f);
+		offset += setHandConstant;
+
+		if (trackingState.HandStatusFlags[0] == 3) {
+			point p0 = point(reinterpret_cast<float*>(&(trackingState.HandPoses[0].ThePose.Position)));
+			p0 = qOffset * p0;
+			m_pLeftHand->SetPosition(p0 + offset);
+			//OVERLAY_DEBUG_SET("p0", p0);
+			quaternion q0 = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[0].ThePose.Orientation)));
+			m_pLeftHand->SetLocalOrientation(q0);
+			m_pLeftHand->SetHandModel(hand::HAND_TYPE::HAND_LEFT);
+			m_pLeftHand->SetHandModelOrientation(q0 * m_pLeftRotation);
+			m_pLeftHand->SetTracked(true);
+			//OVERLAY_DEBUG_SET("q0", q0);
+			//m_pLeftHand->SetVisible(true);
+
+			UpdateSenseController(ovrControllerType::ovrControllerType_LTouch, inputState);
+
+//			ovrInputState inputState;
+//			ovr_GetInputState(m_ovrSession, ovrControllerType::ovrControllerType_LTouch, &inputState);
+		}
+		if (trackingState.HandStatusFlags[1] == 3) {
+			point p0 = point(reinterpret_cast<float*>(&(trackingState.HandPoses[1].ThePose.Position)));
+			p0 = qOffset * p0;
+			m_pRightHand->SetPosition(p0 + offset);
+			OVERLAY_DEBUG_SET("p1", p0);
+			quaternion q0 = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[1].ThePose.Orientation)));
+			m_pRightHand->SetLocalOrientation(q0);
+			OVERLAY_DEBUG_SET("q1", q0);
+			m_pRightHand->SetHandModel(hand::HAND_TYPE::HAND_RIGHT);
+			m_pRightHand->SetHandModelOrientation(q0 * m_pRightRotation);
+			m_pRightHand->SetTracked(true);
+
+			UpdateSenseController(ovrControllerType::ovrControllerType_RTouch, inputState);
+//			ovrInputState inputState;
+//			ovr_GetInputState(m_ovrSession, ovrControllerType::ovrControllerType_RTouch, &inputState);
+		}
+
+		int hand = 0;
+		if (&inputState) {
+			//OVERLAY_DEBUG_SET("get", 1);
+			OVERLAY_DEBUG_SET("trigger", inputState.IndexTriggerNoDeadzone[hand]);
+			OVERLAY_DEBUG_SET("trigger2", inputState.IndexTrigger[hand]);
+			//OVERLAY_DEBUG_SET("grip", inputState.HandTriggerNoDeadzone[hand]);
+			//OVERLAY_DEBUG_SET("grip2", inputState.HandTrigger[hand]);
+			OVERLAY_DEBUG_SET("buttons", (int)inputState.Buttons);
+			//OVERLAY_DEBUG_SET("touches", (int)inputState.Touches);
+			//OVERLAY_DEBUG_SET("stick", point(inputState.Thumbstick[hand].x, inputState.Thumbstick[hand].y, 0.0f));
+			//OVERLAY_DEBUG_SET("");
+		}
+	}
+
+
 //Error:
+	return r;
+}
+
+RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inputState) {
+	RESULT r = R_PASS;
+
+	ControllerState cState;
+	CN(&inputState);
+
+	//ovrControllerType buttons -
+	//0x0001 - A
+	//0x0002 - B
+	//0x0004 - Right stick press
+	//0x0100 - X
+	//0x0200 - Y
+	//0x0400 - Left stick press
+	//0x100000 - Left menu
+
+	cState.fMenu = (inputState.Buttons & 1<<20) != 0;
+	cState.fMenu = ((inputState.Buttons & 1<<1) != 0) || cState.fMenu;
+
+	cState.triggerRange = ((inputState.Buttons & 1) != 0) ? 1.0f : 0.0f;
+
+	if (type == ovrControllerType::ovrControllerType_LTouch) {
+		cState.type = CONTROLLER_LEFT;
+	}
+	else if (type == ovrControllerType::ovrControllerType_RTouch) {
+		cState.type = CONTROLLER_RIGHT;
+	}
+	else {
+		return r;
+	}
+
+	cState.fGrip = (inputState.HandTrigger[cState.type] > 0.9f);
+	//cState.triggerRange = (inputState.IndexTrigger[cState.type]);
+
+	cState.ptTouchpad = point(inputState.Thumbstick[cState.type].x, inputState.Thumbstick[cState.type].y, 0.0f);
+		
+	m_pSenseController->SetControllerState(cState);
+
+Error:
+	return r;
+}
+
+RESULT OVRHMD::UpdateFromPose(ovrPoseStatef& pose, VirtualObj* pObj) {
+	RESULT r = R_PASS;
 	return r;
 }
 
