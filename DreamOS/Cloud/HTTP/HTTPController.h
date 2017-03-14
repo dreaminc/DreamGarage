@@ -19,22 +19,8 @@
 
 #define HTTP_DELAY_SECONDS 5
 
-typedef std::function<void(std::string&&)> HTTPResponseCallback;
-
-class HTTPRequestHandler {
-public:
-	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback) :
-		m_pHTTPRequest(pHTTPRequest),
-		m_pHTTPResponse(pHTTPResponse),
-		m_fnResponseCallback(fnResponseCallback)
-	{
-		// empty
-	}
-
-	HTTPRequest* m_pHTTPRequest;
-	HTTPResponse* m_pHTTPResponse = nullptr;
-	HTTPResponseCallback m_fnResponseCallback;
-};
+class HTTPRequestHandler;
+class HTTPRequestFileHandler;
 
 class HTTPController {
 public:
@@ -45,13 +31,21 @@ public:
 	RESULT Start();
 	RESULT Stop();
 
+	// GET
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse* pHTTPResponse  = nullptr);
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnResponseCallback);
 	RESULT GET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse& httpResponse);
 
+	// POST
 	RESULT APOST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponse* pHTTPResponse = nullptr);
 	RESULT APOST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponseCallback fnResponseCallback);
 	RESULT POST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponse& httpResponse);
+
+	// FILE DOWNLOAD
+	//RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::string &strDesPath, HTTPResponse* pHTTPResponse = nullptr);
+	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::string &strDesPath, HTTPResponseCallback fnResponseCallback);
+	RESULT FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::string &strDestPath, HTTPResponse& httpResponse);
+
 
 	static const std::vector<std::string> ContentHttp() {
 		return { "Content-Type: application/x-www-form-urlencoded" };
@@ -62,9 +56,11 @@ public:
 	}
 
 private:
-	static size_t RequestCallback(void *ptr, size_t size, size_t nmemb, HTTPRequestHandler *cb);
+	static size_t RequestCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestHandler *pHTTPRequestHandler);
+	static size_t RequestFileCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestFileHandler *pHTTPRequestFileHandler);
 
 	RESULT Request(std::function<HTTPRequestHandler*(CURL*)> fnHTTPRequestCallback);
+	RESULT RequestFile(std::function<HTTPRequestFileHandler*(CURL*)> fnHTTPRequestFileCallback);
 	
 	// Thread processing http request / response
 	void ProcessingThread();

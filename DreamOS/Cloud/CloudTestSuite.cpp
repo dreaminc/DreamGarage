@@ -17,7 +17,12 @@ CloudTestSuite::~CloudTestSuite() {
 RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestMultiConnectTest());
+	//CR(AddTestMultiConnectTest());
+
+	CR(AddTestDownloadFile());
+
+	// TODO: Add Websocket tests
+	// TODO: Add HTTP / CURL tests
 
 	CR(AddTestConnectLogin());
 	CR(AddTestMenuAPI());
@@ -26,10 +31,17 @@ Error:
 	return r;
 }
 
+<<<<<<< HEAD
 RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 200.0f;
+=======
+RESULT CloudTestSuite::AddTestDownloadFile() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 20.0f;
+>>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
@@ -47,12 +59,17 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
 
+<<<<<<< HEAD
 		// TODO: This way to start the cloud controller thread is not great
+=======
+		// Download file
+>>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 		{
 			/*
 			std::string strUsername = pCommandLineManager->GetParameterValue("username");
 			std::string strPassword = pCommandLineManager->GetParameterValue("password");
 			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+<<<<<<< HEAD
 			*/
 
 			std::string strUsername = "jason_test";
@@ -63,6 +80,11 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 			CR(pCommandLineManager->SetParameterValue("password", "nightmare"));
 
 			CRM(pCloudController->Start(), "Failed to start cloud controller");
+=======
+
+			CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+			*/
+>>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 		}
 
 	Error:
@@ -77,8 +99,15 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
 		CN(pCloudController);
 
+<<<<<<< HEAD
 		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
 		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+=======
+		/*
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+		*/
+>>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 
 	Error:
 		return r;
@@ -88,8 +117,13 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
 	CN(pNewTest);
 
+<<<<<<< HEAD
 	pNewTest->SetTestName("Test Connect and Login");
 	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
+=======
+	pNewTest->SetTestName("Test Download File");
+	pNewTest->SetTestDescription("Test downloading a file from arbitrary URL");
+>>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 	pNewTest->SetTestDuration(sTestTime);
 
 Error:

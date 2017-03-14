@@ -24,6 +24,7 @@ public:
 	virtual RESULT AddTests() override;
 
 public:
+	RESULT AddTestDownloadFile();
 	RESULT AddTestConnectLogin();
 	RESULT AddTestMenuAPI();
 

@@ -9,6 +9,8 @@
 
 #include "curl/curl.h"
 
+typedef std::function<void(std::string&&)> HTTPResponseCallback;
+
 class HTTPResponse {
 public:
 	virtual void OnResponse(std::string&& response);

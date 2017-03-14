@@ -2387,6 +2387,12 @@
     <ClInclude Include="..\..\..\Cloud\ControllerObserver.h">
       <Filter>Cloud</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
