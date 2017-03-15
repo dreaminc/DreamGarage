@@ -57,13 +57,7 @@ public:
 	//hand* GetHand(hand::HAND_TYPE type);
 
 private:
-	RESULT InitializeRenderModels();
-	RESULT InitializeRenderModel(uint32_t deviceID);
-	RESULT SetControllerModelTexture(model *pModel, texture *pTexture);
-
 	RESULT UpdateSenseController(ovrControllerType type, ovrInputState& inputState);
-
-	RESULT UpdateFromPose(ovrPoseStatef& pose, VirtualObj* pObj);
 
 public:
 	ovrSession m_ovrSession;

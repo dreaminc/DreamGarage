@@ -249,8 +249,6 @@ Error:
 RESULT SandboxApp::RegisterImpControllerEvents() {
 	RESULT r = R_PASS;
 
-//	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
-
 	if (m_pHMD != nullptr) {
 		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
@@ -267,8 +265,6 @@ RESULT SandboxApp::RegisterImpControllerEvents() {
 			pLeftHand->SetVisible(true);
 			pRightHand->SetVisible(true);
 		}
-		//CR(pVive->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
-		//CR(pVive->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
 	}
 Error:
 	return r;
@@ -277,12 +273,8 @@ Error:
 //hand *Windows64App::AttachHand
 
 hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
-	//OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
-
-	//if (pVive != nullptr) {
 	if (m_pHMD != nullptr) {
 		return m_pHMD->GetHand(handType);
-		//return pVive->GetHand(handType);
 	}
 
 	if (m_pSenseLeapMotion != nullptr) {

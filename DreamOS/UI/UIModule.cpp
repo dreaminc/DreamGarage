@@ -55,10 +55,9 @@ ray UIModule::GetHandRay() {
 	CBR(pRightHand != nullptr, R_OBJECT_NOT_FOUND)
 	{
 		point ptHand = pRightHand->GetPosition();
-		OVERLAY_DEBUG_SET("phand", ptHand);
+
 		//GetLookVector
 		quaternion qHand = pRightHand->GetHandState().qOrientation;
-		OVERLAY_DEBUG_SET("qhand", qHand);
 		qHand.Normalize();
 
 		//TODO: investigate how to properly get look vector for controllers
