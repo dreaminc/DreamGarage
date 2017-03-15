@@ -53,8 +53,8 @@ public:
 
 	// FILE DOWNLOAD
 	//RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::string &strDesPath, HTTPResponse* pHTTPResponse = nullptr);
-	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::string &strDesPath, HTTPResponseCallback fnResponseCallback);
-	RESULT FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::string &strDestPath, HTTPResponse& httpResponse);
+	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseCallback fnResponseCallback);
+	RESULT FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse& httpResponse);
 
 
 	static const std::vector<std::string> ContentHttp() {
@@ -76,16 +76,14 @@ public:
 
 private:
 	static size_t RequestCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestHandler *pHTTPRequestHandler);
-	static size_t RequestFileCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestFileHandler *pHTTPRequestFileHandler);
+	//static size_t RequestFileCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestFileHandler *pHTTPRequestFileHandler);
+	static size_t RequestFileCallback(char *pBuffer, size_t pBuffer_n, size_t numBuffers, void *pContext);
 
 	RESULT Request(std::function<HTTPRequestHandler*(CURL*)> fnHTTPRequestCallback);
 	RESULT RequestFile(std::function<HTTPRequestFileHandler*(CURL*)> fnHTTPRequestFileCallback);
 	
 	// Thread processing http request / response
-	void ProcessingThread();
-
-	// Updates the requests
-	void Update();
+	void CURLMultihandleThreadProcess();
 
 public:
 	// TODO: Remove the singleton

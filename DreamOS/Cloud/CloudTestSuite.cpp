@@ -52,6 +52,7 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 
 	double sTestTime = 20.0f;
 <<<<<<< HEAD
+<<<<<<< HEAD
 >>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 =======
 	std::string strImagePlaceholderURI = "http://placehold.it/300.png/09f/fff";
@@ -63,10 +64,20 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 	PathManager* pPathManager = PathManager::instance();
 	strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_DATA, L"testimg.png");
 >>>>>>> adding Data path to Dream (we might want to remove this eventually) and set everything up to get the file transfer set up
+=======
+>>>>>>> confirmed callback firing on AFILE (async file request) and now mapping out the handling strategy / save to disk functionality - also cleaned up the CURL thread a little bit and confirmed that the lambdas in all of the APOST/AGET are not needed
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
+
+		//std::string strImagePlaceholderURI = "http://placehold.it/300.png/09f/fff";
+		std::string strImagePlaceholderURI = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png";
+
+		// Dest
+		std::wstring strImageDest;
+		PathManager* pPathManager = PathManager::instance();
+		strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_DATA, L"testimg.png");
 
 		// Cloud Controller
 		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
