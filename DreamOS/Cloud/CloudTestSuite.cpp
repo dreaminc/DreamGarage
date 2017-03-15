@@ -17,14 +17,19 @@ CloudTestSuite::~CloudTestSuite() {
 RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+<<<<<<< HEAD
 	//CR(AddTestMultiConnectTest());
 
 	CR(AddTestDownloadFile());
+=======
+	CR(AddTestConnectLogin());
+
+	//CR(AddTestDownloadFile());
+>>>>>>> adding HTTPControllerProxy and some config stuff that's pretty useful
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
 
-	CR(AddTestConnectLogin());
 	CR(AddTestMenuAPI());
 
 Error:
@@ -56,8 +61,7 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 		// For later
 		m_pCloudController = pCloudController;
 
-		DEBUG_LINEOUT("Initializing Cloud Controller");
-		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+		//CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
 
 <<<<<<< HEAD
 		// TODO: This way to start the cloud controller thread is not great

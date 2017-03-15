@@ -7,17 +7,59 @@
 #include "HTTPRequestHandler.h"
 #include "HTTPRequestFileHandler.h"
 
+#include "Cloud/CloudController.h"
+
 // Static initialization of Singleton
 HTTPController* HTTPController::s_pInstance = nullptr;
+
+HTTPController* HTTPController::CreateHTTPController() {
+	RESULT r = R_PASS;
+
+	HTTPController *pHTTPController = nullptr;
+
+	pHTTPController = new HTTPController();
+	CNM(pHTTPController, "Failed to allocate http controller");
+
+	CRM(pHTTPController->Initialize(), "Failed to initialize http controller");
+
+// Success:
+	return pHTTPController;
+
+Error:
+	if (pHTTPController != nullptr) {
+		delete pHTTPController;
+		pHTTPController = nullptr;
+	}
+
+	return nullptr;
+}
 
 HTTPController::HTTPController() :
 	m_fRunning(false)
 {
-	Start();
+	// empty
 }
 
 HTTPController::~HTTPController() {
-	Stop();
+	Shutdown();
+}
+
+RESULT HTTPController::Initialize() {
+	RESULT r = R_PASS;
+
+	CRM(Start(), "Failed to start HTTP Controller");
+
+Error:
+	return r;
+}
+
+RESULT HTTPController::Shutdown() {
+	RESULT r = R_PASS;
+
+	CRM(Stop(), "Failed to shut down HTTP Controller");
+
+Error:
+	return r;
 }
 
 void HTTPController::ProcessingThread() {
@@ -449,8 +491,17 @@ size_t HTTPController::RequestCallback(void *pContext, size_t size, size_t nmemb
 	return (size * nmemb);
 }
 
-// Default response
-void HTTPResponse::OnResponse(std::string&& strResponse) {
-	DEBUG_LINEOUT("HTTP response: %s", strResponse.c_str());
+HTTPControllerProxy* HTTPController::GetHTTPControllerProxy() {
+	return (HTTPControllerProxy*)(this);
+}
+
+// Menu Controller Proxy
+CLOUD_CONTROLLER_TYPE HTTPController::GetControllerType() {
+	return CLOUD_CONTROLLER_TYPE::HTTP;
+}
+
+// TODO: Should we add this implementation?
+RESULT HTTPController::RegisterControllerObserver(ControllerObserver* pControllerObserver) {
+	return R_NOT_IMPLEMENTED;
 }
 

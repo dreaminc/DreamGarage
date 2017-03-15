@@ -47,6 +47,7 @@ public:
 	RESULT Start();
 	RESULT Exit(RESULT exitcode);
 
+	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT LoadScene() = 0;
 	virtual RESULT Update(void) = 0;
 
@@ -151,6 +152,10 @@ public:
 protected:
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
+
+protected:
+	RESULT SetSandboxConfiguration(SandboxApp::configuration sandboxconf);
+	const SandboxApp::configuration& GetSandboxConfiguration();
 
 private:
 	SandboxApp *m_pSandbox;

@@ -27,8 +27,9 @@ public:
 		// empty
 	}
 
-	RESULT LoadScene();
-	RESULT Update(void);
+	virtual RESULT DreamTestApp::ConfigureSandbox() override;
+	virtual RESULT LoadScene() override;
+	virtual RESULT Update(void) override;
 
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;

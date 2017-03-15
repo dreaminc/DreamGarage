@@ -13,7 +13,9 @@ typedef std::function<void(std::string&&)> HTTPResponseCallback;
 
 class HTTPResponse {
 public:
-	virtual void OnResponse(std::string&& response);
+	virtual void OnResponse(std::string&& strResponse) {
+		DEBUG_LINEOUT("HTTP response: %s", strResponse.c_str());
+	}
 
 	const std::string& GetResponse() {
 		return m_strResponse;

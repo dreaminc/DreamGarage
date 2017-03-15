@@ -12,6 +12,18 @@ volume *g_pVolume = nullptr;
 volume *g_pVolume2 = nullptr;
 sphere *pSphere5 = nullptr;
 
+RESULT DreamTestApp::ConfigureSandbox() {
+	RESULT r = R_PASS;
+
+	SandboxApp::configuration sandboxconfig;
+	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseLeap = false;
+	SetSandboxConfiguration(sandboxconfig);
+
+//Error:
+	return r;
+}
+
 RESULT DreamTestApp::LoadScene() {
 	RESULT r = R_PASS;
 

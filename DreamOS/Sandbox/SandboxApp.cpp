@@ -43,6 +43,15 @@ SandboxApp::~SandboxApp() {
 	}
 }
 
+RESULT SandboxApp::SetSandboxConfiguration(SandboxApp::configuration sandboxconf) {
+	m_SandboxConfiguration = sandboxconf;
+	return R_PASS;
+}
+
+const SandboxApp::configuration& SandboxApp::GetSandboxConfiguration() {
+	return m_SandboxConfiguration;
+}
+
 RESULT SandboxApp::SetMouseIntersectObjects(bool fMouseIntersectObjects) {
 	m_fMouseIntersectObjects = fMouseIntersectObjects;
 	return R_PASS;
@@ -446,8 +455,14 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// Initialize Interaction Engine
 	CRM(InitializeInteractionEngine(), "Failed to initialize intetraction engine");
 
-	m_fCheckHMD = (m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0);
-	m_fCheckLeap = (m_pCommandLineManager->GetParameterValue("leap").compare("") == 0);
+	// TODO: Remove CMD line arg and use global config
+	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
+		m_SandboxConfiguration.fUseHMD = false;
+	}
+
+	if ((m_pCommandLineManager->GetParameterValue("leap").compare("") == 0) == false) {
+		m_SandboxConfiguration.fUseLeap = false;
+	}
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");

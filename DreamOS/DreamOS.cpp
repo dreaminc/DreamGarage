@@ -25,6 +25,7 @@ DreamOS::~DreamOS() {
 RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	RESULT r = R_PASS;
 
+	// TODO: This should be put into time a manager / utility 
 	srand(static_cast <unsigned> (time(0)));
 
 	// Initialize logger
@@ -35,37 +36,39 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
 
+	// This gives our DreamOS app instance a chance to configure the
+	// sandbox prior to it getting initialized 
+	CRM(ConfigureSandbox(), "Failed to configure sandbox");
+
 	// Check if Dream is launching from a web browser url.
-	// a url command from a webpage, to trigger the launch of Dream, woud start with 'dreamos:run' command line.
-	// The following code splites the whitespaces of a single command line param in that case, into a list of commad line arguments.
+	// a url command from a web page, to trigger the launch of Dream, would start with 'dreamos:run' command line.
+	// The following code splits the white space of a single command line param in that case, into a list of command line arguments.
 	if ((argc > 1) && 
 		((std::string(argv[1]).substr(0, 11).compare("dreamos:run") == 0) ||
 		 (std::string(argv[1]).substr(0, 14).compare("dreamosdev:run") == 0))) {
-		//  Dream is launching from a webpage
+		//  Dream is launching from a web page
 		
-		LOG(INFO) << "Dream runs from a webpage ";
+		LOG(INFO) << "Dream runs from web";
 
-		// decide if to split args or not
+		// Decide if to split args or not
 		if ((std::string(argv[1]).compare("dreamos:run") != 0) &&
 			(std::string(argv[1]).compare("dreamosdev:run") != 0)) {
 			std::vector<std::string> args{ argv[0] };
 			int new_argc = 1;
 
-			std::string cmdln = std::string(argv[1]); // The .exe location is the first argument
+			std::string strCMDInput = std::string(argv[1]); // The .exe location is the first argument
 
-			std::string arg;
-			std::stringstream ss(cmdln);
+			std::string stdArgument;
+			std::stringstream ssCMDInput(strCMDInput);
 
-			while (ss >> arg)
-			{
-				args.push_back(arg);
+			while (ssCMDInput >> stdArgument) {
+				args.push_back(stdArgument);
 				new_argc++;
 			}
 
 			char** new_argv = new char*[new_argc];
 
-			for (int i = 0; i < new_argc; i++)
-			{
+			for (int i = 0; i < new_argc; i++) {
 				new_argv[i] = new char;
 				new_argv[i] = (char*)args[i].c_str();
 			}
@@ -76,9 +79,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 			CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
 		}
 	}
-	else
-	{
-		LOG(INFO) << "Dream runs from exe";
+	else {
+		LOG(INFO) << "Dream runs from EXE";
 
 		// Initialize the sandbox
 		CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
@@ -270,6 +272,14 @@ RESULT DreamOS::RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallb
 
 RESULT DreamOS::UnregisterUpdateCallback() {
 	return m_pSandbox->UnregisterUpdateCallback();
+}
+
+RESULT DreamOS::SetSandboxConfiguration(SandboxApp::configuration sandboxconf) {
+	return m_pSandbox->SetSandboxConfiguration(sandboxconf);
+}
+
+const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
+	return m_pSandbox->GetSandboxConfiguration();
 }
 
 // Physics Engine

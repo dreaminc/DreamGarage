@@ -17,17 +17,27 @@
 #include "HTTPResponse.h"
 #include "HTTPRequest.h"
 
+#include "Cloud/ControllerProxy.h"
+
 #define HTTP_DELAY_SECONDS 5
 
 class HTTPRequestHandler;
 class HTTPRequestFileHandler;
 
-class HTTPController {
+class HTTPControllerProxy : public ControllerProxy {
+public:
+	//virtual RESULT RequestFile(std::string strURI, std::string strDestinationPath) = 0;
+};
+
+
+class HTTPController : public HTTPControllerProxy {
 public:
 	HTTPController();
 	~HTTPController();
 
 public:
+	RESULT Initialize();
+	RESULT Shutdown();
 	RESULT Start();
 	RESULT Stop();
 
@@ -55,6 +65,13 @@ public:
 		return { "Content-Type: application/json", "Accept: application/json; version=1.0" };
 	}
 
+public:
+	HTTPControllerProxy* GetHTTPControllerProxy();
+
+	// Menu Controller Proxy
+	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override;
+
 private:
 	static size_t RequestCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestHandler *pHTTPRequestHandler);
 	static size_t RequestFileCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestFileHandler *pHTTPRequestFileHandler);
@@ -69,12 +86,15 @@ private:
 	void Update();
 
 public:
+	// TODO: Remove the singleton
 	// Singleton
 	static HTTPController *s_pInstance;
 
+	static HTTPController *CreateHTTPController();
+
 	static HTTPController *instance() {
 		if (s_pInstance == nullptr)
-			s_pInstance = new HTTPController();
+			s_pInstance = CreateHTTPController();
 
 		return s_pInstance;
 	}

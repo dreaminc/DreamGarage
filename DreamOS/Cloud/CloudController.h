@@ -29,6 +29,9 @@ class UpdateHeadMessage;
 class UpdateHandMessage;
 class AudioDataMessage;
 
+class MenuControllerProxy;
+class HTTPControllerProxy;
+
 class User;
 class TwilioNTSInformation;
 
@@ -44,6 +47,7 @@ enum class CLOUD_CONTROLLER_TYPE {
 	ENVIRONMENT,
 	MENU,
 	USER,
+	HTTP,
 	INVALID
 };
 
@@ -142,6 +146,7 @@ public:
 
 private:
 	MenuControllerProxy* GetMenuControllerProxy();
+	HTTPControllerProxy* GetHTTPControllerProxy();
 
 private:
 	//UID m_uid;
