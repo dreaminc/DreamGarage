@@ -505,3 +505,11 @@ RESULT HTTPController::RegisterControllerObserver(ControllerObserver* pControlle
 	return R_NOT_IMPLEMENTED;
 }
 
+RESULT HTTPController::RequestFile(std::string strURI, std::wstring strDestinationPath) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+Error:
+	return r;
+}

@@ -12,3 +12,4 @@ TEXTURE			./Texture/
 TEXTURE_CUBE		./Texture/Cube/
 FONT			./Resources/Fonts/
 MODEL			./Models/
+DATA			./Data/

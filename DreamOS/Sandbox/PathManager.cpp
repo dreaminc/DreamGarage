@@ -289,6 +289,24 @@ Error:
 	return r;
 }
 
+std::wstring PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName) {
+	RESULT r = R_PASS;
+	std::wstring wstrRet;
+	wchar_t* pszTempFilePath = nullptr;
+
+	CR(GetFilePath(type, pszFileName, pszTempFilePath));
+
+	wstrRet = std::wstring(pszTempFilePath);
+
+Error:
+	if (pszTempFilePath != nullptr) {
+		delete[] pszTempFilePath;
+		pszTempFilePath = nullptr;
+	}
+
+	return wstrRet;
+}
+
 RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {
 	RESULT r = R_PASS;
 

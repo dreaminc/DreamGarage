@@ -26,7 +26,7 @@ class HTTPRequestFileHandler;
 
 class HTTPControllerProxy : public ControllerProxy {
 public:
-	//virtual RESULT RequestFile(std::string strURI, std::string strDestinationPath) = 0;
+	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) = 0;
 };
 
 
@@ -71,6 +71,8 @@ public:
 	// Menu Controller Proxy
 	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override;
+
+	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) override;
 
 private:
 	static size_t RequestCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestHandler *pHTTPRequestHandler);

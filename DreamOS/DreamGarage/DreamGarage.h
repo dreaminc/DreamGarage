@@ -64,8 +64,9 @@ public:
 	// TODO: this is just a debug test temp
 	RESULT SendSwitchHeadMessage();
 
-	RESULT LoadScene();
-	RESULT Update(void);
+	virtual RESULT ConfigureSandbox() override;
+	virtual RESULT LoadScene() override;
+	virtual RESULT Update(void) override;
 
 	// Cloud Controller
 	RESULT InitializeCloudControllerCallbacks();

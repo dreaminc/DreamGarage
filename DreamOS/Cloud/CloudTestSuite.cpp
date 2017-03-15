@@ -3,6 +3,7 @@
 
 #include "Sandbox/CommandLineManager.h"
 #include "Cloud/Menu/MenuNode.h"
+#include "Cloud/HTTP/HTTPController.h"
 
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -24,8 +25,12 @@ RESULT CloudTestSuite::AddTests() {
 =======
 	CR(AddTestConnectLogin());
 
+<<<<<<< HEAD
 	//CR(AddTestDownloadFile());
 >>>>>>> adding HTTPControllerProxy and some config stuff that's pretty useful
+=======
+	CR(AddTestDownloadFile());
+>>>>>>> adding Data path to Dream (we might want to remove this eventually) and set everything up to get the file transfer set up
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
@@ -46,7 +51,18 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 20.0f;
+<<<<<<< HEAD
 >>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
+=======
+	std::string strImagePlaceholderURI = "http://placehold.it/300.png/09f/fff";
+
+	// Dest
+	std::wstring strImageDest;
+
+	// Root folder
+	PathManager* pPathManager = PathManager::instance();
+	strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_DATA, L"testimg.png");
+>>>>>>> adding Data path to Dream (we might want to remove this eventually) and set everything up to get the file transfer set up
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
@@ -54,10 +70,12 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 
 		// Cloud Controller
 		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		HTTPControllerProxy *pHTTPControllerProxy = nullptr;
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 		CN(pCloudController);
 		CN(pCommandLineManager);
 
+<<<<<<< HEAD
 		// For later
 		m_pCloudController = pCloudController;
 
@@ -90,6 +108,14 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 			*/
 >>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 		}
+=======
+		// Set up file request
+		DEBUG_LINEOUT("Requesting File %s", strImagePlaceholderURI.c_str());
+		pHTTPControllerProxy = (HTTPControllerProxy*)(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP));
+		CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
+
+		CR(pHTTPControllerProxy->RequestFile(strImagePlaceholderURI, strImageDest));
+>>>>>>> adding Data path to Dream (we might want to remove this eventually) and set everything up to get the file transfer set up
 
 	Error:
 		return R_PASS;
