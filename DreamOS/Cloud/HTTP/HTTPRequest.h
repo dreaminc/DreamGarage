@@ -9,26 +9,20 @@
 
 #include "curl/curl.h"
 
+#include <string>
+#include <vector>
+
 class HTTPRequest {
 public:
-	HTTPRequest(CURL *pCURL, std::string strURI, std::vector<std::string> strHeaders) :
-		m_pCURL(pCURL),
-		m_strURI(strURI),
-		m_strHeaders(strHeaders)
-	{
-		// empty
-	}
+	HTTPRequest(CURL *pCURL, std::string strURI, std::vector<std::string> strHeaders);
+	HTTPRequest(CURL *pCURL, std::string strURI, std::vector<std::string> strHeaders, std::string strBody);
+	~HTTPRequest();
 
-	HTTPRequest(CURL *pCURL, std::string strURI, std::vector<std::string> strHeaders, std::string strBody) :
-		m_pCURL(pCURL),
-		m_strURI(strURI),
-		m_strHeaders(strHeaders),
-		m_strBody(strBody)
-	{
-		// empty
-	}
+	std::vector<std::string> GetHeaders();
+	std::string GetBody();
+	std::string GetURI();
 
-public:
+private:
 	CURL* m_pCURL;
 	std::string m_strURI;
 	std::vector<std::string> m_strHeaders;

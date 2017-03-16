@@ -41,6 +41,10 @@ public:
 	RESULT Start();
 	RESULT Stop();
 
+	// TODO: Might want to rename these
+	// TODO: Wrap up in HTTPRequest that is passed to HTTPController
+	// which sets it's params (POST/GET/FILE etc and handles everything on one path)
+
 	// GET
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse* pHTTPResponse  = nullptr);
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnResponseCallback);
@@ -52,10 +56,9 @@ public:
 	RESULT POST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponse& httpResponse);
 
 	// FILE DOWNLOAD
-	//RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::string &strDesPath, HTTPResponse* pHTTPResponse = nullptr);
+	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse* pHTTPResponse = nullptr);
 	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseCallback fnResponseCallback);
 	RESULT FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse& httpResponse);
-
 
 	static const std::vector<std::string> ContentHttp() {
 		return { "Content-Type: application/x-www-form-urlencoded" };
@@ -75,12 +78,12 @@ public:
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) override;
 
 private:
-	static size_t RequestCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestHandler *pHTTPRequestHandler);
+	static size_t RequestCallback(char *pBuffer, size_t elementSize, size_t numElements, HTTPRequestHandler *pHTTPRequestHandler);
 	//static size_t RequestFileCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestFileHandler *pHTTPRequestFileHandler);
-	static size_t RequestFileCallback(char *pBuffer, size_t pBuffer_n, size_t numBuffers, void *pContext);
+	static size_t RequestFileCallback(char *pBuffer, size_t elementSize, size_t numElements, void *pContext);
 
+	// TODO: This might not be needed either
 	RESULT Request(std::function<HTTPRequestHandler*(CURL*)> fnHTTPRequestCallback);
-	RESULT RequestFile(std::function<HTTPRequestFileHandler*(CURL*)> fnHTTPRequestFileCallback);
 	
 	// Thread processing http request / response
 	void CURLMultihandleThreadProcess();

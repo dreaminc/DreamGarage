@@ -74,7 +74,7 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 		//std::string strImagePlaceholderURI = "http://placehold.it/300.png/09f/fff";
 		std::string strImagePlaceholderURI = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png";
 
-		// Dest
+		// Destination Path
 		std::wstring strImageDest;
 		PathManager* pPathManager = PathManager::instance();
 		strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_DATA, L"testimg.png");

@@ -569,6 +569,10 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\Controller.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequest.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />

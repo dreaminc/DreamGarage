@@ -9,28 +9,22 @@
 
 #include "curl/curl.h"
 
+#include <string>
+#include <functional>
+
 typedef std::function<void(std::string&&)> HTTPResponseCallback;
 
 class HTTPResponse {
-public:
-	virtual void OnResponse(std::string&& strResponse) {
-		DEBUG_LINEOUT("HTTP response: %s", strResponse.c_str());
-	}
-
-	const std::string& GetResponse() {
-		return m_strResponse;
-	}
-
-	const std::string& PullResponse() {
-		return std::move(m_strResponse);
-	}
-
-protected:
 	friend class HTTPController;
 
-	void PutResponse(std::string& strResponse) {
-		m_strResponse = std::move(strResponse);
-	}
+public:
+	virtual void OnResponse(std::string&& strResponse);
+
+	const std::string& GetResponse();
+	const std::string& PullResponse();
+
+protected:
+	void PutResponse(std::string& strResponse);
 
 private:
 	std::string	m_strResponse;

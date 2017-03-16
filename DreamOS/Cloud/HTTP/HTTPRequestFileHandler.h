@@ -8,23 +8,21 @@
 // Base User object
 
 #include <functional>
-#include "HTTPResponse.h"
+
+#include "HTTPRequestHandler.h"
 
 class HTTPRequest;
+class HTTPResponse;
 
-class HTTPRequestFileHandler {
+class HTTPRequestFileHandler : public HTTPRequestHandler {
 public:
-	HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback) :
-		m_pHTTPRequest(pHTTPRequest),
-		m_pHTTPResponse(pHTTPResponse),
-		m_fnResponseCallback(fnResponseCallback)
-	{
-		// empty
-	}
+	HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);
+	
+	~HTTPRequestFileHandler();
 
-	HTTPRequest* m_pHTTPRequest;
+private:
+	HTTPRequest* m_pHTTPRequest = nullptr;
 	HTTPResponse* m_pHTTPResponse = nullptr;
-
 	HTTPResponseCallback m_fnResponseCallback = nullptr;
 };
 

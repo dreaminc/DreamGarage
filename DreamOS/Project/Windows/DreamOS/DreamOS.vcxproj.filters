@@ -623,6 +623,18 @@
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp">
       <Filter>External\OCULUS\v1.12.0\Logging</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequest.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

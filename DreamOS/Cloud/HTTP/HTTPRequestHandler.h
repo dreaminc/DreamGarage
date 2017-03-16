@@ -16,14 +16,16 @@ typedef std::function<void(std::string&&)> HTTPResponseCallback;
 
 class HTTPRequestHandler {
 public:
-	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback) :
-		m_pHTTPRequest(pHTTPRequest),
-		m_pHTTPResponse(pHTTPResponse),
-		m_fnResponseCallback(fnResponseCallback)
-	{
-		// empty
-	}
+	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);
 
+	RESULT HandleHTTPResponse(std::string strResponse);
+
+public:
+	std::string GetRequestURI();
+	std::vector<std::string> GetRequestHeaders();
+	std::string GetRequestBody();
+
+private:
 	HTTPRequest* m_pHTTPRequest;
 	HTTPResponse* m_pHTTPResponse = nullptr;
 	HTTPResponseCallback m_fnResponseCallback = nullptr;
