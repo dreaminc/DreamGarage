@@ -27,6 +27,8 @@ public:
 	RESULT AddTestConnectLogin();
 	RESULT AddTestMenuAPI();
 
+	RESULT AddTestMultiConnectTest();
+
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
 

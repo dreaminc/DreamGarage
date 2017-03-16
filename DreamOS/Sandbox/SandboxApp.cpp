@@ -414,6 +414,7 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->RegisterParameter("password", "p", "Nightmare479!"));
 	CR(m_pCommandLineManager->RegisterParameter("hmd", "h", ""));
 	CR(m_pCommandLineManager->RegisterParameter("leap", "lp", ""));
+	CR(m_pCommandLineManager->RegisterParameter("testval", "t", "1"));
 
 	// This can attempt to connect to a given environment
 	CR(m_pCommandLineManager->RegisterParameter("environment", "env", "default"));
