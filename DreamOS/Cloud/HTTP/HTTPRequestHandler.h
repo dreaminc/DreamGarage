@@ -20,7 +20,7 @@ public:
 	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);
 	~HTTPRequestHandler();
 
-	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t pBuffer_n);
+	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements);
 	RESULT HandleHTTPResponse(std::string strResponse);
 
 public:

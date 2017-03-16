@@ -16,6 +16,8 @@
 namespace util {
 	std::vector<std::string> TokenizeString(std::string str, char cDelim);
 	void tolowerstring(std::string& str);
+	std::string WideStringToString(const std::wstring& wstrStr);
+	std::wstring StringToWideString(const std::string& strStr);
 }
 
 #endif // ! UTILITIES_H_

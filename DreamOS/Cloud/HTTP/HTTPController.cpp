@@ -352,7 +352,6 @@ size_t HTTPController::RequestCallback(char *pBuffer, size_t elementSize, size_t
 	RESULT r = R_PASS;
 
 	size_t retVal = -1;
-	size_t pBuffer_n = elementSize * numElements;
 	HTTPRequestHandler *pHTTPRequestHandler = reinterpret_cast<HTTPRequestHandler*>(pContext);
 	CN(pHTTPRequestHandler);
 
@@ -360,19 +359,21 @@ size_t HTTPController::RequestCallback(char *pBuffer, size_t elementSize, size_t
 	CNM(pBuffer, "HTTP callback error");
 	CNM(pHTTPRequestHandler, "HTTP callback error");
 
-	CR(pHTTPRequestHandler->HandleHTTPResponse(pBuffer, pBuffer_n));
+	CR(pHTTPRequestHandler->HandleHTTPResponse(pBuffer, elementSize, numElements));
 
 	// Want to ensure single path exit to release http handler,
 	// so only set retVal to correct value if everything went well.
-	retVal = pBuffer_n;
+	retVal = elementSize * numElements;
 
 Error:
+	/*
 	if (pHTTPRequestHandler != nullptr) {
 		delete pHTTPRequestHandler;
 		pHTTPRequestHandler = nullptr;
 	}
+	*/
 
-	return pBuffer_n;
+	return retVal;
 }
 
 // FILE DOWNLOAD
@@ -399,7 +400,7 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 
 	// CURL
 	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
-	curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+	//curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
 	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
 	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler);
 
@@ -435,7 +436,7 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 
 	// CURL
 	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
-	curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+	//curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
 	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
 	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler);
 

@@ -101,6 +101,7 @@ public:
 	virtual RESULT GetListOfFilesInPath(std::wstring strNameDir, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension = nullptr) = 0;
 
 	RESULT DoesPathExist(PATH_VALUE_TYPE type);
+	RESULT DoesPathExist(std::wstring wstrPath, bool fCheckFile = false);
 	RESULT DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
 	RESULT GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists);
 

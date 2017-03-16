@@ -173,7 +173,7 @@ Error:
 RESULT CloudTestSuite::AddTestConnectLogin() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 3.0f;
+	double sTestTime = 2.0f;
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {

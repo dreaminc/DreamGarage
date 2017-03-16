@@ -55,12 +55,13 @@ typedef enum {
     R_FAIL = RESULT_START_FAIL,
     R_ERROR,
     
-	R_NOT_FOUND,			// general purpose not found error
-	R_FILE_NOT_FOUND,		// slightly more specific file not found error
-	R_INVALID_PARAM,		// invalid parameter 
-	R_PATH_NOT_FOUND,		// path not found
-	R_INVALID_OBJECT,		// Wrong Object passed to function
-	R_OVERFLOW,				// Overflow error of some kind
+	R_NOT_FOUND,				// general purpose not found error
+	R_FILE_NOT_FOUND,			// slightly more specific file not found error
+	R_FILE_ALREADY_EXISTS,		// file already exists
+	R_INVALID_PARAM,			// invalid parameter 
+	R_PATH_NOT_FOUND,			// path not found
+	R_INVALID_OBJECT,			// Wrong Object passed to function
+	R_OVERFLOW,					// Overflow error of some kind
 
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,

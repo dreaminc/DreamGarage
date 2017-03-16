@@ -326,6 +326,26 @@ Error:
 	return r;
 }
 
+// Checks if the path exists, if check file it'll check the file path directly, otherwise
+// it'll look at the top level directory
+RESULT PathManager::DoesPathExist(std::wstring wstrPath, bool fCheckFile) {
+	RESULT r = R_PASS;
+
+	if (!fCheckFile) {
+		wstrPath = wstrPath.substr(0, wstrPath.find_last_of(L"\\/"));
+	}
+
+	CR(DoesPathExist(wstrPath.c_str()));
+	
+	if (fCheckFile)
+		return R_FILE_FOUND;
+	else
+		return R_DIRECTORY_FOUND;
+		
+Error:
+	return r;
+}
+
 RESULT PathManager::DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName) {
 	RESULT r = R_PASS;
 	

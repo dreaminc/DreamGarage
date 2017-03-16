@@ -42,8 +42,10 @@ const std::string& HTTPRequestHandler::GetRequestBody() {
 	return m_pHTTPRequest->GetBody();
 }
 
-RESULT HTTPRequestHandler::HandleHTTPResponse(char *pBuffer, size_t pBuffer_n) {
+RESULT HTTPRequestHandler::HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) {
 	RESULT r = R_PASS;
+
+	size_t pBuffer_n = elementSize * numElements;
 
 	CN(pBuffer);
 	CB(pBuffer_n > 0);

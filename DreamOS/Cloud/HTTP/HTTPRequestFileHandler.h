@@ -19,7 +19,7 @@ public:
 	HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);	
 
 	RESULT SetDestinationFilePath(std::wstring wstrDestinationFilepath);
-	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t pBuffer_n) override;
+	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) override;
 
 private:
 	std::wstring m_wstrDestinationFilePath;
