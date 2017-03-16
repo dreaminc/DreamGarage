@@ -18,19 +18,12 @@ CloudTestSuite::~CloudTestSuite() {
 RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-<<<<<<< HEAD
+
 	//CR(AddTestMultiConnectTest());
 
 	CR(AddTestDownloadFile());
-=======
-	CR(AddTestConnectLogin());
 
-<<<<<<< HEAD
-	//CR(AddTestDownloadFile());
->>>>>>> adding HTTPControllerProxy and some config stuff that's pretty useful
-=======
-	CR(AddTestDownloadFile());
->>>>>>> adding Data path to Dream (we might want to remove this eventually) and set everything up to get the file transfer set up
+	CR(AddTestConnectLogin());
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
@@ -41,20 +34,78 @@ Error:
 	return r;
 }
 
-<<<<<<< HEAD
+
 RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 200.0f;
-=======
+
+	// Initialize the test
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCloudController);
+		CN(pCommandLineManager);
+
+		// For later
+		m_pCloudController = pCloudController;
+
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+		// Log in 
+		{
+			// TODO: This way to start the cloud controller thread is not great
+			std::string strUsername = "jason_test";
+			strUsername += pCommandLineManager->GetParameterValue("testval");
+			strUsername += "@dreamos.com";
+
+			CR(pCommandLineManager->SetParameterValue("username", strUsername));
+			CR(pCommandLineManager->SetParameterValue("password", "nightmare"));
+
+			CRM(pCloudController->Start(), "Failed to start cloud controller");
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Test Connect and Login");
+	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
+	pNewTest->SetTestDuration(sTestTime);
+
+Error:
+	return r;
+}
+
+
 RESULT CloudTestSuite::AddTestDownloadFile() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 20.0f;
-<<<<<<< HEAD
-<<<<<<< HEAD
->>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
-=======
+
 	std::string strImagePlaceholderURI = "http://placehold.it/300.png/09f/fff";
 
 	// Dest
@@ -63,9 +114,6 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 	// Root folder
 	PathManager* pPathManager = PathManager::instance();
 	strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_DATA, L"testimg.png");
->>>>>>> adding Data path to Dream (we might want to remove this eventually) and set everything up to get the file transfer set up
-=======
->>>>>>> confirmed callback firing on AFILE (async file request) and now mapping out the handling strategy / save to disk functionality - also cleaned up the CURL thread a little bit and confirmed that the lambdas in all of the APOST/AGET are not needed
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
@@ -86,47 +134,27 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 		CN(pCloudController);
 		CN(pCommandLineManager);
 
-<<<<<<< HEAD
+
 		// For later
 		m_pCloudController = pCloudController;
 
 		//CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
 
-<<<<<<< HEAD
-		// TODO: This way to start the cloud controller thread is not great
-=======
 		// Download file
->>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 		{
-			/*
 			std::string strUsername = pCommandLineManager->GetParameterValue("username");
 			std::string strPassword = pCommandLineManager->GetParameterValue("password");
 			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
-<<<<<<< HEAD
-			*/
-
-			std::string strUsername = "jason_test";
-			strUsername += pCommandLineManager->GetParameterValue("testval");
-			strUsername += "@dreamos.com";
-
-			CR(pCommandLineManager->SetParameterValue("username", strUsername));
-			CR(pCommandLineManager->SetParameterValue("password", "nightmare"));
-
-			CRM(pCloudController->Start(), "Failed to start cloud controller");
-=======
 
 			CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
-			*/
->>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 		}
-=======
+
 		// Set up file request
 		DEBUG_LINEOUT("Requesting File %s", strImagePlaceholderURI.c_str());
 		pHTTPControllerProxy = (HTTPControllerProxy*)(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP));
 		CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
 
 		CR(pHTTPControllerProxy->RequestFile(strImagePlaceholderURI, strImageDest));
->>>>>>> adding Data path to Dream (we might want to remove this eventually) and set everything up to get the file transfer set up
 
 	Error:
 		return R_PASS;
@@ -140,15 +168,13 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
 		CN(pCloudController);
 
-<<<<<<< HEAD
 		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
 		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
-=======
+
 		/*
 		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
 		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
 		*/
->>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 
 	Error:
 		return r;
@@ -158,13 +184,8 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
 	CN(pNewTest);
 
-<<<<<<< HEAD
-	pNewTest->SetTestName("Test Connect and Login");
-	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
-=======
 	pNewTest->SetTestName("Test Download File");
 	pNewTest->SetTestDescription("Test downloading a file from arbitrary URL");
->>>>>>> adding HTTPRequestFileHandler and a new routes for file requests using CURL, also added the Oculus Lib debug stuff
 	pNewTest->SetTestDuration(sTestTime);
 
 Error:
