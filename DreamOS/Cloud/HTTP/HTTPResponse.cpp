@@ -1,7 +1,12 @@
 #include "HTTPResponse.h"
 
-void HTTPResponse::OnResponse(std::string&& strResponse) {
+RESULT HTTPResponse::OnResponse(std::string&& strResponse) {
+	RESULT r = R_PASS;
+
 	DEBUG_LINEOUT("HTTP response: %s", strResponse.c_str());
+
+//Error:
+	return r;
 }
 
 const std::string& HTTPResponse::GetResponse() {

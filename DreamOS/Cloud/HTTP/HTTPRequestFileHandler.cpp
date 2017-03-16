@@ -6,20 +6,20 @@ HTTPRequestFileHandler::HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPRe
 	// empty
 }
 
-HTTPRequestFileHandler::~HTTPRequestFileHandler() {
-	if (m_pHTTPRequest != nullptr) {
-		delete m_pHTTPRequest;
-		m_pHTTPRequest = nullptr;
-	}
-
-	if (m_pHTTPResponse != nullptr) {
-		delete m_pHTTPResponse;
-		m_pHTTPResponse = nullptr;
-	}
-
-	if (m_fnResponseCallback != nullptr) {
-		m_fnResponseCallback = nullptr;
-	}
+RESULT HTTPRequestFileHandler::SetDestinationFilePath(std::wstring wstrDestinationFilepath) {
+	m_wstrDestinationFilePath = wstrDestinationFilepath;
+	return R_PASS;
 }
 
-// 
+RESULT HTTPRequestFileHandler::HandleHTTPResponse(char *pBuffer, size_t pBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(pBuffer);
+	CB(pBuffer_n > 0);
+
+	// Save to file
+	int a = 5;
+
+Error:
+	return r;
+}

@@ -168,13 +168,28 @@ Error:
 	return r;
 }
 
-RESULT HTTPController::Request(std::function<HTTPRequestHandler*(CURL*)> fnHTTPRequestHandler) {
+// TODO: Replace these functions with HTTPSession functionality
+RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse* pHTTPResponse) {
 	RESULT r = R_PASS;
+
+	HTTPRequestHandler*	pHTTPRequestHandler = nullptr;
+	struct curl_slist *pCURLList = nullptr;
 
 	CURL* pCURL = curl_easy_init();
 	CN(pCURL);
 
-	HTTPRequestHandler*	pHTTPRequestHandler = fnHTTPRequestHandler(pCURL);
+	pHTTPRequestHandler = new HTTPRequestHandler(new HTTPRequest(pCURL, strURI, strHeaders),
+												 (pHTTPResponse) ? pHTTPResponse : &m_defaultResponse,
+												 nullptr);
+	CN(pHTTPRequestHandler);
+
+	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+	curl_easy_setopt(pCURL, CURLOPT_VERBOSE, 1L);
+
+	for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders()) 
+		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
+
+	curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
 
 	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
 	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
@@ -186,48 +201,35 @@ Error:
 	return r;
 }
 
-RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse* pHTTPResponse) {
-	return Request([&](CURL* pCURL) -> HTTPRequestHandler*
-	{
-		HTTPRequestHandler* pHTTPRequestHandler = new HTTPRequestHandler(
-			new HTTPRequest(pCURL, strURI, strHeaders),
-			(pHTTPResponse) ? pHTTPResponse : &m_defaultResponse,
-			nullptr);
-
-		curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
-		curl_easy_setopt(pCURL, CURLOPT_VERBOSE, 1L);
-
-		struct curl_slist *pCURLList = NULL;
-
-		for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders()) {
-			pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
-		}
-
-		curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
-
-		return pHTTPRequestHandler;
-	});
-}
-
 RESULT HTTPController::AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnHTTPResponseCallback) {
-	return Request([&](CURL* pCURL) -> HTTPRequestHandler*
-	{
-		HTTPRequestHandler* pHTTPRequestHandler = new HTTPRequestHandler(
-			new HTTPRequest(pCURL, strURI, strHeaders),
-			nullptr,
-			fnHTTPResponseCallback);
+	RESULT r = R_PASS;
 
-		curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
-		struct curl_slist *pCURLList = NULL;
+	HTTPRequestHandler*	pHTTPRequestHandler = nullptr;
+	struct curl_slist *pCURLList = nullptr;
 
-		for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders()) {
-			pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
-		}
+	CURL* pCURL = curl_easy_init();
+	CN(pCURL);
 
-		curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+	pHTTPRequestHandler = new HTTPRequestHandler(new HTTPRequest(pCURL, strURI, strHeaders),
+												 nullptr,
+												 fnHTTPResponseCallback);
+	CN(pHTTPRequestHandler);
 
-		return pHTTPRequestHandler;
-	});
+	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+
+	for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders()) 
+		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
+
+	curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+
+	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
+	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestHandler);
+
+	curl_multi_add_handle(m_pCURLMultiHandle, pCURL);
+
+Error:
+	return r;
 }
 
 RESULT HTTPController::GET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse& httpResponse) {
@@ -253,52 +255,71 @@ Error:
 }
 
 RESULT HTTPController::APOST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponse* pHTTPResponse) {
-	return Request([&](CURL* pCURL) -> HTTPRequestHandler*
-	{
-		HTTPRequestHandler*	pHTTPRequestHandler = new HTTPRequestHandler(
-			new HTTPRequest(pCURL, strURI, strHeaders, strBody),
-			(pHTTPResponse) ? pHTTPResponse : &m_defaultResponse,
-			nullptr);
+	RESULT r = R_PASS;
+	
+	HTTPRequestHandler*	pHTTPRequestHandler = nullptr;
+	struct curl_slist *pCURLList = nullptr;
 
+	CURL* pCURL = curl_easy_init();
+	CN(pCURL);
 
-		curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
-		curl_easy_setopt(pCURL, CURLOPT_POST, 1L);
+	pHTTPRequestHandler = new HTTPRequestHandler(new HTTPRequest(pCURL, strURI, strHeaders, strBody),
+												 (pHTTPResponse) ? pHTTPResponse : &m_defaultResponse,
+												 nullptr);
+	CN(pHTTPRequestHandler);
 
-		struct curl_slist *pCURLList = NULL;
+	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+	curl_easy_setopt(pCURL, CURLOPT_POST, 1L);
 
-		for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders()) {
-			pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
-		}
+	for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders()) 
+		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
 
-		curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
-		curl_easy_setopt(pCURL, CURLOPT_POSTFIELDS, pHTTPRequestHandler->GetRequestBody().c_str());
+	curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+	curl_easy_setopt(pCURL, CURLOPT_POSTFIELDS, pHTTPRequestHandler->GetRequestBody().c_str());
 
-		return pHTTPRequestHandler;
-	});
+	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
+	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestHandler);
+
+	curl_multi_add_handle(m_pCURLMultiHandle, pCURL);
+
+Error:
+	return r;
 }
 
 RESULT HTTPController::APOST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponseCallback fnHTTPResponseCallback) {
-	return Request([&](CURL* pCURL) -> HTTPRequestHandler*
-	{
-		HTTPRequestHandler*	pHTTPRequestHandler = new HTTPRequestHandler(
-			new HTTPRequest(pCURL, strURI, strHeaders, strBody),
-			nullptr,
-			fnHTTPResponseCallback);
+	RESULT r = R_PASS;
 
-		curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
-		curl_easy_setopt(pCURL, CURLOPT_POST, 1L);
+	CURLcode curlC = CURLE_OK;
 
-		struct curl_slist *pCURLList = NULL;
+	HTTPRequestHandler*	pHTTPRequestHandler = nullptr;
+	struct curl_slist *pCURLList = nullptr;
 
-		for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders()) {
-			pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
-		}
+	CURL* pCURL = curl_easy_init();
+	CN(pCURL);
 
-		curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
-		curl_easy_setopt(pCURL, CURLOPT_POSTFIELDS, pHTTPRequestHandler->GetRequestBody().c_str());
+	pHTTPRequestHandler = new HTTPRequestHandler(new HTTPRequest(pCURL, strURI, strHeaders, strBody),
+												 nullptr,
+												 fnHTTPResponseCallback);
+	CN(pHTTPRequestHandler);
+		
+	curlC = curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+	curlC = curl_easy_setopt(pCURL, CURLOPT_POST, 1L);
 
-		return pHTTPRequestHandler;
-	});
+	for (const auto& strHeader : pHTTPRequestHandler->GetRequestHeaders()) 
+		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
+
+	curlC = curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+	curlC = curl_easy_setopt(pCURL, CURLOPT_POSTFIELDS, pHTTPRequestHandler->GetRequestBody().c_str());
+
+	curlC = curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestHandler->GetRequestURI().c_str());
+	curlC = curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
+	curlC = curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestHandler);
+
+	curl_multi_add_handle(m_pCURLMultiHandle, pCURL);
+
+Error:
+	return r;
 }
 
 RESULT HTTPController::POST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponse& httpResponse) {
@@ -307,7 +328,12 @@ RESULT HTTPController::POST(const std::string& strURI, const std::vector<std::st
 	std::promise<std::string> httpPromise;
 	std::future<std::string> httpFuture = httpPromise.get_future();
 
-	CR(APOST(strURI, strHeaders, strBody, [&](std::string&& strFutureResponse) { httpPromise.set_value(strFutureResponse); }));
+	CR(APOST(strURI, strHeaders, strBody, 
+		[&](std::string&& strFutureResponse) { 
+			httpPromise.set_value(strFutureResponse); 
+		}
+	));
+
 	{
 		// Future Timeout
 		std::chrono::system_clock::time_point httpTimeout = std::chrono::system_clock::now() + std::chrono::seconds(HTTP_DELAY_SECONDS);
@@ -322,45 +348,31 @@ Error:
 	return r;
 }
 
-size_t HTTPController::RequestCallback(char *pBuffer, size_t elementSize, size_t numElements, HTTPRequestHandler *pHTTPRequestHandler) {
+size_t HTTPController::RequestCallback(char *pBuffer, size_t elementSize, size_t numElements, void *pContext) {
 	RESULT r = R_PASS;
 
+	size_t retVal = -1;
 	size_t pBuffer_n = elementSize * numElements;
+	HTTPRequestHandler *pHTTPRequestHandler = reinterpret_cast<HTTPRequestHandler*>(pContext);
+	CN(pHTTPRequestHandler);
 
 	// callback error, should we log out a warning(?)
 	CNM(pBuffer, "HTTP callback error");
 	CNM(pHTTPRequestHandler, "HTTP callback error");
 
-	// Convert into string, this call will limit to the size of the buffer passed in 
-	std::string strResponse(pBuffer, pBuffer_n);
+	CR(pHTTPRequestHandler->HandleHTTPResponse(pBuffer, pBuffer_n));
 
-	if (pHTTPRequestHandler->m_pHTTPResponse) {
-		// using HttpResponse
-		pHTTPRequestHandler->m_pHTTPResponse->OnResponse(std::move(strResponse));
-		delete pHTTPRequestHandler->m_pHTTPRequest;
-		pHTTPRequestHandler->m_pHTTPRequest = nullptr;
-		pHTTPRequestHandler->m_pHTTPResponse = nullptr;
-	}
-	else if (pHTTPRequestHandler->m_fnResponseCallback) {
-		// using HttpResponseFunc
-		pHTTPRequestHandler->m_fnResponseCallback(std::move(strResponse));
-		delete pHTTPRequestHandler->m_pHTTPRequest;
-		pHTTPRequestHandler->m_pHTTPRequest = nullptr;
-		pHTTPRequestHandler->m_fnResponseCallback = nullptr;
-	}
-
-	// cleanup should be made after the callback(!)
-	//curl_easy_cleanup(cb->request->curl);
-	//CURL* c = cb->request->curl;
-	//cb->response = &m_defaultResponse;
-	//delete cb;
-	//curl_easy_cleanup(c);
-
-// Success:
-	return pBuffer_n;
+	// Want to ensure single path exit to release http handler,
+	// so only set retVal to correct value if everything went well.
+	retVal = pBuffer_n;
 
 Error:
-	return -1;
+	if (pHTTPRequestHandler != nullptr) {
+		delete pHTTPRequestHandler;
+		pHTTPRequestHandler = nullptr;
+	}
+
+	return pBuffer_n;
 }
 
 // FILE DOWNLOAD
@@ -379,16 +391,16 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 														 (pHTTPResponse) ? pHTTPResponse : &m_defaultResponse,
 														 nullptr);
 	CN(pHTTPRequestFileHandler);
+	pHTTPRequestFileHandler->SetDestinationFilePath(strDestinationPath);
 
 	// Add the headers
-	for (const auto& strHeader : pHTTPRequestFileHandler->GetRequestHeaders()) {
+	for (const auto& strHeader : pHTTPRequestFileHandler->GetRequestHeaders()) 
 		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
-	}
 
 	// CURL
 	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
 	curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
-	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestFileCallback);
+	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
 	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler);
 
 	// Add multi handle (will get picked up in thread)
@@ -415,16 +427,16 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 														 nullptr,
 														 fnResponseCallback);
 	CN(pHTTPRequestFileHandler);
+	pHTTPRequestFileHandler->SetDestinationFilePath(strDestinationPath);
 
 	// Add the headers
-	for (const auto& strHeader : pHTTPRequestFileHandler->GetRequestHeaders()) {
+	for (const auto& strHeader : pHTTPRequestFileHandler->GetRequestHeaders()) 
 		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
-	}
 
 	// CURL
 	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
 	curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
-	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestFileCallback);
+	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
 	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler);
 
 	// Add multi handle (will get picked up in thread)
@@ -459,57 +471,6 @@ RESULT HTTPController::FILE(const std::string& strURI, const std::vector<std::st
 
 Error:
 	return r;
-}
-
-
-size_t HTTPController::RequestFileCallback(char *pBuffer, size_t elementSize, size_t numElements, void *pContext) {
-	RESULT r = R_PASS;
-
-	HTTPRequestFileHandler *pHTTPRequestFileHandler = reinterpret_cast<HTTPRequestFileHandler*>(pContext);
-	CN(pHTTPRequestFileHandler);
-
-	// callback error, should we log out a warning(?)
-	if (!pContext) {
-		DEBUG_LINEOUT("HTTP callback error");
-		return 0;
-	}
-
-	if (pContext && pHTTPRequestFileHandler) {
-		std::string strResponse(static_cast<char*>(pContext));
-
-		if (pHTTPRequestFileHandler->m_pHTTPResponse) {
-			// Using HttpResponse
-			pHTTPRequestFileHandler->m_pHTTPResponse->OnResponse(std::move(strResponse));
-			
-			pHTTPRequestFileHandler->m_pHTTPRequest = nullptr;
-			pHTTPRequestFileHandler->m_pHTTPResponse = nullptr;
-
-			delete pHTTPRequestFileHandler->m_pHTTPRequest;
-
-		}
-		else if (pHTTPRequestFileHandler->m_fnResponseCallback) {
-			// Using HttpResponseFunc
-			pHTTPRequestFileHandler->m_fnResponseCallback(std::move(strResponse));
-			
-			pHTTPRequestFileHandler->m_pHTTPRequest = nullptr;
-			pHTTPRequestFileHandler->m_fnResponseCallback = nullptr;
-
-			delete pHTTPRequestFileHandler->m_pHTTPRequest;
-		}
-
-		// cleanup should be made after the callback(!)
-		//curl_easy_cleanup(cb->request->curl);
-		//CURL* c = cb->request->curl;
-		//cb->response = &m_defaultResponse;
-		//delete cb;
-		//curl_easy_cleanup(c);
-	}
-
-// Success:
-	return (elementSize * numElements);
-
-Error:
-	return -1;
 }
 
 HTTPControllerProxy* HTTPController::GetHTTPControllerProxy() {

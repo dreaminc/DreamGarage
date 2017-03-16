@@ -11,35 +11,56 @@ HTTPRequestHandler::HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* 
 	// empty
 }
 
-std::string HTTPRequestHandler::GetRequestURI() {
+HTTPRequestHandler::~HTTPRequestHandler() {
 	if (m_pHTTPRequest != nullptr) {
-		return m_pHTTPRequest->GetURI();
+		delete m_pHTTPRequest;
+		m_pHTTPRequest = nullptr;
 	}
 
-	return std::string();
+	if (m_pHTTPResponse != nullptr) {
+		delete m_pHTTPResponse;
+		m_pHTTPResponse = nullptr;
+	}
+
+	if (m_fnResponseCallback != nullptr) {
+		m_fnResponseCallback = nullptr;
+	}
+}
+
+const std::string& HTTPRequestHandler::GetRequestURI() {
+	ACN(m_pHTTPRequest);
+	return m_pHTTPRequest->GetURI();
 }
 
 std::vector<std::string> HTTPRequestHandler::GetRequestHeaders() {
-	if(m_pHTTPRequest != nullptr)
-		return m_pHTTPRequest->GetHeaders();
-
-	return std::vector<std::string>();
+	ACN(m_pHTTPRequest);
+	return m_pHTTPRequest->GetHeaders();
 }
 
-std::string HTTPRequestHandler::GetRequestBody() {
-	if(m_pHTTPRequest != nullptr)
-		return m_pHTTPRequest->GetBody();
-
-	return std::string();
+const std::string& HTTPRequestHandler::GetRequestBody() {
+	ACN(m_pHTTPRequest);
+	return m_pHTTPRequest->GetBody();
 }
 
+RESULT HTTPRequestHandler::HandleHTTPResponse(char *pBuffer, size_t pBuffer_n) {
+	RESULT r = R_PASS;
+
+	CN(pBuffer);
+	CB(pBuffer_n > 0);
+
+	// Convert into string, this call will limit to the size of the buffer passed in 
+	CR(HandleHTTPResponse(std::string(pBuffer, pBuffer_n)));
+
+Error:
+	return r;
+}
 
 RESULT HTTPRequestHandler::HandleHTTPResponse(std::string strResponse) {
 	RESULT r = R_PASS;
 
 	if (m_pHTTPResponse != nullptr) {
 		// Hand off response to response object
-		CR(m_pHTTPResponse->HandleHTTPResponse(strResponse));
+		CR(m_pHTTPResponse->OnResponse(std::move(strResponse)));
 	}
 
 	if (m_fnResponseCallback != nullptr) {

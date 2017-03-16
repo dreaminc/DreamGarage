@@ -7,6 +7,7 @@
 // DreamOS/Dimension/Cloud/Objects/User.h
 // Base User object
 
+#include <vector>
 #include <functional>
 #include "HTTPResponse.h"
 
@@ -17,13 +18,15 @@ typedef std::function<void(std::string&&)> HTTPResponseCallback;
 class HTTPRequestHandler {
 public:
 	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);
+	~HTTPRequestHandler();
 
+	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t pBuffer_n);
 	RESULT HandleHTTPResponse(std::string strResponse);
 
 public:
-	std::string GetRequestURI();
+	const std::string& GetRequestURI();
 	std::vector<std::string> GetRequestHeaders();
-	std::string GetRequestBody();
+	const std::string& GetRequestBody();
 
 private:
 	HTTPRequest* m_pHTTPRequest;

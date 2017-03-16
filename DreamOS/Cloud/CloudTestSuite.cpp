@@ -18,12 +18,11 @@ CloudTestSuite::~CloudTestSuite() {
 RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-
+	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
 	//CR(AddTestMultiConnectTest());
 
-	CR(AddTestDownloadFile());
-
 	CR(AddTestConnectLogin());
+	CR(AddTestDownloadFile());	// requires logged in
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
@@ -106,15 +105,6 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 
 	double sTestTime = 20.0f;
 
-	std::string strImagePlaceholderURI = "http://placehold.it/300.png/09f/fff";
-
-	// Dest
-	std::wstring strImageDest;
-
-	// Root folder
-	PathManager* pPathManager = PathManager::instance();
-	strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_DATA, L"testimg.png");
-
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -134,20 +124,8 @@ RESULT CloudTestSuite::AddTestDownloadFile() {
 		CN(pCloudController);
 		CN(pCommandLineManager);
 
-
 		// For later
 		m_pCloudController = pCloudController;
-
-		//CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
-
-		// Download file
-		{
-			std::string strUsername = pCommandLineManager->GetParameterValue("username");
-			std::string strPassword = pCommandLineManager->GetParameterValue("password");
-			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
-
-			CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
-		}
 
 		// Set up file request
 		DEBUG_LINEOUT("Requesting File %s", strImagePlaceholderURI.c_str());

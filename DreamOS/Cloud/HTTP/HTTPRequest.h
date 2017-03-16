@@ -19,8 +19,8 @@ public:
 	~HTTPRequest();
 
 	std::vector<std::string> GetHeaders();
-	std::string GetBody();
-	std::string GetURI();
+	const std::string& GetBody();
+	const std::string& GetURI();
 
 private:
 	CURL* m_pCURL;

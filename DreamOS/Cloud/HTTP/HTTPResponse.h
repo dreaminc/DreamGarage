@@ -18,7 +18,7 @@ class HTTPResponse {
 	friend class HTTPController;
 
 public:
-	virtual void OnResponse(std::string&& strResponse);
+	virtual RESULT OnResponse(std::string&& strResponse);
 
 	const std::string& GetResponse();
 	const std::string& PullResponse();

@@ -16,14 +16,14 @@ class HTTPResponse;
 
 class HTTPRequestFileHandler : public HTTPRequestHandler {
 public:
-	HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);
-	
-	~HTTPRequestFileHandler();
+	HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);	
+
+	RESULT SetDestinationFilePath(std::wstring wstrDestinationFilepath);
+	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t pBuffer_n) override;
 
 private:
-	HTTPRequest* m_pHTTPRequest = nullptr;
-	HTTPResponse* m_pHTTPResponse = nullptr;
-	HTTPResponseCallback m_fnResponseCallback = nullptr;
+	std::wstring m_wstrDestinationFilePath;
+
 };
 
 

@@ -45,6 +45,8 @@ public:
 	// TODO: Wrap up in HTTPRequest that is passed to HTTPController
 	// which sets it's params (POST/GET/FILE etc and handles everything on one path)
 
+	// TODO: Replace these functions with HTTPSession functionality
+
 	// GET
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse* pHTTPResponse  = nullptr);
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnResponseCallback);
@@ -78,12 +80,7 @@ public:
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) override;
 
 private:
-	static size_t RequestCallback(char *pBuffer, size_t elementSize, size_t numElements, HTTPRequestHandler *pHTTPRequestHandler);
-	//static size_t RequestFileCallback(void *pContext, size_t size, size_t nmemb, HTTPRequestFileHandler *pHTTPRequestFileHandler);
-	static size_t RequestFileCallback(char *pBuffer, size_t elementSize, size_t numElements, void *pContext);
-
-	// TODO: This might not be needed either
-	RESULT Request(std::function<HTTPRequestHandler*(CURL*)> fnHTTPRequestCallback);
+	static size_t RequestCallback(char *pBuffer, size_t elementSize, size_t numElements, void *pContext);
 	
 	// Thread processing http request / response
 	void CURLMultihandleThreadProcess();
