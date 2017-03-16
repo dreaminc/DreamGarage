@@ -151,6 +151,8 @@ public:
 	RESULT SetHandModel(hand::HAND_TYPE type);
 	RESULT SetHandModelOrientation(quaternion q);
 
+	std::shared_ptr<composite> GetModel(hand::HAND_TYPE handType);
+
 private:
 
 	HAND_TYPE m_handType;

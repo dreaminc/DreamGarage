@@ -185,6 +185,16 @@ RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const ha
 	return R_PASS;
 }
 
+std::shared_ptr<composite> hand::GetModel(hand::HAND_TYPE handType) {
+	if (handType == hand::HAND_TYPE::HAND_LEFT) {
+		return m_pLeftModel;
+	}
+	else if (handType == hand::HAND_TYPE::HAND_RIGHT) {
+		return m_pRightModel;
+	}
+	return nullptr;
+}
+
 RESULT hand::Initialize() {
 	RESULT r = R_PASS;
 

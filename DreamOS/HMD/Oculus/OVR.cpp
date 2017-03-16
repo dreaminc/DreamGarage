@@ -265,33 +265,33 @@ RESULT OVRHMD::UpdateHMD() {
 		qRotation.Reverse();
 		qOffset.SetQuaternionRotationMatrix(qRotation);
 
-		// SetHandState has an additional constant that needs to be nullified for OVR controllers
-		point setHandConstant = point(0.0f, 0.0f, 0.25f);
-		offset += setHandConstant;
+		int i = 0;
+		for (auto& hand : { m_pLeftHand, m_pRightHand }) {
+			if (trackingState.HandStatusFlags[i] != 3) continue;
 
-		if (trackingState.HandStatusFlags[0] == 3) {
-			point p0 = point(reinterpret_cast<float*>(&(trackingState.HandPoses[0].ThePose.Position)));
-			p0 = qOffset * p0;
-			m_pLeftHand->SetPosition(p0 + offset);
-			quaternion q0 = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[0].ThePose.Orientation)));
-			m_pLeftHand->SetLocalOrientation(q0);
-			m_pLeftHand->SetHandModel(hand::HAND_TYPE::HAND_LEFT);
-			m_pLeftHand->SetHandModelOrientation(q0 * m_pLeftRotation);
-			m_pLeftHand->SetTracked(true);
+			point ptControllerPosition = point(reinterpret_cast<float*>(&(trackingState.HandPoses[i].ThePose.Position)));
+			ptControllerPosition = qOffset * ptControllerPosition;
+			hand->SetPosition(ptControllerPosition + offset);
 
-			UpdateSenseController(ovrControllerType::ovrControllerType_LTouch, inputState);
-		}
-		if (trackingState.HandStatusFlags[1] == 3) {
-			point p0 = point(reinterpret_cast<float*>(&(trackingState.HandPoses[1].ThePose.Position)));
-			p0 = qOffset * p0;
-			m_pRightHand->SetPosition(p0 + offset);
-			quaternion q0 = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[1].ThePose.Orientation)));
-			m_pRightHand->SetLocalOrientation(q0);
-			m_pRightHand->SetHandModel(hand::HAND_TYPE::HAND_RIGHT);
-			m_pRightHand->SetHandModelOrientation(q0 * m_pRightRotation);
-			m_pRightHand->SetTracked(true);
+			quaternion qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[i].ThePose.Orientation)));
+			// Act like this doesn't exist
+			qOrientation.Reverse();
+			qRotation.Reverse();
+			qOrientation *= qRotation;
+			qOrientation.Reverse();
 
-			UpdateSenseController(ovrControllerType::ovrControllerType_RTouch, inputState);
+			quaternion base = i == 0 ? m_pLeftRotation : m_pRightRotation;
+			hand->SetOrientation(qOrientation * base);
+			hand->SetLocalOrientation(qOrientation);
+			
+			hand::HAND_TYPE hType = i == 0 ? hand::HAND_TYPE::HAND_LEFT : hand::HAND_TYPE::HAND_RIGHT;
+			hand->SetHandModel(hType);
+			hand->SetTracked(true);
+
+			ovrControllerType type = i == 0 ? ovrControllerType_LTouch : ovrControllerType_RTouch; 
+			UpdateSenseController(type, inputState);
+
+			i += 1;
 		}
 	}
 

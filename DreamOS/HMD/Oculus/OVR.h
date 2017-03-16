@@ -53,9 +53,6 @@ public:
 	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
 	ViewMatrix GetViewMatrix(EYE_TYPE eye);
 
-	//RESULT AttachHand(hand *pHand, hand::HAND_TYPE type);
-	//hand* GetHand(hand::HAND_TYPE type);
-
 private:
 	RESULT UpdateSenseController(ovrControllerType type, ovrInputState& inputState);
 

@@ -262,8 +262,6 @@ RESULT SandboxApp::RegisterImpControllerEvents() {
 		if (dynamic_cast<OVRHMD*>(m_pHMD) != nullptr) {
 			AddObject(pLeftHand);
 			AddObject(pRightHand);
-			pLeftHand->SetVisible(true);
-			pRightHand->SetVisible(true);
 		}
 	}
 Error:
