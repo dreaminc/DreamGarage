@@ -17,8 +17,80 @@ CloudTestSuite::~CloudTestSuite() {
 RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMultiConnectTest());
+
 	CR(AddTestConnectLogin());
 	CR(AddTestMenuAPI());
+
+Error:
+	return r;
+}
+
+RESULT CloudTestSuite::AddTestMultiConnectTest() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 200.0f;
+
+	// Initialize the test
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCloudController);
+		CN(pCommandLineManager);
+
+		// For later
+		m_pCloudController = pCloudController;
+
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+		// TODO: This way to start the cloud controller thread is not great
+		{
+			/*
+			std::string strUsername = pCommandLineManager->GetParameterValue("username");
+			std::string strPassword = pCommandLineManager->GetParameterValue("password");
+			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+			*/
+
+			std::string strUsername = "jason_test";
+			strUsername += pCommandLineManager->GetParameterValue("testval");
+			strUsername += "@dreamos.com";
+
+			CR(pCommandLineManager->SetParameterValue("username", strUsername));
+			CR(pCommandLineManager->SetParameterValue("password", "nightmare"));
+
+			CRM(pCloudController->Start(), "Failed to start cloud controller");
+		}
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Test Connect and Login");
+	pNewTest->SetTestDescription("Test connect and log into service - this will hang for a while");
+	pNewTest->SetTestDuration(sTestTime);
 
 Error:
 	return r;

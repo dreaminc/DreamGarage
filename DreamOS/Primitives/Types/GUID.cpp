@@ -49,8 +49,8 @@ RESULT guid::SetGUIDFromString(std::string strGUID) {
 		std::string strUpper = strGUID.substr(0, 16);
 		std::string strLower = strGUID.substr(16);
 
-		m_uiIDUpper = std::stoul(strUpper, nullptr, 16);
-		m_uiIDLower = std::stoul(strLower, nullptr, 16);;
+		m_uiIDUpper = std::stoull(strUpper, nullptr, 16);
+		m_uiIDLower = std::stoull(strLower, nullptr, 16);;
 	}
 
 Error:
