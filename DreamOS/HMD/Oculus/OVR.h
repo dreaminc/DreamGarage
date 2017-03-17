@@ -68,8 +68,8 @@ public:
 	OVRMirrorTexture *m_ovrMirrorTexture;
 	//OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
 
-	quaternion m_pLeftRotation;
-	quaternion m_pRightRotation;
+	quaternion qLeftRotation;
+	quaternion qRightRotation;
 	
 };
 

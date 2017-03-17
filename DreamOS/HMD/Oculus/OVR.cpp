@@ -80,8 +80,8 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 
 	m_pSenseController = new SenseController();
 
-	m_pLeftRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(M_PI / 2.0f));
-	m_pRightRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(-M_PI / 2.0f));
+	qLeftRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(M_PI / 2.0f));
+	qRightRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(-M_PI / 2.0f));
 
 	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
 
@@ -280,7 +280,7 @@ RESULT OVRHMD::UpdateHMD() {
 			qOrientation *= qRotation;
 			qOrientation.Reverse();
 
-			quaternion base = i == 0 ? m_pLeftRotation : m_pRightRotation;
+			quaternion base = i == 0 ? qLeftRotation : qRightRotation;
 			hand->SetOrientation(qOrientation * base);
 			hand->SetLocalOrientation(qOrientation);
 			
