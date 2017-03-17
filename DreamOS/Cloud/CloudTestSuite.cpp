@@ -3,6 +3,7 @@
 
 #include "Sandbox/CommandLineManager.h"
 #include "Cloud/Menu/MenuNode.h"
+#include "Cloud/HTTP/HTTPController.h"
 
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -17,14 +18,21 @@ CloudTestSuite::~CloudTestSuite() {
 RESULT CloudTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestMultiConnectTest());
+	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
+	//CR(AddTestMultiConnectTest());
 
 	CR(AddTestConnectLogin());
+	CR(AddTestDownloadFile());	// requires logged in
+
+	// TODO: Add Websocket tests
+	// TODO: Add HTTP / CURL tests
+
 	CR(AddTestMenuAPI());
 
 Error:
 	return r;
 }
+
 
 RESULT CloudTestSuite::AddTestMultiConnectTest() {
 	RESULT r = R_PASS;
@@ -47,14 +55,9 @@ RESULT CloudTestSuite::AddTestMultiConnectTest() {
 		DEBUG_LINEOUT("Initializing Cloud Controller");
 		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
 
-		// TODO: This way to start the cloud controller thread is not great
+		// Log in 
 		{
-			/*
-			std::string strUsername = pCommandLineManager->GetParameterValue("username");
-			std::string strPassword = pCommandLineManager->GetParameterValue("password");
-			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
-			*/
-
+			// TODO: This way to start the cloud controller thread is not great
 			std::string strUsername = "jason_test";
 			strUsername += pCommandLineManager->GetParameterValue("testval");
 			strUsername += "@dreamos.com";
@@ -96,10 +99,81 @@ Error:
 	return r;
 }
 
+
+RESULT CloudTestSuite::AddTestDownloadFile() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 20.0f;
+
+	// Initialize the test
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		//std::string strImagePlaceholderURI = "http://placehold.it/300.png/09f/fff";
+		std::string strImagePlaceholderURI = "https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png";
+
+		// Destination Path
+		std::wstring strImageDest;
+		PathManager* pPathManager = PathManager::instance();
+		strImageDest = pPathManager->GetFilePath(PATH_VALUE_TYPE::PATH_DATA, L"testimg.png");
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		HTTPControllerProxy *pHTTPControllerProxy = nullptr;
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		CN(pCloudController);
+		CN(pCommandLineManager);
+
+		// For later
+		m_pCloudController = pCloudController;
+
+		// Set up file request
+		DEBUG_LINEOUT("Requesting File %s", strImagePlaceholderURI.c_str());
+		pHTTPControllerProxy = (HTTPControllerProxy*)(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP));
+		CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
+
+		CR(pHTTPControllerProxy->RequestFile(strImagePlaceholderURI, strImageDest));
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CN(pCloudController);
+
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+
+		/*
+		CBM(pCloudController->IsUserLoggedIn(), "User was not logged in");
+		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket did not connect");
+		*/
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnTest, GetCloudController());
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Test Download File");
+	pNewTest->SetTestDescription("Test downloading a file from arbitrary URL");
+	pNewTest->SetTestDuration(sTestTime);
+
+Error:
+	return r;
+}
+
 RESULT CloudTestSuite::AddTestConnectLogin() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 3.0f;
+	double sTestTime = 2.0f;
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {

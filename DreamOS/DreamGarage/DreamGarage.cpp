@@ -44,6 +44,18 @@ volume *pVolume4;
 std::vector<composite*> bears;
 //*/
 
+RESULT DreamGarage::ConfigureSandbox() {
+	RESULT r = R_PASS;
+
+	SandboxApp::configuration sandboxconfig;
+	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseLeap = true;
+	SetSandboxConfiguration(sandboxconfig);
+
+	//Error:
+	return r;
+}
+
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 

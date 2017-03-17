@@ -53,12 +53,25 @@ class SandboxApp :
 	public Subscriber<CmdPromptEvent>, 
 	public Subscriber<CollisionGroupEvent>, 
 	public Subscriber<CollisionObjectEvent>,
-	public valid {
+	public valid 
+{
+	friend class DreamOS;
+
+public:
+	struct configuration {
+		unsigned fUseHMD : 1;
+		unsigned fUseLeap : 1;
+	};
+
+private:
+	SandboxApp::configuration m_SandboxConfiguration;
+
 public:
 	SandboxApp();
 	~SandboxApp();
 
-	friend class DreamOS;
+	RESULT SetSandboxConfiguration(SandboxApp::configuration sandboxconf);
+	const SandboxApp::configuration& GetSandboxConfiguration();
 
 public:
 	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
@@ -251,8 +264,6 @@ protected:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
-	bool m_fCheckHMD;
-	bool m_fCheckLeap;
 
 protected:
 	std::function<RESULT(void)> m_fnUpdateCallback;

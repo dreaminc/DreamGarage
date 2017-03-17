@@ -289,6 +289,24 @@ Error:
 	return r;
 }
 
+std::wstring PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName) {
+	RESULT r = R_PASS;
+	std::wstring wstrRet;
+	wchar_t* pszTempFilePath = nullptr;
+
+	CR(GetFilePath(type, pszFileName, pszTempFilePath));
+
+	wstrRet = std::wstring(pszTempFilePath);
+
+Error:
+	if (pszTempFilePath != nullptr) {
+		delete[] pszTempFilePath;
+		pszTempFilePath = nullptr;
+	}
+
+	return wstrRet;
+}
+
 RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {
 	RESULT r = R_PASS;
 
@@ -305,6 +323,26 @@ Error:
 		pszValuePath = nullptr;
 	}
 
+	return r;
+}
+
+// Checks if the path exists, if check file it'll check the file path directly, otherwise
+// it'll look at the top level directory
+RESULT PathManager::DoesPathExist(std::wstring wstrPath, bool fCheckFile) {
+	RESULT r = R_PASS;
+
+	if (!fCheckFile) {
+		wstrPath = wstrPath.substr(0, wstrPath.find_last_of(L"\\/"));
+	}
+
+	CR(DoesPathExist(wstrPath.c_str()));
+	
+	if (fCheckFile)
+		return R_FILE_FOUND;
+	else
+		return R_DIRECTORY_FOUND;
+		
+Error:
 	return r;
 }
 

@@ -409,8 +409,7 @@ RESULT Windows64App::InitializeSandbox() {
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	
-	// Move this into Sandbox config
-	if (m_fCheckHMD) {
+	if (GetSandboxConfiguration().fUseHMD) {
 		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	
 		if (m_pHMD != nullptr) {
@@ -430,7 +429,7 @@ RESULT Windows64App::InitializeSandbox() {
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
 	// This will only turn on Leap if connected at boot up
-	if (m_fCheckLeap) {
+	if (GetSandboxConfiguration().fUseLeap) {
 		CRM(InitializeLeapMotion(), "Failed to initialize leap motion");
 	}
 

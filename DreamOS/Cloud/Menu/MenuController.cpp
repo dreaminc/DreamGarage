@@ -43,7 +43,7 @@ RESULT MenuController::RegisterControllerObserver(ControllerObserver* pControlle
 
 	MenuController::observer *pMenuControllerObserver = dynamic_cast<MenuController::observer*>(pControllerObserver);
 	
-	CNM((pMenuControllerObserver), "Observer invalidf or cannot be nullptr");
+	CNM((pMenuControllerObserver), "Observer invalid or cannot be nullptr");
 	CBM((m_pMenuControllerObserver == nullptr), "Can't overwrite menu observer");
 	m_pMenuControllerObserver = pMenuControllerObserver;
 
