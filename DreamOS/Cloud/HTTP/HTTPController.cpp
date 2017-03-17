@@ -83,7 +83,7 @@ void HTTPController::CURLMultihandleThreadProcess() {
 		CBM((curlMC == CURLM_OK), "curl_multi_fdset failed");
 
 		if (timeoutCURL < 0) {
-			timeoutCURL = 1000;
+			timeoutCURL = 5000;
 		}
 
 		tvTimeout.tv_sec = timeoutCURL / 1000;
@@ -116,7 +116,7 @@ void HTTPController::CURLMultihandleThreadProcess() {
 				// select error => continue
 			} break;
 
-			case 0:
+			case 0: 
 			default: {
 				// Timeout or readable/writable sockets
 				curlMC = curl_multi_perform(m_pCURLMultiHandle, &m_CURLMultiHandleCount);
@@ -367,6 +367,7 @@ size_t HTTPController::RequestCallback(char *pBuffer, size_t elementSize, size_t
 
 Error:
 	/*
+	// Do this in thread
 	if (pHTTPRequestHandler != nullptr) {
 		delete pHTTPRequestHandler;
 		pHTTPRequestHandler = nullptr;
@@ -381,6 +382,7 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 	RESULT r = R_PASS;
 
 	CURLMcode curlMC = CURLM_OK;
+	CURLcode curlC = CURLE_OK;
 
 	HTTPRequestFileHandler*	pHTTPRequestFileHandler = nullptr;
 	struct curl_slist *pCURLList = nullptr;
@@ -399,10 +401,10 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
 
 	// CURL
-	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
-	//curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
-	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
-	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler);
+	curlC = curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
+	curlC = //curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+	curlC = curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
+	curlC = curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler);
 
 	// Add multi handle (will get picked up in thread)
 	curlMC = curl_multi_add_handle(m_pCURLMultiHandle, pCURL);

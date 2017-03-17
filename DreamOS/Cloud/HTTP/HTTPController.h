@@ -80,6 +80,7 @@ public:
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) override;
 
 private:
+	// CURL Callbacks
 	static size_t RequestCallback(char *pBuffer, size_t elementSize, size_t numElements, void *pContext);
 	
 	// Thread processing http request / response

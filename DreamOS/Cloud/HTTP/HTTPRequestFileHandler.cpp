@@ -5,7 +5,11 @@
 HTTPRequestFileHandler::HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback) :
 	HTTPRequestHandler(pHTTPRequest, pHTTPResponse, fnResponseCallback)
 { 
-	// empty
+	m_pFile_bytes = 0;
+}
+
+HTTPRequestFileHandler::~HTTPRequestFileHandler() {
+	//
 }
 
 RESULT HTTPRequestFileHandler::SetDestinationFilePath(std::wstring wstrDestinationFilepath) {
@@ -13,38 +17,57 @@ RESULT HTTPRequestFileHandler::SetDestinationFilePath(std::wstring wstrDestinati
 	return R_PASS;
 }
 
-RESULT HTTPRequestFileHandler::HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) {
+// TODO: Note: This will overwrite the file if it's there - add capability?
+RESULT HTTPRequestFileHandler::OpenFilePath() {
 	RESULT r = R_PASS;
 
 	PathManager* pPathManager = PathManager::instance();
-	FILE *pFILE = nullptr;
-	size_t pBuffer_n = elementSize * numElements;
-
-	CN(pBuffer);
 	CN(pPathManager);
-	CB(pBuffer_n > 0);
+
+	CB((m_pFILE == nullptr));
 
 	// Save to file
-	
 	if (pPathManager->DoesPathExist(m_wstrDestinationFilePath, false) == R_FILE_FOUND) {
 		// Delete or overwrite the file?
 	}
 
 	// Save to file
-
-	// TODO: Note: This will kill the file if it's there
-	pFILE = fopen(util::WideStringToString(m_wstrDestinationFilePath).c_str(), "wb");
-	CN(pFILE);
-	{
-		size_t bytesWritten = fwrite(pBuffer, elementSize, numElements, pFILE);
-		CBM((bytesWritten == pBuffer_n), "Failed to write file %zd bytes written differ from buffer size %zd", bytesWritten, pBuffer_n);
+	if (m_pFile_bytes == 0) {
+		m_pFILE = fopen(util::WideStringToString(m_wstrDestinationFilePath).c_str(), "wb+");
 	}
-
+	else {
+		m_pFILE = fopen(util::WideStringToString(m_wstrDestinationFilePath).c_str(), "ab");
+	}
+	CN(m_pFILE);
 
 Error:
-	if (pFILE != nullptr) {
-		fclose(pFILE);
-		pFILE = nullptr;
+	return r;
+}
+
+RESULT HTTPRequestFileHandler::HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) {
+	RESULT r = R_PASS;
+
+	size_t pBuffer_n = elementSize * numElements;
+
+	CN(pBuffer);
+	CB(pBuffer_n > 0);
+
+	if (m_pFILE == nullptr) {
+		CR(OpenFilePath());
+	}
+
+	{
+		size_t bytesWritten = fwrite(pBuffer, elementSize, numElements, m_pFILE);
+		CBM((bytesWritten == pBuffer_n), "Failed to write file %zd bytes written differ from buffer size %zd", bytesWritten, pBuffer_n);
+		m_pFile_bytes += bytesWritten;
+
+		DEBUG_LINEOUT("read %zd bytes, total: %zd", bytesWritten, m_pFile_bytes);
+	}
+
+Error:
+	if (m_pFILE != nullptr) {
+		fclose(m_pFILE);
+		m_pFILE = nullptr;
 	}
 
 	return r;

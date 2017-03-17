@@ -17,13 +17,18 @@ class HTTPResponse;
 class HTTPRequestFileHandler : public HTTPRequestHandler {
 public:
 	HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);	
+	~HTTPRequestFileHandler();
 
 	RESULT SetDestinationFilePath(std::wstring wstrDestinationFilepath);
 	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) override;
 
 private:
-	std::wstring m_wstrDestinationFilePath;
+	RESULT OpenFilePath();
 
+private:
+	std::wstring m_wstrDestinationFilePath;
+	FILE *m_pFILE = nullptr;
+	size_t m_pFile_bytes = 0;
 };
 
 
