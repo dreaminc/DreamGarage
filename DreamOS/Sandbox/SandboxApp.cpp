@@ -6,6 +6,7 @@
 #include "Primitives/ray.h"
 
 #include <HMD/OpenVR/OpenVRDevice.h>
+#include <HMD/Oculus/OVR.h>
 
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
@@ -245,20 +246,23 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterImpViveControllerEvents() {
+RESULT SandboxApp::RegisterImpControllerEvents() {
 	RESULT r = R_PASS;
 
-	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
-
-	if (pVive) {
+	if (m_pHMD != nullptr) {
 		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
 
 		pLeftHand->SetOriented(false);
 		pRightHand->SetOriented(false);
 
-		CR(pVive->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
-		CR(pVive->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
+		CR(m_pHMD->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
+		CR(m_pHMD->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
+
+		if (dynamic_cast<OVRHMD*>(m_pHMD) != nullptr) {
+			AddObject(pLeftHand);
+			AddObject(pRightHand);
+		}
 	}
 Error:
 	return r;
@@ -267,10 +271,8 @@ Error:
 //hand *Windows64App::AttachHand
 
 hand *SandboxApp::GetHand(hand::HAND_TYPE handType) {
-	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
-
-	if (pVive != nullptr) {
-		return pVive->GetHand(handType);
+	if (m_pHMD != nullptr) {
+		return m_pHMD->GetHand(handType);
 	}
 
 	if (m_pSenseLeapMotion != nullptr) {

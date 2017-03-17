@@ -55,6 +55,7 @@ ray UIModule::GetHandRay() {
 	CBR(pRightHand != nullptr, R_OBJECT_NOT_FOUND)
 	{
 		point ptHand = pRightHand->GetPosition();
+
 		//GetLookVector
 		quaternion qHand = pRightHand->GetHandState().qOrientation;
 		qHand.Normalize();

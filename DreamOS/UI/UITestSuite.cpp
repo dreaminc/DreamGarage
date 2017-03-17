@@ -37,7 +37,7 @@ RESULT UITestSuite::Initialize() {
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
-
+/*
 	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
 		nullptr,
 		sceneOffset,
@@ -53,7 +53,7 @@ RESULT UITestSuite::Initialize() {
 		sceneOffset,
 		sceneScale,
 		sceneDirection);
-
+//*/
 	for (int i = 0; i < SenseControllerEventType::SENSE_CONTROLLER_INVALID; i++) {
 		CR(m_pDreamOS->RegisterSubscriber((SenseControllerEventType)(i), this));
 	}

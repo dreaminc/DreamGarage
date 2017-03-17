@@ -57,9 +57,6 @@ public:
 
 	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
 	ViewMatrix GetViewMatrix(EYE_TYPE eye);
-	RESULT AttachHand(hand *pHand, hand::HAND_TYPE type);
-	hand* GetHand(hand::HAND_TYPE type);
-	SenseController* GetSenseController();
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);
@@ -105,13 +102,9 @@ public:
 	
 	model *m_pControllerModelLeft;
 	texture *m_pControllerModelLeftTexture;
-	hand *m_pLeftHand;
 	
 	model *m_pControllerModelRight;
 	texture *m_pControllerModelRightTexture;
-	hand *m_pRightHand;
-
-	SenseController* m_pSenseController;
 
 	uint32_t ovrFrame;
 

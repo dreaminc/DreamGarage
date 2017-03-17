@@ -623,6 +623,9 @@
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp">
       <Filter>External\OCULUS\v1.12.0\Logging</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HMD\HMD.cpp">
+      <Filter>HMD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
