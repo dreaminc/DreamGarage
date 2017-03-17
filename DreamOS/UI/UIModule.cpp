@@ -172,8 +172,6 @@ RESULT UIModule::Notify(InteractionObjectEvent *event) {
 	else
 		m_pCurrentItem = pItem;
 
-//	CR(pItem->HandleEvent(event));
-
 Error:
 	return r;
 }

@@ -34,11 +34,11 @@ RESULT DreamUIBar::Initialize() {
 	CR(SetVisible(false));
 
 	auto fnStart = [&](void* pContext) {
-		return R_PASS;
+		return OnTouchStart(pContext);
 	};
 
 	auto fnEnd = [&](void* pContext) {
-		return R_PASS;
+		return OnTouchEnd(pContext);
 	};
 
 	RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN, fnStart);
