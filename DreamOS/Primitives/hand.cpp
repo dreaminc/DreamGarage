@@ -412,7 +412,7 @@ RESULT hand::ToggleRenderType() {
 RESULT hand::SetHandState(const hand::HandState& pHandState) {
 	RESULT r = R_PASS;
 
-	point pt = pHandState.ptPalm - point(0.0f, 0.0f, 0.25f);
+	point pt = pHandState.ptPalm;
 	SetPosition(pt);
 	//SetOrientation(pHandState.qOrientation);
 

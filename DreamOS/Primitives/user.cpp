@@ -14,9 +14,10 @@ RESULT user::Initialize() {
 
 	m_pHead = AddModel(L"\\Models\\face4\\untitled.obj",
 					   nullptr,
-					   point(0.0f, 0.0f - 0.35f, 0.0f),
-					   0.02f,
+					   point(0.0f, 0.0f - 0.35f, HEAD_POS),
+					   0.018f,
 					   vector(0.0f, (float)M_PI, 0.0f));
+
 	m_pHeads.push_back(m_pHead);
 	//m_pHeadTextures.push_back(pHeadTexture);
 	//*/
@@ -35,7 +36,7 @@ RESULT user::Initialize() {
 	m_pMouth = AddQuad(0.3, 1.0);
 
 	m_pMouth->RotateXByDeg(270);
-	m_pMouth->MoveTo(0, 0.25f - 0.35f, -0.17f);
+	m_pMouth->MoveTo(0, 0.25f - 0.35f - 0.05f, -0.17f + HEAD_POS);
 
 	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	

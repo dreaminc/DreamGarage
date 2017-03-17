@@ -267,7 +267,12 @@ RESULT OVRHMD::UpdateHMD() {
 
 		int i = 0;
 		for (auto& hand : { m_pLeftHand, m_pRightHand }) {
-			if (trackingState.HandStatusFlags[i] != 3) continue;
+
+			if (trackingState.HandStatusFlags[i] != 3) {
+				hand->SetTracked(false);
+				hand->SetVisible(false);
+				continue;
+			}
 
 			point ptControllerPosition = point(reinterpret_cast<float*>(&(trackingState.HandPoses[i].ThePose.Position)));
 			ptControllerPosition = qOffset * ptControllerPosition;
