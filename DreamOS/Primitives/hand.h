@@ -148,10 +148,12 @@ public:
 	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);
 	RESULT ToggleRenderType();
 	RESULT SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState);
+	RESULT SetHandModel(hand::HAND_TYPE type);
+	RESULT SetHandModelOrientation(quaternion q);
+
+	std::shared_ptr<composite> GetModel(hand::HAND_TYPE handType);
 
 private:
-
-	RESULT SetHandModel(hand::HAND_TYPE type);
 
 	HAND_TYPE m_handType;
 

@@ -433,7 +433,7 @@ RESULT Windows64App::InitializeSandbox() {
 		CRM(InitializeLeapMotion(), "Failed to initialize leap motion");
 	}
 
-	CRM(RegisterImpViveControllerEvents(), "Failed to register vive controller events");
+	CRM(RegisterImpControllerEvents(), "Failed to register vive controller events");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
 

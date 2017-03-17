@@ -625,6 +625,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp" />
+    <ClCompile Include="..\..\..\HMD\HMD.cpp" />
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />

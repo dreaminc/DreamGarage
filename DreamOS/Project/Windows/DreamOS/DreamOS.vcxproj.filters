@@ -635,6 +635,9 @@
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp">
       <Filter>Cloud\HTTP</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HMD\HMD.cpp">
+      <Filter>HMD</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

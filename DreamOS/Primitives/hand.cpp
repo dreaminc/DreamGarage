@@ -185,6 +185,16 @@ RESULT hand::SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const ha
 	return R_PASS;
 }
 
+std::shared_ptr<composite> hand::GetModel(hand::HAND_TYPE handType) {
+	if (handType == hand::HAND_TYPE::HAND_LEFT) {
+		return m_pLeftModel;
+	}
+	else if (handType == hand::HAND_TYPE::HAND_RIGHT) {
+		return m_pRightModel;
+	}
+	return nullptr;
+}
+
 RESULT hand::Initialize() {
 	RESULT r = R_PASS;
 
@@ -378,6 +388,16 @@ RESULT hand::SetHandModel(hand::HAND_TYPE type) {
 	m_pPinkyFinger->SetVisible(showSkeleton);
 	m_pThumb->SetVisible(showSkeleton);
 
+	return R_PASS;
+}
+
+RESULT hand::SetHandModelOrientation(quaternion q) {
+	if (m_handType == HAND_LEFT) {
+		m_pLeftModel->SetOrientation(q * m_qLeftModel);
+	}
+	if (m_handType == HAND_RIGHT) {
+		m_pRightModel->SetOrientation(q * m_qRightModel);
+	}
 	return R_PASS;
 }
 

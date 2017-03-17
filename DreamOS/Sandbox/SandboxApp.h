@@ -137,7 +137,7 @@ protected:
 	RESULT RegisterImpKeyboardEvents();
 	RESULT RegisterImpMouseEvents();
 	RESULT RegisterImpLeapMotionEvents();
-	RESULT RegisterImpViveControllerEvents();
+	RESULT RegisterImpControllerEvents();
 
 public:
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
