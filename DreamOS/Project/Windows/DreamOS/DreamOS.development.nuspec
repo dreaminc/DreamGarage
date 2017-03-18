@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <package >
   <metadata>
-    <id>Dream</id>
+    <id>DreamDev</id>
     <version>0.1.30</version>
-    <title>Dream</title>
+    <title>DreamDev</title>
     <authors>Dream Garage, Incorporated</authors>
     <owners>Dream Garage, Incorporated</owners>
-    <description>Dream</description>
+    <description>DreamDev</description>
     <!--<licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>-->
     <projectUrl>https://www.dreamos.com</projectUrl>
     <iconUrl>https://github.com/dreaminc/Dream/releases/download/Releases/Dream.ico</iconUrl>
