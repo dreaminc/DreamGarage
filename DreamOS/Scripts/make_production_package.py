@@ -30,7 +30,7 @@ except FileNotFoundError:
 
 print("Copying binaries")
 try:
-    ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and (f[-4:] != '.exe' and f[-4:] != '.dll')]
+    ignore_func = lambda d, files: [f for f in files if isfile(join(d, f)) and (f[-4:] != '.exe' and f[-4:] != '.dll' and f[-4:] != '.bin' and f[-4:] != '.dat')]
     copytree(src_dir + "/", dest_dir + "/", ignore=ignore_func)
 except FileExistsError:
     print("Already Copied")
