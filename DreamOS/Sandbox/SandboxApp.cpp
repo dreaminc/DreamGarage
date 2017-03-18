@@ -268,10 +268,12 @@ RESULT SandboxApp::RegisterImpControllerEvents() {
 		CR(m_pHMD->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
 		CR(m_pHMD->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
 
+/*
 		if (dynamic_cast<OVRHMD*>(m_pHMD) != nullptr) {
 			AddObject(pLeftHand);
 			AddObject(pRightHand);
 		}
+		//*/
 	}
 Error:
 	return r;

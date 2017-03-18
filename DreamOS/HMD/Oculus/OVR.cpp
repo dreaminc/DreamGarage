@@ -85,6 +85,28 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 
 	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
 
+	m_pLeftControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj",
+		nullptr,
+		//point(0.0f, 0.0f, 0.0f),
+		//point(0.0f, 0.0f, -0.1143f),
+		point(0.0f, 0.05715f, 0.0f),
+		1.0f,
+		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
+		//vector(0.0f, 0.0f, 0.0f));
+
+	m_pRightControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj",
+		nullptr,
+		//point(0.f, 0.0f, 0.0f),
+		//point(0.f, 0.0f, -0.1143f),
+		point(0.0f, 0.05715f, 0.0f),
+		1.0f,
+		//vector(0.0f, 0.0f, (float)(M_PI / 4.0f)));
+		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
+		//vector(0.0f, 0.0f, 0.0f));
+
+	m_pLeftControllerModel->SetVisible(false);
+	m_pRightControllerModel->SetVisible(false);
+
 Error:
 	return r;
 }
@@ -268,15 +290,19 @@ RESULT OVRHMD::UpdateHMD() {
 		int i = 0;
 		for (auto& hand : { m_pLeftHand, m_pRightHand }) {
 
+			auto& pModel = i == 0 ? m_pLeftControllerModel : m_pRightControllerModel;
+
 			if (trackingState.HandStatusFlags[i] != 3) {
 				hand->SetTracked(false);
 				hand->SetVisible(false);
+				pModel->SetVisible(false);
 				continue;
 			}
 
 			point ptControllerPosition = point(reinterpret_cast<float*>(&(trackingState.HandPoses[i].ThePose.Position)));
 			ptControllerPosition = qOffset * ptControllerPosition;
 			hand->SetPosition(ptControllerPosition + offset);
+			pModel->SetPosition(ptControllerPosition + offset);
 
 			quaternion qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[i].ThePose.Orientation)));
 			// Act like this doesn't exist
@@ -288,10 +314,12 @@ RESULT OVRHMD::UpdateHMD() {
 			quaternion base = i == 0 ? qLeftRotation : qRightRotation;
 			hand->SetOrientation(qOrientation * base);
 			hand->SetLocalOrientation(qOrientation);
+			pModel->SetOrientation(qOrientation);
 			
 			hand::HAND_TYPE hType = i == 0 ? hand::HAND_TYPE::HAND_LEFT : hand::HAND_TYPE::HAND_RIGHT;
-			hand->SetHandModel(hType);
+//			hand->SetHandModel(hType);
 			hand->SetTracked(true);
+			pModel->SetVisible(true);
 
 			ovrControllerType type = i == 0 ? ovrControllerType_LTouch : ovrControllerType_RTouch; 
 			UpdateSenseController(type, inputState);
