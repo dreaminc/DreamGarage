@@ -56,8 +56,6 @@ public:
 
 	RESULT Update(IconFormat& iconFormat, LabelFormat& labelFormat);
 
-	RESULT HandleEvent(InteractionObjectEvent *event);
-
 	bool Contains(VirtualObj* pObj);
 
 	std::string& GetName();

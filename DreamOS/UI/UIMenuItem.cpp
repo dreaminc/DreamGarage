@@ -86,22 +86,3 @@ bool UIMenuItem::Contains(VirtualObj *pObj) {
 std::string& UIMenuItem::GetName() {
 	return m_strName;
 }
-
-//TODO: function registry per event type
-RESULT UIMenuItem::HandleEvent(InteractionObjectEvent *event) {
-	RESULT r = R_PASS;
-
-	CB(Contains(event->m_pObject));
-
-	switch (event->m_eventType) {
-	case ELEMENT_INTERSECT_BEGAN: {
-		m_pQuad->Scale(1.25f);
-	} break;
-	case ELEMENT_INTERSECT_ENDED: {
-		m_pQuad->Scale(1.0f);
-	} break;
-	}
-
-Error:
-	return r;
-}
