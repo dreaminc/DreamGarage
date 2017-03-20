@@ -33,22 +33,17 @@ RESULT DreamUIBar::Initialize() {
 
 	CR(SetVisible(false));
 
-	auto fnStart = [&](void* pContext) {
-		return OnTouchStart(pContext);
-	};
+	CR(RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN,
+		std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1)));
 
-	auto fnEnd = [&](void* pContext) {
-		return OnTouchEnd(pContext);
-	};
-
-	RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN, fnStart);
-	RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED, fnEnd);
+	CR(RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED,
+		std::bind(&DreamUIBar::HandleTouchEnd, this, std::placeholders::_1)));
 
 Error:
 	return r;
 }
 
-RESULT DreamUIBar::OnTouchStart(void* pContext) {
+RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 	RESULT r = R_PASS;
 
 	UIMenuItem* pItem = reinterpret_cast<UIMenuItem*>(pContext);
@@ -59,11 +54,11 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::OnTouchMove(void* pContext) {
+RESULT DreamUIBar::HandleTouchMove(void* pContext) {
 	return R_PASS;
 }
 
-RESULT DreamUIBar::OnTouchEnd(void* pContext) {
+RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
 	RESULT r = R_PASS;
 
 	UIMenuItem* pItem = reinterpret_cast<UIMenuItem*>(pContext);

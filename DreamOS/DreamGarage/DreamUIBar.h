@@ -15,9 +15,9 @@ public:
 	RESULT Initialize();
 	RESULT Update();
 
-	RESULT OnTouchStart(void* pContext);
-	RESULT OnTouchMove(void* pContext);
-	RESULT OnTouchEnd(void* pContext);
+	RESULT HandleTouchStart(void* pContext);
+	RESULT HandleTouchMove(void* pContext);
+	RESULT HandleTouchEnd(void* pContext);
 
 	// Callback signature
 	// RESULT fnEventCallback(struct (opt) pEventInfo, void* pContext)
