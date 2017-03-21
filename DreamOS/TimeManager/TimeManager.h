@@ -17,7 +17,7 @@
 // FPS Run Rate Filter
 #define NUM_MICROSECONDS_IN_SECOND 1000000.0f
 #define FPS_RRF_VALUE 1.0f
-#define FPS_RRF_RESOLUTION 1000.0f
+#define FPS_RRF_RESOLUTION 50.0f
 #define FPS_RRF_XVAL (FPS_RRF_VALUE/FPS_RRF_RESOLUTION)
 #define FPS_RRF_YVAL ((FPS_RRF_RESOLUTION - FPS_RRF_VALUE)/FPS_RRF_RESOLUTION)
 
@@ -47,6 +47,7 @@ public:
 	RESULT Reset();		// Resets time
 	RESULT Update();	// Updates the time from previous call to update.
 
+	RESULT ResetMinMaxFPS();
 	RESULT PrintFPS();
 
 	double GetRunTimeFrameRate();
@@ -61,6 +62,10 @@ private:
 	double m_totalTimeToProcess;
 
 	double m_runTimeFPS = 0;
+	
+	double m_maxFPS = 0;
+	double m_minFPS = 0;
+
 	long long m_numFrames = 0;
 
 public:

@@ -616,6 +616,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClCompile Include="..\..\..\External\SOIL\SOIL.c" />
     <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c" />
     <ClCompile Include="..\..\..\HAL\HALImp.cpp" />
+    <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
@@ -967,6 +968,7 @@ python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDi
     <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
+    <ClInclude Include="..\..\..\HAL\HALTestSuite.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h" />
     <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h" />

@@ -55,6 +55,12 @@ RESULT TimeManager::Update() {
 	// FPS
 	// TODO: This can be simplified
 	m_runTimeFPS = FPS_RRF_YVAL * m_runTimeFPS  + (FPS_RRF_XVAL * (NUM_MICROSECONDS_IN_SECOND / msDeltaTime));
+	
+	if(m_runTimeFPS > m_maxFPS)
+		m_maxFPS = m_runTimeFPS;
+	else if (m_runTimeFPS < m_minFPS)
+		m_minFPS = m_runTimeFPS;
+
 	m_numFrames++;
 	
 	CR(PrintFPS());
@@ -65,7 +71,7 @@ Error:
 
 RESULT TimeManager::PrintFPS() {
 	//DEBUG_LINEOUT_RETURN("Runtime FPS: %f numframes:%zd", m_runTimeFPS, m_numFrames);
-	DEBUG_LINEOUT_RETURN("Runtime FPS: %f", m_runTimeFPS);
+	DEBUG_LINEOUT_RETURN("Runtime FPS: %04f min:%04f max:%04f", m_runTimeFPS, m_minFPS, m_maxFPS);
 	return R_PASS;
 }
 
@@ -75,4 +81,10 @@ double TimeManager::GetRunTimeFrameRate() {
 
 long long TimeManager::GetTotalNumberOfFrames() {
 	return m_numFrames;
+}
+
+RESULT TimeManager::ResetMinMaxFPS() {
+	m_maxFPS = 0.0f;
+	m_minFPS = 0.0f;
+	return R_PASS;
 }

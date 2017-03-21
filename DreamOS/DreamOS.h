@@ -38,8 +38,10 @@
 
 class DreamOS : public Subscriber<CollisionObjectEvent>, public valid {
 	friend class CloudTestSuite;
+
 	// TODO: this needs to be revisited
 	friend class UIModule;
+	friend class HALTestSuite;
 
 public:
 	DreamOS();
@@ -59,6 +61,7 @@ protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
 	CloudController *GetCloudController();
+	HALImp* GetHALImp();
 
 //protected:
 public:

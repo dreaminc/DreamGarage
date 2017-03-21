@@ -146,6 +146,10 @@ CloudController *DreamOS::GetCloudController() {
 	return m_pSandbox->m_pCloudController;
 }
 
+HALImp* DreamOS::GetHALImp() {
+	return m_pSandbox->m_pHALImp;
+}
+
 // This is a pass-thru at the moment
 RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 	return m_pSandbox->AddPhysicsObject(pObject);
