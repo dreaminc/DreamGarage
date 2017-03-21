@@ -192,6 +192,12 @@
     <Filter Include="External\OCULUS\v1.12.0\Logging">
       <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{ab12ef14-0c46-4045-ac45-cfe6f65b4332}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NuGet">
+      <UniqueIdentifier>{49713455-67bf-497c-a46d-68456ba95718}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -2593,6 +2599,30 @@
     </None>
     <None Include="..\..\..\Models\face4\untitled.mtl">
       <Filter>Models\face4</Filter>
+    </None>
+    <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="DreamOS.development.nuspec">
+      <Filter>NuGet</Filter>
+    </None>
+    <None Include="DreamOS.production.nuspec">
+      <Filter>NuGet</Filter>
+    </None>
+    <None Include="packages.config">
+      <Filter>NuGet</Filter>
+    </None>
+    <None Include="..\..\..\Scripts\make_production.py">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="..\..\..\Scripts\make_production_package.py">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="..\..\..\Scripts\copy_assets.py">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="PropertySheet.props">
+      <Filter>Core</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
