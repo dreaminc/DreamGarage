@@ -21,7 +21,7 @@ class MenuNode {
 	
 public:
 	MenuNode(nlohmann::json jsonMenuNode);
-	MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle);
+	MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType);
 
 	std::string NodeTypeString(MenuNode::type nodeType);
 	MenuNode::type NodeTypeFromString(std::string strNodeType);
@@ -31,6 +31,7 @@ public:
 
 	const std::string& GetPath();
 	const std::string& GetScope();
+	const std::string& GetMIMEType();
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 
@@ -39,6 +40,7 @@ private:
 	std::string m_strPath;
 	std::string m_strScope;
 	std::string m_strTitle;
+	std::string m_strMIMEType;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
 };

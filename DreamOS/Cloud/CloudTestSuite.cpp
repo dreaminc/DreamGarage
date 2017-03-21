@@ -22,12 +22,12 @@ RESULT CloudTestSuite::AddTests() {
 	//CR(AddTestMultiConnectTest());
 
 	CR(AddTestConnectLogin());
+	CR(AddTestMenuAPI());
 	CR(AddTestDownloadFile());	// requires logged in
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
 
-	CR(AddTestMenuAPI());
 
 Error:
 	return r;
