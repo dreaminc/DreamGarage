@@ -17,6 +17,9 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/scope"_json_pointer].is_string())
 		m_strScope = jsonMenuNode["/scope"_json_pointer].get<std::string>();
 
+	if (jsonMenuNode["/mime_type"_json_pointer].is_string())
+		m_strMIMEType = jsonMenuNode["/mime_type"_json_pointer].get<std::string>();
+
 	if (jsonMenuNode["/submenu"_json_pointer].is_array()) {
 		for (auto &subMenuNode : jsonMenuNode["/submenu"_json_pointer]) {
 			std::shared_ptr<MenuNode> pSubMenuNode = std::make_shared<MenuNode>(subMenuNode);
@@ -25,11 +28,12 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 	}
 }
 
-MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle) :
+MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType) :
 	m_nodeType(nodeType),
 	m_strPath(strPath),
 	m_strScope(strScope),
-	m_strTitle(strTitle)
+	m_strTitle(strTitle),
+	m_strMIMEType(strMIMEType)
 {
 	// empty
 }
@@ -39,6 +43,7 @@ RESULT MenuNode::PrintMenuNode() {
 	DEBUG_LINEOUT("Node title: %s", m_strTitle.c_str());
 	DEBUG_LINEOUT("Node path: %s", m_strPath.c_str());
 	DEBUG_LINEOUT("Node scope: %s", m_strScope.c_str());
+	DEBUG_LINEOUT("Node MIME type: %s", m_strMIMEType.c_str());
 
 	if (m_menuNodes.size() > 0) {
 		DEBUG_LINEOUT("Sub Menu Nodes:");
@@ -90,4 +95,8 @@ const std::string& MenuNode::GetPath() {
 
 const std::string& MenuNode::GetScope() {
 	return m_strScope;
+}
+
+const std::string& MenuNode::GetMIMEType() {
+	return m_strMIMEType;
 }

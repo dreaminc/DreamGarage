@@ -101,7 +101,7 @@ Global
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Release|x64.Build.0 = Release|x64
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Release|x86.ActiveCfg = Release|Win32
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Release|x86.Build.0 = Release|Win32
-		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Testing|x64.ActiveCfg = Release|x64
+		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Testing|x64.ActiveCfg = Debug|x64
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.Testing|x86.ActiveCfg = Release|Win32
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.TestingRelease|x64.ActiveCfg = TestingRelease|x64
 		{6CDA867A-5D2E-4BA0-8A31-5F8B21B8BF6A}.TestingRelease|x64.Build.0 = TestingRelease|x64
