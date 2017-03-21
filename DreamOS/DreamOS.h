@@ -38,6 +38,8 @@
 
 class DreamOS : public Subscriber<CollisionObjectEvent>, public valid {
 	friend class CloudTestSuite;
+	// TODO: this needs to be revisited
+	friend class UIModule;
 
 public:
 	DreamOS();

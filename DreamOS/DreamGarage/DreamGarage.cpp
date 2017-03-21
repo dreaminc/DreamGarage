@@ -732,11 +732,11 @@ RESULT DreamGarage::Notify(SenseControllerEvent *event) {
 		// as opposed to accessing the hardcoded local data structures
 		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
-			CR(m_pDreamUIBar->HandleTriggerUp(m_menu, m_menuPath));
+			CR(m_pDreamUIBar->HandleTriggerUp());
 		}
 		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
 			OVERLAY_DEBUG_SET("event", "menu up");
-			CR(m_pDreamUIBar->HandleMenuUp(m_menu, m_menuPath));
+			CR(m_pDreamUIBar->HandleMenuUp());
 		}
 	}
 Error:

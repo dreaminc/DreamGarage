@@ -10,6 +10,7 @@
 #include <stack>
 
 class DreamOS;
+class CloudController;
 
 typedef struct UILayerInfo {
 	std::vector<std::shared_ptr<texture>> icons;
@@ -63,6 +64,8 @@ protected:
 	std::shared_ptr<UIMenuItem> m_pCurrentItem;
 
 	float m_headRotationYDeg;  // can be removed with composite collision code
+
+	CloudController *GetCloudController();
 
 private:
 	DreamOS *m_pDreamOS;

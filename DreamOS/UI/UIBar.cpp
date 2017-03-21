@@ -96,7 +96,7 @@ RESULT UIBar::HandleTriggerUp(std::map<std::string, std::vector<std::string>>& m
 	UILayerInfo info;
 	std::shared_ptr<UIMenuItem> pSelected = GetCurrentItem();
 	CB(!path.empty());
-	CB(pSelected);
+	CBR(pSelected, R_OBJECT_NOT_FOUND);
 
 	CB(menu.count(pSelected->GetName()) > 0);
 
