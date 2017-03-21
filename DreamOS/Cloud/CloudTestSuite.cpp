@@ -22,7 +22,7 @@ RESULT CloudTestSuite::AddTests() {
 	//CR(AddTestMultiConnectTest());
 
 	CR(AddTestConnectLogin());
-	//CR(AddTestDownloadFile());	// requires logged in
+	CR(AddTestDownloadFile());	// requires logged in
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
@@ -253,7 +253,7 @@ Error:
 RESULT CloudTestSuite::AddTestMenuAPI() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 300.0f;
+	double sTestTime = 30.0f;
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
