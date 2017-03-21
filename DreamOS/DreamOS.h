@@ -61,6 +61,9 @@ protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
 	CloudController *GetCloudController();
+
+	// TODO: This is here temporarily, should be replaced by proper sandbox 
+	// related functionality
 	HALImp* GetHALImp();
 
 //protected:
