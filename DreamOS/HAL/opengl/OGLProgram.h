@@ -74,7 +74,7 @@ public:
 	RESULT RenderObjectBoundingVolume(DimObj *pDimObj);
 	RESULT RenderChildren(DimObj *pDimObj);	
 	RESULT RenderChildrenBoundingVolumes(DimObj *pDimObj);
-	RESULT RenderObject(VirtualObj *pVirtualObj);
+	//RESULT RenderObject(VirtualObj *pVirtualObj);
 	
 	RESULT SetLights(ObjectStore *pSceneGraph);
 	virtual RESULT SetLights(std::vector<light*> *pLights);
