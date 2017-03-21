@@ -6,3 +6,8 @@
 *.opendb
 *.opensdf
 *.htm
+/DevReleases/*
+/ProdReleases/*
+*.nupkg
+/packages/*
+
