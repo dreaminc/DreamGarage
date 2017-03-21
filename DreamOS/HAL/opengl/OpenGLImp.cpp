@@ -905,9 +905,9 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	/*
 	m_pOGLProgramShadowDepth->UseProgram();
 	m_pOGLProgramShadowDepth->BindToDepthBuffer();
-	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
-	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
-	CR(m_pOGLProgramShadowDepth->RenderObjectStore(pSceneGraph));
+	m_pOGLProgramShadowDepth->SetCamera(m_pCamera);
+	m_pOGLProgramShadowDepth->SetLights(pLights);
+	m_pOGLProgramShadowDepth->RenderObjectStore(pSceneGraph);
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
 	//*/
 
