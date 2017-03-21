@@ -60,8 +60,8 @@ protected:
 	LabelFormat m_labelFormat;
 	UIBarFormat m_barFormat;
 
-private:
-
+//private:
+protected:
 	std::shared_ptr<texture> m_pIconTexture;
 
 public:

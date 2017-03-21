@@ -253,7 +253,7 @@ Error:
 RESULT CloudTestSuite::AddTestMenuAPI() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 30.0f;
+	double sTestTime = 300.0f;
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {

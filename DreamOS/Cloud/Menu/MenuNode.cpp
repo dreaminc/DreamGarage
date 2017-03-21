@@ -100,3 +100,7 @@ const std::string& MenuNode::GetScope() {
 const std::string& MenuNode::GetMIMEType() {
 	return m_strMIMEType;
 }
+
+const std::string& MenuNode::GetTitle() {
+	return m_strTitle;
+}
