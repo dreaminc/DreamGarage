@@ -59,7 +59,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	pText->MoveTo(labelFormat.ptPosition);
 
 	m_strName = labelFormat.strLabel;
-
+	/*
 	pIcon = pContext->AddQuad(
 		iconFormat.width,
 		iconFormat.height,
@@ -69,7 +69,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		pIcon->SetColorTexture(iconFormat.pTexture.get());
 	else
 		pIcon->SetVisible(false);
-
+//*/
 	m_pContextComposite->RenderToTexture(pContext);
 	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 

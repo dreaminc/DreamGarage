@@ -2,6 +2,7 @@
 #define MENU_NODE_H_
 
 #include "RESULT/EHM.h"
+#include "Primitives/dirty.h"
 
 // DREAM OS
 // DreamOS/Dimension/Cloud/Menu/MenuNode.h
@@ -12,7 +13,7 @@
 
 #include "json.hpp"
 
-class MenuNode {
+class MenuNode : public dirty {
 	enum class type {
 		FOLDER,
 		FILE,
@@ -31,6 +32,7 @@ public:
 
 	const std::string& GetPath();
 	const std::string& GetScope();
+	const std::string& GetTitle();
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 

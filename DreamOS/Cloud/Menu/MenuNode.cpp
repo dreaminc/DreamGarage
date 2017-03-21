@@ -91,3 +91,7 @@ const std::string& MenuNode::GetPath() {
 const std::string& MenuNode::GetScope() {
 	return m_strScope;
 }
+
+const std::string& MenuNode::GetTitle() {
+	return m_strTitle;
+}

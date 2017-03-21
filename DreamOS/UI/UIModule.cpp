@@ -175,3 +175,7 @@ RESULT UIModule::Notify(InteractionObjectEvent *event) {
 Error:
 	return r;
 }
+
+CloudController *UIModule::GetCloudController() {
+	return m_pDreamOS->GetCloudController();
+}
