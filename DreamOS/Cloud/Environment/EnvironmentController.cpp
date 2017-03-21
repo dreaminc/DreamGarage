@@ -1,6 +1,6 @@
-#include "Logger/Logger.h"
-#include "Cloud/CloudController.h"
 #include "EnvironmentController.h"
+#include "Cloud/CloudController.h"
+#include "Logger/Logger.h"
 #include "Cloud/User/User.h"
 
 #include "Cloud/Websockets/Websocket.h"
@@ -14,6 +14,10 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include "Cloud/CloudMessage.h"
+
+#include "Core/Utilities.h"
+
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
 	m_fConnected(false),
@@ -23,8 +27,6 @@ EnvironmentController::EnvironmentController(Controller* pParentController, long
 	m_state(state::UNINITIALIZED)
 {
 	m_environment = Environment(environmentID);
-
-	m_pPeerConnectionController = std::unique_ptr<PeerConnectionController>(new PeerConnectionController(this));
 }
 
 EnvironmentController::~EnvironmentController() {
@@ -36,9 +38,18 @@ EnvironmentController::~EnvironmentController() {
 RESULT EnvironmentController::Initialize() {
 	RESULT r = R_PASS;
 	
+	// Peer Connection Controller
+	m_pPeerConnectionController = std::unique_ptr<PeerConnectionController>(new PeerConnectionController(this));
 	CN(m_pPeerConnectionController);
 	CR(m_pPeerConnectionController->Initialize());
 	CR(m_pPeerConnectionController->RegisterPeerConnectionControllerObserver(this));
+
+	// Menu Controller
+	m_pMenuController = std::make_unique<MenuController>(this);
+	//m_pMenuController = std::unique_ptr<MenuController>(new MenuController(this));
+	CN(m_pMenuController);
+	CR(m_pMenuController->Initialize());
+	//CR(m_pMenuController->RegisterPeerConnectionControllerObserver(this));
 
 Error:
 	return r;
@@ -82,6 +93,33 @@ RESULT EnvironmentController::InitializeWebsocket(std::string& strURI) {
 	CN(m_pEnvironmentWebsocket);
 
 	m_state = state::SOCKET_INITIALIZED;
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::SendEnvironmentSocketMessage(std::shared_ptr<CloudMessage> pCloudRequest, state newState) {
+	RESULT r = R_PASS;
+
+	CR(SendEnvironmentSocketData(pCloudRequest->GetJSONDataString(), newState));
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::SendEnvironmentSocketData(const std::string& strData, state newState) {
+	RESULT r = R_PASS;
+
+	CN(m_pEnvironmentWebsocket);
+	CBM((m_fConnected), "Environment socket not connected");
+	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
+
+	m_fPendingMessage = true;
+	m_state = newState;
+
+	DEBUG_LINEOUT("SendEnvironmentSocketData JSON: %s", strData.c_str());
+
+	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
 
 Error:
 	return r;
@@ -136,9 +174,11 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	guid guidMessage;
 
 	CNM(pParentCloudController, "Parent CloudController not found or null");
-	CN(m_pEnvironmentWebsocket);
-	CBM((m_fConnected), "Environment socket not connected");
-	CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
+
+	// Moved to send
+	//CN(m_pEnvironmentWebsocket);
+	//CBM((m_fConnected), "Environment socket not connected");
+	//CBM(m_pEnvironmentWebsocket->IsRunning(), "Environment socket not running");
 	
 	//strSDPOffer = pParentCloudController->GetSDPOfferString();
 
@@ -161,9 +201,13 @@ RESULT EnvironmentController::CreateEnvironmentUser(User user) {
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Create Environment User JSON: %s", strData.c_str());
 
+	/*
 	m_fPendingMessage = true;
 	m_state = state::CREATING_ENVIRONMENT_USER;
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+	*/
+
+	CR(SendEnvironmentSocketData(strData, state::CREATING_ENVIRONMENT_USER));
 
 Error:
 	return r;
@@ -215,10 +259,13 @@ RESULT EnvironmentController::SetSDPOffer(User user, PeerConnection *pPeerConnec
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set SDP Offer JSON: %s", strData.c_str());
 
+	/*
 	m_fPendingMessage = true;
 	m_state = state::SET_SDP_OFFER;
-
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+	*/
+
+	CR(SendEnvironmentSocketData(strData, state::SET_SDP_OFFER));
 
 	LOG(INFO) << "(cloud) offer was sent to cloud, msg=" << strData;
 
@@ -246,10 +293,13 @@ RESULT EnvironmentController::SetSDPAnswer(User user, PeerConnection *pPeerConne
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set SDP Offer JSON: %s", strData.c_str());
 
+	/*
 	m_fPendingMessage = true;
 	m_state = state::SET_SDP_OFFER;
-
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+	*/
+
+	CR(SendEnvironmentSocketData(strData, state::SET_SDP_ANSWER));
 
 Error:
 	return r;
@@ -275,10 +325,13 @@ RESULT EnvironmentController::SetOfferCandidates(User user, PeerConnection *pPee
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set Offer Candidates JSON: %s", strData.c_str());
 
+	/*
 	m_fPendingMessage = true;
 	m_state = state::SET_OFFER_CANDIDATES;
-
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+	*/
+
+	CR(SendEnvironmentSocketData(strData, state::SET_OFFER_CANDIDATES));
 
 Error:
 	return r;
@@ -305,10 +358,13 @@ RESULT EnvironmentController::SetAnswerCandidates(User user, PeerConnection *pPe
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Set Answer Candidates JSON: %s", strData.c_str());
 
+	/*
 	m_fPendingMessage = true;
 	m_state = state::SET_ANSWER_CANDIDATES;
-
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+	*/
+
+	CR(SendEnvironmentSocketData(strData, state::SET_ANSWER_CANDIDATES));
 
 Error:
 	return r;
@@ -324,6 +380,7 @@ Error:
 	return r;
 }
 
+// TODO: This might be deprecated 
 RESULT EnvironmentController::GetEnvironmentPeerList(User user) {
 	RESULT r = R_PASS;
 
@@ -346,9 +403,13 @@ RESULT EnvironmentController::GetEnvironmentPeerList(User user) {
 	strData = jsonData.dump();
 	DEBUG_LINEOUT("Get Environment User List JSON: %s", strData.c_str());
 
+	/*
 	m_fPendingMessage = true;
 	m_state = state::ENVIRONMENT_PEER_LIST_REQUESTED;
 	CRM(m_pEnvironmentWebsocket->Send(strData), "Failed to send JSON data");
+	*/
+
+	CR(SendEnvironmentSocketData(strData, state::ENVIRONMENT_PEER_LIST_REQUESTED));
 
 Error:
 	return r;
@@ -417,20 +478,6 @@ RESULT EnvironmentController::AddNewPeer(long userID, long environmentID, const 
 
 Error:
 	return r;
-}
-
-std::vector<std::string> TokenizeString(std::string str, char cDelim) {
-	std::istringstream strStream(str);
-	std::vector<std::string> strTokens;
-	std::string strToken;
-
-	while (std::getline(strStream, strToken, cDelim)) {
-		if (!strToken.empty()) {
-			strTokens.push_back(strToken);
-		}
-	}
-
-	return strTokens;
 }
 
 bool EnvironmentController::IsUserIDConnected(long peerUserID) {
@@ -503,6 +550,8 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 	nlohmann::json jsonCloudMessage = nlohmann::json::parse(strMessage);
 
+	std::shared_ptr<CloudMessage> pCloudMessage = CloudMessage::Create(GetCloudController(), strMessage);
+
 	if (jsonCloudMessage["/method"_json_pointer] == nullptr) {
 		// message error
 
@@ -516,9 +565,11 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 	std::string strType = jsonCloudMessage["/type"_json_pointer].get<std::string>();
 	std::string strMethod = jsonCloudMessage["/method"_json_pointer].get<std::string>();
 	
-	std::vector<std::string> strTokens = TokenizeString(strMethod, '.');
+	std::vector<std::string> strTokens = util::TokenizeString(strMethod, '.');
 
 	// Determine who to handle this
+	// TODO: Move this over to CloudMessage instead
+
 	if (strTokens[0] == "peer_connection") {
 		nlohmann::json jsonPayload = jsonCloudMessage["/payload"_json_pointer];
 		strMethod = strTokens[1];
@@ -533,14 +584,16 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 			
 			m_pPeerConnectionController->HandleEnvironmentSocketResponse(strMethod, jsonPayload);
 		}
-		else
-		{
+		else {
 			LOG(ERROR) << "(cloud) websocket msg type unknown";
 		}
 	}
-	else
-	{
+	else {
 		LOG(ERROR) << "(cloud) websocket msg method unknown";
+	}
+
+	if (pCloudMessage->GetController() == "menu") {
+		m_pMenuController->HandleEnvironmentSocketMessage(pCloudMessage);
 	}
 
 	/*
@@ -712,6 +765,14 @@ RESULT EnvironmentController::SetUser(User currentUser) {
 
 RESULT EnvironmentController::SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) {
 	return m_pPeerConnectionController->SetTwilioNTSInformation(twilioNTSInformation);
+}
+
+bool EnvironmentController::IsEnvironmentSocketConnected() {
+	return m_fConnected;
+}
+
+MenuControllerProxy* EnvironmentController::GetMenuControllerProxy() {
+	return m_pMenuController->GetMenuControllerProxy();
 }
 
 RESULT EnvironmentController::OnPeersUpdate(long index) {

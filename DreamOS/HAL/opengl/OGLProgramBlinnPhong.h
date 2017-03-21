@@ -65,7 +65,7 @@ public:
 
 	RESULT SetMaterial(material *pMaterial) {
 		RESULT r = R_PASS;
-
+		
 		if (m_pMaterialsBlock != nullptr) {
 			CR(m_pMaterialsBlock->SetMaterial(pMaterial));
 			CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());

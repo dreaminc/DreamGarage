@@ -15,7 +15,7 @@ public:
 	material() :
 		m_shine(100.0f),
 		m_bump(0.0f),
-		reserved2(0.0f),
+		m_ambient(0.03f),
 		reserved3(0.0f),
 		m_colorAmbient(COLOR_WHITE),
 		m_colorDiffuse(COLOR_WHITE),
@@ -27,7 +27,7 @@ public:
 	material(float shine, color colorAmbient, color colorDiffuse, color colorSpecular) :
 		m_shine(shine),
 		m_bump(0.0f),
-		reserved2(0.0f),
+		m_ambient(0.0f),
 		reserved3(0.0f),
 		m_colorAmbient(colorAmbient),
 		m_colorDiffuse(colorDiffuse),
@@ -36,10 +36,10 @@ public:
 		// empty
 	}
 
-	material(float shine, float bump, color colorAmbient, color colorDiffuse, color colorSpecular) :
+	material(float shine, float bump, color colorAmbient, color colorDiffuse, color colorSpecular, float ambient = 0.03f) :
 		m_shine(shine),
 		m_bump(bump),
-		reserved2(0.0f),
+		m_ambient(ambient),
 		reserved3(0.0f),
 		m_colorAmbient(colorAmbient),
 		m_colorDiffuse(colorDiffuse),
@@ -58,10 +58,14 @@ public:
 		m_colorSpecular = colorSpecular;
 	}
 
+	void SetAmbientIntensity(float ambient) {
+		m_ambient = ambient;
+	}
+
 private:
 	float m_shine;				// specular
 	float m_bump;				// bumpiness 
-	float reserved2;
+	float m_ambient;
 	float reserved3;
 	color m_colorAmbient;
 	color m_colorDiffuse;

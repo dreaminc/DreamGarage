@@ -17,11 +17,11 @@ typedef enum {
 	CLOUD_CONTROLLER_WEBSOCKET		= (1u << 2),
 	CLOUD_CONTROLLER_CURL			= (1u << 3),
 	CLOUD_CONTROLLER_INVALID	
-} CLOUD_CONTROLLER_TYPE;
+} CLOUD_CONTROLLER_IMP_TYPE;
 
 class CloudControllerFactory : public Factory {
 public:
-	static CloudController* MakeCloudController(CLOUD_CONTROLLER_TYPE type, void *pContext);
+	static CloudController* MakeCloudController(CLOUD_CONTROLLER_IMP_TYPE type, void *pContext);
 };
 
 #endif // ! CLOUD_CONTROLLER_FACTORY_H_

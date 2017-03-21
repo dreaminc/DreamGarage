@@ -67,6 +67,9 @@ protected:
 	int m_dragOriginX = 0;
 	int m_dragOriginY = 0;
 
+	int m_lastX = 0;
+	int m_lastY = 0;
+
 private:
 	typedef struct SenseMousePosition {
 		int xPos;
@@ -103,11 +106,10 @@ private:
 protected:
 	// x,y are in window screen coordinates!
 	virtual RESULT SetMousePosition(int x, int y);
-	virtual RESULT GetMousePosition(int& x, int& y);
-
 	virtual RESULT ShowCursor(bool show);
 
 public:
+	virtual RESULT GetMousePosition(int& x, int& y);
 
 	virtual RESULT CaptureMouse();
 	virtual RESULT ReleaseMouse();

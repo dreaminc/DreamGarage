@@ -10,7 +10,6 @@
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
 #include <HMD/HMDFactory.h>
-#include <HMD/OpenVR/OpenVRDevice.h>
 
 #include <string>
 
@@ -23,10 +22,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	m_fFullscreen(DEFAULT_FULLSCREEN),
 	m_wndStyle(WS_OVERLAPPEDWINDOW),
 	m_hDC(nullptr),
-	m_pHMD(nullptr),
 	m_ThreadID(0),
-	m_fnUIThreadCallback(nullptr),
-	m_pSenseLeapMotion(nullptr)
+	m_fnUIThreadCallback(nullptr)
 {
 	RESULT r = R_PASS;
 
@@ -109,8 +106,8 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 	*/
 
 	// Sense Leap Motion Device (TODO: temporarily here!)
-	m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
-	CN(m_pSenseLeapMotion);
+	//m_pSenseLeapMotion = std::make_unique<SenseLeapMotion>();
+	//CN(m_pSenseLeapMotion);
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
@@ -153,9 +150,24 @@ RESULT Windows64App::InitializeMouse() {
 
 	// Initialize Mouse 
 	// Remove mouse capture.
-	// This effects the window responsivenes to drag, resize and focus event.
+	// This effects the window responsiveness to drag, resize and focus event.
 	//CRM(m_pSenseMouse->CaptureMouse(), "Failed to capture mouse");
 	//CRM(m_pSenseMouse->CenterMousePosition(), "Failed to center mouse position");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::InitializeLeapMotion() {
+	RESULT r = R_PASS;
+
+	m_pSenseLeapMotion = std::unique_ptr<SenseLeapMotion>(new SenseLeapMotion());
+	CNM(m_pSenseLeapMotion, "Failed to allocate leap motion");
+
+	if (R_PASS == m_pSenseLeapMotion->InitLeapMotion()) {
+		// Leap Motion successfully initialized
+		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
+	}
 
 Error:
 	return r;
@@ -240,6 +252,8 @@ RESULT Windows64App::InitializePathManager() {
 
 	// Initialize Path Manager
 	m_pPathManager = PathManagerFactory::MakePathManager(PATH_MANAGER_WIN32);
+
+	CNM(m_pPathManager, "Failed to allocated path manager");
 	CVM(m_pPathManager, "Failed to initialize path manager");
 
 	m_pPathManager->PrintPaths();
@@ -306,7 +320,8 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 
 			if (hDC == nullptr) {
 				DEBUG_LINEOUT("Failed to capture Device Context");
-				PostQuitMessage(0);
+				//PostQuitMessage(0);
+				Shutdown();
 				return 0L;
 			}
 
@@ -315,7 +330,8 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 
 		case WM_DESTROY: {
 			DEBUG_LINEOUT("Windows Sandbox being destroyed");
-			PostQuitMessage(0);
+			//PostQuitMessage(0);
+			Shutdown();
 			return 0L;
 		} break;
 
@@ -331,65 +347,6 @@ LRESULT __stdcall Windows64App::WndProc(HWND hWindow, unsigned int msg, WPARAM w
 	// Fall through for all messages for now
 	return DefWindowProc(hWindow, msg, wp, lp);
 }
-
-RESULT Windows64App::RegisterImpKeyboardEvents() {
-	RESULT r = R_PASS;
-
-	// Register Dream Console to keyboard events
-	CR(RegisterSubscriber(SK_ALL, DreamConsole::GetConsole()));
-
-	camera *pCamera = m_pHALImp->GetCamera();
-
-	CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
-
-	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
-
-	/*
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_LEFT, m_pOpenGLImp));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_UP, m_pOpenGLImp));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_DOWN, m_pOpenGLImp));
-	CR(m_pWin64Keyboard->RegisterSubscriber(VK_RIGHT, m_pOpenGLImp));
-
-	for (int i = 0; i < 26; i++) {
-		CR(m_pWin64Keyboard->RegisterSubscriber((SK_SCAN_CODE)('A' + i), m_pOpenGLImp));
-	}
-	*/
-
-	CR(RegisterSubscriber(VK_LEFT, pCamera));
-	CR(RegisterSubscriber(VK_UP, pCamera));
-	CR(RegisterSubscriber(VK_DOWN, pCamera));
-	CR(RegisterSubscriber(VK_RIGHT, pCamera));
-
-	CR(RegisterSubscriber(VK_SPACE, pCamera));
-
-	for (int i = 0; i < 26; i++) {
-		CR(RegisterSubscriber((SK_SCAN_CODE)('A' + i), pCamera));
-	}
-
-	CR(RegisterSubscriber((SK_SCAN_CODE)('F'), m_pHALImp));
-	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
-
-Error:
-	return r;
-}
-
-RESULT Windows64App::RegisterImpMouseEvents() {
-	RESULT r = R_PASS;
-
-	//camera *pCamera = m_pOpenGLImp->GetCamera();
-
-	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
-	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, m_pHALImp));
-	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_DRAG_MOVE, m_pHALImp));
-	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, m_pHALImp));
-	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, m_pHALImp));
-	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_DOWN, m_pHALImp));
-	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_UP, m_pHALImp));
-
-Error:
-	return r;
-}
-
 
 RESULT Windows64App::RegisterUIThreadCallback(std::function<void(int msg_id, void* data)> fnUIThreadCallback) {
 	RESULT r = R_PASS;
@@ -411,97 +368,15 @@ RESULT Windows64App::UnregisterUIThreadCallback() {
 	return r;
 }
 
-// temp
-#include "HAL/opengl/OGLHand.h"
-
-// TODO: shouldn't be this way ultimately 
-RESULT Windows64App::RegisterImpLeapMotionEvents() {
-	RESULT r = R_PASS;
-
-	hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-	hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-	
-	std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
-
-	std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
-
-	pLeftHand->SetOriented(true);
-	pRightHand->SetOriented(true);
-
-	composite* pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
-						nullptr,
-						point(0.0f, 0.0f, 0.0f),
-						0.015f,
-						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
-	
-	composite* pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
-						nullptr,
-						point(0.0f, 0.0f, 0.0f),
-						0.015f,
-						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
-
-	std::shared_ptr<DimObj> pLeftModelSharedPtr(pLeftModel);
-	pLeftModelSharedPtr->SetVisible(true);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftModelSharedPtr);
-
-	std::shared_ptr<DimObj> pRightModelSharedPtr(pRightModel);
-	pRightModelSharedPtr->SetVisible(true);
-	m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightModelSharedPtr);
-
-
-	CR(m_pSenseLeapMotion->AttachHand(pLeftHand, hand::HAND_LEFT));
-	CR(m_pSenseLeapMotion->AttachHand(pRightHand, hand::HAND_RIGHT));
-
-	CR(m_pSenseLeapMotion->AttachModel(pLeftModel, hand::HAND_LEFT));
-	CR(m_pSenseLeapMotion->AttachModel(pRightModel, hand::HAND_RIGHT));
-
-
-Error:
-	return r;
-}
-
-RESULT Windows64App::RegisterImpViveControllerEvents() {
-	RESULT r = R_PASS;
-
-	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
-
-	if (pVive) {
-		hand *pLeftHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-		hand *pRightHand = new OGLHand(reinterpret_cast<OpenGLImp*>(m_pHALImp));
-/*
-		std::shared_ptr<DimObj> pLeftHandSharedPtr(pLeftHand);
-		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pLeftHandSharedPtr);
-
-		std::shared_ptr<DimObj> pRightHandSharedPtr(pRightHand);
-		m_pHALImp->GetCamera()->AddObjectToFrameOfReferenceComposite(pRightHandSharedPtr);
-//*/
-		pLeftHand->SetOriented(false);
-		pRightHand->SetOriented(false);
-
-		pLeftHand->SetHandType(hand::HAND_TYPE::HAND_LEFT);
-		pRightHand->SetHandType(hand::HAND_TYPE::HAND_RIGHT);
-		CR(pVive->AttachHand(pLeftHand, hand::HAND_TYPE::HAND_LEFT));
-		CR(pVive->AttachHand(pRightHand, hand::HAND_TYPE::HAND_RIGHT));
-	}
-Error:
-	return r;
-}
-
-//hand *Windows64App::AttachHand
-
-hand *Windows64App::GetHand(hand::HAND_TYPE handType) {
-	OpenVRDevice *pVive = dynamic_cast<OpenVRDevice *>(m_pHMD);
-
-	if (pVive != nullptr) {
-		return pVive->GetHand(handType);
-	}
-	return m_pSenseLeapMotion->GetHand(handType);
-}
-
 long Windows64App::GetTickCount() {
 	return static_cast<long>(GetTickCount());
+}
+
+RESULT Windows64App::GetSandboxWindowSize(int &width, int &height) {
+	width = m_pxWidth;
+	height = m_pxHeight;
+
+	return R_PASS;
 }
 
 RESULT Windows64App::InitializeSandbox() {
@@ -521,7 +396,7 @@ RESULT Windows64App::InitializeSandbox() {
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
-	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implementation");
 	*/
 
 	CN(m_pHALImp);
@@ -534,43 +409,58 @@ RESULT Windows64App::InitializeSandbox() {
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
 	
-	if (m_fCheckHMD)
+	if (GetSandboxConfiguration().fUseHMD) {
 		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
-
-	if (m_pHMD != nullptr) {
-		CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+	
+		if (m_pHMD != nullptr) {
+			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+		}
 	}
-	//*/
 
 	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
 	m_pHALImp->GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
 	CRM(AddObject(pCameraFrameOfReferenceComposite), "Failed to add composite camera frame of reference");
 
-	/*
-	pSphere = std::shared_ptr<DimObj>(MakeSphere(0.25f, 30, 30, color(COLOR_RED)));
-	pSphere->SetPosition(point(0.0f, 0.0f, -1.0f));
-	pCameraFrameOfReferenceComposite->AddObject(pSphere);
-
-	sphere *pSphere2 = AddSphere(0.25f, 30, 30, color(COLOR_GREEN));
-	pSphere2->SetPosition(point(0.0f, 0.0f, 9.0f));
-	//*/
-
-	// TODO: Move to Sandbox function
+	// TODO: Move ALL to Sandbox function
 	CRM(InitializeKeyboard(), "Failed to initialize keyboard");
 	CRM(RegisterImpKeyboardEvents(), "Failed to register keyboard events");
 
-	// TODO: Move to Sandbox function
 	CRM(InitializeMouse(), "Failed to initialize mouse");
 	CRM(RegisterImpMouseEvents(), "Failed to register mouse events");
 
-	// TODO: This will only turn on Leap if connected at boot up
-	if (m_pSenseLeapMotion != nullptr && m_pSenseLeapMotion->IsConnected() && m_fCheckLeap) {
-		CRM(RegisterImpLeapMotionEvents(), "Failed to register leap motion events");
+	// This will only turn on Leap if connected at boot up
+	if (GetSandboxConfiguration().fUseLeap) {
+		CRM(InitializeLeapMotion(), "Failed to initialize leap motion");
 	}
 
-	CRM(RegisterImpViveControllerEvents(), "Failed to register vive controller events");
+	CRM(RegisterImpControllerEvents(), "Failed to register vive controller events");
 
 	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+
+Error:
+	return r;
+}
+
+RESULT Windows64App::HandleMessages() {
+	RESULT r = R_PASS;
+
+	MSG msg;
+	
+	if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
+		if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
+			HandleMouseEvent(msg);
+		}
+		else if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) {
+			HandleKeyEvent(msg);
+		}
+		else if (WM_QUIT == msg.message) {
+			Shutdown();
+			CBR(false, (RESULT)(msg.wParam));
+		}
+
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 
 Error:
 	return r;
@@ -582,16 +472,13 @@ RESULT Windows64App::Show() {
 	RESULT r = R_PASS;
 
 	// Show the window
+	//CBM(ShowWindow(m_hwndWindow, SW_SHOWDEFAULT), "Failed to show win64app window");
+	//CBM(UpdateWindow(m_hwndWindow), "Faield to update win64app window");
+
 	ShowWindow(m_hwndWindow, SW_SHOWDEFAULT);
 	UpdateWindow(m_hwndWindow);
 	
-	// Launch main message loop
-	MSG msg;
-	bool fQuit = false;
-
-	CN(m_pHALImp);
-	CR(m_pHALImp->MakeCurrentContext());
-
+	// TODO: Move this into it's own function
 	HANDLE hCloseSplashScreenEvent = CreateEvent(NULL,        // no security
 		TRUE,       // manual-reset event
 		FALSE,      // not signaled
@@ -602,95 +489,18 @@ RESULT Windows64App::Show() {
 	LOG(INFO) << "signaling splash to close " << (res ? "ok" : "failed");
 
 	CloseHandle(hCloseSplashScreenEvent);
-
-	while (!fQuit) {
-		if (PeekMessage(&msg, nullptr, NULL, NULL, PM_REMOVE)) {
-			bool fHandled = false;
-
-			if (msg.message >= WM_MOUSEFIRST && msg.message <= WM_MOUSELAST) {
-				fHandled = HandleMouseEvent(msg);
-			}
-			else if (msg.message >= WM_KEYFIRST && msg.message <= WM_KEYLAST) {
-				fHandled = HandleKeyEvent(msg);
-			}
-			else if (WM_QUIT == msg.message)
-				break;
-
-			if (!fHandled)
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-		}
-
-#ifdef CEF_ENABLED
-		// Update Network
-		CR(m_pCloudController->Update());
-#endif
-
-		// Time Manager
-		CR(m_pTimeManager->Update());
-
-		// Update Callback
-		if (m_fnUpdateCallback != nullptr) {
-			CR(m_fnUpdateCallback());
-		}
-
-		// Update the mouse
-		// TODO: This is wrong architecture, this should
-		// be parallel 
-		// TODO: Update Sense etc
-		//m_pWin64Mouse->UpdateMousePosition();
-
-
-		if (m_pHMD != nullptr) {
-			m_pHMD->UpdateHMD();
-		}
-
-		// Update Scene 
-		CR(m_pSceneGraph->UpdateScene());
-
-		// Update HMD
-		if (m_pHMD != nullptr) {
-			m_pHALImp->SetCameraOrientation(m_pHMD->GetHMDOrientation());
-			m_pHALImp->SetCameraPositionDeviation(m_pHMD->GetHMDTrackerDeviation());
-		}
-
-		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
-		//m_pOpenGLImp->Render(m_pSceneGraph);
-
-		///*
-		// Send to the HMD
-		// TODO reorganize Render functions
-		// need to be re-architected so that the HMD functions are called after all of the 
-		// gl functions per eye.
-		if (m_pHMD != nullptr) {
-			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
-			m_pHMD->SubmitFrame();
-			m_pHMD->RenderHMDMirror();
-		}
-		else {
-			// Render Scene
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
-		}
-		//*/
 	
-		// Swap buffers
-		SwapBuffers(m_hDC);
+	//return (RESULT)(msg.wParam);
 
-		DreamConsole::GetConsole()->OnFrameRendered();
-
-		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
-			Shutdown();
-			fQuit = true;
-		}
-	}
-
-	return (RESULT)(msg.wParam);
-Error:
+//Error:
 	return r;
+}
+
+inline RESULT Windows64App::SwapDisplayBuffers() {
+	if (SwapBuffers(m_hDC))
+		return R_PASS;
+	else
+		return R_FAIL;
 }
 
 bool Windows64App::HandleMouseEvent(const MSG&	windowMassage) {
@@ -700,18 +510,6 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage) {
 	WPARAM wp = windowMassage.wParam;
 
 	switch (windowMassage.message) {
-		case Windows64App::WindowMessages::UI_THREAD_CALLBACK: {
-			//m_pCloudController->CallGetUIThreadCallback(static_cast<int>(windowMassage.wParam), reinterpret_cast<void*>(windowMassage.lParam));
-		} break;
-
-		case WM_MOUSEMOVE: {
-			fHandled = true;
-			int xPos = (lp >> 0) & 0xFFFF;
-			int yPos = (lp >> 16) & 0xFFFF;
-			//DEBUG_LINEOUT("Middle mouse button down!");
-			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_MOVE, xPos, yPos, (int)(wp));
-		} break;
-
 		case WM_LBUTTONUP:
 		case WM_LBUTTONDOWN: {
 			fHandled = true;
@@ -774,6 +572,14 @@ bool Windows64App::HandleMouseEvent(const MSG&	windowMassage) {
 			//m_pWin64Mouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, (int)(wp));
 			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_WHEEL, xPos, yPos, wheel);
 		} break;
+
+		case WM_MOUSEMOVE: {
+			fHandled = true;
+			int xPos = (lp >> 0) & 0xFFFF;
+			int yPos = (lp >> 16) & 0xFFFF;
+			//DEBUG_LINEOUT("Middle mouse button down!");
+			m_pSenseMouse->UpdateMouseState(SENSE_MOUSE_MOVE, xPos, yPos, (int)(wp));
+		} break;
 	}
 
 	return fHandled;
@@ -788,68 +594,20 @@ bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
 	switch (windowMassage.message) {
 		case WM_KEYUP: {
 			fHandled = true;
-			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), false);
+			m_pSenseKeyboard->UpdateKeyState((SenseVirtualKey)(windowMassage.wParam), false);
 		} break;
 
 		case WM_KEYDOWN: {
 			fHandled = true;
-			m_pSenseKeyboard->UpdateKeyState((SK_SCAN_CODE)(windowMassage.wParam), true);
+			m_pSenseKeyboard->UpdateKeyState((SenseVirtualKey)(windowMassage.wParam), true);
+		} break;
 
-			/*
-			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
-				HUD_OUT("Key 'L' is pressed");
+		case WM_CHAR: {
+			unsigned int lparam = windowMassage.lParam;
+			unsigned char scanCode = (lparam >> 16);
 
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->LoginUser();
-				}
-			}
-			*/
-
-			// TODO: Clean this up / remove it eventually (if anything, put it into the handler)
-			/*
-			// DEBUG: Bypass for connect to cloud
-			if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('H')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					//m_pCloudController->SendDataChannelStringMessage(NULL, std::string("hi"));
-
-					m_pCloudController->SendUpdateHeadMessage(NULL, point(1, 2, 3), quaternion(1, 2, 3, 4));
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('L')) {
-				HUD_OUT("Key 'L' is pressed");
-
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->LoginUser();
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('P')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->PrintEnvironmentPeerList();
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == (SK_SCAN_CODE)('I')) {
-				if (m_pCloudController != nullptr) {
-					// Attempt to connect to the first peer in the list
-					m_pCloudController->AddIceCandidates();
-				}
-			}
-			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_LEFT) {
-				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::LEFT);
-			}
-			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_RIGHT) {
-				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::RIGHT);
-			}
-			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_UP) {
-				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::TOP);
-			}
-			else if ((SK_SCAN_CODE)(wp) == SK_SCAN_CODE::SK_DOWN) {
-				SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION::BOTTOM);
-			}
-			*/
+			fHandled = true;
+			m_pSenseKeyboard->NotifyTextTyping(static_cast<SenseVirtualKey>(MapVirtualKey(scanCode, MAPVK_VSC_TO_VK)), windowMassage.wParam, true);			
 		} break;
 	}
 	
@@ -858,6 +616,8 @@ bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
 
 RESULT Windows64App::Shutdown() {
 	RESULT r = R_PASS;
+
+	CR(SetSandboxRunning(false));
 
 	// Release device context in use by rc
 	wglMakeCurrent(m_hDC, nullptr);

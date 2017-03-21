@@ -14,6 +14,8 @@
 #include "User/User.h"
 #include "User/TwilioNTSInformation.h"
 
+#include "ControllerProxy.h"
+
 #include <chrono>
 #include <thread>
 
@@ -23,6 +25,7 @@
 #endif
 
 CloudController::CloudController() :
+	Controller(nullptr, this),
 	m_pCloudImp(nullptr),
 	m_pUserController(nullptr),
 	m_pEnvironmentController(nullptr),
@@ -52,7 +55,7 @@ RESULT CloudController::ProcessingThread() {
 
 	//std::this_thread::sleep_for(std::chrono::seconds(3));
 
-	CR(LoginUser());
+	CR(Login());
 
 	// Message pump goes here
 #if (defined(_WIN32) || defined(_WIN64))
@@ -198,6 +201,7 @@ RESULT CloudController::Initialize() {
 
 	CR(InitializeUser());
 	CR(InitializeEnvironment(-1));
+
 Error:
 	return r;
 }
@@ -371,8 +375,19 @@ Error:
 }
 */
 
-void CloudController::Login() {
-	LoginUser();
+RESULT CloudController::Login() {
+	RESULT r = R_PASS;
+
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+
+	std::string strUsername = pCommandLineManager->GetParameterValue("username");
+	std::string strPassword = pCommandLineManager->GetParameterValue("password");
+	std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+	CR(LoginUser(strUsername, strPassword, strOTK));
+
+Error:
+	return r;
 }
 
 User CloudController::GetUser() {
@@ -383,22 +398,27 @@ TwilioNTSInformation CloudController::GetTwilioNTSInformation() {
 	return m_pUserController->GetTwilioNTSInformation();
 }
 
-RESULT CloudController::LoginUser() {
+bool CloudController::IsUserLoggedIn() {
+	return m_pUserController->IsLoggedIn();
+}
+
+bool CloudController::IsEnvironmentConnected() {
+	return m_pEnvironmentController->IsEnvironmentSocketConnected();
+}
+
+RESULT CloudController::LoginUser(std::string strUsername, std::string strPassword, std::string strOTK) {
 	RESULT r = R_PASS;
 
 	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
 	
-	std::string strURI = pCommandLineManager->GetParameterValue("api.ip");
-	std::string strUsername = pCommandLineManager->GetParameterValue("username");
-	std::string strPassword = pCommandLineManager->GetParameterValue("password");
-	std::string strOTK = pCommandLineManager->GetParameterValue("otk.id"); 
+	//std::string strURI = pCommandLineManager->GetParameterValue("api.ip");
 	
 	std::string strEnvironment = pCommandLineManager->GetParameterValue("environment");
 	long environmentID;
 
 	if (strOTK == "INVALIDONETIMEKEY") {
 		HUD_OUT(("Login user " + strUsername + "...").c_str());
-		HUD_OUT(("Login ip " + strURI + "...").c_str());
+		HUD_OUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
 		// TODO: command line / config file - right now hard coded
 		CN(m_pUserController);
@@ -407,7 +427,7 @@ RESULT CloudController::LoginUser() {
 	else {
 		// TODO: If OTK provided log in with that instead
 		HUD_OUT(("Login with OTK " + strOTK + "...").c_str());
-		HUD_OUT(("Login ip " + strURI + "...").c_str());
+		HUD_OUT(("Login ip " + pCommandLineManager->GetParameterValue("api.ip") + "...").c_str());
 
 		CN(m_pUserController);
 		CRM(m_pUserController->LoginWithOTK(strOTK), "Failed to login with OTK");
@@ -677,6 +697,11 @@ Error:
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
 
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("login : login to Dream");
+		HUD_OUT("msg <msg> : broadcast a text msg, <msg>, to connected users");
+	}
+
 	if (event->GetArg(1).compare("login") == 0) {
 		//
 		Start();
@@ -689,4 +714,47 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 
 //Error:
 	return r;
+}
+
+// TODO: Fill out pattern for other controllers
+ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
+	ControllerProxy *pProxy = nullptr;
+
+	switch (controllerType) {
+		case CLOUD_CONTROLLER_TYPE::MENU: {
+			pProxy = (ControllerProxy*)(GetMenuControllerProxy());
+		} break;
+
+		case CLOUD_CONTROLLER_TYPE::HTTP: {
+			pProxy = (ControllerProxy*)(GetHTTPControllerProxy());
+		} break;
+	}
+
+	return pProxy;
+}
+
+RESULT CloudController::RegisterControllerObserver(CLOUD_CONTROLLER_TYPE controllerType, ControllerObserver *pControllerObserver) {
+	RESULT r = R_PASS;
+
+	ControllerProxy *pProxy = nullptr;
+
+	switch (controllerType) {
+		case CLOUD_CONTROLLER_TYPE::MENU: {
+			pProxy = (ControllerProxy*)(GetMenuControllerProxy());
+			CN(pProxy);
+			CR(pProxy->RegisterControllerObserver(pControllerObserver));
+		} break;
+	}
+
+Error:
+	return r;
+}
+
+MenuControllerProxy* CloudController::GetMenuControllerProxy() {
+	return m_pEnvironmentController->GetMenuControllerProxy();
+}
+
+HTTPControllerProxy* CloudController::GetHTTPControllerProxy() {
+	HTTPController *pHTTPController = HTTPController::instance();
+	return pHTTPController->GetHTTPControllerProxy();
 }

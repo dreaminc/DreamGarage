@@ -68,9 +68,12 @@ public:
 	RESULT MakeFragmentShader(const wchar_t *pszFilename);
 
 	// TODO: Likely more eloquent way to do this
-	RESULT RenderSceneGraph(ObjectStore *pSceneGraph);
+	RESULT RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore);
+	RESULT RenderObjectStore(ObjectStore *pObjectStore);
 	RESULT RenderObject(DimObj *pDimObj);
+	RESULT RenderObjectBoundingVolume(DimObj *pDimObj);
 	RESULT RenderChildren(DimObj *pDimObj);	
+	RESULT RenderChildrenBoundingVolumes(DimObj *pDimObj);
 	RESULT RenderObject(VirtualObj *pVirtualObj);
 	
 	RESULT SetLights(ObjectStore *pSceneGraph);

@@ -3,10 +3,20 @@
 RESULT Win32Helper::ThreadBlockingMessageLoop() {
 	MSG msg;
 
-	while (GetMessage(&msg, NULL, 0, 0) > 0)
+	BOOL ret = 0;
+
+	while (ret = GetMessage(&msg, NULL, 0, 0))
 	{
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		if (ret > 0) {
+			TranslateMessage(&msg);
+			DispatchMessage(&msg);
+		}
+		else if (ret < 0) {
+			// window message error
+		}
+		else {
+			break;
+		}
 	}
 
 	return R_PASS;

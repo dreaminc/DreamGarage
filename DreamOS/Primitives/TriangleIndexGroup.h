@@ -7,7 +7,7 @@
 // DreamOS/Dimension/Primitives/TriangleIndexGroup.h
 // This is a triangle index group
 
-#include "matrix.h"
+#include "matrix/matrix.h"
 
 typedef uint32_t dimindex;
 

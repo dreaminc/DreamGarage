@@ -23,10 +23,14 @@
 #include "Primitives/quaternion.h"
 #include "Primitives/hand.h"
 
+class ControllerProxy;
 class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
 class AudioDataMessage;
+
+class MenuControllerProxy;
+class HTTPControllerProxy;
 
 class User;
 class TwilioNTSInformation;
@@ -38,8 +42,18 @@ typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageC
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 typedef std::function<RESULT(long, AudioDataMessage*)> HandleAudioDataCallback;
 
+enum class CLOUD_CONTROLLER_TYPE {
+	CLOUD,
+	ENVIRONMENT,
+	MENU,
+	USER,
+	HTTP,
+	INVALID
+};
+
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver,
-						public Subscriber<CmdPromptEvent> {
+						public Subscriber<CmdPromptEvent> 
+{
 protected:
 	typedef std::function<RESULT(long, const std::string&)> HandleDataChannelStringMessageCallback;
 	typedef std::function<RESULT(long, uint8_t *, int)> HandleDataChannelMessageCallback;
@@ -76,12 +90,15 @@ public:
 	RESULT InitializeUser(version ver = 1.0f);
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
-	RESULT LoginUser();
+	//RESULT LoginUser();
+	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK);
 	RESULT Update();
-	void Login();
+	RESULT Login();
 
 	User GetUser();
 	TwilioNTSInformation GetTwilioNTSInformation();
+	bool IsUserLoggedIn();
+	bool IsEnvironmentConnected();
 
 	virtual long GetUserID() override;
 
@@ -120,6 +137,16 @@ public:
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;
+
+	
+	// Proxy Objects
+public:
+	ControllerProxy* GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
+	RESULT RegisterControllerObserver(CLOUD_CONTROLLER_TYPE controllerType, ControllerObserver *pControllerObserver);
+
+private:
+	MenuControllerProxy* GetMenuControllerProxy();
+	HTTPControllerProxy* GetHTTPControllerProxy();
 
 private:
 	//UID m_uid;

@@ -68,6 +68,11 @@ public:
 	inline void glGetProgramInfoLog(GLuint programID, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
 		return m_glGetProgramInfoLog(programID, bufSize, length, infoLog);
 	}
+
+	// Draw
+	inline void glDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices) {
+		return m_glDrawRangeElements(mode, start, end, count, type, indices);
+	}
 	
 	// Uniform Variables
 	inline GLint glGetUniformLocation(GLuint programID, const GLchar *pszName) {
@@ -351,6 +356,9 @@ private:
 	PFNGLLINKPROGRAMPROC m_glLinkProgram;
 	PFNGLGETPROGRAMIVPROC m_glGetProgramiv;
 	PFNGLGETPROGRAMINFOLOGPROC m_glGetProgramInfoLog;
+
+	// Draw
+	PFNGLDRAWRANGEELEMENTSPROC m_glDrawRangeElements;
 
 	// Uniform Variables
 	PFNGLGETUNIFORMLOCATIONPROC m_glGetUniformLocation;

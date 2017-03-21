@@ -16,6 +16,8 @@
 
 #include "ObjectStoreFactory.h"
 
+class ray;
+
 // The different types of stores should be added here 
 
 class ObjectStore : public valid {
@@ -30,6 +32,7 @@ public:
 
 	RESULT PushObject(VirtualObj *pObject);
 	RESULT RemoveObject(VirtualObj *pObject);
+	RESULT RemoveAllObjects();
 
 	// Effectively a factory method to set up the object store
 	RESULT InitializeSceneGraphStore(ObjectStoreFactory::TYPE type);
@@ -37,11 +40,19 @@ public:
 	RESULT RemoveObjectByUID(UID uid);
 	VirtualObj *FindObjectByUID(UID uid);
 
-	ObjectStoreImp *GetSceneGraphStore() { return m_pSceneGraphStore; }
+	ObjectStoreImp *GetSceneGraphStore() { 
+		return m_pSceneGraphStore; 
+	}
+
+	std::vector<VirtualObj*> GetObjects();
+	std::vector<VirtualObj*> GetObjects(ray rCast);
 
 	// TODO: Arch here
 	RESULT UpdateScene();
 	RESULT LoadScene();
+
+	RESULT CommitObjects();
+
 
 protected:
 	ObjectStoreImp *m_pSceneGraphStore;

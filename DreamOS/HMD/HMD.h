@@ -13,12 +13,15 @@
 
 #include "Primitives/Publisher.h"
 
-#include "Primitives/ViewMatrix.h"
-#include "Primitives/ProjectionMatrix.h"
+#include "Primitives/matrix/ViewMatrix.h"
+#include "Primitives/matrix/ProjectionMatrix.h"
 #include "Primitives/Types/UID.h"
 #include "Primitives/quaternion.h"
 #include "Primitives/point.h"
 #include "Primitives/composite.h"
+#include "Primitives/hand.h"
+
+#include "Sense/SenseController.h"
 
 #define HMD_NUM_EYES 2
 
@@ -114,6 +117,10 @@ public:
 	int GetEyeWidth() { return m_eyeWidth; }
 	int GetEyeHeight() { return m_eyeHeight; }
 
+	RESULT AttachHand(hand *pHand, hand::HAND_TYPE type);
+	hand* GetHand(hand::HAND_TYPE type);
+
+	SenseController* GetSenseController();
 
 protected:
 	point m_ptOrigin;
@@ -125,6 +132,11 @@ protected:
 	HALImp *m_pHALImp;	// TODO: This may not be needed if Sandbox parent is kept
 
 	SandboxApp *m_pParentSandbox;
+
+	hand* m_pLeftHand;
+	hand* m_pRightHand;
+
+	SenseController *m_pSenseController;
 
 private:
 	UID m_uid;

@@ -77,6 +77,16 @@ void DebugData::SetValue(quaternion q)
 	m_value = (GetName() + ": " + std::to_string(q.x()) + ", " + std::to_string(q.y()) + ", " + std::to_string(q.z()) + ", " + std::to_string(q.w())).c_str();
 }
 
+void DebugData::SetValue(int i)
+{
+	m_value = (GetName() + ": " + std::to_string(i));
+}
+
+void DebugData::SetValue(float f)
+{
+	m_value = (GetName() + ":" + std::to_string(f));
+}
+
 const std::string& DebugData::GetName()
 {
 	return m_uniqueName;

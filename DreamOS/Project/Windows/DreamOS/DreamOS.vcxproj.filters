@@ -63,18 +63,6 @@
     <Filter Include="External\OCULUS">
       <UniqueIdentifier>{3686233d-96d6-4810-ab2d-ff06312c2946}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\OCULUS\v132">
-      <UniqueIdentifier>{9fb38d30-c91d-44ad-b826-0bc9b067ae01}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\LibOVR">
-      <UniqueIdentifier>{352f8ae7-d31f-45c0-afc6-c334b01431cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\LibOVRKernel">
-      <UniqueIdentifier>{9b76fa23-0019-42ac-9157-f11820e16332}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\Logging">
-      <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HMD">
       <UniqueIdentifier>{e122ce99-434d-454c-a1b9-c035729da930}</UniqueIdentifier>
     </Filter>
@@ -171,6 +159,39 @@
     <Filter Include="Models\face4">
       <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Primitives\matrix">
+      <UniqueIdentifier>{9ecd8ad4-8dee-4052-a0e9-2f164281aa96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PhysicsEngine">
+      <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cloud\WebBrowser">
+      <UniqueIdentifier>{d8051eb4-4d18-4c14-8db2-24de64018e8a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamTestApp">
+      <UniqueIdentifier>{921ea31d-7767-45b3-8296-bb5f9e9725eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InteractionEngine">
+      <UniqueIdentifier>{4bf81ee4-33cb-4648-aeeb-4c7752abaad8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{28d7c94b-81c3-4992-85e4-1dabd8aad4d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cloud\Menu">
+      <UniqueIdentifier>{ae8879dc-1260-4bae-97f6-1266681d851d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0">
+      <UniqueIdentifier>{9fb38d30-c91d-44ad-b826-0bc9b067ae01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\LibOVR">
+      <UniqueIdentifier>{352f8ae7-d31f-45c0-afc6-c334b01431cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\LibOVRKernel">
+      <UniqueIdentifier>{9b76fa23-0019-42ac-9157-f11820e16332}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\Logging">
+      <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -193,9 +214,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp">
       <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp">
-      <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\point.cpp">
       <Filter>Primitives</Filter>
@@ -293,22 +311,10 @@
     <ClCompile Include="..\..\..\Primitives\font.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamOS.cpp">
@@ -316,9 +322,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\HALImp.cpp">
       <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamGarage.cpp">
-      <Filter>DreamGarage</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp">
       <Filter>Cloud\webrtc</Filter>
@@ -359,9 +362,6 @@
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\composite.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\hand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -398,15 +398,6 @@
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
@@ -437,14 +428,215 @@
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\vector.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\composite.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\volume.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\sphere.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\cylinder.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\TestObject.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\TestSuite.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp">
+      <Filter>Primitives\matrix</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp">
       <Filter>Cloud\User</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseController.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserService.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefHandler.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserController.cpp">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
+      <Filter>DreamTestApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\ObjectState.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\quad.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\line.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\Integrator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIBar.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuItem.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIModule.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp">
+      <Filter>Cloud\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Core\Utilities.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Controller.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp">
+      <Filter>Cloud\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_OutputPlugins.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequest.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\HMD.cpp">
+      <Filter>HMD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -463,13 +655,7 @@
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
       <Filter>RESULT</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\AABV.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\point.h">
@@ -532,9 +718,6 @@
     <ClInclude Include="..\..\..\Primitives\Vertex.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\Shader.h">
       <Filter>HAL</Filter>
     </ClInclude>
@@ -562,22 +745,10 @@
     <ClInclude Include="..\..\..\Core\config.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\RotationMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\camera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ViewMatrix.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseDevice.h">
@@ -802,9 +973,6 @@
     <ClInclude Include="..\..\..\Cloud\CloudImp.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFImp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_app.h">
       <Filter>External\CEF\v3.2556\include</Filter>
     </ClInclude>
@@ -1336,16 +1504,7 @@
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_thread_checker_impl.h">
       <Filter>External\CEF\v3.2556\include\base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFApp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFHandler.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
@@ -1369,9 +1528,6 @@
     <ClInclude Include="..\..\..\Cloud\CloudImp.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFImp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_app.h">
       <Filter>External\CEF\v3.2556\include</Filter>
     </ClInclude>
@@ -1903,23 +2059,11 @@
     <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_thread_checker_impl.h">
       <Filter>External\CEF\v3.2556\include\base</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFApp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFHandler.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamOS.h">
       <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamGarage.h">
-      <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
@@ -1938,9 +2082,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h">
       <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\BiasMatrix.h">
-      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\External\Matrices\Matrices.h">
       <Filter>External\Matrices</Filter>
@@ -1996,9 +2137,6 @@
     <ClInclude Include="..\..\..\Cloud\Controller.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Model.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Message\Message.h">
       <Filter>Cloud\Message</Filter>
     </ClInclude>
@@ -2010,6 +2148,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingVolume.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingSphere.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\line.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingBox.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h">
       <Filter>Scene</Filter>
@@ -2078,11 +2228,185 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\cylinder.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLCylinder.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ray.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\TestSuite.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\matrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ProjectionMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\RotationMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\MatrixTestSuite.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
       <Filter>Cloud\User</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
       <Filter>Cloud\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseController.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimRay.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserService.h">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefHandler.h">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserController.h">
+      <Filter>Cloud\WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
+      <Filter>DreamTestApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ObjectState.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\Integrator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\TestSuiteFactory.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIBar.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuItem.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuLayer.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIModule.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UITestSuite.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h">
+      <Filter>Cloud\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\ControllerProxy.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\CloudMessage.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Utilities.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\CloudModel.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Menu\MenuNode.h">
+      <Filter>Cloud\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\ControllerObserver.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.h">
+      <Filter>Cloud\HTTP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2252,6 +2576,9 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
+    <None Include="..\..\..\Primitives\plane.h">
+      <Filter>Primitives</Filter>
+    </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
@@ -2294,8 +2621,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj">
-      <Filter>Models\face4</Filter>
-    </Object>
+    <Object Include="..\..\..\Models\face4\untitled.obj" />
   </ItemGroup>
 </Project>

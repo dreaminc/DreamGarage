@@ -82,6 +82,9 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 #define ACBM(condition, msg, ...) do{if(!condition){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
 #define ACB(condition) do{if(!condition){assert(0);}}while(0);
 
+// Check Range
+#define CRANGE(val, valMin, valMax) do{if(!(val > valMax) || !(val < valMin)) {r = R_FAIL; goto Error;}}while(0);
+
 // Check NULL Result
 // Ensures that the pointer is not a NULL
 #define CN(pointer) do{if((pointer) == NULL) {r = R_ERROR; goto Error;}}while(0);

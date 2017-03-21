@@ -47,6 +47,8 @@ public:
 	SenseLeapMotion();
 	~SenseLeapMotion();
 
+	RESULT InitLeapMotion();
+
 private:
 	const std::string FingerNames[5] = { "Thumb", "Index", "Middle", "Ring", "Pinky" };
 	const std::string BoneNames[5] = { "Metacarpal", "Proximal", "Middle", "Distal" };
@@ -77,7 +79,6 @@ public:
 	*/
 
 	RESULT AttachHand(hand *pHand, hand::HAND_TYPE handType) {
-		pHand->SetVisible(false);
 		if(handType == hand::HAND_TYPE::HAND_LEFT)
 			m_pLeftHand = pHand;
 		else if (handType == hand::HAND_TYPE::HAND_RIGHT)

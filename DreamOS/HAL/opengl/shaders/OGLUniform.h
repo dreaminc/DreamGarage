@@ -10,7 +10,7 @@
 #include "../OpenGLCommon.h"
 #include "../GLSLObject.h"
 
-#include "Primitives/matrix.h"
+#include "Primitives/matrix/matrix.h"
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 #include "Primitives/quaternion.h"

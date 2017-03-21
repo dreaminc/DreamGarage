@@ -1,5 +1,5 @@
-#include "Logger/Logger.h"
 #include "UserController.h"
+#include "Logger/Logger.h"
 
 #include "Cloud/HTTP/HTTPController.h"
 #include "Sandbox/CommandLineManager.h"
@@ -271,6 +271,10 @@ RESULT UserController::LoadProfile() {
 
 Error:
 	return r;
+}
+
+bool UserController::IsLoggedIn() {
+	return m_fLoggedIn;
 }
 
 // TODO: This may want to move to an API controller object instead

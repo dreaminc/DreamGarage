@@ -36,6 +36,7 @@ class quaternion {
 public:
 	quaternion();
 	quaternion(vector v);
+	quaternion(vector v1, vector v2);
 	quaternion(quaternion_precision theta, vector vectorAxis);
 	quaternion(quaternion_precision theta, quaternion_precision x, quaternion_precision y, quaternion_precision z);
 	quaternion(quaternion_precision values[4]);
@@ -51,6 +52,8 @@ public:
 	RESULT SetValues(quaternion_precision values[4]);
 	RESULT SetValues(quaternionXYZW qXYZW);
 	RESULT SetValuesXYZW(quaternion_precision values[4]);
+
+	RESULT clear();
 
 	quaternion Normalize();
 	quaternion_precision Magnitude();
@@ -70,7 +73,14 @@ public:
 	quaternion_precision GetEulerAngleY();
 	RESULT GetEulerAngles(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z);
 
+	quaternion_precision GetEulerAngleXDeg();
+	quaternion_precision GetEulerAngleYDeg();
+	quaternion_precision GetEulerAngleZDeg();
+	RESULT GetEulerAnglesDeg(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z);
+
 	static quaternion MakeQuaternionWithEuler(quaternion_precision x, quaternion_precision y, quaternion_precision z);
+
+	float ProjectedYRotationDeg();
 
 	RESULT Reverse();
 	quaternion GetReverse();
@@ -81,6 +91,8 @@ public:
 
 	// http://www.mathworks.com/help/aeroblks/quaternionrotation.html
 	vector RotateVector(vector v);
+
+	bool IsZero();
 
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline quaternion_precision &w() { return m_w; }
@@ -97,6 +109,9 @@ public:
 	inline quaternion_precision &x(quaternion_precision val) { return m_x = val; }
 	inline quaternion_precision &y(quaternion_precision val) { return m_y = val; }
 	inline quaternion_precision &z(quaternion_precision val) { return m_z = val; }
+
+	quaternion& operator*=(const quaternion_precision& arg);
+	const quaternion& operator*(const quaternion_precision& arg) const;
 
 	quaternion& operator*=(const quaternion& r);
 	const quaternion& operator*(const quaternion& arg) const;

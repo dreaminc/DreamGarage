@@ -32,15 +32,15 @@ public:
 		
 		switch (eye) {
 			case EYE_LEFT: {
-				ptEye = m_ptOrigin + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
+				ptEye = camera::GetOrigin() + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
 			} break;
 
 			case EYE_RIGHT: {
-				ptEye = m_ptOrigin + (GetRightVector() * (m_pupillaryDistance / 2.0f));
+				ptEye = camera::GetOrigin() + (GetRightVector() * (m_pupillaryDistance / 2.0f));
 			} break;
 
 			case EYE_MONO: {
-				ptEye = m_ptOrigin;
+				ptEye = camera::GetOrigin();
 			} break;
 		}
 
@@ -64,7 +64,7 @@ public:
 		return projMat;
 	}
 
-	virtual point GetOrigin() override {
+	virtual point GetOrigin(bool fAbsolute = false) override {
 		point eyePos = GetEyePosition(EYE_MONO);
 
 		if (m_pHMD != nullptr) {
@@ -74,7 +74,7 @@ public:
 		return eyePos;
 	}
 
-	virtual point GetPosition() override {
+	virtual point GetPosition(bool fAbsolute = false) override {
 		point eyePos = GetEyePosition(EYE_MONO);
 
 		if (m_pHMD != nullptr) {
@@ -96,7 +96,7 @@ public:
 		}
 		// View Matrix requires the opposite of the camera's world position
 		eyePos.Reverse();
-		quaternion q = m_qRotation;
+		quaternion q = camera::GetOrientation();
 //		q.Reverse();
 
 

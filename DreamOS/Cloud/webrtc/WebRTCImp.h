@@ -118,7 +118,7 @@ protected:
 
 private:
 	std::shared_ptr<WebRTCConductor> m_pWebRTCConductor;
-	rtc::Win32Thread m_Win32thread;
+	rtc::Win32Thread* m_pWin32thread;
 
 	DWORD m_UIThreadID;
 	std::string m_strServer;

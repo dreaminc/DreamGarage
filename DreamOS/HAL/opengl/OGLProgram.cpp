@@ -680,22 +680,74 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::RenderSceneGraph(ObjectStore *pSceneGraph) {
+RESULT OGLProgram::RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
-	
-	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
+
+	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
-	pSceneGraph->Reset();
-	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+	pObjectStore->Reset();
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != NULL) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
+		
+		if (pDimObj == NULL) {
+			continue;
+		}
+		else {
+			CR(RenderObjectBoundingVolume(pDimObj));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
+	RESULT r = R_PASS;
+	
+	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = NULL;
+
+	pObjectStore->Reset();
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != NULL) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
 
-		if (pDimObj == NULL)
+		if (pDimObj == NULL) {
 			continue;
+		}
 		else {
 			CR(RenderObject(pDimObj));
-
 		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderObjectBoundingVolume(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Temp - this might want to be a separate flag
+	if (pDimObj->IsVisible() == false)
+		return R_PASS;
+
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+
+	if (pOGLObj != nullptr) {
+		// TODO: This is a bit wonky, RenderBoundingVolume creates the OGL Bounding volume 
+		// which might not be the right flow
+		if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
+			// Update bounding volume:
+			pOGLObj->UpdateBoundingVolume();
+			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
+		}
+
+		// This is called even when bounding volume is null since it'll create the refgeo
+		CR(pOGLObj->RenderBoundingVolume());
+	}
+
+	if (pDimObj->HasChildren()) {
+		CR(RenderChildrenBoundingVolumes(pDimObj));
 	}
 
 Error:
@@ -739,6 +791,24 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 
 	if (pDimObj->HasChildren()) {
 		CR(RenderChildren(pDimObj));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderChildrenBoundingVolumes(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Rethink this since it's in the critical path
+	auto objects = pDimObj->GetChildren();
+
+	for (auto &pVirtualObj : objects) {
+		DimObj *pChildDimObj = dynamic_cast<DimObj*>(pVirtualObj.get());
+
+		if (pChildDimObj != nullptr) {
+			CR(RenderObjectBoundingVolume(pChildDimObj));
+		}
 	}
 
 Error:

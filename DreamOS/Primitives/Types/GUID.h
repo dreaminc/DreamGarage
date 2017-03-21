@@ -20,6 +20,8 @@ public:
 
 	std::string GetGUIDString();
 
+	RESULT SetGUIDFromString(std::string strGUID);
+
 	bool operator==(const guid& rhs) {
 		return ((m_uiIDUpper == rhs.m_uiIDUpper) && (m_uiIDLower == rhs.m_uiIDLower));
 	}

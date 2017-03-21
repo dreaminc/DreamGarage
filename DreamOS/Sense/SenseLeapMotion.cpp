@@ -7,32 +7,28 @@ SenseLeapMotion::SenseLeapMotion() :
 	m_pLeftHand(nullptr),
 	m_pRightHand(nullptr)
 {
+//Success:
+	Validate();
+	return;
+}
+
+RESULT SenseLeapMotion::InitLeapMotion() {
 	RESULT r = R_PASS;
 
 	m_pLeapController = std::make_unique<Leap::Controller>();
 	CNM(m_pLeapController, "Failed to create leap motion controller");
 
+	// this determines if a user has leap motion installed or not
 	CBM((m_pLeapController->addListener(*this)), "Failed to add SenseLeapMotion as listener device");
 
 	m_pLeapController->setPolicy(Leap::Controller::POLICY_ALLOW_PAUSE_RESUME);
 
 	OVERLAY_DEBUG_SET("LeapMotion", "Controller Leap Motion - Detected...");
 
-	/*
-	for (int i = 0; i < NUM_SENSE_KEYBOARD_KEYS; i++) {
-	RegisterEvent(i);
-	}
-	*/
-
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Leap, this);
 
-//Success:
-	Validate();
-	return;
-
 Error:
-	Invalidate();
-	return;
+	return r;
 }
 
 SenseLeapMotion::~SenseLeapMotion() {
@@ -95,23 +91,12 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 		if ((hand.isLeft())) {
 			if (m_pLeftHand != nullptr) {
 				m_pLeftHand->SetFromLeapHand(hand);
-				m_pLeftModel->SetPosition(m_pLeftHand->GetHandState().ptPalm);
-				m_pLeftModel->SetOrientation(m_pLeftHand->GetHandState().qOrientation * baseLeft);
-
-				if (!m_pLeftHand->IsVisible() && m_pLeftHand->IsOriented())
-					m_pLeftModel->SetVisible(true);
-
 				fLeftHandTracked = true;
 			}
 		}
 		else {
 			if (m_pRightHand != nullptr) {
 				m_pRightHand->SetFromLeapHand(hand);
-				m_pRightModel->SetPosition(m_pRightHand->GetHandState().ptPalm);
-				m_pRightModel->SetOrientation(m_pRightHand->GetHandState().qOrientation * baseRight);
-
-				if (!m_pRightHand->IsVisible() && m_pRightHand->IsOriented())
-					m_pRightModel->SetVisible(true);
 				fRightHandTracked = true;
 			}
 		}
@@ -121,17 +106,11 @@ void SenseLeapMotion::onFrame(const Leap::Controller&) {
 		if (m_pLeftHand != nullptr) {
 			m_pLeftHand->OnLostTrack();
 		}
-		if (m_pLeftModel != nullptr) {
-			m_pLeftModel->SetVisible(false);
-		}
 	}
 
 	if (!fRightHandTracked) {
 		if (m_pRightHand != nullptr) {
 			m_pRightHand->OnLostTrack();
-		}
-		if (m_pRightModel != nullptr) {
-			m_pRightModel->SetVisible(false);
 		}
 	}
 
@@ -230,25 +209,16 @@ bool SenseLeapMotion::HasFocus() {
 
 RESULT SenseLeapMotion::Notify(CmdPromptEvent *event) {
 	RESULT r =  R_PASS;
+
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("swap : toggle leap motion skeleton hands / hand model");
+	}
+
 	if (event->GetArg(1).compare("swap") == 0) {
-		if (m_pLeftHand != nullptr) {
-			m_pLeftHand->SetVisible(!m_pLeftHand->IsVisible());
-			m_pLeftHand->SetSkeleton(m_pLeftHand->IsVisible());
-		}
-		if (m_pRightHand != nullptr) {
-			m_pRightHand->SetVisible(!m_pRightHand->IsVisible());
-			m_pRightHand->SetSkeleton(m_pRightHand->IsVisible());
-		}
-		//std::dynamic_pointer_cast<DimObj>(m_pLeftModel->GetChildren()[0])->SetVisible(!m_pLeftHand->IsVisible());
-		//std::dynamic_pointer_cast<DimObj>(m_pRightModel->GetChildren()[0])->SetVisible(!m_pRightHand->IsVisible());
-		
-		if (m_pLeftModel != nullptr)
-			m_pLeftModel->SetVisible(!m_pLeftHand->IsVisible());
-
-		if (m_pRightModel != nullptr)
-			m_pRightModel->SetVisible(!m_pRightHand->IsVisible());
-
-
+		if (m_pLeftHand != nullptr)
+			m_pLeftHand->ToggleRenderType();
+		if (m_pRightHand != nullptr)
+			m_pRightHand->ToggleRenderType();
 	}
 
 

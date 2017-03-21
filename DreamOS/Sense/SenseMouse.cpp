@@ -98,11 +98,22 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 	if ((eventType == SENSE_MOUSE_LEFT_DRAG_MOVE || eventType == SENSE_MOUSE_RIGHT_DRAG_MOVE) && (mEvent.dx != 0 || mEvent.dy != 0)) {
 		CR(NotifySubscribers(eventType, &mEvent));
 	}
-	else if (eventType != SENSE_MOUSE_MOVE) {
+	else if (eventType == SENSE_MOUSE_MOVE) {
+		//if (m_lastX == newX && m_lastY == newY) {
+			mEvent.dx = (newX - m_lastX);
+			mEvent.dy = (newY - m_lastY);
+			CR(NotifySubscribers(eventType, &mEvent));
+		//}
+	}
+	else {
+		// TODO: Why any different than drag above or otherwise. 
 		CR(NotifySubscribers(eventType, &mEvent));
 	}
 
 Error:
+	m_lastX = newX;
+	m_lastY = newY;
+
 	return r;
 }
 

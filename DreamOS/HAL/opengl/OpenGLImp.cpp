@@ -4,9 +4,9 @@
 #include "OGLObj.h"
 #include "OGLFramebuffer.h"
 
-#include "Primitives/ProjectionMatrix.h"
-#include "Primitives/TranslationMatrix.h"
-#include "Primitives/RotationMatrix.h"
+#include "Primitives/matrix/ProjectionMatrix.h"
+#include "Primitives/matrix/TranslationMatrix.h"
+#include "Primitives/matrix/RotationMatrix.h"
 #include <vector>
 
 #include "OGLVolume.h"
@@ -18,12 +18,14 @@
 #include "OGLQuad.h"
 
 #include "OGLSphere.h"
+#include "OGLCylinder.h"
 #include "OGLComposite.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
 #include "OGLSkybox.h"
 #include "OGLUser.h"
 #include "OGLHand.h"
+#include "OGLRay.h"
 
 #include "DreamConsole/DreamConsole.h"
 #include "OGLDreamConsole.h"
@@ -39,6 +41,7 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 {
 	RESULT r = R_PASS;
 
+	// TODO: Generalize 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::OpenGL, this);
 
 	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
@@ -186,6 +189,7 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 }
 
 // TODO: This should be moved to OpenGL Program arch/design
+// TODO: rename this
 RESULT OpenGLImp::PrepareScene() {
 	RESULT r = R_PASS;
 	GLenum glerr = GL_NO_ERROR;
@@ -211,7 +215,11 @@ RESULT OpenGLImp::PrepareScene() {
 	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
-	
+
+	// Reference Geometry Shader Program
+	m_pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	CN(m_pOGLReferenceGeometryProgram);
+
 	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
 	CN(m_pOGLSkyboxProgram);
 
@@ -241,7 +249,7 @@ RESULT OpenGLImp::PrepareScene() {
 
 	// Allocate the camera
 	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, 0.0f), 60.0f, m_pxViewWidth, m_pxViewHeight);
+	m_pCamera = new stereocamera(point(0.0f, 0.0f, 5.0f), 60.0f, m_pxViewWidth, m_pxViewHeight);
 	CN(m_pCamera);
 
 	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -360,8 +368,7 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 
 	switch (mEvent->EventType) {
 		case SENSE_MOUSE_LEFT_DRAG_MOVE: {
-			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx), 
-				static_cast<camera_precision>(mEvent->dy)));
+			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx),  static_cast<camera_precision>(mEvent->dy)));
 		} break;
 		case SENSE_MOUSE_RIGHT_DRAG_MOVE: {
 			if (m_pCamera->IsAllowedMoveByKeys()) {
@@ -597,10 +604,10 @@ Error:
 	return nullptr;
 }
 
-quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight) {
+quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad *pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, pTextureHeight);
+	quad *pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 	CN(pQuad);
 
 //Success:
@@ -614,10 +621,10 @@ Error:
 	return nullptr;
 }
  
-quad* OpenGLImp::MakeQuad(double width, double height, point origin) {
+quad* OpenGLImp::MakeQuad(double width, double height, point origin, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height));
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
 	pQuad->RotateXByDeg(90.0f);
 	pQuad->MoveTo(origin);
 
@@ -631,6 +638,40 @@ Error:
 		delete pQuad;
 		pQuad = nullptr;
 	}
+	return nullptr;
+}
+
+cylinder* OpenGLImp::MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) {
+	RESULT r = R_PASS;
+
+	cylinder *pCylinder = new OGLCylinder(this, radius, height, numAngularDivisions, numVerticalDivisions);
+	CN(pCylinder);
+
+	//Success:
+	return pCylinder;
+
+Error:
+	if (pCylinder != nullptr) {
+		delete pCylinder;
+		pCylinder = nullptr;
+	}
+	return nullptr;
+}
+
+DimRay* OpenGLImp::MakeRay(point ptOrigin, vector vDirection, float step, bool fDirectional) {
+	RESULT r = R_PASS;
+
+	DimRay *pRay = new OGLRay(this, ptOrigin, vDirection, step, fDirectional);
+	CN(pRay);
+
+	//Success:
+	return pRay;
+
+Error:
+	if (pRay != nullptr) {
+			delete pRay;
+			pRay = nullptr;
+		}
 	return nullptr;
 }
 
@@ -685,10 +726,10 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double width, double length, double height) {
+volume* OpenGLImp::MakeVolume(double width, double length, double height, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
-	volume *pVolume = new OGLVolume(this, width, length, height);
+	volume *pVolume = new OGLVolume(this, width, length, height, fTriangleBased);
 	CN(pVolume);
 
 //Success:
@@ -702,8 +743,8 @@ Error:
 	return nullptr;
 }
 
-volume* OpenGLImp::MakeVolume(double side) {
-	return MakeVolume(side, side, side);
+volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {
+	return MakeVolume(side, side, side, fTriangleBased);
 }
 
 text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
@@ -741,10 +782,10 @@ Error:
 	return nullptr;
 }
 
-texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) {
+texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, type, width, height, channels, pBuffer, pBuffer_n);
+	texture *pTexture = new OGLTexture(this, type, width, height, format, channels, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:
@@ -784,6 +825,19 @@ RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
 		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
 		CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
+	}
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, EYE_TYPE eye) {
+	RESULT r = R_PASS;
+	
+	if (IsRenderReferenceGeometry()) {
+		CR(m_pOGLReferenceGeometryProgram->UseProgram());
+		CR(m_pOGLReferenceGeometryProgram->SetStereoCamera(m_pCamera, eye));
+		CR(m_pOGLReferenceGeometryProgram->RenderObjectStoreBoundingVolumes(pObjectStore));
 	}
 
 Error:
@@ -836,18 +890,20 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (m_drawWireframe)
+	if (m_fDrawWireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
 
-	if (m_pHMD == nullptr)
+	if (m_pHMD == nullptr) {
 		CheckFramebufferStatus(GL_FRAMEBUFFER);
+	}
 
 	// Render Shadows
 	m_pOGLProgramShadowDepth->UseProgram();
 	m_pOGLProgramShadowDepth->BindToDepthBuffer();
 	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
 	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
-	CR(m_pOGLProgramShadowDepth->RenderSceneGraph(pSceneGraph));
+	CR(m_pOGLProgramShadowDepth->RenderObjectStore(pSceneGraph));
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
 
 	// 
@@ -871,11 +927,11 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 
 	// Render Layers
 	// 3D Object / skybox
-	pSceneGraph->Reset();
-	CR(m_pOGLRenderProgram->RenderSceneGraph(pSceneGraph));
+	CR(m_pOGLRenderProgram->RenderObjectStore(pSceneGraph));
+	CR(RenderReferenceGeometry(pSceneGraph, eye));
 	CR(RenderSkybox(pObjectStore, eye));
 
-//TODO either remove FlatSceneGraph or create a seperate AddFlatContext for overlays
+//TODO either remove FlatSceneGraph or create a separate AddFlatContext for overlays
 /*
 	// Flat object layer
 	glClearDepth(1.0f);
@@ -948,7 +1004,44 @@ RESULT OpenGLImp::Shutdown() {
 	return r;
 }
 
+RESULT OpenGLImp::SetDrawWireframe(bool fDrawWireframe) {
+	m_fDrawWireframe = fDrawWireframe;
+	return R_PASS;
+}
+
+bool OpenGLImp::IsDrawWireframe() {
+	return m_fDrawWireframe;
+}
+
+RESULT OpenGLImp::SetRenderProfiler(bool fRenderProfiler) {
+	m_fRenderProfiler = fRenderProfiler;
+	return R_PASS;
+}
+
+bool OpenGLImp::IsRenderProfiler() {
+	return m_fRenderProfiler;
+}
+
+RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
+	RESULT r = R_PASS;
+
+	// TODO: This should be part of the CMD line
+	if (event->GetArg(1).compare("list") == 0) {
+		HUD_OUT("wire : toggle wireframe on / off");
+	}
+
+	if (event->GetArg(1).compare("wire") == 0) {
+		SetDrawWireframe(!IsDrawWireframe()); 
+	}
+	else if (event->GetArg(1).compare("refgeo") == 0) {
+		SetRenderReferenceGeometry(!IsRenderReferenceGeometry());
+	}
+
+	return r;
+}
+
 // Open GL / Wrappers
+// TODO: Remove in turn of extensions or something else, right now hitting two context switches and it's non-optimal
 
 // OpenGL Program
 
@@ -1027,6 +1120,16 @@ RESULT OpenGLImp::glGetProgramInterfaceiv(GLuint program, GLenum programInterfac
 
 	m_OpenGLExtensions.glGetProgramInterfaceiv(program, programInterface, pname, params);  
 	CRM(CheckGLError(), "glGetProgramInterfaceiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDrawRangeElements(mode, start, end, count, type, indices);
+	CRM(CheckGLError(), "glDrawRangeElements failed");
 
 Error:
 	return r;
@@ -1581,12 +1684,4 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
 
-	if (event->GetArg(1).compare("wire") == 0) {
-		m_drawWireframe = !m_drawWireframe;
-	}
-
-	return r;
-}

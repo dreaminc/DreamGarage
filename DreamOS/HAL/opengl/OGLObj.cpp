@@ -1,7 +1,16 @@
 #include "OGLObj.h"
 
+#include "Primitives/BoundingVolume.h"
+#include "Primitives/BoundingSphere.h"
+#include "Primitives/BoundingQuad.h"
+
+#include "OGLVolume.h"
+#include "OGLSphere.h"
+#include "OGLQuad.h"
+
 OGLObj::OGLObj(OpenGLImp *pParentImp) :
 	m_pParentImp(pParentImp),
+	m_pOGLBoundingVolume(nullptr),
 	m_fnOGLProgramPreCallback(nullptr),
 	m_fnOGLProgramPostCallback(nullptr)
 {
@@ -36,6 +45,15 @@ Error:
 	return r;
 }
 
+// This should be used in the OGLInitialize function
+inline GLushort OGLObj::GetOGLPrecision() {
+#ifdef FLOAT_PRECISION
+	return GL_FLOAT;
+#elif defined(DOUBLE_PRECISION)
+	return GL_DOUBLE;
+#endif
+}
+
 // This needs to be called from the sub-class constructor
 // or externally from the object (TODO: factory class needed)
 RESULT OGLObj::OGLInitialize() {
@@ -45,6 +63,8 @@ RESULT OGLObj::OGLInitialize() {
 	CR(m_pParentImp->MakeCurrentContext());
 
 	// Set up the Vertex Array Object (VAO)
+	
+	// TODO: Do we need to do this only one time?
 	CR(m_pParentImp->glGenVertexArrays(1, &m_hVAO));
 	CR(m_pParentImp->glBindVertexArray(m_hVAO));
 
@@ -115,7 +135,8 @@ RESULT OGLObj::UpdateOGLBuffers() {
 	DimObj *pDimObj = GetDimObj();
 	CNM(pDimObj, "Failed to acquire Dimension Object");
 
-	CR(m_pParentImp->MakeCurrentContext());
+	//CR(m_pParentImp->MakeCurrentContext());
+
 	CR(m_pParentImp->glBindVertexArray(m_hVAO));
 	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 
@@ -145,9 +166,125 @@ RESULT OGLObj::Render() {
 	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 	CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
+	GLint previousPolygonMode[2]{ 0 };
+	GLboolean previousCullFaceEnabled;
+	glGetIntegerv(GL_POLYGON_MODE, previousPolygonMode);
+	previousCullFaceEnabled = glIsEnabled(GL_CULL_FACE);
+
+	// TODO: This should be made more uniform (functions / caps struct etc)
+	if (pDimObj->IsWireframe()) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		if (previousCullFaceEnabled) {
+			glDisable(GL_CULL_FACE);
+		}
+	}
+
 	glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
+
+	if (pDimObj->IsWireframe()) {
+		if (previousPolygonMode[1] != 0) {
+			glPolygonMode(GL_FRONT, previousPolygonMode[0]);
+			glPolygonMode(GL_BACK, previousPolygonMode[1]);
+		}
+		else {
+			glPolygonMode(GL_FRONT_AND_BACK, previousPolygonMode[0]);
+		}
+
+		if (previousCullFaceEnabled) {
+			glEnable(GL_CULL_FACE);
+		}
+	}
+
+	//glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 	//glDrawElements(GL_LINES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 	//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
+
+Error:
+	return r;
+}
+
+RESULT OGLObj::UpdateBoundingVolume() {
+	RESULT r = R_PASS;
+
+	DimObj *pDimObj = GetDimObj();
+
+	// TODO: Better handling of different bounding volumes (or do it in BoundingVolume)
+	BoundingBox *pBoundingBox = nullptr;
+	BoundingSphere *pBoundingSphere = nullptr;
+	BoundingQuad *pBoundingQuad = nullptr;
+
+	if ((pBoundingBox = dynamic_cast<BoundingBox*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+		OGLVolume *pOGLBoundingBox = dynamic_cast<OGLVolume*>(m_pOGLBoundingVolume);
+
+		if (pBoundingBox->CheckAndCleanDirty() && pOGLBoundingBox != nullptr) {
+			CR(pOGLBoundingBox->UpdateFromBoundingBox(pBoundingBox));
+		}
+	}
+	else if ((pBoundingSphere = dynamic_cast<BoundingSphere*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+		OGLSphere *pOGLBoundingSphere = dynamic_cast<OGLSphere*>(m_pOGLBoundingVolume);
+
+		if (pBoundingSphere->CheckAndCleanDirty() && pOGLBoundingSphere != nullptr) {
+			CR(pOGLBoundingSphere->UpdateFromBoundingSphere(pBoundingSphere));
+		}
+	}
+	else if ((pBoundingQuad = dynamic_cast<BoundingQuad*>(pDimObj->GetBoundingVolume().get())) != nullptr) {
+		OGLQuad *pOGLBoundingQuad = dynamic_cast<OGLQuad*>(m_pOGLBoundingVolume);
+
+		if (pBoundingQuad->CheckAndCleanDirty() && pOGLBoundingQuad != nullptr) {
+			CR(pOGLBoundingQuad->UpdateFromBoundingQuad(pBoundingQuad));
+		}
+	}
+
+	// If this is a child, we should let the parent know
+	/*
+	if (pDimObj->GetParent() != nullptr) {
+		pDimObj->GetParent()->UpdateBoundingVolume();
+	}
+	*/
+
+Error:
+	return r;
+}
+
+RESULT OGLObj::RenderBoundingVolume() {
+	RESULT r = R_PASS;
+
+	if (m_pOGLBoundingVolume == nullptr) {
+		DimObj *pDimObj = GetDimObj();
+		BoundingVolume* pBoundingVolume = pDimObj->GetBoundingVolume().get();
+
+		if (pBoundingVolume == nullptr) {
+			return R_SKIPPED;
+		}
+
+		// Create the bounding volume here
+		// TODO: this might be better placed in a factory creation pattern for all objects instead
+		switch (pBoundingVolume->GetType()) {
+			case BoundingVolume::Type::BOX: {
+				BoundingBox *pBoundingBox = dynamic_cast<BoundingBox*>(pBoundingVolume);
+				m_pOGLBoundingVolume = new OGLVolume(m_pParentImp, pBoundingBox, false);
+			} break;
+
+			case BoundingVolume::Type::SPHERE: {
+				BoundingSphere *pBoundingSphere = dynamic_cast<BoundingSphere*>(pBoundingVolume);
+				m_pOGLBoundingVolume = new OGLSphere(m_pParentImp, pBoundingSphere, false);
+			} break;
+
+			case BoundingVolume::Type::QUAD: {
+				BoundingQuad *pBoundingQuad = dynamic_cast<BoundingQuad*>(pBoundingVolume);
+				m_pOGLBoundingVolume = new OGLQuad(m_pParentImp, pBoundingQuad, false);
+			} break;
+		}
+
+		CN(m_pOGLBoundingVolume);
+		m_pOGLBoundingVolume->GetDimObj()->SetWireframe(true);
+
+		if (pDimObj->GetParent() != nullptr) {
+			m_pOGLBoundingVolume->GetDimObj()->SetParent(pDimObj->GetParent());
+		}
+	}
+	
+	CR(m_pOGLBoundingVolume->Render());
 
 Error:
 	return r;
@@ -181,6 +318,10 @@ OGLTexture* OGLObj::GetTextureSpecular() {
 	DimObj *pDimObj = GetDimObj();
 	OGLTexture *pTexture = reinterpret_cast<OGLTexture*>(pDimObj->GetTextureSpecular());
 	return pTexture;
+}
+
+OGLObj *OGLObj::GetOGLBoundingVolume() {
+	return m_pOGLBoundingVolume;
 }
 
 RESULT OGLObj::SetOGLProgramPreCallback(std::function<RESULT(OGLProgram*, void*)> fnOGLProgramPreCallback) {

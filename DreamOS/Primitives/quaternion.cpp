@@ -10,6 +10,16 @@ quaternion::quaternion(vector v) {
 	Normalize();
 }
 
+// This will result in a quaternion representing the shortest
+// arc between two vectors
+quaternion::quaternion(vector v1, vector v2) {
+	vector vCross = v1.cross(v2);
+	quaternion_precision w = sqrt(v1.magnitudeSquared() * v2.magnitudeSquared()) + v1.dot(v2);
+
+	SetValues(w, vCross.x(), vCross.y(), vCross.z());
+	Normalize();
+}
+
 quaternion::quaternion(quaternion_precision theta, vector vectorAxis) {
 	SetQuaternion(theta, vectorAxis.x(), vectorAxis.y(), vectorAxis.z());
 }
@@ -20,7 +30,7 @@ quaternion::quaternion(quaternion_precision theta, quaternion_precision x, quate
 
 quaternion::quaternion(quaternion_precision values[4]) {
 	SetValues(values);
-	Normalize();
+	//Normalize();
 }
 
 quaternion::quaternion(quaternionXYZW qXYZW) {
@@ -148,6 +158,15 @@ quaternion quaternion::Normalize() {
 	return (*this);
 }
 
+RESULT quaternion::clear() {
+	m_w = 0.0f;
+	m_x = 0.0f;
+	m_y = 0.0f;
+	m_z = 0.0f;
+
+	return R_PASS;
+}
+
 quaternion_precision quaternion::Magnitude() {
 	return static_cast<quaternion_precision>(pow(m_w, 2) + pow(m_x, 2) + pow(m_y, 2) + pow(m_z, 2));
 }
@@ -170,7 +189,7 @@ RESULT quaternion::RotateByVectorSlerp(vector v, quaternion_precision theta, qua
 	bool fPositive = (theta > 0.0f) ? true : false;
 	quaternion_precision thetaLeft = theta;
 
-	while(abs(thetaLeft) != 0.0f) {
+	while(fabs((double)(thetaLeft)) != 0.0f) {
 		if (thetaLeft > slerpLimitValue) {
 			quaternion localRotation(slerpLimitValue, v);
 			(*this) *= localRotation;
@@ -256,6 +275,25 @@ RESULT quaternion::GetEulerAngles(quaternion_precision *x, quaternion_precision 
 	return R_PASS;
 }
 
+quaternion_precision quaternion::GetEulerAngleXDeg() {
+	return (GetEulerAngleX() * (180.f / M_PI));
+}
+
+quaternion_precision quaternion::GetEulerAngleYDeg() {
+	return (GetEulerAngleY() * (180.f / M_PI));
+}
+
+quaternion_precision quaternion::GetEulerAngleZDeg() {
+	return (GetEulerAngleZ() * (180.f / M_PI));
+}
+
+RESULT quaternion::GetEulerAnglesDeg(quaternion_precision *x, quaternion_precision *y, quaternion_precision *z) {
+	*x = GetEulerAngleXDeg();
+	*y = GetEulerAngleYDeg();
+	*z = GetEulerAngleZDeg();
+	return R_PASS;
+}
+
 //quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quaternion_precision psi, quaternion_precision theta) {
 quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quaternion_precision theta, quaternion_precision psi) {
 
@@ -280,6 +318,22 @@ quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quatern
 	return q;
 }
 
+// returns Y rotation on the XZ plane 
+float quaternion::ProjectedYRotationDeg() {
+
+	vector v = RotateVector(vector::kVector(1.0f));
+	vector vXZ = vector(v.x(), 0.0f, v.z());
+	vXZ.Normalize();
+
+	float degZ = asin(vXZ.z());
+	float degZSign = degZ > 0 ? -1.0f : 1.0f;
+	float degX = acos(vXZ.x());
+
+	float degY = (degZSign * degX + (float)M_PI_2) * 180.0f / M_PI;
+
+	return degY < 0.0f ? degY + 360.0f : degY;
+}
+
 quaternion quaternion::GetConjugate() {
 	quaternion q;
 
@@ -290,6 +344,13 @@ quaternion quaternion::GetConjugate() {
 	q.m_z = -1.0f * m_z;
 
 	return q;
+}
+
+bool quaternion::IsZero() {
+	if (m_w == 0.0f && m_x == 0.0f && m_y == 0.0f && m_z == 0.0f)
+		return true;
+	else
+		return false;
 }
 
 quaternion quaternion::Conjugate(quaternion arg) {
@@ -304,22 +365,34 @@ vector quaternion::GetVector() {
 vector quaternion::RotateVector(vector v) {
 	vector retVal;
 
-	retVal.x() = v.x() * (1.0f - 2 * (y2() + z2())) +
-		v.y() * (2 * (x()*y() + w()*z())) +
-		v.z() * (2 * (x()*z() - w()*y()));
+	retVal.x() =	v.x() * (1.0f - 2.0f * (y2() + z2())) +
+					v.y() * (2.0f * (x()*y() + w()*z())) +
+					v.z() * (2.0f * (x()*z() - w()*y()));
 
-	retVal.y() = v.x() * (2 * (x()*y() - w()*z())) +
-		v.y() * (1.0f - 2 * (x2() + z2())) +
-		v.z() * (2 * (y()*z() + w()*x()));
+	retVal.y() =	v.x() * (2.0f * (x()*y() - w()*z())) +
+					v.y() * (1.0f - 2.0f * (x2() + z2())) +
+					v.z() * (2.0f * (y()*z() + w()*x()));
 
-	retVal.z() = v.x() * (2 * (x()*z() + w()*y())) +
-		v.y() * (2 * (y()*z() - w()*x())) +
-		v.z() * (1.0f - 2 * (x2() + y2()));
+	retVal.z() =	v.x() * (2.0f * (x()*z() + w()*y())) +
+					v.y() * (2.0f * (y()*z() - w()*x())) +
+					v.z() * (1.0f - 2.0f * (x2() + y2()));
 
 	return retVal;
 }
 
 
+quaternion& quaternion::operator*=(const quaternion_precision& arg) {
+	m_w *= arg;
+	m_x *= arg;
+	m_y *= arg;
+	m_z *= arg;
+
+	return (*this);
+}
+
+const quaternion& quaternion::operator*(const quaternion_precision& arg) const {
+	return (new quaternion(*this))->operator*=(arg);
+}
 
 // http://www.mathworks.com/help/aeroblks/quaternionmultiplication.html
 quaternion& quaternion::operator*=(const quaternion& r) {
@@ -351,7 +424,7 @@ quaternion& quaternion::operator+=(const quaternion& rhs) {
 }
 
 const quaternion& quaternion::operator+(const quaternion& arg) const {
-	return quaternion(*this).operator+=(arg);
+	return (new quaternion(*this))->operator+=(arg);
 }
 
 quaternion& quaternion::operator-=(const quaternion& rhs) {

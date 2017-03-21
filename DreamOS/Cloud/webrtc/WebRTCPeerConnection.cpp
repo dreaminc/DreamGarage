@@ -54,22 +54,24 @@ public:
 WebRTCPeerConnection::WebRTCPeerConnection(WebRTCPeerConnectionObserver *pParentObserver, long peerConnectionID, rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory) :
 	m_pParentObserver(pParentObserver),
 	m_peerConnectionID(peerConnectionID),
-	m_pWebRTCPeerConnectionFactory(pWebRTCPeerConnectionFactory),
+	m_pWebRTCPeerConnectionFactory(nullptr),
 	m_pWebRTCPeerConnectionInterface(nullptr),
 	m_WebRTCPeerID(-1)
 {
-	if (m_pWebRTCPeerConnectionInterface.get() != nullptr) {
-		m_pWebRTCPeerConnectionInterface.release();
+	if (pWebRTCPeerConnectionFactory != nullptr) {
+		pWebRTCPeerConnectionFactory->AddRef();
+		m_pWebRTCPeerConnectionFactory = pWebRTCPeerConnectionFactory;
 	}
 }
 
-WebRTCPeerConnection::~WebRTCPeerConnection(){
-	if (m_pWebRTCPeerConnectionInterface.get() != nullptr) {
-		m_pWebRTCPeerConnectionInterface.release();
-		m_pWebRTCPeerConnectionInterface = nullptr;
-	}
-
-	m_WebRTCActiveStreams.clear();
+WebRTCPeerConnection::~WebRTCPeerConnection(){	
+	// the following ref counters are wrong.
+	// this is a way to solve the process being hand after shutdown
+	// but this will work ok only in Release.
+	// to solve this issue completely we need to go over all webrtc code
+	// and be more precise about dealing with ref count, for example making sure we AddRef when we set pointers to others.
+	m_pWebRTCPeerConnectionInterface->AddRef();
+	m_pDataChannelInterface->AddRef();
 
 	ClearSessionDescriptionProtocols();
 
@@ -150,7 +152,8 @@ RESULT WebRTCPeerConnection::AddAudioStream(rtc::scoped_refptr<webrtc::MediaStre
 
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
 		m_pWebRTCPeerConnectionFactory->CreateAudioTrack(kAudioLabel, m_pWebRTCPeerConnectionFactory->CreateAudioSource(&audioSourceConstraints)));
-
+	pAudioTrack->AddRef();
+	
 	pMediaStreamInterface->AddTrack(pAudioTrack);
 
 	//pAudioTrack->GetSource()
@@ -737,12 +740,12 @@ Error:
 
 RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
-
+	
 	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
 	CN(m_pDataChannelInterface);
 
 	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)));
-
+	
 Error:
 	return r;
 }
