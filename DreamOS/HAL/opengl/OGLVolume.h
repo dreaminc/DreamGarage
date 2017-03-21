@@ -81,15 +81,17 @@ public:
 
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
+	// Critical path, EHM removed
+	// manually debug
 	virtual RESULT Render() override {
 		RESULT r = R_PASS;
 
 		// TODO: Rethink this since it's in the critical path
 		volume *pVolume = (volume*)(GetDimObj());
 
-		CR(m_pParentImp->glBindVertexArray(m_hVAO));
-		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
-		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
+		m_pParentImp->glBindVertexArray(m_hVAO);
+		m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO);
+		m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO);
 
 		// TODO: This should be made more uniform (functions / caps struct etc)
 		if (pVolume->IsWireframe()) {
@@ -130,9 +132,7 @@ public:
 			glDrawElements(GL_TRIANGLES, pVolume->NumberIndices(), GL_UNSIGNED_INT, NULL);
 		}
 
-		//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
-
-	Error:
+	//Error:
 		return r;
 	}
 };

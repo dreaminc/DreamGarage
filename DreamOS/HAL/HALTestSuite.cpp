@@ -34,14 +34,16 @@ Error:
 RESULT HALTestSuite::AddTestFramerateVolumes() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 25.0f;
+	double sTestTime = 40.0f;
 	int nRepeats = 1;
 
 	float width = 0.25f;
 	float height = width;
 	float length = width;
 
-	float padding = 0.1f;
+	float padding = 0.2f;
+
+	int numObj = 7;
 
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
@@ -49,8 +51,18 @@ RESULT HALTestSuite::AddTestFramerateVolumes() {
 
 		volume *pVolume = nullptr;  
 		
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		//pVolume->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		for (int i = 0; i < numObj; i++) {
+			for (int j = 0; j < numObj; j++) {
+				for (int k = 0; k < numObj; k++) {
+					float xPos = (-1.0f * ((float)numObj / 2.0f)) * (width + padding) + (i * (width + padding));
+					float yPos = (-1.0f * ((float)numObj / 2.0f)) * (width + padding) + (j * (width + padding));
+					float zPos = (-1.0f * ((float)numObj / 2.0f)) * (width + padding) + (k * (width + padding));
+					
+					pVolume = m_pDreamOS->AddVolume(width, height, length);
+					pVolume->SetPosition(point(xPos, yPos, zPos));
+				}
+			}
+		}
 
 		return R_PASS;
 	};

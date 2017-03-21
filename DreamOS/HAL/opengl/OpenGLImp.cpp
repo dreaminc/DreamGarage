@@ -879,14 +879,17 @@ Error:
 	return r;
 }
 
+// This is critical path, so EHM is removed
+// Debug manually
 RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = NULL;
+	VirtualObj *pVirtualObj = nullptr;
 
-	std::vector<light*> *pLights = NULL;
-	CR(pObjectStore->GetLights(pLights));
-	CN(pLights);
+	static EYE_TYPE lastEye = EYE_INVALID;
+
+	std::vector<light*> *pLights = nullptr;
+	pObjectStore->GetLights(pLights);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -899,37 +902,40 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	}
 
 	// Render Shadows
+	/*
 	m_pOGLProgramShadowDepth->UseProgram();
 	m_pOGLProgramShadowDepth->BindToDepthBuffer();
 	CR(m_pOGLProgramShadowDepth->SetCamera(m_pCamera));
 	CR(m_pOGLProgramShadowDepth->SetLights(pLights));
 	CR(m_pOGLProgramShadowDepth->RenderObjectStore(pSceneGraph));
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
+	//*/
 
 	// 
-	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-	CR(m_pOGLRenderProgram->SetLights(pLights));
+	m_pOGLRenderProgram->UseProgram();
+	m_pOGLRenderProgram->SetLights(pLights);
 
 	// Camera Projection Matrix
 	if (m_pHMD != nullptr) {
 		m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
-		CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
+		m_pOGLRenderProgram->UseProgram();
 	}
 
-	//SetViewTarget(eye);
-	CR(m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye));
+	m_pOGLRenderProgram->SetStereoCamera(m_pCamera, eye);
+	
 	if (m_pHMD != nullptr) {
 		m_pHMD->SetAndClearRenderSurface(eye);
 	}
-	else {
+	else if(eye != lastEye) {
 		SetViewTarget(eye);
+		lastEye = eye;
 	}
 
 	// Render Layers
 	// 3D Object / skybox
-	CR(m_pOGLRenderProgram->RenderObjectStore(pSceneGraph));
-	CR(RenderReferenceGeometry(pSceneGraph, eye));
-	CR(RenderSkybox(pObjectStore, eye));
+	m_pOGLRenderProgram->RenderObjectStore(pSceneGraph);
+	RenderReferenceGeometry(pSceneGraph, eye);
+	RenderSkybox(pObjectStore, eye);
 
 //TODO either remove FlatSceneGraph or create a separate AddFlatContext for overlays
 /*
@@ -952,8 +958,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	// Profiler
 	glClearDepth(1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
-
-	CR(RenderProfiler(eye));
+	RenderProfiler(eye);
 
 	// Commit frame to HMD
 	if (m_pHMD) {
@@ -963,8 +968,8 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 
 	glFlush();
 
-Error:
-	CheckGLError();
+//Error:
+	// CheckGLError();
 	return r;
 }
 
