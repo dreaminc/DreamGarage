@@ -53,8 +53,6 @@ RESULT DreamUIBar::Initialize() {
 
 	CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
 
-	//CRM(m_pMenuControllerProxy->RequestSubMenu(), "Failed to request sub menu");
-
 Error:
 	return r;
 }
@@ -88,17 +86,20 @@ Error:
 RESULT DreamUIBar::HandleMenuUp() {
 	RESULT r = R_PASS;
 
-	m_pMenuControllerProxy->RequestSubMenu();
-
-	/*
-	std::map<std::string, std::vector<std::string>> menu;
-	menu = {};
-	menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-
-	std::stack<std::string> path = {};
-
-	UIBar::HandleMenuUp(menu, path);
-	//*/
+	if (m_path.empty()) {
+		m_pMenuControllerProxy->RequestSubMenu();
+		ToggleVisible();
+	}
+	else {
+		m_path.pop();
+		if (!m_path.empty()) {
+			auto pNode = m_path.top();
+			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath());
+		}
+		else {
+			ToggleVisible();
+		}
+	}
 
 	return r;
 }
@@ -108,9 +109,19 @@ RESULT DreamUIBar::HandleTriggerUp() {
 	
 	auto pSelected = GetCurrentItem();
 	CBR(pSelected, R_OBJECT_NOT_FOUND);
+	CBR(m_pMenuNode, R_OBJECT_NOT_FOUND);
 
-	//m_pMenuControllerProxy->RequestSubMenu();
+	//hack
+	if (m_path.empty()) m_path.push(m_pMenuNode);
 
+	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
+		const std::string& s1 = pSelected->GetName();
+		const std::string& s2 = pSubMenuNode->GetTitle();
+		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
+			m_pMenuControllerProxy->RequestSubMenu(pSubMenuNode->GetScope(), pSubMenuNode->GetPath());
+			m_path.push(pSubMenuNode);
+		}
+	}
 
 Error:
 	return r;
@@ -123,14 +134,12 @@ RESULT DreamUIBar::Update() {
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
 		
-		std::map<std::string, std::vector<std::string>> menu;
 		for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 			info.labels.emplace_back(pSubMenuNode->GetTitle());
 			info.icons.emplace_back(m_pIconTexture);
 		}
 		info.labels.emplace_back(m_pMenuNode->GetTitle());
 		info.icons.emplace_back(m_pIconTexture);
-		ToggleVisible();
 		UpdateCurrentUILayer(info);
 	}
 
@@ -165,37 +174,6 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
 		m_pMenuNode = pMenuNode;
 		m_pMenuNode->SetDirty();
-		/*
-		std::string strScope = pMenuNode->GetSubMenuNodes()[0]->GetScope();
-		std::string strPath = pMenuNode->GetSubMenuNodes()[0]->GetPath();
-
-		std::map<std::string, std::vector<std::string>> menu;
-		menu = {};
-
-		menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-		std::stack<std::string> path = {};
-		UIBar::HandleMenuUp(menu, path);
-		//*/
-
-		/*
-		for (auto &pSubMenuNode : pMenuNode->GetSubMenuNodes()) {
-			menu[pMenuNode->GetTitle()].emplace_back(pSubMenuNode->GetTitle());
-		}
-		//*/
-
-		/*
-		//CRM(pMenuControllerProxy->RequestSubMenu(strScope, strPath), "Failed to request sub menu");
-		for (auto &pSubMenuNode : pMenuNode->GetSubMenuNodes()) {
-			info.labels.emplace_back(pSubMenuNode->GetTitle());
-			info.icons.emplace_back(m_pIconTexture);
-			//menu[""].emplace_back(pSubMenuNode->GetTitle());
-		}
-		info.labels.emplace_back(pMenuNode->GetTitle());
-		info.icons.emplace_back(m_pIconTexture);
-		//UpdateCurrentUILayer(info);
-		//*/
-		
-//		UIBar::HandleMenuUp()
 	}
 
 Error:
