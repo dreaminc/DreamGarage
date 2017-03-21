@@ -94,7 +94,7 @@ public:
 
 	virtual RESULT UpdateBuffers();
 
-	bool IsVisible();
+	virtual bool IsVisible() override;
 	RESULT SetVisible(bool fVisible = true);
 
 	bool IsWireframe();

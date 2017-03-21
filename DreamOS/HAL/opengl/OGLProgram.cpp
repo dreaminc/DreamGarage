@@ -702,25 +702,22 @@ Error:
 	return r;
 }
 
+// Critical Path, EHM removed
+// Debug manually
 RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 	
 	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = NULL;
+	VirtualObj *pVirtualObj = nullptr;
 
 	pObjectStore->Reset();
-	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != NULL) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-		if (pDimObj == NULL) {
-			continue;
-		}
-		else {
-			CR(RenderObject(pDimObj));
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
+		if (pVirtualObj->IsVisible() == true) {
+			RenderObject(pVirtualObj);
 		}
 	}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -757,15 +754,8 @@ Error:
 RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
-	if (pDimObj->IsVisible() == false)
-		return R_PASS;
-
+	// TODO: Remove this dynamic cast
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-	
-	/* TODO: This should be replaced with a materials store or OGLMaterial that pre-allocates and swaps binding points (Wait for textures)
-	m_pFragmentShader->SetMaterial(pDimObj->GetMaterial());
-	m_pFragmentShader->UpdateUniformBlockBuffers();
-	//*/
 
 	// Update buffers if marked as dirty
 	if (pDimObj->CheckAndCleanDirty()) {
@@ -773,6 +763,8 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	}
 	
 	if (pOGLObj != nullptr) {
+		// TODO: This should be replaced with a materials store or OGLMaterial that 
+		// pre-allocates and swaps binding points (Wait for textures)
 		SetObjectUniforms(pDimObj);
 		SetMaterial(pDimObj->GetMaterial());
 		SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
@@ -782,7 +774,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 			CR(fnObjectCallback(this, nullptr));
 		}
 
-		CR(pOGLObj->Render());
+		pOGLObj->Render();
 
 		if ((fnObjectCallback = pOGLObj->GetOGLProgramPostCallback()) != nullptr) {
 			CR(fnObjectCallback(this, nullptr));

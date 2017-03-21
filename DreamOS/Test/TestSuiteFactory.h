@@ -14,6 +14,8 @@ public:
 		INTERACTION,
 		UI,
 		CLOUD,
+		HAL,
+		MATH,
 		INVALID
 	} ;
 

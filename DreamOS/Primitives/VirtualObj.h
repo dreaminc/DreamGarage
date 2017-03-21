@@ -67,6 +67,11 @@ public:
 	template <ObjectState::IntegrationType IT>
 	RESULT IntegrateState(float timeStart, float timeDelta, const std::list<ForceGenerator*> &externalForceGenerators);
 
+	// Visibility
+	virtual bool IsVisible() {
+		return false;
+	}
+
 	// Position
 	virtual point GetOrigin(bool fAbsolute = false);
 	virtual point GetPosition(bool fAbsolute = false);

@@ -638,6 +638,9 @@
     <ClCompile Include="..\..\..\HMD\HMD.cpp">
       <Filter>HMD</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp">
+      <Filter>HAL</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2407,6 +2410,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.h">
       <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\HALTestSuite.h">
+      <Filter>HAL</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

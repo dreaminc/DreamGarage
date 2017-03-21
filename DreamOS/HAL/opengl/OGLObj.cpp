@@ -156,15 +156,17 @@ Error:
 // Override this method when necessary by a child object
 // Many objects will not need to though. 
 //virtual RESULT Render() {
+// Critical path, EHM removed
+// Debug manually
 RESULT OGLObj::Render() {
 	RESULT r = R_PASS;
 
 	// TODO: Rethink this since it's in the critical path
 	DimObj *pDimObj = GetDimObj();
 
-	CR(m_pParentImp->glBindVertexArray(m_hVAO));
-	CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
-	CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
+	m_pParentImp->glBindVertexArray(m_hVAO);	// TODO: VAO might not be needed every object every frame
+	m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO);
+	m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO);
 
 	GLint previousPolygonMode[2]{ 0 };
 	GLboolean previousCullFaceEnabled;
@@ -199,7 +201,7 @@ RESULT OGLObj::Render() {
 	//glDrawElements(GL_LINES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 	//glDrawElements(GL_POINT, pDimObj->NumberVertices(), GL_UNSIGNED_INT, NULL);
 
-Error:
+//Error:
 	return r;
 }
 
