@@ -111,12 +111,12 @@ RESULT DreamUIBar::HandleTriggerUp() {
 	CBR(pSelected, R_OBJECT_NOT_FOUND);
 	CBR(m_pMenuNode, R_OBJECT_NOT_FOUND);
 
-	//hack
+	//hack - need to make sure the root node is added to the path
+	// even though it is not selected through this method
+	// ideally, some kind of path is managed in the cloud instead
 	if (m_path.empty()) m_path.push(m_pMenuNode);
 
 	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
-		const std::string& s1 = pSelected->GetName();
-		const std::string& s2 = pSubMenuNode->GetTitle();
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
 			m_pMenuControllerProxy->RequestSubMenu(pSubMenuNode->GetScope(), pSubMenuNode->GetPath());
 			m_path.push(pSubMenuNode);

@@ -330,12 +330,10 @@ RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
 			CR(m_pDreamUIBar->HandleTriggerUp());
-			//CR(m_pDreamUIBar->HandleTriggerUp(m_menu, m_path));
 		}
 		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
 			OVERLAY_DEBUG_SET("event", "menu up");
 			CR(m_pDreamUIBar->HandleMenuUp());
-			//CR(m_pDreamUIBar->HandleMenuUp(m_menu, m_path));
 		}
 	}
 	else if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
@@ -367,7 +365,6 @@ RESULT UITestSuite::Notify(SenseMouseEvent *mEvent) {
 			OVERLAY_DEBUG_SET("event", "mouse left up");
 			
 			CR(m_pDreamUIBar->HandleMenuUp());
-			//CR(m_pDreamUIBar->HandleMenuUp(m_menu, m_path));
 		} break;
 
 		//TODO: Currently broken
