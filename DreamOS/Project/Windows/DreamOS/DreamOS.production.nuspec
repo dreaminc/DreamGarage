@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>Dream</id>
-    <version>0.1.30</version>
+    <version>$version$</version>
     <title>Dream</title>
     <authors>Dream Garage, Incorporated</authors>
     <owners>Dream Garage, Incorporated</owners>
@@ -15,7 +15,7 @@
     <!--<dependencies></dependencies>-->
 
     <releaseNotes>
-      0.1.30 version
+      Version $version$
 
       This is a test of the deplopyment system
     </releaseNotes>

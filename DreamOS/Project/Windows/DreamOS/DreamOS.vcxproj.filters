@@ -2615,6 +2615,9 @@
     <None Include="..\..\..\Scripts\copy_assets.py">
       <Filter>Scripts</Filter>
     </None>
+    <None Include="PropertySheet.props">
+      <Filter>Core</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />

@@ -552,7 +552,8 @@ python $(ProjectDir)..\..\..\Scripts\copy_assets.py $(ProjectDir)..\..\..\ $(Tar
 
 python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDir)..\..\..\Project\Windows\Production\
 
-$(ProjectDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(ProjectDir)DreamOS.production.nuspec"</Command>
+$(ProjectDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(ProjectDir)DreamOS.production.nuspec" -properties version=$(DREAMVERSION)
+$(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Dream.$(DREAMVERSION).nupkg -r ProdReleases</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">
@@ -597,11 +598,11 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcr
 
 xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D
 
-python $(ProjectDir)..\..\..\Scripts\copy_assets.py $(ProjectDir)..\..\..\ $(TargetDir)
 
-python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDir)..\..\..\Project\Windows\Development\
+$(ProjectDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(ProjectDir)DreamOS.development.nuspec" -properties version=$(DREAMVERSION)
+$(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify DreamDev.$(DREAMVERSION).nupkg -r DevReleases
 
-$(ProjectDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(ProjectDir)DreamOS.development.nuspec"</Command>
+</Command>
     </PostBuildEvent>
     <CustomBuildStep>
       <Command>
@@ -1351,6 +1352,7 @@ $(ProjectDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(ProjectDir
     <None Include="DreamOS.production.nuspec" />
     <None Include="packages.config" />
     <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js" />
+    <None Include="PropertySheet.props" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt">
