@@ -45,7 +45,7 @@ private:
 	MenuControllerProxy *m_pMenuControllerProxy = nullptr;
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
 
-	std::stack<std::shared_ptr<MenuNode>> m_path = {};
+	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 };
 
 

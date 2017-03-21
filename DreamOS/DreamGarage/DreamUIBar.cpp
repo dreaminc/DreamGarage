@@ -45,8 +45,6 @@ RESULT DreamUIBar::Initialize() {
 
 	MenuControllerProxy *pMenuControllerProxy = nullptr;
 	CN(m_pCloudController);
-	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
-	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
 
 	m_pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
 	CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
@@ -85,41 +83,46 @@ Error:
 
 RESULT DreamUIBar::HandleMenuUp() {
 	RESULT r = R_PASS;
+	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
+	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
 
-	if (m_path.empty()) {
+	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu();
 		ToggleVisible();
 	}
 	else {
-		m_path.pop();
-		if (!m_path.empty()) {
-			auto pNode = m_path.top();
+		m_pathStack.pop();
+		if (!m_pathStack.empty()) {
+			auto pNode = m_pathStack.top();
 			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath());
 		}
 		else {
 			ToggleVisible();
 		}
 	}
-
+Error:
 	return r;
 }
 
 RESULT DreamUIBar::HandleTriggerUp() {
 	RESULT r = R_PASS;
-	
+
 	auto pSelected = GetCurrentItem();
+
+	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
+	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
 	CBR(pSelected, R_OBJECT_NOT_FOUND);
 	CBR(m_pMenuNode, R_OBJECT_NOT_FOUND);
 
 	//hack - need to make sure the root node is added to the path
 	// even though it is not selected through this method
 	// ideally, some kind of path is managed in the cloud instead
-	if (m_path.empty()) m_path.push(m_pMenuNode);
+	if (m_pathStack.empty()) m_pathStack.push(m_pMenuNode);
 
 	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
 			m_pMenuControllerProxy->RequestSubMenu(pSubMenuNode->GetScope(), pSubMenuNode->GetPath());
-			m_path.push(pSubMenuNode);
+			m_pathStack.push(pSubMenuNode);
 		}
 	}
 
@@ -140,6 +143,8 @@ RESULT DreamUIBar::Update() {
 		}
 		info.labels.emplace_back(m_pMenuNode->GetTitle());
 		info.icons.emplace_back(m_pIconTexture);
+		//TODO: There are several RenderToTexture calls and object creates
+		// that cause a brief timing delay
 		UpdateCurrentUILayer(info);
 	}
 
