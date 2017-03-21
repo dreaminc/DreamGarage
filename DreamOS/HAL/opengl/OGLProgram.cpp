@@ -713,7 +713,7 @@ RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
 	pObjectStore->Reset();
 	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
 		if (pVirtualObj->IsVisible() == true) {
-			RenderObject(pVirtualObj);
+			RenderObject((DimObj*)pVirtualObj);
 		}
 	}
 
@@ -764,7 +764,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	
 	if (pOGLObj != nullptr) {
 		// TODO: This should be replaced with a materials store or OGLMaterial that 
-		// pre-allocates and swaps binding points (Wait for textures)
+		// preallocates and swaps binding points (Wait for textures)
 		SetObjectUniforms(pDimObj);
 		SetMaterial(pDimObj->GetMaterial());
 		SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
@@ -811,17 +811,19 @@ RESULT OGLProgram::RenderChildren(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
 	// TODO: Rethink this since it's in the critical path
-	auto objects = pDimObj->GetChildren();
+	for (auto &pVirtualObj : pDimObj->GetChildren()) {
+		//auto pDimObjChild = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
+		//CR(RenderObject(pDimObjChild.get()));
 
-	for (auto &pVirtualObj : objects) {
-		auto pDimObjChild = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
-		CR(RenderObject(pDimObjChild.get()));
+		if (pVirtualObj->IsVisible() == true)
+			RenderObject((DimObj*)(pVirtualObj.get()));
 	}
 
-Error:
+//Error:
 	return r;
 }
 
+/*
 RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
 
@@ -831,6 +833,7 @@ RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
 
 	return R_FAIL;
 }
+*/
 
 // TODO: Consolidate?
 RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {

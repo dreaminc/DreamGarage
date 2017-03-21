@@ -99,12 +99,12 @@ void OGLDreamConsole::Render(bool isMonoView) {
 
 	//m_OGLProgram->RenderObject(m_OGLTitleText.get());
 
-	// Render hud text
+	// Render HUD text
 	//return;
 	float posY = viewBottom;
 
 	DreamConsole::GetConsole()->ForEach([&](const std::string& consoleText) {
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(consoleText, fontSize)->SetPosition(point(0.1f, posY, 0.0f), text::TOP_RIGHT));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLConsoleText->SetText(consoleText, fontSize)->SetPosition(point(0.1f, posY, 0.0f), text::TOP_RIGHT));
 		posY += m_OGLConsoleText->m_height;
 
 		return !(posY > viewTop);
@@ -116,7 +116,7 @@ void OGLDreamConsole::Render(bool isMonoView) {
 	auto currentCmdTxt = DreamConsole::GetConsole()->GetCmdText();
 	std::string cmdText = ">" + currentCmdTxt;
 
-	m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->SetPosition(point(0.1f, viewBottom, 0.0f), text::BOTTOM_RIGHT));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->SetPosition(point(0.1f, viewBottom, 0.0f), text::BOTTOM_RIGHT));
 
 	yOff = m_OGLConsoleText->m_height / 2;
 		
@@ -130,7 +130,7 @@ void OGLDreamConsole::Render(bool isMonoView) {
 	if ((time / 100) % 10 > 5) {
 		cmdText = "|";
 
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->SetPosition(point(0.1f + xOff, viewBottom - yOff, 0.0f), text::RIGHT));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->SetPosition(point(0.1f + xOff, viewBottom - yOff, 0.0f), text::RIGHT));
 	}
 	
 	// Render debug console text
@@ -286,7 +286,7 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 			// draw current FPS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			//m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize)->MoveTo(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0));
-			m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize)->SetPosition(point(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0), text::RIGHT));
+			m_OGLProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize)->SetPosition(point(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0), text::RIGHT));
 		}
 
 		if (currentPoint.x() < left)
@@ -302,19 +302,19 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		point cr = point(currentPoint.x(), currentPoint.y() - YSCALE(minFPS) + bottom, 0.0f);
 		point pr = point(prevPoint.x(), prevPoint.y() - YSCALE(minFPS) + bottom, 0.0f);
-		m_OGLProgram->RenderObject(m_OGLTriangle->Set(cr, pr, pr));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(cr, pr, pr));
 
 	}
 
 	// Draw local min/max bars
 	int fpsDiff = static_cast<int>(maxFPS) - static_cast<int>(minFPS);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(0), 0), point(right, YSCALE(0), 0), point(right, YSCALE(0), 0)));
-	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0)));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(left, YSCALE(0), 0), point(right, YSCALE(0), 0), point(right, YSCALE(0), 0)));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(left, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0)));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize)->SetPosition(point(left, YSCALE(0), 0), text::TOP_RIGHT));
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::BOTTOM_RIGHT));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize)->SetPosition(point(left, YSCALE(0), 0), text::TOP_RIGHT));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::BOTTOM_RIGHT));
 }
 
 template<typename T>
@@ -361,19 +361,19 @@ void OGLProfilerGraph::RenderMinimal(point& topLeft, point& bottomRight, Profile
 			// draw current FPS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			//m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize)->MoveTo(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0));
-			m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), 3.0f)->SetPosition(point((left+right)/2, currentPoint.y() - YSCALE(minFPS) + bottom, 0), text::CENTER));
+			m_OGLProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(records[index].first), 3.0f)->SetPosition(point((left+right)/2, currentPoint.y() - YSCALE(minFPS) + bottom, 0), text::CENTER));
 		}
 	}
 
 	// Draw local min/max bars
 	int fpsDiff = static_cast<int>(maxFPS) - static_cast<int>(minFPS);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(0), 0), point(right, YSCALE(0), 0), point(right, YSCALE(0), 0)));
-	m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(left, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0)));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(left, YSCALE(0), 0), point(right, YSCALE(0), 0), point(right, YSCALE(0), 0)));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(left, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0)));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize)->SetPosition(point(left, YSCALE(0), 0), text::TOP_RIGHT));
-	m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::BOTTOM_RIGHT));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize)->SetPosition(point(left, YSCALE(0), 0), text::TOP_RIGHT));
+	m_OGLProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::BOTTOM_RIGHT));
 }
 
 // OGLDebugConsole
@@ -412,12 +412,12 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 
 		m_OGLConsoleText->SetText(it->GetValue(), fontSize);
 
-		m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(0, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0)));
-		m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, 0, 0)));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(rowTL, rowTL + point(0, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0)));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, 0, 0)));
 
 		consoleHeight += m_OGLConsoleText->m_height;
 
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetPosition(rowTL, text::BOTTOM_RIGHT));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLConsoleText->SetPosition(rowTL, text::BOTTOM_RIGHT));
 	}
 
 	auto currentCmdText = DreamConsole::GetConsole()->GetCmdText();
@@ -430,11 +430,11 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 
 		m_OGLConsoleText->SetText(currentCmdText, 1.0);
 
-		m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(-m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0), point(-m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0)));
-		m_OGLProgram->RenderObject(m_OGLTriangle->Set(point(-m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0)));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(-m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0), point(-m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0)));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(-m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0)));
 		//m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, 0, 0)));
 
-		m_OGLProgram->RenderObject(m_OGLConsoleText->SetPosition(point(0, 0, 0), text::CENTER));
+		m_OGLProgram->RenderObject((DimObj*)m_OGLConsoleText->SetPosition(point(0, 0, 0), text::CENTER));
 
 		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 		if ((time / 100) % 10 > 5)
@@ -446,7 +446,7 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 
 			point pt = point(xOff, 0, 0);
 
-			m_OGLProgram->RenderObject(m_OGLConsoleText->SetText("|", 1.0)->SetPosition(pt, text::RIGHT));
+			m_OGLProgram->RenderObject((DimObj*)m_OGLConsoleText->SetText("|", 1.0)->SetPosition(pt, text::RIGHT));
 		}
 	}
 }
