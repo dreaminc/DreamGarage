@@ -9,15 +9,15 @@ TimeManager::TimeManager(double	processingTimeQuantum) :
 {
 	RESULT r = R_PASS;
 
-	RegisterEvent(TIME_ELAPSED);
-	Reset();
+	CR(RegisterEvent(TIME_ELAPSED));
+	CR(Reset());
 
 	Validate();
 	return;
-/*TODO: Reference this error case
+
 Error:
 	Invalidate();
-	return;*/
+	return;
 }
 
 TimeManager::~TimeManager() {
@@ -35,20 +35,44 @@ RESULT TimeManager::Reset() {
 }
 
 RESULT TimeManager::Update() {
+	RESULT r = R_PASS;
 
 	auto now = std::chrono::high_resolution_clock::now();
 	auto deltaTime = std::chrono::duration<double>(now - m_currentTime).count();
+	auto msDeltaTime = std::chrono::duration_cast<std::chrono::microseconds>(now - m_currentTime).count();
 	m_currentTime = now;
 
 	m_totalTimeToProcess += deltaTime;
 
 	while (m_totalTimeToProcess >= m_processingTimeQuantum) {
 		TimeEvent event(TIME_ELAPSED, m_totalElapsedTime, m_processingTimeQuantum);
-		NotifySubscribers(TIME_ELAPSED, &event);
+		CR(NotifySubscribers(TIME_ELAPSED, &event));
 
 		m_totalTimeToProcess -= m_processingTimeQuantum;
 		m_totalElapsedTime += m_processingTimeQuantum;
 	}
 
+	// FPS
+	// TODO: This can be simplified
+	m_runTimeFPS = FPS_RRF_YVAL * m_runTimeFPS  + (FPS_RRF_XVAL * (NUM_MICROSECONDS_IN_SECOND / msDeltaTime));
+	m_numFrames++;
+	
+	CR(PrintFPS());
+
+Error:
 	return R_PASS;
+}
+
+RESULT TimeManager::PrintFPS() {
+	//DEBUG_LINEOUT_RETURN("Runtime FPS: %f numframes:%zd", m_runTimeFPS, m_numFrames);
+	DEBUG_LINEOUT_RETURN("Runtime FPS: %f", m_runTimeFPS);
+	return R_PASS;
+}
+
+double TimeManager::GetRunTimeFrameRate() {
+	return m_runTimeFPS;
+}
+
+long long TimeManager::GetTotalNumberOfFrames() {
+	return m_numFrames;
 }

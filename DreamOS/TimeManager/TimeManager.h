@@ -14,6 +14,13 @@
 
 // TODO: This should be made into a singleton
 
+// FPS Run Rate Filter
+#define NUM_MICROSECONDS_IN_SECOND 1000000.0f
+#define FPS_RRF_VALUE 1.0f
+#define FPS_RRF_RESOLUTION 1000.0f
+#define FPS_RRF_XVAL (FPS_RRF_VALUE/FPS_RRF_RESOLUTION)
+#define FPS_RRF_YVAL ((FPS_RRF_RESOLUTION - FPS_RRF_VALUE)/FPS_RRF_RESOLUTION)
+
 typedef enum TimeEventType {
 	TIME_ELAPSED,
 } TIME_EVENT_TYPE;
@@ -40,6 +47,11 @@ public:
 	RESULT Reset();		// Resets time
 	RESULT Update();	// Updates the time from previous call to update.
 
+	RESULT PrintFPS();
+
+	double GetRunTimeFrameRate();
+	long long GetTotalNumberOfFrames();
+
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock>	m_startTime;
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_currentTime;
@@ -47,6 +59,9 @@ private:
 	double m_processingTimeQuantum;
 	double m_totalElapsedTime;
 	double m_totalTimeToProcess;
+
+	double m_runTimeFPS = 0;
+	long long m_numFrames = 0;
 
 public:
 	UID getID() { return m_uid; }
