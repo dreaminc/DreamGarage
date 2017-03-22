@@ -154,12 +154,11 @@ RESULT DreamUIBar::Update() {
 		
 		for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 			info.labels.emplace_back(pSubMenuNode->GetTitle());
-			//info.icons.emplace_back(m_pIconTexture);
 			info.icons.emplace_back(m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())]);
 		}
 		info.labels.emplace_back(m_pMenuNode->GetTitle());
-		//info.icons.emplace_back(m_pIconTexture);
 		info.icons.emplace_back(m_images[MenuNode::MimeType::FOLDER]);
+
 		//TODO: There are several RenderToTexture calls and object creates
 		// that cause a brief timing delay
 		UpdateCurrentUILayer(info);

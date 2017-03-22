@@ -11,8 +11,7 @@ UIBar::UIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat
 	m_labelFormat(labelFormat),
 	m_barFormat(barFormat)
 {
-	m_pIconTexture = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon_jpg_300.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	//m_pIconTexture = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	// empty
 }
 
 UIBar::~UIBar() {
@@ -48,74 +47,6 @@ RESULT UIBar::UpdateWithRadialLayout(size_t index) {
 	}
 
 	return R_PASS;
-}
-
-RESULT UIBar::HandleMenuUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) {
-	RESULT r = R_PASS;
-
-	// pull up menu
-	UILayerInfo info;
-	// go back
-	if (!path.empty()) {
-		path.pop();
-		if (!path.empty()) {
-			std::string& str = path.top();
-			info.labels = menu[str];
-			info.labels.emplace_back(str);
-			for (int i = 0; i < info.labels.size(); i++) {
-				info.icons.emplace_back(m_pIconTexture);
-			}
-		}
-	}
-	// open menu
-	else {
-		info.labels = menu[""];
-		info.labels.emplace_back(""); // fake header for root menu
-		for (int i = 0; i < info.labels.size(); i++) {
-			info.icons.emplace_back(m_pIconTexture);
-		}
-		ToggleVisible();
-		path.push("");
-	}
-	if (info.icons.size() == 0 && info.labels.size() == 0) {
-		CR(ToggleVisible());
-		return r;
-	}
-
-	CR(UpdateCurrentUILayer(info));
-
-Error:
-	return r;
-}
-
-RESULT UIBar::HandleTriggerUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) {
-	RESULT r = R_PASS;
-
-	UILayerInfo info;
-	std::shared_ptr<UIMenuItem> pSelected = GetCurrentItem();
-	CB(!path.empty());
-	CBR(pSelected, R_OBJECT_NOT_FOUND);
-
-	CB(menu.count(pSelected->GetName()) > 0);
-
-	const std::string& strTitle = pSelected->GetName();
-	//TODO: seperate title object into different layer
-	//currently title object is selectable
-	CB(strTitle != path.top()); 
-	path.push(strTitle);
-	info.labels = menu[strTitle];
-	info.labels.emplace_back(strTitle);
-	for (size_t i = 0; i < info.labels.size(); i++) {
-		info.icons.emplace_back(m_pIconTexture);
-	}
-
-	CB((info.icons.size() != 0)); 
-	CB((info.labels.size() != 0));
-
-	CR(UpdateCurrentUILayer(info));
-
-Error:
-	return r;
 }
 
 RESULT UIBar::UpdateCurrentUILayer(UILayerInfo& info) {
