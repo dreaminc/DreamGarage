@@ -25,7 +25,7 @@ struct IconFormat
 	{}
 };
 
-#define LABEL_SIZE 0.2f
+#define LABEL_SIZE 1.0f
 
 struct LabelFormat
 {
@@ -36,7 +36,7 @@ struct LabelFormat
 	vector vScale;
 
 	LabelFormat() :
-		font(L"ArialDistance.fnt"),
+		font(L"Basis_Grotesque_Pro.fnt"),
 		strLabel(""),
 		fontSize(LABEL_SIZE),
 		ptPosition(0.0f, 0.0f, 0.0f),
