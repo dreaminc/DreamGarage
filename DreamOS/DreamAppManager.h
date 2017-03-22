@@ -47,6 +47,9 @@ public:
 		pDreamApp = std::shared_ptr<derivedAppType>(derivedAppType::SelfConstruct(m_pDreamOS, pContext));
 		CN(pDreamApp);
 
+		// Assign the app a composite
+		CRM(pDreamApp->SetComposite(m_pDreamOS->AddComposite()), "Failed to create Dream App composite");
+
 		// Initialize the app
 		CR(pDreamApp->InitializeApp(pDreamApp->GetAppContext()));
 		CR(pDreamApp->SetPriority(DEFAULT_APP_PRIORITY));

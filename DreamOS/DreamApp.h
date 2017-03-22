@@ -89,6 +89,11 @@ protected:
 		return m_pCompositeContext;
 	}
 
+	RESULT SetComposite(composite *pComposite) {
+		m_pCompositeContext = pComposite;
+		return R_PASS;
+	}
+
 	static derivedAppType* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
 		return derivedAppType::SelfConstruct(pDreamOS, pContext);
 	};

@@ -19,7 +19,8 @@ RESULT DreamContentView::InitializeApp(void *pContext) {
 	SetAppDescription("A Shared Content View");
 
 	// Set up the quad
-	
+	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
+	m_pScreenQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
 
 Error:
 	return r;
@@ -29,6 +30,26 @@ RESULT DreamContentView::OnAppDidFinishInitializing(void *pContext) {
 	RESULT r = R_PASS;
 
 	CR(r);
+
+Error:
+	return r;
+}
+
+float DreamContentView::GetWidth() {
+	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+}
+
+float DreamContentView::GetHeight() {
+	return GetWidth() / m_aspectRatio;
+}
+
+RESULT DreamContentView::UpdateViewQuad() {
+	RESULT r = R_PASS;
+
+	CR(m_pScreenQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
+	CR(m_pScreenQuad->SetDirty());
+
+	CR(m_pScreenQuad->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), GetNormal()));
 
 Error:
 	return r;
@@ -69,4 +90,51 @@ Error:
 DreamContentView* DreamContentView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamContentView *pDreamApp = new DreamContentView(pDreamOS, pContext);
 	return pDreamApp;
+}
+
+RESULT DreamContentView::SetAspectRatio(float aspectRatio) {
+	m_aspectRatio = aspectRatio;
+
+	if (m_pScreenQuad != nullptr)
+		return UpdateViewQuad();
+
+	return R_PASS;
+}
+
+RESULT DreamContentView::SetDiagonalSize(float diagonalSize) {
+	m_diagonalSize = diagonalSize;
+
+	if (m_pScreenQuad != nullptr)
+		return UpdateViewQuad();
+
+	return R_PASS;
+}
+
+RESULT DreamContentView::SetParams(point ptPosition, float diagonal, AspectRatio aspectRatio, vector vNormal) {
+	GetComposite()->SetPosition(ptPosition);
+	m_diagonalSize = diagonal;
+	m_aspectRatio = k_aspectRatios[aspectRatio];
+	m_vNormal = vNormal.Normal();
+
+	if (m_pScreenQuad != nullptr)
+		return UpdateViewQuad();
+
+	return R_PASS;
+}
+
+RESULT DreamContentView::SetNormalVector(vector vNormal) {
+	m_vNormal = vNormal.Normal();
+
+	if(m_pScreenQuad != nullptr)
+		return UpdateViewQuad();
+
+	return R_PASS;
+}
+
+vector DreamContentView::GetNormal() {
+	return m_vNormal;
+}
+
+point DreamContentView::GetOrigin() {
+	return GetComposite()->GetOrigin();
 }

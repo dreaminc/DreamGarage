@@ -13,10 +13,30 @@
 #include "Primitives/Subscriber.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 
+#include <map>
+
 class quad;
+
+#define ASPECT_RATIO_16_9  ((16.0f)/(9.0f))
+#define ASPECT_RATIO_4_3 ((4.0f)/(3.0f))
+#define DEFAULT_ASPECT_RATIO ASPECT_RATIO_16_9
+#define DEFAULT_DIAGONAL_SIZE 1.0f
+
 
 class DreamContentView : public DreamApp<DreamContentView>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
+
+public:
+	enum class AspectRatio {
+		ASPECT_16_9,
+		ASPECT_4_3,
+		ASPECT_INVALID
+	};
+
+	std::map<AspectRatio, float> k_aspectRatios = {
+		{AspectRatio::ASPECT_16_9, ASPECT_RATIO_16_9},
+		{AspectRatio::ASPECT_4_3, ASPECT_RATIO_4_3}
+	};
 
 public:
 	DreamContentView(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -27,11 +47,27 @@ public:
 
 	virtual RESULT Notify(InteractionObjectEvent *event) override;
 
+	RESULT SetAspectRatio(float aspectRatio);
+	RESULT SetDiagonalSize(float diagonalSize);
+	RESULT SetNormalVector(vector vNormal);
+
+	RESULT SetParams(point ptPosition, float diagonal, const AspectRatio aspectRatio, vector vNormal);
+
+	float GetWidth();
+	float GetHeight();
+	vector GetNormal();
+	point GetOrigin();
+
+	RESULT UpdateViewQuad();
+
 protected:
 	static DreamContentView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	quad *m_pScreenQuad = nullptr;
+	std::shared_ptr<quad> m_pScreenQuad = nullptr;
+	float m_aspectRatio = DEFAULT_ASPECT_RATIO;
+	float m_diagonalSize = DEFAULT_DIAGONAL_SIZE;
+	vector m_vNormal;
 
 };
 

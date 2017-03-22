@@ -121,6 +121,9 @@ RESULT UITestSuite::AddTestSharedContentView() {
 		pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentView>(this);
 		CNM(pDreamContentView, "Failed to create dream content view");
 
+		// Set up the view
+		pDreamContentView->SetParams(point(0.0f), 20.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
+
 	Error:
 		return R_PASS;
 	};
