@@ -16,12 +16,12 @@
 #include <map>
 
 class quad;
+class texture;
 
 #define ASPECT_RATIO_16_9  ((16.0f)/(9.0f))
 #define ASPECT_RATIO_4_3 ((4.0f)/(3.0f))
 #define DEFAULT_ASPECT_RATIO ASPECT_RATIO_16_9
 #define DEFAULT_DIAGONAL_SIZE 1.0f
-
 
 class DreamContentView : public DreamApp<DreamContentView>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
@@ -59,6 +59,11 @@ public:
 	point GetOrigin();
 
 	RESULT UpdateViewQuad();
+
+	RESULT SetScreenTexture(const std::wstring &wstrTextureFilename);
+
+private:
+	RESULT SetScreenTexture(texture *pTexture);
 
 protected:
 	static DreamContentView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

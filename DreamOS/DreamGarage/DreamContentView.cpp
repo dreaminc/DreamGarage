@@ -55,6 +55,22 @@ Error:
 	return r;
 }
 
+RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
+	return m_pScreenQuad->SetColorTexture(pTexture);
+}
+
+RESULT DreamContentView::SetScreenTexture(const std::wstring &wstrTextureFilename) {
+	RESULT r = R_PASS;
+
+	texture *pTexture = GetDOS()->MakeTexture(const_cast<wchar_t*>(wstrTextureFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	CN(pTexture);
+
+	CR(SetScreenTexture(pTexture));
+
+Error:
+	return r;
+}
+
 RESULT DreamContentView::Update(void *pContext) {
 	RESULT r = R_PASS;
 
