@@ -20,6 +20,7 @@ typedef struct UIBarFormat {
 	// item
 	float itemAngleX;
 	float itemAngleY; // angle between items
+	float itemStartAngleY;
 	float itemPosY;
 	vector itemScale;
 	float itemScaleSelected;
@@ -32,6 +33,7 @@ typedef struct UIBarFormat {
 		menuPosZ(-0.75f),
 		itemAngleX(60.0f),
 		itemAngleY(20.0f),
+		itemStartAngleY(-30.0f),
 		itemPosY(-0.5f),
 		itemScale(vector(1.0f, 1.0f, 1.0f)),
 		itemScaleSelected(1.25f),

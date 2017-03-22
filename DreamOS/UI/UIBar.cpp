@@ -29,13 +29,10 @@ RESULT UIBar::UpdateWithRadialLayout(size_t index) {
 	std::shared_ptr<composite> pContext = pItem->GetContext();
 	std::shared_ptr<quad> pQuad = pItem->GetQuad();
 
-	// used to center the UIBar
-	int shift = (size-1) / 2;
-	float odd = ((size-1) % 2 == 0) ? 0.5f : 0.0f;
-
 	// Radial layout
 	int radIndex = fHeader ? 0 : static_cast<int>(index);
-	float radY = (m_barFormat.itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
+	float radY = (m_barFormat.itemAngleY * M_PI / 180.0f) * -(radIndex);
+	radY -= m_barFormat.itemStartAngleY * M_PI / 180.0f;
 	quaternion rotY = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
 	float yPos = fHeader ? m_barFormat.headerPosY : m_barFormat.itemPosY;
 	pContext->MoveTo(sin(radY) * m_barFormat.menuPosZ, yPos, cos(radY) * m_barFormat.menuPosZ);
