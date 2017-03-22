@@ -58,6 +58,10 @@ private:
 	std::string m_strMIMEType;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
+
+	std::map<MimeType, std::vector<std::string>> m_MimeToString;
+
+	RESULT InitializeMimeToString();
 };
 
 #endif	// ! ENVIRONMENT_H_

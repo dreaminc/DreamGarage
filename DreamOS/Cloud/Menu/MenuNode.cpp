@@ -26,6 +26,7 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 			m_menuNodes.push_back(pSubMenuNode);
 		}
 	}
+	InitializeMimeToString();
 }
 
 MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType) :
@@ -35,8 +36,9 @@ MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string str
 	m_strTitle(strTitle),
 	m_strMIMEType(strMIMEType)
 {
-	// empty
+	InitializeMimeToString();
 }
+
 
 RESULT MenuNode::PrintMenuNode() {
 	DEBUG_LINEOUT("Node Type %s", NodeTypeString(m_nodeType).c_str());
@@ -81,37 +83,30 @@ MenuNode::type MenuNode::NodeTypeFromString(std::string strNodeType) {
 	return MenuNode::type::INVALID;
 }
 
-std::string MenuNode::MimeTypeString(MenuNode::MimeType mimeType) {
-	switch (mimeType) {
-	case MenuNode::MimeType::IMAGE_BMP: return "image/bmp"; break;
-	case MenuNode::MimeType::IMAGE_PNG: return "image/png"; break;
-	case MenuNode::MimeType::IMAGE_GIF: return "image/gif"; break;
-	case MenuNode::MimeType::IMAGE_JPG: return "image/jpg"; break;
-	case MenuNode::MimeType::FOLDER: return "application/folder"; break;
-	default: return "invalid"; break;
-	}
+RESULT MenuNode::InitializeMimeToString() {
 
-	return "invalid";
+	m_MimeToString[MimeType::IMAGE_JPG] = { "image/jpg", "image/jpeg" };
+	m_MimeToString[MimeType::IMAGE_BMP] = { "image/bmp" };
+	m_MimeToString[MimeType::IMAGE_PNG] = { "image/png" };
+	m_MimeToString[MimeType::IMAGE_GIF] = { "image/gif" };
+	m_MimeToString[MimeType::FOLDER] = { "application/folder", "application/vnd.google-apps.folder" };
+	m_MimeToString[MimeType::INVALID] = { "invalid" };
+
+	return R_PASS;
+}
+
+std::string MenuNode::MimeTypeString(MenuNode::MimeType mimeType) {
+	return m_MimeToString[mimeType][0];
 }
 
 MenuNode::MimeType MenuNode::MimeTypeFromString(std::string strMimeType) {
-
-	if (strMimeType == "image/jpg" || strMimeType == "image/jpeg") {
-		return MenuNode::MimeType::IMAGE_JPG;
+	for (auto& key : m_MimeToString) {
+		for (auto& str : key.second) {
+			if (str == strMimeType) {
+				return key.first;
+			}
+		}
 	}
-	else if (strMimeType == "image/bmp") {
-		return MenuNode::MimeType::IMAGE_BMP;
-	}
-	else if (strMimeType == "image/gif") {
-		return MenuNode::MimeType::IMAGE_GIF;
-	}
-	else if (strMimeType == "image/png") {
-		return MenuNode::MimeType::IMAGE_PNG;
-	}
-	else if (strMimeType == "application/folder" || strMimeType == "application/vnd.google-apps.folder") {
-		return MenuNode::MimeType::FOLDER;
-	}
-
 	return MenuNode::MimeType::INVALID;
 }
 
