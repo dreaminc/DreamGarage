@@ -81,6 +81,40 @@ MenuNode::type MenuNode::NodeTypeFromString(std::string strNodeType) {
 	return MenuNode::type::INVALID;
 }
 
+std::string MenuNode::MimeTypeString(MenuNode::MimeType mimeType) {
+	switch (mimeType) {
+	case MenuNode::MimeType::IMAGE_BMP: return "image/bmp"; break;
+	case MenuNode::MimeType::IMAGE_PNG: return "image/png"; break;
+	case MenuNode::MimeType::IMAGE_GIF: return "image/gif"; break;
+	case MenuNode::MimeType::IMAGE_JPG: return "image/jpg"; break;
+	case MenuNode::MimeType::FOLDER: return "application/folder"; break;
+	default: return "invalid"; break;
+	}
+
+	return "invalid";
+}
+
+MenuNode::MimeType MenuNode::MimeTypeFromString(std::string strMimeType) {
+
+	if (strMimeType == "image/jpg" || strMimeType == "image/jpeg") {
+		return MenuNode::MimeType::IMAGE_JPG;
+	}
+	else if (strMimeType == "image/bmp") {
+		return MenuNode::MimeType::IMAGE_BMP;
+	}
+	else if (strMimeType == "image/gif") {
+		return MenuNode::MimeType::IMAGE_GIF;
+	}
+	else if (strMimeType == "image/png") {
+		return MenuNode::MimeType::IMAGE_PNG;
+	}
+	else if (strMimeType == "application/folder" || strMimeType == "application/vnd.google-apps.folder") {
+		return MenuNode::MimeType::FOLDER;
+	}
+
+	return MenuNode::MimeType::INVALID;
+}
+
 size_t MenuNode::NumSubMenuNodes() {
 	return m_menuNodes.size();
 }

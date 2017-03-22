@@ -8,6 +8,21 @@ DreamUIBar::DreamUIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& l
 {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<texture> pJPG = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_jpg_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_images[MenuNode::MimeType::IMAGE_JPG] = pJPG;
+
+	std::shared_ptr<texture> pPNG = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_images[MenuNode::MimeType::IMAGE_PNG] = pPNG;
+
+	std::shared_ptr<texture> pGIF = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_gif_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_images[MenuNode::MimeType::IMAGE_GIF] = pGIF;
+
+	std::shared_ptr<texture> pBMP = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_bmp_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_images[MenuNode::MimeType::IMAGE_BMP] = pBMP;
+
+	std::shared_ptr<texture> pFolder = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_folder_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_images[MenuNode::MimeType::FOLDER] = pFolder;
+
 	CR(DreamUIBar::Initialize());
 
 //Success:
@@ -139,10 +154,12 @@ RESULT DreamUIBar::Update() {
 		
 		for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 			info.labels.emplace_back(pSubMenuNode->GetTitle());
-			info.icons.emplace_back(m_pIconTexture);
+			//info.icons.emplace_back(m_pIconTexture);
+			info.icons.emplace_back(m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())]);
 		}
 		info.labels.emplace_back(m_pMenuNode->GetTitle());
-		info.icons.emplace_back(m_pIconTexture);
+		//info.icons.emplace_back(m_pIconTexture);
+		info.icons.emplace_back(m_images[MenuNode::MimeType::FOLDER]);
 		//TODO: There are several RenderToTexture calls and object creates
 		// that cause a brief timing delay
 		UpdateCurrentUILayer(info);

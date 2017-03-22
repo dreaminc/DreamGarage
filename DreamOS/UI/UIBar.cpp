@@ -11,7 +11,8 @@ UIBar::UIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat
 	m_labelFormat(labelFormat),
 	m_barFormat(barFormat)
 {
-	m_pIconTexture = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pIconTexture = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon_jpg_300.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	//m_pIconTexture = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 }
 
 UIBar::~UIBar() {
@@ -29,15 +30,15 @@ RESULT UIBar::UpdateWithRadialLayout(size_t index) {
 	std::shared_ptr<quad> pQuad = pItem->GetQuad();
 
 	// used to center the UIBar
-	int shift = size / 2;
-	float odd = (size % 2 == 0) ? 0.5f : 0.0f;
+	int shift = (size-1) / 2;
+	float odd = ((size-1) % 2 == 0) ? 0.5f : 0.0f;
 
 	// Radial layout
 	int radIndex = fHeader ? 0 : static_cast<int>(index);
 	float radY = (m_barFormat.itemAngleY * M_PI / 180.0f) * -(radIndex - shift + odd);
 	quaternion rotY = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
 	float yPos = fHeader ? m_barFormat.headerPosY : m_barFormat.itemPosY;
-	pContext->MoveTo(-sin(radY) * 1.5f, yPos, -cos(radY) * 1.5f);
+	pContext->MoveTo(sin(radY) * m_barFormat.menuPosZ, yPos, cos(radY) * m_barFormat.menuPosZ);
 	
 	pContext->SetOrientation(rotY);
 
@@ -137,12 +138,12 @@ RESULT UIBar::UpdateCurrentUILayer(UILayerInfo& info) {
 		
 		if (i < info.icons.size()) {
 			iconFormat.pTexture = info.icons[i];
-			iconFormat.ptPosition = point(0.0f, 0.5f, 0.0f);
+			iconFormat.ptPosition = point(0.0f, 0.25f, 0.0f);
 		}
 
 		if (i < info.labels.size()) {
 			labelFormat.strLabel = info.labels[i];
-			labelFormat.ptPosition = point(0.0f, -0.5f, 0.0f);
+			labelFormat.ptPosition = point(0.0f, -0.9f, 0.0f);
 		}
 
 		auto pItem = pLayer->CreateMenuItem();
