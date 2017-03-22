@@ -19,25 +19,24 @@
 #define DEFAULT_APP_PRIORITY DREAM_APP_PRIORITY
 #define MAX_APP_PRIORITY 10
 
-using namespace std;
-
 #include "DreamApp.h"
+#include "Primitives/Manager.h"
 
 class DreamOS;
 
-class DreamAppManager {
+class DreamAppManager : public Manager {
 public:
 	DreamAppManager(DreamOS *pDreamOS);
 	~DreamAppManager();
 
-	RESULT Initialize();
+	virtual RESULT Initialize() override;
+	virtual RESULT Update() override;
 
 	template<class derivedAppType> 
 	RESULT CreateRegisterAndStartApp(void *pContext = nullptr);
 
 private:
-	priority_queue<shared_ptr<DreamAppBase>, vector<shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
-	UID m_uid;
+	std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
 	DreamOS *m_pDreamOS;
 };
 

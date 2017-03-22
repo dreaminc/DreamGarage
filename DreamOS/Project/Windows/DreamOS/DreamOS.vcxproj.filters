@@ -2441,6 +2441,9 @@
     <ClInclude Include="..\..\..\DreamAppManager.h">
       <Filter>DreamOS</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Manager.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

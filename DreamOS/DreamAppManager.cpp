@@ -3,7 +3,14 @@
 DreamAppManager::DreamAppManager(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
-	// empty
+
+// Success:
+	Validate();
+	return;
+
+// Error:
+	Invalidate();
+	return;
 }
 
 DreamAppManager::~DreamAppManager() {
@@ -13,6 +20,17 @@ DreamAppManager::~DreamAppManager() {
 RESULT DreamAppManager::Initialize() {
 	RESULT r = R_PASS;
 
+	// TODO: 
+	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamAppManager::Update() {
+	RESULT r = R_PASS;
+
+	// TODO: 
 	CR(r);
 
 Error:

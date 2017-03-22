@@ -35,6 +35,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
+	CRM(m_pSandbox->SetDreamOSHandle(this), "Failed to set DreamOS handle");
 
 	// This gives our DreamOS app instance a chance to configure the
 	// sandbox prior to it getting initialized 

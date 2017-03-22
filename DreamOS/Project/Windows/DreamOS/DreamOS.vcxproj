@@ -1123,6 +1123,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\hand.h" />
     <ClInclude Include="..\..\..\Primitives\light.h" />
     <ClInclude Include="..\..\..\Primitives\line.h" />
+    <ClInclude Include="..\..\..\Primitives\Manager.h" />
     <ClInclude Include="..\..\..\Primitives\material.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\matrix.h" />

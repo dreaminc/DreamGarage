@@ -46,6 +46,8 @@ class model;
 class user;
 class Message;
 
+class DreamAppManager;
+
 class SandboxApp : 
 	public Subscriber<SenseKeyboardEvent>, 
 	public Subscriber<SenseTypingEvent>,
@@ -87,6 +89,8 @@ public:
 private:
 	RESULT InitializePhysicsEngine();
 	RESULT InitializeInteractionEngine();
+	RESULT InitializeTimeManager();
+	RESULT InitializeDreamAppManager();
 
 protected:
 	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
@@ -260,11 +264,19 @@ protected:
 	SenseMouse *m_pSenseMouse;
 	HMD *m_pHMD;
 
-	TimeManager* m_pTimeManager;
+	// TODO: Create a "manager manager" or a more generalized way to add these
+	// All "managers" should be unique ptrs 
+	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
+	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
+
+protected:
+	RESULT SetDreamOSHandle(DreamOS *pDreamOSHandle);
+	DreamOS *GetDreamOSHandle();
+	DreamOS *m_pDreamOSHandle = nullptr;
 
 protected:
 	std::function<RESULT(void)> m_fnUpdateCallback;
