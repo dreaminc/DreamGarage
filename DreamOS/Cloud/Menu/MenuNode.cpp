@@ -26,6 +26,7 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 			m_menuNodes.push_back(pSubMenuNode);
 		}
 	}
+	InitializeMimeToString();
 }
 
 MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType) :
@@ -35,8 +36,9 @@ MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string str
 	m_strTitle(strTitle),
 	m_strMIMEType(strMIMEType)
 {
-	// empty
+	InitializeMimeToString();
 }
+
 
 RESULT MenuNode::PrintMenuNode() {
 	DEBUG_LINEOUT("Node Type %s", NodeTypeString(m_nodeType).c_str());
@@ -79,6 +81,33 @@ MenuNode::type MenuNode::NodeTypeFromString(std::string strNodeType) {
 	}
 
 	return MenuNode::type::INVALID;
+}
+
+RESULT MenuNode::InitializeMimeToString() {
+
+	m_MimeToString[MimeType::IMAGE_JPG] = { "image/jpg", "image/jpeg" };
+	m_MimeToString[MimeType::IMAGE_BMP] = { "image/bmp" };
+	m_MimeToString[MimeType::IMAGE_PNG] = { "image/png" };
+	m_MimeToString[MimeType::IMAGE_GIF] = { "image/gif" };
+	m_MimeToString[MimeType::FOLDER] = { "application/folder", "application/vnd.google-apps.folder" };
+	m_MimeToString[MimeType::INVALID] = { "invalid" };
+
+	return R_PASS;
+}
+
+std::string MenuNode::MimeTypeString(MenuNode::MimeType mimeType) {
+	return m_MimeToString[mimeType][0];
+}
+
+MenuNode::MimeType MenuNode::MimeTypeFromString(std::string strMimeType) {
+	for (auto& key : m_MimeToString) {
+		for (auto& str : key.second) {
+			if (str == strMimeType) {
+				return key.first;
+			}
+		}
+	}
+	return MenuNode::MimeType::INVALID;
 }
 
 size_t MenuNode::NumSubMenuNodes() {

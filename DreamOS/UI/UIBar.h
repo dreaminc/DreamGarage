@@ -20,6 +20,7 @@ typedef struct UIBarFormat {
 	// item
 	float itemAngleX;
 	float itemAngleY; // angle between items
+	float itemStartAngleY;
 	float itemPosY;
 	vector itemScale;
 	float itemScaleSelected;
@@ -29,14 +30,15 @@ typedef struct UIBarFormat {
 	float headerPosY;
 
 	UIBarFormat() :
-		menuPosZ(-1.5f),
+		menuPosZ(-0.75f),
 		itemAngleX(60.0f),
 		itemAngleY(20.0f),
+		itemStartAngleY(-30.0f),
 		itemPosY(-0.5f),
 		itemScale(vector(1.0f, 1.0f, 1.0f)),
 		itemScaleSelected(1.25f),
 		headerAngleX(75.0f),
-		headerPosY(0.0f)
+		headerPosY(-0.25f)
 	{}
 
 } UI_BAR_INFO;
@@ -45,10 +47,6 @@ class UIBar : public UIModule {
 public:
 	UIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
 	~UIBar();
-
-	//Deprecated
-	virtual RESULT HandleMenuUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
-	virtual RESULT HandleTriggerUp(std::map<std::string, std::vector<std::string>>& menu, std::stack<std::string>& path) override;
 
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
 
@@ -60,10 +58,6 @@ protected:
 	IconFormat m_iconFormat;
 	LabelFormat m_labelFormat;
 	UIBarFormat m_barFormat;
-
-//private:
-protected:
-	std::shared_ptr<texture> m_pIconTexture;
 
 public:
 	float GetLargeItemScale();

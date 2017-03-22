@@ -19,6 +19,16 @@ class MenuNode : public dirty {
 		FILE,
 		INVALID
 	};
+
+public:
+	enum class MimeType {
+		IMAGE_JPG,
+		IMAGE_PNG,
+		IMAGE_BMP,
+		IMAGE_GIF,
+		FOLDER,
+		INVALID
+	};
 	
 public:
 	MenuNode(nlohmann::json jsonMenuNode);
@@ -26,6 +36,9 @@ public:
 
 	std::string NodeTypeString(MenuNode::type nodeType);
 	MenuNode::type NodeTypeFromString(std::string strNodeType);
+
+	std::string MimeTypeString(MenuNode::MimeType mimeType);
+	MenuNode::MimeType MimeTypeFromString(std::string strMimeType);
 
 	RESULT PrintMenuNode();
 	size_t NumSubMenuNodes();
@@ -45,6 +58,10 @@ private:
 	std::string m_strMIMEType;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
+
+	std::map<MimeType, std::vector<std::string>> m_MimeToString;
+
+	RESULT InitializeMimeToString();
 };
 
 #endif	// ! ENVIRONMENT_H_

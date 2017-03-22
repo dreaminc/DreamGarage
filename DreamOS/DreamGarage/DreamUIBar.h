@@ -7,6 +7,7 @@
 #include <functional>
 
 #include "Cloud/Menu/MenuController.h"
+#include "Cloud/Menu/MenuNode.h"
 
 class DreamUIBar : public UIBar, public MenuController::observer {
 
@@ -46,6 +47,7 @@ private:
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
+	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
 };
 
 
