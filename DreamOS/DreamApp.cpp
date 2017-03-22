@@ -51,3 +51,4 @@ RESULT DreamApp<derivedAppType>::Initialize() {
 Error:
 	return r;
 }
+

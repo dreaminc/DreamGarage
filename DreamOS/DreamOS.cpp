@@ -1,6 +1,7 @@
 #include "DreamOS.h"
 
 #include "Logger/Logger.h"
+#include "DreamAppManager.h"
 
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),

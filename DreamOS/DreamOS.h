@@ -36,6 +36,8 @@
 
 #include "PhysicsEngine/PhysicsEngine.h"
 
+#include "DreamAppManager.h"
+
 class DreamOS : public Subscriber<CollisionObjectEvent>, public valid {
 	friend class CloudTestSuite;
 
@@ -65,6 +67,28 @@ protected:
 	// TODO: This is here temporarily, should be replaced by proper sandbox 
 	// related functionality
 	HALImp* GetHALImp();
+
+	// Dream Apps
+public:
+	// TODO: This is here because of template sillyness - but should be 
+	// put into a .tpp file with an #include of said tpp file at the end
+	// of the header
+	template<class derivedAppType>
+	std::shared_ptr<derivedAppType> LaunchDreamApp(void *pContext) {
+		RESULT r = R_PASS;
+		
+		std::shared_ptr<derivedAppType> pDreamApp = m_pSandbox->m_pDreamAppManager->CreateRegisterAndStartApp<derivedAppType>(pContext);
+		CNM(pDreamApp, "Failed to create app");
+
+		return pDreamApp;
+
+	Error:
+		if (pDreamApp != nullptr) {
+			pDreamApp = nullptr;
+		}
+
+		return nullptr;
+	}
 
 //protected:
 public:

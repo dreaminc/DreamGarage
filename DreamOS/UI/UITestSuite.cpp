@@ -5,6 +5,8 @@
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 
+#include "DreamGarage/DreamContentView.h"
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -111,9 +113,13 @@ RESULT UITestSuite::AddTestSharedContentView() {
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
+		std::shared_ptr<DreamContentView> pDreamContentView = nullptr;
 
 		CN(m_pDreamOS);
 
+		// Create the Shared View App
+		pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentView>(this);
+		CNM(pDreamContentView, "Failed to create dream content view");
 
 	Error:
 		return R_PASS;

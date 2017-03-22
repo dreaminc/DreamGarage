@@ -16,6 +16,8 @@
 class quad;
 
 class DreamContentView : public DreamApp<DreamContentView>, public Subscriber<InteractionObjectEvent> {
+	friend class DreamAppManager;
+
 public:
 	DreamContentView(DreamOS *pDreamOS, void *pContext = nullptr);
 

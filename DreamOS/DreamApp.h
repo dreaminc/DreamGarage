@@ -11,6 +11,7 @@
 #include "Primitives/Types/UID.h"
 
 #include <string>
+#include <memory>
 
 class DreamOS;
 class composite;
@@ -26,6 +27,7 @@ public:
 
 protected:
 	virtual void *GetAppContext() = 0;
+	virtual RESULT Print() { return R_NOT_IMPLEMENTED; }
 
 protected:
 	RESULT SetPriority(int priority);
@@ -43,8 +45,10 @@ private:
 
 // Using Fixed-priority preemptive scheduling: https://en.wikipedia.org/wiki/Fixed-priority_pre-emptive_scheduling
 struct DreamAppBaseCompare {
-	bool operator()(const DreamAppBase &lhsApp , const DreamAppBase &rhsApp) const {
-		return lhsApp.GetEffectivePriorityValue() < rhsApp.GetEffectivePriorityValue();
+	bool operator()(const std::shared_ptr<DreamAppBase> &lhsApp , const std::shared_ptr<DreamAppBase> &rhsApp) const {
+		// Note: This is actually returning the lowest value (not highest)
+		// Since priority is inverted
+		return lhsApp->GetEffectivePriorityValue() > rhsApp->GetEffectivePriorityValue();
 	}
 };
 
@@ -81,6 +85,10 @@ protected:
 		return m_pContext;
 	}
 
+	composite *GetComposite() {
+		return m_pCompositeContext;
+	}
+
 	static derivedAppType* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr) {
 		return derivedAppType::SelfConstruct(pDreamOS, pContext);
 	};
@@ -97,6 +105,11 @@ protected:
 
 	DreamOS *GetDOS() {
 		return m_pDreamOS;
+	}
+
+	virtual RESULT Print() override {
+		DEBUG_LINEOUT_RETURN("%s running %fus pri: %d", (m_strAppName.length() > 0) ? m_strAppName.c_str() : "DreamApp", GetTimeRun(), GetPriority());
+		return R_PASS;
 	}
 
 private:

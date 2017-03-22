@@ -15,6 +15,12 @@ RESULT DreamContentView::InitializeApp(void *pContext) {
 		CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
 	}
 
+	SetAppName("DreamContentView");
+	SetAppDescription("A Shared Content View");
+
+	// Set up the quad
+	
+
 Error:
 	return r;
 }
@@ -31,6 +37,7 @@ Error:
 RESULT DreamContentView::Update(void *pContext) {
 	RESULT r = R_PASS;
 
+	int a = 5;
 	CR(r);
 
 Error:
