@@ -34,7 +34,8 @@ RESULT UIBar::UpdateWithRadialLayout(size_t index) {
 	radY -= m_barFormat.itemStartAngleY * M_PI / 180.0f;
 	quaternion rotY = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
 	float yPos = fHeader ? m_barFormat.headerPosY : m_barFormat.itemPosY;
-	pContext->MoveTo(sin(radY) * m_barFormat.menuPosZ, yPos, cos(radY) * m_barFormat.menuPosZ);
+	float zPos = fHeader ? m_barFormat.menuPosZ * 1.15f : m_barFormat.menuPosZ;
+	pContext->MoveTo(sin(radY) * zPos, yPos, cos(radY) * zPos);
 	
 	pContext->SetOrientation(rotY);
 

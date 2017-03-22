@@ -102,14 +102,14 @@ RESULT DreamUIBar::HandleMenuUp() {
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
 
 	if (m_pathStack.empty()) {
-		m_pMenuControllerProxy->RequestSubMenu();
+		m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
 		ToggleVisible();
 	}
 	else {
 		m_pathStack.pop();
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
-			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath());
+			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 		}
 		else {
 			ToggleVisible();
@@ -136,7 +136,7 @@ RESULT DreamUIBar::HandleTriggerUp() {
 
 	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
-			m_pMenuControllerProxy->RequestSubMenu(pSubMenuNode->GetScope(), pSubMenuNode->GetPath());
+			m_pMenuControllerProxy->RequestSubMenu(pSubMenuNode->GetScope(), pSubMenuNode->GetPath(), pSubMenuNode->GetTitle());
 			m_pathStack.push(pSubMenuNode);
 		}
 	}
@@ -194,6 +194,7 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		auto pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
 		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
 		m_pMenuNode = pMenuNode;
+		OVERLAY_DEBUG_SET("onmenu", pMenuNode->GetTitle());
 		m_pMenuNode->SetDirty();
 	}
 
