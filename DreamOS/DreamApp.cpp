@@ -1,19 +1,39 @@
 #include "DreamApp.h"
 #include "DreamOS.h"
 
-DreamApp::DreamApp(DreamOS *pDreamOS, void *pContext) :
-	m_pDreamOS(pDreamOS),
-	m_pCompositeContext(nullptr),
-	m_pContext(pContext)
-{
-	// Empty
+// DreamAppBase
+RESULT DreamAppBase::SetPriority(int priority) {
+	m_priority = priority;
+	return R_PASS;
 }
 
-DreamApp::~DreamApp() {
-	// empty
+int DreamAppBase::GetPriority() {
+	return m_priority;
 }
 
-RESULT DreamApp::Initialize() {
+RESULT DreamAppBase::ResetTimeRun() {
+	m_usTimeRun = 0.0f;
+	return R_PASS;
+}
+
+RESULT DreamAppBase::IncrementTimeRun(float usTimeDelta) {
+	m_usTimeRun += usTimeDelta;
+	return R_PASS;
+}
+
+float DreamAppBase::GetTimeRun() {
+	return m_usTimeRun;
+}
+
+// In short, this will return 
+float DreamAppBase::GetEffectivePriorityValue() const {
+	return (m_usTimeRun * m_priority);
+}
+
+// DreamApp<derived>
+
+template<class derivedAppType>
+RESULT DreamApp<derivedAppType>::Initialize() {
 	RESULT r = R_PASS;
 
 	// Grab the context composite from DreamOS
@@ -30,18 +50,4 @@ RESULT DreamApp::Initialize() {
 
 Error:
 	return r;
-}
-
-RESULT DreamApp::SetAppName(std::string strAppName) {
-	m_strAppName = strAppName;
-	return R_PASS;
-}
-
-RESULT DreamApp::SetAppDescription(std::string strAppDescription) {
-	m_strAppDescription = strAppDescription;
-	return R_PASS;
-}
-
-DreamOS* DreamApp::GetDOS() {
-	return m_pDreamOS;
 }

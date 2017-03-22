@@ -2,7 +2,7 @@
 #include "DreamOS.h"
 
 DreamContentView::DreamContentView(DreamOS *pDreamOS, void *pContext) :
-	DreamApp(pDreamOS, pContext)
+	DreamApp<DreamContentView>(pDreamOS, pContext)
 {
 	// Empty - initialization by factory
 }
@@ -57,4 +57,9 @@ RESULT DreamContentView::Notify(InteractionObjectEvent *event) {
 
 Error:
 	return r;
+}
+
+DreamContentView* DreamContentView::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamContentView *pDreamApp = new DreamContentView(pDreamOS, pContext);
+	return pDreamApp;
 }

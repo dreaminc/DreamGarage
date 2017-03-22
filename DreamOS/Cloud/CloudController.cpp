@@ -751,7 +751,10 @@ Error:
 }
 
 MenuControllerProxy* CloudController::GetMenuControllerProxy() {
-	return m_pEnvironmentController->GetMenuControllerProxy();
+	if(m_pEnvironmentController != nullptr)
+		return m_pEnvironmentController->GetMenuControllerProxy();
+
+	return nullptr;
 }
 
 HTTPControllerProxy* CloudController::GetHTTPControllerProxy() {

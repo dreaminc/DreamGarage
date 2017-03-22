@@ -23,6 +23,18 @@ UITestSuite::~UITestSuite() {
 	// empty
 }
 
+RESULT UITestSuite::AddTests() {
+	RESULT r = R_PASS;
+
+	CR(AddTestSharedContentView());
+
+	//CR(AddTestUI());
+	CR(AddTestInteractionUI());
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::Initialize() {
 	RESULT r = R_PASS;
 
@@ -90,11 +102,61 @@ RESULT UITestSuite::InitializeUI() {
 	return r;
 }
 
+RESULT UITestSuite::AddTestSharedContentView() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 30.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code 
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestInteractionUI() {
 	RESULT r = R_PASS;
 
 	struct TestContext {
-
 		DimRay *pRay = nullptr;
 	};
 
@@ -299,14 +361,6 @@ Error:
 	return r;
 }
 
-RESULT UITestSuite::AddTests() {
-	RESULT r = R_PASS;
-	//CR(AddTestUI());
-	CR(AddTestInteractionUI());
-Error:
-	return r;
-}
-
 RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 	RESULT r = R_PASS;
 
@@ -364,7 +418,9 @@ RESULT UITestSuite::Notify(SenseMouseEvent *mEvent) {
 
 			OVERLAY_DEBUG_SET("event", "mouse left up");
 			
-			CR(m_pDreamUIBar->HandleMenuUp());
+			if (m_pDreamUIBar != nullptr) {
+				CR(m_pDreamUIBar->HandleMenuUp());
+			}
 		} break;
 
 		//TODO: Currently broken
@@ -372,8 +428,7 @@ RESULT UITestSuite::Notify(SenseMouseEvent *mEvent) {
 			// TODO:
 			OVERLAY_DEBUG_SET("event", "mouse move");
 
-			if (m_pDreamUIBar->IsVisible()) {
-
+			if (m_pDreamUIBar != nullptr && m_pDreamUIBar->IsVisible()) {
 				// update ray / test stuff
 				ray rCast;
 				CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));

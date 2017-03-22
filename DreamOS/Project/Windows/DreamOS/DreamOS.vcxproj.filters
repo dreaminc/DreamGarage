@@ -656,6 +656,9 @@
     <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamAppManager.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2434,6 +2437,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamAppManager.h">
+      <Filter>DreamOS</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

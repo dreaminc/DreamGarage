@@ -15,7 +15,7 @@
 
 class quad;
 
-class DreamContentView : public DreamApp, public Subscriber<InteractionObjectEvent> {
+class DreamContentView : public DreamApp<DreamContentView>, public Subscriber<InteractionObjectEvent> {
 public:
 	DreamContentView(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -24,6 +24,9 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 
 	virtual RESULT Notify(InteractionObjectEvent *event) override;
+
+protected:
+	static DreamContentView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	quad *m_pScreenQuad = nullptr;

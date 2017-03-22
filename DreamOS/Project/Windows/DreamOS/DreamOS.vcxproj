@@ -655,6 +655,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
     <ClCompile Include="..\..\..\Core\Utilities.cpp" />
     <ClCompile Include="..\..\..\DreamApp.cpp" />
+    <ClCompile Include="..\..\..\DreamAppManager.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
     <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
@@ -827,6 +828,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Core\Types\Object.h" />
     <ClInclude Include="..\..\..\Core\Utilities.h" />
     <ClInclude Include="..\..\..\DreamApp.h" />
+    <ClInclude Include="..\..\..\DreamAppManager.h" />
     <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h" />
     <ClInclude Include="..\..\..\DreamConsole\Console.h" />
     <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
