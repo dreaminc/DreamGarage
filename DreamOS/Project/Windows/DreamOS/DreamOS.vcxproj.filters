@@ -647,6 +647,9 @@
     <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp">
       <Filter>HAL</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
