@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <vector>
+#include <memory>
 
 #include "HTTPRequestHandler.h"
 
@@ -41,7 +42,8 @@ private:
 	size_t m_pFile_bytes = 0;
 
 	// Save to buffer
-	std::vector<uint8_t> m_bufferVector;
+	//std::vector<uint8_t> m_bufferVector;
+	std::shared_ptr<std::vector<uint8_t>> m_pBufferVector = nullptr;
 
 	HTTPResponseFileCallback m_fnResponseFileCallback = nullptr;
 };

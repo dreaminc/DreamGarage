@@ -7,6 +7,8 @@ HTTPRequestFileHandler::HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPRe
 	m_fnResponseFileCallback(fnResponseFileCallback)
 { 
 	m_pFile_bytes = 0;
+
+	m_pBufferVector = std::make_shared<std::vector<uint8_t>>();
 }
 
 HTTPRequestFileHandler::~HTTPRequestFileHandler() {
@@ -80,7 +82,7 @@ RESULT HTTPRequestFileHandler::OnHTTPRequestComplete() {
 		uint8_t *pBuffer = GetBuffer();
 		size_t pBuffer_n = GetBufferSize();
 
-		CR(m_fnResponseFileCallback(pBuffer, pBuffer_n));
+		CR(m_fnResponseFileCallback(m_pBufferVector));
 	}
 
 Error:
@@ -109,7 +111,7 @@ Error:
 }
 
 RESULT HTTPRequestFileHandler::ResetBuffer() {
-	m_bufferVector.clear();
+	m_pBufferVector->clear();
 	return R_PASS;
 }
 
@@ -123,7 +125,7 @@ RESULT HTTPRequestFileHandler::AppendToBuffer(char *pBuffer, size_t elementSize,
 
 	{
 		std::vector<uint8_t> newBufferVector(pBuffer, pBuffer + (pBuffer_n));
-		m_bufferVector.insert(m_bufferVector.end(), newBufferVector.begin(), newBufferVector.end());
+		m_pBufferVector->insert(m_pBufferVector->end(), newBufferVector.begin(), newBufferVector.end());
 	}
 
 Error:
@@ -132,10 +134,10 @@ Error:
 
 
 uint8_t* HTTPRequestFileHandler::GetBuffer() {
-	uint8_t* pBuffer = &m_bufferVector[0];
+	uint8_t* pBuffer = &(m_pBufferVector->operator[](0));
 	return pBuffer;
 }
 
 size_t HTTPRequestFileHandler::GetBufferSize() {
-	return m_bufferVector.size();
+	return m_pBufferVector->size();
 }

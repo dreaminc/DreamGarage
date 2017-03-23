@@ -860,6 +860,10 @@ texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE typ
 	return m_pHALImp->MakeTexture(pszFilename, type);
 }
 
+texture* SandboxApp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
+	return m_pHALImp->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, type);
+}
+
 skybox* SandboxApp::MakeSkybox() {
 	return m_pHALImp->MakeSkybox();
 }

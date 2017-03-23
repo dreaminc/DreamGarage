@@ -244,6 +244,10 @@ texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) 
 	return m_pSandbox->MakeTexture(pszFilename, type);
 }
 
+texture *DreamOS::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
+	return m_pSandbox->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, type);
+}
+
 texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
 	return m_pSandbox->MakeTexture(type, width, height, format, channels, pBuffer, pBuffer_n);
 }

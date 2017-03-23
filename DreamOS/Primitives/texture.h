@@ -48,6 +48,10 @@ public:
 	texture(texture::TEXTURE_TYPE type, int width, int height, int channels);
 	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
 	texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+
+	// Loads from a file buffer (file loaded into buffer)
+	texture(texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n);
+
 	texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture(wchar_t * pszName, std::vector<std::wstring> cubeMapFiles);
 	~texture();
@@ -71,6 +75,7 @@ public:
 
 	RESULT LoadTextureFromPath(wchar_t *pszFilepath);
 	RESULT LoadTextureFromFile(wchar_t *pszFilename);
+	RESULT LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n);
 	//RESULT LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
 	RESULT LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
 	RESULT LoadCubeMapByName(wchar_t * pszName);

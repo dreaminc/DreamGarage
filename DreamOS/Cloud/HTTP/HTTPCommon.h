@@ -9,8 +9,10 @@
 
 #include <functional>
 #include <string>
+#include <vector>
+#include <memory>
 
 typedef std::function<void(std::string&&)> HTTPResponseCallback;
-typedef std::function<RESULT(uint8_t*, size_t)> HTTPResponseFileCallback;
+typedef std::function<RESULT(std::shared_ptr<std::vector<uint8_t>>)> HTTPResponseFileCallback;
 
 #endif // ! HTTP_COMMON_H_

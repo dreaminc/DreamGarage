@@ -52,6 +52,26 @@ texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels
 	
 	Validate();
 	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
+// Loads from a file buffer (file loaded into buffer)
+texture::texture(texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n) :
+	m_pImageBuffer(nullptr),
+	m_width(0),
+	m_height(0),
+	m_channels(0),
+	m_type(type)
+{
+	RESULT r = R_PASS;
+
+	CR(LoadTextureFromFileBuffer(pBuffer, pBuffer_n));	
+
+	Validate();
+	return;
 Error:
 	Invalidate();
 	return;
@@ -69,7 +89,7 @@ texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::Pix
 
 	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n))
 
-		Validate();
+	Validate();
 	return;
 Error:
 	Invalidate();
@@ -292,6 +312,19 @@ Error:
 		pszFilePath = nullptr;
 	}
 
+	return r;
+}
+
+RESULT texture::LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n) {
+	RESULT r = R_PASS;
+	
+	m_pImageBuffer = SOIL_load_image_from_memory((unsigned char*)(pBuffer), (int)(pBuffer_n), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
+	CN(m_pImageBuffer);
+
+	// Flip image
+	CR(FlipTextureVertical());
+
+Error:
 	return r;
 }
 

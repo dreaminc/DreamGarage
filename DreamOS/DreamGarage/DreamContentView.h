@@ -14,6 +14,7 @@
 #include "InteractionEngine/InteractionObjectEvent.h"
 
 #include <map>
+#include <vector>
 
 class quad;
 class texture;
@@ -65,7 +66,7 @@ public:
 
 private:
 	RESULT SetScreenTexture(texture *pTexture);
-	RESULT HandleOnFileResponse(uint8_t *pBuffer, size_t pBuffer_n);
+	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector);
 
 protected:
 	static DreamContentView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -76,6 +77,8 @@ private:
 	float m_diagonalSize = DEFAULT_DIAGONAL_SIZE;
 	vector m_vNormal;
 
+
+	std::shared_ptr<std::vector<uint8_t>> m_pPendingBufferVector = nullptr;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

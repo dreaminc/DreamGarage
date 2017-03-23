@@ -61,11 +61,15 @@ RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
 	return m_pScreenQuad->SetColorTexture(pTexture);
 }
 
-RESULT DreamContentView::HandleOnFileResponse(uint8_t *pBuffer, size_t pBuffer_n) {
+RESULT DreamContentView::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector) {
 	RESULT r = R_PASS;
 
-	CR(r);
-	DEBUG_LINEOUT("file size %zd", pBuffer_n);
+	CN(pBufferVector);
+	CBM((m_pPendingBufferVector == nullptr), "New buffer already pending");
+	
+	// This is a thread safe increment - the pending buffer will get 
+	// picked up by the update (in the UI safe zone) and a texture will be created / set
+	m_pPendingBufferVector = pBufferVector;
 
 Error:
 	return r;
@@ -81,7 +85,7 @@ RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 	// Set up file request
 	DEBUG_LINEOUT("Requesting File %s", strURI.c_str());
 	
-	CR(pHTTPControllerProxy->RequestFile(strURI, std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2)));
+	CR(pHTTPControllerProxy->RequestFile(strURI, std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));
 
 Error:
 	return r;
@@ -102,10 +106,22 @@ Error:
 RESULT DreamContentView::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	int a = 5;
-	CR(r);
+	if (m_pPendingBufferVector != nullptr) {
+		uint8_t* pBuffer = &(m_pPendingBufferVector->operator[](0));
+		size_t pBuffer_n = m_pPendingBufferVector->size();
+
+		texture *pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		CN(pTexture);
+		CV(pTexture);
+
+		CR(SetScreenTexture(pTexture));
+	}
 
 Error:
+	if (m_pPendingBufferVector != nullptr) {
+		m_pPendingBufferVector = nullptr;
+	}
+
 	return r;
 }
 	   
