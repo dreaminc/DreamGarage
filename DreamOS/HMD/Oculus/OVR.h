@@ -70,6 +70,9 @@ public:
 
 	quaternion qLeftRotation;
 	quaternion qRightRotation;
+
+	composite *m_pLeftControllerModel;
+	composite *m_pRightControllerModel;
 	
 };
 
