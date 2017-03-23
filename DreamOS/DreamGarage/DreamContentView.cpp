@@ -61,6 +61,16 @@ RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
 	return m_pScreenQuad->SetColorTexture(pTexture);
 }
 
+RESULT DreamContentView::HandleOnFileResponse(uint8_t *pBuffer, size_t pBuffer_n) {
+	RESULT r = R_PASS;
+
+	CR(r);
+	DEBUG_LINEOUT("file size %zd", pBuffer_n);
+
+Error:
+	return r;
+}
+
 RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 	RESULT r = R_PASS;
 
@@ -71,7 +81,7 @@ RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 	// Set up file request
 	DEBUG_LINEOUT("Requesting File %s", strURI.c_str());
 	
-	CR(pHTTPControllerProxy->RequestFile(strURI));
+	CR(pHTTPControllerProxy->RequestFile(strURI, std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2)));
 
 Error:
 	return r;

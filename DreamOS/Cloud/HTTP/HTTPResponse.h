@@ -12,8 +12,6 @@
 #include <string>
 #include <functional>
 
-typedef std::function<void(std::string&&)> HTTPResponseCallback;
-
 class HTTPResponse {
 	friend class HTTPController;
 

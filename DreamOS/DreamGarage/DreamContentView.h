@@ -65,6 +65,7 @@ public:
 
 private:
 	RESULT SetScreenTexture(texture *pTexture);
+	RESULT HandleOnFileResponse(uint8_t *pBuffer, size_t pBuffer_n);
 
 protected:
 	static DreamContentView* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);

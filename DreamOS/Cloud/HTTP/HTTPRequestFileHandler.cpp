@@ -2,8 +2,9 @@
 #include "Sandbox/PathManager.h"
 #include "Core/Utilities.h"
 
-HTTPRequestFileHandler::HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback) :
-	HTTPRequestHandler(pHTTPRequest, pHTTPResponse, fnResponseCallback)
+HTTPRequestFileHandler::HTTPRequestFileHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseFileCallback fnResponseFileCallback) :
+	HTTPRequestHandler(pHTTPRequest, pHTTPResponse, nullptr),
+	m_fnResponseFileCallback(fnResponseFileCallback)
 { 
 	m_pFile_bytes = 0;
 }
@@ -44,11 +45,10 @@ Error:
 	return r;
 }
 
-RESULT HTTPRequestFileHandler::HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) {
+RESULT HTTPRequestFileHandler::SaveBufferToFilePath(char *pBuffer, size_t elementSize, size_t numElements) {
 	RESULT r = R_PASS;
 
 	size_t pBuffer_n = elementSize * numElements;
-
 	CN(pBuffer);
 	CB(pBuffer_n > 0);
 
@@ -71,4 +71,71 @@ Error:
 	}
 
 	return r;
+}
+
+RESULT HTTPRequestFileHandler::OnHTTPRequestComplete() {
+	RESULT r = R_PASS;
+
+	if (m_fnResponseFileCallback != nullptr) {
+		uint8_t *pBuffer = GetBuffer();
+		size_t pBuffer_n = GetBufferSize();
+
+		CR(m_fnResponseFileCallback(pBuffer, pBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
+RESULT HTTPRequestFileHandler::HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) {
+	RESULT r = R_PASS;
+
+	size_t pBuffer_n = elementSize * numElements;
+
+	CN(pBuffer);
+	CB(pBuffer_n > 0);
+
+	if (m_wstrDestinationFilePath.length() > 0) {
+		// Save to File
+		CR(SaveBufferToFilePath(pBuffer, elementSize, numElements));
+	}
+	else {
+		// Save (append) to buffer
+		CR(AppendToBuffer(pBuffer, elementSize, numElements));
+	}
+
+Error:
+	return r;
+}
+
+RESULT HTTPRequestFileHandler::ResetBuffer() {
+	m_bufferVector.clear();
+	return R_PASS;
+}
+
+RESULT HTTPRequestFileHandler::AppendToBuffer(char *pBuffer, size_t elementSize, size_t numElements) {
+	RESULT r = R_PASS;
+
+	size_t pBuffer_n = elementSize * numElements;
+
+	CN(pBuffer);
+	CB(pBuffer_n > 0);
+
+	{
+		std::vector<uint8_t> newBufferVector(pBuffer, pBuffer + (pBuffer_n));
+		m_bufferVector.insert(m_bufferVector.end(), newBufferVector.begin(), newBufferVector.end());
+	}
+
+Error:
+	return r;
+}
+
+
+uint8_t* HTTPRequestFileHandler::GetBuffer() {
+	uint8_t* pBuffer = &m_bufferVector[0];
+	return pBuffer;
+}
+
+size_t HTTPRequestFileHandler::GetBufferSize() {
+	return m_bufferVector.size();
 }

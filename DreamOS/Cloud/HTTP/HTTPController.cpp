@@ -131,12 +131,13 @@ void HTTPController::CURLMultihandleThreadProcess() {
 							
 							//transfers--;
 
-							std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler = FindPendingHTTPRequestHandler(pCURL);
+							std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler = PopPendingHTTPRequestHandler(pCURL);
 							if (pHTTPRequestHandler != nullptr) {
-								int a = 5;
+								CR(pHTTPRequestHandler->OnHTTPRequestComplete());
 							}
 
-							curl_multi_remove_handle(m_pCURLMultiHandle, pCURL);
+							curlMC = curl_multi_remove_handle(m_pCURLMultiHandle, pCURL);
+							CBM((curlMC == CURLM_OK), "curl_multi_remove_handle");
 
 							curl_easy_cleanup(pCURL);
 						}
@@ -166,6 +167,26 @@ size_t HTTPController::NumberOfPendingHTTPRequestHandlers() {
 
 bool HTTPController::IsHTTPRequestHandlerPending() {
 	return (NumberOfPendingHTTPRequestHandlers() > 0);
+}
+
+std::shared_ptr<HTTPRequestHandler> HTTPController::PopPendingHTTPRequestHandler(CURL *pCURL) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler = FindPendingHTTPRequestHandler(pCURL);
+	CN(pHTTPRequestHandler);
+
+	if (pHTTPRequestHandler != nullptr) {
+		CR(RemovePendingHTTPRequestHandler(pHTTPRequestHandler));
+	}
+
+// Success:
+	return pHTTPRequestHandler;
+
+Error:
+	if (pHTTPRequestHandler != nullptr) {
+		pHTTPRequestHandler = nullptr;
+	}
+	return nullptr;
 }
 
 std::shared_ptr<HTTPRequestHandler> HTTPController::FindPendingHTTPRequestHandler(CURL *pCURL) {
@@ -477,7 +498,7 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 	CN(pCURL);
 
 	pHTTPRequestFileHandler = std::make_shared<HTTPRequestFileHandler>(new HTTPRequest(pCURL, strURI, strHeaders, strBody),
-																	   (pHTTPResponse) ? pHTTPResponse : &m_defaultResponse,
+																	   pHTTPResponse,
 																	   nullptr);
 	CN(pHTTPRequestFileHandler);
 	CR(AddPendingHTTPRequestHandler(pHTTPRequestFileHandler));
@@ -504,7 +525,7 @@ Error:
 }
 
 
-RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseCallback fnResponseCallback) {
+RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseFileCallback fnResponseFileCallback) {
 	RESULT r = R_PASS;
 
 	CURLMcode curlMC = CURLM_OK;
@@ -517,7 +538,7 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 
 	pHTTPRequestFileHandler = std::make_shared<HTTPRequestFileHandler>(new HTTPRequest(pCURL, strURI, strHeaders, strBody),
 																	   nullptr,
-																	   fnResponseCallback);
+																	   fnResponseFileCallback);
 	CN(pHTTPRequestFileHandler);
 	CR(AddPendingHTTPRequestHandler(pHTTPRequestFileHandler));
 
@@ -542,6 +563,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT HTTPController::FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse& httpResponse) {
 	RESULT r = R_PASS;
 
@@ -567,6 +589,7 @@ RESULT HTTPController::FILE(const std::string& strURI, const std::vector<std::st
 Error:
 	return r;
 }
+*/
 
 HTTPControllerProxy* HTTPController::GetHTTPControllerProxy() {
 	return (HTTPControllerProxy*)(this);
@@ -598,6 +621,17 @@ Error:
 	return r;
 }
 
-RESULT HTTPController::RequestFile(std::string strURI) {
-	return RequestFile(strURI, std::wstring());
+RESULT HTTPController::RequestFile(std::string strURI, HTTPResponseFileCallback fnResponseFileCallback) {
+	RESULT r = R_PASS;
+
+	std::vector<std::string> strHeaders;
+	std::string strBody;
+	HTTPResponse httpResponse;
+
+	DEBUG_LINEOUT("Requesting file %s to buffer", strURI.c_str());
+
+	CR(AFILE(strURI, strHeaders, strBody, L"", fnResponseFileCallback));
+
+Error:
+	return r;
 }

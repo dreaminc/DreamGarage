@@ -46,6 +46,10 @@ CURL* HTTPRequestHandler::GetCURLHandle() {
 	return m_pHTTPRequest->GetCURLHandle();
 }
 
+RESULT HTTPRequestHandler::OnHTTPRequestComplete() {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT HTTPRequestHandler::HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) {
 	RESULT r = R_PASS;
 

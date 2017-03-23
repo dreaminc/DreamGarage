@@ -2444,6 +2444,9 @@
     <ClInclude Include="..\..\..\Primitives\Manager.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPCommon.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

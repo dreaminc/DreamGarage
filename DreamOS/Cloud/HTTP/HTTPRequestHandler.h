@@ -13,13 +13,14 @@
 
 class HTTPRequest;
 
-typedef std::function<void(std::string&&)> HTTPResponseCallback;
+#include "HTTPCommon.h"
 
 class HTTPRequestHandler {
 public:
 	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback);
 	~HTTPRequestHandler();
 
+	virtual RESULT OnHTTPRequestComplete();
 	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements);
 	RESULT HandleHTTPResponse(std::string strResponse);
 
