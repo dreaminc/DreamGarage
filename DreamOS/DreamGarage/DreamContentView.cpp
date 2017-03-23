@@ -1,6 +1,8 @@
 #include "DreamContentView.h"
 #include "DreamOS.h"
 
+#include "Cloud/HTTP/HTTPController.h"
+
 DreamContentView::DreamContentView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamContentView>(pDreamOS, pContext)
 {
@@ -63,21 +65,13 @@ RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 	RESULT r = R_PASS;
 
 	// Cloud Controller
-	CloudController *pCloudController = GetDOS()->GetCloudController();
-	HTTPControllerProxy *pHTTPControllerProxy = nullptr;
-	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
-	CN(pCloudController);
-	CN(pCommandLineManager);
-
-	// For later
-	m_pCloudController = pCloudController;
-
-	// Set up file request
-	DEBUG_LINEOUT("Requesting File %s", strImagePlaceholderURI.c_str());
-	pHTTPControllerProxy = (HTTPControllerProxy*)(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP));
+	HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
 	CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
 
-	CR(pHTTPControllerProxy->RequestFile(strImagePlaceholderURI, strImageDest));
+	// Set up file request
+	DEBUG_LINEOUT("Requesting File %s", strURI.c_str());
+	
+	CR(pHTTPControllerProxy->RequestFile(strURI));
 
 Error:
 	return r;

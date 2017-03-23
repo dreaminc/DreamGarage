@@ -148,6 +148,10 @@ CloudController *DreamOS::GetCloudController() {
 	return m_pSandbox->m_pCloudController;
 }
 
+ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
+	return GetCloudController()->GetControllerProxy(controllerType);
+}
+
 HALImp* DreamOS::GetHALImp() {
 	return m_pSandbox->m_pHALImp;
 }

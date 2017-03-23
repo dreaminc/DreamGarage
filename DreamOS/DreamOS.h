@@ -70,6 +70,8 @@ protected:
 
 	// Dream Apps
 public:
+	ControllerProxy* GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
+
 	// TODO: This is here because of template sillyness - but should be 
 	// put into a .tpp file with an #include of said tpp file at the end
 	// of the header

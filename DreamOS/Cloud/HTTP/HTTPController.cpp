@@ -394,7 +394,9 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 														 (pHTTPResponse) ? pHTTPResponse : &m_defaultResponse,
 														 nullptr);
 	CN(pHTTPRequestFileHandler);
-	pHTTPRequestFileHandler->SetDestinationFilePath(strDestinationPath);
+
+	if(strDestinationPath.length() > 0)
+		pHTTPRequestFileHandler->SetDestinationFilePath(strDestinationPath);
 
 	// Add the headers
 	for (const auto& strHeader : pHTTPRequestFileHandler->GetRequestHeaders()) 
@@ -430,7 +432,9 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 														 nullptr,
 														 fnResponseCallback);
 	CN(pHTTPRequestFileHandler);
-	pHTTPRequestFileHandler->SetDestinationFilePath(strDestinationPath);
+
+	if (strDestinationPath.length() > 0)
+		pHTTPRequestFileHandler->SetDestinationFilePath(strDestinationPath);
 
 	// Add the headers
 	for (const auto& strHeader : pHTTPRequestFileHandler->GetRequestHeaders()) 
@@ -504,4 +508,8 @@ RESULT HTTPController::RequestFile(std::string strURI, std::wstring strDestinati
 
 Error:
 	return r;
+}
+
+RESULT HTTPController::RequestFile(std::string strURI) {
+	return RequestFile(strURI, std::wstring());
 }

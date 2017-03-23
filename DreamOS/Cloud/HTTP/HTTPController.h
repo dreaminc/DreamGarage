@@ -27,6 +27,7 @@ class HTTPRequestFileHandler;
 class HTTPControllerProxy : public ControllerProxy {
 public:
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) = 0;
+	virtual RESULT RequestFile(std::string strURI) = 0;
 };
 
 
@@ -78,6 +79,7 @@ public:
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override;
 
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) override;
+	virtual RESULT RequestFile(std::string strURI) override;
 
 private:
 	// CURL Callbacks
