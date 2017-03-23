@@ -61,6 +61,7 @@ public:
 	RESULT UpdateViewQuad();
 
 	RESULT SetScreenTexture(const std::wstring &wstrTextureFilename);
+	RESULT SetScreenURI(const std::string &strURI);
 
 private:
 	RESULT SetScreenTexture(texture *pTexture);
