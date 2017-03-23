@@ -52,7 +52,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	CN(pContext);
 
 	pText = pContext->AddText(
-		labelFormat.font,
+		labelFormat.pFont,
 		labelFormat.strLabel,
 		labelFormat.fontSize,
 		true // force distance fields

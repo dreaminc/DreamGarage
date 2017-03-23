@@ -747,6 +747,24 @@ volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {
 	return MakeVolume(side, side, side, fTriangleBased);
 }
 
+text* OpenGLImp::MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
+{
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, pFont, content, size, isBillboard);
+	CN(pText);
+
+//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+	return nullptr;
+}
+
 text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
 {
 	RESULT r = R_PASS;

@@ -25,20 +25,18 @@ struct IconFormat
 	{}
 };
 
-//#define LABEL_SIZE 0.2f
 #define LABEL_SIZE 0.8f
 
 struct LabelFormat
 {
-	const std::wstring font;
+	std::shared_ptr<Font> pFont;
 	std::string strLabel;
 	float fontSize;
 	point ptPosition;
 	vector vScale;
 
 	LabelFormat() :
-		//font(L"ArialDistance.fnt"),
-		font(L"Basis_Grotesque_Pro.fnt"),
+		pFont(std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true)),
 		strLabel(""),
 		fontSize(LABEL_SIZE),
 		ptPosition(0.0f, 0.0f, 0.0f),
