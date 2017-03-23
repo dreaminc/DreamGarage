@@ -70,6 +70,9 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 		CBM((0), "Invalid Eye Passed");
 	}
 
+	// Frame buffer pointers set to respective eye now - avoid code duplication
+
+	// RENDER
 	CR(pOGLRenderFramebuffer->OGLInitialize());
 	CR(pOGLRenderFramebuffer->BindOGLFramebuffer());
 
@@ -79,6 +82,7 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 	CR(pOGLRenderFramebuffer->MakeOGLTextureMultisample());
 	CR(pOGLRenderFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
 
+	// RESOLVE
 	CR(pOGLResolveFramebuffer->OGLInitialize());
 	CR(pOGLResolveFramebuffer->BindOGLFramebuffer());
 
