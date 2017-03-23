@@ -26,7 +26,7 @@ struct IconFormat
 };
 
 //#define LABEL_SIZE 0.2f
-#define LABEL_SIZE 1.0f
+#define LABEL_SIZE 0.8f
 
 struct LabelFormat
 {
