@@ -85,24 +85,20 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 
 	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
 
+	// Oculus controller dimensions: 4.1 x 4.5 x 3.8 in.
+	// model is offcenter, displacing by half height and half depth helps (engine is in meters)
+
 	m_pLeftControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj",
 		nullptr,
-		//point(0.0f, 0.0f, 0.0f),
-		//point(0.0f, 0.0f, -0.1143f),
-		point(0.0f, 0.05715f, 0.0f),
+		point(0.0f, 0.05715f, -0.04826f),
 		1.0f,
 		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
-		//vector(0.0f, 0.0f, 0.0f));
 
 	m_pRightControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj",
 		nullptr,
-		//point(0.f, 0.0f, 0.0f),
-		//point(0.f, 0.0f, -0.1143f),
-		point(0.0f, 0.05715f, 0.0f),
+		point(0.0f, 0.05715f, -0.04826f),
 		1.0f,
-		//vector(0.0f, 0.0f, (float)(M_PI / 4.0f)));
 		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
-		//vector(0.0f, 0.0f, 0.0f));
 
 	m_pLeftControllerModel->SetVisible(false);
 	m_pRightControllerModel->SetVisible(false);
