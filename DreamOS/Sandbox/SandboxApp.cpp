@@ -8,6 +8,8 @@
 #include <HMD/OpenVR/OpenVRDevice.h>
 #include <HMD/Oculus/OVR.h>
 
+#include "DreamAppManager.h"
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -335,6 +337,9 @@ RESULT SandboxApp::RunAppLoop() {
 		// Time Manager
 		CR(m_pTimeManager->Update());
 
+		// App Manager
+		CR(m_pDreamAppManager->Update());
+
 		// Update Callback
 		if (m_fnUpdateCallback != nullptr) {
 			r = m_fnUpdateCallback();
@@ -451,13 +456,12 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
+	// Generalize this module pattern
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
-
-	// Initialize Physics Engine
+	CRM(InitializeTimeManager(), "Failed to initialize time manager");
+	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
 	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
-
-	// Initialize Interaction Engine
-	CRM(InitializeInteractionEngine(), "Failed to initialize intetraction engine");
+	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
 
 	// TODO: Remove CMD line arg and use global config
 	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
@@ -519,6 +523,32 @@ RESULT SandboxApp::InitializeInteractionEngine() {
 	CNM(m_pInteractionGraph, "Failed to allocate interaction Graph");
 
 	CRM(m_pInteractionEngine->SetInteractionGraph(m_pInteractionGraph), "Failed to set interaction object store");
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializeTimeManager() {
+	RESULT r = R_PASS;
+
+	// Initialize Time Manager
+	m_pTimeManager = std::make_unique<TimeManager>();
+
+	CNM(m_pTimeManager, "Failed to allocate Time Manager");
+	CVM(m_pTimeManager, "Failed to validate Time Manager");
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializeDreamAppManager() {
+	RESULT r = R_PASS;
+
+	// Initialize Time Manager
+	m_pDreamAppManager = std::make_unique<DreamAppManager>(GetDreamOSHandle());
+
+	CNM(m_pDreamAppManager, "Failed to allocate Dream App Manager");
+	CVM(m_pDreamAppManager, "Failed to validate Dream App Manager");
 
 Error:
 	return r;
@@ -832,6 +862,10 @@ texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE typ
 	return m_pHALImp->MakeTexture(pszFilename, type);
 }
 
+texture* SandboxApp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
+	return m_pHALImp->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, type);
+}
+
 skybox* SandboxApp::MakeSkybox() {
 	return m_pHALImp->MakeSkybox();
 }
@@ -1083,4 +1117,18 @@ RESULT SandboxApp::RegisterSubscriber(SenseControllerEventType controllerEvent, 
 
 Error:
 	return r;
+}
+
+RESULT SandboxApp::SetDreamOSHandle(DreamOS *pDreamOSHandle) {
+	RESULT r = R_PASS;
+
+	CN(pDreamOSHandle);
+	m_pDreamOSHandle = pDreamOSHandle;
+
+Error:
+	return r;
+}
+
+DreamOS *SandboxApp::GetDreamOSHandle() {
+	return m_pDreamOSHandle;
 }

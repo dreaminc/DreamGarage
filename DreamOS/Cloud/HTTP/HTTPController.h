@@ -13,6 +13,8 @@
 #include <vector>
 #include <functional>
 #include <thread>
+#include <list>
+#include <memory>
 
 #include "HTTPResponse.h"
 #include "HTTPRequest.h"
@@ -24,9 +26,12 @@
 class HTTPRequestHandler;
 class HTTPRequestFileHandler;
 
+#include "HTTPCommon.h"
+
 class HTTPControllerProxy : public ControllerProxy {
 public:
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) = 0;
+	virtual RESULT RequestFile(std::string strURI, HTTPResponseFileCallback fnResponseFileCallback) = 0;
 };
 
 
@@ -59,8 +64,8 @@ public:
 
 	// FILE DOWNLOAD
 	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse* pHTTPResponse = nullptr);
-	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseCallback fnResponseCallback);
-	RESULT FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse& httpResponse);
+	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseFileCallback fnResponseFileCallback);
+	//RESULT FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse& httpResponse);
 
 	static const std::vector<std::string> ContentHttp() {
 		return { "Content-Type: application/x-www-form-urlencoded" };
@@ -78,6 +83,7 @@ public:
 	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override;
 
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) override;
+	virtual RESULT RequestFile(std::string strURI, HTTPResponseFileCallback fnResponseFileCallback) override;
 
 private:
 	// CURL Callbacks
@@ -99,6 +105,19 @@ public:
 
 		return s_pInstance;
 	}
+
+
+private:
+	size_t NumberOfPendingHTTPRequestHandlers();
+	bool IsHTTPRequestHandlerPending();
+	std::shared_ptr<HTTPRequestHandler> PopPendingHTTPRequestHandler(CURL *pCURL);
+	std::shared_ptr<HTTPRequestHandler> FindPendingHTTPRequestHandler(CURL *pCURL);
+	std::shared_ptr<HTTPRequestHandler> FindPendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT AddPendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT RemovePendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT ClearPendingHTTPRequstHandlers();
+
+	std::list<std::shared_ptr<HTTPRequestHandler>> m_PendingHTTPRequestHandlers;
 
 private:
 	std::thread	m_thread;

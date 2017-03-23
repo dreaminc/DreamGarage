@@ -5,6 +5,8 @@
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 
+#include "DreamGarage/DreamContentView.h"
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -21,6 +23,18 @@ Error:
 
 UITestSuite::~UITestSuite() {
 	// empty
+}
+
+RESULT UITestSuite::AddTests() {
+	RESULT r = R_PASS;
+
+	CR(AddTestSharedContentView());
+
+	//CR(AddTestUI());
+	CR(AddTestInteractionUI());
+
+Error:
+	return r;
 }
 
 RESULT UITestSuite::Initialize() {
@@ -90,11 +104,72 @@ RESULT UITestSuite::InitializeUI() {
 	return r;
 }
 
+RESULT UITestSuite::AddTestSharedContentView() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 30.0f;
+	int nRepeats = 1;
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamContentView> pDreamContentView = nullptr;
+
+		CN(m_pDreamOS);
+
+		// Create the Shared View App
+		pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentView>(this);
+		CNM(pDreamContentView, "Failed to create dream content view");
+
+		// Set up the view
+		pDreamContentView->SetParams(point(0.0f), 5.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
+
+		//pDreamContentView->SetScreenTexture(L"crate_color.png");
+		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
+		pDreamContentView->SetScreenURI("https://static.dreamos.com/www/image/hero.387eddfc05dc.jpg");
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code 
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestInteractionUI() {
 	RESULT r = R_PASS;
 
 	struct TestContext {
-
 		DimRay *pRay = nullptr;
 	};
 
@@ -299,14 +374,6 @@ Error:
 	return r;
 }
 
-RESULT UITestSuite::AddTests() {
-	RESULT r = R_PASS;
-	//CR(AddTestUI());
-	CR(AddTestInteractionUI());
-Error:
-	return r;
-}
-
 RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 	RESULT r = R_PASS;
 
@@ -364,7 +431,9 @@ RESULT UITestSuite::Notify(SenseMouseEvent *mEvent) {
 
 			OVERLAY_DEBUG_SET("event", "mouse left up");
 			
-			CR(m_pDreamUIBar->HandleMenuUp());
+			if (m_pDreamUIBar != nullptr) {
+				CR(m_pDreamUIBar->HandleMenuUp());
+			}
 		} break;
 
 		//TODO: Currently broken
@@ -372,8 +441,7 @@ RESULT UITestSuite::Notify(SenseMouseEvent *mEvent) {
 			// TODO:
 			OVERLAY_DEBUG_SET("event", "mouse move");
 
-			if (m_pDreamUIBar->IsVisible()) {
-
+			if (m_pDreamUIBar != nullptr && m_pDreamUIBar->IsVisible()) {
 				// update ray / test stuff
 				ray rCast;
 				CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));

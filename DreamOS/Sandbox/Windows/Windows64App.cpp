@@ -111,10 +111,12 @@ Windows64App::Windows64App(TCHAR* pszClassName) :
 
 	// At this point WM_CREATE message is sent/received and rx-ed by WndProc
 
+	/*
 	// Initialize Time Manager
 	m_pTimeManager = new TimeManager();
 	CNM(m_pTimeManager, "Failed to allocate Time Manager");
 	CVM(m_pTimeManager, "Failed to validate Time Manager");
+	*/
 //TODO: use this label
 //Success:
 	Validate();
@@ -126,10 +128,7 @@ Error:
 }
 
 Windows64App::~Windows64App() {
-	if (m_pTimeManager != nullptr) {
-		delete m_pTimeManager;
-		m_pTimeManager = nullptr;
-	}
+	// empty
 }
 
 RESULT Windows64App::InitializeKeyboard() {

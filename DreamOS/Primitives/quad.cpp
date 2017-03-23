@@ -185,6 +185,21 @@ void quad::SetScaledBillboard(bool fScale) {
 	m_fScaledBillboard = fScale; 
 }
 
+RESULT quad::UpdateParams(float width, float height, vector vNormal) {
+	RESULT r = R_PASS;
+
+	if (width != m_width || height != m_height || vNormal != m_vNormal) {
+		m_width = width;
+		m_height = height;
+		m_vNormal = vNormal;
+
+		CR(SetVertices(width, height, vNormal));
+	}
+
+Error:
+	return r;
+}
+
 RESULT quad::UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleBased) {
 	RESULT r = R_PASS;
 
@@ -218,6 +233,7 @@ Error:
 RESULT quad::SetVertices(float width, float height, vector vNormal) {
 	RESULT r = R_PASS;
 
+	// TODO: potential mem leak in here (not dealloc previous buffer)
 	CR(Allocate());
 
 	float halfHeight = height / 2.0f;

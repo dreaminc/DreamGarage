@@ -1,6 +1,7 @@
 #include "DreamOS.h"
 
 #include "Logger/Logger.h"
+#include "DreamAppManager.h"
 
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
@@ -35,6 +36,7 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	m_pSandbox = SandboxFactory::MakeSandbox(CORE_CONFIG_SANDBOX_PLATFORM);
 	CNM(m_pSandbox, "Failed to create sandbox");
 	CVM(m_pSandbox, "Sandbox is Invalid!");
+	CRM(m_pSandbox->SetDreamOSHandle(this), "Failed to set DreamOS handle");
 
 	// This gives our DreamOS app instance a chance to configure the
 	// sandbox prior to it getting initialized 
@@ -146,6 +148,10 @@ CloudController *DreamOS::GetCloudController() {
 	return m_pSandbox->m_pCloudController;
 }
 
+ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
+	return GetCloudController()->GetControllerProxy(controllerType);
+}
+
 HALImp* DreamOS::GetHALImp() {
 	return m_pSandbox->m_pHALImp;
 }
@@ -236,6 +242,10 @@ text* DreamOS::AddText(const std::wstring& fontName, const std::string& content,
 
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	return m_pSandbox->MakeTexture(pszFilename, type);
+}
+
+texture *DreamOS::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
+	return m_pSandbox->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, type);
 }
 
 texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {

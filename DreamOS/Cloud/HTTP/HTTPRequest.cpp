@@ -18,9 +18,9 @@ HTTPRequest::HTTPRequest(CURL *pCURL, std::string strURI, std::vector<std::strin
 }
 
 HTTPRequest::~HTTPRequest() {
-	/*
 	// This is actually handled in the multi-handle thread code
 	// doing this here screws up the multi-handle
+	/*
 	if (m_pCURL != nullptr) {
 		curl_easy_cleanup(m_pCURL);
 		m_pCURL = nullptr;
@@ -30,6 +30,10 @@ HTTPRequest::~HTTPRequest() {
 
 const std::string& HTTPRequest::GetURI() {
 	return m_strURI;
+}
+
+CURL* HTTPRequest::GetCURLHandle() {
+	return m_pCURL;
 }
 
 std::vector<std::string> HTTPRequest::GetHeaders() {

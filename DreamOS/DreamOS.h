@@ -36,6 +36,8 @@
 
 #include "PhysicsEngine/PhysicsEngine.h"
 
+#include "DreamAppManager.h"
+
 class DreamOS : public Subscriber<CollisionObjectEvent>, public valid {
 	friend class CloudTestSuite;
 
@@ -65,6 +67,30 @@ protected:
 	// TODO: This is here temporarily, should be replaced by proper sandbox 
 	// related functionality
 	HALImp* GetHALImp();
+
+	// Dream Apps
+public:
+	ControllerProxy* GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
+
+	// TODO: This is here because of template sillyness - but should be 
+	// put into a .tpp file with an #include of said tpp file at the end
+	// of the header
+	template<class derivedAppType>
+	std::shared_ptr<derivedAppType> LaunchDreamApp(void *pContext) {
+		RESULT r = R_PASS;
+		
+		std::shared_ptr<derivedAppType> pDreamApp = m_pSandbox->m_pDreamAppManager->CreateRegisterAndStartApp<derivedAppType>(pContext);
+		CNM(pDreamApp, "Failed to create app");
+
+		return pDreamApp;
+
+	Error:
+		if (pDreamApp != nullptr) {
+			pDreamApp = nullptr;
+		}
+
+		return nullptr;
+	}
 
 //protected:
 public:
@@ -103,6 +129,7 @@ public:
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
 
 	skybox *AddSkybox();
 	skybox *MakeSkybox();

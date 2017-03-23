@@ -772,7 +772,10 @@ bool EnvironmentController::IsEnvironmentSocketConnected() {
 }
 
 MenuControllerProxy* EnvironmentController::GetMenuControllerProxy() {
-	return m_pMenuController->GetMenuControllerProxy();
+	if(m_pMenuController != nullptr)
+		return m_pMenuController->GetMenuControllerProxy();
+
+	return nullptr;
 }
 
 RESULT EnvironmentController::OnPeersUpdate(long index) {

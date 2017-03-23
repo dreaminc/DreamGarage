@@ -814,6 +814,25 @@ Error:
 		delete pTexture;
 		pTexture = nullptr;
 	}
+
+	return nullptr;
+}
+
+texture* OpenGLImp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
+	RESULT r = R_PASS;
+
+	texture *pTexture = new OGLTexture(this, type, pBuffer, pBuffer_n);
+	CN(pTexture);
+
+	//Success:
+	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+
 	return nullptr;
 }
 

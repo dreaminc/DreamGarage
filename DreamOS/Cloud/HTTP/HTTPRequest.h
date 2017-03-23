@@ -21,6 +21,7 @@ public:
 	std::vector<std::string> GetHeaders();
 	const std::string& GetBody();
 	const std::string& GetURI();
+	CURL *GetCURLHandle();
 
 private:
 	CURL* m_pCURL;

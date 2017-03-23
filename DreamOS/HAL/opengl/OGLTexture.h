@@ -56,6 +56,24 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	// Load from File Buffer (file loaded into buffer)
+	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n) :
+		texture(type, pBuffer, pBuffer_n),
+		m_textureIndex(0),
+		m_pParentImp(pParentImp)
+	{
+		RESULT r = OGLInitialize();
+		CR(r);
+
+	// Success:
+		Validate();
+		return;
+
+	Error:
+		InvalidateOverride();
+		return;
+	}
+
 	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels) :
 		texture(type, width, height, channels),
 		m_textureIndex(0),

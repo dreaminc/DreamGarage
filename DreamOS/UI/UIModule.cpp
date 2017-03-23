@@ -64,7 +64,7 @@ ray UIModule::GetHandRay() {
 		vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
 		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
 
-		// Accomodate for composite collision bug
+		// Accommodate for composite collision bug
 		ptHand = ptHand + point(-10.0f * vCast);
 		rCast = ray(ptHand, vCast);
 	}

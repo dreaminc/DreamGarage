@@ -649,6 +649,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp">
       <Filter>HMD\Oculus</Filter>
+	</ClCompile>
+    <ClCompile Include="..\..\..\DreamApp.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamAppManager.cpp">
+      <Filter>DreamOS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2422,6 +2431,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\HALTestSuite.h">
       <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamApp.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamAppManager.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Manager.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPCommon.h">
+      <Filter>Cloud\HTTP</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
