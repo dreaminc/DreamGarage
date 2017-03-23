@@ -88,6 +88,7 @@ RESULT MenuController::OnGetSubMenu(std::shared_ptr<CloudMessage> pCloudMessage)
 		std::shared_ptr<MenuNode> pMenuNode = nullptr;
 		if (jsonMenu.size() != 0) 
 			pMenuNode = std::make_shared<MenuNode>(jsonMenu);
+
 		CR(m_pMenuControllerObserver->OnMenuData(pMenuNode));
 	}
 

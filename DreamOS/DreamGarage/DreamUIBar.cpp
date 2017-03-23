@@ -194,7 +194,6 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		auto pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
 		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
 		m_pMenuNode = pMenuNode;
-		OVERLAY_DEBUG_SET("onmenu", pMenuNode->GetTitle());
 		m_pMenuNode->SetDirty();
 	}
 
