@@ -107,11 +107,13 @@ RESULT DreamGarage::LoadScene() {
 		sceneOffset,
 		sceneScale,
 		sceneDirection);
-	AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
+	composite* pClouds = AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
 		nullptr,
 		sceneOffset,
 		sceneScale,
 		sceneDirection);
+
+	pClouds->SetMaterialAmbient(0.8f);
 
 	std::shared_ptr<OGLObj> pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
 	if (pOGLObj != nullptr) {

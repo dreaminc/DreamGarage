@@ -784,6 +784,25 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
+text* SandboxApp::AddText(std::shared_ptr<Font> pFont, const std::string & content, double size, bool isBillboard) {
+	RESULT r = R_PASS;
+
+	text *pText = m_pHALImp->MakeText(pFont, content, size, isBillboard);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+	return nullptr;
+}
+
 text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard) {
 	RESULT r = R_PASS;
 

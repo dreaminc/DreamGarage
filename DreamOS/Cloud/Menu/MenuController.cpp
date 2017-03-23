@@ -88,7 +88,7 @@ RESULT MenuController::OnGetSubMenu(std::shared_ptr<CloudMessage> pCloudMessage)
 		std::shared_ptr<MenuNode> pMenuNode = nullptr;
 		if (jsonMenu.size() != 0) 
 			pMenuNode = std::make_shared<MenuNode>(jsonMenu);
-			
+
 		CR(m_pMenuControllerObserver->OnMenuData(pMenuNode));
 	}
 
@@ -104,7 +104,7 @@ CLOUD_CONTROLLER_TYPE MenuController::GetControllerType() {
 	return CLOUD_CONTROLLER_TYPE::MENU;
 }
 
-RESULT MenuController::RequestSubMenu(std::string strScope, std::string strPath) {
+RESULT MenuController::RequestSubMenu(std::string strScope, std::string strPath, std::string strTitle) {
 	RESULT r = R_PASS;
 
 	nlohmann::json jsonPayload;
@@ -121,6 +121,7 @@ RESULT MenuController::RequestSubMenu(std::string strScope, std::string strPath)
 	jsonPayload["menu"]["node_type"] = "NodeType.Folder";
 	jsonPayload["menu"]["path"] = strPath;
 	jsonPayload["menu"]["scope"] = strScope;
+	jsonPayload["menu"]["title"] = strTitle;
 
 	pCloudRequest = CloudMessage::CreateRequest(pParentCloudController, jsonPayload);
 	CN(pCloudRequest);

@@ -30,7 +30,7 @@ typedef struct UIBarFormat {
 	float headerPosY;
 
 	UIBarFormat() :
-		menuPosZ(-0.75f),
+		menuPosZ(-1.0f),
 		itemAngleX(60.0f),
 		itemAngleY(20.0f),
 		itemStartAngleY(-30.0f),

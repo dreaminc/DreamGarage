@@ -27,6 +27,7 @@ RESULT UIMenuItem::Initialize() {
 	CR(m_pContextComposite->InitializeOBB());
 
 	m_pQuad = m_pContextComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+	m_pQuad->SetMaterialAmbient(0.75f);
 	m_strName = "";
 
 Error:
@@ -51,12 +52,12 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	CN(pContext);
 
 	pText = pContext->AddText(
-		labelFormat.font,
+		labelFormat.pFont,
 		labelFormat.strLabel,
 		labelFormat.fontSize,
 		true // force distance fields
 	);
-	pText->MoveTo(labelFormat.ptPosition);
+	pText->SetPosition(labelFormat.ptPosition, text::AlignmentType::CENTER);
 
 	m_strName = labelFormat.strLabel;
 

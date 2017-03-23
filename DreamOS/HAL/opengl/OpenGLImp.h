@@ -31,6 +31,7 @@
 class SandboxApp; 
 class Windows64App;
 class OGLDreamConsole;
+class font;
 
 class OpenGLImp : public HALImp, public Subscriber<CmdPromptEvent> {
 private:
@@ -94,6 +95,7 @@ public:
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
 	
 	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
+	text* MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 	skybox *MakeSkybox();
