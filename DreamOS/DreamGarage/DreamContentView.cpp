@@ -23,6 +23,7 @@ RESULT DreamContentView::InitializeApp(void *pContext) {
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
 	m_pScreenQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
+	m_pScreenQuad->SetMaterialAmbient(0.8f);
 
 Error:
 	return r;
