@@ -28,6 +28,8 @@ public:
 	std::vector<std::string> GetRequestHeaders();
 	const std::string& GetRequestBody();
 
+	CURL *GetCURLHandle();
+
 private:
 	HTTPRequest* m_pHTTPRequest;
 	HTTPResponse* m_pHTTPResponse = nullptr;

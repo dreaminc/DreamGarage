@@ -13,6 +13,8 @@
 #include <vector>
 #include <functional>
 #include <thread>
+#include <list>
+#include <memory>
 
 #include "HTTPResponse.h"
 #include "HTTPRequest.h"
@@ -101,6 +103,18 @@ public:
 
 		return s_pInstance;
 	}
+
+
+private:
+	size_t NumberOfPendingHTTPRequestHandlers();
+	bool IsHTTPRequestHandlerPending();
+	std::shared_ptr<HTTPRequestHandler> FindPendingHTTPRequestHandler(CURL *pCURL);
+	std::shared_ptr<HTTPRequestHandler> FindPendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT AddPendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT RemovePendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT ClearPendingHTTPRequstHandlers();
+
+	std::list<std::shared_ptr<HTTPRequestHandler>> m_PendingHTTPRequestHandlers;
 
 private:
 	std::thread	m_thread;

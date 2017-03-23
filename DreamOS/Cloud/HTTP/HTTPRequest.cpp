@@ -32,6 +32,10 @@ const std::string& HTTPRequest::GetURI() {
 	return m_strURI;
 }
 
+CURL* HTTPRequest::GetCURLHandle() {
+	return m_pCURL;
+}
+
 std::vector<std::string> HTTPRequest::GetHeaders() {
 	return m_strHeaders;
 }
