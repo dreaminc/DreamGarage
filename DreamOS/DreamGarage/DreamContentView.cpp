@@ -61,7 +61,7 @@ Error:
 
 RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
 	if (m_fFitTextureAspectRatio) {
-		m_aspectRatio = pTexture->GetWidth() / pTexture->GetHeight();
+		m_aspectRatio = (float)pTexture->GetWidth() / (float)pTexture->GetHeight();
 		SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);
 	}
 
@@ -97,6 +97,10 @@ Error:
 RESULT DreamContentView::SetFitTextureAspectRatio(bool fFitTextureAspectRatio) {
 	m_fFitTextureAspectRatio = fFitTextureAspectRatio;
 	return R_PASS;
+}
+
+RESULT DreamContentView::SetVisible(bool fVisible) {
+	return m_pScreenQuad->SetVisible(fVisible);
 }
 
 RESULT DreamContentView::SetScreenURI(const std::string &strURI) {

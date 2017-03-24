@@ -14,6 +14,8 @@ light *g_pLight2 = nullptr;
 #include "Cloud/Message/UpdateHandMessage.h"
 #include "Cloud/Message/AudioDataMessage.h"
 
+#include "DreamGarage/DreamContentView.h"
+
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
 
@@ -350,6 +352,16 @@ RESULT DreamGarage::LoadScene() {
 	m_menu["Play"] = { "a", "b", "c" };
 
 	m_menuPath = {};
+
+	m_pDreamContentView = LaunchDreamApp<DreamContentView>(this);
+	CNM(m_pDreamContentView, "Failed to create dream content view");
+
+	m_pDreamContentView->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
+
+	m_pDreamContentView->SetVisible(false);
+	CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+
+	m_pDreamContentView->SetFitTextureAspectRatio(true);
 
 Error:
 	return r;
@@ -717,6 +729,17 @@ RESULT DreamGarage::HandleAudioData(long senderUserID, AudioDataMessage *pAudioD
 	pUser->UpdateMouth(mouthScale);
 
 Error:
+	return r;
+}
+
+RESULT DreamGarage::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	if (m_pDreamContentView != nullptr) {
+		m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset);
+		m_pDreamContentView->SetVisible(true);
+	}
+
 	return r;
 }
 

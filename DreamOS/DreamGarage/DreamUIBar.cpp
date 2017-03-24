@@ -136,8 +136,20 @@ RESULT DreamUIBar::HandleTriggerUp() {
 
 	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
-			m_pMenuControllerProxy->RequestSubMenu(pSubMenuNode->GetScope(), pSubMenuNode->GetPath(), pSubMenuNode->GetTitle());
-			m_pathStack.push(pSubMenuNode);
+			const std::string& strScope = pSubMenuNode->GetScope();
+			const std::string& strPath = pSubMenuNode->GetPath();
+			const std::string& strTitle = pSubMenuNode->GetTitle();
+
+			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
+				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
+				m_pathStack.push(pSubMenuNode);
+			}
+			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
+				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+			}
 		}
 	}
 

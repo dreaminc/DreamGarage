@@ -282,6 +282,7 @@ RESULT OVRHMD::UpdateHMD() {
 		quaternion qRotation = m_pParentSandbox->GetCamera()->GetOffsetOrientation();
 		qRotation.Reverse();
 		qOffset.SetQuaternionRotationMatrix(qRotation);
+		qRotation.Reverse();
 
 		int i = 0;
 		for (auto& hand : { m_pLeftHand, m_pRightHand }) {
@@ -303,12 +304,12 @@ RESULT OVRHMD::UpdateHMD() {
 			quaternion qOrientation = quaternion(*reinterpret_cast<quaternionXYZW*>(&(trackingState.HandPoses[i].ThePose.Orientation)));
 			// Act like this doesn't exist
 			qOrientation.Reverse();
-			qRotation.Reverse();
 			qOrientation *= qRotation;
 			qOrientation.Reverse();
 
 			quaternion base = i == 0 ? qLeftRotation : qRightRotation;
-			hand->SetOrientation(qOrientation * base);
+			hand->SetOrientation(qOrientation);
+			//hand->SetOrientation(qOrientation * base);
 			hand->SetLocalOrientation(qOrientation);
 			pModel->SetOrientation(qOrientation);
 			

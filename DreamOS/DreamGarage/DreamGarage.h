@@ -16,6 +16,8 @@
 
 #include "DreamUIBar.h"
 
+class DreamContentView;
+
 #include "Cloud/WebBrowser/browser.h"
 
 // temporary browser management for testring
@@ -78,6 +80,7 @@ public:
 	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
 	RESULT HandleAudioData(long senderUserID, AudioDataMessage *pAudioDataMessage);
+	RESULT HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 
 	user* ActivateUser(long userId);
 
@@ -116,6 +119,8 @@ private:
 	std::map<std::string, std::vector<std::string>> m_menu;
 	std::stack<std::string> m_menuPath;
 	std::shared_ptr<texture> m_pIconTexture;
+
+	std::shared_ptr<DreamContentView> m_pDreamContentView;
 
 	// CEF
 	Browsers m_browsers;

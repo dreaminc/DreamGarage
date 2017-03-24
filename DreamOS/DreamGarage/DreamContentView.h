@@ -70,6 +70,8 @@ public:
 
 	RESULT SetFitTextureAspectRatio(bool fFitTextureAspectRatio);
 
+	RESULT SetVisible(bool fVisible);
+
 private:
 	RESULT SetScreenTexture(texture *pTexture);
 	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector);
