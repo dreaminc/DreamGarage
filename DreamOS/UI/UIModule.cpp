@@ -77,6 +77,7 @@ ray UIModule::GetHandRay() {
 		vector vHandLook = RotationMatrix(qHand) * vector(0.0f, 0.0f, -1.0f);
 		vHandLook.Normalize();
 
+
 		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
 
 		if (m_pTestRayController != nullptr) {
