@@ -8,6 +8,7 @@
 
 #include "Cloud/Menu/MenuController.h"
 #include "Cloud/Menu/MenuNode.h"
+#include "Cloud/Environment/EnvironmentController.h"
 
 class DreamUIBar : public UIBar, public MenuController::observer {
 
@@ -44,6 +45,8 @@ private:
 	//Cloud member variables
 	CloudController *m_pCloudController = nullptr;
 	MenuControllerProxy *m_pMenuControllerProxy = nullptr;
+	EnvironmentControllerProxy *m_pEnvironmentControllerProxy = nullptr;
+
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
