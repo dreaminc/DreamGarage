@@ -40,6 +40,9 @@ RESULT UIModule::Initialize() {
 
 	m_pCurrentItem = nullptr;
 
+	m_pTestRayController = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
+	m_pTestRayLookV = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
+
 Error:
 	return r;
 }
@@ -60,9 +63,15 @@ ray UIModule::GetHandRay() {
 		quaternion qHand = pRightHand->GetHandState().qOrientation;
 		qHand.Normalize();
 
+		m_pTestRayController->SetPosition(ptHand);
+		m_pTestRayController->SetOrientation(qHand);
+
 		//TODO: investigate how to properly get look vector for controllers
 		vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
 		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
+
+		m_pTestRayLookV->SetPosition(ptHand);
+		m_pTestRayLookV->SetOrientation(quaternion(vHandLook));
 
 		// Accommodate for composite collision bug
 		ptHand = ptHand + point(-10.0f * vCast);
