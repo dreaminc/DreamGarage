@@ -33,10 +33,10 @@ RESULT user::Initialize() {
 	//*/
 
 	// for now the mouth is in a hardcoded position attached to the face model
-	m_pMouth = AddQuad(0.3, 1.0);
+	m_pMouth = m_pHead->AddQuad(0.3, 1.0);
+	m_pMouth->MoveTo(0.0f, -0.135f, 0.1f);
 
 	m_pMouth->RotateXByDeg(270);
-	m_pMouth->MoveTo(0, 0.25f - 0.35f - 0.05f, -0.17f + HEAD_POS);
 
 	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	
@@ -44,7 +44,6 @@ RESULT user::Initialize() {
 	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());
 
 	m_pMouth->Scale(0.1f);
-	m_pHead->AddChild(m_pMouth);
 
 	// Hands
 	m_pLeapLeftHand = AddHand();
