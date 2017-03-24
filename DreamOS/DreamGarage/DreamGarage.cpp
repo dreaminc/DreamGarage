@@ -70,9 +70,11 @@ RESULT DreamGarage::LoadScene() {
 	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
 	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
 
+	/* If you want to turn on reference geo
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = true;
 	SetHALConfiguration(halconf);
+	*/
 
 	// Console
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);

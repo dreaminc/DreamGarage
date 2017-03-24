@@ -43,8 +43,8 @@ RESULT UIModule::Initialize() {
 	/*
 	m_pTestRayController = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
 	m_pTestRayLookV = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
-	*/
 	m_pSphere = m_pDreamOS->AddSphere(0.02f, 10, 10);
+	*/
 
 Error:
 	return r;

@@ -63,6 +63,7 @@ public:
 private:
 	std::shared_ptr<composite> m_pContextComposite;
 	std::shared_ptr<quad> m_pQuad;
+	std::shared_ptr<quad> m_pQuadInvisible;
 	std::string m_strName;
 
 private:
