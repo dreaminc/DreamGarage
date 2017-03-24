@@ -2,6 +2,7 @@
 #include "DreamOS.h"
 
 #include "Cloud/HTTP/HTTPController.h"
+#include "Cloud/Environment/EnvironmentAsset.h"
 
 DreamContentView::DreamContentView(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamContentView>(pDreamOS, pContext)
@@ -59,6 +60,11 @@ Error:
 }
 
 RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
+	if (m_fFitTextureAspectRatio) {
+		m_aspectRatio = pTexture->GetWidth() / pTexture->GetHeight();
+		SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);
+	}
+
 	return m_pScreenQuad->SetColorTexture(pTexture);
 }
 
@@ -76,6 +82,23 @@ Error:
 	return r;
 }
 
+RESULT DreamContentView::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	if (pEnvironmentAsset != nullptr) {
+		std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
+		CR(SetScreenURI(strEnvironmentAssetURI));
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamContentView::SetFitTextureAspectRatio(bool fFitTextureAspectRatio) {
+	m_fFitTextureAspectRatio = fFitTextureAspectRatio;
+	return R_PASS;
+}
+
 RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 	RESULT r = R_PASS;
 
@@ -83,10 +106,20 @@ RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 	HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
 	CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
 
+	UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+	CNM(pUserControllerProxy, "Failed to get user controller proxy");
+
 	// Set up file request
 	DEBUG_LINEOUT("Requesting File %s", strURI.c_str());
-	
-	CR(pHTTPControllerProxy->RequestFile(strURI, std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));
+	{
+		std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+		//auto strHeaders = HTTPController::ContentAcceptJson();
+
+		auto strHeaders = HTTPController::ContentHttp();
+		strHeaders.push_back(strAuthorizationToken);
+
+		CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));
+	}
 
 Error:
 	return r;
@@ -171,16 +204,20 @@ RESULT DreamContentView::SetDiagonalSize(float diagonalSize) {
 	return R_PASS;
 }
 
-RESULT DreamContentView::SetParams(point ptPosition, float diagonal, AspectRatio aspectRatio, vector vNormal) {
+RESULT DreamContentView::SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal) {
 	GetComposite()->SetPosition(ptPosition);
 	m_diagonalSize = diagonal;
-	m_aspectRatio = k_aspectRatios[aspectRatio];
+	m_aspectRatio = aspectRatio;
 	m_vNormal = vNormal.Normal();
 
 	if (m_pScreenQuad != nullptr)
 		return UpdateViewQuad();
 
 	return R_PASS;
+}
+
+RESULT DreamContentView::SetParams(point ptPosition, float diagonal, AspectRatio aspectRatio, vector vNormal) {
+	return SetParams(ptPosition, diagonal, k_aspectRatios[aspectRatio], vNormal);
 }
 
 RESULT DreamContentView::SetNormalVector(vector vNormal) {

@@ -739,6 +739,7 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 }
 
 // TODO: Fill out pattern for other controllers
+// TODO: Replace with polymorphic fns
 ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
 	ControllerProxy *pProxy = nullptr;
 
@@ -753,7 +754,11 @@ ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE contr
 
 		case CLOUD_CONTROLLER_TYPE::ENVIRONMENT: {
 			pProxy = (ControllerProxy*)(GetEnvironmentControllerProxy());
-		}
+		} break;
+
+		case CLOUD_CONTROLLER_TYPE::USER: {
+			pProxy = (ControllerProxy*)(GetUserControllerProxy());
+		} break;
 	}
 
 	return pProxy;
@@ -774,6 +779,14 @@ RESULT CloudController::RegisterControllerObserver(CLOUD_CONTROLLER_TYPE control
 
 Error:
 	return r;
+}
+
+// TODO: Replace all of these with polymorphic fns 
+UserControllerProxy* CloudController::GetUserControllerProxy() {
+	if (m_pUserController != nullptr)
+		return m_pUserController->GetUserControllerProxy();
+
+	return nullptr;
 }
 
 MenuControllerProxy* CloudController::GetMenuControllerProxy() {

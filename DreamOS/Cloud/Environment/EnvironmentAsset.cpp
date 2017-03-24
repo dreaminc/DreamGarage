@@ -61,3 +61,11 @@ const std::string& EnvironmentAsset::GetStorageProviderScope() {
 const std::string& EnvironmentAsset::GetTitle() {
 	return m_strTitle;
 }
+
+std::string EnvironmentAsset::GetURI() {
+	std::string strURI = "https://api.develop.dreamos.com/environment-asset/";
+	strURI += std::to_string(m_assetID);
+	strURI += "/file";
+
+	return strURI;
+}

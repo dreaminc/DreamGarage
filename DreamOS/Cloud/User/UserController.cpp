@@ -17,6 +17,8 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include "Cloud/CloudController.h"
+
 UserController::UserController(Controller* pParentController) :
 	Controller(pParentController),
 	m_fLoggedIn(false)
@@ -275,6 +277,18 @@ Error:
 
 bool UserController::IsLoggedIn() {
 	return m_fLoggedIn;
+}
+
+UserControllerProxy* UserController::GetUserControllerProxy() {
+	return (UserControllerProxy*)(this);
+}
+
+std::string UserController::GetUserToken() {
+	return m_strToken;
+}
+
+CLOUD_CONTROLLER_TYPE UserController::GetControllerType() {
+	return CLOUD_CONTROLLER_TYPE::USER;
 }
 
 // TODO: This may want to move to an API controller object instead

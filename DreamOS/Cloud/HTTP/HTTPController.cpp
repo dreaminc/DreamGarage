@@ -512,7 +512,7 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 
 	// CURL
 	curlC = curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
-	curlC = //curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+	curlC = curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
 	curlC = curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
 	curlC = curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler.get());
 
@@ -529,6 +529,7 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 	RESULT r = R_PASS;
 
 	CURLMcode curlMC = CURLM_OK;
+	CURLcode curlC = CURLE_OK;
 
 	std::shared_ptr<HTTPRequestFileHandler>	pHTTPRequestFileHandler = nullptr;
 	struct curl_slist *pCURLList = nullptr;
@@ -550,10 +551,10 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 		pCURLList = curl_slist_append(pCURLList, strHeader.c_str());
 
 	// CURL
-	curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
-	//curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
-	curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
-	curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler.get());
+	curlC = curl_easy_setopt(pCURL, CURLOPT_URL, pHTTPRequestFileHandler->GetRequestURI().c_str());
+	curlC = curl_easy_setopt(pCURL, CURLOPT_HTTPHEADER, pCURLList);
+	curlC = curl_easy_setopt(pCURL, CURLOPT_WRITEFUNCTION, &HTTPController::RequestCallback);
+	curlC = curl_easy_setopt(pCURL, CURLOPT_WRITEDATA, pHTTPRequestFileHandler.get());
 
 	// Add multi handle (will get picked up in thread)
 	curlMC = curl_multi_add_handle(m_pCURLMultiHandle, pCURL);
@@ -621,11 +622,11 @@ Error:
 	return r;
 }
 
-RESULT HTTPController::RequestFile(std::string strURI, HTTPResponseFileCallback fnResponseFileCallback) {
+RESULT HTTPController::RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback) {
 	RESULT r = R_PASS;
 
-	std::vector<std::string> strHeaders;
-	std::string strBody;
+	//std::vector<std::string> strHeaders;
+	//std::string strBody;
 	HTTPResponse httpResponse;
 
 	DEBUG_LINEOUT("Requesting file %s to buffer", strURI.c_str());

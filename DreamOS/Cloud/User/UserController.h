@@ -14,8 +14,15 @@
 #include "Cloud/User/User.h"
 #include "Cloud/User/TwilioNTSInformation.h"
 
+#include "Cloud/ControllerProxy.h"
+
+class UserControllerProxy : public ControllerProxy {
+public:
+	virtual std::string GetUserToken() = 0;
+};
+
 // TODO: This is actually a UserController - so change the name of object and file
-class UserController : public Controller {
+class UserController : public Controller, public UserControllerProxy {
 public:
 	enum class UserMethod {
 		LOGIN,
@@ -45,6 +52,12 @@ public:
 	RESULT LoadTwilioNTSInformation();
 
 	bool IsLoggedIn();
+
+	// UserControllerProxy
+	UserControllerProxy* GetUserControllerProxy();
+	virtual std::string GetUserToken() override;
+	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) { return R_NOT_IMPLEMENTED; }
 
 private:
 	std::string GetMethodURI(UserMethod userMethod);

@@ -97,6 +97,8 @@ RESULT HTTPRequestFileHandler::HandleHTTPResponse(char *pBuffer, size_t elementS
 	CN(pBuffer);
 	CB(pBuffer_n > 0);
 
+	DEBUG_LINEOUT("buffer size %zd", pBuffer_n);
+
 	if (m_wstrDestinationFilePath.length() > 0) {
 		// Save to File
 		CR(SaveBufferToFilePath(pBuffer, elementSize, numElements));
