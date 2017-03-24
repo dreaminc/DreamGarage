@@ -553,6 +553,9 @@ bool BoundingBox::Intersect(const ray& r) {
 	point ptMin = (GetAbsoluteOrigin() - GetHalfVector());
 	point ptMax = (GetAbsoluteOrigin() + GetHalfVector());
 
+	if (adjRay.ptOrigin() < ptMax && adjRay.ptOrigin() > ptMin)
+		return true;
+
 	for (int i = 0; i < 3; i++) {
 		double t1 = (ptMin(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);
 		double t2 = (ptMax(i) - adjRay.ptOrigin()(i)) / adjRay.vDirection()(i);

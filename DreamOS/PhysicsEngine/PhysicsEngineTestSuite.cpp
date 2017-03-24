@@ -937,7 +937,7 @@ RESULT PhysicsEngineTestSuite::AddTestRayQuadsComposite() {
 			pTestContext->pCollidePoint[i]->SetVisible(false);
 		}
 
-		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, 2.0f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
+		pTestContext->pRay = m_pDreamOS->AddRay(point(-3.0f, -0.5f, 0.0f), vector(0.5f, -1.0f, 0.0f).Normal());
 		CN(pTestContext->pRay);
 
 		///*

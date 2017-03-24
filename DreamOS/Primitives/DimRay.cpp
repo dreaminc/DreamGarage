@@ -136,6 +136,15 @@ ray DimRay::GetRay() {
 	return ray(ptOrigin, vDirection);
 }
 
+ray DimRay::GetRayFromVerts() {
+	point ptOrigin = m_pVertices[0].GetPoint();
+	//vector vDirection = (RotationMatrix(GetOrientation()) * m_pVertices[1].GetPoint()) - (RotationMatrix(GetOrientation()) * m_pVertices[0].GetPoint());
+	vector vDirection = m_pVertices[1].GetPoint() - m_pVertices[0].GetPoint();
+	vDirection.Normalize();
+
+	return ray(ptOrigin, vDirection);
+}
+
 RESULT DimRay::UpdateFromRay(const ray &rCast) {
 	RESULT r = R_PASS;
 

@@ -28,6 +28,7 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestInteractionFauxUI());
 	CR(AddTestSharedContentView());
 
 	//CR(AddTestUI());
@@ -161,6 +162,160 @@ RESULT UITestSuite::AddTestSharedContentView() {
 	pUITest->SetTestDescription("Basic test of shared content view working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT UITestSuite::AddTestInteractionFauxUI() {
+	RESULT r = R_PASS;
+
+	struct TestContext {
+		DimRay *pRay = nullptr;
+		composite *pComposite = nullptr;
+	};
+
+	TestContext *pTestContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		composite *pComposite = nullptr;
+		std::shared_ptr<composite> pChildComposite = nullptr;
+		std::shared_ptr<composite> pChildItemComposite = nullptr;
+		std::shared_ptr<quad> pQuad = nullptr;
+
+		pTestContext->pRay = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
+		CN(pTestContext->pRay);
+
+		
+		m_pSphere1 = m_pDreamOS->AddSphere(0.02f, 10, 10);
+		m_pSphere2 = m_pDreamOS->AddSphere(0.02f, 10, 10);
+		
+		// Create Faux UI here
+
+		pComposite = m_pDreamOS->AddComposite();
+		CN(pComposite);
+
+		pTestContext->pComposite = pComposite;
+		pComposite->InitializeOBB();
+
+		//pComposite->SetMass(1.0f);
+
+		// Layer
+		pChildComposite = pComposite->AddComposite();
+		CN(pChildComposite);
+		CR(pChildComposite->InitializeOBB());
+
+		// Quads
+		pChildItemComposite = pChildComposite->AddComposite();
+		CR(pChildItemComposite->InitializeOBB());
+		pQuad = pChildItemComposite->AddQuad(0.5f, 0.5f);
+		pQuad->RotateXByDeg(105.0f);
+		pChildItemComposite->SetPosition(point(-2.0f, 0.0f, 0.0f));
+		pChildItemComposite->RotateYByDeg(20.0f);
+
+		pChildItemComposite = pChildComposite->AddComposite();
+		CR(pChildItemComposite->InitializeOBB());
+		pQuad = pChildItemComposite->AddQuad(0.5f, 0.5f);
+		pQuad->RotateXByDeg(105.0f);
+		pChildItemComposite->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		pChildItemComposite->RotateYByDeg(10.0f);
+
+		pChildItemComposite = pChildComposite->AddComposite();
+		CR(pChildItemComposite->InitializeOBB());
+		pQuad = pChildItemComposite->AddQuad(0.5f, 0.5f);
+		pQuad->RotateXByDeg(105.0f);
+		pChildItemComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
+		//pChildItemComposite->RotateYByDeg(0.0f);
+
+		pChildItemComposite = pChildComposite->AddComposite();
+		CR(pChildItemComposite->InitializeOBB());
+		pQuad = pChildItemComposite->AddQuad(0.5f, 0.5f);
+		pQuad->RotateXByDeg(105.0f);
+		pChildItemComposite->SetPosition(point(1.0f, 0.0f, 0.0f));
+		pChildItemComposite->RotateYByDeg(-10.0f);
+
+		pChildItemComposite = pChildComposite->AddComposite();
+		CR(pChildItemComposite->InitializeOBB());
+		pQuad = pChildItemComposite->AddQuad(0.5f, 0.5f);
+		pQuad->RotateXByDeg(105.0f);
+		pChildItemComposite->SetPosition(point(2.0f, 0.0f, 0.0f));
+		pChildItemComposite->RotateYByDeg(-20.0f);
+
+		// Move Composite
+		pChildComposite->SetPosition(point(0.0f, 0.0f, -4.0f));
+
+		pComposite->SetPosition(point(0.0f, 1.5f, 6.0f));
+
+		// Add composite to interaction
+		//CR(m_pDreamOS->AddInteractionObject(pComposite));
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		hand* pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+
+		if (pRightHand != nullptr && pTestContext->pRay != nullptr) {
+			pTestContext->pRay->SetPosition(pRightHand->GetPosition());
+			pTestContext->pRay->SetOrientation(pRightHand->GetHandState().qOrientation);
+
+			point p0 = pRightHand->GetPosition();
+			//GetLookVector
+			quaternion q = pRightHand->GetHandState().qOrientation;
+			q.Normalize();
+
+			vector v = q.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+			vector v2 = vector(-v.x(), -v.y(), v.z());
+			vector vHandLook = RotationMatrix(q) * vector(0.0f, 0.0f, -1.0f);
+
+			ray rcast = ray(p0, vHandLook);
+
+			CollisionManifold manifold = pTestContext->pComposite->Collide(rcast);
+
+			if (manifold.NumContacts() > 0) {
+				int numContacts = manifold.NumContacts();
+
+				if (numContacts > 2)
+					numContacts = 2;
+				for (int i = 0; i < numContacts; i++) {
+					sphere *pSphere = (i == 0) ? m_pSphere1 : m_pSphere2;
+
+					if (pSphere != nullptr) {
+						pSphere->SetVisible(true);
+						pSphere->SetPosition(manifold.GetContactPoint(i).GetPoint());
+					}
+				}
+			}
+		
+
+			m_pDreamOS->UpdateInteractionPrimitive(rcast);
+
+		}
+		return r;
+	};
+
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto fnReset = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("UI Faux Interaction Engine Test");
+	pUITest->SetTestDescription("UI Basic Testing Environment");
+	pUITest->SetTestDuration(10000.0);
+	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;
