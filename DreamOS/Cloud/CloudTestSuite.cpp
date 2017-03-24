@@ -5,6 +5,8 @@
 #include "Cloud/Menu/MenuNode.h"
 #include "Cloud/HTTP/HTTPController.h"
 
+#include "Cloud/Environment/EnvironmentAsset.h"
+
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -232,6 +234,18 @@ Error:
 	return r;
 }
 
+RESULT CloudTestSuite::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	CR(r);
+	pEnvironmentAsset->PrintEnvironmentAsset();
+
+	//https://api.develop.dreamos.com/environment-asset/{id}/file
+
+Error:
+	return r;
+}
+
 RESULT CloudTestSuite::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
@@ -278,6 +292,8 @@ RESULT CloudTestSuite::AddTestMenuAPI() {
 		CN(pCloudController);
 		CBM(pCloudController->IsUserLoggedIn(), "User not logged in");
 		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
+
+		CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&CloudTestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
 		
 		// Set up menu stuff
 		DEBUG_LINEOUT("Requesting Menu");

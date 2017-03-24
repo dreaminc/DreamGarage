@@ -34,6 +34,7 @@ class HTTPControllerProxy;
 
 class User;
 class TwilioNTSInformation;
+class EnvironmentAsset;
 
 typedef std::function<RESULT(long)> HandlePeersUpdateCallback;
 
@@ -41,6 +42,7 @@ typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 typedef std::function<RESULT(long, AudioDataMessage*)> HandleAudioDataCallback;
+typedef std::function<RESULT(std::shared_ptr<EnvironmentAsset>)> HandleEnvironmentAssetCallback;
 
 enum class CLOUD_CONTROLLER_TYPE {
 	CLOUD,
@@ -62,12 +64,13 @@ protected:
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
 
 public:
+	// TODO: Replace with proxy or other better pattern this is getting out of control
 	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);
-
 	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
 	RESULT RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback);
+	RESULT RegisterEnvironmentAssetCallback(HandleEnvironmentAssetCallback fnHandleEnvironmentAssetCallback);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
@@ -128,6 +131,7 @@ public:
 		int sample_rate,
 		size_t number_of_channels,
 		size_t number_of_frames) override;
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
@@ -166,6 +170,7 @@ private:
 	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
 	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
 	HandleAudioDataCallback m_fnHandleAudioDataCallback;
+	HandleEnvironmentAssetCallback m_fnHandleEnvironmentAssetCallback;
 
 	std::thread	m_thread;
 	bool m_fRunning;

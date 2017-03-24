@@ -581,21 +581,16 @@ RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloud
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
 	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
 
-	std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
-	CN(pEnvironmentAsset);
+	if (jsonEnvironmentAsset.size() != 0) {
+		std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
+		CN(pEnvironmentAsset);
 
-	CR(pEnvironmentAsset->PrintEnvironmentAsset());
+		//CR(pEnvironmentAsset->PrintEnvironmentAsset());
 
-	/*
-	if (m_pMenuControllerObserver != nullptr) {
-		std::shared_ptr<MenuNode> pMenuNode = nullptr;
-		if (jsonEnvironmentAsset.size() != 0)
-			pMenuNode = std::make_shared<MenuNode>(jsonEnvironmentAsset);
-
-		CR(m_pMenuControllerObserver->OnMenuData(pMenuNode));
-	}*/
-
-	// TODO:
+		if (m_pEnvironmentControllerObserver != nullptr) {
+			CR(m_pEnvironmentControllerObserver->OnEnvironmentAsset(pEnvironmentAsset));
+		}
+	}
 
 Error:
 	return r;

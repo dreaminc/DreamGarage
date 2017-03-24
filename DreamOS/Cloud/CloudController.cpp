@@ -186,6 +186,16 @@ RESULT CloudController::RegisterAudioDataCallback(HandleAudioDataCallback fnHand
 	}
 }
 
+RESULT CloudController::RegisterEnvironmentAssetCallback(HandleEnvironmentAssetCallback fnHandleEnvironmentAssetCallback) {
+	if (m_fnHandleEnvironmentAssetCallback) {
+		return R_FAIL;
+	}
+	else {
+		m_fnHandleEnvironmentAssetCallback = fnHandleEnvironmentAssetCallback;
+		return R_PASS;
+	}
+}
+
 RESULT CloudController::SetCloudImp(std::unique_ptr<CloudImp> pCloudImp) {
 	RESULT r = R_PASS;
 
@@ -314,12 +324,24 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) {
+	RESULT r = R_PASS;
+
+	if (m_fnHandleEnvironmentAssetCallback != nullptr) {
+		CR(m_fnHandleEnvironmentAssetCallback(pEnvironmnetAsset));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnAudioData(long peerConnectionID,
 	const void* audio_data,
 	int bits_per_sample,
 	int sample_rate,
 	size_t number_of_channels,
-	size_t number_of_frames) {
+	size_t number_of_frames) 
+{
 	RESULT r = R_PASS;
 
 	if (m_fnHandleAudioDataCallback != nullptr) {

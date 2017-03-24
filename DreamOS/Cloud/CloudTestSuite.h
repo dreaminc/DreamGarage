@@ -15,6 +15,7 @@
 
 class DreamOS;
 class CloudController;
+class EnvironmentAsset;
 
 class CloudTestSuite : public TestSuite, public MenuController::observer {
 public:
@@ -32,6 +33,9 @@ public:
 
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
+
+	// Environment Asset Callback
+	RESULT HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 
 private:
 	CloudController *GetCloudController();
