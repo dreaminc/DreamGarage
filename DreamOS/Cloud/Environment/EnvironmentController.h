@@ -24,6 +24,7 @@
 
 class Websocket;
 class CloudMessage;
+class EnvironmentAsset;
 
 class EnvironmentControllerProxy : public ControllerProxy {
 public:
@@ -82,6 +83,7 @@ public:
 			size_t number_of_channels,
 			size_t number_of_frames) = 0;
 		virtual long GetUserID() = 0;
+		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) = 0;
 	};
 
 	RESULT RegisterEnvironmentControllerObserver(EnvironmentControllerObserver* pEnvironmentControllerObserver);
