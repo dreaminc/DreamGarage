@@ -543,6 +543,29 @@ RESULT DreamGarage::Update(void) {
 	return r;
 }
 
+RESULT DreamGarage::SetRoundtablePosition(float angle) {
+	RESULT r = R_PASS;
+
+	camera *pCamera = GetCamera();
+	float radius = 2.0f;
+
+	float ptX = -radius*sin(angle*M_PI / 180.0f);
+	float ptZ =  radius*cos(angle*M_PI / 180.0f);
+	
+	point offset = point(ptX, 0.0f, ptZ);
+	pCamera->SetPosition(offset);
+
+	if (!pCamera->HasHMD()) {
+		pCamera->RotateYByDeg(angle);
+	}
+	else {
+		quaternion qOffset = quaternion::MakeQuaternionWithEuler(0.0f, angle * M_PI / 180.0f, 0.0f);
+		pCamera->SetOffsetOrientation(qOffset);
+	}
+
+	return r;
+}
+
 // Cloud Controller
 RESULT DreamGarage::HandlePeersUpdate(long index) {
 	RESULT r = R_PASS;
@@ -557,37 +580,29 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(index)).c_str());
 
 	if (!m_isSeated) {
-		// an initial imp for seating. would be changed once we decide final seating configurations
-		camera* cam = GetCamera();
-		const float rad = 2.0f;
 
-		auto setCameraRoundtablePos = [&](uint16_t angle) {
-			point offset = point(-rad*sin(angle*M_PI / 180.0f), 0.0f, +rad*cos(angle*M_PI / 180.0f));
-			cam->SetPosition(offset);
+		// full circle configuration
+		/*
+		std::vector<int> m_seatOrdering = { 4, 0, 6, 2, 5, 7, 1, 3 };
+		float m_initialAngle = 0.0f;
+		float m_differenceAngle = 45.0f;
+		//*/
 
-			if (!cam->HasHMD()) {
-				cam->RotateYByDeg(angle);
-			}
-			else {
-				quaternion qOffset = quaternion::MakeQuaternionWithEuler(0.0f, angle * M_PI / 180.0f, 0.0f);
-				cam->SetOffsetOrientation(qOffset);
-			}
-		};
+		// seating should be separate from DreamGarage, so naming these 
+		// as if they were member variables for now
+		// semi circle configuration
+		std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
+		float m_initialAngle = 90.0f;
+		float m_differenceAngle = -30.0f;
 
-		switch (index) {
-			case 0: setCameraRoundtablePos(180); break;
-			case 1: setCameraRoundtablePos(0); break;
-			case 2: setCameraRoundtablePos(270); break;
-			case 3: setCameraRoundtablePos(90); break;
-			case 4: setCameraRoundtablePos(180 + 45); break;
-			case 5: setCameraRoundtablePos(270 + 45); break;
-			case 6: setCameraRoundtablePos(45); break;
-			case 7: setCameraRoundtablePos(90 + 45); break;
-		}
+		CB(index < m_seatLookup.size());
+
+		SetRoundtablePosition(m_initialAngle + (m_differenceAngle * m_seatLookup[index]));
 
 		m_isSeated = true;
 	}
 
+Error:
 	return r;
 }
 

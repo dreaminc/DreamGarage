@@ -71,7 +71,9 @@ public:
 	// Cloud Controller
 	RESULT InitializeCloudControllerCallbacks();
 
+	RESULT SetRoundtablePosition(float angle);
 	RESULT HandlePeersUpdate(long index);
+
 	RESULT HandleDataMessage(long senderUserID, Message *pDataMessage);
 	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
 	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
