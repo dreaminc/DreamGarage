@@ -632,6 +632,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp" />
     <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp" />
     <ClCompile Include="..\..\..\Cloud\Controller.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentAsset.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequest.cpp" />
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.cpp" />
@@ -793,6 +794,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\Controller.h" />
     <ClInclude Include="..\..\..\Cloud\ControllerObserver.h" />
     <ClInclude Include="..\..\..\Cloud\ControllerProxy.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentAsset.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnection.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h" />
     <ClInclude Include="..\..\..\Cloud\HTTP\HTTPCommon.h" />

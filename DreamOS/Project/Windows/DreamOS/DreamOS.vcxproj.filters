@@ -649,7 +649,7 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp">
       <Filter>HMD\Oculus</Filter>
-	</ClCompile>
+    </ClCompile>
     <ClCompile Include="..\..\..\DreamApp.cpp">
       <Filter>DreamOS</Filter>
     </ClCompile>
@@ -658,6 +658,9 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamAppManager.cpp">
       <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentAsset.cpp">
+      <Filter>Cloud\Environment</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2446,6 +2449,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\HTTP\HTTPCommon.h">
       <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentAsset.h">
+      <Filter>Cloud\Environment</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

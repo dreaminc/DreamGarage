@@ -26,6 +26,7 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 			m_menuNodes.push_back(pSubMenuNode);
 		}
 	}
+
 	InitializeMimeToString();
 }
 
