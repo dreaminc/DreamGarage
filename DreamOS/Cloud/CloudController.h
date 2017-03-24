@@ -150,6 +150,7 @@ public:
 
 private:
 	MenuControllerProxy* GetMenuControllerProxy();
+	UserControllerProxy* GetUserControllerProxy();
 	HTTPControllerProxy* GetHTTPControllerProxy();
 	EnvironmentControllerProxy* GetEnvironmentControllerProxy();
 

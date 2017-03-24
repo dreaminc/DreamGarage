@@ -24,6 +24,8 @@ class texture;
 #define DEFAULT_ASPECT_RATIO ASPECT_RATIO_16_9
 #define DEFAULT_DIAGONAL_SIZE 1.0f
 
+class EnvironmentAsset;
+
 class DreamContentView : public DreamApp<DreamContentView>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 
@@ -53,6 +55,7 @@ public:
 	RESULT SetNormalVector(vector vNormal);
 
 	RESULT SetParams(point ptPosition, float diagonal, const AspectRatio aspectRatio, vector vNormal);
+	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
 
 	float GetWidth();
 	float GetHeight();
@@ -63,6 +66,9 @@ public:
 
 	RESULT SetScreenTexture(const std::wstring &wstrTextureFilename);
 	RESULT SetScreenURI(const std::string &strURI);
+	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+
+	RESULT SetFitTextureAspectRatio(bool fFitTextureAspectRatio);
 
 private:
 	RESULT SetScreenTexture(texture *pTexture);
@@ -77,6 +83,7 @@ private:
 	float m_diagonalSize = DEFAULT_DIAGONAL_SIZE;
 	vector m_vNormal;
 
+	bool m_fFitTextureAspectRatio = false;
 
 	std::shared_ptr<std::vector<uint8_t>> m_pPendingBufferVector = nullptr;
 };

@@ -7,6 +7,8 @@
 
 #include "Cloud/Environment/EnvironmentAsset.h"
 
+#include "DreamGarage/DreamContentView.h"
+
 CloudTestSuite::CloudTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -237,10 +239,32 @@ Error:
 RESULT CloudTestSuite::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
-	CR(r);
-	pEnvironmentAsset->PrintEnvironmentAsset();
-
 	//https://api.develop.dreamos.com/environment-asset/{id}/file
+	if (m_pDreamContentView != nullptr) {
+		//CR(m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset));
+		m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset);
+	}
+
+//Error:
+	return r;
+}
+
+RESULT CloudTestSuite::LaunchDreamView() {
+	RESULT r = R_PASS;
+
+	CN(m_pDreamOS);
+
+	// Create the Shared View App
+	m_pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentView>(this);
+	CNM(m_pDreamContentView, "Failed to create dream content view");
+
+	// Set up the view
+	m_pDreamContentView->SetParams(point(0.0f), 5.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
+	//m_pDreamContentView->SetFitTextureAspectRatio(true);
+
+	//pDreamContentView->SetScreenTexture(L"crate_color.png");
+	//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
+	//m_pDreamContentView->SetScreenURI("https://static.dreamos.com/www/image/hero.387eddfc05dc.jpg");
 
 Error:
 	return r;
@@ -294,6 +318,8 @@ RESULT CloudTestSuite::AddTestMenuAPI() {
 		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 
 		CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&CloudTestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+
+		CR(LaunchDreamView());
 		
 		// Set up menu stuff
 		DEBUG_LINEOUT("Requesting Menu");

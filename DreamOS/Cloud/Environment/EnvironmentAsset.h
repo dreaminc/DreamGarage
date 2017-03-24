@@ -26,6 +26,8 @@ public:
 	//const MenuNode::MimeType & GetMIMEType();
 	const std::string& GetTitle();
 
+	std::string GetURI();
+
 private:
 	long m_assetID;
 	std::string m_strPath;
