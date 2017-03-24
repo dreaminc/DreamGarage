@@ -51,6 +51,9 @@ RESULT EnvironmentController::Initialize() {
 	CR(m_pMenuController->Initialize());
 	//CR(m_pMenuController->RegisterPeerConnectionControllerObserver(this));
 
+	// Register Methods
+	CR(RegisterMethod("share", std::bind(&EnvironmentController::OnSharedAsset, this, std::placeholders::_1)));
+
 Error:
 	return r;
 }
@@ -415,6 +418,33 @@ Error:
 	return r;
 }
 
+CLOUD_CONTROLLER_TYPE EnvironmentController::GetControllerType() {
+	return CLOUD_CONTROLLER_TYPE::ENVIRONMENT; 
+}
+
+RESULT EnvironmentController::RequestShareAsset(std::string strStorageProviderScope, std::string strPath, std::string strTitle) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload;
+	std::string strData;
+	guid guidMessage;
+	std::shared_ptr<CloudMessage> pCloudRequest = nullptr;
+
+	jsonPayload["environment_asset"] = nlohmann::json::object();
+	jsonPayload["environment_asset"]["path"] = strPath;
+	jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+
+	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
+	CN(pCloudRequest);
+	CR(pCloudRequest->SetControllerMethod("environment_asset.share"));
+
+	CR(SendEnvironmentSocketMessage(pCloudRequest, EnvironmentController::state::ENVIRONMENT_ASSET_SHARE));
+
+Error:
+	return r;
+}
+
+
 RESULT EnvironmentController::PrintEnvironmentPeerList() {
 	DEBUG_LINEOUT("%d Peers Environment: %d", (int)(m_environmentPeers.size()), (int)(m_environment.GetEnvironmentID()));
 	for (auto &peer : m_environmentPeers)
@@ -543,6 +573,29 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage) {
+	RESULT r = R_PASS;
+
+	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
+	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
+
+	/*
+	if (m_pMenuControllerObserver != nullptr) {
+		std::shared_ptr<MenuNode> pMenuNode = nullptr;
+		if (jsonEnvironmentAsset.size() != 0)
+			pMenuNode = std::make_shared<MenuNode>(jsonEnvironmentAsset);
+
+		CR(m_pMenuControllerObserver->OnMenuData(pMenuNode));
+	}*/
+
+	// TODO:
+
+	CR(r);
+
+Error:
+	return r;
+}
+
 void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage) {
 	DEBUG_LINEOUT("HandleWebsocketMessage");
 
@@ -594,6 +647,10 @@ void EnvironmentController::HandleWebsocketMessage(const std::string& strMessage
 
 	if (pCloudMessage->GetController() == "menu") {
 		m_pMenuController->HandleEnvironmentSocketMessage(pCloudMessage);
+	}
+	else if (pCloudMessage->GetController() == "environment_asset") {
+		RESULT r = HandleOnMethodCallback(pCloudMessage);
+		// TODO: Handle error 
 	}
 
 	/*
@@ -776,6 +833,10 @@ MenuControllerProxy* EnvironmentController::GetMenuControllerProxy() {
 		return m_pMenuController->GetMenuControllerProxy();
 
 	return nullptr;
+}
+
+EnvironmentControllerProxy* EnvironmentController::GetEnvironmentControllerProxy() {
+	return (EnvironmentControllerProxy*)(this);
 }
 
 RESULT EnvironmentController::OnPeersUpdate(long index) {

@@ -728,6 +728,10 @@ ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE contr
 		case CLOUD_CONTROLLER_TYPE::HTTP: {
 			pProxy = (ControllerProxy*)(GetHTTPControllerProxy());
 		} break;
+
+		case CLOUD_CONTROLLER_TYPE::ENVIRONMENT: {
+			pProxy = (ControllerProxy*)(GetEnvironmentControllerProxy());
+		}
 	}
 
 	return pProxy;
@@ -760,4 +764,11 @@ MenuControllerProxy* CloudController::GetMenuControllerProxy() {
 HTTPControllerProxy* CloudController::GetHTTPControllerProxy() {
 	HTTPController *pHTTPController = HTTPController::instance();
 	return pHTTPController->GetHTTPControllerProxy();
+}
+
+EnvironmentControllerProxy* CloudController::GetEnvironmentControllerProxy() {
+	if(m_pEnvironmentController != nullptr)
+		return m_pEnvironmentController->GetEnvironmentControllerProxy();
+
+	return nullptr;
 }

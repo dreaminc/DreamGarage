@@ -22,8 +22,9 @@ RESULT CloudTestSuite::AddTests() {
 	//CR(AddTestMultiConnectTest());
 
 	CR(AddTestConnectLogin());
-	CR(AddTestDownloadFile());	// requires logged in
 	CR(AddTestMenuAPI());
+
+	CR(AddTestDownloadFile());	// requires logged in
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests
@@ -240,10 +241,22 @@ RESULT CloudTestSuite::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		auto pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
 		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
 
-		std::string strScope = pMenuNode->GetSubMenuNodes()[0]->GetScope();
-		std::string strPath = pMenuNode->GetSubMenuNodes()[0]->GetPath();
+		std::shared_ptr<MenuNode> pFirstSubMenuNode = pMenuNode->GetSubMenuNodes()[0];
+		CN(pFirstSubMenuNode);
 
-		CRM(pMenuControllerProxy->RequestSubMenu(strScope, strPath), "Failed to request sub menu");
+		std::string strScope = pFirstSubMenuNode->GetScope();
+		std::string strPath = pFirstSubMenuNode->GetPath();
+		std::string strTitle = pFirstSubMenuNode->GetTitle();
+
+		if (pFirstSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
+			CRM(pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle), "Failed to request sub menu");
+		}
+		else if (pFirstSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
+			auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+			CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+			CRM(pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+		}
 	}
 
 Error:
@@ -253,7 +266,7 @@ Error:
 RESULT CloudTestSuite::AddTestMenuAPI() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 30.0f;
+	double sTestTime = 40.0f;
 
 	// Initialize the test
 	auto fnInitialize = [&](void *pContext) {
@@ -272,7 +285,7 @@ RESULT CloudTestSuite::AddTestMenuAPI() {
 		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
 
 		CRM(pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
-		CRM(pMenuControllerProxy->RequestSubMenu(), "Failed to request sub menu");
+		CRM(pMenuControllerProxy->RequestSubMenu("", "", "menu"), "Failed to request sub menu");
 
 	Error:
 		return R_PASS;

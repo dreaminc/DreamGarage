@@ -20,11 +20,19 @@
 #include "Cloud/User/User.h"
 #include "Cloud/User/TwilioNTSInformation.h"
 
+#include "Cloud/ControllerProxy.h"
+
 class Websocket;
 class CloudMessage;
 
+class EnvironmentControllerProxy : public ControllerProxy {
+public:
+	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
+	virtual RESULT RequestShareAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") = 0;
+};
+
 // TODO: This is actually a UserController - so change the name of object and file
-class EnvironmentController : public Controller, public PeerConnectionController::PeerConnectionControllerObserver {
+class EnvironmentController : public Controller, public PeerConnectionController::PeerConnectionControllerObserver, public EnvironmentControllerProxy {
 	friend class MenuController;
 public:
 	enum class state {
@@ -47,6 +55,9 @@ public:
 
 		// Menu
 		MENU_API_REQUEST,
+
+		// Assets
+		ENVIRONMENT_ASSET_SHARE,
 
 		INVALID
 	};
@@ -95,6 +106,13 @@ public:
 
 	RESULT UpdateEnvironmentUser();
 	RESULT PrintEnvironmentPeerList();
+
+	// EnvironmentControllerProxy
+	// TODO: Note - Register Controller Observer pattern needs to be fixed here
+	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
+	virtual RESULT RequestShareAsset(std::string strStorageProviderScope = "", std::string strPath = "", std::string strTitle = "") override;
+	virtual RESULT OnSharedAsset(std::shared_ptr<CloudMessage> pCloudMessage);
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED; }
 
 	long GetUserID();
 
@@ -151,8 +169,12 @@ public:
 
 	bool IsEnvironmentSocketConnected();
 
-	// Menu Controller
+	// Menu Controller Proxy
 	MenuControllerProxy* GetMenuControllerProxy();
+
+	// Environment Controller Proxy
+	EnvironmentControllerProxy* GetEnvironmentControllerProxy();
+	
 
 public:
 	EnvironmentController::state GetState() {

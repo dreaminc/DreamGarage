@@ -14,6 +14,7 @@
 #include "json.hpp"
 
 class MenuNode : public dirty {
+public:
 	enum class type {
 		FOLDER,
 		FILE,
@@ -47,6 +48,7 @@ public:
 	const std::string& GetScope();
 	const std::string& GetMIMEType();
 	const std::string& GetTitle();
+	const MenuNode::type& GetNodeType();
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 

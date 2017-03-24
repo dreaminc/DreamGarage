@@ -147,6 +147,7 @@ public:
 private:
 	MenuControllerProxy* GetMenuControllerProxy();
 	HTTPControllerProxy* GetHTTPControllerProxy();
+	EnvironmentControllerProxy* GetEnvironmentControllerProxy();
 
 private:
 	//UID m_uid;
