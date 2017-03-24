@@ -133,3 +133,7 @@ const std::string& MenuNode::GetMIMEType() {
 const std::string& MenuNode::GetTitle() {
 	return m_strTitle;
 }
+
+const MenuNode::type& MenuNode::GetNodeType() {
+	return m_nodeType;
+}
