@@ -66,6 +66,11 @@ protected:
 
 private:
 	DreamOS *m_pDreamOS;
+
+	DimRay *m_pTestRayController;
+	DimRay *m_pTestRayLookV;
+
+	sphere *m_pSphere;
 };
 
 #endif // ! UI_MODULE_H_

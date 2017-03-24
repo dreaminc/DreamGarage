@@ -27,6 +27,7 @@ public:
 
 	ray GetRay();
 	RESULT UpdateFromRay(const ray &rCast);
+	ray GetRayFromVerts();
 
 	//TODO: Nested object does not fit with usual pattern of primitives
 	// move to native arrow tip implementation
