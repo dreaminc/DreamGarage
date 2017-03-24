@@ -18,6 +18,8 @@
 
 #include "Core/Utilities.h"
 
+#include "EnvironmentAsset.h"
+
 EnvironmentController::EnvironmentController(Controller* pParentController, long environmentID) :
 	Controller(pParentController),
 	m_fConnected(false),
@@ -579,6 +581,11 @@ RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloud
 	nlohmann::json jsonPayload = pCloudMessage->GetJSONPayload();
 	nlohmann::json jsonEnvironmentAsset = jsonPayload["/environment_asset"_json_pointer];
 
+	std::shared_ptr<EnvironmentAsset> pEnvironmentAsset = std::make_shared<EnvironmentAsset>(jsonEnvironmentAsset);
+	CN(pEnvironmentAsset);
+
+	CR(pEnvironmentAsset->PrintEnvironmentAsset());
+
 	/*
 	if (m_pMenuControllerObserver != nullptr) {
 		std::shared_ptr<MenuNode> pMenuNode = nullptr;
@@ -589,8 +596,6 @@ RESULT EnvironmentController::OnSharedAsset(std::shared_ptr<CloudMessage> pCloud
 	}*/
 
 	// TODO:
-
-	CR(r);
 
 Error:
 	return r;
