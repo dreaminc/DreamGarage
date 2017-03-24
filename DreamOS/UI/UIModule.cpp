@@ -65,11 +65,12 @@ ray UIModule::GetHandRay() {
 		//GetLookVector
 		quaternion qHand = pRightHand->GetHandState().qOrientation;
 		qHand.Normalize();
-
+		/*
 		if (m_pTestRayController != nullptr) {
 			m_pTestRayController->SetPosition(ptHand);
 			m_pTestRayController->SetOrientation(qHand);
 		}
+		//*/
 
 		//TODO: investigate how to properly get look vector for controllers
 		//vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
@@ -79,12 +80,12 @@ ray UIModule::GetHandRay() {
 
 
 		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
-
+/*
 		if (m_pTestRayController != nullptr) {
 			m_pTestRayLookV->SetPosition(ptHand);
 			m_pTestRayLookV->SetOrientation(quaternion(vHandLook));
 		}
-
+//*/
 		// Accommodate for composite collision bug
 		//ptHand = ptHand + point(-10.0f * vCast);
 		//rCast = ray(ptHand, vCast);
@@ -185,11 +186,11 @@ composite *UIModule::GetComposite() {
 
 RESULT UIModule::Notify(InteractionObjectEvent *event) {
 	RESULT r = R_PASS;
-
+/*
 	if (event->m_numContacts > 0 && m_pSphere != nullptr) {
 		m_pSphere->SetPosition(event->m_ptContact[0]);
 	}
-
+	//*/
 	std::shared_ptr<UIMenuItem> pItem = GetMenuItem(event->m_pObject);
 	CBR(pItem != nullptr, R_OBJECT_NOT_FOUND);
 
