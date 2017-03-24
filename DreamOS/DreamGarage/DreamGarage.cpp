@@ -70,17 +70,12 @@ RESULT DreamGarage::LoadScene() {
 	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
 	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
 
-<<<<<<< HEAD
+	
 	/* If you want to turn on reference geo
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = true;
 	SetHALConfiguration(halconf);
 	*/
-=======
-	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = true;
-	SetHALConfiguration(halconf);
->>>>>>> in-box ray intersection working, using controller ray now
 
 	// Console
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
