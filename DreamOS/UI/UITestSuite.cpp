@@ -6,6 +6,7 @@
 #include "InteractionEngine/InteractionObjectEvent.h"
 
 #include "DreamGarage/DreamContentView.h"
+#include "DreamGarage/DreamBrowser.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -28,6 +29,8 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBrowser());
+
 	CR(AddTestInteractionFauxUI());
 	CR(AddTestSharedContentView());
 
@@ -38,7 +41,7 @@ Error:
 RESULT UITestSuite::Initialize() {
 	RESULT r = R_PASS;
 
-	
+
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
@@ -78,13 +81,105 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::InitializeUI() {
+	RESULT r = R_PASS;
+
+	IconFormat iconFormat;
+	LabelFormat labelFormat;
+	RadialLayerFormat menuFormat;
+	RadialLayerFormat titleFormat;
+
+	// differences from default for title layer
+	titleFormat.menuPosZ = -1.15f;
+	titleFormat.itemPosY = -0.25f;
+	titleFormat.itemAngleX = 75.0f;
+
+	m_pDreamUIBar = std::make_shared<DreamUIBar>(m_pDreamOS,iconFormat,labelFormat,menuFormat,titleFormat);
+	m_pDreamUIBar->SetVisible(false);
+
+	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
+	m_menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
+	m_menu["ipsum"] = { "1", "2", "3" };
+	m_menu["Play"] = { "a", "b", "c" };
+
+	m_path = {};
+
+	m_pSphere1 = m_pDreamOS->AddSphere(0.02f, 10, 10);
+	m_pSphere2 = m_pDreamOS->AddSphere(0.02f, 10, 10);
+
+//Error:
+	return r;
+}
+
+RESULT UITestSuite::AddTestBrowser() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 30.0f;
+	int nRepeats = 1;
+
+	// Initialize Code
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+
+		CN(m_pDreamOS);
+
+		// Create the Shared View App
+		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		CNM(pDreamBrowser, "Failed to create dream browser");
+
+		// Set up the view
+		pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+
+		//pDreamContentView->SetScreenTexture(L"crate_color.png");
+		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
+		pDreamBrowser->SetURI("https://www.google.com");
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestSharedContentView() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 30.0f;
 	int nRepeats = 1;
 
-	// Initialize Code 
+	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		std::shared_ptr<DreamContentView> pDreamContentView = nullptr;
@@ -111,12 +206,12 @@ RESULT UITestSuite::AddTestSharedContentView() {
 		return R_PASS;
 	};
 
-	// Update Code 
+	// Update Code
 	auto fnUpdate = [&](void *pContext) {
 		return R_PASS;
 	};
 
-	// Reset Code 
+	// Reset Code
 	auto fnReset = [&](void *pContext) {
 		RESULT r = R_PASS;
 
@@ -161,10 +256,10 @@ RESULT UITestSuite::AddTestInteractionFauxUI() {
 		pTestContext->pRay = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
 		CN(pTestContext->pRay);
 
-		
+
 		m_pSphere1 = m_pDreamOS->AddSphere(0.02f, 10, 10);
 		m_pSphere2 = m_pDreamOS->AddSphere(0.02f, 10, 10);
-		
+
 		// Create Faux UI here
 
 		pComposite = m_pDreamOS->AddComposite();
@@ -266,7 +361,7 @@ RESULT UITestSuite::AddTestInteractionFauxUI() {
 					}
 				}
 			}
-		
+
 
 			m_pDreamOS->UpdateInteractionPrimitive(rcast);
 
@@ -312,7 +407,7 @@ RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 			OVERLAY_DEBUG_SET("event", "trigger down");
 		}
 
-		// TODO:  soon this code will be replaced with api requests, 
+		// TODO:  soon this code will be replaced with api requests,
 		// as opposed to accessing the hardcoded local data structures
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
