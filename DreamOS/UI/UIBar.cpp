@@ -55,7 +55,10 @@ RESULT UIBar::UpdateCurrentUILayer(UILayerInfo& info) {
 
 	m_pCompositeContext->ClearChildren(); //always removes all layers
 	std::shared_ptr<UIMenuLayer> pLayer = nullptr;
+	std::shared_ptr<UIMenuLayer> pTitleLayer = nullptr;
 
+	pTitleLayer = CreateMenuLayer();
+	CN(pTitleLayer);
 	pLayer = CreateMenuLayer();
 	CN(pLayer);
 
@@ -75,7 +78,9 @@ RESULT UIBar::UpdateCurrentUILayer(UILayerInfo& info) {
 			labelFormat.ptPosition = point(0.0f, -0.9f, 0.0f);
 		}
 
-		auto pItem = pLayer->CreateMenuItem();
+		// The last item in the layer info should be for the title item
+		auto& layer = (i == size-1) ? pTitleLayer : pLayer;
+		auto pItem = layer->CreateMenuItem();
 		pItem->Update(iconFormat, labelFormat);
 	}
 

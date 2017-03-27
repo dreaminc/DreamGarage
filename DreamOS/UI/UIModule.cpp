@@ -191,7 +191,9 @@ RESULT UIModule::Notify(InteractionObjectEvent *event) {
 		m_pSphere->SetPosition(event->m_ptContact[0]);
 	}
 	//*/
-	std::shared_ptr<UIMenuItem> pItem = GetMenuItem(event->m_pObject);
+
+	std::shared_ptr<UIMenuItem> pItem = m_pCurrentUILayer->GetMenuItem(event->m_pObject);
+	//std::shared_ptr<UIMenuItem> pItem = GetMenuItem(event->m_pObject);
 	CBR(pItem != nullptr, R_OBJECT_NOT_FOUND);
 
 	//TODO stupid hack, can be fixed by incorporating 
