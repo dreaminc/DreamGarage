@@ -49,6 +49,7 @@ public:
 	~UIBar();
 
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
+	virtual RESULT Notify(InteractionObjectEvent *event) override = 0;
 
 private:
 	// Places MenuItem along a circular arc based on index

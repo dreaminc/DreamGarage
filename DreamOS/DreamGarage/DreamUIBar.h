@@ -23,11 +23,8 @@ public:
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
 
-	// TODO: these functions are related to SenseController instead of the
-	// Interaction Engine
-
-	RESULT HandleMenuUp();
-	RESULT HandleTriggerUp();
+	RESULT HandleMenuUp(void* pContext);
+	RESULT HandleSelect(void* pContext);
 
 	// Callback signature
 	// RESULT fnEventCallback(struct (opt) pEventInfo, void* pContext)
@@ -36,7 +33,7 @@ public:
 
 	std::map<InteractionEventType, std::function<RESULT(void*)>> m_callbacks;
 
-	RESULT Notify(InteractionObjectEvent *event) override;
+	virtual RESULT Notify(InteractionObjectEvent *event) override;
 
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);

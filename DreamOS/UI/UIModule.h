@@ -37,7 +37,6 @@ public:
 	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) = 0;
 
 	std::shared_ptr<UIMenuItem> GetMenuItem(VirtualObj* pObj);
-	std::shared_ptr<UIMenuItem> GetCurrentItem();
 
 	RESULT ToggleVisible();
 	RESULT Show();
@@ -47,7 +46,7 @@ public:
 
 	composite* GetComposite();
 
-	virtual RESULT Notify(InteractionObjectEvent *event) override;
+	virtual RESULT Notify(InteractionObjectEvent *event) override = 0;
 
 protected:
 	composite* m_pCompositeContext;
@@ -57,8 +56,6 @@ protected:
 	//TODO: when multiple layers are needed, implement currentUILayer 
 	// as an iterator with public Set/Previous/Next functions
 	std::shared_ptr<UIMenuLayer> m_pCurrentUILayer;
-
-	std::shared_ptr<UIMenuItem> m_pCurrentItem;
 
 	float m_headRotationYDeg;  // can be removed with composite collision code
 
