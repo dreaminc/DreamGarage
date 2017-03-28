@@ -1,6 +1,8 @@
 #include "DreamBrowser.h"
 #include "DreamOS.h"
 
+#include "PhysicsEngine/CollisionManifold.h"
+
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
 {
@@ -24,6 +26,26 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
 	m_pBrowserQuad->SetMaterialAmbient(0.8f);
 
+	// Set up mouse / hand cursor model
+	///*
+	m_pPointerCursor = GetComposite()->AddModel(L"\\Models\\mouse-cursor\\mouse-cursor.obj",
+												nullptr,
+												point(-0.2f, -0.43f, 0.0f),
+												0.01f,
+												vector(-(float)M_PI_2, 0.0f, 0.0f));
+	m_pPointerCursor->SetMaterialAmbient(0.8f);
+	//*/
+
+	/*
+	m_pHandCursor = GetComposite()->AddModel(L"\\Models\\mouse-hand\\mouse-hand.obj",
+											 nullptr,
+											 point(0.0f, 0.0f, 0.0f),
+											 0.002f,
+											 vector(0.0f, 0.0f, 0.0f));
+	//*/
+
+	GetDOS()->AddInteractionObject(m_pBrowserQuad.get());
+
 Error:
 	return r;
 }
@@ -37,10 +59,20 @@ Error:
 	return r;
 }
 
-RESULT DreamBrowser::Update(void *pContext = nullptr) {
+RESULT DreamBrowser::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	ray rCast;
+
+	CR(GetDOS()->GetMouseRay(rCast, 0.0f));
+
+	{
+		CollisionManifold manifold = m_pBrowserQuad->Collide(rCast);
+
+		if (manifold.NumContacts() > 0) {
+			m_pPointerCursor->SetOrigin(manifold.GetContactPoint(0).GetPoint());
+		}
+	}
 
 Error:
 	return r;

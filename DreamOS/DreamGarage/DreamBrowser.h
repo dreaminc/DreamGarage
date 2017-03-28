@@ -60,6 +60,10 @@ protected:
 
 private:
 	std::shared_ptr<quad> m_pBrowserQuad = nullptr;
+
+	std::shared_ptr<composite> m_pPointerCursor = nullptr;
+	std::shared_ptr<composite> m_pHandCursor = nullptr;
+
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
