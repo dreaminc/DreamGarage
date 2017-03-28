@@ -1,11 +1,11 @@
-#ifndef BROWSER_H_
-#define BROWSER_H_
-
-// DREAM OS
-// DreamOS/Cloud/WebBrowser/browser.h
-// 
+#ifndef WEB_BROWSER_CONTROLLER_H_
+#define WEB_BROWSER_CONTROLLER_H_
 
 #include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/CEFBrowser/WebBrowserController.h
+
 #include <memory>
 #include <functional>
 
@@ -30,21 +30,10 @@ public:
 	virtual void SendKeySequence(const std::string& keys) = 0;
 };
 
-class WebBrowserService {
-public:
-	// initialize service
-	virtual RESULT Initialize() = 0;
-
-	// creates new web browser
-	virtual WebBrowserController* CreateNewWebBrowser(const std::string& url, unsigned int width, unsigned int height) = 0;
-
-	virtual ~WebBrowserService() = 0;
-}; 
-
 namespace WebBrowser {
 	// creates new web browser service
 	// returns nullptr when fails
 	std::unique_ptr<WebBrowserService> CreateNewCefBrowserService();
 }
 
-#endif // !BROWSER_H_
+#endif // !WEB_BROWSER_CONTROLLER_H_

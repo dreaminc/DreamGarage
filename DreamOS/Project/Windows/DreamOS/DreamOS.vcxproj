@@ -642,10 +642,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp" />
     <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp" />
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserController.cpp" />
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserService.cpp" />
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefHandler.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
@@ -812,10 +808,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\Cloud\CloudModel.h" />
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h" />
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h" />
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserController.h" />
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserService.h" />
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefHandler.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />

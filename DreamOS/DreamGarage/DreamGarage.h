@@ -18,38 +18,7 @@
 
 class DreamContentView;
 
-#include "Cloud/WebBrowser/browser.h"
-
-// temporary browser management for testring
-class Browsers {
-public:
-	void Init(composite* composite);
-	void Update();
-	std::string CreateNewBrowser(unsigned int width, unsigned int height, const std::string& url);
-	WebBrowserController*	GetBrowser(const std::string& id);
-	void SetKeyFocus(const std::string& id);
-
-	void OnKey(unsigned int scanCode, char16_t chr);
-
-private:
-	composite*	m_composite;
-
-	std::unique_ptr<WebBrowserService> m_BrowserService = nullptr;
-
-	struct Browser {
-		WebBrowserController*		controller;
-		std::shared_ptr<texture>	texture;
-		std::shared_ptr<quad>		quad;
-	};
-
-	// std::string indicates the id of the browser
-	std::map<std::string, Browser> m_Browsers;
-
-	WebBrowserController* m_browserInKeyFocus = nullptr;
-};
-
-class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<CmdPromptEvent> {
-
+class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
 public:
 
 	DreamGarage() {
@@ -103,9 +72,6 @@ private:
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
 
 	std::shared_ptr<DreamContentView> m_pDreamContentView;
-
-	// CEF
-	Browsers m_browsers;
 };
 
 #endif	// DREAM_GARAGE_H_

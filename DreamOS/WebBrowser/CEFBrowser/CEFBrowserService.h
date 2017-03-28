@@ -5,7 +5,7 @@
 // DreamOS/Cloud/WebBrowser/CefBrowserService.h
 // 
 
-#include "browser.h"
+#include "WebBrowserService.h"
 
 #include <thread>
 #include <mutex>
@@ -14,9 +14,7 @@
 #include "RESULT/EHM.h"
 
 
-class CefBrowserService :
-	public WebBrowserService
-{
+class CefBrowserService : public WebBrowserService {
 public:
 	CefBrowserService();
 	virtual ~CefBrowserService();

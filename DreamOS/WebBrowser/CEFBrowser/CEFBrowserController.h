@@ -23,13 +23,11 @@
 #include <list>
 #include <future>
 
-class CefBrowserController :
-	public WebBrowserController,
-	public CefRenderHandler
+class CEFBrowserController : public WebBrowserController, public CefRenderHandler
 {
 public:
-	CefBrowserController(CefRefPtr<CefBrowser> browser) :
-		m_browser(browser) {}
+	CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
+		m_pCEFBrowser(pCEFBrowser) {}
 
 	// WebBrowserController
 	virtual void PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) override;
@@ -55,14 +53,14 @@ private:
 	int m_bufferHeight = 0;
 
 	// reference to the browser object
-	CefRefPtr<CefBrowser>	m_browser;
+	CefRefPtr<CefBrowser> m_pCEFBrowser;
 
-	// representd new dirty frames since last time they were polled
-	RectList	m_NewDirtyFrames; 
+	// represented new dirty frames since last time they were polled
+	RectList m_NewDirtyFrames; 
 
-	std::mutex	m_BufferMutex;
+	std::mutex m_BufferMutex;
 
-	IMPLEMENT_REFCOUNTING(CefBrowserController);
+	IMPLEMENT_REFCOUNTING(CEFBrowserController);
 };
 
 #endif // !CEF_BROWSER_CONTROLLER_H_

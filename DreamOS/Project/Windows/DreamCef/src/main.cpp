@@ -7,25 +7,20 @@
 
 #include "include\cef_sandbox_win.h"
 
+#include "RESULT/EHM.h"
 
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
+	RESULT r = R_PASS;
+
 	CefMainArgs args(GetModuleHandle(NULL));
 
-	int result = CefExecuteProcess(args, nullptr, nullptr);
+	int cefResult = CefExecuteProcess(args, nullptr, nullptr);
+	CBM((cefResult >= 0), "CefExecuteProcess failed with error %d", cefResult);
 
-	if (result >= 0) // child proccess has endend, so exit.
-	{
-		return result;
-	}
-
-	if (result == -1)
-	{
-		// parent process proccess.
-	}
-
-	return 0;
+Error:
+	return (int)(r);
 }

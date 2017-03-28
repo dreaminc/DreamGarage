@@ -165,9 +165,6 @@
     <Filter Include="PhysicsEngine">
       <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Cloud\WebBrowser">
-      <UniqueIdentifier>{d8051eb4-4d18-4c14-8db2-24de64018e8a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="DreamTestApp">
       <UniqueIdentifier>{921ea31d-7767-45b3-8296-bb5f9e9725eb}</UniqueIdentifier>
     </Filter>
@@ -514,18 +511,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
       <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\browser.cpp">
-      <Filter>Cloud\WebBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserService.cpp">
-      <Filter>Cloud\WebBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefHandler.cpp">
-      <Filter>Cloud\WebBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\WebBrowser\CefBrowserController.cpp">
-      <Filter>Cloud\WebBrowser</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
       <Filter>DreamTestApp</Filter>
@@ -2341,18 +2326,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimRay.h">
       <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\browser.h">
-      <Filter>Cloud\WebBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserService.h">
-      <Filter>Cloud\WebBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefHandler.h">
-      <Filter>Cloud\WebBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\WebBrowser\CefBrowserController.h">
-      <Filter>Cloud\WebBrowser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
       <Filter>DreamTestApp</Filter>
