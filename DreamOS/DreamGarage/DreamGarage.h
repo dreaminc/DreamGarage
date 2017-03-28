@@ -96,18 +96,8 @@ public:
 
 private:
 
-	//user *m_pPeerUser;
-
 	std::map<long, user*> m_peerUsers;
 	std::vector<user*> m_usersPool;
-
-	//composite *m_pPeerUser;
-	//volume *m_pPeerUser;
-
-	sphere *m_pSphere;
-	FlatContext *m_pContext;
-	quad *m_pQuad;
-	std::shared_ptr<DebugData> m_spherePosition;
 
 	bool	m_isSeated = false;
 	float tick = 0.0f;
