@@ -86,9 +86,15 @@ RESULT UITestSuite::InitializeUI() {
 
 	IconFormat iconFormat;
 	LabelFormat labelFormat;
-	UIBarFormat barFormat;
+	RadialLayerFormat menuFormat;
+	RadialLayerFormat titleFormat;
 
-	m_pDreamUIBar = std::make_shared<DreamUIBar>(m_pDreamOS,iconFormat,labelFormat,barFormat);
+	// differences from default for title layer
+	titleFormat.menuPosZ = -1.15f;
+	titleFormat.itemPosY = -0.25f;
+	titleFormat.itemAngleX = 75.0f;
+
+	m_pDreamUIBar = std::make_shared<DreamUIBar>(m_pDreamOS,iconFormat,labelFormat,menuFormat,titleFormat);
 	m_pDreamUIBar->SetVisible(false);
 
 	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };

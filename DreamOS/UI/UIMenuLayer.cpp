@@ -64,3 +64,12 @@ std::shared_ptr<UIMenuItem> UIMenuLayer::GetMenuItem(VirtualObj *pObj) {
 	}
 	return nullptr;
 }
+
+bool UIMenuLayer::ContainsMenuItem(UIMenuItem *pItem) {
+	for (auto& item : m_menuItems) {
+		if (item.get() == pItem) {
+			return true;
+		}
+	}
+	return false;
+}

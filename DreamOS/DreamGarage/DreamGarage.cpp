@@ -138,23 +138,19 @@ RESULT DreamGarage::LoadScene() {
 		);
 	}
 
-	m_pIconTexture = std::shared_ptr<texture>(MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-
 	IconFormat iconFormat;
 	LabelFormat labelFormat;
-	UIBarFormat barFormat;
-	
-	m_pDreamUIBar = std::make_shared<DreamUIBar>(this, iconFormat, labelFormat, barFormat);
+	RadialLayerFormat menuFormat;
+	RadialLayerFormat titleFormat;
+
+	// differences from default for title layer
+	titleFormat.menuPosZ = -1.15f;
+	titleFormat.itemPosY = -0.25f;
+	titleFormat.itemAngleX = 75.0f;
+
+	m_pDreamUIBar = std::make_shared<DreamUIBar>(this, iconFormat, labelFormat, menuFormat, titleFormat);
 	CN(m_pDreamUIBar);
 	CV(m_pDreamUIBar);
-
-	//Hardcoded menu for now, will be replaced with api requests
-	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-	m_menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
-	m_menu["ipsum"] = { "1", "2", "3" };
-	m_menu["Play"] = { "a", "b", "c" };
-
-	m_menuPath = {};
 
 	m_pDreamContentView = LaunchDreamApp<DreamContentView>(this);
 	CNM(m_pDreamContentView, "Failed to create dream content view");
@@ -539,45 +535,6 @@ RESULT DreamGarage::Notify(CmdPromptEvent *event) {
 				else {
 					browser->LoadURL(event->GetArg(3));
 				}
-			}
-		}
-	}
-
-	// app ui add <title> - adds ui menu item to the current menu layer
-	// app ui remove - removes the last menu item
-	// app ui list - lists current menu items in menu layer
-	// TODO: these events still use the hardcoded menu/path
-	if (event->GetArg(1).compare("ui") == 0) {
-		if (event->GetArg(2).compare("add") == 0) {
-			if (!m_menuPath.empty()) {
-				m_menu[m_menuPath.top()].emplace_back(event->GetArg(3));
-				UILayerInfo info;
-				info.labels = m_menu[m_menuPath.top()];
-				info.labels.emplace_back(m_menuPath.top());
-				for (size_t i = 0; i < info.labels.size(); i++) {
-					info.icons.emplace_back(m_pIconTexture);
-				}
-				HUD_OUT(("added item " + event->GetArg(3)).c_str());
-				m_pDreamUIBar->UpdateCurrentUILayer(info);
-			}
-		}
-		else if (event->GetArg(2).compare("remove") == 0) {
-			if (!m_menuPath.empty() && m_menu[m_menuPath.top()].size() > 0) {
-				HUD_OUT(("removed item " + m_menu[m_menuPath.top()].back()).c_str());
-				m_menu[m_menuPath.top()].pop_back();
-				UILayerInfo info;
-				info.labels = m_menu[m_menuPath.top()];
-				info.labels.emplace_back(m_menuPath.top());
-				for (size_t i = 0; i < info.labels.size(); i++) {
-					info.icons.emplace_back(m_pIconTexture);
-				}
-				m_pDreamUIBar->UpdateCurrentUILayer(info);
-			}
-		}
-		else if (event->GetArg(2).compare("list") == 0) {
-			HUD_OUT(("current menu: " + m_menuPath.top()).c_str());
-			for (auto& s : m_menu[m_menuPath.top()]) {
-				HUD_OUT(("\t + " + s).c_str());
 			}
 		}
 	}

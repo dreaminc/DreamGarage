@@ -13,7 +13,7 @@
 
 #include <stack>
 
-typedef struct UIBarFormat {
+typedef struct RadialLayerFormat {
 
 	float menuPosZ;
 
@@ -29,7 +29,7 @@ typedef struct UIBarFormat {
 	float headerAngleX;
 	float headerPosY;
 
-	UIBarFormat() :
+	RadialLayerFormat() :
 		menuPosZ(-1.0f),
 		itemAngleX(60.0f),
 		itemAngleY(20.0f),
@@ -45,19 +45,25 @@ typedef struct UIBarFormat {
 
 class UIBar : public UIModule {
 public:
-	UIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat);
+	UIBar(DreamOS *pDreamOS, 
+			IconFormat& iconFormat, 
+			LabelFormat& labelFormat, 
+			RadialLayerFormat& menuFormat,
+			RadialLayerFormat& titleFormat);
 	~UIBar();
 
-	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
+	RESULT UpdateCurrentUILayer(UILayerInfo& info, RadialLayerFormat& layerFormat);
+	RESULT UpdateUILayers(UILayerInfo& currentInfo, UILayerInfo& titleInfo);
 
 private:
 	// Places MenuItem along a circular arc based on index
-	RESULT UpdateWithRadialLayout(size_t index);
+	RESULT UpdateWithRadialLayout(size_t index, RadialLayerFormat& layerFormat);
 
 protected:
 	IconFormat m_iconFormat;
 	LabelFormat m_labelFormat;
-	UIBarFormat m_barFormat;
+	RadialLayerFormat m_menuFormat;
+	RadialLayerFormat m_titleFormat;
 
 public:
 	float GetLargeItemScale();
