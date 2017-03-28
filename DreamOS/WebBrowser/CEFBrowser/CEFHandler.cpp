@@ -19,61 +19,64 @@
 #pragma warning(default : 4067)
 
 namespace {
-	CefHandler* g_instance = NULL;
+	CEFHandler * g_instance = NULL;
 }
 
-CefHandler::CefHandler() :
-	m_isShuttingDown(false) {
+// This is not the way to do a singleton
+// TODO: Do we want this to be a singleton?
+CEFHandler::CEFHandler() :
+	m_fShuttingdown(false) 
+{
 	DCHECK(!g_instance);
 	g_instance = this;
 }
 
-CefHandler::~CefHandler() {
+CEFHandler ::~CEFHandler() {
 	g_instance = nullptr;
 }
 
-CefHandler* CefHandler::GetInstance() {
+CEFHandler * CEFHandler::GetInstance() {
 	return g_instance;
 }
 
-void CefHandler::OnContextInitialized() {
+void CEFHandler::OnContextInitialized() {
 	CEF_REQUIRE_UI_THREAD();
 
 	//
 }
 
-void CefHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) {
+void CEFHandler::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) {
 	CEF_REQUIRE_UI_THREAD();
 
 	//
 }
 
-void CefHandler::OnAfterCreated(CefRefPtr<CefBrowser> browser) {
+void CEFHandler::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	CEF_REQUIRE_UI_THREAD();
 	
-	m_browsers.push_back(browser);
+	m_cefBrowsers.push_back(pCEFBrowser);
 	
-	m_browserMap[browser] = new CefBrowserController(browser);
+	m_browserMap[pCEFBrowser] = new CEFBrowserController(pCEFBrowser);
 	//m_browserMap[browser]->Resize(0, 0);
-	m_NewWebBrowserControllerPromise.set_value(m_browserMap[browser]);
+	m_NewWebBrowserControllerPromise.set_value(m_browserMap[pCEFBrowser]);
 }
 
-bool CefHandler::DoClose(CefRefPtr<CefBrowser> browser) {
+bool CEFHandler::DoClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 
-	if (m_browsers.size() == 1) {
-		m_isShuttingDown = true;
+	if (m_cefBrowsers.size() == 1) {
+		m_fShuttingdown = true;
 	}
 
 	return false;
 }
 
-void CefHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
+void CEFHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	CEF_REQUIRE_UI_THREAD();
 
-	for (BrowserList::iterator it = m_browsers.begin(); it != m_browsers.end(); ++it) {
+	for (auto it = m_cefBrowsers.begin(); it != m_cefBrowsers.end(); it++) {
 		if ((*it)->IsSame(browser)) {
-			m_browsers.erase(it);
+			m_cefBrowsers.erase(it);
 			break;
 		}
 	}
@@ -84,38 +87,42 @@ void CefHandler::OnBeforeClose(CefRefPtr<CefBrowser> browser) {
 	//}
 }
 
-void CefHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
+void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> browser,
 	CefRefPtr<CefFrame> frame,
 	ErrorCode errorCode,
 	const CefString& errorText,
-	const CefString& failedUrl) {
+	const CefString& failedUrl) 
+{
 	CEF_REQUIRE_UI_THREAD();
-
-	//
 }
 
-void CefHandler::CloseAllBrowsers(bool force_close) {
+void CEFHandler::CloseAllBrowsers(bool fForceClose) {
+	RESULT r = R_PASS;
+
 	if (!CefCurrentlyOn(TID_UI)) {
 		// Execute on the UI thread.
-		CefPostTask(TID_UI,
-			base::Bind(&CefHandler::CloseAllBrowsers, this, force_close));
+		CefPostTask(TID_UI, base::Bind(&CEFHandler::CloseAllBrowsers, this, fForceClose));
 		return;
 	}
 
-	if (m_browsers.empty()) {
+	if (m_cefBrowsers.empty()) {
 		CefQuitMessageLoop();
 		return;
 	}
 
-	for (BrowserList::const_iterator it = m_browsers.begin(); it != m_browsers.end(); ++it)
-		(*it)->GetHost()->CloseBrowser(force_close);
+	for (auto it = m_cefBrowsers.begin(); it != m_cefBrowsers.end(); it++) {
+		(*it)->GetHost()->CloseBrowser(fForceClose);
+	}
 
-	if (m_browsers.empty()) {
+	if (m_cefBrowsers.empty()) {
 		CefQuitMessageLoop();
 	}
+
+//Error:
+	return;
 }
 
-WebBrowserController*	CefHandler::CreateBrowser(unsigned int width, unsigned int height, const std::string& url) {
+WebBrowserController* CEFHandler::CreateBrowser(unsigned int width, unsigned int height, const std::string& url) {
 	CefWindowInfo window_info;
 	CefBrowserSettings browserSettings;
 
@@ -124,7 +131,7 @@ WebBrowserController*	CefHandler::CreateBrowser(unsigned int width, unsigned int
 	window_info.height = height;
 
 	// clear the promise for reuse
-	m_NewWebBrowserControllerPromise = std::promise<CefBrowserController*>();
+	m_NewWebBrowserControllerPromise = std::promise<CEFBrowserController*>();
 
 	auto newBrowser = m_NewWebBrowserControllerPromise.get_future();
 	
@@ -141,24 +148,24 @@ WebBrowserController*	CefHandler::CreateBrowser(unsigned int width, unsigned int
 	return browserController;
 }
 
-bool CefHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
-	return DelegateToController(browser, [&](CefBrowserController* controller) {
+bool CEFHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {
+	return DelegateToController(browser, [&](CEFBrowserController* controller) {
 		controller->GetViewRect(browser, rect);
 	});
 }
 
-void CefHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) {
-	DelegateToController(browser, [&](CefBrowserController* controller) {
+void CEFHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) {
+	DelegateToController(browser, [&](CEFBrowserController* controller) {
 		controller->OnPaint(browser, type, dirtyRects, buffer, width, height);
 	});
 }
 
-inline bool CefHandler::DelegateToController(CefRefPtr<CefBrowser> browser, std::function<void(CefBrowserController* controller)> func) {
+inline bool CEFHandler::DelegateToController(CefRefPtr<CefBrowser> browser, std::function<void(CEFBrowserController* controller)> func) {
 	auto foundItem = std::find_if(m_browserMap.begin(), m_browserMap.end(),
-		[&](std::pair<CefRefPtr<CefBrowser>, CefBrowserController*> const& item)
-	{
-		return item.first->IsSame(browser);
-	});
+		[&](std::pair<CefRefPtr<CefBrowser>, CEFBrowserController*> const& item) {
+			return item.first->IsSame(browser);
+		}
+	);
 
 	if (foundItem != std::end(m_browserMap)) {
 		func((*foundItem).second);

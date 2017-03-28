@@ -5,7 +5,7 @@
 // DreamOS/Cloud/WebBrowser/CefBrowserService.h
 // 
 
-#include "WebBrowserService.h"
+#include "WebBrowser/WebBrowserService.h"
 
 #include <thread>
 #include <mutex>
@@ -13,27 +13,33 @@
 
 #include "RESULT/EHM.h"
 
+#define CEF_PROCESS_NAME_DEFAULT "DreamCef.exe"
 
-class CefBrowserService : public WebBrowserService {
+class CEFBrowserService : public WebBrowserService {
+	enum class state {
+		UNINITIALIZED,
+		INITIALIZING,
+		INITIALIZED, 
+		INITIALIZATION_FAILED,
+		INVALID
+	};
+
 public:
-	CefBrowserService();
-	virtual ~CefBrowserService();
+	CEFBrowserService();
+	virtual ~CEFBrowserService();
 
-	RESULT Initialize() override;
-	WebBrowserController* CreateNewWebBrowser(const std::string& url, unsigned int width, unsigned int height) override;
-
-private:
-	void UnInitialize();
-
-	void ServiceThread();
+	virtual RESULT Initialize() override;
+	virtual WebBrowserController* CreateNewWebBrowser(const std::string& strURL, unsigned int width, unsigned int height) override;
 
 private:
-	const std::string	k_CefProcessName = "DreamCef.exe";
+	RESULT Deinitialize();
+	RESULT ServiceThread();
 
+private:
+	const std::string k_CEFProcessName = CEF_PROCESS_NAME_DEFAULT;
 	std::thread m_ServiceThread;
 
-	enum class InitState { Initializing, Initialized, Failed };
-	InitState m_InitState = InitState::Initializing;
+	state m_state = state::UNINITIALIZED;
 
 	std::mutex m_Mutex;
 	std::condition_variable m_BrowserInit;

@@ -4,10 +4,9 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Cloud/WebBrowser/CefBrowserController.h
-// 
+// DreamOS/Cloud/WebBrowser/CEFBrowser/CEFBrowserController.h
 
-#include "browser.h"
+#include "WebBrowser/WebBrowserController.h"
 
 #include "include\cef_client.h"
 #include "include\cef_base.h"
@@ -23,18 +22,17 @@
 #include <list>
 #include <future>
 
-class CEFBrowserController : public WebBrowserController, public CefRenderHandler
-{
+class CEFBrowserController : public WebBrowserController, public CefRenderHandler {
+
 public:
-	CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
-		m_pCEFBrowser(pCEFBrowser) {}
+	CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser);
 
 	// WebBrowserController
-	virtual void PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) override;
-	virtual int PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> pred) override;
-	virtual void Resize(unsigned int width, unsigned int height) override;
-	virtual void SendKeySequence(const std::string& keys) override;
-	virtual void LoadURL(const std::string& url) override;
+	virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> fnPred) override;
+	virtual RESULT PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> fnPred) override;
+	virtual RESULT Resize(unsigned int width, unsigned int height) override;
+	virtual RESULT SendKeySequence(const std::string& keys) override;
+	virtual RESULT LoadURL(const std::string& url) override;
 
 	// CefRenderHandler
 	virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;

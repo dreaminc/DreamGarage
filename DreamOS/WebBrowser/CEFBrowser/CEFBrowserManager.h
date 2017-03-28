@@ -15,19 +15,19 @@ class CEFBrowserService;
 
 class CEFBrowserManager {
 public:
-	void Initialize(composite* pComposite);
+	RESULT Initialize(composite* pComposite);
 	void Update();
 
 	std::string CreateNewBrowser(unsigned int width, unsigned int height, const std::string& url);
-	CEFBrowserController*	GetBrowser(const std::string& id);
-	void SetKeyFocus(const std::string& id);
+	CEFBrowserController* GetBrowser(const std::string& strID);
 
+	void SetKeyFocus(const std::string& id);
 	void OnKey(unsigned int scanCode, char16_t chr);
 
 private:
 	composite*	m_pComposite;
 
-	std::unique_ptr<CEFBrowserService> m_BrowserService = nullptr;
+	std::unique_ptr<CEFBrowserService> m_pCEFBrowserService = nullptr;
 
 	struct BrowserObject {
 		CEFBrowserController*		pCEFBrowserController;

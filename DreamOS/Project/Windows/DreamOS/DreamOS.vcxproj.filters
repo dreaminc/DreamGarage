@@ -195,6 +195,12 @@
     <Filter Include="NuGet">
       <UniqueIdentifier>{49713455-67bf-497c-a46d-68456ba95718}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WebBrowser">
+      <UniqueIdentifier>{1cefafeb-98c7-4a55-ad04-d0ea29fa152d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebBrowser\CEFBrowser">
+      <UniqueIdentifier>{050ed7a2-b102-42e7-ad6f-8a2e98c25191}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -661,6 +667,21 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp">
       <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserService.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp">
+      <Filter>WebBrowser</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -2455,6 +2476,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h">
       <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserService.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserControllerFactory.h">
+      <Filter>WebBrowser</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

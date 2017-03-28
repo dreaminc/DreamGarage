@@ -6,7 +6,7 @@
 // DreamOS/Cloud/WebBrowser/CefHandler.h
 //
 
-#include "browser.h"
+#include "WebBrowser/WebBrowserController.h"
 
 #include "CefBrowserController.h"
 
@@ -27,7 +27,7 @@
 #include "RESULT/EHM.h"
 
 
-class CefHandler : 
+class CEFHandler : 
 	public CefApp,
 	public CefBrowserProcessHandler,
 	public CefClient,
@@ -37,39 +37,25 @@ class CefHandler :
 	public CefRenderHandler
 {
 public:
-	CefHandler();
-	~CefHandler();
+	CEFHandler();
+	~CEFHandler();
 
-	static CefHandler* GetInstance();
+	static CEFHandler* GetInstance();
 
 	// CefApp
-	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override {
-		return this;
-	}
+	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override { return this; }
 
 	// CefBrowserProcessHandler
 	virtual void OnContextInitialized() override;
 
 	// CefClient
-	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override { 
-		return this;
-	};
-
-	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override {
-		return this;
-	}
-
-	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override {
-		return this;
-	}
-
-	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override {
-		return this;
-	}
+	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override {  return this; };
+	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override { return this; }
+	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
+	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
 
 	// CefDisplayHandler
-	virtual void OnTitleChange(CefRefPtr<CefBrowser> browser,
-		const CefString& title) override;
+	virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
 
 	// CefLifeSpanHandler
 	virtual void OnAfterCreated(CefRefPtr<CefBrowser> browser) override;
@@ -77,16 +63,12 @@ public:
 	virtual void OnBeforeClose(CefRefPtr<CefBrowser> browser) override;
 
 	// CefLoadHandler
-	virtual void OnLoadError(CefRefPtr<CefBrowser> browser,
-		CefRefPtr<CefFrame> frame,
-		ErrorCode errorCode,
-		const CefString& errorText,
-		const CefString& failedUrl) override;
+	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
+						     const CefString& errorText, const CefString& failedUrl) override;
 
 	// Request that all existing browser windows close.
-	void CloseAllBrowsers(bool force_close);
-
-	bool IsShuttingDown() const { return m_isShuttingDown; }
+	void CloseAllBrowsers(bool fForceClose);
+	bool IsShuttingDown() const { return m_fShuttingdown; }
 
 	// CefRenderHandler
 	bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
@@ -96,18 +78,17 @@ public:
 	WebBrowserController*	CreateBrowser(unsigned int width, unsigned int height, const std::string& url);
 
 private:
-	inline bool DelegateToController(CefRefPtr<CefBrowser> browser, std::function<void(CefBrowserController* controller)> func);
+	inline bool DelegateToController(CefRefPtr<CefBrowser> browser, std::function<void(CEFBrowserController* controller)> func);
 
 private:
-	typedef std::list<CefRefPtr<CefBrowser>> BrowserList;
-	BrowserList m_browsers;
+	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;
 
-	bool m_isShuttingDown;
+	bool m_fShuttingdown;
 
-	std::map<CefRefPtr<CefBrowser>, CefBrowserController*> m_browserMap;
-	std::promise<CefBrowserController*> m_NewWebBrowserControllerPromise;
+	std::map<CefRefPtr<CefBrowser>, CEFBrowserController*> m_browserMap;
+	std::promise<CEFBrowserController*> m_NewWebBrowserControllerPromise;
 
-	IMPLEMENT_REFCOUNTING(CefHandler);
+	IMPLEMENT_REFCOUNTING(CEFHandler);
 };
 
 #endif // !CEF_HANDLER_H_
