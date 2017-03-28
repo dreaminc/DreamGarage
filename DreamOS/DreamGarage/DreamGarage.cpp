@@ -512,7 +512,7 @@ RESULT DreamGarage::Notify(CmdPromptEvent *event) {
 			}
 		}
 	}
-	*/
+	//*/
 
 	return r;
 }

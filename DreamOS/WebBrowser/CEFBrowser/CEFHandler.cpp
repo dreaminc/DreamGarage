@@ -123,29 +123,29 @@ void CEFHandler::CloseAllBrowsers(bool fForceClose) {
 }
 
 WebBrowserController* CEFHandler::CreateBrowser(unsigned int width, unsigned int height, const std::string& url) {
-	CefWindowInfo window_info;
-	CefBrowserSettings browserSettings;
+	CefWindowInfo cefWindowInfo;
+	CefBrowserSettings cefBrowserSettings;
 
-	window_info.SetAsWindowless(0, false);
-	window_info.width = width;
-	window_info.height = height;
+	cefWindowInfo.SetAsWindowless(0, false);
+	cefWindowInfo.width = width;
+	cefWindowInfo.height = height;
 
 	// clear the promise for reuse
 	m_NewWebBrowserControllerPromise = std::promise<CEFBrowserController*>();
 
 	auto newBrowser = m_NewWebBrowserControllerPromise.get_future();
 	
-	if (!CefBrowserHost::CreateBrowser(window_info, this, url, browserSettings, nullptr)) {
+	if (!CefBrowserHost::CreateBrowser(cefWindowInfo, this, url, cefBrowserSettings, nullptr)) {
 		LOG(ERROR) << "CreateBrowser failed";
 		return nullptr;
 	}
 
 	// blocks until promise is settled
-	auto browserController = newBrowser.get();
+	WebBrowserController* pBrowserController = newBrowser.get();
 
-	browserController->Resize(width, height);
+	pBrowserController->Resize(width, height);
 
-	return browserController;
+	return pBrowserController;
 }
 
 bool CEFHandler::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) {

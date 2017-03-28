@@ -10,8 +10,9 @@
 #include <string>
 #include "Primitives/composite.h"
 
+#include "WebBrowser/CEFBrowser/CEFBrowserService.h"
+
 class CEFBrowserController;
-class CEFBrowserService;
 
 class CEFBrowserManager {
 public:

@@ -8,6 +8,8 @@
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamBrowser.h"
 
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -114,7 +116,7 @@ RESULT UITestSuite::InitializeUI() {
 RESULT UITestSuite::AddTestBrowser() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 30.0f;
+	double sTestTime = 60.0f;
 	int nRepeats = 1;
 
 	// Initialize Code
@@ -122,8 +124,11 @@ RESULT UITestSuite::AddTestBrowser() {
 		RESULT r = R_PASS;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 
+		std::string strURL = "https://www.google.com";
+
 		CN(m_pDreamOS);
 
+		/*
 		// Create the Shared View App
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		CNM(pDreamBrowser, "Failed to create dream browser");
@@ -133,7 +138,14 @@ RESULT UITestSuite::AddTestBrowser() {
 
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
-		pDreamBrowser->SetURI("https://www.google.com");
+		pDreamBrowser->SetURI(strURL);
+		*/
+
+		CEFBrowserManager *pCEFBrowserManager = new CEFBrowserManager();
+		CN(pCEFBrowserManager);
+		CR(pCEFBrowserManager->Initialize(m_pDreamOS->AddComposite()));
+
+		pCEFBrowserManager->CreateNewBrowser(512, 512, strURL);
 
 	Error:
 		return R_PASS;

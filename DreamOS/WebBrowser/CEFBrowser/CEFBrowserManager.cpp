@@ -5,10 +5,10 @@
 
 #include "DreamConsole/DreamConsole.h"
 
-RESULT CEFBrowserManager::Initialize(composite* composite) {
+RESULT CEFBrowserManager::Initialize(composite* pComposite) {
 	RESULT r = R_PASS;
 
-	m_pComposite = composite;
+	m_pComposite = pComposite;
 	m_pCEFBrowserService = std::make_unique<CEFBrowserService>();
 
 	// Initialize
