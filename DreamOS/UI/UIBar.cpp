@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-UIBar::UIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, RadialLayerFormat& menuFormat, RadialLayerFormat& titleFormat) :
+UIBar::UIBar(DreamOS *pDreamOS, const IconFormat& iconFormat, const LabelFormat& labelFormat, const RadialLayerFormat& menuFormat, const RadialLayerFormat& titleFormat) :
 	UIModule(pDreamOS),
 	m_iconFormat(iconFormat),
 	m_labelFormat(labelFormat),
@@ -19,7 +19,7 @@ UIBar::~UIBar() {
 	// empty
 }
 
-RESULT UIBar::UpdateWithRadialLayout(size_t index, RadialLayerFormat& layerFormat) {
+RESULT UIBar::UpdateWithRadialLayout(size_t index, const RadialLayerFormat& layerFormat) {
 
 	auto& currentMenu = m_pCurrentUILayer->GetMenuItems();
 	auto& pItem = currentMenu[index];
@@ -49,7 +49,7 @@ RESULT UIBar::UpdateWithRadialLayout(size_t index, RadialLayerFormat& layerForma
 
 // currently destroys and recreates the menu based off of the new information
 //
-RESULT UIBar::UpdateUILayers(UILayerInfo& currentInfo, UILayerInfo& titleInfo) {
+RESULT UIBar::UpdateUILayers(const UILayerInfo& currentInfo, const UILayerInfo& titleInfo) {
 	RESULT r = R_PASS;
 	CR(m_pCompositeContext->ClearChildren()); //always removes all layers
 
@@ -60,7 +60,7 @@ Error:
 	return r;
 }
 
-RESULT UIBar::UpdateCurrentUILayer(UILayerInfo& info, RadialLayerFormat& layerFormat) {
+RESULT UIBar::UpdateCurrentUILayer(const UILayerInfo& info, const RadialLayerFormat& layerFormat) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<UIMenuLayer> pLayer = nullptr;

@@ -30,6 +30,8 @@ RESULT UIMenuLayer::Initialize() {
 
 	CR(m_pContextComposite->InitializeOBB());
 
+	m_menuItems = {};
+
 Error:
 	return r;
 }
@@ -57,11 +59,13 @@ std::vector<std::shared_ptr<UIMenuItem>> UIMenuLayer::GetMenuItems() {
 }
 
 std::shared_ptr<UIMenuItem> UIMenuLayer::GetMenuItem(VirtualObj *pObj) {
-	for (auto& pItem : m_menuItems) {
-		if (pItem->Contains(pObj)) {
-			return pItem;
+	//if (m_menuItems != nullptr) {
+		for (auto& pItem : m_menuItems) {
+			if (pItem->Contains(pObj)) {
+				return pItem;
+			}
 		}
-	}
+	//}
 	return nullptr;
 }
 

@@ -46,18 +46,18 @@ typedef struct RadialLayerFormat {
 class UIBar : public UIModule {
 public:
 	UIBar(DreamOS *pDreamOS, 
-			IconFormat& iconFormat, 
-			LabelFormat& labelFormat, 
-			RadialLayerFormat& menuFormat,
-			RadialLayerFormat& titleFormat);
+			const IconFormat& iconFormat, 
+			const LabelFormat& labelFormat, 
+			const RadialLayerFormat& menuFormat,
+			const RadialLayerFormat& titleFormat);
 	~UIBar();
 
-	RESULT UpdateCurrentUILayer(UILayerInfo& info, RadialLayerFormat& layerFormat);
-	RESULT UpdateUILayers(UILayerInfo& currentInfo, UILayerInfo& titleInfo);
+	RESULT UpdateCurrentUILayer(const UILayerInfo& info, const RadialLayerFormat& layerFormat);
+	RESULT UpdateUILayers(const UILayerInfo& currentInfo, const UILayerInfo& titleInfo);
 
 private:
 	// Places MenuItem along a circular arc based on index
-	RESULT UpdateWithRadialLayout(size_t index, RadialLayerFormat& layerFormat);
+	RESULT UpdateWithRadialLayout(size_t index, const RadialLayerFormat& layerFormat);
 
 protected:
 	IconFormat m_iconFormat;

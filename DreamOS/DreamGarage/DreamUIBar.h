@@ -14,10 +14,10 @@ class DreamUIBar : public UIBar, public MenuController::observer {
 
 public:
 	DreamUIBar(DreamOS *pDreamOS, 
-				IconFormat& iconFormat, 
-				LabelFormat& labelFormat, 
-				RadialLayerFormat& menuFormat,
-				RadialLayerFormat& titleFormat);
+				const IconFormat& iconFormat, 
+				const LabelFormat& labelFormat, 
+				const RadialLayerFormat& menuFormat,
+				const RadialLayerFormat& titleFormat);
 	~DreamUIBar();
 
 	RESULT Initialize();

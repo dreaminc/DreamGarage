@@ -3,7 +3,7 @@
 
 #include "Cloud/Menu/MenuNode.h"
 
-DreamUIBar::DreamUIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, RadialLayerFormat& menuFormat, RadialLayerFormat& titleFormat) :
+DreamUIBar::DreamUIBar(DreamOS *pDreamOS, const IconFormat& iconFormat, const LabelFormat& labelFormat, const RadialLayerFormat& menuFormat, const RadialLayerFormat& titleFormat) :
 	UIBar(pDreamOS, iconFormat, labelFormat, menuFormat, titleFormat)
 {
 	RESULT r = R_PASS;
@@ -179,7 +179,7 @@ RESULT DreamUIBar::Update() {
 
 		//TODO: There are several RenderToTexture calls and object creates
 		// that cause a brief timing delay
-		UpdateUILayers(info, titleInfo);
+		CR(UpdateUILayers(info, titleInfo));
 	}
 
 Error:
