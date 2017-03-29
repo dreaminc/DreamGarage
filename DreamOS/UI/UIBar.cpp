@@ -5,11 +5,12 @@
 
 #include <algorithm>
 
-UIBar::UIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat) :
+UIBar::UIBar(DreamOS *pDreamOS, const IconFormat& iconFormat, const LabelFormat& labelFormat, const RadialLayerFormat& menuFormat, const RadialLayerFormat& titleFormat) :
 	UIModule(pDreamOS),
 	m_iconFormat(iconFormat),
 	m_labelFormat(labelFormat),
-	m_barFormat(barFormat)
+	m_menuFormat(menuFormat),
+	m_titleFormat(titleFormat)
 {
 	// empty
 }
@@ -18,44 +19,51 @@ UIBar::~UIBar() {
 	// empty
 }
 
-RESULT UIBar::UpdateWithRadialLayout(size_t index) {
+RESULT UIBar::UpdateWithRadialLayout(size_t index, const RadialLayerFormat& layerFormat) {
 
 	auto& currentMenu = m_pCurrentUILayer->GetMenuItems();
 	auto& pItem = currentMenu[index];
-	int size = static_cast<int>(currentMenu.size());
-	bool fHeader = (index == size - 1);
 
 	std::shared_ptr<composite> pContext = pItem->GetContext();
 	std::shared_ptr<quad> pQuad = pItem->GetQuad();
 
 	// Radial layout
-	int radIndex = fHeader ? 0 : static_cast<int>(index);
-	float radY = (m_barFormat.itemAngleY * M_PI / 180.0f) * -(radIndex);
-	radY -= m_barFormat.itemStartAngleY * M_PI / 180.0f;
-	quaternion rotY = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
-	float yPos = fHeader ? m_barFormat.headerPosY : m_barFormat.itemPosY;
-	float zPos = fHeader ? m_barFormat.menuPosZ * 1.15f : m_barFormat.menuPosZ;
-	pContext->MoveTo(sin(radY) * zPos, yPos, cos(radY) * zPos);
+	int radIndex = static_cast<int>(index);
+	float radY = (layerFormat.itemAngleY * M_PI / 180.0f) * -(radIndex);
+	radY -= layerFormat.itemStartAngleY * M_PI / 180.0f;
+	quaternion qContext = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
+
+	float yPos = layerFormat.itemPosY;
+	float zPos = layerFormat.menuPosZ;
+	point ptContext = point(sin(radY) * zPos, yPos, cos(radY) * zPos);
 	
-	pContext->SetOrientation(rotY);
+	float radX = layerFormat.itemAngleX * M_PI / 180.0f;
+	quaternion qQuad = quaternion::MakeQuaternionWithEuler(radX, 0.0f, 0.0f);
 
-	float radX = (fHeader ? m_barFormat.headerAngleX : m_barFormat.itemAngleX) * M_PI / 180.0f;
-	quaternion rotX = quaternion::MakeQuaternionWithEuler(radX, 0.0f, 0.0f);
+	point ptQuad = point(0.0f, 0.0f, 0.0f);
 
-	if (pQuad != nullptr) {
-		pQuad->MoveTo(0.0f, 0.0f, 0.0f);
-		pQuad->SetOrientation(rotX);
-	}
+	pItem->SetObjectParams(ptQuad, qQuad, ptContext, qContext);
 
 	return R_PASS;
 }
 
-RESULT UIBar::UpdateCurrentUILayer(UILayerInfo& info) {
+// currently destroys and recreates the menu based off of the new information
+//
+RESULT UIBar::UpdateUILayers(const UILayerInfo& currentInfo, const UILayerInfo& titleInfo) {
+	RESULT r = R_PASS;
+	CR(m_pCompositeContext->ClearChildren()); //always removes all layers
+
+	CR(UpdateCurrentUILayer(titleInfo, m_titleFormat));
+	CR(UpdateCurrentUILayer(currentInfo, m_menuFormat));
+
+Error:
+	return r;
+}
+
+RESULT UIBar::UpdateCurrentUILayer(const UILayerInfo& info, const RadialLayerFormat& layerFormat) {
 	RESULT r = R_PASS;
 
-	m_pCompositeContext->ClearChildren(); //always removes all layers
 	std::shared_ptr<UIMenuLayer> pLayer = nullptr;
-
 	pLayer = CreateMenuLayer();
 	CN(pLayer);
 
@@ -65,23 +73,17 @@ RESULT UIBar::UpdateCurrentUILayer(UILayerInfo& info) {
 		auto iconFormat = m_iconFormat;
 		auto labelFormat = m_labelFormat;
 		
-		if (i < info.icons.size()) {
-			iconFormat.pTexture = info.icons[i];
-			iconFormat.ptPosition = point(0.0f, 0.25f, 0.0f);
-		}
-
-		if (i < info.labels.size()) {
-			labelFormat.strLabel = info.labels[i];
-			labelFormat.ptPosition = point(0.0f, -0.9f, 0.0f);
-		}
+		if (i < info.icons.size()) iconFormat.pTexture = info.icons[i];
+		if (i < info.labels.size()) labelFormat.strLabel = info.labels[i];
 
 		auto pItem = pLayer->CreateMenuItem();
-		pItem->Update(iconFormat, labelFormat);
+		CN(pItem);
+		CR(pItem->Update(iconFormat, labelFormat));
 	}
 
 	// currently, must wait until all items are created before positioning
 	for(size_t i = 0; i < size; i++) {
-		UpdateWithRadialLayout(i);
+		CR(UpdateWithRadialLayout(i, layerFormat));
 	}
 
 Error:
@@ -89,5 +91,5 @@ Error:
 }
 
 float UIBar::GetLargeItemScale() {
-	return m_barFormat.itemScaleSelected;
+	return m_menuFormat.itemScaleSelected;
 }

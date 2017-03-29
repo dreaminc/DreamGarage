@@ -104,11 +104,6 @@ private:
 	
 	// UI
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
-	//
-	//temporarily hardcoded
-	std::map<std::string, std::vector<std::string>> m_menu;
-	std::stack<std::string> m_menuPath;
-	std::shared_ptr<texture> m_pIconTexture;
 
 	std::shared_ptr<DreamContentView> m_pDreamContentView;
 

@@ -78,6 +78,16 @@ Error:
 	return r;
 }
 
+RESULT UIMenuItem::SetObjectParams(point ptQuad, quaternion qQuad, point ptContext, quaternion qContext) {
+	m_pQuad->MoveTo(ptQuad);
+	m_pQuad->SetOrientation(qQuad);
+
+	m_pContextComposite->MoveTo(ptContext);
+	m_pContextComposite->SetOrientation(qContext);
+
+	return R_PASS;
+}
+
 // TODO: could be different for different types of MenuItems
 // may make sense to take a comparison function as an argument
 bool UIMenuItem::Contains(VirtualObj *pObj) {
