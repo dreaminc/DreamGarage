@@ -14,12 +14,13 @@
 
 class CEFBrowserController;
 
+
 class CEFBrowserManager {
 public:
 	RESULT Initialize(composite* pComposite);
 	void Update();
 
-	std::string CreateNewBrowser(unsigned int width, unsigned int height, const std::string& url);
+	std::string CreateNewBrowser(unsigned int width, unsigned int height, const std::string& strURL);
 	CEFBrowserController* GetBrowser(const std::string& strID);
 
 	void SetKeyFocus(const std::string& id);

@@ -29,7 +29,7 @@ public:
 
 	// WebBrowserController
 	virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> fnPred) override;
-	virtual RESULT PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> fnPred) override;
+	virtual int PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> fnPred) override;
 	virtual RESULT Resize(unsigned int width, unsigned int height) override;
 	virtual RESULT SendKeySequence(const std::string& keys) override;
 	virtual RESULT LoadURL(const std::string& url) override;

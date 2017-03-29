@@ -19,7 +19,7 @@ public:
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.
-	virtual RESULT PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> pred) = 0;
+	virtual int PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> pred) = 0;
 
 	// Resize the browser.
 	virtual RESULT Resize(unsigned int width, unsigned int height) = 0;

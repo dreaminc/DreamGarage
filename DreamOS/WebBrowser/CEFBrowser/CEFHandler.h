@@ -1,10 +1,10 @@
 #ifndef CEF_HANDLER_H_
 #define CEF_HANDLER_H_
 
+#include "RESULT/EHM.h"
 
 // DREAM OS
 // DreamOS/Cloud/WebBrowser/CefHandler.h
-//
 
 #include "WebBrowser/WebBrowserController.h"
 
@@ -24,35 +24,51 @@
 #include <list>
 #include <future>
 
-#include "RESULT/EHM.h"
 
 
 class CEFHandler : 
-	public CefApp,
-	public CefBrowserProcessHandler,
+	//public CefApp,
+	//public CefBrowserProcessHandler,
 	public CefClient,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
-	public CefLoadHandler,
-	public CefRenderHandler
+	public CefLoadHandler
+	//public CefRenderHandler
 {
-public:
+private:
 	CEFHandler();
 	~CEFHandler();
 
-	static CEFHandler* GetInstance();
+public:
 
 	// CefApp
-	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override { return this; }
+	/*
+	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override { 
+		return this; 
+	}
+	*/
 
 	// CefBrowserProcessHandler
-	virtual void OnContextInitialized() override;
+	//virtual void OnContextInitialized() override;
 
 	// CefClient
-	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override {  return this; };
-	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override { return this; }
-	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { return this; }
-	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { return this; }
+	/*
+	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override { 
+		return this; 
+	}
+	*/
+
+	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override { 
+		return this; 
+	}
+
+	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { 
+		return this; 
+	}
+
+	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { 
+		return this; 
+	}
 
 	// CefDisplayHandler
 	virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
@@ -71,24 +87,30 @@ public:
 	bool IsShuttingDown() const { return m_fShuttingdown; }
 
 	// CefRenderHandler
-	bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
-	void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
+	//virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
+	//virtual void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
 
 public:
 	WebBrowserController*	CreateBrowser(unsigned int width, unsigned int height, const std::string& url);
 
 private:
-	inline bool DelegateToController(CefRefPtr<CefBrowser> browser, std::function<void(CEFBrowserController* controller)> func);
-
-private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;
-
-	bool m_fShuttingdown;
-
-	std::map<CefRefPtr<CefBrowser>, CEFBrowserController*> m_browserMap;
-	std::promise<CEFBrowserController*> m_NewWebBrowserControllerPromise;
+	bool m_fShuttingdown = false;
 
 	IMPLEMENT_REFCOUNTING(CEFHandler);
+
+	// TODO: Replace with Singleton pattern / manager
+	// Singleton Usage
+protected:
+	static CEFHandler *s_pInstance;
+
+public:
+	static CEFHandler *instance() {
+		if (!s_pInstance)
+			s_pInstance = new CEFHandler();
+
+		return s_pInstance;
+	}
 };
 
 #endif // !CEF_HANDLER_H_

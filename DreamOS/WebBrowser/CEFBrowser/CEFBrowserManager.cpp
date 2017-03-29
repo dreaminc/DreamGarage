@@ -5,83 +5,124 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include "CEFApp.h"
+
 RESULT CEFBrowserManager::Initialize(composite* pComposite) {
 	RESULT r = R_PASS;
 
 	m_pComposite = pComposite;
-	m_pCEFBrowserService = std::make_unique<CEFBrowserService>();
-
+	
+	/*
 	// Initialize
+	m_pCEFBrowserService = std::make_unique<CEFBrowserService>();
+	CN(m_pCEFBrowserService);
 	CR(m_pCEFBrowserService->Initialize());
+	*/
 
-Error:
+
+	// Initialize CEF.
+	// Enable High-DPI support on Windows 7 or newer.
+
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
+	CefMainArgs cefMainArgs(hInstance);
+
+	// Provide CEF with command-line arguments.
+	int exitCode = CefExecuteProcess(cefMainArgs, nullptr, nullptr);
+	DEBUG_LINEOUT("CefExecuteProcess returned %d", exitCode);
+
+	// Specify CEF global settings here.
+	CefSettings cefSettings;
+
+	CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(new CEFApp);
+
+	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
+	CefString(&cefSettings.locale) = "en";
+	cefSettings.remote_debugging_port = 8080;
+	cefSettings.multi_threaded_message_loop = true;
+
+	CefInitialize(cefMainArgs, cefSettings, pCEFApp.get(), nullptr);
+
+	// This will block
+	//CefRunMessageLoop();
+
+//Error:
 	return r;
 }
 
 void CEFBrowserManager::Update() {
 	for (auto& b : m_Browsers) {
 		// TODO: optimize with actual dirty rects copy
-		if (b.second.pCEFBrowserController->PollNewDirtyFrames([&](unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom) -> bool {
-			b.second.pTexture->Update(output, width, height, texture::PixelFormat::BGRA);
+		if (b.second.pCEFBrowserController->PollNewDirtyFrames([&](unsigned char *pBufferOutput, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom) -> bool {
+			b.second.pTexture->Update(pBufferOutput, width, height, texture::PixelFormat::BGRA);
 			// poll whole frame and stop iterations
 			return false;
-		})) {
+		})) 
+		{
+			// no if
 		}
 	}
 }
 
 // TODO: all of this into DreamBrowser
-std::string CEFBrowserManager::CreateNewBrowser(unsigned int width, unsigned int height, const std::string& url) {
+std::string CEFBrowserManager::CreateNewBrowser(unsigned int width, unsigned int height, const std::string& strURL) {
 	static int id = 0;
 	id++;
 
+	std::string strID = std::to_string(id);
+
 	// TODO: remove this
 	BrowserObject browserObject {
-		(CEFBrowserController*)(m_pCEFBrowserService->CreateNewWebBrowser(url, width, height)),
+		(CEFBrowserController*)(m_pCEFBrowserService->CreateNewWebBrowser(strURL, width, height)),
 		nullptr,
 		nullptr
 	};
 
+	// TODO: Replace with CN
 	if (browserObject.pCEFBrowserController == nullptr) {
 		return "";
 	}
 
-	std::vector<unsigned char>	buffer(width * height * 4, 0);
+	//std::vector<unsigned char> buffer(width * height * 4, 0);
+	unsigned char *pBuffer = nullptr;
+	size_t pBuffer_n = sizeof(unsigned char) * (width * height * 4);
+	pBuffer = (unsigned char*)malloc(pBuffer_n);
+	memset(pBuffer, 0xFF, pBuffer_n);
 
-	browserObject.pTexture = m_pComposite->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, texture::PixelFormat::RGBA, 4, &buffer[0], width * height * 4);
+	browserObject.pTexture = m_pComposite->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, texture::PixelFormat::RGBA, 4, pBuffer, (int)(pBuffer_n));
 
 	float quadWidth = 4.0f * width / 512;
 	float quadHeight = 4.0f * height / 512;
 
-	std::shared_ptr<quad> quad = m_pComposite->AddQuad(quadWidth, quadHeight);
+	browserObject.pQuad = m_pComposite->AddQuad(quadWidth, quadHeight);
+	browserObject.pQuad->SetVisible(true);
 
 	// Vertical flip
-	quad->TransformUV(
+	browserObject.pQuad->TransformUV(
 		{ { 0, 0 } }, 
 		{ { 1, 0, 
 			0, -1 } }
 	);
 
-	quad->ResetRotation();
-	quad->RotateXBy(0.3f);
+	browserObject.pQuad->ResetRotation();
+	browserObject.pQuad->RotateXBy(0.3f);
 
 	// TODO: this is dumb
 	static float xOffset = -quadWidth / 2;
 
-	quad->MoveTo(xOffset + quadWidth / 2, -0.3f + 0.8f, 0);
+	browserObject.pQuad->MoveTo(xOffset + quadWidth / 2, -0.3f + 0.8f, 0);
 
 	xOffset += quadWidth;
 
-	quad->GetMaterial()->Set(color(0.5f, 0.5f, 0.5f, 1.0f), color(0.5f, 0.5f, 0.5f, 1.0f), color(0.0f, 0.0f, 0.0f, 1.0f));
+	browserObject.pQuad->GetMaterial()->Set(color(0.5f, 0.5f, 0.5f, 1.0f), color(0.5f, 0.5f, 0.5f, 1.0f), color(0.0f, 0.0f, 0.0f, 1.0f));
 
-	quad->SetMaterialTexture(DimObj::MaterialTexture::Ambient, browserObject.pTexture.get());
-	quad->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, browserObject.pTexture.get());
+	browserObject.pQuad->SetMaterialTexture(DimObj::MaterialTexture::Ambient, browserObject.pTexture.get());
+	browserObject.pQuad->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, browserObject.pTexture.get());
 
-	m_Browsers[std::to_string(id)] = browserObject;
+	m_Browsers[strID] = browserObject;
 
-	HUD_OUT("created browser id = %d (%dx%d)", id, width, height);
+	DEBUG_LINEOUT("Created browser id = %d (%dx%d)", id, width, height);
 
-	return std::to_string(id);
+	return strID;
 }
 
 CEFBrowserController* CEFBrowserManager::GetBrowser(const std::string& strID) {

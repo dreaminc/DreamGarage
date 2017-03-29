@@ -24,31 +24,34 @@ Error:
 RESULT CEFBrowserService::Initialize() {
 	RESULT r = R_PASS;
 
-	LOG(INFO) << "Initializing CEF thread..";
+	DEBUG_LINEOUT("Initializing CEF thread..");
 
 	// TODO: Formalize
 	m_ServiceThread = std::thread(&CEFBrowserService::ServiceThread, this);
 
 	// Wait for CEF to initialize
 
-	std::unique_lock<std::mutex> lk(m_Mutex);
-	m_BrowserInit.wait(lk, [&] {return (m_state != state::INITIALIZING); });
+	std::unique_lock<std::mutex> lockCEFBrowserInitialization(m_Mutex);
 
-	LOG(INFO) << "Initializing CEF thread..";
+	m_BrowserInit.wait(lockCEFBrowserInitialization, 
+		[&] {
+			return (m_state != state::UNINITIALIZED); 
+		}
+	);
 
 	switch (m_state) {
 		case CEFBrowserService::state::INITIALIZING: {
-			LOG(ERROR) << "CEF initialize failed (Initializing state)";
+			DEBUG_LINEOUT("CEF initialize failed (Initializing state)");
 			r = R_FAIL;
 		} break;
 
 		case CEFBrowserService::state::INITIALIZED: {
-			LOG(INFO) << "CEF initialize complete";
+			DEBUG_LINEOUT("CEF initialize complete");
 			r = R_PASS;
 		} break;
 
 		case CEFBrowserService::state::INITIALIZATION_FAILED: {
-			LOG(ERROR) << "CEF initialize failed (Failed state)";
+			DEBUG_LINEOUT("CEF initialize failed (Failed state)");
 			r = R_FAIL;
 		} break;
 	}
@@ -60,10 +63,10 @@ RESULT CEFBrowserService::Initialize() {
 RESULT CEFBrowserService::Deinitialize() {
 	RESULT r = R_PASS;
 
-	LOG(INFO) << "CEF force shutdown";
+	DEBUG_LINEOUT("CEF force shutdown");
 
-	if (CEFHandler::GetInstance()) {
-		CEFHandler::GetInstance()->CloseAllBrowsers(true);
+	if (CEFHandler::instance()) {
+		CEFHandler::instance()->CloseAllBrowsers(true);
 	}
 
 	if (m_ServiceThread.joinable())
@@ -76,50 +79,54 @@ RESULT CEFBrowserService::Deinitialize() {
 RESULT CEFBrowserService::ServiceThread() {
 	RESULT r = R_PASS;
 
-	CefSettings m_CEFSettings;
+	CefSettings cefSettings;
 
-	const CefMainArgs CEFMainArgs(GetModuleHandle(NULL));
-
-	void* CEFSandboxInfo = nullptr;
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
+	CefMainArgs CEFMainArgs(hInstance);
 
 	int exitCode = CefExecuteProcess(CEFMainArgs, nullptr, nullptr);
-	LOG(INFO) << "CefExecuteProcess returned " << exitCode;
+	DEBUG_LINEOUT("CefExecuteProcess returned %d", exitCode);
 
-	// Initialize CEF.
-	CefString(&m_CEFSettings.browser_subprocess_path) = k_CEFProcessName;
-	CefString(&m_CEFSettings.locale) = "en";
+	// Initialize CEF
+	CefString(&cefSettings.browser_subprocess_path) = k_CEFProcessName;
+	CefString(&cefSettings.locale) = "en";
 
-	CefRefPtr<CEFHandler> cefHandler(new CEFHandler());
+	//m_CEFSettings.no_sandbox = true;
 
-	if (!CefInitialize(CEFMainArgs, m_CEFSettings, cefHandler.get(), nullptr)) {
-		LOG(ERROR) << "CEFInitialized failed.";
+	CefRefPtr<CEFHandler> pCEFHandler(CEFHandler::instance());
+
+	/*
+	if (CefInitialize(CEFMainArgs, cefSettings, pCEFHandler.get(), nullptr) == false) {
+		DEBUG_LINEOUT("CEFInitialized failed.");
 
 		m_state = state::INITIALIZATION_FAILED;
 		m_BrowserInit.notify_one();
-		return r ;
-	}
 
-	LOG(INFO) << "CefInitialize completed successfully";
+		return r;
+	}
+	*/
+
+	DEBUG_LINEOUT("CefInitialize completed successfully");
 
 	m_state = state::INITIALIZED;
 	m_BrowserInit.notify_one();
 
-	LOG(INFO) << "Run message loop";
+	DEBUG_LINEOUT("CEF Run message loop");
 	CefRunMessageLoop();
 
-	LOG(INFO) << "Shutting down...";
+	DEBUG_LINEOUT("CEF Shutting down...");
 
 //Error:
 	CefShutdown();
-	LOG(INFO) << "Exited";
+	DEBUG_LINEOUT("CEF Exited");
 	return r;
 }
 
 WebBrowserController* CEFBrowserService::CreateNewWebBrowser(const std::string& strURL, unsigned int width, unsigned int height) {
-	if (!CEFHandler::GetInstance()) {
-		LOG(ERROR) << "CefHandler not initialized";
+	if (!CEFHandler::instance()) {
+		DEBUG_LINEOUT("CefHandler not initialized");
 		return nullptr;
 	}
 
-	return CEFHandler::GetInstance()->CreateBrowser(width, height, strURL);
+	return CEFHandler::instance()->CreateBrowser(width, height, strURL);
 }

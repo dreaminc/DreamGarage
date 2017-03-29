@@ -32,7 +32,7 @@ RESULT DreamTestApp::LoadScene() {
 
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
-	// Set up the HAL Conf as needed
+	// Set up the HAL Configuration as needed
 	///*
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = true;

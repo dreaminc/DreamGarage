@@ -120,11 +120,15 @@ RESULT UITestSuite::AddTestBrowser() {
 	int nRepeats = 1;
 
 	// Initialize Code
+	CEFBrowserManager *pCEFBrowserManager = new CEFBrowserManager();
+	//CN(pCEFBrowserManager);
+
+	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 
-		std::string strURL = "https://www.google.com";
+		std::string strURL = "http://www.google.com";
 
 		CN(m_pDreamOS);
 
@@ -141,11 +145,19 @@ RESULT UITestSuite::AddTestBrowser() {
 		pDreamBrowser->SetURI(strURL);
 		*/
 
-		CEFBrowserManager *pCEFBrowserManager = new CEFBrowserManager();
+		CEFBrowserManager *pCEFBrowserManager = (CEFBrowserManager*)(pContext);
 		CN(pCEFBrowserManager);
 		CR(pCEFBrowserManager->Initialize(m_pDreamOS->AddComposite()));
 
+		// Wait a while
+		/*Sleep(1000);
+
 		pCEFBrowserManager->CreateNewBrowser(512, 512, strURL);
+
+		Sleep(1000);
+
+		pCEFBrowserManager->Update();
+		*/
 
 	Error:
 		return R_PASS;
@@ -158,7 +170,15 @@ RESULT UITestSuite::AddTestBrowser() {
 
 	// Update Code
 	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+		RESULT r = R_PASS;
+
+		CEFBrowserManager *pCEFBrowserManager = (CEFBrowserManager*)(pContext);
+		CN(pCEFBrowserManager);
+
+		//pCEFBrowserManager->Update();
+
+	Error:
+		return r;
 	};
 
 	// Reset Code
@@ -173,7 +193,7 @@ RESULT UITestSuite::AddTestBrowser() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, (void*)(pCEFBrowserManager));
 	CN(pUITest);
 
 	pUITest->SetTestName("Local Shared Content View Test");
