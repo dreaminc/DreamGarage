@@ -4,44 +4,45 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/CEFBrowser/CEFBrowserManager.h
-// Base type for texture
+// DreamOS/WebBrowser/CEFBrowser/CEFBrowserManager.h
+// The CEF implementation of browser manager
 
+#define CEF_PROCESS_NAME_DEFAULT "DreamCef.exe"
+
+#include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <string>
-#include "Primitives/composite.h"
-
-#include "WebBrowser/CEFBrowser/CEFBrowserService.h"
+#include "WebBrowser/WebBrowserManager.h"
 
 class CEFBrowserController;
 
-
-class CEFBrowserManager {
+class CEFBrowserManager : public WebBrowserManager {
 public:
-	RESULT Initialize(composite* pComposite);
-	void Update();
-
-	std::string CreateNewBrowser(unsigned int width, unsigned int height, const std::string& strURL);
-	CEFBrowserController* GetBrowser(const std::string& strID);
-
-	void SetKeyFocus(const std::string& id);
-	void OnKey(unsigned int scanCode, char16_t chr);
-
-private:
-	composite*	m_pComposite;
-
-	std::unique_ptr<CEFBrowserService> m_pCEFBrowserService = nullptr;
-
-	struct BrowserObject {
-		CEFBrowserController*		pCEFBrowserController;
-		std::shared_ptr<texture>	pTexture;
-		std::shared_ptr<quad>		pQuad;
+	enum class state {
+		UNINITIALIZED,
+		INITIALIZING,
+		INITIALIZED,
+		INITIALIZATION_FAILED,
+		INVALID
 	};
 
-	// std::string indicates the id of the browser
-	std::map<std::string, BrowserObject> m_Browsers;
+public:
+	virtual RESULT Initialize() override;
+	virtual RESULT Update() override;
+	virtual RESULT Shutdown() override;
 
-	CEFBrowserController* m_browserInKeyFocus = nullptr;
+private:
+	RESULT CEFManagerThread();
+
+private:
+	const std::string k_CEFProcessName = CEF_PROCESS_NAME_DEFAULT;
+	std::thread m_ServiceThread;
+
+	state m_state = state::UNINITIALIZED;
+
+	std::mutex m_mutex;
+	std::condition_variable m_condBrowserInit;
 };
 
-
-#endif	// ! CEF_BROWSER_MANAGER_H_
+#endif // ! CEF_BROWSER_MANAGER_H_

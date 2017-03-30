@@ -145,9 +145,11 @@ RESULT UITestSuite::AddTestBrowser() {
 		pDreamBrowser->SetURI(strURL);
 		*/
 
+		
 		CEFBrowserManager *pCEFBrowserManager = (CEFBrowserManager*)(pContext);
 		CN(pCEFBrowserManager);
-		CR(pCEFBrowserManager->Initialize(m_pDreamOS->AddComposite()));
+		CR(pCEFBrowserManager->Initialize());
+
 
 		// Wait a while
 		/*Sleep(1000);

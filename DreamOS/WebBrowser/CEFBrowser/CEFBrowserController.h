@@ -28,8 +28,8 @@ public:
 	CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser);
 
 	// WebBrowserController
-	virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> fnPred) override;
-	virtual int PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> fnPred) override;
+	RESULT PollFrame();
+	virtual int PollNewDirtyFrames() override;
 	virtual RESULT Resize(unsigned int width, unsigned int height) override;
 	virtual RESULT SendKeySequence(const std::string& keys) override;
 	virtual RESULT LoadURL(const std::string& url) override;
@@ -61,4 +61,4 @@ private:
 	IMPLEMENT_REFCOUNTING(CEFBrowserController);
 };
 
-#endif // !CEF_BROWSER_CONTROLLER_H_
+#endif // ! CEF_BROWSER_CONTROLLER_H_

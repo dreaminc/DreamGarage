@@ -12,28 +12,31 @@ CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	// empty
 }
 
-RESULT CEFBrowserController::PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> fnPred) {
+RESULT CEFBrowserController::PollFrame() {
 	RESULT r = R_PASS;
 
 	std::unique_lock<std::mutex> lock(m_BufferMutex);
-	fnPred(&m_buffer[0], m_bufferWidth, m_bufferHeight);
+	//fnPred(&m_buffer[0], m_bufferWidth, m_bufferHeight);
 
 //Error:
 	return r;
 }
 
-int CEFBrowserController::PollNewDirtyFrames(std::function<bool(unsigned char *output, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom)> fnPred) {
+int CEFBrowserController::PollNewDirtyFrames() {
 	RESULT r = R_PASS;
 	
 	std::unique_lock<std::mutex> lock(m_BufferMutex);
 
+	int numberOfFrames = static_cast<int>(m_NewDirtyFrames.size());
+
+	/*
 	for (auto& dirtyFrame : m_NewDirtyFrames) {
 		if (false == fnPred(&m_buffer[0], m_bufferWidth, m_bufferHeight, dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height)) {
 			break;
 		}
 	}
+	*/
 
-	int numberOfFrames = static_cast<int>(m_NewDirtyFrames.size());
 	m_NewDirtyFrames.clear();
 
 //Error:

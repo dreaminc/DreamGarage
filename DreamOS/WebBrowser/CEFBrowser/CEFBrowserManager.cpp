@@ -1,27 +1,56 @@
 #include "CEFBrowserManager.h"
 
 #include "CEFBrowserController.h"
-#include "CEFBrowserService.h"
-
-#include "DreamConsole/DreamConsole.h"
-
 #include "CEFApp.h"
 
-RESULT CEFBrowserManager::Initialize(composite* pComposite) {
+#include "CEFHandler.h"
+
+RESULT CEFBrowserManager::Initialize() {
 	RESULT r = R_PASS;
 
-	m_pComposite = pComposite;
-	
-	/*
-	// Initialize
-	m_pCEFBrowserService = std::make_unique<CEFBrowserService>();
-	CN(m_pCEFBrowserService);
-	CR(m_pCEFBrowserService->Initialize());
-	*/
+	m_ServiceThread = std::thread(&CEFBrowserManager::CEFManagerThread, this);
+	std::unique_lock<std::mutex> lockCEFBrowserInitialization(m_mutex);
 
+	m_condBrowserInit.wait(lockCEFBrowserInitialization);
+
+	CBM((m_state == CEFBrowserManager::state::INITIALIZED), "CEFBrowserManager not correctly initialized");
+
+// Success:
+	return r;
+
+Error:
+	Shutdown();
+	return r;
+}
+
+RESULT CEFBrowserManager::Update() {
+	RESULT r = R_PASS;
+
+	for (auto& pWebBrowserController : m_webBrowserControllers) {
+		// TODO: optimize with actual dirty rects copy
+		if (pWebBrowserController->PollNewDirtyFrames()) {
+
+			/*
+			[&](unsigned char *pBufferOutput, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom) -> bool {
+			pWebBrowserController.second.pTexture->Update(pBufferOutput, width, height, texture::PixelFormat::BGRA);
+			// poll whole frame and stop iterations
+			return false;
+			*/
+		
+		}
+	}
+
+//Error:
+	return r;
+}
+
+RESULT CEFBrowserManager::CEFManagerThread() {
+	RESULT r = R_PASS;
 
 	// Initialize CEF.
+
 	// Enable High-DPI support on Windows 7 or newer.
+	//CefEnableHighDPISupport();
 
 	HINSTANCE hInstance = GetModuleHandle(nullptr);
 	CefMainArgs cefMainArgs(hInstance);
@@ -38,116 +67,45 @@ RESULT CEFBrowserManager::Initialize(composite* pComposite) {
 	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
 	CefString(&cefSettings.locale) = "en";
 	cefSettings.remote_debugging_port = 8080;
-	cefSettings.multi_threaded_message_loop = true;
+	//cefSettings.multi_threaded_message_loop = true;
 
-	CefInitialize(cefMainArgs, cefSettings, pCEFApp.get(), nullptr);
+	CBM(CefInitialize(cefMainArgs, cefSettings, pCEFApp.get(), nullptr), "CefInitialize error");
 
-	// This will block
-	//CefRunMessageLoop();
+	DEBUG_LINEOUT("CefInitialize completed successfully");
+	m_state = state::INITIALIZED;
+	m_condBrowserInit.notify_one();
 
-//Error:
+	///*
+	DEBUG_LINEOUT("CEF Run message loop");
+	CefRunMessageLoop();
+	//*/
+
+	DEBUG_LINEOUT("CEF thread complete...");
+
+	// Success:
+	return r;
+
+Error:
+	DEBUG_LINEOUT("CEF Initialization Error, shutting down");
+	Shutdown();
 	return r;
 }
 
-void CEFBrowserManager::Update() {
-	for (auto& b : m_Browsers) {
-		// TODO: optimize with actual dirty rects copy
-		if (b.second.pCEFBrowserController->PollNewDirtyFrames([&](unsigned char *pBufferOutput, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom) -> bool {
-			b.second.pTexture->Update(pBufferOutput, width, height, texture::PixelFormat::BGRA);
-			// poll whole frame and stop iterations
-			return false;
-		})) 
-		{
-			// no if
-		}
-	}
-}
+RESULT CEFBrowserManager::Shutdown() {
+	RESULT r = R_PASS;
 
-// TODO: all of this into DreamBrowser
-std::string CEFBrowserManager::CreateNewBrowser(unsigned int width, unsigned int height, const std::string& strURL) {
-	static int id = 0;
-	id++;
+	DEBUG_LINEOUT("CEF force shutdown");
 
-	std::string strID = std::to_string(id);
-
-	// TODO: remove this
-	BrowserObject browserObject {
-		(CEFBrowserController*)(m_pCEFBrowserService->CreateNewWebBrowser(strURL, width, height)),
-		nullptr,
-		nullptr
-	};
-
-	// TODO: Replace with CN
-	if (browserObject.pCEFBrowserController == nullptr) {
-		return "";
+	if (CEFHandler::instance()) {
+		CEFHandler::instance()->CloseAllBrowsers(true);
 	}
 
-	//std::vector<unsigned char> buffer(width * height * 4, 0);
-	unsigned char *pBuffer = nullptr;
-	size_t pBuffer_n = sizeof(unsigned char) * (width * height * 4);
-	pBuffer = (unsigned char*)malloc(pBuffer_n);
-	memset(pBuffer, 0xFF, pBuffer_n);
+	CB((m_ServiceThread.joinable()));
+	m_ServiceThread.join();
 
-	browserObject.pTexture = m_pComposite->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, texture::PixelFormat::RGBA, 4, pBuffer, (int)(pBuffer_n));
+Error:
+	DEBUG_LINEOUT("CEF Exited");
+	CefShutdown();
 
-	float quadWidth = 4.0f * width / 512;
-	float quadHeight = 4.0f * height / 512;
-
-	browserObject.pQuad = m_pComposite->AddQuad(quadWidth, quadHeight);
-	browserObject.pQuad->SetVisible(true);
-
-	// Vertical flip
-	browserObject.pQuad->TransformUV(
-		{ { 0, 0 } }, 
-		{ { 1, 0, 
-			0, -1 } }
-	);
-
-	browserObject.pQuad->ResetRotation();
-	browserObject.pQuad->RotateXBy(0.3f);
-
-	// TODO: this is dumb
-	static float xOffset = -quadWidth / 2;
-
-	browserObject.pQuad->MoveTo(xOffset + quadWidth / 2, -0.3f + 0.8f, 0);
-
-	xOffset += quadWidth;
-
-	browserObject.pQuad->GetMaterial()->Set(color(0.5f, 0.5f, 0.5f, 1.0f), color(0.5f, 0.5f, 0.5f, 1.0f), color(0.0f, 0.0f, 0.0f, 1.0f));
-
-	browserObject.pQuad->SetMaterialTexture(DimObj::MaterialTexture::Ambient, browserObject.pTexture.get());
-	browserObject.pQuad->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, browserObject.pTexture.get());
-
-	m_Browsers[strID] = browserObject;
-
-	DEBUG_LINEOUT("Created browser id = %d (%dx%d)", id, width, height);
-
-	return strID;
-}
-
-CEFBrowserController* CEFBrowserManager::GetBrowser(const std::string& strID) {
-	if (m_Browsers.find(strID) != m_Browsers.end()) {
-		return m_Browsers[strID].pCEFBrowserController;
-	}
-
-	return nullptr;
-}
-
-void CEFBrowserManager::SetKeyFocus(const std::string& id) {
-	m_browserInKeyFocus = GetBrowser(id);
-}
-
-void CEFBrowserManager::OnKey(unsigned int scanCode, char16_t chr) {
-	if (m_browserInKeyFocus) {
-		if (scanCode == VK_ESCAPE) {
-			m_browserInKeyFocus = nullptr;
-			HUD_OUT("browser control is released");
-		}
-		else {
-			// Process displayable characters. 
-			std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, chr));
-
-			m_browserInKeyFocus->SendKeySequence(nonUnicodeChar);
-		}
-	}
+	return r;
 }

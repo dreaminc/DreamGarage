@@ -791,6 +791,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserService.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h" />
@@ -1042,6 +1043,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserControllerFactory.h" />
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserManager.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
