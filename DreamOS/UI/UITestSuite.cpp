@@ -150,11 +150,13 @@ RESULT UITestSuite::AddTestBrowser() {
 		CN(pCEFBrowserManager);
 		CR(pCEFBrowserManager->Initialize());
 
-
-		// Wait a while
-		/*Sleep(1000);
+		//Sleep(1000);
 
 		pCEFBrowserManager->CreateNewBrowser(512, 512, strURL);
+
+
+		// Wait a while
+		/*
 
 		Sleep(1000);
 

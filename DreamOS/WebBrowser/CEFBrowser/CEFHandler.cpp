@@ -19,7 +19,7 @@
 #pragma warning(default : 4067)
 
 // Initialize and allocate the instance
-CEFHandler* CEFHandler::s_pInstance = nullptr;
+CEFHandler* singleton<CEFHandler>::s_pInstance = nullptr;
 
 // This is not the way to do a singleton
 // TODO: Do we want this to be a singleton?
@@ -131,38 +131,6 @@ void CEFHandler::CloseAllBrowsers(bool fForceClose) {
 
 //Error:
 	return;
-}
-
-WebBrowserController* CEFHandler::CreateBrowser(unsigned int width, unsigned int height, const std::string& strURL) {
-	DEBUG_LINEOUT("CEFHANDLE: CreateBrowser");
-
-	CefWindowInfo cefWindowInfo;
-	CefBrowserSettings cefBrowserSettings;
-
-	//cefWindowInfo.SetAsWindowless(0, false);
-	cefWindowInfo.SetAsPopup(nullptr, "cefsimple");
-	cefWindowInfo.width = width;
-	cefWindowInfo.height = height;
-
-	// clear the promise for reuse
-	/*
-	m_NewWebBrowserControllerPromise = std::promise<CEFBrowserController*>();
-	auto newBrowser = m_NewWebBrowserControllerPromise.get_future();
-	*/
-	
-	if (CefBrowserHost::CreateBrowser(cefWindowInfo, this, strURL, cefBrowserSettings, nullptr) == false) {
-		DEBUG_LINEOUT("CreateBrowser failed");
-		return nullptr;
-	}
-
-	// Blocks until promise is settled
-	/*
-	WebBrowserController* pBrowserController = newBrowser.get();
-	pBrowserController->Resize(width, height);
-	return pBrowserController;
-	*/
-
-	return nullptr;
 }
 
 /*

@@ -14,6 +14,7 @@
 #include "Primitives/valid.h"
 
 class WebBrowserController;
+class CEFApp;
 
 class WebBrowserManager : public valid {
 public:
@@ -24,7 +25,10 @@ public:
 	virtual RESULT Update() = 0;
 	virtual RESULT Shutdown() { return R_NOT_IMPLEMENTED; }
 
-	std::shared_ptr<WebBrowserController> CreateNewBrowser(int width, int height, const std::string& strURL );
+
+	virtual std::shared_ptr<WebBrowserController> MakeNewBrowser(int width, int height, const std::string& strURL) = 0;
+
+	std::shared_ptr<WebBrowserController> WebBrowserManager::CreateNewBrowser(int width, int height, const std::string& strURL);
 	std::shared_ptr<WebBrowserController> GetBrowser(const std::string& strID);
 
 	//void SetKeyFocus(const std::string& id);

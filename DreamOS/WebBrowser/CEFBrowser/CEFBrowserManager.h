@@ -15,6 +15,7 @@
 #include <string>
 #include "WebBrowser/WebBrowserManager.h"
 
+class CEFApp;
 class CEFBrowserController;
 
 class CEFBrowserManager : public WebBrowserManager {
@@ -32,14 +33,16 @@ public:
 	virtual RESULT Update() override;
 	virtual RESULT Shutdown() override;
 
+	virtual std::shared_ptr<WebBrowserController> MakeNewBrowser(int width, int height, const std::string& strURL) override;
+
 private:
 	RESULT CEFManagerThread();
 
 private:
+	state m_state = state::UNINITIALIZED;
+
 	const std::string k_CEFProcessName = CEF_PROCESS_NAME_DEFAULT;
 	std::thread m_ServiceThread;
-
-	state m_state = state::UNINITIALIZED;
 
 	std::mutex m_mutex;
 	std::condition_variable m_condBrowserInit;

@@ -17,10 +17,24 @@ Error:
 
 // TODO: all of this into DreamBrowser
 std::shared_ptr<WebBrowserController> WebBrowserManager::CreateNewBrowser(int width, int height, const std::string& strURL) {
+	RESULT r = R_PASS;
 	std::shared_ptr<WebBrowserController> pWebBrowserController = nullptr;
 
+	// This will go to the implementation specific make function
+	pWebBrowserController = MakeNewBrowser(width, height, strURL);
+	CN(pWebBrowserController);
 
+	m_webBrowserControllers.push_back(pWebBrowserController);
+
+// Success:
 	return pWebBrowserController;
+
+Error:
+	if (pWebBrowserController != nullptr) {
+		pWebBrowserController = nullptr;
+	}
+
+	return nullptr;
 }
 
 	/*

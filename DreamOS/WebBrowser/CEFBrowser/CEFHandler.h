@@ -6,6 +6,8 @@
 // DREAM OS
 // DreamOS/Cloud/WebBrowser/CefHandler.h
 
+#include "Primitives/singleton.h"
+
 #include "WebBrowser/WebBrowserController.h"
 
 #include "CefBrowserController.h"
@@ -24,32 +26,18 @@
 #include <list>
 #include <future>
 
-
-
-class CEFHandler : 
-	//public CefApp,
-	//public CefBrowserProcessHandler,
+class CEFHandler : public singleton<CEFHandler>,
 	public CefClient,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
 	public CefLoadHandler
 	//public CefRenderHandler
 {
-private:
+public:
 	CEFHandler();
 	~CEFHandler();
 
 public:
-
-	// CefApp
-	/*
-	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override { 
-		return this; 
-	}
-	*/
-
-	// CefBrowserProcessHandler
-	//virtual void OnContextInitialized() override;
 
 	// CefClient
 	/*
@@ -90,27 +78,11 @@ public:
 	//virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
 	//virtual void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
 
-public:
-	WebBrowserController*	CreateBrowser(unsigned int width, unsigned int height, const std::string& url);
-
 private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;
 	bool m_fShuttingdown = false;
 
 	IMPLEMENT_REFCOUNTING(CEFHandler);
-
-	// TODO: Replace with Singleton pattern / manager
-	// Singleton Usage
-protected:
-	static CEFHandler *s_pInstance;
-
-public:
-	static CEFHandler *instance() {
-		if (!s_pInstance)
-			s_pInstance = new CEFHandler();
-
-		return s_pInstance;
-	}
 };
 
 #endif // !CEF_HANDLER_H_

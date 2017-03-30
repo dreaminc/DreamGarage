@@ -128,5 +128,6 @@ WebBrowserController* CEFBrowserService::CreateNewWebBrowser(const std::string& 
 		return nullptr;
 	}
 
-	return CEFHandler::instance()->CreateBrowser(width, height, strURL);
+	//return CEFHandler::instance()->CreateBrowser(width, height, strURL);
+	return nullptr;
 }
