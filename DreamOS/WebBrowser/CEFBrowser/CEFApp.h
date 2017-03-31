@@ -13,13 +13,22 @@
 
 #include "include/cef_app.h"
 
+#include "CEFHandler.h"
+
 class WebBrowserController;
 
-class CEFApp : public singleton<CEFApp>, public CefApp, public CefBrowserProcessHandler {
+class CEFApp : public singleton<CEFApp>, 
+	public CEFHandler::CEFHandlerObserver,
+	public CefApp, 
+	public CefBrowserProcessHandler
+{
 public:
 	CEFApp();
 
 public:
+	// CEFHandlerObserver
+	virtual RESULT OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) override;
+
 	// CefApp methods:
 	virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override {
 		return this;
@@ -32,6 +41,8 @@ public:
 
 private:
 	// Include the default reference counting implementation.
+	std::promise<std::shared_ptr<CEFBrowserController>> m_promiseCEFBrowserController;
+
 	IMPLEMENT_REFCOUNTING(CEFApp);
 };
 

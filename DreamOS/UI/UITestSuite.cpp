@@ -9,6 +9,7 @@
 #include "DreamGarage/DreamBrowser.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "WebBrowser/WebBrowserController.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -121,6 +122,7 @@ RESULT UITestSuite::AddTestBrowser() {
 
 	// Initialize Code
 	CEFBrowserManager *pCEFBrowserManager = new CEFBrowserManager();
+	WebBrowserManager *pWebBrowserManager = new CEFBrowserManager();
 	//CN(pCEFBrowserManager);
 
 	// Initialize Code
@@ -145,15 +147,16 @@ RESULT UITestSuite::AddTestBrowser() {
 		pDreamBrowser->SetURI(strURL);
 		*/
 
-		
-		CEFBrowserManager *pCEFBrowserManager = (CEFBrowserManager*)(pContext);
-		CN(pCEFBrowserManager);
-		CR(pCEFBrowserManager->Initialize());
+
+		WebBrowserManager *pWebBrowserManager = (WebBrowserManager*)(pContext);
+		CN(pWebBrowserManager);
+		CR(pWebBrowserManager->Initialize());
 
 		//Sleep(1000);
-
-		pCEFBrowserManager->CreateNewBrowser(512, 512, strURL);
-
+		{
+			auto pWebBrowserController = pWebBrowserManager->CreateNewBrowser(512, 512, strURL);
+			//pWebBrowserController->LoadURL("www.cnn.com");
+		}
 
 		// Wait a while
 		/*
@@ -179,7 +182,7 @@ RESULT UITestSuite::AddTestBrowser() {
 		CEFBrowserManager *pCEFBrowserManager = (CEFBrowserManager*)(pContext);
 		CN(pCEFBrowserManager);
 
-		//pCEFBrowserManager->Update();
+		pCEFBrowserManager->Update();
 
 	Error:
 		return r;
@@ -197,7 +200,7 @@ RESULT UITestSuite::AddTestBrowser() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, (void*)(pCEFBrowserManager));
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, (void*)(pWebBrowserManager));
 	CN(pUITest);
 
 	pUITest->SetTestName("Local Shared Content View Test");

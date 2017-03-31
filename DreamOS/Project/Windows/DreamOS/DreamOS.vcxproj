@@ -788,7 +788,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.cpp" />
-    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserService.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp" />
@@ -1040,7 +1039,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.h" />
-    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserService.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h" />
     <ClInclude Include="..\..\..\WebBrowser\WebBrowserControllerFactory.h" />

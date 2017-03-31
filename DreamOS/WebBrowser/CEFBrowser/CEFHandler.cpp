@@ -1,7 +1,9 @@
 #include "CefHandler.h"
 #include "CefBrowserController.h"
 
-#include "easylogging++.h"
+//#include "easylogging++.h"
+
+#include "include\cef_client.h"
 
 #include <sstream>
 #include <string>
@@ -15,6 +17,8 @@
 
 #include "include/wrapper/cef_closure_task.h"
 #include "include/wrapper/cef_helpers.h"
+
+#include "CEFApp.h"
 
 #pragma warning(default : 4067)
 
@@ -33,6 +37,36 @@ CEFHandler::~CEFHandler() {
 	// empty
 }
 
+RESULT CEFHandler::RegisterCEFHandlerObserver(CEFHandlerObserver* pCEFHandlerObserver) {
+	RESULT r = R_PASS;
+
+	CBM((m_pCEFHandlerObserver == nullptr), "CEFHandlerObserver already registered");
+	CN(pCEFHandlerObserver);
+
+	m_pCEFHandlerObserver = pCEFHandlerObserver;
+
+Error:
+	return r;
+}
+
+// Handler Routing
+// Render handler is done at CEFApp to get access to all of the Browser Controllers
+CefRefPtr<CefRenderHandler> CEFHandler::GetRenderHandler() { 
+	return this;
+}
+
+CefRefPtr<CefDisplayHandler> CEFHandler::GetDisplayHandler() {
+	return this;
+}
+
+CefRefPtr<CefLifeSpanHandler> CEFHandler::GetLifeSpanHandler() {
+	return this;
+}
+
+CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
+	return this;
+}
+
 void PlatformTitleChange(CefRefPtr<CefBrowser> pCEFBrowser, const CefString& strTitle) {
 	CefWindowHandle hwnd = pCEFBrowser->GetHost()->GetWindowHandle();
 	SetWindowText(hwnd, std::wstring(strTitle).c_str());
@@ -47,11 +81,23 @@ void CEFHandler::OnTitleChange(CefRefPtr<CefBrowser> pCEFBrowser, const CefStrin
 }
 
 void CEFHandler::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
+	RESULT r = R_PASS;
+
 	DEBUG_LINEOUT("CEFHANDLE: OnAfterCreated");
 
 	CEF_REQUIRE_UI_THREAD();
 	
 	m_cefBrowsers.push_back(pCEFBrowser);
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::make_shared<CEFBrowserController>(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	if (m_pCEFHandlerObserver != nullptr) {
+		CR(m_pCEFHandlerObserver->OnBrowserCreated(pCEFBrowserController));
+	}
+
+Error:
+	return;
 }
 
 bool CEFHandler::DoClose(CefRefPtr<CefBrowser> pCEFBrowser) {
@@ -59,7 +105,7 @@ bool CEFHandler::DoClose(CefRefPtr<CefBrowser> pCEFBrowser) {
 	CEF_REQUIRE_UI_THREAD();
 
 	// Closing the main window requires special handling. See the DoClose()
-	// documentation in the CEF header for a detailed destription of this
+	// documentation in the CEF header for a detailed description of this
 	// process.
 	if (m_cefBrowsers.size() == 1) {
 		// Set a flag to indicate that the window close should be allowed.
@@ -133,22 +179,31 @@ void CEFHandler::CloseAllBrowsers(bool fForceClose) {
 	return;
 }
 
-/*
-
 bool CEFHandler::GetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) {
 	DEBUG_LINEOUT("CEFHANDLE: GetViewRect");
 
-	return DelegateToController(pCEFBrowser, [&](CEFBrowserController* pCEFBrowserController) {
-		pCEFBrowserController->GetViewRect(pCEFBrowser, cefRect);
-	});
+	/*
+	return DelegateToController(pCEFBrowser,
+	[&](CEFBrowserController* pCEFBrowserController) {
+	pCEFBrowserController->GetViewRect(pCEFBrowser, cefRect);
+	}
+	);
+	*/
+
+	return true;
 }
 
-void CEFHandler::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) {
+void CEFHandler::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) {
 	DEBUG_LINEOUT("CEFHANDLE: OnPaint");
 
-	DelegateToController(browser, [&](CEFBrowserController* controller) {
-		controller->OnPaint(browser, type, dirtyRects, buffer, width, height);
-	});
+
+	int a = 54;
+	/*
+	DelegateToController(pCEFBrowser,
+	[&](CEFBrowserController* pCEFBrowserController) {
+	pCEFBrowserController->OnPaint(pCEFBrowser, type, dirtyRects, buffer, width, height);
+	}
+	);
+	*/
 }
-*/
 

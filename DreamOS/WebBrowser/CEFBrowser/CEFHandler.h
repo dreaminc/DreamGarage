@@ -10,11 +10,10 @@
 
 #include "WebBrowser/WebBrowserController.h"
 
-#include "CefBrowserController.h"
+#include "CEFBrowserController.h"
 
 #include "include\cef_client.h"
 #include "include\cef_base.h"
-#include "include\cef_app.h"
 #include "include\internal\cef_win.h"
 
 #include "include\cef_sandbox_win.h"
@@ -30,8 +29,8 @@ class CEFHandler : public singleton<CEFHandler>,
 	public CefClient,
 	public CefDisplayHandler,
 	public CefLifeSpanHandler,
-	public CefLoadHandler
-	//public CefRenderHandler
+	public CefLoadHandler,
+	public CefRenderHandler
 {
 public:
 	CEFHandler();
@@ -39,24 +38,18 @@ public:
 
 public:
 
+	class CEFHandlerObserver {
+	public:
+		virtual RESULT OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) = 0;
+	};
+
+	RESULT RegisterCEFHandlerObserver(CEFHandlerObserver* pCEFHandlerObserver);
+
 	// CefClient
-	/*
-	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override { 
-		return this; 
-	}
-	*/
-
-	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override { 
-		return this; 
-	}
-
-	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override { 
-		return this; 
-	}
-
-	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override { 
-		return this; 
-	}
+	virtual CefRefPtr<CefRenderHandler> GetRenderHandler() override;
+	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override;
+	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
+	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override;
 
 	// CefDisplayHandler
 	virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
@@ -75,12 +68,14 @@ public:
 	bool IsShuttingDown() const { return m_fShuttingdown; }
 
 	// CefRenderHandler
-	//virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
-	//virtual void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
+	virtual bool GetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
+	virtual void OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) override;
 
 private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;
 	bool m_fShuttingdown = false;
+
+	CEFHandlerObserver* m_pCEFHandlerObserver = nullptr;
 
 	IMPLEMENT_REFCOUNTING(CEFHandler);
 };

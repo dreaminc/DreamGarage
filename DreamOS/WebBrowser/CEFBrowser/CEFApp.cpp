@@ -18,10 +18,15 @@ CEFApp::CEFApp() {
 }
 
 void CEFApp::OnContextInitialized() {
+	RESULT r = R_PASS;
+
 	CEF_REQUIRE_UI_THREAD();
 
 	// SimpleHandler implements browser-level callbacks.
-	//CefRefPtr<CEFHandler> pCEFHandler = CefRefPtr<CEFHandler>(CEFHandler::instance());
+	CEFHandler *pCEFHandler = CEFHandler::instance();
+	CN(pCEFHandler);
+
+	CR(pCEFHandler->RegisterCEFHandlerObserver(this));
 
 	/*
 	// Specify CEF browser settings here.
@@ -39,6 +44,20 @@ void CEFApp::OnContextInitialized() {
 	// Create the first browser window.
 	CefBrowserHost::CreateBrowser(cefWindowInfo, pCEFHandler, strURL, cefBrowserSettings, nullptr);
 	*/
+
+Error:
+	return;
+}
+
+RESULT CEFApp::OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) {
+	RESULT r = R_PASS;
+
+	CN(pCEFBrowserController);
+
+	m_promiseCEFBrowserController.set_value(pCEFBrowserController);
+
+Error:
+	return r;
 }
 
 std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int height, const std::string& strURL) {
@@ -57,11 +76,10 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	cefWindowInfo.width = width;
 	cefWindowInfo.height = height;
 
-	// clear the promise for reuse
-	/*
-	m_NewWebBrowserControllerPromise = std::promise<CEFBrowserController*>();
-	auto newBrowser = m_NewWebBrowserControllerPromise.get_future();
-	*/
+	// Set up the promise (Will be set in OnBrowserCreated
+	
+	m_promiseCEFBrowserController = std::promise<std::shared_ptr<CEFBrowserController>>();
+	std::future<std::shared_ptr<CEFBrowserController>> futureCEFBrowserController = m_promiseCEFBrowserController.get_future();
 
 	if (CefBrowserHost::CreateBrowser(cefWindowInfo, pCEFHandler, strURL, cefBrowserSettings, nullptr) == false) {
 		DEBUG_LINEOUT("CreateBrowser failed");
@@ -69,12 +87,11 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	}
 
 	// Blocks until promise is settled
-	/*
-	WebBrowserController* pBrowserController = newBrowser.get();
-	pBrowserController->Resize(width, height);
-	return pBrowserController;
-	*/
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = futureCEFBrowserController.get();
+	CR(pCEFBrowserController->Resize(width, height));
 
-//Error:
+	return pCEFBrowserController;
+
+Error:
 	return pWebBrowserController;
 }

@@ -103,7 +103,7 @@ Error:
 }
 
 // CefRenderHandler
-
+/*
 bool CEFBrowserController::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &cefRect) {
 	cefRect = CefRect(0, 0, m_browserWidth, m_browserHeight);
 	return true;
@@ -128,4 +128,5 @@ void CEFBrowserController::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementTy
 
 	m_NewDirtyFrames.insert(m_NewDirtyFrames.end(), dirtyRects.begin(), dirtyRects.end());
 }
+*/
 

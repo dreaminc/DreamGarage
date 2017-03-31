@@ -653,9 +653,6 @@
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserService.cpp">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClCompile>
@@ -1407,9 +1404,6 @@
       <Filter>WebBrowser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserService.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h">

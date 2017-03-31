@@ -8,12 +8,16 @@
 
 #include "WebBrowser/WebBrowserController.h"
 
+/*
 #include "include\cef_client.h"
 #include "include\cef_base.h"
 #include "include\cef_app.h"
 #include "include\internal\cef_win.h"
 
 #include "include\cef_sandbox_win.h"
+*/
+
+#include "include/cef_render_handler.h"
 
 #include <thread>
 #include <mutex>
@@ -22,7 +26,10 @@
 #include <list>
 #include <future>
 
-class CEFBrowserController : public WebBrowserController, public CefRenderHandler {
+class CEFBrowserController : 
+	public WebBrowserController
+	//public CefRenderHandler 
+{
 
 public:
 	CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser);
@@ -35,8 +42,8 @@ public:
 	virtual RESULT LoadURL(const std::string& url) override;
 
 	// CefRenderHandler
-	virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
-	virtual void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
+	//virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
+	//virtual void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
 
 private:
 	// browser logical size
@@ -53,12 +60,12 @@ private:
 	// reference to the browser object
 	CefRefPtr<CefBrowser> m_pCEFBrowser;
 
-	// represented new dirty frames since last time they were polled
-	RectList m_NewDirtyFrames; 
+	// Represented new dirty frames since last time they were polled
+	CefRenderHandler::RectList m_NewDirtyFrames;
 
 	std::mutex m_BufferMutex;
 
-	IMPLEMENT_REFCOUNTING(CEFBrowserController);
+	//IMPLEMENT_REFCOUNTING(CEFBrowserController);
 };
 
 #endif // ! CEF_BROWSER_CONTROLLER_H_
