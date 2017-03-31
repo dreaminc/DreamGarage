@@ -180,30 +180,28 @@ void CEFHandler::CloseAllBrowsers(bool fForceClose) {
 }
 
 bool CEFHandler::GetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) {
+	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFHANDLE: GetViewRect");
 
-	/*
-	return DelegateToController(pCEFBrowser,
-	[&](CEFBrowserController* pCEFBrowserController) {
-	pCEFBrowserController->GetViewRect(pCEFBrowser, cefRect);
-	}
-	);
-	*/
+	//CN(m_pCEFHandlerObserver);
+	//CR(m_pCEFHandlerObserver->OnGetViewRect(pCEFBrowser, cefRect));
 
+	// temp
+	cefRect = CefRect(0, 0, 512, 512);
+
+//Error:
+	//return (r >= 0);
 	return true;
 }
 
-void CEFHandler::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) {
+void CEFHandler::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) {
+	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFHANDLE: OnPaint");
 
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->OnPaint(pCEFBrowser, type, dirtyRects, pBuffer, width, height));
 
-	int a = 54;
-	/*
-	DelegateToController(pCEFBrowser,
-	[&](CEFBrowserController* pCEFBrowserController) {
-	pCEFBrowserController->OnPaint(pCEFBrowser, type, dirtyRects, buffer, width, height);
-	}
-	);
-	*/
+Error:
+	return;
 }
 

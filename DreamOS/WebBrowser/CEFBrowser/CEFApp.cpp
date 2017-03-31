@@ -17,6 +17,39 @@ CEFApp::CEFApp() {
 	// empty
 }
 
+RESULT CEFApp::RegisterCEFAppObserver(CEFAppObserver* pCEFAppObserver) {
+	RESULT r = R_PASS;
+
+	CBM((m_pCEFAppObserver == nullptr), "CEFAppObserver already registered");
+	CN(pCEFAppObserver);
+
+	m_pCEFAppObserver = pCEFAppObserver;
+
+Error:
+	return r;
+}
+
+// CEFAppObserver
+RESULT CEFApp::OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+	CR(m_pCEFAppObserver->OnGetViewRect(pCEFBrowser, cefRect));
+
+Error:
+	return r;
+}
+
+RESULT CEFApp::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFAppObserver);
+	CR(m_pCEFAppObserver->OnPaint(pCEFBrowser, type, dirtyRects, pBuffer, width, height));
+
+Error:
+	return r;
+}
+
 void CEFApp::OnContextInitialized() {
 	RESULT r = R_PASS;
 

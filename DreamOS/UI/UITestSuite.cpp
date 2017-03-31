@@ -152,10 +152,13 @@ RESULT UITestSuite::AddTestBrowser() {
 		CN(pWebBrowserManager);
 		CR(pWebBrowserManager->Initialize());
 
-		//Sleep(1000);
+		//
 		{
 			auto pWebBrowserController = pWebBrowserManager->CreateNewBrowser(512, 512, strURL);
-			//pWebBrowserController->LoadURL("www.cnn.com");
+			
+			Sleep(1000);
+
+			pWebBrowserController->LoadURL("www.cnn.com");
 		}
 
 		// Wait a while

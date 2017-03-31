@@ -26,6 +26,14 @@ public:
 	CEFApp();
 
 public:
+	class CEFAppObserver {
+	public:
+		virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) = 0;
+		virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) = 0;
+	};
+
+	RESULT RegisterCEFAppObserver(CEFAppObserver* pCEFAppObserver);
+
 	// CEFHandlerObserver
 	virtual RESULT OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) override;
 
@@ -39,9 +47,15 @@ public:
 
 	std::shared_ptr<WebBrowserController> CreateBrowser(int width, int height, const std::string& strURL);
 
+	// CEFAppObserver
+	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
+	virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) override;
+
 private:
 	// Include the default reference counting implementation.
 	std::promise<std::shared_ptr<CEFBrowserController>> m_promiseCEFBrowserController;
+
+	CEFAppObserver* m_pCEFAppObserver = nullptr;
 
 	IMPLEMENT_REFCOUNTING(CEFApp);
 };
