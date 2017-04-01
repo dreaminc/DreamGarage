@@ -132,6 +132,10 @@ RESULT DreamOS::Exit(RESULT exitcode) {
 	return exitcode;
 }
 
+AnimationQueue *DreamOS::GetAnimationQueue() {
+	return m_pSandbox->GetAnimationQueue();
+}
+
 RESULT DreamOS::GetMouseRay(ray &rCast, double t) {
 	return m_pSandbox->GetMouseRay(rCast, t);
 }

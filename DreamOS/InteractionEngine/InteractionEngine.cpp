@@ -1,6 +1,7 @@
 #include "InteractionEngine.h"
 
 #include "Scene/ObjectStore.h"
+#include "AnimationQueue.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -19,6 +20,8 @@ RESULT InteractionEngine::Initialize() {
 	// Ray
 	m_pInteractionRay = std::make_shared<ray>();
 	CN(m_pInteractionRay);
+
+	m_pObjectQueue = new AnimationQueue();
 
 Error:
 	return r;
@@ -78,6 +81,17 @@ RESULT InteractionEngine::Update() {
 
 //Error:
 	return r;
+}
+
+RESULT InteractionEngine::UpdateAnimationQueue() {
+	RESULT r = R_PASS;
+	m_pObjectQueue->Update(0.0);
+//Error:
+	return r;
+}
+
+AnimationQueue* InteractionEngine::GetAnimationQueue() {
+	return m_pObjectQueue;
 }
 
 // TODO: This is temporary

@@ -51,6 +51,10 @@ RESULT SandboxApp::SetSandboxConfiguration(SandboxApp::configuration sandboxconf
 	return R_PASS;
 }
 
+AnimationQueue *SandboxApp::GetAnimationQueue() {
+	return m_pInteractionEngine->GetAnimationQueue();
+}
+
 const SandboxApp::configuration& SandboxApp::GetSandboxConfiguration() {
 	return m_SandboxConfiguration;
 }
@@ -370,6 +374,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		// Update Interaction Engine
 		CR(m_pInteractionEngine->UpdateObjectStore(m_pInteractionGraph));
+		CR(m_pInteractionEngine->UpdateAnimationQueue());
 
 		// Update HMD
 		if (m_pHMD != nullptr) {

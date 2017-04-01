@@ -274,6 +274,10 @@ protected:
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
 
+// temporary
+public:
+	AnimationQueue *GetAnimationQueue();
+
 protected:
 	RESULT SetDreamOSHandle(DreamOS *pDreamOSHandle);
 	DreamOS *GetDreamOSHandle();

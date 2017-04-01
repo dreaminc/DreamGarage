@@ -59,6 +59,8 @@ public:
 
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
 
+	AnimationQueue *GetAnimationQueue();
+
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
