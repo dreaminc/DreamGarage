@@ -39,6 +39,7 @@ RESULT AnimationItem::Update(VirtualObj* pObj, double msTimeStep) {
 	double prog = diff / m_duration;
 	prog = std::min(1.0, prog);
 
+	// Linear animation
 	pObj->SetPosition((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
 	pObj->SetScale((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
 //Error:

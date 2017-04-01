@@ -27,8 +27,10 @@ RESULT AnimationTestSuite::AddTestAnimation() {
 		RESULT r = R_PASS;
 		composite *pComposite = nullptr;
 		std::shared_ptr<sphere> pSphere = nullptr;
+		std::shared_ptr<sphere> pSphere2 = nullptr;
 		AnimationQueue *pQueue = nullptr;
 		AnimationState aState;
+		AnimationState aState2;
 
 		pComposite = m_pDreamOS->AddComposite();
 		CN(pComposite);
@@ -49,6 +51,18 @@ RESULT AnimationTestSuite::AddTestAnimation() {
 
 		pQueue->PushAnimationItem(pSphere.get(), aState, 10.0f);
 
+		pSphere2 = pComposite->AddSphere(1.0f, 10.0f, 10.0f);
+		pSphere2->MoveTo(2.0f, 0.0f, - 2.0f);
+		CN(pSphere2);
+
+		CR(pSphere2->InitializeOBB());
+
+		CR(m_pDreamOS->AddInteractionObject(pComposite));
+		
+		aState2.ptPosition = point(2.0f, 1.0f, -2.0f);
+		aState2.vScale = vector(0.5f, 0.5f, 0.5f);
+
+		pQueue->PushAnimationItem(pSphere2.get(), aState2, 5.0f);
 
 	Error:
 		return R_PASS;
