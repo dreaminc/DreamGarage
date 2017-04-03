@@ -1,5 +1,5 @@
 #include "CefBrowserController.h"
-#include "easylogging++.h"
+//#include "easylogging++.h"
 
 #include "include/cef_browser.h"
 
@@ -15,7 +15,7 @@ CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 RESULT CEFBrowserController::PollFrame() {
 	RESULT r = R_PASS;
 
-	std::unique_lock<std::mutex> lock(m_BufferMutex);
+	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 	//fnPred(&m_buffer[0], m_bufferWidth, m_bufferHeight);
 
 //Error:
@@ -25,7 +25,7 @@ RESULT CEFBrowserController::PollFrame() {
 int CEFBrowserController::PollNewDirtyFrames() {
 	RESULT r = R_PASS;
 	
-	std::unique_lock<std::mutex> lock(m_BufferMutex);
+	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 
 	int numberOfFrames = static_cast<int>(m_NewDirtyFrames.size());
 
@@ -102,31 +102,41 @@ Error:
 	return r;
 }
 
-// CefRenderHandler
-/*
-bool CEFBrowserController::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &cefRect) {
+
+RESULT CEFBrowserController::OnGetViewRect(CefRect &cefRect){
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserController: GetViewRect");
+
 	cefRect = CefRect(0, 0, m_browserWidth, m_browserHeight);
-	return true;
+
+//Error:
+	return r;
 }
 
-void CEFBrowserController::OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) {
-	std::unique_lock<std::mutex> lock(m_BufferMutex);
+RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
 
-	unsigned int bufferSize = width * height * 4;
+	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 
-	const unsigned char* pBuffer = static_cast<const unsigned char*>(buffer);
+	size_t pBuffer_n = width * height * 4;
 
-	m_buffer.assign(pBuffer, pBuffer + bufferSize);
+	m_vectorBuffer.assign(static_cast<const unsigned char*>(pBuffer), static_cast<const unsigned char*>(pBuffer) + pBuffer_n);
 
-	bool isSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
+	bool fSizeChanged = (width != m_bufferWidth) || (height != m_bufferHeight);
 
-	if (isSizeChanged) {
+	if (fSizeChanged) {
 		m_bufferWidth = width;
 		m_bufferHeight = height;
-		LOG(INFO) << "Size changed to " << m_bufferWidth << "," << m_bufferHeight;
+		DEBUG_LINEOUT("Size changed to w:%d h:%d", m_bufferWidth, m_bufferHeight);
 	}
 
 	m_NewDirtyFrames.insert(m_NewDirtyFrames.end(), dirtyRects.begin(), dirtyRects.end());
-}
-*/
 
+//Error:
+	return r;
+}
+
+CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
+	return m_pCEFBrowser;
+}

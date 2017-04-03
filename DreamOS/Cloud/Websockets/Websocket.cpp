@@ -1,6 +1,7 @@
-#include "Logger/Logger.h"
 #include "Websocket.h"
 
+#include "Logger/Logger.h"
+#include "easylogging++.h"
 
 Websocket::Websocket(const std::string& strURI, const HandleWebsocketMessageCallback& fnHandleWebsocketMessageCallback,
 					 const HandleWebsocketConnectionOpenCallback&	fnHandleWebsocketConnectionOpenCallback,
@@ -49,8 +50,8 @@ RESULT Websocket::SetToken(const std::string& strToken) {
 	return R_PASS;
 }
 
-// The following is a client varification for a trusted server.
-// corrently being unsupported. for more details: https://github.com/zaphoyd/websocketpp/tree/develop/examples/print_client_tls
+// The following is a client verification for a trusted server.
+// currently being unsupported. for more details: https://github.com/zaphoyd/websocketpp/tree/develop/examples/print_client_tls
 /* 
 /// Verify that one of the subject alternative names matches the given hostname
 bool verify_subject_alternative_name(const char * hostname, X509 * cert) {

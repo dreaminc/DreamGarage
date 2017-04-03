@@ -9,16 +9,26 @@
 
 #define CEF_PROCESS_NAME_DEFAULT "DreamCef.exe"
 
+#ifdef LOG
+#undef LOG
+#endif
+
+#ifdef PLOG
+#undef PLOG
+#endif
+
 #include <thread>
 #include <mutex>
 #include <condition_variable>
 #include <string>
 #include "WebBrowser/WebBrowserManager.h"
 
+#include "CEFAppObserver.h"
+
 class CEFApp;
 class CEFBrowserController;
 
-class CEFBrowserManager : public WebBrowserManager {
+class CEFBrowserManager : public WebBrowserManager, public CEFAppObserver {
 public:
 	enum class state {
 		UNINITIALIZED,
@@ -34,6 +44,12 @@ public:
 	virtual RESULT Shutdown() override;
 
 	virtual std::shared_ptr<WebBrowserController> MakeNewBrowser(int width, int height, const std::string& strURL) override;
+
+private:
+	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
+	virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) override;
+
+	std::shared_ptr<CEFBrowserController> GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser);
 
 private:
 	RESULT CEFManagerThread();

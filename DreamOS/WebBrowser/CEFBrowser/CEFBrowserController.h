@@ -17,6 +17,14 @@
 #include "include\cef_sandbox_win.h"
 */
 
+#ifdef LOG
+#undef LOG
+#endif
+
+#ifdef PLOG
+#undef PLOG
+#endif
+
 #include "include/cef_render_handler.h"
 
 #include <thread>
@@ -26,10 +34,9 @@
 #include <list>
 #include <future>
 
-class CEFBrowserController : 
-	public WebBrowserController
-	//public CefRenderHandler 
-{
+class CefBrowser;
+
+class CEFBrowserController :  public WebBrowserController {
 
 public:
 	CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser);
@@ -41,17 +48,19 @@ public:
 	virtual RESULT SendKeySequence(const std::string& keys) override;
 	virtual RESULT LoadURL(const std::string& url) override;
 
-	// CefRenderHandler
-	//virtual bool GetViewRect(CefRefPtr<CefBrowser> browser, CefRect &rect) override;
-	//virtual void OnPaint(CefRefPtr<CefBrowser> browser, PaintElementType type, const RectList &dirtyRects, const void *buffer, int width, int height) override;
+	// WebBrowser Controller Render Handling
+	RESULT OnGetViewRect(CefRect &cefRect);
+	RESULT OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height);
+
+	CefRefPtr<CefBrowser> GetCEFBrowser();
 
 private:
 	// browser logical size
 	int m_browserWidth = 0;
 	int m_browserHeight = 0;
 
-	// buffer for the browser content to render into
-	std::vector<unsigned char>	m_buffer;
+	// Buffer for the browser content to render into
+	std::vector<unsigned char> m_vectorBuffer;
 											   
 	// browser physical size (buffer size)
 	int m_bufferWidth = 0;

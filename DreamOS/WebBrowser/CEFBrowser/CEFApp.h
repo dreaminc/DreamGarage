@@ -11,9 +11,19 @@
 #include <memory>
 #include <list>
 
+#ifdef LOG
+#undef LOG
+#endif
+
+#ifdef PLOG
+#undef PLOG
+#endif
+
 #include "include/cef_app.h"
 
 #include "CEFHandler.h"
+
+#include "CEFAppObserver.h"
 
 class WebBrowserController;
 
@@ -26,11 +36,13 @@ public:
 	CEFApp();
 
 public:
+	/*
 	class CEFAppObserver {
 	public:
 		virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) = 0;
 		virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) = 0;
 	};
+	*/
 
 	RESULT RegisterCEFAppObserver(CEFAppObserver* pCEFAppObserver);
 

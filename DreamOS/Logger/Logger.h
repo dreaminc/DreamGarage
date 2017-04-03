@@ -7,10 +7,10 @@
 //#define ELPP_FORCE_USE_STD_THREAD 1
 #define ELPP_NO_DEFAULT_LOG_FILE
 
-#include "easylogging++.h"
-
 // DREAM OS
 // DreamOS/Logger/Logger.h
+
+//#include "easylogging++.h"
 
 // LOG helper shortcuts
 #define LOG_xyz(xyz) "(" << xyz.x() << "," << xyz.y() << "," << xyz.z() << ")"

@@ -1,9 +1,10 @@
 #include "CEFBrowserManager.h"
 
 #include "CEFBrowserController.h"
-#include "CEFApp.h"
 
 #include "CEFHandler.h"
+
+#include "CEFApp.h"
 
 RESULT CEFBrowserManager::Initialize() {
 	RESULT r = R_PASS;
@@ -22,7 +23,6 @@ Error:
 	Shutdown();
 	return r;
 }
-
 RESULT CEFBrowserManager::Update() {
 	RESULT r = R_PASS;
 
@@ -41,6 +41,45 @@ RESULT CEFBrowserManager::Update() {
 
 //Error:
 	return r;
+}
+
+RESULT CEFBrowserManager::OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: GetViewRect");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnGetViewRect(cefRect));
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserManager::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnPaint(type, dirtyRects, pBuffer, width, height));
+
+Error:
+	return r;
+}
+
+std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
+	for (auto &pWebBrowserController : m_webBrowserControllers) {
+		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
+		if (pCEFBrowserController != nullptr) {
+			if (pCEFBrowserController->GetCEFBrowser()->IsSame(pCEFBrowser)) {
+				return pCEFBrowserController;
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 RESULT CEFBrowserManager::CEFManagerThread() {
@@ -69,7 +108,12 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	cefSettings.remote_debugging_port = 8080;
 	//cefSettings.multi_threaded_message_loop = true;
 
-	CBM(CefInitialize(cefMainArgs, cefSettings, CefRefPtr<CEFApp>(CEFApp::instance()), nullptr), "CefInitialize error");
+	CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(CEFApp::instance());
+	CN(pCEFApp);
+
+	CR(pCEFApp->RegisterCEFAppObserver(this));
+
+	CBM(CefInitialize(cefMainArgs, cefSettings, pCEFApp, nullptr), "CefInitialize error");
 
 	DEBUG_LINEOUT("CefInitialize completed successfully");
 	m_state = state::INITIALIZED;

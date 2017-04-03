@@ -1,6 +1,7 @@
-#include "Logger/Logger.h"
-
 #include "WebRTCPeerConnection.h"
+
+#include "Logger/Logger.h"
+#include "easylogging++.h"
 
 #include "WebRTCConductor.h"
 

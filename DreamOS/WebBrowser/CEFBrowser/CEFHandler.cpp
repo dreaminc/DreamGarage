@@ -183,13 +183,10 @@ bool CEFHandler::GetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect
 	RESULT r = R_PASS;
 	DEBUG_LINEOUT("CEFHANDLE: GetViewRect");
 
-	//CN(m_pCEFHandlerObserver);
-	//CR(m_pCEFHandlerObserver->OnGetViewRect(pCEFBrowser, cefRect));
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->OnGetViewRect(pCEFBrowser, cefRect));
 
-	// temp
-	cefRect = CefRect(0, 0, 512, 512);
-
-//Error:
+Error:
 	//return (r >= 0);
 	return true;
 }

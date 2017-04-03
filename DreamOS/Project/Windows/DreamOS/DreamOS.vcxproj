@@ -1037,6 +1037,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\UI\UIModule.h" />
     <ClInclude Include="..\..\..\UI\UITestSuite.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h" />
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFAppObserver.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h" />

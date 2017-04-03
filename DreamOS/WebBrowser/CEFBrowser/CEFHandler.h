@@ -6,6 +6,14 @@
 // DREAM OS
 // DreamOS/Cloud/WebBrowser/CefHandler.h
 
+#ifdef LOG
+#undef LOG
+#endif
+
+#ifdef PLOG
+#undef PLOG
+#endif
+
 #include "Primitives/singleton.h"
 
 #include "WebBrowser/WebBrowserController.h"

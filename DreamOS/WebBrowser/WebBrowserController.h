@@ -9,9 +9,33 @@
 #include <memory>
 #include <functional>
 
+#include <vector>
+
+/*
+struct WebBrowserRect {
+public:
+	int x;
+	int y;
+	int width;
+	int height;
+};
+*/
+
 // TODO: Revisit these functions 
 class WebBrowserController {
 public:
+	/*
+	enum class PAINT_ELEMENT_TYPE {
+		PET_VIEW = 0,
+		PET_POPUP,
+	};
+	*/
+
+public:
+
+	//virtual RESULT OnGetViewRect(WebBrowserRect &webRect) = 0;
+	//virtual RESULT OnPaint(PAINT_ELEMENT_TYPE type, const std::vector<WebBrowserRect> &dirtyRects, const void *pBuffer, int width, int height) = 0;
+
 	// Poll for the current frame of the browser.
 	// This function can be called by any thread.
 	//virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) = 0;

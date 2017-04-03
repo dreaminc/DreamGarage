@@ -1,6 +1,9 @@
 #include "EnvironmentController.h"
 #include "Cloud/CloudController.h"
+
 #include "Logger/Logger.h"
+#include "easylogging++.h"
+
 #include "Cloud/User/User.h"
 
 #include "Cloud/Websockets/Websocket.h"

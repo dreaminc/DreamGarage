@@ -146,8 +146,6 @@ RESULT UITestSuite::AddTestBrowser() {
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
 		pDreamBrowser->SetURI(strURL);
 		*/
-
-
 		WebBrowserManager *pWebBrowserManager = (WebBrowserManager*)(pContext);
 		CN(pWebBrowserManager);
 		CR(pWebBrowserManager->Initialize());
@@ -155,7 +153,7 @@ RESULT UITestSuite::AddTestBrowser() {
 		//
 		{
 			auto pWebBrowserController = pWebBrowserManager->CreateNewBrowser(512, 512, strURL);
-			
+
 			Sleep(1000);
 
 			pWebBrowserController->LoadURL("www.cnn.com");

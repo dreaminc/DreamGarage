@@ -1,5 +1,7 @@
 #include "OpenGLImp.h"
+
 #include "Logger/Logger.h"
+#include "easylogging++.h"
 
 #include "OGLObj.h"
 #include "OGLFramebuffer.h"

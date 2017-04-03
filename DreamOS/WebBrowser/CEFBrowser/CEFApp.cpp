@@ -104,8 +104,8 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	CefWindowInfo cefWindowInfo;
 	CefBrowserSettings cefBrowserSettings;
 
-	//cefWindowInfo.SetAsWindowless(0, false);
-	cefWindowInfo.SetAsPopup(nullptr, "cefsimple");
+	cefWindowInfo.SetAsWindowless(0, false);
+	//cefWindowInfo.SetAsPopup(nullptr, "cefsimple");
 	cefWindowInfo.width = width;
 	cefWindowInfo.height = height;
 
