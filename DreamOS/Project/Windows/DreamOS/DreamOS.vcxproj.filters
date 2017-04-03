@@ -668,6 +668,9 @@
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp">
       <Filter>WebBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserController.cpp">
+      <Filter>WebBrowser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

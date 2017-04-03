@@ -11,7 +11,6 @@
 
 #include <vector>
 
-/*
 struct WebBrowserRect {
 public:
 	int x;
@@ -19,20 +18,25 @@ public:
 	int width;
 	int height;
 };
-*/
 
 // TODO: Revisit these functions 
 class WebBrowserController {
 public:
-	/*
 	enum class PAINT_ELEMENT_TYPE {
 		PET_VIEW = 0,
 		PET_POPUP,
 	};
-	*/
 
 public:
+	class observer {
+	public:
+		virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) = 0;
+	};
 
+public:
+	RESULT RegisterWebBrowserControllerObserver(WebBrowserController::observer* pWebBrowserControllerObserver);
+
+public:
 	//virtual RESULT OnGetViewRect(WebBrowserRect &webRect) = 0;
 	//virtual RESULT OnPaint(PAINT_ELEMENT_TYPE type, const std::vector<WebBrowserRect> &dirtyRects, const void *pBuffer, int width, int height) = 0;
 
@@ -43,7 +47,7 @@ public:
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.
-	virtual int PollNewDirtyFrames() = 0;
+	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) = 0;
 
 	// Resize the browser.
 	virtual RESULT Resize(unsigned int width, unsigned int height) = 0;
@@ -57,6 +61,9 @@ public:
 	std::string GetID() {
 		return m_strID;
 	}
+
+protected:
+	WebBrowserController::observer* m_pWebBrowserControllerObserver = nullptr;
 
 private:
 	std::string m_strID;

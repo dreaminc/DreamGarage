@@ -12,35 +12,53 @@ CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	// empty
 }
 
+RESULT CEFBrowserController::RegisterCEFAppObserver(CEFBrowserController::observer* pCEFBrowserControllerObserver) {
+	RESULT r = R_PASS;
+
+	CBM((m_pWebBrowserControllerObserver == nullptr), "CEFBrowserControllerObserver already registered");
+	CN(pCEFBrowserControllerObserver);
+
+	m_pWebBrowserControllerObserver = pCEFBrowserControllerObserver;
+
+Error:
+	return r;
+}
+
 RESULT CEFBrowserController::PollFrame() {
 	RESULT r = R_PASS;
 
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
-	//fnPred(&m_buffer[0], m_bufferWidth, m_bufferHeight);
+	
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		WebBrowserRect rect = { 0, 0, m_bufferWidth, m_bufferHeight };
+		CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+	}
 
-//Error:
+Error:
 	return r;
 }
 
-int CEFBrowserController::PollNewDirtyFrames() {
+RESULT CEFBrowserController::PollNewDirtyFrames(int &rNumFramesProcessed) {
 	RESULT r = R_PASS;
 	
 	std::unique_lock<std::mutex> lockBufferMutex(m_BufferMutex);
 
-	int numberOfFrames = static_cast<int>(m_NewDirtyFrames.size());
+	rNumFramesProcessed = 0;
 
-	/*
-	for (auto& dirtyFrame : m_NewDirtyFrames) {
-		if (false == fnPred(&m_buffer[0], m_bufferWidth, m_bufferHeight, dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height)) {
-			break;
+	if (m_pWebBrowserControllerObserver != nullptr) {
+		for (auto& dirtyFrame : m_NewDirtyFrames) {
+			WebBrowserRect rect = { dirtyFrame.x, dirtyFrame.y, dirtyFrame.width, dirtyFrame.height };
+			
+			CR(m_pWebBrowserControllerObserver->OnPaint(rect, &m_vectorBuffer[0], m_bufferWidth, m_bufferHeight));
+		
+			rNumFramesProcessed++;
 		}
 	}
-	*/
 
 	m_NewDirtyFrames.clear();
 
-//Error:
-	return numberOfFrames;
+Error:
+	return r;
 }
 
 RESULT CEFBrowserController::Resize(unsigned int width, unsigned int height) {

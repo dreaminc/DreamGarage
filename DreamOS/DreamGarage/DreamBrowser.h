@@ -16,12 +16,15 @@
 #include <map>
 #include <vector>
 
+#include "WebBrowser/WebBrowserController.h"
+
 class quad;
 class texture;
 
 class EnvironmentAsset;
+class WebBrowserManager;
 
-class DreamBrowser : public DreamApp<DreamBrowser>, public Subscriber<InteractionObjectEvent> {
+class DreamBrowser : public DreamApp<DreamBrowser>, public Subscriber<InteractionObjectEvent>, public WebBrowserController::observer {
 	friend class DreamAppManager;
 
 public:
@@ -35,6 +38,8 @@ public:
 	// InteractionObjectEvent
 	virtual RESULT Notify(InteractionObjectEvent *event) override;
 
+	// WebBrowserController Observer
+	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
 
 	RESULT SetAspectRatio(float aspectRatio);
 	RESULT SetDiagonalSize(float diagonalSize);
@@ -60,9 +65,13 @@ protected:
 
 private:
 	std::shared_ptr<quad> m_pBrowserQuad = nullptr;
+	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
 
 	std::shared_ptr<composite> m_pPointerCursor = nullptr;
 	std::shared_ptr<composite> m_pHandCursor = nullptr;
+
+	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
+	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
 
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;

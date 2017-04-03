@@ -8,9 +8,6 @@
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamBrowser.h"
 
-#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
-#include "WebBrowser/WebBrowserController.h"
-
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -121,11 +118,9 @@ RESULT UITestSuite::AddTestBrowser() {
 	int nRepeats = 1;
 
 	// Initialize Code
-	CEFBrowserManager *pCEFBrowserManager = new CEFBrowserManager();
 	WebBrowserManager *pWebBrowserManager = new CEFBrowserManager();
 	//CN(pCEFBrowserManager);
 
-	// Initialize Code
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
@@ -134,7 +129,6 @@ RESULT UITestSuite::AddTestBrowser() {
 
 		CN(m_pDreamOS);
 
-		/*
 		// Create the Shared View App
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		CNM(pDreamBrowser, "Failed to create dream browser");
@@ -180,10 +174,7 @@ RESULT UITestSuite::AddTestBrowser() {
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CEFBrowserManager *pCEFBrowserManager = (CEFBrowserManager*)(pContext);
-		CN(pCEFBrowserManager);
-
-		pCEFBrowserManager->Update();
+		CR(r);
 
 	Error:
 		return r;
@@ -201,7 +192,7 @@ RESULT UITestSuite::AddTestBrowser() {
 		return r;
 	};
 
-	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, (void*)(pWebBrowserManager));
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pUITest);
 
 	pUITest->SetTestName("Local Shared Content View Test");

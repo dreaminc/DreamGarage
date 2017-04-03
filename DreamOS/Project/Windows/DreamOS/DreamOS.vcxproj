@@ -789,6 +789,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserController.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp" />
   </ItemGroup>

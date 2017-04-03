@@ -38,12 +38,13 @@ class CefBrowser;
 
 class CEFBrowserController :  public WebBrowserController {
 
+	RESULT RegisterCEFAppObserver(CEFBrowserController::observer* pCEFBrowserControllerObserver);
 public:
 	CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser);
 
 	// WebBrowserController
 	RESULT PollFrame();
-	virtual int PollNewDirtyFrames() override;
+	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) override;
 	virtual RESULT Resize(unsigned int width, unsigned int height) override;
 	virtual RESULT SendKeySequence(const std::string& keys) override;
 	virtual RESULT LoadURL(const std::string& url) override;

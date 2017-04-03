@@ -28,18 +28,11 @@ RESULT CEFBrowserManager::Update() {
 
 	for (auto& pWebBrowserController : m_webBrowserControllers) {
 		// TODO: optimize with actual dirty rects copy
-		if (pWebBrowserController->PollNewDirtyFrames()) {
-			int a = 5;
-			/*
-			[&](unsigned char *pBufferOutput, unsigned int width, unsigned int height, unsigned int left, unsigned int top, unsigned int right, unsigned int bottom) -> bool {
-			pWebBrowserController.second.pTexture->Update(pBufferOutput, width, height, texture::PixelFormat::BGRA);
-			// poll whole frame and stop iterations
-			return false;
-			*/
-		}
+		int numFramesProcessed = 0;
+		CR(pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
 	}
 
-//Error:
+Error:
 	return r;
 }
 
