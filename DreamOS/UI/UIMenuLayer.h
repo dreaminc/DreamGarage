@@ -5,7 +5,7 @@
 #include "Primitives/composite.h"
 #include "UIMenuItem.h"
 
-class UIMenuLayer : public valid{
+class UIMenuLayer : public valid {
 public:
 	UIMenuLayer(composite* pParentContext);
 	~UIMenuLayer();
@@ -19,6 +19,7 @@ public:
 
 	//Returns the first instance of a MenuItem that contains the argument 
 	std::shared_ptr<UIMenuItem> GetMenuItem(VirtualObj *pObj);
+	bool ContainsMenuItem(UIMenuItem *pItem);
 
 private:
 	std::shared_ptr<composite> m_pContextComposite; // composite for creation of Menu Items

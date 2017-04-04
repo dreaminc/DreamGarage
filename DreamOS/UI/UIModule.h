@@ -34,8 +34,6 @@ public:
 	std::shared_ptr<UIMenuLayer> CreateMenuLayer();
 	std::shared_ptr<UIMenuLayer> GetCurrentLayer();
 
-	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) = 0;
-
 	std::shared_ptr<UIMenuItem> GetMenuItem(VirtualObj* pObj);
 
 	RESULT ToggleVisible();

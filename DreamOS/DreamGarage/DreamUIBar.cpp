@@ -3,8 +3,8 @@
 
 #include "Cloud/Menu/MenuNode.h"
 
-DreamUIBar::DreamUIBar(DreamOS *pDreamOS, IconFormat& iconFormat, LabelFormat& labelFormat, UIBarFormat& barFormat) :
-	UIBar(pDreamOS, iconFormat, labelFormat, barFormat)
+DreamUIBar::DreamUIBar(DreamOS *pDreamOS, const IconFormat& iconFormat, const LabelFormat& labelFormat, const RadialLayerFormat& menuFormat, const RadialLayerFormat& titleFormat) :
+	UIBar(pDreamOS, iconFormat, labelFormat, menuFormat, titleFormat)
 {
 	RESULT r = R_PASS;
 
@@ -81,7 +81,9 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 
 	UIMenuItem* pItem = reinterpret_cast<UIMenuItem*>(pContext);
 	CN(pItem);
-	pItem->GetQuad()->Scale(m_barFormat.itemScaleSelected);
+	if (GetCurrentLayer()->ContainsMenuItem(pItem)) {
+		pItem->GetQuad()->Scale(m_menuFormat.itemScaleSelected);
+	}
 
 Error:
 	return r;
@@ -96,7 +98,9 @@ RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
 
 	UIMenuItem* pItem = reinterpret_cast<UIMenuItem*>(pContext);
 	CN(pItem);
-	pItem->GetQuad()->SetScale(m_barFormat.itemScale);
+	if (GetCurrentLayer()->ContainsMenuItem(pItem)) {
+		pItem->GetQuad()->SetScale(m_menuFormat.itemScale);
+	}
 
 Error:
 	return r;
@@ -168,6 +172,7 @@ Error:
 RESULT DreamUIBar::Update() {
 	RESULT r = R_PASS;
 	UILayerInfo info;
+	UILayerInfo titleInfo;
 	CR(UpdateInteractionPrimitive(GetHandRay()));
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
@@ -176,12 +181,13 @@ RESULT DreamUIBar::Update() {
 			info.labels.emplace_back(pSubMenuNode->GetTitle());
 			info.icons.emplace_back(m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())]);
 		}
-		info.labels.emplace_back(m_pMenuNode->GetTitle());
-		info.icons.emplace_back(m_images[MenuNode::MimeType::FOLDER]);
+
+		titleInfo.labels = { m_pMenuNode->GetTitle() };
+		titleInfo.icons = { m_images[MenuNode::MimeType::FOLDER] };
 
 		//TODO: There are several RenderToTexture calls and object creates
 		// that cause a brief timing delay
-		UpdateCurrentUILayer(info);
+		CR(UpdateUILayers(info, titleInfo));
 	}
 
 Error:

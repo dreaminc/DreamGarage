@@ -21,7 +21,7 @@ struct IconFormat
 		pTexture(nullptr),
 		height(ICON_HEIGHT),
 		width(ICON_WIDTH),
-		ptPosition(0.0f, 0.0f, 0.0f)
+		ptPosition(0.0f, 0.25f, 0.0f)
 	{}
 };
 
@@ -39,7 +39,7 @@ struct LabelFormat
 		pFont(std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true)),
 		strLabel(""),
 		fontSize(LABEL_SIZE),
-		ptPosition(0.0f, 0.0f, 0.0f),
+		ptPosition(0.0f, -0.9f, 0.0f),
 		vScale(1.0f, 1.0f, 1.0f)
 	{}
 };
@@ -55,6 +55,7 @@ public:
 
 
 	RESULT Update(IconFormat& iconFormat, LabelFormat& labelFormat);
+	RESULT SetObjectParams(point ptQuad, quaternion qQuad, point ptContext, quaternion qContext);
 
 	bool Contains(VirtualObj* pObj);
 
