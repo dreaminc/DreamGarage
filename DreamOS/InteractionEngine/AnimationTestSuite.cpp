@@ -2,6 +2,8 @@
 #include "AnimationQueue.h"
 
 #include "DreamOS.h"
+#include "Primitives/composite.h"
+#include "Primitives/sphere.h"
 
 AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) {
 	// empty
@@ -14,55 +16,130 @@ AnimationTestSuite::~AnimationTestSuite() {
 
 RESULT AnimationTestSuite::AddTests() {
 	RESULT r = R_PASS;
-	CR(AddTestAnimation());
+	CR(AddTestAnimationBasic());
+	CR(AddTestCancel());
 Error:
 	return r;
 }
 
-RESULT AnimationTestSuite::AddTestAnimation() {
+RESULT AnimationTestSuite::ResetTest(void *pContext) {
+	RESULT r = R_PASS;
+
+	// Will reset the sandbox as needed between tests
+	CN(m_pDreamOS);
+	CR(m_pDreamOS->RemoveAllObjects());
+
+Error:
+	return r;
+}
+
+RESULT AnimationTestSuite::InitializeAnimationTest(void *pContext) {
+	RESULT r = R_PASS;
+
+	AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
+
+	pTestContext->pComposite = m_pDreamOS->AddComposite();
+	CN(pTestContext->pComposite);
+	pTestContext->pComposite->InitializeOBB();
+
+	pTestContext->pSphere = m_pDreamOS->AddSphere(1.0f, 10.0f, 10.0f);
+	pTestContext->pSphere->MoveTo(0.0f, 0.0f, -2.0f);
+	CN(pTestContext->pSphere);
+
+	CR(pTestContext->pSphere->InitializeOBB());
+
+	pTestContext->pSphere2 = m_pDreamOS->AddSphere(1.0f, 10.0f, 10.0f);
+	pTestContext->pSphere2->MoveTo(2.0f, 0.0f, - 2.0f);
+	CN(pTestContext->pSphere2);
+
+	CR(pTestContext->pSphere2->InitializeOBB());
+
+	pTestContext->fCancelled = false;
+
+	pTestContext->startTime = std::chrono::high_resolution_clock::now();
+
+Error:
+	return r;
+}
+
+RESULT AnimationTestSuite::AddTestAnimationBasic() {
 
 	RESULT r = R_PASS;
 
+	AnimationTestContext *pTestContext = new AnimationTestContext();
+
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		composite *pComposite = nullptr;
-		std::shared_ptr<sphere> pSphere = nullptr;
-		std::shared_ptr<sphere> pSphere2 = nullptr;
 		AnimationQueue *pQueue = nullptr;
 		AnimationState aState;
 		AnimationState aState2;
 
-		pComposite = m_pDreamOS->AddComposite();
-		CN(pComposite);
-		pComposite->InitializeOBB();
+		CR(InitializeAnimationTest(pContext));
+		AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
-		pSphere = pComposite->AddSphere(1.0f, 10.0f, 10.0f);
-		pSphere->MoveTo(0.0f, 0.0f, -2.0f);
-		CN(pSphere);
-
-		// may not be needed
-		CR(pSphere->InitializeOBB());
-
-		CR(m_pDreamOS->AddInteractionObject(pComposite));
+		CR(m_pDreamOS->AddInteractionObject(pTestContext->pComposite));
 		pQueue = m_pDreamOS->GetAnimationQueue();
 
 		aState.ptPosition = point(0.0f, 1.0f, -2.0f);
 		aState.vScale = vector(5.0f, 1.25f, 1.25f);
 
-		pQueue->PushAnimationItem(pSphere.get(), aState, 10.0f);
-
-		pSphere2 = pComposite->AddSphere(1.0f, 10.0f, 10.0f);
-		pSphere2->MoveTo(2.0f, 0.0f, - 2.0f);
-		CN(pSphere2);
-
-		CR(pSphere2->InitializeOBB());
-
-		CR(m_pDreamOS->AddInteractionObject(pComposite));
+		pQueue->PushAnimationItem(pTestContext->pSphere, aState, 2.0f);
 		
+		aState2.ptPosition = point(1.0f, 0.0f, 0.0f);
+		aState2.vScale = vector(1.0f, 1.0f, 1.0f);
+		pQueue->PushAnimationItem(pTestContext->pSphere, aState2, 2.0f);
+
 		aState2.ptPosition = point(2.0f, 1.0f, -2.0f);
 		aState2.vScale = vector(0.5f, 0.5f, 0.5f);
 
-		pQueue->PushAnimationItem(pSphere2.get(), aState2, 5.0f);
+		pQueue->PushAnimationItem(pTestContext->pSphere2, aState2, 5.0f);
+
+	Error:
+		return R_PASS;
+	};
+
+	auto fnTest = [&](void* pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnTest, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Ray Events Controller Test");
+	pNewTest->SetTestDescription("Event handling test");
+	pNewTest->SetTestDuration(10.0);
+	pNewTest->SetTestRepeats(1);
+Error:
+	return r;
+}
+
+RESULT AnimationTestSuite::AddTestCancel() {
+	RESULT r = R_PASS;
+
+	AnimationTestContext *pTestContext = new AnimationTestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		AnimationQueue *pQueue = nullptr;
+		AnimationState aState;
+		AnimationState aState2;
+
+		CR(InitializeAnimationTest(pContext));
+		AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
+
+		CR(m_pDreamOS->AddInteractionObject(pTestContext->pComposite));
+		pQueue = m_pDreamOS->GetAnimationQueue();
+
+		aState.ptPosition = point(0.0f, 1.0f, -2.0f);
+		aState.vScale = vector(1.25f, 1.25f, 1.25f);
+
+		pQueue->PushAnimationItem(pTestContext->pSphere, aState, 2.0f);
+		//m_pDreamOS->GetAnimationQueue()->CancelAnimation(pTestContext->pSphere);
 
 	Error:
 		return R_PASS;
@@ -70,20 +147,40 @@ RESULT AnimationTestSuite::AddTestAnimation() {
 
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-		CR(r);
+
+		AnimationTestContext* pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
+		CN(pTestContext);
+
+		auto diff = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - pTestContext->startTime).count();
+
+		if (diff > 1.0 && !pTestContext->fCancelled) {
+			m_pDreamOS->GetAnimationQueue()->CancelAnimation(pTestContext->pSphere);
+			pTestContext->fCancelled = true;
+		}
+
 	Error:
 		return R_PASS;
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, nullptr);
+	auto fnTest = [&](void* pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Ray Events Controller Test");
 	pNewTest->SetTestDescription("Event handling test");
-	pNewTest->SetTestDuration(10000.0);
+	pNewTest->SetTestDuration(10.0);
 	pNewTest->SetTestRepeats(1);
 Error:
 	return r;
+
 }
 
 RESULT AnimationTestSuite::Notify(InteractionObjectEvent *event) {
@@ -93,4 +190,3 @@ RESULT AnimationTestSuite::Notify(InteractionObjectEvent *event) {
 RESULT AnimationTestSuite::Notify(SenseKeyboardEvent *kbEvent) {
 	return R_PASS;
 }
-

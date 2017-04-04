@@ -9,7 +9,20 @@
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "Sense/SenseKeyboard.h"
 
+#include <memory>
+#include <chrono>
+
 class DreamOS;
+class composite;
+class sphere; 
+
+struct AnimationTestContext {
+	composite *pComposite = nullptr;
+	sphere* pSphere = nullptr;
+	sphere* pSphere2 = nullptr;
+	bool fCancelled;
+	std::chrono::time_point<std::chrono::high_resolution_clock> startTime;
+};
 
 class AnimationTestSuite : public TestSuite, public Subscriber<InteractionObjectEvent>, public Subscriber<SenseKeyboardEvent> {
 public:
@@ -19,9 +32,13 @@ public:
 	virtual RESULT AddTests() override;
 
 public:
-	RESULT AddTestAnimation();
+	RESULT ResetTest(void *pContext);
+	RESULT AddTestAnimationBasic();
+	RESULT AddTestCancel();
 
 private:
+	RESULT InitializeAnimationTest(void *pContext);
+
 	virtual RESULT Notify(InteractionObjectEvent *event) override;
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 
