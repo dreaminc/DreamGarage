@@ -11,32 +11,30 @@ AnimationQueue::~AnimationQueue() {
 	// empty
 }
 
-RESULT AnimationQueue::Update(double msTimeStep) {
+RESULT AnimationQueue::Update() {
 	RESULT r = R_PASS;
 	for (auto& qObj : m_objectQueue) {
 		auto& pObj = qObj.first;
 		auto& pQueue = qObj.second;
-		OVERLAY_DEBUG_SET("size", (int)pQueue.size());
+
 		if (pQueue.empty()) continue;
 
 		auto& pItem = pQueue.begin();
 
-		(*pItem)->StartAnimation(pObj);
-		AnimationState state = (*pItem)->Update();
+		auto tNow = std::chrono::high_resolution_clock::now();
 
-		if ((*pItem)->IsComplete()) {
-			pQueue.pop_front();
-			continue;
-		}
-		while ((*pItem)->GetFlags() == (int)AnimationItem::AnimationFlags::NO_BLOCK && ++pItem != pQueue.end()) {
-			(*pItem)->StartAnimation(pObj);
-			state.Compose((*pItem)->Update());
-		}
+		AnimationState state;
+		state.vScale = vector(1.0f, 1.0f, 1.0f);
 
-		// while pItem.flags & NO_BLOCK && !pQueue.end()
-			// pItem = next()
-			// state.compose(pItem->Update())
-		//  
+		do {
+			(*pItem)->Update(pObj, state, tNow);
+
+			// modifying the deque likely invalidates the iterator
+			if ((*pItem)->IsComplete()) {
+				pQueue.pop_front();
+				continue;
+			}
+		} while ((*pItem)->GetFlags().fNoBlock && ++pItem != pQueue.end());
 
 		state.Apply(pObj);
 	}
@@ -44,7 +42,7 @@ RESULT AnimationQueue::Update(double msTimeStep) {
 	return r;
 }
 
-RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endState, double duration, int flags) {//, AnimationCurveType curve) {
+RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endState, double duration, AnimationItem::AnimationFlags flags) {//, AnimationCurveType curve) {
 	RESULT r = R_PASS;
 
 	AnimationState startState;
@@ -66,7 +64,9 @@ RESULT AnimationQueue::CancelAnimation(VirtualObj *pObj) {
 	
 	auto& qObj = m_objectQueue[pObj];
 
-	auto pNewItem = qObj.front()->CreateCancelAnimation();
+	auto tNow = std::chrono::high_resolution_clock::now();
+
+	auto pNewItem = qObj.front()->CreateCancelAnimation(pObj, tNow);
 
 	qObj.pop_front();
 	qObj.push_front(pNewItem);

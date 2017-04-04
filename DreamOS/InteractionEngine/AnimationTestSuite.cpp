@@ -102,17 +102,19 @@ RESULT AnimationTestSuite::AddTestAnimationBasic() {
 		return R_PASS;
 	};
 
+	auto fnUpdate = fnTest;
+
 	// Update Code 
 	auto fnReset = [&](void *pContext) {
 		return ResetTest(pContext);
 	};
 
-	auto pNewTest = AddTest(fnInitialize, fnTest, fnTest, fnReset, pTestContext);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Controller Test");
+	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
-	pNewTest->SetTestDuration(10.0);
+	pNewTest->SetTestDuration(5.0);
 	pNewTest->SetTestRepeats(1);
 Error:
 	return r;
@@ -139,7 +141,6 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		aState.vScale = vector(1.25f, 1.25f, 1.25f);
 
 		pQueue->PushAnimationItem(pTestContext->pSphere, aState, 2.0f);
-		//m_pDreamOS->GetAnimationQueue()->CancelAnimation(pTestContext->pSphere);
 
 	Error:
 		return R_PASS;
@@ -174,9 +175,9 @@ RESULT AnimationTestSuite::AddTestCancel() {
 	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
-	pNewTest->SetTestName("Ray Events Controller Test");
+	pNewTest->SetTestName("Animation Cancel Test");
 	pNewTest->SetTestDescription("Event handling test");
-	pNewTest->SetTestDuration(10.0);
+	pNewTest->SetTestDuration(5.0);
 	pNewTest->SetTestRepeats(1);
 Error:
 	return r;

@@ -85,7 +85,7 @@ RESULT InteractionEngine::Update() {
 
 RESULT InteractionEngine::UpdateAnimationQueue() {
 	RESULT r = R_PASS;
-	m_pObjectQueue->Update(0.0);
+	m_pObjectQueue->Update();
 //Error:
 	return r;
 }

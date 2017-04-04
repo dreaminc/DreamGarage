@@ -1,18 +1,5 @@
 #include "AnimationItem.h"
-
 #include "Primitives/VirtualObj.h"
-
-RESULT AnimationState::Compose(AnimationState state) {
-	ptPosition += state.ptPosition;
-	vScale = vector(vScale.x() * state.vScale.x(),
-					vScale.y() * state.vScale.y(),
-					vScale.z() * state.vScale.z());
-	return R_PASS;
-}
-
-VirtualObj* AnimationState::Apply(VirtualObj* pObj) {
-	return pObj->MoveTo(ptPosition)->SetScale(vScale);
-}
 
 AnimationItem::AnimationItem(AnimationState startState, AnimationState endState, double duration) {
 	RESULT r = R_PASS;
@@ -21,7 +8,8 @@ AnimationItem::AnimationItem(AnimationState startState, AnimationState endState,
 	m_startState = startState;
 	m_endState = endState;
 	m_duration = duration;
-	m_flags = 0;
+
+	m_flags = AnimationFlags();
 
 	SetDirty();
 
@@ -46,7 +34,17 @@ RESULT AnimationItem::Initialize() {
 	return r;
 }
 
-RESULT AnimationItem::StartAnimation(VirtualObj *pObj) {
+std::shared_ptr<AnimationItem> AnimationItem::CreateCancelAnimation(VirtualObj *pObj, std::chrono::time_point<std::chrono::steady_clock> tNow) {
+	AnimationState startState;
+	startState.vScale = vector(1.0f, 1.0f, 1.0f);
+	Update(pObj, startState, tNow);
+	AnimationState endState = m_startState;
+	auto duration = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
+
+	return std::make_shared<AnimationItem>(startState, endState, duration);
+}
+
+RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, std::chrono::time_point<std::chrono::steady_clock> tNow) {
 	RESULT r = R_PASS;
 
 	if (CheckAndCleanDirty()) {
@@ -58,44 +56,19 @@ RESULT AnimationItem::StartAnimation(VirtualObj *pObj) {
 		m_startTime = std::chrono::high_resolution_clock::now();
 	}
 
-	return r;
-}
-
-std::shared_ptr<AnimationItem> AnimationItem::CreateCancelAnimation() {
-	AnimationState startState = Update();
-	AnimationState endState = m_startState;
-	auto duration = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
-
-	return std::make_shared<AnimationItem>(startState, endState, duration);
-}
-
-AnimationState AnimationItem::Update() {
-	RESULT r = R_PASS;
-
-	auto diff = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
+	auto diff = std::chrono::duration<double>(tNow - m_startTime).count();
 
 	double prog = diff / m_duration;
 	prog = std::min(1.0, prog);
 
-	// Linear animation
-	//pObj->SetPosition((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
-	//pObj->SetScale((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
-
-	AnimationState state;
+	AnimationState updateState;
 		
-	state.ptPosition = ((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
-	state.vScale = ((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
-//Error:
-	return state;
-}
-
-RESULT AnimationItem::EndAnimation() {
-	
-}
-
-RESULT AnimationItem::UpdateStartTime() {
-	m_startTime = std::chrono::high_resolution_clock::now();
-	return R_PASS;
+	//TODO replace with animation curves 
+	updateState.ptPosition = ((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
+	updateState.vScale = ((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
+	CR(state.Compose(updateState));
+Error:
+	return r;
 }
 
 bool AnimationItem::IsComplete() {
@@ -106,11 +79,11 @@ bool AnimationItem::IsComplete() {
 	return prog >= 1.0;
 }
 
-RESULT AnimationItem::SetFlags(int flags) {
-	m_flags = flags;
-	return R_PASS;
+AnimationItem::AnimationFlags AnimationItem::GetFlags() {
+	return m_flags;
 }
 
-int AnimationItem::GetFlags() {
-	return m_flags;
+RESULT AnimationItem::SetFlags(AnimationFlags flags) {
+	m_flags = flags;
+	return R_PASS;
 }

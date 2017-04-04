@@ -671,6 +671,9 @@
     <ClCompile Include="..\..\..\InteractionEngine\AnimationTestSuite.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationState.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2469,6 +2472,9 @@
       <Filter>InteractionEngine</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\InteractionEngine\AnimationTestSuite.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationState.h">
       <Filter>InteractionEngine</Filter>
     </ClInclude>
   </ItemGroup>

@@ -24,8 +24,6 @@
 #include "InteractionObjectEvent.h"
 #include "ActiveObject.h"
 
-//#include "AnimationQueue.h"
-
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
 
 class ObjectStore;

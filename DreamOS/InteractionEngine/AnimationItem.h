@@ -4,53 +4,28 @@
 #include "RESULT/EHM.h"
 #include "Primitives/valid.h"
 #include "Primitives/dirty.h"
+#include "AnimationState.h"
 
 #include <chrono>
 #include <memory>
 
-#include "Primitives/point.h"
-#include "Primitives/quaternion.h"
-#include "Primitives/vector.h"
-
 class VirtualObj;
-
-/*
-enum class AnimationFlags {
-
-	NO_BLOCK = 0x1,
-	LOOPING = 0x2
-
-} ANIMATION_FLAGS;
-/*
-
-enum class AnimationType {
-	POSITION,
-	ORIENTATION,
-	SCALE,
-	INVALID
-} ANIMATION_TYPE;
-//*/
-
-class AnimationState {
-public:
-	point ptPosition;
-	quaternion qRotation;
-	vector vScale;
-
-public:
-	RESULT Compose(AnimationState state);
-	VirtualObj* Apply(VirtualObj *pObj);
-};
 
 class AnimationItem : public valid, public dirty {
 public:
-	enum class AnimationFlags {
+	struct AnimationFlags {
 
-		NO_BLOCK = 0x1,
-		LOOPING = 0x2
+		unsigned fNoBlock : 1;
+		unsigned fLooping  : 1;
+
+		AnimationFlags() :
+			fNoBlock(false),
+			fLooping(false)
+		{};
 
 	} ANIMATION_FLAGS;
 
+	//TODO currently unused
 	enum class AnimationCurveType {
 		LINEAR,
 		INVALID
@@ -60,34 +35,28 @@ public:
 	AnimationItem(AnimationState startState, AnimationState endState, double duration);
 	~AnimationItem();
 
-	std::shared_ptr<AnimationItem> CreateCancelAnimation();
+	std::shared_ptr<AnimationItem> CreateCancelAnimation(VirtualObj *pObj, std::chrono::time_point<std::chrono::steady_clock> tNow);
 
 private:
 	RESULT Initialize();
 
 public:
-	RESULT StartAnimation(VirtualObj *pObj = nullptr);
-	AnimationState Update();
-	RESULT EndAnimation();
+	RESULT Update(VirtualObj *pObj, AnimationState& state, std::chrono::time_point<std::chrono::steady_clock> tNow);
 
-	RESULT UpdateStartTime();
 	bool IsComplete();
 
-	RESULT SetFlags(int flags);
-	int GetFlags();
+	AnimationFlags GetFlags();
+	RESULT SetFlags(AnimationFlags flags);
 
 private:
 	std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
 	double m_duration;
 
-	int m_flags;
-	AnimationCurveType m_type;
+	AnimationFlags m_flags;
+	AnimationCurveType m_curveType;
 
 	AnimationState m_startState;
 	AnimationState m_endState;
 };
-
-
-
 
 #endif // ! ANIMATION_ITEM_H_
