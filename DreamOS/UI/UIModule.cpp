@@ -38,8 +38,6 @@ RESULT UIModule::Initialize() {
 	CR(m_pCompositeContext->InitializeOBB());
 	CR(m_pDreamOS->AddInteractionObject(m_pCompositeContext));
 
-	m_pCurrentItem = nullptr;
-
 	/*
 	m_pTestRayController = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
 	m_pTestRayLookV = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
@@ -132,10 +130,6 @@ std::shared_ptr<UIMenuItem> UIModule::GetMenuItem(VirtualObj *pObj) {
 	return nullptr;
 }
 
-std::shared_ptr<UIMenuItem> UIModule::GetCurrentItem() {
-	return m_pCurrentItem;
-}
-
 RESULT UIModule::ToggleVisible() {
 
 	RESULT r = R_PASS;
@@ -182,29 +176,6 @@ bool UIModule::IsVisible() {
 
 composite *UIModule::GetComposite() {
 	return m_pCompositeContext;
-}
-
-RESULT UIModule::Notify(InteractionObjectEvent *event) {
-	RESULT r = R_PASS;
-/*
-	if (event->m_numContacts > 0 && m_pSphere != nullptr) {
-		m_pSphere->SetPosition(event->m_ptContact[0]);
-	}
-	//*/
-
-	std::shared_ptr<UIMenuItem> pItem = m_pCurrentUILayer->GetMenuItem(event->m_pObject);
-	//std::shared_ptr<UIMenuItem> pItem = GetMenuItem(event->m_pObject);
-	CBR(pItem != nullptr, R_OBJECT_NOT_FOUND);
-
-	//TODO stupid hack, can be fixed by incorporating 
-	// SenseController into the Interaction Engine
-	if (event->m_eventType == InteractionEventType::ELEMENT_INTERSECT_ENDED)
-		m_pCurrentItem = nullptr;
-	else
-		m_pCurrentItem = pItem;
-
-Error:
-	return r;
 }
 
 CloudController *UIModule::GetCloudController() {

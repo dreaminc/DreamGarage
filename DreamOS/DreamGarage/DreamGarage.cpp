@@ -56,11 +56,6 @@ RESULT DreamGarage::LoadScene() {
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
 	RegisterSubscriber(SENSE_TYPING_EVENT_TYPE::CHARACTER_TYPING, this);
 
-	// Controller
-	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
-	RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
-
-	
 	/* If you want to turn on reference geo
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = true;
@@ -470,28 +465,6 @@ RESULT DreamGarage::Notify(SenseTypingEvent *kbEvent) {
 	}
 
 	//Error:
-	return r;
-}
-
-RESULT DreamGarage::Notify(SenseControllerEvent *event) {
-	RESULT r = R_PASS;
-
-	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
-	OVERLAY_DEBUG_SET("event", "none");
-
-	if (event->state.type == CONTROLLER_RIGHT) {
-		// TODO:  soon this code will be replaced with api requests, 
-		// as opposed to accessing the hardcoded local data structures
-		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
-			OVERLAY_DEBUG_SET("event", "trigger up");
-			CR(m_pDreamUIBar->HandleTriggerUp());
-		}
-		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
-			OVERLAY_DEBUG_SET("event", "menu up");
-			CR(m_pDreamUIBar->HandleMenuUp());
-		}
-	}
-Error:
 	return r;
 }
 

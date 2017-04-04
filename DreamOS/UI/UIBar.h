@@ -52,8 +52,8 @@ public:
 			const RadialLayerFormat& titleFormat);
 	~UIBar();
 
-	RESULT UpdateCurrentUILayer(const UILayerInfo& info, const RadialLayerFormat& layerFormat);
-	RESULT UpdateUILayers(const UILayerInfo& currentInfo, const UILayerInfo& titleInfo);
+	virtual RESULT UpdateCurrentUILayer(UILayerInfo& info) override;
+	virtual RESULT Notify(InteractionObjectEvent *event) override = 0;
 
 private:
 	// Places MenuItem along a circular arc based on index

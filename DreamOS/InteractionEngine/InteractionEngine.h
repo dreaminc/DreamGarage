@@ -19,6 +19,9 @@
 
 #include "Primitives/VirtualObj.h"
 #include "Primitives/Publisher.h"
+#include "Primitives/Subscriber.h"
+#include "Sense/SenseController.h"
+
 #include <vector>
 
 #include "InteractionObjectEvent.h"
@@ -33,7 +36,7 @@ class InteractionObject {
 };
 */
 
-class InteractionEngine : public valid, public Publisher<InteractionEventType, InteractionObjectEvent> {
+class InteractionEngine : public valid, public Publisher<InteractionEventType, InteractionObjectEvent>, public Subscriber<SenseControllerEvent> {
 public:
 	static std::unique_ptr<InteractionEngine> MakeEngine();
 
@@ -64,6 +67,10 @@ public:
 	std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject);
 	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
 	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
+
+	virtual RESULT Notify(SenseControllerEvent *event) override;
+
+	RESULT RegisterSenseController(SenseController *pSenseController);
 
 private:
 	std::shared_ptr<ray> m_pInteractionRay = nullptr;

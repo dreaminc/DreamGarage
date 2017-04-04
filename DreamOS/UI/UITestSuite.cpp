@@ -557,11 +557,11 @@ RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 		// as opposed to accessing the hardcoded local data structures
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
-			CR(m_pDreamUIBar->HandleTriggerUp());
+//			CR(m_pDreamUIBar->HandleSelect());
 		}
 		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
 			OVERLAY_DEBUG_SET("event", "menu up");
-			CR(m_pDreamUIBar->HandleMenuUp());
+//			CR(m_pDreamUIBar->HandleMenuUp());
 		}
 	}
 	else if (eventType == SENSE_CONTROLLER_GRIP_DOWN) {
@@ -573,7 +573,7 @@ RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 	else if (eventType == SENSE_CONTROLLER_MENU_DOWN) {
 		OVERLAY_DEBUG_SET("event", "menu down");
 	}
-Error:
+//Error:
 	return r;
 }
 
@@ -593,7 +593,7 @@ RESULT UITestSuite::Notify(SenseMouseEvent *mEvent) {
 			OVERLAY_DEBUG_SET("event", "mouse left up");
 			
 			if (m_pDreamUIBar != nullptr) {
-				CR(m_pDreamUIBar->HandleMenuUp());
+//				CR(m_pDreamUIBar->HandleMenuUp());
 			}
 		} break;
 

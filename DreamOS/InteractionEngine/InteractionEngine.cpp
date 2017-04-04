@@ -24,6 +24,17 @@ Error:
 	return r;
 }
 
+RESULT InteractionEngine::RegisterSenseController(SenseController* pSenseController) {
+	RESULT r = R_PASS;
+
+	CN(pSenseController);
+	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this));
+	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this));
+
+Error:
+	return r;
+}
+
 std::unique_ptr<InteractionEngine> InteractionEngine::MakeEngine() {
 	RESULT r = R_PASS;
 
@@ -269,4 +280,31 @@ ActiveObject::state InteractionEngine::GetActiveObjectState(VirtualObj *pVirtual
 
 Error:
 	return ActiveObject::state::INVALID;
+}
+
+RESULT InteractionEngine::Notify(SenseControllerEvent *event) {
+	RESULT r = R_PASS;
+
+	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
+
+	//TODO:  Expand this to accommodate for left controller
+	if (event->state.type == CONTROLLER_RIGHT) {
+		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
+			for (auto &pObject : m_activeObjects) {
+				if (pObject->GetState() == ActiveObject::state::INTERSECTED) {
+					InteractionEventType type = INTERACTION_EVENT_SELECT;
+					InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+					CR(NotifySubscribers(type, &interactionEvent));
+				}
+			}
+		}
+		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
+			InteractionEventType type = INTERACTION_EVENT_MENU;
+			InteractionObjectEvent interactionEvent(type, m_pInteractionRay, nullptr);
+			CR(NotifySubscribers(type, &interactionEvent));
+		}
+	}
+
+Error:
+	return r;
 }

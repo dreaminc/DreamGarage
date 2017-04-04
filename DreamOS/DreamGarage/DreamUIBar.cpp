@@ -56,6 +56,12 @@ RESULT DreamUIBar::Initialize() {
 	CR(RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED,
 		std::bind(&DreamUIBar::HandleTouchEnd, this, std::placeholders::_1)));
 
+	CR(RegisterEvent(InteractionEventType::INTERACTION_EVENT_SELECT,
+		std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
+
+	CR(RegisterEvent(InteractionEventType::INTERACTION_EVENT_MENU,
+		std::bind(&DreamUIBar::HandleMenuUp, this, std::placeholders::_1)));
+
 	m_pCloudController = GetCloudController();
 
 	MenuControllerProxy *pMenuControllerProxy = nullptr;
@@ -100,7 +106,7 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HandleMenuUp() {
+RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	RESULT r = R_PASS;
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
@@ -123,10 +129,12 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HandleTriggerUp() {
+RESULT DreamUIBar::HandleSelect(void* pContext) {
 	RESULT r = R_PASS;
 
-	auto pSelected = GetCurrentItem();
+//	auto pSelected = GetCurrentItem();
+
+	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
@@ -189,13 +197,12 @@ Error:
 RESULT DreamUIBar::Notify(InteractionObjectEvent *event) {
 	RESULT r = R_PASS;
 
-	UIModule::Notify(event);
-
 	std::function<RESULT(void*)> fnCallback;
 	std::shared_ptr<UIMenuItem> pItem = GetMenuItem(event->m_pObject);
 
-	CBR(m_callbacks.count(event->m_eventType) > 0, R_OBJECT_NOT_FOUND)
-	CBR(pItem != nullptr, R_OBJECT_NOT_FOUND);
+	CBR(m_callbacks.count(event->m_eventType) > 0, R_OBJECT_NOT_FOUND);
+	bool menuUp = (event->m_eventType == InteractionEventType::INTERACTION_EVENT_MENU);
+	CBR(menuUp || (pItem != nullptr), R_OBJECT_NOT_FOUND);
 
 	fnCallback = m_callbacks[event->m_eventType];
 
