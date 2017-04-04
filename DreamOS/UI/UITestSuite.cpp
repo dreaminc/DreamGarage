@@ -69,6 +69,7 @@ RESULT UITestSuite::Initialize() {
 		sceneScale,
 		sceneDirection);
 //*/
+	/*
 	for (int i = 0; i < SenseControllerEventType::SENSE_CONTROLLER_INVALID; i++) {
 		CR(m_pDreamOS->RegisterSubscriber((SenseControllerEventType)(i), this));
 	}
@@ -76,8 +77,9 @@ RESULT UITestSuite::Initialize() {
 	for (int i = 0; i < SenseMouseEventType::SENSE_MOUSE_INVALID; i++) {
 		CR(m_pDreamOS->RegisterSubscriber((SenseMouseEventType)(i), this));
 	}
+	*/
 
-Error:
+//Error:
 	return r;
 }
 
@@ -114,7 +116,7 @@ RESULT UITestSuite::InitializeUI() {
 RESULT UITestSuite::AddTestBrowser() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 60.0f;
+	double sTestTime = 600.0f;
 	int nRepeats = 1;
 
 	// Initialize Code
@@ -125,7 +127,7 @@ RESULT UITestSuite::AddTestBrowser() {
 		RESULT r = R_PASS;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
 
-		std::string strURL = "http://www.google.com";
+		std::string strURL = "http://www.youtube.com";
 
 		CN(m_pDreamOS);
 
@@ -134,7 +136,9 @@ RESULT UITestSuite::AddTestBrowser() {
 		CNM(pDreamBrowser, "Failed to create dream browser");
 
 		// Set up the view
-		pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetDiagonalSize(10.0f);
 
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
@@ -438,8 +442,8 @@ RESULT UITestSuite::Notify(SenseControllerEvent *event) {
 			OVERLAY_DEBUG_SET("event", "trigger down");
 		}
 
-		// TODO:  soon this code will be replaced with api requests,
-		// as opposed to accessing the hardcoded local data structures
+		// TODO:  soon this code will be replaced with api requests, 
+		// as opposed to accessing the hard coded local data structures
 		else if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			OVERLAY_DEBUG_SET("event", "trigger up");
 //			CR(m_pDreamUIBar->HandleSelect());

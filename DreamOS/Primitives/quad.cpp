@@ -195,6 +195,9 @@ RESULT quad::UpdateParams(float width, float height, vector vNormal) {
 
 		CR(SetVertices(width, height, vNormal));
 	}
+	else {
+		r = R_SKIPPED;
+	}
 
 Error:
 	return r;

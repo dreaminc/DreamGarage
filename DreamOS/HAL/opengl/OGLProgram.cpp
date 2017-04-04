@@ -756,6 +756,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 
 	// TODO: Remove this dynamic cast
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+	//CNR(pOGLObj, R_SKIPPED);
 
 	// Update buffers if marked as dirty
 	if (pDimObj->CheckAndCleanDirty()) {

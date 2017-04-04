@@ -48,6 +48,11 @@ RESULT DimObj::Destroy() {
 RESULT DimObj::AllocateVertices(uint32_t numVerts) {
 	RESULT r = R_PASS;
 
+	if (m_pVertices != nullptr) {
+		delete[] m_pVertices;
+		m_pVertices = nullptr;
+	}
+
 	m_pVertices = new vertex[numVerts];
 	CN(m_pVertices);
 
@@ -57,6 +62,11 @@ Error:
 
 RESULT DimObj::AllocateIndices(uint32_t numIndices) {
 	RESULT r = R_PASS;
+
+	if (m_pIndices != nullptr) {
+		delete[] m_pIndices;
+		m_pIndices = nullptr;
+	}
 
 	m_pIndices = new dimindex[numIndices];
 	CN(m_pIndices);
@@ -68,6 +78,11 @@ Error:
 RESULT DimObj::AllocateQuadIndexGroups(uint32_t numQuads) {
 	RESULT r = R_PASS;
 
+	if (m_pIndices != nullptr) {
+		delete[] m_pIndices;
+		m_pIndices = nullptr;
+	}
+
 	m_pIndices = (dimindex*)(new QuadIndexGroup[numQuads]);
 	CN(m_pIndices);
 
@@ -77,6 +92,11 @@ Error:
 
 RESULT DimObj::AllocateTriangleIndexGroups(uint32_t numTriangles) {
 	RESULT r = R_PASS;
+
+	if (m_pIndices != nullptr) {
+		delete[] m_pIndices;
+		m_pIndices = nullptr;
+	}
 
 	m_pIndices = (dimindex*)(new TriangleIndexGroup[numTriangles]);
 	CN(m_pIndices);
@@ -126,16 +146,21 @@ RESULT DimObj::SetColor(color c) {
 	return R_PASS;
 }
 
-RESULT DimObj::TransformUV(matrix<uv_precision, 2, 1> a, matrix<uv_precision, 2, 2> b) {
+RESULT DimObj::TransformUV(matrix<uv_precision, 2, 1> matA, matrix<uv_precision, 2, 2> matB) {
+	RESULT r = R_PASS;
+
 	for (unsigned int i = 0; i < NumberVertices(); i++) {
-		uvcoord uv = m_pVertices[i].GetUV();
-		uv = a + b * uv;
-		m_pVertices[i].SetUV(uv);
+		
+		uvcoord uvCoord = m_pVertices[i].GetUV();
+		uvCoord = matA + matB * uvCoord;
+
+		m_pVertices[i].SetUV(uvCoord);
 	}
 
-	SetDirty();
+	CR(SetDirty());
 
-	return R_PASS;
+Error:
+	return r;
 }
 
 RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {

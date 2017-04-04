@@ -90,7 +90,7 @@ RESULT CEFBrowserController::SendKeySequence(const std::string& keys) {
 	RESULT r = R_PASS;
 
 	size_t word_length = keys.length();
-	CefKeyEvent eventToTest;
+	CefKeyEvent cefKeyEvent;
 
 	CN(m_pCEFBrowser);
 
@@ -98,27 +98,69 @@ RESULT CEFBrowserController::SendKeySequence(const std::string& keys) {
 		BYTE VkCode = LOBYTE(VkKeyScanA(keys[i]));
 		UINT scanCode = MapVirtualKey(VkCode, MAPVK_VK_TO_VSC);
 
-		eventToTest.native_key_code = (scanCode << 16) | 1;
-		eventToTest.windows_key_code = VkCode;
-		eventToTest.type = KEYEVENT_RAWKEYDOWN;
+		cefKeyEvent.native_key_code = (scanCode << 16) | 1;
+		cefKeyEvent.windows_key_code = VkCode;
+		cefKeyEvent.type = KEYEVENT_RAWKEYDOWN;
 		
-		m_pCEFBrowser->GetHost()->SendKeyEvent(eventToTest);
+		m_pCEFBrowser->GetHost()->SendKeyEvent(cefKeyEvent);
 
-		eventToTest.windows_key_code = keys[i];
-		eventToTest.type = KEYEVENT_CHAR;
+		cefKeyEvent.windows_key_code = keys[i];
+		cefKeyEvent.type = KEYEVENT_CHAR;
 		
-		m_pCEFBrowser->GetHost()->SendKeyEvent(eventToTest);
+		m_pCEFBrowser->GetHost()->SendKeyEvent(cefKeyEvent);
 
-		eventToTest.windows_key_code = VkCode;
-		eventToTest.native_key_code |= 0xC0000000;
-		eventToTest.type = KEYEVENT_KEYUP;
+		cefKeyEvent.windows_key_code = VkCode;
+		cefKeyEvent.native_key_code |= 0xC0000000;
+		cefKeyEvent.type = KEYEVENT_KEYUP;
 
-		m_pCEFBrowser->GetHost()->SendKeyEvent(eventToTest);
+		m_pCEFBrowser->GetHost()->SendKeyEvent(cefKeyEvent);
 	}
 
 Error:
 	return r;
 }
+
+
+RESULT CEFBrowserController::SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount) {
+	RESULT r = R_PASS;
+
+	CefMouseEvent cefMouseEvent;
+	CefBrowserHost::MouseButtonType cefMouseButtonType;
+	CN(m_pCEFBrowser);
+
+	cefMouseEvent.x = webBrowserMouseEvent.pt.x;
+	cefMouseEvent.y = webBrowserMouseEvent.pt.y;
+	cefMouseEvent.modifiers = EVENTFLAG_LEFT_MOUSE_BUTTON;
+
+	cefMouseButtonType = (CefBrowserHost::MouseButtonType)webBrowserMouseEvent.mouseButton;
+
+	m_pCEFBrowser->GetHost()->SendMouseClickEvent(cefMouseEvent, cefMouseButtonType, fMouseUp, clickCount);
+
+Error:
+	return r;
+}
+
+
+RESULT CEFBrowserController::SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave) {
+	RESULT r = R_PASS;
+
+	CefMouseEvent cefMouseEvent;
+	CN(m_pCEFBrowser);
+
+	cefMouseEvent.x = webBrowserMouseEvent.pt.x;
+	cefMouseEvent.y = webBrowserMouseEvent.pt.y;
+
+	m_pCEFBrowser->GetHost()->SendMouseMoveEvent(cefMouseEvent, fMouseLeave);
+
+Error:
+	return r;
+}
+
+// TODO: Mouse wheel
+/*--cef()--
+virtual void SendMouseWheelEvent(const CefMouseEvent& event,
+	int deltaX, int deltaY) = 0;
+	*/
 
 
 RESULT CEFBrowserController::OnGetViewRect(CefRect &cefRect){

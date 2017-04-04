@@ -12,6 +12,7 @@ DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	// Empty - initialization by factory
 }
 
+// TODO: Only update the rect
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;
 
@@ -28,14 +29,20 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	std::string strURL = "http://www.google.com";
 
-	int pxWidth = 512;
-	int pxHeight = 512;
+	int pxWidth = 1366;
+	int pxHeight = 768;
+	m_aspectRatio = ((float)pxWidth / (float)pxHeight);
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
 	// Subscribers (children)
 	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 		CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
 	}
+
+	// Controller
+	//RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
+	GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
+	GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this);
 
 	SetAppName("DreamContentView");
 	SetAppDescription("A Shared Content View");
@@ -52,7 +59,16 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
+
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
+	
+	// Flip UV vertically
+	m_pBrowserQuad->TransformUV(
+		{ { 0.0f, 0.0f } },
+		{ { 1.0f, 0.0f,
+			0.0f, -1.0f } }
+	);
+
 	m_pBrowserQuad->SetMaterialAmbient(0.8f);
 
 	// Set up and map the texture
@@ -67,7 +83,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 												point(-0.2f, -0.43f, 0.0f),
 												0.01f,
 												vector(-(float)M_PI_2, 0.0f, 0.0f));
-	m_pPointerCursor->SetMaterialAmbient(0.8f);
+	m_pPointerCursor->SetMaterialAmbient(1.0f);
+	m_pPointerCursor->SetVisible(false);
 	//*/
 
 	/*
@@ -102,8 +119,9 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CR(m_pWebBrowserManager->Update());
 	}
 
-	CR(GetDOS()->GetMouseRay(rCast, 0.0f));
+	CR(GetDOS()->UpdateInteractionPrimitive(GetHandRay()))
 
+	/*
 	{
 		CollisionManifold manifold = m_pBrowserQuad->Collide(rCast);
 
@@ -111,16 +129,91 @@ RESULT DreamBrowser::Update(void *pContext) {
 			m_pPointerCursor->SetOrigin(manifold.GetContactPoint(0).GetPoint());
 		}
 	}
+	*/
 
 Error:
 	return r;
 }
 
+WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
+	WebBrowserPoint webPt;
+
+	// First apply transforms to the ptIntersectionContact 
+	point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
+
+	float width = GetWidth();
+	float height = GetHeight();
+
+	float posX = ptAdjustedContact.x();
+	float posY = ptAdjustedContact.y();
+	float posZ = ptAdjustedContact.z();
+
+	// TODO: This is a bit of a hack, should be a better way (this won't account for the quad normal, only orientation
+	// so it might get confused - technically this should never actually happen otherwise since we can force a dimension
+	if (std::abs(posZ) > std::abs(posY)) {
+		posY = posZ;
+	}
+
+	posX /= width / 2.0f;
+	posY /= height / 2.0f;
+
+	posX = (posX + 1.0f) / 2.0f;
+	posY = (posY + 1.0f) / 2.0f;  // flip it
+
+	// TODO: push into WebBrowserController
+	webPt.x = posX * 1366;
+	webPt.y = 768 - (posY * 768);
+
+	//ptAdjustedContact.Print("adj");
+	//DEBUG_LINEOUT("%d %d", webPt.x, webPt.y);
+
+	return webPt;
+}
+
 // InteractionObjectEvent
-RESULT DreamBrowser::Notify(InteractionObjectEvent *event) {
+RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	switch (pEvent->m_eventType) {
+		case ELEMENT_INTERSECT_BEGAN: {
+			m_pPointerCursor->SetVisible(true);
+
+			WebBrowserMouseEvent webBrowserMouseEvent;
+
+			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
+
+			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
+
+			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+			m_fBrowserActive = true;
+		} break;
+
+		case ELEMENT_INTERSECT_ENDED: {
+			m_pPointerCursor->SetVisible(false);
+
+			WebBrowserMouseEvent webBrowserMouseEvent;
+
+			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
+
+			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, true));
+
+			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+			m_fBrowserActive = false;
+		} break;
+
+		case ELEMENT_INTERSECT_MOVED: {
+			WebBrowserMouseEvent webBrowserMouseEvent;
+
+			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
+
+			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
+
+			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+		} break;
+	}
+
+	// First point of contact
+	m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
 
 Error:
 	return r;
@@ -148,8 +241,9 @@ RESULT DreamBrowser::SetDiagonalSize(float diagonalSize) {
 RESULT DreamBrowser::SetNormalVector(vector vNormal) {
 	m_vNormal = vNormal.Normal();
 
-	if (m_pBrowserQuad != nullptr)
+	if (m_pBrowserQuad != nullptr) {
 		return UpdateViewQuad();
+	}
 
 	return R_PASS;
 }
@@ -160,18 +254,72 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	m_aspectRatio = aspectRatio;
 	m_vNormal = vNormal.Normal();
 
-	if (m_pBrowserQuad != nullptr)
+	if (m_pBrowserQuad != nullptr) {
 		return UpdateViewQuad();
+	}
 
 	return R_PASS;
 }
 
-float DreamBrowser::GetWidth() {
-	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+// TODO: replace with core code
+ray DreamBrowser::GetHandRay() {
+
+	RESULT r = R_PASS;
+
+	ray rCast;
+	hand *pRightHand = GetDOS()->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+
+	CBR(m_pBrowserQuad->IsVisible(), R_SKIPPED);
+	if(pRightHand != nullptr) {
+		point ptHand = pRightHand->GetPosition();
+
+		//GetLookVector
+		quaternion qHand = pRightHand->GetHandState().qOrientation;
+		qHand.Normalize();
+
+		/*
+		if (m_pTestRayController != nullptr) {
+		m_pTestRayController->SetPosition(ptHand);
+		m_pTestRayController->SetOrientation(qHand);
+		}
+		//*/
+
+		//TODO: investigate how to properly get look vector for controllers
+		//vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+
+		vector vHandLook = RotationMatrix(qHand) * vector(0.0f, 0.0f, -1.0f);
+		vHandLook.Normalize();
+
+		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
+		/*
+		if (m_pTestRayController != nullptr) {
+		m_pTestRayLookV->SetPosition(ptHand);
+		m_pTestRayLookV->SetOrientation(quaternion(vHandLook));
+		}
+		//*/
+		// Accommodate for composite collision bug
+		//ptHand = ptHand + point(-10.0f * vCast);
+		//rCast = ray(ptHand, vCast);
+		//rCast = m_pTestRayController->GetRayFromVerts();
+
+		rCast = ray(ptHand, vHandLook);
+	}
+	else {
+		CR(GetDOS()->GetMouseRay(rCast, 0.0f));
+	}
+
+	return rCast;
+
+Error:
+	return ray(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, 0.0f));
 }
 
 float DreamBrowser::GetHeight() {
-	return GetWidth() / m_aspectRatio;
+	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
+}
+
+float DreamBrowser::GetWidth() {
+	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
 
 vector DreamBrowser::GetNormal() {
@@ -186,6 +334,16 @@ RESULT DreamBrowser::UpdateViewQuad() {
 	RESULT r = R_PASS;
 
 	CR(m_pBrowserQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
+	
+	// Flip UV vertically
+	if (r != R_SKIPPED) {
+		m_pBrowserQuad->TransformUV(
+		{ { 0.0f, 0.0f } },
+		{ { 1.0f, 0.0f,
+			0.0f, -1.0f } }
+		);
+	}
+
 	CR(m_pBrowserQuad->SetDirty());
 
 	CR(m_pBrowserQuad->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), GetNormal()));
@@ -199,8 +357,55 @@ RESULT DreamBrowser::SetVisible(bool fVisible) {
 }
 
 RESULT DreamBrowser::SetURI(std::string strURI) {
-	// TODO: 
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserController);
+	CR(m_pWebBrowserController->LoadURL(strURI));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::Notify(SenseControllerEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	SENSE_CONTROLLER_EVENT_TYPE eventType = pEvent->type;
+
+	// TODO: Replace with interaction engine based events
+
+	if (pEvent->state.type == CONTROLLER_RIGHT) {
+		
+		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
+			// TODO: mouse down 
+			if (m_fBrowserActive) {
+				WebBrowserMouseEvent webBrowserEvent;
+
+				webBrowserEvent.pt = m_lastWebBrowserPoint;
+				webBrowserEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
+
+				CR(m_pWebBrowserController->SendMouseClick(webBrowserEvent, true, 1));
+			}
+		}
+		else if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+			if (m_fBrowserActive) {
+				WebBrowserMouseEvent webBrowserEvent;
+
+				webBrowserEvent.pt = m_lastWebBrowserPoint;
+				webBrowserEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
+
+				CR(m_pWebBrowserController->SendMouseClick(webBrowserEvent, false, 1));
+			}
+		}
+		/*
+		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
+			OVERLAY_DEBUG_SET("event", "menu up");
+			CR(m_pDreamUIBar->HandleMenuUp());
+		}
+		*/
+	}
+
+Error:
+	return r;
 }
 
 

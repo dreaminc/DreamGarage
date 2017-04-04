@@ -11,12 +11,29 @@
 
 #include <vector>
 
-struct WebBrowserRect {
-public:
+struct WebBrowserPoint {
 	int x;
 	int y;
+};
+
+struct WebBrowserRect {
+	WebBrowserPoint pt;
 	int width;
 	int height;
+};
+
+struct WebBrowserMouseEvent {
+	enum MOUSE_BUTTON {
+		LEFT,
+		MIDDLE,
+		RIGHT,
+		INVALID
+	};
+
+	MOUSE_BUTTON mouseButton;
+
+	// Relative to top left of browser
+	WebBrowserPoint pt;
 };
 
 // TODO: Revisit these functions 
@@ -43,6 +60,10 @@ public:
 	// Poll for the current frame of the browser.
 	// This function can be called by any thread.
 	//virtual RESULT PollFrame(std::function<bool(unsigned char *output, unsigned int width, unsigned int height)> pred) = 0;
+
+	// Mouse
+	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) = 0;
+	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) = 0;
 
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.

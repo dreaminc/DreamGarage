@@ -325,14 +325,13 @@ public:
 		return m_textureIndex;
 	}
 
-	RESULT Update(unsigned char* pixels, int width, int height, texture::PixelFormat format) override {
+	RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) override {
 		RESULT r = R_PASS;
 
-		CR(m_pParentImp->MakeCurrentContext());
+		//CR(m_pParentImp->MakeCurrentContext());
 
 		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_textureIndex));
-
-		m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GetOGLPixelFormat(format), GL_UNSIGNED_BYTE, pixels);
+		CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GetOGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, pBuffer));
 
 	Error:
 		return r;

@@ -18,13 +18,20 @@
 
 #include "WebBrowser/WebBrowserController.h"
 
+#include "Sense/SenseController.h"
+
 class quad;
 class texture;
 
 class EnvironmentAsset;
 class WebBrowserManager;
 
-class DreamBrowser : public DreamApp<DreamBrowser>, public Subscriber<InteractionObjectEvent>, public WebBrowserController::observer {
+class DreamBrowser : 
+	public DreamApp<DreamBrowser>, 
+	public Subscriber<InteractionObjectEvent>, 
+	public WebBrowserController::observer,
+	public Subscriber<SenseControllerEvent>
+{
 	friend class DreamAppManager;
 
 public:
@@ -36,7 +43,7 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 
 	// InteractionObjectEvent
-	virtual RESULT Notify(InteractionObjectEvent *event) override;
+	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;
 
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
@@ -45,6 +52,10 @@ public:
 	RESULT SetDiagonalSize(float diagonalSize);
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
+
+	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
+
+	ray GetHandRay();
 
 	float GetWidth();
 	float GetHeight();
@@ -56,6 +67,9 @@ public:
 	RESULT SetVisible(bool fVisible);
 
 	RESULT SetURI(std::string strURI);
+
+	// SenseControllerEventSubscriber
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 private:
 	RESULT SetScreenTexture(texture *pTexture);
@@ -72,6 +86,9 @@ private:
 
 	std::shared_ptr<WebBrowserController> m_pWebBrowserController = nullptr;
 	std::shared_ptr<WebBrowserManager> m_pWebBrowserManager = nullptr;
+
+	WebBrowserPoint m_lastWebBrowserPoint;
+	bool m_fBrowserActive = false;
 
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;

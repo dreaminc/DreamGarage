@@ -53,6 +53,9 @@ public:
 	RESULT OnGetViewRect(CefRect &cefRect);
 	RESULT OnPaint(CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height);
 
+	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) override;
+	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
+
 	CefRefPtr<CefBrowser> GetCEFBrowser();
 
 private:
