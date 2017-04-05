@@ -11,7 +11,7 @@ AnimationQueue::~AnimationQueue() {
 	// empty
 }
 
-RESULT AnimationQueue::Update() {
+RESULT AnimationQueue::Update(double sNow) {
 	RESULT r = R_PASS;
 	for (auto& qObj : m_objectQueue) {
 		auto& pObj = qObj.first;
@@ -21,16 +21,14 @@ RESULT AnimationQueue::Update() {
 
 		auto& pItem = pQueue.begin();
 
-		auto tNow = std::chrono::high_resolution_clock::now();
-
 		AnimationState state;
 		state.vScale = vector(1.0f, 1.0f, 1.0f);
 
 		do {
-			(*pItem)->Update(pObj, state, tNow);
+			(*pItem)->Update(pObj, state, sNow);
 
 			// modifying the deque likely invalidates the iterator
-			if ((*pItem)->IsComplete()) {
+			if ((*pItem)->IsComplete(sNow)) {
 				pQueue.pop_front();
 				continue;
 			}
@@ -42,7 +40,7 @@ RESULT AnimationQueue::Update() {
 	return r;
 }
 
-RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endState, double duration, AnimationItem::AnimationFlags flags) {//, AnimationCurveType curve) {
+RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endState, double startTime, double duration, AnimationItem::AnimationFlags flags) {//, AnimationCurveType curve) {
 	RESULT r = R_PASS;
 
 	AnimationState startState;
@@ -50,7 +48,7 @@ RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endSta
 	startState.qRotation = pObj->GetOrientation();
 	startState.vScale = pObj->GetScale();
 
-	std::shared_ptr<AnimationItem> pItem = std::make_shared<AnimationItem>(startState, endState, duration);
+	std::shared_ptr<AnimationItem> pItem = std::make_shared<AnimationItem>(startState, endState, startTime, duration);
 	pItem->SetFlags(flags);
 
 	m_objectQueue[pObj].push_back(pItem);
@@ -59,14 +57,12 @@ RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endSta
 	return r;
 }
 
-RESULT AnimationQueue::CancelAnimation(VirtualObj *pObj) {
+RESULT AnimationQueue::CancelAnimation(VirtualObj *pObj, double startTime) {
 	RESULT r = R_PASS;
 	
 	auto& qObj = m_objectQueue[pObj];
 
-	auto tNow = std::chrono::high_resolution_clock::now();
-
-	auto pNewItem = qObj.front()->CreateCancelAnimation(pObj, tNow);
+	auto pNewItem = qObj.front()->CreateCancelAnimation(pObj, startTime);
 
 	qObj.pop_front();
 	qObj.push_front(pNewItem);

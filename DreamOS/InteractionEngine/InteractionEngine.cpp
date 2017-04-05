@@ -85,13 +85,52 @@ RESULT InteractionEngine::Update() {
 
 RESULT InteractionEngine::UpdateAnimationQueue() {
 	RESULT r = R_PASS;
-	m_pObjectQueue->Update();
+
+	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	msNow /= 1000.0;
+
+	m_pObjectQueue->Update(msNow);
 //Error:
 	return r;
 }
 
 AnimationQueue* InteractionEngine::GetAnimationQueue() {
 	return m_pObjectQueue;
+}
+
+RESULT InteractionEngine::PushAnimationItem(VirtualObj *pObj,
+	point ptPosition,
+	vector vScale,
+	double duration,
+	AnimationItem::AnimationFlags flags) {
+
+	RESULT r = R_PASS;
+
+	AnimationState endState;
+	endState.ptPosition = ptPosition;
+	endState.vScale = vScale;
+
+	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	msNow /= 1000.0;
+
+	CR(m_pObjectQueue->PushAnimationItem(pObj, endState, msNow, duration, flags));
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::CancelAnimation(VirtualObj *pObj) {
+	RESULT r = R_PASS;
+	
+	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	msNow /= 1000.0;
+
+	CR(m_pObjectQueue->CancelAnimation(pObj, msNow));
+Error:
+	return r;
 }
 
 // TODO: This is temporary

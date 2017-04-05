@@ -51,8 +51,18 @@ RESULT SandboxApp::SetSandboxConfiguration(SandboxApp::configuration sandboxconf
 	return R_PASS;
 }
 
-AnimationQueue *SandboxApp::GetAnimationQueue() {
-	return m_pInteractionEngine->GetAnimationQueue();
+RESULT SandboxApp::PushAnimation(VirtualObj *pObj, point ptPosition, vector vScale, double duration) {
+	RESULT r = R_PASS;
+	CR(m_pInteractionEngine->PushAnimationItem(pObj, ptPosition, vScale, duration));
+Error:
+	return r;
+}
+
+RESULT SandboxApp::CancelAnimation(VirtualObj *pObj) {
+	RESULT r = R_PASS;
+	CR(m_pInteractionEngine->CancelAnimation(pObj));
+Error:
+	return r;
 }
 
 const SandboxApp::configuration& SandboxApp::GetSandboxConfiguration() {

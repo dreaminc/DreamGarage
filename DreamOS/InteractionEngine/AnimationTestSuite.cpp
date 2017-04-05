@@ -78,21 +78,19 @@ RESULT AnimationTestSuite::AddTestAnimationBasic() {
 		AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
 		CR(m_pDreamOS->AddInteractionObject(pTestContext->pComposite));
-		pQueue = m_pDreamOS->GetAnimationQueue();
-
 		aState.ptPosition = point(0.0f, 1.0f, -2.0f);
 		aState.vScale = vector(5.0f, 1.25f, 1.25f);
 
-		pQueue->PushAnimationItem(pTestContext->pSphere, aState, 2.0f);
+		m_pDreamOS->PushAnimation(pTestContext->pSphere, aState.ptPosition, aState.vScale, 2.0f);
 		
 		aState2.ptPosition = point(1.0f, 0.0f, 0.0f);
 		aState2.vScale = vector(1.0f, 1.0f, 1.0f);
-		pQueue->PushAnimationItem(pTestContext->pSphere, aState2, 2.0f);
+		m_pDreamOS->PushAnimation(pTestContext->pSphere, aState2.ptPosition, aState2.vScale, 2.0f);
 
 		aState2.ptPosition = point(2.0f, 1.0f, -2.0f);
 		aState2.vScale = vector(0.5f, 0.5f, 0.5f);
 
-		pQueue->PushAnimationItem(pTestContext->pSphere2, aState2, 5.0f);
+		m_pDreamOS->PushAnimation(pTestContext->pSphere2, aState2.ptPosition, aState2.vScale, 5.0f);
 
 	Error:
 		return R_PASS;
@@ -135,12 +133,11 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
 		CR(m_pDreamOS->AddInteractionObject(pTestContext->pComposite));
-		pQueue = m_pDreamOS->GetAnimationQueue();
 
 		aState.ptPosition = point(0.0f, 1.0f, -2.0f);
 		aState.vScale = vector(1.25f, 1.25f, 1.25f);
 
-		pQueue->PushAnimationItem(pTestContext->pSphere, aState, 2.0f);
+		m_pDreamOS->PushAnimation(pTestContext->pSphere, aState.ptPosition, aState.vScale, 2.0f);
 
 	Error:
 		return R_PASS;
@@ -155,7 +152,7 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		auto diff = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - pTestContext->startTime).count();
 
 		if (diff > 1.0 && !pTestContext->fCancelled) {
-			m_pDreamOS->GetAnimationQueue()->CancelAnimation(pTestContext->pSphere);
+			m_pDreamOS->CancelAnimation(pTestContext->pSphere);
 			pTestContext->fCancelled = true;
 		}
 

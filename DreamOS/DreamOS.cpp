@@ -132,8 +132,18 @@ RESULT DreamOS::Exit(RESULT exitcode) {
 	return exitcode;
 }
 
-AnimationQueue *DreamOS::GetAnimationQueue() {
-	return m_pSandbox->GetAnimationQueue();
+RESULT DreamOS::PushAnimation(VirtualObj *pObj, point ptPosition, vector vScale, double duration) {
+	RESULT r = R_PASS;
+	CR(m_pSandbox->PushAnimation(pObj, ptPosition, vScale, duration));
+Error:
+	return r;
+}
+
+RESULT DreamOS::CancelAnimation(VirtualObj *pObj) {
+	RESULT r = R_PASS;
+	CR(m_pSandbox->CancelAnimation(pObj));
+Error:
+	return r;
 }
 
 RESULT DreamOS::GetMouseRay(ray &rCast, double t) {

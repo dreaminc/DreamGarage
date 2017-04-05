@@ -23,11 +23,14 @@
 
 #include "InteractionObjectEvent.h"
 #include "ActiveObject.h"
+#include <chrono>
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
 
 class ObjectStore;
 class AnimationQueue;
+//class AnimationState;
+#include "AnimationItem.h"
 /*
 class InteractionObject {
 
@@ -67,6 +70,13 @@ public:
 	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
 	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
 	AnimationQueue* GetAnimationQueue();
+	RESULT PushAnimationItem(VirtualObj *pObj,
+		point ptPosition,
+		vector vScale,
+		double duration,
+		AnimationItem::AnimationFlags flags = AnimationItem::AnimationFlags());
+
+	RESULT CancelAnimation(VirtualObj *pObj);
 
 private:
 	std::shared_ptr<ray> m_pInteractionRay = nullptr;

@@ -6,7 +6,6 @@
 #include "Primitives/dirty.h"
 #include "AnimationState.h"
 
-#include <chrono>
 #include <memory>
 
 class VirtualObj;
@@ -32,24 +31,24 @@ public:
 	} ANIMATION_CURVE_TYPE;
 
 public:
-	AnimationItem(AnimationState startState, AnimationState endState, double duration);
+	AnimationItem(AnimationState startState, AnimationState endState, double startTime, double duration);
 	~AnimationItem();
 
-	std::shared_ptr<AnimationItem> CreateCancelAnimation(VirtualObj *pObj, std::chrono::time_point<std::chrono::steady_clock> tNow);
+	std::shared_ptr<AnimationItem> CreateCancelAnimation(VirtualObj *pObj, double msNow);
 
 private:
 	RESULT Initialize();
 
 public:
-	RESULT Update(VirtualObj *pObj, AnimationState& state, std::chrono::time_point<std::chrono::steady_clock> tNow);
+	RESULT Update(VirtualObj *pObj, AnimationState& state, double msNow);
 
-	bool IsComplete();
+	bool IsComplete(double msNow);
 
 	AnimationFlags GetFlags();
 	RESULT SetFlags(AnimationFlags flags);
 
 private:
-	std::chrono::time_point<std::chrono::high_resolution_clock> m_startTime;
+	double m_startTime;
 	double m_duration;
 
 	AnimationFlags m_flags;

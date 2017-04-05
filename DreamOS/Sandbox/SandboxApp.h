@@ -276,7 +276,8 @@ protected:
 
 // temporary
 public:
-	AnimationQueue *GetAnimationQueue();
+	RESULT PushAnimation(VirtualObj *pObj, point ptPosition, vector vScale, double duration);
+	RESULT CancelAnimation(VirtualObj *pObj);
 
 protected:
 	RESULT SetDreamOSHandle(DreamOS *pDreamOSHandle);

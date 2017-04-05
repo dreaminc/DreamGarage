@@ -1,17 +1,15 @@
 #include "AnimationItem.h"
 #include "Primitives/VirtualObj.h"
 
-AnimationItem::AnimationItem(AnimationState startState, AnimationState endState, double duration) {
+AnimationItem::AnimationItem(AnimationState startState, AnimationState endState, double startTime, double duration) {
 	RESULT r = R_PASS;
 
 	CR(Initialize());
+
 	m_startState = startState;
 	m_endState = endState;
 	m_duration = duration;
-
-	m_flags = AnimationFlags();
-
-	SetDirty();
+	m_startTime = startTime;
 
 	Validate();
 	return;
@@ -25,26 +23,27 @@ AnimationItem::~AnimationItem() {
 }
 
 RESULT AnimationItem::Initialize() {
-
 	RESULT r = R_PASS;
 
-	m_startTime = std::chrono::high_resolution_clock::now();
+	m_flags = AnimationFlags();
 
-//Error:
+	CR(SetDirty());
+
+Error:
 	return r;
 }
 
-std::shared_ptr<AnimationItem> AnimationItem::CreateCancelAnimation(VirtualObj *pObj, std::chrono::time_point<std::chrono::steady_clock> tNow) {
+std::shared_ptr<AnimationItem> AnimationItem::CreateCancelAnimation(VirtualObj *pObj, double msNow) {
 	AnimationState startState;
 	startState.vScale = vector(1.0f, 1.0f, 1.0f);
-	Update(pObj, startState, tNow);
+	Update(pObj, startState, msNow);
 	AnimationState endState = m_startState;
-	auto duration = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
+	double duration = msNow - m_startTime;
 
-	return std::make_shared<AnimationItem>(startState, endState, duration);
+	return std::make_shared<AnimationItem>(startState, endState, msNow, duration);
 }
 
-RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, std::chrono::time_point<std::chrono::steady_clock> tNow) {
+RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, double msNow) {
 	RESULT r = R_PASS;
 
 	if (CheckAndCleanDirty()) {
@@ -53,11 +52,10 @@ RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, std::chron
 			m_startState.qRotation = pObj->GetOrientation();
 			m_startState.vScale = pObj->GetScale();
 		}
-		m_startTime = std::chrono::high_resolution_clock::now();
+		m_startTime = msNow;
 	}
 
-	auto diff = std::chrono::duration<double>(tNow - m_startTime).count();
-
+	double diff = msNow - m_startTime;
 	double prog = diff / m_duration;
 	prog = std::min(1.0, prog);
 
@@ -71,9 +69,9 @@ Error:
 	return r;
 }
 
-bool AnimationItem::IsComplete() {
+bool AnimationItem::IsComplete(double msNow) {
 
-	auto diff = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
+	double diff = msNow - m_startTime;
 	double prog = diff / m_duration;
 
 	return prog >= 1.0;

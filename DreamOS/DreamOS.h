@@ -59,7 +59,10 @@ public:
 
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
 
-	AnimationQueue *GetAnimationQueue();
+public:
+	
+	RESULT PushAnimation(VirtualObj *pObj, point ptPosition, vector vScale, double duration);
+	RESULT CancelAnimation(VirtualObj *pObj);
 
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
