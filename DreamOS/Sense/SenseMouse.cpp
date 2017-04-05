@@ -59,18 +59,11 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 
 		m_dragOriginX = newX;
 		m_dragOriginY = newY;
-
-		ShowCursor(false);
-
-		CenterMousePosition();
 	}
 
 	if ((m_dragState == MouseDrag::Left && eventType == SENSE_MOUSE_LEFT_BUTTON_UP) ||
 		(m_dragState == MouseDrag::Right && eventType == SENSE_MOUSE_RIGHT_BUTTON_UP) ){
 		m_dragState = MouseDrag::None;
-
-		SetMousePosition(m_dragOriginX, m_dragOriginY);
-		ShowCursor(true);
 	}
 
 	if (m_dragState != MouseDrag::None && eventType == SENSE_MOUSE_MOVE) {
@@ -91,8 +84,6 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 
 		mEvent.dx = (xPos - xCenter) * 1;
 		mEvent.dy = (yPos - yCenter) * 1;
-
-		CenterMousePosition();
 	}
 
 	if ((eventType == SENSE_MOUSE_LEFT_DRAG_MOVE || eventType == SENSE_MOUSE_RIGHT_DRAG_MOVE) && (mEvent.dx != 0 || mEvent.dy != 0)) {

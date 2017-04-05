@@ -40,7 +40,10 @@ class InteractionObject {
 };
 */
 
-class InteractionEngine : public valid, public Publisher<InteractionEventType, InteractionObjectEvent>, public Subscriber<SenseControllerEvent> {
+class InteractionEngine : public valid, 
+	public Publisher<InteractionEventType, InteractionObjectEvent>, 
+	public Subscriber<SenseControllerEvent> 
+{
 public:
 	static std::unique_ptr<InteractionEngine> MakeEngine();
 
@@ -81,7 +84,7 @@ public:
 
 	RESULT CancelAnimation(VirtualObj *pObj);
 
-	virtual RESULT Notify(SenseControllerEvent *event) override;
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 
 	RESULT RegisterSenseController(SenseController *pSenseController);
 

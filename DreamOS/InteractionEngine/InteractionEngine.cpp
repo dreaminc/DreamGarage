@@ -335,13 +335,13 @@ Error:
 	return ActiveObject::state::INVALID;
 }
 
-RESULT InteractionEngine::Notify(SenseControllerEvent *event) {
+RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
-	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
+	SENSE_CONTROLLER_EVENT_TYPE eventType = pEvent->type;
 
 	//TODO:  Expand this to accommodate for left controller
-	if (event->state.type == CONTROLLER_RIGHT) {
+	if (pEvent->state.type == CONTROLLER_RIGHT) {
 		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
 			for (auto &pObject : m_activeObjects) {
 				if (pObject->GetState() == ActiveObject::state::INTERSECTED) {
