@@ -274,6 +274,11 @@ protected:
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
 
+// temporary
+public:
+	RESULT PushAnimation(VirtualObj *pObj, point ptPosition, vector vScale, double duration);
+	RESULT CancelAnimation(VirtualObj *pObj);
+
 protected:
 	RESULT SetDreamOSHandle(DreamOS *pDreamOSHandle);
 	DreamOS *GetDreamOSHandle();

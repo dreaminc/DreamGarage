@@ -662,6 +662,18 @@
     <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentAsset.cpp">
       <Filter>Cloud\Environment</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationItem.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationQueue.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationTestSuite.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationState.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -2452,6 +2464,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentAsset.h">
       <Filter>Cloud\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationItem.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationQueue.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationTestSuite.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationState.h">
+      <Filter>InteractionEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

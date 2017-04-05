@@ -2,6 +2,7 @@
 
 #include "PhysicsEngine/PhysicsEngineTestSuite.h"
 #include "InteractionEngine/InteractionEngineTestSuite.h"
+#include "InteractionEngine/AnimationTestSuite.h"
 #include "UI/UITestSuite.h"
 #include "Cloud/CloudTestSuite.h"
 #include "HAL/HALTestSuite.h"
@@ -19,6 +20,11 @@ std::shared_ptr<TestSuite> TestSuiteFactory::Make(TEST_SUITE_TYPE type, void *pC
 		case TEST_SUITE_TYPE::INTERACTION: {
 			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
 			pTestSuite = std::make_shared<InteractionEngineTestSuite>((DreamOS*)pContext);
+		} break;
+
+		case TEST_SUITE_TYPE::ANIMATION: {
+			CNM(pContext, "This test suite requires DreamOS to be bassed as context");
+			pTestSuite = std::make_shared<AnimationTestSuite>((DreamOS*)pContext);
 		} break;
 
 		case TEST_SUITE_TYPE::CLOUD: {

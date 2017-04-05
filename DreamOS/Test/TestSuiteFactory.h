@@ -16,6 +16,7 @@ public:
 		CLOUD,
 		HAL,
 		MATH,
+		ANIMATION,
 		INVALID
 	} ;
 

@@ -26,10 +26,14 @@
 
 #include "InteractionObjectEvent.h"
 #include "ActiveObject.h"
+#include <chrono>
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
 
 class ObjectStore;
+class AnimationQueue;
+//class AnimationState;
+#include "AnimationItem.h"
 /*
 class InteractionObject {
 
@@ -48,6 +52,7 @@ private:
 public:
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
+	RESULT UpdateAnimationQueue(); 
 	RESULT SetInteractionGraph(ObjectStore *pObjectStore);
 
 	RESULT UpdateInteractionPrimitive(const ray &r);
@@ -67,6 +72,14 @@ public:
 	std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject);
 	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
 	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
+	AnimationQueue* GetAnimationQueue();
+	RESULT PushAnimationItem(VirtualObj *pObj,
+		point ptPosition,
+		vector vScale,
+		double duration,
+		AnimationItem::AnimationFlags flags = AnimationItem::AnimationFlags());
+
+	RESULT CancelAnimation(VirtualObj *pObj);
 
 	virtual RESULT Notify(SenseControllerEvent *event) override;
 
@@ -75,6 +88,8 @@ public:
 private:
 	std::shared_ptr<ray> m_pInteractionRay = nullptr;
 	std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
+	
+	AnimationQueue* m_pObjectQueue;
 
 /*private:
 	// Animation Queue

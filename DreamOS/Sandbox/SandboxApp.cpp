@@ -51,6 +51,20 @@ RESULT SandboxApp::SetSandboxConfiguration(SandboxApp::configuration sandboxconf
 	return R_PASS;
 }
 
+RESULT SandboxApp::PushAnimation(VirtualObj *pObj, point ptPosition, vector vScale, double duration) {
+	RESULT r = R_PASS;
+	CR(m_pInteractionEngine->PushAnimationItem(pObj, ptPosition, vScale, duration));
+Error:
+	return r;
+}
+
+RESULT SandboxApp::CancelAnimation(VirtualObj *pObj) {
+	RESULT r = R_PASS;
+	CR(m_pInteractionEngine->CancelAnimation(pObj));
+Error:
+	return r;
+}
+
 const SandboxApp::configuration& SandboxApp::GetSandboxConfiguration() {
 	return m_SandboxConfiguration;
 }
@@ -370,6 +384,7 @@ RESULT SandboxApp::RunAppLoop() {
 
 		// Update Interaction Engine
 		CR(m_pInteractionEngine->UpdateObjectStore(m_pInteractionGraph));
+		CR(m_pInteractionEngine->UpdateAnimationQueue());
 
 		// Update HMD
 		if (m_pHMD != nullptr) {
