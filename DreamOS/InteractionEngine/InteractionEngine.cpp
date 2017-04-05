@@ -259,7 +259,7 @@ RESULT InteractionEngine::ClearActiveObjects() {
 	return R_PASS;
 }
 
-std::shared_ptr<ActiveObject>  InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject) {
+std::shared_ptr<ActiveObject> InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<ActiveObject> pNewActiveObject = nullptr;

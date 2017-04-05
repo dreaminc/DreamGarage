@@ -32,7 +32,12 @@
 #include "Sense/SenseKeyboard.h"
 #include "HMD/HMD.h"
 
-class camera : public VirtualObj, public Subscriber<CmdPromptEvent>, public Subscriber<SenseKeyboardEvent>, public Subscriber<HMDEvent>, public Subscriber<TimeEvent> {
+class camera : public VirtualObj//, 
+	//public Subscriber<CmdPromptEvent>, 
+	//public Subscriber<SenseKeyboardEvent>, 
+	//public Subscriber<HMDEvent>, 
+	//public Subscriber<TimeEvent> 
+{
 public:
 	camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight);
 	~camera();
@@ -67,9 +72,9 @@ public:
 	RESULT SetUpSpeed(camera_precision speed);
 	RESULT AddUpSpeed(camera_precision speed);
 
-	RESULT Notify(HMDEvent *hmdEvent);
-	RESULT Notify(SenseKeyboardEvent *kbEvent);
-	RESULT Notify(TimeEvent *event);
+	//RESULT Notify(HMDEvent *hmdEvent);
+	//RESULT Notify(SenseKeyboardEvent *kbEvent);
+	//RESULT Notify(TimeEvent *event);
 
 	// Deviation vector is a vector of deviation from the origin point
 	// So resulting point = ptOrigin + vDeviation
@@ -93,10 +98,7 @@ public:
 	ray GetRay(int xPos, int yPos);			// This is assuming an integer screen position but really just calls the one above
 
 
-	bool	IsAllowedMoveByKeys();
-
-	// CmdPromptEventSubscriber
-	virtual RESULT Notify(CmdPromptEvent *event) override;
+	bool IsAllowedMoveByKeys();
 
 	quaternion GetOffsetOrientation();
 	RESULT SetOffsetOrientation(quaternion qOffset);

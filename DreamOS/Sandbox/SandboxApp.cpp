@@ -200,25 +200,24 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	CR(RegisterSubscriber(SVK_ALL, DreamConsole::GetConsole()));
 	CR(RegisterSubscriber(CHARACTER_TYPING, DreamConsole::GetConsole()));
 
-	camera *pCamera = m_pHALImp->GetCamera();
+	//camera *pCamera = m_pHALImp->GetCamera();
 
-	CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
+	//CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
 
-	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
+	//CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
 
-	CR(RegisterSubscriber(SVK_LEFT, pCamera));
-	CR(RegisterSubscriber(SVK_UP, pCamera));
-	CR(RegisterSubscriber(SVK_DOWN, pCamera));
-	CR(RegisterSubscriber(SVK_RIGHT, pCamera));
+	//CR(RegisterSubscriber(SVK_LEFT, pCamera));
+	//CR(RegisterSubscriber(SVK_UP, pCamera));
+	//CR(RegisterSubscriber(SVK_DOWN, pCamera));
+	//CR(RegisterSubscriber(SVK_RIGHT, pCamera));
 	
-	CR(RegisterSubscriber(SVK_SPACE, pCamera));
+	//CR(RegisterSubscriber(SVK_SPACE, pCamera));
 
+	/*
 	for (int i = 0; i < 26; i++) {
 		CR(RegisterSubscriber((SenseVirtualKey)('A' + i), pCamera));
 	}
-
-	CR(RegisterSubscriber((SenseVirtualKey)('F'), m_pHALImp));
-	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
+	*/
 
 Error:
 	return r;
@@ -233,12 +232,14 @@ RESULT SandboxApp::RegisterImpMouseEvents() {
 
 	// TODO: Should either be moved up to the sandbox or into the Imp itself
 	//CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	/*
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_DRAG_MOVE, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_DOWN, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_UP, m_pHALImp));
+	*/
 
 
 Error:

@@ -305,64 +305,7 @@ RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye) {
 	return r;
 }
 
-RESULT OpenGLImp::Notify(SenseKeyboardEvent *kbEvent) {
-	RESULT r = R_PASS;
-
-	/* This has been moved to the camera 
-	DEBUG_LINEOUT("Rx kbe %d %d", kbEvent->KeyCode, kbEvent->KeyState);
-
-	switch (kbEvent->KeyCode) {
-		case (SK_SCAN_CODE)('A'):
-		case SK_LEFT: {
-			if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
-			else
-				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
-	
-			if (kbEvent->KeyState)
-				m_pCamera->Strafe(0.1f);
-
-		} break;
-
-		case (SK_SCAN_CODE)('D') :
-		case SK_RIGHT: {
-			if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(-0.1f, 0.0f, 0.0f);
-			else
-				m_pCamera->AddVelocity(0.1f, 0.0f, 0.0f);
-			
-			if (kbEvent->KeyState)
-				m_pCamera->Strafe(-0.1f);
-		} break;
-
-		case (SK_SCAN_CODE)('W') :
-		case SK_UP: {
-			if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
-			else
-				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
-			
-			if (kbEvent->KeyState)
-				m_pCamera->MoveForward(0.1f);
-		} break;
-
-		case (SK_SCAN_CODE)('S') :
-		case SK_DOWN: {
-			if (kbEvent->KeyState)
-				m_pCamera->AddVelocity(0.0f, 0.0f, -0.1f);
-			else
-				m_pCamera->AddVelocity(0.0f, 0.0f, 0.1f);
-			
-			if (kbEvent->KeyState)
-				m_pCamera->MoveForward(-0.1f);
-		} break;
-	}
-	*/
-
-	return r;
-}
-
-// TODO: Move to camera?
+/*
 RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 	RESULT r = R_PASS;
 
@@ -372,6 +315,7 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 		case SENSE_MOUSE_LEFT_DRAG_MOVE: {
 			CR(m_pCamera->RotateCameraByDiffXY(static_cast<camera_precision>(mEvent->dx),  static_cast<camera_precision>(mEvent->dy)));
 		} break;
+
 		case SENSE_MOUSE_RIGHT_DRAG_MOVE: {
 			if (m_pCamera->IsAllowedMoveByKeys()) {
 				const float mouseMoveFactor = 0.002f;
@@ -384,6 +328,7 @@ RESULT OpenGLImp::Notify(SenseMouseEvent *mEvent) {
 Error:
 	return r;
 }
+*/
 
 //composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
 composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
