@@ -45,15 +45,15 @@ typedef struct RadialLayerFormat {
 
 class UIBar : public UIModule {
 public:
-	UIBar(DreamOS *pDreamOS, 
-			const IconFormat& iconFormat, 
+	UIBar();
+
+	RESULT SetParams(const IconFormat& iconFormat, 
 			const LabelFormat& labelFormat, 
 			const RadialLayerFormat& menuFormat,
 			const RadialLayerFormat& titleFormat);
 	~UIBar();
 
 	RESULT UpdateCurrentUILayer(const UILayerInfo& info, const RadialLayerFormat& layerFormat);
-	virtual RESULT Notify(InteractionObjectEvent *event) override = 0;
 
 protected:
 	RESULT UpdateUILayers(const UILayerInfo& currentInfo, const UILayerInfo& titleInfo);

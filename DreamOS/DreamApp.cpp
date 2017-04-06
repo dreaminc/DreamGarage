@@ -12,11 +12,11 @@ int DreamAppBase::GetPriority() {
 }
 
 RESULT DreamAppBase::ResetTimeRun() {
-	m_usTimeRun = 0.0f;
+	m_usTimeRun = 0.0;
 	return R_PASS;
 }
 
-RESULT DreamAppBase::IncrementTimeRun(float usTimeDelta) {
+RESULT DreamAppBase::IncrementTimeRun(double usTimeDelta) {
 	m_usTimeRun += usTimeDelta;
 	return R_PASS;
 }

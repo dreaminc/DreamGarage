@@ -5,18 +5,22 @@
 
 #include <algorithm>
 
-UIBar::UIBar(DreamOS *pDreamOS, const IconFormat& iconFormat, const LabelFormat& labelFormat, const RadialLayerFormat& menuFormat, const RadialLayerFormat& titleFormat) :
-	UIModule(pDreamOS),
-	m_iconFormat(iconFormat),
-	m_labelFormat(labelFormat),
-	m_menuFormat(menuFormat),
-	m_titleFormat(titleFormat)
+UIBar::UIBar() :
+	UIModule()
 {
 	// empty
 }
 
 UIBar::~UIBar() {
 	// empty
+}
+
+RESULT UIBar::SetParams(const IconFormat& iconFormat, const LabelFormat& labelFormat, const RadialLayerFormat& menuFormat, const RadialLayerFormat& titleFormat) {
+	m_iconFormat = iconFormat;
+	m_labelFormat = labelFormat;
+	m_menuFormat = menuFormat;
+	m_titleFormat = titleFormat;
+	return R_PASS;
 }
 
 RESULT UIBar::UpdateWithRadialLayout(size_t index, const RadialLayerFormat& layerFormat) {

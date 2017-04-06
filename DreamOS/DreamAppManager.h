@@ -56,7 +56,8 @@ public:
 		CR(pDreamApp->ResetTimeRun());
 
 		// Push to priority queue
-		m_appPriorityQueue.push(pDreamApp);
+		m_appPriorityQueue.push_front(pDreamApp);
+		//m_appPriorityQueue.push(pDreamApp);
 
 	// Success::
 		return pDreamApp;
@@ -73,7 +74,8 @@ private:
 	RESULT ClearPriorityQueue();
 
 private:
-	std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
+	std::deque<std::shared_ptr<DreamAppBase>> m_appPriorityQueue;
+	//std::priority_queue<std::shared_ptr<DreamAppBase>, std::vector<std::shared_ptr<DreamAppBase>>, DreamAppBaseCompare> m_appPriorityQueue;
 	DreamOS *m_pDreamOS;
 };
 

@@ -1,6 +1,8 @@
 #ifndef DREAM_UI_BAR_H_
 #define DREAM_UI_BAR_H_
 
+#include "DreamApp.h"
+
 #include "UI/UIBar.h"
 #include "Primitives/composite.h"
 
@@ -10,18 +12,23 @@
 #include "Cloud/Menu/MenuNode.h"
 #include "Cloud/Environment/EnvironmentController.h"
 
-class DreamUIBar : public UIBar, public MenuController::observer {
+class DreamUIBar : public DreamApp<DreamUIBar>, public UIBar, public MenuController::observer, public Subscriber<InteractionObjectEvent> {
+	friend class DreamAppManager;
 
 public:
-	DreamUIBar(DreamOS *pDreamOS, 
+	DreamUIBar(DreamOS *pDreamOS, void *pContext = nullptr);
+
+	RESULT SetParams(
 				const IconFormat& iconFormat, 
 				const LabelFormat& labelFormat, 
 				const RadialLayerFormat& menuFormat,
 				const RadialLayerFormat& titleFormat);
 	~DreamUIBar();
 
-	RESULT Initialize();
-	RESULT Update();
+	virtual RESULT InitializeApp(void *pContext = nullptr) override;
+	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
+
+	virtual RESULT Update(void *pContext = nullptr) override;
 
 	RESULT HandleTouchStart(void* pContext);
 	RESULT HandleTouchMove(void* pContext);
@@ -41,6 +48,9 @@ public:
 
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
+
+protected:
+	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
 	//Cloud member variables

@@ -3,72 +3,37 @@
 
 #include "DreamOS.h"
 
-UIModule::UIModule(DreamOS *pDreamOS) :
-	m_pDreamOS(pDreamOS),
-	m_pCompositeContext(nullptr)
-{
-	RESULT r = R_PASS;
+UIModule::UIModule() {
 
-	CR(UIModule::Initialize());
-
-// Success:
-	Validate();
-	return;
-
-Error:
-	Invalidate();
-	return;
 }
+
 UIModule::~UIModule() {
 	// empty
 }
 
-RESULT UIModule::Initialize() {
+RESULT UIModule::Initialize(composite *pComposite) {
 	RESULT r = R_PASS;
 
-	// Subscribers
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(m_pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), this));
-	}
+	m_pCompositeContext = pComposite;
 
-	CN(m_pDreamOS);
-	m_pCompositeContext = m_pDreamOS->AddComposite();
-	CN(m_pCompositeContext);
-
-	CR(m_pCompositeContext->InitializeOBB());
-	CR(m_pDreamOS->AddInteractionObject(m_pCompositeContext));
-
-	/*
-	m_pTestRayController = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
-	m_pTestRayLookV = m_pDreamOS->AddRay(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, -1.0f));
-	m_pSphere = m_pDreamOS->AddSphere(0.02f, 10, 10);
-	*/
-
-Error:
+//Error:
 	return r;
 }
 
-ray UIModule::GetHandRay() {
+ray UIModule::GetHandRay(hand* pHand) {
 	
 	RESULT r = R_PASS;
 
 	ray rCast;
-	hand *pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
 
 	CBR(IsVisible(), R_SKIPPED); 
-	CBR(pRightHand != nullptr, R_OBJECT_NOT_FOUND)
+	CBR(pHand != nullptr, R_OBJECT_NOT_FOUND)
 	{
-		point ptHand = pRightHand->GetPosition();
+		point ptHand = pHand->GetPosition();
 
 		//GetLookVector
-		quaternion qHand = pRightHand->GetHandState().qOrientation;
+		quaternion qHand = pHand->GetHandState().qOrientation;
 		qHand.Normalize();
-		/*
-		if (m_pTestRayController != nullptr) {
-			m_pTestRayController->SetPosition(ptHand);
-			m_pTestRayController->SetOrientation(qHand);
-		}
-		//*/
 
 		//TODO: investigate how to properly get look vector for controllers
 		//vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
@@ -76,29 +41,12 @@ ray UIModule::GetHandRay() {
 		vector vHandLook = RotationMatrix(qHand) * vector(0.0f, 0.0f, -1.0f);
 		vHandLook.Normalize();
 
-
-		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
-/*
-		if (m_pTestRayController != nullptr) {
-			m_pTestRayLookV->SetPosition(ptHand);
-			m_pTestRayLookV->SetOrientation(quaternion(vHandLook));
-		}
-//*/
-		// Accommodate for composite collision bug
-		//ptHand = ptHand + point(-10.0f * vCast);
-		//rCast = ray(ptHand, vCast);
-		//rCast = m_pTestRayController->GetRayFromVerts();
-
 		rCast = ray(ptHand, vHandLook);
 	}
 	return rCast;
 
 Error:
 	return ray(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, 0.0f));
-}
-
-RESULT UIModule::UpdateInteractionPrimitive(ray rCast) {
-	return m_pDreamOS->UpdateInteractionPrimitive(rCast);
 }
 
 std::shared_ptr<UIMenuLayer> UIModule::CreateMenuLayer() {
@@ -172,12 +120,4 @@ bool UIModule::IsVisible() {
 		return m_pCompositeContext->IsVisible();
 	
 	return false;
-}
-
-composite *UIModule::GetComposite() {
-	return m_pCompositeContext;
-}
-
-CloudController *UIModule::GetCloudController() {
-	return m_pDreamOS->GetCloudController();
 }

@@ -29,10 +29,7 @@ public:
 	~UITestSuite();
 
 	RESULT Initialize();
-	RESULT InitializeUI();
 
-	RESULT AddTestUI();
-	RESULT AddTestInteractionUI();
 	RESULT AddTestInteractionFauxUI();
 	RESULT AddTestSharedContentView();
 

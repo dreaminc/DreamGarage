@@ -3,10 +3,46 @@
 
 #include "Cloud/Menu/MenuNode.h"
 
-DreamUIBar::DreamUIBar(DreamOS *pDreamOS, const IconFormat& iconFormat, const LabelFormat& labelFormat, const RadialLayerFormat& menuFormat, const RadialLayerFormat& titleFormat) :
-	UIBar(pDreamOS, iconFormat, labelFormat, menuFormat, titleFormat)
+DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
+	DreamApp<DreamUIBar>(pDreamOS, pContext),
+	UIBar()
 {
+	// empty
+}
+
+DreamUIBar::~DreamUIBar() 
+{
+	// empty
+}
+
+// TODO: Will be implemented or moved once registration architecture is fleshed out
+RESULT DreamUIBar::RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback) {
+	m_callbacks[type] = fnCallback;
+	return R_PASS;
+}
+
+RESULT DreamUIBar::SetParams(const IconFormat& iconFormat, const LabelFormat& labelFormat, const RadialLayerFormat& menuFormat, const RadialLayerFormat& titleFormat) {
+	return UIBar::SetParams(iconFormat, labelFormat, menuFormat, titleFormat);
+}
+
+RESULT DreamUIBar::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
+
+	DreamOS *pDreamOS = GetDOS();
+
+	SetAppName("DreamUIBar");
+	SetAppDescription("User Interface");
+
+	//DreamApp<DreamUIBar>::Initialize();
+	// Grab the context composite from DreamOS
+	/*
+	CN(m_pDreamOS);
+	m_pCompositeContext = m_pDreamOS->AddComposite();
+	CN(m_pCompositeContext);
+	//*/
+
+
+	UIModule::Initialize(GetComposite());
 
 	std::shared_ptr<texture> pJPG = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_jpg_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_images[MenuNode::MimeType::IMAGE_JPG] = pJPG;
@@ -23,32 +59,14 @@ DreamUIBar::DreamUIBar(DreamOS *pDreamOS, const IconFormat& iconFormat, const La
 	std::shared_ptr<texture> pFolder = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_folder_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_images[MenuNode::MimeType::FOLDER] = pFolder;
 
-	CR(DreamUIBar::Initialize());
-
-//Success:
-	Validate();
-	return;
-
-Error:
-	Invalidate();
-	return;
-}
-
-DreamUIBar::~DreamUIBar() 
-{
-	// empty
-}
-
-// TODO: Will be implemented or moved once registration architecture is fleshed out
-RESULT DreamUIBar::RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback) {
-	m_callbacks[type] = fnCallback;
-	return R_PASS;
-}
-
-RESULT DreamUIBar::Initialize() {
-	RESULT r = R_PASS;
-
 	CR(SetVisible(false));
+	// Initialize the OBB (collisions)
+	CR(GetComposite()->InitializeOBB());
+	CR(GetDOS()->AddInteractionObject(GetComposite()));
+
+	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+		CR(pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), this));
+	}
 
 	CR(RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN,
 		std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1)));
@@ -62,7 +80,7 @@ RESULT DreamUIBar::Initialize() {
 	CR(RegisterEvent(InteractionEventType::INTERACTION_EVENT_MENU,
 		std::bind(&DreamUIBar::HandleMenuUp, this, std::placeholders::_1)));
 
-	m_pCloudController = GetCloudController();
+	m_pCloudController = pDreamOS->GetCloudController();
 
 	MenuControllerProxy *pMenuControllerProxy = nullptr;
 	CN(m_pCloudController);
@@ -72,8 +90,13 @@ RESULT DreamUIBar::Initialize() {
 
 	CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
 
+	//CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 Error:
 	return r;
+}
+
+RESULT DreamUIBar::OnAppDidFinishInitializing(void *pContext) {
+	return R_PASS;
 }
 
 RESULT DreamUIBar::HandleTouchStart(void* pContext) {
@@ -169,11 +192,12 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::Update() {
+RESULT DreamUIBar::Update(void *pContext) {
 	RESULT r = R_PASS;
 	UILayerInfo info;
 	UILayerInfo titleInfo;
-	CR(UpdateInteractionPrimitive(GetHandRay()));
+	DreamOS *pDreamOS = GetDOS();
+	CR(pDreamOS->UpdateInteractionPrimitive(GetHandRay(pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT))));
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
 		
@@ -224,4 +248,9 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 
 Error:
 	return r;
+}
+
+DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
+	DreamUIBar *pDreamApp = new DreamUIBar(pDreamOS, pContext);
+	return pDreamApp;
 }
