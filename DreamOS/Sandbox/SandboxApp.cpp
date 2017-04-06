@@ -476,8 +476,6 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
-	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
-	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
 
 	// TODO: Remove CMD line arg and use global config
 	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
@@ -490,6 +488,11 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
+
+	// TODO: These have dependencies potentially on previous modules
+	// TODO: Need to create proper module loading / dependency system
+	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
+	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
 
 	CommandLineManager::instance()->ForEach([](const std::string& arg) {
 		HUD_OUT(("arg :" + arg).c_str());
@@ -531,7 +534,7 @@ Error:
 RESULT SandboxApp::InitializeInteractionEngine() {
 	RESULT r = R_PASS;
 
-	m_pInteractionEngine = InteractionEngine::MakeEngine();
+	m_pInteractionEngine = InteractionEngine::MakeEngine(this);
 	CNMW(m_pInteractionEngine, "Interaction Engine failed to initialize");
 
 	// Set up interaction graph
@@ -1116,6 +1119,7 @@ Error:
 RESULT SandboxApp::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
 	RESULT r = R_PASS;
 
+	CNM(m_pSenseMouse, "Mouse not initialized");
 	CR(m_pSenseMouse->RegisterSubscriber(mouseEvent, pMouseSubscriber));
 
 Error:

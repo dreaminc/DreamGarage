@@ -116,7 +116,7 @@ RESULT UITestSuite::InitializeUI() {
 RESULT UITestSuite::AddTestBrowser() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 600.0f;
+	double sTestTime = 6000.0f;
 	int nRepeats = 1;
 
 	// Initialize Code

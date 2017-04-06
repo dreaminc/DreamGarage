@@ -119,7 +119,7 @@ RESULT DreamBrowser::Update(void *pContext) {
 		CR(m_pWebBrowserManager->Update());
 	}
 
-	CR(GetDOS()->UpdateInteractionPrimitive(GetHandRay()))
+	//CR(GetDOS()->UpdateInteractionPrimitive(GetHandRay()));
 
 	/*
 	{
@@ -207,6 +207,32 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
 
 			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
+
+			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+		} break;
+
+		case INTERACTION_EVENT_SELECT_UP: {
+			WebBrowserMouseEvent webBrowserMouseEvent;
+
+			bool fMouseUp = (pEvent->m_eventType == INTERACTION_EVENT_SELECT_UP);
+
+			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
+			webBrowserMouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
+
+			CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
+
+			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+		} break;
+
+		case INTERACTION_EVENT_SELECT_DOWN: {
+			WebBrowserMouseEvent webBrowserMouseEvent;
+
+			bool fMouseUp = (pEvent->m_eventType == INTERACTION_EVENT_SELECT_UP);
+
+			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
+			webBrowserMouseEvent.mouseButton = WebBrowserMouseEvent::MOUSE_BUTTON::LEFT;
+
+			CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 		} break;
@@ -304,9 +330,11 @@ ray DreamBrowser::GetHandRay() {
 
 		rCast = ray(ptHand, vHandLook);
 	}
+	/*
 	else {
 		CR(GetDOS()->GetMouseRay(rCast, 0.0f));
 	}
+	*/
 
 	return rCast;
 
@@ -366,6 +394,7 @@ Error:
 	return r;
 }
 
+// TODO: Remove
 RESULT DreamBrowser::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 

@@ -3,8 +3,8 @@
 
 #include "RESULT/EHM.h"
 
-// Dream Interaction Engine 
-// This class combines the various components required for a 
+// Dream Interaction Engine
+// This class combines the various components required for a
 // functional interaction engine, such as collision detection and resolution as well
 // as integration of animation and the relevant queue
 
@@ -21,6 +21,7 @@
 #include "Primitives/Publisher.h"
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseController.h"
+#include "Sense/SenseMouse.h"
 
 #include <vector>
 
@@ -39,23 +40,25 @@ class InteractionObject {
 
 };
 */
+class SandboxApp;
 
-class InteractionEngine : public valid, 
-	public Publisher<InteractionEventType, InteractionObjectEvent>, 
-	public Subscriber<SenseControllerEvent> 
+class InteractionEngine : public valid,
+	public Publisher<InteractionEventType, InteractionObjectEvent>,
+	public Subscriber<SenseControllerEvent>,
+	public Subscriber<SenseMouseEvent>
 {
 public:
-	static std::unique_ptr<InteractionEngine> MakeEngine();
+	static std::unique_ptr<InteractionEngine> MakeEngine(SandboxApp *pSandbox);
 
 private:
-	InteractionEngine();
+	InteractionEngine(SandboxApp *pSandbox);
 
 	RESULT Initialize();
 
 public:
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
-	RESULT UpdateAnimationQueue(); 
+	RESULT UpdateAnimationQueue();
 	RESULT SetInteractionGraph(ObjectStore *pObjectStore);
 
 	RESULT UpdateInteractionPrimitive(const ray &r);
@@ -85,13 +88,15 @@ public:
 	RESULT CancelAnimation(VirtualObj *pObj);
 
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	virtual RESULT Notify(SenseMouseEvent *pEvent) override;
 
 	RESULT RegisterSenseController(SenseController *pSenseController);
+	RESULT RegisterSenseMouse();
 
 private:
 	std::shared_ptr<ray> m_pInteractionRay = nullptr;
 	std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
-	
+
 	AnimationQueue* m_pObjectQueue;
 
 /*private:
@@ -104,6 +109,7 @@ public:
 
 private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;
+	SandboxApp *m_pSandbox = nullptr;
 
 private:
 	UID m_uid;
