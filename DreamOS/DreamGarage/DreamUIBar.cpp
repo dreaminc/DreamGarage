@@ -15,7 +15,6 @@ DreamUIBar::~DreamUIBar()
 	// empty
 }
 
-// TODO: Will be implemented or moved once registration architecture is fleshed out
 RESULT DreamUIBar::RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback) {
 	m_callbacks[type] = fnCallback;
 	return R_PASS;
@@ -32,15 +31,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
-
-	//DreamApp<DreamUIBar>::Initialize();
-	// Grab the context composite from DreamOS
-	/*
-	CN(m_pDreamOS);
-	m_pCompositeContext = m_pDreamOS->AddComposite();
-	CN(m_pCompositeContext);
-	//*/
-
 
 	UIModule::Initialize(GetComposite());
 
@@ -89,8 +79,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
 
 	CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
-
-	//CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 Error:
 	return r;
 }
