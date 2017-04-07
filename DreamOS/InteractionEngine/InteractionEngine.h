@@ -22,6 +22,7 @@
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseController.h"
 #include "Sense/SenseMouse.h"
+#include "Sense/SenseKeyboard.h"
 
 #include <vector>
 
@@ -45,7 +46,9 @@ class SandboxApp;
 class InteractionEngine : public valid,
 	public Publisher<InteractionEventType, InteractionObjectEvent>,
 	public Subscriber<SenseControllerEvent>,
-	public Subscriber<SenseMouseEvent>
+	public Subscriber<SenseMouseEvent>,
+	public Subscriber<SenseKeyboardEvent>,		// TODO: This is redundant, both can be one event
+	public Subscriber<SenseTypingEvent>
 {
 public:
 	static std::unique_ptr<InteractionEngine> MakeEngine(SandboxApp *pSandbox);
@@ -88,9 +91,12 @@ public:
 
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 	virtual RESULT Notify(SenseMouseEvent *pEvent) override;
+	virtual RESULT Notify(SenseKeyboardEvent *pEvent) override;
+	virtual RESULT Notify(SenseTypingEvent *pEvent) override;
 
 	RESULT RegisterSenseController(SenseController *pSenseController);
 	RESULT RegisterSenseMouse();
+	RESULT RegisterSenseKeyboard();
 
 	RESULT UpdateInteractionRay();
 

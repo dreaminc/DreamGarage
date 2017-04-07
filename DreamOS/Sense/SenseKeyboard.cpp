@@ -74,8 +74,7 @@ RESULT SenseKeyboard::NotifyTextTyping(SenseVirtualKey key, char16_t u16char, ui
 }
 
 uint8_t SenseKeyboard::GetKeyState(SenseVirtualKey KeyCode) {
-	switch (KeyCode)
-	{
+	switch (KeyCode) {
 		case SVK_SHIFT:
 		case SVK_CONTROL: {
 #if defined(_WIN32) || defined(_WIN64)

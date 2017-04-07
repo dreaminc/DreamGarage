@@ -93,6 +93,7 @@ private:
 	vector m_vNormal;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
+	bool m_fShiftDown = false;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

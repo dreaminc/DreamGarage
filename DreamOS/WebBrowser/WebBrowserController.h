@@ -66,6 +66,10 @@ public:
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) = 0;
 	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) = 0;
 
+	// Keyboard
+	virtual RESULT SendKeyEventChar(char chKey, bool fKeyDown) = 0;
+	virtual RESULT SendKeySequence(const std::string& strKeySequence) = 0;
+
 	// Get the new dirty frames since last time they were polled.
 	// returns the number of new dirty frame.
 	// This function can be called by any thread.
@@ -77,8 +81,6 @@ public:
 	// Loads a url
 	virtual RESULT LoadURL(const std::string& url) = 0;
 
-	// Sending a key sequence one at a time from the collection of chars in keys
-	virtual RESULT SendKeySequence(const std::string& keys) = 0;
 
 	std::string GetID() {
 		return m_strID;

@@ -86,34 +86,50 @@ Error:
 	return r;
 }
 
-RESULT CEFBrowserController::SendKeySequence(const std::string& keys) {
-	RESULT r = R_PASS;
+RESULT CEFBrowserController::SendKeyEventChar(char chKey, bool fKeyDown) {
+	RESULT r = R_PASS; 
 
-	size_t word_length = keys.length();
 	CefKeyEvent cefKeyEvent;
+
+	BYTE virtualKeyCode = LOBYTE(VkKeyScanA(chKey));
+	UINT scanKeyCode = MapVirtualKey(virtualKeyCode, MAPVK_VK_TO_VSC);
+
+	cefKeyEvent.native_key_code = (scanKeyCode << 16) | 1;
+	cefKeyEvent.windows_key_code = virtualKeyCode;
 
 	CN(m_pCEFBrowser);
 
-	for (size_t i = 0; i < word_length; ++i) {
-		BYTE VkCode = LOBYTE(VkKeyScanA(keys[i]));
-		UINT scanCode = MapVirtualKey(VkCode, MAPVK_VK_TO_VSC);
-
-		cefKeyEvent.native_key_code = (scanCode << 16) | 1;
-		cefKeyEvent.windows_key_code = VkCode;
-		cefKeyEvent.type = KEYEVENT_RAWKEYDOWN;
-		
+	if (fKeyDown) {
+		///*
+		cefKeyEvent.type = KEYEVENT_KEYDOWN;
 		m_pCEFBrowser->GetHost()->SendKeyEvent(cefKeyEvent);
+		//*/
 
-		cefKeyEvent.windows_key_code = keys[i];
+		///*
+		cefKeyEvent.windows_key_code = chKey;
 		cefKeyEvent.type = KEYEVENT_CHAR;
-		
 		m_pCEFBrowser->GetHost()->SendKeyEvent(cefKeyEvent);
-
-		cefKeyEvent.windows_key_code = VkCode;
+		//*/
+	}
+	else {
 		cefKeyEvent.native_key_code |= 0xC0000000;
 		cefKeyEvent.type = KEYEVENT_KEYUP;
 
 		m_pCEFBrowser->GetHost()->SendKeyEvent(cefKeyEvent);
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::SendKeySequence(const std::string& strKeySequence) {
+	RESULT r = R_PASS;
+
+	CefKeyEvent cefKeyEvent;
+
+	for (size_t i = 0; i < strKeySequence.length(); ++i) {
+		CR(SendKeyEventChar(strKeySequence[i], true));
+		CR(SendKeyEventChar(strKeySequence[i], false));
 	}
 
 Error:

@@ -27,6 +27,7 @@ RESULT InteractionEngine::Initialize() {
 	m_pObjectQueue = new AnimationQueue();
 
 	CR(RegisterSenseMouse());
+	CR(RegisterSenseKeyboard());
 
 Error:
 	return r;
@@ -42,6 +43,19 @@ RESULT InteractionEngine::RegisterSenseController(SenseController* pSenseControl
 	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this));
 	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this));
 	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_PAD_MOVE, this));
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::RegisterSenseKeyboard() {
+	RESULT r = R_PASS;
+
+	CN(m_pSandbox);
+
+	// Register Dream Console to keyboard events
+	CR(m_pSandbox->RegisterSubscriber(SVK_ALL, this));
+	CR(m_pSandbox->RegisterSubscriber(CHARACTER_TYPING, this));
 
 Error:
 	return r;
@@ -213,15 +227,15 @@ RESULT InteractionEngine::UpdateInteractionRay() {
 		//rCast = m_pTestRayController->GetRayFromVerts();
 
 		rCast = ray(ptHand, vHandLook);
+		CR(UpdateInteractionPrimitive(rCast));
 	}
 	/*
 	// This is handled by mouse move events
 	else {
 		CR(m_pSandbox->GetMouseRay(rCast, 0.0f));
+		CR(UpdateInteractionPrimitive(rCast));
 	}
 	*/
-	
-	CR(UpdateInteractionPrimitive(rCast));
 
 // Success:
 	return r;
@@ -482,6 +496,56 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 			} break;
 		}
 	}
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::Notify(SenseKeyboardEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	// Pass through keyboard input
+	///*
+	for (auto &pObject : m_activeObjects) {
+		InteractionEventType type;
+
+		if (pEvent->KeyState == 0)
+			type = INTERACTION_EVENT_KEY_UP;
+		else
+			type = INTERACTION_EVENT_KEY_DOWN;
+
+		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+		interactionEvent.SetValue((int)(pEvent->KeyCode));
+
+		CR(NotifySubscribers(type, &interactionEvent));
+	}
+	//*/
+	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::Notify(SenseTypingEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	// Pass through keyboard input
+	/*
+	for (auto &pObject : m_activeObjects) {
+		InteractionEventType type; 
+
+		if (pEvent->KeyState == 0)
+			type = INTERACTION_EVENT_KEY_UP;
+		else
+			type = INTERACTION_EVENT_KEY_DOWN;
+
+		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+		interactionEvent.SetValue((int)(pEvent->KeyCode));
+
+		CR(NotifySubscribers(type, &interactionEvent));
+	}
+	//*/
+	CR(r);
 
 Error:
 	return r;

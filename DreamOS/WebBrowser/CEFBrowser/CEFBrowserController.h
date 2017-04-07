@@ -46,7 +46,6 @@ public:
 	RESULT PollFrame();
 	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) override;
 	virtual RESULT Resize(unsigned int width, unsigned int height) override;
-	virtual RESULT SendKeySequence(const std::string& keys) override;
 	virtual RESULT LoadURL(const std::string& url) override;
 
 	// WebBrowser Controller Render Handling
@@ -56,6 +55,9 @@ public:
 	virtual RESULT SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount = 1) override;
 	virtual RESULT SendMouseMove(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseLeave = false) override; 
 	virtual RESULT SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) override;
+
+	virtual RESULT SendKeyEventChar(char chKey, bool fKeyDown) override;
+	virtual RESULT SendKeySequence(const std::string& strKeySequence) override;
 
 	CefRefPtr<CefBrowser> GetCEFBrowser();
 
