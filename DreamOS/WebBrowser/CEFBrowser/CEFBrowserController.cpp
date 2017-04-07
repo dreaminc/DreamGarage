@@ -120,6 +120,24 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserController::SendMouseWheel(const WebBrowserMouseEvent& webBrowserMouseEvent, int deltaX, int deltaY) {
+	RESULT r = R_PASS;
+
+	CefMouseEvent cefMouseEvent;
+	CefBrowserHost::MouseButtonType cefMouseButtonType;
+	CN(m_pCEFBrowser);
+
+	cefMouseEvent.x = webBrowserMouseEvent.pt.x;
+	cefMouseEvent.y = webBrowserMouseEvent.pt.y;
+	cefMouseEvent.modifiers = EVENTFLAG_LEFT_MOUSE_BUTTON;
+
+	cefMouseButtonType = (CefBrowserHost::MouseButtonType)webBrowserMouseEvent.mouseButton;
+
+	//m_pCEFBrowser->GetHost()->SendMouseWheelEvent(const CefMouseEvent& event, deltaX, deltaY)
+
+Error:
+	return r;
+}
 
 RESULT CEFBrowserController::SendMouseClick(const WebBrowserMouseEvent& webBrowserMouseEvent, bool fMouseUp, int clickCount) {
 	RESULT r = R_PASS;

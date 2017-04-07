@@ -174,6 +174,8 @@ WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptInterse
 RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
+	bool fUpdateMouse = false;
+
 	switch (pEvent->m_eventType) {
 		case ELEMENT_INTERSECT_BEGAN: {
 			m_pPointerCursor->SetVisible(true);
@@ -186,6 +188,8 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 			m_fBrowserActive = true;
+
+			fUpdateMouse = true;
 		} break;
 
 		case ELEMENT_INTERSECT_ENDED: {
@@ -199,6 +203,8 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 			m_fBrowserActive = false;
+
+			fUpdateMouse = true;
 		} break;
 
 		case ELEMENT_INTERSECT_MOVED: {
@@ -209,6 +215,8 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+
+			fUpdateMouse = true;
 		} break;
 
 		case INTERACTION_EVENT_SELECT_UP: {
@@ -236,10 +244,23 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 		} break;
+
+		case INTERACTION_EVENT_WHEEL: {
+			WebBrowserMouseEvent webBrowserMouseEvent;
+
+			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
+			
+
+			//CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
+
+			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+		} break;
 	}
 
 	// First point of contact
-	m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
+	if (fUpdateMouse) {
+		m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
+	}
 
 Error:
 	return r;

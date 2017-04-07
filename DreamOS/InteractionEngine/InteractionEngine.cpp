@@ -52,6 +52,7 @@ RESULT InteractionEngine::RegisterSenseMouse() {
 	CR(m_pSandbox->RegisterSubscriber(SENSE_MOUSE_MOVE, this));
 	CR(m_pSandbox->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, this));
 	CR(m_pSandbox->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, this));
+	CR(m_pSandbox->RegisterSubscriber(SENSE_MOUSE_WHEEL, this));
 
 Error:
 	return r;
@@ -400,9 +401,9 @@ RESULT InteractionEngine::Notify(SenseMouseEvent *pEvent) {
 
 		case SENSE_MOUSE_LEFT_BUTTON_UP: {
 			for (auto &pObject : m_activeObjects) {
-				ray rCast;
-				m_pSandbox->GetMouseRay(rCast, 0.0f);
-				CR(UpdateInteractionPrimitive(rCast));
+				//ray rCast;
+				//m_pSandbox->GetMouseRay(rCast, 0.0f);
+				//CR(UpdateInteractionPrimitive(rCast));
 
 				InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
 				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
@@ -412,12 +413,26 @@ RESULT InteractionEngine::Notify(SenseMouseEvent *pEvent) {
 
 		case SENSE_MOUSE_LEFT_BUTTON_DOWN: {
 			for (auto &pObject : m_activeObjects) {
-				ray rCast;
-				m_pSandbox->GetMouseRay(rCast, 0.0f);
-				CR(UpdateInteractionPrimitive(rCast));
+				//ray rCast;
+				//m_pSandbox->GetMouseRay(rCast, 0.0f);
+				//CR(UpdateInteractionPrimitive(rCast));
 
 				InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
 				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+				CR(NotifySubscribers(type, &interactionEvent));
+			}
+		} break;
+
+		case SENSE_MOUSE_WHEEL: {
+			for (auto &pObject : m_activeObjects) {
+				//ray rCast;
+				//m_pSandbox->GetMouseRay(rCast, 0.0f);
+				//CR(UpdateInteractionPrimitive(rCast));
+
+				InteractionEventType type = INTERACTION_EVENT_WHEEL;
+				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+				interactionEvent.SetValue(pEvent->state);
+
 				CR(NotifySubscribers(type, &interactionEvent));
 			}
 		} break;
