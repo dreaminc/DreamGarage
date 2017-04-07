@@ -41,8 +41,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Controller
 	//RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);
-	GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
-	GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this);
+	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this);
+	//GetDOS()->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this);
 
 	SetAppName("DreamContentView");
 	SetAppDescription("A Shared Content View");
@@ -250,8 +250,10 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			webBrowserMouseEvent.pt = m_lastWebBrowserPoint;
 			
+			int deltaX = 0;
+			int deltaY = pEvent->m_value * m_scrollFactor;
 
-			//CR(m_pWebBrowserController->SendMouseClick(webBrowserMouseEvent, fMouseUp, 1));
+			CR(m_pWebBrowserController->SendMouseWheel(webBrowserMouseEvent, deltaX, deltaY));
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 		} break;
@@ -308,61 +310,6 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	return R_PASS;
 }
 
-// TODO: replace with core code
-ray DreamBrowser::GetHandRay() {
-
-	RESULT r = R_PASS;
-
-	ray rCast;
-	hand *pRightHand = GetDOS()->GetHand(hand::HAND_TYPE::HAND_RIGHT);
-
-	CBR(m_pBrowserQuad->IsVisible(), R_SKIPPED);
-	if(pRightHand != nullptr) {
-		point ptHand = pRightHand->GetPosition();
-
-		//GetLookVector
-		quaternion qHand = pRightHand->GetHandState().qOrientation;
-		qHand.Normalize();
-
-		/*
-		if (m_pTestRayController != nullptr) {
-		m_pTestRayController->SetPosition(ptHand);
-		m_pTestRayController->SetOrientation(qHand);
-		}
-		//*/
-
-		//TODO: investigate how to properly get look vector for controllers
-		//vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
-
-		vector vHandLook = RotationMatrix(qHand) * vector(0.0f, 0.0f, -1.0f);
-		vHandLook.Normalize();
-
-		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
-		/*
-		if (m_pTestRayController != nullptr) {
-		m_pTestRayLookV->SetPosition(ptHand);
-		m_pTestRayLookV->SetOrientation(quaternion(vHandLook));
-		}
-		//*/
-		// Accommodate for composite collision bug
-		//ptHand = ptHand + point(-10.0f * vCast);
-		//rCast = ray(ptHand, vCast);
-		//rCast = m_pTestRayController->GetRayFromVerts();
-
-		rCast = ray(ptHand, vHandLook);
-	}
-	/*
-	else {
-		CR(GetDOS()->GetMouseRay(rCast, 0.0f));
-	}
-	*/
-
-	return rCast;
-
-Error:
-	return ray(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, 0.0f));
-}
-
 float DreamBrowser::GetHeight() {
 	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
@@ -416,6 +363,7 @@ Error:
 }
 
 // TODO: Remove
+/*
 RESULT DreamBrowser::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
@@ -446,17 +394,12 @@ RESULT DreamBrowser::Notify(SenseControllerEvent *pEvent) {
 				CR(m_pWebBrowserController->SendMouseClick(webBrowserEvent, false, 1));
 			}
 		}
-		/*
-		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
-			OVERLAY_DEBUG_SET("event", "menu up");
-			CR(m_pDreamUIBar->HandleMenuUp());
-		}
-		*/
 	}
 
 Error:
 	return r;
 }
+*/
 
 
 RESULT DreamBrowser::SetScreenTexture(texture *pTexture) {
@@ -469,4 +412,10 @@ RESULT DreamBrowser::SetScreenTexture(texture *pTexture) {
 DreamBrowser* DreamBrowser::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamBrowser *pDreamApp = new DreamBrowser(pDreamOS, pContext);
 	return pDreamApp;
+}
+
+
+RESULT DreamBrowser::SetScrollFactor(int scrollFactor) {
+	m_scrollFactor = scrollFactor;
+	return R_PASS;
 }

@@ -129,11 +129,10 @@ RESULT CEFBrowserController::SendMouseWheel(const WebBrowserMouseEvent& webBrows
 
 	cefMouseEvent.x = webBrowserMouseEvent.pt.x;
 	cefMouseEvent.y = webBrowserMouseEvent.pt.y;
-	cefMouseEvent.modifiers = EVENTFLAG_LEFT_MOUSE_BUTTON;
 
 	cefMouseButtonType = (CefBrowserHost::MouseButtonType)webBrowserMouseEvent.mouseButton;
 
-	//m_pCEFBrowser->GetHost()->SendMouseWheelEvent(const CefMouseEvent& event, deltaX, deltaY)
+	m_pCEFBrowser->GetHost()->SendMouseWheelEvent(cefMouseEvent, deltaX, deltaY);
 
 Error:
 	return r;

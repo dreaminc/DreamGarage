@@ -20,6 +20,8 @@
 
 #include "Sense/SenseController.h"
 
+#define DEFAULT_SCROLL_FACTOR 5
+
 class quad;
 class texture;
 
@@ -29,8 +31,7 @@ class WebBrowserManager;
 class DreamBrowser : 
 	public DreamApp<DreamBrowser>, 
 	public Subscriber<InteractionObjectEvent>, 
-	public WebBrowserController::observer,
-	public Subscriber<SenseControllerEvent>
+	public WebBrowserController::observer
 {
 	friend class DreamAppManager;
 
@@ -55,8 +56,6 @@ public:
 
 	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
 
-	ray GetHandRay();
-
 	float GetWidth();
 	float GetHeight();
 	vector GetNormal();
@@ -68,8 +67,7 @@ public:
 
 	RESULT SetURI(std::string strURI);
 
-	// SenseControllerEventSubscriber
-	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	RESULT SetScrollFactor(int scrollFactor);
 
 private:
 	RESULT SetScreenTexture(texture *pTexture);
@@ -93,6 +91,8 @@ private:
 	float m_aspectRatio = 1.0f;
 	float m_diagonalSize = 5.0f;
 	vector m_vNormal;
+
+	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

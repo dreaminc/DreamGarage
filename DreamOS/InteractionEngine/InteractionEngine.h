@@ -62,7 +62,6 @@ public:
 	RESULT SetInteractionGraph(ObjectStore *pObjectStore);
 
 	RESULT UpdateInteractionPrimitive(const ray &r);
-
 	RESULT SetInteractionDiffThreshold(double thresh);
 
 	//RESULT RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
@@ -93,6 +92,8 @@ public:
 	RESULT RegisterSenseController(SenseController *pSenseController);
 	RESULT RegisterSenseMouse();
 
+	RESULT UpdateInteractionRay();
+
 private:
 	std::shared_ptr<ray> m_pInteractionRay = nullptr;
 	std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
@@ -110,6 +111,7 @@ public:
 private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;
 	SandboxApp *m_pSandbox = nullptr;
+	double m_interactionPadAccumulator = 0.0f;
 
 private:
 	UID m_uid;

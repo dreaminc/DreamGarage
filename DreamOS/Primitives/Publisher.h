@@ -300,6 +300,23 @@ public:
 		return r;
 	}
 
+	bool EventHasSubscribers(PKeyClass keyEvent) {
+		typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
+		auto it = m_events.find(keyEvent);
+
+		pszEvent = GetEventKeyString(keyEvent);
+		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
+
+		pSubscriberList = m_events[keyEvent];
+		CNM(pSubscriberList, "Subscriber list is NULL");
+
+		if (pSubscriberList->size() > 0) {
+			return true;
+		}
+
+		return false;
+	}
+
 private:
 	//std::list<Subscriber*> *m_pSubsribers; 
 

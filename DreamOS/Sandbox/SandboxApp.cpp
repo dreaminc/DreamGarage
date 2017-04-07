@@ -543,6 +543,13 @@ RESULT SandboxApp::InitializeInteractionEngine() {
 
 	CRM(m_pInteractionEngine->SetInteractionGraph(m_pInteractionGraph), "Failed to set interaction object store");
 
+	if (m_pHMD != nullptr) {
+		SenseController *pSenseController = m_pHMD->GetSenseController();
+		if (pSenseController != nullptr) {
+			m_pInteractionEngine->RegisterSenseController(pSenseController);
+		}
+	}
+
 Error:
 	return r;
 }
