@@ -21,16 +21,14 @@ typedef struct UILayerInfo {
 	{}
 } UI_LAYER_INFO;
 
-class UIModule : public valid, public Subscriber<InteractionObjectEvent> {
+class UIModule {
 public:
 	// using virtual here causes crash on exit
-	UIModule(DreamOS *pDreamOS);
+	UIModule();
 	~UIModule();
 
-	RESULT Initialize();
-	ray GetHandRay();
-	RESULT UpdateInteractionPrimitive(ray rCast);
-
+	RESULT Initialize(composite *pComposite);
+	ray GetHandRay(hand* pHand);
 	std::shared_ptr<UIMenuLayer> CreateMenuLayer();
 	std::shared_ptr<UIMenuLayer> GetCurrentLayer();
 
@@ -42,10 +40,6 @@ public:
 	RESULT SetVisible(bool fVisible);
 	bool IsVisible();
 
-	composite* GetComposite();
-
-	virtual RESULT Notify(InteractionObjectEvent *event) override = 0;
-
 protected:
 	composite* m_pCompositeContext;
 
@@ -56,16 +50,6 @@ protected:
 	std::shared_ptr<UIMenuLayer> m_pCurrentUILayer;
 
 	float m_headRotationYDeg;  // can be removed with composite collision code
-
-	CloudController *GetCloudController();
-
-private:
-	DreamOS *m_pDreamOS;
-
-	DimRay *m_pTestRayController;
-	DimRay *m_pTestRayLookV;
-
-	sphere *m_pSphere;
 };
 
 #endif // ! UI_MODULE_H_

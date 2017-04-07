@@ -33,12 +33,12 @@ protected:
 	RESULT SetPriority(int priority);
 	int GetPriority();
 	RESULT ResetTimeRun();
-	RESULT IncrementTimeRun(float usTimeDelta);
+	RESULT IncrementTimeRun(double usTimeDelta);
 	float GetTimeRun();
 	float GetEffectivePriorityValue() const;
 
 private:
-	float m_usTimeRun = 0.0f;
+	double m_usTimeRun = 0.0;
 	int m_priority = 0;
 };
 
@@ -48,7 +48,7 @@ struct DreamAppBaseCompare {
 	bool operator()(const std::shared_ptr<DreamAppBase> &lhsApp , const std::shared_ptr<DreamAppBase> &rhsApp) const {
 		// Note: This is actually returning the lowest value (not highest)
 		// Since priority is inverted
-		return lhsApp->GetEffectivePriorityValue() > rhsApp->GetEffectivePriorityValue();
+		return lhsApp->GetEffectivePriorityValue() < rhsApp->GetEffectivePriorityValue();
 	}
 };
 

@@ -143,9 +143,12 @@ RESULT DreamGarage::LoadScene() {
 	titleFormat.itemPosY = -0.25f;
 	titleFormat.itemAngleX = 75.0f;
 
-	m_pDreamUIBar = std::make_shared<DreamUIBar>(this, iconFormat, labelFormat, menuFormat, titleFormat);
+	//m_pDreamUIBar = std::make_shared<DreamUIBar>(this, iconFormat, labelFormat, menuFormat, titleFormat);
+	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this);
 	CN(m_pDreamUIBar);
-	CV(m_pDreamUIBar);
+	//CV(m_pDreamUIBar);
+
+	m_pDreamUIBar->SetParams(iconFormat, labelFormat, menuFormat, titleFormat);
 
 	m_pDreamContentView = LaunchDreamApp<DreamContentView>(this);
 	CNM(m_pDreamContentView, "Failed to create dream content view");

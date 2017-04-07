@@ -63,11 +63,11 @@ public:
 	
 	RESULT PushAnimation(VirtualObj *pObj, point ptPosition, vector vScale, double duration);
 	RESULT CancelAnimation(VirtualObj *pObj);
+	CloudController *GetCloudController();
 
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
-	CloudController *GetCloudController();
 
 	// TODO: This is here temporarily, should be replaced by proper sandbox 
 	// related functionality
