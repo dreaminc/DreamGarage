@@ -115,6 +115,7 @@ std::shared_ptr<WebBrowserController> CEFApp::CreateBrowser(int width, int heigh
 	std::future<std::shared_ptr<CEFBrowserController>> futureCEFBrowserController = m_promiseCEFBrowserController.get_future();
 
 	if (CefBrowserHost::CreateBrowser(cefWindowInfo, pCEFHandler, strURL, cefBrowserSettings, nullptr) == false) {
+	//if (CefBrowserHost::CreateBrowserSync(cefWindowInfo, pCEFHandler, strURL, cefBrowserSettings, nullptr) == false) {
 		DEBUG_LINEOUT("CreateBrowser failed");
 		return nullptr;
 	}

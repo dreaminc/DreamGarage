@@ -31,6 +31,9 @@ public:
 	std::shared_ptr<WebBrowserController> WebBrowserManager::CreateNewBrowser(int width, int height, const std::string& strURL);
 	std::shared_ptr<WebBrowserController> GetBrowser(const std::string& strID);
 
+protected:
+	RESULT ClearAllBrowserControllers();
+
 	//void SetKeyFocus(const std::string& id);
 	//void OnKey(unsigned int scanCode, char16_t chr);
 

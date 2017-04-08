@@ -12,7 +12,8 @@
 #include "Primitives/valid.h"
 
 // TODO: Could squash this with a template 
-class Manager : public valid{
+// TODO: Is this a module?
+class Manager : public valid {
 public:
 	Manager() {
 		// empty
@@ -28,6 +29,10 @@ public:
 	// Update function called to give the manager a chance to update itself
 	// Unless this is handled in a thread
 	virtual RESULT Update() = 0;
+
+
+	// Shutdown the manager
+	virtual RESULT Shutdown() = 0;
 
 private:
 	UID m_uid;

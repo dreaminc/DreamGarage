@@ -39,6 +39,10 @@ public:
 	};
 
 public:
+	CEFBrowserManager();
+	~CEFBrowserManager();
+
+public:
 	virtual RESULT Initialize() override;
 	virtual RESULT Update() override;
 	virtual RESULT Shutdown() override;

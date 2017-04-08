@@ -76,6 +76,7 @@ public:
 	// Request that all existing browser windows close.
 	void CloseAllBrowsers(bool fForceClose);
 	bool IsShuttingDown() const { return m_fShuttingdown; }
+	bool IsBrowserRunning() const { return m_fBrowserRunning; }
 
 	// CefRenderHandler
 	virtual bool GetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
@@ -84,6 +85,7 @@ public:
 private:
 	std::list<CefRefPtr<CefBrowser>> m_cefBrowsers;
 	bool m_fShuttingdown = false;
+	bool m_fBrowserRunning = false;
 
 	CEFHandlerObserver* m_pCEFHandlerObserver = nullptr;
 

@@ -24,6 +24,7 @@ public:
 	virtual RESULT InitializeApp(void *pContext = nullptr) = 0;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;
 	virtual RESULT Update(void *pContext = nullptr) = 0;
+	virtual RESULT Shutdown(void *pContext = nullptr) = 0;
 
 protected:
 	virtual void *GetAppContext() = 0;

@@ -9,7 +9,8 @@ WebBrowserManager::WebBrowserManager() {
 WebBrowserManager::~WebBrowserManager() {
 	RESULT r = R_PASS;
 
-	CRM(Shutdown(), "WebBrowserManager failed to shutdown properly");
+	//CRM(Shutdown(), "WebBrowserManager failed to shutdown properly");
+	CR(r);
 
 Error:
 	return;
@@ -97,6 +98,11 @@ Error:
 
 	return strID;
 */
+
+RESULT WebBrowserManager::ClearAllBrowserControllers() {
+	m_webBrowserControllers.clear();
+	return R_PASS;
+}
 
 std::shared_ptr<WebBrowserController> WebBrowserManager::GetBrowser(const std::string& strID) {
 	for (auto &pWebBrowserController : m_webBrowserControllers) {

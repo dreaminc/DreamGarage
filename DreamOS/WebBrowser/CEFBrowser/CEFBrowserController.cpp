@@ -12,6 +12,26 @@ CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	// empty
 }
 
+CEFBrowserController::~CEFBrowserController() {
+	RESULT r = R_PASS;
+
+	CR(Shutdown());
+
+Error:
+	return;
+}
+
+RESULT CEFBrowserController::Shutdown() {
+	RESULT r = R_PASS;
+
+	if (m_pCEFBrowser != nullptr) {
+		m_pCEFBrowser = nullptr;
+	}
+
+//Error:
+	return r;
+}
+
 RESULT CEFBrowserController::RegisterCEFAppObserver(CEFBrowserController::observer* pCEFBrowserControllerObserver) {
 	RESULT r = R_PASS;
 

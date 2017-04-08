@@ -81,6 +81,8 @@ public:
 	// Loads a url
 	virtual RESULT LoadURL(const std::string& url) = 0;
 
+	virtual RESULT Shutdown() = 0;
+
 
 	std::string GetID() {
 		return m_strID;

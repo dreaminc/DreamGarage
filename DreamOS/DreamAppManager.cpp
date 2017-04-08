@@ -15,13 +15,27 @@ DreamAppManager::DreamAppManager(DreamOS *pDreamOS) :
 }
 
 DreamAppManager::~DreamAppManager() {
-	// empty
+	RESULT r = R_PASS;
+
+	CR(Shutdown());
+
+Error:
+	return;
+}
+
+RESULT DreamAppManager::Shutdown() {
+	RESULT r = R_PASS;
+
+	CR(ClearPriorityQueue());
+
+Error:
+	return r;
 }
 
 RESULT DreamAppManager::Initialize() {
 	RESULT r = R_PASS;
 
-	// TODO: 
+	// TODO:
 	CR(r);
 
 Error:
@@ -53,7 +67,7 @@ RESULT DreamAppManager::Update() {
 	}
 	//*/
 
-	// TODO: Update the time run 
+	// TODO: Update the time run
 	// TODO: Create a time slice mechanism
 	// TODO: Threads?
 
@@ -62,10 +76,22 @@ Error:
 }
 
 RESULT DreamAppManager::ClearPriorityQueue() {
+	RESULT r = R_PASS;
+
 	while (!m_appPriorityQueue.empty()) {
 		//std::shared_ptr<DreamAppBase> pDreamApp = m_appPriorityQueue.top();
 		m_appPriorityQueue.pop_front();
+
+		/*
+		std::shared_ptr<DreamAppBase> pDreamApp = m_appPriorityQueue.top();
+		if (pDreamApp != nullptr) {
+			CR(pDreamApp->Shutdown());
+		}
+
+		m_appPriorityQueue.pop();
+		//*/
 	}
 
-	return R_PASS;
+Error:
+	return r;
 }

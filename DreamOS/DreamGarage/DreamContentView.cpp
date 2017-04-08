@@ -39,6 +39,15 @@ Error:
 	return r;
 }
 
+RESULT DreamContentView::Shutdown(void *pContext) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+Error:
+	return r;
+}
+
 RESULT DreamContentView::Update(void *pContext) {
 	RESULT r = R_PASS;
 

@@ -41,6 +41,7 @@ class CEFBrowserController :  public WebBrowserController {
 	RESULT RegisterCEFAppObserver(CEFBrowserController::observer* pCEFBrowserControllerObserver);
 public:
 	CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser);
+	~CEFBrowserController();
 
 	// WebBrowserController
 	RESULT PollFrame();
@@ -58,6 +59,8 @@ public:
 
 	virtual RESULT SendKeyEventChar(char chKey, bool fKeyDown) override;
 	virtual RESULT SendKeySequence(const std::string& strKeySequence) override;
+
+	virtual RESULT Shutdown() override; 
 
 	CefRefPtr<CefBrowser> GetCEFBrowser();
 

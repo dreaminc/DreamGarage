@@ -37,11 +37,13 @@ class DreamBrowser :
 
 public:
 	DreamBrowser(DreamOS *pDreamOS, void *pContext = nullptr);
+	~DreamBrowser();
 
 	// DreamApp Interface
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
 	virtual RESULT Update(void *pContext = nullptr) override;
+	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 	// InteractionObjectEvent
 	virtual RESULT Notify(InteractionObjectEvent *pEvent) override;

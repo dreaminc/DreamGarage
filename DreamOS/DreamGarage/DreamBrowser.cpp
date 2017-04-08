@@ -12,6 +12,27 @@ DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	// Empty - initialization by factory
 }
 
+DreamBrowser::~DreamBrowser(){
+	RESULT r = R_PASS;
+
+	CR(Shutdown());
+
+Error:
+	return;
+}
+
+RESULT DreamBrowser::Shutdown(void *pContext) {
+	RESULT r = R_PASS;
+
+	if (m_pWebBrowserManager != nullptr) {
+		CR(m_pWebBrowserManager->Shutdown());
+		//m_pWebBrowserManager = nullptr;
+	}
+
+Error:
+	return r;
+}
+
 // TODO: Only update the rect
 RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) {
 	RESULT r = R_PASS;

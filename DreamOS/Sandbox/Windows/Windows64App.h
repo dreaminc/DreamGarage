@@ -42,7 +42,7 @@ public:
 public:	// Sandbox Interface
 	virtual RESULT InitializeSandbox() override;
 	virtual RESULT Show() override;
-	virtual RESULT Shutdown() override;
+	virtual RESULT ShutdownSandbox() override;
 	virtual RESULT RecoverDisplayMode() override;
 	virtual RESULT HandleMessages() override;
 	virtual RESULT SwapDisplayBuffers() override;

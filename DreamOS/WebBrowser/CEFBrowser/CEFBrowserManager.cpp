@@ -6,13 +6,30 @@
 
 #include "CEFApp.h"
 
+CEFBrowserManager::CEFBrowserManager() {
+	// empty
+}
+
+CEFBrowserManager::~CEFBrowserManager() {
+	RESULT r = R_PASS;
+
+	//CRM(Shutdown(), "WebBrowserManager failed to shutdown properly");
+	CR(r);
+
+Error:
+	return;
+}
+
 RESULT CEFBrowserManager::Initialize() {
 	RESULT r = R_PASS;
 
+	/*
 	m_ServiceThread = std::thread(&CEFBrowserManager::CEFManagerThread, this);
 	std::unique_lock<std::mutex> lockCEFBrowserInitialization(m_mutex);
-
 	m_condBrowserInit.wait(lockCEFBrowserInitialization);
+	*/
+
+	CR(CEFManagerThread());
 
 	CBM((m_state == CEFBrowserManager::state::INITIALIZED), "CEFBrowserManager not correctly initialized");
 
@@ -99,7 +116,12 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
 	CefString(&cefSettings.locale) = "en";
 	cefSettings.remote_debugging_port = 8080;
-	//cefSettings.multi_threaded_message_loop = true;
+
+#ifdef _DEBUG
+	cefSettings.single_process = true;
+#endif
+
+	cefSettings.multi_threaded_message_loop = true;
 
 	CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(CEFApp::instance());
 	CN(pCEFApp);
@@ -112,7 +134,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 	m_state = state::INITIALIZED;
 	m_condBrowserInit.notify_one();
 
-	///*
+	/*
 	DEBUG_LINEOUT("CEF Run message loop");
 	CefRunMessageLoop();
 	//*/
@@ -124,6 +146,7 @@ RESULT CEFBrowserManager::CEFManagerThread() {
 
 Error:
 	DEBUG_LINEOUT("CEF Initialization Error, shutting down");
+
 	Shutdown();
 	return r;
 }
@@ -155,16 +178,31 @@ RESULT CEFBrowserManager::Shutdown() {
 
 	DEBUG_LINEOUT("CEF force shutdown");
 
+	//CR(ClearAllBrowserControllers());
+
 	if (CEFHandler::instance()) {
 		CEFHandler::instance()->CloseAllBrowsers(true);
 	}
 
-	CB((m_ServiceThread.joinable()));
-	m_ServiceThread.join();
+	while (CEFHandler::instance()->IsBrowserRunning()) {
+		// empty stub
+	}
 
-Error:
+	/*
+	if (m_ServiceThread.joinable()) {
+		m_ServiceThread.join();
+	}
+	*/
+
 	DEBUG_LINEOUT("CEF Exited");
-	CefShutdown();
 
+	try {
+		CefShutdown();
+	}
+	catch (...) {
+		DEBUG_LINEOUT("CEF hit exception");
+	}
+
+//Error:
 	return r;
 }

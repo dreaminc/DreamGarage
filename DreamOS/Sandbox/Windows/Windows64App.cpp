@@ -613,7 +613,7 @@ bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
 	return fHandled;
 }
 
-RESULT Windows64App::Shutdown() {
+RESULT Windows64App::ShutdownSandbox() {
 	RESULT r = R_PASS;
 
 	CR(SetSandboxRunning(false));

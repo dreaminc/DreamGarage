@@ -88,6 +88,7 @@ void CEFHandler::OnAfterCreated(CefRefPtr<CefBrowser> pCEFBrowser) {
 	CEF_REQUIRE_UI_THREAD();
 	
 	m_cefBrowsers.push_back(pCEFBrowser);
+	m_fBrowserRunning = true;
 
 	std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::make_shared<CEFBrowserController>(pCEFBrowser);
 	CN(pCEFBrowserController);
@@ -107,7 +108,7 @@ bool CEFHandler::DoClose(CefRefPtr<CefBrowser> pCEFBrowser) {
 	// Closing the main window requires special handling. See the DoClose()
 	// documentation in the CEF header for a detailed description of this
 	// process.
-	if (m_cefBrowsers.size() == 1) {
+	if (m_cefBrowsers.size() > 1) {
 		// Set a flag to indicate that the window close should be allowed.
 		m_fShuttingdown = true;
 	}
@@ -122,16 +123,19 @@ void CEFHandler::OnBeforeClose(CefRefPtr<CefBrowser> pCEFBrowser) {
 
 	CEF_REQUIRE_UI_THREAD();
 
+	///*
 	for (auto it = m_cefBrowsers.begin(); it != m_cefBrowsers.end(); it++) {
 		if ((*it)->IsSame(pCEFBrowser)) {
 			m_cefBrowsers.erase(it);
 			break;
 		}
 	}
+	//*/
 
 	// All browser windows have closed. Quit the application message loop.
 	if (m_cefBrowsers.empty()) {
-		CefQuitMessageLoop();
+		m_fBrowserRunning = false;
+		//CefQuitMessageLoop();
 	}
 }
 
@@ -171,8 +175,13 @@ void CEFHandler::CloseAllBrowsers(bool fForceClose) {
 		return;
 	}
 
-	for (auto it = m_cefBrowsers.begin(); it != m_cefBrowsers.end(); it++) {
-		(*it)->GetHost()->CloseBrowser(fForceClose);
+	// Make a copy - threading issue
+	std::list<CefRefPtr<CefBrowser>> tempCEFBrowsers = std::list<CefRefPtr<CefBrowser>>(m_cefBrowsers);
+
+	for (auto &pCEFBrowser : tempCEFBrowsers) {
+		if (pCEFBrowser != nullptr) {
+			pCEFBrowser->GetHost()->CloseBrowser(fForceClose);
+		}
 	}
 
 //Error:

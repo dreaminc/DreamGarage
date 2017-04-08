@@ -328,6 +328,21 @@ inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext; 
 }
 
+RESULT SandboxApp::Shutdown() {
+	RESULT r = R_SUCCESS;
+
+	if (m_pDreamAppManager != nullptr) {
+		CR(m_pDreamAppManager->Shutdown());
+		m_pDreamAppManager = nullptr;
+	}
+
+	// Implementation specific shutdown
+	CR(ShutdownSandbox());
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::RunAppLoop() {
 	RESULT r = R_PASS;
 
