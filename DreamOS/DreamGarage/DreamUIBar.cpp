@@ -2,6 +2,8 @@
 #include "DreamOS.h"
 
 #include "Cloud/Menu/MenuNode.h"
+//#include "InteractionEngine/AnimationCurve.h"
+#include "InteractionEngine/AnimationItem.h"
 
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext),
@@ -93,7 +95,18 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 	UIMenuItem* pItem = reinterpret_cast<UIMenuItem*>(pContext);
 	CN(pItem);
 	if (GetCurrentLayer()->ContainsMenuItem(pItem)) {
-		pItem->GetQuad()->Scale(m_menuFormat.itemScaleSelected);
+	//	pItem->GetQuad()->Scale(m_menuFormat.itemScaleSelected);
+		VirtualObj *pObj = pItem->GetQuad().get();
+		//*
+		GetDOS()->GetInteractionEngineProxy()->
+			PushAnimationItem(pObj,
+				pObj->GetPosition(),
+				pObj->GetOrientation(),
+				vector(m_menuFormat.itemScaleSelected),
+				0.1,
+				AnimationCurveType::EASE_OUT_QUAD,
+				AnimationFlags());
+				//*/
 	}
 
 Error:
@@ -110,7 +123,18 @@ RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
 	UIMenuItem* pItem = reinterpret_cast<UIMenuItem*>(pContext);
 	CN(pItem);
 	if (GetCurrentLayer()->ContainsMenuItem(pItem)) {
-		pItem->GetQuad()->SetScale(m_menuFormat.itemScale);
+		//pItem->GetQuad()->SetScale(m_menuFormat.itemScale);
+		VirtualObj *pObj = pItem->GetQuad().get();
+		//*
+		GetDOS()->GetInteractionEngineProxy()->
+			PushAnimationItem(pObj,
+				pObj->GetPosition(),
+				pObj->GetOrientation(),
+				vector(m_menuFormat.itemScale),
+				0.1,
+				AnimationCurveType::EASE_OUT_QUAD,
+				AnimationFlags());
+				//*/
 	}
 
 Error:
@@ -199,7 +223,44 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 		//TODO: There are several RenderToTexture calls and object creates
 		// that cause a brief timing delay
-		CR(UpdateUILayers(info, titleInfo));
+		//CR(UpdateUILayers(info, titleInfo));
+		//*
+		SetUpdateParams(info, titleInfo);
+		auto fnCallback = [&](void *pContext) {
+			RESULT r = R_PASS;
+			DreamUIBar *pUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+			CN(pUIBar);
+			CR(pUIBar->UpdateUILayers());
+			//composite *pC = pUIBar->UIModule::m_pCompositeContext;
+			composite *pC = pUIBar->DreamApp::GetComposite();
+			pC->SetOrientation(pC->GetOrientation() * quaternion::MakeQuaternionWithEuler(0.0f, -(float)(M_PI), 0.0f));
+		Error:
+			return r;
+		};
+
+		pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+			GetComposite(),
+			GetComposite()->GetPosition(),
+			GetComposite()->GetOrientation() * quaternion::MakeQuaternionWithEuler(0.0f, (float)(M_PI_2), 0.0f),
+			GetComposite()->GetScale(),
+			0.5f,
+			AnimationCurveType::EASE_OUT_QUART,
+			AnimationFlags(),
+			fnCallback,
+			this
+		);
+		//*/
+		//CR(UpdateUILayers(info, titleInfo));
+		quaternion q = GetComposite()->GetOrientation();
+		pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+			GetComposite(),
+			GetComposite()->GetPosition(),
+			q,
+			GetComposite()->GetScale(),
+			0.5f,
+			AnimationCurveType::EASE_OUT_QUART,
+			AnimationFlags()
+		);
 	}
 
 Error:

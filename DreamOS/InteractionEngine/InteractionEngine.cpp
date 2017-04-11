@@ -149,27 +149,28 @@ RESULT InteractionEngine::UpdateAnimationQueue() {
 	return r;
 }
 
-AnimationQueue* InteractionEngine::GetAnimationQueue() {
-	return m_pObjectQueue;
-}
-
 RESULT InteractionEngine::PushAnimationItem(VirtualObj *pObj,
 	point ptPosition,
+	quaternion qRotation,
 	vector vScale,
 	double duration,
-	AnimationItem::AnimationFlags flags) {
+	AnimationCurveType curve,
+	AnimationFlags flags,
+	std::function<RESULT(void*)> endCallback,
+	void* callbackContext) {
 
 	RESULT r = R_PASS;
 
 	AnimationState endState;
 	endState.ptPosition = ptPosition;
+	endState.qRotation = qRotation;
 	endState.vScale = vScale;
 
 	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	msNow /= 1000.0;
 
-	CR(m_pObjectQueue->PushAnimationItem(pObj, endState, msNow, duration, flags));
+	CR(m_pObjectQueue->PushAnimationItem(pObj, endState, msNow, duration, curve, flags, endCallback, callbackContext));
 
 Error:
 	return r;
@@ -603,4 +604,8 @@ RESULT InteractionEngine::Notify(SenseMouseEvent *pEvent) {
 
 Error:
 	return r;
+}
+
+InteractionEngineProxy *InteractionEngine::GetInteractionEngineProxy() {
+	return (InteractionEngineProxy*)(this);
 }

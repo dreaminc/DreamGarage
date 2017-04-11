@@ -4,31 +4,28 @@
 #include "RESULT/EHM.h"
 #include "Primitives/valid.h"
 #include "Primitives/dirty.h"
-#include "AnimationState.h"
 
 #include <memory>
+#include <functional>
 
 class VirtualObj;
+#include "AnimationState.h"
+#include "AnimationCurve.h"
+
+struct AnimationFlags {
+
+	unsigned fNoBlock : 1;
+	unsigned fLooping  : 1;
+
+	AnimationFlags() :
+		fNoBlock(false),
+		fLooping(false)
+	{};
+
+};
 
 class AnimationItem : public valid, public dirty {
 public:
-	struct AnimationFlags {
-
-		unsigned fNoBlock : 1;
-		unsigned fLooping  : 1;
-
-		AnimationFlags() :
-			fNoBlock(false),
-			fLooping(false)
-		{};
-
-	} ANIMATION_FLAGS;
-
-	//TODO currently unused
-	enum class AnimationCurveType {
-		LINEAR,
-		INVALID
-	} ANIMATION_CURVE_TYPE;
 
 public:
 	AnimationItem(AnimationState startState, AnimationState endState, double startTime, double duration);
@@ -46,16 +43,26 @@ public:
 
 	AnimationFlags GetFlags();
 	RESULT SetFlags(AnimationFlags flags);
+	RESULT SetCurveType(AnimationCurveType type);
+
+	std::function<RESULT(void*)> GetEndCallback();
+	RESULT SetEndCallback(std::function<RESULT(void*)> callback);
+
+	void* GetCallbackContext();
+	RESULT SetCallbackContext(void* context);
 
 private:
 	double m_startTime;
 	double m_duration;
 
 	AnimationFlags m_flags;
-	AnimationCurveType m_curveType;
+	AnimationCurve m_curveType;
 
 	AnimationState m_startState;
 	AnimationState m_endState;
+
+	std::function<RESULT(void*)> m_endCallback;
+	void* m_callbackContext;
 };
 
 #endif // ! ANIMATION_ITEM_H_

@@ -671,6 +671,9 @@
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserController.cpp">
       <Filter>WebBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1400,6 +1403,7 @@
     <ClInclude Include="..\..\..\InteractionEngine\AnimationState.h">
       <Filter>InteractionEngine</Filter>
     </ClInclude>
+<<<<<<< HEAD
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
@@ -1432,6 +1436,10 @@
     </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFAppObserver.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
+=======
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h">
+      <Filter>InteractionEngine</Filter>
+>>>>>>> Initial ideas for new functionality:
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

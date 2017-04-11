@@ -60,6 +60,9 @@ public:
 
 	RESULT RotateByVector(vector v, quaternion_precision theta);
 	RESULT RotateByVectorSlerp(vector v, quaternion_precision theta, quaternion_precision slerpLimitValue = DEFAULT_SLERP_LIMIT_VALUE);
+	
+	RESULT RotateToQuaternionSlerp(quaternion q0, quaternion q1, double t);
+	quaternion RotateToQuaternionLerp(quaternion q1, double t);
 
 	RESULT RotateX(quaternion_precision theta);
 	RESULT RotateY(quaternion_precision theta);
