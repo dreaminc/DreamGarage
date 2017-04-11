@@ -17,9 +17,9 @@ float AnimationCurve::GetAnimationProgress(float progress) {
 	case AnimationCurveType::EASE_OUT_QUAD:
 		return -1.0f * progress * (progress - 2.0f); break;
 	case AnimationCurveType::EASE_OUT_EXPO:
-		return -pow(2, -10 * progress) + 1;
+		return -pow(2, -10 * progress) + 1; break;
 	case AnimationCurveType::EASE_OUT_BACK:
-		return (progress - 1) * (progress - 1) * ((easeOut + 1) * (progress-1) + easeOut) + 1;
+		return (progress - 1) * (progress - 1) * ((easeOut + 1) * (progress - 1) + easeOut) + 1; break;
 	case AnimationCurveType::LINEAR:
 		return progress; break;
 	default:

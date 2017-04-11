@@ -1,5 +1,4 @@
 #include "AnimationItem.h"
-//#include "AnimationCurve.h"
 #include "Primitives/VirtualObj.h"
 
 AnimationItem::AnimationItem(AnimationState startState, AnimationState endState, double startTime, double duration) {
@@ -68,7 +67,6 @@ RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, double msN
 	updateState.ptPosition = ((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
 	updateState.qRotation = m_startState.qRotation.RotateToQuaternionLerp(m_endState.qRotation, prog);
 	updateState.vScale = ((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
-	point end = (float)(prog)* m_endState.ptPosition;
 	CR(state.Compose(updateState));
 Error:
 	return r;

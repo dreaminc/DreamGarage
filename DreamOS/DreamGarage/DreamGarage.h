@@ -14,7 +14,6 @@
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseController.h"
 
-//#include "DreamUIBar.h"
 class DreamUIBar;
 class DreamContentView;
 

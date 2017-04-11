@@ -4,7 +4,6 @@
 #include "DreamOS.h"
 #include "Primitives/composite.h"
 #include "Primitives/sphere.h"
-//#include "AnimationCurve.h"
 
 AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) {
 	// empty
@@ -280,7 +279,14 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		aState.ptPosition = point(0.0f, 1.0f, -2.0f);
 		aState.vScale = vector(1.25f, 1.25f, 1.25f);
 
-//		m_pDreamOS->GetInteractionEngineProxy()->PushAnimation(pTestContext->pSphere, aState.ptPosition, aState.vScale, 2.0f, AnimationCurveType::LINEAR, AnimationFlags());
+		m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+			pTestContext->pSphere, 
+			aState.ptPosition, 
+			pTestContext->pSphere->GetOrientation(),
+			aState.vScale, 
+			2.0f, 
+			AnimationCurveType::LINEAR, 
+			AnimationFlags());
 
 	Error:
 		return R_PASS;
@@ -295,7 +301,7 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		auto diff = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - pTestContext->startTime).count();
 
 		if (diff > 1.0 && !pTestContext->fCancelled) {
-//			m_pDreamOS->GetInteractionEngineProxy()->CancelAnimation(pTestContext->pSphere);
+			m_pDreamOS->GetInteractionEngineProxy()->CancelAnimation(pTestContext->pSphere);
 			pTestContext->fCancelled = true;
 		}
 

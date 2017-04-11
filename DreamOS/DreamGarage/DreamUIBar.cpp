@@ -2,7 +2,6 @@
 #include "DreamOS.h"
 
 #include "Cloud/Menu/MenuNode.h"
-//#include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
 
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
@@ -95,9 +94,7 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 	UIMenuItem* pItem = reinterpret_cast<UIMenuItem*>(pContext);
 	CN(pItem);
 	if (GetCurrentLayer()->ContainsMenuItem(pItem)) {
-	//	pItem->GetQuad()->Scale(m_menuFormat.itemScaleSelected);
 		VirtualObj *pObj = pItem->GetQuad().get();
-		//*
 		GetDOS()->GetInteractionEngineProxy()->
 			PushAnimationItem(pObj,
 				pObj->GetPosition(),
@@ -106,7 +103,6 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 				0.1,
 				AnimationCurveType::EASE_OUT_QUAD,
 				AnimationFlags());
-				//*/
 	}
 
 Error:
@@ -123,9 +119,7 @@ RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
 	UIMenuItem* pItem = reinterpret_cast<UIMenuItem*>(pContext);
 	CN(pItem);
 	if (GetCurrentLayer()->ContainsMenuItem(pItem)) {
-		//pItem->GetQuad()->SetScale(m_menuFormat.itemScale);
 		VirtualObj *pObj = pItem->GetQuad().get();
-		//*
 		GetDOS()->GetInteractionEngineProxy()->
 			PushAnimationItem(pObj,
 				pObj->GetPosition(),
@@ -134,7 +128,6 @@ RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
 				0.1,
 				AnimationCurveType::EASE_OUT_QUAD,
 				AnimationFlags());
-				//*/
 	}
 
 Error:
@@ -223,8 +216,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 		//TODO: There are several RenderToTexture calls and object creates
 		// that cause a brief timing delay
-		//CR(UpdateUILayers(info, titleInfo));
-		//*
+
 		SetUpdateParams(info, titleInfo);
 		auto fnCallback = [&](void *pContext) {
 			RESULT r = R_PASS;
@@ -244,13 +236,12 @@ RESULT DreamUIBar::Update(void *pContext) {
 			GetComposite()->GetOrientation() * quaternion::MakeQuaternionWithEuler(0.0f, (float)(M_PI_2), 0.0f),
 			GetComposite()->GetScale(),
 			0.5f,
-			AnimationCurveType::EASE_OUT_QUART,
+			AnimationCurveType::EASE_OUT_QUART, // may want to try ease_in here
 			AnimationFlags(),
 			fnCallback,
 			this
 		);
-		//*/
-		//CR(UpdateUILayers(info, titleInfo));
+
 		quaternion q = GetComposite()->GetOrientation();
 		pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 			GetComposite(),

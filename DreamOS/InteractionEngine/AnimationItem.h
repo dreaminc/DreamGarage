@@ -5,12 +5,13 @@
 #include "Primitives/valid.h"
 #include "Primitives/dirty.h"
 
+#include "AnimationState.h"
+#include "AnimationCurve.h"
+
 #include <memory>
 #include <functional>
 
 class VirtualObj;
-#include "AnimationState.h"
-#include "AnimationCurve.h"
 
 struct AnimationFlags {
 
