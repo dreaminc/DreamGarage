@@ -46,8 +46,8 @@ public:
 	RESULT SetFlags(AnimationFlags flags);
 	RESULT SetCurveType(AnimationCurveType type);
 
-	std::function<RESULT(void*)> GetEndCallback();
-	RESULT SetEndCallback(std::function<RESULT(void*)> callback);
+	std::function<RESULT(void*)> GetAnimationEndedCallback();
+	RESULT SetAnimationEndedCallback(std::function<RESULT(void*)> callback);
 
 	void* GetCallbackContext();
 	RESULT SetCallbackContext(void* context);
@@ -62,8 +62,8 @@ private:
 	AnimationState m_startState;
 	AnimationState m_endState;
 
-	std::function<RESULT(void*)> m_endCallback;
-	void* m_callbackContext;
+	std::function<RESULT(void*)> fnOnAnimationEnded;
+	void* fnOnAnimationEndedContext;
 };
 
 #endif // ! ANIMATION_ITEM_H_

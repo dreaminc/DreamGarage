@@ -1,6 +1,8 @@
 #ifndef ANIMATION_CURVE_H_
 #define ANIMATION_CURVE_H_
 
+#define EASING_CONSTANT 1.70158f
+
 enum class AnimationCurveType {
 	EASE_OUT_QUAD,
 	EASE_OUT_QUART,

@@ -29,8 +29,8 @@ RESULT AnimationQueue::Update(double sNow) {
 
 			// modifying the deque likely invalidates the iterator
 			if ((*pItem)->IsComplete(sNow)) {
-				if ((*pItem)->GetEndCallback() != nullptr) {
-					(*pItem)->GetEndCallback()((*pItem)->GetCallbackContext());
+				if ((*pItem)->GetAnimationEndedCallback() != nullptr) {
+					(*pItem)->GetAnimationEndedCallback()((*pItem)->GetCallbackContext());
 				}
 				pQueue.pop_front();
 				continue;
@@ -55,7 +55,7 @@ RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endSta
 
 	pItem->SetFlags(flags);
 	pItem->SetCurveType(curve);
-	pItem->SetEndCallback(endCallback);
+	pItem->SetAnimationEndedCallback(endCallback);
 	pItem->SetCallbackContext(callbackContext);
 
 	m_objectQueue[pObj].push_back(pItem);
