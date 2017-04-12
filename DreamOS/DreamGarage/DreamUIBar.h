@@ -29,6 +29,7 @@ public:
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
 
 	virtual RESULT Update(void *pContext = nullptr) override;
+	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
 	RESULT HandleTouchStart(void* pContext);
 	RESULT HandleTouchMove(void* pContext);

@@ -92,6 +92,6 @@ RESULT DreamAppManager::ClearPriorityQueue() {
 		//*/
 	}
 
-Error:
+//Error:
 	return r;
 }

@@ -8,6 +8,8 @@
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamBrowser.h"
 
+#include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -83,45 +85,11 @@ RESULT UITestSuite::Initialize() {
 	return r;
 }
 
-RESULT UITestSuite::InitializeUI() {
-	RESULT r = R_PASS;
-
-	IconFormat iconFormat;
-	LabelFormat labelFormat;
-	RadialLayerFormat menuFormat;
-	RadialLayerFormat titleFormat;
-
-	// differences from default for title layer
-	titleFormat.menuPosZ = -1.15f;
-	titleFormat.itemPosY = -0.25f;
-	titleFormat.itemAngleX = 75.0f;
-
-	m_pDreamUIBar = std::make_shared<DreamUIBar>(m_pDreamOS,iconFormat,labelFormat,menuFormat,titleFormat);
-	m_pDreamUIBar->SetVisible(false);
-
-	m_menu[""] = { "lorem", "ipsum", "dolor", "sit" };
-	m_menu["lorem"] = { "Watch", "Listen", "Play", "Whisper", "Present" };
-	m_menu["ipsum"] = { "1", "2", "3" };
-	m_menu["Play"] = { "a", "b", "c" };
-
-	m_path = {};
-
-	m_pSphere1 = m_pDreamOS->AddSphere(0.02f, 10, 10);
-	m_pSphere2 = m_pDreamOS->AddSphere(0.02f, 10, 10);
-
-//Error:
-	return r;
-}
-
 RESULT UITestSuite::AddTestBrowser() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 6000.0f;
 	int nRepeats = 1;
-
-	// Initialize Code
-	WebBrowserManager *pWebBrowserManager = new CEFBrowserManager();
-	//CN(pCEFBrowserManager);
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -143,27 +111,6 @@ RESULT UITestSuite::AddTestBrowser() {
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
 		pDreamBrowser->SetURI(strURL);
-		*/
-		WebBrowserManager *pWebBrowserManager = (WebBrowserManager*)(pContext);
-		CN(pWebBrowserManager);
-		CR(pWebBrowserManager->Initialize());
-
-		//
-		{
-			auto pWebBrowserController = pWebBrowserManager->CreateNewBrowser(512, 512, strURL);
-
-			Sleep(1000);
-
-			pWebBrowserController->LoadURL("www.cnn.com");
-		}
-
-		// Wait a while
-		/*
-
-		Sleep(1000);
-
-		pCEFBrowserManager->Update();
-		*/
 
 	Error:
 		return R_PASS;
