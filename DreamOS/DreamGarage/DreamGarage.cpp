@@ -14,6 +14,7 @@ light *g_pLight = nullptr;
 #include "Cloud/Message/AudioDataMessage.h"
 
 #include "DreamGarage/DreamContentView.h"
+#include "DreamGarage/DreamUIBar.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"

@@ -57,16 +57,23 @@ public:
 
 protected:
 	RESULT UpdateUILayers(const UILayerInfo& currentInfo, const UILayerInfo& titleInfo);
+	RESULT UpdateUILayers();
 
 private:
 	// Places MenuItem along a circular arc based on index
 	RESULT UpdateWithRadialLayout(size_t index, const RadialLayerFormat& layerFormat);
 
 protected:
+	RESULT SetUpdateParams(const UILayerInfo& currentInfo, const UILayerInfo& titleInfo);
+
+protected:
 	IconFormat m_iconFormat;
 	LabelFormat m_labelFormat;
 	RadialLayerFormat m_menuFormat;
 	RadialLayerFormat m_titleFormat;
+
+	UILayerInfo m_currentInfo;
+	UILayerInfo m_titleInfo;
 
 public:
 	float GetLargeItemScale();

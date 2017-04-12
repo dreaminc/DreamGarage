@@ -216,6 +216,22 @@ RESULT quaternion::RotateByVectorSlerp(vector v, quaternion_precision theta, qua
 	return R_PASS;
 }
 
+// https://en.wikipedia.org/wiki/Slerp
+RESULT quaternion::RotateToQuaternionSlerp(quaternion q0, quaternion q1, double t) {
+	return R_NOT_IMPLEMENTED;
+}
+
+quaternion quaternion::RotateToQuaternionLerp(quaternion q1, double t) {
+	float x = (1.0 - t)*(*this).x() + (t*q1.x());
+	float y = (1.0 - t)*(*this).y() + (t*q1.y());
+	float z = (1.0 - t)*(*this).z() + (t*q1.z());
+	float w = (1.0 - t)*(*this).w() + (t*q1.w());
+
+	quaternion result;
+	result.SetValues(w, x, y, z);
+	return result;
+}
+
 RESULT quaternion::RotateX(quaternion_precision theta) {
 	quaternion q = MakeQuaternionWithEuler(theta, 0.0f, 0.0f);
 	(*this) *= q;

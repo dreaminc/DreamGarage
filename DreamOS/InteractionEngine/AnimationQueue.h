@@ -1,14 +1,15 @@
 #ifndef ANIMATION_QUEUE_H_
 #define ANIMATION_QUEUE_H_
 
-#include "InteractionEngine/AnimationItem.h"
-
 #include <map>
 #include <queue>
 #include <deque>
 #include <memory>
+#include <functional>
 
 class VirtualObj;
+enum class AnimationCurveType;
+#include "AnimationItem.h"
 
 class AnimationQueue {
 
@@ -22,8 +23,10 @@ public:
 		AnimationState endState,
 		double startTime,
 		double duration,
-		AnimationItem::AnimationFlags flags = AnimationItem::AnimationFlags());
-							//AnimationCurveType curve = AnimationCurveType::LINEAR);
+		AnimationCurveType curve,
+		AnimationFlags flags,
+		std::function<RESULT(void*)> endCallback = nullptr,
+		void* callbackContext = nullptr);
 
 	RESULT CancelAnimation(VirtualObj *pObj, double startTime);
 

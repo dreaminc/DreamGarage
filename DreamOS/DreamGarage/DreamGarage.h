@@ -12,13 +12,11 @@
 #include "DreamOS.h"
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
-#include "Sense/SenseController.h"
 
-#include "DreamUIBar.h"
-
+class DreamUIBar;
 class DreamContentView;
 
-class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<SenseControllerEvent>, public Subscriber<CmdPromptEvent> {
+class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<CmdPromptEvent> {
 public:
 
 	DreamGarage() {

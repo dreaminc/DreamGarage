@@ -29,6 +29,9 @@ RESULT AnimationQueue::Update(double sNow) {
 
 			// modifying the deque likely invalidates the iterator
 			if ((*pItem)->IsComplete(sNow)) {
+				if ((*pItem)->GetAnimationEndedCallback() != nullptr) {
+					(*pItem)->GetAnimationEndedCallback()((*pItem)->GetCallbackContext());
+				}
 				pQueue.pop_front();
 				continue;
 			}
@@ -40,7 +43,7 @@ RESULT AnimationQueue::Update(double sNow) {
 	return r;
 }
 
-RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endState, double startTime, double duration, AnimationItem::AnimationFlags flags) {//, AnimationCurveType curve) {
+RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endState, double startTime, double duration, AnimationCurveType curve, AnimationFlags flags, std::function<RESULT(void*)> endCallback, void* callbackContext) {
 	RESULT r = R_PASS;
 
 	AnimationState startState;
@@ -49,7 +52,11 @@ RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endSta
 	startState.vScale = pObj->GetScale();
 
 	std::shared_ptr<AnimationItem> pItem = std::make_shared<AnimationItem>(startState, endState, startTime, duration);
+
 	pItem->SetFlags(flags);
+	pItem->SetCurveType(curve);
+	pItem->SetAnimationEndedCallback(endCallback);
+	pItem->SetCallbackContext(callbackContext);
 
 	m_objectQueue[pObj].push_back(pItem);
 

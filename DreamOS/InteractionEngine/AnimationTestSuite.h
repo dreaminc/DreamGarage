@@ -5,8 +5,6 @@
 #include "Test/TestSuite.h"
 
 #include "Primitives/Subscriber.h"
-#include "InteractionEngine/InteractionEngine.h"
-#include "InteractionEngine/InteractionObjectEvent.h"
 #include "Sense/SenseKeyboard.h"
 
 #include <memory>
@@ -15,6 +13,8 @@
 class DreamOS;
 class composite;
 class sphere; 
+class InteractionEngine;
+struct InteractionObjectEvent;
 
 struct AnimationTestContext {
 	composite *pComposite = nullptr;
@@ -35,6 +35,8 @@ public:
 	RESULT ResetTest(void *pContext);
 	RESULT AddTestAnimationBasic();
 	RESULT AddTestCancel();
+	RESULT AddTestCurves();
+	RESULT AddTestRotate();
 
 private:
 	RESULT InitializeAnimationTest(void *pContext);

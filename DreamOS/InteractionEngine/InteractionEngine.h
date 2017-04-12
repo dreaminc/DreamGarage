@@ -25,6 +25,7 @@
 #include "Sense/SenseKeyboard.h"
 
 #include <vector>
+#include <functional>
 
 #include "InteractionObjectEvent.h"
 #include "ActiveObject.h"
@@ -33,23 +34,38 @@
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
 
 class ObjectStore;
-class AnimationQueue;
-//class AnimationState;
-#include "AnimationItem.h"
-/*
-class InteractionObject {
 
-};
-*/
+struct AnimationFlags;
+class AnimationQueue;
+enum class AnimationCurveType;
+
 class SandboxApp;
 
+class InteractionEngineProxy {
+public:
+	virtual RESULT PushAnimationItem(VirtualObj *pObj,
+		point ptPosition,
+		quaternion qRotation,
+		vector vScale,
+		double duration,
+		AnimationCurveType curve,
+		AnimationFlags flags,
+		std::function<RESULT(void*)> endCallback = nullptr,
+		void* callbackContext = nullptr) = 0;
+	virtual RESULT CancelAnimation(VirtualObj *pObj) = 0;
+
+};
+
+
 class InteractionEngine : public valid,
+	public InteractionEngineProxy,
 	public Publisher<InteractionEventType, InteractionObjectEvent>,
 	public Subscriber<SenseControllerEvent>,
 	public Subscriber<SenseMouseEvent>,
 	public Subscriber<SenseKeyboardEvent>,		// TODO: This is redundant, both can be one event
 	public Subscriber<SenseTypingEvent>
 {
+
 public:
 	static std::unique_ptr<InteractionEngine> MakeEngine(SandboxApp *pSandbox);
 
@@ -80,14 +96,17 @@ public:
 	std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject);
 	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
 	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
-	AnimationQueue* GetAnimationQueue();
-	RESULT PushAnimationItem(VirtualObj *pObj,
+	virtual RESULT PushAnimationItem(VirtualObj *pObj,
 		point ptPosition,
+		quaternion qRotation,
 		vector vScale,
 		double duration,
-		AnimationItem::AnimationFlags flags = AnimationItem::AnimationFlags());
+		AnimationCurveType curve,
+		AnimationFlags flags,
+		std::function<RESULT(void*)> endCallback = nullptr,
+		void* callbackContext = nullptr) override;
 
-	RESULT CancelAnimation(VirtualObj *pObj);
+	virtual RESULT CancelAnimation(VirtualObj *pObj) override;
 
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 	virtual RESULT Notify(SenseMouseEvent *pEvent) override;
@@ -99,6 +118,8 @@ public:
 	RESULT RegisterSenseKeyboard();
 
 	RESULT UpdateInteractionRay();
+
+	InteractionEngineProxy *GetInteractionEngineProxy();
 
 private:
 	std::shared_ptr<ray> m_pInteractionRay = nullptr;

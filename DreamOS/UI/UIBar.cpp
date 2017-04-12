@@ -64,6 +64,16 @@ Error:
 	return r;
 }
 
+RESULT UIBar::UpdateUILayers() {
+	return UpdateUILayers(m_currentInfo, m_titleInfo);
+}
+
+RESULT UIBar::SetUpdateParams(const UILayerInfo& currentInfo, const UILayerInfo& titleInfo) {
+	m_currentInfo = currentInfo;
+	m_titleInfo = titleInfo;
+	return R_PASS;
+}
+
 RESULT UIBar::UpdateCurrentUILayer(const UILayerInfo& info, const RadialLayerFormat& layerFormat) {
 	RESULT r = R_PASS;
 

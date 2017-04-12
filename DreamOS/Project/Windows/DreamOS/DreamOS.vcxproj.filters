@@ -1,1675 +1,510 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="RESULT">
-      <UniqueIdentifier>{c5818450-ccaf-494f-a6a3-1829971017c9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Test">
-      <UniqueIdentifier>{4bbf355f-4691-48f4-8232-b4800b606d5f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Main">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Sandbox">
-      <UniqueIdentifier>{394d99b2-78d3-4670-aa3f-893289f45340}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sandbox\Windows">
-      <UniqueIdentifier>{33b730f8-e45f-44ce-922e-c03c1304b623}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sandbox\OSX">
-      <UniqueIdentifier>{fc7ccd20-271e-4faa-962a-45b33f699455}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Primitives">
-      <UniqueIdentifier>{435f4a0d-a8be-4385-a06d-5bfeff5971d8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Primitives\Types">
-      <UniqueIdentifier>{e2f83a20-955b-4bc8-80a3-96529c103e31}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL">
-      <UniqueIdentifier>{82b61aa2-ea9e-4a23-8597-487ea3b7a4e7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL\opengl">
-      <UniqueIdentifier>{250a02de-03cb-461d-9d83-ff8a1ff56fc6}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core">
-      <UniqueIdentifier>{4f039fdc-08f8-43f4-88a5-313b7ed34769}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Types">
-      <UniqueIdentifier>{44fa16e8-b322-4aa9-bf57-b79b92f4c3b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Sense">
-      <UniqueIdentifier>{d6f300ee-6f18-483b-9818-d0018fb18693}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scene">
-      <UniqueIdentifier>{2be3e3ef-4d89-4383-b2de-5d5a55e6a51b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL\opengl\GL">
-      <UniqueIdentifier>{d90f805b-bf9a-4f40-9742-e7bb02818c72}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External">
-      <UniqueIdentifier>{82d7a177-6e17-489e-8f48-0f30a427b8fd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\SOIL">
-      <UniqueIdentifier>{959b6fa9-ce2d-43ef-b7b5-652c05626a9d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="TimeManager">
-      <UniqueIdentifier>{8b96d977-b3e9-4a11-a23d-f434f6d4d4ec}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS">
-      <UniqueIdentifier>{3686233d-96d6-4810-ab2d-ff06312c2946}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HMD">
-      <UniqueIdentifier>{e122ce99-434d-454c-a1b9-c035729da930}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HMD\Oculus">
-      <UniqueIdentifier>{a53afd0a-b5a4-4b9b-80ab-050429f6f805}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL\opengl\shaders">
-      <UniqueIdentifier>{e0da08a9-31cd-4af0-98a1-edfdec0ab066}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL\opengl\shaders\GLSL">
-      <UniqueIdentifier>{3bf90752-857f-43d2-a095-f33ca2e68b6e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL\opengl\shaders\GLSL\v400">
-      <UniqueIdentifier>{4122d50c-6ec2-4425-aca8-8175db942fc1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HAL\opengl\shaders\GLSL\v440">
-      <UniqueIdentifier>{0405a75c-6f11-4a68-b9ec-d514c26e465c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\CEF">
-      <UniqueIdentifier>{c033e102-b336-4bdc-990e-f62e5cb34781}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cloud">
-      <UniqueIdentifier>{8b54f727-8eee-4dc1-83bb-7c8112d843e1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamOS">
-      <UniqueIdentifier>{730db82d-4c28-45f4-928a-51f3c3fb19a7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamGarage">
-      <UniqueIdentifier>{cc87d393-7d70-4ae6-82ee-d220b57063d5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cloud\webrtc">
-      <UniqueIdentifier>{e82ece0f-07c1-4cff-87ab-e214e415001c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cloud\User">
-      <UniqueIdentifier>{e80be9ff-7887-4799-9a5a-ce9fb6cddb54}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cloud\HTTP">
-      <UniqueIdentifier>{818234de-b701-46c6-b1a9-663501c3c2f3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cloud\Websockets">
-      <UniqueIdentifier>{dbdd8c80-c654-40a5-94ca-e83096da4b22}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cloud\Environment">
-      <UniqueIdentifier>{8f3dd62d-3f99-4e45-bf9a-5adc56e8a76f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="HMD\OpenVR">
-      <UniqueIdentifier>{0484651f-4677-4432-aa79-1926163bb61b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\Matrices">
-      <UniqueIdentifier>{ac063e77-2be8-4932-a115-19a7ed9fb129}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cloud\Message">
-      <UniqueIdentifier>{a4934822-8fc9-4363-ac78-f660fcfbe16c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamConsole">
-      <UniqueIdentifier>{b155af0b-bb2b-410e-8f93-70e45db26684}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Logger">
-      <UniqueIdentifier>{58975f25-3a80-4eb9-8a13-ede4abd629d1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Texture">
-      <UniqueIdentifier>{451be8f2-6fb4-4145-9e8c-1bc687711a45}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Texture\Fonts">
-      <UniqueIdentifier>{c0308159-cdcb-4990-9db2-489d8ce4a640}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources">
-      <UniqueIdentifier>{064cde94-bbe7-418c-8746-c82ed21a2885}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resources\Fonts">
-      <UniqueIdentifier>{47aac8d7-21b7-41d9-86f4-dc30eebed8c8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Models">
-      <UniqueIdentifier>{9a748425-2cc2-4f36-8890-7f0968562c06}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Models\face4">
-      <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Primitives\matrix">
-      <UniqueIdentifier>{9ecd8ad4-8dee-4052-a0e9-2f164281aa96}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="PhysicsEngine">
-      <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="DreamTestApp">
-      <UniqueIdentifier>{921ea31d-7767-45b3-8296-bb5f9e9725eb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="InteractionEngine">
-      <UniqueIdentifier>{4bf81ee4-33cb-4648-aeeb-4c7752abaad8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="UI">
-      <UniqueIdentifier>{28d7c94b-81c3-4992-85e4-1dabd8aad4d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Cloud\Menu">
-      <UniqueIdentifier>{ae8879dc-1260-4bae-97f6-1266681d851d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v1.12.0">
-      <UniqueIdentifier>{9fb38d30-c91d-44ad-b826-0bc9b067ae01}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v1.12.0\LibOVR">
-      <UniqueIdentifier>{352f8ae7-d31f-45c0-afc6-c334b01431cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v1.12.0\LibOVRKernel">
-      <UniqueIdentifier>{9b76fa23-0019-42ac-9157-f11820e16332}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v1.12.0\Logging">
-      <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Scripts">
-      <UniqueIdentifier>{ab12ef14-0c46-4045-ac45-cfe6f65b4332}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="NuGet">
-      <UniqueIdentifier>{49713455-67bf-497c-a46d-68456ba95718}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="WebBrowser">
-      <UniqueIdentifier>{1cefafeb-98c7-4a55-ad04-d0ea29fa152d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="WebBrowser\CEFBrowser">
-      <UniqueIdentifier>{050ed7a2-b102-42e7-ad6f-8a2e98c25191}</UniqueIdentifier>
-    </Filter>
+    <Object Include="..\..\..\Models\face4\untitled.obj" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\DreamOSMain.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp">
-      <Filter>Primitives\Types</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp">
-      <Filter>Sandbox\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp">
-      <Filter>Sandbox\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp">
-      <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\PathManager.cpp">
-      <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\point.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp">
-      <Filter>Sandbox\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp">
-      <Filter>Sandbox\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp">
-      <Filter>Sandbox\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp">
-      <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp">
-      <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
-      <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\version.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\SOIL\image_DXT.c">
-      <Filter>External\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\SOIL\image_helper.c">
-      <Filter>External\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\SOIL\SOIL.c">
-      <Filter>External\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c">
-      <Filter>External\SOIL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\texture.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp">
-      <Filter>TimeManager</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HMD\HMDFactory.cpp">
-      <Filter>HMD</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp">
-      <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp">
-      <Filter>HMD\Oculus</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLFragmentShader.cpp">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.cpp">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.cpp">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.cpp">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniform.cpp">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\font.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamOS.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\HALImp.cpp">
-      <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp">
-      <Filter>Cloud\webrtc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp">
-      <Filter>Cloud\webrtc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp">
-      <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp">
-      <Filter>Cloud\User</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp">
-      <Filter>Cloud\HTTP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp">
-      <Filter>Cloud\Websockets</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\User\UserController.cpp">
-      <Filter>Cloud\User</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp">
-      <Filter>Cloud\Environment</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CloudController.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\text.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp">
-      <Filter>HMD\OpenVR</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp">
-      <Filter>External\Matrices</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
-      <Filter>Sense</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\hand.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h">
-      <Filter>Cloud\Message</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\quaternion.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\user.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Scene\ObjectStore.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp">
-      <Filter>Scene</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\FlatContext.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp">
-      <Filter>Cloud\Environment</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp">
-      <Filter>Primitives\Types</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp">
-      <Filter>Primitives\Types</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
-      <Filter>Cloud\webrtc</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp">
-      <Filter>Sense</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\Console.cpp">
-      <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp">
-      <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp">
-      <Filter>DreamConsole</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Logger\Logger.cpp">
-      <Filter>Logger</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp">
-      <Filter>Sandbox\Windows</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\camera.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sense\SenseMouse.cpp">
-      <Filter>Sense</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\vector.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\composite.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\volume.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\sphere.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\cylinder.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Test\TestObject.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Test\TestSuite.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp">
-      <Filter>Primitives\matrix</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp">
-      <Filter>Primitives\matrix</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp">
-      <Filter>Primitives\matrix</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp">
-      <Filter>Cloud\User</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp">
-      <Filter>Primitives\matrix</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sense\SenseController.cpp">
-      <Filter>Sense</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
-      <Filter>HAL\opengl</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
-      <Filter>DreamTestApp</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp">
-      <Filter>Primitives\matrix</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp">
-      <Filter>Primitives\matrix</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\ObjectState.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\quad.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\line.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\PhysicsEngine\Integrator.cpp">
-      <Filter>PhysicsEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp">
-      <Filter>Test</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIBar.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuItem.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIModule.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp">
-      <Filter>Cloud\Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Core\Utilities.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Controller.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp">
-      <Filter>Cloud\Menu</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp">
-      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_OutputPlugins.cpp">
-      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp">
-      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.cpp">
-      <Filter>Cloud\HTTP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.cpp">
-      <Filter>Cloud\HTTP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequest.cpp">
-      <Filter>Cloud\HTTP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp">
-      <Filter>Cloud\HTTP</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HMD\HMD.cpp">
-      <Filter>HMD</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp">
-      <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp">
-      <Filter>HMD\Oculus</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamApp.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamAppManager.cpp">
-      <Filter>DreamOS</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentAsset.cpp">
-      <Filter>Cloud\Environment</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\AnimationItem.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\AnimationQueue.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\AnimationTestSuite.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\InteractionEngine\AnimationState.cpp">
-      <Filter>InteractionEngine</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp">
-      <Filter>DreamGarage</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp">
-      <Filter>WebBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.cpp">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.cpp">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp">
-      <Filter>WebBrowser</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\WebBrowser\WebBrowserController.cpp">
-      <Filter>WebBrowser</Filter>
-    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp" />
+    <ClCompile Include="..\..\..\Cloud\CloudController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp" />
+    <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Controller.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentAsset.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Environment\PeerConnectionController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequest.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
+    <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCConductor.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\User\UserController.cpp" />
+    <ClCompile Include="..\..\..\Cloud\User\UserFactory.cpp" />
+    <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp" />
+    <ClCompile Include="..\..\..\Cloud\Websockets\Websocket.cpp" />
+    <ClCompile Include="..\..\..\Core\Utilities.cpp" />
+    <ClCompile Include="..\..\..\DreamApp.cpp" />
+    <ClCompile Include="..\..\..\DreamAppManager.cpp" />
+    <ClCompile Include="..\..\..\DreamConsole\CmdPrompt.cpp" />
+    <ClCompile Include="..\..\..\DreamConsole\Console.cpp" />
+    <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
+    <ClCompile Include="..\..\..\DreamOS.cpp" />
+    <ClCompile Include="..\..\..\DreamOSMain.cpp" />
+    <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
+    <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_OutputPlugins.cpp" />
+    <ClCompile Include="..\..\..\External\SOIL\image_DXT.c" />
+    <ClCompile Include="..\..\..\External\SOIL\image_helper.c" />
+    <ClCompile Include="..\..\..\External\SOIL\SOIL.c" />
+    <ClCompile Include="..\..\..\External\SOIL\stb_image_aug.c" />
+    <ClCompile Include="..\..\..\HAL\HALImp.cpp" />
+    <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLFragmentShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniform.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp" />
+    <ClCompile Include="..\..\..\HMD\HMD.cpp" />
+    <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
+    <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp" />
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationItem.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationQueue.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationState.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationTestSuite.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\Integrator.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp" />
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp" />
+    <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp" />
+    <ClCompile Include="..\..\..\Logger\Logger.cpp" />
+    <ClCompile Include="..\..\..\Primitives\camera.cpp" />
+    <ClCompile Include="..\..\..\Primitives\composite.cpp" />
+    <ClCompile Include="..\..\..\Primitives\cylinder.cpp" />
+    <ClCompile Include="..\..\..\Primitives\DimObj.cpp" />
+    <ClCompile Include="..\..\..\Primitives\DimRay.cpp" />
+    <ClCompile Include="..\..\..\Primitives\FlatContext.cpp" />
+    <ClCompile Include="..\..\..\Primitives\font.cpp" />
+    <ClCompile Include="..\..\..\Primitives\hand.cpp" />
+    <ClCompile Include="..\..\..\Primitives\line.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp" />
+    <ClCompile Include="..\..\..\Primitives\ObjectState.cpp" />
+    <ClCompile Include="..\..\..\Primitives\point.cpp" />
+    <ClCompile Include="..\..\..\Primitives\quad.cpp" />
+    <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
+    <ClCompile Include="..\..\..\Primitives\sphere.cpp" />
+    <ClCompile Include="..\..\..\Primitives\text.cpp" />
+    <ClCompile Include="..\..\..\Primitives\texture.cpp" />
+    <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp" />
+    <ClCompile Include="..\..\..\Primitives\Types\TypesTests.cpp" />
+    <ClCompile Include="..\..\..\Primitives\Types\UID.cpp" />
+    <ClCompile Include="..\..\..\Primitives\user.cpp" />
+    <ClCompile Include="..\..\..\Primitives\vector.cpp" />
+    <ClCompile Include="..\..\..\Primitives\version.cpp" />
+    <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
+    <ClCompile Include="..\..\..\Primitives\volume.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\SandboxFactory.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win32Helper.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Keyboard.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64Mouse.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp" />
+    <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStore.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseController.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
+    <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
+    <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp" />
+    <ClCompile Include="..\..\..\Test\TestObject.cpp" />
+    <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
+    <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />
+    <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
+    <ClCompile Include="..\..\..\UI\UIBar.cpp" />
+    <ClCompile Include="..\..\..\UI\UIMenuItem.cpp" />
+    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp" />
+    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp" />
+    <ClCompile Include="..\..\..\UI\UIModule.cpp" />
+    <ClCompile Include="..\..\..\UI\UITestSuite.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserController.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp" />
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\DreamOSMain.h">
-      <Filter>Main</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\RESULT\EHM.h">
-      <Filter>RESULT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\RESULT\RESULT.h">
-      <Filter>RESULT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Test\TestObject.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
-      <Filter>RESULT</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\DimObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\point.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\vector.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Types\Number.h">
-      <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h">
-      <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Types\Types.h">
-      <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h">
-      <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Types\UID.h">
-      <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h">
-      <Filter>Sandbox\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\SandboxApp.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\HAL.h">
-      <Filter>HAL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\opengl.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\HALImp.h">
-      <Filter>HAL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h">
-      <Filter>Sandbox\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\PathManager.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Core\Types\Factory.h">
-      <Filter>Core\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Core\Types\Object.h">
-      <Filter>Core\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Vertex.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\Shader.h">
-      <Filter>HAL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Triangle.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\color.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\quad.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\valid.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Core\config.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\camera.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\VirtualObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sense\SenseDevice.h">
-      <Filter>Sense</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sense\SenseKeyboard.h">
-      <Filter>Sense</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Subscriber.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Publisher.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h">
-      <Filter>Sandbox\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sense\SenseMouse.h">
-      <Filter>Sense</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h">
-      <Filter>Sandbox\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\volume.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\texture.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContext.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h">
-      <Filter>Sandbox\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OpenGLExtensions.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OpenGLCommon.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\quaternion.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\stereocamera.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\FileLoader.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h">
-      <Filter>HAL\opengl\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h">
-      <Filter>HAL\opengl\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h">
-      <Filter>HAL\opengl\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h">
-      <Filter>HAL\opengl\GL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\version.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\light.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\sphere.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\material.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\image_DXT.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\image_helper.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\SOIL.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h">
-      <Filter>External\SOIL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\uvcoord.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\TimeManager\TimeManager.h">
-      <Filter>TimeManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\model.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\skybox.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HMD\HMD.h">
-      <Filter>HMD</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HMD\Oculus\OVR.h">
-      <Filter>HMD\Oculus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HMD\HMDFactory.h">
-      <Filter>HMD</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Framebuffer.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\rectangle.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h">
-      <Filter>HMD\Oculus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h">
-      <Filter>HMD\Oculus</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLFragmentShader.h">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniform.h">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.h">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.h">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.h">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\shaders\OpenGLShader.h">
-      <Filter>HAL\opengl\shaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\text.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLText.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\font.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudController.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudImp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
-      <Filter>Sense</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\composite.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\hand.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudController.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudImp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamOS.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h">
-      <Filter>HMD\OpenVR</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h">
-      <Filter>Sense</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\dirty.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\Matrices\Matrices.h">
-      <Filter>External\Matrices</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\Matrices\Vectors.h">
-      <Filter>External\Matrices</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h">
-      <Filter>Cloud\webrtc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h">
-      <Filter>Cloud\webrtc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\CommandLineManager.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\User\UserFactory.h">
-      <Filter>Cloud\User</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPController.h">
-      <Filter>Cloud\HTTP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h">
-      <Filter>Cloud\Websockets</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPResponse.h">
-      <Filter>Cloud\HTTP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequest.h">
-      <Filter>Cloud\HTTP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\User\UserController.h">
-      <Filter>Cloud\User</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\User\User.h">
-      <Filter>Cloud\User</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h">
-      <Filter>Cloud\Environment</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Environment\Environment.h">
-      <Filter>Cloud\Environment</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h">
-      <Filter>Cloud\Environment</Filter>
-    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudController.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudImp.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudMessage.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h" />
+    <ClInclude Include="..\..\..\Cloud\Controller.h" />
+    <ClInclude Include="..\..\..\Cloud\ControllerObserver.h" />
+    <ClInclude Include="..\..\..\Cloud\ControllerProxy.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentAsset.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\PeerConnection.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPCommon.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.h" />
+    <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h" />
+    <ClInclude Include="..\..\..\Cloud\Menu\MenuNode.h" />
+    <ClInclude Include="..\..\..\Cloud\Message\Message.h" />
+    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
+    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h" />
+    <ClInclude Include="..\..\..\Cloud\CloudModel.h" />
+    <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\Environment.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h" />
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentPeer.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPController.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequest.h" />
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPResponse.h" />
+    <ClInclude Include="..\..\..\Cloud\User\User.h" />
+    <ClInclude Include="..\..\..\Cloud\User\UserController.h" />
+    <ClInclude Include="..\..\..\Cloud\User\UserFactory.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h" />
+    <ClInclude Include="..\..\..\Cloud\Websockets\Websocket.h" />
+    <ClInclude Include="..\..\..\Core\config.h" />
+    <ClInclude Include="..\..\..\Core\Types\Factory.h" />
+    <ClInclude Include="..\..\..\Core\Types\Object.h" />
+    <ClInclude Include="..\..\..\Core\Utilities.h" />
+    <ClInclude Include="..\..\..\DreamApp.h" />
+    <ClInclude Include="..\..\..\DreamAppManager.h" />
+    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h" />
+    <ClInclude Include="..\..\..\DreamConsole\Console.h" />
+    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
+    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h" />
+    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
+    <ClInclude Include="..\..\..\DreamOS.h" />
+    <ClInclude Include="..\..\..\DreamOSMain.h" />
+    <ClInclude Include="..\..\..\DreamOSWinMain.h" />
+    <ClInclude Include="..\..\..\External\Matrices\Matrices.h" />
+    <ClInclude Include="..\..\..\External\Matrices\Vectors.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_OutputPlugins.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Tools.h" />
-    <ClInclude Include="..\..\..\Cloud\Controller.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Message\Message.h">
-      <Filter>Cloud\Message</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h">
-      <Filter>Cloud\Message</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\user.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\BoundingVolume.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\BoundingSphere.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\line.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\BoundingBox.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\ObjectStore.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\FlatContext.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Environment\PeerConnectionController.h">
-      <Filter>Cloud\Environment</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Environment\PeerConnection.h">
-      <Filter>Cloud\Environment</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Types\GUID.h">
-      <Filter>Primitives\Types</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamOSWinMain.h">
-      <Filter>Main</Filter>
-    </ClInclude>
+    <ClInclude Include="..\..\..\External\SOIL\image_DXT.h" />
+    <ClInclude Include="..\..\..\External\SOIL\image_helper.h" />
+    <ClInclude Include="..\..\..\External\SOIL\SOIL.h" />
+    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug.h" />
+    <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h" />
+    <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h" />
+    <ClInclude Include="..\..\..\HAL\HAL.h" />
+    <ClInclude Include="..\..\..\HAL\HALImp.h" />
+    <ClInclude Include="..\..\..\HAL\HALTestSuite.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GLSLObject.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GL\glxext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\GL\wglext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLComposite.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLCylinder.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgram.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLText.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLCommon.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLExtensions.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLImp.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContext.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OpenGLUtility.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLFragmentShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniform.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLUniformBlock.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\shaders\OpenGLShader.h" />
+    <ClInclude Include="..\..\..\HAL\Shader.h" />
+    <ClInclude Include="..\..\..\HMD\HMD.h" />
+    <ClInclude Include="..\..\..\HMD\HMDFactory.h" />
+    <ClInclude Include="..\..\..\HMD\Oculus\OVR.h" />
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRMirrorTexture.h" />
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationItem.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationQueue.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationState.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationTestSuite.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\Integrator.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h" />
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingBox.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingSphere.h" />
+    <ClInclude Include="..\..\..\Primitives\BoundingVolume.h" />
+    <ClInclude Include="..\..\..\Logger\Logger.h" />
+    <ClInclude Include="..\..\..\Primitives\camera.h" />
+    <ClInclude Include="..\..\..\Primitives\color.h" />
+    <ClInclude Include="..\..\..\Primitives\composite.h" />
+    <ClInclude Include="..\..\..\Primitives\cylinder.h" />
+    <ClInclude Include="..\..\..\Primitives\DimObj.h" />
+    <ClInclude Include="..\..\..\Primitives\DimRay.h" />
+    <ClInclude Include="..\..\..\Primitives\dirty.h" />
+    <ClInclude Include="..\..\..\Primitives\FlatContext.h" />
+    <ClInclude Include="..\..\..\Primitives\font.h" />
+    <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
+    <ClInclude Include="..\..\..\Primitives\hand.h" />
+    <ClInclude Include="..\..\..\Primitives\light.h" />
+    <ClInclude Include="..\..\..\Primitives\line.h" />
+    <ClInclude Include="..\..\..\Primitives\Manager.h" />
+    <ClInclude Include="..\..\..\Primitives\material.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\matrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\ProjectionMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\RotationMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\model.h" />
+    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h" />
+    <ClInclude Include="..\..\..\Primitives\ObjectState.h" />
+    <ClInclude Include="..\..\..\Primitives\Publisher.h" />
+    <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h" />
+    <ClInclude Include="..\..\..\Primitives\quaternion.h" />
+    <ClInclude Include="..\..\..\Primitives\ray.h" />
+    <ClInclude Include="..\..\..\Primitives\rectangle.h" />
+    <ClInclude Include="..\..\..\Primitives\singleton.h" />
+    <ClInclude Include="..\..\..\Primitives\skybox.h" />
+    <ClInclude Include="..\..\..\Primitives\sphere.h" />
+    <ClInclude Include="..\..\..\Primitives\stereocamera.h" />
+    <ClInclude Include="..\..\..\Primitives\Subscriber.h" />
+    <ClInclude Include="..\..\..\Primitives\point.h" />
+    <ClInclude Include="..\..\..\Primitives\quad.h" />
+    <ClInclude Include="..\..\..\Primitives\text.h" />
+    <ClInclude Include="..\..\..\Primitives\texture.h" />
+    <ClInclude Include="..\..\..\Primitives\Triangle.h" />
+    <ClInclude Include="..\..\..\Primitives\TriangleIndexGroup.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\GUID.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\Number.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\TypeObj.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\Types.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\TypesTests.h" />
+    <ClInclude Include="..\..\..\Primitives\Types\UID.h" />
+    <ClInclude Include="..\..\..\Primitives\user.h" />
+    <ClInclude Include="..\..\..\Primitives\uvcoord.h" />
+    <ClInclude Include="..\..\..\Primitives\valid.h" />
+    <ClInclude Include="..\..\..\Primitives\vector.h" />
+    <ClInclude Include="..\..\..\Primitives\version.h" />
+    <ClInclude Include="..\..\..\Primitives\Vertex.h" />
+    <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
+    <ClInclude Include="..\..\..\Primitives\volume.h" />
+    <ClInclude Include="..\..\..\RESULT\EHM.h" />
+    <ClInclude Include="..\..\..\RESULT\RESULT.h" />
+    <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
+    <ClInclude Include="..\..\..\Sandbox\CommandLineManager.h" />
+    <ClInclude Include="..\..\..\Sandbox\FileLoader.h" />
+    <ClInclude Include="..\..\..\Sandbox\PathManager.h" />
+    <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
+    <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
+    <ClInclude Include="..\..\..\Sandbox\SandboxFactory.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Keyboard.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64Mouse.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h" />
+    <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStore.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h" />
+    <ClInclude Include="..\..\..\Sense\SenseController.h" />
+    <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
+    <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />
+    <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h" />
+    <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
+    <ClInclude Include="..\..\..\Test\MatrixTestSuite.h" />
+    <ClInclude Include="..\..\..\Test\TestObject.h" />
+    <ClInclude Include="..\..\..\Test\TestSuite.h" />
+    <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />
+    <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
+    <ClInclude Include="..\..\..\UI\UIBar.h" />
+    <ClInclude Include="..\..\..\UI\UIMenuItem.h" />
+    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h" />
+    <ClInclude Include="..\..\..\UI\UIMenuLayer.h" />
+    <ClInclude Include="..\..\..\UI\UIModule.h" />
+    <ClInclude Include="..\..\..\UI\UITestSuite.h" />
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h" />
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFAppObserver.h" />
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h" />
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.h" />
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h" />
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h" />
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserControllerFactory.h" />
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserManager.h" />
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.h">
-      <Filter>Cloud\webrtc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h">
-      <Filter>Cloud\webrtc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h">
-      <Filter>Cloud\webrtc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\Console.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLDreamConsole.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamConsole\CmdPrompt.h">
-      <Filter>DreamConsole</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Logger\Logger.h">
-      <Filter>Logger</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\Windows\Win32Helper.h">
-      <Filter>Sandbox\Windows</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\cylinder.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLCylinder.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ray.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Test\TestSuite.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix\matrix.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix\ProjectionMatrix.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix\RotationMatrix.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Test\MatrixTestSuite.h">
-      <Filter>Primitives\matrix</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
-      <Filter>Cloud\User</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
-      <Filter>Cloud\Message</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Sense\SenseController.h">
-      <Filter>Sense</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\DimRay.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
-      <Filter>DreamTestApp</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ObjectState.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\PhysicsEngine\Integrator.h">
-      <Filter>PhysicsEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Test\TestSuiteFactory.h">
-      <Filter>Test</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h">
-      <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h">
-      <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h">
-      <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h">
-      <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIBar.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuItem.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuLayer.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIModule.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UITestSuite.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h">
-      <Filter>Cloud\Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\ControllerProxy.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudMessage.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Core\Utilities.h">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CloudModel.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Menu\MenuNode.h">
-      <Filter>Cloud\Menu</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\ControllerObserver.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.h">
-      <Filter>Cloud\HTTP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.h">
-      <Filter>Cloud\HTTP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\HALTestSuite.h">
-      <Filter>HAL</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamApp.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamAppManager.h">
-      <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\Manager.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPCommon.h">
-      <Filter>Cloud\HTTP</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentAsset.h">
-      <Filter>Cloud\Environment</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\AnimationItem.h">
-      <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\AnimationQueue.h">
-      <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\AnimationTestSuite.h">
-      <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\InteractionEngine\AnimationState.h">
-      <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h">
-      <Filter>DreamGarage</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h">
-      <Filter>WebBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h">
-      <Filter>WebBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\WebBrowserControllerFactory.h">
-      <Filter>WebBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.h">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\WebBrowserManager.h">
-      <Filter>WebBrowser</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\singleton.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFAppObserver.h">
-      <Filter>WebBrowser\CEFBrowser</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\..\Makefile">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\..\Rakefile">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\..\Primitives\.DS_Store">
-      <Filter>Primitives</Filter>
-    </None>
+    <ResourceCompile Include="DreamOS.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\Models\face4\eye.tga" />
+    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga" />
+    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga" />
+    <Image Include="..\..\..\Texture\Fonts\Arial.png" />
+    <Image Include="..\..\..\Texture\Fonts\ArialDistance.png" />
+    <Image Include="..\..\..\Texture\mouth.png" />
+    <Image Include="Dream.ico" />
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="..\..\..\Resources\Fonts\Arial.fnt">
-      <Filter>Resources\Fonts</Filter>
-    </None>
-    <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt">
-      <Filter>Resources\Fonts</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\Primitives\plane.h">
-      <Filter>Primitives</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
-    </None>
-    <None Include="..\..\..\Models\face4\untitled.mtl">
-      <Filter>Models\face4</Filter>
-    </None>
-    <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="DreamOS.development.nuspec">
-      <Filter>NuGet</Filter>
-    </None>
-    <None Include="DreamOS.production.nuspec">
-      <Filter>NuGet</Filter>
-    </None>
-    <None Include="packages.config">
-      <Filter>NuGet</Filter>
-    </None>
-    <None Include="..\..\..\Scripts\make_production.py">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="..\..\..\Scripts\make_production_package.py">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="..\..\..\Scripts\copy_assets.py">
-      <Filter>Scripts</Filter>
-    </None>
-    <None Include="PropertySheet.props">
-      <Filter>Core</Filter>
-    </None>
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongShadow.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureBump.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\flat.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimal.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skybox.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\skyboxScatter.vert" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert" />
+    <None Include="..\..\..\Makefile" />
+    <None Include="..\..\..\Models\face4\untitled.mtl" />
+    <None Include="..\..\..\Primitives\.DS_Store" />
+    <None Include="..\..\..\Primitives\plane.h" />
+    <None Include="..\..\..\Rakefile" />
+    <None Include="..\..\..\Resources\Fonts\Arial.fnt" />
+    <None Include="..\..\..\Resources\Fonts\ArialDistance.fnt" />
+    <None Include="..\..\..\Scripts\copy_assets.py" />
+    <None Include="..\..\..\Scripts\make_production.py" />
+    <None Include="..\..\..\Scripts\make_production_package.py" />
+    <None Include="DreamOS.development.nuspec" />
+    <None Include="DreamOS.production.nuspec" />
+    <None Include="packages.config" />
+    <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js" />
+    <None Include="PropertySheet.props" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="DreamOS.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="Dream.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\..\..\Texture\Fonts\Arial.png">
-      <Filter>Texture\Fonts</Filter>
-    </Image>
-    <Image Include="..\..\..\Texture\Fonts\ArialDistance.png">
-      <Filter>Texture\Fonts</Filter>
-    </Image>
-    <Image Include="..\..\..\Models\face4\eye.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__0_Falloff.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
-    <Image Include="..\..\..\Models\face4\Map__12_Falloff.tga">
-      <Filter>Models\face4</Filter>
-    </Image>
-    <Image Include="..\..\..\Texture\mouth.png">
-      <Filter>Texture</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj" />
   </ItemGroup>
 </Project>

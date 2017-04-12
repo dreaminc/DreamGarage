@@ -10,6 +10,8 @@ AnimationItem::AnimationItem(AnimationState startState, AnimationState endState,
 	m_endState = endState;
 	m_duration = duration;
 	m_startTime = startTime;
+	fnOnAnimationEnded = nullptr;
+	fnOnAnimationEndedContext = nullptr;
 
 	Validate();
 	return;
@@ -58,11 +60,12 @@ RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, double msN
 	double diff = msNow - m_startTime;
 	double prog = diff / m_duration;
 	prog = std::min(1.0, prog);
+	prog = m_curveType.GetAnimationProgress(prog);
 
 	AnimationState updateState;
 		
-	//TODO replace with animation curves 
 	updateState.ptPosition = ((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
+	updateState.qRotation = m_startState.qRotation.RotateToQuaternionLerp(m_endState.qRotation, prog);
 	updateState.vScale = ((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
 	CR(state.Compose(updateState));
 Error:
@@ -77,11 +80,34 @@ bool AnimationItem::IsComplete(double msNow) {
 	return prog >= 1.0;
 }
 
-AnimationItem::AnimationFlags AnimationItem::GetFlags() {
+AnimationFlags AnimationItem::GetFlags() {
 	return m_flags;
 }
 
 RESULT AnimationItem::SetFlags(AnimationFlags flags) {
 	m_flags = flags;
+	return R_PASS;
+}
+
+RESULT AnimationItem::SetCurveType(AnimationCurveType type) {
+	m_curveType = AnimationCurve(type);
+	return R_PASS;
+}
+
+std::function<RESULT(void*)> AnimationItem::GetAnimationEndedCallback() {
+	return fnOnAnimationEnded;
+}
+
+RESULT AnimationItem::SetAnimationEndedCallback(std::function<RESULT(void*)> callback) {
+	fnOnAnimationEnded = callback;
+	return R_PASS;
+}
+
+void* AnimationItem::GetCallbackContext() {
+	return fnOnAnimationEndedContext;
+}
+
+RESULT AnimationItem::SetCallbackContext(void* context) {
+	fnOnAnimationEndedContext = context;
 	return R_PASS;
 }
