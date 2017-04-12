@@ -468,13 +468,9 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 			} break;
 
 			case SENSE_CONTROLLER_MENU_UP: {
-				for (auto &pObject : m_activeObjects) {
-					if (pObject->GetState() == ActiveObject::state::INTERSECTED) {
-						InteractionEventType type = INTERACTION_EVENT_MENU;
-						InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
-						CR(NotifySubscribers(type, &interactionEvent));
-					}
-				}
+				InteractionEventType type = INTERACTION_EVENT_MENU;
+				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, nullptr);
+				CR(NotifySubscribers(type, &interactionEvent));
 			} break;
 
 			case SENSE_CONTROLLER_PAD_MOVE: {

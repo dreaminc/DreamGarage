@@ -65,7 +65,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED,
 		std::bind(&DreamUIBar::HandleTouchEnd, this, std::placeholders::_1)));
 
-	CR(RegisterEvent(InteractionEventType::INTERACTION_EVENT_SELECT,
+	CR(RegisterEvent(InteractionEventType::INTERACTION_EVENT_SELECT_UP,
 		std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
 	CR(RegisterEvent(InteractionEventType::INTERACTION_EVENT_MENU,
