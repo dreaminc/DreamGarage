@@ -7,25 +7,25 @@
 
 #include "include\cef_sandbox_win.h"
 
+#include "RESULT/EHM.h"
+
+#include "WebBrowser/CEFBrowser/CEFApp.h"
 
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
-	CefMainArgs args(GetModuleHandle(NULL));
+	RESULT r = R_PASS;
 
-	int result = CefExecuteProcess(args, nullptr, nullptr);
+	// Enable High-DPI support on Windows 7 or newer.
+	//CefEnableHighDPISupport();
 
-	if (result >= 0) // child proccess has endend, so exit.
-	{
-		return result;
-	}
+	CefMainArgs cefMainArgs(hInstance);
 
-	if (result == -1)
-	{
-		// parent process proccess.
-	}
+	// Optional implementation of the CefApp interface.
+	//CefRefPtr<CEFApp> pCEFApp(new CEFApp);
 
-	return 0;
+	//return CefExecuteProcess(cefMainArgs, pCEFApp.get(), nullptr);
+	return CefExecuteProcess(cefMainArgs, nullptr, nullptr);
 }

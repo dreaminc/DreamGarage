@@ -145,8 +145,7 @@ private:
 
 private:
 	RESULT Notify(CmdPromptEvent *event);
-	RESULT Notify(SenseKeyboardEvent *kbEvent);
-	RESULT Notify(SenseMouseEvent *mEvent);
+	//RESULT Notify(SenseMouseEvent *mEvent);
 
 	// TODO: The Eye Buffers shouldn't be in the OpenGLImp
 	// Best to push into FrameBuffer -> OGLFrameBuffer then attach to HMD or stereo camera

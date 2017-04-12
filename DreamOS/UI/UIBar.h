@@ -25,7 +25,7 @@ typedef struct RadialLayerFormat {
 	vector itemScale;
 	float itemScaleSelected;
 
-	// header 
+	// header
 	float headerAngleX;
 	float headerPosY;
 
@@ -47,8 +47,8 @@ class UIBar : public UIModule {
 public:
 	UIBar();
 
-	RESULT SetParams(const IconFormat& iconFormat, 
-			const LabelFormat& labelFormat, 
+	RESULT SetParams(const IconFormat& iconFormat,
+			const LabelFormat& labelFormat,
 			const RadialLayerFormat& menuFormat,
 			const RadialLayerFormat& titleFormat);
 	~UIBar();

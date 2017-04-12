@@ -160,15 +160,7 @@ RESULT camera::AddUpSpeed(camera_precision speed) {
 	return R_PASS;
 }
 
-RESULT camera::Notify(HMDEvent *hmdEvent) {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("Cam hmd event");//, kbEvent->KeyCode, kbEvent->KeyState);
-
-//	Error:
-	return r;
-}
-
+/*
 RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
@@ -200,7 +192,9 @@ RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 
 	return r;
 }
+*/
 
+/*
 RESULT camera::Notify(TimeEvent *event) {
 	//LOG(INFO) << "time";
 
@@ -235,6 +229,7 @@ RESULT camera::Notify(TimeEvent *event) {
 
 	return R_PASS;
 }
+*/
 
 // Deviation vector is a vector of deviation from the origin point
 // So resulting point = ptOrigin + vDeviation
@@ -360,21 +355,6 @@ ray camera::GetRay(int xPos, int yPos) {
 	
 bool camera::IsAllowedMoveByKeys() {
 	return m_allowMoveByKeys;
-}
-
-RESULT camera::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	if (event->GetArg(1).compare("list") == 0) {
-		HUD_OUT("move : toggle move around using key / mouse");
-	}
-
-	if (event->GetArg(1).compare("move") == 0) {
-		m_allowMoveByKeys = !m_allowMoveByKeys;
-		HUD_OUT((std::string("allow move by keys <- ") + ((m_allowMoveByKeys) ? "on" : "off")).c_str());
-	}
-
-	return r;
 }
 
 quaternion camera::GetOffsetOrientation() {

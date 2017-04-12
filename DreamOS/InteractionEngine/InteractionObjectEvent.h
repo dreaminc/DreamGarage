@@ -20,6 +20,11 @@ typedef enum InteractionEventType {
 	ELEMENT_INTERSECT_CANCELLED,
 	INTERACTION_EVENT_SELECT,
 	INTERACTION_EVENT_MENU,
+	INTERACTION_EVENT_SELECT_DOWN,
+	INTERACTION_EVENT_SELECT_UP,
+	INTERACTION_EVENT_WHEEL,		// TODO: Should we change this to pad and pass a point?
+	INTERACTION_EVENT_KEY_DOWN,
+	INTERACTION_EVENT_KEY_UP,
 	INTERACTION_EVENT_INVALID
 } INTERACTION_EVENT_TYPE;
 
@@ -32,14 +37,17 @@ typedef struct InteractionObjectEvent {
 	point m_ptContact[4];
 	vector m_vNormal[4];
 	int m_numContacts;
+	
+	int m_value;
 
 	// TODO: Add time of collision
-
 	InteractionObjectEvent(InteractionEventType eventType, std::shared_ptr<ray> pInteractionRay, VirtualObj *pObject);
 
 public:
 	RESULT AddPoint(point ptContact, vector vNormal);
 	RESULT AddPoint(ContactPoint contactPoint);
+
+	RESULT SetValue(int val);
 
 } INTERACTION_OBJECT_EVENT;
 

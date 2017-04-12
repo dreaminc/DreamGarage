@@ -1,0 +1,71 @@
+#ifndef CEF_BROWSER_MANAGER_H_
+#define CEF_BROWSER_MANAGER_H_
+
+#include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/WebBrowser/CEFBrowser/CEFBrowserManager.h
+// The CEF implementation of browser manager
+
+#define CEF_PROCESS_NAME_DEFAULT "DreamCef.exe"
+
+#ifdef LOG
+#undef LOG
+#endif
+
+#ifdef PLOG
+#undef PLOG
+#endif
+
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <string>
+#include "WebBrowser/WebBrowserManager.h"
+
+#include "CEFAppObserver.h"
+
+class CEFApp;
+class CEFBrowserController;
+
+class CEFBrowserManager : public WebBrowserManager, public CEFAppObserver {
+public:
+	enum class state {
+		UNINITIALIZED,
+		INITIALIZING,
+		INITIALIZED,
+		INITIALIZATION_FAILED,
+		INVALID
+	};
+
+public:
+	CEFBrowserManager();
+	~CEFBrowserManager();
+
+public:
+	virtual RESULT Initialize() override;
+	virtual RESULT Update() override;
+	virtual RESULT Shutdown() override;
+
+	virtual std::shared_ptr<WebBrowserController> MakeNewBrowser(int width, int height, const std::string& strURL) override;
+
+private:
+	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) override;
+	virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) override;
+
+	std::shared_ptr<CEFBrowserController> GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser);
+
+private:
+	RESULT CEFManagerThread();
+
+private:
+	state m_state = state::UNINITIALIZED;
+
+	const std::string k_CEFProcessName = CEF_PROCESS_NAME_DEFAULT;
+	std::thread m_ServiceThread;
+
+	std::mutex m_mutex;
+	std::condition_variable m_condBrowserInit;
+};
+
+#endif // ! CEF_BROWSER_MANAGER_H_

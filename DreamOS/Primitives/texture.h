@@ -81,7 +81,7 @@ public:
 	RESULT LoadCubeMapByName(wchar_t * pszName);
 	RESULT CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n);
 
-	virtual RESULT Update(unsigned char* pixels, int width, int height, texture::PixelFormat format);
+	virtual RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat);
 
 	static CUBE_MAP GetCubeMapTypeFromFilename(std::wstring strFilename);
 

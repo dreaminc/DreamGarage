@@ -352,14 +352,18 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 	cState.triggerRange = ((inputState.Buttons & 1) != 0) ? 1.0f : 0.0f;
 	//cState.triggerRange = (inputState.IndexTrigger[cState.type]);
 
-	if (type == ovrControllerType::ovrControllerType_LTouch) {
-		cState.type = CONTROLLER_LEFT;
-	}
-	else if (type == ovrControllerType::ovrControllerType_RTouch) {
-		cState.type = CONTROLLER_RIGHT;
-	}
-	else {
-		return r;
+	switch(type) {
+		case ovrControllerType::ovrControllerType_LTouch: {
+			cState.type = CONTROLLER_LEFT;
+		} break;
+	
+		case ovrControllerType::ovrControllerType_RTouch: {
+			cState.type = CONTROLLER_RIGHT;
+		} break;
+
+		default: {
+			return r;
+		} break;
 	}
 
 	cState.fGrip = (inputState.HandTrigger[cState.type] > 0.9f);

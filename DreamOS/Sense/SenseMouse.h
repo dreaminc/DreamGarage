@@ -62,8 +62,14 @@ protected:
 	bool m_fMouseCaptured;
 
 	// Mouse dragging states
-	enum class MouseDrag { None, Left, Right };
-	MouseDrag m_dragState = MouseDrag::None;
+	enum class MouseDrag { 
+		LEFT_BUTTON, 
+		RIGHT_BUTTON, 
+		MIDDLE_BUTTON,
+		NONE 
+	};
+
+	MouseDrag m_dragState = MouseDrag::NONE;
 	int m_dragOriginX = 0;
 	int m_dragOriginY = 0;
 

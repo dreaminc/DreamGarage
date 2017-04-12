@@ -78,13 +78,15 @@ public:
 public:
 	RESULT Initialize(int argc = 0, const char *argv[] = nullptr);
 	RESULT RunAppLoop();
+	RESULT Shutdown();
 
 	virtual RESULT InitializeSandbox() = 0;
 	virtual RESULT Show() = 0;
-	virtual RESULT Shutdown() = 0;
+	
 	virtual RESULT RecoverDisplayMode() = 0;		// Do all sandboxes need this ultimately? 
 	virtual RESULT HandleMessages() = 0;
 	virtual RESULT SwapDisplayBuffers() = 0;
+	virtual RESULT ShutdownSandbox() = 0;
 
 private:
 	RESULT InitializePhysicsEngine();

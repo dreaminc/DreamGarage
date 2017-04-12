@@ -3,8 +3,8 @@
 
 #include "RESULT/EHM.h"
 
-// Dream Interaction Engine 
-// This class combines the various components required for a 
+// Dream Interaction Engine
+// This class combines the various components required for a
 // functional interaction engine, such as collision detection and resolution as well
 // as integration of animation and the relevant queue
 
@@ -21,6 +21,8 @@
 #include "Primitives/Publisher.h"
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseController.h"
+#include "Sense/SenseMouse.h"
+#include "Sense/SenseKeyboard.h"
 
 #include <vector>
 
@@ -39,24 +41,30 @@ class InteractionObject {
 
 };
 */
+class SandboxApp;
 
-class InteractionEngine : public valid, public Publisher<InteractionEventType, InteractionObjectEvent>, public Subscriber<SenseControllerEvent> {
+class InteractionEngine : public valid,
+	public Publisher<InteractionEventType, InteractionObjectEvent>,
+	public Subscriber<SenseControllerEvent>,
+	public Subscriber<SenseMouseEvent>,
+	public Subscriber<SenseKeyboardEvent>,		// TODO: This is redundant, both can be one event
+	public Subscriber<SenseTypingEvent>
+{
 public:
-	static std::unique_ptr<InteractionEngine> MakeEngine();
+	static std::unique_ptr<InteractionEngine> MakeEngine(SandboxApp *pSandbox);
 
 private:
-	InteractionEngine();
+	InteractionEngine(SandboxApp *pSandbox);
 
 	RESULT Initialize();
 
 public:
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
-	RESULT UpdateAnimationQueue(); 
+	RESULT UpdateAnimationQueue();
 	RESULT SetInteractionGraph(ObjectStore *pObjectStore);
 
 	RESULT UpdateInteractionPrimitive(const ray &r);
-
 	RESULT SetInteractionDiffThreshold(double thresh);
 
 	//RESULT RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
@@ -81,14 +89,21 @@ public:
 
 	RESULT CancelAnimation(VirtualObj *pObj);
 
-	virtual RESULT Notify(SenseControllerEvent *event) override;
+	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
+	virtual RESULT Notify(SenseMouseEvent *pEvent) override;
+	virtual RESULT Notify(SenseKeyboardEvent *pEvent) override;
+	virtual RESULT Notify(SenseTypingEvent *pEvent) override;
 
 	RESULT RegisterSenseController(SenseController *pSenseController);
+	RESULT RegisterSenseMouse();
+	RESULT RegisterSenseKeyboard();
+
+	RESULT UpdateInteractionRay();
 
 private:
 	std::shared_ptr<ray> m_pInteractionRay = nullptr;
 	std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
-	
+
 	AnimationQueue* m_pObjectQueue;
 
 /*private:
@@ -101,6 +116,8 @@ public:
 
 private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;
+	SandboxApp *m_pSandbox = nullptr;
+	double m_interactionPadAccumulator = 0.0f;
 
 private:
 	UID m_uid;

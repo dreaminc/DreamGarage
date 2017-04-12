@@ -32,6 +32,7 @@ public:
 
 	RESULT AddTestInteractionFauxUI();
 	RESULT AddTestSharedContentView();
+	RESULT AddTestBrowser();
 
 	virtual RESULT AddTests() override;
 

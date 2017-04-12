@@ -33,7 +33,10 @@
 
 class SandboxApp;
 
-class HALImp : public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent>, public valid {
+class HALImp : 
+	//public Subscriber<SenseMouseEvent>, 
+	public valid 
+{
 	friend class SandboxApp;
 public:
 	struct HALConfiguration {

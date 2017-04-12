@@ -31,6 +31,7 @@ public:
 
 	virtual RESULT Initialize() override;
 	virtual RESULT Update() override;
+	virtual RESULT Shutdown() override;
 
 	// TODO: This is here because of template silliness - but should be 
 	// put into a .tpp file with an #include of said tpp file at the end

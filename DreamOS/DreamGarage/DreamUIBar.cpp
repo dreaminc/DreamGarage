@@ -206,6 +206,10 @@ Error:
 	return r;
 }
 
+RESULT DreamUIBar::Shutdown(void *pContext) {
+	return R_NOT_IMPLEMENTED;
+}
+
 RESULT DreamUIBar::Notify(InteractionObjectEvent *event) {
 	RESULT r = R_PASS;
 

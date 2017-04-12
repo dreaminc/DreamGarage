@@ -413,13 +413,7 @@ RESULT Windows64App::InitializeSandbox() {
 	
 		if (m_pHMD != nullptr) {
 			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
-
-			SenseController *pSenseController = m_pHMD->GetSenseController();
-			if (pSenseController != nullptr) {
-				m_pInteractionEngine->RegisterSenseController(pSenseController);
-			}
 		}
-
 	}
 
 	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
@@ -619,7 +613,7 @@ bool Windows64App::HandleKeyEvent(const MSG& windowMassage) {
 	return fHandled;
 }
 
-RESULT Windows64App::Shutdown() {
+RESULT Windows64App::ShutdownSandbox() {
 	RESULT r = R_PASS;
 
 	CR(SetSandboxRunning(false));

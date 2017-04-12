@@ -52,29 +52,31 @@ RESULT SenseMouse::PrintEvent(SenseMouseEvent *pEvent) {
 RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int newY, int state) {
 	RESULT r = R_PASS;
 
-	SenseMouseEvent mEvent(eventType, newX, newY, m_MousePosition.xPos, m_MousePosition.yPos, state);
+	SenseMouseEvent mEvent(eventType, newX, newY, m_lastX, m_lastY, state);
 
-	if (m_dragState == MouseDrag::None && (eventType == SENSE_MOUSE_LEFT_BUTTON_DOWN || eventType == SENSE_MOUSE_RIGHT_BUTTON_DOWN)) {
-		m_dragState = (eventType == SENSE_MOUSE_LEFT_BUTTON_DOWN) ? MouseDrag::Left : MouseDrag::Right;
+	mEvent.dx = (newX - m_lastX);
+	mEvent.dy = (newY - m_lastY);
+
+	CR(NotifySubscribers(eventType, &mEvent));
+
+	m_MousePosition = { newX, newY };
+
+	/*
+	// TODO: Fix dragging
+	if (m_dragState == MouseDrag::NONE && (eventType == SENSE_MOUSE_LEFT_BUTTON_DOWN || eventType == SENSE_MOUSE_RIGHT_BUTTON_DOWN)) {
+		m_dragState = (eventType == SENSE_MOUSE_LEFT_BUTTON_DOWN) ? MouseDrag::LEFT_BUTTON : MouseDrag::RIGHT_BUTTON;
 
 		m_dragOriginX = newX;
 		m_dragOriginY = newY;
-
-		ShowCursor(false);
-
-		CenterMousePosition();
 	}
 
-	if ((m_dragState == MouseDrag::Left && eventType == SENSE_MOUSE_LEFT_BUTTON_UP) ||
-		(m_dragState == MouseDrag::Right && eventType == SENSE_MOUSE_RIGHT_BUTTON_UP) ){
-		m_dragState = MouseDrag::None;
-
-		SetMousePosition(m_dragOriginX, m_dragOriginY);
-		ShowCursor(true);
+	if ((m_dragState == MouseDrag::LEFT_BUTTON && eventType == SENSE_MOUSE_LEFT_BUTTON_UP) ||
+		(m_dragState == MouseDrag::RIGHT_BUTTON && eventType == SENSE_MOUSE_RIGHT_BUTTON_UP) ){
+		m_dragState = MouseDrag::NONE;
 	}
 
-	if (m_dragState != MouseDrag::None && eventType == SENSE_MOUSE_MOVE) {
-		if (m_dragState == MouseDrag::Left) {
+	if (m_dragState != MouseDrag::NONE && eventType == SENSE_MOUSE_MOVE) {
+		if (m_dragState == MouseDrag::LEFT_BUTTON) {
 			eventType = SENSE_MOUSE_LEFT_DRAG_MOVE;
 			mEvent.EventType = SENSE_MOUSE_LEFT_DRAG_MOVE;
 		}
@@ -91,24 +93,13 @@ RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int ne
 
 		mEvent.dx = (xPos - xCenter) * 1;
 		mEvent.dy = (yPos - yCenter) * 1;
-
-		CenterMousePosition();
 	}
 
 	if ((eventType == SENSE_MOUSE_LEFT_DRAG_MOVE || eventType == SENSE_MOUSE_RIGHT_DRAG_MOVE) && (mEvent.dx != 0 || mEvent.dy != 0)) {
 		CR(NotifySubscribers(eventType, &mEvent));
 	}
-	else if (eventType == SENSE_MOUSE_MOVE) {
-		//if (m_lastX == newX && m_lastY == newY) {
-			mEvent.dx = (newX - m_lastX);
-			mEvent.dy = (newY - m_lastY);
-			CR(NotifySubscribers(eventType, &mEvent));
-		//}
-	}
-	else {
-		// TODO: Why any different than drag above or otherwise. 
-		CR(NotifySubscribers(eventType, &mEvent));
-	}
+	else 
+	*/
 
 Error:
 	m_lastX = newX;

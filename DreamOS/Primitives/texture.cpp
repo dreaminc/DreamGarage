@@ -446,6 +446,6 @@ Error:
 	return r;
 }
 
-RESULT texture::Update(unsigned char* pixels, int width, int height, texture::PixelFormat format) {
+RESULT texture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {
 	return R_NOT_IMPLEMENTED;
 }

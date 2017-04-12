@@ -39,3 +39,8 @@ RESULT InteractionObjectEvent::AddPoint(ContactPoint contactPoint) {
 Error:
 	return r;
 }
+
+RESULT InteractionObjectEvent::SetValue(int val) {
+	m_value = val;
+	return R_PASS;
+}

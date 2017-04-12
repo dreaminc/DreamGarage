@@ -38,7 +38,10 @@
 
 #include "DreamAppManager.h"
 
-class DreamOS : public Subscriber<CollisionObjectEvent>, public valid {
+class DreamOS : 
+	public Subscriber<CollisionObjectEvent>, 
+	public valid 
+{
 	friend class CloudTestSuite;
 
 	// TODO: this needs to be revisited

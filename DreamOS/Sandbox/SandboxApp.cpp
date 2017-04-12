@@ -200,25 +200,24 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	CR(RegisterSubscriber(SVK_ALL, DreamConsole::GetConsole()));
 	CR(RegisterSubscriber(CHARACTER_TYPING, DreamConsole::GetConsole()));
 
-	camera *pCamera = m_pHALImp->GetCamera();
+	//camera *pCamera = m_pHALImp->GetCamera();
 
-	CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
+	//CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
 
-	CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
+	//CR(RegisterSubscriber(TIME_ELAPSED, pCamera));
 
-	CR(RegisterSubscriber(SVK_LEFT, pCamera));
-	CR(RegisterSubscriber(SVK_UP, pCamera));
-	CR(RegisterSubscriber(SVK_DOWN, pCamera));
-	CR(RegisterSubscriber(SVK_RIGHT, pCamera));
+	//CR(RegisterSubscriber(SVK_LEFT, pCamera));
+	//CR(RegisterSubscriber(SVK_UP, pCamera));
+	//CR(RegisterSubscriber(SVK_DOWN, pCamera));
+	//CR(RegisterSubscriber(SVK_RIGHT, pCamera));
 	
-	CR(RegisterSubscriber(SVK_SPACE, pCamera));
+	//CR(RegisterSubscriber(SVK_SPACE, pCamera));
 
+	/*
 	for (int i = 0; i < 26; i++) {
 		CR(RegisterSubscriber((SenseVirtualKey)('A' + i), pCamera));
 	}
-
-	CR(RegisterSubscriber((SenseVirtualKey)('F'), m_pHALImp));
-	//CR(m_pWin64Keyboard->UnregisterSubscriber((SK_SCAN_CODE)('F'), pCamera));
+	*/
 
 Error:
 	return r;
@@ -233,12 +232,14 @@ RESULT SandboxApp::RegisterImpMouseEvents() {
 
 	// TODO: Should either be moved up to the sandbox or into the Imp itself
 	//CR(RegisterSubscriber(SENSE_MOUSE_MOVE, m_pHALImp));
+	/*
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_DRAG_MOVE, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_DOWN, m_pHALImp));
 	CR(RegisterSubscriber(SENSE_MOUSE_RIGHT_BUTTON_UP, m_pHALImp));
+	*/
 
 
 Error:
@@ -325,6 +326,21 @@ inline PathManager* SandboxApp::GetPathManager() {
 
 inline OpenGLRenderingContext * SandboxApp::GetOpenGLRenderingContext() {
 	return m_pOpenGLRenderingContext; 
+}
+
+RESULT SandboxApp::Shutdown() {
+	RESULT r = R_SUCCESS;
+
+	if (m_pDreamAppManager != nullptr) {
+		CR(m_pDreamAppManager->Shutdown());
+		m_pDreamAppManager = nullptr;
+	}
+
+	// Implementation specific shutdown
+	CR(ShutdownSandbox());
+
+Error:
+	return r;
 }
 
 RESULT SandboxApp::RunAppLoop() {
@@ -475,8 +491,6 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
-	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
-	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
 
 	// TODO: Remove CMD line arg and use global config
 	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
@@ -489,6 +503,11 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 
 	// TODO: Show this be replaced with individual initialization of each component?
 	CRM(InitializeSandbox(), "Failed to initialize sandbox");
+
+	// TODO: These have dependencies potentially on previous modules
+	// TODO: Need to create proper module loading / dependency system
+	CRM(InitializePhysicsEngine(), "Failed to initialize physics engine");
+	CRM(InitializeInteractionEngine(), "Failed to initialize interaction engine");
 
 	CommandLineManager::instance()->ForEach([](const std::string& arg) {
 		HUD_OUT(("arg :" + arg).c_str());
@@ -530,7 +549,7 @@ Error:
 RESULT SandboxApp::InitializeInteractionEngine() {
 	RESULT r = R_PASS;
 
-	m_pInteractionEngine = InteractionEngine::MakeEngine();
+	m_pInteractionEngine = InteractionEngine::MakeEngine(this);
 	CNMW(m_pInteractionEngine, "Interaction Engine failed to initialize");
 
 	// Set up interaction graph
@@ -538,6 +557,13 @@ RESULT SandboxApp::InitializeInteractionEngine() {
 	CNM(m_pInteractionGraph, "Failed to allocate interaction Graph");
 
 	CRM(m_pInteractionEngine->SetInteractionGraph(m_pInteractionGraph), "Failed to set interaction object store");
+
+	if (m_pHMD != nullptr) {
+		SenseController *pSenseController = m_pHMD->GetSenseController();
+		if (pSenseController != nullptr) {
+			m_pInteractionEngine->RegisterSenseController(pSenseController);
+		}
+	}
 
 Error:
 	return r;
@@ -1115,6 +1141,7 @@ Error:
 RESULT SandboxApp::RegisterSubscriber(SenseMouseEventType mouseEvent, Subscriber<SenseMouseEvent>* pMouseSubscriber) {
 	RESULT r = R_PASS;
 
+	CNM(m_pSenseMouse, "Mouse not initialized");
 	CR(m_pSenseMouse->RegisterSubscriber(mouseEvent, pMouseSubscriber));
 
 Error:

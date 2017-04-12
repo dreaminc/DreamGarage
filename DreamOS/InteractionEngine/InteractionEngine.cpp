@@ -1,11 +1,14 @@
 #include "InteractionEngine.h"
+#include "Sandbox/SandboxApp.h"
 
 #include "Scene/ObjectStore.h"
 #include "AnimationQueue.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
-InteractionEngine::InteractionEngine() {
+InteractionEngine::InteractionEngine(SandboxApp *pSandbox) :
+	m_pSandbox(pSandbox)
+{
 	// empty
 }
 
@@ -23,30 +26,70 @@ RESULT InteractionEngine::Initialize() {
 
 	m_pObjectQueue = new AnimationQueue();
 
+	CR(RegisterSenseMouse());
+	CR(RegisterSenseKeyboard());
+
 Error:
 	return r;
 }
 
+// TODO: Move to sandbox implementation
 RESULT InteractionEngine::RegisterSenseController(SenseController* pSenseController) {
 	RESULT r = R_PASS;
 
 	CN(pSenseController);
+
 	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this));
 	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_UP, this));
+	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_TRIGGER_DOWN, this));
+	CR(pSenseController->RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_PAD_MOVE, this));
 
 Error:
 	return r;
 }
 
-std::unique_ptr<InteractionEngine> InteractionEngine::MakeEngine() {
+RESULT InteractionEngine::RegisterSenseKeyboard() {
 	RESULT r = R_PASS;
 
-	auto pInteractionEngine = std::unique_ptr<InteractionEngine>(new InteractionEngine());
-	CNM(pInteractionEngine, "Failed to allocate new interaction engine");
-	CRM(pInteractionEngine->Initialize(), "Failed to initialize interaction engine");
+	CN(m_pSandbox);
 
-//Success:
-	return pInteractionEngine;
+	// Register Dream Console to keyboard events
+	CR(m_pSandbox->RegisterSubscriber(SVK_ALL, this));
+	CR(m_pSandbox->RegisterSubscriber(CHARACTER_TYPING, this));
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::RegisterSenseMouse() {
+	RESULT r = R_PASS;
+
+	CN(m_pSandbox);
+
+	CR(m_pSandbox->RegisterSubscriber(SENSE_MOUSE_MOVE, this));
+	CR(m_pSandbox->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, this));
+	CR(m_pSandbox->RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_DOWN, this));
+	CR(m_pSandbox->RegisterSubscriber(SENSE_MOUSE_WHEEL, this));
+
+Error:
+	return r;
+}
+
+std::unique_ptr<InteractionEngine> InteractionEngine::MakeEngine(SandboxApp *pSandbox) {
+	RESULT r = R_PASS;
+
+	CN(pSandbox);
+
+	{
+
+		auto pInteractionEngine = std::unique_ptr<InteractionEngine>(new InteractionEngine(pSandbox));
+
+		CNM(pInteractionEngine, "Failed to allocate new interaction engine");
+		CRM(pInteractionEngine->Initialize(), "Failed to initialize interaction engine");
+
+		//Success:
+		return pInteractionEngine;
+	}
 
 Error:
 	return nullptr;
@@ -134,7 +177,7 @@ Error:
 
 RESULT InteractionEngine::CancelAnimation(VirtualObj *pObj) {
 	RESULT r = R_PASS;
-	
+
 	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	msNow /= 1000.0;
@@ -144,11 +187,73 @@ Error:
 	return r;
 }
 
+// TODO: Tidy up / test this code
+RESULT InteractionEngine::UpdateInteractionRay() {
+	RESULT r = R_PASS;
+
+	ray rCast;
+	hand *pRightHand = m_pSandbox->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+
+	if (pRightHand != nullptr) {
+		point ptHand = pRightHand->GetPosition();
+
+		//GetLookVector
+		quaternion qHand = pRightHand->GetHandState().qOrientation;
+		qHand.Normalize();
+
+		/*
+		if (m_pTestRayController != nullptr) {
+		m_pTestRayController->SetPosition(ptHand);
+		m_pTestRayController->SetOrientation(qHand);
+		}
+		//*/
+
+		//TODO: investigate how to properly get look vector for controllers
+		//vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+
+		vector vHandLook = RotationMatrix(qHand) * vector(0.0f, 0.0f, -1.0f);
+		vHandLook.Normalize();
+
+		vector vCast = vector(-vHandLook.x(), -vHandLook.y(), vHandLook.z());
+		/*
+		if (m_pTestRayController != nullptr) {
+		m_pTestRayLookV->SetPosition(ptHand);
+		m_pTestRayLookV->SetOrientation(quaternion(vHandLook));
+		}
+		//*/
+		// Accommodate for composite collision bug
+		//ptHand = ptHand + point(-10.0f * vCast);
+		//rCast = ray(ptHand, vCast);
+		//rCast = m_pTestRayController->GetRayFromVerts();
+
+		rCast = ray(ptHand, vHandLook);
+		CR(UpdateInteractionPrimitive(rCast));
+	}
+	/*
+	// This is handled by mouse move events
+	else {
+		CR(m_pSandbox->GetMouseRay(rCast, 0.0f));
+		CR(UpdateInteractionPrimitive(rCast));
+	}
+	*/
+
+// Success:
+	return r;
+
+Error:
+	UpdateInteractionPrimitive(ray(point(0.0f, 0.0f, 0.0f), vector(0.0f, 0.0f, 0.0f)));
+	return r;
+}
+
 // TODO: This is temporary
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
 	std::vector<std::shared_ptr<ActiveObject>> activeObjectsToRemove;
+
+
+	// TODO: This should move up into a generic update call
+	CR(UpdateInteractionRay());
 
 	// Check interaction primitives against object store
 	/*
@@ -210,14 +315,14 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 							NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
 						}
 					}
-					
+
 					pActiveObject->SetState(ActiveObject::state::INTERSECTED);
 				}
 			}
 		}
 	}
-	
-	
+
+
 	for (auto &pActiveObject : m_activeObjects) {
 		// Add to remove list if not intersected in current frame
 		if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
@@ -230,13 +335,13 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 		CR(RemoveActiveObject(pActiveObject));
 
 		// Notify element intersect continue
-		// This uses the last available point 
+		// This uses the last available point
 		// TODO: Add projection , find exit point, do we need that?
 		InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED, m_pInteractionRay, pActiveObject->GetObject());
 		interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
 		NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_ENDED, &interactionEvent);
 	}
-	
+
 
 Error:
 	return r;
@@ -259,7 +364,7 @@ RESULT InteractionEngine::ClearActiveObjects() {
 	return R_PASS;
 }
 
-std::shared_ptr<ActiveObject>  InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject) {
+std::shared_ptr<ActiveObject> InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<ActiveObject> pNewActiveObject = nullptr;
@@ -335,27 +440,165 @@ Error:
 	return ActiveObject::state::INVALID;
 }
 
-RESULT InteractionEngine::Notify(SenseControllerEvent *event) {
+RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 	RESULT r = R_PASS;
 
-	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
-
 	//TODO:  Expand this to accommodate for left controller
-	if (event->state.type == CONTROLLER_RIGHT) {
-		if (eventType == SENSE_CONTROLLER_TRIGGER_UP) {
-			for (auto &pObject : m_activeObjects) {
-				if (pObject->GetState() == ActiveObject::state::INTERSECTED) {
-					InteractionEventType type = INTERACTION_EVENT_SELECT;
+	if(pEvent->state.type == CONTROLLER_RIGHT) {
+		switch (pEvent->type) {
+			case SENSE_CONTROLLER_TRIGGER_UP: {
+				for (auto &pObject : m_activeObjects) {
+					if (pObject->GetState() == ActiveObject::state::INTERSECTED) {
+						InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
+						InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+						CR(NotifySubscribers(type, &interactionEvent));
+					}
+				}
+			} break;
+
+			case SENSE_CONTROLLER_TRIGGER_DOWN: {
+				for (auto &pObject : m_activeObjects) {
+					if (pObject->GetState() == ActiveObject::state::INTERSECTED) {
+						InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
+						InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+						CR(NotifySubscribers(type, &interactionEvent));
+					}
+				}
+			} break;
+
+			case SENSE_CONTROLLER_MENU_UP: {
+				for (auto &pObject : m_activeObjects) {
+					if (pObject->GetState() == ActiveObject::state::INTERSECTED) {
+						InteractionEventType type = INTERACTION_EVENT_MENU;
+						InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+						CR(NotifySubscribers(type, &interactionEvent));
+					}
+				}
+			} break;
+
+			case SENSE_CONTROLLER_PAD_MOVE: {
+				// Keeps decimal in accumulator, moves value into touchY
+				m_interactionPadAccumulator += pEvent->state.ptTouchpad.y();
+				double touchY = m_interactionPadAccumulator;
+				m_interactionPadAccumulator = std::modf(m_interactionPadAccumulator, &touchY);
+
+				for (auto &pObject : m_activeObjects) {
+					//ray rCast;
+					//m_pSandbox->GetMouseRay(rCast, 0.0f);
+					//CR(UpdateInteractionPrimitive(rCast));
+
+					InteractionEventType type = INTERACTION_EVENT_WHEEL;
 					InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+					interactionEvent.SetValue((int)(touchY));
+
 					CR(NotifySubscribers(type, &interactionEvent));
 				}
+			} break;
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::Notify(SenseKeyboardEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	// Pass through keyboard input
+	///*
+	for (auto &pObject : m_activeObjects) {
+		InteractionEventType type;
+
+		if (pEvent->KeyState == 0)
+			type = INTERACTION_EVENT_KEY_UP;
+		else
+			type = INTERACTION_EVENT_KEY_DOWN;
+
+		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+		interactionEvent.SetValue((int)(pEvent->KeyCode));
+
+		CR(NotifySubscribers(type, &interactionEvent));
+	}
+	//*/
+	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::Notify(SenseTypingEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	// Pass through keyboard input
+	/*
+	for (auto &pObject : m_activeObjects) {
+		InteractionEventType type; 
+
+		if (pEvent->KeyState == 0)
+			type = INTERACTION_EVENT_KEY_UP;
+		else
+			type = INTERACTION_EVENT_KEY_DOWN;
+
+		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+		interactionEvent.SetValue((int)(pEvent->KeyCode));
+
+		CR(NotifySubscribers(type, &interactionEvent));
+	}
+	//*/
+	CR(r);
+
+Error:
+	return r;
+}
+
+
+RESULT InteractionEngine::Notify(SenseMouseEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	switch (pEvent->EventType) {
+		case SENSE_MOUSE_MOVE: {
+			ray rCast;
+			m_pSandbox->GetMouseRay(rCast, 0.0f);
+			CR(UpdateInteractionPrimitive(rCast));
+		} break;
+
+		case SENSE_MOUSE_LEFT_BUTTON_UP: {
+			for (auto &pObject : m_activeObjects) {
+				//ray rCast;
+				//m_pSandbox->GetMouseRay(rCast, 0.0f);
+				//CR(UpdateInteractionPrimitive(rCast));
+
+				InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
+				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+				CR(NotifySubscribers(type, &interactionEvent));
 			}
-		}
-		else if (eventType == SENSE_CONTROLLER_MENU_UP) {
-			InteractionEventType type = INTERACTION_EVENT_MENU;
-			InteractionObjectEvent interactionEvent(type, m_pInteractionRay, nullptr);
-			CR(NotifySubscribers(type, &interactionEvent));
-		}
+		} break;
+
+		case SENSE_MOUSE_LEFT_BUTTON_DOWN: {
+			for (auto &pObject : m_activeObjects) {
+				//ray rCast;
+				//m_pSandbox->GetMouseRay(rCast, 0.0f);
+				//CR(UpdateInteractionPrimitive(rCast));
+
+				InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
+				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+				CR(NotifySubscribers(type, &interactionEvent));
+			}
+		} break;
+
+		case SENSE_MOUSE_WHEEL: {
+			for (auto &pObject : m_activeObjects) {
+				//ray rCast;
+				//m_pSandbox->GetMouseRay(rCast, 0.0f);
+				//CR(UpdateInteractionPrimitive(rCast));
+
+				InteractionEventType type = INTERACTION_EVENT_WHEEL;
+				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+				interactionEvent.SetValue(pEvent->state * 10);
+
+				CR(NotifySubscribers(type, &interactionEvent));
+			}
+		} break;
 	}
 
 Error:

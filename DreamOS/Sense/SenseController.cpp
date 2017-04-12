@@ -24,10 +24,12 @@ RESULT SenseController::SetControllerState(ControllerState controllerState) {
 	if (currentState->triggerRange != controllerState.triggerRange) {
 		eventType = SENSE_CONTROLLER_TRIGGER_MOVE;
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
+
 		if (controllerState.triggerRange == 1.0f) {
 			eventType = SENSE_CONTROLLER_TRIGGER_DOWN;
 			NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 		}
+
 		if (controllerState.triggerRange != 1.0f && currentState->triggerRange == 1.0f) {
 			eventType = SENSE_CONTROLLER_TRIGGER_UP;
 			NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
@@ -52,7 +54,6 @@ RESULT SenseController::SetControllerState(ControllerState controllerState) {
 		NotifySubscribers(eventType, &SenseControllerEvent(eventType, controllerState));
 	}
 	currentState->fGrip = controllerState.fGrip;
-
 
 	if (!currentState->fMenu && controllerState.fMenu) {
 		eventType = SENSE_CONTROLLER_MENU_DOWN;

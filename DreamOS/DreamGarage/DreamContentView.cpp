@@ -39,6 +39,37 @@ Error:
 	return r;
 }
 
+RESULT DreamContentView::Shutdown(void *pContext) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamContentView::Update(void *pContext) {
+	RESULT r = R_PASS;
+
+	if (m_pPendingBufferVector != nullptr) {
+		uint8_t* pBuffer = &(m_pPendingBufferVector->operator[](0));
+		size_t pBuffer_n = m_pPendingBufferVector->size();
+
+		texture *pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		CN(pTexture);
+		CV(pTexture);
+
+		CR(SetScreenTexture(pTexture));
+	}
+
+Error:
+	if (m_pPendingBufferVector != nullptr) {
+		m_pPendingBufferVector = nullptr;
+	}
+
+	return r;
+}
+
 float DreamContentView::GetWidth() {
 	return std::sqrt(((m_aspectRatio * m_aspectRatio) * (m_diagonalSize * m_diagonalSize)) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
@@ -138,28 +169,6 @@ RESULT DreamContentView::SetScreenTexture(const std::wstring &wstrTextureFilenam
 	CR(SetScreenTexture(pTexture));
 
 Error:
-	return r;
-}
-
-RESULT DreamContentView::Update(void *pContext) {
-	RESULT r = R_PASS;
-
-	if (m_pPendingBufferVector != nullptr) {
-		uint8_t* pBuffer = &(m_pPendingBufferVector->operator[](0));
-		size_t pBuffer_n = m_pPendingBufferVector->size();
-
-		texture *pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
-		CN(pTexture);
-		CV(pTexture);
-
-		CR(SetScreenTexture(pTexture));
-	}
-
-Error:
-	if (m_pPendingBufferVector != nullptr) {
-		m_pPendingBufferVector = nullptr;
-	}
-
 	return r;
 }
 	   
