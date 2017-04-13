@@ -671,6 +671,9 @@
     <ClCompile Include="..\..\..\WebBrowser\WebBrowserController.cpp">
       <Filter>WebBrowser</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1432,6 +1435,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFAppObserver.h">
       <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h">
+      <Filter>InteractionEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
