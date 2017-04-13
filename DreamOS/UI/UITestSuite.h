@@ -15,13 +15,21 @@
 
 class DreamOS;
 class DreamUIBar;
+class UIKeyboard;
 class VirtualObj;
 class sphere;
+class quad;
 
 struct SenseControllerEvent;
 struct SenseKeyboardEvent;
 struct SenseMouseEvent;
 struct InteractionObjectEvent;
+
+struct KeyboardTestContext {
+	sphere* pSphere = nullptr;
+	sphere* pSphere2 = nullptr;
+	quad* pQuad = nullptr;
+};
 
 class UITestSuite : public valid, public TestSuite, public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent> {
 public:
@@ -33,6 +41,7 @@ public:
 	RESULT AddTestInteractionFauxUI();
 	RESULT AddTestSharedContentView();
 	RESULT AddTestBrowser();
+	RESULT AddTestKeyboard();
 
 	virtual RESULT AddTests() override;
 
@@ -52,6 +61,8 @@ private:
 
 	sphere *m_pSphere1;
 	sphere *m_pSphere2;
+
+	std::shared_ptr<UIKeyboard> m_pKeyboard;
 };
 
 
