@@ -23,13 +23,18 @@
 #include "Primitives/quaternion.h"
 #include "Primitives/hand.h"
 
+class ControllerProxy;
 class Message;
 class UpdateHeadMessage; 
 class UpdateHandMessage;
 class AudioDataMessage;
 
+class MenuControllerProxy;
+class HTTPControllerProxy;
+
 class User;
 class TwilioNTSInformation;
+class EnvironmentAsset;
 
 typedef std::function<RESULT(long)> HandlePeersUpdateCallback;
 
@@ -37,9 +42,20 @@ typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
 typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
 typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
 typedef std::function<RESULT(long, AudioDataMessage*)> HandleAudioDataCallback;
+typedef std::function<RESULT(std::shared_ptr<EnvironmentAsset>)> HandleEnvironmentAssetCallback;
+
+enum class CLOUD_CONTROLLER_TYPE {
+	CLOUD,
+	ENVIRONMENT,
+	MENU,
+	USER,
+	HTTP,
+	INVALID
+};
 
 class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver,
-						public Subscriber<CmdPromptEvent> {
+						public Subscriber<CmdPromptEvent> 
+{
 protected:
 	typedef std::function<RESULT(long, const std::string&)> HandleDataChannelStringMessageCallback;
 	typedef std::function<RESULT(long, uint8_t *, int)> HandleDataChannelMessageCallback;
@@ -48,12 +64,13 @@ protected:
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
 
 public:
+	// TODO: Replace with proxy or other better pattern this is getting out of control
 	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);
-
 	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
 	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
 	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
 	RESULT RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback);
+	RESULT RegisterEnvironmentAssetCallback(HandleEnvironmentAssetCallback fnHandleEnvironmentAssetCallback);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
@@ -76,12 +93,15 @@ public:
 	RESULT InitializeUser(version ver = 1.0f);
 	RESULT InitializeEnvironment(long environmentID = -1);
 	RESULT CreateNewURLRequest(std::wstring& strURL);
-	RESULT LoginUser();
+	//RESULT LoginUser();
+	RESULT LoginUser(std::string strUsername, std::string strPassword, std::string strOTK);
 	RESULT Update();
-	void Login();
+	RESULT Login();
 
 	User GetUser();
 	TwilioNTSInformation GetTwilioNTSInformation();
+	bool IsUserLoggedIn();
+	bool IsEnvironmentConnected();
 
 	virtual long GetUserID() override;
 
@@ -111,6 +131,7 @@ public:
 		int sample_rate,
 		size_t number_of_channels,
 		size_t number_of_frames) override;
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
@@ -120,6 +141,18 @@ public:
 
 	// CmdPromptEventSubscriber
 	virtual RESULT Notify(CmdPromptEvent *event) override;
+
+	
+	// Proxy Objects
+public:
+	ControllerProxy* GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
+	RESULT RegisterControllerObserver(CLOUD_CONTROLLER_TYPE controllerType, ControllerObserver *pControllerObserver);
+
+private:
+	MenuControllerProxy* GetMenuControllerProxy();
+	UserControllerProxy* GetUserControllerProxy();
+	HTTPControllerProxy* GetHTTPControllerProxy();
+	EnvironmentControllerProxy* GetEnvironmentControllerProxy();
 
 private:
 	//UID m_uid;
@@ -138,6 +171,7 @@ private:
 	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
 	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
 	HandleAudioDataCallback m_fnHandleAudioDataCallback;
+	HandleEnvironmentAssetCallback m_fnHandleEnvironmentAssetCallback;
 
 	std::thread	m_thread;
 	bool m_fRunning;

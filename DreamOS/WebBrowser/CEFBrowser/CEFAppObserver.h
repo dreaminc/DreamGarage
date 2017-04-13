@@ -1,0 +1,27 @@
+#ifndef CEF_APP_OBSERVER_H_
+#define CEF_APP_OBSERVER_H_
+
+#include "RESULT/EHM.h"
+
+// DREAM OS
+// DreamOS/Cloud/WebBrowser/CEFBrowser/CEFApp.h
+
+#ifdef LOG
+#undef LOG
+#endif
+
+#ifdef PLOG
+#undef PLOG
+#endif
+
+#include "include/internal/cef_ptr.h"
+#include "include/cef_browser.h"
+#include "include/cef_render_handler.h"
+
+class CEFAppObserver {
+public:
+	virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) = 0;
+	virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) = 0;
+};
+
+#endif	// ! CEF_APP_OBSERVER_H_

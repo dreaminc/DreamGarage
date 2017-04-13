@@ -13,45 +13,60 @@
 #include <vector>
 #include <functional>
 #include <thread>
+#include <list>
+#include <memory>
 
 #include "HTTPResponse.h"
 #include "HTTPRequest.h"
 
+#include "Cloud/ControllerProxy.h"
+
 #define HTTP_DELAY_SECONDS 5
 
-typedef std::function<void(std::string&&)> HTTPResponseCallback;
+class HTTPRequestHandler;
+class HTTPRequestFileHandler;
 
-class HTTPRequestHandler {
+#include "HTTPCommon.h"
+
+class HTTPControllerProxy : public ControllerProxy {
 public:
-	HTTPRequestHandler(HTTPRequest* pHTTPRequest, HTTPResponse* pHTTPResponse, HTTPResponseCallback fnResponseCallback) :
-		m_pHTTPRequest(pHTTPRequest),
-		m_pHTTPResponse(pHTTPResponse),
-		m_fnResponseCallback(fnResponseCallback)
-	{
-		// empty
-	}
-
-	HTTPRequest* m_pHTTPRequest;
-	HTTPResponse* m_pHTTPResponse = nullptr;
-	HTTPResponseCallback m_fnResponseCallback;
+	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) = 0;
+	//virtual RESULT RequestFile(std::string strURI, HTTPResponseFileCallback fnResponseFileCallback) = 0;
+	virtual RESULT RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback) = 0;
 };
 
-class HTTPController {
+
+class HTTPController : public HTTPControllerProxy {
 public:
 	HTTPController();
 	~HTTPController();
 
 public:
+	RESULT Initialize();
+	RESULT Shutdown();
 	RESULT Start();
 	RESULT Stop();
 
+	// TODO: Might want to rename these
+	// TODO: Wrap up in HTTPRequest that is passed to HTTPController
+	// which sets it's params (POST/GET/FILE etc and handles everything on one path)
+
+	// TODO: Replace these functions with HTTPSession functionality
+
+	// GET
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse* pHTTPResponse  = nullptr);
 	RESULT AGET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponseCallback fnResponseCallback);
 	RESULT GET(const std::string& strURI, const std::vector<std::string>& strHeaders, HTTPResponse& httpResponse);
 
+	// POST
 	RESULT APOST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponse* pHTTPResponse = nullptr);
 	RESULT APOST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponseCallback fnResponseCallback);
 	RESULT POST(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, HTTPResponse& httpResponse);
+
+	// FILE DOWNLOAD
+	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse* pHTTPResponse = nullptr);
+	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseFileCallback fnResponseFileCallback);
+	//RESULT FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse& httpResponse);
 
 	static const std::vector<std::string> ContentHttp() {
 		return { "Content-Type: application/x-www-form-urlencoded" };
@@ -61,27 +76,50 @@ public:
 		return { "Content-Type: application/json", "Accept: application/json; version=1.0" };
 	}
 
-private:
-	static size_t RequestCallback(void *ptr, size_t size, size_t nmemb, HTTPRequestHandler *cb);
+public:
+	HTTPControllerProxy* GetHTTPControllerProxy();
 
-	RESULT Request(std::function<HTTPRequestHandler*(CURL*)> fnHTTPRequestCallback);
+	// Menu Controller Proxy
+	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override;
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override;
+
+	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) override;
+	//virtual RESULT RequestFile(std::string strURI, HTTPResponseFileCallback fnResponseFileCallback) override;
+	virtual RESULT RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback) override;
+
+private:
+	// CURL Callbacks
+	static size_t RequestCallback(char *pBuffer, size_t elementSize, size_t numElements, void *pContext);
 	
 	// Thread processing http request / response
-	void ProcessingThread();
-
-	// Updates the requests
-	void Update();
+	void CURLMultihandleThreadProcess();
 
 public:
+	// TODO: Remove the singleton
 	// Singleton
 	static HTTPController *s_pInstance;
 
+	static HTTPController *CreateHTTPController();
+
 	static HTTPController *instance() {
 		if (s_pInstance == nullptr)
-			s_pInstance = new HTTPController();
+			s_pInstance = CreateHTTPController();
 
 		return s_pInstance;
 	}
+
+
+private:
+	size_t NumberOfPendingHTTPRequestHandlers();
+	bool IsHTTPRequestHandlerPending();
+	std::shared_ptr<HTTPRequestHandler> PopPendingHTTPRequestHandler(CURL *pCURL);
+	std::shared_ptr<HTTPRequestHandler> FindPendingHTTPRequestHandler(CURL *pCURL);
+	std::shared_ptr<HTTPRequestHandler> FindPendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT AddPendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT RemovePendingHTTPRequestHandler(std::shared_ptr<HTTPRequestHandler> pHTTPRequestHandler);
+	RESULT ClearPendingHTTPRequstHandlers();
+
+	std::list<std::shared_ptr<HTTPRequestHandler>> m_PendingHTTPRequestHandlers;
 
 private:
 	std::thread	m_thread;

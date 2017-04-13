@@ -12,6 +12,7 @@
 
 
 camera::camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
+	VirtualObj(ptOrigin),
 	m_FieldOfViewAngle(FOV),
 	m_ProjectionType(DEFAULT_PROJECTION_TYPE),
 	m_NearPlane(DEFAULT_NEAR_PLANE),
@@ -25,8 +26,8 @@ camera::camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxSc
 	m_vDeviation(),
 	m_pCameraFrameOfReference(nullptr)
 {
-	m_ptOrigin = ptOrigin;
-	m_qRotation = quaternion();
+	//m_ptOrigin = ptOrigin;
+	//m_qRotation = quaternion();
 	m_qOffsetOrientation = quaternion();
 }
 
@@ -53,7 +54,7 @@ int camera::GetPXHeight() {
 }
 
 vector camera::GetRightVector() {
-	quaternion temp = m_qRotation;
+	quaternion temp = GetOrientation();
 	temp.Normalize();
 
 	vector vectorRight = temp.RotateVector(vector::iVector());
@@ -61,7 +62,7 @@ vector camera::GetRightVector() {
 }
 
 vector camera::GetLookVector() {
-	quaternion temp = m_qRotation;
+	quaternion temp = GetOrientation();
 	temp.Normalize();
 
 	vector vectorLook = temp.RotateVector(vector(0.0f, 0.0f, -1.0f));
@@ -80,11 +81,11 @@ ProjectionMatrix camera::GetProjectionMatrix() {
 ViewMatrix camera::GetViewMatrix() {
 
 	// View Matrix requires the opposite of the camera's world position and rotation
-	point ptOrigin = m_ptOrigin;
+	point ptOrigin = GetOrigin();
 	ptOrigin.SetZeroW();
 	ptOrigin.Reverse();
 
-	quaternion q = m_qRotation;
+	quaternion q = GetOrientation();
 
 	ptOrigin += m_vDeviation;
 	ViewMatrix mat = ViewMatrix(ptOrigin, q);
@@ -96,11 +97,13 @@ matrix<camera_precision, 4, 4> camera::GetProjectionViewMatrix() {
 }
 
 RESULT camera::RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {
+	quaternion qRotation = GetOrientation();
 
-	m_qRotation *= quaternion(dy * m_cameraRotateSpeed, GetRightVector());
-	m_qRotation *= quaternion(dx * m_cameraRotateSpeed, GetUpVector());
+	qRotation *= quaternion(dy * m_cameraRotateSpeed, GetRightVector());
+	qRotation *= quaternion(dx * m_cameraRotateSpeed, GetUpVector());
+	qRotation.Normalize();
 
-	m_qRotation.Normalize();
+	SetOrientation(qRotation);
 
 	vector vectorLook = GetLookVector();
 	DEBUG_LINEOUT_RETURN("Camera rotating: x:%0.3f y:%0.3f z:%0.3f", vectorLook.x(), vectorLook.y(), vectorLook.z());
@@ -109,18 +112,21 @@ RESULT camera::RotateCameraByDiffXY(camera_precision dx, camera_precision dy) {
 }
 
 RESULT camera::MoveForward(camera_precision amt) {
-	m_ptOrigin += GetLookVector() * amt;
-	m_ptOrigin(3) = 0.0f;
+	translate(GetLookVector() * amt);
+	//m_ptOrigin += GetLookVector() * amt;
+	//m_ptOrigin(3) = 0.0f;
 	return R_PASS;
 }
 
 RESULT camera::MoveUp(camera_precision amt) {
-	m_ptOrigin += GetUpVector() * amt;
+	translate(GetUpVector() * amt);
+	//m_ptOrigin += GetUpVector() * amt;
 	return R_PASS;
 }
 
 RESULT camera::MoveStrafe(camera_precision amt) {
-	m_ptOrigin += GetRightVector() * amt;
+	translate(GetRightVector() * amt);
+	//m_ptOrigin += GetRightVector() * amt;
 	return R_PASS;
 }
 
@@ -154,15 +160,7 @@ RESULT camera::AddUpSpeed(camera_precision speed) {
 	return R_PASS;
 }
 
-RESULT camera::Notify(HMDEvent *hmdEvent) {
-	RESULT r = R_PASS;
-
-	DEBUG_LINEOUT("Cam hmd event");//, kbEvent->KeyCode, kbEvent->KeyState);
-
-//	Error:
-	return r;
-}
-
+/*
 RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
@@ -173,14 +171,14 @@ RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 
 	bool disableAWDS = DreamConsole::GetConsole()->IsInForeground();
 
-	bool shiftKey = (kbEvent->m_pSenseKeyboard->GetKeyState(SK_SHIFT) & 0x80) > 0;
+	bool shiftKey = (kbEvent->m_pSenseKeyboard->GetKeyState(SVK_SHIFT) & 0x80) > 0;
 
-	bool leftKey = (kbEvent->KeyCode == SK_LEFT) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('A'));
-	bool rightKey = (kbEvent->KeyCode == SK_RIGHT) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('D'));
-	bool forwardKey = (kbEvent->KeyCode == SK_UP && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('W'));
-	bool backwardKey = (kbEvent->KeyCode == SK_DOWN && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('S'));
-	bool upKey = (kbEvent->KeyCode == SK_UP   && shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('Q'));
-	bool downKey = (kbEvent->KeyCode == SK_DOWN && shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SK_SCAN_CODE)('E'));
+	bool leftKey = (kbEvent->KeyCode == SVK_LEFT) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('A'));
+	bool rightKey = (kbEvent->KeyCode == SVK_RIGHT) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('D'));
+	bool forwardKey = (kbEvent->KeyCode == SVK_UP && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('W'));
+	bool backwardKey = (kbEvent->KeyCode == SVK_DOWN && !shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('S'));
+	bool upKey = (kbEvent->KeyCode == SVK_UP   && shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('Q'));
+	bool downKey = (kbEvent->KeyCode == SVK_DOWN && shiftKey) || (!disableAWDS && kbEvent->KeyCode == (SenseVirtualKey)('E'));
 
 #define	MOVE_DIRECTION ((kbEvent->KeyState) ? 1.0f : -1.0f)
 
@@ -194,7 +192,9 @@ RESULT camera::Notify(SenseKeyboardEvent *kbEvent) {
 
 	return r;
 }
+*/
 
+/*
 RESULT camera::Notify(TimeEvent *event) {
 	//LOG(INFO) << "time";
 
@@ -207,19 +207,21 @@ RESULT camera::Notify(TimeEvent *event) {
 	rightMove.y() = 0.0f;
 	rightMove.Normalize();
 
-	m_ptOrigin += lookMove * m_cameraForwardSpeed * dt;
-	m_ptOrigin += rightMove * m_cameraStrafeSpeed * dt;
-	m_ptOrigin += GetUpVector() * m_cameraUpSpeed * dt;
-	m_ptOrigin.SetZeroW();
+	//m_ptOrigin += lookMove * m_cameraForwardSpeed * dt;
+	//m_ptOrigin += rightMove * m_cameraStrafeSpeed * dt;
+	//m_ptOrigin += GetUpVector() * m_cameraUpSpeed * dt;
+	//m_ptOrigin.SetZeroW();
+
+	translate(lookMove * m_cameraForwardSpeed * dt);
+	translate(rightMove * m_cameraStrafeSpeed * dt);
+	translate(GetUpVector() * m_cameraUpSpeed * dt);
 
 	// Update frame of reference
-	quaternion qRotation = m_qRotation;
+	quaternion qRotation = GetOrientation();
 	qRotation.Reverse(); 
 
 	point ptOrigin;
-	ptOrigin = m_ptOrigin;
-	if(m_pHMD != nullptr)
-		ptOrigin += m_pHMD->GetHeadPointOrigin();
+	ptOrigin = GetOrigin();
 	ptOrigin.SetZeroW();
 
 	m_pCameraFrameOfReference->SetPosition(ptOrigin);
@@ -227,6 +229,7 @@ RESULT camera::Notify(TimeEvent *event) {
 
 	return R_PASS;
 }
+*/
 
 // Deviation vector is a vector of deviation from the origin point
 // So resulting point = ptOrigin + vDeviation
@@ -240,24 +243,23 @@ RESULT camera::SetCameraPositionDeviation(vector vDeviation) {
 RESULT camera::UpdateFromKeyboardState(SenseKeyboard *pSK) {
 	RESULT r = R_PASS;
 
-	uint8_t state = pSK->GetKeyState(SK_LEFT);
+	uint8_t state = pSK->GetKeyState(SVK_LEFT);
 	if (state) {
 		DEBUG_LINEOUT("strafe");
 		MoveStrafe(0.1f);
 	}
 
-	state = pSK->GetKeyState(SK_RIGHT);
-	//pSK->CheckKeyState((SK_SCAN_CODE)('D'))
+	state = pSK->GetKeyState(SVK_RIGHT);
 	if (state) {
 		MoveStrafe(-0.1f);
 	}
 
-	state = pSK->GetKeyState(SK_UP);
+	state = pSK->GetKeyState(SVK_UP);
 	if (state) {
 		MoveForward(0.1f);
 	}
 
-	state = pSK->GetKeyState(SK_DOWN);
+	state = pSK->GetKeyState(SVK_DOWN);
 	if (state) {
 		MoveForward(-0.1f);
 	}
@@ -272,7 +274,7 @@ composite* camera::GetFrameOfReferenceComposite() {
 // Potentially could be removed if orientations from headsets, mouse inputs,
 // and in GetViewMatrix are also reversed
 quaternion camera::GetWorldOrientation() {
-	quaternion q = m_qRotation;
+	quaternion q = GetOrientation();
 	q.Reverse();
 	return q;
 }
@@ -310,19 +312,49 @@ int camera::GetScreenHeight() {
 	return m_pxScreenHeight;
 }
 
-bool camera::IsAllowedMoveByKeys() {
-	return m_allowMoveByKeys;
-}
+ray camera::GetRay(double xPos, double yPos, double t) {
+	ray retRay;
 
-RESULT camera::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
+	double x = ((2.0f * xPos) / m_pxScreenWidth) - 1.0f;
+	double y = 1.0f - ((2.0f * yPos) / m_pxScreenHeight);
+	double z = 1.0f;
 
-	if (event->GetArg(1).compare("move") == 0) {
-		m_allowMoveByKeys = !m_allowMoveByKeys;
-		HUD_OUT((std::string("allow move by keys <- ") + ((m_allowMoveByKeys) ? "on" : "off")).c_str());
+	retRay.ptOrigin() = point(GetOrigin());
+	retRay.vDirection() = point(x, y, -1.0f);
+	
+	if (t != 0.0f) {
+		retRay.ptOrigin() += retRay.vDirection() * t;
 	}
 
-	return r;
+	point ptOrigin = GetOrigin();
+	ptOrigin.SetZeroW();
+	ptOrigin += m_vDeviation;
+	ViewMatrix matView = ViewMatrix(ptOrigin, GetOrientation());
+
+	matrix<camera_precision, 4, 4> matProjection = GetProjectionMatrix();
+	//matrix<camera_precision, 4, 4> matView = GetViewMatrix();
+
+	matrix<camera_precision, 4, 4> matProjectionInverse = inverse(matProjection);
+	matrix<camera_precision, 4, 4> matViewInverse = inverse(matView);
+
+	retRay.vDirection() = matProjectionInverse * retRay.vDirection();
+	retRay.vDirection().z() = -1.0f;
+	retRay.vDirection().w() = 0.0f;
+
+	retRay.vDirection() = matViewInverse * retRay.vDirection();
+	retRay.vDirection().Normalize();
+
+	//retRay.Print();
+
+	return retRay;
+}
+
+ray camera::GetRay(int xPos, int yPos) {
+	return GetRay(static_cast<double>(xPos), static_cast<double>(yPos));
+}
+	
+bool camera::IsAllowedMoveByKeys() {
+	return m_allowMoveByKeys;
 }
 
 quaternion camera::GetOffsetOrientation() {

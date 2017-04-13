@@ -33,20 +33,39 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
-		quad(side, numHorizontalDivisions, numVerticalDivisions, pTextureHeight),
+	OGLQuad(OpenGLImp *pParentImp, float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) :
+		quad(side, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, float height, float width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr) :
-		quad(height, width, numHorizontalDivisions, numVerticalDivisions, pTextureHeight),
+	OGLQuad(OpenGLImp *pParentImp, float height, float width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) :
+		quad(height, width, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
+	}
+
+	OGLQuad(OpenGLImp *pParentImp, BoundingQuad* pBoundingQuad, bool fTriangleBased) :
+		quad(pBoundingQuad, fTriangleBased),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
+
+	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad) {
+		RESULT r = R_PASS;
+
+		quad *pQuad = (quad*)(GetDimObj());
+		CR(pQuad->UpdateFromBoundingQuad(pBoundingQuad));
+		CR(UpdateOGLBuffers());
+
+	Error:
+		return r;
 	}
 };
 

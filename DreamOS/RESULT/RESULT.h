@@ -11,6 +11,8 @@
 #define RESULT_START_OK 0x00000000
 #define RESULT_START_WARN 0x70000000
 
+#define DREAM_EPSILON 1.192092896e-07f
+
 #ifndef _USE_MATH_DEFINES
 	#define M_E        2.71828182845904523536   // e
 	#define M_LOG2E    1.44269504088896340736   // log2(e)
@@ -34,31 +36,39 @@ typedef enum {
     R_SUCCESS,
 	R_PASS_TRUE,
 	R_PASS_FALSE,
+	R_QUEUE_EMPTY,
 
 	R_WARNING = RESULT_START_WARN,
 	R_NOT_IMPLEMENTED,
 	R_VIRTUAL,
 	R_ABSTRACT,
+	R_SKIPPED,
+	R_RESET,
 	R_NOT_HANDLED,
 
 	R_FILE_FOUND,
 	R_DIRECTORY_FOUND,
 	R_PATH_FOUND,
+
+	R_OBJECT_NOT_FOUND,
+	R_COMPLETE,
     
     R_FAIL = RESULT_START_FAIL,
     R_ERROR,
     
-	R_NOT_FOUND,			// general purpose not found error
-	R_FILE_NOT_FOUND,		// slightly more specific file not found error
-	R_INVALID_PARAM,		// invalid parameter 
-	R_PATH_NOT_FOUND,		// path not found
-	R_INVALID_OBJECT,		// Wrong Object passed to function
-	R_OVERFLOW,				// Overflow error of some kind
+	R_NOT_FOUND,				// general purpose not found error
+	R_FILE_NOT_FOUND,			// slightly more specific file not found error
+	R_FILE_ALREADY_EXISTS,		// file already exists
+	R_INVALID_PARAM,			// invalid parameter 
+	R_PATH_NOT_FOUND,			// path not found
+	R_INVALID_OBJECT,			// Wrong Object passed to function
+	R_OVERFLOW,					// Overflow error of some kind
 
     // Matrix Error Codes
 	R_MATRIX_ROW_OUT_OF_RANGE,
 	R_MATRIX_COL_OUT_OF_RANGE,
     R_MATRIX_MULT_DIMENSION_MISMATCH,
+	R_EXIT,
 
 	R_INVALID
 } _RESULT;

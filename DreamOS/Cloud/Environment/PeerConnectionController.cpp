@@ -1,4 +1,6 @@
 #include "Logger/Logger.h"
+#include "easylogging++.h"
+
 #include "PeerConnectionController.h"
 #include "PeerConnection.h"
 

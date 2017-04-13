@@ -94,6 +94,7 @@ public:
 	typedef enum HandType {
 		HAND_LEFT,
 		HAND_RIGHT,
+		HAND_SKELETON,
 		HAND_INVALID
 	} HAND_TYPE;
 
@@ -133,21 +134,34 @@ public:
 	//RESULT SetFromLeapMotionHand(SenseLeapMotionHand sHand);
 	RESULT SetFromLeapHand(const Leap::Hand hand);
 	RESULT OnLostTrack();
-	RESULT SetHandType(hand::HAND_TYPE type);
 	RESULT SetHandState(const hand::HandState& pHandState);
 
-	RESULT SetOriented(bool attach);
+	RESULT SetOriented(bool fOriented);
 	bool IsOriented();
 	RESULT SetSkeleton(bool fSkeleton);
 	bool IsSkeleton();
+	RESULT SetTracked(bool fTracked);
 	bool IsTracked();
 	RESULT SetLocalOrientation(quaternion qRotation);
 
 	hand::HandState GetHandState();
 	static hand::HandState GetDebugHandState(hand::HAND_TYPE handType);
+	RESULT ToggleRenderType();
+	RESULT SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState);
+	RESULT SetHandModel(hand::HAND_TYPE type);
+	RESULT SetHandModelOrientation(quaternion q);
+
+	std::shared_ptr<composite> GetModel(hand::HAND_TYPE handType);
 
 private:
+
 	HAND_TYPE m_handType;
+
+	std::shared_ptr<composite> m_pLeftModel;
+	std::shared_ptr<composite> m_pRightModel;
+
+	quaternion m_qLeftModel;
+	quaternion m_qRightModel;
 
 	std::shared_ptr<sphere> m_pPalm;
 

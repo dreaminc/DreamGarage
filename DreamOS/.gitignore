@@ -1,0 +1,3 @@
+# Exclude /Data/ except for empty file
+/Data/*
+!/Data/empty

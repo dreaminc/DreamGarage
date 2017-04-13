@@ -62,10 +62,19 @@ protected:
 	bool m_fMouseCaptured;
 
 	// Mouse dragging states
-	enum class MouseDrag { None, Left, Right };
-	MouseDrag m_dragState = MouseDrag::None;
+	enum class MouseDrag { 
+		LEFT_BUTTON, 
+		RIGHT_BUTTON, 
+		MIDDLE_BUTTON,
+		NONE 
+	};
+
+	MouseDrag m_dragState = MouseDrag::NONE;
 	int m_dragOriginX = 0;
 	int m_dragOriginY = 0;
+
+	int m_lastX = 0;
+	int m_lastY = 0;
 
 private:
 	typedef struct SenseMousePosition {
@@ -103,11 +112,10 @@ private:
 protected:
 	// x,y are in window screen coordinates!
 	virtual RESULT SetMousePosition(int x, int y);
-	virtual RESULT GetMousePosition(int& x, int& y);
-
 	virtual RESULT ShowCursor(bool show);
 
 public:
+	virtual RESULT GetMousePosition(int& x, int& y);
 
 	virtual RESULT CaptureMouse();
 	virtual RESULT ReleaseMouse();

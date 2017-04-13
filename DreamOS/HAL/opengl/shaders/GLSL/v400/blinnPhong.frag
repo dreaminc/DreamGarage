@@ -36,7 +36,7 @@ struct Light {
 struct Material {
 	float m_shine;
 	float m_bump;
-	float reserved2;
+	float m_ambient;
 	float reserved3;
     vec4 m_colorAmbient;
     vec4 m_colorDiffuse;

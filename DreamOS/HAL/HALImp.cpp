@@ -4,11 +4,31 @@ HALImp::HALImp() :
 	m_pCamera(nullptr),
 	m_pHMD(nullptr)
 {
-	// empty stub
+	memset(&m_HALConfiguration, 0, sizeof(HALImp::HALConfiguration));
+	
+	//m_HALConfiguration.fRenderReferenceGeometry = true;
 }
 
 HALImp::~HALImp() {
 	// empty stub
+}
+
+RESULT HALImp::SetHALConfiguration(HALConfiguration halconf) {
+	m_HALConfiguration = halconf;
+	return R_PASS;
+}
+
+const HALImp::HALConfiguration& HALImp::GetHALConfiguration() {
+	return m_HALConfiguration;
+}
+
+RESULT HALImp::SetRenderReferenceGeometry(bool fRenderReferenceGeometry) {
+	m_HALConfiguration.fRenderReferenceGeometry = fRenderReferenceGeometry;
+	return R_PASS;
+}
+
+bool HALImp::IsRenderReferenceGeometry() {
+	return (bool)(m_HALConfiguration.fRenderReferenceGeometry);
 }
 
 camera *HALImp::GetCamera() {

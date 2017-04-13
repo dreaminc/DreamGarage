@@ -27,18 +27,10 @@ WebRTCConductor::WebRTCConductor(WebRTCConductorObserver *pParetObserver) :
 	m_pParentObserver(pParetObserver),
 	m_pWebRTCPeerConnectionFactory(nullptr)
 {
-	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
-		m_pWebRTCPeerConnectionFactory.release();
-	}
-
 	ClearPeerConnections();
 }
 
 WebRTCConductor::~WebRTCConductor() {
-	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
-		m_pWebRTCPeerConnectionFactory.release();
-		m_pWebRTCPeerConnectionFactory = nullptr;
-	}
 }
 
 RESULT WebRTCConductor::ClearPeerConnections() {
@@ -252,15 +244,14 @@ RESULT WebRTCConductor::Initialize() {
 
 	CBM((m_pWebRTCPeerConnectionFactory == nullptr), "Peer Connection Factory already initialized");
 	m_pWebRTCPeerConnectionFactory = webrtc::CreatePeerConnectionFactory();
+	m_pWebRTCPeerConnectionFactory->AddRef();
 	CNM(m_pWebRTCPeerConnectionFactory.get(), "WebRTC Error Failed to initialize PeerConnectionFactory");
 
 //Success:
 	return r;
 
 Error:
-	if (m_pWebRTCPeerConnectionFactory.get() != nullptr) {
-		m_pWebRTCPeerConnectionFactory.release();
-	}
+	m_pWebRTCPeerConnectionFactory->Release();
 
 	return r;
 }

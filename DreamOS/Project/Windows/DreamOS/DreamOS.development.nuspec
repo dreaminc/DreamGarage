@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>DreamDev</id>
+    <version>$version$</version>
+    <title>DreamDev</title>
+    <authors>Dream Garage, Incorporated</authors>
+    <owners>Dream Garage, Incorporated</owners>
+    <description>DreamDev</description>
+    <!--<licenseUrl>http://LICENSE_URL_HERE_OR_DELETE_THIS_LINE</licenseUrl>-->
+    <projectUrl>https://www.dreamos.com</projectUrl>
+    <iconUrl>https://github.com/dreaminc/Dream/releases/download/Releases/Dream.ico</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+
+    <!--<dependencies></dependencies>-->
+
+    <releaseNotes>
+      Verson $version$ 
+
+      This is a test of the deplopyment system
+    </releaseNotes>
+    
+    <copyright>Copyright 2017</copyright>
+    <tags>native, dreamos</tags>
+  </metadata>
+  <files>
+    <file src="x64\DevProduction\*.exe" target="\lib\net45\" />
+    <file src="x64\DevProduction\*.lib" target="\lib\net45\" />
+    <file src="x64\DevProduction\*.dll" target="\lib\net45\" />
+    <file src="x64\DevProduction\*.bin" target="\lib\net45\" />
+    <file src="x64\DevProduction\*.dat" target="\lib\net45\" />
+    
+    <file src=".\..\..\..\dreampaths.txt" target="\lib\net45\dreampaths.txt" />
+    <file src=".\..\..\..\HAL\**" target="\lib\net45\HAL\" />
+    <file src=".\..\..\..\Models\**" target="\lib\net45\Models\" />
+    <file src=".\..\..\..\Resources\**" target="\lib\net45\Resources\" />
+    <file src=".\..\..\..\Texture\**" target="\lib\net45\Texture\" />
+    
+    <file src=".\..\..\..\distribution\*" target="\lib\net45\" />
+    
+    <!--<file src="x64\DevProduction\locales\**" target="\lib\net45\locales\" />-->
+    
+    <file src="DreamOS.targets" target="\build\net45\DreamOS.targets" />
+  </files>
+</package>

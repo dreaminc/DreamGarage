@@ -29,6 +29,8 @@
 // TODO: Temp for testing
 #include "External/Matrices/Matrices.h"
 
+#include "Sense/SenseController.h"
+
 // IVR EHM extension
 
 #define CIVR(ivrr) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){goto Error;}}while(0);
@@ -55,8 +57,6 @@ public:
 
 	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
 	ViewMatrix GetViewMatrix(EYE_TYPE eye);
-	RESULT AttachHand(hand *pHand, hand::HAND_TYPE type);
-	hand* GetHand(hand::HAND_TYPE type);
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);
@@ -71,6 +71,8 @@ private:
 	RESULT InitializeRenderModels();								// This sets up the models
 	RESULT InitializeRenderModel(uint32_t deviceID);	// This sets up a given model
 	RESULT SetControllerModelTexture(model *pModel, texture *pTexture, vr::ETrackedControllerRole controllerRole);
+
+	RESULT UpdateSenseController(vr::ETrackedControllerRole controllerRole, vr::VRControllerState_t state);
 
 public:
 	vr::IVRSystem *m_pIVRHMD;
@@ -100,11 +102,11 @@ public:
 	
 	model *m_pControllerModelLeft;
 	texture *m_pControllerModelLeftTexture;
-	hand *m_pLeftHand;
 	
 	model *m_pControllerModelRight;
 	texture *m_pControllerModelRightTexture;
-	hand *m_pRightHand;
+
+	uint32_t ovrFrame;
 
 	model *m_pHMDModel;
 };

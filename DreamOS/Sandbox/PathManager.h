@@ -31,6 +31,7 @@ typedef enum {
 	PATH_TEXTURE_CUBE,
 	PATH_FONT,
 	PATH_MODEL,
+	PATH_DATA,
 	PATH_INVALID	// Also acts as a found
 } PATH_VALUE_TYPE;
 
@@ -50,7 +51,8 @@ class PathManager : public valid {
 		L"TEXTURE",
 		L"TEXTURE_CUBE",
 		L"FONT",
-		L"MODEL"
+		L"MODEL",
+		L"DATA"
 	};
 
 	int m_cszPathValues_n;
@@ -91,11 +93,15 @@ public:
 	RESULT GetFilePathVersion(PATH_VALUE_TYPE type, version ver, const wchar_t *pszFileName, wchar_t * &n_pszVersionFilePath);
 	RESULT GetFilePathWithFolder(PATH_VALUE_TYPE type, const wchar_t *pszFolderName, std::wstring &strPathWithFolder);
 
+	// std::wstring version
+	std::wstring GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
+
 	virtual RESULT DoesPathExist(const wchar_t *pszPath) = 0;
 	virtual RESULT GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs) = 0;
 	virtual RESULT GetListOfFilesInPath(std::wstring strNameDir, std::vector<std::wstring> &vstrFiles, const wchar_t *pszOptExtension = nullptr) = 0;
 
 	RESULT DoesPathExist(PATH_VALUE_TYPE type);
+	RESULT DoesPathExist(std::wstring wstrPath, bool fCheckFile = false);
 	RESULT DoesFileExist(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
 	RESULT GetFileVersionThatExists(PATH_VALUE_TYPE type, version versionFile, const wchar_t *pszFileName, version *versionFileExists);
 

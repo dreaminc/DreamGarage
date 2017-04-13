@@ -16,6 +16,7 @@
 
 //class Subscriber;
 #include "Subscriber.h"
+#include "Primitives/VirtualObj.h"
 
 // TODO: Bring back the PEventClass - no more subscriber predefined event struct?
 // First lets see if this topology works at all
@@ -36,6 +37,10 @@ public:
 
 		bool operator()(int lhs, int rhs) const {
 			return lhs < rhs;
+		}
+
+		bool operator()(VirtualObj* lhs, VirtualObj* rhs) const {
+			return lhs->getID().GetID() < rhs->getID().GetID();
 		}
 	};
 
@@ -77,6 +82,10 @@ public:
 		return pszString;
 	}
 
+	char* GetEventKeyString(VirtualObj* pKeyObject) {
+		return GetEventKeyString((int)(pKeyObject->getID().GetID()));
+	}
+
 	Publisher() {
 		//m_pSubsribers = new std::list<Subscriber*>();
 		//m_pEvents = new std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>();
@@ -113,11 +122,11 @@ public:
 protected:
 	RESULT RegisterEvent(PKeyClass keyEvent) {
 		RESULT r = R_PASS;
-		char *pszEvent = NULL;
+		char *pszEvent = nullptr;
 		
 		//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
 		auto it = m_events.find(keyEvent);
-        std::list<Subscriber<PKEventClass>*>* pNewSubscriberList = NULL;
+        std::list<Subscriber<PKEventClass>*>* pNewSubscriberList = nullptr;
 
 		pszEvent = GetEventKeyString(keyEvent);
 		CBM((it == m_events.end()), "Event %s already registered", pszEvent);
@@ -132,21 +141,31 @@ protected:
 		//DEBUG_LINEOUT("%s Registered event %s", GetPublisherName(), pszEvent);
 
 	Error:
-		if (pszEvent != NULL) {
+		if (pszEvent != nullptr) {
 			delete[] pszEvent;
-			pszEvent = NULL;
+			pszEvent = nullptr;
 		}
 
 		return r;
+	}
+
+public:
+	bool IsEventRegistered(PKeyClass keyEvent) {
+		auto it = m_events.find(keyEvent);
+		return (!(it == m_events.end()));
+	}
+
+	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> GetEvents() {
+		return m_events;
 	}
 	
 public:
 	// This requires the event to be registered 
 	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
-		char *pszEvent = NULL;
+		char *pszEvent = nullptr;
 		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
-		std::list<Subscriber<PKEventClass>*> *pSubscriberList = NULL;
+		std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 		it = m_events.find(keyEvent);
@@ -167,9 +186,9 @@ public:
 		m_events[keyEvent]->push_back(pSubscriber);
 
 	Error:
-		if (pszEvent != NULL) {
+		if (pszEvent != nullptr) {
 			delete[] pszEvent;
-			pszEvent = NULL;
+			pszEvent = nullptr;
 		}
 
 		return r;
@@ -279,6 +298,23 @@ public:
 		}
 
 		return r;
+	}
+
+	bool EventHasSubscribers(PKeyClass keyEvent) {
+		typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
+		auto it = m_events.find(keyEvent);
+
+		pszEvent = GetEventKeyString(keyEvent);
+		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
+
+		pSubscriberList = m_events[keyEvent];
+		CNM(pSubscriberList, "Subscriber list is NULL");
+
+		if (pSubscriberList->size() > 0) {
+			return true;
+		}
+
+		return false;
 	}
 
 private:

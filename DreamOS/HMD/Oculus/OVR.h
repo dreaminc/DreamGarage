@@ -14,7 +14,7 @@
 #include "HAL/opengl/OGLDepthbuffer.h"
 
 // TODO: Better way?
-#define HMD_OVR_USE_PREDICTED_TIMNIG
+#define HMD_OVR_USE_PREDICTED_TIMING
 
 //#include "External\OCULUS\v132\LibOVR\Include\OVR_CAPI.h"
 //#pragma comment(lib, "External/OCULUS/v132/LibOVR/Lib/Windows/x64/Release/VS2015/LibOVR.lib")
@@ -53,6 +53,9 @@ public:
 	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
 	ViewMatrix GetViewMatrix(EYE_TYPE eye);
 
+private:
+	RESULT UpdateSenseController(ovrControllerType type, ovrInputState& inputState);
+
 public:
 	ovrSession m_ovrSession;
 	ovrHmdDesc m_ovrHMDDescription;
@@ -64,6 +67,13 @@ public:
 	OVRTextureSwapChain *m_ovrTextureSwapChains[HMD_NUM_EYES];
 	OVRMirrorTexture *m_ovrMirrorTexture;
 	//OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
+
+	quaternion qLeftRotation;
+	quaternion qRightRotation;
+
+	composite *m_pLeftControllerModel;
+	composite *m_pRightControllerModel;
+	
 };
 
 #endif // ! HMD_IMP_H_

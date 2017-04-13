@@ -25,6 +25,14 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	OGLSphere(OpenGLImp *pParentImp, BoundingSphere* pBoundingSphere, bool fTriangleBased) :
+		sphere(pBoundingSphere, fTriangleBased),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
+
 	// This needs to be called from the sub-class constructor
 	// or externally from the object (TODO: factory class needed)
 	// TODO: Move this back to OGLObj
@@ -95,7 +103,18 @@ public:
 		WCR(m_pParentImp->glEnableVertexAtrribArray((GLuint)5));
 		CR(m_pParentImp->glVertexAttribPointer((GLuint)5, vertex::GetBitangentDimensions(), GetOGLPrecision(), GL_FALSE, sizeof(vertex), vertex::GetBitangentOffset()));
 
-		CR(m_pParentImp->ReleaseCurrentContext());
+		//CR(m_pParentImp->ReleaseCurrentContext());
+
+	Error:
+		return r;
+	}
+
+	RESULT UpdateFromBoundingSphere(BoundingSphere* pBoundingSphere) {
+		RESULT r = R_PASS;
+
+		sphere *pSphere = (sphere*)(GetDimObj());
+		CR(pSphere->UpdateFromBoundingSphere(pBoundingSphere));
+		CR(UpdateOGLBuffers());
 
 	Error:
 		return r;
@@ -103,7 +122,7 @@ public:
 
 	// Override this method when necessary by a child object
 	// Many objects will not need to though. 
-	RESULT Render() {
+	virtual RESULT Render() override {
 		RESULT r = R_PASS;
 
 		// TODO: Rethink this since it's in the critical path
@@ -113,27 +132,18 @@ public:
 		CR(m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO));
 		CR(m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO));
 
-		/*
-		int numVerts = pDimObj->NumberVertices();
-		glDrawArrays(GL_POINTS, 0, numVerts);
-		return r;
-		//*/
-		
-		
-		//void *pOffset = (void*)(sizeof(dimindex) * indexCount);
+		GLint previousPolygonMode[2]{ 0 };
+		glGetIntegerv(GL_POLYGON_MODE, previousPolygonMode);
 
-		// Top Fan
-		/*
-		int numFanVerts = m_numAngularDivisions + 2;
-		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
-		indexCount += numFanVerts;
-		*/
+		if (pDimObj->IsWireframe()) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		}
 		
 		// Strips
+		// TODO: quad strip?
 		int indexCount = 0;
 		int numTriangleStripVerts = 2 * (m_numAngularDivisions + 1);
 		int numStrips = m_numVerticalDivisions - 1;
-		//numStrips = 2;
 
 		for (int i = 0; i < numStrips; i++) {
 			void *pOffset = (void*)(sizeof(dimindex) * indexCount);
@@ -141,12 +151,15 @@ public:
 			indexCount += numTriangleStripVerts;
 		}
 		
-		/*
-		// Bottom Fan
-		pOffset = (void*)(sizeof(dimindex) * indexCount);
-		glDrawElements(GL_TRIANGLE_FAN, numFanVerts, GL_UNSIGNED_INT, pOffset);
-		indexCount += numFanVerts;
-		//*/
+		if (pDimObj->IsWireframe()) {
+			if (previousPolygonMode[1] != 0) {
+				glPolygonMode(GL_FRONT, previousPolygonMode[0]);
+				glPolygonMode(GL_BACK, previousPolygonMode[1]);
+			}
+			else {
+				glPolygonMode(GL_FRONT_AND_BACK, previousPolygonMode[0]);
+			}
+		}
 
 
 	Error:

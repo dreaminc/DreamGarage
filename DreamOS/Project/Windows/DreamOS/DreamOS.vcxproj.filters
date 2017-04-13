@@ -63,18 +63,6 @@
     <Filter Include="External\OCULUS">
       <UniqueIdentifier>{3686233d-96d6-4810-ab2d-ff06312c2946}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\OCULUS\v132">
-      <UniqueIdentifier>{9fb38d30-c91d-44ad-b826-0bc9b067ae01}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\LibOVR">
-      <UniqueIdentifier>{352f8ae7-d31f-45c0-afc6-c334b01431cf}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\LibOVRKernel">
-      <UniqueIdentifier>{9b76fa23-0019-42ac-9157-f11820e16332}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\OCULUS\v132\Logging">
-      <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HMD">
       <UniqueIdentifier>{e122ce99-434d-454c-a1b9-c035729da930}</UniqueIdentifier>
     </Filter>
@@ -96,26 +84,8 @@
     <Filter Include="External\CEF">
       <UniqueIdentifier>{c033e102-b336-4bdc-990e-f62e5cb34781}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\CEF\v3.2556">
-      <UniqueIdentifier>{c98ee759-94af-4b05-9cd5-74ae52618551}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Cloud">
       <UniqueIdentifier>{8b54f727-8eee-4dc1-83bb-7c8112d843e1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\CEF\v3.2556\include">
-      <UniqueIdentifier>{cc8a22c9-5fba-4549-a653-5ecbf0e29190}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\CEF\v3.2556\include\base">
-      <UniqueIdentifier>{ab6948a2-5c99-41a6-a5ca-0de8bfeee2fe}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\CEF\v3.2556\include\capi">
-      <UniqueIdentifier>{da0a8e0c-cde6-4a6d-8913-12fc963273d9}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\CEF\v3.2556\include\internal">
-      <UniqueIdentifier>{7acd7a4f-1e56-4ad5-b315-da4dba091179}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="External\CEF\v3.2556\include\wrapper">
-      <UniqueIdentifier>{a00bacef-de45-4c28-a2a9-4a1f03ee7b07}</UniqueIdentifier>
     </Filter>
     <Filter Include="DreamOS">
       <UniqueIdentifier>{730db82d-4c28-45f4-928a-51f3c3fb19a7}</UniqueIdentifier>
@@ -171,6 +141,48 @@
     <Filter Include="Models\face4">
       <UniqueIdentifier>{6407adae-441a-4745-82ee-215906aec0b3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Primitives\matrix">
+      <UniqueIdentifier>{9ecd8ad4-8dee-4052-a0e9-2f164281aa96}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PhysicsEngine">
+      <UniqueIdentifier>{50ee9b23-5e58-4c01-a7ea-946aeb9ada77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DreamTestApp">
+      <UniqueIdentifier>{921ea31d-7767-45b3-8296-bb5f9e9725eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InteractionEngine">
+      <UniqueIdentifier>{4bf81ee4-33cb-4648-aeeb-4c7752abaad8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="UI">
+      <UniqueIdentifier>{28d7c94b-81c3-4992-85e4-1dabd8aad4d9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cloud\Menu">
+      <UniqueIdentifier>{ae8879dc-1260-4bae-97f6-1266681d851d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0">
+      <UniqueIdentifier>{9fb38d30-c91d-44ad-b826-0bc9b067ae01}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\LibOVR">
+      <UniqueIdentifier>{352f8ae7-d31f-45c0-afc6-c334b01431cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\LibOVRKernel">
+      <UniqueIdentifier>{9b76fa23-0019-42ac-9157-f11820e16332}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\OCULUS\v1.12.0\Logging">
+      <UniqueIdentifier>{d1975c76-4672-49c3-8861-0d8d96fd0d8e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scripts">
+      <UniqueIdentifier>{ab12ef14-0c46-4045-ac45-cfe6f65b4332}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NuGet">
+      <UniqueIdentifier>{49713455-67bf-497c-a46d-68456ba95718}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebBrowser">
+      <UniqueIdentifier>{1cefafeb-98c7-4a55-ad04-d0ea29fa152d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WebBrowser\CEFBrowser">
+      <UniqueIdentifier>{050ed7a2-b102-42e7-ad6f-8a2e98c25191}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -193,9 +205,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp">
       <Filter>Sandbox</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\ProjectionMatrix.cpp">
-      <Filter>Primitives</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\point.cpp">
       <Filter>Primitives</Filter>
@@ -293,22 +302,10 @@
     <ClCompile Include="..\..\..\Primitives\font.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFHandler.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\CloudControllerFactory.cpp">
-      <Filter>Cloud</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\CEFApp.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\DreamOS.cpp">
@@ -316,9 +313,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\HALImp.cpp">
       <Filter>HAL</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\DreamGarage.cpp">
-      <Filter>DreamGarage</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCImp.cpp">
       <Filter>Cloud\webrtc</Filter>
@@ -359,9 +353,6 @@
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Primitives\composite.cpp">
-      <Filter>Primitives</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\hand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -398,15 +389,6 @@
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp">
       <Filter>Main</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_Library.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\Logging_OutputPlugins.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\External\OCULUS\v132\Logging\src\internal\Logging_Tools.cpp">
-      <Filter>External\OCULUS\v132\Logging</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Cloud\webrtc\WebRTCPeerConnection.cpp">
       <Filter>Cloud\webrtc</Filter>
     </ClCompile>
@@ -437,14 +419,260 @@
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp">
       <Filter>Sense</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingSphere.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingBox.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingVolume.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\vector.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\composite.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\DimObj.cpp">
       <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\volume.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\sphere.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\cylinder.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\TestObject.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\TestSuite.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp">
+      <Filter>Primitives\matrix</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp">
       <Filter>Cloud\User</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionDetector.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionResolver.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngine.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsIntegrator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\GravityGenerator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Sense\SenseController.cpp">
+      <Filter>Sense</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\DimRay.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\DreamTestApp\DreamTestApp.cpp">
+      <Filter>DreamTestApp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp">
+      <Filter>Primitives\matrix</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\ObjectState.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\BoundingQuad.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\quad.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\CollisionManifold.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\ContactPoint.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\line.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\PhysicsEngine\Integrator.cpp">
+      <Filter>PhysicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp">
+      <Filter>Test</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngine.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIBar.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuItem.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIModule.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp">
+      <Filter>Cloud\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\CloudTestSuite.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Core\Utilities.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Controller.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp">
+      <Filter>Cloud\Menu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\CloudMessage.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_OutputPlugins.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp">
+      <Filter>External\OCULUS\v1.12.0\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPRequest.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp">
+      <Filter>Cloud\HTTP</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\HMD.cpp">
+      <Filter>HMD</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\HALTestSuite.cpp">
+      <Filter>HAL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamApp.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamAppManager.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\Environment\EnvironmentAsset.cpp">
+      <Filter>Cloud\Environment</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationItem.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationQueue.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationTestSuite.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationState.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserControllerFactory.cpp">
+      <Filter>WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.cpp">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserManager.cpp">
+      <Filter>WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\WebBrowser\WebBrowserController.cpp">
+      <Filter>WebBrowser</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp">
+      <Filter>InteractionEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -463,13 +691,7 @@
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h">
       <Filter>RESULT</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\AABV.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\DimObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\matrix.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\point.h">
@@ -532,9 +754,6 @@
     <ClInclude Include="..\..\..\Primitives\Vertex.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ProjectionMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\Shader.h">
       <Filter>HAL</Filter>
     </ClInclude>
@@ -562,22 +781,10 @@
     <ClInclude Include="..\..\..\Core\config.h">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\TranslationMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\RotationMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ScalingMatrix.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\camera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h">
-      <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\ViewMatrix.h">
       <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseDevice.h">
@@ -802,550 +1009,7 @@
     <ClInclude Include="..\..\..\Cloud\CloudImp.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFImp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_app.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_auth_callback.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_base.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_browser.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_browser_process_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_callback.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_client.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_command_line.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_context_menu_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_cookie.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_dialog_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_display_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_dom.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_download_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_download_item.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_drag_data.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_drag_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_find_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_focus_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_frame.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_geolocation.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_geolocation_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_jsdialog_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_keyboard_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_life_span_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_load_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_menu_model.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_navigation_entry.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_origin_whitelist.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_pack_resources.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_pack_strings.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_parser.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_path_util.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_print_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_print_settings.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_process_message.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_process_util.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_render_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_render_process_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_request.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_request_context.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_request_context_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_request_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_resource_bundle.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_resource_bundle_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_resource_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_response.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_response_filter.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_runnable.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_sandbox_win.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_scheme.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_ssl_info.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_stream.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_string_visitor.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_task.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_trace.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_urlrequest.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_v8.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_values.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_version.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_web_plugin.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_xml_reader.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_zip_reader.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_byte_read_handler.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_closure_task.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_helpers.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_message_router.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_resource_manager.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_stream_resource_handler.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_xml_object.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_zip_archive.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_export.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_logging_internal.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_ptr.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_list.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_map.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_multimap.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_types.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_wrappers.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_thread_internal.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_time.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_trace_event_internal.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_types.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_types_win.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_types_wrappers.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_win.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_app_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_auth_callback_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_base_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_browser_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_browser_process_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_callback_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_client_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_command_line_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_context_menu_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_cookie_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_dialog_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_display_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_dom_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_download_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_download_item_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_drag_data_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_drag_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_find_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_focus_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_frame_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_geolocation_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_geolocation_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_jsdialog_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_keyboard_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_life_span_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_load_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_menu_model_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_navigation_entry_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_origin_whitelist_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_parser_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_path_util_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_print_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_print_settings_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_process_message_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_process_util_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_render_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_render_process_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_request_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_request_context_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_request_context_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_request_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_resource_bundle_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_resource_bundle_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_resource_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_response_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_response_filter_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_scheme_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_ssl_info_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_stream_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_string_visitor_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_task_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_trace_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_urlrequest_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_v8_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_values_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_web_plugin_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_xml_reader_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_zip_reader_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_atomicops.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_atomic_ref_count.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_basictypes.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_bind.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_bind_helpers.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_build.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_callback.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_callback_forward.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_callback_helpers.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_callback_list.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_cancelable_callback.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_lock.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_logging.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_macros.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_move.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_platform_thread.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_ref_counted.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_scoped_ptr.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_string16.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_template_util.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_thread_checker.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_thread_collision_warner.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_trace_event.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_tuple.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_weak_ptr.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_atomicops_x86_msvc.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_bind_internal.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_bind_internal_win.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_callback_internal.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_lock_impl.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_raw_scoped_refptr_mismatch_checker.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_thread_checker_impl.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFApp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFHandler.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h">
@@ -1369,557 +1033,11 @@
     <ClInclude Include="..\..\..\Cloud\CloudImp.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFImp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_app.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_auth_callback.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_base.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_browser.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_browser_process_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_callback.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_client.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_command_line.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_context_menu_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_cookie.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_dialog_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_display_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_dom.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_download_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_download_item.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_drag_data.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_drag_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_find_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_focus_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_frame.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_geolocation.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_geolocation_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_jsdialog_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_keyboard_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_life_span_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_load_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_menu_model.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_navigation_entry.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_origin_whitelist.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_pack_resources.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_pack_strings.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_parser.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_path_util.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_print_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_print_settings.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_process_message.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_process_util.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_render_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_render_process_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_request.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_request_context.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_request_context_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_request_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_resource_bundle.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_resource_bundle_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_resource_handler.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_response.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_response_filter.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_runnable.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_sandbox_win.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_scheme.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_ssl_info.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_stream.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_string_visitor.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_task.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_trace.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_urlrequest.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_v8.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_values.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_version.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_web_plugin.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_xml_reader.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\cef_zip_reader.h">
-      <Filter>External\CEF\v3.2556\include</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_byte_read_handler.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_closure_task.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_helpers.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_message_router.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_resource_manager.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_stream_resource_handler.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_xml_object.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\wrapper\cef_zip_archive.h">
-      <Filter>External\CEF\v3.2556\include\wrapper</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_export.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_logging_internal.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_ptr.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_list.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_map.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_multimap.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_types.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_string_wrappers.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_thread_internal.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_time.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_trace_event_internal.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_types.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_types_win.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_types_wrappers.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\internal\cef_win.h">
-      <Filter>External\CEF\v3.2556\include\internal</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_app_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_auth_callback_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_base_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_browser_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_browser_process_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_callback_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_client_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_command_line_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_context_menu_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_cookie_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_dialog_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_display_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_dom_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_download_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_download_item_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_drag_data_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_drag_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_find_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_focus_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_frame_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_geolocation_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_geolocation_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_jsdialog_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_keyboard_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_life_span_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_load_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_menu_model_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_navigation_entry_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_origin_whitelist_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_parser_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_path_util_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_print_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_print_settings_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_process_message_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_process_util_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_render_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_render_process_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_request_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_request_context_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_request_context_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_request_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_resource_bundle_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_resource_bundle_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_resource_handler_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_response_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_response_filter_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_scheme_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_ssl_info_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_stream_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_string_visitor_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_task_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_trace_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_urlrequest_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_v8_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_values_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_web_plugin_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_xml_reader_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\capi\cef_zip_reader_capi.h">
-      <Filter>External\CEF\v3.2556\include\capi</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_atomicops.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_atomic_ref_count.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_basictypes.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_bind.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_bind_helpers.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_build.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_callback.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_callback_forward.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_callback_helpers.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_callback_list.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_cancelable_callback.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_lock.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_logging.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_macros.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_move.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_platform_thread.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_ref_counted.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_scoped_ptr.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_string16.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_template_util.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_thread_checker.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_thread_collision_warner.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_trace_event.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_tuple.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\cef_weak_ptr.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_atomicops_x86_msvc.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_bind_internal.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_bind_internal_win.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_callback_internal.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_lock_impl.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_raw_scoped_refptr_mismatch_checker.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\include\base\internal\cef_thread_checker_impl.h">
-      <Filter>External\CEF\v3.2556\include\base</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFApp.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFHandler.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\CloudControllerFactory.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\CEFURLRequestController.h">
       <Filter>Cloud</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\DreamOS.h">
       <Filter>DreamOS</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\DreamGarage.h">
-      <Filter>DreamGarage</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h">
       <Filter>HAL\opengl</Filter>
@@ -1938,9 +1056,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.h">
       <Filter>HAL\opengl</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\BiasMatrix.h">
-      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\External\Matrices\Matrices.h">
       <Filter>External\Matrices</Filter>
@@ -1996,9 +1111,6 @@
     <ClInclude Include="..\..\..\Cloud\Controller.h">
       <Filter>Cloud</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Model.h">
-      <Filter>Cloud</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Message\Message.h">
       <Filter>Cloud\Message</Filter>
     </ClInclude>
@@ -2010,6 +1122,18 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingVolume.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingSphere.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\line.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingBox.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h">
       <Filter>Scene</Filter>
@@ -2078,11 +1202,242 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\cylinder.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLCylinder.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ray.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\TestSuite.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\matrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\BiasMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ProjectionMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\RotationMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\MatrixTestSuite.h">
+      <Filter>Primitives\matrix</Filter>
+    </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
       <Filter>Cloud\User</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
       <Filter>Cloud\Message</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngine.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsIntegrator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGenerator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\GravityGenerator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ForceGeneratorFactory.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Sense\SenseController.h">
+      <Filter>Sense</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DimRay.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\DreamTestApp\DreamTestApp.h">
+      <Filter>DreamTestApp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\BoundingQuad.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ObjectState.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\PhysicsEngineTestSuite.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\ContactPoint.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PhysicsEngine\Integrator.h">
+      <Filter>PhysicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Test\TestSuiteFactory.h">
+      <Filter>Test</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIBar.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuItem.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMenuLayer.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIModule.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UITestSuite.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h">
+      <Filter>Cloud\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\CloudTestSuite.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\ControllerProxy.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\CloudMessage.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Core\Utilities.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\CloudModel.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Menu\MenuNode.h">
+      <Filter>Cloud\Menu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\ControllerObserver.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestHandler.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPRequestFileHandler.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\HALTestSuite.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamApp.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamAppManager.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Manager.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\HTTP\HTTPCommon.h">
+      <Filter>Cloud\HTTP</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentAsset.h">
+      <Filter>Cloud\Environment</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationItem.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationQueue.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationTestSuite.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationState.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserController.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFHandler.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserService.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserControllerFactory.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\WebBrowserManager.h">
+      <Filter>WebBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\singleton.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFAppObserver.h">
+      <Filter>WebBrowser\CEFBrowser</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h">
+      <Filter>InteractionEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2095,11 +1450,11 @@
     <None Include="..\..\..\Primitives\.DS_Store">
       <Filter>Primitives</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\libcef_dll_wrapper.pdb" />
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\natives_blob.bin">
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\libcef_dll_wrapper.pdb" />
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\natives_blob.bin">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2556.1368\Debug\snapshot_blob.bin">
+    <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\snapshot_blob.bin">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="..\..\..\Resources\Fonts\Arial.fnt">
@@ -2252,6 +1607,9 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
       <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
     </None>
+    <None Include="..\..\..\Primitives\plane.h">
+      <Filter>Primitives</Filter>
+    </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
@@ -2260,6 +1618,30 @@
     </None>
     <None Include="..\..\..\Models\face4\untitled.mtl">
       <Filter>Models\face4</Filter>
+    </None>
+    <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="DreamOS.development.nuspec">
+      <Filter>NuGet</Filter>
+    </None>
+    <None Include="DreamOS.production.nuspec">
+      <Filter>NuGet</Filter>
+    </None>
+    <None Include="packages.config">
+      <Filter>NuGet</Filter>
+    </None>
+    <None Include="..\..\..\Scripts\make_production.py">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="..\..\..\Scripts\make_production_package.py">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="..\..\..\Scripts\copy_assets.py">
+      <Filter>Scripts</Filter>
+    </None>
+    <None Include="PropertySheet.props">
+      <Filter>Core</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -2294,8 +1676,6 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="..\..\..\Models\face4\untitled.obj">
-      <Filter>Models\face4</Filter>
-    </Object>
+    <Object Include="..\..\..\Models\face4\untitled.obj" />
   </ItemGroup>
 </Project>

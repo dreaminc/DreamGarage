@@ -680,22 +680,71 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::RenderSceneGraph(ObjectStore *pSceneGraph) {
+RESULT OGLProgram::RenderObjectStoreBoundingVolumes(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
-	
-	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
+
+	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = NULL;
 
-	pSceneGraph->Reset();
-	while ((pVirtualObj = pObjectStore->GetNextObject()) != NULL) {
+	pObjectStore->Reset();
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != NULL) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
-
-		if (pDimObj == NULL)
+		
+		if (pDimObj == NULL) {
 			continue;
-		else {
-			CR(RenderObject(pDimObj));
-
 		}
+		else {
+			CR(RenderObjectBoundingVolume(pDimObj));
+		}
+	}
+
+Error:
+	return r;
+}
+
+// Critical Path, EHM removed
+// Debug manually
+RESULT OGLProgram::RenderObjectStore(ObjectStore *pObjectStore) {
+	RESULT r = R_PASS;
+	
+	ObjectStoreImp *pObjectStoreImp = pObjectStore->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = nullptr;
+
+	pObjectStore->Reset();
+	while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
+		if (pVirtualObj->IsVisible() == true) {
+			RenderObject((DimObj*)pVirtualObj);
+		}
+	}
+
+//Error:
+	return r;
+}
+
+RESULT OGLProgram::RenderObjectBoundingVolume(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Temp - this might want to be a separate flag
+	if (pDimObj->IsVisible() == false)
+		return R_PASS;
+
+	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
+
+	if (pOGLObj != nullptr) {
+		// TODO: This is a bit wonky, RenderBoundingVolume creates the OGL Bounding volume 
+		// which might not be the right flow
+		if (pOGLObj->GetOGLBoundingVolume() != nullptr) {
+			// Update bounding volume:
+			pOGLObj->UpdateBoundingVolume();
+			SetObjectUniforms(pOGLObj->GetOGLBoundingVolume()->GetDimObj());
+		}
+
+		// This is called even when bounding volume is null since it'll create the refgeo
+		CR(pOGLObj->RenderBoundingVolume());
+	}
+
+	if (pDimObj->HasChildren()) {
+		CR(RenderChildrenBoundingVolumes(pDimObj));
 	}
 
 Error:
@@ -705,15 +754,9 @@ Error:
 RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
-	if (pDimObj->IsVisible() == false)
-		return R_PASS;
-
+	// TODO: Remove this dynamic cast
 	OGLObj *pOGLObj = dynamic_cast<OGLObj*>(pDimObj);
-	
-	/* TODO: This should be replaced with a materials store or OGLMaterial that pre-allocates and swaps binding points (Wait for textures)
-	m_pFragmentShader->SetMaterial(pDimObj->GetMaterial());
-	m_pFragmentShader->UpdateUniformBlockBuffers();
-	//*/
+	//CNR(pOGLObj, R_SKIPPED);
 
 	// Update buffers if marked as dirty
 	if (pDimObj->CheckAndCleanDirty()) {
@@ -721,6 +764,8 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 	}
 	
 	if (pOGLObj != nullptr) {
+		// TODO: This should be replaced with a materials store or OGLMaterial that 
+		// preallocates and swaps binding points (Wait for textures)
 		SetObjectUniforms(pDimObj);
 		SetMaterial(pDimObj->GetMaterial());
 		SetObjectTextures(pOGLObj);	// TODO: Should this be absorbed by SetObjectUniforms?
@@ -730,7 +775,7 @@ RESULT OGLProgram::RenderObject(DimObj *pDimObj) {
 			CR(fnObjectCallback(this, nullptr));
 		}
 
-		CR(pOGLObj->Render());
+		pOGLObj->Render();
 
 		if ((fnObjectCallback = pOGLObj->GetOGLProgramPostCallback()) != nullptr) {
 			CR(fnObjectCallback(this, nullptr));
@@ -745,21 +790,41 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::RenderChildren(DimObj *pDimObj) {
+RESULT OGLProgram::RenderChildrenBoundingVolumes(DimObj *pDimObj) {
 	RESULT r = R_PASS;
 
 	// TODO: Rethink this since it's in the critical path
 	auto objects = pDimObj->GetChildren();
 
 	for (auto &pVirtualObj : objects) {
-		auto pDimObjChild = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
-		CR(RenderObject(pDimObjChild.get()));
+		DimObj *pChildDimObj = dynamic_cast<DimObj*>(pVirtualObj.get());
+
+		if (pChildDimObj != nullptr) {
+			CR(RenderObjectBoundingVolume(pChildDimObj));
+		}
 	}
 
 Error:
 	return r;
 }
 
+RESULT OGLProgram::RenderChildren(DimObj *pDimObj) {
+	RESULT r = R_PASS;
+
+	// TODO: Rethink this since it's in the critical path
+	for (auto &pVirtualObj : pDimObj->GetChildren()) {
+		//auto pDimObjChild = std::dynamic_pointer_cast<DimObj>(pVirtualObj);
+		//CR(RenderObject(pDimObjChild.get()));
+
+		if (pVirtualObj->IsVisible() == true)
+			RenderObject((DimObj*)(pVirtualObj.get()));
+	}
+
+//Error:
+	return r;
+}
+
+/*
 RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pVirtualObj);
 
@@ -769,6 +834,7 @@ RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
 
 	return R_FAIL;
 }
+*/
 
 // TODO: Consolidate?
 RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {

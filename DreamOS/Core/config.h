@@ -17,6 +17,10 @@
 #define RIGHT_HANDED
 //#define LEFT_HANDED
 
+// Comment out to use production
+//#define _USE_TEST_APP	
+//#define _UNIT_TESTING
+
 #if defined(_WIN32)
 	#define CORE_CONFIG_SANDBOX_PLATFORM SANDBOX_APP_WIN32
 

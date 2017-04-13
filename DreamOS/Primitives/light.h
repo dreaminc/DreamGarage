@@ -10,7 +10,7 @@
 
 #include "VirtualObj.h"
 #include "color.h"
-#include "ProjectionMatrix.h"
+#include "matrix/ProjectionMatrix.h"
 
 typedef float light_precision;
 
@@ -68,7 +68,7 @@ public:
 			matVP = ProjectionMatrix(width, height, nearPlane, farPlane, m_spotAngle);
 		}
 
-		matVP = matVP * RotationMatrix(m_vectorDirection, vector::jVector(1.0f)) * TranslationMatrix(m_ptOrigin);
+		matVP = matVP * RotationMatrix(m_vectorDirection, vector::jVector(1.0f)) * TranslationMatrix(GetOrigin());
 
 		return matVP;
 	}

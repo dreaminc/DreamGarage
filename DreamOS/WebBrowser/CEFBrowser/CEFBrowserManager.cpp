@@ -1,0 +1,208 @@
+#include "CEFBrowserManager.h"
+
+#include "CEFBrowserController.h"
+
+#include "CEFHandler.h"
+
+#include "CEFApp.h"
+
+CEFBrowserManager::CEFBrowserManager() {
+	// empty
+}
+
+CEFBrowserManager::~CEFBrowserManager() {
+	RESULT r = R_PASS;
+
+	//CRM(Shutdown(), "WebBrowserManager failed to shutdown properly");
+	CR(r);
+
+Error:
+	return;
+}
+
+RESULT CEFBrowserManager::Initialize() {
+	RESULT r = R_PASS;
+
+	/*
+	m_ServiceThread = std::thread(&CEFBrowserManager::CEFManagerThread, this);
+	std::unique_lock<std::mutex> lockCEFBrowserInitialization(m_mutex);
+	m_condBrowserInit.wait(lockCEFBrowserInitialization);
+	*/
+
+	CR(CEFManagerThread());
+
+	CBM((m_state == CEFBrowserManager::state::INITIALIZED), "CEFBrowserManager not correctly initialized");
+
+// Success:
+	return r;
+
+Error:
+	Shutdown();
+	return r;
+}
+RESULT CEFBrowserManager::Update() {
+	RESULT r = R_PASS;
+
+	for (auto& pWebBrowserController : m_webBrowserControllers) {
+		// TODO: optimize with actual dirty rects copy
+		int numFramesProcessed = 0;
+		CR(pWebBrowserController->PollNewDirtyFrames(numFramesProcessed));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserManager::OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: GetViewRect");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnGetViewRect(cefRect));
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserManager::OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, CefRenderHandler::PaintElementType type, const CefRenderHandler::RectList &dirtyRects, const void *pBuffer, int width, int height) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnPaint");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnPaint(type, dirtyRects, pBuffer, width, height));
+
+Error:
+	return r;
+}
+
+std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
+	for (auto &pWebBrowserController : m_webBrowserControllers) {
+		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);
+		if (pCEFBrowserController != nullptr) {
+			if (pCEFBrowserController->GetCEFBrowser()->IsSame(pCEFBrowser)) {
+				return pCEFBrowserController;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+RESULT CEFBrowserManager::CEFManagerThread() {
+	RESULT r = R_PASS;
+
+	// Initialize CEF.
+
+	// Enable High-DPI support on Windows 7 or newer.
+	//CefEnableHighDPISupport();
+
+	HINSTANCE hInstance = GetModuleHandle(nullptr);
+	CefMainArgs cefMainArgs(hInstance);
+
+	// Provide CEF with command-line arguments.
+	int exitCode = CefExecuteProcess(cefMainArgs, nullptr, nullptr);
+	DEBUG_LINEOUT("CefExecuteProcess returned %d", exitCode);
+
+	// Specify CEF global settings here.
+	CefSettings cefSettings;
+
+	//CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(m_pCEFApp.get());
+	//CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(new CEFApp);
+
+	CefString(&cefSettings.browser_subprocess_path) = "DreamCef.exe";
+	CefString(&cefSettings.locale) = "en";
+	cefSettings.remote_debugging_port = 8080;
+
+#ifdef _DEBUG
+	cefSettings.single_process = true;
+#endif
+
+	cefSettings.multi_threaded_message_loop = true;
+
+	CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(CEFApp::instance());
+	CN(pCEFApp);
+
+	CR(pCEFApp->RegisterCEFAppObserver(this));
+
+	CBM(CefInitialize(cefMainArgs, cefSettings, pCEFApp, nullptr), "CefInitialize error");
+
+	DEBUG_LINEOUT("CefInitialize completed successfully");
+	m_state = state::INITIALIZED;
+	m_condBrowserInit.notify_one();
+
+	/*
+	DEBUG_LINEOUT("CEF Run message loop");
+	CefRunMessageLoop();
+	//*/
+
+	DEBUG_LINEOUT("CEF thread complete...");
+
+	// Success:
+	return r;
+
+Error:
+	DEBUG_LINEOUT("CEF Initialization Error, shutting down");
+
+	Shutdown();
+	return r;
+}
+
+std::shared_ptr<WebBrowserController> CEFBrowserManager::MakeNewBrowser(int width, int height, const std::string& strURL) {
+	RESULT r = R_PASS;
+	std::shared_ptr<WebBrowserController> pWebBrowserController = nullptr;
+	DEBUG_LINEOUT("CEFApp: MakeNewBrowser");
+
+	CefRefPtr<CEFApp> pCEFApp = CefRefPtr<CEFApp>(CEFApp::instance());
+	CN(pCEFApp);
+
+	pWebBrowserController = pCEFApp->CreateBrowser(width, height, strURL);
+	CN(pWebBrowserController);
+
+// Success:
+	return pWebBrowserController;
+
+Error:
+	if (pWebBrowserController != nullptr) {
+		pWebBrowserController = nullptr;
+	}
+
+	return nullptr;
+}
+
+RESULT CEFBrowserManager::Shutdown() {
+	RESULT r = R_PASS;
+
+	DEBUG_LINEOUT("CEF force shutdown");
+
+	//CR(ClearAllBrowserControllers());
+
+	if (CEFHandler::instance()) {
+		CEFHandler::instance()->CloseAllBrowsers(true);
+	}
+
+	while (CEFHandler::instance()->IsBrowserRunning()) {
+		// empty stub
+	}
+
+	/*
+	if (m_ServiceThread.joinable()) {
+		m_ServiceThread.join();
+	}
+	*/
+
+	DEBUG_LINEOUT("CEF Exited");
+
+	try {
+		CefShutdown();
+	}
+	catch (...) {
+		DEBUG_LINEOUT("CEF hit exception");
+	}
+
+//Error:
+	return r;
+}

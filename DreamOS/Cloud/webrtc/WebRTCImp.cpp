@@ -23,12 +23,8 @@ WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 }
 
 WebRTCImp::~WebRTCImp() {
+	rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
 	rtc::CleanupSSL();
-
-	if (m_pWebRTCConductor != nullptr) {
-		//m_pWebRTCConductor.release();
-		m_pWebRTCConductor = nullptr;
-	}
 }
 
 // CloudImp Interface
@@ -36,14 +32,14 @@ RESULT WebRTCImp::Initialize() {
 	RESULT r = R_PASS;
 
 	rtc::EnsureWinsockInit();
-	rtc::ThreadManager::Instance()->SetCurrentThread(&m_Win32thread);
+	
+	m_pWin32thread = new rtc::Win32Thread();
+	CN(m_pWin32thread);
+
+	rtc::ThreadManager::Instance()->SetCurrentThread(m_pWin32thread);
+
 	rtc::InitializeSSL();
 
-	// TODO: Remove client - not doing anything clearly
-	//m_pWebRTCClient = std::make_shared<WebRTCClient>(this);
-	//CN(m_pWebRTCClient);
-
-	//m_pWebRTCConductor = rtc::scoped_refptr<WebRTCConductor>(new rtc::RefCountedObject<WebRTCConductor>(this));
 	m_pWebRTCConductor = std::make_shared<WebRTCConductor>(this);
 
 	CN(m_pWebRTCConductor);

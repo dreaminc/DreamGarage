@@ -1,6 +1,8 @@
-#include "Logger/Logger.h"
 #include "FileLoader.h"
 #include "PathManager.h"
+
+#include "Logger/Logger.h"
+#include "easylogging++.h"
 
 #include <fstream>
 #include <sstream>
