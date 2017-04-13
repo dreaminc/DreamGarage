@@ -561,9 +561,6 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcr
 
 xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D
 
-python $(ProjectDir)..\..\..\Scripts\copy_assets.py $(ProjectDir)..\..\..\ $(TargetDir)
-
-python $(ProjectDir)..\..\..\Scripts\make_production.py $(TargetDir) $(ProjectDir)..\..\..\Project\Windows\Production\
 
 $(ProjectDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(ProjectDir)DreamOS.production.nuspec" -properties version=$(DREAMVERSION)
 $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Dream.$(DREAMVERSION).nupkg -r ProdReleases</Command>
