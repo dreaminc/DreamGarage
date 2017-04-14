@@ -933,7 +933,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	RenderReferenceGeometry(pSceneGraph, eye);
 
 	// Skybox
-	//RenderSkybox(pObjectStore, eye);
+	RenderSkybox(pObjectStore, eye);
 
 //TODO either remove FlatSceneGraph or create a separate AddFlatContext for overlays
 /*
