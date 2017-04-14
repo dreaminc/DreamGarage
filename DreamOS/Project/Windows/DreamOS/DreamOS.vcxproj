@@ -689,6 +689,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\DConnection.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\DNode.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\Pipeline.cpp" />
     <ClCompile Include="..\..\..\HMD\HMD.cpp" />
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
@@ -914,6 +917,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OpenGLShader.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\DConnection.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\DNode.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\Pipeline.h" />
     <ClInclude Include="..\..\..\HAL\Shader.h" />
     <ClInclude Include="..\..\..\HMD\HMD.h" />
     <ClInclude Include="..\..\..\HMD\HMDFactory.h" />
@@ -953,6 +959,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\DimRay.h" />
     <ClInclude Include="..\..\..\Primitives\dirty.h" />
+    <ClInclude Include="..\..\..\Primitives\DObject.h" />
     <ClInclude Include="..\..\..\Primitives\FlatContext.h" />
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
