@@ -146,6 +146,15 @@ RESULT DimObj::SetColor(color c) {
 	return R_PASS;
 }
 
+RESULT DimObj::SetAlpha(color_precision a) {
+	for (unsigned int i = 0; i < NumberVertices(); i++)
+		m_pVertices[i].SetAlpha(a);
+
+	SetDirty();
+
+	return R_PASS;
+}
+
 RESULT DimObj::TransformUV(matrix<uv_precision, 2, 1> matA, matrix<uv_precision, 2, 2> matB) {
 	RESULT r = R_PASS;
 

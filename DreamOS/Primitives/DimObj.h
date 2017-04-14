@@ -101,6 +101,7 @@ public:
 	RESULT SetWireframe(bool fWireframe = true);
 
 	RESULT SetColor(color c);
+	RESULT SetAlpha(color_precision a);
 
 	RESULT SetColorTexture(texture *pTexture);
 	RESULT ClearColorTexture();

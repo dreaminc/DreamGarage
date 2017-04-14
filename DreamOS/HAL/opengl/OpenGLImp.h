@@ -212,6 +212,8 @@ public:
 
 	RESULT glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation);
 
+	RESULT glBlendEquation(GLenum mode);
+
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
 	RESULT glUniform1i(GLint location, GLint v0);
