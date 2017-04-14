@@ -26,6 +26,7 @@ public:
 
 public:
 	RESULT AddTestFramerateVolumes();
+	RESULT AddTestAlphaVolumes();
 
 private:
 	RESULT ResetTest(void *pContext);

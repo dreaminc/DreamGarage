@@ -210,12 +210,13 @@ RESULT OpenGLImp::PrepareScene() {
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
+
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
 
 	// Reference Geometry Shader Program
@@ -238,15 +239,23 @@ RESULT OpenGLImp::PrepareScene() {
 	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
 
 	// Face culling
+//#define _CULL_BACK_FACES
+#ifdef _CULL_BACK_FACES
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+#else
+	glDisable(GL_CULL_FACE);
+#endif
 
 	// Dithering 
 	glEnable(GL_DITHER);
 
 	// Blending
 	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE);
+	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Allocate the camera
@@ -805,6 +814,7 @@ RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	skybox *pSkybox = nullptr;
 	CR(pObjectStore->GetSkybox(pSkybox));
+
 	if (pSkybox != nullptr) {
 		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
 		CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
@@ -851,6 +861,7 @@ RESULT OpenGLImp::RenderToTexture(FlatContext* pContext) {
 	CN(pFramebuffer);
 
 	m_pOGLFlatProgram->SetFrameBuffer(pFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, pFramebuffer->GetWidth(), pFramebuffer->GetHeight(), pFramebuffer->GetChannels());
+	
 	CR(m_pOGLFlatProgram->UseProgram());
 	CR(m_pOGLFlatProgram->BindToFramebuffer(pFramebuffer));
 	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, EYE_MONO));
@@ -915,11 +926,14 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 		lastEye = eye;
 	}
 
-	// Render Layers
+
 	// 3D Object / skybox
+	//m_pOGLRenderProgram->UseProgram();
 	m_pOGLRenderProgram->RenderObjectStore(pSceneGraph);
 	RenderReferenceGeometry(pSceneGraph, eye);
-	RenderSkybox(pObjectStore, eye);
+
+	// Skybox
+	//RenderSkybox(pObjectStore, eye);
 
 //TODO either remove FlatSceneGraph or create a separate AddFlatContext for overlays
 /*
@@ -1347,6 +1361,16 @@ RESULT OpenGLImp::glGetAttribLocation(GLuint programID, const GLchar *pszName, G
 	return r;
 Error:
 	*pLocation = -1;
+	return r;
+}
+
+RESULT OpenGLImp::glBlendEquation(GLenum mode) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBlendEquation(mode);
+	CRM(CheckGLError(), "glBlendEquation failed");
+
+Error:
 	return r;
 }
 

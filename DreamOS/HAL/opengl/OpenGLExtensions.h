@@ -180,6 +180,10 @@ public:
 	inline void glBindAttribLocation(GLuint programID, GLuint index, const GLchar *pszName) {
 		return m_glBindAttribLocation(programID, index, pszName);
 	}
+
+	inline void glBlendEquation(GLenum mode) {
+		return m_glBlendEquation(mode);
+	}
 	
 	// Shader
 	inline void glAttachShader(GLuint programID, GLuint shaderID) { 
@@ -391,6 +395,7 @@ private:
 	PFNGLENABLEVERTEXATTRIBARRAYPROC m_glEnableVertexAttribArray;
 	PFNGLDISABLEVERTEXATTRIBARRAYPROC m_glDisableVertexAttribArray;
 	PFNGLBINDATTRIBLOCATIONPROC m_glBindAttribLocation;
+	PFNGLBLENDEQUATIONPROC m_glBlendEquation;
 
 	// Shader
 	PFNGLATTACHSHADERPROC m_glAttachShader;

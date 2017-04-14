@@ -127,6 +127,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation")),
 		"Failed to initialize glBindAttribLocation extension");
 
+	CNMW((m_glBlendEquation = (PFNGLBLENDEQUATIONPROC)wglGetProcAddress("glBlendEquation")),
+		"Failed to initialize glBlendEquation extension");
+
 	// Not supported yet?
 	m_glDisableVertexAttribArray = NULL;
 	m_glGetActiveUniform = NULL;
