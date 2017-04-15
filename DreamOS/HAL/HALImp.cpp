@@ -57,3 +57,13 @@ RESULT HALImp::SetHMD(HMD *pHMD) {
 //Error:
 	return r;
 }
+
+RESULT HALImp::InitializeRenderPipeline() {
+	RESULT r = R_PASS;
+
+	m_pRenderPipeline = std::make_unique<Pipeline>();
+	CN(m_pRenderPipeline);
+
+Error:
+	return r;
+}

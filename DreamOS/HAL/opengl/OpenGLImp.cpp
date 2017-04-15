@@ -43,9 +43,6 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 {
 	RESULT r = R_PASS;
 
-	// TODO: Generalize 
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::OpenGL, this);
-
 	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
 	CRM(PrepareScene(), "Failed to prepare GL Scene");
 
@@ -974,31 +971,6 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 RESULT OpenGLImp::Shutdown() {
 	RESULT r = R_PASS;
 
-	//CBM((wglDeleteContext(m_hglrc)), "Failed to wglDeleteContext(hglrc)");
-
-	/* TODO:  Add this stuff
-	wglMakeCurrent(pDC->m_hDC, m_hrc);
-	//--------------------------------
-	m_pProgram->DetachShader(m_pVertSh);
-	m_pProgram->DetachShader(m_pFragSh);
-
-	delete m_pProgram;
-	m_pProgram = NULL;
-
-	delete m_pVertSh;
-	m_pVertSh = NULL;
-	delete m_pFragSh;
-	m_pFragSh = NULL;
-
-	wglMakeCurrent(NULL, NULL);
-	//--------------------------------
-	if (m_hrc)
-	{
-	wglDeleteContext(m_hrc);
-	m_hrc = NULL;
-	}
-	*/
-
 	if (m_pOpenGLRenderingContext != NULL) {
 		delete m_pOpenGLRenderingContext;
 		m_pOpenGLRenderingContext = NULL;
@@ -1023,24 +995,6 @@ RESULT OpenGLImp::SetRenderProfiler(bool fRenderProfiler) {
 
 bool OpenGLImp::IsRenderProfiler() {
 	return m_fRenderProfiler;
-}
-
-RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	// TODO: This should be part of the CMD line
-	if (event->GetArg(1).compare("list") == 0) {
-		HUD_OUT("wire : toggle wireframe on / off");
-	}
-
-	if (event->GetArg(1).compare("wire") == 0) {
-		SetDrawWireframe(!IsDrawWireframe()); 
-	}
-	else if (event->GetArg(1).compare("refgeo") == 0) {
-		SetRenderReferenceGeometry(!IsRenderReferenceGeometry());
-	}
-
-	return r;
 }
 
 // Open GL / Wrappers

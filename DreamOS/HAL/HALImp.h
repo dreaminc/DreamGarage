@@ -31,13 +31,14 @@
 #include "Primitives/user.h"
 #include "Primitives/DimRay.h"
 
+#include "Pipeline/Pipeline.h"
+
 class SandboxApp;
 
-class HALImp : 
-	//public Subscriber<SenseMouseEvent>, 
-	public valid 
+class HALImp : public valid 
 {
 	friend class SandboxApp;
+
 public:
 	struct HALConfiguration {
 		unsigned fRenderReferenceGeometry : 1;
@@ -59,6 +60,10 @@ public:
 	RESULT SetCameraPositionDeviation(vector vDeviation);
 
 	RESULT SetHMD(HMD *pHMD);
+
+public:
+	RESULT InitializeRenderPipeline();
+
 public:
 
 	virtual RESULT Resize(int pxWidth, int pxHeight) = 0;
@@ -114,6 +119,9 @@ public:
 protected:
 	stereocamera *m_pCamera;
 	HMD *m_pHMD;
+
+private:
+	std::unique_ptr<Pipeline> m_pRenderPipeline = nullptr;
 
 private:
 	UID m_uid;

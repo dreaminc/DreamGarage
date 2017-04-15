@@ -17,6 +17,7 @@ class DNode;
 class SinkNode;
 
 class Pipeline : public DObject {
+public:
 	Pipeline();
 	~Pipeline();
 	

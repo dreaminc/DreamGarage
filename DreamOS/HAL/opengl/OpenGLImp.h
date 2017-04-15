@@ -33,7 +33,7 @@ class Windows64App;
 class OGLDreamConsole;
 class font;
 
-class OpenGLImp : public HALImp, public Subscriber<CmdPromptEvent> {
+class OpenGLImp : public HALImp {
 private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
@@ -129,9 +129,6 @@ public:
 	RESULT Resize(int pxWidth, int pxHeight);
 	RESULT Shutdown();
 
-	//RESULT InitializeStereoFramebuffers(HMD *pHMD);
-	//RESULT SetHMD(HMD *pHMD);
-
 	// Rendering Context 
 	RESULT MakeCurrentContext();
 	RESULT ReleaseCurrentContext();
@@ -142,14 +139,6 @@ private:
 	RESULT InitializeOpenGLVersion();
 
 	RESULT PrepareScene();
-
-private:
-	RESULT Notify(CmdPromptEvent *event);
-	//RESULT Notify(SenseMouseEvent *mEvent);
-
-	// TODO: The Eye Buffers shouldn't be in the OpenGLImp
-	// Best to push into FrameBuffer -> OGLFrameBuffer then attach to HMD or stereo camera
-
 
 // TODO: Unify access to extensions
 public:
