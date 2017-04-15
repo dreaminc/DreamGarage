@@ -6,6 +6,12 @@ DNode::DNode() {
 	// empty
 }
 
+DNode::DNode(std::string strName) :
+	m_strName(strName)
+{
+	// empty
+}
+
 DNode::~DNode() {
 	// empty
 }

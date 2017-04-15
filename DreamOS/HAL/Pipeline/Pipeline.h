@@ -14,6 +14,7 @@
 #include <memory>
 
 class DNode;
+class SinkNode;
 
 class Pipeline : public DObject {
 	Pipeline();
@@ -23,7 +24,8 @@ class Pipeline : public DObject {
 
 private:
 	std::vector<std::shared_ptr<DNode>> m_nodes;
-	std::shared_ptr<DNode> m_pOutputNode = nullptr;
+
+	std::shared_ptr<SinkNode> m_pOutputNode = nullptr;
 };
 
 #endif	// ! PIPELINE_H_

@@ -689,6 +689,15 @@
     <ClCompile Include="..\..\..\HAL\Pipeline\DConnection.cpp">
       <Filter>HAL\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\ProgramNode.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\SinkNode.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\SourceNode.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1467,6 +1476,15 @@
       <Filter>HAL\Pipeline</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\Pipeline\DConnection.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\ProgramNode.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\SinkNode.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\SourceNode.h">
       <Filter>HAL\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>

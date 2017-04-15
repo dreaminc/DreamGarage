@@ -19,6 +19,7 @@ class DNode : public DObject {
 
 public:
 	DNode();
+	DNode(std::string strName);
 	~DNode();
 
 	RESULT ClearInputs();
