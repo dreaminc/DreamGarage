@@ -29,7 +29,7 @@ typedef enum {
 
 class OGLProgramFactory {
 public:
-	static OGLProgram* MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL);
+	static std::shared_ptr<ProgramNode> MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL);
 };
 
 #endif // ! OGL_PROGRAM_FACTORY_H_

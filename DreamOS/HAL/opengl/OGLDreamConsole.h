@@ -16,19 +16,21 @@
 // DreamOS/HAL/opengl/OGLDreamConsole.h
 // OGLDreamConsole renders the profiler to an OGL program
 
+// TODO: Switch to the DreamApp arch 
+
 class OGLRenderContext {
 public:
-	OGLRenderContext(OpenGLImp* pOGL, OGLProgram* pOGLProgram) :
+	OGLRenderContext(OpenGLImp* pOGL, std::shared_ptr<OGLProgram> pOGLProgram) :
 		m_OGLImp(pOGL),
-		m_OGLProgram(pOGLProgram)
+		m_pOGLProgram(pOGLProgram)
 	{}
 
 	virtual ~OGLRenderContext() {}
 
-	void Init();
+	void Initialize();
 	void Render(point& topLeft, point& rightBottom);
 
-	OGLProgram*	m_OGLProgram;
+	std::shared_ptr<OGLProgram>	m_pOGLProgram;
 
 protected:
 	OpenGLImp*	m_OGLImp;
@@ -47,10 +49,10 @@ void Render(const point& topLeft, const point& rightBottom, ProfilerGraph<T>& da
 
 class OGLProfilerGraph : public OGLRenderContext {
 public:
-	OGLProfilerGraph(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
+	OGLProfilerGraph(OpenGLImp* pOGL, std::shared_ptr<OGLProgram> pOGLProgram);
 	~OGLProfilerGraph();
 
-	void Init();
+	void Initialize();
 
 	template<typename T>
 	void Render(point& topLeft, point& bottomRight, ProfilerGraph<T>& graph, double vScale = 1.0);
@@ -73,36 +75,33 @@ private:
 
 class OGLDebugConsole : public OGLRenderContext {
 public:
-	OGLDebugConsole(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
+	OGLDebugConsole(OpenGLImp* pOGL, std::shared_ptr<OGLProgram> pOGLProgram);
 	~OGLDebugConsole();
 
-	void Init();
+	void Initialize();
 	void Render(point& topLeft, point& bottomRight, float fontSize = 4.0f);
 	void Destroy();
 
 private:
 	std::unique_ptr<OGLText>	m_OGLConsoleText;
-
 	std::unique_ptr<OGLQuad>	m_OGLTextBackground;
-
 	std::unique_ptr<OGLTriangle>	m_OGLTriangle;
 };
 
 class OGLDreamConsole : public OGLRenderContext {
 public:
-	OGLDreamConsole(OpenGLImp* pOGL, OGLProgram* pOGLProgram);
+	OGLDreamConsole(OpenGLImp* pOGL, std::shared_ptr<OGLProgram> pOGLProgram);
 	~OGLDreamConsole();
 
-	void Init();
+	void Initialize();
 	
-	// A mono view is an extended view in case the scene is not stereoscopicly rendered for an HMD.
+	// A mono view is an extended view in case the scene is not stereoscopically rendered for an HMD.
 	void Render(bool isMonoView = false);
 	void Destroy();
 
 private:
 	// Title for the profiler
 	std::unique_ptr<OGLText>	 m_OGLTitleText;
-
 	std::unique_ptr<OGLText>	 m_OGLConsoleText;
 
 	OGLProfilerGraph	m_OGLGraph;

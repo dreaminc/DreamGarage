@@ -41,6 +41,11 @@ public:
 		return r;
 	}
 
+	virtual RESULT SetupConnections() override {
+		// TODO: do it
+		return R_NOT_IMPLEMENTED;
+	}
+
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
 		return R_NOT_IMPLEMENTED;
 	}

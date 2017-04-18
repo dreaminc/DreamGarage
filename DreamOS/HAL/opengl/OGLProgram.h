@@ -42,6 +42,10 @@ public:
 	OGLProgram(OpenGLImp *pParentImp, std::string strName = "oglprogram");
 	~OGLProgram();
 
+	// ProgramNode Interface
+	virtual RESULT SetupConnections() = 0;
+	virtual RESULT ProcessNode() override;
+
 	virtual RESULT OGLInitialize();
 	RESULT OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionFile);
 	

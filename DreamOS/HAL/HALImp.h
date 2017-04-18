@@ -142,7 +142,7 @@ protected:
 	HMD *m_pHMD;
 	std::shared_ptr<stereocamera> m_pCamera = nullptr;
 
-private:
+protected:
 	std::unique_ptr<Pipeline> m_pRenderPipeline = nullptr;
 
 private:

@@ -33,6 +33,21 @@ public:
 		return r;
 	}
 
+	virtual RESULT SetupConnections() override {
+		RESULT r = R_PASS;
+
+		// Inputs
+		CR(MakeInput("camera"));
+		CR(MakeInput("lights"));
+		CR(MakeInput("scenegraph"));
+
+		// Outputs
+		CR(MakeOutput("output_framebuffer"));
+
+	Error:
+		return r;
+	}
+
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
 		return R_NOT_IMPLEMENTED;
 	}

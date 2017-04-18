@@ -53,14 +53,14 @@ RESULT DNode::MakeConnection(std::string strName, CONNECTION_TYPE type) {
 	std::vector<std::shared_ptr<DConnection>> *pDConnections = nullptr;
 
 	// Ensure no connections exist with this name
-	CBM((FindConnection(strName, type) == nullptr), "%s Connection %s already exists", ConnectionTypeString(type).c_str(), strName.c_str());
+	CBM((Connection(strName, type) == nullptr), "%s Connection %s already exists", ConnectionTypeString(type).c_str(), strName.c_str());
 
 	pDConnections = GetConnectionSet(type);
 	CN(pDConnections);
 
 	// Create the connection
 	{
-		std::shared_ptr<DConnection> pDConnection = std::make_shared<DConnection>(strName);
+		std::shared_ptr<DConnection> pDConnection = std::make_shared<DConnection>(std::shared_ptr<DNode>(this), strName, type);
 		CN(pDConnection);
 
 		pDConnections->push_back(pDConnection);
@@ -78,7 +78,7 @@ RESULT DNode::MakeOutput(std::string strName) {
 	return MakeConnection(strName, CONNECTION_TYPE::OUTPUT);
 }
 
-std::shared_ptr<DConnection> DNode::FindConnection(std::string strName, CONNECTION_TYPE type) {
+std::shared_ptr<DConnection> DNode::Connection(std::string strName, CONNECTION_TYPE type) {
 	RESULT r = R_PASS;
 
 	std::vector<std::shared_ptr<DConnection>> *pDConnections = GetConnectionSet(type);
@@ -94,12 +94,12 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<DConnection> DNode::FindInput(std::string strName) {
-	return FindConnection(strName, CONNECTION_TYPE::INPUT);
+std::shared_ptr<DConnection> DNode::Input(std::string strName) {
+	return Connection(strName, CONNECTION_TYPE::INPUT);
 }
 
-std::shared_ptr<DConnection> DNode::FindOutput(std::string strName) {
-	return FindConnection(strName, CONNECTION_TYPE::OUTPUT);
+std::shared_ptr<DConnection> DNode::Output(std::string strName) {
+	return Connection(strName, CONNECTION_TYPE::OUTPUT);
 }
 
 
@@ -110,4 +110,47 @@ std::string DNode::GetName() {
 RESULT DNode::SetName(std::string strName) {
 	m_strName = strName;
 	return R_PASS;
+}
+
+RESULT DNode::Connect(std::shared_ptr<DConnection> pInputConnection, std::shared_ptr<DConnection> pOutputConnection) {
+	RESULT r = R_PASS;
+
+	CN(pInputConnection);
+	CN(pOutputConnection);
+	CB(pInputConnection->GetType() == CONNECTION_TYPE::INPUT);
+	CB(pOutputConnection->GetType() == CONNECTION_TYPE::OUTPUT);
+
+	CRM(pInputConnection->Connect(pOutputConnection), "Failed to connect connections together");
+
+Error:
+	return r;
+}
+
+RESULT DNode::ConnectToInput(std::string strInputName, std::shared_ptr<DConnection> pOutputConnection) {
+	RESULT r = R_PASS;
+
+	auto pInputConnection = Input(strInputName);
+
+	CNM(pInputConnection, "%s input not found", strInputName.c_str());
+	CN(pOutputConnection);
+	CB(pOutputConnection->GetType() == CONNECTION_TYPE::OUTPUT);
+
+	CR(Connect(pInputConnection, pOutputConnection));
+
+Error:
+	return r;
+}
+
+RESULT DNode::ConnectToOutput(std::string strOutputName, std::shared_ptr<DConnection> pInputConnection) {
+	RESULT r = R_PASS;
+
+	auto pOutputConnection = Output(strOutputName);
+	CNM(pOutputConnection, "%s output not found", strOutputName.c_str());
+	CN(pInputConnection);
+	CB(pInputConnection->GetType() == CONNECTION_TYPE::INPUT);
+
+	CR(Connect(pInputConnection, pOutputConnection));
+
+Error:
+	return r;
 }

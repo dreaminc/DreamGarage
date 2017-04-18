@@ -16,6 +16,8 @@ public:
 	ProgramNode(std::string strName);
 	~ProgramNode();
 
+	virtual RESULT SetupConnections() = 0;
+
 private:
 	// empty
 };

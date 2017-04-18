@@ -704,6 +704,9 @@
     <ClCompile Include="..\..\..\Primitives\stereocamera.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLViewportDisplay.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1495,6 +1498,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\viewport.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLViewportDisplay.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

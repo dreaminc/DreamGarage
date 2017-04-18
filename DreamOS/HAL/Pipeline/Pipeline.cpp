@@ -28,3 +28,19 @@ RESULT Pipeline::RunPipeline() {
 Error:
 	return r;
 }
+
+RESULT Pipeline::SetDestinationSinkNode(std::shared_ptr<SinkNode> pDestinationSinkNode) {
+	RESULT r = R_PASS;
+	
+	CN(pDestinationSinkNode);
+	CBM((m_pDestinationSinkNode == nullptr), "Destination sink node already set - please disconnect it first");
+	
+	m_pDestinationSinkNode = pDestinationSinkNode;
+
+Error:
+	return r;
+}
+
+std::shared_ptr<SinkNode> Pipeline::GetDestinationSinkNode() {
+	return m_pDestinationSinkNode;
+}

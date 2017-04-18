@@ -189,7 +189,7 @@ RESULT Windows64App::InitializeHAL() {
 	CR(m_pHALImp->SetCamera(m_pCamera));
 
 	CR(m_pHALImp->InitializeHAL());
-	CR(m_pHALImp->SetUpHALPipeline());	// TODO: This should ultimately be a Sandbox side thing
+	CR(m_pHALImp->InitializeRenderPipeline());
 
 Error:
 	return r;

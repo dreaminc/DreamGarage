@@ -15,6 +15,9 @@ public:
 	SinkNode(std::string strName);
 	~SinkNode();
 
+	virtual RESULT SetupConnections() = 0;
+	virtual RESULT ProcessNode() = 0;
+
 private:
 	// empty
 };

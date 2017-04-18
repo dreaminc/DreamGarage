@@ -29,16 +29,17 @@
 #include "OGLHand.h"
 #include "OGLRay.h"
 
+#include "OGLViewportDisplay.h"
+
 #include "DreamConsole/DreamConsole.h"
 #include "OGLDreamConsole.h"
+
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/ProgramNode.h"
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
-	m_pOGLRenderProgram(nullptr),
-	m_pOGLSkyboxProgram(nullptr),
-	m_pOGLOverlayProgram(nullptr),
-	m_pOGLProgramCapture(nullptr),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext)
 {
 	RESULT r = R_PASS;
@@ -54,21 +55,6 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 
 OpenGLImp::~OpenGLImp() {
 	m_pOGLDreamConsole.release();
-
-	if (m_pOGLRenderProgram != nullptr) {
-		delete m_pOGLRenderProgram;
-		m_pOGLRenderProgram = nullptr;
-	}
-
-	if (m_pOGLSkyboxProgram != nullptr) {
-		delete m_pOGLSkyboxProgram;
-		m_pOGLSkyboxProgram = nullptr;
-	}
-
-	if (m_pOGLOverlayProgram != nullptr) {
-		delete m_pOGLOverlayProgram;
-		m_pOGLOverlayProgram = nullptr;
-	}
 }
 
 RESULT OpenGLImp::InitializeOpenGLVersion() {
@@ -187,41 +173,55 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 RESULT OpenGLImp::SetUpHALPipeline() {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<SinkNode> pDestSinkNode = DNode::MakeNode<OGLViewportDisplay>(this);
+	CN(pDestSinkNode);
+
+	CNM(m_pRenderPipeline, "Pipeline not initialized");
+	CR(m_pRenderPipeline->SetDestinationSinkNode(pDestSinkNode));
+
+	pDestSinkNode = m_pRenderPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
 	CR(MakeCurrentContext());
+	{
+		// Set up OGL programs
+		std::shared_ptr<ProgramNode> pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
+		CN(pOGLProgramShadowDepth);
 
-	// Set up OGL programs
+		// TODO(NTH): Add a program / render pipeline arch
+		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
-	m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
-	CN(m_pOGLProgramShadowDepth);
+		std::shared_ptr<ProgramNode> pOGLMinimalProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+		CN(pOGLMinimalProgram);
 
-	// TODO(NTH): Add a program / render pipeline arch
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
-	CN(m_pOGLRenderProgram);
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pOGLMinimalProgram->Output("output_framebuffer")));
 
-	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
+		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);
 
-	// Reference Geometry Shader Program
-	m_pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	CN(m_pOGLReferenceGeometryProgram);
+		// Reference Geometry Shader Program
+		std::shared_ptr<ProgramNode> pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+		CN(pOGLReferenceGeometryProgram);
 
-	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
-	CN(m_pOGLSkyboxProgram);
+		std::shared_ptr<ProgramNode> pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
+		CN(pOGLSkyboxProgram);
 
-	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
-	CN(m_pOGLOverlayProgram);
+		std::shared_ptr<ProgramNode> pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
+		CN(pOGLOverlayProgram);
 
-	m_pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
-	CN(m_pOGLFlatProgram);
+		std::shared_ptr<ProgramNode> pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
+		CN(pOGLFlatProgram);
 
-	m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, m_pOGLOverlayProgram);
+		// TODO: this
+		m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, std::dynamic_pointer_cast<OGLProgram>(pOGLOverlayProgram));
+		CN(m_pOGLDreamConsole);
+	}
 
 	CR(ReleaseCurrentContext());
 
@@ -337,6 +337,8 @@ Error:
 */
 
 //composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+
+// TODO: Fix this
 composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 	
@@ -806,6 +808,7 @@ Error:
 	return nullptr;
 }
 
+// TODO: Remove this, this will eventually just be a node
 RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye) {
 
 	RESULT r = R_PASS;
@@ -813,23 +816,32 @@ RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, std::shared_ptr<ste
 	CR(pObjectStore->GetSkybox(pSkybox));
 
 	if (pSkybox != nullptr) {
+		/*
 		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
 		CR(m_pOGLSkyboxProgram->SetStereoCamera(pCamera, eye));
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
+		*/
 	}
+
+	CR(r);
 
 Error:
 	return r;
 }
 
+// TODO: Remove this, this will eventually just be a node
 RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	
 	if (IsRenderReferenceGeometry()) {
+		/*
 		CR(m_pOGLReferenceGeometryProgram->UseProgram());
 		CR(m_pOGLReferenceGeometryProgram->SetStereoCamera(pCamera, eye));
 		CR(m_pOGLReferenceGeometryProgram->RenderObjectStoreBoundingVolumes(pObjectStore));
+		*/
 	}
+
+	CR(r);
 
 Error:
 	return r;
@@ -841,8 +853,8 @@ RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye, std::shared_ptr<stereocamera> pCa
 
 	// Render profiler overlay
 	if (DreamConsole::GetConsole()->IsInForeground()) {
-		CRM(m_pOGLDreamConsole->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLDreamConsole->m_OGLProgram->SetStereoCamera(pCamera, eye));
+		CRM(m_pOGLDreamConsole->m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
+		CR(m_pOGLDreamConsole->m_pOGLProgram->SetStereoCamera(pCamera, eye));
 		m_pOGLDreamConsole->Render(eye == EYE_MONO);
 	}
 
@@ -850,6 +862,7 @@ Error:
 	return r;
 }
 
+// TODO: Remove this, this will eventually just be a node
 RESULT OpenGLImp::RenderToTexture(FlatContext* pContext, std::shared_ptr<stereocamera> pCamera) {
 	RESULT r = R_PASS;
 
@@ -857,6 +870,7 @@ RESULT OpenGLImp::RenderToTexture(FlatContext* pContext, std::shared_ptr<stereoc
 	OGLFramebuffer* pFramebuffer = dynamic_cast<OGLFramebuffer*>(pContext->GetFramebuffer());
 	CN(pFramebuffer);
 
+	/*	
 	m_pOGLFlatProgram->SetFrameBuffer(pFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, pFramebuffer->GetWidth(), pFramebuffer->GetHeight(), pFramebuffer->GetChannels());
 	
 	CR(m_pOGLFlatProgram->UseProgram());
@@ -865,6 +879,7 @@ RESULT OpenGLImp::RenderToTexture(FlatContext* pContext, std::shared_ptr<stereoc
 
 	CR(m_pOGLFlatProgram->RenderObject(pContext));
 	CR(m_pOGLFlatProgram->UnbindFramebuffer());
+	*/
 
 
 Error:

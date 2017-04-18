@@ -74,6 +74,8 @@ RESULT HALImp::InitializeRenderPipeline() {
 	m_pRenderPipeline = std::make_unique<Pipeline>();
 	CN(m_pRenderPipeline);
 
+	CR(SetUpHALPipeline());
+
 Error:
 	return r;
 }
@@ -102,6 +104,7 @@ RESULT HALImp::Render(ObjectStore* pSceneGraph, std::shared_ptr<stereocamera> pC
 	SetViewTarget(eye, pCamera->GetViewWidth(), pCamera->GetViewHeight());
 
 	// Pipeline stuff
+	CN(m_pRenderPipeline);
 	CR(m_pRenderPipeline->RunPipeline());
 
 	CR(FlushHALBuffers())

@@ -30,6 +30,17 @@ RESULT OGLProgram::SetOGLProgramDepth(OGLProgram *pOGLProgramDepth) {
 	return R_PASS;
 }
 
+RESULT OGLProgram::ProcessNode() {
+	RESULT r = R_PASS;
+
+	// TODO: Do stuff
+
+	CR(r);
+
+Error:
+	return r;
+}
+
 // Note that all vertex attrib, uniforms, uniform blocks are actually 
 // allocated in the OGLInitialize function
 RESULT OGLProgram::OGLInitialize() {

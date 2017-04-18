@@ -25,19 +25,28 @@ std::string ConnectionTypeString(CONNECTION_TYPE type);
 class DConnection : public DObject {
 
 public:
-	DConnection();
-	DConnection(std::string strName);
+	DConnection(std::shared_ptr<DNode> pParentNode, CONNECTION_TYPE connType);
+	DConnection(std::shared_ptr<DNode> pParentNode, std::string strName, CONNECTION_TYPE connType);
 
 	~DConnection();
 
 	std::string GetName();
+	std::string GetParentName();
 	RESULT SetName(std::string strName);
+
+	std::shared_ptr<DConnection> FindConnection(std::shared_ptr<DConnection> pConnection);
+	std::shared_ptr<DConnection> FindConnection(std::string strConnectionName, std::string strNodeName);
+
+	RESULT Connect(std::shared_ptr<DConnection> pConnection);
+
+	CONNECTION_TYPE GetType();
 
 private:
 	std::shared_ptr<DNode> m_pParentNode;
 	std::vector<std::shared_ptr<DConnection>> m_connections;
 
 private:
+	CONNECTION_TYPE m_connType;
 	std::string m_strName;
 };
 

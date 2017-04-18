@@ -37,13 +37,13 @@ class OpenGLImp : public HALImp {
 private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
-	OGLProgram *m_pOGLRenderProgram;
-	OGLProgram *m_pOGLProgramShadowDepth;
-	OGLProgram *m_pOGLProgramCapture;		// temp for testing
-	OGLProgram *m_pOGLSkyboxProgram;
-	OGLProgram *m_pOGLReferenceGeometryProgram;
-	OGLProgram *m_pOGLOverlayProgram;
-	OGLProgram *m_pOGLFlatProgram; 
+	//OGLProgram *m_pOGLRenderProgram;
+	//OGLProgram *m_pOGLProgramShadowDepth;
+	//OGLProgram *m_pOGLProgramCapture;		// temp for testing
+	//OGLProgram *m_pOGLSkyboxProgram;
+	//OGLProgram *m_pOGLReferenceGeometryProgram;
+	//OGLProgram *m_pOGLOverlayProgram;
+	//OGLProgram *m_pOGLFlatProgram; 
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;

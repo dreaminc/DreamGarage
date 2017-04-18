@@ -30,12 +30,37 @@ public:
 	RESULT MakeInput(std::string strName);
 	RESULT MakeOutput(std::string strName);
 
-	std::shared_ptr<DConnection> FindConnection(std::string strName, CONNECTION_TYPE type);
-	std::shared_ptr<DConnection> FindInput(std::string strName);
-	std::shared_ptr<DConnection> FindOutput(std::string strName);
+	std::shared_ptr<DConnection> Connection(std::string strName, CONNECTION_TYPE type);
+	std::shared_ptr<DConnection> Input(std::string strName);
+	std::shared_ptr<DConnection> Output(std::string strName);
 
 	std::string GetName();
 	RESULT SetName(std::string strName);
+
+	virtual RESULT SetupConnections() = 0;
+
+	RESULT Connect(std::shared_ptr<DConnection> pInputConnection, std::shared_ptr<DConnection> pOutputConnection);
+	RESULT ConnectToInput(std::string strInputName, std::shared_ptr<DConnection> pOutputConnection);
+	RESULT ConnectToOutput(std::string strOutputName, std::shared_ptr<DConnection> pInputConnection);
+
+	virtual RESULT ProcessNode() = 0;
+
+	template <class nodeType, class... nodeArgsTypes>
+	static std::shared_ptr<nodeType> MakeNode(nodeArgsTypes&&... sinkArgs) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<nodeType> pNode = std::make_shared<nodeType>(sinkArgs...);
+		CN(pNode);
+
+		CR(pNode->SetupConnections());
+
+		//Success:
+		return pNode;
+
+	Error:
+		pNode = nullptr;
+		return nullptr;
+	}
 
 private:
 	std::vector<std::shared_ptr<DConnection>>* GetConnectionSet(CONNECTION_TYPE type);
