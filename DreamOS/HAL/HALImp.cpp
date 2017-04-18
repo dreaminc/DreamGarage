@@ -31,8 +31,18 @@ bool HALImp::IsRenderReferenceGeometry() {
 	return (bool)(m_HALConfiguration.fRenderReferenceGeometry);
 }
 
-camera *HALImp::GetCamera() {
+std::shared_ptr<stereocamera> HALImp::GetCamera() {
 	return m_pCamera;
+}
+
+RESULT HALImp::SetCamera(std::shared_ptr<stereocamera> pCamera) {
+	RESULT r = R_PASS;
+
+	CN(pCamera);
+	m_pCamera = pCamera;
+
+Error:
+	return r;
 }
 
 RESULT HALImp::SetCameraOrientation(quaternion qOrientation) {
@@ -66,4 +76,54 @@ RESULT HALImp::InitializeRenderPipeline() {
 
 Error:
 	return r;
+}
+
+RESULT HALImp::Render(ObjectStore* pSceneGraph, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye) {
+	RESULT r = R_PASS;
+
+	// TODO: Replace this with source nodes
+	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = nullptr;
+
+	static EYE_TYPE lastEye = EYE_INVALID;
+
+	std::vector<light*> *pLights = nullptr;
+	pObjectStore->GetLights(pLights);
+
+	CR(ClearHALBuffers());
+	CR(ConfigureHAL());
+
+	// Commit frame to HMD
+	if (m_pHMD) {
+		m_pHMD->UnsetRenderSurface(eye);
+		m_pHMD->CommitSwapChain(eye);
+	}
+
+	SetViewTarget(eye, pCamera->GetViewWidth(), pCamera->GetViewHeight());
+
+	// Pipeline stuff
+	CR(m_pRenderPipeline->RunPipeline());
+
+	CR(FlushHALBuffers())
+
+Error:
+	return r;
+}
+
+RESULT HALImp::SetDrawWireframe(bool fDrawWireframe) {
+	m_HALConfiguration.fDrawWireframe = fDrawWireframe;
+	return R_PASS;
+}
+
+bool HALImp::IsDrawWireframe() {
+	return m_HALConfiguration.fDrawWireframe;
+}
+
+RESULT HALImp::SetRenderProfiler(bool fRenderProfiler) {
+	m_HALConfiguration.fRenderProfiler = fRenderProfiler;
+	return R_PASS;
+}
+
+bool HALImp::IsRenderProfiler() {
+	return m_HALConfiguration.fRenderProfiler;
 }

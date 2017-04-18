@@ -53,29 +53,6 @@ private:
 
 	std::unique_ptr<OGLDreamConsole>	m_pOGLDreamConsole;
 
-	// Viewport
-	// TODO: Move this into an object?
-private:
-	int m_pxViewWidth;
-	int m_pxViewHeight;
-
-
-public:
-	int GetViewWidth() { return m_pxViewWidth; }
-	int GetViewHeight() { return m_pxViewHeight; }
-
-private:
-	// TODO: Potentially replace this with a :1 bit field struct
-	bool m_fDrawWireframe = false;
-	bool m_fRenderProfiler = false;
-
-protected:
-	RESULT SetDrawWireframe(bool fDrawWireframe);
-	bool IsDrawWireframe();
-	
-	RESULT SetRenderProfiler(bool fRenderProfiler);
-	bool IsRenderProfiler();
-
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
 	~OpenGLImp();
@@ -117,17 +94,23 @@ public:
 	composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 public:
-	RESULT SetViewTarget(EYE_TYPE eye);
-	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatObjectStore, EYE_TYPE eye); // temporary name
-	RESULT RenderToTexture(FlatContext* pContext);
+	virtual RESULT SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) override;
+	//virtual RESULT Render(ObjectStore *pSceneGraph, EYE_TYPE eye) override; 
+	virtual RESULT ClearHALBuffers() override;
+	virtual RESULT ConfigureHAL() override;
+	virtual RESULT FlushHALBuffers() override;
+
+	virtual RESULT RenderToTexture(FlatContext* pContext, std::shared_ptr<stereocamera> pCamera) override;
 private:
-	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
-	RESULT RenderProfiler(EYE_TYPE eye);
-	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, EYE_TYPE eye);
+	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye);
+	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye);
+	RESULT RenderProfiler(EYE_TYPE eye, std::shared_ptr<stereocamera> pCamera);
 
 public:
-	RESULT Resize(int pxWidth, int pxHeight);
-	RESULT Shutdown();
+	virtual RESULT Resize(viewport newViewport) override;
+	virtual RESULT Shutdown() override;
+	virtual RESULT SetUpHALPipeline() override;
+	virtual RESULT InitializeHAL() override;
 
 	// Rendering Context 
 	RESULT MakeCurrentContext();
@@ -137,8 +120,6 @@ private:
 	//RESULT InitializeExtensions();
 	RESULT InitializeGLContext();
 	RESULT InitializeOpenGLVersion();
-
-	RESULT PrepareScene();
 
 // TODO: Unify access to extensions
 public:

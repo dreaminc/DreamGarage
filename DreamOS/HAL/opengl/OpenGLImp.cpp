@@ -43,14 +43,11 @@ OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 {
 	RESULT r = R_PASS;
 
-	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
-	CRM(PrepareScene(), "Failed to prepare GL Scene");
-
 //Success:
 	Validate();
 	return;
 
-Error:
+//Error:
 	Invalidate();
 	return;
 }
@@ -187,31 +184,26 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
 }
 
-// TODO: This should be moved to OpenGL Program arch/design
-// TODO: rename this
-RESULT OpenGLImp::PrepareScene() {
+RESULT OpenGLImp::SetUpHALPipeline() {
 	RESULT r = R_PASS;
-	GLenum glerr = GL_NO_ERROR;
 
-	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
+	CR(MakeCurrentContext());
 
-	// Clear Background
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	// Set up OGL programs
 
-	//m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
 	m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
 	CN(m_pOGLProgramShadowDepth);
-	
+
 	// TODO(NTH): Add a program / render pipeline arch
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
 	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
+	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 	CN(m_pOGLRenderProgram);
 
 	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
@@ -231,11 +223,27 @@ RESULT OpenGLImp::PrepareScene() {
 
 	m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, m_pOGLOverlayProgram);
 
+	CR(ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::InitializeHAL() {
+	RESULT r = R_PASS;
+
+	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
+
+	CR(MakeCurrentContext());
+
+	// Clear Background
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
 	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
 
-	// Face culling
+								// Face culling
 #define _CULL_BACK_FACES
 #ifdef _CULL_BACK_FACES
 	glEnable(GL_CULL_FACE);
@@ -255,28 +263,18 @@ RESULT OpenGLImp::PrepareScene() {
 	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Allocate the camera
-	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, 5.0f), 60.0f, m_pxViewWidth, m_pxViewHeight);
-	CN(m_pCamera);
-
-	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
+	CR(ReleaseCurrentContext());
 
 Error:
 	return r;
 }
 
-RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
+RESULT OpenGLImp::Resize(viewport newViewport) {
 	RESULT r = R_PASS;
-
-	m_pxViewWidth = pxWidth;
-	m_pxViewHeight = pxHeight;
 
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
-	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
-
-	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
+	glViewport(0, 0, (GLsizei)newViewport.Width(), (GLsizei)newViewport.Height());
 
 Error:
 	//CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -285,7 +283,8 @@ Error:
 }
 
 // Assumes Context Current
-RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye) {
+// TODO: This should move to a sink node
+RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	// Render to screen
@@ -293,20 +292,21 @@ RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye) {
 
 	switch (eye) {
 		case EYE_LEFT: {
-			glViewport(0, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
+			glViewport(0, 0, (GLsizei)pxWidth / 2, (GLsizei)pxHeight);
 		} break;
 
 		case EYE_RIGHT: {
-			glViewport((GLsizei)m_pxViewWidth / 2, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
+			glViewport((GLsizei)pxWidth / 2, 0, (GLsizei)pxWidth / 2, (GLsizei)pxHeight);
 		} break;
 
 		case EYE_MONO: {
-			glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
+			glViewport(0, 0, (GLsizei)pxWidth, (GLsizei)pxHeight);
 		} break;
 	}
 
-	(eye != EYE_MONO) ? m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight) :
-						m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
+	// TODO: Do this in the sandbox when choosing eye - do we need the above then?
+	(eye != EYE_MONO) ? m_pCamera->ResizeCamera(pxWidth/2.0f, pxHeight) :
+						m_pCamera->ResizeCamera(pxWidth, pxHeight);
 
 	return r;
 }
@@ -806,7 +806,7 @@ Error:
 	return nullptr;
 }
 
-RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
+RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye) {
 
 	RESULT r = R_PASS;
 	skybox *pSkybox = nullptr;
@@ -814,7 +814,7 @@ RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
 
 	if (pSkybox != nullptr) {
 		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
+		CR(m_pOGLSkyboxProgram->SetStereoCamera(pCamera, eye));
 		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
 	}
 
@@ -822,12 +822,12 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, EYE_TYPE eye) {
+RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	
 	if (IsRenderReferenceGeometry()) {
 		CR(m_pOGLReferenceGeometryProgram->UseProgram());
-		CR(m_pOGLReferenceGeometryProgram->SetStereoCamera(m_pCamera, eye));
+		CR(m_pOGLReferenceGeometryProgram->SetStereoCamera(pCamera, eye));
 		CR(m_pOGLReferenceGeometryProgram->RenderObjectStoreBoundingVolumes(pObjectStore));
 	}
 
@@ -835,14 +835,14 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
+RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye, std::shared_ptr<stereocamera> pCamera) {
 
 	RESULT r = R_PASS;
 
 	// Render profiler overlay
 	if (DreamConsole::GetConsole()->IsInForeground()) {
 		CRM(m_pOGLDreamConsole->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLDreamConsole->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
+		CR(m_pOGLDreamConsole->m_OGLProgram->SetStereoCamera(pCamera, eye));
 		m_pOGLDreamConsole->Render(eye == EYE_MONO);
 	}
 
@@ -850,7 +850,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::RenderToTexture(FlatContext* pContext) {
+RESULT OpenGLImp::RenderToTexture(FlatContext* pContext, std::shared_ptr<stereocamera> pCamera) {
 	RESULT r = R_PASS;
 
 	// Create framebuffer
@@ -861,7 +861,7 @@ RESULT OpenGLImp::RenderToTexture(FlatContext* pContext) {
 	
 	CR(m_pOGLFlatProgram->UseProgram());
 	CR(m_pOGLFlatProgram->BindToFramebuffer(pFramebuffer));
-	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, EYE_MONO));
+	CR(m_pOGLFlatProgram->SetStereoCamera(pCamera, EYE_MONO));
 
 	CR(m_pOGLFlatProgram->RenderObject(pContext));
 	CR(m_pOGLFlatProgram->UnbindFramebuffer());
@@ -871,10 +871,35 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::ClearHALBuffers() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	return R_PASS;
+}
+
+RESULT OpenGLImp::ConfigureHAL() {
+
+	if (m_HALConfiguration.fDrawWireframe) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	}
+
+	if (m_pHMD == nullptr) {
+		CheckFramebufferStatus(GL_FRAMEBUFFER);
+	}
+
+	return R_PASS;
+}
+
+RESULT OpenGLImp::FlushHALBuffers() {
+	glFlush();
+	return R_PASS;
+}
+
 // This is critical path, so EHM is removed
 // Debug manually
-RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye) {
+/*
+RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, EYE_TYPE eye) {
 	RESULT r = R_PASS;
+
 	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = nullptr;
 
@@ -885,7 +910,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (m_fDrawWireframe) {
+	if (m_HALConfiguration.fDrawWireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
@@ -901,7 +926,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	m_pOGLProgramShadowDepth->SetLights(pLights);
 	m_pOGLProgramShadowDepth->RenderObjectStore(pSceneGraph);
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
-	//*/
+	//
 
 	// 
 	m_pOGLRenderProgram->UseProgram();
@@ -932,24 +957,6 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	// Skybox
 	RenderSkybox(pObjectStore, eye);
 
-//TODO either remove FlatSceneGraph or create a separate AddFlatContext for overlays
-/*
-	// Flat object layer
-	glClearDepth(1.0f);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	
-	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
-
-	CR(m_pOGLFlatProgram->BindToFramebuffer());
-	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, eye));
-	pFlatSceneGraph->Reset();
-	CR(m_pOGLFlatProgram->RenderSceneGraph(pFlatSceneGraph));
-	CR(m_pOGLFlatProgram->UnbindFramebuffer());
-
-	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-	CR(m_pOGLRenderProgram->RenderObject(pQuad));	
-//*/
-
 	// Profiler
 	glClearDepth(1.0f);
 	glClear(GL_DEPTH_BUFFER_BIT);
@@ -967,6 +974,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	// CheckGLError();
 	return r;
 }
+*/
 
 RESULT OpenGLImp::Shutdown() {
 	RESULT r = R_PASS;
@@ -977,24 +985,6 @@ RESULT OpenGLImp::Shutdown() {
 	}
 
 	return r;
-}
-
-RESULT OpenGLImp::SetDrawWireframe(bool fDrawWireframe) {
-	m_fDrawWireframe = fDrawWireframe;
-	return R_PASS;
-}
-
-bool OpenGLImp::IsDrawWireframe() {
-	return m_fDrawWireframe;
-}
-
-RESULT OpenGLImp::SetRenderProfiler(bool fRenderProfiler) {
-	m_fRenderProfiler = fRenderProfiler;
-	return R_PASS;
-}
-
-bool OpenGLImp::IsRenderProfiler() {
-	return m_fRenderProfiler;
 }
 
 // Open GL / Wrappers

@@ -14,7 +14,7 @@
 class OGLProgramSkyboxScatter : public OGLProgram {
 public:
 	OGLProgramSkyboxScatter(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp)
+		OGLProgram(pParentImp, "oglskyboxscatter")
 	{
 		// empty
 	}
@@ -64,8 +64,8 @@ public:
 		auto matVP = matP * matV;
 		auto matVO = pCamera->GetOrientationMatrix();
 
-		auto pxWidth = pCamera->GetPXWidth();
-		auto pxHeight = pCamera->GetPXHeight();
+		auto pxWidth = pCamera->GetViewWidth();
+		auto pxHeight = pCamera->GetViewHeight();
 
 		vector sunDirection = vector(0.0f, sunY, 0.5f);
 		sunDirection.Normalize();
@@ -84,15 +84,15 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
 
 		auto matV = pStereoCamera->GetViewMatrix(eye);
 		auto matP = pStereoCamera->GetProjectionMatrix(eye);
 		auto matVP = matP * matV;
 		auto matVO = pStereoCamera->GetOrientationMatrix();
 
-		auto pxWidth = (pStereoCamera->GetPXWidth());
-		auto pxHeight = (pStereoCamera->GetPXHeight());
+		auto pxWidth = (pStereoCamera->GetViewWidth());
+		auto pxHeight = (pStereoCamera->GetViewHeight());
 
 		/*
 		point sunDirection = point(0.3f, sunY, -0.5f);

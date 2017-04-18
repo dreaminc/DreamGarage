@@ -271,7 +271,7 @@ RESULT DreamGarage::Update(void) {
 RESULT DreamGarage::SetRoundtablePosition(float angle) {
 	RESULT r = R_PASS;
 
-	camera *pCamera = GetCamera();
+	std::shared_ptr<stereocamera> pCamera = GetCamera();
 	float radius = 2.0f;
 
 	float ptX = -radius*sin(angle*M_PI / 180.0f);

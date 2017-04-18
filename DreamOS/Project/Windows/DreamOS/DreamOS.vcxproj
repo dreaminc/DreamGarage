@@ -744,6 +744,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\quad.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
     <ClCompile Include="..\..\..\Primitives\sphere.cpp" />
+    <ClCompile Include="..\..\..\Primitives\stereocamera.cpp" />
     <ClCompile Include="..\..\..\Primitives\text.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp" />
@@ -752,6 +753,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\user.cpp" />
     <ClCompile Include="..\..\..\Primitives\vector.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
+    <ClCompile Include="..\..\..\Primitives\viewport.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\volume.cpp" />
     <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
@@ -1012,6 +1014,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\vector.h" />
     <ClInclude Include="..\..\..\Primitives\version.h" />
     <ClInclude Include="..\..\..\Primitives\Vertex.h" />
+    <ClInclude Include="..\..\..\Primitives\viewport.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
     <ClInclude Include="..\..\..\Primitives\volume.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />

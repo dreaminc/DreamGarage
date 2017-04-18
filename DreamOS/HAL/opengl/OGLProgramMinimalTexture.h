@@ -15,7 +15,7 @@
 class OGLProgramMinimalTexture : public OGLProgram {
 public:
 	OGLProgramMinimalTexture(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp)
+		OGLProgram(pParentImp, "oglminimaltexture")
 	{
 		// empty
 	}
@@ -67,7 +67,7 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
 		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 

@@ -19,90 +19,20 @@ enum EYE_TYPE {
 	EYE_INVALID
 };
 
+class viewport;
+
 class stereocamera : public camera {
 public:
-	stereocamera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
-		camera(ptOrigin, FOV, pxScreenWidth, pxScreenHeight)
-	{
-		m_pupillaryDistance = (DEFAULT_PUPILLARY_DISTANCE / 1000.0f);
-	}
+	stereocamera(point ptOrigin, viewport cameraVieport);
 
-	point GetEyePosition(EYE_TYPE eye) {
-		point ptEye;
-		
-		switch (eye) {
-			case EYE_LEFT: {
-				ptEye = camera::GetOrigin() + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
-			} break;
+	point GetEyePosition(EYE_TYPE eye);
 
-			case EYE_RIGHT: {
-				ptEye = camera::GetOrigin() + (GetRightVector() * (m_pupillaryDistance / 2.0f));
-			} break;
+	ProjectionMatrix GetProjectionMatrix(EYE_TYPE eye);
 
-			case EYE_MONO: {
-				ptEye = camera::GetOrigin();
-			} break;
-		}
+	virtual point GetOrigin(bool fAbsolute = false) override;
+	virtual point GetPosition(bool fAbsolute = false) override;
 
-		ptEye.w() = 0.0f;
-
-		return ptEye;
-	}
-
-	ProjectionMatrix GetProjectionMatrix(EYE_TYPE eye) {
-		ProjectionMatrix projMat;
-
-		if (m_pHMD != nullptr) {
-			projMat = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
-			//projMat.element(0, 2) = projMat.element(2, 0);
-			//projMat.element(1, 2) = projMat.element(2, 1);
-		}
-		else {
-			projMat = camera::GetProjectionMatrix();
-		}
-
-		return projMat;
-	}
-
-	virtual point GetOrigin(bool fAbsolute = false) override {
-		point eyePos = GetEyePosition(EYE_MONO);
-
-		if (m_pHMD != nullptr) {
-			eyePos += m_pHMD->GetHeadPointOrigin();
-		}
-
-		return eyePos;
-	}
-
-	virtual point GetPosition(bool fAbsolute = false) override {
-		point eyePos = GetEyePosition(EYE_MONO);
-
-		if (m_pHMD != nullptr) {
-			eyePos += m_pHMD->GetHeadPointOrigin();
-		}
-
-		return eyePos;
-	}
-
-	ViewMatrix GetViewMatrix(EYE_TYPE eye) {
-		ViewMatrix mat;
-
-		point eyePos = GetEyePosition(eye);
-
-		// TODO: Fix this
-		if (m_pHMD != nullptr) {
-			point offset = m_pHMD->GetHeadPointOrigin();
-			eyePos += offset;
-		}
-		// View Matrix requires the opposite of the camera's world position
-		eyePos.Reverse();
-		quaternion q = camera::GetOrientation();
-//		q.Reverse();
-
-
-		mat = ViewMatrix(eyePos, q);
-		return mat;
-	}
+	ViewMatrix GetViewMatrix(EYE_TYPE eye);
 
 private:
 	camera_precision m_pupillaryDistance;	//  Distance between eyes (in mm)

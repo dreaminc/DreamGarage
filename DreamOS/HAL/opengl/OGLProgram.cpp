@@ -7,7 +7,8 @@
 
 #include "Scene/ObjectStore.h"
 
-OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
+OGLProgram::OGLProgram(OpenGLImp *pParentImp, std::string strName) :
+	ProgramNode(strName),
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),
@@ -837,7 +838,7 @@ RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
 */
 
 // TODO: Consolidate?
-RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgram::SetStereoCamera(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
 	/*

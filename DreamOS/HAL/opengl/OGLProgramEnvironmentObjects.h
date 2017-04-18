@@ -15,7 +15,7 @@
 class OGLProgramEnvironmentObjects : public OGLProgram {
 public:
 	OGLProgramEnvironmentObjects(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp),
+		OGLProgram(pParentImp, "oglenvironment"),
 		m_pLightsBlock(nullptr),
 		m_pMaterialsBlock(nullptr)
 	{
@@ -135,7 +135,7 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
 
 		auto deltaTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
 		m_deltaTime = (float)deltaTime;
@@ -162,16 +162,13 @@ public:
 
 private:
 
-	void SetTextureUniform(OGLTexture* pTexture,
-		OGLUniformSampler2D* pTextureUniform,
-		OGLUniformBool* pBoolUniform) {
+	void SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform) {
 		if (pTexture) {
 			pBoolUniform->SetUniform(true);
 			pTexture->OGLActivateTexture();
 			pTextureUniform->SetUniform(pTexture);
 		}
-		else
-		{
+		else {
 			pBoolUniform->SetUniform(false);
 		}
 	};

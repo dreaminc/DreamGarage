@@ -19,3 +19,12 @@ std::shared_ptr<DNode> Pipeline::FindNode(std::string strName) {
 
 	return nullptr;
 }
+
+RESULT Pipeline::RunPipeline() {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+Error:
+	return r;
+}

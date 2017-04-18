@@ -15,7 +15,7 @@
 class OGLProgramTextureBitBlit : public OGLProgram {
 public:
 	OGLProgramTextureBitBlit(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp)
+		OGLProgram(pParentImp, "ogltexturebitblit")
 	{
 		// empty
 	}
@@ -72,7 +72,7 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
 		m_pUniformProjectionMatrix->SetUniform(pStereoCamera->GetProjectionMatrix(eye));
 		
 		return R_PASS;

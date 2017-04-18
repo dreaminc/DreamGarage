@@ -98,8 +98,8 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 			if (m_fMouseIntersectObjects) {
 				// Create ray
 				// TODO: This will only work for non-HMD camera 
-				camera *pCamera = m_pHALImp->GetCamera();
-				ray rayCamera = pCamera->GetRay(mEvent->xPos, mEvent->yPos);
+				
+				ray rayCamera = m_pCamera->GetRay(mEvent->xPos, mEvent->yPos);
 
 				// intersect ray
 				auto intersectedObjects = m_pSceneGraph->GetObjects(rayCamera);
@@ -137,10 +137,9 @@ RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
 	CR(GetSandboxWindowSize(pxWidth, pxHeight));
 	
 	if (mouseX >= 0 && mouseY >= 0 && mouseX <= pxWidth && mouseY <= pxHeight) {
-		camera *pCamera = m_pHALImp->GetCamera();
-		CN(pCamera);
-
-		rCast = pCamera->GetRay(mouseX, mouseY, t);
+		
+		CN(m_pCamera);
+		rCast = m_pCamera->GetRay(mouseX, mouseY, t);
 
 		//DEBUG_LINEOUT("mouse: (%d, %d)", mouseX, mouseY);
 		//rCast.Print();
@@ -408,14 +407,15 @@ RESULT SandboxApp::RunAppLoop() {
 		// GL functions per eye.
 		if (m_pHMD != nullptr) {
 			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
+			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_LEFT);
+			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_RIGHT);
+
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}
 		else {
 			// Render Scene
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
+			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_MONO);
 		}
 		//*/
 
@@ -428,6 +428,19 @@ RESULT SandboxApp::RunAppLoop() {
 			Shutdown();
 		}
 	}
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::ResizeViewport(viewport newViewport) {
+	RESULT r = R_PASS;
+
+	// Resize the camera
+	CR(m_pCamera->ResizeCamera(newViewport));
+
+	// OpenGL Resize the view after the window had been resized
+	CRM(m_pHALImp->Resize(m_viewport), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
@@ -474,6 +487,8 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
+
+	CRM(InitializeCamera(), "Failed to initialize Camera");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
@@ -580,6 +595,16 @@ RESULT SandboxApp::InitializeDreamAppManager() {
 
 	CNM(m_pDreamAppManager, "Failed to allocate Dream App Manager");
 	CVM(m_pDreamAppManager, "Failed to validate Dream App Manager");
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializeCamera() {
+	RESULT r = R_PASS;
+
+	m_pCamera = std::make_shared<stereocamera>(point(0.0f, 0.0f, 5.0f), m_viewport);
+	CN(m_pCamera);
 
 Error:
 	return r;
@@ -698,7 +723,8 @@ Error:
 RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
 	RESULT r = R_PASS;
 	
-	CR(m_pHALImp->RenderToTexture(pContext));
+	CR(m_pHALImp->RenderToTexture(pContext, m_pCamera));
+
 Error:
 	return r;
 }
@@ -1041,8 +1067,8 @@ Error:
 	return r;
 }
 
-camera* SandboxApp::GetCamera() {
-	return m_pHALImp->GetCamera();
+std::shared_ptr<stereocamera> SandboxApp::GetCamera() {
+	return m_pCamera;
 }
 
 point SandboxApp::GetCameraPosition() {

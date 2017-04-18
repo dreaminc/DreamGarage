@@ -23,6 +23,8 @@ public:
 	
 	std::shared_ptr<DNode> FindNode(std::string strName);
 
+	RESULT RunPipeline();
+
 private:
 	std::vector<std::shared_ptr<DNode>> m_nodes;
 

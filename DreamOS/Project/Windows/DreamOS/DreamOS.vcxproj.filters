@@ -698,6 +698,12 @@
     <ClCompile Include="..\..\..\HAL\Pipeline\SourceNode.cpp">
       <Filter>HAL\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\viewport.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\stereocamera.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1486,6 +1492,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\Pipeline\SourceNode.h">
       <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\viewport.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

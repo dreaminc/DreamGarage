@@ -28,6 +28,8 @@
 #include "PhysicsEngine/PhysicsEngine.h"
 #include "InteractionEngine/InteractionEngine.h"
 
+#include "Primitives/viewport.h"
+
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
 #include "Sense/SenseLeapMotion.h"
@@ -93,6 +95,7 @@ private:
 	RESULT InitializeInteractionEngine();
 	RESULT InitializeTimeManager();
 	RESULT InitializeDreamAppManager();
+	RESULT InitializeCamera();
 
 protected:
 	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
@@ -232,8 +235,10 @@ public:
 	OpenGLRenderingContext *GetOpenGLRenderingContext();
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
+	RESULT ResizeViewport(viewport newViewport);
 
-	camera* GetCamera();
+
+	std::shared_ptr<stereocamera> GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
 
@@ -246,6 +251,8 @@ protected:
 	RESULT SetSandboxRunning(bool fRunning);
 
 protected:
+	viewport m_viewport;
+
 	// TODO: Move to unique_ptr
 	CommandLineManager *m_pCommandLineManager;
 	PathManager *m_pPathManager;
@@ -275,6 +282,7 @@ protected:
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
+	std::shared_ptr<stereocamera> m_pCamera = nullptr;
 
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();

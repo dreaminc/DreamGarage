@@ -6,6 +6,7 @@
 
 #include "Primitives/FlatContext.h"
 #include "Primitives/camera.h"
+#include "Primitives/stereocamera.h"
 
 composite::composite(HALImp *pHALImp) :
 	m_pHALImp(pHALImp)
@@ -349,12 +350,14 @@ Error:
 
 RESULT composite::RenderToTexture(std::shared_ptr<FlatContext> pContext) {
 	RESULT r = R_PASS;
-	CR(m_pHALImp->RenderToTexture(pContext.get()));
+	
+	CR(m_pHALImp->RenderToTexture(pContext.get(), GetCamera()));
+
 Error:
 	return r;
 }
 
-camera *composite::GetCamera() {
+std::shared_ptr<stereocamera> composite::GetCamera() {
 	return m_pHALImp->GetCamera();
 }
 

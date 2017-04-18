@@ -14,7 +14,7 @@
 class OGLProgramBlinnPhongTextureShadow : public OGLProgram {
 public:
 	OGLProgramBlinnPhongTextureShadow(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp),
+		OGLProgram(pParentImp, "oglblinnphongtextureshadow"),
 		m_pLightsBlock(nullptr),
 		m_pMaterialsBlock(nullptr)
 	{
@@ -144,7 +144,7 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
 		auto ptEye = pStereoCamera->GetEyePosition(eye);
 		auto matV = pStereoCamera->GetViewMatrix(eye);
 		auto matP = pStereoCamera->GetProjectionMatrix(eye);

@@ -27,10 +27,11 @@
 	typedef double camera_precision;
 #endif
 
-
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseKeyboard.h"
 #include "HMD/HMD.h"
+
+#include "Primitives/viewport.h"
 
 class camera : public VirtualObj//, 
 	//public Subscriber<CmdPromptEvent>, 
@@ -39,15 +40,13 @@ class camera : public VirtualObj//,
 	//public Subscriber<TimeEvent> 
 {
 public:
-	camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight);
+	camera(point ptOrigin, viewport cameraVieport);
 	~camera();
 
-	// TODO: which one ey?
-	int GetPXWidth();
-	int GetPXHeight();
-	int GetScreenWidth();
-	int GetScreenHeight();
+	int GetViewWidth();
+	int GetViewHeight();
 
+	RESULT ResizeCamera(viewport cameraViewport);
 	RESULT ResizeCamera(int pxWidth, int pxHeight);
 
 	vector GetRightVector();
@@ -94,6 +93,7 @@ public:
 	RESULT SetHMD(HMD *pHMD);
 
 	ray GetRay(double xPos, double yPos, double t = 0.0f);
+
 	// TODO: update this with a time delta / delta movement 
 	ray GetRay(int xPos, int yPos);			// This is assuming an integer screen position but really just calls the one above
 
@@ -109,14 +109,15 @@ protected:
 	HMD *m_pHMD;
 
 	// Projection
-	int m_pxScreenWidth;
-	int m_pxScreenHeight;
+	viewport m_viewport;
+
+	// TODO: Should these go into view port too?
 	camera_precision m_NearPlane;
 	camera_precision m_FarPlane;
 	PROJECTION_MATRIX_TYPE m_ProjectionType;
-	camera_precision m_FieldOfViewAngle;		// Note this is in degrees, not radians
 
 	// TODO: Move to virtual object?
+	// TODO: Should this even be in here?
 	camera_precision m_cameraRotateSpeed;
 	camera_precision m_cameraForwardSpeed;
 	camera_precision m_cameraStrafeSpeed;

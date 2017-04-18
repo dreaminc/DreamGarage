@@ -17,7 +17,7 @@
 class OGLProgramShadowDepth : public OGLProgram {
 public:
 	OGLProgramShadowDepth(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp),
+		OGLProgram(pParentImp, "oglshadowdepth"),
 		m_pShadowEmitter(nullptr)
 	{
 		// empty
@@ -80,7 +80,7 @@ public:
 		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
 		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
 	}
 

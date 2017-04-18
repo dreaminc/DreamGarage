@@ -98,7 +98,7 @@ Error:
 	return r;
 }
 
-camera* DreamOS::GetCamera() {
+std::shared_ptr<stereocamera> DreamOS::GetCamera() {
 	return m_pSandbox->GetCamera();
 }
 
