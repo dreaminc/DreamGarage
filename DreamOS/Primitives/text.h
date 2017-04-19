@@ -59,6 +59,8 @@ public:
 //		Invalidate();
 	}
 
+	std::string& GetText();
+	
 	RESULT SetText(const std::string& text, double size, bool* isChanged = nullptr);
 	
 	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)

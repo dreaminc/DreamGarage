@@ -16,7 +16,8 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = true;
+	//sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	SetSandboxConfiguration(sandboxconfig);
 
