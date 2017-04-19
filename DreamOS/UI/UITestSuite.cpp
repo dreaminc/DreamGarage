@@ -9,12 +9,14 @@
 #include "DreamGarage/DreamBrowser.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "UI/UIKeyboard.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
 	RESULT r = R_PASS;
 
+	CN(m_pDreamUIBar);
 	CR(Initialize());
 
 	Validate();
@@ -31,10 +33,12 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestBrowser());
+	CR(AddTestKeyboard());
 
-	CR(AddTestInteractionFauxUI());
-	CR(AddTestSharedContentView());
+//	CR(AddTestBrowser());
+
+//	CR(AddTestInteractionFauxUI());
+//	CR(AddTestSharedContentView());
 
 Error:
 	return r;
@@ -54,7 +58,7 @@ RESULT UITestSuite::Initialize() {
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
-/*
+//*
 	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
 		nullptr,
 		sceneOffset,
@@ -150,6 +154,56 @@ RESULT UITestSuite::AddTestBrowser() {
 	pUITest->SetTestDescription("Basic test of shared content view working locally");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT UITestSuite::AddTestKeyboard() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+		CR(Initialize());
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local Shared Content View Test");
+	pUITest->SetTestDescription("Basic test of shared content view working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
 
 Error:
 	return r;

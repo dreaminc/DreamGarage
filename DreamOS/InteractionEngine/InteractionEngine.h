@@ -43,6 +43,7 @@ class SandboxApp;
 
 class InteractionEngineProxy {
 public:
+	// Animation functions
 	virtual RESULT PushAnimationItem(VirtualObj *pObj,
 		point ptPosition,
 		quaternion qRotation,
@@ -54,6 +55,10 @@ public:
 		void* callbackContext = nullptr) = 0;
 	virtual RESULT CancelAnimation(VirtualObj *pObj) = 0;
 
+	// Keyboard manual collision functions
+	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject) = 0;
+	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject) = 0;
+	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState) = 0;
 };
 
 
@@ -89,11 +94,11 @@ public:
 	// Active Objects
 public:
 	RESULT ClearActiveObjects();
-	std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject);
-	RESULT SetAllActiveObjectStates(ActiveObject::state newState);
+	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject) override;
+	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState) override;
 	RESULT RemoveActiveObject(VirtualObj *pVirtualObject);
 	RESULT RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
-	std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject);
+	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject) override;
 	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
 	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
 	virtual RESULT PushAnimationItem(VirtualObj *pObj,
