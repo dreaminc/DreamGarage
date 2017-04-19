@@ -707,6 +707,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLViewportDisplay.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\PipelineCommon.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1501,6 +1504,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLViewportDisplay.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\PipelineCommon.h">
+      <Filter>HAL\Pipeline</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

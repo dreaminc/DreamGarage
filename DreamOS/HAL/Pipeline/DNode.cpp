@@ -41,18 +41,9 @@ Error:
 	return r;
 }
 
-std::vector<DConnection*>* DNode::GetConnectionSet(CONNECTION_TYPE type) {
-	if (type == CONNECTION_TYPE::INPUT) {
-		return &m_inputs;
-	}
-	else if (type == CONNECTION_TYPE::OUTPUT) {
-		return &m_outputs;
-	}
-
-	return nullptr;
-}
-
-RESULT DNode::MakeConnection(std::string strName, CONNECTION_TYPE type) {
+/*
+template <class objType>
+RESULT DNode::MakeConnection(std::string strName, CONNECTION_TYPE type, objType*&pDestination) {
 	RESULT r = R_PASS;
 
 	std::vector<DConnection*> *pDConnections = nullptr;
@@ -65,7 +56,7 @@ RESULT DNode::MakeConnection(std::string strName, CONNECTION_TYPE type) {
 
 	// Create the connection
 	{
-		DConnection* pDConnection = new DConnection(this, strName, type);
+		DConnection* pDConnection = DConnection::MakeConnection<objType>(this, strName, type, pDestination);
 		CN(pDConnection);
 
 		pDConnections->push_back(pDConnection);
@@ -75,12 +66,26 @@ Error:
 	return r;
 }
 
-RESULT DNode::MakeInput(std::string strName) {
-	return MakeConnection(strName, CONNECTION_TYPE::INPUT);
+template <class objType>
+RESULT DNode::MakeInput(std::string strName, objType*&pDestination) {
+	return MakeConnection<objType>(strName, CONNECTION_TYPE::INPUT, pDestination);
 }
 
-RESULT DNode::MakeOutput(std::string strName) {
-	return MakeConnection(strName, CONNECTION_TYPE::OUTPUT);
+template <class objType>
+RESULT DNode::MakeOutput(std::string strName, objType*&pDestination) {
+	return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, pDestination);
+}
+*/
+
+std::vector<DConnection*>* DNode::GetConnectionSet(CONNECTION_TYPE type) {
+	if (type == CONNECTION_TYPE::INPUT) {
+		return &m_inputs;
+	}
+	else if (type == CONNECTION_TYPE::OUTPUT) {
+		return &m_outputs;
+	}
+
+	return nullptr;
 }
 
 DConnection* DNode::Connection(std::string strName, CONNECTION_TYPE type) {
@@ -155,6 +160,23 @@ RESULT DNode::ConnectToOutput(std::string strOutputName, DConnection* pInputConn
 	CB(pInputConnection->GetType() == CONNECTION_TYPE::INPUT);
 
 	CR(Connect(pInputConnection, pOutputConnection));
+
+Error:
+	return r;
+}
+
+RESULT DNode::RenderNode(long frameID) {
+	RESULT r = R_PASS;
+
+	// TODO: Handle frameID to prevent repeated node renders
+
+	// First Render input nodes
+	for (auto &pInputConnection : m_inputs) {
+		pInputConnection->RenderConnections(frameID);
+	}
+
+	// Pass processing over to extended node
+	CR(ProcessNode(frameID));
 
 Error:
 	return r;

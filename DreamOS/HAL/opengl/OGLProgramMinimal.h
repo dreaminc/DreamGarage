@@ -37,12 +37,23 @@ public:
 		RESULT r = R_PASS;
 
 		// Inputs
-		CR(MakeInput("camera"));
-		CR(MakeInput("lights"));
-		CR(MakeInput("scenegraph"));
+		CR(MakeInput<camera>("camera", m_pCamera));
+		//CR(MakeInput("lights"));
+		CR(MakeInput<ObjectStore>("scenegraph", m_pSceneGraph));
 
 		// Outputs
-		CR(MakeOutput("output_framebuffer"));
+		CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+
+	Error:
+		return r;
+	}
+
+	RESULT ProcessNode(long frameID) {
+		RESULT r = R_PASS;
+
+		// TODO: Do stuff
+
+		CR(r);
 
 	Error:
 		return r;
@@ -80,6 +91,10 @@ public:
 
 		return R_PASS;
 	}
+
+private:
+	camera *m_pCamera = nullptr;
+	ObjectStore *m_pSceneGraph = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

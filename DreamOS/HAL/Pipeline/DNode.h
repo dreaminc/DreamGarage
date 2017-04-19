@@ -11,8 +11,8 @@
 
 #include <vector>
 
-class DConnection;
-enum class CONNECTION_TYPE;
+#include "PipelineCommon.h"
+#include "DConnection.h"
 
 class DNode : public DObject {
 
@@ -25,9 +25,39 @@ public:
 	RESULT ClearOutputConnections();
 	RESULT ClearConnections();
 
-	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type);
-	RESULT MakeInput(std::string strName);
-	RESULT MakeOutput(std::string strName);
+	template <class objType>
+	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType*&pDestination) {
+		RESULT r = R_PASS;
+
+		std::vector<DConnection*> *pDConnections = nullptr;
+
+		// Ensure no connections exist with this name
+		CBM((Connection(strName, type) == nullptr), "%s Connection %s already exists", ConnectionTypeString(type).c_str(), strName.c_str());
+
+		pDConnections = GetConnectionSet(type);
+		CN(pDConnections);
+
+		// Create the connection
+		{
+			DConnection* pDConnection = DConnection::MakeConnection<objType>(this, strName, type, pDestination);
+			CN(pDConnection);
+
+			pDConnections->push_back(pDConnection);
+		}
+
+	Error:
+		return r;
+	}
+
+	template <class objType>
+	RESULT MakeInput(std::string strName, objType*&pDestination) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::INPUT, pDestination);
+	}
+
+	template <class objType>
+	RESULT MakeOutput(std::string strName, objType*&pDestination) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, pDestination);
+	}
 
 	DConnection* Connection(std::string strName, CONNECTION_TYPE type);
 	DConnection* Input(std::string strName);
@@ -42,7 +72,8 @@ public:
 	RESULT ConnectToInput(std::string strInputName, DConnection* pOutputConnection);
 	RESULT ConnectToOutput(std::string strOutputName, DConnection* pInputConnection);
 
-	virtual RESULT ProcessNode() = 0;
+	RESULT RenderNode(long frameID = 0);
+	virtual RESULT ProcessNode(long frameID = 0) = 0;
 
 	template <class nodeType, class... nodeArgsTypes>
 	static nodeType* MakeNode(nodeArgsTypes&&... sinkArgs) {

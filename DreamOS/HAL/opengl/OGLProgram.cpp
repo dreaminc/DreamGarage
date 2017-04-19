@@ -30,7 +30,7 @@ RESULT OGLProgram::SetOGLProgramDepth(OGLProgram *pOGLProgramDepth) {
 	return R_PASS;
 }
 
-RESULT OGLProgram::ProcessNode() {
+RESULT OGLProgram::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	// TODO: Do stuff

@@ -1,6 +1,7 @@
 #include "Pipeline.h"
 
 #include "DNode.h"
+#include "SinkNode.h"
 
 Pipeline::Pipeline() {
 	// empty
@@ -23,7 +24,7 @@ std::shared_ptr<DNode> Pipeline::FindNode(std::string strName) {
 RESULT Pipeline::RunPipeline() {
 	RESULT r = R_PASS;
 
-	CR(r);
+	CR(m_pDestinationSinkNode->RenderNode(m_frameID++));
 
 Error:
 	return r;

@@ -2,32 +2,48 @@
 
 #include "DNode.h"
 
-std::string ConnectionTypeString(CONNECTION_TYPE type) {
-	switch (type) {
-		case CONNECTION_TYPE::INPUT: return "input"; break;
-		case CONNECTION_TYPE::OUTPUT: return "output"; break;
-		
-		default:
-		case CONNECTION_TYPE::INVALID: return "invalid"; break;
-	}
+// DConnectionTyped Constructor 
 
-	return "invalid";
-}
-
-DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType) :
+template <class objType>
+DConnectionTyped<objType>::DConnectionTyped(DNode* pParentNode, CONNECTION_TYPE connType, objType *pObject) :
 	m_pParentNode(pParentNode),
-	m_connType(connType)
+	m_connType(connType),
+	m_pObject(pObject)
 {
 	// empty
 }
 
-DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType) :
+template <class objType>
+DConnectionTyped<objType>::DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) :
 	m_pParentNode(pParentNode),
 	m_strName(strName),
-	m_connType(connType)
+	m_connType(connType),
+	m_pObject(pObject)
 {
 	// empty
 }
+
+// DConnection Factory Method
+
+/*
+template <class objType>
+DConnection* DConnection::MakeConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) {
+	RESULT r = R_PASS;
+
+	DConnectionTyped<objType> *pConnectionTyped = nullptr;
+
+	pConnectionTyped = new DConnectionTyped<objType>(pParentNode, strName, connType, pObject);
+	CN(pConnectionTyped);
+
+// Success:
+	return pConnectionTyped;
+
+Error:
+	return nullptr;
+}
+*/
+
+// DConnection the rest of the story
 
 DConnection::~DConnection() {
 	RESULT r = R_PASS;
@@ -130,4 +146,24 @@ Error:
 
 CONNECTION_TYPE DConnection::GetType() {
 	return m_connType;
+}
+
+RESULT DConnection::RenderConnections(long frameID) {
+	RESULT r = R_PASS;
+
+	for (auto &pConnection : m_connections) {
+		CR(pConnection->RenderParent(frameID));
+	}
+
+Error:
+	return r;
+}
+
+RESULT DConnection::RenderParent(long frameID) {
+	RESULT r = R_PASS;
+
+	CR(m_pParentNode->RenderNode(frameID));
+
+Error:
+	return r;
 }

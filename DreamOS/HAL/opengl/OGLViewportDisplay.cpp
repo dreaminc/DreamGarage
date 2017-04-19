@@ -10,13 +10,13 @@ OGLViewportDisplay::OGLViewportDisplay(OpenGLImp *pParentImp) :
 RESULT OGLViewportDisplay::SetupConnections() {
 	RESULT r = R_PASS;
 
-	CR(MakeInput("input_framebuffer"));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer", m_pOGLInputFramebuffer));
 
 Error:
 	return r;
 }
 
-RESULT OGLViewportDisplay::ProcessNode() {
+RESULT OGLViewportDisplay::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 	
 	// TODO: Implement this

@@ -10,13 +10,17 @@
 #include "HAL/Pipeline/SinkNode.h"
 
 class OpenGLImp;
+class OGLFramebuffer;
 
 class OGLViewportDisplay : public SinkNode {
 public:
 	OGLViewportDisplay(OpenGLImp *pParentImp);
 
 	virtual RESULT SetupConnections() override;
-	virtual RESULT ProcessNode() override;
+	virtual RESULT ProcessNode(long frameID = 0) override;
+
+private:
+	OGLFramebuffer *m_pOGLInputFramebuffer = nullptr;
 
 private:
 	OpenGLImp* m_pParentImp = nullptr;

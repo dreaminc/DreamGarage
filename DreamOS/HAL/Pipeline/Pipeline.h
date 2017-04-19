@@ -30,8 +30,8 @@ public:
 
 private:
 	std::vector<std::shared_ptr<DNode>> m_nodes;
-
 	SinkNode* m_pDestinationSinkNode = nullptr;
+	long m_frameID = 0;
 };
 
 #endif	// ! PIPELINE_H_

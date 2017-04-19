@@ -693,6 +693,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\Pipeline\DConnection.cpp" />
     <ClCompile Include="..\..\..\HAL\Pipeline\DNode.cpp" />
     <ClCompile Include="..\..\..\HAL\Pipeline\Pipeline.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\PipelineCommon.cpp" />
     <ClCompile Include="..\..\..\HAL\Pipeline\ProgramNode.cpp" />
     <ClCompile Include="..\..\..\HAL\Pipeline\SinkNode.cpp" />
     <ClCompile Include="..\..\..\HAL\Pipeline\SourceNode.cpp" />
@@ -927,6 +928,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\Pipeline\DConnection.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\DNode.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\Pipeline.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\PipelineCommon.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\ProgramNode.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\SinkNode.h" />
     <ClInclude Include="..\..\..\HAL\Pipeline\SourceNode.h" />
