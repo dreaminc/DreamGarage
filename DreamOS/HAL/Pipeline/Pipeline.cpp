@@ -29,7 +29,7 @@ Error:
 	return r;
 }
 
-RESULT Pipeline::SetDestinationSinkNode(std::shared_ptr<SinkNode> pDestinationSinkNode) {
+RESULT Pipeline::SetDestinationSinkNode(SinkNode* pDestinationSinkNode) {
 	RESULT r = R_PASS;
 	
 	CN(pDestinationSinkNode);
@@ -41,6 +41,6 @@ Error:
 	return r;
 }
 
-std::shared_ptr<SinkNode> Pipeline::GetDestinationSinkNode() {
+SinkNode* Pipeline::GetDestinationSinkNode() {
 	return m_pDestinationSinkNode;
 }

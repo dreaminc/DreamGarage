@@ -25,13 +25,13 @@ public:
 
 	RESULT RunPipeline();
 
-	RESULT SetDestinationSinkNode(std::shared_ptr<SinkNode> pDestinationSinkNode);
-	std::shared_ptr<SinkNode> GetDestinationSinkNode();
+	RESULT SetDestinationSinkNode(SinkNode* pDestinationSinkNode);
+	SinkNode* GetDestinationSinkNode();
 
 private:
 	std::vector<std::shared_ptr<DNode>> m_nodes;
 
-	std::shared_ptr<SinkNode> m_pDestinationSinkNode = nullptr;
+	SinkNode* m_pDestinationSinkNode = nullptr;
 };
 
 #endif	// ! PIPELINE_H_

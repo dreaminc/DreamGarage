@@ -173,7 +173,7 @@ RESULT OpenGLImp::ReleaseCurrentContext() {
 RESULT OpenGLImp::SetUpHALPipeline() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<SinkNode> pDestSinkNode = DNode::MakeNode<OGLViewportDisplay>(this);
+	SinkNode* pDestSinkNode = DNode::MakeNode<OGLViewportDisplay>(this);
 	CN(pDestSinkNode);
 
 	CNM(m_pRenderPipeline, "Pipeline not initialized");
@@ -185,14 +185,14 @@ RESULT OpenGLImp::SetUpHALPipeline() {
 	CR(MakeCurrentContext());
 	{
 		// Set up OGL programs
-		std::shared_ptr<ProgramNode> pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
-		CN(pOGLProgramShadowDepth);
+		//std::shared_ptr<ProgramNode> pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
+		//CN(pOGLProgramShadowDepth);
 
 		// TODO(NTH): Add a program / render pipeline arch
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
-		std::shared_ptr<ProgramNode> pOGLMinimalProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+		ProgramNode* pOGLMinimalProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 		CN(pOGLMinimalProgram);
 
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
@@ -203,6 +203,7 @@ RESULT OpenGLImp::SetUpHALPipeline() {
 
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pOGLMinimalProgram->Output("output_framebuffer")));
 
+		/*
 		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);
 
 		// Reference Geometry Shader Program
@@ -221,6 +222,7 @@ RESULT OpenGLImp::SetUpHALPipeline() {
 		// TODO: this
 		m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, std::dynamic_pointer_cast<OGLProgram>(pOGLOverlayProgram));
 		CN(m_pOGLDreamConsole);
+		*/
 	}
 
 	CR(ReleaseCurrentContext());

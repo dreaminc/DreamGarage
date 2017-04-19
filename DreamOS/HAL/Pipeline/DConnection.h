@@ -10,7 +10,6 @@
 #include "Primitives/DObject.h"
 
 #include <vector>
-#include <memory>
 
 class DNode;
 
@@ -25,8 +24,8 @@ std::string ConnectionTypeString(CONNECTION_TYPE type);
 class DConnection : public DObject {
 
 public:
-	DConnection(std::shared_ptr<DNode> pParentNode, CONNECTION_TYPE connType);
-	DConnection(std::shared_ptr<DNode> pParentNode, std::string strName, CONNECTION_TYPE connType);
+	DConnection(DNode* pParentNode, CONNECTION_TYPE connType);
+	DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType);
 
 	~DConnection();
 
@@ -34,16 +33,20 @@ public:
 	std::string GetParentName();
 	RESULT SetName(std::string strName);
 
-	std::shared_ptr<DConnection> FindConnection(std::shared_ptr<DConnection> pConnection);
-	std::shared_ptr<DConnection> FindConnection(std::string strConnectionName, std::string strNodeName);
+	DConnection* FindConnection(DConnection* pConnection);
+	DConnection* FindConnection(std::string strConnectionName, std::string strNodeName);
 
-	RESULT Connect(std::shared_ptr<DConnection> pConnection);
+	RESULT RemoveConnection(DConnection* pConnection);
+
+	RESULT Connect(DConnection* pConnection);
+	RESULT Disconnect(DConnection* pConnection);
+	RESULT Disconnect();
 
 	CONNECTION_TYPE GetType();
 
 private:
-	std::shared_ptr<DNode> m_pParentNode;
-	std::vector<std::shared_ptr<DConnection>> m_connections;
+	DNode* m_pParentNode = nullptr;
+	std::vector<DConnection*> m_connections;
 
 private:
 	CONNECTION_TYPE m_connType;

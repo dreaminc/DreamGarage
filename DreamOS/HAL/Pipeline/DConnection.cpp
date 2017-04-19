@@ -14,14 +14,14 @@ std::string ConnectionTypeString(CONNECTION_TYPE type) {
 	return "invalid";
 }
 
-DConnection::DConnection(std::shared_ptr<DNode> pParentNode, CONNECTION_TYPE connType) :
+DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType) :
 	m_pParentNode(pParentNode),
 	m_connType(connType)
 {
 	// empty
 }
 
-DConnection::DConnection(std::shared_ptr<DNode> pParentNode, std::string strName, CONNECTION_TYPE connType) :
+DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType) :
 	m_pParentNode(pParentNode),
 	m_strName(strName),
 	m_connType(connType)
@@ -30,7 +30,46 @@ DConnection::DConnection(std::shared_ptr<DNode> pParentNode, std::string strName
 }
 
 DConnection::~DConnection() {
-	// empty
+	RESULT r = R_PASS;
+
+	CR(Disconnect());
+
+Error:
+	return;
+}
+
+RESULT DConnection::RemoveConnection(DConnection* pConnection) {
+	for (auto it = m_connections.begin(); it < m_connections.end(); it++) {
+		if ((*it) == pConnection) {
+			m_connections.erase(it);
+			return R_PASS;
+		}
+	}
+
+	return R_NOT_FOUND;
+}
+
+RESULT DConnection::Disconnect(DConnection* pRemoteConnection) {
+	RESULT r = R_PASS;
+
+	CNM(FindConnection(pRemoteConnection), "Failed to find that connection");
+	CR(pRemoteConnection->RemoveConnection(this));
+	CR(RemoveConnection(pRemoteConnection));
+
+Error:
+	return r;
+}
+
+RESULT DConnection::Disconnect() {
+	RESULT r = R_PASS;
+
+	// Remove from all remote connections
+	for (auto &pRemoteConnection : m_connections) {
+		CR(Disconnect(pRemoteConnection));
+	}
+
+Error:
+	return r;
 }
 
 std::string DConnection::GetName() {
@@ -49,7 +88,7 @@ RESULT DConnection::SetName(std::string strName) {
 	return R_PASS;
 }
 
-std::shared_ptr<DConnection> DConnection::FindConnection(std::shared_ptr<DConnection> pConnection) {
+DConnection* DConnection::FindConnection(DConnection* pConnection) {
 	for (auto &pConnectedConnection : m_connections) {
 		if (pConnectedConnection == pConnection) {
 			return pConnectedConnection;
@@ -59,7 +98,7 @@ std::shared_ptr<DConnection> DConnection::FindConnection(std::shared_ptr<DConnec
 	return nullptr;
 }
 
-std::shared_ptr<DConnection> DConnection::FindConnection(std::string strConnectionName, std::string strNodeName) {
+DConnection* DConnection::FindConnection(std::string strConnectionName, std::string strNodeName) {
 	for (auto &pConnection : m_connections) {
 		if (pConnection->GetName() == strConnectionName && pConnection->GetParentName() == strNodeName) {
 			return pConnection;
@@ -69,14 +108,12 @@ std::shared_ptr<DConnection> DConnection::FindConnection(std::string strConnecti
 	return nullptr;
 }
 
-RESULT DConnection::Connect(std::shared_ptr<DConnection> pConnection) {
+RESULT DConnection::Connect(DConnection* pConnection) {
 	RESULT r = R_PASS;
-
-	std::shared_ptr<DConnection> pThisConnection = std::shared_ptr<DConnection>(this);
 
 	// First check this is not already connected
 	CBM((FindConnection(pConnection) == nullptr), "Connection is already connected to this connection");
-	CBM((pConnection->FindConnection(pThisConnection) == nullptr), "This connection is already connected to connection");
+	CBM((pConnection->FindConnection(this) == nullptr), "This connection is already connected to connection");
 
 	// Mutually connect the connections here
 
@@ -84,7 +121,7 @@ RESULT DConnection::Connect(std::shared_ptr<DConnection> pConnection) {
 		ConnectionTypeString(m_connType).c_str(), m_pParentNode->GetName().c_str(), GetName().c_str(),
 		ConnectionTypeString(pConnection->m_connType).c_str(), pConnection->m_pParentNode->GetName().c_str(), pConnection->GetName().c_str());
 
-	pConnection->m_connections.push_back(pThisConnection);
+	pConnection->m_connections.push_back(this);
 	m_connections.push_back(pConnection);
 
 Error:

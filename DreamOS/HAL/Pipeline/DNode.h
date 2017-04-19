@@ -10,7 +10,6 @@
 #include "Primitives/DObject.h"
 
 #include <vector>
-#include <memory>
 
 class DConnection;
 enum class CONNECTION_TYPE;
@@ -22,34 +21,34 @@ public:
 	DNode(std::string strName);
 	~DNode();
 
-	RESULT ClearInputs();
-	RESULT ClearOutputs();
-	RESULT ClearInOut();
+	RESULT ClearInputConnections();
+	RESULT ClearOutputConnections();
+	RESULT ClearConnections();
 
 	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type);
 	RESULT MakeInput(std::string strName);
 	RESULT MakeOutput(std::string strName);
 
-	std::shared_ptr<DConnection> Connection(std::string strName, CONNECTION_TYPE type);
-	std::shared_ptr<DConnection> Input(std::string strName);
-	std::shared_ptr<DConnection> Output(std::string strName);
+	DConnection* Connection(std::string strName, CONNECTION_TYPE type);
+	DConnection* Input(std::string strName);
+	DConnection* Output(std::string strName);
 
 	std::string GetName();
 	RESULT SetName(std::string strName);
 
 	virtual RESULT SetupConnections() = 0;
 
-	RESULT Connect(std::shared_ptr<DConnection> pInputConnection, std::shared_ptr<DConnection> pOutputConnection);
-	RESULT ConnectToInput(std::string strInputName, std::shared_ptr<DConnection> pOutputConnection);
-	RESULT ConnectToOutput(std::string strOutputName, std::shared_ptr<DConnection> pInputConnection);
+	RESULT Connect(DConnection* pInputConnection, DConnection* pOutputConnection);
+	RESULT ConnectToInput(std::string strInputName, DConnection* pOutputConnection);
+	RESULT ConnectToOutput(std::string strOutputName, DConnection* pInputConnection);
 
 	virtual RESULT ProcessNode() = 0;
 
 	template <class nodeType, class... nodeArgsTypes>
-	static std::shared_ptr<nodeType> MakeNode(nodeArgsTypes&&... sinkArgs) {
+	static nodeType* MakeNode(nodeArgsTypes&&... sinkArgs) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<nodeType> pNode = std::make_shared<nodeType>(sinkArgs...);
+		nodeType *pNode = new nodeType(sinkArgs...);
 		CN(pNode);
 
 		CR(pNode->SetupConnections());
@@ -63,11 +62,11 @@ public:
 	}
 
 private:
-	std::vector<std::shared_ptr<DConnection>>* GetConnectionSet(CONNECTION_TYPE type);
+	std::vector<DConnection*>* GetConnectionSet(CONNECTION_TYPE type);
 
 private:
-	std::vector<std::shared_ptr<DConnection>> m_inputs;
-	std::vector<std::shared_ptr<DConnection>> m_outputs;
+	std::vector<DConnection*> m_inputs;
+	std::vector<DConnection*> m_outputs;
 
 private:
 	std::string m_strName;

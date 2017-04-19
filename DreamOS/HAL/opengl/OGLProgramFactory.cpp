@@ -14,85 +14,85 @@
 #include "OGLProgramShadowDepth.h"
 #include "OGLProgramEnvironmentObjects.h"
 
-std::shared_ptr<ProgramNode> OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL) {
-	std::shared_ptr<OGLProgram> pOGLProgram = nullptr;
+ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL) {
+	OGLProgram* pOGLProgram = nullptr;
 	RESULT r = R_PASS;
 
 	switch (type) {
 		case OGLPROGRAM_MINIMAL: {
-			pOGLProgram = std::make_shared<OGLProgramMinimal>(pParentImp);
+			pOGLProgram = new OGLProgramMinimal(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", versionOGL), "Failed to initialize OGL minimal Program");
 		} break;
 
 		case OGLPROGRAM_MINIMAL_TEXTURE: {
-			pOGLProgram = std::make_shared<OGLProgramMinimalTexture>(pParentImp);
+			pOGLProgram = new OGLProgramMinimalTexture(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"minimalTexture.vert", L"minimalTexture.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
 		} break;
 		
 		case OGLPROGRAM_SKYBOX: {
-			pOGLProgram = std::make_shared<OGLProgramSkybox>(pParentImp);
+			pOGLProgram = new OGLProgramSkybox(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"skybox.vert", L"skybox.frag", versionOGL), "Failed to initialize OGL skybox Program");
 		} break;
 
 		case OGLPROGRAM_SKYBOX_SCATTER: {
-			pOGLProgram = std::make_shared<OGLProgramSkyboxScatter>(pParentImp);
+			pOGLProgram = new OGLProgramSkyboxScatter(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"skyboxScatter.vert", L"skyboxScatter.frag", versionOGL), "Failed to initialize OGL skybox Program");
 		} break;
 		
 		case OGLPROGRAM_BLINNPHONG: {
-			pOGLProgram = std::make_shared<OGLProgramBlinnPhong>(pParentImp);
+			pOGLProgram = new OGLProgramBlinnPhong(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blinnPhong.vert", L"blinnPhong.frag", versionOGL), "Failed to initialize OGL blinnPhong Program");
 		} break;
 
 		case OGLPROGRAM_BLINNPHONG_SHADOW: {
-			pOGLProgram = std::make_shared<OGLProgramBlinnPhongShadow>(pParentImp);
+			pOGLProgram = new OGLProgramBlinnPhongShadow(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blinnPhongShadow.vert", L"blinnPhongShadow.frag", versionOGL), "Failed to initialize OGL blinnPhong Program");
 		} break;
 
 		case OGLPROGRAM_BLINNPHONG_TEXTURE: {
-			pOGLProgram = std::make_shared<OGLProgramBlinnPhongTexture>(pParentImp);
+			pOGLProgram = new OGLProgramBlinnPhongTexture(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blinnPhongTexture.vert", L"blinnPhongTexture.frag", versionOGL), "Failed to initialize OGL blinnPhongTexture Program");
 		} break;
 
 		case OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW: {
-			pOGLProgram = std::make_shared<OGLProgramBlinnPhongTextureShadow>(pParentImp);
+			pOGLProgram = new OGLProgramBlinnPhongTextureShadow(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blinnPhongTextureShadow.vert", L"blinnPhongTextureShadow.frag", versionOGL), "Failed to initialize OGL blinnPhongTexture Program");
 		} break;
 
 		case OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP: {
-			pOGLProgram = std::make_shared<OGLProgramBlinnPhongTextureBump>(pParentImp);
+			pOGLProgram = new OGLProgramBlinnPhongTextureBump(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blinnPhongTextureBump.vert", L"blinnPhongTextureBump.frag", versionOGL), "Failed to initialize OGL blinnPhongTextureBump Program");
 		} break;
 
 		case OGLPROGRAM_TEXTURE_BITBLIT: {
-			pOGLProgram = std::make_shared<OGLProgramTextureBitBlit>(pParentImp);
+			pOGLProgram = new OGLProgramTextureBitBlit(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"TextureBitBlit.vert", L"TextureBitBlit.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
 		} break;
 
 		case OGLPROGRAM_FLAT: {
-			pOGLProgram = std::make_shared<OGLProgramFlat>(pParentImp);
+			pOGLProgram = new OGLProgramFlat(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"flat.vert", L"flat.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
 		} break;
 
 		case OGLPROGRAM_SHADOW_DEPTH: {
-			pOGLProgram = std::make_shared<OGLProgramShadowDepth>(pParentImp);
+			pOGLProgram = new OGLProgramShadowDepth(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"ShadowDepth.vert", L"ShadowDepth.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
 		} break;
 
 		case OGLPROGRAM_ENVIRONMENT_OBJECTS: {
-			pOGLProgram = std::make_shared<OGLProgramEnvironmentObjects>(pParentImp);
+			pOGLProgram = new OGLProgramEnvironmentObjects(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"EnvironmentObjects.vert", L"EnvironmentObjects.frag", versionOGL), "Failed to initialize OGL EnvironmentObjects Program");
 		} break;
