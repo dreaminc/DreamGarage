@@ -14,18 +14,15 @@
 #include "PipelineCommon.h"
 
 class DConnection;
-
-template <class objType>
-class DConnectionTyped : public DConnection {
-public:
-	DConnectionTyped(DNode* pParentNode, CONNECTION_TYPE connType, objType *pDestination);
-	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pDestination);
-
-private:
-	objType *m_pObject = nullptr;
-};
+template <class objType> class DConnectionTyped;
 
 class DConnection : public DObject {
+	template <class objType> friend class DConnectionTyped;
+
+protected:
+	DConnection(DNode* pParentNode, CONNECTION_TYPE connType);
+	DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType);
+
 public:
 	~DConnection();
 
@@ -48,7 +45,9 @@ public:
 	RESULT RenderParent(long frameID = 0);
 
 	template <class objType>
-	static DConnection* MakeConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) {
+	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) {
+		
+		///*
 		RESULT r = R_PASS;
 
 		DConnectionTyped<objType> *pConnectionTyped = nullptr;
@@ -57,9 +56,10 @@ public:
 		CN(pConnectionTyped);
 
 		// Success:
-		return pConnectionTyped;
+		return (DConnection*)(pConnectionTyped);
 
 	Error:
+		//*/
 		return nullptr;
 	}
 
@@ -70,7 +70,28 @@ private:
 private:
 	CONNECTION_TYPE m_connType;
 	std::string m_strName;
-	
 };
+
+template <class objType>
+class DConnectionTyped : public DConnection {
+public:
+	DConnectionTyped(DNode* pParentNode, CONNECTION_TYPE connType, objType *pObject) :
+		DConnection(pParentNode, connType),
+		m_pObject(pObject)
+	{
+		// empty
+	}
+
+	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) :
+		DConnection(pParentNode, strName, connType),
+		m_pObject(pObject)
+	{
+		// empty
+	}
+
+private:
+	objType *m_pObject = nullptr;
+};
+
 
 #endif	// ! D_CONNECTION_H_

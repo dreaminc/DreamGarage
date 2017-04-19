@@ -39,7 +39,7 @@ public:
 
 		// Create the connection
 		{
-			DConnection* pDConnection = DConnection::MakeConnection<objType>(this, strName, type, pDestination);
+			DConnection* pDConnection = DConnection::MakeDConnection<objType>(this, strName, type, pDestination);
 			CN(pDConnection);
 
 			pDConnections->push_back(pDConnection);

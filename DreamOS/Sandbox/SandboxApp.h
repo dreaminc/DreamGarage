@@ -117,7 +117,7 @@ public:
 	virtual RESULT InitializePathManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
-	virtual RESULT InitializeHAL() = 0;
+	virtual RESULT InitializeHAL();
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;

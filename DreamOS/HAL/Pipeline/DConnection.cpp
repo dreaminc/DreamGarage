@@ -2,48 +2,20 @@
 
 #include "DNode.h"
 
-// DConnectionTyped Constructor 
-
-template <class objType>
-DConnectionTyped<objType>::DConnectionTyped(DNode* pParentNode, CONNECTION_TYPE connType, objType *pObject) :
+DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType) :
 	m_pParentNode(pParentNode),
-	m_connType(connType),
-	m_pObject(pObject)
+	m_connType(connType)
 {
 	// empty
 }
 
-template <class objType>
-DConnectionTyped<objType>::DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) :
+DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType) :
 	m_pParentNode(pParentNode),
 	m_strName(strName),
-	m_connType(connType),
-	m_pObject(pObject)
+	m_connType(connType)
 {
 	// empty
 }
-
-// DConnection Factory Method
-
-/*
-template <class objType>
-DConnection* DConnection::MakeConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) {
-	RESULT r = R_PASS;
-
-	DConnectionTyped<objType> *pConnectionTyped = nullptr;
-
-	pConnectionTyped = new DConnectionTyped<objType>(pParentNode, strName, connType, pObject);
-	CN(pConnectionTyped);
-
-// Success:
-	return pConnectionTyped;
-
-Error:
-	return nullptr;
-}
-*/
-
-// DConnection the rest of the story
 
 DConnection::~DConnection() {
 	RESULT r = R_PASS;

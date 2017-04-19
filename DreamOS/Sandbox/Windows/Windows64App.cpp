@@ -172,6 +172,7 @@ Error:
 	return r;
 }
 
+/*
 // TODO: Move this to sandbox
 RESULT Windows64App::InitializeHAL() {
 	RESULT r = R_PASS;
@@ -194,6 +195,7 @@ RESULT Windows64App::InitializeHAL() {
 Error:
 	return r;
 }
+*/
 
 RESULT Windows64App::SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) {
 	RESULT r = R_PASS;
