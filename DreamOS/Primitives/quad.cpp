@@ -232,10 +232,6 @@ Error:
 	return r;
 }
 
-vector quad::GetNormal() {
-	return m_vNormal;
-}
-
 // TODO: not supporting triangle based yet
 RESULT quad::SetVertices(float width, float height, vector vNormal) {
 	RESULT r = R_PASS;

@@ -3,10 +3,6 @@
 #include <vector>
 #include <algorithm>
 
-std::string& text::GetText() {
-	return m_text;
-}
-
 RESULT text::SetText(const std::string& text, double size, bool* isChanged)
 {
 	std::vector<quad> quads;

@@ -43,8 +43,6 @@ public:
 
 	RESULT SetVertices(float width, float height, vector vNormal);
 	RESULT SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased);
-
-	vector GetNormal();
 	
 	QUAD_TYPE EvaluatePoints(point a, point b, point c);
 
