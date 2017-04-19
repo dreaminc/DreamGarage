@@ -5,6 +5,12 @@
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/AnimationItem.h"
 
+UIMallet::UIMallet(DreamOS *pDreamOS) 
+{
+	m_pHead = pDreamOS->AddSphere(0.02f, 10.0f, 10.0f);
+	pDreamOS->AddInteractionObject(m_pHead);
+}
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -20,32 +26,25 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_surfaceHeight = 0.5f;
 	m_surfaceWidth = 1.0f;
 	m_pSurface = GetComposite()->AddQuad(m_surfaceHeight, m_surfaceWidth);
-	m_pSurface->SetVisible(false);
-
-	m_pSurface->InitializeOBB();
-
 	CN(m_pSurface);
 
-	m_pLeftMallet = new UIMallet();
+	m_pSurface->SetVisible(false);
+	m_pSurface->InitializeOBB();
+
+	m_pLeftMallet = new UIMallet(GetDOS());
 	CN(m_pLeftMallet);
-	m_pLeftMallet->pHead = GetDOS()->AddSphere(0.02f, 10.0f, 10.0f);
-	CR(GetDOS()->AddInteractionObject(m_pLeftMallet->pHead));
 
-	m_pRightMallet = new UIMallet();
+	m_pRightMallet = new UIMallet(GetDOS());
 	CN(m_pRightMallet);
-	m_pRightMallet->pHead = GetDOS()->AddSphere(0.02f, 10.0f, 10.0f);
-	CR(GetDOS()->AddInteractionObject(m_pRightMallet->pHead));
-
-	m_keys = {};
 
 	m_pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	m_keyStates = {};
-	m_keyStates.emplace_back(ActiveObject::state::NOT_INTERSECTED);
-	m_keyStates.emplace_back(ActiveObject::state::NOT_INTERSECTED);
+	m_keyStates[0] = ActiveObject::state::NOT_INTERSECTED;
+	m_keyStates[1] = ActiveObject::state::NOT_INTERSECTED;
 
-	m_keyObjects = { nullptr,nullptr };
+	m_keyObjects[0] = nullptr;
+	m_keyObjects[1] = nullptr;
 
 	m_typed = "";
 
@@ -129,7 +128,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
-		m_pLeftMallet->pHead->MoveTo(pHand->GetPosition() + point(qOffset * ptOffset));
+		m_pLeftMallet->m_pHead->MoveTo(pHand->GetPosition() + point(qOffset * ptOffset));
 
 	pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
 	CN(pHand);
@@ -138,10 +137,10 @@ RESULT UIKeyboard::Update(void *pContext) {
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pRightMallet)
-		m_pRightMallet->pHead->MoveTo(pHand->GetPosition() + point(qOffset * ptOffset));
+		m_pRightMallet->m_pHead->MoveTo(pHand->GetPosition() + point(qOffset * ptOffset));
 
 	int i = 0;
-	for (auto &mallet : { m_pLeftMallet->pHead, m_pRightMallet->pHead })
+	for (auto &mallet : { m_pLeftMallet->m_pHead, m_pRightMallet->m_pHead })
 	{
 		CollisionManifold manifold = m_pSurface->Collide(mallet);
 
@@ -238,7 +237,7 @@ int UIKeyboard::CollisionPointToIndex(CollisionManifold& manifold) {
 	point ptCenter = GetComposite()->GetPosition();
 	OVERLAY_DEBUG_SET("pt", pt);
 
-	int res;
+	int index;
 
 	auto& keyboardLayout = m_QWERTY;
 	int rowIndex = (pt.z() - ptCenter.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
@@ -248,10 +247,56 @@ int UIKeyboard::CollisionPointToIndex(CollisionManifold& manifold) {
 	colIndex = (pt.x() - ptCenter.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth * keyboardLayout[rowIndex].size();
 	CBR(colIndex >= 0 && colIndex < keyboardLayout[rowIndex].size(), R_OBJECT_NOT_FOUND);
 
-	res = rowIndex * (int)keyboardLayout[0].size() + colIndex;
+	index = rowIndex * (int)keyboardLayout[0].size() + colIndex;
 
 //Success:
-	return res;
+	return index;
 Error:
 	return -1;
+}
+
+RESULT UIKeyboard::UpdateViewQuad() {
+	RESULT r = R_PASS;
+
+	CR(m_pSurface->UpdateParams(GetWidth(), GetHeight(), m_pSurface->GetNormal()));
+	
+	// Flip UV vertically
+	if (r != R_SKIPPED) {
+		m_pSurface->TransformUV(
+		{ { 0.0f, 0.0f } },
+		{ { 1.0f, 0.0f,
+			0.0f, -1.0f } }
+		);
+	}
+
+	CR(m_pSurface->SetDirty());
+
+	CR(m_pSurface->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), m_pSurface->GetNormal()));
+
+Error:
+	return r;
+}
+
+float UIKeyboard::GetWidth() {
+	return m_surfaceWidth;
+}
+
+float UIKeyboard::GetHeight() {
+	return m_surfaceHeight;
+}
+
+RESULT UIKeyboard::SetWidth(float width) {
+	RESULT r = R_PASS;
+	m_surfaceWidth = width;
+	CR(UpdateViewQuad());
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::SetHeight(float height) {
+	RESULT r = R_PASS;
+	m_surfaceHeight = height;
+	CR(UpdateViewQuad());
+Error:
+	return r;
 }

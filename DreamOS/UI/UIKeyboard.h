@@ -16,8 +16,10 @@ class texture;
 class CollisionManifold;
 //class InteractionObjectEvent;
 
-struct UIMallet {
-	sphere *pHead;
+class UIMallet {
+public:
+	UIMallet(DreamOS *pDreamOS);
+	sphere *m_pHead;
 };
 
 class UIKeyboard : public DreamApp<UIKeyboard>, public Subscriber<InteractionObjectEvent> {
@@ -43,6 +45,14 @@ public:
 public:
 	int CollisionPointToIndex(CollisionManifold& manifold);
 
+	float GetWidth();
+	RESULT SetWidth(float width);
+	float GetHeight();
+	RESULT SetHeight(float height);
+
+private:
+	RESULT UIKeyboard::UpdateViewQuad();
+
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -58,8 +68,8 @@ private:
 
 	std::string m_typed;
 
-	std::vector<ActiveObject::state> m_keyStates;
-	std::vector<std::shared_ptr<quad>> m_keyObjects;
+	ActiveObject::state m_keyStates[2];
+	std::shared_ptr<quad> m_keyObjects[2];
 
 	std::vector<std::shared_ptr<quad>> m_keys;
 	std::shared_ptr<Font> m_pFont;
