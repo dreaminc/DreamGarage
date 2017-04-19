@@ -674,9 +674,6 @@
     <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIKeyboard.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1441,9 +1438,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h">
       <Filter>InteractionEngine</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIKeyboard.h">
-      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
