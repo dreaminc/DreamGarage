@@ -82,7 +82,7 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 		if (m_pUniformViewProjectionMatrix != nullptr) {
 			auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 			//auto matVP = pStereoCamera->GetProjectionMatrix(eye);

@@ -147,7 +147,7 @@ public:
 
 	user *AddUser();
 
-	std::shared_ptr<stereocamera> GetCamera();
+	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
 

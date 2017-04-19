@@ -849,7 +849,7 @@ RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
 */
 
 // TODO: Consolidate?
-RESULT OGLProgram::SetStereoCamera(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgram::SetStereoCamera(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
 	/*

@@ -748,7 +748,7 @@ Error:
 }
 
 // TODO: Remove this, this will eventually just be a node
-RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye) {
+RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, stereocamera* pCamera, EYE_TYPE eye) {
 
 	RESULT r = R_PASS;
 	skybox *pSkybox = nullptr;
@@ -769,7 +769,7 @@ Error:
 }
 
 // TODO: Remove this, this will eventually just be a node
-RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye) {
+RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, stereocamera* pCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	
 	if (IsRenderReferenceGeometry()) {
@@ -786,7 +786,7 @@ Error:
 	return r;
 }
 
-RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye, std::shared_ptr<stereocamera> pCamera) {
+RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye, stereocamera* pCamera) {
 
 	RESULT r = R_PASS;
 
@@ -802,7 +802,7 @@ Error:
 }
 
 // TODO: Remove this, this will eventually just be a node
-RESULT OpenGLImp::RenderToTexture(FlatContext* pContext, std::shared_ptr<stereocamera> pCamera) {
+RESULT OpenGLImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
 	RESULT r = R_PASS;
 
 	// Create framebuffer

@@ -69,8 +69,8 @@ public:
 	const HALImp::HALConfiguration& GetHALConfiguration();
 
 public:
-	std::shared_ptr<stereocamera> GetCamera();
-	RESULT SetCamera(std::shared_ptr<stereocamera> pCamera);
+	stereocamera* GetCamera();
+	RESULT SetCamera(stereocamera* pCamera);
 
 	RESULT SetCameraOrientation(quaternion qOrientation);
 	RESULT SetCameraPositionDeviation(vector vDeviation);
@@ -93,7 +93,7 @@ public:
 	virtual RESULT MakeCurrentContext() = 0;
 	virtual RESULT ReleaseCurrentContext() = 0;
 
-	virtual RESULT RenderToTexture(FlatContext* pContext, std::shared_ptr<stereocamera> pCamera) = 0;
+	virtual RESULT RenderToTexture(FlatContext* pContext, stereocamera* pCamera) = 0;
 
 	virtual RESULT Shutdown() = 0;
 
@@ -105,7 +105,7 @@ public:
 	virtual RESULT FlushHALBuffers() = 0;
 
 private:
-	RESULT Render(ObjectStore* pSceneGraph, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye);
+	RESULT Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE eye);
 
 protected:
 	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
@@ -152,7 +152,7 @@ public:
 
 protected:	
 	HMD *m_pHMD;
-	std::shared_ptr<stereocamera> m_pCamera = nullptr;
+	stereocamera* m_pCamera = nullptr;
 
 protected:
 	std::unique_ptr<Pipeline> m_pRenderPipeline = nullptr;

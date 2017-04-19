@@ -710,6 +710,12 @@
     <ClCompile Include="..\..\..\HAL\Pipeline\PipelineCommon.cpp">
       <Filter>HAL\Pipeline</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStoreNode.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\CameraNode.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1507,6 +1513,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\Pipeline\PipelineCommon.h">
       <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreNode.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\CameraNode.h">
+      <Filter>Scene</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

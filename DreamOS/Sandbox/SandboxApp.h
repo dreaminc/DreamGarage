@@ -18,7 +18,8 @@
 #include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
-#include "Scene/ObjectStore.h"
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
 
 #include <functional>
 
@@ -241,7 +242,7 @@ public:
 	RESULT ResizeViewport(viewport newViewport);
 
 
-	std::shared_ptr<stereocamera> GetCamera();
+	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
 
@@ -264,8 +265,10 @@ protected:
 	// TODO: Should these be in their respective "engine" objects?
 	ObjectStore *m_pPhysicsGraph;	
 	ObjectStore *m_pInteractionGraph;
-	ObjectStore *m_pSceneGraph;
 	ObjectStore *m_pFlatSceneGraph;
+
+	//ObjectStore *m_pSceneGraph;
+	ObjectStoreNode *m_pSceneGraph = nullptr;
 
 	CloudController *m_pCloudController;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;
@@ -278,14 +281,16 @@ protected:
 	HMD *m_pHMD;
 
 	// TODO: Create a "manager manager" or a more generalized way to add these
-	// All "managers" should be unique ptrs 
+	// All "managers" should be unique pointers 
 	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
-	std::shared_ptr<stereocamera> m_pCamera = nullptr;
+
+	//std::shared_ptr<stereocamera> m_pCamera = nullptr;
+	CameraNode *m_pCamera = nullptr;
 
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();

@@ -775,9 +775,11 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
+    <ClCompile Include="..\..\..\Scene\CameraNode.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStore.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStoreNode.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseController.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
@@ -1036,10 +1038,12 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
+    <ClInclude Include="..\..\..\Scene\CameraNode.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStore.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreNode.h" />
     <ClInclude Include="..\..\..\Sense\SenseController.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />

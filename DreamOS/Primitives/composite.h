@@ -69,7 +69,7 @@ public:
 
 public:
 	RESULT RenderToTexture(std::shared_ptr<FlatContext> context);
-	std::shared_ptr<stereocamera> GetCamera();
+	stereocamera* GetCamera();
 
 protected:
 	HALImp *m_pHALImp;

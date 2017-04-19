@@ -484,7 +484,8 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
-	m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	//m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
 	// Set up flat graph
@@ -606,7 +607,9 @@ Error:
 RESULT SandboxApp::InitializeCamera() {
 	RESULT r = R_PASS;
 
-	m_pCamera = std::make_shared<stereocamera>(point(0.0f, 0.0f, 5.0f), m_viewport);
+	//m_pCamera = std::make_shared<stereocamera>(point(0.0f, 0.0f, 5.0f), m_viewport);
+
+	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), m_viewport);
 	CN(m_pCamera);
 
 Error:
@@ -663,8 +666,8 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
-		ProgramNode* pOGLMinimalProgram = m_pHALImp->MakeProgramNode("minimal");
-		CN(pOGLMinimalProgram);
+		ProgramNode* pMinimalProgram = m_pHALImp->MakeProgramNode("minimal");
+		CN(pMinimalProgram);
 
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
@@ -672,7 +675,12 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pOGLMinimalProgram->Output("output_framebuffer")));
+		// Connect Program to Display
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pMinimalProgram->Output("output_framebuffer")));
+
+		// Connect Inputs into Program
+		CR(pMinimalProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pMinimalProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
 
 		/*
 		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);
@@ -1159,7 +1167,7 @@ Error:
 	return r;
 }
 
-std::shared_ptr<stereocamera> SandboxApp::GetCamera() {
+stereocamera* SandboxApp::GetCamera() {
 	return m_pCamera;
 }
 

@@ -357,7 +357,7 @@ Error:
 	return r;
 }
 
-std::shared_ptr<stereocamera> composite::GetCamera() {
+stereocamera* composite::GetCamera() {
 	return m_pHALImp->GetCamera();
 }
 

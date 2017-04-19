@@ -87,12 +87,12 @@ public:
 	virtual RESULT SetMaterial(material *pMaterial);
 	
 	RESULT SetCamera(camera *pCamera);
-	RESULT SetStereoCamera(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye);
+	RESULT SetStereoCamera(stereocamera* pStereoCamera, EYE_TYPE eye);
 
 	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) = 0;
 	virtual RESULT SetObjectUniforms(DimObj *pDimObj) = 0;
 	virtual RESULT SetCameraUniforms(camera *pCamera) = 0;
-	virtual RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) = 0;
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) = 0;
 	
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *pShaderID);

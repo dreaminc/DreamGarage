@@ -85,7 +85,7 @@ public:
 		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
 	}
 
-	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
 	}
 

@@ -101,16 +101,16 @@ public:
 	virtual RESULT ConfigureHAL() override;
 	virtual RESULT FlushHALBuffers() override;
 
-	virtual RESULT RenderToTexture(FlatContext* pContext, std::shared_ptr<stereocamera> pCamera) override;
+	virtual RESULT RenderToTexture(FlatContext* pContext, stereocamera* pCamera) override;
 
 	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) override;
 	virtual SourceNode* MakeSourceNode(std::string strNodeName) override;
 	virtual ProgramNode* MakeProgramNode(std::string strNodeName) override;
 
 private:
-	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye);
-	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye);
-	RESULT RenderProfiler(EYE_TYPE eye, std::shared_ptr<stereocamera> pCamera);
+	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, stereocamera* pCamera, EYE_TYPE eye);
+	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, stereocamera* pCamera, EYE_TYPE eye);
+	RESULT RenderProfiler(EYE_TYPE eye, stereocamera* pCamera);
 
 public:
 	virtual RESULT Resize(viewport newViewport) override;

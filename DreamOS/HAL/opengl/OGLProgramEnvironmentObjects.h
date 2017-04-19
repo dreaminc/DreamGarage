@@ -140,7 +140,7 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(std::shared_ptr<stereocamera> pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 
 		auto deltaTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
 		m_deltaTime = (float)deltaTime;

@@ -31,11 +31,11 @@ bool HALImp::IsRenderReferenceGeometry() {
 	return (bool)(m_HALConfiguration.fRenderReferenceGeometry);
 }
 
-std::shared_ptr<stereocamera> HALImp::GetCamera() {
+stereocamera* HALImp::GetCamera() {
 	return m_pCamera;
 }
 
-RESULT HALImp::SetCamera(std::shared_ptr<stereocamera> pCamera) {
+RESULT HALImp::SetCamera(stereocamera* pCamera) {
 	RESULT r = R_PASS;
 
 	CN(pCamera);
@@ -78,7 +78,7 @@ Error:
 	return r;
 }
 
-RESULT HALImp::Render(ObjectStore* pSceneGraph, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye) {
+RESULT HALImp::Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
 	// TODO: Replace this with source nodes

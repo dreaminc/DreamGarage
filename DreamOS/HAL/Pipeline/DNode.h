@@ -55,7 +55,7 @@ public:
 	}
 
 	template <class objType>
-	RESULT MakeOutput(std::string strName, objType*&pDestination) {
+	RESULT MakeOutput(std::string strName, objType *pDestination) {
 		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, pDestination);
 	}
 
