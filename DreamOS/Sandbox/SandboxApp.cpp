@@ -10,6 +10,9 @@
 
 #include "DreamAppManager.h"
 
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/ProgramNode.h"
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -628,6 +631,72 @@ RESULT SandboxApp::InitializeHAL() {
 
 	CR(m_pHALImp->InitializeHAL());
 	CR(m_pHALImp->InitializeRenderPipeline());
+
+	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
+	RESULT r = R_PASS;
+
+	SinkNode* pDestSinkNode = m_pHALImp->MakeSinkNode("display");
+	CN(pDestSinkNode);
+
+	CNM(pRenderPipeline, "Pipeline not initialized");
+	CR(pRenderPipeline->SetDestinationSinkNode(pDestSinkNode));
+
+	pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	// Source Nodes
+	// TODO: 
+
+	CR(m_pHALImp->MakeCurrentContext());
+	{
+		// Set up OGL programs
+		//std::shared_ptr<ProgramNode> pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
+		//CN(pOGLProgramShadowDepth);
+
+		// TODO(NTH): Add a program / render pipeline arch
+		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
+
+		ProgramNode* pOGLMinimalProgram = m_pHALImp->MakeProgramNode("minimal");
+		CN(pOGLMinimalProgram);
+
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
+
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pOGLMinimalProgram->Output("output_framebuffer")));
+
+		/*
+		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);
+
+		// Reference Geometry Shader Program
+		std::shared_ptr<ProgramNode> pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+		CN(pOGLReferenceGeometryProgram);
+
+		std::shared_ptr<ProgramNode> pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
+		CN(pOGLSkyboxProgram);
+
+		std::shared_ptr<ProgramNode> pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
+		CN(pOGLOverlayProgram);
+
+		std::shared_ptr<ProgramNode> pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
+		CN(pOGLFlatProgram);
+
+		// TODO: this
+		m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, std::dynamic_pointer_cast<OGLProgram>(pOGLOverlayProgram));
+		CN(m_pOGLDreamConsole);
+		*/
+	}
+
+	CR(m_pHALImp->ReleaseCurrentContext());
 
 Error:
 	return r;

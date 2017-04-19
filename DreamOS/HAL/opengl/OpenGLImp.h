@@ -59,6 +59,7 @@ public:
 
 	// Object Factory Methods
 public:
+	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
 	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) override;
@@ -101,6 +102,11 @@ public:
 	virtual RESULT FlushHALBuffers() override;
 
 	virtual RESULT RenderToTexture(FlatContext* pContext, std::shared_ptr<stereocamera> pCamera) override;
+
+	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) override;
+	virtual SourceNode* MakeSourceNode(std::string strNodeName) override;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName) override;
+
 private:
 	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye);
 	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye);
@@ -109,12 +115,11 @@ private:
 public:
 	virtual RESULT Resize(viewport newViewport) override;
 	virtual RESULT Shutdown() override;
-	virtual RESULT SetUpHALPipeline() override;
 	virtual RESULT InitializeHAL() override;
 
 	// Rendering Context 
-	RESULT MakeCurrentContext();
-	RESULT ReleaseCurrentContext();
+	virtual RESULT MakeCurrentContext() override ;
+	virtual RESULT ReleaseCurrentContext() override;
 
 private:
 	//RESULT InitializeExtensions();

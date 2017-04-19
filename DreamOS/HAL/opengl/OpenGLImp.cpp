@@ -34,9 +34,6 @@
 #include "DreamConsole/DreamConsole.h"
 #include "OGLDreamConsole.h"
 
-#include "HAL/Pipeline/SinkNode.h"
-#include "HAL/Pipeline/ProgramNode.h"
-
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
@@ -168,67 +165,6 @@ RESULT OpenGLImp::MakeCurrentContext() {
 
 RESULT OpenGLImp::ReleaseCurrentContext() {
 	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
-}
-
-RESULT OpenGLImp::SetUpHALPipeline() {
-	RESULT r = R_PASS;
-
-	SinkNode* pDestSinkNode = DNode::MakeNode<OGLViewportDisplay>(this);
-	CN(pDestSinkNode);
-
-	CNM(m_pRenderPipeline, "Pipeline not initialized");
-	CR(m_pRenderPipeline->SetDestinationSinkNode(pDestSinkNode));
-
-	pDestSinkNode = m_pRenderPipeline->GetDestinationSinkNode();
-	CNM(pDestSinkNode, "Destination sink node isn't set");
-
-	CR(MakeCurrentContext());
-	{
-		// Set up OGL programs
-		//std::shared_ptr<ProgramNode> pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
-		//CN(pOGLProgramShadowDepth);
-
-		// TODO(NTH): Add a program / render pipeline arch
-		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
-		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
-
-		ProgramNode* pOGLMinimalProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-		CN(pOGLMinimalProgram);
-
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
-
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pOGLMinimalProgram->Output("output_framebuffer")));
-
-		/*
-		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);
-
-		// Reference Geometry Shader Program
-		std::shared_ptr<ProgramNode> pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-		CN(pOGLReferenceGeometryProgram);
-
-		std::shared_ptr<ProgramNode> pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
-		CN(pOGLSkyboxProgram);
-
-		std::shared_ptr<ProgramNode> pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
-		CN(pOGLOverlayProgram);
-
-		std::shared_ptr<ProgramNode> pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
-		CN(pOGLFlatProgram);
-
-		// TODO: this
-		m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, std::dynamic_pointer_cast<OGLProgram>(pOGLOverlayProgram));
-		CN(m_pOGLDreamConsole);
-		*/
-	}
-
-	CR(ReleaseCurrentContext());
-
-Error:
-	return r;
 }
 
 RESULT OpenGLImp::InitializeHAL() {
@@ -558,6 +494,7 @@ Error:
 		delete pLight;
 		pLight = nullptr;
 	}
+
 	return nullptr;
 }
 
@@ -886,6 +823,32 @@ RESULT OpenGLImp::RenderToTexture(FlatContext* pContext, std::shared_ptr<stereoc
 
 Error:
 	return r;
+}
+
+SinkNode* OpenGLImp::MakeSinkNode(std::string strNodeName) {
+	SinkNode* pSinkNode = nullptr;
+		
+	if (strNodeName == "display") {
+		pSinkNode = DNode::MakeNode<OGLViewportDisplay>(this);
+	}
+
+	return pSinkNode;
+}
+
+SourceNode* OpenGLImp::MakeSourceNode(std::string strNodeName) {
+	SourceNode* pSourceNode = nullptr;
+
+	// TODO: ? will there be HAL backed Source Nodes?
+
+	return pSourceNode;
+}
+
+ProgramNode* OpenGLImp::MakeProgramNode(std::string strNodeName) {
+	ProgramNode* pProgramNode = nullptr;
+
+	pProgramNode = OGLProgramFactory::MakeOGLProgram(OGLProgramFactory::OGLProgramTypeFromstring(strNodeName), this, m_versionGLSL);
+
+	return pProgramNode;
 }
 
 RESULT OpenGLImp::ClearHALBuffers() {

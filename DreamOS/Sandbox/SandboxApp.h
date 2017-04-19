@@ -117,12 +117,15 @@ public:
 	virtual RESULT InitializePathManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
-	virtual RESULT InitializeHAL();
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
+	
+	// HAL
+	virtual RESULT InitializeHAL();
+	RESULT SetUpHALPipeline(Pipeline* pRenderPipeline);		// TODO: this goes up to DreamOS soon
 
 public:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);

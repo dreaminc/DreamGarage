@@ -14,6 +14,28 @@
 #include "OGLProgramShadowDepth.h"
 #include "OGLProgramEnvironmentObjects.h"
 
+const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramNameType = {
+	{ "minimal", OGLPROGRAM_MINIMAL },
+	{ "minimal_texture", OGLPROGRAM_MINIMAL_TEXTURE },
+	{ "skybox", OGLPROGRAM_SKYBOX },
+	{ "skybox_scatter", OGLPROGRAM_SKYBOX_SCATTER },
+	{ "blinnphong", OGLPROGRAM_BLINNPHONG },
+	{ "blinnphong_shadow", OGLPROGRAM_BLINNPHONG_SHADOW },
+	{ "blinnphong_text", OGLPROGRAM_BLINNPHONG_TEXTURE },
+	{ "blinnphong_text_shadow", OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW },
+	{ "blinnphong_tex_bump", OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP },
+	{ "texture_bitblit", OGLPROGRAM_TEXTURE_BITBLIT },
+	{ "flat", OGLPROGRAM_FLAT },
+	{ "custom", OGLPROGRAM_CUSTOM },
+	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
+	{ "environment", OGLPROGRAM_ENVIRONMENT_OBJECTS },
+	{ "invalid", OGLPROGRAM_INVALID }
+};
+
+OGLPROGRAM_TYPE OGLProgramFactory::OGLProgramTypeFromstring(std::string strProgramName) {
+	return m_OGLProgramNameType.at(strProgramName);
+}
+
 ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL) {
 	OGLProgram* pOGLProgram = nullptr;
 	RESULT r = R_PASS;

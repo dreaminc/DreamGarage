@@ -74,8 +74,6 @@ RESULT HALImp::InitializeRenderPipeline() {
 	m_pRenderPipeline = std::make_unique<Pipeline>();
 	CN(m_pRenderPipeline);
 
-	CR(SetUpHALPipeline());
-
 Error:
 	return r;
 }

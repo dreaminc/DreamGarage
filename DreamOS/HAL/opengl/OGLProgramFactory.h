@@ -7,6 +7,9 @@
 
 #include "OGLProgram.h"
 
+#include <string>
+#include <map>
+
 typedef enum {
 	OGLPROGRAM_MINIMAL,
 	OGLPROGRAM_MINIMAL_TEXTURE,
@@ -28,8 +31,12 @@ typedef enum {
 } OGLPROGRAM_TYPE;
 
 class OGLProgramFactory {
+private:
+	static const std::map<std::string, OGLPROGRAM_TYPE> m_OGLProgramNameType;
+
 public:
 	static ProgramNode* MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL);
+	static 	OGLPROGRAM_TYPE OGLProgramTypeFromstring(std::string strProgramName);
 };
 
 #endif // ! OGL_PROGRAM_FACTORY_H_

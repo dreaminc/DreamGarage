@@ -37,6 +37,10 @@ class SandboxApp;
 
 #include "Primitives/viewport.h"
 
+class SinkNode;
+class SourceNode;
+class ProgramNode;
+
 class HALImp : public valid 
 {
 	friend class SandboxApp;
@@ -75,11 +79,19 @@ public:
 
 public:
 	RESULT InitializeRenderPipeline();
+	Pipeline* GetRenderPipelineHandle() {
+		return m_pRenderPipeline.get();
+	}
+	
+	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) = 0;
+	virtual SourceNode* MakeSourceNode(std::string strNodeName) = 0;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName) = 0;
 
 public:
 
 	virtual RESULT Resize(viewport newViewport) = 0;
 	virtual RESULT MakeCurrentContext() = 0;
+	virtual RESULT ReleaseCurrentContext() = 0;
 
 	virtual RESULT RenderToTexture(FlatContext* pContext, std::shared_ptr<stereocamera> pCamera) = 0;
 
@@ -91,7 +103,6 @@ public:
 	virtual RESULT ClearHALBuffers() = 0;
 	virtual RESULT ConfigureHAL() = 0;
 	virtual RESULT FlushHALBuffers() = 0;
-	virtual RESULT SetUpHALPipeline() = 0;
 
 private:
 	RESULT Render(ObjectStore* pSceneGraph, std::shared_ptr<stereocamera> pCamera, EYE_TYPE eye);
@@ -101,6 +112,7 @@ protected:
 	bool IsRenderReferenceGeometry();
 
 public:
+	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) = 0;
 	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) = 0;
