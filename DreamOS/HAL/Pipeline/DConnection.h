@@ -44,6 +44,8 @@ public:
 	RESULT RenderConnections(long frameID = 0);
 	RESULT RenderParent(long frameID = 0);
 
+	virtual RESULT LinkInputToOutputObjects(DConnection* pInputConnection, DConnection* pOutputConnection) = 0;
+
 	template <class objType>
 	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) {
 		
@@ -53,6 +55,25 @@ public:
 		DConnectionTyped<objType> *pConnectionTyped = nullptr;
 
 		pConnectionTyped = new DConnectionTyped<objType>(pParentNode, strName, connType, pObject);
+		CN(pConnectionTyped);
+
+		// Success:
+		return (DConnection*)(pConnectionTyped);
+
+	Error:
+		//*/
+		return nullptr;
+	}
+
+	template <class objType>
+	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject) {
+
+		///*
+		RESULT r = R_PASS;
+
+		DConnectionTyped<objType> *pConnectionTyped = nullptr;
+
+		pConnectionTyped = new DConnectionTyped<objType>(pParentNode, strName, connType, ppObject);
 		CN(pConnectionTyped);
 
 		// Success:
@@ -75,22 +96,48 @@ private:
 template <class objType>
 class DConnectionTyped : public DConnection {
 public:
-	DConnectionTyped(DNode* pParentNode, CONNECTION_TYPE connType, objType *pObject) :
-		DConnection(pParentNode, connType),
-		m_pObject(pObject)
+
+	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) :
+		DConnection(pParentNode, strName, connType),
+		m_pObject(pObject),
+		m_ppObject(nullptr)
 	{
 		// empty
 	}
 
-	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) :
+	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject) :
 		DConnection(pParentNode, strName, connType),
-		m_pObject(pObject)
+		m_pObject(nullptr),
+		m_ppObject(ppObject)
 	{
 		// empty
+	}
+
+	virtual RESULT LinkInputToOutputObjects(DConnection* pInputConnection, DConnection* pOutputConnection) override {
+		RESULT r = R_PASS;
+
+		CB(pInputConnection->GetType() == CONNECTION_TYPE::INPUT);
+		CB(pOutputConnection->GetType() == CONNECTION_TYPE::OUTPUT);
+
+		DConnectionTyped<objType>* pTypedInputConnection = dynamic_cast<DConnectionTyped<objType>*>(pInputConnection);
+		CN(pTypedInputConnection);
+
+		DConnectionTyped<objType>* pTypedOutputConnection = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
+		CN(pTypedOutputConnection);
+
+		CN(pTypedInputConnection->m_ppObject);
+		CN(pTypedOutputConnection->m_pObject);
+
+		// Set the destination?
+		*pTypedInputConnection->m_ppObject = pTypedOutputConnection->m_pObject;
+
+	Error:
+		return r;
 	}
 
 private:
 	objType *m_pObject = nullptr;
+	objType **m_ppObject = nullptr;
 };
 
 

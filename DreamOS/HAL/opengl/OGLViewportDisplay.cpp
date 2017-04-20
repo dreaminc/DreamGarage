@@ -10,7 +10,7 @@ OGLViewportDisplay::OGLViewportDisplay(OpenGLImp *pParentImp) :
 RESULT OGLViewportDisplay::SetupConnections() {
 	RESULT r = R_PASS;
 
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer", m_pOGLInputFramebuffer));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLInputFramebuffer));
 
 Error:
 	return r;

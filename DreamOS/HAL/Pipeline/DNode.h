@@ -26,7 +26,7 @@ public:
 	RESULT ClearConnections();
 
 	template <class objType>
-	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType*&pDestination) {
+	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType *pDestination) {
 		RESULT r = R_PASS;
 
 		std::vector<DConnection*> *pDConnections = nullptr;
@@ -50,13 +50,37 @@ public:
 	}
 
 	template <class objType>
-	RESULT MakeInput(std::string strName, objType*&pDestination) {
-		return MakeConnection<objType>(strName, CONNECTION_TYPE::INPUT, pDestination);
+	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType **ppDestination) {
+		RESULT r = R_PASS;
+
+		std::vector<DConnection*> *pDConnections = nullptr;
+
+		// Ensure no connections exist with this name
+		CBM((Connection(strName, type) == nullptr), "%s Connection %s already exists", ConnectionTypeString(type).c_str(), strName.c_str());
+
+		pDConnections = GetConnectionSet(type);
+		CN(pDConnections);
+
+		// Create the connection
+		{
+			DConnection* pDConnection = DConnection::MakeDConnection<objType>(this, strName, type, ppDestination);
+			CN(pDConnection);
+
+			pDConnections->push_back(pDConnection);
+		}
+
+	Error:
+		return r;
 	}
 
 	template <class objType>
-	RESULT MakeOutput(std::string strName, objType *pDestination) {
-		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, pDestination);
+	RESULT MakeInput(std::string strName, objType **ppDestination) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::INPUT, ppDestination);
+	}
+
+	template <class objType>
+	RESULT MakeOutput(std::string strName, objType *ppDestination) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, ppDestination);
 	}
 
 	DConnection* Connection(std::string strName, CONNECTION_TYPE type);

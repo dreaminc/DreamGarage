@@ -112,6 +112,11 @@ RESULT DConnection::Connect(DConnection* pConnection) {
 	pConnection->m_connections.push_back(this);
 	m_connections.push_back(pConnection);
 
+	if(m_connType == CONNECTION_TYPE::INPUT)
+		LinkInputToOutputObjects(this, pConnection);
+	else
+		LinkInputToOutputObjects(pConnection, this);
+
 Error:
 	return r;
 }

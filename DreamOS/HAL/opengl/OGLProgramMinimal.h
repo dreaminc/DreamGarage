@@ -37,9 +37,9 @@ public:
 		RESULT r = R_PASS;
 
 		// Inputs
-		CR(MakeInput<camera>("camera", m_pCamera));
+		CR(MakeInput<stereocamera>("camera", &m_pCamera));
 		//CR(MakeInput("lights"));
-		CR(MakeInput<ObjectStore>("scenegraph", m_pSceneGraph));
+		CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph));
 
 		// Outputs
 		CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
@@ -93,7 +93,7 @@ public:
 	}
 
 private:
-	camera *m_pCamera = nullptr;
+	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
 
 private:
