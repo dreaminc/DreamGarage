@@ -666,8 +666,9 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
-		ProgramNode* pMinimalProgram = m_pHALImp->MakeProgramNode("minimal");
-		CN(pMinimalProgram);
+		//ProgramNode* pProgramNode = m_pHALImp->MakeProgramNode("minimal");
+		ProgramNode* pProgramNode = m_pHALImp->MakeProgramNode("environment");
+		CN(pProgramNode);
 
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
@@ -676,11 +677,11 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 
 		// Connect Program to Display
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pMinimalProgram->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pProgramNode->Output("output_framebuffer")));
 
 		// Connect Inputs into Program
-		CR(pMinimalProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-		CR(pMinimalProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+		CR(pProgramNode->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
 
 		/*
 		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);

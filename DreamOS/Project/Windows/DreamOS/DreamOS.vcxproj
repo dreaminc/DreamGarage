@@ -678,6 +678,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimal.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
