@@ -1,0 +1,116 @@
+#include "OGLProgramMinimal.h"
+
+#include "Scene/ObjectStoreImp.h"
+#include "Scene/ObjectStore.h"
+
+#include "Primitives/stereocamera.h"
+
+OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp) :
+	OGLProgram(pParentImp, "oglminimal")
+{
+	// empty
+}
+
+RESULT OGLProgramMinimal::OGLInitialize() {
+	RESULT r = R_PASS;
+
+	CR(OGLProgram::OGLInitialize());
+
+	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
+	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramMinimal::SetupConnections() {
+	RESULT r = R_PASS;
+
+	// Inputs
+	CR(MakeInput<stereocamera>("camera", &m_pCamera));
+	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph));
+	//TODO: CR(MakeInput("lights"));
+
+	// Outputs
+	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgramMinimal::ProcessNode(long frameID) {
+	RESULT r = R_PASS;
+
+	// For now
+	EYE_TYPE eye = EYE_MONO;
+
+	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
+
+	std::vector<light*> *pLights = nullptr;
+	pObjectStore->GetLights(pLights);
+
+	UseProgram();
+	SetLights(pLights);
+
+	/*
+	// Camera Projection Matrix
+	if (m_pHMD != nullptr) {
+	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
+	UseProgram();
+	}
+	*/
+
+	SetStereoCamera(m_pCamera, eye);
+
+	/*
+	if (m_pHMD != nullptr) {
+	m_pHMD->SetAndClearRenderSurface(eye);
+	}
+	else if (eye != lastEye) {
+	SetViewTarget(eye);
+	lastEye = eye;
+	}
+	*/
+
+	// 3D Object / skybox
+	RenderObjectStore(m_pSceneGraph);
+
+//Error:
+	return r;
+}
+
+RESULT OGLProgramMinimal::SetObjectTextures(OGLObj *pOGLObj) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT OGLProgramMinimal::SetObjectUniforms(DimObj *pDimObj) {
+	if (m_pUniformModelMatrix != nullptr) {
+		auto matModel = pDimObj->GetModelMatrix();
+		m_pUniformModelMatrix->SetUniform(matModel);
+	}
+
+	return R_PASS;
+}
+
+RESULT OGLProgramMinimal::SetCameraUniforms(camera *pCamera) {
+	if (m_pUniformViewProjectionMatrix != nullptr) {
+		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
+		//auto matVP = pCamera->GetProjectionMatrix();
+		m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	}
+
+	return R_PASS;
+}
+
+RESULT OGLProgramMinimal::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+	if (m_pUniformViewProjectionMatrix != nullptr) {
+		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
+		//auto matVP = pStereoCamera->GetProjectionMatrix(eye);
+		m_pUniformViewProjectionMatrix->SetUniform(matVP);
+	}
+
+	return R_PASS;
+}
