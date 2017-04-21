@@ -14,6 +14,24 @@ enum class CONNECTION_TYPE {
 	INVALID
 };
 
+enum class DCONNECTION_FLAGS : int {
+	NONE			= 0 << 0,
+	PASSIVE			= 1 << 1
+};
+
+// taken from: http://stackoverflow.com/questions/12059774/c11-standard-conformant-bitmasks-using-enum-class
+inline constexpr DCONNECTION_FLAGS
+operator&(DCONNECTION_FLAGS __x, DCONNECTION_FLAGS __y) {
+	return static_cast<DCONNECTION_FLAGS>
+		(static_cast<int>(__x) & static_cast<int>(__y));
+}
+
+inline constexpr DCONNECTION_FLAGS
+operator|(DCONNECTION_FLAGS __x, DCONNECTION_FLAGS __y) {
+	return static_cast<DCONNECTION_FLAGS>
+		(static_cast<int>(__x) | static_cast<int>(__y));
+}
+
 class DNode;
 class DConnection;
 

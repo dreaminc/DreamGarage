@@ -2,17 +2,19 @@
 
 #include "DNode.h"
 
-DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType) :
+DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags) :
 	m_pParentNode(pParentNode),
-	m_connType(connType)
+	m_connType(connType),
+	m_flags(optFlags)
 {
 	// empty
 }
 
-DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType) :
+DConnection::DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags) :
 	m_pParentNode(pParentNode),
 	m_strName(strName),
-	m_connType(connType)
+	m_connType(connType),
+	m_flags(optFlags)
 {
 	// empty
 }
@@ -125,22 +127,29 @@ CONNECTION_TYPE DConnection::GetType() {
 	return m_connType;
 }
 
+bool DConnection::IsActive() {
+	if (static_cast<int>(m_flags & DCONNECTION_FLAGS::PASSIVE) != 0) {
+		return false;
+	}
+
+	return true;
+}
+
 RESULT DConnection::RenderConnections(long frameID) {
 	RESULT r = R_PASS;
 
 	for (auto &pConnection : m_connections) {
-		CR(pConnection->RenderParent(frameID));
+		if (pConnection->IsActive()) {
+			r = pConnection->RenderParent(frameID);
+
+			if (r < 0)
+				return r;
+		}
 	}
 
-Error:
-	return r;
+	return R_PASS;
 }
 
 RESULT DConnection::RenderParent(long frameID) {
-	RESULT r = R_PASS;
-
-	CR(m_pParentNode->RenderNode(frameID));
-
-Error:
-	return r;
+	return m_pParentNode->RenderNode(frameID);
 }

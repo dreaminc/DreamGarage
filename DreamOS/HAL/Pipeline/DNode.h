@@ -26,7 +26,7 @@ public:
 	RESULT ClearConnections();
 
 	template <class objType>
-	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType *pDestination) {
+	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType *pDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
 		RESULT r = R_PASS;
 
 		std::vector<DConnection*> *pDConnections = nullptr;
@@ -39,7 +39,7 @@ public:
 
 		// Create the connection
 		{
-			DConnection* pDConnection = DConnection::MakeDConnection<objType>(this, strName, type, pDestination);
+			DConnection* pDConnection = DConnection::MakeDConnection<objType>(this, strName, type, pDestination, optFlags);
 			CN(pDConnection);
 
 			pDConnections->push_back(pDConnection);
@@ -50,7 +50,7 @@ public:
 	}
 
 	template <class objType>
-	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType **ppDestination) {
+	RESULT MakeConnection(std::string strName, CONNECTION_TYPE type, objType **ppDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
 		RESULT r = R_PASS;
 
 		std::vector<DConnection*> *pDConnections = nullptr;
@@ -63,7 +63,7 @@ public:
 
 		// Create the connection
 		{
-			DConnection* pDConnection = DConnection::MakeDConnection<objType>(this, strName, type, ppDestination);
+			DConnection* pDConnection = DConnection::MakeDConnection<objType>(this, strName, type, ppDestination, optFlags);
 			CN(pDConnection);
 
 			pDConnections->push_back(pDConnection);
@@ -74,13 +74,13 @@ public:
 	}
 
 	template <class objType>
-	RESULT MakeInput(std::string strName, objType **ppDestination) {
-		return MakeConnection<objType>(strName, CONNECTION_TYPE::INPUT, ppDestination);
+	RESULT MakeInput(std::string strName, objType **ppDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::INPUT, ppDestination, optFlags);
 	}
 
 	template <class objType>
-	RESULT MakeOutput(std::string strName, objType *ppDestination) {
-		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, ppDestination);
+	RESULT MakeOutput(std::string strName, objType *ppDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, ppDestination, optFlags);
 	}
 
 	DConnection* Connection(std::string strName, CONNECTION_TYPE type);

@@ -20,8 +20,8 @@ class DConnection : public DObject {
 	template <class objType> friend class DConnectionTyped;
 
 protected:
-	DConnection(DNode* pParentNode, CONNECTION_TYPE connType);
-	DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType);
+	DConnection(DNode* pParentNode, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE);
+	DConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE);
 
 public:
 	~DConnection();
@@ -40,6 +40,7 @@ public:
 	RESULT Disconnect();
 
 	CONNECTION_TYPE GetType();
+	bool IsActive();
 
 	RESULT RenderConnections(long frameID = 0);
 	RESULT RenderParent(long frameID = 0);
@@ -47,14 +48,14 @@ public:
 	virtual RESULT LinkInputToOutputObjects(DConnection* pInputConnection, DConnection* pOutputConnection) = 0;
 
 	template <class objType>
-	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) {
+	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
 		
 		///*
 		RESULT r = R_PASS;
 
 		DConnectionTyped<objType> *pConnectionTyped = nullptr;
 
-		pConnectionTyped = new DConnectionTyped<objType>(pParentNode, strName, connType, pObject);
+		pConnectionTyped = new DConnectionTyped<objType>(pParentNode, strName, connType, pObject, optFlags);
 		CN(pConnectionTyped);
 
 		// Success:
@@ -66,14 +67,14 @@ public:
 	}
 
 	template <class objType>
-	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject) {
+	static DConnection* MakeDConnection(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
 
 		///*
 		RESULT r = R_PASS;
 
 		DConnectionTyped<objType> *pConnectionTyped = nullptr;
 
-		pConnectionTyped = new DConnectionTyped<objType>(pParentNode, strName, connType, ppObject);
+		pConnectionTyped = new DConnectionTyped<objType>(pParentNode, strName, connType, ppObject, optFlags);
 		CN(pConnectionTyped);
 
 		// Success:
@@ -85,6 +86,7 @@ public:
 	}
 
 private:
+	DCONNECTION_FLAGS m_flags;
 	DNode* m_pParentNode = nullptr;
 	std::vector<DConnection*> m_connections;
 
@@ -97,16 +99,16 @@ template <class objType>
 class DConnectionTyped : public DConnection {
 public:
 
-	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject) :
-		DConnection(pParentNode, strName, connType),
+	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType *pObject, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) :
+		DConnection(pParentNode, strName, connType, optFlags),
 		m_pObject(pObject),
 		m_ppObject(nullptr)
 	{
 		// empty
 	}
 
-	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject) :
-		DConnection(pParentNode, strName, connType),
+	DConnectionTyped(DNode* pParentNode, std::string strName, CONNECTION_TYPE connType, objType **ppObject, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) :
+		DConnection(pParentNode, strName, connType, optFlags),
 		m_pObject(nullptr),
 		m_ppObject(ppObject)
 	{
