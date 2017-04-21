@@ -749,24 +749,6 @@ Error:
 	return nullptr;
 }
 
-// TODO: Remove this, this will eventually just be a node
-RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, stereocamera* pCamera, EYE_TYPE eye) {
-	RESULT r = R_PASS;
-	
-	if (IsRenderReferenceGeometry()) {
-		/*
-		CR(m_pOGLReferenceGeometryProgram->UseProgram());
-		CR(m_pOGLReferenceGeometryProgram->SetStereoCamera(pCamera, eye));
-		CR(m_pOGLReferenceGeometryProgram->RenderObjectStoreBoundingVolumes(pObjectStore));
-		*/
-	}
-
-	CR(r);
-
-Error:
-	return r;
-}
-
 RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye, stereocamera* pCamera) {
 
 	RESULT r = R_PASS;

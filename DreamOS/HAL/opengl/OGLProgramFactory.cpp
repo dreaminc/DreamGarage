@@ -1,6 +1,7 @@
 #include "OGLProgramFactory.h"
 
 #include "OGLProgramMinimal.h"
+#include "OGLProgramReferenceGeometry.h"
 #include "OGLProgramSkybox.h"
 #include "OGLProgramSkyboxScatter.h"
 #include "OGLProgramBlinnPhong.h"
@@ -28,6 +29,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "flat", OGLPROGRAM_FLAT },
 	{ "custom", OGLPROGRAM_CUSTOM },
 	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
+	{ "reference", OGLPROGRAM_REFERENCE },
 	{ "environment", OGLPROGRAM_ENVIRONMENT_OBJECTS },
 	{ "invalid", OGLPROGRAM_INVALID }
 };
@@ -43,6 +45,12 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 	switch (type) {
 		case OGLPROGRAM_MINIMAL: {
 			pOGLProgram = new OGLProgramMinimal(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", versionOGL), "Failed to initialize OGL minimal Program");
+		} break;
+
+		case OGLPROGRAM_REFERENCE: {
+			pOGLProgram = new OGLProgramReferenceGeometry(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"minimal.vert", L"minimal.frag", versionOGL), "Failed to initialize OGL minimal Program");
 		} break;

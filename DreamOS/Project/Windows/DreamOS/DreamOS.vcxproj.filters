@@ -728,6 +728,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1531,6 +1534,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Scene\CameraNode.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

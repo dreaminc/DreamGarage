@@ -108,7 +108,6 @@ public:
 	virtual ProgramNode* MakeProgramNode(std::string strNodeName) override;
 
 private:
-	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, stereocamera* pCamera, EYE_TYPE eye);
 	RESULT RenderProfiler(EYE_TYPE eye, stereocamera* pCamera);
 
 public:

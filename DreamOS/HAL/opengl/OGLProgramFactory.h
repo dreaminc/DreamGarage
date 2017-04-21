@@ -24,6 +24,7 @@ typedef enum {
 	OGLPROGRAM_FLAT,
 	OGLPROGRAM_CUSTOM,
 	OGLPROGRAM_SHADOW_DEPTH,
+	OGLPROGRAM_REFERENCE,
 	// Production shaders - using features from previous shaders 
 	OGLPROGRAM_ENVIRONMENT_OBJECTS, // used for models in the environment such as head and hands
 	// /Production shaders

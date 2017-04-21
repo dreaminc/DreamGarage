@@ -109,6 +109,8 @@ private:
 
 protected:
 	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
+
+public:
 	bool IsRenderReferenceGeometry();
 
 public:
