@@ -12,13 +12,6 @@
 
 #define DEFAULT_PUPILLARY_DISTANCE 55
 
-enum EYE_TYPE {
-	EYE_LEFT,
-	EYE_RIGHT,
-	EYE_MONO,
-	EYE_INVALID
-};
-
 class viewport;
 
 class stereocamera : public camera {
@@ -34,7 +27,11 @@ public:
 
 	ViewMatrix GetViewMatrix(EYE_TYPE eye);
 
+	virtual EYE_TYPE GetCameraEye() override;
+	RESULT SetCameraEye(EYE_TYPE eye);
+
 private:
+	EYE_TYPE m_eye;
 	camera_precision m_pupillaryDistance;	//  Distance between eyes (in mm)
 };
 

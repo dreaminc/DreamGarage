@@ -243,8 +243,10 @@ RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) {
 	}
 
 	// TODO: Do this in the sandbox when choosing eye - do we need the above then?
+	/*
 	(eye != EYE_MONO) ? m_pCamera->ResizeCamera(pxWidth/2.0f, pxHeight) :
 						m_pCamera->ResizeCamera(pxWidth, pxHeight);
+						*/
 
 	return r;
 }

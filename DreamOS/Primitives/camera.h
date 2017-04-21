@@ -33,6 +33,13 @@
 
 #include "Primitives/viewport.h"
 
+enum EYE_TYPE {
+	EYE_LEFT,
+	EYE_RIGHT,
+	EYE_MONO,
+	EYE_INVALID
+};
+
 class camera : public VirtualObj//, 
 	//public Subscriber<CmdPromptEvent>, 
 	//public Subscriber<SenseKeyboardEvent>, 
@@ -97,13 +104,16 @@ public:
 	// TODO: update this with a time delta / delta movement 
 	ray GetRay(int xPos, int yPos);			// This is assuming an integer screen position but really just calls the one above
 
-
 	bool IsAllowedMoveByKeys();
 
 	quaternion GetOffsetOrientation();
 	RESULT SetOffsetOrientation(quaternion qOffset);
 
 	bool HasHMD();
+
+	virtual EYE_TYPE GetCameraEye() {
+		return EYE_MONO;
+	}
 
 protected:
 	HMD *m_pHMD;

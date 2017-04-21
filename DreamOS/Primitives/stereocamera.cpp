@@ -3,7 +3,8 @@
 #include "Primitives/viewport.h"
 
 stereocamera::stereocamera(point ptOrigin, viewport cameraVieport) :
-	camera(ptOrigin, cameraVieport)
+	camera(ptOrigin, cameraVieport),
+	m_eye(EYE_MONO)
 {
 	m_pupillaryDistance = (DEFAULT_PUPILLARY_DISTANCE / 1000.0f);
 }
@@ -77,4 +78,13 @@ ViewMatrix stereocamera::GetViewMatrix(EYE_TYPE eye) {
 
 	mat = ViewMatrix(eyePos, q);
 	return mat;
+}
+
+EYE_TYPE stereocamera::GetCameraEye() {
+	return m_eye;
+}
+
+RESULT stereocamera::SetCameraEye(EYE_TYPE eye) {
+	m_eye = eye;
+	return R_PASS;
 }

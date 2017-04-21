@@ -44,9 +44,6 @@ Error:
 RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	// For now
-	EYE_TYPE eye = EYE_MONO;
-
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
 
 	std::vector<light*> *pLights = nullptr;
@@ -55,25 +52,7 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	UseProgram();
 	SetLights(pLights);
 
-	/*
-	// Camera Projection Matrix
-	if (m_pHMD != nullptr) {
-	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
-	UseProgram();
-	}
-	*/
-
-	SetStereoCamera(m_pCamera, eye);
-
-	/*
-	if (m_pHMD != nullptr) {
-	m_pHMD->SetAndClearRenderSurface(eye);
-	}
-	else if (eye != lastEye) {
-	SetViewTarget(eye);
-	lastEye = eye;
-	}
-	*/
+	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);

@@ -90,8 +90,22 @@ RESULT HALImp::Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE 
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	CR(ClearHALBuffers());
-	CR(ConfigureHAL());
+	m_pCamera->SetCameraEye(eye);
+
+	ClearHALBuffers();
+	ConfigureHAL();
+
+	// Camera Projection Matrix
+	if (m_pHMD != nullptr) {
+		m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
+		m_pHMD->SetAndClearRenderSurface(eye);
+	}
+	else {
+		SetViewTarget(eye, pCamera->GetViewWidth(), pCamera->GetViewHeight());
+	}
+
+	// Pipeline stuff
+	m_pRenderPipeline->RunPipeline();
 
 	// Commit frame to HMD
 	if (m_pHMD) {
@@ -99,15 +113,9 @@ RESULT HALImp::Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE 
 		m_pHMD->CommitSwapChain(eye);
 	}
 
-	SetViewTarget(eye, pCamera->GetViewWidth(), pCamera->GetViewHeight());
+	FlushHALBuffers();
 
-	// Pipeline stuff
-	CN(m_pRenderPipeline);
-	CR(m_pRenderPipeline->RunPipeline());
-
-	CR(FlushHALBuffers())
-
-Error:
+//Error:
 	return r;
 }
 
