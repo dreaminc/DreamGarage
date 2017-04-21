@@ -641,6 +641,7 @@ Error:
 	return r;
 }
 
+// TODO: Move this up to DreamOS
 RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 
@@ -666,9 +667,17 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
 
-		//ProgramNode* pProgramNode = m_pHALImp->MakeProgramNode("minimal");
-		ProgramNode* pProgramNode = m_pHALImp->MakeProgramNode("environment");
-		CN(pProgramNode);
+		//ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("environment");
+		ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("minimal");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+
+		//ProgramNode* pSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
+		ProgramNode* pSkyboxProgram = m_pHALImp->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
 
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
@@ -677,11 +686,9 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 
 		// Connect Program to Display
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pProgramNode->Output("output_framebuffer")));
-
-		// Connect Inputs into Program
-		CR(pProgramNode->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-		CR(pProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+		
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		/*
 		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);
@@ -689,9 +696,6 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		// Reference Geometry Shader Program
 		std::shared_ptr<ProgramNode> pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
 		CN(pOGLReferenceGeometryProgram);
-
-		std::shared_ptr<ProgramNode> pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
-		CN(pOGLSkyboxProgram);
 
 		std::shared_ptr<ProgramNode> pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
 		CN(pOGLOverlayProgram);

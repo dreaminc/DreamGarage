@@ -748,27 +748,6 @@ Error:
 }
 
 // TODO: Remove this, this will eventually just be a node
-RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, stereocamera* pCamera, EYE_TYPE eye) {
-
-	RESULT r = R_PASS;
-	skybox *pSkybox = nullptr;
-	CR(pObjectStore->GetSkybox(pSkybox));
-
-	if (pSkybox != nullptr) {
-		/*
-		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLSkyboxProgram->SetStereoCamera(pCamera, eye));
-		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
-		*/
-	}
-
-	CR(r);
-
-Error:
-	return r;
-}
-
-// TODO: Remove this, this will eventually just be a node
 RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, stereocamera* pCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	
