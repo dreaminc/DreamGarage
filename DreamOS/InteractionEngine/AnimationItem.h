@@ -49,6 +49,9 @@ public:
 	std::function<RESULT(void*)> GetAnimationEndedCallback();
 	RESULT SetAnimationEndedCallback(std::function<RESULT(void*)> callback);
 
+	std::function<RESULT(void*)> GetAnimationStartCallback();
+	RESULT SetAnimationStartCallback(std::function<RESULT(void*)> callback);
+
 	void* GetCallbackContext();
 	RESULT SetCallbackContext(void* context);
 
@@ -63,7 +66,8 @@ private:
 	AnimationState m_endState;
 
 	std::function<RESULT(void*)> fnOnAnimationEnded;
-	void* fnOnAnimationEndedContext;
+	std::function<RESULT(void*)> fnOnAnimationStart;
+	void* fnOnAnimationContext;
 };
 
 #endif // ! ANIMATION_ITEM_H_

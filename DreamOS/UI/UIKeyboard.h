@@ -43,6 +43,15 @@ public:
 	virtual RESULT Notify(InteractionObjectEvent *oEvent) override;
 
 public:
+
+	RESULT ShowKeyboard();
+	RESULT HideKeyboard();
+	RESULT HideSurface();
+	RESULT HideMallets();
+	RESULT ShowMallets();
+	bool IsVisible();
+	RESULT SetVisible(bool fVisible);
+
 	int CollisionPointToIndex(CollisionManifold& manifold);
 
 	float GetWidth();
@@ -56,12 +65,11 @@ private:
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
-//	RESULT UpdateKeys();
-
 private:
 	std::shared_ptr<quad> m_pSurface;
 	float m_surfaceWidth;
 	float m_surfaceHeight;
+	point m_ptSurface;
 
 	UIMallet *m_pLeftMallet;
 	UIMallet *m_pRightMallet;

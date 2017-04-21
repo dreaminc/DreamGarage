@@ -58,6 +58,7 @@ RESULT Controller::HandleOnMethodCallback(std::shared_ptr<CloudMessage> pCloudMe
 	RESULT r = R_PASS;
 	
 	std::string strMethodName = pCloudMessage->GetMethod();
+	auto s = pCloudMessage->GetJSONDataString();
 
 	auto itMethod = m_methods.find(strMethodName);
 	CBM((itMethod != m_methods.end()), "Method %s not found", strMethodName.c_str());

@@ -168,6 +168,7 @@ RESULT UITestSuite::AddTestKeyboard() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		m_pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+		m_pKeyboard->ShowKeyboard();
 		CR(Initialize());
 	Error:
 		return r;

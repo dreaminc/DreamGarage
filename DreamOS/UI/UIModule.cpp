@@ -78,6 +78,10 @@ std::shared_ptr<UIMenuItem> UIModule::GetMenuItem(VirtualObj *pObj) {
 	return nullptr;
 }
 
+quaternion UIModule::GetInitialMenuOrientation() {
+	return quaternion::MakeQuaternionWithEuler(0.0f, m_headRotationYDeg * M_PI / 180.0f, 0.0f);
+}
+
 RESULT UIModule::ToggleVisible() {
 
 	RESULT r = R_PASS;

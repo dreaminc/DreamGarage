@@ -18,6 +18,7 @@ public:
 	enum class type {
 		FOLDER,
 		FILE,
+		ACTION,
 		INVALID
 	};
 

@@ -25,6 +25,7 @@ public:
 		double duration,
 		AnimationCurveType curve,
 		AnimationFlags flags,
+		std::function<RESULT(void*)> startCallback = nullptr,
 		std::function<RESULT(void*)> endCallback = nullptr,
 		void* callbackContext = nullptr);
 

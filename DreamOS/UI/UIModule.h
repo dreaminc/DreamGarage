@@ -33,6 +33,7 @@ public:
 	std::shared_ptr<UIMenuLayer> GetCurrentLayer();
 
 	std::shared_ptr<UIMenuItem> GetMenuItem(VirtualObj* pObj);
+	quaternion GetInitialMenuOrientation();
 
 	RESULT ToggleVisible();
 	RESULT Show();

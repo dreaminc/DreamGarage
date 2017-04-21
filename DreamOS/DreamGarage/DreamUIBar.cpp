@@ -4,6 +4,8 @@
 #include "Cloud/Menu/MenuNode.h"
 #include "InteractionEngine/AnimationItem.h"
 
+#include "UI/UIKeyboard.h"
+
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext),
 	UIBar()
@@ -29,6 +31,8 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	DreamOS *pDreamOS = GetDOS();
+
+	m_pKeyboard = pDreamOS->LaunchDreamApp<UIKeyboard>(this);
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
@@ -145,9 +149,11 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	}
 	else {
 		m_pathStack.pop();
+		m_pKeyboard->HideKeyboard();
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
 			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
+			HideMenu();
 		}
 		else {
 			ToggleVisible();
@@ -181,18 +187,40 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 			const std::string& strTitle = pSubMenuNode->GetTitle();
 
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
+				HideMenu();
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
+
+			//	if (m_pKeyboard->IsVisible()) m_pKeyboard->HideKeyboard();
+				m_pKeyboard->HideKeyboard();
+				//m_pKeyboard->SetVisible(false);
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+
+				m_pKeyboard->HideKeyboard();
+			}
+			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
+				HideMenu();
+				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
+				m_pathStack.push(pSubMenuNode);
+				m_pKeyboard->ShowKeyboard();
 			}
 		}
 	}
 
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::UpdateMenu(void *pContext) {
+	RESULT r = R_PASS;
+	DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+	CN(pDreamUIBar);
+	CR(pDreamUIBar->UpdateUILayers());
 Error:
 	return r;
 }
@@ -217,42 +245,47 @@ RESULT DreamUIBar::Update(void *pContext) {
 		//TODO: There are several RenderToTexture calls and object creates
 		// that cause a brief timing delay
 
-		SetUpdateParams(info, titleInfo);
-		auto fnCallback = [&](void *pContext) {
-			RESULT r = R_PASS;
-			DreamUIBar *pUIBar = reinterpret_cast<DreamUIBar*>(pContext);
-			CN(pUIBar);
-			CR(pUIBar->UpdateUILayers());
-			//composite *pC = pUIBar->UIModule::m_pCompositeContext;
-			composite *pC = pUIBar->DreamApp::GetComposite();
-			pC->SetOrientation(pC->GetOrientation() * quaternion::MakeQuaternionWithEuler(0.0f, -(float)(M_PI), 0.0f));
-		Error:
-			return r;
-		};
-
-		pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-			GetComposite(),
-			GetComposite()->GetPosition(),
-			GetComposite()->GetOrientation() * quaternion::MakeQuaternionWithEuler(0.0f, (float)(M_PI_2), 0.0f),
-			GetComposite()->GetScale(),
-			0.5f,
-			AnimationCurveType::EASE_OUT_QUART, // may want to try ease_in here
-			AnimationFlags(),
-			fnCallback,
-			this
-		);
-
-		quaternion q = GetComposite()->GetOrientation();
-		pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-			GetComposite(),
-			GetComposite()->GetPosition(),
-			q,
-			GetComposite()->GetScale(),
-			0.5f,
-			AnimationCurveType::EASE_OUT_QUART,
-			AnimationFlags()
-		);
+		CR(SetUpdateParams(info, titleInfo));
+		CR(ShowMenu(std::bind(&DreamUIBar::UpdateMenu, this, std::placeholders::_1), nullptr));
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> startCallback, std::function<RESULT(void*)> endCallback) {
+	RESULT r = R_PASS;
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		GetComposite(),
+		GetComposite()->GetPosition(),
+		GetInitialMenuOrientation() * quaternion::MakeQuaternionWithEuler(0.0f, (float)(M_PI_2), 0.0f),
+		GetComposite()->GetScale(),
+		0.5f,
+		AnimationCurveType::EASE_OUT_QUART, // may want to try ease_in here
+		AnimationFlags(),
+		startCallback,
+		endCallback,
+		this
+	));
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> startCallback, std::function<RESULT(void*)> endCallback) {
+	RESULT r = R_PASS;
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		GetComposite(),
+		GetComposite()->GetPosition(),
+		GetInitialMenuOrientation(),
+		GetComposite()->GetScale(),
+		0.5f,
+		AnimationCurveType::EASE_OUT_QUART,
+		AnimationFlags(),
+		startCallback,
+		endCallback,
+		this
+	));
 
 Error:
 	return r;

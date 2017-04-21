@@ -9,6 +9,7 @@ UIMallet::UIMallet(DreamOS *pDreamOS)
 {
 	m_pHead = pDreamOS->AddSphere(0.02f, 10.0f, 10.0f);
 	pDreamOS->AddInteractionObject(m_pHead);
+	m_pHead->SetVisible(false);
 }
 
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
@@ -20,11 +21,11 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	//TODO this may become deprecated
-	GetComposite()->MoveTo(0.0f, 0.8f, 4.75f);
+	m_ptSurface = point(0.0f, 0.9f, 4.65f);
 	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
 
-	m_surfaceHeight = 0.5f;
-	m_surfaceWidth = 1.0f;
+	m_surfaceHeight = 0.25f;
+	m_surfaceWidth = 0.5f;
 	m_pSurface = GetComposite()->AddQuad(m_surfaceHeight, m_surfaceWidth);
 	CN(m_pSurface);
 
@@ -54,6 +55,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_QWERTY = { "qwertyuiop","asdfghjkl;","zxcvbnm,.." };
 
 	InitializeQuadsWithLayout(m_QWERTY);
+	GetComposite()->SetVisible(false);
 
 Error:
 	return r;
@@ -112,7 +114,7 @@ RESULT UIKeyboard::OnAppDidFinishInitializing(void *pContext) {
 RESULT UIKeyboard::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	point ptOffset = point(0.0f, 0.0f, -0.25f);
+	point ptOffset = point(0.0f, 0.0f, -0.2f);
 	RotationMatrix qOffset = RotationMatrix();
 	VirtualObj *pObj = nullptr;
 
@@ -226,6 +228,91 @@ RESULT UIKeyboard::Notify(InteractionObjectEvent *oEvent) {
 	}
 
 	return R_PASS;
+}
+
+RESULT UIKeyboard::ShowKeyboard() {
+
+	GetComposite()->SetPosition(point(0.0f, -1.0f, 5.0f));
+	auto fnCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
+		CN(pKeyboard);
+		pKeyboard->GetComposite()->SetVisible(true);
+		pKeyboard->HideSurface();
+		pKeyboard->ShowMallets();
+	Error:
+		return r;
+	};
+
+	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		GetComposite(),
+		m_ptSurface,
+		GetComposite()->GetOrientation(),
+		GetComposite()->GetScale(),
+		0.2f,
+		AnimationCurveType::EASE_OUT_QUAD,
+		AnimationFlags(),
+		nullptr,
+		fnCallback,
+		this
+	);
+	return R_PASS;
+}
+
+RESULT UIKeyboard::HideKeyboard() {
+
+	auto fnCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
+		CN(pKeyboard);
+		pKeyboard->GetComposite()->SetVisible(false);
+		pKeyboard->HideMallets();
+		//pKeyboard->
+	Error:
+		return r;
+	};
+
+	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		GetComposite(),
+		point(0.0f, -1.0f, 5.0f),
+		GetComposite()->GetOrientation(),
+		GetComposite()->GetScale(),
+		0.2f,
+		AnimationCurveType::EASE_OUT_QUAD,
+		AnimationFlags(),
+		nullptr,
+		fnCallback,
+		this
+	);
+	return R_PASS;
+}
+
+RESULT UIKeyboard::HideSurface() {
+	return m_pSurface->SetVisible(false);
+}
+
+RESULT UIKeyboard::HideMallets() {
+	RESULT r = R_PASS;
+	CR(m_pLeftMallet->m_pHead->SetVisible(false));
+	CR(m_pRightMallet->m_pHead->SetVisible(false));
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::ShowMallets() {
+	RESULT r = R_PASS;
+	CR(m_pLeftMallet->m_pHead->SetVisible(true));
+	CR(m_pRightMallet->m_pHead->SetVisible(true));
+Error:
+	return r;
+}
+
+bool UIKeyboard::IsVisible() {
+	return GetComposite()->IsVisible();
+}
+
+RESULT UIKeyboard::SetVisible(bool fVisible) {
+	return GetComposite()->SetVisible(fVisible);
 }
 
 //TODO: A good amount of code in the layout and in this function currently assumes

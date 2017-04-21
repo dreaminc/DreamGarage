@@ -10,8 +10,9 @@ AnimationItem::AnimationItem(AnimationState startState, AnimationState endState,
 	m_endState = endState;
 	m_duration = duration;
 	m_startTime = startTime;
+	fnOnAnimationStart = nullptr;
 	fnOnAnimationEnded = nullptr;
-	fnOnAnimationEndedContext = nullptr;
+	fnOnAnimationContext = nullptr;
 
 	Validate();
 	return;
@@ -103,11 +104,20 @@ RESULT AnimationItem::SetAnimationEndedCallback(std::function<RESULT(void*)> cal
 	return R_PASS;
 }
 
+std::function<RESULT(void*)> AnimationItem::GetAnimationStartCallback() {
+	return fnOnAnimationStart;
+}
+
+RESULT AnimationItem::SetAnimationStartCallback(std::function<RESULT(void*)> callback) {
+	fnOnAnimationStart = callback;
+	return R_PASS;
+}
+
 void* AnimationItem::GetCallbackContext() {
-	return fnOnAnimationEndedContext;
+	return fnOnAnimationContext;
 }
 
 RESULT AnimationItem::SetCallbackContext(void* context) {
-	fnOnAnimationEndedContext = context;
+	fnOnAnimationContext = context;
 	return R_PASS;
 }

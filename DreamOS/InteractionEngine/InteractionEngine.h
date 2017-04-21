@@ -51,6 +51,7 @@ public:
 		double duration,
 		AnimationCurveType curve,
 		AnimationFlags flags,
+		std::function<RESULT(void*)> startCallback = nullptr,
 		std::function<RESULT(void*)> endCallback = nullptr,
 		void* callbackContext = nullptr) = 0;
 	virtual RESULT CancelAnimation(VirtualObj *pObj) = 0;
@@ -108,6 +109,7 @@ public:
 		double duration,
 		AnimationCurveType curve,
 		AnimationFlags flags,
+		std::function<RESULT(void*)> startCallback = nullptr,
 		std::function<RESULT(void*)> endCallback = nullptr,
 		void* callbackContext = nullptr) override;
 
@@ -131,14 +133,6 @@ private:
 	std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
 
 	AnimationQueue* m_pObjectQueue;
-
-/*private:
-	// Animation Queue
-public:
-	RESULT ClearAnimationQueue();
-
-	std::map<VirtualObj *pObject, std::shared_ptr<ActiveObject>> m_activeObjects;
-	*/
 
 private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;

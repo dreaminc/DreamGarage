@@ -156,6 +156,7 @@ RESULT InteractionEngine::PushAnimationItem(VirtualObj *pObj,
 	double duration,
 	AnimationCurveType curve,
 	AnimationFlags flags,
+	std::function<RESULT(void*)> startCallback,
 	std::function<RESULT(void*)> endCallback,
 	void* callbackContext) {
 
@@ -170,7 +171,7 @@ RESULT InteractionEngine::PushAnimationItem(VirtualObj *pObj,
 	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
 	msNow /= 1000.0;
 
-	CR(m_pObjectQueue->PushAnimationItem(pObj, endState, msNow, duration, curve, flags, endCallback, callbackContext));
+	CR(m_pObjectQueue->PushAnimationItem(pObj, endState, msNow, duration, curve, flags, startCallback, endCallback, callbackContext));
 
 Error:
 	return r;
