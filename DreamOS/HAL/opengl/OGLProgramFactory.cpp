@@ -131,7 +131,7 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 		} break;
 
 		case OGLPROGRAM_ENVIRONMENT_OBJECTS: {
-			pOGLProgram = new OGLDreamConsole(pParentImp);
+			pOGLProgram = new OGLProgramEnvironmentObjects(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"EnvironmentObjects.vert", L"EnvironmentObjects.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
 		} break;
