@@ -40,9 +40,17 @@ public:
 		return r;
 	}
 
-	virtual RESULT SetupConnections() override {
-		// TODO: do it
-		return R_NOT_IMPLEMENTED;
+	RESULT SetupConnections() {
+		RESULT r = R_PASS;
+
+		// Inputs
+		CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
+
+		// Outputs
+		CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+
+	Error:
+		return r;
 	}
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
@@ -82,6 +90,9 @@ public:
 		
 		return R_PASS;
 	}
+
+protected:
+	stereocamera *m_pCamera = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

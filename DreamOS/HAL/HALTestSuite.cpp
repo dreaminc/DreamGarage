@@ -14,6 +14,7 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestRenderToTextureQuad());
 
 	CR(AddTestAlphaVolumes());
 	CR(AddTestFramerateVolumes());
@@ -33,6 +34,77 @@ Error:
 	return r;
 }
 
+
+RESULT HALTestSuite::AddTestRenderToTextureQuad() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.3f;
+	float alpha = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		{
+
+			composite *pComposite = m_pDreamOS->AddComposite();
+			CN(pComposite);
+
+			std::shared_ptr<FlatContext> pFlatContext = pComposite->MakeFlatContext();
+			CN(pFlatContext);
+
+			std::shared_ptr<quad> pFlatQuad = pFlatContext->AddQuad(1.0f, 1.0f, point(0.0f));
+			CN(pContext);
+
+			pComposite->RenderToTexture(pFlatContext);
+
+			quad *pQuad = m_pDreamOS->AddQuad(width, height);
+			CN(pQuad);
+			CN(pQuad->SetPosition(point(0.0f, -2.0f, 0.0f)));
+			//pQuad->SetColor(COLOR_GREEN);
+			CR(pQuad->SetColorTexture(pFlatContext->GetFramebuffer()->GetTexture()));
+			
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Render To Texture");
+	pNewTest->SetTestDescription("Testing rendering to texture using a quad");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
 
 RESULT HALTestSuite::AddTestAlphaVolumes() {
 	RESULT r = R_PASS;
@@ -91,7 +163,7 @@ RESULT HALTestSuite::AddTestAlphaVolumes() {
 	};
 
 	// Update Code 
-	auto fnUpdate = [&](void *pContext) {
+	auto fnUpdate = [&](void *pContext) {		
 		return R_PASS;
 	};
 

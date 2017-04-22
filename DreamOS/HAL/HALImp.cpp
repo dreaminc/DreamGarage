@@ -1,5 +1,9 @@
 #include "HALImp.h"
 
+#include "HAl/Pipeline/ProgramNode.h"
+
+#include "HAL/FlatProgram.h"
+
 HALImp::HALImp() :
 	m_pCamera(nullptr),
 	m_pHMD(nullptr)
@@ -65,6 +69,39 @@ RESULT HALImp::SetHMD(HMD *pHMD) {
 	m_pCamera->SetHMD(pHMD);
 
 //Error:
+	return r;
+}
+
+// TODO: Remove this, this will eventually just be a node
+RESULT HALImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
+	RESULT r = R_PASS;
+
+	framebuffer *pFramebuffer = nullptr;
+	FlatProgram* pFlatProgram = nullptr;
+
+	if (m_pFlatProgram == nullptr) {
+		m_pFlatProgram = MakeProgramNode("flat");
+		CN(m_pFlatProgram);
+	}
+
+	pFlatProgram = dynamic_cast<FlatProgram*>(m_pFlatProgram);
+	CN(pFlatProgram);
+
+	pFramebuffer = pContext->GetFramebuffer();
+
+	/*
+	m_pFlatProgram->SetInput<stereocamera>("camera", pCamera);
+	m_pFlatProgram->SetInput<FlatContext>("flatcontext", pContext);
+	m_pFlatProgram->SetInput<framebuffer>("framebuffer", pFramebuffer);
+	*/
+
+	pFlatProgram->SetFlatContext(pContext);
+	pFlatProgram->SetCamera(pCamera);
+	pFlatProgram->SetFlatFramebuffer(pContext->GetFramebuffer());
+
+	m_pFlatProgram->ProcessNode(0);
+	
+Error:
 	return r;
 }
 

@@ -51,7 +51,7 @@ private:
 	version m_versionOGL;
 	version m_versionGLSL;
 
-	std::unique_ptr<OGLDreamConsole>	m_pOGLDreamConsole;
+	std::unique_ptr<OGLDreamConsole> m_pOGLDreamConsole;
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
@@ -101,14 +101,9 @@ public:
 	virtual RESULT ConfigureHAL() override;
 	virtual RESULT FlushHALBuffers() override;
 
-	virtual RESULT RenderToTexture(FlatContext* pContext, stereocamera* pCamera) override;
-
 	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) override;
 	virtual SourceNode* MakeSourceNode(std::string strNodeName) override;
 	virtual ProgramNode* MakeProgramNode(std::string strNodeName) override;
-
-private:
-	RESULT RenderProfiler(EYE_TYPE eye, stereocamera* pCamera);
 
 public:
 	virtual RESULT Resize(viewport newViewport) override;

@@ -204,7 +204,6 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalD
 	CR(pFramebuffer->BindOGLFramebuffer());
 
 	CR(pFramebuffer->MakeOGLTexture());
-
 	CR(pFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
 	CR(pFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
 
@@ -232,6 +231,7 @@ RESULT OGLProgram::InitializeRenderTexture(GLenum internalDepthFormat, GLenum ty
 	CR(m_pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, internalDepthFormat, GL_DEPTH_COMPONENT, typeDepth));
 
 	CR(m_pOGLRenderTexture->BindTexture(GL_TEXTURE_2D));
+
 	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));

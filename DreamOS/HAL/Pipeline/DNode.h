@@ -79,8 +79,26 @@ public:
 	}
 
 	template <class objType>
-	RESULT MakeOutput(std::string strName, objType *ppDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
-		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, ppDestination, optFlags);
+	RESULT MakeOutput(std::string strName, objType *pDestination, DCONNECTION_FLAGS optFlags = DCONNECTION_FLAGS::NONE) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, pDestination, optFlags);
+	}
+
+	template <class objType>
+	RESULT SetInput(std::string strName, objType *pDestination) {
+		RESULT r = R_PASS;
+
+		DConnection* pDConnection = nullptr;
+
+		// Find the connection
+		CNM((pDConnection = Connection(strName, CONNECTION_TYPE::INPUT)), "In Connection %s not found", strName.c_str());
+
+		DConnectionTyped<objType> *pDConnectionTyped = dynamic_cast<DConnectionTyped<objType>*>(pDConnection);
+		CN(pDConnectionTyped);
+
+		CR(pDConnectionTyped->SetConnection(pDestination));
+
+	Error:
+		return r;
 	}
 
 	DConnection* Connection(std::string strName, CONNECTION_TYPE type);

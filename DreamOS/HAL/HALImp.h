@@ -41,6 +41,8 @@ class SinkNode;
 class SourceNode;
 class ProgramNode;
 
+class FlatProgram;	// This one is special for render to texture
+
 class HALImp : public valid 
 {
 	friend class SandboxApp;
@@ -93,7 +95,7 @@ public:
 	virtual RESULT MakeCurrentContext() = 0;
 	virtual RESULT ReleaseCurrentContext() = 0;
 
-	virtual RESULT RenderToTexture(FlatContext* pContext, stereocamera* pCamera) = 0;
+	virtual RESULT RenderToTexture(FlatContext* pContext, stereocamera* pCamera);
 
 	virtual RESULT Shutdown() = 0;
 
@@ -158,6 +160,9 @@ protected:
 
 protected:
 	std::unique_ptr<Pipeline> m_pRenderPipeline = nullptr;
+	
+	// This is used to render to texture
+	ProgramNode* m_pFlatProgram = nullptr;
 
 private:
 	UID m_uid;

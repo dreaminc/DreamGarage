@@ -681,7 +681,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimal.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
@@ -876,6 +878,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug.h" />
     <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h" />
     <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h" />
+    <ClInclude Include="..\..\..\HAL\FlatProgram.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
     <ClInclude Include="..\..\..\HAL\HALTestSuite.h" />

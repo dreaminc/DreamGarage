@@ -4,91 +4,31 @@
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
-class OGLProgramFlat : public OGLProgram {
+#include "OGLFramebuffer.h"
+
+#include "HAL/FlatProgram.h"
+
+class OGLProgramFlat : public OGLProgram, public FlatProgram {
 public:
-	OGLProgramFlat(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp, "oglflat")
-	{
-		// empty
-	}
+	OGLProgramFlat(OpenGLImp *pParentImp);
 
-	RESULT OGLInitialize() {
-		RESULT r = R_PASS;
+	RESULT OGLInitialize();
 
-		CR(OGLProgram::OGLInitialize());
+	virtual RESULT SetupConnections() override;
+	virtual RESULT ProcessNode(long frameID = 0) override;
 
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeUVCoord), std::string("inV_vec2UVCoord")));
+	virtual RESULT SetFlatFramebuffer(framebuffer *pFramebuffer) override;
+	virtual RESULT SetCamera(stereocamera *pCamera) override;
+	virtual RESULT SetFlatContext(FlatContext *pFlatContext) override;
 
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTexture), std::string("u_hasTexture")));
+	RESULT SetObjectTextures(OGLObj *pOGLObj);
+	RESULT SetObjectUniforms(DimObj *pDimObj);
+	RESULT SetCameraUniforms(camera *pCamera);
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfDistanceMap), std::string("u_fDistanceMap")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformBuffer), std::string("u_buffer")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformGamma), std::string("u_gamma")));
-
-	Error:
-		return r;
-	}
-
-	virtual RESULT SetupConnections() override {
-		// TODO: do it
-		return R_NOT_IMPLEMENTED;
-	}
-
-	RESULT SetObjectTextures(OGLObj *pOGLObj) {
-		RESULT r = R_PASS;
-
-		OGLTexture *pTexture = nullptr;
-
-		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-			pTexture->OGLActivateTexture();
-			m_pUniformTextureColor->SetUniform(pTexture);
-			m_pUniformHasTexture->SetUniform(true);
-		}
-		else
-		{
-			m_pUniformHasTexture->SetUniform(false);
-		}
-
-		return r;
-	}
-
-	RESULT SetObjectUniforms(DimObj *pDimObj) {
-		auto matModel = pDimObj->GetModelMatrix();
-		m_pUniformModelMatrix->SetUniform(matModel);
-
-		text *pText = dynamic_cast<text*>(pDimObj);
-		
-		m_pUniformfDistanceMap->SetUniform(pText != nullptr && pText->GetFont()->HasDistanceMap());
-		if (pText != nullptr) {
-			float buffer = pText->GetFont()->GetBuffer();
-			float gamma = pText->GetFont()->GetGamma();
-			m_pUniformBuffer->SetUniformFloat(&buffer);
-			m_pUniformGamma->SetUniformFloat(&gamma);
-		}
-
-		return R_PASS;
-	}
-
-	RESULT SetCameraUniforms(camera *pCamera) {
-		auto matP = pCamera->GetProjectionMatrix();
-		if (m_pUniformProjectionMatrix)
-			m_pUniformProjectionMatrix->SetUniform(matP);
-
-		return R_PASS;
-	}
-
-	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-		auto matP = pStereoCamera->GetProjectionMatrix(eye);
-		if (m_pUniformProjectionMatrix)
-			m_pUniformProjectionMatrix->SetUniform(matP);
-
-		return R_PASS;
-	}
+private:
+	stereocamera *m_pCamera = nullptr;
+	FlatContext *m_pFlatContext = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

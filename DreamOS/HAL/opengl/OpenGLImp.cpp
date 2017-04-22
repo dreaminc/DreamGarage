@@ -749,45 +749,6 @@ Error:
 	return nullptr;
 }
 
-RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye, stereocamera* pCamera) {
-
-	RESULT r = R_PASS;
-
-	// Render profiler overlay
-	if (DreamConsole::GetConsole()->IsInForeground()) {
-		CRM(m_pOGLDreamConsole->m_pOGLProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLDreamConsole->m_pOGLProgram->SetStereoCamera(pCamera, eye));
-		m_pOGLDreamConsole->Render(eye == EYE_MONO);
-	}
-
-Error:
-	return r;
-}
-
-// TODO: Remove this, this will eventually just be a node
-RESULT OpenGLImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
-	RESULT r = R_PASS;
-
-	// Create framebuffer
-	OGLFramebuffer* pFramebuffer = dynamic_cast<OGLFramebuffer*>(pContext->GetFramebuffer());
-	CN(pFramebuffer);
-
-	/*	
-	m_pOGLFlatProgram->SetFrameBuffer(pFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, pFramebuffer->GetWidth(), pFramebuffer->GetHeight(), pFramebuffer->GetChannels());
-	
-	CR(m_pOGLFlatProgram->UseProgram());
-	CR(m_pOGLFlatProgram->BindToFramebuffer(pFramebuffer));
-	CR(m_pOGLFlatProgram->SetStereoCamera(pCamera, EYE_MONO));
-
-	CR(m_pOGLFlatProgram->RenderObject(pContext));
-	CR(m_pOGLFlatProgram->UnbindFramebuffer());
-	*/
-
-
-Error:
-	return r;
-}
-
 SinkNode* OpenGLImp::MakeSinkNode(std::string strNodeName) {
 	SinkNode* pSinkNode = nullptr;
 		

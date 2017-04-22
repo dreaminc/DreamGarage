@@ -137,6 +137,16 @@ public:
 		return r;
 	}
 
+	RESULT SetConnection(objType **ppObject) {
+		m_pObject = *ppObject;
+		return R_PASS;
+	}
+
+	RESULT SetConnection(objType *pObject) {
+		*m_ppObject = pObject;
+		return R_PASS;
+	}
+
 private:
 	objType *m_pObject = nullptr;
 	objType **m_ppObject = nullptr;

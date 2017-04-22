@@ -6,18 +6,15 @@
 
 #include "DreamConsole/DreamConsole.h"
 
-
 // DreamConsole
 
-DreamConsole::DreamConsole()
-{
+DreamConsole::DreamConsole() {
 	Validate();
 	return;
 }
 
-DreamConsole::~DreamConsole()
-{
-
+DreamConsole::~DreamConsole() {
+	// empty
 }
 
 const DreamConsole::Configuration& DreamConsole::GetConfiguration()
@@ -25,26 +22,25 @@ const DreamConsole::Configuration& DreamConsole::GetConfiguration()
 	return m_configuration;
 }
 
-void DreamConsole::Init()
-{
-	if (m_isInit)
-	{
-		return;
-	}
+RESULT DreamConsole::Initialize() {
+	RESULT r = R_PASS;
+
+	CB((m_fInitialized == false));
 
 	// Initialize singleton
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamConsole, this);
 
-	m_isInit = true;
+	m_fInitialized = true;
+
+Error:
+	return r;
 }
 
-bool DreamConsole::IsInForeground()
-{
-	return m_isInForeground;
+bool DreamConsole::IsInForeground() {
+	return m_fInForeground;
 }
 
-void DreamConsole::OnFrameRendered()
-{
+void DreamConsole::OnFrameRendered() {
 	m_ticker.Tick();
 
 	m_FPSGraph.AddMeasurement(static_cast<uint16_t>(m_ticker.GetTicksPerSecond()));
@@ -52,42 +48,35 @@ void DreamConsole::OnFrameRendered()
 	return;
 }
 
-DreamConsole::FPSGraph_t& DreamConsole::GetFPSGraph()
-{
+DreamConsole::FPSGraph_t& DreamConsole::GetFPSGraph() {
 	return m_FPSGraph;
 }
 
-void DreamConsole::AddConsoleLine(const std::string& text)
-{
+void DreamConsole::AddConsoleLine(const std::string& text) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	m_ConsoleText.push_back(std::to_string(m_lineCnt++) + " " + text);
 
-	while (m_ConsoleText.size() > console_max_lines)
-	{
+	while (m_ConsoleText.size() > console_max_lines) {
 		m_ConsoleText.pop_front();
 	}
 }
 
-void DreamConsole::ForEach(std::function<bool(const std::string)> pred)
-{
+void DreamConsole::ForEach(std::function<bool(const std::string)> pred) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::for_each(m_ConsoleText.rbegin(), m_ConsoleText.rend(), pred);
 }
 
-const std::deque<std::string>& DreamConsole::GetConsoleText()
-{
+const std::deque<std::string>& DreamConsole::GetConsoleText() {
 	return m_ConsoleText;
 }
 
-const std::string& DreamConsole::GetCmdText()
-{
+const std::string& DreamConsole::GetCmdText() {
 	return m_cmdText;
 }
 
-unsigned int DreamConsole::GetCmtTextCursorPos()
-{
+unsigned int DreamConsole::GetCmtTextCursorPos() {
 	return m_cmdTextCursorPos;
 }
 
@@ -112,57 +101,41 @@ void DreamConsole::TextCursorMoveForward() {
 RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
 
-	if (kbEvent->m_pSenseKeyboard)
-	{
+	if (kbEvent->m_pSenseKeyboard) {
 		SenseVirtualKey keyCode = kbEvent->KeyCode;
 
-		if (kbEvent->KeyState)
-		{
-			if (!IsInForeground())
-			{
-				if (keyCode == SVK_TAB)
-				{
+		if (kbEvent->KeyState) {
+			if (!IsInForeground()) {
+				if (keyCode == SVK_TAB) {
 					// quick hack to enable dream console in production but only using several tab hits
 #ifdef PRODUCTION_BUILD
 					static int hits = 0;
 					hits++;
 					if (hits > 7)
-						m_isInForeground = true;
+						m_fInForeground = true;
 #else
-					m_isInForeground = true;
+					m_fInForeground = true;
 #endif // PRODUCTION_BUILD
 				}
 			}
-			else
-			{
-				if (keyCode == SVK_TAB)
-				{
-					m_isInForeground = false;
+			else {
+				if (keyCode == SVK_TAB) {
+					m_fInForeground = false;
 				}
-				else
-				{
+				else {
 					///*** old way
-					switch (keyCode)
-					{
-					case SVK_BACK: {
-					} break;
-					case SVK_RETURN: {
-					} break;
-					case SVK_ESCAPE: {
-					} break;
-					case SVK_LEFT: {
-						TextCursorMoveBackward();
-					} break;
-					case SVK_RIGHT: {
-						TextCursorMoveForward();
-					} break;
-					case SVK_UP:
-					case SVK_DOWN: {
+					switch (keyCode) {
 
-					} break;
-					default: {
-						// don't process type character here. look for SenseTypingEvent
-					} break;
+						case SVK_LEFT: TextCursorMoveBackward(); break;
+						case SVK_RIGHT: TextCursorMoveForward(); break;
+					
+						// Don't process type character here. look for SenseTypingEvent
+						case SVK_BACK: 
+						case SVK_RETURN: 
+						case SVK_UP:
+						case SVK_DOWN: 
+						case SVK_ESCAPE: 
+						default: break;
 					}
 					//*/
 				}
@@ -177,52 +150,51 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 RESULT DreamConsole::Notify(SenseTypingEvent *kbEvent) {
 	RESULT r = R_PASS;
 
-	if (IsInForeground())
-	{
+	if (IsInForeground()) {
 		switch (kbEvent->u16character) {
-		case SVK_BACK:
-			// Process a backspace. 
-			if (!m_cmdText.empty() && GetCmtTextCursorPos() > 0) {
-				m_cmdText.erase(GetCmtTextCursorPos() - 1, 1);
-				TextCursorMoveBackward();
-			}
+			case SVK_BACK:
+				// Process a backspace. 
+				if (!m_cmdText.empty() && GetCmtTextCursorPos() > 0) {
+					m_cmdText.erase(GetCmtTextCursorPos() - 1, 1);
+					TextCursorMoveBackward();
+				}
 
-			break;
+				break;
 
-		case 0x0A:
-			// Process a linefeed. 
-			break;
+			case 0x0A: {
+				// Process a linefeed. 
+			} break;
 
-		case SVK_ESCAPE:
-			// Process an escape. 
-			if (!m_cmdText.empty()) {
+			case SVK_ESCAPE:
+				// Process an escape. 
+				if (!m_cmdText.empty()) {
+					m_cmdText.erase();
+					TextCursorMoveBack();
+				}
+				else {
+					m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
+					TextCursorMoveFront();
+				}
+				break;
+
+			case SVK_TAB: {
+				// Process a tab. 
+			} break;
+
+			case SVK_RETURN: {
+				// Process a carriage return. 
+				HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
+				CMDPROMPT_EXECUTE(m_cmdText);
 				m_cmdText.erase();
 				TextCursorMoveBack();
-			}
-			else {
-				m_cmdText = CmdPrompt::GetCmdPrompt()->GetLastCommand();
-				TextCursorMoveFront();
-			}
-			break;
+			} break;
 
-		case SVK_TAB:
-			// Process a tab. 
-			break;
-
-		case SVK_RETURN:
-			// Process a carriage return. 
-			HUD_OUT((std::string("cmd: ") + m_cmdText).c_str());
-			CMDPROMPT_EXECUTE(m_cmdText);
-			m_cmdText.erase();
-			TextCursorMoveBack();
-			break;
-
-		default:
-			// Process displayable characters. 
-			std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, kbEvent->u16character));
-			m_cmdText.insert(GetCmtTextCursorPos(), 1, nonUnicodeChar[0]);
-			TextCursorMoveForward();
-			break;
+			default: {
+				// Process displayable characters. 
+				std::string nonUnicodeChar = utf16_to_utf8(std::u16string(1, kbEvent->u16character));
+				m_cmdText.insert(GetCmtTextCursorPos(), 1, nonUnicodeChar[0]);
+				TextCursorMoveForward();
+			} break;
 		}
 	}
 
@@ -251,28 +223,22 @@ RESULT DreamConsole::Notify(CmdPromptEvent *event) {
 }
 
 // TickCounter
-TickCounter::TickCounter()
-{
+TickCounter::TickCounter() {
 	m_tickTimes.resize(m_nsamples);
 }
 
-TickCounter::~TickCounter()
-{
-
+TickCounter::~TickCounter() {
+	// empty
 }
 
-void TickCounter::Tick()
-{
+void TickCounter::Tick() {
 	m_tickTimes[m_currentSample++] = std::chrono::high_resolution_clock::now();
 
 	if (m_currentSample >= m_nsamples)
-	{
 		m_currentSample = 0;
-	}
 }
 
-double	TickCounter::GetTicksPerSecond()
-{
+double	TickCounter::GetTicksPerSecond() {
 	auto result = std::minmax_element(m_tickTimes.begin(), m_tickTimes.end());
 
 	double elapsedTime = std::chrono::duration<double>(m_tickTimes[result.second - m_tickTimes.begin()] 

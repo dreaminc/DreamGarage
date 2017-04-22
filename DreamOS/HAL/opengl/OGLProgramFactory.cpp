@@ -15,6 +15,8 @@
 #include "OGLProgramShadowDepth.h"
 #include "OGLProgramEnvironmentObjects.h"
 
+#include "OGLDreamConsole.h"
+
 const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramNameType = {
 	{ "minimal", OGLPROGRAM_MINIMAL },
 	{ "minimal_texture", OGLPROGRAM_MINIMAL_TEXTURE },
@@ -31,6 +33,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "shadow_depth", OGLPROGRAM_SHADOW_DEPTH },
 	{ "reference", OGLPROGRAM_REFERENCE },
 	{ "environment", OGLPROGRAM_ENVIRONMENT_OBJECTS },
+	{ "debugconsole", OGLPROGRAM_DEBUG_CONSOLE },
 	{ "invalid", OGLPROGRAM_INVALID }
 };
 
@@ -121,10 +124,16 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CRM(pOGLProgram->OGLInitialize(L"ShadowDepth.vert", L"ShadowDepth.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
 		} break;
 
-		case OGLPROGRAM_ENVIRONMENT_OBJECTS: {
-			pOGLProgram = new OGLProgramEnvironmentObjects(pParentImp);
+		case OGLPROGRAM_DEBUG_CONSOLE: {
+			pOGLProgram = new OGLDreamConsole(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
-			CRM(pOGLProgram->OGLInitialize(L"EnvironmentObjects.vert", L"EnvironmentObjects.frag", versionOGL), "Failed to initialize OGL EnvironmentObjects Program");
+			CRM(pOGLProgram->OGLInitialize(L"TextureBitBlit.vert", L"TextureBitBlit.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
+		} break;
+
+		case OGLPROGRAM_ENVIRONMENT_OBJECTS: {
+			pOGLProgram = new OGLDreamConsole(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"EnvironmentObjects.vert", L"EnvironmentObjects.frag", versionOGL), "Failed to initialize OGL minimal texture Program");
 		} break;
 
 		case OGLPROGRAM_CUSTOM:
