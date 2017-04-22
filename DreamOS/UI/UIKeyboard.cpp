@@ -5,6 +5,15 @@
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/AnimationItem.h"
 
+UIKey::UIKey() {}
+
+UIKey::UIKey(float left, float width, std::string& letter) 
+{
+	m_left = left;
+	m_width = width;
+	m_letter = letter;
+}
+
 UIMallet::UIMallet(DreamOS *pDreamOS) 
 {
 	m_pHead = pDreamOS->AddSphere(0.02f, 10.0f, 10.0f);
@@ -20,8 +29,9 @@ UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 RESULT UIKeyboard::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
+	std::vector<UIKey*> row;
 	//TODO this may become deprecated
-	m_ptSurface = point(0.0f, 0.9f, 4.65f);
+	m_ptSurface = point(-0.0f, 0.9f, 4.65f);
 	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
 
 	m_surfaceHeight = 0.25f;
@@ -52,7 +62,48 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	// TODO: going to need something much more advanced than this soon
 	// TODO: special characters (backspace) (shift) TODO: multi-character ('.com')
 	//
-	m_QWERTY = { "qwertyuiop","asdfghjkl;","zxcvbnm,.." };
+	//m_QWERTY = { "qwertyuiop","asdfghjkl","zxcvbnm" };
+	m_QWERTY.clear();
+	float left = 0.0f;
+	for (auto c : "qwertyuiop") {
+		std::string ch = std::string(1, c); 
+		auto k = new UIKey(left, 0.1f, ch);
+		row.emplace_back(k);
+		left += 0.1f;
+	}
+	row.pop_back();
+	m_QWERTY.emplace_back(row);
+
+	row.clear();
+	left = 0.05f;
+	for (auto c : "asdfghjkl") {
+		std::string ch = std::string(1, c); 
+		auto k = new UIKey(left, 0.1f, ch);
+		row.emplace_back(k);
+		left += 0.1f;
+	}
+	row.pop_back();
+	m_QWERTY.emplace_back(row);
+
+	row.clear();
+	left = 0.15f;
+	for (auto c : "zxcvbnm") {
+		std::string ch = std::string(1, c); 
+		auto k = new UIKey(left, 0.1f, ch);
+		row.emplace_back(k);
+		left += 0.1f;
+	}
+	row.pop_back();
+	m_QWERTY.emplace_back(row);
+
+	row.clear();
+	left = 0.25f;
+	{
+		std::string ch = " ";
+		auto k = new UIKey(left, 0.35f, ch);
+		row.emplace_back(k);
+	}
+	m_QWERTY.emplace_back(row);
 
 	InitializeQuadsWithLayout(m_QWERTY);
 	GetComposite()->SetVisible(false);
@@ -61,7 +112,7 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::InitializeQuadsWithLayout(std::vector<std::string> layout) {
+RESULT UIKeyboard::InitializeQuadsWithLayout(std::vector<std::vector<UIKey*>> layout) {
 	RESULT r = R_PASS;
 	
 	FlatContext *pQuadTextures = GetDOS()->AddFlatContext();
@@ -72,31 +123,28 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(std::vector<std::string> layout) {
 	int rowIndex = 0;
 	int colIndex = 0;
 	for (auto& row : layout) {
-		for (char c : row) {
+		for (auto& key : row) {
 			if (pQuadTextures->HasChildren()) pQuadTextures->ClearChildren();
-
-			std::string ch = std::string(1, c); // "" + c undefined behavior?
 
 			auto keyBack = pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
 			keyBack->SetColorTexture(m_pKeyTexture.get());
 
-			pQuadTextures->AddText(m_pFont, ch, 0.2f, true);
+			pQuadTextures->AddText(m_pFont, key->m_letter, 0.2f, true);
 			GetDOS()->RenderToTexture(pQuadTextures);
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(keyDimension, keyDimension);
 			pQuad->SetColorTexture(pQuadTextures->GetFramebuffer()->GetTexture());
-
-			float colCount = (float)layout[rowIndex].size();
-			float xPos = (m_surfaceWidth / colCount) * (colIndex - (colCount / 2.0f) + 0.5f);
+			pQuad->ScaleX(1.0f / (0.1f / key->m_width));
 
 			float rowCount = (float)layout.size();
 			float zPos = (m_surfaceHeight / rowCount) * (rowIndex - (rowCount / 2.0f) + 0.5f);
 
+			float xPos = m_surfaceWidth * key->m_left + (key->m_width / 2.0f) - (m_surfaceWidth / 2.0f);
+
 			pQuad->SetPosition(point(xPos, 0.01f, zPos) + m_pSurface->GetPosition());
 			pQuad->SetMaterialAmbient(0.75f);
 
-			m_keys.emplace_back(pQuad);
-
+			key->m_pQuad = pQuad;
 			colIndex++;
 		}
 		colIndex = 0;
@@ -157,12 +205,11 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 				// forces mallet head to be above collision surface
 				if (manifold.GetNormal().y() > 0.0f) { 
-					int index = CollisionPointToIndex(manifold);
-					CBR(index >= 0, R_OBJECT_NOT_FOUND);
-
-					int rowSize = (int)m_QWERTY[0].size();
-					m_typed += m_QWERTY[index / rowSize][index % rowSize];
-					m_keyObjects[i] = m_keys[index];
+					
+					auto key = CollisionPointToKey(manifold);
+					CNR(key, R_OBJECT_NOT_FOUND);
+					m_typed += key->m_letter;
+					m_keyObjects[i] = key->m_pQuad;
 					OVERLAY_DEBUG_SET("str key", m_typed.c_str());
 				}
 
@@ -267,7 +314,6 @@ RESULT UIKeyboard::HideKeyboard() {
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(false);
 		pKeyboard->HideMallets();
-		//pKeyboard->
 	Error:
 		return r;
 	};
@@ -317,29 +363,32 @@ RESULT UIKeyboard::SetVisible(bool fVisible) {
 
 //TODO: A good amount of code in the layout and in this function currently assumes
 // that the keyboard is a grid
-int UIKeyboard::CollisionPointToIndex(CollisionManifold& manifold) {
+UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 	RESULT r = R_PASS;
 
 	point pt = manifold.GetContactPoint(0).GetPoint();
 	point ptCenter = GetComposite()->GetPosition();
 	OVERLAY_DEBUG_SET("pt", pt);
 
-	int index;
-
 	auto& keyboardLayout = m_QWERTY;
 	int rowIndex = (pt.z() - ptCenter.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
-	int colIndex;
 	CBR(rowIndex >= 0 && rowIndex < keyboardLayout.size(), R_OBJECT_NOT_FOUND);
 
-	colIndex = (pt.x() - ptCenter.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth * keyboardLayout[rowIndex].size();
-	CBR(colIndex >= 0 && colIndex < keyboardLayout[rowIndex].size(), R_OBJECT_NOT_FOUND);
+	float xPos = (pt.x() - ptCenter.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth;
+	OVERLAY_DEBUG_SET("xpo", xPos);
+	auto& row = keyboardLayout[rowIndex];
 
-	index = rowIndex * (int)keyboardLayout[0].size() + colIndex;
+	for (int i = (int)row.size() - 1; i >= 0; i--) {
+		auto k = row[i];
+		float pos = xPos - (k->m_width / 2.0f);
+		if (k->m_left <= pos) {
+			CBR(k->m_left + k->m_width >= pos, R_OBJECT_NOT_FOUND);
+			return k;
+		}
+	}
 
-//Success:
-	return index;
 Error:
-	return -1;
+	return nullptr;
 }
 
 RESULT UIKeyboard::UpdateViewQuad() {

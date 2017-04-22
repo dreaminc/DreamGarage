@@ -16,6 +16,18 @@ class texture;
 class CollisionManifold;
 //class InteractionObjectEvent;
 
+// TODO: As these classes expand, separate into different files
+class UIKey {
+public:
+	UIKey();
+	UIKey(float left, float width, std::string& letter);
+public:
+	float m_left;	// left side of the key
+	float m_width;  // width of the key
+	std::string m_letter; // letter on the key
+	std::shared_ptr<quad> m_pQuad; //key surface TODO this sux
+};
+
 class UIMallet {
 public:
 	UIMallet(DreamOS *pDreamOS);
@@ -29,7 +41,7 @@ public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	RESULT InitializeQuadsWithLayout(std::vector<std::string> layout);
+	RESULT InitializeQuadsWithLayout(std::vector<std::vector<UIKey*>> layout);
 
 public:
 	//DreamApp
@@ -52,7 +64,7 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
-	int CollisionPointToIndex(CollisionManifold& manifold);
+	UIKey* CollisionPointToKey(CollisionManifold& manifold);
 
 	float GetWidth();
 	RESULT SetWidth(float width);
@@ -79,11 +91,10 @@ private:
 	ActiveObject::state m_keyStates[2];
 	std::shared_ptr<quad> m_keyObjects[2];
 
-	std::vector<std::shared_ptr<quad>> m_keys;
 	std::shared_ptr<Font> m_pFont;
 	std::shared_ptr<texture> m_pKeyTexture;
 
-	std::vector<std::string> m_QWERTY;
+	std::vector<std::vector<UIKey*>> m_QWERTY;
 };
 
 #endif // ! UI_KEYBOARD_H_
