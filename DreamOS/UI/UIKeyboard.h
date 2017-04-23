@@ -6,6 +6,9 @@
 #include "InteractionEngine/InteractionObjectEvent.h"
 #include "InteractionEngine/ActiveObject.h"
 
+#include "UI/UIKeyboardLayout.h"
+#include "UI/UIMallet.h"
+
 #include <vector>
 
 class quad;
@@ -14,25 +17,6 @@ class text;
 class Font;
 class texture;
 class CollisionManifold;
-//class InteractionObjectEvent;
-
-// TODO: As these classes expand, separate into different files
-class UIKey {
-public:
-	UIKey();
-	UIKey(float left, float width, std::string& letter);
-public:
-	float m_left;	// left side of the key
-	float m_width;  // width of the key
-	std::string m_letter; // letter on the key
-	std::shared_ptr<quad> m_pQuad; //key surface TODO this sux
-};
-
-class UIMallet {
-public:
-	UIMallet(DreamOS *pDreamOS);
-	sphere *m_pHead;
-};
 
 class UIKeyboard : public DreamApp<UIKeyboard>, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
@@ -41,7 +25,7 @@ public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	RESULT InitializeQuadsWithLayout(std::vector<std::vector<UIKey*>> layout);
+	RESULT InitializeQuadsWithLayout();
 
 public:
 	//DreamApp
@@ -54,18 +38,18 @@ public:
 	//InteractionEngine
 	virtual RESULT Notify(InteractionObjectEvent *oEvent) override;
 
+//Animation
 public:
-
 	RESULT ShowKeyboard();
 	RESULT HideKeyboard();
 	RESULT HideSurface();
-	RESULT HideMallets();
-	RESULT ShowMallets();
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
 	UIKey* CollisionPointToKey(CollisionManifold& manifold);
 
+//Dynamic Resizing
+public:
 	float GetWidth();
 	RESULT SetWidth(float width);
 	float GetHeight();
@@ -94,7 +78,7 @@ private:
 	std::shared_ptr<Font> m_pFont;
 	std::shared_ptr<texture> m_pKeyTexture;
 
-	std::vector<std::vector<UIKey*>> m_QWERTY;
+	UIKeyboardLayout *m_pLayout;
 };
 
 #endif // ! UI_KEYBOARD_H_

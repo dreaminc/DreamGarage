@@ -5,22 +5,6 @@
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/AnimationItem.h"
 
-UIKey::UIKey() {}
-
-UIKey::UIKey(float left, float width, std::string& letter) 
-{
-	m_left = left;
-	m_width = width;
-	m_letter = letter;
-}
-
-UIMallet::UIMallet(DreamOS *pDreamOS) 
-{
-	m_pHead = pDreamOS->AddSphere(0.02f, 10.0f, 10.0f);
-	pDreamOS->AddInteractionObject(m_pHead);
-	m_pHead->SetVisible(false);
-}
-
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -29,7 +13,6 @@ UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 RESULT UIKeyboard::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	std::vector<UIKey*> row;
 	//TODO this may become deprecated
 	m_ptSurface = point(-0.0f, 0.9f, 4.65f);
 	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
@@ -59,65 +42,24 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	m_typed = "";
 
-	// TODO: going to need something much more advanced than this soon
-	// TODO: special characters (backspace) (shift) TODO: multi-character ('.com')
-	//
-	//m_QWERTY = { "qwertyuiop","asdfghjkl","zxcvbnm" };
-	m_QWERTY.clear();
-	float left = 0.0f;
-	for (auto c : "qwertyuiop") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
-		row.emplace_back(k);
-		left += 0.1f;
-	}
-	row.pop_back();
-	m_QWERTY.emplace_back(row);
+	m_pLayout = new UIKeyboardLayout();
+	m_pLayout->CreateQWERTYLayout();
+	InitializeQuadsWithLayout();
 
-	row.clear();
-	left = 0.05f;
-	for (auto c : "asdfghjkl") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
-		row.emplace_back(k);
-		left += 0.1f;
-	}
-	row.pop_back();
-	m_QWERTY.emplace_back(row);
-
-	row.clear();
-	left = 0.15f;
-	for (auto c : "zxcvbnm") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
-		row.emplace_back(k);
-		left += 0.1f;
-	}
-	row.pop_back();
-	m_QWERTY.emplace_back(row);
-
-	row.clear();
-	left = 0.25f;
-	{
-		std::string ch = " ";
-		auto k = new UIKey(left, 0.35f, ch);
-		row.emplace_back(k);
-	}
-	m_QWERTY.emplace_back(row);
-
-	InitializeQuadsWithLayout(m_QWERTY);
 	GetComposite()->SetVisible(false);
 
 Error:
 	return r;
 }
 
-RESULT UIKeyboard::InitializeQuadsWithLayout(std::vector<std::vector<UIKey*>> layout) {
+RESULT UIKeyboard::InitializeQuadsWithLayout() {
 	RESULT r = R_PASS;
 	
 	FlatContext *pQuadTextures = GetDOS()->AddFlatContext();
 
-	//not flexible
+	auto& layout = m_pLayout->GetKeys();
+
+	//not flexible, TODO: take max of rows?
 	float keyDimension = m_surfaceWidth / (float)layout[0].size();
 
 	int rowIndex = 0;
@@ -134,7 +76,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(std::vector<std::vector<UIKey*>> la
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(keyDimension, keyDimension);
 			pQuad->SetColorTexture(pQuadTextures->GetFramebuffer()->GetTexture());
-			pQuad->ScaleX(1.0f / (0.1f / key->m_width));
+			pQuad->ScaleX(1.0f / (keyDimension / (0.5f*key->m_width)));
 
 			float rowCount = (float)layout.size();
 			float zPos = (m_surfaceHeight / rowCount) * (rowIndex - (rowCount / 2.0f) + 0.5f);
@@ -162,12 +104,16 @@ RESULT UIKeyboard::OnAppDidFinishInitializing(void *pContext) {
 RESULT UIKeyboard::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	point ptOffset = point(0.0f, 0.0f, -0.2f);
 	RotationMatrix qOffset = RotationMatrix();
 	VirtualObj *pObj = nullptr;
 
 	InteractionEngineProxy *pProxy = nullptr;
 	DreamOS *pDOS = GetDOS();
+
+	// update quads if layout has changed
+	if (m_pLayout->CheckAndCleanDirty()) {
+		InitializeQuadsWithLayout();
+	}
 
 	CN(pDOS);
 	pProxy = pDOS->GetInteractionEngineProxy();
@@ -178,7 +124,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
-		m_pLeftMallet->m_pHead->MoveTo(pHand->GetPosition() + point(qOffset * ptOffset));
+		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
 	pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
 	CN(pHand);
@@ -187,10 +133,10 @@ RESULT UIKeyboard::Update(void *pContext) {
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pRightMallet)
-		m_pRightMallet->m_pHead->MoveTo(pHand->GetPosition() + point(qOffset * ptOffset));
+		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
 
 	int i = 0;
-	for (auto &mallet : { m_pLeftMallet->m_pHead, m_pRightMallet->m_pHead })
+	for (auto &mallet : { m_pLeftMallet->GetMalletHead(), m_pRightMallet->GetMalletHead() })
 	{
 		CollisionManifold manifold = m_pSurface->Collide(mallet);
 
@@ -279,14 +225,23 @@ RESULT UIKeyboard::Notify(InteractionObjectEvent *oEvent) {
 
 RESULT UIKeyboard::ShowKeyboard() {
 
-	GetComposite()->SetPosition(point(0.0f, -1.0f, 5.0f));
-	auto fnCallback = [&](void *pContext) {
+	auto fnStartCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
+		CN(pKeyboard);
+		GetComposite()->SetPosition(point(0.0f, -1.0f, 5.0f));
+	Error:
+		return r;
+	};
+
+	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
-		pKeyboard->ShowMallets();
+		m_pLeftMallet->Show();
+		m_pRightMallet->Show();
 	Error:
 		return r;
 	};
@@ -299,8 +254,8 @@ RESULT UIKeyboard::ShowKeyboard() {
 		0.2f,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
-		nullptr,
-		fnCallback,
+		fnStartCallback,
+		fnEndCallback,
 		this
 	);
 	return R_PASS;
@@ -313,14 +268,15 @@ RESULT UIKeyboard::HideKeyboard() {
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(false);
-		pKeyboard->HideMallets();
+		m_pLeftMallet->Hide();
+		m_pRightMallet->Hide();
 	Error:
 		return r;
 	};
 
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		GetComposite(),
-		point(0.0f, -1.0f, 5.0f),
+		point(0.0f, 0.0f, 5.0f),
 		GetComposite()->GetOrientation(),
 		GetComposite()->GetScale(),
 		0.2f,
@@ -335,22 +291,6 @@ RESULT UIKeyboard::HideKeyboard() {
 
 RESULT UIKeyboard::HideSurface() {
 	return m_pSurface->SetVisible(false);
-}
-
-RESULT UIKeyboard::HideMallets() {
-	RESULT r = R_PASS;
-	CR(m_pLeftMallet->m_pHead->SetVisible(false));
-	CR(m_pRightMallet->m_pHead->SetVisible(false));
-Error:
-	return r;
-}
-
-RESULT UIKeyboard::ShowMallets() {
-	RESULT r = R_PASS;
-	CR(m_pLeftMallet->m_pHead->SetVisible(true));
-	CR(m_pRightMallet->m_pHead->SetVisible(true));
-Error:
-	return r;
 }
 
 bool UIKeyboard::IsVisible() {
@@ -370,7 +310,7 @@ UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 	point ptCenter = GetComposite()->GetPosition();
 	OVERLAY_DEBUG_SET("pt", pt);
 
-	auto& keyboardLayout = m_QWERTY;
+	auto& keyboardLayout = m_pLayout->GetKeys();
 	int rowIndex = (pt.z() - ptCenter.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
 	CBR(rowIndex >= 0 && rowIndex < keyboardLayout.size(), R_OBJECT_NOT_FOUND);
 
@@ -383,7 +323,7 @@ UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 		float pos = xPos - (k->m_width / 2.0f);
 		if (k->m_left <= pos) {
 			CBR(k->m_left + k->m_width >= pos, R_OBJECT_NOT_FOUND);
-			return k;
+			return k.get();
 		}
 	}
 
