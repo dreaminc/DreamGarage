@@ -33,9 +33,10 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBrowser());
+
 	CR(AddTestKeyboard());
 
-//	CR(AddTestBrowser());
 
 //	CR(AddTestInteractionFauxUI());
 //	CR(AddTestSharedContentView());

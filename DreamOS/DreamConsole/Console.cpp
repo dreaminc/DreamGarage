@@ -40,6 +40,11 @@ bool DreamConsole::IsInForeground() {
 	return m_fInForeground;
 }
 
+RESULT DreamConsole::SetInForeground(bool fInForeground) {
+	m_fInForeground = fInForeground;
+	return R_PASS;
+}
+
 void DreamConsole::OnFrameRendered() {
 	m_ticker.Tick();
 
@@ -104,42 +109,22 @@ RESULT DreamConsole::Notify(SenseKeyboardEvent *kbEvent) {
 	if (kbEvent->m_pSenseKeyboard) {
 		SenseVirtualKey keyCode = kbEvent->KeyCode;
 
-		if (kbEvent->KeyState) {
-			if (!IsInForeground()) {
-				if (keyCode == SVK_TAB) {
-					// quick hack to enable dream console in production but only using several tab hits
-#ifdef PRODUCTION_BUILD
-					static int hits = 0;
-					hits++;
-					if (hits > 7)
-						m_fInForeground = true;
-#else
-					m_fInForeground = true;
-#endif // PRODUCTION_BUILD
-				}
-			}
-			else {
-				if (keyCode == SVK_TAB) {
-					m_fInForeground = false;
-				}
-				else {
-					///*** old way
-					switch (keyCode) {
+		if(IsInForeground()) {
+			///*** old way
+			switch (keyCode) {
 
-						case SVK_LEFT: TextCursorMoveBackward(); break;
-						case SVK_RIGHT: TextCursorMoveForward(); break;
+				case SVK_LEFT: TextCursorMoveBackward(); break;
+				case SVK_RIGHT: TextCursorMoveForward(); break;
 					
-						// Don't process type character here. look for SenseTypingEvent
-						case SVK_BACK: 
-						case SVK_RETURN: 
-						case SVK_UP:
-						case SVK_DOWN: 
-						case SVK_ESCAPE: 
-						default: break;
-					}
-					//*/
-				}
+				// Don't process type character here. look for SenseTypingEvent
+				case SVK_BACK: 
+				case SVK_RETURN: 
+				case SVK_UP:
+				case SVK_DOWN: 
+				case SVK_ESCAPE: 
+				default: break;
 			}
+			//*/
 		}
 	}
 

@@ -83,7 +83,39 @@ RESULT SandboxApp::Notify(CmdPromptEvent *event) {
 }
 
 RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	if (kbEvent->m_pSenseKeyboard) {
+		SenseVirtualKey keyCode = kbEvent->KeyCode;
+
+		if (kbEvent->KeyState) {
+			if (m_pHALImp->IsRenderProfiler() == false) {
+				if (keyCode == SVK_TAB) {
+					// quick hack to enable dream console in production but only using several tab hits
+#ifdef PRODUCTION_BUILD
+					static int hits = 0;
+					hits++;
+					if (hits > 7) {
+						m_pHALImp->SetRenderProfiler(true);
+						DreamConsole::GetConsole()->SetInForeground(true);
+					}
+#else
+					m_pHALImp->SetRenderProfiler(true);
+					DreamConsole::GetConsole()->SetInForeground(true);
+#endif // PRODUCTION_BUILD
+				}
+			}
+			else {
+				if (keyCode == SVK_TAB) {
+					m_pHALImp->SetRenderProfiler(false);
+					DreamConsole::GetConsole()->SetInForeground(false);
+				}
+			}
+		}
+	}
+
+	//Error:
+	return r;
 }
 
 RESULT SandboxApp::Notify(SenseTypingEvent *kbEvent) {
@@ -191,6 +223,8 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	// Register Dream Console to keyboard events
 	CR(RegisterSubscriber(SVK_ALL, DreamConsole::GetConsole()));
 	CR(RegisterSubscriber(CHARACTER_TYPING, DreamConsole::GetConsole()));
+
+	CR(RegisterSubscriber(SVK_TAB, this));
 
 	//camera *pCamera = m_pHALImp->GetCamera();
 

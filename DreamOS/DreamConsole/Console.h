@@ -63,6 +63,7 @@ public:
 	RESULT Initialize();
 
 	bool IsInForeground();
+	RESULT SetInForeground(bool fInForeground);
 
 	void OnFrameRendered();
 
