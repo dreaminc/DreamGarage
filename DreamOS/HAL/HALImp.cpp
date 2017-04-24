@@ -1,5 +1,9 @@
 #include "HALImp.h"
 
+#include "HAl/Pipeline/ProgramNode.h"
+
+#include "HAL/FlatProgram.h"
+
 HALImp::HALImp() :
 	m_pCamera(nullptr),
 	m_pHMD(nullptr)
@@ -31,8 +35,18 @@ bool HALImp::IsRenderReferenceGeometry() {
 	return (bool)(m_HALConfiguration.fRenderReferenceGeometry);
 }
 
-camera *HALImp::GetCamera() {
+stereocamera* HALImp::GetCamera() {
 	return m_pCamera;
+}
+
+RESULT HALImp::SetCamera(stereocamera* pCamera) {
+	RESULT r = R_PASS;
+
+	CN(pCamera);
+	m_pCamera = pCamera;
+
+Error:
+	return r;
 }
 
 RESULT HALImp::SetCameraOrientation(quaternion qOrientation) {
@@ -56,4 +70,106 @@ RESULT HALImp::SetHMD(HMD *pHMD) {
 
 //Error:
 	return r;
+}
+
+// TODO: Remove this, this will eventually just be a node
+RESULT HALImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
+	RESULT r = R_PASS;
+
+	framebuffer *pFramebuffer = nullptr;
+	FlatProgram* pFlatProgram = nullptr;
+
+	if (m_pFlatProgram == nullptr) {
+		m_pFlatProgram = MakeProgramNode("flat");
+		CN(m_pFlatProgram);
+	}
+
+	pFlatProgram = dynamic_cast<FlatProgram*>(m_pFlatProgram);
+	CN(pFlatProgram);
+
+	pFramebuffer = pContext->GetFramebuffer();
+
+	/*
+	m_pFlatProgram->SetInput<stereocamera>("camera", pCamera);
+	m_pFlatProgram->SetInput<FlatContext>("flatcontext", pContext);
+	m_pFlatProgram->SetInput<framebuffer>("framebuffer", pFramebuffer);
+	*/
+
+	pFlatProgram->SetFlatContext(pContext);
+	pFlatProgram->SetCamera(pCamera);
+	pFlatProgram->SetFlatFramebuffer(pContext->GetFramebuffer());
+
+	m_pFlatProgram->ProcessNode(0);
+	
+Error:
+	return r;
+}
+
+RESULT HALImp::InitializeRenderPipeline() {
+	RESULT r = R_PASS;
+
+	m_pRenderPipeline = std::make_unique<Pipeline>();
+	CN(m_pRenderPipeline);
+
+Error:
+	return r;
+}
+
+RESULT HALImp::Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE eye) {
+	RESULT r = R_PASS;
+
+	// TODO: Replace this with source nodes
+	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
+	VirtualObj *pVirtualObj = nullptr;
+
+	static EYE_TYPE lastEye = EYE_INVALID;
+
+	std::vector<light*> *pLights = nullptr;
+	pObjectStore->GetLights(pLights);
+
+	m_pCamera->SetCameraEye(eye);
+
+	ClearHALBuffers();
+	ConfigureHAL();
+
+	// Camera Projection Matrix
+	if (m_pHMD != nullptr) {
+		m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
+		m_pHMD->SetAndClearRenderSurface(eye);
+	}
+	else {
+		SetViewTarget(eye, pCamera->GetViewWidth(), pCamera->GetViewHeight());
+	}
+
+	// Pipeline stuff
+	m_pRenderPipeline->RunPipeline();
+
+	// Commit frame to HMD
+	if (m_pHMD) {
+		m_pHMD->UnsetRenderSurface(eye);
+		m_pHMD->CommitSwapChain(eye);
+	}
+
+	FlushHALBuffers();
+
+//Error:
+	return r;
+}
+
+RESULT HALImp::SetDrawWireframe(bool fDrawWireframe) {
+	m_HALConfiguration.fDrawWireframe = fDrawWireframe;
+	return R_PASS;
+}
+
+bool HALImp::IsDrawWireframe() {
+	return m_HALConfiguration.fDrawWireframe;
+}
+
+RESULT HALImp::SetRenderProfiler(bool fRenderProfiler) {
+	m_HALConfiguration.fRenderProfiler = fRenderProfiler;
+	return R_PASS;
+}
+
+bool HALImp::IsRenderProfiler() {
+	return m_HALConfiguration.fRenderProfiler;
 }

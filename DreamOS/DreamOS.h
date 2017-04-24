@@ -147,7 +147,7 @@ public:
 
 	user *AddUser();
 
-	camera* GetCamera();
+	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
 

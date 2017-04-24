@@ -25,6 +25,7 @@ public:
 	virtual RESULT AddTests() override;
 
 public:
+	RESULT AddTestRenderToTextureQuad();
 	RESULT AddTestFramerateVolumes();
 	RESULT AddTestAlphaVolumes();
 

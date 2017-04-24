@@ -7,7 +7,8 @@
 
 #include "Scene/ObjectStore.h"
 
-OGLProgram::OGLProgram(OpenGLImp *pParentImp) :
+OGLProgram::OGLProgram(OpenGLImp *pParentImp, std::string strName) :
+	ProgramNode(strName),
 	m_pParentImp(pParentImp),
 	m_OGLProgramIndex(NULL),
 	m_pVertexShader(nullptr),
@@ -27,6 +28,17 @@ OGLProgram::~OGLProgram() {
 RESULT OGLProgram::SetOGLProgramDepth(OGLProgram *pOGLProgramDepth) {
 	m_pOGLProgramDepth = pOGLProgramDepth;
 	return R_PASS;
+}
+
+RESULT OGLProgram::ProcessNode(long frameID) {
+	RESULT r = R_PASS;
+
+	// TODO: Do stuff
+
+	CR(r);
+
+Error:
+	return r;
 }
 
 // Note that all vertex attrib, uniforms, uniform blocks are actually 
@@ -192,7 +204,6 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalD
 	CR(pFramebuffer->BindOGLFramebuffer());
 
 	CR(pFramebuffer->MakeOGLTexture());
-
 	CR(pFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
 	CR(pFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
 
@@ -220,6 +231,7 @@ RESULT OGLProgram::InitializeRenderTexture(GLenum internalDepthFormat, GLenum ty
 	CR(m_pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, internalDepthFormat, GL_DEPTH_COMPONENT, typeDepth));
 
 	CR(m_pOGLRenderTexture->BindTexture(GL_TEXTURE_2D));
+
 	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
 	CR(m_pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
@@ -837,7 +849,7 @@ RESULT OGLProgram::RenderObject(VirtualObj *pVirtualObj) {
 */
 
 // TODO: Consolidate?
-RESULT OGLProgram::SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgram::SetStereoCamera(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	RESULT r = R_PASS;
 
 	/*

@@ -28,6 +28,8 @@
 #include "OGLLightsBlock.h"
 #include "OGLMaterialBlock.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+
 class OpenGLImp;
 class OGLVertexAttribute;
 class OGLUniform;
@@ -35,10 +37,14 @@ class OGLFramebuffer;
 class OGLTexture;
 class ObjectStore;
 
-class OGLProgram {
+class OGLProgram : public ProgramNode {
 public:
-	OGLProgram(OpenGLImp *pParentImp);
+	OGLProgram(OpenGLImp *pParentImp, std::string strName = "oglprogram");
 	~OGLProgram();
+
+	// ProgramNode Interface
+	virtual RESULT SetupConnections() = 0;
+	virtual RESULT ProcessNode(long frameID = 0) override;
 
 	virtual RESULT OGLInitialize();
 	RESULT OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionFile);
@@ -81,12 +87,12 @@ public:
 	virtual RESULT SetMaterial(material *pMaterial);
 	
 	RESULT SetCamera(camera *pCamera);
-	RESULT SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye);
+	RESULT SetStereoCamera(stereocamera* pStereoCamera, EYE_TYPE eye);
 
 	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) = 0;
 	virtual RESULT SetObjectUniforms(DimObj *pDimObj) = 0;
 	virtual RESULT SetCameraUniforms(camera *pCamera) = 0;
-	virtual RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) = 0;
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) = 0;
 	
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *pShaderID);

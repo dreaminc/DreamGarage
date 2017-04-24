@@ -15,7 +15,7 @@
 class OGLProgramTextureBitBlit : public OGLProgram {
 public:
 	OGLProgramTextureBitBlit(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp)
+		OGLProgram(pParentImp, "ogltexturebitblit")
 	{
 		// empty
 	}
@@ -35,6 +35,19 @@ public:
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTexture), std::string("u_hasTexture")));
+
+	Error:
+		return r;
+	}
+
+	RESULT SetupConnections() {
+		RESULT r = R_PASS;
+
+		// Inputs
+		CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
+
+		// Outputs
+		CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
 
 	Error:
 		return r;
@@ -72,11 +85,14 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 		m_pUniformProjectionMatrix->SetUniform(pStereoCamera->GetProjectionMatrix(eye));
 		
 		return R_PASS;
 	}
+
+protected:
+	stereocamera *m_pCamera = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

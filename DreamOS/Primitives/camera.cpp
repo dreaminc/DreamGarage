@@ -10,15 +10,12 @@
 #define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_PERSPECTIVE
 //#define DEFAULT_PROJECTION_TYPE PROJECTION_MATRIX_ORTHOGRAPHIC
 
-
-camera::camera(point ptOrigin, camera_precision FOV, int pxScreenWidth, int pxScreenHeight) :
+camera::camera(point ptOrigin, viewport cameraVieport) :
 	VirtualObj(ptOrigin),
-	m_FieldOfViewAngle(FOV),
+	m_viewport(cameraVieport),
 	m_ProjectionType(DEFAULT_PROJECTION_TYPE),
 	m_NearPlane(DEFAULT_NEAR_PLANE),
 	m_FarPlane(DEFAULT_FAR_PLANE),
-	m_pxScreenWidth(pxScreenWidth),
-	m_pxScreenHeight(pxScreenHeight),
 	m_cameraRotateSpeed(DEFAULT_CAMERA_ROTATE_SPEED),
 	m_cameraForwardSpeed(0.0f),
 	m_cameraStrafeSpeed(0.0f),
@@ -35,9 +32,13 @@ camera::~camera() {
 	// empty stub
 }
 
+RESULT camera::ResizeCamera(viewport cameraViewport) {
+	m_viewport = cameraViewport;
+	return R_PASS;
+}
+
 RESULT camera::ResizeCamera(int pxWidth, int pxHeight) {
-	m_pxScreenWidth = pxWidth;
-	m_pxScreenHeight = pxHeight;
+	m_viewport.ResizeViewport(pxWidth, pxHeight);
 	return R_PASS;
 }
 
@@ -45,12 +46,12 @@ vector camera::GetUpVector() {
 	return vector::jVector();
 }
 
-int camera::GetPXWidth() {
-	return m_pxScreenWidth;
+int camera::GetViewWidth() {
+	return m_viewport.Width();
 }
 
-int camera::GetPXHeight() {
-	return m_pxScreenHeight;
+int camera::GetViewHeight() {
+	return m_viewport.Height();
 }
 
 vector camera::GetRightVector() {
@@ -71,11 +72,11 @@ vector camera::GetLookVector() {
 
 ProjectionMatrix camera::GetProjectionMatrix() {
 	return ProjectionMatrix(m_ProjectionType,
-		static_cast<projection_precision>(m_pxScreenWidth),
-		static_cast<projection_precision>(m_pxScreenHeight),
+		static_cast<projection_precision>(m_viewport.Width()),
+		static_cast<projection_precision>(m_viewport.Height()),
 		static_cast<projection_precision>(m_NearPlane),
 		static_cast<projection_precision>(m_FarPlane),
-		static_cast<projection_precision>(m_FieldOfViewAngle));
+		static_cast<projection_precision>(m_viewport.FOVAngle()));
 }
 
 ViewMatrix camera::GetViewMatrix() {
@@ -304,19 +305,11 @@ RESULT camera::SetHMD(HMD *pHMD) {
 	return R_PASS;
 }
 
-int camera::GetScreenWidth() {
-	return m_pxScreenWidth;
-}
-
-int camera::GetScreenHeight() {
-	return m_pxScreenHeight;
-}
-
 ray camera::GetRay(double xPos, double yPos, double t) {
 	ray retRay;
 
-	double x = ((2.0f * xPos) / m_pxScreenWidth) - 1.0f;
-	double y = 1.0f - ((2.0f * yPos) / m_pxScreenHeight);
+	double x = ((2.0f * xPos) / m_viewport.Width()) - 1.0f;
+	double y = 1.0f - ((2.0f * yPos) / m_viewport.Height());
 	double z = 1.0f;
 
 	retRay.ptOrigin() = point(GetOrigin());

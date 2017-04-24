@@ -56,7 +56,7 @@ public:
 	RESULT InitializePathManager();
 	RESULT InitializeOpenGLRenderingContext();
 	RESULT InitializeCloudController();
-	RESULT InitializeHAL();
+	//RESULT InitializeHAL();
 	RESULT InitializeKeyboard();
 	RESULT InitializeMouse();
 	RESULT InitializeLeapMotion();

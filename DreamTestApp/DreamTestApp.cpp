@@ -16,8 +16,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = true;
-	//sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	SetSandboxConfiguration(sandboxconfig);
 
@@ -37,6 +36,8 @@ RESULT DreamTestApp::LoadScene() {
 	///*
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = false;
+	halconf.fDrawWireframe = false;
+	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
 	//*/
 

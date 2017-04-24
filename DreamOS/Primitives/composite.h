@@ -22,6 +22,7 @@ class HALImp;
 class hand;
 class camera;
 class FlatContext;
+class stereocamera;
 
 class composite : public DimObj {
 public:
@@ -68,7 +69,7 @@ public:
 
 public:
 	RESULT RenderToTexture(std::shared_ptr<FlatContext> context);
-	camera* GetCamera();
+	stereocamera* GetCamera();
 
 protected:
 	HALImp *m_pHALImp;

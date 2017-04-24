@@ -678,8 +678,16 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimal.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLViewportDisplay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLRenderingContextFactory.cpp" />
@@ -689,6 +697,13 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\shaders\OpenGLShader.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\DConnection.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\DNode.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\Pipeline.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\PipelineCommon.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\ProgramNode.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\SinkNode.cpp" />
+    <ClCompile Include="..\..\..\HAL\Pipeline\SourceNode.cpp" />
     <ClCompile Include="..\..\..\HMD\HMD.cpp" />
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
@@ -738,6 +753,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\quad.cpp" />
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp" />
     <ClCompile Include="..\..\..\Primitives\sphere.cpp" />
+    <ClCompile Include="..\..\..\Primitives\stereocamera.cpp" />
     <ClCompile Include="..\..\..\Primitives\text.cpp" />
     <ClCompile Include="..\..\..\Primitives\texture.cpp" />
     <ClCompile Include="..\..\..\Primitives\Types\GUID.cpp" />
@@ -746,6 +762,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\user.cpp" />
     <ClCompile Include="..\..\..\Primitives\vector.cpp" />
     <ClCompile Include="..\..\..\Primitives\version.cpp" />
+    <ClCompile Include="..\..\..\Primitives\viewport.cpp" />
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\volume.cpp" />
     <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
@@ -765,9 +782,11 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Win64PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\Windows\Windows64App.cpp" />
+    <ClCompile Include="..\..\..\Scene\CameraNode.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreFactory.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStore.cpp" />
     <ClCompile Include="..\..\..\Scene\ObjectStoreImpList.cpp" />
+    <ClCompile Include="..\..\..\Scene\ObjectStoreNode.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseController.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
@@ -859,6 +878,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug.h" />
     <ClInclude Include="..\..\..\External\SOIL\stbi_DDS_aug_c.h" />
     <ClInclude Include="..\..\..\External\SOIL\stb_image_aug.h" />
+    <ClInclude Include="..\..\..\HAL\FlatProgram.h" />
     <ClInclude Include="..\..\..\HAL\HAL.h" />
     <ClInclude Include="..\..\..\HAL\HALImp.h" />
     <ClInclude Include="..\..\..\HAL\HALTestSuite.h" />
@@ -888,6 +908,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
@@ -900,6 +921,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLTriangle.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLUser.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLViewportDisplay.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLVolume.h" />
     <ClInclude Include="..\..\..\HAL\opengl\opengl.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OpenGLCommon.h" />
@@ -914,6 +936,13 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexAttribute.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OGLVertexShader.h" />
     <ClInclude Include="..\..\..\HAL\opengl\shaders\OpenGLShader.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\DConnection.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\DNode.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\Pipeline.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\PipelineCommon.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\ProgramNode.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\SinkNode.h" />
+    <ClInclude Include="..\..\..\HAL\Pipeline\SourceNode.h" />
     <ClInclude Include="..\..\..\HAL\Shader.h" />
     <ClInclude Include="..\..\..\HMD\HMD.h" />
     <ClInclude Include="..\..\..\HMD\HMDFactory.h" />
@@ -953,6 +982,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\DimObj.h" />
     <ClInclude Include="..\..\..\Primitives\DimRay.h" />
     <ClInclude Include="..\..\..\Primitives\dirty.h" />
+    <ClInclude Include="..\..\..\Primitives\DObject.h" />
     <ClInclude Include="..\..\..\Primitives\FlatContext.h" />
     <ClInclude Include="..\..\..\Primitives\font.h" />
     <ClInclude Include="..\..\..\Primitives\Framebuffer.h" />
@@ -999,6 +1029,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\vector.h" />
     <ClInclude Include="..\..\..\Primitives\version.h" />
     <ClInclude Include="..\..\..\Primitives\Vertex.h" />
+    <ClInclude Include="..\..\..\Primitives\viewport.h" />
     <ClInclude Include="..\..\..\Primitives\VirtualObj.h" />
     <ClInclude Include="..\..\..\Primitives\volume.h" />
     <ClInclude Include="..\..\..\RESULT\EHM.h" />
@@ -1016,10 +1047,12 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64OpenGLRenderingContext.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Win64PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\Windows\Windows64App.h" />
+    <ClInclude Include="..\..\..\Scene\CameraNode.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreFactory.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStore.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreImpList.h" />
     <ClInclude Include="..\..\..\Scene\ObjectStoreImp.h" />
+    <ClInclude Include="..\..\..\Scene\ObjectStoreNode.h" />
     <ClInclude Include="..\..\..\Sense\SenseController.h" />
     <ClInclude Include="..\..\..\Sense\SenseDevice.h" />
     <ClInclude Include="..\..\..\Sense\SenseKeyboard.h" />

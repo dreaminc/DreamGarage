@@ -18,7 +18,8 @@
 #include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
-#include "Scene/ObjectStore.h"
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
 
 #include <functional>
 
@@ -27,6 +28,8 @@
 
 #include "PhysicsEngine/PhysicsEngine.h"
 #include "InteractionEngine/InteractionEngine.h"
+
+#include "Primitives/viewport.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -93,6 +96,7 @@ private:
 	RESULT InitializeInteractionEngine();
 	RESULT InitializeTimeManager();
 	RESULT InitializeDreamAppManager();
+	RESULT InitializeCamera();
 
 protected:
 	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
@@ -114,12 +118,15 @@ public:
 	virtual RESULT InitializePathManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
-	virtual RESULT InitializeHAL() = 0;
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
+	
+	// HAL
+	virtual RESULT InitializeHAL();
+	RESULT SetUpHALPipeline(Pipeline* pRenderPipeline);		// TODO: this goes up to DreamOS soon
 
 public:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
@@ -232,8 +239,10 @@ public:
 	OpenGLRenderingContext *GetOpenGLRenderingContext();
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
+	RESULT ResizeViewport(viewport newViewport);
 
-	camera* GetCamera();
+
+	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
 
@@ -246,6 +255,8 @@ protected:
 	RESULT SetSandboxRunning(bool fRunning);
 
 protected:
+	viewport m_viewport;
+
 	// TODO: Move to unique_ptr
 	CommandLineManager *m_pCommandLineManager;
 	PathManager *m_pPathManager;
@@ -254,8 +265,10 @@ protected:
 	// TODO: Should these be in their respective "engine" objects?
 	ObjectStore *m_pPhysicsGraph;	
 	ObjectStore *m_pInteractionGraph;
-	ObjectStore *m_pSceneGraph;
 	ObjectStore *m_pFlatSceneGraph;
+
+	//ObjectStore *m_pSceneGraph;
+	ObjectStoreNode *m_pSceneGraph = nullptr;
 
 	CloudController *m_pCloudController;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;
@@ -268,13 +281,16 @@ protected:
 	HMD *m_pHMD;
 
 	// TODO: Create a "manager manager" or a more generalized way to add these
-	// All "managers" should be unique ptrs 
+	// All "managers" should be unique pointers 
 	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
+
+	//std::shared_ptr<stereocamera> m_pCamera = nullptr;
+	CameraNode *m_pCamera = nullptr;
 
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();

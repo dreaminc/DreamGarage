@@ -31,20 +31,37 @@
 #include "Primitives/user.h"
 #include "Primitives/DimRay.h"
 
+#include "Pipeline/Pipeline.h"
+
 class SandboxApp;
 
-class HALImp : 
-	//public Subscriber<SenseMouseEvent>, 
-	public valid 
+#include "Primitives/viewport.h"
+
+class SinkNode;
+class SourceNode;
+class ProgramNode;
+
+class FlatProgram;	// This one is special for render to texture
+
+class HALImp : public valid 
 {
 	friend class SandboxApp;
+
 public:
 	struct HALConfiguration {
 		unsigned fRenderReferenceGeometry : 1;
+		unsigned fDrawWireframe : 1;
+		unsigned fRenderProfiler : 1;
 	};
 
-private:
+protected:
 	HALConfiguration m_HALConfiguration;
+
+public:
+	RESULT SetDrawWireframe(bool fDrawWireframe);
+	bool IsDrawWireframe();
+	RESULT SetRenderProfiler(bool fRenderProfiler);
+	bool IsRenderProfiler();
 
 public:
 	HALImp();
@@ -54,26 +71,52 @@ public:
 	const HALImp::HALConfiguration& GetHALConfiguration();
 
 public:
-	camera *GetCamera();
+	stereocamera* GetCamera();
+	RESULT SetCamera(stereocamera* pCamera);
+
 	RESULT SetCameraOrientation(quaternion qOrientation);
 	RESULT SetCameraPositionDeviation(vector vDeviation);
 
 	RESULT SetHMD(HMD *pHMD);
+
+public:
+	RESULT InitializeRenderPipeline();
+	Pipeline* GetRenderPipelineHandle() {
+		return m_pRenderPipeline.get();
+	}
+	
+	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) = 0;
+	virtual SourceNode* MakeSourceNode(std::string strNodeName) = 0;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName) = 0;
+
 public:
 
-	virtual RESULT Resize(int pxWidth, int pxHeight) = 0;
+	virtual RESULT Resize(viewport newViewport) = 0;
 	virtual RESULT MakeCurrentContext() = 0;
+	virtual RESULT ReleaseCurrentContext() = 0;
 
-	virtual RESULT Render(ObjectStore* pSceneGraph, ObjectStore* pFlatSceneGraph, EYE_TYPE eye) = 0;
-	virtual RESULT RenderToTexture(FlatContext* pContext) = 0;
+	virtual RESULT RenderToTexture(FlatContext* pContext, stereocamera* pCamera);
 
 	virtual RESULT Shutdown() = 0;
 
+	virtual RESULT SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) = 0;
+
+	virtual RESULT InitializeHAL() = 0;
+	virtual RESULT ClearHALBuffers() = 0;
+	virtual RESULT ConfigureHAL() = 0;
+	virtual RESULT FlushHALBuffers() = 0;
+
+private:
+	RESULT Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE eye);
+
 protected:
 	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
+
+public:
 	bool IsRenderReferenceGeometry();
 
 public:
+	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) = 0;
 	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) = 0;
@@ -111,9 +154,15 @@ public:
 	virtual model* MakeModel(const std::vector<vertex>& vertices) = 0;
 	*/
 
-protected:
-	stereocamera *m_pCamera;
+protected:	
 	HMD *m_pHMD;
+	stereocamera* m_pCamera = nullptr;
+
+protected:
+	std::unique_ptr<Pipeline> m_pRenderPipeline = nullptr;
+	
+	// This is used to render to texture
+	ProgramNode* m_pFlatProgram = nullptr;
 
 private:
 	UID m_uid;

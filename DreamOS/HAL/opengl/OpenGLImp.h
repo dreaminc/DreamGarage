@@ -33,17 +33,17 @@ class Windows64App;
 class OGLDreamConsole;
 class font;
 
-class OpenGLImp : public HALImp, public Subscriber<CmdPromptEvent> {
+class OpenGLImp : public HALImp {
 private:
 	// TODO: Create an OpenGL Program class which should combine
 	// the shaders since we might want to jump around OGL programs in the future
-	OGLProgram *m_pOGLRenderProgram;
-	OGLProgram *m_pOGLProgramShadowDepth;
-	OGLProgram *m_pOGLProgramCapture;		// temp for testing
-	OGLProgram *m_pOGLSkyboxProgram;
-	OGLProgram *m_pOGLReferenceGeometryProgram;
-	OGLProgram *m_pOGLOverlayProgram;
-	OGLProgram *m_pOGLFlatProgram; 
+	//OGLProgram *m_pOGLRenderProgram;
+	//OGLProgram *m_pOGLProgramShadowDepth;
+	//OGLProgram *m_pOGLProgramCapture;		// temp for testing
+	//OGLProgram *m_pOGLSkyboxProgram;
+	//OGLProgram *m_pOGLReferenceGeometryProgram;
+	//OGLProgram *m_pOGLOverlayProgram;
+	//OGLProgram *m_pOGLFlatProgram; 
 
 	// TODO: Fix this architecture 
 	OpenGLRenderingContext *m_pOpenGLRenderingContext;
@@ -51,30 +51,7 @@ private:
 	version m_versionOGL;
 	version m_versionGLSL;
 
-	std::unique_ptr<OGLDreamConsole>	m_pOGLDreamConsole;
-
-	// Viewport
-	// TODO: Move this into an object?
-private:
-	int m_pxViewWidth;
-	int m_pxViewHeight;
-
-
-public:
-	int GetViewWidth() { return m_pxViewWidth; }
-	int GetViewHeight() { return m_pxViewHeight; }
-
-private:
-	// TODO: Potentially replace this with a :1 bit field struct
-	bool m_fDrawWireframe = false;
-	bool m_fRenderProfiler = false;
-
-protected:
-	RESULT SetDrawWireframe(bool fDrawWireframe);
-	bool IsDrawWireframe();
-	
-	RESULT SetRenderProfiler(bool fRenderProfiler);
-	bool IsRenderProfiler();
+	std::unique_ptr<OGLDreamConsole> m_pOGLDreamConsole;
 
 public:
 	OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext);
@@ -82,6 +59,7 @@ public:
 
 	// Object Factory Methods
 public:
+	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
 	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) override;
@@ -117,39 +95,29 @@ public:
 	composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 public:
-	RESULT SetViewTarget(EYE_TYPE eye);
-	RESULT Render(ObjectStore *pSceneGraph, ObjectStore *pFlatObjectStore, EYE_TYPE eye); // temporary name
-	RESULT RenderToTexture(FlatContext* pContext);
-private:
-	RESULT RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye);
-	RESULT RenderProfiler(EYE_TYPE eye);
-	RESULT RenderReferenceGeometry(ObjectStore* pObjectStore, EYE_TYPE eye);
+	virtual RESULT SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) override;
+	//virtual RESULT Render(ObjectStore *pSceneGraph, EYE_TYPE eye) override; 
+	virtual RESULT ClearHALBuffers() override;
+	virtual RESULT ConfigureHAL() override;
+	virtual RESULT FlushHALBuffers() override;
+
+	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) override;
+	virtual SourceNode* MakeSourceNode(std::string strNodeName) override;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName) override;
 
 public:
-	RESULT Resize(int pxWidth, int pxHeight);
-	RESULT Shutdown();
-
-	//RESULT InitializeStereoFramebuffers(HMD *pHMD);
-	//RESULT SetHMD(HMD *pHMD);
+	virtual RESULT Resize(viewport newViewport) override;
+	virtual RESULT Shutdown() override;
+	virtual RESULT InitializeHAL() override;
 
 	// Rendering Context 
-	RESULT MakeCurrentContext();
-	RESULT ReleaseCurrentContext();
+	virtual RESULT MakeCurrentContext() override ;
+	virtual RESULT ReleaseCurrentContext() override;
 
 private:
 	//RESULT InitializeExtensions();
 	RESULT InitializeGLContext();
 	RESULT InitializeOpenGLVersion();
-
-	RESULT PrepareScene();
-
-private:
-	RESULT Notify(CmdPromptEvent *event);
-	//RESULT Notify(SenseMouseEvent *mEvent);
-
-	// TODO: The Eye Buffers shouldn't be in the OpenGLImp
-	// Best to push into FrameBuffer -> OGLFrameBuffer then attach to HMD or stereo camera
-
 
 // TODO: Unify access to extensions
 public:

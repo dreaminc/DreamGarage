@@ -42,7 +42,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = true;
 	SetSandboxConfiguration(sandboxconfig);
 
@@ -60,11 +60,14 @@ RESULT DreamGarage::LoadScene() {
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
 	RegisterSubscriber(SENSE_TYPING_EVENT_TYPE::CHARACTER_TYPING, this);
 
-	/* If you want to turn on reference geo
+	///*
 	HALImp::HALConfiguration halconf;
-	halconf.fRenderReferenceGeometry = true;
+	halconf.fRenderReferenceGeometry = false;
+	halconf.fDrawWireframe = false;
+	halconf.fRenderProfiler = true;
 	SetHALConfiguration(halconf);
-	*/
+	//*/
+	
 
 	// Console
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
@@ -271,7 +274,7 @@ RESULT DreamGarage::Update(void) {
 RESULT DreamGarage::SetRoundtablePosition(float angle) {
 	RESULT r = R_PASS;
 
-	camera *pCamera = GetCamera();
+	stereocamera* pCamera = GetCamera();
 	float radius = 2.0f;
 
 	float ptX = -radius*sin(angle*M_PI / 180.0f);

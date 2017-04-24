@@ -10,6 +10,9 @@
 
 #include "DreamAppManager.h"
 
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/ProgramNode.h"
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -80,7 +83,39 @@ RESULT SandboxApp::Notify(CmdPromptEvent *event) {
 }
 
 RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	if (kbEvent->m_pSenseKeyboard) {
+		SenseVirtualKey keyCode = kbEvent->KeyCode;
+
+		if (kbEvent->KeyState) {
+			if (m_pHALImp->IsRenderProfiler() == false) {
+				if (keyCode == SVK_TAB) {
+					// quick hack to enable dream console in production but only using several tab hits
+#ifdef PRODUCTION_BUILD
+					static int hits = 0;
+					hits++;
+					if (hits > 7) {
+						m_pHALImp->SetRenderProfiler(true);
+						DreamConsole::GetConsole()->SetInForeground(true);
+					}
+#else
+					m_pHALImp->SetRenderProfiler(true);
+					DreamConsole::GetConsole()->SetInForeground(true);
+#endif // PRODUCTION_BUILD
+				}
+			}
+			else {
+				if (keyCode == SVK_TAB) {
+					m_pHALImp->SetRenderProfiler(false);
+					DreamConsole::GetConsole()->SetInForeground(false);
+				}
+			}
+		}
+	}
+
+	//Error:
+	return r;
 }
 
 RESULT SandboxApp::Notify(SenseTypingEvent *kbEvent) {
@@ -98,8 +133,8 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 			if (m_fMouseIntersectObjects) {
 				// Create ray
 				// TODO: This will only work for non-HMD camera 
-				camera *pCamera = m_pHALImp->GetCamera();
-				ray rayCamera = pCamera->GetRay(mEvent->xPos, mEvent->yPos);
+				
+				ray rayCamera = m_pCamera->GetRay(mEvent->xPos, mEvent->yPos);
 
 				// intersect ray
 				auto intersectedObjects = m_pSceneGraph->GetObjects(rayCamera);
@@ -137,10 +172,9 @@ RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
 	CR(GetSandboxWindowSize(pxWidth, pxHeight));
 	
 	if (mouseX >= 0 && mouseY >= 0 && mouseX <= pxWidth && mouseY <= pxHeight) {
-		camera *pCamera = m_pHALImp->GetCamera();
-		CN(pCamera);
-
-		rCast = pCamera->GetRay(mouseX, mouseY, t);
+		
+		CN(m_pCamera);
+		rCast = m_pCamera->GetRay(mouseX, mouseY, t);
 
 		//DEBUG_LINEOUT("mouse: (%d, %d)", mouseX, mouseY);
 		//rCast.Print();
@@ -189,6 +223,8 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	// Register Dream Console to keyboard events
 	CR(RegisterSubscriber(SVK_ALL, DreamConsole::GetConsole()));
 	CR(RegisterSubscriber(CHARACTER_TYPING, DreamConsole::GetConsole()));
+
+	CR(RegisterSubscriber(SVK_TAB, this));
 
 	//camera *pCamera = m_pHALImp->GetCamera();
 
@@ -408,14 +444,15 @@ RESULT SandboxApp::RunAppLoop() {
 		// GL functions per eye.
 		if (m_pHMD != nullptr) {
 			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
+			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_LEFT);
+			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_RIGHT);
+
 			m_pHMD->SubmitFrame();
 			m_pHMD->RenderHMDMirror();
 		}
 		else {
 			// Render Scene
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
+			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_MONO);
 		}
 		//*/
 
@@ -428,6 +465,19 @@ RESULT SandboxApp::RunAppLoop() {
 			Shutdown();
 		}
 	}
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::ResizeViewport(viewport newViewport) {
+	RESULT r = R_PASS;
+
+	// Resize the camera
+	CR(m_pCamera->ResizeCamera(newViewport));
+
+	// OpenGL Resize the view after the window had been resized
+	CRM(m_pHALImp->Resize(m_viewport), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
@@ -468,12 +518,15 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
-	m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	//m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
 
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
+
+	CRM(InitializeCamera(), "Failed to initialize Camera");
 
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
@@ -580,6 +633,123 @@ RESULT SandboxApp::InitializeDreamAppManager() {
 
 	CNM(m_pDreamAppManager, "Failed to allocate Dream App Manager");
 	CVM(m_pDreamAppManager, "Failed to validate Dream App Manager");
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializeCamera() {
+	RESULT r = R_PASS;
+
+	//m_pCamera = std::make_shared<stereocamera>(point(0.0f, 0.0f, 5.0f), m_viewport);
+
+	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), m_viewport);
+	CN(m_pCamera);
+
+Error:
+	return r;
+}
+
+// TODO: Move this to sandbox
+RESULT SandboxApp::InitializeHAL() {
+	RESULT r = R_PASS;
+
+	// Setup OpenGL and Resize Windows etc
+	//CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
+	CNM(m_pCamera, "HAL depends on camera being set up");
+
+	// Create and initialize OpenGL Imp
+	// TODO: HAL factory pattern
+	m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
+	CNM(m_pHALImp, "Failed to create HAL Implementation");
+	CVM(m_pHALImp, "HAL Implementation Invalid");
+
+	CR(m_pHALImp->SetCamera(m_pCamera));
+
+	CR(m_pHALImp->InitializeHAL());
+	CR(m_pHALImp->InitializeRenderPipeline());
+
+	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
+
+Error:
+	return r;
+}
+
+// TODO: Move this up to DreamOS
+RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
+	RESULT r = R_PASS;
+
+	SinkNode* pDestSinkNode = m_pHALImp->MakeSinkNode("display");
+	CN(pDestSinkNode);
+
+	CNM(pRenderPipeline, "Pipeline not initialized");
+	CR(pRenderPipeline->SetDestinationSinkNode(pDestSinkNode));
+
+	pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	// Source Nodes
+	// TODO: 
+
+	CR(m_pHALImp->MakeCurrentContext());
+	{
+		// Set up OGL programs
+		//std::shared_ptr<ProgramNode> pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
+		//CN(pOGLProgramShadowDepth);
+
+		// TODO(NTH): Add a program / render pipeline arch
+		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
+		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
+
+		ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("environment");
+		//ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("minimal_texture");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+
+		//ProgramNode* pSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
+		ProgramNode* pSkyboxProgram = m_pHALImp->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		//std::shared_ptr<ProgramNode> pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
+		ProgramNode* pReferenceGeometryProgram = m_pHALImp->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+
+		ProgramNode* pDreamConsoleProgram = m_pHALImp->MakeProgramNode("debugconsole");
+		CN(pDreamConsoleProgram);
+		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
+
+		// Connect Program to Display
+		
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+
+		//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		/*
+		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);
+
+		
+
+		*/
+	}
+
+	CR(m_pHALImp->ReleaseCurrentContext());
 
 Error:
 	return r;
@@ -698,7 +868,8 @@ Error:
 RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
 	RESULT r = R_PASS;
 	
-	CR(m_pHALImp->RenderToTexture(pContext));
+	CR(m_pHALImp->RenderToTexture(pContext, m_pCamera));
+
 Error:
 	return r;
 }
@@ -1041,8 +1212,8 @@ Error:
 	return r;
 }
 
-camera* SandboxApp::GetCamera() {
-	return m_pHALImp->GetCamera();
+stereocamera* SandboxApp::GetCamera() {
+	return m_pCamera;
 }
 
 point SandboxApp::GetCameraPosition() {
