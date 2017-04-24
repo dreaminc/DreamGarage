@@ -25,8 +25,9 @@ public:
 		double duration,
 		AnimationCurveType curve,
 		AnimationFlags flags,
-		std::function<RESULT(void*)> endCallback = nullptr,
-		void* callbackContext = nullptr);
+		std::function<RESULT(void*)> fnStartCallback = nullptr,
+		std::function<RESULT(void*)> fnEndCallback = nullptr,
+		void* pCallbackContext = nullptr);
 
 	RESULT CancelAnimation(VirtualObj *pObj, double startTime);
 

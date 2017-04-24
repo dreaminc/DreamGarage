@@ -43,7 +43,17 @@ RESULT AnimationQueue::Update(double sNow) {
 	return r;
 }
 
-RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endState, double startTime, double duration, AnimationCurveType curve, AnimationFlags flags, std::function<RESULT(void*)> endCallback, void* callbackContext) {
+RESULT AnimationQueue::PushAnimationItem(
+	VirtualObj *pObj, 
+	AnimationState endState, 
+	double startTime, 
+	double duration, 
+	AnimationCurveType curve, 
+	AnimationFlags flags, 
+	std::function<RESULT(void*)> fnStartCallback, 
+	std::function<RESULT(void*)> fnEndCallback, 
+	void* pCallbackContext) {
+
 	RESULT r = R_PASS;
 
 	AnimationState startState;
@@ -55,12 +65,16 @@ RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endSta
 
 	pItem->SetFlags(flags);
 	pItem->SetCurveType(curve);
-	pItem->SetAnimationEndedCallback(endCallback);
-	pItem->SetCallbackContext(callbackContext);
+	pItem->SetAnimationStartCallback(fnStartCallback);
+	pItem->SetAnimationEndedCallback(fnEndCallback);
+	pItem->SetCallbackContext(pCallbackContext);
 
 	m_objectQueue[pObj].push_back(pItem);
 
-//Error:
+	CNR(fnStartCallback, R_PASS);
+	CR(fnStartCallback(pCallbackContext));
+
+Error:
 	return r;
 }
 

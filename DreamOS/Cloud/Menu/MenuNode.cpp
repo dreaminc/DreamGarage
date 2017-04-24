@@ -63,6 +63,7 @@ std::string MenuNode::NodeTypeString(MenuNode::type nodeType) {
 	switch (nodeType) {
 		case MenuNode::type::FOLDER: return "folder"; break;
 		case MenuNode::type::FILE: return "file"; break;
+		case MenuNode::type::ACTION: return "action"; break;
 		default: return "invalid"; break;
 	}
 
@@ -78,7 +79,8 @@ MenuNode::type MenuNode::NodeTypeFromString(std::string strNodeType) {
 			return MenuNode::type::FOLDER;
 		else if (strTokens[1] == "file")
 			return MenuNode::type::FILE;
-
+		else if (strTokens[1] == "action")
+			return MenuNode::type::ACTION;
 	}
 
 	return MenuNode::type::INVALID;

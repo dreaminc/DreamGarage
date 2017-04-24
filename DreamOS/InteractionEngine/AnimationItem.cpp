@@ -10,8 +10,9 @@ AnimationItem::AnimationItem(AnimationState startState, AnimationState endState,
 	m_endState = endState;
 	m_duration = duration;
 	m_startTime = startTime;
-	fnOnAnimationEnded = nullptr;
-	fnOnAnimationEndedContext = nullptr;
+	m_fnOnAnimationStart = nullptr;
+	m_fnOnAnimationEnded = nullptr;
+	m_fnOnAnimationContext = nullptr;
 
 	Validate();
 	return;
@@ -95,19 +96,28 @@ RESULT AnimationItem::SetCurveType(AnimationCurveType type) {
 }
 
 std::function<RESULT(void*)> AnimationItem::GetAnimationEndedCallback() {
-	return fnOnAnimationEnded;
+	return m_fnOnAnimationEnded;
 }
 
 RESULT AnimationItem::SetAnimationEndedCallback(std::function<RESULT(void*)> callback) {
-	fnOnAnimationEnded = callback;
+	m_fnOnAnimationEnded = callback;
+	return R_PASS;
+}
+
+std::function<RESULT(void*)> AnimationItem::GetAnimationStartCallback() {
+	return m_fnOnAnimationStart;
+}
+
+RESULT AnimationItem::SetAnimationStartCallback(std::function<RESULT(void*)> callback) {
+	m_fnOnAnimationStart = callback;
 	return R_PASS;
 }
 
 void* AnimationItem::GetCallbackContext() {
-	return fnOnAnimationEndedContext;
+	return m_fnOnAnimationContext;
 }
 
 RESULT AnimationItem::SetCallbackContext(void* context) {
-	fnOnAnimationEndedContext = context;
+	m_fnOnAnimationContext = context;
 	return R_PASS;
 }

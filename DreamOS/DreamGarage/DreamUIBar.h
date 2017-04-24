@@ -12,6 +12,8 @@
 #include "Cloud/Menu/MenuNode.h"
 #include "Cloud/Environment/EnvironmentController.h"
 
+class UIKeyboard;
+
 class DreamUIBar : public DreamApp<DreamUIBar>, public UIBar, public MenuController::observer, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 
@@ -30,6 +32,13 @@ public:
 
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
+
+	// Animation Callbacks
+	RESULT UpdateMenu(void *pContext);
+
+	// Animations
+	RESULT HideMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
+	RESULT ShowMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
 	RESULT HandleTouchStart(void* pContext);
 	RESULT HandleTouchMove(void* pContext);
@@ -63,6 +72,8 @@ private:
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
+
+	std::shared_ptr<UIKeyboard> m_pKeyboard;
 };
 
 
