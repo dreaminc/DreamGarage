@@ -96,10 +96,7 @@ std::shared_ptr<CloudMessage> CloudMessage::CreateRequest(CloudController *pPare
 
 	pCloudMessage->m_type = CloudMessage::type::REQUEST;
 
-
 	CR(pCloudMessage->SetPayload(jsonPayload));
-
-	{auto s = pCloudMessage->GetJSONDataString(); }
 
 //Success:
 	return pCloudMessage;

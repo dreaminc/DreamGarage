@@ -71,7 +71,6 @@ RESULT AnimationQueue::PushAnimationItem(
 
 	m_objectQueue[pObj].push_back(pItem);
 
-	// TODO is this the right place to call this?
 	CNR(startCallback, R_PASS);
 	CR(startCallback(callbackContext));
 

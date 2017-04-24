@@ -149,7 +149,8 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	}
 	else {
 		m_pathStack.pop();
-		m_pKeyboard->HideKeyboard();
+		if (m_pKeyboard->IsVisible()) m_pKeyboard->HideKeyboard();
+
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
 			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
@@ -190,18 +191,12 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 				HideMenu();
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
-
-			//	if (m_pKeyboard->IsVisible()) m_pKeyboard->HideKeyboard();
-				m_pKeyboard->HideKeyboard();
-				//m_pKeyboard->SetVisible(false);
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-
-				m_pKeyboard->HideKeyboard();
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
 				HideMenu();

@@ -301,21 +301,18 @@ RESULT UIKeyboard::SetVisible(bool fVisible) {
 	return GetComposite()->SetVisible(fVisible);
 }
 
-//TODO: A good amount of code in the layout and in this function currently assumes
-// that the keyboard is a grid
+// this function assumes the key height is constant
 UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 	RESULT r = R_PASS;
 
 	point pt = manifold.GetContactPoint(0).GetPoint();
 	point ptCenter = GetComposite()->GetPosition();
-	OVERLAY_DEBUG_SET("pt", pt);
 
 	auto& keyboardLayout = m_pLayout->GetKeys();
 	int rowIndex = (pt.z() - ptCenter.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
 	CBR(rowIndex >= 0 && rowIndex < keyboardLayout.size(), R_OBJECT_NOT_FOUND);
 
 	float xPos = (pt.x() - ptCenter.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth;
-	OVERLAY_DEBUG_SET("xpo", xPos);
 	auto& row = keyboardLayout[rowIndex];
 
 	for (int i = (int)row.size() - 1; i >= 0; i--) {
