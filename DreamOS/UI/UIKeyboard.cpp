@@ -40,7 +40,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
 
-	m_typed = "";
+	m_strEnteredText = "";
 
 	m_pLayout = new UIKeyboardLayout();
 	m_pLayout->CreateQWERTYLayout();
@@ -154,9 +154,9 @@ RESULT UIKeyboard::Update(void *pContext) {
 					
 					auto key = CollisionPointToKey(manifold);
 					CNR(key, R_OBJECT_NOT_FOUND);
-					m_typed += key->m_letter;
+					m_strEnteredText += key->m_letter;
 					m_keyObjects[i] = key->m_pQuad;
-					OVERLAY_DEBUG_SET("str key", m_typed.c_str());
+					OVERLAY_DEBUG_SET("str key", m_strEnteredText.c_str());
 				}
 
 				m_keyStates[i] = ActiveObject::state::INTERSECTED;

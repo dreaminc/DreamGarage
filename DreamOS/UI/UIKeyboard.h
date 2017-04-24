@@ -70,7 +70,7 @@ private:
 	UIMallet *m_pLeftMallet;
 	UIMallet *m_pRightMallet;
 
-	std::string m_typed;
+	std::string m_strEnteredText;
 
 	ActiveObject::state m_keyStates[2];
 	std::shared_ptr<quad> m_keyObjects[2];

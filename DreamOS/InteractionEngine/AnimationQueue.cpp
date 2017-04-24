@@ -50,9 +50,9 @@ RESULT AnimationQueue::PushAnimationItem(
 	double duration, 
 	AnimationCurveType curve, 
 	AnimationFlags flags, 
-	std::function<RESULT(void*)> startCallback, 
-	std::function<RESULT(void*)> endCallback, 
-	void* callbackContext) {
+	std::function<RESULT(void*)> fnStartCallback, 
+	std::function<RESULT(void*)> fnEndCallback, 
+	void* pCallbackContext) {
 
 	RESULT r = R_PASS;
 
@@ -65,14 +65,14 @@ RESULT AnimationQueue::PushAnimationItem(
 
 	pItem->SetFlags(flags);
 	pItem->SetCurveType(curve);
-	pItem->SetAnimationStartCallback(startCallback);
-	pItem->SetAnimationEndedCallback(endCallback);
-	pItem->SetCallbackContext(callbackContext);
+	pItem->SetAnimationStartCallback(fnStartCallback);
+	pItem->SetAnimationEndedCallback(fnEndCallback);
+	pItem->SetCallbackContext(pCallbackContext);
 
 	m_objectQueue[pObj].push_back(pItem);
 
-	CNR(startCallback, R_PASS);
-	CR(startCallback(callbackContext));
+	CNR(fnStartCallback, R_PASS);
+	CR(fnStartCallback(pCallbackContext));
 
 Error:
 	return r;

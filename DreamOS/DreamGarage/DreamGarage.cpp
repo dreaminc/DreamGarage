@@ -42,7 +42,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = true;
 	SetSandboxConfiguration(sandboxconfig);
 
@@ -64,7 +64,7 @@ RESULT DreamGarage::LoadScene() {
 	HALImp::HALConfiguration halconf;
 	halconf.fRenderReferenceGeometry = false;
 	halconf.fDrawWireframe = false;
-	halconf.fRenderProfiler = true;
+	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
 	//*/
 	

@@ -248,37 +248,40 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> startCallback, std::function<RESULT(void*)> endCallback) {
+RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
 	RESULT r = R_PASS;
+
+	composite *pComposite = GetComposite();
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
-		GetComposite()->GetPosition(),
+		pComposite,
+		pComposite->GetPosition(),
 		GetInitialMenuOrientation() * quaternion::MakeQuaternionWithEuler(0.0f, (float)(M_PI_2), 0.0f),
-		GetComposite()->GetScale(),
+		pComposite->GetScale(),
 		0.5f,
 		AnimationCurveType::EASE_OUT_QUART, // may want to try ease_in here
 		AnimationFlags(),
-		startCallback,
-		endCallback,
+		fnStartCallback,
+		fnEndCallback,
 		this
 	));
 Error:
 	return r;
 }
 
-RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> startCallback, std::function<RESULT(void*)> endCallback) {
+RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
 	RESULT r = R_PASS;
 
+	composite *pComposite = GetComposite();
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
-		GetComposite()->GetPosition(),
+		pComposite,
+		pComposite->GetPosition(),
 		GetInitialMenuOrientation(),
-		GetComposite()->GetScale(),
+		pComposite->GetScale(),
 		0.5f,
 		AnimationCurveType::EASE_OUT_QUART,
 		AnimationFlags(),
-		startCallback,
-		endCallback,
+		fnStartCallback,
+		fnEndCallback,
 		this
 	));
 

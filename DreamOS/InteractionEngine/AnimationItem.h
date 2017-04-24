@@ -65,9 +65,9 @@ private:
 	AnimationState m_startState;
 	AnimationState m_endState;
 
-	std::function<RESULT(void*)> fnOnAnimationEnded;
-	std::function<RESULT(void*)> fnOnAnimationStart;
-	void* fnOnAnimationContext;
+	std::function<RESULT(void*)> m_fnOnAnimationEnded;
+	std::function<RESULT(void*)> m_fnOnAnimationStart;
+	void* m_fnOnAnimationContext;
 };
 
 #endif // ! ANIMATION_ITEM_H_

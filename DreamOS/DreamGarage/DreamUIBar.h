@@ -37,8 +37,8 @@ public:
 	RESULT UpdateMenu(void *pContext);
 
 	// Animations
-	RESULT HideMenu(std::function<RESULT(void*)> startCallback = nullptr, std::function<RESULT(void*)> endCallback = nullptr);
-	RESULT ShowMenu(std::function<RESULT(void*)> startCallback = nullptr, std::function<RESULT(void*)> endCallback = nullptr);
+	RESULT HideMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
+	RESULT ShowMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
 	RESULT HandleTouchStart(void* pContext);
 	RESULT HandleTouchMove(void* pContext);
