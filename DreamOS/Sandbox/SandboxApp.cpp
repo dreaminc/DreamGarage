@@ -715,7 +715,7 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 
 		ProgramNode *pRenderScreenQuad = m_pHALImp->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		/*
 		//ProgramNode* pSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
@@ -740,6 +740,7 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		// Connected in parallel (order matters)
 		// NOTE: Right now this won't work with mixing for example
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
 
 		/*
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));

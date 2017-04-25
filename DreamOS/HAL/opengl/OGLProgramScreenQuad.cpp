@@ -4,6 +4,8 @@
 
 #include "OpenGLImp.h"
 #include "OGLQuad.h"
+#include "OGLFramebuffer.h"
+#include "OGLTexture.h"
 
 OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglscreenquad")
@@ -36,6 +38,8 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 
 	InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, pxWidth, pxHeight, channels);
 
+	m_pTexture = m_pParentImp->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
 Error:
 	return r;
 }
@@ -62,6 +66,14 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	if(m_pOGLFramebuffer != nullptr) 
 		BindToFramebuffer(m_pOGLFramebuffer);
+
+	if (m_pOGLFramebufferInput != nullptr) {
+		OGLTexture *pTexture = (OGLTexture*)(m_pOGLFramebufferInput->GetTexture());
+		//OGLTexture *pTexture = (OGLTexture*)m_pTexture;
+		
+		pTexture->OGLActivateTexture();
+		m_pUniformTextureColor->SetUniform(pTexture);
+	}
 
 	m_pScreenQuad->Render();
 

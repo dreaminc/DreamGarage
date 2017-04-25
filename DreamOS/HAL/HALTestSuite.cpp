@@ -151,8 +151,7 @@ RESULT HALTestSuite::AddTestAlphaVolumes() {
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 		CR(pVolume->SetColor(COLOR_BLUE));
 		CR(pVolume->SetAlpha(alpha));
-		
-
+	
 
 	Error:
 		return r;

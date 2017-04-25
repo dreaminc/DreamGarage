@@ -5,6 +5,8 @@
 
 #include "Primitives/stereocamera.h"
 
+#include "OpenGLImp.h"
+
 OGLProgramMinimal::OGLProgramMinimal(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglminimal")
 {
@@ -21,6 +23,14 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+
+	// TODO: Better way
+	auto pCamera = m_pParentImp->GetCamera();
+	int pxWidth = pCamera->GetViewWidth();
+	int pxHeight = pCamera->GetViewHeight();
+	int channels = 4;
+
+	InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, pxWidth, pxHeight, channels);
 
 Error:
 	return r;
@@ -60,6 +70,8 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
+
+	UnbindFramebuffer();
 
 //Error:
 	return r;
