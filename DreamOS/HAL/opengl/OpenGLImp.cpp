@@ -212,7 +212,9 @@ RESULT OpenGLImp::Resize(viewport newViewport) {
 
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
+	SetViewport(newViewport);
 	glViewport(0, 0, (GLsizei)newViewport.Width(), (GLsizei)newViewport.Height());
+
 
 Error:
 	//CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -227,6 +229,8 @@ RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) {
 
 	// Render to screen
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	SetViewport(pxWidth, pxHeight);
 
 	switch (eye) {
 		case EYE_LEFT: {

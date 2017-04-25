@@ -31,7 +31,6 @@ private:
 
 private:
 	OGLQuad *m_pScreenQuad = nullptr;
-	texture *m_pTexture = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

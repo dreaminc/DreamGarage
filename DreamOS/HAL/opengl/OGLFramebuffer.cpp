@@ -60,6 +60,61 @@ Error:
 	return r;
 }
 
+RESULT OGLFramebuffer::InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLDepthbuffer);
+	CR(m_pOGLDepthbuffer->OGLInitializeRenderBuffer());
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::MakeOGLDepthbuffer() {
+	RESULT r = R_PASS;
+
+	m_pOGLDepthbuffer = new OGLDepthbuffer(m_pParentImp, m_width, m_height);
+	CN(m_pOGLDepthbuffer);
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::ResizeFramebuffer(int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	m_width = pxWidth;
+	m_height = pxHeight;
+
+	CR(BindOGLFramebuffer());
+
+	if (m_pOGLTexture != nullptr) {
+		delete m_pOGLTexture;
+		m_pOGLTexture = nullptr;
+		
+		CR(MakeOGLTexture());
+
+		CR(SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	}
+
+	if (m_pOGLDepthbuffer != nullptr) {
+		delete m_pOGLDepthbuffer;
+		m_pOGLDepthbuffer = nullptr;
+
+		CR(MakeOGLDepthbuffer());
+		CN(m_pOGLDepthbuffer);
+		CR(m_pOGLDepthbuffer->OGLInitializeRenderBuffer());
+	}
+
+	CR(SetOGLDrawBuffers(1));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
 OGLTexture* OGLFramebuffer::GetOGLTexture() {
 	return m_pOGLTexture;
 }
@@ -177,31 +232,11 @@ Error:
 	return r;
 }
 
-RESULT OGLFramebuffer::InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth) {
-	RESULT r = R_PASS;
-
-	CN(m_pOGLDepthbuffer);
-	CR(m_pOGLDepthbuffer->OGLInitializeRenderBuffer());
-
-Error:
-	return r;
-}
-
 RESULT OGLFramebuffer::InitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample) {
 	RESULT r = R_PASS;
 
 	CN(m_pOGLDepthbuffer);
 	CR(m_pOGLDepthbuffer->OGLInitializeRenderBufferMultisample(internalDepthFormat, typeDepth, multisample));
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::MakeOGLDepthbuffer() {
-	RESULT r = R_PASS;
-
-	m_pOGLDepthbuffer = new OGLDepthbuffer(m_pParentImp, m_width, m_height);
-	CN(m_pOGLDepthbuffer);
 
 Error:
 	return r;

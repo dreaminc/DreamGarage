@@ -96,6 +96,10 @@ RESULT OGLUniformBool::SetUniform(bool flag) {
 	return SetUniformInteger((flag)? 1 : 0);
 }
 
+RESULT OGLUniformFloat::SetUniform(float value) {
+	return SetUniformFloat(reinterpret_cast<GLfloat*>(&value));
+}
+
 RESULT OGLUniformPoint::SetUniform(point pt) {
 	return SetUniform4fv(reinterpret_cast<GLfloat*>(&pt));
 }

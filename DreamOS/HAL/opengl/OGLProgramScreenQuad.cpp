@@ -28,17 +28,7 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	m_pScreenQuad = new OGLQuad(m_pParentImp, 1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f)); // , nullptr, vNormal);
 	CN(m_pScreenQuad);
 
-	//SetFrameBuffer(m_pOGLFramebuffer, , GL_FLOAT, m_pOGLFramebuffer->GetWidth(), m_pOGLFramebuffer->GetHeight(), m_pOGLFramebuffer->GetChannels());
-
-	// TODO: Better way
-	auto pCamera = m_pParentImp->GetCamera();
-	int pxWidth = pCamera->GetViewWidth();
-	int pxHeight = pCamera->GetViewHeight();
-	int channels = 4;
-
-	InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT, pxWidth, pxHeight, channels);
-
-	m_pTexture = m_pParentImp->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 
 Error:
 	return r;
@@ -50,6 +40,7 @@ RESULT OGLProgramScreenQuad::SetupConnections() {
 	// Inputs
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebufferInput));
 
+	
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
 
@@ -64,12 +55,13 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	//glDisable(GL_CULL_FACE);
 
+	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+
 	if(m_pOGLFramebuffer != nullptr) 
 		BindToFramebuffer(m_pOGLFramebuffer);
 
 	if (m_pOGLFramebufferInput != nullptr) {
 		OGLTexture *pTexture = (OGLTexture*)(m_pOGLFramebufferInput->GetTexture());
-		//OGLTexture *pTexture = (OGLTexture*)m_pTexture;
 		
 		pTexture->OGLActivateTexture();
 		m_pUniformTextureColor->SetUniform(pTexture);

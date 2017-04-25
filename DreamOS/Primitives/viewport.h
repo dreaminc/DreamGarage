@@ -18,8 +18,8 @@ public:
 			 int pxHeight = DEFAULT_VIEWPORT_HEIGHT, 
 			 float FOVAngle = DEFAULT_VIEWPORT_FOV_ANGLE);
 
-	int Width();
-	int Height();
+	int Width() const;
+	int Height() const;
 	float FOVAngle();
 
 	RESULT ResizeViewport(int width, int height);

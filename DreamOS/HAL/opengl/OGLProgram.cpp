@@ -83,11 +83,11 @@ Error:
 RESULT OGLProgram::BindToDepthBuffer() {
 	RESULT r = R_PASS;
 
-	CR(m_pOGLFramebuffer->BindOGLDepthBuffer());
-	CR(m_pOGLFramebuffer->SetAndClearViewportDepthBuffer());
+CR(m_pOGLFramebuffer->BindOGLDepthBuffer());
+CR(m_pOGLFramebuffer->SetAndClearViewportDepthBuffer());
 
 Error:
-	return r;
+return r;
 }
 
 RESULT OGLProgram::BindToFramebuffer(OGLFramebuffer* pFramebuffer) {
@@ -97,9 +97,9 @@ RESULT OGLProgram::BindToFramebuffer(OGLFramebuffer* pFramebuffer) {
 
 	// Render to our framebuffer
 	// By default, uses the member framebuffer
-	OGLFramebuffer* pfb = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
-	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, pfb->GetFramebufferIndex()));
-	CR(pfb->SetAndClearViewport());
+	OGLFramebuffer* pOGLFramebuffer = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
+	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, pOGLFramebuffer->GetFramebufferIndex()));
+	CR(pOGLFramebuffer->SetAndClearViewport());
 
 	// Check framebuffer
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -173,6 +173,27 @@ RESULT OGLProgram::InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum
 
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UpdateFramebufferToViewport(GLenum internalDepthFormat, GLenum typeDepth, int channels) {
+	RESULT r = R_PASS;
+
+	int pxWidth = m_pParentImp->GetViewport().Width();
+	int pxHeight = m_pParentImp->GetViewport().Height();
+
+	if (m_pOGLFramebuffer != nullptr) {
+		if (m_pOGLFramebuffer->GetWidth() != pxWidth || m_pOGLFramebuffer->GetHeight() != pxHeight) {
+			return m_pOGLFramebuffer->ResizeFramebuffer(pxWidth, pxHeight);
+		}
+		else {
+			return R_PASS;
+		}
+	}
+
+	CR(InitializeFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
 
 Error:
 	return r;

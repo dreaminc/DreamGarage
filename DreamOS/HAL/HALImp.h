@@ -79,6 +79,10 @@ public:
 
 	RESULT SetHMD(HMD *pHMD);
 
+	RESULT SetViewport(const viewport &newViewport);
+	RESULT SetViewport(int pxWidth, int pxHeight);
+	const viewport& GetViewport();
+
 public:
 	RESULT InitializeRenderPipeline();
 	Pipeline* GetRenderPipelineHandle() {
@@ -158,6 +162,7 @@ public:
 protected:	
 	HMD *m_pHMD;
 	stereocamera* m_pCamera = nullptr;
+	viewport m_viewport;
 
 protected:
 	std::unique_ptr<Pipeline> m_pRenderPipeline = nullptr;
