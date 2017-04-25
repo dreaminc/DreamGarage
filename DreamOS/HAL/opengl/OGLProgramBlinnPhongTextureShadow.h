@@ -131,7 +131,9 @@ public:
 		//m_pUniformProjectionMatrix->SetUniform(matP);
 		//m_pUniformModelViewMatrix
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-
+	
+		/*
+		// TODO: This
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformHasTextureDepth->SetUniform(true);
@@ -145,6 +147,7 @@ public:
 		{
 			m_pUniformHasTextureDepth->SetUniform(false);
 		}
+		*/
 
 		return R_PASS;
 	}
@@ -160,6 +163,8 @@ public:
 		//m_pUniformModelViewMatrix->SetUniform(matM)
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
+		/*
+		// TODO: this
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformHasTextureDepth->SetUniform(true);
@@ -169,6 +174,7 @@ public:
 			pOGLProgramShadowDepth->SetDepthTexture(1);
 			m_pUniformTextureDepth->SetUniform(1);
 		}
+		*/
 
 		return R_PASS;
 	}

@@ -50,6 +50,10 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	pObjectStore->GetLights(pLights);
 
 	UseProgram();
+
+	if (m_pOGLFramebuffer != nullptr)
+		BindToFramebuffer(m_pOGLFramebuffer);
+
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());

@@ -15,19 +15,13 @@ OGLProgram::OGLProgram(OpenGLImp *pParentImp, std::string strName) :
 	m_pFragmentShader(nullptr),
 	m_versionOGL(0),
 	m_pOGLFramebuffer(nullptr),
-	m_pOGLRenderTexture(nullptr),
-	m_pOGLProgramDepth(nullptr)
+	m_pOGLRenderTexture(nullptr)
 {
 	// empty
 }
 
 OGLProgram::~OGLProgram() {
 	ReleaseProgram();
-}
-
-RESULT OGLProgram::SetOGLProgramDepth(OGLProgram *pOGLProgramDepth) {
-	m_pOGLProgramDepth = pOGLProgramDepth;
-	return R_PASS;
 }
 
 RESULT OGLProgram::ProcessNode(long frameID) {

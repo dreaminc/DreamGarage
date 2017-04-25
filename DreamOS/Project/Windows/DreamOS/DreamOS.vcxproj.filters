@@ -764,6 +764,9 @@
     <ClCompile Include="..\..\..\DreamGarage\DreamControlView.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1574,7 +1577,6 @@
     <ClInclude Include="..\..\..\HAL\FlatProgram.h">
       <Filter>HAL</Filter>
     </ClInclude>
-
     <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h">
       <Filter>UI</Filter>
     </ClInclude>
@@ -1598,6 +1600,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h">
       <Filter>DreamGarage</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1802,6 +1807,12 @@
     </None>
     <None Include="PropertySheet.props">
       <Filter>Core</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -455,7 +455,7 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcr
 
 xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" /D	
 
-	  </Command>
+  </Command>
     </PostBuildEvent>
     <PreBuildEvent>
       <Command>
@@ -685,6 +685,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimal.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLText.cpp" />
@@ -918,6 +919,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimal.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
@@ -1225,6 +1227,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\minimalTexture.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\ShadowDepth.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>

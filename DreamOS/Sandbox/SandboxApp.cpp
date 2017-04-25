@@ -700,13 +700,24 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		// TODO(NTH): Add a program / render pipeline arch
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
 		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
+		
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
+		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 
-		ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("environment");
-		//ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("minimal_texture");
+		//ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("environment");
+		ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("minimal");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
 
+		ProgramNode *pRenderScreenQuad = m_pHALImp->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		/*
 		//ProgramNode* pSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
 		ProgramNode* pSkyboxProgram = m_pHALImp->MakeProgramNode("skybox_scatter");
 		CN(pSkyboxProgram);
@@ -723,23 +734,20 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		ProgramNode* pDreamConsoleProgram = m_pHALImp->MakeProgramNode("debugconsole");
 		CN(pDreamConsoleProgram);
 		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
-
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
+		*/
 
 		// Connect Program to Display
-		
 		// Connected in parallel (order matters)
 		// NOTE: Right now this won't work with mixing for example
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		/*
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		*/
 
-		//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		
 
 		/*
 		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);

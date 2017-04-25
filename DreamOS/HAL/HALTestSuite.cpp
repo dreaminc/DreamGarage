@@ -13,10 +13,11 @@ HALTestSuite::~HALTestSuite() {
 
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
+	
+	CR(AddTestAlphaVolumes());
 
 	CR(AddTestRenderToTextureQuad());
 
-	CR(AddTestAlphaVolumes());
 	CR(AddTestFramerateVolumes());
 
 Error:

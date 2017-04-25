@@ -132,13 +132,6 @@ public:
 	GLuint GetOGLDepthbufferIndex();
 	RESULT SetDepthTexture(int textureNumber);
 
-	// TODO: Is this the right way to do it?  It's better than feeding the texture directly in
-	// This may be better with an OGLProgram hierarchy - children/dependents etc
-	RESULT SetOGLProgramDepth(OGLProgram *pOGLProgramDepth);
-
-protected:
-	OGLProgram *m_pOGLProgramDepth;
-
 public:
 	OGLFramebuffer *GetOGLFramebuffer();
 	RESULT SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
