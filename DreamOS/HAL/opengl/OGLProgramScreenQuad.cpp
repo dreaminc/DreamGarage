@@ -28,7 +28,8 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	m_pScreenQuad = new OGLQuad(m_pParentImp, 1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f)); // , nullptr, vNormal);
 	CN(m_pScreenQuad);
 
-	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
 
 Error:
 	return r;
@@ -55,16 +56,28 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	//glDisable(GL_CULL_FACE);
 
-	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	// Seems to be killing our texture
+	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 
 	if(m_pOGLFramebuffer != nullptr) 
 		BindToFramebuffer(m_pOGLFramebuffer);
 
 	if (m_pOGLFramebufferInput != nullptr) {
-		OGLTexture *pTexture = (OGLTexture*)(m_pOGLFramebufferInput->GetTexture());
-		
-		pTexture->OGLActivateTexture();
-		m_pUniformTextureColor->SetUniform(pTexture);
+		if (m_fRenderDepth) {
+			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
+			GLenum glTextureUnit = GL_TEXTURE0;
+
+			m_pParentImp->glActiveTexture(glTextureUnit);
+			m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLFramebufferInput->GetOGLDepthbufferIndex());
+
+			m_pUniformTextureColor->SetUniform(0);
+		}
+		else {
+			OGLTexture *pTexture = (OGLTexture*)(m_pOGLFramebufferInput->GetTexture());
+
+			pTexture->OGLActivateTexture();
+			m_pUniformTextureColor->SetUniform(pTexture);
+		}
 	}
 
 	m_pScreenQuad->Render();

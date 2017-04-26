@@ -258,6 +258,8 @@ RESULT OGLFramebuffer::InitializeDepthBuffer(GLenum internalDepthFormat, GLenum 
 	CN(m_pOGLDepthbuffer);
 	CR(m_pOGLDepthbuffer->OGLInitialize(internalDepthFormat, typeDepth));
 
+	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, GetOGLDepthbufferIndex(), 0));
+
 Error:
 	return r;
 }

@@ -173,6 +173,13 @@ RESULT DNode::Terminate() {
 RESULT DNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 
+	// This will reset the terminate for the node which may choose to set 
+	// it later.
+
+	// For recursive nodes, this will permeate since PreProcessNode will have 
+	// already be called 
+	m_fTerminate = false;
+
 	// TODO: Handle frameID to prevent repeated node renders
 
 	// This allows a node to process stuff before it's connections
@@ -181,13 +188,16 @@ RESULT DNode::RenderNode(long frameID) {
 	CR(PreProcessNode(frameID));
 
 	if (m_fTerminate == true) {
-		m_fTerminate = false;
 		return r;
 	}
 
 	// First Render input nodes
 	for (auto &pInputConnection : m_inputs) {
-		pInputConnection->RenderConnections(frameID + 1);
+		pInputConnection->RenderConnections(frameID);
+
+		if (m_fTerminate == true) {
+			return r;
+		}
 	}
 
 	// Pass processing over to extended node

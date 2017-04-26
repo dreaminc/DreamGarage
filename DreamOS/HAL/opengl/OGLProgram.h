@@ -144,14 +144,23 @@ protected:
 	// OGL Framebuffer
 	// This can be used to render the program to a texture / framebuffer
 	OGLFramebuffer *m_pOGLFramebuffer;
-	OGLTexture *m_pOGLRenderTexture;
-	//RESULT BindToFrameBuffer();
 	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
 	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
-	RESULT InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
+
+	RESULT InitializeFrameBufferWithDepth(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
+	
+	RESULT InitializeDepthFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
 	RESULT InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
+	
 	RESULT UpdateFramebufferToViewport(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat = GL_DEPTH_COMPONENT16, GLenum typeDepth = GL_FLOAT, int channels = 4);
 	RESULT UpdateFramebufferToViewport(GLenum internalDepthFormat = GL_DEPTH_COMPONENT16, GLenum typeDepth = GL_FLOAT, int channels = 4);
+
+	// Render Texture
+	OGLTexture *m_pOGLRenderTexture;
+	RESULT InitializeRenderTexture(OGLTexture*&pOGLRenderTexture, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 	// Shaders
 	OGLVertexShader *m_pVertexShader;

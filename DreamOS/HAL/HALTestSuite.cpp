@@ -136,7 +136,7 @@ RESULT HALTestSuite::AddTestAlphaVolumes() {
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 1.0f));
 		CR(pVolume->SetColor(COLOR_WHITE));
 		CR(pVolume->SetAlpha(alpha));
 		

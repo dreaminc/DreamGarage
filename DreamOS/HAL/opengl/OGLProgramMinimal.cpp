@@ -24,7 +24,10 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
-	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//InitializeFrameBufferWithDepth(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//InitializeDepthFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	InitializeDepthToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024);
 
 Error:
 	return r;
@@ -53,7 +56,7 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 
 	UseProgram();
 

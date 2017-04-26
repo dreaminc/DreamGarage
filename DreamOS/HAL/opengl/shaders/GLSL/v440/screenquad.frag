@@ -19,8 +19,11 @@ uniform vec4 u_vec4BackgroundColor;
 void main(void) {  
 	// Look up texture by coord
 	vec4 color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
+	
+	//float param = color.x;
 
 	// Add to background color
 	//out_vec4Color = color + u_vec4BackgroundColor * DataIn.color.a;
-	out_vec4Color = color + vec4(0.2f);
+	//out_vec4Color = vec4(param, param, param, 1.0f);
+	out_vec4Color = color;
 }

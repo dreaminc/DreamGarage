@@ -14,6 +14,8 @@ class ObjectStore;
 class stereocamera;
 class OGLQuery;
 
+#define MAX_DEPTH_PEEL_LAYERS 4
+
 class OGLProgramDepthPeel : public OGLProgram {
 public:
 	OGLProgramDepthPeel(OpenGLImp *pParentImp);

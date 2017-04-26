@@ -31,6 +31,7 @@ private:
 
 private:
 	OGLQuad *m_pScreenQuad = nullptr;
+	bool m_fRenderDepth = true;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

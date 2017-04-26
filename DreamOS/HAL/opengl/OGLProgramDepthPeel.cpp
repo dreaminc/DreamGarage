@@ -31,8 +31,11 @@ RESULT OGLProgramDepthPeel::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
 
-	UpdateFramebufferToViewport(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
-	UpdateFramebufferToViewport(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//CR(InitializeDepthToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT));
+
+	InitializeFrameBufferWithDepth(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	InitializeFrameBufferWithDepth(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
 
 	m_pOGLQuery = new OGLQuery(m_pParentImp);
 	CN(m_pOGLQuery);
@@ -71,11 +74,7 @@ RESULT OGLProgramDepthPeel::SetupConnections() {
 	CR(MakeOutput<OGLFramebuffer>("output_framebufferB", m_pOGLFramebufferOutputB));
 
 	// The render output
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
-
-	// Update buffers as needed
-	UpdateFramebufferToViewport(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
-	UpdateFramebufferToViewport(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));	
 
 Error:
 	return r;
@@ -90,24 +89,54 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 	pObjectStore->GetLights(pLights);
 
 	// Update buffers as needed
-	UpdateFramebufferToViewport(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
-	UpdateFramebufferToViewport(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	if (m_depth == 0) {
+		//UpdateFramebufferToViewport(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
+		//UpdateFramebufferToViewport(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);	
+
+		UpdateFramebufferToViewport(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	}
+
+	// Alternate buffers 
+	OGLFramebuffer *pOGLFramebufferInput = ((m_depth % 2) == 0) ? m_pOGLFramebufferInputA : m_pOGLFramebufferInputB;
+	OGLFramebuffer *pOGLFramebufferOutput = ((m_depth % 2) == 0) ? m_pOGLFramebufferOutputB : m_pOGLFramebufferOutputA;
 
 	UseProgram();
+	
+	if (pOGLFramebufferOutput != nullptr) {
+		BindToFramebuffer(pOGLFramebufferOutput);
+	}
 
-	if (m_pOGLFramebuffer != nullptr)
-		BindToFramebuffer(m_pOGLFramebuffer);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	if (m_depth == 0) {
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+	else {
+		// Disable blending and depth testing
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+	}
 
 	SetLights(pLights);
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
-	OGLFramebuffer *pOGLFramebufferInput = ((m_depth % 2) == 0) ? m_pOGLFramebufferInputA : m_pOGLFramebufferInputB;
-
 	if (pOGLFramebufferInput != nullptr) {
+		/*
 		OGLTexture *pTexture = (OGLTexture*)(pOGLFramebufferInput->GetTexture());
 
 		pTexture->OGLActivateTexture();
 		m_pUniformTextureDepth->SetUniform(pTexture);
+		*/
+
+		// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
+		GLenum glTextureUnit = GL_TEXTURE0;
+
+		//m_pParentImp->glActiveTexture(glTextureUnit);
+		//m_pParentImp->BindTexture(GL_TEXTURE_2D, pOGLFramebufferInput->GetOGLDepthbufferIndex());
+
+		//m_pUniformTextureDepth->SetUniform(0);
 	}
 
 	m_pOGLQuery->BeginQuery(GL_SAMPLES_PASSED_ARB);
@@ -117,10 +146,20 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 
 	m_pOGLQuery->EndQuery(GL_SAMPLES_PASSED_ARB);
 
+	// TODO: Blending here
+
 	GLuint samples;
 	m_pOGLQuery->GetQueryObject(&samples);
-	if (samples == 0) {
+
+	//if (samples == 0 || m_depth >= MAX_DEPTH_PEEL_LAYERS) {
+	if (samples == 0 || m_depth == 1 ) {
+		// TODO: This might not be the best way to do this
+		// we kind of want a "stack frame" object potentially 
+		m_depth = 0;
 		Terminate();
+	}
+	else {
+		m_depth++;
 	}
 
 	UnbindFramebuffer();
