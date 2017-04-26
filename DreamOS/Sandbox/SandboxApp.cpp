@@ -707,11 +707,21 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
 		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
 
-		//ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("environment");
-		ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("minimal");
+		/*
+		ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("environment");
+		//ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("depthpeel");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+		*/
+
+		ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("depthpeel");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+
+		CR(pRenderProgramNode->ConnectToInput("input_framebufferA", pRenderProgramNode->Output("output_framebufferA")));
+		CR(pRenderProgramNode->ConnectToInput("input_framebufferB", pRenderProgramNode->Output("output_framebufferB")));
 
 		ProgramNode *pRenderScreenQuad = m_pHALImp->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);

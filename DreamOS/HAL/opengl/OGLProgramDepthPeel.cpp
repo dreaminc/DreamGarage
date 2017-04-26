@@ -10,6 +10,8 @@
 #include "OGLTexture.h"
 #include "OGLQuery.h"
 
+#include "HAL/opengl/GL/glext.h"
+
 OGLProgramDepthPeel::OGLProgramDepthPeel(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "ogldepthpeel")
 {
@@ -61,12 +63,19 @@ RESULT OGLProgramDepthPeel::SetupConnections() {
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
-	CR(MakeOutput<OGLFramebuffer>("input_framebufferA", m_pOGLFramebufferInputA));
-	CR(MakeOutput<OGLFramebuffer>("input_framebufferB", m_pOGLFramebufferInputB));
+	CR(MakeInput<OGLFramebuffer>("input_framebufferA", &m_pOGLFramebufferInputA));
+	CR(MakeInput<OGLFramebuffer>("input_framebufferB", &m_pOGLFramebufferInputB));
 
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebufferA", m_pOGLFramebufferOutputA));
 	CR(MakeOutput<OGLFramebuffer>("output_framebufferB", m_pOGLFramebufferOutputB));
+
+	// The render output
+	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+
+	// Update buffers as needed
+	UpdateFramebufferToViewport(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	UpdateFramebufferToViewport(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);
 
 Error:
 	return r;
@@ -101,8 +110,18 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		m_pUniformTextureDepth->SetUniform(pTexture);
 	}
 
+	m_pOGLQuery->BeginQuery(GL_SAMPLES_PASSED_ARB);
+
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
+
+	m_pOGLQuery->EndQuery(GL_SAMPLES_PASSED_ARB);
+
+	GLuint samples;
+	m_pOGLQuery->GetQueryObject(&samples);
+	if (samples == 0) {
+		Terminate();
+	}
 
 	UnbindFramebuffer();
 

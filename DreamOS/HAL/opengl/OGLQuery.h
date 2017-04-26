@@ -23,9 +23,15 @@ public:
 
 	RESULT OGLInitialize();
 
+	RESULT BeginQuery(GLenum target);
+	RESULT EndQuery(GLenum target);
+
+	RESULT GetQueryObject(GLuint *pValue);
+
 private:
 	OpenGLImp *m_pParentImp = nullptr;
 	GLuint m_queryID;
+	bool m_fPendingQuery = false;
 };
 
 #endif // ! OGL_QUERY_H_
