@@ -4,7 +4,7 @@
 // This is a minimal shader that simply displays
 // a vertex color and position (no lighting, no textures)
 
-#version 400 core
+#version 440 core
 
 layout (location = 0) in vec4 inV_vec4Position;
 layout (location = 1) in vec4 inV_vec4Color;

@@ -1559,6 +1559,82 @@ Error:
 	return r;
 }
 
+// Queries
+RESULT OpenGLImp::glGenQueries(GLsizei n, GLuint *ids) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGenQueries(n, ids);
+	CRM(CheckGLError(), "glGenQueries failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDeleteQueries(GLsizei n, const GLuint *ids) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteQueries(n, ids);
+	CRM(CheckGLError(), "glDeleteQueries failed");
+
+Error:
+	return r;
+}
+
+bool OpenGLImp::glIsQuery(GLuint id) {
+	return (m_OpenGLExtensions.glIsQuery(id) != 0);
+}
+
+RESULT OpenGLImp::glBeginQuery(GLenum target, GLuint id) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBeginQuery(target, id);
+	CRM(CheckGLError(), "glBeginQuery failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glEndQuery(GLenum target) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glEndQuery(target);
+	CRM(CheckGLError(), "glEndQuery failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryiv(GLenum target, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryiv(target, pname, params);
+	CRM(CheckGLError(), "glGetQueryiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryObjectiv(id, pname, params);
+	CRM(CheckGLError(), "glGetQueryObjectiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryObjectuiv(id, pname, params);
+	CRM(CheckGLError(), "glGetQueryObjectuiv failed");
+
+Error:
+	return r;
+}
+
+
 RESULT OpenGLImp::wglSwapIntervalEXT(int interval) {
 	RESULT r = R_PASS;
 

@@ -218,6 +218,16 @@ public:
 	RESULT TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
 	RESULT glGenerateMipmap(GLenum target);
 
+	// Queries
+	RESULT glGenQueries(GLsizei n, GLuint *ids);
+	RESULT glDeleteQueries(GLsizei n, const GLuint *ids);
+	bool glIsQuery(GLuint id);
+	RESULT glBeginQuery(GLenum target, GLuint id);
+	RESULT glEndQuery(GLenum target);
+	RESULT glGetQueryiv(GLenum target, GLenum pname, GLint *params);
+	RESULT glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params);
+	RESULT glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params);
+
 public:
 	RESULT CheckGLError();
 	//char* GetInfoLog();

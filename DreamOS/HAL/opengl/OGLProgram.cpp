@@ -178,7 +178,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgram::UpdateFramebufferToViewport(GLenum internalDepthFormat, GLenum typeDepth, int channels) {
+RESULT OGLProgram::UpdateFramebufferToViewport(OGLFramebuffer *pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels) {
 	RESULT r = R_PASS;
 
 	int pxWidth = m_pParentImp->GetViewport().Width();
@@ -186,21 +186,26 @@ RESULT OGLProgram::UpdateFramebufferToViewport(GLenum internalDepthFormat, GLenu
 
 	if (m_pOGLFramebuffer != nullptr) {
 		if (m_pOGLFramebuffer->GetWidth() != pxWidth || m_pOGLFramebuffer->GetHeight() != pxHeight) {
-			return m_pOGLFramebuffer->ResizeFramebuffer(pxWidth, pxHeight);
+			return pOGLFramebuffer->ResizeFramebuffer(pxWidth, pxHeight);
 		}
 		else {
 			return R_PASS;
 		}
 	}
 
-	CR(InitializeFrameBuffer(internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
+	CR(InitializeFrameBuffer(pOGLFramebuffer, internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
 
 Error:
 	return r;
 }
 
+RESULT OGLProgram::UpdateFramebufferToViewport(GLenum internalDepthFormat, GLenum typeDepth, int channels) {
+	return UpdateFramebufferToViewport(m_pOGLFramebuffer, internalDepthFormat, typeDepth, channels);
+}
+
 // TODO: This is not generic, hacking right now to get shadows to work first then will generalize
-RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+
+RESULT OGLProgram::InitializeFrameBuffer(OGLFramebuffer *pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
@@ -208,6 +213,10 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 
 Error:
 	return r;
+}
+
+RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
+	return InitializeFrameBuffer(m_pOGLFramebuffer, internalDepthFormat, typeDepth, pxWidth, pxHeight, channels);
 }
 
 RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer* pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {

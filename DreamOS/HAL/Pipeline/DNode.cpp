@@ -165,14 +165,29 @@ Error:
 	return r;
 }
 
+RESULT DNode::Terminate() {
+	m_fTerminate = true;
+	return R_PASS;
+}
+
 RESULT DNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 
 	// TODO: Handle frameID to prevent repeated node renders
 
+	// This allows a node to process stuff before it's connections
+	// This is used often in recursive type nodes
+	// TODO: We might want to revisit this in the future
+	CR(PreProcessNode(frameID));
+
+	if (m_fTerminate == true) {
+		m_fTerminate = false;
+		return r;
+	}
+
 	// First Render input nodes
 	for (auto &pInputConnection : m_inputs) {
-		pInputConnection->RenderConnections(frameID);
+		pInputConnection->RenderConnections(frameID + 1);
 	}
 
 	// Pass processing over to extended node

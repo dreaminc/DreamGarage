@@ -679,6 +679,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLObj.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp" />
@@ -687,6 +688,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLText.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLViewportDisplay.cpp" />
@@ -913,6 +915,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFlat.h" />
@@ -925,6 +928,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLQuery.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLSphere.h" />
@@ -1101,78 +1105,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\libcef_dll_wrapper.pdb" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\natives_blob.bin" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\snapshot_blob.bin" />
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
-      <DeploymentContent>true</DeploymentContent>
-    </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhong.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>
@@ -1203,6 +1135,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
       <DeploymentContent>true</DeploymentContent>
     </None>

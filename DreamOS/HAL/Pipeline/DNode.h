@@ -116,6 +116,11 @@ public:
 
 	RESULT RenderNode(long frameID = 0);
 	virtual RESULT ProcessNode(long frameID = 0) = 0;
+	virtual RESULT PreProcessNode(long frameID = 0) { return R_NOT_IMPLEMENTED; }
+
+	// Allows for the early termination of a path
+	// This will prevent connections from rendering / processing
+	RESULT Terminate();
 
 	template <class nodeType, class... nodeArgsTypes>
 	static nodeType* MakeNode(nodeArgsTypes&&... sinkArgs) {
@@ -140,6 +145,8 @@ private:
 private:
 	std::vector<DConnection*> m_inputs;
 	std::vector<DConnection*> m_outputs;
+
+	bool m_fTerminate = false;
 
 private:
 	std::string m_strName;
