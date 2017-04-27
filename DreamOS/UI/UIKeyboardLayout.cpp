@@ -1,8 +1,9 @@
 #include "UIKeyboardLayout.h"
+#include "Sense/SenseKeyboard.h"
 
 UIKey::UIKey() {}
 
-UIKey::UIKey(float left, float width, std::string& letter) 
+UIKey::UIKey(float left, float width, unsigned int letter) 
 {
 	m_left = left;
 	m_width = width;
@@ -33,8 +34,7 @@ RESULT UIKeyboardLayout::CreateQWERTYLayout() {
 	std::vector<std::shared_ptr<UIKey>> row;
 	float left = 0.0f;
 	for (auto c : "qwertyuiop") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
+		auto k = new UIKey(left, 0.1f, c);
 		row.emplace_back(k);
 		left += 0.1f;
 	}
@@ -44,8 +44,7 @@ RESULT UIKeyboardLayout::CreateQWERTYLayout() {
 	row.clear();
 	left = 0.05f;
 	for (auto c : "asdfghjkl") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
+		auto k = new UIKey(left, 0.1f, c);
 		row.emplace_back(k);
 		left += 0.1f;
 	}
@@ -53,21 +52,54 @@ RESULT UIKeyboardLayout::CreateQWERTYLayout() {
 	m_pLayout.emplace_back(row);
 
 	row.clear();
+	// Shift
+	left = 0.0f;
+	{
+		auto k = new UIKey(left, 0.125f, SVK_SHIFT);
+		row.emplace_back(k);
+	}
+	// Backspace
+	{
+		auto k = new UIKey(0.875f, 0.125f, SVK_BACK);
+		row.emplace_back(k);
+	}
+
 	left = 0.15f;
 	for (auto c : "zxcvbnm") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
+		auto k = new UIKey(left, 0.1f, c);
 		row.emplace_back(k);
 		left += 0.1f;
 	}
+
+
 	row.pop_back();
 	m_pLayout.emplace_back(row);
 
 	row.clear();
-	left = 0.25f;
+	left = 0.0f;
 	{
-		std::string ch = " ";
-		auto k = new UIKey(left, 0.35f, ch);
+		//TODO: using unused values for keys not defined by ascii
+		auto k = new UIKey(left, 0.125f, SVK_CONTROL); // Number layer
+		row.emplace_back(k);
+		left += 0.125f;
+
+		k = new UIKey(left, 0.125f, SVK_PRIOR); // www.
+		row.emplace_back(k);
+		left += 0.125f;
+
+		left += 0.1f;
+
+		k = new UIKey(left, 0.35f, SVK_SPACE);
+	//	auto k = new UIKey(left, 0.1f, ch);
+		row.emplace_back(k);
+
+		left += 0.35f;
+		k = new UIKey(left, 0.125f, '.');
+		row.emplace_back(k);
+
+		// 'go' or 'enter'
+		left += 0.15f;
+		k = new UIKey(left, 0.15f, SVK_RETURN);
 		row.emplace_back(k);
 	}
 	m_pLayout.emplace_back(row);

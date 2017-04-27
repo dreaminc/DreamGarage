@@ -90,7 +90,13 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
-	
+
+	m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
+
+	auto s = (SenseKeyboard*)m_pKeyboard.get();
+	auto pub = (Publisher<SenseVirtualKey, SenseKeyboardEvent>*)s;
+
+	CR(pub->RegisterSubscriber(SVK_ALL, m_pSandbox->GetInteractionEngineProxy()));
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
@@ -298,6 +304,10 @@ RESULT DreamOS::SetSandboxConfiguration(SandboxApp::configuration sandboxconf) {
 
 const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
 	return m_pSandbox->GetSandboxConfiguration();
+}
+
+std::shared_ptr<UIKeyboard> DreamOS::GetKeyboard() {
+	return m_pKeyboard;
 }
 
 // Physics Engine

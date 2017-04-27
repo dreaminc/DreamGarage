@@ -6,6 +6,8 @@
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/WebBrowserController.h"
 
+#include "Cloud/Environment/EnvironmentAsset.h"
+
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
 {
@@ -139,6 +141,9 @@ RESULT DreamBrowser::Update(void *pContext) {
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Update());
 	}
+	else {
+		SetVisible(false);
+	}
 
 	//CR(GetDOS()->UpdateInteractionPrimitive(GetHandRay()));
 
@@ -199,18 +204,20 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 	switch (pEvent->m_eventType) {
 		case ELEMENT_INTERSECT_BEGAN: {
-			m_pPointerCursor->SetVisible(true);
+			if (m_pBrowserQuad->IsVisible()) {
+				m_pPointerCursor->SetVisible(true);
 
-			WebBrowserMouseEvent webBrowserMouseEvent;
+				WebBrowserMouseEvent webBrowserMouseEvent;
 
-			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
+				webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
 
-			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
+				CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
 
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-			m_fBrowserActive = true;
+				m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+				m_fBrowserActive = true;
 
-			fUpdateMouse = true;
+				fUpdateMouse = true;
+			}
 		} break;
 
 		case ELEMENT_INTERSECT_ENDED: {
@@ -281,7 +288,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 		// Keyboard
 		// TODO: Should be a "typing manager" in between?
-		case INTERACTION_EVENT_KEY_UP: 
+		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
 
@@ -289,7 +296,14 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 				m_fShiftDown = fKeyDown;
 
 			char chKey = (char)(pEvent->m_value);
-			
+		
+			if (pEvent->m_value == SVK_RETURN) {
+				if (!IsVisible()) 
+					SetURI(m_strEntered.m_string);
+				SetVisible(true);
+				m_strEntered.m_string.clear();
+			}
+
 			if (m_fShiftDown) {
 				switch (chKey) {
 				case '0': chKey = ')'; break;
@@ -310,12 +324,15 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			}
 
 			CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
+			m_strEntered.UpdateString(chKey);
+			OVERLAY_DEBUG_SET("bstr", m_strEntered.m_string.c_str());
 		} break;
 	}
 
 	// First point of contact
 	if (fUpdateMouse) {
-		m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
+		if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin())
+			m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
 	}
 
 Error:
@@ -402,8 +419,28 @@ Error:
 	return r;
 }
 
+bool DreamBrowser::IsVisible() {
+	return m_pBrowserQuad->IsVisible();
+}
+
 RESULT DreamBrowser::SetVisible(bool fVisible) {
-	return m_pBrowserQuad->SetVisible(fVisible);
+	RESULT r = R_PASS;
+	CR(m_pBrowserQuad->SetVisible(fVisible));
+	CR(m_pPointerCursor->SetVisible(fVisible));
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	if (pEnvironmentAsset != nullptr) {
+		std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
+		CR(SetURI(strEnvironmentAssetURI));
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamBrowser::SetURI(std::string strURI) {

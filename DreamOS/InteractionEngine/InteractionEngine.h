@@ -41,7 +41,7 @@ enum class AnimationCurveType;
 
 class SandboxApp;
 
-class InteractionEngineProxy {
+class InteractionEngineProxy : public Subscriber<SenseKeyboardEvent> {
 public:
 	// Animation functions
 	virtual RESULT PushAnimationItem(VirtualObj *pObj,
@@ -60,6 +60,10 @@ public:
 	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject) = 0;
 	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject) = 0;
 	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState) = 0;
+
+	virtual RESULT Notify(SenseKeyboardEvent *pEvent) = 0;
+
+	virtual point GetInteractionRayOrigin() = 0;
 };
 
 
@@ -68,7 +72,7 @@ class InteractionEngine : public valid,
 	public Publisher<InteractionEventType, InteractionObjectEvent>,
 	public Subscriber<SenseControllerEvent>,
 	public Subscriber<SenseMouseEvent>,
-	public Subscriber<SenseKeyboardEvent>,		// TODO: This is redundant, both can be one event
+	//public Subscriber<SenseKeyboardEvent>,		// TODO: This is redundant, both can be one event
 	public Subscriber<SenseTypingEvent>
 {
 
@@ -124,6 +128,7 @@ public:
 	RESULT RegisterSenseMouse();
 	RESULT RegisterSenseKeyboard();
 
+	virtual point GetInteractionRayOrigin() override;
 	RESULT UpdateInteractionRay();
 
 	InteractionEngineProxy *GetInteractionEngineProxy();

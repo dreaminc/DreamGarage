@@ -12,8 +12,6 @@
 #include "Cloud/Menu/MenuNode.h"
 #include "Cloud/Environment/EnvironmentController.h"
 
-class UIKeyboard;
-
 class DreamUIBar : public DreamApp<DreamUIBar>, public UIBar, public MenuController::observer, public Subscriber<InteractionObjectEvent> {
 	friend class DreamAppManager;
 
@@ -72,8 +70,6 @@ private:
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
-
-	std::shared_ptr<UIKeyboard> m_pKeyboard;
 };
 
 

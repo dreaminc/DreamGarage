@@ -40,8 +40,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
 
-	m_strEnteredText = "";
-
 	m_pLayout = new UIKeyboardLayout();
 	m_pLayout->CreateQWERTYLayout();
 	InitializeQuadsWithLayout();
@@ -71,7 +69,10 @@ RESULT UIKeyboard::InitializeQuadsWithLayout() {
 			auto keyBack = pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
 			keyBack->SetColorTexture(m_pKeyTexture.get());
 
-			pQuadTextures->AddText(m_pFont, key->m_letter, 0.2f, true);
+			std::string ch = "";
+			if (key->m_letter > 0x21) ch = key->m_letter;
+
+			pQuadTextures->AddText(m_pFont, ch, 0.2f, true);
 			GetDOS()->RenderToTexture(pQuadTextures);
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(keyDimension, keyDimension);
@@ -81,7 +82,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout() {
 			float rowCount = (float)layout.size();
 			float zPos = (m_surfaceHeight / rowCount) * (rowIndex - (rowCount / 2.0f) + 0.5f);
 
-			float xPos = m_surfaceWidth * key->m_left + (key->m_width / 2.0f) - (m_surfaceWidth / 2.0f);
+			float xPos = m_surfaceWidth * key->m_left - (m_surfaceWidth / 2.0f) +(key->m_width / 4.0f);
 
 			pQuad->SetPosition(point(xPos, 0.01f, zPos) + m_pSurface->GetPosition());
 			pQuad->SetMaterialAmbient(0.75f);
@@ -154,21 +155,25 @@ RESULT UIKeyboard::Update(void *pContext) {
 					
 					auto key = CollisionPointToKey(manifold);
 					CNR(key, R_OBJECT_NOT_FOUND);
-					m_strEnteredText += key->m_letter;
-					m_keyObjects[i] = key->m_pQuad;
-					OVERLAY_DEBUG_SET("str key", m_strEnteredText.c_str());
+
+					CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
+
+					m_strEnteredText.UpdateString(key->m_letter);
+					m_keyObjects[i] = key;
+					OVERLAY_DEBUG_SET("str key", m_strEnteredText.m_string.c_str());
 				}
 
 				m_keyStates[i] = ActiveObject::state::INTERSECTED;
 				CNR(m_keyObjects[i], R_OBJECT_NOT_FOUND);
 
-				point ptPosition = m_keyObjects[i]->GetPosition();
+				auto pObj = m_keyObjects[i]->m_pQuad;
+				point ptPosition = pObj->GetPosition();
 				GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 
-					m_keyObjects[i].get(),
+					pObj.get(),
 					point(ptPosition.x(), -0.025f, ptPosition.z()),
-					m_keyObjects[i]->GetOrientation(),
-					m_keyObjects[i]->GetScale(),
+					pObj->GetOrientation(),
+					pObj->GetScale(),
 					0.1f,
 					AnimationCurveType::EASE_OUT_QUAD,
 					AnimationFlags()
@@ -179,17 +184,19 @@ RESULT UIKeyboard::Update(void *pContext) {
 			m_keyStates[i] = ActiveObject::state::NOT_INTERSECTED;
 			if (m_keyObjects[i] != nullptr) {
 
-				point ptPosition = m_keyObjects[i]->GetPosition();
+				auto pObj = m_keyObjects[i]->m_pQuad;
+				point ptPosition = pObj->GetPosition();
 				GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-					m_keyObjects[i].get(),
+					pObj.get(),
 					point(ptPosition.x(), 0.01f, ptPosition.z()),
-					m_keyObjects[i]->GetOrientation(),
-					m_keyObjects[i]->GetScale(),
+					pObj->GetOrientation(),
+					pObj->GetScale(),
 					0.1f,
 					AnimationCurveType::EASE_OUT_QUAD,
 					AnimationFlags()
 				);
 
+				CR(UpdateKeyState((SenseVirtualKey)(m_keyObjects[i]->m_letter), 0));
 				m_keyObjects[i] = nullptr;
 			}
 		}
@@ -206,21 +213,6 @@ RESULT UIKeyboard::Shutdown(void *pContext) {
 UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	UIKeyboard *pUIKeyboard = new UIKeyboard(pDreamOS, pContext);
 	return pUIKeyboard;
-}
-
-//TODO:
-//The collision information needed for the keyboard is currently deeper
-//than what InteractionObjectEvents offer.  
-//A future InteractionEngine solution has potential to be cleaner arch.
-RESULT UIKeyboard::Notify(InteractionObjectEvent *oEvent) {
-	
-	switch (oEvent->m_eventType) {
-	case ELEMENT_INTERSECT_ENDED: {
-//		m_pTyped->SetText(m_pTyped->GetText() + 'a', 1.0f);
-	} break;
-	}
-
-	return R_PASS;
 }
 
 RESULT UIKeyboard::ShowKeyboard() {
@@ -317,7 +309,7 @@ UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 
 	for (int i = (int)row.size() - 1; i >= 0; i--) {
 		auto k = row[i];
-		float pos = xPos - (k->m_width / 2.0f);
+		float pos = xPos;// -(k->m_width / 2.0f);
 		if (k->m_left <= pos) {
 			CBR(k->m_left + k->m_width >= pos, R_OBJECT_NOT_FOUND);
 			return k.get();
@@ -326,6 +318,21 @@ UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 
 Error:
 	return nullptr;
+}
+
+RESULT UIKeyboard::UpdateKeyStates() {
+	RESULT r = R_PASS;
+	CB((GetKeyboardState(m_KeyStates)));
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::UpdateKeyState(SenseVirtualKey key, uint8_t keyState) {
+	return SetKeyState(key, keyState);
+}
+
+RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT UIKeyboard::UpdateViewQuad() {

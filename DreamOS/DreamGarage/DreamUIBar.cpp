@@ -32,8 +32,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	DreamOS *pDreamOS = GetDOS();
 
-	m_pKeyboard = pDreamOS->LaunchDreamApp<UIKeyboard>(this);
-
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
 
@@ -140,6 +138,10 @@ Error:
 
 RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	RESULT r = R_PASS;
+
+	auto pKeyboard = GetDOS()->GetKeyboard();
+	CN(pKeyboard);
+
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
 
@@ -149,7 +151,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	}
 	else {
 		m_pathStack.pop();
-		if (m_pKeyboard->IsVisible()) m_pKeyboard->HideKeyboard();
+		if (pKeyboard->IsVisible()) pKeyboard->HideKeyboard();
 
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
@@ -202,7 +204,7 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 				HideMenu();
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
-				m_pKeyboard->ShowKeyboard();
+				GetDOS()->GetKeyboard()->ShowKeyboard();
 			}
 		}
 	}

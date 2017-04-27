@@ -56,7 +56,7 @@ RESULT InteractionEngine::RegisterSenseKeyboard() {
 	// Register Dream Console to keyboard events
 	CR(m_pSandbox->RegisterSubscriber(SVK_ALL, this));
 	CR(m_pSandbox->RegisterSubscriber(CHARACTER_TYPING, this));
-
+	
 Error:
 	return r;
 }
@@ -187,6 +187,10 @@ RESULT InteractionEngine::CancelAnimation(VirtualObj *pObj) {
 	CR(m_pObjectQueue->CancelAnimation(pObj, msNow));
 Error:
 	return r;
+}
+
+point InteractionEngine::GetInteractionRayOrigin() {
+	return m_pInteractionRay->GetOrigin();
 }
 
 // TODO: Tidy up / test this code

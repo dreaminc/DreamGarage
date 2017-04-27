@@ -38,6 +38,8 @@
 
 #include "DreamAppManager.h"
 
+#include "UI/UIKeyboard.h"
+
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
 	public valid 
@@ -200,6 +202,13 @@ protected:
 
 private:
 	SandboxApp *m_pSandbox;
+
+// System Applications
+public:
+	std::shared_ptr<UIKeyboard> GetKeyboard();
+
+private:
+	std::shared_ptr<UIKeyboard> m_pKeyboard;
 
 private:
 	version m_versionDreamOS;

@@ -20,6 +20,8 @@
 
 #include "Sense/SenseController.h"
 
+#include "Primitives/TextEntryString.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
@@ -65,8 +67,10 @@ public:
 
 	RESULT UpdateViewQuad();
 
+	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
+	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetURI(std::string strURI);
 
 	RESULT SetScrollFactor(int scrollFactor);
@@ -96,6 +100,8 @@ private:
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
 	bool m_fShiftDown = false;
+
+	TextEntryString m_strEntered;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_
