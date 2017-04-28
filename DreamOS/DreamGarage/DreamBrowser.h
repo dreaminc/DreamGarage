@@ -53,6 +53,7 @@ public:
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
 
+	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
 	RESULT SetDiagonalSize(float diagonalSize);
 	RESULT SetNormalVector(vector vNormal);

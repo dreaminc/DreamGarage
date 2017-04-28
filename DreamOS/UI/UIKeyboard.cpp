@@ -139,6 +139,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	int i = 0;
 	for (auto &mallet : { m_pLeftMallet->GetMalletHead(), m_pRightMallet->GetMalletHead() })
 	{
+		//GetDOS()->GetInteractionEngineProxy()->
 		CollisionManifold manifold = m_pSurface->Collide(mallet);
 
 		pObj = manifold.GetObjectA();

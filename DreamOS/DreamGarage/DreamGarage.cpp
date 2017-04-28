@@ -163,6 +163,8 @@ RESULT DreamGarage::LoadScene() {
 	m_pDreamBrowser->SetDiagonalSize(10.0f);
 	
 	m_pDreamBrowser->SetVisible(false);
+	//m_pDreamBrowser->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, 1.7f, vector(0.0f, 0.0f, 1.0f));
+	//m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, 0.0f));
 	//*/
 /*
 	m_pDreamContentView = LaunchDreamApp<DreamContentView>(this);

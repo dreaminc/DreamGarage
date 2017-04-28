@@ -507,8 +507,9 @@ RESULT InteractionEngine::Notify(SenseKeyboardEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	// Pass through keyboard input
+
 	///*
-	for (auto &pObject : m_activeObjects) {
+//	for (auto &pObject : m_activeObjects) {
 		InteractionEventType type;
 
 		if (pEvent->KeyState == 0)
@@ -516,11 +517,12 @@ RESULT InteractionEngine::Notify(SenseKeyboardEvent *pEvent) {
 		else
 			type = INTERACTION_EVENT_KEY_DOWN;
 
-		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, nullptr);
+		//InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
 		interactionEvent.SetValue((int)(pEvent->KeyCode));
 
 		CR(NotifySubscribers(type, &interactionEvent));
-	}
+//	}
 	//*/
 	CR(r);
 

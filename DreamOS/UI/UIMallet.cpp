@@ -5,7 +5,7 @@ UIMallet::UIMallet(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
 	m_pHead = m_pDreamOS->AddSphere(0.02f, 10.0f, 10.0f);
-	m_pDreamOS->AddInteractionObject(m_pHead);
+	//m_pDreamOS->AddInteractionObject(m_pHead);
 	m_pHead->SetVisible(false);
 	m_headOffset = point(0.0f, 0.0f, -0.2f);
 }

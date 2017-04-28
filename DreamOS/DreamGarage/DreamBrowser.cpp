@@ -339,6 +339,10 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::SetPosition(point ptPosition) {
+	GetComposite()->SetPosition(ptPosition);
+	return R_PASS;
+}
 
 RESULT DreamBrowser::SetAspectRatio(float aspectRatio) {
 	m_aspectRatio = aspectRatio;
