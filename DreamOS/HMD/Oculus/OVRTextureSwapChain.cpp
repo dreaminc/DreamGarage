@@ -71,12 +71,12 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 	m_pOGLResolveFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
 	CR(m_pOGLResolveFramebuffer->MakeOGLDepthbuffer());
 	CR(m_pOGLResolveFramebuffer->OGLInitialize());
-	CR(m_pOGLResolveFramebuffer->InitializeDepthBuffer());
+	CR(m_pOGLResolveFramebuffer->InitializeDepthAttachment());
 
 	// Set up render FBO
 	m_pOGLRenderFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
 	CR(m_pOGLRenderFramebuffer->OGLInitialize());
-	CR(m_pOGLRenderFramebuffer->BindOGLFramebuffer());
+	CR(m_pOGLRenderFramebuffer->Bind());
 	CR(m_pOGLRenderFramebuffer->MakeOGLDepthbuffer());
 	CR(m_pOGLRenderFramebuffer->InitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OVR_MULTI_SAMPLE));
 	CR(m_pOGLRenderFramebuffer->MakeOGLTextureMultisample());
@@ -142,7 +142,7 @@ RESULT OVRTextureSwapChain::SetAndClearRenderSurface() {
 
 	glEnable(GL_MULTISAMPLE);
 
-	m_pOGLRenderFramebuffer->BindOGLFramebuffer();
+	m_pOGLRenderFramebuffer->Bind();
 	m_pOGLRenderFramebuffer->SetAndClearViewportDepthBuffer();
 	
 
@@ -169,7 +169,7 @@ RESULT OVRTextureSwapChain::UnsetRenderSurface() {
 		// curTexId = m_textureIndex;
 	}
 
-	CR(m_pOGLResolveFramebuffer->BindOGLFramebuffer());
+	CR(m_pOGLResolveFramebuffer->Bind());
 	CR(m_pOGLResolveFramebuffer->AttachOGLTexture(currentTextureIndex));
 	CR(m_pOGLResolveFramebuffer->AttachOGLDepthbuffer());
 	CR(m_pOGLResolveFramebuffer->SetAndClearViewport());

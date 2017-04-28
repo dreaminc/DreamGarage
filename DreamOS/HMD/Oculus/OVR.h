@@ -11,7 +11,7 @@
 
 #include "HMD/HMD.h"
 #include "OVRTextureSwapChain.h"
-#include "HAL/opengl/OGLDepthbuffer.h"
+#include "HAL/opengl/OGLAttachment.h"
 
 // TODO: Better way?
 #define HMD_OVR_USE_PREDICTED_TIMING

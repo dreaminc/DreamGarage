@@ -240,15 +240,15 @@ RESULT OGLProgram::InitializeFrameBufferWithDepth(OGLFramebuffer*&pOGLFramebuffe
 		pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
 		
 		CR(pOGLFramebuffer->OGLInitialize());
-		CR(pOGLFramebuffer->BindOGLFramebuffer());
+		CR(pOGLFramebuffer->Bind());
 
 		CR(pOGLFramebuffer->MakeOGLTexture());
 		CR(pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 		CR(pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-		CR(pOGLFramebuffer->InitializeDepthBuffer(internalDepthFormat, typeDepth));
+		CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
 
-		CR(pOGLFramebuffer->SetOGLDrawBuffers(1));
+		CR(pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 
 		// Always check that our framebuffer is ok
 		CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -265,14 +265,14 @@ RESULT OGLProgram::InitializeDepthFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, G
 	CN(pOGLFramebuffer);
 
 	CR(pOGLFramebuffer->OGLInitialize());
-	CR(pOGLFramebuffer->BindOGLFramebuffer());
+	CR(pOGLFramebuffer->Bind());
 
 	CR(pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-	CR(pOGLFramebuffer->InitializeDepthBuffer(internalDepthFormat, typeDepth));
+	CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
 
 	CR(pOGLFramebuffer->SetOGLDepthbufferTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
-	CR(pOGLFramebuffer->SetOGLDrawBuffers(0));
+	CR(pOGLFramebuffer->InitializeOGLDrawBuffers(0));
 
 	// Check that our framebuffer is OK
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -287,7 +287,7 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer *pFramebuffer, GLenum internalD
 	CN(pFramebuffer);
 	
 	CR(pFramebuffer->OGLInitialize());	
-	CR(pFramebuffer->BindOGLFramebuffer());
+	CR(pFramebuffer->Bind());
 
 	CR(pFramebuffer->MakeOGLTexture());
 	CR(pFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
@@ -295,7 +295,7 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer *pFramebuffer, GLenum internalD
 
 	CR(pFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-	CR(pFramebuffer->SetOGLDrawBuffers(1));
+	CR(pFramebuffer->InitializeOGLDrawBuffers(1));
 
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));

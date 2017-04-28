@@ -770,6 +770,12 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLRenderbuffer.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLAttachment.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1032,9 +1038,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\rectangle.h">
       <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h">
-      <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h">
       <Filter>HMD\Oculus</Filter>
@@ -1611,6 +1614,12 @@
       <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuery.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLRenderbuffer.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLAttachment.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>

@@ -9,7 +9,7 @@
 // so it's possible to inspect the output of the compositor on the machine (good for debug)
 
 #include "HAL/opengl/OpenGLImp.h"
-#include "HAL/opengl/OGLDepthbuffer.h"
+#include "HAL/opengl/OGLAttachment.h"
 #include "OVR_CAPI_GL.h"
 
 #include "HAL/opengl/OGLTexture.h"
@@ -65,7 +65,7 @@ public:
 		m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, textureIndex, m_width, m_height, m_channels);
 		CN(m_pOGLFramebuffer);
 		CR(m_pOGLFramebuffer->OGLInitialize());
-		CR(m_pOGLFramebuffer->BindOGLFramebuffer());
+		CR(m_pOGLFramebuffer->Bind());
 		CR(m_pOGLFramebuffer->AttachOGLTexture(textureIndex));
 
 		CR(m_pParentImp->glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));

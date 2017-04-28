@@ -1082,6 +1082,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteRenderbuffers(n, renderbuffers);
+	CRM(CheckGLError(), "glDeleteRenderbuffers failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
 	RESULT r = R_PASS;
 

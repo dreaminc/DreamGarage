@@ -11,7 +11,7 @@
 // chain
 
 #include "HAL/opengl/OpenGLImp.h"
-#include "HAL/opengl/OGLDepthbuffer.h"
+#include "HAL/opengl/OGLAttachment.h"
 #include "OVR_CAPI_GL.h"
 
 #include "HAL/opengl/OGLTexture.h"

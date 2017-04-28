@@ -10,7 +10,7 @@
 #include "OpenGLCommon.h"
 #include "Primitives/Framebuffer.h"
 
-#include "OGLDepthbuffer.h"
+#include "OGLAttachment.h"
 
 class OpenGLImp;
 

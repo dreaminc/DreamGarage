@@ -129,6 +129,7 @@ public:
 
 	RESULT InitializeRenderToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 	RESULT InitializeDepthToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
+	
 	GLuint GetOGLDepthbufferIndex();
 	RESULT SetDepthTexture(int textureNumber);
 

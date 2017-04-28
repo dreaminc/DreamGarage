@@ -246,7 +246,6 @@ public:
 
 		CR(m_pParentImp->MakeCurrentContext());
 		CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
-		//CR(m_pParentImp->BindTexture(GL_TEXTURE_CUBE_MAP, *pTextureIndex));
 
 		for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
 			//size_t sizeSide = m_width * m_height * sizeof(unsigned char);

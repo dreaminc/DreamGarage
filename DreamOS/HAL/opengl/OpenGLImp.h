@@ -147,7 +147,9 @@ public:
 	RESULT glGenFramebuffers(GLsizei n, GLuint *framebuffers);
 	RESULT glBindFramebuffer(GLenum target, GLuint gluiFramebuffer);
 
+	// Renderbuffer
 	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);
+	RESULT glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers);
 	RESULT glBindRenderbuffer(GLenum target, GLuint renderbuffer);
 	RESULT glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
 	RESULT glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);

@@ -15,7 +15,7 @@
 // TODO: Should this go into Sense?
 
 #include "HMD/HMD.h"
-#include "HAL/opengl/OGLDepthbuffer.h"
+#include "HAL/opengl/OGLAttachment.h"
 
 #define DEFAULT_OPENVR_RENDER_CHANNELS 3
 #define DEFAULT_OPENVR_RESOLVE_CHANNELS 4

@@ -270,6 +270,10 @@ public:
 		return m_glGenRenderbuffers(n, renderbuffers);
 	}
 
+	inline void glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+		return m_glDeleteRenderbuffers(n, renderbuffers);
+	}
+
 	inline void glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
 		return m_glBindRenderbuffer(target, renderbuffer);
 	}
@@ -457,6 +461,7 @@ private:
 	PFNGLBINDFRAMEBUFFERPROC m_glBindFramebuffer;
 
 	PFNGLGENRENDERBUFFERSPROC m_glGenRenderbuffers;
+	PFNGLDELETERENDERBUFFERSPROC m_glDeleteRenderbuffers;
 	PFNGLBINDRENDERBUFFERPROC m_glBindRenderbuffer;
 	PFNGLRENDERBUFFERSTORAGEPROC m_glRenderbufferStorage;
 	PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC m_glRenderBufferStorageMultisample;

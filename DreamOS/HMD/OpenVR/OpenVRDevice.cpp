@@ -74,7 +74,7 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 
 	// RENDER
 	CR(pOGLRenderFramebuffer->OGLInitialize());
-	CR(pOGLRenderFramebuffer->BindOGLFramebuffer());
+	CR(pOGLRenderFramebuffer->Bind());
 
 	CR(pOGLRenderFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
 	CR(pOGLRenderFramebuffer->InitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OPENVR_MULTISAMPLE));
@@ -84,7 +84,7 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 
 	// RESOLVE
 	CR(pOGLResolveFramebuffer->OGLInitialize());
-	CR(pOGLResolveFramebuffer->BindOGLFramebuffer());
+	CR(pOGLResolveFramebuffer->Bind());
 
 	CR(pOGLResolveFramebuffer->MakeOGLTexture());
 	OGLTexture* pOGLTexture = pOGLResolveFramebuffer->GetOGLTexture();
@@ -631,11 +631,11 @@ RESULT OpenVRDevice::SetAndClearRenderSurface(EYE_TYPE eye) {
 	glEnable(GL_MULTISAMPLE);
 
 	if (eye == EYE_LEFT) {
-		m_pFramebufferRenderLeft->BindOGLFramebuffer();
+		m_pFramebufferRenderLeft->Bind();
 		m_pFramebufferRenderLeft->SetAndClearViewportDepthBuffer();
 	}
 	else if (eye == EYE_RIGHT) {
-		m_pFramebufferRenderRight->BindOGLFramebuffer();
+		m_pFramebufferRenderRight->Bind();
 		m_pFramebufferRenderRight->SetAndClearViewportDepthBuffer();
 	}
 
