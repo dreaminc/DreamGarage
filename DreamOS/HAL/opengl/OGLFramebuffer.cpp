@@ -58,16 +58,6 @@ OGLFramebuffer::~OGLFramebuffer() {
 	}
 }
 
-RESULT OGLFramebuffer::MakeOGLTexture() {
-	RESULT r = R_PASS;
-
-	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, m_width, m_height, m_channels);
-	CN(m_pOGLTexture);
-
-Error:
-	return r;
-}
-
 RESULT OGLFramebuffer::ResizeFramebuffer(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
@@ -76,25 +66,21 @@ RESULT OGLFramebuffer::ResizeFramebuffer(int pxWidth, int pxHeight) {
 
 	CR(Bind());
 
-	if (m_pOGLTexture != nullptr) {
+	if (m_pOGLColorAttachment != nullptr) {
 		delete m_pOGLTexture;
 		m_pOGLTexture = nullptr;
 		
 		CR(MakeOGLTexture());
-
 		CR(SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+		CR(m_pOGLColorAttachment->Resize(pxWidth, pxHeight));
 	}
 
 	if (m_pOGLDepthAttachment != nullptr) {
-		delete m_pOGLDepthAttachment;
-		m_pOGLDepthAttachment = nullptr;
-
-		CR(MakeOGLDepthbuffer());
-		CN(m_pOGLDepthAttachment);
-		CR(m_pOGLDepthAttachment->OGLInitializeRenderBuffer());
+		CR(m_pOGLDepthAttachment->Resize(pxWidth, pxHeight));
 	}
 
-	CR(InitializeOGLDrawBuffers(1));
+	//CR(InitializeOGLDrawBuffers(1));
 
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));

@@ -11,9 +11,6 @@
 
 texture::texture() :
 	m_pImageBuffer(nullptr),
-	m_width(0),
-	m_height(0),
-	m_channels(0),
 	m_type(texture::TEXTURE_TYPE::TEXTURE_INVALID)
 {
 	Validate();
@@ -21,29 +18,28 @@ texture::texture() :
 
 texture::texture(texture::TEXTURE_TYPE type) :
 	m_pImageBuffer(nullptr),
-	m_width(NULL),
-	m_height(NULL),
-	m_channels(NULL),
 	m_type(type)
 {
 	Validate();
 }
 
-texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels) :
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, int samples) :
 	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
+	m_samples(samples),
 	m_type(type)
 {
 	Validate();
 }
 
-texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) :
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples) :
 	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
+	m_samples(samples),
 	m_type(type) 
 {
 	RESULT r = R_PASS;
@@ -61,9 +57,6 @@ Error:
 // Loads from a file buffer (file loaded into buffer)
 texture::texture(texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n) :
 	m_pImageBuffer(nullptr),
-	m_width(0),
-	m_height(0),
-	m_channels(0),
 	m_type(type)
 {
 	RESULT r = R_PASS;
@@ -77,11 +70,12 @@ Error:
 	return;
 }
 
-texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) :
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n, int samples) :
 	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
+	m_samples(samples),
 	m_format(format),
 	m_type(type)
 {
@@ -98,9 +92,6 @@ Error:
 
 texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_INVALID) :
 	m_pImageBuffer(nullptr),
-	m_width(0),
-	m_height(0),
-	m_channels(0),
 	m_type(type)
 {
 	RESULT r = R_PASS;
@@ -121,9 +112,6 @@ Error:
 
 texture::texture(wchar_t *pszName, std::vector<std::wstring> cubeMapFiles) :
 	m_pImageBuffer(nullptr),
-	m_width(0),
-	m_height(0),
-	m_channels(0),
 	m_type(texture::TEXTURE_TYPE::TEXTURE_CUBE)
 {
 	RESULT r = R_PASS;

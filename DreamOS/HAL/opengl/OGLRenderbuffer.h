@@ -15,10 +15,11 @@ public:
 	~OGLRenderbuffer();
 
 	RESULT OGLInitialize();
-
-	RESULT OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample = 4);
+	RESULT OGLDelete();
 	
 	GLuint GetOGLRenderbufferIndex();
+
+	RESULT Resize(int pxWidth, int pxHeight);
 
 private:
 	OpenGLImp *m_pParentImp;

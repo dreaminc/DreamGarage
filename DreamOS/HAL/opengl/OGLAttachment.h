@@ -27,6 +27,8 @@ public:
 	GLuint GetOGLRenderbufferIndex();
 	GLuint GetOGLTextureIndex();
 
+	RESULT Resize(int pxWidth, int pxHeight);
+
 	bool HasRenderbuffer() {
 		return (m_pOGLRenderbuffer != nullptr);
 	}

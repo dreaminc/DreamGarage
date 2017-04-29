@@ -45,9 +45,9 @@ public:
 public:
 	texture();
 	texture(texture::TEXTURE_TYPE type);
-	texture(texture::TEXTURE_TYPE type, int width, int height, int channels);
-	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
-	texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, int samples = 0);
+	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
+	texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
 
 	// Loads from a file buffer (file loaded into buffer)
 	texture(texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n);
@@ -87,24 +87,17 @@ public:
 
 	double GetValueAtUV(double uValue, double vValue);
 
-	int GetWidth() {
-		return m_width;
-	}
-
-	int GetHeight() {
-		return m_height;
-	}
-
-	int GetChannels() {
-		return m_channels;
-	}
+	int GetWidth() { return m_width; }
+	int GetHeight() { return m_height; }
+	int GetChannels() { return m_channels; }
+	int GetSamples() { return m_samples; }
 
 	PixelFormat GetPixelFormat() {
 		return m_format;
 	}
 
 	RESULT SetWidth(int width) {
-		if (m_width != NULL) {
+		if (m_width != 0) {
 			return R_FAIL;
 		}
 		else {
@@ -114,7 +107,7 @@ public:
 	}
 
 	RESULT SetHeight(int height) {
-		if (m_height != NULL) {
+		if (m_height != 0) {
 			return R_FAIL;
 		}
 		else {
@@ -124,11 +117,21 @@ public:
 	}
 
 	RESULT SetChannels(int channels) {
-		if (m_channels != NULL) {
+		if (m_channels != 0) {
 			return R_FAIL;
 		}
 		else {
 			m_channels = channels;
+			return R_PASS;
+		}
+	}
+
+	RESULT SetSamples(int samples) {
+		if (m_samples != 0) {
+			return R_FAIL;
+		}
+		else {
+			m_samples = samples;
 			return R_PASS;
 		}
 	}
@@ -139,15 +142,15 @@ public:
 	}
 
 protected:
-	int m_width;
-	int m_height;
-	int m_channels;
 	PixelFormat	m_format = PixelFormat::Unspecified;
-
-	unsigned char *m_pImageBuffer;
-
-	//int m_textureNumber;
 	TEXTURE_TYPE m_type;
+
+	int m_width = 0;
+	int m_height = 0;
+	int m_channels = 0;
+	int m_samples = 0;
+
+	unsigned char *m_pImageBuffer = nullptr;
 
 private:
 	UID m_uid;

@@ -40,8 +40,23 @@ GLuint OGLAttachment ::GetOGLTextureIndex() {
 	return 0;
 }
 
+RESULT OGLAttachment::Resize(int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	if (m_pOGLTexture != nullptr) {
+		CR(m_pOGLTexture->Resize(pxWidth, pxHeight));
+	}
+
+	if (m_pOGLRenderbuffer != nullptr) {
+		CR(m_pOGLRenderbuffer->Resize(pxWidth, pxHeight));
+	}
+
+Error:
+	return r;
+}
+
 // TODO: This is a temporary approach
-RESULT OGLAttachment ::OGLInitializeRenderBuffer() {
+RESULT OGLAttachment::OGLInitializeRenderBuffer() {
 	RESULT r = R_PASS;
 
 	m_pOGLRenderbuffer = new OGLRenderbuffer(m_pParentImp, m_width, m_height, m_sampleCount);

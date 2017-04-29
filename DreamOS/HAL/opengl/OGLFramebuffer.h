@@ -38,8 +38,6 @@ public:
 	RESULT SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget);
 	RESULT SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment);
 	RESULT SetDepthTexture(int textureNumber);
-
-	RESULT MakeOGLTexture();
 	
 	RESULT MakeOGLTextureMultisample();
 	RESULT InitializeOGLDrawBuffers(int numDrawBuffers);
