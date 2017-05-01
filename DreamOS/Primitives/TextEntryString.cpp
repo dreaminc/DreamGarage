@@ -2,6 +2,10 @@
 #include "Sense/SenseKeyboard.h"
 
 RESULT TextEntryString::UpdateString(unsigned int keyCode) {
+
+	RESULT r = R_PASS;
+	CR(SetDirty());
+
 	switch (keyCode) {
 	case SVK_CONTROL:
 	case SVK_SHIFT: 
@@ -19,6 +23,7 @@ RESULT TextEntryString::UpdateString(unsigned int keyCode) {
 		m_string += keyCode;
 		break;
 	}
-	return R_PASS;
-	
+
+Error:
+	return r;
 }

@@ -31,8 +31,6 @@ public:
 		std::wstring font(L"Fonts/" + pFont->GetGlyphImageFile());
 		// Load appropriate glyph texture
 
-		#pragma message ("bad code - use const std::string")
-
 		texture *pColorTexture = new OGLTexture(pParentImp, (wchar_t*)font.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 		SetColorTexture(pColorTexture);

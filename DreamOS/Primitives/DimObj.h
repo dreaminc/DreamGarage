@@ -128,6 +128,7 @@ public:
 
 	// Children (composite objects)
 	RESULT AddChild(std::shared_ptr<DimObj> pDimObj);
+	RESULT RemoveLastChild();
 	RESULT ClearChildren();
 	bool HasChildren();
 	bool CompareParent(DimObj* pParent);

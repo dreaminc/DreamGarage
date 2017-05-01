@@ -24,6 +24,17 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	m_pSurface->SetVisible(false);
 	m_pSurface->InitializeOBB();
+//*
+	m_pTextBox = GetComposite()->AddQuad(m_surfaceHeight / 4.0f, m_surfaceWidth);
+	CN(m_pTextBox);
+	m_pTextBox->SetVisible(false);
+	m_pTextBox->SetPosition(point(0.0f, 0.01f, -m_surfaceHeight * 0.75f ));
+	m_pTextBoxTexture = GetComposite()->MakeTexture(L"Textbox-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pTextBox->SetColorTexture(m_pTextBoxTexture.get());
+//	m_pTextBoxText = std::make_shared<text>(GetDOS()->AddText(L"Basis_Grotesque_Pro.fnt", ""));
+	//*/
+
+	m_pTextBoxContainer = GetComposite()->AddComposite();
 
 	m_pLeftMallet = new UIMallet(GetDOS());
 	CN(m_pLeftMallet);
@@ -53,7 +64,7 @@ Error:
 RESULT UIKeyboard::InitializeQuadsWithLayout() {
 	RESULT r = R_PASS;
 	
-	FlatContext *pQuadTextures = GetDOS()->AddFlatContext();
+	m_pQuadTextures = GetDOS()->AddFlatContext();
 
 	auto& layout = m_pLayout->GetKeys();
 
@@ -64,19 +75,30 @@ RESULT UIKeyboard::InitializeQuadsWithLayout() {
 	int colIndex = 0;
 	for (auto& row : layout) {
 		for (auto& key : row) {
-			if (pQuadTextures->HasChildren()) pQuadTextures->ClearChildren();
 
-			auto keyBack = pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
+			// Set up text box key texture
+			if (m_pQuadTextures->HasChildren()) m_pQuadTextures->ClearChildren();
+			std::string ch = "";
+			if (key->m_letter > 0x20) ch = key->m_letter;
+
+			m_pQuadTextures->AddText(m_pFont, ch, 0.2f, true);
+			GetDOS()->RenderToTexture(m_pQuadTextures);
+
+			m_keyTextureLookup[ch] = m_pQuadTextures->GetFramebuffer()->GetTexture();
+
+			// Set up key quad texture
+			if (m_pQuadTextures->HasChildren()) m_pQuadTextures->ClearChildren();
+
+			auto keyBack = m_pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
 			keyBack->SetColorTexture(m_pKeyTexture.get());
 
-			std::string ch = "";
-			if (key->m_letter > 0x21) ch = key->m_letter;
-
-			pQuadTextures->AddText(m_pFont, ch, 0.2f, true);
-			GetDOS()->RenderToTexture(pQuadTextures);
+			m_pQuadTextures->AddText(m_pFont, ch, 0.2f, true);
+			GetDOS()->RenderToTexture(m_pQuadTextures);
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(keyDimension, keyDimension);
-			pQuad->SetColorTexture(pQuadTextures->GetFramebuffer()->GetTexture());
+			pQuad->SetColorTexture(m_pQuadTextures->GetFramebuffer()->GetTexture());
+
+			// Set up key quad positioning
 			pQuad->ScaleX(1.0f / (keyDimension / (0.5f*key->m_width)));
 
 			float rowCount = (float)layout.size();
@@ -159,9 +181,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 					CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
 
-					m_strEnteredText.UpdateString(key->m_letter);
 					m_keyObjects[i] = key;
-					OVERLAY_DEBUG_SET("str key", m_strEnteredText.m_string.c_str());
 				}
 
 				m_keyStates[i] = ActiveObject::state::INTERSECTED;
@@ -353,6 +373,35 @@ RESULT UIKeyboard::UpdateViewQuad() {
 	CR(m_pSurface->SetDirty());
 
 	CR(m_pSurface->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), m_pSurface->GetNormal()));
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::UpdateTextBox(int chkey) {
+	RESULT r = R_PASS;
+		
+	if (chkey == SVK_RETURN) {
+		CR(m_pTextBoxContainer->ClearChildren());
+	}
+
+	else if (chkey == SVK_BACK) {
+		CR(m_pTextBoxContainer->RemoveLastChild());
+	}
+
+	else {
+		float keyDimension = m_surfaceWidth / (float)m_pLayout->GetKeys()[0].size();
+		std::string ch = "";
+		ch = chkey;
+		if (m_keyTextureLookup.count(ch) > 0) {
+			auto pQuad = m_pTextBoxContainer->AddQuad(keyDimension, keyDimension);
+			CN(pQuad);
+			CR(pQuad->SetColorTexture(m_keyTextureLookup[ch]));
+			// TODO: Hardcoded positioning code here should be temporary
+			pQuad->SetPosition(point((keyDimension / 3.0f) * m_pTextBoxContainer->GetChildren().size() - (m_surfaceWidth / 2.0f), 0.011f, -m_surfaceHeight * 0.75f));
+		}
+	}
+
 
 Error:
 	return r;

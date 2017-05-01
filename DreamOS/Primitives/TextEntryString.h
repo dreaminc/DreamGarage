@@ -2,9 +2,10 @@
 #define TEXT_ENTRY_STRING_H_
 
 #include "RESULT/EHM.h"
+#include "Primitives/dirty.h"
 #include <string>
 
-class TextEntryString {
+class TextEntryString : public dirty {
 public:
 	RESULT UpdateString(unsigned int keyCode);
 

@@ -288,6 +288,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 		// Keyboard
 		// TODO: Should be a "typing manager" in between?
+		// TODO: haven't seen any issues with KEY_UP being a no-op
 		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
@@ -295,14 +296,17 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			if (pEvent->m_value == SVK_SHIFT)
 				m_fShiftDown = fKeyDown;
 
-			char chKey = (char)(pEvent->m_value);
-		
-			if (pEvent->m_value == SVK_RETURN) {
-				if (!IsVisible()) 
-					SetURI(m_strEntered.m_string);
+			else if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
 				m_strEntered.m_string.clear();
 			}
+
+			else if (pEvent->m_value == SVK_BACK) {
+				if (m_strEntered.m_string.size() > 0)
+					m_strEntered.m_string.pop_back();
+			}
+
+			char chKey = (char)(pEvent->m_value);
 
 			if (m_fShiftDown) {
 				switch (chKey) {
@@ -325,6 +329,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
 			m_strEntered.UpdateString(chKey);
+			GetDOS()->GetKeyboard()->UpdateTextBox(chKey);
 			OVERLAY_DEBUG_SET("bstr", m_strEntered.m_string.c_str());
 		} break;
 	}

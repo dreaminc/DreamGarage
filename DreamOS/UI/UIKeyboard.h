@@ -9,6 +9,7 @@
 
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
+#include "HAL/opengl/OGLText.h" // !!!
 
 #include <vector>
 #include <string>
@@ -19,6 +20,7 @@ class text;
 class Font;
 class texture;
 class CollisionManifold;
+class FlatContext;
 
 class UIKeyboard : public DreamApp<UIKeyboard>, public SenseKeyboard {
 	friend class DreamAppManager;
@@ -66,6 +68,9 @@ private:
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
+public:
+	RESULT UpdateTextBox(int chkey);
+
 private:
 	std::shared_ptr<quad> m_pSurface;
 	float m_surfaceWidth;
@@ -75,7 +80,13 @@ private:
 	UIMallet *m_pLeftMallet;
 	UIMallet *m_pRightMallet;
 
-	TextEntryString m_strEnteredText;
+	std::shared_ptr<quad> m_pTextBox;
+	std::shared_ptr<texture> m_pTextBoxTexture;
+
+	std::shared_ptr<composite> m_pTextBoxContainer;
+	std::map<std::string, texture*> m_keyTextureLookup;
+
+	FlatContext *m_pQuadTextures;
 
 	ActiveObject::state m_keyStates[2];
 	UIKey* m_keyObjects[2];

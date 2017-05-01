@@ -278,6 +278,12 @@ RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
 	return R_PASS;
 }
 
+RESULT DimObj::RemoveLastChild() {
+	if (m_pObjects != nullptr && m_pObjects->size() > 0)
+		m_pObjects->pop_back();
+	return R_PASS;
+}
+
 RESULT DimObj::ClearChildren() {
 	if (m_pObjects != nullptr)
 		m_pObjects->clear();

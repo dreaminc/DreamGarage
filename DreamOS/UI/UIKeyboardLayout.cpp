@@ -58,21 +58,22 @@ RESULT UIKeyboardLayout::CreateQWERTYLayout() {
 		auto k = new UIKey(left, 0.125f, SVK_SHIFT);
 		row.emplace_back(k);
 	}
+
+	left = 0.15f;
+	for (auto c : "zxcvbnm") {
+		if (c) {
+			auto k = new UIKey(left, 0.1f, c);
+			row.emplace_back(k);
+			left += 0.1f;
+		}
+	}
+
 	// Backspace
 	{
 		auto k = new UIKey(0.875f, 0.125f, SVK_BACK);
 		row.emplace_back(k);
 	}
 
-	left = 0.15f;
-	for (auto c : "zxcvbnm") {
-		auto k = new UIKey(left, 0.1f, c);
-		row.emplace_back(k);
-		left += 0.1f;
-	}
-
-
-	row.pop_back();
 	m_pLayout.emplace_back(row);
 
 	row.clear();
