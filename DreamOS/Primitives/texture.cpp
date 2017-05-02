@@ -81,7 +81,7 @@ texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::Pix
 {
 	RESULT r = R_PASS;
 
-	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n))
+	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n));
 
 	Validate();
 	return;
@@ -105,6 +105,7 @@ texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEX
 
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;
@@ -252,7 +253,19 @@ double texture::GetValueAtUV(double uValue, double vValue) {
 	return retVal;
 }
 
-RESULT texture::LoadTextureFromPath(wchar_t *pszFilepath) {
+RESULT texture::SetParams(int pxWidth, int pxHeight, int channels, int samples, int levels) {
+	RESULT r = R_PASS;
+
+	CR(SetWidth(pxWidth));
+	CR(SetHeight(pxHeight));
+	CR(SetChannels(channels));
+	CR(SetLevels(levels));
+
+Error:
+	return r;
+}
+
+RESULT texture::LoadTextureFromPath(const wchar_t *pszFilepath) {
 	RESULT r = R_PASS;
 
 	std::wstring wstrFilepath(pszFilepath);
@@ -282,7 +295,7 @@ Error:
 	return r;
 }
 
-RESULT texture::LoadTextureFromFile(wchar_t *pszFilename) {
+RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 	wchar_t *pszFilePath = nullptr;
 
@@ -316,7 +329,7 @@ Error:
 	return r;
 }
 
-RESULT texture::LoadCubeMapByName(wchar_t * pszName) {
+RESULT texture::LoadCubeMapByName(const wchar_t * pszName) {
 	RESULT r = R_PASS;
 
 	std::vector<std::wstring> vstrCubeMapFiles;
@@ -363,7 +376,7 @@ texture::CUBE_MAP texture::GetCubeMapTypeFromFilename(std::wstring strFilename) 
 	return retType;
 }
 
-// TODO: Based on 8 bit per channel atm
+// TODO: Based on 8 bit per channel at the moment
 // Note this returns the size of the texture, in the case of cube maps this refers to 
 // one side not all six textures - for that use GetCubeMapSize
 size_t texture::GetTextureSize() {
@@ -376,7 +389,7 @@ size_t texture::GetCubeMapSize() {
 }
 
 //RESULT texture::LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight) {
-RESULT texture::LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) {
+RESULT texture::LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) {
 	RESULT r = R_PASS;
 	
 	PathManager *pPathManager = PathManager::instance();

@@ -693,6 +693,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLText.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRenderbuffer.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLTexture.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLViewportDisplay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLExtensions.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OpenGLImp.cpp" />
@@ -713,6 +714,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HMD\HMD.cpp" />
     <ClCompile Include="..\..\..\HMD\HMDFactory.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVR.cpp" />
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRMirrorTexture.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp" />

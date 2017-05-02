@@ -190,7 +190,7 @@ RESULT OGLProgramEnvironmentObjects::SetRiverAnimation(bool fRiverAnimation) {
 void OGLProgramEnvironmentObjects::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform) {
 	if (pTexture) {
 		pBoolUniform->SetUniform(true);
-		pTexture->OGLActivateTexture();
+		pTexture->OGLActivateTexture(0);
 		pTextureUniform->SetUniform(pTexture);
 	}
 	else {

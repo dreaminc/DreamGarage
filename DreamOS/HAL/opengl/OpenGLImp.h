@@ -207,7 +207,8 @@ public:
 	RESULT glAttachShader(GLuint program, GLuint shader);
 
 	// Textures
-	RESULT GenerateTextures(GLsizei n, GLuint *textures);
+	RESULT GenerateTextures(GLsizei n, GLuint *pTextures);
+	RESULT DeleteTextures(GLsizei n, GLuint *pTextures);
 	RESULT glActiveTexture(GLenum texture);
 	RESULT glBindTextures(GLuint first, GLsizei count, const GLuint *textures);
 	RESULT BindTexture(GLenum target, GLuint texture);

@@ -14,18 +14,29 @@ class OGLRenderbuffer;
 
 class OGLAttachment {
 public:
-	OGLAttachment (OpenGLImp *pParentImp, int width, int height, int sampleCount = 1);
+	OGLAttachment(OpenGLImp *pParentImp, int width, int height, int channels = 3, int sampleCount = 1);
 	~OGLAttachment ();
 
 	// TODO: This is a temporary approach
 	RESULT OGLInitializeRenderBuffer();
 
 	// TODO: Potentially combine with the upper function - use mutli sample or not based on multisample value
-	RESULT OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample = 4);
-	RESULT OGLInitialize(GLenum internalFormat = GL_DEPTH_COMPONENT24, GLenum type = GL_UNSIGNED_INT);
+	RESULT OGLInitialize(OGLTexture *pOGLTexture);
+	RESULT OGLInitializeDepthTexture(GLenum internalFormat = GL_DEPTH_COMPONENT24, GLenum type = GL_UNSIGNED_INT);
+	RESULT OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT, int multisample = 4);
 	
+	RESULT AttachToFramebuffer(GLenum target, GLenum attachment);
+	RESULT AttachTextureToFramebuffer(GLenum target, GLenum attachment);
+	RESULT AttachRenderBufferToFramebuffer(GLenum target = GL_FRAMEBUFFER, GLenum attachment = GL_DEPTH_ATTACHMENT, GLenum renderbuffertarget = GL_RENDERBUFFER);
+
+	RESULT MakeOGLTextureMultisample();
+	RESULT MakeOGLTexture();
+
 	GLuint GetOGLRenderbufferIndex();
 	GLuint GetOGLTextureIndex();
+
+	OGLTexture *GetOGLTexture() { return m_pOGLTexture; }
+	OGLRenderbuffer *GetOGLRenderBuffer() { return m_pOGLRenderbuffer; }
 
 	RESULT Resize(int pxWidth, int pxHeight);
 
@@ -37,10 +48,20 @@ public:
 		return (m_pOGLTexture != nullptr);
 	}
 
+	RESULT SetSampleCount(int samples) {
+		if (m_sampleCount != 0) {
+			return R_FAIL;
+		}
+		
+		m_sampleCount = samples;
+		return R_PASS;
+	}
+
 private:
 	int m_width;
 	int m_height;
-	int m_sampleCount;
+	int m_channels;
+	int m_sampleCount = 0;
 
 private:
 	OpenGLImp *m_pParentImp = nullptr;

@@ -186,7 +186,7 @@ private:
 		OGLUniformBool* pBoolUniform) {
 		if (pTexture) {
 			pBoolUniform->SetUniform(true);
-			pTexture->OGLActivateTexture();
+			pTexture->OGLActivateTexture(0);
 			pTextureUniform->SetUniform(pTexture);
 		}
 		else

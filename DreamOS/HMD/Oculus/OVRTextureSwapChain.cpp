@@ -53,14 +53,22 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 		GLuint chainTextureIndex;
 		ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, i, &chainTextureIndex);
 
-		OGLTexture *pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, chainTextureIndex, m_width, m_height, m_channels);
-		CR(pOGLTexture->BindTexture(GL_TEXTURE_2D));
+		//OGLTexture *pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, chainTextureIndex, m_width, m_height, m_channels);
+		OGLTexture *pOGLTexture = OGLTexture::MakeTextureFromAllocatedTexture(m_pParentImp, 
+																			  texture::TEXTURE_TYPE::TEXTURE_COLOR, 
+																			  GL_TEXTURE_2D, 
+																			  chainTextureIndex, 
+																			  m_width, 
+																			  m_height, 
+																			  m_channels);
+		CR(pOGLTexture->Bind());
 
-		CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-		CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-		CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-		CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+		CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+		CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+		CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+		CR(pOGLTexture->SetTextureParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
+		// TODO: Move this into the texture class no?
 		if (m_mipLevels > 1) {
 			CR(m_pParentImp->glGenerateMipmap(GL_TEXTURE_2D));
 		}
@@ -69,17 +77,22 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 	}
 
 	m_pOGLResolveFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
-	CR(m_pOGLResolveFramebuffer->MakeOGLDepthbuffer());
 	CR(m_pOGLResolveFramebuffer->OGLInitialize());
-	CR(m_pOGLResolveFramebuffer->InitializeDepthAttachment());
+	CR(m_pOGLResolveFramebuffer->Bind());
+
+	CR(m_pOGLResolveFramebuffer->MakeDepthAttachment());
+	CR(m_pOGLResolveFramebuffer->GetDepthAttachment()->OGLInitializeDepthTexture());
 
 	// Set up render FBO
 	m_pOGLRenderFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
 	CR(m_pOGLRenderFramebuffer->OGLInitialize());
 	CR(m_pOGLRenderFramebuffer->Bind());
-	CR(m_pOGLRenderFramebuffer->MakeOGLDepthbuffer());
-	CR(m_pOGLRenderFramebuffer->InitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OVR_MULTI_SAMPLE));
-	CR(m_pOGLRenderFramebuffer->MakeOGLTextureMultisample());
+
+	CR(m_pOGLRenderFramebuffer->MakeDepthAttachment());
+	CR(m_pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OVR_MULTI_SAMPLE));
+
+	CR(m_pOGLRenderFramebuffer->MakeColorAttachment());
+	CR(m_pOGLRenderFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(m_pOGLRenderFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
 
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0));
@@ -143,7 +156,7 @@ RESULT OVRTextureSwapChain::SetAndClearRenderSurface() {
 	glEnable(GL_MULTISAMPLE);
 
 	m_pOGLRenderFramebuffer->Bind();
-	m_pOGLRenderFramebuffer->SetAndClearViewportDepthBuffer();
+	m_pOGLRenderFramebuffer->SetAndClearViewport(true, true);
 	
 
 //Error:
@@ -170,8 +183,11 @@ RESULT OVRTextureSwapChain::UnsetRenderSurface() {
 	}
 
 	CR(m_pOGLResolveFramebuffer->Bind());
-	CR(m_pOGLResolveFramebuffer->AttachOGLTexture(currentTextureIndex));
-	CR(m_pOGLResolveFramebuffer->AttachOGLDepthbuffer());
+
+	// TODO: better way?
+	m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, currentTextureIndex, 0);
+
+	CR(m_pOGLResolveFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 	CR(m_pOGLResolveFramebuffer->SetAndClearViewport());
 	
 	m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_pOGLRenderFramebuffer->GetFramebufferIndex());

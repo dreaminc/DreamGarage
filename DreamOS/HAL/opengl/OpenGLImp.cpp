@@ -160,11 +160,23 @@ Error:
 }
 
 RESULT OpenGLImp::MakeCurrentContext() {
-	return m_pOpenGLRenderingContext->MakeCurrentContext();
+	if (m_fCurrentContext == false) {
+		m_fCurrentContext = true;
+		return m_pOpenGLRenderingContext->MakeCurrentContext();
+	}
+	else {
+		return R_SKIPPED;
+	}
 }
 
 RESULT OpenGLImp::ReleaseCurrentContext() {
-	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
+	if (m_fCurrentContext == true) {
+		m_fCurrentContext = false;
+		return m_pOpenGLRenderingContext->ReleaseCurrentContext();
+	}
+	else {
+		return R_SKIPPED;
+	}
 }
 
 RESULT OpenGLImp::InitializeHAL() {
@@ -323,26 +335,28 @@ composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& ws
 
 		pComposite->AddChild(pModel);
 
+		// TODO: WTF IS THIS LAMBDA FOR!!!!!
 		auto GetTexture = [&](const std::string& file) -> texture* {
-			std::wstring wstr(file.begin(), file.end());
-			wstr = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.find_last_of(L"/\\")) + L"\\" + wstr;
+			std::wstring wstrFilename(file.begin(), file.end());
+			wstrFilename = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.find_last_of(L"/\\")) + L"\\" + wstrFilename;
 
-			if (textureMap.find(wstr) == textureMap.end()) {
-				texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			if (textureMap.find(wstrFilename) == textureMap.end()) {
+				//texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstrFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+				texture *pTempTexture = OGLTexture::MakeTextureFromPath(this, texture::TEXTURE_TYPE::TEXTURE_COLOR, wstrFilename);
 
 				if (!pTempTexture) {
-					LOG(ERROR) << "Failed to load model texture : " << wstr;
+					LOG(ERROR) << "Failed to load model texture : " << wstrFilename;
 					return nullptr;
 				}
 
-				textureMap[wstr] = pTempTexture;
+				textureMap[wstrFilename] = pTempTexture;
 
 				if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0) {
 					return pTempTexture;
 				}
 			}
 			else {
-				return textureMap[wstr];
+				return textureMap[wstrFilename];
 			}
 
 			return nullptr;
@@ -706,7 +720,7 @@ Error:
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, pszFilename, type);
+	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));
 	CN(pTexture);
 
 //Success:
@@ -723,7 +737,7 @@ Error:
 texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, type, width, height, format, channels, pBuffer, pBuffer_n);
+	texture *pTexture = OGLTexture::MakeTextureFromBuffer(this, type, width, height, channels, format, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:
@@ -741,7 +755,7 @@ Error:
 texture* OpenGLImp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, type, pBuffer, pBuffer_n);
+	texture *pTexture = OGLTexture::MakeTextureFromFileBuffer(this, type, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:
@@ -1454,11 +1468,20 @@ Error:
 }
 
 // Textures
-RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *textures) {
+RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *pTextures) {
 	RESULT r = R_PASS;
 
-	//m_OpenGLExtensions.glGenTextures(n, textures);
-	glGenTextures(n, textures);
+	glGenTextures(n, pTextures);
+	CRM(CheckGLError(), "glGenTextures failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::DeleteTextures(GLsizei n, GLuint *pTextures) {
+	RESULT r = R_PASS;
+
+	glDeleteTextures(n, pTextures);
 	CRM(CheckGLError(), "glGenTextures failed");
 
 Error:

@@ -73,12 +73,12 @@ public:
 	RESULT FlipTextureVertical();
 	RESULT ReleaseTextureData();
 
-	RESULT LoadTextureFromPath(wchar_t *pszFilepath);
-	RESULT LoadTextureFromFile(wchar_t *pszFilename);
+	RESULT LoadTextureFromPath(const wchar_t *pszFilepath);
+	RESULT LoadTextureFromFile(const wchar_t *pszFilename);
 	RESULT LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n);
 	//RESULT LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
-	RESULT LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
-	RESULT LoadCubeMapByName(wchar_t * pszName);
+	RESULT LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
+	RESULT LoadCubeMapByName(const wchar_t * pszName);
 	RESULT CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n);
 
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat);
@@ -91,10 +91,13 @@ public:
 	int GetHeight() { return m_height; }
 	int GetChannels() { return m_channels; }
 	int GetSamples() { return m_samples; }
+	int GetLevels() { return m_levels; }
 
 	PixelFormat GetPixelFormat() {
 		return m_format;
 	}
+
+	RESULT SetParams(int pxWidth, int pxHeight, int channels, int samples = 1, int levels = 0);
 
 	RESULT SetWidth(int width) {
 		if (m_width != 0) {
@@ -136,6 +139,16 @@ public:
 		}
 	}
 
+	RESULT SetLevels(int levels) {
+		if (m_levels != 0) {
+			return R_FAIL;
+		}
+		else {
+			m_levels = levels;
+			return R_PASS;
+		}
+	}
+
 	RESULT SetFormat(PixelFormat format) {
 		m_format = format;
 		return R_PASS;
@@ -149,6 +162,7 @@ protected:
 	int m_height = 0;
 	int m_channels = 0;
 	int m_samples = 0;
+	int m_levels = 0;
 
 	unsigned char *m_pImageBuffer = nullptr;
 

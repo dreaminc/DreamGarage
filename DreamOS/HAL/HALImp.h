@@ -170,6 +170,8 @@ protected:
 	// This is used to render to texture
 	ProgramNode* m_pFlatProgram = nullptr;
 
+	bool m_fCurrentContext = false;
+
 private:
 	UID m_uid;
 };

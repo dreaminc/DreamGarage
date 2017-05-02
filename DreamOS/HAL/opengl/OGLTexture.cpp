@@ -1,27 +1,21 @@
 #include "OGLTexture.h"
 
-OGLTexture::OGLTexture(OpenGLImp *pParentImp) :
-	texture(),
-	m_textureIndex(0),
-	m_pParentImp(pParentImp)
-{
-	// empty
-}
-
-OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type) :
+OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget) :
 	texture(type),
 	m_textureIndex(0),
+	m_textureTarget(textureTarget),
 	m_pParentImp(pParentImp)
 {
 	// This constructor should be used when deeper configuration is sought 
 }
 
+/*
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) :
 	texture(type, width, height, format, channels, pBuffer, pBuffer_n),
 	m_textureIndex(0),
 	m_pParentImp(pParentImp)
 {
-	RESULT r = OGLInitialize();
+	// empty
 }
 
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) :
@@ -29,7 +23,7 @@ OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int wi
 	m_textureIndex(0),
 	m_pParentImp(pParentImp)
 {
-	RESULT r = OGLInitialize();
+	// empty
 }
 
 // Load from File Buffer (file loaded into buffer)
@@ -38,16 +32,7 @@ OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, uint8_
 	m_textureIndex(0),
 	m_pParentImp(pParentImp)
 {
-	RESULT r = OGLInitialize();
-	CR(r);
-
-	// Success:
-	Validate();
-	return;
-
-Error:
-	InvalidateOverride();
-	return;
+	// empty
 }
 
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels) :
@@ -55,7 +40,7 @@ OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int wi
 	m_textureIndex(0),
 	m_pParentImp(pParentImp)
 {
-	RESULT r = OGLInitialize();
+	// empty
 }
 
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLuint textureID, int width, int height, int channels) :
@@ -63,7 +48,7 @@ OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLuint
 	m_textureIndex(0),
 	m_pParentImp(pParentImp)
 {
-	RESULT r = OGLInitialize(textureID);
+	// empty
 }
 
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename, texture::TEXTURE_TYPE type) :
@@ -71,7 +56,7 @@ OGLTexture::OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename, texture::TEX
 	m_textureIndex(0),
 	m_pParentImp(pParentImp)
 {
-	RESULT r = OGLInitialize();
+	// empty
 }
 
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) :
@@ -79,102 +64,215 @@ OGLTexture::OGLTexture(OpenGLImp *pParentImp, wchar_t *pszName, std::vector<std:
 	m_textureIndex(0),
 	m_pParentImp(pParentImp)
 {
-	RESULT r = OGLInitialize();
+	// empty
 }
+*/
 
 OGLTexture::~OGLTexture() {
 	texture::~texture();
-}
 
-// These may ultimately be programatic
-GLint OGLTexture::GetColorTextureNumber() {
-	return 0;
-}
-
-GLint OGLTexture::GetBumpTextureNumber() {
-	return 1;
-}
-
-// TODO: Is this even needed?
-GLint OGLTexture::GetCubeTextureNumber() {
-	return 2;
-}
-
-// Get rid of these - push into programs
-GLint OGLTexture::GetTextureNumber() {
-	switch (GetTextureType()) {
-	case texture::TEXTURE_TYPE::TEXTURE_COLOR: {
-		return GetColorTextureNumber();
-	} break;
-
-	case TEXTURE_TYPE::TEXTURE_BUMP: {
-		return GetBumpTextureNumber();
-	} break;
-
-		// TODO: Do we need this?
-	case TEXTURE_TYPE::TEXTURE_CUBE: {
-		return GetCubeTextureNumber();
-	} break;
-
-	default:
-	case TEXTURE_TYPE::TEXTURE_INVALID: {
-		return -1;
-	} break;
+	if (m_textureIndex != 0) {
+		m_pParentImp->DeleteTextures(1, &m_textureIndex);
+		m_textureIndex = 0;
 	}
-
-	return -1;
 }
 
-RESULT OGLTexture::BindTexture(GLenum textureTarget) {
-	return m_pParentImp->BindTexture(textureTarget, m_textureIndex);
+RESULT OGLTexture::Bind() {
+	return m_pParentImp->BindTexture(m_textureTarget, m_textureIndex);
 }
 
-RESULT OGLTexture::SetTextureParameter(GLenum textureTarget, GLenum paramName, GLint paramVal) {
+RESULT OGLTexture::SetTextureParameter(GLenum paramName, GLint paramVal) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
-	CR(BindTexture(textureTarget));
-	CR(m_pParentImp->TexParameteri(textureTarget, paramName, paramVal));
+
+	CR(Bind());
+	CR(m_pParentImp->TexParameteri(m_textureTarget, paramName, paramVal));
 
 Error:
 	return r;
 }
 
-RESULT OGLTexture::OGLInitialize(GLuint textureID = NULL) {
+RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 	RESULT r = R_PASS;
 
-	if (GetTextureType() == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
-		CRM(OGLInitializeCubeMap(&m_textureIndex, GetGLTextureNumberDefine()), "Failed to initialize texture");
+	GLenum glFormat = GetOGLPixelFormat();
+	GLint internalGLFormat = static_cast<GLint>(glFormat);
+
+	unsigned char *pImageBuffer = nullptr;
+
+	if (m_pImageBuffer != nullptr) {
+		pImageBuffer = m_pImageBuffer + (optOffset);
+	}
+
+	CR(Bind());
+
+	// TODO: Pull deeper settings from texture object
+	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, GL_UNSIGNED_BYTE, pImageBuffer));
+
+Error:
+	return r;
+}
+
+RESULT OGLTexture::Resize(int pxWidth, int pxHeight) {
+	RESULT r = R_PASS;
+
+	m_width = pxWidth;
+	m_height = pxHeight;
+
+	CR(AllocateGLTexture());
+
+Error:
+	return r;
+}
+
+OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, int levels, int samples) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
+	CN(pTexture);
+
+	CR(pTexture->OGLInitialize(NULL));
+	CR(pTexture->SetParams(width, height, channels, samples, levels));
+	CR(pTexture->AllocateGLTexture());
+
+	CR(pTexture->SetDefaultTextureParams());
+
+Error:
+	return pTexture;
+}
+
+OGLTexture* OGLTexture::MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels, int samples) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
+	CN(pTexture);
+
+	CR(pTexture->OGLInitialize(textureID));
+	CR(pTexture->SetParams(width, height, channels, samples, levels));
+
+Error:
+	return pTexture;
+}
+
+OGLTexture* OGLTexture::MakeCubeMap(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels) {
+	RESULT r = R_PASS;
+	
+	OGLTexture *pTexture = nullptr;
+
+	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
+	CN(pTexture);
+
+	GLenum textureTarget = GL_TEXTURE_CUBE_MAP;
+
+	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
+		size_t pCubeMapSideOffset = pTexture->GetTextureSize();
+		CR(pTexture->AllocateGLTexture(pCubeMapSideOffset));
+		
+		// TODO: Is this needed here?  I think it can be out of the for loop
+		CR(pTexture->SetDefaultCubeMapParams());
+	}
+
+Error:
+	return pTexture;
+}
+
+OGLTexture* OGLTexture::MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, std::wstring wstrFilename) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
+		CN(pTexture);
+
+		CR(pTexture->LoadCubeMapByName(wstrFilename.c_str()));
 	}
 	else {
-		if (textureID == NULL) {
-			CRM(OGLInitializeTexture(&m_textureIndex, GetGLTextureNumberDefine(), GL_TEXTURE_2D), "Failed to initialize texture");
-		}
-		else {
-			CRM(OGLInitializeTexture(textureID, GetGLTextureNumberDefine(), GL_TEXTURE_2D), "Failed to initialize texture");
-		}
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
+		CN(pTexture);
+
+		CR(pTexture->LoadTextureFromFile(wstrFilename.c_str()));
+	}
+
+	CR(pTexture->OGLInitialize(NULL));
+	CR(pTexture->AllocateGLTexture());
+
+	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
+		CR(pTexture->SetDefaultCubeMapParams());
+	}
+	else {
+		CR(pTexture->SetDefaultTextureParams());
 	}
 
 Error:
-	return r;
+	return pTexture;
 }
 
-RESULT OGLTexture::OGLInitializeTexture(GLuint textureIndex, GLenum textureNumber, GLenum textureTarget) {
+OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, texture::PixelFormat format, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
-	CR(m_pParentImp->MakeCurrentContext());
+	OGLTexture *pTexture = nullptr;
 
-	m_textureIndex = textureIndex;
-	CR(m_pParentImp->glActiveTexture(textureNumber));
+	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
+	}
+	else {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
+	}
 
-	// Texture params TODO: Add controls for these 
-	CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
-	CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
-	CRM(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
-	CRM(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
+	CN(pTexture);
+
+	CR(pTexture->OGLInitialize(NULL));
+	CR(pTexture->SetParams(width, height, channels));
+	CR(pTexture->SetFormat(format));
+
+	CR(pTexture->CopyTextureBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
+	CR(pTexture->AllocateGLTexture());
+
+	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
+		CR(pTexture->SetDefaultCubeMapParams());
+	}
+	else {
+		CR(pTexture->SetDefaultTextureParams());
+	}
 
 Error:
-	return r;
+	return pTexture;
+}
+
+OGLTexture* OGLTexture::MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, void *pBuffer, size_t pBuffer_n) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_CUBE_MAP);
+	}
+	else {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
+	}
+
+	CN(pTexture);
+
+	CR(pTexture->OGLInitialize(NULL));
+
+	CR(pTexture->LoadTextureFromFileBuffer((uint8_t*)pBuffer, pBuffer_n));
+	CR(pTexture->AllocateGLTexture());
+
+	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
+		CR(pTexture->SetDefaultCubeMapParams());
+	}
+	else {
+		CR(pTexture->SetDefaultTextureParams());
+	}
+
+Error:
+	return pTexture;
 }
 
 RESULT OGLTexture::OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber) {
@@ -203,22 +301,50 @@ Error:
 	return r;
 }
 
-RESULT OGLTexture::OGLInitializeMultisample(int multisample = 4) {
+RESULT OGLTexture::SetDefaultTextureParams() {
+	RESULT r = R_PASS;
+
+	CRM(SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST), "Failed to set GL_TEXTURE_MAG_FILTER");
+	CRM(SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST), "Failed to set GL_TEXTURE_MIN_FILTER");
+	CRM(SetTextureParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
+	CRM(SetTextureParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
+
+Error:
+	return r;
+}
+
+RESULT OGLTexture::SetDefaultCubeMapParams() {
+	RESULT r = R_PASS;
+
+	CRM(SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
+	CRM(SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
+
+	CRM(SetTextureParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
+	CRM(SetTextureParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
+	CRM(SetTextureParameter(GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
+
+Error:
+	return r;
+}
+
+RESULT OGLTexture::OGLInitialize(GLuint textureID) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
-	CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
 
-	//CR(m_pParentImp->glActiveTexture(textureNumber));
-	CR(m_pParentImp->BindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_textureIndex));
-	CR(m_pParentImp->glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, multisample, GL_RGBA8, m_width, m_height, true));
+	if (textureID == NULL) {
+		CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
+	}
+	else {
+		m_textureIndex = textureID;
+	}
 
 Error:
 	return r;
 }
 
 // border will be zero more often than the buffer is 
-RESULT OGLTexture::OGLInitializeTexture(GLenum textureTarget, GLint level, GLint internalformat, GLenum format, GLenum type, const void *pBuffer = nullptr, GLint border = 0) {
+RESULT OGLTexture::OGLInitializeTexture(GLenum textureTarget, GLint level, GLint internalformat, GLenum format, GLenum type, const void *pBuffer, GLint border) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
@@ -232,88 +358,79 @@ Error:
 	return r;
 }
 
-RESULT OGLTexture::OGLInitializeTexture(GLuint *pTextureIndex, GLenum textureNumber, GLenum textureTarget) {
+// TODO: Move up 
+RESULT OGLTexture::OGLInitializeMultisample(int multisample) {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->MakeCurrentContext());
-	CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
+	CR(m_pParentImp->GenerateTextures(1, &m_textureIndex));
 
-	//CR(m_pParentImp->glActiveTexture(textureNumber));
-	CR(m_pParentImp->BindTexture(textureTarget, *pTextureIndex));
+	CB((m_textureTarget == GL_TEXTURE_2D_MULTISAMPLE));
 
-	GLenum	format = GetOGLPixelFormat(m_format, m_channels);
-	GLint	internalFormat = static_cast<GLint>(format);
-
-	// TODO: Pull deeper settings from texture object
-	if (m_pImageBuffer != NULL) {
-		CR(m_pParentImp->TexImage2D(textureTarget, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, m_pImageBuffer));
-	}
-	else {
-		CR(m_pParentImp->TexImage2D(textureTarget, 0, internalFormat, m_width, m_height, 0, format, GL_UNSIGNED_BYTE, NULL));
-	}
-
-	// Texture params TODO: Add controls for these 
-	CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MAG_FILTER, GL_NEAREST), "Failed to set GL_TEXTURE_MAG_FILTER");
-	CRM(m_pParentImp->TexParameteri(textureTarget, GL_TEXTURE_MIN_FILTER, GL_NEAREST), "Failed to set GL_TEXTURE_MIN_FILTER");
-	//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_S");
-	//CRM(m_pParentImp->TexParamteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set GL_TEXTURE_WRAP_T");
-
-	// TODO: Delete the image data here?
+	CR(m_pParentImp->BindTexture(m_textureTarget, m_textureIndex));
+	CR(m_pParentImp->glTexImage2DMultisample(m_textureTarget, multisample, GL_RGBA8, m_width, m_height, true));
 
 Error:
 	return r;
 }
 
-RESULT OGLTexture::Resize(int pxWidth, int pxHeight) {
+RESULT OGLTexture::OGLActivateTexture(int value) {
 	RESULT r = R_PASS;
 
-Error:
-	return r;
-}
-
-RESULT OGLTexture::OGLActivateTexture() {
-	RESULT r = R_PASS;
-
-	if (GetTextureType() == TEXTURE_TYPE::TEXTURE_CUBE) {
-		CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine()));
-		CR(m_pParentImp->BindTexture(GL_TEXTURE_CUBE_MAP, m_textureIndex));
-	}
-	else {
-		CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine()));
-		CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_textureIndex));
-	}
+	CR(m_pParentImp->glActiveTexture(GetGLTextureNumberDefine(value)));
+	CR(m_pParentImp->BindTexture(m_textureTarget, m_textureIndex));
 
 Error:
 	return r;
 }
 
-GLenum OGLTexture::GetGLTextureNumberDefine() {
-	return (GLenum)((GL_TEXTURE0) + GetTextureNumber());
+GLenum OGLTexture::GetGLTextureNumberDefine(int value) {
+	return (GLenum)((GL_TEXTURE0) + value);
 }
 
 GLuint OGLTexture::GetOGLTextureIndex() {
 	return m_textureIndex;
 }
 
-RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) override {
+RESULT OGLTexture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {
 	RESULT r = R_PASS;
 
-	//CR(m_pParentImp->MakeCurrentContext());
+	CR(Bind());
 
-	CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_textureIndex));
 	CR(m_pParentImp->TextureSubImage2D(GL_TEXTURE_2D, 0, 0, 0, width, height, GetOGLPixelFormat(pixelFormat), GL_UNSIGNED_BYTE, pBuffer));
 
 Error:
 	return r;
 }
 
-GLenum OGLTexture::GetOGLPixelFormat(texture::PixelFormat format, int channels = 3) {
-	switch (format) {
-	case texture::PixelFormat::Unspecified: return (channels == 3) ? GL_RGB : GL_RGBA;
-	case texture::PixelFormat::RGB:			return GL_RGB;
-	case texture::PixelFormat::RGBA:		return GL_RGBA;
-	case texture::PixelFormat::BGR:			return GL_BGR;
-	case texture::PixelFormat::BGRA:		return GL_BGRA;
+GLenum OGLTexture::GetOGLPixelFormat() {
+	return GetOGLPixelFormat(m_format, m_channels);
+}
+
+GLenum OGLTexture::GetOGLPixelFormat(texture::PixelFormat pixelFormat, int channels) {
+	switch (pixelFormat) {
+		case texture::PixelFormat::Unspecified: {
+			if (channels == 3)
+				return GL_RGB; 
+			else 
+				return GL_RGBA;
+		} break;
+
+		case texture::PixelFormat::RGB: {
+			return GL_RGB; 
+		} break;
+
+		case texture::PixelFormat::RGBA: {
+			return GL_RGBA;
+		} break;
+
+		case texture::PixelFormat::BGR: {
+			return GL_BGR;
+		} break;
+
+		case texture::PixelFormat::BGRA: {
+			return GL_BGRA;
+		} break;
 	}
 
 	return 0; // no format for unknown

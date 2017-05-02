@@ -3,9 +3,10 @@
 #include "OGLTexture.h"
 #include "OGLRenderbuffer.h"
 
-OGLAttachment ::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int sampleCount) :
+OGLAttachment ::OGLAttachment (OpenGLImp *pParentImp, int width, int height, int channels, int sampleCount) :
 	m_width(width),
 	m_height(height),
+	m_channels(channels),
 	m_sampleCount(sampleCount),
 	m_pParentImp(pParentImp)
 {
@@ -72,9 +73,10 @@ Error:
 }
 
 // TODO: Potentially combine with the upper function - use mutlisample or not based on multisample value
-RESULT OGLAttachment ::OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample = 4) {
+RESULT OGLAttachment ::OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample) {
 	RESULT r = R_PASS;
 
+	// TODO: Create a render buffer 
 	CR(m_pParentImp->glGenRenderbuffers(1, &m_depthbufferIndex));
 	CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufferIndex));
 
@@ -87,10 +89,34 @@ Error:
 	return r;
 }
 
-RESULT OGLAttachment ::OGLInitialize(GLenum internalFormat = GL_DEPTH_COMPONENT24, GLenum type = GL_UNSIGNED_INT) {
+RESULT OGLAttachment::OGLInitialize(OGLTexture *pOGLTexture) {
 	RESULT r = R_PASS;
 
-	// TODO: Replace with texture object instead?
+	CN(pOGLTexture);
+	CB((m_pOGLTexture == nullptr));
+
+	m_pOGLTexture = pOGLTexture;
+
+Error:
+	return r;
+}
+
+RESULT OGLAttachment::AttachToFramebuffer(GLenum target, GLenum attachment) {
+	return m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLTexture->GetOGLTextureIndex(), 0);
+}
+
+RESULT OGLAttachment::AttachTextureToFramebuffer(GLenum target, GLenum attachment) {
+	return m_pParentImp->glFramebufferTexture2D(target, attachment, m_pOGLTexture->GetOGLTextureTarget(), m_pOGLTexture->GetOGLTextureIndex(), 0);
+}
+
+RESULT OGLAttachment::AttachRenderBufferToFramebuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget) {
+	return m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, m_pOGLRenderbuffer->GetOGLRenderbufferIndex());
+}
+
+RESULT OGLAttachment::OGLInitializeDepthTexture(GLenum internalFormat, GLenum type) {
+	RESULT r = R_PASS;
+
+	// TODO: Replace with texture
 	CR(m_pParentImp->GenerateTextures(1, &m_depthbufferIndex));
 	CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_depthbufferIndex));
 
@@ -114,6 +140,33 @@ RESULT OGLAttachment ::OGLInitialize(GLenum internalFormat = GL_DEPTH_COMPONENT2
 	//m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
 	//m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex);
 
+
+Error:
+	return r;
+}
+
+RESULT OGLAttachment::MakeOGLTexture() {
+	RESULT r = R_PASS;
+
+	m_pOGLTexture = OGLTexture::MakeTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, m_width, m_height, m_channels);
+	CN(m_pOGLTexture);
+
+Error:
+	return r;
+}
+
+RESULT OGLAttachment::MakeOGLTextureMultisample() {
+	RESULT r = R_PASS;
+
+	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, GL_TEXTURE_2D_MULTISAMPLE);
+	CN(m_pOGLTexture);
+
+	m_pOGLTexture->SetWidth(m_width);
+	m_pOGLTexture->SetHeight(m_height);
+	m_pOGLTexture->SetChannels(m_channels);
+	m_pOGLTexture->SetSamples(m_sampleCount);
+
+	m_pOGLTexture->OGLInitializeMultisample();
 
 Error:
 	return r;

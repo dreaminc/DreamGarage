@@ -9,7 +9,6 @@
 OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp) :
 	framebuffer(),
 	m_pParentImp(pParentImp),
-	m_pOGLTexture(nullptr),
 	m_pDrawBuffers(nullptr),
 	m_pOGLDepthAttachment(nullptr)
 {
@@ -19,17 +18,6 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp) :
 OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels) :
 	framebuffer(width, height, channels),
 	m_pParentImp(pParentImp),
-	m_pOGLTexture(nullptr),
-	m_pDrawBuffers(nullptr),
-	m_pOGLDepthAttachment(nullptr)
-{
-	// empty
-}
-
-OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int width, int height, int channels) :
-	framebuffer(width, height, channels),
-	m_pParentImp(pParentImp),
-	m_pOGLTexture(nullptr),
 	m_pDrawBuffers(nullptr),
 	m_pOGLDepthAttachment(nullptr)
 {
@@ -37,11 +25,6 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int widt
 }
 
 OGLFramebuffer::~OGLFramebuffer() {
-	if (m_pOGLTexture != nullptr) {
-		delete m_pOGLTexture;
-		m_pOGLTexture = nullptr;
-	}
-
 	if (m_pOGLDepthAttachment != nullptr) {
 		delete m_pOGLDepthAttachment;
 		m_pOGLDepthAttachment = nullptr;
@@ -66,13 +49,7 @@ RESULT OGLFramebuffer::ResizeFramebuffer(int pxWidth, int pxHeight) {
 
 	CR(Bind());
 
-	if (m_pOGLColorAttachment != nullptr) {
-		delete m_pOGLTexture;
-		m_pOGLTexture = nullptr;
-		
-		CR(MakeOGLTexture());
-		CR(SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
-
+	if (m_pOGLColorAttachment != nullptr) {		
 		CR(m_pOGLColorAttachment->Resize(pxWidth, pxHeight));
 	}
 
@@ -84,32 +61,6 @@ RESULT OGLFramebuffer::ResizeFramebuffer(int pxWidth, int pxHeight) {
 
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::MakeOGLTextureMultisample() {
-	RESULT r = R_PASS;
-
-	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	CN(m_pOGLTexture);
-
-	m_pOGLTexture->SetWidth(m_width);
-	m_pOGLTexture->SetHeight(m_height);
-	m_pOGLTexture->SetChannels(m_channels);
-
-	m_pOGLTexture->OGLInitializeMultisample();
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment) {
-	RESULT r = R_PASS;
-
-	CN(m_pOGLDepthAttachment);
-	CR(m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLDepthAttachment->GetOGLDepthbufferIndex(), 0));
 
 Error:
 	return r;
@@ -133,7 +84,7 @@ Error:
 RESULT OGLFramebuffer::SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget) {
 	RESULT r = R_PASS;
 
-	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLTexture->GetOGLTextureIndex(), 0));
+	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLColorAttachment->GetOGLTextureIndex(), 0));
 
 Error:
 	return r;
@@ -187,11 +138,38 @@ Error:
 	return r;
 }
 
-RESULT OGLFramebuffer::InitializeDepthAttachment(GLenum internalDepthFormat, GLenum typeDepth) {
+
+RESULT OGLFramebuffer::MakeColorAttachment() {
 	RESULT r = R_PASS;
 
-	CB(m_pOGLDepthAttachment)
-	CR(m_pOGLDepthAttachment->OGLInitialize(internalDepthFormat, typeDepth));
+	CB((m_pOGLColorAttachment == nullptr));
+
+	m_pOGLColorAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels);
+	CN(m_pOGLColorAttachment);
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::InitializeColorAttachment(OGLTexture *pOGLTexture) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLColorAttachment);
+	CR(m_pOGLColorAttachment->OGLInitialize(pOGLTexture));
+	CR(m_pOGLColorAttachment->AttachToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(InitializeOGLDrawBuffers(1));
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::MakeDepthAttachment() {
+	RESULT r = R_PASS;
+
+	CB((m_pOGLDepthAttachment == nullptr));
+
+	m_pOGLDepthAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels);
+	CN(m_pOGLDepthAttachment);
 
 Error:
 	return r;
@@ -202,16 +180,6 @@ RESULT OGLFramebuffer::InitializeRenderBuffer(GLenum internalDepthFormat, GLenum
 
 	CN(m_pOGLDepthAttachment);
 	CR(m_pOGLDepthAttachment->OGLInitializeRenderBuffer());
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::InitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample) {
-	RESULT r = R_PASS;
-
-	CN(m_pOGLDepthAttachment);
-	CR(m_pOGLDepthAttachment->OGLInitializeRenderBufferMultisample(internalDepthFormat, typeDepth, multisample));
 
 Error:
 	return r;
@@ -234,7 +202,7 @@ GLuint OGLFramebuffer::GetFramebufferIndex() {
 	return m_framebufferIndex;
 }
 
-RESULT OGLFramebuffer::SetAndClearViewport(bool fColor = true, bool fDepth = true) {
+RESULT OGLFramebuffer::SetAndClearViewport(bool fColor, bool fDepth) {
 	glViewport(0, 0, m_width, m_height);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
@@ -254,57 +222,6 @@ Error:
 	return r;
 }
 
-/*
-RESULT OGLFramebuffer::AttachOGLTexture(GLuint textureIndex) {
-	RESULT r = R_PASS;
-
-	if (textureIndex == NULL) {
-		if (m_pOGLTexture != nullptr) {
-			CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GetOGLTextureIndex(), 0));
-		}
-	}
-	else {
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureIndex, 0));
-	}
-
-Error:
-	return r;
-}
-*/
-
-RESULT OGLFramebuffer::AttachOGLDepthbuffer() {
-	RESULT r = R_PASS;
-		
-	CN(m_pOGLDepthAttachment);
-	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_pOGLDepthAttachment->GetOGLDepthbufferIndex(), 0));
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::AttachRenderBuffer(OGLRenderbuffer *pOGLRenderbuffer, GLenum attachment, GLenum target, GLenum renderbuffertarget) {
-	RESULT r = R_PASS;
-
-	CR(Bind());
-
-	//CR(m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, pOGLRenderbuffer->GetOGLRenderbufferIndex()));
-	CR(m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, pOGLRenderbuffer->GetOGLRenderbufferIndex()));
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::AttachTexture(OGLTexture *pOGLTexture, GLenum attachment, GLenum target, GLenum renderbuffertarget, GLint levels) {
-	RESULT r = R_PASS;
-
-	CR(Bind());
-
-	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, renderbuffertarget, pOGLTexture->GetOGLTextureIndex(), levels));
-
-Error:
-	return r;
-}
-
 RESULT OGLFramebuffer::Bind() {
 	RESULT r = R_PASS;
 
@@ -319,6 +236,7 @@ RESULT OGLFramebuffer::UnbindAttachments() {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
+
 	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0));
 	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0));
 

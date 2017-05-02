@@ -83,11 +83,11 @@ Error:
 RESULT OGLProgram::BindToDepthBuffer() {
 	RESULT r = R_PASS;
 
-CR(m_pOGLFramebuffer->BindOGLDepthBuffer());
-CR(m_pOGLFramebuffer->SetAndClearViewportDepthBuffer());
+	CR(m_pOGLFramebuffer->Bind());
+	CR(m_pOGLFramebuffer->SetAndClearViewport(true, true));
 
 Error:
-return r;
+	return r;
 }
 
 RESULT OGLProgram::BindToFramebuffer(OGLFramebuffer* pFramebuffer) {
@@ -137,6 +137,7 @@ Error:
 	return r;
 }
 
+/*
 RESULT OGLProgram::SetDepthTexture(int textureNumber) {
 	return m_pOGLFramebuffer->SetDepthTexture(textureNumber);
 }
@@ -144,6 +145,7 @@ RESULT OGLProgram::SetDepthTexture(int textureNumber) {
 GLuint OGLProgram::GetOGLDepthbufferIndex() {
 	return m_pOGLFramebuffer->GetOGLDepthbufferIndex();
 }
+*/
 
 RESULT OGLProgram::InitializeDepthToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
@@ -320,7 +322,7 @@ RESULT OGLProgram::InitializeRenderTexture(OGLTexture*&pOGLRenderTexture, GLenum
 
 	CR(pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, internalDepthFormat, GL_DEPTH_COMPONENT, typeDepth));
 
-	CR(pOGLRenderTexture->BindTexture(GL_TEXTURE_2D));
+	CR(pOGLRenderTexture->Bind(GL_TEXTURE_2D));
 
 	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
 	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));

@@ -21,7 +21,6 @@ public:
 
 	OGLFramebuffer(OpenGLImp *pParentImp);
 	OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels);
-	OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int width, int height, int channels);
 
 	~OGLFramebuffer();
 
@@ -35,25 +34,25 @@ public:
 	RESULT SetAndClearViewport(bool fColor = true, bool fDepth = true);
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
+	// TODO: These should not be directly used 
 	RESULT SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget);
-	RESULT SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment);
 	RESULT SetDepthTexture(int textureNumber);
 	
-	RESULT MakeOGLTextureMultisample();
 	RESULT InitializeOGLDrawBuffers(int numDrawBuffers);
 
-	// TOOD: 
-	RESULT InitializeDepthAttachment(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT);
+	RESULT MakeDepthAttachment();
+	RESULT MakeColorAttachment();
+
+	OGLAttachment* GetDepthAttachment() { return m_pOGLDepthAttachment; }
+	OGLAttachment* GetColorAttachment() { return m_pOGLColorAttachment; }
+
+	// TODO: 
+	RESULT InitializeColorAttachment(OGLTexture *pOGLTexture);
 	RESULT InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth);
-	RESULT InitializeRenderBufferMultisample(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT, int multisample = 4);
 
 	RESULT ResizeFramebuffer(int pxWidth, int pxHeight);
 
 	GLuint GetFramebufferIndex();
-private:
-	// Common attachments: GL_DEPTH_ATTACHMENT, GL_COLOR_ATTACHMENT0
-	RESULT AttachRenderBuffer(OGLRenderbuffer *pOGLRenderbuffer, GLenum attachment, GLenum target = GL_FRAMEBUFFER, GLenum renderbuffertarget = GL_RENDERBUFFER);
-	RESULT AttachTexture(OGLTexture *pOGLTexture, GLenum attachment, GLenum target = GL_FRAMEBUFFER, GLenum renderbuffertarget = GL_TEXTURE_2D, GLint levels = 0);
 
 private:
 	OpenGLImp *m_pParentImp;
@@ -63,7 +62,7 @@ private:
 	
 	GLuint m_framebufferIndex;
 
-	OGLAttachment *m_pOGLDepthAttachment = nullptr;
+	OGLAttachment* m_pOGLDepthAttachment = nullptr;
 	OGLAttachment* m_pOGLColorAttachment = nullptr;
 	
 	// TODO: Stencil attachments 

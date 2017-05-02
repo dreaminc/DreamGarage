@@ -66,7 +66,7 @@ public:
 		OGLTexture *pTexture = nullptr;
 
 		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-			pTexture->OGLActivateTexture();
+			pTexture->OGLActivateTexture(0);
 			m_pUniformTextureColor->SetUniform(pTexture);
 			m_pUniformUseColorTexture->SetUniform(true);
 		}
@@ -75,7 +75,7 @@ public:
 		}
 
 		if ((pTexture = pOGLObj->GetBumpTexture()) != nullptr) {
-			pTexture->OGLActivateTexture();
+			pTexture->OGLActivateTexture(1);
 			m_pUniformTextureBump->SetUniform(pTexture);
 			m_pUniformUseBumpTexture->SetUniform(true);
 		}

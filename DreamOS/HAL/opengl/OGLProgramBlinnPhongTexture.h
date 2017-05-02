@@ -64,7 +64,7 @@ public:
 		OGLTexture *pTexture = nullptr;
 
 		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-			pTexture->OGLActivateTexture();
+			pTexture->OGLActivateTexture(0);
 			m_pUniformTextureColor->SetUniform(pTexture);
 			m_pUniformUseColorTexture->SetUniform(true);
 		}

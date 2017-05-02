@@ -776,6 +776,12 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLAttachment.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLTexture.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRMirrorTexture.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

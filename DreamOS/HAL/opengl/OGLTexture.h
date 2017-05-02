@@ -23,9 +23,11 @@ public:
 		GL_TEXTURE_CUBE_MAP_POSITIVE_Z
 	};
 
-public: 
-	OGLTexture(OpenGLImp *pParentImp);
-	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type);
+	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget = GL_TEXTURE_2D);
+private: 
+
+	// TODO: remove all these
+	/*
 	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels);
 	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLuint textureID, int width, int height, int channels);
 
@@ -37,42 +39,57 @@ public:
 	// Load from File 
 	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	OGLTexture(OpenGLImp *pParentImp, wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
+	*/
 
+
+public:
 	~OGLTexture();
 
-	GLint GetColorTextureNumber();
-	GLint GetBumpTextureNumber();
-	GLint GetCubeTextureNumber();
-	GLint GetTextureNumber();
-
-	RESULT BindTexture(GLenum textureTarget);
-	RESULT SetTextureParameter(GLenum textureTarget, GLenum paramName, GLint paramVal);
+	RESULT Bind();
+	RESULT SetTextureParameter(GLenum paramName, GLint paramVal);
 	
 	// border will be zero more often than the buffer is 
-	RESULT OGLInitialize(GLuint textureID = NULL);
+	RESULT OGLTexture::OGLInitialize(GLuint textureID);
+
 	RESULT OGLInitializeTexture(GLenum textureTarget, GLint level, GLint internalformat, GLenum format, GLenum type, const void *pBuffer = nullptr, GLint border = 0);
-	RESULT OGLInitializeTexture(GLuint *pTextureIndex, GLenum textureNumber, GLenum textureTarget);
 	RESULT OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNumber);
-	RESULT OGLInitializeTexture(GLuint textureIndex, GLenum textureNumber, GLenum textureTarget);
 	RESULT OGLInitializeMultisample(int multisample = 4);
+
+	RESULT SetDefaultTextureParams();
+	RESULT SetDefaultCubeMapParams();
 	
-	RESULT OGLActivateTexture();
+	RESULT OGLActivateTexture(int value);
 
 	RESULT Resize(int pxWidth, int pxHeight);
 
-	GLenum GetGLTextureNumberDefine();
+	GLenum GetGLTextureNumberDefine(int value);
 
 	GLuint GetOGLTextureIndex();
 
+	RESULT AllocateGLTexture(size_t optOffset = 0);
+
 	RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) override;
 
+	static GLenum GetOGLPixelFormat(texture::PixelFormat pixelFormat, int channels = 3);
+
+	GLenum GetOGLTextureTarget() { return m_textureTarget; }
+
 private:
-	GLenum GetOGLPixelFormat(texture::PixelFormat format, int channels = 3);
+	GLenum GetOGLPixelFormat();
+
+public:
+	static OGLTexture *MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, int levels = 0, int samples = 1);
+	static OGLTexture *MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
+	static OGLTexture *MakeCubeMap(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels);
+	static OGLTexture *MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, std::wstring wstrFilename);
+	static OGLTexture *MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, texture::PixelFormat format, void *pBuffer, size_t pBuffer_n);
+	static OGLTexture *MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, void *pBuffer, size_t pBuffer_n);
 
 private:
 	OpenGLImp *m_pParentImp = nullptr;
 
 	GLuint m_textureIndex = 0;
+	GLenum m_textureTarget = 0;
 };
 
 #endif // !OGL_TEXTURE_H_

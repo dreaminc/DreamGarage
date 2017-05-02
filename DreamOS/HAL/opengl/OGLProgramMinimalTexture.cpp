@@ -66,7 +66,7 @@ RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
 	OGLTexture *pTexture = nullptr;
 
 	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-		pTexture->OGLActivateTexture();
+		pTexture->OGLActivateTexture(0);
 		m_pUniformTextureColor->SetUniform(pTexture);
 	}
 

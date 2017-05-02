@@ -6,6 +6,7 @@
 #include "OGLQuad.h"
 #include "OGLFramebuffer.h"
 #include "OGLTexture.h"
+#include "OGLAttachment.h"
 
 OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglscreenquad")
@@ -68,14 +69,14 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 			GLenum glTextureUnit = GL_TEXTURE0;
 
 			m_pParentImp->glActiveTexture(glTextureUnit);
-			m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLFramebufferInput->GetOGLDepthbufferIndex());
+			m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
 
 			m_pUniformTextureColor->SetUniform(0);
 		}
 		else {
 			OGLTexture *pTexture = (OGLTexture*)(m_pOGLFramebufferInput->GetTexture());
 
-			pTexture->OGLActivateTexture();
+			pTexture->OGLActivateTexture(0);
 			m_pUniformTextureColor->SetUniform(pTexture);
 		}
 	}
