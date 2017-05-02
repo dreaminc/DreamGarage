@@ -161,7 +161,6 @@ RESULT UIKeyboard::Update(void *pContext) {
 	int i = 0;
 	for (auto &mallet : { m_pLeftMallet->GetMalletHead(), m_pRightMallet->GetMalletHead() })
 	{
-		//GetDOS()->GetInteractionEngineProxy()->
 		CollisionManifold manifold = m_pSurface->Collide(mallet);
 
 		pObj = manifold.GetObjectA();
@@ -330,7 +329,7 @@ UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 
 	for (int i = (int)row.size() - 1; i >= 0; i--) {
 		auto k = row[i];
-		float pos = xPos;// -(k->m_width / 2.0f);
+		float pos = xPos;
 		if (k->m_left <= pos) {
 			CBR(k->m_left + k->m_width >= pos, R_OBJECT_NOT_FOUND);
 			return k.get();

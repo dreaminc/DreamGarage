@@ -32,76 +32,79 @@ RESULT UIKeyboardLayout::CreateQWERTYLayout() {
 
 	m_pLayout.clear();
 	std::vector<std::shared_ptr<UIKey>> row;
+	std::string rowChars;
+
 	float left = 0.0f;
-	for (auto c : "qwertyuiop") {
-		auto k = new UIKey(left, 0.1f, c);
-		row.emplace_back(k);
+	rowChars = "qwertyuiop";
+	for (int i = 0; i < rowChars.size(); i++) {
+		auto key = new UIKey(left, 0.1f, rowChars[i]);
+		row.emplace_back(key);
 		left += 0.1f;
 	}
-	row.pop_back();
 	m_pLayout.emplace_back(row);
-
 	row.clear();
+
 	left = 0.05f;
-	for (auto c : "asdfghjkl") {
-		auto k = new UIKey(left, 0.1f, c);
-		row.emplace_back(k);
+	rowChars = "asdfghjkl";
+	for (int i = 0; i < rowChars.size(); i++) {
+		auto key = new UIKey(left, 0.1f, rowChars[i]);
+		row.emplace_back(key);
 		left += 0.1f;
 	}
-	row.pop_back();
 	m_pLayout.emplace_back(row);
-
 	row.clear();
+
 	// Shift
 	left = 0.0f;
 	{
-		auto k = new UIKey(left, 0.125f, SVK_SHIFT);
-		row.emplace_back(k);
+		auto key = new UIKey(left, 0.125f, SVK_SHIFT);
+		row.emplace_back(key);
 	}
 
 	left = 0.15f;
-	for (auto c : "zxcvbnm") {
-		if (c) {
-			auto k = new UIKey(left, 0.1f, c);
-			row.emplace_back(k);
-			left += 0.1f;
-		}
+	rowChars = "zxcvbnm";
+	for (int i = 0; i < rowChars.size(); i++) {
+		auto key = new UIKey(left, 0.1f, rowChars[i]);
+		row.emplace_back(key);
+		left += 0.1f;
 	}
 
 	// Backspace
 	{
-		auto k = new UIKey(0.875f, 0.125f, SVK_BACK);
-		row.emplace_back(k);
+		auto key = new UIKey(0.875f, 0.125f, SVK_BACK);
+		row.emplace_back(key);
 	}
 
 	m_pLayout.emplace_back(row);
-
 	row.clear();
+
 	left = 0.0f;
 	{
-		//TODO: using unused values for keys not defined by ascii
-		auto k = new UIKey(left, 0.125f, SVK_CONTROL); // Number layer
-		row.emplace_back(k);
+		//TODO: using unused values for behaviors not defined by ascii
+		auto key = new UIKey(left, 0.125f, SVK_CONTROL); // Number layer
+		row.emplace_back(key);
 		left += 0.125f;
 
-		k = new UIKey(left, 0.125f, SVK_PRIOR); // www.
-		row.emplace_back(k);
+		//TODO: leaving this out for now, 'www.' doesn't seem too useful
+		/*
+		key = new UIKey(left, 0.125f, SVK_PRIOR); // spare key
+		row.emplace_back(key);
+		//*/
 		left += 0.125f;
 
 		left += 0.1f;
 
-		k = new UIKey(left, 0.35f, SVK_SPACE);
-	//	auto k = new UIKey(left, 0.1f, ch);
-		row.emplace_back(k);
+		key = new UIKey(left, 0.35f, SVK_SPACE);
+		row.emplace_back(key);
 
 		left += 0.35f;
-		k = new UIKey(left, 0.125f, '.');
-		row.emplace_back(k);
+		key = new UIKey(left, 0.125f, '.');
+		row.emplace_back(key);
 
 		// 'go' or 'enter'
 		left += 0.15f;
-		k = new UIKey(left, 0.15f, SVK_RETURN);
-		row.emplace_back(k);
+		key = new UIKey(left, 0.15f, SVK_RETURN);
+		row.emplace_back(key);
 	}
 	m_pLayout.emplace_back(row);
 

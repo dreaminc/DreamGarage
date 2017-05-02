@@ -508,6 +508,8 @@ RESULT InteractionEngine::Notify(SenseKeyboardEvent *pEvent) {
 
 	// Pass through keyboard input
 
+	//TODO: hack to get around active object issues
+	//
 	///*
 //	for (auto &pObject : m_activeObjects) {
 		InteractionEventType type;

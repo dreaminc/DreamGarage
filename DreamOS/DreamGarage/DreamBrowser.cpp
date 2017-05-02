@@ -330,7 +330,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
 			m_strEntered.UpdateString(chKey);
 			GetDOS()->GetKeyboard()->UpdateTextBox(chKey);
-			OVERLAY_DEBUG_SET("bstr", m_strEntered.m_string.c_str());
+
 		} break;
 	}
 
