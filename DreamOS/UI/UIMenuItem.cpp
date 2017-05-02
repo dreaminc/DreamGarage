@@ -73,7 +73,9 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		pIcon->SetVisible(false);
 
 	m_pContextComposite->RenderToTexture(pContext);
-	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
+
+	// TODO: this is no longer supported:
+	//m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
 
 Error:
 	return r;

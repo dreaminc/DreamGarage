@@ -10,6 +10,7 @@
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
+	// empty
 }
 
 RESULT UIKeyboard::InitializeApp(void *pContext) {
@@ -139,6 +140,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 		for (auto& pKey : layoutRow) {
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(keyDimension, keyDimension);
+
 			if (m_keyTextureAtlas[pKey->m_letter])
 				pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]);
 

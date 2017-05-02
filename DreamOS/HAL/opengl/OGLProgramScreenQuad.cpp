@@ -74,10 +74,10 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 			m_pUniformTextureColor->SetUniform(0);
 		}
 		else {
-			OGLTexture *pTexture = (OGLTexture*)(m_pOGLFramebufferInput->GetTexture());
+			m_pParentImp->glActiveTexture(GL_TEXTURE0);
+			m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
 
-			pTexture->OGLActivateTexture(0);
-			m_pUniformTextureColor->SetUniform(pTexture);
+			m_pUniformTextureColor->SetUniform(0);
 		}
 	}
 

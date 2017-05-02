@@ -71,7 +71,9 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 			CN(pQuad);
 			CN(pQuad->SetPosition(point(0.0f, -2.0f, 0.0f)));
 			//pQuad->SetColor(COLOR_GREEN);
-			CR(pQuad->SetColorTexture(pFlatContext->GetFramebuffer()->GetTexture()));
+
+			// TODO: this is no longer supported:
+			//CR(pQuad->SetColorTexture(pFlatContext->GetFramebuffer()->GetTexture()));
 			
 		}
 

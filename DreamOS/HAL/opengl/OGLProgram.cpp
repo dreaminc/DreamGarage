@@ -99,8 +99,8 @@ RESULT OGLProgram::BindToFramebuffer(OGLFramebuffer* pFramebuffer) {
 	// Render to our framebuffer
 	// By default, uses the member framebuffer
 	OGLFramebuffer* pOGLFramebuffer = (pFramebuffer == nullptr) ? m_pOGLFramebuffer : pFramebuffer;
-	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, pOGLFramebuffer->GetFramebufferIndex()));
-	CR(pOGLFramebuffer->SetAndClearViewport());
+	CR(pOGLFramebuffer->Bind());
+	CR(pOGLFramebuffer->SetAndClearViewport(true, true));
 
 	// Check framebuffer
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
