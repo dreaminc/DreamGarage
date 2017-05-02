@@ -14,7 +14,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	//TODO this may become deprecated
-	m_ptSurface = point(-0.0f, 0.9f, 4.65f);
+	m_ptSurface = point(-0.0f, 0.9f, 4.75f);
 	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
 
 	m_surfaceHeight = 0.25f;
