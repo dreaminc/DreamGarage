@@ -81,7 +81,7 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 	CR(m_pOGLResolveFramebuffer->Bind());
 
 	CR(m_pOGLResolveFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLResolveFramebuffer->GetDepthAttachment()->OGLInitializeDepthTexture());
+	CR(m_pOGLResolveFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture());
 
 	// Set up render FBO
 	m_pOGLRenderFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
@@ -89,7 +89,8 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 	CR(m_pOGLRenderFramebuffer->Bind());
 
 	CR(m_pOGLRenderFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OVR_MULTI_SAMPLE));
+	//CR(m_pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OVR_MULTI_SAMPLE));
+	CR(m_pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer(DEFAULT_OVR_MULTI_SAMPLE));
 
 	CR(m_pOGLRenderFramebuffer->MakeColorAttachment());
 	CR(m_pOGLRenderFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());

@@ -3,6 +3,7 @@
 #include "OGLObj.h"
 
 #include "OGLFramebuffer.h"
+#include "OGLAttachment.h"
 #include "OGLTexture.h"
 
 #include "Scene/ObjectStore.h"
@@ -243,12 +244,15 @@ RESULT OGLProgram::InitializeFrameBufferWithDepth(OGLFramebuffer*&pOGLFramebuffe
 		
 		CR(pOGLFramebuffer->OGLInitialize());
 		CR(pOGLFramebuffer->Bind());
+		CR(pOGLFramebuffer->MakeColorAttachment());
 
-		CR(pOGLFramebuffer->MakeOGLTexture());
-		CR(pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+		CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture());
+		CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+		//CR(pOGLFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
-		CR(pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-		CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
+		CR(pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
+		CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth));
+		//CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
 
 		CR(pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 
@@ -269,10 +273,12 @@ RESULT OGLProgram::InitializeDepthFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, G
 	CR(pOGLFramebuffer->OGLInitialize());
 	CR(pOGLFramebuffer->Bind());
 
-	CR(pOGLFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-	CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
+	CR(pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
+	CR(pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth));
+	//CR(pOGLFramebuffer->InitializeDepthAttachment(internalDepthFormat, typeDepth));
 
-	CR(pOGLFramebuffer->SetOGLDepthbufferTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+	//CR(pOGLFramebuffer->SetOGLDepthbufferTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+	CR(pOGLFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
 	CR(pOGLFramebuffer->InitializeOGLDrawBuffers(0));
 
@@ -291,11 +297,14 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer *pFramebuffer, GLenum internalD
 	CR(pFramebuffer->OGLInitialize());	
 	CR(pFramebuffer->Bind());
 
-	CR(pFramebuffer->MakeOGLTexture());
-	CR(pFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-	CR(pFramebuffer->InitializeRenderBuffer(internalDepthFormat, typeDepth));
+	CR(pFramebuffer->MakeColorAttachment());
+	CR(pFramebuffer->GetColorAttachment()->MakeOGLTexture());
 
-	CR(pFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(pFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
+	CR(pFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+
+	//CR(pFramebuffer->SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(pFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(pFramebuffer->InitializeOGLDrawBuffers(1));
 
@@ -322,12 +331,12 @@ RESULT OGLProgram::InitializeRenderTexture(OGLTexture*&pOGLRenderTexture, GLenum
 
 	CR(pOGLRenderTexture->OGLInitializeTexture(GL_TEXTURE_2D, 0, internalDepthFormat, GL_DEPTH_COMPONENT, typeDepth));
 
-	CR(pOGLRenderTexture->Bind(GL_TEXTURE_2D));
+	CR(pOGLRenderTexture->Bind());
 
-	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST));
-	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST));
-	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
+	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST));
+	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST));
+	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
+	CR(pOGLRenderTexture->SetTextureParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
 Error:
 	return r;

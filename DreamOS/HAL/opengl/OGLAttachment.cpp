@@ -57,10 +57,10 @@ Error:
 }
 
 // TODO: This is a temporary approach
-RESULT OGLAttachment::OGLInitializeRenderBuffer() {
+RESULT OGLAttachment::OGLInitializeRenderBuffer(int samples) {
 	RESULT r = R_PASS;
 
-	m_pOGLRenderbuffer = new OGLRenderbuffer(m_pParentImp, m_width, m_height, m_sampleCount);
+	m_pOGLRenderbuffer = new OGLRenderbuffer(m_pParentImp, m_width, m_height, samples);
 	CN(m_pOGLRenderbuffer);
 
 	CR(m_pOGLRenderbuffer->OGLInitialize());
@@ -72,7 +72,8 @@ Error:
 	return r;
 }
 
-// TODO: Potentially combine with the upper function - use mutlisample or not based on multisample value
+/*
+// TODO: Potentially combine with the upper function - use mutli sample or not based on multi sample value
 RESULT OGLAttachment ::OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample) {
 	RESULT r = R_PASS;
 
@@ -88,6 +89,7 @@ RESULT OGLAttachment ::OGLInitializeRenderBufferMultisample(GLenum internalDepth
 Error:
 	return r;
 }
+*/
 
 RESULT OGLAttachment::OGLInitialize(OGLTexture *pOGLTexture) {
 	RESULT r = R_PASS;
@@ -113,33 +115,17 @@ RESULT OGLAttachment::AttachRenderBufferToFramebuffer(GLenum target, GLenum atta
 	return m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, m_pOGLRenderbuffer->GetOGLRenderbufferIndex());
 }
 
-RESULT OGLAttachment::OGLInitializeDepthTexture(GLenum internalFormat, GLenum type) {
+RESULT OGLAttachment::MakeOGLDepthTexture(GLenum internalGLFormat, GLenum pixelDataType) {
 	RESULT r = R_PASS;
 
-	// TODO: Replace with texture
-	CR(m_pParentImp->GenerateTextures(1, &m_depthbufferIndex));
-	CR(m_pParentImp->BindTexture(GL_TEXTURE_2D, m_depthbufferIndex));
-
-	CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
-	CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-	CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
-	CR(m_pParentImp->TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
-
-	/*
-	if (GLE_ARB_depth_buffer_float) {
-	internalFormat = GL_DEPTH_COMPONENT32F;
-	type = GL_FLOAT;
-	}
-	*/
-	glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, m_width, m_height, 0, GL_DEPTH_COMPONENT, type, NULL);
-
-	// The depth buffer
-	// Implement OGLRenderbuffer
-	// TODO: Create a depth buffer object (like OGLTexture / Framebuffer
-	//m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_depthbufferIndex);
-	//m_pParentImp->glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, m_width, m_height);
-	//m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex);
-
+	m_pOGLTexture = OGLTexture::MakeTextureWithFormat(m_pParentImp, 
+		texture::TEXTURE_TYPE::TEXTURE_COLOR, 
+		m_width, 
+		m_height, 
+		m_channels,
+		internalGLFormat, GL_DEPTH_COMPONENT, pixelDataType
+	);
+	CN(m_pOGLTexture);
 
 Error:
 	return r;

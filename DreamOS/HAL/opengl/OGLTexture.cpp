@@ -93,6 +93,18 @@ Error:
 	return r;
 }
 
+RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType) {
+	RESULT r = R_PASS;
+	
+	CR(Bind());
+
+	// TODO: Pull deeper settings from texture object
+	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, pixelDataType, pImageBuffer));
+
+Error:
+	return r;
+}
+
 RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 	RESULT r = R_PASS;
 
@@ -105,10 +117,7 @@ RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 		pImageBuffer = m_pImageBuffer + (optOffset);
 	}
 
-	CR(Bind());
-
-	// TODO: Pull deeper settings from texture object
-	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, GL_UNSIGNED_BYTE, pImageBuffer));
+	CR(AllocateGLTexture(pImageBuffer, internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
 
 Error:
 	return r;
@@ -126,6 +135,30 @@ Error:
 	return r;
 }
 
+OGLTexture* OGLTexture::MakeTextureWithFormat(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type,
+											  int width, int height, int channels, 
+											  GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType, 
+											  int levels, int samples) 
+{
+	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
+	CN(pTexture);
+
+	CR(pTexture->OGLInitialize(NULL));
+	CR(pTexture->SetParams(width, height, channels, samples, levels));
+
+	CR(pTexture->AllocateGLTexture(nullptr, internalGLFormat, glFormat, pixelDataType));
+
+	// TODO: Rename or remove this / specialize more
+	CR(pTexture->SetDefaultDepthTextureParams());
+
+Error:
+	return pTexture;
+}
+
 OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, int levels, int samples) {
 	RESULT r = R_PASS;
 
@@ -138,6 +171,7 @@ OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE
 	CR(pTexture->SetParams(width, height, channels, samples, levels));
 	CR(pTexture->AllocateGLTexture());
 
+	// TODO: Rename or remove this / specialize more
 	CR(pTexture->SetDefaultTextureParams());
 
 Error:
@@ -174,6 +208,7 @@ OGLTexture* OGLTexture::MakeCubeMap(OpenGLImp *pParentImp, texture::TEXTURE_TYPE
 		CR(pTexture->AllocateGLTexture(pCubeMapSideOffset));
 		
 		// TODO: Is this needed here?  I think it can be out of the for loop
+		// TODO: Rename or remove this / specialize more
 		CR(pTexture->SetDefaultCubeMapParams());
 	}
 
@@ -202,6 +237,7 @@ OGLTexture* OGLTexture::MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXT
 	CR(pTexture->OGLInitialize(NULL));
 	CR(pTexture->AllocateGLTexture());
 
+	// TODO: Rename or remove this / specialize more
 	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
 		CR(pTexture->SetDefaultCubeMapParams());
 	}
@@ -234,6 +270,7 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TE
 	CR(pTexture->CopyTextureBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
 	CR(pTexture->AllocateGLTexture());
 
+	// TODO: Rename or remove this / specialize more
 	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
 		CR(pTexture->SetDefaultCubeMapParams());
 	}
@@ -264,6 +301,7 @@ OGLTexture* OGLTexture::MakeTextureFromFileBuffer(OpenGLImp *pParentImp, texture
 	CR(pTexture->LoadTextureFromFileBuffer((uint8_t*)pBuffer, pBuffer_n));
 	CR(pTexture->AllocateGLTexture());
 
+	// TODO: Rename or remove this / specialize more
 	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {
 		CR(pTexture->SetDefaultCubeMapParams());
 	}
@@ -301,11 +339,25 @@ Error:
 	return r;
 }
 
+RESULT OGLTexture::SetDefaultDepthTextureParams() {
+	RESULT r = R_PASS;
+
+	CRM(SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");
+	CRM(SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MIN_FILTER");
+
+	CRM(SetTextureParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
+	CRM(SetTextureParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
+
+Error:
+	return r;
+}
+
 RESULT OGLTexture::SetDefaultTextureParams() {
 	RESULT r = R_PASS;
 
 	CRM(SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_NEAREST), "Failed to set GL_TEXTURE_MAG_FILTER");
 	CRM(SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_NEAREST), "Failed to set GL_TEXTURE_MIN_FILTER");
+
 	CRM(SetTextureParameter(GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
 	CRM(SetTextureParameter(GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE), "Failed to set texture wrap");
 

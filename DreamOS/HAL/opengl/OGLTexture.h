@@ -56,6 +56,7 @@ public:
 	RESULT OGLInitializeMultisample(int multisample = 4);
 
 	RESULT SetDefaultTextureParams();
+	RESULT SetDefaultDepthTextureParams();
 	RESULT SetDefaultCubeMapParams();
 	
 	RESULT OGLActivateTexture(int value);
@@ -67,6 +68,7 @@ public:
 	GLuint GetOGLTextureIndex();
 
 	RESULT AllocateGLTexture(size_t optOffset = 0);
+	RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType);
 
 	RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) override;
 
@@ -79,6 +81,7 @@ private:
 
 public:
 	static OGLTexture *MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, int levels = 0, int samples = 1);
+	static OGLTexture *MakeTextureWithFormat(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, GLint internalGLFormat = GL_DEPTH_COMPONENT24, GLenum glFormat = GL_DEPTH_COMPONENT, GLenum pixelDataType = GL_UNSIGNED_INT, int levels = 1, int samples = 0);
 	static OGLTexture *MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
 	static OGLTexture *MakeCubeMap(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels);
 	static OGLTexture *MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, std::wstring wstrFilename);

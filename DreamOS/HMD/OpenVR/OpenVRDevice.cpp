@@ -77,7 +77,8 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 	CR(pOGLRenderFramebuffer->Bind());
 
 	CR(pOGLRenderFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
-	CR(pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OPENVR_MULTISAMPLE));
+	//CR(pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OPENVR_MULTISAMPLE));
+	CR(pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer(DEFAULT_OPENVR_MULTISAMPLE));
 
 	CR(pOGLRenderFramebuffer->MakeColorAttachment());		// Note: This will create a new color buffer
 	CR(pOGLRenderFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());

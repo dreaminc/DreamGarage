@@ -35,7 +35,7 @@ RESULT OGLRenderbuffer::OGLInitialize() {
 
 	CR(m_pParentImp->glBindRenderbuffer(GL_RENDERBUFFER, m_OGLRenderbufferIndex));
 
-	if (m_sampleCount > 0) {
+	if (m_sampleCount > 1) {
 		CR(m_pParentImp->glRenderbufferStorageMultisample(GL_RENDERBUFFER, m_sampleCount, GL_DEPTH_COMPONENT, m_width, m_height));
 	}
 	else {

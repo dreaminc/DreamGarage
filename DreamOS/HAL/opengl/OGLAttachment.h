@@ -18,12 +18,12 @@ public:
 	~OGLAttachment ();
 
 	// TODO: This is a temporary approach
-	RESULT OGLInitializeRenderBuffer();
+	RESULT OGLInitializeRenderBuffer(int samples = 0);
 
 	// TODO: Potentially combine with the upper function - use mutli sample or not based on multisample value
 	RESULT OGLInitialize(OGLTexture *pOGLTexture);
-	RESULT OGLInitializeDepthTexture(GLenum internalFormat = GL_DEPTH_COMPONENT24, GLenum type = GL_UNSIGNED_INT);
-	RESULT OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT, int multisample = 4);
+	RESULT MakeOGLDepthTexture(GLenum internalGLFormat = GL_DEPTH_COMPONENT24, GLenum pixelDataType = GL_UNSIGNED_INT);
+	//RESULT OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT, int multisample = 4);
 	
 	RESULT AttachToFramebuffer(GLenum target, GLenum attachment);
 	RESULT AttachTextureToFramebuffer(GLenum target, GLenum attachment);
