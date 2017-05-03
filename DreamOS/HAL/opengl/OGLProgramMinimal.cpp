@@ -32,26 +32,7 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	//InitializeDepthToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024);
 
 	// Custom framebuffer output settings
-	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, 1024, 1024, 1);
-	CN(m_pOGLFramebuffer);
-
-	CR(m_pOGLFramebuffer->OGLInitialize());
-	CR(m_pOGLFramebuffer->Bind());
-
-	// Color attachment
-	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
-	
-	// Depth attachment 
-	CR(m_pOGLFramebuffer->MakeDepthAttachment());		
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT));
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
-
-	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
-
-	// Check that our framebuffer is OK
-	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+	CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
 
 Error:
 	return r;
@@ -80,7 +61,7 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 
 	UseProgram();
 

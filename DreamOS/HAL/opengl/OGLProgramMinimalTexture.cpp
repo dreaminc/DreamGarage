@@ -21,6 +21,8 @@ RESULT OGLProgramMinimalTexture::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
+	CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
+
 Error:
 	return r;
 }
@@ -48,13 +50,21 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
+	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+
 	UseProgram();
+
+	if (m_pOGLFramebuffer != nullptr)
+		BindToFramebuffer(m_pOGLFramebuffer);
+
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
+
+	UnbindFramebuffer();
 
 	//Error:
 	return r;
@@ -66,8 +76,13 @@ RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
 	OGLTexture *pTexture = nullptr;
 
 	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-		pTexture->OGLActivateTexture(0);
-		m_pUniformTextureColor->SetUniform(pTexture);
+		//pTexture->OGLActivateTexture(0);
+		//m_pUniformTextureColor->SetUniform(pTexture);
+
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(GL_TEXTURE_2D, pTexture->GetOGLTextureIndex());
+
+		m_pUniformTextureColor->SetUniform(0);
 	}
 
 	//	Error:

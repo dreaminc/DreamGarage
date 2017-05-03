@@ -41,23 +41,43 @@ OGLFramebuffer::~OGLFramebuffer() {
 	}
 }
 
-RESULT OGLFramebuffer::ResizeFramebuffer(int pxWidth, int pxHeight) {
+RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFormat, GLenum typeDepth) {
 	RESULT r = R_PASS;
+	
+	CBR(((pxWidth != m_width) || (pxHeight != m_height)), R_SKIPPED);
 
 	m_width = pxWidth;
 	m_height = pxHeight;
 
 	CR(Bind());
 
+	// TODO: This is destroying the attachments and creating new ones - try to fix
+
 	if (m_pOGLColorAttachment != nullptr) {		
-		CR(m_pOGLColorAttachment->Resize(pxWidth, pxHeight));
+		//CR(m_pOGLColorAttachment->Resize(pxWidth, pxHeight));
+
+		///*
+		CR(DeleteColorAttachment());
+
+		CR(MakeColorAttachment());
+		CR(GetColorAttachment()->MakeOGLTexture());
+		CR(GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+		//*/
 	}
 
 	if (m_pOGLDepthAttachment != nullptr) {
-		CR(m_pOGLDepthAttachment->Resize(pxWidth, pxHeight));
+		//CR(m_pOGLDepthAttachment->Resize(pxWidth, pxHeight));
+
+		///*
+		CR(DeleteDepthAttachment());
+
+		CR(MakeDepthAttachment());
+		CR(GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT));
+		CR(GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+		//*/
 	}
 
-	//CR(InitializeOGLDrawBuffers(1));
+	CR(InitializeOGLDrawBuffers(1));
 
 	// Always check that our framebuffer is ok
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -138,6 +158,17 @@ Error:
 	return r;
 }
 
+RESULT OGLFramebuffer::DeleteColorAttachment() {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLColorAttachment);
+
+	delete m_pOGLColorAttachment;
+	m_pOGLColorAttachment = nullptr;
+
+Error:
+	return r;
+}
 
 RESULT OGLFramebuffer::MakeColorAttachment() {
 	RESULT r = R_PASS;
@@ -158,6 +189,18 @@ RESULT OGLFramebuffer::InitializeColorAttachment(OGLTexture *pOGLTexture) {
 	CR(m_pOGLColorAttachment->OGLInitialize(pOGLTexture));
 	CR(m_pOGLColorAttachment->AttachToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 	CR(InitializeOGLDrawBuffers(1));
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::DeleteDepthAttachment() {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLDepthAttachment);
+
+	delete m_pOGLDepthAttachment;
+	m_pOGLDepthAttachment = nullptr;
 
 Error:
 	return r;

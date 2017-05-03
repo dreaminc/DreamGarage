@@ -44,6 +44,11 @@ GLuint OGLAttachment ::GetOGLTextureIndex() {
 RESULT OGLAttachment::Resize(int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
+	CBR(((pxWidth != m_width) || (pxHeight != m_height)), R_SKIPPED);
+
+	m_width = pxWidth;
+	m_height = pxHeight;
+
 	if (m_pOGLTexture != nullptr) {
 		CR(m_pOGLTexture->Resize(pxWidth, pxHeight));
 	}

@@ -18,8 +18,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestMinimalShader());
 	CR(AddTestMinimalTextureShader());
+	CR(AddTestMinimalShader());
 
 	CR(AddTestAlphaVolumes());
 
@@ -171,7 +171,7 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -190,23 +190,13 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		pVolume->SetPosition(point(-1.0f, 0.0f, 0.0f));
+		
+		texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		CN(pColorTexture);
 
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		CR(pVolume->SetColor(COLOR_RED));
+		CR(pVolume->SetColorTexture(pColorTexture));
 
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
-		CR(pVolume->SetColor(COLOR_BLUE));
-
-		pVolume = m_pDreamOS->AddVolume(width, height, length);
-		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
 
 	Error:
 		return r;
@@ -228,7 +218,7 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("Render To Texture");

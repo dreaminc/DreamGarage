@@ -171,6 +171,8 @@ RESULT OGLProgram::InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum
 	RESULT r = R_PASS;
 
 	pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, channels);
+	CN(pOGLFramebuffer);
+
 	CR(SetFrameBuffer(pOGLFramebuffer, internalDepthFormat, typeDepth, pxWidth, pxHeight, channels));
 
 Error:
@@ -221,7 +223,8 @@ RESULT OGLProgram::UpdateFramebufferToViewport(OGLFramebuffer*&pOGLFramebuffer, 
 
 	if (pOGLFramebuffer != nullptr) {
 		if (pOGLFramebuffer->GetWidth() != pxWidth || pOGLFramebuffer->GetHeight() != pxHeight) {
-			return pOGLFramebuffer->ResizeFramebuffer(pxWidth, pxHeight);
+			return pOGLFramebuffer->Resize(pxWidth, pxHeight);
+			//return InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT);
 		}
 		else {
 			return R_PASS;
@@ -292,6 +295,7 @@ Error:
 RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer *pFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
 	RESULT r = R_PASS;
 
+	/*
 	CN(pFramebuffer);
 	
 	CR(pFramebuffer->OGLInitialize());	
@@ -309,6 +313,27 @@ RESULT OGLProgram::SetFrameBuffer(OGLFramebuffer *pFramebuffer, GLenum internalD
 	CR(pFramebuffer->InitializeOGLDrawBuffers(1));
 
 	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
+	*/
+
+	CN(pFramebuffer);
+
+	CR(pFramebuffer->OGLInitialize());
+	CR(pFramebuffer->Bind());
+
+	// Color attachment
+	CR(pFramebuffer->MakeColorAttachment());
+	CR(pFramebuffer->GetColorAttachment()->MakeOGLTexture());
+	CR(pFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	// Depth attachment 
+	CR(pFramebuffer->MakeDepthAttachment());
+	CR(pFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT));
+	CR(pFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+
+	CR(pFramebuffer->InitializeOGLDrawBuffers(1));
+
+	// Check that our framebuffer is OK
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 Error:

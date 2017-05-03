@@ -42,6 +42,8 @@ public:
 
 	RESULT MakeDepthAttachment();
 	RESULT MakeColorAttachment();
+	RESULT DeleteColorAttachment();
+	RESULT DeleteDepthAttachment();
 
 	OGLAttachment* GetDepthAttachment() { return m_pOGLDepthAttachment; }
 	OGLAttachment* GetColorAttachment() { return m_pOGLColorAttachment; }
@@ -50,7 +52,7 @@ public:
 	RESULT InitializeColorAttachment(OGLTexture *pOGLTexture);
 	RESULT InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth);
 
-	RESULT ResizeFramebuffer(int pxWidth, int pxHeight);
+	RESULT Resize(int pxWidth, int pxHeight, GLenum internalDepthFormat = GL_DEPTH_COMPONENT16, GLenum typeDepth = GL_FLOAT);
 
 	GLuint GetFramebufferIndex();
 
