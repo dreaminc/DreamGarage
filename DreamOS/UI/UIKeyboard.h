@@ -64,6 +64,7 @@ public:
 
 private:
 	RESULT UIKeyboard::UpdateViewQuad();
+	RESULT UIKeyboard::UpdateAppComposite();
 
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -75,7 +76,10 @@ private:
 	std::shared_ptr<quad> m_pSurface;
 	float m_surfaceWidth;
 	float m_surfaceHeight;
-	point m_ptSurface;
+
+	point m_ptSurfaceOffset;
+	quaternion m_qSurfaceOrientation;
+	float m_surfaceDistance;
 
 	UIMallet *m_pLeftMallet;
 	UIMallet *m_pRightMallet;

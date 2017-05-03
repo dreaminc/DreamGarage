@@ -18,8 +18,9 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
 
 	//TODO this may become deprecated
-	m_ptSurface = point(-0.0f, 0.9f, 4.75f);
-	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));
+	m_surfaceDistance = 0.5f;
+	m_ptSurfaceOffset = point(0.0f, -0.25f, -m_surfaceDistance);
+	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
 
 	m_surfaceHeight = 0.25f;
 	m_surfaceWidth = 0.5f;
@@ -246,6 +247,8 @@ RESULT UIKeyboard::ShowKeyboard() {
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		GetComposite()->SetPosition(point(0.0f, -1.0f, 5.0f));
+		pKeyboard->GetComposite()->SetVisible(true);
+		pKeyboard->HideSurface();
 	Error:
 		return r;
 	};
@@ -254,18 +257,17 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		pKeyboard->GetComposite()->SetVisible(true);
-		pKeyboard->HideSurface();
 		m_pLeftMallet->Show();
 		m_pRightMallet->Show();
 	Error:
 		return r;
 	};
 
+	UpdateAppComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		GetComposite(),
-		m_ptSurface,
-		GetComposite()->GetOrientation(),
+		m_ptSurfaceOffset,
+		GetComposite()->GetOrientation() * m_qSurfaceOrientation,
 		GetComposite()->GetScale(),
 		0.2f,
 		AnimationCurveType::EASE_OUT_QUAD,
@@ -324,6 +326,10 @@ UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 	point pt = manifold.GetContactPoint(0).GetPoint();
 	point ptCenter = GetComposite()->GetPosition();
 
+	auto mat = inverse(RotationMatrix(GetComposite()->GetOrientation()));
+	pt = mat*pt;
+	ptCenter = mat*ptCenter;
+
 	auto& keyboardLayout = m_pLayout->GetKeys();
 	int rowIndex = (pt.z() - ptCenter.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
 	CBR(rowIndex >= 0 && rowIndex < keyboardLayout.size(), R_OBJECT_NOT_FOUND);
@@ -340,6 +346,21 @@ UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 		}
 	}
 
+/*
+	float radY = GetComposite()->GetOrientation().ProjectedYRotationDeg() * M_PI / 180.0f;
+	// convert absolute collision point into keyboard surface basis
+	point bl = point(-m_surfaceWidth / 2.0f * cos(radY), 0.0f, -m_surfaceHeight / 2.0f * sin(radY)) + ptCenter;
+	point tr = point(m_surfaceWidth / 2.0f * cos(radY), 0.0f, m_surfaceHeight / 2.0f * sin(radY)) + ptCenter;
+
+	OVERLAY_DEBUG_SET("pt", pt);
+	OVERLAY_DEBUG_SET("ptl", bl);
+	OVERLAY_DEBUG_SET("ptr", tr);
+
+	float px = (pt.x() - bl.x()) / (tr.x() - bl.x());
+	float pz = (pt.z() - bl.z()) / (tr.z() - bl.z());
+	OVERLAY_DEBUG_SET("px", px);
+	OVERLAY_DEBUG_SET("pz", pz);
+//*/
 Error:
 	return nullptr;
 }
@@ -378,6 +399,30 @@ RESULT UIKeyboard::UpdateViewQuad() {
 	CR(m_pSurface->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), m_pSurface->GetNormal()));
 
 Error:
+	return r;
+}
+
+//TODO: This isn't ideal, especially because this code is similar to code in 
+// UIModule and UIBar.  This code should be refactored upon creation of 
+// a 'user' object that manages the positions of applications appropriately.
+//
+RESULT UIKeyboard::UpdateAppComposite() {
+	RESULT r = R_PASS;
+
+	auto pComposite = GetComposite();
+	quaternion q = pComposite->GetCamera()->GetOrientation();
+	float headRotationYDeg = q.ProjectedYRotationDeg();
+	float radY = headRotationYDeg * M_PI / 180.0f;
+	quaternion q2 = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
+
+	m_ptSurfaceOffset = pComposite->GetCamera()->GetPosition();
+	point cam = m_surfaceDistance * point(-sin(radY), -0.5f, -cos(radY));
+	OVERLAY_DEBUG_SET("cam", cam);
+	m_ptSurfaceOffset = m_ptSurfaceOffset + cam;
+	pComposite->SetPosition(m_ptSurfaceOffset);
+	pComposite->SetOrientation(q2);
+
+//Error:
 	return r;
 }
 
