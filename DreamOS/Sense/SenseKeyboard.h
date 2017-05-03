@@ -92,7 +92,7 @@ public:
 
 	~SenseKeyboard();
 
-	// raw keyboard eveny
+	// raw keyboard event
 	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) = 0;
 	// text typing event
 	// this event is separated than the raw event as it in Windows OS

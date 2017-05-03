@@ -90,7 +90,10 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
-	
+
+	m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
+	CN(m_pKeyboard);
+
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
@@ -240,8 +243,12 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
-text* DreamOS::AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard) {
-	return m_pSandbox->AddText(fontName, content, size, isBillboard);
+text *DreamOS::MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard) {
+	return m_pSandbox->MakeText(pFont, content, size, isBillboard);
+}
+
+text* DreamOS::AddText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard) {
+	return m_pSandbox->AddText(pFont, content, size, isBillboard);
 }
 
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
@@ -298,6 +305,10 @@ RESULT DreamOS::SetSandboxConfiguration(SandboxApp::configuration sandboxconf) {
 
 const SandboxApp::configuration& DreamOS::GetSandboxConfiguration() {
 	return m_pSandbox->GetSandboxConfiguration();
+}
+
+std::shared_ptr<UIKeyboard> DreamOS::GetKeyboard() {
+	return m_pKeyboard;
 }
 
 // Physics Engine

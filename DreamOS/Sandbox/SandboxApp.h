@@ -194,6 +194,7 @@ public:
 
 	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
 	text* AddText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard);
+	text* MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);

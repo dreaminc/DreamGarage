@@ -2,14 +2,17 @@
 #define UI_KEYBOARD_H_
 
 #include "DreamApp.h"
-#include "Primitives/Subscriber.h"
-#include "InteractionEngine/InteractionObjectEvent.h"
+#include "Primitives/TextEntryString.h"
+#include "Primitives/Publisher.h"
 #include "InteractionEngine/ActiveObject.h"
+#include "Sense/SenseKeyboard.h"
 
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
+#include "HAL/opengl/OGLText.h" // !!!
 
 #include <vector>
+#include <string>
 
 class quad;
 class sphere;
@@ -17,8 +20,9 @@ class text;
 class Font;
 class texture;
 class CollisionManifold;
+class FlatContext;
 
-class UIKeyboard : public DreamApp<UIKeyboard>, public Subscriber<InteractionObjectEvent> {
+class UIKeyboard : public DreamApp<UIKeyboard>, public SenseKeyboard {
 	friend class DreamAppManager;
 
 public:
@@ -35,9 +39,6 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
-	//InteractionEngine
-	virtual RESULT Notify(InteractionObjectEvent *oEvent) override;
-
 //Animation
 public:
 	RESULT ShowKeyboard();
@@ -47,6 +48,12 @@ public:
 	RESULT SetVisible(bool fVisible);
 
 	UIKey* CollisionPointToKey(CollisionManifold& manifold);
+
+//SenseKeyboard
+public:
+	RESULT UpdateKeyStates();
+	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) override;
+	RESULT CheckKeyState(SenseVirtualKey key);
 
 //Dynamic Resizing
 public:
@@ -61,6 +68,9 @@ private:
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
+public:
+	RESULT UpdateTextBox(int chkey);
+
 private:
 	std::shared_ptr<quad> m_pSurface;
 	float m_surfaceWidth;
@@ -70,10 +80,16 @@ private:
 	UIMallet *m_pLeftMallet;
 	UIMallet *m_pRightMallet;
 
-	std::string m_strEnteredText;
+	std::shared_ptr<quad> m_pTextBox;
+	std::shared_ptr<texture> m_pTextBoxTexture;
+
+	std::shared_ptr<composite> m_pTextBoxContainer;
+	std::map<std::string, texture*> m_keyTextureLookup;
+
+	FlatContext *m_pQuadTextures;
 
 	ActiveObject::state m_keyStates[2];
-	std::shared_ptr<quad> m_keyObjects[2];
+	UIKey* m_keyObjects[2];
 
 	std::shared_ptr<Font> m_pFont;
 	std::shared_ptr<texture> m_pKeyTexture;

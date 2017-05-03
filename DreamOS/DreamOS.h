@@ -38,6 +38,8 @@
 
 #include "DreamAppManager.h"
 
+#include "UI/UIKeyboard.h"
+
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
 	public valid 
@@ -121,7 +123,8 @@ public:
 	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	sphere *MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 
-	text *AddText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text *AddText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text *MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	
 	volume *MakeVolume(double side, bool fTriangleBased = true);
 	volume *MakeVolume(double width, double length, double height, bool fTriangleBased = true);
@@ -200,6 +203,13 @@ protected:
 
 private:
 	SandboxApp *m_pSandbox;
+
+// System Applications
+public:
+	std::shared_ptr<UIKeyboard> GetKeyboard();
+
+private:
+	std::shared_ptr<UIKeyboard> m_pKeyboard;
 
 private:
 	version m_versionDreamOS;

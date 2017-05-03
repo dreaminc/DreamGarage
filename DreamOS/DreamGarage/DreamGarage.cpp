@@ -15,6 +15,7 @@ light *g_pLight = nullptr;
 
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamUIBar.h"
+#include "DreamGarage/DreamBrowser.h"
 
 #include "HAL/opengl/OGLObj.h"
 #include "HAL/opengl/OGLProgramEnvironmentObjects.h"
@@ -154,16 +155,29 @@ RESULT DreamGarage::LoadScene() {
 	//CV(m_pDreamUIBar);
 
 	m_pDreamUIBar->SetParams(iconFormat, labelFormat, menuFormat, titleFormat);
+//*
+	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
+	CNM(m_pDreamBrowser, "Failed to create dream browser");
 
+	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+	m_pDreamBrowser->SetDiagonalSize(10.0f);
+	
+	m_pDreamBrowser->SetVisible(false);
+	//TODO: collisions doesn't follow properly
+	//m_pDreamBrowser->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, 1.7f, vector(0.0f, 0.0f, 1.0f));
+	//m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, 0.0f));
+	//*/
+/*
 	m_pDreamContentView = LaunchDreamApp<DreamContentView>(this);
 	CNM(m_pDreamContentView, "Failed to create dream content view");
 
 	m_pDreamContentView->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
 
 	m_pDreamContentView->SetVisible(false);
-	CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
-
 	m_pDreamContentView->SetFitTextureAspectRatio(true);
+	//*/
+
+	CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
 
 Error:
 	return r;
@@ -451,11 +465,17 @@ Error:
 RESULT DreamGarage::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
+	/*
 	if (m_pDreamContentView != nullptr) {
 		m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset);
 		m_pDreamContentView->SetVisible(true);
 	}
 
+	//*/
+	if (m_pDreamBrowser != nullptr) {
+		m_pDreamBrowser->SetVisible(true);
+		m_pDreamBrowser->SetEnvironmentAsset(pEnvironmentAsset);
+	}
 	return r;
 }
 

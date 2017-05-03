@@ -75,7 +75,7 @@ public:
 private:
 
 	// Font to be used for the text
-	std::shared_ptr<Font> m_font = nullptr;
+	std::shared_ptr<Font> m_font;
 
 	// String of the text
 	std::string	m_text = "";

@@ -1,8 +1,9 @@
 #include "UIKeyboardLayout.h"
+#include "Sense/SenseKeyboard.h"
 
 UIKey::UIKey() {}
 
-UIKey::UIKey(float left, float width, std::string& letter) 
+UIKey::UIKey(float left, float width, unsigned int letter) 
 {
 	m_left = left;
 	m_width = width;
@@ -31,44 +32,79 @@ RESULT UIKeyboardLayout::CreateQWERTYLayout() {
 
 	m_pLayout.clear();
 	std::vector<std::shared_ptr<UIKey>> row;
+	std::string rowChars;
+
 	float left = 0.0f;
-	for (auto c : "qwertyuiop") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
-		row.emplace_back(k);
+	rowChars = "qwertyuiop";
+	for (int i = 0; i < rowChars.size(); i++) {
+		auto key = new UIKey(left, 0.1f, rowChars[i]);
+		row.emplace_back(key);
 		left += 0.1f;
 	}
-	row.pop_back();
 	m_pLayout.emplace_back(row);
-
 	row.clear();
+
 	left = 0.05f;
-	for (auto c : "asdfghjkl") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
-		row.emplace_back(k);
+	rowChars = "asdfghjkl";
+	for (int i = 0; i < rowChars.size(); i++) {
+		auto key = new UIKey(left, 0.1f, rowChars[i]);
+		row.emplace_back(key);
 		left += 0.1f;
 	}
-	row.pop_back();
 	m_pLayout.emplace_back(row);
-
 	row.clear();
-	left = 0.15f;
-	for (auto c : "zxcvbnm") {
-		std::string ch = std::string(1, c); 
-		auto k = new UIKey(left, 0.1f, ch);
-		row.emplace_back(k);
-		left += 0.1f;
-	}
-	row.pop_back();
-	m_pLayout.emplace_back(row);
 
-	row.clear();
-	left = 0.25f;
+	// Shift
+	left = 0.0f;
 	{
-		std::string ch = " ";
-		auto k = new UIKey(left, 0.35f, ch);
-		row.emplace_back(k);
+		auto key = new UIKey(left, 0.125f, SVK_SHIFT);
+		row.emplace_back(key);
+	}
+
+	left = 0.15f;
+	rowChars = "zxcvbnm";
+	for (int i = 0; i < rowChars.size(); i++) {
+		auto key = new UIKey(left, 0.1f, rowChars[i]);
+		row.emplace_back(key);
+		left += 0.1f;
+	}
+
+	// Backspace
+	{
+		auto key = new UIKey(0.875f, 0.125f, SVK_BACK);
+		row.emplace_back(key);
+	}
+
+	m_pLayout.emplace_back(row);
+	row.clear();
+
+	left = 0.0f;
+	{
+		//TODO: using unused values for behaviors not defined by ascii
+		auto key = new UIKey(left, 0.125f, SVK_CONTROL); // Number layer
+		row.emplace_back(key);
+		left += 0.125f;
+
+		//TODO: leaving this out for now, 'www.' doesn't seem too useful
+		/*
+		key = new UIKey(left, 0.125f, SVK_PRIOR); // spare key
+		row.emplace_back(key);
+		//*/
+		left += 0.125f;
+
+		left += 0.1f;
+
+		key = new UIKey(left, 0.35f, SVK_SPACE);
+		row.emplace_back(key);
+
+		left += 0.35f;
+		key = new UIKey(left, 0.125f, '.');
+		row.emplace_back(key);
+
+		// 'go' or 'enter'
+		left += 0.15f;
+		key = new UIKey(left, 0.15f, SVK_RETURN);
+		row.emplace_back(key);
 	}
 	m_pLayout.emplace_back(row);
 

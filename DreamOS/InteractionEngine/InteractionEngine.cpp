@@ -56,7 +56,7 @@ RESULT InteractionEngine::RegisterSenseKeyboard() {
 	// Register Dream Console to keyboard events
 	CR(m_pSandbox->RegisterSubscriber(SVK_ALL, this));
 	CR(m_pSandbox->RegisterSubscriber(CHARACTER_TYPING, this));
-
+	
 Error:
 	return r;
 }
@@ -187,6 +187,10 @@ RESULT InteractionEngine::CancelAnimation(VirtualObj *pObj) {
 	CR(m_pObjectQueue->CancelAnimation(pObj, msNow));
 Error:
 	return r;
+}
+
+point InteractionEngine::GetInteractionRayOrigin() {
+	return m_pInteractionRay->GetOrigin();
 }
 
 // TODO: Tidy up / test this code
@@ -503,8 +507,11 @@ RESULT InteractionEngine::Notify(SenseKeyboardEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	// Pass through keyboard input
+
+	//TODO: hack to get around active object issues
+	//
 	///*
-	for (auto &pObject : m_activeObjects) {
+//	for (auto &pObject : m_activeObjects) {
 		InteractionEventType type;
 
 		if (pEvent->KeyState == 0)
@@ -512,11 +519,12 @@ RESULT InteractionEngine::Notify(SenseKeyboardEvent *pEvent) {
 		else
 			type = INTERACTION_EVENT_KEY_DOWN;
 
-		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, nullptr);
+		//InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
 		interactionEvent.SetValue((int)(pEvent->KeyCode));
 
 		CR(NotifySubscribers(type, &interactionEvent));
-	}
+//	}
 	//*/
 	CR(r);
 
