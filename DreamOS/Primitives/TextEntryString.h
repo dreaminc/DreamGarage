@@ -8,6 +8,11 @@ class TextEntryString {
 public:
 	RESULT UpdateString(unsigned int keyCode);
 
+	RESULT clear();
+	size_t size();
+	RESULT pop_back();
+
+private:
 	std::string m_string;
 };
 

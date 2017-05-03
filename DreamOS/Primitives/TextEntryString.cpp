@@ -28,3 +28,17 @@ RESULT TextEntryString::UpdateString(unsigned int keyCode) {
 //Error:
 	return r;
 }
+
+RESULT TextEntryString::clear() {
+	m_string.clear();
+	return R_PASS;
+}
+
+size_t TextEntryString::size() {
+	return m_string.size();
+}
+
+RESULT TextEntryString::pop_back() {
+	m_string.pop_back();
+	return R_PASS;
+}

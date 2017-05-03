@@ -298,12 +298,12 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			else if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
-				m_strEntered.m_string.clear();
+				m_strEntered.clear();
 			}
 
 			else if (pEvent->m_value == SVK_BACK) {
-				if (m_strEntered.m_string.size() > 0)
-					m_strEntered.m_string.pop_back();
+				if (m_strEntered.size() > 0)
+					m_strEntered.pop_back();
 			}
 
 			char chKey = (char)(pEvent->m_value);

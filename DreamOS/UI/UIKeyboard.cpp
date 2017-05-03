@@ -13,6 +13,10 @@ UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 RESULT UIKeyboard::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
+	// Register keyboard events
+	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
+	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
+
 	//TODO this may become deprecated
 	m_ptSurface = point(-0.0f, 0.9f, 4.75f);
 	GetComposite()->SetOrientation(quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f));

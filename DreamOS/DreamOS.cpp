@@ -92,11 +92,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	CRM(LoadScene(), "Failed to load scene");
 
 	m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
+	CN(m_pKeyboard);
 
-	auto pSense = (SenseKeyboard*)m_pKeyboard.get();
-	auto pPublisher = (Publisher<SenseVirtualKey, SenseKeyboardEvent>*)pSense;
-
-	CR(pPublisher->RegisterSubscriber(SVK_ALL, m_pSandbox->GetInteractionEngineProxy()));
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
 
