@@ -30,14 +30,16 @@ public:
 	std::string GetParentName();
 	RESULT SetName(std::string strName);
 
+	size_t GetNumConnections();
 	DConnection* FindConnection(DConnection* pConnection);
 	DConnection* FindConnection(std::string strConnectionName, std::string strNodeName);
 
 	RESULT RemoveConnection(DConnection* pConnection);
 
 	RESULT Connect(DConnection* pConnection);
-	RESULT Disconnect(DConnection* pConnection);
+	
 	RESULT Disconnect();
+	RESULT Disconnect(DConnection* pConnection);
 
 	CONNECTION_TYPE GetType();
 	bool IsActive();

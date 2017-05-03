@@ -101,6 +101,11 @@ public:
 		return r;
 	}
 
+	size_t GetNumInputConnections();
+	size_t GetNumOutputConnections();
+	size_t GetNumConnections(CONNECTION_TYPE type);
+	size_t GetNumConnections();
+
 	DConnection* Connection(std::string strName, CONNECTION_TYPE type);
 	DConnection* Input(std::string strName);
 	DConnection* Output(std::string strName);
@@ -113,6 +118,8 @@ public:
 	RESULT Connect(DConnection* pInputConnection, DConnection* pOutputConnection);
 	RESULT ConnectToInput(std::string strInputName, DConnection* pOutputConnection);
 	RESULT ConnectToOutput(std::string strOutputName, DConnection* pInputConnection);
+
+	RESULT Disconnect();
 
 	RESULT RenderNode(long frameID = 0);
 	virtual RESULT ProcessNode(long frameID = 0) = 0;
@@ -147,6 +154,15 @@ private:
 	std::vector<DConnection*> m_outputs;
 
 	bool m_fTerminate = false;
+
+	// TODO: Move to a pattern
+public:
+	int incRefCount() { m_refCount++; return m_refCount; }
+	int decRefCount() { m_refCount--; return m_refCount; }
+	int refCount() { return m_refCount; }
+
+private:
+	int m_refCount = 0;
 
 private:
 	std::string m_strName;

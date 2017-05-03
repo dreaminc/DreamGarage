@@ -521,6 +521,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	//m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
+	
+	// This will prevent scene graph from being deleted when not connected
+	// TODO: Attach to Sandbox somehow?
+	CB(m_pSceneGraph->incRefCount());
 
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
@@ -646,6 +650,9 @@ RESULT SandboxApp::InitializeCamera() {
 	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), m_viewport);
 	CN(m_pCamera);
 
+	// This will prevent camera from being deleted when not connected
+	CB(m_pCamera->incRefCount());
+
 Error:
 	return r;
 }
@@ -688,9 +695,12 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
 	CNM(pDestSinkNode, "Destination sink node isn't set");
 
+	CB(pDestSinkNode->incRefCount());
+
 	// Source Nodes
 	// TODO: 
 
+	/*
 	CR(m_pHALImp->MakeCurrentContext());
 	{
 		// Set up OGL programs
@@ -723,7 +733,7 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 
 		CR(pRenderProgramNode->ConnectToInput("input_framebufferA", pRenderProgramNode->Output("output_framebufferA")));
 		CR(pRenderProgramNode->ConnectToInput("input_framebufferB", pRenderProgramNode->Output("output_framebufferB")));
-		//*/
+		
 
 		ProgramNode *pRenderScreenQuad = m_pHALImp->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
@@ -747,7 +757,7 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		ProgramNode* pDreamConsoleProgram = m_pHALImp->MakeProgramNode("debugconsole");
 		CN(pDreamConsoleProgram);
 		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
-		*/
+		
 
 		// Connect Program to Display
 		// Connected in parallel (order matters)
@@ -759,7 +769,7 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
-		*/
+		
 
 		
 
@@ -768,10 +778,10 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 
 		
 
-		*/
 	}
 
 	CR(m_pHALImp->ReleaseCurrentContext());
+	*/
 
 Error:
 	return r;

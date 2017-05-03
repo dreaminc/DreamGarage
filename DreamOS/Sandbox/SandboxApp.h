@@ -244,10 +244,12 @@ public:
 	RESULT UnregisterUpdateCallback();
 	RESULT ResizeViewport(viewport newViewport);
 
-
 	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
+
+	CameraNode* GetCameraNode() { return m_pCamera; }
+	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
 
 	hand *GetHand(hand::HAND_TYPE handType);
 

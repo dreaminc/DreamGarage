@@ -24,7 +24,24 @@ std::shared_ptr<DNode> Pipeline::FindNode(std::string strName) {
 RESULT Pipeline::RunPipeline() {
 	RESULT r = R_PASS;
 
+	CN(m_pDestinationSinkNode);
 	CR(m_pDestinationSinkNode->RenderNode(m_frameID++));
+
+Error:
+	return r;
+}
+
+RESULT Pipeline::Reset(bool fResetDestination) {
+	RESULT r = R_PASS;
+
+	CR(m_pDestinationSinkNode->Disconnect());
+
+	if (fResetDestination == true) {
+		if (m_pDestinationSinkNode != nullptr) {
+			delete m_pDestinationSinkNode;
+			m_pDestinationSinkNode = nullptr;
+		}
+	}
 
 Error:
 	return r;

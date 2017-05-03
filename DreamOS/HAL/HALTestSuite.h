@@ -25,6 +25,9 @@ public:
 	virtual RESULT AddTests() override;
 
 public:
+	RESULT AddTestMinimalShader();
+	RESULT AddTestMinimalTextureShader();	
+
 	RESULT AddTestRenderToTextureQuad();
 	RESULT AddTestFramerateVolumes();
 	RESULT AddTestAlphaVolumes();

@@ -15,7 +15,8 @@ DNode::DNode(std::string strName) :
 DNode::~DNode() {
 	RESULT r = R_PASS;
 
-	CR(ClearConnections());
+	CR(r);
+	// TODO: 
 
 Error:
 	return;
@@ -76,6 +77,33 @@ RESULT DNode::MakeOutput(std::string strName, objType*&pDestination) {
 	return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, pDestination);
 }
 */
+
+size_t DNode::GetNumConnections() {
+	return (GetNumConnections(CONNECTION_TYPE::INPUT)) + (GetNumConnections(CONNECTION_TYPE::OUTPUT));
+}
+
+size_t DNode::GetNumInputConnections() {
+	return GetNumConnections(CONNECTION_TYPE::INPUT);
+}
+
+size_t DNode::GetNumOutputConnections() {
+	return GetNumConnections(CONNECTION_TYPE::OUTPUT);
+}
+
+size_t DNode::GetNumConnections(CONNECTION_TYPE type) {
+	RESULT r = R_PASS;
+	size_t retSize = 0;
+
+	std::vector<DConnection*> *pDConnections = GetConnectionSet(type);
+	CN(pDConnections);
+
+	for (auto &pDConnection : *pDConnections) {
+		retSize += pDConnection->GetNumConnections();
+	}
+
+Error:
+	return retSize;
+}
 
 std::vector<DConnection*>* DNode::GetConnectionSet(CONNECTION_TYPE type) {
 	if (type == CONNECTION_TYPE::INPUT) {
@@ -160,6 +188,21 @@ RESULT DNode::ConnectToOutput(std::string strOutputName, DConnection* pInputConn
 	CB(pInputConnection->GetType() == CONNECTION_TYPE::INPUT);
 
 	CR(Connect(pInputConnection, pOutputConnection));
+
+Error:
+	return r;
+}
+
+RESULT DNode::Disconnect() {
+	RESULT r = R_PASS;
+
+	for (auto &pConnection : m_inputs) {
+		CR(pConnection->Disconnect());
+	}
+
+	for (auto &pConnection : m_outputs) {
+		CR(pConnection->Disconnect());
+	}
 
 Error:
 	return r;

@@ -76,6 +76,7 @@ protected:
 	// related functionality
 	HALImp* GetHALImp();
 
+
 	// Dream Apps
 public:
 	ControllerProxy* GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType);
@@ -156,6 +157,9 @@ public:
 	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
+
+	CameraNode* GetCameraNode() { return m_pSandbox->GetCameraNode(); }
+	ObjectStoreNode* GetSceneGraphNode() { return m_pSandbox->GetSceneGraphNode(); }
 
 	// Hands
 	hand *GetHand(hand::HAND_TYPE handType);

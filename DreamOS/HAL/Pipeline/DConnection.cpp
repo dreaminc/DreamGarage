@@ -1,6 +1,7 @@
 #include "DConnection.h"
 
 #include "DNode.h"
+#include "ProgramNode.h"
 
 DConnection::DConnection(DNode* pParentNode, CONNECTION_TYPE connType, DCONNECTION_FLAGS optFlags) :
 	m_pParentNode(pParentNode),
@@ -46,6 +47,14 @@ RESULT DConnection::Disconnect(DConnection* pRemoteConnection) {
 	CR(pRemoteConnection->RemoveConnection(this));
 	CR(RemoveConnection(pRemoteConnection));
 
+	DEBUG_LINEOUT("Disconnecting %s:%s.%s to %s:%s.%s",
+		ConnectionTypeString(m_connType).c_str(), m_pParentNode->GetName().c_str(), GetName().c_str(),
+		ConnectionTypeString(pRemoteConnection->m_connType).c_str(), pRemoteConnection->m_pParentNode->GetName().c_str(), pRemoteConnection->GetName().c_str());
+
+	if (pRemoteConnection->m_pParentNode != nullptr) {
+		CR(pRemoteConnection->m_pParentNode->Disconnect());
+	}
+
 Error:
 	return r;
 }
@@ -54,8 +63,20 @@ RESULT DConnection::Disconnect() {
 	RESULT r = R_PASS;
 
 	// Remove from all remote connections
-	for (auto &pRemoteConnection : m_connections) {
+	while (m_connections.size() > 0) {
+		auto pRemoteConnection = m_connections.back();
+
 		CR(Disconnect(pRemoteConnection));
+
+		DNode *pNode = pRemoteConnection->m_pParentNode;
+		if (pNode != nullptr) {
+			if (pNode->GetNumConnections() == 0 && pNode->refCount() == 0) {
+				DEBUG_LINEOUT("Node %s has zero connections - deleting", pNode->GetName().c_str());
+
+				delete pNode;
+				pNode = nullptr;
+			}
+		}
 	}
 
 Error:
@@ -76,6 +97,10 @@ std::string DConnection::GetParentName() {
 RESULT DConnection::SetName(std::string strName) {
 	m_strName = strName;
 	return R_PASS;
+}
+
+size_t DConnection::GetNumConnections() {
+	return m_connections.size();
 }
 
 DConnection* DConnection::FindConnection(DConnection* pConnection) {
