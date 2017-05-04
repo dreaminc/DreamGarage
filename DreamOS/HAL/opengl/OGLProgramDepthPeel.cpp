@@ -12,6 +12,8 @@
 
 #include "HAL/opengl/GL/glext.h"
 
+//OGLTexture *g_pColorTexture = nullptr;
+
 OGLProgramDepthPeel::OGLProgramDepthPeel(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "ogldepthpeel")
 {
@@ -31,15 +33,56 @@ RESULT OGLProgramDepthPeel::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
 
-	//CR(InitializeDepthToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT));
+	//InitializeFrameBuffer(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
 
-	InitializeFrameBufferWithDepth(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
-	InitializeFrameBufferWithDepth(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);
-	InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
+	m_pOGLFramebufferOutputA = new OGLFramebuffer(m_pParentImp, 1024, 1024, 4);
+	CN(m_pOGLFramebufferOutputA);
+
+	CR(m_pOGLFramebufferOutputA->OGLInitialize());
+	CR(m_pOGLFramebufferOutputA->Bind());
+
+	// Color attachment
+	CR(m_pOGLFramebufferOutputA->MakeColorAttachment());
+	CR(m_pOGLFramebufferOutputA->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebufferOutputA->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	// Depth attachment 
+	CR(m_pOGLFramebufferOutputA->MakeDepthAttachment());
+	CR(m_pOGLFramebufferOutputA->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32F, GL_FLOAT, texture::TEXTURE_TYPE::TEXTURE_RECTANGLE));
+	CR(m_pOGLFramebufferOutputA->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+
+	CR(m_pOGLFramebufferOutputA->InitializeOGLDrawBuffers(1));
+
+	//InitializeFrameBuffer(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
+
+	m_pOGLFramebufferOutputB = new OGLFramebuffer(m_pParentImp, 1024, 1024, 4);
+	CN(m_pOGLFramebufferOutputB);
+
+	CR(m_pOGLFramebufferOutputB->OGLInitialize());
+	CR(m_pOGLFramebufferOutputB->Bind());
+
+	// Color attachment
+	CR(m_pOGLFramebufferOutputB->MakeColorAttachment());
+	CR(m_pOGLFramebufferOutputB->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebufferOutputB->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	// Depth attachment 
+	CR(m_pOGLFramebufferOutputB->MakeDepthAttachment());
+	CR(m_pOGLFramebufferOutputB->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32F, GL_FLOAT, texture::TEXTURE_TYPE::TEXTURE_RECTANGLE));
+	CR(m_pOGLFramebufferOutputB->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+
+	CR(m_pOGLFramebufferOutputB->InitializeOGLDrawBuffers(1));
+
+	InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
+
+	//g_pColorTexture = (OGLTexture *)m_pParentImp->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_RECTANGLE);
 
 	m_pOGLQuery = new OGLQuery(m_pParentImp);
 	CN(m_pOGLQuery);
 	CR(m_pOGLQuery->OGLInitialize());
+
+	// Check that our framebuffer is OK
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 Error:
 	return r;
@@ -93,7 +136,7 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		//UpdateFramebufferToViewport(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
 		//UpdateFramebufferToViewport(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);	
 
-		UpdateFramebufferToViewport(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
+		//UpdateFramebufferToViewport(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
 	}
 
 	// Alternate buffers 
@@ -116,27 +159,22 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 	else {
 		// Disable blending and depth testing
 		glEnable(GL_DEPTH_TEST);
+		//glDisable(GL_DEPTH_TEST);
 		glDisable(GL_BLEND);
 	}
+
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	SetLights(pLights);
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	if (pOGLFramebufferInput != nullptr) {
-		/*
-		OGLTexture *pTexture = (OGLTexture*)(pOGLFramebufferInput->GetTexture());
-
-		pTexture->OGLActivateTexture();
-		m_pUniformTextureDepth->SetUniform(pTexture);
-		*/
-
-		// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
-		GLenum glTextureUnit = GL_TEXTURE0;
-
-		//m_pParentImp->glActiveTexture(glTextureUnit);
-		//m_pParentImp->BindTexture(GL_TEXTURE_2D, pOGLFramebufferInput->GetOGLDepthbufferIndex());
-
-		//m_pUniformTextureDepth->SetUniform(0);
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+		//m_pParentImp->BindTexture(g_pColorTexture->GetOGLTextureTarget(), g_pColorTexture->GetOGLTextureIndex());
+		
+		m_pUniformTextureDepth->SetUniform(0);
 	}
 
 	m_pOGLQuery->BeginQuery(GL_SAMPLES_PASSED_ARB);
@@ -151,12 +189,17 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 	GLuint samples;
 	m_pOGLQuery->GetQueryObject(&samples);
 
-	//if (samples == 0 || m_depth >= MAX_DEPTH_PEEL_LAYERS) {
-	if (samples == 0 || m_depth == 1 ) {
+	//if (samples == 0 || m_depth == 1 ) {
+	if (samples == 0 || m_depth >= MAX_DEPTH_PEEL_LAYERS) {
 		// TODO: This might not be the best way to do this
 		// we kind of want a "stack frame" object potentially 
 		m_depth = 0;
 		Terminate();
+
+		/*
+		m_pOGLFramebufferOutputA->SetAndClearViewport(false, true);
+		m_pOGLFramebufferOutputB->SetAndClearViewport(false, true);
+		*/
 	}
 	else {
 		m_depth++;

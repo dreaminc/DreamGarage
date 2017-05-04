@@ -27,6 +27,7 @@ public:
 public:
 	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalTextureShader();	
+	RESULT AddTestDepthPeelingShader();
 
 	RESULT AddTestRenderToTextureQuad();
 	RESULT AddTestFramerateVolumes();

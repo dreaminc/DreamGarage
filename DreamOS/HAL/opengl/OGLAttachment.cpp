@@ -33,7 +33,15 @@ GLuint OGLAttachment ::GetOGLRenderbufferIndex() {
 	return 0;
 }
 
-GLuint OGLAttachment ::GetOGLTextureIndex() {
+GLenum OGLAttachment::GetOGLTextureTarget() {
+	if (m_pOGLTexture != nullptr) {
+		return m_pOGLTexture->GetOGLTextureTarget();
+	}
+
+	return 0;
+}
+
+GLuint OGLAttachment::GetOGLTextureIndex() {
 	if (m_pOGLTexture != nullptr) {
 		return m_pOGLTexture->GetOGLTextureIndex();
 	}
@@ -120,11 +128,11 @@ RESULT OGLAttachment::AttachRenderBufferToFramebuffer(GLenum target, GLenum atta
 	return m_pParentImp->glFramebufferRenderbuffer(target, attachment, renderbuffertarget, m_pOGLRenderbuffer->GetOGLRenderbufferIndex());
 }
 
-RESULT OGLAttachment::MakeOGLDepthTexture(GLenum internalGLFormat, GLenum pixelDataType) {
+RESULT OGLAttachment::MakeOGLDepthTexture(GLenum internalGLFormat, GLenum pixelDataType, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
 	m_pOGLTexture = OGLTexture::MakeTextureWithFormat(m_pParentImp, 
-		texture::TEXTURE_TYPE::TEXTURE_COLOR, 
+		type, 
 		m_width, 
 		m_height, 
 		m_channels,
@@ -136,10 +144,10 @@ Error:
 	return r;
 }
 
-RESULT OGLAttachment::MakeOGLTexture() {
+RESULT OGLAttachment::MakeOGLTexture(texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
-	m_pOGLTexture = OGLTexture::MakeTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, m_width, m_height, m_channels);
+	m_pOGLTexture = OGLTexture::MakeTexture(m_pParentImp, type, m_width, m_height, m_channels);
 	CN(m_pOGLTexture);
 
 Error:

@@ -146,8 +146,15 @@ OGLTexture* OGLTexture::MakeTextureWithFormat(OpenGLImp *pParentImp, texture::TE
 
 	OGLTexture *pTexture = nullptr;
 
-	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
-	CN(pTexture);
+	// TODO: Get rid of other texture targets and do 2d, cube, rectangle (others?)
+	if (type == texture::TEXTURE_TYPE::TEXTURE_RECTANGLE) {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_RECTANGLE);
+		CN(pTexture);
+	}
+	else {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
+		CN(pTexture);
+	}
 
 	CR(pTexture->OGLInitialize(NULL));
 	CR(pTexture->SetParams(width, height, channels, samples, levels));
@@ -166,8 +173,15 @@ OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE
 
 	OGLTexture *pTexture = nullptr;
 
-	pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
-	CN(pTexture);
+	// TODO: Get rid of other texture targets and do 2d, cube, rectangle (others?)
+	if (type == texture::TEXTURE_TYPE::TEXTURE_RECTANGLE) {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_RECTANGLE);
+		CN(pTexture);
+	}
+	else {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);
+		CN(pTexture);
+	}
 
 	CR(pTexture->OGLInitialize(NULL));
 	CR(pTexture->SetParams(width, height, channels, samples, levels));
@@ -228,6 +242,12 @@ OGLTexture* OGLTexture::MakeTextureFromPath(OpenGLImp *pParentImp, texture::TEXT
 		CN(pTexture);
 
 		CR(pTexture->LoadCubeMapByName(wstrFilename.c_str()));
+	}
+	else if (type == texture::TEXTURE_TYPE::TEXTURE_RECTANGLE) {
+		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_RECTANGLE);
+		CN(pTexture);
+
+		CR(pTexture->LoadTextureFromFile(wstrFilename.c_str()));
 	}
 	else {
 		pTexture = new OGLTexture(pParentImp, type, GL_TEXTURE_2D);

@@ -779,7 +779,6 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 		
 
 	}
-
 	CR(m_pHALImp->ReleaseCurrentContext());
 	*/
 

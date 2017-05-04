@@ -22,7 +22,6 @@ public:
 
 	// TODO: Potentially combine with the upper function - use mutli sample or not based on multisample value
 	RESULT OGLInitialize(OGLTexture *pOGLTexture);
-	RESULT MakeOGLDepthTexture(GLenum internalGLFormat = GL_DEPTH_COMPONENT24, GLenum pixelDataType = GL_UNSIGNED_INT);
 	//RESULT OGLInitializeRenderBufferMultisample(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT, int multisample = 4);
 	
 	RESULT AttachToFramebuffer(GLenum target, GLenum attachment);
@@ -30,10 +29,12 @@ public:
 	RESULT AttachRenderBufferToFramebuffer(GLenum target = GL_FRAMEBUFFER, GLenum attachment = GL_DEPTH_ATTACHMENT, GLenum renderbuffertarget = GL_RENDERBUFFER);
 
 	RESULT MakeOGLTextureMultisample();
-	RESULT MakeOGLTexture();
+	RESULT MakeOGLDepthTexture(GLenum internalGLFormat = GL_DEPTH_COMPONENT24, GLenum pixelDataType = GL_UNSIGNED_INT, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	RESULT MakeOGLTexture(texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	GLuint GetOGLRenderbufferIndex();
 	GLuint GetOGLTextureIndex();
+	GLenum GetOGLTextureTarget();
 
 	OGLTexture *GetOGLTexture() { return m_pOGLTexture; }
 	OGLRenderbuffer *GetOGLRenderBuffer() { return m_pOGLRenderbuffer; }
