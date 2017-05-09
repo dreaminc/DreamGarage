@@ -67,13 +67,13 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 		if (m_fRenderDepth) {
 			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
 			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+			m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
 
 			m_pUniformTextureColor->SetUniform(0);
 		}
 		else {
 			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
+			m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
 
 			m_pUniformTextureColor->SetUniform(0);
 		}

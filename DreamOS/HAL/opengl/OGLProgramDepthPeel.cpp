@@ -165,7 +165,7 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 	if (m_depth == 0) {
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	else {
 		// Disable blending and depth testing
@@ -210,10 +210,16 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		/*
 		m_pOGLFramebufferOutputA->SetAndClearViewport(false, true);
 		m_pOGLFramebufferOutputB->SetAndClearViewport(false, true);
-		*/
+		//*/
 	}
 	else {
 		// Blend the texture here
+
+		if (m_pOGLProgramBlendQuad != nullptr) {
+			//CR(m_pOGLProgramBlendQuad->ProcessNode(frameID));
+			m_pOGLProgramBlendQuad->SetInput<OGLFramebuffer>("input_framebuffer", pOGLFramebufferOutput);
+			m_pOGLProgramBlendQuad->ProcessNode(frameID);
+		}
 
 		m_depth++;
 	}

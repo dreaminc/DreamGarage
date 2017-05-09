@@ -8,6 +8,8 @@
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
+OGLTexture *g_pColorTexture = nullptr;
+
 OGLProgramBlendQuad::OGLProgramBlendQuad(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglblendquad")
 {
@@ -31,6 +33,8 @@ RESULT OGLProgramBlendQuad::OGLInitialize() {
 
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
+
+	g_pColorTexture = (OGLTexture *)m_pParentImp->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_RECTANGLE);
 
 Error:
 	return r;
@@ -62,25 +66,36 @@ RESULT OGLProgramBlendQuad::ProcessNode(long frameID) {
 	if(m_pOGLFramebuffer != nullptr) 
 		BindToFramebuffer(m_pOGLFramebuffer);
 
-	//use separate blending function
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Use separate blending function
 	m_pParentImp->glBlendEquation(GL_FUNC_ADD);
 	m_pParentImp->glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
 
+	///*
 	if (m_pOGLFramebufferInput != nullptr) {
 		if (m_fRenderDepth) {
 			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
 			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+			m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
 
 			m_pUniformTextureColor->SetUniform(0);
 		}
 		else {
 			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
+			m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
 
 			m_pUniformTextureColor->SetUniform(0);
 		}
 	}
+	//*/
+
+	/*
+	m_pParentImp->glActiveTexture(GL_TEXTURE0);
+	m_pParentImp->BindTexture(g_pColorTexture->GetOGLTextureTarget(), g_pColorTexture->GetOGLTextureIndex());
+	m_pUniformTextureColor->SetUniform(0);
+	//*/
 
 	m_pQuad->Render();
 
