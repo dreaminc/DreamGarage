@@ -48,7 +48,8 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pRightMallet = new UIMallet(GetDOS());
 	CN(m_pRightMallet);
 
-	m_keyTypeThreshold = -0.015f;
+	m_keyTypeThreshold = 0.0f; // triggered once the center of the mallet hits the keyboard surface
+	m_keyReleaseThreshold = -0.025f;
 
 	m_pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -169,15 +170,13 @@ RESULT UIKeyboard::Update(void *pContext) {
 	int i = 0;
 	for (auto &mallet : { m_pLeftMallet, m_pRightMallet })
 	{
-		auto head = mallet->GetMalletHead();
 		point ptBoxOrigin = m_pSurface->GetOrigin(true);
-		point ptSphereOrigin = head->GetOrigin(true);
+		point ptSphereOrigin = mallet->GetMalletHead()->GetOrigin(true);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pSurface->GetOrientation(true))) * (ptSphereOrigin - m_pSurface->GetOrigin(true)));
-		OVERLAY_DEBUG_SET("pt", ptSphereOrigin);
 
-		if (ptSphereOrigin.y() >= 0.02f) mallet->CheckAndCleanDirty();
+		if (ptSphereOrigin.y() >= mallet->GetRadius()) mallet->CheckAndCleanDirty();
 
-		if (ptSphereOrigin.y() < 0.02f && !mallet->IsDirty()) {
+		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
 
 			auto key = CollisionPointToKey(ptSphereOrigin);
 			if (!key) {
@@ -186,7 +185,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 			}
 
 			point ptPosition = key->m_pQuad->GetPosition();
-			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - 0.02f, ptPosition.z()));
+			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - mallet->GetRadius(), ptPosition.z()));
 
 			//stops typing the same character a bunch of times
 			if (m_keyStates[i] == ActiveObject::state::NOT_INTERSECTED) {
@@ -198,16 +197,19 @@ RESULT UIKeyboard::Update(void *pContext) {
 				CR(ReleaseKey(i));
 				m_keyObjects[i] = key;
 			}
+
+			// type key once the mallet center hits the typing threshold
+			// currently, the key can't be typed again until it ReleaseKey is called on it
 			if (ptSphereOrigin.y() < m_keyTypeThreshold && !key->m_fTyped) {
 				CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
 				key->m_fTyped = true;
 			}
 	
-			//TODO: may want this to be a different distance than the 'typed' threshold
-			// this comes with some edge cases however
-			if (ptSphereOrigin.y() < m_keyTypeThreshold) {
+			if (ptSphereOrigin.y() < m_keyReleaseThreshold) {
 				CR(ReleaseKey(i));
-				mallet->SetDirty();
+				// once the mallet is below the forced key release threshold, 
+				// no key can be touched until the mallet is above the keyboard surface
+				mallet->SetDirty(); 
 			}
 		}
 		else {
@@ -325,6 +327,7 @@ RESULT UIKeyboard::ReleaseKey(int index) {
 		AnimationFlags()
 	));
 
+	// currently, keys can only be typed once until ReleaseKey is called
 	pKey->m_fTyped = false;
 
 	m_keyObjects[index] = nullptr;
