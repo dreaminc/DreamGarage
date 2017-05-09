@@ -5,9 +5,6 @@
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/AnimationItem.h"
 
-#include "Primitives/BoundingQuad.h"
-#include "Primitives/BoundingSphere.h"
-
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -31,12 +28,12 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	CN(m_pSurface);
 
 	m_pSurface->SetVisible(false);
-	m_pSurface->InitializeOBB();
+	m_pSurface->InitializeOBB(); // TODO: using the default BoundingQuad could potentially be better
 
 	m_pTextBox = GetComposite()->AddQuad(m_surfaceHeight / 4.0f, m_surfaceWidth);
 	CN(m_pTextBox);
 	m_pTextBox->SetVisible(false);
-	m_pTextBox->SetPosition(point(0.0f, 0.00f, -m_surfaceHeight * 0.75f ));
+	m_pTextBox->SetPosition(point(0.0f, 0.0f, -m_surfaceHeight * 0.75f ));
 	m_pTextBoxTexture = GetComposite()->MakeTexture(L"Textbox-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	m_pTextBox->SetColorTexture(m_pTextBoxTexture.get());
 
@@ -88,7 +85,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout() {
 			// Set up text box key texture
 			if (m_pQuadTextures->HasChildren()) m_pQuadTextures->ClearChildren();
 			std::string ch = "";
-			if (key->m_letter > 0x20) ch = key->m_letter;
+			if (key->m_letter >= 0x20) ch = key->m_letter;
 
 			m_pQuadTextures->AddText(m_pFont, ch, 0.2f, true);
 			GetDOS()->RenderToTexture(m_pQuadTextures);
@@ -341,23 +338,11 @@ Error:
 // this function assumes the key height is constant
 UIKey* UIKeyboard::CollisionPointToKey(point ptCollision) {
 	RESULT r = R_PASS;
-/*
-	point pt = manifold.GetContactPoint(0).GetPoint();
-	point ptCenter = GetComposite()->GetPosition();
-
-	auto mat = inverse(RotationMatrix(GetComposite()->GetOrientation()));
-	pt = mat*pt;
-	ptCenter = mat*ptCenter;
-//*/
-	//OVERLAY_DEBUG_SET("max", (float)manifold.MaxPenetrationDepth());
-	//OVERLAY_DEBUG_SET("min", (float)manifold.MinPenetrationDepth());
 
 	auto& keyboardLayout = m_pLayout->GetKeys();
-//	int rowIndex = (pt.z() - ptCenter.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
 	int rowIndex = (ptCollision.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
 	CBR(rowIndex >= 0 && rowIndex < keyboardLayout.size(), R_OBJECT_NOT_FOUND);
 
-//	float xPos = (pt.x() - ptCenter.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth;
 	float xPos = (ptCollision.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth;
 	auto& row = keyboardLayout[rowIndex];
 
@@ -426,7 +411,6 @@ RESULT UIKeyboard::UpdateAppComposite() {
 
 	m_ptSurfaceOffset = pComposite->GetCamera()->GetPosition();
 	point cam = m_surfaceDistance * point(-sin(radY), -0.5f, -cos(radY));
-	OVERLAY_DEBUG_SET("cam", cam);
 	m_ptSurfaceOffset = m_ptSurfaceOffset + cam;
 	pComposite->SetPosition(m_ptSurfaceOffset);
 	pComposite->SetOrientation(q2);
@@ -454,7 +438,7 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 			auto pQuad = m_pTextBoxContainer->AddQuad(keyDimension, keyDimension);
 			CN(pQuad);
 			CR(pQuad->SetColorTexture(m_keyTextureLookup[ch]));
-			// TODO: Hardcoded positioning code here should be temporary
+			// TODO: Hard-coded positioning code here should be temporary
 			pQuad->SetPosition(point((keyDimension / 3.0f) * m_pTextBoxContainer->GetChildren().size() - (m_surfaceWidth / 2.0f), 0.001f, -m_surfaceHeight * 0.75f));
 		}
 	}

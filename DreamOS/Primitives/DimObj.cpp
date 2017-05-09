@@ -740,7 +740,7 @@ RESULT DimObj::InitializeBoundingQuad(point ptOrigin, float width, float height,
 
 	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);
 
-	CR(UpdateBoundingVolume());
+	//CR(UpdateBoundingVolume());
 
 Error:
 	return r;

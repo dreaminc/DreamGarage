@@ -19,7 +19,6 @@ public:
 	unsigned int m_letter; // letter on the key
 
 	bool m_fTyped; // key has been typed
-	bool m_fReleased; // key has been released
 
 	std::shared_ptr<quad> m_pQuad; 
 };

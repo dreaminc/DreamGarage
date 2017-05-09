@@ -10,7 +10,6 @@ UIKey::UIKey(float left, float width, unsigned int letter)
 	m_letter = letter;
 
 	m_fTyped = false;
-	m_fReleased = false;
 }
 
 UIKeyboardLayout::UIKeyboardLayout(LayoutType type) :
