@@ -17,6 +17,10 @@ public:
 	float m_left;	// left side of the key
 	float m_width;  // width of the key
 	unsigned int m_letter; // letter on the key
+
+	bool m_fTyped; // key has been typed
+	bool m_fReleased; // key has been released
+
 	std::shared_ptr<quad> m_pQuad; 
 };
 

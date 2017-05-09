@@ -68,7 +68,6 @@ RESULT DreamGarage::LoadScene() {
 	halconf.fRenderProfiler = false;
 	SetHALConfiguration(halconf);
 	//*/
-	
 
 	// Console
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);

@@ -47,7 +47,10 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
-	UIKey* CollisionPointToKey(CollisionManifold& manifold);
+	UIKey* CollisionPointToKey(point ptCollision);
+
+private:
+	RESULT ReleaseKey(int index);
 
 //SenseKeyboard
 public:
@@ -91,6 +94,9 @@ private:
 	std::map<std::string, texture*> m_keyTextureLookup;
 
 	FlatContext *m_pQuadTextures;
+
+	float m_keyTypeThreshold;
+	float m_keyReleaseThreshold;
 
 	ActiveObject::state m_keyStates[2];
 	UIKey* m_keyObjects[2];

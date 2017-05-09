@@ -5,6 +5,9 @@
 #include "PhysicsEngine/CollisionManifold.h"
 #include "InteractionEngine/AnimationItem.h"
 
+#include "Primitives/BoundingQuad.h"
+#include "Primitives/BoundingSphere.h"
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -29,15 +32,13 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	m_pSurface->SetVisible(false);
 	m_pSurface->InitializeOBB();
-//*
+
 	m_pTextBox = GetComposite()->AddQuad(m_surfaceHeight / 4.0f, m_surfaceWidth);
 	CN(m_pTextBox);
 	m_pTextBox->SetVisible(false);
-	m_pTextBox->SetPosition(point(0.0f, 0.01f, -m_surfaceHeight * 0.75f ));
+	m_pTextBox->SetPosition(point(0.0f, 0.00f, -m_surfaceHeight * 0.75f ));
 	m_pTextBoxTexture = GetComposite()->MakeTexture(L"Textbox-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	m_pTextBox->SetColorTexture(m_pTextBoxTexture.get());
-//	m_pTextBoxText = std::make_shared<text>(GetDOS()->AddText(L"Basis_Grotesque_Pro.fnt", ""));
-	//*/
 
 	m_pTextBoxContainer = GetComposite()->AddComposite();
 
@@ -46,6 +47,8 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	m_pRightMallet = new UIMallet(GetDOS());
 	CN(m_pRightMallet);
+
+	m_keyTypeThreshold = -0.015f;
 
 	m_pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -111,7 +114,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout() {
 
 			float xPos = m_surfaceWidth * key->m_left - (m_surfaceWidth / 2.0f) +(key->m_width / 4.0f);
 
-			pQuad->SetPosition(point(xPos, 0.01f, zPos) + m_pSurface->GetPosition());
+			pQuad->SetPosition(point(xPos, 0.0f, zPos) + m_pSurface->GetPosition());
 			pQuad->SetMaterialAmbient(0.75f);
 
 			key->m_pQuad = pQuad;
@@ -164,67 +167,53 @@ RESULT UIKeyboard::Update(void *pContext) {
 		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
 
 	int i = 0;
-	for (auto &mallet : { m_pLeftMallet->GetMalletHead(), m_pRightMallet->GetMalletHead() })
+	for (auto &mallet : { m_pLeftMallet, m_pRightMallet })
 	{
-		CollisionManifold manifold = m_pSurface->Collide(mallet);
+		auto head = mallet->GetMalletHead();
+		point ptBoxOrigin = m_pSurface->GetOrigin(true);
+		point ptSphereOrigin = head->GetOrigin(true);
+		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pSurface->GetOrientation(true))) * (ptSphereOrigin - m_pSurface->GetOrigin(true)));
+		OVERLAY_DEBUG_SET("pt", ptSphereOrigin);
 
-		pObj = manifold.GetObjectA();
-		if (pObj == nullptr)
-			pObj = manifold.GetObjectB();
-		CN(pObj);
+		if (ptSphereOrigin.y() >= 0.02f) mallet->CheckAndCleanDirty();
 
-		if (manifold.NumContacts() > 0) {
+		if (ptSphereOrigin.y() < 0.02f && !mallet->IsDirty()) {
 
-			if (m_keyStates[i] == ActiveObject::state::NOT_INTERSECTED) { 
+			auto key = CollisionPointToKey(ptSphereOrigin);
+			if (!key) {
+				if (m_keyObjects[i]) ReleaseKey(i);
+				continue;
+			}
 
-				// forces mallet head to be above collision surface
-				if (manifold.GetNormal().y() > 0.0f) { 
-					
-					auto key = CollisionPointToKey(manifold);
-					CNR(key, R_OBJECT_NOT_FOUND);
+			point ptPosition = key->m_pQuad->GetPosition();
+			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - 0.02f, ptPosition.z()));
 
-					CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
-
-					m_keyObjects[i] = key;
-				}
-
+			//stops typing the same character a bunch of times
+			if (m_keyStates[i] == ActiveObject::state::NOT_INTERSECTED) {
+				m_keyObjects[i] = key;
 				m_keyStates[i] = ActiveObject::state::INTERSECTED;
-				CNR(m_keyObjects[i], R_OBJECT_NOT_FOUND);
-
-				auto pObj = m_keyObjects[i]->m_pQuad;
-				point ptPosition = pObj->GetPosition();
-				GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-
-					pObj.get(),
-					point(ptPosition.x(), -0.025f, ptPosition.z()),
-					pObj->GetOrientation(),
-					pObj->GetScale(),
-					0.1f,
-					AnimationCurveType::EASE_OUT_QUAD,
-					AnimationFlags()
-				);
+			}
+			// allows for rolling over keys without typing them
+			else if (m_keyObjects[i] && key != m_keyObjects[i]) {
+				CR(ReleaseKey(i));
+				m_keyObjects[i] = key;
+			}
+			if (ptSphereOrigin.y() < m_keyTypeThreshold && !key->m_fTyped) {
+				CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
+				key->m_fTyped = true;
+			}
+	
+			//TODO: may want this to be a different distance than the 'typed' threshold
+			// this comes with some edge cases however
+			if (ptSphereOrigin.y() < m_keyTypeThreshold) {
+				CR(ReleaseKey(i));
+				mallet->SetDirty();
 			}
 		}
 		else {
-			m_keyStates[i] = ActiveObject::state::NOT_INTERSECTED;
-			if (m_keyObjects[i] != nullptr) {
-
-				auto pObj = m_keyObjects[i]->m_pQuad;
-				point ptPosition = pObj->GetPosition();
-				GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-					pObj.get(),
-					point(ptPosition.x(), 0.01f, ptPosition.z()),
-					pObj->GetOrientation(),
-					pObj->GetScale(),
-					0.1f,
-					AnimationCurveType::EASE_OUT_QUAD,
-					AnimationFlags()
-				);
-
-				CR(UpdateKeyState((SenseVirtualKey)(m_keyObjects[i]->m_letter), 0));
-				m_keyObjects[i] = nullptr;
-			}
+			if (m_keyObjects[i]) ReleaseKey(i);
 		}
+
 		i++;
 	}
 Error:
@@ -319,22 +308,54 @@ RESULT UIKeyboard::SetVisible(bool fVisible) {
 	return GetComposite()->SetVisible(fVisible);
 }
 
-// this function assumes the key height is constant
-UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
+RESULT UIKeyboard::ReleaseKey(int index) {	
 	RESULT r = R_PASS;
+	
+	auto pKey = m_keyObjects[index];
+	auto pObj = pKey->m_pQuad;
+	point ptPosition = pObj->GetPosition();
 
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		pObj.get(),
+		point(ptPosition.x(), 0.00f, ptPosition.z()),
+		pObj->GetOrientation(),
+		pObj->GetScale(),
+		0.1f,
+		AnimationCurveType::EASE_OUT_QUAD,
+		AnimationFlags()
+	));
+
+	pKey->m_fTyped = false;
+
+	m_keyObjects[index] = nullptr;
+	m_keyStates[index] = ActiveObject::state::NOT_INTERSECTED;
+
+	CR(UpdateKeyState((SenseVirtualKey)(pKey->m_letter), 0));
+
+Error:
+	return r;
+}
+// this function assumes the key height is constant
+UIKey* UIKeyboard::CollisionPointToKey(point ptCollision) {
+	RESULT r = R_PASS;
+/*
 	point pt = manifold.GetContactPoint(0).GetPoint();
 	point ptCenter = GetComposite()->GetPosition();
 
 	auto mat = inverse(RotationMatrix(GetComposite()->GetOrientation()));
 	pt = mat*pt;
 	ptCenter = mat*ptCenter;
+//*/
+	//OVERLAY_DEBUG_SET("max", (float)manifold.MaxPenetrationDepth());
+	//OVERLAY_DEBUG_SET("min", (float)manifold.MinPenetrationDepth());
 
 	auto& keyboardLayout = m_pLayout->GetKeys();
-	int rowIndex = (pt.z() - ptCenter.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
+//	int rowIndex = (pt.z() - ptCenter.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
+	int rowIndex = (ptCollision.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
 	CBR(rowIndex >= 0 && rowIndex < keyboardLayout.size(), R_OBJECT_NOT_FOUND);
 
-	float xPos = (pt.x() - ptCenter.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth;
+//	float xPos = (pt.x() - ptCenter.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth;
+	float xPos = (ptCollision.x() + (m_surfaceWidth / 2.0f)) / m_surfaceWidth;
 	auto& row = keyboardLayout[rowIndex];
 
 	for (int i = (int)row.size() - 1; i >= 0; i--) {
@@ -346,21 +367,6 @@ UIKey* UIKeyboard::CollisionPointToKey(CollisionManifold& manifold) {
 		}
 	}
 
-/*
-	float radY = GetComposite()->GetOrientation().ProjectedYRotationDeg() * M_PI / 180.0f;
-	// convert absolute collision point into keyboard surface basis
-	point bl = point(-m_surfaceWidth / 2.0f * cos(radY), 0.0f, -m_surfaceHeight / 2.0f * sin(radY)) + ptCenter;
-	point tr = point(m_surfaceWidth / 2.0f * cos(radY), 0.0f, m_surfaceHeight / 2.0f * sin(radY)) + ptCenter;
-
-	OVERLAY_DEBUG_SET("pt", pt);
-	OVERLAY_DEBUG_SET("ptl", bl);
-	OVERLAY_DEBUG_SET("ptr", tr);
-
-	float px = (pt.x() - bl.x()) / (tr.x() - bl.x());
-	float pz = (pt.z() - bl.z()) / (tr.z() - bl.z());
-	OVERLAY_DEBUG_SET("px", px);
-	OVERLAY_DEBUG_SET("pz", pz);
-//*/
 Error:
 	return nullptr;
 }
@@ -446,7 +452,7 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 			CN(pQuad);
 			CR(pQuad->SetColorTexture(m_keyTextureLookup[ch]));
 			// TODO: Hardcoded positioning code here should be temporary
-			pQuad->SetPosition(point((keyDimension / 3.0f) * m_pTextBoxContainer->GetChildren().size() - (m_surfaceWidth / 2.0f), 0.011f, -m_surfaceHeight * 0.75f));
+			pQuad->SetPosition(point((keyDimension / 3.0f) * m_pTextBoxContainer->GetChildren().size() - (m_surfaceWidth / 2.0f), 0.001f, -m_surfaceHeight * 0.75f));
 		}
 	}
 
