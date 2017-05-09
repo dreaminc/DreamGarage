@@ -59,6 +59,9 @@ public:
 
 	// Object Factory Methods
 public:
+	version GetOGLVersion() { return m_versionOGL; }
+	version GetGLSLVersion() { return m_versionGLSL; }
+
 	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
@@ -183,7 +186,9 @@ public:
 
 	RESULT glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation);
 
+	// Blending 
 	RESULT glBlendEquation(GLenum mode);
+	RESULT glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);

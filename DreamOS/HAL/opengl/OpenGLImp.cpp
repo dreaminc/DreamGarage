@@ -1260,11 +1260,23 @@ Error:
 	return r;
 }
 
+// Blending 
+
 RESULT OpenGLImp::glBlendEquation(GLenum mode) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBlendEquation(mode);
 	CRM(CheckGLError(), "glBlendEquation failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
+	CRM(CheckGLError(), "glBlendFuncSeparate failed");
 
 Error:
 	return r;

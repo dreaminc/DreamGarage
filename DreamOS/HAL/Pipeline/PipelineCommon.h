@@ -16,7 +16,8 @@ enum class CONNECTION_TYPE {
 
 enum class DCONNECTION_FLAGS : int {
 	NONE			= 0,
-	PASSIVE			= 1 << 0
+	PASSIVE			= 1 << 0,
+	PASSTHRU		= 1 << 1
 };
 
 // taken from: http://stackoverflow.com/questions/12059774/c11-standard-conformant-bitmasks-using-enum-class

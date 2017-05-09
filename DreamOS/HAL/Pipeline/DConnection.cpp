@@ -153,11 +153,17 @@ CONNECTION_TYPE DConnection::GetType() {
 }
 
 bool DConnection::IsActive() {
-	if (static_cast<int>(m_flags & DCONNECTION_FLAGS::PASSIVE) != 0) {
+	if (static_cast<int>(m_flags & DCONNECTION_FLAGS::PASSIVE) != 0)
 		return false;
-	}
+	else
+		return true;
+}
 
-	return true;
+bool DConnection::IsPassthru() {
+	if (static_cast<int>(m_flags & DCONNECTION_FLAGS::PASSTHRU) != 0)
+		return true;
+	else
+		return false;
 }
 
 RESULT DConnection::RenderConnections(long frameID) {

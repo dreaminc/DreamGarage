@@ -84,6 +84,11 @@ public:
 	}
 
 	template <class objType>
+	RESULT MakeOutputPassthru(std::string strName, objType **ppDestination) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, ppDestination, DCONNECTION_FLAGS::PASSTHRU);
+	}
+
+	template <class objType>
 	RESULT SetInput(std::string strName, objType *pDestination) {
 		RESULT r = R_PASS;
 
@@ -96,6 +101,29 @@ public:
 		CN(pDConnectionTyped);
 
 		CR(pDConnectionTyped->SetConnection(pDestination));
+
+	Error:
+		return r;
+	}
+
+	template <class objType>
+	RESULT SetOutputPassthru(std::string strName, DConnection* pOutputConnection) {
+		RESULT r = R_PASS;
+
+		DConnection* pDConnection = nullptr;
+
+		// Find the connection
+		CNM((pDConnection = Connection(strName, CONNECTION_TYPE::OUTPUT)), "Output Connection %s not found", strName.c_str());
+		CBM((pDConnection->IsPassthru()), "Output Connection %s is not set to pass thru", strName.c_str())
+
+		DConnectionTyped<objType> *pDConnectionTyped = dynamic_cast<DConnectionTyped<objType>*>(pDConnection);
+		CN(pDConnectionTyped);
+
+		DConnectionTyped<objType> *pDConnectionTypedOutput = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
+		CN(pDConnectionTypedOutput);
+
+		//CR(pDConnectionTyped->SetConnection(pDestination));
+		CR(pDConnectionTyped->SetConnectionPassthru(pDConnectionTypedOutput));
 
 	Error:
 		return r;

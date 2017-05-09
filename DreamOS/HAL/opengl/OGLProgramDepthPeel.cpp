@@ -12,6 +12,8 @@
 
 #include "HAL/opengl/GL/glext.h"
 
+#include "OGLProgramBlendQuad.h"
+
 //OGLTexture *g_pColorTexture = nullptr;
 
 OGLProgramDepthPeel::OGLProgramDepthPeel(OpenGLImp *pParentImp) :
@@ -73,13 +75,16 @@ RESULT OGLProgramDepthPeel::OGLInitialize() {
 
 	CR(m_pOGLFramebufferOutputB->InitializeOGLDrawBuffers(1));
 
-	InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
+	//InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
 
 	//g_pColorTexture = (OGLTexture *)m_pParentImp->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_RECTANGLE);
 
 	m_pOGLQuery = new OGLQuery(m_pParentImp);
 	CN(m_pOGLQuery);
 	CR(m_pOGLQuery->OGLInitialize());
+
+	// Blend program
+	CR(InitializeBlendQuadProgram());
 
 	// Check that our framebuffer is OK
 	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -88,18 +93,21 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramDepthPeel::InitializeBlendQuadProgram() {
+	RESULT r = R_PASS;
 
-OGLFramebuffer *m_pOGLFramebufferInputA = nullptr;
-OGLFramebuffer *m_pOGLFramebufferInputB = nullptr;
+	m_pOGLProgramBlendQuad = new OGLProgramBlendQuad(m_pParentImp);
+	CNM(m_pOGLProgramBlendQuad, "Failed to allocate OGLProgram");
 
-OGLFramebuffer *m_pOGLFramebufferOutputA = nullptr;
-OGLFramebuffer *m_pOGLFramebufferOutputB = nullptr;
+	CRM(m_pOGLProgramBlendQuad->OGLProgram::OGLInitialize(L"blendquad.vert", L"blendquad.frag", m_pParentImp->GetOGLVersion()),
+		"Failed to initialize OGL blend quad Program");
 
-int m_numSamplesProcessed;
-int *m_pNumSamplesProcessedLastPass = nullptr;
+	// TODO: Move this somewhere better
+	CR(m_pOGLProgramBlendQuad->SetupConnections());
 
-int m_depth;
-int *m_pLastDepth = nullptr;
+Error:
+	return r;
+}
 
 RESULT OGLProgramDepthPeel::SetupConnections() {
 	RESULT r = R_PASS;
@@ -117,7 +125,10 @@ RESULT OGLProgramDepthPeel::SetupConnections() {
 	CR(MakeOutput<OGLFramebuffer>("output_framebufferB", m_pOGLFramebufferOutputB));
 
 	// The render output
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));	
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));	
+
+	// Connect output as pass-thru to internal blend program
+	CR(SetOutputPassthru<OGLFramebuffer>("output_framebuffer", m_pOGLProgramBlendQuad->Output("output_framebuffer")));
 
 Error:
 	return r;
@@ -202,6 +213,8 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		*/
 	}
 	else {
+		// Blend the texture here
+
 		m_depth++;
 	}
 

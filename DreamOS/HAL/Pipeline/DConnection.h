@@ -43,6 +43,7 @@ public:
 
 	CONNECTION_TYPE GetType();
 	bool IsActive();
+	bool IsPassthru();
 
 	RESULT RenderConnections(long frameID = 0);
 	RESULT RenderParent(long frameID = 0);
@@ -130,13 +131,27 @@ public:
 		CN(pTypedOutputConnection);
 
 		CN(pTypedInputConnection->m_ppObject);
-		CN(pTypedOutputConnection->m_pObject);
 
-		// Set the destination?
-		*pTypedInputConnection->m_ppObject = pTypedOutputConnection->m_pObject;
+		// Handle Pass-thru
+		if (pTypedOutputConnection->IsPassthru()) {
+			// Set the destination?
+			CN(pTypedOutputConnection->m_ppObject);
+			*pTypedInputConnection->m_ppObject = *pTypedOutputConnection->m_ppObject;
+		}
+		else {
+			// Set the destination?
+			CN(pTypedOutputConnection->m_pObject);
+			*pTypedInputConnection->m_ppObject = pTypedOutputConnection->m_pObject;
+		}
+
 
 	Error:
 		return r;
+	}
+
+	RESULT SetConnectionPassthru(DConnectionTyped<objType>* pOutputConnection) {
+		*m_ppObject = pOutputConnection->m_pObject;
+		return R_PASS;
 	}
 
 	RESULT SetConnection(objType **ppObject) {

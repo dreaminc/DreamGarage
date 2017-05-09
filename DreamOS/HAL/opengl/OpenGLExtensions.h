@@ -181,8 +181,14 @@ public:
 		return m_glBindAttribLocation(programID, index, pszName);
 	}
 
+	// Blending
+
 	inline void glBlendEquation(GLenum mode) {
 		return m_glBlendEquation(mode);
+	}
+
+	inline void glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha) {
+		return m_glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
 	}
 
 	// Shader
@@ -432,7 +438,10 @@ private:
 	PFNGLENABLEVERTEXATTRIBARRAYPROC m_glEnableVertexAttribArray;
 	PFNGLDISABLEVERTEXATTRIBARRAYPROC m_glDisableVertexAttribArray;
 	PFNGLBINDATTRIBLOCATIONPROC m_glBindAttribLocation;
+	
+	// Blending
 	PFNGLBLENDEQUATIONPROC m_glBlendEquation;
+	PFNGLBLENDFUNCSEPARATEPROC m_glBlendFuncSeparate;
 
 	// Shader
 	PFNGLATTACHSHADERPROC m_glAttachShader;

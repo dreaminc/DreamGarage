@@ -14,6 +14,8 @@ class ObjectStore;
 class stereocamera;
 class OGLQuery;
 
+class OGLProgramBlendQuad;
+
 #define MAX_DEPTH_PEEL_LAYERS 6
 
 class OGLProgramDepthPeel : public OGLProgram {
@@ -30,6 +32,9 @@ public:
 	RESULT SetObjectUniforms(DimObj *pDimObj);
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
+
+private:
+	RESULT InitializeBlendQuadProgram();
 
 protected:
 	stereocamera *m_pCamera = nullptr;
@@ -49,6 +54,8 @@ private:
 	int *m_pLastDepth = nullptr;
 
 	OGLQuery *m_pOGLQuery = nullptr;
+
+	OGLProgramBlendQuad *m_pOGLProgramBlendQuad = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
