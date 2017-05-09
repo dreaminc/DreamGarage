@@ -164,7 +164,8 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 
 	if (m_depth == 0) {
 		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_BLEND);
+		//glEnable(GL_BLEND);
+		glDisable(GL_BLEND);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	else {
@@ -207,9 +208,9 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		m_depth = 0;
 		Terminate();
 
-		/*
-		m_pOGLFramebufferOutputA->SetAndClearViewport(false, true);
-		m_pOGLFramebufferOutputB->SetAndClearViewport(false, true);
+		///*
+		m_pOGLFramebufferOutputA->SetAndClearViewport(true, true);
+		m_pOGLFramebufferOutputB->SetAndClearViewport(true, true);
 		//*/
 	}
 	else {

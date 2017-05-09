@@ -66,10 +66,12 @@ RESULT OGLProgramBlendQuad::ProcessNode(long frameID) {
 	if(m_pOGLFramebuffer != nullptr) 
 		BindToFramebuffer(m_pOGLFramebuffer);
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	//glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// Use separate blending function
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
 	m_pParentImp->glBlendEquation(GL_FUNC_ADD);
 	m_pParentImp->glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
 
