@@ -46,6 +46,11 @@ RESULT OGLProgramBlendQuad::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
+	// Depth attachment 
+	CR(m_pOGLFramebuffer->MakeDepthAttachment());
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32F, GL_FLOAT, texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+
 	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 
 	g_pColorTexture1 = (OGLTexture *)m_pParentImp->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -74,8 +79,8 @@ RESULT OGLProgramBlendQuad::ClearFrameBuffer() {
 	CN(m_pOGLFramebuffer);
 	CR(m_pOGLFramebuffer->Bind());
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	m_pass = 0;
 
@@ -89,7 +94,7 @@ RESULT OGLProgramBlendQuad::ProcessNode(long frameID) {
 	UseProgram();
 
 	// Seems to be killing our texture
-	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT32F, GL_FLOAT);
 
 	if (m_pOGLFramebuffer != nullptr) {
 		m_pOGLFramebuffer->Bind();

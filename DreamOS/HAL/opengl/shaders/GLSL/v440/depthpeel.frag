@@ -15,14 +15,18 @@ layout (location = 0) out vec4 out_vec4Color;
 // Depth texture 
 uniform sampler2DRect u_textureDepth;
 
-void main(void) {  
-	// Read the depth value from the depth texture
-	float frontDepth = texture(u_textureDepth, gl_FragCoord.xy).r;
+uniform bool u_fDiscard;
 
+void main(void) {  
 	// Compare the current fragment depth with the depth in the depth texture
 	// if it is less, discard the current fragment
-	if(gl_FragCoord.z <= frontDepth) {
-		discard;
+	if(u_fDiscard) {
+		// Read the depth value from the depth texture
+		float frontDepth = texture(u_textureDepth, gl_FragCoord.xy).r;
+
+		if(gl_FragCoord.z <= frontDepth) {
+			discard;
+		}
 	}
 	
 	// NOTE: This is just doing minimal stuff at the moment

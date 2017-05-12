@@ -65,6 +65,8 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
 	OGLUniformSampler2D *m_pUniformTextureDepth = nullptr;
+
+	OGLUniformBool *m_pUniformDiscardFlag = nullptr;
 };
 
 #endif // ! OGLPROGRAM_DEPTH_PEEL_H_

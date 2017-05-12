@@ -35,6 +35,8 @@ RESULT OGLProgramDepthPeel::OGLInitialize() {
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureDepth), std::string("u_textureDepth")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformDiscardFlag), std::string("u_fDiscard")));
+
 	//InitializeFrameBuffer(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
 
 	m_pOGLFramebufferOutputA = new OGLFramebuffer(m_pParentImp, 1024, 1024, 4);
@@ -156,8 +158,8 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 
 	if (m_depth == 0) {
 		glClearDepth(0.0f);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-		
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
 		m_pOGLFramebuffer->Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -167,88 +169,65 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		m_pOGLFramebufferOutputB->Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		m_pOGLProgramBlendQuad->ClearFrameBuffer();
-
-		if (m_pOGLFramebuffer != nullptr) {
-			BindToFramebuffer(m_pOGLFramebuffer);
-		}
-
 		glClearDepth(1.0f);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-		glEnable(GL_DEPTH_TEST);
-		//glEnable(GL_BLEND);
-		glDisable(GL_BLEND);
-
-		m_pParentImp->glBlendEquation(GL_FUNC_ADD);
-		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
-		SetLights(pLights);
-		SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
-
-		if (pOGLFramebufferInput != nullptr) {
-			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
-			m_pUniformTextureDepth->SetUniform(0);
-		}
-
-		// 3D Object / skybox
-		RenderObjectStore(m_pSceneGraph);
-
-		//m_depth++;
-		Terminate();
-	}/*
+		m_pOGLProgramBlendQuad->ClearFrameBuffer();
+		m_pUniformDiscardFlag->SetUniform(false);
+	}
 	else {
-		if (pOGLFramebufferOutput != nullptr) {
-			BindToFramebuffer(pOGLFramebufferOutput);
-		}
+		m_pUniformDiscardFlag->SetUniform(true);
+	}
+		
+	if (pOGLFramebufferOutput != nullptr) {
+		BindToFramebuffer(pOGLFramebufferOutput);
+	}
 
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	//glDisable(GL_BLEND);
 
-		m_pParentImp->glBlendEquation(GL_FUNC_ADD);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	m_pParentImp->glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-		SetLights(pLights);
-		SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
+	SetLights(pLights);
+	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
-		if (pOGLFramebufferInput != nullptr) {
-			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
-			m_pUniformTextureDepth->SetUniform(0);
-		}
+	if (pOGLFramebufferInput != nullptr) {
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+		m_pUniformTextureDepth->SetUniform(0);
+	}
 
-		m_pOGLQuery->BeginQuery(GL_SAMPLES_PASSED_ARB);
+	m_pOGLQuery->BeginQuery(GL_SAMPLES_PASSED_ARB);
 
-		// 3D Object / skybox
-		RenderObjectStore(m_pSceneGraph);
+	// 3D Object / skybox
+	RenderObjectStore(m_pSceneGraph);
 
-		m_pOGLQuery->EndQuery(GL_SAMPLES_PASSED_ARB);
+	m_pOGLQuery->EndQuery(GL_SAMPLES_PASSED_ARB);
 
-		GLuint samples;
-		m_pOGLQuery->GetQueryObject(&samples);
+	GLuint samples;
+	m_pOGLQuery->GetQueryObject(&samples);
 
-		// Blending here
-		if (m_pOGLProgramBlendQuad != nullptr) {
-			m_pOGLProgramBlendQuad->SetInput<OGLFramebuffer>("input_framebuffer", pOGLFramebufferOutput);
-			m_pOGLProgramBlendQuad->ProcessNode(frameID);
-		}
+	// Blending here
+	if (m_pOGLProgramBlendQuad != nullptr) {
+		m_pOGLProgramBlendQuad->SetInput<OGLFramebuffer>("input_framebuffer", pOGLFramebufferOutput);
+		m_pOGLProgramBlendQuad->ProcessNode(frameID);
+	}
 
-		//if (samples == 0 || m_depth >= 1) {
-		if (samples == 0 || m_depth >= MAX_DEPTH_PEEL_LAYERS) {
-				// TODO: This might not be the best way to do this
-				// we kind of want a "stack frame" object potentially 
-			m_depth = 0;
-			Terminate();
-		}
-		else {
-			m_depth++;
-		}
-	}*/
+	//if (samples == 0 || m_depth >= 1) {
+	if (samples == 0 || m_depth >= MAX_DEPTH_PEEL_LAYERS) {
+			// TODO: This might not be the best way to do this
+			// we kind of want a "stack frame" object potentially 
+		m_depth = 0;
+		Terminate();
+	}
+	else {
+		m_depth++;
+	}
+	
 
 	UnbindFramebuffer();
 

@@ -60,7 +60,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 	float length = width;
 
 	float padding = 0.3f;
-	float alpha = 0.25f;
+	float alpha = 0.10f;
 
 	struct depthPeelingTestContext {
 		volume *pVolume1 = nullptr;
@@ -110,8 +110,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		CR(pVolume->SetColor(COLOR_WHITE));
 		CR(pVolume->SetAlpha(alpha));
 
-
-		pTestContext->pVolume1 = m_pDreamOS->AddVolume(width, height, length);
+		pTestContext->pVolume1 = m_pDreamOS->AddVolume(width * 0.5f, height * 0.5f, length * 0.5f);
 		pVolume = pTestContext->pVolume1;
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 1.0f));
