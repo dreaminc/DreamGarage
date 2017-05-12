@@ -559,3 +559,13 @@ RESULT UIKeyboard::SetHeight(float height) {
 Error:
 	return r;
 }
+
+RESULT UIKeyboard::SetKeyTypeThreshold(float threshold) {
+	m_keyTypeThreshold = threshold;
+	return R_PASS;
+}
+
+RESULT UIKeyboard::SetKeyReleaseThreshold(float threshold) {
+	m_keyReleaseThreshold = threshold;
+	return R_PASS;
+}

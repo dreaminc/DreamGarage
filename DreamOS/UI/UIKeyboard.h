@@ -70,6 +70,9 @@ public:
 	float GetHeight();
 	RESULT SetHeight(float height);
 
+	RESULT SetKeyTypeThreshold(float threshold);
+	RESULT SetKeyReleaseThreshold(float threshold);
+
 private:
 	RESULT UIKeyboard::UpdateViewQuad();
 	RESULT UIKeyboard::UpdateAppComposite();
