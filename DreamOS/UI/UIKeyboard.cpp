@@ -182,24 +182,35 @@ RESULT UIKeyboard::Update(void *pContext) {
 		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
 
 			//TODO: CollisionPointToKey returns one key based on the center of the sphere
-			// if it accounted for the radius, it may be better to return multiple keys
+			// if it accounted for the radius, it would be able to return multiple keys
 			auto key = CollisionPointToKey(ptSphereOrigin);
 			if (!key) continue;
 			CR(AddActiveKey(key));
 			keyCollisions[i] = key;
 
-			// TODO: take min of mallet ys in the case of both mallets on the same key
 			point ptPosition = key->m_pQuad->GetPosition();
+
+			// TODO: edge case where there is a new interaction during the key release animation
 			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - mallet->GetRadius(), ptPosition.z()));
 		}
+
 		i++;
+	}
+
+	// covers edge case where both mallets are hitting the same key
+	if (keyCollisions[0] && keyCollisions[1] && keyCollisions[0] == keyCollisions[1]) {
+
+		auto key = keyCollisions[0];
+		point ptPosition = key->m_pQuad->GetPosition();
+		float y = std::min(ptCollisions[0].y(), ptCollisions[1].y());
+		key->m_pQuad->SetPosition(point(ptPosition.x(), y - m_pLeftMallet->GetRadius(), ptPosition.z()));
+
 	}
 
 
 	for (auto key : m_activeKeys) {
 
 		// get collision point and check that key is active
-		//point ptCollision;
 		bool fActive = false;
 		for (int j = 0; j < 2; j++) {
 			auto k = keyCollisions[j];
