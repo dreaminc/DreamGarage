@@ -794,6 +794,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
     <ClCompile Include="..\..\..\UI\UIBar.cpp" />
+    <ClCompile Include="..\..\..\UI\UIKey.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboard.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboardLayout.cpp" />
     <ClCompile Include="..\..\..\UI\UIMallet.cpp" />
@@ -1065,6 +1066,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
     <ClInclude Include="..\..\..\UI\UIBar.h" />
+    <ClInclude Include="..\..\..\UI\UIKey.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboard.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h" />
     <ClInclude Include="..\..\..\UI\UIMallet.h" />

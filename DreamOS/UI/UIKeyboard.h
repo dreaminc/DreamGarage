@@ -4,12 +4,10 @@
 #include "DreamApp.h"
 #include "Primitives/TextEntryString.h"
 #include "Primitives/Publisher.h"
-#include "InteractionEngine/ActiveObject.h"
 #include "Sense/SenseKeyboard.h"
 
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
-#include "HAL/opengl/OGLText.h" // !!!
 
 #include <vector>
 #include <string>
@@ -47,13 +45,23 @@ public:
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
-	UIKey* CollisionPointToKey(CollisionManifold& manifold);
+	UIKey* CollisionPointToKey(point ptCollision);
+
+private:
+	RESULT ReleaseKey(UIKey *pKey);
 
 //SenseKeyboard
 public:
 	RESULT UpdateKeyStates();
 	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) override;
 	RESULT CheckKeyState(SenseVirtualKey key);
+
+//Active Keys
+private:
+	bool IsActiveKey(UIKey *pKey);
+	RESULT AddActiveKey(UIKey *pKey);
+	RESULT RemoveActiveKey(UIKey *pKey);
+	RESULT ClearActiveKeys();
 
 //Dynamic Resizing
 public:
@@ -62,8 +70,12 @@ public:
 	float GetHeight();
 	RESULT SetHeight(float height);
 
+	RESULT SetKeyTypeThreshold(float threshold);
+	RESULT SetKeyReleaseThreshold(float threshold);
+
 private:
 	RESULT UIKeyboard::UpdateViewQuad();
+	RESULT UIKeyboard::UpdateAppComposite();
 
 protected:
 	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
@@ -75,7 +87,10 @@ private:
 	std::shared_ptr<quad> m_pSurface;
 	float m_surfaceWidth;
 	float m_surfaceHeight;
-	point m_ptSurface;
+
+	point m_ptSurfaceOffset;
+	quaternion m_qSurfaceOrientation;
+	float m_surfaceDistance;
 
 	UIMallet *m_pLeftMallet;
 	UIMallet *m_pRightMallet;
@@ -88,8 +103,12 @@ private:
 
 	FlatContext *m_pQuadTextures;
 
-	ActiveObject::state m_keyStates[2];
+	float m_keyTypeThreshold;
+	float m_keyReleaseThreshold;
+
+	//TODO: this should be dynamic
 	UIKey* m_keyObjects[2];
+	std::list<UIKey*> m_activeKeys;
 
 	std::shared_ptr<Font> m_pFont;
 	std::shared_ptr<texture> m_pKeyTexture;
