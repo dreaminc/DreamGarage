@@ -31,7 +31,8 @@ public:
 	RESULT Unbind();
 	RESULT UnbindAttachments();
 
-	RESULT SetAndClearViewport(bool fColor = true, bool fDepth = true);
+	//RESULT SetAndClearViewport(bool fColor = true, bool fDepth = true);
+	RESULT SetAndClearViewport(bool fColor = true, bool fDepth = true, bool fBind = false);
 	RESULT BindToScreen(int pxWidth, int pxHeight);
 
 	// TODO: These should not be directly used 

@@ -25,12 +25,14 @@ public:
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
+	RESULT ClearFrameBuffer();
+
 private:
 	OGLFramebuffer *m_pOGLFramebufferInput = nullptr;
 
 private:
 	OGLQuad *m_pQuad = nullptr;
-	bool m_fRenderDepth = false;
+	int m_pass = 0;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

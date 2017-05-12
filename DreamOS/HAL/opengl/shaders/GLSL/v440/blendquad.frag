@@ -21,7 +21,7 @@ void main(void) {
 	// Look up texture by coord
 	//vec4 color = texture(u_textureColor, gl_FragCoord.xy);
 	vec4 color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
-	
+
 	//float param = color.x;
 
 	// Add to background color

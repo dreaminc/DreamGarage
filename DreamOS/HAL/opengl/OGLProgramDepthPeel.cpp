@@ -144,10 +144,8 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 
 	// Update buffers as needed
 	if (m_depth == 0) {
-		//UpdateFramebufferToViewport(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT16, GL_FLOAT);
-		//UpdateFramebufferToViewport(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT16, GL_FLOAT);	
-
-		//UpdateFramebufferToViewport(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
+		UpdateFramebufferToViewport(m_pOGLFramebufferOutputA, GL_DEPTH_COMPONENT32F, GL_FLOAT);
+		UpdateFramebufferToViewport(m_pOGLFramebufferOutputB, GL_DEPTH_COMPONENT32F, GL_FLOAT);	
 	}
 
 	// Alternate buffers 
@@ -155,75 +153,102 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 	OGLFramebuffer *pOGLFramebufferOutput = ((m_depth % 2) == 0) ? m_pOGLFramebufferOutputB : m_pOGLFramebufferOutputA;
 
 	UseProgram();
-	
-	if (pOGLFramebufferOutput != nullptr) {
-		BindToFramebuffer(pOGLFramebufferOutput);
-	}
-
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
 	if (m_depth == 0) {
+		glClearDepth(0.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+		
+		m_pOGLFramebuffer->Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		m_pOGLFramebufferOutputA->Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		m_pOGLFramebufferOutputB->Bind();
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		m_pOGLProgramBlendQuad->ClearFrameBuffer();
+
+		if (m_pOGLFramebuffer != nullptr) {
+			BindToFramebuffer(m_pOGLFramebuffer);
+		}
+
+		glClearDepth(1.0f);
+		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
 		glEnable(GL_DEPTH_TEST);
 		//glEnable(GL_BLEND);
 		glDisable(GL_BLEND);
+
+		m_pParentImp->glBlendEquation(GL_FUNC_ADD);
 		//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-	else {
-		// Disable blending and depth testing
-		glEnable(GL_DEPTH_TEST);
-		//glDisable(GL_DEPTH_TEST);
-		glDisable(GL_BLEND);
-	}
 
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
-	SetLights(pLights);
-	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
+		SetLights(pLights);
+		SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
-	if (pOGLFramebufferInput != nullptr) {
-		m_pParentImp->glActiveTexture(GL_TEXTURE0);
-		m_pParentImp->BindTexture(pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
-		//m_pParentImp->BindTexture(g_pColorTexture->GetOGLTextureTarget(), g_pColorTexture->GetOGLTextureIndex());
-		
-		m_pUniformTextureDepth->SetUniform(0);
-	}
+		if (pOGLFramebufferInput != nullptr) {
+			m_pParentImp->glActiveTexture(GL_TEXTURE0);
+			m_pParentImp->BindTexture(pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+			m_pUniformTextureDepth->SetUniform(0);
+		}
 
-	m_pOGLQuery->BeginQuery(GL_SAMPLES_PASSED_ARB);
+		// 3D Object / skybox
+		RenderObjectStore(m_pSceneGraph);
 
-	// 3D Object / skybox
-	RenderObjectStore(m_pSceneGraph);
-
-	m_pOGLQuery->EndQuery(GL_SAMPLES_PASSED_ARB);
-
-	// TODO: Blending here
-
-	GLuint samples;
-	m_pOGLQuery->GetQueryObject(&samples);
-
-	//if (samples == 0 || m_depth == 1 ) {
-	if (samples == 0 || m_depth >= MAX_DEPTH_PEEL_LAYERS) {
-		// TODO: This might not be the best way to do this
-		// we kind of want a "stack frame" object potentially 
-		m_depth = 0;
+		//m_depth++;
 		Terminate();
-
-		///*
-		m_pOGLFramebufferOutputA->SetAndClearViewport(true, true);
-		m_pOGLFramebufferOutputB->SetAndClearViewport(true, true);
-		//*/
-	}
+	}/*
 	else {
-		// Blend the texture here
+		if (pOGLFramebufferOutput != nullptr) {
+			BindToFramebuffer(pOGLFramebufferOutput);
+		}
 
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+
+		m_pParentImp->glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+		SetLights(pLights);
+		SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
+
+		if (pOGLFramebufferInput != nullptr) {
+			m_pParentImp->glActiveTexture(GL_TEXTURE0);
+			m_pParentImp->BindTexture(pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+			m_pUniformTextureDepth->SetUniform(0);
+		}
+
+		m_pOGLQuery->BeginQuery(GL_SAMPLES_PASSED_ARB);
+
+		// 3D Object / skybox
+		RenderObjectStore(m_pSceneGraph);
+
+		m_pOGLQuery->EndQuery(GL_SAMPLES_PASSED_ARB);
+
+		GLuint samples;
+		m_pOGLQuery->GetQueryObject(&samples);
+
+		// Blending here
 		if (m_pOGLProgramBlendQuad != nullptr) {
-			//CR(m_pOGLProgramBlendQuad->ProcessNode(frameID));
 			m_pOGLProgramBlendQuad->SetInput<OGLFramebuffer>("input_framebuffer", pOGLFramebufferOutput);
 			m_pOGLProgramBlendQuad->ProcessNode(frameID);
 		}
 
-		m_depth++;
-	}
+		//if (samples == 0 || m_depth >= 1) {
+		if (samples == 0 || m_depth >= MAX_DEPTH_PEEL_LAYERS) {
+				// TODO: This might not be the best way to do this
+				// we kind of want a "stack frame" object potentially 
+			m_depth = 0;
+			Terminate();
+		}
+		else {
+			m_depth++;
+		}
+	}*/
 
 	UnbindFramebuffer();
 

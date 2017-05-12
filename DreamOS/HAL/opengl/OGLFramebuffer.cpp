@@ -57,10 +57,11 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 		//CR(m_pOGLColorAttachment->Resize(pxWidth, pxHeight));
 
 		///*
+		texture::TEXTURE_TYPE colorTextureType = m_pOGLColorAttachment->GetOGLTexture()->GetTextureType();
 		CR(DeleteColorAttachment());
 
 		CR(MakeColorAttachment());
-		CR(GetColorAttachment()->MakeOGLTexture());
+		CR(GetColorAttachment()->MakeOGLTexture(colorTextureType));
 		CR(GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 		//*/
 	}
@@ -69,10 +70,11 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 		//CR(m_pOGLDepthAttachment->Resize(pxWidth, pxHeight));
 
 		///*
+		texture::TEXTURE_TYPE depthTextureType = m_pOGLDepthAttachment->GetOGLTexture()->GetTextureType();
 		CR(DeleteDepthAttachment());
 
 		CR(MakeDepthAttachment());
-		CR(GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT));
+		CR(GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth, depthTextureType));
 		CR(GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 		//*/
 	}
@@ -245,7 +247,11 @@ GLuint OGLFramebuffer::GetFramebufferIndex() {
 	return m_framebufferIndex;
 }
 
-RESULT OGLFramebuffer::SetAndClearViewport(bool fColor, bool fDepth) {
+RESULT OGLFramebuffer::SetAndClearViewport(bool fColor, bool fDepth, bool fBind) {
+	if (fBind) {
+		Bind();
+	}
+
 	glViewport(0, 0, m_width, m_height);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 

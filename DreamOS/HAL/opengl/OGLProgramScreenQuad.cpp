@@ -63,6 +63,8 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 	if(m_pOGLFramebuffer != nullptr) 
 		BindToFramebuffer(m_pOGLFramebuffer);
 
+	glDisable(GL_BLEND);
+
 	if (m_pOGLFramebufferInput != nullptr) {
 		if (m_fRenderDepth) {
 			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform

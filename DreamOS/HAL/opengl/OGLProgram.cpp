@@ -223,7 +223,7 @@ RESULT OGLProgram::UpdateFramebufferToViewport(OGLFramebuffer*&pOGLFramebuffer, 
 
 	if (pOGLFramebuffer != nullptr) {
 		if (pOGLFramebuffer->GetWidth() != pxWidth || pOGLFramebuffer->GetHeight() != pxHeight) {
-			return pOGLFramebuffer->Resize(pxWidth, pxHeight);
+			return pOGLFramebuffer->Resize(pxWidth, pxHeight, internalDepthFormat, typeDepth);
 			//return InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT);
 		}
 		else {
