@@ -1,17 +1,6 @@
 #include "UIKeyboardLayout.h"
 #include "Sense/SenseKeyboard.h"
 
-UIKey::UIKey() {}
-
-UIKey::UIKey(float left, float width, unsigned int letter) 
-{
-	m_left = left;
-	m_width = width;
-	m_letter = letter;
-
-	m_fTyped = false;
-}
-
 UIKeyboardLayout::UIKeyboardLayout(LayoutType type) :
 m_layoutType(type)
 {}

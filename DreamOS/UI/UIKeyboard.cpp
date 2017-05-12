@@ -51,9 +51,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	m_keyStates[0] = ActiveObject::state::NOT_INTERSECTED;
-	m_keyStates[1] = ActiveObject::state::NOT_INTERSECTED;
-
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
 
@@ -139,6 +136,10 @@ RESULT UIKeyboard::Update(void *pContext) {
 	InteractionEngineProxy *pProxy = nullptr;
 	DreamOS *pDOS = GetDOS();
 
+	UIKey *keyCollisions[2];
+	point ptCollisions[2];
+	point ptCollision;
+
 	// update quads if layout has changed
 	if (m_pLayout->CheckAndCleanDirty()) {
 		InitializeQuadsWithLayout();
@@ -148,6 +149,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	pProxy = pDOS->GetInteractionEngineProxy();
 	CN(pProxy);
 
+	// Update Mallet Positions
 	hand *pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
 	CN(pHand);
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
@@ -164,57 +166,96 @@ RESULT UIKeyboard::Update(void *pContext) {
 	if (m_pRightMallet)
 		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
 
+	// Update Keys
 	int i = 0;
 	for (auto &mallet : { m_pLeftMallet, m_pRightMallet })
 	{
 		point ptBoxOrigin = m_pSurface->GetOrigin(true);
 		point ptSphereOrigin = mallet->GetMalletHead()->GetOrigin(true);
 		ptSphereOrigin = (point)(inverse(RotationMatrix(m_pSurface->GetOrientation(true))) * (ptSphereOrigin - m_pSurface->GetOrigin(true)));
+		ptCollisions[i] = ptSphereOrigin;
 
 		if (ptSphereOrigin.y() >= mallet->GetRadius()) mallet->CheckAndCleanDirty();
-
+		else if (ptSphereOrigin.y() < m_keyReleaseThreshold) mallet->SetDirty();
+		
+		// if the sphere is lower than its own radius, there must be an interaction
 		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
 
+			//TODO: CollisionPointToKey returns one key based on the center of the sphere
+			// if it accounted for the radius, it may be better to return multiple keys
 			auto key = CollisionPointToKey(ptSphereOrigin);
-			if (!key) {
-				if (m_keyObjects[i]) ReleaseKey(i);
-				continue;
-			}
+			if (!key) continue;
+			CR(AddActiveKey(key));
+			keyCollisions[i] = key;
 
+			// TODO: take min of mallet ys in the case of both mallets on the same key
 			point ptPosition = key->m_pQuad->GetPosition();
 			key->m_pQuad->SetPosition(point(ptPosition.x(), ptSphereOrigin.y() - mallet->GetRadius(), ptPosition.z()));
-
-			//stops typing the same character a bunch of times
-			if (m_keyStates[i] == ActiveObject::state::NOT_INTERSECTED) {
-				m_keyObjects[i] = key;
-				m_keyStates[i] = ActiveObject::state::INTERSECTED;
-			}
-			// allows for rolling over keys without typing them
-			else if (m_keyObjects[i] && key != m_keyObjects[i]) {
-				CR(ReleaseKey(i));
-				m_keyObjects[i] = key;
-			}
-
-			// type key once the mallet center hits the typing threshold
-			// currently, the key can't be typed again until it ReleaseKey is called on it
-			if (ptSphereOrigin.y() < m_keyTypeThreshold && !key->m_fTyped) {
-				CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
-				key->m_fTyped = true;
-			}
-	
-			if (ptSphereOrigin.y() < m_keyReleaseThreshold) {
-				CR(ReleaseKey(i));
-				// once the mallet is below the forced key release threshold, 
-				// no key can be touched until the mallet is above the keyboard surface
-				mallet->SetDirty(); 
-			}
 		}
-		else {
-			if (m_keyObjects[i]) ReleaseKey(i);
-		}
-
 		i++;
 	}
+
+
+	for (auto key : m_activeKeys) {
+
+		// get collision point and check that key is active
+		//point ptCollision;
+		bool fActive = false;
+		for (int j = 0; j < 2; j++) {
+			auto k = keyCollisions[j];
+			if (key == k) {
+				ptCollision = ptCollisions[j];
+				fActive = true;
+			}
+		}
+
+		if (!fActive) {
+			key->m_state = KeyState::KEY_NOT_INTERSECTED;
+			continue;
+		}
+		
+		switch (key->m_state) {
+
+		case KeyState::KEY_DOWN: {
+			if (ptCollision.y() > m_keyTypeThreshold) key->m_state = KeyState::KEY_MAYBE_UP;
+			else if (ptCollision.y() < m_keyReleaseThreshold) ReleaseKey(key);
+			//else key->m_state = KeyState::KEY_DOWN;
+		} break;
+
+		case KeyState::KEY_MAYBE_DOWN: {
+			if (ptCollision.y() < m_keyTypeThreshold) {
+				CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
+				key->m_state = KeyState::KEY_DOWN;
+			}
+			else key->m_state = KeyState::KEY_UP;
+		} break;
+
+		case KeyState::KEY_MAYBE_UP: {
+			if (ptCollision.y() > m_keyTypeThreshold) {
+				CR(UpdateKeyState((SenseVirtualKey)(key->m_letter), 0));
+				key->m_state = KeyState::KEY_UP;
+			}
+			else key->m_state = KeyState::KEY_DOWN;
+		} break;
+
+		case KeyState::KEY_UP: {
+			if (ptCollision.y() < m_keyTypeThreshold) key->m_state = KeyState::KEY_MAYBE_DOWN;
+			//else key->m_state = KeyState::KEY_UP;
+		} break;
+
+		default: break;
+		}
+
+	}
+
+	for (auto key : m_activeKeys) {
+		if (key->m_state == KeyState::KEY_NOT_INTERSECTED) {
+			ReleaseKey(key);
+			RemoveActiveKey(key);
+			key->m_state = KeyState::KEY_UP;
+		}
+	}
+
 Error:
 	return r;
 }
@@ -307,10 +348,10 @@ RESULT UIKeyboard::SetVisible(bool fVisible) {
 	return GetComposite()->SetVisible(fVisible);
 }
 
-RESULT UIKeyboard::ReleaseKey(int index) {	
+RESULT UIKeyboard::ReleaseKey(UIKey *pKey) {	
 	RESULT r = R_PASS;
 	
-	auto pKey = m_keyObjects[index];
+//	auto pKey = m_keyObjects[index];
 	auto pObj = pKey->m_pQuad;
 	point ptPosition = pObj->GetPosition();
 
@@ -325,10 +366,10 @@ RESULT UIKeyboard::ReleaseKey(int index) {
 	));
 
 	// currently, keys can only be typed once until ReleaseKey is called
-	pKey->m_fTyped = false;
+//	pKey->m_fTyped = false;
 
-	m_keyObjects[index] = nullptr;
-	m_keyStates[index] = ActiveObject::state::NOT_INTERSECTED;
+//	m_keyObjects[index] = nullptr;
+//	m_keyStates[index] = ActiveObject::state::NOT_INTERSECTED;
 
 	CR(UpdateKeyState((SenseVirtualKey)(pKey->m_letter), 0));
 
@@ -372,28 +413,6 @@ RESULT UIKeyboard::UpdateKeyState(SenseVirtualKey key, uint8_t keyState) {
 
 RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
 	return R_NOT_IMPLEMENTED;
-}
-
-RESULT UIKeyboard::UpdateViewQuad() {
-	RESULT r = R_PASS;
-
-	CR(m_pSurface->UpdateParams(GetWidth(), GetHeight(), m_pSurface->GetNormal()));
-	
-	// Flip UV vertically
-	if (r != R_SKIPPED) {
-		m_pSurface->TransformUV(
-		{ { 0.0f, 0.0f } },
-		{ { 1.0f, 0.0f,
-			0.0f, -1.0f } }
-		);
-	}
-
-	CR(m_pSurface->SetDirty());
-
-	CR(m_pSurface->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), m_pSurface->GetNormal()));
-
-Error:
-	return r;
 }
 
 //TODO: This isn't ideal, especially because this code is similar to code in 
@@ -443,6 +462,64 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 		}
 	}
 
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::ClearActiveKeys() {
+	m_activeKeys.clear();
+	return R_PASS;
+}
+
+RESULT UIKeyboard::AddActiveKey(UIKey *pKey) {
+	RESULT r = R_PASS;
+
+	CBR(!IsActiveKey(pKey), R_PASS);
+	m_activeKeys.push_back(pKey);
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::RemoveActiveKey(UIKey *pKey) {
+	RESULT r = R_PASS;
+
+	CBR(IsActiveKey(pKey), R_OBJECT_NOT_FOUND);
+	m_activeKeys.remove(pKey);
+
+Error:
+	return r;
+}
+
+bool UIKeyboard::IsActiveKey(UIKey *pKey) {
+	
+	for (auto it = m_activeKeys.begin(); it != m_activeKeys.end(); it++) {
+		if ((*it) == pKey) {
+			return true;
+		}
+	}
+	return false;
+}
+
+
+RESULT UIKeyboard::UpdateViewQuad() {
+	RESULT r = R_PASS;
+
+	CR(m_pSurface->UpdateParams(GetWidth(), GetHeight(), m_pSurface->GetNormal()));
+	
+	// Flip UV vertically
+	if (r != R_SKIPPED) {
+		m_pSurface->TransformUV(
+		{ { 0.0f, 0.0f } },
+		{ { 1.0f, 0.0f,
+			0.0f, -1.0f } }
+		);
+	}
+
+	CR(m_pSurface->SetDirty());
+
+	CR(m_pSurface->InitializeBoundingQuad(point(0.0f, 0.0f, 0.0f), GetWidth(), GetHeight(), m_pSurface->GetNormal()));
 
 Error:
 	return r;

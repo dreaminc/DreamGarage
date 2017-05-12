@@ -4,12 +4,10 @@
 #include "DreamApp.h"
 #include "Primitives/TextEntryString.h"
 #include "Primitives/Publisher.h"
-#include "InteractionEngine/ActiveObject.h"
 #include "Sense/SenseKeyboard.h"
 
 #include "UI/UIKeyboardLayout.h"
 #include "UI/UIMallet.h"
-#include "HAL/opengl/OGLText.h" // !!!
 
 #include <vector>
 #include <string>
@@ -50,13 +48,20 @@ public:
 	UIKey* CollisionPointToKey(point ptCollision);
 
 private:
-	RESULT ReleaseKey(int index);
+	RESULT ReleaseKey(UIKey *pKey);
 
 //SenseKeyboard
 public:
 	RESULT UpdateKeyStates();
 	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) override;
 	RESULT CheckKeyState(SenseVirtualKey key);
+
+//Active Keys
+private:
+	bool IsActiveKey(UIKey *pKey);
+	RESULT AddActiveKey(UIKey *pKey);
+	RESULT RemoveActiveKey(UIKey *pKey);
+	RESULT ClearActiveKeys();
 
 //Dynamic Resizing
 public:
@@ -98,8 +103,9 @@ private:
 	float m_keyTypeThreshold;
 	float m_keyReleaseThreshold;
 
-	ActiveObject::state m_keyStates[2];
+	//TODO: this should be dynamic
 	UIKey* m_keyObjects[2];
+	std::list<UIKey*> m_activeKeys;
 
 	std::shared_ptr<Font> m_pFont;
 	std::shared_ptr<texture> m_pKeyTexture;
