@@ -60,10 +60,11 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 	float length = width;
 
 	float padding = 0.3f;
-	float alpha = 0.10f;
+	float alpha = 0.25f;
 
 	struct depthPeelingTestContext {
 		volume *pVolume1 = nullptr;
+		volume *pVolume2 = nullptr;
 	};
 
 	depthPeelingTestContext *pTestContext = new depthPeelingTestContext;
@@ -103,12 +104,24 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		depthPeelingTestContext *pTestContext = static_cast<depthPeelingTestContext*>(pContext);
 
 		volume *pVolume = nullptr;
+		sphere *pSphere = nullptr;
 
+		/*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_WHITE));
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+		//CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetRandomColor());
 		CR(pVolume->SetAlpha(alpha));
+		//*/
+
+		///*
+		pSphere = m_pDreamOS->AddSphere(1.0f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+		CR(pSphere->SetColor(COLOR_WHITE));
+		CR(pSphere->SetAlpha(alpha));
+		//*/
 
 		pTestContext->pVolume1 = m_pDreamOS->AddVolume(width * 0.5f, height * 0.5f, length * 0.5f);
 		pVolume = pTestContext->pVolume1;
@@ -117,6 +130,31 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		CR(pVolume->SetColor(COLOR_BLUE));
 		CR(pVolume->SetAlpha(1.0f));
 
+		// Opposite ordering 
+		pTestContext->pVolume2 = m_pDreamOS->AddVolume(width * 0.5f, height * 0.5f, length * 0.5f);
+		pVolume = pTestContext->pVolume2;
+		CN(pVolume);
+		pVolume->SetPosition(point(width, 0.0f, (length + padding) * 1.0f));
+		CR(pVolume->SetColor(COLOR_BLUE));
+		CR(pVolume->SetAlpha(1.0f));
+
+		/*
+		pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pVolume);
+		pVolume->SetPosition(point(width, 0.0f, (length + padding) * 0.0f));
+		CR(pVolume->SetColor(COLOR_WHITE));
+		CR(pVolume->SetAlpha(alpha));
+		//*/
+		
+		///*
+		pSphere = m_pDreamOS->AddSphere(1.0f, 10, 10);
+		CN(pSphere);
+		pSphere->SetPosition(point(width, 0.0f, (length + padding) * 0.0f));
+		CR(pSphere->SetColor(COLOR_WHITE));
+		CR(pSphere->SetAlpha(alpha));
+		//*/
+
+		/*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
@@ -128,6 +166,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 		CR(pVolume->SetColor(COLOR_WHITE));
 		CR(pVolume->SetAlpha(alpha));
+		*/
 
 
 	Error:
@@ -143,6 +182,7 @@ RESULT HALTestSuite::AddTestDepthPeelingShader() {
 	auto fnUpdate = [&](void *pContext) {
 		depthPeelingTestContext *pTestContext = static_cast<depthPeelingTestContext*>(pContext);
 		pTestContext->pVolume1->SetPosition(pTestContext->pVolume1->GetPosition() + vector(0.0f, 0.0f, -0.001f));
+		pTestContext->pVolume2->SetPosition(pTestContext->pVolume2->GetPosition() + vector(0.0f, 0.0f, -0.001f));
 
 		return R_PASS;
 	};

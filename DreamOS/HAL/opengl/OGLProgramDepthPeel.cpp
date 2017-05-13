@@ -160,9 +160,6 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		glClearDepth(0.0f);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
-		m_pOGLFramebuffer->Bind();
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 		m_pOGLFramebufferOutputA->Bind();
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -172,11 +169,7 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		glClearDepth(1.0f);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
-		m_pOGLProgramBlendQuad->ClearFrameBuffer();
-		m_pUniformDiscardFlag->SetUniform(false);
-	}
-	else {
-		m_pUniformDiscardFlag->SetUniform(true);
+		m_pOGLProgramBlendQuad->ClearFrameBuffer();	
 	}
 		
 	if (pOGLFramebufferOutput != nullptr) {
@@ -184,11 +177,23 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 	}
 
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
+	
 	//glDisable(GL_BLEND);
 
-	m_pParentImp->glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glEnable(GL_BLEND);
+
+	if (m_depth == 0) {
+		glEnable(GL_CULL_FACE);
+		m_pParentImp->glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
+		m_pUniformDiscardFlag->SetUniform(false);
+	}
+	else {
+		glDisable(GL_CULL_FACE);
+		m_pParentImp->glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		m_pUniformDiscardFlag->SetUniform(true);
+	}
 
 	glDrawBuffer(GL_COLOR_ATTACHMENT0);
 
@@ -217,7 +222,7 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		m_pOGLProgramBlendQuad->ProcessNode(frameID);
 	}
 
-	//if (samples == 0 || m_depth >= 1) {
+	//if (samples == 0 || m_depth >= 0) {
 	if (samples == 0 || m_depth >= MAX_DEPTH_PEEL_LAYERS) {
 			// TODO: This might not be the best way to do this
 			// we kind of want a "stack frame" object potentially 
@@ -228,6 +233,7 @@ RESULT OGLProgramDepthPeel::PreProcessNode(long frameID) {
 		m_depth++;
 	}
 	
+	glEnable(GL_CULL_FACE);
 
 	UnbindFramebuffer();
 

@@ -105,29 +105,9 @@ RESULT OGLProgramBlendQuad::ProcessNode(long frameID) {
 	// Use separate blending function
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	
-	/*
-	glEnable(GL_BLEND);
+
 	m_pParentImp->glBlendEquation(GL_FUNC_ADD);
 	m_pParentImp->glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
-	//*/
-
-	///*
-	//if (m_pass != 0) {
-		m_pParentImp->glBlendEquation(GL_FUNC_ADD);
-		m_pParentImp->glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
-		//m_pParentImp->glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_ONE);
-
-		//glBlendFunc(GL_ONE_MINUS_DST_ALPHA, GL_ONE);
-
-		//m_pParentImp->glBlendFuncSeparate(GL_ONE_MINUS_DST_ALPHA, GL_ONE, GL_ZERO, GL_DST_ALPHA);
-		//m_pParentImp->glBlendFuncSeparate(GL_DST_ALPHA, GL_ONE, GL_ZERO, GL_SRC_ALPHA);
-	//}
-	/*else {
-		m_pParentImp->glBlendEquation(GL_FUNC_ADD);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-	//*/
 
 	if (m_pOGLFramebufferInput != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);

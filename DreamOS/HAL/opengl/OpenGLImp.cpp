@@ -191,7 +191,7 @@ RESULT OpenGLImp::InitializeHAL() {
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
-	//glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
+	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
 
 								// Face culling
 #define _CULL_BACK_FACES
