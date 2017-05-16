@@ -85,6 +85,18 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 
 	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
 
+#ifdef _USE_TEST_APP
+	// In testing we just use spheres to speed up on testing
+	// TODO: Add this to config instead
+
+	m_pLeftControllerModel = m_pParentSandbox->AddComposite();
+	CN(m_pLeftControllerModel);
+	m_pLeftControllerModel->AddSphere(0.5f, 10, 10);
+
+	m_pRightControllerModel = m_pParentSandbox->AddComposite();
+	CN(m_pRightControllerModel);
+	m_pRightControllerModel->AddSphere(0.5f, 10, 10);
+#else 
 	// Oculus controller dimensions: 4.1 x 4.5 x 3.8 in.
 	// model is offcenter, displacing by half height and half depth helps (engine is in meters)
 
@@ -99,9 +111,13 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		point(0.0f, 0.05715f, -0.04826f),
 		1.0f,
 		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
+#endif
 
-	m_pLeftControllerModel->SetVisible(false);
-	m_pRightControllerModel->SetVisible(false);
+	if(m_pLeftControllerModel != nullptr)
+		m_pLeftControllerModel->SetVisible(false);
+
+	if(m_pRightControllerModel)
+		m_pRightControllerModel->SetVisible(false);
 
 Error:
 	return r;

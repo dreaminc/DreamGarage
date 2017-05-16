@@ -59,8 +59,10 @@ RESULT OVRMirrorTexture::OVRInitialize() {
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
 	CN(m_pOGLFramebuffer);
 	CR(m_pOGLFramebuffer->OGLInitialize());
-	CR(m_pOGLFramebuffer->InitializeColorAttachment(m_pOGLTexture));
 	CR(m_pOGLFramebuffer->Bind());
+
+	CR(m_pOGLFramebuffer->MakeColorAttachment());
+	CR(m_pOGLFramebuffer->InitializeColorAttachment(m_pOGLTexture));
 
 	// TODO: Fit this in more generic?
 	CR(m_pParentImp->glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0));

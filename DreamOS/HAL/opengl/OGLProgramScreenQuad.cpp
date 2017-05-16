@@ -30,7 +30,7 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	CN(m_pScreenQuad);
 
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
-	InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
+	//InitializeFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024, 4);
 
 Error:
 	return r;
