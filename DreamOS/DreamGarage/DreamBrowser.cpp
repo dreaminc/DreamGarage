@@ -324,8 +324,8 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			}
 			else {
 			*/
-			if (chKey >= 'A' && chKey <= 'Z')
-				chKey += 32;
+			//if (chKey >= 'A' && chKey <= 'Z')
+			//	chKey += 32;
 			//}
 
 			CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));

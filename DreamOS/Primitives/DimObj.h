@@ -104,6 +104,7 @@ public:
 	RESULT SetAlpha(color_precision a);
 
 	RESULT SetColorTexture(texture *pTexture);
+	RESULT UpdateColorTexture(texture *pTexture);
 	RESULT ClearColorTexture();
 	texture *GetColorTexture();
 

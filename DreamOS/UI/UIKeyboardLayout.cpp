@@ -15,9 +15,9 @@ RESULT UIKeyboardLayout::UpdateKeysWithLayout(LayoutType type) {
 	// there will be different layouts for caps, numbers
 	switch (type) {
 	case LayoutType::QWERTY: CR(UpdateQWERTYLayout()); break;
-	case LayoutType::QWERTY_UPPER: CR(UpdateQWERTYLayout(true, false));
-	case LayoutType::QWERTY_NUM: CR(UpdateQWERTYLayout(false, true));
-	case LayoutType::QWERTY_SYMBOL: CR(UpdateQWERTYLayout(true, true));
+	case LayoutType::QWERTY_UPPER: CR(UpdateQWERTYLayout(true, false)); break;
+	case LayoutType::QWERTY_NUM: CR(UpdateQWERTYLayout(false, true)); break;
+	case LayoutType::QWERTY_SYMBOL: CR(UpdateQWERTYLayout(true, true)); break;
 	default: break;
 	}
 
@@ -92,7 +92,7 @@ RESULT UIKeyboardLayout::UpdateQWERTYLayout(bool fUpper, bool fNum) {
 
 	for (int i = 1; i < m_pLayout[2].size()-1; i++) {
 		auto key = m_pLayout[2][i];
-		key->m_letter = rowChars[i];
+		key->m_letter = rowChars[i-1];
 	}
 	SetDirty();
 
