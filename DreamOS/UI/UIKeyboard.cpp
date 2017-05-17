@@ -139,9 +139,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(keyDimension, keyDimension);
 			if (m_keyTextureAtlas[ch])
-			//	texture *pTexture = new texture(*m_keyTextureAtlas[ch]);
 				pQuad->UpdateColorTexture(m_keyTextureAtlas[ch]);
-
 
 			// Set up key quad positioning
 			pQuad->ScaleX(1.0f / (keyDimension / (0.5f*key->m_width)));
@@ -400,9 +398,7 @@ RESULT UIKeyboard::SetVisible(bool fVisible) {
 RESULT UIKeyboard::ReleaseKey(UIKey *pKey) {	
 	RESULT r = R_PASS;
 	
-	//if (!pKey) return R_PASS; // TODO ???
 	auto pObj = pKey->m_pQuad;
-	//if (!pObj) return R_PASS;
 	point ptPosition = pObj->GetPosition();
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
@@ -491,23 +487,13 @@ RESULT UIKeyboard::UpdateAppComposite() {
 RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 	RESULT r = R_PASS;
 
-//	CBR(m_kbLayers.count(kbType) > 0, R_OBJECT_NOT_FOUND);
-
-//	m_kbLayers[m_currentLayout]->SetVisible(false);
-//	m_currentLayout = kbType;
-//	m_kbLayers[m_currentLayout]->SetVisible(true);
-
-//	m_pLayout->UpdateQWERTYLayout(kbType);
 	m_pLayout->UpdateKeysWithLayout(kbType);
 
 	for (auto row : m_pLayout->GetKeys()) {
 		for (auto& key : row) {
 			std::string ch = std::string(1, key->m_letter);
 			if (m_keyTextureAtlas.count(ch) > 0 && m_keyTextureAtlas[ch]) {
-				//if (!m_keyTextureAtlas[ch]) continue;
-			//	texture *pTexture = new texture(*m_keyTextureAtlas[ch]);
 				CR(key->m_pQuad->UpdateColorTexture(m_keyTextureAtlas[ch]));
-//				CR(r);
 			}
 		}
 	}

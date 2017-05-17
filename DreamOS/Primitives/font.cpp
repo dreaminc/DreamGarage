@@ -19,9 +19,6 @@ Font::Font(const std::wstring& fnt_file, bool distanceMap)
 {
 	LoadFontFromFile(fnt_file);
 	m_fDistanceMap = distanceMap;
-	//m_pTexture = 
-	// Error:
-	// return false;
 }
 
 Font::~Font()

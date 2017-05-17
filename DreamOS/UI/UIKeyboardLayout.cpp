@@ -46,7 +46,7 @@ std::string UIKeyboardLayout::GenerateQWERTYRow(int rowIndex, bool fUpper, bool 
 			else { return "asdfghjkl"; }
 		}
 		else {
-			if (fUpper) { return "_.|~<>..."; } // TODO: periods for shit we don't know what to do with
+			if (fUpper) { return "_.|~<>..."; } // TODO: periods on unused keys
 			else { return "-.:;()$&@"; }
 		}
 	} break;
@@ -70,9 +70,7 @@ std::string UIKeyboardLayout::GenerateQWERTYRow(int rowIndex, bool fUpper, bool 
 RESULT UIKeyboardLayout::UpdateQWERTYLayout(bool fUpper, bool fNum) {
 	RESULT r = R_PASS;
 
-	//stupid hack alert
 	std::string rowChars;
-	//CN(m_pLayout);
 
 	rowChars = GenerateQWERTYRow(0, fUpper, fNum);
 	

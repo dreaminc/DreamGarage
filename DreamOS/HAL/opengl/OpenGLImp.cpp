@@ -643,11 +643,12 @@ volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {
 	return MakeVolume(side, side, side, fTriangleBased);
 }
 
+//TODO: the texture could be stored in the font already, but having this pathway
+// avoids conflicts with parts of the code that use fonts without setting the texture
 text* OpenGLImp::MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
 {
 	RESULT r = R_PASS;
 
-//	text *pText = new OGLText(this, pFont, content, size, isBillboard);
 	text *pText = new OGLText(this, pFont, pFontTexture, content, size, isBillboard);
 	CN(pText);
 

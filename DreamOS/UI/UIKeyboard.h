@@ -117,7 +117,6 @@ private:
 
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
-	//std::map<LayoutType, UIKeyboardLayout*> m_kbLayers;
 };
 
 #endif // ! UI_KEYBOARD_H_
