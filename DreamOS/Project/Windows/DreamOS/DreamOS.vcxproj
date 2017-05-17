@@ -674,6 +674,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\GLSLObject.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLAttachment.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLFramebuffer.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLHMDDisplay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLLightsBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLMaterialBlock.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLDreamConsole.cpp" />
@@ -909,6 +910,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLAttachment.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLHMDDisplay.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />

@@ -9,7 +9,6 @@
 
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
-#include <HMD/HMDFactory.h>
 
 #include <string>
 
@@ -408,21 +407,6 @@ RESULT Windows64App::InitializeSandbox() {
 
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
-
-	// HMD
-	// TODO: This should go into (as well as the above) into the Sandbox
-	// This needs to be done after GL set up
-
-	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
-	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
-	
-	if (GetSandboxConfiguration().fUseHMD) {
-		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
-	
-		if (m_pHMD != nullptr) {
-			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
-		}
-	}
 
 	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
 	GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);

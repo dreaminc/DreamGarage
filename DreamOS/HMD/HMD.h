@@ -23,6 +23,8 @@
 
 #include "Sense/SenseController.h"
 
+#include "HAL/Pipeline/SinkNode.h"
+
 #define HMD_NUM_EYES 2
 
 class HALImp;
@@ -88,6 +90,10 @@ public:
 	}
 
 public:
+	// Sink node
+	virtual RESULT SetupConnections() = 0;
+	virtual RESULT ProcessNode(long frameID = 0) = 0;
+
 	// Called by factory to initialize HMD
 	//virtual RESULT InitializeHMD(HALImp *halimp) = 0;
 	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) = 0;

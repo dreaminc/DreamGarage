@@ -135,31 +135,11 @@ RESULT OVRTextureSwapChain::Commit() {
 RESULT OVRTextureSwapChain::SetAndClearRenderSurface() {
 	RESULT r = R_PASS;
 
-	/*
-	GLuint currentTextureIndex;
-
-	if (m_ovrTextureSwapChain) {
-		int currentIndex;
-		CR((RESULT)ovr_GetTextureSwapChainCurrentIndex(m_ovrSession, m_ovrTextureSwapChain, &currentIndex));
-		CR((RESULT)ovr_GetTextureSwapChainBufferGL(m_ovrSession, m_ovrTextureSwapChain, currentIndex, &currentTextureIndex));
-	}
-	else {
-		// TODO:
-		// curTexId = m_textureIndex;
-	}
-
-	CR(m_pOGLResolveFramebuffer->BindOGLFramebuffer());
-	CR(m_pOGLResolveFramebuffer->AttachOGLTexture(currentTextureIndex));
-	CR(m_pOGLResolveFramebuffer->AttachOGLDepthbuffer());
-	CR(m_pOGLResolveFramebuffer->SetAndClearViewport());
-	*/
-
 	glEnable(GL_MULTISAMPLE);
 
 	m_pOGLRenderFramebuffer->Bind();
 	m_pOGLRenderFramebuffer->SetAndClearViewport(true, true);
 	
-
 //Error:
 	return r;
 }

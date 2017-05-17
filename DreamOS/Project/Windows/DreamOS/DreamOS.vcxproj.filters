@@ -785,6 +785,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLHMDDisplay.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1632,6 +1635,9 @@
       <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLHMDDisplay.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>

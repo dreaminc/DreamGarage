@@ -137,6 +137,7 @@ ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, floa
 	return projMat;
 }
 
+// TODO: This might be dead code
 ViewMatrix OVRHMD::GetViewMatrix(EYE_TYPE eye) {
 	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
 
@@ -176,8 +177,11 @@ ViewMatrix OVRHMD::GetViewMatrix(EYE_TYPE eye) {
 	
 	//return ViewMatrix(point(), qOrientation);
 	
-	///*
-	static float yaw = 0.15f;
+	return ViewMatrix(ptPosition, 0.0f, 0.0f, 0.0f);
+
+	/*
+	//static float yaw = 0.15f;
+	//static float yaw = 0.0f;
 	//yaw += 0.001f;
 
 	if (eye != EYE_LEFT)

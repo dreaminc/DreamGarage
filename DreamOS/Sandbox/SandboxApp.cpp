@@ -13,6 +13,8 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
 
+#include <HMD/HMDFactory.h>
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -531,8 +533,12 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeCamera(), "Failed to initialize Camera");
-
 	CRM(InitializeHAL(), "Failed to initialize HAL");
+
+	CRM(InitializeHMD(), "Failed to initialize HMD");
+
+	// Set up the pipeline
+	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
 
 	// Generalize this module pattern
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
@@ -657,7 +663,30 @@ Error:
 	return r;
 }
 
-// TODO: Move this to sandbox
+// Note: This needs to be done after GL set up
+RESULT SandboxApp::InitializeHMD() {
+	RESULT r = R_PASS;
+
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
+
+	int pxWidth, pxHeight;
+	GetSandboxWindowSize(pxWidth, pxHeight);
+
+	if (GetSandboxConfiguration().fUseHMD) {
+		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, pxWidth, pxHeight);
+
+		if (m_pHMD != nullptr) {
+			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::InitializeHAL() {
 	RESULT r = R_PASS;
 
@@ -676,8 +705,6 @@ RESULT SandboxApp::InitializeHAL() {
 	CR(m_pHALImp->InitializeHAL());
 	CR(m_pHALImp->InitializeRenderPipeline());
 
-	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
-
 Error:
 	return r;
 }
@@ -686,6 +713,7 @@ Error:
 RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 
+	// TODO: Get from HMD if HMD is valid
 	SinkNode* pDestSinkNode = m_pHALImp->MakeSinkNode("display");
 	CN(pDestSinkNode);
 

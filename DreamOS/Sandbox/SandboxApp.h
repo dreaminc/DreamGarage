@@ -128,6 +128,9 @@ public:
 	virtual RESULT InitializeHAL();
 	RESULT SetUpHALPipeline(Pipeline* pRenderPipeline);		// TODO: this goes up to DreamOS soon
 
+	// HMD
+	RESULT InitializeHMD();
+
 public:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
