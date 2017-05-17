@@ -52,7 +52,7 @@ Error:
 std::shared_ptr<UIMenuLayer> UIModule::CreateMenuLayer() {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<UIMenuLayer> pUIMenuLayer = std::make_shared<UIMenuLayer>(m_pCompositeContext);;
+	std::shared_ptr<UIMenuLayer> pUIMenuLayer = std::make_shared<UIMenuLayer>(m_pCompositeContext);
 	CN(pUIMenuLayer);
 	CV(pUIMenuLayer);
 

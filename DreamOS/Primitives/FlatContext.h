@@ -13,8 +13,8 @@ public:
 	std::shared_ptr<quad> MakeQuad(double width, double height, point origin);
 	std::shared_ptr<quad> AddQuad(double width, double height, point origin);
 
-	std::shared_ptr<text> MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool fDistanceMap = false);
-	std::shared_ptr<text> AddText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool fDistanceMap);
+	std::shared_ptr<text> MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap = false);
+	std::shared_ptr<text> AddText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap);
 
 public:
 	framebuffer* GetFramebuffer() { return m_pFramebuffer; }

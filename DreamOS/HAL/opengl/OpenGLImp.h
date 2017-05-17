@@ -72,6 +72,7 @@ public:
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
 	
+	text* MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	text* MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	

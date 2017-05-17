@@ -53,6 +53,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 
 	pText = pContext->AddText(
 		labelFormat.pFont,
+		labelFormat.pFont->GetTexture().get(),
 		labelFormat.strLabel,
 		labelFormat.fontSize,
 		true // force distance fields

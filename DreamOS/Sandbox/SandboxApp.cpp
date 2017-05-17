@@ -1041,6 +1041,29 @@ Error:
 	return nullptr;
 }
 
+text* SandboxApp::MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string & content, double size, bool isBillboard) {
+	return m_pHALImp->MakeText(pFont, pFontTexture, content, size, isBillboard);
+}
+
+text* SandboxApp::AddText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string & content, double size, bool isBillboard) {
+	RESULT r = R_PASS;
+
+	text *pText = m_pHALImp->MakeText(pFont, pFontTexture, content, size, isBillboard);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+	return nullptr;
+}
+
 text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard) {
 	RESULT r = R_PASS;
 

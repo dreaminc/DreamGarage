@@ -15,6 +15,9 @@ UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 RESULT UIKeyboard::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<Font> pFont;
+	std::wstring font;
+
 	// Register keyboard events
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
@@ -50,21 +53,13 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyTypeThreshold = 0.0f; // triggered once the center of the mallet hits the keyboard surface
 	m_keyReleaseThreshold = -0.025f;
 
-	m_pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
+	m_pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", GetComposite(), true);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
 
-	// preload possible keyboard layers 
-//	m_pLayout = new UIKeyboardLayout(LayoutType::QWERTY);
-	/*
-	for (LayoutType type : {LayoutType::QWERTY,
-							LayoutType::QWERTY_UPPER,
-							LayoutType::QWERTY_NUM,
-							LayoutType::QWERTY_SYMBOL}) {
-//*/
-
+	// pre-load possible keyboard layers 
 	InitializeTexturesWithLayout(LayoutType::QWERTY);
 	InitializeTexturesWithLayout(LayoutType::QWERTY_UPPER);
 	InitializeTexturesWithLayout(LayoutType::QWERTY_NUM);
@@ -102,7 +97,7 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			std::string ch = "";
 			if (key->m_letter >= 0x20) ch = key->m_letter;
 
-			m_pQuadTextures->AddText(m_pFont, ch, 0.2f, true);
+			std::shared_ptr<text> pText = m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
 			GetDOS()->RenderToTexture(m_pQuadTextures);
 
 			m_keyCharAtlas[ch] = m_pQuadTextures->GetFramebuffer()->GetTexture();
@@ -113,7 +108,7 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			auto keyBack = m_pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
 			keyBack->SetColorTexture(m_pKeyTexture.get());
 
-			m_pQuadTextures->AddText(m_pFont, ch, 0.2f, true);
+			m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
 			GetDOS()->RenderToTexture(m_pQuadTextures);
 
 			auto pTexture = m_pQuadTextures->GetFramebuffer()->GetTexture();

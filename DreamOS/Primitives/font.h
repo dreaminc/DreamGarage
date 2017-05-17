@@ -12,6 +12,8 @@
 
 #include "Primitives/quad.h"
 
+class composite;
+
 class Font {
 public:
 
@@ -49,6 +51,8 @@ public:
 		CharacterGlyph() { }
 	};
 
+	Font(const std::wstring& fnt_file, composite *pContext, bool distanceMap = false);
+	//TODO: not removing this in order to avoid changing DreamConsole
 	Font(const std::wstring& fnt_file, bool distanceMap = false);
 	~Font();
 
@@ -84,15 +88,18 @@ private:
 
 // Distance Mapping
 public:
-	bool HasDistanceMap() { return m_fDistanceMap; }
-	float GetBuffer() { return m_buffer; }
-	float GetGamma() { return m_gamma; }
-
-
+	bool HasDistanceMap();
+	float GetBuffer();
+	float GetGamma();
+	std::shared_ptr<texture> GetTexture();
+	RESULT SetTexture(std::shared_ptr<texture> pTexture);
+	
 private:
 	bool m_fDistanceMap;
 	float m_buffer = 0.5f;
 	float m_gamma = 0.02f;
+
+	std::shared_ptr<texture> m_pTexture;
 };
 
 #endif // ! FONT_H_

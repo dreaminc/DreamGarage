@@ -35,8 +35,11 @@ struct LabelFormat
 	point ptPosition;
 	vector vScale;
 
+	//TODO: a context is used to create the default texture off of the default font
+	//	set manually for now
 	LabelFormat() :
-		pFont(std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true)),
+		//pFont(std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true)),
+		pFont(nullptr),
 		strLabel(""),
 		fontSize(LABEL_SIZE),
 		ptPosition(0.0f, -0.9f, 0.0f),

@@ -46,12 +46,12 @@ typedef struct RadialLayerFormat {
 class UIBar : public UIModule {
 public:
 	UIBar();
+	~UIBar();
 
 	RESULT SetParams(const IconFormat& iconFormat,
 			const LabelFormat& labelFormat,
 			const RadialLayerFormat& menuFormat,
 			const RadialLayerFormat& titleFormat);
-	~UIBar();
 
 	RESULT UpdateCurrentUILayer(const UILayerInfo& info, const RadialLayerFormat& layerFormat);
 

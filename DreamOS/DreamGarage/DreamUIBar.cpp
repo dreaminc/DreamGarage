@@ -27,6 +27,12 @@ RESULT DreamUIBar::SetParams(const IconFormat& iconFormat, const LabelFormat& la
 	return UIBar::SetParams(iconFormat, labelFormat, menuFormat, titleFormat);
 }
 
+//Generating the font texture is expensive, only use this function during initialization
+RESULT DreamUIBar::SetFont(const std::wstring& strFile) {
+	m_labelFormat.pFont = std::make_shared<Font>(strFile, GetComposite(), true);
+	return R_PASS;
+}
+
 RESULT DreamUIBar::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
