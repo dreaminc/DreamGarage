@@ -100,8 +100,8 @@ private:
 	std::shared_ptr<texture> m_pTextBoxTexture;
 
 	std::shared_ptr<composite> m_pTextBoxContainer;
-	std::map<std::string, texture*> m_keyCharAtlas;
-	std::map<std::string, texture*> m_keyTextureAtlas;
+	std::map<unsigned int, texture*> m_keyCharAtlas;
+	std::map<unsigned int, texture*> m_keyTextureAtlas;
 
 	FlatContext *m_pQuadTextures;
 
