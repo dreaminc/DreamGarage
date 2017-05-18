@@ -53,8 +53,8 @@ RESULT OVRHMDSinkNode::SetupConnections() {
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer_lefteye", ppInputFramebufferLeft));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer_righteye", ppInputFramebufferRight));
 
-	m_pInputFramebuffers[EYE_LEFT] = Connection("input_framebuffer_lefteye", CONNECTION_TYPE::INPUT);
-	m_pInputFramebuffers[EYE_RIGHT] = Connection("input_framebuffer_righteye", CONNECTION_TYPE::INPUT);
+	m_pInputConnection[EYE_LEFT] = Connection("input_framebuffer_lefteye", CONNECTION_TYPE::INPUT);
+	m_pInputConnection[EYE_RIGHT] = Connection("input_framebuffer_righteye", CONNECTION_TYPE::INPUT);
 
 Error:
 	return r;
@@ -78,7 +78,7 @@ RESULT OVRHMDSinkNode::RenderNode(long frameID) {
 
 		m_pParentHMD->SetAndClearRenderSurface((EYE_TYPE)(i));
 
-		CR(m_pInputFramebuffers[i]->RenderConnections(frameID));
+		CR(m_pInputConnection[i]->RenderConnections(frameID));
 
 		// Commit Frame to HMD
 		m_pParentHMD->UnsetRenderSurface((EYE_TYPE)(i));

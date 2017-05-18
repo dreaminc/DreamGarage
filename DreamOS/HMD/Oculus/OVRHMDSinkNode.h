@@ -43,8 +43,7 @@ private:
 	OVRHMD *m_pParentHMD = nullptr;
 	OpenGLImp *m_pParentImp = nullptr;
 
-	DConnection *m_pInputFramebuffers[HMD_NUM_EYES] = { nullptr };
-	DConnection *m_pRightEyeInputFramebuffer = nullptr;
+	DConnection *m_pInputConnection[HMD_NUM_EYES] = { nullptr };
 };
 
 

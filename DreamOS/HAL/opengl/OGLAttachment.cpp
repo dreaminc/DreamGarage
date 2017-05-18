@@ -70,16 +70,16 @@ Error:
 }
 
 // TODO: This is a temporary approach
-RESULT OGLAttachment::OGLInitializeRenderBuffer(int samples) {
+RESULT OGLAttachment::OGLInitializeRenderBuffer() {
 	RESULT r = R_PASS;
 
-	m_pOGLRenderbuffer = new OGLRenderbuffer(m_pParentImp, m_width, m_height, samples);
+	m_pOGLRenderbuffer = new OGLRenderbuffer(m_pParentImp, m_width, m_height, m_sampleCount);
 	CN(m_pOGLRenderbuffer);
 
 	CR(m_pOGLRenderbuffer->OGLInitialize());
 
 	// Move this to the framebuffer
-	//CR(m_pParentImp->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_depthbufferIndex));
+	
 
 Error:
 	return r;

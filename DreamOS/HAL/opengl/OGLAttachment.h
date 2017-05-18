@@ -18,7 +18,7 @@ public:
 	~OGLAttachment ();
 
 	// TODO: This is a temporary approach
-	RESULT OGLInitializeRenderBuffer(int samples = 0);
+	RESULT OGLInitializeRenderBuffer();
 
 	// TODO: Potentially combine with the upper function - use mutli sample or not based on multisample value
 	RESULT OGLInitialize(OGLTexture *pOGLTexture);

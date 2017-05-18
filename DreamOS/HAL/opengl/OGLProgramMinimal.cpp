@@ -49,8 +49,7 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
 
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer(4));
-
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 	//*/
 
 Error:
@@ -84,6 +83,8 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	UseProgram();
+
+	glEnable(GL_DEPTH_TEST);
 
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);

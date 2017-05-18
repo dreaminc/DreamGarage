@@ -62,15 +62,15 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 			CR(DeleteColorAttachment());
 
 			CR(MakeColorAttachment());
-			CR(GetColorAttachment()->MakeOGLTexture(colorTextureType));
-			CR(GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+			CR(m_pOGLColorAttachment->MakeOGLTexture(colorTextureType));
+			CR(m_pOGLColorAttachment->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 		}
 		else if (m_pOGLColorAttachment->GetOGLRenderBuffer() != nullptr) {
-			int samples = m_pOGLColorAttachment->GetSampleCount();
 			CR(DeleteDepthAttachment());
 
 			CR(MakeDepthAttachment());
-			CR(GetDepthAttachment()->OGLInitializeRenderBuffer(samples));
+			CR(m_pOGLColorAttachment->OGLInitializeRenderBuffer());
+			CR(m_pOGLColorAttachment->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER));
 		}
 		//*/
 	}
@@ -85,15 +85,15 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 			CR(DeleteDepthAttachment());
 
 			CR(MakeDepthAttachment());
-			CR(GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth, depthTextureType));
-			CR(GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+			CR(m_pOGLDepthAttachment->MakeOGLDepthTexture(internalDepthFormat, typeDepth, depthTextureType));
+			CR(m_pOGLDepthAttachment->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 		}
 		else if (m_pOGLDepthAttachment->GetOGLRenderBuffer() != nullptr) {
-			int samples = m_pOGLDepthAttachment->GetSampleCount();
 			CR(DeleteDepthAttachment());
 
 			CR(MakeDepthAttachment());
-			CR(GetDepthAttachment()->OGLInitializeRenderBuffer(samples));
+			CR(m_pOGLDepthAttachment->OGLInitializeRenderBuffer());
+			CR(m_pOGLDepthAttachment->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
 		}
 		//*/
 	}
@@ -232,7 +232,7 @@ RESULT OGLFramebuffer::MakeDepthAttachment() {
 
 	CB((m_pOGLDepthAttachment == nullptr));
 
-	m_pOGLDepthAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels);
+	m_pOGLDepthAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels, m_samples);
 	CN(m_pOGLDepthAttachment);
 
 Error:

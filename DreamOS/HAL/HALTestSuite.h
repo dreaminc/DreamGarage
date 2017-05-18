@@ -27,6 +27,7 @@ public:
 public:
 	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalShaderHMD();
+	RESULT AddTestBlinnPhongShaderHMD();
 
 	RESULT AddTestMinimalTextureShader();	
 	RESULT AddTestDepthPeelingShader();

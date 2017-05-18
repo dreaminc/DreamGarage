@@ -5,6 +5,10 @@
 
 #include "Primitives/stereocamera.h"
 
+#include "OpenGLImp.h"
+#include "OGLFramebuffer.h"
+#include "OGLAttachment.h"
+
 OGLProgramBlinnPhong::OGLProgramBlinnPhong(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglblinnphong"),
 	m_pLightsBlock(nullptr),
@@ -37,6 +41,32 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
+	int pxWidth = m_pParentImp->GetViewport().Width();
+	int pxHeight = m_pParentImp->GetViewport().Height();
+	
+	//pxWidth = 1024;
+	//pxHeight = 1024;
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+	CR(m_pOGLFramebuffer->OGLInitialize());
+	CR(m_pOGLFramebuffer->Bind());
+
+	CR(m_pOGLFramebuffer->SetSampleCount(4));
+
+	CR(m_pOGLFramebuffer->MakeColorAttachment());
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
+	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
+
+	///*
+	CR(m_pOGLFramebuffer->MakeDepthAttachment());
+	//CR(m_pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OVR_MULTI_SAMPLE));
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+
+	//*/
+
+	
+
 Error:
 	return r;
 }
@@ -59,36 +89,26 @@ Error:
 RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	// For now
-	EYE_TYPE eye = EYE_MONO;
-
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
 
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
+	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT24, GL_INT);
+	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+
 	UseProgram();
+
+	if (m_pOGLFramebuffer != nullptr)
+		BindToFramebuffer(m_pOGLFramebuffer);
+
+	glEnable(GL_DEPTH_TEST);	// Enable depth test
+	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	SetLights(pLights);
 
-	/*
-	// Camera Projection Matrix
-	if (m_pHMD != nullptr) {
-	m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
-	UseProgram();
-	}
-	*/
-
-	SetStereoCamera(m_pCamera, eye);
-
-	/*
-	if (m_pHMD != nullptr) {
-	m_pHMD->SetAndClearRenderSurface(eye);
-	}
-	else if (eye != lastEye) {
-	SetViewTarget(eye);
-	lastEye = eye;
-	}
-	*/
+	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
