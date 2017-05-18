@@ -439,24 +439,7 @@ RESULT SandboxApp::RunAppLoop() {
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 		//m_pOpenGLImp->Render(m_pSceneGraph);
 
-		///*
-		// Send to the HMD
-		// TODO reorganize Render functions
-		// need to be re-architected so that the HMD functions are called after all of the 
-		// GL functions per eye.
-		if (m_pHMD != nullptr) {
-			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_LEFT);
-			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_RIGHT);
-
-			m_pHMD->SubmitFrame();
-			m_pHMD->RenderHMDMirror();
-		}
-		else {
-			// Render Scene
-			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_MONO);
-		}
-		//*/
+		m_pHALImp->Render();
 
 		// Swap buffers
 		SwapDisplayBuffers();
@@ -714,7 +697,14 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 
 	// TODO: Get from HMD if HMD is valid
-	SinkNode* pDestSinkNode = m_pHALImp->MakeSinkNode("display");
+	SinkNode* pDestSinkNode = nullptr;
+
+	if (m_pHMD == nullptr) {
+		pDestSinkNode = m_pHALImp->MakeSinkNode("display");
+	}
+	else {
+		pDestSinkNode = (SinkNode*)(m_pHMD->GetHMDSinkNode());
+	}
 	CN(pDestSinkNode);
 
 	CNM(pRenderPipeline, "Pipeline not initialized");

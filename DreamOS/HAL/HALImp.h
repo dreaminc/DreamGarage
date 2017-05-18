@@ -111,7 +111,7 @@ public:
 	virtual RESULT FlushHALBuffers() = 0;
 
 private:
-	RESULT Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE eye);
+	RESULT Render();
 
 protected:
 	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);

@@ -17,6 +17,7 @@ public:
 	OGLViewportDisplay(OpenGLImp *pParentImp);
 
 	virtual RESULT SetupConnections() override;
+	virtual RESULT PreProcessNode(long frameID = 0) override;
 	virtual RESULT ProcessNode(long frameID = 0) override;
 
 private:

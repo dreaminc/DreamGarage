@@ -19,6 +19,19 @@ Error:
 	return r;
 }
 
+RESULT OGLViewportDisplay::PreProcessNode(long frameID) {
+	RESULT r = R_PASS;
+
+	auto pCamera = m_pParentImp->GetCamera();
+
+	pCamera->SetCameraEye(EYE_MONO);
+
+	m_pParentImp->SetViewTarget(EYE_MONO, pCamera->GetViewWidth(), pCamera->GetViewHeight());
+
+//Error:
+	return r;
+}
+
 RESULT OGLViewportDisplay::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 	

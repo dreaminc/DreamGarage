@@ -23,6 +23,7 @@
 #define DEFAULT_OVR_MULTI_SAMPLE 4
 
 class OVRTextureSwapChain {
+	friend class OVRHMDSinkNode;
 
 public:
 	OVRTextureSwapChain(OpenGLImp *pParentImp, ovrSession session, int width, int height, int mipLevels, unsigned char *data, int sampleCount);
@@ -47,6 +48,7 @@ private:
 	ovrTextureSwapChainDesc m_ovrTextureSwapChainDescription;
 	ovrTextureSwapChain  m_ovrTextureSwapChain;
 
+protected:
 	std::vector<OGLTexture*> m_swapChainOGLTextures;
 	
 	OGLFramebuffer *m_pOGLResolveFramebuffer = nullptr;

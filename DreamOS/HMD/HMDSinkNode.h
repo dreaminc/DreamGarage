@@ -21,7 +21,6 @@ public:
 	}
 
 	virtual RESULT SetupConnections() = 0;
-	virtual RESULT ProcessNode(long frameID = 0) = 0;
 };
 
 

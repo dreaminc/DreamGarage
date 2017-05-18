@@ -213,6 +213,8 @@ RESULT DNode::Terminate() {
 	return R_PASS;
 }
 
+// RenderNode can be overridden but this should be an exceptionally rare thing 
+// since a node that abuses RenderNode can basically kill a network
 RESULT DNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 

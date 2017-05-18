@@ -47,16 +47,46 @@ Error:
 RESULT OVRHMDSinkNode::SetupConnections() {
 	RESULT r = R_PASS;
 
-	CR(r);
+	OGLFramebuffer **ppInputFramebufferLeft = &(m_ovrTextureSwapChains[EYE_LEFT]->m_pOGLRenderFramebuffer);
+	OGLFramebuffer **ppInputFramebufferRight = &(m_ovrTextureSwapChains[EYE_RIGHT]->m_pOGLRenderFramebuffer);
+
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_lefteye", ppInputFramebufferLeft));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_righteye", ppInputFramebufferRight));
+
+	m_pInputFramebuffers[EYE_LEFT] = Connection("input_framebuffer_lefteye", CONNECTION_TYPE::INPUT);
+	m_pInputFramebuffers[EYE_RIGHT] = Connection("input_framebuffer_righteye", CONNECTION_TYPE::INPUT);
 
 Error:
 	return r;
 }
 
-RESULT OVRHMDSinkNode::ProcessNode(long frameID) {
+RESULT OVRHMDSinkNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 
-	CR(r);
+	auto pCamera = m_pParentImp->GetCamera();
+	int pxViewportWidth = m_pParentImp->GetViewport().Width();
+	int pxViewportHeight = m_pParentImp->GetViewport().Height();
+	int channels = 4;
+
+	pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
+
+	for (int i = 0; i < HMD_NUM_EYES; i++) {
+		pCamera->SetCameraEye((EYE_TYPE)(i));
+
+		m_pParentImp->ClearHALBuffers();
+		m_pParentImp->ConfigureHAL();
+
+		m_pParentHMD->SetAndClearRenderSurface((EYE_TYPE)(i));
+
+		CR(m_pInputFramebuffers[i]->RenderConnections(frameID));
+
+		// Commit Frame to HMD
+		m_pParentHMD->UnsetRenderSurface((EYE_TYPE)(i));
+		m_pParentHMD->CommitSwapChain((EYE_TYPE)(i));
+	}
+
+	m_pParentHMD->SubmitFrame();
+	m_pParentHMD->RenderHMDMirror();
 
 Error:
 	return r;

@@ -25,12 +25,13 @@ public:
 	RESULT OGLInitialize();
 
 	virtual RESULT SetupConnections() override;
-	virtual RESULT ProcessNode(long frameID = 0) override;
 
 	RESULT CommitSwapChain(EYE_TYPE eye);
 	RESULT SetAndClearRenderSurface(EYE_TYPE eye);
 	RESULT UnsetRenderSurface(EYE_TYPE eye);
 	RESULT SubmitFrame();
+
+	virtual RESULT RenderNode(long frameID = 0) override;
 
 private:
 	// Texture Swap Chains
@@ -41,6 +42,9 @@ private:
 private:
 	OVRHMD *m_pParentHMD = nullptr;
 	OpenGLImp *m_pParentImp = nullptr;
+
+	DConnection *m_pInputFramebuffers[HMD_NUM_EYES] = { nullptr };
+	DConnection *m_pRightEyeInputFramebuffer = nullptr;
 };
 
 
