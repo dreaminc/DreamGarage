@@ -58,6 +58,11 @@ public:
 		return R_PASS;
 	}
 
+	int GetWidth() { return m_width; }
+	int GetHeight() { return m_height; }
+	int GetChannels() { return m_channels; }
+	int GetSampleCount() { return m_sampleCount; }
+
 private:
 	int m_width;
 	int m_height;

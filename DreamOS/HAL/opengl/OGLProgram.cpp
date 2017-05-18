@@ -161,10 +161,6 @@ RESULT OGLProgram::InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum
 	return InitializeDepthFrameBuffer(m_pOGLFramebuffer, internalDepthFormat, typeDepth, pxWidth, pxHeight);
 }
 
-RESULT OGLProgram::UpdateFramebufferToViewport(GLenum internalDepthFormat, GLenum typeDepth, int channels) {
-	return UpdateFramebufferToViewport(m_pOGLFramebuffer, internalDepthFormat, typeDepth, channels);
-}
-
 // TODO: This is not generic, hacking right now to get shadows to work first then will generalize
 
 RESULT OGLProgram::InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels) {
@@ -213,6 +209,32 @@ RESULT OGLProgram::InitializeFrameBuffer(GLenum internalDepthFormat, GLenum type
 	return InitializeFrameBuffer(m_pOGLFramebuffer, internalDepthFormat, typeDepth, pxWidth, pxHeight, channels);
 }
 
+RESULT OGLProgram::UpdateFramebufferToCamera(OGLFramebuffer*&pOGLFramebuffer, camera *pCamera, GLenum internalDepthFormat, GLenum typeDepth, int channels) {
+	RESULT r = R_PASS;
+
+	int pxWidth = pCamera->GetViewWidth();
+	int pxHeight = pCamera->GetViewHeight();
+
+	CN(pOGLFramebuffer);
+
+	if (pOGLFramebuffer != nullptr) {
+		if (pOGLFramebuffer->GetWidth() != pxWidth || pOGLFramebuffer->GetHeight() != pxHeight) {
+			return pOGLFramebuffer->Resize(pxWidth, pxHeight, internalDepthFormat, typeDepth);
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT OGLProgram::UpdateFramebufferToCamera(camera *pCamera, GLenum internalDepthFormat, GLenum typeDepth, int channels) {
+	return UpdateFramebufferToCamera(m_pOGLFramebuffer, pCamera, internalDepthFormat, typeDepth, channels);
+}
+
+RESULT OGLProgram::UpdateFramebufferToViewport(GLenum internalDepthFormat, GLenum typeDepth, int channels) {
+	return UpdateFramebufferToViewport(m_pOGLFramebuffer, internalDepthFormat, typeDepth, channels);
+}
+
 RESULT OGLProgram::UpdateFramebufferToViewport(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels) {
 	RESULT r = R_PASS;
 
@@ -224,10 +246,6 @@ RESULT OGLProgram::UpdateFramebufferToViewport(OGLFramebuffer*&pOGLFramebuffer, 
 	if (pOGLFramebuffer != nullptr) {
 		if (pOGLFramebuffer->GetWidth() != pxWidth || pOGLFramebuffer->GetHeight() != pxHeight) {
 			return pOGLFramebuffer->Resize(pxWidth, pxHeight, internalDepthFormat, typeDepth);
-			//return InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT);
-		}
-		else {
-			return R_PASS;
 		}
 	}
 

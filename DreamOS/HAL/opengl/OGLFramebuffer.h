@@ -57,6 +57,9 @@ public:
 
 	GLuint GetFramebufferIndex();
 
+	RESULT SetSampleCount(int samples) { m_samples = samples; return R_PASS; }
+	int GetSampleCount() { return m_samples; }
+
 private:
 	OpenGLImp *m_pParentImp;
 
@@ -69,6 +72,9 @@ private:
 	OGLAttachment* m_pOGLColorAttachment = nullptr;
 	
 	// TODO: Stencil attachments 
+
+private:
+	int m_samples = 1;
 };
 
 #endif // ! OGL_FRAMEBUFFER_H_

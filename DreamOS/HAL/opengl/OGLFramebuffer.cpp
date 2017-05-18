@@ -57,25 +57,44 @@ RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFor
 		//CR(m_pOGLColorAttachment->Resize(pxWidth, pxHeight));
 
 		///*
-		texture::TEXTURE_TYPE colorTextureType = m_pOGLColorAttachment->GetOGLTexture()->GetTextureType();
-		CR(DeleteColorAttachment());
+		if (m_pOGLColorAttachment->GetOGLTexture() != nullptr) {
+			texture::TEXTURE_TYPE colorTextureType = m_pOGLColorAttachment->GetOGLTexture()->GetTextureType();
+			CR(DeleteColorAttachment());
 
-		CR(MakeColorAttachment());
-		CR(GetColorAttachment()->MakeOGLTexture(colorTextureType));
-		CR(GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+			CR(MakeColorAttachment());
+			CR(GetColorAttachment()->MakeOGLTexture(colorTextureType));
+			CR(GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+		}
+		else if (m_pOGLColorAttachment->GetOGLRenderBuffer() != nullptr) {
+			int samples = m_pOGLColorAttachment->GetSampleCount();
+			CR(DeleteDepthAttachment());
+
+			CR(MakeDepthAttachment());
+			CR(GetDepthAttachment()->OGLInitializeRenderBuffer(samples));
+		}
 		//*/
 	}
 
 	if (m_pOGLDepthAttachment != nullptr) {
+		// TODO: Move this into attachment
 		//CR(m_pOGLDepthAttachment->Resize(pxWidth, pxHeight));
 
 		///*
-		texture::TEXTURE_TYPE depthTextureType = m_pOGLDepthAttachment->GetOGLTexture()->GetTextureType();
-		CR(DeleteDepthAttachment());
+		if (m_pOGLDepthAttachment->GetOGLTexture() != nullptr) {
+			texture::TEXTURE_TYPE depthTextureType = m_pOGLDepthAttachment->GetOGLTexture()->GetTextureType();
+			CR(DeleteDepthAttachment());
 
-		CR(MakeDepthAttachment());
-		CR(GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth, depthTextureType));
-		CR(GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+			CR(MakeDepthAttachment());
+			CR(GetDepthAttachment()->MakeOGLDepthTexture(internalDepthFormat, typeDepth, depthTextureType));
+			CR(GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+		}
+		else if (m_pOGLDepthAttachment->GetOGLRenderBuffer() != nullptr) {
+			int samples = m_pOGLDepthAttachment->GetSampleCount();
+			CR(DeleteDepthAttachment());
+
+			CR(MakeDepthAttachment());
+			CR(GetDepthAttachment()->OGLInitializeRenderBuffer(samples));
+		}
 		//*/
 	}
 
@@ -177,7 +196,7 @@ RESULT OGLFramebuffer::MakeColorAttachment() {
 
 	CB((m_pOGLColorAttachment == nullptr));
 
-	m_pOGLColorAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels);
+	m_pOGLColorAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels, m_samples);
 	CN(m_pOGLColorAttachment);
 
 Error:

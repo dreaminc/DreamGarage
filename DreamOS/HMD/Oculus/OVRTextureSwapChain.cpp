@@ -84,6 +84,7 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 	CR(m_pOGLResolveFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture());
 
 	// Set up render FBO
+	/*
 	m_pOGLRenderFramebuffer = new OGLFramebuffer(m_pParentImp, m_width, m_height, m_channels);
 	CR(m_pOGLRenderFramebuffer->OGLInitialize());
 	CR(m_pOGLRenderFramebuffer->Bind());
@@ -95,6 +96,7 @@ RESULT OVRTextureSwapChain::OVRInitialize() {
 	CR(m_pOGLRenderFramebuffer->MakeColorAttachment());
 	CR(m_pOGLRenderFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(m_pOGLRenderFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
+	//*/
 
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, 0));
 

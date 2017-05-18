@@ -32,7 +32,26 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	//InitializeDepthToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, 1024, 1024);
 
 	// Custom framebuffer output settings
-	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
+	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT24, GL_INT));
+
+	///*
+	int pxWidth = m_pParentImp->GetViewport().Width();
+	int pxHeight = m_pParentImp->GetViewport().Height();
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+	CR(m_pOGLFramebuffer->OGLInitialize());
+	CR(m_pOGLFramebuffer->Bind());
+
+	CR(m_pOGLFramebuffer->SetSampleCount(4));
+
+	CR(m_pOGLFramebuffer->MakeColorAttachment());
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
+	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
+
+	CR(m_pOGLFramebuffer->MakeDepthAttachment());
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer(4));
+
+	//*/
 
 Error:
 	return r;
@@ -61,7 +80,8 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT24, GL_INT);
+	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	UseProgram();
 

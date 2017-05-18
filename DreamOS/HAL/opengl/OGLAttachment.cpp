@@ -147,8 +147,13 @@ Error:
 RESULT OGLAttachment::MakeOGLTexture(texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
-	m_pOGLTexture = OGLTexture::MakeTexture(m_pParentImp, type, m_width, m_height, m_channels);
-	CN(m_pOGLTexture);
+	if (m_sampleCount == 1) {
+		m_pOGLTexture = OGLTexture::MakeTexture(m_pParentImp, type, m_width, m_height, m_channels);
+		CN(m_pOGLTexture);
+	}
+	else {
+		CR(MakeOGLTextureMultisample());
+	}
 
 Error:
 	return r;
