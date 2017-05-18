@@ -62,6 +62,8 @@ HMD* HMDFactory::MakeHMD(HMD_TYPE type, SandboxApp *pParentSandbox, HALImp *hali
 		} break;
 	}
 
+	CR(pHMD->InitializeHMDSinkNode());
+
 	return pHMD;
 Error:
 	if (pHMD != nullptr) {

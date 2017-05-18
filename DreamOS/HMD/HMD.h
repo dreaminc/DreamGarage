@@ -9,7 +9,8 @@
 // DreamOS/HMD/HMD.h
 // The HMD parent class 
 
-// TODO: Should this go into Sense?
+// TODO: All "sense" related functionality should be woven into the Source node
+// TODO: All "sink/display" related functionality should be pushed into the Sink node
 
 #include "Primitives/Publisher.h"
 
@@ -23,12 +24,13 @@
 
 #include "Sense/SenseController.h"
 
-#include "HAL/Pipeline/SinkNode.h"
-
 #define HMD_NUM_EYES 2
 
 class HALImp;
 class SandboxApp;
+
+class HMDSinkNode;
+class HMDSourceNode;
 
 typedef enum HMDEventType {
 	HMD_EVENT_ORIENTATION,
@@ -90,10 +92,12 @@ public:
 	}
 
 public:
-	// Sink node
-	virtual RESULT SetupConnections() = 0;
-	virtual RESULT ProcessNode(long frameID = 0) = 0;
+	virtual HMDSinkNode *GetHMDSinkNode() = 0;
+	virtual HMDSourceNode *GetHMDSourceNode() = 0;
+	virtual RESULT InitializeHMDSourceNode() = 0;
+	virtual RESULT InitializeHMDSinkNode() = 0;
 
+public:
 	// Called by factory to initialize HMD
 	//virtual RESULT InitializeHMD(HALImp *halimp) = 0;
 	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) = 0;
@@ -101,6 +105,7 @@ public:
 	// Called to update/poll tracking info
 	virtual RESULT UpdateHMD() = 0;
 
+	virtual RESULT ReleaseHMD() = 0;
 
 	virtual RESULT SetUpFrame() = 0;
 	virtual RESULT BindFramebuffer(EYE_TYPE eye) = 0;
@@ -120,13 +125,24 @@ public:
 	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) = 0;
 	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) = 0;
 
-	int GetEyeWidth() { return m_eyeWidth; }
-	int GetEyeHeight() { return m_eyeHeight; }
-
 	RESULT AttachHand(hand *pHand, hand::HAND_TYPE type);
 	hand* GetHand(hand::HAND_TYPE type);
 
 	SenseController* GetSenseController();
+
+	int GetEyeWidth() { return m_eyeWidth; }
+	int GetEyeHeight() { return m_eyeHeight; }
+
+protected:
+	RESULT SetEyeWidth(int eyeWidth) {
+		m_eyeWidth = eyeWidth;
+		return R_PASS;
+	}
+
+	RESULT SetEyeHeight(int eyeHeight) {
+		m_eyeHeight = eyeHeight;
+		return R_PASS;
+	}
 
 protected:
 	point m_ptOrigin;

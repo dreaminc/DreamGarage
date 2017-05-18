@@ -785,8 +785,8 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\HAL\opengl\OGLHMDDisplay.cpp">
-      <Filter>HAL\opengl</Filter>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRHMDSinkNode.cpp">
+      <Filter>HMD\Oculus</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1637,8 +1637,14 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLHMDDisplay.h">
-      <Filter>HAL\opengl</Filter>
+    <ClInclude Include="..\..\..\HMD\HMDSinkNode.h">
+      <Filter>HMD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\HMDSourceNode.h">
+      <Filter>HMD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRHMDSinkNode.h">
+      <Filter>HMD\Oculus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -13,6 +13,8 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include "OVRHMDSinkNode.h"
+
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
@@ -23,6 +25,35 @@ OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 
 OVRHMD::~OVRHMD() {
 	// empty stub
+}
+
+RESULT OVRHMD::InitializeHMDSourceNode() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT OVRHMD::InitializeHMDSinkNode() {
+	RESULT r = R_PASS;
+
+	OpenGLImp *pOGLImp = dynamic_cast<OpenGLImp*>(m_pHALImp);
+	CN(pOGLImp);
+
+	m_pOVRHMDSinkNode = new OVRHMDSinkNode(pOGLImp, this);
+	CN(m_pOVRHMDSinkNode);
+
+	CR(m_pOVRHMDSinkNode->OGLInitialize());
+	CR(m_pOVRHMDSinkNode->SetupConnections());
+
+Error:
+	return r;
+}
+
+HMDSinkNode* OVRHMD::GetHMDSinkNode() {
+	return (HMDSinkNode*)(m_pOVRHMDSinkNode);
+}
+
+HMDSourceNode* OVRHMD::GetHMDSourceNode() {
+	// TODO:
+	return nullptr;
 }
 
 RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
@@ -48,20 +79,6 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 
 	// FloorLevel will give tracking poses where the floor height is 0
 	CR((RESULT)ovr_SetTrackingOriginType(m_ovrSession, ovrTrackingOrigin_FloorLevel));
-
-	for (int i = 0; i < HMD_NUM_EYES; i++) {
-		ovrSizei idealTextureSize = ovr_GetFovTextureSize(m_ovrSession, ovrEyeType(i), m_ovrHMDDescription.DefaultEyeFov[i], 1);
-		
-		m_eyeWidth = idealTextureSize.w;
-		m_eyeHeight = idealTextureSize.h;
-
-		m_ovrTextureSwapChains[i] = new OVRTextureSwapChain(oglimp, m_ovrSession, idealTextureSize.w, idealTextureSize.h, 1, NULL, 1);
-		CR(m_ovrTextureSwapChains[i]->OVRInitialize());
-	}
-
-	// Frontload Layer Initialization
-	m_ovrLayer.Header.Type = ovrLayerType_EyeFov;
-	m_ovrLayer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
 
 	// Set up the mirror texture
 	if (wndWidth == 0)
@@ -98,7 +115,7 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	m_pRightControllerModel->AddSphere(0.5f, 10, 10);
 #else 
 	// Oculus controller dimensions: 4.1 x 4.5 x 3.8 in.
-	// model is offcenter, displacing by half height and half depth helps (engine is in meters)
+	// model is off center, displacing by half height and half depth helps (engine is in meters)
 
 	m_pLeftControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj",
 		nullptr,
@@ -210,54 +227,19 @@ RESULT OVRHMD::BindFramebuffer(EYE_TYPE eye) {
 
 // Commit the changes to the texture swap chain
 RESULT OVRHMD::CommitSwapChain(EYE_TYPE eye) {
-	return m_ovrTextureSwapChains[eye]->Commit();
+	return m_pOVRHMDSinkNode->CommitSwapChain(eye);
 }
 
 RESULT OVRHMD::SetAndClearRenderSurface(EYE_TYPE eye) {
-	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
-
-	m_ovrEyeRenderDescription[eyeType] = ovr_GetRenderDesc(m_ovrSession, eyeType, m_ovrHMDDescription.DefaultEyeFov[eyeType]);
-
-	return m_ovrTextureSwapChains[eye]->SetAndClearRenderSurface();
+	return m_pOVRHMDSinkNode->SetAndClearRenderSurface(eye);
 }
 
 RESULT OVRHMD::UnsetRenderSurface(EYE_TYPE eye) {
-	return m_ovrTextureSwapChains[eye]->UnsetRenderSurface();
+	return m_pOVRHMDSinkNode->UnsetRenderSurface(eye);
 }
 
 RESULT OVRHMD::SubmitFrame() {
-	RESULT r = R_PASS;
-
-	// TODO: Split this across the eyes 
-	long long frameIndex = 0;
-	ovrPosef EyeRenderPose[2];
-	ovrVector3f HmdToEyeOffset[2] = { m_ovrEyeRenderDescription[0].HmdToEyeOffset, m_ovrEyeRenderDescription[1].HmdToEyeOffset };
-
-	double sensorSampleTime;    // sensorSampleTime is fed into the layer later
-	ovr_GetEyePoses(m_ovrSession, frameIndex, ovrTrue, HmdToEyeOffset, EyeRenderPose, &sensorSampleTime);
-
-	for (int eye = 0; eye < 2; eye++) {
-		m_ovrLayer.ColorTexture[eye] = m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain();
-		m_ovrLayer.Viewport[eye] = m_ovrTextureSwapChains[eye]->GetOVRViewportRecti();
-		m_ovrLayer.Fov[eye] = m_ovrHMDDescription.DefaultEyeFov[eye];
-		m_ovrLayer.RenderPose[eye] = EyeRenderPose[eye];
-		m_ovrLayer.SensorSampleTime = sensorSampleTime;
-	}
-
-	ovrLayerHeader* layers = &m_ovrLayer.Header;
-	CR((RESULT)ovr_SubmitFrame(m_ovrSession, 0, nullptr, &layers, 1));
-
-	/* TODO: Might want to check on session
-	ovrSessionStatus sessionStatus;
-		ovr_GetSessionStatus(session, &sessionStatus);
-		if (sessionStatus.ShouldQuit)
-			goto Done;
-		if (sessionStatus.ShouldRecenter)
-			ovr_RecenterTrackingOrigin(session);
-	*/
-
-Error:
-	return r;
+	return m_pOVRHMDSinkNode->SubmitFrame();
 }
 
 // TODO: Better way?
@@ -404,18 +386,9 @@ RESULT OVRHMD::ReleaseHMD() {
 		m_ovrSession = nullptr;
 	}
 
-	for (int i = 0; i < HMD_NUM_EYES; i++) {
-		if (m_ovrTextureSwapChains[i] != nullptr) {
-			delete m_ovrTextureSwapChains[i];
-			m_ovrTextureSwapChains[i] = nullptr;
-		}
-
-		/*
-		if (m_depthbuffers[i] != nullptr) {
-			delete m_depthbuffers[i];
-			m_depthbuffers[i] = nullptr;
-		}
-		*/
+	if (m_pOVRHMDSinkNode != nullptr) {
+		delete m_pOVRHMDSinkNode;
+		m_pOVRHMDSinkNode = nullptr;
 	}
 
 	ovr_Shutdown();

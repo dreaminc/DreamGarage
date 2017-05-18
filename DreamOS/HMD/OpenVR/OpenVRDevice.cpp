@@ -31,6 +31,15 @@ OpenVRDevice::~OpenVRDevice() {
 	vr::VR_Shutdown();
 }
 
+// TODO: Implement these
+RESULT OpenVRDevice::InitializeHMDSourceNode() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT OpenVRDevice::InitializeHMDSinkNode() {
+	return R_NOT_IMPLEMENTED;
+}
+
 std::string OpenVRDevice::GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError) {
 	uint32_t unRequiredBufferLen = pHmd->GetStringTrackedDeviceProperty(unDevice, prop, NULL, 0, peError);
 	if (unRequiredBufferLen == 0)
