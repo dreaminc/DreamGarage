@@ -23,6 +23,8 @@ public:
 				const LabelFormat& labelFormat, 
 				const RadialLayerFormat& menuFormat,
 				const RadialLayerFormat& titleFormat);
+	RESULT SetFont(const std::wstring& strFont);
+
 	~DreamUIBar();
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;

@@ -207,6 +207,16 @@ Error:
 	return r;
 }
 
+RESULT DimObj::UpdateColorTexture(texture *pTexture) {
+
+	RESULT r = R_PASS;
+	m_pColorTexture = pTexture;
+	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+//Error:
+	return r;
+}
+
 RESULT DimObj::ClearColorTexture() {
 	RESULT r = R_PASS;
 

@@ -100,7 +100,6 @@ private:
 	vector m_vNormal;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
-	bool m_fShiftDown = false;
 
 	TextEntryString m_strEntered;
 };

@@ -6,12 +6,19 @@
 
 #include "Sandbox/PathManager.h"
 
+#include "Primitives/composite.h"
+
+Font::Font(const std::wstring& fnt_file, composite *pContext, bool distanceMap) {
+	LoadFontFromFile(fnt_file);
+	wchar_t* strFile = (wchar_t*)(L"Fonts/" + GetGlyphImageFile()).c_str();
+	m_pTexture = pContext->MakeTexture(strFile, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_fDistanceMap = distanceMap;
+}
+
 Font::Font(const std::wstring& fnt_file, bool distanceMap)
 {
 	LoadFontFromFile(fnt_file);
 	m_fDistanceMap = distanceMap;
-	// Error:
-	// return false;
 }
 
 Font::~Font()
@@ -147,3 +154,26 @@ bool Font::GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret)
 	return true;
 }
 
+bool Font::HasDistanceMap() {
+	return m_fDistanceMap;
+}
+
+float Font::GetBuffer() {
+	return m_buffer;
+}
+
+float Font::GetGamma() {
+	return m_gamma;
+}
+
+std::shared_ptr<texture> Font::GetTexture() {
+	return m_pTexture;
+}
+
+RESULT Font::SetTexture(std::shared_ptr<texture> pTexture) {
+	RESULT r = R_PASS;
+	CN(pTexture);
+	m_pTexture = pTexture;
+Error:
+	return r;
+}

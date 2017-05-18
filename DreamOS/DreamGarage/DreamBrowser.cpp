@@ -293,10 +293,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		case INTERACTION_EVENT_KEY_DOWN: {
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
 
-			if (pEvent->m_value == SVK_SHIFT)
-				m_fShiftDown = fKeyDown;
-
-			else if (pEvent->m_value == SVK_RETURN) {
+			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
 				m_strEntered.clear();
 			}
@@ -307,25 +304,6 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			}
 
 			char chKey = (char)(pEvent->m_value);
-
-			if (m_fShiftDown) {
-				switch (chKey) {
-				case '0': chKey = ')'; break;
-				case '1': chKey = '!'; break;
-				case '2': chKey = '@'; break;
-				case '3': chKey = '#'; break;
-				case '4': chKey = '$'; break;
-				case '5': chKey = '%'; break;
-				case '6': chKey = '^'; break;
-				case '7': chKey = '&'; break;
-				case '8': chKey = '*'; break;
-				case '9': chKey = '('; break;
-				}
-			}
-			else {
-				if (chKey >= 'A' && chKey <= 'Z')
-					chKey += 32;
-			}
 
 			CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
 			m_strEntered.UpdateString(chKey);

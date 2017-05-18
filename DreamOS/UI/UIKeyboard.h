@@ -27,28 +27,31 @@ public:
 	UIKeyboard(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
-	RESULT InitializeQuadsWithLayout();
+	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
+	RESULT InitializeTexturesWithLayout(LayoutType type);
 
+//DreamApp
 public:
-	//DreamApp
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) override;
 
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+protected:
+	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+
 //Animation
 public:
 	RESULT ShowKeyboard();
 	RESULT HideKeyboard();
-	RESULT HideSurface();
 	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
-	UIKey* CollisionPointToKey(point ptCollision);
-
 private:
 	RESULT ReleaseKey(UIKey *pKey);
+	RESULT HideSurface();
+	UIKey* CollisionPointToKey(point ptCollision);
 
 //SenseKeyboard
 public:
@@ -76,9 +79,7 @@ public:
 private:
 	RESULT UIKeyboard::UpdateViewQuad();
 	RESULT UIKeyboard::UpdateAppComposite();
-
-protected:
-	static UIKeyboard* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
+	RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType);
 
 public:
 	RESULT UpdateTextBox(int chkey);
@@ -99,7 +100,8 @@ private:
 	std::shared_ptr<texture> m_pTextBoxTexture;
 
 	std::shared_ptr<composite> m_pTextBoxContainer;
-	std::map<std::string, texture*> m_keyTextureLookup;
+	std::map<unsigned int, texture*> m_keyCharAtlas;
+	std::map<unsigned int, texture*> m_keyTextureAtlas;
 
 	FlatContext *m_pQuadTextures;
 
@@ -113,6 +115,7 @@ private:
 	std::shared_ptr<Font> m_pFont;
 	std::shared_ptr<texture> m_pKeyTexture;
 
+	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;
 };
 

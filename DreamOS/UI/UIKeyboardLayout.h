@@ -13,7 +13,8 @@ class quad;
 enum class LayoutType {
 	QWERTY,
 	QWERTY_UPPER,
-	NUM,
+	QWERTY_NUM,
+	QWERTY_SYMBOL,
 	INVALID
 };
 
@@ -24,10 +25,17 @@ public:
 
 public:
 	RESULT UpdateKeysWithLayout(LayoutType type = LayoutType::QWERTY);
-	RESULT CreateQWERTYLayout();
+	RESULT CreateQWERTYLayout(bool fUpper = false, bool fNum = false);
 
+	LayoutType GetLayoutType();
 	RESULT SetLayoutType(LayoutType type);
+	RESULT UpdateQWERTYLayout(bool fUpper = false, bool fNum = false);
 	std::vector<std::vector<std::shared_ptr<UIKey>>> GetKeys();
+
+	RESULT SetVisible(bool fVisible);
+
+private:
+	std::string GenerateQWERTYRow(int rowIndex, bool fUpper = false, bool fNum = false);
 
 private:
 	LayoutType m_layoutType;

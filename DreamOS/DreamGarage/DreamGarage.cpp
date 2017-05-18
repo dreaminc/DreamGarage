@@ -148,12 +148,13 @@ RESULT DreamGarage::LoadScene() {
 	titleFormat.itemPosY = -0.25f;
 	titleFormat.itemAngleX = 75.0f;
 
-	//m_pDreamUIBar = std::make_shared<DreamUIBar>(this, iconFormat, labelFormat, menuFormat, titleFormat);
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this);
 	CN(m_pDreamUIBar);
+
 	//CV(m_pDreamUIBar);
 
 	m_pDreamUIBar->SetParams(iconFormat, labelFormat, menuFormat, titleFormat);
+	m_pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
 //*
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
 	CNM(m_pDreamBrowser, "Failed to create dream browser");
