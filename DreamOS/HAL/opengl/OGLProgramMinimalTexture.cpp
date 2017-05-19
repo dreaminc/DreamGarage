@@ -80,8 +80,7 @@ RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
 		//m_pUniformTextureColor->SetUniform(pTexture);
 
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
-		m_pParentImp->BindTexture(GL_TEXTURE_2D, pTexture->GetOGLTextureIndex());
-
+		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
 	}
 

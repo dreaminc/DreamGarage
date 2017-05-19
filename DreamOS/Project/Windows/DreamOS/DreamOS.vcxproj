@@ -681,6 +681,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp" />

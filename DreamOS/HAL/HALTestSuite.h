@@ -25,13 +25,16 @@ public:
 	virtual RESULT AddTests() override;
 
 public:
-	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalShaderHMD();
 	RESULT AddTestBlinnPhongShaderHMD();
 	RESULT AddTestBlinnPhongShaderBlurHMD();
-	RESULT AddTestBlinnPhongShaderBlur();
+	RESULT AddTestBlinnPhongShaderTextureHMD();
 
-	RESULT AddTestMinimalTextureShader();	
+	RESULT AddTestMinimalShader();
+	RESULT AddTestMinimalTextureShader();
+	RESULT AddTestBlinnPhongShaderBlur();
+	RESULT AddTestBlinnPhongShaderTexture();
+
 	RESULT AddTestDepthPeelingShader();
 
 	RESULT AddTestRenderToTextureQuad();

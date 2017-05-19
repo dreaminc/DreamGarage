@@ -1,23 +1,18 @@
-#include "OGLProgramBlinnPhong.h"
-
-#include "Scene/ObjectStoreImp.h"
-#include "Scene/ObjectStore.h"
-
-#include "Primitives/stereocamera.h"
+#include "OGLProgramBlinnPhongTexture.h"
 
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramBlinnPhong::OGLProgramBlinnPhong(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglblinnphong"),
+OGLProgramBlinnPhongTexture::OGLProgramBlinnPhongTexture(OpenGLImp *pParentImp) :
+	OGLProgram(pParentImp, "oglblinnpohongtexture"),
 	m_pLightsBlock(nullptr),
 	m_pMaterialsBlock(nullptr)
 {
 	// empty
 }
 
-RESULT OGLProgramBlinnPhong::OGLInitialize() {
+RESULT OGLProgramBlinnPhongTexture::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -37,13 +32,18 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformUseColorTexture), std::string("u_fUseColorTexture")));
+
 	// Uniform Blocks
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
+	// Framebuffer Output
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
-	
+
 	//pxWidth = 1024;
 	//pxHeight = 1024;
 
@@ -54,7 +54,7 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(m_pOGLFramebuffer->SetSampleCount(4));
 
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	
+
 	/*
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
@@ -69,13 +69,11 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
 	//*/
 
-	
-
 Error:
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::SetupConnections() {
+RESULT OGLProgramBlinnPhongTexture::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
@@ -90,7 +88,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
+RESULT OGLProgramBlinnPhongTexture::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
@@ -106,10 +104,6 @@ RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);
 
-	glEnable(GL_DEPTH_TEST);	// Enable depth test
-	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
@@ -123,11 +117,31 @@ RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::SetObjectTextures(OGLObj *pOGLObj) {
-	return R_NOT_IMPLEMENTED;
+RESULT OGLProgramBlinnPhongTexture::SetObjectTextures(OGLObj *pOGLObj) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pTexture = nullptr;
+
+	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+		//pTexture->OGLActivateTexture(0);
+		//m_pUniformTextureColor->SetUniform(pTexture);
+		//m_pUniformUseColorTexture->SetUniform(true);
+
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
+		m_pUniformTextureColor->SetUniform(0);
+
+		m_pUniformUseColorTexture->SetUniform(true);
+	}
+	else {
+		m_pUniformUseColorTexture->SetUniform(false);
+	}
+
+	//	Error:
+	return r;
 }
 
-RESULT OGLProgramBlinnPhong::SetLights(std::vector<light*> *pLights) {
+RESULT OGLProgramBlinnPhongTexture::SetLights(std::vector<light*> *pLights) {
 	RESULT r = R_PASS;
 
 	if (m_pLightsBlock != nullptr) {
@@ -139,7 +153,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::SetMaterial(material *pMaterial) {
+RESULT OGLProgramBlinnPhongTexture::SetMaterial(material *pMaterial) {
 	RESULT r = R_PASS;
 
 	if (m_pMaterialsBlock != nullptr) {
@@ -151,14 +165,14 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramBlinnPhong::SetObjectUniforms(DimObj *pDimObj) {
+RESULT OGLProgramBlinnPhongTexture::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramBlinnPhong::SetCameraUniforms(camera *pCamera) {
+RESULT OGLProgramBlinnPhongTexture::SetCameraUniforms(camera *pCamera) {
 
 	auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
@@ -173,7 +187,7 @@ RESULT OGLProgramBlinnPhong::SetCameraUniforms(camera *pCamera) {
 	return R_PASS;
 }
 
-RESULT OGLProgramBlinnPhong::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgramBlinnPhongTexture::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
