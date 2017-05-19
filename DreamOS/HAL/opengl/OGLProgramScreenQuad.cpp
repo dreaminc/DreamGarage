@@ -23,7 +23,11 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
 	
 	// Uniforms 
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformColorTexture), std::string("u_textureColor")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformColorTextureMS), std::string("u_textureColorMS")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pFUniformTextureMS), std::string("u_fTextureMS")));
+
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformBackgroundColor), std::string("u_vec4BackgroundColor")));
 
 	m_pScreenQuad = new OGLQuad(m_pParentImp, 1.0f, 1.0f, 1, 1, nullptr, vector::kVector(1.0f)); // , nullptr, vNormal);
@@ -63,7 +67,6 @@ RESULT OGLProgramScreenQuad::SetupConnections() {
 	// Inputs
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebufferInput));
 
-	
 	// Outputs
 	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
 
@@ -82,24 +85,38 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	UpdateFramebufferToCamera(m_pParentImp->GetCamera(), GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
-	if(m_pOGLFramebuffer != nullptr) 
+	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
+	}
 
 	glDisable(GL_BLEND);
 
 	if (m_pOGLFramebufferInput != nullptr) {
-		if (m_fRenderDepth) {
-			// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
-			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+		if (m_pOGLFramebufferInput->GetSampleCount() > 1) {
+			m_pParentImp->glActiveTexture(GL_TEXTURE1);
+			
+			if (m_fRenderDepth) {
+				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+			}
+			else {
+				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
+			}
 
-			m_pUniformTextureColor->SetUniform(0);
+			m_pUniformColorTextureMS->SetUniform(1);
+			m_pFUniformTextureMS->SetUniform(true);
 		}
 		else {
 			m_pParentImp->glActiveTexture(GL_TEXTURE0);
-			m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
 
-			m_pUniformTextureColor->SetUniform(0);
+			if (m_fRenderDepth) {
+				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
+			}
+			else {
+				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetColorAttachment()->GetOGLTextureIndex());
+			}
+
+			m_pUniformColorTextureMS->SetUniform(0);
+			m_pFUniformTextureMS->SetUniform(false);
 		}
 	}
 

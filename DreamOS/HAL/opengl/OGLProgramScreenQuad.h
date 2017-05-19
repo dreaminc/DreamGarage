@@ -36,7 +36,11 @@ private:
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
 
-	OGLUniformSampler2D *m_pUniformTextureColor = nullptr;
+	OGLUniformSampler2D *m_pUniformColorTexture = nullptr;
+	OGLUniformSampler2D *m_pUniformColorTextureMS = nullptr;
+
+	OGLUniformBool *m_pFUniformTextureMS = nullptr;
+
 	OGLUniformVector *m_pUniformBackgroundColor = nullptr;
 };
 
