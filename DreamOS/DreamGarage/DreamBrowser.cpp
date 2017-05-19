@@ -368,6 +368,10 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	return R_PASS;
 }
 
+float DreamBrowser::GetAspectRatio() {
+	return m_aspectRatio;
+}
+
 float DreamBrowser::GetHeight() {
 	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
@@ -489,7 +493,11 @@ Error:
 }
 */
 
+std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
+	return m_pBrowserTexture;
+}
 
+//TODO: currently unused?
 RESULT DreamBrowser::SetScreenTexture(texture *pTexture) {
 	m_aspectRatio = (float)pTexture->GetWidth() / (float)pTexture->GetHeight();
 	SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);

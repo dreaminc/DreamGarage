@@ -655,6 +655,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamConsole\DebugConsole.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamBrowser.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamContentView.cpp" />
+    <ClCompile Include="..\..\..\DreamGarage\DreamControlView.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamGarage.cpp" />
     <ClCompile Include="..\..\..\DreamGarage\DreamUIBar.cpp" />
     <ClCompile Include="..\..\..\DreamOS.cpp" />
@@ -869,6 +870,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />

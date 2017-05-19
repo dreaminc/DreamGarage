@@ -65,6 +65,7 @@ public:
 	float GetHeight();
 	vector GetNormal();
 	point GetOrigin();
+	float GetAspectRatio();
 
 	RESULT UpdateViewQuad();
 
@@ -77,6 +78,7 @@ public:
 
 	RESULT SetScrollFactor(int scrollFactor);
 
+	std::shared_ptr<texture> GetScreenTexture();
 private:
 	RESULT SetScreenTexture(texture *pTexture);
 
