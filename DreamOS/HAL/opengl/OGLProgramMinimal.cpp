@@ -45,11 +45,13 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	CR(m_pOGLFramebuffer->SetSampleCount(4));
 
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
-	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
-	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+
+	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 	//*/
 
 Error:

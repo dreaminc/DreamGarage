@@ -1,4 +1,4 @@
-#include "OGLProgramScreenQuad.h"
+#include "OGLProgramBlurQuad.h"
 
 #include "Primitives/stereocamera.h"
 
@@ -8,13 +8,13 @@
 #include "OGLTexture.h"
 #include "OGLAttachment.h"
 
-OGLProgramScreenQuad::OGLProgramScreenQuad(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglscreenquad")
+OGLProgramBlurQuad::OGLProgramBlurQuad(OpenGLImp *pParentImp) :
+	OGLProgram(pParentImp, "oglblurquad")
 {
 	// empty
 }
 
-RESULT OGLProgramScreenQuad::OGLInitialize() {
+RESULT OGLProgramBlurQuad::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -36,9 +36,6 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
-	//pxWidth = 1024;
-	//pxHeight = 1024;
-
 	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
 	CR(m_pOGLFramebuffer->OGLInitialize());
 	CR(m_pOGLFramebuffer->Bind());
@@ -57,7 +54,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramScreenQuad::SetupConnections() {
+RESULT OGLProgramBlurQuad::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
@@ -71,7 +68,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
+RESULT OGLProgramBlurQuad::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	UseProgram();
@@ -111,18 +108,18 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 	return r;
 }
 
-RESULT OGLProgramScreenQuad::SetObjectTextures(OGLObj *pOGLObj) {
+RESULT OGLProgramBlurQuad::SetObjectTextures(OGLObj *pOGLObj) {
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT OGLProgramScreenQuad::SetObjectUniforms(DimObj *pDimObj) {
+RESULT OGLProgramBlurQuad::SetObjectUniforms(DimObj *pDimObj) {
 	return R_PASS;
 }
 
-RESULT OGLProgramScreenQuad::SetCameraUniforms(camera *pCamera) {
+RESULT OGLProgramBlurQuad::SetCameraUniforms(camera *pCamera) {
 	return R_PASS;
 }
 
-RESULT OGLProgramScreenQuad::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgramBlurQuad::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	return R_PASS;
 }

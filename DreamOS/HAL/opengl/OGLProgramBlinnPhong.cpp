@@ -54,8 +54,13 @@ RESULT OGLProgramBlinnPhong::OGLInitialize() {
 	CR(m_pOGLFramebuffer->SetSampleCount(4));
 
 	CR(m_pOGLFramebuffer->MakeColorAttachment());
+	
+	/*
 	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(m_pOGLFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
+	*/
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	///*
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());
@@ -112,6 +117,8 @@ RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
+
+	UnbindFramebuffer();
 
 	//Error:
 	return r;

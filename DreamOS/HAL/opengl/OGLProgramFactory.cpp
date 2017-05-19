@@ -17,6 +17,7 @@
 #include "OGLProgramScreenQuad.h"
 #include "OGLProgramDepthPeel.h"
 #include "OGLProgramBlendQuad.h"
+#include "OGLProgramBlurQuad.h"
 
 #include "OGLDreamConsole.h"
 
@@ -40,6 +41,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "screenquad", OGLPROGRAM_SCREEN_QUAD },
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
+	{ "blur", OGLPROGRAM_BLUR_QUAD },
 	{ "invalid", OGLPROGRAM_INVALID }
 };
 
@@ -176,6 +178,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"blendquad.vert", L"blendquad.frag", versionOGL),
 				"Failed to initialize OGL blend quad Program");
+		} break;
+
+		case OGLPROGRAM_BLUR_QUAD: {
+			pOGLProgram = new OGLProgramBlurQuad(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"blurquad.vert", L"blurquad.frag", versionOGL),
+				"Failed to initialize OGL blur quad Program");
 		} break;
 
 		case OGLPROGRAM_CUSTOM:

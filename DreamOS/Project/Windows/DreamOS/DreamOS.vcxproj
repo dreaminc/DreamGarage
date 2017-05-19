@@ -681,6 +681,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFactory.cpp" />
@@ -922,6 +923,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureShadow.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramFactory.h" />
@@ -1148,6 +1150,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blinnPhongTextureShadow.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert" />
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\EnvironmentObjects.frag">
