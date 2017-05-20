@@ -6,6 +6,10 @@
 #include <sstream>
 #include <string>
 
+#include "Cloud/WebRequest.h"
+#include "Cloud/WebRequestPostData.h"
+#include "Cloud/WebRequestPostDataElement.h"
+
 CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	m_pCEFBrowser(pCEFBrowser)
 {
@@ -101,6 +105,90 @@ RESULT CEFBrowserController::LoadURL(const std::string& url) {
 	CN(m_pCEFBrowser);
 
 	m_pCEFBrowser->GetFocusedFrame()->LoadURL(url);
+
+Error:
+	return r;
+}
+
+CefRefPtr<CefPostData> CEFBrowserController::MakeCEFRequestPostData(std::shared_ptr<WebRequestPostData> pWebRequestPostData) {
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefPostData> pCEFPostData = CefPostData::Create();
+	CN(pCEFPostData);
+	
+	for (auto &pElement : pWebRequestPostData->GetElements()) {
+		CefRefPtr<CefPostDataElement> pCEFPostDataElement = CefPostDataElement::Create();
+		CN(pCEFPostDataElement);
+
+		pCEFPostDataElement->SetToBytes(pElement->GetValue().size(), pElement->GetValue().c_str());
+		
+		CB(pCEFPostData->AddElement(pCEFPostDataElement));
+	}
+
+	return pCEFPostData;
+Error:
+
+	if (pCEFPostData != nullptr) {
+		pCEFPostData = nullptr;
+	}
+
+	return nullptr;
+}
+
+CefRefPtr<CefRequest> CEFBrowserController::MakeCEFRequest(const WebRequest &webRequest) {
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefRequest> pCEFRequest = CefRequest::Create();
+	CN(pCEFRequest);
+	
+	{
+		// URL
+		pCEFRequest->SetURL((CefString)(static_cast<WebRequest>(webRequest).GetURL()));
+
+		// Method
+		pCEFRequest->SetMethod((CefString)(static_cast<WebRequest>(webRequest).GetRequestMethodString()));
+
+		// Headers
+		CefRequest::HeaderMap cefHeaderMap;
+
+		// TODO: Might be a more bettarz way to code this
+		for (auto it = static_cast<WebRequest>(webRequest).GetRequestHeaders().begin();
+			it != static_cast<WebRequest>(webRequest).GetRequestHeaders().end();
+			it++)
+		{
+			cefHeaderMap.insert((*it));
+		}
+		pCEFRequest->SetHeaderMap(cefHeaderMap);
+
+		// Post Data
+		CefRefPtr<CefPostData> pCEFPostData = MakeCEFRequestPostData(static_cast<WebRequest>(webRequest).GetPostData());
+		CN(pCEFPostData);
+
+		pCEFRequest->SetPostData(pCEFPostData);
+
+	}
+
+	return pCEFRequest;
+
+Error:
+	if (pCEFRequest != nullptr) {
+		pCEFRequest = nullptr;
+	}
+
+	return nullptr;
+}
+
+RESULT CEFBrowserController::LoadRequest(const WebRequest &webRequest) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFBrowser);
+
+	{
+		CefRefPtr<CefRequest> pCEFRequest = MakeCEFRequest(webRequest);
+		CN(pCEFRequest);
+
+		m_pCEFBrowser->GetFocusedFrame()->LoadRequest(pCEFRequest);
+	}
 
 Error:
 	return r;
