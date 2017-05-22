@@ -102,8 +102,9 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
-		WebRequest webRequest;
 		std::string strURL = "http://www.youtube.com";
+
+		WebRequest webRequest;
 
 		CN(m_pDreamOS);
 
@@ -120,17 +121,17 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
 		//pDreamBrowser->SetURI(strURL);
 
-		webRequest.SetURL(L"http://httpbin.org/post");
+		webRequest.SetURL(L"http://httpbin.org/get");
 		//CR(webRequest.SetURL(L"http://www.cnn.com"));
 
-		CR(webRequest.SetRequestMethod(WebRequest::Method::POST));
-		CR(webRequest.AddRequestHeader(L"sup", L"yeah"));
+		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
+		CR(webRequest.AddRequestHeader(L"Authorization", L"Token "));
 
 		// NOTE: this is kind of working, data is clearly being sent but there's
 		// no real support for form/file etc yet
 		// This is not yet needed
 		// TODO: Break this out into a separate UI suite (Browser/CEF)
-		CR(webRequest.AddPostDataElement(L"post data element"));
+		//CR(webRequest.AddPostDataElement(L"post data element"));
 
 		CR(pDreamBrowser->LoadRequest(webRequest));
 
