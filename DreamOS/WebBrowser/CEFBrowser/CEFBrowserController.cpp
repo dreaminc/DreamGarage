@@ -115,6 +115,7 @@ CefRefPtr<CefPostData> CEFBrowserController::MakeCEFRequestPostData(std::shared_
 
 	CefRefPtr<CefPostData> pCEFPostData = CefPostData::Create();
 	CN(pCEFPostData);
+	CN(pWebRequestPostData);
 	
 	for (auto &pElement : pWebRequestPostData->GetElements()) {
 		CefRefPtr<CefPostDataElement> pCEFPostDataElement = CefPostDataElement::Create();
@@ -149,23 +150,27 @@ CefRefPtr<CefRequest> CEFBrowserController::MakeCEFRequest(const WebRequest &web
 		pCEFRequest->SetMethod((CefString)(static_cast<WebRequest>(webRequest).GetRequestMethodString()));
 
 		// Headers
-		CefRequest::HeaderMap cefHeaderMap;
-
 		// TODO: Might be a more bettarz way to code this
-		for (auto it = static_cast<WebRequest>(webRequest).GetRequestHeaders().begin();
-			it != static_cast<WebRequest>(webRequest).GetRequestHeaders().end();
-			it++)
-		{
-			cefHeaderMap.insert((*it));
+		std::multimap<std::wstring, std::wstring> requestHeasders = static_cast<WebRequest>(webRequest).GetRequestHeaders();
+
+		if (requestHeasders.size() > 0) {
+			CefRequest::HeaderMap cefHeaderMap;
+			
+			for (auto& header: requestHeasders) {
+				cefHeaderMap.insert(header);
+			}
+
+			pCEFRequest->SetHeaderMap(cefHeaderMap);
 		}
-		pCEFRequest->SetHeaderMap(cefHeaderMap);
 
 		// Post Data
-		CefRefPtr<CefPostData> pCEFPostData = MakeCEFRequestPostData(static_cast<WebRequest>(webRequest).GetPostData());
-		CN(pCEFPostData);
+		std::shared_ptr<WebRequestPostData> pWebRequestPostData = static_cast<WebRequest>(webRequest).GetPostData();
+		if (pWebRequestPostData != nullptr) {
+			CefRefPtr<CefPostData> pCEFPostData = MakeCEFRequestPostData(pWebRequestPostData);
+			CN(pCEFPostData);
 
-		pCEFRequest->SetPostData(pCEFPostData);
-
+			pCEFRequest->SetPostData(pCEFPostData);
+		}
 	}
 
 	return pCEFRequest;

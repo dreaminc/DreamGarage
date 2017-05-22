@@ -69,6 +69,6 @@ size_t WebRequestPostData::GetElementCount() {
 	return m_postDataElements.size();
 }
 
-const std::vector<std::shared_ptr<WebRequestPostDataElement>>& WebRequestPostData::GetElements() {
+std::vector<std::shared_ptr<WebRequestPostDataElement>> WebRequestPostData::GetElements() {
 	return m_postDataElements;
 }

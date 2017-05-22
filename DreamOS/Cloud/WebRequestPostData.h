@@ -25,7 +25,7 @@ public:
 	RESULT AddPostDataElement(std::wstring wstrValue);
 	std::shared_ptr<WebRequestPostDataElement> FindPostDataElementByStringValue(std::wstring wstrValue);
 
-	const std::vector<std::shared_ptr<WebRequestPostDataElement>>& GetElements();
+	std::vector<std::shared_ptr<WebRequestPostDataElement>> GetElements();
 
 private:
 	RESULT AddPostDataElement(std::shared_ptr<WebRequestPostDataElement> pPostDataElement);

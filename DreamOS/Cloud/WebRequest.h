@@ -32,12 +32,14 @@ public:
 
 	std::shared_ptr<WebRequestPostData> GetPostData();
 	RESULT SetPostData(std::shared_ptr<WebRequestPostData> pWebRequestPostData);
+	RESULT AddPostDataElement(std::wstring wstrValue);
 
 	WebRequest::Method GetRequestMethod();
 	RESULT SetRequestMethod(WebRequest::Method requestMethod);
 
 	RESULT SetRequestHeaders(const std::multimap<std::wstring, std::wstring> &requestHeaders);
-	const std::multimap<std::wstring, std::wstring> &GetRequestHeaders();
+	RESULT AddRequestHeader(const std::wstring& wstrKey, const std::wstring& wstrValue);
+	std::multimap<std::wstring, std::wstring> GetRequestHeaders();
 	RESULT ClearRequestHeaders();
 
 	// Set all together
@@ -45,6 +47,9 @@ public:
 			   WebRequest::Method requestMethod,
 			   std::shared_ptr<WebRequestPostData> pWebRequestPostData,
 			   const std::multimap<std::wstring, std::wstring>& m_headers);
+
+private:
+	RESULT InitializePostData();
 
 private:
 	std::wstring m_wstrURL;

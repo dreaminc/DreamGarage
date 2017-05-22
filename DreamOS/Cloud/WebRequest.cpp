@@ -1,5 +1,7 @@
 #include "WebRequest.h"
 
+#include "WebRequestPostData.h"
+
 WebRequest::WebRequest() {
 	// empty
 }
@@ -38,6 +40,31 @@ RESULT WebRequest::SetPostData(std::shared_ptr<WebRequestPostData> pWebRequestPo
 	return R_PASS;
 }
 
+RESULT WebRequest::InitializePostData() {
+	RESULT r = R_PASS;
+
+	if (m_pWebRequestPostData == nullptr) {
+		m_pWebRequestPostData = std::make_shared<WebRequestPostData>();
+	}
+
+	CN(m_pWebRequestPostData);
+
+Error:
+	return r;
+}
+
+RESULT WebRequest::AddPostDataElement(std::wstring wstrValue) {
+	RESULT r = R_PASS;
+
+	CR(InitializePostData());
+
+	CN(m_pWebRequestPostData);
+	CR(m_pWebRequestPostData->AddPostDataElement(wstrValue));
+
+Error:
+	return r;
+}
+
 WebRequest::Method WebRequest::GetRequestMethod() {
 	return m_requestMethod;
 }
@@ -62,7 +89,12 @@ Error:
 	return r;
 }
 
-const std::multimap<std::wstring, std::wstring>& WebRequest::GetRequestHeaders() {
+RESULT WebRequest::AddRequestHeader(const std::wstring& wstrKey, const std::wstring& wstrValue) {
+	m_requestHeaders.emplace(wstrKey, wstrValue);
+	return R_PASS;
+}
+
+std::multimap<std::wstring, std::wstring> WebRequest::GetRequestHeaders() {
 	return m_requestHeaders;
 }
 
