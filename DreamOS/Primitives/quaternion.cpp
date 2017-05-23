@@ -334,22 +334,6 @@ quaternion quaternion::MakeQuaternionWithEuler(quaternion_precision phi, quatern
 	return q;
 }
 
-// returns Y rotation on the XZ plane 
-float quaternion::ProjectedYRotationDeg() {
-
-	vector v = RotateVector(vector::kVector(1.0f));
-	vector vXZ = vector(v.x(), 0.0f, v.z());
-	vXZ.Normalize();
-
-	float degZ = asin(vXZ.z());
-	float degZSign = degZ > 0 ? -1.0f : 1.0f;
-	float degX = acos(vXZ.x());
-
-	float degY = (degZSign * degX + (float)M_PI_2) * 180.0f / M_PI;
-
-	return degY < 0.0f ? degY + 360.0f : degY;
-}
-
 quaternion quaternion::GetConjugate() {
 	quaternion q;
 

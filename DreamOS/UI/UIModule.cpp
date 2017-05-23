@@ -78,29 +78,6 @@ std::shared_ptr<UIMenuItem> UIModule::GetMenuItem(VirtualObj *pObj) {
 	return nullptr;
 }
 
-quaternion UIModule::GetInitialMenuOrientation() {
-	return quaternion::MakeQuaternionWithEuler(0.0f, m_headRotationYDeg * M_PI / 180.0f, 0.0f);
-}
-
-RESULT UIModule::ToggleVisible() {
-
-	RESULT r = R_PASS;
-
-	m_pCompositeContext->SetVisible(!m_pCompositeContext->IsVisible());
-
-	// if the context has become visible, reset its position to match the camera
-	if (m_pCompositeContext->IsVisible()) {
-		quaternion q = m_pCompositeContext->GetCamera()->GetOrientation();
-		m_headRotationYDeg = q.ProjectedYRotationDeg();
-		quaternion q2 = quaternion::MakeQuaternionWithEuler(0.0f, m_headRotationYDeg * M_PI / 180.0f, 0.0f);
-
-		m_pCompositeContext->SetPosition(m_pCompositeContext->GetCamera()->GetPosition());
-		m_pCompositeContext->SetOrientation(q2);
-	}
-
-	return r;
-}
-
 RESULT UIModule::Show() {
 	RESULT r = R_PASS;
 	CR(m_pCompositeContext->SetVisible(true));

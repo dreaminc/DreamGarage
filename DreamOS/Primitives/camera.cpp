@@ -63,11 +63,17 @@ vector camera::GetRightVector() {
 }
 
 vector camera::GetLookVector() {
+	/*
 	quaternion temp = GetOrientation();
 	temp.Normalize();
 
 	vector vectorLook = temp.RotateVector(vector(0.0f, 0.0f, -1.0f));
 	return vectorLook.Normal();
+	//*/
+	RotationMatrix matLook = RotationMatrix(GetWorldOrientation());
+	//RotationMatrix matLook = RotationMatrix(GetOrientation());
+	vector vLook = matLook * vector(0.0f, 0.0f, -1.0f);
+	return vLook.Normal();
 }
 
 ProjectionMatrix camera::GetProjectionMatrix() {

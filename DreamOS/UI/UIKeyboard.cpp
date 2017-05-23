@@ -321,11 +321,14 @@ UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 
 RESULT UIKeyboard::ShowKeyboard() {
 
+	UpdateCompositeWithCameraLook(m_surfaceDistance, -0.25f);
+	SetSurfaceOffset(GetComposite()->GetPosition());
+
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		GetComposite()->SetPosition(point(0.0f, -1.0f, 5.0f));
+		GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, 1.0f, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
 	Error:
@@ -342,12 +345,12 @@ RESULT UIKeyboard::ShowKeyboard() {
 		return r;
 	};
 
-	UpdateAppComposite();
+	VirtualObj *pObj = GetComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
+		pObj,
 		m_ptSurfaceOffset,
-		GetComposite()->GetOrientation() * m_qSurfaceOrientation,
-		GetComposite()->GetScale(),
+		pObj->GetOrientation() * m_qSurfaceOrientation,
+		pObj->GetScale(),
 		0.2f,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
@@ -371,11 +374,12 @@ RESULT UIKeyboard::HideKeyboard() {
 		return r;
 	};
 
+	VirtualObj* pObj = GetComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		GetComposite(),
-		point(0.0f, 0.0f, 5.0f),
-		GetComposite()->GetOrientation(),
-		GetComposite()->GetScale(),
+		pObj,
+		pObj->GetPosition() - point(0.0f, 1.0f, 0.0f),
+		pObj->GetOrientation(),
+		pObj->GetScale(),
 		0.2f,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
@@ -462,29 +466,6 @@ RESULT UIKeyboard::UpdateKeyState(SenseVirtualKey key, uint8_t keyState) {
 
 RESULT UIKeyboard::CheckKeyState(SenseVirtualKey key) {
 	return R_NOT_IMPLEMENTED;
-}
-
-//TODO: This isn't ideal, especially because this code is similar to code in 
-// UIModule and UIBar.  This code should be refactored upon creation of 
-// a 'user' object that manages the positions of applications appropriately.
-//
-RESULT UIKeyboard::UpdateAppComposite() {
-	RESULT r = R_PASS;
-
-	auto pComposite = GetComposite();
-	quaternion q = pComposite->GetCamera()->GetOrientation();
-	float headRotationYDeg = q.ProjectedYRotationDeg();
-	float radY = headRotationYDeg * M_PI / 180.0f;
-	quaternion q2 = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
-
-	m_ptSurfaceOffset = pComposite->GetCamera()->GetPosition();
-	point cam = m_surfaceDistance * point(-sin(radY), -0.5f, -cos(radY));
-	m_ptSurfaceOffset = m_ptSurfaceOffset + cam;
-	pComposite->SetPosition(m_ptSurfaceOffset);
-	pComposite->SetOrientation(q2);
-
-//Error:
-	return r;
 }
 
 RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
@@ -645,5 +626,10 @@ RESULT UIKeyboard::SetKeyTypeThreshold(float threshold) {
 
 RESULT UIKeyboard::SetKeyReleaseThreshold(float threshold) {
 	m_keyReleaseThreshold = threshold;
+	return R_PASS;
+}
+
+RESULT UIKeyboard::SetSurfaceOffset(point ptOffset) {
+	m_ptSurfaceOffset = ptOffset;
 	return R_PASS;
 }
