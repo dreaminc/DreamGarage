@@ -9,6 +9,8 @@
 #include "DreamGarage/DreamBrowser.h"
 
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
+#include "Cloud/WebRequest.h"
+
 #include "UI/UIKeyboard.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
@@ -33,6 +35,7 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBrowserRequest());
 	CR(AddTestBrowser());
 
 	CR(AddTestKeyboard());
@@ -87,6 +90,91 @@ RESULT UITestSuite::Initialize() {
 	*/
 
 //Error:
+	return r;
+}
+
+RESULT UITestSuite::AddTestBrowserRequest() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::shared_ptr<DreamBrowser> pDreamBrowser = nullptr;
+		std::string strURL = "http://www.youtube.com";
+
+		WebRequest webRequest;
+
+		CN(m_pDreamOS);
+
+		// Create the Shared View App
+		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		CNM(pDreamBrowser, "Failed to create dream browser");
+
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		pDreamBrowser->SetDiagonalSize(10.0f);
+
+		//pDreamContentView->SetScreenTexture(L"crate_color.png");
+		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
+		//pDreamBrowser->SetURI(strURL);
+
+		webRequest.SetURL(L"http://httpbin.org/get");
+		//CR(webRequest.SetURL(L"http://www.cnn.com"));
+
+		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
+		CR(webRequest.AddRequestHeader(L"Authorization", L"Token "));
+
+		// NOTE: this is kind of working, data is clearly being sent but there's
+		// no real support for form/file etc yet
+		// This is not yet needed
+		// TODO: Break this out into a separate UI suite (Browser/CEF)
+		//CR(webRequest.AddPostDataElement(L"post data element"));
+
+		CR(pDreamBrowser->LoadRequest(webRequest));
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Browser Request Test");
+	pUITest->SetTestDescription("Basic test of browser working with a web request");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
 	return r;
 }
 

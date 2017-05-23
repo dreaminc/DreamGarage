@@ -73,6 +73,7 @@ public:
 
 	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetURI(std::string strURI);
+	RESULT LoadRequest(const WebRequest &webRequest);
 
 	RESULT SetScrollFactor(int scrollFactor);
 

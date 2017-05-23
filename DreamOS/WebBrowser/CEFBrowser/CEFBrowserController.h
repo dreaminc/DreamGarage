@@ -34,7 +34,14 @@
 #include <list>
 #include <future>
 
+// Theirs 
 class CefBrowser;
+class CefRequest;
+class CefPostData;
+
+// Ours
+class WebRequest;
+class WebRequestPostData;
 
 class CEFBrowserController :  public WebBrowserController {
 
@@ -47,7 +54,11 @@ public:
 	RESULT PollFrame();
 	virtual RESULT PollNewDirtyFrames(int &rNumFramesProcessed) override;
 	virtual RESULT Resize(unsigned int width, unsigned int height) override;
-	virtual RESULT LoadURL(const std::string& url) override;
+	virtual RESULT LoadURL(const std::string& strURL) override;
+	virtual RESULT LoadRequest(const WebRequest &webRequest) override;
+
+	CefRefPtr<CefRequest> MakeCEFRequest(const WebRequest &webRequest);
+	CefRefPtr<CefPostData> MakeCEFRequestPostData(std::shared_ptr<WebRequestPostData> pWebRequestPostData);
 
 	// WebBrowser Controller Render Handling
 	RESULT OnGetViewRect(CefRect &cefRect);

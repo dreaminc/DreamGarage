@@ -36,6 +36,8 @@ struct WebBrowserMouseEvent {
 	WebBrowserPoint pt;
 };
 
+class WebRequest;
+
 // TODO: Revisit these functions 
 class WebBrowserController {
 public:
@@ -78,8 +80,11 @@ public:
 	// Resize the browser.
 	virtual RESULT Resize(unsigned int width, unsigned int height) = 0;
 
-	// Loads a url
-	virtual RESULT LoadURL(const std::string& url) = 0;
+	// Loads a URL
+	virtual RESULT LoadURL(const std::string& strURL) = 0;
+
+	// Loads a Web Request
+	virtual RESULT LoadRequest(const WebRequest &webRequest) = 0;
 
 	virtual RESULT Shutdown() = 0;
 

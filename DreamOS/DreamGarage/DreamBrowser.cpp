@@ -440,6 +440,16 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::LoadRequest(const WebRequest &webRequest) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserController);
+	CR(m_pWebBrowserController->LoadRequest(webRequest));
+
+Error:
+	return r;
+}
+
 // TODO: Remove
 /*
 RESULT DreamBrowser::Notify(SenseControllerEvent *pEvent) {

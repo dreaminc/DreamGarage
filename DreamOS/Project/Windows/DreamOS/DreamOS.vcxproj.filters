@@ -752,6 +752,15 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLText.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebRequest.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebRequestPostData.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebRequestPostDataElement.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1562,6 +1571,7 @@
     <ClInclude Include="..\..\..\HAL\FlatProgram.h">
       <Filter>HAL</Filter>
     </ClInclude>
+
     <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h">
       <Filter>UI</Filter>
     </ClInclude>
@@ -1573,6 +1583,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIKey.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebRequest.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebRequestPostData.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebRequestPostDataElement.h">
+      <Filter>Cloud</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
