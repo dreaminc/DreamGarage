@@ -191,6 +191,14 @@ Error:
 	return r;
 }
 
+texture* OGLFramebuffer::GetColorTexture() {
+	if (m_pOGLColorAttachment != nullptr) {
+		return (texture*)(m_pOGLColorAttachment->GetOGLTexture());
+	}
+
+	return nullptr;
+}
+
 RESULT OGLFramebuffer::MakeColorAttachment() {
 	RESULT r = R_PASS;
 

@@ -24,6 +24,8 @@ public:
 
 	~OGLFramebuffer();
 
+	virtual texture *GetColorTexture() override;
+
 	// TODO: Consolidate - there's a conflict with the texture swap chain stuff and this, so the code paths are different 
 	RESULT OGLInitialize(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT);
 	

@@ -88,6 +88,9 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
 	}
 
+	// Give the Client a chance to set up the pipeline
+	CRM(SetupPipeline(GetRenderPipeline()), "Failed to set up pipeline");
+
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
 
@@ -105,6 +108,10 @@ Error:
 
 stereocamera* DreamOS::GetCamera() {
 	return m_pSandbox->GetCamera();
+}
+
+Pipeline *DreamOS::GetRenderPipeline() {
+	return m_pSandbox->m_pHALImp->GetRenderPipelineHandle();
 }
 
 point DreamOS::GetCameraPosition() {

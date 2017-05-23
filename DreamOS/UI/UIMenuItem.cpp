@@ -67,6 +67,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		iconFormat.height,
 		iconFormat.ptPosition
 	);
+
 	if (iconFormat.pTexture != nullptr)
 		pIcon->SetColorTexture(iconFormat.pTexture.get());
 	else
@@ -74,8 +75,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 
 	m_pContextComposite->RenderToTexture(pContext);
 
-	// TODO: this is no longer supported:
-	//m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
+	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetColorTexture());
 
 Error:
 	return r;

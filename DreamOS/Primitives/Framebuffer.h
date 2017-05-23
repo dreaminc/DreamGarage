@@ -39,6 +39,8 @@ public:
 	int GetHeight() { return m_height; }
 	int GetChannels() { return m_channels; }
 
+	virtual texture *GetColorTexture() = 0;
+
 protected:
 	int m_width;
 	int m_height;

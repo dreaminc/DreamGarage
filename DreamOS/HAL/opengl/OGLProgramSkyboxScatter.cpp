@@ -33,6 +33,7 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformSunDirection), std::string("u_vecSunDirection")));
 
 	// Framebuffer Output
+	/*
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -49,6 +50,7 @@ RESULT OGLProgramSkyboxScatter::OGLInitialize() {
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+	*/
 
 	// TODO: We can create the skybox mesh here and pull it out of scene graph / box or whatever
 
@@ -64,10 +66,14 @@ RESULT OGLProgramSkyboxScatter::SetupConnections() {
 
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
-	//CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
 	// Outputs
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+
+	// The render output is passed through
+	// TODO: Flag?
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 
 Error:
 	return r;
@@ -81,7 +87,7 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	skybox *pSkybox = nullptr;
 	CR(pObjectStore->GetSkybox(pSkybox));
@@ -91,8 +97,10 @@ RESULT OGLProgramSkyboxScatter::ProcessNode(long frameID) {
 
 	UseProgram();
 
-	if (m_pOGLFramebuffer != nullptr)
-		BindToFramebuffer(m_pOGLFramebuffer);
+	if (m_pOGLFramebuffer != nullptr) {
+		//BindToFramebuffer(m_pOGLFramebuffer);
+		m_pOGLFramebuffer->Bind();	// NOTE: This will simply bind, BindToFramebuffer will clear
+	}
 
 	SetLights(pLights);
 

@@ -31,7 +31,7 @@ protected:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
 
-private:
+protected:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
 	OGLVertexAttributeColor *m_pVertexAttributeColor;
 

@@ -107,6 +107,9 @@ public:
 	// ProgramNode
 	//virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
+
+	//virtual RESULT OGLInitialize() override;
+	virtual RESULT SetupConnections() override;
 	
 	// A mono view is an extended view in case the scene is not stereoscopically rendered for an HMD.
 	void Render(bool fMono = false);

@@ -127,6 +127,7 @@ RESULT OGLProgramDepthPeel::SetupConnections() {
 	CR(MakeOutput<OGLFramebuffer>("output_framebufferB", m_pOGLFramebufferOutputB));
 
 	// The render output
+	// TODO: Flag?
 	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));	
 
 	// Connect output as pass-thru to internal blend program

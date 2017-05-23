@@ -18,6 +18,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestRenderToTextureQuad());
+
 	CR(AddTestEnvironmentShader());
 
 	CR(AddTestBlinnPhongShaderTexture());
@@ -35,10 +37,7 @@ RESULT HALTestSuite::AddTests() {
 	
 	CR(AddTestDepthPeelingShader());
 
-
 	CR(AddTestAlphaVolumes());
-
-	CR(AddTestRenderToTextureQuad());
 
 	CR(AddTestFramerateVolumes());
 
@@ -357,28 +356,38 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
 		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 		CN(pSkyboxProgram);
 		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-		/*
-		// Reference Geometry Shader Program
-		ProgramNode* pReferenceGeometryProgram = m_pHALImp->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 		// Debug Console
-		ProgramNode* pDreamConsoleProgram = m_pHALImp->MakeProgramNode("debugconsole");
+		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
 		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
-		*/
+		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+		// Connect output as pass-thru to internal blend program
+		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -1176,6 +1185,31 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 		m_pDreamOS->SetGravityState(false);
 
 		{
+			// Set up the pipeline
+			HALImp *pHAL = m_pDreamOS->GetHALImp();
+			Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+			SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+			CNM(pDestSinkNode, "Destination sink node isn't set");
+
+			CR(pHAL->MakeCurrentContext());
+
+			ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+			CN(pRenderProgramNode);
+			CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+			CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+			ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+			CN(pRenderScreenQuad);
+			CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+			CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+			CR(pHAL->ReleaseCurrentContext());
+
+			// Set up scene
+			
+			light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 			composite *pComposite = m_pDreamOS->AddComposite();
 			CN(pComposite);
@@ -1191,10 +1225,10 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 			quad *pQuad = m_pDreamOS->AddQuad(width, height);
 			CN(pQuad);
 			CN(pQuad->SetPosition(point(0.0f, -2.0f, 0.0f)));
-			//pQuad->SetColor(COLOR_GREEN);
+			pQuad->SetColor(COLOR_GREEN);
 
 			// TODO: this is no longer supported:
-			//CR(pQuad->SetColorTexture(pFlatContext->GetFramebuffer()->GetTexture()));
+			CR(pQuad->SetColorTexture(pFlatContext->GetFramebuffer()->GetColorTexture()));
 			
 		}
 

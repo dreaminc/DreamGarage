@@ -60,6 +60,7 @@ public:
 
 	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT LoadScene() = 0;
+	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) { return R_NOT_IMPLEMENTED; }
 	virtual RESULT Update(void) = 0;
 
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
@@ -153,6 +154,8 @@ public:
 	composite *AddComposite();
 
 	user *AddUser();
+
+	Pipeline *GetRenderPipeline();
 
 	stereocamera* GetCamera();
 	point GetCameraPosition();

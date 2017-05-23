@@ -794,6 +794,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
