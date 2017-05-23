@@ -18,6 +18,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestEnvironmentShader());
+
 	CR(AddTestBlinnPhongShaderTexture());
 	CR(AddTestBlinnPhongShaderTextureHMD());
 	CR(AddTestMinimalTextureShader());
@@ -317,6 +319,135 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureHMD() {
 
 	pNewTest->SetTestName("Blinn Phong Texture Shader");
 	pNewTest->SetTestDescription("Blinn phong texture shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestEnvironmentShader() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 40.0f;
+	int nRepeats = 1;
+
+	float width = 1.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		/*
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = m_pHALImp->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+
+		// Debug Console
+		ProgramNode* pDreamConsoleProgram = m_pHALImp->MakeProgramNode("debugconsole");
+		CN(pDreamConsoleProgram);
+		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
+		*/
+
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		// Connect Program to Display
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		volume *pVolume = nullptr;
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+		pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pVolume);
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+		pVolume->SetColorTexture(pColorTexture);
+
+		//CR(pVolume->SetColor(COLOR_WHITE));
+
+		///*
+		pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pVolume);
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
+		CR(pVolume->SetColor(COLOR_GREEN));
+
+		pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pVolume);
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -1.0f));
+		CR(pVolume->SetColor(COLOR_RED));
+
+		pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pVolume);
+		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
+		CR(pVolume->SetColor(COLOR_BLUE));
+		//*/
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Environment Shader");
+	pNewTest->SetTestDescription("Environment shader test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 

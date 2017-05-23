@@ -34,7 +34,6 @@ private:
 private:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
-	OGLFramebuffer* m_pOGLFramebuffer = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
