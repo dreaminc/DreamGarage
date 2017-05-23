@@ -761,6 +761,9 @@
     <ClCompile Include="..\..\..\Cloud\WebRequestPostDataElement.cpp">
       <Filter>Cloud</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamControlView.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1592,6 +1595,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\WebRequestPostDataElement.h">
       <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h">
+      <Filter>DreamGarage</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

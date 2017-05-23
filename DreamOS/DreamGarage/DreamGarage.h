@@ -16,6 +16,7 @@
 class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
+class DreamControlView;
 
 class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<CmdPromptEvent> {
 public:
@@ -71,6 +72,7 @@ private:
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
 	std::shared_ptr<DreamContentView> m_pDreamContentView;
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser;
+	std::shared_ptr<DreamControlView> m_pDreamControlView;
 };
 
 #endif	// DREAM_GARAGE_H_
