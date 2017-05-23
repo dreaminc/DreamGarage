@@ -12,7 +12,7 @@ class DreamControlView : public DreamApp<DreamControlView> {
 public:
 	DreamControlView(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	enum class ControlViewState {
+	enum class State {
 		HIDDEN,
 		HIDE,
 		VISIBLE,
@@ -42,7 +42,7 @@ public:
 	RESULT SetSharedViewContext(std::shared_ptr<DreamBrowser> pContext);
 
 	std::shared_ptr<quad> GetViewQuad();
-	RESULT SetViewState(ControlViewState state);
+	RESULT SetViewState(State state);
 
 private:
 	std::shared_ptr<DreamBrowser> m_pSharedViewContext; // unclear whether this should be a DreamBrowser
@@ -50,7 +50,7 @@ private:
 	vector m_vNormal;
 	std::shared_ptr<texture> m_pViewTexture;
 
-	ControlViewState m_viewState;
+	State m_viewState;
 
 	float m_hiddenScale; 
 	float m_visibleScale;

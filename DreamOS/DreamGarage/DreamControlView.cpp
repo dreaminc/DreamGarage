@@ -12,14 +12,15 @@ DreamControlView::DreamControlView(DreamOS *pDreamOS, void *pContext) :
 RESULT DreamControlView::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	m_vNormal = vector(0.0f, sin(M_PI / 6.0f), cos(M_PI / 6.0f)).Normal();
+	m_vNormal = vector::jVector().RotateByQuaternion(quaternion::MakeQuaternionWithEuler(-(float)M_PI / 3.0f, 0.0f, 0.0f));
+	//m_vNormal = vector(0.0f, sin(M_PI / 6.0f), cos(M_PI / 6.0f)).Normal();
 
 	m_pViewQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, m_vNormal);
 	CN(m_pViewQuad);
 	m_pViewQuad->SetPosition(m_ptHiddenPosition);
 	CR(m_pViewQuad->SetVisible(false));
 
-	m_viewState = ControlViewState::HIDDEN;
+	m_viewState = State::HIDDEN;
 
 	m_ptHiddenPosition = point(0.0f, -0.25f, 5.0f);
 	m_ptVisiblePosition = point(0.0f, -0.25f, 4.0f);
@@ -52,12 +53,12 @@ RESULT DreamControlView::Update(void *pContext) {
 
 	switch (m_viewState) {
 
-	case ControlViewState::VISIBLE: {
+	case State::VISIBLE: {
 		if (ptOffset.y() > m_hideThreshold)
 			Hide();
 	} break;
 		
-	case ControlViewState::HIDDEN: {
+	case State::HIDDEN: {
 		if (ptOffset.y() < m_showThreshold)
 			Show();
 	} break;
@@ -80,22 +81,14 @@ RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		DreamControlView *pControlView = reinterpret_cast<DreamControlView *>(pContext);
-		CN(pControlView);
-		pControlView->GetViewQuad()->SetVisible(true);
-		pControlView->SetViewState(ControlViewState::SHOW);
-	Error:
-		return r;
+		GetViewQuad()->SetVisible(true);
+		SetViewState(State::SHOW);
+		return R_PASS;
 	};
 
 	auto fnEndCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		DreamControlView *pControlView = reinterpret_cast<DreamControlView *>(pContext);
-		CN(pControlView);
-		pControlView->SetViewState(ControlViewState::VISIBLE);
-	Error:
-		return r;
+		SetViewState(State::VISIBLE);
+		return R_PASS;
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
@@ -119,22 +112,14 @@ RESULT DreamControlView::Hide() {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		DreamControlView *pControlView = reinterpret_cast<DreamControlView *>(pContext);
-		CN(pControlView);
-		pControlView->SetViewState(ControlViewState::HIDE);
-	Error:
-		return r;
+		SetViewState(State::HIDE);
+		return R_PASS;
 	};
 
 	auto fnEndCallback = [&](void *pContext) {
-		RESULT r = R_PASS;
-		DreamControlView *pControlView = reinterpret_cast<DreamControlView *>(pContext);
-		CN(pControlView);
-		pControlView->GetViewQuad()->SetVisible(false);
-		pControlView->SetViewState(ControlViewState::HIDDEN);
-	Error:
-		return r;
+		GetViewQuad()->SetVisible(false);
+		SetViewState(State::HIDDEN);
+		return R_PASS;
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
@@ -182,7 +167,7 @@ std::shared_ptr<quad> DreamControlView::GetViewQuad() {
 	return m_pViewQuad;
 }
 
-RESULT DreamControlView::SetViewState(ControlViewState state) {
+RESULT DreamControlView::SetViewState(State state) {
 	m_viewState = state;
 	return R_PASS;
 }
