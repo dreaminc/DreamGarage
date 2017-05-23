@@ -16,7 +16,6 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_pViewQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, m_vNormal);
 	CN(m_pViewQuad);
-	//m_pViewQuad->SetPosition(m_ptHiddenPosition);
 	CR(m_pViewQuad->SetVisible(false));
 	m_pViewQuad->SetMaterialAmbient(0.75f);
 

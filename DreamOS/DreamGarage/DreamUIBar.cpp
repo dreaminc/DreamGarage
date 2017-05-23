@@ -153,7 +153,6 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
-	//	ToggleVisible();
 		UpdateMenuVisibility(!IsVisible());
 	}
 	else {
@@ -166,7 +165,6 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			HideMenu();
 		}
 		else {
-		//	ToggleVisible();
 			UpdateMenuVisibility(!IsVisible());
 		}
 	}
