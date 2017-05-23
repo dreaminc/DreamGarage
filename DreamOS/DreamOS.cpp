@@ -91,8 +91,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
 
-	m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
-	CN(m_pKeyboard);
+	//m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
+	//CN(m_pKeyboard);
 
 	// Register the update callback
 	CRM(RegisterUpdateCallback(std::bind(&DreamOS::Update, this)), "Failed to register DreamOS update callback");
@@ -100,6 +100,8 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 Error:
 	return r;
 }
+
+
 
 stereocamera* DreamOS::GetCamera() {
 	return m_pSandbox->GetCamera();
@@ -161,6 +163,16 @@ ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controll
 
 HALImp* DreamOS::GetHALImp() {
 	return m_pSandbox->m_pHALImp;
+}
+
+RESULT DreamOS::InitializeKeyboard() {
+	RESULT r = R_PASS;
+
+	m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
+	CN(m_pKeyboard);
+
+Error:
+	return r;
 }
 
 // This is a pass-thru at the moment
