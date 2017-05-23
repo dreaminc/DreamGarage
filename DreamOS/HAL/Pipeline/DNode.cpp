@@ -164,6 +164,21 @@ Error:
 	return r;
 }
 
+// This can be used with sink nodes where all inputs connect to the same network
+RESULT DNode::ConnectToAllInputs(DConnection* pOutputConnection) {
+	RESULT r = R_PASS;
+
+	std::vector<DConnection*> *pDConnections = GetConnectionSet(CONNECTION_TYPE::INPUT);
+	CN(pDConnections);
+
+	for (auto &pDConnection : *pDConnections) {
+		CR(Connect(pDConnection, pOutputConnection));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DNode::ConnectToInput(std::string strInputName, DConnection* pOutputConnection) {
 	RESULT r = R_PASS;
 

@@ -347,7 +347,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		HALImp *pHAL = m_pDreamOS->GetHALImp();
 		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
 
-		SinkNode*pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
 		CNM(pDestSinkNode, "Destination sink node isn't set");
 
 		CR(pHAL->MakeCurrentContext());
@@ -361,7 +361,15 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		CN(pRenderScreenQuad);
 		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
+
+		/*
 		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer_lefteye", pRenderProgramNode->Output("output_framebuffer")));
+		CR(pDestSinkNode->ConnectToInput("input_framebuffer_righteye", pRenderProgramNode->Output("output_framebuffer")));
+		*/
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 		CR(pHAL->ReleaseCurrentContext());
 

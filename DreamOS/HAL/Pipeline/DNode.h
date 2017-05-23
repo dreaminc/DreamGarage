@@ -146,6 +146,7 @@ public:
 	RESULT Connect(DConnection* pInputConnection, DConnection* pOutputConnection);
 	RESULT ConnectToInput(std::string strInputName, DConnection* pOutputConnection);
 	RESULT ConnectToOutput(std::string strOutputName, DConnection* pInputConnection);
+	RESULT ConnectToAllInputs(DConnection* pOutputConnection);
 
 	RESULT Disconnect();
 
