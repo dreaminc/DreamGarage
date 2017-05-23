@@ -179,6 +179,9 @@ RESULT DreamGarage::LoadScene() {
 
 	CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
 
+	// UIKeyboard App
+	CR(InitializeKeyboard());
+
 Error:
 	return r;
 }

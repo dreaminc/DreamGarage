@@ -102,6 +102,9 @@ public:
 
 //protected:
 public:
+	// Keyboard
+	RESULT InitializeKeyboard();
+
 	// Physics
 	RESULT AddPhysicsObject(VirtualObj *pObject);
 	RESULT SetGravityAcceleration(double acceleration);
