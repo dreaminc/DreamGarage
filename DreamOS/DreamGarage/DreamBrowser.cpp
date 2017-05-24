@@ -40,6 +40,7 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	RESULT r = R_PASS;
 
 	CN(m_pBrowserTexture);
+	//CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
 	
 Error:
@@ -85,12 +86,8 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
 	
 	// Flip UV vertically
-	/*
-	m_pBrowserQuad->TransformUV(
-		{ { 0.0f, 0.0f } },
-		{ { 1.0f, 0.0f,
-			0.0f, -1.0f } }
-	);
+	///*
+	m_pBrowserQuad->FlipUVVertical();
 	//*/
 
 	m_pBrowserQuad->SetMaterialAmbient(0.8f);
@@ -398,15 +395,11 @@ RESULT DreamBrowser::UpdateViewQuad() {
 	CR(m_pBrowserQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
 	
 	// Flip UV vertically
-	/*
+	///*
 	if (r != R_SKIPPED) {
-		m_pBrowserQuad->TransformUV(
-		{ { 0.0f, 0.0f } },
-		{ { 1.0f, 0.0f,
-			0.0f, -1.0f } }
-		);
+		m_pBrowserQuad->FlipUVVertical();
 	}
-	*/
+	//*/
 
 	CR(m_pBrowserQuad->SetDirty());
 

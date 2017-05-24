@@ -155,6 +155,7 @@ RESULT DimObj::SetAlpha(color_precision a) {
 	return R_PASS;
 }
 
+// This is busted
 RESULT DimObj::TransformUV(matrix<uv_precision, 2, 1> matA, matrix<uv_precision, 2, 2> matB) {
 	RESULT r = R_PASS;
 
