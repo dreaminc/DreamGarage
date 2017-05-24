@@ -49,6 +49,7 @@ class DreamOS :
 	// TODO: this needs to be revisited
 	friend class UIModule;
 	friend class HALTestSuite;
+	friend class UITestSuite;
 
 public:
 	DreamOS();

@@ -82,22 +82,26 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
-
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
 	
 	// Flip UV vertically
+	/*
 	m_pBrowserQuad->TransformUV(
 		{ { 0.0f, 0.0f } },
 		{ { 1.0f, 0.0f,
 			0.0f, -1.0f } }
 	);
+	//*/
 
 	m_pBrowserQuad->SetMaterialAmbient(0.8f);
 
 	// Set up and map the texture
-	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
-	m_pBrowserQuad->SetMaterialTexture(DimObj::MaterialTexture::Ambient, m_pBrowserTexture.get());
+	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
+	//m_pBrowserTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+
+	m_pBrowserQuad->SetColorTexture(m_pBrowserTexture.get());
 	m_pBrowserQuad->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, m_pBrowserTexture.get());
+	m_pBrowserQuad->SetMaterialTexture(DimObj::MaterialTexture::Ambient, m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
 	///*
@@ -394,6 +398,7 @@ RESULT DreamBrowser::UpdateViewQuad() {
 	CR(m_pBrowserQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
 	
 	// Flip UV vertically
+	/*
 	if (r != R_SKIPPED) {
 		m_pBrowserQuad->TransformUV(
 		{ { 0.0f, 0.0f } },
@@ -401,6 +406,7 @@ RESULT DreamBrowser::UpdateViewQuad() {
 			0.0f, -1.0f } }
 		);
 	}
+	*/
 
 	CR(m_pBrowserQuad->SetDirty());
 

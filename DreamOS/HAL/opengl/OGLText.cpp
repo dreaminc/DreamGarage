@@ -11,7 +11,8 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::
 	std::wstring font(L"Fonts/" + pFont->GetGlyphImageFile());
 	// Load appropriate glyph texture
 
-	texture *pColorTexture = new OGLTexture(pParentImp, (wchar_t*)font.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//texture *pColorTexture = new OGLTexture(pParentImp, (wchar_t*)font.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pColorTexture = pParentImp->MakeTexture((wchar_t*)font.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	SetColorTexture(pColorTexture);
 }
 

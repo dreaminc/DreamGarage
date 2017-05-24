@@ -18,11 +18,12 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestBlinnPhongShaderTexture());
+
 	CR(AddTestRenderToTextureQuad());
 
 	CR(AddTestEnvironmentShader());
 
-	CR(AddTestBlinnPhongShaderTexture());
 	CR(AddTestBlinnPhongShaderTextureHMD());
 	CR(AddTestMinimalTextureShader());
 
@@ -493,6 +494,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		CR(pHAL->MakeCurrentContext());
 
 		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -500,14 +502,6 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-
-		/*
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
-
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer_lefteye", pRenderProgramNode->Output("output_framebuffer")));
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer_righteye", pRenderProgramNode->Output("output_framebuffer")));
-		*/
 
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
@@ -519,20 +513,29 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		texture *pColorTexture2 = m_pDreamOS->MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		pVolume->SetColorTexture(pColorTexture);
+		pVolume->SetColorTexture(pColorTexture1);
 		
 		//CR(pVolume->SetColor(COLOR_WHITE));
 
 		///*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
-		CR(pVolume->SetColor(COLOR_GREEN));
+		pVolume->SetPosition(point(width, 0.0f, (length + padding) * -3.0f));
+		//CR(pVolume->SetColor(COLOR_GREEN));
+		pVolume->SetColorTexture(pColorTexture2);
+
+
+		auto pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
+		CN(pQuad);
+		pQuad->SetPosition(point(width, 0.0f, (length + padding) * -0.0f));
+		//CR(pVolume->SetColor(COLOR_GREEN));
+		pQuad->SetColorTexture(pColorTexture1);
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);

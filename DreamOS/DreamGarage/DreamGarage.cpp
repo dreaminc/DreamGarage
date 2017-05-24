@@ -67,7 +67,8 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	//CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));

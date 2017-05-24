@@ -104,7 +104,7 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			std::shared_ptr<text> pText = m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
 			GetDOS()->RenderToTexture(m_pQuadTextures);
 
-			m_keyCharAtlas[pKey->m_letter] = m_pQuadTextures->GetFramebuffer()->GetTexture();
+			m_keyCharAtlas[pKey->m_letter] = m_pQuadTextures->GetFramebuffer()->GetColorTexture();
 
 			// Set up key quad texture
 			if (m_pQuadTextures->HasChildren()) 
@@ -116,7 +116,7 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
 			GetDOS()->RenderToTexture(m_pQuadTextures);
 
-			auto pTexture = m_pQuadTextures->GetFramebuffer()->GetTexture();
+			auto pTexture = m_pQuadTextures->GetFramebuffer()->GetColorTexture();
 			m_keyTextureAtlas[pKey->m_letter] = pTexture;
 		}
 	}
