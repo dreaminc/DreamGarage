@@ -553,22 +553,30 @@ RESULT HALTestSuite::AddTestText() {
 		{
 			auto pFlatContext = m_pDreamOS->AddFlatContext();
 
-			auto pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", pFlatContext, true);
+			auto pComposite = m_pDreamOS->AddComposite();
+			auto pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", pComposite, true);
 
-			//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"Fonts/Basis_Grotesque_Pro.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"Fonts/Basis_Grotesque_Pro.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 			auto pTextLetter = pFlatContext->AddText(pFont, pFont->GetTexture().get(), "hi", 1.0f, true);
-
-			//auto pFlatQuad = pFlatContext->AddQuad(1.0f, 1.0f, point(0.0f));
-			//pFlatQuad->SetColorTexture(pColorTexture1);
-			//pFlatQuad->SetColorTexture(pFont->GetTexture().get());
 
 			m_pDreamOS->RenderToTexture(pFlatContext);
 
 			auto pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
 			CN(pQuad);
 			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
-			//pQuad->SetColorTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
-			pQuad->SetColorTexture(pFlatContext->GetFramebuffer()->GetColorTexture());
+			pQuad->SetColorTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
+
+			pFlatContext->ClearChildren();
+			
+			pTextLetter = pFlatContext->AddText(pFont, pFont->GetTexture().get(), "hello", 1.0f, true);
+			m_pDreamOS->RenderToTexture(pFlatContext);
+			
+			pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
+			CN(pQuad);
+			pQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
+			pQuad->SetColorTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
+
+			
 		}
 
 		/*

@@ -75,7 +75,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 
 	m_pContextComposite->RenderToTexture(pContext);
 
-	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetColorTexture());
+	m_pQuad->UpdateColorTexture(pContext->GetFramebuffer()->GetColorTexture());
 
 Error:
 	return r;

@@ -28,6 +28,7 @@
 #include "OGLUser.h"
 #include "OGLHand.h"
 #include "OGLRay.h"
+#include "OGLAttachment.h"
 
 #include "OGLViewportDisplay.h"
 
@@ -468,6 +469,13 @@ FlatContext *OpenGLImp::MakeFlatContext(int width, int height, int channels) {
 	CN(pOGLFramebuffer);
 
 	pFlatContext->SetFramebuffer(pOGLFramebuffer);
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 	CN(pFlatContext);
 
