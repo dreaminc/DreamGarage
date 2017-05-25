@@ -94,11 +94,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up and map the texture
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
-	//m_pBrowserTexture = std::shared_ptr<texture>(GetDOS()->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-
 	m_pBrowserQuad->SetColorTexture(m_pBrowserTexture.get());
-	m_pBrowserQuad->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, m_pBrowserTexture.get());
-	m_pBrowserQuad->SetMaterialTexture(DimObj::MaterialTexture::Ambient, m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
 	///*
