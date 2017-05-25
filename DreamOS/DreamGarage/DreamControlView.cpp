@@ -61,7 +61,7 @@ RESULT DreamControlView::Update(void *pContext) {
 	} break;
 	
 	}
-Error:
+
 	return r;
 }
 
