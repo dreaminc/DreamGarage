@@ -1,14 +1,16 @@
 #include "OGLFramebuffer.h"
 
 #include "OpenGLImp.h"
+
 #include "OGLTexture.h"
+#include "OGLAttachment.h"
+#include "OGLRenderbuffer.h"
 
 OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp) :
 	framebuffer(),
 	m_pParentImp(pParentImp),
-	m_pOGLTexture(nullptr),
 	m_pDrawBuffers(nullptr),
-	m_pOGLDepthbuffer(nullptr)
+	m_pOGLDepthAttachment(nullptr)
 {
 	// empty
 }
@@ -16,32 +18,21 @@ OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp) :
 OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels) :
 	framebuffer(width, height, channels),
 	m_pParentImp(pParentImp),
-	m_pOGLTexture(nullptr),
 	m_pDrawBuffers(nullptr),
-	m_pOGLDepthbuffer(nullptr)
-{
-	// empty
-}
-
-OGLFramebuffer::OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int width, int height, int channels) :
-	framebuffer(width, height, channels),
-	m_pParentImp(pParentImp),
-	m_pOGLTexture(nullptr),
-	m_pDrawBuffers(nullptr),
-	m_pOGLDepthbuffer(nullptr)
+	m_pOGLDepthAttachment(nullptr)
 {
 	// empty
 }
 
 OGLFramebuffer::~OGLFramebuffer() {
-	if (m_pOGLTexture != nullptr) {
-		delete m_pOGLTexture;
-		m_pOGLTexture = nullptr;
+	if (m_pOGLDepthAttachment != nullptr) {
+		delete m_pOGLDepthAttachment;
+		m_pOGLDepthAttachment = nullptr;
 	}
 
-	if (m_pOGLDepthbuffer != nullptr) {
-		delete m_pOGLDepthbuffer;
-		m_pOGLDepthbuffer = nullptr;
+	if (m_pOGLColorAttachment != nullptr) {
+		delete m_pOGLColorAttachment;
+		m_pOGLColorAttachment = nullptr;
 	}
 
 	if (m_pDrawBuffers != nullptr) {
@@ -50,49 +41,67 @@ OGLFramebuffer::~OGLFramebuffer() {
 	}
 }
 
-RESULT OGLFramebuffer::MakeOGLTexture() {
+RESULT OGLFramebuffer::Resize(int pxWidth, int pxHeight, GLenum internalDepthFormat, GLenum typeDepth) {
 	RESULT r = R_PASS;
+	
+	CBR(((pxWidth != m_width) || (pxHeight != m_height)), R_SKIPPED);
 
-	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, m_width, m_height, m_channels);
-	CN(m_pOGLTexture);
+	m_width = pxWidth;
+	m_height = pxHeight;
 
-Error:
-	return r;
-}
+	CR(Bind());
 
-OGLTexture* OGLFramebuffer::GetOGLTexture() {
-	return m_pOGLTexture;
-}
+	// TODO: This is destroying the attachments and creating new ones - try to fix
 
-texture* OGLFramebuffer::GetTexture() {
-	return m_pOGLTexture;
-}
+	if (m_pOGLColorAttachment != nullptr) {		
+		//CR(m_pOGLColorAttachment->Resize(pxWidth, pxHeight));
 
-RESULT OGLFramebuffer::MakeOGLTextureMultisample() {
-	RESULT r = R_PASS;
+		///*
+		if (m_pOGLColorAttachment->GetOGLTexture() != nullptr) {
+			texture::TEXTURE_TYPE colorTextureType = m_pOGLColorAttachment->GetOGLTexture()->GetTextureType();
+			CR(DeleteColorAttachment());
 
-	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	CN(m_pOGLTexture);
+			CR(MakeColorAttachment());
+			CR(m_pOGLColorAttachment->MakeOGLTexture(colorTextureType));
+			CR(m_pOGLColorAttachment->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+		}
+		else if (m_pOGLColorAttachment->GetOGLRenderBuffer() != nullptr) {
+			CR(DeleteDepthAttachment());
 
-	m_pOGLTexture->SetWidth(m_width);
-	m_pOGLTexture->SetHeight(m_height);
-	m_pOGLTexture->SetChannels(m_channels);
+			CR(MakeDepthAttachment());
+			CR(m_pOGLColorAttachment->OGLInitializeRenderBuffer());
+			CR(m_pOGLColorAttachment->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER));
+		}
+		//*/
+	}
 
-	m_pOGLTexture->OGLInitializeMultisample();
+	if (m_pOGLDepthAttachment != nullptr) {
+		// TODO: Move this into attachment
+		//CR(m_pOGLDepthAttachment->Resize(pxWidth, pxHeight));
 
-Error:
-	return r;
-}
+		///*
+		if (m_pOGLDepthAttachment->GetOGLTexture() != nullptr) {
+			texture::TEXTURE_TYPE depthTextureType = m_pOGLDepthAttachment->GetOGLTexture()->GetTextureType();
+			CR(DeleteDepthAttachment());
 
-GLuint OGLFramebuffer::GetOGLDepthbufferIndex() {
-	return m_pOGLDepthbuffer->GetOGLDepthbufferIndex();
-}
+			CR(MakeDepthAttachment());
+			CR(m_pOGLDepthAttachment->MakeOGLDepthTexture(internalDepthFormat, typeDepth, depthTextureType));
+			CR(m_pOGLDepthAttachment->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
+		}
+		else if (m_pOGLDepthAttachment->GetOGLRenderBuffer() != nullptr) {
+			CR(DeleteDepthAttachment());
 
-RESULT OGLFramebuffer::SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment) {
-	RESULT r = R_PASS;
+			CR(MakeDepthAttachment());
+			CR(m_pOGLDepthAttachment->OGLInitializeRenderBuffer());
+			CR(m_pOGLDepthAttachment->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+		}
+		//*/
+	}
 
-	CN(m_pOGLDepthbuffer);
-	CR(m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
+	CR(InitializeOGLDrawBuffers(1));
+
+	// Always check that our framebuffer is ok
+	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 Error:
 	return r;
@@ -101,21 +110,12 @@ Error:
 RESULT OGLFramebuffer::SetDepthTexture(int textureNumber) {
 	RESULT r = R_PASS;
 
-	CN(m_pOGLDepthbuffer);
+	CN(m_pOGLDepthAttachment);
 
 	GLenum glTextureUnit = GL_TEXTURE0 + textureNumber;
 
 	m_pParentImp->glActiveTexture(glTextureUnit);
-	m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex());
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::SetOGLTextureToFramebuffer(GLenum target, GLenum attachment) {
-	RESULT r = R_PASS;
-
-	CR(m_pParentImp->glFramebufferTexture(target, attachment, m_pOGLTexture->GetOGLTextureIndex(), 0));
+	m_pParentImp->BindTexture(GL_TEXTURE_2D, m_pOGLDepthAttachment->GetOGLTextureIndex());
 
 Error:
 	return r;
@@ -125,12 +125,13 @@ Error:
 RESULT OGLFramebuffer::SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget) {
 	RESULT r = R_PASS;
 
-	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLTexture->GetOGLTextureIndex(), 0));
+	CR(m_pParentImp->glFramebufferTexture2D(target, attachment, textarget, m_pOGLColorAttachment->GetOGLTextureIndex(), 0));
 
 Error:
 	return r;
 }
 
+/*
 RESULT OGLFramebuffer::SetOGLTexture(GLuint textureIndex) {
 	RESULT r = R_PASS;
 
@@ -141,15 +142,16 @@ RESULT OGLFramebuffer::SetOGLTexture(GLuint textureIndex) {
 
 	CN(m_pOGLTexture);
 
-	// Set the Framebuffer Texture
+	// Set the Frame buffer Texture
 	CR(SetOGLTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 Error:
 	return r;
 }
+*/
 
 // TODO: Not sure if this is right / should be used
-RESULT OGLFramebuffer::SetOGLDrawBuffers(int numDrawBuffers) {
+RESULT OGLFramebuffer::InitializeOGLDrawBuffers(int numDrawBuffers) {
 	RESULT r = R_PASS;
 	
 	m_pDrawBuffers_n = numDrawBuffers;
@@ -177,51 +179,79 @@ Error:
 	return r;
 }
 
+RESULT OGLFramebuffer::DeleteColorAttachment() {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLColorAttachment);
+
+	delete m_pOGLColorAttachment;
+	m_pOGLColorAttachment = nullptr;
+
+Error:
+	return r;
+}
+
+texture* OGLFramebuffer::GetColorTexture() {
+	if (m_pOGLColorAttachment != nullptr) {
+		return (texture*)(m_pOGLColorAttachment->GetOGLTexture());
+	}
+
+	return nullptr;
+}
+
+RESULT OGLFramebuffer::MakeColorAttachment() {
+	RESULT r = R_PASS;
+
+	CB((m_pOGLColorAttachment == nullptr));
+
+	m_pOGLColorAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels, m_samples);
+	CN(m_pOGLColorAttachment);
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::InitializeColorAttachment(OGLTexture *pOGLTexture) {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLColorAttachment);
+	CR(m_pOGLColorAttachment->OGLInitialize(pOGLTexture));
+	CR(m_pOGLColorAttachment->AttachToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(InitializeOGLDrawBuffers(1));
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::DeleteDepthAttachment() {
+	RESULT r = R_PASS;
+
+	CN(m_pOGLDepthAttachment);
+
+	delete m_pOGLDepthAttachment;
+	m_pOGLDepthAttachment = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT OGLFramebuffer::MakeDepthAttachment() {
+	RESULT r = R_PASS;
+
+	CB((m_pOGLDepthAttachment == nullptr));
+
+	m_pOGLDepthAttachment = new OGLAttachment(m_pParentImp, m_width, m_height, m_channels, m_samples);
+	CN(m_pOGLDepthAttachment);
+
+Error:
+	return r;
+}
+
 RESULT OGLFramebuffer::InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth) {
 	RESULT r = R_PASS;
 
-	CN(m_pOGLDepthbuffer);
-	CR(m_pOGLDepthbuffer->OGLInitializeRenderBuffer());
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::InitializeRenderBufferMultisample(GLenum internalDepthFormat, GLenum typeDepth, int multisample) {
-	RESULT r = R_PASS;
-
-	CN(m_pOGLDepthbuffer);
-	CR(m_pOGLDepthbuffer->OGLInitializeRenderBufferMultisample(internalDepthFormat, typeDepth, multisample));
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::MakeOGLDepthbuffer() {
-	RESULT r = R_PASS;
-
-	m_pOGLDepthbuffer = new OGLDepthbuffer(m_pParentImp, m_width, m_height);
-	CN(m_pOGLDepthbuffer);
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer) {
-	RESULT r = R_PASS;
-
-	CB((pOGLDepthbuffer == nullptr));
-	m_pOGLDepthbuffer = pOGLDepthbuffer;
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::InitializeDepthBuffer(GLenum internalDepthFormat, GLenum typeDepth) {
-	RESULT r = R_PASS;
-
-	CN(m_pOGLDepthbuffer);
-	CR(m_pOGLDepthbuffer->OGLInitialize(internalDepthFormat, typeDepth));
+	CN(m_pOGLDepthAttachment);
+	CR(m_pOGLDepthAttachment->OGLInitializeRenderBuffer());
 
 Error:
 	return r;
@@ -234,53 +264,28 @@ RESULT OGLFramebuffer::OGLInitialize(GLenum internalDepthFormat, GLenum typeDept
 
 	// Create Buffer Objects
 	CR(m_pParentImp->glGenFramebuffers(1, &m_framebufferIndex));
-	
-	// Initialize the depth buffer if it exists
-	/*
-	if (m_pOGLDepthbuffer != nullptr) {
-		m_pOGLDepthbuffer->OGLInitialize(internalDepthFormat, typeDepth);
-	}
-	*/
+	CB((m_framebufferIndex != 0));
 
 Error:
 	return r;
-}
-
-GLuint OGLFramebuffer::GetOGLTextureIndex() {
-	if (m_pOGLTexture != nullptr) {
-		return m_pOGLTexture->GetOGLTextureIndex();
-	}
-	else {
-		return 0;
-	}
 }
 
 GLuint OGLFramebuffer::GetFramebufferIndex() {
 	return m_framebufferIndex;
 }
 
-RESULT OGLFramebuffer::SetAndClearViewport() {
-	RESULT r = R_PASS;
+RESULT OGLFramebuffer::SetAndClearViewport(bool fColor, bool fDepth, bool fBind) {
+	if (fBind) {
+		Bind();
+	}
 
 	glViewport(0, 0, m_width, m_height);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glEnable(GL_FRAMEBUFFER_SRGB);
 
-//Error:
-	return r;
-}
+	GLbitfield glClearBitfield = ((fColor) ? GL_COLOR_BUFFER_BIT : 0) + ((fDepth) ? GL_DEPTH_BUFFER_BIT : 0);
+	glClear(glClearBitfield);
 
-RESULT OGLFramebuffer::SetAndClearViewportDepthBuffer() {
-	RESULT r = R_PASS;
-
-	glViewport(0, 0, m_width, m_height);
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	//glEnable(GL_FRAMEBUFFER_SRGB);
-
-//Error:
-	return r;
+	return R_PASS;
 }
 
 RESULT OGLFramebuffer::BindToScreen(int pxWidth, int pxHeight) {
@@ -293,89 +298,21 @@ Error:
 	return r;
 }
 
-// This binds only the depth buffer (color not used) 
-RESULT OGLFramebuffer::BindOGLDepthBuffer() {
+RESULT OGLFramebuffer::Bind() {
 	RESULT r = R_PASS;
 
 	// Render to our framebuffer
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
 
-	/*
-	if (m_pOGLDepthbuffer != nullptr) {
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
-	}
-	
-	glDrawBuffer(GL_NONE); 
-
-	// Check framebuffer
-	CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
-	*/
-
 Error:
 	return r;
 }
 
-RESULT OGLFramebuffer::AttachOGLTexture(GLuint textureIndex) {
-	RESULT r = R_PASS;
-
-	if (textureIndex == NULL) {
-		if (m_pOGLTexture != nullptr) {
-			CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GetOGLTextureIndex(), 0));
-		}
-	}
-	else {
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureIndex, 0));
-	}
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::AttachOGLDepthbuffer() {
-	RESULT r = R_PASS;
-		
-	CN(m_pOGLDepthbuffer);
-	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::BindOGLFramebuffer() {
-	RESULT r = R_PASS;
-
-	// Render to our framebuffer
-	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
-
-	// TODO: This will clearly blow up texture swap chain
-	/*
-	if (m_pOGLDepthbuffer != nullptr) {
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_pOGLDepthbuffer->GetOGLDepthbufferIndex(), 0));
-	}
-
-	if (textureIndex == NULL) {
-		if (m_pOGLTexture != nullptr) {
-			CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, GetOGLTextureIndex(), 0));
-		}
-	}
-	else {
-		CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureIndex, 0));
-	}
-	//*/
-
-	// Check framebuffer
-	//CR(m_pParentImp->CheckFramebufferStatus(GL_FRAMEBUFFER));
-
-	//CR(SetOGLDrawBuffers(1));
-
-Error:
-	return r;
-}
-
-RESULT OGLFramebuffer::UnbindOGLFramebuffer() {
+RESULT OGLFramebuffer::UnbindAttachments() {
 	RESULT r = R_PASS;
 
 	CR(m_pParentImp->glBindFramebuffer(GL_FRAMEBUFFER, m_framebufferIndex));
+
 	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0));
 	CR(m_pParentImp->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, 0, 0));
 

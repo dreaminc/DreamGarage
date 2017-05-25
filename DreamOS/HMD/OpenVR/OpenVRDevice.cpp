@@ -31,6 +31,15 @@ OpenVRDevice::~OpenVRDevice() {
 	vr::VR_Shutdown();
 }
 
+// TODO: Implement these
+RESULT OpenVRDevice::InitializeHMDSourceNode() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT OpenVRDevice::InitializeHMDSinkNode() {
+	return R_NOT_IMPLEMENTED;
+}
+
 std::string OpenVRDevice::GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError) {
 	uint32_t unRequiredBufferLen = pHmd->GetStringTrackedDeviceProperty(unDevice, prop, NULL, 0, peError);
 	if (unRequiredBufferLen == 0)
@@ -74,22 +83,30 @@ RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32
 
 	// RENDER
 	CR(pOGLRenderFramebuffer->OGLInitialize());
-	CR(pOGLRenderFramebuffer->BindOGLFramebuffer());
+	CR(pOGLRenderFramebuffer->Bind());
 
-	CR(pOGLRenderFramebuffer->MakeOGLDepthbuffer());		// Note: This will create a new depth buffer
-	CR(pOGLRenderFramebuffer->InitializeRenderBufferMultisample(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OPENVR_MULTISAMPLE));
+	CR(pOGLRenderFramebuffer->SetSampleCount(DEFAULT_OPENVR_MULTISAMPLE));
 
-	CR(pOGLRenderFramebuffer->MakeOGLTextureMultisample());
+	CR(pOGLRenderFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
+	//CR(pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OPENVR_MULTISAMPLE));
+	CR(pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+
+	CR(pOGLRenderFramebuffer->MakeColorAttachment());		// Note: This will create a new color buffer
+	CR(pOGLRenderFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
 	CR(pOGLRenderFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
 
 	// RESOLVE
 	CR(pOGLResolveFramebuffer->OGLInitialize());
-	CR(pOGLResolveFramebuffer->BindOGLFramebuffer());
+	CR(pOGLResolveFramebuffer->Bind());
+	CR(pOGLResolveFramebuffer->MakeColorAttachment());
 
-	CR(pOGLResolveFramebuffer->MakeOGLTexture());
-	OGLTexture* pOGLTexture = pOGLResolveFramebuffer->GetOGLTexture();
-	pOGLTexture->SetGLTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	pOGLTexture->SetGLTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 0);
+	CR(pOGLResolveFramebuffer->GetColorAttachment()->MakeOGLTexture());
+	OGLTexture* pOGLTexture = pOGLResolveFramebuffer->GetColorAttachment()->GetOGLTexture();
+
+	pOGLTexture->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	pOGLTexture->SetTextureParameter(GL_TEXTURE_MAX_LEVEL, 0);
+
+	// TODO: This should be done less piece meal 
 	CR(pOGLResolveFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D));
 
 	// Check FBO status and unbind
@@ -565,7 +582,7 @@ RESULT OpenVRDevice::SubmitFrame() {
 
 	// Left Eye
 	vr::Texture_t leftEyeTexture;
-	leftEyeTexture.handle = (void*)(static_cast<int64_t>(m_pFramebufferResolveLeft->GetOGLTextureIndex()));
+	leftEyeTexture.handle = (void*)(static_cast<int64_t>(m_pFramebufferResolveLeft->GetColorAttachment()->GetOGLTextureIndex()));
 	leftEyeTexture.eType = vr::API_OpenGL;
 	leftEyeTexture.eColorSpace = vr::ColorSpace_Gamma;
 	ivrResult = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
@@ -573,7 +590,7 @@ RESULT OpenVRDevice::SubmitFrame() {
 
 	// Right Eye
 	vr::Texture_t rightEyeTexture;
-	rightEyeTexture.handle = (void*)(static_cast<int64_t>(m_pFramebufferResolveRight->GetOGLTextureIndex()));
+	rightEyeTexture.handle = (void*)(static_cast<int64_t>(m_pFramebufferResolveRight->GetColorAttachment()->GetOGLTextureIndex()));
 	rightEyeTexture.eType = vr::API_OpenGL;
 	rightEyeTexture.eColorSpace = vr::ColorSpace_Gamma;
 	ivrResult = vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
@@ -631,12 +648,12 @@ RESULT OpenVRDevice::SetAndClearRenderSurface(EYE_TYPE eye) {
 	glEnable(GL_MULTISAMPLE);
 
 	if (eye == EYE_LEFT) {
-		m_pFramebufferRenderLeft->BindOGLFramebuffer();
-		m_pFramebufferRenderLeft->SetAndClearViewportDepthBuffer();
+		m_pFramebufferRenderLeft->Bind();
+		m_pFramebufferRenderLeft->SetAndClearViewport(true, true);
 	}
 	else if (eye == EYE_RIGHT) {
-		m_pFramebufferRenderRight->BindOGLFramebuffer();
-		m_pFramebufferRenderRight->SetAndClearViewportDepthBuffer();
+		m_pFramebufferRenderRight->Bind();
+		m_pFramebufferRenderRight->SetAndClearViewport(true, true);
 	}
 
 //Error:	

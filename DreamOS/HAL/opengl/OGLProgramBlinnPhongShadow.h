@@ -119,6 +119,8 @@ public:
 		//m_pUniformModelViewMatrix
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 		
+		/*
+		// TODO: this
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
@@ -127,6 +129,7 @@ public:
 			pOGLProgramShadowDepth->SetDepthTexture(0);
 			m_pUniformTextureDepth->SetUniform(0);			
 		}
+		*/
 
 		point origin = pCamera->GetOrigin();
 		m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
@@ -147,6 +150,8 @@ public:
 		point origin = pStereoCamera->GetOrigin();
 		m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
 
+		/*
+		// TODO: this
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
@@ -155,6 +160,7 @@ public:
 			pOGLProgramShadowDepth->SetDepthTexture(0);
 			m_pUniformTextureDepth->SetUniform(0);
 		}
+		*/
 
 		return R_PASS;
 	}

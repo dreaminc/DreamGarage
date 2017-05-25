@@ -15,7 +15,7 @@
 // TODO: Should this go into Sense?
 
 #include "HMD/HMD.h"
-#include "HAL/opengl/OGLDepthbuffer.h"
+#include "HAL/opengl/OGLAttachment.h"
 
 #define DEFAULT_OPENVR_RENDER_CHANNELS 3
 #define DEFAULT_OPENVR_RESOLVE_CHANNELS 4
@@ -41,22 +41,28 @@ public:
 	OpenVRDevice(SandboxApp *pParentSandbox);
 	~OpenVRDevice();
 
-	RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
-	RESULT UpdateHMD();
-	RESULT ReleaseHMD();
+	// TODO: Do this for vive
+	virtual HMDSinkNode *GetHMDSinkNode() override { return nullptr; }
+	virtual HMDSourceNode *GetHMDSourceNode() override { return nullptr; }
+	virtual RESULT InitializeHMDSourceNode() override;
+	virtual RESULT InitializeHMDSinkNode() override;
 
-	RESULT SetUpFrame();
-	RESULT BindFramebuffer(EYE_TYPE eye);
-	RESULT CommitSwapChain(EYE_TYPE eye);
-	RESULT SubmitFrame();
+	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) override;
+	virtual RESULT UpdateHMD() override;
+	virtual RESULT ReleaseHMD() override;
 
-	RESULT SetAndClearRenderSurface(EYE_TYPE eye);
-	RESULT UnsetRenderSurface(EYE_TYPE eye);
+	virtual RESULT SetUpFrame() override;
+	virtual RESULT BindFramebuffer(EYE_TYPE eye) override;
+	virtual RESULT CommitSwapChain(EYE_TYPE eye) override;
+	virtual RESULT SubmitFrame() override;
 
-	RESULT RenderHMDMirror();
+	virtual RESULT SetAndClearRenderSurface(EYE_TYPE eye) override;
+	virtual RESULT UnsetRenderSurface(EYE_TYPE eye) override;
 
-	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
-	ViewMatrix GetViewMatrix(EYE_TYPE eye);
+	virtual RESULT RenderHMDMirror() override;
+
+	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
+	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);

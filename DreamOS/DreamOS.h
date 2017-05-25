@@ -49,6 +49,7 @@ class DreamOS :
 	// TODO: this needs to be revisited
 	friend class UIModule;
 	friend class HALTestSuite;
+	friend class UITestSuite;
 
 public:
 	DreamOS();
@@ -60,6 +61,7 @@ public:
 
 	virtual RESULT ConfigureSandbox() { return R_NOT_IMPLEMENTED; }
 	virtual RESULT LoadScene() = 0;
+	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) { return R_NOT_IMPLEMENTED; }
 	virtual RESULT Update(void) = 0;
 
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
@@ -75,6 +77,7 @@ protected:
 	// TODO: This is here temporarily, should be replaced by proper sandbox 
 	// related functionality
 	HALImp* GetHALImp();
+
 
 	// Dream Apps
 public:
@@ -142,6 +145,7 @@ public:
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(const texture &srcTexture);
 
 	skybox *AddSkybox();
 	skybox *MakeSkybox();
@@ -153,9 +157,14 @@ public:
 
 	user *AddUser();
 
+	Pipeline *GetRenderPipeline();
+
 	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
+
+	CameraNode* GetCameraNode() { return m_pSandbox->GetCameraNode(); }
+	ObjectStoreNode* GetSceneGraphNode() { return m_pSandbox->GetSceneGraphNode(); }
 
 	// Hands
 	hand *GetHand(hand::HAND_TYPE handType);

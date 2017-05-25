@@ -68,9 +68,8 @@ RESULT OGLProgramFlat::SetFlatContext(FlatContext *pFlatContext) {
 RESULT OGLProgramFlat::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	SetFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, m_pOGLFramebuffer->GetWidth(), m_pOGLFramebuffer->GetHeight(), m_pOGLFramebuffer->GetChannels());
-
 	CR(UseProgram());
+
 	CR(BindToFramebuffer(m_pOGLFramebuffer));
 
 	CR(SetStereoCamera(m_pCamera, EYE_MONO));
@@ -88,8 +87,10 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 	OGLTexture *pTexture = nullptr;
 
 	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-		pTexture->OGLActivateTexture();
-		m_pUniformTextureColor->SetUniform(pTexture);
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
+		m_pUniformTextureColor->SetUniform(0);
+
 		m_pUniformHasTexture->SetUniform(true);
 	}
 	else {

@@ -75,9 +75,6 @@
     <Filter Include="HAL\opengl\shaders\GLSL">
       <UniqueIdentifier>{3bf90752-857f-43d2-a095-f33ca2e68b6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="HAL\opengl\shaders\GLSL\v400">
-      <UniqueIdentifier>{4122d50c-6ec2-4425-aca8-8175db942fc1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HAL\opengl\shaders\GLSL\v440">
       <UniqueIdentifier>{0405a75c-6f11-4a68-b9ec-d514c26e465c}</UniqueIdentifier>
     </Filter>
@@ -764,6 +761,42 @@
     <ClCompile Include="..\..\..\DreamGarage\DreamControlView.cpp">
       <Filter>DreamGarage</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLRenderbuffer.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLAttachment.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLTexture.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRMirrorTexture.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRHMDSinkNode.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1026,9 +1059,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\rectangle.h">
       <Filter>Primitives</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h">
-      <Filter>HAL\opengl</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h">
       <Filter>HMD\Oculus</Filter>
@@ -1574,7 +1604,6 @@
     <ClInclude Include="..\..\..\HAL\FlatProgram.h">
       <Filter>HAL</Filter>
     </ClInclude>
-
     <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h">
       <Filter>UI</Filter>
     </ClInclude>
@@ -1598,6 +1627,36 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h">
       <Filter>DreamGarage</Filter>
+	</ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLQuery.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLRenderbuffer.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLAttachment.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\HMDSinkNode.h">
+      <Filter>HMD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\HMDSourceNode.h">
+      <Filter>HMD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRHMDSinkNode.h">
+      <Filter>HMD\Oculus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1695,78 +1754,6 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
     <None Include="..\..\..\Primitives\plane.h">
       <Filter>Primitives</Filter>
     </None>
@@ -1802,6 +1789,30 @@
     </None>
     <None Include="PropertySheet.props">
       <Filter>Core</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blendquad.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blendquad.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

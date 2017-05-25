@@ -15,7 +15,8 @@ DNode::DNode(std::string strName) :
 DNode::~DNode() {
 	RESULT r = R_PASS;
 
-	CR(ClearConnections());
+	CR(r);
+	// TODO: 
 
 Error:
 	return;
@@ -77,6 +78,33 @@ RESULT DNode::MakeOutput(std::string strName, objType*&pDestination) {
 }
 */
 
+size_t DNode::GetNumConnections() {
+	return (GetNumConnections(CONNECTION_TYPE::INPUT)) + (GetNumConnections(CONNECTION_TYPE::OUTPUT));
+}
+
+size_t DNode::GetNumInputConnections() {
+	return GetNumConnections(CONNECTION_TYPE::INPUT);
+}
+
+size_t DNode::GetNumOutputConnections() {
+	return GetNumConnections(CONNECTION_TYPE::OUTPUT);
+}
+
+size_t DNode::GetNumConnections(CONNECTION_TYPE type) {
+	RESULT r = R_PASS;
+	size_t retSize = 0;
+
+	std::vector<DConnection*> *pDConnections = GetConnectionSet(type);
+	CN(pDConnections);
+
+	for (auto &pDConnection : *pDConnections) {
+		retSize += pDConnection->GetNumConnections();
+	}
+
+Error:
+	return retSize;
+}
+
 std::vector<DConnection*>* DNode::GetConnectionSet(CONNECTION_TYPE type) {
 	if (type == CONNECTION_TYPE::INPUT) {
 		return &m_inputs;
@@ -136,6 +164,21 @@ Error:
 	return r;
 }
 
+// This can be used with sink nodes where all inputs connect to the same network
+RESULT DNode::ConnectToAllInputs(DConnection* pOutputConnection) {
+	RESULT r = R_PASS;
+
+	std::vector<DConnection*> *pDConnections = GetConnectionSet(CONNECTION_TYPE::INPUT);
+	CN(pDConnections);
+
+	for (auto &pDConnection : *pDConnections) {
+		CR(Connect(pDConnection, pOutputConnection));
+	}
+
+Error:
+	return r;
+}
+
 RESULT DNode::ConnectToInput(std::string strInputName, DConnection* pOutputConnection) {
 	RESULT r = R_PASS;
 
@@ -165,14 +208,56 @@ Error:
 	return r;
 }
 
+RESULT DNode::Disconnect() {
+	RESULT r = R_PASS;
+
+	for (auto &pConnection : m_inputs) {
+		CR(pConnection->Disconnect());
+	}
+
+	for (auto &pConnection : m_outputs) {
+		CR(pConnection->Disconnect());
+	}
+
+Error:
+	return r;
+}
+
+RESULT DNode::Terminate() {
+	m_fTerminate = true;
+	return R_PASS;
+}
+
+// RenderNode can be overridden but this should be an exceptionally rare thing 
+// since a node that abuses RenderNode can basically kill a network
 RESULT DNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 
+	// This will reset the terminate for the node which may choose to set 
+	// it later.
+
+	// For recursive nodes, this will permeate since PreProcessNode will have 
+	// already be called 
+	m_fTerminate = false;
+
 	// TODO: Handle frameID to prevent repeated node renders
+
+	// This allows a node to process stuff before it's connections
+	// This is used often in recursive type nodes
+	// TODO: We might want to revisit this in the future
+	CR(PreProcessNode(frameID));
+
+	if (m_fTerminate == true) {
+		return r;
+	}
 
 	// First Render input nodes
 	for (auto &pInputConnection : m_inputs) {
 		pInputConnection->RenderConnections(frameID);
+
+		if (m_fTerminate == true) {
+			return r;
+		}
 	}
 
 	// Pass processing over to extended node

@@ -84,6 +84,11 @@ public:
 	}
 
 	template <class objType>
+	RESULT MakeOutputPassthru(std::string strName, objType **ppDestination) {
+		return MakeConnection<objType>(strName, CONNECTION_TYPE::OUTPUT, ppDestination, DCONNECTION_FLAGS::PASSTHRU);
+	}
+
+	template <class objType>
 	RESULT SetInput(std::string strName, objType *pDestination) {
 		RESULT r = R_PASS;
 
@@ -101,6 +106,34 @@ public:
 		return r;
 	}
 
+	template <class objType>
+	RESULT SetOutputPassthru(std::string strName, DConnection* pOutputConnection) {
+		RESULT r = R_PASS;
+
+		DConnection* pDConnection = nullptr;
+
+		// Find the connection
+		CNM((pDConnection = Connection(strName, CONNECTION_TYPE::OUTPUT)), "Output Connection %s not found", strName.c_str());
+		CBM((pDConnection->IsPassthru()), "Output Connection %s is not set to pass thru", strName.c_str())
+
+		DConnectionTyped<objType> *pDConnectionTyped = dynamic_cast<DConnectionTyped<objType>*>(pDConnection);
+		CN(pDConnectionTyped);
+
+		DConnectionTyped<objType> *pDConnectionTypedOutput = dynamic_cast<DConnectionTyped<objType>*>(pOutputConnection);
+		CN(pDConnectionTypedOutput);
+
+		//CR(pDConnectionTyped->SetConnection(pDestination));
+		CR(pDConnectionTyped->SetConnectionPassthru(pDConnectionTypedOutput));
+
+	Error:
+		return r;
+	}
+
+	size_t GetNumInputConnections();
+	size_t GetNumOutputConnections();
+	size_t GetNumConnections(CONNECTION_TYPE type);
+	size_t GetNumConnections();
+
 	DConnection* Connection(std::string strName, CONNECTION_TYPE type);
 	DConnection* Input(std::string strName);
 	DConnection* Output(std::string strName);
@@ -113,9 +146,17 @@ public:
 	RESULT Connect(DConnection* pInputConnection, DConnection* pOutputConnection);
 	RESULT ConnectToInput(std::string strInputName, DConnection* pOutputConnection);
 	RESULT ConnectToOutput(std::string strOutputName, DConnection* pInputConnection);
+	RESULT ConnectToAllInputs(DConnection* pOutputConnection);
 
-	RESULT RenderNode(long frameID = 0);
-	virtual RESULT ProcessNode(long frameID = 0) = 0;
+	RESULT Disconnect();
+
+	virtual RESULT RenderNode(long frameID = 0);
+	virtual RESULT ProcessNode(long frameID = 0) { return R_NOT_IMPLEMENTED; }
+	virtual RESULT PreProcessNode(long frameID = 0) { return R_NOT_IMPLEMENTED; }
+
+	// Allows for the early termination of a path
+	// This will prevent connections from rendering / processing
+	RESULT Terminate();
 
 	template <class nodeType, class... nodeArgsTypes>
 	static nodeType* MakeNode(nodeArgsTypes&&... sinkArgs) {
@@ -140,6 +181,17 @@ private:
 private:
 	std::vector<DConnection*> m_inputs;
 	std::vector<DConnection*> m_outputs;
+
+	bool m_fTerminate = false;
+
+	// TODO: Move to a pattern
+public:
+	int incRefCount() { m_refCount++; return m_refCount; }
+	int decRefCount() { m_refCount--; return m_refCount; }
+	int refCount() { return m_refCount; }
+
+private:
+	int m_refCount = 0;
 
 private:
 	std::string m_strName;

@@ -12,6 +12,8 @@
 #include <string>
 #include <algorithm>
 
+#include "HAL/opengl/OGLFramebuffer.h"
+
 // OGLRenderContext
 void OGLRenderContext::Initialize() 
 {
@@ -64,6 +66,21 @@ void OGLDreamConsole::Initialize() {
 	m_OGLConsoleText->MoveTo(-0.8f, 0.8f, 0);
 }
 
+RESULT OGLDreamConsole::SetupConnections() {
+	RESULT r = R_PASS;
+
+	// Inputs
+	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
+
+	// Outputs
+	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
+
+Error:
+	return r;
+}
+
 RESULT OGLDreamConsole::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
@@ -73,9 +90,16 @@ RESULT OGLDreamConsole::ProcessNode(long frameID) {
 
 	UseProgram();
 
+	if (m_pOGLFramebuffer != nullptr) {
+		//BindToFramebuffer(m_pOGLFramebuffer);
+		m_pOGLFramebuffer->Bind();
+	}
+
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	Render(m_pCamera->GetCameraEye() == EYE_MONO);
+
+	UnbindFramebuffer();
 
 //Error:
 	return r;

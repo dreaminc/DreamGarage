@@ -232,6 +232,50 @@ Error:
 	return r;
 }
 
+RESULT quad::FlipUVVertical() {
+	RESULT r = R_PASS;
+
+	int vertCount = 0;
+
+	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
+		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
+			uv_precision uValue = m_pVertices[vertCount].GetUV().u();
+			uv_precision vValue = m_pVertices[vertCount].GetUV().v();
+
+			vValue = (1.0f - vValue);
+
+			m_pVertices[vertCount++].SetUV(uValue, vValue);
+		}
+	}
+
+	CR(SetDirty());
+
+Error:
+	return r;
+}
+
+RESULT quad::FlipUVHorizontal() {
+	RESULT r = R_PASS;
+
+	int vertCount = 0;
+
+	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
+		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
+			uv_precision uValue = m_pVertices[vertCount].GetUV().u();
+			uv_precision vValue = m_pVertices[vertCount].GetUV().v();
+
+			uValue = (1.0f - uValue);
+
+			m_pVertices[vertCount++].SetUV(uValue, vValue);
+		}
+	}
+
+	CR(SetDirty());
+
+Error:
+	return r;
+}
+
 vector quad::GetNormal() {
 	return m_vNormal;
 }

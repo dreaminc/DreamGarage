@@ -28,6 +28,7 @@
 #include "OGLUser.h"
 #include "OGLHand.h"
 #include "OGLRay.h"
+#include "OGLAttachment.h"
 
 #include "OGLViewportDisplay.h"
 
@@ -160,11 +161,23 @@ Error:
 }
 
 RESULT OpenGLImp::MakeCurrentContext() {
-	return m_pOpenGLRenderingContext->MakeCurrentContext();
+	if (m_fCurrentContext == false) {
+		m_fCurrentContext = true;
+		return m_pOpenGLRenderingContext->MakeCurrentContext();
+	}
+	else {
+		return R_SKIPPED;
+	}
 }
 
 RESULT OpenGLImp::ReleaseCurrentContext() {
-	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
+	if (m_fCurrentContext == true) {
+		m_fCurrentContext = false;
+		return m_pOpenGLRenderingContext->ReleaseCurrentContext();
+	}
+	else {
+		return R_SKIPPED;
+	}
 }
 
 RESULT OpenGLImp::InitializeHAL() {
@@ -175,7 +188,7 @@ RESULT OpenGLImp::InitializeHAL() {
 	CR(MakeCurrentContext());
 
 	// Clear Background
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
@@ -212,7 +225,9 @@ RESULT OpenGLImp::Resize(viewport newViewport) {
 
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
+	SetViewport(newViewport);
 	glViewport(0, 0, (GLsizei)newViewport.Width(), (GLsizei)newViewport.Height());
+
 
 Error:
 	//CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -227,6 +242,8 @@ RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) {
 
 	// Render to screen
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	SetViewport(pxWidth, pxHeight);
 
 	switch (eye) {
 		case EYE_LEFT: {
@@ -319,26 +336,28 @@ composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& ws
 
 		pComposite->AddChild(pModel);
 
+		// TODO: WTF IS THIS LAMBDA FOR!!!!!
 		auto GetTexture = [&](const std::string& file) -> texture* {
-			std::wstring wstr(file.begin(), file.end());
-			wstr = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.find_last_of(L"/\\")) + L"\\" + wstr;
+			std::wstring wstrFilename(file.begin(), file.end());
+			wstrFilename = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.find_last_of(L"/\\")) + L"\\" + wstrFilename;
 
-			if (textureMap.find(wstr) == textureMap.end()) {
-				texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			if (textureMap.find(wstrFilename) == textureMap.end()) {
+				//texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstrFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+				texture *pTempTexture = OGLTexture::MakeTextureFromPath(this, texture::TEXTURE_TYPE::TEXTURE_COLOR, wstrFilename);
 
 				if (!pTempTexture) {
-					LOG(ERROR) << "Failed to load model texture : " << wstr;
+					LOG(ERROR) << "Failed to load model texture : " << wstrFilename;
 					return nullptr;
 				}
 
-				textureMap[wstr] = pTempTexture;
+				textureMap[wstrFilename] = pTempTexture;
 
 				if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0) {
 					return pTempTexture;
 				}
 			}
 			else {
-				return textureMap[wstr];
+				return textureMap[wstrFilename];
 			}
 
 			return nullptr;
@@ -450,6 +469,13 @@ FlatContext *OpenGLImp::MakeFlatContext(int width, int height, int channels) {
 	CN(pOGLFramebuffer);
 
 	pFlatContext->SetFramebuffer(pOGLFramebuffer);
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 	CN(pFlatContext);
 
@@ -702,7 +728,7 @@ Error:
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, pszFilename, type);
+	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));
 	CN(pTexture);
 
 //Success:
@@ -713,13 +739,32 @@ Error:
 		delete pTexture;
 		pTexture = nullptr;
 	}
+
+	return nullptr;
+}
+
+texture* OpenGLImp::MakeTexture(const texture &srcTexture) {
+	RESULT r = R_PASS;
+
+	texture *pTexture = OGLTexture::MakeTexture(srcTexture);
+	CN(pTexture);
+
+	//Success:
+	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+
 	return nullptr;
 }
 
 texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, type, width, height, format, channels, pBuffer, pBuffer_n);
+	texture *pTexture = OGLTexture::MakeTextureFromBuffer(this, type, width, height, channels, format, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:
@@ -737,7 +782,7 @@ Error:
 texture* OpenGLImp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, type, pBuffer, pBuffer_n);
+	texture *pTexture = OGLTexture::MakeTextureFromFileBuffer(this, type, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:
@@ -1078,6 +1123,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteRenderbuffers(n, renderbuffers);
+	CRM(CheckGLError(), "glDeleteRenderbuffers failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
 	RESULT r = R_PASS;
 
@@ -1232,11 +1287,23 @@ Error:
 	return r;
 }
 
+// Blending 
+
 RESULT OpenGLImp::glBlendEquation(GLenum mode) {
 	RESULT r = R_PASS;
 
 	m_OpenGLExtensions.glBlendEquation(mode);
 	CRM(CheckGLError(), "glBlendEquation failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
+	CRM(CheckGLError(), "glBlendFuncSeparate failed");
 
 Error:
 	return r;
@@ -1440,11 +1507,20 @@ Error:
 }
 
 // Textures
-RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *textures) {
+RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *pTextures) {
 	RESULT r = R_PASS;
 
-	//m_OpenGLExtensions.glGenTextures(n, textures);
-	glGenTextures(n, textures);
+	glGenTextures(n, pTextures);
+	CRM(CheckGLError(), "glGenTextures failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::DeleteTextures(GLsizei n, GLuint *pTextures) {
+	RESULT r = R_PASS;
+
+	glDeleteTextures(n, pTextures);
 	CRM(CheckGLError(), "glGenTextures failed");
 
 Error:
@@ -1554,6 +1630,82 @@ RESULT OpenGLImp::glGenerateMipmap(GLenum target) {
 Error:
 	return r;
 }
+
+// Queries
+RESULT OpenGLImp::glGenQueries(GLsizei n, GLuint *ids) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGenQueries(n, ids);
+	CRM(CheckGLError(), "glGenQueries failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDeleteQueries(GLsizei n, const GLuint *ids) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteQueries(n, ids);
+	CRM(CheckGLError(), "glDeleteQueries failed");
+
+Error:
+	return r;
+}
+
+bool OpenGLImp::glIsQuery(GLuint id) {
+	return (m_OpenGLExtensions.glIsQuery(id) != 0);
+}
+
+RESULT OpenGLImp::glBeginQuery(GLenum target, GLuint id) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBeginQuery(target, id);
+	CRM(CheckGLError(), "glBeginQuery failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glEndQuery(GLenum target) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glEndQuery(target);
+	CRM(CheckGLError(), "glEndQuery failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryiv(GLenum target, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryiv(target, pname, params);
+	CRM(CheckGLError(), "glGetQueryiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryObjectiv(id, pname, params);
+	CRM(CheckGLError(), "glGetQueryObjectiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryObjectuiv(id, pname, params);
+	CRM(CheckGLError(), "glGetQueryObjectuiv failed");
+
+Error:
+	return r;
+}
+
 
 RESULT OpenGLImp::wglSwapIntervalEXT(int interval) {
 	RESULT r = R_PASS;

@@ -59,6 +59,9 @@ public:
 
 	// Object Factory Methods
 public:
+	version GetOGLVersion() { return m_versionOGL; }
+	version GetGLSLVersion() { return m_versionGLSL; }
+
 	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
@@ -78,7 +81,8 @@ public:
 	
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) override;
-	virtual texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) override;
+	virtual texture* MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) override;
+	virtual texture* MakeTexture(const texture &srcTexture) override;
 	
 	skybox *MakeSkybox();
 
@@ -147,7 +151,9 @@ public:
 	RESULT glGenFramebuffers(GLsizei n, GLuint *framebuffers);
 	RESULT glBindFramebuffer(GLenum target, GLuint gluiFramebuffer);
 
+	// Renderbuffer
 	RESULT glGenRenderbuffers(GLsizei n, GLuint *renderbuffers);
+	RESULT glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers);
 	RESULT glBindRenderbuffer(GLenum target, GLuint renderbuffer);
 	RESULT glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
 	RESULT glRenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
@@ -157,7 +163,7 @@ public:
 	RESULT glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
 	RESULT glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 	RESULT glDrawBuffers(GLsizei n, const GLenum *bufs);
-
+	
 
 	RESULT glGenVertexArrays(GLsizei n, GLuint *arrays);
 	RESULT glBindVertexArray(GLuint gluiArray);
@@ -181,7 +187,9 @@ public:
 
 	RESULT glGetAttribLocation(GLuint programID, const GLchar *pszName, GLint *pLocation);
 
+	// Blending 
 	RESULT glBlendEquation(GLenum mode);
+	RESULT glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
 
 	// Uniform Variables
 	RESULT glGetUniformLocation(GLuint program, const GLchar *name, GLint *pLocation);
@@ -205,7 +213,8 @@ public:
 	RESULT glAttachShader(GLuint program, GLuint shader);
 
 	// Textures
-	RESULT GenerateTextures(GLsizei n, GLuint *textures);
+	RESULT GenerateTextures(GLsizei n, GLuint *pTextures);
+	RESULT DeleteTextures(GLsizei n, GLuint *pTextures);
 	RESULT glActiveTexture(GLenum texture);
 	RESULT glBindTextures(GLuint first, GLsizei count, const GLuint *textures);
 	RESULT BindTexture(GLenum target, GLuint texture);
@@ -217,6 +226,16 @@ public:
 	RESULT TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const void *pixels);
 	RESULT TextureSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const void *pixels);
 	RESULT glGenerateMipmap(GLenum target);
+
+	// Queries
+	RESULT glGenQueries(GLsizei n, GLuint *ids);
+	RESULT glDeleteQueries(GLsizei n, const GLuint *ids);
+	bool glIsQuery(GLuint id);
+	RESULT glBeginQuery(GLenum target, GLuint id);
+	RESULT glEndQuery(GLenum target);
+	RESULT glGetQueryiv(GLenum target, GLenum pname, GLint *params);
+	RESULT glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params);
+	RESULT glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params);
 
 public:
 	RESULT CheckGLError();

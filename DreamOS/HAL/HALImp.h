@@ -79,6 +79,10 @@ public:
 
 	RESULT SetHMD(HMD *pHMD);
 
+	RESULT SetViewport(const viewport &newViewport);
+	RESULT SetViewport(int pxWidth, int pxHeight);
+	const viewport& GetViewport();
+
 public:
 	RESULT InitializeRenderPipeline();
 	Pipeline* GetRenderPipelineHandle() {
@@ -107,7 +111,7 @@ public:
 	virtual RESULT FlushHALBuffers() = 0;
 
 private:
-	RESULT Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE eye);
+	RESULT Render();
 
 protected:
 	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
@@ -135,6 +139,7 @@ public:
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) = 0;
 	virtual texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) = 0;
+	virtual texture* MakeTexture(const texture &srcTexture) = 0;
 
 	virtual skybox *MakeSkybox() = 0;
 	virtual model *MakeModel(wchar_t *pszModelName) = 0;
@@ -158,12 +163,15 @@ public:
 protected:	
 	HMD *m_pHMD;
 	stereocamera* m_pCamera = nullptr;
+	viewport m_viewport;
 
 protected:
 	std::unique_ptr<Pipeline> m_pRenderPipeline = nullptr;
 	
 	// This is used to render to texture
 	ProgramNode* m_pFlatProgram = nullptr;
+
+	bool m_fCurrentContext = false;
 
 private:
 	UID m_uid;

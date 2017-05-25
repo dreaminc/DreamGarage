@@ -127,8 +127,13 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)wglGetProcAddress("glBindAttribLocation")),
 		"Failed to initialize glBindAttribLocation extension");
 
+	// Blending
+
 	CNMW((m_glBlendEquation = (PFNGLBLENDEQUATIONPROC)wglGetProcAddress("glBlendEquation")),
 		"Failed to initialize glBlendEquation extension");
+
+	CNMW((m_glBlendFuncSeparate = (PFNGLBLENDFUNCSEPARATEPROC)wglGetProcAddress("glBlendFuncSeparate")),
+		"Failed to initialize glBlendFuncSeparate extension");
 
 	// Not supported yet?
 	m_glDisableVertexAttribArray = NULL;
@@ -187,6 +192,9 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 	CNMW((m_glGenRenderbuffers = (PFNGLGENRENDERBUFFERSPROC)wglGetProcAddress("glGenRenderbuffers")),
 		"Failed to initialize glGenRenderbuffers extension");
 
+	CNMW((m_glDeleteRenderbuffers = (PFNGLDELETERENDERBUFFERSPROC)wglGetProcAddress("glDeleteRenderbuffers")),
+		"Failed to initialize glDeleteRenderbuffers extension");
+
 	CNMW((m_glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)wglGetProcAddress("glBindRenderbuffer")),
 		"Failed to initialize glBindRenderbuffer extension");
 
@@ -242,6 +250,31 @@ RESULT OpenGLExtensions::InitializeExtensions() {
 
 	CNMW((m_glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)wglGetProcAddress("glDeleteVertexArrays")),
 		"Failed to initialize glDeleteVertexArrays extension");
+
+	// Queries 
+	CNMW((m_glGenQueries = (PFNGLGENQUERIESPROC)wglGetProcAddress("glGenQueries")),
+		"Failed to initialize glGenQueries extension");
+
+	CNMW((m_glDeleteQueries = (PFNGLDELETEQUERIESPROC)wglGetProcAddress("glDeleteQueries")),
+		"Failed to initialize glDeleteQueries extension");
+
+	CNMW((m_glIsQuery = (PFNGLISQUERYPROC)wglGetProcAddress("glIsQuery")),
+		"Failed to initialize glIsQuery extension");
+
+	CNMW((m_glBeginQuery = (PFNGLBEGINQUERYPROC)wglGetProcAddress("glBeginQuery")),
+		"Failed to initialize glBeginQuery extension");
+
+	CNMW((m_glEndQuery = (PFNGLENDQUERYPROC)wglGetProcAddress("glEndQuery")),
+		"Failed to initialize glEndQuery extension");
+
+	CNMW((m_glGetQueryiv = (PFNGLGETQUERYIVPROC)wglGetProcAddress("glGetQueryiv")),
+		"Failed to initialize glGetQueryiv extension");
+
+	CNMW((m_glGetQueryObjectiv = (PFNGLGETQUERYOBJECTIVPROC)wglGetProcAddress("glGetQueryObjectiv")),
+		"Failed to initialize glGetQueryObjectiv extension");
+
+	CNMW((m_glGetQueryObjectuiv = (PFNGLGETQUERYOBJECTUIVPROC)wglGetProcAddress("glGetQueryObjectuiv")),
+		"Failed to initialize glGetQueryObjectuiv extension");
 
 	return r;
 }

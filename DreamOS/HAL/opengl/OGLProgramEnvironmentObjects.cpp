@@ -5,6 +5,10 @@
 
 #include "Primitives/stereocamera.h"
 
+#include "OpenGLImp.h"
+#include "OGLFramebuffer.h"
+#include "OGLAttachment.h"
+
 OGLProgramEnvironmentObjects::OGLProgramEnvironmentObjects(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglenvironment"),
 	m_pLightsBlock(nullptr),
@@ -54,6 +58,24 @@ RESULT OGLProgramEnvironmentObjects::OGLInitialize() {
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pLightsBlock), std::string("ub_Lights")));
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
+	// Framebuffer Output
+	int pxWidth = m_pParentImp->GetViewport().Width();
+	int pxHeight = m_pParentImp->GetViewport().Height();
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+	CR(m_pOGLFramebuffer->OGLInitialize());
+	CR(m_pOGLFramebuffer->Bind());
+
+	CR(m_pOGLFramebuffer->SetSampleCount(4));
+
+	CR(m_pOGLFramebuffer->MakeColorAttachment());
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(m_pOGLFramebuffer->MakeDepthAttachment());
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachRenderBufferToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER));
+
 	m_deltaTime = 0.0f;
 	m_startTime = std::chrono::high_resolution_clock::now();
 
@@ -84,13 +106,21 @@ RESULT OGLProgramEnvironmentObjects::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
+	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+
 	UseProgram();
+
+	if (m_pOGLFramebuffer != nullptr)
+		BindToFramebuffer(m_pOGLFramebuffer);
+
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
+
+	UnbindFramebuffer();
 
 	//Error:
 	return r;
@@ -99,13 +129,16 @@ RESULT OGLProgramEnvironmentObjects::ProcessNode(long frameID) {
 RESULT OGLProgramEnvironmentObjects::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
+	// bump
+	//SetTextureUniform(pOGLObj->GetColorTexture(), m_pUniformTextureColor, m_pUniformHasTextureColor, 0);
+
 	// color texture
-	SetTextureUniform(pOGLObj->GetColorTexture(), m_pUniformTextureColor, m_pUniformHasTextureColor);
+	SetTextureUniform(pOGLObj->GetColorTexture(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
 
 	// material textures
-	SetTextureUniform(pOGLObj->GetTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient);
-	SetTextureUniform(pOGLObj->GetTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse);
-	SetTextureUniform(pOGLObj->GetTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular);
+	//SetTextureUniform(pOGLObj->GetTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
+	SetTextureUniform(pOGLObj->GetTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
+	//SetTextureUniform(pOGLObj->GetTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
 
 	// bump texture
 	// TODO: add bump texture to shader
@@ -187,11 +220,14 @@ RESULT OGLProgramEnvironmentObjects::SetRiverAnimation(bool fRiverAnimation) {
 	return R_PASS;
 }
 
-void OGLProgramEnvironmentObjects::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform) {
+void OGLProgramEnvironmentObjects::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
 	if (pTexture) {
 		pBoolUniform->SetUniform(true);
-		pTexture->OGLActivateTexture();
-		pTextureUniform->SetUniform(pTexture);
+
+		m_pParentImp->glActiveTexture(GL_TEXTURE0 + texUnit);
+		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
+
+		m_pUniformTextureColor->SetUniform(texUnit);
 	}
 	else {
 		pBoolUniform->SetUniform(false);

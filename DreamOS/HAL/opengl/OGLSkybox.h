@@ -26,16 +26,19 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	/*
 	RESULT OGLActivateCubeMapTexture() {
 		RESULT r = R_PASS;
 
 		OGLTexture *pCubeMapTexture = reinterpret_cast<OGLTexture*>(m_pCubeMapTexture);
+
 		CN(pCubeMapTexture);
 		CR(pCubeMapTexture->OGLActivateTexture());
 
 	Error:
 		return r;
 	}
+	*/
 
 	// Face culling
 	

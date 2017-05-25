@@ -24,6 +24,7 @@ public:
 	std::shared_ptr<DNode> FindNode(std::string strName);
 
 	RESULT RunPipeline();
+	RESULT Reset(bool fResetDestination = false);
 
 	RESULT SetDestinationSinkNode(SinkNode* pDestinationSinkNode);
 	SinkNode* GetDestinationSinkNode();

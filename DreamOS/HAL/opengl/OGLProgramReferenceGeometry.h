@@ -16,6 +16,9 @@ class OGLProgramReferenceGeometry : public OGLProgramMinimal {
 public:
 	OGLProgramReferenceGeometry(OpenGLImp *pParentImp);
 	virtual RESULT ProcessNode(long frameID) override;
+
+	virtual RESULT OGLInitialize() override;
+	virtual RESULT SetupConnections() override;
 };
 
 #endif // ! OGLPROGRAM_REFERENCE_GEOMETRY_H_

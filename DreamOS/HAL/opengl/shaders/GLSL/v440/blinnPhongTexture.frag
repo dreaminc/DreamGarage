@@ -59,7 +59,7 @@ layout(std140) uniform ub_Lights {
 
 layout (location = 0) out vec4 out_vec4Color;
 
-float g_ambient = 0.01f;
+float g_ambient = material.m_ambient;
 
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
@@ -103,6 +103,7 @@ void main(void) {
 	
 	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 1.0f);
 	vec4 ambientColor = g_vec4AmbientLightLevel * textureColor;
+
 	if(u_fUseColorTexture == true) {
 		out_vec4Color = max((vec4LightValue * DataIn.color * textureColor), ambientColor);
 	}

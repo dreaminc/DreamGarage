@@ -88,6 +88,9 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
 	}
 
+	// Give the Client a chance to set up the pipeline
+	CRM(SetupPipeline(GetRenderPipeline()), "Failed to set up pipeline");
+
 	// Load the scene
 	CRM(LoadScene(), "Failed to load scene");
 
@@ -105,6 +108,10 @@ Error:
 
 stereocamera* DreamOS::GetCamera() {
 	return m_pSandbox->GetCamera();
+}
+
+Pipeline *DreamOS::GetRenderPipeline() {
+	return m_pSandbox->m_pHALImp->GetRenderPipelineHandle();
 }
 
 point DreamOS::GetCameraPosition() {
@@ -269,6 +276,10 @@ texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) 
 
 texture *DreamOS::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
 	return m_pSandbox->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, type);
+}
+
+texture* DreamOS::MakeTexture(const texture &srcTexture) {
+	return m_pSandbox->MakeTexture(srcTexture);
 }
 
 texture* DreamOS::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {

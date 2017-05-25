@@ -13,6 +13,10 @@
 
 #include "UI/UIKeyboard.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/SourceNode.h"
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -35,10 +39,11 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestBrowserRequest());
+	CR(AddTestKeyboard());
+
 	CR(AddTestBrowser());
 
-	CR(AddTestKeyboard());
+	CR(AddTestBrowserRequest());
 
 
 //	CR(AddTestInteractionFauxUI());
@@ -62,23 +67,27 @@ RESULT UITestSuite::Initialize() {
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
-//*
+
+	/*
 	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
 		nullptr,
 		sceneOffset,
 		sceneScale,
 		sceneDirection);
+
 	composite* pRiver = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\river.obj",
 		nullptr,
 		sceneOffset,
 		sceneScale,
 		sceneDirection);
+
 	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
 		nullptr,
 		sceneOffset,
 		sceneScale,
 		sceneDirection);
-//*/
+	//*/
+
 	/*
 	for (int i = 0; i < SenseControllerEventType::SENSE_CONTROLLER_INVALID; i++) {
 		CR(m_pDreamOS->RegisterSubscriber((SenseControllerEventType)(i), this));
@@ -178,6 +187,37 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::SetupPipeline() {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+	
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestBrowser() {
 	RESULT r = R_PASS;
 
@@ -192,6 +232,10 @@ RESULT UITestSuite::AddTestBrowser() {
 
 		CN(m_pDreamOS);
 
+		CR(SetupPipeline());
+
+		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
 		// Create the Shared View App
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		CNM(pDreamBrowser, "Failed to create dream browser");
@@ -204,6 +248,19 @@ RESULT UITestSuite::AddTestBrowser() {
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
 		pDreamBrowser->SetURI(strURL);
+
+		/*
+		{
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			auto pComposite = m_pDreamOS->AddComposite();
+
+			auto pQuad = pComposite->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
+			CN(pQuad);
+			pQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
+			//CR(pVolume->SetColor(COLOR_GREEN));
+			pQuad->SetColorTexture(pColorTexture1);
+		}
+		*/
 
 	Error:
 		return R_PASS;
@@ -255,9 +312,16 @@ RESULT UITestSuite::AddTestKeyboard() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
 		m_pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
 		m_pKeyboard->ShowKeyboard();
+
 		CR(Initialize());
+
 	Error:
 		return r;
 	};
@@ -570,3 +634,4 @@ RESULT UITestSuite::Notify(SenseMouseEvent *mEvent) {
 //Error:
 	return r;
 }
+

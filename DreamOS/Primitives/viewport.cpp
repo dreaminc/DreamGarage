@@ -8,11 +8,11 @@ viewport::viewport(int pxWidth, int pxHeight, float FOVAngle) :
 	// empty
 }
 
-int viewport::Width() {
+int viewport::Width() const {
 	return m_pxViewWidth;
 }
 
-int viewport::Height() {
+int viewport::Height() const {
 	return m_pxViewHeight;
 }
 

@@ -52,6 +52,9 @@ public:
 	virtual RESULT Notify(SenseMouseEvent *mEvent) override;
 
 private:
+	RESULT SetupPipeline();
+
+private:
 	DreamOS *m_pDreamOS;
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
 

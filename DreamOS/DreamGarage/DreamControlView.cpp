@@ -13,7 +13,6 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	m_vNormal = vector::jVector().RotateByQuaternion(quaternion::MakeQuaternionWithEuler(-(float)M_PI / 3.0f, 0.0f, 0.0f));
-	//m_vNormal = vector(0.0f, sin(M_PI / 6.0f), cos(M_PI / 6.0f)).Normal();
 
 	m_pViewQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, m_vNormal);
 	CN(m_pViewQuad);
@@ -48,8 +47,6 @@ RESULT DreamControlView::Update(void *pContext) {
 	matOffset.SetQuaternionRotationMatrix(qHeadRotation);
 	point ptOffset = point(0.0f, 0.0f, -1.0f);
 	ptOffset = matOffset * ptOffset;
-
-	bool fShouldBeVisible = (ptOffset.y() < m_showThreshold);
 
 	switch (m_viewState) {
 
@@ -150,14 +147,7 @@ RESULT DreamControlView::SetSharedViewContext(std::shared_ptr<DreamBrowser> pCon
 	float scale = 1.0f / 6.0f;
 	CR(m_pViewQuad->UpdateParams(width * scale, height * scale, m_vNormal));
 	
-	// Flip UV vertically
-	if (r != R_SKIPPED) {
-		m_pViewQuad->TransformUV(
-		{ { 0.0f, 0.0f } },
-		{ { 1.0f, 0.0f,
-			0.0f, -1.0f } }
-		);
-	}
+	m_pViewQuad->FlipUVVertical();
 
 Error:
 	return r;

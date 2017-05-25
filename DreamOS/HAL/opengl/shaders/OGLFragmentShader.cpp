@@ -99,7 +99,7 @@ RESULT OGLFragmentShader::SetTexture(OGLTexture *pTexture) {
 		} break;
 	}
 
-	CR(pTexture->OGLActivateTexture());
+	//CR(pTexture->OGLActivateTexture());
 
 Error:
 	return r;

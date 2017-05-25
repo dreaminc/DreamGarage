@@ -29,16 +29,16 @@ public:
 	}
 
 	// OGL Program
-	inline GLuint glCreateProgram(void) { 
-		return m_glCreateProgram(); 
+	inline GLuint glCreateProgram(void) {
+		return m_glCreateProgram();
 	}
 
-	inline void glDeleteProgram(GLuint programID) { 
-		return m_glDeleteProgram(programID); 
+	inline void glDeleteProgram(GLuint programID) {
+		return m_glDeleteProgram(programID);
 	}
 
-	inline GLboolean glIsProgram(GLuint programID) { 
-		return m_glIsProgram(programID); 
+	inline GLboolean glIsProgram(GLuint programID) {
+		return m_glIsProgram(programID);
 	}
 
 	inline void glGetProgramInterfaceiv(GLuint program, GLenum programInterface, GLenum pname, GLint *params) {
@@ -52,19 +52,19 @@ public:
 	inline void glGetProgramResourceName(GLuint program, GLenum programInterface, GLuint index, GLsizei bufSize, GLsizei *length, GLchar *name) {
 		return m_glGetProgramResourceName(program, programInterface, index, bufSize, length, name);
 	}
-	
+
 	inline void glUseProgram(GLuint programID) {
 		return m_glUseProgram(programID);
 	}
-	
-	inline void glLinkProgram(GLuint programID) { 
-		return m_glLinkProgram(programID); 
+
+	inline void glLinkProgram(GLuint programID) {
+		return m_glLinkProgram(programID);
 	}
-	
+
 	inline void glGetProgramiv(GLuint programID, GLenum pname, GLint *params) {
 		return m_glGetProgramiv(programID, pname, params);
 	}
-	
+
 	inline void glGetProgramInfoLog(GLuint programID, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
 		return m_glGetProgramInfoLog(programID, bufSize, length, infoLog);
 	}
@@ -73,56 +73,56 @@ public:
 	inline void glDrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void *indices) {
 		return m_glDrawRangeElements(mode, start, end, count, type, indices);
 	}
-	
+
 	// Uniform Variables
 	inline GLint glGetUniformLocation(GLuint programID, const GLchar *pszName) {
 		return m_glGetUniformLocation(programID, pszName);
 	}
-	
-	inline void glUniform1i(GLint location, GLint v0) { 
-		return m_glUniform1i(location, v0); 
+
+	inline void glUniform1i(GLint location, GLint v0) {
+		return m_glUniform1i(location, v0);
 	}
-	
+
 	inline void glUniform1iv(GLint location, GLsizei count, const GLint *value) {
 		return m_glUniform1iv(location, count, value);
 	}
-	
+
 	inline void glUniform2iv(GLint location, GLsizei count, const GLint *value) {
 		return m_glUniform2iv(location, count, value);
 	}
-	
+
 	inline void glUniform3iv(GLint location, GLsizei count, const GLint *value) {
 		return m_glUniform3iv(location, count, value);
 	}
-	
+
 	inline void glUniform4iv(GLint location, GLsizei count, const GLint *value) {
 		return m_glUniform4iv(location, count, value);
 	}
-	
+
 	inline void glUniform1f(GLint location, GLfloat v0) {
 		return m_glUniform1f(location, v0);
 	}
-	
+
 	inline void glUniform1fv(GLint location, GLsizei count, const GLfloat *value) {
 		return m_glUniform1fv(location, count, value);
 	}
-	
+
 	inline void glUniform2fv(GLint location, GLsizei count, const GLfloat *value) {
 		return m_glUniform2fv(location, count, value);
 	}
-	
+
 	inline void glUniform3fv(GLint location, GLsizei count, const GLfloat *value) {
 		return m_glUniform3fv(location, count, value);
 	}
-	
+
 	inline void glUniform4fv(GLint location, GLsizei count, const GLfloat *value) {
 		return m_glUniform4fv(location, count, value);
 	}
-	
+
 	inline void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
 		return m_glUniformMatrix4fv(location, count, transpose, value);
 	}
-	
+
 	inline void glGetActiveUniform(GLuint programID, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *pszName) {
 		return m_glGetActiveUniform(programID, index, bufSize, length, size, type, pszName);
 	}
@@ -143,77 +143,83 @@ public:
 	inline void glGetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar *const*uniformNames, GLuint *uniformIndices) {
 		return m_glGetUniformIndices(program, uniformCount, uniformNames, uniformIndices);
 	}
-	
+
 	// Attributes
 	inline GLint glGetAttribLocation(GLuint programID, const GLchar *pszName) {
 		return m_glGetAttribLocation(programID, pszName);
 	}
-	
+
 	inline void glVertexAttrib1f(GLuint index, GLfloat x) {
 		return m_glVertexAttrib1f(index, x);
 	}
-	
+
 	inline void glVertexAttrib1fv(GLuint index, const GLfloat *v) {
 		return m_glVertexAttrib1fv(index, v);
 	}
-	
+
 	inline void glVertexAttrib2fv(GLuint index, const GLfloat *v) {
 		return m_glVertexAttrib2fv(index, v);
 	}
-	
+
 	inline void glVertexAttrib3fv(GLuint index, const GLfloat *v) {
 		return m_glVertexAttrib3fv(index, v);
 	}
-	
+
 	inline void glVertexAttrib4fv(GLuint index, const GLfloat *v) {
 		return m_glVertexAttrib4fv(index, v);
 	}
-	
+
 	inline void glEnableVertexAttribArray(GLuint index) {
 		return m_glEnableVertexAttribArray(index);
 	}
-	
+
 	inline void glDisableVertexAttribArray(GLuint index) {
 		return m_glDisableVertexAttribArray(index);
 	}
-	
+
 	inline void glBindAttribLocation(GLuint programID, GLuint index, const GLchar *pszName) {
 		return m_glBindAttribLocation(programID, index, pszName);
 	}
 
+	// Blending
+
 	inline void glBlendEquation(GLenum mode) {
 		return m_glBlendEquation(mode);
 	}
-	
+
+	inline void glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha) {
+		return m_glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
+	}
+
 	// Shader
-	inline void glAttachShader(GLuint programID, GLuint shaderID) { 
-		return m_glAttachShader(programID, shaderID); 
+	inline void glAttachShader(GLuint programID, GLuint shaderID) {
+		return m_glAttachShader(programID, shaderID);
 	}
-	
-	inline void glDetachShader(GLuint programID, GLuint shaderID) { 
-		return m_glDetachShader(programID, shaderID); 
+
+	inline void glDetachShader(GLuint programID, GLuint shaderID) {
+		return m_glDetachShader(programID, shaderID);
 	}
-	
-	inline GLuint glCreateShader(GLenum type) { 
-		return m_glCreateShader(type); 
+
+	inline GLuint glCreateShader(GLenum type) {
+		return m_glCreateShader(type);
 	}
-	
-	inline void glDeleteShader(GLuint shader) { 
-		return m_glDeleteShader(shader); 
+
+	inline void glDeleteShader(GLuint shader) {
+		return m_glDeleteShader(shader);
 	}
-	
+
 	inline void glShaderSource(GLuint shader, GLsizei count, const GLchar *const*string, const GLint *length) {
 		return m_glShaderSource(shader, count, string, length);
 	}
-	
-	inline void glCompileShader(GLuint shaderID) { 
-		return m_glCompileShader(shaderID); 
+
+	inline void glCompileShader(GLuint shaderID) {
+		return m_glCompileShader(shaderID);
 	}
-	
+
 	inline void glGetShaderiv(GLuint shader, GLenum pname, GLint *params) {
 		return m_glGetShaderiv(shader, pname, params);
 	}
-	
+
 	inline void glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
 		return m_glGetShaderInfoLog(shader, bufSize, length, infoLog);
 	}
@@ -270,10 +276,14 @@ public:
 		return m_glGenRenderbuffers(n, renderbuffers);
 	}
 
+	inline void glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+		return m_glDeleteRenderbuffers(n, renderbuffers);
+	}
+
 	inline void glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
 		return m_glBindRenderbuffer(target, renderbuffer);
 	}
-	
+
 	inline void glRenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height) {
 		return m_glRenderbufferStorage(target, internalformat, width, height);
 	}
@@ -310,11 +320,11 @@ public:
 	inline void glGenBuffers(GLsizei n, GLuint *buffers) {
 		return m_glGenBuffers(n, buffers);
 	}
-	
+
 	inline void glBindBuffer(GLenum target, GLuint bufferID) {
 		return m_glBindBuffer(target, bufferID);
 	}
-	
+
 	inline void glBufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
 		return m_glBufferData(target, size, data, usage);
 	}
@@ -322,7 +332,7 @@ public:
 	inline void glBufferSubData(GLenum target, GLsizeiptr offset, GLsizeiptr size, const void *data) {
 		return m_glBufferSubData(target, offset, size, data);
 	}
-	
+
 	inline void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
 		return m_glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 	}
@@ -335,13 +345,46 @@ public:
 	inline void glGenVertexArrays(GLsizei n, GLuint *arrays) {
 		return m_glGenVertexArrays(n, arrays);
 	}
-	
+
 	inline void glBindVertexArray(GLuint array) {
 		return m_glBindVertexArray(array);
 	}
-	
+
 	inline void glDeleteVertexArrays(GLsizei n, const GLuint *arrays) {
 		return m_glDeleteVertexArrays(n, arrays);
+	}
+
+	// Queries 
+	inline void glGenQueries(GLsizei n, GLuint *ids) {
+		return m_glGenQueries(n, ids);
+	}
+
+	inline void glDeleteQueries(GLsizei n, const GLuint *ids) {
+		return m_glDeleteQueries(n, ids);
+	}
+
+	inline GLboolean glIsQuery(GLuint id) {
+		return m_glIsQuery(id);
+	}
+
+	inline void glBeginQuery(GLenum target, GLuint id) {
+		return m_glBeginQuery(target, id);
+	}
+
+	inline void glEndQuery(GLenum target) {
+		return m_glEndQuery(target);
+	}
+
+	inline void glGetQueryiv(GLenum target, GLenum pname, GLint *params) {
+		return m_glGetQueryiv(target, pname, params);
+	}
+
+	inline void glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params) {
+		return m_glGetQueryObjectiv(id, pname, params);
+	}
+
+	inline void glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params) {
+		return m_glGetQueryObjectuiv(id, pname, params);
 	}
 
 private:
@@ -395,7 +438,10 @@ private:
 	PFNGLENABLEVERTEXATTRIBARRAYPROC m_glEnableVertexAttribArray;
 	PFNGLDISABLEVERTEXATTRIBARRAYPROC m_glDisableVertexAttribArray;
 	PFNGLBINDATTRIBLOCATIONPROC m_glBindAttribLocation;
+	
+	// Blending
 	PFNGLBLENDEQUATIONPROC m_glBlendEquation;
+	PFNGLBLENDFUNCSEPARATEPROC m_glBlendFuncSeparate;
 
 	// Shader
 	PFNGLATTACHSHADERPROC m_glAttachShader;
@@ -416,14 +462,17 @@ private:
 	PFNGLTEXIMAGE2DMULTISAMPLEPROC m_glTexImage2DMultisample;
 	//PFNGLTEXPARAMETERIPROC m_glTexParameteri;
 	//PFNGLTEXIMAGE2DPROC m_glTexImage2D;
+	//PFNGLCOPYTEXIMAGE2DPROC m_glCopyTexImage2D;	// part of core
 	//PFNGLTEXSUBIMAGE2DPROC m_glTexSubImage2D;
 	PFNGLGENERATEMIPMAPPROC m_glGenerateMipmap;
+
 
 	// FBO
 	PFNGLGENFRAMEBUFFERSPROC m_glGenFramebuffers;
 	PFNGLBINDFRAMEBUFFERPROC m_glBindFramebuffer;
 
 	PFNGLGENRENDERBUFFERSPROC m_glGenRenderbuffers;
+	PFNGLDELETERENDERBUFFERSPROC m_glDeleteRenderbuffers;
 	PFNGLBINDRENDERBUFFERPROC m_glBindRenderbuffer;
 	PFNGLRENDERBUFFERSTORAGEPROC m_glRenderbufferStorage;
 	PFNGLRENDERBUFFERSTORAGEMULTISAMPLEPROC m_glRenderBufferStorageMultisample;
@@ -447,6 +496,16 @@ private:
 	PFNGLGENVERTEXARRAYSPROC m_glGenVertexArrays;
 	PFNGLBINDVERTEXARRAYPROC m_glBindVertexArray;
 	PFNGLDELETEVERTEXARRAYSPROC m_glDeleteVertexArrays;
+
+	// QUERY
+	PFNGLGENQUERIESPROC m_glGenQueries;
+	PFNGLDELETEQUERIESPROC m_glDeleteQueries;
+	PFNGLISQUERYPROC m_glIsQuery;
+	PFNGLBEGINQUERYPROC m_glBeginQuery;
+	PFNGLENDQUERYPROC m_glEndQuery;
+	PFNGLGETQUERYIVPROC m_glGetQueryiv;
+	PFNGLGETQUERYOBJECTIVPROC m_glGetQueryObjectiv;
+	PFNGLGETQUERYOBJECTUIVPROC m_glGetQueryObjectuiv;
 };
 
 #endif // ! OPEN_GL_EXTENSION_H_

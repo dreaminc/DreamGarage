@@ -10,8 +10,7 @@
 // TODO: Should this go into Sense?
 
 #include "HMD/HMD.h"
-#include "OVRTextureSwapChain.h"
-#include "HAL/opengl/OGLDepthbuffer.h"
+#include "HAL/opengl/OGLAttachment.h"
 
 // TODO: Better way?
 #define HMD_OVR_USE_PREDICTED_TIMING
@@ -31,27 +30,38 @@
 class OGLFramebuffer;
 
 class OVRHMD : public HMD {
+	friend class OVRHMDSinkNode;
+
 public:
 	OVRHMD(SandboxApp *pParentSandbox);
 	~OVRHMD();
 
+	virtual HMDSinkNode *GetHMDSinkNode() override;
+	virtual HMDSourceNode *GetHMDSourceNode() override;
+	virtual RESULT InitializeHMDSourceNode() override;
+	virtual RESULT InitializeHMDSinkNode() override;
+
 	//RESULT InitializeHMD(HALImp *halimp);
-	RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
-	RESULT UpdateHMD();
-	RESULT ReleaseHMD();
+	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) override;
+	virtual RESULT UpdateHMD() override;
+	virtual RESULT ReleaseHMD() override;
 
-	RESULT SetUpFrame();
-	RESULT BindFramebuffer(EYE_TYPE eye);
-	RESULT CommitSwapChain(EYE_TYPE eye);
-	RESULT SubmitFrame();
+	virtual RESULT SetUpFrame() override;
+	virtual RESULT BindFramebuffer(EYE_TYPE eye) override;
+	virtual RESULT CommitSwapChain(EYE_TYPE eye) override;
+	virtual RESULT SubmitFrame() override;
 
-	RESULT SetAndClearRenderSurface(EYE_TYPE eye);
-	RESULT UnsetRenderSurface(EYE_TYPE eye);
+	virtual RESULT SetAndClearRenderSurface(EYE_TYPE eye) override;
+	virtual RESULT UnsetRenderSurface(EYE_TYPE eye) override;
 
-	RESULT RenderHMDMirror();
+	virtual RESULT RenderHMDMirror() override;
 
-	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
-	ViewMatrix GetViewMatrix(EYE_TYPE eye);
+	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
+	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
+
+protected:
+	inline const ovrSession &GetOVRSession() { return m_ovrSession; }
+	inline const ovrHmdDesc &GetOVRHMDDescription() { return m_ovrHMDDescription; }
 
 private:
 	RESULT UpdateSenseController(ovrControllerType type, ovrInputState& inputState);
@@ -59,12 +69,9 @@ private:
 public:
 	ovrSession m_ovrSession;
 	ovrHmdDesc m_ovrHMDDescription;
-	ovrEyeRenderDesc m_ovrEyeRenderDescription[2];
-	std::vector<ovrTrackerDesc>   m_TrackerDescriptions;
-	ovrLayerEyeFov m_ovrLayer;
+	std::vector<ovrTrackerDesc> m_TrackerDescriptions;
 
-	// Texture Swap Chains
-	OVRTextureSwapChain *m_ovrTextureSwapChains[HMD_NUM_EYES];
+	// Mirror Texture (TODO: Move to separate sink node)
 	OVRMirrorTexture *m_ovrMirrorTexture;
 	//OGLDepthbuffer *m_depthbuffers[HMD_NUM_EYES];		// TODO: Push this into the swap chain
 
@@ -73,6 +80,10 @@ public:
 
 	composite *m_pLeftControllerModel;
 	composite *m_pRightControllerModel;
+
+private:
+	OVRHMDSinkNode *m_pOVRHMDSinkNode = nullptr;
+	//OVRHMDSourceNode *m_pOVRHMDSourceNode = nullptr;
 	
 };
 

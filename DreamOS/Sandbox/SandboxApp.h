@@ -128,6 +128,9 @@ public:
 	virtual RESULT InitializeHAL();
 	RESULT SetUpHALPipeline(Pipeline* pRenderPipeline);		// TODO: this goes up to DreamOS soon
 
+	// HMD
+	RESULT InitializeHMD();
+
 public:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
 	const HALImp::HALConfiguration& GetHALConfiguration();
@@ -201,6 +204,7 @@ public:
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(const texture &srcTexture);
 
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);
@@ -244,10 +248,12 @@ public:
 	RESULT UnregisterUpdateCallback();
 	RESULT ResizeViewport(viewport newViewport);
 
-
 	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
+
+	CameraNode* GetCameraNode() { return m_pCamera; }
+	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
 
 	hand *GetHand(hand::HAND_TYPE handType);
 

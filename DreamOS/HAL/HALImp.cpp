@@ -72,6 +72,19 @@ RESULT HALImp::SetHMD(HMD *pHMD) {
 	return r;
 }
 
+RESULT HALImp::SetViewport(const viewport &newViewport) {
+	m_viewport = newViewport;
+	return R_PASS;
+}
+
+RESULT HALImp::SetViewport(int pxWidth, int pxHeight) {
+	return m_viewport.ResizeViewport(pxWidth, pxHeight);
+}
+
+const viewport& HALImp::GetViewport() {
+	return m_viewport;
+}
+
 // TODO: Remove this, this will eventually just be a node
 RESULT HALImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
 	RESULT r = R_PASS;
@@ -115,40 +128,11 @@ Error:
 	return r;
 }
 
-RESULT HALImp::Render(ObjectStore* pSceneGraph, stereocamera* pCamera, EYE_TYPE eye) {
+RESULT HALImp::Render() {
 	RESULT r = R_PASS;
-
-	// TODO: Replace this with source nodes
-	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
-	VirtualObj *pVirtualObj = nullptr;
-
-	static EYE_TYPE lastEye = EYE_INVALID;
-
-	std::vector<light*> *pLights = nullptr;
-	pObjectStore->GetLights(pLights);
-
-	m_pCamera->SetCameraEye(eye);
-
-	ClearHALBuffers();
-	ConfigureHAL();
-
-	// Camera Projection Matrix
-	if (m_pHMD != nullptr) {
-		m_pCamera->ResizeCamera(m_pHMD->GetEyeWidth(), m_pHMD->GetEyeHeight());
-		m_pHMD->SetAndClearRenderSurface(eye);
-	}
-	else {
-		SetViewTarget(eye, pCamera->GetViewWidth(), pCamera->GetViewHeight());
-	}
 
 	// Pipeline stuff
 	m_pRenderPipeline->RunPipeline();
-
-	// Commit frame to HMD
-	if (m_pHMD) {
-		m_pHMD->UnsetRenderSurface(eye);
-		m_pHMD->CommitSwapChain(eye);
-	}
 
 	FlushHALBuffers();
 

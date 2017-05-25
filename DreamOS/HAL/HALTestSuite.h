@@ -25,6 +25,26 @@ public:
 	virtual RESULT AddTests() override;
 
 public:
+	// Note: This should eventually call the DreamGarageApp pipeline
+	// function rather than duplicating it
+	RESULT AddTestEnvironmentShader();
+
+	RESULT AddTestText();
+
+	// TODO: Consolidate the HMD tests 
+	RESULT AddTestMinimalShaderHMD();
+	RESULT AddTestBlinnPhongShaderHMD();
+	RESULT AddTestBlinnPhongShaderBlurHMD();
+	RESULT AddTestBlinnPhongShaderTextureHMD();
+	RESULT AddTestBlinnPhongShaderTextureCopy();
+
+	RESULT AddTestMinimalShader();
+	RESULT AddTestMinimalTextureShader();
+	RESULT AddTestBlinnPhongShaderBlur();
+	RESULT AddTestBlinnPhongShaderTexture();
+
+	RESULT AddTestDepthPeelingShader();
+
 	RESULT AddTestRenderToTextureQuad();
 	RESULT AddTestFramerateVolumes();
 	RESULT AddTestAlphaVolumes();

@@ -67,13 +67,15 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		iconFormat.height,
 		iconFormat.ptPosition
 	);
+
 	if (iconFormat.pTexture != nullptr)
 		pIcon->SetColorTexture(iconFormat.pTexture.get());
 	else
 		pIcon->SetVisible(false);
 
 	m_pContextComposite->RenderToTexture(pContext);
-	m_pQuad->SetColorTexture(pContext->GetFramebuffer()->GetTexture());
+
+	m_pQuad->UpdateColorTexture(pContext->GetFramebuffer()->GetColorTexture());
 
 Error:
 	return r;

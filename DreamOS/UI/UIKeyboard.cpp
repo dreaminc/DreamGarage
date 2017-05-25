@@ -10,6 +10,7 @@
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
+	// empty
 }
 
 RESULT UIKeyboard::InitializeApp(void *pContext) {
@@ -103,7 +104,7 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			std::shared_ptr<text> pText = m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
 			GetDOS()->RenderToTexture(m_pQuadTextures);
 
-			m_keyCharAtlas[pKey->m_letter] = m_pQuadTextures->GetFramebuffer()->GetTexture();
+			m_keyCharAtlas[pKey->m_letter] = GetDOS()->MakeTexture(*(m_pQuadTextures->GetFramebuffer()->GetColorTexture()));
 
 			// Set up key quad texture
 			if (m_pQuadTextures->HasChildren()) 
@@ -112,10 +113,10 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			auto keyBack = m_pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
 			keyBack->SetColorTexture(m_pKeyTexture.get());
 
-			m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
+			pText = m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
 			GetDOS()->RenderToTexture(m_pQuadTextures);
 
-			auto pTexture = m_pQuadTextures->GetFramebuffer()->GetTexture();
+			auto pTexture = GetDOS()->MakeTexture(*(m_pQuadTextures->GetFramebuffer()->GetColorTexture()));
 			m_keyTextureAtlas[pKey->m_letter] = pTexture;
 		}
 	}
@@ -139,6 +140,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 		for (auto& pKey : layoutRow) {
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(keyDimension, keyDimension);
+
 			if (m_keyTextureAtlas[pKey->m_letter])
 				pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]);
 

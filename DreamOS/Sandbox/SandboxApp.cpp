@@ -13,6 +13,8 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
 
+#include <HMD/HMDFactory.h>
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
@@ -437,24 +439,7 @@ RESULT SandboxApp::RunAppLoop() {
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 		//m_pOpenGLImp->Render(m_pSceneGraph);
 
-		///*
-		// Send to the HMD
-		// TODO reorganize Render functions
-		// need to be re-architected so that the HMD functions are called after all of the 
-		// GL functions per eye.
-		if (m_pHMD != nullptr) {
-			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_LEFT);
-			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_RIGHT);
-
-			m_pHMD->SubmitFrame();
-			m_pHMD->RenderHMDMirror();
-		}
-		else {
-			// Render Scene
-			m_pHALImp->Render(m_pSceneGraph, m_pCamera, EYE_MONO);
-		}
-		//*/
+		m_pHALImp->Render();
 
 		// Swap buffers
 		SwapDisplayBuffers();
@@ -521,14 +506,22 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	//m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
+	
+	// This will prevent scene graph from being deleted when not connected
+	// TODO: Attach to Sandbox somehow?
+	CB(m_pSceneGraph->incRefCount());
 
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
 	CRM(InitializeCamera(), "Failed to initialize Camera");
-
 	CRM(InitializeHAL(), "Failed to initialize HAL");
+
+	CRM(InitializeHMD(), "Failed to initialize HMD");
+
+	// Set up the pipeline
+	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
 
 	// Generalize this module pattern
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
@@ -646,11 +639,37 @@ RESULT SandboxApp::InitializeCamera() {
 	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), m_viewport);
 	CN(m_pCamera);
 
+	// This will prevent camera from being deleted when not connected
+	CB(m_pCamera->incRefCount());
+
 Error:
 	return r;
 }
 
-// TODO: Move this to sandbox
+// Note: This needs to be done after GL set up
+RESULT SandboxApp::InitializeHMD() {
+	RESULT r = R_PASS;
+
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
+
+	int pxWidth, pxHeight;
+	GetSandboxWindowSize(pxWidth, pxHeight);
+
+	if (GetSandboxConfiguration().fUseHMD) {
+		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, pxWidth, pxHeight);
+
+		if (m_pHMD != nullptr) {
+			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::InitializeHAL() {
 	RESULT r = R_PASS;
 
@@ -669,8 +688,6 @@ RESULT SandboxApp::InitializeHAL() {
 	CR(m_pHALImp->InitializeHAL());
 	CR(m_pHALImp->InitializeRenderPipeline());
 
-	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
-
 Error:
 	return r;
 }
@@ -679,7 +696,15 @@ Error:
 RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	RESULT r = R_PASS;
 
-	SinkNode* pDestSinkNode = m_pHALImp->MakeSinkNode("display");
+	// TODO: Get from HMD if HMD is valid
+	SinkNode* pDestSinkNode = nullptr;
+
+	if (m_pHMD == nullptr) {
+		pDestSinkNode = m_pHALImp->MakeSinkNode("display");
+	}
+	else {
+		pDestSinkNode = (SinkNode*)(m_pHMD->GetHMDSinkNode());
+	}
 	CN(pDestSinkNode);
 
 	CNM(pRenderPipeline, "Pipeline not initialized");
@@ -688,68 +713,7 @@ RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
 	pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
 	CNM(pDestSinkNode, "Destination sink node isn't set");
 
-	// Source Nodes
-	// TODO: 
-
-	CR(m_pHALImp->MakeCurrentContext());
-	{
-		// Set up OGL programs
-		//std::shared_ptr<ProgramNode> pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
-		//CN(pOGLProgramShadowDepth);
-
-		// TODO(NTH): Add a program / render pipeline arch
-		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
-		//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
-
-		ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("environment");
-		//ProgramNode* pRenderProgramNode = m_pHALImp->MakeProgramNode("minimal_texture");
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
-
-		//ProgramNode* pSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
-		ProgramNode* pSkyboxProgram = m_pHALImp->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
-
-		// Reference Geometry Shader Program
-		//std::shared_ptr<ProgramNode> pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-		ProgramNode* pReferenceGeometryProgram = m_pHALImp->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pSceneGraph->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
-
-		ProgramNode* pDreamConsoleProgram = m_pHALImp->MakeProgramNode("debugconsole");
-		CN(pDreamConsoleProgram);
-		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pCamera->Output("stereocamera")));
-
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-		//std::shared_ptr<ProgramNode> pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
-
-		// Connect Program to Display
-		
-		// Connected in parallel (order matters)
-		// NOTE: Right now this won't work with mixing for example
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
-
-		//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		/*
-		//pOGLRenderProgram->SetOGLProgramDepth(pOGLProgramShadowDepth);
-
-		
-
-		*/
-	}
-
-	CR(m_pHALImp->ReleaseCurrentContext());
+	CB(pDestSinkNode->incRefCount());
 
 Error:
 	return r;
@@ -1081,6 +1045,10 @@ Error:
 		pText = nullptr;
 	}
 	return nullptr;
+}
+
+texture* SandboxApp::MakeTexture(const texture &srcTexture) {
+	return m_pHALImp->MakeTexture(srcTexture);
 }
 
 texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
