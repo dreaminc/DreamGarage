@@ -1047,6 +1047,10 @@ Error:
 	return nullptr;
 }
 
+texture* SandboxApp::MakeTexture(const texture &srcTexture) {
+	return m_pHALImp->MakeTexture(srcTexture);
+}
+
 texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
 	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, format, channels, pBuffer, pBuffer_n);
 }

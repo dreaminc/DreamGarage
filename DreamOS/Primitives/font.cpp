@@ -8,11 +8,12 @@
 
 #include "Primitives/composite.h"
 
-Font::Font(const std::wstring& fnt_file, composite *pContext, bool distanceMap) {
+Font::Font(const std::wstring& fnt_file, composite *pContext, bool fDistanceMap) {
 	LoadFontFromFile(fnt_file);
-	wchar_t* strFile = (wchar_t*)(L"Fonts/" + GetGlyphImageFile()).c_str();
-	m_pTexture = pContext->MakeTexture(strFile, texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	m_fDistanceMap = distanceMap;
+	std::wstring strFile = L"Fonts/" + GetGlyphImageFile();
+	const wchar_t* pszFile = strFile.c_str();
+	m_pTexture = pContext->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_fDistanceMap = fDistanceMap;
 }
 
 Font::Font(const std::wstring& fnt_file, bool distanceMap)
@@ -23,7 +24,7 @@ Font::Font(const std::wstring& fnt_file, bool distanceMap)
 
 Font::~Font()
 {
-
+	// empty
 }
 
 template <typename T>

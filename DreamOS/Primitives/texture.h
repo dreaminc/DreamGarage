@@ -46,6 +46,7 @@ public:
 
 public:
 	texture();
+	texture(const texture& tex);
 	texture(texture::TEXTURE_TYPE type);
 	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, int samples = 0);
 	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples = 0);

@@ -29,10 +29,14 @@ public:
 	// function rather than duplicating it
 	RESULT AddTestEnvironmentShader();
 
+	RESULT AddTestText();
+
+	// TODO: Consolidate the HMD tests 
 	RESULT AddTestMinimalShaderHMD();
 	RESULT AddTestBlinnPhongShaderHMD();
 	RESULT AddTestBlinnPhongShaderBlurHMD();
 	RESULT AddTestBlinnPhongShaderTextureHMD();
+	RESULT AddTestBlinnPhongShaderTextureCopy();
 
 	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalTextureShader();

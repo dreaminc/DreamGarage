@@ -24,6 +24,7 @@ public:
 	};
 
 	OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget = GL_TEXTURE_2D);
+	OGLTexture(const OGLTexture &pOGLTexture);
 private: 
 
 	// TODO: remove all these
@@ -75,11 +76,16 @@ public:
 	static GLenum GetOGLPixelFormat(texture::PixelFormat pixelFormat, int channels = 3);
 
 	GLenum GetOGLTextureTarget() { return m_textureTarget; }
+	GLint GetOGLInternalFormat() { return m_glInternalFormat; }
+	GLenum GetOGLFormat() { return m_glFormat; }
 
 private:
 	GLenum GetOGLPixelFormat();
+	RESULT CopyTextureBufferFromTexture(OGLTexture *pTexture);
+	size_t GetTextureByteSize();
 
 public:
+	static OGLTexture *MakeTexture(const texture &srcTexture);
 	static OGLTexture *MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, int levels = 0, int samples = 1);
 	static OGLTexture *MakeTextureWithFormat(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, GLint internalGLFormat = GL_DEPTH_COMPONENT24, GLenum glFormat = GL_DEPTH_COMPONENT, GLenum pixelDataType = GL_UNSIGNED_INT, int levels = 1, int samples = 0);
 	static OGLTexture *MakeTextureFromAllocatedTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget, GLuint textureID, int width, int height, int channels, int levels = 0, int samples = 1);
@@ -93,6 +99,12 @@ private:
 
 	GLuint m_textureIndex = 0;
 	GLenum m_textureTarget = 0;
+
+	// Note: this will work as long as the client is the one to allocate the texture
+	// if not these values may be incorrect 
+	GLint m_glInternalFormat; 
+	GLenum m_glFormat;
+	GLenum m_glPixelDataType;
 };
 
 #endif // !OGL_TEXTURE_H_

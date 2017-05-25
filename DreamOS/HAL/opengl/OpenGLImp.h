@@ -81,7 +81,8 @@ public:
 	
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) override;
-	virtual texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) override;
+	virtual texture* MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) override;
+	virtual texture* MakeTexture(const texture &srcTexture) override;
 	
 	skybox *MakeSkybox();
 
@@ -162,7 +163,7 @@ public:
 	RESULT glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
 	RESULT glBlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
 	RESULT glDrawBuffers(GLsizei n, const GLenum *bufs);
-
+	
 
 	RESULT glGenVertexArrays(GLsizei n, GLuint *arrays);
 	RESULT glBindVertexArray(GLuint gluiArray);

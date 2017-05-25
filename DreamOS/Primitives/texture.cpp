@@ -16,6 +16,19 @@ texture::texture() :
 	Validate();
 }
 
+texture::texture(const texture& tex) :
+	m_pImageBuffer(nullptr),
+	m_width(tex.m_width),
+	m_height(tex.m_height),
+	m_channels(tex.m_channels),
+	m_samples(tex.m_samples),
+	m_format(tex.m_format),
+	m_type(tex.m_type)
+{
+	// NOTE: this will not copy buffers on either GPU or CPU side
+	Validate();
+}
+
 texture::texture(texture::TEXTURE_TYPE type) :
 	m_pImageBuffer(nullptr),
 	m_type(type)

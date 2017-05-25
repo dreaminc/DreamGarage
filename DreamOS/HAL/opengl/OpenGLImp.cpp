@@ -731,6 +731,25 @@ Error:
 		delete pTexture;
 		pTexture = nullptr;
 	}
+
+	return nullptr;
+}
+
+texture* OpenGLImp::MakeTexture(const texture &srcTexture) {
+	RESULT r = R_PASS;
+
+	texture *pTexture = OGLTexture::MakeTexture(srcTexture);
+	CN(pTexture);
+
+	//Success:
+	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+
 	return nullptr;
 }
 

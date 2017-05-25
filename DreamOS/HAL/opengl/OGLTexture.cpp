@@ -9,6 +9,19 @@ OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum
 	// This constructor should be used when deeper configuration is sought 
 }
 
+OGLTexture::OGLTexture(const OGLTexture &pOGLTexture) :
+	texture((const texture&)(pOGLTexture)),
+	m_textureIndex(0),
+	m_textureTarget(pOGLTexture.m_textureTarget),
+	m_pParentImp(pOGLTexture.m_pParentImp),
+	m_glFormat(pOGLTexture.m_glFormat),
+	m_glInternalFormat(pOGLTexture.m_glInternalFormat),
+	m_glPixelDataType(pOGLTexture.m_glPixelDataType)
+{
+	// empty
+	// NOTE: this will not copy buffers on either GPU or CPU side
+}
+
 /*
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) :
 	texture(type, width, height, format, channels, pBuffer, pBuffer_n),
@@ -93,6 +106,7 @@ Error:
 	return r;
 }
 
+// TODO: Border?
 RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internalGLFormat, GLenum glFormat, GLenum pixelDataType) {
 	RESULT r = R_PASS;
 	
@@ -100,6 +114,10 @@ RESULT OGLTexture::AllocateGLTexture(unsigned char *pImageBuffer, GLint internal
 
 	// TODO: Pull deeper settings from texture object
 	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, internalGLFormat, m_width, m_height, 0, glFormat, pixelDataType, pImageBuffer));
+
+	m_glInternalFormat = internalGLFormat;
+	m_glFormat = glFormat;
+	m_glPixelDataType = pixelDataType;
 
 Error:
 	return r;
@@ -166,6 +184,114 @@ OGLTexture* OGLTexture::MakeTextureWithFormat(OpenGLImp *pParentImp, texture::TE
 
 Error:
 	return pTexture;
+}
+
+size_t OGLTexture::GetTextureByteSize() {
+	size_t sizeVal = 0;
+
+	switch (m_glPixelDataType) {
+		case GL_UNSIGNED_BYTE:
+		case GL_BYTE:
+		case GL_UNSIGNED_BYTE_3_3_2:
+		case GL_UNSIGNED_BYTE_2_3_3_REV: {
+			sizeVal = sizeof(char);
+		} break;
+		
+		case GL_UNSIGNED_SHORT:
+		case GL_SHORT:
+		case GL_UNSIGNED_SHORT_5_6_5:
+		case GL_UNSIGNED_SHORT_5_6_5_REV:
+		case GL_UNSIGNED_SHORT_4_4_4_4:
+		case GL_UNSIGNED_SHORT_4_4_4_4_REV:
+		case GL_UNSIGNED_SHORT_5_5_5_1:
+		case GL_UNSIGNED_SHORT_1_5_5_5_REV: {
+			sizeVal = sizeof(short);
+		} break;
+
+		case GL_INT:
+		case GL_UNSIGNED_INT:
+		case GL_UNSIGNED_INT_8_8_8_8:
+		case GL_UNSIGNED_INT_8_8_8_8_REV:
+		case GL_UNSIGNED_INT_10_10_10_2:
+		case GL_UNSIGNED_INT_2_10_10_10_REV:
+		case GL_UNSIGNED_INT_24_8:
+		case GL_UNSIGNED_INT_10F_11F_11F_REV:
+		case GL_UNSIGNED_INT_5_9_9_9_REV: {
+			sizeVal = sizeof(int);
+		} break;
+		
+		case GL_HALF_FLOAT:
+		case GL_FLOAT:
+		case GL_FLOAT_32_UNSIGNED_INT_24_8_REV: {
+			sizeVal = sizeof(float);
+		} break;
+	}
+
+	sizeVal = sizeVal * m_width * m_channels * m_height;
+
+	return sizeVal;
+}
+
+// TODO: Border?
+RESULT OGLTexture::CopyTextureBufferFromTexture(OGLTexture *pTexture) {
+	RESULT r = R_PASS;
+
+	void *pTextureBuffer = nullptr;
+	size_t pTextureBuffer_n = GetTextureByteSize();
+
+	pTextureBuffer = (unsigned char*)malloc(pTextureBuffer_n);
+	CN(pTextureBuffer);
+	memset(pTextureBuffer, 0, pTextureBuffer_n);
+
+	CR(pTexture->Bind());
+	glGetTexImage(pTexture->GetOGLTextureTarget(), 0, pTexture->GetOGLFormat(), pTexture->m_glPixelDataType, pTextureBuffer);
+	CRM(m_pParentImp->CheckGLError(), "glGetTexImage failed");
+
+	// Bind Texture
+	CR(Bind());
+	CR(m_pParentImp->TexImage2D(m_textureTarget, 0, m_glInternalFormat, m_width, m_height, 0, m_glFormat, m_glPixelDataType, pTextureBuffer));
+
+	CRM(m_pParentImp->CheckGLError(), "glCopyTexImage2D failed");
+
+Error:
+	if (pTextureBuffer != nullptr) {
+		delete pTextureBuffer;
+		pTextureBuffer = nullptr;
+	}
+
+	return r;
+}
+
+OGLTexture* OGLTexture::MakeTexture(const texture &srcTexture) {
+	RESULT r = R_PASS;
+
+	OGLTexture *pDestTexture = nullptr;
+	OGLTexture *pSrcTexture = nullptr;
+
+	pSrcTexture = dynamic_cast<OGLTexture*>((texture*)(&srcTexture));
+	CNM(pSrcTexture, "Source texture not of type OGLTexture");
+
+	pDestTexture = new OGLTexture(*pSrcTexture);
+	CN(pDestTexture);
+
+	CR(pDestTexture->OGLInitialize(NULL));
+	//CR(pDestTexture->AllocateGLTexture());
+
+	CR(pDestTexture->CopyTextureBufferFromTexture(pSrcTexture));
+
+	// TODO: Rename or remove this / specialize more
+	CR(pDestTexture->SetDefaultTextureParams());
+
+	return pDestTexture;
+
+Error:
+
+	if (pDestTexture != nullptr) {
+		delete pDestTexture;
+		pDestTexture = nullptr;
+	}
+
+	return nullptr;
 }
 
 OGLTexture* OGLTexture::MakeTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, int width, int height, int channels, int levels, int samples) {

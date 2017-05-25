@@ -68,7 +68,7 @@ RESULT OGLProgramFlat::SetFlatContext(FlatContext *pFlatContext) {
 RESULT OGLProgramFlat::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
-	SetFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, m_pOGLFramebuffer->GetWidth(), m_pOGLFramebuffer->GetHeight(), m_pOGLFramebuffer->GetChannels());
+	//SetFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, m_pOGLFramebuffer->GetWidth(), m_pOGLFramebuffer->GetHeight(), m_pOGLFramebuffer->GetChannels());
 
 	CR(UseProgram());
 
