@@ -153,7 +153,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
-		ToggleVisible();
+		UpdateMenuVisibility(!IsVisible());
 	}
 	else {
 		m_pathStack.pop();
@@ -165,7 +165,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			HideMenu();
 		}
 		else {
-			ToggleVisible();
+			UpdateMenuVisibility(!IsVisible());
 		}
 	}
 Error:
@@ -263,7 +263,7 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
 		pComposite->GetPosition(),
-		GetInitialMenuOrientation() * quaternion::MakeQuaternionWithEuler(0.0f, (float)(M_PI_2), 0.0f),
+		m_qMenuOrientation * quaternion::MakeQuaternionWithEuler(0.0f, (float)(M_PI_2), 0.0f),
 		pComposite->GetScale(),
 		0.5f,
 		AnimationCurveType::EASE_OUT_QUART, // may want to try ease_in here
@@ -283,7 +283,7 @@ RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
 		pComposite->GetPosition(),
-		GetInitialMenuOrientation(),
+		m_qMenuOrientation,
 		pComposite->GetScale(),
 		0.5f,
 		AnimationCurveType::EASE_OUT_QUART,
@@ -336,4 +336,13 @@ Error:
 DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamUIBar *pDreamApp = new DreamUIBar(pDreamOS, pContext);
 	return pDreamApp;
+}
+
+RESULT DreamUIBar::UpdateMenuVisibility(bool fVisible) {
+	if (fVisible) {
+		UpdateCompositeWithCameraLook(0.0f, 0.0f);
+		m_qMenuOrientation = GetComposite()->GetOrientation(); // save for use in animations
+	}
+	SetVisible(fVisible);
+	return R_PASS;
 }

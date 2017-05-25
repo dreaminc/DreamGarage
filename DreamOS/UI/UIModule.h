@@ -33,9 +33,7 @@ public:
 	std::shared_ptr<UIMenuLayer> GetCurrentLayer();
 
 	std::shared_ptr<UIMenuItem> GetMenuItem(VirtualObj* pObj);
-	quaternion GetInitialMenuOrientation();
 
-	RESULT ToggleVisible();
 	RESULT Show();
 	RESULT Hide();
 	RESULT SetVisible(bool fVisible);
@@ -49,8 +47,6 @@ protected:
 	//TODO: when multiple layers are needed, implement currentUILayer 
 	// as an iterator with public Set/Previous/Next functions
 	std::shared_ptr<UIMenuLayer> m_pCurrentUILayer;
-
-	float m_headRotationYDeg;  // can be removed with composite collision code
 };
 
 #endif // ! UI_MODULE_H_

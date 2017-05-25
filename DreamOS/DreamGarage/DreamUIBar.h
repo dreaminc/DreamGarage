@@ -63,6 +63,9 @@ protected:
 	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
+	RESULT UpdateMenuVisibility(bool fVisible);
+
+private:
 	//Cloud member variables
 	CloudController *m_pCloudController = nullptr;
 	MenuControllerProxy *m_pMenuControllerProxy = nullptr;
@@ -72,6 +75,8 @@ private:
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
+
+	quaternion m_qMenuOrientation;
 };
 
 

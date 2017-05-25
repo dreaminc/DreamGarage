@@ -75,10 +75,10 @@ public:
 
 	RESULT SetKeyTypeThreshold(float threshold);
 	RESULT SetKeyReleaseThreshold(float threshold);
+	RESULT SetSurfaceOffset(point ptOffset);
 
 private:
 	RESULT UIKeyboard::UpdateViewQuad();
-	RESULT UIKeyboard::UpdateAppComposite();
 	RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType);
 
 public:

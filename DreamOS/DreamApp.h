@@ -82,6 +82,24 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) = 0;
 
 protected:
+
+	//template<class derivedAppType>
+	//TODO: move to the source file
+	RESULT UpdateCompositeWithCameraLook(float depth, float yPos) {
+
+		composite *pComposite = GetComposite();
+		auto pCamera = pComposite->GetCamera();
+		vector vLook = pCamera->GetLookVector();
+
+		vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
+		point lookOffset = depth * vLookXZ + point(0.0f, yPos, 0.0f);
+
+		pComposite->SetPosition(pCamera->GetPosition() + lookOffset);
+		pComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));
+
+		return R_PASS;
+	}
+
 	void *GetAppContext() {
 		return m_pContext;
 	}

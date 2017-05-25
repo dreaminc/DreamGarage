@@ -16,8 +16,8 @@ RESULT DreamControlView::InitializeApp(void *pContext) {
 
 	m_pViewQuad = GetComposite()->AddQuad(1.0f, 1.0f, 1, 1, nullptr, m_vNormal);
 	CN(m_pViewQuad);
-	m_pViewQuad->SetPosition(m_ptHiddenPosition);
 	CR(m_pViewQuad->SetVisible(false));
+	m_pViewQuad->SetMaterialAmbient(0.75f);
 
 	m_viewState = State::HIDDEN;
 
@@ -41,22 +41,17 @@ RESULT DreamControlView::OnAppDidFinishInitializing(void *pContext) {
 RESULT DreamControlView::Update(void *pContext) {
 	RESULT r = R_PASS;
 
-	quaternion qHeadRotation = GetDOS()->GetCameraOrientation();
-
-	RotationMatrix matOffset = RotationMatrix();
-	matOffset.SetQuaternionRotationMatrix(qHeadRotation);
-	point ptOffset = point(0.0f, 0.0f, -1.0f);
-	ptOffset = matOffset * ptOffset;
+	vector vLook = GetDOS()->GetCamera()->GetLookVector();
 
 	switch (m_viewState) {
 
 	case State::VISIBLE: {
-		if (ptOffset.y() > m_hideThreshold)
+		if (vLook.y() > m_hideThreshold)
 			Hide();
 	} break;
 		
 	case State::HIDDEN: {
-		if (ptOffset.y() < m_showThreshold)
+		if (vLook.y() < m_showThreshold)
 			Show();
 	} break;
 	
@@ -76,6 +71,9 @@ DreamControlView *DreamControlView::SelfConstruct(DreamOS *pDreamOS, void *pCont
 
 RESULT DreamControlView::Show() {
 	RESULT r = R_PASS;
+	UpdateCompositeWithCameraLook(1.0f, -1.0f);
+	m_ptVisiblePosition = GetComposite()->GetPosition();
+	m_ptHiddenPosition = GetComposite()->GetPosition() - point(0.0f, 1.0f, 0.0f);
 
 	auto fnStartCallback = [&](void *pContext) {
 		GetViewQuad()->SetVisible(true);
@@ -89,9 +87,9 @@ RESULT DreamControlView::Show() {
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pViewQuad.get(),
+		GetComposite(),
 		m_ptVisiblePosition,
-		m_pViewQuad->GetOrientation(),
+		GetComposite()->GetOrientation(),
 		vector(m_visibleScale, m_visibleScale, m_visibleScale),
 		0.1f,
 		AnimationCurveType::EASE_OUT_QUAD,
@@ -120,9 +118,9 @@ RESULT DreamControlView::Hide() {
 	};
 
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
-		m_pViewQuad.get(),
+		GetComposite(),
 		m_ptHiddenPosition,
-		m_pViewQuad->GetOrientation(),
+		GetComposite()->GetOrientation(),
 		vector(m_hiddenScale, m_hiddenScale, m_hiddenScale),
 		0.1f,
 		AnimationCurveType::EASE_OUT_QUAD,
