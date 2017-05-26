@@ -32,7 +32,10 @@ public:
 
 	virtual RESULT AddTests() override;
 
+	RESULT SetupPipeline();
+
 	RESULT AddTestCompositeRay();
+	RESULT AddTestCompositeRayNested();
 	RESULT AddTestCompositeRayController();
 
 	RESULT InitializeRayCompositeTest(void *pContext);
