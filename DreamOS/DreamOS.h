@@ -50,6 +50,7 @@ class DreamOS :
 	friend class UIModule;
 	friend class HALTestSuite;
 	friend class UITestSuite;
+	friend class InteractionEngineTestSuite;
 
 public:
 	DreamOS();

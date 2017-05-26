@@ -3,6 +3,10 @@
 
 #include "PhysicsEngine/CollisionManifold.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/SourceNode.h"
+
 InteractionEngineTestSuite::InteractionEngineTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -28,8 +32,11 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestCompositeRayNested());
+
+	CR(AddTestCompositeRay());
+
 	CR(AddTestCompositeRayController());
-	//CR(AddTestCompositeRay());
 
 Error:
 	return r;
@@ -155,6 +162,48 @@ RESULT InteractionEngineTestSuite::AddNestedCompositeQuads(int nestingLevel, flo
 Error:
 	return r;
 }
+
+RESULT InteractionEngineTestSuite::SetupPipeline() {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
 RESULT InteractionEngineTestSuite::InitializeRayCompositeTest(void* pContext) {
 	RESULT r = R_PASS;
 	m_pDreamOS->SetGravityState(false);
@@ -176,7 +225,6 @@ RESULT InteractionEngineTestSuite::InitializeRayCompositeTest(void* pContext) {
 	pTestContext->pComposite = pComposite;
 
 	pComposite->InitializeOBB();
-	//pComposite->SetMass(1.0f);
 
 	///*
 	pChildComposite = pComposite->AddComposite();
@@ -187,6 +235,7 @@ RESULT InteractionEngineTestSuite::InitializeRayCompositeTest(void* pContext) {
 	pSphere = pChildComposite->AddSphere(0.5f, 10, 10);
 	CN(pSphere);
 	pSphere->SetPosition(point(2.0f, 2.0f, 0.0f));
+	//pSphere->SetColor(COLOR_RED);
 
 	// Create the nested composites / quads
 	CR(AddNestedCompositeQuads(nNesting, size, pChildComposite));
@@ -206,6 +255,7 @@ RESULT InteractionEngineTestSuite::InitializeRayCompositeTest(void* pContext) {
 		pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
 		CN(pTestContext->pCollidePoint[i]);
 		pTestContext->pCollidePoint[i]->SetVisible(false);
+		pTestContext->pCollidePoint[i]->SetColor(COLOR_RED);
 	}
 
 	// Add Ray to interaction
@@ -315,6 +365,11 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 	// Initialize Code 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
 		CR(InitializeRayCompositeTest(pContext));
 
 	Error:
@@ -335,6 +390,171 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRay() {
 
 		CN(pTestContext->pComposite);
 		CN(pTestContext->pRay);
+
+		// Get ray from mouse
+		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
+		//pTestContext->pRay->UpdateFromRay(rCast);
+		//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+
+		///*
+		for (int i = 0; i < 4; i++) {
+			pTestContext->pCollidePoint[i]->SetVisible(false);
+		}
+
+		// Check for composite collisions using the ray
+		{
+			CollisionManifold manifold = pTestContext->pComposite->Collide(rCast);
+
+			if (manifold.NumContacts() > 0) {
+				for (int i = 0; i < manifold.NumContacts(); i++) {
+					pTestContext->pCollidePoint[i]->SetVisible(true);
+					pTestContext->pCollidePoint[i]->SetOrigin(manifold.GetContactPoint(i).GetPoint());
+				}
+			}
+		}
+		//*/
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		CR(ResetTest(pContext));
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Ray Events Test");
+	pNewTest->SetTestDescription("Event handling test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngineTestSuite::AddTestCompositeRayNested() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 100.0f;
+	int nRepeats = 1;
+
+	RayCompositeTestContext *pTestContext = new RayCompositeTestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupPipeline());
+
+		{
+			RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+			std::shared_ptr<composite> pChildComposite = nullptr;
+			composite *pComposite = nullptr;
+			std::shared_ptr<sphere> pSphere = nullptr;
+
+			// Create a complex composite
+			pComposite = m_pDreamOS->AddComposite();
+			CN(pComposite);
+
+			pTestContext->pComposite = pComposite;
+
+			pComposite->InitializeOBB();
+
+			///*
+			pChildComposite = pComposite->AddComposite();
+			CN(pChildComposite);
+			CR(pChildComposite->InitializeOBB());
+			//*/
+
+			auto pChildChildComposite = pChildComposite->AddComposite();
+			CN(pChildChildComposite);
+			CR(pChildChildComposite->InitializeOBB());
+
+			auto pActiveComposite = pChildChildComposite;
+
+			auto pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
+			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
+			pQuad->SetColor(COLOR_BLUE);
+
+			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
+			pQuad->SetPosition(point(1.5f, 0.0f, 0.0f));
+			pQuad->SetColor(COLOR_BLUE);
+
+			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
+			pQuad->SetPosition(point(-1.5f, 0.0f, 0.0f));
+			pQuad->SetColor(COLOR_BLUE);
+
+			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
+			pQuad->SetPosition(point(0.0f, 0.0f, 1.5f));
+			pQuad->SetColor(COLOR_BLUE);
+
+			pQuad = pActiveComposite->AddQuad(1.0f, 1.0f);
+			pQuad->SetPosition(point(0.0f, 0.0f, -1.5f));
+			pQuad->SetColor(COLOR_BLUE);
+
+			pChildComposite->SetPosition(point(1.0f, 0.0f, 0.0f));
+			pChildComposite->RotateYByDeg(45.0f);
+
+			pChildChildComposite->SetPosition(point(0.0f, 1.0f, 0.0f));
+			pChildChildComposite->RotateYByDeg(45.0f);
+
+			pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
+			pComposite->RotateXByDeg(90.0f);
+			//pComposite->RotateZByDeg(45.0f);
+
+			// The Ray
+			//pTestContext->pRay = m_pDreamOS->AddRay(point(-size / 2, size / 2, 2.0f), vector(0.0f, 0.0f, -1.0f).Normal());
+			//CN(pTestContext->pRay);
+
+			// Add composite to interaction
+			//CR(m_pDreamOS->AddInteractionObject(pComposite));
+
+			// Collide point spheres
+			for (int i = 0; i < 4; i++) {
+				pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+				CN(pTestContext->pCollidePoint[i]);
+				pTestContext->pCollidePoint[i]->SetVisible(false);
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		RayCompositeTestContext *pTestContext = reinterpret_cast<RayCompositeTestContext*>(pContext);
+		ray rCast;
+
+		CN(pTestContext->pComposite);
+		//CN(pTestContext->pRay);
 		
 		// Get ray from mouse
 		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
