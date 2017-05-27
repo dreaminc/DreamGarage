@@ -84,6 +84,14 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
+
+	/*
+	m_pTestSphereAbsolute = GetDOS()->AddSphere(0.025f, 10, 10);
+	m_pTestSphereAbsolute->SetColor(COLOR_RED);
+
+	m_pTestSphereRelative = GetComposite()->AddSphere(0.025f, 10, 10);
+	m_pTestSphereRelative->SetColor(COLOR_RED);
+	*/
 	
 	// Flip UV vertically
 	///*
@@ -161,8 +169,12 @@ Error:
 WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
 	WebBrowserPoint webPt;
 
+	ptIntersectionContact.w() = 1.0f;
+
 	// First apply transforms to the ptIntersectionContact 
 	point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
+	
+	//m_pTestSphereRelative->SetPosition(ptAdjustedContact);
 
 	float width = GetWidth();
 	float height = GetHeight();
@@ -198,6 +210,8 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	bool fUpdateMouse = false;
+
+	//m_pTestSphereAbsolute->SetPosition(pEvent->m_ptContact[0]);
 
 	switch (pEvent->m_eventType) {
 		case ELEMENT_INTERSECT_BEGAN: {
@@ -311,8 +325,14 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 	// First point of contact
 	if (fUpdateMouse) {
-		if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin())
-			m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
+		if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
+			//m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
+			point ptIntersectionContact = pEvent->m_ptContact[0];
+			ptIntersectionContact.w() = 1.0f;
+
+			point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
+			m_pPointerCursor->SetOrigin(ptAdjustedContact);
+		}
 	}
 
 Error:

@@ -214,6 +214,8 @@ RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 		m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 		m_pDreamBrowser->SetDiagonalSize(10.0f);
 
+		m_pDreamBrowser->SetPosition(point(0.0f, 1.0f, 0.0f));
+
 		// Cloud Controller
 		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
 		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
