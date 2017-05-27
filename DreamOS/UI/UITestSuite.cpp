@@ -17,6 +17,14 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
+#include "Sandbox/CommandLineManager.h"
+#include "Cloud/Environment/EnvironmentAsset.h"
+#include "Cloud/Menu/MenuNode.h"
+#include "Cloud/HTTP/HTTPController.h"
+#include "Cloud/WebRequest.h"
+
+#include "Core/Utilities.h"
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -39,11 +47,13 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBrowserRequestWithMenuAPI());
+	CR(AddTestBrowserRequest());
+
 	CR(AddTestKeyboard());
 
 	CR(AddTestBrowser());
 
-	CR(AddTestBrowserRequest());
 
 
 //	CR(AddTestInteractionFauxUI());
@@ -102,6 +112,187 @@ RESULT UITestSuite::Initialize() {
 	return r;
 }
 
+RESULT UITestSuite::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
+	RESULT r = R_PASS;
+
+	CR(pMenuNode->PrintMenuNode());
+
+	if (pMenuNode->NumSubMenuNodes() > 0) {
+		auto pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
+		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
+
+		for (auto &pSubMenuNode : pMenuNode->GetSubMenuNodes()) {
+			std::string strScope = pSubMenuNode->GetScope();
+			std::string strPath = pSubMenuNode->GetPath();
+			std::string strTitle = pSubMenuNode->GetTitle();
+
+			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
+				if (strTitle == "Share" || 
+					strTitle == "File" || 
+					strTitle == "Google Drive" || 
+					strTitle == "Golden" ||
+					strTitle == "People") 
+				{
+					CRM(pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle), "Failed to request sub menu");
+					return r;
+				}
+			}
+			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
+				auto pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+				CNM(pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+				CRM(pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+
+				return r;
+			}
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT UITestSuite::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	//https://api.develop.dreamos.com/environment-asset/{id}/file
+	
+	if (m_pDreamBrowser != nullptr) {
+		//CR(m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset));
+		//m_pDreamContentView->SetEnvironmentAsset(pEnvironmentAsset);
+		WebRequest webRequest;
+
+		std::wstring strEnvironmentAssetURI = util::StringToWideString(pEnvironmentAsset->GetURI());
+
+		webRequest.SetURL(strEnvironmentAssetURI);
+		//webRequest.SetURL(L"http://www.youtube.com");
+
+		auto pUserControllerProxy = dynamic_cast<UserControllerProxy*>(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::USER));
+		CN(pUserControllerProxy);
+		std::string strTokenValue = "Token " + pUserControllerProxy->GetUserToken();
+		std::wstring wstrTokenValue = util::StringToWideString(strTokenValue);
+
+		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
+		CR(webRequest.AddRequestHeader(L"Authorization", wstrTokenValue));
+		//CR(webRequest.AddRequestHeader(L"Authorization", L"Tokenz"));
+
+		// NOTE: this is kind of working, data is clearly being sent but there's
+		// no real support for form/file etc yet
+		// This is not yet needed
+		// TODO: Break this out into a separate UI suite (Browser/CEF)
+		//CR(webRequest.AddPostDataElement(L"post data element"));
+
+		CR(m_pDreamBrowser->LoadRequest(webRequest));
+	}
+	
+
+Error:
+	return r;
+}
+
+
+RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::string strURL = "http://www.youtube.com";
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		// Create the Browser
+		m_pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
+		CNM(m_pDreamBrowser, "Failed to create dream browser");
+
+		// Set up the view
+		//pDreamBrowser->SetParams(point(0.0f), 5.0f, 1.0f, vector(0.0f, 0.0f, 1.0f));
+		m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
+		m_pDreamBrowser->SetDiagonalSize(10.0f);
+
+		// Cloud Controller
+		CloudController *pCloudController = reinterpret_cast<CloudController*>(pContext);
+		CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+		MenuControllerProxy *pMenuControllerProxy = nullptr;
+		CN(pContext);
+		CN(pCloudController);
+		CN(pCommandLineManager);
+
+		// For later
+		m_pCloudController = pCloudController;
+
+		DEBUG_LINEOUT("Initializing Cloud Controller");
+		CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+
+		// Log in 
+		{
+			std::string strUsername = pCommandLineManager->GetParameterValue("username");
+			std::string strPassword = pCommandLineManager->GetParameterValue("password");
+			std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+			CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+		}
+
+		CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&UITestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+
+		
+		Sleep(1000);
+
+		// Set up menu stuff
+		DEBUG_LINEOUT("Requesting Menu");
+		pMenuControllerProxy = (MenuControllerProxy*)(pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
+		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
+
+		CRM(pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
+		CRM(pMenuControllerProxy->RequestSubMenu("", "", "menu"), "Failed to request sub menu");
+
+	Error:
+		return R_PASS;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	CN(pUITest);
+
+	pUITest->SetTestName("Browser Request Test");
+	pUITest->SetTestDescription("Basic test of browser working with a web request");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestBrowserRequest() {
 	RESULT r = R_PASS;
 
@@ -117,6 +308,8 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 
 		CN(m_pDreamOS);
 
+		CR(SetupPipeline());
+
 		// Create the Shared View App
 		pDreamBrowser = m_pDreamOS->LaunchDreamApp<DreamBrowser>(this);
 		CNM(pDreamBrowser, "Failed to create dream browser");
@@ -130,8 +323,10 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
 		//pDreamBrowser->SetURI(strURL);
 
-		webRequest.SetURL(L"http://httpbin.org/get");
+		//webRequest.SetURL(L"http://httpbin.org/get");
 		//CR(webRequest.SetURL(L"http://www.cnn.com"));
+		//webRequest.SetURL(L"https://placehold.it/350x150");
+		webRequest.SetURL(L"http://placehold.it/350x150/A00AAA/000000");
 
 		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
 		CR(webRequest.AddRequestHeader(L"Authorization", L"Token "));

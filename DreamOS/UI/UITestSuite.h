@@ -13,12 +13,17 @@
 #include <stack>
 #include <memory>
 
+#include "Cloud/Menu/MenuController.h"
+
 class DreamOS;
 class DreamUIBar;
 class UIKeyboard;
 class VirtualObj;
 class sphere;
 class quad;
+
+class EnvironmentAsset;
+class DreamBrowser;
 
 struct SenseControllerEvent;
 struct SenseKeyboardEvent;
@@ -31,7 +36,11 @@ struct KeyboardTestContext {
 	quad* pQuad = nullptr;
 };
 
-class UITestSuite : public valid, public TestSuite, public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseMouseEvent> {
+class UITestSuite : public valid, public TestSuite, 
+					public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, 
+					public Subscriber<SenseMouseEvent>,
+					public MenuController::observer
+{
 public:
 	UITestSuite(DreamOS *pDreamOS);
 	~UITestSuite();
@@ -42,9 +51,16 @@ public:
 	RESULT AddTestSharedContentView();
 	RESULT AddTestBrowser();
 	RESULT AddTestBrowserRequest();
+	RESULT AddTestBrowserRequestWithMenuAPI();
 	RESULT AddTestKeyboard();
 
 	virtual RESULT AddTests() override;
+
+	// Menu Controller Observer
+	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
+
+	// Environment Asset Callback
+	RESULT HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 
 public:
 	virtual RESULT Notify(SenseControllerEvent *event) override;
@@ -56,6 +72,8 @@ private:
 
 private:
 	DreamOS *m_pDreamOS;
+	std::shared_ptr<DreamBrowser> m_pDreamBrowser = nullptr;
+	CloudController *m_pCloudController = nullptr;
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
 
 	VirtualObj* m_pPrevSelected;

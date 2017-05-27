@@ -67,6 +67,12 @@ CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 	return this;
 }
 
+/*
+CefRefPtr<CefDownloadHandler> CEFHandler::GetDownloadHandler() {
+	return this;
+}
+*/
+
 void PlatformTitleChange(CefRefPtr<CefBrowser> pCEFBrowser, const CefString& strTitle) {
 	CefWindowHandle hwnd = pCEFBrowser->GetHost()->GetWindowHandle();
 	SetWindowText(hwnd, std::wstring(strTitle).c_str());
