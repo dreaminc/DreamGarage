@@ -222,7 +222,7 @@ RESULT DreamGarage::LoadScene() {
 
 	m_pDreamBrowser->SetNormalVector(vector(0.0f, 0.0f, 1.0f));
 	m_pDreamBrowser->SetDiagonalSize(10.0f);
-	//m_pDreamBrowser->SetPosition(point(0.0f, 1.5f, 0.0f));
+	m_pDreamBrowser->SetPosition(point(0.0f, 1.85f, 0.0f));
 	
 	m_pDreamBrowser->SetVisible(false);
 

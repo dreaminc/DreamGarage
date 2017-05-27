@@ -1,5 +1,6 @@
 #include "DreamBrowser.h"
 #include "DreamOS.h"
+#include "Core/Utilities.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
@@ -7,6 +8,8 @@
 #include "WebBrowser/WebBrowserController.h"
 
 #include "Cloud/Environment/EnvironmentAsset.h"
+
+#include "Cloud/WebRequest.h"
 
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
@@ -421,8 +424,22 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 	RESULT r = R_PASS;
 
 	if (pEnvironmentAsset != nullptr) {
+		WebRequest webRequest;
+
 		std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
-		CR(SetURI(strEnvironmentAssetURI));
+
+		std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
+		CR(webRequest.SetURL(wstrAssetURI));
+		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
+	
+		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+		CN(pUserControllerProxy);
+
+		std::string strUserToken = pUserControllerProxy->GetUserToken();
+		std::wstring wstrUserToken = util::StringToWideString(strUserToken);
+		CR(webRequest.AddRequestHeader(L"Authorization", L"Token " + wstrUserToken));
+
+		LoadRequest(webRequest);
 	}
 
 Error:

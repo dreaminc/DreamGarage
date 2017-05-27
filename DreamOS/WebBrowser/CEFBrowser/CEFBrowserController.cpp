@@ -144,10 +144,10 @@ CefRefPtr<CefRequest> CEFBrowserController::MakeCEFRequest(const WebRequest &web
 	
 	{
 		// URL
-		pCEFRequest->SetURL((CefString)(static_cast<WebRequest>(webRequest).GetURL()));
+		pCEFRequest->SetURL((CefString)(static_cast<WebRequest>(webRequest).GetURL().c_str()));
 
 		// Method
-		pCEFRequest->SetMethod((CefString)(static_cast<WebRequest>(webRequest).GetRequestMethodString()));
+		pCEFRequest->SetMethod((CefString)(static_cast<WebRequest>(webRequest).GetRequestMethodString().c_str()));
 
 		// Headers
 		// TODO: Might be a more bettarz way to code this
@@ -192,6 +192,7 @@ RESULT CEFBrowserController::LoadRequest(const WebRequest &webRequest) {
 		CefRefPtr<CefRequest> pCEFRequest = MakeCEFRequest(webRequest);
 		CN(pCEFRequest);
 
+		pCEFRequest->SetFlags(UR_FLAG_NO_DOWNLOAD_DATA);
 		m_pCEFBrowser->GetFocusedFrame()->LoadRequest(pCEFRequest);
 	}
 
