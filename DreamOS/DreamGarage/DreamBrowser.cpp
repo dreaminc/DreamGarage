@@ -428,7 +428,6 @@ RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvi
 
 		std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
 
-		//TODO: fails for characters that are not single byte
 		std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
 		CR(webRequest.SetURL(wstrAssetURI));
 		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
