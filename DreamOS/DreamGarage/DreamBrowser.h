@@ -25,6 +25,7 @@
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
+class sphere;
 class texture;
 
 class EnvironmentAsset;
@@ -86,6 +87,8 @@ protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
+	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
+	sphere *m_pTestSphereAbsolute = nullptr;
 	std::shared_ptr<quad> m_pBrowserQuad = nullptr;
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
 

@@ -37,7 +37,7 @@ public:
 	// Functionality
 	RESULT LaunchDreamView();
 
-// Menu Controller Observer
+	// Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
 
 	// Environment Asset Callback

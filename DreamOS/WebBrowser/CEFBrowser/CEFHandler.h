@@ -39,6 +39,7 @@ class CEFHandler : public singleton<CEFHandler>,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
 	public CefRenderHandler
+	//public CefDownloadHandler
 {
 public:
 	CEFHandler();
@@ -60,6 +61,20 @@ public:
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override;
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override;
+
+	//virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() override;
+	// CefDownloadHandler methods
+	/*
+	void OnBeforeDownload(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefDownloadItem> download_item,
+		const CefString& suggested_name,
+		CefRefPtr<CefBeforeDownloadCallback> callback) OVERRIDE;
+	void OnDownloadUpdated(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefDownloadItem> download_item,
+		CefRefPtr<CefDownloadItemCallback> callback) OVERRIDE;
+		*/
 
 	// CefDisplayHandler
 	virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
