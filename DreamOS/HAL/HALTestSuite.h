@@ -50,6 +50,8 @@ public:
 	RESULT AddTestBlinnPhongShaderTextureCopy();
 
 	RESULT AddTestMouseDrag();
+	RESULT AddTestBlinnPhongShadowShader();
+
 	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalTextureShader();
 	RESULT AddTestBlinnPhongShaderBlur();

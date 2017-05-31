@@ -92,6 +92,8 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	glDisable(GL_BLEND);
 
+	//m_fRenderDepth = true;
+
 	if (m_pOGLFramebufferInput != nullptr) {
 		int sampleCount = m_pOGLFramebufferInput->GetSampleCount();
 
