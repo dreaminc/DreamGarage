@@ -78,7 +78,14 @@ public:
 	RESULT AddTestRotation();
 
 	RESULT AddTestMouseDrag();
-	
+
+	RESULT AddTestBlinnPhongShadowShader();
+
+	RESULT AddTestMinimalShader();
+	RESULT AddTestMinimalTextureShader();
+	RESULT AddTestBlinnPhongShaderBlur();
+	RESULT AddTestBlinnPhongShaderTexture();
+
 	RESULT AddTestSenseHaptics();
 
 	RESULT AddTestRenderToTextureQuad();

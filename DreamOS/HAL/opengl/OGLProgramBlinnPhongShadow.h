@@ -165,6 +165,26 @@ public:
 		return R_PASS;
 	}
 
+	OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp);
+
+	RESULT OGLInitialize();
+
+	virtual RESULT SetupConnections() override;
+	virtual RESULT ProcessNode(long frameID) override;
+
+	RESULT SetObjectTextures(OGLObj *pOGLObj);
+	RESULT SetLights(std::vector<light*> *pLights);
+	RESULT SetMaterial(material *pMaterial);
+	RESULT SetObjectUniforms(DimObj *pDimObj);
+	RESULT SetCameraUniforms(camera *pCamera);
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
+
+private:
+	stereocamera *m_pCamera = nullptr;
+	ObjectStore *m_pSceneGraph = nullptr;
+
+	OGLFramebuffer *m_pInputFramebufferShadowDepth = nullptr;
+
 private:
 	// Vertex Attribute
 	OGLVertexAttributePoint *m_pVertexAttributePosition;

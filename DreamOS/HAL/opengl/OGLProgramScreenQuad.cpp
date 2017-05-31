@@ -145,6 +145,8 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	glDisable(GL_BLEND);
 
+	//m_fRenderDepth = true;
+
 	if (m_pOGLFramebufferInput != nullptr) {
 
 		if (m_pUniformWindowWidth != nullptr)

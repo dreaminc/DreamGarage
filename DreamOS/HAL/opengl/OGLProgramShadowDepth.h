@@ -16,87 +16,37 @@
 
 class OGLProgramShadowDepth : public OGLProgram {
 public:
+<<<<<<< HEAD
 	OGLProgramShadowDepth(OpenGLImp *pParentImp, PIPELINE_FLAGS optFlags = PIPELINE_FLAGS::NONE) :
 		OGLProgram(pParentImp, "oglshadowdepth", optFlags),
 		m_pShadowEmitter(nullptr)
 	{
 		// empty
 	}
+=======
+	OGLProgramShadowDepth(OpenGLImp *pParentImp);
+>>>>>>> shadow HAL test set up and relevant shaders (using blinn phong shadow for now) moved to new arch
 
-	RESULT OGLInitialize() {
-		RESULT r = R_PASS;
+	RESULT OGLInitialize();
 
-		CR(OGLProgram::OGLInitialize());
+	virtual RESULT SetupConnections() override;
+	virtual RESULT ProcessNode(long frameID) override;
 
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
+	RESULT SetLights(std::vector<light*> *pLights);
+	RESULT SetObjectTextures(OGLObj *pOGLObj);
+	RESULT SetObjectUniforms(DimObj *pDimObj);
 
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+	matrix<virtual_precision, 4, 4>GetViewProjectionMatrix();
 
-		// Create this as a pure depth map texture
-		CR(InitializeDepthToTexture(GL_DEPTH_COMPONENT16, GL_FLOAT, SHADOW_MAP_WIDTH, SHADOW_MAP_HEIGHT));
+	RESULT SetCameraUniforms(camera *pCamera);
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
-	Error:
-		return r;
-	}
+	RESULT SetShadowCastingLightSource(light *pLight);
 
-	virtual RESULT SetupConnections() override {
-		// TODO: do it
-		return R_NOT_IMPLEMENTED;
-	}
+	light *pGetShadowCastingLight();
 
-	RESULT SetLights(std::vector<light*> *pLights) {
-		RESULT r = R_PASS;
-
-		// TODO: This will use the first light that has shadows enabled
-		for (auto it = pLights->begin(); it != pLights->end(); it++) {
-			if ((*it)->IsShadowEmitter()) {
-				m_pShadowEmitter = (*it);
-			}
-		}
-
-//	Error:
-		return r;
-	}
-
-	RESULT SetObjectTextures(OGLObj *pOGLObj) {
-		return R_NOT_IMPLEMENTED;
-	}
-
-	RESULT SetObjectUniforms(DimObj *pDimObj) {
-		auto matModel = pDimObj->GetModelMatrix();
-		m_pUniformModelMatrix->SetUniform(matModel);
-
-		return R_PASS;
-	}
-
-	matrix<virtual_precision, 4, 4>GetViewProjectionMatrix() {
-		matrix<virtual_precision, 4, 4> matVP;
-		matVP.identity();
-
-		if (m_pShadowEmitter != nullptr) {
-			matVP = m_pShadowEmitter->GetViewProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f);
-		}
-
-		return matVP;
-	}
-
-	RESULT SetCameraUniforms(camera *pCamera) {
-		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
-	}
-
-	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
-	}
-
-	RESULT SetShadowCastingLightSource(light *pLight) {
-		m_pShadowEmitter = pLight;
-		return R_PASS;
-	}
-
-	light *pGetShadowCastingLight() {
-		return m_pShadowEmitter;
-	}
+private:
+	ObjectStore *m_pSceneGraph = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
