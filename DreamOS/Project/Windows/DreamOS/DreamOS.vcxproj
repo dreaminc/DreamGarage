@@ -691,6 +691,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp" />

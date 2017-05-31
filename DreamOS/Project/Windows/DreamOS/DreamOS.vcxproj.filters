@@ -797,6 +797,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramShadowDepth.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1627,7 +1630,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h">
       <Filter>DreamGarage</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>

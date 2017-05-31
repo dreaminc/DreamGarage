@@ -91,6 +91,8 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 
 	glDisable(GL_BLEND);
 
+	//m_fRenderDepth = true;
+
 	if (m_pOGLFramebufferInput != nullptr) {
 		if (m_pOGLFramebufferInput->GetSampleCount() > 1) {
 			m_pParentImp->glActiveTexture(GL_TEXTURE1);
