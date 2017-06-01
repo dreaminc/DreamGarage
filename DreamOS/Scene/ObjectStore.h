@@ -17,6 +17,7 @@
 #include "ObjectStoreFactory.h"
 
 class ray;
+class point;
 
 // The different types of stores should be added here 
 
@@ -46,6 +47,8 @@ public:
 
 	std::vector<VirtualObj*> GetObjects();
 	std::vector<VirtualObj*> GetObjects(ray rCast);
+
+	RESULT GetMinMaxPoint(point *pPtMax, point *pPtMin);
 
 	// TODO: Arch here
 	RESULT UpdateScene();

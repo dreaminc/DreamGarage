@@ -92,6 +92,10 @@ std::vector<VirtualObj*> ObjectStore::GetObjects(ray rCast) {
 	return m_pSceneGraphStore->GetObjects(rCast);
 }
 
+RESULT ObjectStore::GetMinMaxPoint(point *pPtMax, point *pPtMin) {
+	return m_pSceneGraphStore->GetMinMaxPoint(pPtMax, pPtMin);
+}
+
 // TODO: This is holding the collide functionality here temporarily 
 RESULT ObjectStore::UpdateScene() {
 	return R_NOT_IMPLEMENTED;

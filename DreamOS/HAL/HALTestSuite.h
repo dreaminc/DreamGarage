@@ -16,6 +16,7 @@
 
 class DreamOS;
 class HALImp;
+class composite;
 
 class HALTestSuite : public TestSuite {
 public:
@@ -60,6 +61,8 @@ private:
 private:
 	DreamOS *m_pDreamOS;
 	HALImp *m_pHALImp = nullptr;
+
+	composite *m_pModel = nullptr;
 };
 
 #endif // ! HAL_TEST_SUITE_H_
