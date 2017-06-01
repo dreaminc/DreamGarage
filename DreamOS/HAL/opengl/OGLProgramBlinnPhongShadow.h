@@ -203,6 +203,7 @@ private:
 
 	OGLUniformPoint *m_pUniformObjectCenter;
 	OGLUniformPoint *m_pUniformEyePosition;
+	OGLUniformVector *m_pUniformShadowEmitterDirection;
 
 	// Booleans
 	OGLUniformBool *m_pUniformfBillboard;

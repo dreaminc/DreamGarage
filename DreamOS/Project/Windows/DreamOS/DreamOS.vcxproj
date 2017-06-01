@@ -342,6 +342,7 @@ __BASE_FILE__="%(Filename)%(Extension)";%(PreprocessorDefinitions)</Preprocessor
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgram.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongShadow.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBumpDisplacement.cpp" />

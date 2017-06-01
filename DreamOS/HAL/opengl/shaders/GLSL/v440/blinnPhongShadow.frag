@@ -7,6 +7,8 @@
 #version 440 core
 
 #define MAX_TOTAL_LIGHTS 10
+#define SHADOW_PCF_OFFSET 1.0f
+#define _USE_PCF
 
 in vec3 inF_vec3Color;
 
@@ -20,10 +22,11 @@ in Data {
 	vec4 vertViewSpace;
 
 	vec4 vertShadowCoordinate;
-	vec3 directionShadowCastingLight;
+	vec3 shadowEmitterDirection;
 } DataIn;
 
-uniform sampler2D u_textureDepth;
+uniform sampler2DShadow u_textureDepth;
+//uniform sampler2D u_textureDepth;
 
 // Light Structure
 struct Light {
@@ -61,13 +64,6 @@ layout (location = 0) out vec4 out_vec4Color;
 
 float g_ambient = 0.01f;
 
-vec2 poissonDisk[4] = vec2[](
-  vec2( -0.94201624, -0.39906216 ),
-  vec2( 0.94558609, -0.76890725 ),
-  vec2( -0.094184101, -0.92938870 ),
-  vec2( 0.34495938, 0.29387760 )
-);
-
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
 void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue) {
@@ -95,30 +91,36 @@ void main(void) {
 	float diffuseValue = 0.0f, specularValue = 0.0f;
 	
 	vec3 normal = normalize(DataIn.normal.xyz);
-	//vec3 directionEye = normalize(DataIn.directionEye);
 	vec3 directionEye = -normalize(DataIn.vertViewSpace.xyz);
 
 	// TODO: This is a hack, currently hard coded values
 	float lightVisibility = 1.0f;
-	float cosTheta = dot(normal, DataIn.directionShadowCastingLight);
+	float cosTheta = dot(normal, normalize(DataIn.shadowEmitterDirection.xyz));
+	
 	float bias = 0.005f * tan(acos(cosTheta)); // cosTheta is dot( n,l ), clamped between 0 and 1
 	bias = clamp(bias, 0.0f, 0.01f);
-	bias = 0.0f;
 
-	///*
-	if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy).x  <  (DataIn.vertShadowCoordinate.z - bias)) {
-		lightVisibility = 0.5;
-	}
-	//*/
+	if(cosTheta > bias) {
+	#ifdef 	_USE_PCF
+		float shadowAccumulator = 0.0f;
 
-	/*
-	for (int i=0; i < 4; i++){
-		if(texture(u_textureDepth, DataIn.vertShadowCoordinate.xy + poissonDisk[i]/700.0).x  <  (DataIn.vertShadowCoordinate.z - bias)){
-			//lightVisibility = 0.5;
-			lightVisibility -= 0.2;
-		}
+		// weight center more
+		shadowAccumulator += 4.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(0, 0));
+		shadowAccumulator += 2.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(-SHADOW_PCF_OFFSET, -SHADOW_PCF_OFFSET));
+		shadowAccumulator += 2.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(-SHADOW_PCF_OFFSET, SHADOW_PCF_OFFSET));
+		shadowAccumulator += 2.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, SHADOW_PCF_OFFSET));
+		shadowAccumulator += 2.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, -SHADOW_PCF_OFFSET));
+	
+		lightVisibility *= (shadowAccumulator * (1.0f/12.0f));
+		lightVisibility = clamp(lightVisibility, 0.10f, 1.0f);
+	#else
+		float shadowVal = textureProj(u_textureDepth, DataIn.vertShadowCoordinate);
+		lightVisibility *= shadowVal;
+	#endif
 	}
-	//*/
+	else {
+		lightVisibility = 0.0f;
+	}
 
 	for(int i = 0; i < numLights; i++) {
 		vec3 directionLight = normalize(DataIn.directionLight[i]);

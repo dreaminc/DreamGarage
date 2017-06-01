@@ -99,6 +99,10 @@ RESULT DConnection::SetName(std::string strName) {
 	return R_PASS;
 }
 
+DNode* DConnection::GetParentNode() {
+	return m_pParentNode;
+}
+
 size_t DConnection::GetNumConnections() {
 	return m_connections.size();
 }

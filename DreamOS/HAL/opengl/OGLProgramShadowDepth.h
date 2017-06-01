@@ -11,8 +11,8 @@
 #include "Primitives/matrix/ProjectionMatrix.h"
 #include "Primitives/matrix/ViewMatrix.h"
 
-#define SHADOW_MAP_WIDTH 1024
-#define SHADOW_MAP_HEIGHT 1024
+#define SHADOW_MAP_WIDTH 1024 * 8
+#define SHADOW_MAP_HEIGHT 1024 * 8
 
 class OGLProgramShadowDepth : public OGLProgram {
 public:
@@ -37,6 +37,7 @@ public:
 	RESULT SetObjectUniforms(DimObj *pDimObj);
 
 	matrix<virtual_precision, 4, 4>GetViewProjectionMatrix();
+	vector GetShadowEmitterDirection();
 
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
