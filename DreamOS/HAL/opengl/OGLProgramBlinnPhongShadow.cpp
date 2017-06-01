@@ -31,6 +31,8 @@ RESULT OGLProgramBlinnPhongShadow::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelViewMatrix), std::string("u_mat4ModelView")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformDepthViewProjectionMatrix), std::string("u_mat4DepthVP")));
+	
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformShadowEmitterDirection), std::string("u_vec4ShadowEmitterDirection")));
 
 	// Billboard boolean uniforms
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfBillboard), std::string("u_fBillboard")));
@@ -113,10 +115,6 @@ RESULT OGLProgramBlinnPhongShadow::ProcessNode(long frameID) {
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);
 
-	glEnable(GL_DEPTH_TEST);	// Enable depth test
-	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
@@ -179,20 +177,23 @@ RESULT OGLProgramBlinnPhongShadow::SetCameraUniforms(camera *pCamera) {
 	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	//m_pUniformModelViewMatrix
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
-	/*
-	// TODO: this
-	OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
-	if (pOGLProgramShadowDepth != nullptr) {
-	m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
+	if (m_pInputFramebufferShadowDepth != nullptr) {
+		DConnection *pInputDConnection = Connection("input_shadowdepth_framebuffer", CONNECTION_TYPE::INPUT)->GetConnectionEntry(0);
+		DNode *pProgramNode = pInputDConnection->GetParentNode();
+		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(pProgramNode);
+		if (pOGLProgramShadowDepth != nullptr) {
+			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
+			m_pUniformShadowEmitterDirection->SetUniform(pOGLProgramShadowDepth->GetShadowEmitterDirection());
+		}
+		
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureTarget(), 
+								  m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureIndex());
 
-	// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
-	pOGLProgramShadowDepth->SetDepthTexture(0);
-	m_pUniformTextureDepth->SetUniform(0);
+		m_pUniformTextureDepth->SetUniform(0);
 	}
-	*/
 
 	point origin = pCamera->GetOrigin();
 	m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
@@ -207,23 +208,26 @@ RESULT OGLProgramBlinnPhongShadow::SetCameraUniforms(stereocamera* pStereoCamera
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
 	m_pUniformViewMatrix->SetUniform(matV);
-	//m_pUniformModelViewMatrix->SetUniform(matM)
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
+
+	if (m_pInputFramebufferShadowDepth != nullptr) {
+		DConnection *pInputDConnection = Connection("input_shadowdepth_framebuffer", CONNECTION_TYPE::INPUT)->GetConnectionEntry(0);
+		DNode *pProgramNode = pInputDConnection->GetParentNode();
+		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(pProgramNode);
+		if (pOGLProgramShadowDepth != nullptr) {
+			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
+			m_pUniformShadowEmitterDirection->SetUniform(pOGLProgramShadowDepth->GetShadowEmitterDirection());
+		}
+
+		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+		m_pParentImp->BindTexture(m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureTarget(),
+			m_pInputFramebufferShadowDepth->GetDepthAttachment()->GetOGLTextureIndex());
+
+		m_pUniformTextureDepth->SetUniform(0);
+	}
 
 	point origin = pStereoCamera->GetOrigin();
 	m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
-
-	/*
-	// TODO: this
-	OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
-	if (pOGLProgramShadowDepth != nullptr) {
-	m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
-
-	// TODO: Might be better to formalize this (units are simply routes mapped to the uniform
-	pOGLProgramShadowDepth->SetDepthTexture(0);
-	m_pUniformTextureDepth->SetUniform(0);
-	}
-	*/
 
 	return R_PASS;
 }

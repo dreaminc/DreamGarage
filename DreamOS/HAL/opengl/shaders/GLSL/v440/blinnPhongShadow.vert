@@ -25,7 +25,7 @@ out Data {
 	vec4 vertViewSpace;
 	
 	vec4 vertShadowCoordinate;
-	vec3 directionShadowCastingLight;
+	vec3 shadowEmitterDirection;
 } DataOut;
 
 uniform vec4 u_vec4Eye;
@@ -34,6 +34,8 @@ uniform mat4 u_mat4View;
 uniform mat4 u_mat4ModelView;
 uniform mat4 u_mat4ViewProjection;
 uniform mat4 u_mat4Normal;
+
+uniform vec4 u_vec4ShadowEmitterDirection;
 
 uniform mat4 u_mat4DepthVP;
 
@@ -66,10 +68,19 @@ layout(std140) uniform ub_Lights {
 mat4 g_mat4ModelView = u_mat4View * u_mat4Model;
 mat4 g_mat4InvTransposeModelView = transpose(inverse(g_mat4ModelView));
 
+///*
 mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.0,
 					0.0, 0.5, 0.0, 0.0,
 					0.0, 0.0, 0.5, 0.0,
 					0.5, 0.5, 0.5, 1.0);
+//*/
+
+/*
+mat4 biasMat = mat4(0.5, 0.0, 0.0, 0.5,
+					0.0, 0.5, 0.0, 0.5,
+					0.0, 0.0, 0.5, 0.5,
+					0.0, 0.0, 0.0, 1.0);
+//*/
 
 // billboarding matrices
 vec3 dir = -normalize(u_vec4EyePosition.xyz + u_vec4ObjectCenter.xyz);
@@ -110,8 +121,7 @@ void main(void) {
 		}
 	}
 
-	// TODO: Fix this
-	DataOut.directionShadowCastingLight = vec3(0.0f, 1.0f, 0.0f);
+	DataOut.shadowEmitterDirection = normalize(vec3(mat3(u_mat4View) * (-u_vec4ShadowEmitterDirection.xyz)));
 	DataOut.vertShadowCoordinate = vertDepthSpace;
 	DataOut.directionEye = -normalize(vertViewSpace.xyz);
 	DataOut.vertWorldSpace = vertWorldSpace;
