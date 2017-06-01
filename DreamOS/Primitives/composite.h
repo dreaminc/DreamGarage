@@ -49,6 +49,7 @@ public:
 	RESULT ClearObjects();
 
 	virtual RESULT UpdateBoundingVolume() override;
+	virtual RESULT GetMinMaxPoint(point *pPtMax, point *pPtMin) override;
 
 	// TODO: This is currently not building correctly, so has been removed for now
 	/*

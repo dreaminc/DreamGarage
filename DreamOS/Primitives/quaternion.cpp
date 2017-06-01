@@ -437,7 +437,7 @@ quaternion& quaternion::operator-=(const quaternion& rhs) {
 	m_y -= rhs.m_y;
 	m_z -= rhs.m_z;
 
-	return *this;
+	return (*this);
 }
 
 //const quaternion& quaternion::operator-(const quaternion& arg) const {
@@ -459,6 +459,10 @@ bool quaternion::operator==(const quaternion& rhs) {
 
 bool quaternion::operator!=(const quaternion& rhs) {
 	return !(quaternion(*this) == rhs);
+}
+
+const quaternion& quaternion::operator-(const quaternion& arg) const {
+	return (new quaternion(*this))->operator-=(arg);
 }
 
 // Utility

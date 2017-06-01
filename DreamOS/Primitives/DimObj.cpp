@@ -1053,8 +1053,53 @@ matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision,
 	}
 }
 
+
 matrix<virtual_precision, 4, 4> DimObj::GetRelativeModelMatrix() {
 	return VirtualObj::GetModelMatrix();
+}
+
+// This is similar to the below, but can be used when a bounding volume is not
+// desired (or by the below functions
+// TODO: Split up into another function so both this and UpdateBoundingVolume can use it
+RESULT DimObj::GetMinMaxPoint(point *pPtMax, point *pPtMin) {
+	RESULT r = R_PASS;
+
+	auto matModel = GetModelMatrix();
+
+	CN(pPtMax);
+	CN(pPtMin);
+
+	CB((NumberVertices() > 0));
+
+	*pPtMax = m_pVertices[0].GetPoint();
+	*pPtMin = m_pVertices[0].GetPoint();
+
+	CN(m_pVertices);
+
+	for (unsigned int i = 0; i < NumberVertices(); i++) {
+		point ptVert = matModel * m_pVertices[i].GetPoint();
+
+		// X
+		if (ptVert.x() > pPtMax->x())
+			pPtMax->x() = ptVert.x();
+		else if (ptVert.x() < pPtMin->x())
+			pPtMin->x() = ptVert.x();
+
+		// Y
+		if (ptVert.y() > pPtMax->y())
+			pPtMax->y() = ptVert.y();
+		else if (ptVert.y() < pPtMin->y())
+			pPtMin->y() = ptVert.y();
+
+		// Z
+		if (ptVert.z() > pPtMax->z())
+			pPtMax->z() = ptVert.z();
+		else if (ptVert.z() < pPtMin->z())
+			pPtMin->z() = ptVert.z();
+	}
+
+Error:
+	return r;
 }
 
 // Bounding Box

@@ -249,3 +249,55 @@ std::vector<std::vector<VirtualObj*>> ObjectStoreImpList::GetObjectCollisionGrou
 
 	return collisionGroups;
 }
+
+// TODO: Replace with a min/max point update thing
+RESULT ObjectStoreImpList::GetMinMaxPoint(point *pPtMax, point *pPtMin) {
+	RESULT r = R_PASS;
+
+	point ptMinTemp = point();
+	point ptMaxTemp = point();
+	
+	for (auto &object : m_objects) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(object);
+
+		if (pDimObj != nullptr) {
+			CR(pDimObj->GetMinMaxPoint(&ptMaxTemp, &ptMinTemp));
+
+			// X
+			if (ptMaxTemp.x() > pPtMax->x())
+				pPtMax->x() = ptMaxTemp.x();
+			else if (ptMaxTemp.x() < pPtMin->x())
+				pPtMin->x() = ptMaxTemp.x();
+
+			if (ptMinTemp.x() > pPtMax->x())
+				pPtMax->x() = ptMinTemp.x();
+			else if (ptMinTemp.x() < pPtMin->x())
+				pPtMin->x() = ptMinTemp.x();
+
+			// Y
+			if (ptMaxTemp.y() > pPtMax->y())
+				pPtMax->y() = ptMaxTemp.y();
+			else if (ptMaxTemp.y() < pPtMin->y())
+				pPtMin->y() = ptMaxTemp.y();
+
+			if (ptMinTemp.y() > pPtMax->y())
+				pPtMax->y() = ptMinTemp.y();
+			else if (ptMinTemp.y() < pPtMin->y())
+				pPtMin->y() = ptMinTemp.y();
+
+			// Z
+			if (ptMaxTemp.z() > pPtMax->z())
+				pPtMax->z() = ptMaxTemp.z();
+			else if (ptMaxTemp.z() < pPtMin->z())
+				pPtMin->z() = ptMaxTemp.z();
+
+			if (ptMinTemp.z() > pPtMax->z())
+				pPtMax->z() = ptMinTemp.z();
+			else if (ptMinTemp.z() < pPtMin->z())
+				pPtMin->z() = ptMinTemp.z();
+		}
+	}
+
+Error:
+	return r;
+}
