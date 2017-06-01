@@ -29,6 +29,7 @@ public:
 	std::string GetName();
 	std::string GetParentName();
 	RESULT SetName(std::string strName);
+	DNode *GetParentNode();
 
 	size_t GetNumConnections();
 	DConnection* FindConnection(DConnection* pConnection);
@@ -86,6 +87,18 @@ public:
 	Error:
 		//*/
 		return nullptr;
+	}
+
+	DConnection* GetConnectionEntry(int i) {
+		if (i < m_connections.size()) {
+			return m_connections[i];
+		}
+
+		return nullptr;
+	}
+
+	DConnection* operator [](int i) { 
+		return GetConnectionEntry(i);
 	}
 
 private:

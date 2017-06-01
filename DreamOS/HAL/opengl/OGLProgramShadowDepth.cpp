@@ -3,6 +3,7 @@
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
+#include "OGLTexture.h"
 
 OGLProgramShadowDepth::OGLProgramShadowDepth(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglshadowdepth"),
@@ -31,12 +32,23 @@ RESULT OGLProgramShadowDepth::OGLInitialize() {
 	CR(m_pOGLFramebuffer->OGLInitialize());
 	CR(m_pOGLFramebuffer->Bind());
 
+	CR(m_pOGLFramebuffer->SetSampleCount(4));
+
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
-	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT));
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32, GL_FLOAT));
+	//CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT));
+	
+	// Use linear filtering
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_MAG_FILTER, GL_LINEAR));
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+
+	// Reference Compare
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE));
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->GetOGLTexture()->SetTextureParameter(GL_TEXTURE_COMPARE_FUNC, GL_LESS));
 
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT));
 
-	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(0));
+	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
 
 Error:
 	return r;
@@ -68,6 +80,11 @@ m_pOGLProgramShadowDepth->UnbindFramebuffer();
 RESULT OGLProgramShadowDepth::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
+	// Trick to only render at reduced frame rate
+	if (frameID % 5 != 0) {
+		return R_SKIPPED;
+	}
+
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
 
 	std::vector<light*> *pLights = nullptr;
@@ -88,8 +105,24 @@ RESULT OGLProgramShadowDepth::ProcessNode(long frameID) {
 		m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
 	}
 
+	// We render the back faces to avoid artifacts 
+	
+	glClear(GL_DEPTH_BUFFER_BIT);
+
+	glEnable(GL_CULL_FACE);
+	//glDisable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+
+	glPolygonOffset(1.0f, 1.0f);
+	glEnable(GL_POLYGON_OFFSET_FILL);
+
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
+
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_BACK);
+
+	glDisable(GL_POLYGON_OFFSET_FILL);
 
 	UnbindFramebuffer();
 
@@ -122,12 +155,23 @@ RESULT OGLProgramShadowDepth::SetObjectUniforms(DimObj *pDimObj) {
 	return R_PASS;
 }
 
+vector OGLProgramShadowDepth::GetShadowEmitterDirection() {
+	vector vShadowEmitterDirection;
+
+	if (m_pShadowEmitter != nullptr) {
+		vShadowEmitterDirection = m_pShadowEmitter->GetLightDirection();
+	}
+
+	return vShadowEmitterDirection;
+}
+
+// TODO: Determine scene size from scene graph
 matrix<virtual_precision, 4, 4> OGLProgramShadowDepth::GetViewProjectionMatrix() {
 	matrix<virtual_precision, 4, 4> matVP;
 	matVP.identity();
 
 	if (m_pShadowEmitter != nullptr) {
-		matVP = m_pShadowEmitter->GetViewProjectionMatrix(30.0f, 30.0f, 0.1f, 1000.0f);
+		matVP = m_pShadowEmitter->GetViewProjectionMatrix(80.0f, 80.0f, 0.1f, 1000.0f);
 	}
 
 	return matVP;
