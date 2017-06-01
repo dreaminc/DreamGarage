@@ -42,6 +42,7 @@ public:
 	RESULT ClearObjects();
 
 	virtual RESULT UpdateBoundingVolume() override;
+	virtual RESULT GetMinMaxPoint(point *pPtMax, point *pPtMin) override;
 
 	///*
 	template<typename objType, typename... Targs>

@@ -195,6 +195,8 @@ protected:
 	// Bounding Volume
 public:
 	virtual RESULT UpdateBoundingVolume();
+	virtual RESULT GetMinMaxPoint(point *pPtMax, point *pPtMin);
+
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();

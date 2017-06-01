@@ -60,6 +60,60 @@ RESULT composite::ClearObjects() {
 	return ClearChildren();
 }
 
+// TODO: Consolidate functionality with below
+RESULT composite::GetMinMaxPoint(point *pPtMax, point *pPtMin) {
+	RESULT r = R_PASS;
+
+	point ptMinTemp = point();
+	point ptMaxTemp = point();
+
+	if (HasChildren()) {
+		for (auto &childObj : GetChildren()) {
+			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(childObj);
+
+			if (pDimObj != nullptr) {
+				CR(pDimObj->GetMinMaxPoint(&ptMaxTemp, &ptMinTemp));
+
+				// X
+				if (ptMaxTemp.x() > pPtMax->x())
+					pPtMax->x() = ptMaxTemp.x();
+				else if (ptMaxTemp.x() < pPtMin->x())
+					pPtMin->x() = ptMaxTemp.x();
+
+				if (ptMinTemp.x() > pPtMax->x())
+					pPtMax->x() = ptMinTemp.x();
+				else if (ptMinTemp.x() < pPtMin->x())
+					pPtMin->x() = ptMinTemp.x();
+
+				// Y
+				if (ptMaxTemp.y() > pPtMax->y())
+					pPtMax->y() = ptMaxTemp.y();
+				else if (ptMaxTemp.y() < pPtMin->y())
+					pPtMin->y() = ptMaxTemp.y();
+
+				if (ptMinTemp.y() > pPtMax->y())
+					pPtMax->y() = ptMinTemp.y();
+				else if (ptMinTemp.y() < pPtMin->y())
+					pPtMin->y() = ptMinTemp.y();
+
+				// Z
+				if (ptMaxTemp.z() > pPtMax->z())
+					pPtMax->z() = ptMaxTemp.z();
+				else if (ptMaxTemp.z() < pPtMin->z())
+					pPtMin->z() = ptMaxTemp.z();
+
+				if (ptMinTemp.z() > pPtMax->z())
+					pPtMax->z() = ptMinTemp.z();
+				else if (ptMinTemp.z() < pPtMin->z())
+					pPtMin->z() = ptMinTemp.z();
+			}
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT composite::UpdateBoundingVolume() {
 	RESULT r = R_PASS;
 
@@ -80,7 +134,6 @@ RESULT composite::UpdateBoundingVolume() {
 	if (HasChildren()) {
 		for (auto &childObj : GetChildren()) {
 			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(childObj);
-			
 
 			if (pDimObj != nullptr) {
 				auto pObjBoundingVolume = pDimObj->GetBoundingVolume();

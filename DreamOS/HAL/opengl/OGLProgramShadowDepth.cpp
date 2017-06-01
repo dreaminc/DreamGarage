@@ -81,7 +81,7 @@ RESULT OGLProgramShadowDepth::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	// Trick to only render at reduced frame rate
-	if (frameID % 5 != 0) {
+	if (frameID % 3 != 0) {
 		return R_SKIPPED;
 	}
 
@@ -169,6 +169,11 @@ vector OGLProgramShadowDepth::GetShadowEmitterDirection() {
 matrix<virtual_precision, 4, 4> OGLProgramShadowDepth::GetViewProjectionMatrix() {
 	matrix<virtual_precision, 4, 4> matVP;
 	matVP.identity();
+
+	point ptSceneMax, ptSceneMin, ptSceneMid;
+
+	m_pSceneGraph->GetMinMaxPoint(&ptSceneMax, &ptSceneMin);
+	ptSceneMid = point::midpoint(ptSceneMax, ptSceneMin);
 
 	if (m_pShadowEmitter != nullptr) {
 		matVP = m_pShadowEmitter->GetViewProjectionMatrix(80.0f, 80.0f, 0.1f, 1000.0f);
