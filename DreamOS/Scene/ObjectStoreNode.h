@@ -20,7 +20,6 @@ public:
 	ObjectStoreNode(ObjectStoreFactory::TYPE type);
 	ObjectStoreNode();
 
-
 	RESULT SetupConnections() override;
 	RESULT ProcessNode(long frameID = 0) override;
 };

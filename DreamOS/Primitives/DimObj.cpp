@@ -1077,7 +1077,7 @@ RESULT DimObj::GetMinMaxPoint(point *pPtMax, point *pPtMin) {
 	CN(m_pVertices);
 
 	for (unsigned int i = 0; i < NumberVertices(); i++) {
-		point ptVert = matModel * m_pVertices[i].GetPoint();
+		point ptVert = m_pVertices[i].GetPoint();
 
 		// X
 		if (ptVert.x() > pPtMax->x())
@@ -1097,6 +1097,9 @@ RESULT DimObj::GetMinMaxPoint(point *pPtMax, point *pPtMin) {
 		else if (ptVert.z() < pPtMin->z())
 			pPtMin->z() = ptVert.z();
 	}
+
+	*pPtMax = matModel * (*pPtMax);
+	*pPtMin = matModel * (*pPtMin);
 
 Error:
 	return r;
