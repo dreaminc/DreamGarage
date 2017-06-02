@@ -663,7 +663,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 
 	float padding = 0.5f;
 
-	float adjs = 3.0f;
+	float adjs = 1.0f;
 	float sceneScale = 0.1f / adjs;
 	point sceneOffset = point(90.0f / adjs, -5.0f / adjs, -25.0f / adjs);
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
@@ -706,7 +706,9 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 
 		volume *pVolume = nullptr;
 
-		g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.15f, -1.0f, -0.0f).Normal());
+		//g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.15f, -1.0f, -0.0f).Normal());
+		//g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, -1.0f, -0.0f).Normal());
+		g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f).Normal());
 		g_pLightTest->EnableShadows();
 
 		///*
@@ -724,13 +726,16 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 		pSphere->SetPosition(point(1.0f, 1.0f, 0.0f));
 		//*/
 
-		///*
+		/*
 		auto pQuad = m_pDreamOS->AddQuad(10.0f, 10.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
 		CN(pQuad)
 		pQuad->SetPosition(point(0.0f, -1.5f, 0.0f));
+
+		m_pDreamOS->GetSceneGraphNode()->UpdateMinMax();
+
 		//*/
 
-		/*
+		///*
 		m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
 			nullptr,
 			sceneOffset,

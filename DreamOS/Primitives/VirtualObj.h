@@ -41,7 +41,6 @@ protected:
 	ObjectState m_objectState;
 	ObjectDerivative m_objectDerivative;
 
-
 	vector m_vScale;				// Scale vector
 
 	// The pivot point

@@ -56,9 +56,20 @@ public:
 
 	RESULT CommitObjects();
 
+	point GetMinimimPoint();
+	point GetMaximumPoint();
+	point GetMidPoint();
+
+public:
+	RESULT UpdateMinMax();
 
 protected:
 	ObjectStoreImp *m_pSceneGraphStore;
+
+	point m_ptSceneMax; 
+	point m_ptSceneMin; 
+	point m_ptSceneMid;
+
 private:
 	UID m_uid;
 };

@@ -26,87 +26,29 @@ typedef enum LightType {
 
 class light : public VirtualObj {
 public:
-	light() :
-		VirtualObj(),
-		m_type(DEFAULT_LIGHT_TYPE),
-		m_power(DEFAULT_LIGHT_INTENSITY),
-		m_colorDiffuse(COLOR_WHITE),
-		m_colorSpecular(COLOR_WHITE),
-		m_vectorDirection(vector::jVector(-1.0f)),
-		m_fShadowEmitter(false),
-		m_spotAngle(0.0f)
-	{
-		// empty
-	}
+	light();
+	light(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
 
-	light(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) :
-		VirtualObj(ptOrigin),
-		m_type(type),
-		m_power(intensity),
-		m_colorDiffuse(colorDiffuse),
-		m_colorSpecular(colorSpecular),
-		m_vectorDirection(vectorDirection)
-	{
-		// empty
-	}
+	~light();
 
-	~light() {
-		// empty
-	}
+	matrix<virtual_precision, 4, 4> GetViewProjectionMatrix(virtual_precision width, virtual_precision height, virtual_precision nearPlane, virtual_precision farPlane);
+	matrix<virtual_precision, 4, 4> GetViewProjectionMatrix(point ptSceneMax, point ptSceneMin, virtual_precision nearPlane, virtual_precision farPlane);
 
-	matrix<virtual_precision, 4, 4> GetViewProjectionMatrix(virtual_precision width, virtual_precision height, virtual_precision nearPlane, virtual_precision farPlane) {
-		matrix<virtual_precision, 4, 4> matVP;
-		matVP.identity();
+	LIGHT_TYPE GetLightType();
+	light_precision GetPower();
 
-		quaternion qOrientation = quaternion::jQuaternion(0.0f);
-		//qOrientation.RotateByVector(m_vectorDirection, 0.0f); //quaternion(0.0f, m_vectorDirection).RotateVector(vector::kVector(-1.0f));
+	color GetDiffuseColor();
+	color GetSpecularColor();
+	vector GetLightDirection();
 
-		if (m_type == LIGHT_DIRECITONAL) {
-			matVP = ProjectionMatrix(width, height, nearPlane, farPlane);
-		}
-		else if (m_type == LIGHT_SPOT) {
-			matVP = ProjectionMatrix(width, height, nearPlane, farPlane, m_spotAngle);
-		}
+	RESULT EnableShadows();
+	RESULT DisableShadows();
+	bool IsShadowEmitter();
 
-		matVP = matVP * RotationMatrix(m_vectorDirection, vector::jVector(1.0f)) * TranslationMatrix(GetOrigin());
-
-		return matVP;
-	}
-
-	LIGHT_TYPE GetLightType() { return m_type; }
-	light_precision GetPower() { return m_power; }
-
-	color GetDiffuseColor() { return m_colorDiffuse; }
-	color GetSpecularColor() { return m_colorSpecular; }
-	vector GetLightDirection() { return m_vectorDirection; }
-
-	RESULT EnableShadows() { m_fShadowEmitter = true; return R_FAIL; }
-	RESULT DisableShadows() { m_fShadowEmitter = false; return R_FAIL; }
-	bool IsShadowEmitter() { return m_fShadowEmitter; }
-
-	RESULT RotateLightDirection(rotation_precision phi, rotation_precision theta, rotation_precision psi) {
-		m_vectorDirection = RotationMatrix(phi, theta, psi) * m_vectorDirection;
-		m_vectorDirection.Normalize();
-		return R_PASS;
-	}
-
-	RESULT RotateLightDirectionXAxis(rotation_precision theta) {
-		m_vectorDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::X_AXIS, theta) * m_vectorDirection;
-		m_vectorDirection.Normalize();
-		return R_PASS;
-	}
-
-	RESULT RotateLightDirectionYAxis(rotation_precision theta) {
-		m_vectorDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::Y_AXIS, theta) * m_vectorDirection;
-		m_vectorDirection.Normalize();
-		return R_PASS;
-	}
-
-	RESULT RotateLightDirectionZAxis(rotation_precision theta) {
-		m_vectorDirection = RotationMatrix(RotationMatrix::ROTATION_MATRIX_TYPE::Z_AXIS, theta) * m_vectorDirection;
-		m_vectorDirection.Normalize();
-		return R_PASS;
-	}
+	RESULT RotateLightDirection(rotation_precision phi, rotation_precision theta, rotation_precision psi);
+	RESULT RotateLightDirectionXAxis(rotation_precision theta);
+	RESULT RotateLightDirectionYAxis(rotation_precision theta);
+	RESULT RotateLightDirectionZAxis(rotation_precision theta);
 
 private:
 	LIGHT_TYPE m_type;		// NOTE: This is treated as an int
