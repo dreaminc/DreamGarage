@@ -36,6 +36,7 @@ RESULT OGLProgramShadowDepth::OGLInitialize() {
 
 	CR(m_pOGLFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
 	CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT32, GL_FLOAT));
+	//CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT24, GL_FLOAT));
 	//CR(m_pOGLFramebuffer->GetDepthAttachment()->MakeOGLDepthTexture(GL_DEPTH_COMPONENT16, GL_FLOAT));
 	
 	// Use linear filtering
@@ -81,7 +82,7 @@ RESULT OGLProgramShadowDepth::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	// Trick to only render at reduced frame rate
-	if (frameID % 3 != 0) {
+	if (frameID % 5 != 0) {
 		return R_SKIPPED;
 	}
 
@@ -170,13 +171,10 @@ matrix<virtual_precision, 4, 4> OGLProgramShadowDepth::GetViewProjectionMatrix()
 	matrix<virtual_precision, 4, 4> matVP;
 	matVP.identity();
 
-	point ptSceneMax, ptSceneMin, ptSceneMid;
-
-	m_pSceneGraph->GetMinMaxPoint(&ptSceneMax, &ptSceneMin);
-	ptSceneMid = point::midpoint(ptSceneMax, ptSceneMin);
-
 	if (m_pShadowEmitter != nullptr) {
-		matVP = m_pShadowEmitter->GetViewProjectionMatrix(80.0f, 80.0f, 0.1f, 1000.0f);
+		//matVP = m_pShadowEmitter->GetViewProjectionMatrix(80.0f, 80.0f, 0.1f, 1000.0f);
+		//matVP = m_pShadowEmitter->GetViewProjectionMatrix(10.0f, 10.0f, 0.1f, 1000.0f);
+		matVP = m_pShadowEmitter->GetViewProjectionMatrix(m_pSceneGraph->GetMaximumPoint(), m_pSceneGraph->GetMinimimPoint(), 0.1f, 1000.0f);
 	}
 
 	return matVP;

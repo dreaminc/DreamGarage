@@ -95,7 +95,7 @@ Error:
 RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 40.0f;
+	double sTestTime = 180.0f;
 	int nRepeats = 1;
 
 	float width = 1.5f;
@@ -103,6 +103,11 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 	float length = width;
 
 	float padding = 0.5f;
+
+	float adjs = 1.0f;
+	float sceneScale = 0.1f / adjs;
+	point sceneOffset = point(90.0f / adjs, -5.0f / adjs, -25.0f / adjs);
+	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
 
 	// Initialize Code 
 	auto fnInitialize = [=](void *pContext) {
@@ -118,19 +123,17 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		///*
 		ProgramNode* pShadowDepthProgramNode = pHAL->MakeProgramNode("shadow_depth");
 		CN(pShadowDepthProgramNode);
 		CR(pShadowDepthProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		//CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		//*/
 
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_shadow");
 		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_shadow");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pRenderProgramNode->ConnectToInput("input_shadowdepth_framebuffer", pShadowDepthProgramNode->Output("output_framebuffer")));
 
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
@@ -144,21 +147,74 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.0f));
-		pLight->EnableShadows();
+		//g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.15f, -1.0f, -0.0f).Normal());
+		//g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-1.0f, -1.0f, -0.0f).Normal());
+		g_pLightTest = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, 0.0f).Normal());
+		g_pLightTest->EnableShadows();
 
+		///*
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
-		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
+		//pVolume->SetPosition(point(-width, -height/2.0f - 0.1f, (length + padding) * 0.0f));
+		pVolume->SetPosition(point(-width, 1.0f, (length + padding) * 0.0f));
 		
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
-		pVolume->SetPosition(point(width, 0.0f, (length + padding) * -3.0f));
+		pVolume->SetPosition(point(width, 1.0f, (length + padding) * -3.0f));
 
+		auto pSphere = m_pDreamOS->AddSphere(0.5f, 20, 20);
+		CN(pSphere);
+		pSphere->SetPosition(point(1.0f, 1.0f, 0.0f));
+		//*/
 
-		auto pQuad = m_pDreamOS->AddQuad(6.0f, 6.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
-		CN(pQuad);
-		pQuad->SetPosition(point(0.0f, -1.0f, 0.0f));
+		/*
+		auto pQuad = m_pDreamOS->AddQuad(10.0f, 10.0f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+		CN(pQuad)
+		pQuad->SetPosition(point(0.0f, -1.5f, 0.0f));
+		m_pDreamOS->GetSceneGraphNode()->UpdateMinMax();
+		//*/
+
+		///*
+		m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
+			nullptr,
+			sceneOffset,
+			sceneScale,
+			sceneDirection);
+		//*/
+
+		/*
+		m_pDreamOS->AddModel(L"\\Models\\ForestIsland\\ForestIsland.obj",
+			nullptr,
+			sceneOffset,
+			sceneScale,
+			sceneDirection);
+		//*/
+
+		/*
+		composite* pRiver = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\river.obj",
+			nullptr,
+			sceneOffset,
+			sceneScale,
+			sceneDirection);
+		//*/
+
+		/*
+		m_pModel = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds_1.obj",
+			nullptr,
+			point(0.0f, 0.0f, 0.0f),
+			0.2f,
+			vector(0.0f, 0.0f, 0.0f));
+		m_pModel->SetPosition(point(0.0f, 0.0f, -5.0f));
+		//*/
+
+		/*
+		m_pModel = m_pDreamOS->AddModel(L"\\Models\\Low_Poly_Cloud_Pack\\Low_Poly_Cloud_Pack.obj",
+			nullptr,
+			point(0.0f, 0.0f, 0.0f),
+			0.2f,
+			vector(0.0f, 0.0f, 0.0f));
+		m_pModel->SetPosition(point(0.0f, 0.0f, -5.0f));
+		//*/
 
 	Error:
 		return r;
@@ -171,6 +227,15 @@ RESULT HALTestSuite::AddTestBlinnPhongShadowShader() {
 
 	// Update Code 
 	auto fnUpdate = [&](void *pContext) {
+
+		if(g_pLightTest != nullptr) {
+			//g_pLightTest->RotateLightDirection(0.001f, 0.0f, 0.0f);
+		}
+		
+		if (m_pModel != nullptr) {
+			m_pModel->RotateYByDeg(0.1f);
+		}
+
 		return R_PASS;
 	};
 

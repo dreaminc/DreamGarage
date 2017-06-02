@@ -7,7 +7,7 @@
 #version 440 core
 
 #define MAX_TOTAL_LIGHTS 10
-#define SHADOW_PCF_OFFSET 1.0f
+#define SHADOW_PCF_OFFSET 10.0f
 #define _USE_PCF
 
 in vec3 inF_vec3Color;
@@ -64,6 +64,13 @@ layout (location = 0) out vec4 out_vec4Color;
 
 float g_ambient = 0.01f;
 
+vec2 samplingLookup[] = vec2[](
+  vec2( -1.0f, -1.0f ),
+  vec2( -1.0f, 1.0 ),
+  vec2( 1.0f, -1.0f ),
+  vec2( 1.0f, 1.0f )
+);
+
 vec4 g_vec4AmbientLightLevel = g_ambient * material.m_colorAmbient;
 
 void CalculateFragmentLightValue(in float power, in vec3 vectorNormal, in vec3 directionLight, in vec3 directionEye, in float distanceLight, out float diffuseValue, out float specularValue) {
@@ -105,14 +112,23 @@ void main(void) {
 		float shadowAccumulator = 0.0f;
 
 		// weight center more
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(0, 0));
+		shadowAccumulator += 2.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(0, 0));
+
 		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(-SHADOW_PCF_OFFSET, -SHADOW_PCF_OFFSET));
+		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(-SHADOW_PCF_OFFSET, 0));
 		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(-SHADOW_PCF_OFFSET, SHADOW_PCF_OFFSET));
-		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, SHADOW_PCF_OFFSET));
+
+		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(0, SHADOW_PCF_OFFSET));
+		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(0, -SHADOW_PCF_OFFSET));
+
 		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, -SHADOW_PCF_OFFSET));
+		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, 0));
+		shadowAccumulator += 1.0f * textureProjOffset(u_textureDepth, DataIn.vertShadowCoordinate, ivec2(SHADOW_PCF_OFFSET, SHADOW_PCF_OFFSET));
+
+		
 	
-		lightVisibility *= (shadowAccumulator * (1.0f/5.0f));
-		lightVisibility = clamp(lightVisibility, 0.10f, 1.0f);
+		lightVisibility *= (shadowAccumulator * (1.0f/10.0f));
+		lightVisibility = clamp(lightVisibility, 0.25f, 1.0f);
 	#else
 		float shadowVal = textureProj(u_textureDepth, DataIn.vertShadowCoordinate);
 		lightVisibility *= shadowVal;

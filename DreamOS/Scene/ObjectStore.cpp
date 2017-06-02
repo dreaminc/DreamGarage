@@ -55,6 +55,39 @@ RESULT ObjectStore::PushObject(VirtualObj *pObject, bool fForce) {
 	// Push otherwise
 	CR(m_pSceneGraphStore->PushObject(pObject));
 
+	Error:
+	return r;
+}
+
+point ObjectStore::GetMinimimPoint() {
+	return m_ptSceneMin;
+}
+
+point ObjectStore::GetMaximumPoint() {
+	return m_ptSceneMax;
+}
+
+point ObjectStore::GetMidPoint() {
+	return m_ptSceneMid;
+}
+
+RESULT ObjectStore::UpdateMinMax() {
+	RESULT r = R_PASS;
+
+	CR(GetMinMaxPoint(&m_ptSceneMax, &m_ptSceneMin));
+	m_ptSceneMid = point::midpoint(m_ptSceneMax, m_ptSceneMin);
+
+Error:
+	return r;
+}
+
+RESULT ObjectStore::PushObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pSceneGraphStore->PushObject(pObject));
+
+	CR(UpdateMinMax());
+
 Error:
 	return r;
 }
@@ -64,6 +97,8 @@ RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
 
 	CN(m_pSceneGraphStore);
 	CR(m_pSceneGraphStore->RemoveObject(pObject));
+
+	CR(UpdateMinMax());
 
 Error:
 	return r;
