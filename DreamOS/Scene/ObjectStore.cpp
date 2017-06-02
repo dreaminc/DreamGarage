@@ -40,8 +40,37 @@ RESULT ObjectStore::Reset() {
 	return m_pSceneGraphStore->ResetIterator();
 }
 
+point ObjectStore::GetMinimimPoint() {
+	return m_ptSceneMin;
+}
+
+point ObjectStore::GetMaximumPoint() {
+	return m_ptSceneMax;
+}
+
+point ObjectStore::GetMidPoint() {
+	return m_ptSceneMid;
+}
+
+RESULT ObjectStore::UpdateMinMax() {
+	RESULT r = R_PASS;
+
+	CR(GetMinMaxPoint(&m_ptSceneMax, &m_ptSceneMin));
+	m_ptSceneMid = point::midpoint(m_ptSceneMax, m_ptSceneMin);
+
+Error:
+	return r;
+}
+
 RESULT ObjectStore::PushObject(VirtualObj *pObject) {
-	return m_pSceneGraphStore->PushObject(pObject);
+	RESULT r = R_PASS;
+
+	CR(m_pSceneGraphStore->PushObject(pObject));
+
+	CR(UpdateMinMax());
+
+Error:
+	return r;
 }
 
 RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
@@ -49,6 +78,8 @@ RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
 
 	CN(m_pSceneGraphStore);
 	CR(m_pSceneGraphStore->RemoveObject(pObject));
+
+	CR(UpdateMinMax());
 
 Error:
 	return r;
@@ -90,6 +121,10 @@ std::vector<VirtualObj*> ObjectStore::GetObjects() {
 
 std::vector<VirtualObj*> ObjectStore::GetObjects(ray rCast) {
 	return m_pSceneGraphStore->GetObjects(rCast);
+}
+
+RESULT ObjectStore::GetMinMaxPoint(point *pPtMax, point *pPtMin) {
+	return m_pSceneGraphStore->GetMinMaxPoint(pPtMax, pPtMin);
 }
 
 // TODO: This is holding the collide functionality here temporarily 

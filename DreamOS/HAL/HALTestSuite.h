@@ -16,6 +16,7 @@
 
 class DreamOS;
 class HALImp;
+class composite;
 
 class HALTestSuite : public TestSuite {
 public:
@@ -38,6 +39,8 @@ public:
 	RESULT AddTestBlinnPhongShaderTextureHMD();
 	RESULT AddTestBlinnPhongShaderTextureCopy();
 
+	RESULT AddTestBlinnPhongShadowShader();
+
 	RESULT AddTestMinimalShader();
 	RESULT AddTestMinimalTextureShader();
 	RESULT AddTestBlinnPhongShaderBlur();
@@ -58,6 +61,8 @@ private:
 private:
 	DreamOS *m_pDreamOS;
 	HALImp *m_pHALImp = nullptr;
+
+	composite *m_pModel = nullptr;
 };
 
 #endif // ! HAL_TEST_SUITE_H_

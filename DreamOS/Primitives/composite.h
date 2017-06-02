@@ -37,6 +37,7 @@ public:
 	RESULT ClearObjects();
 
 	virtual RESULT UpdateBoundingVolume() override;
+	virtual RESULT GetMinMaxPoint(point *pPtMax, point *pPtMin) override;
 
 	std::shared_ptr<sphere> MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	std::shared_ptr<sphere> AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
