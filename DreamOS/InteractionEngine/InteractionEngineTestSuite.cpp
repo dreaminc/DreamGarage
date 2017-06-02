@@ -51,9 +51,9 @@ RESULT InteractionEngineTestSuite::AddTests() {
 
 	CR(AddTestCompositeRayNested());
 
-	CR(AddTestCompositeRay());
+	//CR(AddTestCompositeRay());
 
-	CR(AddTestCompositeRayController());
+	//CR(AddTestCompositeRayController());
 
 Error:
 	return r;

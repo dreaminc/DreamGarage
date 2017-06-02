@@ -22,6 +22,7 @@ class HALImp;
 class hand;
 class camera;
 class FlatContext;
+class UIView;
 class stereocamera;
 
 class composite : public DimObj {
@@ -63,6 +64,9 @@ public:
 
 	std::shared_ptr<FlatContext> MakeFlatContext(int width = 1024, int height = 1024, int channels = 4);
 	std::shared_ptr<FlatContext> AddFlatContext(int width = 1024, int height = 1024, int channels = 4);
+
+	std::shared_ptr<UIView> MakeUIView();
+	std::shared_ptr<UIView> AddUIView();
 
 	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	std::shared_ptr<texture> MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);

@@ -12,6 +12,8 @@
 #include "Cloud/WebRequest.h"
 
 #include "UI/UIKeyboard.h"
+#include "UI/UIEvent.h"
+#include "UI/UIView.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -47,15 +49,14 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestBrowserRequestWithMenuAPI());
-	CR(AddTestBrowserRequest());
+	CR(AddTestUIView());
 
-	CR(AddTestKeyboard());
+	//CR(AddTestBrowserRequestWithMenuAPI());
+	//CR(AddTestBrowserRequest());
 
-	CR(AddTestBrowser());
+	//CR(AddTestKeyboard());
 
-
-
+	//CR(AddTestBrowser());
 //	CR(AddTestInteractionFauxUI());
 //	CR(AddTestSharedContentView());
 
@@ -560,6 +561,101 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::AddTestUIView() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		{
+			auto pComposite = m_pDreamOS->AddComposite();
+			pComposite->InitializeOBB();
+
+			auto pView = pComposite->AddUIView();
+			pView->InitializeOBB();
+			pView->SetPosition(point(0.0f, 1.0f, 2.0f));
+			
+			auto pQuad = pView->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector());
+			//pQuad->SetPosition(point(0.0f, 1.0f, 2.0f));
+
+			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+				CR(m_pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), pView.get()));
+			}
+			for (int i = 0; i < UIEventType::UI_EVENT_INVALID; i++) {
+				CR(pView->RegisterSubscriber((UIEventType)(i), this));
+			}
+			
+			m_pDreamOS->AddInteractionObject(pComposite);
+		}
+		
+		CR(Initialize());
+
+	Error:
+		return r;
+	};
+
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		ray rCast;
+		CN(m_pDreamOS);
+		hand *pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+
+		if (pHand != nullptr) {
+			point ptHand = pHand->GetPosition();
+
+			//GetLookVector
+			quaternion qHand = pHand->GetHandState().qOrientation;
+			qHand.Normalize();
+
+			//TODO: investigate how to properly get look vector for controllers
+			//vector vHandLook = qHand.RotateVector(vector(0.0f, 0.0f, -1.0f)).Normal();
+
+			vector vHandLook = RotationMatrix(qHand) * vector(0.0f, 0.0f, -1.0f);
+			vHandLook.Normalize();
+
+			rCast = ray(ptHand, vHandLook);
+		}
+		
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local UIView Test");
+	pUITest->SetTestDescription("Basic test of uiview working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestSharedContentView() {
 	RESULT r = R_PASS;
 
@@ -826,6 +922,30 @@ Error:
 
 RESULT UITestSuite::Notify(SenseMouseEvent *mEvent) {
 	RESULT r = R_PASS;
+
+//Error:
+	return r;
+}
+
+RESULT UITestSuite::Notify(UIEvent *pEvent) {
+	RESULT r = R_PASS;
+
+	switch (pEvent->m_eventType) {
+	case (UIEventType::UI_EVENT_INTERSECT_BEGAN): {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
+		
+		if (pDimObj != nullptr) {
+			pDimObj->RotateZByDeg(45.0f);
+		}
+	} break;
+	case (UIEventType::UI_EVENT_INTERSECT_ENDED): {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
+
+		if (pDimObj != nullptr) {
+			pDimObj->ResetRotation();
+		}
+	} break;
+	}
 
 //Error:
 	return r;

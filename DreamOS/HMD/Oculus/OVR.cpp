@@ -108,11 +108,11 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 
 	m_pLeftControllerModel = m_pParentSandbox->AddComposite();
 	CN(m_pLeftControllerModel);
-	m_pLeftControllerModel->AddSphere(0.5f, 10, 10);
+	m_pLeftControllerModel->AddSphere(0.05f, 10, 10);
 
 	m_pRightControllerModel = m_pParentSandbox->AddComposite();
 	CN(m_pRightControllerModel);
-	m_pRightControllerModel->AddSphere(0.5f, 10, 10);
+	m_pRightControllerModel->AddSphere(0.05f, 10, 10);
 #else 
 	// Oculus controller dimensions: 4.1 x 4.5 x 3.8 in.
 	// model is off center, displacing by half height and half depth helps (engine is in meters)

@@ -8,6 +8,8 @@
 #include "Primitives/camera.h"
 #include "Primitives/stereocamera.h"
 
+#include "UI/UIView.h"
+
 composite::composite(HALImp *pHALImp) :
 	m_pHALImp(pHALImp)
 {
@@ -344,6 +346,22 @@ std::shared_ptr<FlatContext> composite::AddFlatContext(int width, int height, in
 	CR(AddObject(pContext));
 
 	return pContext;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIView> composite::MakeUIView() {
+	std::shared_ptr<UIView> pView(new UIView(m_pHALImp));
+
+	return pView;
+}
+
+std::shared_ptr<UIView> composite::AddUIView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIView> pView = MakeUIView();
+	CR(AddObject(pView));
+	return pView;
 Error:
 	return nullptr;
 }

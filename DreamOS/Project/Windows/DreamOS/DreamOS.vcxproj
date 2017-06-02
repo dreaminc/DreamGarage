@@ -814,6 +814,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Test\TestSuiteFactory.cpp" />
     <ClCompile Include="..\..\..\TimeManager\TimeManager.cpp" />
     <ClCompile Include="..\..\..\UI\UIBar.cpp" />
+    <ClCompile Include="..\..\..\UI\UIContainer.cpp" />
+    <ClCompile Include="..\..\..\UI\UIEvent.cpp" />
     <ClCompile Include="..\..\..\UI\UIKey.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboard.cpp" />
     <ClCompile Include="..\..\..\UI\UIKeyboardLayout.cpp" />
@@ -823,6 +825,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp" />
     <ClCompile Include="..\..\..\UI\UIModule.cpp" />
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp" />
+    <ClCompile Include="..\..\..\UI\UIView.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.cpp" />
     <ClCompile Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserManager.cpp" />
@@ -1102,6 +1105,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Test\TestSuiteFactory.h" />
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h" />
     <ClInclude Include="..\..\..\UI\UIBar.h" />
+    <ClInclude Include="..\..\..\UI\UIContainer.h" />
+    <ClInclude Include="..\..\..\UI\UIEvent.h" />
     <ClInclude Include="..\..\..\UI\UIKey.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboard.h" />
     <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h" />
@@ -1111,6 +1116,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\UI\UIMenuLayer.h" />
     <ClInclude Include="..\..\..\UI\UIModule.h" />
     <ClInclude Include="..\..\..\UI\UITestSuite.h" />
+    <ClInclude Include="..\..\..\UI\UIView.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFApp.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFAppObserver.h" />
     <ClInclude Include="..\..\..\WebBrowser\CEFBrowser\CEFBrowserController.h" />

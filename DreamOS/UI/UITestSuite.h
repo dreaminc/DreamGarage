@@ -29,6 +29,7 @@ struct SenseControllerEvent;
 struct SenseKeyboardEvent;
 struct SenseMouseEvent;
 struct InteractionObjectEvent;
+struct UIEvent;
 
 struct KeyboardTestContext {
 	sphere* pSphere = nullptr;
@@ -39,6 +40,7 @@ struct KeyboardTestContext {
 class UITestSuite : public valid, public TestSuite, 
 					public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, 
 					public Subscriber<SenseMouseEvent>,
+					public Subscriber<UIEvent>,
 					public MenuController::observer
 {
 public:
@@ -53,6 +55,7 @@ public:
 	RESULT AddTestBrowserRequest();
 	RESULT AddTestBrowserRequestWithMenuAPI();
 	RESULT AddTestKeyboard();
+	RESULT AddTestUIView();
 
 	virtual RESULT AddTests() override;
 
@@ -66,6 +69,7 @@ public:
 	virtual RESULT Notify(SenseControllerEvent *event) override;
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(SenseMouseEvent *mEvent) override;
+	virtual RESULT Notify(UIEvent *mEvent) override;
 
 private:
 	RESULT SetupPipeline();
