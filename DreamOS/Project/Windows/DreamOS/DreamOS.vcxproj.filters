@@ -1627,7 +1627,7 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h">
       <Filter>DreamGarage</Filter>
-	</ClInclude>
+    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
@@ -1657,6 +1657,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Multipublisher.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -34,6 +34,8 @@ public:
 
 	RESULT SetupPipeline();
 
+	RESULT AddTestObjectBasedEvents();
+
 	RESULT AddTestCompositeRay();
 	RESULT AddTestCompositeRayNested();
 	RESULT AddTestCompositeRayController();

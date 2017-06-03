@@ -22,10 +22,15 @@
 // First lets see if this topology works at all
 
 template <typename PKeyClass, typename PKEventClass>
-class Publisher {
+class I_Publisher {
 public:
+	virtual RESULT RegisterEvent(PKeyClass keyEvent) = 0;
+	virtual bool IsEventRegistered(PKeyClass keyEvent) = 0;
 
-	// Forward declaration for template
+	virtual RESULT NotifySubscribers(PKeyClass keyEvent, PKEventClass *pEvent) = 0;
+	virtual bool EventHasSubscribers(PKeyClass keyEvent) = 0;
+
+public:
 	struct MAP_COMPARE_FUNCTION_STRUCT {
 		bool operator()(std::string a, std::string b) const {
 			return a.compare(b) < 0;
@@ -44,22 +49,14 @@ public:
 		}
 	};
 
-	/*
-	char* Publisher<PKeyClass, PEventClass>::GetEventKeyString(PKeyClass keyEvent) {
-		return "FUNCNOTDEFINED";
-	}
-	*/
-	
 	char* GetEventKeyString(int keyEvent) {
 		int numLength = (keyEvent == 0) ? 2 : (int)(log10(keyEvent)) + 2;
 
 		char *pszNumString = new char[numLength];
 		memset(pszNumString, 0, sizeof(char) * numLength);
-		//itoa(keyEvent, pszNumString, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
-		//_itoa_s(keyEvent, pszNumString, sizeof(char) * numLength, 10);		// TODO: Note this is not POSIX compliant and will fail compilation
-        
-        // Going C99 standard
-        snprintf(pszNumString, sizeof(char) * numLength, "%d", keyEvent);
+
+		// Going C99 standard
+		snprintf(pszNumString, sizeof(char) * numLength, "%d", keyEvent);
 
 		return pszNumString;
 	}
@@ -67,6 +64,7 @@ public:
 	char* GetEventKeyString(char* keyEvent) {
 		int strLength = strlen(keyEvent) + 1;
 		char *pszString = new char[strLength];
+		
 		memset(pszString, 0, sizeof(char) * strLength);
 		memcpy(pszString, keyEvent, sizeof(char) * (strLength - 1));
 
@@ -76,6 +74,7 @@ public:
 	char* GetEventKeyString(const std::string& keyEvent) {
 		int strLength = static_cast<int>(keyEvent.length());// strlen(keyEvent) + 1;
 		char *pszString = new char[strLength];
+
 		memset(pszString, 0, sizeof(char) * strLength);
 		memcpy(pszString, keyEvent.c_str(), sizeof(char) * (strLength - 1));
 
@@ -85,34 +84,29 @@ public:
 	char* GetEventKeyString(VirtualObj* pKeyObject) {
 		return GetEventKeyString((int)(pKeyObject->getID().GetID()));
 	}
+};
 
+template <typename PKeyClass, typename PKEventClass>
+class Publisher : public I_Publisher<PKeyClass, PKEventClass> {
+public:
 	Publisher() {
-		//m_pSubsribers = new std::list<Subscriber*>();
-		//m_pEvents = new std::map<PKeyClass, std::list<Subscriber*>*, MAP_COMPARE_FUNCTION_STRUCT>();
 		// empty
 	}
 
 	// This will not deallocate the subscribers, the subscribing object is responsible to do that
 	// and to unregister themselves
 	~Publisher() {
-		//if (m_pEvents != NULL) {
+		auto it = m_events.begin();
 
-			//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
-			auto it = m_events.begin();
-			
-			while (it != m_events.end()) {
-				std::list<Subscriber<PKEventClass>*> *pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
+		while (it != m_events.end()) {
+			std::list<Subscriber<PKEventClass>*> *pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
-				if (pSubscriberList != NULL) {
-					delete pSubscriberList;
-					pSubscriberList = NULL;
-				}
-				it++;
+			if (pSubscriberList != nullptr) {
+				delete pSubscriberList;
+				pSubscriberList = nullptr;
 			}
-
-			//delete m_pEvents;
-			//m_pEvents = NULL;
-		//}
+			it++;
+		}
 	}
 
 	char *GetPublisherName() {
@@ -120,37 +114,26 @@ public:
 	}
 
 protected:
-	RESULT RegisterEvent(PKeyClass keyEvent) {
-		RESULT r = R_PASS;
-		char *pszEvent = nullptr;
+	virtual RESULT RegisterEvent(PKeyClass keyEvent) override {
+		RESULT r = R_PASS;		
 		
-		//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
 		auto it = m_events.find(keyEvent);
         std::list<Subscriber<PKEventClass>*>* pNewSubscriberList = nullptr;
 
-		pszEvent = GetEventKeyString(keyEvent);
-		CBM((it == m_events.end()), "Event %s already registered", pszEvent);
+		CBM((it == m_events.end()), "Event %s already registered", GetEventKeyString(keyEvent));
 		
 		// Create a new subscriber list for the event entry
-
-
-		// typename std::list<Subscriber<PKEventClass>*>*	pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
 		pNewSubscriberList = (std::list<Subscriber<PKEventClass>*>*)(new std::list<Subscriber<PKEventClass>*>());
 		m_events[keyEvent] = pNewSubscriberList;
 
 		//DEBUG_LINEOUT("%s Registered event %s", GetPublisherName(), pszEvent);
 
 	Error:
-		if (pszEvent != nullptr) {
-			delete[] pszEvent;
-			pszEvent = nullptr;
-		}
-
 		return r;
 	}
 
 public:
-	bool IsEventRegistered(PKeyClass keyEvent) {
+	virtual bool IsEventRegistered(PKeyClass keyEvent) override {
 		auto it = m_events.find(keyEvent);
 		return (!(it == m_events.end()));
 	}
@@ -163,44 +146,28 @@ public:
 	// This requires the event to be registered 
 	RESULT RegisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
-		char *pszEvent = nullptr;
+		
 		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
 		std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 		it = m_events.find(keyEvent);
-
-		pszEvent = GetEventKeyString(keyEvent);
-		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
+		CBM((it != m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
 
 		// Check if already registered
 		pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
-		//for (std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 		for (auto eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 			Subscriber<PKEventClass>* pTempSubscriber = reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator);
-			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", pszEvent);
+			CBM((pTempSubscriber != pSubscriber), "Already subscribed to %s", GetEventKeyString(keyEvent));
 		}
 
 		// If we made it this far then push the subscriber into the list for the given event
 		m_events[keyEvent]->push_back(pSubscriber);
 
 	Error:
-		if (pszEvent != nullptr) {
-			delete[] pszEvent;
-			pszEvent = nullptr;
-		}
-
 		return r;
 	}
-
-	/* TODO:
-	// Similar to the above, but will register to the ALL list so will get notified for all events
-	// but will get secondary preference at the moment (TODO: Add priority)
-	RESULT RegisterSubscriber(Subscriber<PKEventClass>* pSubscriber) {
-
-	}
-	*/
 
 	// Error handling warranted by the fact that this should only be called with confidence 
 	// that the subscriber is subscriber to a given event per the subscriber or the Publisher 
@@ -208,19 +175,16 @@ public:
 	RESULT UnregisterSubscriber(PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 
-		//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
 		auto it = m_events.find(keyEvent);
-		char *pszEvent = GetEventKeyString(keyEvent);
-        
-        typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = NULL;
+		
+        typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
         
         CNM(pSubscriber, "Subscriber cannot be NULL");
-		CBM((it == m_events.end()), "Event %s not registered", pszEvent);
+		CBM((it == m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
 
 		pSubscriberList = reinterpret_cast<std::list<Subscriber<PKEventClass>*>*>(it->second);
 
-		if (pSubscriberList != NULL) {
-			//for (typename std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
+		if (pSubscriberList != nullptr) {
 			for (auto eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 				Subscriber<PKEventClass>* pListSubscriber = reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator);
 
@@ -231,15 +195,9 @@ public:
 			}
 		}
 
-
-		CBM((0), "Subscriber not found for event %s", pszEvent);
+		CBM((0), "Subscriber not found for event %s", GetEventKeyString(keyEvent));
 
 	Error:
-		if (pszEvent != NULL) {
-			delete[] pszEvent;
-			pszEvent = NULL;
-		}
-
 		return r;
 	}
 
@@ -248,7 +206,6 @@ public:
 	// things get out of line
 	RESULT UnregisterSubscriber(Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
-		char *pszEvent = NULL;
 
 		typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.begin();
         CNM(pSubscriber, "Subscriber cannot be NULL");
@@ -256,56 +213,43 @@ public:
 		while (it != m_events.end()) {
 			PKeyClass keyEvent = reinterpret_cast<PKeyClass>(it->first);
 
-			pszEvent = GetEventKeyString(keyEvent);
-			CRM(UnregisterSubscriber(keyEvent, pSubscriber), "Failed to unsubscribe for event %s", pszEvent);
+			CRM(UnregisterSubscriber(keyEvent, pSubscriber), "Failed to unsubscribe for event %s", GetEventKeyString(keyEvent));
 			
 			it++;
 		}
 
 	Error:
-		if (pszEvent != NULL) {
-			delete[] pszEvent;
-			pszEvent = NULL;
-		}
-
 		return r;
 	}
 
-	RESULT NotifySubscribers(PKeyClass keyEvent, PKEventClass *pEvent) {
+	virtual RESULT NotifySubscribers(PKeyClass keyEvent, PKEventClass *pEvent) override {
 		RESULT r = R_PASS;
-		char *pszEvent = NULL;
-        typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = NULL;
-		//typename std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it = m_events.find(keyEvent);
+		
+        typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 		auto it = m_events.find(keyEvent);
 
-		pszEvent = GetEventKeyString(keyEvent);
-		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
+		CBM((it != m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
 		
 		pSubscriberList = m_events[keyEvent];
 		CNM(pSubscriberList, "Subscriber list is NULL");
 
 		if (pSubscriberList->size() > 0) {
-			//for (typename std::list<Subscriber<PKEventClass>*>::iterator eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 			for (auto eventIterator = pSubscriberList->begin(); eventIterator != pSubscriberList->end(); eventIterator++) {
 				WCR(reinterpret_cast<Subscriber<PKEventClass>*>(*eventIterator)->Notify(pEvent));
 			}
 		}
 
 	Error:
-		if (pszEvent != NULL) {
-			delete[] pszEvent;
-			pszEvent = NULL;
-		}
-
 		return r;
 	}
 
-	bool EventHasSubscribers(PKeyClass keyEvent) {
+	virtual bool EventHasSubscribers(PKeyClass keyEvent) override {
+		RESULT r = R_PASS;
+
 		typename std::list<Subscriber<PKEventClass>*> *pSubscriberList = nullptr;
 		auto it = m_events.find(keyEvent);
 
-		pszEvent = GetEventKeyString(keyEvent);
-		CBM((it != m_events.end()), "Event %s not registered", pszEvent);
+		CBM((it != m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
 
 		pSubscriberList = m_events[keyEvent];
 		CNM(pSubscriberList, "Subscriber list is NULL");
@@ -314,21 +258,12 @@ public:
 			return true;
 		}
 
+	Error:
 		return false;
 	}
 
 private:
-	//std::list<Subscriber*> *m_pSubsribers; 
-
-	// Maintain a list of all subscribers and the events they're subscribed to
-	//TODO: std::map<Subscriber<PKEventClass>*, std::list<Subscriber<PKEventClass>*> m_subscribers;
-
-	// Events 
 	std::map<PKeyClass, std::list<Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT> m_events;
-
-	// TODO: Add an subscribe all function
-	// These subscribers get notified of ALL events
-	//std::list<Subscriber<PKEventClass>*> m_pSubscribeAllList;
 };
 
 #endif // ! PUBLISHER_H_
