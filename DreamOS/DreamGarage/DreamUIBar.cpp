@@ -63,9 +63,9 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(GetComposite()->InitializeOBB());
 	CR(GetDOS()->AddInteractionObject(GetComposite()));
 
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), this));
-	}
+	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+	//	CR(pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), this));
+	//}
 
 	CR(RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN,
 		std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1)));

@@ -30,8 +30,9 @@ public:
 
 	RESULT Reset();
 
-	RESULT PushObject(VirtualObj *pObject);
+	RESULT PushObject(VirtualObj *pObject, bool fForce = false);
 	RESULT RemoveObject(VirtualObj *pObject);
+	VirtualObj *FindObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();
 
 	// Effectively a factory method to set up the object store

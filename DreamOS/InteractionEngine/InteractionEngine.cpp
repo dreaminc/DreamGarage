@@ -289,8 +289,11 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 					// Manifold should return only one object, one will be nullptr
 					pObj = manifold.GetObjectA();
-					if(pObj == nullptr)
+
+					if (pObj == nullptr) {
 						pObj = manifold.GetObjectB();
+					}
+
 					CN(pObj);
 
 					// Check for active object
@@ -304,9 +307,12 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 						// Notify element intersect begin
 						InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN, m_pInteractionRay, pObj);
-						for(int i = 0; i < manifold.NumContacts(); i++)
+						
+						for (int i = 0; i < manifold.NumContacts(); i++) {
 							interactionEvent.AddPoint(manifold.GetContactPoint(i));
-						NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_BEGAN, &interactionEvent);
+						}
+
+						NotifySubscribers(pObj, InteractionEventType::ELEMENT_INTERSECT_BEGAN, &interactionEvent);
 					}
 					else {
 						vector vDiff = manifold.GetContactPoint(0).GetPoint() - pActiveObject->GetIntersectionPoint();
@@ -316,9 +322,12 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 							// Notify element intersect continue
 							InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_MOVED, m_pInteractionRay, pObj);
-							for (int i = 0; i < manifold.NumContacts(); i++)
+							
+							for (int i = 0; i < manifold.NumContacts(); i++) {
 								interactionEvent.AddPoint(manifold.GetContactPoint(i));
-							NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
+							}
+
+							NotifySubscribers(pObj, InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
 						}
 					}
 
@@ -345,7 +354,8 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 		// TODO: Add projection , find exit point, do we need that?
 		InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED, m_pInteractionRay, pActiveObject->GetObject());
 		interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
-		NotifySubscribers(InteractionEventType::ELEMENT_INTERSECT_ENDED, &interactionEvent);
+
+		NotifySubscribers(pActiveObject->GetObject(), InteractionEventType::ELEMENT_INTERSECT_ENDED, &interactionEvent);
 	}
 
 

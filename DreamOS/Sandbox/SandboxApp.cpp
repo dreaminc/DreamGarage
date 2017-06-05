@@ -729,10 +729,10 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+RESULT SandboxApp::RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 
-	r = m_pInteractionEngine->RegisterSubscriber(eventType, pInteractionSubscriber);
+	r = m_pInteractionEngine->RegisterSubscriber(pObject, eventType, pInteractionSubscriber);
 	CR(r);
 
 Error:

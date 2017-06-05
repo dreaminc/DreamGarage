@@ -18,7 +18,7 @@
 //#include "PhysicsIntegrator.h"
 
 #include "Primitives/VirtualObj.h"
-#include "Primitives/Publisher.h"
+//#include "Primitives/Publisher.h"
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseController.h"
 #include "Sense/SenseMouse.h"
@@ -30,6 +30,8 @@
 #include "InteractionObjectEvent.h"
 #include "ActiveObject.h"
 #include <chrono>
+
+#include "Primitives/Multipublisher.h"
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
 
@@ -69,7 +71,8 @@ public:
 
 class InteractionEngine : public valid,
 	public InteractionEngineProxy,
-	public Publisher<InteractionEventType, InteractionObjectEvent>,
+	//public Publisher<InteractionEventType, InteractionObjectEvent>,
+	public Multipublisher<VirtualObj*, InteractionEventType, InteractionObjectEvent>,
 	public Subscriber<SenseControllerEvent>,
 	public Subscriber<SenseMouseEvent>,
 	//public Subscriber<SenseKeyboardEvent>,		// TODO: This is redundant, both can be one event
@@ -141,6 +144,7 @@ private:
 
 private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;
+
 	SandboxApp *m_pSandbox = nullptr;
 	double m_interactionPadAccumulator = 0.0f;
 
