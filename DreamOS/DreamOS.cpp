@@ -345,11 +345,21 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+RESULT DreamOS::RegisterEventSubscriber(VirtualObj* pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 
-	r = m_pSandbox->RegisterEventSubscriber(eventType, pInteractionSubscriber);
-	CR(r);
+	CR(m_pSandbox->RegisterEventSubscriber(pObject, eventType, pInteractionSubscriber));
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	RESULT r = R_PASS;
+
+	CR(AddInteractionObject(pObject));
+
+	CR(m_pSandbox->RegisterEventSubscriber(pObject, eventType, pInteractionSubscriber));
 
 Error:
 	return r;

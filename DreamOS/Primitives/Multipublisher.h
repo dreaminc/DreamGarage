@@ -1,12 +1,6 @@
 #ifndef MULTIPUBLISHER_H_
 #define MULTIPUBLISHER_H_
 
-#include <list>
-#include <map>
-#include <string>
-
-#include <math.h>
-
 #include "RESULT/EHM.h"
 
 // DREAM OS
@@ -17,7 +11,11 @@
 
 #include "Publisher.h"
 #include "Subscriber.h"
-#include "Primitives/VirtualObj.h"
+
+#include <string>
+#include <map>
+
+#include <math.h>
 
 template <typename PIndexClass, typename PKeyClass, typename PKEventClass>
 class Multipublisher : public I_Publisher<PKeyClass, PKEventClass> {
@@ -40,10 +38,10 @@ protected:
 	virtual RESULT RegisterEvent(PKeyClass keyEvent) override {
 		RESULT r = R_PASS;
 		
-		auto it = m_events.find(keyEvent);
-		std::map<PIndexClass, Subscriber<PKEventClass>*>* pNewSubscriberMap = nullptr;
+		auto it = m_indexedEvents.find(keyEvent);
+		typename std::map<PIndexClass, Subscriber<PKEventClass>*>* pNewSubscriberMap = nullptr;
 
-		CBM((it == m_events.end()), "Event %s already registered", GetEventKeyString(keyEvent));
+		CBM((it == m_indexedEvents.end()), "Event %s already registered", GetEventKeyString(keyEvent));
 
 		// Create a new subscriber list for the event entry
 		pNewSubscriberMap = (std::map<PIndexClass, Subscriber<PKEventClass>*>*)(new std::map<PIndexClass, Subscriber<PKEventClass>*>());
@@ -70,8 +68,10 @@ public:
 	RESULT RegisterSubscriber(PIndexClass indexEvent, PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 		char *pszEvent = nullptr;
+
 		typename std::map<PKeyClass, std::map<PIndexClass, Subscriber<PKEventClass>*>*, MAP_COMPARE_FUNCTION_STRUCT>::iterator it;
-		std::map<PIndexClass, Subscriber<PKEventClass>*> *pSubscriberMap = nullptr;
+		typename std::map<PIndexClass, Subscriber<PKEventClass>*>* pSubscriberMap = nullptr;
+		typename std::map<PIndexClass, Subscriber<PKEventClass>*>::iterator indexedIt;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
 		it = m_indexedEvents.find(keyEvent);
@@ -79,12 +79,12 @@ public:
 
 		// Check if already registered
 		pSubscriberMap = reinterpret_cast<std::map<PIndexClass, Subscriber<PKEventClass>*>*>(it->second);
-		auto indexedIt = pSubscriberMap->find(indexEvent);
+		indexedIt = pSubscriberMap->find(indexEvent);
 
-		CBM((indexedIt == pSubscriberMap->end(), "Object already subscribed to event %s", GetEventKeyString(keyEvent));
+		CBM((indexedIt == pSubscriberMap->end()), "Object already subscribed to event %s", GetEventKeyString(keyEvent));
 
 		// If not found - add it here
-		pSubscriberMap[indexEvent] = pSubscriber;
+		(*pSubscriberMap)[indexEvent] = pSubscriber;
 
 		// TODO: Don't currently support multiple subscribers to the same object 
 		// If we want this - there needs to be a list of subscribers 
@@ -99,7 +99,7 @@ public:
 	RESULT UnregisterSubscriber(PIndexClass indexEvent, PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 
-		auto it = m_events.find(keyEvent);
+		auto it = m_indexedEvents.find(keyEvent);
 
 		typename std::map<PIndexClass, Subscriber<PKEventClass>*> *pSubscriberMap = nullptr;
 
@@ -161,17 +161,19 @@ public:
 	virtual RESULT NotifySubscribers(PKeyClass keyEvent, PKEventClass *pEvent) override {
 		RESULT r = R_PASS;
 
-		typename std::map<PIndexClass, Subscriber<PKEventClass>*> *pSubscriberMap = nullptr;
-		auto it = m_events.find(keyEvent);
+		typename std::map<PIndexClass, Subscriber<PKEventClass>*>* pSubscriberMap = nullptr;
+		auto it = m_indexedEvents.find(keyEvent);
 
-		CBM((it != m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
 
 		pSubscriberMap = m_indexedEvents[keyEvent];
 		CNM(pSubscriberMap, "Subscriber map is NULL");
 
 		if (pSubscriberMap->size() > 0) {
-			for (auto &indexSubItem : pSubscriberMap) {
-				WCR(reinterpret_cast<Subscriber<PKEventClass>*>(indexSubItem->second)->Notify(pEvent));
+			for (auto &indexSubItem : *pSubscriberMap) {
+				//WCR(reinterpret_cast<Subscriber<PKEventClass>*>(indexSubItem.second)->Notify(pEvent));
+				WCR(indexSubItem.second->Notify(pEvent));
+			
 			}
 		}
 
@@ -182,10 +184,10 @@ public:
 	virtual bool EventHasSubscribers(PKeyClass keyEvent) override {
 		RESULT r = R_PASS;
 
-		typename std::map<PIndexClass, Subscriber<PKEventClass>*> *pSubscriberMap = nullptr;
-		auto it = m_events.find(keyEvent);
+		typename std::map<PIndexClass, Subscriber<PKEventClass>*>* pSubscriberMap = nullptr;
+		auto it = m_indexedEvents.find(keyEvent);
 
-		CBM((it != m_events.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
 
 		pSubscriberMap = m_indexedEvents[keyEvent];
 		CNM(pSubscriberMap, "Subscriber list is NULL");

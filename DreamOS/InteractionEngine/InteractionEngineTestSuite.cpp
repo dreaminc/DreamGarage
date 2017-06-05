@@ -13,13 +13,18 @@ InteractionEngineTestSuite::InteractionEngineTestSuite(DreamOS *pDreamOS) :
 	RESULT r = R_PASS;
 
 	// Subscribers
+	/*
 	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 		CR(m_pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), this));
 	}
+	*/
+
+	CR(r);
 
 //Success:
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;
@@ -32,9 +37,9 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestCompositeRayNested());
-
 	CR(AddTestObjectBasedEvents());
+
+	CR(AddTestCompositeRayNested());
 
 	CR(AddTestCompositeRay());
 
@@ -169,7 +174,11 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 			//CN(pTestContext->pRay);
 
 			// Add composite to interaction
-			//CR(m_pDreamOS->AddInteractionObject(pComposite));
+			//CR(m_pDreamOS->AddAndRegisterInteractionObject(pComposite));
+
+			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+				CR(m_pDreamOS->AddAndRegisterInteractionObject(pComposite, (InteractionEventType)(i), this));
+			}
 
 			// Collide point spheres
 			for (int i = 0; i < 4; i++) {

@@ -115,6 +115,7 @@ public:
 	RESULT SetGravityState(bool fEnabled);
 
 	RESULT AddInteractionObject(VirtualObj *pObject);
+	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT RemoveAllObjects();
@@ -180,7 +181,7 @@ protected:
 	virtual RESULT Notify(CollisionObjectEvent *oEvent) { return R_PASS; }
 	
 public:
-	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+	RESULT RegisterEventSubscriber(VirtualObj* pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 
 	// Cloud Controller
 protected:
