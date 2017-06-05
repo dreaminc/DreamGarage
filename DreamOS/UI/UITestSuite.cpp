@@ -585,7 +585,7 @@ RESULT UITestSuite::AddTestUIView() {
 			//pQuad->SetPosition(point(0.0f, 1.0f, 2.0f));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-				CR(m_pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), pView.get()));
+				CR(m_pDreamOS->RegisterEventSubscriber(nullptr, (InteractionEventType)(i), pView.get()));
 			}
 			for (int i = 0; i < UIEventType::UI_EVENT_INVALID; i++) {
 				CR(pView->RegisterSubscriber((UIEventType)(i), this));
