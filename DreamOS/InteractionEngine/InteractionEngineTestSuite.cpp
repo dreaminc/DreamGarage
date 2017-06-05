@@ -174,10 +174,11 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 			//CN(pTestContext->pRay);
 
 			// Add composite to interaction
-			//CR(m_pDreamOS->AddAndRegisterInteractionObject(pComposite));
+			CR(m_pDreamOS->AddInteractionObject(pComposite));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-				CR(m_pDreamOS->AddAndRegisterInteractionObject(pComposite, (InteractionEventType)(i), this));
+				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
+				CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
 			}
 
 			// Collide point spheres

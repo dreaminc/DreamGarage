@@ -181,6 +181,32 @@ public:
 		return r;
 	}
 
+	// This is multi publisher specific, the above will send to all (similar to publisher)
+	RESULT NotifySubscribers(PIndexClass index, PKeyClass keyEvent, PKEventClass *pEvent) {
+		RESULT r = R_PASS;
+
+		typename std::map<PIndexClass, Subscriber<PKEventClass>*>* pSubscriberMap = nullptr;
+		auto it = m_indexedEvents.find(keyEvent);
+
+		CBM((it != m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+
+		pSubscriberMap = m_indexedEvents[keyEvent];
+		CNM(pSubscriberMap, "Subscriber map is NULL");
+
+		if (pSubscriberMap->size() > 0) {
+			for (auto &indexSubItem : *pSubscriberMap) {
+				//WCR(reinterpret_cast<Subscriber<PKEventClass>*>(indexSubItem.second)->Notify(pEvent));
+				if (indexSubItem.first == index) {
+					WCR(indexSubItem.second->Notify(pEvent));
+				}
+
+			}
+		}
+
+	Error:
+		return r;
+	}
+
 	virtual bool EventHasSubscribers(PKeyClass keyEvent) override {
 		RESULT r = R_PASS;
 
