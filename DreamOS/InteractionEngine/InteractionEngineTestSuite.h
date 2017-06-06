@@ -36,6 +36,8 @@ public:
 
 	RESULT AddTestObjectBasedEvents();
 
+	RESULT AddTestNestedCompositeOBB();
+
 	RESULT AddTestCompositeRay();
 	RESULT AddTestCompositeRayNested();
 	RESULT AddTestCompositeRayController();

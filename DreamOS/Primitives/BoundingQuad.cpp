@@ -234,16 +234,31 @@ vector BoundingQuad::GetNormal() {
 	return m_vNormal;
 }
 
+// This is busted
 vector BoundingQuad::GetHalfVector() {
-	vector vReturn = vector(GetWidth()/2.0f, 0.0f, GetHeight() / 2.0f);
+	vector vScale = GetScale();
+	//RotationMatrix matRotation = RotationMatrix(GetAbsoluteOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
+	RotationMatrix matRotation = RotationMatrix(GetOrientation());	// .GetEulerAngles(&phi, &theta, &psi);
 
-	//quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
-	vector vNormal = RotationMatrix(GetAbsoluteOrientation()) * m_vNormal;
-	quaternion qOrientation = quaternion(vector::jVector(1.0f), vNormal.Normal());
-	RotationMatrix rotMat(qOrientation);
-	vReturn = rotMat * vReturn;
+	double width = 0.0f;
+	double height = 0.0f;
+	double length = 0.0f;
 
-	return vReturn;
+	for (int i = 0; i < 8; i++) {
+		point pt = GetQuadPoint((QuadPoint)(i));
+		pt = matRotation * pt;
+
+		if (pt.x() > width)
+			width = pt.x();
+
+		if (pt.y() > height)
+			height = pt.y();
+
+		if (pt.z() > length)
+			length = pt.z();
+	}
+
+	return vector(width * vScale.x(), height * vScale.y(), length * vScale.z());
 }
 
 point BoundingQuad::GetMinPoint() {
@@ -257,32 +272,37 @@ point BoundingQuad::GetMaxPoint() {
 point BoundingQuad::GetQuadPoint(QuadPoint ptType) {
 	point ptRet = point();
 
+	double halfWidth = m_width / 2.0f;
+	double halfHeight = m_height / 2.0f;
+
 	switch (ptType) {
 		case QuadPoint::TOP_RIGHT: {
-			ptRet.x() += m_width;
-			ptRet.y() += m_height;
+			ptRet.x() += halfWidth;
+			ptRet.z() += halfHeight;
 		} break;
 
 		case QuadPoint::TOP_LEFT: {
-			ptRet.x() -= m_width;
-			ptRet.y() += m_height;
+			ptRet.x() -= halfWidth;
+			ptRet.z() += halfHeight;
 		} break;
 
 		case QuadPoint::BOTTOM_RIGHT: {
-			ptRet.x() += m_width;
-			ptRet.y() -= m_height;
+			ptRet.x() += halfWidth;
+			ptRet.z() -= halfHeight;
 		} break;
 
 		case QuadPoint::BOTTOM_LEFT: {
-			ptRet.x() -= m_width;
-			ptRet.y() -= m_height;
+			ptRet.x() -= halfWidth;
+			ptRet.z() -= halfHeight;
 		} break;
 	}
 
+	// Accounts for normal rotation
 	quaternion qOrientation = quaternion(vector::jVector(1.0f), m_vNormal);
-	RotationMatrix rotMat(qOrientation);
-	ptRet = rotMat * ptRet;
-	ptRet = ptRet + GetOrigin();
+	RotationMatrix matRotation(qOrientation);
+	ptRet = matRotation * ptRet;
+
+	//ptRet = ptRet + GetOrigin();
 		
 	return ptRet;
 }
