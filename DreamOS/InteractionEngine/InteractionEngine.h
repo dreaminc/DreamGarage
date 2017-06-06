@@ -65,7 +65,7 @@ public:
 
 	virtual RESULT Notify(SenseKeyboardEvent *pEvent) = 0;
 
-	virtual point GetInteractionRayOrigin() = 0;
+	//virtual point GetInteractionRayOrigin() = 0;
 };
 
 
@@ -87,13 +87,27 @@ private:
 
 	RESULT Initialize();
 
+	RESULT UpdateObjectStoreRay(ObjectStore *pObjectStore, const ray &rCast);
+	RESULT UpdateObjectStoreObject(ObjectStore *pObjectStore, VirtualObj *pObject);
+
 public:
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
+
 	RESULT UpdateAnimationQueue();
 	RESULT SetInteractionGraph(ObjectStore *pObjectStore);
 
+	/*
 	RESULT UpdateInteractionPrimitive(const ray &r);
+	virtual point GetInteractionRayOrigin() override;
+	RESULT UpdateInteractionRay();
+	*/
+
+	RESULT AddInteractionObject(VirtualObj *pInteractionObject);
+	RESULT RemoveInteractionObject(VirtualObj *pInteractionObject);
+	RESULT ClearInteractionObjects();
+	VirtualObj *FindInteractionObject(VirtualObj *pInteractionObject);
+
 	RESULT SetInteractionDiffThreshold(double thresh);
 
 	//RESULT RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
@@ -101,7 +115,7 @@ public:
 
 	// Active Objects
 public:
-	RESULT ClearActiveObjects();
+	RESULT ClearActiveObjects(VirtualObj *pInteractionObject = nullptr);
 	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject) override;
 	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState) override;
 	RESULT RemoveActiveObject(VirtualObj *pVirtualObject);
@@ -109,6 +123,7 @@ public:
 	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject) override;
 	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
 	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
+	
 	virtual RESULT PushAnimationItem(VirtualObj *pObj,
 		point ptPosition,
 		quaternion qRotation,
@@ -131,14 +146,13 @@ public:
 	RESULT RegisterSenseMouse();
 	RESULT RegisterSenseKeyboard();
 
-	virtual point GetInteractionRayOrigin() override;
-	RESULT UpdateInteractionRay();
-
 	InteractionEngineProxy *GetInteractionEngineProxy();
 
 private:
-	std::shared_ptr<ray> m_pInteractionRay = nullptr;
-	std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
+	//std::shared_ptr<ray> m_pInteractionRay = nullptr;
+	std::vector<VirtualObj*> m_interactionObjects;
+	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
+	std::map<VirtualObj*, std::list<std::shared_ptr<ActiveObject>>> m_activeObjects;
 
 	AnimationQueue* m_pObjectQueue;
 

@@ -2,10 +2,15 @@
 
 #include "PhysicsEngine/ContactPoint.h"
 
-InteractionObjectEvent::InteractionObjectEvent(InteractionEventType eventType, std::shared_ptr<ray> pInteractionRay, VirtualObj *pObject) :
+//InteractionObjectEvent::InteractionObjectEvent(InteractionEventType eventType, std::shared_ptr<ray> pInteractionRay, VirtualObj *pObject) :
+InteractionObjectEvent::InteractionObjectEvent(InteractionEventType eventType, 
+											   std::shared_ptr<ray> pInteractionRay, 
+											   VirtualObj *pObject, 
+											   VirtualObj *pInteractionObject) :
 	m_eventType(eventType),
 	m_pInteractionRay(pInteractionRay),
 	m_pObject(pObject),
+	m_pInteractionObject(pInteractionObject),
 	m_numContacts(0)
 {
 	memset(m_ptContact, 0, sizeof(point) * 4);

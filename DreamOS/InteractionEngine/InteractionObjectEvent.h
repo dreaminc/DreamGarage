@@ -32,8 +32,9 @@ typedef enum InteractionEventType {
 typedef struct InteractionObjectEvent {
 
 	InteractionEventType m_eventType;
-	std::shared_ptr<ray> m_pInteractionRay;
-	VirtualObj *m_pObject;
+	std::shared_ptr<ray> m_pInteractionRay = nullptr;
+	VirtualObj *m_pInteractionObject = nullptr;
+	VirtualObj *m_pObject = nullptr;
 	point m_ptContact[4];
 	vector m_vNormal[4];
 	int m_numContacts;
@@ -41,7 +42,7 @@ typedef struct InteractionObjectEvent {
 	int m_value;
 
 	// TODO: Add time of collision
-	InteractionObjectEvent(InteractionEventType eventType, std::shared_ptr<ray> pInteractionRay, VirtualObj *pObject);
+	InteractionObjectEvent(InteractionEventType eventType, std::shared_ptr<ray> pInteractionRay = nullptr, VirtualObj *pObject = nullptr, VirtualObj *pInteractionObject = nullptr);
 
 public:
 	RESULT AddPoint(point ptContact, vector vNormal);

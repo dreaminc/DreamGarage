@@ -15,10 +15,10 @@ class ContactPoint;
 
 class ActiveObject {
 public:
-	enum class state {
-		NOT_INTERSECTED,
-		INTERSECTED,
-		INVALID
+	enum class state : uint8_t {
+		NOT_INTERSECTED,		
+		INTERSECTED, 	 
+		INVALID				
 	};
 
 public:
@@ -39,7 +39,9 @@ public:
 
 private:
 	ActiveObject::state m_state = state::NOT_INTERSECTED;
+	
 	VirtualObj *m_pObject = nullptr;
+
 	point m_ptIntersection;
 	vector m_vNormal;
 };
