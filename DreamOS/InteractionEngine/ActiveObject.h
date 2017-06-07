@@ -16,9 +16,10 @@ class ContactPoint;
 class ActiveObject {
 public:
 	enum class state : uint8_t {
-		NOT_INTERSECTED,		
-		INTERSECTED, 	 
-		INVALID				
+		NOT_INTERSECTED = 0,		
+		RAY_INTERSECTED = 1 << 0, 	 
+		OBJ_INTERSECTED = 1 << 1,
+		INVALID			= 0xFF
 	};
 
 public:
@@ -27,7 +28,11 @@ public:
 	RESULT UpdateObject(const point &ptIntersection, const vector &vNormal, ActiveObject::state newState);
 	
 	ActiveObject::state GetState();
-	RESULT SetState(ActiveObject::state newstate);
+
+	RESULT SetState(ActiveObject::state newState);
+	RESULT AddState(ActiveObject::state newState);
+	RESULT RemoveState(ActiveObject::state newState);
+	bool HasState(ActiveObject::state newState);
 
 	RESULT SetContactPoint(ContactPoint contactPoint);
 	RESULT SetInteractionPoint(point ptIntersection);
@@ -45,5 +50,8 @@ private:
 	point m_ptIntersection;
 	vector m_vNormal;
 };
+
+ActiveObject::state operator&(ActiveObject::state lhs, ActiveObject::state rhs);
+ActiveObject::state operator|(ActiveObject::state lhs, ActiveObject::state rhs);
 
 #endif // ! ACTIVE_OBJECT_H_

@@ -21,6 +21,31 @@ RESULT ActiveObject::SetState(ActiveObject::state newState) {
 	return R_PASS;
 }
 
+RESULT ActiveObject::AddState(ActiveObject::state newState) {
+	if (newState != state::NOT_INTERSECTED) {
+		m_state = (ActiveObject::state)(static_cast<uint8_t>(m_state) | static_cast<uint8_t>(newState));
+	}
+	/*
+	else {
+		m_state = state::NOT_INTERSECTED;
+	}
+	*/
+
+	return R_PASS;
+}
+
+RESULT ActiveObject::RemoveState(ActiveObject::state newState) {
+	m_state = (ActiveObject::state)(static_cast<uint8_t>(m_state) & ~static_cast<uint8_t>(newState));
+	return R_PASS;
+}
+
+bool ActiveObject::HasState(ActiveObject::state newState) {
+	if ((static_cast<uint8_t>(m_state) & static_cast<uint8_t>(newState)) != 0)
+		return true;
+
+	return false;
+}
+
 ActiveObject::state ActiveObject::GetState() {
 	return m_state;
 }
@@ -52,4 +77,12 @@ RESULT ActiveObject::SetContactPoint(ContactPoint contactPoint) {
 	m_vNormal = contactPoint.GetNormal();
 
 	return R_PASS;
+}
+
+ActiveObject::state operator&(ActiveObject::state lhs, ActiveObject::state rhs) {
+	return (ActiveObject::state)(static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs));
+}
+
+ActiveObject::state operator|(ActiveObject::state lhs, ActiveObject::state rhs) {
+	return (ActiveObject::state)(static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs));
 }

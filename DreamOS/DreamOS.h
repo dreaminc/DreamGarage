@@ -115,8 +115,9 @@ public:
 	RESULT SetGravityState(bool fEnabled);
 
 	RESULT AddInteractionObject(VirtualObj *pObject);
+	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
-	RESULT UpdateInteractionPrimitive(const ray &rCast);
+	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT RemoveAllObjects();
 

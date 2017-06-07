@@ -43,7 +43,7 @@ RESULT DreamApp<derivedAppType>::Initialize() {
 
 	// Initialize the OBB (collisions)
 	CR(m_pCompositeContext->InitializeOBB());
-	CR(m_pDreamOS->AddInteractionObject(m_pCompositeContext));
+	CR(m_pDreamOS->AddObjectToInteractionGraph(m_pCompositeContext));
 
 	// Initialize the App
 	CR(InitializeApp(m_pContext));

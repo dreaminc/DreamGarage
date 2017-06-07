@@ -21,8 +21,8 @@ RESULT InteractionEngine::Initialize() {
 	}
 
 	// Ray
-	m_pInteractionRay = std::make_shared<ray>();
-	CN(m_pInteractionRay);
+	//m_pInteractionRay = std::make_shared<ray>();
+	//CN(m_pInteractionRay);
 
 	m_pObjectQueue = new AnimationQueue();
 
@@ -104,6 +104,7 @@ RESULT InteractionEngine::SetInteractionGraph(ObjectStore *pObjectStore) {
 	return r;
 }
 
+/*
 RESULT InteractionEngine::UpdateInteractionPrimitive(const ray &rCast) {
 	RESULT r = R_PASS;
 
@@ -116,6 +117,7 @@ RESULT InteractionEngine::UpdateInteractionPrimitive(const ray &rCast) {
 Error:
 	return r;
 }
+*/
 
 RESULT InteractionEngine::SetInteractionDiffThreshold(double thresh) {
 	RESULT r = R_PASS;
@@ -250,12 +252,15 @@ Error:
 RESULT InteractionEngine::RemoveInteractionObject(VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
-	CNR((FindInteractionObject(pInteractionObject) == nullptr), R_NOT_FOUND);
+	//CNR((FindInteractionObject(pInteractionObject) == nullptr), R_NOT_FOUND);
 	
 	auto pInteractionObjectIterator = std::find(m_interactionObjects.begin(), m_interactionObjects.end(), pInteractionObject);
 	CBR(pInteractionObjectIterator != m_interactionObjects.end(), R_NOT_FOUND);
 
 	m_interactionObjects.erase(pInteractionObjectIterator);
+
+	// Remove the list
+	m_activeObjects.erase(pInteractionObject);
 
 Error:
 	return r;
@@ -263,6 +268,8 @@ Error:
 
 RESULT InteractionEngine::ClearInteractionObjects() {
 	m_interactionObjects.clear();
+	m_activeObjects.clear();
+
 	return R_PASS;
 }
 
@@ -276,65 +283,108 @@ VirtualObj* InteractionEngine::FindInteractionObject(VirtualObj *pInteractionObj
 	return nullptr;
 }
 
-RESULT InteractionEngine::UpdateObjectStoreRay(ObjectStore *pObjectStore, const ray &rCast) {
+RESULT InteractionEngine::UpdateActiveObject(VirtualObj *pInteractionObject, VirtualObj *pObject, CollisionManifold manifold, bool fRay) {
 	RESULT r = R_PASS;
+
+	// Check for active object
+	auto pActiveObject = FindActiveObject(pObject, pInteractionObject);
+
+	if (pActiveObject == nullptr) {
+		pActiveObject = AddActiveObject(manifold.GetObjectA(), pInteractionObject);
+		CN(pActiveObject);
+
+		pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
+
+		// Notify element intersect begin 
+		InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN);
+		interactionEvent.m_pObject = pObject;
+		interactionEvent.m_pInteractionObject = pInteractionObject;
+
+		if (fRay)
+			interactionEvent.m_interactionRay = pInteractionObject->GetRay(true);
+
+		for (int i = 0; i < manifold.NumContacts(); i++) {
+			interactionEvent.AddPoint(manifold.GetContactPoint(i));
+		}
+
+		NotifySubscribers(pObject, InteractionEventType::ELEMENT_INTERSECT_BEGAN, &interactionEvent);
+	}
+	else {
+		vector vDiff = manifold.GetContactPoint(0).GetPoint() - pActiveObject->GetIntersectionPoint();
+
+		if (vDiff.magnitude() > m_diffThreshold) {
+			pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
+
+			// Notify element intersect continue
+			InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_MOVED);
+			interactionEvent.m_pObject = pObject;
+			interactionEvent.m_pInteractionObject = pInteractionObject;
+
+			if (fRay)
+				interactionEvent.m_interactionRay = pInteractionObject->GetRay(true);
+
+			for (int i = 0; i < manifold.NumContacts(); i++) {
+				interactionEvent.AddPoint(manifold.GetContactPoint(i));
+			}
+
+			NotifySubscribers(pObject, InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
+		}
+	}
+
+	if (fRay) {
+		pActiveObject->AddState(ActiveObject::state::RAY_INTERSECTED);
+	}
+	else {
+		pActiveObject->AddState(ActiveObject::state::OBJ_INTERSECTED);
+	}
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore, VirtualObj *pInteractionObject) {
+	RESULT r = R_PASS;
+
+	ray rCast = pInteractionObject->GetRay(true);
+	VirtualObj *pObj = nullptr;
 
 	for (auto &pObject : pObjectStore->GetObjects()) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 
+		// Ray
 		if (pDimObj->Intersect(rCast)) {
-			CollisionManifold manifold = pDimObj->Collide(rCast);
-			int numContacts = 0;
-			VirtualObj *pObj = nullptr;
+			CollisionManifold rayManifold = pDimObj->Collide(rCast);
+			int rayNumContacts = rayManifold.NumContacts();
 
-			if ((numContacts = manifold.NumContacts()) > 0) {
-
+			if (rayNumContacts > 0) {
 				// Manifold should return only one object, one will be nullptr
-				pObj = manifold.GetObjectA();
+				pObj = rayManifold.GetObjectA();
 
 				if (pObj == nullptr) {
-					pObj = manifold.GetObjectB();
+					pObj = rayManifold.GetObjectB();
 				}
-
-				CN(pObj);
-
-				// Check for active object
-				auto pActiveObject = FindActiveObject(pObj);
-
-				if (pActiveObject == nullptr) {
-					pActiveObject = AddActiveObject(manifold.GetObjectA());
-					CN(pActiveObject);
-
-					pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
-
-					// Notify element intersect begin
-					InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN, rCast, pObj);
-
-					for (int i = 0; i < manifold.NumContacts(); i++) {
-						interactionEvent.AddPoint(manifold.GetContactPoint(i));
-					}
-
-					NotifySubscribers(pObj, InteractionEventType::ELEMENT_INTERSECT_BEGAN, &interactionEvent);
-				}
-				else {
-					vector vDiff = manifold.GetContactPoint(0).GetPoint() - pActiveObject->GetIntersectionPoint();
-
-					if (vDiff.magnitude() > m_diffThreshold) {
-						pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
-
-						// Notify element intersect continue
-						InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_MOVED, rCast, pObj);
-
-						for (int i = 0; i < manifold.NumContacts(); i++) {
-							interactionEvent.AddPoint(manifold.GetContactPoint(i));
-						}
-
-						NotifySubscribers(pObj, InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
-					}
-				}
-
-				pActiveObject->SetState(ActiveObject::state::RAY_INTERSECTED);
 			}
+
+			CR(UpdateActiveObject(pInteractionObject, pObj, rayManifold, true));
+		}
+
+		// Object Collision
+		if (pDimObj->Intersect(pObject)) {
+
+			CollisionManifold objManifold = pDimObj->Collide(pInteractionObject);
+
+			int objNumContacts = objManifold.NumContacts();
+
+			if (objNumContacts > 0) {
+				// Manifold should return only one object, one will be nullptr
+				pObj = objManifold.GetObjectA();
+
+				if (pObj == nullptr) {
+					pObj = objManifold.GetObjectB();
+				}
+			}
+			
+			CR(UpdateActiveObject(pInteractionObject, pObj, objManifold, false));
 		}
 	}
 	
@@ -349,106 +399,55 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 	std::vector<std::shared_ptr<ActiveObject>> activeObjectsToRemove;
 
-	//// TODO: This should move up into a generic update call
-	//CR(UpdateInteractionRay());
-
 	// TODO: First pass (no state tracking yet)
 	// Set all objects to non-intersected - below will set it to intersected, then remaining
 	// non-intersected objects are clearly no longer in the active set
 	CR(SetAllActiveObjectStates(ActiveObject::state::NOT_INTERSECTED));
 
-	if (m_pInteractionRay != nullptr) {
-		for (auto &pObject : pObjectStore->GetObjects()) {
-			DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+	for (auto &pInteractionObject : m_interactionObjects) {
+		//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
+		CR(UpdateObjectStore(pObjectStore, pInteractionObject));
 
-			if (pDimObj->Intersect(*m_pInteractionRay.get())) {
-				CollisionManifold manifold = pDimObj->Collide(*m_pInteractionRay.get());
-				int numContacts = 0;
-				VirtualObj *pObj = nullptr;
-
-				if ((numContacts = manifold.NumContacts()) > 0) {
-
-					// Manifold should return only one object, one will be nullptr
-					pObj = manifold.GetObjectA();
-
-					if (pObj == nullptr) {
-						pObj = manifold.GetObjectB();
-					}
-
-					CN(pObj);
-
-					// Check for active object
-					auto pActiveObject = FindActiveObject(pObj);
-
-					if (pActiveObject == nullptr) {
-						pActiveObject = AddActiveObject(manifold.GetObjectA());
-						CN(pActiveObject);
-
-						pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
-
-						// Notify element intersect begin
-						InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN, m_pInteractionRay, pObj);
-						
-						for (int i = 0; i < manifold.NumContacts(); i++) {
-							interactionEvent.AddPoint(manifold.GetContactPoint(i));
-						}
-
-						NotifySubscribers(pObj, InteractionEventType::ELEMENT_INTERSECT_BEGAN, &interactionEvent);
-					}
-					else {
-						vector vDiff = manifold.GetContactPoint(0).GetPoint() - pActiveObject->GetIntersectionPoint();
-
-						if (vDiff.magnitude() > m_diffThreshold) {
-							pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
-
-							// Notify element intersect continue
-							InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_MOVED, m_pInteractionRay, pObj);
-							
-							for (int i = 0; i < manifold.NumContacts(); i++) {
-								interactionEvent.AddPoint(manifold.GetContactPoint(i));
-							}
-
-							NotifySubscribers(pObj, InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
-						}
-					}
-
-					pActiveObject->SetState(ActiveObject::state::RAY_INTERSECTED);
-				}
+		for (auto &pActiveObject : m_activeObjects[pInteractionObject]) {
+			// Add to remove list if not intersected in current frame
+			if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
+				activeObjectsToRemove.push_back(pActiveObject);
 			}
 		}
-	}
 
+		for (auto &pActiveObject : activeObjectsToRemove) {
+			// Notify no longer intersected
+			CR(RemoveActiveObject(pActiveObject, pInteractionObject));
 
-	for (auto &pActiveObject : m_activeObjects) {
-		// Add to remove list if not intersected in current frame
-		if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
-			activeObjectsToRemove.push_back(pActiveObject);
+			// Notify element intersect continue
+			// This uses the last available point
+			// TODO: Add projection , find exit point, do we need that?
+			InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED, pInteractionObject->GetRay(), pActiveObject->GetObject());
+			interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
+
+			NotifySubscribers(pActiveObject->GetObject(), InteractionEventType::ELEMENT_INTERSECT_ENDED, &interactionEvent);
 		}
 	}
-
-	for (auto &pActiveObject : activeObjectsToRemove) {
-		// Notify no longer intersected
-		CR(RemoveActiveObject(pActiveObject));
-
-		// Notify element intersect continue
-		// This uses the last available point
-		// TODO: Add projection , find exit point, do we need that?
-		InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED, m_pInteractionRay, pActiveObject->GetObject());
-		interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
-
-		NotifySubscribers(pActiveObject->GetObject(), InteractionEventType::ELEMENT_INTERSECT_ENDED, &interactionEvent);
-	}
-
 
 Error:
 	return r;
 }
 
-RESULT InteractionEngine::SetAllActiveObjectStates(ActiveObject::state newState) {
+
+RESULT InteractionEngine::SetAllActiveObjectStates(ActiveObject::state newState, VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
-	for (auto &pActiveObject : m_activeObjects) {
-		CR(pActiveObject->SetState(newState));
+	if (pInteractionObject == nullptr) {
+		for (auto &activeObjects : m_activeObjects) {
+			for (auto &pActiveObject : activeObjects.second) {
+				CR(pActiveObject->SetState(newState));
+			}
+		}	
+	}
+	else {
+		for (auto &pActiveObject : m_activeObjects[pInteractionObject]) {
+			CR(pActiveObject->SetState(newState));
+		}
 	}
 
 Error:
@@ -467,18 +466,28 @@ RESULT InteractionEngine::ClearActiveObjects(VirtualObj *pInteractionObject) {
 	return R_PASS;
 }
 
-std::shared_ptr<ActiveObject> InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject) {
+std::shared_ptr<ActiveObject> InteractionEngine::AddActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<ActiveObject> pNewActiveObject = nullptr;
 
-	CBM((FindActiveObject(pVirtualObject) == nullptr), "Active Object already active");
+	CBM((FindActiveObject(pVirtualObject, pInteractionObject) == nullptr), "Active Object already active");
 
 	pNewActiveObject = std::make_shared<ActiveObject>(pVirtualObject);
 	CN(pNewActiveObject);
 	pNewActiveObject->SetState(ActiveObject::state::NOT_INTERSECTED);
 
-	m_activeObjects.push_back(pNewActiveObject);
+	//m_activeObjects.push_back(pNewActiveObject);
+
+	// If interaction object is nullptr active object will be added to all 
+	if (pInteractionObject == nullptr) {
+		for (auto &activeObjects : m_activeObjects) {
+			activeObjects.second.push_back(pNewActiveObject);
+		}
+	}
+	else {
+		m_activeObjects[pInteractionObject].push_back(pNewActiveObject);
+	}
 
 // Success:
 	return pNewActiveObject;
@@ -487,60 +496,123 @@ Error:
 	return nullptr;
 }
 
-RESULT InteractionEngine::RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject) {
+std::shared_ptr<ActiveObject> InteractionEngine::FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject) {
+	// If interaction object is null - return all (this is only really useful for checking all 
+	// lanes to avoid duplication)
+	if (pInteractionObject == nullptr) {
+		for (auto &activeObjects : m_activeObjects) {
+			for (auto &pActiveObject : activeObjects.second) {
+				if (pActiveObject->GetObject() == pVirtualObject) {
+					return pActiveObject;
+				}
+			}
+		}
+	}
+	else {
+		for (auto &pActiveObject : m_activeObjects[pInteractionObject]) {
+			if (pActiveObject->GetObject() == pVirtualObject) {
+				return pActiveObject;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<ActiveObject> InteractionEngine::FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject) {
+	// If interaction object is null - return all (this is only really useful for checking all 
+	// lanes to avoid duplication)
+	if (pInteractionObject == nullptr) {
+		for (auto &activeObjects : m_activeObjects) {
+			for (auto &pActiveObject : activeObjects.second) {
+				if (pActiveObject == pActiveObject) {
+					return pActiveObject;
+				}
+			}
+		}
+	}
+	else {
+		for (auto &pActiveObject : m_activeObjects[pInteractionObject]) {
+			if (pActiveObject == pActiveObject) {
+				return pActiveObject;
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+RESULT InteractionEngine::RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pActiveObject);
 	CNM(pNewActiveObject, "Active object not found");
 
-	m_activeObjects.remove(pNewActiveObject);
+	//m_activeObjects.remove(pNewActiveObject);
+
+	if (pInteractionObject == nullptr) {
+		for (auto &activeObjects : m_activeObjects) {
+			if (std::find(activeObjects.second.begin(), activeObjects.second.end(), pNewActiveObject) != activeObjects.second.end()) {
+				activeObjects.second.remove(pNewActiveObject);
+				break;
+			}
+		}
+	}
+	else {
+		if (std::find(m_activeObjects[pInteractionObject].begin(), m_activeObjects[pInteractionObject].end(), pNewActiveObject) != m_activeObjects[pInteractionObject].end()) {
+			m_activeObjects[pInteractionObject].remove(pNewActiveObject);
+		}
+	}
 
 Error:
 	return r;
 }
 
-RESULT InteractionEngine::RemoveActiveObject(VirtualObj *pVirtualObject) {
+RESULT InteractionEngine::RemoveActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pVirtualObject);
 	CNM(pNewActiveObject, "Active object not found");
 
-	m_activeObjects.remove(pNewActiveObject);
+	CR(RemoveActiveObject(pNewActiveObject, pInteractionObject));
 
 Error:
 	return r;
 }
 
-std::shared_ptr<ActiveObject> InteractionEngine::FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject) {
-	for (auto it = m_activeObjects.begin(); it != m_activeObjects.end(); it++) {
-		if ((*it) == pActiveObject) {
-			return (*it);
-		}
-	}
-
-	return nullptr;
-}
-
-std::shared_ptr<ActiveObject> InteractionEngine::FindActiveObject(VirtualObj *pVirtualObject) {
-	for (auto it = m_activeObjects.begin(); it != m_activeObjects.end(); it++) {
-		if ((*it)->GetObject() == pVirtualObject) {
-			return (*it);
-		}
-	}
-
-	return nullptr;
-}
-
-ActiveObject::state InteractionEngine::GetActiveObjectState(VirtualObj *pVirtualObject) {
+ActiveObject::state InteractionEngine::GetActiveObjectState(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pVirtualObject);
+	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pVirtualObject, pInteractionObject);
 	CNM(pNewActiveObject, "Active object not found");
 
 	return pNewActiveObject->GetState();
 
 Error:
 	return ActiveObject::state::INVALID;
+}
+
+std::vector<std::shared_ptr<ActiveObject>> InteractionEngine::FindActiveObjectsWithState(ActiveObject::state state, VirtualObj *pInteractionObject) {
+	std::vector<std::shared_ptr<ActiveObject>> retVector;
+
+	if (pInteractionObject == nullptr) {
+		for (auto &activeObjects : m_activeObjects) {
+			for (auto &pActiveObject : activeObjects.second) {
+				if (pActiveObject->HasState(state)) {
+					retVector.push_back(pActiveObject);
+				}
+			}
+		}
+	}
+	else {
+		for (auto &pActiveObject : m_activeObjects[pInteractionObject]) {
+			if (pActiveObject->HasState(state)) {
+				retVector.push_back(pActiveObject);
+			}
+		}
+	}
+
+	return retVector;
 }
 
 RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
@@ -550,28 +622,31 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 	if(pEvent->state.type == CONTROLLER_RIGHT) {
 		switch (pEvent->type) {
 			case SENSE_CONTROLLER_TRIGGER_UP: {
-				for (auto &pObject : m_activeObjects) {
-					if (pObject->GetState() == ActiveObject::state::RAY_INTERSECTED) {
-						InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
-						InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
-						CR(NotifySubscribers(type, &interactionEvent));
-					}
+				for(auto &pActiveObject : FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+					VirtualObj *pObject = pActiveObject->GetObject();
+
+					InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
+					InteractionObjectEvent interactionEvent(type, pObject);
+
+					CR(NotifySubscribers(pObject, type, &interactionEvent));
 				}
 			} break;
 
 			case SENSE_CONTROLLER_TRIGGER_DOWN: {
-				for (auto &pObject : m_activeObjects) {
-					if (pObject->GetState() == ActiveObject::state::RAY_INTERSECTED) {
-						InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
-						InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
-						CR(NotifySubscribers(type, &interactionEvent));
-					}
+				for (auto &pActiveObject : FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+					VirtualObj *pObject = pActiveObject->GetObject();
+
+					InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
+					InteractionObjectEvent interactionEvent(type, pObject);
+
+					CR(NotifySubscribers(pObject, type, &interactionEvent));
 				}
 			} break;
 
 			case SENSE_CONTROLLER_MENU_UP: {
 				InteractionEventType type = INTERACTION_EVENT_MENU;
-				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, nullptr);
+				InteractionObjectEvent interactionEvent(type);
+
 				CR(NotifySubscribers(type, &interactionEvent));
 			} break;
 
@@ -581,13 +656,11 @@ RESULT InteractionEngine::Notify(SenseControllerEvent *pEvent) {
 				double touchY = m_interactionPadAccumulator;
 				m_interactionPadAccumulator = std::modf(m_interactionPadAccumulator, &touchY);
 
-				for (auto &pObject : m_activeObjects) {
-					//ray rCast;
-					//m_pSandbox->GetMouseRay(rCast, 0.0f);
-					//CR(UpdateInteractionPrimitive(rCast));
+				for (auto &pActiveObject : FindActiveObjectsWithState(ActiveObject::state::RAY_INTERSECTED | ActiveObject::state::OBJ_INTERSECTED)) {
+					VirtualObj *pObject = pActiveObject->GetObject();
 
 					InteractionEventType type = INTERACTION_EVENT_WHEEL;
-					InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+					InteractionObjectEvent interactionEvent(type, pObject);
 					interactionEvent.SetValue((int)(touchY));
 
 					CR(NotifySubscribers(type, &interactionEvent));
@@ -616,8 +689,7 @@ RESULT InteractionEngine::Notify(SenseKeyboardEvent *pEvent) {
 		else
 			type = INTERACTION_EVENT_KEY_DOWN;
 
-		InteractionObjectEvent interactionEvent(type, m_pInteractionRay, nullptr);
-		//InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+		InteractionObjectEvent interactionEvent(type);
 		interactionEvent.SetValue((int)(pEvent->KeyCode));
 
 		CR(NotifySubscribers(type, &interactionEvent));
@@ -662,41 +734,49 @@ RESULT InteractionEngine::Notify(SenseMouseEvent *pEvent) {
 		case SENSE_MOUSE_MOVE: {
 			ray rCast;
 			m_pSandbox->GetMouseRay(rCast, 0.0f);
-			CR(UpdateInteractionPrimitive(rCast));
+			
+			//CR(UpdateInteractionPrimitive(rCast));
+
 		} break;
 
 		case SENSE_MOUSE_LEFT_BUTTON_UP: {
-			for (auto &pObject : m_activeObjects) {
+			for (auto &activeObjects : m_activeObjects) {
+				VirtualObj *pObject = activeObjects.first;
+
 				//ray rCast;
 				//m_pSandbox->GetMouseRay(rCast, 0.0f);
 				//CR(UpdateInteractionPrimitive(rCast));
 
 				InteractionEventType type = INTERACTION_EVENT_SELECT_UP;
-				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+				InteractionObjectEvent interactionEvent(type, pObject);
 				CR(NotifySubscribers(type, &interactionEvent));
 			}
 		} break;
 
 		case SENSE_MOUSE_LEFT_BUTTON_DOWN: {
-			for (auto &pObject : m_activeObjects) {
+			for (auto &activeObjects : m_activeObjects) {
+				VirtualObj *pObject = activeObjects.first;
+
 				//ray rCast;
 				//m_pSandbox->GetMouseRay(rCast, 0.0f);
 				//CR(UpdateInteractionPrimitive(rCast));
 
 				InteractionEventType type = INTERACTION_EVENT_SELECT_DOWN;
-				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+				InteractionObjectEvent interactionEvent(type, pObject);
 				CR(NotifySubscribers(type, &interactionEvent));
 			}
 		} break;
 
 		case SENSE_MOUSE_WHEEL: {
-			for (auto &pObject : m_activeObjects) {
+			for (auto &activeObjects : m_activeObjects) {
+				VirtualObj *pObject = activeObjects.first;
+
 				//ray rCast;
 				//m_pSandbox->GetMouseRay(rCast, 0.0f);
 				//CR(UpdateInteractionPrimitive(rCast));
 
 				InteractionEventType type = INTERACTION_EVENT_WHEEL;
-				InteractionObjectEvent interactionEvent(type, m_pInteractionRay, pObject->GetObject());
+				InteractionObjectEvent interactionEvent(type, pObject);
 				interactionEvent.SetValue(pEvent->state * 10);
 
 				CR(NotifySubscribers(type, &interactionEvent));

@@ -61,7 +61,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(SetVisible(false));
 	// Initialize the OBB (collisions)
 	CR(GetComposite()->InitializeOBB());
-	CR(GetDOS()->AddInteractionObject(GetComposite()));
+	CR(GetDOS()->AddObjectToInteractionGraph(GetComposite()));
 
 	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 	//	CR(pDreamOS->RegisterEventSubscriber((InteractionEventType)(i), this));
@@ -233,7 +233,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 	UILayerInfo info;
 	UILayerInfo titleInfo;
 	DreamOS *pDreamOS = GetDOS();
-	CR(pDreamOS->UpdateInteractionPrimitive(GetHandRay(pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT))));
+
+	//CR(pDreamOS->UpdateInteractionPrimitive(GetHandRay(pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT))));
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
 		

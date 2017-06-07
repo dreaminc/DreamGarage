@@ -749,8 +749,7 @@ RESULT UITestSuite::AddTestInteractionFauxUI() {
 				}
 			}
 
-
-			m_pDreamOS->UpdateInteractionPrimitive(rcast);
+			//m_pDreamOS->UpdateInteractionPrimitive(rcast);
 
 		}
 		return r;

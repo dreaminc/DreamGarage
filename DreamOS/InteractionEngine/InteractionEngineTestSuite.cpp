@@ -181,7 +181,7 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 			//CN(pTestContext->pRay);
 
 			// Add composite to interaction
-			CR(m_pDreamOS->AddInteractionObject(pComposite));
+			CR(m_pDreamOS->AddObjectToInteractionGraph(pComposite));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
@@ -212,7 +212,7 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 
 		// Get ray from mouse
 		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
-		CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+		//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
 
 	Error:
 		return r;
@@ -327,7 +327,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			//CN(pTestContext->pRay);
 
 			// Add composite to interaction
-			CR(m_pDreamOS->AddInteractionObject(pComposite));
+			CR(m_pDreamOS->AddObjectToInteractionGraph(pComposite));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
@@ -359,7 +359,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 
 		// Get ray from mouse
 		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
-		CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+		//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
 
 	Error:
 		return r;
@@ -474,7 +474,7 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 			//CN(pTestContext->pRay);
 
 			// Add composite to interaction
-			CR(m_pDreamOS->AddInteractionObject(pComposite));
+			CR(m_pDreamOS->AddObjectToInteractionGraph(pComposite));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
@@ -506,7 +506,7 @@ RESULT InteractionEngineTestSuite::AddTestObjectBasedEvents() {
 
 		// Get ray from mouse
 		CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
-		CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+		//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
 
 	Error:
 		return r;
@@ -702,7 +702,7 @@ RESULT InteractionEngineTestSuite::InitializeRayCompositeTest(void* pContext) {
 	CN(pTestContext->pRay);
 
 	// Add composite to interaction
-	CR(m_pDreamOS->AddInteractionObject(pComposite));
+	CR(m_pDreamOS->AddObjectToInteractionGraph(pComposite));
 
 	// Collide point spheres
 	for (int i = 0; i < 4; i++) {
@@ -767,7 +767,7 @@ RESULT InteractionEngineTestSuite::AddTestCompositeRayController() {
 			}
 
 			pTestContext->pRay->UpdateFromRay(rCast);
-			CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
+			//CR(m_pDreamOS->UpdateInteractionPrimitive(rCast));
 
 		}
 

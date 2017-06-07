@@ -40,6 +40,7 @@ class ObjectStore;
 struct AnimationFlags;
 class AnimationQueue;
 enum class AnimationCurveType;
+class CollisionManifold;
 
 class SandboxApp;
 
@@ -59,9 +60,10 @@ public:
 	virtual RESULT CancelAnimation(VirtualObj *pObj) = 0;
 
 	// Keyboard manual collision functions
-	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject) = 0;
-	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject) = 0;
-	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState) = 0;
+	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
+	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
+
+	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState, VirtualObj *pInteractionObject = nullptr) = 0;
 
 	virtual RESULT Notify(SenseKeyboardEvent *pEvent) = 0;
 
@@ -87,8 +89,9 @@ private:
 
 	RESULT Initialize();
 
-	RESULT UpdateObjectStoreRay(ObjectStore *pObjectStore, const ray &rCast);
-	RESULT UpdateObjectStoreObject(ObjectStore *pObjectStore, VirtualObj *pObject);
+	//RESULT UpdateObjectStoreRay(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
+	RESULT UpdateObjectStore(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
+	RESULT UpdateActiveObject(VirtualObj *pInteractionObject, VirtualObj *pObject, CollisionManifold manifold, bool fRay);
 
 public:
 	RESULT Update();
@@ -116,13 +119,17 @@ public:
 	// Active Objects
 public:
 	RESULT ClearActiveObjects(VirtualObj *pInteractionObject = nullptr);
-	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject) override;
-	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState) override;
-	RESULT RemoveActiveObject(VirtualObj *pVirtualObject);
-	RESULT RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
-	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject) override;
-	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
-	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
+	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState, VirtualObj *pInteractionObject = nullptr) override;
+
+	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) override;
+	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) override;
+	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject = nullptr);
+	std::vector<std::shared_ptr<ActiveObject>> FindActiveObjectsWithState(ActiveObject::state state, VirtualObj *pInteractionObject = nullptr);
+
+	RESULT RemoveActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr);
+	RESULT RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject = nullptr);
+
+	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject);
 	
 	virtual RESULT PushAnimationItem(VirtualObj *pObj,
 		point ptPosition,
