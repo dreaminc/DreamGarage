@@ -127,11 +127,12 @@ CollisionManifold DimRay::Collide(VirtualObj* pObj) {
 // Attempts to make ray into a virtual object failed as a result of extending
 // DimRay with DimObj - the issue being that otherwise every ray would need
 // to have verts which might not be ideal in terms of using ray as a primitive
-// The use of DimRay as an actual DimObj should be only done for debuggin purposes
+// The use of DimRay as an actual DimObj should be only done for debugging purposes
 // since this is not a general solution
-ray DimRay::GetRay() {
-	point ptOrigin = m_ptOrigin + DimObj::GetOrigin();
-	vector vDirection = RotationMatrix(GetOrientation()) * m_vDirection;
+
+ray DimRay::GetRay(bool fAbsolute) {
+	point ptOrigin = m_ptOrigin + DimObj::GetOrigin(fAbsolute);
+	vector vDirection = RotationMatrix(GetOrientation(fAbsolute)) * m_vDirection;
 
 	return ray(ptOrigin, vDirection);
 }

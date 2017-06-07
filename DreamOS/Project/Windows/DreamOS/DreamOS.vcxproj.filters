@@ -797,6 +797,9 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\stdafx.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1661,6 +1664,7 @@
     <ClInclude Include="..\..\..\Primitives\Multipublisher.h">
       <Filter>Primitives</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

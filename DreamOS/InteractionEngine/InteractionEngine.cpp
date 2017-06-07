@@ -397,7 +397,7 @@ Error:
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 	RESULT r = R_PASS;
 
-	std::vector<std::shared_ptr<ActiveObject>> activeObjectsToRemove;
+	std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
 
 	// TODO: First pass (no state tracking yet)
 	// Set all objects to non-intersected - below will set it to intersected, then remaining
@@ -411,11 +411,11 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 		for (auto &pActiveObject : m_activeObjects[pInteractionObject]) {
 			// Add to remove list if not intersected in current frame
 			if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
-				activeObjectsToRemove.push_back(pActiveObject);
+				activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
 			}
 		}
 
-		for (auto &pActiveObject : activeObjectsToRemove) {
+		for (auto &pActiveObject : activeObjectsToRemove[pInteractionObject]) {
 			// Notify no longer intersected
 			CR(RemoveActiveObject(pActiveObject, pInteractionObject));
 
@@ -545,8 +545,8 @@ std::shared_ptr<ActiveObject> InteractionEngine::FindActiveObject(std::shared_pt
 RESULT InteractionEngine::RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pActiveObject);
-	CNM(pNewActiveObject, "Active object not found");
+	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pActiveObject, pInteractionObject);
+	CBM((pNewActiveObject != nullptr), "Active object not found");
 
 	//m_activeObjects.remove(pNewActiveObject);
 
@@ -571,7 +571,7 @@ Error:
 RESULT InteractionEngine::RemoveActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pVirtualObject);
+	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pVirtualObject, pInteractionObject);
 	CNM(pNewActiveObject, "Active object not found");
 
 	CR(RemoveActiveObject(pNewActiveObject, pInteractionObject));
@@ -584,7 +584,7 @@ ActiveObject::state InteractionEngine::GetActiveObjectState(VirtualObj *pVirtual
 	RESULT r = R_PASS;
 
 	std::shared_ptr<ActiveObject> pNewActiveObject = FindActiveObject(pVirtualObject, pInteractionObject);
-	CNM(pNewActiveObject, "Active object not found");
+	CBM((pNewActiveObject != nullptr), "Active object not found");
 
 	return pNewActiveObject->GetState();
 
