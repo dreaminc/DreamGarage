@@ -283,6 +283,7 @@ VirtualObj* InteractionEngine::FindInteractionObject(VirtualObj *pInteractionObj
 	return nullptr;
 }
 
+// TODO: not quite true to the name of the function, this only sets intersection but won't un intersect
 RESULT InteractionEngine::UpdateActiveObject(VirtualObj *pInteractionObject, VirtualObj *pObject, CollisionManifold manifold, bool fRay) {
 	RESULT r = R_PASS;
 
@@ -290,7 +291,7 @@ RESULT InteractionEngine::UpdateActiveObject(VirtualObj *pInteractionObject, Vir
 	auto pActiveObject = FindActiveObject(pObject, pInteractionObject);
 
 	if (pActiveObject == nullptr) {
-		pActiveObject = AddActiveObject(manifold.GetObjectA(), pInteractionObject);
+		pActiveObject = AddActiveObject(pObject, pInteractionObject);
 		CN(pActiveObject);
 
 		pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
@@ -363,16 +364,18 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore, VirtualOb
 				if (pObj == nullptr) {
 					pObj = rayManifold.GetObjectB();
 				}
+
 			}
 
 			CR(UpdateActiveObject(pInteractionObject, pObj, rayManifold, true));
 		}
 
 		// Object Collision
-		if (pDimObj->Intersect(pObject)) {
+		if (pDimObj->Intersect(pInteractionObject)) {
 
 			CollisionManifold objManifold = pDimObj->Collide(pInteractionObject);
 
+			// TODO: Move this code to UpdateActiveObject
 			int objNumContacts = objManifold.NumContacts();
 
 			if (objNumContacts > 0) {
@@ -382,9 +385,9 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore, VirtualOb
 				if (pObj == nullptr) {
 					pObj = objManifold.GetObjectB();
 				}
+
+				CR(UpdateActiveObject(pInteractionObject, pObj, objManifold, false));
 			}
-			
-			CR(UpdateActiveObject(pInteractionObject, pObj, objManifold, false));
 		}
 	}
 	

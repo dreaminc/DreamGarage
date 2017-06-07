@@ -61,10 +61,11 @@ CollisionManifold BoundingQuad::Collide(const BoundingBox& rhs) {
 bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
 	// First calculate rotation per normal and re-orient
 
+	//quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
 	quaternion qOrientation = GetAbsoluteOrientation() * quaternion(vector::jVector(1.0f), m_vNormal);
-	RotationMatrix rotMat = RotationMatrix(qOrientation);
+	RotationMatrix matRotation = RotationMatrix(qOrientation);
 
-	point ptSphereOrigin = inverse(rotMat) * (static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
+	point ptSphereOrigin = inverse(matRotation) * (static_cast<BoundingSphere>(rhs).GetAbsoluteOrigin() - GetAbsoluteOrigin());
 	double distance = ptSphereOrigin.y();
 
 	if (std::abs(distance) < static_cast<BoundingSphere>(rhs).GetRadius()) {
@@ -72,8 +73,11 @@ bool BoundingQuad::Intersect(const BoundingSphere& rhs) {
 		//point ptMin = GetMinPoint();
 
 		///*
-		point ptMax = point(GetWidth() / 2.0f, GetHeight() / 2.0f, 0.0f);
-		point ptMin = point((-1.0f * GetWidth()) / 2.0f, (-1.0f * GetHeight()) / 2.0f, 0.0f);
+		//point ptMax = point(GetWidth() / 2.0f, GetHeight() / 2.0f, 0.0f);
+		//point ptMin = point((-1.0f * GetWidth()) / 2.0f, (-1.0f * GetHeight()) / 2.0f, 0.0f);
+
+		point ptMax = point(GetWidth() / 2.0f, 0.0f, GetHeight() / 2.0f);
+		point ptMin = point((-1.0f * GetWidth()) / 2.0f, 0.0f, (-1.0f * GetHeight()) / 2.0f);
 
 		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
 		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));
@@ -110,8 +114,11 @@ CollisionManifold BoundingQuad::Collide(const BoundingSphere& rhs) {
 		//point ptMin = GetMinPoint();
 
 		///*
-		point ptMax = point(GetWidth() / 2.0f, GetHeight() / 2.0f, 0.0f);
-		point ptMin = point((-1.0f * GetWidth()) / 2.0f, (-1.0f * GetHeight())/2.0f, 0.0f);
+		//point ptMax = point(GetWidth() / 2.0f, GetHeight() / 2.0f, 0.0f);
+		//point ptMin = point((-1.0f * GetWidth()) / 2.0f, (-1.0f * GetHeight())/2.0f, 0.0f);
+
+		point ptMax = point(GetWidth() / 2.0f, 0.0f, GetHeight() / 2.0f);
+		point ptMin = point((-1.0f * GetWidth()) / 2.0f, 0.0f, (-1.0f * GetHeight()) / 2.0f);
 
 		float closestX = std::max(ptMin.x(), std::min(ptSphereOrigin.x(), ptMax.x()));
 		float closestY = std::max(ptMin.y(), std::min(ptSphereOrigin.y(), ptMax.y()));

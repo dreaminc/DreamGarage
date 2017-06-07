@@ -278,6 +278,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			pTestContext->pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
 			pTestContext->pQuad->SetColor(COLOR_BLUE);
 			//pTestContext->pQuad->RotateXByDeg(90.0f);
+			//pTestContext->pQuad->RotateYByDeg(45.0f);
 
 			// The Ray
 			pTestContext->pRay[0] = m_pDreamOS->AddRay(point(-2.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f).Normal());
@@ -286,12 +287,17 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			pTestContext->pRay[1] = m_pDreamOS->AddRay(point(-5.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f).Normal());
 			CN(pTestContext->pRay[1]);
 
+			pTestContext->pSphere = m_pDreamOS->AddSphere(0.05f, 10, 10);
+			CN(pTestContext->pSphere);
+			pTestContext->pSphere->SetPosition(point(-2.0f, -1.99f, 0.0f));
+
 			// Add composite to interaction
 			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pQuad));
 
 			// Add Ray to interaction engine
-			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[0]));
-			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[1]));
+			//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[0]));
+			//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[1]));
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pSphere));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
@@ -329,8 +335,10 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			//CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
 			//pTestContext->pRay->UpdateFromRay(rCast);
 
-			pTestContext->pRay[0]->translateX(0.0005f);
-			pTestContext->pRay[1]->translateX(0.0005f);
+			//pTestContext->pRay[0]->translateX(0.0005f);
+			//pTestContext->pRay[1]->translateX(0.0005f);
+
+			pTestContext->pSphere->translateX(0.001f);
 		}
 
 		CR(r);
