@@ -26,7 +26,9 @@ RESULT UIButton::Initialize() {
 		CR(RegisterSubscriber((UIEventType)(i), this));
 	}
 
+	m_pContextComposite = AddComposite();
 	m_pSurface = AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector());
+//	m_pSurface = m_pContextComposite->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector());
 
 	CN(m_pSurface);
 	CR(InitializeOBB());
@@ -68,4 +70,8 @@ Error:
 
 std::shared_ptr<quad> UIButton::GetSurface() {
 	return m_pSurface;
+}
+
+std::shared_ptr<composite> UIButton::GetComposite() {
+	return m_pContextComposite;
 }

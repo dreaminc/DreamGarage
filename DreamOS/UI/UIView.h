@@ -12,19 +12,24 @@
 #include "Primitives/composite.h"
 
 class UIButton;
+class UIScrollView;
 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
 public:
 	UIView(HALImp *pHALImp);
 	~UIView();
 
+	RESULT Initialize();
+
 public:
 
 	std::shared_ptr<UIButton> MakeUIButton();
 	std::shared_ptr<UIButton> AddUIButton();
 
-	RESULT Notify(InteractionObjectEvent *pEvent);
+	std::shared_ptr<UIScrollView> MakeUIScrollView();
+	std::shared_ptr<UIScrollView> AddUIScrollView();
 
+	RESULT Notify(InteractionObjectEvent *pEvent);
 };
 
 #endif // !UI_VIEW_H_ 

@@ -1,17 +1,35 @@
 #include "UIView.h"
 #include "Primitives/ray.h"
 #include "UIButton.h"
+#include "UIScrollView.h"
 
 UIView::UIView(HALImp *pHALImp) :
 composite(pHALImp)
 {
-	for (int i = 0; i < UIEventType::UI_EVENT_INVALID; i++) {
-		RegisterEvent((UIEventType)(i));
-	}
+	RESULT r = R_PASS;
+
+	CR(Initialize());
+
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
 }
 
 UIView::~UIView() {
 
+}
+
+RESULT UIView::Initialize() {
+	RESULT r = R_PASS;
+
+	for (int i = 0; i < UIEventType::UI_EVENT_INVALID; i++) {
+		CR(RegisterEvent((UIEventType)(i)));
+	}
+
+Error:
+	return r;
 }
 
 std::shared_ptr<UIButton> UIView::MakeUIButton() {
@@ -26,6 +44,22 @@ std::shared_ptr<UIButton> UIView::AddUIButton() {
 	std::shared_ptr<UIButton> pButton = MakeUIButton();
 	CR(AddObject(pButton));
 	return pButton;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIScrollView> UIView::MakeUIScrollView() {
+	std::shared_ptr<UIScrollView> pScrollView(new UIScrollView(m_pHALImp));
+
+	return pScrollView;
+}
+
+std::shared_ptr<UIScrollView> UIView::AddUIScrollView() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIScrollView> pScrollView = MakeUIScrollView();
+	CR(AddObject(pScrollView));
+	return pScrollView;
 Error:
 	return nullptr;
 }

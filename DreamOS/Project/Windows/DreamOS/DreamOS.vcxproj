@@ -825,6 +825,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp" />
     <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp" />
     <ClCompile Include="..\..\..\UI\UIModule.cpp" />
+    <ClCompile Include="..\..\..\UI\UIScrollView.cpp" />
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp" />
     <ClCompile Include="..\..\..\UI\UIView.cpp" />
     <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp" />
@@ -1118,6 +1119,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h" />
     <ClInclude Include="..\..\..\UI\UIMenuLayer.h" />
     <ClInclude Include="..\..\..\UI\UIModule.h" />
+    <ClInclude Include="..\..\..\UI\UIScrollView.h" />
     <ClInclude Include="..\..\..\UI\UITestSuite.h" />
     <ClInclude Include="..\..\..\UI\UIView.h" />
     <ClInclude Include="..\..\..\UI\UIViewTestSuite.h" />

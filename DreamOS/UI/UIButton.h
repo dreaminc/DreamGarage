@@ -18,11 +18,13 @@ public:
 	RESULT RegisterEvent(UIEventType type, std::function<RESULT(void*)> fnCallback);
 	RESULT Notify(UIEvent *pEvent);
 
+	std::shared_ptr<composite> GetComposite();
 	std::shared_ptr<quad> GetSurface();
 
 private:
 	// objects (TODO: could be in subclass)
 	std::shared_ptr<quad> m_pSurface;
+	std::shared_ptr<composite> m_pContextComposite;
 	std::map<UIEventType, std::function<RESULT(void*)>> m_callbacks;
 };
 

@@ -4,6 +4,7 @@
 
 #include "UIView.h"
 #include "UIButton.h"
+#include "UIScrollView.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -76,7 +77,9 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestUIButtons());
+	CR(AddTestUIScrollView());
+	//CR(AddTestUIButtons());
+	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
 
 Error:
@@ -255,7 +258,6 @@ RESULT UIViewTestSuite::AddTestUIView() {
 		return r;
 	};
 
-	//auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
 	auto pUITest = AddTest(fnInitialize,
 		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
@@ -391,10 +393,109 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
+RESULT UIViewTestSuite::AddTestUIScrollView() {
 	RESULT r = R_PASS;
 
+	double sTestTime = 10000.0;
+
+	struct TestContext {
+		composite* pComposite = nullptr;
+		std::shared_ptr<UIView> pView = nullptr;
+		std::shared_ptr<UIScrollView> pScrollView = nullptr;
+		std::vector<std::shared_ptr<UIButton>> pButtons = {};
+	};
+	TestContext *pContext = new TestContext();
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		//*
+		auto& pComposite = pTestContext->pComposite;
+		auto& pView = pTestContext->pView;
+		auto& pScrollView = pTestContext->pScrollView;
+		auto& pButtons = pTestContext->pButtons;
+		//*/
+		/*
+		composite* pComposite;
+		std::shared_ptr<UIView> pView;
+		std::shared_ptr<UIScrollView> pScrollView;
+		std::vector<std::shared_ptr<UIButton>> pButtons;
+		//*/
+
+		int numButtons = 8;
+
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		pComposite = m_pDreamOS->AddComposite();
+		pComposite->InitializeOBB();
+
+		pView = pComposite->AddUIView();
+		pView->InitializeOBB();
+
+		pScrollView = pView->AddUIScrollView();
+		pScrollView->InitializeWithDOS(m_pDreamOS);
+
+		for (int i = 0; i < numButtons; i++) {
+			pButtons.emplace_back(pView->MakeUIButton()); // ScrollView adds them
+		}
+
+		pScrollView->UpdateMenuButtons(pButtons);
+		pScrollView->SetPosition(point(0.0f, 0.0f, 5.0f));
+
+		///*
+		//pTestContext->pComposite = pComposite;
+		//pTestContext->pButtons = pButtons;
+		//pTestContext->pScrollView = pScrollView;
+		//pTestContext->pView = pView;
+		//*/
+
+	Error:
+		return r;
+	};
+	 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
+		auto pScrollView = pTestContext->pScrollView;
+		CN(pTestContext);
+		CN(pScrollView);
+
+		CR(UpdateHandRay(pContext));
+		CR(pScrollView->Update());
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize,
+		fnUpdate,
+		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
+		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
+		pContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local UIView Test");
+	pUITest->SetTestDescription("Basic test of uiview working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
+	RESULT r = R_PASS;
 	switch (pEvent->m_eventType) {
+	case (UIEventType::UI_SELECT_ENDED): {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
+		
+		if (pDimObj != nullptr) {
+			pDimObj->RotateYByDeg(45.0f);
+		}
+	}
+	//*
 	case (UIEventType::UI_HOVER_BEGIN): {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
 		
@@ -409,6 +510,7 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 			pDimObj->ResetRotation();
 		}
 	} break;
+	//*/
 	}
 
 //Error:

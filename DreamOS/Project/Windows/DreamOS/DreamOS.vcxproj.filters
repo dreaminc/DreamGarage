@@ -818,6 +818,9 @@
     <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp">
       <Filter>UI</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIScrollView.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1699,6 +1702,9 @@
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIViewTestSuite.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIScrollView.h">
       <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
