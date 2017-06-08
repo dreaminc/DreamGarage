@@ -394,9 +394,9 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore, VirtualOb
 		// TODO: Merge events
 		if (interactionEvent.m_eventType != InteractionEventType::INTERACTION_EVENT_INVALID) {
 
-			interactionEvent.m_pObject = pObject;
+			interactionEvent.m_pObject = pObj;
 			interactionEvent.m_pInteractionObject = pInteractionObject;
-			interactionEvent.m_activeState = GetActiveObjectState(pObject, pInteractionObject);
+			interactionEvent.m_activeState = GetActiveObjectState(pObj, pInteractionObject);
 
 			CR(NotifySubscribers(pObject, interactionEvent.m_eventType, &interactionEvent));
 		}

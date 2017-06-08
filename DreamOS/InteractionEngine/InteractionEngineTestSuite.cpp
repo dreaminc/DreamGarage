@@ -37,6 +37,8 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMultiPrimitiveComposite());
+
 	CR(AddTestMultiPrimitive());
 
 	CR(AddTestObjectBasedEvents());
@@ -242,6 +244,147 @@ RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
 
 	pNewTest->SetTestName("Ray Events Test");
 	pNewTest->SetTestDescription("Event handling test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngineTestSuite::AddTestMultiPrimitiveComposite() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 100.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		composite *pComposite = nullptr;
+		sphere *pSphere = nullptr;
+		DimRay *pRay[2] = { nullptr, nullptr };
+		DimRay *pMouseRay = nullptr;
+		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupPipeline());
+
+		{
+			TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+			// Create a complex composite
+			pTestContext->pComposite = m_pDreamOS->AddComposite();
+			CN(pTestContext->pComposite);
+			pTestContext->pComposite->InitializeOBB();
+			pTestContext->pComposite->SetPosition(point(0.0f, -2.0f, 0.0f));
+
+			// Add composite to interaction
+			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite));
+
+			auto pQuad = pTestContext->pComposite->AddQuad(1.0f, 1.0f);
+			pQuad->SetColor(COLOR_BLUE);
+			//pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
+			//pQuad->RotateXByDeg(90.0f);
+			//pQuad->RotateYByDeg(45.0f);
+
+			// The Ray
+			pTestContext->pRay[0] = m_pDreamOS->AddRay(point(-2.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f).Normal());
+			CN(pTestContext->pRay[0]);
+
+			pTestContext->pRay[1] = m_pDreamOS->AddRay(point(-2.1f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f).Normal());
+			CN(pTestContext->pRay[1]);
+
+			pTestContext->pMouseRay = m_pDreamOS->AddRay(point(-0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f).Normal());
+			CN(pTestContext->pMouseRay);
+
+			pTestContext->pSphere = m_pDreamOS->AddSphere(0.05f, 10, 10);
+			CN(pTestContext->pSphere);
+			//pTestContext->pSphere->SetPosition(point(-2.0f, -1.98f, 0.0f));
+			//pTestContext->pSphere->SetPosition(point(-2.0f, -2.55f, 0.0f));
+			pTestContext->pSphere->SetPosition(point(-2.0f, -2.02f, 0.0f));
+			//pTestContext->pSphere->RotateXByDeg(180.0f);
+
+			// Add Ray to interaction engine
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[0]));
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[1]));
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pMouseRay));
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pSphere));
+
+			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+				CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pComposite, (InteractionEventType)(i), this));
+			}
+
+			// Collide point spheres
+			for (int i = 0; i < 4; i++) {
+				pTestContext->pCollidePoint[i] = m_pDreamOS->AddSphere(0.025f, 10, 10);
+				CN(pTestContext->pCollidePoint[i]);
+				pTestContext->pCollidePoint[i]->SetVisible(false);
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		ray rCast;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		// This updates the ray from the mouse
+		if (pTestContext != nullptr) {
+
+			CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
+			pTestContext->pMouseRay->UpdateFromRay(rCast);
+
+			//pTestContext->pRay[0]->translateX(0.00052f);
+			//pTestContext->pRay[1]->translateX(0.00051f);
+			//pTestContext->pSphere->translateX(0.00075f);
+		}
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+
+		if (pTestContext != nullptr) {
+			delete pTestContext;
+			pTestContext = nullptr;
+		}
+
+		CR(ResetTest(pContext));
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Multi Primitive Interaction Composite Test");
+	pNewTest->SetTestDescription("Test covering multi interaction objects interacting with composite objects");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
