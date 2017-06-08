@@ -29,6 +29,7 @@
 
 #include "InteractionObjectEvent.h"
 #include "ActiveObject.h"
+#include "ActiveObjectQueue.h"
 #include <chrono>
 
 #include "Primitives/Multipublisher.h"
@@ -60,10 +61,9 @@ public:
 	virtual RESULT CancelAnimation(VirtualObj *pObj) = 0;
 
 	// Keyboard manual collision functions
-	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
-	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
-
-	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState, VirtualObj *pInteractionObject = nullptr) = 0;
+	//virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
+	//virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
+	//virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState, VirtualObj *pInteractionObject = nullptr) = 0;
 
 	virtual RESULT Notify(SenseKeyboardEvent *pEvent) = 0;
 
@@ -88,10 +88,13 @@ private:
 	InteractionEngine(SandboxApp *pSandbox);
 
 	RESULT Initialize();
+	RESULT InitializeActiveObjectQueues();
 
 	//RESULT UpdateObjectStoreRay(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
-	RESULT UpdateObjectStore(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
-	InteractionEventType UpdateActiveObject(VirtualObj *pInteractionObject, CollisionManifold manifold, bool fRay);
+	//RESULT UpdateObjectStore(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
+	RESULT UpdateObjectStore(ActiveObject::type activeObjectType, ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
+	//InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold);
+	InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold, VirtualObj *pEventObject);
 
 public:
 	RESULT Update();
@@ -118,19 +121,6 @@ public:
 
 	// Active Objects
 public:
-	RESULT ClearActiveObjects(VirtualObj *pInteractionObject = nullptr);
-	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState, VirtualObj *pInteractionObject = nullptr) override;
-
-	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) override;
-	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) override;
-	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject = nullptr);
-	std::vector<std::shared_ptr<ActiveObject>> FindActiveObjectsWithState(ActiveObject::state state, VirtualObj *pInteractionObject = nullptr);
-
-	RESULT RemoveActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr);
-	RESULT RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject, VirtualObj *pInteractionObject = nullptr);
-
-	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject);
-	
 	virtual RESULT PushAnimationItem(VirtualObj *pObj,
 		point ptPosition,
 		quaternion qRotation,
@@ -159,9 +149,11 @@ private:
 	//std::shared_ptr<ray> m_pInteractionRay = nullptr;
 	std::vector<VirtualObj*> m_interactionObjects;
 	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
-	std::map<VirtualObj*, std::list<std::shared_ptr<ActiveObject>>> m_activeObjects;
 
-	AnimationQueue* m_pObjectQueue;
+	//std::map<VirtualObj*, std::list<std::shared_ptr<ActiveObject>>> m_activeObjects;
+	std::map<ActiveObject::type, ActiveObjectQueue> m_activeObjectQueues;
+	
+	AnimationQueue* m_pObjectQueue = nullptr;
 
 private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;

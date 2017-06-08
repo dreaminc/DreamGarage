@@ -721,6 +721,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\ActiveObjectQueue.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\AnimationItem.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\AnimationQueue.cpp" />
@@ -980,6 +981,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
     <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\ActiveObjectQueue.h" />
     <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h" />
     <ClInclude Include="..\..\..\InteractionEngine\AnimationItem.h" />
     <ClInclude Include="..\..\..\InteractionEngine\AnimationQueue.h" />

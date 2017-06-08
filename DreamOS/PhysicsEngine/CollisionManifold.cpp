@@ -1,14 +1,12 @@
 #include "CollisionManifold.h"
 
-/*
 CollisionManifold::CollisionManifold() :
 	m_pObjA(nullptr),
 	m_pObjB(nullptr),
 	m_numContacts(0)
 {
-	Clear();
+	//Clear();
 }
-*/
 
 CollisionManifold::CollisionManifold(VirtualObj *pObjA, VirtualObj *pObjB) :
 	m_pObjA(pObjA),

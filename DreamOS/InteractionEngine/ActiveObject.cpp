@@ -3,6 +3,15 @@
 
 ActiveObject::ActiveObject(VirtualObj *pObject) :
 	m_pObject(pObject),
+	m_pEventObject(pObject),
+	m_state(ActiveObject::state::NOT_INTERSECTED)
+{
+	// empty
+}
+
+ActiveObject::ActiveObject(VirtualObj *pObject, VirtualObj *pEventObject) :
+	m_pObject(pObject),
+	m_pEventObject(pEventObject),
 	m_state(ActiveObject::state::NOT_INTERSECTED)
 {
 	// empty
@@ -60,6 +69,15 @@ vector ActiveObject::GetIntersectionNormal() {
 
 VirtualObj* ActiveObject::GetObject() {
 	return m_pObject;
+}
+
+VirtualObj* ActiveObject::GetEventObject() {
+	return m_pEventObject;
+}
+
+RESULT ActiveObject::SetEventObject(VirtualObj *pEventObject) {
+	m_pEventObject = pEventObject;
+	return R_PASS;
 }
 
 RESULT ActiveObject::SetInteractionPoint(point ptIntersection) {

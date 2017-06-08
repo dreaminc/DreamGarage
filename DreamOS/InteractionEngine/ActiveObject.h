@@ -22,8 +22,15 @@ public:
 		INVALID			= 0xFF
 	};
 
+	enum class type : uint8_t {
+		INTERSECT,
+		COLLIDE,
+		INVALID
+	};
+
 public:
 	ActiveObject(VirtualObj *pObject);
+	ActiveObject(VirtualObj *pObject, VirtualObj *pEventObject);
 
 	RESULT UpdateObject(const point &ptIntersection, const vector &vNormal, ActiveObject::state newState);
 	
@@ -41,11 +48,15 @@ public:
 	point GetIntersectionPoint();
 	vector GetIntersectionNormal();
 	VirtualObj *GetObject();
+	VirtualObj *GetEventObject();
+
+	RESULT SetEventObject(VirtualObj *pEventObject);
 
 private:
 	ActiveObject::state m_state = state::NOT_INTERSECTED;
 	
 	VirtualObj *m_pObject = nullptr;
+	VirtualObj *m_pEventObject = nullptr;
 
 	point m_ptIntersection;
 	vector m_vNormal;
