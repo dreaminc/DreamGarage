@@ -38,6 +38,9 @@ public:
 
 	RESULT AddTestNestedCompositeOBB();
 
+	RESULT AddTestMultiPrimitive();
+	RESULT AddTestMultiPrimitiveComposite();
+
 	RESULT AddTestCompositeRay();
 	RESULT AddTestCompositeRayNested();
 	RESULT AddTestCompositeRayController();

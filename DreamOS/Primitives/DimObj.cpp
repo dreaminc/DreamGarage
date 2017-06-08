@@ -310,26 +310,79 @@ std::vector<std::shared_ptr<VirtualObj>> DimObj::GetChildren() {
 }
 
 // Intersections and Collision
-bool DimObj::Intersect(VirtualObj* pObj) {
+bool DimObj::Intersect(VirtualObj* pObj, int depth) {
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
 
+	/*
 	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
 		return false;
 	}
 	else {
 		return GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get());
 	}
+	//*/
+
+	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
+		return false;
+	}
+	else {
+		if (GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get())) {
+			if (HasChildren()) {
+				for (auto &pChild : GetChildren()) {
+					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
+
+					// Bounding Volume is oriented correctly using the DimObj overloads
+					if (pDimChild->Intersect(pObj, (depth + 1))) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
-CollisionManifold DimObj::Collide(VirtualObj* pObj) {
+CollisionManifold DimObj::Collide(VirtualObj* pObj, int depth) {
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
 
+	/*
 	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
 		return CollisionManifold(this, pObj);
 	}
 	else {
 		return GetBoundingVolume()->Collide(pDimObj->GetBoundingVolume().get());
 	}
+	//*/
+
+	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
+		return CollisionManifold(this, pObj);
+	}
+	else {
+		if (Intersect(pObj)) {
+			if (HasChildren()) {
+				for (auto &pChild : GetChildren()) {
+					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
+
+					if (pDimChild->Intersect(pObj)) {
+						return pDimChild->Collide(pObj, (depth + 1));
+					}
+				}
+
+				return CollisionManifold(this, pObj);
+			}
+			else {
+				return GetBoundingVolume()->Collide(pDimObj->GetBoundingVolume().get());
+			}
+		}
+	}
+
+	return CollisionManifold(this, pObj);
 }
 
 bool DimObj::Intersect(const ray &rCast, int depth) {

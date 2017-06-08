@@ -15,19 +15,31 @@ class ContactPoint;
 
 class ActiveObject {
 public:
-	enum class state {
-		NOT_INTERSECTED,
-		INTERSECTED,
+	enum class state : uint8_t {
+		NOT_INTERSECTED = 0,		
+		RAY_INTERSECTED = 1 << 0, 	 
+		OBJ_INTERSECTED = 1 << 1,
+		INVALID			= 0xFF
+	};
+
+	enum class type : uint8_t {
+		INTERSECT,
+		COLLIDE,
 		INVALID
 	};
 
 public:
 	ActiveObject(VirtualObj *pObject);
+	ActiveObject(VirtualObj *pObject, VirtualObj *pEventObject);
 
 	RESULT UpdateObject(const point &ptIntersection, const vector &vNormal, ActiveObject::state newState);
 	
 	ActiveObject::state GetState();
-	RESULT SetState(ActiveObject::state newstate);
+
+	RESULT SetState(ActiveObject::state newState);
+	RESULT AddState(ActiveObject::state newState);
+	RESULT RemoveState(ActiveObject::state newState);
+	bool HasState(ActiveObject::state newState);
 
 	RESULT SetContactPoint(ContactPoint contactPoint);
 	RESULT SetInteractionPoint(point ptIntersection);
@@ -36,12 +48,21 @@ public:
 	point GetIntersectionPoint();
 	vector GetIntersectionNormal();
 	VirtualObj *GetObject();
+	VirtualObj *GetEventObject();
+
+	RESULT SetEventObject(VirtualObj *pEventObject);
 
 private:
 	ActiveObject::state m_state = state::NOT_INTERSECTED;
+	
 	VirtualObj *m_pObject = nullptr;
+	VirtualObj *m_pEventObject = nullptr;
+
 	point m_ptIntersection;
 	vector m_vNormal;
 };
+
+ActiveObject::state operator&(ActiveObject::state lhs, ActiveObject::state rhs);
+ActiveObject::state operator|(ActiveObject::state lhs, ActiveObject::state rhs);
 
 #endif // ! ACTIVE_OBJECT_H_

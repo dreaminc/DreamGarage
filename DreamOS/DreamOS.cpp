@@ -188,13 +188,19 @@ RESULT DreamOS::AddPhysicsObject(VirtualObj *pObject) {
 }
 
 // This is a pass-thru at the moment
+RESULT DreamOS::AddObjectToInteractionGraph(VirtualObj *pObject) {
+	return m_pSandbox->AddObjectToInteractionGraph(pObject);
+}
+
 RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->AddInteractionObject(pObject);
 }
 
+/*
 RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
 	return m_pSandbox->UpdateInteractionPrimitive(rCast);
 }
+*/
 
 RESULT DreamOS::SetGravityAcceleration(double acceleration) {
 	return m_pSandbox->SetGravityAcceleration(acceleration);
@@ -357,7 +363,7 @@ Error:
 RESULT DreamOS::AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 
-	CR(AddInteractionObject(pObject));
+	CR(AddObjectToInteractionGraph(pObject));
 
 	CR(m_pSandbox->RegisterEventSubscriber(pObject, eventType, pInteractionSubscriber));
 

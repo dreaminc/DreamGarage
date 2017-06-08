@@ -126,7 +126,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 											 vector(0.0f, 0.0f, 0.0f));
 	//*/
 
-	GetDOS()->AddInteractionObject(m_pBrowserQuad.get());
+	GetDOS()->AddObjectToInteractionGraph(m_pBrowserQuad.get());
 
 Error:
 	return r;
@@ -328,14 +328,14 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 	// First point of contact
 	if (fUpdateMouse) {
-		if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
+		//if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
 			//m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
 			point ptIntersectionContact = pEvent->m_ptContact[0];
 			ptIntersectionContact.w() = 1.0f;
 
 			point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
 			m_pPointerCursor->SetOrigin(ptAdjustedContact);
-		}
+		//}
 	}
 
 Error:

@@ -33,6 +33,8 @@ typedef enum ObjectType {
 	OBJECT_INVALID
 } OBJECT_TYPE;
 
+class ray;
+
 class VirtualObj : public valid {
 public:
 	friend class PhysicsIntegrator;		// TODO: move physics stuff into state/derivative for RK4
@@ -136,6 +138,9 @@ public:
 	VirtualObj* AddVelocity(point_precision x, point_precision y, point_precision z);
 	VirtualObj* SetVelocity(matrix <point_precision, 4, 1> vVelocity);
 	VirtualObj* SetVelocity(point_precision x, point_precision y, point_precision z);
+
+	// Ray - objects can override this if they'd like to
+	virtual ray GetRay(bool fAbsolute = false);
 
 	// Acceleration
 	/*

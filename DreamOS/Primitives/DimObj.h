@@ -137,8 +137,8 @@ public:
 	std::vector<std::shared_ptr<VirtualObj>> GetChildren();
 
 	// Intersections and Collision
-	bool Intersect(VirtualObj* pObj);
-	CollisionManifold Collide(VirtualObj* pObj);
+	bool Intersect(VirtualObj* pObj, int depth = 0);
+	CollisionManifold Collide(VirtualObj* pObj, int depth = 0);
 
 	bool Intersect(const ray &rCast, int depth = 0);
 	CollisionManifold Collide(const ray &rCast, int depth = 0);

@@ -772,7 +772,7 @@ Error:
 }
 
 // This adds the object to the interaction graph (otherwise it will not be included in event handling)
-RESULT SandboxApp::AddInteractionObject(VirtualObj *pObject) {
+RESULT SandboxApp::AddObjectToInteractionGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pInteractionGraph->PushObject(pObject));
@@ -781,6 +781,16 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::AddInteractionObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pInteractionEngine->AddInteractionObject(pObject));
+
+Error:
+	return r;
+}
+
+/*
 RESULT SandboxApp::UpdateInteractionPrimitive(const ray &rCast) {
 	RESULT r = R_PASS;
 
@@ -789,6 +799,7 @@ RESULT SandboxApp::UpdateInteractionPrimitive(const ray &rCast) {
 Error:
 	return r;
 }
+*/
 
 // This is the nuclear option - it will flush all objects out
 RESULT SandboxApp::RemoveAllObjects() {

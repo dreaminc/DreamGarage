@@ -302,8 +302,7 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libss
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Testing|x64'">
     <ClCompile>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>_DEBUG;_USE_TEST_APP;_CONSOLE;__STD_C;_CRT_SECURE_NO_DEPRECATE;_SCL_SECURE_NO_DEPRECATE;__STDC_CONSTANT_MACROS;__STDC_FORMAT_MACROS;WEBRTC_WIN;_WIN32_WINNT=0x0A00;WINVER=0x0A00;WIN32;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;ENABLE_WEBRTC=1;ENABLE_MEDIA_ROUTER=1;ENABLE_PEPPER_CDMS;ENABLE_SRTP=0;_WINSOCK_DEPRECATED_NO_WARNINGS;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -315,6 +314,7 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libss
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <TreatWarningAsError>true</TreatWarningAsError>
+      <PrecompiledHeaderFile>$(ProjectDir)..\..\..\stdafx.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -721,6 +721,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp" />
+    <ClCompile Include="..\..\..\InteractionEngine\ActiveObjectQueue.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\AnimationItem.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\AnimationQueue.cpp" />
@@ -803,6 +804,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Sense\SenseKeyboard.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseLeapMotion.cpp" />
     <ClCompile Include="..\..\..\Sense\SenseMouse.cpp" />
+    <ClCompile Include="..\..\..\stdafx.cpp" />
     <ClCompile Include="..\..\..\Test\MatrixTestSuite.cpp" />
     <ClCompile Include="..\..\..\Test\TestObject.cpp" />
     <ClCompile Include="..\..\..\Test\TestSuite.cpp" />
@@ -979,6 +981,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
     <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h" />
+    <ClInclude Include="..\..\..\InteractionEngine\ActiveObjectQueue.h" />
     <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h" />
     <ClInclude Include="..\..\..\InteractionEngine\AnimationItem.h" />
     <ClInclude Include="..\..\..\InteractionEngine\AnimationQueue.h" />
@@ -1089,6 +1092,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Sense\SenseLeapMotion.h" />
     <ClInclude Include="..\..\..\Sense\SenseLeapMotionHand.h" />
     <ClInclude Include="..\..\..\Sense\SenseMouse.h" />
+    <ClInclude Include="..\..\..\stdafx.h" />
     <ClInclude Include="..\..\..\Test\MatrixTestSuite.h" />
     <ClInclude Include="..\..\..\Test\TestObject.h" />
     <ClInclude Include="..\..\..\Test\TestSuite.h" />

@@ -164,8 +164,9 @@ public:
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
 
+	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
-	RESULT UpdateInteractionPrimitive(const ray &rCast);
+	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT RemoveAllObjects();
 

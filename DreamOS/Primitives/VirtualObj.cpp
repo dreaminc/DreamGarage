@@ -1,5 +1,7 @@
 #include "VirtualObj.h"
 
+#include "ray.h"
+
 VirtualObj::VirtualObj() :
 	m_objectState(this),
 	m_objectDerivative(),
@@ -192,6 +194,11 @@ VirtualObj* VirtualObj::SetVelocity(matrix <point_precision, 4, 1> vVelocity) {
 VirtualObj* VirtualObj::SetVelocity(point_precision x, point_precision y, point_precision z) {
 	m_objectState.SetVelocity(vector(x, y, z));
 	return this;
+}
+
+ray VirtualObj::GetRay(bool fAbsolute) {
+	vector vDirection = vector::jVector(1.0f).RotateByQuaternion(GetOrientation(fAbsolute));
+	return ray(GetOrigin(fAbsolute), vDirection);
 }
 
 /*

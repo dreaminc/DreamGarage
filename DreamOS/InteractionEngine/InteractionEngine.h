@@ -29,6 +29,7 @@
 
 #include "InteractionObjectEvent.h"
 #include "ActiveObject.h"
+#include "ActiveObjectQueue.h"
 #include <chrono>
 
 #include "Primitives/Multipublisher.h"
@@ -40,6 +41,7 @@ class ObjectStore;
 struct AnimationFlags;
 class AnimationQueue;
 enum class AnimationCurveType;
+class CollisionManifold;
 
 class SandboxApp;
 
@@ -59,13 +61,13 @@ public:
 	virtual RESULT CancelAnimation(VirtualObj *pObj) = 0;
 
 	// Keyboard manual collision functions
-	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject) = 0;
-	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject) = 0;
-	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState) = 0;
+	//virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
+	//virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
+	//virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState, VirtualObj *pInteractionObject = nullptr) = 0;
 
 	virtual RESULT Notify(SenseKeyboardEvent *pEvent) = 0;
 
-	virtual point GetInteractionRayOrigin() = 0;
+	//virtual point GetInteractionRayOrigin() = 0;
 };
 
 
@@ -86,14 +88,32 @@ private:
 	InteractionEngine(SandboxApp *pSandbox);
 
 	RESULT Initialize();
+	RESULT InitializeActiveObjectQueues();
+
+	//RESULT UpdateObjectStoreRay(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
+	//RESULT UpdateObjectStore(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
+	RESULT UpdateObjectStore(ActiveObject::type activeObjectType, ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
+	//InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold);
+	InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold, VirtualObj *pEventObject);
 
 public:
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
+
 	RESULT UpdateAnimationQueue();
 	RESULT SetInteractionGraph(ObjectStore *pObjectStore);
 
+	/*
 	RESULT UpdateInteractionPrimitive(const ray &r);
+	virtual point GetInteractionRayOrigin() override;
+	RESULT UpdateInteractionRay();
+	*/
+
+	RESULT AddInteractionObject(VirtualObj *pInteractionObject);
+	RESULT RemoveInteractionObject(VirtualObj *pInteractionObject);
+	RESULT ClearInteractionObjects();
+	VirtualObj *FindInteractionObject(VirtualObj *pInteractionObject);
+
 	RESULT SetInteractionDiffThreshold(double thresh);
 
 	//RESULT RegisterSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
@@ -101,14 +121,6 @@ public:
 
 	// Active Objects
 public:
-	RESULT ClearActiveObjects();
-	virtual std::shared_ptr<ActiveObject> AddActiveObject(VirtualObj *pVirtualObject) override;
-	virtual RESULT SetAllActiveObjectStates(ActiveObject::state newState) override;
-	RESULT RemoveActiveObject(VirtualObj *pVirtualObject);
-	RESULT RemoveActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
-	virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject) override;
-	std::shared_ptr<ActiveObject> FindActiveObject(std::shared_ptr<ActiveObject> pActiveObject);
-	ActiveObject::state GetActiveObjectState(VirtualObj *pVirtualObject);
 	virtual RESULT PushAnimationItem(VirtualObj *pObj,
 		point ptPosition,
 		quaternion qRotation,
@@ -131,16 +143,17 @@ public:
 	RESULT RegisterSenseMouse();
 	RESULT RegisterSenseKeyboard();
 
-	virtual point GetInteractionRayOrigin() override;
-	RESULT UpdateInteractionRay();
-
 	InteractionEngineProxy *GetInteractionEngineProxy();
 
 private:
-	std::shared_ptr<ray> m_pInteractionRay = nullptr;
-	std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
+	//std::shared_ptr<ray> m_pInteractionRay = nullptr;
+	std::vector<VirtualObj*> m_interactionObjects;
+	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
 
-	AnimationQueue* m_pObjectQueue;
+	//std::map<VirtualObj*, std::list<std::shared_ptr<ActiveObject>>> m_activeObjects;
+	std::map<ActiveObject::type, ActiveObjectQueue> m_activeObjectQueues;
+	
+	AnimationQueue* m_pObjectQueue = nullptr;
 
 private:
 	double m_diffThreshold = DEFAULT_INTERACTION_DIFF_THRESHOLD;

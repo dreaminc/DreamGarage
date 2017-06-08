@@ -216,7 +216,7 @@ RESULT AnimationTestSuite::AddTestAnimationBasic() {
 		CR(InitializeAnimationTest(pContext));
 		AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
-		CR(m_pDreamOS->AddInteractionObject(pTestContext->pComposite));
+		CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite));
 		aState.ptPosition = point(0.0f, 1.0f, -2.0f);
 		aState.qRotation = quaternion(0.0f, 0.0f, 0.0f, 1.0f);
 		aState.vScale = vector(5.0f, 1.25f, 1.25f);
@@ -274,7 +274,7 @@ RESULT AnimationTestSuite::AddTestCancel() {
 		CR(InitializeAnimationTest(pContext));
 		AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
-		CR(m_pDreamOS->AddInteractionObject(pTestContext->pComposite));
+		CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pComposite));
 
 		aState.ptPosition = point(0.0f, 1.0f, -2.0f);
 		aState.vScale = vector(1.25f, 1.25f, 1.25f);
