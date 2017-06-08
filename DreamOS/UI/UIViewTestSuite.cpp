@@ -1,6 +1,7 @@
 #include "UIViewTestSuite.h"
 
 #include "DreamOS.h"
+#include "DreamGarage/DreamUIBar.h"
 
 #include "UIView.h"
 #include "UIButton.h"
@@ -77,6 +78,7 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestDreamUIBar());
 	CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
@@ -474,6 +476,42 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
 		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
 		pContext);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local UIView Test");
+	pUITest->SetTestDescription("Basic test of uiview working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+RESULT UIViewTestSuite::AddTestDreamUIBar() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		
+		CN(m_pDreamOS);
+
+		CR(SetupPipeline());
+
+		{
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
+		}
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize,
+		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
+		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
+		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
+		nullptr);
 	CN(pUITest);
 
 	pUITest->SetTestName("Local UIView Test");

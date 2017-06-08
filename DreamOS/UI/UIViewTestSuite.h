@@ -27,6 +27,7 @@ public:
 	RESULT AddTestUIButton();
 	RESULT AddTestUIButtons();
 	RESULT AddTestUIScrollView();
+	RESULT AddTestDreamUIBar();
 
 	virtual RESULT AddTests() override;
 

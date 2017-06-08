@@ -12,7 +12,12 @@
 #include "Cloud/Menu/MenuNode.h"
 #include "Cloud/Environment/EnvironmentController.h"
 
-class DreamUIBar : public DreamApp<DreamUIBar>, public UIBar, public MenuController::observer, public Subscriber<InteractionObjectEvent> {
+class DreamUIBar :	public DreamApp<DreamUIBar>, 
+					public UIBar, 
+					public MenuController::observer, 
+					public Subscriber<InteractionObjectEvent> 
+{
+
 	friend class DreamAppManager;
 
 public:
