@@ -256,7 +256,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 	int nRepeats = 1;
 
 	struct TestContext {
-		quad *pQuad = nullptr;
+		quad *pQuad[4] = { nullptr, nullptr, nullptr, nullptr };
 		sphere *pSphere = nullptr;
 		DimRay *pRay[2] = { nullptr, nullptr };
 		DimRay *pMouseRay = nullptr;
@@ -276,11 +276,32 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 		{
 			TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 
-			pTestContext->pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
-			pTestContext->pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
-			pTestContext->pQuad->SetColor(COLOR_BLUE);
+			pTestContext->pQuad[0] = m_pDreamOS->AddQuad(1.0f, 1.0f);
+			pTestContext->pQuad[0]->SetPosition(point(0.0f, -2.0f, 0.0f));
+			pTestContext->pQuad[0]->SetColor(COLOR_BLUE);
 			//pTestContext->pQuad->RotateXByDeg(90.0f);
 			//pTestContext->pQuad->RotateYByDeg(45.0f);
+
+			// Add composite to interaction
+			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pQuad[0]));
+
+			pTestContext->pQuad[1] = m_pDreamOS->AddQuad(1.0f, 1.0f);
+			pTestContext->pQuad[1]->SetPosition(point(2.0f, -2.0f, 0.0f));
+			pTestContext->pQuad[1]->SetColor(COLOR_BLUE);
+			//pTestContext->pQuad->RotateXByDeg(90.0f);
+			//pTestContext->pQuad->RotateYByDeg(45.0f);
+
+			// Add composite to interaction
+			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pQuad[1]));
+
+			pTestContext->pQuad[2] = m_pDreamOS->AddQuad(1.0f, 1.0f);
+			pTestContext->pQuad[2]->SetPosition(point(4.0f, -2.0f, 0.0f));
+			pTestContext->pQuad[2]->SetColor(COLOR_BLUE);
+			//pTestContext->pQuad->RotateXByDeg(90.0f);
+			//pTestContext->pQuad->RotateYByDeg(45.0f);
+
+			// Add composite to interaction
+			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pQuad[2]));
 
 			// The Ray
 			pTestContext->pRay[0] = m_pDreamOS->AddRay(point(-2.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f).Normal());
@@ -299,9 +320,6 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			pTestContext->pSphere->SetPosition(point(-2.0f, -2.02f, 0.0f));
 			//pTestContext->pSphere->RotateXByDeg(180.0f);
 
-			// Add composite to interaction
-			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pQuad));
-
 			// Add Ray to interaction engine
 			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[0]));
 			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[1]));
@@ -309,9 +327,9 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			CR(m_pDreamOS->AddInteractionObject(pTestContext->pSphere));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-				//CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad.get(), (InteractionEventType)(i), this));
-				CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pQuad, (InteractionEventType)(i), this));
-				//CR(m_pDreamOS->RegisterEventSubscriber(pComposite, (InteractionEventType)(i), this));
+				for (int j = 0; j < 3; j++) {
+					CR(m_pDreamOS->RegisterEventSubscriber(pTestContext->pQuad[j], (InteractionEventType)(i), this));
+				}
 			}
 
 			// Collide point spheres
@@ -345,8 +363,8 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
 			pTestContext->pMouseRay->UpdateFromRay(rCast);
 			
-			//pTestContext->pRay[0]->translateX(0.0005f);
-			//pTestContext->pRay[1]->translateX(0.0005f);
+			pTestContext->pRay[0]->translateX(0.00052f);
+			pTestContext->pRay[1]->translateX(0.00051f);
 
 			pTestContext->pSphere->translateX(0.00075f);
 		}

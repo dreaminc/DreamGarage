@@ -346,11 +346,11 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore, VirtualOb
 	RESULT r = R_PASS;
 
 	ray rCast = pInteractionObject->GetRay(true);
-	VirtualObj *pObj = nullptr;
-	InteractionObjectEvent interactionEvent;
 
 	for (auto &pObject : pObjectStore->GetObjects()) {
+		VirtualObj *pObj = nullptr;
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+		InteractionObjectEvent interactionEvent;
 
 		// Ray
 		if (pDimObj->Intersect(rCast)) {
