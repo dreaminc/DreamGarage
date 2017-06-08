@@ -147,12 +147,10 @@ ray DimRay::GetRayFromVerts() {
 }
 
 RESULT DimRay::UpdateFromRay(const ray &rCast) {
-	RESULT r = R_PASS;
-
 	SetOrigin(rCast.GetOrigin());
+	
+	ResetRotation();
+	SetDirectionVector(rCast.GetVector());
 
-	// TODO: Handle orientation etc 
-
-//Error:
-	return r;
+	return R_PASS;
 }

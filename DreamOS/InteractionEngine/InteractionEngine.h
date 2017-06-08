@@ -91,7 +91,7 @@ private:
 
 	//RESULT UpdateObjectStoreRay(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore, VirtualObj *pInteractionObject);
-	RESULT UpdateActiveObject(VirtualObj *pInteractionObject, VirtualObj *pObject, CollisionManifold manifold, bool fRay);
+	InteractionEventType UpdateActiveObject(VirtualObj *pInteractionObject, CollisionManifold manifold, bool fRay);
 
 public:
 	RESULT Update();

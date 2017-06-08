@@ -41,6 +41,11 @@ public:
 		return m_vDirection;
 	}
 
+	RESULT SetDirectionVector(const vector &vDirection) {
+		m_vDirection = vDirection;
+		return R_PASS;
+	}
+
 	point GetOrigin() const {
 		return m_ptOrigin;
 	}

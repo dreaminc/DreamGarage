@@ -10,6 +10,8 @@
 #include "Primitives/ray.h"
 #include <memory>
 
+#include "ActiveObject.h"
+
 class VirtualObj;
 class ContactPoint;
 
@@ -38,10 +40,12 @@ typedef struct InteractionObjectEvent {
 	point m_ptContact[4];
 	vector m_vNormal[4];
 	int m_numContacts;
+	ActiveObject::state m_activeState;
 	
 	int m_value;
 
 	// TODO: Add time of collision
+	InteractionObjectEvent();
 	InteractionObjectEvent(InteractionEventType eventType, VirtualObj *pObject = nullptr, VirtualObj *pInteractionObject = nullptr);
 	InteractionObjectEvent(InteractionEventType eventType, const ray &interactionRay, VirtualObj *pObject = nullptr, VirtualObj *pInteractionObject = nullptr);
 

@@ -70,27 +70,28 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 	// handle event
 	switch (mEvent->m_eventType) {
 		case InteractionEventType::ELEMENT_INTERSECT_BEGAN: {
-			DEBUG_LINEOUT("began");
+			DEBUG_LINEOUT("began state: 0x%x", mEvent->m_activeState);
 
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 			
 			if (pDimObj != nullptr) {
-				pDimObj->RotateYByDeg(45.0f);
+				pDimObj->RotateYByDeg(15.0f);
 			}
 
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
-			DEBUG_LINEOUT("moved");
+			DEBUG_LINEOUT("moved state: 0x%x", mEvent->m_activeState);
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
-			DEBUG_LINEOUT("ended");
+			DEBUG_LINEOUT("ended state: 0x%x", mEvent->m_activeState);
 
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 
 			if (pDimObj != nullptr) {
-				pDimObj->ResetRotation();
+				//pDimObj->ResetRotation();
+				pDimObj->RotateYByDeg(-15.0f);
 			}
 		} break;
 	}
@@ -258,6 +259,7 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 		quad *pQuad = nullptr;
 		sphere *pSphere = nullptr;
 		DimRay *pRay[2] = { nullptr, nullptr };
+		DimRay *pMouseRay = nullptr;
 		sphere *pCollidePoint[4] = { nullptr, nullptr, nullptr, nullptr };
 	} *pTestContext = new TestContext();
 
@@ -284,19 +286,26 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 			pTestContext->pRay[0] = m_pDreamOS->AddRay(point(-2.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f).Normal());
 			CN(pTestContext->pRay[0]);
 
-			pTestContext->pRay[1] = m_pDreamOS->AddRay(point(-5.0f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f).Normal());
+			pTestContext->pRay[1] = m_pDreamOS->AddRay(point(-2.1f, 0.0f, 0.0f), vector(0.0f, -1.0f, 0.0f).Normal());
 			CN(pTestContext->pRay[1]);
+
+			pTestContext->pMouseRay = m_pDreamOS->AddRay(point(-0.0f, 0.0f, 0.0f), vector(0.0f, 1.0f, 0.0f).Normal());
+			CN(pTestContext->pMouseRay);
 
 			pTestContext->pSphere = m_pDreamOS->AddSphere(0.05f, 10, 10);
 			CN(pTestContext->pSphere);
-			pTestContext->pSphere->SetPosition(point(-2.0f, -1.99f, 0.0f));
+			//pTestContext->pSphere->SetPosition(point(-2.0f, -1.98f, 0.0f));
+			//pTestContext->pSphere->SetPosition(point(-2.0f, -2.55f, 0.0f));
+			pTestContext->pSphere->SetPosition(point(-2.0f, -2.02f, 0.0f));
+			//pTestContext->pSphere->RotateXByDeg(180.0f);
 
 			// Add composite to interaction
 			CR(m_pDreamOS->AddObjectToInteractionGraph(pTestContext->pQuad));
 
 			// Add Ray to interaction engine
-			//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[0]));
-			//CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[1]));
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[0]));
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pRay[1]));
+			CR(m_pDreamOS->AddInteractionObject(pTestContext->pMouseRay));
 			CR(m_pDreamOS->AddInteractionObject(pTestContext->pSphere));
 
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
@@ -332,13 +341,14 @@ RESULT InteractionEngineTestSuite::AddTestMultiPrimitive() {
 
 		// This updates the ray from the mouse
 		if (pTestContext != nullptr) {
-			//CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
-			//pTestContext->pRay->UpdateFromRay(rCast);
-
+			
+			CR(m_pDreamOS->GetMouseRay(rCast, 0.0f));
+			pTestContext->pMouseRay->UpdateFromRay(rCast);
+			
 			//pTestContext->pRay[0]->translateX(0.0005f);
 			//pTestContext->pRay[1]->translateX(0.0005f);
 
-			pTestContext->pSphere->translateX(0.001f);
+			pTestContext->pSphere->translateX(0.00075f);
 		}
 
 		CR(r);

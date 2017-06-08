@@ -284,11 +284,30 @@ VirtualObj* InteractionEngine::FindInteractionObject(VirtualObj *pInteractionObj
 }
 
 // TODO: not quite true to the name of the function, this only sets intersection but won't un intersect
-RESULT InteractionEngine::UpdateActiveObject(VirtualObj *pInteractionObject, VirtualObj *pObject, CollisionManifold manifold, bool fRay) {
+InteractionEventType InteractionEngine::UpdateActiveObject(VirtualObj *pInteractionObject, CollisionManifold manifold, bool fRay) {
 	RESULT r = R_PASS;
 
+	InteractionEventType eventType = InteractionEventType::INTERACTION_EVENT_INVALID;
+	VirtualObj *pObject = nullptr;
+	std::shared_ptr<ActiveObject> pActiveObject = nullptr;
+
+	int numContacts = manifold.NumContacts();
+
+	// Ensure more than one contact found
+	CB((numContacts > 0));
+
+	// Manifold should return only one object, one will be nullptr
+	pObject = manifold.GetObjectA();
+
+	if (pObject == nullptr) {
+		pObject = manifold.GetObjectB();
+	}
+	
+	// Ensure object present
+	CN(pObject);
+
 	// Check for active object
-	auto pActiveObject = FindActiveObject(pObject, pInteractionObject);
+	pActiveObject = FindActiveObject(pObject, pInteractionObject);
 
 	if (pActiveObject == nullptr) {
 		pActiveObject = AddActiveObject(pObject, pInteractionObject);
@@ -297,18 +316,7 @@ RESULT InteractionEngine::UpdateActiveObject(VirtualObj *pInteractionObject, Vir
 		pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
 
 		// Notify element intersect begin 
-		InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN);
-		interactionEvent.m_pObject = pObject;
-		interactionEvent.m_pInteractionObject = pInteractionObject;
-
-		if (fRay)
-			interactionEvent.m_interactionRay = pInteractionObject->GetRay(true);
-
-		for (int i = 0; i < manifold.NumContacts(); i++) {
-			interactionEvent.AddPoint(manifold.GetContactPoint(i));
-		}
-
-		NotifySubscribers(pObject, InteractionEventType::ELEMENT_INTERSECT_BEGAN, &interactionEvent);
+		eventType = InteractionEventType::ELEMENT_INTERSECT_BEGAN;
 	}
 	else {
 		vector vDiff = manifold.GetContactPoint(0).GetPoint() - pActiveObject->GetIntersectionPoint();
@@ -317,18 +325,7 @@ RESULT InteractionEngine::UpdateActiveObject(VirtualObj *pInteractionObject, Vir
 			pActiveObject->SetContactPoint(manifold.GetContactPoint(0));
 
 			// Notify element intersect continue
-			InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_MOVED);
-			interactionEvent.m_pObject = pObject;
-			interactionEvent.m_pInteractionObject = pInteractionObject;
-
-			if (fRay)
-				interactionEvent.m_interactionRay = pInteractionObject->GetRay(true);
-
-			for (int i = 0; i < manifold.NumContacts(); i++) {
-				interactionEvent.AddPoint(manifold.GetContactPoint(i));
-			}
-
-			NotifySubscribers(pObject, InteractionEventType::ELEMENT_INTERSECT_MOVED, &interactionEvent);
+			eventType = InteractionEventType::ELEMENT_INTERSECT_MOVED;
 		}
 	}
 
@@ -339,8 +336,10 @@ RESULT InteractionEngine::UpdateActiveObject(VirtualObj *pInteractionObject, Vir
 		pActiveObject->AddState(ActiveObject::state::OBJ_INTERSECTED);
 	}
 
+	return eventType;
+
 Error:
-	return r;
+	return InteractionEventType::INTERACTION_EVENT_INVALID;
 }
 
 RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore, VirtualObj *pInteractionObject) {
@@ -348,6 +347,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore, VirtualOb
 
 	ray rCast = pInteractionObject->GetRay(true);
 	VirtualObj *pObj = nullptr;
+	InteractionObjectEvent interactionEvent;
 
 	for (auto &pObject : pObjectStore->GetObjects()) {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
@@ -355,39 +355,50 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore, VirtualOb
 		// Ray
 		if (pDimObj->Intersect(rCast)) {
 			CollisionManifold rayManifold = pDimObj->Collide(rCast);
-			int rayNumContacts = rayManifold.NumContacts();
-
-			if (rayNumContacts > 0) {
-				// Manifold should return only one object, one will be nullptr
-				pObj = rayManifold.GetObjectA();
-
-				if (pObj == nullptr) {
-					pObj = rayManifold.GetObjectB();
+			InteractionEventType eventTypeRay;
+			
+			eventTypeRay = UpdateActiveObject(pInteractionObject, rayManifold, true);
+			
+			if (eventTypeRay != InteractionEventType::INTERACTION_EVENT_INVALID) {
+				for (int i = 0; i < rayManifold.NumContacts(); i++) {
+					interactionEvent.AddPoint(rayManifold.GetContactPoint(i));
 				}
 
+				interactionEvent.m_interactionRay = rCast;
+				interactionEvent.m_eventType = eventTypeRay;
 			}
-
-			CR(UpdateActiveObject(pInteractionObject, pObj, rayManifold, true));
 		}
 
 		// Object Collision
 		if (pDimObj->Intersect(pInteractionObject)) {
-
 			CollisionManifold objManifold = pDimObj->Collide(pInteractionObject);
+			InteractionEventType eventTypeObj;
 
-			// TODO: Move this code to UpdateActiveObject
-			int objNumContacts = objManifold.NumContacts();
+			eventTypeObj = UpdateActiveObject(pInteractionObject, objManifold, false);
 
-			if (objNumContacts > 0) {
-				// Manifold should return only one object, one will be nullptr
-				pObj = objManifold.GetObjectA();
-
-				if (pObj == nullptr) {
-					pObj = objManifold.GetObjectB();
+			if (eventTypeObj != InteractionEventType::INTERACTION_EVENT_INVALID) {
+				for (int i = 0; i < objManifold.NumContacts(); i++) {
+					interactionEvent.AddPoint(objManifold.GetContactPoint(i));
 				}
 
-				CR(UpdateActiveObject(pInteractionObject, pObj, objManifold, false));
+				// If a ray event occurs first, the event type might look like a move
+				// but is really a combo event - so just ignore it otherwise it would
+				// overwrite the begin event (end is picked up below
+				if (interactionEvent.m_eventType == InteractionEventType::INTERACTION_EVENT_INVALID) {
+					interactionEvent.m_eventType = eventTypeObj;
+				}
 			}
+		}
+
+
+		// TODO: Merge events
+		if (interactionEvent.m_eventType != InteractionEventType::INTERACTION_EVENT_INVALID) {
+
+			interactionEvent.m_pObject = pObject;
+			interactionEvent.m_pInteractionObject = pInteractionObject;
+			interactionEvent.m_activeState = GetActiveObjectState(pObject, pInteractionObject);
+
+			CR(NotifySubscribers(pObject, interactionEvent.m_eventType, &interactionEvent));
 		}
 	}
 	
@@ -426,7 +437,9 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 			// This uses the last available point
 			// TODO: Add projection , find exit point, do we need that?
 			InteractionObjectEvent interactionEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED, pInteractionObject->GetRay(), pActiveObject->GetObject());
+			
 			interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
+			interactionEvent.m_activeState = pActiveObject->GetState();
 
 			NotifySubscribers(pActiveObject->GetObject(), InteractionEventType::ELEMENT_INTERSECT_ENDED, &interactionEvent);
 		}
