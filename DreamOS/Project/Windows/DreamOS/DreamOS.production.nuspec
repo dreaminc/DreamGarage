@@ -29,6 +29,7 @@
     <file src="x64\Production\*.dll" target="\lib\net45\" />
     <file src="x64\Production\*.bin" target="\lib\net45\" />
     <file src="x64\Production\*.dat" target="\lib\net45\" />
+    <file src="x64\DevProduction\*.pak" target="\lib\net45\" />
 
     <file src=".\..\..\..\dreampaths.txt" target="\lib\net45\dreampaths.txt" />
     <file src=".\..\..\..\HAL\**" target="\lib\net45\HAL\" />
@@ -38,7 +39,7 @@
 
     <file src=".\..\..\..\distribution\*" target="\lib\net45\" />
 
-    <!--<file src="x64\DevProduction\locales\**" target="\lib\net45\locales\" />-->
+    <file src="x64\DevProduction\locales\**" target="\lib\net45\locales\" />
     
     <file src="DreamOS.targets" target="\build\net45\DreamOS.targets" />
   </files>

@@ -540,15 +540,12 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libss
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Release\*" "$(TargetDir)"
+      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
+ /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Release\*" "$(TargetDir)"
+ /D
 
 xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Release\*" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
 
 xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
 
@@ -591,15 +588,12 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Release\*" "$(TargetDir)"
+      <Command>xcopy /y /s /e "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Resources\*" "$(TargetDir)"
+ /D
+xcopy /y "$(ProjectDir)..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Release\*" "$(TargetDir)"
+ /D
 
 xcopy /y "$(ProjectDir)..\..\..\External\libcurl\curl-7.49.1\lib\Windows\x64\Release\*.dll" "$(TargetDir)"
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Release\*" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\*" "$(TargetDir)" /D
-
-xcopy /y "$(ProjectDir)..\..\..\External\CEF\Resources\locales\en-US.pak" "$(TargetDir)\locales" /D
 
 xcopy /y "$(ProjectDir)..\..\..\External\leapSDK\lib\x64\Leap.dll" "$(TargetDir)" /D
 
@@ -611,7 +605,9 @@ xcopy /y "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libss
 
 
 $(ProjectDir)packages\NuGet.CommandLine.3.5.0\tools\nuget.exe pack "$(ProjectDir)DreamOS.development.nuspec" -properties version=$(DREAMVERSION)
-$(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify DreamDev.$(DREAMVERSION).nupkg -r DevReleases
+$(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify DreamDev.$(DREAMVERSION).nupkg -r DevReleases	
+
+ 
 
 </Command>
     </PostBuildEvent>
