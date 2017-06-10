@@ -147,7 +147,7 @@ void OGLDreamConsole::Render(bool fMono) {
 
 	DreamConsole::GetConsole()->ForEach([&](const std::string& consoleText) {
 		RenderObject((DimObj*)m_OGLConsoleText->SetText(consoleText, fontSize)->SetPosition(point(0.1f, posY, 0.0f), text::TOP_RIGHT));
-		posY += m_OGLConsoleText->m_height;
+		posY += m_OGLConsoleText->GetHeight();
 
 		return !(posY > viewTop);
 	});
@@ -160,13 +160,13 @@ void OGLDreamConsole::Render(bool fMono) {
 
 	RenderObject((DimObj*)m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->SetPosition(point(0.1f, viewBottom, 0.0f), text::BOTTOM_RIGHT));
 
-	yOff = m_OGLConsoleText->m_height / 2;
+	yOff = m_OGLConsoleText->GetHeight() / 2.0f;
 		
 	auto currentCmdTxtUntilCursor = DreamConsole::GetConsole()->GetCmdText().substr(0, DreamConsole::GetConsole()->GetCmtTextCursorPos());
 
 	cmdText = ">" + currentCmdTxtUntilCursor;
 
-	xOff = m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->m_width;
+	xOff = m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->GetWidth();
 		
 	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 	if ((time / 100) % 10 > 5) {
@@ -416,13 +416,11 @@ OGLDebugConsole::OGLDebugConsole(OpenGLImp* pOGL, OGLProgram *pParentProgram) :
 	Initialize();
 }
 
-OGLDebugConsole::~OGLDebugConsole()
-{
+OGLDebugConsole::~OGLDebugConsole() {
 	Destroy();
 }
 
-void OGLDebugConsole::Initialize()
-{
+void OGLDebugConsole::Initialize() {
 	OGLRenderContext::Initialize();
 	m_OGLConsoleText = std::make_unique<OGLText>(m_OGLImp, m_pOGLFont);	
 
@@ -439,32 +437,30 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 
 	m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 0.3f));
 
-	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData())
-	{
+	for (const auto& it : DebugConsole::GetDebugConsole()->GetConsoleData()) {
 		point rowTL = point(topLeft.x(), topLeft.y() - consoleHeight, 0.0f);
 
 		m_OGLConsoleText->SetText(it->GetValue(), fontSize);
 
-		m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(rowTL, rowTL + point(0, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0)));
-		m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, 0, 0)));
+		m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(rowTL, rowTL + point(0, -m_OGLConsoleText->GetHeight(), 0), rowTL + point(m_OGLConsoleText->GetWidth(), -m_OGLConsoleText->GetHeight(), 0)));
+		m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->GetWidth(), -m_OGLConsoleText->GetHeight(), 0), rowTL + point(m_OGLConsoleText->GetWidth(), 0, 0)));
 
-		consoleHeight += m_OGLConsoleText->m_height;
+		consoleHeight += m_OGLConsoleText->GetHeight();
 
 		m_pParentProgram->RenderObject((DimObj*)m_OGLConsoleText->SetPosition(rowTL, text::BOTTOM_RIGHT));
 	}
 
 	auto currentCmdText = DreamConsole::GetConsole()->GetCmdText();
 	
-	if (currentCmdText.length() > 0)
-	{
+	if (currentCmdText.length() > 0) {
 		m_OGLTriangle->SetColor(color(0.0f, 0.0f, 0.0f, 0.8f));
 
 		point rowTL = point(topLeft.x(), topLeft.y() - consoleHeight, 0.0f);
 
 		m_OGLConsoleText->SetText(currentCmdText, 1.0);
 
-		m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(-m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0), point(-m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0)));
-		m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(-m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, -m_OGLConsoleText->m_height / 2, 0), point(+m_OGLConsoleText->m_width / 2, +m_OGLConsoleText->m_height / 2, 0)));
+		m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(-m_OGLConsoleText->GetWidth() / 2.0f, -m_OGLConsoleText->GetHeight() / 2, 0), point(m_OGLConsoleText->GetWidth() / 2, +m_OGLConsoleText->GetHeight() / 2, 0), point(-m_OGLConsoleText->GetWidth() / 2, +m_OGLConsoleText->GetHeight() / 2, 0)));
+		m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(-m_OGLConsoleText->GetWidth() / 2.0f, -m_OGLConsoleText->GetHeight() / 2, 0), point(m_OGLConsoleText->GetWidth() / 2, -m_OGLConsoleText->GetHeight() / 2, 0), point(+m_OGLConsoleText->GetWidth() / 2, +m_OGLConsoleText->GetHeight() / 2, 0)));
 		//m_OGLProgram->RenderObject(m_OGLTriangle->Set(rowTL, rowTL + point(m_OGLConsoleText->m_width, -m_OGLConsoleText->m_height, 0), rowTL + point(m_OGLConsoleText->m_width, 0, 0)));
 
 		m_pParentProgram->RenderObject((DimObj*)m_OGLConsoleText->SetPosition(point(0, 0, 0), text::CENTER));
@@ -472,10 +468,10 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
 		if ((time / 100) % 10 > 5) {
-			auto xOff = -m_OGLConsoleText->m_width / 2;
+			auto xOff = -m_OGLConsoleText->GetWidth() / 2;
 
 			auto currentCmdTxtUntilCursor = DreamConsole::GetConsole()->GetCmdText().substr(0, DreamConsole::GetConsole()->GetCmtTextCursorPos());
-			xOff += m_OGLConsoleText->SetText(currentCmdTxtUntilCursor, 1.0)->m_width;
+			xOff += m_OGLConsoleText->SetText(currentCmdTxtUntilCursor, 1.0)->GetWidth();
 
 			point pt = point(xOff, 0, 0);
 

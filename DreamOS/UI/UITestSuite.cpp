@@ -51,6 +51,15 @@ RESULT UITestSuite::AddTests() {
 
 	CR(AddTestUIView());
 
+	CR(AddTestFont());
+
+	CR(AddTestBrowserRequestWithMenuAPI());
+	CR(AddTestBrowserRequest());
+
+	CR(AddTestKeyboard());
+
+	CR(AddTestBrowser());
+
 	//CR(AddTestBrowserRequestWithMenuAPI());
 	//CR(AddTestBrowserRequest());
 
@@ -191,6 +200,78 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::AddTestFont() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		std::string strURL = "http://www.youtube.com";
+
+		CN(m_pDreamOS);
+
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupPipeline());
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+		pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
+		pQuad->SetColor(COLOR_BLUE);
+
+		// TODO: Fix this
+		std::wstring strFile = L"Fonts/" + GetGlyphImageFile();
+		const wchar_t* pszFile = strFile.c_str();
+		auto pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
+		auto pTexture =  m_pDreamOS->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+		auto pText = m_pDreamOS->AddText(pFont, "test");
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	CN(pUITest);
+
+	pUITest->SetTestName("Browser Request Test");
+	pUITest->SetTestDescription("Basic test of browser working with a web request");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
 
 RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 	RESULT r = R_PASS;
@@ -397,8 +478,8 @@ RESULT UITestSuite::SetupPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 	
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));

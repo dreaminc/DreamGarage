@@ -16,28 +16,25 @@ Font::Font(const std::wstring& fnt_file, composite *pContext, bool fDistanceMap)
 	m_fDistanceMap = fDistanceMap;
 }
 
-Font::Font(const std::wstring& fnt_file, bool distanceMap)
-{
+Font::Font(const std::wstring& fnt_file, bool distanceMap) {
 	LoadFontFromFile(fnt_file);
 	m_fDistanceMap = distanceMap;
 }
 
-Font::~Font()
-{
+Font::~Font() {
 	// empty
 }
 
+// TODO: Merge two
 template <typename T>
-T Font::GetValue(const std::wstring& line, const std::wstring& valueName, const char breaker)
-{
+T Font::GetValue(const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter) {
 	T value;
 
-	auto pos = line.find(valueName);
+	auto pos = wstrLine.find(wstrValueName);
 
-	if (pos < line.size())
-	{
-		pos += valueName.size();
-		std::wstring valueString = line.substr(pos, line.find(breaker, pos) - pos);
+	if (pos < wstrLine.size()) {
+		pos += wstrValueName.size();
+		std::wstring valueString = wstrLine.substr(pos, wstrLine.find(delimiter, pos) - pos);
 		std::wistringstream iss(valueString);
 		iss >> value;
 	}
@@ -46,106 +43,93 @@ T Font::GetValue(const std::wstring& line, const std::wstring& valueName, const 
 }
 
 template <typename T>
-bool Font::GetValue(T& value, const std::wstring& line, const std::wstring& valueName)
-{
-	auto pos = line.find(valueName);
+RESULT Font::GetValue(T& value, const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter) {
+	RESULT r = R_PASS;
 
-	if (pos < line.size())
+	auto pos = wstrLine.find(wstrValueName);
+
+	CB((pos < wstrLine.size()));
+
 	{
-		pos += valueName.size();
-		std::wstring valueString = line.substr(pos, line.find(' ', pos) - pos);
+		pos += wstrValueName.size();
+		std::wstring valueString = wstrLine.substr(pos, wstrLine.find(' ', pos) - pos);
 		std::wistringstream iss(valueString);
-		return !(iss >> std::dec >> value).fail();
+
+		//return !(iss >> std::dec >> value).fail();
+
+		CB(((iss >> std::dec >> value).fail() == false));
 	}
 
-	return false;
+Error:
+	return r;
 }
 
-bool Font::LoadFontFromFile(const std::wstring& fnt_file)
-{
+RESULT Font::LoadFontFromFile(const std::wstring& wstrFontFile) {
+	RESULT r = R_PASS;
+
 	PathManager *pPathManager = PathManager::instance();
+	std::wstring wstrLine;
+	wchar_t* wpszPath = nullptr;
 
-	wchar_t* path = nullptr;
+	pPathManager->GetFilePath(PATH_FONT, wstrFontFile.c_str(), wpszPath);
 
-	pPathManager->GetFilePath(PATH_FONT, fnt_file.c_str(), path);
+	std::wstring wstrFilePath(wpszPath);
+	std::wifstream file(wstrFilePath, std::ios::binary);
 
-	std::wstring	file_path(path);
+	CB((file.is_open()));
 
-	if (path)
-	{
-		delete[] path;
-		path = nullptr;
-	}
+	while (std::getline(file, wstrLine)) {
 
-	std::wifstream file(file_path, std::ios::binary);
+		if (m_glyphWidth == 0) {
+			GetValue<uint32_t>(m_glyphWidth, wstrLine, L"scaleW=");
+		}
 
-	if (!file.is_open())
-	{
-		return false;
-	}
+		if (m_glyphHeight == 0) {
+			GetValue<uint32_t>(m_glyphHeight, wstrLine, L"scaleH=");
+		}
 
-	std::wstring line;
+		if (m_glyphBase == 0) {
+			GetValue<uint32_t>(m_glyphBase, wstrLine, L"base=");
+		}
 
-	while (std::getline(file, line)) {
+		if (m_wstrGlyphImageFilename.length() == 0) {
+			m_wstrGlyphImageFilename = GetValue<std::wstring>(wstrLine, L"file=\"", '\"');
+		}
 
-		if (m_glyphWidth == 0)
-			GetValue<uint32_t>(m_glyphWidth, line, L"scaleW=");
+		CharacterGlyph charGlyph(wstrLine);
 
-		if (m_glyphHeight == 0)
-			GetValue<uint32_t>(m_glyphHeight, line, L"scaleH=");
-
-		if (m_glyphBase == 0)
-			GetValue<uint32_t>(m_glyphBase, line, L"base=");
-
-		if (m_glyphImageFileName.length() == 0)
-			m_glyphImageFileName = GetValue<std::wstring>(line, L"file=\"", '\"');
-
-		uint32_t ascii_id = 0;
-
-		if (GetValue<uint32_t>(ascii_id, line, L"char id="))
-		{
-			m_charMap.emplace(ascii_id, CharacterGlyph(ascii_id,
-				GetValue<uint32_t>(line, L"x="),
-				GetValue<uint32_t>(line, L"y="),
-				GetValue<uint32_t>(line, L"width="),
-				GetValue<uint32_t>(line, L"height="),
-				GetValue<int32_t>(line, L"xoffset="),
-				GetValue<int32_t>(line, L"yoffset="),
-				GetValue<uint32_t>(line, L"xadvance="),
-				GetValue<uint32_t>(line, L"page=")));
+		if (charGlyph.fValid == true) {
+			m_charMap[charGlyph.asciiValue] = charGlyph;
 		}
 	}
 
-	return true;
+Error:
+	if (wpszPath) {
+		delete[] wpszPath;
+		wpszPath = nullptr;
+	}
 
-//Error:
-//	return false;
+	return r;
 }
 
-const std::wstring& Font::GetGlyphImageFile() const
-{
-	return m_glyphImageFileName;
+const std::wstring& Font::GetGlyphImageFile() const {
+	return m_wstrGlyphImageFilename;
 }
 
-uint32_t Font::GetGlyphWidth() const
-{
+uint32_t Font::GetGlyphWidth() const {
 	return m_glyphWidth;
 }
 
-uint32_t Font::GetGlyphHeight() const
-{
+uint32_t Font::GetGlyphHeight() const {
 	return m_glyphHeight;
 }
 
-uint32_t Font::GetGlyphBase() const
-{
+uint32_t Font::GetGlyphBase() const {
 	return m_glyphBase;
 }
 
-bool Font::GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret)
-{
-	if (m_charMap.find(ascii_id) == m_charMap.end())
-	{
+bool Font::GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret) {
+	if (m_charMap.find(ascii_id) == m_charMap.end()) {
 		// ascii does not exist in the glyph
 		return false;
 	}
@@ -173,8 +157,10 @@ std::shared_ptr<texture> Font::GetTexture() {
 
 RESULT Font::SetTexture(std::shared_ptr<texture> pTexture) {
 	RESULT r = R_PASS;
+
 	CN(pTexture);
 	m_pTexture = pTexture;
+
 Error:
 	return r;
 }

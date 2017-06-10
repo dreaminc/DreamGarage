@@ -5,6 +5,7 @@
 
 // DREAM OS
 // DreamOS/Dimension/Primitives/font.h
+// Converting this to FreeType
 
 #include <string>
 #include <map>
@@ -12,52 +13,56 @@
 
 #include "Primitives/quad.h"
 
+#include <ft2build.h>
+#include FT_FREETYPE_H  
+
 class composite;
 
 class Font {
 public:
 
 	struct CharacterGlyph {
-		uint8_t		ascii_id;
-		uint32_t	x;
-		uint32_t	y;
-		uint32_t	width;
-		uint32_t	height;
-		int32_t		xoffset;
-		int32_t		yoffset;
-		uint32_t	xadvance;
-		uint32_t	page;
+		uint8_t		asciiValue = 0;
+		uint32_t	x = 0;
+		uint32_t	y = 0;
+		uint32_t	width = 0;
+		uint32_t	height = 0;
+		int32_t		xoffset = 0;
+		int32_t		yoffset = 0;
+		uint32_t	xadvance = 0;
+		uint32_t	page = 0;
+		bool fValid = false;
 
-		CharacterGlyph(uint8_t		_ascii_id,
-			uint32_t	_x,
-			uint32_t	_y,
-			uint32_t	_width,
-			uint32_t	_height,
-			int32_t		_xoffset,
-			int32_t		_yoffset,
-			uint32_t	_xadvance,
-			uint32_t	_page) :
-			ascii_id(_ascii_id),
-			x(_x),
-			y(_y),
-			width(_width),
-			height(_height),
-			xoffset(_xoffset),
-			yoffset(_yoffset),
-			xadvance(_xadvance),
-			page(_page)
-		{}
+		CharacterGlyph() {
+			// empty
+		}
 
-		CharacterGlyph() { }
+		CharacterGlyph(std::wstring wstrFontFileLine) {
+			asciiValue = GetValue<uint32_t>(wstrFontFileLine, L"char id=");
+
+			if (asciiValue) {
+				x = GetValue<uint32_t>(wstrFontFileLine, L"x=");
+				y = GetValue<uint32_t>(wstrFontFileLine, L"y=");
+				width = GetValue<uint32_t>(wstrFontFileLine, L"width=");
+				height = GetValue<uint32_t>(wstrFontFileLine, L"height=");
+				xoffset = GetValue<uint32_t>(wstrFontFileLine, L"xoffset=");
+				yoffset = GetValue<uint32_t>(wstrFontFileLine, L"yoffset=");
+				xadvance = GetValue<uint32_t>(wstrFontFileLine, L"xadvance=");
+				page = GetValue<uint32_t>(wstrFontFileLine, L"page=");
+				fValid = true;
+			}
+		}
 	};
 
-	Font(const std::wstring& fnt_file, composite *pContext, bool distanceMap = false);
+	Font(const std::wstring& wstrFontFile, composite *pContext, bool distanceMap = false);
+	
 	//TODO: not removing this in order to avoid changing DreamConsole
-	Font(const std::wstring& fnt_file, bool distanceMap = false);
+	Font(const std::wstring& wstrFontFile, bool distanceMap = false);
+	
 	~Font();
 
-	// Get a glyph structure from an ascii.
-	// returns false when the ascii does not exist for the font.
+	// Get a glyph structure from an ASCII.
+	// returns false when the ASCII does not exist for the font.
 	bool GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret);
 
 	const std::wstring& GetGlyphImageFile() const;
@@ -66,19 +71,19 @@ public:
 	uint32_t GetGlyphBase() const;
 
 private:
-	bool LoadFontFromFile(const std::wstring& fnt_file);
+	RESULT LoadFontFromFile(const std::wstring& wstrFontFile);
 
 	template <typename T>
-	T GetValue(const std::wstring& line, const std::wstring& valueName, const char breaker = ' ');
+	static T GetValue(const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter = ' ');
 
 	template <typename T>
-	bool GetValue(T& value, const std::wstring& line, const std::wstring& valueName);
+	static RESULT GetValue(T& value, const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter = ' ');
 
 private:
-	std::map<uint32_t, const std::string>	m_glyphTexturesMap;
-	std::map<uint8_t, CharacterGlyph>	m_charMap;
+	std::map<uint32_t, const std::string> m_glyphTexturesMap;
+	std::map<uint8_t, CharacterGlyph> m_charMap;
 
-	std::wstring	m_glyphImageFileName = L"";
+	std::wstring m_wstrGlyphImageFilename = L"";
 
 	uint32_t m_glyphWidth = 0;
 	uint32_t m_glyphHeight = 0;
@@ -91,6 +96,7 @@ public:
 	bool HasDistanceMap();
 	float GetBuffer();
 	float GetGamma();
+
 	std::shared_ptr<texture> GetTexture();
 	RESULT SetTexture(std::shared_ptr<texture> pTexture);
 	
