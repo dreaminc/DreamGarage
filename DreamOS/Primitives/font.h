@@ -54,10 +54,11 @@ public:
 		}
 	};
 
-	Font(const std::wstring& wstrFontFile, composite *pContext, bool distanceMap = false);
+	Font(bool fDistanceMap = false);
+	Font(const std::wstring& wstrFontFile, composite *pContext, bool fDistanceMap = false);
 	
 	//TODO: not removing this in order to avoid changing DreamConsole
-	Font(const std::wstring& wstrFontFile, bool distanceMap = false);
+	Font(const std::wstring& wstrFontFile, bool fDistanceMap = false);
 	
 	~Font();
 
@@ -106,6 +107,20 @@ private:
 	float m_gamma = 0.02f;
 
 	std::shared_ptr<texture> m_pTexture;
+
+	// internal freetype stuff (remove above when done)
+private:
+	RESULT SetFreetypeFace(FT_Face pFTFace);
+	FT_Face m_pFTFace = nullptr;
+
+	// Static Freetype Stuff
+private:
+	static FT_Library m_pFT;
+	static bool IsFreetypeInitialized();
+	static RESULT InitializeFreetypeLibrary();
+
+public:
+	static std::shared_ptr<Font> MakeFreetypeFont(std::wstring wstrFontFilename, bool fDistanceMapped = true);
 };
 
 #endif // ! FONT_H_

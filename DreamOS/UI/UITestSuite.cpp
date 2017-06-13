@@ -222,13 +222,21 @@ RESULT UITestSuite::AddTestFont() {
 		pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
 		pQuad->SetColor(COLOR_BLUE);
 
-		// TODO: Fix this
-		std::wstring strFile = L"Fonts/" + GetGlyphImageFile();
-		const wchar_t* pszFile = strFile.c_str();
-		auto pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
-		auto pTexture =  m_pDreamOS->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		// Fix this
+		{
+			/*
+			auto pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
+			std::wstring strFile = L"Fonts/" + pFont->GetGlyphImageFile();
+			const wchar_t* pszFile = strFile.c_str();
 
-		auto pText = m_pDreamOS->AddText(pFont, "test");
+			pFont->SetTexture(std::shared_ptr<texture>(m_pDreamOS->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR)));
+
+			auto pText = m_pDreamOS->AddText(pFont, "test");
+			pText->SetPosition(point(0.0f, -1.0f, 0.0f));
+			*/
+			auto pFont = Font::MakeFreetypeFont(L"arial.ttf", true);
+			CN(pFont);
+		}
 
 	Error:
 		return r;
