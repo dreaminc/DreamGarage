@@ -68,8 +68,21 @@ RESULT UIView::Notify(InteractionObjectEvent *pEvent) {
 	RESULT r = R_PASS;
 	//TODO: symbolic for now, change when there are multiple object types
 	//auto pRay = std::dynamic_pointer_cast<std::shared_ptr<ray>>(pEvent->m_pInteractionRay);
-	auto pRay = pEvent->m_pInteractionRay;
+//	auto pRay = pEvent->m_pInteractionObject;
 	switch (pEvent->m_eventType) {
+	case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
+		UIEvent *pUIEvent = new UIEvent(UI_SELECT_BEGIN, pEvent->m_pObject);
+		CR(NotifySubscribers(UI_SELECT_BEGIN, pUIEvent));
+	} break;
+	case (InteractionEventType::ELEMENT_COLLIDE_MOVED): {
+		UIEvent *pUIEvent = new UIEvent(UI_SELECT_MOVED, pEvent->m_pObject);
+		CR(NotifySubscribers(UI_SELECT_MOVED, pUIEvent));
+	} break;
+	case (InteractionEventType::ELEMENT_COLLIDE_ENDED): {
+		UIEvent *pUIEvent = new UIEvent(UI_SELECT_ENDED, pEvent->m_pObject);
+		CR(NotifySubscribers(UI_SELECT_ENDED, pUIEvent));
+	} break;
+		/*
 	case (InteractionEventType::ELEMENT_INTERSECT_BEGAN): {
 		if (pRay != nullptr) {
 			UIEvent *pUIEvent = new UIEvent(UI_HOVER_BEGIN, pEvent->m_pObject);
@@ -96,7 +109,6 @@ RESULT UIView::Notify(InteractionObjectEvent *pEvent) {
 			CR(NotifySubscribers(UI_SELECT_MOVED, pUIEvent));
 		}
 	} break;
-
 	case (InteractionEventType::INTERACTION_EVENT_SELECT_UP): {
 		UIEvent *pUIEvent = new UIEvent(UI_SELECT_ENDED, pEvent->m_pObject);
 		CR(NotifySubscribers(UI_SELECT_BEGIN, pUIEvent));
@@ -105,6 +117,7 @@ RESULT UIView::Notify(InteractionObjectEvent *pEvent) {
 		UIEvent *pUIEvent = new UIEvent(UI_SELECT_BEGIN, pEvent->m_pObject);
 		CR(NotifySubscribers(UI_SELECT_ENDED, pUIEvent));
 	} break;
+//*/
 	}
 
 Error:

@@ -6,6 +6,7 @@
 #include "UIView.h"
 #include "UIButton.h"
 #include "UIScrollView.h"
+#include "UIMallet.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -13,6 +14,8 @@
 
 #include "InteractionEngine/AnimationCurve.h"
 #include "InteractionEngine/AnimationItem.h"
+
+#include "Primitives/hand.h"
 
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -78,7 +81,7 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestDreamUIBar());
+	//CR(AddTestDreamUIBar());
 	CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
@@ -126,7 +129,7 @@ RESULT UIViewTestSuite::UpdateHandRay(void *pContext) {
 		rCast = ray(ptHand, vHandLook);
 	}
 
-	m_pDreamOS->UpdateInteractionPrimitive(rCast);
+//	m_pDreamOS->UpdateInteractionPrimitive(rCast);
 
 Error:
 	return r;
@@ -405,6 +408,8 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		std::shared_ptr<UIView> pView = nullptr;
 		std::shared_ptr<UIScrollView> pScrollView = nullptr;
 		std::vector<std::shared_ptr<UIButton>> pButtons = {};
+		UIMallet* pLeftMallet = nullptr;
+		UIMallet* pRightMallet = nullptr;
 	};
 	TestContext *pContext = new TestContext();
 
@@ -412,24 +417,21 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		RESULT r = R_PASS;
 
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		//*
+
 		auto& pComposite = pTestContext->pComposite;
 		auto& pView = pTestContext->pView;
 		auto& pScrollView = pTestContext->pScrollView;
 		auto& pButtons = pTestContext->pButtons;
-		//*/
-		/*
-		composite* pComposite;
-		std::shared_ptr<UIView> pView;
-		std::shared_ptr<UIScrollView> pScrollView;
-		std::vector<std::shared_ptr<UIButton>> pButtons;
-		//*/
+		auto& pLeftMallet = pTestContext->pLeftMallet;
+		auto& pRightMallet = pTestContext->pRightMallet;
 
 		int numButtons = 8;
 
 		CN(m_pDreamOS);
 
 		CR(SetupPipeline());
+
+		//CR(m_pDreamOS->AddInteractionObject(m_pDreamOS->GetHand(hand::HAND_RIGHT)));
 
 		pComposite = m_pDreamOS->AddComposite();
 		pComposite->InitializeOBB();
@@ -447,12 +449,14 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		pScrollView->UpdateMenuButtons(pButtons);
 		pScrollView->SetPosition(point(0.0f, 0.0f, 5.0f));
 
-		///*
-		//pTestContext->pComposite = pComposite;
-		//pTestContext->pButtons = pButtons;
-		//pTestContext->pScrollView = pScrollView;
-		//pTestContext->pView = pView;
-		//*/
+		pLeftMallet = new UIMallet(m_pDreamOS);
+		pRightMallet = new UIMallet(m_pDreamOS);
+
+		pLeftMallet->Show();
+		pRightMallet->Show();
+
+		m_pDreamOS->AddInteractionObject(pLeftMallet->GetMalletHead());
+		m_pDreamOS->AddInteractionObject(pRightMallet->GetMalletHead());
 
 	Error:
 		return r;
@@ -460,16 +464,36 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 	 
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
+		RotationMatrix qOffset = RotationMatrix();
 		auto pTestContext = reinterpret_cast<TestContext*>(pContext);
-		auto pScrollView = pTestContext->pScrollView;
 		CN(pTestContext);
-		CN(pScrollView);
 
-		CR(UpdateHandRay(pContext));
-		CR(pScrollView->Update());
-	Error:
-		return r;
-	};
+		{
+			auto pScrollView = pTestContext->pScrollView;
+			auto& pLeftMallet = pTestContext->pLeftMallet;
+			auto& pRightMallet = pTestContext->pRightMallet;
+
+			hand *pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
+			CN(pHand);
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+			if (pLeftMallet)
+				pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+
+			pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+			CN(pHand);
+
+			qOffset = RotationMatrix();
+			qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+			if (pRightMallet)
+				pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+
+			CR(pScrollView->Update());
+		}
+		Error:
+			return r;
+		};
 
 	auto pUITest = AddTest(fnInitialize,
 		fnUpdate,

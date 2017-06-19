@@ -13,9 +13,9 @@
 #include "Cloud/Environment/EnvironmentController.h"
 
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
-					public UIBar, 
-					public MenuController::observer, 
-					public Subscriber<InteractionObjectEvent> 
+					//public UIBar, 
+					public MenuController::observer//, 
+					//public Subscriber<InteractionObjectEvent> 
 {
 
 	friend class DreamAppManager;
@@ -59,7 +59,7 @@ public:
 
 	std::map<InteractionEventType, std::function<RESULT(void*)>> m_callbacks;
 
-	virtual RESULT Notify(InteractionObjectEvent *event) override;
+	//virtual RESULT Notify(InteractionObjectEvent *event) override;
 
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);

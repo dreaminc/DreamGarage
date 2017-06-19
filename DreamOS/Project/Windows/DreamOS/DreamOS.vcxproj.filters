@@ -797,9 +797,6 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\stdafx.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObjectQueue.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
@@ -1685,7 +1682,6 @@
     <ClInclude Include="..\..\..\Primitives\Multipublisher.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\stdafx.h" />
     <ClInclude Include="..\..\..\InteractionEngine\ActiveObjectQueue.h">
       <Filter>InteractionEngine</Filter>
     </ClInclude>
