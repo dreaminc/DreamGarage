@@ -181,6 +181,8 @@ RESULT UIKeyboard::Update(void *pContext) {
 	DreamOS *pDOS = GetDOS();
 
 	UIKey *keyCollisions[2];
+	keyCollisions[0] = nullptr;
+	keyCollisions[1] = nullptr;
 	point ptCollisions[2];
 	point ptCollision;
 
@@ -237,13 +239,12 @@ RESULT UIKeyboard::Update(void *pContext) {
 	}
 
 	// covers edge case where both mallets are hitting the same key
-	if (keyCollisions[0] && keyCollisions[1] && keyCollisions[0] == keyCollisions[1]) {
+	if (keyCollisions[0] != nullptr && keyCollisions[1] != nullptr && keyCollisions[0] == keyCollisions[1]) {
 
 		auto key = keyCollisions[0];
 		point ptPosition = key->m_pQuad->GetPosition();
 		float y = std::min(ptCollisions[0].y(), ptCollisions[1].y());
 		key->m_pQuad->SetPosition(point(ptPosition.x(), y - m_pLeftMallet->GetRadius(), ptPosition.z()));
-
 	}
 
 
@@ -484,6 +485,19 @@ RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 	
 Error:
 	return r;
+}
+
+RESULT UIKeyboard::SetMallets(UIMallet *leftMallet, UIMallet *rightMallet) {
+	RESULT r = R_PASS;
+
+	CN(leftMallet);
+	m_pLeftMallet = leftMallet;
+
+	CN(rightMallet);
+	m_pRightMallet = rightMallet;
+
+Error:
+	return R_PASS;
 }
 
 RESULT UIKeyboard::UpdateTextBox(int chkey) {

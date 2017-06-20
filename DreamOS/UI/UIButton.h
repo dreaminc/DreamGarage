@@ -21,7 +21,7 @@ public:
 	std::shared_ptr<composite> GetComposite();
 	std::shared_ptr<quad> GetSurface();
 
-private:
+protected:
 	// objects (TODO: could be in subclass)
 	std::shared_ptr<quad> m_pSurface;
 	std::shared_ptr<composite> m_pContextComposite;

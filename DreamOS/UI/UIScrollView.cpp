@@ -102,7 +102,10 @@ RESULT UIScrollView::Update() {
 	//TODO:
 	//- rotate by velocity
 	//- update visible scrollbars
-	auto pChildren = m_pMenuButtonsContainer->GetChildren();
+	std::vector<std::shared_ptr<VirtualObj>> pChildren;
+	CBR(m_pMenuButtonsContainer->HasChildren(), R_PASS);
+
+	pChildren = m_pMenuButtonsContainer->GetChildren();
 	if (pChildren.size() > m_maxElements) {
 		float maxRotation = (pChildren.size() - m_maxElements) * m_yRotationPerElement;
 
@@ -135,7 +138,7 @@ RESULT UIScrollView::Update() {
 			m_objectIndex -= 1;
 		}
 	}
-
+Error:
 	return r; 
 }
 
@@ -174,10 +177,10 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
-		CR(pButton->RegisterEvent(UI_SELECT_BEGIN,
-			std::bind(&UIScrollView::AnimateScaleUp, this, std::placeholders::_1)));
-		CR(pButton->RegisterEvent(UI_SELECT_ENDED,
-			std::bind(&UIScrollView::AnimateScaleReset, this, std::placeholders::_1)));
+	//	CR(pButton->RegisterEvent(UI_SELECT_BEGIN,
+	//		std::bind(&UIScrollView::AnimateScaleUp, this, std::placeholders::_1)));
+	//	CR(pButton->RegisterEvent(UI_SELECT_ENDED,
+	//		std::bind(&UIScrollView::AnimateScaleReset, this, std::placeholders::_1)));
 
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);

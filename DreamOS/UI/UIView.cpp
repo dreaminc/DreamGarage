@@ -1,6 +1,7 @@
 #include "UIView.h"
 #include "Primitives/ray.h"
 #include "UIButton.h"
+#include "UIMenuItem.h"
 #include "UIScrollView.h"
 
 UIView::UIView(HALImp *pHALImp) :
@@ -48,6 +49,22 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIMenuItem> UIView::MakeUIMenuItem() {
+	std::shared_ptr<UIMenuItem> pButton(new UIMenuItem(m_pHALImp));
+
+	return pButton;
+}
+
+std::shared_ptr<UIMenuItem> UIView::AddUIMenuItem() {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIMenuItem> pButton = MakeUIMenuItem();
+	CR(AddObject(pButton));
+	return pButton;
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<UIScrollView> UIView::MakeUIScrollView() {
 	std::shared_ptr<UIScrollView> pScrollView(new UIScrollView(m_pHALImp));
 
@@ -81,6 +98,11 @@ RESULT UIView::Notify(InteractionObjectEvent *pEvent) {
 	case (InteractionEventType::ELEMENT_COLLIDE_ENDED): {
 		UIEvent *pUIEvent = new UIEvent(UI_SELECT_ENDED, pEvent->m_pObject);
 		CR(NotifySubscribers(UI_SELECT_ENDED, pUIEvent));
+	} break;
+	case (InteractionEventType::INTERACTION_EVENT_MENU): {
+		UIEvent *pUIEvent = new UIEvent(UI_MENU, pEvent->m_pObject);
+		this;
+		CR(NotifySubscribers(UI_MENU, pUIEvent));
 	} break;
 		/*
 	case (InteractionEventType::ELEMENT_INTERSECT_BEGAN): {

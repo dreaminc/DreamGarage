@@ -13,6 +13,7 @@
 
 class UIButton;
 class UIScrollView;
+class UIMenuItem;
 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
 public:
@@ -23,8 +24,12 @@ public:
 
 public:
 
+	//TODO: these could be MakeUIObject<T>
 	std::shared_ptr<UIButton> MakeUIButton();
 	std::shared_ptr<UIButton> AddUIButton();
+
+	std::shared_ptr<UIMenuItem> MakeUIMenuItem();
+	std::shared_ptr<UIMenuItem> AddUIMenuItem();
 
 	std::shared_ptr<UIScrollView> MakeUIScrollView();
 	std::shared_ptr<UIScrollView> AddUIScrollView();

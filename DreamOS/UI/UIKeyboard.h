@@ -84,6 +84,9 @@ private:
 public:
 	RESULT UpdateTextBox(int chkey);
 
+	//temp
+	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
+
 private:
 	std::shared_ptr<quad> m_pSurface;
 	float m_surfaceWidth;

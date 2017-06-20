@@ -38,15 +38,16 @@ Error:
 
 std::shared_ptr<UIMenuItem> UIMenuLayer::CreateMenuItem() {
 	RESULT r = R_PASS;
-
+/*
 	std::shared_ptr<UIMenuItem> pMenuItem = std::make_shared<UIMenuItem>(m_pContextComposite);
 	CN(pMenuItem);
 	CV(pMenuItem);
 
 	m_menuItems.emplace_back(pMenuItem);
-	
 Error:
 	return pMenuItem;
+//*/	
+	return nullptr;
 }
 
 RESULT UIMenuLayer::Clear() {

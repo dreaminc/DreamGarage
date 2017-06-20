@@ -199,22 +199,22 @@ RESULT DreamGarage::LoadScene() {
 		);
 	}
 
-	IconFormat iconFormat;
-	LabelFormat labelFormat;
-	RadialLayerFormat menuFormat;
-	RadialLayerFormat titleFormat;
+	//IconFormat iconFormat;
+	//LabelFormat labelFormat;
+	///RadialLayerFormat menuFormat;
+	//RadialLayerFormat titleFormat;
 
 	// differences from default for title layer
-	titleFormat.menuPosZ = -1.15f;
-	titleFormat.itemPosY = -0.25f;
-	titleFormat.itemAngleX = 75.0f;
+	//titleFormat.menuPosZ = -1.15f;
+	//titleFormat.itemPosY = -0.25f;
+	//titleFormat.itemAngleX = 75.0f;
 
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this);
 	CN(m_pDreamUIBar);
 
 	//CV(m_pDreamUIBar);
 
-	m_pDreamUIBar->SetParams(iconFormat, labelFormat, menuFormat, titleFormat);
+	//m_pDreamUIBar->SetParams(iconFormat, labelFormat, menuFormat, titleFormat);
 	m_pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
 //*
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);

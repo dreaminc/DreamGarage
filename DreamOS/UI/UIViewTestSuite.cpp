@@ -2,6 +2,7 @@
 
 #include "DreamOS.h"
 #include "DreamGarage/DreamUIBar.h"
+#include "DreamGarage/DreamBrowser.h"
 
 #include "UIView.h"
 #include "UIButton.h"
@@ -81,8 +82,8 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	//CR(AddTestDreamUIBar());
-	CR(AddTestUIScrollView());
+	CR(AddTestDreamUIBar());
+	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
@@ -524,7 +525,23 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		CR(SetupPipeline());
 
 		{
+			auto pCloudController = m_pDreamOS->GetCloudController();
+			auto pCommandLineManager = CommandLineManager::instance();
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			{
+				std::string strUsername = pCommandLineManager->GetParameterValue("username");
+				std::string strPassword = pCommandLineManager->GetParameterValue("password");
+				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+			}
+
 			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this);
+			CN(pDreamUIBar);
+			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
+
+			CR(m_pDreamOS->InitializeKeyboard());
 		}
 
 	Error:
