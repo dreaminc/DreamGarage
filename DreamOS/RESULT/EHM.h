@@ -55,6 +55,9 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
     #define CurrentFileLine ""
 #endif
 
+#define RFAILED() (r&0x80000000)
+#define RSUCCESS() (!RFAILED())
+
 // Check RESULT value
 // Ensures that RESULT is successful
 #define CR(res) do{r=(res);if(r&0x80000000){goto Error;}}while(0);

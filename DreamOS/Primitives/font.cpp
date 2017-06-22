@@ -37,6 +37,8 @@ std::shared_ptr<Font> Font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 	RESULT r = R_PASS;
 	std::shared_ptr<Font> pFont = nullptr;
 	FT_Error fte = 0;
+	char *pszFilepath = nullptr;
+	FT_Face pFTFace = nullptr;
 
 	if (IsFreetypeInitialized() == false) {
 		CR(InitializeFreetypeLibrary());
@@ -49,9 +51,6 @@ std::shared_ptr<Font> Font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 	PathManager *pPathManager = PathManager::instance();
 	CN(pPathManager);
 
-	char *pszFilepath = nullptr;
-	FT_Face pFTFace = nullptr;
-
 	pPathManager->GetFilePath(PATH_FONT, wstrFontFilename, pszFilepath);
 	CN(pszFilepath);
 
@@ -62,15 +61,17 @@ std::shared_ptr<Font> Font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 	CN(pFTFace);
 	CR(pFont->SetFreetypeFace(pFTFace));
 
-
-	return pFont;
-
 Error:
-	if (pFont != nullptr) {
+	if (RFAILED() && pFont != nullptr) {
 		pFont = nullptr;
 	}
 
-	return nullptr;
+	if (pszFilepath != nullptr) {
+		delete[] pszFilepath;
+		pszFilepath = nullptr;
+	}
+
+	return pFont;
 }
 
 
@@ -112,7 +113,10 @@ Font::Font(const std::wstring& strFontFilename, bool fDistanceMap) :
 }
 
 Font::~Font() {
-	// empty
+	if (m_pFTFace != nullptr) {
+		FT_Done_Face(m_pFTFace);
+		m_pFTFace = nullptr;
+	}
 }
 
 // TODO: Merge two

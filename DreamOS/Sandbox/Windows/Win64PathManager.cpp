@@ -89,11 +89,10 @@ RESULT Win64PathManager::GetDreamPath(char* &n_pszDreamPath) {
 	CNM(m_pszDreamRootPath, "DreamRootPath NULL");
 
 	n_pszDreamPath_n = wcslen(m_pszDreamRootPath) + 1;
-	memset(n_pszDreamPath, 0, n_pszDreamPath_n);
-
-	//pszDreamPath = m_pszDreamRootPath;
-	n_pszDreamPath = new char[n_pszDreamPath_n];
+	n_pszDreamPath = (char *)(new char[n_pszDreamPath_n]);
 	CN(n_pszDreamPath);
+
+	memset(n_pszDreamPath, 0, n_pszDreamPath_n);
 
 	size_t lenCopied = std::wcstombs(n_pszDreamPath, m_pszDreamRootPath, n_pszDreamPath_n);
 	CB((lenCopied != 0));

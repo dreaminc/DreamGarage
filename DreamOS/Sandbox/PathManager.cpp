@@ -1,6 +1,8 @@
 #include "PathManager.h"
 #include "Primitives/Types/Number.h"
 
+#include "Core/Utilities.h"
+
 // Initialize and allocate the instance
 PathManager* PathManager::m_pInstance = nullptr;
 
@@ -251,13 +253,26 @@ RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename,
 	RESULT r = R_PASS;
 
 	size_t wstrFilename_n = wstrFilename.size();
-	long n_pszFilePath_n = 0;
+	size_t n_pszFilePath_n = 0;
 
 	char *pszValuePath = nullptr;
 	size_t pszValuePath_n = 0;
 
+	std::string strFilename = util::WideStringToString(wstrFilename);
+
 	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
 	pszValuePath_n = strlen(pszValuePath);
+
+	n_pszFilePath_n = strlen(pszValuePath) + 1 + strFilename.size() + 1;
+	n_pszFilePath = (char *)(new char[n_pszFilePath_n]);
+	CN(n_pszFilePath);
+
+	memset(n_pszFilePath, 0, n_pszFilePath_n);
+
+	// Compose the path
+	// TODO: Maybe do some lower level parsing here since ./ will just get attached
+	strncat(n_pszFilePath, pszValuePath, pszValuePath_n);
+	strncat(n_pszFilePath, strFilename.c_str(), strFilename.size());
 
 Error:
 	// Release memory from GetValuePath

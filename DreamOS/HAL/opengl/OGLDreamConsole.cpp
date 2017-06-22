@@ -17,7 +17,7 @@
 // OGLRenderContext
 void OGLRenderContext::Initialize() 
 {
-	m_pOGLFont = std::make_shared<Font>(L"Arial.fnt");
+	m_pOGLFont = std::make_shared<Font>(L"Arial.fnt", false);
 	
 	// Default font size
 	m_fontSize = 4.0f;
@@ -56,7 +56,7 @@ OGLDreamConsole::~OGLDreamConsole()
 
 void OGLDreamConsole::Initialize() {
 	// Font
-	m_pOGLFont = std::make_shared<Font>(L"Arial.fnt");
+	m_pOGLFont = std::make_shared<Font>(L"Arial.fnt", false);
 	m_fontSize = 4.0f;
 
 	//m_OGLTitleText = std::make_unique<OGLText>(m_OGLImp, m_OGLFont, "Dream Garage v0.01");
@@ -199,7 +199,7 @@ void OGLProfilerGraph::Initialize()
 	m_OGLTriangle = std::make_unique<OGLTriangle>(m_OGLImp);
 	m_OGLTriangle->SetColor(color(0.8f, 0.0f, 0.0f, 1));
 
-	m_pOGLFont = std::make_shared<Font>(L"Arial.fnt");
+	m_pOGLFont = std::make_shared<Font>(L"Arial.fnt", false);
 	m_OGLFPSText = std::make_unique<OGLText>(m_OGLImp, m_pOGLFont);
 
 	m_BackgroundMargin = 0;
