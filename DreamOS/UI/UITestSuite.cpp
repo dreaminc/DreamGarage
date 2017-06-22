@@ -27,6 +27,8 @@
 
 #include "Core/Utilities.h"
 
+#include "Primitives/font.h"
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {

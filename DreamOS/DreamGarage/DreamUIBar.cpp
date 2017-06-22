@@ -17,6 +17,8 @@
 
 #include <vector>
 
+#include "Primitives/font.h"
+
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
 {

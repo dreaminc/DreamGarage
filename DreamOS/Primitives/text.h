@@ -11,8 +11,9 @@
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
-#include "font.h"
 #include <memory>
+
+class Font;
 
 class text : public DimObj {
 public:
@@ -55,7 +56,7 @@ public:
 
 	text(std::shared_ptr<Font> font, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
 
-	RESULT SetText(const std::string& text, double size, bool* isChanged = nullptr);
+	RESULT SetText(const std::string& strText, double size, bool* fChanged = nullptr);
 	
 	VirtualObj* SetPosition(point pt, AlignmentType alignType = CENTER);
 

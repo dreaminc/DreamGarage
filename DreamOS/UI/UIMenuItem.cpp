@@ -1,4 +1,5 @@
 #include "UIMenuItem.h"
+#include "Primitives/font.h"
 
 UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIButton(pHALImp, pDreamOS)

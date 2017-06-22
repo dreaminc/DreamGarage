@@ -1,5 +1,5 @@
 #include "OGLText.h"
-
+#include "Primitives/font.h"
 
 OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& strText, double size, bool fBillboard) :
 	text(pFont, strText, size, fBillboard),

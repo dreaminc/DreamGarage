@@ -7,6 +7,8 @@
 
 #include "UIKey.h"
 
+#include "Primitives/font.h"
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {

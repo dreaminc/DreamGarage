@@ -9,9 +9,11 @@
 #include <memory>
 
 #include "OGLObj.h"
-#include "Primitives/font.h"
+//#include "Primitives/font.h"
 #include "Primitives/text.h"
 #include "OGLTexture.h"
+
+class Font;
 
 class OGLText : public text, public OGLObj {
 protected:

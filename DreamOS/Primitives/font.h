@@ -16,6 +16,8 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H  
 
+#define DEFAULT_FONT_SIZE 32
+
 class composite;
 
 class Font {
@@ -27,9 +29,9 @@ public:
 		uint32_t	y = 0;
 		uint32_t	width = 0;
 		uint32_t	height = 0;
-		int32_t		xoffset = 0;
-		int32_t		yoffset = 0;
-		uint32_t	xadvance = 0;
+		int32_t		bearingX = 0;
+		int32_t		bearingY = 0;
+		uint32_t	advance = 0;
 		uint32_t	page = 0;
 		bool fValid = false;
 
@@ -37,6 +39,7 @@ public:
 			// empty
 		}
 
+		// TODO: Get rid of this when we move to Freefont
 		CharacterGlyph(std::wstring wstrFontFileLine) {
 			asciiValue = GetValue<uint32_t>(wstrFontFileLine, L"char id=");
 
@@ -45,9 +48,9 @@ public:
 				y = GetValue<uint32_t>(wstrFontFileLine, L"y=");
 				width = GetValue<uint32_t>(wstrFontFileLine, L"width=");
 				height = GetValue<uint32_t>(wstrFontFileLine, L"height=");
-				xoffset = GetValue<uint32_t>(wstrFontFileLine, L"xoffset=");
-				yoffset = GetValue<uint32_t>(wstrFontFileLine, L"yoffset=");
-				xadvance = GetValue<uint32_t>(wstrFontFileLine, L"xadvance=");
+				bearingX = GetValue<uint32_t>(wstrFontFileLine, L"xoffset=");
+				bearingY = GetValue<uint32_t>(wstrFontFileLine, L"yoffset=");
+				advance = GetValue<uint32_t>(wstrFontFileLine, L"xadvance=");
 				page = GetValue<uint32_t>(wstrFontFileLine, L"page=");
 				fValid = true;
 			}
@@ -92,6 +95,8 @@ private:
 	// A glyph base defines the number of pixels in the y-axis above the virtual line of drawing a text
 	uint32_t m_glyphBase = 0;
 
+	uint32_t m_fontPixelSize = DEFAULT_FONT_SIZE;
+
 // Distance Mapping
 public:
 	bool HasDistanceMap();
@@ -109,9 +114,15 @@ private:
 	std::shared_ptr<texture> m_pTexture;
 
 	// internal freetype stuff (remove above when done)
+	// TODO: Refactor to remove freetype / or remove all other functions and pathways
 private:
 	RESULT SetFreetypeFace(FT_Face pFTFace);
 	FT_Face m_pFTFace = nullptr;
+
+	// Public Freetype Refactor stuff
+public:
+	RESULT SetFontSize(uint32_t size);
+	uint32_t GetFontSize();
 
 	// Static Freetype Stuff
 private:

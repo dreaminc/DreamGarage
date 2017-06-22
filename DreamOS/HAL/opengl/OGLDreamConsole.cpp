@@ -14,6 +14,8 @@
 
 #include "HAL/opengl/OGLFramebuffer.h"
 
+#include "Primitives/font.h"
+
 // OGLRenderContext
 void OGLRenderContext::Initialize() 
 {

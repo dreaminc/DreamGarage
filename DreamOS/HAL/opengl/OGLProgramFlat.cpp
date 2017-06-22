@@ -4,6 +4,7 @@
 #include "Scene/ObjectStore.h"
 
 #include "Primitives/stereocamera.h"
+#include "Primitives/font.h"
 
 #include "OGLObj.h"
 #include "OGLTexture.h"

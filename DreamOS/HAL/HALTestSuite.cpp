@@ -5,6 +5,8 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
+#include "Primitives/font.h"
+
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {

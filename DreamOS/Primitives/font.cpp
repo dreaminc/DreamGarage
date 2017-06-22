@@ -61,6 +61,10 @@ std::shared_ptr<Font> Font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 	CN(pFTFace);
 	CR(pFont->SetFreetypeFace(pFTFace));
 
+	// Set up the characters
+	CR(pFont->SetFontSize(pFont->GetFontSize()));
+
+
 Error:
 	if (RFAILED() && pFont != nullptr) {
 		pFont = nullptr;
@@ -81,6 +85,22 @@ Font::Font(bool fDistanceMap) :
 	m_fDistanceMap(fDistanceMap)
 {
 	// empty
+}
+
+uint32_t Font::GetFontSize() {
+	return m_fontPixelSize;
+}
+
+RESULT Font::SetFontSize(uint32_t size) {
+	RESULT r = R_PASS;
+	FT_Error fte = 0;
+
+	m_fontPixelSize = size;
+	fte = FT_Set_Pixel_Sizes(m_pFTFace, 0, m_fontPixelSize);
+	CBM((fte == 0), "Set font sizes with error 0x%x", fte);
+
+Error:
+	return r;
 }
 
 RESULT Font::SetFreetypeFace(FT_Face pFTFace) {
