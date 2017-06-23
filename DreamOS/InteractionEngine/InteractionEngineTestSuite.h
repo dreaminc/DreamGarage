@@ -41,6 +41,9 @@ public:
 	RESULT AddTestMultiPrimitive();
 	RESULT AddTestMultiPrimitiveComposite();
 
+	RESULT AddTestMultiPrimitiveRemove();
+	RESULT AddTestMultiPrimitiveCompositeRemove();
+
 	RESULT AddTestCompositeRay();
 	RESULT AddTestCompositeRayNested();
 	RESULT AddTestCompositeRayController();

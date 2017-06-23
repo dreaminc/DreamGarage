@@ -32,7 +32,7 @@ UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 
 	CN(m_pDreamUIBar);
 	CR(Initialize());
-
+	 
 	Validate();
 	return;
 Error:

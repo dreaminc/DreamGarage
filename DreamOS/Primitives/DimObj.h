@@ -129,6 +129,8 @@ public:
 
 	// Children (composite objects)
 	RESULT AddChild(std::shared_ptr<DimObj> pDimObj);
+	RESULT RemoveChild(std::shared_ptr<DimObj> pDimObj);
+	RESULT RemoveChild(VirtualObj *pObj);
 	RESULT RemoveLastChild();
 	RESULT ClearChildren();
 	bool HasChildren();

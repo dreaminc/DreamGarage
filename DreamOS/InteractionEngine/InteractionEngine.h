@@ -132,6 +132,8 @@ public:
 		std::function<RESULT(void*)> endCallback = nullptr,
 		void* callbackContext = nullptr) override;
 
+	
+
 	virtual RESULT CancelAnimation(VirtualObj *pObj) override;
 
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;

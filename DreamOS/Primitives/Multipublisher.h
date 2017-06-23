@@ -11,6 +11,7 @@
 
 #include "Publisher.h"
 #include "Subscriber.h"
+#include "Primitives/dirty.h"
 
 #include <string>
 #include <map>
@@ -18,9 +19,11 @@
 #include <math.h>
 
 template <typename PIndexClass, typename PKeyClass, typename PKEventClass>
-class Multipublisher : public I_Publisher<PKeyClass, PKEventClass> {
+class Multipublisher : public I_Publisher<PKeyClass, PKEventClass>, public dirty {
 public:
-	Multipublisher() {
+	Multipublisher() :
+		dirty(false)
+	{
 		// empty
 	}
 
@@ -96,20 +99,20 @@ public:
 	// Error handling warranted by the fact that this should only be called with confidence 
 	// that the subscriber is subscriber to a given event per the subscriber or the Publisher 
 	// releasing all subscriber events for whatever purpose
-	RESULT UnregisterSubscriber(PIndexClass indexEvent, PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
+	RESULT UnregisterSubscriber(PIndexClass indexClass, PKeyClass keyClass, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 
-		auto it = m_indexedEvents.find(keyEvent);
+		auto it = m_indexedEvents.find(keyClass);
 
 		typename std::map<PIndexClass, Subscriber<PKEventClass>*> *pSubscriberMap = nullptr;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
-		CBM((it == m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it == m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyClass));
 
 		pSubscriberMap = reinterpret_cast<std::map<PIndexClass, Subscriber<PKEventClass>*>*>(it->second);
 
 		if (pSubscriberMap != nullptr) {
-			auto indexedIt = pSubscriberMap->find(indexEvent);
+			auto indexedIt = pSubscriberMap->find(indexClass);
 
 			if (indexedIt != pSubscriberMap->end()) {
 				pSubscriberMap->erase(indexedIt);
@@ -119,14 +122,16 @@ public:
 			// TODO: Don't currently support multiple subscribers to the same object 
 			// If we want this - there needs to be a list of subscribers 
 
-			CBM((0), "Index not found for event %s", GetEventKeyString(keyEvent));
+			CBM((0), "Index not found for event %s", GetEventKeyString(keyClass));
 		}
 
-		CBM((0), "Subscriber not found for event %s", GetEventKeyString(keyEvent));
+		CBM((0), "Subscriber not found for event %s", GetEventKeyString(keyClass));
 
 	Error:
 		return r;
 	}
+
+	
 
 	// This will unsubscribe a subscriber from all events
 	// Error handling warranted by the fact that something is really wrong if
@@ -158,6 +163,55 @@ public:
 		return r;
 	}
 
+	// This will simply remove all event subscribers 
+	RESULT UnregisterSubscriber(PIndexClass indexClass) {
+		RESULT r = R_PASS;
+		bool fFound = false;
+
+		for (auto &indexMap : m_indexedEvents) {
+			auto it = indexMap.second->find(indexClass);
+
+			if (it != indexMap.second->end()) {
+				indexMap.second->erase(it);
+				fFound = true;
+
+				// Dirty used as an internal signal to ensure
+				// old data not iterated on
+				SetDirty();
+			}
+		}
+
+		CBM((fFound), "No subscribers found for index");
+
+	Error:
+		return r;
+	}
+
+	bool FindIndexClass(PIndexClass indexClass) {
+		bool fRefVal = false;
+
+		for (auto &indexMap : m_indexedEvents) {
+			for (auto &indexedMap : *(indexMap.second)) {
+				if (indexedMap.first == indexClass) {
+					return true;
+				}
+			}
+		}
+
+		return fRefVal;
+	}
+
+	bool FindKeyClass(PKeyClass keyClass) {
+		auto it = m_indexedEvents.find(keyClass);
+
+		if (it == m_indexedEvents.end()) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
 	virtual RESULT NotifySubscribers(PKeyClass keyEvent, PKEventClass *pEvent) override {
 		RESULT r = R_PASS;
 
@@ -171,9 +225,7 @@ public:
 
 		if (pSubscriberMap->size() > 0) {
 			for (auto &indexSubItem : *pSubscriberMap) {
-				//WCR(reinterpret_cast<Subscriber<PKEventClass>*>(indexSubItem.second)->Notify(pEvent));
 				WCR(indexSubItem.second->Notify(pEvent));
-			
 			}
 		}
 
@@ -195,11 +247,15 @@ public:
 
 		if (pSubscriberMap->size() > 0) {
 			for (auto &indexSubItem : *pSubscriberMap) {
-				//WCR(reinterpret_cast<Subscriber<PKEventClass>*>(indexSubItem.second)->Notify(pEvent));
+				
 				if (indexSubItem.first == index) {
 					WCR(indexSubItem.second->Notify(pEvent));
 				}
 
+				// If dirty set ensure index still exists
+				if (CheckAndCleanDirty() && FindIndexClass(index) == false) {
+					break;
+				}
 			}
 		}
 
