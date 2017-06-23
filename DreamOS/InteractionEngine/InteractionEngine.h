@@ -13,12 +13,6 @@
 #include "Primitives/Types/UID.h"
 #include "Primitives/valid.h"
 
-//#include "CollisionDetector.h"
-//#include "CollisionResolver.h"
-//#include "PhysicsIntegrator.h"
-
-#include "Primitives/VirtualObj.h"
-//#include "Primitives/Publisher.h"
 #include "Primitives/Subscriber.h"
 #include "Sense/SenseController.h"
 #include "Sense/SenseMouse.h"
@@ -45,10 +39,13 @@ class CollisionManifold;
 
 class SandboxApp;
 
+class DimObj;
+class color;
+
 class InteractionEngineProxy : public Subscriber<SenseKeyboardEvent> {
 public:
 	// Animation functions
-	virtual RESULT PushAnimationItem(VirtualObj *pObj,
+	virtual RESULT PushAnimationItem(DimObj *pObj,
 		point ptPosition,
 		quaternion qRotation,
 		vector vScale,
@@ -58,7 +55,17 @@ public:
 		std::function<RESULT(void*)> startCallback = nullptr,
 		std::function<RESULT(void*)> endCallback = nullptr,
 		void* callbackContext = nullptr) = 0;
-	virtual RESULT CancelAnimation(VirtualObj *pObj) = 0;
+
+	virtual RESULT PushAnimationItem(DimObj *pObj,
+		color cColor,
+		double duration,
+		AnimationCurveType curve,
+		AnimationFlags flags,
+		std::function<RESULT(void*)> startCallback = nullptr,
+		std::function<RESULT(void*)> endCallback = nullptr,
+		void* callbackContext = nullptr) = 0;
+
+	virtual RESULT CancelAnimation(DimObj *pObj) = 0;
 
 	// Keyboard manual collision functions
 	//virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
@@ -121,7 +128,7 @@ public:
 
 	// Active Objects
 public:
-	virtual RESULT PushAnimationItem(VirtualObj *pObj,
+	virtual RESULT PushAnimationItem(DimObj *pObj,
 		point ptPosition,
 		quaternion qRotation,
 		vector vScale,
@@ -132,9 +139,16 @@ public:
 		std::function<RESULT(void*)> endCallback = nullptr,
 		void* callbackContext = nullptr) override;
 
-	
+	virtual RESULT PushAnimationItem(DimObj *pObj,
+		color cColor,
+		double duration,
+		AnimationCurveType curve,
+		AnimationFlags flags,
+		std::function<RESULT(void*)> startCallback = nullptr,
+		std::function<RESULT(void*)> endCallback = nullptr,
+		void* callbackContext = nullptr) override;
 
-	virtual RESULT CancelAnimation(VirtualObj *pObj) override;
+	virtual RESULT CancelAnimation(DimObj *pObj) override;
 
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 	virtual RESULT Notify(SenseMouseEvent *pEvent) override;

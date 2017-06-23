@@ -1,6 +1,6 @@
 #include "AnimationQueue.h"
 #include "AnimationItem.h"
-#include "Primitives/VirtualObj.h"
+#include "Primitives/DimObj.h"
 #include "DreamConsole/DreamConsole.h"
 
 AnimationQueue::AnimationQueue() {
@@ -44,7 +44,7 @@ RESULT AnimationQueue::Update(double sNow) {
 }
 
 RESULT AnimationQueue::PushAnimationItem(
-	VirtualObj *pObj, 
+	DimObj *pObj, 
 	AnimationState endState, 
 	double startTime, 
 	double duration, 
@@ -78,7 +78,7 @@ Error:
 	return r;
 }
 
-RESULT AnimationQueue::CancelAnimation(VirtualObj *pObj, double startTime) {
+RESULT AnimationQueue::CancelAnimation(DimObj *pObj, double startTime) {
 	RESULT r = R_PASS;
 	
 	auto& qObj = m_objectQueue[pObj];

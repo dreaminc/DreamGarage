@@ -137,11 +137,17 @@ RESULT DimObj::SetWireframe(bool fWireframe) {
 	return R_PASS; 
 }
 
+color DimObj::GetColor() {
+	return m_cColor;
+}
+
 RESULT DimObj::SetColor(color c) {
 	for (unsigned int i = 0; i < NumberVertices(); i++)
 		m_pVertices[i].SetColor(c);
 
 	SetDirty();
+
+	m_cColor = c;
 
 	return R_PASS;
 }
@@ -151,6 +157,8 @@ RESULT DimObj::SetAlpha(color_precision a) {
 		m_pVertices[i].SetAlpha(a);
 
 	SetDirty();
+
+	m_cColor.a(a);
 
 	return R_PASS;
 }

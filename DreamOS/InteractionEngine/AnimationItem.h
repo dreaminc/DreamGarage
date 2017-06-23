@@ -11,7 +11,7 @@
 #include <memory>
 #include <functional>
 
-class VirtualObj;
+class DimObj;
 
 struct AnimationFlags {
 
@@ -32,13 +32,13 @@ public:
 	AnimationItem(AnimationState startState, AnimationState endState, double startTime, double duration);
 	~AnimationItem();
 
-	std::shared_ptr<AnimationItem> CreateCancelAnimation(VirtualObj *pObj, double msNow);
+	std::shared_ptr<AnimationItem> CreateCancelAnimation(DimObj *pObj, double msNow);
 
 private:
 	RESULT Initialize();
 
 public:
-	RESULT Update(VirtualObj *pObj, AnimationState& state, double msNow);
+	RESULT Update(DimObj *pObj, AnimationState& state, double msNow);
 
 	bool IsComplete(double msNow);
 

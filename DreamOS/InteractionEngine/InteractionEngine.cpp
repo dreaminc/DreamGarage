@@ -6,6 +6,8 @@
 
 #include "PhysicsEngine/CollisionManifold.h"
 
+#include "Primitives/color.h"
+
 InteractionEngine::InteractionEngine(SandboxApp *pSandbox) :
 	m_pSandbox(pSandbox)
 {
@@ -165,7 +167,7 @@ RESULT InteractionEngine::UpdateAnimationQueue() {
 	return r;
 }
 
-RESULT InteractionEngine::PushAnimationItem(VirtualObj *pObj,
+RESULT InteractionEngine::PushAnimationItem(DimObj *pObj,
 	point ptPosition,
 	quaternion qRotation,
 	vector vScale,
@@ -193,7 +195,31 @@ Error:
 	return r;
 }
 
-RESULT InteractionEngine::CancelAnimation(VirtualObj *pObj) {
+RESULT InteractionEngine::PushAnimationItem(DimObj *pObj,
+	color cColor,
+	double duration,
+	AnimationCurveType curve,
+	AnimationFlags flags,
+	std::function<RESULT(void*)> startCallback,
+	std::function<RESULT(void*)> endCallback,
+	void* callbackContext) {
+	
+	RESULT r = R_PASS;
+
+	AnimationState endState;
+	endState.cColor = cColor;
+
+	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	msNow /= 1000.0;
+
+	CR(m_pObjectQueue->PushAnimationItem(pObj, endState, msNow, duration, curve, flags, startCallback, endCallback, callbackContext));
+
+Error:
+	return r;
+}
+
+RESULT InteractionEngine::CancelAnimation(DimObj *pObj) {
 	RESULT r = R_PASS;
 
 	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();

@@ -57,6 +57,8 @@ protected:
 	texture *m_pTextureDiffuse = nullptr;
 	texture *m_pTextureSpecular = nullptr;
 
+	color m_cColor;
+
 private:
 	bool m_fVisible;
 	bool m_fWireframe;
@@ -100,6 +102,7 @@ public:
 	bool IsWireframe();
 	RESULT SetWireframe(bool fWireframe = true);
 
+	color GetColor();
 	RESULT SetColor(color c);
 	RESULT SetAlpha(color_precision a);
 

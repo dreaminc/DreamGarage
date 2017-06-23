@@ -7,7 +7,7 @@
 #include <memory>
 #include <functional>
 
-class VirtualObj;
+class DimObj;
 enum class AnimationCurveType;
 #include "AnimationItem.h"
 
@@ -19,7 +19,7 @@ public:
 
 public:
 	RESULT Update(double sNow); // updates all objects
-	RESULT PushAnimationItem(VirtualObj *pObj,
+	RESULT PushAnimationItem(DimObj *pObj,
 		AnimationState endState,
 		double startTime,
 		double duration,
@@ -29,10 +29,10 @@ public:
 		std::function<RESULT(void*)> fnEndCallback = nullptr,
 		void* pCallbackContext = nullptr);
 
-	RESULT CancelAnimation(VirtualObj *pObj, double startTime);
+	RESULT CancelAnimation(DimObj *pObj, double startTime);
 
 private:
-	std::map<VirtualObj*, std::deque<std::shared_ptr<AnimationItem>>> m_objectQueue;
+	std::map<DimObj*, std::deque<std::shared_ptr<AnimationItem>>> m_objectQueue;
 
 };
 
