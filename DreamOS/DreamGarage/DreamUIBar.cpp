@@ -64,7 +64,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	// Initialize UIScrollView
 	m_pView = GetComposite()->AddUIView();
 	CN(m_pView);
-	m_pView->SetPosition(point(0.0f, 0.0f, 5.0f));
+	m_pView->SetPosition(point(0.0f, 0.0f, 1.0f));
 
 	m_pScrollView = m_pView->AddUIScrollView();
 	CN(m_pScrollView);
@@ -142,6 +142,8 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
 		GetComposite()->SetVisible(!GetComposite()->IsVisible());
+		//move to anim
+		UpdateCompositeWithCameraLook(0.0f, -1.0f);
 	}
 	else {
 		m_pathStack.pop();
@@ -154,6 +156,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		}
 		else {
 			GetComposite()->SetVisible(!GetComposite()->IsVisible());
+			UpdateCompositeWithCameraLook(0.0f, -1.0f);
 		}
 	}
 Error:

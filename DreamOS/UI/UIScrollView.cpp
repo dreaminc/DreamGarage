@@ -36,11 +36,11 @@ RESULT UIScrollView::Initialize() {
 	m_yRotationPerElement = (float)M_PI / 9.0f;
 	m_velocity = 0.0f;
 
-	m_menuDepth = -0.5f;
+	m_menuDepth = -1.5f;
 	//m_menuDepth = -3.5f;
 	m_itemAngleX = -30.0f;
-	m_itemAngleY = 20.0f;
-	m_itemStartAngleY = -30.0f;
+	m_itemAngleY = 10.0f;
+	m_itemStartAngleY = -15.0f;
 	//m_itemHeight = -0.5f;
 	m_itemHeight = 0.75f;
 	m_itemScale = 0.25f;
@@ -48,7 +48,7 @@ RESULT UIScrollView::Initialize() {
 	m_itemScaleSelected = 1.25f;
 
 	m_titleAngleX = 75.0f;
-	m_titleHeight = -0.25f;
+	m_titleHeight = 0.0f;
 
 	m_pTitleView = AddUIView();
 
@@ -177,10 +177,12 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
-	//	CR(pButton->RegisterEvent(UI_SELECT_BEGIN,
-	//		std::bind(&UIScrollView::AnimateScaleUp, this, std::placeholders::_1)));
-	//	CR(pButton->RegisterEvent(UI_SELECT_ENDED,
-	//		std::bind(&UIScrollView::AnimateScaleReset, this, std::placeholders::_1)));
+		/*
+		CR(pButton->RegisterEvent(UI_SELECT_BEGIN,
+			std::bind(&UIScrollView::AnimateScaleUp, this, std::placeholders::_1)));
+		CR(pButton->RegisterEvent(UI_SELECT_ENDED,
+			std::bind(&UIScrollView::AnimateScaleReset, this, std::placeholders::_1)));
+			//*/
 
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);
