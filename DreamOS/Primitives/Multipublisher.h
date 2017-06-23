@@ -11,6 +11,7 @@
 
 #include "Publisher.h"
 #include "Subscriber.h"
+#include "Primitives/dirty.h"
 
 #include <string>
 #include <map>
@@ -18,9 +19,11 @@
 #include <math.h>
 
 template <typename PIndexClass, typename PKeyClass, typename PKEventClass>
-class Multipublisher : public I_Publisher<PKeyClass, PKEventClass> {
+class Multipublisher : public I_Publisher<PKeyClass, PKEventClass>, public dirty {
 public:
-	Multipublisher() {
+	Multipublisher() :
+		dirty(false)
+	{
 		// empty
 	}
 
@@ -128,25 +131,7 @@ public:
 		return r;
 	}
 
-	// This will simply remove all event subscribers 
-	RESULT UnregisterSubscriber(PIndexClass indexClass) {
-		RESULT r = R_PASS;
-		bool fFound = false;
-
-		for (auto &indexMap : m_indexedEvents) {
-			auto it = indexMap.second->find(indexClass);
-
-			if (it != indexMap.second->end()) {
-				indexMap.second->erase(it);
-				fFound = true;
-			}
-		}
-
-		CBM((fFound), "No subscribers found for index");
-
-	Error:
-		return r;
-	}
+	
 
 	// This will unsubscribe a subscriber from all events
 	// Error handling warranted by the fact that something is really wrong if
@@ -178,6 +163,55 @@ public:
 		return r;
 	}
 
+	// This will simply remove all event subscribers 
+	RESULT UnregisterSubscriber(PIndexClass indexClass) {
+		RESULT r = R_PASS;
+		bool fFound = false;
+
+		for (auto &indexMap : m_indexedEvents) {
+			auto it = indexMap.second->find(indexClass);
+
+			if (it != indexMap.second->end()) {
+				indexMap.second->erase(it);
+				fFound = true;
+
+				// Dirty used as an internal signal to ensure
+				// old data not iterated on
+				SetDirty();
+			}
+		}
+
+		CBM((fFound), "No subscribers found for index");
+
+	Error:
+		return r;
+	}
+
+	bool FindIndexClass(PIndexClass indexClass) {
+		bool fRefVal = false;
+
+		for (auto &indexMap : m_indexedEvents) {
+			for (auto &indexedMap : *(indexMap.second)) {
+				if (indexedMap.first == indexClass) {
+					return true;
+				}
+			}
+		}
+
+		return fRefVal;
+	}
+
+	bool FindKeyClass(PKeyClass keyClass) {
+		auto it = m_indexedEvents.find(keyClass);
+
+		if (it == m_indexedEvents.end()) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+
 	virtual RESULT NotifySubscribers(PKeyClass keyEvent, PKEventClass *pEvent) override {
 		RESULT r = R_PASS;
 
@@ -191,9 +225,7 @@ public:
 
 		if (pSubscriberMap->size() > 0) {
 			for (auto &indexSubItem : *pSubscriberMap) {
-				//WCR(reinterpret_cast<Subscriber<PKEventClass>*>(indexSubItem.second)->Notify(pEvent));
 				WCR(indexSubItem.second->Notify(pEvent));
-			
 			}
 		}
 
@@ -215,11 +247,15 @@ public:
 
 		if (pSubscriberMap->size() > 0) {
 			for (auto &indexSubItem : *pSubscriberMap) {
-				//WCR(reinterpret_cast<Subscriber<PKEventClass>*>(indexSubItem.second)->Notify(pEvent));
+				
 				if (indexSubItem.first == index) {
 					WCR(indexSubItem.second->Notify(pEvent));
 				}
 
+				// If dirty set ensure index still exists
+				if (CheckAndCleanDirty() && FindIndexClass(index) == false) {
+					break;
+				}
 			}
 		}
 

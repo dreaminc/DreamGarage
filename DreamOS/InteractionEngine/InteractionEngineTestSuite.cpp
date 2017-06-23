@@ -79,37 +79,13 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 			
 			if (pDimObj != nullptr) {
-				pDimObj->RotateYByDeg(15.0f);
+				//pDimObj->RotateYByDeg(15.0f);
 			}
 
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_MOVED: {
 			DEBUG_LINEOUT("intersect moved state: 0x%x", mEvent->m_activeState);
-			
-			// Attempt to delete object
-			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
-
-			if (pDimObj != nullptr) {
-				m_pDreamOS->RemoveObject(pDimObj);
-				m_pDreamOS->UnregisterInteractionObject(pDimObj);
-
-				/*
-				// Create new one
-				auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
-				pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
-				pQuad->SetColor(COLOR_BLUE);
-
-				// Add composite to interaction
-				CRM(m_pDreamOS->AddObjectToInteractionGraph(pQuad), "Failed to add quad");
-
-				// TODO: Simplyfy (combine with above)
-				for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-					CR(m_pDreamOS->RegisterEventSubscriber(pQuad, (InteractionEventType)(i), this));
-				}
-				*/
-			}
-
 		} break;
 
 		case InteractionEventType::ELEMENT_INTERSECT_ENDED: {
@@ -119,7 +95,26 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 
 			if (pDimObj != nullptr) {
 				//pDimObj->ResetRotation();
-				pDimObj->RotateYByDeg(-15.0f);
+				//pDimObj->RotateYByDeg(-15.0f); 
+				point ptPosition = pDimObj->GetPosition();
+				
+				// Remove object 
+				m_pDreamOS->RemoveObject(pDimObj);
+				m_pDreamOS->UnregisterInteractionObject(pDimObj);
+
+				// Create new one
+				auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+				pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
+				pQuad->SetColor(COLOR_RED);
+				pQuad->SetPosition(ptPosition);
+
+				// Add composite to interaction
+				CRM(m_pDreamOS->AddObjectToInteractionGraph(pQuad), "Failed to add quad");
+
+				// TODO: Simplify (combine with above)
+				for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+					CR(m_pDreamOS->RegisterEventSubscriber(pQuad, (InteractionEventType)(i), this));
+				}
 			}
 		} break;
 
@@ -150,7 +145,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 		} break;
 	}
 
-//Error:
+Error:
 	return r;
 }
 
