@@ -41,6 +41,7 @@ typedef struct InteractionObjectEvent {
 	ray m_interactionRay;
 	VirtualObj *m_pInteractionObject = nullptr;
 	VirtualObj *m_pObject = nullptr;
+	VirtualObj *m_pEventObject = nullptr;
 	point m_ptContact[4];
 	vector m_vNormal[4];
 	int m_numContacts;

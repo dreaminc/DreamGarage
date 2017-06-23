@@ -398,8 +398,8 @@ Error:
 RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType, ObjectStore *pObjectStore, VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
-	for (auto &pObject : pObjectStore->GetObjects()) {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
+	for (auto &pEventObject : pObjectStore->GetObjects()) {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pEventObject);
 		InteractionObjectEvent interactionEvent;
 		CollisionManifold manifold;
 		bool fIntersect = false;
@@ -422,25 +422,26 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 			
 		if(fIntersect) {
 			InteractionEventType eventType;
-			eventType = UpdateActiveObject(activeObjectType, pInteractionObject, manifold, pObject);
+			eventType = UpdateActiveObject(activeObjectType, pInteractionObject, manifold, pEventObject);
 			
 			if (eventType != InteractionEventType::INTERACTION_EVENT_INVALID) {
 				for (int i = 0; i < manifold.NumContacts(); i++) {
 					interactionEvent.AddPoint(manifold.GetContactPoint(i));
 				}
 
-				VirtualObj *pObj = manifold.GetObjectA();
-				if (pObj == nullptr) {
-					pObj = manifold.GetObjectB();
+				VirtualObj *pObject = manifold.GetObjectA();
+				if (pObject == nullptr) {
+					pObject = manifold.GetObjectB();
 				}
 
 				interactionEvent.m_eventType = eventType;
-				interactionEvent.m_pObject = pObj;
+				interactionEvent.m_pObject = pObject;
+				interactionEvent.m_pEventObject = pEventObject;
 				interactionEvent.m_pInteractionObject = pInteractionObject;
-				interactionEvent.m_activeState = m_activeObjectQueues[activeObjectType].GetActiveObjectState(pObj, pInteractionObject);
+				interactionEvent.m_activeState = m_activeObjectQueues[activeObjectType].GetActiveObjectState(pObject, pInteractionObject);
 
 				// Note this will go to all composite subs
-				CR(NotifySubscribers(pObject, interactionEvent.m_eventType, &interactionEvent));
+				CR(NotifySubscribers(pEventObject, interactionEvent.m_eventType, &interactionEvent));
 			}
 		}
 
@@ -520,6 +521,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 				}
 
 				interactionEvent.m_pObject = pActiveObject->GetObject();
+				interactionEvent.m_pEventObject = pActiveObject->GetEventObject();
 				interactionEvent.AddPoint(pActiveObject->GetIntersectionPoint(), pActiveObject->GetIntersectionNormal());
 				interactionEvent.m_activeState = pActiveObject->GetState();
 
