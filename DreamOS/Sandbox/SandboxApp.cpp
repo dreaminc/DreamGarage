@@ -739,6 +739,14 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	return m_pInteractionEngine->UnregisterSubscriber(pObject, eventType, pInteractionSubscriber);
+}
+
+RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject) {
+	return m_pInteractionEngine->UnregisterSubscriber(pObject);
+}
+
 long SandboxApp::GetTickCount() {
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 }
@@ -801,12 +809,24 @@ Error:
 }
 */
 
+RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pPhysicsGraph->RemoveObject(pObject));
+	CR(m_pSceneGraph->RemoveObject(pObject));
+	CR(m_pInteractionGraph->RemoveObject(pObject));
+
+Error:
+	return r;
+}
+
 // This is the nuclear option - it will flush all objects out
 RESULT SandboxApp::RemoveAllObjects() {
 	RESULT r = R_PASS;
 
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());
+	CR(m_pInteractionGraph->RemoveAllObjects());
 
 Error:
 	return r;

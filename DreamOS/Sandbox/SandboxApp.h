@@ -100,7 +100,10 @@ private:
 
 protected:
 	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
+	
 	RESULT RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+	RESULT UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+	RESULT UnregisterInteractionObject(VirtualObj *pObject);
 
 public:
 	enum class SANDBOX_WINDOW_POSITION {
@@ -169,6 +172,7 @@ public:
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
 	RESULT RemoveAllObjects();
+	RESULT RemoveObject(VirtualObj *pObject);
 
 	RESULT AddObject(VirtualObj *pObject);	
 	FlatContext* AddFlatContext(int width, int height, int channels);

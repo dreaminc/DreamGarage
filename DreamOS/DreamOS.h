@@ -119,6 +119,7 @@ public:
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
+	RESULT RemoveObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();
 
 	light *AddLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection);
@@ -183,6 +184,8 @@ protected:
 	
 public:
 	RESULT RegisterEventSubscriber(VirtualObj* pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+	RESULT UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+	RESULT UnregisterInteractionObject(VirtualObj *pObject);
 
 	// Cloud Controller
 protected:

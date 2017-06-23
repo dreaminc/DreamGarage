@@ -210,6 +210,10 @@ RESULT DreamOS::SetGravityState(bool fEnabled) {
 	return m_pSandbox->SetGravityState(fEnabled);
 }
 
+RESULT DreamOS::RemoveObject(VirtualObj *pObject) {
+	return m_pSandbox->RemoveObject(pObject);
+}
+
 RESULT DreamOS::RemoveAllObjects() {
 	return m_pSandbox->RemoveAllObjects();
 }
@@ -358,6 +362,14 @@ RESULT DreamOS::RegisterEventSubscriber(VirtualObj* pObject, InteractionEventTyp
 
 Error:
 	return r;
+}
+
+RESULT DreamOS::UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	return m_pSandbox->UnregisterInteractionObject(pObject, eventType, pInteractionSubscriber);
+}
+
+RESULT DreamOS::UnregisterInteractionObject(VirtualObj *pObject) {
+	return m_pSandbox->UnregisterInteractionObject(pObject);
 }
 
 RESULT DreamOS::AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {

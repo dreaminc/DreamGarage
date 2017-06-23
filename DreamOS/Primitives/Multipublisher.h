@@ -96,20 +96,20 @@ public:
 	// Error handling warranted by the fact that this should only be called with confidence 
 	// that the subscriber is subscriber to a given event per the subscriber or the Publisher 
 	// releasing all subscriber events for whatever purpose
-	RESULT UnregisterSubscriber(PIndexClass indexEvent, PKeyClass keyEvent, Subscriber<PKEventClass>* pSubscriber) {
+	RESULT UnregisterSubscriber(PIndexClass indexClass, PKeyClass keyClass, Subscriber<PKEventClass>* pSubscriber) {
 		RESULT r = R_PASS;
 
-		auto it = m_indexedEvents.find(keyEvent);
+		auto it = m_indexedEvents.find(keyClass);
 
 		typename std::map<PIndexClass, Subscriber<PKEventClass>*> *pSubscriberMap = nullptr;
 
 		CNM(pSubscriber, "Subscriber cannot be NULL");
-		CBM((it == m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyEvent));
+		CBM((it == m_indexedEvents.end()), "Event %s not registered", GetEventKeyString(keyClass));
 
 		pSubscriberMap = reinterpret_cast<std::map<PIndexClass, Subscriber<PKEventClass>*>*>(it->second);
 
 		if (pSubscriberMap != nullptr) {
-			auto indexedIt = pSubscriberMap->find(indexEvent);
+			auto indexedIt = pSubscriberMap->find(indexClass);
 
 			if (indexedIt != pSubscriberMap->end()) {
 				pSubscriberMap->erase(indexedIt);
@@ -119,10 +119,30 @@ public:
 			// TODO: Don't currently support multiple subscribers to the same object 
 			// If we want this - there needs to be a list of subscribers 
 
-			CBM((0), "Index not found for event %s", GetEventKeyString(keyEvent));
+			CBM((0), "Index not found for event %s", GetEventKeyString(keyClass));
 		}
 
-		CBM((0), "Subscriber not found for event %s", GetEventKeyString(keyEvent));
+		CBM((0), "Subscriber not found for event %s", GetEventKeyString(keyClass));
+
+	Error:
+		return r;
+	}
+
+	// This will simply remove all event subscribers 
+	RESULT UnregisterSubscriber(PIndexClass indexClass) {
+		RESULT r = R_PASS;
+		bool fFound = false;
+
+		for (auto &indexMap : m_indexedEvents) {
+			auto it = indexMap.second->find(indexClass);
+
+			if (it != indexMap.second->end()) {
+				indexMap.second->erase(it);
+				fFound = true;
+			}
+		}
+
+		CBM((fFound), "No subscribers found for index");
 
 	Error:
 		return r;
