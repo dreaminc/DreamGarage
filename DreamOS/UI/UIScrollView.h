@@ -6,6 +6,11 @@
 class UIButton;
 class DreamOS;
 
+enum class MenuState {
+	NONE,
+	SCROLLING
+};
+
 class UIScrollView : public UIView {
 public:
 	UIScrollView(HALImp *pHALImp);
@@ -32,6 +37,7 @@ public:
 	RESULT AnimateScaleShow(void *pContext);
 
 public:
+	MenuState GetState();
 	std::shared_ptr<UIView> GetTitleView();
 
 private:
@@ -59,6 +65,7 @@ private:
 	std::shared_ptr<UIView> m_pTitleView;
 	std::shared_ptr<UIButton> m_pLeftScrollButton; 
 	std::shared_ptr<UIButton> m_pRightScrollButton;
+	MenuState m_menuState;
 
 	std::shared_ptr<UIView> m_pMenuButtonsContainer; // used to clear for now
 	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;

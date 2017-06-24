@@ -19,13 +19,6 @@
 
 #include "Primitives/font.h"
 
-enum class MenuState {
-	HIDE,
-	HIDDEN,
-	VISIBLE,
-	SHOW
-};
-
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
 					//public UIBar, 
 					public MenuController::observer, 

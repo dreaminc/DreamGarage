@@ -167,6 +167,7 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 	RESULT r = R_PASS;
 
 //	auto pSelected = GetCurrentItem();
+	CBR(m_pScrollView->GetState() != MenuState::SCROLLING, R_PASS);
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 
@@ -259,7 +260,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 			pButton->Update(iconFormat, labelFormat);
 
-			CR(pButton->RegisterEvent(UI_SELECT_BEGIN,
+			CR(pButton->RegisterEvent(UI_SELECT_ENDED,
 				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
 			pButtons.emplace_back(pButton);

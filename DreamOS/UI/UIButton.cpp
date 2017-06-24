@@ -40,7 +40,7 @@ Error:
 RESULT UIButton::RegisterToInteractionEngine(DreamOS *pDreamOS) {
 	RESULT r = R_PASS;
 	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(pDreamOS->AddAndRegisterInteractionObject(GetSurface().get(), (InteractionEventType)(i), this));
+		CR(pDreamOS->AddAndRegisterInteractionObject(this, (InteractionEventType)(i), this));
 	}
 Error:
 	return r;

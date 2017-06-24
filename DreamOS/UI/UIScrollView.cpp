@@ -33,7 +33,7 @@ RESULT UIScrollView::Initialize() {
 	m_maxElements = 4;
 	m_objectIndex = 0;
 	m_yRotation = 0.0f;
-	m_yRotationPerElement = (float)M_PI / 9.0f;
+	m_yRotationPerElement = (float)M_PI / 18.0f;
 	m_velocity = 0.0f;
 
 	m_menuDepth = -1.5f;
@@ -170,6 +170,13 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 	RESULT r = R_PASS;
 
 	CN(m_pDreamOS);
+
+	if (m_pMenuButtonsContainer->HasChildren()) {
+		for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
+			CR(m_pDreamOS->RemoveObject(pButton.get()));
+			CR(m_pDreamOS->UnregisterInteractionObject(pButton.get()));
+		}
+	}
 	CR(m_pMenuButtonsContainer->ClearChildren());
 
 	int i = 0;
@@ -247,18 +254,25 @@ Error:
 }
 
 RESULT UIScrollView::StartScrollRight(void *pContext) {
+	m_menuState = MenuState::SCROLLING;
 	m_velocity = 0.01f;
 	return R_PASS;
 }
 
 RESULT UIScrollView::StartScrollLeft(void *pContext) {
+	m_menuState = MenuState::SCROLLING;
 	m_velocity = -0.01f;
 	return R_PASS;
 }
 
 RESULT UIScrollView::StopScroll(void *pContext) {
+	m_menuState = MenuState::NONE;
 	m_velocity = 0.0f;
 	return R_PASS;
+}
+
+MenuState UIScrollView::GetState() {
+	return m_menuState;
 }
 
 std::shared_ptr<UIView> UIScrollView::GetTitleView() {
