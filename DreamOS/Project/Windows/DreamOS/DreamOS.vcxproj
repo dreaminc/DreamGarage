@@ -432,6 +432,7 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Rel
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

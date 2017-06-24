@@ -23,8 +23,23 @@ RESULT Font::InitializeFreetypeLibrary() {
 	RESULT r = R_PASS;
 	FT_Error fte = 0;
 
+	CBM((m_pFT == nullptr), "Freetype already initialized");
+
 	fte = FT_Init_FreeType(&m_pFT);
 	CBM((fte == 0), "ERROR::FREETYPE: Could not init FreeType Library err:0x%x", fte);
+
+Error:
+	return r;
+}
+
+RESULT Font::UninitializeFreetypeLibrary() {
+	RESULT r = R_PASS;
+	FT_Error fte = 0;
+
+	CNM(m_pFT, "Freetype not initialized");
+
+	fte = FT_Done_FreeType(m_pFT);
+	CBM((fte == 0), "ERROR::FREETYPE: Could not uninit FreeType Library err:0x%x", fte);
 
 Error:
 	return r;
@@ -63,7 +78,7 @@ std::shared_ptr<Font> Font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 
 	// Set up the characters
 	CR(pFont->SetFontSize(pFont->GetFontSize()));
-
+	CR(pFont->LoadFreetypeGlyphs());
 
 Error:
 	if (RFAILED() && pFont != nullptr) {
@@ -85,6 +100,33 @@ Font::Font(bool fDistanceMap) :
 	m_fDistanceMap(fDistanceMap)
 {
 	// empty
+}
+
+RESULT Font::LoadFreetypeGlyphs() {
+	RESULT r = R_PASS;
+	FT_Error fte = 0;
+
+	for (FT_Long i = 0; i < m_pFTFace->num_glyphs; i++) {
+		FT_Load_Char(m_pFTFace, i, FT_LOAD_RENDER);
+		CBM((fte == 0), "Font failed to load char %d with error 0x%x", i, fte);
+
+		CharacterGlyph glyph;
+		
+		glyph.value = i;
+		glyph.width = m_pFTFace->glyph->bitmap.width;
+		glyph.height = m_pFTFace->glyph->bitmap.rows;
+		glyph.bearingX = m_pFTFace->glyph->bitmap_left;
+		glyph.bearingY = m_pFTFace->glyph->bitmap_top;
+		glyph.advance = m_pFTFace->glyph->advance.x;
+
+		// TODO: Copy the bitmap buffer?
+
+		// Push into map
+		m_characters[i] = glyph;
+	}
+
+Error:
+	return r;
 }
 
 uint32_t Font::GetFontSize() {
@@ -211,7 +253,7 @@ RESULT Font::LoadFontFromFile(const std::wstring& wstrFontFile) {
 		CharacterGlyph charGlyph(wstrLine);
 
 		if (charGlyph.fValid == true) {
-			m_charMap[charGlyph.asciiValue] = charGlyph;
+			m_characters[charGlyph.value] = charGlyph;
 		}
 	}
 
@@ -241,12 +283,12 @@ uint32_t Font::GetGlyphBase() const {
 }
 
 bool Font::GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret) {
-	if (m_charMap.find(ascii_id) == m_charMap.end()) {
+	if (m_characters.find(ascii_id) == m_characters.end()) {
 		// ascii does not exist in the glyph
 		return false;
 	}
 
-	ret = m_charMap[ascii_id];
+	ret = m_characters[ascii_id];
 
 	return true;
 }

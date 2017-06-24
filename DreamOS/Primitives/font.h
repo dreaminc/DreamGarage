@@ -24,7 +24,7 @@ class Font {
 public:
 
 	struct CharacterGlyph {
-		uint8_t		asciiValue = 0;
+		uint32_t	value = 0;
 		uint32_t	x = 0;
 		uint32_t	y = 0;
 		uint32_t	width = 0;
@@ -41,9 +41,9 @@ public:
 
 		// TODO: Get rid of this when we move to Freefont
 		CharacterGlyph(std::wstring wstrFontFileLine) {
-			asciiValue = GetValue<uint32_t>(wstrFontFileLine, L"char id=");
+			value = GetValue<uint32_t>(wstrFontFileLine, L"char id=");
 
-			if (asciiValue) {
+			if (value) {
 				x = GetValue<uint32_t>(wstrFontFileLine, L"x=");
 				y = GetValue<uint32_t>(wstrFontFileLine, L"y=");
 				width = GetValue<uint32_t>(wstrFontFileLine, L"width=");
@@ -85,7 +85,7 @@ private:
 
 private:
 	std::map<uint32_t, const std::string> m_glyphTexturesMap;
-	std::map<uint8_t, CharacterGlyph> m_charMap;
+	std::map<uint32_t, CharacterGlyph> m_characters;
 
 	std::wstring m_wstrGlyphImageFilename = L"";
 
@@ -123,12 +123,14 @@ private:
 public:
 	RESULT SetFontSize(uint32_t size);
 	uint32_t GetFontSize();
+	RESULT LoadFreetypeGlyphs();
 
 	// Static Freetype Stuff
 private:
 	static FT_Library m_pFT;
 	static bool IsFreetypeInitialized();
 	static RESULT InitializeFreetypeLibrary();
+	static RESULT UninitializeFreetypeLibrary();
 
 public:
 	static std::shared_ptr<Font> MakeFreetypeFont(std::wstring wstrFontFilename, bool fDistanceMapped = true);
