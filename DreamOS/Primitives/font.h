@@ -67,7 +67,7 @@ public:
 
 	// Get a glyph structure from an ASCII.
 	// returns false when the ASCII does not exist for the font.
-	bool GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret);
+	RESULT GetGlyphFromChar(uint8_t ascii_id, CharacterGlyph& r_glyph);
 
 	const std::wstring& GetGlyphImageFile() const;
 	uint32_t GetGlyphWidth() const;

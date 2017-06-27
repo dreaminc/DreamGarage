@@ -58,7 +58,8 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		labelFormat.fontSize,
 		true // force distance fields
 	);
-	pText->SetPosition(labelFormat.ptPosition, text::AlignmentType::CENTER);
+
+	pText->SetPosition(labelFormat.ptPosition);
 
 	m_strName = labelFormat.strLabel;
 

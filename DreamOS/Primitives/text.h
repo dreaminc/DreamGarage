@@ -17,6 +17,21 @@ class Font;
 
 class text : public DimObj {
 public:
+	enum class VerticalAlignment {
+		TOP,
+		MIDDLE,
+		BOTTOM,
+		INVALID
+	};
+
+	enum class HorizontalAlignment {
+		LEFT,
+		CENTER,
+		RIGHT,
+		INVALID
+	};
+
+public:
 
 	RESULT Allocate() {
 		RESULT r = R_PASS;
@@ -41,42 +56,29 @@ private:
 	unsigned int m_nIndices;
 
 public:
-
-	// TODO: Make into two (valign vs halign)
-	enum AlignmentType {
-		TOP_LEFT,
-		TOP_RIGHT,
-		CENTER,
-		BOTTOM_LEFT,
-		BOTTOM_RIGHT,
-		RIGHT,
-		LEFT,
-	};
-
-
-	text(std::shared_ptr<Font> font, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
+	text(std::shared_ptr<Font> pFont, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
 
 	RESULT SetText(const std::string& strText, double size, bool* fChanged = nullptr);
 	
-	VirtualObj* SetPosition(point pt, AlignmentType alignType = CENTER);
+	VirtualObj* SetPosition(point pt, VerticalAlignment vAlign = VerticalAlignment::MIDDLE, HorizontalAlignment hAlign = HorizontalAlignment::CENTER);
 
-	std::shared_ptr<Font> GetFont() { return m_font; }
 	std::string& GetText();
+	std::shared_ptr<Font> GetFont();
+	float GetWidth();
+	float GetHeight();
 
-	float GetWidth() {
-		return m_width;
-	}
-
-	float GetHeight() {
-		return m_height;
-	}
+public:
+	//static text& MakeText()
 
 private:
 	float m_width = 0.0f;
 	float m_height = 0.0f;
 
+	VerticalAlignment m_vAlign = VerticalAlignment::TOP;
+	HorizontalAlignment m_hAlign = HorizontalAlignment::CENTER;
+
 	// Font to be used for the text
-	std::shared_ptr<Font> m_font;
+	std::shared_ptr<Font> m_pFont = nullptr;
 
 	// String of the text
 	std::string	m_strText = "";

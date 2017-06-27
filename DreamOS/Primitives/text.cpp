@@ -6,7 +6,7 @@
 #include "font.h"
 
 text::text(std::shared_ptr<Font> font, const std::string& strText, double size, bool fBillboard) :
-	m_font(font)
+	m_pFont(font)
 {
 	RESULT r = R_PASS;
 
@@ -20,53 +20,64 @@ Error:
 	return;
 }
 
-VirtualObj* text::SetPosition(point pt, AlignmentType alignType) {
-	uv_precision dx = 0.0f;
-	uv_precision dy = 0.0f;
+VirtualObj* text::SetPosition(point pt, VerticalAlignment vAlign, HorizontalAlignment hAlign) {
+	uv_precision xOffset = 0.0f;
+	uv_precision yOffset = 0.0f;
 	
-	switch (alignType) {
-	case CENTER: {
-		// nothing
-	} break;
+	m_vAlign = vAlign;
+	m_hAlign = hAlign;
 
-	case RIGHT: {
-		dx = m_width / 2;
-	} break;
+	// TODO: Change this to use DimObj pivot
+	switch (m_hAlign) {
+		case HorizontalAlignment::LEFT: {
+			xOffset = -m_width / 2;
+		} break;
 
-	case LEFT: {
-		dx = -m_width / 2;
-	} break;
+		case HorizontalAlignment::CENTER: {
+			// nothing
+		} break;
 
-	case BOTTOM_LEFT: {
-		dx = -m_width / 2;
-		dy = -m_height / 2;
-	} break;
-
-	case BOTTOM_RIGHT: {
-		dx = m_width / 2;
-		dy = -m_height / 2;
-	} break;
-
-	case TOP_LEFT: {
-		dx = -m_width / 2;
-		dy = m_height / 2;
-	} break;
-
-	case TOP_RIGHT: {
-		dx = m_width / 2;
-		dy = m_height / 2;
-	} break;
+		case HorizontalAlignment::RIGHT: {
+			xOffset = m_width / 2;
+		} break;
 	}
 
-	return this->MoveTo(pt.x() + dx, pt.y() + dy, pt.z());
+	switch (m_vAlign) {
+		case VerticalAlignment::TOP: {
+			yOffset = m_height / 2;
+		} break;
+
+		case VerticalAlignment::MIDDLE: {
+			// nothing
+		} break;
+
+		case VerticalAlignment::BOTTOM: {
+			yOffset = -m_height / 2;
+		} break;
+	}
+
+	return this->MoveTo(pt.x() + xOffset, pt.y() + yOffset, pt.z());
 }
 
 std::string& text::GetText() {
 	return m_strText;
 }
 
+std::shared_ptr<Font> text::GetFont() { 
+	return m_pFont; 
+}
+
+float text::GetWidth() {
+	return m_width;
+}
+
+float text::GetHeight() {
+	return m_height;
+}
+
 RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 	RESULT r = R_PASS;
+
 	std::vector<quad> quads;
 	point ptCenter;
 
@@ -78,13 +89,12 @@ RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 
 		return R_SUCCESS;
 	}
-
-	if (fChanged) {
+	else  if (fChanged) {
 		*fChanged = true;
 	}
 
 	if (m_strText.length() != strText.length()) {
-		// text length was changed, we need to re-allocate buffers
+		// Text length was changed, we need to re-allocate buffers
 		Destroy();
 
 		m_nVertices = 4 * static_cast<unsigned int>(strText.length());
@@ -104,9 +114,9 @@ RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 	const int screenWidth = static_cast<int>(1920 * size);
 	const int screenHeight = static_cast<int>(1080 * size);
 
-	uv_precision glyphWidth = static_cast<float>(m_font->GetGlyphWidth());
-	uv_precision glyphHeight = static_cast<float>(m_font->GetGlyphHeight());
-	uv_precision glyphBase = static_cast<float>(m_font->GetGlyphBase());
+	uv_precision glyphWidth = static_cast<float>(m_pFont->GetGlyphWidth());
+	uv_precision glyphHeight = static_cast<float>(m_pFont->GetGlyphHeight());
+	uv_precision glyphBase = static_cast<float>(m_pFont->GetGlyphBase());
 
 	#define XSCALE_TO_SCREEN(x)	2.0f * (x) / screenWidth
 	#define YSCALE_TO_SCREEN(y)	2.0f * (y) / screenHeight
@@ -126,7 +136,7 @@ RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 	for_each(strText.begin(), strText.end(), [&](char c) {
 		Font::CharacterGlyph glyph;
 
-		if (m_font->GetGlyphFromChr(c, glyph)) {
+		if (m_pFont->GetGlyphFromChar(c, glyph)) {
 			uv_precision x = glyph.x / glyphWidth;
 			uv_precision y = (glyphHeight - glyph.y) / glyphHeight;
 			uv_precision w = glyph.width / glyphWidth;

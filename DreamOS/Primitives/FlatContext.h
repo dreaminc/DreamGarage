@@ -21,7 +21,7 @@ public:
 	void SetFramebuffer(framebuffer* pFramebuffer) { m_pFramebuffer = pFramebuffer; }
 
 private:
-	framebuffer* m_pFramebuffer;
+	framebuffer* m_pFramebuffer = nullptr;
 };
 
 #endif	// ! FLAT_CONTEXT_H_

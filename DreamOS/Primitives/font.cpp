@@ -282,15 +282,17 @@ uint32_t Font::GetGlyphBase() const {
 	return m_glyphBase;
 }
 
-bool Font::GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret) {
-	if (m_characters.find(ascii_id) == m_characters.end()) {
-		// ascii does not exist in the glyph
-		return false;
-	}
+RESULT Font::GetGlyphFromChar(uint8_t ascii_id, CharacterGlyph& r_glyph) {
+	RESULT r = R_PASS;
 
-	ret = m_characters[ascii_id];
+	auto it = m_characters.find(ascii_id); 
+	CB((it != m_characters.end()));				// Ascii does not exist in the glyph
+		
+	// Retrieve the glyph from the font
+	r_glyph = (*it).second;
 
-	return true;
+Error:
+	return r;
 }
 
 bool Font::HasDistanceMap() {

@@ -226,7 +226,9 @@ RESULT UITestSuite::AddTestFont() {
 
 		// Fix this
 		{
-			/*
+
+			// OLD
+			///*
 			auto pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
 			std::wstring strFile = L"Fonts/" + pFont->GetGlyphImageFile();
 			const wchar_t* pszFile = strFile.c_str();
@@ -235,9 +237,13 @@ RESULT UITestSuite::AddTestFont() {
 
 			auto pText = m_pDreamOS->AddText(pFont, "test");
 			pText->SetPosition(point(0.0f, -1.0f, 0.0f));
-			*/
+			//*/
+			
+			// NEW
+			/*
 			auto pFont = Font::MakeFreetypeFont(L"arial.ttf", true);
 			CN(pFont);
+			*/
 		}
 
 	Error:
@@ -489,8 +495,8 @@ RESULT UITestSuite::SetupPipeline() {
 	CR(pHAL->MakeCurrentContext());
 	
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
