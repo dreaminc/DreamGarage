@@ -113,10 +113,10 @@ bool DimObj::IsVisible() {
 	return m_fVisible;
 }
 
-RESULT DimObj::SetVisible(bool fVisible) { 
+RESULT DimObj::SetVisible(bool fVisible, bool fSetChildren) { 
 	m_fVisible = fVisible;
 
-	if (HasChildren()) {
+	if (fSetChildren && HasChildren()) {
 		for (auto& child : GetChildren()) {
 			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(child);
 			if (pDimObj) {

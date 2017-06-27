@@ -1,12 +1,19 @@
 #include "DreamUIBar.h"
 #include "DreamOS.h"
 
+#include "Cloud/Menu/MenuController.h"
 #include "Cloud/Menu/MenuNode.h"
+#include "Cloud/Environment/EnvironmentController.h"
+
 #include "InteractionEngine/AnimationItem.h"
 
 #include "UI/UIKeyboard.h"
 #include "UI/UIButton.h"
 #include "UI/UIMenuItem.h"
+#include "UI/UIScrollView.h"
+#include "UI/UIMallet.h"
+
+#include "Primitives/font.h"
 
 #include <vector>
 
@@ -81,21 +88,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	pDreamOS->AddAndRegisterInteractionObject(m_pView.get(), InteractionEventType::INTERACTION_EVENT_MENU, m_pView.get());
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
-	
-/*
-	CR(RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_BEGAN,
-		std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1)));
-
-	CR(RegisterEvent(InteractionEventType::ELEMENT_INTERSECT_ENDED,
-		std::bind(&DreamUIBar::HandleTouchEnd, this, std::placeholders::_1)));
-
-	CR(RegisterEvent(InteractionEventType::INTERACTION_EVENT_SELECT_UP,
-		std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
-
-	CR(RegisterEvent(InteractionEventType::INTERACTION_EVENT_MENU,
-		std::bind(&DreamUIBar::HandleMenuUp, this, std::placeholders::_1)));
-	//*/
-
 
 	m_pCloudController = pDreamOS->GetCloudController();
 
@@ -133,16 +125,20 @@ RESULT DreamUIBar::HandleTouchEnd(void* pContext) {
 RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	RESULT r = R_PASS;
 
+	auto pItemsView = m_pScrollView->GetMenuItemsView();
+
 	auto pKeyboard = GetDOS()->GetKeyboard();
 	CN(pKeyboard);
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
 
+
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
-		GetComposite()->SetVisible(!GetComposite()->IsVisible());
-		//move to anim
+
+		GetComposite()->SetVisible(!GetComposite()->IsVisible(), false);
+
 		UpdateCompositeWithCameraLook(0.0f, -1.0f);
 	}
 	else {
@@ -155,7 +151,8 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			HideMenu();
 		}
 		else {
-			GetComposite()->SetVisible(!GetComposite()->IsVisible());
+			GetComposite()->SetVisible(!GetComposite()->IsVisible(), false);
+
 			UpdateCompositeWithCameraLook(0.0f, -1.0f);
 		}
 	}
@@ -266,22 +263,9 @@ RESULT DreamUIBar::Update(void *pContext) {
 			pButtons.emplace_back(pButton);
 		}
 
-		m_pScrollView->UpdateMenuButtons(pButtons);
-	/**
-		for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
-			info.labels.emplace_back(pSubMenuNode->GetTitle());
-			info.icons.emplace_back(m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())]);
-		}
+		CR(m_pScrollView->UpdateMenuButtons(pButtons));
 
-		titleInfo.labels = { m_pMenuNode->GetTitle() };
-		titleInfo.icons = { m_images[MenuNode::MimeType::FOLDER] };
-//*/
-		//TODO: There are several RenderToTexture calls and object creates
-		// that cause a brief timing delay
-
-		//CR(SetUpdateParams(info, titleInfo));
 		CR(ShowMenu(std::bind(&DreamUIBar::UpdateMenu, this, std::placeholders::_1), nullptr));
-		//CR(ShowMenu(nullptr, nullptr));
 	}
 
 Error:

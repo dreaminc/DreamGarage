@@ -3,27 +3,30 @@
 
 #include "DreamApp.h"
 
-//#include "UI/UIBar.h"
-#include "UI/UIScrollView.h"
-#include "UI/UIMallet.h"
-//#include "UI/UIEvent.h"
+#include "UI/UIEvent.h"
+#include "InteractionEngine/InteractionObjectEvent.h"
 
-#include "Primitives/composite.h"
+#include "Cloud/Menu/MenuController.h"
+#include "Cloud/Menu/MenuNode.h"
+
+#include "Primitives/Subscriber.h"
 
 #include <functional>
 #include <stack>
 
-#include "Cloud/Menu/MenuController.h"
-#include "Cloud/Menu/MenuNode.h"
-#include "Cloud/Environment/EnvironmentController.h"
+class UIScrollView;
+class UIMallet;
+class UIView;
 
-#include "Primitives/font.h"
+class CloudController;
+class EnvironmentControllerProxy;
+
+class Font;
+class texture;
 
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
-					//public UIBar, 
 					public MenuController::observer, 
 					public Subscriber<UIEvent>
-					//public Subscriber<InteractionObjectEvent> 
 {
 
 	friend class DreamAppManager;

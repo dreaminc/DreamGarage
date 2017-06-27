@@ -551,19 +551,7 @@
     <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIBar.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\UI\UIMenuItem.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIModule.cpp">
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
@@ -804,9 +792,6 @@
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UI\UIEvent.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIContainer.cpp">
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UI\UIButton.cpp">
@@ -1457,19 +1442,7 @@
     <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h">
       <Filter>InteractionEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIBar.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\UI\UIMenuItem.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuLayer.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIModule.h">
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UITestSuite.h">
@@ -1689,9 +1662,6 @@
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIEvent.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIContainer.h">
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIButton.h">

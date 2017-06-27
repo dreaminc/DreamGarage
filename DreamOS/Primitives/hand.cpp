@@ -1,6 +1,7 @@
 #include "hand.h"
 #include "Sense/SenseLeapMotionHand.h"
 #include "DreamConsole/DreamConsole.h"
+#include "Primitives/sphere.h"
 
 
 thumb::thumb(HALImp* pHALImp) :

@@ -33,12 +33,10 @@ public:
 	RESULT StartScrollRight(void *pContext);
 	RESULT StopScroll(void *pContext);
 
-	RESULT AnimateScaleDismiss(void *pContext);
-	RESULT AnimateScaleShow(void *pContext);
-
 public:
 	MenuState GetState();
 	std::shared_ptr<UIView> GetTitleView();
+	std::shared_ptr<UIView> GetMenuItemsView();
 
 private:
 	// button positioning

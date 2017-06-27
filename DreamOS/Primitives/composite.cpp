@@ -8,6 +8,11 @@
 #include "Primitives/camera.h"
 #include "Primitives/stereocamera.h"
 
+#include "Primitives/sphere.h"
+#include "Primitives/volume.h"
+#include "Primitives/DimRay.h"
+#include "quad.h"
+
 #include "UI/UIView.h"
 
 composite::composite(HALImp *pHALImp) :

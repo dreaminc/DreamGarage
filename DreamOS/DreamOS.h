@@ -78,7 +78,6 @@ protected:
 
 	// TODO: This is here temporarily, should be replaced by proper sandbox 
 	// related functionality
-public:
 	HALImp* GetHALImp();
 
 

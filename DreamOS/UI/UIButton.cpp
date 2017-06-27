@@ -28,7 +28,6 @@ RESULT UIButton::Initialize() {
 
 	m_pContextComposite = AddComposite();
 	m_pSurface = AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector::kVector());
-//	m_pSurface = m_pContextComposite->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector());
 
 	CN(m_pSurface);
 	CR(InitializeOBB());

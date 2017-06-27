@@ -34,7 +34,6 @@ RESULT AnimationQueue::Update(double sNow) {
 				}
 				pQueue.pop_front();
 				break;
-//				continue;
 			}
 		} while ((*pItem)->GetFlags().fNoBlock && ++pItem != pQueue.end());
 

@@ -1,4 +1,5 @@
 #include "user.h"
+#include "Primitives/quad.h"
 
 user::user(HALImp* pHALImp) :
 	composite(pHALImp)

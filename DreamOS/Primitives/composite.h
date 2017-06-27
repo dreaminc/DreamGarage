@@ -14,10 +14,10 @@
 
 class HALImp;
 
-#include "Primitives/sphere.h"
-#include "Primitives/volume.h"
-#include "Primitives/DimRay.h"
-#include "quad.h"
+class sphere;
+class volume;
+class DimRay;
+class quad;
 
 class hand;
 class camera;

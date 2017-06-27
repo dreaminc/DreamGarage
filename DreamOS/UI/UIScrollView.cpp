@@ -33,18 +33,14 @@ RESULT UIScrollView::Initialize() {
 	m_maxElements = 4;
 	m_objectIndex = 0;
 	m_yRotation = 0.0f;
-	m_yRotationPerElement = (float)M_PI / 18.0f;
 	m_velocity = 0.0f;
 
 	m_menuDepth = -1.5f;
-	//m_menuDepth = -3.5f;
 	m_itemAngleX = -30.0f;
 	m_itemAngleY = 10.0f;
 	m_itemStartAngleY = -15.0f;
-	//m_itemHeight = -0.5f;
 	m_itemHeight = 0.75f;
 	m_itemScale = 0.25f;
-	//m_itemScale = 1.0f;
 	m_itemScaleSelected = 1.25f;
 
 	m_titleAngleX = 75.0f;
@@ -105,9 +101,12 @@ RESULT UIScrollView::Update() {
 	std::vector<std::shared_ptr<VirtualObj>> pChildren;
 	CBR(m_pMenuButtonsContainer->HasChildren(), R_PASS);
 
+	float yRotationPerElement =  (float)M_PI / (180.0f / m_itemAngleY);
+	//float yRotationPerElement = m_itemAngleY * M_PI / 180.0f;
+
 	pChildren = m_pMenuButtonsContainer->GetChildren();
 	if (pChildren.size() > m_maxElements) {
-		float maxRotation = (pChildren.size() - m_maxElements) * m_yRotationPerElement;
+		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;
 
 		m_yRotation = std::max(0.0f, std::min(m_yRotation + m_velocity, maxRotation));
 
@@ -117,8 +116,8 @@ RESULT UIScrollView::Update() {
 
 		m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
 
-		float diff = m_yRotation - (m_objectIndex * m_yRotationPerElement);
-		if (diff >= m_yRotationPerElement && m_objectIndex + m_maxElements < pChildren.size()) {
+		float diff = m_yRotation - (m_objectIndex * yRotationPerElement);
+		if (diff >= yRotationPerElement && m_objectIndex + m_maxElements < pChildren.size()) {
 
 			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex].get());
 			pButton->SetVisible(false);
@@ -171,6 +170,12 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 	CN(m_pDreamOS);
 
+	m_objectIndex = 0;
+	m_yRotation = 0.0f;
+	m_velocity = 0.0f;
+	//m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
+	m_pMenuButtonsContainer->ResetRotation();
+
 	if (m_pMenuButtonsContainer->HasChildren()) {
 		for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
 			CR(m_pDreamOS->RemoveObject(pButton.get()));
@@ -184,12 +189,6 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
-		/*
-		CR(pButton->RegisterEvent(UI_SELECT_BEGIN,
-			std::bind(&UIScrollView::AnimateScaleUp, this, std::placeholders::_1)));
-		CR(pButton->RegisterEvent(UI_SELECT_ENDED,
-			std::bind(&UIScrollView::AnimateScaleReset, this, std::placeholders::_1)));
-			//*/
 
 		PositionMenuButton(i, pButton);
 		m_pMenuButtonsContainer->AddObject(pButton);
@@ -204,10 +203,10 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 	if (m_pMenuButtonsContainer->GetChildren().size() > m_maxElements) {
 		m_pRightScrollButton->SetVisible(true);
 	}
-
-	m_objectIndex = 0;
-	m_yRotation = 0.0f;
-	m_velocity = 0.0f;
+	else {
+		m_pRightScrollButton->SetVisible(false);
+	}
+	m_pLeftScrollButton->SetVisible(false);
 
 Error:
 	return r;
@@ -277,4 +276,8 @@ MenuState UIScrollView::GetState() {
 
 std::shared_ptr<UIView> UIScrollView::GetTitleView() {
 	return m_pTitleView;
+}
+
+std::shared_ptr<UIView> UIScrollView::GetMenuItemsView() {
+	return m_pMenuButtonsContainer;
 }
