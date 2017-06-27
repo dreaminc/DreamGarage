@@ -5,6 +5,10 @@
 #include "Primitives/composite.h"
 #include "Primitives/sphere.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/SourceNode.h"
+
 AnimationTestSuite::AnimationTestSuite(DreamOS *pDreamOS) {
 	// empty
 	m_pDreamOS = pDreamOS;
@@ -16,6 +20,7 @@ AnimationTestSuite::~AnimationTestSuite() {
 
 RESULT AnimationTestSuite::AddTests() {
 	RESULT r = R_PASS;
+	CR(AddTestColor());
 	CR(AddTestRotate());
 	CR(AddTestCurves());
 	CR(AddTestAnimationBasic());
@@ -37,6 +42,8 @@ Error:
 
 RESULT AnimationTestSuite::InitializeAnimationTest(void *pContext) {
 	RESULT r = R_PASS;
+
+	CR(SetupPipeline());
 
 	AnimationTestContext *pTestContext = reinterpret_cast<AnimationTestContext*>(pContext);
 
@@ -69,6 +76,8 @@ RESULT AnimationTestSuite::AddTestCurves() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
+
+		CR(SetupPipeline());
 
 		sphere *m_pSphere1 = nullptr;
 		sphere *m_pSphere2 = nullptr;
@@ -124,6 +133,8 @@ RESULT AnimationTestSuite::AddTestCurves() {
 			AnimationCurveType::EASE_OUT_BACK,
 			AnimationFlags()
 		);
+
+	Error:
 		return r;
 	};
 
@@ -156,6 +167,7 @@ RESULT AnimationTestSuite::AddTestRotate() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
+		CR(SetupPipeline());
 		sphere *m_pSphere1 = nullptr;
 
 		m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
@@ -176,6 +188,7 @@ RESULT AnimationTestSuite::AddTestRotate() {
 			AnimationFlags()
 		);
 
+	Error:
 		return r;
 	};
 
@@ -200,6 +213,50 @@ RESULT AnimationTestSuite::AddTestRotate() {
 Error:
 	return r;
 }
+
+RESULT AnimationTestSuite::AddTestColor() {
+
+	RESULT r = R_PASS;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(SetupPipeline());
+
+		sphere *m_pSphere1 = nullptr;
+
+		m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
+		m_pSphere1->MoveTo(0.0f, 0.0f, 0.0f);
+		quaternion q;
+		q.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
+		m_pSphere1->SetOrientation(q);
+
+	Error:
+		return r;
+	};
+
+	auto fnTest = [&](void* pContext) {
+		return R_PASS;
+	};
+
+	auto fnUpdate = fnTest;
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, nullptr);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Animation Test");
+	pNewTest->SetTestDescription("Event handling test");
+	pNewTest->SetTestDuration(5.0);
+	pNewTest->SetTestRepeats(1);
+Error:
+	return r;
+}
+
 
 RESULT AnimationTestSuite::AddTestAnimationBasic() {
 
@@ -336,4 +393,45 @@ RESULT AnimationTestSuite::Notify(InteractionObjectEvent *event) {
 
 RESULT AnimationTestSuite::Notify(SenseKeyboardEvent *kbEvent) {
 	return R_PASS;
+}
+
+RESULT AnimationTestSuite::SetupPipeline() {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
 }

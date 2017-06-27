@@ -184,12 +184,20 @@ Error:
 RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 	RESULT r = R_PASS;
 
-	#define SET_TEXTURE(type, texture) case DimObj::MaterialTexture::type: texture = pTexture; break
-
 	switch (type) {
-		SET_TEXTURE(Ambient, m_pTextureAmbient);
-		SET_TEXTURE(Diffuse, m_pTextureDiffuse);
-		SET_TEXTURE(Specular, m_pTextureSpecular);
+
+	case DimObj::MaterialTexture::Ambient: {
+		m_pTextureAmbient = pTexture;
+	} break;
+
+	case DimObj::MaterialTexture::Diffuse: {
+		m_pTextureDiffuse = pTexture; 
+	} break;
+
+	case DimObj::MaterialTexture::Specular: {
+		m_pTextureSpecular = pTexture;
+	} break;
+
 	}
 
 	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -732,9 +740,14 @@ RESULT DimObj::Notify(TimeEvent *event) {
 	return R_PASS;
 }
 
-// TODO: This shoudln't be baked in here ultimately
+// TODO: This shouldn't be baked in here ultimately
 material* DimObj::GetMaterial() {
 	return (&m_material);
+}
+
+RESULT DimObj::SetMaterial(material mMaterial) {
+	m_material = mMaterial;
+	return R_PASS;
 }
 
 matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {

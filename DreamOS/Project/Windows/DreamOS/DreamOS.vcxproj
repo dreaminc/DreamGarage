@@ -753,6 +753,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\font.cpp" />
     <ClCompile Include="..\..\..\Primitives\hand.cpp" />
     <ClCompile Include="..\..\..\Primitives\line.cpp" />
+    <ClCompile Include="..\..\..\Primitives\material.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\matrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ProjectionMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />

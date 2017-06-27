@@ -372,7 +372,7 @@ composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& ws
 		if (m.first.map_Ks.compare("") != 0)
 			pModel->SetMaterialTexture(DimObj::MaterialTexture::Specular, GetTexture(m.first.map_Ks));
 
-		pModel->GetMaterial()->Set(m.first.Ka, m.first.Kd, m.first.Ks);
+		pModel->GetMaterial()->SetColors(m.first.Ka, m.first.Kd, m.first.Ks);
 		pModel->SetColor(color(COLOR_WHITE));
 
 		pModel->Scale(scale);
