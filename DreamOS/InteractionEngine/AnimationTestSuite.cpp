@@ -226,11 +226,17 @@ RESULT AnimationTestSuite::AddTestColor() {
 
 		sphere *m_pSphere1 = nullptr;
 
+		volume *m_volume = m_pDreamOS->AddVolume(2.0f);
+		m_volume->SetMaterialAmbient(0.75);
+		m_volume->GetMaterial()->SetColors(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
+		m_volume->MoveTo(0.0f, 0.0f, -1.0f);
+
 		m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
 		m_pSphere1->MoveTo(0.0f, 0.0f, 0.0f);
 		m_pSphere1->SetMaterialAmbient(0.75);
 		m_pSphere1->GetMaterial()->SetColors(COLOR_GREEN, COLOR_GREEN, COLOR_GREEN);
-		//m_pSphere1->SetColor(COLOR_GREEN);
+
+
 		quaternion q;
 		q.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
 		m_pSphere1->SetOrientation(q);
@@ -238,7 +244,7 @@ RESULT AnimationTestSuite::AddTestColor() {
 		m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 			m_pSphere1,
 			cColor,
-			3.0,
+			5.0,
 			AnimationCurveType::LINEAR,
 			AnimationFlags());
 
@@ -262,7 +268,7 @@ RESULT AnimationTestSuite::AddTestColor() {
 
 	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
-	pNewTest->SetTestDuration(5.0);
+	pNewTest->SetTestDuration(10.0);
 	pNewTest->SetTestRepeats(1);
 Error:
 	return r;
@@ -322,7 +328,7 @@ RESULT AnimationTestSuite::AddTestAnimationBasic() {
 
 	pNewTest->SetTestName("Animation Test");
 	pNewTest->SetTestDescription("Event handling test");
-	pNewTest->SetTestDuration(5.0);
+	pNewTest->SetTestDuration(10.0);
 	pNewTest->SetTestRepeats(1);
 Error:
 	return r;
@@ -459,20 +465,13 @@ RESULT AnimationTestSuite::SetupProductionPipeline() {
 
 	//CR(pHAL->MakeCurrentContext());
 
-//	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+//	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	// Reference Geometry Shader Program
-	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-	CN(pReferenceGeometryProgram);
-	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
+	/*
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
@@ -480,21 +479,14 @@ RESULT AnimationTestSuite::SetupProductionPipeline() {
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
 	// Connect output as pass-thru to internal blend program
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
-	// Debug Console
-	ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
-	CN(pDreamConsoleProgram);
-	CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-	// Connect output as pass-thru to internal blend program
 	CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	//*/
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 	
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 	// Connect Program to Display
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));

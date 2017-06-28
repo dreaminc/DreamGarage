@@ -26,6 +26,8 @@ RESULT OGLProgramMinimal::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 
+	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
+
 	//InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	//InitializeFrameBufferWithDepth(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
 	//InitializeDepthFrameBuffer(m_pOGLFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT);
@@ -87,9 +89,12 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	UseProgram();
 
 	glEnable(GL_DEPTH_TEST);
+	//glDisable(GL_DEPTH_TEST);
 
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);
+
+	glEnable(GL_BLEND);
 
 	SetLights(pLights);
 
@@ -115,6 +120,18 @@ RESULT OGLProgramMinimal::SetObjectUniforms(DimObj *pDimObj) {
 	}
 
 	return R_PASS;
+}
+
+RESULT OGLProgramMinimal::SetMaterial(material *pMaterial) {
+	RESULT r = R_PASS;
+
+	if (m_pMaterialsBlock != nullptr) {
+		CR(m_pMaterialsBlock->SetMaterial(pMaterial));
+		CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
+	}
+
+Error:
+	return r;
 }
 
 RESULT OGLProgramMinimal::SetCameraUniforms(camera *pCamera) {

@@ -7,8 +7,6 @@
 
 #include "OpenGLShader.h"
 
-#include "Primitives/material.h"
-
 class OGLProgram;	// Declare OpenGLImp class
 class OGLTexture;
 class OGLObj;
