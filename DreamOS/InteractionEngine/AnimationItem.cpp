@@ -54,7 +54,7 @@ RESULT AnimationItem::Update(DimObj *pObj, AnimationState& state, double msNow) 
 			m_startState.ptPosition = pObj->GetPosition();
 			m_startState.qRotation = pObj->GetOrientation();
 			m_startState.vScale = pObj->GetScale();
-			m_startState.cColor = pObj->GetColor();
+			m_startState.cColor = pObj->GetMaterial()->GetDiffuseColor();
 		}
 		m_startTime = msNow;
 	}

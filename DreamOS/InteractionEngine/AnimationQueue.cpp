@@ -60,6 +60,7 @@ RESULT AnimationQueue::PushAnimationItem(
 	startState.ptPosition = pObj->GetOrigin();
 	startState.qRotation = pObj->GetOrientation();
 	startState.vScale = pObj->GetScale();
+	startState.cColor = pObj->GetMaterial()->GetDiffuseColor();
 
 	std::shared_ptr<AnimationItem> pItem = std::make_shared<AnimationItem>(startState, endState, startTime, duration);
 

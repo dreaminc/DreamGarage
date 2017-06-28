@@ -19,6 +19,7 @@ public:
 	RESULT SetColors(color colorAmbient, color colorDiffuse, color colorSpecular);
 	RESULT SetDiffuseColor(color colorDiffuse);
 	RESULT SetAmbientIntensity(float ambient);
+	color GetDiffuseColor();
 
 private:
 	float m_shine;				// specular

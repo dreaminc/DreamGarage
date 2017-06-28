@@ -221,15 +221,26 @@ RESULT AnimationTestSuite::AddTestColor() {
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(SetupPipeline());
+		auto cColor = color(0.0f, 0.0f, 1.0f, 0.0f);
+		CR(SetupProductionPipeline());
 
 		sphere *m_pSphere1 = nullptr;
 
 		m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
 		m_pSphere1->MoveTo(0.0f, 0.0f, 0.0f);
+		m_pSphere1->SetMaterialAmbient(0.75);
+		m_pSphere1->GetMaterial()->SetColors(COLOR_GREEN, COLOR_GREEN, COLOR_GREEN);
+		//m_pSphere1->SetColor(COLOR_GREEN);
 		quaternion q;
 		q.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
 		m_pSphere1->SetOrientation(q);
+
+		m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+			m_pSphere1,
+			cColor,
+			3.0,
+			AnimationCurveType::LINEAR,
+			AnimationFlags());
 
 	Error:
 		return r;
@@ -431,6 +442,64 @@ RESULT AnimationTestSuite::SetupPipeline() {
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 	CR(pHAL->ReleaseCurrentContext());
+
+Error:
+	return r;
+}
+
+RESULT AnimationTestSuite::SetupProductionPipeline() {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	//CR(pHAL->MakeCurrentContext());
+
+//	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Connect output as pass-thru to internal blend program
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	// Debug Console
+	ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
+	CN(pDreamConsoleProgram);
+	CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Connect output as pass-thru to internal blend program
+	CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+	// Screen Quad Shader (opt - we could replace this if we need to)
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+
+	// Connect Program to Display
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	//CR(pHAL->ReleaseCurrentContext());
 
 Error:
 	return r;

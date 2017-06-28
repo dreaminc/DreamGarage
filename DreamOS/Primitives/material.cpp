@@ -55,3 +55,7 @@ RESULT material::SetAmbientIntensity(float ambient) {
 	m_ambient = ambient;
 	return R_PASS;
 }
+
+color material::GetDiffuseColor() {
+	return m_colorDiffuse;
+}

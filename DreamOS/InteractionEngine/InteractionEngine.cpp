@@ -207,6 +207,9 @@ RESULT InteractionEngine::PushAnimationItem(DimObj *pObj,
 	RESULT r = R_PASS;
 
 	AnimationState endState;
+	endState.ptPosition = pObj->GetPosition();
+	endState.qRotation = pObj->GetOrientation();
+	endState.vScale = pObj->GetScale();
 	endState.cColor = cColor;
 
 	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();

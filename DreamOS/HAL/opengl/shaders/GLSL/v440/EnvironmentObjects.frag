@@ -170,6 +170,8 @@ void main(void) {
 	// max() is component-wise, and some alpha values currently default to one
 	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.w);
 
+//	out_vec4Color = material.m_colorDiffuse;
+	//out_vec4Color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
 	// opaque/fully transparent blending without reordering
-	EnableBlending(colorAmbient.a, colorDiffuse.a);
+	//EnableBlending(colorAmbient.a, colorDiffuse.a);
 }

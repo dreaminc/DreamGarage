@@ -15,8 +15,10 @@ RESULT AnimationState::Compose(AnimationState state) {
 DimObj* AnimationState::Apply(DimObj* pObj) {
 
 //	pObj->SetColor(cColor);
-	//currently setting diffuse color through the material
-	pObj->GetMaterial()->SetDiffuseColor(cColor);
+	//TODO: currently setting diffuse color through the material
+	// will need an overhaul with the shaders
+	//pObj->GetMaterial()->SetDiffuseColor(cColor);
+	pObj->GetMaterial()->SetColors(cColor, cColor, cColor);
 	pObj->MoveTo(ptPosition)->SetScale(vScale)->SetOrientation(qRotation);
 	return pObj;
 }
