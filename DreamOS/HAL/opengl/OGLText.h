@@ -13,7 +13,7 @@
 #include "Primitives/text.h"
 #include "OGLTexture.h"
 
-class Font;
+class font;
 
 class OGLText : public text, public OGLObj {
 protected:
@@ -22,8 +22,8 @@ protected:
 	}
 
 public:
-	OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& text = "", double size = 1.0f, bool isBillboard = false);
-	OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& text = "", double size = 1.0f, bool isBillboard = false);
+	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& text = "", double size = 1.0f, bool isBillboard = false);
+	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& text = "", double size = 1.0f, bool isBillboard = false);
 	OGLText* SetText(const std::string& text, double size = 1.0);
 };
 

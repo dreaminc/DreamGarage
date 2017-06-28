@@ -1035,11 +1035,11 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<Font> pFont, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string & content, double size, bool isBillboard) {
 	return m_pHALImp->MakeText(pFont, content, size, isBillboard);
 }
 
-text* SandboxApp::AddText(std::shared_ptr<Font> pFont, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string & content, double size, bool isBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = m_pHALImp->MakeText(pFont, content, size, isBillboard);
@@ -1058,11 +1058,11 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string & content, double size, bool isBillboard) {
 	return m_pHALImp->MakeText(pFont, pFontTexture, content, size, isBillboard);
 }
 
-text* SandboxApp::AddText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string & content, double size, bool isBillboard) {
 	RESULT r = R_PASS;
 
 	text *pText = m_pHALImp->MakeText(pFont, pFontTexture, content, size, isBillboard);

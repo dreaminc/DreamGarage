@@ -19,8 +19,9 @@
 #define DEFAULT_FONT_SIZE 32
 
 class composite;
+class quad;
 
-class Font {
+class font {
 public:
 
 	struct CharacterGlyph {
@@ -39,7 +40,7 @@ public:
 			// empty
 		}
 
-		// TODO: Get rid of this when we move to Freefont
+		// TODO: Get rid of this when we move to Freetype
 		CharacterGlyph(std::wstring wstrFontFileLine) {
 			value = GetValue<uint32_t>(wstrFontFileLine, L"char id=");
 
@@ -57,13 +58,13 @@ public:
 		}
 	};
 
-	Font(bool fDistanceMap = false);
-	Font(const std::wstring& wstrFontFile, composite *pContext, bool fDistanceMap = false);
+	font(bool fDistanceMap = false);
+	font(const std::wstring& wstrFontFile, composite *pContext, bool fDistanceMap = false);
 	
 	//TODO: not removing this in order to avoid changing DreamConsole
-	Font(const std::wstring& wstrFontFile, bool fDistanceMap = false);
+	font(const std::wstring& wstrFontFile, bool fDistanceMap = false);
 	
-	~Font();
+	~font();
 
 	// Get a glyph structure from an ASCII.
 	// returns false when the ASCII does not exist for the font.
@@ -111,7 +112,7 @@ private:
 	float m_buffer = 0.5f;
 	float m_gamma = 0.02f;
 
-	std::shared_ptr<texture> m_pTexture;
+	std::shared_ptr<texture> m_pTexture = nullptr;
 
 	// internal freetype stuff (remove above when done)
 	// TODO: Refactor to remove freetype / or remove all other functions and pathways
@@ -133,7 +134,7 @@ private:
 	static RESULT UninitializeFreetypeLibrary();
 
 public:
-	static std::shared_ptr<Font> MakeFreetypeFont(std::wstring wstrFontFilename, bool fDistanceMapped = true);
+	static std::shared_ptr<font> MakeFreetypeFont(std::wstring wstrFontFilename, bool fDistanceMapped = true);
 };
 
 #endif // ! FONT_H_

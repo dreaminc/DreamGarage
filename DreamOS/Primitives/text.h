@@ -13,7 +13,8 @@
 #include "color.h"
 #include <memory>
 
-class Font;
+class font;
+class quad;
 
 class text : public DimObj {
 public:
@@ -56,14 +57,14 @@ private:
 	unsigned int m_nIndices;
 
 public:
-	text(std::shared_ptr<Font> pFont, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
+	text(std::shared_ptr<font> pFont, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
 
 	RESULT SetText(const std::string& strText, double size, bool* fChanged = nullptr);
 	
 	VirtualObj* SetPosition(point pt, VerticalAlignment vAlign = VerticalAlignment::MIDDLE, HorizontalAlignment hAlign = HorizontalAlignment::CENTER);
 
 	std::string& GetText();
-	std::shared_ptr<Font> GetFont();
+	std::shared_ptr<font> GetFont();
 	float GetWidth();
 	float GetHeight();
 
@@ -78,7 +79,7 @@ private:
 	HorizontalAlignment m_hAlign = HorizontalAlignment::CENTER;
 
 	// Font to be used for the text
-	std::shared_ptr<Font> m_pFont = nullptr;
+	std::shared_ptr<font> m_pFont = nullptr;
 
 	// String of the text
 	std::string	m_strText = "";

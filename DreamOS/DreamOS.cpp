@@ -272,11 +272,11 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
-text *DreamOS::MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard) {
+text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& content, double size, bool isBillboard) {
 	return m_pSandbox->MakeText(pFont, content, size, isBillboard);
 }
 
-text* DreamOS::AddText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard) {
+text* DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& content, double size, bool isBillboard) {
 	return m_pSandbox->AddText(pFont, content, size, isBillboard);
 }
 

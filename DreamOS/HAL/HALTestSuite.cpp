@@ -6,6 +6,8 @@
 #include "HAL/Pipeline/SourceNode.h"
 
 #include "Primitives/font.h"
+#include "Primitives/text.h"
+#include "Primitives/framebuffer.h"
 
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -688,7 +690,7 @@ RESULT HALTestSuite::AddTestText() {
 			auto pFlatContext = m_pDreamOS->AddFlatContext();
 
 			auto pComposite = m_pDreamOS->AddComposite();
-			auto pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", pComposite, true);
+			auto pFont = std::make_shared<font>(L"Basis_Grotesque_Pro.fnt", pComposite, true);
 
 			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"Fonts/Basis_Grotesque_Pro.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 			auto pTextLetter = pFlatContext->AddText(pFont, pFont->GetTexture().get(), "hi", 1.0f, true);

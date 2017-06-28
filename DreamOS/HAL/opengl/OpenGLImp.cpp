@@ -670,7 +670,7 @@ volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {
 
 //TODO: the texture could be stored in the font already, but having this pathway
 // avoids conflicts with parts of the code that use fonts without setting the texture
-text* OpenGLImp::MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
 {
 	RESULT r = R_PASS;
 
@@ -688,7 +688,7 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
 {
 	RESULT r = R_PASS;
 
@@ -710,7 +710,7 @@ text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& conte
 {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, std::make_shared<Font>(fontName, fDistanceMap), content, size, isBillboard);
+	text *pText = new OGLText(this, std::make_shared<font>(fontName, fDistanceMap), content, size, isBillboard);
 	CN(pText);
 
 //Success:

@@ -137,8 +137,8 @@ public:
 	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	sphere *MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 
-	text *AddText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool isBillboard = false);
-	text *MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text *AddText(std::shared_ptr<font> pFont, const std::string& content, double size = 1.0f, bool isBillboard = false);
+	text *MakeText(std::shared_ptr<font> pFont, const std::string& content, double size = 1.0f, bool isBillboard = false);
 	
 	volume *MakeVolume(double side, bool fTriangleBased = true);
 	volume *MakeVolume(double width, double length, double height, bool fTriangleBased = true);

@@ -5,7 +5,7 @@
 
 #include "font.h"
 
-text::text(std::shared_ptr<Font> font, const std::string& strText, double size, bool fBillboard) :
+text::text(std::shared_ptr<font> font, const std::string& strText, double size, bool fBillboard) :
 	m_pFont(font)
 {
 	RESULT r = R_PASS;
@@ -63,7 +63,7 @@ std::string& text::GetText() {
 	return m_strText;
 }
 
-std::shared_ptr<Font> text::GetFont() { 
+std::shared_ptr<font> text::GetFont() { 
 	return m_pFont; 
 }
 
@@ -134,7 +134,7 @@ RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 	float minBottom = 0.0f;
 
 	for_each(strText.begin(), strText.end(), [&](char c) {
-		Font::CharacterGlyph glyph;
+		font::CharacterGlyph glyph;
 
 		if (m_pFont->GetGlyphFromChar(c, glyph)) {
 			uv_precision x = glyph.x / glyphWidth;

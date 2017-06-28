@@ -75,9 +75,9 @@ public:
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
 	
-	text* MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
+	text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
-	text* MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
+	text* MakeText(std::shared_ptr<font> pFont, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
 	
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) override;

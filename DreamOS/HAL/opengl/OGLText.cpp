@@ -1,7 +1,7 @@
 #include "OGLText.h"
 #include "Primitives/font.h"
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::string& strText, double size, bool fBillboard) :
+OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText, double size, bool fBillboard) :
 	text(pFont, strText, size, fBillboard),
 	OGLObj(pParentImp)
 {
@@ -16,7 +16,7 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, const std::
 	SetColorTexture(pColorTexture);
 }
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& text, double size, bool isBillboard) :
+OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& text, double size, bool isBillboard) :
 	text(pFont, text, size, isBillboard),
 	OGLObj(pParentImp)
 {

@@ -133,8 +133,8 @@ public:
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;
 
 	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
-	virtual text* MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
-	virtual text* MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
+	virtual text* MakeText(std::shared_ptr<font> pFont, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
+	virtual text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
 
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) = 0;
