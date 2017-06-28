@@ -30,7 +30,10 @@
 class BoundingVolume;
 class CollisionManifold;
 
-class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
+class DimObj : public VirtualObj, 
+			   public Subscriber<TimeEvent>, 
+			   public dirty 
+{
 	friend class OGLObj;
 
 protected:

@@ -5,7 +5,8 @@
 
 #include "font.h"
 
-text::text(std::shared_ptr<font> font, const std::string& strText, double size, bool fBillboard) :
+text::text(HALImp *pHALImp, std::shared_ptr<font> font, const std::string& strText, double size, bool fBillboard) :
+	FlatContext(pHALImp),
 	m_pFont(font)
 {
 	RESULT r = R_PASS;
@@ -78,8 +79,6 @@ float text::GetHeight() {
 RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 	RESULT r = R_PASS;
 
-	std::vector<quad> quads;
-	point ptCenter;
 
 	if (m_strText.compare(strText) == 0) {
 		// no need to update the text
@@ -93,45 +92,24 @@ RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 		*fChanged = true;
 	}
 
-	if (m_strText.length() != strText.length()) {
-		// Text length was changed, we need to re-allocate buffers
-		Destroy();
-
-		m_nVertices = 4 * static_cast<unsigned int>(strText.length());
-		m_nIndices = 6 * static_cast<unsigned int>(strText.length());
-
-		CR(Allocate());
-
-		SetDirty();
-	}
+	// Clear out kids
+	CR(ClearChildren());
 
 	m_strText = strText;
-
-	float posx = 0;
-
-	// For now the font scale is based on 1080p
-	// TODO: Fuck this
-	const int screenWidth = static_cast<int>(1920 * size);
-	const int screenHeight = static_cast<int>(1080 * size);
 
 	uv_precision glyphWidth = static_cast<float>(m_pFont->GetGlyphWidth());
 	uv_precision glyphHeight = static_cast<float>(m_pFont->GetGlyphHeight());
 	uv_precision glyphBase = static_cast<float>(m_pFont->GetGlyphBase());
 
-	#define XSCALE_TO_SCREEN(x)	2.0f * (x) / screenWidth
-	#define YSCALE_TO_SCREEN(y)	2.0f * (y) / screenHeight
-
-	m_width = 0.0f;
-
 	float maxBelow = 0.0f;
 	float maxAbove = 0.0f;
+	float posX = 0;
+	point ptCenter;
 
-	bool  fFirstCharacter = true;
-
-	float minLeft = 0.0f;
-	float maxRight = 0.0f;
-	float maxTop = 0.0f;
-	float minBottom = 0.0f;
+	float minLeft = std::numeric_limits<float>::max();
+	float maxRight = std::numeric_limits<float>::min();
+	float maxTop = std::numeric_limits<float>::min();
+	float minBottom = std::numeric_limits<float>::max();
 
 	for_each(strText.begin(), strText.end(), [&](char c) {
 		font::CharacterGlyph glyph;
@@ -142,29 +120,25 @@ RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 			uv_precision w = glyph.width / glyphWidth;
 			uv_precision h = glyph.height / glyphHeight;
 
-			uv_precision dx = XSCALE_TO_SCREEN(glyph.width);
-			uv_precision dy = YSCALE_TO_SCREEN(glyph.height);
+			//uv_precision dx = XSCALE_TO_SCREEN(glyph.width);
+			//uv_precision dy = YSCALE_TO_SCREEN(glyph.height);
 
-			vector_precision dxs = XSCALE_TO_SCREEN(glyph.bearingX);
-			vector_precision dys = YSCALE_TO_SCREEN(glyphBase - glyph.bearingY) - dy / 2.0f;
+			//vector_precision dxs = XSCALE_TO_SCREEN(glyph.bearingX);
+			//vector_precision dys = YSCALE_TO_SCREEN(glyphBase - glyph.bearingY) - dy / 2.0f;
 
-			if (fFirstCharacter) {
-				fFirstCharacter = false;
+			minLeft = std::min(minLeft, posX + dxs);
+			maxRight = std::max(maxRight, dx + posX + dxs);
+			maxTop = std::max(maxTop, dys + dy / 2.0f);
+			minBottom = std::min(minBottom, dys - dy / 2.0f);
+			
 
-				minLeft = posx + dxs;
-				maxRight = dx + posx + dxs;
-				maxTop = dys + dy / 2.0f;
-				minBottom = dys - dy / 2.0f;
-			}
-			else {
-				minLeft = std::min(minLeft, posx + dxs);
-				maxRight = std::max(maxRight, dx + posx + dxs);
-				maxTop = std::max(maxTop, dys + dy / 2.0f);
-				minBottom = std::min(minBottom, dys - dy / 2.0f);
-			}
+			auto pQuad = AddQuad(x, y, vector(dx / 2.0f + posX + dxs, dys, 0.0f));
+			//pQuad->SetUV()
 
-			quads.push_back(quad(dy, dx, vector(dx / 2.0f + posx + dxs, dys, 0), uvcoord(x, y - h), uvcoord(x + w, y)));
-			posx += XSCALE_TO_SCREEN(glyph.advance);
+			//quads.push_back(quad(dy, dx, , uvcoord(x, y - h), uvcoord(x + w, y)));
+
+			//posX += XSCALE_TO_SCREEN(glyph.advance);
+			posX += glyph.advance;
 		}
 	});
 
@@ -173,6 +147,7 @@ RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 
 	ptCenter = point((minLeft + maxRight) / 2.0f, (maxTop + minBottom) / 2.0f, 0.0f);
 
+	/*
 	unsigned int verticesCnt = 0;
 	unsigned int indicesCnt = 0;
 	unsigned int quadCnt = 0;
@@ -201,6 +176,7 @@ RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
 
 		quadCnt += 4;
 	}
+	*/
 
 Error:
 	return r;

@@ -147,34 +147,44 @@ void OGLDreamConsole::Render(bool fMono) {
 	//return;
 	float posY = viewBottom;
 
-	DreamConsole::GetConsole()->ForEach([&](const std::string& consoleText) {
-		RenderObject((DimObj*)m_OGLConsoleText->SetText(consoleText, fontSize)->SetPosition(point(0.1f, posY, 0.0f), text::VerticalAlignment::TOP, text::HorizontalAlignment::RIGHT));
-		posY += m_OGLConsoleText->GetHeight();
+	DreamConsole::GetConsole()->ForEach(
+		[&](const std::string& consoleText) {
+			m_OGLConsoleText->SetText(consoleText, fontSize); 
+			m_OGLConsoleText->SetPosition(point(0.1f, posY, 0.0f), text::VerticalAlignment::TOP, text::HorizontalAlignment::RIGHT);
+			RenderObject(m_OGLConsoleText.get());
+			posY += m_OGLConsoleText->GetHeight();
 
-		return !(posY > viewTop);
-	});
+			return !(posY > viewTop);
+		}
+	);
 
 
-	float xOff, yOff = 0; // cursor offset
+	float xOffset, yOffset = 0; // cursor offset
 	
 	auto currentCmdTxt = DreamConsole::GetConsole()->GetCmdText();
 	std::string cmdText = ">" + currentCmdTxt;
 
-	RenderObject((DimObj*)m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->SetPosition(point(0.1f, viewBottom, 0.0f), text::VerticalAlignment::BOTTOM, text::HorizontalAlignment::RIGHT));
+	m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f); 
+	m_OGLConsoleText->SetPosition(point(0.1f, viewBottom, 0.0f), text::VerticalAlignment::BOTTOM, text::HorizontalAlignment::RIGHT);
+	RenderObject(m_OGLConsoleText.get());
 
-	yOff = m_OGLConsoleText->GetHeight() / 2.0f;
+	yOffset = m_OGLConsoleText->GetHeight() / 2.0f;
 		
 	auto currentCmdTxtUntilCursor = DreamConsole::GetConsole()->GetCmdText().substr(0, DreamConsole::GetConsole()->GetCmtTextCursorPos());
 
 	cmdText = ">" + currentCmdTxtUntilCursor;
 
-	xOff = m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->GetWidth();
+	m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f);
+	xOffset = m_OGLConsoleText->GetWidth();
 		
 	auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
+	
 	if ((time / 100) % 10 > 5) {
 		cmdText = "|";
 
-		RenderObject((DimObj*)m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f)->SetPosition(point(0.1f + xOff, viewBottom - yOff, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::RIGHT));
+		m_OGLConsoleText->SetText(cmdText, fontSize + 0.02f);
+		m_OGLConsoleText->SetPosition(point(0.1f + xOffset, viewBottom - yOffset, 0.0f), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::RIGHT);
+		RenderObject(m_OGLConsoleText.get());
 	}
 	
 	// Render debug console text
@@ -324,8 +334,10 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 		if (count == 0) {
 			// draw current FPS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			//m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize)->MoveTo(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0));
-			m_pParentProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize)->SetPosition(point(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::RIGHT));
+			
+			m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize);
+			m_OGLFPSText->SetPosition(point(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0), text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::RIGHT);
+			m_pParentProgram->RenderObject(m_OGLFPSText.get());
 		}
 
 		if (currentPoint.x() < left) {
@@ -346,12 +358,19 @@ void OGLProfilerGraph::Render(point& topLeft, point& bottomRight, ProfilerGraph<
 	// Draw local min/max bars
 	int fpsDiff = static_cast<int>(maxFPS) - static_cast<int>(minFPS);
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	
 	m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(left, YSCALE(0), 0), point(right, YSCALE(0), 0), point(right, YSCALE(0), 0)));
 	m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(left, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0)));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_pParentProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize)->SetPosition(point(left, YSCALE(0), 0), text::VerticalAlignment::TOP, text::HorizontalAlignment::RIGHT));
-	m_pParentProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::VerticalAlignment::BOTTOM, text::HorizontalAlignment::RIGHT));
+
+	m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize); 
+	m_OGLFPSText->SetPosition(point(left, YSCALE(0), 0), text::VerticalAlignment::TOP, text::HorizontalAlignment::RIGHT);
+	m_pParentProgram->RenderObject(m_OGLFPSText.get());
+
+	m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize); 
+	m_OGLFPSText->SetPosition(point(left, YSCALE(fpsDiff), 0), text::VerticalAlignment::BOTTOM, text::HorizontalAlignment::RIGHT);
+	m_pParentProgram->RenderObject(m_OGLFPSText.get());
 }
 
 template<typename T>
@@ -395,8 +414,10 @@ void OGLProfilerGraph::RenderMinimal(point& topLeft, point& bottomRight, Profile
 		if (count == 0) {
 			// draw current FPS
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-			//m_OGLProgram->RenderObject(m_OGLFPSText->SetText(std::to_string(records[index].first), m_fontSize)->MoveTo(right, currentPoint.y() - YSCALE(minFPS) + bottom, 0));
-			m_pParentProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(records[index].first), 3.0f)->SetPosition(point((left+right)/2, currentPoint.y() - YSCALE(minFPS) + bottom, 0)));
+			
+			m_OGLFPSText->SetText(std::to_string(records[index].first), 3.0f); 
+			m_OGLFPSText->SetPosition(point((left + right) / 2, currentPoint.y() - YSCALE(minFPS) + bottom, 0));
+			m_pParentProgram->RenderObject(m_OGLFPSText.get());
 		}
 	}
 
@@ -407,8 +428,14 @@ void OGLProfilerGraph::RenderMinimal(point& topLeft, point& bottomRight, Profile
 	m_pParentProgram->RenderObject((DimObj*)m_OGLTriangle->Set(point(left, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0), point(right, YSCALE(fpsDiff), 0)));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	m_pParentProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize)->SetPosition(point(left, YSCALE(0), 0), text::VerticalAlignment::TOP, text::HorizontalAlignment::RIGHT));
-	m_pParentProgram->RenderObject((DimObj*)m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize)->SetPosition(point(left, YSCALE(fpsDiff), 0), text::VerticalAlignment::BOTTOM, text::HorizontalAlignment::RIGHT));
+	
+	m_OGLFPSText->SetText(std::to_string(minFPS), m_fontSize); 
+	m_OGLFPSText->SetPosition(point(left, YSCALE(0), 0), text::VerticalAlignment::TOP, text::HorizontalAlignment::RIGHT);
+	m_pParentProgram->RenderObject(m_OGLFPSText.get());
+
+	m_OGLFPSText->SetText(std::to_string(maxFPS), m_fontSize); 
+	m_OGLFPSText->SetPosition(point(left, YSCALE(fpsDiff), 0), text::VerticalAlignment::BOTTOM, text::HorizontalAlignment::RIGHT);
+	m_pParentProgram->RenderObject(m_OGLFPSText.get());
 }
 
 // OGLDebugConsole
@@ -470,14 +497,18 @@ void OGLDebugConsole::Render(point& topLeft, point& bottomRight, float fontSize)
 		auto time = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now().time_since_epoch()).count();
 
 		if ((time / 100) % 10 > 5) {
-			auto xOff = -m_OGLConsoleText->GetWidth() / 2;
+			auto xOffset = -m_OGLConsoleText->GetWidth() / 2;
 
 			auto currentCmdTxtUntilCursor = DreamConsole::GetConsole()->GetCmdText().substr(0, DreamConsole::GetConsole()->GetCmtTextCursorPos());
-			xOff += m_OGLConsoleText->SetText(currentCmdTxtUntilCursor, 1.0)->GetWidth();
 
-			point pt = point(xOff, 0, 0);
+			m_OGLConsoleText->SetText(currentCmdTxtUntilCursor, 1.0);
+			xOffset += m_OGLConsoleText->GetWidth();
 
-			m_pParentProgram->RenderObject((DimObj*)m_OGLConsoleText->SetText("|", 1.0)->SetPosition(pt, text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::RIGHT));
+			point pt = point(xOffset, 0, 0);
+
+			m_OGLConsoleText->SetText("|", 1.0); 
+			m_OGLConsoleText->SetPosition(pt, text::VerticalAlignment::MIDDLE, text::HorizontalAlignment::RIGHT);
+			m_pParentProgram->RenderObject(m_OGLConsoleText.get());
 		}
 	}
 }

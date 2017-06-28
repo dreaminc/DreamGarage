@@ -13,10 +13,16 @@
 #include "color.h"
 #include <memory>
 
-class font;
-class quad;
+#include "FlatContext.h"
+#include "quad.h"
 
-class text : public DimObj {
+class font;
+//class quad;
+
+class HALImp;
+
+//class text : public DimObj {
+class text : public FlatContext {
 public:
 	enum class VerticalAlignment {
 		TOP,
@@ -32,6 +38,7 @@ public:
 		INVALID
 	};
 
+	/*
 public:
 
 	RESULT Allocate() {
@@ -55,9 +62,10 @@ public:
 private:
 	unsigned int m_nVertices;
 	unsigned int m_nIndices;
+	*/
 
 public:
-	text(std::shared_ptr<font> pFont, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
 
 	RESULT SetText(const std::string& strText, double size, bool* fChanged = nullptr);
 	

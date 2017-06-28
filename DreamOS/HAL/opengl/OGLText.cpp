@@ -2,7 +2,7 @@
 #include "Primitives/font.h"
 
 OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText, double size, bool fBillboard) :
-	text(pFont, strText, size, fBillboard),
+	text(pParentImp, pFont, strText, size, fBillboard),
 	OGLObj(pParentImp)
 {
 	// TODO: Implement valid and CV EHM
@@ -16,8 +16,8 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::
 	SetColorTexture(pColorTexture);
 }
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& text, double size, bool isBillboard) :
-	text(pFont, text, size, isBillboard),
+OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strText, double size, bool isBillboard) :
+	text(pParentImp, pFont, strText, size, isBillboard),
 	OGLObj(pParentImp)
 {
 	// TODO: Implement valid and CV EHM
@@ -26,21 +26,26 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pF
 	SetColorTexture(pFontTexture);
 }
 
-OGLText* OGLText::SetText(const std::string& text, double size)
-{
-	bool hasChanged = false;
+RESULT OGLText::SetText(const std::string& strText, double size) {
+	RESULT r = R_PASS;
+	bool fChanged = false;
 
-	text::SetText(text, size, &hasChanged);
+	CR(text::SetText(strText, size, &fChanged));
 
 	// TODO: need to be able to deal with changing vertex amounts automatically
-	if (CheckAndCleanDirty())
-	{
-		ReleaseOGLBuffers();
-		OGLInitialize();
+	if (CheckAndCleanDirty()) {
+		CR(ReleaseOGLBuffers());
+		CR(OGLInitialize());
 	}
 	
-	if (hasChanged)
+	if (fChanged) {
 		SetDirty();
+	}
 
-	return this;
+Error:
+	return r;
+}
+
+DimObj *OGLText::GetDimObj() {
+	return (DimObj*)this;
 }
