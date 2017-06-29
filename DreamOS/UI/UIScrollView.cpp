@@ -8,8 +8,8 @@
 
 #include "DreamOS.h"
 
-UIScrollView::UIScrollView(HALImp *pHALImp) :
-UIView(pHALImp)
+UIScrollView::UIScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :
+UIView(pHALImp, pDreamOS)
 {
 	RESULT r = R_PASS;
 
@@ -30,22 +30,6 @@ UIScrollView::~UIScrollView()
 RESULT UIScrollView::Initialize() {
 	RESULT r = R_PASS;
 
-	m_maxElements = 4;
-	m_objectIndex = 0;
-	m_yRotation = 0.0f;
-	m_velocity = 0.0f;
-
-	m_menuDepth = -1.5f;
-	m_itemAngleX = -30.0f;
-	m_itemAngleY = 10.0f;
-	m_itemStartAngleY = -15.0f;
-	m_itemHeight = 0.75f;
-	m_itemScale = 0.25f;
-	m_itemScaleSelected = 1.25f;
-
-	m_titleAngleX = 75.0f;
-	m_titleHeight = 0.0f;
-
 	m_pTitleView = AddUIView();
 
 	m_pLeftScrollButton = AddUIButton();
@@ -57,14 +41,6 @@ RESULT UIScrollView::Initialize() {
 	PositionMenuButton(m_maxElements, m_pRightScrollButton);
 
 	m_pMenuButtonsContainer = AddUIView();
-
-	return R_PASS;
-}
-
-RESULT UIScrollView::InitializeWithDOS(DreamOS *pDreamOS) {
-	RESULT r = R_PASS;
-	
-	m_pDreamOS = pDreamOS;
 
 	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left-600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pRightScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-right-600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
@@ -79,14 +55,14 @@ RESULT UIScrollView::InitializeWithDOS(DreamOS *pDreamOS) {
 			std::bind(&UIScrollView::AnimateScaleReset, this, std::placeholders::_1)));
 			//*/
 
-		CR(pButton->RegisterEvent(UI_SELECT_ENDED,
+		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			std::bind(&UIScrollView::StopScroll, this, std::placeholders::_1)));
 	}
 
-	CR(m_pLeftScrollButton->RegisterEvent(UI_SELECT_BEGIN,
+	CR(m_pLeftScrollButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
 		std::bind(&UIScrollView::StartScrollLeft, this, std::placeholders::_1)));
 
-	CR(m_pRightScrollButton->RegisterEvent(UI_SELECT_BEGIN,
+	CR(m_pRightScrollButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
 		std::bind(&UIScrollView::StartScrollRight, this, std::placeholders::_1)));
 
 Error:
@@ -102,7 +78,6 @@ RESULT UIScrollView::Update() {
 	CBR(m_pMenuButtonsContainer->HasChildren(), R_PASS);
 
 	float yRotationPerElement =  (float)M_PI / (180.0f / m_itemAngleY);
-	//float yRotationPerElement = m_itemAngleY * M_PI / 180.0f;
 
 	pChildren = m_pMenuButtonsContainer->GetChildren();
 	if (pChildren.size() > m_maxElements) {

@@ -69,13 +69,12 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(GetDOS()->AddObjectToInteractionGraph(GetComposite()));
 
 	// Initialize UIScrollView
-	m_pView = GetComposite()->AddUIView();
+	m_pView = GetComposite()->AddUIView(GetDOS());
 	CN(m_pView);
 	m_pView->SetPosition(point(0.0f, 0.0f, 1.0f));
 
 	m_pScrollView = m_pView->AddUIScrollView();
 	CN(m_pScrollView);
-	CR(m_pScrollView->InitializeWithDOS(pDreamOS));
 
 	m_pLeftMallet = new UIMallet(GetDOS());
 	CN(m_pLeftMallet);
@@ -257,7 +256,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 			pButton->Update(iconFormat, labelFormat);
 
-			CR(pButton->RegisterEvent(UI_SELECT_ENDED,
+			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
 			pButtons.emplace_back(pButton);
@@ -344,7 +343,7 @@ RESULT DreamUIBar::Notify(UIEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	switch (pEvent->m_eventType) {
-	case (UI_MENU): {
+	case (UIEventType::UI_MENU): {
 		CR(HandleMenuUp(pEvent->m_pObj));
 	} break;
 	}

@@ -6,6 +6,16 @@
 class UIButton;
 class DreamOS;
 
+#define MAX_ELEMENTS 4
+#define MENU_DEPTH -1.5f
+#define ITEM_ANGLE_X -30.0f
+#define ITEM_ANGLE_Y 10.0f
+#define ITEM_START_ANGLE_Y -15.0f
+#define ITEM_HEIGHT 0.75
+#define ITEM_SCALE 0.25
+#define ITEM_SCALE_SELECTED 1.25
+#define TITLE_ANGLE_X 75.0f
+
 enum class MenuState {
 	NONE,
 	SCROLLING
@@ -13,11 +23,10 @@ enum class MenuState {
 
 class UIScrollView : public UIView {
 public:
-	UIScrollView(HALImp *pHALImp);
+	UIScrollView(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UIScrollView();
 
 	RESULT Initialize();
-	RESULT InitializeWithDOS(DreamOS *pDreamOS);
 
 	RESULT Update();
 	RESULT UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons);
@@ -40,36 +49,33 @@ public:
 
 private:
 	// button positioning
-	float m_menuDepth;
+	float m_menuDepth = MENU_DEPTH;
 
-	float m_itemAngleX;
-	float m_itemAngleY;
-	float m_itemStartAngleY;
-	float m_itemHeight;
-	float m_itemScale;
-	float m_itemScaleSelected;
+	float m_itemAngleX = ITEM_ANGLE_X;
+	float m_itemAngleY = ITEM_ANGLE_Y;
+	float m_itemStartAngleY = ITEM_START_ANGLE_Y;
+	float m_itemHeight = ITEM_HEIGHT;
+	float m_itemScale = ITEM_SCALE;
+	float m_itemScaleSelected = ITEM_SCALE_SELECTED;
 
-	float m_titleAngleX;
+	float m_titleAngleX = TITLE_ANGLE_X;
 	float m_titleHeight;
 
 	// scrolling
-	float m_maxElements;
+	float m_maxElements = MAX_ELEMENTS;
 	int m_objectIndex;
 	float m_yRotation;
 	float m_yRotationPerElement;
 	float m_velocity;
 
 	// UI objects
-	std::shared_ptr<UIView> m_pTitleView;
-	std::shared_ptr<UIButton> m_pLeftScrollButton; 
-	std::shared_ptr<UIButton> m_pRightScrollButton;
+	std::shared_ptr<UIView> m_pTitleView = nullptr;
+	std::shared_ptr<UIButton> m_pLeftScrollButton = nullptr; 
+	std::shared_ptr<UIButton> m_pRightScrollButton = nullptr;
 	MenuState m_menuState;
 
-	std::shared_ptr<UIView> m_pMenuButtonsContainer; // used to clear for now
+	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
 	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
-
-	// context
-	DreamOS *m_pDreamOS;
 };
 
 #endif // ! UI_SCROLL_VIEW_H_

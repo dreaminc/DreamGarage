@@ -15,6 +15,8 @@
 
 #include "UI/UIView.h"
 
+#include "DreamOS.h"
+
 composite::composite(HALImp *pHALImp) :
 	m_pHALImp(pHALImp)
 {
@@ -355,16 +357,16 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<UIView> composite::MakeUIView() {
-	std::shared_ptr<UIView> pView(new UIView(m_pHALImp));
+std::shared_ptr<UIView> composite::MakeUIView(DreamOS *pDreamOS) {
+	std::shared_ptr<UIView> pView(new UIView(m_pHALImp, pDreamOS));
 
 	return pView;
 }
 
-std::shared_ptr<UIView> composite::AddUIView() {
+std::shared_ptr<UIView> composite::AddUIView(DreamOS *pDreamOS) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<UIView> pView = MakeUIView();
+	std::shared_ptr<UIView> pView = MakeUIView(pDreamOS);
 	CR(AddObject(pView));
 	return pView;
 Error:

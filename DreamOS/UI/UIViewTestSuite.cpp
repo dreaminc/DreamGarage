@@ -243,7 +243,7 @@ RESULT UIViewTestSuite::AddTestUIView() {
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
 
-			auto pView = pComposite->AddUIView();
+			auto pView = pComposite->AddUIView(m_pDreamOS);
 			pView->InitializeOBB();
 			
 			auto pQuad = pView->AddQuad(1.0f, 1.0f, 1, 1, nullptr, vector::kVector());
@@ -251,7 +251,7 @@ RESULT UIViewTestSuite::AddTestUIView() {
 			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
 				CR(m_pDreamOS->RegisterEventSubscriber(nullptr, (InteractionEventType)(i), pView.get()));
 			}
-			for (int i = 0; i < UIEventType::UI_EVENT_INVALID; i++) {
+			for (int i = 0; i < (int)(UIEventType::UI_EVENT_INVALID); i++) {
 				CR(pView->RegisterSubscriber((UIEventType)(i), this));
 			}
 			
@@ -296,24 +296,24 @@ RESULT UIViewTestSuite::AddTestUIButton() {
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
 
-			auto pView = pComposite->AddUIView();
+			auto pView = pComposite->AddUIView(m_pDreamOS);
 			pView->InitializeOBB();
 
 			auto pButton = pView->AddUIButton();
 			pButton->RegisterToInteractionEngine(m_pDreamOS);
 
-			pButton->RegisterEvent(UI_HOVER_BEGIN, 
+			pButton->RegisterEvent(UIEventType::UI_HOVER_BEGIN, 
 				std::bind(&UIViewTestSuite::Rotate45, this, std::placeholders::_1));
-			pButton->RegisterEvent(UI_HOVER_ENDED,
+			pButton->RegisterEvent(UIEventType::UI_HOVER_ENDED,
 				std::bind(&UIViewTestSuite::ResetRotation, this, std::placeholders::_1));
 		
 			auto p2 = pView->AddUIButton();
 			p2->SetPosition(point(2.0f, 0.0f, 0.0f));
 			p2->RegisterToInteractionEngine(m_pDreamOS);
 
-			p2->RegisterEvent(UI_HOVER_BEGIN,
+			p2->RegisterEvent(UIEventType::UI_HOVER_BEGIN,
 				std::bind(&UIViewTestSuite::Rotate15, this, std::placeholders::_1));
-			p2->RegisterEvent(UI_HOVER_ENDED,
+			p2->RegisterEvent(UIEventType::UI_HOVER_ENDED,
 				std::bind(&UIViewTestSuite::ResetRotation, this, std::placeholders::_1));
 
 			m_pDreamOS->AddInteractionObject(pComposite);
@@ -322,9 +322,9 @@ RESULT UIViewTestSuite::AddTestUIButton() {
 			p3->SetPosition(point(-2.0f, 0.0f, 0.0f));
 			p3->RegisterToInteractionEngine(m_pDreamOS);
 
-			p3->RegisterEvent(UI_HOVER_BEGIN,
+			p3->RegisterEvent(UIEventType::UI_HOVER_BEGIN,
 				std::bind(&UIViewTestSuite::AnimateScaleUp, this, std::placeholders::_1));
-			p3->RegisterEvent(UI_HOVER_ENDED,
+			p3->RegisterEvent(UIEventType::UI_HOVER_ENDED,
 				std::bind(&UIViewTestSuite::AnimateScaleReset, this, std::placeholders::_1));
 		}
 	Error:
@@ -363,7 +363,7 @@ RESULT UIViewTestSuite::AddTestUIButtons() {
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
 
-			auto pView = pComposite->AddUIView();
+			auto pView = pComposite->AddUIView(m_pDreamOS);
 			pView->InitializeOBB();
 
 			for (int i = 0; i < 4; i++) {
@@ -371,9 +371,9 @@ RESULT UIViewTestSuite::AddTestUIButtons() {
 				pButton->RegisterToInteractionEngine(m_pDreamOS);
 				pButton->SetPosition(point(i * 1.5f - 2.25f, 0.0f, 0.0f));
 
-				pButton->RegisterEvent(UI_HOVER_BEGIN,
+				pButton->RegisterEvent(UIEventType::UI_HOVER_BEGIN,
 					std::bind(&UIViewTestSuite::AnimateScaleUp, this, std::placeholders::_1));
-				pButton->RegisterEvent(UI_HOVER_ENDED,
+				pButton->RegisterEvent(UIEventType::UI_HOVER_ENDED,
 					std::bind(&UIViewTestSuite::AnimateScaleReset, this, std::placeholders::_1));
 				//pButton->RegisterEvent(UI_SELECT_ENDED,
 				//	std::bind(&UIViewTestSuite::AnimateMoveUpAndBack, this, std::placeholders::_1));
@@ -437,11 +437,10 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		pComposite = m_pDreamOS->AddComposite();
 		pComposite->InitializeOBB();
 
-		pView = pComposite->AddUIView();
+		pView = pComposite->AddUIView(m_pDreamOS);
 		pView->InitializeOBB();
 
 		pScrollView = pView->AddUIScrollView();
-		pScrollView->InitializeWithDOS(m_pDreamOS);
 
 		for (int i = 0; i < numButtons; i++) {
 			pButtons.emplace_back(pView->MakeUIButton()); // ScrollView adds them

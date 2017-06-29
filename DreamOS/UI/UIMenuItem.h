@@ -8,6 +8,8 @@
 
 #include "UI/UIButton.h"
 
+class DreamOS;
+
 // IconFormat defaults
 #define ICON_HEIGHT 1.5f
 #define ICON_WIDTH 1.5f
@@ -51,7 +53,7 @@ struct LabelFormat
 
 class UIMenuItem : public UIButton {
 public:
-	UIMenuItem(HALImp *pHALImp);
+	UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS);
 
 	RESULT Initialize();
 

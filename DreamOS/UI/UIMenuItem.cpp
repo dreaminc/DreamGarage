@@ -1,7 +1,7 @@
 #include "UIMenuItem.h"
 
-UIMenuItem::UIMenuItem(HALImp *pHALImp) :
-	UIButton(pHALImp)
+UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS) :
+	UIButton(pHALImp, pDreamOS)
 {
 	RESULT r = R_PASS;
 

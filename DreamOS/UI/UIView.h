@@ -14,17 +14,20 @@
 class UIButton;
 class UIScrollView;
 class UIMenuItem;
+class DreamOS;
 
 class UIView : public composite, public Publisher<UIEventType, UIEvent>, public Subscriber<InteractionObjectEvent> {
 public:
-	UIView(HALImp *pHALImp);
+	UIView(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UIView();
 
 	RESULT Initialize();
 
 public:
 
-	//TODO: these could be MakeUIObject<T>
+	std::shared_ptr<UIView> MakeUIView();
+	std::shared_ptr<UIView> AddUIView();
+
 	std::shared_ptr<UIButton> MakeUIButton();
 	std::shared_ptr<UIButton> AddUIButton();
 
@@ -35,6 +38,9 @@ public:
 	std::shared_ptr<UIScrollView> AddUIScrollView();
 
 	RESULT Notify(InteractionObjectEvent *pEvent);
+
+protected:
+	DreamOS *m_pDreamOS = nullptr;
 };
 
 #endif // !UI_VIEW_H_ 

@@ -1,8 +1,8 @@
 #include "UIButton.h"
 #include "DreamOS.h"
 
-UIButton::UIButton(HALImp *pHALImp) :
-UIView(pHALImp)
+UIButton::UIButton(HALImp *pHALImp, DreamOS *pDreamOS) :
+UIView(pHALImp, pDreamOS)
 {
 	RESULT r = R_PASS;
 
@@ -22,7 +22,7 @@ UIButton::~UIButton() {
 RESULT UIButton::Initialize() {
 	RESULT r = R_PASS;
 
-	for (int i = 0; i < UIEventType::UI_EVENT_INVALID; i++) {
+	for (int i = 0; i < (int)(UIEventType::UI_EVENT_INVALID); i++) {
 		CR(RegisterSubscriber((UIEventType)(i), this));
 	}
 

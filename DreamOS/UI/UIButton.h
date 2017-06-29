@@ -8,7 +8,7 @@ class DreamOS;
 
 class UIButton : public UIView, public Subscriber<UIEvent> {
 public:
-	UIButton(HALImp *pHALImp);
+	UIButton(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UIButton();
 
 	RESULT Initialize();
@@ -23,8 +23,8 @@ public:
 
 protected:
 	// objects (TODO: could be in subclass)
-	std::shared_ptr<quad> m_pSurface;
-	std::shared_ptr<composite> m_pContextComposite;
+	std::shared_ptr<quad> m_pSurface = nullptr;
+	std::shared_ptr<composite> m_pContextComposite = nullptr;
 	std::map<UIEventType, std::function<RESULT(void*)>> m_callbacks;
 };
 
