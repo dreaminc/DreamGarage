@@ -33,7 +33,7 @@ RESULT AnimationQueue::Update(double sNow) {
 					(*pItem)->GetAnimationEndedCallback()((*pItem)->GetCallbackContext());
 				}
 				pQueue.pop_front();
-				continue;
+				break;
 			}
 		} while ((*pItem)->GetFlags().fNoBlock && ++pItem != pQueue.end());
 

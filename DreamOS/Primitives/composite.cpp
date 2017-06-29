@@ -8,6 +8,15 @@
 #include "Primitives/camera.h"
 #include "Primitives/stereocamera.h"
 
+#include "Primitives/sphere.h"
+#include "Primitives/volume.h"
+#include "Primitives/DimRay.h"
+#include "quad.h"
+
+#include "UI/UIView.h"
+
+#include "DreamOS.h"
+
 composite::composite(HALImp *pHALImp) :
 	m_pHALImp(pHALImp)
 {
@@ -344,6 +353,22 @@ std::shared_ptr<FlatContext> composite::AddFlatContext(int width, int height, in
 	CR(AddObject(pContext));
 
 	return pContext;
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<UIView> composite::MakeUIView(DreamOS *pDreamOS) {
+	std::shared_ptr<UIView> pView(new UIView(m_pHALImp, pDreamOS));
+
+	return pView;
+}
+
+std::shared_ptr<UIView> composite::AddUIView(DreamOS *pDreamOS) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIView> pView = MakeUIView(pDreamOS);
+	CR(AddObject(pView));
+	return pView;
 Error:
 	return nullptr;
 }

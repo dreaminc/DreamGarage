@@ -6,6 +6,10 @@
 #include "Primitives/composite.h"
 #include "InteractionEngine/InteractionObjectEvent.h"
 
+#include "UI/UIButton.h"
+
+class DreamOS;
+
 // IconFormat defaults
 #define ICON_HEIGHT 1.5f
 #define ICON_WIDTH 1.5f
@@ -47,15 +51,14 @@ struct LabelFormat
 	{}
 };
 
-class UIMenuItem : public valid {
+class UIMenuItem : public UIButton {
 public:
-	UIMenuItem(std::shared_ptr<composite> pParentComposite);
+	UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS);
 
 	RESULT Initialize();
 
 	std::shared_ptr<composite> GetContext();
 	std::shared_ptr<quad> GetQuad();
-
 
 	RESULT Update(IconFormat& iconFormat, LabelFormat& labelFormat);
 	RESULT SetObjectParams(point ptQuad, quaternion qQuad, point ptContext, quaternion qContext);
@@ -65,9 +68,6 @@ public:
 	std::string& GetName();
 
 private:
-	std::shared_ptr<composite> m_pContextComposite;
-	std::shared_ptr<quad> m_pQuad;
-	std::shared_ptr<quad> m_pQuadInvisible;
 	std::string m_strName;
 
 private:

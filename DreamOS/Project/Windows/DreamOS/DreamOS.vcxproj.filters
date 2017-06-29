@@ -551,19 +551,7 @@
     <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIBar.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\UI\UIMenuItem.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIModule.cpp">
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
@@ -797,11 +785,23 @@
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp">
       <Filter>HAL\opengl</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\stdafx.cpp">
-      <Filter>Main</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObjectQueue.cpp">
       <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIView.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIEvent.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIButton.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIScrollView.cpp">
+      <Filter>UI</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1442,19 +1442,7 @@
     <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h">
       <Filter>InteractionEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIBar.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\UI\UIMenuItem.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuLayer.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIModule.h">
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UITestSuite.h">
@@ -1667,9 +1655,23 @@
     <ClInclude Include="..\..\..\Primitives\Multipublisher.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\stdafx.h" />
     <ClInclude Include="..\..\..\InteractionEngine\ActiveObjectQueue.h">
       <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIView.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIEvent.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIButton.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIViewTestSuite.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIScrollView.h">
+      <Filter>UI</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

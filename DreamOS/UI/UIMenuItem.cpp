@@ -1,8 +1,7 @@
 #include "UIMenuItem.h"
 
-UIMenuItem::UIMenuItem(std::shared_ptr<composite> pParentComposite) :
-	m_pParentContext(pParentComposite),
-	m_pContextComposite(nullptr)
+UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS) :
+	UIButton(pHALImp, pDreamOS)
 {
 	RESULT r = R_PASS;
 
@@ -26,8 +25,8 @@ RESULT UIMenuItem::Initialize() {
 
 	CR(m_pContextComposite->InitializeOBB());
 
-	m_pQuad = m_pContextComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
-	m_pQuad->SetMaterialAmbient(0.75f);
+	//m_pQuad = m_pContextComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+	m_pSurface->SetMaterialAmbient(0.75f);
 	m_strName = "";
 
 Error:
@@ -39,7 +38,7 @@ std::shared_ptr<composite> UIMenuItem::GetContext() {
 }
 
 std::shared_ptr<quad> UIMenuItem::GetQuad() {
-	return m_pQuad;
+	return m_pSurface;
 }
 
 RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
@@ -75,15 +74,15 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 
 	m_pContextComposite->RenderToTexture(pContext);
 
-	m_pQuad->UpdateColorTexture(pContext->GetFramebuffer()->GetColorTexture());
+	m_pSurface->UpdateColorTexture(pContext->GetFramebuffer()->GetColorTexture());
 
 Error:
 	return r;
 }
 
 RESULT UIMenuItem::SetObjectParams(point ptQuad, quaternion qQuad, point ptContext, quaternion qContext) {
-	m_pQuad->MoveTo(ptQuad);
-	m_pQuad->SetOrientation(qQuad);
+	m_pSurface->MoveTo(ptQuad);
+	m_pSurface->SetOrientation(qQuad);
 
 	m_pContextComposite->MoveTo(ptContext);
 	m_pContextComposite->SetOrientation(qContext);
@@ -94,7 +93,7 @@ RESULT UIMenuItem::SetObjectParams(point ptQuad, quaternion qQuad, point ptConte
 // TODO: could be different for different types of MenuItems
 // may make sense to take a comparison function as an argument
 bool UIMenuItem::Contains(VirtualObj *pObj) {
-	return (pObj == m_pQuad.get());
+	return (pObj == m_pSurface.get());
 }
 
 std::string& UIMenuItem::GetName() {

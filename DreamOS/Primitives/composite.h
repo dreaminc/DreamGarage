@@ -14,15 +14,18 @@
 
 class HALImp;
 
-#include "Primitives/sphere.h"
-#include "Primitives/volume.h"
-#include "Primitives/DimRay.h"
-#include "quad.h"
+class sphere;
+class volume;
+class DimRay;
+class quad;
 
 class hand;
 class camera;
 class FlatContext;
+class UIView;
 class stereocamera;
+
+class DreamOS;
 
 class composite : public DimObj {
 public:
@@ -63,6 +66,9 @@ public:
 
 	std::shared_ptr<FlatContext> MakeFlatContext(int width = 1024, int height = 1024, int channels = 4);
 	std::shared_ptr<FlatContext> AddFlatContext(int width = 1024, int height = 1024, int channels = 4);
+
+	std::shared_ptr<UIView> MakeUIView(DreamOS *pDreamOS);
+	std::shared_ptr<UIView> AddUIView(DreamOS *pDreamOS);
 
 	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	std::shared_ptr<texture> MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
