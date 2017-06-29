@@ -78,8 +78,12 @@ float text::GetHeight() {
 	return m_height;
 }
 
-float text::GetDPMM() {
-	return m_dpmm;
+float text::GetDPMM(float mmVal) {
+	return m_dpmm * mmVal;
+}
+
+float text::GetDPM(float mVal) {
+	return m_dpmm * 100.0f * mVal;
 }
 
 // TODO: Update everything
@@ -138,13 +142,17 @@ RESULT text::SetText(const std::string& strText) {
 			//maxTop = std::max(maxTop, ((fontBase - glyph.bearingY) + glyph.height) / 2.0f);
 			//minBottom = std::min(minBottom, ((fontBase - glyph.bearingY) - glyph.height) / 2.0f);
 			
-			float uvBottom = (fontImageHeight - glyph.y);
-			float uvTop = (fontImageHeight - glyph.y) - glyph.height;
-			float uvLeft = glyph.x;
-			float uvRight = glyph.x + glyph.width;
+			float uvBottom = (fontImageHeight - glyph.y) / fontImageHeight;
+			float uvTop = ((fontImageHeight - glyph.y) - glyph.height) / fontImageHeight;
 
-			uvcoord uvBottomLeft = uvcoord(uvLeft, uvBottom);
-			uvcoord uvTopRight = uvcoord(uvRight, uvTop);
+			uvBottom = 1.0f - uvBottom;
+			uvTop = 1.0f - uvTop;
+
+			float uvLeft = glyph.x / fontImageWidth;
+			float uvRight = (glyph.x + glyph.width) / fontImageWidth;
+
+			uvcoord uvTopLeft = uvcoord(uvLeft, uvTop);
+			uvcoord uvBottomRight = uvcoord(uvRight, uvBottom);
 
 			float glyphQuadXPosition = posX + ((float)glyph.width / 2.0f) + (float)glyph.bearingX;
 			float glyphQuadYPosition = posY + ((float)(glyph.bearingY - (float)(glyph.height) / 2.0f));
@@ -160,7 +168,8 @@ RESULT text::SetText(const std::string& strText) {
 			glyphQuadYPosition /= (m_dpmm * 10.0f);
 
 			point ptGlyph = point(glyphQuadXPosition, glyphQuadYPosition, 0.0f);
-			auto pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvBottomLeft, uvTopRight);
+			auto pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
+			pQuad->SetColorTexture(m_pFont->GetTexture().get());
 
 			// TODO: Add in wrap / heights
 

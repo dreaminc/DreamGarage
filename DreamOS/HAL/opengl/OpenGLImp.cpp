@@ -562,10 +562,10 @@ Error:
 	return nullptr;
 }
 
-quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, uvcoord uvBottomLeft, uvcoord uvTopRight, vector vNormal) {
+quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), ptOrigin, uvTopLeft, uvBottomRight, vNormal);
 	//pQuad->RotateXByDeg(90.0f);
 	pQuad->MoveTo(ptOrigin);
 
@@ -696,6 +696,23 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, co
 	text *pText = new OGLText(this, pFont, pFontTexture, strContent, width, height, fBillboard);
 	CN(pText);
 
+	int fbWidth = pText->GetDPM(width);
+	int fbHeight = pText->GetDPM(height);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
 //Success:
 	return pText;
 
@@ -713,6 +730,23 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	text *pText = new OGLText(this, pFont, strContent, width, height, fBillboard);
 	CN(pText);
 
+	int fbWidth = pText->GetDPMM() * width * 100.0f;
+	int fbHeight = pText->GetDPMM() * height * 100.0f;
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+	
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
 //Success:
 	return pText;
 
@@ -729,6 +763,23 @@ text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& strCo
 
 	text *pText = new OGLText(this, std::make_shared<font>(fontName, fDistanceMap), strContent, width, height, fBillboard);
 	CN(pText);
+
+	int fbWidth = pText->GetDPMM() * width * 100.0f;
+	int fbHeight = pText->GetDPMM() * height * 100.0f;
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 //Success:
 	return pText;

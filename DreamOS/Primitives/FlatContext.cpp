@@ -35,10 +35,10 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point ptOrigin, uvcoord uvBottomLeft, uvcoord uvTopRight, vector vNormal) {
+std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvBottomLeft, uvTopRight, vNormal));
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
 
 	//Success:
 	return pQuad;
@@ -47,10 +47,10 @@ std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point p
 	return nullptr;
 }
 
-std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point ptOrigin, uvcoord uvBottomLeft, uvcoord uvTopRight, vector vNormal) {
+std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin, uvBottomLeft, uvTopRight, vNormal);
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal);
 	CR(AddObject(pQuad));
 
 	//Success:
@@ -78,6 +78,15 @@ std::shared_ptr<text> FlatContext::AddText(std::shared_ptr<font> pFont, texture 
 
 Error:
 	return nullptr;
+}
+
+RESULT FlatContext::RenderToTexture() {
+	RESULT r = R_PASS;
+
+	CR(m_pHALImp->RenderToTexture(this, GetCamera()));
+
+Error:
+	return r;
 }
 
 framebuffer* FlatContext::GetFramebuffer() {

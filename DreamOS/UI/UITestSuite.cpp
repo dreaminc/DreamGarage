@@ -244,7 +244,11 @@ RESULT UITestSuite::AddTestFont() {
 
 			//auto pText = m_pDreamOS->AddText(pFont, "test", 1.0f, 0.25f);
 			auto pText = m_pDreamOS->AddText(pFont, "abc", 1.0f, 0.25f);
+			CN(pText);
+
 			pText->RotateXByDeg(90.0f);
+
+			pText->RenderToTexture();
 
 			//pText->SetPosition(point(0.0f, -1.0f, 0.0f));
 
@@ -512,8 +516,8 @@ RESULT UITestSuite::SetupPipeline() {
 	
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));

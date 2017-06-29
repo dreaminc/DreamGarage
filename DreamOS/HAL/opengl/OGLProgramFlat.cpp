@@ -107,12 +107,17 @@ RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
 
 	text *pText = dynamic_cast<text*>(pDimObj);
 
-	m_pUniformfDistanceMap->SetUniform(pText != nullptr && pText->GetFont()->HasDistanceMap());
 	if (pText != nullptr) {
 		float buffer = pText->GetFont()->GetBuffer();
 		float gamma = pText->GetFont()->GetGamma();
+
 		m_pUniformBuffer->SetUniformFloat(&buffer);
 		m_pUniformGamma->SetUniformFloat(&gamma);
+
+		m_pUniformfDistanceMap->SetUniform(pText->GetFont()->HasDistanceMap());
+	}
+	else {
+		m_pUniformfDistanceMap->SetUniform(true);
 	}
 
 	return R_PASS;

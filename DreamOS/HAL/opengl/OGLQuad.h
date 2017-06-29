@@ -49,6 +49,14 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	OGLQuad(OpenGLImp *pParentImp, float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) :
+		quad(width, height, ptCenter, uvTopLeft, uvBottomRight, vNormal),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
+
 	OGLQuad(OpenGLImp *pParentImp, BoundingQuad* pBoundingQuad, bool fTriangleBased) :
 		quad(pBoundingQuad, fTriangleBased),
 		OGLObj(pParentImp)

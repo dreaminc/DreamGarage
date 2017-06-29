@@ -17,13 +17,15 @@ public:
 	FlatContext(HALImp *pHALImp);
 
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin);
-	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin, uvcoord uvBottomLeft, uvcoord uvTopRight, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector());
 
 	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin);
-	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin, uvcoord uvBottomLeft, uvcoord uvTopRight, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector());
 
-	std::shared_ptr<text> MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap = false);
+	std::shared_ptr<text> MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double size, bool fDistanceMap = false);
 	std::shared_ptr<text> AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap);
+
+	RESULT RenderToTexture();
 
 public:
 	framebuffer* GetFramebuffer();

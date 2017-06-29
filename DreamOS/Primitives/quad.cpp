@@ -88,7 +88,7 @@ Error:
 
 // This needs to be re-designed, too specific for 2D blits.
 //quad::quad(float height, float width, point& ptCenter, uvcoord& uvBottomLeft, uvcoord& uvUpperRight, vector vNormal) :
-quad::quad(float height, float width, point& ptCenter, const uvcoord& uvBottomLeft, const uvcoord& uvTopRight, vector vNormal) :
+quad::quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) :
 	m_quadType(RECTANGLE),
 	m_numHorizontalDivisions(1),
 	m_numVerticalDivisions(1),
@@ -96,6 +96,11 @@ quad::quad(float height, float width, point& ptCenter, const uvcoord& uvBottomLe
 	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
 {
 	RESULT r = R_PASS;
+	
+	// TODO: UV thing
+	CR(SetVertices(width, height, vNormal, uvTopLeft, uvBottomRight));
+
+	/*
 	CR(Allocate());
 
 	float halfSideX = width / 2.0f;
@@ -115,6 +120,7 @@ quad::quad(float height, float width, point& ptCenter, const uvcoord& uvBottomLe
 
 	pTriIndices[indexCount++] = TriangleIndexGroup(A, C, B);
 	pTriIndices[indexCount++] = TriangleIndexGroup(B, C, D);
+	*/
 
 //Success:
 	Validate();
@@ -283,10 +289,10 @@ vector quad::GetNormal() {
 }
 
 // TODO: not supporting triangle based yet
-RESULT quad::SetVertices(float width, float height, vector vNormal) {
+//RESULT quad::SetVertices(float width, float height, vector vNormal) {
+RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight) {
 	RESULT r = R_PASS;
 
-	// TODO: potential mem leak in here (not dealloc previous buffer)
 	CR(Allocate());
 
 	float halfHeight = height / 2.0f;
@@ -306,8 +312,12 @@ RESULT quad::SetVertices(float width, float height, vector vNormal) {
 		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
 
 			double yValue = 0.0f;
-			uv_precision uValue = (float)(i) / (float)(m_numHorizontalDivisions);
-			uv_precision vValue = (float)(j) / (float)(m_numVerticalDivisions);
+
+			uv_precision uRange = uvBottomRight.u() - uvTopLeft.u();
+			uv_precision vRange = uvBottomRight.v() - uvTopLeft.v();
+
+			uv_precision uValue = uvTopLeft.u() + (((float)(i) / (float)(m_numHorizontalDivisions)) * uRange);
+			uv_precision vValue = uvTopLeft.v() + (((float)(j) / (float)(m_numVerticalDivisions)) * vRange);
 
 			if (m_pTextureHeight != nullptr) {
 				yValue = m_pTextureHeight->GetValueAtUV(uValue, vValue);
@@ -316,7 +326,7 @@ RESULT quad::SetVertices(float width, float height, vector vNormal) {
 
 			m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, static_cast<float>(yValue), (heightInc * j) - halfHeight),
 				vector::jVector(1.0f),
-				uvcoord(uValue, 1 - vValue));
+				uvcoord(uValue, 1.0f - vValue));
 
 			// TODO: Calculate normal (based on geometry)
 

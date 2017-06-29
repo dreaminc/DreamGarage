@@ -76,7 +76,8 @@ public:
 
 	float GetWidth();
 	float GetHeight();
-	float GetDPMM();
+	float GetDPMM(float mmVal = 1.0f);
+	float GetDPM(float mVal = 1.0f);
 
 	RESULT SetWidth(float width);
 	RESULT SetHeight(float height);
