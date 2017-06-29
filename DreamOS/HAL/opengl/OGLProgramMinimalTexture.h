@@ -22,6 +22,7 @@ public:
 	virtual RESULT ProcessNode(long frameID) override;
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj);
+	RESULT SetMaterial(material *pMaterial);
 	RESULT SetObjectUniforms(DimObj *pDimObj);
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
@@ -39,6 +40,8 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
+
+	OGLMaterialBlock *m_pMaterialsBlock;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_TEXTURE_H_

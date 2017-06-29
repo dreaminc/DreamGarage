@@ -158,7 +158,7 @@ RESULT UIViewTestSuite::AnimateScaleUp(void *pContext) {
 	RESULT r = R_PASS;
 
 	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	VirtualObj *pObj = button->GetSurface().get();
+	DimObj *pObj = button->GetSurface().get();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
@@ -178,7 +178,7 @@ RESULT UIViewTestSuite::AnimateScaleReset(void *pContext) {
 	RESULT r = R_PASS;
 
 	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	VirtualObj *pObj = button->GetSurface().get();
+	DimObj *pObj = button->GetSurface().get();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
@@ -198,7 +198,7 @@ RESULT UIViewTestSuite::AnimateMoveUpAndBack(void *pContext) {
 	RESULT r = R_PASS;
 
 	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	VirtualObj *pObj = button->GetSurface().get();
+	DimObj *pObj = button->GetSurface().get();
 
 	point ptOrigin = pObj->GetPosition();
 

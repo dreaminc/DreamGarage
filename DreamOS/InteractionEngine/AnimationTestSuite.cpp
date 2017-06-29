@@ -222,29 +222,39 @@ RESULT AnimationTestSuite::AddTestColor() {
 		RESULT r = R_PASS;
 
 		auto cColor = color(0.0f, 0.0f, 1.0f, 0.0f);
-		CR(SetupProductionPipeline());
 
-		sphere *m_pSphere1 = nullptr;
+		CR(SetupProductionPipeline());
 
 		volume *m_volume = m_pDreamOS->AddVolume(2.0f);
 		m_volume->SetMaterialAmbient(0.75);
 		m_volume->GetMaterial()->SetColors(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
 		m_volume->MoveTo(0.0f, 0.0f, -1.0f);
 
-		m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
+		texture* pPNG = m_pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+		quad *m_pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+		m_pQuad->MoveTo(0.0f, 0.0f, 0.0f);
+		m_pQuad->GetMaterial()->SetColors(COLOR_GREEN, COLOR_GREEN, COLOR_GREEN);
+		m_pQuad->SetColorTexture(pPNG);
+
+/*
+		sphere *m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
 		m_pSphere1->MoveTo(0.0f, 0.0f, 0.0f);
 		m_pSphere1->SetMaterialAmbient(0.75);
 		m_pSphere1->GetMaterial()->SetColors(COLOR_GREEN, COLOR_GREEN, COLOR_GREEN);
 
+		m_pSphere1->SetColorTexture(pPNG);
+		//*/
 
 		quaternion q;
 		q.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
-		m_pSphere1->SetOrientation(q);
+		m_pQuad->SetOrientation(q);
+		m_pQuad->RotateXByDeg(90.0f);
 
 		m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-			m_pSphere1,
+			m_pQuad,
 			cColor,
-			5.0,
+			4.0,
 			AnimationCurveType::LINEAR,
 			AnimationFlags());
 
@@ -465,7 +475,8 @@ RESULT AnimationTestSuite::SetupProductionPipeline() {
 
 	//CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 //	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
