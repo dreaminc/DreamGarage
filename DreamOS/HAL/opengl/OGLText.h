@@ -20,9 +20,10 @@ protected:
 	virtual DimObj *GetDimObj() override;
 
 public:
-	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText = "", double size = 1.0f, bool isBillboard = false);
-	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strText = "", double size = 1.0f, bool isBillboard = false);
-	RESULT SetText(const std::string& text, double size = 1.0);
+	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 1.0f, bool fBillboard = false);
+	OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strText = "", double width = 1.0f, double height = 1.0f, bool fBillboard = false);
+	
+	virtual RESULT SetText(const std::string& text) override;
 };
 
 #endif // ! OGL_TEXT_H_

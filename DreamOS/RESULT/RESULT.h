@@ -43,6 +43,7 @@ typedef enum {
 	R_VIRTUAL,
 	R_ABSTRACT,
 	R_SKIPPED,
+	R_NO_EFFECT,
 	R_RESET,
 	R_NOT_HANDLED,
 

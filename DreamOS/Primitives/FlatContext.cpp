@@ -10,10 +10,10 @@ FlatContext::FlatContext(HALImp * pHALImp) :
 	// TODO add UI capabilities (alignments, etc)
 }
 
-std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point origin) {
+std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point ptOrigin) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, origin));
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin));
 
 //Success:
 	return pQuad;
@@ -22,13 +22,38 @@ std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point o
 	return nullptr;
 }
 
-std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point origin) {
+std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point ptOrigin) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<quad> pQuad = MakeQuad(width, height, origin);
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin);
 	CR(AddObject(pQuad));
 
 //Success:
+	return pQuad;
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point ptOrigin, uvcoord uvBottomLeft, uvcoord uvTopRight, vector vNormal) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvBottomLeft, uvTopRight, vNormal));
+
+	//Success:
+	return pQuad;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> FlatContext::AddQuad(double width, double height, point ptOrigin, uvcoord uvBottomLeft, uvcoord uvTopRight, vector vNormal) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin, uvBottomLeft, uvTopRight, vNormal);
+	CR(AddObject(pQuad));
+
+	//Success:
 	return pQuad;
 
 Error:

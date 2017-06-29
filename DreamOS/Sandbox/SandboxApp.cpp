@@ -1035,14 +1035,14 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string & content, double size, bool isBillboard) {
-	return m_pHALImp->MakeText(pFont, content, size, isBillboard);
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
+	return m_pHALImp->MakeText(pFont, strContent, width, height, true, fBillboard);
 }
 
-text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(pFont, content, size, isBillboard);
+	text *pText = m_pHALImp->MakeText(pFont, strContent, width, height, true, fBillboard);
 	CN(pText);
 
 	CR(AddObject(pText));
@@ -1058,14 +1058,14 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string & content, double size, bool isBillboard) {
-	return m_pHALImp->MakeText(pFont, pFontTexture, content, size, isBillboard);
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
+	return m_pHALImp->MakeText(pFont, pFontTexture, strContent, width, height, true, fBillboard);
 }
 
-text* SandboxApp::AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(pFont, pFontTexture, content, size, isBillboard);
+	text *pText = m_pHALImp->MakeText(pFont, pFontTexture, strContent, width, height, true, fBillboard);
 	CN(pText);
 
 	CR(AddObject(pText));
@@ -1081,10 +1081,10 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::AddText(const std::wstring & fontName, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(fontName, content, size, isBillboard);
+	text *pText = m_pHALImp->MakeText(fontName, strContent, width, height, fBillboard);
 	CN(pText);
 
 	CR(AddObject(pText));

@@ -1,14 +1,14 @@
 #include "OGLText.h"
 #include "Primitives/font.h"
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText, double size, bool fBillboard) :
-	text(pParentImp, pFont, strText, size, fBillboard),
+OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
+	text(pParentImp, pFont, strText, width, height, fBillboard),
 	OGLObj(pParentImp)
 {
 	// TODO: Implement valid and CV EHM
 	RESULT r = OGLInitialize();
 
-	std::wstring strFont(L"Fonts/" + pFont->GetGlyphImageFile());
+	std::wstring strFont(L"Fonts/" + pFont->GetFontImageFile());
 	// Load appropriate glyph texture
 
 	//texture *pColorTexture = new OGLTexture(pParentImp, (wchar_t*)font.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -16,8 +16,8 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::
 	SetColorTexture(pColorTexture);
 }
 
-OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strText, double size, bool isBillboard) :
-	text(pParentImp, pFont, strText, size, isBillboard),
+OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strText, double width, double height, bool fBillboard) :
+	text(pParentImp, pFont, strText, width, height, fBillboard),
 	OGLObj(pParentImp)
 {
 	// TODO: Implement valid and CV EHM
@@ -26,11 +26,12 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, texture *pF
 	SetColorTexture(pFontTexture);
 }
 
-RESULT OGLText::SetText(const std::string& strText, double size) {
+RESULT OGLText::SetText(const std::string& strText) {
 	RESULT r = R_PASS;
 	bool fChanged = false;
 
-	CR(text::SetText(strText, size, &fChanged));
+	CR(text::SetText(strText));
+	fChanged = (r != R_NO_EFFECT);
 
 	// TODO: need to be able to deal with changing vertex amounts automatically
 	if (CheckAndCleanDirty()) {

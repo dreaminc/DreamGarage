@@ -70,10 +70,10 @@ public:
 	// returns false when the ASCII does not exist for the font.
 	RESULT GetGlyphFromChar(uint8_t ascii_id, CharacterGlyph& r_glyph);
 
-	const std::wstring& GetGlyphImageFile() const;
-	uint32_t GetGlyphWidth() const;
-	uint32_t GetGlyphHeight() const;
-	uint32_t GetGlyphBase() const;
+	const std::wstring& GetFontImageFile() const;
+	uint32_t GetFontTextureWidth() const;
+	uint32_t GetFontTextureHeight() const;
+	uint32_t GetFontBase() const;
 
 private:
 	RESULT LoadFontFromFile(const std::wstring& wstrFontFile);
@@ -85,16 +85,16 @@ private:
 	static RESULT GetValue(T& value, const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter = ' ');
 
 private:
-	std::map<uint32_t, const std::string> m_glyphTexturesMap;
+	std::map<uint32_t, const std::string> m_fontTexturesMap;
 	std::map<uint32_t, CharacterGlyph> m_characters;
 
-	std::wstring m_wstrGlyphImageFilename = L"";
+	std::wstring m_wstrFontImageFilename = L"";
 
-	uint32_t m_glyphWidth = 0;
-	uint32_t m_glyphHeight = 0;
+	uint32_t m_fontImageWidth = 0;
+	uint32_t m_fontImageHeight = 0;
 
 	// A glyph base defines the number of pixels in the y-axis above the virtual line of drawing a text
-	uint32_t m_glyphBase = 0;
+	uint32_t m_fontBase = 0;
 
 	uint32_t m_fontPixelSize = DEFAULT_FONT_SIZE;
 

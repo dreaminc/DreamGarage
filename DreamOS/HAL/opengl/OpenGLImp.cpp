@@ -542,16 +542,36 @@ Error:
 	return nullptr;
 }
  
-quad* OpenGLImp::MakeQuad(double width, double height, point origin, vector vNormal) {
+quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, vector vNormal) {
 	RESULT r = R_PASS;
 
 	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
-	pQuad->RotateXByDeg(90.0f);
-	pQuad->MoveTo(origin);
+	//pQuad->RotateXByDeg(90.0f);
+	pQuad->MoveTo(ptOrigin);
 
 	CN(pQuad);
 
 //Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+	return nullptr;
+}
+
+quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, uvcoord uvBottomLeft, uvcoord uvTopRight, vector vNormal) {
+	RESULT r = R_PASS;
+
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
+	//pQuad->RotateXByDeg(90.0f);
+	pQuad->MoveTo(ptOrigin);
+
+	CN(pQuad);
+
+	//Success:
 	return pQuad;
 
 Error:
@@ -670,11 +690,10 @@ volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {
 
 //TODO: the texture could be stored in the font already, but having this pathway
 // avoids conflicts with parts of the code that use fonts without setting the texture
-text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
-{
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, pFont, pFontTexture, content, size, isBillboard);
+	text *pText = new OGLText(this, pFont, pFontTexture, strContent, width, height, fBillboard);
 	CN(pText);
 
 //Success:
@@ -688,11 +707,10 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
-{
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, pFont, content, size, isBillboard);
+	text *pText = new OGLText(this, pFont, strContent, width, height, fBillboard);
 	CN(pText);
 
 //Success:
@@ -706,11 +724,10 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
-{
+text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, std::make_shared<font>(fontName, fDistanceMap), content, size, isBillboard);
+	text *pText = new OGLText(this, std::make_shared<font>(fontName, fDistanceMap), strContent, width, height, fBillboard);
 	CN(pText);
 
 //Success:

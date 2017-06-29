@@ -5,13 +5,15 @@
 
 #include "font.h"
 
-text::text(HALImp *pHALImp, std::shared_ptr<font> font, const std::string& strText, double size, bool fBillboard) :
+text::text(HALImp *pHALImp, std::shared_ptr<font> font, const std::string& strText, double width, double height, bool fBillboard) :
 	FlatContext(pHALImp),
-	m_pFont(font)
+	m_pFont(font),
+	m_width(width),
+	m_height(height)
 {
 	RESULT r = R_PASS;
 
-	CR(SetText(strText, size));
+	CR(SetText(strText));
 
 	Validate();
 	return;
@@ -76,107 +78,100 @@ float text::GetHeight() {
 	return m_height;
 }
 
-RESULT text::SetText(const std::string& strText, double size, bool* fChanged) {
+float text::GetDPMM() {
+	return m_dpmm;
+}
+
+// TODO: Update everything
+RESULT text::SetWidth(float width) {
+	m_width = width;
+	return R_PASS;
+}
+
+RESULT text::SetHeight(float height) {
+	m_height = height;
+	return R_PASS;
+}
+
+RESULT text::SetDPMM(float dpmm) {
+	m_dpmm = dpmm;
+	return R_PASS;
+}
+
+RESULT text::SetText(const std::string& strText) {
 	RESULT r = R_PASS;
+	point ptCenter;
 
-
-	if (m_strText.compare(strText) == 0) {
-		// no need to update the text
-		if (fChanged) {
-			*fChanged = false;
-		}
-
-		return R_SUCCESS;
-	}
-	else  if (fChanged) {
-		*fChanged = true;
-	}
+	CBR((m_strText.compare(strText) != 0), R_NO_EFFECT);
 
 	// Clear out kids
 	CR(ClearChildren());
 
 	m_strText = strText;
 
-	uv_precision glyphWidth = static_cast<float>(m_pFont->GetGlyphWidth());
-	uv_precision glyphHeight = static_cast<float>(m_pFont->GetGlyphHeight());
-	uv_precision glyphBase = static_cast<float>(m_pFont->GetGlyphBase());
+	float fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
+	float fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
+	float fontBase = static_cast<float>(m_pFont->GetFontBase());
+
+	// Apply DPMM to the width
+	double effectiveDotsWidth = (m_width * 1000.0f) * m_dpmm;
+	double effectiveDotsHeight = (m_height * 1000.0f) * m_dpmm;
 
 	float maxBelow = 0.0f;
 	float maxAbove = 0.0f;
-	float posX = 0;
-	point ptCenter;
+	float posX = 0.0f;
+	float posY = 0.0f;
 
 	float minLeft = std::numeric_limits<float>::max();
 	float maxRight = std::numeric_limits<float>::min();
 	float maxTop = std::numeric_limits<float>::min();
 	float minBottom = std::numeric_limits<float>::max();
 
-	for_each(strText.begin(), strText.end(), [&](char c) {
+	for(char &c : m_strText) {
 		font::CharacterGlyph glyph;
 
 		if (m_pFont->GetGlyphFromChar(c, glyph)) {
-			uv_precision x = glyph.x / glyphWidth;
-			uv_precision y = (glyphHeight - glyph.y) / glyphHeight;
-			uv_precision w = glyph.width / glyphWidth;
-			uv_precision h = glyph.height / glyphHeight;
-
-			//uv_precision dx = XSCALE_TO_SCREEN(glyph.width);
-			//uv_precision dy = YSCALE_TO_SCREEN(glyph.height);
-
-			//vector_precision dxs = XSCALE_TO_SCREEN(glyph.bearingX);
-			//vector_precision dys = YSCALE_TO_SCREEN(glyphBase - glyph.bearingY) - dy / 2.0f;
-
-			minLeft = std::min(minLeft, posX + dxs);
-			maxRight = std::max(maxRight, dx + posX + dxs);
-			maxTop = std::max(maxTop, dys + dy / 2.0f);
-			minBottom = std::min(minBottom, dys - dy / 2.0f);
 			
+			// TODO: Do this through composite
+			//minLeft = std::min(minLeft, posX + glyph.bearingX);
+			//maxRight = std::max(maxRight, posX + glyph.bearingX);
+			//maxTop = std::max(maxTop, ((fontBase - glyph.bearingY) + glyph.height) / 2.0f);
+			//minBottom = std::min(minBottom, ((fontBase - glyph.bearingY) - glyph.height) / 2.0f);
+			
+			float uvBottom = (fontImageHeight - glyph.y);
+			float uvTop = (fontImageHeight - glyph.y) - glyph.height;
+			float uvLeft = glyph.x;
+			float uvRight = glyph.x + glyph.width;
 
-			auto pQuad = AddQuad(x, y, vector(dx / 2.0f + posX + dxs, dys, 0.0f));
-			//pQuad->SetUV()
+			uvcoord uvBottomLeft = uvcoord(uvLeft, uvBottom);
+			uvcoord uvTopRight = uvcoord(uvRight, uvTop);
 
-			//quads.push_back(quad(dy, dx, , uvcoord(x, y - h), uvcoord(x + w, y)));
+			float glyphQuadXPosition = posX + ((float)glyph.width / 2.0f) + (float)glyph.bearingX;
+			float glyphQuadYPosition = posY + ((float)(glyph.bearingY - (float)(glyph.height) / 2.0f));
 
-			//posX += XSCALE_TO_SCREEN(glyph.advance);
+			float glyphWidth = glyph.width;
+			float glyphHeight = glyph.height;
+
+			// Apply DPMM
+			glyphWidth /= (m_dpmm * 10.0f);
+			glyphHeight /= (m_dpmm * 10.0f);
+
+			glyphQuadXPosition /= (m_dpmm * 10.0f);
+			glyphQuadYPosition /= (m_dpmm * 10.0f);
+
+			point ptGlyph = point(glyphQuadXPosition, glyphQuadYPosition, 0.0f);
+			auto pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvBottomLeft, uvTopRight);
+
+			// TODO: Add in wrap / heights
+
 			posX += glyph.advance;
 		}
-	});
-
-	m_width = maxRight - minLeft;
-	m_height = maxTop - minBottom;
+	}
+	
+	//m_width = maxRight - minLeft;
+	//m_height = maxTop - minBottom;
 
 	ptCenter = point((minLeft + maxRight) / 2.0f, (maxTop + minBottom) / 2.0f, 0.0f);
-
-	/*
-	unsigned int verticesCnt = 0;
-	unsigned int indicesCnt = 0;
-	unsigned int quadCnt = 0;
-
-	for (auto& q : quads) {
-		vertex* pVertices = q.VertexData();
-
-		pVertices[0].m_point -= ptCenter;
-		pVertices[1].m_point -= ptCenter;
-		pVertices[2].m_point -= ptCenter;
-		pVertices[3].m_point -= ptCenter;
-
-		m_pVertices[verticesCnt++] = pVertices[0];
-		m_pVertices[verticesCnt++] = pVertices[1];
-		m_pVertices[verticesCnt++] = pVertices[2];
-		m_pVertices[verticesCnt++] = pVertices[3];
-
-		dimindex* pIndices = q.IndexData();
-
-		m_pIndices[indicesCnt++] = pIndices[0] + quadCnt;
-		m_pIndices[indicesCnt++] = pIndices[1] + quadCnt;
-		m_pIndices[indicesCnt++] = pIndices[2] + quadCnt;
-		m_pIndices[indicesCnt++] = pIndices[3] + quadCnt;
-		m_pIndices[indicesCnt++] = pIndices[4] + quadCnt;
-		m_pIndices[indicesCnt++] = pIndices[5] + quadCnt;
-
-		quadCnt += 4;
-	}
-	*/
 
 Error:
 	return r;

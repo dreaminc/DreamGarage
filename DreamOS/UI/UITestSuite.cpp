@@ -223,34 +223,35 @@ RESULT UITestSuite::AddTestFont() {
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
+		/*
 		auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
 		//pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
 		pQuad->RotateXByDeg(90.0f);
 		pQuad->SetColor(COLOR_BLUE);
+		*/
 
 		// Fix this
 		{
 
 			// OLD
-			auto pFlatContext = m_pDreamOS->AddFlatContext();
+			//auto pFlatContext = m_pDreamOS->AddFlatContext();
 			
 			///*
 			auto pFont = std::make_shared<font>(L"Basis_Grotesque_Pro.fnt", true);
-			std::wstring strFile = L"Fonts/" + pFont->GetGlyphImageFile();
+			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
 			const wchar_t* pszFile = strFile.c_str();
 			pFont->SetTexture(std::shared_ptr<texture>(m_pDreamOS->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR)));
 
-			auto pText = pFlatContext->AddText(pFont, 
-											   pFont->GetTexture().get(),
-											   "test", 
-											   0.5f, 
-											   true);
+			//auto pText = m_pDreamOS->AddText(pFont, "test", 1.0f, 0.25f);
+			auto pText = m_pDreamOS->AddText(pFont, "abc", 1.0f, 0.25f);
+			pText->RotateXByDeg(90.0f);
+
 			//pText->SetPosition(point(0.0f, -1.0f, 0.0f));
 
-			m_pDreamOS->RenderToTexture(pFlatContext);
+			//m_pDreamOS->RenderToTexture(pFlatContext);
 
 			// Set the texture to the quad
-			pQuad->UpdateColorTexture(pFlatContext->GetFramebuffer()->GetColorTexture());
+			//pQuad->UpdateColorTexture(pFlatContext->GetFramebuffer()->GetColorTexture());
 			//*/
 			
 			// NEW
@@ -511,7 +512,8 @@ RESULT UITestSuite::SetupPipeline() {
 	
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));

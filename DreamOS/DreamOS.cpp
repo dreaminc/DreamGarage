@@ -272,12 +272,12 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
-text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& content, double size, bool isBillboard) {
-	return m_pSandbox->MakeText(pFont, content, size, isBillboard);
+text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& content, double width, double height, bool fBillboard) {
+	return m_pSandbox->MakeText(pFont, content, width, height, fBillboard);
 }
 
-text* DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& content, double size, bool isBillboard) {
-	return m_pSandbox->AddText(pFont, content, size, isBillboard);
+text* DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& content, double width, double height, bool fBillboard) {
+	return m_pSandbox->AddText(pFont, content, width, height, fBillboard);
 }
 
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {

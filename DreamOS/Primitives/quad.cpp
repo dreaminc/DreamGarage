@@ -59,7 +59,7 @@ Error:
 }
 
 // Rectangle
-quad::quad(float height, float width, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
+quad::quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
 	m_quadType(RECTANGLE),
 	m_numHorizontalDivisions(numHorizontalDivisions),
 	m_numVerticalDivisions(numVerticalDivisions),
@@ -87,7 +87,8 @@ Error:
 }
 
 // This needs to be re-designed, too specific for 2D blits.
-quad::quad(float height, float width, point& ptCenter, uvcoord& uvBottomLeft, uvcoord& uvUpperRight, vector vNormal) :
+//quad::quad(float height, float width, point& ptCenter, uvcoord& uvBottomLeft, uvcoord& uvUpperRight, vector vNormal) :
+quad::quad(float height, float width, point& ptCenter, const uvcoord& uvBottomLeft, const uvcoord& uvTopRight, vector vNormal) :
 	m_quadType(RECTANGLE),
 	m_numHorizontalDivisions(1),
 	m_numVerticalDivisions(1),
@@ -107,10 +108,10 @@ quad::quad(float height, float width, point& ptCenter, uvcoord& uvBottomLeft, uv
 	// TODO: ASDFAGKJHNSDFGKJSDFG
 	TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
 
-	m_pVertices[A = vertCount++] = vertex(point(-halfSideX + ptCenter.x(), halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvcoord(uvBottomLeft.u(), uvUpperRight.v()));		// A
-	m_pVertices[B = vertCount++] = vertex(point(halfSideX + ptCenter.x(), halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvUpperRight);			// B
+	m_pVertices[A = vertCount++] = vertex(point(-halfSideX + ptCenter.x(), halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvcoord(uvBottomLeft.u(), uvTopRight.v()));		// A
+	m_pVertices[B = vertCount++] = vertex(point(halfSideX + ptCenter.x(), halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvTopRight);			// B
 	m_pVertices[C = vertCount++] = vertex(point(-halfSideX + ptCenter.x(), -halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvBottomLeft);		// C
-	m_pVertices[D = vertCount++] = vertex(point(halfSideX + ptCenter.x(), -halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvcoord(uvUpperRight.u(), uvBottomLeft.v()));		// D
+	m_pVertices[D = vertCount++] = vertex(point(halfSideX + ptCenter.x(), -halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvcoord(uvTopRight.u(), uvBottomLeft.v()));		// D
 
 	pTriIndices[indexCount++] = TriangleIndexGroup(A, C, B);
 	pTriIndices[indexCount++] = TriangleIndexGroup(B, C, D);

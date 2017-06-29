@@ -65,16 +65,22 @@ private:
 	*/
 
 public:
-	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 
-	RESULT SetText(const std::string& strText, double size, bool* fChanged = nullptr);
+	virtual RESULT SetText(const std::string& strText);
 	
 	VirtualObj* SetPosition(point pt, VerticalAlignment vAlign = VerticalAlignment::MIDDLE, HorizontalAlignment hAlign = HorizontalAlignment::CENTER);
 
 	std::string& GetText();
 	std::shared_ptr<font> GetFont();
+
 	float GetWidth();
 	float GetHeight();
+	float GetDPMM();
+
+	RESULT SetWidth(float width);
+	RESULT SetHeight(float height);
+	RESULT SetDPMM(float dpmm);
 
 public:
 	//static text& MakeText()
@@ -82,6 +88,7 @@ public:
 private:
 	float m_width = 0.0f;
 	float m_height = 0.0f;
+	float m_dpmm = 11.0f;	// Dots per mm - global units in meters so this should be taken into consideration
 
 	VerticalAlignment m_vAlign = VerticalAlignment::TOP;
 	HorizontalAlignment m_hAlign = HorizontalAlignment::CENTER;

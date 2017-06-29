@@ -162,7 +162,7 @@ font::font(const std::wstring& strFontFilename, composite *pContext, bool fDista
 {
 	LoadFontFromFile(strFontFilename);
 
-	std::wstring strFile = L"Fonts/" + GetGlyphImageFile();
+	std::wstring strFile = L"Fonts/" + GetFontImageFile();
 	const wchar_t* pszFile = strFile.c_str();
 	
 	m_pTexture = pContext->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -233,21 +233,21 @@ RESULT font::LoadFontFromFile(const std::wstring& wstrFontFile) {
 
 	while (std::getline(file, wstrLine)) {
 
-		if (m_glyphWidth == 0) {
-			GetValue<uint32_t>(m_glyphWidth, wstrLine, L"scaleW=");
+		if (m_fontImageHeight == 0) {
+			GetValue<uint32_t>(m_fontImageWidth, wstrLine, L"scaleW=");
 		}
 
-		if (m_glyphHeight == 0) {
-			GetValue<uint32_t>(m_glyphHeight, wstrLine, L"scaleH=");
+		if (m_fontImageHeight == 0) {
+			GetValue<uint32_t>(m_fontImageHeight, wstrLine, L"scaleH=");
 		}
 
-		if (m_glyphBase == 0) {
-			GetValue<uint32_t>(m_glyphBase, wstrLine, L"base=");
+		if (m_fontBase == 0) {
+			GetValue<uint32_t>(m_fontBase, wstrLine, L"base=");
 		}
 
-		if (m_wstrGlyphImageFilename.length() == 0) {
+		if (m_wstrFontImageFilename.length() == 0) {
 			// GetValue<std::wstring>(m_wstrGlyphImageFilename, wstrLine, L"file=\"", '\"');
-			m_wstrGlyphImageFilename = GetValue<std::wstring>(wstrLine, L"file=\"", '\"');
+			m_wstrFontImageFilename = GetValue<std::wstring>(wstrLine, L"file=\"", '\"');
 		}
 
 		CharacterGlyph charGlyph(wstrLine);
@@ -266,20 +266,20 @@ Error:
 	return r;
 }
 
-const std::wstring& font::GetGlyphImageFile() const {
-	return m_wstrGlyphImageFilename;
+const std::wstring& font::GetFontImageFile() const {
+	return m_wstrFontImageFilename;
 }
 
-uint32_t font::GetGlyphWidth() const {
-	return m_glyphWidth;
+uint32_t font::GetFontTextureWidth() const {
+	return m_fontImageWidth;
 }
 
-uint32_t font::GetGlyphHeight() const {
-	return m_glyphHeight;
+uint32_t font::GetFontTextureHeight() const {
+	return m_fontImageHeight;
 }
 
-uint32_t font::GetGlyphBase() const {
-	return m_glyphBase;
+uint32_t font::GetFontBase() const {
+	return m_fontBase;
 }
 
 RESULT font::GetGlyphFromChar(uint8_t ascii_id, CharacterGlyph& r_glyph) {
