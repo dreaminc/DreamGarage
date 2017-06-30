@@ -221,10 +221,10 @@ RESULT DreamGarage::LoadScene() {
 	
 	m_pDreamBrowser->SetVisible(false);
 
-	m_pDreamControlView = LaunchDreamApp<DreamControlView>(this);
-	CN(m_pDreamControlView);
+	//m_pDreamControlView = LaunchDreamApp<DreamControlView>(this);
+	//CN(m_pDreamControlView);
 
-	m_pDreamControlView->SetSharedViewContext(m_pDreamBrowser);
+	//m_pDreamControlView->SetSharedViewContext(m_pDreamBrowser);
 
 	//TODO: collisions doesn't follow properly
 	//m_pDreamBrowser->SetParams(point(0.0f, 2.0f, -2.0f), 5.0f, 1.7f, vector(0.0f, 0.0f, 1.0f));
