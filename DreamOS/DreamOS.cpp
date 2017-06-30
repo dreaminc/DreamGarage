@@ -226,13 +226,11 @@ light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOr
 	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
-FlatContext* DreamOS::AddFlatContext(int width, int height, int channels)
-{
+FlatContext* DreamOS::AddFlatContext(int width, int height, int channels) {
 	return m_pSandbox->AddFlatContext(width, height, channels);
 }
 
-RESULT DreamOS::RenderToTexture(FlatContext *pContext) 
-{
+RESULT DreamOS::RenderToTexture(FlatContext *pContext) {
 	return m_pSandbox->RenderToTexture(pContext);
 }
 

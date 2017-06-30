@@ -851,6 +851,20 @@ Error:
 	return r;
 }
 
+RESULT DimObj::InitializeBoundingQuad() {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingQuad>(new BoundingQuad(this));
+	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);
+
+	CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
 RESULT DimObj::InitializeBoundingQuad(point ptOrigin, float width, float height, vector vNormal) {
 	RESULT r = R_PASS;
 

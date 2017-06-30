@@ -57,6 +57,7 @@ public:
 	RESULT AddTestKeyboard();
 	RESULT AddTestUIView();
 	RESULT AddTestFont();
+	RESULT AddTestFlatContextCompositionQuads();
 
 	virtual RESULT AddTests() override;
 

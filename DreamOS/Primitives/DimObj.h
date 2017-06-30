@@ -176,6 +176,7 @@ public:
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();
+	RESULT InitializeBoundingQuad();
 	RESULT InitializeBoundingQuad(point ptOrigin, float width, float height, vector vNormal);
 	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 

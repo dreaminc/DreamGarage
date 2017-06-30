@@ -875,11 +875,21 @@ Error:
 FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 
-	FlatContext* context = m_pHALImp->MakeFlatContext(width, height, channels);
-	CR(m_pFlatSceneGraph->PushObject(context));
+	FlatContext* pFlatContext = m_pHALImp->MakeFlatContext(width, height, channels);
+	//CR(m_pFlatSceneGraph->PushObject(pFlatContext));
+	CN(pFlatContext);
+
+	CR(AddObject(pFlatContext));
+
+	return pFlatContext;
 
 Error:
-	return context;
+	if (pFlatContext != nullptr) {
+		delete pFlatContext;
+		pFlatContext = nullptr;
+	}
+
+	return nullptr;
 }
 
 RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {

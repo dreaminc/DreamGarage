@@ -10,7 +10,7 @@ BoundingQuad::BoundingQuad(VirtualObj *pParentObject) :
 	BoundingVolume(pParentObject),
 	m_width(0.0f),
 	m_height(0.0f),
-	m_vNormal(vector())
+	m_vNormal(vector::jVector(1.0f))
 {
 	// empty
 }
@@ -226,7 +226,15 @@ RESULT BoundingQuad::SetMaxPointFromOrigin(point ptMax) {
 }
 
 RESULT BoundingQuad::SetHalfVector(vector vHalfVector) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	// TODO: Apply Quad normal
+
+	m_width = vHalfVector.x() * 2.0f;
+	m_height = vHalfVector.z() * 2.0f;
+
+//Error:
+	return r;
 }
 
 double BoundingQuad::GetWidth() {

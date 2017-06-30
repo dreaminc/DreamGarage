@@ -56,6 +56,8 @@ RESULT UITestSuite::AddTests() {
 
 	CR(AddTestUIView());
 
+	CR(AddTestFlatContextCompositionQuads());
+
 	CR(AddTestFont());
 
 	CR(AddTestBrowserRequestWithMenuAPI());
@@ -200,6 +202,102 @@ RESULT UITestSuite::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> p
 		CR(m_pDreamBrowser->LoadRequest(webRequest));
 	}
 	
+
+Error:
+	return r;
+}
+
+RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		
+		CN(m_pDreamOS);
+
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupPipeline());
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		{
+			///*
+			//auto pFlatContext = m_pDreamOS->AddFlatContext();
+			auto pFlatContext = m_pDreamOS->AddComposite();
+			CN(pFlatContext);
+			
+			//pFlatContext->InitializeOBB();
+			pFlatContext->InitializeBoundingQuad();
+
+			auto pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, 1.0f));
+			CN(pQuad);
+			pQuad->SetColor(COLOR_BLUE);
+
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, -1.0f));
+			CN(pQuad);
+			pQuad->SetColor(COLOR_GREEN);
+
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, 1.0f));
+			CN(pQuad);
+			pQuad->SetColor(COLOR_RED);
+
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, -1.0f));
+			CN(pQuad);
+			pQuad->SetColor(COLOR_YELLOW);
+
+			pFlatContext->RotateXByDeg(90.0f);
+			//*/
+
+			/*
+			auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+			pQuad->RotateXByDeg(90.0f);
+			pQuad->SetColor(COLOR_BLUE);
+			*/
+
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	CN(pUITest);
+
+	pUITest->SetTestName("Flat Context Composition Test");
+	pUITest->SetTestDescription("Flat context composition test");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
 
 Error:
 	return r;
@@ -515,15 +613,24 @@ RESULT UITestSuite::SetupPipeline() {
 	
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
