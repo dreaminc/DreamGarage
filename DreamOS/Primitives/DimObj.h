@@ -57,8 +57,6 @@ protected:
 	texture *m_pTextureDiffuse = nullptr;
 	texture *m_pTextureSpecular = nullptr;
 
-	color m_cColor;
-
 private:
 	bool m_fVisible;
 	bool m_fWireframe;

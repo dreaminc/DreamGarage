@@ -138,7 +138,7 @@ RESULT DimObj::SetWireframe(bool fWireframe) {
 }
 
 color DimObj::GetColor() {
-	return m_cColor;
+	return GetMaterial()->GetDiffuseColor();
 }
 
 RESULT DimObj::SetColor(color c) {
@@ -147,7 +147,7 @@ RESULT DimObj::SetColor(color c) {
 
 	SetDirty();
 
-	m_cColor = c;
+	GetMaterial()->SetColors(c,c,c);
 
 	return R_PASS;
 }
@@ -158,7 +158,7 @@ RESULT DimObj::SetAlpha(color_precision a) {
 
 	SetDirty();
 
-	m_cColor.a(a);
+	GetMaterial()->SetAmbientIntensity(a);
 
 	return R_PASS;
 }

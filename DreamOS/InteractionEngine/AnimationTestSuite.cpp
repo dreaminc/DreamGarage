@@ -225,6 +225,9 @@ RESULT AnimationTestSuite::AddTestUIColor() {
 //		CR(SetupColorTestPipeline());
 		CR(SetupUINodePipeline());
 
+		auto pSphere = m_pDreamOS->AddSphere(0.2f, 10.0f, 10.0f);
+		pSphere->SetMaterialAmbient(0.75f);
+
 		auto pComposite = m_pDreamOS->MakeComposite();
 		m_pDreamOS->AddObjectToUIGraph(pComposite);
 
