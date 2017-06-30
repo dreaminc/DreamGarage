@@ -100,6 +100,8 @@ quad::quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft,
 	// TODO: UV thing
 	CR(SetVertices(width, height, vNormal, uvTopLeft, uvBottomRight));
 
+	CR(InitializeBoundingQuad(GetOrigin(), width, height, vNormal));
+
 	/*
 	CR(Allocate());
 

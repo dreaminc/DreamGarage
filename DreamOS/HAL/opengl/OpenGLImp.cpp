@@ -696,8 +696,10 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, co
 	text *pText = new OGLText(this, pFont, pFontTexture, strContent, width, height, fBillboard);
 	CN(pText);
 
-	int fbWidth = pText->GetDPM(width);
-	int fbHeight = pText->GetDPM(height);
+	//int fbWidth = pText->GetDPM(width);
+	//int fbHeight = pText->GetDPM(height);
+	int fbWidth = 1024; 
+	int fbHeight = 1024;
 
 	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
 	CN(pOGLFramebuffer);
@@ -730,8 +732,10 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	text *pText = new OGLText(this, pFont, strContent, width, height, fBillboard);
 	CN(pText);
 
-	int fbWidth = pText->GetDPMM() * width * 100.0f;
-	int fbHeight = pText->GetDPMM() * height * 100.0f;
+	int fbWidth = pText->GetDPM(width);
+	int fbHeight = pText->GetDPM(height);
+	//int fbWidth = 1024;
+	//int fbHeight = 1024;
 
 	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
 	CN(pOGLFramebuffer);

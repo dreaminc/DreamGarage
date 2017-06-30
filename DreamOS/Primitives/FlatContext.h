@@ -27,6 +27,9 @@ public:
 
 	RESULT RenderToTexture();
 
+	float GetWidth();
+	float GetHeight();
+
 public:
 	framebuffer* GetFramebuffer();
 	RESULT SetFramebuffer(framebuffer* pFramebuffer);

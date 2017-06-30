@@ -66,10 +66,15 @@ private:
 
 public:
 	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, bool fBillboard = false);
+	~text();
 
 	virtual RESULT SetText(const std::string& strText);
 	
 	VirtualObj* SetPosition(point pt, VerticalAlignment vAlign = VerticalAlignment::MIDDLE, HorizontalAlignment hAlign = HorizontalAlignment::CENTER);
+
+	// TODO: This clobbers the rest of thing, might want to move text to quad and 
+	// have a flat context internally or something like that
+	RESULT RenderToQuad();
 
 	std::string& GetText();
 	std::shared_ptr<font> GetFont();
@@ -99,6 +104,8 @@ private:
 
 	// String of the text
 	std::string	m_strText = "";
+
+	std::shared_ptr<quad> m_pQuad = nullptr;
 };
 
 #endif // ! TEXT_H_

@@ -99,7 +99,9 @@ public:
 	virtual RESULT MakeCurrentContext() = 0;
 	virtual RESULT ReleaseCurrentContext() = 0;
 
+	FlatProgram* GetFlatProgram();
 	virtual RESULT RenderToTexture(FlatContext* pContext, stereocamera* pCamera);
+	virtual RESULT RenderToTexture(FlatContext* pContext);
 
 	virtual RESULT Shutdown() = 0;
 

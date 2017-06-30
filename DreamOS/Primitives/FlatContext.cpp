@@ -7,7 +7,19 @@
 FlatContext::FlatContext(HALImp * pHALImp) :
 	composite(pHALImp)
 {
-	// TODO add UI capabilities (alignments, etc)
+	RESULT r = R_PASS;
+
+	// TODO: add UI capabilities (alignments, etc)
+
+	// TODO: Switch to quad, this should never have a third dimension
+	CR(InitializeOBB());
+	//CR(InitializeBoundingQuad(GetOrigin(), width, height, vector::jVector(1.0f)));
+
+	return;
+
+Error:
+	Invalidate();
+	return;
 }
 
 std::shared_ptr<quad> FlatContext::MakeQuad(double width, double height, point ptOrigin) {
@@ -83,7 +95,7 @@ Error:
 RESULT FlatContext::RenderToTexture() {
 	RESULT r = R_PASS;
 
-	CR(m_pHALImp->RenderToTexture(this, GetCamera()));
+	CR(m_pHALImp->RenderToTexture(this));
 
 Error:
 	return r;
@@ -96,4 +108,14 @@ framebuffer* FlatContext::GetFramebuffer() {
 RESULT FlatContext::SetFramebuffer(framebuffer* pFramebuffer) {
 	m_pFramebuffer = pFramebuffer;
 	return R_PASS;
+}
+
+float FlatContext::GetWidth() {
+	vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
+	return vDiff.x();
+}
+
+float FlatContext::GetHeight() {
+	vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
+	return vDiff.y();
 }

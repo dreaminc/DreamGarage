@@ -4,6 +4,8 @@
 #include <algorithm>
 
 #include "font.h"
+#include "HAL/HALImp.h"
+#include "Framebuffer.h"
 
 text::text(HALImp *pHALImp, std::shared_ptr<font> font, const std::string& strText, double width, double height, bool fBillboard) :
 	FlatContext(pHALImp),
@@ -13,6 +15,8 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> font, const std::string& strTe
 {
 	RESULT r = R_PASS;
 
+	// TODO: This should go into a factory method or something
+
 	CR(SetText(strText));
 
 	Validate();
@@ -21,6 +25,32 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> font, const std::string& strTe
 Error:
 	Invalidate();
 	return;
+}
+
+text::~text() {
+	if (m_pQuad != nullptr) {
+		m_pQuad = nullptr;
+	}
+
+	ClearChildren();
+}
+
+RESULT text::RenderToQuad() {
+	RESULT r = R_PASS;
+
+	CR(RenderToTexture());
+
+	CR(ClearChildren());
+
+	if (m_pQuad == nullptr) {
+		m_pQuad = AddQuad(m_width, m_height, point(0.0f));
+		CN(m_pQuad);
+	}
+
+	CR(m_pQuad->SetColorTexture(GetFramebuffer()->GetColorTexture()));
+
+Error:
+	return r;
 }
 
 VirtualObj* text::SetPosition(point pt, VerticalAlignment vAlign, HorizontalAlignment hAlign) {
@@ -118,18 +148,19 @@ RESULT text::SetText(const std::string& strText) {
 	float fontBase = static_cast<float>(m_pFont->GetFontBase());
 
 	// Apply DPMM to the width
-	double effectiveDotsWidth = (m_width * 1000.0f) * m_dpmm;
-	double effectiveDotsHeight = (m_height * 1000.0f) * m_dpmm;
+	double effectiveDotsWidth = GetDPMM(m_width);
+	double effectiveDotsHeight = GetDPMM(m_height);
 
-	float maxBelow = 0.0f;
-	float maxAbove = 0.0f;
+	//float maxBelow = 0.0f;
+	//float maxAbove = 0.0f;
+
 	float posX = 0.0f;
 	float posY = 0.0f;
 
-	float minLeft = std::numeric_limits<float>::max();
-	float maxRight = std::numeric_limits<float>::min();
-	float maxTop = std::numeric_limits<float>::min();
-	float minBottom = std::numeric_limits<float>::max();
+	//float minLeft = std::numeric_limits<float>::max();
+	//float maxRight = std::numeric_limits<float>::min();
+	//float maxTop = std::numeric_limits<float>::min();
+	//float minBottom = std::numeric_limits<float>::max();
 
 	for(char &c : m_strText) {
 		font::CharacterGlyph glyph;
@@ -142,8 +173,9 @@ RESULT text::SetText(const std::string& strText) {
 			//maxTop = std::max(maxTop, ((fontBase - glyph.bearingY) + glyph.height) / 2.0f);
 			//minBottom = std::min(minBottom, ((fontBase - glyph.bearingY) - glyph.height) / 2.0f);
 			
-			float uvBottom = (fontImageHeight - glyph.y) / fontImageHeight;
-			float uvTop = ((fontImageHeight - glyph.y) - glyph.height) / fontImageHeight;
+			// UV
+			float uvTop = (fontImageHeight - glyph.y) / fontImageHeight;
+			float uvBottom = ((fontImageHeight - glyph.y) - glyph.height) / fontImageHeight;
 
 			uvBottom = 1.0f - uvBottom;
 			uvTop = 1.0f - uvTop;
@@ -154,11 +186,16 @@ RESULT text::SetText(const std::string& strText) {
 			uvcoord uvTopLeft = uvcoord(uvLeft, uvTop);
 			uvcoord uvBottomRight = uvcoord(uvRight, uvBottom);
 
-			float glyphQuadXPosition = posX + ((float)glyph.width / 2.0f) + (float)glyph.bearingX;
-			float glyphQuadYPosition = posY + ((float)(glyph.bearingY - (float)(glyph.height) / 2.0f));
+			// Position
 
-			float glyphWidth = glyph.width;
-			float glyphHeight = glyph.height;
+			float glyphQuadXPosition = posX + ((float)(glyph.width) / 2.0f) + (float)(glyph.bearingX);
+			float glyphQuadYPosition = posY - ((float)(fontBase) - (float)(glyph.bearingY) - ((float)(glyph.height) / 2.0f));
+
+			//float glyphWidth = GetDPM(glyph.width);
+			//float glyphHeight = GetDPM(glyph.height);
+
+			float glyphWidth = (glyph.width);
+			float glyphHeight = (glyph.height);
 
 			// Apply DPMM
 			glyphWidth /= (m_dpmm * 10.0f);
@@ -167,20 +204,23 @@ RESULT text::SetText(const std::string& strText) {
 			glyphQuadXPosition /= (m_dpmm * 10.0f);
 			glyphQuadYPosition /= (m_dpmm * 10.0f);
 
-			point ptGlyph = point(glyphQuadXPosition, glyphQuadYPosition, 0.0f);
+			//glyphQuadXPosition = GetDPM(glyphQuadXPosition);
+			//glyphQuadYPosition = GetDPM(glyphQuadYPosition);
+
+			point ptGlyph = point(glyphQuadXPosition, m_height, glyphQuadYPosition);
 			auto pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 			pQuad->SetColorTexture(m_pFont->GetTexture().get());
 
 			// TODO: Add in wrap / heights
 
-			posX += glyph.advance;
+			posX += (float)(glyph.advance);
 		}
 	}
 	
 	//m_width = maxRight - minLeft;
 	//m_height = maxTop - minBottom;
 
-	ptCenter = point((minLeft + maxRight) / 2.0f, (maxTop + minBottom) / 2.0f, 0.0f);
+	//ptCenter = point((minLeft + maxRight) / 2.0f, (maxTop + minBottom) / 2.0f, 0.0f);
 
 Error:
 	return r;

@@ -82,6 +82,29 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
+	RESULT r = R_PASS;
+
+	CR(UseProgram());
+
+	CR(BindToFramebuffer(m_pOGLFramebuffer));
+	
+	{
+		float width = pFlatContext->GetWidth() * 4.0f;
+		float height = pFlatContext->GetHeight() * 4.0f;
+
+		auto matP = ProjectionMatrix(width, height, -1.0f, 1.0f);
+		m_pUniformProjectionMatrix->SetUniform(matP);
+
+		CR(RenderObject(pFlatContext));
+	}
+
+	CR(UnbindFramebuffer());
+
+Error:
+	return r;
+}
+
 RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
@@ -89,6 +112,7 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 
 	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
 
@@ -125,16 +149,20 @@ RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
 
 RESULT OGLProgramFlat::SetCameraUniforms(camera *pCamera) {
 	auto matP = pCamera->GetProjectionMatrix();
-	if (m_pUniformProjectionMatrix)
+
+	if (m_pUniformProjectionMatrix) {
 		m_pUniformProjectionMatrix->SetUniform(matP);
+	}
 
 	return R_PASS;
 }
 
 RESULT OGLProgramFlat::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
-	if (m_pUniformProjectionMatrix)
+
+	if (m_pUniformProjectionMatrix) {
 		m_pUniformProjectionMatrix->SetUniform(matP);
+	}
 
 	return R_PASS;
 }

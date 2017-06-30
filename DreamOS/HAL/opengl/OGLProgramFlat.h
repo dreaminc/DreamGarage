@@ -17,6 +17,8 @@ public:
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID = 0) override;
 
+	// FlatProgram
+	virtual RESULT RenderFlatContext(FlatContext *pFlatContext) override;
 	virtual RESULT SetFlatFramebuffer(framebuffer *pFramebuffer) override;
 	virtual RESULT SetCamera(stereocamera *pCamera) override;
 	virtual RESULT SetFlatContext(FlatContext *pFlatContext) override;

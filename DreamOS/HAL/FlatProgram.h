@@ -22,6 +22,7 @@ public:
 	virtual RESULT SetFlatFramebuffer(framebuffer *pFramebuffer) = 0;
 	virtual RESULT SetCamera(stereocamera *pCamera) = 0;
 	virtual RESULT SetFlatContext(FlatContext *pFlatContext) = 0;
+	virtual RESULT RenderFlatContext(FlatContext *pFlatContext) = 0;
 };
 
 #endif	// ! FLAT_PROGRAM_NODE_H_
