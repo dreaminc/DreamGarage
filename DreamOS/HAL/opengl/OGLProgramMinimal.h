@@ -22,10 +22,11 @@ public:
 	virtual RESULT SetupConnections() override;
 	virtual RESULT ProcessNode(long frameID) override;
 
-	RESULT SetObjectTextures(OGLObj *pOGLObj);
-	RESULT SetObjectUniforms(DimObj *pDimObj);
-	RESULT SetCameraUniforms(camera *pCamera);
-	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
+	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) override;
+	virtual RESULT SetMaterial(material *pMaterial) override;
+	virtual RESULT SetObjectUniforms(DimObj *pDimObj) override;
+	virtual RESULT SetCameraUniforms(camera *pCamera) override;
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
 
 protected:
 	stereocamera *m_pCamera = nullptr;
@@ -37,6 +38,8 @@ protected:
 
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+
+	OGLMaterialBlock *m_pMaterialsBlock;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_H_

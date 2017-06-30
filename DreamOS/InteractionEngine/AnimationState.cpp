@@ -1,5 +1,6 @@
 #include "AnimationState.h"
-#include "Primitives/VirtualObj.h"
+
+#include "Primitives/DimObj.h"
 
 RESULT AnimationState::Compose(AnimationState state) {
 	ptPosition += state.ptPosition;
@@ -7,9 +8,17 @@ RESULT AnimationState::Compose(AnimationState state) {
 	vScale = vector(vScale.x() * state.vScale.x(),
 					vScale.y() * state.vScale.y(),
 					vScale.z() * state.vScale.z());
+	cColor = state.cColor;
 	return R_PASS;
 }
 
-VirtualObj* AnimationState::Apply(VirtualObj* pObj) {
-	return pObj->MoveTo(ptPosition)->SetScale(vScale)->SetOrientation(qRotation);
+DimObj* AnimationState::Apply(DimObj* pObj) {
+
+//	pObj->SetColor(cColor);
+	//TODO: currently setting diffuse color through the material
+	// will need an overhaul with the shaders
+	//pObj->GetMaterial()->SetDiffuseColor(cColor);
+	pObj->GetMaterial()->SetColors(cColor, cColor, cColor);
+	pObj->MoveTo(ptPosition)->SetScale(vScale)->SetOrientation(qRotation);
+	return pObj;
 }

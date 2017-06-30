@@ -113,6 +113,8 @@ RESULT OGLProgramEnvironmentObjects::ProcessNode(long frameID) {
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);
 
+	glEnable(GL_BLEND);
+
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());

@@ -346,7 +346,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		return r;
 	};
 
-	VirtualObj *pObj = GetComposite();
+	DimObj *pObj = GetComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		m_ptSurfaceOffset,
@@ -375,7 +375,7 @@ RESULT UIKeyboard::HideKeyboard() {
 		return r;
 	};
 
-	VirtualObj* pObj = GetComposite();
+	DimObj *pObj = GetComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		pObj->GetPosition() - point(0.0f, 1.0f, 0.0f),

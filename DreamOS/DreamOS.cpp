@@ -320,6 +320,10 @@ composite *DreamOS::AddComposite() {
 	return m_pSandbox->AddComposite();
 }
 
+composite *DreamOS::MakeComposite() {
+	return m_pSandbox->MakeComposite();
+}
+
 user *DreamOS::AddUser() {
 	return m_pSandbox->AddUser();
 }
@@ -381,6 +385,10 @@ RESULT DreamOS::AddAndRegisterInteractionObject(VirtualObj *pObject, Interaction
 
 Error:
 	return r;
+}
+
+RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
+	return m_pSandbox->AddObjectToUIGraph(pObject);
 }
 
 // Cloud Controller

@@ -8,59 +8,18 @@
 // Base type for material
 
 #include "color.h"
-#include "texture.h"
 
 class material {
 public:
-	material() :
-		m_shine(100.0f),
-		m_bump(0.0f),
-		m_ambient(0.03f),
-		reserved3(0.0f),
-		m_colorAmbient(COLOR_WHITE),
-		m_colorDiffuse(COLOR_WHITE),
-		m_colorSpecular(COLOR_WHITE)
-	{
-		// empty
-	}
+	material();
+	material(float shine, color colorAmbient, color colorDiffuse, color colorSpecular);
+	material(float shine, float bump, color colorAmbient, color colorDiffuse, color colorSpecular, float ambient = 0.03f);
+	~material();
 
-	material(float shine, color colorAmbient, color colorDiffuse, color colorSpecular) :
-		m_shine(shine),
-		m_bump(0.0f),
-		m_ambient(0.0f),
-		reserved3(0.0f),
-		m_colorAmbient(colorAmbient),
-		m_colorDiffuse(colorDiffuse),
-		m_colorSpecular(colorSpecular)
-	{
-		// empty
-	}
-
-	material(float shine, float bump, color colorAmbient, color colorDiffuse, color colorSpecular, float ambient = 0.03f) :
-		m_shine(shine),
-		m_bump(bump),
-		m_ambient(ambient),
-		reserved3(0.0f),
-		m_colorAmbient(colorAmbient),
-		m_colorDiffuse(colorDiffuse),
-		m_colorSpecular(colorSpecular)
-	{
-		// empty
-	}
-
-	~material() {
-		// empty
-	}
-
-	void Set(color colorAmbient, color colorDiffuse, color colorSpecular) {
-		m_colorAmbient = colorAmbient;
-		m_colorDiffuse = colorDiffuse;
-		m_colorSpecular = colorSpecular;
-	}
-
-	void SetAmbientIntensity(float ambient) {
-		m_ambient = ambient;
-	}
+	RESULT SetColors(color colorAmbient, color colorDiffuse, color colorSpecular);
+	RESULT SetDiffuseColor(color colorDiffuse);
+	RESULT SetAmbientIntensity(float ambient);
+	color GetDiffuseColor();
 
 private:
 	float m_shine;				// specular

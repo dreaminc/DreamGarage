@@ -37,6 +37,10 @@ public:
 	RESULT AddTestCancel();
 	RESULT AddTestCurves();
 	RESULT AddTestRotate();
+	RESULT AddTestUIColor();
+
+	RESULT SetupPipeline();
+	RESULT SetupUINodePipeline();
 
 private:
 	RESULT InitializeAnimationTest(void *pContext);

@@ -191,7 +191,7 @@ RESULT UIScrollView::AnimateScaleUp(void *pContext) {
 	RESULT r = R_PASS;
 
 	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	VirtualObj *pObj = button->GetSurface().get();
+	DimObj *pObj = button->GetSurface().get();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
@@ -211,7 +211,7 @@ RESULT UIScrollView::AnimateScaleReset(void *pContext) {
 	RESULT r = R_PASS;
 
 	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	VirtualObj *pObj = button->GetSurface().get();
+	DimObj *pObj = button->GetSurface().get();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,

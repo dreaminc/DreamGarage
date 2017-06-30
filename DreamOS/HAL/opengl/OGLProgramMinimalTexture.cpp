@@ -1,5 +1,9 @@
 #include "OGLProgramMinimalTexture.h"
 
+#include "OpenGLImp.h"
+#include "OGLFramebuffer.h"
+#include "OGLAttachment.h"
+
 OGLProgramMinimalTexture::OGLProgramMinimalTexture(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "oglminimaltexture")
 {
@@ -21,7 +25,28 @@ RESULT OGLProgramMinimalTexture::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
-	CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
+	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
+
+	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
+	/*
+	int pxWidth = m_pParentImp->GetViewport().Width();
+	int pxHeight = m_pParentImp->GetViewport().Height();
+
+	m_pOGLFramebuffer = new OGLFramebuffer(m_pParentImp, pxWidth, pxHeight, 4);
+	CR(m_pOGLFramebuffer->OGLInitialize());
+	CR(m_pOGLFramebuffer->Bind());
+
+	CR(m_pOGLFramebuffer->SetSampleCount(4));
+
+	CR(m_pOGLFramebuffer->MakeColorAttachment());
+	CR(m_pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(m_pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(m_pOGLFramebuffer->MakeDepthAttachment());
+	CR(m_pOGLFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
+
+	CR(m_pOGLFramebuffer->InitializeOGLDrawBuffers(1));
+	//*/
 
 Error:
 	return r;
@@ -33,10 +58,12 @@ RESULT OGLProgramMinimalTexture::SetupConnections() {
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 
 Error:
 	return r;
@@ -50,12 +77,17 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	std::vector<light*> *pLights = nullptr;
 	pObjectStore->GetLights(pLights);
 
-	UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
+	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	UseProgram();
 
-	if (m_pOGLFramebuffer != nullptr)
-		BindToFramebuffer(m_pOGLFramebuffer);
+	if (m_pOGLFramebuffer != nullptr) {
+		//BindToFramebuffer(m_pOGLFramebuffer);
+		m_pOGLFramebuffer->Bind();	
+	}
+
+	glEnable(GL_BLEND);
 
 	SetLights(pLights);
 
@@ -93,6 +125,18 @@ RESULT OGLProgramMinimalTexture::SetObjectUniforms(DimObj *pDimObj) {
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	return R_PASS;
+}
+
+RESULT OGLProgramMinimalTexture::SetMaterial(material *pMaterial) {
+	RESULT r = R_PASS;
+
+	if (m_pMaterialsBlock != nullptr) {
+		CR(m_pMaterialsBlock->SetMaterial(pMaterial));
+		CR(m_pMaterialsBlock->UpdateOGLUniformBlockBuffers());
+	}
+
+Error:
+	return r;
 }
 
 RESULT OGLProgramMinimalTexture::SetCameraUniforms(camera *pCamera) {
