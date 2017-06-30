@@ -33,7 +33,7 @@ public:
 	RESULT SetRiverAnimation(bool fRiverAnimation);
 
 private:
-	void SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit);
+	RESULT SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit);
 
 private:
 	stereocamera *m_pCamera = nullptr;

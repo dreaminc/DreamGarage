@@ -30,6 +30,7 @@ public:
 	RESULT AddTestEnvironmentShader();
 
 	RESULT AddTestText();
+	RESULT AddTestModel();
 
 	// TODO: Consolidate the HMD tests 
 	RESULT AddTestMinimalShaderHMD();

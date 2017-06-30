@@ -129,16 +129,16 @@ RESULT OGLProgramEnvironmentObjects::ProcessNode(long frameID) {
 RESULT OGLProgramEnvironmentObjects::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
-	// bump
-	//SetTextureUniform(pOGLObj->GetColorTexture(), m_pUniformTextureColor, m_pUniformHasTextureColor, 0);
+	// Bump
+	SetTextureUniform(pOGLObj->GetColorTexture(), m_pUniformTextureBump, m_pUniformHasTextureBump, 0);
 
-	// color texture
+	// Color texture
 	SetTextureUniform(pOGLObj->GetColorTexture(), m_pUniformTextureColor, m_pUniformHasTextureColor, 1);
 
-	// material textures
-	//SetTextureUniform(pOGLObj->GetTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
+	// Material textures
+	SetTextureUniform(pOGLObj->GetTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient, 2);
 	SetTextureUniform(pOGLObj->GetTextureDiffuse(), m_pUniformTextureDiffuse, m_pUniformHasTextureDiffuse, 3);
-	//SetTextureUniform(pOGLObj->GetTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
+	SetTextureUniform(pOGLObj->GetTextureSpecular(), m_pUniformTextureSpecular, m_pUniformHasTextureSpecular, 4);
 
 	// bump texture
 	// TODO: add bump texture to shader
@@ -220,16 +220,21 @@ RESULT OGLProgramEnvironmentObjects::SetRiverAnimation(bool fRiverAnimation) {
 	return R_PASS;
 }
 
-void OGLProgramEnvironmentObjects::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
+RESULT OGLProgramEnvironmentObjects::SetTextureUniform(OGLTexture* pTexture, OGLUniformSampler2D* pTextureUniform, OGLUniformBool* pBoolUniform, int texUnit) {
+	RESULT r = R_PASS;
+	
 	if (pTexture) {
 		pBoolUniform->SetUniform(true);
 
 		m_pParentImp->glActiveTexture(GL_TEXTURE0 + texUnit);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 
-		m_pUniformTextureColor->SetUniform(texUnit);
+		pTextureUniform->SetUniform(texUnit);
 	}
 	else {
 		pBoolUniform->SetUniform(false);
 	}
-};
+
+//Error:
+	return r;
+}
