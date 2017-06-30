@@ -20,6 +20,7 @@ SandboxApp::SandboxApp() :
 	m_pCommandLineManager(nullptr),
 	m_pOpenGLRenderingContext(nullptr),
 	m_pSceneGraph(nullptr),
+	m_pUISceneGraph(nullptr),
 	m_pPhysicsGraph(nullptr),
 	m_pInteractionGraph(nullptr),
 	m_pFlatSceneGraph(nullptr),
@@ -506,6 +507,9 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	//m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
+
+	m_pUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pUISceneGraph, "Failed to allocate UI Scene Graph");
 	
 	// This will prevent scene graph from being deleted when not connected
 	// TODO: Attach to Sandbox somehow?
@@ -798,6 +802,15 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pUISceneGraph->PushObject(pObject));
+
+Error:
+	return r;
+}
+
 /*
 RESULT SandboxApp::UpdateInteractionPrimitive(const ray &rCast) {
 	RESULT r = R_PASS;
@@ -814,6 +827,7 @@ RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 
 	CR(m_pPhysicsGraph->RemoveObject(pObject));
 	CR(m_pSceneGraph->RemoveObject(pObject));
+	CR(m_pUISceneGraph->RemoveObject(pObject));
 	CR(m_pInteractionGraph->RemoveObject(pObject));
 
 Error:
@@ -826,6 +840,7 @@ RESULT SandboxApp::RemoveAllObjects() {
 
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());
+	CR(m_pUISceneGraph->RemoveAllObjects());
 	CR(m_pInteractionGraph->RemoveAllObjects());
 
 Error:
@@ -1201,9 +1216,13 @@ composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pT
 	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
+composite* SandboxApp::MakeComposite() {
+	return m_pHALImp->MakeComposite();
+}
+
 composite* SandboxApp::AddComposite() {
 	RESULT r = R_PASS;
-	composite* pComposite = m_pHALImp->MakeComposite();
+	composite* pComposite = MakeComposite();
 	CN(pComposite);
 	CR(AddObject(pComposite));
 	

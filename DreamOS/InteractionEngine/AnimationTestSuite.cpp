@@ -20,7 +20,7 @@ AnimationTestSuite::~AnimationTestSuite() {
 
 RESULT AnimationTestSuite::AddTests() {
 	RESULT r = R_PASS;
-	CR(AddTestColor());
+	CR(AddTestUIColor());
 	CR(AddTestRotate());
 	CR(AddTestCurves());
 	CR(AddTestAnimationBasic());
@@ -214,8 +214,7 @@ Error:
 	return r;
 }
 
-RESULT AnimationTestSuite::AddTestColor() {
-
+RESULT AnimationTestSuite::AddTestUIColor() {
 	RESULT r = R_PASS;
 
 	auto fnInitialize = [&](void *pContext) {
@@ -223,28 +222,19 @@ RESULT AnimationTestSuite::AddTestColor() {
 
 		auto cColor = color(0.0f, 0.0f, 1.0f, 0.0f);
 
-		CR(SetupProductionPipeline());
+//		CR(SetupColorTestPipeline());
+		CR(SetupUINodePipeline());
 
-		volume *m_volume = m_pDreamOS->AddVolume(2.0f);
-		m_volume->SetMaterialAmbient(0.75);
-		m_volume->GetMaterial()->SetColors(COLOR_WHITE, COLOR_WHITE, COLOR_WHITE);
-		m_volume->MoveTo(0.0f, 0.0f, -1.0f);
+		auto pComposite = m_pDreamOS->MakeComposite();
+		m_pDreamOS->AddObjectToUIGraph(pComposite);
 
 		texture* pPNG = m_pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-		quad *m_pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+		quad *m_pQuad = pComposite->MakeQuad(1.0f, 1.0f).get();
 		m_pQuad->MoveTo(0.0f, 0.0f, 0.0f);
 		m_pQuad->GetMaterial()->SetColors(COLOR_GREEN, COLOR_GREEN, COLOR_GREEN);
 		m_pQuad->SetColorTexture(pPNG);
-
-/*
-		sphere *m_pSphere1 = m_pDreamOS->AddSphere(0.5f, 10.0f, 10.0f);
-		m_pSphere1->MoveTo(0.0f, 0.0f, 0.0f);
-		m_pSphere1->SetMaterialAmbient(0.75);
-		m_pSphere1->GetMaterial()->SetColors(COLOR_GREEN, COLOR_GREEN, COLOR_GREEN);
-
-		m_pSphere1->SetColorTexture(pPNG);
-		//*/
+		m_pDreamOS->AddObjectToUIGraph(m_pQuad);
 
 		quaternion q;
 		q.SetValues(1.0f, 0.0f, 0.0f, 0.0f);
@@ -283,7 +273,6 @@ RESULT AnimationTestSuite::AddTestColor() {
 Error:
 	return r;
 }
-
 
 RESULT AnimationTestSuite::AddTestAnimationBasic() {
 
@@ -463,7 +452,7 @@ Error:
 	return r;
 }
 
-RESULT AnimationTestSuite::SetupProductionPipeline() {
+RESULT AnimationTestSuite::SetupUINodePipeline() {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -475,34 +464,38 @@ RESULT AnimationTestSuite::SetupProductionPipeline() {
 
 	//CR(pHAL->MakeCurrentContext());
 
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 //	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
-	/*
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Connect output as pass-thru to internal blend program
-	CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+//*
+	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	CN(pUIProgramNode);
+	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 	//*/
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
 	
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
 	// Connect Program to Display
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-
-	//CR(pHAL->ReleaseCurrentContext());
 
 Error:
 	return r;

@@ -171,6 +171,8 @@ public:
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
+	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+
 	RESULT RemoveAllObjects();
 	RESULT RemoveObject(VirtualObj *pObject);
 
@@ -219,6 +221,7 @@ public:
 	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 	composite* AddComposite();
+	composite* MakeComposite();
 
 	user *AddUser();
 
@@ -259,6 +262,7 @@ public:
 
 	CameraNode* GetCameraNode() { return m_pCamera; }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
+	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
 
 	hand *GetHand(hand::HAND_TYPE handType);
 
@@ -283,6 +287,7 @@ protected:
 
 	//ObjectStore *m_pSceneGraph;
 	ObjectStoreNode *m_pSceneGraph = nullptr;
+	ObjectStoreNode *m_pUISceneGraph = nullptr;
 
 	CloudController *m_pCloudController;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;

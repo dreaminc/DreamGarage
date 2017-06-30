@@ -121,6 +121,8 @@ public:
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
+	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+
 	RESULT RemoveObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();
 
@@ -159,7 +161,9 @@ public:
 	model *AddModel(wchar_t *pszModelName);
 	model *MakeModel(wchar_t *pszModelName);
 	composite *AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+
 	composite *AddComposite();
+	composite *MakeComposite();
 
 	user *AddUser();
 
@@ -171,6 +175,7 @@ public:
 
 	CameraNode* GetCameraNode() { return m_pSandbox->GetCameraNode(); }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSandbox->GetSceneGraphNode(); }
+	ObjectStoreNode* GetUISceneGraphNode() { return m_pSandbox->GetUISceneGraphNode(); }
 
 	// Hands
 	hand *GetHand(hand::HAND_TYPE handType);
