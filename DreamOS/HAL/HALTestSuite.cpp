@@ -18,6 +18,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestModel());
+
 	CR(AddTestText());
 
 	CR(AddTestBlinnPhongShaderTextureCopy());
@@ -462,6 +464,127 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 
 	pNewTest->SetTestName("Environment Shader");
 	pNewTest->SetTestDescription("Environment shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+// This will test the HAL model shit
+// TODO: Fix this
+RESULT HALTestSuite::AddTestModel() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	float width = 5.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		// Debug Console
+		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
+		CN(pDreamConsoleProgram);
+		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+
+		// Connect Program to Display
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		volume *pVolume = nullptr;
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		{
+			auto pHead = m_pDreamOS->AddModel(L"\\Models\\face4\\untitled.obj",
+				nullptr,
+				point(0.0f, 0.0f, 0.0f),
+				0.018f,
+				vector(0.0f, 0.0f, 0.0f));
+
+			pHead->SetPosition(point(0.0f, 0.0f, 2.0f));
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("HAL Model Test");
+	pNewTest->SetTestDescription("HAL Model test");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
