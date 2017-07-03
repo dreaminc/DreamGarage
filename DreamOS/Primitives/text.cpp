@@ -7,11 +7,33 @@
 #include "HAL/HALImp.h"
 #include "Framebuffer.h"
 
-text::text(HALImp *pHALImp, std::shared_ptr<font> font, const std::string& strText, double width, double height, bool fBillboard) :
+text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
 	FlatContext(pHALImp),
-	m_pFont(font),
+	m_pFont(pFont),
 	m_width(width),
-	m_height(height)
+	m_height(height),
+	m_flags(text::flags::NONE)
+{
+	RESULT r = R_PASS;
+
+	// TODO: This should go into a factory method or something
+
+	CR(SetText(strText));
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
+text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, text::flags textFlags) :
+	FlatContext(pHALImp),
+	m_pFont(pFont),
+	m_width(1.0f),
+	m_height(1.0f),
+	m_flags(textFlags)
 {
 	RESULT r = R_PASS;
 
@@ -140,7 +162,15 @@ float text::GetDPMM(float mmVal) {
 }
 
 float text::GetDPM(float mVal) {
-	return m_dpmm * 100.0f * mVal;
+	return m_dpmm * (1000.0f * mVal);
+}
+
+float text::GetMMSizeFromDots(float val) {
+	return (val / m_dpmm);
+}
+
+float text::GetMSizeFromDots(float val) {
+	return (val) / (m_dpmm * 1000.0f);
 }
 
 // TODO: Update everything
@@ -159,9 +189,14 @@ RESULT text::SetDPMM(float dpmm) {
 	return R_PASS;
 }
 
-RESULT text::SetScaleToFit(bool fScaleToFit) {
-	m_fScaleToFit = fScaleToFit;
-	return R_PASS;
+RESULT text::SetRows(int rows) {
+	RESULT r = R_PASS;
+
+	CB((rows > 0));
+	m_rows = rows;
+
+Error:
+	return r;
 }
 
 RESULT text::SetOffset(float xOffset, float yOffset) {
@@ -169,6 +204,90 @@ RESULT text::SetOffset(float xOffset, float yOffset) {
 	m_yOffset = yOffset;
 
 	return R_PASS;
+}
+
+
+// This is currently a bit of a hack,
+// however it will set the height of the text font
+// in aspect of meters
+RESULT text::SetFontHeightM(float mVal) {
+	RESULT r = R_PASS;
+
+	CN(m_pFont);
+
+	{
+		// We can use the DPMM to figure out the current meter height of the font
+		float effLineHeightM = GetMSizeFromDots(m_pFont->GetFontLineHeight());
+		m_scaleFactor = mVal / effLineHeightM;
+	}
+
+Error:
+	return r;
+}
+
+RESULT text::SetFontHeightMM(float mmVal) {
+	return SetFontHeightM(mmVal / 1000.0f);
+}
+
+// Scale to fit will scale the text to fit the size of the quad
+// Note: This may induce warp distortion, so might want to split this
+// into two different flags (ScaleToFitHeight and ScaleToFitWidth)
+
+// Incompatible: fit to size
+// Compatible: Wrap
+RESULT text::SetScaleToFit(bool fScaleToFit) {
+	RESULT r = R_PASS;
+
+	if (fScaleToFit) {
+		CBM((IsFitToSize() == false), "Scale to fit and fit to size are incompatible");
+	}
+
+	m_fScaleToFit = fScaleToFit;
+
+Error:
+	return r;
+}
+
+// TODO: Wrapping will wrap the text if outside of the width
+// set for the object
+RESULT text::SetWrap(bool fWrap) {
+	RESULT r = R_PASS;
+
+	//Error:
+	return r;
+}
+
+// TODO: Fit to size will fit the quad to the 
+// respective size of the text (fit all)
+
+// Incompatible: Scale to fit
+// Compatible: Wrap
+RESULT text::SetFitToSize(bool fFitToSize) {
+	RESULT r = R_PASS;
+
+	//Error:
+	return r;
+}
+
+// TODO: This will set whether or not the text is billboarded
+RESULT text::SetBillboard(bool fBillboard) {
+	return R_NOT_IMPLEMENTED;
+}
+
+bool text::IsScaleToFit() {
+	return ((m_flags & text::flags::SCALE_TO_FIT) != text::flags::NONE);
+}
+
+bool text::IsWrap() {
+	return ((m_flags & text::flags::WRAP) != text::flags::NONE);
+}
+
+bool text::IsFitToSize() {
+	return ((m_flags & text::flags::FIT_TO_SIZE) != text::flags::NONE);
+}
+
+bool text::IsBillboard() {
+	return ((m_flags & text::flags::BILLBOARD) != text::flags::NONE);
 }
 
 RESULT text::SetText(const std::string& strText) {
@@ -190,16 +309,8 @@ RESULT text::SetText(const std::string& strText) {
 	double effectiveDotsWidth = GetDPMM(m_width);
 	double effectiveDotsHeight = GetDPMM(m_height);
 
-	//float maxBelow = 0.0f;
-	//float maxAbove = 0.0f;
-
 	float posX = 0.0f;
 	float posY = 0.0f;
-
-	//float minLeft = std::numeric_limits<float>::max();
-	//float maxRight = std::numeric_limits<float>::min();
-	//float maxTop = std::numeric_limits<float>::min();
-	//float minBottom = std::numeric_limits<float>::max();
 
 	for(char &c : m_strText) {
 		font::CharacterGlyph glyph;
@@ -226,25 +337,16 @@ RESULT text::SetText(const std::string& strText) {
 			uvcoord uvBottomRight = uvcoord(uvRight, uvBottom);
 
 			// Position
-
 			float glyphQuadXPosition = posX + ((float)(glyph.width) / 2.0f) + (float)(glyph.bearingX);
 			float glyphQuadYPosition = posY - ((float)(fontBase) - (float)(glyph.bearingY) - ((float)(glyph.height) / 2.0f));
 
-			//float glyphWidth = GetDPM(glyph.width);
-			//float glyphHeight = GetDPM(glyph.height);
+			// Apply DPMM and scale factor
 
-			float glyphWidth = (glyph.width);
-			float glyphHeight = (glyph.height);
+			float glyphWidth = GetMSizeFromDots(glyph.width) * m_scaleFactor;
+			float glyphHeight = GetMSizeFromDots(glyph.height) * m_scaleFactor;
 
-			// Apply DPMM
-			glyphWidth /= (m_dpmm * 10.0f);
-			glyphHeight /= (m_dpmm * 10.0f);
-
-			glyphQuadXPosition /= (m_dpmm * 10.0f);
-			glyphQuadYPosition /= (m_dpmm * 10.0f);
-
-			//glyphQuadXPosition = GetDPM(glyphQuadXPosition);
-			//glyphQuadYPosition = GetDPM(glyphQuadYPosition);
+			glyphQuadXPosition = GetMSizeFromDots(glyphQuadXPosition) * m_scaleFactor;
+			glyphQuadYPosition = GetMSizeFromDots(glyphQuadYPosition) * m_scaleFactor;
 
 			point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 			auto pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
@@ -256,6 +358,11 @@ RESULT text::SetText(const std::string& strText) {
 		}
 	}
 	
+	if (IsScaleToFit()) {
+		m_width = FlatContext::GetWidth();
+		m_height = FlatContext::GetHeight();
+	}
+
 	//m_width = maxRight - minLeft;
 	//m_height = maxTop - minBottom;
 

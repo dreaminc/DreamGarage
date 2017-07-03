@@ -4,6 +4,8 @@
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
 
+#include "Primitives/BoundingQuad.h"
+
 FlatContext::FlatContext(HALImp * pHALImp) :
 	composite(pHALImp)
 {
@@ -114,13 +116,17 @@ RESULT FlatContext::SetFramebuffer(framebuffer* pFramebuffer) {
 // This is to do with the normal, not not orientation 
 
 float FlatContext::GetWidth() {
-	vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
-	return vDiff.x();
+	//vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
+	//return vDiff.x();
+
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetWidth();
 }
 
 float FlatContext::GetHeight() {
-	vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
-	return vDiff.y();
+	//vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
+	//return vDiff.y();
+
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetHeight();
 }
 
 float FlatContext::GetLeft() {

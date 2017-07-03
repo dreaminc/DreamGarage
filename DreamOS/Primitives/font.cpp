@@ -245,6 +245,10 @@ RESULT font::LoadFontFromFile(const std::wstring& wstrFontFile) {
 			GetValue<uint32_t>(m_fontBase, wstrLine, L"base=");
 		}
 
+		if (m_fontLineHeight == 0) {
+			GetValue<uint32_t>(m_fontLineHeight, wstrLine, L"lineHeight=");
+		}
+
 		if (m_wstrFontImageFilename.length() == 0) {
 			// GetValue<std::wstring>(m_wstrGlyphImageFilename, wstrLine, L"file=\"", '\"');
 			m_wstrFontImageFilename = GetValue<std::wstring>(wstrLine, L"file=\"", '\"');
@@ -280,6 +284,10 @@ uint32_t font::GetFontTextureHeight() const {
 
 uint32_t font::GetFontBase() const {
 	return m_fontBase;
+}
+
+uint32_t font::GetFontLineHeight() const {
+	return m_fontLineHeight;
 }
 
 RESULT font::GetGlyphFromChar(uint8_t ascii_id, CharacterGlyph& r_glyph) {

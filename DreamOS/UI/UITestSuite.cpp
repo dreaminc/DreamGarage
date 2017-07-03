@@ -342,14 +342,18 @@ RESULT UITestSuite::AddTestFont() {
 			pFont->SetTexture(std::shared_ptr<texture>(m_pDreamOS->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR)));
 
 			//auto pText = m_pDreamOS->AddText(pFont, "test", 1.0f, 0.25f);
-			auto pText = m_pDreamOS->AddText(pFont, "Testing", 2.0f, 0.5f);
+			//auto pText = m_pDreamOS->AddText(pFont, "Testing", 2.0f, 0.5f);
+
+			// Size to fit
+			auto pText = m_pDreamOS->AddText(pFont, "Testing", text::flags::SCALE_TO_FIT);
 			CN(pText);
 			pText->RotateXByDeg(90.0f);
 
 			//pText->RenderToTexture();
 			pText->RenderToQuad();
 
-			//pText->SetPosition(point(0.0f, -1.0f, 0.0f));
+			//pText->SetPosition(point(0.0f, 0.0f, 2.0f));
+			//pText->SetScale(vector(50.0f));
 
 			//m_pDreamOS->RenderToTexture(pFlatContext);
 

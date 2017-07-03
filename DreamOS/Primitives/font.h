@@ -17,6 +17,9 @@
 #include FT_FREETYPE_H  
 
 #define DEFAULT_FONT_SIZE 32
+#define FONT_PT_PER_INCH 72.0f
+#define FONT_PT_PER_MM (FONT_PT_PER_INCH / 25.4)
+#define FONT_PT_PER_M (FONT_PT_PER_MM * 1000.0f)
 
 class composite;
 class quad;
@@ -56,6 +59,26 @@ public:
 				fValid = true;
 			}
 		}
+
+		// TODO: Add flag / switch approach this is getting verbose
+		// TODO: Split into a different file as well
+		float GetWidthMM() {
+			return (width / FONT_PT_PER_MM);
+		}
+
+		float GetWidthM() {
+			return (width / FONT_PT_PER_M);
+		}
+
+		float GetHeightMM() {
+			return (height / FONT_PT_PER_MM);
+		}
+
+		float GetHeightM() {
+			return (height / FONT_PT_PER_M);
+		}
+
+		
 	};
 
 	font(bool fDistanceMap = false);
@@ -74,6 +97,7 @@ public:
 	uint32_t GetFontTextureWidth() const;
 	uint32_t GetFontTextureHeight() const;
 	uint32_t GetFontBase() const;
+	uint32_t GetFontLineHeight() const;
 
 private:
 	RESULT LoadFontFromFile(const std::wstring& wstrFontFile);
@@ -95,6 +119,7 @@ private:
 
 	// A glyph base defines the number of pixels in the y-axis above the virtual line of drawing a text
 	uint32_t m_fontBase = 0;
+	uint32_t m_fontLineHeight = 0;
 
 	uint32_t m_fontPixelSize = DEFAULT_FONT_SIZE;
 

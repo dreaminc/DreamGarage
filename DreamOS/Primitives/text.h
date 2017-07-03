@@ -38,33 +38,17 @@ public:
 		INVALID
 	};
 
-	/*
-public:
-
-	RESULT Allocate() {
-		RESULT r = R_PASS;
-
-		CR(AllocateVertices(m_nVertices));
-		CR(AllocateIndices(m_nIndices));
-
-	Error:
-		return R_PASS;
-	}
-
-	inline unsigned int NumberVertices() { 
-		return m_nVertices; 
-	}
-
-	inline unsigned int NumberIndices() { 
-		return m_nIndices; 
-	}
-
-private:
-	unsigned int m_nVertices;
-	unsigned int m_nIndices;
-	*/
+	enum class flags : uint8_t {
+		NONE			= 0,
+		WRAP			= 1 << 0,
+		SCALE_TO_FIT	= 1 << 1,
+		FIT_TO_SIZE		= 1 << 2,
+		BILLBOARD		= 1 << 3,
+		INVALID			= 0xFF
+	};
 
 public:
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", text::flags textFlags = text::flags::NONE);
 	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 	~text();
 
@@ -81,24 +65,45 @@ public:
 
 	float GetWidth();
 	float GetHeight();
+
 	float GetDPMM(float mmVal = 1.0f);
 	float GetDPM(float mVal = 1.0f);
+
+	float GetMMSizeFromDots(float val);
+	float GetMSizeFromDots(float val);
 
 	RESULT SetWidth(float width);
 	RESULT SetHeight(float height);
 	RESULT SetDPMM(float dpmm);
 
-	RESULT SetScaleToFit(bool fScaleToFit = true);
+	RESULT SetFontHeightM(float mVal);
+	RESULT SetFontHeightMM(float mmVal);
+
 	RESULT SetOffset(float xOffset, float yOffset);
+	RESULT SetRows(int rows);
+
+	RESULT SetScaleToFit(bool fScaleToFit = true);
+	RESULT SetWrap(bool fWrap = true);
+	RESULT SetFitToSize(bool fFitToSize = true);
+	RESULT SetBillboard(bool fBillboard = true);
+
+	bool IsScaleToFit();
+	bool IsWrap();
+	bool IsFitToSize();
+	bool IsBillboard();
 
 public:
 	//static text& MakeText()
 
 private:
 	bool m_fScaleToFit = false;
+	flags m_flags = text::flags::NONE;
 
 	float m_xOffset = 0.0f;
 	float m_yOffset = 0.0f;
+	float m_scaleFactor = 1.0f;
+	
+	int m_rows = 1;
 
 	float m_width = 0.0f;
 	float m_height = 0.0f;
@@ -115,5 +120,18 @@ private:
 
 	std::shared_ptr<quad> m_pQuad = nullptr;
 };
+
+
+inline constexpr text::flags operator | (const text::flags &lhs, const text::flags &rhs) {
+	return static_cast<text::flags>(
+		static_cast<std::underlying_type<text::flags>::type>(lhs) | static_cast<std::underlying_type<text::flags>::type>(rhs)
+		);
+}
+
+inline constexpr text::flags operator & (const text::flags &lhs, const text::flags &rhs) {
+	return static_cast<text::flags>(
+		static_cast<std::underlying_type<text::flags>::type>(lhs) & static_cast<std::underlying_type<text::flags>::type>(rhs)
+		);
+}
 
 #endif // ! TEXT_H_
