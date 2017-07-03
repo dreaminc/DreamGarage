@@ -60,6 +60,8 @@ RESULT UITestSuite::AddTests() {
 
 	CR(AddTestFont());
 
+	CR(AddTestFlatContextCompositionQuads());
+
 	CR(AddTestBrowserRequestWithMenuAPI());
 	CR(AddTestBrowserRequest());
 
@@ -613,8 +615,8 @@ RESULT UITestSuite::SetupPipeline() {
 	
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));

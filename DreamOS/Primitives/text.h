@@ -88,10 +88,18 @@ public:
 	RESULT SetHeight(float height);
 	RESULT SetDPMM(float dpmm);
 
+	RESULT SetScaleToFit(bool fScaleToFit = true);
+	RESULT SetOffset(float xOffset, float yOffset);
+
 public:
 	//static text& MakeText()
 
 private:
+	bool m_fScaleToFit = false;
+
+	float m_xOffset = 0.0f;
+	float m_yOffset = 0.0f;
+
 	float m_width = 0.0f;
 	float m_height = 0.0f;
 	float m_dpmm = 11.0f;	// Dots per mm - global units in meters so this should be taken into consideration

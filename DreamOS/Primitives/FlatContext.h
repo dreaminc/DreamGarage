@@ -29,6 +29,10 @@ public:
 
 	float GetWidth();
 	float GetHeight();
+	float GetLeft();
+	float GetRight();
+	float GetTop();
+	float GetBottom();
 
 public:
 	framebuffer* GetFramebuffer();

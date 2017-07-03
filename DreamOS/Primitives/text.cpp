@@ -43,7 +43,34 @@ RESULT text::RenderToQuad() {
 	CR(ClearChildren());
 
 	if (m_pQuad == nullptr) {
-		m_pQuad = AddQuad(m_width, m_height, point(0.0f));
+		uvcoord uvTopLeft = uvcoord(0.0f, 0.0f);
+		uvcoord uvBottomRight = uvcoord(1.0f, 1.0f);
+
+		// We map the uvCoordinates per the height/width of the text object 
+		// vs the bounding area
+		float left = GetLeft();
+		float right = GetRight();
+		float top = GetTop();
+		float bottom = GetBottom();
+
+		float contextWidth = FlatContext::GetWidth();
+		float contextHeight = FlatContext::GetHeight();
+
+		if (m_fScaleToFit) {
+			// TODO: Scale to fit
+		}
+		else {
+			float uvLeft = m_xOffset / contextWidth;
+			float uvRight = (m_width + m_xOffset) / contextWidth;
+
+			float uvTop = m_yOffset / contextHeight;
+			float uvBottom = (m_height + m_yOffset) / contextHeight;
+
+			uvTopLeft = uvcoord(uvLeft, uvTop);
+			uvBottomRight = uvcoord(uvRight, uvBottom);
+		}
+
+		m_pQuad = AddQuad(m_width, m_height, point(0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
 		CN(m_pQuad);
 	}
 
@@ -132,6 +159,18 @@ RESULT text::SetDPMM(float dpmm) {
 	return R_PASS;
 }
 
+RESULT text::SetScaleToFit(bool fScaleToFit) {
+	m_fScaleToFit = fScaleToFit;
+	return R_PASS;
+}
+
+RESULT text::SetOffset(float xOffset, float yOffset) {
+	m_xOffset = xOffset;
+	m_yOffset = yOffset;
+
+	return R_PASS;
+}
+
 RESULT text::SetText(const std::string& strText) {
 	RESULT r = R_PASS;
 	point ptCenter;
@@ -207,7 +246,7 @@ RESULT text::SetText(const std::string& strText) {
 			//glyphQuadXPosition = GetDPM(glyphQuadXPosition);
 			//glyphQuadYPosition = GetDPM(glyphQuadYPosition);
 
-			point ptGlyph = point(glyphQuadXPosition, m_height, glyphQuadYPosition);
+			point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 			auto pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 			pQuad->SetColorTexture(m_pFont->GetTexture().get());
 

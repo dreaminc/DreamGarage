@@ -42,6 +42,24 @@ ProjectionMatrix::ProjectionMatrix(projection_precision width, projection_precis
 	ACRM(SetOrthographic(width, height, nearPlane, farPlane), "Failed to set perspective matrix");
 }
 
+ProjectionMatrix ProjectionMatrix::MakeOrtho(projection_precision width, projection_precision height,
+											 projection_precision nearPlane, projection_precision farPlane) 
+{
+	return ProjectionMatrix(width, height, nearPlane, farPlane);
+}
+
+ProjectionMatrix ProjectionMatrix::MakeOrtho(projection_precision left, projection_precision right,
+											 projection_precision top, projection_precision bottom,
+											 projection_precision nearPlane, projection_precision farPlane)  
+{
+	ProjectionMatrix projMat;
+
+	projMat.m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+	projMat.SetOrthographic(left, right, top, bottom, nearPlane, farPlane);
+
+	return projMat;
+}
+
 ProjectionMatrix::~ProjectionMatrix() {
 	// Empty Stub
 }
@@ -126,23 +144,41 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision width,
 	m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
 
 	this->clear();
-
-	projection_precision ratio = width / height;
 	
 	this->element(0, 0) = 2.0f / width;
-	
 	this->element(1, 1) = 2.0f / height;
-
-	/*
-	this->element(2, 2) = -2.0f / (farPlane - nearPlane);
-	this->element(3, 2) = (-(farPlane + nearPlane)) / (farPlane - nearPlane);
-	*/
 
 	this->element(2, 2) = -1.0f / (farPlane - nearPlane);
 	this->element(3, 2) = (-nearPlane) / (farPlane - nearPlane);
 
 	this->element(3, 3) = 1.0f;
 
+	return r;
+}
+
+// http://www.songho.ca/opengl/gl_projectionmatrix.html
+RESULT ProjectionMatrix::SetOrthographic(projection_precision left, projection_precision right,
+										 projection_precision top, projection_precision bottom,
+										 projection_precision nearPlane, projection_precision farPlane) 
+{
+	RESULT r = R_PASS;
+
+	m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+
+	this->clear();
+
+	// Scaling / Clipping
+	this->element(0, 0) = 2.0f / (right - left);
+	this->element(1, 1) = 2.0f / (top - bottom);
+	this->element(2, 2) = -2.0f / (farPlane - nearPlane);
+
+	// Translation
+	this->element(0, 3) = (-1.0f * (right + left)) / (right - left);
+	this->element(1, 3) = (-1.0f * (top + bottom)) / (top - bottom);
+	this->element(2, 3) = (-1.0f * (farPlane + nearPlane)) / (farPlane - nearPlane);
+
+	this->element(3, 3) = 1.0f;
+	
 	return r;
 }
 

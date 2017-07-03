@@ -90,10 +90,14 @@ RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
 	CR(BindToFramebuffer(m_pOGLFramebuffer));
 	
 	{
-		float width = pFlatContext->GetWidth() * 4.0f;
-		float height = pFlatContext->GetHeight() * 4.0f;
+		float left = pFlatContext->GetLeft();
+		float right = pFlatContext->GetRight();
+		float top = pFlatContext->GetTop();
+		float bottom = pFlatContext->GetBottom();
+		float nearPlane = -1.0f;
+		float farPlane = 1.0f;
 
-		auto matP = ProjectionMatrix(width, height, -1.0f, 1.0f);
+		auto matP = ProjectionMatrix::MakeOrtho(left, right, top, bottom, nearPlane, farPlane);
 		m_pUniformProjectionMatrix->SetUniform(matP);
 
 		CR(RenderObject(pFlatContext));

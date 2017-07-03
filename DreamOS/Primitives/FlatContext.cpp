@@ -12,8 +12,8 @@ FlatContext::FlatContext(HALImp * pHALImp) :
 	// TODO: add UI capabilities (alignments, etc)
 
 	// TODO: Switch to quad, this should never have a third dimension
-	CR(InitializeOBB());
-	//CR(InitializeBoundingQuad(GetOrigin(), width, height, vector::jVector(1.0f)));
+	//CR(InitializeOBB());
+	CR(InitializeBoundingQuad());
 
 	return;
 
@@ -110,6 +110,9 @@ RESULT FlatContext::SetFramebuffer(framebuffer* pFramebuffer) {
 	return R_PASS;
 }
 
+// TODO: Fix the sizing (not y) generality 
+// This is to do with the normal, not not orientation 
+
 float FlatContext::GetWidth() {
 	vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
 	return vDiff.x();
@@ -118,4 +121,20 @@ float FlatContext::GetWidth() {
 float FlatContext::GetHeight() {
 	vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
 	return vDiff.y();
+}
+
+float FlatContext::GetLeft() {
+	return m_pBoundingVolume->GetMinPoint().x();
+}
+
+float FlatContext::GetRight() {
+	return m_pBoundingVolume->GetMaxPoint().x();
+}
+
+float FlatContext::GetTop() {
+	return m_pBoundingVolume->GetMaxPoint().y();
+}
+
+float FlatContext::GetBottom() {
+	return m_pBoundingVolume->GetMinPoint().y();
 }
