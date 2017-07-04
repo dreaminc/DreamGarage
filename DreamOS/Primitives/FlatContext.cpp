@@ -129,6 +129,7 @@ float FlatContext::GetHeight() {
 	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetHeight();
 }
 
+// TODO: Generality
 float FlatContext::GetLeft() {
 	return m_pBoundingVolume->GetMinPoint().x();
 }
@@ -138,9 +139,9 @@ float FlatContext::GetRight() {
 }
 
 float FlatContext::GetTop() {
-	return m_pBoundingVolume->GetMaxPoint().y();
+	return m_pBoundingVolume->GetMaxPoint().z();
 }
 
 float FlatContext::GetBottom() {
-	return m_pBoundingVolume->GetMinPoint().y();
+	return m_pBoundingVolume->GetMinPoint().z();
 }

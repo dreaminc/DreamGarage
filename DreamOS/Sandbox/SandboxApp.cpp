@@ -1045,10 +1045,10 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
-text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, text::flags textFlags) {
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(pFont, strContent, textFlags);
+	text *pText = m_pHALImp->MakeText(pFont, strContent, lineHeightM, textFlags);
 	CN(pText);
 
 	CR(AddObject(pText));
@@ -1065,8 +1065,8 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, text::flags textFlags) {
-	return m_pHALImp->MakeText(pFont, strContent, textFlags);
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+	return m_pHALImp->MakeText(pFont, strContent, lineHeightM, textFlags);
 }
 
 

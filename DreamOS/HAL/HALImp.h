@@ -135,7 +135,7 @@ public:
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) = 0;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;
 
-	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, text::flags textFlags = text::flags::NONE) = 0;
+	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE) = 0;
 	virtual text* MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 	virtual text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;

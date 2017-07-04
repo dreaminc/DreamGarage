@@ -28,7 +28,7 @@ Error:
 	return;
 }
 
-text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, text::flags textFlags) :
+text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double lineHeightM, text::flags textFlags) :
 	FlatContext(pHALImp),
 	m_pFont(pFont),
 	m_width(1.0f),
@@ -38,6 +38,7 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strT
 	RESULT r = R_PASS;
 
 	// TODO: This should go into a factory method or something
+	CR(SetFontHeightM(lineHeightM));
 
 	CR(SetText(strText));
 

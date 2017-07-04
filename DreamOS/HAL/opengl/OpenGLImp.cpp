@@ -9,7 +9,9 @@
 #include "Primitives/matrix/ProjectionMatrix.h"
 #include "Primitives/matrix/TranslationMatrix.h"
 #include "Primitives/matrix/RotationMatrix.h"
+
 #include <vector>
+#include <algorithm>
 
 #include "OGLVolume.h"
 
@@ -34,6 +36,8 @@
 
 #include "DreamConsole/DreamConsole.h"
 #include "OGLDreamConsole.h"
+
+#include "Core/Utilities.h"
 
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
@@ -797,14 +801,21 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, text::flags textFlags) {
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, pFont, strContent, textFlags);
+	text *pText = new OGLText(this, pFont, strContent, lineHeightM, textFlags);
 	CN(pText);
 
 	int fbWidth = pText->GetDPM(pText->GetWidth());
 	int fbHeight = pText->GetDPM(pText->GetHeight());
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
 
 	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
 	CN(pOGLFramebuffer);

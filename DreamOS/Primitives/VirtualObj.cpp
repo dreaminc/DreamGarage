@@ -494,3 +494,17 @@ matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix(matrix<virtual_precis
 		return (TranslationMatrix(m_objectState.m_ptOrigin, m_ptPivot) * RotationMatrix(m_objectState.m_qRotation) * ScalingMatrix(m_vScale) * childMat);
 	}
 }
+
+matrix<virtual_precision, 4, 4> VirtualObj::GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	return RotationMatrix(m_objectState.m_qRotation);
+}
+
+matrix<virtual_precision, 4, 4> VirtualObj::GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_ptPivot.IsZero()) {
+		return TranslationMatrix(m_objectState.m_ptOrigin);
+	}
+	else {
+		return TranslationMatrix(m_objectState.m_ptOrigin, m_ptPivot);
+	}
+}
+

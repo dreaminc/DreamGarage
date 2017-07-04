@@ -749,6 +749,26 @@ RESULT DimObj::SetMaterial(material mMaterial) {
 	return R_PASS;
 }
 
+matrix<virtual_precision, 4, 4> DimObj::GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_pParent != nullptr) {
+		auto modelMatrix = VirtualObj::GetRotationMatrix(childMat);
+		return m_pParent->GetRotationMatrix(modelMatrix);
+	}
+	else {
+		return VirtualObj::GetRotationMatrix(childMat);
+	}
+}
+
+matrix<virtual_precision, 4, 4> DimObj::GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_pParent != nullptr) {
+		auto modelMatrix = VirtualObj::GetTranslationMatrix(childMat);
+		return m_pParent->GetTranslationMatrix(modelMatrix);
+	}
+	else {
+		return VirtualObj::GetTranslationMatrix(childMat);
+	}
+}
+
 matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
 	if (m_pParent != nullptr) {
 		auto modelMatrix = VirtualObj::GetModelMatrix(childMat);
