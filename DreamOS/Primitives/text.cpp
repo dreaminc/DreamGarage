@@ -325,24 +325,25 @@ RESULT text::SetText(const std::string& strText) {
 	float fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
 	float fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
 	float fontBase = static_cast<float>(m_pFont->GetFontBase());
+	float fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
 
 	// Apply DPMM to the width
 	double effectiveDotsWidth = GetDPMM(m_width);
 	double effectiveDotsHeight = GetDPMM(m_height);
 
+	// These are in dots 
 	float posX = 0.0f;
 	float posY = 0.0f;
 
 	for(char &c : m_strText) {
 		font::CharacterGlyph glyph;
 
-		if (m_pFont->GetGlyphFromChar(c, glyph)) {
-			
-			// TODO: Do this through composite
-			//minLeft = std::min(minLeft, posX + glyph.bearingX);
-			//maxRight = std::max(maxRight, posX + glyph.bearingX);
-			//maxTop = std::max(maxTop, ((fontBase - glyph.bearingY) + glyph.height) / 2.0f);
-			//minBottom = std::min(minBottom, ((fontBase - glyph.bearingY) - glyph.height) / 2.0f);
+		// This triggers a line break
+		if (c == '\n') {
+			posX = 0.0f;
+			posY += fontLineHeight;
+		}
+		else if (m_pFont->GetGlyphFromChar(c, glyph)) {
 			
 			// UV
 			float uvTop = (fontImageHeight - glyph.y) / fontImageHeight;
@@ -372,8 +373,6 @@ RESULT text::SetText(const std::string& strText) {
 			point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 			auto pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 			pQuad->SetColorTexture(m_pFont->GetTexture().get());
-
-			// TODO: Add in wrap / heights
 
 			posX += (float)(glyph.advance);
 		}

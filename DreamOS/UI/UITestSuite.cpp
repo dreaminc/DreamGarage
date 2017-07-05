@@ -345,7 +345,7 @@ RESULT UITestSuite::AddTestFont() {
 			//auto pText = m_pDreamOS->AddText(pFont, "Testing", 2.0f, 0.5f);
 
 			// Fit to Scale
-			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 0.6f, text::flags::FIT_TO_SIZE);
+			auto pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE);
 			
 			// Size to fit
 			// Note this sets the line height by way of font - this teases at future settings, 
