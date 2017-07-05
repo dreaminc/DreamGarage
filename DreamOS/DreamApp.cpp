@@ -33,12 +33,18 @@ float DreamAppBase::GetEffectivePriorityValue() const {
 // DreamApp<derived>
 
 template<class derivedAppType>
-RESULT DreamApp<derivedAppType>::Initialize() {
+RESULT DreamApp<derivedAppType>::Initialize(bool fAddToScene) {
 	RESULT r = R_PASS;
 
 	// Grab the context composite from DreamOS
 	CN(m_pDreamOS);
-	m_pCompositeContext = m_pDreamOS->AddComposite();
+
+//	m_pCompositeContext = m_pDreamOS->AddComposite();
+	if (fAddToScene)
+		m_pCompositeContext = m_pDreamOS->AddComposite();
+	else 
+		m_pCompositeContext = m_pDreamOS->MakeComposite();
+
 	CN(m_pCompositeContext);
 
 	// Initialize the OBB (collisions)

@@ -20,6 +20,7 @@ public:
 
 private:
 	RESULT SetupPipeline();
+	RESULT SetupUINodePipeline();
 
 // Tests
 public:

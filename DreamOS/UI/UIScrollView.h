@@ -42,6 +42,9 @@ public:
 	RESULT StartScrollRight(void *pContext);
 	RESULT StopScroll(void *pContext);
 
+	RESULT HideButton(UIButton* pScrollButton);
+	RESULT ShowButton(UIButton* pScrollButton);
+
 public:
 	MenuState GetState();
 	std::shared_ptr<UIView> GetTitleView();

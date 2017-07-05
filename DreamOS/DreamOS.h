@@ -90,10 +90,10 @@ public:
 	// put into a .tpp file with an #include of said tpp file at the end
 	// of the header
 	template<class derivedAppType>
-	std::shared_ptr<derivedAppType> LaunchDreamApp(void *pContext) {
+	std::shared_ptr<derivedAppType> LaunchDreamApp(void *pContext, bool fAddToScene = true) {
 		RESULT r = R_PASS;
 		
-		std::shared_ptr<derivedAppType> pDreamApp = m_pSandbox->m_pDreamAppManager->CreateRegisterAndStartApp<derivedAppType>(pContext);
+		std::shared_ptr<derivedAppType> pDreamApp = m_pSandbox->m_pDreamAppManager->CreateRegisterAndStartApp<derivedAppType>(pContext, fAddToScene);
 		CNM(pDreamApp, "Failed to create app");
 
 		return pDreamApp;

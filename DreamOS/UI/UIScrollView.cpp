@@ -40,6 +40,10 @@ RESULT UIScrollView::Initialize() {
 	m_pRightScrollButton->SetVisible(false);
 	PositionMenuButton(m_maxElements, m_pRightScrollButton);
 
+	color cTransparent = color(1.0f, 1.0f, 1.0f, 0.0f);
+	m_pLeftScrollButton->GetMaterial()->SetColors(cTransparent, cTransparent, cTransparent);
+	m_pRightScrollButton->GetMaterial()->SetColors(cTransparent, cTransparent, cTransparent);
+
 	m_pMenuButtonsContainer = AddUIView();
 
 	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left-600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
@@ -86,30 +90,51 @@ RESULT UIScrollView::Update() {
 		m_yRotation = std::max(0.0f, std::min(m_yRotation + m_velocity, maxRotation));
 
 		// update visible items / index
-		m_pLeftScrollButton->SetVisible(m_yRotation > 0.0f);
-		m_pRightScrollButton->SetVisible(m_yRotation < maxRotation);
+		// TODO: it is possible for one of these animations to get invalidated, not sure how to reproduce
+		if (m_yRotation > 0.0f && !m_pLeftScrollButton->IsVisible()) {
+			ShowButton(m_pLeftScrollButton.get());
+		}
+		else if (m_yRotation <= 0.0f && m_pLeftScrollButton->IsVisible()) {
+			HideButton(m_pLeftScrollButton.get());
+		}
+		if (m_yRotation < maxRotation && !m_pRightScrollButton->IsVisible()) {
+			ShowButton(m_pRightScrollButton.get());
+		}
+		else if (m_yRotation >= maxRotation && m_pRightScrollButton->IsVisible()) {
+			HideButton(m_pRightScrollButton.get());
+		}
 
 		m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
 
 		float diff = m_yRotation - (m_objectIndex * yRotationPerElement);
+
 		if (diff >= yRotationPerElement && m_objectIndex + m_maxElements < pChildren.size()) {
-
-			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex].get());
-			pButton->SetVisible(false);
-
-			pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex + m_maxElements].get());
-			pButton->SetVisible(true);
-
+			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex + m_maxElements].get());
+			if (!pButton->IsVisible()) {
+				ShowButton(pButton);
+			}
 			m_objectIndex += 1;
 		}
-		else if (diff <= -m_yRotationPerElement && m_objectIndex > 0) {
-			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex + m_maxElements - 1].get());
-			pButton->SetVisible(false);
+		else if (diff > 0.0f && m_objectIndex + m_maxElements < pChildren.size()) {
+			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex].get());
+			if (pButton->IsVisible()) {
+				HideButton(pButton);
+			}
+		}
 
-			pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex - 1].get());
-			pButton->SetVisible(true);
-
+		else if (diff <= -yRotationPerElement && m_objectIndex > 0) {
+			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex - 1].get());
+			if (!pButton->IsVisible()) {
+				ShowButton(pButton);
+			}
 			m_objectIndex -= 1;
+		}
+		else if (diff < 0.0f && m_objectIndex > 0) {
+			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex + m_maxElements - 1].get());
+			if (pButton->IsVisible()) {
+				HideButton(pButton);
+			}
+
 		}
 	}
 Error:
@@ -174,14 +199,20 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 		i++;
 	}
-
-	if (m_pMenuButtonsContainer->GetChildren().size() > m_maxElements) {
-		m_pRightScrollButton->SetVisible(true);
+	//*
+	if (m_pMenuButtonsContainer->GetChildren().size() > m_maxElements && !m_pRightScrollButton->IsVisible()) {
+	//	m_pRightScrollButton->SetVisible(true);
+		ShowButton(m_pRightScrollButton.get());
 	}
-	else {
-		m_pRightScrollButton->SetVisible(false);
+	else if (m_pMenuButtonsContainer->GetChildren().size() <= m_maxElements && m_pRightScrollButton->IsVisible()) {
+	//	m_pRightScrollButton->SetVisible(false);
+		HideButton(m_pRightScrollButton.get());
 	}
-	m_pLeftScrollButton->SetVisible(false);
+	//m_pLeftScrollButton->SetVisible(false);
+	if (m_pLeftScrollButton->IsVisible()) {
+		HideButton(m_pLeftScrollButton.get());
+	}
+	//*/
 
 Error:
 	return r;
@@ -243,6 +274,56 @@ RESULT UIScrollView::StopScroll(void *pContext) {
 	m_menuState = MenuState::NONE;
 	m_velocity = 0.0f;
 	return R_PASS;
+}
+
+RESULT UIScrollView::HideButton(UIButton* pScrollButton) {
+	RESULT r = R_PASS;
+
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DimObj *pObj = reinterpret_cast<DimObj*>(pContext);
+		pObj->SetVisible(false);
+		return R_PASS;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		pScrollButton->GetSurface().get(),
+		color(1.0f, 1.0f, 1.0f, 0.0f),
+		0.1f,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		pScrollButton));
+
+Error:
+	return r;
+}
+
+RESULT UIScrollView::ShowButton(UIButton* pScrollButton) {
+	RESULT r = R_PASS;
+
+	auto fnStartCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DimObj *pObj = reinterpret_cast<DimObj*>(pContext);
+		pObj->SetVisible(true);
+		return R_PASS;
+	};
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		pScrollButton->GetSurface().get(),
+		color(1.0f, 1.0f, 1.0f, 1.0f),
+		0.1f,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		fnStartCallback,
+		nullptr,
+		pScrollButton));
+
+Error:
+	return r;
 }
 
 MenuState UIScrollView::GetState() {

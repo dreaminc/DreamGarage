@@ -37,7 +37,7 @@ public:
 	// put into a .tpp file with an #include of said tpp file at the end
 	// of the header
 	template<class derivedAppType> 
-	std::shared_ptr<derivedAppType> CreateRegisterAndStartApp(void *pContext = nullptr) {
+	std::shared_ptr<derivedAppType> CreateRegisterAndStartApp(void *pContext = nullptr, bool fAddToScene = true) {
 		RESULT r = R_PASS;
 
 		std::shared_ptr<derivedAppType> pDreamApp = nullptr;
@@ -49,7 +49,12 @@ public:
 		CN(pDreamApp);
 
 		// Assign the app a composite
-		CRM(pDreamApp->SetComposite(m_pDreamOS->AddComposite()), "Failed to create Dream App composite");
+		if (fAddToScene) {
+			CRM(pDreamApp->SetComposite(m_pDreamOS->AddComposite()), "Failed to create Dream App composite");
+		}
+		else {
+			CRM(pDreamApp->SetComposite(m_pDreamOS->MakeComposite()), "Failed to create Dream App composite");
+		}
 
 		// Initialize the app
 		CR(pDreamApp->InitializeApp(pDreamApp->GetAppContext()));

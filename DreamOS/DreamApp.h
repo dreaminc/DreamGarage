@@ -75,7 +75,7 @@ public:
 		// empty
 	}
 
-	RESULT Initialize();
+	RESULT Initialize(bool fAddToScene = true);
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) = 0;
 	virtual RESULT OnAppDidFinishInitializing(void *pContext = nullptr) = 0;

@@ -45,6 +45,8 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	DreamOS *pDreamOS = GetDOS();
 
+	pDreamOS->AddObjectToUIGraph(GetComposite());
+
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
 
@@ -298,7 +300,7 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
 	RESULT r = R_PASS;
 
-	//composite *pComposite = GetComposite();
+//	composite *pComposite = GetComposite();
 	m_pLeftMallet->Show();
 	m_pRightMallet->Show();
 /*
@@ -314,7 +316,7 @@ RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 		fnEndCallback,
 		this
 	));
-	//*/
+//*/
 
 //Error:
 	return r;
