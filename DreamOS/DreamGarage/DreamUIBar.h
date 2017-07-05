@@ -92,6 +92,7 @@ private:
 	std::shared_ptr<Font> m_pFont;
 
 	quaternion m_qMenuOrientation;
+	point m_ptMenuShowOffset;
 };
 
 

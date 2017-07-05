@@ -99,6 +99,9 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
 
 	CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
+
+	m_ptMenuShowOffset = point(0.0f, 0.5f, -0.5f);
+
 Error:
 	return r;
 }
@@ -137,10 +140,6 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
-
-		GetComposite()->SetVisible(!GetComposite()->IsVisible(), false);
-
-		UpdateCompositeWithCameraLook(0.0f, -1.0f);
 	}
 	else {
 		m_pathStack.pop();
@@ -149,12 +148,9 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
 			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
-			HideMenu();
 		}
 		else {
-			GetComposite()->SetVisible(!GetComposite()->IsVisible(), false);
-
-			UpdateCompositeWithCameraLook(0.0f, -1.0f);
+			HideMenu();
 		}
 	}
 Error:
@@ -213,7 +209,12 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	RESULT r = R_PASS;
 	DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
 	CN(pDreamUIBar);
-	//CR(pDreamUIBar->UpdateUILayers());
+
+	// TODO: first time the menu is called up, the scroll chevrons are incorrectly visible
+	GetComposite()->SetVisible(true);
+	m_pScrollView->SetPosition( point(0.0f, 0.0f, 0.0f)-m_ptMenuShowOffset);
+	m_pLeftMallet->Show();
+	m_pRightMallet->Show();
 Error:
 	return r;
 }
@@ -276,41 +277,52 @@ Error:
 RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
 	RESULT r = R_PASS;
 
-	//composite *pComposite = GetComposite();
-	m_pLeftMallet->Hide();
-	m_pRightMallet->Hide();
-/*
+	composite *pComposite = m_pScrollView.get();
+
+	auto fnEndCallback2 = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
+		CN(pDreamUIBar);
+
+		m_pScrollView->SetPosition(point(0.0f, 0.0f, 0.0f));
+		m_pScrollView->SetVisible(false);
+
+	Error:
+		return r;
+	};
+//*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
-		pComposite->GetPosition(),
-		m_qMenuOrientation * quaternion::MakeQuaternionWithEuler(0.0f, (float)(M_PI_2), 0.0f),
+		pComposite->GetPosition() - m_ptMenuShowOffset,
+		pComposite->GetOrientation(),
 		pComposite->GetScale(),
 		0.5f,
 		AnimationCurveType::EASE_OUT_QUART, // may want to try ease_in here
 		AnimationFlags(),
 		fnStartCallback,
-		fnEndCallback,
+		fnEndCallback2,
 		this
 	));
 	//*/
-//Error:
+Error:
 	return r;
 }
 
 RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
 	RESULT r = R_PASS;
 
-//	composite *pComposite = GetComposite();
-	m_pLeftMallet->Show();
-	m_pRightMallet->Show();
-/*
+	UpdateCompositeWithCameraLook(0.0f, -1.0f);
+	composite *pComposite = m_pScrollView.get();
+	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
+//*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
 		pComposite->GetPosition(),
-		m_qMenuOrientation,
+		pComposite->GetOrientation(),
 		pComposite->GetScale(),
-		0.5f,
-		AnimationCurveType::EASE_OUT_QUART,
+		0.1f,
+		AnimationCurveType::EASE_OUT_BACK,
 		AnimationFlags(),
 		fnStartCallback,
 		fnEndCallback,
@@ -318,7 +330,7 @@ RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 	));
 //*/
 
-//Error:
+Error:
 	return r;
 }
 
