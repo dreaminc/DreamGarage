@@ -112,36 +112,27 @@ RESULT FlatContext::SetFramebuffer(framebuffer* pFramebuffer) {
 	return R_PASS;
 }
 
-// TODO: Fix the sizing (not y) generality 
-// This is to do with the normal, not not orientation 
-
 float FlatContext::GetWidth() {
-	//vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
-	//return vDiff.x();
-
 	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetWidth();
 }
 
 float FlatContext::GetHeight() {
-	//vector vDiff = m_pBoundingVolume->GetMaxPoint() - m_pBoundingVolume->GetMinPoint();
-	//return vDiff.y();
-
 	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetHeight();
 }
 
-// TODO: Generality
+// TODO: This is not general and will not work if the text is rotated at all
 float FlatContext::GetLeft() {
-	return m_pBoundingVolume->GetMinPoint().x();
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetLeft();
 }
 
 float FlatContext::GetRight() {
-	return m_pBoundingVolume->GetMaxPoint().x();
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetRight();
 }
 
 float FlatContext::GetTop() {
-	return m_pBoundingVolume->GetMaxPoint().z();
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetTop();
 }
 
 float FlatContext::GetBottom() {
-	return m_pBoundingVolume->GetMinPoint().z();
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetBottom();
 }

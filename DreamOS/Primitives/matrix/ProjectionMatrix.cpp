@@ -60,6 +60,18 @@ ProjectionMatrix ProjectionMatrix::MakeOrtho(projection_precision left, projecti
 	return projMat;
 }
 
+ProjectionMatrix ProjectionMatrix::MakeOrthoYAxis(projection_precision left, projection_precision right,
+												  projection_precision top, projection_precision bottom,
+												  projection_precision nearPlane, projection_precision farPlane)
+{
+	ProjectionMatrix projMat;
+
+	projMat.m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+	projMat.SetOrthographicYAxis(left, right, top, bottom, nearPlane, farPlane);
+
+	return projMat;
+}
+
 ProjectionMatrix::~ProjectionMatrix() {
 	// Empty Stub
 }
@@ -179,6 +191,31 @@ RESULT ProjectionMatrix::SetOrthographic(projection_precision left, projection_p
 
 	this->element(3, 3) = 1.0f;
 	
+	return r;
+}
+
+RESULT ProjectionMatrix::SetOrthographicYAxis(projection_precision left, projection_precision right,
+											  projection_precision top, projection_precision bottom,
+											  projection_precision nearPlane, projection_precision farPlane)
+{
+	RESULT r = R_PASS;
+
+	m_type = PROJECTION_MATRIX_ORTHOGRAPHIC;
+
+	this->clear();
+
+	// Scaling / Clipping
+	this->element(0, 0) = 2.0f / (right - left);
+	this->element(1, 2) = -2.0f / (bottom - top);
+	this->element(2, 1) = 2.0f / (nearPlane - farPlane);
+
+	// Translation
+	this->element(0, 3) = (-1.0f * (right + left)) / (right - left);
+	this->element(1, 3) = (-1.0f * (bottom + top)) / (bottom - top);
+	this->element(2, 3) = (-1.0f * (nearPlane + farPlane)) / (nearPlane - farPlane);
+
+	this->element(3, 3) = 1.0f;
+
 	return r;
 }
 

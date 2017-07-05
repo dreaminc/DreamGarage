@@ -92,22 +92,17 @@ RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
 	{
 		float left = pFlatContext->GetLeft();
 		float right = pFlatContext->GetRight();
+
 		float top = pFlatContext->GetTop();
 		float bottom = pFlatContext->GetBottom();
+
 		float nearPlane = -1.0f;
 		float farPlane = 1.0f;
 
-		auto matP = ProjectionMatrix::MakeOrtho(left, right, top, bottom, nearPlane, farPlane);
+		// TODO: Why the negative one?
+		auto matP = ProjectionMatrix::MakeOrthoYAxis(left, right, top * -1.0f, bottom * -1.0f, nearPlane, farPlane);
 
-		// Re-orient quad such that normal is facing Z
-		//auto matRot = inverse(RotationMatrix(pFlatContext->GetOrientation())) * RotationMatrix(RotationMatrix::X_AXIS, (rotation_precision)M_PI_2);
-
-		// TODO: This is a hack - should do this properly with normal vector / projections etc
-		auto matRot = RotationMatrix(RotationMatrix::X_AXIS, (rotation_precision)M_PI_2);
-		auto matTranslate = TranslationMatrix(point(0.0f, pFlatContext->GetBoundingVolume()->GetCenter().z() * 2.0f, 0.0f));
-		m_pUniformProjectionMatrix->SetUniform(matP * matTranslate * matRot);
-
-		//m_pUniformProjectionMatrix->SetUniform(matP);
+		m_pUniformProjectionMatrix->SetUniform(matP);
 
 		CR(RenderObject(pFlatContext));
 	}
@@ -139,9 +134,8 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 }
 
 RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
-	auto matModel = pDimObj->GetModelMatrix();
-	//auto matModel = pDimObj->GetTranslationMatrix() * RotationMatrix(RotationMatrix::X_AXIS, -(rotation_precision)M_PI_2);
 
+	auto matModel = pDimObj->VirtualObj::GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	text *pText = dynamic_cast<text*>(pDimObj);

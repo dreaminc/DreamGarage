@@ -345,13 +345,14 @@ RESULT UITestSuite::AddTestFont() {
 			//auto pText = m_pDreamOS->AddText(pFont, "Testing", 2.0f, 0.5f);
 
 			// Size to fit
-			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 0.35f, text::flags::SCALE_TO_FIT);
+			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 0.6f, text::flags::SCALE_TO_FIT);
 			CN(pText);
 
 			//pText->RenderToTexture();
 			pText->RenderToQuad();
 
 			pText->RotateXByDeg(90.0f);
+
 
 
 			//pText->SetPosition(point(0.0f, 0.0f, 2.0f));

@@ -25,6 +25,15 @@ class vector;
 
 class point : public matrix <point_precision, 4, 1> {
 public:
+	enum component {
+		X,
+		Y,
+		Z,
+		W,
+		INVALID
+	};
+
+public:
 	point();
 	point(point_precision val);
 	point(point_precision x, point_precision y, point_precision z);
@@ -55,6 +64,9 @@ public:
 
 	RESULT Print(char *pszOptName = nullptr, bool fReturn = false);
 	std::string toString(bool fW = false);
+
+	inline point_precision &GetComponent(component c);
+	RESULT swap(component a, component b);
 
 	// Subtracting points results in vector
 	/*

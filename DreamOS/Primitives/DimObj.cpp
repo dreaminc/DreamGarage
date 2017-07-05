@@ -779,6 +779,10 @@ matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision,
 	}
 }
 
+matrix<virtual_precision, 4, 4> DimObj::GetRelativeModelMatrix() {
+	return VirtualObj::GetModelMatrix();
+}
+
 // Bounding Box
 RESULT DimObj::UpdateBoundingVolume() {
 	RESULT r = R_PASS;
