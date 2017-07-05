@@ -98,6 +98,9 @@ public:
 	uint32_t GetFontTextureHeight() const;
 	uint32_t GetFontBase() const;
 	uint32_t GetFontLineHeight() const;
+	
+	float GetLineHeight();
+	RESULT SetLineHeight(float lineHeight);
 
 private:
 	RESULT LoadFontFromFile(const std::wstring& wstrFontFile);
@@ -120,6 +123,7 @@ private:
 	// A glyph base defines the number of pixels in the y-axis above the virtual line of drawing a text
 	uint32_t m_fontBase = 0;
 	uint32_t m_fontLineHeight = 0;
+	float m_lineHeight = 0.25f;
 
 	uint32_t m_fontPixelSize = DEFAULT_FONT_SIZE;
 

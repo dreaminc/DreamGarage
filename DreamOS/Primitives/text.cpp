@@ -50,6 +50,28 @@ Error:
 	return;
 }
 
+text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, text::flags textFlags) :
+	FlatContext(pHALImp),
+	m_pFont(pFont),
+	m_width(width),
+	m_height(height),
+	m_flags(textFlags)
+{
+	RESULT r = R_PASS;
+
+	// TODO: This should go into a factory method or something
+	CR(SetFontHeightM(pFont->GetLineHeight()));
+
+	CR(SetText(strText));
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
 text::~text() {
 	if (m_pQuad != nullptr) {
 		m_pQuad = nullptr;
@@ -79,10 +101,7 @@ RESULT text::RenderToQuad() {
 		float contextWidth = FlatContext::GetWidth();
 		float contextHeight = FlatContext::GetHeight();
 
-		if (m_fScaleToFit) {
-			// TODO: Scale to fit
-		}
-		else {
+		if(IsFitToSize()) {
 			float uvLeft = m_xOffset / contextWidth;
 			float uvRight = (m_width + m_xOffset) / contextWidth;
 
@@ -94,6 +113,7 @@ RESULT text::RenderToQuad() {
 		}
 
 		m_pQuad = AddQuad(m_width, m_height, point(0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+		
 		CN(m_pQuad);
 	}
 
@@ -359,7 +379,7 @@ RESULT text::SetText(const std::string& strText) {
 		}
 	}
 	
-	if (IsScaleToFit()) {
+	if (IsFitToSize()) {
 		m_width = FlatContext::GetWidth();
 		m_height = FlatContext::GetHeight();
 	}

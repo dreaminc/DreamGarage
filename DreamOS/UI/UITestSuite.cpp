@@ -344,8 +344,14 @@ RESULT UITestSuite::AddTestFont() {
 			//auto pText = m_pDreamOS->AddText(pFont, "test", 1.0f, 0.25f);
 			//auto pText = m_pDreamOS->AddText(pFont, "Testing", 2.0f, 0.5f);
 
+			// Fit to Scale
+			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 0.6f, text::flags::FIT_TO_SIZE);
+			
 			// Size to fit
-			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 0.6f, text::flags::SCALE_TO_FIT);
+			// Note this sets the line height by way of font - this teases at future settings, 
+			// but right now it's avoiding adding MORE constructor paths / vars to this creation path
+			//auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::SCALE_TO_FIT);
+
 			CN(pText);
 
 			//pText->RenderToTexture();

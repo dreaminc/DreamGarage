@@ -1069,6 +1069,30 @@ text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strCo
 	return m_pHALImp->MakeText(pFont, strContent, lineHeightM, textFlags);
 }
 
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	return m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
+}
+
 
 text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
 	return m_pHALImp->MakeText(pFont, strContent, width, height, true, fBillboard);

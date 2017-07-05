@@ -843,6 +843,48 @@ Error:
 	return nullptr;
 }
 
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, pFont, strContent, width, height, textFlags);
+	CN(pText);
+
+	int fbWidth = pText->GetDPM(pText->GetWidth());
+	int fbHeight = pText->GetDPM(pText->GetHeight());
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 

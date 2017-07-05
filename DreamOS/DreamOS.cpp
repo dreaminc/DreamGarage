@@ -278,6 +278,14 @@ text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& strConte
 	return m_pSandbox->MakeText(pFont, strContent, lineHeightM, textFlags);
 }
 
+text *DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	return m_pSandbox->AddText(pFont, strContent, width, height, textFlags);
+}
+
+text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	return m_pSandbox->MakeText(pFont, strContent, width, height, textFlags);
+}
+
 text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& content, double width, double height, bool fBillboard) {
 	return m_pSandbox->MakeText(pFont, content, width, height, fBillboard);
 }

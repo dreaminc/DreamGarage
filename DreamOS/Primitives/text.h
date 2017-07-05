@@ -48,6 +48,7 @@ public:
 	};
 
 public:
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE);
 	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE);
 	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 	~text();

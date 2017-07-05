@@ -290,6 +290,15 @@ uint32_t font::GetFontLineHeight() const {
 	return m_fontLineHeight;
 }
 
+float font::GetLineHeight() {
+	return m_lineHeight;
+}
+
+RESULT font::SetLineHeight(float lineHeight) {
+	m_lineHeight = lineHeight;
+	return R_PASS;
+}
+
 RESULT font::GetGlyphFromChar(uint8_t ascii_id, CharacterGlyph& r_glyph) {
 	RESULT r = R_PASS;
 

@@ -41,6 +41,21 @@ OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::
 	SetColorTexture(pColorTexture);
 }
 
+OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) :
+	text(pParentImp, pFont, strContent, width, height, textFlags),
+	OGLObj(pParentImp)
+{
+	// TODO: Implement valid and CV EHM
+	RESULT r = OGLInitialize();
+
+	// Load appropriate glyph texture
+	std::wstring strFont(L"Fonts/" + pFont->GetFontImageFile());
+
+	//texture *pColorTexture = new OGLTexture(pParentImp, (wchar_t*)font.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pColorTexture = pParentImp->MakeTexture((wchar_t*)strFont.c_str(), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	SetColorTexture(pColorTexture);
+}
+
 RESULT OGLText::SetText(const std::string& strText) {
 	RESULT r = R_PASS;
 	bool fChanged = false;
