@@ -30,6 +30,8 @@ public:
 		void* pCallbackContext = nullptr);
 
 	RESULT CancelAnimation(DimObj *pObj, double startTime);
+	RESULT RemoveAnimationObject(DimObj *pObj);
+	RESULT RemoveAllObjects();
 
 private:
 	std::map<DimObj*, std::deque<std::shared_ptr<AnimationItem>>> m_objectQueue;

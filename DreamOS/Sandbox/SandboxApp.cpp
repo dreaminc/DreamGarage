@@ -825,6 +825,10 @@ Error:
 RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
+	DimObj *pObj = reinterpret_cast<DimObj*>(pObject);
+	if (pObj != nullptr)
+		CR(m_pInteractionEngine->RemoveAnimationObject(pObj));
+
 	CR(m_pPhysicsGraph->RemoveObject(pObject));
 	CR(m_pSceneGraph->RemoveObject(pObject));
 	CR(m_pUISceneGraph->RemoveObject(pObject));
@@ -837,6 +841,9 @@ Error:
 // This is the nuclear option - it will flush all objects out
 RESULT SandboxApp::RemoveAllObjects() {
 	RESULT r = R_PASS;
+
+	// removes all animations
+	CR(m_pInteractionEngine->RemoveAllObjects()); 
 
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());

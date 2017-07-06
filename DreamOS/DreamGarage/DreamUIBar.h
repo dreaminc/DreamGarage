@@ -23,6 +23,7 @@ class EnvironmentControllerProxy;
 
 class Font;
 class texture;
+class UIButton;
 
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
 					public MenuController::observer, 
@@ -50,6 +51,7 @@ public:
 	// Animations
 	RESULT HideMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 	RESULT ShowMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
+	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
 	RESULT HandleTouchStart(void* pContext);
 	RESULT HandleTouchMove(void* pContext);

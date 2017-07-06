@@ -16,7 +16,7 @@ class DreamOS;
 #define ITEM_SCALE_SELECTED 1.25
 #define TITLE_ANGLE_X 75.0f
 
-enum class MenuState {
+enum class ScrollState {
 	NONE,
 	SCROLLING
 };
@@ -44,9 +44,12 @@ public:
 
 	RESULT HideButton(UIButton* pScrollButton);
 	RESULT ShowButton(UIButton* pScrollButton);
+	RESULT HideAndPushButton(UIButton* pButton);
+	// pass optional pushButton to have an additional moving back animation
+	RESULT HideAllButtons(UIButton* pPushButton = nullptr);
 
 public:
-	MenuState GetState();
+	ScrollState GetState();
 	std::shared_ptr<UIView> GetTitleView();
 	std::shared_ptr<UIView> GetMenuItemsView();
 
@@ -75,7 +78,7 @@ private:
 	std::shared_ptr<UIView> m_pTitleView = nullptr;
 	std::shared_ptr<UIButton> m_pLeftScrollButton = nullptr; 
 	std::shared_ptr<UIButton> m_pRightScrollButton = nullptr;
-	MenuState m_menuState;
+	ScrollState m_menuState;
 
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
 	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;

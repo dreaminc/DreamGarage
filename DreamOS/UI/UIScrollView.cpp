@@ -177,9 +177,14 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 	m_pMenuButtonsContainer->ResetRotation();
 
 	if (m_pMenuButtonsContainer->HasChildren()) {
-		for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
-			CR(m_pDreamOS->RemoveObject(pButton.get()));
-			CR(m_pDreamOS->UnregisterInteractionObject(pButton.get()));
+		for (auto& pObj : m_pMenuButtonsContainer->GetChildren()) {
+			UIButton* pButton = reinterpret_cast<UIButton*>(pObj.get());
+
+			//TODO: this works for now, but it may be necessary to have some of the individual
+			// RemoveObject functions properly cascade the call for future situations
+			CR(m_pDreamOS->RemoveObject(pButton->GetSurface().get()));
+			CR(m_pDreamOS->RemoveObject(pButton));
+			CR(m_pDreamOS->UnregisterInteractionObject(pButton));
 		}
 	}
 	CR(m_pMenuButtonsContainer->ClearChildren());
@@ -259,21 +264,40 @@ Error:
 }
 
 RESULT UIScrollView::StartScrollRight(void *pContext) {
-	m_menuState = MenuState::SCROLLING;
+	m_menuState = ScrollState::SCROLLING;
 	m_velocity = 0.01f;
 	return R_PASS;
 }
 
 RESULT UIScrollView::StartScrollLeft(void *pContext) {
-	m_menuState = MenuState::SCROLLING;
+	m_menuState = ScrollState::SCROLLING;
 	m_velocity = -0.01f;
 	return R_PASS;
 }
 
 RESULT UIScrollView::StopScroll(void *pContext) {
-	m_menuState = MenuState::NONE;
+	m_menuState = ScrollState::NONE;
 	m_velocity = 0.0f;
 	return R_PASS;
+}
+
+RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
+	RESULT r = R_PASS;
+
+	for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
+		auto pObj = reinterpret_cast<UIButton*>(pButton.get());
+		if (pObj != pPushButton) {
+			CR(HideButton(pObj));
+		}
+		else {
+			CR(HideAndPushButton(pObj));
+		}
+	}
+	CR(HideButton(m_pLeftScrollButton.get()));
+	CR(HideButton(m_pRightScrollButton.get()));
+
+Error:
+	return r;
 }
 
 RESULT UIScrollView::HideButton(UIButton* pScrollButton) {
@@ -326,7 +350,37 @@ Error:
 	return r;
 }
 
-MenuState UIScrollView::GetState() {
+RESULT UIScrollView::HideAndPushButton(UIButton* pButton) {
+	RESULT r = R_PASS;
+
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		DimObj *pObj = reinterpret_cast<DimObj*>(pContext);
+		pObj->SetVisible(false);
+		return R_PASS;
+	};
+
+	auto pSurface = pButton->GetSurface().get();
+
+	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
+		pSurface,
+		pSurface->GetPosition() + point(0.0f, 0.0f, -0.1f),
+		pSurface->GetOrientation(),
+		pSurface->GetScale(),
+		color(1.0f, 1.0f, 1.0f, 0.0f),
+		0.1f,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		pButton));
+
+Error:
+	return r;
+}
+
+ScrollState UIScrollView::GetState() {
 	return m_menuState;
 }
 
