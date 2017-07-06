@@ -292,6 +292,24 @@ RESULT DimObj::SetRandomColor() {
 	return R_PASS;
 }
 
+RESULT DimObj::RemoveChild(std::shared_ptr<DimObj> pDimObj) {
+	RESULT r = R_PASS;
+
+	CN(m_pObjects);
+	CN(pDimObj);
+
+	{
+		auto it = std::find(m_pObjects->begin(), m_pObjects->end(), pDimObj);
+
+		CBR((it != m_pObjects->end()), R_NOT_FOUND);
+
+		m_pObjects->erase(it);
+	}
+
+Error:
+	return r;
+}
+
 // Children (composite objects)
 RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
 	if (m_pObjects == nullptr) {

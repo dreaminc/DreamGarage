@@ -345,21 +345,37 @@ RESULT UITestSuite::AddTestFont() {
 			//auto pText = m_pDreamOS->AddText(pFont, "Testing", 2.0f, 0.5f);
 
 			// Fit to Scale
-			//auto pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE);
+			auto pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE);
+			CN(pText);
+			pText->RenderToQuad();
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(-3.0f, 2.0f, 0.0f));
 			
 			// Size to fit
 			// Note this sets the line height by way of font - this teases at future settings, 
 			// but right now it's avoiding adding MORE constructor paths / vars to this creation path
-			//auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::SCALE_TO_FIT);
-			//auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::NONE);
-			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.3f, 0.6f, text::flags::WRAP);
-
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::SCALE_TO_FIT);
 			CN(pText);
+			pText->RenderToQuad();
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(2.0f, -2.0f, 0.0f));
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::NONE);
+			CN(pText);
+			pText->RenderToQuad();
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(2.0f, 2.0f, 0.0f));
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.1f, 0.6f, text::flags::TRAIL_ELLIPSIS);
+			CN(pText);
+			pText->RenderToQuad();
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(-3.0f, -2.0f, 0.0f));
 
 			//pText->RenderToTexture();
-			pText->RenderToQuad();
+			
 
-			pText->RotateXByDeg(90.0f);
+			
 
 			//pText->SetPosition(point(0.0f, 0.0f, 2.0f));
 			//pText->SetScale(vector(50.0f));

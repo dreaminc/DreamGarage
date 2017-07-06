@@ -25,62 +25,9 @@ class composite;
 class quad;
 
 class font {
+	friend struct CharacterGlyph;
+
 public:
-
-	struct CharacterGlyph {
-		uint32_t	value = 0;
-		uint32_t	x = 0;
-		uint32_t	y = 0;
-		uint32_t	width = 0;
-		uint32_t	height = 0;
-		int32_t		bearingX = 0;
-		int32_t		bearingY = 0;
-		uint32_t	advance = 0;
-		uint32_t	page = 0;
-		bool fValid = false;
-
-		CharacterGlyph() {
-			// empty
-		}
-
-		// TODO: Get rid of this when we move to Freetype
-		CharacterGlyph(std::wstring wstrFontFileLine) {
-			value = GetValue<uint32_t>(wstrFontFileLine, L"char id=");
-
-			if (value) {
-				x = GetValue<uint32_t>(wstrFontFileLine, L"x=");
-				y = GetValue<uint32_t>(wstrFontFileLine, L"y=");
-				width = GetValue<uint32_t>(wstrFontFileLine, L"width=");
-				height = GetValue<uint32_t>(wstrFontFileLine, L"height=");
-				bearingX = GetValue<uint32_t>(wstrFontFileLine, L"xoffset=");
-				bearingY = GetValue<uint32_t>(wstrFontFileLine, L"yoffset=");
-				advance = GetValue<uint32_t>(wstrFontFileLine, L"xadvance=");
-				page = GetValue<uint32_t>(wstrFontFileLine, L"page=");
-				fValid = true;
-			}
-		}
-
-		// TODO: Add flag / switch approach this is getting verbose
-		// TODO: Split into a different file as well
-		float GetWidthMM() {
-			return (width / FONT_PT_PER_MM);
-		}
-
-		float GetWidthM() {
-			return (width / FONT_PT_PER_M);
-		}
-
-		float GetHeightMM() {
-			return (height / FONT_PT_PER_MM);
-		}
-
-		float GetHeightM() {
-			return (height / FONT_PT_PER_M);
-		}
-
-		
-	};
-
 	font(bool fDistanceMap = false);
 	font(const std::wstring& wstrFontFile, composite *pContext, bool fDistanceMap = false);
 	
@@ -105,6 +52,7 @@ public:
 private:
 	RESULT LoadFontFromFile(const std::wstring& wstrFontFile);
 
+protected:
 	template <typename T>
 	static T GetValue(const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter = ' ');
 
@@ -164,6 +112,60 @@ private:
 
 public:
 	static std::shared_ptr<font> MakeFreetypeFont(std::wstring wstrFontFilename, bool fDistanceMapped = true);
+};
+
+
+// TODO: Move to own file
+struct CharacterGlyph {
+	uint32_t	value = 0;
+	uint32_t	x = 0;
+	uint32_t	y = 0;
+	uint32_t	width = 0;
+	uint32_t	height = 0;
+	int32_t		bearingX = 0;
+	int32_t		bearingY = 0;
+	uint32_t	advance = 0;
+	uint32_t	page = 0;
+	bool fValid = false;
+
+	CharacterGlyph() {
+		// empty
+	}
+
+	// TODO: Get rid of this when we move to Freetype
+	CharacterGlyph(std::wstring wstrFontFileLine) {
+		value = font::GetValue<uint32_t>(wstrFontFileLine, L"char id=");
+
+		if (value) {
+			x = font::GetValue<uint32_t>(wstrFontFileLine, L"x=");
+			y = font::GetValue<uint32_t>(wstrFontFileLine, L"y=");
+			width = font::GetValue<uint32_t>(wstrFontFileLine, L"width=");
+			height = font::GetValue<uint32_t>(wstrFontFileLine, L"height=");
+			bearingX = font::GetValue<uint32_t>(wstrFontFileLine, L"xoffset=");
+			bearingY = font::GetValue<uint32_t>(wstrFontFileLine, L"yoffset=");
+			advance = font::GetValue<uint32_t>(wstrFontFileLine, L"xadvance=");
+			page = font::GetValue<uint32_t>(wstrFontFileLine, L"page=");
+			fValid = true;
+		}
+	}
+
+	// TODO: Add flag / switch approach this is getting verbose
+	// TODO: Split into a different file as well
+	float GetWidthMM() {
+		return (width / FONT_PT_PER_MM);
+	}
+
+	float GetWidthM() {
+		return (width / FONT_PT_PER_M);
+	}
+
+	float GetHeightMM() {
+		return (height / FONT_PT_PER_MM);
+	}
+
+	float GetHeightM() {
+		return (height / FONT_PT_PER_M);
+	}
 };
 
 #endif // ! FONT_H_

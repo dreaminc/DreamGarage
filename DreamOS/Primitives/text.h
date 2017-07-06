@@ -20,6 +20,7 @@ class font;
 //class quad;
 
 class HALImp;
+struct CharacterGlyph;
 
 //class text : public DimObj {
 class text : public FlatContext {
@@ -44,6 +45,7 @@ public:
 		SCALE_TO_FIT	= 1 << 1,
 		FIT_TO_SIZE		= 1 << 2,
 		BILLBOARD		= 1 << 3,
+		TRAIL_ELLIPSIS	= 1 << 4,
 		INVALID			= 0xFF
 	};
 
@@ -92,9 +94,13 @@ public:
 	bool IsWrap();
 	bool IsFitToSize();
 	bool IsBillboard();
+	bool IsTrailingEllipsis();
 
 public:
 	//static text& MakeText()
+
+private:
+	std::shared_ptr<quad> AddGlyphQuad(CharacterGlyph glyph, float posX, float posY);
 
 private:
 	bool m_fScaleToFit = false;

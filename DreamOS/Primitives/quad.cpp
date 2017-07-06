@@ -305,6 +305,9 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 
 	CR(Allocate());
 
+	m_width = width;
+	m_height = height;
+
 	float halfHeight = height / 2.0f;
 	float halfWidth = width / 2.0f;
 

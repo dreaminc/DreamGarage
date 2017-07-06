@@ -313,10 +313,63 @@ bool text::IsBillboard() {
 	return ((m_flags & text::flags::BILLBOARD) != text::flags::NONE);
 }
 
+bool text::IsTrailingEllipsis() {
+	return ((m_flags & text::flags::TRAIL_ELLIPSIS) != text::flags::NONE);
+}
+
+// Notes all values are in dots
+std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float posY) {
+	RESULT r = R_PASS;
+
+	float fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
+	float fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
+	float fontBase = static_cast<float>(m_pFont->GetFontBase());
+
+	// UV
+	float uvTop = (fontImageHeight - glyph.y) / fontImageHeight;
+	float uvBottom = ((fontImageHeight - glyph.y) - glyph.height) / fontImageHeight;
+
+	uvBottom = 1.0f - uvBottom;
+	uvTop = 1.0f - uvTop;
+
+	float uvLeft = glyph.x / fontImageWidth;
+	float uvRight = (glyph.x + glyph.width) / fontImageWidth;
+
+	uvcoord uvTopLeft = uvcoord(uvLeft, uvTop);
+	uvcoord uvBottomRight = uvcoord(uvRight, uvBottom);
+
+	// Position
+	float glyphQuadXPosition = posX + ((float)(glyph.width) / 2.0f) + (float)(glyph.bearingX);
+	float glyphQuadYPosition = posY - ((float)(fontBase)-(float)(glyph.bearingY) - ((float)(glyph.height) / 2.0f));
+
+	// Apply DPMM and scale factor
+
+	float glyphWidth = GetMSizeFromDots(glyph.width) * m_scaleFactor;
+	float glyphHeight = GetMSizeFromDots(glyph.height) * m_scaleFactor;
+
+	glyphQuadXPosition = GetMSizeFromDots(glyphQuadXPosition) * m_scaleFactor;
+	glyphQuadYPosition = GetMSizeFromDots(glyphQuadYPosition) * m_scaleFactor;
+
+	point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
+	std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
+	pQuad->SetColorTexture(m_pFont->GetTexture().get());
+
+	return pQuad;
+
+	/*
+Error:
+	if (pQuad != nullptr) {
+		pQuad = nullptr;
+	}
+
+	return nullptr;*/
+}
+
 RESULT text::SetText(const std::string& strText) {
 	RESULT r = R_PASS;
 	point ptCenter;
 	std::vector<std::shared_ptr<quad>> curWordQuads;
+	std::vector<std::shared_ptr<quad>> curLineQuads;
 
 	CBR((m_strText.compare(strText) != 0), R_NO_EFFECT);
 
@@ -325,9 +378,6 @@ RESULT text::SetText(const std::string& strText) {
 
 	m_strText = strText;
 
-	float fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
-	float fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
-	float fontBase = static_cast<float>(m_pFont->GetFontBase());
 	float fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
 
 	// Apply DPMM to the width
@@ -341,7 +391,7 @@ RESULT text::SetText(const std::string& strText) {
 	float toWord = 0.0f;
 
 	for(char &c : m_strText) {
-		font::CharacterGlyph glyph;
+		CharacterGlyph glyph;
 		bool fInWord = false;
 
 		// This triggers a line break
@@ -360,41 +410,18 @@ RESULT text::SetText(const std::string& strText) {
 				continue;
 			}
 
-			// UV
-			float uvTop = (fontImageHeight - glyph.y) / fontImageHeight;
-			float uvBottom = ((fontImageHeight - glyph.y) - glyph.height) / fontImageHeight;
-
-			uvBottom = 1.0f - uvBottom;
-			uvTop = 1.0f - uvTop;
-
-			float uvLeft = glyph.x / fontImageWidth;
-			float uvRight = (glyph.x + glyph.width) / fontImageWidth;
-
-			uvcoord uvTopLeft = uvcoord(uvLeft, uvTop);
-			uvcoord uvBottomRight = uvcoord(uvRight, uvBottom);
-
-			// Position
-			float glyphQuadXPosition = posX + ((float)(glyph.width) / 2.0f) + (float)(glyph.bearingX);
-			float glyphQuadYPosition = posY - ((float)(fontBase) - (float)(glyph.bearingY) - ((float)(glyph.height) / 2.0f));
-
-			// Apply DPMM and scale factor
-
-			float glyphWidth = GetMSizeFromDots(glyph.width) * m_scaleFactor;
-			float glyphHeight = GetMSizeFromDots(glyph.height) * m_scaleFactor;
-
-			glyphQuadXPosition = GetMSizeFromDots(glyphQuadXPosition) * m_scaleFactor;
-			glyphQuadYPosition = GetMSizeFromDots(glyphQuadYPosition) * m_scaleFactor;
-
-			point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
-			std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
-			pQuad->SetColorTexture(m_pFont->GetTexture().get());
+			auto pQuad = AddGlyphQuad(glyph, posX, posY);
 			
 			curWordQuads.push_back(pQuad);
+			curLineQuads.push_back(pQuad);
 
 			posX += (float)(glyph.advance);
 			fromStartOfWord += (float)(glyph.advance);
 
-			if (IsWrap() && (GetMSizeFromDots(posX) * m_scaleFactor) > m_width) {
+			float posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
+
+			// Wrapping
+			if (IsWrap() && posXM > m_width) {
 				if ( curWordQuads.size() > 0 ) {
 					float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
 					float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
@@ -409,7 +436,41 @@ RESULT text::SetText(const std::string& strText) {
 					toWord = 0.0f;
 				}
 
+				curLineQuads.clear();
 				posY += fontLineHeight;
+			}
+
+			// Ellipsis
+			// TODO: Consolidate code (ext fn.)
+			if (IsTrailingEllipsis() && posXM > m_width) {
+				CharacterGlyph periodGlyph; 
+				m_pFont->GetGlyphFromChar('.', periodGlyph);
+
+				float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
+
+				// Remove characters so we have space for the ellipsis 
+				while (posXM > (m_width - (periodGlyphWidth * 3.0f)) && posXM > 0.0f) {
+					auto pQuad = curLineQuads.back();
+					curLineQuads.pop_back();
+
+					// Remove from flat context
+					RemoveChild(pQuad);
+
+					posXM = pQuad->GetPosition().x() - (pQuad->GetWidth()/2.0f);
+				}
+
+				for (int i = 0; i < 3; i++) {
+					auto pPeriodQuad = AddGlyphQuad(periodGlyph, posX, posY);
+					
+					// Adjust position
+					point ptPeriod = pPeriodQuad->GetPosition();
+					ptPeriod.x() = posXM + pPeriodQuad->GetWidth() / 2.0f;
+					pPeriodQuad->SetPosition(ptPeriod);
+
+					posXM += pPeriodQuad->GetWidth();
+				}
+
+				break;
 			}
 		}
 	}
