@@ -100,7 +100,7 @@ public:
 	bool IsWireframe();
 	RESULT SetWireframe(bool fWireframe = true);
 
-	color GetColor();
+//	color GetColor();
 	RESULT SetColor(color c);
 	RESULT SetAlpha(color_precision a);
 

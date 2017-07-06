@@ -360,6 +360,8 @@ RESULT DreamUIBar::Shutdown(void *pContext) {
 RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	RESULT r = R_PASS;
 
+	CNR(pMenuNode, R_OBJECT_NOT_FOUND);
+
 	if (pMenuNode->NumSubMenuNodes() > 0) {
 		auto pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
 		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
