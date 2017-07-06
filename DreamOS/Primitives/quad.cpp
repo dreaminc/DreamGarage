@@ -195,6 +195,14 @@ void quad::SetScaledBillboard(bool fScale) {
 	m_fScaledBillboard = fScale; 
 }
 
+float quad::GetWidth() {
+	return m_width;
+}
+
+float quad::GetHeight() {
+	return m_height;
+}
+
 RESULT quad::UpdateParams(float width, float height, vector vNormal) {
 	RESULT r = R_PASS;
 

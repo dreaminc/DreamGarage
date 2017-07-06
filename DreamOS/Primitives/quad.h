@@ -66,6 +66,9 @@ public:
 	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleBased = true);
 	RESULT UpdateParams(float width, float height, vector vNormal);
 
+	float GetWidth();
+	float GetHeight();
+
 private:
 	QUAD_TYPE m_quadType;
 

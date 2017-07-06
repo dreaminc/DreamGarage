@@ -2,10 +2,12 @@
 #include "quad.h"
 #include <vector>
 #include <algorithm>
+#include <cctype>
 
 #include "font.h"
 #include "HAL/HALImp.h"
 #include "Framebuffer.h"
+
 
 text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
 	FlatContext(pHALImp),
@@ -101,7 +103,7 @@ RESULT text::RenderToQuad() {
 		float contextWidth = FlatContext::GetWidth();
 		float contextHeight = FlatContext::GetHeight();
 
-		if(IsFitToSize()) {
+		if(!IsScaleToFit()) {
 			float uvLeft = m_xOffset / contextWidth;
 			float uvRight = (m_width + m_xOffset) / contextWidth;
 
@@ -314,6 +316,7 @@ bool text::IsBillboard() {
 RESULT text::SetText(const std::string& strText) {
 	RESULT r = R_PASS;
 	point ptCenter;
+	std::vector<std::shared_ptr<quad>> curWordQuads;
 
 	CBR((m_strText.compare(strText) != 0), R_NO_EFFECT);
 
@@ -334,9 +337,12 @@ RESULT text::SetText(const std::string& strText) {
 	// These are in dots 
 	float posX = 0.0f;
 	float posY = 0.0f;
+	float fromStartOfWord = 0.0f;
+	float toWord = 0.0f;
 
 	for(char &c : m_strText) {
 		font::CharacterGlyph glyph;
+		bool fInWord = false;
 
 		// This triggers a line break
 		if (c == '\n') {
@@ -345,6 +351,15 @@ RESULT text::SetText(const std::string& strText) {
 		}
 		else if (m_pFont->GetGlyphFromChar(c, glyph)) {
 			
+			if (std::isspace(c)) {
+				curWordQuads.clear();
+				posX += (float)(glyph.advance);
+				toWord = posX;
+
+				fromStartOfWord = 0.0f;
+				continue;
+			}
+
 			// UV
 			float uvTop = (fontImageHeight - glyph.y) / fontImageHeight;
 			float uvBottom = ((fontImageHeight - glyph.y) - glyph.height) / fontImageHeight;
@@ -371,10 +386,31 @@ RESULT text::SetText(const std::string& strText) {
 			glyphQuadYPosition = GetMSizeFromDots(glyphQuadYPosition) * m_scaleFactor;
 
 			point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
-			auto pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
+			std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 			pQuad->SetColorTexture(m_pFont->GetTexture().get());
+			
+			curWordQuads.push_back(pQuad);
 
 			posX += (float)(glyph.advance);
+			fromStartOfWord += (float)(glyph.advance);
+
+			if (IsWrap() && (GetMSizeFromDots(posX) * m_scaleFactor) > m_width) {
+				if ( curWordQuads.size() > 0 ) {
+					float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
+					float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
+
+					for (auto &pQuad : curWordQuads) {
+						pQuad->translateX(-xOffset);
+						pQuad->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
+					}
+
+					// Convert back from meters to dots 
+					posX = fromStartOfWord;
+					toWord = 0.0f;
+				}
+
+				posY += fontLineHeight;
+			}
 		}
 	}
 	
