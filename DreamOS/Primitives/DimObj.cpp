@@ -182,15 +182,7 @@ Error:
 
 RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 	RESULT r = R_PASS;
-	/*
-	#define SET_TEXTURE(type, texture) case DimObj::MaterialTexture::type: texture = pTexture; break
-	switch (type) {
-		SET_TEXTURE(Ambient, m_pTextureAmbient);
-		SET_TEXTURE(Diffuse, m_pTextureDiffuse);
-		SET_TEXTURE(Specular, m_pTextureSpecular);
-	}
-	//*/
-	//*
+
 	switch (type) {
 
 	case DimObj::MaterialTexture::Ambient: {
@@ -207,7 +199,6 @@ RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 
 	}
 
-	//*/
 	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 //Error:

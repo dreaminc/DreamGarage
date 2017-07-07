@@ -88,13 +88,12 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	// Connect output as pass-thru to internal blend program
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-//*
+
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//*/
 
 	// Debug Console
 	ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
@@ -102,7 +101,6 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	CR(pDreamConsoleProgram->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 
 	// Connect output as pass-thru to internal blend program
-	//CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 	CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
 
 	// Screen Quad Shader (opt - we could replace this if we need to)

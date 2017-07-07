@@ -32,8 +32,6 @@ UIScrollView::~UIScrollView()
 RESULT UIScrollView::Initialize() {
 	RESULT r = R_PASS;
 
-	//SetPosition(point(0.0f, 0.0f, 0.15f));
-
 	m_pTitleView = AddUIView();
 
 	m_pLeftScrollButton = AddUIButton();

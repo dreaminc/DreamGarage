@@ -38,7 +38,6 @@ RESULT DreamApp<derivedAppType>::Initialize() {
 
 	// Grab the context composite from DreamOS
 	CN(m_pDreamOS);
-
 	m_pCompositeContext = m_pDreamOS->AddComposite();
 	CN(m_pCompositeContext);
 
