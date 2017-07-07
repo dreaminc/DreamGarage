@@ -120,7 +120,7 @@ vec4 darkColor  = vec4(21.0f / 255.0f,  50.0f / 255.0f, 115.0f / 255.0f, 1.0f);
 
 vec4 EnableRiverAnimation() {
 	float color = ((1.5f * DataIn.riverAnimationDisplacement) + 1.0f) / 2.0f;
-	vec4 guess = (color*lightColor) + ((1.0f - color)*darkColor);
+	vec4 guess = (color * lightColor) + ((1.0f - color) * darkColor);
 	return vec4(guess.xyz, 1.0f);
 }
 //*/
@@ -168,10 +168,11 @@ void main(void) {
 
 	// keeping the alpha value outside max() helps with distance-mapped fonts;
 	// max() is component-wise, and some alpha values currently default to one
-	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.w);
-
-//	out_vec4Color = material.m_colorDiffuse;
-	//out_vec4Color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
+	
 	// opaque/fully transparent blending without reordering
-	//EnableBlending(colorAmbient.a, colorDiffuse.a);
+	EnableBlending(colorAmbient.a, colorDiffuse.a);
+	out_vec4Color = vec4(max(vec4LightValue.xyz, (lightColorAmbient * colorAmbient).xyz), colorDiffuse.a);
+
+	//	out_vec4Color = material.m_colorDiffuse;
+	//out_vec4Color = vec4(0.0f, 0.0f, 1.0f, 1.0f);
 }

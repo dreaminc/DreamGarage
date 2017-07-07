@@ -34,7 +34,7 @@ public:
 
 	// TODO: Consolidate the HMD tests 
 	RESULT AddTestMinimalShaderHMD();
-	RESULT AddTestBlinnPhongShaderHMD();
+	RESULT AddTestBlinnPhongShader();
 	RESULT AddTestBlinnPhongShaderBlurHMD();
 	RESULT AddTestBlinnPhongShaderTextureHMD();
 	RESULT AddTestBlinnPhongShaderTextureCopy();

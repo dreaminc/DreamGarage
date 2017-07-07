@@ -142,12 +142,13 @@ color DimObj::GetColor() {
 }
 
 RESULT DimObj::SetColor(color c) {
-	for (unsigned int i = 0; i < NumberVertices(); i++)
+	for (unsigned int i = 0; i < NumberVertices(); i++) {
 		m_pVertices[i].SetColor(c);
+	}
 
 	SetDirty();
 
-	GetMaterial()->SetColors(c,c,c);
+	GetMaterial()->SetColors(c, c, c);
 
 	return R_PASS;
 }
@@ -157,8 +158,6 @@ RESULT DimObj::SetAlpha(color_precision a) {
 		m_pVertices[i].SetAlpha(a);
 
 	SetDirty();
-
-	GetMaterial()->SetAmbientIntensity(a);
 
 	return R_PASS;
 }

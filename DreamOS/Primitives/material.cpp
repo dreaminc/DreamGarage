@@ -46,8 +46,18 @@ RESULT material::SetColors(color colorAmbient, color colorDiffuse, color colorSp
 	return R_PASS;
 }
 
+RESULT material::SetAmbientColor(color colorAmbient) {
+	m_colorAmbient = colorAmbient;
+	return R_PASS;
+}
+
 RESULT material::SetDiffuseColor(color colorDiffuse) {
 	m_colorDiffuse = colorDiffuse;
+	return R_PASS;
+}
+
+RESULT material::SetSpecularColor(color colorSpecular) {
+	m_colorSpecular = colorSpecular;
 	return R_PASS;
 }
 
