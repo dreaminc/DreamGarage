@@ -215,8 +215,8 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 	bool fUpdateMouse = false;
 
 	//m_pTestSphereAbsolute->SetPosition(pEvent->m_ptContact[0]);
-
 	switch (pEvent->m_eventType) {
+	/*
 		case ELEMENT_INTERSECT_BEGAN: {
 			if (m_pBrowserQuad->IsVisible()) {
 				m_pPointerCursor->SetVisible(true);
@@ -299,7 +299,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 		} break;
-
+		//*/
 		// Keyboard
 		// TODO: Should be a "typing manager" in between?
 		// TODO: haven't seen any issues with KEY_UP being a no-op
@@ -325,7 +325,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 		} break;
 	}
-
+/*
 	// First point of contact
 	if (fUpdateMouse) {
 		//if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
@@ -337,6 +337,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 			m_pPointerCursor->SetOrigin(ptAdjustedContact);
 		//}
 	}
+	//*/
 
 Error:
 	return r;
@@ -435,7 +436,7 @@ bool DreamBrowser::IsVisible() {
 RESULT DreamBrowser::SetVisible(bool fVisible) {
 	RESULT r = R_PASS;
 	CR(m_pBrowserQuad->SetVisible(fVisible));
-	CR(m_pPointerCursor->SetVisible(fVisible));
+	//CR(m_pPointerCursor->SetVisible(fVisible));
 Error:
 	return r;
 }
