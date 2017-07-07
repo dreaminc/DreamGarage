@@ -419,9 +419,44 @@ RESULT text::SetText(const std::string& strText) {
 			fromStartOfWord += (float)(glyph.advance);
 
 			float posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
+			float posYM = (GetMSizeFromDots(posX) * m_scaleFactor);
 
 			// Wrapping
 			if (IsWrap() && posXM > m_width) {
+				// Test for ellipsis 
+				if (IsTrailingEllipsis() && (GetMSizeFromDots(posY + fontLineHeight * 2.0f) * m_scaleFactor) > m_height) {
+					// TODO: Move to func
+					CharacterGlyph periodGlyph;
+					m_pFont->GetGlyphFromChar('.', periodGlyph);
+
+					float periodGlyphWidth = GetMSizeFromDots(periodGlyph.width) * m_scaleFactor;
+
+					// Remove characters so we have space for the ellipsis 
+					while (posXM > (m_width - (periodGlyphWidth * 3.0f)) && posXM > 0.0f) {
+						auto pQuad = curLineQuads.back();
+						curLineQuads.pop_back();
+
+						// Remove from flat context
+						RemoveChild(pQuad);
+
+						posXM = pQuad->GetPosition().x() - (pQuad->GetWidth() / 2.0f);
+					}
+
+					for (int i = 0; i < 3; i++) {
+						auto pPeriodQuad = AddGlyphQuad(periodGlyph, posX, posY);
+
+						// Adjust position
+						point ptPeriod = pPeriodQuad->GetPosition();
+						ptPeriod.x() = posXM + pPeriodQuad->GetWidth() / 2.0f;
+						pPeriodQuad->SetPosition(ptPeriod);
+
+						posXM += pPeriodQuad->GetWidth();
+					}
+
+					break;
+				}
+
+				// Move to func
 				if ( curWordQuads.size() > 0 ) {
 					float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
 					float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
@@ -440,9 +475,11 @@ RESULT text::SetText(const std::string& strText) {
 				posY += fontLineHeight;
 			}
 
+			posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
+			posYM = (GetMSizeFromDots(posX) * m_scaleFactor);
+
 			// Ellipsis
-			// TODO: Consolidate code (ext fn.)
-			if (IsTrailingEllipsis() && posXM > m_width) {
+			if (IsTrailingEllipsis() && (posXM > m_width)) {
 				CharacterGlyph periodGlyph; 
 				m_pFont->GetGlyphFromChar('.', periodGlyph);
 

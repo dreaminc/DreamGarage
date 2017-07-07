@@ -335,12 +335,12 @@ RESULT UITestSuite::AddTestFont() {
 			// OLD
 			//auto pFlatContext = m_pDreamOS->AddFlatContext();
 			
-			///*
 			auto pFont = std::make_shared<font>(L"Basis_Grotesque_Pro.fnt", true);
 			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
 			const wchar_t* pszFile = strFile.c_str();
 			pFont->SetTexture(std::shared_ptr<texture>(m_pDreamOS->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR)));
 
+			///*
 			//auto pText = m_pDreamOS->AddText(pFont, "test", 1.0f, 0.25f);
 			//auto pText = m_pDreamOS->AddText(pFont, "Testing", 2.0f, 0.5f);
 
@@ -372,6 +372,19 @@ RESULT UITestSuite::AddTestFont() {
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(-3.0f, -2.0f, 0.0f));
 
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP);
+			CN(pText);
+			pText->RenderToQuad();
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(-3.0f, 0.0f, 0.0f));
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP);
+			CN(pText);
+			pText->RenderToQuad();
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
+
+			//*/
 			//pText->RenderToTexture();
 			
 
