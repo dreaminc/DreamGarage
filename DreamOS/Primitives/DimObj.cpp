@@ -136,11 +136,10 @@ RESULT DimObj::SetWireframe(bool fWireframe) {
 	m_fWireframe = fWireframe; 
 	return R_PASS; 
 }
-/*
+
 color DimObj::GetColor() {
 	return GetMaterial()->GetDiffuseColor();
 }
-//*/
 
 RESULT DimObj::SetColor(color c) {
 	for (unsigned int i = 0; i < NumberVertices(); i++) {

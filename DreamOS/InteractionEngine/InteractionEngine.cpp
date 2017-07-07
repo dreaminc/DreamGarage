@@ -215,6 +215,7 @@ RESULT InteractionEngine::PushAnimationItem(DimObj *pObj,
 	endState.ptPosition = ptPosition;
 	endState.qRotation = qRotation;
 	endState.vScale = vScale;
+	endState.cColor = pObj->GetMaterial()->GetDiffuseColor();
 
 	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();

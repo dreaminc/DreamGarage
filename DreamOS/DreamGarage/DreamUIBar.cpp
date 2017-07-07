@@ -73,7 +73,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	// Initialize UIScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
 	CN(m_pView);
-	m_pView->SetPosition(point(0.0f, 0.0f, 1.0f));
+	m_pView->SetPosition(point(0.0f, 0.0f, 0.9f));
 
 	m_pScrollView = m_pView->AddUIScrollView();
 	CN(m_pScrollView);
@@ -140,6 +140,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
+		UpdateCompositeWithCameraLook(0.0f, -1.0f);
 	}
 	else {
 		m_pathStack.pop();
@@ -151,7 +152,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 		}
 		else {
-			HideMenu();
+			CR(HideMenu());
 		}
 	}
 Error:
@@ -174,6 +175,8 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 	//TODO: Invisible objects potentially should not receive interaction events
 	CBR(pSelected->IsVisible(), R_OBJECT_NOT_FOUND);
 
+	CBR(m_menuState == MenuState::NONE, R_PASS);
+
 	//hack - need to make sure the root node is added to the path
 	// even though it is not selected through this method
 	// ideally, some kind of path is managed in the cloud instead
@@ -186,8 +189,9 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 			const std::string& strTitle = pSubMenuNode->GetTitle();
 
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
-				//HideMenu();
-				SelectMenuItem(pSelected);
+				CR(SelectMenuItem(pSelected,
+					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1), 
+					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
 			}
@@ -196,12 +200,15 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
-				SelectMenuItem(pSelected);
+				CR(SelectMenuItem(pSelected,
+					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1), 
+					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
-				//HideMenu();
-				SelectMenuItem(pSelected);
+				CR(SelectMenuItem(pSelected,
+					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1), 
+					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
 				GetDOS()->GetKeyboard()->ShowKeyboard();
@@ -222,6 +229,7 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	m_pScrollView->SetPosition( point(0.0f, 0.0f, 0.0f)-m_ptMenuShowOffset);
 	m_pLeftMallet->Show();
 	m_pRightMallet->Show();
+	m_menuState = MenuState::ANIMATING;
 Error:
 	return r;
 }
@@ -272,11 +280,10 @@ RESULT DreamUIBar::Update(void *pContext) {
 			pButtons.emplace_back(pButton);
 		}
 
-		//we'll see if this crashes shit
-		//could be solved with a local lambda that calls this and UpdateMenu
 		CR(m_pScrollView->UpdateMenuButtons(pButtons));
 
-		CR(ShowMenu(std::bind(&DreamUIBar::UpdateMenu, this, std::placeholders::_1), nullptr));
+		CR(ShowMenu(std::bind(&DreamUIBar::UpdateMenu, this, std::placeholders::_1), 
+					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 	}
 
 Error:
@@ -292,20 +299,32 @@ Error:
 	return r;
 }
 
-RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
+RESULT DreamUIBar::SetMenuStateAnimated(void *pContext) {
+	RESULT r = R_PASS;
+	m_menuState = MenuState::ANIMATING;
+	return r;
+}
+
+RESULT DreamUIBar::ClearMenuState(void* pContext) {
+	RESULT r = R_PASS;
+	m_menuState = MenuState::NONE;
+	return r;
+}
+
+RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
+	m_menuState = MenuState::ANIMATING;
 
-	auto fnEndCallback2 = [&](void *pContext) {
+	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 
 		DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
 		CN(pDreamUIBar);
 
-		//m_pScrollView->SetPosition(point(0.0f, 0.0f, 0.0f));
 		GetComposite()->SetVisible(false, false);
-
+		m_menuState = MenuState::NONE;
 	Error:
 		return r;
 	};
@@ -319,7 +338,7 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 		AnimationCurveType::EASE_OUT_QUART, // may want to try ease_in here
 		AnimationFlags(),
 		fnStartCallback,
-		fnEndCallback2,
+		fnEndCallback,
 		this
 	));
 	//*/
@@ -330,7 +349,6 @@ Error:
 RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::function<RESULT(void*)> fnEndCallback) {
 	RESULT r = R_PASS;
 
-	UpdateCompositeWithCameraLook(0.0f, -1.0f);
 	composite *pComposite = m_pScrollView.get();
 	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
 //*

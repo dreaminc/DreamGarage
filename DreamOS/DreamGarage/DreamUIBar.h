@@ -25,6 +25,11 @@ class Font;
 class texture;
 class UIButton;
 
+enum class MenuState {
+	NONE,
+	ANIMATING
+};
+
 class DreamUIBar :	public DreamApp<DreamUIBar>, 
 					public MenuController::observer, 
 					public Subscriber<UIEvent>
@@ -49,7 +54,7 @@ public:
 	RESULT UpdateMenu(void *pContext);
 
 	// Animations
-	RESULT HideMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
+	RESULT HideMenu(std::function<RESULT(void*)> fnStartCallback = nullptr);
 	RESULT ShowMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
 
@@ -59,6 +64,9 @@ public:
 
 	RESULT HandleMenuUp(void* pContext);
 	RESULT HandleSelect(void* pContext);
+
+	RESULT SetMenuStateAnimated(void *pContext);
+	RESULT ClearMenuState(void* pContext);
 
 	RESULT RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback);
 
@@ -95,6 +103,8 @@ private:
 
 	quaternion m_qMenuOrientation;
 	point m_ptMenuShowOffset;
+
+	MenuState m_menuState = MenuState::NONE;
 };
 
 

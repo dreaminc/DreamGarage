@@ -62,9 +62,9 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	std::vector<unsigned char> vectorByteBuffer(pxWidth * pxHeight * 4, 0xFF);
 
 	// Subscribers (children)
-	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-	//	CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
-	//}
+	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
+	}
 
 	// Controller
 	//RegisterSubscriber(SENSE_CONTROLLER_EVENT_TYPE::SENSE_CONTROLLER_MENU_UP, this);

@@ -19,8 +19,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	std::shared_ptr<Font> pFont;
 	std::wstring font;
 
-	//GetDOS()->AddObjectToUIGraph(GetComposite());
-
 	// Register keyboard events
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));

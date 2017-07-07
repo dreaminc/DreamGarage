@@ -8,6 +8,8 @@
 
 #include "DreamOS.h"
 
+#include "DreamConsole/DreamConsole.h"
+
 UIScrollView::UIScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :
 UIView(pHALImp, pDreamOS)
 {
@@ -30,6 +32,8 @@ UIScrollView::~UIScrollView()
 RESULT UIScrollView::Initialize() {
 	RESULT r = R_PASS;
 
+	//SetPosition(point(0.0f, 0.0f, 0.15f));
+
 	m_pTitleView = AddUIView();
 
 	m_pLeftScrollButton = AddUIButton();
@@ -40,34 +44,21 @@ RESULT UIScrollView::Initialize() {
 	m_pRightScrollButton->SetVisible(false);
 	PositionMenuButton(m_maxElements, m_pRightScrollButton);
 
-	color cTransparent = color(1.0f, 1.0f, 1.0f, 0.0f);
-	m_pLeftScrollButton->GetMaterial()->SetColors(cTransparent, cTransparent, cTransparent);
-	m_pRightScrollButton->GetMaterial()->SetColors(cTransparent, cTransparent, cTransparent);
+	//color cTransparent = color(1.0f, 1.0f, 1.0f, 0.0f);
+	//m_pLeftScrollButton->GetMaterial()->SetColors(cTransparent, cTransparent, cTransparent);
+	//m_pRightScrollButton->GetMaterial()->SetColors(cTransparent, cTransparent, cTransparent);
 
 	m_pMenuButtonsContainer = AddUIView();
 
 	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left-600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pRightScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-right-600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
+	m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
+
 	for (auto& pButton : { m_pLeftScrollButton, m_pRightScrollButton }) {
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
-		/*
-		CR(pButton->RegisterEvent(UI_HOVER_BEGIN,
-			std::bind(&UIScrollView::AnimateScaleUp, this, std::placeholders::_1)));
-		CR(pButton->RegisterEvent(UI_HOVER_ENDED,
-			std::bind(&UIScrollView::AnimateScaleReset, this, std::placeholders::_1)));
-			//*/
-
-		CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
-			std::bind(&UIScrollView::StopScroll, this, std::placeholders::_1)));
 	}
-
-	CR(m_pLeftScrollButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
-		std::bind(&UIScrollView::StartScrollLeft, this, std::placeholders::_1)));
-
-	CR(m_pRightScrollButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
-		std::bind(&UIScrollView::StartScrollRight, this, std::placeholders::_1)));
 
 Error:
 	return r;
@@ -75,9 +66,7 @@ Error:
 
 RESULT UIScrollView::Update() {
 	RESULT r = R_PASS;
-	//TODO:
-	//- rotate by velocity
-	//- update visible scrollbars
+
 	std::vector<std::shared_ptr<VirtualObj>> pChildren;
 	CBR(m_pMenuButtonsContainer->HasChildren(), R_PASS);
 
@@ -91,50 +80,37 @@ RESULT UIScrollView::Update() {
 
 		// update visible items / index
 		// TODO: it is possible for one of these animations to get invalidated, not sure how to reproduce
-		if (m_yRotation > 0.0f && !m_pLeftScrollButton->IsVisible()) {
-			ShowButton(m_pLeftScrollButton.get());
+		if (m_yRotation > 0.0f) {// && !m_pLeftScrollButton->IsVisible()) {
+			//ShowButton(m_pLeftScrollButton.get());
+			m_pLeftScrollButton->SetVisible(true);
 		}
-		else if (m_yRotation <= 0.0f && m_pLeftScrollButton->IsVisible()) {
-			HideButton(m_pLeftScrollButton.get());
+		else if (m_yRotation <= 0.0f) {//  && m_pLeftScrollButton->IsVisible()) {
+			//HideButton(m_pLeftScrollButton.get());
+			m_pLeftScrollButton->SetVisible(false);
 		}
-		if (m_yRotation < maxRotation && !m_pRightScrollButton->IsVisible()) {
-			ShowButton(m_pRightScrollButton.get());
+		if (m_yRotation < maxRotation) {//  && !m_pRightScrollButton->IsVisible()) {
+			//ShowButton(m_pRightScrollButton.get());
+			m_pRightScrollButton->SetVisible(true);
 		}
-		else if (m_yRotation >= maxRotation && m_pRightScrollButton->IsVisible()) {
-			HideButton(m_pRightScrollButton.get());
+		else if (m_yRotation >= maxRotation) {//  && m_pRightScrollButton->IsVisible()) {
+			//HideButton(m_pRightScrollButton.get());
+			m_pRightScrollButton->SetVisible(false);
 		}
 
 		m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
 
-		float diff = m_yRotation - (m_objectIndex * yRotationPerElement);
+		//TODO: approach will need a less naive implementation if animations are used
+		int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements;
+		int lowIndex = std::ceil(m_yRotation / yRotationPerElement);
 
-		if (diff >= yRotationPerElement && m_objectIndex + m_maxElements < pChildren.size()) {
-			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex + m_maxElements].get());
-			if (!pButton->IsVisible()) {
-				ShowButton(pButton);
+		for (int i = 0; i < pChildren.size(); i++) {
+			auto pButton = dynamic_cast<UIButton*>(pChildren[i].get());
+			if (i >= lowIndex && i < highIndex) {
+				pButton->SetVisible(true);
 			}
-			m_objectIndex += 1;
-		}
-		else if (diff > 0.0f && m_objectIndex + m_maxElements < pChildren.size()) {
-			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex].get());
-			if (pButton->IsVisible()) {
-				HideButton(pButton);
+			else {
+				pButton->SetVisible(false);
 			}
-		}
-
-		else if (diff <= -yRotationPerElement && m_objectIndex > 0) {
-			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex - 1].get());
-			if (!pButton->IsVisible()) {
-				ShowButton(pButton);
-			}
-			m_objectIndex -= 1;
-		}
-		else if (diff < 0.0f && m_objectIndex > 0) {
-			auto pButton = dynamic_cast<UIButton*>(pChildren[m_objectIndex + m_maxElements - 1].get());
-			if (pButton->IsVisible()) {
-				HideButton(pButton);
-			}
-
 		}
 	}
 Error:
@@ -170,7 +146,6 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 	CN(m_pDreamOS);
 
-	m_objectIndex = 0;
 	m_yRotation = 0.0f;
 	m_velocity = 0.0f;
 	//m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
@@ -204,16 +179,18 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 
 		i++;
 	}
+	
 	//*
-	if (m_pMenuButtonsContainer->GetChildren().size() > m_maxElements && !m_pRightScrollButton->IsVisible()) {
-	//	m_pRightScrollButton->SetVisible(true);
-		ShowButton(m_pRightScrollButton.get());
+	if (m_pMenuButtonsContainer->GetChildren().size() > m_maxElements) {
+		m_pRightScrollButton->SetVisible(true);
+	//	ShowButton(m_pRightScrollButton.get());
 	}
-	else if (m_pMenuButtonsContainer->GetChildren().size() <= m_maxElements && m_pRightScrollButton->IsVisible()) {
-	//	m_pRightScrollButton->SetVisible(false);
-		HideButton(m_pRightScrollButton.get());
+	else if (m_pMenuButtonsContainer->GetChildren().size() <= m_maxElements) {
+		m_pRightScrollButton->SetVisible(false);
+	//	HideButton(m_pRightScrollButton.get());
 	}
-	//m_pLeftScrollButton->SetVisible(false);
+	m_pLeftScrollButton->SetVisible(false);
+	/*
 	if (m_pLeftScrollButton->IsVisible()) {
 		HideButton(m_pLeftScrollButton.get());
 	}
@@ -293,8 +270,8 @@ RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
 			CR(HideAndPushButton(pObj));
 		}
 	}
-	CR(HideButton(m_pLeftScrollButton.get()));
-	CR(HideButton(m_pRightScrollButton.get()));
+	//CR(HideButton(m_pLeftScrollButton.get()));
+	//CR(HideButton(m_pRightScrollButton.get()));
 
 Error:
 	return r;
@@ -355,7 +332,6 @@ RESULT UIScrollView::HideAndPushButton(UIButton* pButton) {
 
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
-
 		DimObj *pObj = reinterpret_cast<DimObj*>(pContext);
 		pObj->SetVisible(false);
 		return R_PASS;
@@ -390,4 +366,15 @@ std::shared_ptr<UIView> UIScrollView::GetTitleView() {
 
 std::shared_ptr<UIView> UIScrollView::GetMenuItemsView() {
 	return m_pMenuButtonsContainer;
+}
+
+RESULT UIScrollView::Notify(SenseControllerEvent *pEvent) {
+	switch (pEvent->type) {
+	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
+		m_velocity = pEvent->state.ptTouchpad.x() * PAD_MOVE_CONSTANT;
+		OVERLAY_DEBUG_SET("velocity", m_velocity);
+	} break;
+
+	}
+	return R_PASS;
 }

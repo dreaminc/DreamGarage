@@ -2,6 +2,8 @@
 #define UI_SCROLL_VIEW_H_
 
 #include "UIView.h"
+#include "Primitives/Subscriber.h"
+#include "Sense/SenseController.h"
 
 class UIButton;
 class DreamOS;
@@ -15,13 +17,16 @@ class DreamOS;
 #define ITEM_SCALE 0.25
 #define ITEM_SCALE_SELECTED 1.25
 #define TITLE_ANGLE_X 75.0f
+#define PAD_MOVE_CONSTANT 0.005f
 
 enum class ScrollState {
 	NONE,
 	SCROLLING
 };
 
-class UIScrollView : public UIView {
+class UIScrollView : public UIView,
+					public Subscriber<SenseControllerEvent>					
+{
 public:
 	UIScrollView(HALImp *pHALImp, DreamOS *pDreamOS);
 	~UIScrollView();
@@ -53,6 +58,9 @@ public:
 	std::shared_ptr<UIView> GetTitleView();
 	std::shared_ptr<UIView> GetMenuItemsView();
 
+public:
+	RESULT Notify(SenseControllerEvent *pEvent);
+
 private:
 	// button positioning
 	float m_menuDepth = MENU_DEPTH;
@@ -69,7 +77,8 @@ private:
 
 	// scrolling
 	float m_maxElements = MAX_ELEMENTS;
-	int m_objectIndex;
+	int m_objectIndexMin;
+	int m_objectIndexMax;
 	float m_yRotation;
 	float m_yRotationPerElement;
 	float m_velocity;
