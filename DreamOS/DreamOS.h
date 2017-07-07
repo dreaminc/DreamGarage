@@ -145,6 +145,8 @@ public:
 
 	text *AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 	text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
+
+	std::shared_ptr<font> MakeFont(std::wstring wstrFontFileName, bool fDistanceMap = false);
 	
 	volume *MakeVolume(double side, bool fTriangleBased = true);
 	volume *MakeVolume(double width, double length, double height, bool fTriangleBased = true);
@@ -245,6 +247,13 @@ private:
 private:
 	version m_versionDreamOS;
 	UID m_uid;
+
+private:
+	RESULT ReleaseFont(std::wstring wstrFontFileName);
+	std::shared_ptr<font> GetFont(std::wstring wstrFontFileName);
+	RESULT ClearFonts();
+
+	std::map<std::wstring, std::shared_ptr<font>> m_fonts;
 };
 
 #endif	// ! DREAM_OS_H_

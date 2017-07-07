@@ -3,6 +3,8 @@
 #include "Logger/Logger.h"
 #include "DreamAppManager.h"
 
+#include "Primitives/font.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -268,6 +270,66 @@ volume* DreamOS::MakeVolume(double side, bool fTriangleBased) {
 	
 quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
+RESULT DreamOS::ReleaseFont(std::wstring wstrFontFileName) {
+	RESULT r = R_PASS;
+
+	auto it = m_fonts.find(wstrFontFileName);
+	CBR((it != m_fonts.end()), R_NOT_FOUND);
+
+	m_fonts.erase(it);
+
+Error:
+	return r;
+}
+
+std::shared_ptr<font> DreamOS::GetFont(std::wstring wstrFontFileName) {
+	RESULT r = R_PASS;
+
+	auto it = m_fonts.find(wstrFontFileName);
+	CBR((it != m_fonts.end()), R_NOT_FOUND);
+
+	return (*it).second;
+
+Error:
+	return nullptr;
+}
+
+RESULT DreamOS::ClearFonts() {
+	m_fonts.clear();
+	return R_PASS;
+}
+
+std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDistanceMap ) {
+	RESULT r = R_PASS;
+	
+	// First check font store
+	std::shared_ptr<font> pFont = GetFont(wstrFontFileName);
+
+	if (pFont == nullptr) {
+		pFont = std::make_shared<font>(wstrFontFileName, fDistanceMap);
+		CN(pFont);
+
+		{
+			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
+			const wchar_t* pszFile = strFile.c_str();
+
+			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR))));
+		}
+
+		// Push font into store
+		m_fonts[wstrFontFileName] = pFont;
+	}
+
+	return pFont;
+
+Error:
+	if (pFont != nullptr) {
+		pFont = nullptr;
+	}
+
+	return nullptr;
 }
 
 text *DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {

@@ -20,13 +20,9 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strT
 
 	// TODO: This should go into a factory method or something
 
-	CR(SetText(strText));
+	//CR(SetText(strText));
 
 	Validate();
-	return;
-
-Error:
-	Invalidate();
 	return;
 }
 
@@ -42,7 +38,7 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strT
 	// TODO: This should go into a factory method or something
 	CR(SetFontHeightM(lineHeightM));
 
-	CR(SetText(strText));
+	//CR(SetText(strText));
 
 	Validate();
 	return;
@@ -64,7 +60,7 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strT
 	// TODO: This should go into a factory method or something
 	CR(SetFontHeightM(pFont->GetLineHeight()));
 
-	CR(SetText(strText));
+	//CR(SetText(strText));
 
 	Validate();
 	return;
@@ -89,7 +85,12 @@ RESULT text::RenderToQuad() {
 
 	CR(ClearChildren());
 
-	if (m_pQuad == nullptr) {
+	// Remove quad if exists 
+	if (m_pQuad != nullptr) {
+		m_pQuad = nullptr;
+	}
+
+	{
 		uvcoord uvTopLeft = uvcoord(0.0f, 0.0f);
 		uvcoord uvBottomRight = uvcoord(1.0f, 1.0f);
 
@@ -103,7 +104,7 @@ RESULT text::RenderToQuad() {
 		float contextWidth = FlatContext::GetWidth();
 		float contextHeight = FlatContext::GetHeight();
 
-		if(!IsScaleToFit()) {
+		if (!IsScaleToFit()) {
 			float uvLeft = m_xOffset / contextWidth;
 			float uvRight = (m_width + m_xOffset) / contextWidth;
 
@@ -114,12 +115,15 @@ RESULT text::RenderToQuad() {
 			uvBottomRight = uvcoord(uvRight, uvBottom);
 		}
 
-		m_pQuad = AddQuad(m_width, m_height, point(0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
-		
-		CN(m_pQuad);
-	}
+		if (m_pQuad != nullptr) {
+			m_pQuad = nullptr;
+		}
 
-	CR(m_pQuad->SetColorTexture(GetFramebuffer()->GetColorTexture()));
+		m_pQuad = AddQuad(m_width, m_height, point(0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+		CN(m_pQuad);
+
+		CR(m_pQuad->SetColorTexture(GetFramebuffer()->GetColorTexture()));
+	}
 
 Error:
 	return r;
@@ -315,6 +319,10 @@ bool text::IsBillboard() {
 
 bool text::IsTrailingEllipsis() {
 	return ((m_flags & text::flags::TRAIL_ELLIPSIS) != text::flags::NONE);
+}
+
+bool text::IsRenderToQuad() {
+	return ((m_flags & text::flags::RENDER_QUAD) != text::flags::NONE);
 }
 
 // Notes all values are in dots

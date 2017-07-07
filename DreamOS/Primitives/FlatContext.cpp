@@ -121,18 +121,18 @@ float FlatContext::GetHeight() {
 }
 
 // TODO: This is not general and will not work if the text is rotated at all
-float FlatContext::GetLeft() {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetLeft();
+float FlatContext::GetLeft(bool fAbsolute) {
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetLeft(fAbsolute);
 }
 
-float FlatContext::GetRight() {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetRight();
+float FlatContext::GetRight(bool fAbsolute) {
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetRight(fAbsolute);
 }
 
-float FlatContext::GetTop() {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetTop();
+float FlatContext::GetTop(bool fAbsolute) {
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetTop(fAbsolute);
 }
 
-float FlatContext::GetBottom() {
-	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetBottom();
+float FlatContext::GetBottom(bool fAbsolute) {
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetBottom(fAbsolute);
 }

@@ -90,11 +90,11 @@ RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
 	CR(BindToFramebuffer(m_pOGLFramebuffer));
 	
 	{
-		float left = pFlatContext->GetLeft();
-		float right = pFlatContext->GetRight();
+		float left = pFlatContext->GetLeft(false);
+		float right = pFlatContext->GetRight(false);
 
-		float top = pFlatContext->GetTop();
-		float bottom = pFlatContext->GetBottom();
+		float top = pFlatContext->GetTop(false);
+		float bottom = pFlatContext->GetBottom(false);
 
 		float nearPlane = -1.0f;
 		float farPlane = 1.0f;

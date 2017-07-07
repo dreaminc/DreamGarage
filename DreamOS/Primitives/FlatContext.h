@@ -29,16 +29,16 @@ public:
 
 	float GetWidth();
 	float GetHeight();
-	float GetLeft();
-	float GetRight();
-	float GetTop();
-	float GetBottom();
+	float GetLeft(bool fAbsolute = true);
+	float GetRight(bool fAbsolute = true);
+	float GetTop(bool fAbsolute = true);
+	float GetBottom(bool fAbsolute = true);
 
 public:
 	framebuffer* GetFramebuffer();
 	RESULT SetFramebuffer(framebuffer* pFramebuffer);
 
-private:
+protected:
 	framebuffer* m_pFramebuffer = nullptr;
 };
 

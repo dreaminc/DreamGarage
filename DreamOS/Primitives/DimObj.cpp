@@ -362,8 +362,10 @@ RESULT DimObj::RemoveLastChild() {
 }
 
 RESULT DimObj::ClearChildren() {
-	if (m_pObjects != nullptr)
+	if (m_pObjects != nullptr) {
 		m_pObjects->clear();
+	}
+
 	return R_PASS;
 }
 

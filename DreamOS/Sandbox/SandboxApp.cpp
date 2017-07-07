@@ -1048,7 +1048,7 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(pFont, strContent, lineHeightM, textFlags);
+	text *pText = MakeText(pFont, strContent, lineHeightM, textFlags);
 	CN(pText);
 
 	CR(AddObject(pText));
@@ -1066,13 +1066,29 @@ Error:
 }
 
 text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
-	return m_pHALImp->MakeText(pFont, strContent, lineHeightM, textFlags);
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, strContent, lineHeightM, textFlags);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
 }
 
 text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
+	text *pText = MakeText(pFont, strContent, width, height, textFlags);
 	CN(pText);
 
 	CR(AddObject(pText));
@@ -1090,18 +1106,50 @@ Error:
 }
 
 text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
-	return m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
 }
 
 
 text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
-	return m_pHALImp->MakeText(pFont, strContent, width, height, true, fBillboard);
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, strContent, width, height, true, fBillboard);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
 }
 
 text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(pFont, strContent, width, height, true, fBillboard);
+	text *pText = MakeText(pFont, strContent, width, height, fBillboard);
 	CN(pText);
 
 	CR(AddObject(pText));
@@ -1119,13 +1167,29 @@ Error:
 }
 
 text* SandboxApp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
-	return m_pHALImp->MakeText(pFont, pFontTexture, strContent, width, height, true, fBillboard);
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, pFontTexture, strContent, width, height, true, fBillboard);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
 }
 
 text* SandboxApp::AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(pFont, pFontTexture, strContent, width, height, true, fBillboard);
+	text *pText = MakeText(pFont, pFontTexture, strContent, width, height, fBillboard);
 	CN(pText);
 
 	CR(AddObject(pText));
@@ -1146,6 +1210,10 @@ text* SandboxApp::AddText(const std::wstring & fontName, const std::string &strC
 
 	text *pText = m_pHALImp->MakeText(fontName, strContent, width, height, fBillboard);
 	CN(pText);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
 
 	CR(AddObject(pText));
 

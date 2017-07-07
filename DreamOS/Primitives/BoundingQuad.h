@@ -50,10 +50,10 @@ public:
 	// Quad specific 
 	double GetWidth();
 	double GetHeight();
-	double GetLeft();
-	double GetRight();
-	double GetTop();
-	double GetBottom();
+	double GetLeft(bool fAbsolute = true);
+	double GetRight(bool fAbsolute = true);
+	double GetTop(bool fAbsolute = true);
+	double GetBottom(bool fAbsolute = true);
 
 	vector GetNormal();
 

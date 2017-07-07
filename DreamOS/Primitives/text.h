@@ -46,6 +46,7 @@ public:
 		FIT_TO_SIZE		= 1 << 2,
 		BILLBOARD		= 1 << 3,
 		TRAIL_ELLIPSIS	= 1 << 4,
+		RENDER_QUAD 	= 1 << 5,
 		INVALID			= 0xFF
 	};
 
@@ -95,6 +96,7 @@ public:
 	bool IsFitToSize();
 	bool IsBillboard();
 	bool IsTrailingEllipsis();
+	bool IsRenderToQuad();
 
 public:
 	//static text& MakeText()

@@ -700,10 +700,17 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, co
 	text *pText = new OGLText(this, pFont, pFontTexture, strContent, width, height, fBillboard);
 	CN(pText);
 
-	//int fbWidth = pText->GetDPM(width);
-	//int fbHeight = pText->GetDPM(height);
-	int fbWidth = 1024; 
-	int fbHeight = 1024;
+	CR(pText->SetText(strContent));
+
+	int fbWidth = pText->GetDPM(width);
+	int fbHeight = pText->GetDPM(height);
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
 
 	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
 	CN(pOGLFramebuffer);
@@ -718,6 +725,8 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, co
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
 
 //Success:
 	return pText;
@@ -736,10 +745,17 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	text *pText = new OGLText(this, pFont, strContent, width, height, fBillboard);
 	CN(pText);
 
+	CR(pText->SetText(strContent));
+
 	int fbWidth = pText->GetDPM(width);
 	int fbHeight = pText->GetDPM(height);
-	//int fbWidth = 1024;
-	//int fbHeight = 1024;
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
 
 	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
 	CN(pOGLFramebuffer);
@@ -755,6 +771,8 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+
 //Success:
 	return pText;
 
@@ -766,14 +784,23 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
+text* OpenGLImp::MakeText(const std::wstring& strFontFileName, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, std::make_shared<font>(fontName, fDistanceMap), strContent, width, height, fBillboard);
+	text *pText = new OGLText(this, std::make_shared<font>(strFontFileName, fDistanceMap), strContent, width, height, fBillboard);
 	CN(pText);
+
+	CR(pText->SetText(strContent));
 
 	int fbWidth = pText->GetDPM(width);
 	int fbHeight = pText->GetDPM(height);
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
 
 	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
 	CN(pOGLFramebuffer);
@@ -807,6 +834,8 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	text *pText = new OGLText(this, pFont, strContent, lineHeightM, textFlags);
 	CN(pText);
 
+	CR(pText->SetText(strContent));
+
 	int fbWidth = pText->GetDPM(pText->GetWidth());
 	int fbHeight = pText->GetDPM(pText->GetHeight());
 
@@ -830,6 +859,8 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;
@@ -849,6 +880,8 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	text *pText = new OGLText(this, pFont, strContent, width, height, textFlags);
 	CN(pText);
 
+	CR(pText->SetText(strContent));
+
 	int fbWidth = pText->GetDPM(pText->GetWidth());
 	int fbHeight = pText->GetDPM(pText->GetHeight());
 
@@ -872,6 +905,8 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+	
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;
