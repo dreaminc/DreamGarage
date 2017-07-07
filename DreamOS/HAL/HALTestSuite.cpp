@@ -17,14 +17,16 @@ HALTestSuite::~HALTestSuite() {
 
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
-	
+
 	CR(AddTestModel());
+
+	CR(AddTestBlinnPhongShaderTexture());
+	
+	CR(AddTestBlinnPhongShader());
 
 	CR(AddTestText());
 
 	CR(AddTestBlinnPhongShaderTextureCopy());
-
-	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestRenderToTextureQuad());
 
@@ -38,7 +40,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestBlinnPhongShaderBlur());
 	CR(AddTestMinimalShader());
 
-	CR(AddTestBlinnPhongShaderHMD());
 
 	CR(AddTestMinimalShaderHMD());
 	
@@ -499,7 +500,7 @@ RESULT HALTestSuite::AddTestModel() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");		
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -547,10 +548,13 @@ RESULT HALTestSuite::AddTestModel() {
 		// Objects 
 
 		volume *pVolume = nullptr;
+		sphere *pSphere = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
+			///*
 			auto pHead = m_pDreamOS->AddModel(L"\\Models\\face4\\untitled.obj",
 				nullptr,
 				point(0.0f, 0.0f, 0.0f),
@@ -558,6 +562,11 @@ RESULT HALTestSuite::AddTestModel() {
 				vector(0.0f, 0.0f, 0.0f));
 
 			pHead->SetPosition(point(0.0f, 0.0f, 2.0f));
+			//*/
+
+			pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20, COLOR_RED);
+			CN(pSphere);
+			pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
 		}
 
 	Error:
@@ -914,7 +923,6 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		CR(pHAL->MakeCurrentContext());
 
 		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -1205,7 +1213,7 @@ Error:
 	return r;
 }
 
-RESULT HALTestSuite::AddTestBlinnPhongShaderHMD() {
+RESULT HALTestSuite::AddTestBlinnPhongShader() {
 	RESULT r = R_PASS;
 
 	double sTestTime = 40.0f;
@@ -1234,24 +1242,18 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderHMD() {
 		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));		
 
-		/*
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
-		//*/
-
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer_lefteye", pRenderProgramNode->Output("output_framebuffer")));
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer_righteye", pRenderProgramNode->Output("output_framebuffer")));
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderProgramNode->Output("output_framebuffer")));
 
 		CR(pHAL->ReleaseCurrentContext());
 
 		// Objects 
 
 		volume *pVolume = nullptr;
+		sphere *pSphere = nullptr;
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
@@ -1274,6 +1276,11 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderHMD() {
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 		CR(pVolume->SetColor(COLOR_BLUE));
+
+		pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20);
+		CN(pSphere);
+		pSphere->SetPosition(point(width, 0.0f, 0.0f));
+		CR(pSphere->SetColor(COLOR_YELLOW));
 
 	Error:
 		return r;

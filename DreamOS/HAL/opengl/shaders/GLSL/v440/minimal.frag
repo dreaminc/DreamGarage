@@ -27,6 +27,5 @@ layout(std140) uniform ub_material {
 layout (location = 0) out vec4 out_vec4Color;
 
 void main(void) {  
-//	out_vec4Color = DataIn.color;
-	out_vec4Color = material.m_colorDiffuse;
+	out_vec4Color = DataIn.color;
 }

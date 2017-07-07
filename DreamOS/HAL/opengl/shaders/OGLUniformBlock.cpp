@@ -33,13 +33,14 @@ RESULT OGLUniformBlock::OGLInitialize() {
 	CR(pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
 	*/
 
+	// Bind buffer to binding point
+	CR(pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
+
 	m_pUniformBufferData_n = m_uniformBlockDataSize;
 	m_pUniformBufferData = (void*)malloc(m_pUniformBufferData_n);
 	memset(m_pUniformBufferData, 0, m_pUniformBufferData_n);
 	CR(pParentImp->glBufferData(GL_UNIFORM_BUFFER, m_pUniformBufferData_n, m_pUniformBufferData, GL_DYNAMIC_DRAW));
 
-	// Bind buffer to binding point
-	CR(pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
 
 	//CR(m_pParentImp->ReleaseCurrentContext());
 
@@ -98,6 +99,10 @@ RESULT OGLUniformBlock::UpdateOGLUniformBlockBuffers() {
 	(pParentImp->glBufferData(GL_UNIFORM_BUFFER, pUniformBufferData_n, pUniformBufferData, GL_DYNAMIC_DRAW));
 	*/
 
+	// Bind buffer to binding point
+	CR(pParentImp->glBindBufferBase(GL_UNIFORM_BUFFER, m_uniformBlockBindingPoint, m_uniformBlockBufferIndex));
+
+	// Set the data 
 	CR(pParentImp->glBufferData(GL_UNIFORM_BUFFER, m_pUniformBufferData_n, m_pUniformBufferData, GL_DYNAMIC_DRAW));
 
 	
