@@ -171,6 +171,7 @@ RESULT InteractionEngine::PushAnimationItem(DimObj *pObj,
 	point ptPosition,
 	quaternion qRotation,
 	vector vScale,
+	color cColor,
 	double duration,
 	AnimationCurveType curve,
 	AnimationFlags flags,
@@ -184,6 +185,37 @@ RESULT InteractionEngine::PushAnimationItem(DimObj *pObj,
 	endState.ptPosition = ptPosition;
 	endState.qRotation = qRotation;
 	endState.vScale = vScale;
+	endState.cColor = cColor;
+
+	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	msNow /= 1000.0;
+
+	CR(m_pObjectQueue->PushAnimationItem(pObj, endState, msNow, duration, curve, flags, startCallback, endCallback, callbackContext));
+
+Error:
+	return r;
+}
+
+
+RESULT InteractionEngine::PushAnimationItem(DimObj *pObj,
+	point ptPosition,
+	quaternion qRotation,
+	vector vScale,
+	double duration,
+	AnimationCurveType curve,
+	AnimationFlags flags,
+	std::function<RESULT(void*)> startCallback,
+	std::function<RESULT(void*)> endCallback,
+	void* callbackContext) {
+
+	RESULT r = R_PASS;
+
+	AnimationState endState;
+	endState.ptPosition = ptPosition;
+	endState.qRotation = qRotation;
+	endState.vScale = vScale;
+	endState.cColor = pObj->GetMaterial()->GetDiffuseColor();
 
 	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
 	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
@@ -232,6 +264,14 @@ RESULT InteractionEngine::CancelAnimation(DimObj *pObj) {
 	CR(m_pObjectQueue->CancelAnimation(pObj, msNow));
 Error:
 	return r;
+}
+
+RESULT InteractionEngine::RemoveAnimationObject(DimObj *pObj) {
+	return m_pObjectQueue->RemoveAnimationObject(pObj);
+}
+
+RESULT InteractionEngine::RemoveAllObjects() {
+	return m_pObjectQueue->RemoveAllObjects();
 }
 
 /*

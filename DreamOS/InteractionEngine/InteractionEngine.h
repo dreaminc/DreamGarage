@@ -49,6 +49,18 @@ public:
 		point ptPosition,
 		quaternion qRotation,
 		vector vScale,
+		color cColor,
+		double duration,
+		AnimationCurveType curve,
+		AnimationFlags flags,
+		std::function<RESULT(void*)> startCallback = nullptr,
+		std::function<RESULT(void*)> endCallback = nullptr,
+		void* callbackContext = nullptr) = 0;
+
+	virtual RESULT PushAnimationItem(DimObj *pObj,
+		point ptPosition,
+		quaternion qRotation,
+		vector vScale,
 		double duration,
 		AnimationCurveType curve,
 		AnimationFlags flags,
@@ -66,6 +78,8 @@ public:
 		void* callbackContext = nullptr) = 0;
 
 	virtual RESULT CancelAnimation(DimObj *pObj) = 0;
+	virtual RESULT RemoveAnimationObject(DimObj *pObj) = 0;
+	virtual RESULT RemoveAllObjects() = 0;
 
 	// Keyboard manual collision functions
 	//virtual std::shared_ptr<ActiveObject> FindActiveObject(VirtualObj *pVirtualObject, VirtualObj *pInteractionObject = nullptr) = 0;
@@ -128,6 +142,19 @@ public:
 
 	// Active Objects
 public:
+
+	virtual RESULT PushAnimationItem(DimObj *pObj,
+		point ptPosition,
+		quaternion qRotation,
+		vector vScale,
+		color cColor,
+		double duration,
+		AnimationCurveType curve,
+		AnimationFlags flags,
+		std::function<RESULT(void*)> startCallback = nullptr,
+		std::function<RESULT(void*)> endCallback = nullptr,
+		void* callbackContext = nullptr) override;
+
 	virtual RESULT PushAnimationItem(DimObj *pObj,
 		point ptPosition,
 		quaternion qRotation,
@@ -149,6 +176,8 @@ public:
 		void* callbackContext = nullptr) override;
 
 	virtual RESULT CancelAnimation(DimObj *pObj) override;
+	virtual RESULT RemoveAnimationObject(DimObj *pObj) override;
+	virtual RESULT RemoveAllObjects() override;
 
 	virtual RESULT Notify(SenseControllerEvent *pEvent) override;
 	virtual RESULT Notify(SenseMouseEvent *pEvent) override;
