@@ -54,11 +54,11 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestFont());
+
 	CR(AddTestUIView());
 
 	CR(AddTestFlatContextCompositionQuads());
-
-	CR(AddTestFont());
 
 	CR(AddTestFlatContextCompositionQuads());
 
@@ -313,7 +313,6 @@ RESULT UITestSuite::AddTestFont() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::string strURL = "http://www.youtube.com";
 
 		CN(m_pDreamOS);
 
@@ -323,100 +322,52 @@ RESULT UITestSuite::AddTestFont() {
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		/*
-		auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
-		//pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
-		pQuad->RotateXByDeg(90.0f);
-		pQuad->SetColor(COLOR_BLUE);
-		*/
-
-		// Fix this
 		{
-			// OLD
-			//auto pFlatContext = m_pDreamOS->AddFlatContext();
-			
-			/*
-			auto pFont = std::make_shared<font>(L"Basis_Grotesque_Pro.fnt", true);
-			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
-			const wchar_t* pszFile = strFile.c_str();
-			pFont->SetTexture(std::shared_ptr<texture>(m_pDreamOS->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR)));
-			*/
-
 			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 			CN(pFont);
 
-			///*
-			//auto pText = m_pDreamOS->AddText(pFont, "test", 1.0f, 0.25f);
-			//auto pText = m_pDreamOS->AddText(pFont, "Testing", 2.0f, 0.5f);
-
 			// Fit to Scale
-			///*
+			
 			auto pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD);
 			CN(pText);
 			//pText->RenderToQuad();
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(-3.0f, 2.0f, 0.0f));
-			pText->SetText("testing this thing");
+			
+			pText->SetText("testing this \nthing");
 
 			// Size to fit
 			// Note this sets the line height by way of font - this teases at future settings, 
 			// but right now it's avoiding adding MORE constructor paths / vars to this creation path
 			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::SCALE_TO_FIT | text::flags::RENDER_QUAD);
 			CN(pText);
-			//pText->RenderToQuad();
-
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(2.0f, -2.0f, 0.0f));
-
 			pText->SetText("testing this thing");
 
-			
-			
 			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::NONE | text::flags::RENDER_QUAD);
 			CN(pText);
-			//pText->RenderToQuad();
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(2.0f, 2.0f, 0.0f));
 			pText->SetText("testing this thing");
 
 			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.1f, 0.6f, text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD);
 			CN(pText);
-			//pText->RenderToQuad();
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(-3.0f, -2.0f, 0.0f));
 			pText->SetText("testing this thing");
 
 			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD);
 			CN(pText);
-			//pText->RenderToQuad();
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(-3.0f, 0.0f, 0.0f));
 			pText->SetText("testing this thing");
 
 			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP | text::flags::RENDER_QUAD);
 			CN(pText);
-			//pText->RenderToQuad();
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
 			pText->SetText("testing this thing");
-
-			//*/
-			//pText->RenderToTexture();
-
-			//pText->SetPosition(point(0.0f, 0.0f, 2.0f));
-			//pText->SetScale(vector(50.0f));
-
-			//m_pDreamOS->RenderToTexture(pFlatContext);
-
-			// Set the texture to the quad
-			//pQuad->UpdateColorTexture(pFlatContext->GetFramebuffer()->GetColorTexture());
-			//*/
-			
-			// NEW
-			/*
-			auto pFont = Font::MakeFreetypeFont(L"arial.ttf", true);
-			CN(pFont);
-			*/
 
 		}
 
@@ -669,8 +620,8 @@ RESULT UITestSuite::SetupPipeline() {
 	CR(pHAL->MakeCurrentContext());
 	
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);

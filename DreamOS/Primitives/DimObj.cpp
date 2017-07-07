@@ -322,18 +322,6 @@ RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
 	return R_PASS;
 }
 
-RESULT DimObj::RemoveChild(std::shared_ptr<DimObj> pDimObj) {
-	RESULT r = R_PASS;
-
-	auto it = std::find(m_pObjects->begin(), m_pObjects->end(), pDimObj);
-	CBM((it != m_pObjects->end()), "child not found");
-
-	m_pObjects->erase(it);
-
-Error:
-	return r;
-}
-
 RESULT DimObj::RemoveChild(VirtualObj *pObj) {
 	RESULT r = R_PASS;
 	bool fFound = false;

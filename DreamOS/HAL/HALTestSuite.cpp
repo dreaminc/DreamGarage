@@ -22,6 +22,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMinimalTextureShader());
+
 	CR(AddTestModel());
 
 	CR(AddTestBlinnPhongShaderTexture());
@@ -37,13 +39,12 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestEnvironmentShader());
 
 	CR(AddTestBlinnPhongShaderTextureHMD());
-	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestBlinnPhongShaderBlurHMD());
 
 	CR(AddTestBlinnPhongShaderBlur());
-	CR(AddTestMinimalShader());
 
+	CR(AddTestMinimalShader());
 
 	CR(AddTestMinimalShaderHMD());
 	
