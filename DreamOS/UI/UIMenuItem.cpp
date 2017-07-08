@@ -1,4 +1,7 @@
 #include "UIMenuItem.h"
+#include "Primitives/font.h"
+#include "Primitives/text.h"
+#include "Primitives/framebuffer.h"
 
 UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIButton(pHALImp, pDreamOS)
@@ -57,7 +60,8 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		labelFormat.fontSize,
 		true // force distance fields
 	);
-	pText->SetPosition(labelFormat.ptPosition, text::AlignmentType::CENTER);
+
+	pText->SetPosition(labelFormat.ptPosition);
 
 	m_strName = labelFormat.strLabel;
 

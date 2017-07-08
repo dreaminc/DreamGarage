@@ -15,7 +15,7 @@
 class quad;
 class sphere;
 class text;
-class Font;
+class font;
 class texture;
 class CollisionManifold;
 class FlatContext;
@@ -115,7 +115,7 @@ private:
 	UIKey* m_keyObjects[2];
 	std::list<UIKey*> m_activeKeys;
 
-	std::shared_ptr<Font> m_pFont;
+	std::shared_ptr<font> m_pFont;
 	std::shared_ptr<texture> m_pKeyTexture;
 
 	LayoutType m_currentLayout;

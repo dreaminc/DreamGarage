@@ -48,6 +48,9 @@ public:
 	// TODO: Understand performance implications of this although both element and this are inline
 	inline uv_precision &u() { return this->element(0, 0); }
 	inline uv_precision &v() { return this->element(1, 0); }
+
+	const uv_precision &u() const { return this->element(0, 0); }
+	const uv_precision &v() const { return this->element(1, 0); }
 	
 	inline uv_precision &u(uv_precision val) { return this->element(0, 0) = val; }
 	inline uv_precision &v(uv_precision val) { return this->element(1, 0) = val; }

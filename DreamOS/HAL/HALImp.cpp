@@ -85,11 +85,8 @@ const viewport& HALImp::GetViewport() {
 	return m_viewport;
 }
 
-// TODO: Remove this, this will eventually just be a node
-RESULT HALImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
+FlatProgram* HALImp::GetFlatProgram() {
 	RESULT r = R_PASS;
-
-	framebuffer *pFramebuffer = nullptr;
 	FlatProgram* pFlatProgram = nullptr;
 
 	if (m_pFlatProgram == nullptr) {
@@ -100,13 +97,27 @@ RESULT HALImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
 	pFlatProgram = dynamic_cast<FlatProgram*>(m_pFlatProgram);
 	CN(pFlatProgram);
 
-	pFramebuffer = pContext->GetFramebuffer();
+//Success:
+	return pFlatProgram;
 
-	/*
-	m_pFlatProgram->SetInput<stereocamera>("camera", pCamera);
-	m_pFlatProgram->SetInput<FlatContext>("flatcontext", pContext);
-	m_pFlatProgram->SetInput<framebuffer>("framebuffer", pFramebuffer);
-	*/
+Error:
+	if (pFlatProgram != nullptr) {
+		delete pFlatProgram;
+		pFlatProgram = nullptr;
+	}
+
+	return nullptr;
+}
+
+// TODO: Remove this, this will eventually just be a node
+RESULT HALImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
+	RESULT r = R_PASS;
+
+	FlatProgram* pFlatProgram = GetFlatProgram();
+	framebuffer *pFramebuffer = pContext->GetFramebuffer();
+
+	CN(pFramebuffer);
+	CN(pFlatProgram);
 
 	pFlatProgram->SetFlatContext(pContext);
 	pFlatProgram->SetCamera(pCamera);
@@ -114,6 +125,22 @@ RESULT HALImp::RenderToTexture(FlatContext* pContext, stereocamera* pCamera) {
 
 	m_pFlatProgram->ProcessNode(0);
 	
+Error:
+	return r;
+}
+
+RESULT HALImp::RenderToTexture(FlatContext* pFlatContext) {
+	RESULT r = R_PASS;
+
+	FlatProgram* pFlatProgram = GetFlatProgram();
+	framebuffer *pFramebuffer = pFlatContext->GetFramebuffer();
+
+	CN(pFramebuffer);
+	CN(pFlatProgram);
+	
+	pFlatProgram->SetFlatFramebuffer(pFlatContext->GetFramebuffer());
+	pFlatProgram->RenderFlatContext(pFlatContext);
+
 Error:
 	return r;
 }

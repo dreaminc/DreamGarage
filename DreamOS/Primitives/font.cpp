@@ -9,19 +9,21 @@
 #include "Primitives/composite.h"
 
 // Freetype Library Stuff
-FT_Library Font::m_pFT = nullptr;
+FT_Library font::m_pFT = nullptr;
 
 
-bool Font::IsFreetypeInitialized() {
+bool font::IsFreetypeInitialized() {
 	if (m_pFT != nullptr)
 		return true;
 
 	return false;
 }
 
-RESULT Font::InitializeFreetypeLibrary() {
+RESULT font::InitializeFreetypeLibrary() {
 	RESULT r = R_PASS;
 	FT_Error fte = 0;
+
+	CBM((m_pFT == nullptr), "Freetype already initialized");
 
 	fte = FT_Init_FreeType(&m_pFT);
 	CBM((fte == 0), "ERROR::FREETYPE: Could not init FreeType Library err:0x%x", fte);
@@ -30,12 +32,25 @@ Error:
 	return r;
 }
 
+RESULT font::UninitializeFreetypeLibrary() {
+	RESULT r = R_PASS;
+	FT_Error fte = 0;
+
+	CNM(m_pFT, "Freetype not initialized");
+
+	fte = FT_Done_FreeType(m_pFT);
+	CBM((fte == 0), "ERROR::FREETYPE: Could not uninit FreeType Library err:0x%x", fte);
+
+Error:
+	return r;
+}
+
 // TODO: Cache font faces
 // TODO: Check windows folder
 // TODO: Check DreamOS font folder
-std::shared_ptr<Font> Font::MakeFreetypeFont(std::wstring wstrFontFilename, bool fDistanceMapped) {
+std::shared_ptr<font> font::MakeFreetypeFont(std::wstring wstrFontFilename, bool fDistanceMapped) {
 	RESULT r = R_PASS;
-	std::shared_ptr<Font> pFont = nullptr;
+	std::shared_ptr<font> pFont = nullptr;
 	FT_Error fte = 0;
 	char *pszFilepath = nullptr;
 	FT_Face pFTFace = nullptr;
@@ -45,7 +60,7 @@ std::shared_ptr<Font> Font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 	}
 
 	// Create the font object
-	pFont = std::make_shared<Font>(fDistanceMapped);
+	pFont = std::make_shared<font>(fDistanceMapped);
 	CN(pFont);
 
 	PathManager *pPathManager = PathManager::instance();
@@ -60,6 +75,10 @@ std::shared_ptr<Font> Font::MakeFreetypeFont(std::wstring wstrFontFilename, bool
 	CBM((fte == 0), "Font failed to load with error 0x%x", fte);
 	CN(pFTFace);
 	CR(pFont->SetFreetypeFace(pFTFace));
+
+	// Set up the characters
+	CR(pFont->SetFontSize(pFont->GetFontSize()));
+	CR(pFont->LoadFreetypeGlyphs());
 
 Error:
 	if (RFAILED() && pFont != nullptr) {
@@ -77,13 +96,56 @@ Error:
 
 // FONT
 // TODO: A lot of this will not be needed when this effort is complete
-Font::Font(bool fDistanceMap) :
+font::font(bool fDistanceMap) :
 	m_fDistanceMap(fDistanceMap)
 {
 	// empty
 }
 
-RESULT Font::SetFreetypeFace(FT_Face pFTFace) {
+RESULT font::LoadFreetypeGlyphs() {
+	RESULT r = R_PASS;
+	FT_Error fte = 0;
+
+	for (FT_Long i = 0; i < m_pFTFace->num_glyphs; i++) {
+		FT_Load_Char(m_pFTFace, i, FT_LOAD_RENDER);
+		CBM((fte == 0), "Font failed to load char %d with error 0x%x", i, fte);
+
+		CharacterGlyph glyph;
+		
+		glyph.value = i;
+		glyph.width = m_pFTFace->glyph->bitmap.width;
+		glyph.height = m_pFTFace->glyph->bitmap.rows;
+		glyph.bearingX = m_pFTFace->glyph->bitmap_left;
+		glyph.bearingY = m_pFTFace->glyph->bitmap_top;
+		glyph.advance = m_pFTFace->glyph->advance.x;
+
+		// TODO: Copy the bitmap buffer?
+
+		// Push into map
+		m_characters[i] = glyph;
+	}
+
+Error:
+	return r;
+}
+
+uint32_t font::GetFontSize() {
+	return m_fontPixelSize;
+}
+
+RESULT font::SetFontSize(uint32_t size) {
+	RESULT r = R_PASS;
+	FT_Error fte = 0;
+
+	m_fontPixelSize = size;
+	fte = FT_Set_Pixel_Sizes(m_pFTFace, 0, m_fontPixelSize);
+	CBM((fte == 0), "Set font sizes with error 0x%x", fte);
+
+Error:
+	return r;
+}
+
+RESULT font::SetFreetypeFace(FT_Face pFTFace) {
 	RESULT r = R_PASS;
 
 	CN(pFTFace);
@@ -95,24 +157,24 @@ Error:
 	return r;
 }
 
-Font::Font(const std::wstring& strFontFilename, composite *pContext, bool fDistanceMap) :
+font::font(const std::wstring& strFontFilename, composite *pContext, bool fDistanceMap) :
 	m_fDistanceMap(fDistanceMap)
 {
 	LoadFontFromFile(strFontFilename);
 
-	std::wstring strFile = L"Fonts/" + GetGlyphImageFile();
+	std::wstring strFile = L"Fonts/" + GetFontImageFile();
 	const wchar_t* pszFile = strFile.c_str();
 	
 	m_pTexture = pContext->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR);
 }
 
-Font::Font(const std::wstring& strFontFilename, bool fDistanceMap) :
+font::font(const std::wstring& strFontFilename, bool fDistanceMap) :
 	m_fDistanceMap(fDistanceMap)
 {
 	LoadFontFromFile(strFontFilename);
 }
 
-Font::~Font() {
+font::~font() {
 	if (m_pFTFace != nullptr) {
 		FT_Done_Face(m_pFTFace);
 		m_pFTFace = nullptr;
@@ -121,7 +183,7 @@ Font::~Font() {
 
 // TODO: Merge two
 template <typename T>
-T Font::GetValue(const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter) {
+T font::GetValue(const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter) {
 	RESULT r = R_PASS;
 	T value;
 
@@ -134,7 +196,7 @@ Error:
 }
 
 template <typename T>
-RESULT Font::GetValue(T& value, const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter) {
+RESULT font::GetValue(T& value, const std::wstring& wstrLine, const std::wstring& wstrValueName, const char delimiter) {
 	RESULT r = R_PASS;
 
 	auto pos = wstrLine.find(wstrValueName);
@@ -155,7 +217,7 @@ Error:
 	return r;
 }
 
-RESULT Font::LoadFontFromFile(const std::wstring& wstrFontFile) {
+RESULT font::LoadFontFromFile(const std::wstring& wstrFontFile) {
 	RESULT r = R_PASS;
 
 	PathManager *pPathManager = PathManager::instance();
@@ -171,27 +233,31 @@ RESULT Font::LoadFontFromFile(const std::wstring& wstrFontFile) {
 
 	while (std::getline(file, wstrLine)) {
 
-		if (m_glyphWidth == 0) {
-			GetValue<uint32_t>(m_glyphWidth, wstrLine, L"scaleW=");
+		if (m_fontImageHeight == 0) {
+			GetValue<uint32_t>(m_fontImageWidth, wstrLine, L"scaleW=");
 		}
 
-		if (m_glyphHeight == 0) {
-			GetValue<uint32_t>(m_glyphHeight, wstrLine, L"scaleH=");
+		if (m_fontImageHeight == 0) {
+			GetValue<uint32_t>(m_fontImageHeight, wstrLine, L"scaleH=");
 		}
 
-		if (m_glyphBase == 0) {
-			GetValue<uint32_t>(m_glyphBase, wstrLine, L"base=");
+		if (m_fontBase == 0) {
+			GetValue<uint32_t>(m_fontBase, wstrLine, L"base=");
 		}
 
-		if (m_wstrGlyphImageFilename.length() == 0) {
+		if (m_fontLineHeight == 0) {
+			GetValue<uint32_t>(m_fontLineHeight, wstrLine, L"lineHeight=");
+		}
+
+		if (m_wstrFontImageFilename.length() == 0) {
 			// GetValue<std::wstring>(m_wstrGlyphImageFilename, wstrLine, L"file=\"", '\"');
-			m_wstrGlyphImageFilename = GetValue<std::wstring>(wstrLine, L"file=\"", '\"');
+			m_wstrFontImageFilename = GetValue<std::wstring>(wstrLine, L"file=\"", '\"');
 		}
 
 		CharacterGlyph charGlyph(wstrLine);
 
 		if (charGlyph.fValid == true) {
-			m_charMap[charGlyph.asciiValue] = charGlyph;
+			m_characters[charGlyph.value] = charGlyph;
 		}
 	}
 
@@ -204,50 +270,65 @@ Error:
 	return r;
 }
 
-const std::wstring& Font::GetGlyphImageFile() const {
-	return m_wstrGlyphImageFilename;
+const std::wstring& font::GetFontImageFile() const {
+	return m_wstrFontImageFilename;
 }
 
-uint32_t Font::GetGlyphWidth() const {
-	return m_glyphWidth;
+uint32_t font::GetFontTextureWidth() const {
+	return m_fontImageWidth;
 }
 
-uint32_t Font::GetGlyphHeight() const {
-	return m_glyphHeight;
+uint32_t font::GetFontTextureHeight() const {
+	return m_fontImageHeight;
 }
 
-uint32_t Font::GetGlyphBase() const {
-	return m_glyphBase;
+uint32_t font::GetFontBase() const {
+	return m_fontBase;
 }
 
-bool Font::GetGlyphFromChr(uint8_t ascii_id, CharacterGlyph& ret) {
-	if (m_charMap.find(ascii_id) == m_charMap.end()) {
-		// ascii does not exist in the glyph
-		return false;
-	}
-
-	ret = m_charMap[ascii_id];
-
-	return true;
+uint32_t font::GetFontLineHeight() const {
+	return m_fontLineHeight;
 }
 
-bool Font::HasDistanceMap() {
+float font::GetLineHeight() {
+	return m_lineHeight;
+}
+
+RESULT font::SetLineHeight(float lineHeight) {
+	m_lineHeight = lineHeight;
+	return R_PASS;
+}
+
+RESULT font::GetGlyphFromChar(uint8_t ascii_id, CharacterGlyph& r_glyph) {
+	RESULT r = R_PASS;
+
+	auto it = m_characters.find(ascii_id); 
+	CB((it != m_characters.end()));				// Ascii does not exist in the glyph
+		
+	// Retrieve the glyph from the font
+	r_glyph = (*it).second;
+
+Error:
+	return r;
+}
+
+bool font::HasDistanceMap() {
 	return m_fDistanceMap;
 }
 
-float Font::GetBuffer() {
+float font::GetBuffer() {
 	return m_buffer;
 }
 
-float Font::GetGamma() {
+float font::GetGamma() {
 	return m_gamma;
 }
 
-std::shared_ptr<texture> Font::GetTexture() {
+std::shared_ptr<texture> font::GetTexture() {
 	return m_pTexture;
 }
 
-RESULT Font::SetTexture(std::shared_ptr<texture> pTexture) {
+RESULT font::SetTexture(std::shared_ptr<texture> pTexture) {
 	RESULT r = R_PASS;
 
 	CN(pTexture);

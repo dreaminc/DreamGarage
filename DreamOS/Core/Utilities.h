@@ -18,6 +18,16 @@ namespace util {
 	void tolowerstring(std::string& str);
 	std::string WideStringToString(const std::wstring& wstrStr);
 	std::wstring StringToWideString(const std::string& strStr);
+
+	template <class T>
+	RESULT Clamp(T &val, const T& low, const T& high) {
+		if (val < low)
+			val = low;
+		else if (val > high)
+			val = high;
+
+		return R_PASS;
+	}
 }
 
 #endif // ! UTILITIES_H_

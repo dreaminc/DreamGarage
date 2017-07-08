@@ -65,7 +65,8 @@ public:
 	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) override;
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) override;
-	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) override;
+	virtual quad* MakeQuad(double width, double height, point ptOrigin, vector vNormal = vector::jVector()) override;
+	virtual quad* MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) override;
 
 	virtual sphere* MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions, color c) override;
 
@@ -75,9 +76,11 @@ public:
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) override;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) override;
 	
-	text* MakeText(std::shared_ptr<Font> pFont, texture *pFontTexture, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
-	text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
-	text* MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false);
+	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE) override;
+	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE) override;
+	virtual text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
+	virtual text* MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
+	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) override;
 	
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) override;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) override;

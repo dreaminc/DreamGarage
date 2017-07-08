@@ -21,7 +21,7 @@ class UIView;
 class CloudController;
 class EnvironmentControllerProxy;
 
-class Font;
+class font;
 class texture;
 class UIButton;
 
@@ -99,7 +99,7 @@ private:
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
-	std::shared_ptr<Font> m_pFont;
+	std::shared_ptr<font> m_pFont;
 
 	quaternion m_qMenuOrientation;
 	point m_ptMenuShowOffset;

@@ -59,7 +59,7 @@ Error:
 }
 
 // Rectangle
-quad::quad(float height, float width, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
+quad::quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
 	m_quadType(RECTANGLE),
 	m_numHorizontalDivisions(numHorizontalDivisions),
 	m_numVerticalDivisions(numVerticalDivisions),
@@ -87,7 +87,8 @@ Error:
 }
 
 // This needs to be re-designed, too specific for 2D blits.
-quad::quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright, vector vNormal) :
+//quad::quad(float height, float width, point& ptCenter, uvcoord& uvBottomLeft, uvcoord& uvUpperRight, vector vNormal) :
+quad::quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) :
 	m_quadType(RECTANGLE),
 	m_numHorizontalDivisions(1),
 	m_numVerticalDivisions(1),
@@ -95,6 +96,13 @@ quad::quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uv
 	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
 {
 	RESULT r = R_PASS;
+	
+	// TODO: UV thing
+	CR(SetVertices(width, height, vNormal, uvTopLeft, uvBottomRight));
+
+	CR(InitializeBoundingQuad(GetOrigin(), width, height, vNormal));
+
+	/*
 	CR(Allocate());
 
 	float halfSideX = width / 2.0f;
@@ -104,15 +112,17 @@ quad::quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uv
 	int A, B, C, D;
 
 	// Set up indices 
+	// TODO: ASDFAGKJHNSDFGKJSDFG
 	TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
 
-	m_pVertices[A = vertCount++] = vertex(point(-halfSideX + center.x(), halfSideY + center.y(), center.z()), vector(0, 0, 1), uvcoord(uv_bottomleft.u(), uv_upperright.v()));		// A
-	m_pVertices[B = vertCount++] = vertex(point(halfSideX + center.x(), halfSideY + center.y(), center.z()), vector(0, 0, 1), uv_upperright);			// B
-	m_pVertices[C = vertCount++] = vertex(point(-halfSideX + center.x(), -halfSideY + center.y(), center.z()), vector(0, 0, 1), uv_bottomleft);		// C
-	m_pVertices[D = vertCount++] = vertex(point(halfSideX + center.x(), -halfSideY + center.y(), center.z()), vector(0, 0, 1), uvcoord(uv_upperright.u(), uv_bottomleft.v()));		// D
+	m_pVertices[A = vertCount++] = vertex(point(-halfSideX + ptCenter.x(), halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvcoord(uvBottomLeft.u(), uvTopRight.v()));		// A
+	m_pVertices[B = vertCount++] = vertex(point(halfSideX + ptCenter.x(), halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvTopRight);			// B
+	m_pVertices[C = vertCount++] = vertex(point(-halfSideX + ptCenter.x(), -halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvBottomLeft);		// C
+	m_pVertices[D = vertCount++] = vertex(point(halfSideX + ptCenter.x(), -halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvcoord(uvTopRight.u(), uvBottomLeft.v()));		// D
 
 	pTriIndices[indexCount++] = TriangleIndexGroup(A, C, B);
 	pTriIndices[indexCount++] = TriangleIndexGroup(B, C, D);
+	*/
 
 //Success:
 	Validate();
@@ -183,6 +193,14 @@ bool quad::IsScaledBillboard() {
 
 void quad::SetScaledBillboard(bool fScale) {
 	m_fScaledBillboard = fScale; 
+}
+
+float quad::GetWidth() {
+	return m_width;
+}
+
+float quad::GetHeight() {
+	return m_height;
 }
 
 RESULT quad::UpdateParams(float width, float height, vector vNormal) {
@@ -281,11 +299,14 @@ vector quad::GetNormal() {
 }
 
 // TODO: not supporting triangle based yet
-RESULT quad::SetVertices(float width, float height, vector vNormal) {
+//RESULT quad::SetVertices(float width, float height, vector vNormal) {
+RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight) {
 	RESULT r = R_PASS;
 
-	// TODO: potential mem leak in here (not dealloc previous buffer)
 	CR(Allocate());
+
+	m_width = width;
+	m_height = height;
 
 	float halfHeight = height / 2.0f;
 	float halfWidth = width / 2.0f;
@@ -304,8 +325,12 @@ RESULT quad::SetVertices(float width, float height, vector vNormal) {
 		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
 
 			double yValue = 0.0f;
-			uv_precision uValue = (float)(i) / (float)(m_numHorizontalDivisions);
-			uv_precision vValue = (float)(j) / (float)(m_numVerticalDivisions);
+
+			uv_precision uRange = uvBottomRight.u() - uvTopLeft.u();
+			uv_precision vRange = uvBottomRight.v() - uvTopLeft.v();
+
+			uv_precision uValue = uvTopLeft.u() + (((float)(i) / (float)(m_numHorizontalDivisions)) * uRange);
+			uv_precision vValue = uvTopLeft.v() + (((float)(j) / (float)(m_numVerticalDivisions)) * vRange);
 
 			if (m_pTextureHeight != nullptr) {
 				yValue = m_pTextureHeight->GetValueAtUV(uValue, vValue);
@@ -314,7 +339,7 @@ RESULT quad::SetVertices(float width, float height, vector vNormal) {
 
 			m_pVertices[vertCount] = vertex(point((widthInc * i) - halfWidth, static_cast<float>(yValue), (heightInc * j) - halfHeight),
 				vector::jVector(1.0f),
-				uvcoord(uValue, 1 - vValue));
+				uvcoord(uValue, 1.0f - vValue));
 
 			// TODO: Calculate normal (based on geometry)
 

@@ -17,6 +17,8 @@
 
 #include <vector>
 
+#include "Primitives/font.h"
+
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
 {
@@ -36,7 +38,9 @@ RESULT DreamUIBar::RegisterEvent(InteractionEventType type, std::function<RESULT
 //Generating the font texture is expensive, only use this function during initialization
 RESULT DreamUIBar::SetFont(const std::wstring& strFile) {
 //	m_labelFormat.pFont = std::make_shared<Font>(strFile, GetComposite(), true);
-	m_pFont = std::make_shared<Font>(strFile, GetComposite(), true);
+	//m_pFont = std::make_shared<font>(strFile, GetComposite(), true);
+	m_pFont = GetDOS()->MakeFont(strFile, true);
+
 	return R_PASS;
 }
 

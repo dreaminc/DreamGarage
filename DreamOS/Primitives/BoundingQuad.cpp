@@ -10,7 +10,7 @@ BoundingQuad::BoundingQuad(VirtualObj *pParentObject) :
 	BoundingVolume(pParentObject),
 	m_width(0.0f),
 	m_height(0.0f),
-	m_vNormal(vector())
+	m_vNormal(vector::jVector(1.0f))
 {
 	// empty
 }
@@ -226,7 +226,15 @@ RESULT BoundingQuad::SetMaxPointFromOrigin(point ptMax) {
 }
 
 RESULT BoundingQuad::SetHalfVector(vector vHalfVector) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	// TODO: Apply Quad normal
+
+	m_width = vHalfVector.x() * 2.0f;
+	m_height = vHalfVector.z() * 2.0f;
+
+//Error:
+	return r;
 }
 
 double BoundingQuad::GetWidth() {
@@ -239,6 +247,52 @@ double BoundingQuad::GetHeight() {
 
 vector BoundingQuad::GetNormal() {
 	return m_vNormal;
+}
+
+// This will re-orient the HV perpendicular to the normal
+// So height is now in terms of the Z component
+double BoundingQuad::GetLeft(bool fAbsolute) {
+	vector vHVNormal;
+
+	if (fAbsolute)
+		vHVNormal = GetOrigin() - (vector)(inverse(RotationMatrix(GetOrientation())) * GetHalfVector());
+	else
+		return GetCenter().x() - (m_width / 2.0f);
+	
+	return vHVNormal.x();
+}
+
+double BoundingQuad::GetRight(bool fAbsolute) {
+	vector vHVNormal;
+
+	if (fAbsolute)
+		vHVNormal = GetOrigin() + (vector)(inverse(RotationMatrix(GetOrientation())) * GetHalfVector());
+	else
+		return GetCenter().x() + (m_width / 2.0f);
+
+	return vHVNormal.x();
+}
+
+double BoundingQuad::GetTop(bool fAbsolute) {
+	vector vHVNormal;
+
+	if (fAbsolute)
+		vHVNormal = GetOrigin() + (vector)(inverse(RotationMatrix(GetOrientation())) * GetHalfVector());
+	else
+		return GetCenter().z() + (m_height / 2.0f);
+
+	return vHVNormal.z();
+}
+
+double BoundingQuad::GetBottom(bool fAbsolute) {
+	vector vHVNormal;
+
+	if (fAbsolute)
+		vHVNormal = GetOrigin() - (vector)(inverse(RotationMatrix(GetOrientation())) * GetHalfVector());
+	else
+		return GetCenter().z() - (m_height / 2.0f);
+
+	return vHVNormal.z();
 }
 
 // This is busted

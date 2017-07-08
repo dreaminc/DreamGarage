@@ -47,8 +47,14 @@ public:
 		return BoundingVolume::Type::QUAD;
 	}
 
+	// Quad specific 
 	double GetWidth();
 	double GetHeight();
+	double GetLeft(bool fAbsolute = true);
+	double GetRight(bool fAbsolute = true);
+	double GetTop(bool fAbsolute = true);
+	double GetBottom(bool fAbsolute = true);
+
 	vector GetNormal();
 
 	vector GetHalfVector();

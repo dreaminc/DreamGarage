@@ -67,10 +67,10 @@ void DreamConsole::AddConsoleLine(const std::string& text) {
 	}
 }
 
-void DreamConsole::ForEach(std::function<bool(const std::string)> pred) {
+void DreamConsole::ForEach(std::function<bool(const std::string)> fnPred) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	std::for_each(m_ConsoleText.rbegin(), m_ConsoleText.rend(), pred);
+	std::for_each(m_ConsoleText.rbegin(), m_ConsoleText.rend(), fnPred);
 }
 
 const std::deque<std::string>& DreamConsole::GetConsoleText() {

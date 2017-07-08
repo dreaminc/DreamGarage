@@ -45,7 +45,7 @@ protected:
 	float m_BackgroundMargin = 0.0f;// 0.025f;
 
 	// A font for the text. TBD: remove and use a font factory
-	std::shared_ptr<Font> m_pOGLFont;
+	std::shared_ptr<font> m_pOGLFont;
 	float m_fontSize;
 
 	OGLProgram *m_pParentProgram = nullptr;
@@ -116,7 +116,7 @@ public:
 	void Destroy();
 
 private:
-	std::shared_ptr<Font> m_pOGLFont;
+	std::shared_ptr<font> m_pOGLFont;
 	float m_fontSize;
 
 	// Title for the profiler

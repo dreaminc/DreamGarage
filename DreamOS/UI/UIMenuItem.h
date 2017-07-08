@@ -33,7 +33,7 @@ struct IconFormat
 
 struct LabelFormat
 {
-	std::shared_ptr<Font> pFont;
+	std::shared_ptr<font> pFont;
 	std::string strLabel;
 	float fontSize;
 	point ptPosition;

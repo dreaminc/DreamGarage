@@ -3,6 +3,8 @@
 #include "Logger/Logger.h"
 #include "DreamAppManager.h"
 
+#include "Primitives/font.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -226,13 +228,11 @@ light* DreamOS::MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOr
 	return m_pSandbox->MakeLight(type, intensity, ptOrigin, colorDiffuse, colorSpecular, vectorDirection);
 }
 
-FlatContext* DreamOS::AddFlatContext(int width, int height, int channels)
-{
+FlatContext* DreamOS::AddFlatContext(int width, int height, int channels) {
 	return m_pSandbox->AddFlatContext(width, height, channels);
 }
 
-RESULT DreamOS::RenderToTexture(FlatContext *pContext) 
-{
+RESULT DreamOS::RenderToTexture(FlatContext *pContext) {
 	return m_pSandbox->RenderToTexture(pContext);
 }
 
@@ -272,12 +272,88 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
-text *DreamOS::MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard) {
-	return m_pSandbox->MakeText(pFont, content, size, isBillboard);
+RESULT DreamOS::ReleaseFont(std::wstring wstrFontFileName) {
+	RESULT r = R_PASS;
+
+	auto it = m_fonts.find(wstrFontFileName);
+	CBR((it != m_fonts.end()), R_NOT_FOUND);
+
+	m_fonts.erase(it);
+
+Error:
+	return r;
 }
 
-text* DreamOS::AddText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard) {
-	return m_pSandbox->AddText(pFont, content, size, isBillboard);
+std::shared_ptr<font> DreamOS::GetFont(std::wstring wstrFontFileName) {
+	RESULT r = R_PASS;
+
+	auto it = m_fonts.find(wstrFontFileName);
+	CBR((it != m_fonts.end()), R_NOT_FOUND);
+
+	return (*it).second;
+
+Error:
+	return nullptr;
+}
+
+RESULT DreamOS::ClearFonts() {
+	m_fonts.clear();
+	return R_PASS;
+}
+
+std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDistanceMap ) {
+	RESULT r = R_PASS;
+	
+	// First check font store
+	std::shared_ptr<font> pFont = GetFont(wstrFontFileName);
+
+	if (pFont == nullptr) {
+		pFont = std::make_shared<font>(wstrFontFileName, fDistanceMap);
+		CN(pFont);
+
+		{
+			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
+			const wchar_t* pszFile = strFile.c_str();
+
+			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR))));
+		}
+
+		// Push font into store
+		m_fonts[wstrFontFileName] = pFont;
+	}
+
+	return pFont;
+
+Error:
+	if (pFont != nullptr) {
+		pFont = nullptr;
+	}
+
+	return nullptr;
+}
+
+text *DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+	return m_pSandbox->AddText(pFont, strContent, lineHeightM, textFlags);
+}
+
+text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+	return m_pSandbox->MakeText(pFont, strContent, lineHeightM, textFlags);
+}
+
+text *DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	return m_pSandbox->AddText(pFont, strContent, width, height, textFlags);
+}
+
+text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	return m_pSandbox->MakeText(pFont, strContent, width, height, textFlags);
+}
+
+text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& content, double width, double height, bool fBillboard) {
+	return m_pSandbox->MakeText(pFont, content, width, height, fBillboard);
+}
+
+text* DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& content, double width, double height, bool fBillboard) {
+	return m_pSandbox->AddText(pFont, content, width, height, fBillboard);
 }
 
 texture* DreamOS::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {

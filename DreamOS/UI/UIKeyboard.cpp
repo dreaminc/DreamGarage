@@ -7,6 +7,10 @@
 
 #include "UIKey.h"
 
+#include "Primitives/font.h"
+#include "Primitives/text.h"
+#include "Primitives/framebuffer.h"
+
 UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<UIKeyboard>(pDreamOS, pContext)
 {
@@ -16,8 +20,8 @@ UIKeyboard::UIKeyboard(DreamOS *pDreamOS, void *pContext) :
 RESULT UIKeyboard::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
-	std::shared_ptr<Font> pFont;
-	std::wstring font;
+	std::shared_ptr<font> pFont;
+	std::wstring wstrFont;
 
 	// Register keyboard events
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
@@ -54,7 +58,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyTypeThreshold = 0.0f; // triggered once the center of the mallet hits the keyboard surface
 	m_keyReleaseThreshold = -0.025f;
 
-	m_pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", GetComposite(), true);
+	m_pFont = std::make_shared<font>(L"Basis_Grotesque_Pro.fnt", GetComposite(), true);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	m_keyObjects[0] = nullptr;

@@ -292,6 +292,24 @@ RESULT DimObj::SetRandomColor() {
 	return R_PASS;
 }
 
+RESULT DimObj::RemoveChild(std::shared_ptr<DimObj> pDimObj) {
+	RESULT r = R_PASS;
+
+	CN(m_pObjects);
+	CN(pDimObj);
+
+	{
+		auto it = std::find(m_pObjects->begin(), m_pObjects->end(), pDimObj);
+
+		CBR((it != m_pObjects->end()), R_NOT_FOUND);
+
+		m_pObjects->erase(it);
+	}
+
+Error:
+	return r;
+}
+
 // Children (composite objects)
 RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
 	if (m_pObjects == nullptr) {
@@ -302,18 +320,6 @@ RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
 	pDimObj->SetParent(this);
 
 	return R_PASS;
-}
-
-RESULT DimObj::RemoveChild(std::shared_ptr<DimObj> pDimObj) {
-	RESULT r = R_PASS;
-
-	auto it = std::find(m_pObjects->begin(), m_pObjects->end(), pDimObj);
-	CBM((it != m_pObjects->end()), "child not found");
-
-	m_pObjects->erase(it);
-
-Error:
-	return r;
 }
 
 RESULT DimObj::RemoveChild(VirtualObj *pObj) {
@@ -344,8 +350,10 @@ RESULT DimObj::RemoveLastChild() {
 }
 
 RESULT DimObj::ClearChildren() {
-	if (m_pObjects != nullptr)
+	if (m_pObjects != nullptr) {
 		m_pObjects->clear();
+	}
+
 	return R_PASS;
 }
 
@@ -749,6 +757,26 @@ RESULT DimObj::SetMaterial(material mMaterial) {
 	return R_PASS;
 }
 
+matrix<virtual_precision, 4, 4> DimObj::GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_pParent != nullptr) {
+		auto modelMatrix = VirtualObj::GetRotationMatrix(childMat);
+		return m_pParent->GetRotationMatrix(modelMatrix);
+	}
+	else {
+		return VirtualObj::GetRotationMatrix(childMat);
+	}
+}
+
+matrix<virtual_precision, 4, 4> DimObj::GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_pParent != nullptr) {
+		auto modelMatrix = VirtualObj::GetTranslationMatrix(childMat);
+		return m_pParent->GetTranslationMatrix(modelMatrix);
+	}
+	else {
+		return VirtualObj::GetTranslationMatrix(childMat);
+	}
+}
+
 matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
 	if (m_pParent != nullptr) {
 		auto modelMatrix = VirtualObj::GetModelMatrix(childMat);
@@ -757,6 +785,10 @@ matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision,
 	else {
 		return VirtualObj::GetModelMatrix(childMat);
 	}
+}
+
+matrix<virtual_precision, 4, 4> DimObj::GetRelativeModelMatrix() {
+	return VirtualObj::GetModelMatrix();
 }
 
 // Bounding Box
@@ -844,6 +876,20 @@ RESULT DimObj::InitializeBoundingSphere() {
 	CN(m_pBoundingVolume);
 
 	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::SPHERE);
+
+	CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
+RESULT DimObj::InitializeBoundingQuad() {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingQuad>(new BoundingQuad(this));
+	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);
 
 	CR(UpdateBoundingVolume());
 

@@ -4,6 +4,7 @@
 #include "Scene/ObjectStore.h"
 
 #include "Primitives/stereocamera.h"
+#include "Primitives/font.h"
 
 #include "OGLObj.h"
 #include "OGLTexture.h"
@@ -81,6 +82,37 @@ Error:
 	return r;
 }
 
+RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
+	RESULT r = R_PASS;
+
+	CR(UseProgram());
+
+	CR(BindToFramebuffer(m_pOGLFramebuffer));
+	
+	{
+		float left = pFlatContext->GetLeft(false);
+		float right = pFlatContext->GetRight(false);
+
+		float top = pFlatContext->GetTop(false);
+		float bottom = pFlatContext->GetBottom(false);
+
+		float nearPlane = -1.0f;
+		float farPlane = 1.0f;
+
+		// TODO: Why the negative one?
+		auto matP = ProjectionMatrix::MakeOrthoYAxis(left, right, top * -1.0f, bottom * -1.0f, nearPlane, farPlane);
+
+		m_pUniformProjectionMatrix->SetUniform(matP);
+
+		CR(RenderObject(pFlatContext));
+	}
+
+	CR(UnbindFramebuffer());
+
+Error:
+	return r;
+}
+
 RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
@@ -88,6 +120,7 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 
 	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
+
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
 
@@ -101,17 +134,23 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 }
 
 RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
-	auto matModel = pDimObj->GetModelMatrix();
+
+	auto matModel = pDimObj->VirtualObj::GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	text *pText = dynamic_cast<text*>(pDimObj);
 
-	m_pUniformfDistanceMap->SetUniform(pText != nullptr && pText->GetFont()->HasDistanceMap());
 	if (pText != nullptr) {
 		float buffer = pText->GetFont()->GetBuffer();
 		float gamma = pText->GetFont()->GetGamma();
+
 		m_pUniformBuffer->SetUniformFloat(&buffer);
 		m_pUniformGamma->SetUniformFloat(&gamma);
+
+		m_pUniformfDistanceMap->SetUniform(pText->GetFont()->HasDistanceMap());
+	}
+	else {
+		m_pUniformfDistanceMap->SetUniform(true);
 	}
 
 	return R_PASS;
@@ -119,16 +158,20 @@ RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
 
 RESULT OGLProgramFlat::SetCameraUniforms(camera *pCamera) {
 	auto matP = pCamera->GetProjectionMatrix();
-	if (m_pUniformProjectionMatrix)
+
+	if (m_pUniformProjectionMatrix) {
 		m_pUniformProjectionMatrix->SetUniform(matP);
+	}
 
 	return R_PASS;
 }
 
 RESULT OGLProgramFlat::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	auto matP = pStereoCamera->GetProjectionMatrix(eye);
-	if (m_pUniformProjectionMatrix)
+
+	if (m_pUniformProjectionMatrix) {
 		m_pUniformProjectionMatrix->SetUniform(matP);
+	}
 
 	return R_PASS;
 }

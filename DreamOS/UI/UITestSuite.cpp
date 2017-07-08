@@ -27,6 +27,11 @@
 
 #include "Core/Utilities.h"
 
+#include "Primitives/font.h"
+#include "Primitives/text.h"
+#include "Primitives/framebuffer.h"
+
+
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -49,9 +54,13 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestFont());
+
 	CR(AddTestUIView());
 
-	CR(AddTestFont());
+	CR(AddTestFlatContextCompositionQuads());
+
+	CR(AddTestFlatContextCompositionQuads());
 
 	CR(AddTestBrowserRequestWithMenuAPI());
 	CR(AddTestBrowserRequest());
@@ -200,6 +209,102 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+		
+		CN(m_pDreamOS);
+
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupPipeline());
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		{
+			///*
+			//auto pFlatContext = m_pDreamOS->AddFlatContext();
+			auto pFlatContext = m_pDreamOS->AddComposite();
+			CN(pFlatContext);
+			
+			//pFlatContext->InitializeOBB();
+			pFlatContext->InitializeBoundingQuad();
+
+			auto pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, 1.0f));
+			CN(pQuad);
+			pQuad->SetColor(COLOR_BLUE);
+
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(-1.0f, 0.0f, -1.0f));
+			CN(pQuad);
+			pQuad->SetColor(COLOR_GREEN);
+
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, 1.0f));
+			CN(pQuad);
+			pQuad->SetColor(COLOR_RED);
+
+			pQuad = pFlatContext->AddQuad(0.5f, 0.5f, point(1.0f, 0.0f, -1.0f));
+			CN(pQuad);
+			pQuad->SetColor(COLOR_YELLOW);
+
+			pFlatContext->RotateXByDeg(90.0f);
+			//*/
+
+			/*
+			auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+			pQuad->RotateXByDeg(90.0f);
+			pQuad->SetColor(COLOR_BLUE);
+			*/
+
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	CN(pUITest);
+
+	pUITest->SetTestName("Flat Context Composition Test");
+	pUITest->SetTestDescription("Flat context composition test");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::AddTestFont() {
 	RESULT r = R_PASS;
 
@@ -208,7 +313,6 @@ RESULT UITestSuite::AddTestFont() {
 
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-		std::string strURL = "http://www.youtube.com";
 
 		CN(m_pDreamOS);
 
@@ -218,24 +322,53 @@ RESULT UITestSuite::AddTestFont() {
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
-		pQuad->SetPosition(point(0.0f, -2.0f, 0.0f));
-		pQuad->SetColor(COLOR_BLUE);
-
-		// Fix this
 		{
-			/*
-			auto pFont = std::make_shared<Font>(L"Basis_Grotesque_Pro.fnt", true);
-			std::wstring strFile = L"Fonts/" + pFont->GetGlyphImageFile();
-			const wchar_t* pszFile = strFile.c_str();
-
-			pFont->SetTexture(std::shared_ptr<texture>(m_pDreamOS->MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR)));
-
-			auto pText = m_pDreamOS->AddText(pFont, "test");
-			pText->SetPosition(point(0.0f, -1.0f, 0.0f));
-			*/
-			auto pFont = Font::MakeFreetypeFont(L"arial.ttf", true);
+			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 			CN(pFont);
+
+			// Fit to Scale
+			
+			auto pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD);
+			CN(pText);
+			//pText->RenderToQuad();
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(-3.0f, 2.0f, 0.0f));
+			
+			pText->SetText("testing this \nthing");
+
+			// Size to fit
+			// Note this sets the line height by way of font - this teases at future settings, 
+			// but right now it's avoiding adding MORE constructor paths / vars to this creation path
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::SCALE_TO_FIT | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(2.0f, -2.0f, 0.0f));
+			pText->SetText("testing this thing");
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::NONE | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(2.0f, 2.0f, 0.0f));
+			pText->SetText("testing this thing");
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.1f, 0.6f, text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(-3.0f, -2.0f, 0.0f));
+			pText->SetText("testing this thing");
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(-3.0f, 0.0f, 0.0f));
+			pText->SetText("testing this thing");
+
+			pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP | text::flags::RENDER_QUAD);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
+			pText->SetText("testing this thing");
+
 		}
 
 	Error:
@@ -489,13 +622,23 @@ RESULT UITestSuite::SetupPipeline() {
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
 	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 

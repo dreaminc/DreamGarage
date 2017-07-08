@@ -37,11 +37,12 @@ public:
 	quad(quad&& q);	// move ctor
 
 	quad(float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
-	quad(float height, float width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
-	quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright, vector vNormal = vector::jVector());
+	quad(float width, float height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
+	quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
 	quad(BoundingQuad *pBoundingQuad, bool fTriangleBased);
 
-	RESULT SetVertices(float width, float height, vector vNormal);
+	//RESULT SetVertices(float width, float height, vector vNormal);
+	RESULT SetVertices(float width, float height, vector vNormal, const uvcoord& uvTopLeft = uvcoord(0.0f, 0.0f), const uvcoord& uvBottomRight = uvcoord(1.0f, 1.0f));
 	RESULT SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased);
 
 	RESULT FlipUVVertical();
@@ -64,6 +65,9 @@ public:
 
 	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleBased = true);
 	RESULT UpdateParams(float width, float height, vector vNormal);
+
+	float GetWidth();
+	float GetHeight();
 
 private:
 	QUAD_TYPE m_quadType;

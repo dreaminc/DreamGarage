@@ -30,7 +30,10 @@
 class BoundingVolume;
 class CollisionManifold;
 
-class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
+class DimObj : public VirtualObj, 
+			   public Subscriber<TimeEvent>, 
+			   public dirty 
+{
 	friend class OGLObj;
 
 protected:
@@ -173,6 +176,7 @@ public:
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();
+	RESULT InitializeBoundingQuad();
 	RESULT InitializeBoundingQuad(point ptOrigin, float width, float height, vector vNormal);
 	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 
@@ -197,7 +201,10 @@ public:
 	material* GetMaterial();
 	RESULT SetMaterial(material mMaterial);
 
+	matrix<virtual_precision, 4, 4> GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
+	matrix<virtual_precision, 4, 4> GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
+	matrix<virtual_precision, 4, 4> GetRelativeModelMatrix();
 };
 
 #endif // !DIM_OBJ_H_

@@ -124,6 +124,40 @@ std::string point::toString(bool fW) {
 	return strRet;
 }
 
+point_precision& point::GetComponent(component c) {
+	switch (c) {
+		case component::X: {
+			return x();
+		} break;
+
+		case component::Y: {
+			return y();
+		} break;
+
+		case component::Z: {
+			return z();
+		} break;
+
+		case component::W:
+		case component::INVALID:
+		default: {
+			return w();
+		} break;
+	}
+
+	return w();
+}
+
+// General purpose component swap
+RESULT point::swap(component a, component b) {
+	point_precision temp = GetComponent(a);
+	
+	GetComponent(a) = GetComponent(b);
+	GetComponent(b) = temp;
+
+	return R_PASS;
+}
+
 // Operators
 
 vector point::operator-(const point& rhs) const {

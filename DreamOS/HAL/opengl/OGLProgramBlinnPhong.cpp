@@ -102,7 +102,7 @@ RESULT OGLProgramBlinnPhong::ProcessNode(long frameID) {
 	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	UseProgram();
-
+	
 	if (m_pOGLFramebuffer != nullptr)
 		BindToFramebuffer(m_pOGLFramebuffer);
 

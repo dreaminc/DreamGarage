@@ -301,6 +301,32 @@ std::shared_ptr<volume> composite::AddVolume(double side) {
 	return AddVolume(side, side, side);
 }
 
+
+std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptOrigin) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin));
+
+	//Success:
+	return pQuad;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptOrigin) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin);
+	CR(AddObject(pQuad));
+
+	//Success:
+	return pQuad;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
@@ -314,8 +340,7 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal)
-{
+std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal){
 	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 

@@ -75,7 +75,7 @@ public:
 
 	const std::deque<std::string>& GetConsoleText();
 
-	void ForEach(std::function<bool(const std::string)> pred);
+	void ForEach(std::function<bool(const std::string)> fnPred);
 
 	const std::string& GetCmdText();
 	unsigned int GetCmtTextCursorPos();
