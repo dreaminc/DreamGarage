@@ -698,7 +698,20 @@ RESULT HALTestSuite::AddTestModel() {
 
 	// Update Code 
 	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+		RESULT r = R_PASS;
+
+		ObjectStoreImp *pObjectStoreImp = m_pDreamOS->GetUISceneGraphNode()->GetSceneGraphStore();
+		VirtualObj *pVirtualObj = nullptr;
+
+		CN(pObjectStoreImp);
+
+		m_pDreamOS->GetUISceneGraphNode()->Reset();
+		while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
+			pVirtualObj->translateX(0.001f);
+		}
+
+	Error:
+		return r;
 	};
 
 	// Update Code 
@@ -990,6 +1003,7 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
+			/*
 			pVolume = m_pDreamOS->AddVolume(width, height, length);
 			CN(pVolume);
 			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -3.0f));
@@ -1009,11 +1023,15 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 			CN(pVolume);
 			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 			CR(pVolume->SetColor(COLOR_BLUE));
+			*/
 
-			pQuad = m_pDreamOS->MakeQuad(1.0f, 1.0f);
-			CN(pQuad);
-			pQuad->RotateXByDeg(90.0f);
-			CR(m_pDreamOS->AddObjectToUIGraph(pQuad));
+			for (int i = -4; i < 5; i++) {
+				pQuad = m_pDreamOS->MakeQuad(1.0f, 1.0f);
+				CN(pQuad);
+				pQuad->RotateXByDeg(90.0f);
+				pQuad->translateX(i * 1.05f);
+				CR(m_pDreamOS->AddObjectToUIGraph(pQuad));
+			}
 		}
 
 	Error:

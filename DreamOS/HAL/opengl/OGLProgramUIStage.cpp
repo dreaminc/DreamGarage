@@ -4,6 +4,8 @@
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
+#include "Primitives/matrix/ProjectionMatrix.h"
+
 OGLProgramUIStage::OGLProgramUIStage(OpenGLImp *pParentImp) :
 	OGLProgram(pParentImp, "ogluistage")
 {
@@ -23,8 +25,16 @@ RESULT OGLProgramUIStage::OGLInitialize() {
 	// Uniform Variables
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
+	// Textures
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
+
+	// Clipping
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingProjection), std::string("u_mat4ClippingProjection")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformClippingEnabled), std::string("u_clippingEnabled")));
+
+	// Materials 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
@@ -93,6 +103,12 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
+	// TODO: update with changes 
+	ProjectionMatrix matClipping = ProjectionMatrix(2.0f, 2.0f, -2.0f, 2.0f);
+
+	m_pUniformClippingProjection->SetUniform(matClipping);
+	m_pUniformClippingEnabled->SetUniform(true);
+
 	// 3D Object / skybox
 	RenderObjectStore(m_pSceneGraph);
 
@@ -108,16 +124,31 @@ RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	OGLTexture *pTexture = nullptr;
 
 	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-		//pTexture->OGLActivateTexture(0);
-		//m_pUniformTextureColor->SetUniform(pTexture);
-
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
+
+		m_pUniformHasTextureColor->SetUniform(true);
+	}
+	else {
+		m_pUniformHasTextureColor->SetUniform(false);
 	}
 
 	//	Error:
 	return r;
+}
+
+RESULT OGLProgramUIStage::SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) {
+	m_left = left;
+	m_right = right;
+	m_top = top;
+	m_bottom = bottom;
+	m_nearPlane = nearPlane;
+	m_farPlane = farPlane;
+
+	// TODO: Calc the matrix here for speed?
+
+	return R_PASS;
 }
 
 RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {

@@ -24,6 +24,8 @@ public:
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
+	RESULT SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane);
+
 protected:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
@@ -37,6 +39,18 @@ private:
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
+	OGLUniformBool *m_pUniformHasTextureColor;
+
+	// Clipping Projection
+	float m_left = -2.0f;
+	float m_right = 2.0f;
+	float m_top = 2.0f;
+	float m_bottom = -2.0f;
+	float m_nearPlane = -2.0f;
+	float m_farPlane = 2.0f;
+
+	OGLUniformBool *m_pUniformClippingEnabled;
+	OGLUniformMatrix4 *m_pUniformClippingProjection;
 
 	OGLMaterialBlock *m_pMaterialsBlock;
 };
