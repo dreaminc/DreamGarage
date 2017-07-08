@@ -1,16 +1,16 @@
-#include "OGLProgramMinimalTexture.h"
+#include "OGLProgramUIStage.h"
 
 #include "OpenGLImp.h"
 #include "OGLFramebuffer.h"
 #include "OGLAttachment.h"
 
-OGLProgramMinimalTexture::OGLProgramMinimalTexture(OpenGLImp *pParentImp) :
-	OGLProgram(pParentImp, "oglminimaltexture")
+OGLProgramUIStage::OGLProgramUIStage(OpenGLImp *pParentImp) :
+	OGLProgram(pParentImp, "ogluistage")
 {
 	// empty
 }
 
-RESULT OGLProgramMinimalTexture::OGLInitialize() {
+RESULT OGLProgramUIStage::OGLInitialize() {
 	RESULT r = R_PASS;
 
 	CR(OGLProgram::OGLInitialize());
@@ -23,15 +23,12 @@ RESULT OGLProgramMinimalTexture::OGLInitialize() {
 	// Uniform Variables
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
-
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
 
 	//CR(InitializeFrameBuffer(GL_DEPTH_COMPONENT16, GL_FLOAT));
-
-	///*
+	/*
 	int pxWidth = m_pParentImp->GetViewport().Width();
 	int pxHeight = m_pParentImp->GetViewport().Height();
 
@@ -55,7 +52,7 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetupConnections() {
+RESULT OGLProgramUIStage::SetupConnections() {
 	RESULT r = R_PASS;
 
 	// Inputs
@@ -65,13 +62,14 @@ RESULT OGLProgramMinimalTexture::SetupConnections() {
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
 
 Error:
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
+RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	RESULT r = R_PASS;
 
 	ObjectStoreImp *pObjectStore = m_pSceneGraph->GetSceneGraphStore();
@@ -80,12 +78,13 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	pObjectStore->GetLights(pLights);
 
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
-	UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
+	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
-		BindToFramebuffer(m_pOGLFramebuffer);
+		//BindToFramebuffer(m_pOGLFramebuffer);
+		m_pOGLFramebuffer->Bind();	
 	}
 
 	glEnable(GL_BLEND);
@@ -103,7 +102,7 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
+RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	RESULT r = R_PASS;
 
 	OGLTexture *pTexture = nullptr;
@@ -115,24 +114,20 @@ RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
-		m_pUniformHasTextureColor->SetUniform(true);
-	}
-	else {
-		m_pUniformHasTextureColor->SetUniform(false);
 	}
 
 	//	Error:
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetObjectUniforms(DimObj *pDimObj) {
+RESULT OGLProgramUIStage::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramMinimalTexture::SetMaterial(material *pMaterial) {
+RESULT OGLProgramUIStage::SetMaterial(material *pMaterial) {
 	RESULT r = R_PASS;
 
 	if (m_pMaterialsBlock != nullptr) {
@@ -144,14 +139,14 @@ Error:
 	return r;
 }
 
-RESULT OGLProgramMinimalTexture::SetCameraUniforms(camera *pCamera) {
+RESULT OGLProgramUIStage::SetCameraUniforms(camera *pCamera) {
 	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
 	return R_PASS;
 }
 
-RESULT OGLProgramMinimalTexture::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+RESULT OGLProgramUIStage::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 	m_pUniformViewProjectionMatrix->SetUniform(matVP);
 

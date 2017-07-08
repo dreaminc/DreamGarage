@@ -691,6 +691,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp" />
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramUIStage.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLRay.cpp" />
     <ClCompile Include="..\..\..\HAL\opengl\OGLText.cpp" />
@@ -947,6 +948,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkybox.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramUIStage.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuad.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLQuery.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLRay.h" />
@@ -1225,6 +1227,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
       <DeploymentContent>true</DeploymentContent>
     </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.frag" />
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\uistage.vert" />
     <None Include="..\..\..\Makefile" />
     <None Include="..\..\..\Models\face4\untitled.mtl">
       <DeploymentContent>true</DeploymentContent>

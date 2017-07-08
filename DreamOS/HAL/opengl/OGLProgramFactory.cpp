@@ -18,6 +18,7 @@
 #include "OGLProgramDepthPeel.h"
 #include "OGLProgramBlendQuad.h"
 #include "OGLProgramBlurQuad.h"
+#include "OGLProgramUIStage.h"
 
 #include "OGLDreamConsole.h"
 
@@ -42,6 +43,7 @@ const std::map<std::string, OGLPROGRAM_TYPE> OGLProgramFactory::m_OGLProgramName
 	{ "depthpeel", OGLPROGRAM_DEPTH_PEEL },
 	{ "blendquad", OGLPROGRAM_BLEND_QUAD },
 	{ "blur", OGLPROGRAM_BLUR_QUAD },
+	{ "uistage", OGLPROGRAM_UI_STAGE },
 	{ "invalid", OGLPROGRAM_INVALID }
 };
 
@@ -72,6 +74,13 @@ ProgramNode* OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *
 			pOGLProgram = new OGLProgramMinimalTexture(pParentImp);
 			CNM(pOGLProgram, "Failed to allocate OGLProgram");
 			CRM(pOGLProgram->OGLInitialize(L"minimalTexture.vert", L"minimalTexture.frag", versionOGL), 
+				"Failed to initialize OGL minimal texture Program");
+		} break;
+
+		case OGLPROGRAM_UI_STAGE: {
+			pOGLProgram = new OGLProgramUIStage(pParentImp);
+			CNM(pOGLProgram, "Failed to allocate OGLProgram");
+			CRM(pOGLProgram->OGLInitialize(L"uistage.vert", L"uistage.frag", versionOGL),
 				"Failed to initialize OGL minimal texture Program");
 		} break;
 		
