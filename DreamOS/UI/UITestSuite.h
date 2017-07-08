@@ -56,6 +56,7 @@ public:
 	RESULT AddTestBrowserRequestWithMenuAPI();
 	RESULT AddTestKeyboard();
 	RESULT AddTestUIView();
+	RESULT AddTestFont();
 
 	virtual RESULT AddTests() override;
 

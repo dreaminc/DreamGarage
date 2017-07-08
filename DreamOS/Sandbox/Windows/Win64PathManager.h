@@ -33,7 +33,8 @@ public:
 	RESULT PrintPaths();
 
 	RESULT GetCurrentPath(wchar_t*&pszCurrentPath);
-	RESULT GetDreamPath(wchar_t*&pszDreamPath);
+	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) override;
+	virtual RESULT GetDreamPath(char* &n_pszDreamPath) override;
 	//RESULT GetValuePath(PATH_VALUE_TYPE, wchar_t* &pszPath);
 
 private:

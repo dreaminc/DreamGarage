@@ -3,8 +3,64 @@
 #include <vector>
 #include <algorithm>
 
+text::text(std::shared_ptr<Font> font, const std::string& strText, double size, bool fBillboard) :
+	m_font(font)
+{
+	RESULT r = R_PASS;
+
+	CR(SetText(strText, size));
+
+	Validate();
+	return;
+
+Error:
+	Invalidate();
+	return;
+}
+
+VirtualObj* text::SetPosition(point pt, AlignmentType alignType) {
+	uv_precision dx = 0.0f;
+	uv_precision dy = 0.0f;
+	
+	switch (alignType) {
+	case CENTER: {
+		// nothing
+	} break;
+
+	case RIGHT: {
+		dx = m_width / 2;
+	} break;
+
+	case LEFT: {
+		dx = -m_width / 2;
+	} break;
+
+	case BOTTOM_LEFT: {
+		dx = -m_width / 2;
+		dy = -m_height / 2;
+	} break;
+
+	case BOTTOM_RIGHT: {
+		dx = m_width / 2;
+		dy = -m_height / 2;
+	} break;
+
+	case TOP_LEFT: {
+		dx = -m_width / 2;
+		dy = m_height / 2;
+	} break;
+
+	case TOP_RIGHT: {
+		dx = m_width / 2;
+		dy = m_height / 2;
+	} break;
+	}
+
+	return this->MoveTo(pt.x() + dx, pt.y() + dy, pt.z());
+}
+
 std::string& text::GetText() {
-	return m_text;
+	return m_strText;
 }
 
 RESULT text::SetText(const std::string& text, double size, bool* isChanged)
@@ -12,7 +68,7 @@ RESULT text::SetText(const std::string& text, double size, bool* isChanged)
 	std::vector<quad> quads;
 	point center_vector;
 
-	if (m_text.compare(text) == 0)
+	if (m_strText.compare(text) == 0)
 	{
 		// no need to update the text
 		if (isChanged)
@@ -23,7 +79,7 @@ RESULT text::SetText(const std::string& text, double size, bool* isChanged)
 	if (isChanged)
 		*isChanged = true;
 
-	if (m_text.length() != text.length())
+	if (m_strText.length() != text.length())
 	{
 		// text length was changed, we need to re-allocate buffers
 		Destroy();
@@ -37,7 +93,7 @@ RESULT text::SetText(const std::string& text, double size, bool* isChanged)
 		SetDirty();
 	}
 
-	m_text = text;
+	m_strText = text;
 
 	float posx = 0;
 
@@ -45,9 +101,9 @@ RESULT text::SetText(const std::string& text, double size, bool* isChanged)
 	const int screen_width = static_cast<int>(1920 * size);
 	const int screen_height = static_cast<int>(1080 * size);
 
-	uv_precision	glyphWidth = static_cast<float>(m_font->GetGlyphWidth());
-	uv_precision	glyphHeight = static_cast<float>(m_font->GetGlyphHeight());
-	uv_precision	glyphBase = static_cast<float>(m_font->GetGlyphBase());
+	uv_precision glyphWidth = static_cast<float>(m_font->GetGlyphWidth());
+	uv_precision glyphHeight = static_cast<float>(m_font->GetGlyphHeight());
+	uv_precision glyphBase = static_cast<float>(m_font->GetGlyphBase());
 
 	#define XSCALE_TO_SCREEN(x)	2.0f * (x) / screen_width
 	#define YSCALE_TO_SCREEN(y)	2.0f * (y) / screen_height

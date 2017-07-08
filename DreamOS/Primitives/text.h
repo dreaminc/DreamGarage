@@ -27,8 +27,13 @@ public:
 		return R_PASS;
 	}
 
-	inline unsigned int NumberVertices() { return m_nVertices; }
-	inline unsigned int NumberIndices() { return m_nIndices; }
+	inline unsigned int NumberVertices() { 
+		return m_nVertices; 
+	}
+
+	inline unsigned int NumberIndices() { 
+		return m_nIndices; 
+	}
 
 private:
 	unsigned int m_nVertices;
@@ -36,6 +41,7 @@ private:
 
 public:
 
+	// TODO: Make into two (valign vs halign)
 	enum AlignmentType {
 		TOP_LEFT,
 		TOP_RIGHT,
@@ -46,39 +52,33 @@ public:
 		LEFT,
 	};
 
-	uv_precision m_width = 0.0f;
-	uv_precision m_height = 0.0f;
 
-	text(std::shared_ptr<Font> font, const std::string& text = "", double size = 1.0, bool isBillboard = false) :
-		m_font(font)
-	{
-		SetText(text, size);
+	text(std::shared_ptr<Font> font, const std::string& strText = "", double size = 1.0, bool fBillboard = false);
 
-		Validate();
-//	Error:
-//		Invalidate();
-	}
-
-	std::string& GetText();
-	
 	RESULT SetText(const std::string& text, double size, bool* isChanged = nullptr);
 	
-	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)
-	{
-		uv_precision dx = (align == CENTER) ? 0.0f : (align == RIGHT) ? m_width / 2 : (align == LEFT) ? -m_width / 2 : (align == BOTTOM_LEFT || align == TOP_LEFT) ? -m_width / 2 : m_width / 2;
-		uv_precision dy = (align == CENTER || align == RIGHT || align == LEFT) ? 0.0f : (align == TOP_RIGHT || align == TOP_LEFT) ? m_height / 2 : -m_height / 2;
-		return this->MoveTo(p.x() + dx, p.y() + dy, p.z());
-	}
+	VirtualObj* SetPosition(point pt, AlignmentType alignType = CENTER);
 
 	std::shared_ptr<Font> GetFont() { return m_font; }
+	std::string& GetText();
+
+	float GetWidth() {
+		return m_width;
+	}
+
+	float GetHeight() {
+		return m_height;
+	}
 
 private:
+	float m_width = 0.0f;
+	float m_height = 0.0f;
 
 	// Font to be used for the text
 	std::shared_ptr<Font> m_font;
 
 	// String of the text
-	std::string	m_text = "";
+	std::string	m_strText = "";
 };
 
 #endif // ! TEXT_H_

@@ -1,6 +1,8 @@
 #include "PathManager.h"
 #include "Primitives/Types/Number.h"
 
+#include "Core/Utilities.h"
+
 // Initialize and allocate the instance
 PathManager* PathManager::m_pInstance = nullptr;
 
@@ -132,6 +134,48 @@ Error:
 	return r;
 }
 
+RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, char* &n_pszPath) {
+	RESULT r = R_PASS;
+
+	size_t n_pszPath_n = 0;
+
+	char *pszDreamPath = nullptr;
+	size_t pszDreamPath_n = 0;
+
+	char *pszValue = nullptr;
+	size_t pszValue_n = 0;
+
+	CRM(IsPathRegistered(type), "Value not registered");
+
+	// Convert to char*
+	// TODO: add to util?
+	pszValue_n = wcslen(m_pmapNVPPaths->at(type));
+	pszValue = new char[pszValue_n];
+	memset(pszValue, 0, pszValue_n);
+	std::wcstombs(pszValue, m_pmapNVPPaths->at(type), pszValue_n);
+
+	CRM(GetDreamPath(pszDreamPath), "Failed to acquire dream path");
+	pszDreamPath_n = strlen(pszDreamPath);
+
+	n_pszPath_n = pszDreamPath_n + 1 + pszValue_n + 1;
+	n_pszPath = new char[n_pszPath_n];
+	memset(n_pszPath, 0, sizeof(char) * n_pszPath_n);
+
+	// Compose the path
+	// TODO: Maybe do some lower level parsing here since ./ will just get attached
+	// TODO: This breaks cross-platform-ness
+	strncat(n_pszPath, pszDreamPath, pszDreamPath_n);
+	strncat(n_pszPath, pszValue, pszValue_n);
+
+Error:
+	if (pszDreamPath != nullptr) {
+		delete[] pszDreamPath;
+		pszDreamPath = nullptr;
+	}
+
+	return r;
+}
+
 RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath) {
 	RESULT r = R_PASS;
 
@@ -205,6 +249,41 @@ Error:
 }
 
 // TODO: Move this to get file / FileManager
+RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename, char* &n_pszFilePath) {
+	RESULT r = R_PASS;
+
+	size_t wstrFilename_n = wstrFilename.size();
+	size_t n_pszFilePath_n = 0;
+
+	char *pszValuePath = nullptr;
+	size_t pszValuePath_n = 0;
+
+	std::string strFilename = util::WideStringToString(wstrFilename);
+
+	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
+	pszValuePath_n = strlen(pszValuePath);
+
+	n_pszFilePath_n = strlen(pszValuePath) + 1 + strFilename.size() + 1;
+	n_pszFilePath = (char *)(new char[n_pszFilePath_n]);
+	CN(n_pszFilePath);
+
+	memset(n_pszFilePath, 0, n_pszFilePath_n);
+
+	// Compose the path
+	// TODO: Maybe do some lower level parsing here since ./ will just get attached
+	strncat(n_pszFilePath, pszValuePath, pszValuePath_n);
+	strncat(n_pszFilePath, strFilename.c_str(), strFilename.size());
+
+Error:
+	// Release memory from GetValuePath
+	if (pszValuePath != nullptr) {
+		delete[] pszValuePath;
+		pszValuePath = nullptr;
+	}
+
+	return r;
+}
+
 RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName, wchar_t * &n_pszFilePath) {
 	RESULT r = R_PASS;
 	long pszFileName_n = static_cast<long>(wcslen(pszFileName));
