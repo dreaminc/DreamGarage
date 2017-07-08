@@ -985,6 +985,7 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 		// Objects 
 
 		volume *pVolume = nullptr;
+		quad *pQuad = nullptr;
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
@@ -1008,6 +1009,11 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 			CN(pVolume);
 			pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 			CR(pVolume->SetColor(COLOR_BLUE));
+
+			pQuad = m_pDreamOS->MakeQuad(1.0f, 1.0f);
+			CN(pQuad);
+			pQuad->RotateXByDeg(90.0f);
+			CR(m_pDreamOS->AddObjectToUIGraph(pQuad));
 		}
 
 	Error:

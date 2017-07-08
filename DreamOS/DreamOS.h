@@ -191,6 +191,7 @@ public:
 	RESULT RenderToTexture(FlatContext* pContext);
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
+	quad *MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
 	template<typename objType, typename... Targs>
 	objType *Add(Targs... Fargs) {
