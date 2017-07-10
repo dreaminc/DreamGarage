@@ -61,8 +61,6 @@ void main(void) {
 		}
 	}
 
-	
-	
 	if(u_hasTextureColor == true) {
 		color = texture(u_textureColor, DataIn.uvCoord);
 	}
