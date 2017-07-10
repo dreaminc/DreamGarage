@@ -270,7 +270,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 			CN(pButton);
 
 			auto iconFormat = IconFormat();
-			iconFormat.pTexture = m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())];
+			iconFormat.pTexture = m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())].get();
 
 			auto labelFormat = LabelFormat();
 			labelFormat.strLabel = pSubMenuNode->GetTitle();

@@ -2,6 +2,7 @@
 #include "Primitives/font.h"
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
+#include "DreamOS.h"
 
 UIMenuItem::UIMenuItem(HALImp *pHALImp, DreamOS *pDreamOS) :
 	UIButton(pHALImp, pDreamOS)
@@ -47,40 +48,28 @@ std::shared_ptr<quad> UIMenuItem::GetQuad() {
 RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	RESULT r = R_PASS;
 
-	// TODO: reuse this object?
-	std::shared_ptr<FlatContext> pContext = m_pContextComposite->MakeFlatContext();
 	std::shared_ptr<text> pText;
 	std::shared_ptr<quad> pIcon;
-	CN(pContext);
 
-	pText = pContext->AddText(
-		labelFormat.pFont,
-		labelFormat.pFont->GetTexture().get(),
-		labelFormat.strLabel,
-		labelFormat.fontSize,
-		true // force distance fields
-	);
+	pText = std::shared_ptr<text>(m_pDreamOS->MakeText(labelFormat.pFont,
+		labelFormat.strLabel, 0.25, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+	pText->RotateXByDeg(90.0f);
 
 	pText->SetPosition(labelFormat.ptPosition);
+	AddObject(pText);
 
 	m_strName = labelFormat.strLabel;
 
-	pIcon = pContext->AddQuad(
-		iconFormat.width,
-		iconFormat.height,
-		iconFormat.ptPosition
-	);
+	pIcon = AddQuad(1.0f, 1.0f);
+	pIcon->RotateXByDeg(90.0f);
 
+	pIcon->SetPosition(iconFormat.ptPosition);
 	if (iconFormat.pTexture != nullptr)
-		pIcon->SetColorTexture(iconFormat.pTexture.get());
+		pIcon->SetColorTexture(iconFormat.pTexture);
 	else
 		pIcon->SetVisible(false);
 
-	m_pContextComposite->RenderToTexture(pContext);
-
-	m_pSurface->UpdateColorTexture(pContext->GetFramebuffer()->GetColorTexture());
-
-Error:
+//Error:
 	return r;
 }
 
