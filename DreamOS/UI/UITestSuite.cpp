@@ -55,7 +55,7 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestFont());
+	//CR(AddTestFont());
 
 	CR(AddTestKeyboard());
 

@@ -64,7 +64,8 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pFont->SetLineHeight(0.03125f);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
+	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::WRAP | text::flags::RENDER_QUAD));
+	//m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
 	m_pTextBoxText->SetPosition(point(0.0f, 0.0f, -((m_surfaceHeight / 2.0f) + (m_surfaceHeight / 8.0f))));
 	m_pTextBoxContainer->AddObject(m_pTextBoxText);
 
@@ -104,8 +105,11 @@ RESULT UIKeyboard::InitializeLayoutTexture(LayoutType type) {
 
 	pLayout->CreateQWERTYLayout(fUpper, fNum);
 
-	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::RENDER_QUAD);
+	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::NONE);
+	//auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::RENDER_QUAD);
 	CN(pText);
+
+	//pText->SetBackgroundColorTexture(m_pKeyTexture.get());
 
 	m_layoutAtlas[type] = pText;
 
