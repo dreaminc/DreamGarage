@@ -103,6 +103,7 @@ RESULT text::RenderToQuad() {
 
 	// Remove quad if exists 
 	if (m_pQuad != nullptr) {
+		RemoveChild(m_pQuad);
 		m_pQuad = nullptr;
 	}
 
@@ -135,9 +136,13 @@ RESULT text::RenderToQuad() {
 			m_pQuad = nullptr;
 		}
 
-		m_pQuad = AddQuad(m_width, m_height, point(0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
-		CN(m_pQuad);
+		if (m_pBackgroundQuad != nullptr) {
+			m_pBackgroundQuad->SetPosition(point(0.0f, 0.0f, 1.0f));
+			AddChild(m_pBackgroundQuad);
+		}
 
+		m_pQuad = AddQuad(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+		CN(m_pQuad);
 		CR(m_pQuad->SetColorTexture(GetFramebuffer()->GetColorTexture()));
 	}
 
@@ -374,7 +379,7 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	glyphQuadXPosition = GetMSizeFromDots(glyphQuadXPosition) * m_scaleFactor;
 	glyphQuadYPosition = GetMSizeFromDots(glyphQuadYPosition) * m_scaleFactor;
 
-	point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
+	point ptGlyph = point(glyphQuadXPosition, -0.1f, glyphQuadYPosition);
 	std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 	pQuad->SetColorTexture(m_pFont->GetTexture().get());
 
@@ -594,7 +599,7 @@ RESULT text::SetText(const std::string& strText) {
 
 					posXM = pQuad->GetPosition().x() - (pQuad->GetWidth()/2.0f);
 				}
-
+				
 				for (int i = 0; i < 3; i++) {
 					auto pPeriodQuad = AddGlyphQuad(periodGlyph, posX, posY);
 					
@@ -616,10 +621,37 @@ RESULT text::SetText(const std::string& strText) {
 		m_height = FlatContext::GetHeight();
 	}
 
+	if (m_pBackgroundQuad != nullptr) {
+		CR(SetBackgroundColor(m_backgroundColor));
+	}
+
 	//m_width = maxRight - minLeft;
 	//m_height = maxTop - minBottom;
 
 	//ptCenter = point((minLeft + maxRight) / 2.0f, (maxTop + minBottom) / 2.0f, 0.0f);
+
+Error:
+	return r;
+}
+
+RESULT text::SetBackgroundColor(color backgroundColor) {
+	RESULT r = R_PASS;
+
+	m_backgroundColor = backgroundColor;
+
+	if (m_pBackgroundQuad != nullptr) {
+		RemoveChild(m_pBackgroundQuad);
+		m_pBackgroundQuad = nullptr;
+	}
+
+	//point ptQuadCenter = FlatContext::GetBoundingVolume()->GetCenter();
+	//ptQuadCenter = point(0.0f, 0.0f, 0.0f);
+
+	//m_pBackgroundQuad = AddQuad(m_width, m_height, point(0.0f, -0.1f, 0.0f));
+	m_pBackgroundQuad = MakeQuad(m_width, m_height, point(0.0f));
+	CN(m_pBackgroundQuad);
+
+	CR(m_pBackgroundQuad->SetColor(m_backgroundColor));
 
 Error:
 	return r;

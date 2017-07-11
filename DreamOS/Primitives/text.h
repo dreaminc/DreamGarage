@@ -101,6 +101,8 @@ public:
 	bool IsBillboard();
 	bool IsTrailingEllipsis();
 	bool IsRenderToQuad();
+	
+	RESULT SetBackgroundColor(color backgroundColor);
 
 public:
 	//static text& MakeText()
@@ -132,6 +134,9 @@ private:
 	std::string	m_strText = "";
 
 	std::shared_ptr<quad> m_pQuad = nullptr;
+
+	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
+	color m_backgroundColor = COLOR_WHITE;
 };
 
 
