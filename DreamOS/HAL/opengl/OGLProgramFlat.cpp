@@ -105,6 +105,7 @@ RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
 		m_pUniformProjectionMatrix->SetUniform(matP);
 
 		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
 
 		CR(RenderObject(pFlatContext));
 	}

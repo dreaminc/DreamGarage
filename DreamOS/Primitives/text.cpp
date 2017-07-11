@@ -136,10 +136,12 @@ RESULT text::RenderToQuad() {
 			m_pQuad = nullptr;
 		}
 
+		/*
 		if (m_pBackgroundQuad != nullptr) {
 			m_pBackgroundQuad->SetPosition(point(0.0f, 0.0f, 1.0f));
 			AddChild(m_pBackgroundQuad);
 		}
+		*/
 
 		m_pQuad = AddQuad(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
 		CN(m_pQuad);
@@ -379,7 +381,7 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	glyphQuadXPosition = GetMSizeFromDots(glyphQuadXPosition) * m_scaleFactor;
 	glyphQuadYPosition = GetMSizeFromDots(glyphQuadYPosition) * m_scaleFactor;
 
-	point ptGlyph = point(glyphQuadXPosition, -0.1f, glyphQuadYPosition);
+	point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 	std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 	pQuad->SetColorTexture(m_pFont->GetTexture().get());
 
@@ -645,11 +647,14 @@ RESULT text::SetBackgroundColor(color backgroundColor) {
 	}
 
 	//point ptQuadCenter = FlatContext::GetBoundingVolume()->GetCenter();
-	//ptQuadCenter = point(0.0f, 0.0f, 0.0f);
+	float xPos = FlatContext::GetLeft() + FlatContext::GetWidth() / 2.0f;
+	float yPos = FlatContext::GetTop() - FlatContext::GetHeight() / 2.0f;
 
-	//m_pBackgroundQuad = AddQuad(m_width, m_height, point(0.0f, -0.1f, 0.0f));
-	m_pBackgroundQuad = MakeQuad(m_width, m_height, point(0.0f));
+	point ptQuadCenter = point(xPos, 0.0f, yPos);
+	m_pBackgroundQuad = MakeQuad(FlatContext::GetWidth(), FlatContext::GetHeight(), ptQuadCenter);
 	CN(m_pBackgroundQuad);
+
+	AddChild(m_pBackgroundQuad, true);
 
 	CR(m_pBackgroundQuad->SetColor(m_backgroundColor));
 
