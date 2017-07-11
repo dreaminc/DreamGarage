@@ -9,6 +9,7 @@
 #include <vector>
 
 class quad;
+class texture;
 
 enum class LayoutType {
 	QWERTY,
@@ -34,6 +35,8 @@ public:
 
 	RESULT SetVisible(bool fVisible);
 	float GetRowHeight();
+	RESULT SetKeyTexture(texture *pKeyTexture);
+	texture *GetKeyTexture();
 
 private:
 	std::string GenerateQWERTYRow(int rowIndex, bool fUpper = false, bool fNum = false);
@@ -42,6 +45,7 @@ private:
 	LayoutType m_layoutType;
 	std::vector<std::vector<std::shared_ptr<UIKey>>> m_pLayout;
 	float m_rowHeight = 0.0625f;
+	texture *m_pKeyTexture = nullptr;
 };
 
 

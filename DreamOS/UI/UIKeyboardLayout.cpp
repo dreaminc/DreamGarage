@@ -2,6 +2,7 @@
 #include "Sense/SenseKeyboard.h"
 #include "Primitives/quad.h"
 
+#include "Primitives/texture.h"
 
 UIKeyboardLayout::UIKeyboardLayout(LayoutType type) :
 m_layoutType(type)
@@ -205,4 +206,13 @@ Error:
 
 float UIKeyboardLayout::GetRowHeight() {
 	return m_rowHeight;
+}
+
+RESULT UIKeyboardLayout::SetKeyTexture(texture *pKeyTexture) {
+	m_pKeyTexture = pKeyTexture;
+	return R_PASS;
+}
+
+texture* UIKeyboardLayout::GetKeyTexture() {
+	return m_pKeyTexture;
 }
