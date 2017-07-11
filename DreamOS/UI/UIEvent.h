@@ -36,8 +36,9 @@ struct UIEvent {
 
 	UIEventType m_eventType;
 	VirtualObj *m_pObj;
+	VirtualObj *m_pInteractionObject = nullptr;
 
-	UIEvent(UIEventType eventType, VirtualObj *pObj);
+	UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj* m_pInteractionObject = nullptr);
 };
 
 #endif // ! UI_EVENT_H_

@@ -21,6 +21,7 @@ public:
 	std::shared_ptr<composite> GetContextComposite();
 	std::shared_ptr<composite> GetSurfaceComposite();
 	std::shared_ptr<quad> GetSurface();
+	VirtualObj *GetInteractionObject();
 
 protected:
 	// objects (TODO: could be in subclass)
@@ -35,6 +36,8 @@ protected:
 	std::shared_ptr<composite> m_pContextComposite = nullptr;
 
 	std::map<UIEventType, std::function<RESULT(void*)>> m_callbacks;
+
+	VirtualObj *m_pInteractionObject = nullptr; // set on UIEvents since the button is the context for the callbacks
 };
 
 #endif // ! UI_BUTTON_H_
