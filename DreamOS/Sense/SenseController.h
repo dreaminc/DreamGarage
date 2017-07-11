@@ -50,15 +50,28 @@ typedef struct SenseControllerEvent : SenseDevice::SenseDeviceEvent {
 class SenseController : public SenseDevice, public Publisher<SenseControllerEventType, SenseControllerEvent>, public valid {
 
 public:
+	enum class HapticCurveType {
+		SQUARE,
+		SAW,
+		SINE,
+		EXPONENTIAL,
+		CONSTANT,
+		INVALID
+	};
+
+public:
 	SenseController();
 	~SenseController();
+
+	virtual RESULT Initialize() = 0;
+	virtual RESULT SubmitHapticBuffer(ControllerType controllerType, HapticCurveType type, float amplitude, float freq, float msDuration) = 0;
+	virtual RESULT SubmitHapticImpulse(ControllerType controllerType, HapticCurveType shape, float amplitude, float msDuration, int cycles = 1) = 0;
 
 public:
 	ControllerState GetControllerState(ControllerType type);
 	RESULT SetControllerState(ControllerState controllerState);
 
 private:
-
 	std::map<ControllerType, ControllerState> m_controllerStates;
 };
 

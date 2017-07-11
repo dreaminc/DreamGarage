@@ -44,6 +44,8 @@ public:
 	RESULT AddTestBlinnPhongShaderBlur();
 	RESULT AddTestBlinnPhongShaderTexture();
 
+	RESULT AddTestSenseHaptics();
+
 	RESULT AddTestDepthPeelingShader();
 
 	RESULT AddTestRenderToTextureQuad();

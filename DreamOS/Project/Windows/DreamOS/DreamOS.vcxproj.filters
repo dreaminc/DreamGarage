@@ -806,6 +806,9 @@
     <ClCompile Include="..\..\..\Primitives\material.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRTouchController.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1675,6 +1678,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UIScrollView.h">
       <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRTouchController.h">
+      <Filter>HMD\Oculus</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

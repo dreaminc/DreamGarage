@@ -9,6 +9,8 @@
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
 
+#include "PhysicsEngine/CollisionManifold.h"
+
 HALTestSuite::HALTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
 {
@@ -22,11 +24,13 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestSenseHaptics());
+
+	CR(AddTestBlinnPhongShaderTexture());
+
 	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestModel());
-
-	CR(AddTestBlinnPhongShaderTexture());
 	
 	CR(AddTestBlinnPhongShader());
 
@@ -899,12 +903,120 @@ Error:
 	return r;
 }
 
-// TODO: There should be a cleaner way to run w/ HMD or not (auto-detect)
+RESULT HALTestSuite::AddTestSenseHaptics() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 800.0f;
+	int nRepeats = 1;
+
+	float width = 1.0f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	struct TestContext {
+		volume *pVolume = nullptr;
+		bool fCollide[2] = { false, false };
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->pVolume = m_pDreamOS->AddVolume(width, height, length);
+		CN(pTestContext->pVolume);
+		pTestContext->pVolume->SetPosition(point(0.0f, 1.0f, 4.0f));
+		pTestContext->pVolume->SetColor(COLOR_BLUE);
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext); 
+
+		// Get the controller sphere
+		for (int i = 0; i < CONTROLLER_INVALID; i++) {
+			sphere *pControllerSphere = (sphere*)(m_pDreamOS->GetHMD()->GetSenseControllerObject(CONTROLLER_TYPE(i)));
+
+			if (pControllerSphere != nullptr) {
+				auto manifold = pControllerSphere->Collide(pTestContext->pVolume);
+				if (manifold.NumContacts() > 0 && pTestContext->fCollide[i] == false) {
+					//m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticBuffer(CONTROLLER_TYPE(i), SenseController::HapticCurveType::SINE, 1.0f, 5.0f, 800.0f);
+					m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(i), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1);
+					pTestContext->fCollide[i] = true;
+				}
+				else if (manifold.NumContacts() == 0 && pTestContext->fCollide[i] == true) {
+					pTestContext->fCollide[i] = false;
+				}
+			}
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Blinn Phong Texture Shader");
+	pNewTest->SetTestDescription("Blinn phong texture shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 // TODO: There's a bug with directional lights here
 RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 40.0f;
+	double sTestTime = 80.0f;
 	int nRepeats = 1;
 
 	float width = 1.5f;

@@ -346,6 +346,7 @@ Error:
 RESULT DimObj::RemoveLastChild() {
 	if (m_pObjects != nullptr && m_pObjects->size() > 0)
 		m_pObjects->pop_back();
+
 	return R_PASS;
 }
 
@@ -355,6 +356,12 @@ RESULT DimObj::ClearChildren() {
 	}
 
 	return R_PASS;
+}
+
+// Explicit for VirtualObj
+template <>
+std::shared_ptr<VirtualObj> DimObj::GetFirstChild<VirtualObj>() {
+	return m_pObjects->front();
 }
 
 bool DimObj::HasChildren() {
