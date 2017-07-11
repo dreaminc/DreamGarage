@@ -135,38 +135,38 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	auto pItemsView = m_pScrollView->GetMenuItemsView();
 
-	auto pKeyboard = GetDOS()->GetKeyboard();
-	CN(pKeyboard);
+auto pKeyboard = GetDOS()->GetKeyboard();
+CN(pKeyboard);
 
-	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
-	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
+CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
+CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
 
 
-	if (m_pathStack.empty()) {
-		m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
-		UpdateCompositeWithCameraLook(0.0f, -1.0f);
+if (m_pathStack.empty()) {
+	m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
+	UpdateCompositeWithCameraLook(0.0f, -1.0f);
+}
+else {
+	m_pathStack.pop();
+	if (pKeyboard->IsVisible()) pKeyboard->HideKeyboard();
+
+	if (!m_pathStack.empty()) {
+		auto pNode = m_pathStack.top();
+		SelectMenuItem();
+		m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 	}
 	else {
-		m_pathStack.pop();
-		if (pKeyboard->IsVisible()) pKeyboard->HideKeyboard();
-
-		if (!m_pathStack.empty()) {
-			auto pNode = m_pathStack.top();
-			SelectMenuItem();
-			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
-		}
-		else {
-			CR(HideMenu());
-		}
+		CR(HideMenu());
 	}
+}
 Error:
-	return r;
+return r;
 }
 
 RESULT DreamUIBar::HandleSelect(void* pContext) {
 	RESULT r = R_PASS;
 
-//	auto pSelected = GetCurrentItem();
+	//	auto pSelected = GetCurrentItem();
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
@@ -204,7 +204,7 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
 				CR(SelectMenuItem(pSelected,
-					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1), 
+					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
@@ -215,13 +215,13 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 				CR(SelectMenuItem(pSelected,
-					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1), 
+					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
 				CR(SelectMenuItem(pSelected,
-					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1), 
+					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
@@ -229,6 +229,26 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 			}
 		}
 	}
+
+Error:
+	return r;
+}
+
+RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
+	RESULT r = R_PASS;
+
+	auto pObj = reinterpret_cast<DimObj*>(pContext);
+	texture *pTexture = nullptr;
+
+	CN(pBufferVector);
+	uint8_t* pBuffer = &(pBufferVector->operator[](0));
+	size_t pBuffer_n = pBufferVector->size();
+
+	CN(pObj);
+	pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	CN(pTexture);
+
+	CR(pObj->UpdateColorTexture(pTexture));
 
 Error:
 	return r;
@@ -400,14 +420,14 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		m_pMenuNode = pMenuNode;
 		if (m_pathStack.empty()) m_pathStack.push(m_pMenuNode);
 		m_pMenuNode->SetDirty();
-		for (auto& pSubMenuNodes : pMenuNode->GetSubMenuNodes()) {
-			HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
-			CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
 
+		HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+		CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
 
-			UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-			CNM(pUserControllerProxy, "Failed to get user controller proxy");
+		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+		CNM(pUserControllerProxy, "Failed to get user controller proxy");
 
+		for (auto& pSubMenuNode : pMenuNode->GetSubMenuNodes()) {
 
 			std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
 			//auto strHeaders = HTTPController::ContentAcceptJson();
@@ -415,7 +435,10 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 			auto strHeaders = HTTPController::ContentHttp();
 			strHeaders.push_back(strAuthorizationToken);
 
-			//CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));
+			auto strURI = pSubMenuNode->GetIconURL();
+		//	if (strURI != "") {
+		//		CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1), ));
+		//	}
 			
 		}
 	}

@@ -143,6 +143,14 @@ const std::string& MenuNode::GetTitle() {
 	return m_strTitle;
 }
 
+const std::string& MenuNode::GetIconURL() {
+	return m_strIconURL;
+}
+
+const std::string& MenuNode::GetThumbnailURL() {
+	return m_strThumbnailURL;
+}
+
 const MenuNode::type& MenuNode::GetNodeType() {
 	return m_nodeType;
 }

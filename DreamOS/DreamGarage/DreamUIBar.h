@@ -65,6 +65,8 @@ public:
 	RESULT HandleMenuUp(void* pContext);
 	RESULT HandleSelect(void* pContext);
 
+	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
+
 	RESULT SetMenuStateAnimated(void *pContext);
 	RESULT ClearMenuState(void* pContext);
 
