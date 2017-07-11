@@ -186,10 +186,10 @@ RESULT DimObj::SetMaterialColors(color c, bool fSetChildren) {
 	GetMaterial()->SetColors(c,c,c);
 
 	if (fSetChildren && HasChildren()) {
-		for (auto& child : GetChildren()) {
-			DimObj* obj = reinterpret_cast<DimObj*>(child.get());
-			if (obj == nullptr) continue;
-			CR(obj->SetMaterialColors(c, fSetChildren));
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialColors(c, fSetChildren));
 		}
 	}
 
