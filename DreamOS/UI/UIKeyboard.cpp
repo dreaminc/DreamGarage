@@ -40,12 +40,14 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pSurface->SetVisible(false);
 	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
 
-	m_pTextBox = GetComposite()->AddQuad(m_surfaceHeight / 4.0f, m_surfaceWidth);
-	CN(m_pTextBox);
+	/*
+	//m_pTextBox = GetComposite()->AddQuad(m_surfaceHeight / 4.0f, m_surfaceWidth);
+	//CN(m_pTextBox);
 	m_pTextBox->SetVisible(false);
 	m_pTextBox->SetPosition(point(0.0f, 0.0f, -m_surfaceHeight * 0.75f ));
-	m_pTextBoxTexture = GetComposite()->MakeTexture(L"Textbox-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	CR(m_pTextBox->SetColorTexture(m_pTextBoxTexture.get()));
+	//m_pTextBoxTexture = GetComposite()->MakeTexture(L"Textbox-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	//CR(m_pTextBox->SetColorTexture(m_pTextBoxTexture.get()));
+	//*/
 
 	m_pTextBoxContainer = GetComposite()->AddComposite();
 
@@ -59,7 +61,13 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyReleaseThreshold = -0.025f;
 
 	m_pFont = std::make_shared<font>(L"Basis_Grotesque_Pro.fnt", GetComposite(), true);
+	m_pFont->SetLineHeight(0.03125f);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::WRAP | text::flags::RENDER_QUAD));
+	//m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
+	m_pTextBoxText->SetPosition(point(0.0f, 0.0f, -((m_surfaceHeight / 2.0f) + (m_surfaceHeight / 8.0f))));
+	m_pTextBoxContainer->AddObject(m_pTextBoxText);
 
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
@@ -70,6 +78,11 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	//InitializeTexturesWithLayout(LayoutType::QWERTY_NUM);
 	//InitializeTexturesWithLayout(LayoutType::QWERTY_SYMBOL);
 
+	InitializeLayoutTexture(LayoutType::QWERTY);
+	InitializeLayoutTexture(LayoutType::QWERTY_UPPER);
+	InitializeLayoutTexture(LayoutType::QWERTY_NUM);
+	InitializeLayoutTexture(LayoutType::QWERTY_SYMBOL);
+
 	auto pLayout = new UIKeyboardLayout();
 	pLayout->CreateQWERTYLayout(); // should be in constructor probably
 	InitializeQuadsWithLayout(pLayout);
@@ -78,6 +91,27 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_currentLayout = LayoutType::QWERTY;
 
 	GetComposite()->SetVisible(false);
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::InitializeLayoutTexture(LayoutType type) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIKeyboardLayout> pLayout = std::make_shared<UIKeyboardLayout>(type);
+	bool fUpper = (type == LayoutType::QWERTY_UPPER || type == LayoutType::QWERTY_SYMBOL);
+	bool fNum = (type == LayoutType::QWERTY_NUM || type == LayoutType::QWERTY_SYMBOL);
+
+	pLayout->CreateQWERTYLayout(fUpper, fNum);
+
+	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::NONE);
+	//auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::RENDER_QUAD);
+	CN(pText);
+
+	//pText->SetBackgroundColorTexture(m_pKeyTexture.get());
+
+	m_layoutAtlas[type] = pText;
 
 Error:
 	return r;
@@ -100,7 +134,7 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			// Set up text box key texture
 			if (m_pQuadTextures->HasChildren()) 
 				m_pQuadTextures->ClearChildren();
-
+			/*
 			std::string ch = "";
 			if (pKey->m_letter >= 0x20) 
 				ch = pKey->m_letter;
@@ -113,28 +147,29 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			// Set up key quad texture
 			if (m_pQuadTextures->HasChildren()) 
 				m_pQuadTextures->ClearChildren();
+			*/
 
-			auto keyBack = m_pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
-			keyBack->SetColorTexture(m_pKeyTexture.get());
+//			auto keyBack = m_pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
+//			keyBack->SetColorTexture(m_pKeyTexture.get());
 
-			pText = GetDOS()->MakeText(m_pFont, ch, 0.2f, text::flags::NONE | text::flags::RENDER_QUAD);
+//			pText = GetDOS()->MakeText(m_pFont, ch, 0.2f, text::flags::NONE | text::flags::RENDER_QUAD);
 			//GetDOS()->RenderToTexture(m_pQuadTextures);
 
-			auto pTexture = GetDOS()->MakeTexture(*(pText->GetFramebuffer()->GetColorTexture()));
-			m_keyTextureAtlas[pKey->m_letter] = pTexture;
+//			auto pTexture = GetDOS()->MakeTexture(*(pText->GetFramebuffer()->GetColorTexture()));
+//			m_keyTextureAtlas[pKey->m_letter] = pTexture;
 		}
 	}
 
 //Error:
 	return r;
 }
+
 RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 	RESULT r = R_PASS;
 	
 	m_pQuadTextures = GetDOS()->AddFlatContext();
 
 	auto& pLayoutKeys = pLayout->GetKeys();
-
 	//not flexible, TODO: take max of rows?
 	float keyDimension = m_surfaceWidth / (float)pLayoutKeys[0].size();
 
@@ -143,20 +178,39 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 	for (auto& layoutRow : pLayoutKeys) {
 		for (auto& pKey : layoutRow) {
 
-			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(keyDimension, keyDimension);
+			float uvLeft = pKey->m_left / (m_surfaceWidth * 2.0f);
+			float uvRight = (pKey->m_left + pKey->m_width) / (m_surfaceWidth * 2.0f);
 
-			if (m_keyTextureAtlas[pKey->m_letter])
-				pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]);
-
-			// Set up key quad positioning
-			pQuad->ScaleX(1.0f / (keyDimension / (0.5f*pKey->m_width)));
+			float uvTop = (rowIndex * pLayout->GetRowHeight()) / m_surfaceHeight;
+			float uvBottom = ((rowIndex+1) * pLayout->GetRowHeight()) / m_surfaceHeight;
 
 			float rowCount = (float)pLayoutKeys.size();
 			float zPos = (m_surfaceHeight / rowCount) * (rowIndex - (rowCount / 2.0f) + 0.5f);
 
 			float xPos = m_surfaceWidth * pKey->m_left - (m_surfaceWidth / 2.0f) +(pKey->m_width / 4.0f);
 
-			pQuad->SetPosition(point(xPos, 0.0f, zPos) + m_pSurface->GetPosition());
+			point ptOrigin = point(xPos, 0.0f, zPos) + m_pSurface->GetPosition();
+
+			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(
+				keyDimension,
+				keyDimension,
+				ptOrigin,
+				uvcoord(uvLeft, uvTop),
+				uvcoord(uvRight, uvBottom));
+				//uvcoord(0.0f, 0.0f),
+				//uvcoord(1.0f, 1.0f));
+
+//			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetColorTexture());
+			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
+
+/*
+			if (m_keyTextureAtlas[pKey->m_letter])
+				pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]);
+				//*/
+
+			// Set up key quad positioning
+			pQuad->ScaleX(1.0f / (keyDimension / (0.5f*pKey->m_width)));
+
 			pQuad->SetMaterialAmbient(0.75f);
 
 			pKey->m_pQuad = pQuad;
@@ -181,6 +235,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	RotationMatrix qOffset = RotationMatrix();
 	VirtualObj *pObj = nullptr;
 
+	GetComposite();
 	InteractionEngineProxy *pProxy = nullptr;
 	DreamOS *pDOS = GetDOS();
 
@@ -256,11 +311,13 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 		// get collision point and check that key is active
 		bool fActive = false;
+		ControllerType controllerType;
 		for (int j = 0; j < 2; j++) {
 			auto k = keyCollisions[j];
 			if (key == k) {
 				ptCollision = ptCollisions[j];
 				fActive = true;
+				controllerType = (ControllerType)(j);
 			}
 		}
 
@@ -280,6 +337,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		case KeyState::KEY_MAYBE_DOWN: {
 			if (ptCollision.y() < m_keyTypeThreshold) {
 				CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
+				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(controllerType, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 				key->m_state = KeyState::KEY_DOWN;
 			}
 			else key->m_state = KeyState::KEY_UP;
@@ -346,6 +404,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		CN(pKeyboard);
 		m_pLeftMallet->Show();
 		m_pRightMallet->Show();
+		//GetComposite()->SetPosition(point(0.0f, 1.0f, 0.0f));
 	Error:
 		return r;
 	};
@@ -478,13 +537,17 @@ RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 
 	m_pLayout->UpdateKeysWithLayout(kbType);
 
+	//*
 	for (auto layoutRow : m_pLayout->GetKeys()) {
 		for (auto& pKey : layoutRow) {
-			if (m_keyTextureAtlas.count(pKey->m_letter) > 0 && m_keyTextureAtlas[pKey->m_letter]) {
-				CR(pKey->m_pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]));
-			}
+	//		if (m_keyTextureAtlas.count(pKey->m_letter) > 0 && m_keyTextureAtlas[pKey->m_letter]) {
+	//			CR(pKey->m_pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]));
+	//		}
+			CR(pKey->m_pQuad->UpdateColorTexture(m_layoutAtlas[kbType]->GetFramebuffer()->GetColorTexture()));
 		}
 	}
+	//*/
+
 	m_currentLayout = kbType;
 	
 Error:
@@ -504,9 +567,9 @@ Error:
 	return R_PASS;
 }
 
-RESULT UIKeyboard::UpdateTextBox(int chkey) {
+RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 	RESULT r = R_PASS;
-		
+	/*
 	if (chkey == SVK_RETURN) {
 		CR(m_pTextBoxContainer->ClearChildren());
 	}
@@ -514,9 +577,10 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 	else if (chkey == SVK_BACK) {
 		CR(m_pTextBoxContainer->RemoveLastChild());
 	}
+	//*/
 
 	//TODO: this logic should probably be in UIKeyboardLayout
-	else if (chkey == SVK_SHIFT) {
+	if (chkey == SVK_SHIFT) {
 		LayoutType newType;
 		switch (m_currentLayout) {
 		case LayoutType::QWERTY: newType = LayoutType::QWERTY_UPPER; break;
@@ -540,14 +604,7 @@ RESULT UIKeyboard::UpdateTextBox(int chkey) {
 	}
 
 	else {
-		float keyDimension = m_surfaceWidth / (float)m_pLayout->GetKeys()[0].size();
-		if (m_keyCharAtlas.count(chkey) > 0) {
-			auto pQuad = m_pTextBoxContainer->AddQuad(keyDimension, keyDimension);
-			CN(pQuad);
-			CR(pQuad->UpdateColorTexture(m_keyCharAtlas[chkey]));
-			// TODO: Hard-coded positioning code here should be temporary
-			pQuad->SetPosition(point((keyDimension / 3.0f) * m_pTextBoxContainer->GetChildren().size() - (m_surfaceWidth / 2.0f), 0.001f, -m_surfaceHeight * 0.75f));
-		}
+		m_pTextBoxText->SetText(strEntered);
 	}
 
 

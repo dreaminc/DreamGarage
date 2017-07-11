@@ -64,6 +64,9 @@ public:
 	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin);
 	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin);
 
+	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
+
 	std::shared_ptr<DimRay> MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	std::shared_ptr<DimRay> AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 

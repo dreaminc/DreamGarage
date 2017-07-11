@@ -11,6 +11,7 @@ public:
 	RESULT clear();
 	size_t size();
 	RESULT pop_back();
+	std::string GetString();
 
 private:
 	std::string m_string;

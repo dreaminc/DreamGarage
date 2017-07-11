@@ -29,6 +29,7 @@ public:
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
 	RESULT InitializeTexturesWithLayout(LayoutType type);
+	RESULT InitializeLayoutTexture(LayoutType type);
 
 //DreamApp
 public:
@@ -82,7 +83,7 @@ private:
 	RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType);
 
 public:
-	RESULT UpdateTextBox(int chkey);
+	RESULT UpdateTextBox(int chkey, std::string strEntered);
 
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
@@ -102,9 +103,12 @@ private:
 	std::shared_ptr<quad> m_pTextBox;
 	std::shared_ptr<texture> m_pTextBoxTexture;
 
+	std::shared_ptr<text> m_pTextBoxText;
 	std::shared_ptr<composite> m_pTextBoxContainer;
 	std::map<unsigned int, texture*> m_keyCharAtlas;
 	std::map<unsigned int, texture*> m_keyTextureAtlas;
+
+	std::map<LayoutType, text*> m_layoutAtlas;
 
 	FlatContext *m_pQuadTextures;
 
