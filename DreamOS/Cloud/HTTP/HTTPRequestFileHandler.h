@@ -25,6 +25,11 @@ public:
 	virtual RESULT HandleHTTPResponse(char *pBuffer, size_t elementSize, size_t numElements) override;
 	virtual RESULT OnHTTPRequestComplete() override;
 
+	RESULT SetHandlerContext(void *pContext) {
+		m_pContext = pContext;
+		return R_PASS;
+	}
+
 private:
 	RESULT OpenFilePath();
 	RESULT SaveBufferToFilePath(char *pBuffer, size_t elementSize, size_t numElements);
@@ -46,6 +51,7 @@ private:
 	std::shared_ptr<std::vector<uint8_t>> m_pBufferVector = nullptr;
 
 	HTTPResponseFileCallback m_fnResponseFileCallback = nullptr;
+	void *m_pContext = nullptr;;
 };
 
 
