@@ -33,6 +33,7 @@ public:
 	std::vector<std::vector<std::shared_ptr<UIKey>>> GetKeys();
 
 	RESULT SetVisible(bool fVisible);
+	float GetRowHeight();
 
 private:
 	std::string GenerateQWERTYRow(int rowIndex, bool fUpper = false, bool fNum = false);
@@ -40,6 +41,7 @@ private:
 private:
 	LayoutType m_layoutType;
 	std::vector<std::vector<std::shared_ptr<UIKey>>> m_pLayout;
+	float m_rowHeight = 0.0625f;
 };
 
 

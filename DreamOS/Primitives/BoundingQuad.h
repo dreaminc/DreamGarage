@@ -48,6 +48,8 @@ public:
 	}
 
 	// Quad specific 
+	RESULT SetBounds(float width, float height);
+
 	double GetWidth();
 	double GetHeight();
 	double GetLeft(bool fAbsolute = true);

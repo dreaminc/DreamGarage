@@ -34,6 +34,8 @@ public:
 	float GetTop(bool fAbsolute = true);
 	float GetBottom(bool fAbsolute = true);
 
+	RESULT SetBounds(float width, float height);
+
 public:
 	framebuffer* GetFramebuffer();
 	RESULT SetFramebuffer(framebuffer* pFramebuffer);

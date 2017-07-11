@@ -828,6 +828,53 @@ Error:
 	return nullptr;
 }
 
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, pFont, textFlags);
+	CN(pText);
+
+	//CR(pText->SetText(strContent));
+	CR(pText->CreateLayout(pLayout, margin));
+
+	int fbWidth = pText->GetDPM(pText->GetWidth());
+	int fbHeight = pText->GetDPM(pText->GetHeight());
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
 text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	RESULT r = R_PASS;
 

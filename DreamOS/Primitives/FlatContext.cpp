@@ -112,6 +112,10 @@ RESULT FlatContext::SetFramebuffer(framebuffer* pFramebuffer) {
 	return R_PASS;
 }
 
+RESULT FlatContext::SetBounds(float width, float height) {
+	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->SetBounds(width, height);
+}
+
 float FlatContext::GetWidth() {
 	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetWidth();
 }
