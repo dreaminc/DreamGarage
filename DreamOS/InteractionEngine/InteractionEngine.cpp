@@ -587,6 +587,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 				}
 				else if (activeObjectQueue.first == ActiveObject::type::COLLIDE) {
 					interactionEvent.m_eventType = InteractionEventType::ELEMENT_COLLIDE_ENDED;
+					interactionEvent.m_pInteractionObject = pInteractionObject;
 				}
 
 				interactionEvent.m_pObject = pActiveObject->GetObject();

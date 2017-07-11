@@ -186,6 +186,16 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 	// ideally, some kind of path is managed in the cloud instead
 	if (m_pathStack.empty()) m_pathStack.push(m_pMenuNode);
 
+	auto pMalletHead = pSelected->GetInteractionObject();
+	if (pMalletHead != nullptr) {
+		if (pMalletHead == m_pLeftMallet->GetMalletHead()) {
+			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+		}
+		else if (pMalletHead == m_pRightMallet->GetMalletHead()) {
+			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(1), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+		}
+	}
+
 	for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 		if (pSelected->GetName() == pSubMenuNode->GetTitle()) {
 			const std::string& strScope = pSubMenuNode->GetScope();

@@ -55,6 +55,8 @@ RESULT UIButton::RegisterEvent(UIEventType type, std::function<RESULT(void*)> fn
 RESULT UIButton::Notify(UIEvent *pEvent) {
 	RESULT r = R_PASS;
 
+	m_pInteractionObject = pEvent->m_pInteractionObject;
+
 	std::function<RESULT(void*)> fnCallback;
 
 	CBR(pEvent->m_pObj == m_pSurface.get(), R_SKIPPED);
@@ -79,4 +81,8 @@ std::shared_ptr<composite> UIButton::GetContextComposite() {
 
 std::shared_ptr<composite> UIButton::GetSurfaceComposite() {
 	return m_pSurfaceComposite;
+}
+
+VirtualObj *UIButton::GetInteractionObject() {
+	return m_pInteractionObject;
 }

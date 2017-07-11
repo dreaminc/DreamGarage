@@ -107,19 +107,19 @@ RESULT UIView::Notify(InteractionObjectEvent *pEvent) {
 //	auto pRay = pEvent->m_pInteractionObject;
 	switch (pEvent->m_eventType) {
 	case (InteractionEventType::ELEMENT_COLLIDE_BEGAN): {
-		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_BEGIN, pEvent->m_pObject);
+		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_BEGIN, pEvent->m_pObject, pEvent->m_pInteractionObject);
 		CR(NotifySubscribers(UIEventType::UI_SELECT_BEGIN, pUIEvent));
 	} break;
 	case (InteractionEventType::ELEMENT_COLLIDE_MOVED): {
-		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_MOVED, pEvent->m_pObject);
+		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_MOVED, pEvent->m_pObject, pEvent->m_pInteractionObject);
 		CR(NotifySubscribers(UIEventType::UI_SELECT_MOVED, pUIEvent));
 	} break;
 	case (InteractionEventType::ELEMENT_COLLIDE_ENDED): {
-		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_ENDED, pEvent->m_pObject);
+		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_SELECT_ENDED, pEvent->m_pObject, pEvent->m_pInteractionObject);
 		CR(NotifySubscribers(UIEventType::UI_SELECT_ENDED, pUIEvent));
 	} break;
 	case (InteractionEventType::INTERACTION_EVENT_MENU): {
-		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_MENU, pEvent->m_pObject);
+		UIEvent *pUIEvent = new UIEvent(UIEventType::UI_MENU, pEvent->m_pObject, pEvent->m_pInteractionObject);
 		this;
 		CR(NotifySubscribers(UIEventType::UI_MENU, pUIEvent));
 	} break;
