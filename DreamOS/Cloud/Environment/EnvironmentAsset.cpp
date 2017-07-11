@@ -65,7 +65,9 @@ const std::string& EnvironmentAsset::GetTitle() {
 std::string EnvironmentAsset::GetURI() {
 	std::string strURI = "https://api.develop.dreamos.com/environment-asset/";
 	strURI += std::to_string(m_assetID);
-	strURI += "/file";
+	
+	//strURI += "/file";
+	strURI += "/content";
 
 	return strURI;
 }
