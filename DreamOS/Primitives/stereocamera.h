@@ -29,6 +29,7 @@ public:
 
 	virtual EYE_TYPE GetCameraEye() override;
 	RESULT SetCameraEye(EYE_TYPE eye);
+	RESULT SetHMDAdjustedPosition(point ptPosition);
 
 private:
 	EYE_TYPE m_eye;

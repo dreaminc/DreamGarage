@@ -56,6 +56,23 @@ point stereocamera::GetOrigin(bool fAbsolute) {
 	return eyePos;
 }
 
+RESULT stereocamera::SetHMDAdjustedPosition(point ptPosition) {
+	RESULT r = R_PASS;
+
+	if (m_pHMD != nullptr) {
+		point ptHMDOffset = m_pHMD->GetHeadPointOrigin();
+		point ptAdjustedPosition = ptPosition - ptHMDOffset;
+
+		SetPosition(ptAdjustedPosition);
+	}
+	else {
+		SetPosition(ptPosition);
+	}
+
+//Error:
+	return r;
+}
+
 point stereocamera::GetPosition(bool fAbsolute) {
 	return GetOrigin(fAbsolute);
 }
@@ -70,6 +87,7 @@ ViewMatrix stereocamera::GetViewMatrix(EYE_TYPE eye) {
 		point offset = m_pHMD->GetHeadPointOrigin();
 		eyePos += offset;
 	}
+
 	// View Matrix requires the opposite of the camera's world position
 	eyePos.Reverse();
 	quaternion q = camera::GetOrientation();
