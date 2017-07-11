@@ -52,22 +52,20 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	std::shared_ptr<quad> pIcon;
 
 	pText = std::shared_ptr<text>(m_pDreamOS->MakeText(labelFormat.pFont,
-		labelFormat.strLabel, 0.25, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+		labelFormat.strLabel, 0.035, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
 	pText->RotateXByDeg(90.0f);
 
 	pText->SetPosition(labelFormat.ptPosition);
-	AddObject(pText);
+	m_pSurfaceComposite->AddObject(pText);
 
 	m_strName = labelFormat.strLabel;
 
-	pIcon = AddQuad(1.0f, 1.0f);
-	pIcon->RotateXByDeg(90.0f);
+	//m_pSurface->RotateXByDeg(90.0f);
 
-	pIcon->SetPosition(iconFormat.ptPosition);
 	if (iconFormat.pTexture != nullptr)
-		pIcon->SetColorTexture(iconFormat.pTexture);
+		m_pSurface->SetColorTexture(iconFormat.pTexture);
 	else
-		pIcon->SetVisible(false);
+		m_pSurface->SetVisible(false);
 
 //Error:
 	return r;

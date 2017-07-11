@@ -343,6 +343,7 @@ RESULT UITestSuite::AddTestUIMenuItem() {
 
 			pMenuItem->Update(i, l);
 			pMenuItem->SetPosition(point(0.0f, 0.0f, 2.0));
+			//pMenuItem->SetOrientation()
 		}
 		
 	Error:

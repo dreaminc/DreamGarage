@@ -27,7 +27,9 @@ RESULT UIButton::Initialize() {
 	}
 
 	m_pContextComposite = AddComposite();
+	m_pSurfaceComposite = AddComposite();
 	m_pSurface = AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector::kVector());
+	//m_pSurface = m_pSurfaceComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector::kVector());
 
 	CN(m_pSurface);
 	CR(InitializeOBB());
@@ -71,6 +73,10 @@ std::shared_ptr<quad> UIButton::GetSurface() {
 	return m_pSurface;
 }
 
-std::shared_ptr<composite> UIButton::GetComposite() {
+std::shared_ptr<composite> UIButton::GetContextComposite() {
 	return m_pContextComposite;
+}
+
+std::shared_ptr<composite> UIButton::GetSurfaceComposite() {
+	return m_pSurfaceComposite;
 }

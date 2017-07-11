@@ -77,7 +77,6 @@ RESULT UIScrollView::Update() {
 		m_yRotation = std::max(0.0f, std::min(m_yRotation + m_velocity, maxRotation));
 
 		// update visible items / index
-		// TODO: it is possible for one of these animations to get invalidated, not sure how to reproduce
 		if (m_yRotation > 0.0f) {// && !m_pLeftScrollButton->IsVisible()) {
 			//ShowButton(m_pLeftScrollButton.get());
 			m_pLeftScrollButton->SetVisible(true);
@@ -111,6 +110,10 @@ RESULT UIScrollView::Update() {
 			}
 		}
 	}
+	else {
+		m_pLeftScrollButton->SetVisible(false);
+		m_pRightScrollButton->SetVisible(false);
+	}
 Error:
 	return r; 
 }
@@ -135,6 +138,7 @@ RESULT UIScrollView::PositionMenuButton(int index, std::shared_ptr<UIButton> pBu
 	quaternion qQuad = quaternion::MakeQuaternionWithEuler(radX, 0.0f, 0.0f);
 
 	pButton->GetSurface()->SetOrientation(qQuad);
+	pButton->GetSurfaceComposite()->SetOrientation(qQuad);
 
 	return r;
 }
@@ -178,7 +182,7 @@ RESULT UIScrollView::UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pB
 		i++;
 	}
 	
-	//*
+	/*
 	if (m_pMenuButtonsContainer->GetChildren().size() > m_maxElements) {
 		m_pRightScrollButton->SetVisible(true);
 	//	ShowButton(m_pRightScrollButton.get());
@@ -259,6 +263,9 @@ RESULT UIScrollView::StopScroll(void *pContext) {
 RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
 	RESULT r = R_PASS;
 
+	m_pLeftScrollButton->SetVisible(false);
+	m_pRightScrollButton->SetVisible(false);
+
 	for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
 		auto pObj = reinterpret_cast<UIButton*>(pButton.get());
 		if (pObj != pPushButton) {
@@ -287,7 +294,8 @@ RESULT UIScrollView::HideButton(UIButton* pScrollButton) {
 	};
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		pScrollButton->GetSurface().get(),
+		//pScrollButton->GetSurface().get(),
+		pScrollButton,
 		color(1.0f, 1.0f, 1.0f, 0.0f),
 		0.1f,
 		AnimationCurveType::LINEAR,
@@ -335,7 +343,8 @@ RESULT UIScrollView::HideAndPushButton(UIButton* pButton) {
 		return R_PASS;
 	};
 
-	auto pSurface = pButton->GetSurface().get();
+	auto pSurface = pButton;
+	//auto pSurface = pButton->GetSurface().get();
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pSurface,
