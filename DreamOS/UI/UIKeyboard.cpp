@@ -65,10 +65,10 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyObjects[1] = nullptr;
 
 	// pre-load possible keyboard layers 
-	InitializeTexturesWithLayout(LayoutType::QWERTY);
-	InitializeTexturesWithLayout(LayoutType::QWERTY_UPPER);
-	InitializeTexturesWithLayout(LayoutType::QWERTY_NUM);
-	InitializeTexturesWithLayout(LayoutType::QWERTY_SYMBOL);
+	//InitializeTexturesWithLayout(LayoutType::QWERTY);
+	//InitializeTexturesWithLayout(LayoutType::QWERTY_UPPER);
+	//InitializeTexturesWithLayout(LayoutType::QWERTY_NUM);
+	//InitializeTexturesWithLayout(LayoutType::QWERTY_SYMBOL);
 
 	auto pLayout = new UIKeyboardLayout();
 	pLayout->CreateQWERTYLayout(); // should be in constructor probably
@@ -105,10 +105,10 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			if (pKey->m_letter >= 0x20) 
 				ch = pKey->m_letter;
 
-			std::shared_ptr<text> pText = m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
-			GetDOS()->RenderToTexture(m_pQuadTextures);
+			text* pText = GetDOS()->MakeText(m_pFont, ch, 0.2f, text::flags::NONE | text::flags::RENDER_QUAD);
+			//GetDOS()->RenderToTexture(m_pQuadTextures);
 
-			m_keyCharAtlas[pKey->m_letter] = GetDOS()->MakeTexture(*(m_pQuadTextures->GetFramebuffer()->GetColorTexture()));
+			m_keyCharAtlas[pKey->m_letter] = GetDOS()->MakeTexture(*(pText->GetFramebuffer()->GetColorTexture()));
 
 			// Set up key quad texture
 			if (m_pQuadTextures->HasChildren()) 
@@ -117,10 +117,10 @@ RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
 			auto keyBack = m_pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
 			keyBack->SetColorTexture(m_pKeyTexture.get());
 
-			pText = m_pQuadTextures->AddText(m_pFont, m_pFont->GetTexture().get(), ch, 0.2f, true);
-			GetDOS()->RenderToTexture(m_pQuadTextures);
+			pText = GetDOS()->MakeText(m_pFont, ch, 0.2f, text::flags::NONE | text::flags::RENDER_QUAD);
+			//GetDOS()->RenderToTexture(m_pQuadTextures);
 
-			auto pTexture = GetDOS()->MakeTexture(*(m_pQuadTextures->GetFramebuffer()->GetColorTexture()));
+			auto pTexture = GetDOS()->MakeTexture(*(pText->GetFramebuffer()->GetColorTexture()));
 			m_keyTextureAtlas[pKey->m_letter] = pTexture;
 		}
 	}

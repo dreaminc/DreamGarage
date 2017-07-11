@@ -180,6 +180,23 @@ Error:
 	return r;
 }
 
+RESULT DimObj::SetMaterialColors(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetColors(c,c,c);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialColors(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 	RESULT r = R_PASS;
 

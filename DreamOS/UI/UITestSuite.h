@@ -56,6 +56,7 @@ public:
 	RESULT AddTestBrowserRequestWithMenuAPI();
 	RESULT AddTestKeyboard();
 	RESULT AddTestUIView();
+	RESULT AddTestUIMenuItem();
 	RESULT AddTestFont();
 	RESULT AddTestFlatContextCompositionQuads();
 
@@ -75,6 +76,7 @@ public:
 
 private:
 	RESULT SetupPipeline();
+	RESULT SetupUINodePipeline();
 
 private:
 	DreamOS *m_pDreamOS;

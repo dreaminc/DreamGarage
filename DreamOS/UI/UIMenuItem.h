@@ -16,7 +16,7 @@ class DreamOS;
 
 struct IconFormat
 {
-	std::shared_ptr<texture> pTexture;
+	texture* pTexture;
 	float height;
 	float width;
 	point ptPosition;
@@ -25,7 +25,7 @@ struct IconFormat
 		pTexture(nullptr),
 		height(ICON_HEIGHT),
 		width(ICON_WIDTH),
-		ptPosition(0.0f, 0.25f, 0.0f)
+		ptPosition(0.0f, 0.35f, 0.0f)
 	{}
 };
 
@@ -46,7 +46,7 @@ struct LabelFormat
 		pFont(nullptr),
 		strLabel(""),
 		fontSize(LABEL_SIZE),
-		ptPosition(0.0f, -0.9f, 0.0f),
+		ptPosition(0.0f, -0.25f, 0.0f),
 		vScale(1.0f, 1.0f, 1.0f)
 	{}
 };

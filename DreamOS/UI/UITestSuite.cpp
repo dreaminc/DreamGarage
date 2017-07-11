@@ -54,6 +54,10 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	//CR(AddTestKeyboard());
+
+	CR(AddTestUIMenuItem());
+
 	CR(AddTestFont());
 
 	CR(AddTestUIView());
@@ -65,7 +69,6 @@ RESULT UITestSuite::AddTests() {
 	CR(AddTestBrowserRequestWithMenuAPI());
 	CR(AddTestBrowserRequest());
 
-	CR(AddTestKeyboard());
 
 	CR(AddTestBrowser());
 
@@ -298,6 +301,87 @@ RESULT UITestSuite::AddTestFlatContextCompositionQuads() {
 
 	pUITest->SetTestName("Flat Context Composition Test");
 	pUITest->SetTestDescription("Flat context composition test");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT UITestSuite::AddTestUIMenuItem() {
+	RESULT r = R_PASS;
+	
+	double sTestTime = 6000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		m_pDreamOS->SetGravityState(false);
+
+		CR(SetupUINodePipeline());
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
+		{
+			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+			auto pComposite = m_pDreamOS->MakeComposite();
+			auto pView = pComposite->AddUIView(m_pDreamOS);
+			auto pMenuItem = pView->AddUIMenuItem();
+			m_pDreamOS->AddObjectToUIGraph(pComposite);
+
+			IconFormat i = IconFormat();
+			LabelFormat l = LabelFormat();
+
+			l.pFont = pFont;
+			l.strLabel = "testing";
+
+			texture* pPNG = m_pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			i.pTexture = pPNG;
+
+			pMenuItem->Update(i, l);
+			pMenuItem->SetPosition(point(0.0f, 0.0f, 2.0));
+			//pMenuItem->SetOrientation()
+		}
+		
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(r);
+
+	Error:
+		return r;
+	};
+
+	// Reset Code
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		// Will reset the sandbox as needed between tests
+		CN(m_pDreamOS);
+		CR(m_pDreamOS->RemoveAllObjects());
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS->GetCloudController());
+	CN(pUITest);
+
+	pUITest->SetTestName("Browser Request Test");
+	pUITest->SetTestDescription("Basic test of browser working with a web request");
 	pUITest->SetTestDuration(sTestTime);
 	pUITest->SetTestRepeats(nRepeats);
 
@@ -607,6 +691,55 @@ Error:
 	return r;
 }
 
+RESULT UITestSuite::SetupUINodePipeline() {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	//CR(pHAL->MakeCurrentContext());
+
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+//	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+//*
+	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	CN(pUIProgramNode);
+	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
+	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	//*/
+
+	// Screen Quad Shader (opt - we could replace this if we need to)
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+
+	// Connect Program to Display
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+Error:
+	return r;
+}
+
 RESULT UITestSuite::SetupPipeline() {
 	RESULT r = R_PASS;
 
@@ -747,7 +880,9 @@ RESULT UITestSuite::AddTestKeyboard() {
 
 		CR(SetupPipeline());
 
-		m_pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+		//m_pKeyboard = m_pDreamOS->LaunchDreamApp<UIKeyboard>(this);
+		CR(m_pDreamOS->InitializeKeyboard());
+		m_pKeyboard = m_pDreamOS->GetKeyboard();
 		m_pKeyboard->ShowKeyboard();
 
 		CR(Initialize());
