@@ -41,7 +41,7 @@ private:
 	OGLUniformMatrix4 *m_pUniformProjectionMatrix;
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
-	OGLUniformBool *m_pUniformHasTexture;
+	OGLUniformBool *m_pUniformHasColorTexture;
 
 	OGLUniform *m_pUniformBuffer;
 	OGLUniform *m_pUniformGamma;

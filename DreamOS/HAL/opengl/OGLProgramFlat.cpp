@@ -27,7 +27,7 @@ RESULT OGLProgramFlat::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformProjectionMatrix), std::string("u_mat4Projection")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
-	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTexture), std::string("u_hasTexture")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasColorTexture), std::string("u_hasColorTexture")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformfDistanceMap), std::string("u_fDistanceMap")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformBuffer), std::string("u_buffer")));
@@ -104,6 +104,9 @@ RESULT OGLProgramFlat::RenderFlatContext(FlatContext *pFlatContext) {
 
 		m_pUniformProjectionMatrix->SetUniform(matP);
 
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_BLEND);
+
 		CR(RenderObject(pFlatContext));
 	}
 
@@ -123,11 +126,13 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
-
-		m_pUniformHasTexture->SetUniform(true);
+		
+		m_pUniformfDistanceMap->SetUniform(pTexture->IsDistanceMapped());
+		m_pUniformHasColorTexture->SetUniform(true);
 	}
 	else {
-		m_pUniformHasTexture->SetUniform(false);
+		m_pUniformHasColorTexture->SetUniform(false);
+		m_pUniformfDistanceMap->SetUniform(false);
 	}
 
 	return r;
@@ -138,8 +143,8 @@ RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
 	auto matModel = pDimObj->VirtualObj::GetModelMatrix();
 	m_pUniformModelMatrix->SetUniform(matModel);
 
+	/*
 	text *pText = dynamic_cast<text*>(pDimObj);
-
 	if (pText != nullptr) {
 		float buffer = pText->GetFont()->GetBuffer();
 		float gamma = pText->GetFont()->GetGamma();
@@ -147,11 +152,12 @@ RESULT OGLProgramFlat::SetObjectUniforms(DimObj *pDimObj) {
 		m_pUniformBuffer->SetUniformFloat(&buffer);
 		m_pUniformGamma->SetUniformFloat(&gamma);
 
-		m_pUniformfDistanceMap->SetUniform(pText->GetFont()->HasDistanceMap());
+		//m_pUniformfDistanceMap->SetUniform(pText->GetFont()->HasDistanceMap());
 	}
 	else {
-		m_pUniformfDistanceMap->SetUniform(true);
+		//m_pUniformfDistanceMap->SetUniform(true);
 	}
+	*/
 
 	return R_PASS;
 }

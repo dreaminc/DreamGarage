@@ -15,6 +15,12 @@
 
 class texture : public valid {
 public:
+	enum class flags : uint16_t {
+		NONE			= 0,
+		DISTANCE_MAP	= 1 << 0,
+		INVALID			= 0xFFFF
+	};
+
 	// The texture type and channel
 	enum class TEXTURE_TYPE {
 		TEXTURE_COLOR = 0,
@@ -157,6 +163,9 @@ public:
 		return R_PASS;
 	}
 
+	bool IsDistanceMapped();
+	RESULT SetDistanceMapped();
+
 protected:
 	PixelFormat	m_format = PixelFormat::Unspecified;
 	TEXTURE_TYPE m_type;
@@ -167,10 +176,24 @@ protected:
 	int m_samples = 0;
 	int m_levels = 0;
 
+	flags m_flags = texture::flags::NONE;
+
 	unsigned char *m_pImageBuffer = nullptr;
 
 private:
 	UID m_uid;
 };
+
+inline constexpr texture::flags operator | (const texture::flags &lhs, const texture::flags &rhs) {
+	return static_cast<texture::flags>(
+		static_cast<std::underlying_type<texture::flags>::type>(lhs) | static_cast<std::underlying_type<texture::flags>::type>(rhs)
+		);
+}
+
+inline constexpr texture::flags operator & (const texture::flags &lhs, const texture::flags &rhs) {
+	return static_cast<texture::flags>(
+		static_cast<std::underlying_type<texture::flags>::type>(lhs) & static_cast<std::underlying_type<texture::flags>::type>(rhs)
+		);
+}
 
 #endif // ! TEXTURE_H_

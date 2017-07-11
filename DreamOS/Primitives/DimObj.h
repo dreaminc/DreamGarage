@@ -133,7 +133,7 @@ public:
 	RESULT TransformUV(matrix<uv_precision, 2, 1> matA, matrix<uv_precision, 2, 2> matB);
 
 	// Children (composite objects)
-	RESULT AddChild(std::shared_ptr<DimObj> pDimObj);
+	RESULT AddChild(std::shared_ptr<DimObj> pDimObj, bool fFront = false);
 	RESULT RemoveChild(std::shared_ptr<DimObj> pDimObj);
 	RESULT RemoveChild(VirtualObj *pObj);
 	RESULT RemoveLastChild();

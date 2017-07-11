@@ -24,9 +24,9 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestSenseHaptics());
-
 	CR(AddTestBlinnPhongShaderTexture());
+
+	CR(AddTestSenseHaptics());
 
 	CR(AddTestMinimalTextureShader());
 
@@ -1076,7 +1076,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		pVolume->SetColorTexture(pColorTexture2);
 
 
-		auto pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
+		auto pQuad = m_pDreamOS->AddQuad(1.0f, 0.5f, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
 		CN(pQuad);
 		pQuad->SetPosition(point(width, 0.0f, (length + padding) * -0.0f));
 		//CR(pVolume->SetColor(COLOR_GREEN));

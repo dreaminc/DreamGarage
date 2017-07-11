@@ -334,6 +334,9 @@ RESULT font::SetTexture(std::shared_ptr<texture> pTexture) {
 	CN(pTexture);
 	m_pTexture = pTexture;
 
+	// TODO: More stuff to generalize here
+	m_pTexture->SetDistanceMapped();
+
 Error:
 	return r;
 }

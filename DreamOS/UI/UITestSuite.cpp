@@ -456,6 +456,7 @@ RESULT UITestSuite::AddTestFont() {
 			*/
 
 			// Layout
+			/*
 			auto pLayout = new UIKeyboardLayout();
 			CN(pLayout);
 			CR(pLayout->CreateQWERTYLayout());
@@ -464,6 +465,21 @@ RESULT UITestSuite::AddTestFont() {
 			//auto pText = m_pDreamOS->AddText(pFont, pLayout, .025f, 0.025f, 0.01f, 0.01f);
 			CN(pText);
 			pText->RotateXByDeg(90.0f);
+			*/
+
+			// background
+			//auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP | text::flags::RENDER_QUAD);
+			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP);
+			CN(pText);
+
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			//pText->SetBackgroundColor(COLOR_BLUE);
+			pText->SetBackgroundColorTexture(pColorTexture1);
+
+			pText->RenderToQuad();
+
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
 
 			//pQuad = AddQuad(slsld)
 			//pText->GetColorTexture()
@@ -768,8 +784,8 @@ RESULT UITestSuite::SetupPipeline() {
 	CR(pHAL->MakeCurrentContext());
 	
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);

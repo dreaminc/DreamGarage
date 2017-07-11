@@ -328,12 +328,18 @@ Error:
 }
 
 // Children (composite objects)
-RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
+RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj, bool fFront) {
 	if (m_pObjects == nullptr) {
 		m_pObjects = std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>>(new std::vector<std::shared_ptr<VirtualObj>>);
 	}
 
-	m_pObjects->push_back(pDimObj);
+	if (fFront) {
+		m_pObjects->insert(m_pObjects->begin(), pDimObj);
+	}
+	else {
+		m_pObjects->push_back(pDimObj);
+	}
+
 	pDimObj->SetParent(this);
 
 	return R_PASS;
