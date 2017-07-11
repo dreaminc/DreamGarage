@@ -442,8 +442,8 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 
 				// Position
 				float glyphQuadXPosition = pUIKey->m_left;
-				float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
-				//float glyphQuadYPosition = posY;
+				//float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
+				float glyphQuadYPosition = posY;
 				
 				if ((pUIKey->m_left + pUIKey->m_width) > width)
 					width = (pUIKey->m_left + pUIKey->m_width);

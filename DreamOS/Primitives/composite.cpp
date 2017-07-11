@@ -327,6 +327,32 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) {
+
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
+
+	//Success:
+	return pQuad;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
+	CR(AddObject(pQuad));
+
+	//Success:
+	return pQuad;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 

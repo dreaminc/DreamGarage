@@ -57,7 +57,7 @@ RESULT UITestSuite::AddTests() {
 	
 	CR(AddTestFont());
 
-	//CR(AddTestKeyboard());
+	CR(AddTestKeyboard());
 
 	CR(AddTestUIMenuItem());
 
@@ -921,6 +921,7 @@ RESULT UITestSuite::AddTestKeyboard() {
 		CR(m_pDreamOS->InitializeKeyboard());
 		m_pKeyboard = m_pDreamOS->GetKeyboard();
 		m_pKeyboard->ShowKeyboard();
+		//m_pKeyboard->GetComposite()->SetPosition(point(0.0f, 1.0f, 0.0f));
 
 		CR(Initialize());
 

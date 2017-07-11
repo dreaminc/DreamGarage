@@ -309,19 +309,13 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
-				m_strEntered.clear();
-			}
-
-			else if (pEvent->m_value == SVK_BACK) {
-				if (m_strEntered.size() > 0)
-					m_strEntered.pop_back();
 			}
 
 			char chKey = (char)(pEvent->m_value);
 
 			CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
 			m_strEntered.UpdateString(chKey);
-			GetDOS()->GetKeyboard()->UpdateTextBox(chKey);
+			GetDOS()->GetKeyboard()->UpdateTextBox(chKey, m_strEntered.GetString());
 
 		} break;
 	}

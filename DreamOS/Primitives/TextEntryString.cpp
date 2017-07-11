@@ -42,3 +42,7 @@ RESULT TextEntryString::pop_back() {
 	m_string.pop_back();
 	return R_PASS;
 }
+
+std::string TextEntryString::GetString() {
+	return m_string;
+}
