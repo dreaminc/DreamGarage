@@ -40,6 +40,8 @@
 
 #include "UI/UIKeyboard.h"
 
+class UIKeyboardLayout;
+
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
 	public valid 
@@ -147,6 +149,9 @@ public:
 
 	text *AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 	text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
+
+	text *AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
+	text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
 
 	std::shared_ptr<font> MakeFont(std::wstring wstrFontFileName, bool fDistanceMap = false);
 	

@@ -22,6 +22,8 @@ class font;
 class HALImp;
 struct CharacterGlyph;
 
+class UIKeyboardLayout;
+
 //class text : public DimObj {
 class text : public FlatContext {
 public:
@@ -51,12 +53,14 @@ public:
 	};
 
 public:
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, text::flags textFlags = text::flags::NONE);
 	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE);
 	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE);
 	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 	~text();
 
 	virtual RESULT SetText(const std::string& strText);
+	RESULT CreateLayout(UIKeyboardLayout *pLayout, double marginRatio = 0.25f);
 	
 	VirtualObj* SetPosition(point pt, VerticalAlignment vAlign = VerticalAlignment::MIDDLE, HorizontalAlignment hAlign = HorizontalAlignment::CENTER);
 

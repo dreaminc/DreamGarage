@@ -49,6 +49,8 @@ class model;
 class user;
 class Message;
 
+class UIKeyboardLayout;
+
 class DreamAppManager;
 
 class SandboxApp : 
@@ -201,6 +203,9 @@ public:
 	cylinder* AddCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions);
 
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
+
+	text *AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
+	text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
 
 	text *AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE);
 	text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE);

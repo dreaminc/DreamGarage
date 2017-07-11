@@ -8,6 +8,22 @@
 #include "HAL/HALImp.h"
 #include "Framebuffer.h"
 
+#include "UI/UIKeyboardLayout.h"
+
+#include "Core/Utilities.h"
+
+text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, text::flags textFlags) :
+	FlatContext(pHALImp),
+	m_pFont(pFont),
+	m_width(1.0f),
+	m_height(1.0f),
+	m_flags(textFlags)
+{
+	RESULT r = R_PASS;
+
+	Validate();
+	return;
+}
 
 text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
 	FlatContext(pHALImp),
@@ -348,7 +364,7 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 
 	// Position
 	float glyphQuadXPosition = posX + ((float)(glyph.width) / 2.0f) + (float)(glyph.bearingX);
-	float glyphQuadYPosition = posY - ((float)(fontBase)-(float)(glyph.bearingY) - ((float)(glyph.height) / 2.0f));
+	float glyphQuadYPosition = posY - ((float)(fontBase) - (float)(glyph.bearingY) - ((float)(glyph.height) / 2.0f));
 
 	// Apply DPMM and scale factor
 
@@ -371,6 +387,81 @@ Error:
 	}
 
 	return nullptr;*/
+}
+
+RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
+	RESULT r = R_PASS;
+
+	// Clear out kids
+	CR(ClearChildren());
+
+	//float posX = 0.0f;
+	float posY = 0.0f;
+
+	float width = 0.0f;
+	//float height = 0.0f;
+
+	float fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
+	float fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
+	float fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
+
+	float rowHeight = pLayout->GetRowHeight();
+
+	float effLineHeightM = GetMSizeFromDots(m_pFont->GetFontLineHeight());
+	
+	util::Clamp<double>(marginRatio, 0.0f, 0.5f);
+
+	m_scaleFactor = (rowHeight / effLineHeightM) * (1.0f - marginRatio);
+
+	// Create the layout in text form
+	for (auto &layoutRow : pLayout->GetKeys()) {
+		for (auto &pUIKey : layoutRow) {
+			CharacterGlyph glyph;
+			if (m_pFont->GetGlyphFromChar((char)(pUIKey->m_letter), glyph)) {
+				//AddGlyphQuad(glyph, posX, posY);
+
+				// Get UV values 
+				float uvTop = (fontImageHeight - glyph.y) / fontImageHeight;
+				float uvBottom = ((fontImageHeight - glyph.y) - glyph.height) / fontImageHeight;
+
+				uvBottom = 1.0f - uvBottom;
+				uvTop = 1.0f - uvTop;
+
+				float uvLeft = glyph.x / fontImageWidth;
+				float uvRight = (glyph.x + glyph.width) / fontImageWidth;
+
+				uvcoord uvTopLeft = uvcoord(uvLeft, uvTop);
+				uvcoord uvBottomRight = uvcoord(uvRight, uvBottom);
+
+				// Position
+				float glyphQuadXPosition = pUIKey->m_left;
+				float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
+				
+				if ((pUIKey->m_left + pUIKey->m_width) > width)
+					width = (pUIKey->m_left + pUIKey->m_width);
+
+				// Size
+				float glyphWidth = GetMSizeFromDots(glyph.width) * m_scaleFactor;
+				float glyphHeight = GetMSizeFromDots(glyph.height) * m_scaleFactor;
+
+				point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
+				std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
+
+				//posX += (float)(glyph.advance);
+			}
+		}
+
+		//posX = 0.0f;
+		posY += rowHeight;
+	}
+
+	m_width = width;
+	m_height = posY;
+
+	FlatContext::SetBounds(m_width, m_height);
+
+Error:
+	return r;
 }
 
 RESULT text::SetText(const std::string& strText) {

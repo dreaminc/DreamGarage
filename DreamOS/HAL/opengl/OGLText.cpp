@@ -1,6 +1,14 @@
 #include "OGLText.h"
 #include "Primitives/font.h"
 
+OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, text::flags textFlags) :
+	text(pParentImp, pFont, textFlags),
+	OGLObj(pParentImp)
+{
+	// TODO: Implement valid and CV EHM
+	RESULT r = OGLInitialize();
+}
+
 OGLText::OGLText(OpenGLImp *pParentImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
 	text(pParentImp, pFont, strText, width, height, fBillboard),
 	OGLObj(pParentImp)

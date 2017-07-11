@@ -1045,6 +1045,46 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = MakeText(pFont, pLayout, margin, textFlags);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, pLayout, margin, textFlags);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
 text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	RESULT r = R_PASS;
 

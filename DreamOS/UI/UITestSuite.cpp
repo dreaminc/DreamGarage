@@ -31,6 +31,7 @@
 #include "Primitives/text.h"
 #include "Primitives/framebuffer.h"
 
+#include "UI/UIKeyboardLayout.h"
 
 UITestSuite::UITestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -53,12 +54,12 @@ UITestSuite::~UITestSuite() {
 
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
+	
+	CR(AddTestFont());
 
 	//CR(AddTestKeyboard());
 
 	CR(AddTestUIMenuItem());
-
-	CR(AddTestFont());
 
 	CR(AddTestUIView());
 
@@ -411,7 +412,7 @@ RESULT UITestSuite::AddTestFont() {
 			CN(pFont);
 
 			// Fit to Scale
-			
+			/*
 			auto pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD);
 			CN(pText);
 			//pText->RenderToQuad();
@@ -452,6 +453,20 @@ RESULT UITestSuite::AddTestFont() {
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
 			pText->SetText("testing this thing");
+			*/
+
+			// Layout
+			auto pLayout = new UIKeyboardLayout();
+			CN(pLayout);
+			CR(pLayout->CreateQWERTYLayout());
+
+			auto pText = m_pDreamOS->AddText(pFont, pLayout, 0.25f, text::flags::RENDER_QUAD);
+			//auto pText = m_pDreamOS->AddText(pFont, pLayout, .025f, 0.025f, 0.01f, 0.01f);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+
+			//pQuad = AddQuad(slsld)
+			//pText->GetColorTexture()
 
 		}
 

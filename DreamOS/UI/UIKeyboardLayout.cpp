@@ -198,6 +198,11 @@ RESULT UIKeyboardLayout::SetVisible(bool fVisible) {
 			CR(key->m_pQuad->SetVisible(fVisible));
 		}
 	}
+
 Error:
 	return r;
+}
+
+float UIKeyboardLayout::GetRowHeight() {
+	return m_rowHeight;
 }

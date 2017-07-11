@@ -336,11 +336,19 @@ Error:
 	return nullptr;
 }
 
-text *DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+text* DreamOS::AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+	return m_pSandbox->AddText(pFont, pLayout, margin, textFlags);
+}
+
+text* DreamOS::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+	return m_pSandbox->MakeText(pFont, pLayout, margin, textFlags);
+}
+
+text* DreamOS::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	return m_pSandbox->AddText(pFont, strContent, lineHeightM, textFlags);
 }
 
-text *DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+text* DreamOS::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
 	return m_pSandbox->MakeText(pFont, strContent, lineHeightM, textFlags);
 }
 

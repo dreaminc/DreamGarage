@@ -225,6 +225,13 @@ RESULT BoundingQuad::SetMaxPointFromOrigin(point ptMax) {
 	return R_SUCCESS;
 }
 
+RESULT BoundingQuad::SetBounds(float width, float height) {
+	m_width = width;
+	m_height = height;
+
+	return R_SUCCESS;
+}
+
 RESULT BoundingQuad::SetHalfVector(vector vHalfVector) {
 	RESULT r = R_PASS;
 
