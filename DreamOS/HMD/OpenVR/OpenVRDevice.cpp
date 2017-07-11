@@ -138,7 +138,10 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	CNM(m_pCompositor, "Failed to initialize IVR compositor");
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
-	m_pSenseController = new SenseController();
+	
+	// TODO: Fix this
+	//m_pSenseController = new SenseController();
+	CN(m_pSenseController);
 
 	OVERLAY_DEBUG_OUT("HMD Vive - On");
 
@@ -301,6 +304,32 @@ RESULT OpenVRDevice::InitializeRenderModels() {
 
 Error:
 	return r;
+}
+
+VirtualObj *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType) {
+	/*
+	switch (controllerType) {
+	case CONTROLLER_LEFT: {
+#ifdef _USE_TEST_APP
+		return m_pLeftControllerModel->GetFirstChild<sphere>().get();
+#else
+		return m_pLeftControllerModel;
+#endif
+	} break;
+
+	case CONTROLLER_RIGHT: {
+#ifdef _USE_TEST_APP
+		return m_pRightControllerModel->GetFirstChild<sphere>().get();
+#else
+		return m_pRightControllerModel;
+#endif
+	} break;
+	}
+	*/
+
+	// TODO:! 
+
+	return nullptr;
 }
 
 RESULT OpenVRDevice::SetupStereoRenderTargets() {

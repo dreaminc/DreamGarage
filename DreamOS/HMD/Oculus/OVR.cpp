@@ -15,6 +15,8 @@
 
 #include "OVRHMDSinkNode.h"
 
+#include "OVRTouchController.h"
+
 OVRHMD::OVRHMD(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_ovrSession(nullptr),
@@ -58,6 +60,7 @@ HMDSourceNode* OVRHMD::GetHMDSourceNode() {
 
 RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	RESULT r = R_PASS;
+
 	ovrGraphicsLuid luid;
 	m_pHALImp = halimp;
 	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(halimp);
@@ -95,12 +98,16 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	// Turn off vsync to let the compositor do its magic
 	oglimp->wglSwapIntervalEXT(0);
 
-	m_pSenseController = new SenseController();
+	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
+
+	// Controller
+
+	m_pSenseController = new OVRTouchController(m_ovrSession);
+	CN(m_pSenseController);
+	CR(m_pSenseController->Initialize());
 
 	qLeftRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(M_PI / 2.0f));
 	qRightRotation = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)(-M_PI / 2.0f));
-
-	OVERLAY_DEBUG_OUT("HMD Oculus Rift - On");
 
 #ifdef _USE_TEST_APP
 	// In testing we just use spheres to speed up on testing
@@ -144,6 +151,30 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 
 Error:
 	return r;
+}
+
+
+
+VirtualObj *OVRHMD::GetSenseControllerObject(ControllerType controllerType) {
+	switch (controllerType) {
+		case CONTROLLER_LEFT: {
+			#ifdef _USE_TEST_APP
+				return m_pLeftControllerModel->GetFirstChild<sphere>().get();
+			#else
+				return m_pLeftControllerModel;
+			#endif
+		} break;
+
+		case CONTROLLER_RIGHT: {
+			#ifdef _USE_TEST_APP
+				return m_pRightControllerModel->GetFirstChild<sphere>().get();
+			#else
+				return m_pRightControllerModel;
+			#endif
+		} break;
+	}
+
+	return nullptr;
 }
 
 ProjectionMatrix OVRHMD::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {

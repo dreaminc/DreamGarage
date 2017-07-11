@@ -137,6 +137,20 @@ public:
 	RESULT RemoveChild(VirtualObj *pObj);
 	RESULT RemoveLastChild();
 	RESULT ClearChildren();
+
+	// Explicit instantiations in source 
+	template <class objType> 
+	std::shared_ptr<objType> GetFirstChild() {
+		for (auto &pChildObject : *m_pObjects) {
+			std::shared_ptr<objType> pObj = std::dynamic_pointer_cast<objType>(pChildObject);
+			if (pObj != nullptr) {
+				return pObj;
+			}
+		}
+
+		return nullptr;
+	}
+
 	bool HasChildren();
 	bool CompareParent(DimObj* pParent);
 

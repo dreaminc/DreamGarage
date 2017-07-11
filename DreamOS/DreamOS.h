@@ -69,6 +69,8 @@ public:
 
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
 
+	HMD *GetHMD();
+
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();
 	CloudController *GetCloudController();

@@ -154,6 +154,10 @@ RESULT DreamOS::GetMouseRay(ray &rCast, double t) {
 	return m_pSandbox->GetMouseRay(rCast, t);
 }
 
+HMD *DreamOS::GetHMD() {
+	return m_pSandbox->m_pHMD;
+}
+
 RESULT DreamOS::SetHALConfiguration(HALImp::HALConfiguration halconf) {
 	return m_pSandbox->SetHALConfiguration(halconf);
 }
