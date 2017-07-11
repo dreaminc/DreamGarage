@@ -307,11 +307,13 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 		// get collision point and check that key is active
 		bool fActive = false;
+		ControllerType controllerType;
 		for (int j = 0; j < 2; j++) {
 			auto k = keyCollisions[j];
 			if (key == k) {
 				ptCollision = ptCollisions[j];
 				fActive = true;
+				controllerType = (ControllerType)(j);
 			}
 		}
 
@@ -331,6 +333,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		case KeyState::KEY_MAYBE_DOWN: {
 			if (ptCollision.y() < m_keyTypeThreshold) {
 				CR(UpdateKeyState((SenseVirtualKey)key->m_letter, 1));
+				CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(controllerType, SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 				key->m_state = KeyState::KEY_DOWN;
 			}
 			else key->m_state = KeyState::KEY_UP;
