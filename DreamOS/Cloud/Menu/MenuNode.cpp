@@ -27,6 +27,12 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 		}
 	}
 
+	if (jsonMenuNode["/icon_url"_json_pointer].is_string())
+		m_strIconURL = jsonMenuNode["/icon_url"_json_pointer].get<std::string>();
+
+	if (jsonMenuNode["/thumbnail_url"_json_pointer].is_string())
+		m_strThumbnailURL = jsonMenuNode["/thumbnail_url"_json_pointer].get<std::string>();
+
 	InitializeMimeToString();
 }
 

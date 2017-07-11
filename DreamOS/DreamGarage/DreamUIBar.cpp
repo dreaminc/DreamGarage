@@ -17,7 +17,7 @@
 
 #include <vector>
 
-#include "Primitives/font.h"
+#include "Cloud/HTTP/HTTPController.h"
 
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
@@ -400,6 +400,24 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		m_pMenuNode = pMenuNode;
 		if (m_pathStack.empty()) m_pathStack.push(m_pMenuNode);
 		m_pMenuNode->SetDirty();
+		for (auto& pSubMenuNodes : pMenuNode->GetSubMenuNodes()) {
+			HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+			CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
+
+
+			UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+			CNM(pUserControllerProxy, "Failed to get user controller proxy");
+
+
+			std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+			//auto strHeaders = HTTPController::ContentAcceptJson();
+
+			auto strHeaders = HTTPController::ContentHttp();
+			strHeaders.push_back(strAuthorizationToken);
+
+			//CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));
+			
+		}
 	}
 
 Error:
