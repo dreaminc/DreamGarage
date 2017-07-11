@@ -443,6 +443,7 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 				// Position
 				float glyphQuadXPosition = pUIKey->m_left;
 				float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
+				//float glyphQuadYPosition = posY;
 				
 				if ((pUIKey->m_left + pUIKey->m_width) > width)
 					width = (pUIKey->m_left + pUIKey->m_width);
@@ -636,27 +637,59 @@ Error:
 	return r;
 }
 
-RESULT text::SetBackgroundColor(color backgroundColor) {
+RESULT text::SetBackgroundQuad() {
 	RESULT r = R_PASS;
-
-	m_backgroundColor = backgroundColor;
 
 	if (m_pBackgroundQuad != nullptr) {
 		RemoveChild(m_pBackgroundQuad);
 		m_pBackgroundQuad = nullptr;
 	}
 
-	//point ptQuadCenter = FlatContext::GetBoundingVolume()->GetCenter();
-	float xPos = FlatContext::GetLeft() + FlatContext::GetWidth() / 2.0f;
-	float yPos = FlatContext::GetTop() - FlatContext::GetHeight() / 2.0f;
+	point ptContextCenter = FlatContext::GetBoundingVolume()->GetCenter();
+	float contextWidth = std::abs(FlatContext::GetRight() - FlatContext::GetLeft());
+	float contextHeight = std::abs(FlatContext::GetTop() - FlatContext::GetBottom());
 
-	point ptQuadCenter = point(xPos, 0.0f, yPos);
-	m_pBackgroundQuad = MakeQuad(FlatContext::GetWidth(), FlatContext::GetHeight(), ptQuadCenter);
+	float width = std::max(m_width, contextWidth);
+	float height = std::max(m_height, contextHeight);
+
+	point ptQuadCenter = point(width / 2.0f, 0.0f, FlatContext::GetTop() - height / 2.0f);
+
+	///*
+	m_pBackgroundQuad = MakeQuad(width, height, ptQuadCenter);
+	//*/
+	//m_pBackgroundQuad = MakeQuad(FlatContext::GetWidth(), FlatContext::GetHeight(), ptQuadCenter);
 	CN(m_pBackgroundQuad);
 
 	AddChild(m_pBackgroundQuad, true);
+	UpdateBoundingVolume();
+
+Error:
+	return r;
+}
+
+RESULT text::SetBackgroundColor(color backgroundColor) {
+	RESULT r = R_PASS;
+
+	m_backgroundColor = backgroundColor;
+
+	CR(SetBackgroundQuad());
+	CN(m_pBackgroundQuad);
 
 	CR(m_pBackgroundQuad->SetColor(m_backgroundColor));
+
+Error:
+	return r;
+}
+
+RESULT text::SetBackgroundColorTexture(texture *pColorTexture) {
+	RESULT r = R_PASS;
+
+	m_pBackgroundColorTexture = pColorTexture;
+
+	CR(SetBackgroundQuad());
+	CN(m_pBackgroundQuad);
+
+	CR(m_pBackgroundQuad->SetColorTexture(m_pBackgroundColorTexture));
 
 Error:
 	return r;

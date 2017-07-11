@@ -463,3 +463,12 @@ Error:
 RESULT texture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {
 	return R_NOT_IMPLEMENTED;
 }
+
+bool texture::IsDistanceMapped() {
+	return ((m_flags & texture::flags::DISTANCE_MAP) != texture::flags::NONE);
+}
+
+RESULT texture::SetDistanceMapped() {
+	m_flags = m_flags | texture::flags::DISTANCE_MAP;
+	return R_PASS;
+}

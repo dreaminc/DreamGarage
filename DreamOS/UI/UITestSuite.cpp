@@ -471,7 +471,11 @@ RESULT UITestSuite::AddTestFont() {
 			//auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP | text::flags::RENDER_QUAD);
 			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP);
 			CN(pText);
-			pText->SetBackgroundColor(COLOR_BLUE);
+
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			//pText->SetBackgroundColor(COLOR_BLUE);
+			pText->SetBackgroundColorTexture(pColorTexture1);
+
 			pText->RenderToQuad();
 
 			pText->RotateXByDeg(90.0f);

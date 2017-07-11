@@ -103,12 +103,14 @@ public:
 	bool IsRenderToQuad();
 	
 	RESULT SetBackgroundColor(color backgroundColor);
+	RESULT SetBackgroundColorTexture(texture *pColorTexture);
 
 public:
 	//static text& MakeText()
 
 private:
 	std::shared_ptr<quad> AddGlyphQuad(CharacterGlyph glyph, float posX, float posY);
+	RESULT SetBackgroundQuad();
 
 private:
 	bool m_fScaleToFit = false;
@@ -137,6 +139,7 @@ private:
 
 	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
 	color m_backgroundColor = COLOR_WHITE;
+	texture *m_pBackgroundColorTexture = nullptr;
 };
 
 

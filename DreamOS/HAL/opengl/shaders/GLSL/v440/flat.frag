@@ -20,6 +20,7 @@ float bufferValue = 0.5f;
 float gammaValue = 0.02f;
 
 void main(void) {  
+	
 	// Distance mapping
 	if (u_fDistanceMap == true) {
 		float dist = texture(u_textureColor, DataIn.uvCoord * 1.0f).a;

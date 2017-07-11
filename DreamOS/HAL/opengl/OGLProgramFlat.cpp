@@ -127,8 +127,8 @@ RESULT OGLProgramFlat::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
 		
+		m_pUniformfDistanceMap->SetUniform(pTexture->IsDistanceMapped());
 		m_pUniformHasColorTexture->SetUniform(true);
-		m_pUniformfDistanceMap->SetUniform(true);
 	}
 	else {
 		m_pUniformHasColorTexture->SetUniform(false);
