@@ -456,18 +456,23 @@ RESULT UITestSuite::AddTestFont() {
 			*/
 
 			// Layout
-			/*
+			///*
 			auto pLayout = new UIKeyboardLayout();
 			CN(pLayout);
 			CR(pLayout->CreateQWERTYLayout());
+
+			texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			CN(pColorTexture1);
+			pLayout->SetKeyTexture(pColorTexture1);
 
 			auto pText = m_pDreamOS->AddText(pFont, pLayout, 0.25f, text::flags::RENDER_QUAD);
 			//auto pText = m_pDreamOS->AddText(pFont, pLayout, .025f, 0.025f, 0.01f, 0.01f);
 			CN(pText);
 			pText->RotateXByDeg(90.0f);
-			*/
+			//*/
 
 			// background
+			/*
 			//auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP | text::flags::RENDER_QUAD);
 			auto pText = m_pDreamOS->AddText(pFont, "Testing this thing", 1.0f, 0.6f, text::flags::WRAP);
 			CN(pText);
@@ -480,6 +485,7 @@ RESULT UITestSuite::AddTestFont() {
 
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
+			*/
 
 			//pQuad = AddQuad(slsld)
 			//pText->GetColorTexture()

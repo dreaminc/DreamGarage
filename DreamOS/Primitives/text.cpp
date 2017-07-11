@@ -453,7 +453,17 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 				float glyphHeight = GetMSizeFromDots(glyph.height) * m_scaleFactor;
 
 				point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
-				std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
+
+				///*
+				texture *pLayoutBGTexture = nullptr;
+				if ((pLayoutBGTexture = pLayout->GetKeyTexture()) != nullptr) {
+					std::shared_ptr<quad> pBgQuad = AddQuad(pUIKey->m_width, rowHeight, ptGlyph);
+					pBgQuad->SetColorTexture(pLayoutBGTexture);
+				}
+				//*/
+
+				std::shared_ptr<quad> pGlyphQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
+				pGlyphQuad->SetColorTexture(m_pFont->GetTexture().get());
 
 				//posX += (float)(glyph.advance);
 			}
