@@ -43,7 +43,8 @@ public:
 	// Cloud Controller
 	RESULT InitializeCloudControllerCallbacks();
 
-	RESULT SetRoundtablePosition(float angle);
+	RESULT GetRoundtablePosition(int index, point &ptPosition, float &rotationAngle);
+	RESULT SetRoundtablePosition(int index);
 	RESULT HandlePeersUpdate(long index);
 
 	RESULT HandleDataMessage(long senderUserID, Message *pDataMessage);
@@ -66,8 +67,12 @@ private:
 	std::map<long, user*> m_peerUsers;
 	std::vector<user*> m_usersPool;
 
-	bool	m_isSeated = false;
-	float tick = 0.0f;
+	bool m_fSeated = false;
+	float m_tick = 0.0f;
+	float m_seatPositioningRadius = 3.5f;
+	std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
+	float m_initialAngle = 90.0f;
+	float m_keepOutAngle = 5.0f;
 	
 	// UI
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
