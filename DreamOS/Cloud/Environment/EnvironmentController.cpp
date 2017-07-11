@@ -437,7 +437,9 @@ RESULT EnvironmentController::RequestShareAsset(std::string strStorageProviderSc
 
 	jsonPayload["environment_asset"] = nlohmann::json::object();
 	jsonPayload["environment_asset"]["path"] = strPath;
-	jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+
+	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+	jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
