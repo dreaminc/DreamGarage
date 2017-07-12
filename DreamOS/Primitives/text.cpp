@@ -355,6 +355,7 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	float fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
 	float fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
 	float fontBase = static_cast<float>(m_pFont->GetFontBase());
+	float fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
 
 	// UV
 	float uvTop = (fontImageHeight - glyph.y) / fontImageHeight;
@@ -372,14 +373,29 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	// Position
 	float glyphQuadXPosition = posX + ((float)(glyph.width) / 2.0f) + (float)(glyph.bearingX);
 	float glyphQuadYPosition = posY - ((float)(fontBase) - (float)(glyph.bearingY) - ((float)(glyph.height) / 2.0f));
+	float glyphBgQuadYPosition = posY - (fontLineHeight - fontBase);
 
 	// Apply DPMM and scale factor
 
 	float glyphWidth = GetMSizeFromDots(glyph.width) * m_scaleFactor;
 	float glyphHeight = GetMSizeFromDots(glyph.height) * m_scaleFactor;
 
+	// TODO: Not entirely sure why, but some fonts require this fudge factor
+	// due to offsets breaking the line height rules etc
+	float glyphBgHeight = GetMSizeFromDots(fontLineHeight * 1.1f) * m_scaleFactor;
+	
+	if (glyphHeight > glyphBgHeight) {
+		glyphHeight = glyphBgHeight;
+	}
+
 	glyphQuadXPosition = GetMSizeFromDots(glyphQuadXPosition) * m_scaleFactor;
 	glyphQuadYPosition = GetMSizeFromDots(glyphQuadYPosition) * m_scaleFactor;
+	glyphBgQuadYPosition = GetMSizeFromDots(glyphBgQuadYPosition) * m_scaleFactor;
+
+	// Create a transparent background quad to ensure sizing 
+	point ptGlyphBg = point(glyphQuadXPosition, 0.0f, glyphBgQuadYPosition);
+	std::shared_ptr<quad> pQuadBg = AddQuad(glyphWidth, glyphBgHeight, ptGlyphBg, uvcoord(0.0f, 0.0f), uvcoord(0.0f, 0.0f));
+	pQuadBg->SetColorTexture(m_pFont->GetTexture().get());
 
 	point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 	std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
@@ -442,8 +458,8 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 
 				// Position
 				float glyphQuadXPosition = pUIKey->m_left;
-				//float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
-				float glyphQuadYPosition = posY;
+				float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
+				//float glyphQuadYPosition = posY;
 				
 				if ((pUIKey->m_left + pUIKey->m_width) > width)
 					width = (pUIKey->m_left + pUIKey->m_width);
@@ -517,7 +533,8 @@ RESULT text::SetText(const std::string& strText) {
 			posY += fontLineHeight;
 		}
 		else if (m_pFont->GetGlyphFromChar(c, glyph)) {
-			
+			bool fQuitWrap = false;
+
 			if (std::isspace(c)) {
 				curWordQuads.clear();
 				posX += (float)(glyph.advance);
@@ -536,7 +553,7 @@ RESULT text::SetText(const std::string& strText) {
 			fromStartOfWord += (float)(glyph.advance);
 
 			float posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
-			float posYM = (GetMSizeFromDots(posX) * m_scaleFactor);
+			float posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
 
 			// Wrapping
 			if (IsWrap() && posXM > m_width) {
@@ -575,25 +592,34 @@ RESULT text::SetText(const std::string& strText) {
 
 				// Move to func
 				if ( curWordQuads.size() > 0 ) {
-					float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
-					float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
-
-					for (auto &pQuad : curWordQuads) {
-						pQuad->translateX(-xOffset);
-						pQuad->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
-					}
-
 					// Convert back from meters to dots 
-					posX = fromStartOfWord;
-					toWord = 0.0f;
+					if ((GetMSizeFromDots(fromStartOfWord) * m_scaleFactor) >= m_width) {
+						// Give up - if ellipsis is on lower test will catch it and break
+						// otherwise we give up
+						fQuitWrap = true;
+					}
+					else {
+						float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
+						float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
+
+						for (auto &pQuad : curWordQuads) {
+							pQuad->translateX(-xOffset);
+							pQuad->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
+						}
+
+						posX = fromStartOfWord;
+						toWord = 0.0f;
+					}
 				}
 
-				curLineQuads.clear();
-				posY += fontLineHeight;
+				if (fQuitWrap == false) {
+					curLineQuads.clear();
+					posY += fontLineHeight;
+				}
 			}
 
 			posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
-			posYM = (GetMSizeFromDots(posX) * m_scaleFactor);
+			posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
 
 			// Ellipsis
 			if (IsTrailingEllipsis() && (posXM > m_width)) {
@@ -626,12 +652,20 @@ RESULT text::SetText(const std::string& strText) {
 
 				break;
 			}
+
+			// If wrapping has given up quit
+			if (fQuitWrap) {
+				break;
+			}
 		}
 	}
 	
 	if (IsFitToSize()) {
 		m_width = FlatContext::GetWidth();
 		m_height = FlatContext::GetHeight();
+	}
+	else {
+		// TODO: 
 	}
 
 	if (m_pBackgroundQuad != nullptr) {

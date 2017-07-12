@@ -17,7 +17,7 @@ layout (location = 0) out vec4 out_vec4Color;
 vec4 g_ambient = vec4(0.1);
 
 float bufferValue = 0.5f;
-float gammaValue = 0.02f;
+float gammaValue = 0.0125f;
 
 void main(void) {  
 	

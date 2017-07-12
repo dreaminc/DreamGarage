@@ -55,7 +55,7 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	//CR(AddTestFont());
+	CR(AddTestFont());
 
 	CR(AddTestKeyboard());
 
@@ -395,9 +395,15 @@ RESULT UITestSuite::AddTestFont() {
 
 	double sTestTime = 6000.0f;
 	int nRepeats = 1;
+	
+	struct TestContext {
+		text *pText = nullptr;
+		std::chrono::system_clock::time_point timeLastUpdate; 
+	} *pTestContext = new TestContext();
 
-	auto fnInitialize = [&](void *pContext) {
+	auto fnInitialize = [=](void *pContext) {
 		RESULT r = R_PASS;
+		float lineHeight = 0.35f;
 
 		CN(m_pDreamOS);
 
@@ -405,15 +411,38 @@ RESULT UITestSuite::AddTestFont() {
 
 		CR(SetupPipeline());
 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		{
 			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+			pFont->SetLineHeight(lineHeight);
 			CN(pFont);
 
 			// Fit to Scale
 			/*
-			auto pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD);
+			auto pText = m_pDreamOS->AddText(pFont, "", lineHeight * 5.0f, lineHeight * 4.0f , text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD);
+			//auto pText = m_pDreamOS->AddText(pFont, "", lineHeight * 5.0f, lineHeight, text::flags::TRAIL_ELLIPSIS);
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, 0.0f, 0.0f));
+
+			pTestContext->pText = pText;
+			pTestContext->timeLastUpdate = std::chrono::system_clock::now();
+			*/
+
+			auto pText = m_pDreamOS->AddText(pFont, "abcdefghijklmnopqrstuvwxyz", lineHeight * 5.0f, lineHeight * 2.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD);
+			//auto pText = m_pDreamOS->AddText(pFont, "abc def ghi jkl mno pqr stu vwx yz", lineHeight * 5.0f, lineHeight * 4.0f, text::flags::WRAP );
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, 0.0f, 0.0f));
+
+			//pText->SetText("testing this \nthing");
+
+			/*
+			pText = m_pDreamOS->AddText(pFont, "Testing this \nthing", 0.6f, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD);
 			CN(pText);
 			//pText->RenderToQuad();
 			pText->RotateXByDeg(90.0f);
@@ -421,6 +450,7 @@ RESULT UITestSuite::AddTestFont() {
 			
 			pText->SetText("testing this \nthing");
 
+			///*
 			// Size to fit
 			// Note this sets the line height by way of font - this teases at future settings, 
 			// but right now it's avoiding adding MORE constructor paths / vars to this creation path
@@ -453,10 +483,10 @@ RESULT UITestSuite::AddTestFont() {
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(3.0f, 0.0f, 0.0f));
 			pText->SetText("testing this thing");
-			*/
+			//*/
 
 			// Layout
-			///*
+			/*
 			auto pLayout = new UIKeyboardLayout();
 			CN(pLayout);
 			CR(pLayout->CreateQWERTYLayout());
@@ -505,7 +535,24 @@ RESULT UITestSuite::AddTestFont() {
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		CR(r);
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		/*
+		static char c = 'a';
+		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
+		if (pTestContext->pText != nullptr && 
+			std::chrono::duration_cast<std::chrono::seconds>(timeNow - pTestContext->timeLastUpdate).count() >= 1) 
+		{
+			std::string strText = pTestContext->pText->GetText();
+			strText += c++;
+
+			pTestContext->pText->SetText(strText);
+
+			pTestContext->timeLastUpdate = timeNow;
+		}
+		*/
 
 	Error:
 		return r;
@@ -790,8 +837,8 @@ RESULT UITestSuite::SetupPipeline() {
 	CR(pHAL->MakeCurrentContext());
 	
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 	CN(pRenderProgramNode);
