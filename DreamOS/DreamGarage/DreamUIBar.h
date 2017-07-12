@@ -13,6 +13,7 @@
 
 #include <functional>
 #include <stack>
+#include <queue>
 
 class UIScrollView;
 class UIMallet;
@@ -98,6 +99,7 @@ private:
 	EnvironmentControllerProxy *m_pEnvironmentControllerProxy = nullptr;
 
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
+	std::queue<std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;

@@ -237,20 +237,13 @@ Error:
 RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
 	RESULT r = R_PASS;
 
-	auto pObj = reinterpret_cast<DimObj*>(pContext);
-	texture *pTexture = nullptr;
+	auto pObj = reinterpret_cast<MenuNode*>(pContext);
 
-	CN(pBufferVector);
-	uint8_t* pBuffer = &(pBufferVector->operator[](0));
-	size_t pBuffer_n = pBufferVector->size();
+	m_downloadQueue.push(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
 
-	CN(pObj);
-	pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	CN(pTexture);
+//	CR(pObj->UpdateColorTexture(pTexture));
 
-	CR(pObj->UpdateColorTexture(pTexture));
-
-Error:
+//Error:
 	return r;
 }
 
@@ -290,6 +283,32 @@ RESULT DreamUIBar::Update(void *pContext) {
 		m_pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pRightMallet->GetHeadOffset()));
 
 	CR(m_pScrollView->Update());
+
+	while (!m_downloadQueue.empty()) {
+		auto pQueueObj = m_downloadQueue.front();
+		auto pMenuNode = pQueueObj.first;
+		auto pBufferVector = pQueueObj.second;
+		auto pChildren = m_pScrollView->GetMenuItemsView()->GetChildren();
+		for (auto& pChild : pChildren) {
+			auto pObj = reinterpret_cast<UIMenuItem*>(pChild.get());
+			if (pObj->GetName() == pMenuNode->GetTitle()) {
+				texture *pTexture = nullptr;
+
+				CN(pBufferVector);
+				uint8_t* pBuffer = &(pBufferVector->operator[](0));
+				size_t pBuffer_n = pBufferVector->size();
+
+				pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+				CN(pTexture);
+				pObj->GetSurface()->UpdateColorTexture(pTexture);
+			}
+		}
+		
+		if (pBufferVector != nullptr) {
+			pBufferVector = nullptr;
+		}
+		m_downloadQueue.pop();
+	}
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
 	
@@ -427,18 +446,17 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
 		CNM(pUserControllerProxy, "Failed to get user controller proxy");
 
-		for (auto& pSubMenuNode : pMenuNode->GetSubMenuNodes()) {
+		for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 
 			std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
-			//auto strHeaders = HTTPController::ContentAcceptJson();
 
 			auto strHeaders = HTTPController::ContentHttp();
 			strHeaders.push_back(strAuthorizationToken);
 
 			auto strURI = pSubMenuNode->GetIconURL();
-		//	if (strURI != "") {
-		//		CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1), ));
-		//	}
+			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
+				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pSubMenuNode.get()));
+			}
 			
 		}
 	}
