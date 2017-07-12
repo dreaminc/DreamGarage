@@ -361,16 +361,30 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
+			std::string strURL = m_strEntered.GetString();
+
+			char chKey = (char)(pEvent->m_value);
+			m_strEntered.UpdateString(chKey);
+
+			// TODO: Move this into keyboard
+			GetDOS()->GetKeyboard()->UpdateTextBox(chKey, m_strEntered.GetString());
 
 			if (pEvent->m_value == SVK_RETURN) {
 				SetVisible(true);
+
+				std::string strPath = GetDOS()->GetKeyboard()->GetPath();
+				std::string strScope = GetDOS()->GetKeyboard()->GetScope();
+				std::string strTitle = "website";
+
+				strPath = strURL;
+
+				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 			}
 
-			char chKey = (char)(pEvent->m_value);
-
-			CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
-			m_strEntered.UpdateString(chKey);
-			GetDOS()->GetKeyboard()->UpdateTextBox(chKey, m_strEntered.GetString());
+			//CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
 
 		} break;
 	}

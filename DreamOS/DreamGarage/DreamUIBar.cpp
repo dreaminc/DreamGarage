@@ -223,8 +223,14 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
+
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
+
+				// TODO: This is temporary until we have better IPC
+				GetDOS()->GetKeyboard()->SetPath(strPath);
+				GetDOS()->GetKeyboard()->SetScope(strScope);
+
 				GetDOS()->GetKeyboard()->ShowKeyboard();
 			}
 		}
@@ -237,9 +243,17 @@ Error:
 RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext) {
 	RESULT r = R_PASS;
 
-	auto pObj = reinterpret_cast<MenuNode*>(pContext);
+	if (pContext != nullptr) {
+		MenuNode* pObj = reinterpret_cast<MenuNode*>(pContext);
+		std::string strTitleCopy = pObj->GetTitle();
 
-	m_downloadQueue.push(std::pair<MenuNode*, std::shared_ptr<std::vector<uint8_t>>>(pObj, pBufferVector));
+		m_downloadQueue.push_back(std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>(strTitleCopy, pBufferVector));
+
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+	}
 
 //	CR(pObj->UpdateColorTexture(pTexture));
 
@@ -265,6 +279,10 @@ RESULT DreamUIBar::Update(void *pContext) {
 	RESULT r = R_PASS;
 	DreamOS *pDreamOS = GetDOS();
 
+	// Copy into temp vector
+	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> downloadQueueCopy = m_downloadQueue;
+	m_downloadQueue.clear();
+
 	RotationMatrix qOffset = RotationMatrix();
 	hand *pHand = pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
 	CN(pHand);
@@ -284,14 +302,15 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 	CR(m_pScrollView->Update());
 
-	while (!m_downloadQueue.empty()) {
-		auto pQueueObj = m_downloadQueue.front();
-		auto pMenuNode = pQueueObj.first;
+	//while (!m_downloadQueue.empty()) {
+	for(auto &pQueueObj : downloadQueueCopy) {
+		auto pMenuNodeTitle = pQueueObj.first;
 		auto pBufferVector = pQueueObj.second;
 		auto pChildren = m_pScrollView->GetMenuItemsView()->GetChildren();
+
 		for (auto& pChild : pChildren) {
-			auto pObj = reinterpret_cast<UIMenuItem*>(pChild.get());
-			if (pObj->GetName() == pMenuNode->GetTitle()) {
+			auto pObj = dynamic_cast<UIMenuItem*>(pChild.get());
+			if (pObj != nullptr && pMenuNodeTitle.size() > 0 && pObj->GetName() == pMenuNodeTitle) {
 				texture *pTexture = nullptr;
 
 				CN(pBufferVector);
@@ -307,7 +326,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 		if (pBufferVector != nullptr) {
 			pBufferVector = nullptr;
 		}
-		m_downloadQueue.pop();
+
+		//m_downloadQueue.pop();
 	}
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
@@ -455,7 +475,8 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 
 			auto strURI = pSubMenuNode->GetIconURL();
 			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
-				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pSubMenuNode.get()));
+				MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
+				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 			}
 			
 		}

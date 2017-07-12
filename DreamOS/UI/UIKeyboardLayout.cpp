@@ -48,7 +48,7 @@ std::string UIKeyboardLayout::GenerateQWERTYRow(int rowIndex, bool fUpper, bool 
 		}
 		else {
 			if (fUpper) { return "_.|~<>..."; } // TODO: periods on unused keys
-			else { return "-.:;()$&@"; }
+			else { return "-//:;()$&@"; }
 		}
 	} break;
 	case 2: {

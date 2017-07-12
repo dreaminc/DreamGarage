@@ -709,3 +709,21 @@ RESULT UIKeyboard::SetSurfaceOffset(point ptOffset) {
 	m_ptSurfaceOffset = ptOffset;
 	return R_PASS;
 }
+
+RESULT UIKeyboard::SetPath(std::string strPath) {
+	m_strPath = strPath;
+	return R_PASS;
+}
+
+RESULT UIKeyboard::SetScope(std::string strScope) {
+	m_strScope = strScope;
+	return R_PASS;
+}
+
+std::string UIKeyboard::GetPath() {
+	return m_strPath;
+}
+
+std::string UIKeyboard::GetScope() {
+	return m_strScope;
+}
