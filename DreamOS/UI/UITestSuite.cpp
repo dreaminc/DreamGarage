@@ -731,7 +731,7 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 		// TODO: Break this out into a separate UI suite (Browser/CEF)
 		//CR(webRequest.AddPostDataElement(L"post data element"));
 
-		CR(pDreamBrowser->LoadRequest(webRequest));
+		//CR(pDreamBrowser->LoadRequest(webRequest));
 
 	Error:
 		return R_PASS;
