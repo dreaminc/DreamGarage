@@ -55,6 +55,8 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestBrowserRequest());
+
 	CR(AddTestFont());
 
 	CR(AddTestKeyboard());
@@ -68,7 +70,6 @@ RESULT UITestSuite::AddTests() {
 	CR(AddTestFlatContextCompositionQuads());
 
 	CR(AddTestBrowserRequestWithMenuAPI());
-	CR(AddTestBrowserRequest());
 
 
 	CR(AddTestBrowser());

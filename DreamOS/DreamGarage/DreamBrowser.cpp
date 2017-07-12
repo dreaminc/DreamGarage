@@ -50,6 +50,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamBrowser::OnLoadStart() {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
+	return R_NOT_IMPLEMENTED;
+}
+
 // DreamApp Interface
 RESULT DreamBrowser::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
