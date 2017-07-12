@@ -53,6 +53,9 @@ public:
 
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
+	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) override;
+	virtual RESULT OnLoadStart() override;
+	virtual RESULT OnLoadEnd(int httpStatusCode) override;
 
 	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);

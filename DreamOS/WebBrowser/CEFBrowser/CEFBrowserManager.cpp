@@ -79,6 +79,46 @@ Error:
 	return r;
 }
 
+RESULT CEFBrowserManager::OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowser, bool fLoading, bool fCanGoBack, bool fCanGoForward) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadingStateChanged");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnLoadingStateChanged(fLoading, fCanGoBack, fCanGoForward));
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserManager::OnLoadStart(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadStart");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	CR(pCEFBrowserController->OnLoadStart(pCEFFrame, transition_type));
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserManager::OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+
+	std::shared_ptr<CEFBrowserController> pCEFBrowserController = GetCEFBrowserController(pCEFBrowser);
+	CN(pCEFBrowserController);
+
+	// TODO: add frame
+	CR(pCEFBrowserController->OnLoadEnd(pCEFFrame, httpStatusCode));
+
+Error:
+	return r;
+}
+
 std::shared_ptr<CEFBrowserController> CEFBrowserManager::GetCEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) {
 	for (auto &pWebBrowserController : m_webBrowserControllers) {
 		std::shared_ptr<CEFBrowserController> pCEFBrowserController = std::dynamic_pointer_cast<CEFBrowserController>(pWebBrowserController);

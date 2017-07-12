@@ -55,6 +55,8 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestBrowserRequest());
+
 	CR(AddTestFont());
 
 	CR(AddTestKeyboard());
@@ -68,7 +70,6 @@ RESULT UITestSuite::AddTests() {
 	CR(AddTestFlatContextCompositionQuads());
 
 	CR(AddTestBrowserRequestWithMenuAPI());
-	CR(AddTestBrowserRequest());
 
 
 	CR(AddTestBrowser());
@@ -730,7 +731,7 @@ RESULT UITestSuite::AddTestBrowserRequest() {
 		// TODO: Break this out into a separate UI suite (Browser/CEF)
 		//CR(webRequest.AddPostDataElement(L"post data element"));
 
-		CR(pDreamBrowser->LoadRequest(webRequest));
+		//CR(pDreamBrowser->LoadRequest(webRequest));
 
 	Error:
 		return R_PASS;

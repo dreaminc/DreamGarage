@@ -4,6 +4,8 @@
 
 #include "PhysicsEngine/CollisionManifold.h"
 
+#include "InteractionEngine/AnimationItem.h"
+
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/WebBrowserController.h"
 
@@ -46,6 +48,59 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	//CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
 	
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamBrowser::OnLoadStart() {
+	//Fade to black
+	RESULT r = R_PASS;
+
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pBrowserQuad->SetVisible(false);
+		return r;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pBrowserQuad.get(),
+		color(0.0f, 0.0f, 0.0f, 1.0f),
+		0.1f,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
+	RESULT r = R_PASS;
+
+	auto fnStartCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		m_pBrowserQuad->SetVisible(true);
+		return r;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pBrowserQuad.get(),
+		color(1.0f, 1.0f, 1.0f, 1.0f),
+		0.1f,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		fnStartCallback,
+		nullptr,
+		this
+	));
+
 Error:
 	return r;
 }

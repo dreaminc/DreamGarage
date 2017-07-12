@@ -344,6 +344,41 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	return r;
 }
 
+RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward));
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+
+	// TODO: Add transition type
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadStart());
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadEnd(httpStatusCode));
+
+Error:
+	return r;
+}
+
 CefRefPtr<CefBrowser> CEFBrowserController::GetCEFBrowser() {
 	return m_pCEFBrowser;
 }
