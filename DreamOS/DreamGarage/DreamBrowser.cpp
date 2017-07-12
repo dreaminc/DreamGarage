@@ -306,9 +306,11 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
+			std::string strURL = m_strEntered.GetString();
 
 			char chKey = (char)(pEvent->m_value);
 			m_strEntered.UpdateString(chKey);
+
 			// TODO: Move this into keyboard
 			GetDOS()->GetKeyboard()->UpdateTextBox(chKey, m_strEntered.GetString());
 
@@ -319,7 +321,7 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 				std::string strScope = GetDOS()->GetKeyboard()->GetScope();
 				std::string strTitle = "website";
 
-				strPath = m_strEntered.GetString();
+				strPath = strURL;
 
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
