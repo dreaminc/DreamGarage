@@ -355,6 +355,7 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	float fontImageWidth = static_cast<float>(m_pFont->GetFontTextureWidth());
 	float fontImageHeight = static_cast<float>(m_pFont->GetFontTextureHeight());
 	float fontBase = static_cast<float>(m_pFont->GetFontBase());
+	float fontLineHeight = static_cast<float>(m_pFont->GetFontLineHeight());
 
 	// UV
 	float uvTop = (fontImageHeight - glyph.y) / fontImageHeight;
@@ -372,14 +373,29 @@ std::shared_ptr<quad> text::AddGlyphQuad(CharacterGlyph glyph, float posX, float
 	// Position
 	float glyphQuadXPosition = posX + ((float)(glyph.width) / 2.0f) + (float)(glyph.bearingX);
 	float glyphQuadYPosition = posY - ((float)(fontBase) - (float)(glyph.bearingY) - ((float)(glyph.height) / 2.0f));
+	float glyphBgQuadYPosition = posY - (fontLineHeight - fontBase);
 
 	// Apply DPMM and scale factor
 
 	float glyphWidth = GetMSizeFromDots(glyph.width) * m_scaleFactor;
 	float glyphHeight = GetMSizeFromDots(glyph.height) * m_scaleFactor;
 
+	// TODO: Not entirely sure why, but some fonts require this fudge factor
+	// due to offsets breaking the line height rules etc
+	float glyphBgHeight = GetMSizeFromDots(fontLineHeight * 1.1f) * m_scaleFactor;
+	
+	if (glyphHeight > glyphBgHeight) {
+		glyphHeight = glyphBgHeight;
+	}
+
 	glyphQuadXPosition = GetMSizeFromDots(glyphQuadXPosition) * m_scaleFactor;
 	glyphQuadYPosition = GetMSizeFromDots(glyphQuadYPosition) * m_scaleFactor;
+	glyphBgQuadYPosition = GetMSizeFromDots(glyphBgQuadYPosition) * m_scaleFactor;
+
+	// Create a transparent background quad to ensure sizing 
+	point ptGlyphBg = point(glyphQuadXPosition, 0.0f, glyphBgQuadYPosition);
+	std::shared_ptr<quad> pQuadBg = AddQuad(glyphWidth, glyphBgHeight, ptGlyphBg, uvcoord(0.0f, 0.0f), uvcoord(0.0f, 0.0f));
+	pQuadBg->SetColorTexture(m_pFont->GetTexture().get());
 
 	point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 	std::shared_ptr<quad> pQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
@@ -442,8 +458,8 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 
 				// Position
 				float glyphQuadXPosition = pUIKey->m_left;
-				//float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
-				float glyphQuadYPosition = posY;
+				float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
+				//float glyphQuadYPosition = posY;
 				
 				if ((pUIKey->m_left + pUIKey->m_width) > width)
 					width = (pUIKey->m_left + pUIKey->m_width);
@@ -632,6 +648,9 @@ RESULT text::SetText(const std::string& strText) {
 	if (IsFitToSize()) {
 		m_width = FlatContext::GetWidth();
 		m_height = FlatContext::GetHeight();
+	}
+	else {
+		// TODO: 
 	}
 
 	if (m_pBackgroundQuad != nullptr) {
