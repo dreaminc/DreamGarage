@@ -38,6 +38,7 @@ RESULT user::Initialize() {
 	m_pMouth->MoveTo(0.0f, -0.135f, 0.1f);
 
 	m_pMouth->RotateXByDeg(270);
+	m_pMouth->RotateZByDeg(90);
 
 	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	
