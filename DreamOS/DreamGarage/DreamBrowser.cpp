@@ -56,13 +56,14 @@ RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool f
 	return R_NOT_IMPLEMENTED;
 }
 
-RESULT DreamBrowser::OnLoadStart() {
-	//Fade to black
+RESULT DreamBrowser::FadeQuadToBlack() {
+
 	RESULT r = R_PASS;
 
+	//Fade to black
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
-		m_pBrowserQuad->SetVisible(false);
+		//m_pBrowserQuad->SetVisible(false);
 		return r;
 	};
 
@@ -81,12 +82,18 @@ Error:
 	return r;
 }
 
+RESULT DreamBrowser::OnLoadStart() {
+	RESULT r = R_PASS;
+
+	return r;
+}
+
 RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
-		m_pBrowserQuad->SetVisible(true);
+		//m_pBrowserQuad->SetVisible(true);
 		return r;
 	};
 

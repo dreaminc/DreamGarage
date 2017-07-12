@@ -28,7 +28,7 @@ RESULT UIButton::Initialize() {
 
 	m_pContextComposite = AddComposite();
 	m_pSurfaceComposite = AddComposite();
-	m_pSurface = AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector::kVector());
+	m_pSurface = AddQuad(0.25f, 0.25f * (9.0f / 16.0f), 1, 1, nullptr, vector::kVector());
 	//m_pSurface = m_pSurfaceComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector::kVector());
 
 	CN(m_pSurface);

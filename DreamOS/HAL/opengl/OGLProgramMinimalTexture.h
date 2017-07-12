@@ -39,6 +39,7 @@ private:
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
+	OGLUniformBool *m_pUniformHasTextureColor;
 	OGLUniformSampler2D *m_pUniformTextureColor;
 
 	OGLMaterialBlock *m_pMaterialsBlock;

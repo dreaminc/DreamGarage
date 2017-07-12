@@ -160,7 +160,7 @@ RESULT DreamGarage::LoadScene() {
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
-
+//*
 	AddModel(L"\\Models\\FloatingIsland\\env.obj",
 		nullptr,
 		sceneOffset,
@@ -204,7 +204,7 @@ RESULT DreamGarage::LoadScene() {
 			}
 		);
 	}
-
+//*/
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
 	CN(m_pDreamUIBar);
 
@@ -565,6 +565,7 @@ RESULT DreamGarage::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> p
 	//*/
 	if (m_pDreamBrowser != nullptr) {
 		m_pDreamBrowser->SetVisible(true);
+		m_pDreamBrowser->FadeQuadToBlack();
 		m_pDreamBrowser->SetEnvironmentAsset(pEnvironmentAsset);
 	}
 	return r;

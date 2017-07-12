@@ -28,7 +28,6 @@ public:
 
 private:
 	RESULT InitializeQuadsWithLayout(UIKeyboardLayout *pLayout);
-	RESULT InitializeTexturesWithLayout(LayoutType type);
 	RESULT InitializeLayoutTexture(LayoutType type);
 
 //DreamApp
