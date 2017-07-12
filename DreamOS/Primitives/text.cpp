@@ -533,7 +533,8 @@ RESULT text::SetText(const std::string& strText) {
 			posY += fontLineHeight;
 		}
 		else if (m_pFont->GetGlyphFromChar(c, glyph)) {
-			
+			bool fQuitWrap = false;
+
 			if (std::isspace(c)) {
 				curWordQuads.clear();
 				posX += (float)(glyph.advance);
@@ -552,7 +553,7 @@ RESULT text::SetText(const std::string& strText) {
 			fromStartOfWord += (float)(glyph.advance);
 
 			float posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
-			float posYM = (GetMSizeFromDots(posX) * m_scaleFactor);
+			float posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
 
 			// Wrapping
 			if (IsWrap() && posXM > m_width) {
@@ -591,25 +592,34 @@ RESULT text::SetText(const std::string& strText) {
 
 				// Move to func
 				if ( curWordQuads.size() > 0 ) {
-					float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
-					float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
-
-					for (auto &pQuad : curWordQuads) {
-						pQuad->translateX(-xOffset);
-						pQuad->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
-					}
-
 					// Convert back from meters to dots 
-					posX = fromStartOfWord;
-					toWord = 0.0f;
+					if ((GetMSizeFromDots(fromStartOfWord) * m_scaleFactor) >= m_width) {
+						// Give up - if ellipsis is on lower test will catch it and break
+						// otherwise we give up
+						fQuitWrap = true;
+					}
+					else {
+						float xOffset = GetMSizeFromDots(toWord) * m_scaleFactor;
+						float yOffset = GetMSizeFromDots(fontLineHeight) * m_scaleFactor;
+
+						for (auto &pQuad : curWordQuads) {
+							pQuad->translateX(-xOffset);
+							pQuad->translateZ(yOffset);		// Note this is in Z because of flat context mechanics
+						}
+
+						posX = fromStartOfWord;
+						toWord = 0.0f;
+					}
 				}
 
-				curLineQuads.clear();
-				posY += fontLineHeight;
+				if (fQuitWrap == false) {
+					curLineQuads.clear();
+					posY += fontLineHeight;
+				}
 			}
 
 			posXM = (GetMSizeFromDots(posX) * m_scaleFactor);
-			posYM = (GetMSizeFromDots(posX) * m_scaleFactor);
+			posYM = (GetMSizeFromDots(posY) * m_scaleFactor);
 
 			// Ellipsis
 			if (IsTrailingEllipsis() && (posXM > m_width)) {
@@ -640,6 +650,11 @@ RESULT text::SetText(const std::string& strText) {
 					posXM += pPeriodQuad->GetWidth();
 				}
 
+				break;
+			}
+
+			// If wrapping has given up quit
+			if (fQuitWrap) {
 				break;
 			}
 		}

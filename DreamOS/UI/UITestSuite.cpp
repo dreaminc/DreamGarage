@@ -422,6 +422,7 @@ RESULT UITestSuite::AddTestFont() {
 			CN(pFont);
 
 			// Fit to Scale
+			/*
 			auto pText = m_pDreamOS->AddText(pFont, "", lineHeight * 5.0f, lineHeight * 4.0f , text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD);
 			//auto pText = m_pDreamOS->AddText(pFont, "", lineHeight * 5.0f, lineHeight, text::flags::TRAIL_ELLIPSIS);
 			CN(pText);
@@ -430,6 +431,13 @@ RESULT UITestSuite::AddTestFont() {
 
 			pTestContext->pText = pText;
 			pTestContext->timeLastUpdate = std::chrono::system_clock::now();
+			*/
+
+			auto pText = m_pDreamOS->AddText(pFont, "abcdefghijklmnopqrstuvwxyz", lineHeight * 5.0f, lineHeight * 2.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD);
+			//auto pText = m_pDreamOS->AddText(pFont, "abc def ghi jkl mno pqr stu vwx yz", lineHeight * 5.0f, lineHeight * 4.0f, text::flags::WRAP );
+			CN(pText);
+			pText->RotateXByDeg(90.0f);
+			pText->SetPosition(point(0.0f, 0.0f, 0.0f));
 
 			//pText->SetText("testing this \nthing");
 
@@ -527,14 +535,16 @@ RESULT UITestSuite::AddTestFont() {
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
 
-		static char c = 'a';
 
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
+		/*
+		static char c = 'a';
 		std::chrono::system_clock::time_point timeNow = std::chrono::system_clock::now();
-
-		if (std::chrono::duration_cast<std::chrono::seconds>(timeNow - pTestContext->timeLastUpdate).count() >= 1) {
+		if (pTestContext->pText != nullptr && 
+			std::chrono::duration_cast<std::chrono::seconds>(timeNow - pTestContext->timeLastUpdate).count() >= 1) 
+		{
 			std::string strText = pTestContext->pText->GetText();
 			strText += c++;
 
@@ -542,6 +552,7 @@ RESULT UITestSuite::AddTestFont() {
 
 			pTestContext->timeLastUpdate = timeNow;
 		}
+		*/
 
 	Error:
 		return r;
