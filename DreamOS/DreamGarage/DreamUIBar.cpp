@@ -223,8 +223,14 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
+
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
 				m_pathStack.push(pSubMenuNode);
+
+				// TODO: This is temporary until we have better IPC
+				GetDOS()->GetKeyboard()->SetPath(strPath);
+				GetDOS()->GetKeyboard()->SetScope(strScope);
+
 				GetDOS()->GetKeyboard()->ShowKeyboard();
 			}
 		}

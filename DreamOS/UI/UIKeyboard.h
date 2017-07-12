@@ -88,6 +88,16 @@ public:
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
 
+	// TODO: Temo until better IPC
+public:
+	RESULT SetPath(std::string strPath);
+	RESULT SetScope(std::string strScope);
+	std::string GetPath();
+	std::string GetScope();
+
+	std::string m_strPath;
+	std::string m_strScope;
+
 private:
 	std::shared_ptr<quad> m_pSurface;
 	float m_surfaceWidth;
