@@ -35,12 +35,9 @@ RESULT DreamUIBar::RegisterEvent(InteractionEventType type, std::function<RESULT
 	return R_PASS;
 }
 
-//Generating the font texture is expensive, only use this function during initialization
 RESULT DreamUIBar::SetFont(const std::wstring& strFile) {
-//	m_labelFormat.pFont = std::make_shared<Font>(strFile, GetComposite(), true);
-	//m_pFont = std::make_shared<font>(strFile, GetComposite(), true);
 	m_pFont = GetDOS()->MakeFont(strFile, true);
-
+	//m_pFont->SetLineHeight()
 	return R_PASS;
 }
 
@@ -68,6 +65,10 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	std::shared_ptr<texture> pFolder = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_folder_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_images[MenuNode::MimeType::FOLDER] = pFolder;
+
+	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
 	CR(GetComposite()->SetVisible(false));
 	// Initialize the OBB (collisions)
@@ -143,7 +144,8 @@ CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connect
 
 
 if (m_pathStack.empty()) {
-	m_pMenuControllerProxy->RequestSubMenu("", "", "Menu");
+	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
+	m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
 	UpdateCompositeWithCameraLook(0.0f, -1.0f);
 }
 else {
@@ -152,6 +154,29 @@ else {
 
 	if (!m_pathStack.empty()) {
 		auto pNode = m_pathStack.top();
+		if (pNode->GetTitle() == "Share") {
+			m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+		}
+		else {
+			HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+			CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
+
+			UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+			CNM(pUserControllerProxy, "Failed to get user controller proxy");
+
+			std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+
+			auto strHeaders = HTTPController::ContentHttp();
+			strHeaders.push_back(strAuthorizationToken);
+
+			auto strURI = pNode->GetThumbnailURL();
+			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
+				MenuNode* pTempMenuNode = new MenuNode(pNode->GetNodeType(), pNode->GetPath(), pNode->GetScope(), pNode->GetTitle(), pNode->GetMIMEType());
+				pTempMenuNode->SetName("root_menu_title");
+				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
+			}
+		}
+
 		SelectMenuItem();
 		m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
 	}
@@ -202,18 +227,38 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 			const std::string& strPath = pSubMenuNode->GetPath();
 			const std::string& strTitle = pSubMenuNode->GetTitle();
 
+			HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+			CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
+
+			UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+			CNM(pUserControllerProxy, "Failed to get user controller proxy");
+
+			std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+
+			auto strHeaders = HTTPController::ContentHttp();
+			strHeaders.push_back(strAuthorizationToken);
+
+			auto strURI = pSubMenuNode->GetIconURL();
+			if (strURI != "") {
+				MenuNode* pTempMenuNode = new MenuNode();
+				pTempMenuNode->SetName("root_menu_title");
+				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
+			}
+
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
 				m_pMenuControllerProxy->RequestSubMenu(strScope, strPath, strTitle);
-				m_pathStack.push(pSubMenuNode);
+				auto pTempMenuNode = std::shared_ptr<MenuNode>(new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType(), pSubMenuNode->GetIconURL(), pSubMenuNode->GetThumbnailURL()));
+				m_pathStack.push(pTempMenuNode);
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
 				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
+				//brow
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
@@ -267,7 +312,11 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	CN(pDreamUIBar);
 
 	GetComposite()->SetVisible(true, false);
+	//m_pScrollView->SetVisible(true);
+	m_pScrollView->SetScrollVisible(true);
 	m_pScrollView->SetPosition( point(0.0f, 0.0f, 0.0f)-m_ptMenuShowOffset);
+	m_pScrollView->GetTitleQuad()->SetVisible(true);
+	m_pScrollView->GetTitleText()->SetVisible(true);
 	m_pLeftMallet->Show();
 	m_pRightMallet->Show();
 	m_menuState = MenuState::ANIMATING;
@@ -308,19 +357,24 @@ RESULT DreamUIBar::Update(void *pContext) {
 		auto pBufferVector = pQueueObj.second;
 		auto pChildren = m_pScrollView->GetMenuItemsView()->GetChildren();
 
+		texture *pTexture = nullptr;
+
+		CN(pBufferVector);
+		uint8_t* pBuffer = &(pBufferVector->operator[](0));
+		size_t pBuffer_n = pBufferVector->size();
+
+		pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		CN(pTexture);
+
 		for (auto& pChild : pChildren) {
 			auto pObj = dynamic_cast<UIMenuItem*>(pChild.get());
 			if (pObj != nullptr && pMenuNodeTitle.size() > 0 && pObj->GetName() == pMenuNodeTitle) {
-				texture *pTexture = nullptr;
-
-				CN(pBufferVector);
-				uint8_t* pBuffer = &(pBufferVector->operator[](0));
-				size_t pBuffer_n = pBufferVector->size();
-
-				pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
-				CN(pTexture);
 				pObj->GetSurface()->UpdateColorTexture(pTexture);
 			}
+		}
+
+		if (pMenuNodeTitle == "root_menu_title") {
+			m_pScrollView->GetTitleQuad()->UpdateColorTexture(pTexture);
 		}
 		
 		if (pBufferVector != nullptr) {
@@ -331,15 +385,16 @@ RESULT DreamUIBar::Update(void *pContext) {
 	}
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
-	
-		std::vector<std::shared_ptr<UIButton>> pButtons; 
+
+		std::vector<std::shared_ptr<UIButton>> pButtons;
 
 		for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 			auto pButton = m_pView->MakeUIMenuItem();
 			CN(pButton);
 
 			auto iconFormat = IconFormat();
-			iconFormat.pTexture = m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())].get();
+			//iconFormat.pTexture = m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())].get();
+			iconFormat.pTexture = m_pDefaultThumbnail.get();
 
 			auto labelFormat = LabelFormat();
 			labelFormat.strLabel = pSubMenuNode->GetTitle();
@@ -353,7 +408,21 @@ RESULT DreamUIBar::Update(void *pContext) {
 			pButtons.emplace_back(pButton);
 		}
 
+		//TODO: could subclass
+		auto pTitleView = m_pScrollView->GetTitleView();
+
+		// if there is a thumbnail, make a quad for it
+		//if (m_pMenuNode->GetThumbnailURL() != "") {
+		//	m_pScrollView->G;
+		//}
+
+		//if (m_pMenuNode->GetTitle() != "") {
+		m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
+		//}
+		
 		CR(m_pScrollView->UpdateMenuButtons(pButtons));
+
+
 
 		CR(ShowMenu(std::bind(&DreamUIBar::UpdateMenu, this, std::placeholders::_1), 
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
@@ -466,19 +535,25 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
 		CNM(pUserControllerProxy, "Failed to get user controller proxy");
 
+		std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+
+		auto strHeaders = HTTPController::ContentHttp();
+		strHeaders.push_back(strAuthorizationToken);
+
 		for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 
-			std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
-
-			auto strHeaders = HTTPController::ContentHttp();
-			strHeaders.push_back(strAuthorizationToken);
-
-			auto strURI = pSubMenuNode->GetIconURL();
+			auto strURI = pSubMenuNode->GetThumbnailURL();
 			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
 				MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
 				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 			}
-			
+		}
+
+		auto strURI = m_pMenuNode->GetIconURL();
+		if (strURI != "") {
+			MenuNode* pTempMenuNode = new MenuNode();
+			pTempMenuNode->SetName("root_menu_title");
+			CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_pMenuNode.get()));
 		}
 	}
 

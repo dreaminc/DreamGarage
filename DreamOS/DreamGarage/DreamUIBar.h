@@ -103,6 +103,11 @@ private:
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
 	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
+
+	std::shared_ptr<texture> m_pDefaultThumbnail;
+	std::shared_ptr<texture> m_pDefaultIcon;
+	std::shared_ptr<texture> m_pShareIcon;
+
 	std::shared_ptr<font> m_pFont;
 
 	quaternion m_qMenuOrientation;

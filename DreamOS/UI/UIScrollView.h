@@ -7,16 +7,18 @@
 
 class UIButton;
 class DreamOS;
+class text;
 
 #define MAX_ELEMENTS 4
 #define MENU_DEPTH -1.5f
 #define ITEM_ANGLE_X -30.0f
-#define ITEM_ANGLE_Y 10.0f
+#define ITEM_ANGLE_Y 12.0f
 #define ITEM_START_ANGLE_Y -15.0f
 #define ITEM_HEIGHT 0.75
 #define ITEM_SCALE 0.25
 #define ITEM_SCALE_SELECTED 1.25
 #define TITLE_ANGLE_X 75.0f
+#define TITLE_HEIGHT 0.875f
 #define PAD_MOVE_CONSTANT 0.005f
 
 enum class ScrollState {
@@ -37,6 +39,7 @@ public:
 	RESULT UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons);
 	RESULT PositionMenuButton(int index, std::shared_ptr<UIButton> pButton);
 
+	RESULT SetScrollVisible(bool fVisible);
 // default behaviors
 public:
 	RESULT AnimateScaleUp(void *pContext);
@@ -56,6 +59,8 @@ public:
 public:
 	ScrollState GetState();
 	std::shared_ptr<UIView> GetTitleView();
+	std::shared_ptr<quad> GetTitleQuad();
+	std::shared_ptr<text> GetTitleText();
 	std::shared_ptr<UIView> GetMenuItemsView();
 
 public:
@@ -73,7 +78,7 @@ private:
 	float m_itemScaleSelected = ITEM_SCALE_SELECTED;
 
 	float m_titleAngleX = TITLE_ANGLE_X;
-	float m_titleHeight;
+	float m_titleHeight = TITLE_HEIGHT;
 
 	// scrolling
 	float m_maxElements = MAX_ELEMENTS;
@@ -85,12 +90,17 @@ private:
 
 	// UI objects
 	std::shared_ptr<UIView> m_pTitleView = nullptr;
+	std::shared_ptr<quad> m_pTitleQuad = nullptr;
+	std::shared_ptr<text> m_pTitleText = nullptr;
+
 	std::shared_ptr<UIButton> m_pLeftScrollButton = nullptr; 
 	std::shared_ptr<UIButton> m_pRightScrollButton = nullptr;
 	ScrollState m_menuState;
 
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
 	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
+
+	bool m_fScrollButtonVisible = false;
 };
 
 #endif // ! UI_SCROLL_VIEW_H_

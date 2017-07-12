@@ -7,6 +7,7 @@
 #include "Primitives/VirtualObj.h"
 
 #include "DreamOS.h"
+#include "Primitives/font.h"
 
 #include "DreamConsole/DreamConsole.h"
 
@@ -32,19 +33,48 @@ UIScrollView::~UIScrollView()
 RESULT UIScrollView::Initialize() {
 	RESULT r = R_PASS;
 
-	m_pTitleView = AddUIView();
+
+	color scrollColor = color(1.0f, 1.0f, 1.0f, 0.5f);
 
 	m_pLeftScrollButton = AddUIButton();
 	m_pLeftScrollButton->SetVisible(false);
+	m_pLeftScrollButton->GetSurface()->SetScale(vector(0.4f));
+	m_pLeftScrollButton->GetMaterial()->SetColors(scrollColor, scrollColor, scrollColor);
 	PositionMenuButton(-1, m_pLeftScrollButton);
 
 	m_pRightScrollButton = AddUIButton();
 	m_pRightScrollButton->SetVisible(false);
+	m_pRightScrollButton->GetSurface()->SetScale(vector(0.4f));
+	m_pRightScrollButton->GetMaterial()->SetColors(scrollColor, scrollColor, scrollColor);
 	PositionMenuButton(m_maxElements, m_pRightScrollButton);
 
 	//color cTransparent = color(1.0f, 1.0f, 1.0f, 0.0f);
 	//m_pLeftScrollButton->GetMaterial()->SetColors(cTransparent, cTransparent, cTransparent);
 	//m_pRightScrollButton->GetMaterial()->SetColors(cTransparent, cTransparent, cTransparent);
+
+	//m_pTitleView = AddUIView();
+	m_pTitleQuad = AddQuad(0.068f, 0.068f * (3.0f / 4.0f));
+	m_pTitleQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pTitleQuad->RotateXByDeg(90.0f);
+	m_pTitleQuad->SetPosition(point(-0.485f, m_titleHeight, m_menuDepth));
+	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+	pFont->SetLineHeight(0.055f);
+	m_pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+		pFont,
+		"Share",
+		1.0,
+		0.055,
+		text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
+
+	m_pTitleText->RotateXByDeg(90.0f);
+	m_pTitleText->SetPosition(point(0.085f, m_titleHeight - 0.005f, m_menuDepth));
+	/*
+	m_pTitleText->SetBackgroundColor(COLOR_BLACK);
+	m_pTitleText->RenderToQuad();
+	//*/
+
+	AddObject(m_pTitleText);
+	//m_pTitleView->SetPosition(point(0.0f, m_titleHeight, m_menuDepth));
 
 	m_pMenuButtonsContainer = AddUIView();
 
@@ -71,27 +101,29 @@ RESULT UIScrollView::Update() {
 	float yRotationPerElement =  (float)M_PI / (180.0f / m_itemAngleY);
 
 	pChildren = m_pMenuButtonsContainer->GetChildren();
-	if (pChildren.size() > m_maxElements) {
+	if (pChildren.size() > m_maxElements && m_fScrollButtonVisible) {
 		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;
 
 		m_yRotation = std::max(0.0f, std::min(m_yRotation + m_velocity, maxRotation));
 
-		// update visible items / index
-		if (m_yRotation > 0.0f) {// && !m_pLeftScrollButton->IsVisible()) {
-			//ShowButton(m_pLeftScrollButton.get());
-			m_pLeftScrollButton->SetVisible(true);
-		}
-		else if (m_yRotation <= 0.0f) {//  && m_pLeftScrollButton->IsVisible()) {
-			//HideButton(m_pLeftScrollButton.get());
-			m_pLeftScrollButton->SetVisible(false);
-		}
-		if (m_yRotation < maxRotation) {//  && !m_pRightScrollButton->IsVisible()) {
-			//ShowButton(m_pRightScrollButton.get());
-			m_pRightScrollButton->SetVisible(true);
-		}
-		else if (m_yRotation >= maxRotation) {//  && m_pRightScrollButton->IsVisible()) {
-			//HideButton(m_pRightScrollButton.get());
-			m_pRightScrollButton->SetVisible(false);
+		if (IsVisible()) {
+			// update visible items / index
+			if (m_yRotation > 0.0f) {// && !m_pLeftScrollButton->IsVisible()) {
+				//ShowButton(m_pLeftScrollButton.get());
+				m_pLeftScrollButton->SetVisible(true);
+			}
+			else if (m_yRotation <= 0.0f) {//  && m_pLeftScrollButton->IsVisible()) {
+				//HideButton(m_pLeftScrollButton.get());
+				m_pLeftScrollButton->SetVisible(false);
+			}
+			if (m_yRotation < maxRotation) {//  && !m_pRightScrollButton->IsVisible()) {
+				//ShowButton(m_pRightScrollButton.get());
+				m_pRightScrollButton->SetVisible(true);
+			}
+			else if (m_yRotation >= maxRotation) {//  && m_pRightScrollButton->IsVisible()) {
+				//HideButton(m_pRightScrollButton.get());
+				m_pRightScrollButton->SetVisible(false);
+			}
 		}
 
 		m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
@@ -263,8 +295,7 @@ RESULT UIScrollView::StopScroll(void *pContext) {
 RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
 	RESULT r = R_PASS;
 
-	m_pLeftScrollButton->SetVisible(false);
-	m_pRightScrollButton->SetVisible(false);
+	m_fScrollButtonVisible = false;
 
 	for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
 		auto pObj = reinterpret_cast<UIButton*>(pButton.get());
@@ -275,6 +306,11 @@ RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
 			CR(HideAndPushButton(pObj));
 		}
 	}
+	m_pLeftScrollButton->SetVisible(false);
+	m_pRightScrollButton->SetVisible(false);
+	m_pTitleQuad->SetVisible(false);
+	m_pTitleText->SetVisible(false);
+	//m_pTitleView->SetVisible(false);
 	//CR(HideButton(m_pLeftScrollButton.get()));
 	//CR(HideButton(m_pRightScrollButton.get()));
 
@@ -367,8 +403,21 @@ ScrollState UIScrollView::GetState() {
 	return m_menuState;
 }
 
+RESULT UIScrollView::SetScrollVisible(bool fVisible) {
+	m_fScrollButtonVisible = fVisible;
+	return R_PASS;
+}
+
 std::shared_ptr<UIView> UIScrollView::GetTitleView() {
 	return m_pTitleView;
+}
+
+std::shared_ptr<quad> UIScrollView::GetTitleQuad() {
+	return m_pTitleQuad;
+}
+
+std::shared_ptr<text> UIScrollView::GetTitleText() {
+	return m_pTitleText;
 }
 
 std::shared_ptr<UIView> UIScrollView::GetMenuItemsView() {

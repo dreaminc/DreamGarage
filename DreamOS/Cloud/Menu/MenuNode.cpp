@@ -2,6 +2,10 @@
 
 #include "Core/Utilities.h"
 
+MenuNode::MenuNode() {
+	// empty
+}
+
 MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/node_type"_json_pointer].is_string()) {
 		std::string strNodeType = jsonMenuNode["/node_type"_json_pointer].get<std::string>();
@@ -42,6 +46,18 @@ MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string str
 	m_strScope(strScope),
 	m_strTitle(strTitle),
 	m_strMIMEType(strMIMEType)
+{
+	InitializeMimeToString();
+}
+
+MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType, std::string strIconURL, std::string strThumbnailURL) :
+	m_nodeType(nodeType),
+	m_strPath(strPath),
+	m_strScope(strScope),
+	m_strTitle(strTitle),
+	m_strMIMEType(strMIMEType),
+	m_strIconURL(strIconURL),
+	m_strThumbnailURL(strThumbnailURL)
 {
 	InitializeMimeToString();
 }
@@ -153,4 +169,9 @@ const std::string& MenuNode::GetThumbnailURL() {
 
 const MenuNode::type& MenuNode::GetNodeType() {
 	return m_nodeType;
+}
+
+RESULT MenuNode::SetName(std::string strName) {
+	m_strTitle = strName;
+	return R_PASS;
 }

@@ -60,24 +60,27 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyTypeThreshold = 0.0f; // triggered once the center of the mallet hits the keyboard surface
 	m_keyReleaseThreshold = -0.025f;
 
+	float m_lineHeight = 0.0625f;
+
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-	m_pFont->SetLineHeight(0.0625f);
+	m_pFont->SetLineHeight(m_lineHeight);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	//m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::WRAP | text::flags::RENDER_QUAD));
-	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
-	m_pTextBoxText->SetPosition(point(0.0f, 0.0f, -((m_surfaceHeight / 2.0f) + (m_surfaceHeight / 8.0f))));
+	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
+		m_pFont,
+		"",
+		0.5,
+		m_lineHeight * 2.0f, 
+		text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+
+	m_pTextBoxText->SetPosition(point(0.0f, 0.0f, -((m_surfaceHeight / 2.0f) + (m_surfaceHeight / 4.0f))));
 	m_pTextBoxContainer->AddObject(m_pTextBoxText);
 
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
 
 	// pre-load possible keyboard layers 
-	//InitializeTexturesWithLayout(LayoutType::QWERTY);
-	//InitializeTexturesWithLayout(LayoutType::QWERTY_UPPER);
-	//InitializeTexturesWithLayout(LayoutType::QWERTY_NUM);
-	//InitializeTexturesWithLayout(LayoutType::QWERTY_SYMBOL);
-
 	InitializeLayoutTexture(LayoutType::QWERTY);
 	InitializeLayoutTexture(LayoutType::QWERTY_UPPER);
 	InitializeLayoutTexture(LayoutType::QWERTY_NUM);
@@ -105,63 +108,14 @@ RESULT UIKeyboard::InitializeLayoutTexture(LayoutType type) {
 
 	pLayout->CreateQWERTYLayout(fUpper, fNum);
 	pLayout->SetKeyTexture(m_pKeyTexture.get());
+
 	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::NONE);
-	//auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::RENDER_QUAD);
 	CN(pText);
 	pText->RenderToQuad();
-
-	//pText->SetBackgroundColorTexture(m_pKeyTexture.get());
 
 	m_layoutAtlas[type] = pText;
 
 Error:
-	return r;
-}
-
-RESULT UIKeyboard::InitializeTexturesWithLayout(LayoutType type) {
-	RESULT r = R_PASS;
-
-	m_pQuadTextures = GetDOS()->AddFlatContext();
-
-	std::shared_ptr<UIKeyboardLayout> pLayout = std::make_shared<UIKeyboardLayout>(type);
-	bool fUpper = (type == LayoutType::QWERTY_UPPER || type == LayoutType::QWERTY_SYMBOL);
-	bool fNum = (type == LayoutType::QWERTY_NUM || type == LayoutType::QWERTY_SYMBOL);
-
-	pLayout->CreateQWERTYLayout(fUpper, fNum);
-
-	for (auto& layoutRow : pLayout->GetKeys()) {
-		for (auto& pKey : layoutRow) {
-
-			// Set up text box key texture
-			if (m_pQuadTextures->HasChildren()) 
-				m_pQuadTextures->ClearChildren();
-			/*
-			std::string ch = "";
-			if (pKey->m_letter >= 0x20) 
-				ch = pKey->m_letter;
-
-			text* pText = GetDOS()->MakeText(m_pFont, ch, 0.2f, text::flags::NONE | text::flags::RENDER_QUAD);
-			//GetDOS()->RenderToTexture(m_pQuadTextures);
-
-			m_keyCharAtlas[pKey->m_letter] = GetDOS()->MakeTexture(*(pText->GetFramebuffer()->GetColorTexture()));
-
-			// Set up key quad texture
-			if (m_pQuadTextures->HasChildren()) 
-				m_pQuadTextures->ClearChildren();
-			*/
-
-//			auto keyBack = m_pQuadTextures->AddQuad(2.0f, 2.0f, point(0.0f, 0.0f, 0.0f));
-//			keyBack->SetColorTexture(m_pKeyTexture.get());
-
-//			pText = GetDOS()->MakeText(m_pFont, ch, 0.2f, text::flags::NONE | text::flags::RENDER_QUAD);
-			//GetDOS()->RenderToTexture(m_pQuadTextures);
-
-//			auto pTexture = GetDOS()->MakeTexture(*(pText->GetFramebuffer()->GetColorTexture()));
-//			m_keyTextureAtlas[pKey->m_letter] = pTexture;
-		}
-	}
-
-//Error:
 	return r;
 }
 
@@ -193,8 +147,8 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 			point ptOrigin = point(xPos, 0.0f, zPos) + m_pSurface->GetPosition();
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(
-				keyDimension,
-				keyDimension,
+				keyDimension,//*0.9f,
+				keyDimension,//*0.9f,
 				ptOrigin,
 				uvcoord(uvLeft, uvTop),
 				uvcoord(uvRight, uvBottom));

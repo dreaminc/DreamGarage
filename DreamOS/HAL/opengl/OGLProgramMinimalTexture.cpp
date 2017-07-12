@@ -23,6 +23,8 @@ RESULT OGLProgramMinimalTexture::OGLInitialize() {
 	// Uniform Variables
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformHasTextureColor), std::string("u_hasTextureColor")));
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
 
 	CR(RegisterUniformBlock(reinterpret_cast<OGLUniformBlock**>(&m_pMaterialsBlock), std::string("ub_material")));
@@ -114,6 +116,10 @@ RESULT OGLProgramMinimalTexture::SetObjectTextures(OGLObj *pOGLObj) {
 		m_pParentImp->glActiveTexture(GL_TEXTURE0);
 		m_pParentImp->BindTexture(pTexture->GetOGLTextureTarget(), pTexture->GetOGLTextureIndex());
 		m_pUniformTextureColor->SetUniform(0);
+		m_pUniformHasTextureColor->SetUniform(true);
+	}
+	else {
+		m_pUniformHasTextureColor->SetUniform(false);
 	}
 
 	//	Error:

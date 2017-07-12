@@ -63,6 +63,8 @@ public:
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
 
+	RESULT FadeQuadToBlack();
+
 	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
 
 	float GetWidth();

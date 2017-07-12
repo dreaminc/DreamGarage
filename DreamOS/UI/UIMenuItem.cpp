@@ -51,11 +51,28 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	std::shared_ptr<text> pText;
 	std::shared_ptr<quad> pIcon;
 
-	pText = std::shared_ptr<text>(m_pDreamOS->MakeText(labelFormat.pFont,
-		labelFormat.strLabel, 0.035, text::flags::FIT_TO_SIZE | text::flags::RENDER_QUAD));
+	labelFormat.pFont->SetLineHeight(0.025f);
+	//labelFormat.pFont->SetLineHeight(0.025f);
+
+	pText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+		labelFormat.pFont,
+		labelFormat.strLabel, 
+		0.225,
+		0.0703125, 
+		text::flags::WRAP | text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
+
+	//pText->SetBackgroundColor(color(0.0f, 0.0f, 0.0f, 0.65f));
+	//pText->RenderToQuad();
+
 	pText->RotateXByDeg(90.0f);
 
 	pText->SetPosition(labelFormat.ptPosition);
+
+	auto pBgQuad = m_pSurfaceComposite->AddQuad(0.25, 0.2);
+	pBgQuad->SetColor(color(0.0f, 0.0f, 0.0f, 0.65f));
+	pBgQuad->SetPosition(pText->GetPosition() + point(0.0f, 0.0725f, -0.0001f));
+	pBgQuad->RotateXByDeg(90.0f);
+	//pText->RenderToQuad();
 	m_pSurfaceComposite->AddObject(pText);
 
 	m_strName = labelFormat.strLabel;
