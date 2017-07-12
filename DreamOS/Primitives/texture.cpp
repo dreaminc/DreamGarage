@@ -332,6 +332,8 @@ Error:
 RESULT texture::LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 	
+	//m_channels = 3;
+	//m_pImageBuffer = SOIL_load_image_from_memory((unsigned char*)(pBuffer), (int)(pBuffer_n), &m_width, &m_height, NULL, SOIL_LOAD_RGB);
 	m_pImageBuffer = SOIL_load_image_from_memory((unsigned char*)(pBuffer), (int)(pBuffer_n), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 	CN(m_pImageBuffer);
 

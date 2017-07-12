@@ -627,7 +627,7 @@ Error:
 	return r;
 }
 
-RESULT HTTPController::RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback) {
+RESULT HTTPController::RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback, void *pContext) {
 	RESULT r = R_PASS;
 
 	//std::vector<std::string> strHeaders;
@@ -636,7 +636,7 @@ RESULT HTTPController::RequestFile(std::string strURI, std::vector<std::string> 
 
 	DEBUG_LINEOUT("Requesting file %s to buffer", strURI.c_str());
 
-	CR(AFILE(strURI, strHeaders, strBody, L"", fnResponseFileCallback));
+	CR(AFILE(strURI, strHeaders, strBody, L"", fnResponseFileCallback, pContext));
 
 Error:
 	return r;

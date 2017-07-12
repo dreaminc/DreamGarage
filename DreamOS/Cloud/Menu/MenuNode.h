@@ -49,6 +49,9 @@ public:
 	const std::string& GetScope();
 	const std::string& GetMIMEType();
 	const std::string& GetTitle();
+	const std::string& GetIconURL();
+	const std::string& GetThumbnailURL();
+
 	const MenuNode::type& GetNodeType();
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
@@ -59,6 +62,8 @@ private:
 	std::string m_strScope;
 	std::string m_strTitle;
 	std::string m_strMIMEType;
+	std::string m_strIconURL;
+	std::string m_strThumbnailURL;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
 

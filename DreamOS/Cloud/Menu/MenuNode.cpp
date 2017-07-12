@@ -27,6 +27,12 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 		}
 	}
 
+	if (jsonMenuNode["/icon_url"_json_pointer].is_string())
+		m_strIconURL = jsonMenuNode["/icon_url"_json_pointer].get<std::string>();
+
+	if (jsonMenuNode["/thumbnail_url"_json_pointer].is_string())
+		m_strThumbnailURL = jsonMenuNode["/thumbnail_url"_json_pointer].get<std::string>();
+
 	InitializeMimeToString();
 }
 
@@ -135,6 +141,14 @@ const std::string& MenuNode::GetMIMEType() {
 
 const std::string& MenuNode::GetTitle() {
 	return m_strTitle;
+}
+
+const std::string& MenuNode::GetIconURL() {
+	return m_strIconURL;
+}
+
+const std::string& MenuNode::GetThumbnailURL() {
+	return m_strThumbnailURL;
 }
 
 const MenuNode::type& MenuNode::GetNodeType() {
