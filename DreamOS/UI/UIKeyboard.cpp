@@ -28,26 +28,13 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
 
 	//TODO this may become deprecated
-	m_surfaceDistance = 0.5f;
-	m_ptSurfaceOffset = point(0.0f, -0.25f, -m_surfaceDistance);
-	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
+	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(SURFACE_ANGLE * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
 
-	m_surfaceHeight = 0.25f;
-	m_surfaceWidth = 0.5f;
 	m_pSurface = GetComposite()->AddQuad(m_surfaceHeight, m_surfaceWidth);
 	CN(m_pSurface);
 
 	m_pSurface->SetVisible(false);
 	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
-
-	/*
-	//m_pTextBox = GetComposite()->AddQuad(m_surfaceHeight / 4.0f, m_surfaceWidth);
-	//CN(m_pTextBox);
-	m_pTextBox->SetVisible(false);
-	m_pTextBox->SetPosition(point(0.0f, 0.0f, -m_surfaceHeight * 0.75f ));
-	//m_pTextBoxTexture = GetComposite()->MakeTexture(L"Textbox-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	//CR(m_pTextBox->SetColorTexture(m_pTextBoxTexture.get()));
-	//*/
 
 	m_pTextBoxContainer = GetComposite()->AddComposite();
 
@@ -57,11 +44,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pRightMallet = new UIMallet(GetDOS());
 	CN(m_pRightMallet);
 
-	m_keyTypeThreshold = 0.0f; // triggered once the center of the mallet hits the keyboard surface
-	m_keyReleaseThreshold = -0.025f;
-
-	float m_lineHeight = 0.0625f;
-
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	m_pFont->SetLineHeight(m_lineHeight);
 	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -70,10 +52,11 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
 		m_pFont,
 		"",
-		0.5,
-		m_lineHeight * 2.0f, 
+		m_surfaceWidth,
+		m_lineHeight * m_numLines, 
 		text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
 
+	//TODO 4.0f should be derived out of layout
 	m_pTextBoxText->SetPosition(point(0.0f, 0.0f, -((m_surfaceHeight / 2.0f) + (m_surfaceHeight / 4.0f))));
 	m_pTextBoxContainer->AddObject(m_pTextBoxText);
 
@@ -122,8 +105,6 @@ Error:
 RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 	RESULT r = R_PASS;
 	
-	m_pQuadTextures = GetDOS()->AddFlatContext();
-
 	auto& pLayoutKeys = pLayout->GetKeys();
 	//not flexible, TODO: take max of rows?
 	float keyDimension = m_surfaceWidth / (float)pLayoutKeys[0].size();
@@ -152,21 +133,13 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 				ptOrigin,
 				uvcoord(uvLeft, uvTop),
 				uvcoord(uvRight, uvBottom));
-				//uvcoord(0.0f, 0.0f),
-				//uvcoord(1.0f, 1.0f));
 
-//			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetColorTexture());
 			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
-
-/*
-			if (m_keyTextureAtlas[pKey->m_letter])
-				pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]);
-				//*/
 
 			// Set up key quad positioning
 			pQuad->ScaleX(1.0f / (keyDimension / (0.5f*pKey->m_width)));
 
-			pQuad->SetMaterialAmbient(0.75f);
+			pQuad->SetMaterialAmbient(m_ambientIntensity);
 
 			pKey->m_pQuad = pQuad;
 			pKey->m_pQuad->SetVisible(false);
@@ -339,14 +312,14 @@ UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 
 RESULT UIKeyboard::ShowKeyboard() {
 
-	UpdateCompositeWithCameraLook(m_surfaceDistance, -0.25f);
+	UpdateCompositeWithCameraLook(m_offsetDepth, m_offsetHeight);
 	SetSurfaceOffset(GetComposite()->GetPosition());
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, 1.0f, 0.0f));
+		GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
 	Error:
@@ -359,7 +332,6 @@ RESULT UIKeyboard::ShowKeyboard() {
 		CN(pKeyboard);
 		m_pLeftMallet->Show();
 		m_pRightMallet->Show();
-		//GetComposite()->SetPosition(point(0.0f, 1.0f, 0.0f));
 	Error:
 		return r;
 	};
@@ -370,7 +342,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		m_ptSurfaceOffset,
 		pObj->GetOrientation() * m_qSurfaceOrientation,
 		pObj->GetScale(),
-		0.2f,
+		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
 		fnStartCallback,
@@ -396,10 +368,10 @@ RESULT UIKeyboard::HideKeyboard() {
 	DimObj *pObj = GetComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
-		pObj->GetPosition() - point(0.0f, 1.0f, 0.0f),
+		pObj->GetPosition() - point(0.0f, m_animationOffsetHeight, 0.0f),
 		pObj->GetOrientation(),
 		pObj->GetScale(),
-		0.2f,
+		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
 		nullptr,
@@ -432,7 +404,7 @@ RESULT UIKeyboard::ReleaseKey(UIKey *pKey) {
 		point(ptPosition.x(), 0.00f, ptPosition.z()),
 		pObj->GetOrientation(),
 		pObj->GetScale(),
-		0.1f,
+		m_keyReleaseDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags()
 	));
@@ -446,11 +418,11 @@ RESULT UIKeyboard::ReleaseKey(UIKey *pKey) {
 Error:
 	return r;
 }
+
 // this function assumes the key height is constant
 UIKey* UIKeyboard::CollisionPointToKey(point ptCollision) {
 	RESULT r = R_PASS;
 
-//	auto& keyboardLayout = m_kbLayers[m_currentLayout]->GetKeys();
 	auto& keyboardLayout = m_pLayout->GetKeys();
 
 	int rowIndex = (ptCollision.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
@@ -492,16 +464,11 @@ RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 
 	m_pLayout->UpdateKeysWithLayout(kbType);
 
-	//*
 	for (auto layoutRow : m_pLayout->GetKeys()) {
 		for (auto& pKey : layoutRow) {
-	//		if (m_keyTextureAtlas.count(pKey->m_letter) > 0 && m_keyTextureAtlas[pKey->m_letter]) {
-	//			CR(pKey->m_pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]));
-	//		}
 			CR(pKey->m_pQuad->UpdateColorTexture(m_layoutAtlas[kbType]->GetFramebuffer()->GetColorTexture()));
 		}
 	}
-	//*/
 
 	m_currentLayout = kbType;
 	
@@ -524,15 +491,6 @@ Error:
 
 RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 	RESULT r = R_PASS;
-	/*
-	if (chkey == SVK_RETURN) {
-		CR(m_pTextBoxContainer->ClearChildren());
-	}
-
-	else if (chkey == SVK_BACK) {
-		CR(m_pTextBoxContainer->RemoveLastChild());
-	}
-	//*/
 
 	//TODO: this logic should probably be in UIKeyboardLayout
 	if (chkey == SVK_SHIFT) {
