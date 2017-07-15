@@ -33,7 +33,7 @@ quad::quad(quad&& q) :
 
 // Square
 quad::quad(float side, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
-	m_quadType(SQUARE),
+	m_quadType(type::SQUARE),
 	m_numHorizontalDivisions(numHorizontalDivisions),
 	m_numVerticalDivisions(numVerticalDivisions),
 	m_pTextureHeight(pTextureHeight),
@@ -60,7 +60,7 @@ Error:
 
 // Rectangle
 quad::quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) :
-	m_quadType(RECTANGLE),
+	m_quadType(type::RECTANGLE),
 	m_numHorizontalDivisions(numHorizontalDivisions),
 	m_numVerticalDivisions(numVerticalDivisions),
 	m_pTextureHeight(pTextureHeight),
@@ -89,7 +89,7 @@ Error:
 // This needs to be re-designed, too specific for 2D blits.
 //quad::quad(float height, float width, point& ptCenter, uvcoord& uvBottomLeft, uvcoord& uvUpperRight, vector vNormal) :
 quad::quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) :
-	m_quadType(RECTANGLE),
+	m_quadType(type::RECTANGLE),
 	m_numHorizontalDivisions(1),
 	m_numVerticalDivisions(1),
 	m_pTextureHeight(nullptr),
@@ -133,7 +133,7 @@ Error:
 }
 
 quad::quad(BoundingQuad *pBoundingQuad, bool fTriangleBased) :
-	m_quadType(RECTANGLE),
+	m_quadType(type::RECTANGLE),
 	m_numHorizontalDivisions(1),
 	m_numVerticalDivisions(1),
 	m_pTextureHeight(nullptr),
@@ -380,10 +380,30 @@ Error:
 	return r;
 }
 
+// TODO: Cruve on arbitrary axis 
+RESULT quad::ApplyCurveToVertices() {
+	RESULT r = R_PASS;
+
+	CB((m_quadCurveType != CurveType::FLAT));
+
+	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
+		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
+			int vertNum = (i * m_numHorizontalDivisions) + j;
+			float 
+
+			//point ptAdjustedPoint 
+			//m_pVertices[vertNum].SetPoint()
+		}
+	}
+
+Error:
+	return r;
+}
+
 // TODO: Parallelogram
 // TODO: Trapezoid
 // TODO: Rhombus
 // TODO: Trapezium + Evaluate Points
-quad::QUAD_TYPE quad::EvaluatePoints(point a, point b, point c) {
-	return INVALID;
+quad::type quad::EvaluatePoints(point a, point b, point c) {
+	return type::INVALID;
 }

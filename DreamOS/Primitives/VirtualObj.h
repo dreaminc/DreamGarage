@@ -86,6 +86,7 @@ public:
 
 	VirtualObj* SetOrigin(point p);
 	VirtualObj* SetPosition(point p);
+	VirtualObj* SetPosition(point_precision x, point_precision y, point_precision z);
 	VirtualObj* MoveTo(point p);
 	VirtualObj* MoveTo(point_precision x, point_precision y, point_precision z);
 
