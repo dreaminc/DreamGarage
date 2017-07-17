@@ -129,7 +129,6 @@ private:
 
 	float m_keyScale = KEY_SCALE;
 	float m_keyMargin = KEY_MARGIN;
-	float m_rowHeight;
 
 	point m_ptSurfaceOffset = point(0.0f, OFFSET_HEIGHT, -OFFSET_DEPTH);
 	quaternion m_qSurfaceOrientation;

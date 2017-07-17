@@ -63,7 +63,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
 
-	m_rowHeight = 0.1f / 0.9f; 
 	// pre-load possible keyboard layers 
 	InitializeLayoutTexture(LayoutType::QWERTY);
 	InitializeLayoutTexture(LayoutType::QWERTY_UPPER);
@@ -123,11 +122,6 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 
 			float uvTop = (rowIndex * m_surfaceHeight);
 			float uvBottom = (((rowIndex + 1) * m_surfaceHeight));
-			//float uvTop = (rowIndex * pLayout->GetRowHeight());// / m_surfaceHeight;
-			//float uvBottom = (((rowIndex + 1) * pLayout->GetRowHeight()));// / m_surfaceHeight;
-
-//			uvLeft += 0.006f;
-//			uvRight += 0.006f;
 
 			float rowCount = (float)pLayoutKeys.size();
 			float zPos = (m_surfaceHeight / rowCount) * (rowIndex - (rowCount / 2.0f) + 0.5f);
@@ -146,8 +140,8 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
 
 			// Set up key quad positioning
-			pQuad->ScaleX((0.9f * 0.5f*pKey->m_width) / keyDimension);
-			pQuad->ScaleY(0.9f);
+			pQuad->ScaleX((m_keyScale * 0.5f*pKey->m_width) / keyDimension);
+			pQuad->ScaleY(m_keyScale);
 
 			pQuad->SetMaterialAmbient(m_ambientIntensity);
 
