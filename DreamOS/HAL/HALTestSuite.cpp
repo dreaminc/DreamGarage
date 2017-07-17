@@ -688,7 +688,9 @@ RESULT HALTestSuite::AddTestQuadObject() {
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
-			auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+			//auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
+			//auto pQuad = m_pDreamOS->TAddQuad(1.0f, 1.0f);
+			auto pQuad = m_pDreamOS->Add<quad>(1.0f, 1.0f);
 			CN(pQuad);
 			pQuad->SetPosition(0.0f, -1.0f, 0.0f);
 		}

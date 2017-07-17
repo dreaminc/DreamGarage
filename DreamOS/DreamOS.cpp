@@ -271,7 +271,7 @@ volume* DreamOS::MakeVolume(double width, double length, double height, bool fTr
 volume* DreamOS::MakeVolume(double side, bool fTriangleBased) {
 	return m_pSandbox->AddVolume(side, fTriangleBased);
 }
-	
+
 quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }

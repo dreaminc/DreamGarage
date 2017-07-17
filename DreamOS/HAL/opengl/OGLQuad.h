@@ -57,6 +57,14 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
+	OGLQuad(OpenGLImp *pParentImp, float width, float height, int numHorizontalDivisions, int numVerticalDivisions, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) :
+		quad(width, height, numHorizontalDivisions, numVerticalDivisions, curveType, vNormal),
+		OGLObj(pParentImp)
+	{
+		// TODO: Implement valid and CV EHM
+		RESULT r = OGLInitialize();
+	}
+
 	OGLQuad(OpenGLImp *pParentImp, BoundingQuad* pBoundingQuad, bool fTriangleBased) :
 		quad(pBoundingQuad, fTriangleBased),
 		OGLObj(pParentImp)

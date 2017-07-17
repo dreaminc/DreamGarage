@@ -49,9 +49,12 @@ public:
 	quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
 	quad(BoundingQuad *pBoundingQuad, bool fTriangleBased);
 
+	quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, CurveType curveType = CurveType::FLAT, vector vNormal = vector::jVector());
+
 	//RESULT SetVertices(float width, float height, vector vNormal);
 	RESULT SetVertices(float width, float height, vector vNormal, const uvcoord& uvTopLeft = uvcoord(0.0f, 0.0f), const uvcoord& uvBottomRight = uvcoord(1.0f, 1.0f));
 	RESULT SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased);
+
 	RESULT ApplyCurveToVertices();
 
 	RESULT FlipUVVertical();

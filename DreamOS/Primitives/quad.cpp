@@ -102,28 +102,6 @@ quad::quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft,
 
 	CR(InitializeBoundingQuad(GetOrigin(), width, height, vNormal));
 
-	/*
-	CR(Allocate());
-
-	float halfSideX = width / 2.0f;
-	float halfSideY = height / 2.0f;
-	int vertCount = 0;
-	int indexCount = 0;
-	int A, B, C, D;
-
-	// Set up indices 
-	// TODO: ASDFAGKJHNSDFGKJSDFG
-	TriangleIndexGroup *pTriIndices = reinterpret_cast<TriangleIndexGroup*>(m_pIndices);
-
-	m_pVertices[A = vertCount++] = vertex(point(-halfSideX + ptCenter.x(), halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvcoord(uvBottomLeft.u(), uvTopRight.v()));		// A
-	m_pVertices[B = vertCount++] = vertex(point(halfSideX + ptCenter.x(), halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvTopRight);			// B
-	m_pVertices[C = vertCount++] = vertex(point(-halfSideX + ptCenter.x(), -halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvBottomLeft);		// C
-	m_pVertices[D = vertCount++] = vertex(point(halfSideX + ptCenter.x(), -halfSideY + ptCenter.y(), ptCenter.z()), vector(0, 0, 1), uvcoord(uvTopRight.u(), uvBottomLeft.v()));		// D
-
-	pTriIndices[indexCount++] = TriangleIndexGroup(A, C, B);
-	pTriIndices[indexCount++] = TriangleIndexGroup(B, C, D);
-	*/
-
 //Success:
 	Validate();
 	return;
@@ -151,6 +129,30 @@ Error:
 	return;
 }
 
+quad::quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, CurveType curveType, vector vNormal) :
+	m_quadType(type::RECTANGLE),
+	m_numHorizontalDivisions(numHorizontalDivisions),
+	m_numVerticalDivisions(numVerticalDivisions),
+	m_pTextureHeight(nullptr),
+	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
+{
+	RESULT r = R_PASS;
+
+	// TODO: UV thing
+	CR(SetVertices(width, height, vNormal));
+	
+	CR(ApplyCurveToVertices());
+
+	CR(InitializeOBB());
+
+	//Success:
+	Validate();
+	return;
+Error:
+	Invalidate();
+	return;
+}
+
 RESULT quad::Allocate() {
 	RESULT r = R_PASS;
 
@@ -165,8 +167,8 @@ RESULT quad::Allocate() {
 inline unsigned int quad::NumberVertices() {
 //return NUM_QUAD_POINTS; 
 
-unsigned int numVerts = (m_numVerticalDivisions + 1) * (m_numHorizontalDivisions + 1);
-return numVerts;
+	unsigned int numVerts = (m_numVerticalDivisions + 1) * (m_numHorizontalDivisions + 1);
+	return numVerts;
 }
 
 inline unsigned int quad::NumberIndices() {
@@ -380,7 +382,7 @@ Error:
 	return r;
 }
 
-// TODO: Cruve on arbitrary axis 
+// TODO: Curve on arbitrary axis 
 RESULT quad::ApplyCurveToVertices() {
 	RESULT r = R_PASS;
 
@@ -389,10 +391,39 @@ RESULT quad::ApplyCurveToVertices() {
 	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
 		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
 			int vertNum = (i * m_numHorizontalDivisions) + j;
-			float 
 
-			//point ptAdjustedPoint 
-			//m_pVertices[vertNum].SetPoint()
+			// Puts effective val in [-1, 1] range
+			float effRange = ((float)(m_numHorizontalDivisions + 1));
+			float effVal = -1.0f + 2.0f * ((float)(i) / effRange);
+
+			float displacementAmount = 0.0f;
+
+			switch (m_quadCurveType) {
+				case CurveType::FLAT: {
+					displacementAmount = 0.0f;
+				} break;
+
+				case CurveType::PARABOLIC: {
+					displacementAmount = effVal * effVal;
+				}break;
+
+				// TODO: make radius programmatic
+				case CurveType::CIRCLE: {
+					float radius = 1.0f;
+					displacementAmount = radius - std::sqrt(1.0f - (effVal * effVal));
+				} break;
+			}
+
+			vertex *pVertex = &(m_pVertices[vertNum]);
+			pVertex->TranslatePoint(m_vNormal * displacementAmount);
+
+			// Calculate normal (based on geometry)
+
+			/*
+			pVertex->SetTangent(vector(-1.0f, 0.0f, 0.0f));
+			pVertex->SetBitangent(vector(0.0f, 0.0f, -1.0f));
+			*/
+
 		}
 	}
 

@@ -583,6 +583,25 @@ Error:
 		delete pQuad;
 		pQuad = nullptr;
 	}
+
+	return nullptr;
+}
+
+quad* OpenGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, quad::CurveType curveType, vector vNormal) {
+	RESULT r = R_PASS;
+
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, curveType, vNormal);
+	CN(pQuad);	
+
+	//Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
