@@ -48,7 +48,7 @@ std::string UIKeyboardLayout::GenerateQWERTYRow(int rowIndex, bool fUpper, bool 
 		}
 		else {
 			if (fUpper) { return "_.|~<>..."; } // TODO: periods on unused keys
-			else { return "-//:;()$&@"; }
+			else { return "-/:;()$&@"; }
 		}
 	} break;
 	case 2: {
@@ -202,6 +202,11 @@ RESULT UIKeyboardLayout::SetVisible(bool fVisible) {
 
 Error:
 	return r;
+}
+
+RESULT UIKeyboardLayout::SetRowHeight(float rowHeight) {
+	m_rowHeight = rowHeight;
+	return R_PASS;
 }
 
 float UIKeyboardLayout::GetRowHeight() {

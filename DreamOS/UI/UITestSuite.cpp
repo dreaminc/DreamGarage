@@ -55,9 +55,9 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestBrowserRequest());
+	//CR(AddTestBrowserRequest());
 
-	CR(AddTestFont());
+	//CR(AddTestFont());
 
 	CR(AddTestKeyboard());
 
@@ -979,7 +979,7 @@ RESULT UITestSuite::AddTestKeyboard() {
 
 	auto fnUpdate = [&](void *pContext) {
 		RESULT r = R_PASS;
-
+		//m_pDreamOS->GetKeyboard()->GetComposite()->SetPosition(0.0f, 1.0f, 0.0f);
 		CR(r);
 	Error:
 		return r;

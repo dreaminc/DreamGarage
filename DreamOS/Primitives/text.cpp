@@ -439,8 +439,29 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 	// Create the layout in text form
 	for (auto &layoutRow : pLayout->GetKeys()) {
 		for (auto &pUIKey : layoutRow) {
+			// Position
+			float glyphQuadXPosition = pUIKey->m_left + (pUIKey->m_width / 2.0f);
+			float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
+			//float glyphQuadYPosition = posY;
+			
+			if ((pUIKey->m_left + pUIKey->m_width) > width)
+				width = (pUIKey->m_left + pUIKey->m_width);
+
+			///*
+
+			point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
+
+			texture *pLayoutBGTexture = nullptr;
+			if ((pLayoutBGTexture = pLayout->GetKeyTexture()) != nullptr) {
+				std::shared_ptr<quad> pBgQuad = AddQuad(pUIKey->m_width, rowHeight, ptGlyph);
+				pBgQuad->SetColorTexture(pLayoutBGTexture);
+			}
+			//*/
+
 			CharacterGlyph glyph;
-			if (m_pFont->GetGlyphFromChar((char)(pUIKey->m_letter), glyph)) {
+			if ( pUIKey->m_letter > 0x20) { 
+
+				m_pFont->GetGlyphFromChar((char)(pUIKey->m_letter), glyph);
 				//AddGlyphQuad(glyph, posX, posY);
 
 				// Get UV values 
@@ -456,28 +477,12 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 				uvcoord uvTopLeft = uvcoord(uvLeft, uvTop);
 				uvcoord uvBottomRight = uvcoord(uvRight, uvBottom);
 
-				// Position
-				float glyphQuadXPosition = pUIKey->m_left;
-				float glyphQuadYPosition = posY + (float)(rowHeight / 2.0f);
-				//float glyphQuadYPosition = posY;
-				
-				if ((pUIKey->m_left + pUIKey->m_width) > width)
-					width = (pUIKey->m_left + pUIKey->m_width);
-
 				// Size
 				float glyphWidth = GetMSizeFromDots(glyph.width) * m_scaleFactor;
 				float glyphHeight = GetMSizeFromDots(glyph.height) * m_scaleFactor;
 
-				point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
-
-				///*
-				texture *pLayoutBGTexture = nullptr;
-				if ((pLayoutBGTexture = pLayout->GetKeyTexture()) != nullptr) {
-					std::shared_ptr<quad> pBgQuad = AddQuad(pUIKey->m_width, rowHeight, ptGlyph);
-					pBgQuad->SetColorTexture(pLayoutBGTexture);
-				}
-				//*/
-
+				//TODO: account for bearingY like AddGlyphQuad
+				// may be possible to use AddGlyphQuad
 				std::shared_ptr<quad> pGlyphQuad = AddQuad(glyphWidth, glyphHeight, ptGlyph, uvTopLeft, uvBottomRight);
 				pGlyphQuad->SetColorTexture(m_pFont->GetTexture().get());
 

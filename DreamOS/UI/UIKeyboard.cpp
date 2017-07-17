@@ -63,6 +63,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
 
+	m_rowHeight = 0.1f / 0.9f; 
 	// pre-load possible keyboard layers 
 	InitializeLayoutTexture(LayoutType::QWERTY);
 	InitializeLayoutTexture(LayoutType::QWERTY_UPPER);
@@ -92,7 +93,10 @@ RESULT UIKeyboard::InitializeLayoutTexture(LayoutType type) {
 	pLayout->CreateQWERTYLayout(fUpper, fNum);
 	pLayout->SetKeyTexture(m_pKeyTexture.get());
 
-	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::NONE);
+	// this calculation seems weird, but has a value similar to the "fudge factor" in AddGlyphQuad
+	pLayout->SetRowHeight((1.0f / (float)pLayout->GetKeys()[0].size()) / m_keyScale);
+
+	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), m_keyMargin, text::flags::NONE);
 	CN(pText);
 	pText->RenderToQuad();
 
@@ -114,22 +118,27 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 	for (auto& layoutRow : pLayoutKeys) {
 		for (auto& pKey : layoutRow) {
 
-			float uvLeft = pKey->m_left / (m_surfaceWidth * 2.0f);
-			float uvRight = (pKey->m_left + pKey->m_width) / (m_surfaceWidth * 2.0f);
+			float uvLeft = pKey->m_left;// / (m_surfaceWidth * 2.0f);
+			float uvRight = (pKey->m_left + pKey->m_width);// / (m_surfaceWidth * 2.0f);
 
-			float uvTop = (rowIndex * pLayout->GetRowHeight()) / m_surfaceHeight;
-			float uvBottom = ((rowIndex+1) * pLayout->GetRowHeight()) / m_surfaceHeight;
+			float uvTop = (rowIndex * m_surfaceHeight);
+			float uvBottom = (((rowIndex + 1) * m_surfaceHeight));
+			//float uvTop = (rowIndex * pLayout->GetRowHeight());// / m_surfaceHeight;
+			//float uvBottom = (((rowIndex + 1) * pLayout->GetRowHeight()));// / m_surfaceHeight;
+
+//			uvLeft += 0.006f;
+//			uvRight += 0.006f;
 
 			float rowCount = (float)pLayoutKeys.size();
 			float zPos = (m_surfaceHeight / rowCount) * (rowIndex - (rowCount / 2.0f) + 0.5f);
 
-			float xPos = m_surfaceWidth * pKey->m_left - (m_surfaceWidth / 2.0f) +(pKey->m_width / 4.0f);
+			float xPos = m_surfaceWidth * (pKey->m_left + pKey->m_width / 2.0f) - (m_surfaceWidth / 2.0f);
 
 			point ptOrigin = point(xPos, 0.0f, zPos) + m_pSurface->GetPosition();
 
 			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(
-				keyDimension,//*0.9f,
-				keyDimension,//*0.9f,
+				keyDimension,
+				keyDimension,
 				ptOrigin,
 				uvcoord(uvLeft, uvTop),
 				uvcoord(uvRight, uvBottom));
@@ -137,7 +146,8 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
 
 			// Set up key quad positioning
-			pQuad->ScaleX(1.0f / (keyDimension / (0.5f*pKey->m_width)));
+			pQuad->ScaleX((0.9f * 0.5f*pKey->m_width) / keyDimension);
+			pQuad->ScaleY(0.9f);
 
 			pQuad->SetMaterialAmbient(m_ambientIntensity);
 
@@ -179,14 +189,14 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	// Update Mallet Positions
 	hand *pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
-	CN(pHand);
+	CNR(pHand, R_OBJECT_NOT_FOUND);
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
 	pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
-	CN(pHand);
+	CNR(pHand, R_OBJECT_NOT_FOUND);
 
 	qOffset = RotationMatrix();
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
@@ -504,6 +514,14 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 		CR(UpdateKeyboardLayout(newType));
 	}
 
+	else if (chkey == SVK_RETURN) {
+		m_pTextBoxText->SetText("");
+		//TODO: it is possible that when the menu button is pressed again, 
+		// the user is at the root menu by coincidence.  may need to notify
+		// DreamUIBar in some way in the future
+		HideKeyboard();
+	}
+
 	else if (chkey == SVK_CONTROL) {
 		LayoutType newType;
 		switch (m_currentLayout) {
@@ -518,6 +536,9 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 
 	else {
 		m_pTextBoxText->SetText(strEntered);
+		if (m_currentLayout == LayoutType::QWERTY_UPPER) {
+			CR(UpdateKeyboardLayout(LayoutType::QWERTY));
+		}
 	}
 
 
