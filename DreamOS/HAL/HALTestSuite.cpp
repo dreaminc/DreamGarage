@@ -638,7 +638,8 @@ RESULT HALTestSuite::AddTestQuadObject() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -684,15 +685,18 @@ RESULT HALTestSuite::AddTestQuadObject() {
 
 		// Objects 
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, -0.0f));
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
 			//auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			//auto pQuad = m_pDreamOS->TAddQuad(1.0f, 1.0f);
-			auto pQuad = m_pDreamOS->Add<quad>(1.0f, 1.0f);
+			//auto pQuad = m_pDreamOS->Add<quad>(1.0f, 1.0f);
+			//auto pQuad = m_pDreamOS->Add<quad>(4.0f, 1.0f, 10, 10, quad::CurveType::PARABOLIC);
+			auto pQuad = m_pDreamOS->Add<quad>(5.0f, 1.0f, 10, 10, quad::CurveType::CIRCLE);
 			CN(pQuad);
-			pQuad->SetPosition(0.0f, -1.0f, 0.0f);
+			pQuad->SetPosition(0.0f, -2.0f, 0.0f);
 		}
 
 	Error:

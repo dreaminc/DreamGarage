@@ -134,7 +134,8 @@ quad::quad(float width, float height, int numHorizontalDivisions, int numVertica
 	m_numHorizontalDivisions(numHorizontalDivisions),
 	m_numVerticalDivisions(numVerticalDivisions),
 	m_pTextureHeight(nullptr),
-	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE)
+	m_heightMapScale(DEFAULT_HEIGHT_MAP_SCALE),
+	m_quadCurveType(curveType)
 {
 	RESULT r = R_PASS;
 
@@ -309,6 +310,7 @@ RESULT quad::SetVertices(float width, float height, vector vNormal, const uvcoor
 
 	m_width = width;
 	m_height = height;
+	m_vNormal = vNormal;
 
 	float halfHeight = height / 2.0f;
 	float halfWidth = width / 2.0f;
@@ -390,13 +392,15 @@ RESULT quad::ApplyCurveToVertices() {
 
 	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
 		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
-			int vertNum = (i * m_numHorizontalDivisions) + j;
+			int vertNum = (i * (m_numHorizontalDivisions + 1)) + j;
 
 			// Puts effective val in [-1, 1] range
-			float effRange = ((float)(m_numHorizontalDivisions + 1));
+			float effRange = ((float)(m_numHorizontalDivisions));
 			float effVal = -1.0f + 2.0f * ((float)(i) / effRange);
 
 			float displacementAmount = 0.0f;
+			
+			vector vNormal = vector::jVector(1.0f);
 
 			switch (m_quadCurveType) {
 				case CurveType::FLAT: {
@@ -404,13 +408,25 @@ RESULT quad::ApplyCurveToVertices() {
 				} break;
 
 				case CurveType::PARABOLIC: {
+					float maxHeight = 1.0f;
 					displacementAmount = effVal * effVal;
+					float dxdy = 2.0f * effVal;
+
+					vNormal = vector(-effVal, maxHeight - displacementAmount, 0.0f).Normal();
 				}break;
 
 				// TODO: make radius programmatic
 				case CurveType::CIRCLE: {
-					float radius = 1.0f;
-					displacementAmount = radius - std::sqrt(1.0f - (effVal * effVal));
+					float radius = m_width / 2.0f;
+					float effX = effVal * radius;
+					
+					displacementAmount = radius - std::sqrt((radius * radius) - (effX * effX));
+					
+					//if (std::isnan(displacementAmount))
+					//	displacementAmount = 0.0f;
+
+					// Normal calculated from radius (pointing at center)
+					vNormal = vector(-effX, radius - displacementAmount, 0.0f).Normal();
 				} break;
 			}
 
@@ -418,12 +434,9 @@ RESULT quad::ApplyCurveToVertices() {
 			pVertex->TranslatePoint(m_vNormal * displacementAmount);
 
 			// Calculate normal (based on geometry)
-
-			/*
-			pVertex->SetTangent(vector(-1.0f, 0.0f, 0.0f));
-			pVertex->SetBitangent(vector(0.0f, 0.0f, -1.0f));
-			*/
-
+			pVertex->SetNormal(vNormal);
+			pVertex->SetTangent(vNormal.cross(vector::kVector(1.0f)).Normal());
+			pVertex->SetBitangent(vector::kVector(1.0f));
 		}
 	}
 
