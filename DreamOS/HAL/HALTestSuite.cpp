@@ -693,8 +693,12 @@ RESULT HALTestSuite::AddTestQuadObject() {
 			//auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
 			//auto pQuad = m_pDreamOS->TAddQuad(1.0f, 1.0f);
 			//auto pQuad = m_pDreamOS->Add<quad>(1.0f, 1.0f);
+			
 			//auto pQuad = m_pDreamOS->Add<quad>(4.0f, 1.0f, 10, 10, quad::CurveType::PARABOLIC);
-			auto pQuad = m_pDreamOS->Add<quad>(5.0f, 1.0f, 10, 10, quad::CurveType::CIRCLE);
+
+			auto pComposite = m_pDreamOS->Add<composite>();
+			auto pQuad = pComposite->Add<quad>(5.0f, 1.0f, 10, 10, quad::CurveType::CIRCLE);
+
 			CN(pQuad);
 			pQuad->SetPosition(0.0f, -2.0f, 0.0f);
 		}

@@ -184,11 +184,3 @@ RESULT HALImp::SetRenderProfiler(bool fRenderProfiler) {
 bool HALImp::IsRenderProfiler() {
 	return m_HALConfiguration.fRenderProfiler;
 }
-
-
-/*
-template<typename... Targs>
-quad* HALImp::TMakeObject<quad>(Targs... Fargs) {
-	return MakeQuad(Fargs...);
-}
-*/

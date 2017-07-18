@@ -529,6 +529,8 @@ Error:
 	return nullptr;
 }
 
+// Quad
+
 quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 

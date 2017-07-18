@@ -41,6 +41,84 @@ public:
 
 	virtual RESULT UpdateBoundingVolume() override;
 
+	///*
+	template<typename objType, typename... Targs>
+	std::shared_ptr<objType> Add(Targs... Fargs) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject(Fargs...));
+		CN(pObj);
+
+		CR(AddObject(pObj));
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType, typename... Targs>
+	objType *Make(Targs... Fargs) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject(Fargs...));
+		CN(pObj);
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType>
+	std::shared_ptr<objType> Add() {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject());
+		CN(pObj);
+
+		CR(AddObject(pObj));
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType>
+	objType *Make() {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject());
+		CN(pObj);
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+	//*/
+
 	std::shared_ptr<sphere> MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	std::shared_ptr<sphere> AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 

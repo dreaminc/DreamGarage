@@ -124,19 +124,13 @@ public:
 	bool IsRenderReferenceGeometry();
 
 public:
-	template<typename objType, typename... Targs>
-	objType* TMakeObject(Targs... Fargs) {
-		return MakeObject(Fargs...);
+	template<typename... Targs> 
+	quad* TMakeObject(Targs... Fargs) {
+		return MakeQuad(Fargs...);
 	}
 
 	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
-	
-	// Quad
-	template<typename... Targs>
-	quad* MakeObject(Targs... Fargs) {
-		return MakeQuad(Fargs...);
-	}
 
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) = 0;
 	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) = 0;
@@ -173,7 +167,15 @@ public:
 
 	virtual user *MakeUser() = 0;
 
+
+	// Composite
+	//template<typename... Targs>
+	composite* TMakeObject() {
+		return MakeComposite();
+	}
+
 	virtual composite *MakeComposite() = 0;
+
 	virtual FlatContext* MakeFlatContext(int width, int height, int channels) = 0;
 	virtual hand* MakeHand() = 0;
 
