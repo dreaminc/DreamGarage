@@ -7,6 +7,7 @@
 
 #include <memory>
 #include <vector>
+#include <map>
 
 class quad;
 class texture;
@@ -34,9 +35,12 @@ public:
 	std::vector<std::vector<std::shared_ptr<UIKey>>> GetKeys();
 
 	RESULT SetVisible(bool fVisible);
+	RESULT SetRowHeight(float rowHeight);
 	float GetRowHeight();
 	RESULT SetKeyTexture(texture *pKeyTexture);
 	texture *GetKeyTexture();
+	texture *GetSpecialTexture(unsigned int keyChar);
+	RESULT AddToSpecialTextures(unsigned int keyChar, texture *pKeyTexture);
 
 private:
 	std::string GenerateQWERTYRow(int rowIndex, bool fUpper = false, bool fNum = false);
@@ -46,6 +50,9 @@ private:
 	std::vector<std::vector<std::shared_ptr<UIKey>>> m_pLayout;
 	float m_rowHeight = 0.0625f;
 	texture *m_pKeyTexture = nullptr;
+
+	// only used for keys with unique textures
+	std::map<unsigned int, texture *> m_specialKeyTextures;
 };
 
 

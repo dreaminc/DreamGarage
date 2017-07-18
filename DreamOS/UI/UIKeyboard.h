@@ -12,6 +12,28 @@
 #include <vector>
 #include <string>
 
+#define SURFACE_WIDTH 0.5f // surface is a quad that holds the entire keyboard layout
+#define SURFACE_HEIGHT 0.25f
+#define SURFACE_ANGLE 30.0f
+
+#define OFFSET_DEPTH 0.5f
+#define OFFSET_HEIGHT -0.25f
+
+#define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
+#define TEXTBOX_NUM_LINES 1.0f
+//#define TEXTBOX_WIDTH 0.5f // textbox width matches surface width
+
+#define KEY_TYPE_THRESHOLD 0.0f 
+#define KEY_RELEASE_THRESHOLD -0.025f
+#define KEY_SCALE 0.9f
+#define KEY_MARGIN 0.25f
+
+#define KEY_RELEASE_DURATION 0.1f
+#define ANIMATION_DURATION 0.2f
+#define ANIMATION_OFFSET_HEIGHT 1.0f
+
+#define AMBIENT_INTENSITY 0.75f
+
 class quad;
 class sphere;
 class text;
@@ -83,6 +105,7 @@ private:
 
 public:
 	RESULT UpdateTextBox(int chkey, std::string strEntered);
+	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
 
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
@@ -98,38 +121,61 @@ public:
 	std::string m_strScope;
 
 private:
-	std::shared_ptr<quad> m_pSurface;
-	float m_surfaceWidth;
-	float m_surfaceHeight;
+	// layout variables
+	float m_surfaceWidth = SURFACE_WIDTH;
+	float m_surfaceHeight = SURFACE_HEIGHT;
 
-	point m_ptSurfaceOffset;
+	float m_lineHeight = TEXTBOX_LINE_HEIGHT;
+	float m_numLines = TEXTBOX_NUM_LINES;
+
+	float m_keyScale = KEY_SCALE;
+	float m_keyMargin = KEY_MARGIN;
+
+	point m_ptSurfaceOffset = point(0.0f, OFFSET_HEIGHT, -OFFSET_DEPTH);
 	quaternion m_qSurfaceOrientation;
-	float m_surfaceDistance;
+	float m_offsetDepth = OFFSET_DEPTH;
+	float m_offsetHeight = OFFSET_HEIGHT;
 
+	float m_keyTypeThreshold = KEY_TYPE_THRESHOLD;
+	float m_keyReleaseThreshold = KEY_RELEASE_THRESHOLD;
+
+	float m_keyReleaseDuration = KEY_RELEASE_DURATION;
+	float m_animationDuration = ANIMATION_DURATION;
+	float m_animationOffsetHeight = ANIMATION_OFFSET_HEIGHT;
+
+	float m_ambientIntensity = AMBIENT_INTENSITY;
+
+	// objects
 	UIMallet *m_pLeftMallet;
 	UIMallet *m_pRightMallet;
 
-	std::shared_ptr<quad> m_pTextBox;
-	std::shared_ptr<texture> m_pTextBoxTexture;
+	std::shared_ptr<composite> m_pSurfaceContainer;
+	std::shared_ptr<quad> m_pSurface;
 
 	std::shared_ptr<text> m_pTextBoxText;
-	std::shared_ptr<composite> m_pTextBoxContainer;
-	std::map<unsigned int, texture*> m_keyCharAtlas;
-	std::map<unsigned int, texture*> m_keyTextureAtlas;
+	std::shared_ptr<quad> m_pTextBoxBackground;
+	std::shared_ptr<text> m_pTitleText;
+	std::shared_ptr<quad> m_pTitleIcon;
+	std::shared_ptr<composite> m_pHeaderContainer;
 
 	std::map<LayoutType, text*> m_layoutAtlas;
-
-	FlatContext *m_pQuadTextures;
-
-	float m_keyTypeThreshold;
-	float m_keyReleaseThreshold;
 
 	//TODO: this should be dynamic
 	UIKey* m_keyObjects[2];
 	std::list<UIKey*> m_activeKeys;
 
 	std::shared_ptr<font> m_pFont;
+	//key textures
 	std::shared_ptr<texture> m_pKeyTexture;
+	std::shared_ptr<texture> m_pTextBoxTexture;
+	std::shared_ptr<texture> m_pDeleteTexture;
+	std::shared_ptr<texture> m_pLettersTexture;
+	std::shared_ptr<texture> m_pNumbersTexture;
+	std::shared_ptr<texture> m_pReturnTexture;
+	std::shared_ptr<texture> m_pShiftTexture;
+	std::shared_ptr<texture> m_pSpaceTexture;
+	std::shared_ptr<texture> m_pSymbolsTexture;
+	std::shared_ptr<texture> m_pUnshiftTexture;
 
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;

@@ -48,7 +48,7 @@ std::string UIKeyboardLayout::GenerateQWERTYRow(int rowIndex, bool fUpper, bool 
 		}
 		else {
 			if (fUpper) { return "_.|~<>..."; } // TODO: periods on unused keys
-			else { return "-//:;()$&@"; }
+			else { return "-/:;()$&@"; }
 		}
 	} break;
 	case 2: {
@@ -204,6 +204,11 @@ Error:
 	return r;
 }
 
+RESULT UIKeyboardLayout::SetRowHeight(float rowHeight) {
+	m_rowHeight = rowHeight;
+	return R_PASS;
+}
+
 float UIKeyboardLayout::GetRowHeight() {
 	return m_rowHeight;
 }
@@ -215,4 +220,16 @@ RESULT UIKeyboardLayout::SetKeyTexture(texture *pKeyTexture) {
 
 texture* UIKeyboardLayout::GetKeyTexture() {
 	return m_pKeyTexture;
+}
+
+RESULT UIKeyboardLayout::AddToSpecialTextures(unsigned int keyChar, texture *pKeyTexture) {
+	m_specialKeyTextures[keyChar] = pKeyTexture;
+	return R_PASS;
+}
+
+texture *UIKeyboardLayout::GetSpecialTexture(unsigned int keyChar) {
+	if (m_specialKeyTextures.count(keyChar) > 0) {
+		return m_specialKeyTextures[keyChar];
+	}
+	return nullptr;
 }

@@ -375,6 +375,8 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 		if (pMenuNodeTitle == "root_menu_title") {
 			m_pScrollView->GetTitleQuad()->UpdateColorTexture(pTexture);
+			//TODO: temporary, should be revisited during menu cleanup
+			GetDOS()->GetKeyboard()->UpdateTitle(pTexture, "Website");
 		}
 		
 		if (pBufferVector != nullptr) {

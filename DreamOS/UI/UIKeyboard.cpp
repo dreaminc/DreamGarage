@@ -23,59 +23,83 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	std::shared_ptr<font> pFont;
 	std::wstring wstrFont;
 
+	GetDOS()->AddObjectToUIGraph(GetComposite());
 	// Register keyboard events
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
 
 	//TODO this may become deprecated
-	m_surfaceDistance = 0.5f;
-	m_ptSurfaceOffset = point(0.0f, -0.25f, -m_surfaceDistance);
-	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(30.0f * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
+	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(SURFACE_ANGLE * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
 
-	m_surfaceHeight = 0.25f;
-	m_surfaceWidth = 0.5f;
-	m_pSurface = GetComposite()->AddQuad(m_surfaceHeight, m_surfaceWidth);
+	m_pSurfaceContainer = GetComposite()->AddComposite();
+	m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
+
+	m_pSurface = m_pSurfaceContainer->AddQuad(m_surfaceHeight, m_surfaceWidth);
 	CN(m_pSurface);
 
 	m_pSurface->SetVisible(false);
 	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
 
-	/*
-	//m_pTextBox = GetComposite()->AddQuad(m_surfaceHeight / 4.0f, m_surfaceWidth);
-	//CN(m_pTextBox);
-	m_pTextBox->SetVisible(false);
-	m_pTextBox->SetPosition(point(0.0f, 0.0f, -m_surfaceHeight * 0.75f ));
-	//m_pTextBoxTexture = GetComposite()->MakeTexture(L"Textbox-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	//CR(m_pTextBox->SetColorTexture(m_pTextBoxTexture.get()));
-	//*/
+	m_pHeaderContainer = GetComposite()->AddComposite();
 
-	m_pTextBoxContainer = GetComposite()->AddComposite();
-
+	//TODO: should not need defaults here anymore
 	m_pLeftMallet = new UIMallet(GetDOS());
 	CN(m_pLeftMallet);
 
 	m_pRightMallet = new UIMallet(GetDOS());
 	CN(m_pRightMallet);
 
-	m_keyTypeThreshold = 0.0f; // triggered once the center of the mallet hits the keyboard surface
-	m_keyReleaseThreshold = -0.025f;
-
-	float m_lineHeight = 0.0625f;
-
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	m_pFont->SetLineHeight(m_lineHeight);
-	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	//m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::WRAP | text::flags::RENDER_QUAD));
-	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
-		m_pFont,
-		"",
-		0.5,
-		m_lineHeight * 2.0f, 
-		text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+	// textures for keycaps and objects
+	m_pKeyTexture = GetComposite()->MakeTexture(L"key-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pTextBoxTexture = GetComposite()->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-	m_pTextBoxText->SetPosition(point(0.0f, 0.0f, -((m_surfaceHeight / 2.0f) + (m_surfaceHeight / 4.0f))));
-	m_pTextBoxContainer->AddObject(m_pTextBoxText);
+	m_pDeleteTexture = GetComposite()->MakeTexture(L"Keycaps\\key-delete-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pLettersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-abc-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pNumbersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-123-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pReturnTexture = GetComposite()->MakeTexture(L"Keycaps\\key-return-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pShiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-shift-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pSpaceTexture = GetComposite()->MakeTexture(L"Keycaps\\key-space-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pSymbolsTexture = GetComposite()->MakeTexture(L"Keycaps\\key-symbol-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+	{
+		//Setup textbox
+		float offset = m_surfaceHeight / 2.0f;
+		float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
+
+		m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), -cos(angle) * offset));
+		m_pHeaderContainer->RotateXByDeg(90.0f);
+
+		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(m_surfaceWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
+		m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
+
+		m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
+			m_pFont,
+			"",
+			m_surfaceWidth - 0.02f,
+			m_lineHeight * m_numLines, 
+			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+
+		m_pHeaderContainer->AddObject(m_pTextBoxText);
+
+		//Setup title / icon
+		m_pTitleIcon = m_pHeaderContainer->AddQuad(0.068, 0.068 * (3.0f / 4.0f));
+		m_pTitleIcon->SetPosition(point(-m_surfaceWidth / 2.0f + 0.034f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+
+		m_pFont->SetLineHeight(0.050f);
+		m_pTitleText = std::shared_ptr<text>(GetDOS()->MakeText(
+			m_pFont,
+			"",
+			m_surfaceWidth - 0.02f,
+			0.050,
+			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+		m_pTitleText->SetPosition(point(m_surfaceWidth / 6.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		m_pHeaderContainer->AddObject(m_pTitleText);
+
+	}
 
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
@@ -109,7 +133,34 @@ RESULT UIKeyboard::InitializeLayoutTexture(LayoutType type) {
 	pLayout->CreateQWERTYLayout(fUpper, fNum);
 	pLayout->SetKeyTexture(m_pKeyTexture.get());
 
-	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), 0.25f, text::flags::NONE);
+	pLayout->AddToSpecialTextures(SVK_SPACE, m_pSpaceTexture.get());
+	pLayout->AddToSpecialTextures(SVK_RETURN, m_pReturnTexture.get());
+	pLayout->AddToSpecialTextures(SVK_BACK, m_pDeleteTexture.get());
+	
+	switch (type) {
+	case LayoutType::QWERTY: {
+		pLayout->AddToSpecialTextures(SVK_SHIFT, m_pShiftTexture.get());
+		pLayout->AddToSpecialTextures(SVK_CONTROL, m_pNumbersTexture.get());
+	} break;
+	case LayoutType::QWERTY_UPPER: {
+		pLayout->AddToSpecialTextures(SVK_SHIFT, m_pUnshiftTexture.get());
+		pLayout->AddToSpecialTextures(SVK_CONTROL, m_pNumbersTexture.get());
+	} break;
+	case LayoutType::QWERTY_NUM: {
+		pLayout->AddToSpecialTextures(SVK_SHIFT, m_pSymbolsTexture.get());
+		pLayout->AddToSpecialTextures(SVK_CONTROL, m_pLettersTexture.get());
+	} break;
+	case LayoutType::QWERTY_SYMBOL: {
+		pLayout->AddToSpecialTextures(SVK_SHIFT, m_pNumbersTexture.get());
+		pLayout->AddToSpecialTextures(SVK_CONTROL, m_pLettersTexture.get());
+	} break;
+	}
+
+	// this calculation seems weird, but has a value similar to the "fudge factor" in AddGlyphQuad
+	pLayout->SetRowHeight((1.0f / (float)pLayout->GetKeys()[0].size()) / m_keyScale);
+
+	m_pFont->SetLineHeight(m_lineHeight);
+	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), m_keyMargin, text::flags::NONE);
 	CN(pText);
 	pText->RenderToQuad();
 
@@ -122,8 +173,6 @@ Error:
 RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 	RESULT r = R_PASS;
 	
-	m_pQuadTextures = GetDOS()->AddFlatContext();
-
 	auto& pLayoutKeys = pLayout->GetKeys();
 	//not flexible, TODO: take max of rows?
 	float keyDimension = m_surfaceWidth / (float)pLayoutKeys[0].size();
@@ -133,40 +182,33 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 	for (auto& layoutRow : pLayoutKeys) {
 		for (auto& pKey : layoutRow) {
 
-			float uvLeft = pKey->m_left / (m_surfaceWidth * 2.0f);
-			float uvRight = (pKey->m_left + pKey->m_width) / (m_surfaceWidth * 2.0f);
+			float uvLeft = pKey->m_left;// / (m_surfaceWidth * 2.0f);
+			float uvRight = (pKey->m_left + pKey->m_width);// / (m_surfaceWidth * 2.0f);
 
-			float uvTop = (rowIndex * pLayout->GetRowHeight()) / m_surfaceHeight;
-			float uvBottom = ((rowIndex+1) * pLayout->GetRowHeight()) / m_surfaceHeight;
+			float uvTop = (rowIndex * m_surfaceHeight);
+			float uvBottom = (((rowIndex + 1) * m_surfaceHeight));
 
 			float rowCount = (float)pLayoutKeys.size();
 			float zPos = (m_surfaceHeight / rowCount) * (rowIndex - (rowCount / 2.0f) + 0.5f);
 
-			float xPos = m_surfaceWidth * pKey->m_left - (m_surfaceWidth / 2.0f) +(pKey->m_width / 4.0f);
+			float xPos = m_surfaceWidth * (pKey->m_left + pKey->m_width / 2.0f) - (m_surfaceWidth / 2.0f);
 
 			point ptOrigin = point(xPos, 0.0f, zPos) + m_pSurface->GetPosition();
 
-			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(
-				keyDimension,//*0.9f,
-				keyDimension,//*0.9f,
+			std::shared_ptr<quad> pQuad = m_pSurfaceContainer->AddQuad(
+				keyDimension,
+				keyDimension,
 				ptOrigin,
 				uvcoord(uvLeft, uvTop),
 				uvcoord(uvRight, uvBottom));
-				//uvcoord(0.0f, 0.0f),
-				//uvcoord(1.0f, 1.0f));
 
-//			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetColorTexture());
 			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
 
-/*
-			if (m_keyTextureAtlas[pKey->m_letter])
-				pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]);
-				//*/
-
 			// Set up key quad positioning
-			pQuad->ScaleX(1.0f / (keyDimension / (0.5f*pKey->m_width)));
+			pQuad->ScaleX((m_keyScale * 0.5f*pKey->m_width) / keyDimension);
+			pQuad->ScaleY(m_keyScale);
 
-			pQuad->SetMaterialAmbient(0.75f);
+			pQuad->SetMaterialAmbient(m_ambientIntensity);
 
 			pKey->m_pQuad = pQuad;
 			pKey->m_pQuad->SetVisible(false);
@@ -190,7 +232,6 @@ RESULT UIKeyboard::Update(void *pContext) {
 	RotationMatrix qOffset = RotationMatrix();
 	VirtualObj *pObj = nullptr;
 
-	GetComposite();
 	InteractionEngineProxy *pProxy = nullptr;
 	DreamOS *pDOS = GetDOS();
 
@@ -206,14 +247,14 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	// Update Mallet Positions
 	hand *pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
-	CN(pHand);
+	CNR(pHand, R_OBJECT_NOT_FOUND);
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
 	pHand = pDOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
-	CN(pHand);
+	CNR(pHand, R_OBJECT_NOT_FOUND);
 
 	qOffset = RotationMatrix();
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
@@ -231,7 +272,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		ptCollisions[i] = ptSphereOrigin;
 
 		if (ptSphereOrigin.y() >= mallet->GetRadius()) mallet->CheckAndCleanDirty();
-		else if (ptSphereOrigin.y() < m_keyReleaseThreshold) mallet->SetDirty();
+		//else if (ptSphereOrigin.y() < m_keyReleaseThreshold) mallet->SetDirty();
 		
 		// if the sphere is lower than its own radius, there must be an interaction
 		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
@@ -267,12 +308,14 @@ RESULT UIKeyboard::Update(void *pContext) {
 		// get collision point and check that key is active
 		bool fActive = false;
 		ControllerType controllerType;
+		UIMallet *pMallet = nullptr;
 		for (int j = 0; j < 2; j++) {
 			auto k = keyCollisions[j];
 			if (key == k) {
 				ptCollision = ptCollisions[j];
 				fActive = true;
 				controllerType = (ControllerType)(j);
+				pMallet = (j == 0) ? m_pLeftMallet : m_pRightMallet;
 			}
 		}
 
@@ -285,7 +328,11 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 		case KeyState::KEY_DOWN: {
 			if (ptCollision.y() > m_keyTypeThreshold) key->m_state = KeyState::KEY_MAYBE_UP;
-			else if (ptCollision.y() < m_keyReleaseThreshold) ReleaseKey(key);
+			else if (ptCollision.y() < m_keyReleaseThreshold) {
+				ReleaseKey(key);
+				if (pMallet != nullptr)
+					pMallet->SetDirty();
+			}
 			//else key->m_state = KeyState::KEY_DOWN;
 		} break;
 
@@ -339,14 +386,14 @@ UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 
 RESULT UIKeyboard::ShowKeyboard() {
 
-	UpdateCompositeWithCameraLook(m_surfaceDistance, -0.25f);
+	UpdateCompositeWithCameraLook(m_offsetDepth, m_offsetHeight);
 	SetSurfaceOffset(GetComposite()->GetPosition());
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, 1.0f, 0.0f));
+		GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
 	Error:
@@ -359,7 +406,6 @@ RESULT UIKeyboard::ShowKeyboard() {
 		CN(pKeyboard);
 		m_pLeftMallet->Show();
 		m_pRightMallet->Show();
-		//GetComposite()->SetPosition(point(0.0f, 1.0f, 0.0f));
 	Error:
 		return r;
 	};
@@ -368,9 +414,9 @@ RESULT UIKeyboard::ShowKeyboard() {
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		m_ptSurfaceOffset,
-		pObj->GetOrientation() * m_qSurfaceOrientation,
+		pObj->GetOrientation(),// * m_qSurfaceOrientation,
 		pObj->GetScale(),
-		0.2f,
+		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
 		fnStartCallback,
@@ -396,10 +442,10 @@ RESULT UIKeyboard::HideKeyboard() {
 	DimObj *pObj = GetComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
-		pObj->GetPosition() - point(0.0f, 1.0f, 0.0f),
+		pObj->GetPosition() - point(0.0f, m_animationOffsetHeight, 0.0f),
 		pObj->GetOrientation(),
 		pObj->GetScale(),
-		0.2f,
+		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
 		nullptr,
@@ -432,7 +478,7 @@ RESULT UIKeyboard::ReleaseKey(UIKey *pKey) {
 		point(ptPosition.x(), 0.00f, ptPosition.z()),
 		pObj->GetOrientation(),
 		pObj->GetScale(),
-		0.1f,
+		m_keyReleaseDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags()
 	));
@@ -446,11 +492,11 @@ RESULT UIKeyboard::ReleaseKey(UIKey *pKey) {
 Error:
 	return r;
 }
+
 // this function assumes the key height is constant
 UIKey* UIKeyboard::CollisionPointToKey(point ptCollision) {
 	RESULT r = R_PASS;
 
-//	auto& keyboardLayout = m_kbLayers[m_currentLayout]->GetKeys();
 	auto& keyboardLayout = m_pLayout->GetKeys();
 
 	int rowIndex = (ptCollision.z() + (m_surfaceHeight / 2.0f)) / m_surfaceHeight * keyboardLayout.size();
@@ -492,16 +538,11 @@ RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 
 	m_pLayout->UpdateKeysWithLayout(kbType);
 
-	//*
 	for (auto layoutRow : m_pLayout->GetKeys()) {
 		for (auto& pKey : layoutRow) {
-	//		if (m_keyTextureAtlas.count(pKey->m_letter) > 0 && m_keyTextureAtlas[pKey->m_letter]) {
-	//			CR(pKey->m_pQuad->UpdateColorTexture(m_keyTextureAtlas[pKey->m_letter]));
-	//		}
 			CR(pKey->m_pQuad->UpdateColorTexture(m_layoutAtlas[kbType]->GetFramebuffer()->GetColorTexture()));
 		}
 	}
-	//*/
 
 	m_currentLayout = kbType;
 	
@@ -524,15 +565,6 @@ Error:
 
 RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 	RESULT r = R_PASS;
-	/*
-	if (chkey == SVK_RETURN) {
-		CR(m_pTextBoxContainer->ClearChildren());
-	}
-
-	else if (chkey == SVK_BACK) {
-		CR(m_pTextBoxContainer->RemoveLastChild());
-	}
-	//*/
 
 	//TODO: this logic should probably be in UIKeyboardLayout
 	if (chkey == SVK_SHIFT) {
@@ -544,6 +576,14 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 		case LayoutType::QWERTY_SYMBOL: newType = LayoutType::QWERTY_NUM; break;
 		}
 		CR(UpdateKeyboardLayout(newType));
+	}
+
+	else if (chkey == SVK_RETURN) {
+		m_pTextBoxText->SetText("");
+		//TODO: it is possible that when the menu button is pressed again, 
+		// the user is at the root menu by coincidence.  may need to notify
+		// DreamUIBar in some way in the future
+		HideKeyboard();
 	}
 
 	else if (chkey == SVK_CONTROL) {
@@ -560,8 +600,23 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 
 	else {
 		m_pTextBoxText->SetText(strEntered);
+		if (m_currentLayout == LayoutType::QWERTY_UPPER) {
+			CR(UpdateKeyboardLayout(LayoutType::QWERTY));
+		}
 	}
 
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::UpdateTitle(texture *pIconTexture, std::string strTitle) {
+	RESULT r = R_PASS;
+
+	if (pIconTexture != nullptr) {
+		CR(m_pTitleIcon->UpdateColorTexture(pIconTexture));
+	}
+	m_pTitleText->SetText(strTitle);
 
 Error:
 	return r;
