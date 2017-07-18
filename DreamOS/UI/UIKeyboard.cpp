@@ -23,6 +23,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	std::shared_ptr<font> pFont;
 	std::wstring wstrFont;
 
+	GetDOS()->AddObjectToUIGraph(GetComposite());
 	// Register keyboard events
 	auto pSenseKeyboardPublisher = dynamic_cast<Publisher<SenseVirtualKey, SenseKeyboardEvent>*>(this);
 	CR(pSenseKeyboardPublisher->RegisterSubscriber(SVK_ALL, GetDOS()->GetInteractionEngineProxy()));
@@ -30,14 +31,18 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	//TODO this may become deprecated
 	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(SURFACE_ANGLE * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
 
-	m_pSurface = GetComposite()->AddQuad(m_surfaceHeight, m_surfaceWidth);
+	m_pSurfaceContainer = GetComposite()->AddComposite();
+	m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
+
+	m_pSurface = m_pSurfaceContainer->AddQuad(m_surfaceHeight, m_surfaceWidth);
 	CN(m_pSurface);
 
 	m_pSurface->SetVisible(false);
 	CR(m_pSurface->InitializeOBB()); // TODO: using the default BoundingQuad could potentially be better
 
-	m_pTextBoxContainer = GetComposite()->AddComposite();
+	m_pHeaderContainer = GetComposite()->AddComposite();
 
+	//TODO: should not need defaults here anymore
 	m_pLeftMallet = new UIMallet(GetDOS());
 	CN(m_pLeftMallet);
 
@@ -46,7 +51,10 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	m_pFont->SetLineHeight(m_lineHeight);
+
+	// textures for keycaps and objects
 	m_pKeyTexture = GetComposite()->MakeTexture(L"key-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pTextBoxTexture = GetComposite()->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 	m_pDeleteTexture = GetComposite()->MakeTexture(L"Keycaps\\key-delete-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	m_pLettersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-abc-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -56,17 +64,42 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 	m_pSpaceTexture = GetComposite()->MakeTexture(L"Keycaps\\key-space-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	m_pSymbolsTexture = GetComposite()->MakeTexture(L"Keycaps\\key-symbol-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-	//m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::WRAP | text::flags::RENDER_QUAD));
-	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
-		m_pFont,
-		"",
-		m_surfaceWidth,
-		m_lineHeight * m_numLines, 
-		text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
 
-	//TODO 4.0f should be derived out of layout
-	m_pTextBoxText->SetPosition(point(0.0f, 0.0f, -((m_surfaceHeight / 2.0f) + (m_surfaceHeight / 4.0f))));
-	m_pTextBoxContainer->AddObject(m_pTextBoxText);
+	{
+		//Setup textbox
+		float offset = m_surfaceHeight / 2.0f;
+		float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
+
+		m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), -cos(angle) * offset));
+		m_pHeaderContainer->RotateXByDeg(90.0f);
+
+		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(m_surfaceWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
+		m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
+
+		m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
+			m_pFont,
+			"",
+			m_surfaceWidth - 0.02f,
+			m_lineHeight * m_numLines, 
+			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+
+		m_pHeaderContainer->AddObject(m_pTextBoxText);
+
+		//Setup title / icon
+		m_pTitleIcon = m_pHeaderContainer->AddQuad(0.068, 0.068 * (3.0f / 4.0f));
+		m_pTitleIcon->SetPosition(point(-m_surfaceWidth / 2.0f + 0.034f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+
+		m_pFont->SetLineHeight(0.050f);
+		m_pTitleText = std::shared_ptr<text>(GetDOS()->MakeText(
+			m_pFont,
+			"",
+			m_surfaceWidth - 0.02f,
+			0.050,
+			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+		m_pTitleText->SetPosition(point(m_surfaceWidth / 6.0f, 0.0f, -2.5f * m_lineHeight * m_numLines));
+		m_pHeaderContainer->AddObject(m_pTitleText);
+
+	}
 
 	m_keyObjects[0] = nullptr;
 	m_keyObjects[1] = nullptr;
@@ -126,6 +159,7 @@ RESULT UIKeyboard::InitializeLayoutTexture(LayoutType type) {
 	// this calculation seems weird, but has a value similar to the "fudge factor" in AddGlyphQuad
 	pLayout->SetRowHeight((1.0f / (float)pLayout->GetKeys()[0].size()) / m_keyScale);
 
+	m_pFont->SetLineHeight(m_lineHeight);
 	auto pText = GetDOS()->MakeText(m_pFont, pLayout.get(), m_keyMargin, text::flags::NONE);
 	CN(pText);
 	pText->RenderToQuad();
@@ -161,7 +195,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 
 			point ptOrigin = point(xPos, 0.0f, zPos) + m_pSurface->GetPosition();
 
-			std::shared_ptr<quad> pQuad = GetComposite()->AddQuad(
+			std::shared_ptr<quad> pQuad = m_pSurfaceContainer->AddQuad(
 				keyDimension,
 				keyDimension,
 				ptOrigin,
@@ -198,7 +232,6 @@ RESULT UIKeyboard::Update(void *pContext) {
 	RotationMatrix qOffset = RotationMatrix();
 	VirtualObj *pObj = nullptr;
 
-	GetComposite();
 	InteractionEngineProxy *pProxy = nullptr;
 	DreamOS *pDOS = GetDOS();
 
@@ -381,7 +414,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
 		m_ptSurfaceOffset,
-		pObj->GetOrientation() * m_qSurfaceOrientation,
+		pObj->GetOrientation(),// * m_qSurfaceOrientation,
 		pObj->GetScale(),
 		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUAD,
@@ -572,6 +605,18 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 		}
 	}
 
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::UpdateTitle(texture *pIconTexture, std::string strTitle) {
+	RESULT r = R_PASS;
+
+	if (pIconTexture != nullptr) {
+		CR(m_pTitleIcon->UpdateColorTexture(pIconTexture));
+	}
+	m_pTitleText->SetText(strTitle);
 
 Error:
 	return r;

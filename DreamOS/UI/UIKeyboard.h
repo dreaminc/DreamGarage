@@ -19,8 +19,8 @@
 #define OFFSET_DEPTH 0.5f
 #define OFFSET_HEIGHT -0.25f
 
-#define TEXTBOX_LINE_HEIGHT 0.035f // text box records what has been typed
-#define TEXTBOX_NUM_LINES 2.0f
+#define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
+#define TEXTBOX_NUM_LINES 1.0f
 //#define TEXTBOX_WIDTH 0.5f // textbox width matches surface width
 
 #define KEY_TYPE_THRESHOLD 0.0f 
@@ -105,6 +105,7 @@ private:
 
 public:
 	RESULT UpdateTextBox(int chkey, std::string strEntered);
+	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
 
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
@@ -148,12 +149,14 @@ private:
 	UIMallet *m_pLeftMallet;
 	UIMallet *m_pRightMallet;
 
+	std::shared_ptr<composite> m_pSurfaceContainer;
 	std::shared_ptr<quad> m_pSurface;
-	std::shared_ptr<quad> m_pTextBox;
-	std::shared_ptr<texture> m_pTextBoxTexture;
 
 	std::shared_ptr<text> m_pTextBoxText;
-	std::shared_ptr<composite> m_pTextBoxContainer;
+	std::shared_ptr<quad> m_pTextBoxBackground;
+	std::shared_ptr<text> m_pTitleText;
+	std::shared_ptr<quad> m_pTitleIcon;
+	std::shared_ptr<composite> m_pHeaderContainer;
 
 	std::map<LayoutType, text*> m_layoutAtlas;
 
@@ -164,6 +167,7 @@ private:
 	std::shared_ptr<font> m_pFont;
 	//key textures
 	std::shared_ptr<texture> m_pKeyTexture;
+	std::shared_ptr<texture> m_pTextBoxTexture;
 	std::shared_ptr<texture> m_pDeleteTexture;
 	std::shared_ptr<texture> m_pLettersTexture;
 	std::shared_ptr<texture> m_pNumbersTexture;
