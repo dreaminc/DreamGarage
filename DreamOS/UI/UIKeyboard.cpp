@@ -208,7 +208,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 		ptCollisions[i] = ptSphereOrigin;
 
 		if (ptSphereOrigin.y() >= mallet->GetRadius()) mallet->CheckAndCleanDirty();
-		else if (ptSphereOrigin.y() < m_keyReleaseThreshold) mallet->SetDirty();
+		//else if (ptSphereOrigin.y() < m_keyReleaseThreshold) mallet->SetDirty();
 		
 		// if the sphere is lower than its own radius, there must be an interaction
 		if (ptSphereOrigin.y() < mallet->GetRadius() && !mallet->IsDirty()) {
@@ -244,12 +244,14 @@ RESULT UIKeyboard::Update(void *pContext) {
 		// get collision point and check that key is active
 		bool fActive = false;
 		ControllerType controllerType;
+		UIMallet *pMallet = nullptr;
 		for (int j = 0; j < 2; j++) {
 			auto k = keyCollisions[j];
 			if (key == k) {
 				ptCollision = ptCollisions[j];
 				fActive = true;
 				controllerType = (ControllerType)(j);
+				pMallet = (j == 0) ? m_pLeftMallet : m_pRightMallet;
 			}
 		}
 
@@ -262,7 +264,11 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 		case KeyState::KEY_DOWN: {
 			if (ptCollision.y() > m_keyTypeThreshold) key->m_state = KeyState::KEY_MAYBE_UP;
-			else if (ptCollision.y() < m_keyReleaseThreshold) ReleaseKey(key);
+			else if (ptCollision.y() < m_keyReleaseThreshold) {
+				ReleaseKey(key);
+				if (pMallet != nullptr)
+					pMallet->SetDirty();
+			}
 			//else key->m_state = KeyState::KEY_DOWN;
 		} break;
 
