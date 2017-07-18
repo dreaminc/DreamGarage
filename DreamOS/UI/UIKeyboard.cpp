@@ -46,8 +46,16 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	m_pFont = GetDOS()->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	m_pFont->SetLineHeight(m_lineHeight);
-	m_pKeyTexture = GetComposite()->MakeTexture(L"Key-Dark-1024.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pKeyTexture = GetComposite()->MakeTexture(L"key-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
+	m_pDeleteTexture = GetComposite()->MakeTexture(L"Keycaps\\key-delete-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pLettersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-abc-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pNumbersTexture = GetComposite()->MakeTexture(L"Keycaps\\key-123-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pReturnTexture = GetComposite()->MakeTexture(L"Keycaps\\key-return-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pShiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-shift-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pSpaceTexture = GetComposite()->MakeTexture(L"Keycaps\\key-space-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pSymbolsTexture = GetComposite()->MakeTexture(L"Keycaps\\key-symbol-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pUnshiftTexture = GetComposite()->MakeTexture(L"Keycaps\\key-unshift-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 	//m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(m_pFont, "", 0.5, 0.0625, text::flags::WRAP | text::flags::RENDER_QUAD));
 	m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
 		m_pFont,
@@ -91,6 +99,29 @@ RESULT UIKeyboard::InitializeLayoutTexture(LayoutType type) {
 
 	pLayout->CreateQWERTYLayout(fUpper, fNum);
 	pLayout->SetKeyTexture(m_pKeyTexture.get());
+
+	pLayout->AddToSpecialTextures(SVK_SPACE, m_pSpaceTexture.get());
+	pLayout->AddToSpecialTextures(SVK_RETURN, m_pReturnTexture.get());
+	pLayout->AddToSpecialTextures(SVK_BACK, m_pDeleteTexture.get());
+	
+	switch (type) {
+	case LayoutType::QWERTY: {
+		pLayout->AddToSpecialTextures(SVK_SHIFT, m_pShiftTexture.get());
+		pLayout->AddToSpecialTextures(SVK_CONTROL, m_pNumbersTexture.get());
+	} break;
+	case LayoutType::QWERTY_UPPER: {
+		pLayout->AddToSpecialTextures(SVK_SHIFT, m_pUnshiftTexture.get());
+		pLayout->AddToSpecialTextures(SVK_CONTROL, m_pNumbersTexture.get());
+	} break;
+	case LayoutType::QWERTY_NUM: {
+		pLayout->AddToSpecialTextures(SVK_SHIFT, m_pSymbolsTexture.get());
+		pLayout->AddToSpecialTextures(SVK_CONTROL, m_pLettersTexture.get());
+	} break;
+	case LayoutType::QWERTY_SYMBOL: {
+		pLayout->AddToSpecialTextures(SVK_SHIFT, m_pNumbersTexture.get());
+		pLayout->AddToSpecialTextures(SVK_CONTROL, m_pLettersTexture.get());
+	} break;
+	}
 
 	// this calculation seems weird, but has a value similar to the "fudge factor" in AddGlyphQuad
 	pLayout->SetRowHeight((1.0f / (float)pLayout->GetKeys()[0].size()) / m_keyScale);

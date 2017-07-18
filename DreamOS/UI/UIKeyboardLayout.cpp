@@ -221,3 +221,15 @@ RESULT UIKeyboardLayout::SetKeyTexture(texture *pKeyTexture) {
 texture* UIKeyboardLayout::GetKeyTexture() {
 	return m_pKeyTexture;
 }
+
+RESULT UIKeyboardLayout::AddToSpecialTextures(unsigned int keyChar, texture *pKeyTexture) {
+	m_specialKeyTextures[keyChar] = pKeyTexture;
+	return R_PASS;
+}
+
+texture *UIKeyboardLayout::GetSpecialTexture(unsigned int keyChar) {
+	if (m_specialKeyTextures.count(keyChar) > 0) {
+		return m_specialKeyTextures[keyChar];
+	}
+	return nullptr;
+}

@@ -162,7 +162,16 @@ private:
 	std::list<UIKey*> m_activeKeys;
 
 	std::shared_ptr<font> m_pFont;
+	//key textures
 	std::shared_ptr<texture> m_pKeyTexture;
+	std::shared_ptr<texture> m_pDeleteTexture;
+	std::shared_ptr<texture> m_pLettersTexture;
+	std::shared_ptr<texture> m_pNumbersTexture;
+	std::shared_ptr<texture> m_pReturnTexture;
+	std::shared_ptr<texture> m_pShiftTexture;
+	std::shared_ptr<texture> m_pSpaceTexture;
+	std::shared_ptr<texture> m_pSymbolsTexture;
+	std::shared_ptr<texture> m_pUnshiftTexture;
 
 	LayoutType m_currentLayout;
 	UIKeyboardLayout *m_pLayout;

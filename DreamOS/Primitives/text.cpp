@@ -452,7 +452,11 @@ RESULT text::CreateLayout(UIKeyboardLayout *pLayout, double marginRatio) {
 			point ptGlyph = point(glyphQuadXPosition, 0.0f, glyphQuadYPosition);
 
 			texture *pLayoutBGTexture = nullptr;
-			if ((pLayoutBGTexture = pLayout->GetKeyTexture()) != nullptr) {
+			if ((pLayoutBGTexture = pLayout->GetSpecialTexture(pUIKey->m_letter)) != nullptr) {
+				std::shared_ptr<quad> pBgQuad = AddQuad(pUIKey->m_width, rowHeight, ptGlyph);
+				pBgQuad->SetColorTexture(pLayoutBGTexture);
+			}
+			else if ((pLayoutBGTexture = pLayout->GetKeyTexture()) != nullptr) {
 				std::shared_ptr<quad> pBgQuad = AddQuad(pUIKey->m_width, rowHeight, ptGlyph);
 				pBgQuad->SetColorTexture(pLayoutBGTexture);
 			}
