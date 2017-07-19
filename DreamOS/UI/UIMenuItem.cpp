@@ -52,7 +52,6 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	std::shared_ptr<quad> pIcon;
 
 	labelFormat.pFont->SetLineHeight(0.025f);
-	//labelFormat.pFont->SetLineHeight(0.025f);
 
 	pText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 		labelFormat.pFont,
@@ -66,9 +65,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	pText->SetPosition(labelFormat.ptPosition);
 
 	auto pBgQuad = m_pSurfaceComposite->AddQuad(GetSurface()->GetWidth(), GetSurface()->GetHeight() / 2.0f);
-	//pBgQuad->SetColor(labelFormat.bgColor);
-	
-//	pBgQuad->SetPosition(pText->GetPosition() + point(0.0f, 0.0725f, -0.0001f));
+
 	point ptDiff = point(0.0f, (GetSurface()->GetHeight() + pBgQuad->GetHeight()) / 2.0f, 0.0001f);
 	pBgQuad->SetPosition(GetSurface()->GetPosition() - ptDiff);
 	pBgQuad->RotateXByDeg(90.0f);
@@ -80,12 +77,9 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		pBgQuad->SetColor(labelFormat.bgColor);
 	}
 
-	//pText->RenderToQuad();
 	m_pSurfaceComposite->AddObject(pText);
 
 	m_strName = labelFormat.strLabel;
-
-	//m_pSurface->RotateXByDeg(90.0f);
 
 	if (iconFormat.pTexture != nullptr)
 		m_pSurface->SetColorTexture(iconFormat.pTexture);

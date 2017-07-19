@@ -138,6 +138,7 @@ if (m_pathStack.empty()) {
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 	m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
 	UpdateCompositeWithCameraLook(0.0f, -1.0f);
+	GetDOS()->GetKeyboard()->UpdateComposite();
 }
 else {
 	m_pathStack.pop();

@@ -241,6 +241,9 @@ RESULT UIKeyboard::Update(void *pContext) {
 	point ptCollisions[2];
 	point ptCollision;
 
+	// skip keyboard interaction if not visible
+	CBR(IsVisible(), R_PASS);
+
 	CN(pDOS);
 	pProxy = pDOS->GetInteractionEngineProxy();
 	CN(pProxy);
@@ -385,9 +388,6 @@ UIKeyboard* UIKeyboard::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 }
 
 RESULT UIKeyboard::ShowKeyboard() {
-
-	UpdateCompositeWithCameraLook(m_offsetDepth, m_offsetHeight);
-	SetSurfaceOffset(GetComposite()->GetPosition());
 
 	auto fnStartCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
@@ -617,6 +617,16 @@ RESULT UIKeyboard::UpdateTitle(texture *pIconTexture, std::string strTitle) {
 		CR(m_pTitleIcon->UpdateColorTexture(pIconTexture));
 	}
 	m_pTitleText->SetText(strTitle);
+
+Error:
+	return r;
+}
+
+RESULT UIKeyboard::UpdateComposite() {
+	RESULT r = R_PASS;
+
+	CR(UpdateCompositeWithCameraLook(m_offsetDepth, m_offsetHeight));
+	CR(SetSurfaceOffset(GetComposite()->GetPosition()));
 
 Error:
 	return r;
