@@ -57,8 +57,8 @@ public:
 		RESULT r = OGLInitialize();
 	}
 
-	OGLQuad(OpenGLImp *pParentImp, float width, float height, int numHorizontalDivisions, int numVerticalDivisions, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) :
-		quad(width, height, numHorizontalDivisions, numVerticalDivisions, curveType, vNormal),
+	OGLQuad(OpenGLImp *pParentImp, float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) :
+		quad(width, height, numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM

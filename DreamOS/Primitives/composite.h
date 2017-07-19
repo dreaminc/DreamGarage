@@ -46,7 +46,7 @@ public:
 	std::shared_ptr<objType> Add(Targs... Fargs) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject(Fargs...));
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject<objType>(Fargs...));
 		CN(pObj);
 
 		CR(AddObject(pObj));
@@ -66,7 +66,7 @@ public:
 	objType *Make(Targs... Fargs) {
 		RESULT r = R_PASS;
 
-		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject(Fargs...));
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject<objType>(Fargs...));
 		CN(pObj);
 
 		//Success:

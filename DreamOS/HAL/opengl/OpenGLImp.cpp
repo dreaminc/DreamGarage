@@ -589,10 +589,10 @@ Error:
 	return nullptr;
 }
 
-quad* OpenGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, quad::CurveType curveType, vector vNormal) {
+quad* OpenGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
 	RESULT r = R_PASS;
 
-	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, curveType, vNormal);
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
 	CN(pQuad);	
 
 	//Success:

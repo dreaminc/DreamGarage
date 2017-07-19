@@ -143,7 +143,21 @@ RESULT text::RenderToQuad() {
 		}
 		*/
 
-		m_pQuad = AddQuad(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+		// Add curved quads
+		int divs = 40;
+
+
+		//m_pQuad = AddQuad(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+		if (((m_flags & text::flags::CURVE_QUAD_CIRCLE) != text::flags::NONE)) {
+			m_pQuad = Add<quad>(m_width, m_height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::PARABOLIC, vector::jVector(1.0f));
+		}
+		else if (((m_flags & text::flags::CURVE_QUAD_PARABOLIC) != text::flags::NONE)) {
+			m_pQuad = Add<quad>(m_width, m_height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::CIRCLE, vector::jVector(1.0f));
+		}
+		else {
+			m_pQuad = Add<quad>(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+		}
+
 		CN(m_pQuad);
 		CR(m_pQuad->SetColorTexture(GetFramebuffer()->GetColorTexture()));
 	}

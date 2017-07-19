@@ -41,15 +41,17 @@ public:
 		INVALID
 	};
 
-	enum class flags : uint8_t {
-		NONE			= 0,
-		WRAP			= 1 << 0,
-		SCALE_TO_FIT	= 1 << 1,
-		FIT_TO_SIZE		= 1 << 2,
-		BILLBOARD		= 1 << 3,
-		TRAIL_ELLIPSIS	= 1 << 4,
-		RENDER_QUAD 	= 1 << 5,
-		INVALID			= 0xFF
+	enum class flags : uint16_t {
+		NONE					= 0,
+		WRAP					= 1 << 0,
+		SCALE_TO_FIT			= 1 << 1,
+		FIT_TO_SIZE				= 1 << 2,
+		BILLBOARD				= 1 << 3,
+		TRAIL_ELLIPSIS			= 1 << 4,
+		RENDER_QUAD 			= 1 << 5,
+		CURVE_QUAD_CIRCLE		= 1 << 6, 
+		CURVE_QUAD_PARABOLIC	= 1 << 7,
+		INVALID					= 0xFFFF
 	};
 
 public:

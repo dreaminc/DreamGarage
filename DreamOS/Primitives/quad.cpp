@@ -129,7 +129,7 @@ Error:
 	return;
 }
 
-quad::quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, CurveType curveType, vector vNormal) :
+quad::quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, CurveType curveType, vector vNormal) :
 	m_quadType(type::RECTANGLE),
 	m_numHorizontalDivisions(numHorizontalDivisions),
 	m_numVerticalDivisions(numVerticalDivisions),
@@ -140,7 +140,7 @@ quad::quad(float width, float height, int numHorizontalDivisions, int numVertica
 	RESULT r = R_PASS;
 
 	// TODO: UV thing
-	CR(SetVertices(width, height, vNormal));
+	CR(SetVertices(width, height, vNormal, uvTopLeft, uvBottomRight));
 	
 	CR(ApplyCurveToVertices());
 
@@ -388,59 +388,120 @@ Error:
 RESULT quad::ApplyCurveToVertices() {
 	RESULT r = R_PASS;
 
+	size_t numVals = m_numHorizontalDivisions + 1;
+	float effRange = ((float)(m_numHorizontalDivisions));
+
+	float *pCurveY = nullptr;
+	float *pCurveX = nullptr;
+	uv_precision *pUVals = nullptr;
+	vector *pVNormals = nullptr;
+
 	CB((m_quadCurveType != CurveType::FLAT));
+
+	pCurveY = new float[numVals];
+	pCurveX = new float[numVals];
+	pVNormals = new vector[numVals];
+	pUVals = new uv_precision[numVals];
+
+	memset(pCurveX, 0, sizeof(float) * numVals);
+	memset(pCurveY, 0, sizeof(float) * numVals);
+	memset(pVNormals, 0, sizeof(vector) * numVals);
+	memset(pUVals, 0, sizeof(uv_precision) * numVals);
+
+	// Calculate curve
+	for (int i = 0; i < numVals; i++) {
+		// Puts effective val in [-1, 1] range
+		float effVal = -1.0f + 2.0f * ((float)(i) / effRange);
+
+		switch (m_quadCurveType) {
+			case CurveType::FLAT: {
+				pCurveY[i] = 0.0f;
+			} break;
+
+			case CurveType::PARABOLIC: {
+				float maxHeight = 1.0f;
+				pCurveX[i] = effVal * m_width;
+				pCurveY[i] = effVal * effVal;
+				pVNormals[i] = vector(-pCurveX[i], maxHeight - pCurveY[i], 0.0f).Normal();
+			} break;
+
+			// TODO: make radius programmatic
+			case CurveType::CIRCLE: {
+				float radius = m_width / 2.0f;
+				
+				float effX = effVal * radius;
+
+				pCurveX[i] = effX;
+				pCurveY[i] = radius - std::sqrt((radius * radius) - (effX * effX));
+
+				//if (std::isnan(displacementAmount))
+				//	displacementAmount = 0.0f;
+
+				// Normal calculated from radius (pointing at center)
+				pVNormals[i] = vector(-effX, radius - pCurveY[i], 0.0f).Normal();
+			} break;
+		}
+	}
+
+	// distance
+	float totalDistance = 0.0f;
+	for (int i = 1; i < numVals; i++) {
+		float incDistance2 = std::pow((pCurveX[i] - pCurveX[i - 1]), 2.0f) + std::pow((pCurveY[i] - pCurveY[i - 1]), 2.0f);
+		float incDistance = std::sqrt(incDistance2);
+		totalDistance += incDistance;
+	}
+
+	// U values (UV coordinate)
+	float distanceAccumulator = 0.0f;
+	for (int i = 1; i < numVals; i++) {
+		float incDistance2 = std::pow((pCurveX[i] - pCurveX[i - 1]), 2.0f) + std::pow((pCurveY[i] - pCurveY[i - 1]), 2.0f);
+		float incDistance = std::sqrt(incDistance2);
+
+		distanceAccumulator += incDistance;
+
+		pUVals[i] = (distanceAccumulator / totalDistance);
+	}
 
 	for (int i = 0; i < m_numHorizontalDivisions + 1; i++) {
 		for (int j = 0; j < m_numVerticalDivisions + 1; j++) {
 			int vertNum = (i * (m_numHorizontalDivisions + 1)) + j;
 
-			// Puts effective val in [-1, 1] range
-			float effRange = ((float)(m_numHorizontalDivisions));
-			float effVal = -1.0f + 2.0f * ((float)(i) / effRange);
-
-			float displacementAmount = 0.0f;
-			
-			vector vNormal = vector::jVector(1.0f);
-
-			switch (m_quadCurveType) {
-				case CurveType::FLAT: {
-					displacementAmount = 0.0f;
-				} break;
-
-				case CurveType::PARABOLIC: {
-					float maxHeight = 1.0f;
-					displacementAmount = effVal * effVal;
-					float dxdy = 2.0f * effVal;
-
-					vNormal = vector(-effVal, maxHeight - displacementAmount, 0.0f).Normal();
-				}break;
-
-				// TODO: make radius programmatic
-				case CurveType::CIRCLE: {
-					float radius = m_width / 2.0f;
-					float effX = effVal * radius;
-					
-					displacementAmount = radius - std::sqrt((radius * radius) - (effX * effX));
-					
-					//if (std::isnan(displacementAmount))
-					//	displacementAmount = 0.0f;
-
-					// Normal calculated from radius (pointing at center)
-					vNormal = vector(-effX, radius - displacementAmount, 0.0f).Normal();
-				} break;
-			}
-
+			// Displacement
 			vertex *pVertex = &(m_pVertices[vertNum]);
-			pVertex->TranslatePoint(m_vNormal * displacementAmount);
+			pVertex->TranslatePoint(m_vNormal * pCurveY[i]);
+
+			// UV
+			uvcoord oldUV = pVertex->GetUV();
+			pVertex->SetUV(pUVals[i], oldUV.v());
 
 			// Calculate normal (based on geometry)
-			pVertex->SetNormal(vNormal);
-			pVertex->SetTangent(vNormal.cross(vector::kVector(1.0f)).Normal());
+			pVertex->SetNormal(pVNormals[i]);
+			pVertex->SetTangent(pVNormals[i].cross(vector::kVector(1.0f)).Normal());
 			pVertex->SetBitangent(vector::kVector(1.0f));
 		}
 	}
 
 Error:
+	if (pCurveY != nullptr) {
+		delete[] pCurveY;
+		pCurveY = nullptr;
+	}
+
+	if (pCurveX != nullptr) {
+		delete[] pCurveX;
+		pCurveX = nullptr;
+	}
+
+	if (pUVals != nullptr) {
+		delete[] pUVals;
+		pUVals = nullptr;
+	}
+
+	if (pVNormals != nullptr) {
+		delete[] pVNormals;
+		pVNormals = nullptr;
+	}
+
 	return r;
 }
 

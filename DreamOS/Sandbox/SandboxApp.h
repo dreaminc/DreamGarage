@@ -199,7 +199,7 @@ public:
 	objType *TAddObject(Targs... Fargs) {
 		RESULT r = R_PASS;
 
-		objType *pObj = m_pHALImp->TMakeObject(Fargs...);
+		objType *pObj = m_pHALImp->TMakeObject<objType>(Fargs...);
 		CN(pObj);
 
 		CR(AddObject(pObj));
@@ -220,7 +220,7 @@ public:
 	objType *TMakeObject(Targs... Fargs) {
 		RESULT r = R_PASS;
 
-		objType *pObj = m_pHALImp->TMakeObject(Fargs...);
+		objType *pObj = m_pHALImp->TMakeObject<objType>(Fargs...);
 		CN(pObj);
 
 		//Success:
