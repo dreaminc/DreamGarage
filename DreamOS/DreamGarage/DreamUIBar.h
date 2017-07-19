@@ -21,6 +21,8 @@ class UIView;
 
 class CloudController;
 class EnvironmentControllerProxy;
+class HTTPControllerProxy;
+class UserControllerProxy;
 
 class font;
 class texture;
@@ -77,6 +79,7 @@ public:
 
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
+	std::vector<std::string> GetStringHeaders();
 
 // UIEvent
 	RESULT Notify(UIEvent *pEvent);
@@ -97,16 +100,18 @@ private:
 	CloudController *m_pCloudController = nullptr;
 	MenuControllerProxy *m_pMenuControllerProxy = nullptr;
 	EnvironmentControllerProxy *m_pEnvironmentControllerProxy = nullptr;
+	HTTPControllerProxy *m_pHTTPControllerProxy = nullptr;
+	UserControllerProxy *m_pUserControllerProxy = nullptr;
 
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
 	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
-	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
 
 	std::shared_ptr<texture> m_pDefaultThumbnail;
 	std::shared_ptr<texture> m_pDefaultIcon;
 	std::shared_ptr<texture> m_pShareIcon;
+	std::shared_ptr<texture> m_pMenuItemBg;
 
 	std::shared_ptr<font> m_pFont;
 

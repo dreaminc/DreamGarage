@@ -46,29 +46,16 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	DreamOS *pDreamOS = GetDOS();
 
+	m_pFont = pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	pDreamOS->AddObjectToUIGraph(GetComposite());
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
 
-	std::shared_ptr<texture> pJPG = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_jpg_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_images[MenuNode::MimeType::IMAGE_JPG] = pJPG;
-
-	std::shared_ptr<texture> pPNG = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_images[MenuNode::MimeType::IMAGE_PNG] = pPNG;
-
-	std::shared_ptr<texture> pGIF = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_gif_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_images[MenuNode::MimeType::IMAGE_GIF] = pGIF;
-
-	std::shared_ptr<texture> pBMP = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_bmp_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_images[MenuNode::MimeType::IMAGE_BMP] = pBMP;
-
-	std::shared_ptr<texture> pFolder = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icons_600\\icon_folder_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_images[MenuNode::MimeType::FOLDER] = pFolder;
-
 	m_pDefaultThumbnail = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-default.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pDefaultIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-default.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
 	CR(GetComposite()->SetVisible(false));
 	// Initialize the OBB (collisions)
@@ -96,14 +83,18 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CR(m_pView->RegisterSubscriber(UIEventType::UI_MENU, this));
 
 	m_pCloudController = pDreamOS->GetCloudController();
-
-	MenuControllerProxy *pMenuControllerProxy = nullptr;
 	CN(m_pCloudController);
 
 	m_pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
 	CNM(m_pMenuControllerProxy, "Failed to get menu controller proxy");
 
 	CRM(m_pMenuControllerProxy->RegisterControllerObserver(this), "Failed to register Menu Controller Observer");
+
+	m_pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
+	CNM(m_pHTTPControllerProxy, "Failed to get http controller proxy");
+
+	m_pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+	CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
 
 	m_ptMenuShowOffset = point(0.0f, 0.5f, -0.5f);
 
@@ -158,22 +149,11 @@ else {
 			m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
 		}
 		else {
-			HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
-			CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
-
-			UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-			CNM(pUserControllerProxy, "Failed to get user controller proxy");
-
-			std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
-
-			auto strHeaders = HTTPController::ContentHttp();
-			strHeaders.push_back(strAuthorizationToken);
-
 			auto strURI = pNode->GetThumbnailURL();
 			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
 				MenuNode* pTempMenuNode = new MenuNode(pNode->GetNodeType(), pNode->GetPath(), pNode->GetScope(), pNode->GetTitle(), pNode->GetMIMEType());
 				pTempMenuNode->SetName("root_menu_title");
-				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
+				CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 			}
 		}
 
@@ -227,22 +207,11 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 			const std::string& strPath = pSubMenuNode->GetPath();
 			const std::string& strTitle = pSubMenuNode->GetTitle();
 
-			HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
-			CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
-
-			UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-			CNM(pUserControllerProxy, "Failed to get user controller proxy");
-
-			std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
-
-			auto strHeaders = HTTPController::ContentHttp();
-			strHeaders.push_back(strAuthorizationToken);
-
 			auto strURI = pSubMenuNode->GetIconURL();
 			if (strURI != "") {
 				MenuNode* pTempMenuNode = new MenuNode();
 				pTempMenuNode->SetName("root_menu_title");
-				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
+				CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 			}
 
 			if (pSubMenuNode->GetNodeType() == MenuNode::type::FOLDER) {
@@ -254,7 +223,7 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 				m_pathStack.push(pTempMenuNode);
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::FILE) {
-				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+				m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
 				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
 
 				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
@@ -395,12 +364,12 @@ RESULT DreamUIBar::Update(void *pContext) {
 			CN(pButton);
 
 			auto iconFormat = IconFormat();
-			//iconFormat.pTexture = m_images[pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType())].get();
 			iconFormat.pTexture = m_pDefaultThumbnail.get();
 
 			auto labelFormat = LabelFormat();
 			labelFormat.strLabel = pSubMenuNode->GetTitle();
 			labelFormat.pFont = m_pFont;
+			labelFormat.pBgTexture = m_pMenuItemBg.get();
 
 			pButton->Update(iconFormat, labelFormat);
 
@@ -413,14 +382,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 		//TODO: could subclass
 		auto pTitleView = m_pScrollView->GetTitleView();
 
-		// if there is a thumbnail, make a quad for it
-		//if (m_pMenuNode->GetThumbnailURL() != "") {
-		//	m_pScrollView->G;
-		//}
-
-		//if (m_pMenuNode->GetTitle() != "") {
 		m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
-		//}
 		
 		CR(m_pScrollView->UpdateMenuButtons(pButtons));
 
@@ -525,29 +487,19 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 	CNR(pMenuNode, R_OBJECT_NOT_FOUND);
 
 	if (pMenuNode->NumSubMenuNodes() > 0) {
-		auto pMenuControllerProxy = (MenuControllerProxy*)(m_pCloudController->GetControllerProxy(CLOUD_CONTROLLER_TYPE::MENU));
-		CNM(pMenuControllerProxy, "Failed to get menu controller proxy");
+
 		m_pMenuNode = pMenuNode;
 		if (m_pathStack.empty()) m_pathStack.push(m_pMenuNode);
 		m_pMenuNode->SetDirty();
 
-		HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
-		CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
-
-		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-		CNM(pUserControllerProxy, "Failed to get user controller proxy");
-
-		std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
-
-		auto strHeaders = HTTPController::ContentHttp();
-		strHeaders.push_back(strAuthorizationToken);
+		auto strHeaders = GetStringHeaders();
 
 		for (auto& pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {
 
 			auto strURI = pSubMenuNode->GetThumbnailURL();
 			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
 				MenuNode* pTempMenuNode = new MenuNode(pSubMenuNode->GetNodeType(), pSubMenuNode->GetPath(), pSubMenuNode->GetScope(), pSubMenuNode->GetTitle(), pSubMenuNode->GetMIMEType());
-				CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
+				CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
 			}
 		}
 
@@ -555,12 +507,22 @@ RESULT DreamUIBar::OnMenuData(std::shared_ptr<MenuNode> pMenuNode) {
 		if (strURI != "") {
 			MenuNode* pTempMenuNode = new MenuNode();
 			pTempMenuNode->SetName("root_menu_title");
-			CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_pMenuNode.get()));
+			CR(m_pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), m_pMenuNode.get()));
 		}
 	}
 
 Error:
 	return r;
+}
+
+std::vector<std::string> DreamUIBar::GetStringHeaders() {
+
+	std::string strAuthorizationToken = "Authorization: Token " + m_pUserControllerProxy->GetUserToken();
+
+	auto strHeaders = HTTPController::ContentHttp();
+	strHeaders.push_back(strAuthorizationToken);
+
+	return strHeaders;
 }
 
 RESULT DreamUIBar::Notify(UIEvent *pEvent) {

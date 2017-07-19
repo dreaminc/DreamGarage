@@ -34,17 +34,17 @@ RESULT UIScrollView::Initialize() {
 	RESULT r = R_PASS;
 
 
-	color scrollColor = color(1.0f, 1.0f, 1.0f, 0.5f);
+	color scrollColor = color(1.0f, 1.0f, 1.0f, m_canScrollAlpha);
 
 	m_pLeftScrollButton = AddUIButton();
 	m_pLeftScrollButton->SetVisible(false);
-	m_pLeftScrollButton->GetSurface()->SetScale(vector(0.4f));
+	m_pLeftScrollButton->GetSurface()->SetScale(vector(m_scrollScale));
 	m_pLeftScrollButton->GetMaterial()->SetColors(scrollColor, scrollColor, scrollColor);
 	PositionMenuButton(-1, m_pLeftScrollButton);
 
 	m_pRightScrollButton = AddUIButton();
 	m_pRightScrollButton->SetVisible(false);
-	m_pRightScrollButton->GetSurface()->SetScale(vector(0.4f));
+	m_pRightScrollButton->GetSurface()->SetScale(vector(m_scrollScale));
 	m_pRightScrollButton->GetMaterial()->SetColors(scrollColor, scrollColor, scrollColor);
 	PositionMenuButton(m_maxElements, m_pRightScrollButton);
 

@@ -209,8 +209,6 @@ RESULT DreamGarage::LoadScene() {
 	CN(m_pDreamUIBar);
 
 	//CV(m_pDreamUIBar);
-
-	m_pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
 //*
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
 	CNM(m_pDreamBrowser, "Failed to create dream browser");

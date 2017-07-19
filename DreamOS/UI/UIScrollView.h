@@ -11,15 +11,20 @@ class text;
 
 #define MAX_ELEMENTS 4
 #define MENU_DEPTH -1.5f
+
 #define ITEM_ANGLE_X -30.0f
 #define ITEM_ANGLE_Y 12.0f
 #define ITEM_START_ANGLE_Y -15.0f
 #define ITEM_HEIGHT 0.75
 #define ITEM_SCALE 0.25
 #define ITEM_SCALE_SELECTED 1.25
+
 #define TITLE_ANGLE_X 75.0f
 #define TITLE_HEIGHT 0.875f
+
 #define PAD_MOVE_CONSTANT 0.005f
+#define CAN_SCROLL_ALPHA 0.5f
+#define SCROLL_SCALE 0.4f
 
 enum class ScrollState {
 	NONE,
@@ -81,6 +86,8 @@ private:
 	float m_titleHeight = TITLE_HEIGHT;
 
 	// scrolling
+	float m_canScrollAlpha = CAN_SCROLL_ALPHA;
+	float m_scrollScale = SCROLL_SCALE;
 	float m_maxElements = MAX_ELEMENTS;
 	int m_objectIndexMin;
 	int m_objectIndexMax;
