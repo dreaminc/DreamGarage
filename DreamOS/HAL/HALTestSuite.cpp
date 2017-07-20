@@ -737,9 +737,34 @@ RESULT HALTestSuite::AddTestQuadObject() {
 			pQuad->translateX(1.5f);
 			//pQuad->RotateXByDeg(90.0f);
 
-			//pFlatContext->translateY(-1.0f);
+			pFlatContext->translateY(1.0f);
 			pFlatContext->translateZ(-1.0f);
 
+			pFlatContext->RenderToQuad(quad::CurveType::FLAT);
+			pFlatContext->RotateXByDeg(90.0f);
+
+
+			pFlatContext = m_pDreamOS->Add<FlatContext>(1024, 1024, 4);
+			CN(pFlatContext);
+
+			pQuad = pFlatContext->AddQuad(1.0f, 1.0f);
+			CN(pQuad);
+			//pQuad->RotateXByDeg(90.0f);
+
+			pQuad = pFlatContext->AddQuad(1.0f, 1.0f);
+			CN(pQuad);
+			pQuad->translateX(-1.5f);
+			//pQuad->RotateXByDeg(90.0f);
+
+			pQuad = pFlatContext->AddQuad(1.0f, 1.0f);
+			CN(pQuad);
+			pQuad->translateX(1.5f);
+			//pQuad->RotateXByDeg(90.0f);
+
+			pFlatContext->translateY(1.0f);
+			pFlatContext->translateZ(-1.0f);
+
+			//pFlatContext->RenderToQuad(quad::CurveType::PARABOLIC);
 			pFlatContext->RenderToQuad(quad::CurveType::CIRCLE);
 			pFlatContext->RotateXByDeg(90.0f);
 		}

@@ -71,6 +71,12 @@ public:
 	template <typename T = float>
 	T GetCurveBufferArcLength(std::vector<std::pair<T, T>> curveValues);
 
+	template <typename T = float>
+	T GetCurveArcLength(T startVal, T endVal, int divisions, quad::CurveType curveType, T val = 1.0f);
+
+	template <typename T = float>
+	std::pair<T, T> GetStartEndForCurveLengthWithMidpoint(T length, T midpoint, int divisions, quad::CurveType curveType, T val = 1.0f);
+
 	RESULT ApplyCurveToVertices();
 
 	RESULT FlipUVVertical();

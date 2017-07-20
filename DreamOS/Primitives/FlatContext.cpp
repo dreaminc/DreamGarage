@@ -195,7 +195,7 @@ RESULT FlatContext::RenderToQuad(float width, float height, float xOffset, float
 		*/
 
 		// Add curved quads
-		int divs = 40;
+		int divs = 100;
 
 
 		//m_pQuad = AddQuad(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
