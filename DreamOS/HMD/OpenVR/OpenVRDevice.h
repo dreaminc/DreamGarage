@@ -37,12 +37,14 @@
 #define CIVRM(ivrr, msg, ...) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: %s\n",vr::VR_GetVRInitErrorAsEnglishDescription(ivrResult));goto Error;}}while(0);
 
 class OpenVRDevice : public HMD {
+	friend class OpenVRHMDSinkNode;
+
 public:
 	OpenVRDevice(SandboxApp *pParentSandbox);
 	~OpenVRDevice();
 
 	// TODO: Do this for vive
-	virtual HMDSinkNode *GetHMDSinkNode() override { return nullptr; }
+	virtual HMDSinkNode *GetHMDSinkNode() override;
 	virtual HMDSourceNode *GetHMDSourceNode() override { return nullptr; }
 	virtual RESULT InitializeHMDSourceNode() override;
 	virtual RESULT InitializeHMDSinkNode() override;
@@ -117,6 +119,9 @@ public:
 	uint32_t ovrFrame;
 
 	model *m_pHMDModel;
+
+private:
+	OpenVRHMDSinkNode *m_pOpenVRHMDSinkNode = nullptr;
 };
 
 #endif // ! OPENVR_DEVICE_H_

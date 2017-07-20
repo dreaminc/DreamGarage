@@ -7,6 +7,8 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include "OpenVRHMDSinkNode.h"
+
 OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),
@@ -37,7 +39,23 @@ RESULT OpenVRDevice::InitializeHMDSourceNode() {
 }
 
 RESULT OpenVRDevice::InitializeHMDSinkNode() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	OpenGLImp *pOGLImp = dynamic_cast<OpenGLImp*>(m_pHALImp);
+	CN(pOGLImp);
+
+	m_pOpenVRHMDSinkNode = new OpenVRHMDSinkNode(pOGLImp, this);
+	CN(m_pOpenVRHMDSinkNode);
+
+	CR(m_pOpenVRHMDSinkNode->OGLInitialize());
+	CR(m_pOpenVRHMDSinkNode->SetupConnections());
+
+Error:
+	return r;
+}
+
+HMDSinkNode* OpenVRDevice::GetHMDSinkNode() {
+	return (HMDSinkNode*)(m_pOpenVRHMDSinkNode);
 }
 
 std::string OpenVRDevice::GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError) {
