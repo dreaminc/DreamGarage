@@ -705,6 +705,7 @@ RESULT HALTestSuite::AddTestQuadObject() {
 			pQuad->RotateXByDeg(90.0f);
 			*/
 
+			/*
 			float lineHeight = 0.35f;
 
 			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
@@ -717,6 +718,30 @@ RESULT HALTestSuite::AddTestQuadObject() {
 			pText->RotateXByDeg(90.0f);
 			pText->SetPosition(point(0.0f, 0.0f, 0.0f));
 			pText->SetMaterialAmbient(0.8f);
+			*/
+
+			auto pFlatContext = m_pDreamOS->Add<FlatContext>(1024, 1024, 4);
+			CN(pFlatContext);
+
+			auto pQuad = pFlatContext->AddQuad(1.0f, 1.0f);
+			CN(pQuad);
+			//pQuad->RotateXByDeg(90.0f);
+
+			pQuad = pFlatContext->AddQuad(1.0f, 1.0f);
+			CN(pQuad);
+			pQuad->translateX(-1.5f);
+			//pQuad->RotateXByDeg(90.0f);
+
+			pQuad = pFlatContext->AddQuad(1.0f, 1.0f);
+			CN(pQuad);
+			pQuad->translateX(1.5f);
+			//pQuad->RotateXByDeg(90.0f);
+
+			//pFlatContext->translateY(-1.0f);
+			pFlatContext->translateZ(-1.0f);
+
+			pFlatContext->RenderToQuad(quad::CurveType::CIRCLE);
+			pFlatContext->RotateXByDeg(90.0f);
 		}
 
 	Error:

@@ -198,7 +198,8 @@ public:
 
 	virtual composite *MakeComposite() = 0;
 
-	virtual FlatContext* MakeFlatContext(int width, int height, int channels) = 0;
+	virtual FlatContext* MakeFlatContext(int pxFBWidth, int pxFBHeight, int channels) = 0;
+
 	virtual hand* MakeHand() = 0;
 
 	/*
@@ -227,6 +228,12 @@ template<>
 template<typename... Targs>
 quad* HALImp::HelperFactory<quad>::TMakeObject(Targs... Fargs) {
 	return m_pImp->MakeQuad(Fargs...);
+}
+
+template<>
+template<typename... Targs>
+FlatContext* HALImp::HelperFactory<FlatContext>::TMakeObject(Targs... Fargs) {
+	return m_pImp->MakeFlatContext(Fargs...);
 }
 
 // TODO: a lot of this logic should go into the implementation maybe?

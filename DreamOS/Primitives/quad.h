@@ -55,6 +55,22 @@ public:
 	RESULT SetVertices(float width, float height, vector vNormal, const uvcoord& uvTopLeft = uvcoord(0.0f, 0.0f), const uvcoord& uvBottomRight = uvcoord(1.0f, 1.0f));
 	RESULT SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased);
 
+	// TODO: We should move this into a util / general math lib
+	template <typename T=float>
+	std::vector<std::pair<T, T>> GetCurveBuffer(T startVal, T endVal, int divisions, quad::CurveType curveType, T val = 1.0f);
+
+	template <typename T = float>
+	std::pair<T, T> GetCurveFocus(quad::CurveType curveType, T val = 1.0f);
+
+	template <typename T = float>
+	T GetCurveInterpolatedValue(T xVal, std::vector<std::pair<T, T>> curveValues);
+
+	template <typename T = float>
+	std::pair<T, T> GetCurveNormal(T xVal, std::vector<std::pair<T, T>> curveValues, std::pair<T, T> ptFocus);
+
+	template <typename T = float>
+	T GetCurveBufferArcLength(std::vector<std::pair<T, T>> curveValues);
+
 	RESULT ApplyCurveToVertices();
 
 	RESULT FlipUVVertical();

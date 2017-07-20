@@ -141,6 +141,10 @@ float FlatContext::GetBottom(bool fAbsolute) {
 	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetBottom(fAbsolute);
 }
 
+RESULT FlatContext::RenderToQuad(quad::CurveType curveType) {
+	return RenderToQuad(GetWidth(), GetHeight(), 0.0f, 0.0f, curveType);
+}
+
 RESULT FlatContext::RenderToQuad(float width, float height, float xOffset, float yOffset, quad::CurveType curveType) {
 	RESULT r = R_PASS;
 

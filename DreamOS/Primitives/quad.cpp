@@ -384,6 +384,140 @@ Error:
 	return r;
 }
 
+// TODO: Move these into a math curve lib
+template <typename T>
+std::vector<std::pair<T, T>> quad::GetCurveBuffer(T startVal, T endVal, int divisions, quad::CurveType curveType, T val) {
+	std::vector<std::pair<T, T>> returnValues;
+
+	float xVal = startVal;
+	T range = startVal - endVal;
+	T increment = range / (divisions - 1);
+
+	for (int i = 0; i < divisions; i++) {
+		T xVal = i * (increment);
+		T yVal = 0.0f;
+
+		switch (curveType) {
+			case CurveType::FLAT: {
+				yVal = 0.0f;
+			} break;
+
+			case CurveType::PARABOLIC: {
+				yVal = val * std::pow(xVal, 2);
+			} break;
+
+			// TODO: make radius programmatic
+			case CurveType::CIRCLE: {
+				T radius = val;
+				yVal = radius - std::sqrt(std::pow(radius, 2) - std::pow(effX, 2));
+			} break;
+		}
+
+		returnValues.push_back(std::make_pair<T, T>(xVal, yVal));
+	}
+
+	return returnValues;
+}
+
+template <typename T>
+std::pair<T, T> quad::GetCurveFocus(quad::CurveType curveType, T val) {
+	std::pair<T, T> ptFocus; 
+
+	switch (curveType) {
+		case CurveType::FLAT: {
+			ptFocus = std::make_pair<T, T>(0.0f, 0.0f);
+		} break;
+
+		case CurveType::PARABOLIC: {
+			ptFocus = std::make_pair<T, T>(0.0f, (T)((1.0f)/(val * 4.0f)));
+		} break;
+
+			// TODO: make radius programmatic
+		case CurveType::CIRCLE: {
+			ptFocus = std::make_pair<T, T>(0.0f, val);
+		} break;
+	}
+
+	return ptFocus;
+}
+
+template <typename T>
+T quad::GetCurveBufferArcLength(std::vector<std::pair<T, T>> curveValues) {
+	T retVal = 0;
+
+	for (int i = 1; i < curveValues.size(); i++) {
+		T xDiff = (curveValues[i].first - curveValues[i - 1].first);
+		T yDiff = (curveValues[i].second - curveValues[i - 1].second);
+		T incDistance = std::sqrt(std::pow(xDiff, 2.0f) + std::pow(yDiff, 2.0f));
+
+		retVal += incDistance;
+	}
+
+	return retVal;
+}
+
+template <typename T>
+T quad::GetCurveInterpolatedValue(T xVal, std::vector<std::pair<T, T>> curveValues) {
+	T lastXVal = curveValues[0].first;
+	T curXVal = 0.0f;
+
+	T lastYVal = curveValues[0].second;
+	T curYVal = 0.0f;
+
+	// can't handle xVals outside of bounds
+	if (xVal < lastXVal) {
+		return std::make_pair<T, T>(0, 0);
+	}
+
+	// Find interpolated value
+	for (int i = 0; i < curveValues.size(); i++) {
+		lastXVal = curXVal;
+		lastYVal = curYVal;
+
+		curXVal = curveValues[i].first;
+		curYVal = curveValues[i].second;
+
+		if (curXVal > xVal)
+			break;
+	}
+
+	// Can't handle X values outside of bounds
+	if (xVal > curXVal) {
+		return std::make_pair<T, T>(0, 0);
+	}
+
+	// Linear interpolation
+	T xRatio = ((xVal - lastXVal) / (curXVal - lastXVal));
+	T yDiff = curYVal - lastYVal;
+	T interpolatedYVal = lastYVal + (yDiff * xRatio);
+
+	return interpolatedYVal;
+}
+
+template <typename T>
+RESULT NormalizePair(std::pair<T, T> &vPair) {
+	
+	T magnitude = std::sqrt(std::pow(vPair.first, 2) + std::pow(vPair.second, 2));
+
+	vPair.first /= magnitude;
+	vPair.second /= magnitude;
+
+	return R_PASS;
+}
+
+template <typename T>
+std::pair<T, T> quad::GetCurveNormal(T xVal, std::vector<std::pair<T, T>> curveValues, std::pair<T, T> ptFocus) {
+	std::pair<T, T> vNormal;
+
+	T interpolatedYVal = GetCurveInterpolatedValue(xVal, curveValues);
+
+	std::pair<T, T> vNormal = std::make_pair<T, T>(ptFocus.first - xVal, ptFocus.second);
+
+	NormalizePair<T>(vNormal);
+
+	return vNormal;
+}
+
 // TODO: Curve on arbitrary axis 
 RESULT quad::ApplyCurveToVertices() {
 	RESULT r = R_PASS;
@@ -407,6 +541,8 @@ RESULT quad::ApplyCurveToVertices() {
 	memset(pCurveY, 0, sizeof(float) * numVals);
 	memset(pVNormals, 0, sizeof(vector) * numVals);
 	memset(pUVals, 0, sizeof(uv_precision) * numVals);
+
+	//auto curveValues = GetCurveBuffer(-1.0f, 1.0f, m_numHorizontalDivisions + 1, m_quadCurveType, 1.0f);
 
 	// Calculate curve
 	for (int i = 0; i < numVals; i++) {
@@ -451,7 +587,7 @@ RESULT quad::ApplyCurveToVertices() {
 		totalDistance += incDistance;
 	}
 
-	// U values (UV coordinate)
+	// Calculate effective X values and respective U values
 	float distanceAccumulator = 0.0f;
 	for (int i = 1; i < numVals; i++) {
 		float incDistance2 = std::pow((pCurveX[i] - pCurveX[i - 1]), 2.0f) + std::pow((pCurveY[i] - pCurveY[i - 1]), 2.0f);
@@ -468,7 +604,12 @@ RESULT quad::ApplyCurveToVertices() {
 
 			// Displacement
 			vertex *pVertex = &(m_pVertices[vertNum]);
-			pVertex->TranslatePoint(m_vNormal * pCurveY[i]);
+			point ptVert = pVertex->GetPoint();
+
+			ptVert = ptVert + (m_vNormal * pCurveY[i]);
+			ptVert.x() = (pUVals[i] - 0.5f) * m_width;
+
+			pVertex->TranslatePoint(ptVert);
 
 			// UV
 			uvcoord oldUV = pVertex->GetUV();
