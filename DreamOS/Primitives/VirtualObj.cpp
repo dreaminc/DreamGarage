@@ -113,6 +113,12 @@ VirtualObj* VirtualObj::SetPosition(point p) {
 	return this;
 }
 
+VirtualObj* VirtualObj::SetPosition(point_precision x, point_precision y, point_precision z) {
+	m_objectState.m_ptOrigin = point(x, y, z);
+	OnManipulation();
+	return this;
+}
+
 VirtualObj* VirtualObj::MoveTo(point p) {
 	m_objectState.m_ptOrigin = p;
 	OnManipulation();

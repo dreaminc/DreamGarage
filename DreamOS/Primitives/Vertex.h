@@ -192,6 +192,21 @@ public:
 		m_point += pt;
 		return R_PASS;
 	}
+
+	RESULT TranslateX(point_precision val) {
+		m_point.x() += val;
+		return R_PASS;
+	}
+
+	RESULT TranslateY(point_precision val) {
+		m_point.y() += val;
+		return R_PASS;
+	}
+
+	RESULT TranslateZ(point_precision val) {
+		m_point.z() += val;
+		return R_PASS;
+	}
 	
 	//RESULT SetColorA(float x, float y, float z);
 	RESULT SetColor(color_precision r, color_precision g, color_precision b) {

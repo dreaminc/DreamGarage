@@ -123,12 +123,39 @@ protected:
 public:
 	bool IsRenderReferenceGeometry();
 
+private:
+	template <typename objType>
+	class HelperFactory {
+		friend class HALImp;
+
+	protected:
+		HelperFactory(HALImp *pImp) : m_pImp(pImp) {
+			//empty 
+		}
+
+		template<typename... Targs>
+		objType *TMakeObject(Targs... Fargs);
+
+		HALImp *m_pImp = nullptr;
+	};
+
 public:
+	template<typename objType, typename... Targs>
+	objType* TMakeObject(Targs... Fargs) {
+		HelperFactory<objType> helperFactory(this);
+
+		objType *pObj = helperFactory.TMakeObject(Fargs...);
+
+		return pObj;
+	}
+
 	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
+
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) = 0;
 	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) = 0;
 	virtual quad* MakeQuad(double width, double height, point origin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) = 0;
+	virtual quad* MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) = 0;
 
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) = 0;
@@ -137,6 +164,8 @@ public:
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) = 0;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;
 	
+	
+
 	virtual text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE) = 0;
 	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE) = 0;
 	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE) = 0;
@@ -160,8 +189,17 @@ public:
 
 	virtual user *MakeUser() = 0;
 
+
+	// Composite
+	//template<typename... Targs>
+	composite* TMakeObject() {
+		return MakeComposite();
+	}
+
 	virtual composite *MakeComposite() = 0;
-	virtual FlatContext* MakeFlatContext(int width, int height, int channels) = 0;
+
+	virtual FlatContext* MakeFlatContext(int pxFBWidth, int pxFBHeight, int channels) = 0;
+
 	virtual hand* MakeHand() = 0;
 
 	/*
@@ -184,5 +222,40 @@ protected:
 private:
 	UID m_uid;
 };
+
+
+template<>
+template<typename... Targs>
+quad* HALImp::HelperFactory<quad>::TMakeObject(Targs... Fargs) {
+	return m_pImp->MakeQuad(Fargs...);
+}
+
+template<>
+template<typename... Targs>
+FlatContext* HALImp::HelperFactory<FlatContext>::TMakeObject(Targs... Fargs) {
+	return m_pImp->MakeFlatContext(Fargs...);
+}
+
+// TODO: a lot of this logic should go into the implementation maybe?
+template<>
+template<typename... Targs>
+text* HALImp::HelperFactory<text>::TMakeObject(Targs... Fargs) {
+	RESULT r = R_PASS;
+
+	text *pText = m_pImp->MakeText(Fargs...);
+	if (pText != nullptr && pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
 
 #endif // ! HAL_IMP_H_

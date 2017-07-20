@@ -138,6 +138,26 @@ public:
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 
+	template<typename objType, typename... Targs>
+	objType *Add(Targs... Fargs) {
+		return m_pSandbox->TAddObject<objType>(Fargs...);
+	}
+
+	template<typename objType, typename... Targs>
+	objType *Make(Targs... Fargs) {
+		return m_pSandbox->TMakeObject<objType>(Fargs...);
+	}
+
+	template<typename objType>
+	objType *Add() {
+		return m_pSandbox->TAddObject<objType>();
+	}
+
+	template<typename objType>
+	objType *Make() {
+		return m_pSandbox->TMakeObject<objType>();
+	}
+
 	sphere *AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 	sphere *MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 

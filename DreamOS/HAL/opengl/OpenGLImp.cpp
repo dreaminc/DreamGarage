@@ -464,11 +464,11 @@ Error:
 	return nullptr;
 }
 
-FlatContext *OpenGLImp::MakeFlatContext(int width, int height, int channels) {
+FlatContext *OpenGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbChannels) {
 	RESULT r = R_PASS;
 
 	FlatContext *pFlatContext = new FlatContext(this);
-	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, width, height, channels);
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, pxFBWidth, pxFBHeight, fbChannels);
 	CN(pOGLFramebuffer);
 
 	pFlatContext->SetFramebuffer(pOGLFramebuffer);
@@ -529,6 +529,8 @@ Error:
 	return nullptr;
 }
 
+// Quad
+
 quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
@@ -583,6 +585,25 @@ Error:
 		delete pQuad;
 		pQuad = nullptr;
 	}
+
+	return nullptr;
+}
+
+quad* OpenGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
+	RESULT r = R_PASS;
+
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
+	CN(pQuad);	
+
+	//Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 

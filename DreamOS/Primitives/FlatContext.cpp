@@ -140,3 +140,79 @@ float FlatContext::GetTop(bool fAbsolute) {
 float FlatContext::GetBottom(bool fAbsolute) {
 	return std::static_pointer_cast<BoundingQuad>(m_pBoundingVolume)->GetBottom(fAbsolute);
 }
+
+RESULT FlatContext::RenderToQuad(quad::CurveType curveType) {
+	return RenderToQuad(GetWidth(), GetHeight(), 0.0f, 0.0f, curveType);
+}
+
+RESULT FlatContext::RenderToQuad(float width, float height, float xOffset, float yOffset, quad::CurveType curveType) {
+	RESULT r = R_PASS;
+
+	CR(RenderToTexture());
+
+	CR(ClearChildren());
+
+	// Remove quad if exists 
+	if (m_pQuad != nullptr) {
+		RemoveChild(m_pQuad);
+		m_pQuad = nullptr;
+	}
+
+	{
+		uvcoord uvTopLeft = uvcoord(0.0f, 0.0f);
+		uvcoord uvBottomRight = uvcoord(1.0f, 1.0f);
+
+		// We map the uvCoordinates per the height/width of the text object 
+		// vs the bounding area
+		float left = GetLeft();
+		float right = GetRight();
+		float top = GetTop();
+		float bottom = GetBottom();
+
+		float contextWidth = FlatContext::GetWidth();
+		float contextHeight = FlatContext::GetHeight();
+
+		if (!IsScaleToFit()) {
+			float uvLeft = xOffset / contextWidth;
+			float uvRight = (width + xOffset) / contextWidth;
+
+			float uvTop = yOffset / contextHeight;
+			float uvBottom = (height + yOffset) / contextHeight;
+
+			uvTopLeft = uvcoord(uvLeft, uvTop);
+			uvBottomRight = uvcoord(uvRight, uvBottom);
+		}
+
+		if (m_pQuad != nullptr) {
+			m_pQuad = nullptr;
+		}
+
+		/*
+		if (m_pBackgroundQuad != nullptr) {
+		m_pBackgroundQuad->SetPosition(point(0.0f, 0.0f, 1.0f));
+		AddChild(m_pBackgroundQuad);
+		}
+		*/
+
+		// Add curved quads
+		int divs = 100;
+
+
+		//m_pQuad = AddQuad(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+		if (curveType == quad::CurveType::PARABOLIC) {
+			m_pQuad = Add<quad>(width, height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::PARABOLIC, vector::jVector(1.0f));
+		}
+		else if (curveType == quad::CurveType::CIRCLE) {
+			m_pQuad = Add<quad>(width, height, divs, divs, uvTopLeft, uvBottomRight, quad::CurveType::CIRCLE, vector::jVector(1.0f));
+		}
+		else {
+			m_pQuad = Add<quad>(width, height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
+		}
+
+		CN(m_pQuad);
+		CR(m_pQuad->SetColorTexture(GetFramebuffer()->GetColorTexture()));
+	}
+
+Error:
+	return r;
+}

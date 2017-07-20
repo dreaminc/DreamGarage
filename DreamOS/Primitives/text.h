@@ -41,15 +41,17 @@ public:
 		INVALID
 	};
 
-	enum class flags : uint8_t {
-		NONE			= 0,
-		WRAP			= 1 << 0,
-		SCALE_TO_FIT	= 1 << 1,
-		FIT_TO_SIZE		= 1 << 2,
-		BILLBOARD		= 1 << 3,
-		TRAIL_ELLIPSIS	= 1 << 4,
-		RENDER_QUAD 	= 1 << 5,
-		INVALID			= 0xFF
+	enum class flags : uint16_t {
+		NONE					= 0,
+		WRAP					= 1 << 0,
+		SCALE_TO_FIT			= 1 << 1,
+		FIT_TO_SIZE				= 1 << 2,
+		BILLBOARD				= 1 << 3,
+		TRAIL_ELLIPSIS			= 1 << 4,
+		RENDER_QUAD 			= 1 << 5,
+		CURVE_QUAD_CIRCLE		= 1 << 6, 
+		CURVE_QUAD_PARABOLIC	= 1 << 7,
+		INVALID					= 0xFFFF
 	};
 
 public:
@@ -64,12 +66,10 @@ public:
 	
 	VirtualObj* SetPosition(point pt, VerticalAlignment vAlign = VerticalAlignment::MIDDLE, HorizontalAlignment hAlign = HorizontalAlignment::CENTER);
 
-	// TODO: This clobbers the rest of thing, might want to move text to quad and 
-	// have a flat context internally or something like that
-	RESULT RenderToQuad();
-
 	std::string& GetText();
 	std::shared_ptr<font> GetFont();
+
+	RESULT RenderToQuad();
 
 	float GetWidth();
 	float GetHeight();
@@ -95,7 +95,7 @@ public:
 	RESULT SetFitToSize(bool fFitToSize = true);
 	RESULT SetBillboard(bool fBillboard = true);
 
-	bool IsScaleToFit();
+	virtual bool IsScaleToFit() override;
 	bool IsWrap();
 	bool IsFitToSize();
 	bool IsBillboard();
@@ -116,15 +116,17 @@ private:
 	bool m_fScaleToFit = false;
 	flags m_flags = text::flags::NONE;
 
-	float m_xOffset = 0.0f;
-	float m_yOffset = 0.0f;
 	float m_scaleFactor = 1.0f;
 	
 	int m_rows = 1;
 
+	float m_dpmm = 11.0f;	// Dots per mm - global units in meters so this should be taken into consideration
+
 	float m_width = 0.0f;
 	float m_height = 0.0f;
-	float m_dpmm = 11.0f;	// Dots per mm - global units in meters so this should be taken into consideration
+
+	float m_xOffset = 0.0f;
+	float m_yOffset = 0.0f;
 
 	VerticalAlignment m_vAlign = VerticalAlignment::TOP;
 	HorizontalAlignment m_hAlign = HorizontalAlignment::CENTER;
@@ -134,8 +136,6 @@ private:
 
 	// String of the text
 	std::string	m_strText = "";
-
-	std::shared_ptr<quad> m_pQuad = nullptr;
 
 	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
 	color m_backgroundColor = COLOR_WHITE;

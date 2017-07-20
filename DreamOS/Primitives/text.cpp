@@ -14,9 +14,9 @@
 
 text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, text::flags textFlags) :
 	FlatContext(pHALImp),
-	m_pFont(pFont),
 	m_width(1.0f),
 	m_height(1.0f),
+	m_pFont(pFont),
 	m_flags(textFlags)
 {
 	RESULT r = R_PASS;
@@ -27,9 +27,9 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, text::flags textFlags) 
 
 text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, bool fBillboard) :
 	FlatContext(pHALImp),
-	m_pFont(pFont),
 	m_width(width),
 	m_height(height),
+	m_pFont(pFont),
 	m_flags(text::flags::NONE)
 {
 	RESULT r = R_PASS;
@@ -44,9 +44,9 @@ text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strT
 
 text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double lineHeightM, text::flags textFlags) :
 	FlatContext(pHALImp),
-	m_pFont(pFont),
 	m_width(1.0f),
 	m_height(1.0f),
+	m_pFont(pFont),
 	m_flags(textFlags)
 {
 	RESULT r = R_PASS;
@@ -66,9 +66,9 @@ Error:
 
 text::text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText, double width, double height, text::flags textFlags) :
 	FlatContext(pHALImp),
-	m_pFont(pFont),
 	m_width(width),
 	m_height(height),
+	m_pFont(pFont),
 	m_flags(textFlags)
 {
 	RESULT r = R_PASS;
@@ -97,56 +97,17 @@ text::~text() {
 RESULT text::RenderToQuad() {
 	RESULT r = R_PASS;
 
-	CR(RenderToTexture());
+	quad::CurveType curveType = quad::CurveType::FLAT;
 
-	CR(ClearChildren());
-
-	// Remove quad if exists 
-	if (m_pQuad != nullptr) {
-		RemoveChild(m_pQuad);
-		m_pQuad = nullptr;
+	if (((m_flags & text::flags::CURVE_QUAD_PARABOLIC) != text::flags::NONE)) {
+		curveType = quad::CurveType::PARABOLIC;
+	}
+	else if (((m_flags & text::flags::CURVE_QUAD_CIRCLE) != text::flags::NONE)) {
+		curveType = quad::CurveType::PARABOLIC;
 	}
 
-	{
-		uvcoord uvTopLeft = uvcoord(0.0f, 0.0f);
-		uvcoord uvBottomRight = uvcoord(1.0f, 1.0f);
-
-		// We map the uvCoordinates per the height/width of the text object 
-		// vs the bounding area
-		float left = GetLeft();
-		float right = GetRight();
-		float top = GetTop();
-		float bottom = GetBottom();
-
-		float contextWidth = FlatContext::GetWidth();
-		float contextHeight = FlatContext::GetHeight();
-
-		if (!IsScaleToFit()) {
-			float uvLeft = m_xOffset / contextWidth;
-			float uvRight = (m_width + m_xOffset) / contextWidth;
-
-			float uvTop = m_yOffset / contextHeight;
-			float uvBottom = (m_height + m_yOffset) / contextHeight;
-
-			uvTopLeft = uvcoord(uvLeft, uvTop);
-			uvBottomRight = uvcoord(uvRight, uvBottom);
-		}
-
-		if (m_pQuad != nullptr) {
-			m_pQuad = nullptr;
-		}
-
-		/*
-		if (m_pBackgroundQuad != nullptr) {
-			m_pBackgroundQuad->SetPosition(point(0.0f, 0.0f, 1.0f));
-			AddChild(m_pBackgroundQuad);
-		}
-		*/
-
-		m_pQuad = AddQuad(m_width, m_height, point(0.0f, 0.0f, 0.0f), uvTopLeft, uvBottomRight, vector::jVector(1.0f));
-		CN(m_pQuad);
-		CR(m_pQuad->SetColorTexture(GetFramebuffer()->GetColorTexture()));
-	}
+	// Render with the appropriate curve
+	CR(FlatContext::RenderToQuad(m_width, m_height, m_xOffset, m_yOffset, curveType));
 
 Error:
 	return r;

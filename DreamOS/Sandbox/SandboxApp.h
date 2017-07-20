@@ -195,6 +195,86 @@ public:
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal);
 
+	template<typename objType, typename... Targs>
+	objType *TAddObject(Targs... Fargs) {
+		RESULT r = R_PASS;
+
+		objType *pObj = m_pHALImp->TMakeObject<objType>(Fargs...);
+		CN(pObj);
+
+		CR(AddObject(pObj));
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType, typename... Targs>
+	objType *TMakeObject(Targs... Fargs) {
+		RESULT r = R_PASS;
+
+		objType *pObj = m_pHALImp->TMakeObject<objType>(Fargs...);
+		CN(pObj);
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType>
+	objType *TAddObject() {
+		RESULT r = R_PASS;
+
+		objType *pObj = m_pHALImp->TMakeObject();
+		CN(pObj);
+
+		CR(AddObject(pObj));
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType>
+	objType *TMakeObject() {
+		RESULT r = R_PASS;
+
+		objType *pObj = m_pHALImp->TMakeObject();
+		CN(pObj);
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
 	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 
 	volume* AddVolume(double side, bool fTriangleBased = true);
