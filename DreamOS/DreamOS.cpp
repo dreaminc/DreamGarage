@@ -181,7 +181,7 @@ HALImp* DreamOS::GetHALImp() {
 RESULT DreamOS::InitializeKeyboard() {
 	RESULT r = R_PASS;
 
-	m_pKeyboard = LaunchDreamApp<UIKeyboard>(this);
+	m_pKeyboard = LaunchDreamApp<UIKeyboard>(this, false);
 	CN(m_pKeyboard);
 
 Error:
