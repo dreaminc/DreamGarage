@@ -25,6 +25,8 @@ class text;
 #define PAD_MOVE_CONSTANT 0.005f
 #define CAN_SCROLL_ALPHA 0.5f
 #define SCROLL_SCALE 0.4f
+#define FADE_DURATION 0.1f
+#define SCROLL_ASPECT_RATIO 414.0f / 600.0f
 
 enum class ScrollState {
 	NONE,
@@ -42,7 +44,7 @@ public:
 
 	RESULT Update();
 	RESULT UpdateMenuButtons(std::vector<std::shared_ptr<UIButton>> pButtons);
-	RESULT PositionMenuButton(int index, std::shared_ptr<UIButton> pButton);
+	RESULT PositionMenuButton(float index, std::shared_ptr<UIButton> pButton);
 
 	RESULT SetScrollVisible(bool fVisible);
 // default behaviors
@@ -56,7 +58,7 @@ public:
 	RESULT StopScroll(void *pContext);
 
 	RESULT HideButton(UIButton* pScrollButton);
-	RESULT ShowButton(UIButton* pScrollButton);
+	RESULT ShowButton(UIButton* pScrollButton, color showColor = color(1.0f, 1.0f, 1.0f, 1.0f));
 	RESULT HideAndPushButton(UIButton* pButton);
 	// pass optional pushButton to have an additional moving back animation
 	RESULT HideAllButtons(UIButton* pPushButton = nullptr);
@@ -94,6 +96,11 @@ private:
 	float m_yRotation;
 	float m_yRotationPerElement;
 	float m_velocity;
+	float m_fadeDuration = FADE_DURATION;
+
+	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
+	color m_canScrollColor = color(1.0f, 1.0f, 1.0f, 0.5f);
+	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// UI objects
 	std::shared_ptr<UIView> m_pTitleView = nullptr;

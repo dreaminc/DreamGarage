@@ -97,6 +97,10 @@ RESULT AnimationQueue::RemoveAnimationObject(DimObj *pObj) {
 	return R_PASS;
 }
 
+bool AnimationQueue::IsAnimating(DimObj *pObj) {
+	return m_objectQueue.count(pObj) > 0 && m_objectQueue[pObj].size() > 0;
+}
+
 RESULT AnimationQueue::RemoveAllObjects() {
 	m_objectQueue.clear();
 	return R_PASS;

@@ -57,7 +57,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	m_pShareIcon = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pMenuItemBg = std::shared_ptr<texture>(pDreamOS->MakeTexture(L"thumbnail-text-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
-	CR(GetComposite()->SetVisible(false));
+	CR(GetComposite()->SetVisible(false, false));
 	// Initialize the OBB (collisions)
 	CR(GetComposite()->InitializeOBB());
 	CR(GetDOS()->AddObjectToInteractionGraph(GetComposite()));
@@ -232,6 +232,8 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 				CR(SelectMenuItem(pSelected,
 					std::bind(&DreamUIBar::SetMenuStateAnimated, this, std::placeholders::_1),
 					std::bind(&DreamUIBar::ClearMenuState, this, std::placeholders::_1)));
+				m_pLeftMallet->Hide();
+				m_pRightMallet->Hide();
 				m_pathStack = std::stack<std::shared_ptr<MenuNode>>();
 			}
 			else if (pSubMenuNode->GetNodeType() == MenuNode::type::ACTION) {
@@ -282,7 +284,6 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	CN(pDreamUIBar);
 
 	GetComposite()->SetVisible(true, false);
-	//m_pScrollView->SetVisible(true);
 	m_pScrollView->SetScrollVisible(true);
 	m_pScrollView->SetPosition( point(0.0f, 0.0f, 0.0f)-m_ptMenuShowOffset);
 	m_pScrollView->GetTitleQuad()->SetVisible(true);
@@ -423,6 +424,8 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 
 	composite *pComposite = m_pScrollView.get();
 	m_menuState = MenuState::ANIMATING;
+	m_pLeftMallet->Hide();
+	m_pRightMallet->Hide();
 
 	auto fnEndCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
