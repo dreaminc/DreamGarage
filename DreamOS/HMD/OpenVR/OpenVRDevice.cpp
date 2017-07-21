@@ -358,9 +358,12 @@ RESULT OpenVRDevice::UpdateHMD() {
 	RESULT r = R_PASS;
 
 	// Process SteamVR events
-	vr::VREvent_t event;
-	while (m_pIVRHMD->PollNextEvent(&event, sizeof(event))) {
-		HandleVREvent(event);
+	vr::VREvent_t vrEvent;
+	CN(m_pIVRHMD);
+
+
+	if(m_pIVRHMD->PollNextEvent(&vrEvent, sizeof(vr::VREvent_t))) {
+		HandleVREvent(vrEvent);
 	}
 
 	// Process SteamVR controller state
@@ -394,7 +397,6 @@ RESULT OpenVRDevice::UpdateHMD() {
 		}
 	}
 
-	CN(m_pIVRHMD);
 
 	vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
