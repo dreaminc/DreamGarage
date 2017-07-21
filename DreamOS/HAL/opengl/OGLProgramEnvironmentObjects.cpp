@@ -197,7 +197,6 @@ RESULT OGLProgramEnvironmentObjects::SetCameraUniforms(camera *pCamera) {
 }
 
 RESULT OGLProgramEnvironmentObjects::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
-
 	auto deltaTime = std::chrono::duration<double>(std::chrono::high_resolution_clock::now() - m_startTime).count();
 	m_deltaTime = (float)deltaTime;
 	m_deltaTime *= 0.5f;

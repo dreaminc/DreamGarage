@@ -11,10 +11,11 @@
 #include "HMD/HMDSinkNode.h"
 
 // Include the Oculus SDK
-//#include "OVR_CAPI_GL.h"
+#include <openvr.h>
 
 class OpenGLImp;
 class OpenVRDevice;
+class OGLFramebuffer;
 
 class OpenVRHMDSinkNode : public HMDSinkNode {
 public:
@@ -25,18 +26,27 @@ public:
 
 	virtual RESULT SetupConnections() override;
 
-	RESULT CommitSwapChain(EYE_TYPE eye);
-	RESULT SetAndClearRenderSurface(EYE_TYPE eye);
 	RESULT UnsetRenderSurface(EYE_TYPE eye);
 	RESULT SubmitFrame();
 
 	virtual RESULT RenderNode(long frameID = 0) override;
 
 private:
+	RESULT RenderMirrorToBackBuffer();
+
+private:
 	OpenVRDevice *m_pParentHMD = nullptr;
 	OpenGLImp *m_pParentImp = nullptr;
 
 	DConnection *m_pInputConnection[HMD_NUM_EYES] = { nullptr };
+
+	OGLFramebuffer *m_pOGLInputFramebuffer = nullptr;
+
+private:
+	vr::IVRCompositor *m_pCompositor = nullptr;
+
+	bool m_fVblank;
+	bool m_fGlFinishHack;
 };
 
 

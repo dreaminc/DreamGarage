@@ -12,6 +12,7 @@ stereocamera::stereocamera(point ptOrigin, viewport cameraVieport) :
 point stereocamera::GetEyePosition(EYE_TYPE eye) {
 	point ptEye;
 
+	
 	switch (eye) {
 	case EYE_LEFT: {
 		ptEye = camera::GetOrigin() + (GetRightVector() * (-m_pupillaryDistance / 2.0f));
@@ -21,6 +22,7 @@ point stereocamera::GetEyePosition(EYE_TYPE eye) {
 		ptEye = camera::GetOrigin() + (GetRightVector() * (m_pupillaryDistance / 2.0f));
 	} break;
 
+	default:
 	case EYE_MONO: {
 		ptEye = camera::GetOrigin();
 	} break;
@@ -36,8 +38,6 @@ ProjectionMatrix stereocamera::GetProjectionMatrix(EYE_TYPE eye) {
 
 	if (m_pHMD != nullptr) {
 		projMat = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
-		//projMat.element(0, 2) = projMat.element(2, 0);
-		//projMat.element(1, 2) = projMat.element(2, 1);
 	}
 	else {
 		projMat = camera::GetProjectionMatrix();
@@ -91,8 +91,6 @@ ViewMatrix stereocamera::GetViewMatrix(EYE_TYPE eye) {
 	// View Matrix requires the opposite of the camera's world position
 	eyePos.Reverse();
 	quaternion q = camera::GetOrientation();
-	//		q.Reverse();
-
 
 	mat = ViewMatrix(eyePos, q);
 	return mat;

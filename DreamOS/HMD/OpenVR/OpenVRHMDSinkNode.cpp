@@ -1,6 +1,10 @@
 #include "OpenVRHMDSinkNode.h"
 #include "OpenVRDevice.h"
 
+#include "HAL/opengl/OGLFramebuffer.h"
+
+#include "HAL/opengl/OGLTexture.h"
+
 OpenVRHMDSinkNode::OpenVRHMDSinkNode(OpenGLImp *pOGLImp, OpenVRDevice *pParentHMD) :
 	HMDSinkNode("openvrhmdsinknode"),
 	m_pParentImp(pOGLImp),
@@ -16,22 +20,8 @@ OpenVRHMDSinkNode::~OpenVRHMDSinkNode() {
 RESULT OpenVRHMDSinkNode::OGLInitialize() {
 	RESULT r = R_PASS;
 
-	// Texture Swap Chain
-	for (int i = 0; i < HMD_NUM_EYES; i++) {
-		ovrSizei idealTextureSize = ovr_GetFovTextureSize(m_pParentHMD->GetOVRSession(), 
-														  ovrEyeType(i), 
-														  m_pParentHMD->GetOVRHMDDescription().DefaultEyeFov[i], 1);
-
-		m_pParentHMD->SetEyeWidth(idealTextureSize.w);
-		m_pParentHMD->SetEyeHeight(idealTextureSize.h);
-
-		m_ovrTextureSwapChains[i] = new OVRTextureSwapChain(m_pParentImp, m_pParentHMD->GetOVRSession(), idealTextureSize.w, idealTextureSize.h, 1, NULL, 1);
-		CR(m_ovrTextureSwapChains[i]->OVRInitialize());
-	}
-
-	// Front load Layer Initialization
-	m_ovrLayer.Header.Type = ovrLayerType_EyeFov;
-	m_ovrLayer.Header.Flags = ovrLayerFlag_TextureOriginAtBottomLeft;   // Because OpenGL.
+	m_pCompositor = vr::VRCompositor();
+	CNM(m_pCompositor, "Failed to initialize IVR compositor");
 
 Error:
 	return r;
@@ -40,11 +30,8 @@ Error:
 RESULT OpenVRHMDSinkNode::SetupConnections() {
 	RESULT r = R_PASS;
 
-	OGLFramebuffer **ppInputFramebufferLeft = &(m_ovrTextureSwapChains[EYE_LEFT]->m_pOGLRenderFramebuffer);
-	OGLFramebuffer **ppInputFramebufferRight = &(m_ovrTextureSwapChains[EYE_RIGHT]->m_pOGLRenderFramebuffer);
-
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_lefteye", ppInputFramebufferLeft));
-	CR(MakeInput<OGLFramebuffer>("input_framebuffer_righteye", ppInputFramebufferRight));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_lefteye", &m_pOGLInputFramebuffer));
+	CR(MakeInput<OGLFramebuffer>("input_framebuffer_righteye", &m_pOGLInputFramebuffer));
 
 	m_pInputConnection[EYE_LEFT] = Connection("input_framebuffer_lefteye", CONNECTION_TYPE::INPUT);
 	m_pInputConnection[EYE_RIGHT] = Connection("input_framebuffer_righteye", CONNECTION_TYPE::INPUT);
@@ -58,88 +45,109 @@ RESULT OpenVRHMDSinkNode::RenderNode(long frameID) {
 	RESULT r = R_PASS;
 
 	auto pCamera = m_pParentImp->GetCamera();
-	int pxViewportWidth = m_pParentImp->GetViewport().Width();
-	int pxViewportHeight = m_pParentImp->GetViewport().Height();
-	int channels = 4;
 
 	pCamera->ResizeCamera(m_pParentHMD->GetEyeWidth(), m_pParentHMD->GetEyeHeight());
 
 	for (int i = 0; i < HMD_NUM_EYES; i++) {
-		pCamera->SetCameraEye((EYE_TYPE)(i));
-
 		m_pParentImp->ClearHALBuffers();
 		m_pParentImp->ConfigureHAL();
 
-		m_pParentHMD->SetAndClearRenderSurface((EYE_TYPE)(i));
+		pCamera->SetCameraEye((EYE_TYPE)(i));
 
 		CR(m_pInputConnection[i]->RenderConnections(frameID));
 
-		// Commit Frame to HMD
-		m_pParentHMD->UnsetRenderSurface((EYE_TYPE)(i));
-		m_pParentHMD->CommitSwapChain((EYE_TYPE)(i));
+		CR(UnsetRenderSurface((EYE_TYPE)(i)));
 	}
 
 	m_pParentHMD->SubmitFrame();
-	m_pParentHMD->RenderHMDMirror();
+
+	//m_pParentHMD->RenderHMDMirror();
+	RenderMirrorToBackBuffer();
 
 Error:
 	return r;
 }
 
-RESULT OpenVRHMDSinkNode::CommitSwapChain(EYE_TYPE eye) {
-	return m_ovrTextureSwapChains[eye]->Commit();
-}
-
-RESULT OpenVRHMDSinkNode::SetAndClearRenderSurface(EYE_TYPE eye) {
-	ovrSession OVRSession = m_pParentHMD->GetOVRSession();
-	ovrHmdDesc OVRHMDDesc = m_pParentHMD->GetOVRHMDDescription();
-
-	ovrEyeType eyeType = (eye == EYE_LEFT) ? ovrEye_Left : ovrEye_Right;
-
-	m_ovrEyeRenderDescription[eyeType] = ovr_GetRenderDesc(OVRSession, eyeType, OVRHMDDesc.DefaultEyeFov[eyeType]);
-
-	return m_ovrTextureSwapChains[eye]->SetAndClearRenderSurface();
-}
-
 RESULT OpenVRHMDSinkNode::UnsetRenderSurface(EYE_TYPE eye) {
-	return m_ovrTextureSwapChains[eye]->UnsetRenderSurface();
+	RESULT r = R_PASS;
+	vr::EVRCompositorError ivrResult = vr::VRCompositorError_None;
+
+	vr::Texture_t eyeTexture;
+	eyeTexture.handle = (void*)(static_cast<int64_t>(m_pOGLInputFramebuffer->GetColorAttachment()->GetOGLTextureIndex()));
+	eyeTexture.eType = vr::API_OpenGL;
+	eyeTexture.eColorSpace = vr::ColorSpace_Gamma;
+	ivrResult = vr::VRCompositor()->Submit((vr::EVREye)(eye), &eyeTexture);
+	CB((ivrResult == vr::VRCompositorError_None));
+
+Error:
+	return r;
+}
+
+RESULT OpenVRHMDSinkNode::RenderMirrorToBackBuffer() {
+	RESULT r = R_PASS;
+
+	int fbWidth = m_pOGLInputFramebuffer->GetWidth();
+
+	// TODO: Move this to framebuffer
+	CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_pOGLInputFramebuffer->GetFramebufferIndex()));
+	CR(m_pParentImp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0));
+
+	CR(m_pParentImp->glBlitFramebuffer(0, m_pOGLInputFramebuffer->GetHeight(), 
+									   m_pOGLInputFramebuffer->GetWidth(), 0, 
+									   0, m_pParentImp->GetViewport().Height(), m_pParentImp->GetViewport().Width(), 0,
+								       GL_COLOR_BUFFER_BIT, GL_NEAREST));
+
+	CR(m_pParentImp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0));
+
+Error:
+	return r;
 }
 
 RESULT OpenVRHMDSinkNode::SubmitFrame() {
 	RESULT r = R_PASS;
 
-	ovrSession OVRSession = m_pParentHMD->GetOVRSession();
-	ovrHmdDesc OVRHMDDesc = m_pParentHMD->GetOVRHMDDescription();
-
-	// TODO: Split this across the eyes 
-	long long frameIndex = 0;
-	ovrPosef EyeRenderPose[2];
-	ovrVector3f HmdToEyeOffset[2] = { m_ovrEyeRenderDescription[0].HmdToEyeOffset, m_ovrEyeRenderDescription[1].HmdToEyeOffset };
-
-	double sensorSampleTime;    // sensorSampleTime is fed into the layer later
-	ovr_GetEyePoses(OVRSession, frameIndex, ovrTrue, HmdToEyeOffset, EyeRenderPose, &sensorSampleTime);
-
-	for (int eye = 0; eye < 2; eye++) {
-		m_ovrLayer.ColorTexture[eye] = m_ovrTextureSwapChains[eye]->GetOVRTextureSwapChain();
-		m_ovrLayer.Viewport[eye] = m_ovrTextureSwapChains[eye]->GetOVRViewportRecti();
-		m_ovrLayer.Fov[eye] = OVRHMDDesc.DefaultEyeFov[eye];
-		m_ovrLayer.RenderPose[eye] = EyeRenderPose[eye];
-		m_ovrLayer.SensorSampleTime = sensorSampleTime;
+	if (m_fVblank && m_fGlFinishHack) {
+		//$ HACKHACK. From gpuview profiling, it looks like there is a bug where two renders and a present
+		// happen right before and after the vsync causing all kinds of jittering issues. This glFinish()
+		// appears to clear that up. Temporary fix while I try to get nvidia to investigate this problem.
+		// 1/29/2014 mikesart
+		glFinish();
 	}
 
-	ovrLayerHeader* layers = &m_ovrLayer.Header;
-
-	CR((RESULT)ovr_SubmitFrame(OVRSession, 0, nullptr, &layers, 1));
-
-	/* TODO: Might want to check on session
-	ovrSessionStatus sessionStatus;
-	ovr_GetSessionStatus(session, &sessionStatus);
-	if (sessionStatus.ShouldQuit)
-	goto Done;
-	if (sessionStatus.ShouldRecenter)
-	ovr_RecenterTrackingOrigin(session);
+	/*
+	// SwapWindow
+	{
+	SDL_GL_SwapWindow(m_pWindow);
+	}
 	*/
 
-Error:
+	// Clear
+	{
+		// We want to make sure the glFinish waits for the entire present to complete, not just the submission
+		// of the command. So, we do a clear here right here so the glFinish will wait fully for the swap.
+		glClearColor(0, 0, 0, 1);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
+
+	// Flush and wait for swap.
+	if (m_fVblank) {
+		glFlush();
+		glFinish();
+	}
+
+	/*
+	// Spew out the controller and pose count whenever they change.
+	if (m_iTrackedControllerCount != m_iTrackedControllerCount_Last || m_iValidPoseCount != m_iValidPoseCount_Last)
+	{
+	m_iValidPoseCount_Last = m_iValidPoseCount;
+	m_iTrackedControllerCount_Last = m_iTrackedControllerCount;
+
+	dprintf("PoseCount:%d(%s) Controllers:%d\n", m_iValidPoseCount, m_strPoseClasses.c_str(), m_iTrackedControllerCount);
+	}
+	*/
+
+	glFinish();
+
+//Error:
 	return r;
 }

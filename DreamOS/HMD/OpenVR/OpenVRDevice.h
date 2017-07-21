@@ -24,8 +24,6 @@
 #include <vector>
 #include <algorithm>
 
-#include "HAL/opengl/OGLFramebuffer.h"
-
 // TODO: Temp for testing
 #include "External/Matrices/Matrices.h"
 
@@ -70,8 +68,6 @@ public:
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);
-	RESULT InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32_t nHeight);
-	RESULT SetupStereoRenderTargets();
 	RESULT HandleVREvent(vr::VREvent_t event);
 	//float PredictSecondsToPhotons(float secondOffset = 0.0f);
 	Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose);
@@ -86,15 +82,9 @@ private:
 
 public:
 	vr::IVRSystem *m_pIVRHMD;
-	vr::IVRCompositor *m_pCompositor;
 
 	std::string m_strDriver;
 	std::string m_strDisplay;
-
-	OGLFramebuffer *m_pFramebufferRenderLeft;
-	OGLFramebuffer *m_pFramebufferResolveLeft;
-	OGLFramebuffer *m_pFramebufferRenderRight;
-	OGLFramebuffer *m_pFramebufferResolveRight;
 
 	// Pose / device tracking
 	int m_trackedControllerCount;
@@ -103,9 +93,6 @@ public:
 	int m_validPoseCount_Last;
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
 	std::string m_strPoseClasses;                            // what classes we saw poses for this frame
-
-	bool m_fVblank;
-	bool m_fGlFinishHack;
 
 	// Device Render Models
 	vr::IVRRenderModels *m_pRenderModels;
@@ -116,7 +103,7 @@ public:
 	model *m_pControllerModelRight;
 	texture *m_pControllerModelRightTexture;
 
-	uint32_t ovrFrame;
+	uint32_t m_vrFrameCount;
 
 	model *m_pHMDModel;
 
