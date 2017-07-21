@@ -34,16 +34,21 @@ point stereocamera::GetEyePosition(EYE_TYPE eye) {
 }
 
 ProjectionMatrix stereocamera::GetProjectionMatrix(EYE_TYPE eye) {
-	ProjectionMatrix projMat;
+	//ProjectionMatrix projMat;
 
 	if (m_pHMD != nullptr) {
-		projMat = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
+		if (m_fProjEyeInit[eye] == false) {
+			m_projEye[eye] = m_pHMD->GetPerspectiveFOVMatrix(eye, m_NearPlane, m_FarPlane);
+			m_fProjEyeInit[eye] = true;
+		}
+
+		return m_projEye[eye];
 	}
 	else {
-		projMat = camera::GetProjectionMatrix();
+		return camera::GetProjectionMatrix();
 	}
 
-	return projMat;
+	//return projMat;
 }
 
 point stereocamera::GetOrigin(bool fAbsolute) {

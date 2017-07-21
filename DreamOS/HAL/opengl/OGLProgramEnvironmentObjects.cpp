@@ -183,9 +183,9 @@ RESULT OGLProgramEnvironmentObjects::SetObjectUniforms(DimObj *pDimObj) {
 
 RESULT OGLProgramEnvironmentObjects::SetCameraUniforms(camera *pCamera) {
 
-	auto ptEye = pCamera->GetOrigin();
+	//auto ptEye = pCamera->GetOrigin();
 	auto matV = pCamera->GetViewMatrix();
-	auto matP = pCamera->GetProjectionMatrix();
+	//auto matP = pCamera->GetProjectionMatrix();
 	auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
 
 	m_pUniformViewMatrix->SetUniform(matV);
@@ -202,9 +202,9 @@ RESULT OGLProgramEnvironmentObjects::SetCameraUniforms(stereocamera* pStereoCame
 	m_deltaTime *= 0.5f;
 	m_pUniformTime->SetUniformFloat(reinterpret_cast<GLfloat*>(&m_deltaTime));
 
-	auto ptEye = pStereoCamera->GetEyePosition(eye);
+	//auto ptEye = pStereoCamera->GetEyePosition(eye);
 	auto matV = pStereoCamera->GetViewMatrix(eye);
-	auto matP = pStereoCamera->GetProjectionMatrix(eye);
+	//auto matP = pStereoCamera->GetProjectionMatrix(eye);
 	auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 
 	m_pUniformViewMatrix->SetUniform(matV);
