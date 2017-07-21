@@ -380,8 +380,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 		// TODO: currently not getting click events from touch pad or trigger
 		// more info: https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetControllerState
-
-		if (m_pIVRHMD->GetControllerState(unDevice, &state)) {
+		if (m_pIVRHMD->GetControllerState(unDevice, &state, sizeof(vr::VRControllerState_t))) {
 			if (m_pIVRHMD->GetTrackedDeviceClass(unDevice) == vr::TrackedDeviceClass_Controller) {
 				uint32_t currentFrame = state.unPacketNum;
 
@@ -452,6 +451,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pControllerModelLeft->SetOrientation(qOrientation);
 
 						m_pLeftHand->SetPosition(ptControllerPosition);
+						m_pLeftHand->SetOrientation(qOrientation);
 						m_pLeftHand->SetLocalOrientation(qOrientation);
 
 						fLeftHandTracked = true;
@@ -462,6 +462,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pControllerModelRight->SetOrientation(qOrientation);
 
 						m_pRightHand->SetPosition(ptControllerPosition);
+						m_pRightHand->SetOrientation(qOrientation);
 						m_pRightHand->SetLocalOrientation(qOrientation);
 
 						fRightHandTracked = true;
@@ -495,19 +496,9 @@ RESULT OpenVRDevice::UpdateHMD() {
 					//m_qOrientation.Reverse();
 				} break;
 
-				case vr::TrackedDeviceClass_Invalid: {
-					// TODO: Handle invalid
-				} break;
-
-				case vr::TrackedDeviceClass_Other: {
-					// TODO: Handle other
-				} break;
-
-				case vr::TrackedDeviceClass_TrackingReference: {
-					// TODO: Handle tracking reference
-				} break;
-
-				default: {
+				case vr::TrackedDeviceClass_Invalid:
+				case vr::TrackedDeviceClass_TrackingReference: 
+				default:{
 					// TODO: Default handling
 				} break;
 			}
@@ -565,7 +556,7 @@ ProjectionMatrix OpenVRDevice::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear
 		return ProjectionMatrix();
 	}
 
-	vr::HmdMatrix44_t mat = m_pIVRHMD->GetProjectionMatrix(eyeType, znear, zfar, vr::API_OpenGL);
+	vr::HmdMatrix44_t mat = m_pIVRHMD->GetProjectionMatrix(eyeType, znear, zfar);
 
 	ProjectionMatrix projMat;
 

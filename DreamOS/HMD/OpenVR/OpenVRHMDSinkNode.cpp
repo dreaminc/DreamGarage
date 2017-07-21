@@ -72,12 +72,20 @@ RESULT OpenVRHMDSinkNode::UnsetRenderSurface(EYE_TYPE eye) {
 	RESULT r = R_PASS;
 	vr::EVRCompositorError ivrResult = vr::VRCompositorError_None;
 
-	vr::Texture_t eyeTexture;
-	eyeTexture.handle = (void*)(static_cast<int64_t>(m_pOGLInputFramebuffer->GetColorAttachment()->GetOGLTextureIndex()));
-	eyeTexture.eType = vr::API_OpenGL;
-	eyeTexture.eColorSpace = vr::ColorSpace_Gamma;
+	vr::Texture_t eyeTexture = { 
+		(void*)(uintptr_t)m_pOGLInputFramebuffer->GetColorAttachment()->GetOGLTextureIndex(), 
+		vr::TextureType_OpenGL, 
+		vr::ColorSpace_Gamma 
+	};
+
 	ivrResult = vr::VRCompositor()->Submit((vr::EVREye)(eye), &eyeTexture);
 	CB((ivrResult == vr::VRCompositorError_None));
+
+
+	//vr::Texture_t leftEyeTexture 
+	//vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
+	//vr::Texture_t rightEyeTexture = { (void*)(uintptr_t)rightEyeDesc.m_nResolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
+	//vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
 
 Error:
 	return r;

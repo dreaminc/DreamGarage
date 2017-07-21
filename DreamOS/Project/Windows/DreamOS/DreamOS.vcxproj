@@ -1238,7 +1238,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="DreamOS.production.nuspec" />
     <None Include="packages.config" />
     <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js" />
-    <None Include="PropertySheet.props" />
+    <None Include="PropertySheet.props">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt">

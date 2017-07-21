@@ -38,9 +38,13 @@ RESULT OpenVRController::SubmitHapticImpulse(ControllerType controllerType, Hapt
 	vr::TrackedDeviceIndex_t unControllerDeviceIndex = m_pIVRHMD->GetTrackedDeviceIndexForControllerRole(unDeviceType);
 
 	// pulse is in micro-seconds
-	// TODO: add more haptic resolution
+	// TODO: add more haptic resolution (axes)
+
 	unsigned short usDuration = (unsigned short)(msDuration * 1000.0f);
-	m_pIVRHMD->TriggerHapticPulse(unControllerDeviceIndex, 0, usDuration);
+	util::Clamp<unsigned short>(usDuration, 100, 3999);	// undocumented max range
+	uint32_t axisIndex = vr::k_EButton_Axis0 - vr::k_EButton_Axis0;		// Add different button axes
+
+	m_pIVRHMD->TriggerHapticPulse(unControllerDeviceIndex, axisIndex, usDuration);
 
 Error:
 	return r;
