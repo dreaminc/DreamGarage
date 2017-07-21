@@ -58,6 +58,11 @@ public:
 	RESULT SetUniform(float flag);
 };
 
+class OGLUniformInt : public OGLUniform {
+public:
+	RESULT SetUniform(int val);
+};
+
 class OGLUniformPoint : public OGLUniform {
 public:
 	RESULT SetUniform(point pt);

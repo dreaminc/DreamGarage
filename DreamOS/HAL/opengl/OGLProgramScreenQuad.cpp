@@ -27,6 +27,7 @@ RESULT OGLProgramScreenQuad::OGLInitialize() {
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformColorTextureMS), std::string("u_textureColorMS")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pFUniformTextureMS), std::string("u_fTextureMS")));
+	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformColorTextureMS_n), std::string("u_textureColorMS_n")));
 
 	CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformBackgroundColor), std::string("u_vec4BackgroundColor")));
 
@@ -92,9 +93,13 @@ RESULT OGLProgramScreenQuad::ProcessNode(long frameID) {
 	glDisable(GL_BLEND);
 
 	if (m_pOGLFramebufferInput != nullptr) {
-		if (m_pOGLFramebufferInput->GetSampleCount() > 1) {
+		int sampleCount = m_pOGLFramebufferInput->GetSampleCount();
+
+		if (sampleCount > 1) {
 			m_pParentImp->glActiveTexture(GL_TEXTURE1);
 			
+			m_pUniformColorTextureMS_n->SetUniformInteger(sampleCount);
+
 			if (m_fRenderDepth) {
 				m_pParentImp->BindTexture(m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureTarget(), m_pOGLFramebufferInput->GetDepthAttachment()->GetOGLTextureIndex());
 			}
