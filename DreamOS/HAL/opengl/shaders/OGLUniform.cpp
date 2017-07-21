@@ -100,6 +100,10 @@ RESULT OGLUniformFloat::SetUniform(float value) {
 	return SetUniformFloat(reinterpret_cast<GLfloat*>(&value));
 }
 
+RESULT OGLUniformInt::SetUniform(int value) {
+	return SetUniformInteger(static_cast<GLint>(value));
+}
+
 RESULT OGLUniformPoint::SetUniform(point pt) {
 	return SetUniform4fv(reinterpret_cast<GLfloat*>(&pt));
 }

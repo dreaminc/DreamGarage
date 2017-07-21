@@ -40,6 +40,7 @@ private:
 	OGLUniformSampler2D *m_pUniformColorTextureMS = nullptr;
 
 	OGLUniformBool *m_pFUniformTextureMS = nullptr;
+	OGLUniformInt *m_pUniformColorTextureMS_n = nullptr;
 
 	OGLUniformVector *m_pUniformBackgroundColor = nullptr;
 };

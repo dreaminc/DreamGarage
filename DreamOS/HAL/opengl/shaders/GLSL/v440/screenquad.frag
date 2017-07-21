@@ -12,6 +12,7 @@ in Data {
 
 uniform sampler2D u_textureColor;
 uniform sampler2DMS u_textureColorMS;
+uniform int u_textureColorMS_n;
 
 uniform	bool u_fTextureMS;
 bool g_fTextureMS = true;
@@ -25,7 +26,13 @@ void main(void) {
 	vec4 color = vec4(0.0f);
 
 	if(u_fTextureMS == true) {
-		color = texelFetch(u_textureColorMS, ivec2(gl_FragCoord.xy), 1);
+		vec4 colorAccumulator = vec4(0.0f);
+		for(int i = 0; i < u_textureColorMS_n; i++) {
+			colorAccumulator += texelFetch(u_textureColorMS, ivec2(gl_FragCoord.xy), i);
+		}
+
+		//color = texelFetch(u_textureColorMS, ivec2(gl_FragCoord.xy), 1);
+		color = colorAccumulator / (float)(u_textureColorMS_n);
 	}
 	else {
 		color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
