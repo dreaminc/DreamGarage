@@ -23,3 +23,13 @@ DimObj* AnimationState::Apply(DimObj* pObj) {
 	pObj->MoveTo(ptPosition)->SetScale(vScale)->SetOrientation(qRotation);
 	return pObj;
 }
+
+DimObj* AnimationState::ApplyTransform(DimObj *pObj) {
+	pObj->MoveTo(ptPosition)->SetScale(vScale)->SetOrientation(qRotation);
+	return pObj;
+}
+
+DimObj* AnimationState::ApplyColor(DimObj *pObj) {
+	pObj->SetMaterialColors(cColor, true);
+	return pObj;
+}

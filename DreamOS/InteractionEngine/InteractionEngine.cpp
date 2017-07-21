@@ -266,6 +266,10 @@ Error:
 	return r;
 }
 
+bool InteractionEngine::IsAnimating(DimObj *pobj) {
+	return m_pObjectQueue->IsAnimating(pobj);
+}
+
 RESULT InteractionEngine::RemoveAnimationObject(DimObj *pObj) {
 	return m_pObjectQueue->RemoveAnimationObject(pObj);
 }

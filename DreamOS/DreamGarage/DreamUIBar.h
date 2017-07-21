@@ -21,10 +21,18 @@ class UIView;
 
 class CloudController;
 class EnvironmentControllerProxy;
+class HTTPControllerProxy;
+class UserControllerProxy;
 
 class font;
 class texture;
 class UIButton;
+
+#define SCROLLVIEW_DEPTH 0.9f
+#define MENU_HEIGHT -1.0f
+#define SHOW_MENU_HEIGHT -0.5f
+#define SHOW_MENU_DEPTH 1.4f
+#define MENU_ANIMATION_DURATION 0.1f;
 
 enum class MenuState {
 	NONE,
@@ -77,6 +85,7 @@ public:
 
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
+	std::vector<std::string> GetStringHeaders();
 
 // UIEvent
 	RESULT Notify(UIEvent *pEvent);
@@ -97,21 +106,26 @@ private:
 	CloudController *m_pCloudController = nullptr;
 	MenuControllerProxy *m_pMenuControllerProxy = nullptr;
 	EnvironmentControllerProxy *m_pEnvironmentControllerProxy = nullptr;
+	HTTPControllerProxy *m_pHTTPControllerProxy = nullptr;
+	UserControllerProxy *m_pUserControllerProxy = nullptr;
 
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
 	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
-	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
 
 	std::shared_ptr<texture> m_pDefaultThumbnail;
 	std::shared_ptr<texture> m_pDefaultIcon;
 	std::shared_ptr<texture> m_pShareIcon;
+	std::shared_ptr<texture> m_pMenuItemBg;
 
 	std::shared_ptr<font> m_pFont;
 
 	quaternion m_qMenuOrientation;
-	point m_ptMenuShowOffset;
+	point m_ptMenuShowOffset = point(0.0f, SHOW_MENU_HEIGHT, SHOW_MENU_DEPTH);
+	float m_menuHeight = MENU_HEIGHT;
+	float m_animationDuration = MENU_ANIMATION_DURATION;
+	float m_scrollViewDepth = SCROLLVIEW_DEPTH;
 
 	MenuState m_menuState = MenuState::NONE;
 };

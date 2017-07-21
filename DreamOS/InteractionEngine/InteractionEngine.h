@@ -78,6 +78,7 @@ public:
 		void* callbackContext = nullptr) = 0;
 
 	virtual RESULT CancelAnimation(DimObj *pObj) = 0;
+	virtual bool IsAnimating(DimObj *pobj) = 0;
 	virtual RESULT RemoveAnimationObject(DimObj *pObj) = 0;
 	virtual RESULT RemoveAllObjects() = 0;
 
@@ -176,6 +177,7 @@ public:
 		void* callbackContext = nullptr) override;
 
 	virtual RESULT CancelAnimation(DimObj *pObj) override;
+	virtual bool IsAnimating(DimObj *pobj) override;
 	virtual RESULT RemoveAnimationObject(DimObj *pObj) override;
 	virtual RESULT RemoveAllObjects() override;
 

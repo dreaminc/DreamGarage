@@ -31,6 +31,7 @@ public:
 
 	RESULT CancelAnimation(DimObj *pObj, double startTime);
 	RESULT RemoveAnimationObject(DimObj *pObj);
+	bool IsAnimating(DimObj *pObj);
 	RESULT RemoveAllObjects();
 
 private:

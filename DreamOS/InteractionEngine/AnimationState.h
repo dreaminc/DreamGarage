@@ -20,6 +20,8 @@ public:
 public:
 	RESULT Compose(AnimationState state);
 	DimObj* Apply(DimObj *pObj);
+	DimObj* ApplyColor(DimObj *pObj);
+	DimObj* ApplyTransform(DimObj *pObj);
 };
 
 #endif // ! ANIMATION_STATE_H_

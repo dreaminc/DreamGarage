@@ -55,6 +55,8 @@ public:
 	void* GetCallbackContext();
 	RESULT SetCallbackContext(void* context);
 
+	bool ShouldAnimateColor();
+
 private:
 	double m_startTime;
 	double m_duration;

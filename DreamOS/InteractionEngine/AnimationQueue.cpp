@@ -37,7 +37,13 @@ RESULT AnimationQueue::Update(double sNow) {
 			}
 		} while ((*pItem)->GetFlags().fNoBlock && ++pItem != pQueue.end());
 
-		state.Apply(pObj);
+
+		//TODO: hack to avoid color issues
+		//state.Apply(pObj);
+		state.ApplyTransform(pObj);
+		if ((*pItem)->ShouldAnimateColor()) {
+			state.ApplyColor(pObj);
+		}
 	}
 //Error:
 	return r;
@@ -95,6 +101,10 @@ RESULT AnimationQueue::CancelAnimation(DimObj *pObj, double startTime) {
 RESULT AnimationQueue::RemoveAnimationObject(DimObj *pObj) {
 	m_objectQueue[pObj] = std::deque<std::shared_ptr<AnimationItem>>();
 	return R_PASS;
+}
+
+bool AnimationQueue::IsAnimating(DimObj *pObj) {
+	return m_objectQueue.count(pObj) > 0 && m_objectQueue[pObj].size() > 0;
 }
 
 RESULT AnimationQueue::RemoveAllObjects() {

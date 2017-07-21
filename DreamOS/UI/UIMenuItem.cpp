@@ -52,7 +52,6 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	std::shared_ptr<quad> pIcon;
 
 	labelFormat.pFont->SetLineHeight(0.025f);
-	//labelFormat.pFont->SetLineHeight(0.025f);
 
 	pText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 		labelFormat.pFont,
@@ -61,23 +60,26 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 		0.0703125, 
 		text::flags::WRAP | text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
 
-	//pText->SetBackgroundColor(color(0.0f, 0.0f, 0.0f, 0.65f));
-	//pText->RenderToQuad();
-
 	pText->RotateXByDeg(90.0f);
 
 	pText->SetPosition(labelFormat.ptPosition);
 
-	auto pBgQuad = m_pSurfaceComposite->AddQuad(0.25, 0.2);
-	pBgQuad->SetColor(color(0.0f, 0.0f, 0.0f, 0.65f));
-	pBgQuad->SetPosition(pText->GetPosition() + point(0.0f, 0.0725f, -0.0001f));
+	auto pBgQuad = m_pSurfaceComposite->AddQuad(GetSurface()->GetWidth(), GetSurface()->GetHeight() / 2.0f);
+
+	point ptDiff = point(0.0f, (GetSurface()->GetHeight() + pBgQuad->GetHeight()) / 2.0f, 0.0001f);
+	pBgQuad->SetPosition(GetSurface()->GetPosition() - ptDiff);
 	pBgQuad->RotateXByDeg(90.0f);
-	//pText->RenderToQuad();
+
+	if (labelFormat.pBgTexture != nullptr) {
+		pBgQuad->UpdateColorTexture(labelFormat.pBgTexture);
+	}
+	else {
+		pBgQuad->SetColor(labelFormat.bgColor);
+	}
+
 	m_pSurfaceComposite->AddObject(pText);
 
 	m_strName = labelFormat.strLabel;
-
-	//m_pSurface->RotateXByDeg(90.0f);
 
 	if (iconFormat.pTexture != nullptr)
 		m_pSurface->SetColorTexture(iconFormat.pTexture);

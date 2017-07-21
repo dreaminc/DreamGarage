@@ -70,8 +70,10 @@ RESULT AnimationItem::Update(DimObj *pObj, AnimationState& state, double msNow) 
 	updateState.qRotation = m_startState.qRotation.RotateToQuaternionLerp(m_endState.qRotation, prog);
 	updateState.vScale = ((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
 
-	auto vColor = ((float)(1.0 - prog) * m_startState.cColor + (float)(prog)* m_endState.cColor);
-	updateState.cColor.SetColor(vColor.element(0, 0), vColor.element(1, 0), vColor.element(2, 0), vColor.element(3, 0));
+	if (m_startState.cColor != m_endState.cColor) {
+		auto vColor = ((float)(1.0 - prog) * m_startState.cColor + (float)(prog)* m_endState.cColor);
+		updateState.cColor.SetColor(vColor.element(0, 0), vColor.element(1, 0), vColor.element(2, 0), vColor.element(3, 0));
+	}
 
 	CR(state.Compose(updateState));
 Error:
@@ -125,4 +127,8 @@ void* AnimationItem::GetCallbackContext() {
 RESULT AnimationItem::SetCallbackContext(void* context) {
 	m_fnOnAnimationContext = context;
 	return R_PASS;
+}
+
+bool AnimationItem::ShouldAnimateColor() {
+	return m_startState.cColor != m_endState.cColor;
 }
