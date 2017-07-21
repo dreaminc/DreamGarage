@@ -661,8 +661,8 @@ RESULT SandboxApp::InitializeHMD() {
 	GetSandboxWindowSize(pxWidth, pxHeight);
 
 	if (GetSandboxConfiguration().fUseHMD) {
-		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
-		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
+		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, pxWidth, pxHeight);
+		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, pxWidth, pxHeight);
 		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, pxWidth, pxHeight);
 
 		if (m_pHMD != nullptr) {

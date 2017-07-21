@@ -721,6 +721,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.cpp" />
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTouchController.cpp" />
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRDevice.cpp" />
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRHMDSinkNode.cpp" />
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRController.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObject.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\ActiveObjectQueue.cpp" />
     <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp" />
@@ -983,6 +985,8 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h" />
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTouchController.h" />
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRDevice.h" />
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRHMDSinkNode.h" />
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRController.h" />
     <ClInclude Include="..\..\..\InteractionEngine\ActiveObject.h" />
     <ClInclude Include="..\..\..\InteractionEngine\ActiveObjectQueue.h" />
     <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h" />
@@ -1234,7 +1238,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <None Include="DreamOS.production.nuspec" />
     <None Include="packages.config" />
     <None Include="packages\jQuery.2.1.1\tools\jquery-2.1.1.intellisense.js" />
-    <None Include="PropertySheet.props" />
+    <None Include="PropertySheet.props">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\..\..\dreampaths.txt">

@@ -1,5 +1,4 @@
 #include "OpenVRDevice.h"
-#include "HAL/opengl/OGLTexture.h"
 
 #include "Sandbox/SandboxApp.h"
 
@@ -7,15 +6,14 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include "OpenVRHMDSinkNode.h"
+
+#include "OpenVRController.h"
+
 OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),
 	m_pRenderModels(nullptr),
-	m_pCompositor(nullptr),
-	m_pFramebufferRenderLeft(nullptr),
-	m_pFramebufferResolveLeft(nullptr),
-	m_pFramebufferRenderRight(nullptr),
-	m_pFramebufferResolveRight(nullptr),
 	m_pControllerModelLeft(nullptr),
 	m_pControllerModelRight(nullptr),
 	m_pHMDModel(nullptr)
@@ -37,7 +35,23 @@ RESULT OpenVRDevice::InitializeHMDSourceNode() {
 }
 
 RESULT OpenVRDevice::InitializeHMDSinkNode() {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	OpenGLImp *pOGLImp = dynamic_cast<OpenGLImp*>(m_pHALImp);
+	CN(pOGLImp);
+
+	m_pOpenVRHMDSinkNode = new OpenVRHMDSinkNode(pOGLImp, this);
+	CN(m_pOpenVRHMDSinkNode);
+
+	CR(m_pOpenVRHMDSinkNode->OGLInitialize());
+	CR(m_pOpenVRHMDSinkNode->SetupConnections());
+
+Error:
+	return r;
+}
+
+HMDSinkNode* OpenVRDevice::GetHMDSinkNode() {
+	return (HMDSinkNode*)(m_pOpenVRHMDSinkNode);
 }
 
 std::string OpenVRDevice::GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError) {
@@ -50,71 +64,6 @@ std::string OpenVRDevice::GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::Tracke
 	std::string sResult = pchBuffer;
 	delete[] pchBuffer;
 	return sResult;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose:
-//-----------------------------------------------------------------------------
-RESULT OpenVRDevice::InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32_t nHeight) {
-	RESULT r = R_PASS;
-	
-	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(m_pHALImp);
-
-	OGLFramebuffer *pOGLRenderFramebuffer = nullptr;
-	OGLFramebuffer *pOGLResolveFramebuffer = nullptr;
-
-	if (eye == EYE_LEFT) {
-		m_pFramebufferRenderLeft = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_RENDER_CHANNELS);
-		m_pFramebufferResolveLeft = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_RESOLVE_CHANNELS);
-		pOGLRenderFramebuffer = m_pFramebufferRenderLeft;
-		pOGLResolveFramebuffer = m_pFramebufferResolveLeft;
-	}
-	else if (eye == EYE_RIGHT) {
-		m_pFramebufferRenderRight = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_RENDER_CHANNELS);
-		m_pFramebufferResolveRight = new OGLFramebuffer(oglimp, m_eyeWidth, m_eyeHeight, DEFAULT_OPENVR_RESOLVE_CHANNELS);
-		pOGLRenderFramebuffer = m_pFramebufferRenderRight;
-		pOGLResolveFramebuffer = m_pFramebufferResolveRight;
-	}
-	else {
-		CBM((0), "Invalid Eye Passed");
-	}
-
-	// Frame buffer pointers set to respective eye now - avoid code duplication
-
-	// RENDER
-	CR(pOGLRenderFramebuffer->OGLInitialize());
-	CR(pOGLRenderFramebuffer->Bind());
-
-	CR(pOGLRenderFramebuffer->SetSampleCount(DEFAULT_OPENVR_MULTISAMPLE));
-
-	CR(pOGLRenderFramebuffer->MakeDepthAttachment());		// Note: This will create a new depth buffer
-	//CR(pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer(GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT, DEFAULT_OPENVR_MULTISAMPLE));
-	CR(pOGLRenderFramebuffer->GetDepthAttachment()->OGLInitializeRenderBuffer());
-
-	CR(pOGLRenderFramebuffer->MakeColorAttachment());		// Note: This will create a new color buffer
-	CR(pOGLRenderFramebuffer->GetColorAttachment()->MakeOGLTextureMultisample());
-	CR(pOGLRenderFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE));
-
-	// RESOLVE
-	CR(pOGLResolveFramebuffer->OGLInitialize());
-	CR(pOGLResolveFramebuffer->Bind());
-	CR(pOGLResolveFramebuffer->MakeColorAttachment());
-
-	CR(pOGLResolveFramebuffer->GetColorAttachment()->MakeOGLTexture());
-	OGLTexture* pOGLTexture = pOGLResolveFramebuffer->GetColorAttachment()->GetOGLTexture();
-
-	pOGLTexture->SetTextureParameter(GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	pOGLTexture->SetTextureParameter(GL_TEXTURE_MAX_LEVEL, 0);
-
-	// TODO: This should be done less piece meal 
-	CR(pOGLResolveFramebuffer->SetOGLTextureToFramebuffer2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D));
-
-	// Check FBO status and unbind
-	CR(oglimp->CheckFramebufferStatus(GL_FRAMEBUFFER));
-	CR(oglimp->glBindFramebuffer(GL_FRAMEBUFFER, 0));
-
-Error:
-	return r;
 }
 
 RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
@@ -132,16 +81,17 @@ RESULT OpenVRDevice::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) 
 	m_strDriver = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_TrackingSystemName_String);
 	m_strDisplay = GetTrackedDeviceString(m_pIVRHMD, vr::k_unTrackedDeviceIndex_Hmd, vr::Prop_SerialNumber_String);
 
-	CRM(SetupStereoRenderTargets(), "Failed to get render models");
+	// Eye Widths
+	m_pIVRHMD->GetRecommendedRenderTargetSize(&m_eyeWidth, &m_eyeHeight);
 
-	m_pCompositor = vr::VRCompositor();
-	CNM(m_pCompositor, "Failed to initialize IVR compositor");
 
 	CRM(InitializeRenderModels(), "Failed to load render models");
 	
 	// TODO: Fix this
-	//m_pSenseController = new SenseController();
+	//m_pSenseController = new OVRTouchController(m_ovrSession);
+	m_pSenseController = new OpenVRController(m_pIVRHMD);
 	CN(m_pSenseController);
+	CR(m_pSenseController->Initialize());
 
 	OVERLAY_DEBUG_OUT("HMD Vive - On");
 
@@ -332,21 +282,6 @@ VirtualObj *OpenVRDevice::GetSenseControllerObject(ControllerType controllerType
 	return nullptr;
 }
 
-RESULT OpenVRDevice::SetupStereoRenderTargets() {
-	RESULT r = R_PASS;
-
-	CN(m_pIVRHMD);
-
-	m_pIVRHMD->GetRecommendedRenderTargetSize(&m_eyeWidth, &m_eyeHeight);
-
-	for (int i = 0; i < 2; i++) {
-		CR(InitializeFrameBuffer(static_cast<EYE_TYPE>(i), m_eyeWidth, m_eyeHeight));
-	}
-
-Error:
-	return r;
-}
-
 RESULT OpenVRDevice::HandleVREvent(vr::VREvent_t event) {
 	RESULT r = R_PASS;
 
@@ -423,9 +358,12 @@ RESULT OpenVRDevice::UpdateHMD() {
 	RESULT r = R_PASS;
 
 	// Process SteamVR events
-	vr::VREvent_t event;
-	while (m_pIVRHMD->PollNextEvent(&event, sizeof(event))) {
-		HandleVREvent(event);
+	vr::VREvent_t vrEvent;
+	CN(m_pIVRHMD);
+
+
+	if(m_pIVRHMD->PollNextEvent(&vrEvent, sizeof(vr::VREvent_t))) {
+		HandleVREvent(vrEvent);
 	}
 
 	// Process SteamVR controller state
@@ -442,13 +380,12 @@ RESULT OpenVRDevice::UpdateHMD() {
 
 		// TODO: currently not getting click events from touch pad or trigger
 		// more info: https://github.com/ValveSoftware/openvr/wiki/IVRSystem::GetControllerState
-
-		if (m_pIVRHMD->GetControllerState(unDevice, &state)) {
+		if (m_pIVRHMD->GetControllerState(unDevice, &state, sizeof(vr::VRControllerState_t))) {
 			if (m_pIVRHMD->GetTrackedDeviceClass(unDevice) == vr::TrackedDeviceClass_Controller) {
 				uint32_t currentFrame = state.unPacketNum;
 
-				if (currentFrame != ovrFrame) {
-					ovrFrame = currentFrame;
+				if (currentFrame != m_vrFrameCount) {
+					m_vrFrameCount = currentFrame;
 					vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(unDevice);
 					UpdateSenseController(controllerRole, state);
 				}
@@ -459,7 +396,6 @@ RESULT OpenVRDevice::UpdateHMD() {
 		}
 	}
 
-	CN(m_pIVRHMD);
 
 	vr::VRCompositor()->WaitGetPoses(m_rTrackedDevicePose, vr::k_unMaxTrackedDeviceCount, NULL, 0);
 
@@ -515,6 +451,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pControllerModelLeft->SetOrientation(qOrientation);
 
 						m_pLeftHand->SetPosition(ptControllerPosition);
+						m_pLeftHand->SetOrientation(qOrientation);
 						m_pLeftHand->SetLocalOrientation(qOrientation);
 
 						fLeftHandTracked = true;
@@ -525,6 +462,7 @@ RESULT OpenVRDevice::UpdateHMD() {
 						m_pControllerModelRight->SetOrientation(qOrientation);
 
 						m_pRightHand->SetPosition(ptControllerPosition);
+						m_pRightHand->SetOrientation(qOrientation);
 						m_pRightHand->SetLocalOrientation(qOrientation);
 
 						fRightHandTracked = true;
@@ -558,19 +496,9 @@ RESULT OpenVRDevice::UpdateHMD() {
 					//m_qOrientation.Reverse();
 				} break;
 
-				case vr::TrackedDeviceClass_Invalid: {
-					// TODO: Handle invalid
-				} break;
-
-				case vr::TrackedDeviceClass_Other: {
-					// TODO: Handle other
-				} break;
-
-				case vr::TrackedDeviceClass_TrackingReference: {
-					// TODO: Handle tracking reference
-				} break;
-
-				default: {
+				case vr::TrackedDeviceClass_Invalid:
+				case vr::TrackedDeviceClass_TrackingReference: 
+				default:{
 					// TODO: Default handling
 				} break;
 			}
@@ -606,113 +534,15 @@ RESULT OpenVRDevice::CommitSwapChain(EYE_TYPE eye) {
 }
 
 RESULT OpenVRDevice::SubmitFrame() {
-	RESULT r = R_PASS;
-	vr::EVRCompositorError ivrResult = vr::VRCompositorError_None;
-
-	// Left Eye
-	vr::Texture_t leftEyeTexture;
-	leftEyeTexture.handle = (void*)(static_cast<int64_t>(m_pFramebufferResolveLeft->GetColorAttachment()->GetOGLTextureIndex()));
-	leftEyeTexture.eType = vr::API_OpenGL;
-	leftEyeTexture.eColorSpace = vr::ColorSpace_Gamma;
-	ivrResult = vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture);
-	CB((ivrResult == vr::VRCompositorError_None));
-
-	// Right Eye
-	vr::Texture_t rightEyeTexture;
-	rightEyeTexture.handle = (void*)(static_cast<int64_t>(m_pFramebufferResolveRight->GetColorAttachment()->GetOGLTextureIndex()));
-	rightEyeTexture.eType = vr::API_OpenGL;
-	rightEyeTexture.eColorSpace = vr::ColorSpace_Gamma;
-	ivrResult = vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture);
-	CB((ivrResult == vr::VRCompositorError_None));
-	
-	if (m_fVblank && m_fGlFinishHack) {
-		//$ HACKHACK. From gpuview profiling, it looks like there is a bug where two renders and a present
-		// happen right before and after the vsync causing all kinds of jittering issues. This glFinish()
-		// appears to clear that up. Temporary fix while I try to get nvidia to investigate this problem.
-		// 1/29/2014 mikesart
-		glFinish();
-	}
-
-	/*
-	// SwapWindow
-	{
-		SDL_GL_SwapWindow(m_pWindow);
-	}
-	*/
-
-	// Clear
-	{
-		// We want to make sure the glFinish waits for the entire present to complete, not just the submission
-		// of the command. So, we do a clear here right here so the glFinish will wait fully for the swap.
-		glClearColor(0, 0, 0, 1);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	}
-
-// Flush and wait for swap.
-	if (m_fVblank) {
-		glFlush();
-		glFinish();
-	}
-
-	/*
-	// Spew out the controller and pose count whenever they change.
-	if (m_iTrackedControllerCount != m_iTrackedControllerCount_Last || m_iValidPoseCount != m_iValidPoseCount_Last)
-	{
-		m_iValidPoseCount_Last = m_iValidPoseCount;
-		m_iTrackedControllerCount_Last = m_iTrackedControllerCount;
-
-		dprintf("PoseCount:%d(%s) Controllers:%d\n", m_iValidPoseCount, m_strPoseClasses.c_str(), m_iTrackedControllerCount);
-	}
-	*/
-
-	glFinish();
-
-Error:
-	return r;
+	return m_pOpenVRHMDSinkNode->SubmitFrame();
 }
 
 RESULT OpenVRDevice::SetAndClearRenderSurface(EYE_TYPE eye) {
-	RESULT r = R_PASS;
-
-	glEnable(GL_MULTISAMPLE);
-
-	if (eye == EYE_LEFT) {
-		m_pFramebufferRenderLeft->Bind();
-		m_pFramebufferRenderLeft->SetAndClearViewport(true, true);
-	}
-	else if (eye == EYE_RIGHT) {
-		m_pFramebufferRenderRight->Bind();
-		m_pFramebufferRenderRight->SetAndClearViewport(true, true);
-	}
-
-//Error:	
-	return r;
+	return R_NOT_IMPLEMENTED;
 }
 
 RESULT OpenVRDevice::UnsetRenderSurface(EYE_TYPE eye) {
-	RESULT r = R_PASS;
-	OpenGLImp *oglimp = dynamic_cast<OpenGLImp*>(m_pHALImp);
-
-	oglimp->glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	glDisable(GL_MULTISAMPLE);
-
-	if (eye == EYE_LEFT) {
-		oglimp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_pFramebufferRenderLeft->GetFramebufferIndex());
-		oglimp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_pFramebufferResolveLeft->GetFramebufferIndex());
-	}
-	else if (eye == EYE_RIGHT) {
-		oglimp->glBindFramebuffer(GL_READ_FRAMEBUFFER, m_pFramebufferRenderRight->GetFramebufferIndex());
-		oglimp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_pFramebufferResolveRight->GetFramebufferIndex());
-	}
-
-	oglimp->glBlitFramebuffer(0, 0, m_eyeWidth, m_eyeHeight, 0, 0, m_eyeWidth, m_eyeHeight, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-
-	oglimp->glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-	oglimp->glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-
-//Error:
-	return r;
+	return m_pOpenVRHMDSinkNode->UnsetRenderSurface(eye);
 }
 
 RESULT OpenVRDevice::RenderHMDMirror() {
@@ -722,10 +552,11 @@ RESULT OpenVRDevice::RenderHMDMirror() {
 ProjectionMatrix OpenVRDevice::GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) {
 	vr::EVREye eyeType = (eye == EYE_LEFT) ? vr::Eye_Left : vr::Eye_Right;
 
-	if (m_pIVRHMD == nullptr)
+	if (m_pIVRHMD == nullptr) {
 		return ProjectionMatrix();
+	}
 
-	vr::HmdMatrix44_t mat = m_pIVRHMD->GetProjectionMatrix(eyeType, znear, zfar, vr::API_OpenGL);
+	vr::HmdMatrix44_t mat = m_pIVRHMD->GetProjectionMatrix(eyeType, znear, zfar);
 
 	ProjectionMatrix projMat;
 
@@ -759,9 +590,12 @@ ViewMatrix OpenVRDevice::GetViewMatrix(EYE_TYPE eye) {
 	ViewMatrix viewMat;
 	viewMat.identity();
 
-	for (int i = 0; i < 4; i++)
-		for (int j = 0; j < 4; j++)
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 4; j++) {
 			viewMat(j, i) = mat4View[i * 4 + j];
+			//viewMat(i, j) = mat4View[i * 4 + j];
+		}
+	}
 
 	return viewMat;
 }

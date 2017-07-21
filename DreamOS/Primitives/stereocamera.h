@@ -34,6 +34,9 @@ public:
 private:
 	EYE_TYPE m_eye;
 	camera_precision m_pupillaryDistance;	//  Distance between eyes (in mm)
+
+	bool m_fProjEyeInit[2] = { false, false};
+	ProjectionMatrix m_projEye[2];
 };
 
 #endif // ! STEREO_CAMERA_H_

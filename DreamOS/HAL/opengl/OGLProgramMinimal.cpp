@@ -91,8 +91,9 @@ RESULT OGLProgramMinimal::ProcessNode(long frameID) {
 	glEnable(GL_DEPTH_TEST);
 	//glDisable(GL_DEPTH_TEST);
 
-	if (m_pOGLFramebuffer != nullptr)
+	if (m_pOGLFramebuffer != nullptr) {
 		BindToFramebuffer(m_pOGLFramebuffer);
+	}
 
 	glEnable(GL_BLEND);
 
@@ -145,6 +146,7 @@ RESULT OGLProgramMinimal::SetCameraUniforms(camera *pCamera) {
 }
 
 RESULT OGLProgramMinimal::SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
+
 	if (m_pUniformViewProjectionMatrix != nullptr) {
 		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
 		//auto matVP = pStereoCamera->GetProjectionMatrix(eye);

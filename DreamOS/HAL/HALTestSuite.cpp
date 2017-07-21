@@ -24,13 +24,15 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestMinimalShader());
+
+	CR(AddTestMinimalTextureShader());
+
 	CR(AddTestQuadObject());
 
 	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestSenseHaptics());
-
-	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestModel());
 	
@@ -49,8 +51,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestBlinnPhongShaderBlurHMD());
 
 	CR(AddTestBlinnPhongShaderBlur());
-
-	CR(AddTestMinimalShader());
 
 	CR(AddTestMinimalShaderHMD());
 	
@@ -634,7 +634,7 @@ RESULT HALTestSuite::AddTestQuadObject() {
 		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
 
 		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
-		CNM(pDestSinkNode, "Destination sink node isn't set");
+		CNM(pDestSinkNode, "Destination sink node isn't set");		
 
 		CR(pHAL->MakeCurrentContext());
 
@@ -1757,7 +1757,11 @@ RESULT HALTestSuite::AddTestMinimalShader() {
 		CN(pRenderScreenQuad);
 		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 		CR(pHAL->ReleaseCurrentContext());
 
@@ -1854,7 +1858,11 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 		CN(pRenderScreenQuad);
 		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-		CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+		//CR(pDestSinkNode->ConnectToInput("input_framebuffer", pRenderScreenQuad->Output("output_framebuffer")));
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
 		CR(pHAL->ReleaseCurrentContext());
 

@@ -809,6 +809,12 @@
     <ClCompile Include="..\..\..\HMD\Oculus\OVRTouchController.cpp">
       <Filter>HMD\Oculus</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRHMDSinkNode.cpp">
+      <Filter>HMD\OpenVR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRController.cpp">
+      <Filter>HMD\OpenVR</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1681,6 +1687,12 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTouchController.h">
       <Filter>HMD\Oculus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRHMDSinkNode.h">
+      <Filter>HMD\OpenVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRController.h">
+      <Filter>HMD\OpenVR</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
