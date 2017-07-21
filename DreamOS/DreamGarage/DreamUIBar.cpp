@@ -134,7 +134,8 @@ CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connect
 if (m_pathStack.empty()) {
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 	m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
-	UpdateCompositeWithCameraLook(0.0f, m_menuHeight);
+//	UpdateCompositeWithCameraLook(0.0f, m_menuHeight);
+	UpdateCompositeWithHands(m_menuHeight, Axes::Z);
 	GetDOS()->GetKeyboard()->UpdateComposite();
 }
 else {

@@ -28,7 +28,7 @@ class font;
 class texture;
 class UIButton;
 
-#define SCROLLVIEW_DEPTH 0.9f
+#define SCROLLVIEW_DEPTH 1.2f
 #define MENU_HEIGHT -1.0f
 #define SHOW_MENU_HEIGHT -0.5f
 #define SHOW_MENU_DEPTH 1.4f
