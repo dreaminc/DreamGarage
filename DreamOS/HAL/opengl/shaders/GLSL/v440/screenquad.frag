@@ -32,7 +32,7 @@ void main(void) {
 		}
 
 		//color = texelFetch(u_textureColorMS, ivec2(gl_FragCoord.xy), 1);
-		color = colorAccumulator / (float)(u_textureColorMS_n);
+		color = colorAccumulator / (u_textureColorMS_n);
 	}
 	else {
 		color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
