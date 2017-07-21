@@ -11,6 +11,8 @@
 
 #include "DreamConsole/DreamConsole.h"
 
+#include <chrono>
+
 UIScrollView::UIScrollView(HALImp *pHALImp, DreamOS *pDreamOS) :
 UIView(pHALImp, pDreamOS)
 {
@@ -35,18 +37,21 @@ RESULT UIScrollView::Initialize() {
 
 	m_pLeftScrollButton = AddUIButton();
 	m_pLeftScrollButton->SetVisible(false);
-	m_pLeftScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, 1.0f, m_scrollScale));
-	PositionMenuButton(-1.0f + 0.25f, m_pLeftScrollButton);
+	m_pLeftScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale, m_scrollScale));
+	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton);
 
 	m_pRightScrollButton = AddUIButton();
 	m_pRightScrollButton->SetVisible(false);
-	m_pRightScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, 1.0f, m_scrollScale));
-	PositionMenuButton(m_maxElements - 0.25f, m_pRightScrollButton);
+	m_pRightScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale, m_scrollScale));
+	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
 
 	m_pLeftScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
 	m_pRightScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
 
-	//m_pTitleView = AddUIView();
+	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pRightScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-right.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+
+	//TODO:  clean this up, potentially with curved quad implementation
 	m_pTitleQuad = AddQuad(0.068f, 0.068f * (3.0f / 4.0f));
 	m_pTitleQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pTitleQuad->RotateXByDeg(90.0f);
@@ -62,18 +67,10 @@ RESULT UIScrollView::Initialize() {
 
 	m_pTitleText->RotateXByDeg(90.0f);
 	m_pTitleText->SetPosition(point(0.085f, m_titleHeight - 0.005f, m_menuDepth));
-	/*
-	m_pTitleText->SetBackgroundColor(COLOR_BLACK);
-	m_pTitleText->RenderToQuad();
-	//*/
 
 	AddObject(m_pTitleText);
-	//m_pTitleView->SetPosition(point(0.0f, m_titleHeight, m_menuDepth));
 
 	m_pMenuButtonsContainer = AddUIView();
-
-	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left-600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_pRightScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-right-600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
 	m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 
@@ -81,6 +78,10 @@ RESULT UIScrollView::Initialize() {
 		CN(pButton);
 		CR(pButton->RegisterToInteractionEngine(m_pDreamOS));
 	}
+
+	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	m_frameMs = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	m_frameMs /= 1000.0;
 
 Error:
 	return r;
@@ -92,24 +93,30 @@ RESULT UIScrollView::Update() {
 	std::vector<std::shared_ptr<VirtualObj>> pChildren;
 	CBR(m_pMenuButtonsContainer->HasChildren(), R_PASS);
 
-	float yRotationPerElement =  (float)M_PI / (180.0f / m_itemAngleY);
+	float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
+
+	auto tNow = std::chrono::high_resolution_clock::now().time_since_epoch();
+	double msNow = std::chrono::duration_cast<std::chrono::milliseconds>(tNow).count();
+	msNow /= 1000.0;
+
+	double tDiff = (msNow - m_frameMs) * (90.0);
 
 	pChildren = m_pMenuButtonsContainer->GetChildren();
-	if (pChildren.size() > m_maxElements && IsVisible() && m_fScrollButtonVisible) {
+	if (pChildren.size() > m_maxElements && m_fScrollButtonVisible) {
 		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;
 
-		m_yRotation = std::max(0.0f, std::min(m_yRotation + m_velocity, maxRotation));
+		m_yRotation = std::max(0.0f, std::min(m_yRotation + (m_velocity*(float)(tDiff)) , maxRotation));
 
 		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pLeftScrollButton.get())) {
 			color leftColor = m_pLeftScrollButton->GetMaterial()->GetDiffuseColor();
 			if (m_yRotation > 0.0f && m_velocity < 0.0f && leftColor != m_visibleColor ) {
-				ShowButton(m_pLeftScrollButton.get(), m_visibleColor);
+				ShowObject(m_pLeftScrollButton.get(), m_visibleColor);
 			}
 			else if (m_yRotation > 0.0f && m_velocity >= 0.0f && leftColor != m_canScrollColor) {
-				ShowButton(m_pLeftScrollButton.get(), m_canScrollColor);
+				ShowObject(m_pLeftScrollButton.get(), m_canScrollColor);
 			}
 			else if (m_yRotation <= 0.0f && leftColor != m_hiddenColor) {
-				HideButton(m_pLeftScrollButton.get());
+				HideObject(m_pLeftScrollButton.get());
 			}
 
 		}
@@ -117,13 +124,13 @@ RESULT UIScrollView::Update() {
 		if (!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pRightScrollButton.get())) {
 			color rightColor = m_pRightScrollButton->GetMaterial()->GetDiffuseColor();
 			if (m_yRotation < maxRotation && m_velocity > 0.0f && rightColor != m_visibleColor) {
-				ShowButton(m_pRightScrollButton.get(), m_visibleColor);
+				ShowObject(m_pRightScrollButton.get(), m_visibleColor);
 			}
 			else if (m_yRotation < maxRotation && m_velocity <= 0.0f && rightColor != m_canScrollColor) {
-				ShowButton(m_pRightScrollButton.get(), m_canScrollColor);
+				ShowObject(m_pRightScrollButton.get(), m_canScrollColor);
 			}
 			else if (m_yRotation >= maxRotation && rightColor != m_hiddenColor) {
-				HideButton(m_pRightScrollButton.get());
+				HideObject(m_pRightScrollButton.get());
 			}
 		}
 
@@ -143,6 +150,7 @@ RESULT UIScrollView::Update() {
 			}
 		}
 	}
+	m_frameMs = msNow;
 
 Error:
 	return r; 
@@ -216,64 +224,6 @@ Error:
 	return r;
 }
 
-RESULT UIScrollView::AnimateScaleUp(void *pContext) {
-	RESULT r = R_PASS;
-
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	DimObj *pObj = button->GetSurface().get();
-
-	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		pObj,
-		pObj->GetPosition(),
-		pObj->GetOrientation(),
-		vector(1.25f, 1.25, 1.25f),
-		0.1,
-		AnimationCurveType::LINEAR,
-		AnimationFlags()
-	));
-
-Error:
-	return r;
-}
-
-RESULT UIScrollView::AnimateScaleReset(void *pContext) {
-	RESULT r = R_PASS;
-
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	DimObj *pObj = button->GetSurface().get();
-
-	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		pObj,
-		pObj->GetPosition(),
-		pObj->GetOrientation(),
-		vector(1.0f, 1.0, 1.0f),
-		0.1,
-		AnimationCurveType::LINEAR,
-		AnimationFlags()
-	));
-
-Error:
-	return r;
-}
-
-RESULT UIScrollView::StartScrollRight(void *pContext) {
-	m_menuState = ScrollState::SCROLLING;
-	m_velocity = 0.01f;
-	return R_PASS;
-}
-
-RESULT UIScrollView::StartScrollLeft(void *pContext) {
-	m_menuState = ScrollState::SCROLLING;
-	m_velocity = -0.01f;
-	return R_PASS;
-}
-
-RESULT UIScrollView::StopScroll(void *pContext) {
-	m_menuState = ScrollState::NONE;
-	m_velocity = 0.0f;
-	return R_PASS;
-}
-
 RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
 	RESULT r = R_PASS;
 
@@ -282,23 +232,34 @@ RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
 	for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
 		auto pObj = reinterpret_cast<UIButton*>(pButton.get());
 		if (pObj != pPushButton) {
-			CR(HideButton(pObj));
+			CR(HideObject(pObj));
 		}
 		else {
 			CR(HideAndPushButton(pObj));
 		}
 	}
 	for (auto& pButton : { m_pLeftScrollButton, m_pRightScrollButton }) {
-		CR(HideButton(pButton.get()));
+		CR(HideObject(pButton.get()));
 	}
-	m_pTitleQuad->SetVisible(false);
-	m_pTitleText->SetVisible(false);
+	HideObject(m_pTitleText.get());
+	HideObject(m_pTitleQuad.get());
 
 Error:
 	return r;
 }
 
-RESULT UIScrollView::HideButton(UIButton* pScrollButton) {
+RESULT UIScrollView::ShowTitle() {
+	RESULT r = R_PASS;
+
+	m_pTitleQuad->SetVisible(true);
+	m_pTitleQuad->SetMaterialColors(m_visibleColor, true);
+	m_pTitleText->SetVisible(true);
+	m_pTitleText->SetMaterialColors(m_visibleColor, true);
+
+	return r;
+}
+
+RESULT UIScrollView::HideObject(DimObj* pObject) {
 	RESULT r = R_PASS;
 
 	auto fnEndCallback = [&](void *pContext) {
@@ -310,21 +271,20 @@ RESULT UIScrollView::HideButton(UIButton* pScrollButton) {
 	};
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		//pScrollButton->GetSurface().get(),
-		pScrollButton,
-		color(1.0f, 1.0f, 1.0f, 0.0f),
+		pObject,
+		m_hiddenColor,
 		m_fadeDuration,
 		AnimationCurveType::LINEAR,
 		AnimationFlags(),
 		nullptr,
 		fnEndCallback,
-		pScrollButton));
+		pObject));
 
 Error:
 	return r;
 }
 
-RESULT UIScrollView::ShowButton(UIButton* pScrollButton, color showColor) {
+RESULT UIScrollView::ShowObject(DimObj* pObject, color showColor /* = color(1.0f, 1.0f, 1.0f, 1.0f) */) {
 	RESULT r = R_PASS;
 
 	auto fnStartCallback = [&](void *pContext) {
@@ -336,14 +296,14 @@ RESULT UIScrollView::ShowButton(UIButton* pScrollButton, color showColor) {
 	};
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
-		pScrollButton,
+		pObject,
 		showColor,
 		m_fadeDuration,
 		AnimationCurveType::LINEAR,
 		AnimationFlags(),
 		fnStartCallback,
 		nullptr,
-		pScrollButton));
+		pObject));
 
 Error:
 	return r;
@@ -364,10 +324,10 @@ RESULT UIScrollView::HideAndPushButton(UIButton* pButton) {
 
 	CR(m_pDreamOS->GetInteractionEngineProxy()->PushAnimationItem(
 		pSurface,
-		pSurface->GetPosition() + point(0.0f, 0.0f, -0.1f),
+		pSurface->GetPosition() + point(0.0f, 0.0f, m_pushDepth),
 		pSurface->GetOrientation(),
 		pSurface->GetScale(),
-		color(1.0f, 1.0f, 1.0f, 0.0f),
+		m_hiddenColor,
 		m_fadeDuration,
 		AnimationCurveType::LINEAR,
 		AnimationFlags(),
@@ -386,10 +346,6 @@ ScrollState UIScrollView::GetState() {
 RESULT UIScrollView::SetScrollVisible(bool fVisible) {
 	m_fScrollButtonVisible = fVisible;
 	return R_PASS;
-}
-
-std::shared_ptr<UIView> UIScrollView::GetTitleView() {
-	return m_pTitleView;
 }
 
 std::shared_ptr<quad> UIScrollView::GetTitleQuad() {

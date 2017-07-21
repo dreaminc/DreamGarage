@@ -28,6 +28,12 @@ class font;
 class texture;
 class UIButton;
 
+#define SCROLLVIEW_DEPTH 0.9f
+#define MENU_HEIGHT -1.0f
+#define SHOW_MENU_HEIGHT -0.5f
+#define SHOW_MENU_DEPTH 1.4f
+#define ANIMATION_DURATION 0.1f;
+
 enum class MenuState {
 	NONE,
 	ANIMATING
@@ -116,7 +122,9 @@ private:
 	std::shared_ptr<font> m_pFont;
 
 	quaternion m_qMenuOrientation;
-	point m_ptMenuShowOffset;
+	point m_ptMenuShowOffset = point(0.0f, SHOW_MENU_HEIGHT, SHOW_MENU_DEPTH);
+	float m_menuHeight = MENU_HEIGHT;
+	float m_animationDuration = ANIMATION_DURATION;
 
 	MenuState m_menuState = MenuState::NONE;
 };

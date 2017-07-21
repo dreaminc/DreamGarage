@@ -37,7 +37,13 @@ RESULT AnimationQueue::Update(double sNow) {
 			}
 		} while ((*pItem)->GetFlags().fNoBlock && ++pItem != pQueue.end());
 
-		state.Apply(pObj);
+
+		//TODO: hack to avoid color issues
+		//state.Apply(pObj);
+		state.ApplyTransform(pObj);
+		if ((*pItem)->ShouldAnimateColor()) {
+			state.ApplyColor(pObj);
+		}
 	}
 //Error:
 	return r;

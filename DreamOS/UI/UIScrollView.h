@@ -23,10 +23,13 @@ class text;
 #define TITLE_HEIGHT 0.875f
 
 #define PAD_MOVE_CONSTANT 0.005f
-#define CAN_SCROLL_ALPHA 0.5f
-#define SCROLL_SCALE 0.4f
-#define FADE_DURATION 0.1f
+
+#define SCROLL_SCALE 0.4f 
+#define SCROLL_ARROW_BIAS 0.4f
 #define SCROLL_ASPECT_RATIO 414.0f / 600.0f
+
+#define FADE_DURATION 0.1f
+#define PUSH_DEPTH -0.1f
 
 enum class ScrollState {
 	NONE,
@@ -49,23 +52,15 @@ public:
 	RESULT SetScrollVisible(bool fVisible);
 // default behaviors
 public:
-	RESULT AnimateScaleUp(void *pContext);
-	RESULT AnimateScaleReset(void *pContext);
-
-	//Temporary
-	RESULT StartScrollLeft(void *pContext);
-	RESULT StartScrollRight(void *pContext);
-	RESULT StopScroll(void *pContext);
-
-	RESULT HideButton(UIButton* pScrollButton);
-	RESULT ShowButton(UIButton* pScrollButton, color showColor = color(1.0f, 1.0f, 1.0f, 1.0f));
+	RESULT HideObject(DimObj* pObject);
+	RESULT ShowObject(DimObj* pObject, color showColor = color(1.0f, 1.0f, 1.0f, 1.0f));
 	RESULT HideAndPushButton(UIButton* pButton);
 	// pass optional pushButton to have an additional moving back animation
 	RESULT HideAllButtons(UIButton* pPushButton = nullptr);
+	RESULT ShowTitle();
 
 public:
 	ScrollState GetState();
-	std::shared_ptr<UIView> GetTitleView();
 	std::shared_ptr<quad> GetTitleQuad();
 	std::shared_ptr<text> GetTitleText();
 	std::shared_ptr<UIView> GetMenuItemsView();
@@ -88,8 +83,8 @@ private:
 	float m_titleHeight = TITLE_HEIGHT;
 
 	// scrolling
-	float m_canScrollAlpha = CAN_SCROLL_ALPHA;
 	float m_scrollScale = SCROLL_SCALE;
+	float m_scrollBias = SCROLL_ARROW_BIAS;
 	float m_maxElements = MAX_ELEMENTS;
 	int m_objectIndexMin;
 	int m_objectIndexMax;
@@ -97,13 +92,15 @@ private:
 	float m_yRotationPerElement;
 	float m_velocity;
 	float m_fadeDuration = FADE_DURATION;
+	float m_pushDepth = PUSH_DEPTH;
+	double m_frameMs;
 
 	color m_hiddenColor = color(1.0f, 1.0f, 1.0f, 0.0f);
 	color m_canScrollColor = color(1.0f, 1.0f, 1.0f, 0.5f);
 	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// UI objects
-	std::shared_ptr<UIView> m_pTitleView = nullptr;
+	std::shared_ptr<FlatContext> m_pTitleView = nullptr;
 	std::shared_ptr<quad> m_pTitleQuad = nullptr;
 	std::shared_ptr<text> m_pTitleText = nullptr;
 

@@ -65,7 +65,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	// Initialize UIScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
 	CN(m_pView);
-	m_pView->SetPosition(point(0.0f, 0.0f, 0.9f));
 
 	m_pScrollView = m_pView->AddUIScrollView();
 	CN(m_pScrollView);
@@ -95,8 +94,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	m_pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
 	CNM(m_pUserControllerProxy, "Failed to get user controller proxy");
-
-	m_ptMenuShowOffset = point(0.0f, 0.5f, -0.5f);
 
 Error:
 	return r;
@@ -137,7 +134,7 @@ CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connect
 if (m_pathStack.empty()) {
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 	m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
-	UpdateCompositeWithCameraLook(0.0f, -1.0f);
+	UpdateCompositeWithCameraLook(0.0f, m_menuHeight);
 	GetDOS()->GetKeyboard()->UpdateComposite();
 }
 else {
@@ -272,22 +269,21 @@ RESULT DreamUIBar::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pB
 		}
 	}
 
-//	CR(pObj->UpdateColorTexture(pTexture));
-
 //Error:
 	return r;
 }
 
 RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	RESULT r = R_PASS;
+
 	DreamUIBar *pDreamUIBar = reinterpret_cast<DreamUIBar*>(pContext);
 	CN(pDreamUIBar);
 
 	GetComposite()->SetVisible(true, false);
 	m_pScrollView->SetScrollVisible(true);
-	m_pScrollView->SetPosition( point(0.0f, 0.0f, 0.0f)-m_ptMenuShowOffset);
-	m_pScrollView->GetTitleQuad()->SetVisible(true);
-	m_pScrollView->GetTitleText()->SetVisible(true);
+	m_pScrollView->SetPosition(m_ptMenuShowOffset);
+	m_pScrollView->ShowTitle();
+
 	m_pLeftMallet->Show();
 	m_pRightMallet->Show();
 	m_menuState = MenuState::ANIMATING;
@@ -381,9 +377,6 @@ RESULT DreamUIBar::Update(void *pContext) {
 			pButtons.emplace_back(pButton);
 		}
 
-		//TODO: could subclass
-		auto pTitleView = m_pScrollView->GetTitleView();
-
 		m_pScrollView->GetTitleText()->SetText(m_pMenuNode->GetTitle());
 		
 		CR(m_pScrollView->UpdateMenuButtons(pButtons));
@@ -444,7 +437,7 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 		pComposite->GetPosition() - m_ptMenuShowOffset,
 		pComposite->GetOrientation(),
 		pComposite->GetScale(),
-		0.5f,
+		m_animationDuration,
 		AnimationCurveType::EASE_OUT_QUART, // may want to try ease_in here
 		AnimationFlags(),
 		fnStartCallback,
@@ -460,14 +453,13 @@ RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
-	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
 //*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
 		pComposite->GetPosition(),
 		pComposite->GetOrientation(),
 		pComposite->GetScale(),
-		0.1f,
+		m_animationDuration,
 		//AnimationCurveType::EASE_OUT_BACK,
 		AnimationCurveType::EASE_OUT_QUAD,
 		AnimationFlags(),
