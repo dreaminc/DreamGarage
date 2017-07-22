@@ -325,14 +325,14 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 	RotationMatrix qOffset = RotationMatrix();
 	hand *pHand = pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
-	CN(pHand);
+	CNR(pHand, R_OBJECT_NOT_FOUND);
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
 
 	if (m_pLeftMallet)
 		m_pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * m_pLeftMallet->GetHeadOffset()));
 
 	pHand = pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
-	CN(pHand);
+	CNR(pHand, R_OBJECT_NOT_FOUND);
 
 	qOffset = RotationMatrix();
 	qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());

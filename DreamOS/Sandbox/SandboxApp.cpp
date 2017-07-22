@@ -538,6 +538,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeCamera(), "Failed to initialize Camera");
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
+	// TODO: Remove CMD line arg and use global config
+	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
+		m_SandboxConfiguration.fUseHMD = false;
+	}
 	CRM(InitializeHMD(), "Failed to initialize HMD");
 
 	// Set up the pipeline
@@ -547,11 +551,6 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
-
-	// TODO: Remove CMD line arg and use global config
-	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
-		m_SandboxConfiguration.fUseHMD = false;
-	}
 
 	if ((m_pCommandLineManager->GetParameterValue("leap").compare("") == 0) == false) {
 		m_SandboxConfiguration.fUseLeap = false;

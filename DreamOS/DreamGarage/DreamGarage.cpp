@@ -27,6 +27,8 @@ light *g_pLight = nullptr;
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
 
+#include "Core/Utilities.h"
+
 // TODO: Should this go into the DreamOS side?
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 	RESULT r = R_PASS;
@@ -160,7 +162,7 @@ RESULT DreamGarage::LoadScene() {
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
-//*
+/*
 	AddModel(L"\\Models\\FloatingIsland\\env.obj",
 		nullptr,
 		sceneOffset,
@@ -210,6 +212,8 @@ RESULT DreamGarage::LoadScene() {
 
 	//CV(m_pDreamUIBar);
 //*
+
+#ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);
 	CNM(m_pDreamBrowser, "Failed to create dream browser");
 
@@ -218,6 +222,7 @@ RESULT DreamGarage::LoadScene() {
 	m_pDreamBrowser->SetPosition(point(0.0f, 2.0f, -2.0f));
 	
 	m_pDreamBrowser->SetVisible(false);
+#endif
 
 	//m_pDreamControlView = LaunchDreamApp<DreamControlView>(this);
 	//CN(m_pDreamControlView);
@@ -460,7 +465,7 @@ Error:
 	return r;
 }
 
-user*	DreamGarage::ActivateUser(long userId) {
+user* DreamGarage::ActivateUser(long userId) {
 	if (m_peerUsers.find(userId) == m_peerUsers.end()) {
 		if (m_usersPool.empty()) {
 			LOG(ERROR) << "cannot activate a new user, no reserved users exist";
@@ -483,11 +488,12 @@ user*	DreamGarage::ActivateUser(long userId) {
 RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
+	// This will set visible 
 	user* pUser = ActivateUser(senderUserID);
 
 	point headPos = pUpdateHeadMessage->GetPosition();
 
-	std::string st = "pos" + std::to_string(senderUserID);
+	std::string strPosition = "pos" + std::to_string(senderUserID);
 
 	WCN(pUser);
 
@@ -495,7 +501,7 @@ RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage
 
 	pUser->GetHead()->SetPosition(headPos);
 
-	OVERLAY_DEBUG_SET(st, (st + "=" + std::to_string(headPos.x()) + "," + std::to_string(headPos.y()) + "," + std::to_string(headPos.z())).c_str());
+	OVERLAY_DEBUG_SET(strPosition, (strPosition + "=" + std::to_string(headPos.x()) + "," + std::to_string(headPos.y()) + "," + std::to_string(headPos.z())).c_str());
 
 	pUser->GetHead()->SetOrientation(qOrientation);
 
@@ -508,11 +514,10 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
 	//pUpdateHandMessage->PrintMessage();
-
-	user* pUser = ActivateUser(senderUserID);
-
 	hand::HandState handState;
 
+	user* pUser = ActivateUser(senderUserID);
+	//user *pUser = m_peerUsers[senderUserID];
 	WCN(pUser);
 
 	handState = pUpdateHandMessage->GetHandState();
@@ -526,25 +531,27 @@ RESULT DreamGarage::HandleAudioData(long senderUserID, AudioDataMessage *pAudioD
 	RESULT r = R_PASS;
 
 	user* pUser = ActivateUser(senderUserID);
-
+	//user *pUser = m_peerUsers[senderUserID];
 	WCN(pUser);
 
-	auto msg = pAudioDataMessage->GetAudioData();
+	//auto msg = pAudioDataMessage->GetAudioMessageBody();
+	auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
+	CN(pAudioBuffer);
 
-	size_t size = msg.number_of_channels * msg.number_of_frames;
-	float average = 0;
+	size_t numSamples = pAudioDataMessage->GetChannels() * pAudioDataMessage->GetFrames();
+	float averageAccumulator = 0.0f;
 
-	for (int i = 0; i < size; ++i) {
-		int16_t val = *(static_cast<const int16_t*>(msg.audio_data) + i);
-		if (abs(val) > 10)
-			average += abs(val);
+	for (int i = 0; i < numSamples; ++i) {
+		//int16_t val = static_cast<const int16_t>(msg.pAudioDataBuffer[i]);
+		int16_t value = *(static_cast<const int16_t*>(pAudioBuffer) + i);
+		float scaledValue = (float)(value) / (std::numeric_limits<int16_t>::max());
+
+		averageAccumulator += std::abs(scaledValue);
 	}
 
-	float mouthScale = average / size / 1000.0f;
+	float mouthScale = averageAccumulator / numSamples;
 
-	if (mouthScale > 1.0f) mouthScale = 1.0f;
-	if (mouthScale < 0.1f) mouthScale = 0.0f;
-
+	util::Clamp<float>(mouthScale, 0.0f, 1.0f);
 	pUser->UpdateMouth(mouthScale);
 
 Error:

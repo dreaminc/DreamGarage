@@ -15,28 +15,28 @@
 class AudioDataMessage : public Message {
 private:
 	struct MessageBody {
-		const void* audio_data;
-		int bits_per_sample;
-		int sample_rate;
-		size_t number_of_channels;
-		size_t number_of_frames;
+		const void* pAudioDataBuffer;
+		int bitsPerSample;
+		int samplingRate;
+		size_t channels;
+		size_t frames;
 	} m_body;
 
 public:
 	AudioDataMessage(long senderUserID, 
 		long receiverUserID, 
-		const void* audio_data,
-		int bits_per_sample,
-		int sample_rate,
-		size_t number_of_channels,
-		size_t number_of_frames) :
+		const void* pAudioDataBuffer,
+		int bitsPerSample,
+		int samplingRate,
+		size_t channels,
+		size_t frames) :
 		Message(senderUserID, receiverUserID, MessageType::MESSAGE_AUDIO_DATA, sizeof(AudioDataMessage))
 	{
-		m_body.audio_data = audio_data;
-		m_body.bits_per_sample = bits_per_sample;
-		m_body.sample_rate = sample_rate;
-		m_body.number_of_channels = number_of_channels;
-		m_body.number_of_frames = number_of_frames;
+		m_body.pAudioDataBuffer = pAudioDataBuffer;
+		m_body.bitsPerSample = bitsPerSample;
+		m_body.samplingRate = samplingRate;
+		m_body.channels = channels;
+		m_body.frames = frames;
 	}
 
 	~AudioDataMessage() {
@@ -47,9 +47,28 @@ public:
 		return R_NOT_IMPLEMENTED;
 	}
 
-
-	const MessageBody& GetAudioData() {
+	const MessageBody& GetAudioMessageBody() {
 		return m_body;
+	}
+
+	const void *GetAudioMessageBuffer() {
+		return m_body.pAudioDataBuffer;
+	}
+
+	const int GetBitsPerSample() {
+		return m_body.bitsPerSample;
+	}
+
+	const int GetSamplingRate() {
+		return m_body.samplingRate;
+	}
+
+	const size_t GetChannels() {
+		return m_body.channels;
+	}
+
+	const size_t GetFrames() {
+		return m_body.frames;
 	}
 };
 

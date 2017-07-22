@@ -227,6 +227,8 @@ RESULT hand::Initialize() {
 
 	point ptModel = point(0.0f, 0.0f, 0.0f);
 	float scaleModel = 0.015f;
+
+#ifndef _DEBUG
 	m_pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
 						nullptr,
 						ptModel,
@@ -238,6 +240,13 @@ RESULT hand::Initialize() {
 						ptModel,
 						scaleModel,
 						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
+#else
+	m_pLeftModel = AddComposite();
+	m_pLeftModel->AddVolume(0.02f);
+
+	m_pRightModel = AddComposite();
+	m_pRightModel->AddVolume(0.02f);
+#endif
 
 	m_qLeftModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI_2);
 	m_qRightModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
@@ -284,8 +293,12 @@ bool hand::IsTracked() {
 
 RESULT hand::OnLostTrack() {
 	m_fTracked = false;
-	m_pLeftModel->SetVisible(m_fTracked);
-	m_pRightModel->SetVisible(m_fTracked);
+	
+	if(m_pLeftModel)
+		m_pLeftModel->SetVisible(m_fTracked);
+
+	if(m_pRightModel)
+		m_pRightModel->SetVisible(m_fTracked);
 	
 	m_pPalm->SetVisible(m_fTracked);
 	m_pIndexFinger->SetVisible(m_fTracked);
