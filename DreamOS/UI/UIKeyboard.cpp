@@ -625,8 +625,9 @@ Error:
 RESULT UIKeyboard::UpdateComposite() {
 	RESULT r = R_PASS;
 
-	CR(UpdateCompositeWithCameraLook(m_offsetDepth, m_offsetHeight));
-	CR(SetSurfaceOffset(GetComposite()->GetPosition()));
+	//CR(UpdateCompositeWithCameraLook(m_offsetDepth, m_offsetHeight));
+	CR(UpdateCompositeWithHands(m_offsetHeight));
+	CR(SetSurfaceOffset(GetComposite()->GetPosition() + point(0.0f, 0.0f, OFFSET_DEPTH)));
 
 Error:
 	return r;

@@ -16,8 +16,8 @@
 #define SURFACE_HEIGHT 0.25f
 #define SURFACE_ANGLE 30.0f
 
-#define OFFSET_DEPTH 0.5f
-#define OFFSET_HEIGHT -0.25f
+#define OFFSET_DEPTH -0.175f
+#define OFFSET_HEIGHT -0.275f
 
 #define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
 #define TEXTBOX_NUM_LINES 1.0f
@@ -132,9 +132,8 @@ private:
 	float m_keyScale = KEY_SCALE;
 	float m_keyMargin = KEY_MARGIN;
 
-	point m_ptSurfaceOffset = point(0.0f, OFFSET_HEIGHT, -OFFSET_DEPTH);
+	point m_ptSurfaceOffset = point(0.0f, OFFSET_HEIGHT, OFFSET_DEPTH);
 	quaternion m_qSurfaceOrientation;
-	float m_offsetDepth = OFFSET_DEPTH;
 	float m_offsetHeight = OFFSET_HEIGHT;
 
 	float m_keyTypeThreshold = KEY_TYPE_THRESHOLD;
