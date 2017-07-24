@@ -29,7 +29,7 @@ class texture;
 class UIButton;
 
 #define SCROLLVIEW_DEPTH 1.175f
-#define MENU_HEIGHT -1.0f
+#define MENU_HEIGHT -0.95f
 #define SHOW_MENU_HEIGHT -0.5f
 #define SHOW_MENU_DEPTH 1.4f
 #define MENU_ANIMATION_DURATION 0.1f;

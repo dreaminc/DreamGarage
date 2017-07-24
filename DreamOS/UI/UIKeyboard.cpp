@@ -396,6 +396,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 		GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
+
 	Error:
 		return r;
 	};

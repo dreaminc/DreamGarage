@@ -16,8 +16,8 @@
 #define SURFACE_HEIGHT 0.25f
 #define SURFACE_ANGLE 30.0f
 
-#define OFFSET_DEPTH -0.175f
-#define OFFSET_HEIGHT -0.275f
+#define OFFSET_DEPTH -0.1f
+#define OFFSET_HEIGHT -0.29f
 
 #define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
 #define TEXTBOX_NUM_LINES 1.0f
