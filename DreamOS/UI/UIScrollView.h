@@ -14,7 +14,7 @@ class text;
 
 #define ITEM_ANGLE_X -30.0f
 #define ITEM_ANGLE_Y 12.0f
-#define ITEM_START_ANGLE_Y -15.0f
+#define ITEM_START_ANGLE_Y -18.0f
 #define ITEM_HEIGHT 0.75
 #define ITEM_SCALE 0.25
 #define ITEM_SCALE_SELECTED 1.25

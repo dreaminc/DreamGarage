@@ -23,6 +23,7 @@ RESULT AnimationQueue::Update(double sNow) {
 
 		AnimationState state;
 		state.vScale = vector(1.0f, 1.0f, 1.0f);
+		bool fShouldAnimateColor = (*pItem)->ShouldAnimateColor();
 
 		do {
 			(*pItem)->Update(pObj, state, sNow);
@@ -33,6 +34,7 @@ RESULT AnimationQueue::Update(double sNow) {
 					(*pItem)->GetAnimationEndedCallback()((*pItem)->GetCallbackContext());
 				}
 				pQueue.pop_front();
+				
 				break;
 			}
 		} while ((*pItem)->GetFlags().fNoBlock && ++pItem != pQueue.end());
@@ -41,7 +43,7 @@ RESULT AnimationQueue::Update(double sNow) {
 		//TODO: hack to avoid color issues
 		//state.Apply(pObj);
 		state.ApplyTransform(pObj);
-		if ((*pItem)->ShouldAnimateColor()) {
+		if (fShouldAnimateColor) {
 			state.ApplyColor(pObj);
 		}
 	}
