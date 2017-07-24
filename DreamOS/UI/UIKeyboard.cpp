@@ -436,6 +436,13 @@ RESULT UIKeyboard::HideKeyboard() {
 		pKeyboard->GetComposite()->SetVisible(false);
 		m_pLeftMallet->Hide();
 		m_pRightMallet->Hide();
+
+		// full press of key that clears whole string
+		CR(UpdateKeyState((SenseVirtualKey)(SVK_DELETE), 0));
+		CR(UpdateKeyState((SenseVirtualKey)(SVK_DELETE), 1));
+
+		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
+
 	Error:
 		return r;
 	};
@@ -585,6 +592,10 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 		// the user is at the root menu by coincidence.  may need to notify
 		// DreamUIBar in some way in the future
 		HideKeyboard();
+	}
+
+	else if (chkey == SVK_DELETE) {
+		m_pTextBoxText->SetText("");
 	}
 
 	else if (chkey == SVK_CONTROL) {
