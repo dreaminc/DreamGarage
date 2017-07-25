@@ -68,6 +68,7 @@ public:
 	struct configuration {
 		unsigned fUseHMD : 1;
 		unsigned fUseLeap : 1;
+		unsigned fMouseLook : 1;
 	};
 
 private:
