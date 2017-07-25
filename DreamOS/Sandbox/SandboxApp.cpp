@@ -157,6 +157,20 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 				}
 			}
 		} break;
+
+		case SENSE_MOUSE_LEFT_DRAG_MOVE: {
+			if (m_SandboxConfiguration.fMouseLook) {
+				m_pSenseMouse->CaptureMouse();
+				//m_pSenseMouse->CenterMousePosition();
+				m_pCamera->RotateCameraByDiffXY(mEvent->dx, mEvent->dy);
+			}
+		} break;
+
+		case SENSE_MOUSE_LEFT_BUTTON_UP: {
+			if (m_SandboxConfiguration.fMouseLook) {
+				m_pSenseMouse->ReleaseMouse();
+			}
+		} break;
 	}
 
 //Error:
@@ -256,6 +270,8 @@ RESULT SandboxApp::RegisterImpMouseEvents() {
 	RESULT r = R_PASS;
 
 	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, this));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, this));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, this));
 
 	//camera *pCamera = m_pOpenGLImp->GetCamera();
 
