@@ -50,7 +50,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = true;
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fUseLeap = false;
 	SetSandboxConfiguration(sandboxconfig);
 
@@ -162,7 +162,8 @@ RESULT DreamGarage::LoadScene() {
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
-/*
+
+#ifndef _DEBUG
 	AddModel(L"\\Models\\FloatingIsland\\env.obj",
 		nullptr,
 		sceneOffset,
@@ -206,12 +207,10 @@ RESULT DreamGarage::LoadScene() {
 			}
 		);
 	}
-//*/
+#endif
+
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
 	CN(m_pDreamUIBar);
-
-	//CV(m_pDreamUIBar);
-//*
 
 #ifndef _DEBUG
 	m_pDreamBrowser = LaunchDreamApp<DreamBrowser>(this);

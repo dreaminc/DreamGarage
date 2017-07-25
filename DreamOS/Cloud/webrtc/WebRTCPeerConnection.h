@@ -41,12 +41,7 @@ public:
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 
-		virtual RESULT OnAudioData(long peerConnectionID,
-			const void* audio_data,
-			int bits_per_sample,
-			int sample_rate,
-			size_t number_of_channels,
-			size_t number_of_frames) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 	};
 
 	friend class WebRTCPeerConnectionObserver;
@@ -74,7 +69,7 @@ protected:
 	virtual void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	virtual void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	virtual void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
-	virtual void OnRenegotiationNeeded() override {}
+	virtual void OnRenegotiationNeeded() override;
 	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
 	virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state);
 	virtual void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
@@ -90,11 +85,7 @@ protected:
 	virtual void OnFailure(const std::string& error) override;
 
 	// webrtc::AudioTrackSinkInterface
-	virtual void OnData(const void* audio_data,
-		int bits_per_sample,
-		int sample_rate,
-		size_t number_of_channels,
-		size_t number_of_frames) override;
+	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);

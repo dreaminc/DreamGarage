@@ -101,17 +101,16 @@ RESULT WebRTCPeerConnection::AddStreams() {
 
 	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
 
-	CR(AddAudioStream(pMediaStreamInterface));
+	//CR(AddAudioStream(pMediaStreamInterface));
 
 	// Add streams
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
 		LOG(ERROR) << "Adding stream to PeerConnection failed";
+		DEBUG_LINEOUT("Adding stream to PeerConnection failed");
 	}
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
 	m_WebRTCActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
-
-	//main_wnd_->SwitchToStreamingUI();
 
 Error:
 	return r;
@@ -170,6 +169,10 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 
 	//rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface = nullptr;
 	webrtc::DataChannelInit dataChannelInit;
+	
+	//dataChannelInit.maxRetransmits = 0;
+	//dataChannelInit.maxRetransmitTime = 0;
+	dataChannelInit.reliable = true;
 
 	CB((m_WebRTCActiveDataChannels.find(kDataLabel) == m_WebRTCActiveDataChannels.end()));
 
@@ -217,22 +220,26 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 	if (!stream) {
 		LOG(ERROR) << "cannot add stream";
+		DEBUG_LINEOUT("Cannot add stream");
 		return;
 	}
 
 	if (!stream->FindAudioTrack(kAudioLabel)) {
 		LOG(ERROR) << "cannot FindAudioTrack";
+		DEBUG_LINEOUT("Cannot FindAudioTrack");
 		return;
 	}
 
 	if (!stream->FindAudioTrack(kAudioLabel)->GetSource()) {
 		LOG(ERROR) << "cannot GetSource";
+		DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
 		return;
 	}
 
 	stream->FindAudioTrack(kAudioLabel)->GetSource()->AddSink(this);
 
 	LOG(INFO) << "added sink";
+	DEBUG_LINEOUT("Added Sink");
 
 	// TODO:
 	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_STREAM_ADDED, stream.release());
@@ -246,8 +253,15 @@ void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStream
 	// m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
 }
 
-void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) {
-	DEBUG_LINEOUT("OnDataChannel: %s", channel->label().c_str());
+void WebRTCPeerConnection::OnRenegotiationNeeded() {
+	DEBUG_LINEOUT("OnRenegotiationNeeded");
+	LOG(INFO) << "OnRenegotiationNeeded";
+
+	return;
+}
+
+void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface) {
+	DEBUG_LINEOUT("OnDataChannel: %s", pDataChannelInterface->label().c_str());
 
 	//channel->Send(webrtc::DataBuffer("DEADBEEF"));
 
@@ -258,22 +272,12 @@ void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelI
 	// TODO: 
 	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_DATA, stream.release());
 
-	channel->RegisterObserver(this);
+	pDataChannelInterface->RegisterObserver(this);
 }
 
-void WebRTCPeerConnection::OnData(const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames)
-{
+void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	if (m_pParentObserver != nullptr) {
-		m_pParentObserver->OnAudioData(m_peerConnectionID,
-			audio_data,
-			bits_per_sample,
-			sample_rate,
-			number_of_channels,
-			number_of_frames);
+		m_pParentObserver->OnAudioData(m_peerConnectionID, pAudioBuffer, bitsPerSample, samplingRate, channels, frames);
 	}
 }
 
@@ -375,7 +379,7 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 }
 
 void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state) {
-	DEBUG_OUT("ICE Connection Change: ");
+	DEBUG_OUT("ICE Gathering Change: ");
 	LOG(INFO) << "OnIceGatheringChange";
 
 	switch (new_state) {
@@ -446,7 +450,28 @@ void WebRTCPeerConnection::OnStateChange() {
 	CN(m_pDataChannelInterface);
 
 	//DEBUG_LINEOUT("WebRTCConductor::OnStateChange %d", pWebRTCDataChannel->state());
-	DEBUG_LINEOUT("WebRTCConductor::OnStateChange %s", GetDataStateString(m_pDataChannelInterface->state()).c_str());
+	auto dataChannelState = m_pDataChannelInterface->state();
+	DEBUG_LINEOUT("WebRTCConductor::OnStateChange %s", GetDataStateString(dataChannelState).c_str());
+
+	switch (dataChannelState) {
+		case webrtc::DataChannelInterface::DataState::kConnecting: {
+			// nothing
+		} break;
+		case webrtc::DataChannelInterface::DataState::kOpen: {
+			// nothing
+			int a = 5;
+		} break;
+		case webrtc::DataChannelInterface::DataState::kClosing: {
+			// nothing
+			int a = 5;
+		} break;
+
+		case webrtc::DataChannelInterface::DataState::kClosed: {
+			// nothing 
+			int a = 5;
+		} break;
+	}
+		
 
 Error:
 	return;
@@ -459,6 +484,7 @@ void WebRTCPeerConnection::OnMessage(const webrtc::DataBuffer& buffer) {
 	if (buffer.binary) {
 		int pDataBuffer_n = (int)(buffer.size());
 		uint8_t *pDataBuffer = new uint8_t[pDataBuffer_n];
+
 		memset(pDataBuffer, 0, sizeof(char) * pDataBuffer_n);
 		memcpy(pDataBuffer, buffer.data.data<uint8_t>(), buffer.size());
 
@@ -472,6 +498,7 @@ void WebRTCPeerConnection::OnMessage(const webrtc::DataBuffer& buffer) {
 	else {
 		int pszBufferString_n = (int)(buffer.size()) + 1;
 		char *pszBufferString = new char[pszBufferString_n];
+
 		memset(pszBufferString, 0, sizeof(char) * pszBufferString_n);
 		memcpy(pszBufferString, buffer.data.data<char>(), buffer.size());
 
@@ -533,11 +560,11 @@ Error:
 }
 
 
-void WebRTCPeerConnection::OnFailure(const std::string& error) {
+void WebRTCPeerConnection::OnFailure(const std::string& strError) {
 	RESULT r = R_PASS;
 
-	DEBUG_LINEOUT("WebRTC Error: %s", error.c_str());
-	LOG(INFO) << "(cloud) WebRTC Error: " << error.c_str();
+	DEBUG_LINEOUT("WebRTC Error: %s", strError.c_str());
+	LOG(INFO) << "(cloud) WebRTC Error: " << strError.c_str();
 
 	if (m_pParentObserver != nullptr) {
 		CR(m_pParentObserver->OnSDPFailure(m_peerConnectionID, m_fOffer));

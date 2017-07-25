@@ -63,7 +63,6 @@ public:
 	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 private:
-
 	std::map<long, user*> m_peerUsers;
 	std::vector<user*> m_usersPool;
 
