@@ -435,7 +435,8 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 //*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
-		pComposite->GetPosition() - (point(0.0f, 0.0f, m_scrollViewDepth) - m_ptMenuShowOffset),
+		//pComposite->GetPosition() - (point(0.0f, 0.0f, m_scrollViewDepth) - m_ptMenuShowOffset),
+		pComposite->GetPosition(),
 		pComposite->GetOrientation(),
 		pComposite->GetScale(),
 		m_animationDuration,
@@ -454,7 +455,8 @@ RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
-	pComposite->SetPosition(point(0.0f, 0.0f, m_scrollViewDepth));
+	//pComposite->SetPosition(point(0.0f, 0.0f, m_scrollViewDepth));
+	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
 //*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,

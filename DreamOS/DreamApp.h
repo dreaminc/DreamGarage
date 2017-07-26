@@ -116,6 +116,7 @@ protected:
 		vector vLook = pCamera->GetLookVector();
 
 		vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
+		vector vUp = vector(0.0f, 1.0f, 0.0f);
 
 		hand *pLeftHand = GetDOS()->GetHand(hand::HAND_LEFT);
 		hand *pRightHand = GetDOS()->GetHand(hand::HAND_RIGHT);
@@ -133,13 +134,18 @@ protected:
 			for (auto& hand : { pLeftHand, pRightHand }) {
 				float handDist = 0.0f;
 				point ptHand = hand->GetPosition();
+				ptHand = (point)(inverse(RotationMatrix(vLookXZ, vUp)) * (ptHand - pCamera->GetOrigin(true)));
+				//ptHand = (point)(inverse(RotationMatrix(pCamera->GetOrientation(true))) * (ptHand - pCamera->GetOrigin(true)));
 
 				if ((axes & 1) != 0)
-					handDist += pow(ptCamera.x() - ptHand.x(), 2);
+					handDist += pow(ptHand.x(), 2);
+					//handDist += pow(ptCamera.x() - ptHand.x(), 2);
 				if ((axes & 2) != 0)
-					handDist += pow(ptCamera.y() - ptHand.y(), 2);
+					handDist += pow(ptHand.y(), 2);
+					//handDist += pow(ptCamera.y() - ptHand.y(), 2);
 				if ((axes & 4) != 0)
-					handDist += pow(ptCamera.z() - ptHand.z(), 2);
+					handDist += pow(ptHand.z(), 2);
+					//handDist += pow(ptCamera.z() - ptHand.z(), 2);
 
 				if (handDist > dist)
 					dist = handDist;

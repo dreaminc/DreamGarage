@@ -10,7 +10,8 @@ class DreamOS;
 class text;
 
 #define MAX_ELEMENTS 4
-#define MENU_DEPTH -1.5f
+#define MENU_DEPTH -0.3f // -1.5f
+#define MENU_CENTER_OFFSET (1.5f + MENU_DEPTH)
 
 #define ITEM_ANGLE_X -30.0f
 #define ITEM_ANGLE_Y 12.0f
@@ -71,6 +72,7 @@ public:
 private:
 	// button positioning
 	float m_menuDepth = MENU_DEPTH;
+	float m_menuCenterOffset = MENU_CENTER_OFFSET;
 
 	float m_itemAngleX = ITEM_ANGLE_X;
 	float m_itemAngleY = ITEM_ANGLE_Y;

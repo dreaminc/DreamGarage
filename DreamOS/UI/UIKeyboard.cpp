@@ -33,6 +33,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 	m_pSurfaceContainer = GetComposite()->AddComposite();
 	m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
+	m_pSurfaceContainer->SetPosition(m_ptSurfaceOffset);
 
 	m_pSurface = m_pSurfaceContainer->AddQuad(m_surfaceHeight, m_surfaceWidth);
 	CN(m_pSurface);
@@ -70,7 +71,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 		float offset = m_surfaceHeight / 2.0f;
 		float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
 
-		m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), -cos(angle) * offset));
+		m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), -cos(angle) * offset + OFFSET_DEPTH));
 		m_pHeaderContainer->RotateXByDeg(90.0f);
 
 		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(m_surfaceWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
@@ -393,7 +394,8 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, m_animationOffsetHeight, 0.0f));
+		GetComposite()->SetPosition(m_ptComposite - point(0.0f, m_animationOffsetHeight, 0.0f));
+		//GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
 
@@ -414,7 +416,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 	DimObj *pObj = GetComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
-		m_ptSurfaceOffset,
+		m_ptComposite,
 		pObj->GetOrientation(),// * m_qSurfaceOrientation,
 		pObj->GetScale(),
 		m_animationDuration,
@@ -429,11 +431,13 @@ RESULT UIKeyboard::ShowKeyboard() {
 
 RESULT UIKeyboard::HideKeyboard() {
 
+	//point ptPosition = GetComposite()->GetPosition();
 	auto fnCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(false);
+	//	pKeyboard->GetComposite()->SetPosition(ptPosition);
 		m_pLeftMallet->Hide();
 		m_pRightMallet->Hide();
 
@@ -638,8 +642,10 @@ RESULT UIKeyboard::UpdateComposite() {
 	RESULT r = R_PASS;
 
 	//CR(UpdateCompositeWithCameraLook(m_offsetDepth, m_offsetHeight));
-	CR(UpdateCompositeWithHands(m_offsetHeight));
-	CR(SetSurfaceOffset(GetComposite()->GetPosition() + point(0.0f, 0.0f, OFFSET_DEPTH)));
+	CR(UpdateCompositeWithHands(m_offsetHeight, DreamApp::Axes::Z));
+	m_ptComposite = GetComposite()->GetPosition();
+	//CR(SetSurfaceOffset(GetComposite()->GetPosition() + point(0.0f, 0.0f, OFFSET_DEPTH)));
+	//CR(SetSurfaceOffset(GetComposite()->GetPosition() + point(0.0f, 0.0f, OFFSET_DEPTH)));
 
 Error:
 	return r;

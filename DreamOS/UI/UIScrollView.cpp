@@ -164,8 +164,9 @@ RESULT UIScrollView::PositionMenuButton(float index, std::shared_ptr<UIButton> p
 	radY -= (m_itemStartAngleY * M_PI / 180.0f);
 
 	float yPos = m_itemHeight;
-	float zPos = m_menuDepth;
-	point ptContext = point(sin(radY) * zPos, yPos, cos(radY) * zPos);
+	float zPos = (m_menuDepth - m_menuCenterOffset);
+	point ptContext = point(sin(radY) * zPos, yPos, (cos(radY) * zPos) + m_menuCenterOffset);
+	//point ptContext = point(index/4.0f, yPos, 0.0f);
 
 	quaternion qContext = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
 
