@@ -167,12 +167,12 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 
 	DEBUG_LINEOUT("WebRTCConductor::AddDataChannel");
 
-	//rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface = nullptr;
 	webrtc::DataChannelInit dataChannelInit;
-	
-	//dataChannelInit.maxRetransmits = 0;
-	//dataChannelInit.maxRetransmitTime = 0;
-	dataChannelInit.reliable = true;
+
+	// Set max transmit time to 3 frames
+	dataChannelInit.maxRetransmitTime = ((int)(1000.0f / 90.0f) * 3);
+	dataChannelInit.reliable = false;
+	dataChannelInit.ordered = false;
 
 	CB((m_WebRTCActiveDataChannels.find(kDataLabel) == m_WebRTCActiveDataChannels.end()));
 
@@ -606,6 +606,7 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 	RESULT r = R_PASS;
 
 	webrtc::PeerConnectionInterface::RTCConfiguration rtcConfiguration;
+	rtcConfiguration.dscp();
 
 	webrtc::PeerConnectionInterface::IceServer iceServer;
 	webrtc::FakeConstraints webrtcConstraints;
@@ -628,6 +629,10 @@ RESULT WebRTCPeerConnection::CreatePeerConnection(bool dtls) {
 		}
 
 		webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp, "true");
+		//webrtcConstraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableRtpDataChannels, "true");
+
+		rtcConfiguration.enable_dtls_srtp = rtc::Optional<bool>(true);
+		//rtcConfiguration.enable_rtp_data_channel = true;
 
 		m_pWebRTCPeerConnectionInterface = m_pWebRTCPeerConnectionFactory->CreatePeerConnection(rtcConfiguration, &webrtcConstraints, NULL, std::move(pCertificateGenerator), this);
 	}
@@ -771,6 +776,10 @@ RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer,
 	
 	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
 	CN(m_pDataChannelInterface);
+
+	if (m_pDataChannelInterface->buffered_amount() > 1000) {
+		int a = 5;
+	}
 
 	CB(m_pDataChannelInterface->Send(webrtc::DataBuffer(rtc::CopyOnWriteBuffer(pDataChannelBuffer, pDataChannelBuffer_n), true)));
 	
