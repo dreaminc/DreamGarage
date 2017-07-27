@@ -121,6 +121,7 @@ protected:
 		hand *pLeftHand = GetDOS()->GetHand(hand::HAND_LEFT);
 		hand *pRightHand = GetDOS()->GetHand(hand::HAND_RIGHT);
 
+		//TODO: use axes enum to define plane, cylinder, or sphere surface
 		uint16_t axes = static_cast<uint16_t>(handAxes);
 
 		CN(pCamera);
@@ -130,30 +131,17 @@ protected:
 			float dist = 0.0f;
 
 			point ptCamera = pCamera->GetPosition();
-
+			vector vPos;
 			for (auto& hand : { pLeftHand, pRightHand }) {
 				float handDist = 0.0f;
-				point ptHand = hand->GetPosition();
-				ptHand = (point)(inverse(RotationMatrix(vLookXZ, vUp)) * (ptHand - pCamera->GetOrigin(true)));
-				//ptHand = (point)(inverse(RotationMatrix(pCamera->GetOrientation(true))) * (ptHand - pCamera->GetOrigin(true)));
-
-				if ((axes & 1) != 0)
-					handDist += pow(ptHand.x(), 2);
-					//handDist += pow(ptCamera.x() - ptHand.x(), 2);
-				if ((axes & 2) != 0)
-					handDist += pow(ptHand.y(), 2);
-					//handDist += pow(ptCamera.y() - ptHand.y(), 2);
-				if ((axes & 4) != 0)
-					handDist += pow(ptHand.z(), 2);
-					//handDist += pow(ptCamera.z() - ptHand.z(), 2);
-
-				if (handDist > dist)
-					dist = handDist;
+				point ptHand = hand->GetPosition(true);
+				vector vHand = ptHand - pCamera->GetOrigin(true);
+				vector vTempPos = vLookXZ * (vHand.dot(vLookXZ));
+				if (vTempPos.magnitudeSquared() > vPos.magnitudeSquared())
+					vPos = vTempPos;
 			}
 
-			dist = pow(dist, 0.5f);
-
-			point lookOffset = (dist) * vLookXZ + point(0.0f, yPos, 0.0f);
+			point lookOffset = vPos + point(0.0f, yPos, 0.0f);
 
 			pComposite->SetPosition(pCamera->GetPosition() + lookOffset);
 			pComposite->SetOrientation(quaternion(vector(0.0f, 0.0f, -1.0f), vLookXZ));

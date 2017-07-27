@@ -64,6 +64,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 
 	// Initialize UIScrollView
 	m_pView = GetComposite()->AddUIView(GetDOS());
+	m_pView->SetPosition(0.0f, 0.0f, m_menuDepth);
 	CN(m_pView);
 
 	m_pScrollView = m_pView->AddUIScrollView();
@@ -134,9 +135,8 @@ CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connect
 if (m_pathStack.empty()) {
 	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 	m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
-//	UpdateCompositeWithCameraLook(0.0f, m_menuHeight);
-	UpdateCompositeWithHands(m_menuHeight, Axes::Z);
-	GetDOS()->GetKeyboard()->UpdateComposite();
+	UpdateCompositeWithHands(m_menuHeight);
+	GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight, m_menuDepth);
 }
 else {
 	m_pathStack.pop();
@@ -181,6 +181,7 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 	CBR(m_pMenuNode, R_OBJECT_NOT_FOUND);
 
 	//TODO: Invisible objects potentially should not receive interaction events
+	CBR(GetComposite()->IsVisible(), R_OBJECT_NOT_FOUND);
 	CBR(pSelected->IsVisible(), R_OBJECT_NOT_FOUND);
 
 	CBR(m_menuState == MenuState::NONE, R_PASS);
@@ -435,7 +436,6 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 //*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pComposite,
-		//pComposite->GetPosition() - (point(0.0f, 0.0f, m_scrollViewDepth) - m_ptMenuShowOffset),
 		pComposite->GetPosition(),
 		pComposite->GetOrientation(),
 		pComposite->GetScale(),
@@ -455,7 +455,6 @@ RESULT DreamUIBar::ShowMenu(std::function<RESULT(void*)> fnStartCallback, std::f
 	RESULT r = R_PASS;
 
 	composite *pComposite = m_pScrollView.get();
-	//pComposite->SetPosition(point(0.0f, 0.0f, m_scrollViewDepth));
 	pComposite->SetPosition(point(0.0f, 0.0f, 0.0f));
 //*
 	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(

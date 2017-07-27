@@ -10,23 +10,20 @@ class DreamOS;
 class text;
 
 #define MAX_ELEMENTS 4
-#define MENU_DEPTH -0.3f // -1.5f
-#define MENU_CENTER_OFFSET (1.5f + MENU_DEPTH)
+#define MENU_CENTER_OFFSET -1.5f
 
 #define ITEM_ANGLE_X -30.0f
 #define ITEM_ANGLE_Y 12.0f
-#define ITEM_START_ANGLE_Y -18.0f
-#define ITEM_HEIGHT 0.75
-#define ITEM_SCALE 0.25
-#define ITEM_SCALE_SELECTED 1.25
+#define ITEM_START_ANGLE_Y (-1.5f * ITEM_ANGLE_Y)
+#define ITEM_HEIGHT 0.0f 
 
 #define TITLE_ANGLE_X 75.0f
-#define TITLE_HEIGHT 0.875f
+#define TITLE_HEIGHT (ITEM_HEIGHT + 0.125f) //TODO: derive out of item angle + defined margin
 
 #define PAD_MOVE_CONSTANT 0.005f
 
 #define SCROLL_SCALE 0.4f 
-#define SCROLL_ARROW_BIAS 0.4f
+#define SCROLL_ARROW_BIAS 0.4f // Pulls scroll chevrons in towards the menu items
 #define SCROLL_ASPECT_RATIO 414.0f / 600.0f
 
 #define FADE_DURATION 0.1f
@@ -71,15 +68,12 @@ public:
 
 private:
 	// button positioning
-	float m_menuDepth = MENU_DEPTH;
 	float m_menuCenterOffset = MENU_CENTER_OFFSET;
 
 	float m_itemAngleX = ITEM_ANGLE_X;
 	float m_itemAngleY = ITEM_ANGLE_Y;
 	float m_itemStartAngleY = ITEM_START_ANGLE_Y;
 	float m_itemHeight = ITEM_HEIGHT;
-	float m_itemScale = ITEM_SCALE;
-	float m_itemScaleSelected = ITEM_SCALE_SELECTED;
 
 	float m_titleAngleX = TITLE_ANGLE_X;
 	float m_titleHeight = TITLE_HEIGHT;
@@ -102,7 +96,7 @@ private:
 	color m_visibleColor = color(1.0f, 1.0f, 1.0f, 1.0f);
 
 	// UI objects
-	std::shared_ptr<FlatContext> m_pTitleView = nullptr;
+	std::shared_ptr<UIView> m_pTitleView = nullptr;
 	std::shared_ptr<quad> m_pTitleQuad = nullptr;
 	std::shared_ptr<text> m_pTitleText = nullptr;
 
