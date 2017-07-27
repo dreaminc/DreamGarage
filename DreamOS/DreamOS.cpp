@@ -488,6 +488,7 @@ RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
 }
 
 // Cloud Controller
+/*
 RESULT DreamOS::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
 	return m_pSandbox->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
 }
@@ -506,6 +507,15 @@ RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallbac
 
 RESULT DreamOS::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
 	return m_pSandbox->RegisterAudioDataCallback(fnHandleAudioDataCallback);
+}
+*/
+
+RESULT DreamOS::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
+	return m_pSandbox->RegisterPeerConnectionObserver(pPeerConnectionObserver);
+}
+
+RESULT DreamOS::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
+	return m_pSandbox->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
 RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {

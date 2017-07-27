@@ -19,6 +19,8 @@
 #include <chrono>
 #include <thread>
 
+#include "Cloud/Environment/PeerConnection.h"
+
 #if (defined(_WIN32) || defined(_WIN64))
 #include "Sandbox/Windows/Win32Helper.h"
 #else
@@ -84,7 +86,7 @@ RESULT CloudController::Start() {
 
 	DEBUG_LINEOUT("CloudController::Start");
 
-	m_thread = std::thread(&CloudController::ProcessingThread, this);
+	m_cloudThread = std::thread(&CloudController::ProcessingThread, this);
 
 //Error:
 	return r;
@@ -100,7 +102,7 @@ RESULT CloudController::Stop() {
 	m_fRunning = false;
 
 #if (defined(_WIN32) || defined(_WIN64))
-	Win32Helper::PostQuitMessage(m_thread);
+	Win32Helper::PostQuitMessage(m_cloudThread);
 #else
 #pragma message ("not implemented post quit to thread")
 	while (m_fRunning) {
@@ -108,8 +110,8 @@ RESULT CloudController::Stop() {
 	}
 #endif
 
-	if (m_thread.joinable()) {
-		m_thread.join();
+	if (m_cloudThread.joinable()) {
+		m_cloudThread.join();
 	}
 
 //Error:
@@ -136,6 +138,7 @@ RESULT CloudController::RegisterDataChannelMessageCallback(HandleDataChannelMess
 	}
 }
 
+/*
 RESULT CloudController::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
 	if (m_fnHandlePeersUpdateCallback) {
 		return R_FAIL;
@@ -195,6 +198,7 @@ RESULT CloudController::RegisterEnvironmentAssetCallback(HandleEnvironmentAssetC
 		return R_PASS;
 	}
 }
+*/
 
 RESULT CloudController::SetCloudImp(std::unique_ptr<CloudImp> pCloudImp) {
 	RESULT r = R_PASS;
@@ -272,11 +276,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnPeersUpdate(long index) {
+RESULT CloudController::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
-	if (m_fnHandlePeersUpdateCallback != nullptr) {
-		CR(m_fnHandlePeersUpdateCallback(index));
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnNewPeerConnection(userID, peerUserID, fOfferor, pPeerConnection));
 	}
 
 Error:
@@ -293,29 +297,30 @@ RESULT CloudController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChan
 	Message *pDataChannelMessage = reinterpret_cast<Message*>(pDataChannelBuffer);
 	CN(pDataChannelMessage);
 
+	// TODO: Move this into DreamGarage
 	switch (pDataChannelMessage->GetType()) {
 		case Message::MessageType::MESSAGE_UPDATE_HEAD: {
-			if (m_fnHandleHeadUpdateMessageCallback != nullptr) {
+			if (m_pPeerConnectionObserver != nullptr) {
 				UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDataChannelBuffer);
 				CN(pUpdateHeadMessage);
 				// TODO: Add peer ID from
-				CR(m_fnHandleHeadUpdateMessageCallback(peerUserID, pUpdateHeadMessage));
+				CR(m_pPeerConnectionObserver->OnHeadUpdateMessage(peerUserID, pUpdateHeadMessage));
 			}
 		} break;
 
 		case Message::MessageType::MESSAGE_UPDATE_HAND: {
-			if (m_fnHandleHandUpdateMessageCallback != nullptr) {
+			if (m_pPeerConnectionObserver != nullptr) {
 				UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDataChannelBuffer);
 				CN(pUpdateHandMessage);
 				// TODO: Add peer ID from
-				CR(m_fnHandleHandUpdateMessageCallback(peerUserID, pUpdateHandMessage));
+				CR(m_pPeerConnectionObserver->OnHandUpdateMessage(peerUserID, pUpdateHandMessage));
 			}
 		} break;
 
 		default: {
-			if (m_fnHandleDataMessageCallback != nullptr) {
+			if (m_pPeerConnectionObserver != nullptr) {
 				// TODO: Add peer ID from
-				CR(m_fnHandleDataMessageCallback(peerUserID, pDataChannelMessage));
+				CR(m_pPeerConnectionObserver->OnDataMessage(peerUserID, pDataChannelMessage));
 			}
 		} break;
 	}
@@ -327,33 +332,23 @@ Error:
 RESULT CloudController::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) {
 	RESULT r = R_PASS;
 
-	if (m_fnHandleEnvironmentAssetCallback != nullptr) {
-		CR(m_fnHandleEnvironmentAssetCallback(pEnvironmnetAsset));
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnEnvironmentAsset(pEnvironmnetAsset));
 	}
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnAudioData(long peerConnectionID,
-	const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames) 
-{
+RESULT CloudController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
 	RESULT r = R_PASS;
 
-	if (m_fnHandleAudioDataCallback != nullptr) {
-		AudioDataMessage audioDataMessage(peerConnectionID,
-			peerConnectionID,
-			audio_data,
-			bits_per_sample,
-			sample_rate,
-			number_of_channels,
-			number_of_frames);
+	long senderUserID = pPeerConnection->GetPeerUserID();
+	long recieverUserID = pPeerConnection->GetUserID();
 
-		CR(m_fnHandleAudioDataCallback(peerConnectionID, &audioDataMessage));
+	if (m_pPeerConnectionObserver != nullptr) {
+		AudioDataMessage audioDataMessage(senderUserID, recieverUserID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames);
+		CR(m_pPeerConnectionObserver->OnAudioDataMessage(pPeerConnection, &audioDataMessage));
 	}
 
 Error:
@@ -776,6 +771,28 @@ RESULT CloudController::RegisterControllerObserver(CLOUD_CONTROLLER_TYPE control
 			CR(pProxy->RegisterControllerObserver(pControllerObserver));
 		} break;
 	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pPeerConnectionObserver), "Observer cannot be nullptr");
+	CBM((m_pPeerConnectionObserver == nullptr), "Can't overwrite peer connection observer");
+	m_pPeerConnectionObserver = pPeerConnectionObserver;
+
+Error:
+	return r;
+}
+
+RESULT CloudController::RegisterEnvironmentObserver(EnvironmentObserver* pEnvironmentObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pEnvironmentObserver), "Observer cannot be nullptr");
+	CBM((m_pEnvironmentObserver == nullptr), "Can't overwrite environment observer");
+	m_pEnvironmentObserver = pEnvironmentObserver;
 
 Error:
 	return r;

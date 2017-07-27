@@ -72,8 +72,8 @@ protected:
 	virtual void OnRenegotiationNeeded() override;
 	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
 	virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state);
-	virtual void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
-	virtual void OnIceConnectionReceivingChange(bool receiving) override;
+	virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) override;
+	virtual void OnIceConnectionReceivingChange(bool fReceiving) override;
 
 	// DataChannelObserver Implementation
 	virtual void OnStateChange() override;

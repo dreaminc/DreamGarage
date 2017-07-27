@@ -29,7 +29,10 @@ light *g_pLight = nullptr;
 
 #include "Core/Utilities.h"
 
+#include "Cloud/Environment/PeerConnection.h"
+
 // TODO: Should this go into the DreamOS side?
+/*
 RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 	RESULT r = R_PASS;
 
@@ -44,6 +47,7 @@ RESULT DreamGarage::InitializeCloudControllerCallbacks() {
 Error:
 	return r;
 }
+*/
 
 
 RESULT DreamGarage::ConfigureSandbox() {
@@ -128,8 +132,14 @@ Error:
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
+	point sceneOffset = point(90, -5, -25);
+	float sceneScale = 0.1f;
+	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+
 	// TODO: This should go into an "initialize" function
-	InitializeCloudControllerCallbacks();
+	//InitializeCloudControllerCallbacks();
+	CRM(RegisterPeerConnectionObserver(this), "Failed to register Peer Connection Observer");
+	CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller");
 
 	// Keyboard
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
@@ -163,10 +173,6 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
-
-	point sceneOffset = point(90, -5, -25);
-	float sceneScale = 0.1f;
-	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
 
 #ifndef _DEBUG
 	AddModel(L"\\Models\\FloatingIsland\\env.obj",
@@ -247,7 +253,7 @@ RESULT DreamGarage::LoadScene() {
 	m_pDreamContentView->SetFitTextureAspectRatio(true);
 	//*/
 
-	CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+	//CR(GetCloudController()->RegisterEnvironmentAssetCallback(std::bind(&DreamGarage::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
 
 	// UIKeyboard App
 	CR(InitializeKeyboard());
@@ -423,8 +429,12 @@ Error:
 }
 
 // Cloud Controller
-RESULT DreamGarage::HandlePeersUpdate(long index) {
+RESULT DreamGarage::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
+
+	//int index = pPeerConnection->GetLoca
+	long index = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
+	index -= 1;
 
 	if (m_fSeated) {
 		LOG(INFO) << "HandlePeersUpdate already seated" << index;
@@ -436,9 +446,7 @@ RESULT DreamGarage::HandlePeersUpdate(long index) {
 
 	if (!m_fSeated) {
 		CBM((index < m_seatLookup.size()), "Peer index %d not supported by client", index);
-
 		CR(SetRoundtablePosition(index));
-
 		m_fSeated = true;
 	}
 
@@ -446,7 +454,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::HandleDataMessage(long senderUserID, Message *pDataMessage) {
+RESULT DreamGarage::OnDataMessage(long senderUserID, Message *pDataMessage) {
 	RESULT r = R_PASS;
 	LOG(INFO) << "data received";
 
@@ -489,7 +497,7 @@ user* DreamGarage::ActivateUser(long userId) {
 	return m_peerUsers[userId];
 }
 
-RESULT DreamGarage::HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
+RESULT DreamGarage::OnHeadUpdateMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
 	// This will set visible 
@@ -513,7 +521,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage) {
+RESULT DreamGarage::OnHandUpdateMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage) {
 	RESULT r = R_PASS;
 
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
@@ -521,7 +529,6 @@ RESULT DreamGarage::HandleUpdateHandMessage(long senderUserID, UpdateHandMessage
 	hand::HandState handState;
 
 	user* pUser = ActivateUser(senderUserID);
-	//user *pUser = m_peerUsers[senderUserID];
 	WCN(pUser);
 
 	handState = pUpdateHandMessage->GetHandState();
@@ -531,11 +538,11 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::HandleAudioData(long senderUserID, AudioDataMessage *pAudioDataMessage) {
+RESULT DreamGarage::OnAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 
+	long senderUserID = pPeerConnection->GetPeerUserID();
 	user* pUser = ActivateUser(senderUserID);
-	//user *pUser = m_peerUsers[senderUserID];
 	WCN(pUser);
 
 	//auto msg = pAudioDataMessage->GetAudioMessageBody();
@@ -562,7 +569,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT DreamGarage::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	/*

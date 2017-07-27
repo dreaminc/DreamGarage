@@ -407,23 +407,23 @@ void WebRTCPeerConnection::OnIceGatheringChange(webrtc::PeerConnectionInterface:
 	}
 }
 
-void WebRTCPeerConnection::OnIceConnectionReceivingChange(bool receiving) {
-	DEBUG_LINEOUT("ICE Receiving %s", (receiving) ? "true" : "false");
-	LOG(INFO) << "OnIceConnectionReceivingChange: " << ((receiving) ? "true" : "false");
+void WebRTCPeerConnection::OnIceConnectionReceivingChange(bool fReceiving) {
+	DEBUG_LINEOUT("ICE Receiving %s", (fReceiving) ? "true" : "false");
+	LOG(INFO) << "OnIceConnectionReceivingChange: " << ((fReceiving) ? "true" : "false");
 }
 
-void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
-	DEBUG_LINEOUT("OnIceCandidate: %s %d", candidate->sdp_mid().c_str(), candidate->sdp_mline_index());
-	LOG(INFO) << "OnIceCandidate: " << candidate->sdp_mid() << " " << candidate->sdp_mline_index();
+void WebRTCPeerConnection::OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) {
+	DEBUG_LINEOUT("OnIceCandidate: %s %d", pICECandidate->sdp_mid().c_str(), pICECandidate->sdp_mline_index());
+	LOG(INFO) << "OnIceCandidate: " << pICECandidate->sdp_mid() << " " << pICECandidate->sdp_mline_index();
 
 	//Json::StyledWriter writer;
 	//Json::Value jmessage;
 
 	WebRTCICECandidate iceCandidate;
-	iceCandidate.m_SDPMediateLineIndex = candidate->sdp_mline_index();
-	iceCandidate.m_strSDPMediaID = candidate->sdp_mid();
+	iceCandidate.m_SDPMediateLineIndex = pICECandidate->sdp_mline_index();
+	iceCandidate.m_strSDPMediaID = pICECandidate->sdp_mid();
 
-	if (!candidate->ToString(&(iceCandidate.m_strSDPCandidate))) {
+	if (!pICECandidate->ToString(&(iceCandidate.m_strSDPCandidate))) {
 		LOG(ERROR) << "Failed to serialize candidate";
 		return;
 	}

@@ -18,7 +18,13 @@ class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
 
-class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<CmdPromptEvent> {
+class DreamGarage : public DreamOS, 
+				    public Subscriber<SenseKeyboardEvent>, 
+					public Subscriber<SenseTypingEvent>, 
+					public Subscriber<CmdPromptEvent>,	// TODO: Remove this
+					public CloudController::PeerConnectionObserver,
+					public CloudController::EnvironmentObserver
+{
 public:
 
 	DreamGarage() {
@@ -41,17 +47,20 @@ public:
 	virtual RESULT Update(void) override;
 
 	// Cloud Controller
-	RESULT InitializeCloudControllerCallbacks();
+	//RESULT InitializeCloudControllerCallbacks();
 
 	RESULT GetRoundtablePosition(int index, point &ptPosition, float &rotationAngle);
 	RESULT SetRoundtablePosition(int index);
-	RESULT HandlePeersUpdate(long index);
 
-	RESULT HandleDataMessage(long senderUserID, Message *pDataMessage);
-	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
-	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
-	RESULT HandleAudioData(long senderUserID, AudioDataMessage *pAudioDataMessage);
-	RESULT HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	// PeerConnectionObserver
+	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnDataMessage(long senderUserID, Message *pDataMessage) override;
+	virtual RESULT OnHeadUpdateMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) override;
+	virtual RESULT OnHandUpdateMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage) override;
+	virtual RESULT OnAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) override;
+
+	// EnvironmentObserver
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
 	user* ActivateUser(long userId);
 

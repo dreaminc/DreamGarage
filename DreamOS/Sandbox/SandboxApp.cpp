@@ -1478,6 +1478,15 @@ quaternion SandboxApp::GetCameraOrientation() {
 }
 
 // Cloud Controller
+RESULT SandboxApp::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
+	return m_pCloudController->RegisterPeerConnectionObserver(pPeerConnectionObserver);
+}
+
+RESULT SandboxApp::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
+	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
+}
+
+/*
 RESULT SandboxApp::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
 	return m_pCloudController->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
 }
@@ -1497,6 +1506,7 @@ RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCall
 RESULT SandboxApp::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
 	return m_pCloudController->RegisterAudioDataCallback(fnHandleAudioDataCallback);
 }
+*/
 
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pCloudController->SendDataMessage(userID, pDataMessage);

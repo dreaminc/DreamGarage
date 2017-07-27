@@ -36,14 +36,6 @@ class User;
 class TwilioNTSInformation;
 class EnvironmentAsset;
 
-typedef std::function<RESULT(long)> HandlePeersUpdateCallback;
-
-typedef std::function<RESULT(long, Message*)> HandleDataMessageCallback;
-typedef std::function<RESULT(long, UpdateHeadMessage*)> HandleHeadUpdateMessageCallback;
-typedef std::function<RESULT(long, UpdateHandMessage*)> HandleHandUpdateMessageCallback;
-typedef std::function<RESULT(long, AudioDataMessage*)> HandleAudioDataCallback;
-typedef std::function<RESULT(std::shared_ptr<EnvironmentAsset>)> HandleEnvironmentAssetCallback;
-
 enum class CLOUD_CONTROLLER_TYPE {
 	CLOUD,
 	ENVIRONMENT,
@@ -53,7 +45,9 @@ enum class CLOUD_CONTROLLER_TYPE {
 	INVALID
 };
 
-class CloudController : public Controller, public std::enable_shared_from_this<CloudController>, public EnvironmentController::EnvironmentControllerObserver,
+class CloudController : public Controller, 
+						public std::enable_shared_from_this<CloudController>, 
+						public EnvironmentController::EnvironmentControllerObserver,
 						public Subscriber<CmdPromptEvent> 
 {
 protected:
@@ -64,14 +58,31 @@ protected:
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
 
 public:
-	// TODO: Replace with proxy or other better pattern this is getting out of control
-	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);
-	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
-	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
-	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
-	RESULT RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback);
-	RESULT RegisterEnvironmentAssetCallback(HandleEnvironmentAssetCallback fnHandleEnvironmentAssetCallback);
+	// TODO: Replace with proxy or observer better pattern this is getting out of control
 
+	class PeerConnectionObserver {
+	public:
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnDataMessage(long senderUserID, Message *pDataMessage) = 0;
+		// Deprecate these (client specific)
+		virtual RESULT OnHeadUpdateMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage)= 0;
+		virtual RESULT OnHandUpdateMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage)= 0;
+		virtual RESULT OnAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) = 0;
+	};
+	
+	class EnvironmentObserver {
+	public:
+		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) = 0;
+	};
+
+	RESULT RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionControllerObserver);
+	RESULT RegisterEnvironmentObserver(EnvironmentObserver* pEnvironmentObserver);
+
+private:
+	PeerConnectionObserver *m_pPeerConnectionObserver = nullptr;
+	EnvironmentObserver *m_pEnvironmentObserver = nullptr;
+	
+public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
 	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
 	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
@@ -122,15 +133,10 @@ public:
 	RESULT OnICECandidatesGatheringDone();
 
 	// EnvironmentControllerObserver
-	virtual RESULT OnPeersUpdate(long index) override;
+	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
-	virtual RESULT OnAudioData(long peerConnectionID,
-		const void* audio_data,
-		int bits_per_sample,
-		int sample_rate,
-		size_t number_of_channels,
-		size_t number_of_frames) override;
+	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
@@ -165,15 +171,7 @@ private:
 	HandleDataChannelStringMessageCallback m_fnHandleDataChannelStringMessageCallback;
 	HandleDataChannelMessageCallback m_fnHandleDataChannelMessageCallback;
 
-	HandlePeersUpdateCallback m_fnHandlePeersUpdateCallback;
-
-	HandleDataMessageCallback m_fnHandleDataMessageCallback;
-	HandleHeadUpdateMessageCallback m_fnHandleHeadUpdateMessageCallback;
-	HandleHandUpdateMessageCallback m_fnHandleHandUpdateMessageCallback;
-	HandleAudioDataCallback m_fnHandleAudioDataCallback;
-	HandleEnvironmentAssetCallback m_fnHandleEnvironmentAssetCallback;
-
-	std::thread	m_thread;
+	std::thread	m_cloudThread;
 	bool m_fRunning;
 	RESULT ProcessingThread();
 };

@@ -176,7 +176,7 @@ Error:
 	return r;
 }
 
-RESULT UITestSuite::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT UITestSuite::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	//https://api.develop.dreamos.com/environment-asset/{id}/file
@@ -631,8 +631,8 @@ RESULT UITestSuite::AddTestBrowserRequestWithMenuAPI() {
 			CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
 		}
 
-		CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&UITestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
-
+		//CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&UITestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+		CR(pCloudController->RegisterEnvironmentObserver(this));
 		
 		Sleep(1000);
 

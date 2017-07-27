@@ -11,6 +11,7 @@
 #include <functional>
 #include <memory>
 
+#include "Cloud/CloudController.h"
 #include "Cloud/Menu/MenuController.h"
 
 class DreamOS;
@@ -19,7 +20,10 @@ class EnvironmentAsset;
 
 class DreamContentView;
 
-class CloudTestSuite : public TestSuite, public MenuController::observer {
+class CloudTestSuite : public TestSuite, 
+					   public MenuController::observer,
+					   public CloudController::EnvironmentObserver
+{
 public:
 	CloudTestSuite(DreamOS *pDreamOS);
 	~CloudTestSuite();
@@ -41,7 +45,7 @@ public:
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
 
 	// Environment Asset Callback
-	RESULT HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
 private:
 	CloudController *GetCloudController();

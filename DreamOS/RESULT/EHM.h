@@ -41,10 +41,12 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
     #define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
     #define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0); 
 	#define DEBUG_LINEOUT_RETURN(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\r"); } while(0); 
+	#define DEBUG_SYSTEM_PAUSE() do { system("pause"); } while(0); 
 #else
 	#define DEBUG_OUT(str, ...)
 	#define DEBUG_LINEOUT(str, ...)
 	#define DEBUG_LINEOUT_RETURN(str, ...) 
+	#define DEBUG_SYSTEM_PAUSE()
 #endif
 
 #define DEBUG_FILE_LINE

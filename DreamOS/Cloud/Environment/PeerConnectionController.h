@@ -32,15 +32,10 @@ public:
 		virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) = 0;
 
 		// TODO: Switch to Peer User ID
-		virtual RESULT OnPeersUpdate(long index) = 0;
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
-		virtual RESULT OnAudioData(long peerConnectionID,
-			const void* audio_data,
-			int bits_per_sample,
-			int sample_rate,
-			size_t number_of_channels,
-			size_t number_of_frames) = 0;
+		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 
 		virtual long GetUserID() = 0;
 	};
@@ -120,8 +115,7 @@ public:
 	RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation);
 
 private:
-	// called when peer connections is changed
-	RESULT OnNewPeerConnection(long myUserID, long peerUserID, bool isOfferor, PeerConnection* pPeerConnection);
+	RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection);
 
 private:
 	std::unique_ptr<WebRTCImp> m_pWebRTCImp;

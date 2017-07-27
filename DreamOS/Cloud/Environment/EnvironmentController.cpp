@@ -844,11 +844,11 @@ EnvironmentControllerProxy* EnvironmentController::GetEnvironmentControllerProxy
 	return (EnvironmentControllerProxy*)(this);
 }
 
-RESULT EnvironmentController::OnPeersUpdate(long index) {
+RESULT EnvironmentController::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnPeersUpdate(index));
+		CR(m_pEnvironmentControllerObserver->OnNewPeerConnection(userID, peerUserID, fOfferor, pPeerConnection));
 	}
 
 Error:
@@ -877,21 +877,11 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnAudioData(long peerConnectionID,
-	const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames) {
+RESULT EnvironmentController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnAudioData(peerConnectionID,
-			audio_data,
-			bits_per_sample,
-			sample_rate,
-			number_of_channels,
-			number_of_frames));
+		CR(m_pEnvironmentControllerObserver->OnAudioData(pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:
