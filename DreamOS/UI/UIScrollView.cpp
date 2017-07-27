@@ -62,7 +62,6 @@ RESULT UIScrollView::Initialize() {
 	m_pTitleQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pTitleQuad->RotateXByDeg(90.0f);
 	m_pTitleQuad->SetPosition(point(0.034f, m_titleHeight, 0.0f));
-	//m_pTitleQuad->SetPosition(point(-0.485f, m_titleHeight, 0.0f));
 	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	pFont->SetLineHeight(0.055f);
 	m_pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
@@ -74,7 +73,6 @@ RESULT UIScrollView::Initialize() {
 
 	m_pTitleText->RotateXByDeg(90.0f);
 	m_pTitleText->SetPosition(point(0.6f, m_titleHeight - 0.005f, 0.0f));
-	//m_pTitleText->SetPosition(point(0.085f, m_titleHeight - 0.005f, 0.0f));
 
 	m_pTitleView->AddObject(m_pTitleText);
 
@@ -173,9 +171,7 @@ RESULT UIScrollView::PositionMenuButton(float index, std::shared_ptr<UIButton> p
 
 	float yPos = m_itemHeight;
 	float zPos = m_menuCenterOffset;
-	//float zPos = (m_menuDepth - m_menuCenterOffset);
 	point ptContext = point(sin(radY) * zPos, yPos, ((cos(radY) - 1) * zPos));
-	//point ptContext = point(index/4.0f, yPos, 0.0f);
 
 	quaternion qContext = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
 

@@ -70,9 +70,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 		float offset = m_surfaceHeight / 2.0f;
 		float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
 
-		//m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), -cos(angle) * offset + OFFSET_DEPTH));
-		//m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), -0.3f));
-		//m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), 0.0f));
 		m_pHeaderContainer->RotateXByDeg(90.0f);
 
 		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(m_surfaceWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
@@ -431,13 +428,11 @@ RESULT UIKeyboard::ShowKeyboard() {
 
 RESULT UIKeyboard::HideKeyboard() {
 
-	//point ptPosition = GetComposite()->GetPosition();
 	auto fnCallback = [&](void *pContext) {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
 		pKeyboard->GetComposite()->SetVisible(false);
-	//	pKeyboard->GetComposite()->SetPosition(ptPosition);
 		m_pLeftMallet->Hide();
 		m_pRightMallet->Hide();
 
@@ -643,7 +638,6 @@ RESULT UIKeyboard::UpdateComposite(float height, float depth) {
 
 	point ptHeader = m_pHeaderContainer->GetPosition();
 	m_pHeaderContainer->SetPosition(point(ptHeader.x(), ptHeader.y(), depth));
-	//m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), 0.0f));
 	float offset = m_surfaceHeight / 2.0f;
 	float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
 	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
