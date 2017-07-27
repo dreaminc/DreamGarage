@@ -51,8 +51,8 @@ class CloudController : public Controller,
 						public Subscriber<CmdPromptEvent> 
 {
 protected:
-	typedef std::function<RESULT(long, const std::string&)> HandleDataChannelStringMessageCallback;
-	typedef std::function<RESULT(long, uint8_t *, int)> HandleDataChannelMessageCallback;
+	typedef std::function<RESULT(PeerConnection*, const std::string&)> HandleDataChannelStringMessageCallback;
+	typedef std::function<RESULT(PeerConnection*, uint8_t *, int)> HandleDataChannelMessageCallback;
 
 	RESULT RegisterDataChannelStringMessageCallback(HandleDataChannelStringMessageCallback fnHandleDataChannelStringMessageCallback);
 	RESULT RegisterDataChannelMessageCallback(HandleDataChannelMessageCallback fnHandleDataChannelMessageCallback);
@@ -63,11 +63,8 @@ public:
 	class PeerConnectionObserver {
 	public:
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
-		virtual RESULT OnDataMessage(long senderUserID, Message *pDataMessage) = 0;
-		// Deprecate these (client specific)
-		virtual RESULT OnHeadUpdateMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage)= 0;
-		virtual RESULT OnHandUpdateMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage)= 0;
-		virtual RESULT OnAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) = 0;
+		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) = 0;
+		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
 	};
 	
 	class EnvironmentObserver {
@@ -134,8 +131,8 @@ public:
 
 	// EnvironmentControllerObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
-	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
-	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) override;
 

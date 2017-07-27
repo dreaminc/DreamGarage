@@ -538,7 +538,7 @@ RESULT PeerConnectionController::OnDataChannelStringMessage(long peerConnectionI
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(pPeerConnection->GetPeerUserID(), strDataChannelMessage));
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(pPeerConnection, strDataChannelMessage));
 	}
 
 Error:
@@ -552,7 +552,7 @@ RESULT PeerConnectionController::OnDataChannelMessage(long peerConnectionID, uin
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(pPeerConnection->GetPeerUserID(), pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(pPeerConnection, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 Error:

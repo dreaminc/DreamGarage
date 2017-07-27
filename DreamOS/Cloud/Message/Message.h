@@ -10,16 +10,17 @@
 #include <string>
 #include <time.h>
 
+#define MESSAGE_INVALID 0xFFFF
+
 class Message {
 public:
-	typedef enum class MESSAGE_TYPE : uint16_t {
-		MESSAGE_UPDATE_HEAD,
-		MESSAGE_UPDATE_HAND,
-		MESSAGE_AUDIO_DATA,
-		MESSAGE_UPDATE_CHAT,
-		MESSAGE_CUSTOM,
-		MESSAGE_INVALID = 0xFFFF
-	} MessageType;
+	typedef uint16_t MessageType;
+
+		//MESSAGE_UPDATE_HEAD,
+		//MESSAGE_UPDATE_HAND,
+		//MESSAGE_AUDIO_DATA,
+		//MESSAGE_UPDATE_CHAT,
+		//MESSAGE_CUSTOM,
 
 private:
 	__declspec(align(8)) struct MessageHeader {
@@ -35,7 +36,7 @@ public:
 		m_header.senderUserID = -1;
 		m_header.receiverUserID = -1;
 		m_header.timestamp = time(nullptr);
-		m_header.type = MessageType::MESSAGE_INVALID;
+		m_header.type = MESSAGE_INVALID;
 		m_header.messageSize = sizeof(Message);
 	}
 

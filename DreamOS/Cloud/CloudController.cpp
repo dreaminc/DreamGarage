@@ -266,11 +266,15 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
+RESULT CloudController::OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 
 	CN(m_fnHandleDataChannelStringMessageCallback);
-	CR(m_fnHandleDataChannelStringMessageCallback(peerConnectionID, strDataChannelMessage));
+	CR(m_fnHandleDataChannelStringMessageCallback(pPeerConnection, strDataChannelMessage));
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnStringDataMessage(pPeerConnection, strDataChannelMessage));
+	}
 
 Error:
 	return r;
@@ -287,16 +291,21 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT CloudController::OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
 	if (m_fnHandleDataChannelMessageCallback != nullptr) {
-		CR(m_fnHandleDataChannelMessageCallback(peerUserID, pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_fnHandleDataChannelMessageCallback(pPeerConnection, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 	Message *pDataChannelMessage = reinterpret_cast<Message*>(pDataChannelBuffer);
 	CN(pDataChannelMessage);
 
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnDataMessage(pPeerConnection, pDataChannelMessage));
+	}
+
+	/*
 	// TODO: Move this into DreamGarage
 	switch (pDataChannelMessage->GetType()) {
 		case Message::MessageType::MESSAGE_UPDATE_HEAD: {
@@ -318,12 +327,10 @@ RESULT CloudController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChan
 		} break;
 
 		default: {
-			if (m_pPeerConnectionObserver != nullptr) {
-				// TODO: Add peer ID from
-				CR(m_pPeerConnectionObserver->OnDataMessage(peerUserID, pDataChannelMessage));
-			}
+			
 		} break;
 	}
+	*/
 
 Error:
 	return r;

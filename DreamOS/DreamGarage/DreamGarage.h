@@ -54,10 +54,8 @@ public:
 
 	// PeerConnectionObserver
 	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
-	virtual RESULT OnDataMessage(long senderUserID, Message *pDataMessage) override;
-	virtual RESULT OnHeadUpdateMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) override;
-	virtual RESULT OnHandUpdateMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage) override;
-	virtual RESULT OnAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) override;
+	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) override;
+	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 
 	// EnvironmentObserver
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;

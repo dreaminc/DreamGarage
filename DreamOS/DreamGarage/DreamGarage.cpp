@@ -454,7 +454,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnDataMessage(long senderUserID, Message *pDataMessage) {
+RESULT DreamGarage::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
 	RESULT r = R_PASS;
 	LOG(INFO) << "data received";
 
@@ -472,8 +472,22 @@ RESULT DreamGarage::OnDataMessage(long senderUserID, Message *pDataMessage) {
 		CR(m_pPeerUser->SwitchHeadModel());
 	}
 
+	// TODO: Handle the appropriate message here
+
 Error:
 */
+	return r;
+}
+
+RESULT DreamGarage::OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+	RESULT r = R_PASS;
+
+	CN(pPeerConnection);
+
+	DEBUG_LINEOUT("DataString: %s", strDataChannelMessage);
+	LOG(INFO) << "DataString: " << strDataChannelMessage;
+
+Error:
 	return r;
 }
 

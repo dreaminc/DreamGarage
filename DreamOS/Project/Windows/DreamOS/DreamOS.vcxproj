@@ -632,7 +632,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp" />
-    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebRequest.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebRequestPostData.cpp" />
@@ -851,8 +850,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h" />
     <ClInclude Include="..\..\..\Cloud\Menu\MenuNode.h" />
     <ClInclude Include="..\..\..\Cloud\Message\Message.h" />
-    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
-    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\Cloud\CloudModel.h" />
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h" />
     <ClInclude Include="..\..\..\Cloud\WebRequest.h" />
@@ -884,11 +881,15 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
     <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h" />
     <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h" />
+    <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
+    <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h" />
+    <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
