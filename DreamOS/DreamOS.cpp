@@ -492,27 +492,6 @@ RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
 }
 
 // Cloud Controller
-/*
-RESULT DreamOS::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
-	return m_pSandbox->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
-}
-
-RESULT DreamOS::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
-	return m_pSandbox->RegisterDataMessageCallback(fnHandleDataMessageCallback);
-}
-
-RESULT DreamOS::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
-	return m_pSandbox->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
-}
-
-RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
-	return m_pSandbox->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
-}
-
-RESULT DreamOS::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
-	return m_pSandbox->RegisterAudioDataCallback(fnHandleAudioDataCallback);
-}
-*/
 
 RESULT DreamOS::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
 	return m_pSandbox->RegisterPeerConnectionObserver(pPeerConnectionObserver);
@@ -526,25 +505,9 @@ RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pSandbox->SendDataMessage(userID, pDataMessage);
 }
 
-//RESULT DreamOS::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-//	return m_pSandbox->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-//}
-//
-//RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
-//	return m_pSandbox->SendUpdateHandMessage(userID, handState);
-//}
-
 RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pSandbox->BroadcastDataMessage(pDataMessage);
 }
-
-//RESULT DreamOS::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-//	return m_pSandbox->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
-//}
-//
-//RESULT DreamOS::BroadcastUpdateHandMessage(hand::HandState handState) {
-//	return m_pSandbox->BroadcastUpdateHandMessage(handState);
-//}
 
 RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {
 	return m_pSandbox->RegisterSubscriber(keyEvent, pKeyboardSubscriber);

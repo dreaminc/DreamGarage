@@ -138,68 +138,6 @@ RESULT CloudController::RegisterDataChannelMessageCallback(HandleDataChannelMess
 	}
 }
 
-/*
-RESULT CloudController::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
-	if (m_fnHandlePeersUpdateCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandlePeersUpdateCallback = fnHandlePeersUpdateCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
-	if (m_fnHandleDataMessageCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleDataMessageCallback = fnHandleDataMessageCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
-	if (m_fnHandleHeadUpdateMessageCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleHeadUpdateMessageCallback = fnHandleHeadUpdateMessageCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
-	if (m_fnHandleHandUpdateMessageCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleHandUpdateMessageCallback = fnHandleHandUpdateMessageCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
-	if (m_fnHandleAudioDataCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleAudioDataCallback = fnHandleAudioDataCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterEnvironmentAssetCallback(HandleEnvironmentAssetCallback fnHandleEnvironmentAssetCallback) {
-	if (m_fnHandleEnvironmentAssetCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleEnvironmentAssetCallback = fnHandleEnvironmentAssetCallback;
-		return R_PASS;
-	}
-}
-*/
-
 RESULT CloudController::SetCloudImp(std::unique_ptr<CloudImp> pCloudImp) {
 	RESULT r = R_PASS;
 

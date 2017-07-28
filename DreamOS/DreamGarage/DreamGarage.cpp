@@ -274,13 +274,6 @@ RESULT DreamGarage::SendUpdateHeadMessage(long userID, point ptPosition, quatern
 
 	// Create the message
 	UpdateHeadMessage updateHeadMessage(GetUserID(), userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-
-	//pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
-	//pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-	//CN(pDatachannelBuffer);
-	//memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
-
-	//CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
 	CR(SendDataMessage(userID, &updateHeadMessage));
 
 Error:
@@ -294,13 +287,6 @@ RESULT DreamGarage::SendUpdateHandMessage(long userID, hand::HandState handState
 
 	// Create the message
 	UpdateHandMessage updateHandMessage(GetUserID(), userID, handState);
-
-	//pDatachannelBuffer_n = sizeof(UpdateHandMessage);
-	//pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-	//CN(pDatachannelBuffer);
-	//memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
-
-	//CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
 	CR(SendDataMessage(userID, &updateHandMessage));
 
 Error:
@@ -315,13 +301,6 @@ RESULT DreamGarage::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOri
 
 	// Create the message
 	UpdateHeadMessage updateHeadMessage(GetUserID(), -1, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-
-	//pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
-	//pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-	//CN(pDatachannelBuffer);
-	//memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
-
-	//CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
 	CR(BroadcastDataMessage(&updateHeadMessage));
 
 Error:
@@ -335,13 +314,6 @@ RESULT DreamGarage::BroadcastUpdateHandMessage(hand::HandState handState) {
 
 	// Create the message
 	UpdateHandMessage updateHandMessage(GetUserID(), -1, handState);
-
-	//pDatachannelBuffer_n = sizeof(UpdateHandMessage);
-	//pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-	//CN(pDatachannelBuffer);
-	//memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
-
-	//CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
 	CR(BroadcastDataMessage(&updateHandMessage));
 
 Error:
@@ -354,7 +326,6 @@ RESULT DreamGarage::SendHeadPosition() {
 	point ptPosition = GetCameraPosition();
 	quaternion qOrientation = GetCameraOrientation();
 
-	//CR(SendUpdateHeadMessage(NULL, ptPosition, qOrientation));
 	CR(BroadcastUpdateHeadMessage(ptPosition, qOrientation));
 
 Error:

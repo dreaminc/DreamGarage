@@ -90,12 +90,7 @@ private:
 	
 public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
-	//RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	//RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
-
 	RESULT BroadcastDataMessage(Message *pDataMessage);
-	//RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	//RESULT BroadcastUpdateHandMessage(hand::HandState handState);
 
 public:
 	CloudController();

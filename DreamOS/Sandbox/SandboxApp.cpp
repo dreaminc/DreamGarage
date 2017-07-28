@@ -1486,52 +1486,14 @@ RESULT SandboxApp::RegisterEnvironmentObserver(CloudController::EnvironmentObser
 	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
-/*
-RESULT SandboxApp::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
-	return m_pCloudController->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
-}
-
-RESULT SandboxApp::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
-	return m_pCloudController->RegisterDataMessageCallback(fnHandleDataMessageCallback);
-}
-
-RESULT SandboxApp::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
-	return m_pCloudController->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
-}
-
-RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
-	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
-}
-
-RESULT SandboxApp::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
-	return m_pCloudController->RegisterAudioDataCallback(fnHandleAudioDataCallback);
-}
-*/
-
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pCloudController->SendDataMessage(userID, pDataMessage);
 }
-
-//RESULT SandboxApp::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-//	return m_pCloudController->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-//}
-//
-//RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState) {
-//	return m_pCloudController->SendUpdateHandMessage(userID, handState);
-//}
 
 
 RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
 }
-
-//RESULT SandboxApp::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-//	return m_pCloudController->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
-//}
-//
-//RESULT SandboxApp::BroadcastUpdateHandMessage(hand::HandState handState) {
-//	return m_pCloudController->BroadcastUpdateHandMessage(handState);
-//}
 
 // TimeManager
 RESULT SandboxApp::RegisterSubscriber(TimeEventType timeEvent, Subscriber<TimeEvent>* pTimeSubscriber) {
