@@ -99,12 +99,21 @@ RESULT UIViewTestSuite::SetupUINodePipeline() {
 	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
 	// Skybox
 	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 	CN(pSkyboxProgram);
 	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 //*
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
@@ -590,6 +599,17 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
 
 			CR(m_pDreamOS->InitializeKeyboard());
+
+			float radius = 0.015f;
+			point ptcam = m_pDreamOS->GetCamera()->GetPosition();
+			auto pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
+			pSphere->SetPosition(ptcam + point(0.0f, 1.0f, -0.5f));
+			pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
+			pSphere->SetPosition(ptcam + point(0.0f, 1.0f, 0.5f));
+			pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
+			pSphere->SetPosition(ptcam + point(0.5f, 1.0f, 0.0f));
+			pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
+			pSphere->SetPosition(ptcam + point(-0.5f, 1.0f, 0.0f));
 		}
 
 	Error:

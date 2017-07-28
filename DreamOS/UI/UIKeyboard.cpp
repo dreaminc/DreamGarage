@@ -70,7 +70,6 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 		float offset = m_surfaceHeight / 2.0f;
 		float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
 
-		m_pHeaderContainer->SetPosition(point(0.0f, sin(angle) * offset + (2.0f * m_lineHeight * m_numLines), -cos(angle) * offset));
 		m_pHeaderContainer->RotateXByDeg(90.0f);
 
 		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(m_surfaceWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
@@ -393,9 +392,10 @@ RESULT UIKeyboard::ShowKeyboard() {
 		RESULT r = R_PASS;
 		UIKeyboard *pKeyboard = reinterpret_cast<UIKeyboard*>(pContext);
 		CN(pKeyboard);
-		GetComposite()->SetPosition(m_ptSurfaceOffset - point(0.0f, m_animationOffsetHeight, 0.0f));
+		GetComposite()->SetPosition(m_ptComposite - point(0.0f, m_animationOffsetHeight, 0.0f));
 		pKeyboard->GetComposite()->SetVisible(true);
 		pKeyboard->HideSurface();
+
 	Error:
 		return r;
 	};
@@ -413,7 +413,7 @@ RESULT UIKeyboard::ShowKeyboard() {
 	DimObj *pObj = GetComposite();
 	GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
 		pObj,
-		m_ptSurfaceOffset,
+		m_ptComposite,
 		pObj->GetOrientation(),// * m_qSurfaceOrientation,
 		pObj->GetScale(),
 		m_animationDuration,
@@ -435,6 +435,13 @@ RESULT UIKeyboard::HideKeyboard() {
 		pKeyboard->GetComposite()->SetVisible(false);
 		m_pLeftMallet->Hide();
 		m_pRightMallet->Hide();
+
+		// full press of key that clears whole string
+		CR(UpdateKeyState((SenseVirtualKey)(0x01), 0));
+		CR(UpdateKeyState((SenseVirtualKey)(0x01), 1));
+
+		CR(UpdateKeyboardLayout(LayoutType::QWERTY));
+
 	Error:
 		return r;
 	};
@@ -586,6 +593,10 @@ RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 		HideKeyboard();
 	}
 
+	else if (chkey == 0x01) {
+		m_pTextBoxText->SetText("");
+	}
+
 	else if (chkey == SVK_CONTROL) {
 		LayoutType newType;
 		switch (m_currentLayout) {
@@ -622,11 +633,17 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateComposite() {
+RESULT UIKeyboard::UpdateComposite(float height, float depth) {
 	RESULT r = R_PASS;
 
-	CR(UpdateCompositeWithCameraLook(m_offsetDepth, m_offsetHeight));
-	CR(SetSurfaceOffset(GetComposite()->GetPosition()));
+	point ptHeader = m_pHeaderContainer->GetPosition();
+	m_pHeaderContainer->SetPosition(point(ptHeader.x(), ptHeader.y(), depth));
+	float offset = m_surfaceHeight / 2.0f;
+	float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
+	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
+
+	CR(UpdateCompositeWithHands(height));
+	m_ptComposite = GetComposite()->GetPosition();
 
 Error:
 	return r;
@@ -721,11 +738,6 @@ RESULT UIKeyboard::SetKeyTypeThreshold(float threshold) {
 
 RESULT UIKeyboard::SetKeyReleaseThreshold(float threshold) {
 	m_keyReleaseThreshold = threshold;
-	return R_PASS;
-}
-
-RESULT UIKeyboard::SetSurfaceOffset(point ptOffset) {
-	m_ptSurfaceOffset = ptOffset;
 	return R_PASS;
 }
 

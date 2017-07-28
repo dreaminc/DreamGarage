@@ -51,11 +51,17 @@ RESULT UIScrollView::Initialize() {
 	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pRightScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-right.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
+	m_pTitleView = AddUIView();
+	float radY = (m_itemAngleY * M_PI / 180.0f) * -2.0f;
+
+	point ptContext = point(-sin(radY) * m_menuCenterOffset, m_itemHeight, 0.0f);
+	m_pTitleView->SetPosition(ptContext);
+
 	//TODO:  clean this up, potentially with curved quad implementation
-	m_pTitleQuad = AddQuad(0.068f, 0.068f * (3.0f / 4.0f));
+	m_pTitleQuad = m_pTitleView->AddQuad(0.068f, 0.068f * (3.0f / 4.0f));
 	m_pTitleQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pTitleQuad->RotateXByDeg(90.0f);
-	m_pTitleQuad->SetPosition(point(-0.485f, m_titleHeight, m_menuDepth));
+	m_pTitleQuad->SetPosition(point(0.034f, m_titleHeight, 0.0f));
 	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	pFont->SetLineHeight(0.055f);
 	m_pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
@@ -66,9 +72,9 @@ RESULT UIScrollView::Initialize() {
 		text::flags::TRAIL_ELLIPSIS | text::flags::RENDER_QUAD));
 
 	m_pTitleText->RotateXByDeg(90.0f);
-	m_pTitleText->SetPosition(point(0.085f, m_titleHeight - 0.005f, m_menuDepth));
+	m_pTitleText->SetPosition(point(0.6f, m_titleHeight - 0.005f, 0.0f));
 
-	AddObject(m_pTitleText);
+	m_pTitleView->AddObject(m_pTitleText);
 
 	m_pMenuButtonsContainer = AddUIView();
 
@@ -164,8 +170,8 @@ RESULT UIScrollView::PositionMenuButton(float index, std::shared_ptr<UIButton> p
 	radY -= (m_itemStartAngleY * M_PI / 180.0f);
 
 	float yPos = m_itemHeight;
-	float zPos = m_menuDepth;
-	point ptContext = point(sin(radY) * zPos, yPos, cos(radY) * zPos);
+	float zPos = m_menuCenterOffset;
+	point ptContext = point(sin(radY) * zPos, yPos, ((cos(radY) - 1) * zPos));
 
 	quaternion qContext = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
 

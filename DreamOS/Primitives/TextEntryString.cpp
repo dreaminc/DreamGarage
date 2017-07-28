@@ -14,6 +14,9 @@ RESULT TextEntryString::UpdateString(unsigned int keyCode) {
 		m_string += "www.";
 		break;
 	//*/
+	case 0x01:
+		m_string.clear();
+		break;
 	case SVK_BACK:
 		if (m_string.size() > 0) m_string.pop_back();
 		break;

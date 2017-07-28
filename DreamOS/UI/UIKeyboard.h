@@ -16,8 +16,7 @@
 #define SURFACE_HEIGHT 0.25f
 #define SURFACE_ANGLE 30.0f
 
-#define OFFSET_DEPTH 0.5f
-#define OFFSET_HEIGHT -0.25f
+#define OFFSET_HEIGHT -0.29f
 
 #define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
 #define TEXTBOX_NUM_LINES 1.0f
@@ -106,7 +105,7 @@ private:
 public:
 	RESULT UpdateTextBox(int chkey, std::string strEntered);
 	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
-	RESULT UpdateComposite(); // update position/orientation
+	RESULT UpdateComposite(float height, float depth); // update position/orientation
 
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
@@ -132,9 +131,8 @@ private:
 	float m_keyScale = KEY_SCALE;
 	float m_keyMargin = KEY_MARGIN;
 
-	point m_ptSurfaceOffset = point(0.0f, OFFSET_HEIGHT, -OFFSET_DEPTH);
+	point m_ptComposite;
 	quaternion m_qSurfaceOrientation;
-	float m_offsetDepth = OFFSET_DEPTH;
 	float m_offsetHeight = OFFSET_HEIGHT;
 
 	float m_keyTypeThreshold = KEY_TYPE_THRESHOLD;
