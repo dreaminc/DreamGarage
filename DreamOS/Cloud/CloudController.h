@@ -45,7 +45,15 @@ enum class CLOUD_CONTROLLER_TYPE {
 	INVALID
 };
 
+class CloudControllerProxy : public ControllerProxy {
+public:
+	//virtual CLOUD_CONTROLLER_TYPE GetControllerType() = 0;
+	//virtual RESULT RequestSubMenu(std::string strScope = "", std::string strPath = "", std::string strTitle = "") = 0;
+	virtual long GetUserID() = 0;
+};
+
 class CloudController : public Controller, 
+						public CloudControllerProxy,
 						public std::enable_shared_from_this<CloudController>, 
 						public EnvironmentController::EnvironmentControllerObserver,
 						public Subscriber<CmdPromptEvent> 
@@ -65,6 +73,7 @@ public:
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
 		virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) = 0;
 		virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 	};
 	
 	class EnvironmentObserver {
@@ -81,16 +90,20 @@ private:
 	
 public:
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
-	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+	//RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	//RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
 
 	RESULT BroadcastDataMessage(Message *pDataMessage);
-	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
+	//RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	//RESULT BroadcastUpdateHandMessage(hand::HandState handState);
 
 public:
 	CloudController();
 	~CloudController();
+
+	// CloudControllerProxy
+	virtual CLOUD_CONTROLLER_TYPE GetControllerType() override { return CLOUD_CONTROLLER_TYPE::CLOUD; }
+	virtual RESULT RegisterControllerObserver(ControllerObserver* pControllerObserver) override { return R_NOT_IMPLEMENTED; }
 
 	RESULT SetCloudImp(std::unique_ptr<CloudImp> pCloudImp);
 

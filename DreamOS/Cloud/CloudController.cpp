@@ -5,9 +5,9 @@
 #include "Sandbox/CommandLineManager.h"
 
 #include "Cloud/Message/Message.h"
-#include "Cloud/Message/UpdateHandMessage.h"
-#include "Cloud/Message/UpdateHeadMessage.h"
-#include "Cloud/Message/AudioDataMessage.h"
+//#include "Cloud/Message/UpdateHandMessage.h"
+//#include "Cloud/Message/UpdateHeadMessage.h"
+//#include "Cloud/Message/AudioDataMessage.h"
 
 #include "DreamConsole/DreamConsole.h"
 
@@ -273,7 +273,7 @@ RESULT CloudController::OnDataChannelStringMessage(PeerConnection* pPeerConnecti
 	CR(m_fnHandleDataChannelStringMessageCallback(pPeerConnection, strDataChannelMessage));
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		CR(m_pPeerConnectionObserver->OnStringDataMessage(pPeerConnection, strDataChannelMessage));
+		CR(m_pPeerConnectionObserver->OnDataStringMessage(pPeerConnection, strDataChannelMessage));
 	}
 
 Error:
@@ -354,8 +354,7 @@ RESULT CloudController::OnAudioData(PeerConnection* pPeerConnection, const void*
 	long recieverUserID = pPeerConnection->GetUserID();
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		AudioDataMessage audioDataMessage(senderUserID, recieverUserID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames);
-		CR(m_pPeerConnectionObserver->OnAudioDataMessage(pPeerConnection, &audioDataMessage));
+		CR(m_pPeerConnectionObserver->OnAudioData(pPeerConnection, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:
@@ -580,6 +579,8 @@ RESULT CloudController::SendDataMessage(long userID, Message *pDataMessage) {
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	CB(m_fRunning);
+
 	// TODO: Fix this - remove m_pCloudImp
 	//CB(m_pCloudImp->IsConnected());
 	CB(m_pEnvironmentController->IsUserIDConnected(userID));
@@ -590,60 +591,6 @@ RESULT CloudController::SendDataMessage(long userID, Message *pDataMessage) {
 		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
 		CN(pDatachannelBuffer);
 		memcpy(pDatachannelBuffer, pDataMessage, pDataMessage->GetSize());
-		CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
-	}
-
-Error:
-	return r;
-}
-
-RESULT CloudController::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	RESULT r = R_PASS;
-	uint8_t *pDatachannelBuffer = nullptr;
-	int pDatachannelBuffer_n = 0;
-
-	CB(m_fRunning);
-
-	// TODO: Fix this - remove m_pCloudImp
-	//CB(m_pCloudImp->IsConnected());
-	CB(m_pEnvironmentController->IsUserIDConnected(userID));
-	CN(m_pUserController);
-	{
-		// Create the message
-		UpdateHeadMessage updateHeadMessage(m_pUserController->GetUserID(), userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-
-		pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
-		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-		CN(pDatachannelBuffer);
-		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
-
-		CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
-	}
-
-Error:
-	return r;
-}
-
-RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handState) {
-	RESULT r = R_PASS;
-	uint8_t *pDatachannelBuffer = nullptr;
-	int pDatachannelBuffer_n = 0;
-
-	CB(m_fRunning);
-
-	// TODO: Fix this - remove m_pCloudImp
-	//CB(m_pCloudImp->IsConnected());
-	CB(m_pEnvironmentController->IsUserIDConnected(userID));
-	CN(m_pUserController);
-	{
-		// Create the message
-		UpdateHandMessage updateHeadMessage(m_pUserController->GetUserID(), userID, handState);
-
-		pDatachannelBuffer_n = sizeof(UpdateHandMessage);
-		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-		CN(pDatachannelBuffer);
-		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
-
 		CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
 	}
 
@@ -659,6 +606,8 @@ RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	CB(m_fRunning);
+
 	CN(m_pUserController);
 	{
 		// Create the message
@@ -674,49 +623,7 @@ Error:
 	return r;
 }
 
-RESULT CloudController::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	RESULT r = R_PASS;
-	uint8_t *pDatachannelBuffer = nullptr;
-	int pDatachannelBuffer_n = 0;
 
-	CN(m_pUserController);
-	{
-		// Create the message
-		UpdateHeadMessage updateHeadMessage(m_pUserController->GetUserID(), -1, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-
-		pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
-		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-		CN(pDatachannelBuffer);
-		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
-
-		CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
-	}
-
-Error:
-	return r;
-}
-
-RESULT CloudController::BroadcastUpdateHandMessage(hand::HandState handState) {
-	RESULT r = R_PASS;
-	uint8_t *pDatachannelBuffer = nullptr;
-	int pDatachannelBuffer_n = 0;
-
-	CN(m_pUserController);
-	{
-		// Create the message
-		UpdateHandMessage updateHeadMessage(m_pUserController->GetUserID(), -1, handState);
-
-		pDatachannelBuffer_n = sizeof(UpdateHandMessage);
-		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-		CN(pDatachannelBuffer);
-		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
-
-		CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
-	}
-
-Error:
-	return r;
-}
 
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
@@ -746,6 +653,10 @@ ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE contr
 	ControllerProxy *pProxy = nullptr;
 
 	switch (controllerType) {
+		case CLOUD_CONTROLLER_TYPE::CLOUD: {
+			pProxy = (ControllerProxy*)(this);
+		} break;
+
 		case CLOUD_CONTROLLER_TYPE::MENU: {
 			pProxy = (ControllerProxy*)(GetMenuControllerProxy());
 		} break;

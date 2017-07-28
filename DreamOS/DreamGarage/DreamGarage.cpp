@@ -9,9 +9,9 @@
 light *g_pLight = nullptr;
 
 #include "Cloud/CloudController.h"
-#include "Cloud/Message/UpdateHeadMessage.h"
-#include "Cloud/Message/UpdateHandMessage.h"
-#include "Cloud/Message/AudioDataMessage.h"
+//#include "Cloud/Message/UpdateHeadMessage.h"
+//#include "Cloud/Message/UpdateHandMessage.h"
+//#include "Cloud/Message/AudioDataMessage.h"
 
 #include "DreamGarage/DreamContentView.h"
 #include "DreamGarage/DreamUIBar.h"
@@ -30,6 +30,11 @@ light *g_pLight = nullptr;
 #include "Core/Utilities.h"
 
 #include "Cloud/Environment/PeerConnection.h"
+
+#include "DreamGarageMessage.h"
+#include "UpdateHeadMessage.h"
+#include "UpdateHandMessage.h"
+#include "AudioDataMessage.h"
 
 // TODO: Should this go into the DreamOS side?
 /*
@@ -262,6 +267,87 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	RESULT r = R_PASS;
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	// Create the message
+	UpdateHeadMessage updateHeadMessage(GetUserID(), userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
+
+	//pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
+	//pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
+	//CN(pDatachannelBuffer);
+	//memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
+
+	//CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
+	CR(SendDataMessage(userID, &updateHeadMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::SendUpdateHandMessage(long userID, hand::HandState handState) {
+	RESULT r = R_PASS;
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	// Create the message
+	UpdateHandMessage updateHandMessage(GetUserID(), userID, handState);
+
+	//pDatachannelBuffer_n = sizeof(UpdateHandMessage);
+	//pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
+	//CN(pDatachannelBuffer);
+	//memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
+
+	//CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
+	CR(SendDataMessage(userID, &updateHandMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
+	RESULT r = R_PASS;
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+
+	// Create the message
+	UpdateHeadMessage updateHeadMessage(GetUserID(), -1, ptPosition, qOrientation, vVelocity, qAngularVelocity);
+
+	//pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
+	//pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
+	//CN(pDatachannelBuffer);
+	//memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
+
+	//CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
+	CR(BroadcastDataMessage(&updateHeadMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::BroadcastUpdateHandMessage(hand::HandState handState) {
+	RESULT r = R_PASS;
+	uint8_t *pDatachannelBuffer = nullptr;
+	int pDatachannelBuffer_n = 0;
+
+	// Create the message
+	UpdateHandMessage updateHandMessage(GetUserID(), -1, handState);
+
+	//pDatachannelBuffer_n = sizeof(UpdateHandMessage);
+	//pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
+	//CN(pDatachannelBuffer);
+	//memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
+
+	//CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
+	CR(BroadcastDataMessage(&updateHandMessage));
+
+Error:
+	return r;
+}
+
 RESULT DreamGarage::SendHeadPosition() {
 	RESULT r = R_PASS;
 
@@ -293,7 +379,7 @@ Error:
 	return r;
 }
 
-
+/*
 class SwitchHeadMessage : public Message {
 public:
 	SwitchHeadMessage(long senderUserID, long receiverUserID) :
@@ -316,6 +402,7 @@ RESULT DreamGarage::SendSwitchHeadMessage() {
 Error:
 	return r;
 }
+*/
 
 // Head update time
 #define UPDATE_HEAD_COUNT_THROTTLE 90	
@@ -456,13 +543,14 @@ Error:
 
 RESULT DreamGarage::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
 	RESULT r = R_PASS;
-	LOG(INFO) << "data received";
+	//LOG(INFO) << "data received";
 
+	/*
 	if (pDataMessage) {
 		std::string st((char*)pDataMessage);
 		st = "<- " + st;
 		HUD_OUT(st.c_str());
-	}
+	}*/
 
 	/*
 	Message::MessageType switchHeadModelMessage = (Message::MessageType)((uint16_t)(Message::MessageType::MESSAGE_CUSTOM) + 1);
@@ -473,9 +561,33 @@ RESULT DreamGarage::OnDataMessage(PeerConnection* pPeerConnection, Message *pDat
 	}
 
 	// TODO: Handle the appropriate message here
+	*/
+
+	DreamGarageMessage::type dreamGarageMsgType = (DreamGarageMessage::type)(pDataMessage->GetType());
+	switch (dreamGarageMsgType) {
+		case DreamGarageMessage::type::UPDATE_HEAD: {
+			UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDataMessage);
+			CR(HandleHeadUpdateMessage(pPeerConnection, pUpdateHeadMessage));
+		} break;
+
+		case DreamGarageMessage::type::UPDATE_HAND: {
+			UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDataMessage);
+			CR(HandleHandUpdateMessage(pPeerConnection, pUpdateHandMessage));
+		} break;
+
+		case DreamGarageMessage::type::AUDIO_DATA: {
+
+		} break;
+
+		default:
+		case DreamGarageMessage::type::UPDATE_CHAT:
+		case DreamGarageMessage::type::CUSTOM:
+		case DreamGarageMessage::type::INVALID: {
+			DEBUG_LINEOUT("Unhandled Data Message of Type 0x%x", dreamGarageMsgType);
+		} break;
+	}
 
 Error:
-*/
 	return r;
 }
 
@@ -484,7 +596,7 @@ RESULT DreamGarage::OnDataStringMessage(PeerConnection* pPeerConnection, const s
 
 	CN(pPeerConnection);
 
-	DEBUG_LINEOUT("DataString: %s", strDataChannelMessage);
+	DEBUG_LINEOUT("DataString: %s", strDataChannelMessage.c_str());
 	LOG(INFO) << "DataString: " << strDataChannelMessage;
 
 Error:
@@ -511,10 +623,25 @@ user* DreamGarage::ActivateUser(long userId) {
 	return m_peerUsers[userId];
 }
 
-RESULT DreamGarage::OnHeadUpdateMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage) {
+RESULT DreamGarage::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+	RESULT r = R_PASS;
+
+	long senderUserID = pPeerConnection->GetPeerUserID();
+	long recieverUserID = pPeerConnection->GetUserID();
+
+	AudioDataMessage audioDataMessage(senderUserID, recieverUserID, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames);
+
+	CR(HandleAudioDataMessage(pPeerConnection, &audioDataMessage));
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
 	// This will set visible 
+	long senderUserID = pPeerConnection->GetPeerUserID();
 	user* pUser = ActivateUser(senderUserID);
 
 	point headPos = pUpdateHeadMessage->GetPosition();
@@ -535,11 +662,13 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnHandUpdateMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage) {
+RESULT DreamGarage::HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage) {
 	RESULT r = R_PASS;
 
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
 	//pUpdateHandMessage->PrintMessage();
+
+	long senderUserID = pPeerConnection->GetPeerUserID();
 	hand::HandState handState;
 
 	user* pUser = ActivateUser(senderUserID);
@@ -552,7 +681,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::OnAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
+RESULT DreamGarage::HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 
 	long senderUserID = pPeerConnection->GetPeerUserID();
