@@ -8,17 +8,18 @@
 // Base Message object
 
 #include <string>
-#include "Cloud/Message/Message.h"
+#include "DreamMessage.h"
 
-class DreamGarageMessage : public Message {
+class DreamGarageMessage : public DreamMessage {
 public:
-	enum class type {
+	enum class type : Message::DataType {
+		CLIENT = (Message::DataType)(DreamMessage::type::CLIENT),
 		UPDATE_HEAD,
 		UPDATE_HAND,
 		AUDIO_DATA,
 		UPDATE_CHAT,
 		CUSTOM,
-		INVALID
+		INVALID = MESSAGE_INVALID
 	};
 
 private:
@@ -30,13 +31,13 @@ private:
 
 public:
 	DreamGarageMessage() :
-		Message()
+		DreamMessage()
 	{
 		// empty
 	}
 
 	DreamGarageMessage(long senderUserID, long receiverUserID, DreamGarageMessage::type msgType, long messageSize) :
-		Message(senderUserID, receiverUserID, (Message::MessageType)(msgType), messageSize)
+		DreamMessage(senderUserID, receiverUserID, (DreamMessage::type)(msgType), messageSize)
 	{
 		// empty
 	}
@@ -47,7 +48,7 @@ public:
 
 	virtual RESULT PrintMessage() override {
 		DEBUG_LINEOUT("DreamGarageMessage:");
-		Message::PrintMessage();
+		DreamMessage::PrintMessage();
 		return R_PASS;
 	}
 };

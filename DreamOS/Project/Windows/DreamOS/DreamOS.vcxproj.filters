@@ -1697,6 +1697,9 @@
     <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h">
       <Filter>DreamGarage</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\DreamMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

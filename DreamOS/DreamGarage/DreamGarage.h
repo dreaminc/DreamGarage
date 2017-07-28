@@ -21,9 +21,7 @@ class DreamControlView;
 class DreamGarage : public DreamOS, 
 				    public Subscriber<SenseKeyboardEvent>, 
 					public Subscriber<SenseTypingEvent>, 
-					public Subscriber<CmdPromptEvent>,	// TODO: Remove this
-					public CloudController::PeerConnectionObserver,
-					public CloudController::EnvironmentObserver
+					public Subscriber<CmdPromptEvent>	// TODO: Remove this
 {
 public:
 
@@ -53,12 +51,18 @@ public:
 	RESULT SetRoundtablePosition(int index);
 
 	// PeerConnectionObserver
-	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
-	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) override;
-	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
+	//virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	//virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) override;
+	//virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
+	//virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	//
+
+	// Cloud
+	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
+	virtual RESULT OnNewDreamPeer(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
-	// EnvironmentObserver
+	// Environment
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
 	// DreamGarage Messages

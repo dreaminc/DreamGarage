@@ -41,10 +41,13 @@
 #include "UI/UIKeyboard.h"
 
 class UIKeyboardLayout;
+class DreamMessage;
 
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
-	public valid 
+	public valid,
+	public CloudController::PeerConnectionObserver,
+	public CloudController::EnvironmentObserver
 {
 	friend class CloudTestSuite;
 
@@ -72,6 +75,22 @@ public:
 	RESULT GetMouseRay(ray &rCast, double t = 0.0f);
 
 	HMD *GetHMD();
+
+
+	// PeerConnectionObserver
+	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
+	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+
+	// EnvironmentObserver
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	// Cloud Controller Hooks
+	virtual RESULT OnNewDreamPeer(PeerConnection *pPeerConnection) = 0;
+	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) = 0;
 
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();

@@ -5,6 +5,9 @@
 
 #include "Primitives/font.h"
 
+#include "Cloud/Environment/PeerConnection.h"
+#include "DreamMessage.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -90,6 +93,10 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
 	}
 
+	// Cloud Controller
+	CRM(RegisterPeerConnectionObserver(this), "Failed to register Peer Connection Observer");
+	CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller");
+
 	// Give the Client a chance to set up the pipeline
 	CRM(SetupPipeline(GetRenderPipeline()), "Failed to set up pipeline");
 
@@ -106,6 +113,90 @@ Error:
 	return r;
 }
 
+// Cloud
+RESULT DreamOS::OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+	RESULT r = R_PASS;
+
+	CN(pPeerConnection);
+
+	DEBUG_LINEOUT("DataString: %s", strDataChannelMessage.c_str());
+	LOG(INFO) << "DataString: " << strDataChannelMessage;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	/*
+	long index = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
+	index -= 1;
+
+	if (m_fSeated) {
+		LOG(INFO) << "HandlePeersUpdate already seated" << index;
+		return R_PASS;
+	}
+
+	LOG(INFO) << "HandlePeersUpdate " << index;
+	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(index)).c_str());
+
+	if (!m_fSeated) {
+		CBM((index < m_seatLookup.size()), "Peer index %d not supported by client", index);
+		CR(SetRoundtablePosition(index));
+		m_fSeated = true;
+	}
+	*/
+
+	CR(OnNewDreamPeer(pPeerConnection));
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
+	RESULT r = R_PASS;
+	
+	DreamMessage::type dreamMsgType = (DreamMessage::type)(pDataMessage->GetType());
+
+	// Route the message to the right place
+
+	if (dreamMsgType < DreamMessage::type::CLIENT) {
+		// DREAM OS Messages
+		switch (dreamMsgType) {
+			case DreamMessage::type::HANDSHAKE: {
+				//UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDataMessage);
+				//CR(HandleHeadUpdateMessage(pPeerConnection, pUpdateHeadMessage));
+				// TODO:
+			} break;
+
+			case DreamMessage::type::ACK: {
+				//UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDataMessage);
+				//CR(HandleHandUpdateMessage(pPeerConnection, pUpdateHandMessage));
+				// TODO:
+			} break;
+
+			default: {
+				DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%I64x", dreamMsgType);
+			} break;
+		}
+	}
+	else if (dreamMsgType >= DreamMessage::type::CLIENT && dreamMsgType < DreamMessage::type::APP) {
+		// Dream Client Messages
+		CR(OnDreamMessage(pPeerConnection, (DreamMessage*)(pDataMessage)));
+	}
+	else if (dreamMsgType >= DreamMessage::type::APP) {
+		// TODO: App messages
+	}
+	else {
+		DEBUG_LINEOUT("Unhandled Dream Message of Type 0x%I64x", dreamMsgType);
+	}
+
+Error:
+	return r;
+}
+
+// Environment
 
 
 stereocamera* DreamOS::GetCamera() {

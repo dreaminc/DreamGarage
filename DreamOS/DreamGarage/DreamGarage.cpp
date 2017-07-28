@@ -141,11 +141,6 @@ RESULT DreamGarage::LoadScene() {
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
 
-	// TODO: This should go into an "initialize" function
-	//InitializeCloudControllerCallbacks();
-	CRM(RegisterPeerConnectionObserver(this), "Failed to register Peer Connection Observer");
-	CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller");
-
 	// Keyboard
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
 	RegisterSubscriber(SENSE_TYPING_EVENT_TYPE::CHARACTER_TYPING, this);
@@ -487,10 +482,14 @@ Error:
 }
 
 // Cloud Controller
-RESULT DreamGarage::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+
+RESULT DreamGarage::OnNewDreamPeer(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
+	///*
 	//int index = pPeerConnection->GetLoca
+	bool fOfferor = (pPeerConnection->GetOfferUserID() == GetUserID());
+
 	long index = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
 	index -= 1;
 
@@ -507,12 +506,15 @@ RESULT DreamGarage::OnNewPeerConnection(long userID, long peerUserID, bool fOffe
 		CR(SetRoundtablePosition(index));
 		m_fSeated = true;
 	}
+	//*/
+
+	CR(r);
 
 Error:
 	return r;
 }
 
-RESULT DreamGarage::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
+RESULT DreamGarage::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
 	RESULT r = R_PASS;
 	//LOG(INFO) << "data received";
 
@@ -534,41 +536,29 @@ RESULT DreamGarage::OnDataMessage(PeerConnection* pPeerConnection, Message *pDat
 	// TODO: Handle the appropriate message here
 	*/
 
-	DreamGarageMessage::type dreamGarageMsgType = (DreamGarageMessage::type)(pDataMessage->GetType());
+	DreamGarageMessage::type dreamGarageMsgType = (DreamGarageMessage::type)(pDreamMessage->GetType());
 	switch (dreamGarageMsgType) {
 		case DreamGarageMessage::type::UPDATE_HEAD: {
-			UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDataMessage);
+			UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDreamMessage);
 			CR(HandleHeadUpdateMessage(pPeerConnection, pUpdateHeadMessage));
 		} break;
 
 		case DreamGarageMessage::type::UPDATE_HAND: {
-			UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDataMessage);
+			UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDreamMessage);
 			CR(HandleHandUpdateMessage(pPeerConnection, pUpdateHandMessage));
 		} break;
 
 		case DreamGarageMessage::type::AUDIO_DATA: {
-
+			// empty
 		} break;
 
 		default:
 		case DreamGarageMessage::type::UPDATE_CHAT:
 		case DreamGarageMessage::type::CUSTOM:
 		case DreamGarageMessage::type::INVALID: {
-			DEBUG_LINEOUT("Unhandled Data Message of Type 0x%x", dreamGarageMsgType);
+			DEBUG_LINEOUT("Unhandled Dream Client Message of Type 0x%I64x", dreamGarageMsgType);
 		} break;
 	}
-
-Error:
-	return r;
-}
-
-RESULT DreamGarage::OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
-	RESULT r = R_PASS;
-
-	CN(pPeerConnection);
-
-	DEBUG_LINEOUT("DataString: %s", strDataChannelMessage.c_str());
-	LOG(INFO) << "DataString: " << strDataChannelMessage;
 
 Error:
 	return r;
