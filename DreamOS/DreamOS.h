@@ -43,6 +43,10 @@
 class UIKeyboardLayout;
 class DreamMessage;
 
+class PeerStayAliveMessage;
+class PeerAckMessage;
+class PeerHandshakeMessage;
+
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
 	public valid,
@@ -91,6 +95,14 @@ public:
 	// Cloud Controller Hooks
 	virtual RESULT OnNewDreamPeer(PeerConnection *pPeerConnection) = 0;
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) = 0;
+
+	// Peers
+	RESULT HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, PeerHandshakeMessage *pPeerHandshakeMessage);
+	RESULT HandlePeerStayAliveMessage(PeerConnection* pPeerConnection, PeerStayAliveMessage *pPeerStayAliveMessage);
+	RESULT HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage);
+
+private:
+	//std::list
 
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();

@@ -14,8 +14,9 @@ class DreamMessage : public Message {
 public:
 	enum class type : Message::DataType {
 		OS = (Message::DataType)(Message::type::OS),
-		HANDSHAKE,
-		ACK,
+		PEER_HANDSHAKE,
+		PEER_STAYALIVE,
+		PEER_ACK,
 		CLIENT	= DreamMessage::type::OS << MESSAGE_SPACE_BIT_SIZE,		// TODO: This may be deprecated as everything becomes an APP
 		APP = DreamMessage::type::CLIENT << MESSAGE_SPACE_BIT_SIZE,
 		INVALID = MESSAGE_INVALID

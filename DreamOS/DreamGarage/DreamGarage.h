@@ -87,8 +87,8 @@ public:
 	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 private:
-	std::map<long, user*> m_peerUsers;
-	std::vector<user*> m_usersPool;
+	//std::map<long, user*> m_peerUsers;
+	//std::vector<user*> m_usersPool;
 
 	bool m_fSeated = false;
 	float m_tick = 0.0f;

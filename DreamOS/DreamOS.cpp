@@ -164,16 +164,19 @@ RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMes
 	if (dreamMsgType < DreamMessage::type::CLIENT) {
 		// DREAM OS Messages
 		switch (dreamMsgType) {
-			case DreamMessage::type::HANDSHAKE: {
-				//UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDataMessage);
-				//CR(HandleHeadUpdateMessage(pPeerConnection, pUpdateHeadMessage));
-				// TODO:
+			case DreamMessage::type::PEER_HANDSHAKE: {
+				PeerHandshakeMessage *pPeerHandshakeMessage = reinterpret_cast<PeerHandshakeMessage*>(pDataMessage);
+				CR(HandlePeerHandshakeMessage(pPeerConnection, pPeerHandshakeMessage));
 			} break;
 
-			case DreamMessage::type::ACK: {
-				//UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDataMessage);
-				//CR(HandleHandUpdateMessage(pPeerConnection, pUpdateHandMessage));
-				// TODO:
+			case DreamMessage::type::PEER_STAYALIVE: {
+				PeerStayAliveMessage *pPeerStayAliveMessage = reinterpret_cast<PeerStayAliveMessage*>(pDataMessage);
+				CR(HandlePeerStayAliveMessage(pPeerConnection, pPeerStayAliveMessage));
+			} break;
+
+			case DreamMessage::type::PEER_ACK: {
+				PeerAckMessage *pPeerAckMessage = reinterpret_cast<PeerAckMessage*>(pDataMessage);
+				CR(HandlePeerAckMessage(pPeerConnection, pPeerAckMessage));
 			} break;
 
 			default: {
@@ -197,6 +200,34 @@ Error:
 }
 
 // Environment
+
+// Peers
+RESULT DreamOS::HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, PeerHandshakeMessage *pPeerHandshakeMessage) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::HandlePeerStayAliveMessage(PeerConnection* pPeerConnection, PeerStayAliveMessage *pPeerStayAliveMessage) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage) {
+	RESULT r = R_PASS;
+
+	CR(r);
+
+Error:
+	return r;
+}
 
 
 stereocamera* DreamOS::GetCamera() {
