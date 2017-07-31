@@ -24,12 +24,6 @@ public:
 		// empty
 	}
 
-	PeerHandshakeMessage(long senderUserID, long receiverUserID) :
-		DreamMessage(senderUserID, receiverUserID, DreamMessage::type::PEER_HANDSHAKE, sizeof(PeerHandshakeMessage))
-	{
-		// empty
-	}
-
 	~PeerHandshakeMessage() {
 		// empty
 	}

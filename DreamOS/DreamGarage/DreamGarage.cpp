@@ -156,13 +156,14 @@ RESULT DreamGarage::LoadScene() {
 	// Console
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
+	/*
+	// TODO: switch to pool 
 	for (auto x : std::array<int, 8>()) {
 		user* pNewUser = AddUser();
-
 		pNewUser->SetVisible(false);
-
 		m_usersPool.push_back(pNewUser);
 	}
+	*/
 	
 	AddSkybox();
 
@@ -567,6 +568,7 @@ Error:
 }
 
 user* DreamGarage::ActivateUser(long userId) {
+	/*
 	if (m_peerUsers.find(userId) == m_peerUsers.end()) {
 		if (m_usersPool.empty()) {
 			LOG(ERROR) << "cannot activate a new user, no reserved users exist";
@@ -584,6 +586,11 @@ user* DreamGarage::ActivateUser(long userId) {
 	}
 
 	return m_peerUsers[userId];
+	*/
+
+	// TODO: 
+
+	return nullptr;
 }
 
 RESULT DreamGarage::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {

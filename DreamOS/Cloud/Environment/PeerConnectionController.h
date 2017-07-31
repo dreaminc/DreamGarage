@@ -23,7 +23,7 @@ class Websocket;
 class PeerConnection;
 
 // TODO: This is actually a UserController - so change the name of object and file
-class PeerConnectionController : public Controller, public WebRTCImp::WebRTCObserver{
+class PeerConnectionController : public Controller, public WebRTCImp::WebRTCObserver {
 public:
 	class PeerConnectionControllerObserver {
 	public:
@@ -94,6 +94,7 @@ public:
 	virtual RESULT OnSDPOfferSuccess(long peerConnectionID) override;
 	virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) override;
 	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
 	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;

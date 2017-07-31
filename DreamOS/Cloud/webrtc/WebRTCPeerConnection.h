@@ -14,6 +14,7 @@
 #include "webrtc/api/peerconnectioninterface.h"
 
 #include "WebRTCICECandidate.h"
+#include "WebRTCIceConnection.h"
 
 class WebRTConductor;
 class User;
@@ -35,6 +36,7 @@ public:
 		virtual RESULT OnSDPSuccess(long peerConnectionID, bool fOffer) = 0;
 		virtual RESULT OnSDPFailure(long peerConnectionID, bool fOffer) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 

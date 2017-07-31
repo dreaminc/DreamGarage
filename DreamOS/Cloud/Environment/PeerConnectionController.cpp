@@ -207,7 +207,7 @@ RESULT PeerConnectionController::OnNewPeerConnection(long userID, long peerUserI
 
 	long position = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
 	
-	LOG(INFO) << "myUserID" << (fOfferor ? "(Offeror)" : "(Answerer)") << "=" << userID << " peerUserID=" << peerUserID << " position=" << position;
+	LOG(INFO) << "myUserID" << (fOfferor ? "(Offerer)" : "(Answerer)") << "=" << userID << " peerUserID=" << peerUserID << " position=" << position;
 	DEBUG_LINEOUT("%s: myUserID: %d peerUserID: %d, position: %d", (fOfferor ? "Offeror" : "Answerer"), userID, peerUserID, position);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
@@ -269,7 +269,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		//m_pWebRTCImp->InitializePeerConnection(true);
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
 
-		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection));
+		// This is now moved to WebRTC connection stable
+		//CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection));
 	}
 	else if (strMethod == "set_offer") {
 		LOG(ERROR) << "(cloud) set offer should not be a request";
@@ -301,7 +302,8 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, false);
 		CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
 
-		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+		// This is now moved to WebRTC connection stable (maybe not do it this way - add connection stable separately) 
+		//CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection));
 	}
 	else if (strMethod == "set_offer_candidates") {
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
@@ -428,6 +430,8 @@ RESULT PeerConnectionController::OnWebRTCConnectionStable(long peerConnectionID)
 	}
 	//*/
 
+	//CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+
 Error:
 	return r;
 }
@@ -526,6 +530,33 @@ RESULT PeerConnectionController::OnICECandidatesGatheringDone(long peerConnectio
 		m_pPeerConnectionControllerObserver->OnICECandidatesGatheringDone(pPeerConnection);
 	}
 
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
+	RESULT r = R_PASS;
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	switch (webRTCIceConnectionState) {
+		case WebRTCIceConnection::state::CONNECTED: {
+			CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+		} break;
+
+		default: {
+			// TODO:
+		} break;
+	}
+
+	/*
+	// TODO: do we need this?
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		m_pPeerConnectionControllerObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState);
+	}
+	*/
 
 Error:
 	return r;

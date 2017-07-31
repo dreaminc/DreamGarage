@@ -8,6 +8,11 @@
 #include "Cloud/Environment/PeerConnection.h"
 #include "DreamMessage.h"
 
+// Messages
+#include "PeerHandshakeMessage.h"
+#include "PeerAckMessage.h"
+#include "PeerStayAliveMessage.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -148,8 +153,12 @@ RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor,
 	}
 	*/
 
-	CR(OnNewDreamPeer(pPeerConnection));
+	//CR(OnNewDreamPeer(pPeerConnection));
 
+	// Initialize handshake - only add user when peer connection stabilized 
+	PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
+	CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
+	
 Error:
 	return r;
 }
@@ -256,7 +265,7 @@ std::shared_ptr<DreamPeer> DreamOS::FindPeer(long peerUserID) {
 	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
 
 	if ((it = m_dreamPeers.find(peerUserID)) != m_dreamPeers.end()) {
-		return (*it)->second;
+		return (*it).second;
 	}
 
 	return nullptr;

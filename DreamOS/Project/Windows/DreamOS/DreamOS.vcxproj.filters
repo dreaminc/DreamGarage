@@ -812,6 +812,9 @@
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRController.cpp">
       <Filter>HMD\OpenVR</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamPeer.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1699,6 +1702,21 @@
     </ClInclude>
     <ClInclude Include="..\..\..\DreamMessage.h">
       <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamPeer.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerAckMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerHandshakeMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerStayAliveMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCIceConnection.h">
+      <Filter>Cloud\webrtc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

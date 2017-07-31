@@ -339,6 +339,14 @@ RESULT WebRTCConductor::OnICECandidatesGatheringDone(long peerConnectionID) {
 	return R_NOT_HANDLED;
 }
 
+RESULT WebRTCConductor::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState);
+	}
+
+	return R_NOT_HANDLED;
+}
+
 RESULT WebRTCConductor::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage);

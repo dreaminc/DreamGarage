@@ -338,41 +338,73 @@ void WebRTCPeerConnection::OnIceConnectionChange(webrtc::PeerConnectionInterface
 	case webrtc::PeerConnectionInterface::kIceConnectionNew: {
 		DEBUG_LINEOUT("ICE Connection New");
 		LOG(INFO) << "ICE Connection New";
+
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::NEW);
+		}
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionChecking: {
 		DEBUG_LINEOUT("ICE Connection Checking");
 		LOG(INFO) << "ICE Connection Checking";
+
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::CHECKING);
+		}
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionConnected: {
 		DEBUG_LINEOUT("ICE Connection Connected");
 		LOG(INFO) << "ICE Connection Connected";
+
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::CONNECTED);
+		}
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionCompleted: {
 		DEBUG_LINEOUT("ICE Connection Completed");
 		LOG(INFO) << "ICE Connection Completed";
+
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::COMPLETED);
+		}
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionFailed: {
 		DEBUG_LINEOUT("ICE Connection Failed");
 		LOG(INFO) << "ICE Connection Failed";
+
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::FAILED);
+		}
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionDisconnected: {
 		DEBUG_LINEOUT("ICE Connection Disconnected");
 		LOG(INFO) << "ICE Connection Disconnected";
+
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::DISCONNECTED);
+		}
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionClosed: {
 		DEBUG_LINEOUT("ICE Connection Closed");
 		LOG(INFO) << "ICE Connection Closed";
+
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::CLOSED);
+		}
 	} break;
 
 	case webrtc::PeerConnectionInterface::kIceConnectionMax: {
 		DEBUG_LINEOUT("ICE Connection Max");
 		LOG(INFO) << "ICE Connection Max";
+
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnIceConnectionChange(m_peerConnectionID, WebRTCIceConnection::state::MAX);
+		}
 	} break;
 
 	}

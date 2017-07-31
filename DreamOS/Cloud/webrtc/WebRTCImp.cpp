@@ -257,6 +257,17 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState));
+	}
+
+Error:
+	return r;
+}
+
 RESULT WebRTCImp::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 

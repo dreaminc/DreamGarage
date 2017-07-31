@@ -26,7 +26,9 @@ class WebRTCClient;
 class WebRTCICECandidate;
 class PeerConnection;
 
-class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp>, public WebRTCConductor::WebRTCConductorObserver {
+class WebRTCImp : public CloudImp, 
+				  public std::enable_shared_from_this<WebRTCImp>, 
+				  public WebRTCConductor::WebRTCConductorObserver {
 public:
 	enum WindowMessages {
 		UI_THREAD_CALLBACK = WM_APP + 1,
@@ -40,6 +42,7 @@ public:
 		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;
 		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
@@ -93,14 +96,15 @@ public:
 
 protected:
 	// WebRTCConductorObserver 
-	RESULT OnWebRTCConnectionStable(long peerConnectionID);
-	RESULT OnWebRTCConnectionClosed(long peerConnectionID);
-	RESULT OnSDPOfferSuccess(long peerConnectionID);
-	RESULT OnSDPAnswerSuccess(long peerConnectionID);
-	RESULT OnICECandidatesGatheringDone(long peerConnectionID);
-	RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage);
-	RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-	RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames);
+	virtual RESULT OnWebRTCConnectionStable(long peerConnectionID) override;
+	virtual RESULT OnWebRTCConnectionClosed(long peerConnectionID) override;
+	virtual RESULT OnSDPOfferSuccess(long peerConnectionID) override;
+	virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) override;
+	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) override;
+	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 protected:
 	// WebRTC Specific
