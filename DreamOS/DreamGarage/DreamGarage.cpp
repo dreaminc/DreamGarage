@@ -158,7 +158,9 @@ RESULT DreamGarage::LoadScene() {
 
 	for (auto x : std::array<int, 8>()) {
 		user* pNewUser = AddUser();
+
 		pNewUser->SetVisible(false);
+
 		m_usersPool.push_back(pNewUser);
 	}
 	

@@ -37,6 +37,7 @@
 #include "PhysicsEngine/PhysicsEngine.h"
 
 #include "DreamAppManager.h"
+#include "DreamPeer.h"
 
 #include "UI/UIKeyboard.h"
 
@@ -46,6 +47,7 @@ class DreamMessage;
 class PeerStayAliveMessage;
 class PeerAckMessage;
 class PeerHandshakeMessage;
+
 
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
@@ -102,7 +104,13 @@ public:
 	RESULT HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage);
 
 private:
-	//std::list
+	RESULT CreateNewPeer(PeerConnection *pPeerConnection);
+	std::shared_ptr<DreamPeer> FindPeer(long peerUserID);
+	RESULT RemovePeer(long peerUserID);
+	RESULT RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer);
+	DreamPeer::state GetPeerState(long peerUserID);
+
+	std::map<long, std::shared_ptr<DreamPeer>> m_dreamPeers;
 
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();
