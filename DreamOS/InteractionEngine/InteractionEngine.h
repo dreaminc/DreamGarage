@@ -27,6 +27,7 @@
 #include <chrono>
 
 #include "Primitives/Multipublisher.h"
+#include "Primitives/plane.h"
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
 
@@ -41,6 +42,7 @@ class SandboxApp;
 
 class DimObj;
 class color;
+class plane;
 
 class InteractionEngineProxy : public Subscriber<SenseKeyboardEvent> {
 public:
@@ -119,6 +121,13 @@ private:
 	InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold, VirtualObj *pEventObject);
 
 public:
+	struct CaptureObj {
+		VirtualObj *pObj;
+		float threshold;
+		plane planeContext;
+		point ptOffset;
+	};
+
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);
 
@@ -130,6 +139,9 @@ public:
 	virtual point GetInteractionRayOrigin() override;
 	RESULT UpdateInteractionRay();
 	*/
+
+	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
+	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddInteractionObject(VirtualObj *pInteractionObject);
 	RESULT RemoveInteractionObject(VirtualObj *pInteractionObject);
@@ -197,7 +209,7 @@ private:
 	std::vector<VirtualObj*> m_interactionObjects;
 	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
 
-	//std::map<VirtualObj*, std::list<std::shared_ptr<ActiveObject>>> m_activeObjects;
+	std::map<VirtualObj*, CaptureObj*> m_capturedObjects;
 	std::map<ActiveObject::type, ActiveObjectQueue> m_activeObjectQueues;
 	
 	AnimationQueue* m_pObjectQueue = nullptr;

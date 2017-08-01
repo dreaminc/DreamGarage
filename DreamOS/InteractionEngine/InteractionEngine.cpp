@@ -323,6 +323,39 @@ Error:
 }
 */
 
+RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
+	RESULT r = R_PASS;
+
+	plane planeContext(pObject->GetPosition(), vDirection);
+
+	CaptureObj *cObj = new CaptureObj();
+	cObj->pObj = pObject;
+	cObj->threshold = threshold;
+	cObj->planeContext = planeContext;
+	cObj->ptOffset = pInteractionObject->GetPosition(true) - ptContact;
+
+//	CR(RemoveInteractionObject(pObject));
+
+//	DimObj *pObj = reinterpret_cast<DimObj*>(pObject);
+//	if (pObj != nullptr)
+//		CR(RemoveAnimationObject(pObj));
+
+	m_capturedObjects[pInteractionObject] = cObj;
+
+//Error:
+	return r;
+}
+
+RESULT InteractionEngine::ReleaseObjects(VirtualObj *pInteractionObject) {
+	RESULT r = R_PASS;
+
+	CBR(m_capturedObjects.count(pInteractionObject) > 0, R_OBJECT_NOT_FOUND);
+	m_capturedObjects.erase(pInteractionObject);
+
+Error:
+	return r;
+}
+
 RESULT InteractionEngine::AddInteractionObject(VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
@@ -477,6 +510,10 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 		CollisionManifold manifold;
 		bool fIntersect = false;
 
+		if ((m_capturedObjects.count(pInteractionObject) > 0) && pEventObject == m_capturedObjects[pInteractionObject]->pObj) {
+			continue;
+		}
+
 		// Acquire manifold accordingly
 		if (activeObjectType == ActiveObject::type::INTERSECT) {
 			interactionEvent.m_interactionRay = pInteractionObject->GetRay(true);
@@ -514,7 +551,12 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 				interactionEvent.m_activeState = m_activeObjectQueues[activeObjectType].GetActiveObjectState(pObject, pInteractionObject);
 
 				// Note this will go to all composite subs
-				CR(NotifySubscribers(pEventObject, interactionEvent.m_eventType, &interactionEvent));
+				if (interactionEvent.m_eventType == ELEMENT_COLLIDE_MOVED) {
+					CR(NotifySubscribers(pEventObject, interactionEvent.m_eventType, &interactionEvent));
+				}
+				else {
+					CR(NotifySubscribers(pEventObject, interactionEvent.m_eventType, &interactionEvent));
+				}
 			}
 		}
 
@@ -557,7 +599,10 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 	for (auto &activeObjectQueue : m_activeObjectQueues) {
 
+		std::vector<VirtualObj*> captureObjectsToRemove;
 		std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
+
+		//TODO: extend capture object implementation to handle multiple captured objects
 
 		// TODO: First pass (no state tracking yet)
 		// Set all objects to non-intersected - below will set it to intersected, then remaining
@@ -567,11 +612,45 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 		for (auto &pInteractionObject : m_interactionObjects) {
 			//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
 			CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
+			if (m_capturedObjects.count(pInteractionObject) > 0) {
+//				for (auto &pCaptureObj : m_capturedObjects[pInteractionObject]) {
+				auto &pCaptureObj = m_capturedObjects[pInteractionObject];
+				point ptObj = pInteractionObject->GetPosition(true) - pCaptureObj->ptOffset;
+				point ptCap = pCaptureObj->pObj->GetPosition(true);
 
-			for (auto &pActiveObject : activeObjectQueue.second[pInteractionObject]) {
-				// Add to remove list if not intersected in current frame
-				if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
-					activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+				vector vDiff = ptObj - ptCap;
+				vector vDirection = pCaptureObj->planeContext.GetNormal();
+				float vDot = vDiff.dot(vDirection);
+
+				vector vOriginDiff = ptObj - pCaptureObj->planeContext.GetPosition();
+				float vOriginDot = vOriginDiff.dot(vDirection);
+
+				if (vOriginDot < 0.0f) {
+					//ReleaseObject(pCaptureObj,pInteractionObject);
+					captureObjectsToRemove.push_back(pInteractionObject);
+				}
+				else {
+					vector vProj = vDirection * (vDot);
+
+					pCaptureObj->pObj->SetPosition(pCaptureObj->pObj->GetPosition() + vProj);
+
+					plane planeCapture = pCaptureObj->planeContext;
+					vector vDistance = pCaptureObj->pObj->GetPosition() - planeCapture.GetPosition();
+
+					if (vDistance.magnitude() > (pCaptureObj->threshold)) { 
+					//	ReleaseObject(pCaptureObj, pInteractionObject);
+						InteractionObjectEvent interactionEvent(ELEMENT_COLLIDE_TRIGGER, pCaptureObj->pObj, pInteractionObject);
+						CR(NotifySubscribers(pCaptureObj->pObj, ELEMENT_COLLIDE_TRIGGER, &interactionEvent));
+						//captureObjectsToRemove.push_back(pInteractionObject);
+					}
+				}
+			}
+			else {
+				for (auto &pActiveObject : activeObjectQueue.second[pInteractionObject]) {
+					// Add to remove list if not intersected in current frame
+					if (pActiveObject->GetState() == ActiveObject::state::NOT_INTERSECTED) {
+						activeObjectsToRemove[pInteractionObject].push_back(pActiveObject);
+					}
 				}
 			}
 
@@ -601,6 +680,10 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 				CR(NotifySubscribers(pActiveObject->GetEventObject(), interactionEvent.m_eventType, &interactionEvent));
 			}
+		}
+		for (auto& pInteractionObject : captureObjectsToRemove) {
+			ReleaseObjects(pInteractionObject);
+			m_capturedObjects.erase(pInteractionObject);
 		}
 	}
 

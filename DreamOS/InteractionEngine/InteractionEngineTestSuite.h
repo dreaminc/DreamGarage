@@ -33,6 +33,9 @@ public:
 	virtual RESULT AddTests() override;
 
 	RESULT SetupPipeline();
+	RESULT Initialize();
+
+	RESULT AddTestCaptureObject();
 
 	RESULT AddTestObjectBasedEvents();
 

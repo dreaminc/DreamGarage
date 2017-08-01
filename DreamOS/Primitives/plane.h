@@ -31,7 +31,13 @@ public:
 		return m_vNormal.Normal().dot(m_ptPosition - pt);
 	}
 
+	vector GetNormal() {
+		return m_vNormal;
+	}
 
+	point GetPosition() {
+		return m_ptPosition;
+	}
 
 // Utilities for axes
 	static plane iPlane() { return plane(point(0.0f, 0.0f, 0.0f), vector::iVector(1.0f)); }

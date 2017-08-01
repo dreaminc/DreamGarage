@@ -202,6 +202,14 @@ RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->AddInteractionObject(pObject);
 }
 
+RESULT DreamOS::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
+	return m_pSandbox->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold);
+}
+
+RESULT DreamOS::ReleaseObjects(VirtualObj *pInteractionObject) {
+	return m_pSandbox->ReleaseObjects(pInteractionObject);
+}
+
 /*
 RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
 	return m_pSandbox->UpdateInteractionPrimitive(rCast);
