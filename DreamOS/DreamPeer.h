@@ -27,6 +27,9 @@ public:
 	};
 
 	struct PeerConnectionState {
+		unsigned fDataChannel : 1;
+		unsigned fAudioChannel : 1;
+
 		unsigned fSentHandshakeRequest : 1;
 		unsigned fReceivedHandshakeAck : 1;
 		unsigned fReceivedHandshakeRequest : 1;
@@ -40,9 +43,23 @@ public:
 	};
 
 public:
+	class DreamPeerObserver {
+	public:
+		virtual RESULT OnDreamPeerStateChange(DreamPeer* pDreamPeer) = 0;
+	};
+
+	RESULT RegisterDreamPeerObserver(DreamPeerObserver* pDreamPeerObserver);
+
+private:
+	DreamPeerObserver* m_pDreamPeerObserver = nullptr;
+
+public:
 	DreamPeer::DreamPeer(DreamOS *pDOS, PeerConnection *pPeerConnection);
 
 	RESULT Initialize();
+
+	RESULT OnDataChannel();
+	RESULT OnAudioChannel();
 
 	RESULT SentHandshakeRequest();
 	RESULT ReceivedHandshakeACK();
@@ -53,7 +70,13 @@ public:
 	bool IsPeerReady();
 
 	DreamPeer::state GetState();
+
 	long GetPeerUserID();
+
+	PeerConnection *GetPeerConnection();
+
+private:
+	RESULT SetState(DreamPeer::state peerState);
 
 private:
 	long m_peerUserID = -1;

@@ -131,6 +131,41 @@ Error:
 	return r;
 }
 
+RESULT DreamOS::OnDataChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	CR(pDreamPeer->OnDataChannel());
+
+	{
+		long userID = GetUserID();
+		long peerUserID = pPeerConnection->GetPeerUserID();
+
+		// Initialize handshake - only add user when peer connection stabilized 
+		PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
+		CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
+
+		pDreamPeer->SentHandshakeRequest();
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnAudioChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	CR(pDreamPeer->OnAudioChannel());
+
+Error:
+	return r;
+}
+
 RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -158,15 +193,21 @@ RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor,
 	// Create a new peer
 	auto pDreamPeer = CreateNewPeer(pPeerConnection);
 	CN(pDreamPeer);
-
-	{
-		// Initialize handshake - only add user when peer connection stabilized 
-		PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
-		CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
-
-		pDreamPeer->SentHandshakeRequest();
-	}
+	CR(pDreamPeer->RegisterDreamPeerObserver(this));
 	
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnDreamPeerStateChange(DreamPeer* pDreamPeer) {
+	RESULT r = R_PASS;
+
+	switch (pDreamPeer->GetState()) {
+		case DreamPeer::state::ESTABLISHED: {
+			CR(OnNewDreamPeer(pDreamPeer->GetPeerConnection()));
+		} break;
+	}
+
 Error:
 	return r;
 }
@@ -236,9 +277,11 @@ RESULT DreamOS::HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, Peer
 
 		pDreamPeer->SentHandshakeACK();
 
+		/*
 		if (pDreamPeer->IsPeerReady()) {
 			int a = 5;
 		}
+		*/
 	}
 
 Error:
@@ -281,9 +324,11 @@ RESULT DreamOS::HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMes
 		case PeerAckMessage::type::PEER_HANDSHAKE: {
 			pDreamPeer->ReceivedHandshakeACK();
 
+			/*
 			if (pDreamPeer->IsPeerReady()) {
 				int a = 5;
 			}
+			*/
 		} break;
 
 		case PeerAckMessage::type::PEER_STAY_ALIVE: {

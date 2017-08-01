@@ -887,3 +887,25 @@ RESULT EnvironmentController::OnAudioData(PeerConnection* pPeerConnection, const
 Error:
 	return r;
 }
+
+RESULT EnvironmentController::OnDataChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnDataChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnAudioChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnAudioChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}

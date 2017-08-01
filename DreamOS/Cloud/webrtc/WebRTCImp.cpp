@@ -312,6 +312,18 @@ Error:
 	return r;
 }
 
+
+RESULT WebRTCImp::OnAudioChannel(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnAudioChannel(peerConnectionID));
+	}
+
+Error:
+	return r;
+}
+
 RESULT WebRTCImp::OnAudioData(long peerConnectionID,
 	const void* audio_data,
 	int bits_per_sample,

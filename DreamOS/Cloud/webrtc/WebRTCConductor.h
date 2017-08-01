@@ -43,6 +43,7 @@ public:
 
 		virtual RESULT OnRenegotiationNeeded(long peerConnectionID) = 0;
 		virtual RESULT OnDataChannel(long peerConnectionID) = 0;
+		virtual RESULT OnAudioChannel(long peerConnectionID) = 0;
 
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;

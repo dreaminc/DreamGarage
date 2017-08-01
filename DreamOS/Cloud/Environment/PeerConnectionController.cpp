@@ -264,13 +264,14 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;
 
+		// New peer connection (from server)
+		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection));
+
 		// Initialize SDP Peer Connection and Offer
 		CN(m_pWebRTCImp);
 		//m_pWebRTCImp->InitializePeerConnection(true);
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
 
-		// This is now moved to WebRTC connection stable
-		//CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection));
 	}
 	else if (strMethod == "set_offer") {
 		LOG(ERROR) << "(cloud) set offer should not be a request";
@@ -293,6 +294,9 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;	
+		
+		// New peer connection (from server)
+		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection));
 
 		std::string strSDPOffer = pPeerConnection->GetSDPOffer();
 
@@ -302,8 +306,6 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, false);
 		CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
 
-		// This is now moved to WebRTC connection stable (maybe not do it this way - add connection stable separately) 
-		//CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection));
 	}
 	else if (strMethod == "set_offer_candidates") {
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
@@ -572,8 +574,23 @@ RESULT PeerConnectionController::OnDataChannel(long peerConnectionID) {
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
-	// Peer connection valid on data channel connected 
-	CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		CR(m_pPeerConnectionControllerObserver->OnDataChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnAudioChannel(long peerConnectionID) {
+	RESULT r = R_PASS;
+	
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		CR(m_pPeerConnectionControllerObserver->OnAudioChannel(pPeerConnection));
+	}
 
 Error:
 	return r;

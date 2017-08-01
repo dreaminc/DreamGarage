@@ -101,7 +101,7 @@ RESULT WebRTCPeerConnection::AddStreams() {
 
 	pMediaStreamInterface = m_pWebRTCPeerConnectionFactory->CreateLocalMediaStream(kStreamLabel);
 
-	//CR(AddAudioStream(pMediaStreamInterface));
+	CR(AddAudioStream(pMediaStreamInterface));
 
 	// Add streams
 	if (!m_pWebRTCPeerConnectionInterface->AddStream(pMediaStreamInterface)) {
@@ -215,30 +215,31 @@ std::list<WebRTCICECandidate> WebRTCPeerConnection::GetICECandidates() {
 
 // PeerConnectionObserver Interface
 void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
+	
 	DEBUG_LINEOUT("OnAddStream: %s", pMediaStreamInterface->label().c_str());
-	LOG(INFO) << "added " << pMediaStreamInterface->label() << " me=" << m_peerConnectionID;
+	LOG(INFO) << "Added " << pMediaStreamInterface->label() << " me=" << m_peerConnectionID;
 
 	if (!pMediaStreamInterface) {
-		LOG(ERROR) << "cannot add stream";
+		LOG(ERROR) << "Cannot add stream";
 		DEBUG_LINEOUT("Cannot add stream");
 		return;
 	}
 
 	if (!pMediaStreamInterface->FindAudioTrack(kAudioLabel)) {
-		LOG(ERROR) << "cannot FindAudioTrack";
+		LOG(ERROR) << "Cannot FindAudioTrack";
 		DEBUG_LINEOUT("Cannot FindAudioTrack");
 		return;
 	}
 
 	if (!pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()) {
-		LOG(ERROR) << "cannot GetSource";
+		LOG(ERROR) << "Cannot GetSource";
 		DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
 		return;
 	}
 
 	pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->AddSink(this);
 
-	LOG(INFO) << "added sink";
+	LOG(INFO) << "Added sink";
 	DEBUG_LINEOUT("Added Sink");
 
 	if (m_pParentObserver != nullptr) {

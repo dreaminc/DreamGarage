@@ -48,6 +48,7 @@ public:
 		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 		virtual RESULT OnRenegotiationNeeded(long peerConnectionID) = 0;
 		virtual RESULT OnDataChannel(long peerConnectionID) = 0;
+		virtual RESULT OnAudioChannel(long peerConnectionID) = 0;
 	};
 
 public:
@@ -109,6 +110,7 @@ protected:
 	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnRenegotiationNeeded(long peerConnectionID) override;
 	virtual RESULT OnDataChannel(long peerConnectionID) override;
+	virtual RESULT OnAudioChannel(long peerConnectionID) override;
 
 protected:
 	// WebRTC Specific

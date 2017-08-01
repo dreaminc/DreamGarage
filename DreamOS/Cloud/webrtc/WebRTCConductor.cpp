@@ -372,12 +372,17 @@ RESULT WebRTCConductor::OnRenegotiationNeeded(long peerConnectionID) {
 }
 
 RESULT WebRTCConductor::OnAddStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) {
-	// TODO: 
-	//if (m_pParentObserver != nullptr) {
-	//	return m_pParentObserver->OnAddStream(peerConnectionID);
-	//}
+	RESULT r = R_PASS;
 
-	return R_NOT_HANDLED;
+	//if (pMediaStream->label() == kAudioLabel) {
+
+	if(pMediaStream->FindAudioTrack(kAudioLabel)) {
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnAudioChannel(peerConnectionID);
+		}
+	}
+
+	return r;
 }
 
 RESULT WebRTCConductor::OnRemoveStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) {

@@ -53,7 +53,8 @@ class DreamOS :
 	public Subscriber<CollisionObjectEvent>, 
 	public valid,
 	public CloudController::PeerConnectionObserver,
-	public CloudController::EnvironmentObserver
+	public CloudController::EnvironmentObserver,
+	public DreamPeer::DreamPeerObserver
 {
 	friend class CloudTestSuite;
 
@@ -88,11 +89,17 @@ public:
 	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
 	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
+	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
+
 
 	// EnvironmentObserver
 	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
 		return R_NOT_IMPLEMENTED;
 	}
+
+	// DreamPeer Observer
+	virtual RESULT OnDreamPeerStateChange(DreamPeer* pDreamPeer) override;
 
 	// Cloud Controller Hooks
 	virtual RESULT OnNewDreamPeer(PeerConnection *pPeerConnection) = 0;

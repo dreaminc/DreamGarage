@@ -285,6 +285,28 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnDataChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnDataChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnAudioChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnAudioChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
 	RESULT r = R_PASS;
 

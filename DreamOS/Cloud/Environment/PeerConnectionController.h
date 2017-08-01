@@ -37,6 +37,9 @@ public:
 		virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 
+		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
+
 		virtual long GetUserID() = 0;
 	};
 
@@ -100,6 +103,7 @@ public:
 	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnRenegotiationNeeded(long peerConnectionID) override;
 	virtual RESULT OnDataChannel(long peerConnectionID) override;
+	virtual RESULT OnAudioChannel(long peerConnectionID) override;
 
 	RESULT SendDataChannelStringMessage(int peerID, std::string& strMessage);
 	RESULT SendDataChannelMessage(int peerID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
