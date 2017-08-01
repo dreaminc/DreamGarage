@@ -40,6 +40,12 @@ public:
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 
+		virtual RESULT OnRenegotiationNeeded(long peerConnectionID) = 0;
+		virtual RESULT OnAddStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) = 0;
+		virtual RESULT OnRemoveStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) = 0;
+		virtual RESULT OnDataChannel(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) = 0;
+		virtual RESULT OnDataChannelStateChange(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) = 0;
+
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 
@@ -78,6 +84,7 @@ protected:
 	virtual void OnIceConnectionReceivingChange(bool fReceiving) override;
 
 	// DataChannelObserver Implementation
+	// Need to create a separate WebRTCDataChannel object
 	virtual void OnStateChange() override;
 	virtual void OnMessage(const webrtc::DataBuffer& buffer) override;
 	virtual void OnBufferedAmountChange(uint64_t previous_amount) override  {};

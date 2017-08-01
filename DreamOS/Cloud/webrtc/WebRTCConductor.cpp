@@ -363,6 +363,49 @@ RESULT WebRTCConductor::OnDataChannelMessage(long peerConnectionID, uint8_t *pDa
 	return R_NOT_HANDLED;
 }
 
+RESULT WebRTCConductor::OnRenegotiationNeeded(long peerConnectionID) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnRenegotiationNeeded(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnAddStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) {
+	// TODO: 
+	//if (m_pParentObserver != nullptr) {
+	//	return m_pParentObserver->OnAddStream(peerConnectionID);
+	//}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnRemoveStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) {
+	// TODO: 
+	//if (m_pParentObserver != nullptr) {
+	//	return m_pParentObserver->OnRemoveStream(peerConnectionID);
+	//}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnDataChannel(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnDataChannel(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnDataChannelStateChange(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) {
+	// TODO: 
+	//if (m_pParentObserver != nullptr) {
+	//	return m_pParentObserver->OnDataChannelStateChange(peerConnectionID);
+	//}
+
+	return R_NOT_HANDLED;
+}
+
 User WebRTCConductor::GetUser() {
 	return m_pParentObserver->GetUser();
 }

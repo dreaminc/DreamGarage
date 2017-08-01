@@ -214,48 +214,54 @@ std::list<WebRTCICECandidate> WebRTCPeerConnection::GetICECandidates() {
 
 
 // PeerConnectionObserver Interface
-void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
-	DEBUG_LINEOUT("OnAddStream: %s", stream->label().c_str());
-	LOG(INFO) << "added " << stream->label() << " me=" << m_peerConnectionID;
+void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
+	DEBUG_LINEOUT("OnAddStream: %s", pMediaStreamInterface->label().c_str());
+	LOG(INFO) << "added " << pMediaStreamInterface->label() << " me=" << m_peerConnectionID;
 
-	if (!stream) {
+	if (!pMediaStreamInterface) {
 		LOG(ERROR) << "cannot add stream";
 		DEBUG_LINEOUT("Cannot add stream");
 		return;
 	}
 
-	if (!stream->FindAudioTrack(kAudioLabel)) {
+	if (!pMediaStreamInterface->FindAudioTrack(kAudioLabel)) {
 		LOG(ERROR) << "cannot FindAudioTrack";
 		DEBUG_LINEOUT("Cannot FindAudioTrack");
 		return;
 	}
 
-	if (!stream->FindAudioTrack(kAudioLabel)->GetSource()) {
+	if (!pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()) {
 		LOG(ERROR) << "cannot GetSource";
 		DEBUG_LINEOUT("Cannot AudioTrackInterface::GetSource");
 		return;
 	}
 
-	stream->FindAudioTrack(kAudioLabel)->GetSource()->AddSink(this);
+	pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->AddSink(this);
 
 	LOG(INFO) << "added sink";
 	DEBUG_LINEOUT("Added Sink");
 
-	// TODO:
-	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_STREAM_ADDED, stream.release());
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnAddStream(m_peerConnectionID, pMediaStreamInterface);
+	}
 }
 
-void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
-	DEBUG_LINEOUT("OnRemoveStream: %s", stream->label().c_str());
-	LOG(INFO) << "OnRemoveStream: " << stream->label();
+void WebRTCPeerConnection::OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
+	DEBUG_LINEOUT("OnRemoveStream: %s", pMediaStreamInterface->label().c_str());
+	LOG(INFO) << "OnRemoveStream: " << pMediaStreamInterface->label();
 
-	// TODO:
-	// m_pParentWebRTCImp->QueueUIThreadCallback(STREAM_REMOVED, stream.release());
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnRemoveStream(m_peerConnectionID, pMediaStreamInterface);
+	}
 }
 
 void WebRTCPeerConnection::OnRenegotiationNeeded() {
 	DEBUG_LINEOUT("OnRenegotiationNeeded");
 	LOG(INFO) << "OnRenegotiationNeeded";
+
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnRenegotiationNeeded(m_peerConnectionID);
+	}
 
 	return;
 }
@@ -273,6 +279,10 @@ void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelI
 	// m_pParentWebRTCImp->QueueUIThreadCallback(NEW_DATA, stream.release());
 
 	pDataChannelInterface->RegisterObserver(this);
+
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnDataChannel(m_peerConnectionID, pDataChannelInterface);
+	}
 }
 
 void WebRTCPeerConnection::OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
@@ -477,7 +487,8 @@ std::string GetDataStateString(webrtc::DataChannelInterface::DataState state) {
 void WebRTCPeerConnection::OnStateChange() {
 	RESULT r = R_PASS;
 
-	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	// TODO: Support multiple data channels
+	//auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
 	//CN(pWebRTCDataChannel);
 	CN(m_pDataChannelInterface);
 
@@ -503,7 +514,10 @@ void WebRTCPeerConnection::OnStateChange() {
 			int a = 5;
 		} break;
 	}
-		
+
+	if (m_pParentObserver != nullptr) {
+		m_pParentObserver->OnDataChannelStateChange(m_peerConnectionID, m_pDataChannelInterface);
+	}
 
 Error:
 	return;

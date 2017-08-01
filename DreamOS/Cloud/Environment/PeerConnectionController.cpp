@@ -543,7 +543,7 @@ RESULT PeerConnectionController::OnIceConnectionChange(long peerConnectionID, We
 
 	switch (webRTCIceConnectionState) {
 		case WebRTCIceConnection::state::CONNECTED: {
-			CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+			//CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
 		} break;
 
 		default: {
@@ -557,6 +557,23 @@ RESULT PeerConnectionController::OnIceConnectionChange(long peerConnectionID, We
 		m_pPeerConnectionControllerObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState);
 	}
 	*/
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnRenegotiationNeeded(long peerConnectionID) {
+	return R_NOT_HANDLED;
+}
+
+RESULT PeerConnectionController::OnDataChannel(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	// Peer connection valid on data channel connected 
+	CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
 
 Error:
 	return r;

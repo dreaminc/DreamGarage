@@ -27,7 +27,11 @@ public:
 	};
 
 	struct PeerConnectionState {
-		unsigned fPendingHandshakeAck : 1;
+		unsigned fSentHandshakeRequest : 1;
+		unsigned fReceivedHandshakeAck : 1;
+		unsigned fReceivedHandshakeRequest : 1;
+		unsigned fSentHandshakeRequestACK : 1;
+
 		unsigned fReceivedAndRespondedToHandshake : 1;
 
 		// Hang detection
@@ -39,6 +43,14 @@ public:
 	DreamPeer::DreamPeer(DreamOS *pDOS, PeerConnection *pPeerConnection);
 
 	RESULT Initialize();
+
+	RESULT SentHandshakeRequest();
+	RESULT ReceivedHandshakeACK();
+	RESULT SentHandshakeACK();
+	RESULT ReceivedHandshakeRequest();
+
+	RESULT UpdatePeerHandshakeState();
+	bool IsPeerReady();
 
 	DreamPeer::state GetState();
 	long GetPeerUserID();

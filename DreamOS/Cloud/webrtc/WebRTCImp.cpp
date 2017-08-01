@@ -290,6 +290,28 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::OnRenegotiationNeeded(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnRenegotiationNeeded(peerConnectionID));
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnDataChannel(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnDataChannel(peerConnectionID));
+	}
+
+Error:
+	return r;
+}
+
 RESULT WebRTCImp::OnAudioData(long peerConnectionID,
 	const void* audio_data,
 	int bits_per_sample,

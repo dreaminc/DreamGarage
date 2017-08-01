@@ -155,9 +155,17 @@ RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor,
 
 	//CR(OnNewDreamPeer(pPeerConnection));
 
-	// Initialize handshake - only add user when peer connection stabilized 
-	PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
-	CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
+	// Create a new peer
+	auto pDreamPeer = CreateNewPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	{
+		// Initialize handshake - only add user when peer connection stabilized 
+		PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
+		CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
+
+		pDreamPeer->SentHandshakeRequest();
+	}
 	
 Error:
 	return r;
@@ -214,8 +222,24 @@ Error:
 RESULT DreamOS::HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, PeerHandshakeMessage *pPeerHandshakeMessage) {
 	RESULT r = R_PASS;
 
-	//TODO:
-	CR(r);
+	// Retrieve peer
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	long userID = GetUserID();
+	long peerUserID = pPeerConnection->GetPeerUserID();
+
+	{
+		// ACK the handshake
+		PeerAckMessage peerHandshakeMessageAck(userID, peerUserID, PeerAckMessage::type::PEER_HANDSHAKE);
+		CR(SendDataMessage(peerUserID, &peerHandshakeMessageAck));
+
+		pDreamPeer->SentHandshakeACK();
+
+		if (pDreamPeer->IsPeerReady()) {
+			int a = 5;
+		}
+	}
 
 Error:
 	return r;
@@ -224,8 +248,20 @@ Error:
 RESULT DreamOS::HandlePeerStayAliveMessage(PeerConnection* pPeerConnection, PeerStayAliveMessage *pPeerStayAliveMessage) {
 	RESULT r = R_PASS;
 
-	//TODO: 
-	CR(r);
+	// Retrieve peer
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	CB((pDreamPeer->IsPeerReady()));
+
+	{
+		long userID = GetUserID();
+		long peerUserID = pPeerConnection->GetPeerUserID();
+
+		// Initialize handshake - only add user when peer connection stabilized 
+		PeerAckMessage peerHandshakeMessageAck(userID, peerUserID, PeerAckMessage::type::PEER_STAY_ALIVE);
+		CR(SendDataMessage(peerUserID, &peerHandshakeMessageAck));
+	}
 
 Error:
 	return r;
@@ -234,16 +270,37 @@ Error:
 RESULT DreamOS::HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage) {
 	RESULT r = R_PASS;
 
-	// TODO: 
-	CR(r);
+	// Retrieve peer
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	long userID = GetUserID();
+	long peerUserID = pPeerConnection->GetPeerUserID();
+
+	switch (pPeerAckMessage->GetACKType()) {
+		case PeerAckMessage::type::PEER_HANDSHAKE: {
+			pDreamPeer->ReceivedHandshakeACK();
+
+			if (pDreamPeer->IsPeerReady()) {
+				int a = 5;
+			}
+		} break;
+
+		case PeerAckMessage::type::PEER_STAY_ALIVE: {
+			// TODO: update the stay alive
+		} break;
+
+		default: {
+			// TODO: ?
+		} break;
+	}
 
 Error:
 	return r;
 }
 
-RESULT DreamOS::CreateNewPeer(PeerConnection *pPeerConnection) {
+std::shared_ptr<DreamPeer> DreamOS::CreateNewPeer(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
-
 	std::shared_ptr<DreamPeer> pDreamPeer = nullptr;
 
 	long peerUserID = pPeerConnection->GetPeerUserID();
@@ -257,8 +314,18 @@ RESULT DreamOS::CreateNewPeer(PeerConnection *pPeerConnection) {
 	// Set map
 	m_dreamPeers[peerUserID] = pDreamPeer;
 
+	return pDreamPeer;
+
 Error:
-	return r;
+	if (pDreamPeer != nullptr) {
+		pDreamPeer = nullptr;
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<DreamPeer> DreamOS::FindPeer(PeerConnection *pPeerConnection) {
+	return FindPeer(pPeerConnection->GetPeerUserID());
 }
 
 std::shared_ptr<DreamPeer> DreamOS::FindPeer(long peerUserID) {

@@ -104,8 +104,9 @@ public:
 	RESULT HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage);
 
 private:
-	RESULT CreateNewPeer(PeerConnection *pPeerConnection);
+	std::shared_ptr<DreamPeer> CreateNewPeer(PeerConnection *pPeerConnection);
 	std::shared_ptr<DreamPeer> FindPeer(long peerUserID);
+	std::shared_ptr<DreamPeer> FindPeer(PeerConnection *pPeerConnection);
 	RESULT RemovePeer(long peerUserID);
 	RESULT RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer);
 	DreamPeer::state GetPeerState(long peerUserID);

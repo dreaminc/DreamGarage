@@ -26,7 +26,8 @@ private:
 
 public:
 	PeerAckMessage(long senderUserID, long receiverUserID, PeerAckMessage::type ackType ) :
-		DreamMessage(senderUserID, receiverUserID, DreamMessage::type::PEER_ACK, sizeof(PeerAckMessage))
+		DreamMessage(senderUserID, receiverUserID, DreamMessage::type::PEER_ACK, sizeof(PeerAckMessage)),
+		m_ackType(ackType)
 	{
 		// empty
 	}
