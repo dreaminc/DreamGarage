@@ -67,7 +67,7 @@ user* DreamPeer::GetUserModel() {
 RESULT DreamPeer::AssignUserModel(user* pUserModel) {
 	RESULT r = R_PASS;
 
-	CBN(pUserModel);
+	CBN(m_pUserModel);
 	m_pUserModel = pUserModel;
 
 Error:

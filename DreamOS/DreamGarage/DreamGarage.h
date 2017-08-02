@@ -51,6 +51,7 @@ public:
 
 	RESULT GetRoundtablePosition(int index, point &ptPosition, float &rotationAngle);
 	RESULT SetRoundtablePosition(int index);
+	RESULT SetRoundtablePosition(DreamPeer *pDreamPeer, int seatingPosition);
 
 	// PeerConnectionObserver
 	//virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;

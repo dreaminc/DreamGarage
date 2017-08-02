@@ -143,7 +143,7 @@ RESULT DreamGarage::SetupUserModelPool() {
 		m_usersModelPool[i].second->SetVisible(false);
 	}
 
-Error:
+//Error:
 	return r;
 }
 
@@ -533,6 +533,21 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::SetRoundtablePosition(DreamPeer *pDreamPeer, int seatingPosition) {
+	RESULT r = R_PASS;
+
+	point ptSeatPosition;
+	float angleRotation;
+
+	CR(GetRoundtablePosition(seatingPosition, ptSeatPosition, angleRotation));
+
+	pDreamPeer->GetUserModel()->RotateYByDeg(angleRotation);
+	pDreamPeer->SetPosition(ptSeatPosition);
+
+Error:
+	return r;
+}
+
 // Cloud Controller
 
 RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
@@ -567,16 +582,9 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
 	}
 	//*/
 
-	// Assign Model From Pool
-	//CR()
+	// Assign Model From Pool and position peer
 	CR(AllocateAndAssignUserModelFromPool(pDreamPeer));
-
-	point ptSeatPosition;
-	float angleRotation;
-
-	CR(GetRoundtablePosition(remoteSeatingPosition, ptSeatPosition, angleRotation));
-	pDreamPeer->GetUserModel()->RotateYByDeg(angleRotation);
-	pDreamPeer->SetPosition(ptSeatPosition);
+	CR(SetRoundtablePosition(pDreamPeer, remoteSeatingPosition));
 	pDreamPeer->SetVisible();
 
 	// Turn on sound
@@ -585,8 +593,6 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
 	if (pWebRTCPeerConnectionProxy != nullptr) {
 		pWebRTCPeerConnectionProxy->SetAudioVolume(10.0f);
 	}
-
-	CR(r);
 
 Error:
 	return r;

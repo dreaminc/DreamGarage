@@ -10,10 +10,14 @@
 
 #include "Primitives/DObject.h"
 
+#include "Primitives/point.h"
+#include "Primitives/quaternion.h"
+
 class User;
 class PeerConnection;
 class composite;
 class DreamOS;
+class user;
 
 class WebRTCPeerConnectionProxy;
 
