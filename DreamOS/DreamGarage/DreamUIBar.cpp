@@ -106,7 +106,18 @@ RESULT DreamUIBar::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 	RESULT r = R_PASS;
+	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
+	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
+	GetDOS()->CaptureObject(
+	//	pSelected->GetSurface().get(), 
+		pSelected,
+		pSelected->GetInteractionObject(), 
+		pSelected->GetContactPoint(), 
+		vector(0.0f, 0.0f, -1.0f), 
+		0.1f);
+
+Error:
 	return r;
 }
 
@@ -125,46 +136,46 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	auto pItemsView = m_pScrollView->GetMenuItemsView();
 
-auto pKeyboard = GetDOS()->GetKeyboard();
-CN(pKeyboard);
+	auto pKeyboard = GetDOS()->GetKeyboard();
+	CN(pKeyboard);
 
-CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
-CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
+	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
+	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
 
 
-if (m_pathStack.empty()) {
-	m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
-	m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
-	UpdateCompositeWithHands(m_menuHeight);
-	GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight, m_menuDepth);
-}
-else {
-	m_pathStack.pop();
-	if (pKeyboard->IsVisible()) pKeyboard->HideKeyboard();
-
-	if (!m_pathStack.empty()) {
-		auto pNode = m_pathStack.top();
-		if (pNode->GetTitle() == "Share") {
-			m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
-		}
-		else {
-			auto strURI = pNode->GetThumbnailURL();
-			if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
-				MenuNode* pTempMenuNode = new MenuNode(pNode->GetNodeType(), pNode->GetPath(), pNode->GetScope(), pNode->GetTitle(), pNode->GetMIMEType());
-				pTempMenuNode->SetName("root_menu_title");
-				CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
-			}
-		}
-
-		SelectMenuItem();
-		m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
+	if (m_pathStack.empty()) {
+		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
+		m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+		UpdateCompositeWithHands(m_menuHeight);
+		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight, m_menuDepth);
 	}
 	else {
-		CR(HideMenu());
+		m_pathStack.pop();
+		if (pKeyboard->IsVisible()) pKeyboard->HideKeyboard();
+
+		if (!m_pathStack.empty()) {
+			auto pNode = m_pathStack.top();
+			if (pNode->GetTitle() == "Share") {
+				m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+			}
+			else {
+				auto strURI = pNode->GetThumbnailURL();
+				if (strURI != "") {// && pSubMenuNode->MimeTypeFromString(pSubMenuNode->GetMIMEType()) == MenuNode::MimeType::IMAGE_PNG) {
+					MenuNode* pTempMenuNode = new MenuNode(pNode->GetNodeType(), pNode->GetPath(), pNode->GetScope(), pNode->GetTitle(), pNode->GetMIMEType());
+					pTempMenuNode->SetName("root_menu_title");
+					CR(m_pHTTPControllerProxy->RequestFile(strURI, GetStringHeaders(), "", std::bind(&DreamUIBar::HandleOnFileResponse, this, std::placeholders::_1, std::placeholders::_2), pTempMenuNode));
+				}
+			}
+
+			SelectMenuItem();
+			m_pMenuControllerProxy->RequestSubMenu(pNode->GetScope(), pNode->GetPath(), pNode->GetTitle());
+		}
+		else {
+			CR(HideMenu());
+		}
 	}
-}
 Error:
-return r;
+	return r;
 }
 
 RESULT DreamUIBar::HandleSelect(void* pContext) {
@@ -174,6 +185,9 @@ RESULT DreamUIBar::HandleSelect(void* pContext) {
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
+
+	GetDOS()->ReleaseObjects(m_pLeftMallet->GetMalletHead());
+	GetDOS()->ReleaseObjects(m_pRightMallet->GetMalletHead());
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
 	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
@@ -373,8 +387,15 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 			pButton->Update(iconFormat, labelFormat);
 
-			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
+			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
+			//*
+			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
+				std::bind(&DreamUIBar::HandleTouchStart, this, std::placeholders::_1)));
+			CR(pButton->RegisterEvent(UIEventType::UI_SELECT_TRIGGER,
 				std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
+				//*/
+			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
+			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
 			pButtons.emplace_back(pButton);
 		}

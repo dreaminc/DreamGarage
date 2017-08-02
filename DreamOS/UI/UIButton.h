@@ -22,6 +22,7 @@ public:
 	std::shared_ptr<composite> GetSurfaceComposite();
 	std::shared_ptr<quad> GetSurface();
 	VirtualObj *GetInteractionObject();
+	point GetContactPoint();
 
 protected:
 	// objects (TODO: could be in subclass)
@@ -38,6 +39,7 @@ protected:
 	std::map<UIEventType, std::function<RESULT(void*)>> m_callbacks;
 
 	VirtualObj *m_pInteractionObject = nullptr; // set on UIEvents since the button is the context for the callbacks
+	point m_ptContact;
 };
 
 #endif // ! UI_BUTTON_H_

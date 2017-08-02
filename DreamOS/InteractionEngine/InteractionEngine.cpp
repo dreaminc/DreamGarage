@@ -326,13 +326,18 @@ Error:
 RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
 	RESULT r = R_PASS;
 
-	plane planeContext(pObject->GetPosition(), vDirection);
+	plane planeContext(pObject->GetPosition(true), vDirection);
 
 	CaptureObj *cObj = new CaptureObj();
 	cObj->pObj = pObject;
 	cObj->threshold = threshold;
 	cObj->planeContext = planeContext;
-	cObj->ptOffset = pInteractionObject->GetPosition(true) - ptContact;
+	//cObj->ptOffset = ptContact;
+	//cObj->ptOffset = pInteractionObject->GetPosition(true) - ptContact;
+	//cObj->ptOffset = (ptContact - pInteractionObject->GetPosition(true)) + (ptContact - pObject->GetPosition(true));
+	cObj->ptOffset = pInteractionObject->GetPosition(true) - pObject->GetPosition(true);
+	//cObj->ptOffset = ptContact - pObject->GetPosition(true);
+
 
 //	CR(RemoveInteractionObject(pObject));
 
@@ -616,6 +621,8 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 //				for (auto &pCaptureObj : m_capturedObjects[pInteractionObject]) {
 				auto &pCaptureObj = m_capturedObjects[pInteractionObject];
 				point ptObj = pInteractionObject->GetPosition(true) - pCaptureObj->ptOffset;
+				//point ptObj = pInteractionObject->GetPosition(true) + pCaptureObj->planeContext.GetPosition() + pCaptureObj->ptOffset;
+				//point ptObj = pCaptureObj->ptOffset;
 				point ptCap = pCaptureObj->pObj->GetPosition(true);
 
 				vector vDiff = ptObj - ptCap;
@@ -630,12 +637,14 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 					captureObjectsToRemove.push_back(pInteractionObject);
 				}
 				else {
+					//vector vProj = vDirection * (vOriginDot);
 					vector vProj = vDirection * (vDot);
 
+					//pCaptureObj->pObj->SetPosition(pCaptureObj->planeContext.GetPosition() + vProj);
 					pCaptureObj->pObj->SetPosition(pCaptureObj->pObj->GetPosition() + vProj);
 
 					plane planeCapture = pCaptureObj->planeContext;
-					vector vDistance = pCaptureObj->pObj->GetPosition() - planeCapture.GetPosition();
+					vector vDistance = pCaptureObj->pObj->GetPosition(true) - planeCapture.GetPosition();
 
 					if (vDistance.magnitude() > (pCaptureObj->threshold)) { 
 					//	ReleaseObject(pCaptureObj, pInteractionObject);

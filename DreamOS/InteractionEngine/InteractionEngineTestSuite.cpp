@@ -141,7 +141,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 
 			if (pDimObj != nullptr) {
-				pDimObj->RotateZByDeg(15.0f);
+				//pDimObj->RotateZByDeg(15.0f);
 				pDimObj->SetColor(COLOR_BLUE);
 				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), 0.1f);
 			}
@@ -152,7 +152,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 
 			if (pDimObj != nullptr) {
-				pDimObj->RotateZByDeg(15.0f);
+				//pDimObj->RotateZByDeg(15.0f);
 				pDimObj->SetColor(COLOR_GREEN);
 			}
 			m_pDreamOS->ReleaseObjects(mEvent->m_pInteractionObject);
@@ -169,7 +169,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 
 			if (pDimObj != nullptr) {
 				//pDimObj->ResetRotation();
-				pDimObj->RotateZByDeg(-15.0f);
+				//pDimObj->RotateZByDeg(-15.0f);
 			}
 		} break;
 	}
@@ -211,9 +211,21 @@ RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
 			m_pDreamOS->AddInteractionObject(pCaptureContext->pLeftMallet->GetMalletHead());
 			m_pDreamOS->AddInteractionObject(pCaptureContext->pRightMallet->GetMalletHead());
 
-			auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
-			pQuad->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, -0.25f));
+			auto pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
+			pQuad->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, 0.0f));
 			pQuad->RotateXByDeg(90.0f);
+			pQuad->RotateYByDeg(0.0f);
+			//pQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+			pQuad->SetColor(COLOR_BLUE);
+			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+				CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad, (InteractionEventType)(i), this));
+				//CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
+			}
+
+			pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
+			pQuad->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(-0.5f, 1.0f, 0.0f));
+			pQuad->RotateXByDeg(90.0f);
+			pQuad->RotateYByDeg(-30.0f);
 			//pQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 			pQuad->SetColor(COLOR_BLUE);
 			//pQuad->InitializeOBB();

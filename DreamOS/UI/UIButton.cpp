@@ -56,10 +56,12 @@ RESULT UIButton::Notify(UIEvent *pEvent) {
 	RESULT r = R_PASS;
 
 	m_pInteractionObject = pEvent->m_pInteractionObject;
+	m_ptContact = pEvent->m_ptContact;
 
 	std::function<RESULT(void*)> fnCallback;
 
-	CBR(pEvent->m_pObj == m_pSurface.get(), R_SKIPPED);
+	CBR(pEvent->m_pObj == this || pEvent->m_pObj == GetSurface().get(), R_SKIPPED);
+	//CBR(pEvent->m_pObj == m_pSurface.get(), R_SKIPPED);
 	CBR(m_callbacks.count(pEvent->m_eventType) > 0, R_OBJECT_NOT_FOUND);
 
 	fnCallback = m_callbacks[pEvent->m_eventType];
@@ -85,4 +87,8 @@ std::shared_ptr<composite> UIButton::GetSurfaceComposite() {
 
 VirtualObj *UIButton::GetInteractionObject() {
 	return m_pInteractionObject;
+}
+
+point UIButton::GetContactPoint() {
+	return m_ptContact;
 }
