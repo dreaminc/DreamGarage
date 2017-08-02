@@ -79,6 +79,14 @@ public:
 
 	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy();
 
+	user* GetUserModel();
+	RESULT AssignUserModel(user* pUserModel);
+	RESULT ReleaseUserModel();
+
+	RESULT SetVisible(bool fVisibile = true);
+	RESULT SetPosition(point ptPosition);
+	RESULT SetOrientation(quaternion qOrientation);
+
 private:
 	RESULT SetState(DreamPeer::state peerState);
 
@@ -87,6 +95,7 @@ private:
 	DreamOS *m_pDOS = nullptr;
 	PeerConnection *m_pPeerConnection = nullptr;
 	DreamPeer::state m_state = DreamPeer::state::UNINITIALIZED;
+	user *m_pUserModel = nullptr;
 
 private:
 	PeerConnectionState m_peerConnectionState = {0};

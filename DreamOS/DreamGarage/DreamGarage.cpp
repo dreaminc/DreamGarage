@@ -134,6 +134,62 @@ Error:
 	return r;
 }
 
+RESULT DreamGarage::SetupUserModelPool() {
+	RESULT r = R_PASS;
+
+	// Set up user pool
+	for (int i = 0; i < MAX_PEERS; i++) {
+		m_usersModelPool[i] = std::make_pair<DreamPeer*, user*>(nullptr, AddUser());
+		m_usersModelPool[i].second->SetVisible(false);
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::AllocateAndAssignUserModelFromPool(DreamPeer *pDreamPeer) {
+	RESULT r = R_PASS;
+
+	for (auto& userModelPair : m_usersModelPool) {
+		if (userModelPair.first == nullptr) {
+			userModelPair.second->SetVisible(0.0f);
+			CR(pDreamPeer->AssignUserModel(userModelPair.second));
+
+			userModelPair.first = pDreamPeer;
+
+			return R_PASS;
+		}
+	}
+
+	return R_POOL_FULL;
+
+Error:
+	return r;
+}
+
+RESULT DreamGarage::UnallocateUserModelFromPool(DreamPeer *pDreamPeer) {
+	for (auto& userModelPair : m_usersModelPool) {
+		if (userModelPair.first == pDreamPeer) {
+			// release model and set to invisible
+			userModelPair.first = nullptr;
+			userModelPair.second->SetVisible(false);
+			return R_PASS;
+		}
+	}
+
+	return R_NOT_FOUND;
+}
+
+user* DreamGarage::FindUserModelInPool(DreamPeer *pDreamPeer) {
+	for (const auto& userModelPair : m_usersModelPool) {
+		if (userModelPair.first == pDreamPeer) {
+			return userModelPair.second;
+		}
+	}
+
+	return nullptr;
+}
+
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
@@ -156,14 +212,7 @@ RESULT DreamGarage::LoadScene() {
 	// Console
 	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::DreamApp, this);
 
-	/*
-	// TODO: switch to pool 
-	for (auto x : std::array<int, 8>()) {
-		user* pNewUser = AddUser();
-		pNewUser->SetVisible(false);
-		m_usersPool.push_back(pNewUser);
-	}
-	*/
+	CR(SetupUserModelPool());
 	
 	AddSkybox();
 
@@ -459,7 +508,7 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::SetRoundtablePosition(int index) {
+RESULT DreamGarage::SetRoundtablePosition(int seatingPosition) {
 	RESULT r = R_PASS;
 
 	stereocamera* pCamera = GetCamera();
@@ -467,8 +516,8 @@ RESULT DreamGarage::SetRoundtablePosition(int index) {
 	point ptSeatPosition;
 	float angleRotation;
 
-	CB((index < m_seatLookup.size()));
-	CR(GetRoundtablePosition(index, ptSeatPosition, angleRotation));
+	CB((seatingPosition < m_seatLookup.size()));
+	CR(GetRoundtablePosition(seatingPosition, ptSeatPosition, angleRotation));
 	
 	if (!pCamera->HasHMD()) {
 		pCamera->RotateYByDeg(angleRotation);
@@ -486,32 +535,49 @@ Error:
 
 // Cloud Controller
 
-RESULT DreamGarage::OnNewDreamPeer(PeerConnection *pPeerConnection) {
+RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
 	RESULT r = R_PASS;
 
 	///*
 	//int index = pPeerConnection->GetLoca
+	PeerConnection *pPeerConnection = pDreamPeer->GetPeerConnection();
+
 	bool fOfferor = (pPeerConnection->GetOfferUserID() == GetUserID());
 
-	long index = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
-	index -= 1;
+	// My seating position
+	long localSeatingPosition = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
+	localSeatingPosition -= 1;
+
+	// Remote seating position
+	long remoteSeatingPosition = (fOfferor) ? pPeerConnection->GetAnswererPosition() : pPeerConnection->GetOfferorPosition();
+	remoteSeatingPosition -= 1;
 
 	if (m_fSeated) {
-		LOG(INFO) << "HandlePeersUpdate already seated" << index;
+		LOG(INFO) << "HandlePeersUpdate already seated" << localSeatingPosition;
 		return R_PASS;
 	}
 
-	LOG(INFO) << "HandlePeersUpdate " << index;
-	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(index)).c_str());
+	LOG(INFO) << "HandlePeersUpdate " << localSeatingPosition;
+	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(localSeatingPosition)).c_str());
 
 	if (!m_fSeated) {
-		CBM((index < m_seatLookup.size()), "Peer index %d not supported by client", index);
-		CR(SetRoundtablePosition(index));
+		CBM((localSeatingPosition < m_seatLookup.size()), "Peer index %d not supported by client", localSeatingPosition);
+		CR(SetRoundtablePosition(localSeatingPosition));
 		m_fSeated = true;
 	}
 	//*/
 
-	// TODO: Model heads etc
+	// Assign Model From Pool
+	//CR()
+	CR(AllocateAndAssignUserModelFromPool(pDreamPeer));
+
+	point ptSeatPosition;
+	float angleRotation;
+
+	CR(GetRoundtablePosition(remoteSeatingPosition, ptSeatPosition, angleRotation));
+	pDreamPeer->GetUserModel()->RotateYByDeg(angleRotation);
+	pDreamPeer->SetPosition(ptSeatPosition);
+	pDreamPeer->SetVisible();
 
 	// Turn on sound
 	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = GetWebRTCPeerConnectionProxy(pPeerConnection);

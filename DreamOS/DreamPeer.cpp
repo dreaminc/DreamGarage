@@ -60,6 +60,64 @@ PeerConnection* DreamPeer::GetPeerConnection() {
 	return m_pPeerConnection;
 }
 
+user* DreamPeer::GetUserModel() {
+	return m_pUserModel;
+}
+
+RESULT DreamPeer::AssignUserModel(user* pUserModel) {
+	RESULT r = R_PASS;
+
+	CBN(pUserModel);
+	m_pUserModel = pUserModel;
+
+Error:
+	return r;
+}
+
+// TODO: We should create a proper object pool design
+RESULT DreamPeer::ReleaseUserModel() {
+	RESULT r = R_PASS;
+
+	CN(m_pUserModel);
+	m_pUserModel = nullptr;
+
+Error:
+	return r;
+}
+
+RESULT DreamPeer::SetVisible(bool fVisibile) {
+	RESULT r = R_PASS;
+
+	CN(m_pUserModel);
+
+	CR(m_pUserModel->SetVisible(fVisibile));
+
+Error:
+	return r;
+}
+
+RESULT DreamPeer::SetPosition(point ptPosition) {
+	RESULT r = R_PASS;
+
+	CN(m_pUserModel);
+
+	m_pUserModel->SetPosition(ptPosition);
+
+Error:
+	return r;
+}
+
+RESULT DreamPeer::SetOrientation(quaternion qOrientation) {
+	RESULT r = R_PASS;
+
+	CN(m_pUserModel);
+
+	m_pUserModel->SetOrientation(qOrientation);
+
+Error:
+	return r;
+}
+
 WebRTCPeerConnectionProxy* DreamPeer::GetWebRTCPeerConnectionProxy() {
 	RESULT r = R_PASS;
 

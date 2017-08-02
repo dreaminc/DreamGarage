@@ -18,6 +18,8 @@ class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
 
+#define MAX_PEERS 8
+
 class DreamGarage : public DreamOS, 
 				    public Subscriber<SenseKeyboardEvent>, 
 					public Subscriber<SenseTypingEvent>, 
@@ -59,7 +61,7 @@ public:
 
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
-	virtual RESULT OnNewDreamPeer(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnNewDreamPeer(DreamPeer *pDreamPeer) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 	// Environment
@@ -88,8 +90,17 @@ public:
 
 private:
 	//std::map<long, user*> m_peerUsers;
-	//std::vector<user*> m_usersPool;
+	// User Pool
 
+	RESULT SetupUserModelPool();
+	RESULT AllocateAndAssignUserModelFromPool(DreamPeer *pDreamPeer);
+	user* FindUserModelInPool(DreamPeer *pDreamPeer);
+	RESULT UnallocateUserModelFromPool(DreamPeer *pDreamPeer);
+
+	std::array<std::pair<DreamPeer*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeer*, user*>(nullptr, nullptr) };
+
+
+private:
 	bool m_fSeated = false;
 	float m_tick = 0.0f;
 	float m_seatPositioningRadius = 3.5f;

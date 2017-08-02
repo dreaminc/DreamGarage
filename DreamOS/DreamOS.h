@@ -102,7 +102,7 @@ public:
 	virtual RESULT OnDreamPeerStateChange(DreamPeer* pDreamPeer) override;
 
 	// Cloud Controller Hooks
-	virtual RESULT OnNewDreamPeer(PeerConnection *pPeerConnection) = 0;
+	virtual RESULT OnNewDreamPeer(DreamPeer *pDreamPeer) = 0;
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) = 0;
 
 	// Peers

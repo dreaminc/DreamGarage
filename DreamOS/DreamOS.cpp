@@ -220,7 +220,7 @@ RESULT DreamOS::OnDreamPeerStateChange(DreamPeer* pDreamPeer) {
 
 	switch (pDreamPeer->GetState()) {
 		case DreamPeer::state::ESTABLISHED: {
-			CR(OnNewDreamPeer(pDreamPeer->GetPeerConnection()));
+			CR(OnNewDreamPeer(pDreamPeer));
 		} break;
 	}
 
