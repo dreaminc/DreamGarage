@@ -22,13 +22,22 @@
 #include "Cloud/User/User.h"
 #include "Cloud/User/TwilioNTSInformation.h"
 
+#include "Primitives/Proxy.h"
+
 class WebRTCClient;
 class WebRTCICECandidate;
 class PeerConnection;
 
+class WebRTCImpProxy : public Proxy<WebRTCImpProxy> {
+public:
+	virtual WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) = 0;
+};
+
 class WebRTCImp : public CloudImp, 
 				  public std::enable_shared_from_this<WebRTCImp>, 
-				  public WebRTCConductor::WebRTCConductorObserver {
+				  public WebRTCConductor::WebRTCConductorObserver,
+				  public WebRTCImpProxy
+{
 public:
 	enum WindowMessages {
 		UI_THREAD_CALLBACK = WM_APP + 1,
@@ -73,6 +82,10 @@ public:
 	bool IsOfferer(long peerConnectionID);
 	bool IsAnswerer(long peerConnectionID);
 	std::list<WebRTCICECandidate> GetCandidates(long peerConnectionID);
+
+	// WebRTCImpProxy
+	virtual WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) override;
+	virtual WebRTCImpProxy *GetProxy() override;
 
 	// Functionality
 	// TODO: Hand around PeerConnection object instead of peerConnectionID?

@@ -199,6 +199,22 @@ Error:
 	return r;
 }
 
+WebRTCPeerConnectionProxy *DreamOS::GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = nullptr;
+
+	WebRTCImpProxy* pWebRTCProxy = (WebRTCImpProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::WEBRTC));
+	CN(pWebRTCProxy);
+
+	pWebRTCPeerConnectionProxy = pWebRTCProxy->GetWebRTCPeerConnectionProxy(pPeerConnection);
+	CN(pWebRTCPeerConnectionProxy);
+
+	return pWebRTCPeerConnectionProxy;
+
+Error:
+	return nullptr;
+}
+
 RESULT DreamOS::OnDreamPeerStateChange(DreamPeer* pDreamPeer) {
 	RESULT r = R_PASS;
 

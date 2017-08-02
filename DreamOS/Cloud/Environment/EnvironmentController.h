@@ -176,6 +176,7 @@ public:
 	// Environment Controller Proxy
 	EnvironmentControllerProxy* GetEnvironmentControllerProxy();
 	
+	WebRTCImpProxy* GetWebRTCControllerProxy();
 
 public:
 	EnvironmentController::state GetState() {

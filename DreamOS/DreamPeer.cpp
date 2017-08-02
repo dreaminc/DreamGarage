@@ -1,4 +1,5 @@
 #include "DreamPeer.h"
+#include "DreamOS.h"
 
 DreamPeer::DreamPeer(DreamOS *pDOS, PeerConnection *pPeerConnection) :
 	m_pDOS(pDOS),
@@ -57,6 +58,20 @@ long DreamPeer::GetPeerUserID() {
 
 PeerConnection* DreamPeer::GetPeerConnection() {
 	return m_pPeerConnection;
+}
+
+WebRTCPeerConnectionProxy* DreamPeer::GetWebRTCPeerConnectionProxy() {
+	RESULT r = R_PASS;
+
+	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = nullptr;
+
+	CN(m_pDOS);
+
+	pWebRTCPeerConnectionProxy = m_pDOS->GetWebRTCPeerConnectionProxy(m_pPeerConnection);
+
+	return pWebRTCPeerConnectionProxy;
+Error:
+	return nullptr;
 }
 
 bool DreamPeer::IsPeerReady() {

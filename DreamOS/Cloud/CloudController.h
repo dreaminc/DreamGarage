@@ -42,6 +42,7 @@ enum class CLOUD_CONTROLLER_TYPE {
 	MENU,
 	USER,
 	HTTP,
+	WEBRTC,
 	INVALID
 };
 
@@ -165,6 +166,7 @@ public:
 
 private:
 	MenuControllerProxy* GetMenuControllerProxy();
+	WebRTCImpProxy* GetWebRTCControllerProxy();
 	UserControllerProxy* GetUserControllerProxy();
 	HTTPControllerProxy* GetHTTPControllerProxy();
 	EnvironmentControllerProxy* GetEnvironmentControllerProxy();

@@ -116,6 +116,8 @@ public:
 	RESULT SetUser(User currentUser);
 	RESULT SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation);
 
+	WebRTCImpProxy* GetWebRTCControllerProxy();
+
 private:
 	RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection);
 

@@ -206,6 +206,14 @@ Error:
 }
 */
 
+WebRTCPeerConnectionProxy* WebRTCImp::GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) {
+	return m_pWebRTCConductor->GetWebRTCPeerConnectionProxy(pPeerConnection);
+}
+
+WebRTCImpProxy* WebRTCImp::GetProxy() {
+	return (WebRTCImpProxy*)(this);
+}
+
 RESULT WebRTCImp::AddOfferCandidates(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 

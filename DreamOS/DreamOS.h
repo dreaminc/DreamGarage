@@ -110,6 +110,8 @@ public:
 	RESULT HandlePeerStayAliveMessage(PeerConnection* pPeerConnection, PeerStayAliveMessage *pPeerStayAliveMessage);
 	RESULT HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage);
 
+	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection);
+
 protected:
 	std::shared_ptr<DreamPeer> CreateNewPeer(PeerConnection *pPeerConnection);
 	std::shared_ptr<DreamPeer> FindPeer(long peerUserID);

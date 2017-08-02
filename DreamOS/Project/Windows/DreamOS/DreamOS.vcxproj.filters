@@ -1718,6 +1718,9 @@
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCIceConnection.h">
       <Filter>Cloud\webrtc</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Proxy.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

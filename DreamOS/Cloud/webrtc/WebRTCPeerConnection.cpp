@@ -228,7 +228,7 @@ RESULT WebRTCPeerConnection::SetAudioVolume(double val) {
 		CN(pAudioTrack);
 
 		// Set volume
-		pAudioTrack->GetSource()->SetVolume(0.0f);
+		pAudioTrack->GetSource()->SetVolume(val);
 	}
 
 Error:

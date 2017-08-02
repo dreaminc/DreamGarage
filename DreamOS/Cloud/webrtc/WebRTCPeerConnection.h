@@ -16,14 +16,15 @@
 #include "WebRTCICECandidate.h"
 #include "WebRTCIceConnection.h"
 
+#include "Primitives/Proxy.h"
+
 class WebRTConductor;
 class User;
 class TwilioNTSInformation;
 
-class WebRTCPeerConnectionProxy {
+class WebRTCPeerConnectionProxy : public Proxy<WebRTCPeerConnectionProxy> {
 public:
 	virtual RESULT SetAudioVolume(double val) = 0;
-	virtual WebRTCPeerConnectionProxy* GetProxy() = 0;
 };
 
 class WebRTCPeerConnection : 

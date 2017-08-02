@@ -840,6 +840,13 @@ MenuControllerProxy* EnvironmentController::GetMenuControllerProxy() {
 	return nullptr;
 }
 
+WebRTCImpProxy* EnvironmentController::GetWebRTCControllerProxy() {
+	if (m_pPeerConnectionController != nullptr)
+		return m_pPeerConnectionController->GetWebRTCControllerProxy();
+
+	return nullptr;
+}
+
 EnvironmentControllerProxy* EnvironmentController::GetEnvironmentControllerProxy() {
 	return (EnvironmentControllerProxy*)(this);
 }

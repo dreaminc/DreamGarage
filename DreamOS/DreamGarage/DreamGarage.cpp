@@ -511,6 +511,15 @@ RESULT DreamGarage::OnNewDreamPeer(PeerConnection *pPeerConnection) {
 	}
 	//*/
 
+	// TODO: Model heads etc
+
+	// Turn on sound
+	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = GetWebRTCPeerConnectionProxy(pPeerConnection);
+
+	if (pWebRTCPeerConnectionProxy != nullptr) {
+		pWebRTCPeerConnectionProxy->SetAudioVolume(10.0f);
+	}
+
 	CR(r);
 
 Error:

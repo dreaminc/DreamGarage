@@ -709,3 +709,10 @@ RESULT PeerConnectionController::SetUser(User currentUser) {
 RESULT PeerConnectionController::SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) {
 	return m_pWebRTCImp->SetTwilioNTSInformation(twilioNTSInformation);
 }
+
+WebRTCImpProxy* PeerConnectionController::GetWebRTCControllerProxy() {
+	if (m_pWebRTCImp != nullptr)
+		return m_pWebRTCImp->GetProxy();
+
+	return nullptr;
+}

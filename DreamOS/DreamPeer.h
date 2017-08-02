@@ -15,6 +15,8 @@ class PeerConnection;
 class composite;
 class DreamOS;
 
+class WebRTCPeerConnectionProxy;
+
 class DreamPeer : public DObject {
 public:
 	enum class state : uint16_t {
@@ -74,6 +76,8 @@ public:
 	long GetPeerUserID();
 
 	PeerConnection *GetPeerConnection();
+
+	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy();
 
 private:
 	RESULT SetState(DreamPeer::state peerState);

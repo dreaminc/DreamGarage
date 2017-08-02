@@ -122,6 +122,8 @@ protected:
 	RESULT AddOfferCandidates(PeerConnection *pPeerConnection);
 	RESULT AddAnswerCandidates(PeerConnection *pPeerConnection);
 
+	WebRTCPeerConnectionProxy* GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection);
+
 public:
 	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);
 	RESULT SendDataChannelMessageByPeerUserID(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);

@@ -607,6 +607,7 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 	return r;
 }
 
+// TODO: Fix inconsistency with proxy pattern (webrtc is correct, proxy shouldn't include register observer for example)
 // TODO: Fill out pattern for other controllers
 // TODO: Replace with polymorphic fns
 ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
@@ -615,6 +616,10 @@ ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE contr
 	switch (controllerType) {
 		case CLOUD_CONTROLLER_TYPE::CLOUD: {
 			pProxy = (ControllerProxy*)(this);
+		} break;
+
+		case CLOUD_CONTROLLER_TYPE::WEBRTC: {
+			pProxy = (ControllerProxy*)(GetWebRTCControllerProxy());
 		} break;
 
 		case CLOUD_CONTROLLER_TYPE::MENU: {
@@ -680,6 +685,14 @@ Error:
 UserControllerProxy* CloudController::GetUserControllerProxy() {
 	if (m_pUserController != nullptr)
 		return m_pUserController->GetUserControllerProxy();
+
+	return nullptr;
+}
+
+WebRTCImpProxy* CloudController::GetWebRTCControllerProxy() {
+	if (m_pEnvironmentController != nullptr) {
+		return m_pEnvironmentController->GetWebRTCControllerProxy();
+	}
 
 	return nullptr;
 }
