@@ -25,6 +25,8 @@
 
 #include "Cloud/User/TwilioNTSInformation.h"
 
+#include "Core/Utilities.h"
+
 // TODO: Make this more legitimate + put in different file
 class DummySetSessionDescriptionObserver : public webrtc::SetSessionDescriptionObserver {
 public:
@@ -92,7 +94,7 @@ RESULT WebRTCPeerConnection::AddStreams() {
 	rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface = nullptr;
 	rtc::scoped_refptr<webrtc::AudioTrackInterface> pAudioTrack = nullptr;
 
-	CB((m_WebRTCActiveStreams.find(kStreamLabel) == m_WebRTCActiveStreams.end()));
+	CB((m_WebRTCLocalActiveStreams.find(kStreamLabel) == m_WebRTCLocalActiveStreams.end()));
 
 	/*
 	pAudioTrack = rtc::scoped_refptr<webrtc::AudioTrackInterface>(
@@ -110,7 +112,7 @@ RESULT WebRTCPeerConnection::AddStreams() {
 	}
 
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
-	m_WebRTCActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
+	m_WebRTCLocalActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
 
 Error:
 	return r;
@@ -174,13 +176,13 @@ RESULT WebRTCPeerConnection::AddDataChannel() {
 	dataChannelInit.reliable = false;
 	dataChannelInit.ordered = false;
 
-	CB((m_WebRTCActiveDataChannels.find(kDataLabel) == m_WebRTCActiveDataChannels.end()));
+	CB((m_WebRTCLocalActiveDataChannels.find(kDataLabel) == m_WebRTCLocalActiveDataChannels.end()));
 
 	m_pDataChannelInterface = m_pWebRTCPeerConnectionInterface->CreateDataChannel(kDataLabel, &dataChannelInit);
 	CN(m_pDataChannelInterface);
-
+	
 	typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataChannelPair;
-	m_WebRTCActiveDataChannels.insert(DataChannelPair(m_pDataChannelInterface->label(), m_pDataChannelInterface));
+	m_WebRTCLocalActiveDataChannels.insert(DataChannelPair(m_pDataChannelInterface->label(), m_pDataChannelInterface));
 
 Error:
 	return r;
@@ -212,12 +214,44 @@ std::list<WebRTCICECandidate> WebRTCPeerConnection::GetICECandidates() {
 	return m_webRTCICECandidates;
 }
 
+RESULT WebRTCPeerConnection::SetAudioVolume(double val) {
+	RESULT r = R_PASS;
+
+	util::Clamp<double>(val, 0.0f, 10.0f);
+
+	CB((m_WebRTCLocalActiveStreams.size() > 0));
+	{
+		auto pMediaStream = m_WebRTCRemoteActiveStreams[kStreamLabel];
+		CN(pMediaStream);
+
+		auto pAudioTrack = pMediaStream->FindAudioTrack(kAudioLabel);
+		CN(pAudioTrack);
+
+		// Set volume
+		pAudioTrack->GetSource()->SetVolume(0.0f);
+	}
+
+Error:
+	return r;
+}
+
+WebRTCPeerConnectionProxy* WebRTCPeerConnection::GetProxy() {
+	return (WebRTCPeerConnectionProxy*)(this);
+}
 
 // PeerConnectionObserver Interface
 void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStreamInterface) {
 	
+	// TODO: do we add to a map like out going? Or check existing ?
+
 	DEBUG_LINEOUT("OnAddStream: %s", pMediaStreamInterface->label().c_str());
 	LOG(INFO) << "Added " << pMediaStreamInterface->label() << " me=" << m_peerConnectionID;
+
+	// Add to remote streams
+	if (m_WebRTCRemoteActiveStreams.find(pMediaStreamInterface->label()) == m_WebRTCRemoteActiveStreams.end()) {
+		typedef std::pair<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> MediaStreamPair;
+		m_WebRTCRemoteActiveStreams.insert(MediaStreamPair(pMediaStreamInterface->label(), pMediaStreamInterface));
+	}
 
 	if (!pMediaStreamInterface) {
 		LOG(ERROR) << "Cannot add stream";
@@ -239,8 +273,11 @@ void WebRTCPeerConnection::OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInt
 
 	pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->AddSink(this);
 
-	LOG(INFO) << "Added sink";
-	DEBUG_LINEOUT("Added Sink");
+	//pMediaStreamInterface->FindAudioTrack(kAudioLabel)->GetSource()->SetVolume(0.0f);
+	SetAudioVolume(0.0f);
+
+	LOG(INFO) << "Added audio sink";
+	DEBUG_LINEOUT("Added audio Sink");
 
 	if (m_pParentObserver != nullptr) {
 		m_pParentObserver->OnAddStream(m_peerConnectionID, pMediaStreamInterface);
@@ -269,6 +306,12 @@ void WebRTCPeerConnection::OnRenegotiationNeeded() {
 
 void WebRTCPeerConnection::OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannelInterface) {
 	DEBUG_LINEOUT("OnDataChannel: %s", pDataChannelInterface->label().c_str());
+
+	// Add to remote data streams
+	if (m_WebRTCRemoteActiveDataChannels.find(pDataChannelInterface->label()) == m_WebRTCRemoteActiveDataChannels.end()) {
+		typedef std::pair<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface>> DataStreamPair;
+		m_WebRTCRemoteActiveDataChannels.insert(DataStreamPair(pDataChannelInterface->label(), pDataChannelInterface));
+	}
 
 	//channel->Send(webrtc::DataBuffer("DEADBEEF"));
 
@@ -806,7 +849,7 @@ RESULT WebRTCPeerConnection::SendDataChannelStringMessage(std::string& strMessag
 
 	//m_SignalOnDataChannel
 
-	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	auto pWebRTCDataChannel = m_WebRTCLocalActiveDataChannels[kDataLabel];
 	//CN(pWebRTCDataChannel);
 	CN(m_pDataChannelInterface);
 
@@ -821,7 +864,7 @@ Error:
 RESULT WebRTCPeerConnection::SendDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 	
-	auto pWebRTCDataChannel = m_WebRTCActiveDataChannels[kDataLabel];
+	auto pWebRTCDataChannel = m_WebRTCLocalActiveDataChannels[kDataLabel];
 	CN(m_pDataChannelInterface);
 
 	if (m_pDataChannelInterface->buffered_amount() > 1000) {

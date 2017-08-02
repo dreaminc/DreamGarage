@@ -110,7 +110,7 @@ public:
 	RESULT HandlePeerStayAliveMessage(PeerConnection* pPeerConnection, PeerStayAliveMessage *pPeerStayAliveMessage);
 	RESULT HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage);
 
-private:
+protected:
 	std::shared_ptr<DreamPeer> CreateNewPeer(PeerConnection *pPeerConnection);
 	std::shared_ptr<DreamPeer> FindPeer(long peerUserID);
 	std::shared_ptr<DreamPeer> FindPeer(PeerConnection *pPeerConnection);
@@ -118,6 +118,7 @@ private:
 	RESULT RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer);
 	DreamPeer::state GetPeerState(long peerUserID);
 
+private:
 	std::map<long, std::shared_ptr<DreamPeer>> m_dreamPeers;
 
 public:

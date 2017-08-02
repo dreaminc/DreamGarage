@@ -20,12 +20,22 @@ class WebRTConductor;
 class User;
 class TwilioNTSInformation;
 
+class WebRTCPeerConnectionProxy {
+public:
+	virtual RESULT SetAudioVolume(double val) = 0;
+	virtual WebRTCPeerConnectionProxy* GetProxy() = 0;
+};
+
 class WebRTCPeerConnection : 
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
-	public webrtc::AudioTrackSinkInterface
+	public webrtc::AudioTrackSinkInterface,
+	public WebRTCPeerConnectionProxy
 {
+public:
+	
+
 public:
 	class WebRTCPeerConnectionObserver {
 	public:
@@ -69,6 +79,11 @@ public:
 	RESULT ClearLocalSessionDescriptionProtocol();
 	RESULT ClearRemoteSessionDescriptionProtocol();
 	std::list<WebRTCICECandidate> GetICECandidates();
+
+public:
+	// WebRTCPeerConnectionProxy
+	virtual RESULT SetAudioVolume(double val) override;
+	virtual WebRTCPeerConnectionProxy* GetProxy() override;
 
 protected:
 
@@ -165,8 +180,11 @@ private:
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnectionInterface;
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCActiveStreams;
-	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCActiveDataChannels;
+	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
+	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCLocalActiveDataChannels;
+
+	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
+	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCRemoteActiveDataChannels;
 
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;
