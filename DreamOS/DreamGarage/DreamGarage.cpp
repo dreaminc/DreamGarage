@@ -167,9 +167,9 @@ Error:
 	return r;
 }
 
-RESULT DreamGarage::UnallocateUserModelFromPool(DreamPeer *pDreamPeer) {
+RESULT DreamGarage::UnallocateUserModelFromPool(std::shared_ptr<DreamPeer> pDreamPeer) {
 	for (auto& userModelPair : m_usersModelPool) {
-		if (userModelPair.first == pDreamPeer) {
+		if (userModelPair.first == pDreamPeer.get()) {
 			// release model and set to invisible
 			userModelPair.first = nullptr;
 			userModelPair.second->SetVisible(false);
@@ -549,6 +549,15 @@ Error:
 }
 
 // Cloud Controller
+
+RESULT DreamGarage::OnDreamPeerDisconnected(std::shared_ptr<DreamPeer> pDreamPeer) {
+	RESULT r = R_PASS;
+
+	CR(UnallocateUserModelFromPool(pDreamPeer));
+
+Error:
+	return r;
+}
 
 RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
 	RESULT r = R_PASS;

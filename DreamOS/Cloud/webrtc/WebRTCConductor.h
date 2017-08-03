@@ -100,6 +100,7 @@ private:
 	rtc::scoped_refptr<WebRTCPeerConnection> AddNewPeerConnection(long peerConnectionID);
 	rtc::scoped_refptr<WebRTCPeerConnection> GetPeerConnection(long peerConnectionID);
 	bool FindPeerConnectionByID(long peerConnectionID);
+	RESULT RemovePeerConnectionByID(long peerConnectionID);
 
 	rtc::scoped_refptr<WebRTCPeerConnection> GetPeerConnectionByPeerUserID(long peerConnectionID);
 	bool FindPeerConnectionByPeerUserID(long peerUserID);

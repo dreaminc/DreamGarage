@@ -210,6 +210,17 @@ RESULT WebRTCPeerConnection::ClearRemoteSessionDescriptionProtocol() {
 	return R_PASS;
 }
 
+RESULT WebRTCPeerConnection::CloseWebRTCPeerConnection() {
+	RESULT r = R_PASS;
+
+	CN(m_pWebRTCPeerConnectionInterface);
+
+	m_pWebRTCPeerConnectionInterface->Close();
+
+Error:
+	return r;
+}
+
 std::list<WebRTCICECandidate> WebRTCPeerConnection::GetICECandidates() {
 	return m_webRTCICECandidates;
 }

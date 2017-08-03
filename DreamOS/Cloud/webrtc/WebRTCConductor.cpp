@@ -77,6 +77,25 @@ bool WebRTCConductor::FindPeerConnectionByID(long peerConnectionID) {
 		return true;
 }
 
+RESULT WebRTCConductor::RemovePeerConnectionByID(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	auto pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CN(pWebRTCPeerConnection);
+	
+	{
+		auto it = std::find(m_webRTCPeerConnections.begin(), m_webRTCPeerConnections.end(), pWebRTCPeerConnection);
+		CB((it != m_webRTCPeerConnections.end()));
+
+		m_webRTCPeerConnections.erase(it);
+
+		CR(pWebRTCPeerConnection->CloseWebRTCPeerConnection());
+	}
+
+Error:
+	return r;
+}
+
 rtc::scoped_refptr<WebRTCPeerConnection> WebRTCConductor::GetPeerConnectionByPeerUserID(long peerUserID) {
 	for (auto &pWebRTCPeerConnection : m_webRTCPeerConnections)
 		if (pWebRTCPeerConnection->GetPeerUserID() == peerUserID)
@@ -353,11 +372,22 @@ RESULT WebRTCConductor::OnICECandidatesGatheringDone(long peerConnectionID) {
 }
 
 RESULT WebRTCConductor::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
-	if (m_pParentObserver != nullptr) {
-		return m_pParentObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState);
+	RESULT r = R_PASS;
+
+	switch (webRTCIceConnectionState) {
+		case WebRTCIceConnection::state::DISCONNECTED: {
+			// Remove the peer connection 
+			DEBUG_LINEOUT("ICE Connection disconnected, remove webrtc peer connection");
+			CR(RemovePeerConnectionByID(peerConnectionID));
+		} break;
 	}
 
-	return R_NOT_HANDLED;
+	if (m_pParentObserver != nullptr) {
+		CR(m_pParentObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState));
+	}
+
+Error:
+	return r;
 }
 
 RESULT WebRTCConductor::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {

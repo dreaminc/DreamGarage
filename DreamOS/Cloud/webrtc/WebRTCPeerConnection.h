@@ -81,6 +81,8 @@ public:
 	RESULT ClearRemoteSessionDescriptionProtocol();
 	std::list<WebRTCICECandidate> GetICECandidates();
 
+	RESULT CloseWebRTCPeerConnection();
+
 public:
 	// WebRTCPeerConnectionProxy
 	virtual RESULT SetAudioVolume(double val) override;

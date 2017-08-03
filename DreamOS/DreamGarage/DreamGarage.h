@@ -63,6 +63,7 @@ public:
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
 	virtual RESULT OnNewDreamPeer(DreamPeer *pDreamPeer) override;
+	virtual RESULT OnDreamPeerDisconnected(std::shared_ptr<DreamPeer> pDreamPeer) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 	// Environment
@@ -96,7 +97,7 @@ private:
 	RESULT SetupUserModelPool();
 	RESULT AllocateAndAssignUserModelFromPool(DreamPeer *pDreamPeer);
 	user* FindUserModelInPool(DreamPeer *pDreamPeer);
-	RESULT UnallocateUserModelFromPool(DreamPeer *pDreamPeer);
+	RESULT UnallocateUserModelFromPool(std::shared_ptr<DreamPeer> pDreamPeer);
 
 	std::array<std::pair<DreamPeer*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeer*, user*>(nullptr, nullptr) };
 

@@ -229,6 +229,17 @@ Error:
 	return r;
 }
 
+RESULT CloudController::OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnPeerConnectionDisconnected(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
 RESULT CloudController::OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 

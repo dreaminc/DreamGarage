@@ -862,6 +862,17 @@ Error:
 	return r;
 }
 
+RESULT EnvironmentController::OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnPeerConnectionDisconnected(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
 RESULT EnvironmentController::OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
 	RESULT r = R_NOT_IMPLEMENTED;
 

@@ -184,6 +184,18 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long peerConne
 }
 */
 
+RESULT PeerConnectionController::DeletePeerConnection(PeerConnection *pPeerConnection) {
+	// Find the peer connection
+	for(auto it = m_peerConnections.begin(); it != m_peerConnections.end(); it++) {
+		if (pPeerConnection == &(*it)) {
+			m_peerConnections.erase(it);
+			return R_PASS;
+		}
+	}
+
+	return R_NOT_FOUND;
+}
+
 PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) {
 	
 	PeerConnection peerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
@@ -214,6 +226,24 @@ RESULT PeerConnectionController::OnNewPeerConnection(long userID, long peerUserI
 		//CR(m_pPeerConnectionControllerObserver->OnNewPeerConnection(position - 1));
 		CR(m_pPeerConnectionControllerObserver->OnNewPeerConnection(userID, peerUserID, fOfferor, pPeerConnection));
 	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+	RESULT rObserver = R_PASS;
+
+	// Let the observer act first, since we'll be deleting the peer connection 
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		rObserver = m_pPeerConnectionControllerObserver->OnPeerConnectionDisconnected(pPeerConnection);
+	}
+
+	// Remove the peer
+	CR(DeletePeerConnection(pPeerConnection));
+
+	//CR(rObserver);
 
 Error:
 	return r;
@@ -546,6 +576,10 @@ RESULT PeerConnectionController::OnIceConnectionChange(long peerConnectionID, We
 	switch (webRTCIceConnectionState) {
 		case WebRTCIceConnection::state::CONNECTED: {
 			//CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+		} break;
+
+		case WebRTCIceConnection::state::DISCONNECTED: {
+			CR(OnPeerConnectionDisconnected(pPeerConnection));
 		} break;
 
 		default: {

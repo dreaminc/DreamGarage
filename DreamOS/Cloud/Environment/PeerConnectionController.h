@@ -33,6 +33,7 @@ public:
 
 		// TODO: Switch to Peer User ID
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
@@ -72,6 +73,7 @@ public:
 
 	//PeerConnection *CreateNewPeerConnection(long peerConnectionID, long userID, long peerUserID);	// DEADBEEF: ?
 	PeerConnection* CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection);
+	RESULT DeletePeerConnection(PeerConnection *pPeerConnection);
 	
 	// TODO: This is kind of useless
 	bool FindPeerConnectionByOfferUserID(long offerUserID);
@@ -120,6 +122,7 @@ public:
 
 private:
 	RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection);
+	RESULT OnPeerConnectionDisconnected(PeerConnection *pPeerConnection);
 
 private:
 	std::unique_ptr<WebRTCImp> m_pWebRTCImp;

@@ -169,27 +169,6 @@ Error:
 RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
-	/*
-	long index = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
-	index -= 1;
-
-	if (m_fSeated) {
-		LOG(INFO) << "HandlePeersUpdate already seated" << index;
-		return R_PASS;
-	}
-
-	LOG(INFO) << "HandlePeersUpdate " << index;
-	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(index)).c_str());
-
-	if (!m_fSeated) {
-		CBM((index < m_seatLookup.size()), "Peer index %d not supported by client", index);
-		CR(SetRoundtablePosition(index));
-		m_fSeated = true;
-	}
-	*/
-
-	//CR(OnNewDreamPeer(pPeerConnection));
-
 	// Create a new peer
 	auto pDreamPeer = CreateNewPeer(pPeerConnection);
 	CN(pDreamPeer);
@@ -199,7 +178,23 @@ Error:
 	return r;
 }
 
-WebRTCPeerConnectionProxy *DreamOS::GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) {
+RESULT DreamOS::OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	// First give client layer to do something 
+	CR(OnDreamPeerDisconnected(pDreamPeer));
+
+	// Delete the dream peer
+	CR(RemovePeer(pDreamPeer));
+
+Error:
+	return r;
+}
+
+WebRTCPeerConnectionProxy* DreamOS::GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = nullptr;
 
