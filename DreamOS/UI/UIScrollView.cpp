@@ -35,22 +35,6 @@ UIScrollView::~UIScrollView()
 RESULT UIScrollView::Initialize() {
 	RESULT r = R_PASS;
 
-	m_pLeftScrollButton = AddUIButton();
-	m_pLeftScrollButton->SetVisible(false);
-	m_pLeftScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale, m_scrollScale));
-	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton);
-
-	m_pRightScrollButton = AddUIButton();
-	m_pRightScrollButton->SetVisible(false);
-	m_pRightScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale, m_scrollScale));
-	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
-
-	m_pLeftScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
-	m_pRightScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
-
-	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-	m_pRightScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-right.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
-
 	m_pTitleView = AddUIView();
 	float radY = (m_itemAngleY * M_PI / 180.0f) * -2.0f;
 
@@ -77,6 +61,28 @@ RESULT UIScrollView::Initialize() {
 	m_pTitleView->AddObject(m_pTitleText);
 
 	m_pMenuButtonsContainer = AddUIView();
+	m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, -m_menuCenterOffset);
+	//m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, 0.3f);
+
+	m_pLeftScrollButton = AddUIButton();
+	m_pLeftScrollButton->SetVisible(false);
+
+	//TODO: may be worth adding a constructor that exposes surface width / height
+	m_pLeftScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale * 16.0f / 9.0f, m_scrollScale));
+	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton);
+	m_pLeftScrollButton->SetPosition(m_pLeftScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
+
+	m_pRightScrollButton = AddUIButton();
+	m_pRightScrollButton->SetVisible(false);
+	m_pRightScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale * 16.0f / 9.0f, m_scrollScale));
+	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
+	m_pRightScrollButton->SetPosition(m_pRightScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
+
+	m_pLeftScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
+	m_pRightScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
+
+	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pRightScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-right.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 
 	m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 
@@ -141,6 +147,7 @@ RESULT UIScrollView::Update() {
 		}
 
 		m_pMenuButtonsContainer->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, m_yRotation, 0.0f));
+		//m_pMenuButtonsContainer->SetPosition(point(0.0f, 0.0f, 0.3f));
 
 		//TODO: approach will need a less naive implementation if animations are used
 		int highIndex = (int)(m_yRotation / yRotationPerElement) + m_maxElements;
@@ -171,7 +178,7 @@ RESULT UIScrollView::PositionMenuButton(float index, std::shared_ptr<UIButton> p
 
 	float yPos = m_itemHeight;
 	float zPos = m_menuCenterOffset;
-	point ptContext = point(sin(radY) * zPos, yPos, ((cos(radY) - 1) * zPos));
+	point ptContext = point(sin(radY) * zPos, yPos, (cos(radY) * zPos));
 
 	quaternion qContext = quaternion::MakeQuaternionWithEuler(0.0f, radY, 0.0f);
 

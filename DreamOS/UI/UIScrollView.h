@@ -20,11 +20,11 @@ class text;
 #define TITLE_ANGLE_X 75.0f
 #define TITLE_HEIGHT (ITEM_HEIGHT + 0.125f) //TODO: derive out of item angle + defined margin
 
-#define PAD_MOVE_CONSTANT 0.005f
+#define PAD_MOVE_CONSTANT 0.01f
 
 #define SCROLL_SCALE 0.4f 
 #define SCROLL_ARROW_BIAS 0.4f // Pulls scroll chevrons in towards the menu items
-#define SCROLL_ASPECT_RATIO 414.0f / 600.0f
+#define SCROLL_ASPECT_RATIO 138.0f / 200.0f
 
 #define FADE_DURATION 0.1f
 #define PUSH_DEPTH -0.1f

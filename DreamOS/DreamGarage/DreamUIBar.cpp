@@ -68,6 +68,7 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	CN(m_pView);
 
 	m_pScrollView = m_pView->AddUIScrollView();
+	//m_pScrollView->SetPosition(0.0f, 0.0f, m_menuDepth);
 	CN(m_pScrollView);
 
 	m_pLeftMallet = new UIMallet(GetDOS());
