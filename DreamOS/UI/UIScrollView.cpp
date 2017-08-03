@@ -68,15 +68,19 @@ RESULT UIScrollView::Initialize() {
 	m_pLeftScrollButton->SetVisible(false);
 
 	//TODO: may be worth adding a constructor that exposes surface width / height
+	//point ptRightScrollButtonOffset = point(0.0f, -0.05f * cos(m_itemAngleX), 0.05f * sin(m_itemAngleX));
+	point ptLeftScrollButtonOffset = point(0.0f, -0.05 * sin(m_itemAngleX), 0.0f);
+	point ptRightScrollButtonOffset = point(0.0f, 0.0f, 0.05f * sin(m_itemAngleX));
+
 	m_pLeftScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale * 16.0f / 9.0f, m_scrollScale));
 	PositionMenuButton(-1.0f + m_scrollBias, m_pLeftScrollButton);
-	m_pLeftScrollButton->SetPosition(m_pLeftScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
+	m_pLeftScrollButton->SetPosition(m_pLeftScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition() + ptLeftScrollButtonOffset);
 
 	m_pRightScrollButton = AddUIButton();
 	m_pRightScrollButton->SetVisible(false);
 	m_pRightScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale * 16.0f / 9.0f, m_scrollScale));
 	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
-	m_pRightScrollButton->SetPosition(m_pRightScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition());
+	m_pRightScrollButton->SetPosition(m_pRightScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition() + ptRightScrollButtonOffset);
 
 	m_pLeftScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
 	m_pRightScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
