@@ -13,6 +13,8 @@
 #include "Primitives/point.h"
 #include "Primitives/quaternion.h"
 
+#include "Primitives/hand.h"
+
 class User;
 class PeerConnection;
 class composite;
@@ -88,8 +90,9 @@ public:
 	RESULT ReleaseUserModel();
 
 	RESULT SetVisible(bool fVisibile = true);
-	RESULT SetPosition(point ptPosition);
-	RESULT SetOrientation(quaternion qOrientation);
+	RESULT SetPosition(const point& ptPosition);
+	RESULT SetOrientation(const quaternion& qOrientation);
+	RESULT UpdateHand(const hand::HandState& pHandState);
 
 private:
 	RESULT SetState(DreamPeer::state peerState);

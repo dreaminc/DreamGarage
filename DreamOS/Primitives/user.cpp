@@ -57,7 +57,10 @@ RESULT user::Initialize() {
 
 	// Hands
 	m_pLeapLeftHand = AddHand();
+	m_pLeapLeftHand->OnLostTrack();
+
 	m_pLeapRightHand = AddHand();
+	m_pLeapRightHand->OnLostTrack();
 
 	SetPosition(point(0.0f, 0.0f, 0.0f));
 

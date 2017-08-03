@@ -306,6 +306,7 @@ RESULT hand::OnLostTrack() {
 	m_pRingFinger->SetVisible(m_fTracked);
 	m_pPinkyFinger->SetVisible(m_fTracked);
 	m_pThumb->SetVisible(m_fTracked);
+
 	return R_PASS;
 }
 

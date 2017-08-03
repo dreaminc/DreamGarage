@@ -89,30 +89,37 @@ RESULT DreamPeer::SetVisible(bool fVisibile) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-
 	CR(m_pUserModel->SetVisible(fVisibile));
 
 Error:
 	return r;
 }
 
-RESULT DreamPeer::SetPosition(point ptPosition) {
+RESULT DreamPeer::SetPosition(const point& ptPosition) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-
 	m_pUserModel->SetPosition(ptPosition);
 
 Error:
 	return r;
 }
 
-RESULT DreamPeer::SetOrientation(quaternion qOrientation) {
+RESULT DreamPeer::SetOrientation(const quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-
 	m_pUserModel->SetOrientation(qOrientation);
+
+Error:
+	return r;
+}
+
+RESULT DreamPeer::UpdateHand(const hand::HandState& handState) {
+	RESULT r = R_PASS;
+
+	CN(m_pUserModel);
+	m_pUserModel->UpdateHand(handState);
 
 Error:
 	return r;

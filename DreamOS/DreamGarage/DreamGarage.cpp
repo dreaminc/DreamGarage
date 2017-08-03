@@ -567,11 +567,6 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
 	long remoteSeatingPosition = (fOfferor) ? pPeerConnection->GetAnswererPosition() : pPeerConnection->GetOfferorPosition();
 	remoteSeatingPosition -= 1;
 
-	if (m_fSeated) {
-		LOG(INFO) << "HandlePeersUpdate already seated" << localSeatingPosition;
-		return R_PASS;
-	}
-
 	LOG(INFO) << "HandlePeersUpdate " << localSeatingPosition;
 	OVERLAY_DEBUG_SET("seat", (std::string("seat=") + std::to_string(localSeatingPosition)).c_str());
 
@@ -691,6 +686,7 @@ Error:
 RESULT DreamGarage::HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage) {
 	RESULT r = R_PASS;
 
+	/*
 	// This will set visible 
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	user* pUser = ActivateUser(senderUserID);
@@ -708,6 +704,16 @@ RESULT DreamGarage::HandleHeadUpdateMessage(PeerConnection* pPeerConnection, Upd
 	OVERLAY_DEBUG_SET(strPosition, (strPosition + "=" + std::to_string(headPos.x()) + "," + std::to_string(headPos.y()) + "," + std::to_string(headPos.z())).c_str());
 
 	pUser->GetHead()->SetOrientation(qOrientation);
+	*/
+
+	point ptHeadPosition = pUpdateHeadMessage->GetPosition();
+	quaternion qOrientation = pUpdateHeadMessage->GetOrientation();
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	pDreamPeer->SetPosition(ptHeadPosition);
+	pDreamPeer->SetOrientation(qOrientation);
 
 Error:
 	return r;
@@ -719,6 +725,7 @@ RESULT DreamGarage::HandleHandUpdateMessage(PeerConnection* pPeerConnection, Upd
 	//DEBUG_LINEOUT("HandleUpdateHandMessage");
 	//pUpdateHandMessage->PrintMessage();
 
+	/*
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	hand::HandState handState;
 
@@ -727,6 +734,14 @@ RESULT DreamGarage::HandleHandUpdateMessage(PeerConnection* pPeerConnection, Upd
 
 	handState = pUpdateHandMessage->GetHandState();
 	pUser->UpdateHand(handState);
+	*/
+
+	hand::HandState handState = pUpdateHandMessage->GetHandState();
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	pDreamPeer->UpdateHand(handState);
 
 Error:
 	return r;
