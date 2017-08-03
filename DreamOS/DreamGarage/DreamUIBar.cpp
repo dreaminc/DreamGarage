@@ -106,16 +106,23 @@ RESULT DreamUIBar::OnAppDidFinishInitializing(void *pContext) {
 
 RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 	RESULT r = R_PASS;
-	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
+	auto pSurface = pSelected->GetSurface();
+	quaternion qSurface = (pSurface->GetOrientation());
+	qSurface.Reverse();
+	vector vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
+
+	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
+
 	GetDOS()->CaptureObject(
 	//	pSelected->GetSurface().get(), 
 		pSelected,
 		pSelected->GetInteractionObject(), 
 		pSelected->GetContactPoint(), 
-		vector(0.0f, 0.0f, -1.0f), 
-		0.1f);
+		//vector(0.0f, 0.0f, -1.0f), 
+		vSurface,
+		0.05f);
 
 Error:
 	return r;
@@ -371,6 +378,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 
 	if (m_pMenuNode && m_pMenuNode->CheckAndCleanDirty()) {
 
+		//std::vector<std::shared_ptr<UIMenuItem>> pButtons;
 		std::vector<std::shared_ptr<UIButton>> pButtons;
 
 		for (auto &pSubMenuNode : m_pMenuNode->GetSubMenuNodes()) {

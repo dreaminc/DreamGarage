@@ -126,6 +126,7 @@ public:
 		float threshold;
 		plane planeContext;
 		point ptOffset;
+		point ptOrigin;
 	};
 
 	RESULT Update();

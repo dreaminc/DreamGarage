@@ -327,8 +327,8 @@ RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pIntera
 	RESULT r = R_PASS;
 
 	plane planeContext(pObject->GetPosition(true), vDirection);
-
 	CaptureObj *cObj = new CaptureObj();
+	cObj->ptOrigin = pObject->GetPosition();
 	cObj->pObj = pObject;
 	cObj->threshold = threshold;
 	cObj->planeContext = planeContext;
@@ -634,6 +634,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 				if (vOriginDot < 0.0f) {
 					//ReleaseObject(pCaptureObj,pInteractionObject);
+					pCaptureObj->pObj->SetPosition(pCaptureObj->ptOrigin);
 					captureObjectsToRemove.push_back(pInteractionObject);
 				}
 				else {
@@ -647,6 +648,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 					vector vDistance = pCaptureObj->pObj->GetPosition(true) - planeCapture.GetPosition();
 
 					if (vDistance.magnitude() > (pCaptureObj->threshold)) { 
+						pCaptureObj->pObj->SetPosition(pCaptureObj->ptOrigin + (vDirection * pCaptureObj->threshold));
 					//	ReleaseObject(pCaptureObj, pInteractionObject);
 						InteractionObjectEvent interactionEvent(ELEMENT_COLLIDE_TRIGGER, pCaptureObj->pObj, pInteractionObject);
 						CR(NotifySubscribers(pCaptureObj->pObj, ELEMENT_COLLIDE_TRIGGER, &interactionEvent));

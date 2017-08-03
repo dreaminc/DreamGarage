@@ -72,7 +72,9 @@ public:
 
 	std::string& GetName();
 
+
 private:
+	std::shared_ptr<text> m_pLabel = nullptr;
 	std::string m_strName;
 
 private:
