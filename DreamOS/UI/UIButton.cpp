@@ -60,8 +60,6 @@ RESULT UIButton::Notify(UIEvent *pEvent) {
 
 	std::function<RESULT(void*)> fnCallback;
 
-	CBR(pEvent->m_pObj == this || pEvent->m_pObj == GetSurface().get(), R_SKIPPED);
-	//CBR(pEvent->m_pObj == m_pSurface.get(), R_SKIPPED);
 	CBR(m_callbacks.count(pEvent->m_eventType) > 0, R_OBJECT_NOT_FOUND);
 
 	fnCallback = m_callbacks[pEvent->m_eventType];

@@ -327,23 +327,13 @@ RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pIntera
 	RESULT r = R_PASS;
 
 	plane planeContext(pObject->GetPosition(true), vDirection);
-	CaptureObj *cObj = new CaptureObj();
-	cObj->ptOrigin = pObject->GetPosition();
-	cObj->pObj = pObject;
-	cObj->threshold = threshold;
-	cObj->planeContext = planeContext;
-	//cObj->ptOffset = ptContact;
-	//cObj->ptOffset = pInteractionObject->GetPosition(true) - ptContact;
-	//cObj->ptOffset = (ptContact - pInteractionObject->GetPosition(true)) + (ptContact - pObject->GetPosition(true));
-	cObj->ptOffset = pInteractionObject->GetPosition(true) - pObject->GetPosition(true);
-	//cObj->ptOffset = ptContact - pObject->GetPosition(true);
-
-
-//	CR(RemoveInteractionObject(pObject));
-
-//	DimObj *pObj = reinterpret_cast<DimObj*>(pObject);
-//	if (pObj != nullptr)
-//		CR(RemoveAnimationObject(pObj));
+	CapturedObj *cObj = new CapturedObj();
+	cObj->m_ptOrigin = pObject->GetPosition();
+	cObj->m_pObj = pObject;
+	cObj->m_threshold = threshold;
+	cObj->m_planeContext = planeContext;
+	// save difference between initial position and 
+	cObj->m_ptOffset = pInteractionObject->GetPosition(true) - pObject->GetPosition(true);
 
 	m_capturedObjects[pInteractionObject] = cObj;
 
@@ -515,7 +505,7 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 		CollisionManifold manifold;
 		bool fIntersect = false;
 
-		if ((m_capturedObjects.count(pInteractionObject) > 0) && pEventObject == m_capturedObjects[pInteractionObject]->pObj) {
+		if ((m_capturedObjects.count(pInteractionObject) > 0) && pEventObject == m_capturedObjects[pInteractionObject]->m_pObj) {
 			continue;
 		}
 
@@ -556,12 +546,7 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 				interactionEvent.m_activeState = m_activeObjectQueues[activeObjectType].GetActiveObjectState(pObject, pInteractionObject);
 
 				// Note this will go to all composite subs
-				if (interactionEvent.m_eventType == ELEMENT_COLLIDE_MOVED) {
-					CR(NotifySubscribers(pEventObject, interactionEvent.m_eventType, &interactionEvent));
-				}
-				else {
-					CR(NotifySubscribers(pEventObject, interactionEvent.m_eventType, &interactionEvent));
-				}
+				CR(NotifySubscribers(pEventObject, interactionEvent.m_eventType, &interactionEvent));
 			}
 		}
 
@@ -604,7 +589,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 	for (auto &activeObjectQueue : m_activeObjectQueues) {
 
-		std::vector<VirtualObj*> captureObjectsToRemove;
+		std::vector<VirtualObj*> capturedObjectsToRemove;
 		std::map<VirtualObj*, std::vector<std::shared_ptr<ActiveObject>>> activeObjectsToRemove;
 
 		//TODO: extend capture object implementation to handle multiple captured objects
@@ -618,41 +603,40 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 			//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
 			CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
 			if (m_capturedObjects.count(pInteractionObject) > 0) {
-//				for (auto &pCaptureObj : m_capturedObjects[pInteractionObject]) {
-				auto &pCaptureObj = m_capturedObjects[pInteractionObject];
-				point ptObj = pInteractionObject->GetPosition(true) - pCaptureObj->ptOffset;
-				//point ptObj = pInteractionObject->GetPosition(true) + pCaptureObj->planeContext.GetPosition() + pCaptureObj->ptOffset;
-				//point ptObj = pCaptureObj->ptOffset;
-				point ptCap = pCaptureObj->pObj->GetPosition(true);
 
+				auto &pCaptureObj = m_capturedObjects[pInteractionObject];
+				point ptObj = pInteractionObject->GetPosition(true) - pCaptureObj->m_ptOffset;
+				point ptCap = pCaptureObj->m_pObj->GetPosition(true);
+
+				// project difference of this frame along the movement vector
 				vector vDiff = ptObj - ptCap;
-				vector vDirection = pCaptureObj->planeContext.GetNormal();
+				vector vDirection = pCaptureObj->m_planeContext.GetNormal();
 				float vDot = vDiff.dot(vDirection);
 
-				vector vOriginDiff = ptObj - pCaptureObj->planeContext.GetPosition();
+				// project the difference between the current position and the original position
+				// along the movement vector.  if this is negative, release the object
+				vector vOriginDiff = ptObj - pCaptureObj->m_planeContext.GetPosition();
 				float vOriginDot = vOriginDiff.dot(vDirection);
 
 				if (vOriginDot < 0.0f) {
-					//ReleaseObject(pCaptureObj,pInteractionObject);
-					pCaptureObj->pObj->SetPosition(pCaptureObj->ptOrigin);
-					captureObjectsToRemove.push_back(pInteractionObject);
+					// clamp to original position
+					pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_ptOrigin);
+					capturedObjectsToRemove.push_back(pInteractionObject);
 				}
 				else {
-					//vector vProj = vDirection * (vOriginDot);
 					vector vProj = vDirection * (vDot);
 
-					//pCaptureObj->pObj->SetPosition(pCaptureObj->planeContext.GetPosition() + vProj);
-					pCaptureObj->pObj->SetPosition(pCaptureObj->pObj->GetPosition() + vProj);
+					pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_pObj->GetPosition() + vProj);
 
-					plane planeCapture = pCaptureObj->planeContext;
-					vector vDistance = pCaptureObj->pObj->GetPosition(true) - planeCapture.GetPosition();
+					plane planeCapture = pCaptureObj->m_planeContext;
+					vector vDistance = pCaptureObj->m_pObj->GetPosition(true) - planeCapture.GetPosition();
 
-					if (vDistance.magnitude() > (pCaptureObj->threshold)) { 
-						pCaptureObj->pObj->SetPosition(pCaptureObj->ptOrigin + (vDirection * pCaptureObj->threshold));
-					//	ReleaseObject(pCaptureObj, pInteractionObject);
-						InteractionObjectEvent interactionEvent(ELEMENT_COLLIDE_TRIGGER, pCaptureObj->pObj, pInteractionObject);
-						CR(NotifySubscribers(pCaptureObj->pObj, ELEMENT_COLLIDE_TRIGGER, &interactionEvent));
-						//captureObjectsToRemove.push_back(pInteractionObject);
+					if (vDistance.magnitude() > (pCaptureObj->m_threshold)) { 
+						// clamp to maximum position
+						pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_ptOrigin + (vDirection * pCaptureObj->m_threshold));
+
+						InteractionObjectEvent interactionEvent(ELEMENT_COLLIDE_TRIGGER, pCaptureObj->m_pObj, pInteractionObject);
+						CR(NotifySubscribers(pCaptureObj->m_pObj, ELEMENT_COLLIDE_TRIGGER, &interactionEvent));
 					}
 				}
 			}
@@ -692,7 +676,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 				CR(NotifySubscribers(pActiveObject->GetEventObject(), interactionEvent.m_eventType, &interactionEvent));
 			}
 		}
-		for (auto& pInteractionObject : captureObjectsToRemove) {
+		for (auto& pInteractionObject : capturedObjectsToRemove) {
 			ReleaseObjects(pInteractionObject);
 			m_capturedObjects.erase(pInteractionObject);
 		}

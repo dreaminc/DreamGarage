@@ -23,15 +23,18 @@ Error:
 RESULT UIMenuItem::Initialize() {
 	RESULT r = R_PASS;
 
-	CN(m_pParentContext);
-	m_pContextComposite = m_pParentContext->AddComposite();
-	CN(m_pContextComposite);
+//	m_pContextComposite = m_pParentContext->AddComposite();
+//	CN(m_pContextComposite);
 
 	CR(m_pContextComposite->InitializeOBB());
+	CR(m_pSurfaceComposite->InitializeOBB());
 
 	//m_pQuad = m_pContextComposite->AddQuad(0.25f, 0.25f, 1, 1, nullptr, vector(0.0f, 1.0f, 0.0f).Normal());
+		//CR(pDreamOS->AddAndRegisterInteractionObject(m_pSurfaceComposite.get(), (InteractionEventType)(i), this));
 	m_pSurface->SetMaterialAmbient(0.75f);
 	m_strName = "";
+
+	CR(InitializeOBB());
 
 Error:
 	return r;

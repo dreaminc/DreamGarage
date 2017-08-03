@@ -121,12 +121,12 @@ private:
 	InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold, VirtualObj *pEventObject);
 
 public:
-	struct CaptureObj {
-		VirtualObj *pObj;
-		float threshold;
-		plane planeContext;
-		point ptOffset;
-		point ptOrigin;
+	struct CapturedObj {
+		VirtualObj *m_pObj;
+		float m_threshold;
+		plane m_planeContext;
+		point m_ptOffset;
+		point m_ptOrigin;
 	};
 
 	RESULT Update();
@@ -210,7 +210,7 @@ private:
 	std::vector<VirtualObj*> m_interactionObjects;
 	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
 
-	std::map<VirtualObj*, CaptureObj*> m_capturedObjects;
+	std::map<VirtualObj*, CapturedObj*> m_capturedObjects;
 	std::map<ActiveObject::type, ActiveObjectQueue> m_activeObjectQueues;
 	
 	AnimationQueue* m_pObjectQueue = nullptr;
