@@ -65,6 +65,8 @@ public:
 	RESULT Initialize();
 	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer, bool fAddDataChannel);
 
+	RESULT Shutdown();
+
 	friend class WebRTCImp;
 
 public:

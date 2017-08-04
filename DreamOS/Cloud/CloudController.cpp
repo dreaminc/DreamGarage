@@ -96,10 +96,11 @@ RESULT CloudController::Stop() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("CloudController::Stop");
-
 	HUD_OUT("login into Relativity ...");
 
 	m_fRunning = false;
+
+	m_pEnvironmentController->m_pPeerConnectionController->m_pWebRTCImp->Shutdown();
 
 #if (defined(_WIN32) || defined(_WIN64))
 	Win32Helper::PostQuitMessage(m_cloudThread);

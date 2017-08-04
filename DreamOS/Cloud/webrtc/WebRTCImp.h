@@ -67,6 +67,8 @@ public:
 	friend class WebRTCClient;
 	friend class WebRTCConductor;
 
+	RESULT Shutdown();
+
 	// CloudImp Interface
 	RESULT Initialize();
 	RESULT RegisterObserver(WebRTCObserver *pWebRTCObserver);

@@ -37,6 +37,7 @@ class EnvironmentController : public Controller,
 							  public PeerConnectionController::PeerConnectionControllerObserver, 
 							  public EnvironmentControllerProxy {
 	friend class MenuController;
+	friend class CloudController;
 public:
 	enum class state {
 		UNINITIALIZED,

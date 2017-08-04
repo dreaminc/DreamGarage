@@ -23,8 +23,24 @@ WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 }
 
 WebRTCImp::~WebRTCImp() {
+
+	//BOOL res = PostThreadMessage(GetThreadId(thread.native_handle()), WM_QUIT, 0, 0);
+	//rtc::ThreadManager::Instance()->
+
+	//m_pWin32thread->Stop();
+	//m_pWin32thread->Quit();
 	rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
 	rtc::CleanupSSL();
+}
+
+RESULT WebRTCImp::Shutdown() {
+	RESULT r = R_PASS;
+
+	m_pWebRTCConductor->Shutdown();
+	m_pWin32thread->Quit();
+
+//Error:
+	return r;
 }
 
 // CloudImp Interface

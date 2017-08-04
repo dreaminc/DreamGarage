@@ -25,6 +25,8 @@ class PeerConnection;
 
 // TODO: This is actually a UserController - so change the name of object and file
 class PeerConnectionController : public Controller, public WebRTCImp::WebRTCObserver {
+	friend class CloudController;
+	friend class EnvironmentController;
 public:
 	class PeerConnectionControllerObserver {
 	public:

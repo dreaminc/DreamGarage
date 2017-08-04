@@ -327,6 +327,11 @@ Error:
 	return r;
 }
 
+RESULT WebRTCConductor::Shutdown() {
+	m_webRTCPeerConnections.clear();
+	return R_PASS;
+}
+
 RESULT WebRTCConductor::OnSDPOfferSuccess(long peerConnectionID) {		// TODO: Consolidate with below
 	LOG(INFO) << "OnSDPOfferSuccess";
 
