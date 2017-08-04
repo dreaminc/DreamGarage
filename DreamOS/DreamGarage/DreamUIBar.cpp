@@ -110,7 +110,7 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 	auto pSurface = pSelected->GetSurface();
-	quaternion qSurface = (pSurface->GetOrientation());
+	quaternion qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
 	qSurface.Reverse();
 	vector vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
 
@@ -123,7 +123,7 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 		pSelected->GetContactPoint(), 
 		//vector(0.0f, 0.0f, -1.0f), 
 		vSurface,
-		0.05f);
+		m_actuationDepth);
 
 Error:
 	return r;
@@ -155,7 +155,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 		m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
-		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight, m_menuDepth);
+		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 	}
 	else {
 		m_pathStack.pop();

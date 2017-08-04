@@ -16,8 +16,6 @@
 #define SURFACE_HEIGHT 0.25f
 #define SURFACE_ANGLE 30.0f
 
-#define OFFSET_HEIGHT -0.29f
-
 #define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
 #define TEXTBOX_NUM_LINES 1.0f
 //#define TEXTBOX_WIDTH 0.5f // textbox width matches surface width
@@ -133,7 +131,6 @@ private:
 
 	point m_ptComposite;
 	quaternion m_qSurfaceOrientation;
-	float m_offsetHeight = OFFSET_HEIGHT;
 
 	float m_keyTypeThreshold = KEY_TYPE_THRESHOLD;
 	float m_keyReleaseThreshold = KEY_RELEASE_THRESHOLD;

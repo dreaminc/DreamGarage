@@ -29,10 +29,14 @@ class texture;
 class UIButton;
 
 #define MENU_DEPTH -0.3f
-#define MENU_HEIGHT -0.2f
+#define MENU_HEIGHT -0.16f
+#define KEYBOARD_OFFSET -0.07f
+
 #define SHOW_MENU_HEIGHT -0.5f
 #define SHOW_MENU_DEPTH 1.4f
 #define MENU_ANIMATION_DURATION 0.1f;
+
+#define ACTUATION_DEPTH 0.055f;
 
 enum class MenuState {
 	NONE,
@@ -124,8 +128,10 @@ private:
 	quaternion m_qMenuOrientation;
 	point m_ptMenuShowOffset = point(0.0f, SHOW_MENU_HEIGHT, SHOW_MENU_DEPTH);
 	float m_menuHeight = MENU_HEIGHT;
+	float m_keyboardOffset = KEYBOARD_OFFSET;
 	float m_menuDepth = MENU_DEPTH;
 	float m_animationDuration = MENU_ANIMATION_DURATION;
+	float m_actuationDepth = ACTUATION_DEPTH;
 
 	MenuState m_menuState = MenuState::NONE;
 };
