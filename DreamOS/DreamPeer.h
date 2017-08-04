@@ -93,6 +93,7 @@ public:
 	RESULT SetPosition(const point& ptPosition);
 	RESULT SetOrientation(const quaternion& qOrientation);
 	RESULT UpdateHand(const hand::HandState& pHandState);
+	RESULT UpdateMouth(float mouthScale);
 
 private:
 	RESULT SetState(DreamPeer::state peerState);

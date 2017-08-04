@@ -115,6 +115,16 @@ Error:
 	return r;
 }
 
+RESULT DreamPeer::UpdateMouth(float mouthScale) {
+	RESULT r = R_PASS;
+
+	CN(m_pUserModel);
+	m_pUserModel->UpdateMouth(mouthScale);
+
+Error:
+	return r;
+}
+
 RESULT DreamPeer::UpdateHand(const hand::HandState& handState) {
 	RESULT r = R_PASS;
 

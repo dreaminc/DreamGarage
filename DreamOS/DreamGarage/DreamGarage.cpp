@@ -59,10 +59,11 @@ RESULT DreamGarage::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
 
 #ifdef _DEBUG
+	sandboxconfig.fUseHMD = false;
 	sandboxconfig.fMouseLook = true;
 #endif
 
@@ -193,6 +194,7 @@ user* DreamGarage::FindUserModelInPool(DreamPeer *pDreamPeer) {
 RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
+	std::shared_ptr<OGLObj> pOGLObj = nullptr;
 	point sceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
 	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
@@ -245,7 +247,7 @@ RESULT DreamGarage::LoadScene() {
 
 	pClouds->SetMaterialAmbient(0.8f);
 
-	std::shared_ptr<OGLObj> pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
+	pOGLObj = std::dynamic_pointer_cast<OGLObj>(pRiver->GetChildren()[0]);
 	if (pOGLObj != nullptr) {
 		pOGLObj->SetOGLProgramPreCallback(
 			[](OGLProgram* pOGLProgram, void *pContext) {
@@ -588,7 +590,7 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
 
 	// Assign Model From Pool and position peer
 	CR(AllocateAndAssignUserModelFromPool(pDreamPeer));
-	CR(SetRoundtablePosition(pDreamPeer, remoteSeatingPosition));
+	//CR(SetRoundtablePosition(pDreamPeer, remoteSeatingPosition));
 	pDreamPeer->SetVisible();
 
 	// Turn on sound
@@ -759,9 +761,14 @@ Error:
 RESULT DreamGarage::HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage) {
 	RESULT r = R_PASS;
 
+	/*
 	long senderUserID = pPeerConnection->GetPeerUserID();
 	user* pUser = ActivateUser(senderUserID);
 	WCN(pUser);
+	*/
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
 
 	//auto msg = pAudioDataMessage->GetAudioMessageBody();
 	auto pAudioBuffer = pAudioDataMessage->GetAudioMessageBuffer();
@@ -779,9 +786,10 @@ RESULT DreamGarage::HandleAudioDataMessage(PeerConnection* pPeerConnection, Audi
 	}
 
 	float mouthScale = averageAccumulator / numSamples;
+	mouthScale *= 10.0f;
 
 	util::Clamp<float>(mouthScale, 0.0f, 1.0f);
-	pUser->UpdateMouth(mouthScale);
+	pDreamPeer->UpdateMouth(mouthScale);
 
 Error:
 	return r;
