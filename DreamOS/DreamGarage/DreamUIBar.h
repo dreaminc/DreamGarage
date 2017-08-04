@@ -29,14 +29,14 @@ class texture;
 class UIButton;
 
 #define MENU_DEPTH -0.3f
-#define MENU_HEIGHT -0.18f
-#define KEYBOARD_OFFSET -0.04f
+#define MENU_HEIGHT -0.16f
+#define KEYBOARD_OFFSET -0.07f
 
 #define SHOW_MENU_HEIGHT -0.5f
 #define SHOW_MENU_DEPTH 1.4f
 #define MENU_ANIMATION_DURATION 0.1f;
 
-#define ACTUATION_DEPTH 0.0625f;
+#define ACTUATION_DEPTH 0.055f;
 
 enum class MenuState {
 	NONE,

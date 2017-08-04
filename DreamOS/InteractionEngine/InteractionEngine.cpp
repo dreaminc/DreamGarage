@@ -334,7 +334,10 @@ RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pIntera
 	cObj->m_planeContext = planeContext;
 	// save difference between initial position and 
 	cObj->m_ptOffset = pInteractionObject->GetPosition(true) - pObject->GetPosition(true);
-
+	if (m_capturedObjects.count(pInteractionObject) > 0) {
+		auto& pOldCaptureObj = m_capturedObjects[pInteractionObject];
+		pOldCaptureObj->m_pObj->SetPosition(pOldCaptureObj->m_ptOrigin);
+	}
 	m_capturedObjects[pInteractionObject] = cObj;
 
 //Error:
