@@ -632,7 +632,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Cloud\HTTP\HTTPResponse.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuController.cpp" />
     <ClCompile Include="..\..\..\Cloud\Menu\MenuNode.cpp" />
-    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h" />
     <ClCompile Include="..\..\..\Cloud\User\UserImp.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebRequest.cpp" />
     <ClCompile Include="..\..\..\Cloud\WebRequestPostData.cpp" />
@@ -659,6 +658,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\DreamOS.cpp" />
     <ClCompile Include="..\..\..\DreamOSMain.cpp" />
     <ClCompile Include="..\..\..\DreamOSWinMain.cpp" />
+    <ClCompile Include="..\..\..\DreamPeer.cpp" />
     <ClCompile Include="..\..\..\External\Matrices\Matrices.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\internal\Logging_Tools.cpp" />
     <ClCompile Include="..\..\..\External\OCULUS\v1.12.0\Logging\src\Logging_Library.cpp" />
@@ -851,8 +851,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\Menu\MenuController.h" />
     <ClInclude Include="..\..\..\Cloud\Menu\MenuNode.h" />
     <ClInclude Include="..\..\..\Cloud\Message\Message.h" />
-    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h" />
-    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\Cloud\CloudModel.h" />
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h" />
     <ClInclude Include="..\..\..\Cloud\WebRequest.h" />
@@ -861,6 +859,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCCommon.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCConductor.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCICECandidate.h" />
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCIceConnection.h" />
     <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCImp.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\Environment.h" />
     <ClInclude Include="..\..\..\Cloud\Environment\EnvironmentController.h" />
@@ -884,14 +883,20 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamConsole\DebugConsole.h" />
     <ClInclude Include="..\..\..\DreamConsole\DreamConsole.h" />
     <ClInclude Include="..\..\..\DreamConsole\ProfilerGraph.h" />
+    <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamBrowser.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamContentView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamGarage.h" />
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h" />
     <ClInclude Include="..\..\..\DreamGarage\DreamUIBar.h" />
+    <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h" />
+    <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h" />
+    <ClInclude Include="..\..\..\DreamMessage.h" />
     <ClInclude Include="..\..\..\DreamOS.h" />
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
+    <ClInclude Include="..\..\..\DreamPeer.h" />
     <ClInclude Include="..\..\..\External\Matrices\Matrices.h" />
     <ClInclude Include="..\..\..\External\Matrices\Vectors.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
@@ -997,6 +1002,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\InteractionEngine\InteractionEngine.h" />
     <ClInclude Include="..\..\..\InteractionEngine\InteractionEngineTestSuite.h" />
     <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h" />
+    <ClInclude Include="..\..\..\PeerAckMessage.h" />
+    <ClInclude Include="..\..\..\PeerHandshakeMessage.h" />
+    <ClInclude Include="..\..\..\PeerStayAliveMessage.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionManifold.h" />
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionResolver.h" />
@@ -1039,6 +1047,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\model.h" />
     <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h" />
     <ClInclude Include="..\..\..\Primitives\ObjectState.h" />
+    <ClInclude Include="..\..\..\Primitives\Proxy.h" />
     <ClInclude Include="..\..\..\Primitives\Publisher.h" />
     <ClInclude Include="..\..\..\Primitives\Multipublisher.h" />
     <ClInclude Include="..\..\..\Primitives\QuadIndexGroup.h" />

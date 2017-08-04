@@ -5,6 +5,14 @@
 
 #include "Primitives/font.h"
 
+#include "Cloud/Environment/PeerConnection.h"
+#include "DreamMessage.h"
+
+// Messages
+#include "PeerHandshakeMessage.h"
+#include "PeerAckMessage.h"
+#include "PeerStayAliveMessage.h"
+
 DreamOS::DreamOS() :
 	m_versionDreamOS(DREAM_OS_VERSION_MAJOR, DREAM_OS_VERSION_MINOR, DREAM_OS_VERSION_MINOR_MINOR),
 	m_pSandbox(nullptr)
@@ -90,6 +98,10 @@ RESULT DreamOS::Initialize(int argc, const char *argv[]) {
 		CRM(m_pSandbox->Initialize(argc, argv), "Failed to initialize Sandbox");
 	}
 
+	// Cloud Controller
+	CRM(RegisterPeerConnectionObserver(this), "Failed to register Peer Connection Observer");
+	CRM(RegisterEnvironmentObserver(this), "Failed to register environment controller");
+
 	// Give the Client a chance to set up the pipeline
 	CRM(SetupPipeline(GetRenderPipeline()), "Failed to set up pipeline");
 
@@ -106,6 +118,316 @@ Error:
 	return r;
 }
 
+// Cloud
+RESULT DreamOS::OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
+	RESULT r = R_PASS;
+
+	CN(pPeerConnection);
+
+	DEBUG_LINEOUT("DataString: %s", strDataChannelMessage.c_str());
+	LOG(INFO) << "DataString: " << strDataChannelMessage;
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnDataChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	CR(pDreamPeer->OnDataChannel());
+
+	{
+		long userID = GetUserID();
+		long peerUserID = pPeerConnection->GetPeerUserID();
+
+		// Initialize handshake - only add user when peer connection stabilized 
+		PeerHandshakeMessage peerHandshakeMessage(userID, peerUserID);
+		CR(SendDataMessage(peerUserID, &peerHandshakeMessage));
+
+		pDreamPeer->SentHandshakeRequest();
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnAudioChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	CR(pDreamPeer->OnAudioChannel());
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	// Create a new peer
+	auto pDreamPeer = CreateNewPeer(pPeerConnection);
+	CN(pDreamPeer);
+	CR(pDreamPeer->RegisterDreamPeerObserver(this));
+	
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	// First give client layer to do something 
+	CR(OnDreamPeerConnectionClosed(pDreamPeer));
+
+	// Delete the dream peer
+	CR(RemovePeer(pDreamPeer));
+
+Error:
+	return r;
+}
+
+WebRTCPeerConnectionProxy* DreamOS::GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = nullptr;
+
+	WebRTCImpProxy* pWebRTCProxy = (WebRTCImpProxy*)(GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::WEBRTC));
+	CN(pWebRTCProxy);
+
+	pWebRTCPeerConnectionProxy = pWebRTCProxy->GetWebRTCPeerConnectionProxy(pPeerConnection);
+	CN(pWebRTCPeerConnectionProxy);
+
+	return pWebRTCPeerConnectionProxy;
+
+Error:
+	return nullptr;
+}
+
+RESULT DreamOS::OnDreamPeerStateChange(DreamPeer* pDreamPeer) {
+	RESULT r = R_PASS;
+
+	switch (pDreamPeer->GetState()) {
+		case DreamPeer::state::ESTABLISHED: {
+			CR(OnNewDreamPeer(pDreamPeer));
+		} break;
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) {
+	RESULT r = R_PASS;
+	
+	DreamMessage::type dreamMsgType = (DreamMessage::type)(pDataMessage->GetType());
+
+	// Route the message to the right place
+
+	if (dreamMsgType < DreamMessage::type::CLIENT) {
+		// DREAM OS Messages
+		switch (dreamMsgType) {
+			case DreamMessage::type::PEER_HANDSHAKE: {
+				PeerHandshakeMessage *pPeerHandshakeMessage = reinterpret_cast<PeerHandshakeMessage*>(pDataMessage);
+				CR(HandlePeerHandshakeMessage(pPeerConnection, pPeerHandshakeMessage));
+			} break;
+
+			case DreamMessage::type::PEER_STAYALIVE: {
+				PeerStayAliveMessage *pPeerStayAliveMessage = reinterpret_cast<PeerStayAliveMessage*>(pDataMessage);
+				CR(HandlePeerStayAliveMessage(pPeerConnection, pPeerStayAliveMessage));
+			} break;
+
+			case DreamMessage::type::PEER_ACK: {
+				PeerAckMessage *pPeerAckMessage = reinterpret_cast<PeerAckMessage*>(pDataMessage);
+				CR(HandlePeerAckMessage(pPeerConnection, pPeerAckMessage));
+			} break;
+
+			default: {
+				DEBUG_LINEOUT("Unhandled Dream OS Message of Type 0x%I64x", dreamMsgType);
+			} break;
+		}
+	}
+	else if (dreamMsgType >= DreamMessage::type::CLIENT && dreamMsgType < DreamMessage::type::APP) {
+		// Dream Client Messages
+		CR(OnDreamMessage(pPeerConnection, (DreamMessage*)(pDataMessage)));
+	}
+	else if (dreamMsgType >= DreamMessage::type::APP) {
+		// TODO: App messages
+	}
+	else {
+		DEBUG_LINEOUT("Unhandled Dream Message of Type 0x%I64x", dreamMsgType);
+	}
+
+Error:
+	return r;
+}
+
+// Environment
+
+// Peers
+RESULT DreamOS::HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, PeerHandshakeMessage *pPeerHandshakeMessage) {
+	RESULT r = R_PASS;
+
+	// Retrieve peer
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	long userID = GetUserID();
+	long peerUserID = pPeerConnection->GetPeerUserID();
+
+	{
+		// ACK the handshake
+		PeerAckMessage peerHandshakeMessageAck(userID, peerUserID, PeerAckMessage::type::PEER_HANDSHAKE);
+		CR(SendDataMessage(peerUserID, &peerHandshakeMessageAck));
+
+		pDreamPeer->SentHandshakeACK();
+
+		/*
+		if (pDreamPeer->IsPeerReady()) {
+			int a = 5;
+		}
+		*/
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::HandlePeerStayAliveMessage(PeerConnection* pPeerConnection, PeerStayAliveMessage *pPeerStayAliveMessage) {
+	RESULT r = R_PASS;
+
+	// Retrieve peer
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	CB((pDreamPeer->IsPeerReady()));
+
+	{
+		long userID = GetUserID();
+		long peerUserID = pPeerConnection->GetPeerUserID();
+
+		// Initialize handshake - only add user when peer connection stabilized 
+		PeerAckMessage peerHandshakeMessageAck(userID, peerUserID, PeerAckMessage::type::PEER_STAY_ALIVE);
+		CR(SendDataMessage(peerUserID, &peerHandshakeMessageAck));
+	}
+
+Error:
+	return r;
+}
+
+RESULT DreamOS::HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage) {
+	RESULT r = R_PASS;
+
+	// Retrieve peer
+	auto pDreamPeer = FindPeer(pPeerConnection);
+	CN(pDreamPeer);
+
+	long userID = GetUserID();
+	long peerUserID = pPeerConnection->GetPeerUserID();
+
+	switch (pPeerAckMessage->GetACKType()) {
+		case PeerAckMessage::type::PEER_HANDSHAKE: {
+			pDreamPeer->ReceivedHandshakeACK();
+
+			/*
+			if (pDreamPeer->IsPeerReady()) {
+				int a = 5;
+			}
+			*/
+		} break;
+
+		case PeerAckMessage::type::PEER_STAY_ALIVE: {
+			// TODO: update the stay alive
+		} break;
+
+		default: {
+			// TODO: ?
+		} break;
+	}
+
+Error:
+	return r;
+}
+
+std::shared_ptr<DreamPeer> DreamOS::CreateNewPeer(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+	std::shared_ptr<DreamPeer> pDreamPeer = nullptr;
+
+	long peerUserID = pPeerConnection->GetPeerUserID();
+	CBM((m_dreamPeers.find(peerUserID) == m_dreamPeers.end()), "Error: Peer user ID %d already exists", peerUserID);
+
+	pDreamPeer = std::make_shared<DreamPeer>(this, pPeerConnection);
+	CN(pDreamPeer);
+
+	CR(pDreamPeer->Initialize());
+
+	// Set map
+	m_dreamPeers[peerUserID] = pDreamPeer;
+
+	return pDreamPeer;
+
+Error:
+	if (pDreamPeer != nullptr) {
+		pDreamPeer = nullptr;
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<DreamPeer> DreamOS::FindPeer(PeerConnection *pPeerConnection) {
+	return FindPeer(pPeerConnection->GetPeerUserID());
+}
+
+std::shared_ptr<DreamPeer> DreamOS::FindPeer(long peerUserID) {
+	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+
+	if ((it = m_dreamPeers.find(peerUserID)) != m_dreamPeers.end()) {
+		return (*it).second;
+	}
+
+	return nullptr;
+}
+
+RESULT DreamOS::RemovePeer(long peerUserID) {
+	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+
+	if ((it = m_dreamPeers.find(peerUserID)) != m_dreamPeers.end()) {
+		m_dreamPeers.erase(it);
+		return R_PASS;
+	}
+
+	return R_NOT_FOUND;
+}
+
+RESULT DreamOS::RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer) {
+	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+
+	for (auto &pairDreamPeer : m_dreamPeers) {
+		if (pairDreamPeer.second == pDreamPeer) {
+			it = m_dreamPeers.find(pairDreamPeer.first);
+			m_dreamPeers.erase(it);
+			return R_PASS;
+		}
+	}
+
+	return R_NOT_FOUND;
+}
+
+DreamPeer::state DreamOS::GetPeerState(long peerUserID) {
+	std::shared_ptr<DreamPeer> pDreamPeer = nullptr;
+
+	if ((pDreamPeer = FindPeer(peerUserID)) != nullptr) {
+		return pDreamPeer->GetState();
+	}
+
+	return DreamPeer::state::INVALID;
+}
 
 
 stereocamera* DreamOS::GetCamera() {
@@ -168,6 +490,10 @@ const HALImp::HALConfiguration& DreamOS::GetHALConfiguration() {
 
 CloudController *DreamOS::GetCloudController() {
 	return m_pSandbox->m_pCloudController;
+}
+
+long DreamOS::GetUserID() {
+	return m_pSandbox->m_pCloudController->GetUserID();
 }
 
 ControllerProxy* DreamOS::GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
@@ -488,48 +814,21 @@ RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
 }
 
 // Cloud Controller
-RESULT DreamOS::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
-	return m_pSandbox->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
+
+RESULT DreamOS::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
+	return m_pSandbox->RegisterPeerConnectionObserver(pPeerConnectionObserver);
 }
 
-RESULT DreamOS::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
-	return m_pSandbox->RegisterDataMessageCallback(fnHandleDataMessageCallback);
-}
-
-RESULT DreamOS::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
-	return m_pSandbox->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
-}
-
-RESULT DreamOS::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
-	return m_pSandbox->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
-}
-
-RESULT DreamOS::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
-	return m_pSandbox->RegisterAudioDataCallback(fnHandleAudioDataCallback);
+RESULT DreamOS::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
+	return m_pSandbox->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
 RESULT DreamOS::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pSandbox->SendDataMessage(userID, pDataMessage);
 }
 
-RESULT DreamOS::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	return m_pSandbox->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-}
-
-RESULT DreamOS::SendUpdateHandMessage(long userID, hand::HandState handState) {
-	return m_pSandbox->SendUpdateHandMessage(userID, handState);
-}
-
 RESULT DreamOS::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pSandbox->BroadcastDataMessage(pDataMessage);
-}
-
-RESULT DreamOS::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	return m_pSandbox->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
-}
-
-RESULT DreamOS::BroadcastUpdateHandMessage(hand::HandState handState) {
-	return m_pSandbox->BroadcastUpdateHandMessage(handState);
 }
 
 RESULT DreamOS::RegisterSubscriber(SenseVirtualKey keyEvent, Subscriber<SenseKeyboardEvent>* pKeyboardSubscriber) {

@@ -77,6 +77,23 @@ bool WebRTCConductor::FindPeerConnectionByID(long peerConnectionID) {
 		return true;
 }
 
+RESULT WebRTCConductor::RemovePeerConnectionByID(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	auto pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+	CN(pWebRTCPeerConnection);
+	
+	{
+		auto it = std::find(m_webRTCPeerConnections.begin(), m_webRTCPeerConnections.end(), pWebRTCPeerConnection);
+		CB((it != m_webRTCPeerConnections.end()));
+
+		m_webRTCPeerConnections.erase(it);
+	}
+
+Error:
+	return r;
+}
+
 rtc::scoped_refptr<WebRTCPeerConnection> WebRTCConductor::GetPeerConnectionByPeerUserID(long peerUserID) {
 	for (auto &pWebRTCPeerConnection : m_webRTCPeerConnections)
 		if (pWebRTCPeerConnection->GetPeerUserID() == peerUserID)
@@ -239,6 +256,19 @@ Error:
 	return r;
 }
 
+WebRTCPeerConnectionProxy* WebRTCConductor::GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	auto pWebRTCPeerConnection = GetPeerConnection(pPeerConnection->GetPeerConnectionID());
+	CN(pWebRTCPeerConnection);
+
+	// Get proxy from WebRTCPeerConnection
+	return pWebRTCPeerConnection->GetProxy();
+
+Error:
+	return nullptr;
+}
+
 RESULT WebRTCConductor::Initialize() {
 	RESULT r = R_PASS;
 
@@ -283,11 +313,23 @@ RESULT WebRTCConductor::OnWebRTCConnectionStable(long peerConnectionID) {
 }
 
 RESULT WebRTCConductor::OnWebRTCConnectionClosed(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	// First give observer message
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnWebRTCConnectionClosed(peerConnectionID);
 	}
 
-	return R_NOT_HANDLED;
+	DEBUG_LINEOUT("ICE Connection disconnected, remove webrtc peer connection");
+	CR(RemovePeerConnectionByID(peerConnectionID));
+
+Error:
+	return r;
+}
+
+RESULT WebRTCConductor::Shutdown() {
+	m_webRTCPeerConnections.clear();
+	return R_PASS;
 }
 
 RESULT WebRTCConductor::OnSDPOfferSuccess(long peerConnectionID) {		// TODO: Consolidate with below
@@ -339,6 +381,27 @@ RESULT WebRTCConductor::OnICECandidatesGatheringDone(long peerConnectionID) {
 	return R_NOT_HANDLED;
 }
 
+RESULT WebRTCConductor::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
+	RESULT r = R_PASS;
+
+	switch (webRTCIceConnectionState) {
+		case WebRTCIceConnection::state::DISCONNECTED: {
+			// Close the WebRTC connection
+			auto pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+			CN(pWebRTCPeerConnection);
+
+			CR(pWebRTCPeerConnection->CloseWebRTCPeerConnection());
+		} break;
+	}
+
+	if (m_pParentObserver != nullptr) {
+		CR(m_pParentObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState));
+	}
+
+Error:
+	return r;
+}
+
 RESULT WebRTCConductor::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnDataChannelStringMessage(peerConnectionID, strDataChannelMessage);
@@ -351,6 +414,54 @@ RESULT WebRTCConductor::OnDataChannelMessage(long peerConnectionID, uint8_t *pDa
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n);
 	}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnRenegotiationNeeded(long peerConnectionID) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnRenegotiationNeeded(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnAddStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) {
+	RESULT r = R_PASS;
+
+	//if (pMediaStream->label() == kAudioLabel) {
+
+	if(pMediaStream->FindAudioTrack(kAudioLabel)) {
+		if (m_pParentObserver != nullptr) {
+			m_pParentObserver->OnAudioChannel(peerConnectionID);
+		}
+	}
+
+	return r;
+}
+
+RESULT WebRTCConductor::OnRemoveStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) {
+	// TODO: 
+	//if (m_pParentObserver != nullptr) {
+	//	return m_pParentObserver->OnRemoveStream(peerConnectionID);
+	//}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnDataChannel(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) {
+	if (m_pParentObserver != nullptr) {
+		return m_pParentObserver->OnDataChannel(peerConnectionID);
+	}
+
+	return R_NOT_HANDLED;
+}
+
+RESULT WebRTCConductor::OnDataChannelStateChange(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) {
+	// TODO: 
+	//if (m_pParentObserver != nullptr) {
+	//	return m_pParentObserver->OnDataChannelStateChange(peerConnectionID);
+	//}
 
 	return R_NOT_HANDLED;
 }

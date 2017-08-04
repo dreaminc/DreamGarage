@@ -13,6 +13,7 @@
 #include <stack>
 #include <memory>
 
+#include "Cloud/CloudController.h"
 #include "Cloud/Menu/MenuController.h"
 
 class DreamOS;
@@ -22,7 +23,6 @@ class VirtualObj;
 class sphere;
 class quad;
 
-class EnvironmentAsset;
 class DreamBrowser;
 
 struct SenseControllerEvent;
@@ -41,7 +41,8 @@ class UITestSuite : public valid, public TestSuite,
 					public Subscriber<SenseControllerEvent>, public Subscriber<SenseKeyboardEvent>, 
 					public Subscriber<SenseMouseEvent>,
 					public Subscriber<UIEvent>,
-					public MenuController::observer
+					public MenuController::observer,
+					public CloudController::EnvironmentObserver
 {
 public:
 	UITestSuite(DreamOS *pDreamOS);
@@ -66,7 +67,7 @@ public:
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
 
 	// Environment Asset Callback
-	RESULT HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
 
 public:
 	virtual RESULT Notify(SenseControllerEvent *event) override;

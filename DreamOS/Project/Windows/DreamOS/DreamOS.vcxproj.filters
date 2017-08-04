@@ -356,9 +356,6 @@
     <ClCompile Include="..\..\..\Primitives\hand.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h">
-      <Filter>Cloud\Message</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp">
       <Filter>Primitives</Filter>
     </ClCompile>
@@ -815,6 +812,9 @@
     <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRController.cpp">
       <Filter>HMD\OpenVR</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\DreamPeer.cpp">
+      <Filter>DreamOS</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">
@@ -1252,9 +1252,6 @@
     <ClInclude Include="..\..\..\Cloud\Message\Message.h">
       <Filter>Cloud\Message</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h">
-      <Filter>Cloud\Message</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\user.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -1381,9 +1378,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
       <Filter>Cloud\User</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
-      <Filter>Cloud\Message</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h">
       <Filter>PhysicsEngine</Filter>
@@ -1693,6 +1687,39 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRController.h">
       <Filter>HMD\OpenVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamPeer.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerAckMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerHandshakeMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerStayAliveMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCIceConnection.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Proxy.h">
+      <Filter>Primitives</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -33,8 +33,11 @@ public:
 };
 
 // TODO: This is actually a UserController - so change the name of object and file
-class EnvironmentController : public Controller, public PeerConnectionController::PeerConnectionControllerObserver, public EnvironmentControllerProxy {
+class EnvironmentController : public Controller, 
+							  public PeerConnectionController::PeerConnectionControllerObserver, 
+							  public EnvironmentControllerProxy {
 	friend class MenuController;
+	friend class CloudController;
 public:
 	enum class state {
 		UNINITIALIZED,
@@ -73,15 +76,15 @@ public:
 	// TODO: Convert to a proper controller observer pattern?
 	class EnvironmentControllerObserver {
 	public:
-		virtual RESULT OnPeersUpdate(long index) = 0;
-		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
-		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
-		virtual RESULT OnAudioData(long peerConnectionID,
-			const void* audio_data,
-			int bits_per_sample,
-			int sample_rate,
-			size_t number_of_channels,
-			size_t number_of_frames) = 0;
+		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
+		virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
+		virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		
+		virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) = 0;
+		virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) = 0;
+		
 		virtual long GetUserID() = 0;
 		virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) = 0;
 	};
@@ -142,18 +145,17 @@ private:
 	std::string GetMethodURI(EnvironmentMethod userMethod);
 
 	// PeerConnectionControllerObserver
-	virtual RESULT OnPeersUpdate(long index) override;
-	virtual RESULT OnDataChannelStringMessage(long peerUserID, const std::string& strDataChannelMessage) override;
-	virtual RESULT OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
-	virtual RESULT OnAudioData(long peerConnectionID,
-		const void* audio_data,
-		int bits_per_sample,
-		int sample_rate,
-		size_t number_of_channels,
-		size_t number_of_frames) override;
+	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 	virtual RESULT OnSDPOfferSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnSDPAnswerSuccess(PeerConnection *pPeerConnection) override;
 	virtual RESULT OnICECandidatesGatheringDone(PeerConnection *pPeerConnection) override;
+
+	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
+	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
 
 public:
 	long GetEnvironmentID() { return m_environment.GetEnvironmentID(); }
@@ -177,6 +179,7 @@ public:
 	// Environment Controller Proxy
 	EnvironmentControllerProxy* GetEnvironmentControllerProxy();
 	
+	WebRTCImpProxy* GetWebRTCControllerProxy();
 
 public:
 	EnvironmentController::state GetState() {

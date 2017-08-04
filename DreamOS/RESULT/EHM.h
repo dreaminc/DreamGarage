@@ -41,10 +41,12 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
     #define DEBUG_OUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); } while(0);
     #define DEBUG_LINEOUT(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\n"); } while(0); 
 	#define DEBUG_LINEOUT_RETURN(str, ...) do { CONSOLE_OUT(str, ##__VA_ARGS__); CONSOLE_OUT("\r"); } while(0); 
+	#define DEBUG_SYSTEM_PAUSE() do { system("pause"); } while(0); 
 #else
 	#define DEBUG_OUT(str, ...)
 	#define DEBUG_LINEOUT(str, ...)
 	#define DEBUG_LINEOUT_RETURN(str, ...) 
+	#define DEBUG_SYSTEM_PAUSE()
 #endif
 
 #define DEBUG_FILE_LINE
@@ -99,6 +101,18 @@ template <typename T, size_t N> char(&ArraySizeHelper(T(&array)[N]))[N];
 
 #define ACNM(pointer, msg, ...) do{if((pointer) == NULL){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
 #define ACN(pointer) do{if((pointer) == NULL){assert(0);}}while(0);
+
+// Check is null (ensure null) result
+// Ensures that the pointer IS NULL
+#define CBN(pointer) do{if((pointer) != NULL) {r = R_ERROR; goto Error;}}while(0);
+#define WCBN(pointer) do{if((pointer) != NULL) {r = R_WARNING; goto Error;}}while(0);
+#define CBNR(pointer, failCode) do{if((pointer) != NULL) {r = failCode; goto Error;}}while(0);
+#define CBNM(pointer, msg, ...) do{if((pointer) != NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_ERROR; goto Error; }}while(0);
+#define CBNMW(pointer, msg, ...) do{if((pointer) != NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = R_WARNING; }}while(0);
+#define CBNRM(pointer, failCode, msg, ...) do{if((pointer) != NULL) { DEBUG_OUT(CurrentFileLine); DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); r = failCode; goto Error; }}while(0);
+
+#define ABCNM(pointer, msg, ...) do{if((pointer) != NULL){DEBUG_OUT(msg, ##__VA_ARGS__); DEBUG_OUT("\n"); assert(0);}}while(0);
+#define ABCN(pointer) do{if((pointer) != NULL){assert(0);}}while(0);
 
 // Check Pointer Result
 // Ensures that the pointer is not a NULL

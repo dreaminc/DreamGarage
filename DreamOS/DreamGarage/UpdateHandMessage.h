@@ -8,14 +8,16 @@
 // Base Message object
 
 #include <string>
-#include "Message.h"
+#include "DreamGarageMessage.h"
 
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 #include "Primitives/quaternion.h"
 #include "Primitives/hand.h"
 
-class UpdateHandMessage : public Message {
+// TODO: We might want to switch this out with other messages
+
+class UpdateHandMessage : public DreamGarageMessage {
 private:
 	__declspec(align(4)) struct MessageBody {
 		hand::HandState handState;
@@ -23,7 +25,7 @@ private:
 
 public:
 	UpdateHandMessage(long senderUserID, long receiverUserID, hand::HandState handState) :
-		Message(senderUserID, receiverUserID, MessageType::MESSAGE_UPDATE_HAND, sizeof(UpdateHandMessage))
+		DreamGarageMessage(senderUserID, receiverUserID, DreamGarageMessage::type::UPDATE_HAND, sizeof(UpdateHandMessage))
 	{
 		m_body.handState = handState;
 	}
@@ -37,7 +39,6 @@ public:
 		m_body.handState.PrintState();
 		return R_PASS;
 	}
-
 
 	hand::HandState GetHandState() {
 		return m_body.handState;

@@ -37,14 +37,24 @@
 #include "PhysicsEngine/PhysicsEngine.h"
 
 #include "DreamAppManager.h"
+#include "DreamPeer.h"
 
 #include "UI/UIKeyboard.h"
 
 class UIKeyboardLayout;
+class DreamMessage;
+
+class PeerStayAliveMessage;
+class PeerAckMessage;
+class PeerHandshakeMessage;
+
 
 class DreamOS : 
 	public Subscriber<CollisionObjectEvent>, 
-	public valid 
+	public valid,
+	public CloudController::PeerConnectionObserver,
+	public CloudController::EnvironmentObserver,
+	public DreamPeer::DreamPeerObserver
 {
 	friend class CloudTestSuite;
 
@@ -73,9 +83,50 @@ public:
 
 	HMD *GetHMD();
 
+	// PeerConnectionObserver
+	virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) override;
+	virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDreamMessage) override;
+	virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+	virtual RESULT OnDataChannel(PeerConnection* pPeerConnection) override;
+	virtual RESULT OnAudioChannel(PeerConnection* pPeerConnection) override;
+
+	// EnvironmentObserver
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override {
+		return R_NOT_IMPLEMENTED;
+	}
+
+	// DreamPeer Observer
+	virtual RESULT OnDreamPeerStateChange(DreamPeer* pDreamPeer) override;
+
+	// Cloud Controller Hooks
+	virtual RESULT OnNewDreamPeer(DreamPeer *pDreamPeer) = 0;
+	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) = 0;
+	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) = 0;
+
+	// Peers
+	RESULT HandlePeerHandshakeMessage(PeerConnection* pPeerConnection, PeerHandshakeMessage *pPeerHandshakeMessage);
+	RESULT HandlePeerStayAliveMessage(PeerConnection* pPeerConnection, PeerStayAliveMessage *pPeerStayAliveMessage);
+	RESULT HandlePeerAckMessage(PeerConnection* pPeerConnection, PeerAckMessage *pPeerAckMessage);
+
+	WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection);
+
+protected:
+	std::shared_ptr<DreamPeer> CreateNewPeer(PeerConnection *pPeerConnection);
+	std::shared_ptr<DreamPeer> FindPeer(long peerUserID);
+	std::shared_ptr<DreamPeer> FindPeer(PeerConnection *pPeerConnection);
+	RESULT RemovePeer(long peerUserID);
+	RESULT RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer);
+	DreamPeer::state GetPeerState(long peerUserID);
+
+private:
+	std::map<long, std::shared_ptr<DreamPeer>> m_dreamPeers;
+
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();
 	CloudController *GetCloudController();
+	long GetUserID();
 
 protected:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
@@ -234,19 +285,11 @@ public:
 
 	// Cloud Controller
 protected:
-	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback);
-	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
-	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
-	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
-	RESULT RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback);
+	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);
+	RESULT RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
-	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
-
 	RESULT BroadcastDataMessage(Message *pDataMessage);
-	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
 
 	// IO
 //protected:

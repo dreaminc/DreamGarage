@@ -37,8 +37,13 @@ public:
 		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;		// TODO: Consolidate with below
 		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;	// TODO: Consolidate with below
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+
+		virtual RESULT OnRenegotiationNeeded(long peerConnectionID) = 0;
+		virtual RESULT OnDataChannel(long peerConnectionID) = 0;
+		virtual RESULT OnAudioChannel(long peerConnectionID) = 0;
 
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
@@ -60,6 +65,8 @@ public:
 	RESULT Initialize();
 	RESULT InitializeNewPeerConnection(long peerConnectionID, bool fCreateOffer, bool fAddDataChannel);
 
+	RESULT Shutdown();
+
 	friend class WebRTCImp;
 
 public:
@@ -71,8 +78,14 @@ public:
 	virtual RESULT OnSDPSuccess(long peerConnectionID, bool fOffer) override;
 	virtual RESULT OnSDPFailure(long peerConnectionID, bool fOffer) override;
 	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) override;
 	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
 	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnRenegotiationNeeded(long peerConnectionID) override;
+	virtual RESULT OnAddStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) override;
+	virtual RESULT OnRemoveStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) override;
+	virtual RESULT OnDataChannel(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) override;
+	virtual RESULT OnDataChannelStateChange(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) override;
 
 	virtual User GetUser() override;
 	virtual TwilioNTSInformation GetTwilioNTSInformation() override;
@@ -89,6 +102,7 @@ private:
 	rtc::scoped_refptr<WebRTCPeerConnection> AddNewPeerConnection(long peerConnectionID);
 	rtc::scoped_refptr<WebRTCPeerConnection> GetPeerConnection(long peerConnectionID);
 	bool FindPeerConnectionByID(long peerConnectionID);
+	RESULT RemovePeerConnectionByID(long peerConnectionID);
 
 	rtc::scoped_refptr<WebRTCPeerConnection> GetPeerConnectionByPeerUserID(long peerConnectionID);
 	bool FindPeerConnectionByPeerUserID(long peerUserID);
@@ -110,6 +124,8 @@ protected:
 
 	RESULT AddOfferCandidates(PeerConnection *pPeerConnection);
 	RESULT AddAnswerCandidates(PeerConnection *pPeerConnection);
+
+	WebRTCPeerConnectionProxy* GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection);
 
 public:
 	RESULT SendDataChannelStringMessageByPeerUserID(long peerUserID, std::string& strMessage);

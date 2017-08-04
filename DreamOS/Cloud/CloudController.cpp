@@ -5,9 +5,9 @@
 #include "Sandbox/CommandLineManager.h"
 
 #include "Cloud/Message/Message.h"
-#include "Cloud/Message/UpdateHandMessage.h"
-#include "Cloud/Message/UpdateHeadMessage.h"
-#include "Cloud/Message/AudioDataMessage.h"
+//#include "Cloud/Message/UpdateHandMessage.h"
+//#include "Cloud/Message/UpdateHeadMessage.h"
+//#include "Cloud/Message/AudioDataMessage.h"
 
 #include "DreamConsole/DreamConsole.h"
 
@@ -18,6 +18,8 @@
 
 #include <chrono>
 #include <thread>
+
+#include "Cloud/Environment/PeerConnection.h"
 
 #if (defined(_WIN32) || defined(_WIN64))
 #include "Sandbox/Windows/Win32Helper.h"
@@ -84,7 +86,7 @@ RESULT CloudController::Start() {
 
 	DEBUG_LINEOUT("CloudController::Start");
 
-	m_thread = std::thread(&CloudController::ProcessingThread, this);
+	m_cloudThread = std::thread(&CloudController::ProcessingThread, this);
 
 //Error:
 	return r;
@@ -94,13 +96,14 @@ RESULT CloudController::Stop() {
 	RESULT r = R_PASS;
 
 	DEBUG_LINEOUT("CloudController::Stop");
-
 	HUD_OUT("login into Relativity ...");
 
 	m_fRunning = false;
 
+	m_pEnvironmentController->m_pPeerConnectionController->m_pWebRTCImp->Shutdown();
+
 #if (defined(_WIN32) || defined(_WIN64))
-	Win32Helper::PostQuitMessage(m_thread);
+	Win32Helper::PostQuitMessage(m_cloudThread);
 #else
 #pragma message ("not implemented post quit to thread")
 	while (m_fRunning) {
@@ -108,8 +111,8 @@ RESULT CloudController::Stop() {
 	}
 #endif
 
-	if (m_thread.joinable()) {
-		m_thread.join();
+	if (m_cloudThread.joinable()) {
+		m_cloudThread.join();
 	}
 
 //Error:
@@ -132,66 +135,6 @@ RESULT CloudController::RegisterDataChannelMessageCallback(HandleDataChannelMess
 	}
 	else {
 		m_fnHandleDataChannelMessageCallback = fnHandleDataChannelMessageCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
-	if (m_fnHandlePeersUpdateCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandlePeersUpdateCallback = fnHandlePeersUpdateCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
-	if (m_fnHandleDataMessageCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleDataMessageCallback = fnHandleDataMessageCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
-	if (m_fnHandleHeadUpdateMessageCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleHeadUpdateMessageCallback = fnHandleHeadUpdateMessageCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
-	if (m_fnHandleHandUpdateMessageCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleHandUpdateMessageCallback = fnHandleHandUpdateMessageCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
-	if (m_fnHandleAudioDataCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleAudioDataCallback = fnHandleAudioDataCallback;
-		return R_PASS;
-	}
-}
-
-RESULT CloudController::RegisterEnvironmentAssetCallback(HandleEnvironmentAssetCallback fnHandleEnvironmentAssetCallback) {
-	if (m_fnHandleEnvironmentAssetCallback) {
-		return R_FAIL;
-	}
-	else {
-		m_fnHandleEnvironmentAssetCallback = fnHandleEnvironmentAssetCallback;
 		return R_PASS;
 	}
 }
@@ -262,63 +205,82 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
+RESULT CloudController::OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 
 	CN(m_fnHandleDataChannelStringMessageCallback);
-	CR(m_fnHandleDataChannelStringMessageCallback(peerConnectionID, strDataChannelMessage));
+	CR(m_fnHandleDataChannelStringMessageCallback(pPeerConnection, strDataChannelMessage));
 
-Error:
-	return r;
-}
-
-RESULT CloudController::OnPeersUpdate(long index) {
-	RESULT r = R_PASS;
-
-	if (m_fnHandlePeersUpdateCallback != nullptr) {
-		CR(m_fnHandlePeersUpdateCallback(index));
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnDataStringMessage(pPeerConnection, strDataChannelMessage));
 	}
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT CloudController::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnNewPeerConnection(userID, peerUserID, fOfferor, pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnPeerConnectionClosed(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
 	if (m_fnHandleDataChannelMessageCallback != nullptr) {
-		CR(m_fnHandleDataChannelMessageCallback(peerUserID, pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_fnHandleDataChannelMessageCallback(pPeerConnection, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 	Message *pDataChannelMessage = reinterpret_cast<Message*>(pDataChannelBuffer);
 	CN(pDataChannelMessage);
 
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnDataMessage(pPeerConnection, pDataChannelMessage));
+	}
+
+	/*
+	// TODO: Move this into DreamGarage
 	switch (pDataChannelMessage->GetType()) {
 		case Message::MessageType::MESSAGE_UPDATE_HEAD: {
-			if (m_fnHandleHeadUpdateMessageCallback != nullptr) {
+			if (m_pPeerConnectionObserver != nullptr) {
 				UpdateHeadMessage *pUpdateHeadMessage = reinterpret_cast<UpdateHeadMessage*>(pDataChannelBuffer);
 				CN(pUpdateHeadMessage);
 				// TODO: Add peer ID from
-				CR(m_fnHandleHeadUpdateMessageCallback(peerUserID, pUpdateHeadMessage));
+				CR(m_pPeerConnectionObserver->OnHeadUpdateMessage(peerUserID, pUpdateHeadMessage));
 			}
 		} break;
 
 		case Message::MessageType::MESSAGE_UPDATE_HAND: {
-			if (m_fnHandleHandUpdateMessageCallback != nullptr) {
+			if (m_pPeerConnectionObserver != nullptr) {
 				UpdateHandMessage *pUpdateHandMessage = reinterpret_cast<UpdateHandMessage*>(pDataChannelBuffer);
 				CN(pUpdateHandMessage);
 				// TODO: Add peer ID from
-				CR(m_fnHandleHandUpdateMessageCallback(peerUserID, pUpdateHandMessage));
+				CR(m_pPeerConnectionObserver->OnHandUpdateMessage(peerUserID, pUpdateHandMessage));
 			}
 		} break;
 
 		default: {
-			if (m_fnHandleDataMessageCallback != nullptr) {
-				// TODO: Add peer ID from
-				CR(m_fnHandleDataMessageCallback(peerUserID, pDataChannelMessage));
-			}
+			
 		} break;
 	}
+	*/
 
 Error:
 	return r;
@@ -327,33 +289,44 @@ Error:
 RESULT CloudController::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmnetAsset) {
 	RESULT r = R_PASS;
 
-	if (m_fnHandleEnvironmentAssetCallback != nullptr) {
-		CR(m_fnHandleEnvironmentAssetCallback(pEnvironmnetAsset));
+	if (m_pEnvironmentObserver != nullptr) {
+		CR(m_pEnvironmentObserver->OnEnvironmentAsset(pEnvironmnetAsset));
 	}
 
 Error:
 	return r;
 }
 
-RESULT CloudController::OnAudioData(long peerConnectionID,
-	const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames) 
-{
+RESULT CloudController::OnDataChannel(PeerConnection* pPeerConnection) {
 	RESULT r = R_PASS;
 
-	if (m_fnHandleAudioDataCallback != nullptr) {
-		AudioDataMessage audioDataMessage(peerConnectionID,
-			peerConnectionID,
-			audio_data,
-			bits_per_sample,
-			sample_rate,
-			number_of_channels,
-			number_of_frames);
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnDataChannel(pPeerConnection));
+	}
 
-		CR(m_fnHandleAudioDataCallback(peerConnectionID, &audioDataMessage));
+Error:
+	return r;
+}
+
+RESULT CloudController::OnAudioChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnAudioChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT CloudController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames)  {
+	RESULT r = R_PASS;
+
+	long senderUserID = pPeerConnection->GetPeerUserID();
+	long recieverUserID = pPeerConnection->GetUserID();
+
+	if (m_pPeerConnectionObserver != nullptr) {
+		CR(m_pPeerConnectionObserver->OnAudioData(pPeerConnection, pAudioDataBuffer, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:
@@ -578,6 +551,8 @@ RESULT CloudController::SendDataMessage(long userID, Message *pDataMessage) {
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	CB(m_fRunning);
+
 	// TODO: Fix this - remove m_pCloudImp
 	//CB(m_pCloudImp->IsConnected());
 	CB(m_pEnvironmentController->IsUserIDConnected(userID));
@@ -588,60 +563,6 @@ RESULT CloudController::SendDataMessage(long userID, Message *pDataMessage) {
 		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
 		CN(pDatachannelBuffer);
 		memcpy(pDatachannelBuffer, pDataMessage, pDataMessage->GetSize());
-		CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
-	}
-
-Error:
-	return r;
-}
-
-RESULT CloudController::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	RESULT r = R_PASS;
-	uint8_t *pDatachannelBuffer = nullptr;
-	int pDatachannelBuffer_n = 0;
-
-	CB(m_fRunning);
-
-	// TODO: Fix this - remove m_pCloudImp
-	//CB(m_pCloudImp->IsConnected());
-	CB(m_pEnvironmentController->IsUserIDConnected(userID));
-	CN(m_pUserController);
-	{
-		// Create the message
-		UpdateHeadMessage updateHeadMessage(m_pUserController->GetUserID(), userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-
-		pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
-		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-		CN(pDatachannelBuffer);
-		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
-
-		CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
-	}
-
-Error:
-	return r;
-}
-
-RESULT CloudController::SendUpdateHandMessage(long userID, hand::HandState handState) {
-	RESULT r = R_PASS;
-	uint8_t *pDatachannelBuffer = nullptr;
-	int pDatachannelBuffer_n = 0;
-
-	CB(m_fRunning);
-
-	// TODO: Fix this - remove m_pCloudImp
-	//CB(m_pCloudImp->IsConnected());
-	CB(m_pEnvironmentController->IsUserIDConnected(userID));
-	CN(m_pUserController);
-	{
-		// Create the message
-		UpdateHandMessage updateHeadMessage(m_pUserController->GetUserID(), userID, handState);
-
-		pDatachannelBuffer_n = sizeof(UpdateHandMessage);
-		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-		CN(pDatachannelBuffer);
-		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
-
 		CR(SendDataChannelMessage(userID, pDatachannelBuffer, pDatachannelBuffer_n));
 	}
 
@@ -657,6 +578,8 @@ RESULT CloudController::BroadcastDataMessage(Message *pDataMessage) {
 	uint8_t *pDatachannelBuffer = nullptr;
 	int pDatachannelBuffer_n = 0;
 
+	CB(m_fRunning);
+
 	CN(m_pUserController);
 	{
 		// Create the message
@@ -672,49 +595,7 @@ Error:
 	return r;
 }
 
-RESULT CloudController::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	RESULT r = R_PASS;
-	uint8_t *pDatachannelBuffer = nullptr;
-	int pDatachannelBuffer_n = 0;
 
-	CN(m_pUserController);
-	{
-		// Create the message
-		UpdateHeadMessage updateHeadMessage(m_pUserController->GetUserID(), -1, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-
-		pDatachannelBuffer_n = sizeof(UpdateHeadMessage);
-		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-		CN(pDatachannelBuffer);
-		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHeadMessage));
-
-		CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
-	}
-
-Error:
-	return r;
-}
-
-RESULT CloudController::BroadcastUpdateHandMessage(hand::HandState handState) {
-	RESULT r = R_PASS;
-	uint8_t *pDatachannelBuffer = nullptr;
-	int pDatachannelBuffer_n = 0;
-
-	CN(m_pUserController);
-	{
-		// Create the message
-		UpdateHandMessage updateHeadMessage(m_pUserController->GetUserID(), -1, handState);
-
-		pDatachannelBuffer_n = sizeof(UpdateHandMessage);
-		pDatachannelBuffer = new uint8_t[pDatachannelBuffer_n];
-		CN(pDatachannelBuffer);
-		memcpy(pDatachannelBuffer, &updateHeadMessage, sizeof(UpdateHandMessage));
-
-		CR(BroadcastDataChannelMessage(pDatachannelBuffer, pDatachannelBuffer_n));
-	}
-
-Error:
-	return r;
-}
 
 RESULT CloudController::Notify(CmdPromptEvent *event) {
 	RESULT r = R_PASS;
@@ -738,12 +619,21 @@ RESULT CloudController::Notify(CmdPromptEvent *event) {
 	return r;
 }
 
+// TODO: Fix inconsistency with proxy pattern (webrtc is correct, proxy shouldn't include register observer for example)
 // TODO: Fill out pattern for other controllers
 // TODO: Replace with polymorphic fns
 ControllerProxy* CloudController::GetControllerProxy(CLOUD_CONTROLLER_TYPE controllerType) {
 	ControllerProxy *pProxy = nullptr;
 
 	switch (controllerType) {
+		case CLOUD_CONTROLLER_TYPE::CLOUD: {
+			pProxy = (ControllerProxy*)(this);
+		} break;
+
+		case CLOUD_CONTROLLER_TYPE::WEBRTC: {
+			pProxy = (ControllerProxy*)(GetWebRTCControllerProxy());
+		} break;
+
 		case CLOUD_CONTROLLER_TYPE::MENU: {
 			pProxy = (ControllerProxy*)(GetMenuControllerProxy());
 		} break;
@@ -781,10 +671,40 @@ Error:
 	return r;
 }
 
+RESULT CloudController::RegisterPeerConnectionObserver(PeerConnectionObserver* pPeerConnectionObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pPeerConnectionObserver), "Observer cannot be nullptr");
+	CBM((m_pPeerConnectionObserver == nullptr), "Can't overwrite peer connection observer");
+	m_pPeerConnectionObserver = pPeerConnectionObserver;
+
+Error:
+	return r;
+}
+
+RESULT CloudController::RegisterEnvironmentObserver(EnvironmentObserver* pEnvironmentObserver) {
+	RESULT r = R_PASS;
+
+	CNM((pEnvironmentObserver), "Observer cannot be nullptr");
+	CBM((m_pEnvironmentObserver == nullptr), "Can't overwrite environment observer");
+	m_pEnvironmentObserver = pEnvironmentObserver;
+
+Error:
+	return r;
+}
+
 // TODO: Replace all of these with polymorphic fns 
 UserControllerProxy* CloudController::GetUserControllerProxy() {
 	if (m_pUserController != nullptr)
 		return m_pUserController->GetUserControllerProxy();
+
+	return nullptr;
+}
+
+WebRTCImpProxy* CloudController::GetWebRTCControllerProxy() {
+	if (m_pEnvironmentController != nullptr) {
+		return m_pEnvironmentController->GetWebRTCControllerProxy();
+	}
 
 	return nullptr;
 }

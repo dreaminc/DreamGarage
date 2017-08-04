@@ -538,6 +538,10 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeCamera(), "Failed to initialize Camera");
 	CRM(InitializeHAL(), "Failed to initialize HAL");
 
+	// TODO: Remove CMD line arg and use global config
+	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
+		m_SandboxConfiguration.fUseHMD = false;
+	}
 	CRM(InitializeHMD(), "Failed to initialize HMD");
 
 	// Set up the pipeline
@@ -547,11 +551,6 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
 	CRM(InitializeTimeManager(), "Failed to initialize time manager");
 	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
-
-	// TODO: Remove CMD line arg and use global config
-	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
-		m_SandboxConfiguration.fUseHMD = false;
-	}
 
 	if ((m_pCommandLineManager->GetParameterValue("leap").compare("") == 0) == false) {
 		m_SandboxConfiguration.fUseLeap = false;
@@ -1479,49 +1478,21 @@ quaternion SandboxApp::GetCameraOrientation() {
 }
 
 // Cloud Controller
-RESULT SandboxApp::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
-	return m_pCloudController->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
+RESULT SandboxApp::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
+	return m_pCloudController->RegisterPeerConnectionObserver(pPeerConnectionObserver);
 }
 
-RESULT SandboxApp::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
-	return m_pCloudController->RegisterDataMessageCallback(fnHandleDataMessageCallback);
-}
-
-RESULT SandboxApp::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
-	return m_pCloudController->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
-}
-
-RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
-	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
-}
-
-RESULT SandboxApp::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
-	return m_pCloudController->RegisterAudioDataCallback(fnHandleAudioDataCallback);
+RESULT SandboxApp::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
+	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pCloudController->SendDataMessage(userID, pDataMessage);
 }
 
-RESULT SandboxApp::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	return m_pCloudController->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-}
-
-RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState) {
-	return m_pCloudController->SendUpdateHandMessage(userID, handState);
-}
-
 
 RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
-}
-
-RESULT SandboxApp::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	return m_pCloudController->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
-}
-
-RESULT SandboxApp::BroadcastUpdateHandMessage(hand::HandState handState) {
-	return m_pCloudController->BroadcastUpdateHandMessage(handState);
 }
 
 // TimeManager

@@ -8,13 +8,13 @@
 // Base Message object
 
 #include <string>
-#include "Message.h"
+#include "DreamGarageMessage.h"
 
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 #include "Primitives/quaternion.h"
 
-class UpdateHeadMessage : public Message {
+class UpdateHeadMessage : public DreamGarageMessage {
 
 private:
 	__declspec(align(4)) struct MessageBody {
@@ -26,7 +26,7 @@ private:
 
 public:
 	UpdateHeadMessage(long senderUserID, long receiverUserID, point ptPosition, quaternion qOrientation) :
-		Message(senderUserID, receiverUserID, MessageType::MESSAGE_UPDATE_HEAD, sizeof(UpdateHeadMessage))
+		DreamGarageMessage(senderUserID, receiverUserID, DreamGarageMessage::type::UPDATE_HEAD, sizeof(UpdateHeadMessage))
 	{
 		m_body.ptPosition = ptPosition;
 		m_body.qOrientation = qOrientation;
@@ -38,7 +38,7 @@ public:
 					  point ptPosition, quaternion qOrientation, 
 					  vector vVelocity, quaternion qAngularVelocity
 	) :
-		Message(senderUserID, receiverUserID, MessageType::MESSAGE_UPDATE_HEAD, sizeof(UpdateHeadMessage))
+		DreamGarageMessage(senderUserID, receiverUserID, DreamGarageMessage::type::UPDATE_HEAD, sizeof(UpdateHeadMessage))
 	{
 		m_body.ptPosition = ptPosition;
 		m_body.qOrientation = qOrientation;

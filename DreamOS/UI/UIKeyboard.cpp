@@ -241,7 +241,7 @@ RESULT UIKeyboard::Update(void *pContext) {
 	point ptCollision;
 
 	// skip keyboard interaction if not visible
-	CBR(IsVisible(), R_PASS);
+	CBR((IsVisible()), R_SKIPPED);
 
 	CN(pDOS);
 	pProxy = pDOS->GetInteractionEngineProxy();
@@ -459,6 +459,7 @@ RESULT UIKeyboard::HideKeyboard() {
 		fnCallback,
 		this
 	);
+
 	return R_PASS;
 }
 

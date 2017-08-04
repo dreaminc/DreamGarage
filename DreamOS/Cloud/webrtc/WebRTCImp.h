@@ -22,11 +22,22 @@
 #include "Cloud/User/User.h"
 #include "Cloud/User/TwilioNTSInformation.h"
 
+#include "Primitives/Proxy.h"
+
 class WebRTCClient;
 class WebRTCICECandidate;
 class PeerConnection;
 
-class WebRTCImp : public CloudImp, public std::enable_shared_from_this<WebRTCImp>, public WebRTCConductor::WebRTCConductorObserver {
+class WebRTCImpProxy : public Proxy<WebRTCImpProxy> {
+public:
+	virtual WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) = 0;
+};
+
+class WebRTCImp : public CloudImp, 
+				  public std::enable_shared_from_this<WebRTCImp>, 
+				  public WebRTCConductor::WebRTCConductorObserver,
+				  public WebRTCImpProxy
+{
 public:
 	enum WindowMessages {
 		UI_THREAD_CALLBACK = WM_APP + 1,
@@ -40,14 +51,13 @@ public:
 		virtual RESULT OnSDPOfferSuccess(long peerConnectionID) = 0;
 		virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
-		virtual RESULT OnAudioData(long peerConnectionID,
-			const void* audio_data,
-			int bits_per_sample,
-			int sample_rate,
-			size_t number_of_channels,
-			size_t number_of_frames) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
+		virtual RESULT OnRenegotiationNeeded(long peerConnectionID) = 0;
+		virtual RESULT OnDataChannel(long peerConnectionID) = 0;
+		virtual RESULT OnAudioChannel(long peerConnectionID) = 0;
 	};
 
 public:
@@ -56,6 +66,8 @@ public:
 
 	friend class WebRTCClient;
 	friend class WebRTCConductor;
+
+	RESULT Shutdown();
 
 	// CloudImp Interface
 	RESULT Initialize();
@@ -72,6 +84,10 @@ public:
 	bool IsOfferer(long peerConnectionID);
 	bool IsAnswerer(long peerConnectionID);
 	std::list<WebRTCICECandidate> GetCandidates(long peerConnectionID);
+
+	// WebRTCImpProxy
+	virtual WebRTCPeerConnectionProxy *GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) override;
+	virtual WebRTCImpProxy *GetProxy() override;
 
 	// Functionality
 	// TODO: Hand around PeerConnection object instead of peerConnectionID?
@@ -98,19 +114,18 @@ public:
 
 protected:
 	// WebRTCConductorObserver 
-	RESULT OnWebRTCConnectionStable(long peerConnectionID);
-	RESULT OnWebRTCConnectionClosed(long peerConnectionID);
-	RESULT OnSDPOfferSuccess(long peerConnectionID);
-	RESULT OnSDPAnswerSuccess(long peerConnectionID);
-	RESULT OnICECandidatesGatheringDone(long peerConnectionID);
-	RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage);
-	RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n);
-	RESULT OnAudioData(long peerConnectionID,
-		const void* audio_data,
-		int bits_per_sample,
-		int sample_rate,
-		size_t number_of_channels,
-		size_t number_of_frames);
+	virtual RESULT OnWebRTCConnectionStable(long peerConnectionID) override;
+	virtual RESULT OnWebRTCConnectionClosed(long peerConnectionID) override;
+	virtual RESULT OnSDPOfferSuccess(long peerConnectionID) override;
+	virtual RESULT OnSDPAnswerSuccess(long peerConnectionID) override;
+	virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) override;
+	virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) override;
+	virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) override;
+	virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) override;
+	virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	virtual RESULT OnRenegotiationNeeded(long peerConnectionID) override;
+	virtual RESULT OnDataChannel(long peerConnectionID) override;
+	virtual RESULT OnAudioChannel(long peerConnectionID) override;
 
 protected:
 	// WebRTC Specific

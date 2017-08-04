@@ -236,7 +236,7 @@ Error:
 	return r;
 }
 
-RESULT CloudTestSuite::HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+RESULT CloudTestSuite::OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
 	RESULT r = R_PASS;
 
 	//https://api.develop.dreamos.com/environment-asset/{id}/file
@@ -317,7 +317,8 @@ RESULT CloudTestSuite::AddTestMenuAPI() {
 		CBM(pCloudController->IsUserLoggedIn(), "User not logged in");
 		CBM(pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 
-		CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&CloudTestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+		//CR(pCloudController->RegisterEnvironmentAssetCallback(std::bind(&CloudTestSuite::HandleOnEnvironmentAsset, this, std::placeholders::_1)));
+		CR(pCloudController->RegisterEnvironmentObserver(this));
 
 		CR(LaunchDreamView());
 		

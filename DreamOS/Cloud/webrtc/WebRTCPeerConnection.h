@@ -14,17 +14,29 @@
 #include "webrtc/api/peerconnectioninterface.h"
 
 #include "WebRTCICECandidate.h"
+#include "WebRTCIceConnection.h"
+
+#include "Primitives/Proxy.h"
 
 class WebRTConductor;
 class User;
 class TwilioNTSInformation;
 
+class WebRTCPeerConnectionProxy : public Proxy<WebRTCPeerConnectionProxy> {
+public:
+	virtual RESULT SetAudioVolume(double val) = 0;
+};
+
 class WebRTCPeerConnection : 
 	public webrtc::PeerConnectionObserver, 
 	public webrtc::DataChannelObserver,
 	public webrtc::CreateSessionDescriptionObserver,
-	public webrtc::AudioTrackSinkInterface
+	public webrtc::AudioTrackSinkInterface,
+	public WebRTCPeerConnectionProxy
 {
+public:
+	
+
 public:
 	class WebRTCPeerConnectionObserver {
 	public:
@@ -35,18 +47,20 @@ public:
 		virtual RESULT OnSDPSuccess(long peerConnectionID, bool fOffer) = 0;
 		virtual RESULT OnSDPFailure(long peerConnectionID, bool fOffer) = 0;
 		virtual RESULT OnICECandidatesGatheringDone(long peerConnectionID) = 0;
+		virtual RESULT OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) = 0;
 		virtual RESULT OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
+
+		virtual RESULT OnRenegotiationNeeded(long peerConnectionID) = 0;
+		virtual RESULT OnAddStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) = 0;
+		virtual RESULT OnRemoveStream(long peerConnectionID, rtc::scoped_refptr<webrtc::MediaStreamInterface> pMediaStream) = 0;
+		virtual RESULT OnDataChannel(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) = 0;
+		virtual RESULT OnDataChannelStateChange(long peerConnectionID, rtc::scoped_refptr<webrtc::DataChannelInterface> pDataChannel) = 0;
 
 		virtual User GetUser() = 0;
 		virtual TwilioNTSInformation GetTwilioNTSInformation() = 0;
 
-		virtual RESULT OnAudioData(long peerConnectionID,
-			const void* audio_data,
-			int bits_per_sample,
-			int sample_rate,
-			size_t number_of_channels,
-			size_t number_of_frames) = 0;
+		virtual RESULT OnAudioData(long peerConnectionID, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
 	};
 
 	friend class WebRTCPeerConnectionObserver;
@@ -67,6 +81,13 @@ public:
 	RESULT ClearRemoteSessionDescriptionProtocol();
 	std::list<WebRTCICECandidate> GetICECandidates();
 
+	RESULT CloseWebRTCPeerConnection();
+
+public:
+	// WebRTCPeerConnectionProxy
+	virtual RESULT SetAudioVolume(double val) override;
+	virtual WebRTCPeerConnectionProxy* GetProxy() override;
+
 protected:
 
 	// PeerConnectionObserver implementation.
@@ -74,13 +95,14 @@ protected:
 	virtual void OnAddStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	virtual void OnRemoveStream(rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) override;
 	virtual void OnDataChannel(rtc::scoped_refptr<webrtc::DataChannelInterface> channel) override;
-	virtual void OnRenegotiationNeeded() override {}
+	virtual void OnRenegotiationNeeded() override;
 	virtual void OnIceConnectionChange(webrtc::PeerConnectionInterface::IceConnectionState new_state);
 	virtual void OnIceGatheringChange(webrtc::PeerConnectionInterface::IceGatheringState new_state);
-	virtual void OnIceCandidate(const webrtc::IceCandidateInterface* candidate) override;
-	virtual void OnIceConnectionReceivingChange(bool receiving) override;
+	virtual void OnIceCandidate(const webrtc::IceCandidateInterface* pICECandidate) override;
+	virtual void OnIceConnectionReceivingChange(bool fReceiving) override;
 
 	// DataChannelObserver Implementation
+	// Need to create a separate WebRTCDataChannel object
 	virtual void OnStateChange() override;
 	virtual void OnMessage(const webrtc::DataBuffer& buffer) override;
 	virtual void OnBufferedAmountChange(uint64_t previous_amount) override  {};
@@ -90,11 +112,7 @@ protected:
 	virtual void OnFailure(const std::string& error) override;
 
 	// webrtc::AudioTrackSinkInterface
-	virtual void OnData(const void* audio_data,
-		int bits_per_sample,
-		int sample_rate,
-		size_t number_of_channels,
-		size_t number_of_frames) override;
+	virtual void OnData(const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 public:
 	RESULT InitializePeerConnection(bool fAddDataChannel = false);
@@ -165,8 +183,11 @@ private:
 	rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_pWebRTCPeerConnectionInterface;
 	rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> m_pWebRTCPeerConnectionFactory;
 
-	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCActiveStreams;
-	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCActiveDataChannels;
+	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCLocalActiveStreams;
+	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCLocalActiveDataChannels;
+
+	std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> > m_WebRTCRemoteActiveStreams;
+	std::map<std::string, rtc::scoped_refptr<webrtc::DataChannelInterface> > m_WebRTCRemoteActiveDataChannels;
 
 	rtc::scoped_refptr<webrtc::DataChannelInterface> m_pDataChannelInterface;
 	sigslot::signal1<webrtc::DataChannelInterface*> m_SignalOnDataChannel;

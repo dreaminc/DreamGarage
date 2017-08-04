@@ -23,8 +23,24 @@ WebRTCImp::WebRTCImp(CloudController *pParentCloudController) :
 }
 
 WebRTCImp::~WebRTCImp() {
+
+	//BOOL res = PostThreadMessage(GetThreadId(thread.native_handle()), WM_QUIT, 0, 0);
+	//rtc::ThreadManager::Instance()->
+
+	//m_pWin32thread->Stop();
+	//m_pWin32thread->Quit();
 	rtc::ThreadManager::Instance()->SetCurrentThread(NULL);
 	rtc::CleanupSSL();
+}
+
+RESULT WebRTCImp::Shutdown() {
+	RESULT r = R_PASS;
+
+	m_pWebRTCConductor->Shutdown();
+	m_pWin32thread->Quit();
+
+//Error:
+	return r;
 }
 
 // CloudImp Interface
@@ -206,6 +222,14 @@ Error:
 }
 */
 
+WebRTCPeerConnectionProxy* WebRTCImp::GetWebRTCPeerConnectionProxy(PeerConnection* pPeerConnection) {
+	return m_pWebRTCConductor->GetWebRTCPeerConnectionProxy(pPeerConnection);
+}
+
+WebRTCImpProxy* WebRTCImp::GetProxy() {
+	return (WebRTCImpProxy*)(this);
+}
+
 RESULT WebRTCImp::AddOfferCandidates(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
@@ -257,6 +281,17 @@ Error:
 	return r;
 }
 
+RESULT WebRTCImp::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState));
+	}
+
+Error:
+	return r;
+}
+
 RESULT WebRTCImp::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
 	RESULT r = R_PASS;
 
@@ -273,6 +308,40 @@ RESULT WebRTCImp::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChan
 
 	if (m_pWebRTCObserver != nullptr) {
 		CR(m_pWebRTCObserver->OnDataChannelMessage(peerConnectionID, pDataChannelBuffer, pDataChannelBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnRenegotiationNeeded(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnRenegotiationNeeded(peerConnectionID));
+	}
+
+Error:
+	return r;
+}
+
+RESULT WebRTCImp::OnDataChannel(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnDataChannel(peerConnectionID));
+	}
+
+Error:
+	return r;
+}
+
+
+RESULT WebRTCImp::OnAudioChannel(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	if (m_pWebRTCObserver != nullptr) {
+		CR(m_pWebRTCObserver->OnAudioChannel(peerConnectionID));
 	}
 
 Error:
