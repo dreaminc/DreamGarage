@@ -88,8 +88,6 @@ RESULT WebRTCConductor::RemovePeerConnectionByID(long peerConnectionID) {
 		CB((it != m_webRTCPeerConnections.end()));
 
 		m_webRTCPeerConnections.erase(it);
-
-		CR(pWebRTCPeerConnection->CloseWebRTCPeerConnection());
 	}
 
 Error:
@@ -315,11 +313,18 @@ RESULT WebRTCConductor::OnWebRTCConnectionStable(long peerConnectionID) {
 }
 
 RESULT WebRTCConductor::OnWebRTCConnectionClosed(long peerConnectionID) {
+	RESULT r = R_PASS;
+
+	// First give observer message
 	if (m_pParentObserver != nullptr) {
 		return m_pParentObserver->OnWebRTCConnectionClosed(peerConnectionID);
 	}
 
-	return R_NOT_HANDLED;
+	DEBUG_LINEOUT("ICE Connection disconnected, remove webrtc peer connection");
+	CR(RemovePeerConnectionByID(peerConnectionID));
+
+Error:
+	return r;
 }
 
 RESULT WebRTCConductor::OnSDPOfferSuccess(long peerConnectionID) {		// TODO: Consolidate with below
@@ -376,9 +381,11 @@ RESULT WebRTCConductor::OnIceConnectionChange(long peerConnectionID, WebRTCIceCo
 
 	switch (webRTCIceConnectionState) {
 		case WebRTCIceConnection::state::DISCONNECTED: {
-			// Remove the peer connection 
-			DEBUG_LINEOUT("ICE Connection disconnected, remove webrtc peer connection");
-			CR(RemovePeerConnectionByID(peerConnectionID));
+			// Close the WebRTC connection
+			auto pWebRTCPeerConnection = GetPeerConnection(peerConnectionID);
+			CN(pWebRTCPeerConnection);
+
+			CR(pWebRTCPeerConnection->CloseWebRTCPeerConnection());
 		} break;
 	}
 

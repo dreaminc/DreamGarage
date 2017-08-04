@@ -9,6 +9,7 @@
 
 #include <string>
 #include <memory>
+#include <mutex>
 
 #include "Cloud/Controller.h"
 
@@ -33,7 +34,7 @@ public:
 
 		// TODO: Switch to Peer User ID
 		virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) = 0;
-		virtual RESULT OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) = 0;
+		virtual RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection) = 0;
 		virtual RESULT OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) = 0;
 		virtual RESULT OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) = 0;
 		virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) = 0;
@@ -122,7 +123,7 @@ public:
 
 private:
 	RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection);
-	RESULT OnPeerConnectionDisconnected(PeerConnection *pPeerConnection);
+	RESULT OnPeerConnectionClosed(PeerConnection *pPeerConnection);
 
 private:
 	std::unique_ptr<WebRTCImp> m_pWebRTCImp;
@@ -132,7 +133,8 @@ private:
 	bool m_fPendingMessage;
 	uint64_t m_pendingMessageID;
 
-	std::vector<PeerConnection> m_peerConnections;
+	std::vector<PeerConnection*> m_peerConnections;
+	//std::recursive_mutex m_peerConnections_mutex;
 	//PeerConnection *m_pPeerConnectionCurrentHandshake;	// TODO: This is no longer needed, all connections should be self contained
 
 	PeerConnectionControllerObserver *m_pPeerConnectionControllerObserver;

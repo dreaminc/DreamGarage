@@ -63,7 +63,7 @@ public:
 	// Cloud
 	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
 	virtual RESULT OnNewDreamPeer(DreamPeer *pDreamPeer) override;
-	virtual RESULT OnDreamPeerDisconnected(std::shared_ptr<DreamPeer> pDreamPeer) override;
+	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) override;
 	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
 
 	// Environment

@@ -229,11 +229,11 @@ Error:
 	return r;
 }
 
-RESULT CloudController::OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) {
+RESULT CloudController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
 	if (m_pPeerConnectionObserver != nullptr) {
-		CR(m_pPeerConnectionObserver->OnPeerConnectionDisconnected(pPeerConnection));
+		CR(m_pPeerConnectionObserver->OnPeerConnectionClosed(pPeerConnection));
 	}
 
 Error:

@@ -862,11 +862,11 @@ Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) {
+RESULT EnvironmentController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnPeerConnectionDisconnected(pPeerConnection));
+		CR(m_pEnvironmentControllerObserver->OnPeerConnectionClosed(pPeerConnection));
 	}
 
 Error:

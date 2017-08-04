@@ -81,6 +81,8 @@ WebRTCPeerConnection::~WebRTCPeerConnection(){
 	m_webRTCICECandidates.clear();
 
 	m_WebRTCPeerID = -1;
+
+	CloseWebRTCPeerConnection();
 }
 
 RESULT WebRTCPeerConnection::SetPeerConnectionFactory(rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> pWebRTCPeerConnectionFactory) {

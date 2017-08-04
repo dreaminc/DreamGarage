@@ -178,14 +178,14 @@ Error:
 	return r;
 }
 
-RESULT DreamOS::OnPeerConnectionDisconnected(PeerConnection *pPeerConnection) {
+RESULT DreamOS::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_PASS;
 
 	auto pDreamPeer = FindPeer(pPeerConnection);
 	CN(pDreamPeer);
 
 	// First give client layer to do something 
-	CR(OnDreamPeerDisconnected(pDreamPeer));
+	CR(OnDreamPeerConnectionClosed(pDreamPeer));
 
 	// Delete the dream peer
 	CR(RemovePeer(pDreamPeer));
@@ -406,7 +406,17 @@ RESULT DreamOS::RemovePeer(long peerUserID) {
 }
 
 RESULT DreamOS::RemovePeer(std::shared_ptr<DreamPeer> pDreamPeer) {
-	return RemovePeer(pDreamPeer->GetPeerUserID());
+	std::map<long, std::shared_ptr<DreamPeer>>::iterator it;
+
+	for (auto &pairDreamPeer : m_dreamPeers) {
+		if (pairDreamPeer.second == pDreamPeer) {
+			it = m_dreamPeers.find(pairDreamPeer.first);
+			m_dreamPeers.erase(it);
+			return R_PASS;
+		}
+	}
+
+	return R_NOT_FOUND;
 }
 
 DreamPeer::state DreamOS::GetPeerState(long peerUserID) {

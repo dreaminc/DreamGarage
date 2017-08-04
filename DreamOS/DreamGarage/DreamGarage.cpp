@@ -550,7 +550,7 @@ Error:
 
 // Cloud Controller
 
-RESULT DreamGarage::OnDreamPeerDisconnected(std::shared_ptr<DreamPeer> pDreamPeer) {
+RESULT DreamGarage::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) {
 	RESULT r = R_PASS;
 
 	CR(UnallocateUserModelFromPool(pDreamPeer));
