@@ -590,14 +590,14 @@ RESULT DreamGarage::OnNewDreamPeer(DreamPeer *pDreamPeer) {
 
 	// Assign Model From Pool and position peer
 	CR(AllocateAndAssignUserModelFromPool(pDreamPeer));
-	//CR(SetRoundtablePosition(pDreamPeer, remoteSeatingPosition));
+	CR(SetRoundtablePosition(pDreamPeer, remoteSeatingPosition));
 	pDreamPeer->SetVisible();
 
 	// Turn on sound
 	WebRTCPeerConnectionProxy *pWebRTCPeerConnectionProxy = GetWebRTCPeerConnectionProxy(pPeerConnection);
 
 	if (pWebRTCPeerConnectionProxy != nullptr) {
-		pWebRTCPeerConnectionProxy->SetAudioVolume(10.0f);
+		pWebRTCPeerConnectionProxy->SetAudioVolume(1.0f);
 	}
 
 Error:
