@@ -1,6 +1,7 @@
 #ifndef UI_EVENT_H_
 #define UI_EVENT_H_
 
+#include "Primitives/point.h"
 class VirtualObj;
 
 enum UIEventType {
@@ -11,6 +12,7 @@ enum UIEventType {
 	UI_HOVER_ENDED,
 	UI_SELECT_BEGIN,
 	UI_SELECT_MOVED,
+	UI_SELECT_TRIGGER,
 	UI_SELECT_ENDED,
 	UI_MENU,
 	UI_EVENT_INVALID
@@ -37,8 +39,9 @@ struct UIEvent {
 	UIEventType m_eventType;
 	VirtualObj *m_pObj;
 	VirtualObj *m_pInteractionObject = nullptr;
+	point m_ptContact;
 
-	UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj* m_pInteractionObject = nullptr);
+	UIEvent(UIEventType eventType, VirtualObj *pObj, VirtualObj* m_pInteractionObject = nullptr, point ptContact = point(0.0f, 0.0f, 0.0f));
 };
 
 #endif // ! UI_EVENT_H_

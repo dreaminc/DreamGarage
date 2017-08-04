@@ -248,12 +248,12 @@ RESULT UIScrollView::HideAllButtons(UIButton* pPushButton) {
 
 	for (auto& pButton : m_pMenuButtonsContainer->GetChildren()) {
 		auto pObj = reinterpret_cast<UIButton*>(pButton.get());
-		if (pObj != pPushButton) {
+		//if (pObj != pPushButton) {
 			CR(HideObject(pObj));
-		}
-		else {
-			CR(HideAndPushButton(pObj));
-		}
+		//}
+		//else {
+		//	CR(HideAndPushButton(pObj));
+		//}
 	}
 	for (auto& pButton : { m_pLeftScrollButton, m_pRightScrollButton }) {
 		CR(HideObject(pButton.get()));

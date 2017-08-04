@@ -37,6 +37,8 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestCaptureObject());
+
 	CR(AddTestMultiPrimitiveCompositeRemove());
 
 	CR(AddTestMultiPrimitiveRemove());
@@ -82,6 +84,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			
 			if (pDimObj != nullptr) {
 				//pDimObj->RotateYByDeg(15.0f);
+				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), 0.5f);
 			}
 
 		} break;
@@ -138,10 +141,22 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
 
 			if (pDimObj != nullptr) {
-				pDimObj->RotateYByDeg(15.0f);
+				//pDimObj->RotateZByDeg(15.0f);
+				pDimObj->SetColor(COLOR_BLUE);
+				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), 0.1f);
 			}
 
 		} break;
+
+		case InteractionEventType::ELEMENT_COLLIDE_TRIGGER: {
+			DimObj *pDimObj = dynamic_cast<DimObj*>(mEvent->m_pObject);
+
+			if (pDimObj != nullptr) {
+				//pDimObj->RotateZByDeg(15.0f);
+				pDimObj->SetColor(COLOR_GREEN);
+			}
+			m_pDreamOS->ReleaseObjects(mEvent->m_pInteractionObject);
+		}
 
 		case InteractionEventType::ELEMENT_COLLIDE_MOVED: {
 			DEBUG_LINEOUT("collide moved state: 0x%x", mEvent->m_activeState);
@@ -154,13 +169,135 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 
 			if (pDimObj != nullptr) {
 				//pDimObj->ResetRotation();
-				pDimObj->RotateYByDeg(-15.0f);
+				//pDimObj->RotateZByDeg(-15.0f);
 			}
 		} break;
 	}
 
 //Error:
 	return r;
+}
+
+RESULT InteractionEngineTestSuite::AddTestCaptureObject() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 100.0f;
+	int nRepeats = 1;
+
+	struct CaptureContext {
+		UIMallet *pLeftMallet = nullptr;
+		UIMallet *pRightMallet = nullptr;
+	};
+
+	// Initialize Code 
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(SetupPipeline());
+		CR(Initialize());
+		{
+			CaptureContext *pCaptureContext = reinterpret_cast<CaptureContext*>(pContext);
+
+			CN(pCaptureContext);
+			CN(m_pDreamOS);
+			
+			pCaptureContext->pLeftMallet = new UIMallet(m_pDreamOS);
+			pCaptureContext->pLeftMallet->Show();
+			//pCaptureContext->pLeftMallet->GetMalletHead()->InitializeOBB();
+			pCaptureContext->pRightMallet = new UIMallet(m_pDreamOS);
+			pCaptureContext->pRightMallet->Show();
+			//pCaptureContext->pRightMallet->GetMalletHead()->InitializeOBB();
+
+			m_pDreamOS->AddInteractionObject(pCaptureContext->pLeftMallet->GetMalletHead());
+			m_pDreamOS->AddInteractionObject(pCaptureContext->pRightMallet->GetMalletHead());
+
+			auto pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
+			pQuad->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, 0.0f));
+			pQuad->RotateXByDeg(90.0f);
+			pQuad->RotateYByDeg(0.0f);
+			//pQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+			pQuad->SetColor(COLOR_BLUE);
+			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+				CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad, (InteractionEventType)(i), this));
+				//CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
+			}
+
+			pQuad = m_pDreamOS->AddQuad(0.5f, 0.5f);
+			pQuad->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(-0.5f, 1.0f, 0.0f));
+			pQuad->RotateXByDeg(90.0f);
+			pQuad->RotateYByDeg(-30.0f);
+			//pQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+			pQuad->SetColor(COLOR_BLUE);
+			//pQuad->InitializeOBB();
+			//m_pDreamOS->AddInteractionObject(pQuad);
+			for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+				CR(m_pDreamOS->AddAndRegisterInteractionObject(pQuad, (InteractionEventType)(i), this));
+				//CR(m_pDreamOS->RegisterEventSubscriber(pQuad.get(), (InteractionEventType)(i), this));
+			}
+
+			m_pDreamOS->SetGravityState(false);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		CaptureContext *pCaptureContext = reinterpret_cast<CaptureContext*>(pContext);
+
+		RotationMatrix qOffset = RotationMatrix();
+		hand *pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
+		CN(pHand);
+		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+		auto& pLeftMallet = pCaptureContext->pLeftMallet;
+		auto& pRightMallet = pCaptureContext->pRightMallet;
+
+		if (pLeftMallet)
+			pLeftMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pLeftMallet->GetHeadOffset()));
+
+		pHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+		CN(pHand);
+
+		qOffset = RotationMatrix();
+		qOffset.SetQuaternionRotationMatrix(pHand->GetOrientation());
+
+		if (pRightMallet)
+			pRightMallet->GetMalletHead()->MoveTo(pHand->GetPosition() + point(qOffset * pRightMallet->GetHeadOffset()));
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(ResetTest(pContext));
+
+	Error:
+		return r;
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, new CaptureContext());
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Capture Test");
+	pNewTest->SetTestDescription("Capture handling test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+
 }
 
 RESULT InteractionEngineTestSuite::AddTestNestedCompositeOBB() {
@@ -1132,6 +1269,18 @@ RESULT InteractionEngineTestSuite::SetupPipeline() {
 
 Error:
 	return r;
+}
+
+RESULT InteractionEngineTestSuite::Initialize() {
+
+	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, 4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(-4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+
+	m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+
+	return R_PASS;
 }
 
 RESULT InteractionEngineTestSuite::InitializeRayCompositeTest(void* pContext) {
