@@ -61,6 +61,7 @@ RESULT DreamGarage::ConfigureSandbox() {
 	SandboxApp::configuration sandboxconfig;
 	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
+	sandboxconfig.fMouseLook = false;
 
 #ifdef _DEBUG
 	sandboxconfig.fUseHMD = false;

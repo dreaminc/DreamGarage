@@ -99,7 +99,7 @@ RESULT DreamPeer::SetPosition(const point& ptPosition) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	m_pUserModel->SetPosition(ptPosition);
+	m_pUserModel->GetHead()->SetPosition(ptPosition);
 
 Error:
 	return r;
@@ -109,7 +109,7 @@ RESULT DreamPeer::SetOrientation(const quaternion& qOrientation) {
 	RESULT r = R_PASS;
 
 	CN(m_pUserModel);
-	m_pUserModel->SetOrientation(qOrientation);
+	m_pUserModel->GetHead()->SetOrientation(qOrientation);
 
 Error:
 	return r;
