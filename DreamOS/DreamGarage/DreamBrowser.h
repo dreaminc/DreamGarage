@@ -20,9 +20,12 @@
 
 #include "Sense/SenseController.h"
 
+#include "Primitives/TextEntryString.h"
+
 #define DEFAULT_SCROLL_FACTOR 5
 
 class quad;
+class sphere;
 class texture;
 
 class EnvironmentAsset;
@@ -50,11 +53,17 @@ public:
 
 	// WebBrowserController Observer
 	virtual RESULT OnPaint(const WebBrowserRect &rect, const void *pBuffer, int width, int height) override;
+	virtual RESULT OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) override;
+	virtual RESULT OnLoadStart() override;
+	virtual RESULT OnLoadEnd(int httpStatusCode) override;
 
+	RESULT SetPosition(point ptPosition);
 	RESULT SetAspectRatio(float aspectRatio);
 	RESULT SetDiagonalSize(float diagonalSize);
 	RESULT SetNormalVector(vector vNormal);
 	RESULT SetParams(point ptPosition, float diagonal, float aspectRatio, vector vNormal);
+
+	RESULT FadeQuadToBlack();
 
 	WebBrowserPoint GetRelativeBrowserPointFromContact(point ptIntersectionContact);
 
@@ -62,15 +71,20 @@ public:
 	float GetHeight();
 	vector GetNormal();
 	point GetOrigin();
+	float GetAspectRatio();
 
 	RESULT UpdateViewQuad();
 
+	bool IsVisible();
 	RESULT SetVisible(bool fVisible);
 
+	RESULT SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
 	RESULT SetURI(std::string strURI);
+	RESULT LoadRequest(const WebRequest &webRequest);
 
 	RESULT SetScrollFactor(int scrollFactor);
 
+	std::shared_ptr<texture> GetScreenTexture();
 private:
 	RESULT SetScreenTexture(texture *pTexture);
 
@@ -78,6 +92,8 @@ protected:
 	static DreamBrowser* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
+	std::shared_ptr<sphere> m_pTestSphereRelative = nullptr;
+	sphere *m_pTestSphereAbsolute = nullptr;
 	std::shared_ptr<quad> m_pBrowserQuad = nullptr;
 	std::shared_ptr<texture> m_pBrowserTexture = nullptr;
 
@@ -95,7 +111,8 @@ private:
 	vector m_vNormal;
 
 	int m_scrollFactor = DEFAULT_SCROLL_FACTOR;
-	bool m_fShiftDown = false;
+
+	TextEntryString m_strEntered;
 };
 
 #endif // ! DREAM_CONTENT_VIEW_H_

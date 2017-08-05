@@ -75,9 +75,6 @@
     <Filter Include="HAL\opengl\shaders\GLSL">
       <UniqueIdentifier>{3bf90752-857f-43d2-a095-f33ca2e68b6e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="HAL\opengl\shaders\GLSL\v400">
-      <UniqueIdentifier>{4122d50c-6ec2-4425-aca8-8175db942fc1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="HAL\opengl\shaders\GLSL\v440">
       <UniqueIdentifier>{0405a75c-6f11-4a68-b9ec-d514c26e465c}</UniqueIdentifier>
     </Filter>
@@ -182,6 +179,9 @@
     </Filter>
     <Filter Include="WebBrowser\CEFBrowser">
       <UniqueIdentifier>{050ed7a2-b102-42e7-ad6f-8a2e98c25191}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="HAL\Pipeline">
+      <UniqueIdentifier>{61e0e0cc-0539-461d-b419-c995721545e8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -355,9 +355,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\hand.cpp">
       <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Cloud\Message\UpdateHandMessage.h">
-      <Filter>Cloud\Message</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\quaternion.cpp">
       <Filter>Primitives</Filter>
@@ -551,19 +548,7 @@
     <ClCompile Include="..\..\..\InteractionEngine\InteractionObjectEvent.cpp">
       <Filter>InteractionEngine</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIBar.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\..\UI\UIMenuItem.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuItemSubscriber.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIMenuLayer.cpp">
-      <Filter>UI</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\UI\UIModule.cpp">
       <Filter>UI</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\UI\UITestSuite.cpp">
@@ -673,6 +658,162 @@
     </ClCompile>
     <ClCompile Include="..\..\..\InteractionEngine\AnimationCurve.cpp">
       <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIKeyboard.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\Pipeline.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\DNode.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\DConnection.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\ProgramNode.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\SinkNode.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\SourceNode.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\viewport.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\stereocamera.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLViewportDisplay.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\Pipeline\PipelineCommon.cpp">
+      <Filter>HAL\Pipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\ObjectStoreNode.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Scene\CameraNode.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimal.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhong.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramEnvironmentObjects.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramSkyboxScatter.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramMinimalTexture.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramFlat.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIKeyboardLayout.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIMallet.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\TextEntryString.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIKey.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLText.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebRequest.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebRequestPostData.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Cloud\WebRequestPostDataElement.cpp">
+      <Filter>Cloud</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamGarage\DreamControlView.cpp">
+      <Filter>DreamGarage</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLQuery.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLRenderbuffer.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLAttachment.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLTexture.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRMirrorTexture.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRHMDSinkNode.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTexture.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramTextureBitBlit.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\InteractionEngine\ActiveObjectQueue.cpp">
+      <Filter>InteractionEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIView.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIEvent.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIButton.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIViewTestSuite.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\UI\UIScrollView.cpp">
+      <Filter>UI</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\material.cpp">
+      <Filter>Primitives</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\Oculus\OVRTouchController.cpp">
+      <Filter>HMD\Oculus</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRHMDSinkNode.cpp">
+      <Filter>HMD\OpenVR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\HMD\OpenVR\OpenVRController.cpp">
+      <Filter>HMD\OpenVR</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\DreamPeer.cpp">
+      <Filter>DreamOS</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -937,9 +1078,6 @@
     <ClInclude Include="..\..\..\Primitives\rectangle.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLDepthbuffer.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HMD\Oculus\OVRTextureSwapChain.h">
       <Filter>HMD\Oculus</Filter>
     </ClInclude>
@@ -1114,9 +1252,6 @@
     <ClInclude Include="..\..\..\Cloud\Message\Message.h">
       <Filter>Cloud\Message</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Message\UpdateHeadMessage.h">
-      <Filter>Cloud\Message</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\user.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -1244,9 +1379,6 @@
     <ClInclude Include="..\..\..\Cloud\User\TwilioNTSInformation.h">
       <Filter>Cloud\User</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Cloud\Message\AudioDataMessage.h">
-      <Filter>Cloud\Message</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\PhysicsEngine\CollisionDetector.h">
       <Filter>PhysicsEngine</Filter>
     </ClInclude>
@@ -1316,19 +1448,7 @@
     <ClInclude Include="..\..\..\InteractionEngine\InteractionObjectEvent.h">
       <Filter>InteractionEngine</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIBar.h">
-      <Filter>UI</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\UI\UIMenuItem.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuItemSubscriber.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIMenuLayer.h">
-      <Filter>UI</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\UI\UIModule.h">
       <Filter>UI</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\UI\UITestSuite.h">
@@ -1439,6 +1559,168 @@
     <ClInclude Include="..\..\..\InteractionEngine\AnimationCurve.h">
       <Filter>InteractionEngine</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIKeyboard.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\DObject.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\Pipeline.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\DNode.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\DConnection.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\ProgramNode.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\SinkNode.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\SourceNode.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\viewport.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLViewportDisplay.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\Pipeline\PipelineCommon.h">
+      <Filter>HAL\Pipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\ObjectStoreNode.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Scene\CameraNode.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramReferenceGeometry.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\FlatProgram.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIKeyboardLayout.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIMallet.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\TextEntryString.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIKey.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebRequest.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebRequestPostData.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\WebRequestPostDataElement.h">
+      <Filter>Cloud</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamControlView.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramScreenQuad.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramDepthPeel.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLQuery.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLRenderbuffer.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLAttachment.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlendQuad.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\HMDSinkNode.h">
+      <Filter>HMD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\HMDSourceNode.h">
+      <Filter>HMD</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRHMDSinkNode.h">
+      <Filter>HMD\Oculus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLProgramBlurQuad.h">
+      <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Multipublisher.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\InteractionEngine\ActiveObjectQueue.h">
+      <Filter>InteractionEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIView.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIEvent.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIButton.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIViewTestSuite.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\UI\UIScrollView.h">
+      <Filter>UI</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\Oculus\OVRTouchController.h">
+      <Filter>HMD\Oculus</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRHMDSinkNode.h">
+      <Filter>HMD\OpenVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HMD\OpenVR\OpenVRController.h">
+      <Filter>HMD\OpenVR</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\AudioDataMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\DreamGarageMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\UpdateHandMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamGarage\UpdateHeadMessage.h">
+      <Filter>DreamGarage</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\DreamPeer.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerAckMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerHandshakeMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\PeerStayAliveMessage.h">
+      <Filter>DreamOS</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Cloud\webrtc\WebRTCIceConnection.h">
+      <Filter>Cloud\webrtc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\Proxy.h">
+      <Filter>Primitives</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -1535,78 +1817,6 @@
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\TextureBitBlit.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhong.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureBump.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\blinnPhongTextureShadow.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\flat.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimal.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\minimalTexture.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\ShadowDepth.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skybox.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\skyboxScatter.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.frag">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
-    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v400\TextureBitBlit.vert">
-      <Filter>HAL\opengl\shaders\GLSL\v400</Filter>
-    </None>
     <None Include="..\..\..\Primitives\plane.h">
       <Filter>Primitives</Filter>
     </None>
@@ -1642,6 +1852,30 @@
     </None>
     <None Include="PropertySheet.props">
       <Filter>Core</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\screenquad.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\depthpeel.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blendquad.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blendquad.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.frag">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.vert">
+      <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

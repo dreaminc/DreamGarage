@@ -437,7 +437,9 @@ RESULT EnvironmentController::RequestShareAsset(std::string strStorageProviderSc
 
 	jsonPayload["environment_asset"] = nlohmann::json::object();
 	jsonPayload["environment_asset"]["path"] = strPath;
-	jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+
+	//jsonPayload["environment_asset"]["storage_provider_scope"] = strStorageProviderScope;
+	jsonPayload["environment_asset"]["scope"] = strStorageProviderScope;
 
 	pCloudRequest = CloudMessage::CreateRequest(GetCloudController(), jsonPayload);
 	CN(pCloudRequest);
@@ -838,58 +840,88 @@ MenuControllerProxy* EnvironmentController::GetMenuControllerProxy() {
 	return nullptr;
 }
 
+WebRTCImpProxy* EnvironmentController::GetWebRTCControllerProxy() {
+	if (m_pPeerConnectionController != nullptr)
+		return m_pPeerConnectionController->GetWebRTCControllerProxy();
+
+	return nullptr;
+}
+
 EnvironmentControllerProxy* EnvironmentController::GetEnvironmentControllerProxy() {
 	return (EnvironmentControllerProxy*)(this);
 }
 
-RESULT EnvironmentController::OnPeersUpdate(long index) {
+RESULT EnvironmentController::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnPeersUpdate(index));
+		CR(m_pEnvironmentControllerObserver->OnNewPeerConnection(userID, peerUserID, fOfferor, pPeerConnection));
 	}
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnDataChannelStringMessage(long peerUserID, const std::string& strDataChannelMessage) {
+RESULT EnvironmentController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(peerUserID, strDataChannelMessage));
+		CR(m_pEnvironmentControllerObserver->OnPeerConnectionClosed(pPeerConnection));
 	}
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnDataChannelMessage(long peerUserID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
+RESULT EnvironmentController::OnDataChannelStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(peerUserID, pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pEnvironmentControllerObserver->OnDataChannelStringMessage(pPeerConnection, strDataChannelMessage));
 	}
 
 Error:
 	return r;
 }
 
-RESULT EnvironmentController::OnAudioData(long peerConnectionID,
-	const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames) {
+RESULT EnvironmentController::OnDataChannelMessage(PeerConnection* pPeerConnection, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_NOT_IMPLEMENTED;
 
 	if (m_pEnvironmentControllerObserver != nullptr) {
-		CR(m_pEnvironmentControllerObserver->OnAudioData(peerConnectionID,
-			audio_data,
-			bits_per_sample,
-			sample_rate,
-			number_of_channels,
-			number_of_frames));
+		CR(m_pEnvironmentControllerObserver->OnDataChannelMessage(pPeerConnection, pDataChannelBuffer, pDataChannelBuffer_n));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnAudioData(pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnDataChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnDataChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT EnvironmentController::OnAudioChannel(PeerConnection* pPeerConnection) {
+	RESULT r = R_NOT_IMPLEMENTED;
+
+	if (m_pEnvironmentControllerObserver != nullptr) {
+		CR(m_pEnvironmentControllerObserver->OnAudioChannel(pPeerConnection));
 	}
 
 Error:

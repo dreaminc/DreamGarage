@@ -18,6 +18,7 @@ public:
 	enum class type {
 		FOLDER,
 		FILE,
+		ACTION,
 		INVALID
 	};
 
@@ -32,8 +33,10 @@ public:
 	};
 	
 public:
+	MenuNode();
 	MenuNode(nlohmann::json jsonMenuNode);
 	MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType);
+	MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType, std::string strIconURL, std::string strThumbnailURL);
 
 	std::string NodeTypeString(MenuNode::type nodeType);
 	MenuNode::type NodeTypeFromString(std::string strNodeType);
@@ -48,7 +51,12 @@ public:
 	const std::string& GetScope();
 	const std::string& GetMIMEType();
 	const std::string& GetTitle();
+	const std::string& GetIconURL();
+	const std::string& GetThumbnailURL();
+
 	const MenuNode::type& GetNodeType();
+
+	RESULT SetName(std::string strName);
 
 	std::vector<std::shared_ptr<MenuNode>> GetSubMenuNodes();
 
@@ -58,6 +66,8 @@ private:
 	std::string m_strScope;
 	std::string m_strTitle;
 	std::string m_strMIMEType;
+	std::string m_strIconURL;
+	std::string m_strThumbnailURL;
 
 	std::vector<std::shared_ptr<MenuNode>> m_menuNodes;
 

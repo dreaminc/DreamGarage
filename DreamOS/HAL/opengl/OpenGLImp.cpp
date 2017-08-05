@@ -9,7 +9,9 @@
 #include "Primitives/matrix/ProjectionMatrix.h"
 #include "Primitives/matrix/TranslationMatrix.h"
 #include "Primitives/matrix/RotationMatrix.h"
+
 #include <vector>
+#include <algorithm>
 
 #include "OGLVolume.h"
 
@@ -28,53 +30,33 @@
 #include "OGLUser.h"
 #include "OGLHand.h"
 #include "OGLRay.h"
+#include "OGLAttachment.h"
+
+#include "OGLViewportDisplay.h"
 
 #include "DreamConsole/DreamConsole.h"
 #include "OGLDreamConsole.h"
 
+#include "Core/Utilities.h"
+
 OpenGLImp::OpenGLImp(OpenGLRenderingContext *pOpenGLRenderingContext) :
 	m_versionOGL(0),
 	m_versionGLSL(0),
-	m_pOGLRenderProgram(nullptr),
-	m_pOGLSkyboxProgram(nullptr),
-	m_pOGLOverlayProgram(nullptr),
-	m_pOGLProgramCapture(nullptr),
 	m_pOpenGLRenderingContext(pOpenGLRenderingContext)
 {
 	RESULT r = R_PASS;
-
-	// TODO: Generalize 
-	CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::OpenGL, this);
-
-	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
-	CRM(PrepareScene(), "Failed to prepare GL Scene");
 
 //Success:
 	Validate();
 	return;
 
-Error:
+//Error:
 	Invalidate();
 	return;
 }
 
 OpenGLImp::~OpenGLImp() {
 	m_pOGLDreamConsole.release();
-
-	if (m_pOGLRenderProgram != nullptr) {
-		delete m_pOGLRenderProgram;
-		m_pOGLRenderProgram = nullptr;
-	}
-
-	if (m_pOGLSkyboxProgram != nullptr) {
-		delete m_pOGLSkyboxProgram;
-		m_pOGLSkyboxProgram = nullptr;
-	}
-
-	if (m_pOGLOverlayProgram != nullptr) {
-		delete m_pOGLOverlayProgram;
-		m_pOGLOverlayProgram = nullptr;
-	}
 }
 
 RESULT OpenGLImp::InitializeOpenGLVersion() {
@@ -183,94 +165,73 @@ Error:
 }
 
 RESULT OpenGLImp::MakeCurrentContext() {
-	return m_pOpenGLRenderingContext->MakeCurrentContext();
+	if (m_fCurrentContext == false) {
+		m_fCurrentContext = true;
+		return m_pOpenGLRenderingContext->MakeCurrentContext();
+	}
+	else {
+		return R_SKIPPED;
+	}
 }
 
 RESULT OpenGLImp::ReleaseCurrentContext() {
-	return m_pOpenGLRenderingContext->ReleaseCurrentContext();
+	if (m_fCurrentContext == true) {
+		m_fCurrentContext = false;
+		return m_pOpenGLRenderingContext->ReleaseCurrentContext();
+	}
+	else {
+		return R_SKIPPED;
+	}
 }
 
-// TODO: This should be moved to OpenGL Program arch/design
-// TODO: rename this
-RESULT OpenGLImp::PrepareScene() {
+RESULT OpenGLImp::InitializeHAL() {
 	RESULT r = R_PASS;
-	GLenum glerr = GL_NO_ERROR;
 
-	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
+	CRM(InitializeGLContext(), "Failed to Initialize OpenGL Context");
+
+	CR(MakeCurrentContext());
 
 	// Clear Background
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
-	//m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
-	m_pOGLProgramShadowDepth = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SHADOW_DEPTH, this, m_versionGLSL);
-	CN(m_pOGLProgramShadowDepth);
-	
-	// TODO(NTH): Add a program / render pipeline arch
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_BUMP, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
-
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL_TEXTURE, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_SHADOW, this, m_versionGLSL);
-	//m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_BLINNPHONG_TEXTURE_SHADOW, this, m_versionGLSL);
-	m_pOGLRenderProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_ENVIRONMENT_OBJECTS, this, m_versionGLSL);
-	CN(m_pOGLRenderProgram);
-	m_pOGLRenderProgram->SetOGLProgramDepth(m_pOGLProgramShadowDepth);
-
-	// Reference Geometry Shader Program
-	m_pOGLReferenceGeometryProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_MINIMAL, this, m_versionGLSL);
-	CN(m_pOGLReferenceGeometryProgram);
-
-	m_pOGLSkyboxProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_SKYBOX_SCATTER, this, m_versionGLSL);
-	CN(m_pOGLSkyboxProgram);
-
-	m_pOGLOverlayProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_TEXTURE_BITBLIT, this, m_versionGLSL);
-	CN(m_pOGLOverlayProgram);
-
-	m_pOGLFlatProgram = OGLProgramFactory::MakeOGLProgram(OGLPROGRAM_FLAT, this, m_versionGLSL);
-	CN(m_pOGLFlatProgram);
-
-	m_pOGLDreamConsole = std::make_unique<OGLDreamConsole>(this, m_pOGLOverlayProgram);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
 	// Depth testing
 	glEnable(GL_DEPTH_TEST);	// Enable depth test
 	glDepthFunc(GL_LEQUAL);		// Accept fragment if it closer to the camera than the former one
 
-	// Face culling
+								// Face culling
+#define _CULL_BACK_FACES
+#ifdef _CULL_BACK_FACES
 	glEnable(GL_CULL_FACE);
 	glCullFace(GL_BACK);
+#else
+	glDisable(GL_CULL_FACE);
+#endif
 
 	// Dithering 
 	glEnable(GL_DITHER);
 
 	// Blending
 	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_ONE, GL_ONE);
+	//glBlendFunc(GL_ZERO, GL_SRC_COLOR);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Allocate the camera
-	// TODO: Wire this up directly to HMD
-	m_pCamera = new stereocamera(point(0.0f, 0.0f, 5.0f), 60.0f, m_pxViewWidth, m_pxViewHeight);
-	CN(m_pCamera);
-
-	CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
+	CR(ReleaseCurrentContext());
 
 Error:
 	return r;
 }
 
-RESULT OpenGLImp::Resize(int pxWidth, int pxHeight) {
+RESULT OpenGLImp::Resize(viewport newViewport) {
 	RESULT r = R_PASS;
-
-	m_pxViewWidth = pxWidth;
-	m_pxViewHeight = pxHeight;
 
 	CR(m_pOpenGLRenderingContext->MakeCurrentContext());
 
-	glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
+	SetViewport(newViewport);
+	glViewport(0, 0, (GLsizei)newViewport.Width(), (GLsizei)newViewport.Height());
 
-	m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
 
 Error:
 	//CR(m_pOpenGLRenderingContext->ReleaseCurrentContext());
@@ -279,28 +240,34 @@ Error:
 }
 
 // Assumes Context Current
-RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye) {
+// TODO: This should move to a sink node
+RESULT OpenGLImp::SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) {
 	RESULT r = R_PASS;
 
 	// Render to screen
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+	SetViewport(pxWidth, pxHeight);
+
 	switch (eye) {
 		case EYE_LEFT: {
-			glViewport(0, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
+			glViewport(0, 0, (GLsizei)pxWidth / 2, (GLsizei)pxHeight);
 		} break;
 
 		case EYE_RIGHT: {
-			glViewport((GLsizei)m_pxViewWidth / 2, 0, (GLsizei)m_pxViewWidth / 2, (GLsizei)m_pxViewHeight);
+			glViewport((GLsizei)pxWidth / 2, 0, (GLsizei)pxWidth / 2, (GLsizei)pxHeight);
 		} break;
 
 		case EYE_MONO: {
-			glViewport(0, 0, (GLsizei)m_pxViewWidth, (GLsizei)m_pxViewHeight);
+			glViewport(0, 0, (GLsizei)pxWidth, (GLsizei)pxHeight);
 		} break;
 	}
 
-	(eye != EYE_MONO) ? m_pCamera->ResizeCamera(m_pxViewWidth/2, m_pxViewHeight) :
-						m_pCamera->ResizeCamera(m_pxViewWidth, m_pxViewHeight);
+	// TODO: Do this in the sandbox when choosing eye - do we need the above then?
+	/*
+	(eye != EYE_MONO) ? m_pCamera->ResizeCamera(pxWidth/2.0f, pxHeight) :
+						m_pCamera->ResizeCamera(pxWidth, pxHeight);
+						*/
 
 	return r;
 }
@@ -331,6 +298,8 @@ Error:
 */
 
 //composite* OpenGLImp::LoadModel(SceneGraph* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, point_precision rotateY) {
+
+// TODO: Fix this
 composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 	
@@ -371,26 +340,28 @@ composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& ws
 
 		pComposite->AddChild(pModel);
 
+		// TODO: WTF IS THIS LAMBDA FOR!!!!!
 		auto GetTexture = [&](const std::string& file) -> texture* {
-			std::wstring wstr(file.begin(), file.end());
-			wstr = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.find_last_of(L"/\\")) + L"\\" + wstr;
+			std::wstring wstrFilename(file.begin(), file.end());
+			wstrFilename = L"..\\" + wstrOBJFilename.substr(0, wstrOBJFilename.find_last_of(L"/\\")) + L"\\" + wstrFilename;
 
-			if (textureMap.find(wstr) == textureMap.end()) {
-				texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstr.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			if (textureMap.find(wstrFilename) == textureMap.end()) {
+				//texture *pTempTexture = new OGLTexture(this, (wchar_t*)(wstrFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+				texture *pTempTexture = OGLTexture::MakeTextureFromPath(this, texture::TEXTURE_TYPE::TEXTURE_COLOR, wstrFilename);
 
 				if (!pTempTexture) {
-					LOG(ERROR) << "Failed to load model texture : " << wstr;
+					LOG(ERROR) << "Failed to load model texture : " << wstrFilename;
 					return nullptr;
 				}
 
-				textureMap[wstr] = pTempTexture;
+				textureMap[wstrFilename] = pTempTexture;
 
 				if (pTempTexture->GetWidth() > 0 && pTempTexture->GetHeight() > 0) {
 					return pTempTexture;
 				}
 			}
 			else {
-				return textureMap[wstr];
+				return textureMap[wstrFilename];
 			}
 
 			return nullptr;
@@ -405,8 +376,7 @@ composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& ws
 		if (m.first.map_Ks.compare("") != 0)
 			pModel->SetMaterialTexture(DimObj::MaterialTexture::Specular, GetTexture(m.first.map_Ks));
 
-		pModel->GetMaterial()->Set(m.first.Ka, m.first.Kd, m.first.Ks);
-		pModel->SetColor(color(COLOR_WHITE));
+		pModel->GetMaterial()->SetColors(m.first.Ka, m.first.Kd, m.first.Ks);
 
 		pModel->Scale(scale);
 		pModel->MoveTo(ptPosition);
@@ -494,14 +464,21 @@ Error:
 	return nullptr;
 }
 
-FlatContext *OpenGLImp::MakeFlatContext(int width, int height, int channels) {
+FlatContext *OpenGLImp::MakeFlatContext(int pxFBWidth, int pxFBHeight, int fbChannels) {
 	RESULT r = R_PASS;
 
 	FlatContext *pFlatContext = new FlatContext(this);
-	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, width, height, channels);
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, pxFBWidth, pxFBHeight, fbChannels);
 	CN(pOGLFramebuffer);
 
 	pFlatContext->SetFramebuffer(pOGLFramebuffer);
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
 	CN(pFlatContext);
 
@@ -548,8 +525,11 @@ Error:
 		delete pLight;
 		pLight = nullptr;
 	}
+
 	return nullptr;
 }
+
+// Quad
 
 quad* OpenGLImp::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
@@ -568,12 +548,12 @@ Error:
 	return nullptr;
 }
  
-quad* OpenGLImp::MakeQuad(double width, double height, point origin, vector vNormal) {
+quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, vector vNormal) {
 	RESULT r = R_PASS;
 
 	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), 1, 1, nullptr, vNormal);
-	pQuad->RotateXByDeg(90.0f);
-	pQuad->MoveTo(origin);
+	//pQuad->RotateXByDeg(90.0f);
+	pQuad->MoveTo(ptOrigin);
 
 	CN(pQuad);
 
@@ -585,6 +565,45 @@ Error:
 		delete pQuad;
 		pQuad = nullptr;
 	}
+	return nullptr;
+}
+
+quad* OpenGLImp::MakeQuad(double width, double height, point ptOrigin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal) {
+	RESULT r = R_PASS;
+
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), ptOrigin, uvTopLeft, uvBottomRight, vNormal);
+	//pQuad->RotateXByDeg(90.0f);
+	pQuad->MoveTo(ptOrigin);
+
+	CN(pQuad);
+
+	//Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+
+	return nullptr;
+}
+
+quad* OpenGLImp::MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType, vector vNormal) {
+	RESULT r = R_PASS;
+
+	quad* pQuad = new OGLQuad(this, static_cast<float>(width), static_cast<float>(height), numHorizontalDivisions, numVerticalDivisions, uvTopLeft, uvBottomRight, curveType, vNormal);
+	CN(pQuad);	
+
+	//Success:
+	return pQuad;
+
+Error:
+	if (pQuad != nullptr) {
+		delete pQuad;
+		pQuad = nullptr;
+	}
+
 	return nullptr;
 }
 
@@ -694,12 +713,41 @@ volume* OpenGLImp::MakeVolume(double side, bool fTriangleBased) {
 	return MakeVolume(side, side, side, fTriangleBased);
 }
 
-text* OpenGLImp::MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
-{
+//TODO: the texture could be stored in the font already, but having this pathway
+// avoids conflicts with parts of the code that use fonts without setting the texture
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, pFont, content, size, isBillboard);
+	text *pText = new OGLText(this, pFont, pFontTexture, strContent, width, height, fBillboard);
 	CN(pText);
+
+	CR(pText->SetText(strContent));
+
+	int fbWidth = pText->GetDPM(width);
+	int fbHeight = pText->GetDPM(height);
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
 
 //Success:
 	return pText;
@@ -712,12 +760,39 @@ Error:
 	return nullptr;
 }
 
-text* OpenGLImp::MakeText(const std::wstring& fontName, const std::string& content, double size, bool fDistanceMap, bool isBillboard)
-{
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = new OGLText(this, std::make_shared<Font>(fontName, fDistanceMap), content, size, isBillboard);
+	text *pText = new OGLText(this, pFont, strContent, width, height, fBillboard);
 	CN(pText);
+
+	CR(pText->SetText(strContent));
+
+	int fbWidth = pText->GetDPM(width);
+	int fbHeight = pText->GetDPM(height);
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+	
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
 
 //Success:
 	return pText;
@@ -727,13 +802,196 @@ Error:
 		delete pText;
 		pText = nullptr;
 	}
+	return nullptr;
+}
+
+text* OpenGLImp::MakeText(const std::wstring& strFontFileName, const std::string& strContent, double width, double height, bool fDistanceMap, bool fBillboard) {
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, std::make_shared<font>(strFontFileName, fDistanceMap), strContent, width, height, fBillboard);
+	CN(pText);
+
+	CR(pText->SetText(strContent));
+
+	int fbWidth = pText->GetDPM(width);
+	int fbHeight = pText->GetDPM(height);
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, pFont, textFlags);
+	CN(pText);
+
+	//CR(pText->SetText(strContent));
+	CR(pText->CreateLayout(pLayout, margin));
+
+	int fbWidth = pText->GetDPM(pText->GetWidth());
+	int fbHeight = pText->GetDPM(pText->GetHeight());
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, pFont, strContent, lineHeightM, textFlags);
+	CN(pText);
+
+	CR(pText->SetText(strContent));
+
+	int fbWidth = pText->GetDPM(pText->GetWidth());
+	int fbHeight = pText->GetDPM(pText->GetHeight());
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = new OGLText(this, pFont, strContent, width, height, textFlags);
+	CN(pText);
+
+	CR(pText->SetText(strContent));
+
+	int fbWidth = pText->GetDPM(pText->GetWidth());
+	int fbHeight = pText->GetDPM(pText->GetHeight());
+
+	// TODO: Switch to this with C++17
+	//std::clamp(fbWidth, 32, 2048);
+	//std::clamp(fbHeight, 32, 2048);
+
+	util::Clamp(fbWidth, 32, 2048);
+	util::Clamp(fbHeight, 32, 2048);
+
+	OGLFramebuffer *pOGLFramebuffer = new OGLFramebuffer(this, fbWidth, fbHeight, 4);
+	CN(pOGLFramebuffer);
+
+	pText->SetFramebuffer(pOGLFramebuffer);
+
+	CR(pOGLFramebuffer->OGLInitialize());
+	CR(pOGLFramebuffer->Bind());
+
+	CR(pOGLFramebuffer->MakeColorAttachment());
+	CR(pOGLFramebuffer->GetColorAttachment()->MakeOGLTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	CR(pOGLFramebuffer->GetColorAttachment()->AttachTextureToFramebuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0));
+
+	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
+	
+	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
 	return nullptr;
 }
 
 texture* OpenGLImp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, pszFilename, type);
+	texture *pTexture = OGLTexture::MakeTextureFromPath(this, type, std::wstring(pszFilename));
 	CN(pTexture);
 
 //Success:
@@ -744,13 +1002,32 @@ Error:
 		delete pTexture;
 		pTexture = nullptr;
 	}
+
+	return nullptr;
+}
+
+texture* OpenGLImp::MakeTexture(const texture &srcTexture) {
+	RESULT r = R_PASS;
+
+	texture *pTexture = OGLTexture::MakeTexture(srcTexture);
+	CN(pTexture);
+
+	//Success:
+	return pTexture;
+
+Error:
+	if (pTexture != nullptr) {
+		delete pTexture;
+		pTexture = nullptr;
+	}
+
 	return nullptr;
 }
 
 texture* OpenGLImp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, type, width, height, format, channels, pBuffer, pBuffer_n);
+	texture *pTexture = OGLTexture::MakeTextureFromBuffer(this, type, width, height, channels, format, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:
@@ -768,7 +1045,7 @@ Error:
 texture* OpenGLImp::MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = new OGLTexture(this, type, pBuffer, pBuffer_n);
+	texture *pTexture = OGLTexture::MakeTextureFromFileBuffer(this, type, pBuffer, pBuffer_n);
 	CN(pTexture);
 
 	//Success:
@@ -800,73 +1077,61 @@ Error:
 	return nullptr;
 }
 
-RESULT OpenGLImp::RenderSkybox(ObjectStoreImp* pObjectStore, EYE_TYPE eye) {
-
-	RESULT r = R_PASS;
-	skybox *pSkybox = nullptr;
-	CR(pObjectStore->GetSkybox(pSkybox));
-	if (pSkybox != nullptr) {
-		CRM(m_pOGLSkyboxProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLSkyboxProgram->SetStereoCamera(m_pCamera, eye));
-		CR(m_pOGLSkyboxProgram->RenderObject(pSkybox));
+SinkNode* OpenGLImp::MakeSinkNode(std::string strNodeName) {
+	SinkNode* pSinkNode = nullptr;
+		
+	if (strNodeName == "display") {
+		pSinkNode = DNode::MakeNode<OGLViewportDisplay>(this);
 	}
 
-Error:
-	return r;
+	return pSinkNode;
 }
 
-RESULT OpenGLImp::RenderReferenceGeometry(ObjectStore* pObjectStore, EYE_TYPE eye) {
-	RESULT r = R_PASS;
-	
-	if (IsRenderReferenceGeometry()) {
-		CR(m_pOGLReferenceGeometryProgram->UseProgram());
-		CR(m_pOGLReferenceGeometryProgram->SetStereoCamera(m_pCamera, eye));
-		CR(m_pOGLReferenceGeometryProgram->RenderObjectStoreBoundingVolumes(pObjectStore));
+SourceNode* OpenGLImp::MakeSourceNode(std::string strNodeName) {
+	SourceNode* pSourceNode = nullptr;
+
+	// TODO: ? will there be HAL backed Source Nodes?
+
+	return pSourceNode;
+}
+
+ProgramNode* OpenGLImp::MakeProgramNode(std::string strNodeName) {
+	ProgramNode* pProgramNode = nullptr;
+
+	pProgramNode = OGLProgramFactory::MakeOGLProgram(OGLProgramFactory::OGLProgramTypeFromstring(strNodeName), this, m_versionGLSL);
+
+	return pProgramNode;
+}
+
+RESULT OpenGLImp::ClearHALBuffers() {
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	return R_PASS;
+}
+
+RESULT OpenGLImp::ConfigureHAL() {
+
+	if (m_HALConfiguration.fDrawWireframe) {
+		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
-Error:
-	return r;
-}
-
-RESULT OpenGLImp::RenderProfiler(EYE_TYPE eye) {
-
-	RESULT r = R_PASS;
-
-	// Render profiler overlay
-	if (DreamConsole::GetConsole()->IsInForeground()) {
-		CRM(m_pOGLDreamConsole->m_OGLProgram->UseProgram(), "Failed to use OGLProgram");
-		CR(m_pOGLDreamConsole->m_OGLProgram->SetStereoCamera(m_pCamera, eye));
-		m_pOGLDreamConsole->Render(eye == EYE_MONO);
+	if (m_pHMD == nullptr) {
+		CheckFramebufferStatus(GL_FRAMEBUFFER);
 	}
 
-Error:
-	return r;
+	return R_PASS;
 }
 
-RESULT OpenGLImp::RenderToTexture(FlatContext* pContext) {
-	RESULT r = R_PASS;
-
-	// Create framebuffer
-	OGLFramebuffer* pFramebuffer = dynamic_cast<OGLFramebuffer*>(pContext->GetFramebuffer());
-	CN(pFramebuffer);
-
-	m_pOGLFlatProgram->SetFrameBuffer(pFramebuffer, GL_DEPTH_COMPONENT16, GL_FLOAT, pFramebuffer->GetWidth(), pFramebuffer->GetHeight(), pFramebuffer->GetChannels());
-	CR(m_pOGLFlatProgram->UseProgram());
-	CR(m_pOGLFlatProgram->BindToFramebuffer(pFramebuffer));
-	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, EYE_MONO));
-
-	CR(m_pOGLFlatProgram->RenderObject(pContext));
-	CR(m_pOGLFlatProgram->UnbindFramebuffer());
-
-
-Error:
-	return r;
+RESULT OpenGLImp::FlushHALBuffers() {
+	glFlush();
+	return R_PASS;
 }
 
 // This is critical path, so EHM is removed
 // Debug manually
-RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph, EYE_TYPE eye) {
+/*
+RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, EYE_TYPE eye) {
 	RESULT r = R_PASS;
+
 	ObjectStoreImp *pObjectStore = pSceneGraph->GetSceneGraphStore();
 	VirtualObj *pVirtualObj = nullptr;
 
@@ -877,7 +1142,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	if (m_fDrawWireframe) {
+	if (m_HALConfiguration.fDrawWireframe) {
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	}
 
@@ -893,7 +1158,7 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	m_pOGLProgramShadowDepth->SetLights(pLights);
 	m_pOGLProgramShadowDepth->RenderObjectStore(pSceneGraph);
 	m_pOGLProgramShadowDepth->UnbindFramebuffer();
-	//*/
+	//
 
 	// 
 	m_pOGLRenderProgram->UseProgram();
@@ -915,29 +1180,14 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 		lastEye = eye;
 	}
 
-	// Render Layers
+
 	// 3D Object / skybox
+	//m_pOGLRenderProgram->UseProgram();
 	m_pOGLRenderProgram->RenderObjectStore(pSceneGraph);
 	RenderReferenceGeometry(pSceneGraph, eye);
+
+	// Skybox
 	RenderSkybox(pObjectStore, eye);
-
-//TODO either remove FlatSceneGraph or create a separate AddFlatContext for overlays
-/*
-	// Flat object layer
-	glClearDepth(1.0f);
-	glClear(GL_DEPTH_BUFFER_BIT);
-	
-	CRM(m_pOGLFlatProgram->UseProgram(), "Failed to use OGLProgram");
-
-	CR(m_pOGLFlatProgram->BindToFramebuffer());
-	CR(m_pOGLFlatProgram->SetStereoCamera(m_pCamera, eye));
-	pFlatSceneGraph->Reset();
-	CR(m_pOGLFlatProgram->RenderSceneGraph(pFlatSceneGraph));
-	CR(m_pOGLFlatProgram->UnbindFramebuffer());
-
-	CRM(m_pOGLRenderProgram->UseProgram(), "Failed to use OGLProgram");
-	CR(m_pOGLRenderProgram->RenderObject(pQuad));	
-//*/
 
 	// Profiler
 	glClearDepth(1.0f);
@@ -956,74 +1206,14 @@ RESULT OpenGLImp::Render(ObjectStore *pSceneGraph, ObjectStore *pFlatSceneGraph,
 	// CheckGLError();
 	return r;
 }
+*/
 
 RESULT OpenGLImp::Shutdown() {
 	RESULT r = R_PASS;
 
-	//CBM((wglDeleteContext(m_hglrc)), "Failed to wglDeleteContext(hglrc)");
-
-	/* TODO:  Add this stuff
-	wglMakeCurrent(pDC->m_hDC, m_hrc);
-	//--------------------------------
-	m_pProgram->DetachShader(m_pVertSh);
-	m_pProgram->DetachShader(m_pFragSh);
-
-	delete m_pProgram;
-	m_pProgram = NULL;
-
-	delete m_pVertSh;
-	m_pVertSh = NULL;
-	delete m_pFragSh;
-	m_pFragSh = NULL;
-
-	wglMakeCurrent(NULL, NULL);
-	//--------------------------------
-	if (m_hrc)
-	{
-	wglDeleteContext(m_hrc);
-	m_hrc = NULL;
-	}
-	*/
-
 	if (m_pOpenGLRenderingContext != NULL) {
 		delete m_pOpenGLRenderingContext;
 		m_pOpenGLRenderingContext = NULL;
-	}
-
-	return r;
-}
-
-RESULT OpenGLImp::SetDrawWireframe(bool fDrawWireframe) {
-	m_fDrawWireframe = fDrawWireframe;
-	return R_PASS;
-}
-
-bool OpenGLImp::IsDrawWireframe() {
-	return m_fDrawWireframe;
-}
-
-RESULT OpenGLImp::SetRenderProfiler(bool fRenderProfiler) {
-	m_fRenderProfiler = fRenderProfiler;
-	return R_PASS;
-}
-
-bool OpenGLImp::IsRenderProfiler() {
-	return m_fRenderProfiler;
-}
-
-RESULT OpenGLImp::Notify(CmdPromptEvent *event) {
-	RESULT r = R_PASS;
-
-	// TODO: This should be part of the CMD line
-	if (event->GetArg(1).compare("list") == 0) {
-		HUD_OUT("wire : toggle wireframe on / off");
-	}
-
-	if (event->GetArg(1).compare("wire") == 0) {
-		SetDrawWireframe(!IsDrawWireframe()); 
-	}
-	else if (event->GetArg(1).compare("refgeo") == 0) {
-		SetRenderReferenceGeometry(!IsRenderReferenceGeometry());
 	}
 
 	return r;
@@ -1196,6 +1386,16 @@ Error:
 	return r;
 }
 
+RESULT OpenGLImp::glDeleteRenderbuffers(GLsizei n, GLuint *renderbuffers) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteRenderbuffers(n, renderbuffers);
+	CRM(CheckGLError(), "glDeleteRenderbuffers failed");
+
+Error:
+	return r;
+}
+
 RESULT OpenGLImp::glBindRenderbuffer(GLenum target, GLuint renderbuffer) {
 	RESULT r = R_PASS;
 
@@ -1347,6 +1547,28 @@ RESULT OpenGLImp::glGetAttribLocation(GLuint programID, const GLchar *pszName, G
 	return r;
 Error:
 	*pLocation = -1;
+	return r;
+}
+
+// Blending 
+
+RESULT OpenGLImp::glBlendEquation(GLenum mode) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBlendEquation(mode);
+	CRM(CheckGLError(), "glBlendEquation failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glBlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
+	CRM(CheckGLError(), "glBlendFuncSeparate failed");
+
+Error:
 	return r;
 }
 
@@ -1548,11 +1770,20 @@ Error:
 }
 
 // Textures
-RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *textures) {
+RESULT OpenGLImp::GenerateTextures(GLsizei n, GLuint *pTextures) {
 	RESULT r = R_PASS;
 
-	//m_OpenGLExtensions.glGenTextures(n, textures);
-	glGenTextures(n, textures);
+	glGenTextures(n, pTextures);
+	CRM(CheckGLError(), "glGenTextures failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::DeleteTextures(GLsizei n, GLuint *pTextures) {
+	RESULT r = R_PASS;
+
+	glDeleteTextures(n, pTextures);
 	CRM(CheckGLError(), "glGenTextures failed");
 
 Error:
@@ -1662,6 +1893,82 @@ RESULT OpenGLImp::glGenerateMipmap(GLenum target) {
 Error:
 	return r;
 }
+
+// Queries
+RESULT OpenGLImp::glGenQueries(GLsizei n, GLuint *ids) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGenQueries(n, ids);
+	CRM(CheckGLError(), "glGenQueries failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glDeleteQueries(GLsizei n, const GLuint *ids) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glDeleteQueries(n, ids);
+	CRM(CheckGLError(), "glDeleteQueries failed");
+
+Error:
+	return r;
+}
+
+bool OpenGLImp::glIsQuery(GLuint id) {
+	return (m_OpenGLExtensions.glIsQuery(id) != 0);
+}
+
+RESULT OpenGLImp::glBeginQuery(GLenum target, GLuint id) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glBeginQuery(target, id);
+	CRM(CheckGLError(), "glBeginQuery failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glEndQuery(GLenum target) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glEndQuery(target);
+	CRM(CheckGLError(), "glEndQuery failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryiv(GLenum target, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryiv(target, pname, params);
+	CRM(CheckGLError(), "glGetQueryiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryObjectiv(GLuint id, GLenum pname, GLint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryObjectiv(id, pname, params);
+	CRM(CheckGLError(), "glGetQueryObjectiv failed");
+
+Error:
+	return r;
+}
+
+RESULT OpenGLImp::glGetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params) {
+	RESULT r = R_PASS;
+
+	m_OpenGLExtensions.glGetQueryObjectuiv(id, pname, params);
+	CRM(CheckGLError(), "glGetQueryObjectuiv failed");
+
+Error:
+	return r;
+}
+
 
 RESULT OpenGLImp::wglSwapIntervalEXT(int interval) {
 	RESULT r = R_PASS;

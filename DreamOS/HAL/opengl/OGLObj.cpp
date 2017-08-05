@@ -158,16 +158,24 @@ Error:
 //virtual RESULT Render() {
 // Critical path, EHM removed
 // Debug manually
+
+bool g_fVAOInit = false;
+
 RESULT OGLObj::Render() {
 	RESULT r = R_PASS;
 
 	// TODO: Rethink this since it's in the critical path
 	DimObj *pDimObj = GetDimObj();
 
-	m_pParentImp->glBindVertexArray(m_hVAO);	// TODO: VAO might not be needed every object every frame
+	//if (g_fVAOInit == false) {
+		m_pParentImp->glBindVertexArray(m_hVAO);	// TODO: VAO might not be needed every object every frame
+		g_fVAOInit = true;
+	//}
+
 	m_pParentImp->glBindBuffer(GL_ARRAY_BUFFER, m_hVBO);
 	m_pParentImp->glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_hIBO);
 
+#ifdef _DEBUG
 	GLint previousPolygonMode[2]{ 0 };
 	GLboolean previousCullFaceEnabled;
 	glGetIntegerv(GL_POLYGON_MODE, previousPolygonMode);
@@ -180,9 +188,11 @@ RESULT OGLObj::Render() {
 			glDisable(GL_CULL_FACE);
 		}
 	}
+#endif
 
 	glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 
+#ifdef _DEBUG
 	if (pDimObj->IsWireframe()) {
 		if (previousPolygonMode[1] != 0) {
 			glPolygonMode(GL_FRONT, previousPolygonMode[0]);
@@ -196,6 +206,7 @@ RESULT OGLObj::Render() {
 			glEnable(GL_CULL_FACE);
 		}
 	}
+#endif
 
 	//glDrawElements(GL_TRIANGLES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);
 	//glDrawElements(GL_LINES, pDimObj->NumberIndices(), GL_UNSIGNED_INT, NULL);

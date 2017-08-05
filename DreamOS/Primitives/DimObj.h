@@ -30,7 +30,10 @@
 class BoundingVolume;
 class CollisionManifold;
 
-class DimObj : public VirtualObj, public Subscriber<TimeEvent>, public dirty {
+class DimObj : public VirtualObj, 
+			   public Subscriber<TimeEvent>, 
+			   public dirty 
+{
 	friend class OGLObj;
 
 protected:
@@ -95,14 +98,17 @@ public:
 	virtual RESULT UpdateBuffers();
 
 	virtual bool IsVisible() override;
-	RESULT SetVisible(bool fVisible = true);
+	RESULT SetVisible(bool fVisible = true, bool fSetChildren = true);
 
 	bool IsWireframe();
 	RESULT SetWireframe(bool fWireframe = true);
 
+	color GetColor();
 	RESULT SetColor(color c);
+	RESULT SetAlpha(color_precision a);
 
 	RESULT SetColorTexture(texture *pTexture);
+	RESULT UpdateColorTexture(texture *pTexture);
 	RESULT ClearColorTexture();
 	texture *GetColorTexture();
 
@@ -111,6 +117,7 @@ public:
 	texture *GetBumpTexture();
 	
 	// TODO: Above accessors / create texture store
+	RESULT SetMaterialColors(color c, bool fSetChildren = false);
 	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
 	RESULT SetMaterialAmbient(float ambient);
 	
@@ -126,16 +133,33 @@ public:
 	RESULT TransformUV(matrix<uv_precision, 2, 1> matA, matrix<uv_precision, 2, 2> matB);
 
 	// Children (composite objects)
-	RESULT AddChild(std::shared_ptr<DimObj> pDimObj);
+	RESULT AddChild(std::shared_ptr<DimObj> pDimObj, bool fFront = false);
+	RESULT RemoveChild(std::shared_ptr<DimObj> pDimObj);
+	RESULT RemoveChild(VirtualObj *pObj);
+	RESULT RemoveLastChild();
 	RESULT ClearChildren();
+
+	// Explicit instantiations in source 
+	template <class objType> 
+	std::shared_ptr<objType> GetFirstChild() {
+		for (auto &pChildObject : *m_pObjects) {
+			std::shared_ptr<objType> pObj = std::dynamic_pointer_cast<objType>(pChildObject);
+			if (pObj != nullptr) {
+				return pObj;
+			}
+		}
+
+		return nullptr;
+	}
+
 	bool HasChildren();
 	bool CompareParent(DimObj* pParent);
 
 	std::vector<std::shared_ptr<VirtualObj>> GetChildren();
 
 	// Intersections and Collision
-	bool Intersect(VirtualObj* pObj);
-	CollisionManifold Collide(VirtualObj* pObj);
+	bool Intersect(VirtualObj* pObj, int depth = 0);
+	CollisionManifold Collide(VirtualObj* pObj, int depth = 0);
 
 	bool Intersect(const ray &rCast, int depth = 0);
 	CollisionManifold Collide(const ray &rCast, int depth = 0);
@@ -167,6 +191,7 @@ public:
 	RESULT InitializeAABB();
 	RESULT InitializeOBB();
 	RESULT InitializeBoundingSphere();
+	RESULT InitializeBoundingQuad();
 	RESULT InitializeBoundingQuad(point ptOrigin, float width, float height, vector vNormal);
 	std::shared_ptr<BoundingVolume> GetBoundingVolume();
 
@@ -189,8 +214,12 @@ public:
 	RESULT Notify(TimeEvent *event);
 
 	material* GetMaterial();
+	RESULT SetMaterial(material mMaterial);
 
+	matrix<virtual_precision, 4, 4> GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
+	matrix<virtual_precision, 4, 4> GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
+	matrix<virtual_precision, 4, 4> GetRelativeModelMatrix();
 };
 
 #endif // !DIM_OBJ_H_

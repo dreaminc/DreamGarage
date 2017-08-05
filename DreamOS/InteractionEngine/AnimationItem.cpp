@@ -1,5 +1,5 @@
 #include "AnimationItem.h"
-#include "Primitives/VirtualObj.h"
+#include "Primitives/DimObj.h"
 
 AnimationItem::AnimationItem(AnimationState startState, AnimationState endState, double startTime, double duration) {
 	RESULT r = R_PASS;
@@ -10,8 +10,9 @@ AnimationItem::AnimationItem(AnimationState startState, AnimationState endState,
 	m_endState = endState;
 	m_duration = duration;
 	m_startTime = startTime;
-	fnOnAnimationEnded = nullptr;
-	fnOnAnimationEndedContext = nullptr;
+	m_fnOnAnimationStart = nullptr;
+	m_fnOnAnimationEnded = nullptr;
+	m_fnOnAnimationContext = nullptr;
 
 	Validate();
 	return;
@@ -35,7 +36,7 @@ Error:
 	return r;
 }
 
-std::shared_ptr<AnimationItem> AnimationItem::CreateCancelAnimation(VirtualObj *pObj, double msNow) {
+std::shared_ptr<AnimationItem> AnimationItem::CreateCancelAnimation(DimObj *pObj, double msNow) {
 	AnimationState startState;
 	startState.vScale = vector(1.0f, 1.0f, 1.0f);
 	Update(pObj, startState, msNow);
@@ -45,7 +46,7 @@ std::shared_ptr<AnimationItem> AnimationItem::CreateCancelAnimation(VirtualObj *
 	return std::make_shared<AnimationItem>(startState, endState, msNow, duration);
 }
 
-RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, double msNow) {
+RESULT AnimationItem::Update(DimObj *pObj, AnimationState& state, double msNow) {
 	RESULT r = R_PASS;
 
 	if (CheckAndCleanDirty()) {
@@ -53,6 +54,7 @@ RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, double msN
 			m_startState.ptPosition = pObj->GetPosition();
 			m_startState.qRotation = pObj->GetOrientation();
 			m_startState.vScale = pObj->GetScale();
+			m_startState.cColor = pObj->GetMaterial()->GetDiffuseColor();
 		}
 		m_startTime = msNow;
 	}
@@ -67,6 +69,12 @@ RESULT AnimationItem::Update(VirtualObj *pObj, AnimationState& state, double msN
 	updateState.ptPosition = ((float)(1.0 - prog) * m_startState.ptPosition + (float)(prog)* m_endState.ptPosition);
 	updateState.qRotation = m_startState.qRotation.RotateToQuaternionLerp(m_endState.qRotation, prog);
 	updateState.vScale = ((float)(1.0 - prog) * m_startState.vScale + (float)(prog)* m_endState.vScale);
+
+	if (m_startState.cColor != m_endState.cColor) {
+		auto vColor = ((float)(1.0 - prog) * m_startState.cColor + (float)(prog)* m_endState.cColor);
+		updateState.cColor.SetColor(vColor.element(0, 0), vColor.element(1, 0), vColor.element(2, 0), vColor.element(3, 0));
+	}
+
 	CR(state.Compose(updateState));
 Error:
 	return r;
@@ -95,19 +103,32 @@ RESULT AnimationItem::SetCurveType(AnimationCurveType type) {
 }
 
 std::function<RESULT(void*)> AnimationItem::GetAnimationEndedCallback() {
-	return fnOnAnimationEnded;
+	return m_fnOnAnimationEnded;
 }
 
 RESULT AnimationItem::SetAnimationEndedCallback(std::function<RESULT(void*)> callback) {
-	fnOnAnimationEnded = callback;
+	m_fnOnAnimationEnded = callback;
+	return R_PASS;
+}
+
+std::function<RESULT(void*)> AnimationItem::GetAnimationStartCallback() {
+	return m_fnOnAnimationStart;
+}
+
+RESULT AnimationItem::SetAnimationStartCallback(std::function<RESULT(void*)> callback) {
+	m_fnOnAnimationStart = callback;
 	return R_PASS;
 }
 
 void* AnimationItem::GetCallbackContext() {
-	return fnOnAnimationEndedContext;
+	return m_fnOnAnimationContext;
 }
 
 RESULT AnimationItem::SetCallbackContext(void* context) {
-	fnOnAnimationEndedContext = context;
+	m_fnOnAnimationContext = context;
 	return R_PASS;
+}
+
+bool AnimationItem::ShouldAnimateColor() {
+	return m_startState.cColor != m_endState.cColor;
 }

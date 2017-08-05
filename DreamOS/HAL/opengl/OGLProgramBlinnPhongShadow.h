@@ -16,7 +16,7 @@
 class OGLProgramBlinnPhongShadow : public OGLProgram {
 public:
 	OGLProgramBlinnPhongShadow(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp),
+		OGLProgram(pParentImp, "oglblinnphongshadow"),
 		m_pLightsBlock(nullptr),
 		m_pMaterialsBlock(nullptr)
 	{
@@ -60,6 +60,11 @@ public:
 
 	Error:
 		return r;
+	}
+
+	virtual RESULT SetupConnections() override {
+		// TODO: do it
+		return R_NOT_IMPLEMENTED;
 	}
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
@@ -114,6 +119,8 @@ public:
 		//m_pUniformModelViewMatrix
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 		
+		/*
+		// TODO: this
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
@@ -122,6 +129,7 @@ public:
 			pOGLProgramShadowDepth->SetDepthTexture(0);
 			m_pUniformTextureDepth->SetUniform(0);			
 		}
+		*/
 
 		point origin = pCamera->GetOrigin();
 		m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
@@ -129,7 +137,7 @@ public:
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 		auto ptEye = pStereoCamera->GetEyePosition(eye);
 		auto matV = pStereoCamera->GetViewMatrix(eye);
 		auto matP = pStereoCamera->GetProjectionMatrix(eye);
@@ -142,6 +150,8 @@ public:
 		point origin = pStereoCamera->GetOrigin();
 		m_pUniformEyePosition->SetUniform(point(origin.x(), origin.y(), origin.z(), 1.0f));
 
+		/*
+		// TODO: this
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformDepthViewProjectionMatrix->SetUniform(pOGLProgramShadowDepth->GetViewProjectionMatrix());
@@ -150,6 +160,7 @@ public:
 			pOGLProgramShadowDepth->SetDepthTexture(0);
 			m_pUniformTextureDepth->SetUniform(0);
 		}
+		*/
 
 		return R_PASS;
 	}

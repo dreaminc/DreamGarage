@@ -1,10 +1,17 @@
 #include "DreamBrowser.h"
 #include "DreamOS.h"
+#include "Core/Utilities.h"
 
 #include "PhysicsEngine/CollisionManifold.h"
 
+#include "InteractionEngine/AnimationItem.h"
+
 #include "WebBrowser/CEFBrowser/CEFBrowserManager.h"
 #include "WebBrowser/WebBrowserController.h"
+
+#include "Cloud/Environment/EnvironmentAsset.h"
+
+#include "Cloud/WebRequest.h"
 
 DreamBrowser::DreamBrowser(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamBrowser>(pDreamOS, pContext)
@@ -38,8 +45,69 @@ RESULT DreamBrowser::OnPaint(const WebBrowserRect &rect, const void *pBuffer, in
 	RESULT r = R_PASS;
 
 	CN(m_pBrowserTexture);
+	//CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
 	CR(m_pBrowserTexture->Update((unsigned char*)(pBuffer), width, height, texture::PixelFormat::BGRA));
 	
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::OnLoadingStateChange(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamBrowser::FadeQuadToBlack() {
+
+	RESULT r = R_PASS;
+
+	//Fade to black
+	auto fnEndCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		//m_pBrowserQuad->SetVisible(false);
+		return r;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pBrowserQuad.get(),
+		color(0.0f, 0.0f, 0.0f, 1.0f),
+		0.1f,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		nullptr,
+		fnEndCallback,
+		this
+	));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::OnLoadStart() {
+	RESULT r = R_PASS;
+
+	return r;
+}
+
+RESULT DreamBrowser::OnLoadEnd(int httpStatusCode) {
+	RESULT r = R_PASS;
+
+	auto fnStartCallback = [&](void *pContext) {
+		RESULT r = R_PASS;
+		//m_pBrowserQuad->SetVisible(true);
+		return r;
+	};
+
+	CR(GetDOS()->GetInteractionEngineProxy()->PushAnimationItem(
+		m_pBrowserQuad.get(),
+		color(1.0f, 1.0f, 1.0f, 1.0f),
+		0.1f,
+		AnimationCurveType::LINEAR,
+		AnimationFlags(),
+		fnStartCallback,
+		nullptr,
+		this
+	));
+
 Error:
 	return r;
 }
@@ -57,7 +125,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Subscribers (children)
 	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
+		CR(GetDOS()->RegisterEventSubscriber(GetComposite(), (InteractionEventType)(i), this));
 	}
 
 	// Controller
@@ -80,22 +148,26 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up the quad
 	SetNormalVector(vector(0.0f, 1.0f, 0.0f).Normal());
-
 	m_pBrowserQuad = GetComposite()->AddQuad(GetWidth(), GetHeight(), 1, 1, nullptr, GetNormal());
+
+	/*
+	m_pTestSphereAbsolute = GetDOS()->AddSphere(0.025f, 10, 10);
+	m_pTestSphereAbsolute->SetColor(COLOR_RED);
+
+	m_pTestSphereRelative = GetComposite()->AddSphere(0.025f, 10, 10);
+	m_pTestSphereRelative->SetColor(COLOR_RED);
+	*/
 	
 	// Flip UV vertically
-	m_pBrowserQuad->TransformUV(
-		{ { 0.0f, 0.0f } },
-		{ { 1.0f, 0.0f,
-			0.0f, -1.0f } }
-	);
+	///*
+	m_pBrowserQuad->FlipUVVertical();
+	//*/
 
 	m_pBrowserQuad->SetMaterialAmbient(0.8f);
 
 	// Set up and map the texture
-	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);
-	m_pBrowserQuad->SetMaterialTexture(DimObj::MaterialTexture::Ambient, m_pBrowserTexture.get());
-	m_pBrowserQuad->SetMaterialTexture(DimObj::MaterialTexture::Diffuse, m_pBrowserTexture.get());
+	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
+	m_pBrowserQuad->SetColorTexture(m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
 	///*
@@ -116,7 +188,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 											 vector(0.0f, 0.0f, 0.0f));
 	//*/
 
-	GetDOS()->AddInteractionObject(m_pBrowserQuad.get());
+	GetDOS()->AddObjectToInteractionGraph(m_pBrowserQuad.get());
 
 Error:
 	return r;
@@ -139,6 +211,9 @@ RESULT DreamBrowser::Update(void *pContext) {
 	if (m_pWebBrowserManager != nullptr) {
 		CR(m_pWebBrowserManager->Update());
 	}
+	else {
+		SetVisible(false);
+	}
 
 	//CR(GetDOS()->UpdateInteractionPrimitive(GetHandRay()));
 
@@ -159,8 +234,12 @@ Error:
 WebBrowserPoint DreamBrowser::GetRelativeBrowserPointFromContact(point ptIntersectionContact) {
 	WebBrowserPoint webPt;
 
+	ptIntersectionContact.w() = 1.0f;
+
 	// First apply transforms to the ptIntersectionContact 
 	point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
+	
+	//m_pTestSphereRelative->SetPosition(ptAdjustedContact);
 
 	float width = GetWidth();
 	float height = GetHeight();
@@ -197,20 +276,24 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 	bool fUpdateMouse = false;
 
+	//m_pTestSphereAbsolute->SetPosition(pEvent->m_ptContact[0]);
 	switch (pEvent->m_eventType) {
+	/*
 		case ELEMENT_INTERSECT_BEGAN: {
-			m_pPointerCursor->SetVisible(true);
+			if (m_pBrowserQuad->IsVisible()) {
+				m_pPointerCursor->SetVisible(true);
 
-			WebBrowserMouseEvent webBrowserMouseEvent;
+				WebBrowserMouseEvent webBrowserMouseEvent;
 
-			webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
+				webBrowserMouseEvent.pt = GetRelativeBrowserPointFromContact(pEvent->m_ptContact[0]);
 
-			CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
+				CR(m_pWebBrowserController->SendMouseMove(webBrowserMouseEvent, false));
 
-			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
-			m_fBrowserActive = true;
+				m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
+				m_fBrowserActive = true;
 
-			fUpdateMouse = true;
+				fUpdateMouse = true;
+			}
 		} break;
 
 		case ELEMENT_INTERSECT_ENDED: {
@@ -278,50 +361,62 @@ RESULT DreamBrowser::Notify(InteractionObjectEvent *pEvent) {
 
 			m_lastWebBrowserPoint = webBrowserMouseEvent.pt;
 		} break;
-
+		//*/
 		// Keyboard
 		// TODO: Should be a "typing manager" in between?
-		case INTERACTION_EVENT_KEY_UP: 
+		// TODO: haven't seen any issues with KEY_UP being a no-op
+		case INTERACTION_EVENT_KEY_UP: break;
 		case INTERACTION_EVENT_KEY_DOWN: {
 			bool fKeyDown = (pEvent->m_eventType == INTERACTION_EVENT_KEY_DOWN);
-
-			if (pEvent->m_value == SVK_SHIFT)
-				m_fShiftDown = fKeyDown;
+			std::string strURL = m_strEntered.GetString();
 
 			char chKey = (char)(pEvent->m_value);
-			
-			if (m_fShiftDown) {
-				switch (chKey) {
-				case '0': chKey = ')'; break;
-				case '1': chKey = '!'; break;
-				case '2': chKey = '@'; break;
-				case '3': chKey = '#'; break;
-				case '4': chKey = '$'; break;
-				case '5': chKey = '%'; break;
-				case '6': chKey = '^'; break;
-				case '7': chKey = '&'; break;
-				case '8': chKey = '*'; break;
-				case '9': chKey = '('; break;
-				}
-			}
-			else {
-				if (chKey >= 'A' && chKey <= 'Z')
-					chKey += 32;
+			m_strEntered.UpdateString(chKey);
+
+			// TODO: Move this into keyboard
+			GetDOS()->GetKeyboard()->UpdateTextBox(chKey, m_strEntered.GetString());
+
+			if (pEvent->m_value == SVK_RETURN) {
+				SetVisible(true);
+
+				std::string strPath = GetDOS()->GetKeyboard()->GetPath();
+				std::string strScope = GetDOS()->GetKeyboard()->GetScope();
+				std::string strTitle = "website";
+
+				strPath = strURL;
+
+				auto m_pEnvironmentControllerProxy = (EnvironmentControllerProxy*)(GetDOS()->GetCloudController()->GetControllerProxy(CLOUD_CONTROLLER_TYPE::ENVIRONMENT));
+				CNM(m_pEnvironmentControllerProxy, "Failed to get environment controller proxy");
+
+				CRM(m_pEnvironmentControllerProxy->RequestShareAsset(strScope, strPath, strTitle), "Failed to share environment asset");
 			}
 
-			CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
+			//CR(m_pWebBrowserController->SendKeyEventChar(chKey, fKeyDown));
+
 		} break;
 	}
-
+/*
 	// First point of contact
 	if (fUpdateMouse) {
-		m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
+		//if (pEvent->m_ptContact[0] != GetDOS()->GetInteractionEngineProxy()->GetInteractionRayOrigin()) {
+			//m_pPointerCursor->SetOrigin(pEvent->m_ptContact[0]);
+			point ptIntersectionContact = pEvent->m_ptContact[0];
+			ptIntersectionContact.w() = 1.0f;
+
+			point ptAdjustedContact = inverse(m_pBrowserQuad->GetModelMatrix()) * ptIntersectionContact;
+			m_pPointerCursor->SetOrigin(ptAdjustedContact);
+		//}
 	}
+	//*/
 
 Error:
 	return r;
 }
 
+RESULT DreamBrowser::SetPosition(point ptPosition) {
+	GetComposite()->SetPosition(ptPosition);
+	return R_PASS;
+}
 
 RESULT DreamBrowser::SetAspectRatio(float aspectRatio) {
 	m_aspectRatio = aspectRatio;
@@ -364,6 +459,10 @@ RESULT DreamBrowser::SetParams(point ptPosition, float diagonal, float aspectRat
 	return R_PASS;
 }
 
+float DreamBrowser::GetAspectRatio() {
+	return m_aspectRatio;
+}
+
 float DreamBrowser::GetHeight() {
 	return std::sqrt((m_diagonalSize * m_diagonalSize) / (1.0f + (m_aspectRatio * m_aspectRatio)));
 }
@@ -386,13 +485,11 @@ RESULT DreamBrowser::UpdateViewQuad() {
 	CR(m_pBrowserQuad->UpdateParams(GetWidth(), GetHeight(), GetNormal()));
 	
 	// Flip UV vertically
+	///*
 	if (r != R_SKIPPED) {
-		m_pBrowserQuad->TransformUV(
-		{ { 0.0f, 0.0f } },
-		{ { 1.0f, 0.0f,
-			0.0f, -1.0f } }
-		);
+		m_pBrowserQuad->FlipUVVertical();
 	}
+	//*/
 
 	CR(m_pBrowserQuad->SetDirty());
 
@@ -402,8 +499,42 @@ Error:
 	return r;
 }
 
+bool DreamBrowser::IsVisible() {
+	return m_pBrowserQuad->IsVisible();
+}
+
 RESULT DreamBrowser::SetVisible(bool fVisible) {
-	return m_pBrowserQuad->SetVisible(fVisible);
+	RESULT r = R_PASS;
+	CR(m_pBrowserQuad->SetVisible(fVisible));
+	//CR(m_pPointerCursor->SetVisible(fVisible));
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::SetEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) {
+	RESULT r = R_PASS;
+
+	if (pEnvironmentAsset != nullptr) {
+		WebRequest webRequest;
+
+		std::string strEnvironmentAssetURI = pEnvironmentAsset->GetURI();
+
+		std::wstring wstrAssetURI = util::StringToWideString(strEnvironmentAssetURI);
+		CR(webRequest.SetURL(wstrAssetURI));
+		CR(webRequest.SetRequestMethod(WebRequest::Method::GET));
+	
+		UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+		CN(pUserControllerProxy);
+
+		std::string strUserToken = pUserControllerProxy->GetUserToken();
+		std::wstring wstrUserToken = util::StringToWideString(strUserToken);
+		CR(webRequest.AddRequestHeader(L"Authorization", L"Token " + wstrUserToken));
+
+		LoadRequest(webRequest);
+	}
+
+Error:
+	return r;
 }
 
 RESULT DreamBrowser::SetURI(std::string strURI) {
@@ -411,6 +542,16 @@ RESULT DreamBrowser::SetURI(std::string strURI) {
 
 	CN(m_pWebBrowserController);
 	CR(m_pWebBrowserController->LoadURL(strURI));
+
+Error:
+	return r;
+}
+
+RESULT DreamBrowser::LoadRequest(const WebRequest &webRequest) {
+	RESULT r = R_PASS;
+
+	CN(m_pWebBrowserController);
+	CR(m_pWebBrowserController->LoadRequest(webRequest));
 
 Error:
 	return r;
@@ -455,7 +596,11 @@ Error:
 }
 */
 
+std::shared_ptr<texture> DreamBrowser::GetScreenTexture() {
+	return m_pBrowserTexture;
+}
 
+//TODO: currently unused?
 RESULT DreamBrowser::SetScreenTexture(texture *pTexture) {
 	m_aspectRatio = (float)pTexture->GetWidth() / (float)pTexture->GetHeight();
 	SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);

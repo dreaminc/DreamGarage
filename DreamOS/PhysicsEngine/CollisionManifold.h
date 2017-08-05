@@ -16,7 +16,7 @@ class VirtualObj;
 
 class CollisionManifold {
 public:
-	//CollisionManifold();
+	CollisionManifold();
 	CollisionManifold(VirtualObj *pObjA, VirtualObj *pObjB);
 	RESULT AddContactPoint(point ptContact, vector vNormal, double penetrationDepth, int weight);
 	RESULT Clear();

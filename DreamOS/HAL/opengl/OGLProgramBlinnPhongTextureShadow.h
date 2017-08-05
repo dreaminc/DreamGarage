@@ -14,7 +14,7 @@
 class OGLProgramBlinnPhongTextureShadow : public OGLProgram {
 public:
 	OGLProgramBlinnPhongTextureShadow(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp),
+		OGLProgram(pParentImp, "oglblinnphongtextureshadow"),
 		m_pLightsBlock(nullptr),
 		m_pMaterialsBlock(nullptr)
 	{
@@ -63,6 +63,11 @@ public:
 
 	Error:
 		return r;
+	}
+
+	virtual RESULT SetupConnections() override {
+		// TODO: do it
+		return R_NOT_IMPLEMENTED;
 	}
 
 	RESULT SetObjectTextures(OGLObj *pOGLObj) {
@@ -126,7 +131,9 @@ public:
 		//m_pUniformProjectionMatrix->SetUniform(matP);
 		//m_pUniformModelViewMatrix
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-
+	
+		/*
+		// TODO: This
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformHasTextureDepth->SetUniform(true);
@@ -140,11 +147,12 @@ public:
 		{
 			m_pUniformHasTextureDepth->SetUniform(false);
 		}
+		*/
 
 		return R_PASS;
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 		auto ptEye = pStereoCamera->GetEyePosition(eye);
 		auto matV = pStereoCamera->GetViewMatrix(eye);
 		auto matP = pStereoCamera->GetProjectionMatrix(eye);
@@ -155,6 +163,8 @@ public:
 		//m_pUniformModelViewMatrix->SetUniform(matM)
 		m_pUniformViewProjectionMatrix->SetUniform(matVP);
 
+		/*
+		// TODO: this
 		OGLProgramShadowDepth *pOGLProgramShadowDepth = dynamic_cast<OGLProgramShadowDepth*>(m_pOGLProgramDepth);
 		if (pOGLProgramShadowDepth != nullptr) {
 			m_pUniformHasTextureDepth->SetUniform(true);
@@ -164,6 +174,7 @@ public:
 			pOGLProgramShadowDepth->SetDepthTexture(1);
 			m_pUniformTextureDepth->SetUniform(1);
 		}
+		*/
 
 		return R_PASS;
 	}
@@ -175,7 +186,7 @@ private:
 		OGLUniformBool* pBoolUniform) {
 		if (pTexture) {
 			pBoolUniform->SetUniform(true);
-			pTexture->OGLActivateTexture();
+			pTexture->OGLActivateTexture(0);
 			pTextureUniform->SetUniform(pTexture);
 		}
 		else

@@ -10,6 +10,8 @@
 #include "Primitives/ray.h"
 #include <memory>
 
+#include "ActiveObject.h"
+
 class VirtualObj;
 class ContactPoint;
 
@@ -18,6 +20,11 @@ typedef enum InteractionEventType {
 	ELEMENT_INTERSECT_MOVED,
 	ELEMENT_INTERSECT_ENDED,
 	ELEMENT_INTERSECT_CANCELLED,
+	ELEMENT_COLLIDE_BEGAN,
+	ELEMENT_COLLIDE_MOVED,
+	ELEMENT_COLLIDE_TRIGGER,
+	ELEMENT_COLLIDE_ENDED,
+	ELEMENT_COLLIDE_CANCELLED,
 	INTERACTION_EVENT_SELECT,
 	INTERACTION_EVENT_MENU,
 	INTERACTION_EVENT_SELECT_DOWN,
@@ -32,16 +39,21 @@ typedef enum InteractionEventType {
 typedef struct InteractionObjectEvent {
 
 	InteractionEventType m_eventType;
-	std::shared_ptr<ray> m_pInteractionRay;
-	VirtualObj *m_pObject;
+	ray m_interactionRay;
+	VirtualObj *m_pInteractionObject = nullptr;
+	VirtualObj *m_pObject = nullptr;
+	VirtualObj *m_pEventObject = nullptr;
 	point m_ptContact[4];
 	vector m_vNormal[4];
 	int m_numContacts;
+	ActiveObject::state m_activeState;
 	
 	int m_value;
 
 	// TODO: Add time of collision
-	InteractionObjectEvent(InteractionEventType eventType, std::shared_ptr<ray> pInteractionRay, VirtualObj *pObject);
+	InteractionObjectEvent();
+	InteractionObjectEvent(InteractionEventType eventType, VirtualObj *pObject = nullptr, VirtualObj *pInteractionObject = nullptr);
+	InteractionObjectEvent(InteractionEventType eventType, const ray &interactionRay, VirtualObj *pObject = nullptr, VirtualObj *pInteractionObject = nullptr);
 
 public:
 	RESULT AddPoint(point ptContact, vector vNormal);

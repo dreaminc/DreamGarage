@@ -22,29 +22,69 @@ class BoundingQuad;
 
 class quad : public DimObj {
 public:
-	typedef enum {
+	enum class type {
 		SQUARE,
 		RECTANGLE,
 		PARALLELOGRAM,
 		TRAPEZOID,
 		RHOMBUS,
 		TRAPEZIUM,
+		CURVED,
 		INVALID
-	} QUAD_TYPE;
+	};
+
+	enum class CurveType {
+		FLAT,
+		PARABOLIC,
+		CIRCLE,
+		INVALID
+	};
 
 public:
 	quad(quad& q);	// copy ctor
 	quad(quad&& q);	// move ctor
 
 	quad(float side, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
-	quad(float height, float width, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
-	quad(float height, float width, vector& center, uvcoord& uv_bottomleft, uvcoord& uv_upperright, vector vNormal = vector::jVector());
+	quad(float width, float height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
+	quad(float width, float height, point& ptCenter, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
 	quad(BoundingQuad *pBoundingQuad, bool fTriangleBased);
 
-	RESULT SetVertices(float width, float height, vector vNormal);
+	quad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, CurveType curveType = CurveType::FLAT, vector vNormal = vector::jVector());
+
+	//RESULT SetVertices(float width, float height, vector vNormal);
+	RESULT SetVertices(float width, float height, vector vNormal, const uvcoord& uvTopLeft = uvcoord(0.0f, 0.0f), const uvcoord& uvBottomRight = uvcoord(1.0f, 1.0f));
 	RESULT SetVertices(BoundingQuad* pBoundingQuad, bool fTriangleBased);
+
+	// TODO: We should move this into a util / general math lib
+	template <typename T=float>
+	std::vector<std::pair<T, T>> GetCurveBuffer(T startVal, T endVal, int divisions, quad::CurveType curveType, T val = 1.0f);
+
+	template <typename T = float>
+	std::pair<T, T> GetCurveFocus(quad::CurveType curveType, T val = 1.0f);
+
+	template <typename T = float>
+	T GetCurveInterpolatedValue(T xVal, std::vector<std::pair<T, T>> curveValues);
+
+	template <typename T = float>
+	std::pair<T, T> GetCurveNormal(T xVal, std::vector<std::pair<T, T>> curveValues, std::pair<T, T> ptFocus);
+
+	template <typename T = float>
+	T GetCurveBufferArcLength(std::vector<std::pair<T, T>> curveValues);
+
+	template <typename T = float>
+	T GetCurveArcLength(T startVal, T endVal, int divisions, quad::CurveType curveType, T val = 1.0f);
+
+	template <typename T = float>
+	std::pair<T, T> GetStartEndForCurveLengthWithMidpoint(T length, T midpoint, int divisions, quad::CurveType curveType, T val = 1.0f);
+
+	RESULT ApplyCurveToVertices();
+
+	RESULT FlipUVVertical();
+	RESULT FlipUVHorizontal();
+
+	vector GetNormal();
 	
-	QUAD_TYPE EvaluatePoints(point a, point b, point c);
+	type EvaluatePoints(point a, point b, point c);
 
 	virtual RESULT Allocate() override;
 
@@ -60,14 +100,18 @@ public:
 	RESULT UpdateFromBoundingQuad(BoundingQuad* pBoundingQuad, bool fTriangleBased = true);
 	RESULT UpdateParams(float width, float height, vector vNormal);
 
+	float GetWidth();
+	float GetHeight();
+
 private:
-	QUAD_TYPE m_quadType;
+	type m_quadType = type::INVALID;
+	CurveType m_quadCurveType = CurveType::INVALID;
 
-	int m_numVerticalDivisions;
-	int m_numHorizontalDivisions;
+	int m_numVerticalDivisions = 1;
+	int m_numHorizontalDivisions = 1;
 
-	texture *m_pTextureHeight;
-	double m_heightMapScale;
+	texture *m_pTextureHeight = nullptr;
+	double m_heightMapScale = 1.0f;
 
 	float m_width;
 	float m_height;

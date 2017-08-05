@@ -11,39 +11,48 @@
 
 texture::texture() :
 	m_pImageBuffer(nullptr),
-	m_width(0),
-	m_height(0),
-	m_channels(0),
 	m_type(texture::TEXTURE_TYPE::TEXTURE_INVALID)
 {
 	Validate();
 }
 
+texture::texture(const texture& tex) :
+	m_pImageBuffer(nullptr),
+	m_width(tex.m_width),
+	m_height(tex.m_height),
+	m_channels(tex.m_channels),
+	m_samples(tex.m_samples),
+	m_format(tex.m_format),
+	m_type(tex.m_type)
+{
+	// NOTE: this will not copy buffers on either GPU or CPU side
+	Validate();
+}
+
 texture::texture(texture::TEXTURE_TYPE type) :
 	m_pImageBuffer(nullptr),
-	m_width(NULL),
-	m_height(NULL),
-	m_channels(NULL),
 	m_type(type)
 {
 	Validate();
 }
 
-texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels) :
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, int samples) :
 	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
+	m_samples(samples),
 	m_type(type)
 {
 	Validate();
 }
 
-texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n) :
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples) :
 	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
+	m_samples(samples),
 	m_type(type) 
 {
 	RESULT r = R_PASS;
@@ -61,9 +70,6 @@ Error:
 // Loads from a file buffer (file loaded into buffer)
 texture::texture(texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n) :
 	m_pImageBuffer(nullptr),
-	m_width(0),
-	m_height(0),
-	m_channels(0),
 	m_type(type)
 {
 	RESULT r = R_PASS;
@@ -77,17 +83,18 @@ Error:
 	return;
 }
 
-texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) :
+texture::texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n, int samples) :
 	m_pImageBuffer(nullptr),
 	m_width(width),
 	m_height(height),
 	m_channels(channels),
+	m_samples(samples),
 	m_format(format),
 	m_type(type)
 {
 	RESULT r = R_PASS;
 
-	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n))
+	CR(CopyTextureBuffer(width, height, channels, pBuffer, pBuffer_n));
 
 	Validate();
 	return;
@@ -98,9 +105,6 @@ Error:
 
 texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEXTURE_TYPE::TEXTURE_INVALID) :
 	m_pImageBuffer(nullptr),
-	m_width(0),
-	m_height(0),
-	m_channels(0),
 	m_type(type)
 {
 	RESULT r = R_PASS;
@@ -114,6 +118,7 @@ texture::texture(wchar_t *pszFilename, texture::TEXTURE_TYPE type = texture::TEX
 
 	Validate();
 	return;
+
 Error:
 	Invalidate();
 	return;
@@ -121,9 +126,6 @@ Error:
 
 texture::texture(wchar_t *pszName, std::vector<std::wstring> cubeMapFiles) :
 	m_pImageBuffer(nullptr),
-	m_width(0),
-	m_height(0),
-	m_channels(0),
 	m_type(texture::TEXTURE_TYPE::TEXTURE_CUBE)
 {
 	RESULT r = R_PASS;
@@ -264,7 +266,19 @@ double texture::GetValueAtUV(double uValue, double vValue) {
 	return retVal;
 }
 
-RESULT texture::LoadTextureFromPath(wchar_t *pszFilepath) {
+RESULT texture::SetParams(int pxWidth, int pxHeight, int channels, int samples, int levels) {
+	RESULT r = R_PASS;
+
+	CR(SetWidth(pxWidth));
+	CR(SetHeight(pxHeight));
+	CR(SetChannels(channels));
+	CR(SetLevels(levels));
+
+Error:
+	return r;
+}
+
+RESULT texture::LoadTextureFromPath(const wchar_t *pszFilepath) {
 	RESULT r = R_PASS;
 
 	std::wstring wstrFilepath(pszFilepath);
@@ -294,7 +308,7 @@ Error:
 	return r;
 }
 
-RESULT texture::LoadTextureFromFile(wchar_t *pszFilename) {
+RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 	wchar_t *pszFilePath = nullptr;
 
@@ -318,6 +332,8 @@ Error:
 RESULT texture::LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 	
+	//m_channels = 3;
+	//m_pImageBuffer = SOIL_load_image_from_memory((unsigned char*)(pBuffer), (int)(pBuffer_n), &m_width, &m_height, NULL, SOIL_LOAD_RGB);
 	m_pImageBuffer = SOIL_load_image_from_memory((unsigned char*)(pBuffer), (int)(pBuffer_n), &m_width, &m_height, &m_channels, SOIL_LOAD_AUTO);
 	CN(m_pImageBuffer);
 
@@ -328,7 +344,7 @@ Error:
 	return r;
 }
 
-RESULT texture::LoadCubeMapByName(wchar_t * pszName) {
+RESULT texture::LoadCubeMapByName(const wchar_t * pszName) {
 	RESULT r = R_PASS;
 
 	std::vector<std::wstring> vstrCubeMapFiles;
@@ -375,7 +391,7 @@ texture::CUBE_MAP texture::GetCubeMapTypeFromFilename(std::wstring strFilename) 
 	return retType;
 }
 
-// TODO: Based on 8 bit per channel atm
+// TODO: Based on 8 bit per channel at the moment
 // Note this returns the size of the texture, in the case of cube maps this refers to 
 // one side not all six textures - for that use GetCubeMapSize
 size_t texture::GetTextureSize() {
@@ -388,7 +404,7 @@ size_t texture::GetCubeMapSize() {
 }
 
 //RESULT texture::LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight) {
-RESULT texture::LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) {
+RESULT texture::LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles) {
 	RESULT r = R_PASS;
 	
 	PathManager *pPathManager = PathManager::instance();
@@ -448,4 +464,13 @@ Error:
 
 RESULT texture::Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat) {
 	return R_NOT_IMPLEMENTED;
+}
+
+bool texture::IsDistanceMapped() {
+	return ((m_flags & texture::flags::DISTANCE_MAP) != texture::flags::NONE);
+}
+
+RESULT texture::SetDistanceMapped() {
+	m_flags = m_flags | texture::flags::DISTANCE_MAP;
+	return R_PASS;
 }

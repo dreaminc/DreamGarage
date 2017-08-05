@@ -71,7 +71,7 @@ Error:
 RESULT Win64PathManager::GetCurrentPath(wchar_t *& pszCurrentPath) {
 	RESULT r = R_PASS;
 
-	pszCurrentPath = NULL;
+	pszCurrentPath = nullptr;
 
 	CNM(m_pszCurDirectiory, "CurDirectory NULL");
 	pszCurrentPath = m_pszCurDirectiory;
@@ -80,10 +80,31 @@ Error:
 	return r;
 }
 
+RESULT Win64PathManager::GetDreamPath(char* &n_pszDreamPath) {
+	RESULT r = R_PASS;
+
+	n_pszDreamPath = nullptr;
+	size_t n_pszDreamPath_n = 0;
+
+	CNM(m_pszDreamRootPath, "DreamRootPath NULL");
+
+	n_pszDreamPath_n = wcslen(m_pszDreamRootPath) + 1;
+	n_pszDreamPath = (char *)(new char[n_pszDreamPath_n]);
+	CN(n_pszDreamPath);
+
+	memset(n_pszDreamPath, 0, n_pszDreamPath_n);
+
+	size_t lenCopied = std::wcstombs(n_pszDreamPath, m_pszDreamRootPath, n_pszDreamPath_n);
+	CB((lenCopied != 0));
+
+Error:
+	return r;
+}
+
 RESULT Win64PathManager::GetDreamPath(wchar_t*&pszDreamPath) {
 	RESULT r = R_PASS;
 
-	pszDreamPath = NULL;
+	pszDreamPath = nullptr;
 
 	CNM(m_pszDreamRootPath, "DreamRootPath NULL");
 	pszDreamPath = m_pszDreamRootPath;

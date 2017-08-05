@@ -82,7 +82,7 @@ RESULT HTTPRequestFileHandler::OnHTTPRequestComplete() {
 		uint8_t *pBuffer = GetBuffer();
 		size_t pBuffer_n = GetBufferSize();
 
-		CR(m_fnResponseFileCallback(m_pBufferVector));
+		CR(m_fnResponseFileCallback(m_pBufferVector, m_pContext));
 	}
 
 Error:

@@ -18,7 +18,8 @@
 #include "Sandbox/CommandLineManager.h"
 #include "HAL/opengl/OpenGLRenderingContext.h"
 
-#include "Scene/ObjectStore.h"
+#include "Scene/ObjectStoreNode.h"
+#include "Scene/CameraNode.h"
 
 #include <functional>
 
@@ -27,6 +28,8 @@
 
 #include "PhysicsEngine/PhysicsEngine.h"
 #include "InteractionEngine/InteractionEngine.h"
+
+#include "Primitives/viewport.h"
 
 #include "Sense/SenseKeyboard.h"
 #include "Sense/SenseMouse.h"
@@ -46,6 +49,8 @@ class model;
 class user;
 class Message;
 
+class UIKeyboardLayout;
+
 class DreamAppManager;
 
 class SandboxApp : 
@@ -63,6 +68,7 @@ public:
 	struct configuration {
 		unsigned fUseHMD : 1;
 		unsigned fUseLeap : 1;
+		unsigned fMouseLook : 1;
 	};
 
 private:
@@ -93,10 +99,14 @@ private:
 	RESULT InitializeInteractionEngine();
 	RESULT InitializeTimeManager();
 	RESULT InitializeDreamAppManager();
+	RESULT InitializeCamera();
 
 protected:
 	RESULT RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber);
-	RESULT RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+	
+	RESULT RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+	RESULT UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
+	RESULT UnregisterInteractionObject(VirtualObj *pObject);
 
 public:
 	enum class SANDBOX_WINDOW_POSITION {
@@ -114,12 +124,18 @@ public:
 	virtual RESULT InitializePathManager() = 0;
 	virtual RESULT InitializeOpenGLRenderingContext() = 0;
 	virtual RESULT InitializeCloudController() = 0;
-	virtual RESULT InitializeHAL() = 0;
 	virtual RESULT InitializeKeyboard() = 0;
 	virtual RESULT InitializeMouse() = 0;
 	virtual RESULT InitializeLeapMotion() = 0;
 	virtual long GetTickCount();
 	virtual	RESULT GetSandboxWindowSize(int &width, int &height) = 0;
+	
+	// HAL
+	virtual RESULT InitializeHAL();
+	RESULT SetUpHALPipeline(Pipeline* pRenderPipeline);		// TODO: this goes up to DreamOS soon
+
+	// HMD
+	RESULT InitializeHMD();
 
 public:
 	RESULT SetHALConfiguration(HALImp::HALConfiguration halconf);
@@ -154,10 +170,16 @@ public:
 	RESULT SetGravityAcceleration(double acceleration);
 	RESULT SetGravityState(bool fEnabled);
 
+	RESULT AddObjectToInteractionGraph(VirtualObj *pObject);
 	RESULT AddInteractionObject(VirtualObj *pObject);
-	RESULT UpdateInteractionPrimitive(const ray &rCast);
+	//RESULT UpdateInteractionPrimitive(const ray &rCast);
+	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
+	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
+
+	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 
 	RESULT RemoveAllObjects();
+	RESULT RemoveObject(VirtualObj *pObject);
 
 	RESULT AddObject(VirtualObj *pObject);	
 	FlatContext* AddFlatContext(int width, int height, int channels);
@@ -176,6 +198,86 @@ public:
 
 	quad *AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal);
 
+	template<typename objType, typename... Targs>
+	objType *TAddObject(Targs... Fargs) {
+		RESULT r = R_PASS;
+
+		objType *pObj = m_pHALImp->TMakeObject<objType>(Fargs...);
+		CN(pObj);
+
+		CR(AddObject(pObj));
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType, typename... Targs>
+	objType *TMakeObject(Targs... Fargs) {
+		RESULT r = R_PASS;
+
+		objType *pObj = m_pHALImp->TMakeObject<objType>(Fargs...);
+		CN(pObj);
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType>
+	objType *TAddObject() {
+		RESULT r = R_PASS;
+
+		objType *pObj = m_pHALImp->TMakeObject();
+		CN(pObj);
+
+		CR(AddObject(pObj));
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType>
+	objType *TMakeObject() {
+		RESULT r = R_PASS;
+
+		objType *pObj = m_pHALImp->TMakeObject();
+		CN(pObj);
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			delete pObj;
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
 	sphere* AddSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE));
 
 	volume* AddVolume(double side, bool fTriangleBased = true);
@@ -185,12 +287,26 @@ public:
 
 	DimRay* AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 
-	text* AddText(const std::wstring& fontName, const std::string& content, double size, bool isBillboard);
-	text* AddText(std::shared_ptr<Font> pFont, const std::string& content, double size, bool isBillboard);
+	text *AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
+	text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE);
+
+	text *AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE);
+	text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE);
+
+	text *AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE);
+	text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE);
+
+	text* MakeText(std::shared_ptr<font> pFont, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
+	text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
+
+	text* AddText(const std::wstring& fontName, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
+	text* AddText(std::shared_ptr<font> pFont, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
+	text* AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& content, double width = 1.0f, double height = 0.25f, bool fBillboard = false);
 
 	texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 	texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type);
+	texture* MakeTexture(const texture &srcTexture);
 
 	skybox *AddSkybox();
 	model *AddModel(wchar_t *pszModelName);
@@ -200,24 +316,17 @@ public:
 	composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 	composite* AddComposite();
+	composite* MakeComposite();
 
 	user *AddUser();
 
 	// Cloud Controller 
 public:
-	RESULT RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandleEnvironmentConnectionCallback);
-	RESULT RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback);
-	RESULT RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback);
-	RESULT RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback);
-	RESULT RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback);
+	RESULT RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver);
+	RESULT RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver);
 
 	RESULT SendDataMessage(long userID, Message *pDataMessage);
-	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
-
 	RESULT BroadcastDataMessage(Message *pDataMessage);
-	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
-	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
 
 	// IO
 public:
@@ -232,10 +341,15 @@ public:
 	OpenGLRenderingContext *GetOpenGLRenderingContext();
 	RESULT RegisterUpdateCallback(std::function<RESULT(void)> fnUpdateCallback);
 	RESULT UnregisterUpdateCallback();
+	RESULT ResizeViewport(viewport newViewport);
 
-	camera* GetCamera();
+	stereocamera* GetCamera();
 	point GetCameraPosition();
 	quaternion GetCameraOrientation();
+
+	CameraNode* GetCameraNode() { return m_pCamera; }
+	ObjectStoreNode* GetSceneGraphNode() { return m_pSceneGraph; }
+	ObjectStoreNode* GetUISceneGraphNode() { return m_pUISceneGraph; }
 
 	hand *GetHand(hand::HAND_TYPE handType);
 
@@ -246,6 +360,8 @@ protected:
 	RESULT SetSandboxRunning(bool fRunning);
 
 protected:
+	viewport m_viewport;
+
 	// TODO: Move to unique_ptr
 	CommandLineManager *m_pCommandLineManager;
 	PathManager *m_pPathManager;
@@ -254,8 +370,11 @@ protected:
 	// TODO: Should these be in their respective "engine" objects?
 	ObjectStore *m_pPhysicsGraph;	
 	ObjectStore *m_pInteractionGraph;
-	ObjectStore *m_pSceneGraph;
 	ObjectStore *m_pFlatSceneGraph;
+
+	//ObjectStore *m_pSceneGraph;
+	ObjectStoreNode *m_pSceneGraph = nullptr;
+	ObjectStoreNode *m_pUISceneGraph = nullptr;
 
 	CloudController *m_pCloudController;
 	std::unique_ptr<PhysicsEngine> m_pPhysicsEngine;
@@ -268,13 +387,16 @@ protected:
 	HMD *m_pHMD;
 
 	// TODO: Create a "manager manager" or a more generalized way to add these
-	// All "managers" should be unique ptrs 
+	// All "managers" should be unique pointers 
 	std::unique_ptr<TimeManager> m_pTimeManager = nullptr;
 	std::unique_ptr<DreamAppManager> m_pDreamAppManager = nullptr;
 
 	// TODO: Generalize the implementation architecture - still pretty bogged down in Win32
 	//OpenGLImp *m_pOpenGLImp;
 	HALImp *m_pHALImp;
+
+	//std::shared_ptr<stereocamera> m_pCamera = nullptr;
+	CameraNode *m_pCamera = nullptr;
 
 public:
 	InteractionEngineProxy *GetInteractionEngineProxy();

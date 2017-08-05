@@ -9,7 +9,6 @@
 
 #include "Win64Keyboard.h"
 #include "Win64Mouse.h"
-#include <HMD/HMDFactory.h>
 
 #include <string>
 
@@ -172,11 +171,14 @@ Error:
 	return r;
 }
 
+/*
+// TODO: Move this to sandbox
 RESULT Windows64App::InitializeHAL() {
 	RESULT r = R_PASS;
 
 	// Setup OpenGL and Resize Windows etc
 	CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
+	CNM(m_pCamera, "HAL depends on camera being set up");
 
 	// Create and initialize OpenGL Imp
 	// TODO: HAL factory pattern
@@ -184,9 +186,15 @@ RESULT Windows64App::InitializeHAL() {
 	CNM(m_pHALImp, "Failed to create HAL Implementation");
 	CVM(m_pHALImp, "HAL Implementation Invalid");
 
+	CR(m_pHALImp->SetCamera(m_pCamera));
+
+	CR(m_pHALImp->InitializeHAL());
+	CR(m_pHALImp->InitializeRenderPipeline());
+
 Error:
 	return r;
 }
+*/
 
 RESULT Windows64App::SetSandboxWindowPosition(SANDBOX_WINDOW_POSITION sandboxWindowPosition) {
 	RESULT r = R_PASS;
@@ -285,8 +293,7 @@ RESULT Windows64App::SetDimensions(int pxWidth, int pxHeight) {
 	m_pxWidth = pxWidth;
 	m_pxHeight = pxHeight;
 
-	// OpenGL Resize the view after the window had been resized
-	CRM(m_pHALImp->Resize(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	CR(ResizeViewport(viewport(m_pxWidth, m_pxHeight)));
 
 Error:
 	return r;
@@ -401,23 +408,8 @@ RESULT Windows64App::InitializeSandbox() {
 	CN(m_pHALImp);
 	CR(m_pHALImp->MakeCurrentContext());
 
-	// HMD
-	// TODO: This should go into (as well as the above) into the Sandbox
-	// This needs to be done after GL set up
-
-	//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
-	//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, m_pxWidth, m_pxHeight);
-	
-	if (GetSandboxConfiguration().fUseHMD) {
-		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, m_pxWidth, m_pxHeight);
-	
-		if (m_pHMD != nullptr) {
-			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
-		}
-	}
-
 	composite *pCameraFrameOfReferenceComposite = m_pHALImp->MakeComposite();
-	m_pHALImp->GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
+	GetCamera()->SetFrameOfReferenceComposite(pCameraFrameOfReferenceComposite);
 	CRM(AddObject(pCameraFrameOfReferenceComposite), "Failed to add composite camera frame of reference");
 
 	// TODO: Move ALL to Sandbox function
@@ -434,7 +426,7 @@ RESULT Windows64App::InitializeSandbox() {
 
 	CRM(RegisterImpControllerEvents(), "Failed to register vive controller events");
 
-	CRM(SetDimensions(m_pxWidth, m_pxHeight), "Failed to resize OpenGL Implemenation");
+	CRM(ResizeViewport(m_viewport), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;

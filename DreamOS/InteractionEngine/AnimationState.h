@@ -2,21 +2,26 @@
 #define ANIMATION_STATE_H_
 
 #include "RESULT/EHM.h"
+
+#include "Primitives/color.h"
 #include "Primitives/point.h"
 #include "Primitives/quaternion.h"
 #include "Primitives/vector.h"
 
-class VirtualObj;
+class DimObj;
 
 class AnimationState {
 public:
 	point ptPosition;
 	quaternion qRotation;
 	vector vScale;
+	color cColor;
 
 public:
 	RESULT Compose(AnimationState state);
-	VirtualObj* Apply(VirtualObj *pObj);
+	DimObj* Apply(DimObj *pObj);
+	DimObj* ApplyColor(DimObj *pObj);
+	DimObj* ApplyTransform(DimObj *pObj);
 };
 
 #endif // ! ANIMATION_STATE_H_

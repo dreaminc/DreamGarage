@@ -14,14 +14,18 @@
 
 class HALImp;
 
-#include "Primitives/sphere.h"
-#include "Primitives/volume.h"
-#include "Primitives/DimRay.h"
-#include "quad.h"
+class sphere;
+class volume;
+class DimRay;
+class quad;
 
 class hand;
 class camera;
 class FlatContext;
+class UIView;
+class stereocamera;
+
+class DreamOS;
 
 class composite : public DimObj {
 public:
@@ -36,6 +40,84 @@ public:
 	RESULT ClearObjects();
 
 	virtual RESULT UpdateBoundingVolume() override;
+
+	///*
+	template<typename objType, typename... Targs>
+	std::shared_ptr<objType> Add(Targs... Fargs) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject<objType>(Fargs...));
+		CN(pObj);
+
+		CR(AddObject(pObj));
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType, typename... Targs>
+	objType *Make(Targs... Fargs) {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject<objType>(Fargs...));
+		CN(pObj);
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType>
+	std::shared_ptr<objType> Add() {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject());
+		CN(pObj);
+
+		CR(AddObject(pObj));
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+
+	template<typename objType>
+	objType *Make() {
+		RESULT r = R_PASS;
+
+		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject());
+		CN(pObj);
+
+		//Success:
+		return pObj;
+
+	Error:
+		if (pObj != nullptr) {
+			pObj = nullptr;
+		}
+
+		return nullptr;
+	}
+	//*/
 
 	std::shared_ptr<sphere> MakeSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
 	std::shared_ptr<sphere> AddSphere(float radius, int numAngularDivisions, int numVerticalDivisions);
@@ -56,6 +138,12 @@ public:
 
 	std::shared_ptr<quad> MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
 	std::shared_ptr<quad> AddQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector());
+	
+	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin);
+	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin);
+
+	std::shared_ptr<quad> MakeQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
+	std::shared_ptr<quad> AddQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal = vector::jVector());
 
 	std::shared_ptr<DimRay> MakeRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
 	std::shared_ptr<DimRay> AddRay(point ptOrigin, vector vDirection, float step = 1.0f, bool fDirectional = true);
@@ -63,12 +151,15 @@ public:
 	std::shared_ptr<FlatContext> MakeFlatContext(int width = 1024, int height = 1024, int channels = 4);
 	std::shared_ptr<FlatContext> AddFlatContext(int width = 1024, int height = 1024, int channels = 4);
 
+	std::shared_ptr<UIView> MakeUIView(DreamOS *pDreamOS);
+	std::shared_ptr<UIView> AddUIView(DreamOS *pDreamOS);
+
 	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	std::shared_ptr<texture> MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
 
 public:
 	RESULT RenderToTexture(std::shared_ptr<FlatContext> context);
-	camera* GetCamera();
+	stereocamera* GetCamera();
 
 protected:
 	HALImp *m_pHALImp;

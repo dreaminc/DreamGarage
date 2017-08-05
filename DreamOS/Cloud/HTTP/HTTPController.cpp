@@ -525,7 +525,7 @@ Error:
 }
 
 
-RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseFileCallback fnResponseFileCallback) {
+RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseFileCallback fnResponseFileCallback, void *pContext) {
 	RESULT r = R_PASS;
 
 	CURLMcode curlMC = CURLM_OK;
@@ -541,6 +541,11 @@ RESULT HTTPController::AFILE(const std::string& strURI, const std::vector<std::s
 																	   nullptr,
 																	   fnResponseFileCallback);
 	CN(pHTTPRequestFileHandler);
+
+	if (pContext != nullptr) {
+		pHTTPRequestFileHandler->SetHandlerContext(pContext);
+	}
+
 	CR(AddPendingHTTPRequestHandler(pHTTPRequestFileHandler));
 
 	if (strDestinationPath.length() > 0)
@@ -622,7 +627,7 @@ Error:
 	return r;
 }
 
-RESULT HTTPController::RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback) {
+RESULT HTTPController::RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback, void *pContext) {
 	RESULT r = R_PASS;
 
 	//std::vector<std::string> strHeaders;
@@ -631,7 +636,7 @@ RESULT HTTPController::RequestFile(std::string strURI, std::vector<std::string> 
 
 	DEBUG_LINEOUT("Requesting file %s to buffer", strURI.c_str());
 
-	CR(AFILE(strURI, strHeaders, strBody, L"", fnResponseFileCallback));
+	CR(AFILE(strURI, strHeaders, strBody, L"", fnResponseFileCallback, pContext));
 
 Error:
 	return r;

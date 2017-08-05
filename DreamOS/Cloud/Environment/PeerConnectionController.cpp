@@ -85,11 +85,16 @@ bool PeerConnectionController::FindPeerConnectionByOfferUserID(long offerUserID)
 }
 
 PeerConnection *PeerConnectionController::GetPeerConnectionByOfferUserID(long offerUserID) {
-	for (auto &peerConnection : m_peerConnections) {
-		if (offerUserID == peerConnection.GetOfferUserID()) {
-			return &(peerConnection);
+
+	//m_peerConnections_mutex.lock();
+
+	for (auto &pPeerConnection : m_peerConnections) {
+		if (offerUserID == pPeerConnection->GetOfferUserID()) {
+			return pPeerConnection;
 		}
 	}
+
+	//m_peerConnections_mutex.unlock();
 
 	return nullptr;
 }
@@ -102,11 +107,16 @@ bool PeerConnectionController::FindPeerConnectionByPeerUserID(long peerUserID) {
 }
 
 PeerConnection *PeerConnectionController::GetPeerConnectionByPeerUserID(long peerUserID) {
-	for (auto &peerConnection : m_peerConnections) {
-		if (peerUserID == peerConnection.GetPeerUserID()) {
-			return &(peerConnection);
+	
+	//m_peerConnections_mutex.lock();
+	
+	for (auto &pPeerConnection : m_peerConnections) {
+		if (peerUserID == pPeerConnection->GetPeerUserID()) {
+			return pPeerConnection;
 		}
 	}
+
+	//m_peerConnections_mutex.unlock();
 
 	return nullptr;
 }
@@ -119,11 +129,16 @@ bool PeerConnectionController::FindPeerConnectionByAnswerUserID(long answerUserI
 }
 
 PeerConnection *PeerConnectionController::GetPeerConnectionByAnswerUserID(long answerUserID) {
-	for (auto &peerConnection : m_peerConnections) {
-		if (answerUserID == peerConnection.GetAnswerUserID()) {
-			return &(peerConnection);
+
+	//m_peerConnections_mutex.lock();
+
+	for (auto &pPeerConnection : m_peerConnections) {
+		if (answerUserID == pPeerConnection->GetAnswerUserID()) {
+			return pPeerConnection;
 		}
 	}
+
+	//m_peerConnections_mutex.unlock();
 
 	return nullptr;
 }
@@ -136,9 +151,9 @@ bool PeerConnectionController::FindPeerConnectionByID(long peerConnectionID) {
 }
 
 PeerConnection *PeerConnectionController::GetPeerConnectionByID(long peerConnectionID) {
-	for (auto &peerConnection : m_peerConnections) {
-		if (peerConnectionID == peerConnection.GetPeerConnectionID()) {
-			return &(peerConnection);
+	for (auto &pPeerConnection : m_peerConnections) {
+		if (peerConnectionID == pPeerConnection->GetPeerConnectionID()) {
+			return pPeerConnection;
 		}
 	}
 
@@ -150,7 +165,7 @@ bool PeerConnectionController::IsUserIDConnected(long peerUserID) {
 	//PeerConnection *pPeerConnection = GetPeerConnectionByAnswerUserID(peerUserID);
 	
 	//if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnected()) {
-	if (m_peerConnections.size() != 0 && (*(m_peerConnections.begin())).IsWebRTCConnected()) {
+	if (m_peerConnections.size() != 0 && (*(m_peerConnections.begin()))->IsWebRTCConnected()) {
 		return true;
 	}
 	else {
@@ -184,35 +199,77 @@ PeerConnection* PeerConnectionController::CreateNewPeerConnection(long peerConne
 }
 */
 
-PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) {
-	
-	PeerConnection peerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
-	PeerConnection *pPeerConnection = nullptr;
+RESULT PeerConnectionController::DeletePeerConnection(PeerConnection *pPeerConnection) {
 
-	if ((pPeerConnection = GetPeerConnectionByID(peerConnection.GetPeerConnectionID())) != nullptr) {
-		LOG(INFO) << "(cloud) creating a peer already found by connection";
-		DEBUG_LINEOUT("Peer Connection %d already exists", peerConnection.GetPeerConnectionID());
-		return pPeerConnection;
+	// Find the peer connection
+	for(auto it = m_peerConnections.begin(); it != m_peerConnections.end(); it++) {
+		if (pPeerConnection == (*it)) {
+			m_peerConnections.erase(it);
+
+			delete pPeerConnection;
+			pPeerConnection = nullptr;
+
+			return R_PASS;
+		}
 	}
 
-	m_peerConnections.push_back(peerConnection);
-	pPeerConnection = &(m_peerConnections.back());
+	return R_NOT_FOUND;
+}
+
+PeerConnection* PeerConnectionController::CreateNewPeerConnection(long userID, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) {
+	PeerConnection *pPeerConnection = new PeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
+	PeerConnection *pPeerConnectionTemp = nullptr;
+
+
+	if ((pPeerConnectionTemp = GetPeerConnectionByID(pPeerConnection->GetPeerConnectionID())) != nullptr) {
+		LOG(INFO) << "(cloud) creating a peer already found by connection";
+		DEBUG_LINEOUT("Peer Connection %d already exists", pPeerConnection->GetPeerConnectionID());
+
+		delete pPeerConnection;
+		pPeerConnection = nullptr;
+
+		return pPeerConnectionTemp;
+	}
+
+	m_peerConnections.push_back(pPeerConnection);
 
 	//Error:
 	return pPeerConnection;
 }
 
-RESULT PeerConnectionController::OnNewPeerConnection(long myUserID, long peerUserID, bool isOfferor, PeerConnection* pPeerConnection) {//, nlohmann::json jsonPeerConnection, nlohmann::json jsonOfferSocketConnection, nlohmann::json jsonAnswerSocketConnection) {
-	long position = (isOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
-	
-	LOG(INFO) << "myUserID" << (isOfferor ? "(Offeror)" : "(Answerer)") << "=" << myUserID << " peerUserID=" << peerUserID << " position=" << position;// << " socketID=" << mySocketID << " socket=" << jsonOfferSocketConnection;
-	
-	// position is given by the server for each user as a unique number, 1 to 8.
-	// it represents the seating position should be taken by each user (a round-table seating configuration).
+RESULT PeerConnectionController::OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) {
+	RESULT r = R_PASS;
 
-	LOG(INFO) << "Peer update: userID=" << myUserID << ", position=" << position;
+	long position = (fOfferor) ? pPeerConnection->GetOfferorPosition() : pPeerConnection->GetAnswererPosition();
+	
+	LOG(INFO) << "myUserID" << (fOfferor ? "(Offerer)" : "(Answerer)") << "=" << userID << " peerUserID=" << peerUserID << " position=" << position;
+	DEBUG_LINEOUT("%s: myUserID: %d peerUserID: %d, position: %d", (fOfferor ? "Offeror" : "Answerer"), userID, peerUserID, position);
 
-	return m_pPeerConnectionControllerObserver->OnPeersUpdate(position - 1);
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		//CR(m_pPeerConnectionControllerObserver->OnNewPeerConnection(position - 1));
+		CR(m_pPeerConnectionControllerObserver->OnNewPeerConnection(userID, peerUserID, fOfferor, pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnPeerConnectionClosed(PeerConnection *pPeerConnection) {
+	RESULT r = R_PASS;
+	RESULT rObserver = R_PASS;
+
+	// Let the observer act first, since we'll be deleting the peer connection 
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		rObserver = m_pPeerConnectionControllerObserver->OnPeerConnectionClosed(pPeerConnection);
+	}
+
+	// TODO: Remove the peer
+	CR(DeletePeerConnection(pPeerConnection));
+
+	//CR(rObserver);
+
+Error:
+	return r;
 }
 
 RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strMethod, nlohmann::json jsonPayload) {
@@ -260,12 +317,14 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;
 
+		// New peer connection (from server)
+		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection));
+
 		// Initialize SDP Peer Connection and Offer
 		CN(m_pWebRTCImp);
 		//m_pWebRTCImp->InitializePeerConnection(true);
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, true);
 
-		OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), true, pPeerConnection);
 	}
 	else if (strMethod == "set_offer") {
 		LOG(ERROR) << "(cloud) set offer should not be a request";
@@ -288,6 +347,9 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		pPeerConnection = CreateNewPeerConnection(userID, jsonPeerConnection, jsonOfferSocketConnection, jsonAnswerSocketConnection);
 		// DEADBEEF: No longer true
 		//m_pPeerConnectionCurrentHandshake = pPeerConnection;	
+		
+		// New peer connection (from server)
+		CR(OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection));
 
 		std::string strSDPOffer = pPeerConnection->GetSDPOffer();
 
@@ -297,7 +359,6 @@ RESULT PeerConnectionController::HandleEnvironmentSocketRequest(std::string strM
 		m_pWebRTCImp->InitializeNewPeerConnection(peerConnectionID, false);
 		CR(m_pWebRTCImp->CreateSDPOfferAnswer(peerConnectionID, strSDPOffer));
 
-		OnNewPeerConnection(userID, pPeerConnection->GetPeerUserID(), false, pPeerConnection);
 	}
 	else if (strMethod == "set_offer_candidates") {
 		CNM((pPeerConnection), "Peer Connection %d doesn't exist", peerConnectionID);
@@ -424,6 +485,8 @@ RESULT PeerConnectionController::OnWebRTCConnectionStable(long peerConnectionID)
 	}
 	//*/
 
+	//CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+
 Error:
 	return r;
 }
@@ -445,7 +508,7 @@ RESULT PeerConnectionController::OnWebRTCConnectionClosed(long peerConnectionID)
 
 	DEBUG_LINEOUT("Peer Connection %d Closed", peerConnectionID);
 
-	// TODO: Remove peer connection from list here
+	CR(OnPeerConnectionClosed(pPeerConnection));
 
 Error:
 	return r;
@@ -501,7 +564,7 @@ Error:
 }
 
 RESULT PeerConnectionController::OnICECandidatesGatheringDone(long peerConnectionID) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
 
 	//CR(m_pPeerConnectionCurrentHandshake->SetSDPOffer(m_pWebRTCImp->GetSDPOfferString()));
 	// TODO: Add ICE Candidates to the peer connection
@@ -527,14 +590,77 @@ Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
-	RESULT r = R_NOT_IMPLEMENTED;
+RESULT PeerConnectionController::OnIceConnectionChange(long peerConnectionID, WebRTCIceConnection::state webRTCIceConnectionState) {
+	RESULT r = R_PASS;
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	switch (webRTCIceConnectionState) {
+		case WebRTCIceConnection::state::CONNECTED: {
+			//CR(OnNewPeerConnection(GetUserID(), pPeerConnection->GetPeerUserID(), false, pPeerConnection));
+		} break;
+
+		case WebRTCIceConnection::state::DISCONNECTED: {
+			//CR(OnPeerConnectionDisconnected(pPeerConnection));
+		} break;
+
+		default: {
+			// TODO:
+		} break;
+	}
+
+	/*
+	// TODO: do we need this?
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		m_pPeerConnectionControllerObserver->OnIceConnectionChange(peerConnectionID, webRTCIceConnectionState);
+	}
+	*/
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnRenegotiationNeeded(long peerConnectionID) {
+	return R_NOT_HANDLED;
+}
+
+RESULT PeerConnectionController::OnDataChannel(long peerConnectionID) {
+	RESULT r = R_PASS;
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(pPeerConnection->GetPeerUserID(), strDataChannelMessage));
+		CR(m_pPeerConnectionControllerObserver->OnDataChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnAudioChannel(long peerConnectionID) {
+	RESULT r = R_PASS;
+	
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		CR(m_pPeerConnectionControllerObserver->OnAudioChannel(pPeerConnection));
+	}
+
+Error:
+	return r;
+}
+
+RESULT PeerConnectionController::OnDataChannelStringMessage(long peerConnectionID, const std::string& strDataChannelMessage) {
+	RESULT r = R_PASS;
+
+	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
+	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
+
+	if (m_pPeerConnectionControllerObserver != nullptr) {
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelStringMessage(pPeerConnection, strDataChannelMessage));
 	}
 
 Error:
@@ -542,37 +668,28 @@ Error:
 }
 
 RESULT PeerConnectionController::OnDataChannelMessage(long peerConnectionID, uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
-	RESULT r = R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(pPeerConnection->GetPeerUserID(), pDataChannelBuffer, pDataChannelBuffer_n));
+		CR(m_pPeerConnectionControllerObserver->OnDataChannelMessage(pPeerConnection, pDataChannelBuffer, pDataChannelBuffer_n));
 	}
 
 Error:
 	return r;
 }
 
-RESULT PeerConnectionController::OnAudioData(long peerConnectionID,
-	const void* audio_data,
-	int bits_per_sample,
-	int sample_rate,
-	size_t number_of_channels,
-	size_t number_of_frames) {
-	RESULT r = R_NOT_IMPLEMENTED;
+// Note: This will block on mutex
+RESULT PeerConnectionController::OnAudioData(long peerConnectionID, const void* pAudioData, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+	RESULT r = R_PASS;
 
 	PeerConnection *pPeerConnection = GetPeerConnectionByID(peerConnectionID);
 	CNM(pPeerConnection, "Peer connection %d not found", peerConnectionID);
 
 	if (m_pPeerConnectionControllerObserver != nullptr) {
-		CR(m_pPeerConnectionControllerObserver->OnAudioData(pPeerConnection->GetPeerUserID(),
-			audio_data,
-			bits_per_sample,
-			sample_rate,
-			number_of_channels,
-			number_of_frames));
+		CR(m_pPeerConnectionControllerObserver->OnAudioData(pPeerConnection, pAudioData, bitsPerSample, samplingRate, channels, frames));
 	}
 
 Error:
@@ -608,11 +725,14 @@ Error:
 RESULT PeerConnectionController::BroadcastDataChannelStringMessage(std::string& strMessage) {
 	RESULT r = R_PASS;
 
+	// Copy
+	const auto peerVectorCopy = m_peerConnections;
+
 	CN(m_pWebRTCImp);
 
-	for (auto &pPeerConnection: m_peerConnections) {
-		if (pPeerConnection.IsWebRTCConnectionStable()) {
-			CR(m_pWebRTCImp->SendDataChannelStringMessage(pPeerConnection.GetPeerConnectionID(), strMessage));
+	for (const auto &pPeerConnection: peerVectorCopy) {
+		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+			CR(m_pWebRTCImp->SendDataChannelStringMessage(pPeerConnection->GetPeerConnectionID(), strMessage));
 		}
 	}
 
@@ -623,11 +743,14 @@ Error:
 RESULT PeerConnectionController::BroadcastDataChannelMessage(uint8_t *pDataChannelBuffer, int pDataChannelBuffer_n) {
 	RESULT r = R_PASS;
 
+	// Copy
+	const auto peerVectorCopy = m_peerConnections;
+
 	CN(m_pWebRTCImp);
 
-	for (auto &pPeerConnection : m_peerConnections) {
-		if (pPeerConnection.IsWebRTCConnectionStable()) {
-			CR(m_pWebRTCImp->SendDataChannelMessage(pPeerConnection.GetPeerConnectionID(), pDataChannelBuffer, pDataChannelBuffer_n));
+	for (const auto &pPeerConnection : peerVectorCopy) {
+		if (pPeerConnection != nullptr && pPeerConnection->IsWebRTCConnectionStable()) {
+			CR(m_pWebRTCImp->SendDataChannelMessage(pPeerConnection->GetPeerConnectionID(), pDataChannelBuffer, pDataChannelBuffer_n));
 		}
 	}
 
@@ -649,4 +772,11 @@ RESULT PeerConnectionController::SetUser(User currentUser) {
 
 RESULT PeerConnectionController::SetTwilioNTSInformation(TwilioNTSInformation twilioNTSInformation) {
 	return m_pWebRTCImp->SetTwilioNTSInformation(twilioNTSInformation);
+}
+
+WebRTCImpProxy* PeerConnectionController::GetWebRTCControllerProxy() {
+	if (m_pWebRTCImp != nullptr)
+		return m_pWebRTCImp->GetProxy();
+
+	return nullptr;
 }

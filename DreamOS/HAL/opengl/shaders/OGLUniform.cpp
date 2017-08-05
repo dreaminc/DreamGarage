@@ -96,6 +96,14 @@ RESULT OGLUniformBool::SetUniform(bool flag) {
 	return SetUniformInteger((flag)? 1 : 0);
 }
 
+RESULT OGLUniformFloat::SetUniform(float value) {
+	return SetUniformFloat(reinterpret_cast<GLfloat*>(&value));
+}
+
+RESULT OGLUniformInt::SetUniform(int value) {
+	return SetUniformInteger(static_cast<GLint>(value));
+}
+
 RESULT OGLUniformPoint::SetUniform(point pt) {
 	return SetUniform4fv(reinterpret_cast<GLfloat*>(&pt));
 }
@@ -114,9 +122,7 @@ RESULT OGLUniformMatrix4::SetUniform(matrix<float, 4, 4> mat) {
 }
 
 RESULT OGLUniformSampler2D::SetUniform(OGLTexture *pTexture) {
-	//return SetUniformInteger(pTexture->GetGLTextureNumberDefine());
-	//return SetUniformInteger(0);
-	return SetUniformInteger(pTexture->GetTextureNumber());
+	return SetUniformInteger(pTexture->GetOGLTextureIndex());
 }
 
 RESULT OGLUniformSampler2D::SetUniform(GLint textureIndex) {

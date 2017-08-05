@@ -10,68 +10,36 @@
 #include "./RESULT/EHM.h"
 #include "OGLProgram.h"
 
+class ObjectStore;
+class stereocamera;
+
 class OGLProgramMinimal : public OGLProgram {
 public:
-	OGLProgramMinimal(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp)
-	{
-		// empty
-	}
+	OGLProgramMinimal(OpenGLImp *pParentImp);
 
-	RESULT OGLInitialize() {
-		RESULT r = R_PASS;
+	RESULT OGLInitialize();
 
-		CR(OGLProgram::OGLInitialize());
+	virtual RESULT SetupConnections() override;
+	virtual RESULT ProcessNode(long frameID) override;
 
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
+	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) override;
+	virtual RESULT SetMaterial(material *pMaterial) override;
+	virtual RESULT SetObjectUniforms(DimObj *pDimObj) override;
+	virtual RESULT SetCameraUniforms(camera *pCamera) override;
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) override;
 
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
+protected:
+	stereocamera *m_pCamera = nullptr;
+	ObjectStore *m_pSceneGraph = nullptr;
 
-	Error:
-		return r;
-	}
-
-	RESULT SetObjectTextures(OGLObj *pOGLObj) {
-		return R_NOT_IMPLEMENTED;
-	}
-
-	RESULT SetObjectUniforms(DimObj *pDimObj) {
-		if (m_pUniformModelMatrix != nullptr) {
-			auto matModel = pDimObj->GetModelMatrix();
-			m_pUniformModelMatrix->SetUniform(matModel);
-		}
-
-		return R_PASS;
-	}
-
-	RESULT SetCameraUniforms(camera *pCamera) {
-		if (m_pUniformViewProjectionMatrix != nullptr) {
-			auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
-			//auto matVP = pCamera->GetProjectionMatrix();
-			m_pUniformViewProjectionMatrix->SetUniform(matVP);
-		}
-
-		return R_PASS;
-	}
-
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
-		if (m_pUniformViewProjectionMatrix != nullptr) {
-			auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
-			//auto matVP = pStereoCamera->GetProjectionMatrix(eye);
-			m_pUniformViewProjectionMatrix->SetUniform(matVP);
-		}
-
-		return R_PASS;
-	}
-
-private:
+protected:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
 	OGLVertexAttributeColor *m_pVertexAttributeColor;
 
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
+
+	OGLMaterialBlock *m_pMaterialsBlock;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_H_

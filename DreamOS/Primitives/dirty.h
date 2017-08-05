@@ -13,8 +13,8 @@ private:
 	bool m_fDirty;
 
 public:
-	dirty() :
-		m_fDirty(false)
+	dirty(bool fStartState = false) :
+		m_fDirty(fStartState)
 	{
 		/* empty stub */
 	}

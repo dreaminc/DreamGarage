@@ -9,7 +9,7 @@ SHADERS 		./HAL/opengl/shaders/GLSL/
 SANDBOX			./Sandbox/
 RESULT 			./RESULT/
 TEXTURE			./Texture/
-TEXTURE_CUBE		./Texture/Cube/
+TEXTURE_CUBE	./Texture/Cube/
 FONT			./Resources/Fonts/
 MODEL			./Models/
 DATA			./Data/

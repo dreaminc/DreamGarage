@@ -10,23 +10,26 @@
 #include <string>
 #include <time.h>
 
+#define MESSAGE_INVALID 0xFFFF
+#define MESSAGE_SPACE_BIT_SIZE 8
+
 class Message {
 public:
-	typedef enum class MESSAGE_TYPE : uint16_t {
-		MESSAGE_UPDATE_HEAD,
-		MESSAGE_UPDATE_HAND,
-		MESSAGE_AUDIO_DATA,
-		MESSAGE_UPDATE_CHAT,
-		MESSAGE_CUSTOM,
-		MESSAGE_INVALID = 0xFFFF
-	} MessageType;
+	typedef uint64_t DataType;
+
+	enum class type : DataType {
+		CLOUD = 1,
+		OS = Message::type::CLOUD << MESSAGE_SPACE_BIT_SIZE,
+		INVALID = MESSAGE_INVALID
+	};
+
 
 private:
 	__declspec(align(8)) struct MessageHeader {
 		long senderUserID;
 		long receiverUserID;
 		time_t timestamp;
-		MessageType type;
+		DataType type;
 		long messageSize;
 	} m_header;
 
@@ -35,15 +38,15 @@ public:
 		m_header.senderUserID = -1;
 		m_header.receiverUserID = -1;
 		m_header.timestamp = time(nullptr);
-		m_header.type = MessageType::MESSAGE_INVALID;
+		m_header.type = (DataType)(type::INVALID);
 		m_header.messageSize = sizeof(Message);
 	}
 
-	Message(long senderUserID, long receiverUserID, MessageType type, long messageSize) {
+	Message(long senderUserID, long receiverUserID, Message::type msgType, long messageSize) {
 		m_header.senderUserID = senderUserID;
 		m_header.receiverUserID = receiverUserID;
 		m_header.timestamp = time(nullptr);
-		m_header.type = type;
+		m_header.type = (DataType)(msgType);
 		m_header.messageSize = messageSize;
 	}
 
@@ -51,7 +54,7 @@ public:
 		// empty
 	}
 
-	Message::MessageType GetType() { return m_header.type; }
+	Message::DataType GetType() { return m_header.type; }
 	long GetSize() { return m_header.messageSize; }
 	time_t GetTimeStamp() { return m_header.timestamp; }
 	long GetSenderUserID() { return m_header.senderUserID; }

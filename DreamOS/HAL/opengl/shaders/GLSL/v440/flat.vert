@@ -19,10 +19,14 @@ void main(void) {
 	// Vert Color
 	DataOut.color = inV_vec4Color;
 
+	/*
 	// Projected Vert Position
-	float xoffset = u_mat4Projection[2][0]*-1;
-	float yoffset = u_mat4Projection[2][1]*-1;
+	float xoffset = u_mat4Projection[2][0] * -1.0f;
+	float yoffset = u_mat4Projection[2][1] * -1.0f;
 
 	// Projected Vert Position
 	gl_Position = u_mat4Model * vec4(inV_vec4Position.x + xoffset, inV_vec4Position.y + yoffset, inV_vec4Position.z, 1.0f);
+	*/
+
+	gl_Position = u_mat4Projection * u_mat4Model * inV_vec4Position;
 }

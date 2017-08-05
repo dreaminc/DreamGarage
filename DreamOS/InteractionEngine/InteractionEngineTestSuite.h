@@ -32,7 +32,23 @@ public:
 
 	virtual RESULT AddTests() override;
 
+	RESULT SetupPipeline();
+	RESULT Initialize();
+
+	RESULT AddTestCaptureObject();
+
+	RESULT AddTestObjectBasedEvents();
+
+	RESULT AddTestNestedCompositeOBB();
+
+	RESULT AddTestMultiPrimitive();
+	RESULT AddTestMultiPrimitiveComposite();
+
+	RESULT AddTestMultiPrimitiveRemove();
+	RESULT AddTestMultiPrimitiveCompositeRemove();
+
 	RESULT AddTestCompositeRay();
+	RESULT AddTestCompositeRayNested();
 	RESULT AddTestCompositeRayController();
 
 	RESULT InitializeRayCompositeTest(void *pContext);

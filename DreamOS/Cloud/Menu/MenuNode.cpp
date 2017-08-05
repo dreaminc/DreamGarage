@@ -2,6 +2,10 @@
 
 #include "Core/Utilities.h"
 
+MenuNode::MenuNode() {
+	// empty
+}
+
 MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/node_type"_json_pointer].is_string()) {
 		std::string strNodeType = jsonMenuNode["/node_type"_json_pointer].get<std::string>();
@@ -27,6 +31,12 @@ MenuNode::MenuNode(nlohmann::json jsonMenuNode) {
 		}
 	}
 
+	if (jsonMenuNode["/icon_url"_json_pointer].is_string())
+		m_strIconURL = jsonMenuNode["/icon_url"_json_pointer].get<std::string>();
+
+	if (jsonMenuNode["/thumbnail_url"_json_pointer].is_string())
+		m_strThumbnailURL = jsonMenuNode["/thumbnail_url"_json_pointer].get<std::string>();
+
 	InitializeMimeToString();
 }
 
@@ -36,6 +46,18 @@ MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string str
 	m_strScope(strScope),
 	m_strTitle(strTitle),
 	m_strMIMEType(strMIMEType)
+{
+	InitializeMimeToString();
+}
+
+MenuNode::MenuNode(MenuNode::type nodeType, std::string strPath, std::string strScope, std::string strTitle, std::string strMIMEType, std::string strIconURL, std::string strThumbnailURL) :
+	m_nodeType(nodeType),
+	m_strPath(strPath),
+	m_strScope(strScope),
+	m_strTitle(strTitle),
+	m_strMIMEType(strMIMEType),
+	m_strIconURL(strIconURL),
+	m_strThumbnailURL(strThumbnailURL)
 {
 	InitializeMimeToString();
 }
@@ -63,6 +85,7 @@ std::string MenuNode::NodeTypeString(MenuNode::type nodeType) {
 	switch (nodeType) {
 		case MenuNode::type::FOLDER: return "folder"; break;
 		case MenuNode::type::FILE: return "file"; break;
+		case MenuNode::type::ACTION: return "action"; break;
 		default: return "invalid"; break;
 	}
 
@@ -78,7 +101,8 @@ MenuNode::type MenuNode::NodeTypeFromString(std::string strNodeType) {
 			return MenuNode::type::FOLDER;
 		else if (strTokens[1] == "file")
 			return MenuNode::type::FILE;
-
+		else if (strTokens[1] == "action")
+			return MenuNode::type::ACTION;
 	}
 
 	return MenuNode::type::INVALID;
@@ -135,6 +159,19 @@ const std::string& MenuNode::GetTitle() {
 	return m_strTitle;
 }
 
+const std::string& MenuNode::GetIconURL() {
+	return m_strIconURL;
+}
+
+const std::string& MenuNode::GetThumbnailURL() {
+	return m_strThumbnailURL;
+}
+
 const MenuNode::type& MenuNode::GetNodeType() {
 	return m_nodeType;
+}
+
+RESULT MenuNode::SetName(std::string strName) {
+	m_strTitle = strName;
+	return R_PASS;
 }

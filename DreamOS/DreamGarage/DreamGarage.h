@@ -15,8 +15,16 @@
 
 class DreamUIBar;
 class DreamContentView;
+class DreamBrowser;
+class DreamControlView;
 
-class DreamGarage : public DreamOS, public Subscriber<SenseKeyboardEvent>, public Subscriber<SenseTypingEvent>, public Subscriber<CmdPromptEvent> {
+#define MAX_PEERS 8
+
+class DreamGarage : public DreamOS, 
+				    public Subscriber<SenseKeyboardEvent>, 
+					public Subscriber<SenseTypingEvent>, 
+					public Subscriber<CmdPromptEvent>	// TODO: Remove this
+{
 public:
 
 	DreamGarage() {
@@ -31,23 +39,47 @@ public:
 	RESULT SendHandPosition();
 
 	// TODO: this is just a debug test temp
-	RESULT SendSwitchHeadMessage();
+	//RESULT SendSwitchHeadMessage();
 
 	virtual RESULT ConfigureSandbox() override;
 	virtual RESULT LoadScene() override;
+	virtual RESULT SetupPipeline(Pipeline* pRenderPipeline) override;
 	virtual RESULT Update(void) override;
 
 	// Cloud Controller
-	RESULT InitializeCloudControllerCallbacks();
+	//RESULT InitializeCloudControllerCallbacks();
 
-	RESULT SetRoundtablePosition(float angle);
-	RESULT HandlePeersUpdate(long index);
+	RESULT GetRoundtablePosition(int index, point &ptPosition, float &rotationAngle);
+	RESULT SetRoundtablePosition(int index);
+	RESULT SetRoundtablePosition(DreamPeer *pDreamPeer, int seatingPosition);
 
-	RESULT HandleDataMessage(long senderUserID, Message *pDataMessage);
-	RESULT HandleUpdateHeadMessage(long senderUserID, UpdateHeadMessage *pUpdateHeadMessage);
-	RESULT HandleUpdateHandMessage(long senderUserID, UpdateHandMessage *pUpdateHandMessage);
-	RESULT HandleAudioData(long senderUserID, AudioDataMessage *pAudioDataMessage);
-	RESULT HandleOnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset);
+	// PeerConnectionObserver
+	//virtual RESULT OnNewPeerConnection(long userID, long peerUserID, bool fOfferor, PeerConnection* pPeerConnection) override;
+	//virtual RESULT OnDataMessage(PeerConnection* pPeerConnection, Message *pDataMessage) override;
+	//virtual RESULT OnDataStringMessage(PeerConnection* pPeerConnection, const std::string& strDataChannelMessage) override;
+	//virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+	//
+
+	// Cloud
+	virtual RESULT OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) override;
+	virtual RESULT OnNewDreamPeer(DreamPeer *pDreamPeer) override;
+	virtual RESULT OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) override;
+	virtual RESULT OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) override;
+
+	// Environment
+	virtual RESULT OnEnvironmentAsset(std::shared_ptr<EnvironmentAsset> pEnvironmentAsset) override;
+
+	// DreamGarage Messages
+	RESULT HandleHeadUpdateMessage(PeerConnection* pPeerConnection, UpdateHeadMessage *pUpdateHeadMessage);
+	RESULT HandleHandUpdateMessage(PeerConnection* pPeerConnection, UpdateHandMessage *pUpdateHandMessage);
+	RESULT HandleAudioDataMessage(PeerConnection* pPeerConnection, AudioDataMessage *pAudioDataMessage);
+
+	// 
+	RESULT SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT SendUpdateHandMessage(long userID, hand::HandState handState);
+
+	RESULT BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity = vector(), quaternion qAngularVelocity = quaternion());
+	RESULT BroadcastUpdateHandMessage(hand::HandState handState);
 
 	user* ActivateUser(long userId);
 
@@ -59,17 +91,30 @@ public:
 	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 private:
+	//std::map<long, user*> m_peerUsers;
+	// User Pool
 
-	std::map<long, user*> m_peerUsers;
-	std::vector<user*> m_usersPool;
+	RESULT SetupUserModelPool();
+	RESULT AllocateAndAssignUserModelFromPool(DreamPeer *pDreamPeer);
+	user* FindUserModelInPool(DreamPeer *pDreamPeer);
+	RESULT UnallocateUserModelFromPool(std::shared_ptr<DreamPeer> pDreamPeer);
 
-	bool	m_isSeated = false;
-	float tick = 0.0f;
+	std::array<std::pair<DreamPeer*, user*>, MAX_PEERS> m_usersModelPool = { std::pair<DreamPeer*, user*>(nullptr, nullptr) };
+
+
+private:
+	bool m_fSeated = false;
+	float m_tick = 0.0f;
+	float m_seatPositioningRadius = 4.0f;
+	std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
+	float m_initialAngle = 90.0f;
+	float m_keepOutAngle = 5.0f;
 	
 	// UI
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
-
 	std::shared_ptr<DreamContentView> m_pDreamContentView;
+	std::shared_ptr<DreamBrowser> m_pDreamBrowser;
+	std::shared_ptr<DreamControlView> m_pDreamControlView;
 };
 
 #endif	// DREAM_GARAGE_H_

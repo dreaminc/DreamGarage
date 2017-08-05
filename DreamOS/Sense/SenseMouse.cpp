@@ -49,17 +49,106 @@ RESULT SenseMouse::PrintEvent(SenseMouseEvent *pEvent) {
 	return R_PASS;
 }
 
+SenseMouse::MouseDragState GetMouseDragButton(SenseMouseEventType eventType) {
+	switch (eventType) {
+		case SENSE_MOUSE_LEFT_BUTTON_UP:
+		case SENSE_MOUSE_LEFT_BUTTON_DOWN: {
+			return SenseMouse::MouseDragState::LEFT;
+		} break;
+
+		case SENSE_MOUSE_MIDDLE_BUTTON_UP:
+		case SENSE_MOUSE_MIDDLE_BUTTON_DOWN: {
+			return SenseMouse::MouseDragState::MIDDLE;
+		} break;
+
+		case SENSE_MOUSE_RIGHT_BUTTON_UP: 
+		case SENSE_MOUSE_RIGHT_BUTTON_DOWN: {
+			return SenseMouse::MouseDragState::RIGHT;
+		} break;
+	}
+
+	return SenseMouse::MouseDragState::NONE;
+}
+
+SenseMouseEventType GetMouseDragEvent(SenseMouse::MouseDragState dragState) {
+	switch (dragState) {
+	case SenseMouse::MouseDragState::LEFT: return SENSE_MOUSE_LEFT_DRAG_MOVE; break;
+	case SenseMouse::MouseDragState::MIDDLE: return SENSE_MOUSE_MIDDLE_DRAG_MOVE; break;
+	case SenseMouse::MouseDragState::RIGHT: return SENSE_MOUSE_RIGHT_DRAG_MOVE; break;
+	}
+
+	return SENSE_MOUSE_INVALID;
+}
+
 RESULT SenseMouse::SetMouseState(SenseMouseEventType eventType, int newX, int newY, int state) {
 	RESULT r = R_PASS;
 
 	SenseMouseEvent mEvent(eventType, newX, newY, m_lastX, m_lastY, state);
-
 	mEvent.dx = (newX - m_lastX);
 	mEvent.dy = (newY - m_lastY);
-
-	CR(NotifySubscribers(eventType, &mEvent));
-
 	m_MousePosition = { newX, newY };
+
+	switch (eventType) {
+	case SENSE_MOUSE_LEFT_BUTTON_UP:
+	case SENSE_MOUSE_MIDDLE_BUTTON_UP:
+	case SENSE_MOUSE_RIGHT_BUTTON_UP: {
+		m_dragState = m_dragState & (~GetMouseDragButton(eventType));
+
+		CR(NotifySubscribers(eventType, &mEvent));
+	} break;
+
+	case SENSE_MOUSE_LEFT_BUTTON_DOWN: 
+	case SENSE_MOUSE_MIDDLE_BUTTON_DOWN:
+	case SENSE_MOUSE_RIGHT_BUTTON_DOWN: {
+		if (m_dragState == MouseDragState::NONE) {
+			m_dragOriginX = newX;
+			m_dragOriginY = newY;
+		}
+
+		m_dragState = m_dragState | GetMouseDragButton(eventType);
+
+		CR(NotifySubscribers(eventType, &mEvent));
+	} break;
+
+	case SENSE_MOUSE_WHEEL: {
+		CR(NotifySubscribers(eventType, &mEvent));
+	} break;
+
+	case SENSE_MOUSE_MOVE: {
+		CR(NotifySubscribers(eventType, &mEvent));
+
+		if (m_dragState != MouseDragState::NONE) {
+			SenseMouseEvent mDragEvent(eventType, newX, newY, m_lastX, m_lastY, state);
+
+			int xCenter = 0, yCenter = 0;
+			GetCenterPosition(xCenter, yCenter);
+
+			int xPos = 0, yPos = 0;
+			GetMousePosition(xPos, yPos);
+
+			mEvent.dx = (xPos - xCenter) * 1;
+			mEvent.dy = (yPos - yCenter) * 1;
+
+			for (int i = 1; i <= (int)(SenseMouse::MouseDragState::RIGHT); i <<= 1) {
+				SenseMouse::MouseDragState mouseState = (SenseMouse::MouseDragState)(i);
+
+				if ((m_dragState | mouseState) != MouseDragState::NONE) {
+					SenseMouseEventType dragEventType = GetMouseDragEvent(mouseState);
+					mDragEvent.EventType = dragEventType;
+
+					CR(NotifySubscribers(dragEventType, &mDragEvent));
+				}
+			}
+		}
+	} break;
+
+	case SENSE_MOUSE_LEFT_DRAG_MOVE:
+	case SENSE_MOUSE_RIGHT_DRAG_MOVE:
+	default: {
+		// TODO: ?
+		CR(NotifySubscribers(eventType, &mEvent));
+	} break;
+	}
 
 	/*
 	// TODO: Fix dragging

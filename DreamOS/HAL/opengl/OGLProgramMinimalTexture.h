@@ -14,65 +14,22 @@
 
 class OGLProgramMinimalTexture : public OGLProgram {
 public:
-	OGLProgramMinimalTexture(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp)
-	{
-		// empty
-	}
+	OGLProgramMinimalTexture(OpenGLImp *pParentImp);
 
-	RESULT OGLInitialize() {
-		RESULT r = R_PASS;
+	RESULT OGLInitialize();
 
-		CR(OGLProgram::OGLInitialize());
+	virtual RESULT SetupConnections() override;
+	virtual RESULT ProcessNode(long frameID) override;
 
-		// Vertex Attributes
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributePosition), std::string("inV_vec4Position")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeColor), std::string("inV_vec4Color")));
-		CR(RegisterVertexAttribute(reinterpret_cast<OGLVertexAttribute**>(&m_pVertexAttributeUVCoord), std::string("inV_vec2UVCoord")));
+	RESULT SetObjectTextures(OGLObj *pOGLObj);
+	RESULT SetMaterial(material *pMaterial);
+	RESULT SetObjectUniforms(DimObj *pDimObj);
+	RESULT SetCameraUniforms(camera *pCamera);
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
-		// Uniform Variables
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformModelMatrix), std::string("u_mat4Model")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformViewProjectionMatrix), std::string("u_mat4ViewProjection")));
-		CR(RegisterUniform(reinterpret_cast<OGLUniform**>(&m_pUniformTextureColor), std::string("u_textureColor")));
-
-	Error:
-		return r;
-	}
-
-	RESULT SetObjectTextures(OGLObj *pOGLObj) {
-		RESULT r = R_PASS;
-
-		OGLTexture *pTexture = nullptr;
-
-		if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
-			pTexture->OGLActivateTexture();
-			m_pUniformTextureColor->SetUniform(pTexture);
-		}
-
-//	Error:
-		return r;
-	}
-
-	RESULT SetObjectUniforms(DimObj *pDimObj) {
-		auto matModel = pDimObj->GetModelMatrix();
-		m_pUniformModelMatrix->SetUniform(matModel);
-
-		return R_PASS;
-	}
-
-	RESULT SetCameraUniforms(camera *pCamera) {
-		auto matVP = pCamera->GetProjectionMatrix() * pCamera->GetViewMatrix();
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-
-		return R_PASS;
-	}
-
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
-		auto matVP = pStereoCamera->GetProjectionMatrix(eye) * pStereoCamera->GetViewMatrix(eye);
-		m_pUniformViewProjectionMatrix->SetUniform(matVP);
-
-		return R_PASS;
-	}
+protected:
+	stereocamera *m_pCamera = nullptr;
+	ObjectStore *m_pSceneGraph = nullptr;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
@@ -82,7 +39,10 @@ private:
 	OGLUniformMatrix4 *m_pUniformModelMatrix;
 	OGLUniformMatrix4 *m_pUniformViewProjectionMatrix;
 
+	OGLUniformBool *m_pUniformHasTextureColor;
 	OGLUniformSampler2D *m_pUniformTextureColor;
+
+	OGLMaterialBlock *m_pMaterialsBlock;
 };
 
 #endif // ! OGLPROGRAM_MINIMAL_TEXTURE_H_

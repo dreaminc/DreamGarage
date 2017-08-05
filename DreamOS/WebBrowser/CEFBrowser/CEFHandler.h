@@ -39,6 +39,7 @@ class CEFHandler : public singleton<CEFHandler>,
 	public CefLifeSpanHandler,
 	public CefLoadHandler,
 	public CefRenderHandler
+	//public CefDownloadHandler
 {
 public:
 	CEFHandler();
@@ -51,6 +52,10 @@ public:
 		virtual RESULT OnBrowserCreated(std::shared_ptr<CEFBrowserController> pCEFBrowserController) = 0;
 		virtual RESULT OnGetViewRect(CefRefPtr<CefBrowser> pCEFBrowser, CefRect &cefRect) = 0;
 		virtual RESULT OnPaint(CefRefPtr<CefBrowser> pCEFBrowser, PaintElementType type, const RectList &dirtyRects, const void *pBuffer, int width, int height) = 0;
+
+		virtual RESULT OnLoadingStateChanged(CefRefPtr<CefBrowser> pCEFBrowser, bool fLoading, bool fCanGoBack, bool fCanGoForward) = 0;
+		virtual RESULT OnLoadStart(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) = 0;
+		virtual RESULT OnLoadEnd(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) = 0;
 	};
 
 	RESULT RegisterCEFHandlerObserver(CEFHandlerObserver* pCEFHandlerObserver);
@@ -60,6 +65,20 @@ public:
 	virtual CefRefPtr<CefDisplayHandler> GetDisplayHandler() override;
 	virtual CefRefPtr<CefLifeSpanHandler> GetLifeSpanHandler() override;
 	virtual CefRefPtr<CefLoadHandler> GetLoadHandler() override;
+
+	//virtual CefRefPtr<CefDownloadHandler> GetDownloadHandler() override;
+	// CefDownloadHandler methods
+	/*
+	void OnBeforeDownload(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefDownloadItem> download_item,
+		const CefString& suggested_name,
+		CefRefPtr<CefBeforeDownloadCallback> callback) OVERRIDE;
+	void OnDownloadUpdated(
+		CefRefPtr<CefBrowser> browser,
+		CefRefPtr<CefDownloadItem> download_item,
+		CefRefPtr<CefDownloadItemCallback> callback) OVERRIDE;
+		*/
 
 	// CefDisplayHandler
 	virtual void OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& title) override;
@@ -72,6 +91,11 @@ public:
 	// CefLoadHandler
 	virtual void OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, ErrorCode errorCode,
 						     const CefString& errorText, const CefString& failedUrl) override;
+
+	virtual void OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) override;
+	virtual void OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::TransitionType transition_type) override;
+	virtual void OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) override;
+
 
 	// Request that all existing browser windows close.
 	void CloseAllBrowsers(bool fForceClose);

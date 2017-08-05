@@ -14,9 +14,11 @@ RESULT DreamContentView::InitializeApp(void *pContext) {
 	RESULT r = R_PASS;
 
 	// Subscribers (children)
-	for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
-		CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
-	}
+	//for (int i = 0; i < InteractionEventType::INTERACTION_EVENT_INVALID; i++) {
+	//	CR(GetDOS()->RegisterEventSubscriber((InteractionEventType)(i), this));
+	//}
+
+	CR(r);
 
 	SetAppName("DreamContentView");
 	SetAppDescription("A Shared Content View");

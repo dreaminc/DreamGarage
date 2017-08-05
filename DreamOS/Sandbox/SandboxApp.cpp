@@ -10,11 +10,17 @@
 
 #include "DreamAppManager.h"
 
+#include "HAL/Pipeline/SinkNode.h"
+#include "HAL/Pipeline/ProgramNode.h"
+
+#include <HMD/HMDFactory.h>
+
 SandboxApp::SandboxApp() :
 	m_pPathManager(nullptr),
 	m_pCommandLineManager(nullptr),
 	m_pOpenGLRenderingContext(nullptr),
 	m_pSceneGraph(nullptr),
+	m_pUISceneGraph(nullptr),
 	m_pPhysicsGraph(nullptr),
 	m_pInteractionGraph(nullptr),
 	m_pFlatSceneGraph(nullptr),
@@ -80,7 +86,39 @@ RESULT SandboxApp::Notify(CmdPromptEvent *event) {
 }
 
 RESULT SandboxApp::Notify(SenseKeyboardEvent *kbEvent) {
-	return R_NOT_IMPLEMENTED;
+	RESULT r = R_PASS;
+
+	if (kbEvent->m_pSenseKeyboard) {
+		SenseVirtualKey keyCode = kbEvent->KeyCode;
+
+		if (kbEvent->KeyState) {
+			if (m_pHALImp->IsRenderProfiler() == false) {
+				if (keyCode == SVK_TAB) {
+					// quick hack to enable dream console in production but only using several tab hits
+#ifdef PRODUCTION_BUILD
+					static int hits = 0;
+					hits++;
+					if (hits > 7) {
+						m_pHALImp->SetRenderProfiler(true);
+						DreamConsole::GetConsole()->SetInForeground(true);
+					}
+#else
+					m_pHALImp->SetRenderProfiler(true);
+					DreamConsole::GetConsole()->SetInForeground(true);
+#endif // PRODUCTION_BUILD
+				}
+			}
+			else {
+				if (keyCode == SVK_TAB) {
+					m_pHALImp->SetRenderProfiler(false);
+					DreamConsole::GetConsole()->SetInForeground(false);
+				}
+			}
+		}
+	}
+
+	//Error:
+	return r;
 }
 
 RESULT SandboxApp::Notify(SenseTypingEvent *kbEvent) {
@@ -98,8 +136,8 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 			if (m_fMouseIntersectObjects) {
 				// Create ray
 				// TODO: This will only work for non-HMD camera 
-				camera *pCamera = m_pHALImp->GetCamera();
-				ray rayCamera = pCamera->GetRay(mEvent->xPos, mEvent->yPos);
+				
+				ray rayCamera = m_pCamera->GetRay(mEvent->xPos, mEvent->yPos);
 
 				// intersect ray
 				auto intersectedObjects = m_pSceneGraph->GetObjects(rayCamera);
@@ -117,6 +155,20 @@ RESULT SandboxApp::Notify(SenseMouseEvent *mEvent) {
 					DimObj *pDimObj = dynamic_cast<DimObj*>(pObject);
 					pDimObj->SetColor(color(COLOR_RED));
 				}
+			}
+		} break;
+
+		case SENSE_MOUSE_LEFT_DRAG_MOVE: {
+			if (m_SandboxConfiguration.fMouseLook) {
+				m_pSenseMouse->CaptureMouse();
+				//m_pSenseMouse->CenterMousePosition();
+				m_pCamera->RotateCameraByDiffXY(mEvent->dx, mEvent->dy);
+			}
+		} break;
+
+		case SENSE_MOUSE_LEFT_BUTTON_UP: {
+			if (m_SandboxConfiguration.fMouseLook) {
+				m_pSenseMouse->ReleaseMouse();
 			}
 		} break;
 	}
@@ -137,10 +189,9 @@ RESULT SandboxApp::GetMouseRay(ray &rCast, double t){
 	CR(GetSandboxWindowSize(pxWidth, pxHeight));
 	
 	if (mouseX >= 0 && mouseY >= 0 && mouseX <= pxWidth && mouseY <= pxHeight) {
-		camera *pCamera = m_pHALImp->GetCamera();
-		CN(pCamera);
-
-		rCast = pCamera->GetRay(mouseX, mouseY, t);
+		
+		CN(m_pCamera);
+		rCast = m_pCamera->GetRay(mouseX, mouseY, t);
 
 		//DEBUG_LINEOUT("mouse: (%d, %d)", mouseX, mouseY);
 		//rCast.Print();
@@ -190,6 +241,8 @@ RESULT SandboxApp::RegisterImpKeyboardEvents() {
 	CR(RegisterSubscriber(SVK_ALL, DreamConsole::GetConsole()));
 	CR(RegisterSubscriber(CHARACTER_TYPING, DreamConsole::GetConsole()));
 
+	CR(RegisterSubscriber(SVK_TAB, this));
+
 	//camera *pCamera = m_pHALImp->GetCamera();
 
 	//CR(CmdPrompt::GetCmdPrompt()->RegisterMethod(CmdPrompt::method::Camera, pCamera));
@@ -217,6 +270,8 @@ RESULT SandboxApp::RegisterImpMouseEvents() {
 	RESULT r = R_PASS;
 
 	CR(RegisterSubscriber(SENSE_MOUSE_MOVE, this));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_DRAG_MOVE, this));
+	CR(RegisterSubscriber(SENSE_MOUSE_LEFT_BUTTON_UP, this));
 
 	//camera *pCamera = m_pOpenGLImp->GetCamera();
 
@@ -401,23 +456,7 @@ RESULT SandboxApp::RunAppLoop() {
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 		//m_pOpenGLImp->Render(m_pSceneGraph);
 
-		///*
-		// Send to the HMD
-		// TODO reorganize Render functions
-		// need to be re-architected so that the HMD functions are called after all of the 
-		// GL functions per eye.
-		if (m_pHMD != nullptr) {
-			//m_pHALImp->RenderStereoFramebuffers(m_pSceneGraph);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_LEFT);
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_RIGHT);
-			m_pHMD->SubmitFrame();
-			m_pHMD->RenderHMDMirror();
-		}
-		else {
-			// Render Scene
-			m_pHALImp->Render(m_pSceneGraph, m_pFlatSceneGraph, EYE_MONO);
-		}
-		//*/
+		m_pHALImp->Render();
 
 		// Swap buffers
 		SwapDisplayBuffers();
@@ -428,6 +467,19 @@ RESULT SandboxApp::RunAppLoop() {
 			Shutdown();
 		}
 	}
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::ResizeViewport(viewport newViewport) {
+	RESULT r = R_PASS;
+
+	// Resize the camera
+	CR(m_pCamera->ResizeCamera(newViewport));
+
+	// OpenGL Resize the view after the window had been resized
+	CRM(m_pHALImp->Resize(m_viewport), "Failed to resize OpenGL Implemenation");
 
 Error:
 	return r;
@@ -468,24 +520,37 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	CR(m_pCommandLineManager->InitializeFromCommandLine(argc, argv));
 
 	// Set up Scene Graph
-	m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	//m_pSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
+	m_pSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pSceneGraph, "Failed to allocate Scene Graph");
+
+	m_pUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pUISceneGraph, "Failed to allocate UI Scene Graph");
+	
+	// This will prevent scene graph from being deleted when not connected
+	// TODO: Attach to Sandbox somehow?
+	CB(m_pSceneGraph->incRefCount());
 
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pFlatSceneGraph, "Failed to allocate Scene Graph");
 
+	CRM(InitializeCamera(), "Failed to initialize Camera");
 	CRM(InitializeHAL(), "Failed to initialize HAL");
-
-	// Generalize this module pattern
-	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
-	CRM(InitializeTimeManager(), "Failed to initialize time manager");
-	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
 
 	// TODO: Remove CMD line arg and use global config
 	if ((m_pCommandLineManager->GetParameterValue("hmd").compare("") == 0) == false) {
 		m_SandboxConfiguration.fUseHMD = false;
 	}
+	CRM(InitializeHMD(), "Failed to initialize HMD");
+
+	// Set up the pipeline
+	CR(SetUpHALPipeline(m_pHALImp->GetRenderPipelineHandle()));
+
+	// Generalize this module pattern
+	CRM(InitializeCloudController(), "Failed to initialize cloud controller");
+	CRM(InitializeTimeManager(), "Failed to initialize time manager");
+	CRM(InitializeDreamAppManager(), "Failed to initialize app manager");
 
 	if ((m_pCommandLineManager->GetParameterValue("leap").compare("") == 0) == false) {
 		m_SandboxConfiguration.fUseLeap = false;
@@ -585,6 +650,94 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::InitializeCamera() {
+	RESULT r = R_PASS;
+
+	//m_pCamera = std::make_shared<stereocamera>(point(0.0f, 0.0f, 5.0f), m_viewport);
+
+	m_pCamera = DNode::MakeNode<CameraNode>(point(0.0f, 0.0f, 5.0f), m_viewport);
+	CN(m_pCamera);
+
+	// This will prevent camera from being deleted when not connected
+	CB(m_pCamera->incRefCount());
+
+Error:
+	return r;
+}
+
+// Note: This needs to be done after GL set up
+RESULT SandboxApp::InitializeHMD() {
+	RESULT r = R_PASS;
+
+	CN(m_pHALImp);
+	CR(m_pHALImp->MakeCurrentContext());
+
+	int pxWidth, pxHeight;
+	GetSandboxWindowSize(pxWidth, pxHeight);
+
+	if (GetSandboxConfiguration().fUseHMD) {
+		//m_pHMD = HMDFactory::MakeHMD(HMD_OVR, this, m_pHALImp, pxWidth, pxHeight);
+		//m_pHMD = HMDFactory::MakeHMD(HMD_OPENVR, this, m_pHALImp, pxWidth, pxHeight);
+		m_pHMD = HMDFactory::MakeHMD(HMD_ANY_AVAILABLE, this, m_pHALImp, pxWidth, pxHeight);
+
+		if (m_pHMD != nullptr) {
+			CRM(m_pHALImp->SetHMD(m_pHMD), "Failed to initialize stereo frame buffers");
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::InitializeHAL() {
+	RESULT r = R_PASS;
+
+	// Setup OpenGL and Resize Windows etc
+	//CNM(m_hDC, "Can't start Sandbox with NULL Device Context");
+	CNM(m_pCamera, "HAL depends on camera being set up");
+
+	// Create and initialize OpenGL Imp
+	// TODO: HAL factory pattern
+	m_pHALImp = new OpenGLImp(m_pOpenGLRenderingContext);
+	CNM(m_pHALImp, "Failed to create HAL Implementation");
+	CVM(m_pHALImp, "HAL Implementation Invalid");
+
+	CR(m_pHALImp->SetCamera(m_pCamera));
+
+	CR(m_pHALImp->InitializeHAL());
+	CR(m_pHALImp->InitializeRenderPipeline());
+
+Error:
+	return r;
+}
+
+// TODO: Move this up to DreamOS
+RESULT SandboxApp::SetUpHALPipeline(Pipeline* pRenderPipeline) {
+	RESULT r = R_PASS;
+
+	// TODO: Get from HMD if HMD is valid
+	SinkNode* pDestSinkNode = nullptr;
+
+	if (m_pHMD == nullptr) {
+		pDestSinkNode = m_pHALImp->MakeSinkNode("display");
+	}
+	else {
+		pDestSinkNode = (SinkNode*)(m_pHMD->GetHMDSinkNode());
+	}
+	CN(pDestSinkNode);
+
+	CNM(pRenderPipeline, "Pipeline not initialized");
+	CR(pRenderPipeline->SetDestinationSinkNode(pDestSinkNode));
+
+	pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CB(pDestSinkNode->incRefCount());
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::RegisterObjectAndSubscriber(VirtualObj *pVirtualObject, Subscriber<CollisionObjectEvent>* pCollisionDetectorSubscriber) {
 	RESULT r = R_PASS;
 
@@ -595,14 +748,22 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::RegisterEventSubscriber(InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+RESULT SandboxApp::RegisterEventSubscriber(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
 	RESULT r = R_PASS;
 
-	r = m_pInteractionEngine->RegisterSubscriber(eventType, pInteractionSubscriber);
+	r = m_pInteractionEngine->RegisterSubscriber(pObject, eventType, pInteractionSubscriber);
 	CR(r);
 
 Error:
 	return r;
+}
+
+RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber) {
+	return m_pInteractionEngine->UnregisterSubscriber(pObject, eventType, pInteractionSubscriber);
+}
+
+RESULT SandboxApp::UnregisterInteractionObject(VirtualObj *pObject) {
+	return m_pInteractionEngine->UnregisterSubscriber(pObject);
 }
 
 long SandboxApp::GetTickCount() {
@@ -638,7 +799,7 @@ Error:
 }
 
 // This adds the object to the interaction graph (otherwise it will not be included in event handling)
-RESULT SandboxApp::AddInteractionObject(VirtualObj *pObject) {
+RESULT SandboxApp::AddObjectToInteractionGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pInteractionGraph->PushObject(pObject));
@@ -647,10 +808,64 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::AddInteractionObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pInteractionEngine->AddInteractionObject(pObject));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
+	RESULT r = R_PASS;
+
+	CR(m_pInteractionEngine->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::ReleaseObjects(VirtualObj *pInteractionObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pInteractionEngine->ReleaseObjects(pInteractionObject));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pUISceneGraph->PushObject(pObject));
+
+Error:
+	return r;
+}
+
+/*
 RESULT SandboxApp::UpdateInteractionPrimitive(const ray &rCast) {
 	RESULT r = R_PASS;
 
 	CR(m_pInteractionEngine->UpdateInteractionPrimitive(rCast));
+
+Error:
+	return r;
+}
+*/
+
+RESULT SandboxApp::RemoveObject(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	DimObj *pObj = reinterpret_cast<DimObj*>(pObject);
+	if (pObj != nullptr)
+		CR(m_pInteractionEngine->RemoveAnimationObject(pObj));
+
+	CR(m_pPhysicsGraph->RemoveObject(pObject));
+	CR(m_pSceneGraph->RemoveObject(pObject));
+	CR(m_pUISceneGraph->RemoveObject(pObject));
+	CR(m_pInteractionGraph->RemoveObject(pObject));
 
 Error:
 	return r;
@@ -660,8 +875,13 @@ Error:
 RESULT SandboxApp::RemoveAllObjects() {
 	RESULT r = R_PASS;
 
+	// removes all animations
+	CR(m_pInteractionEngine->RemoveAllObjects()); 
+
 	CR(m_pPhysicsGraph->RemoveAllObjects());
 	CR(m_pSceneGraph->RemoveAllObjects());
+	CR(m_pUISceneGraph->RemoveAllObjects());
+	CR(m_pInteractionGraph->RemoveAllObjects());
 
 Error:
 	return r;
@@ -688,17 +908,28 @@ Error:
 FlatContext* SandboxApp::AddFlatContext(int width, int height, int channels) {
 	RESULT r = R_PASS;
 
-	FlatContext* context = m_pHALImp->MakeFlatContext(width, height, channels);
-	CR(m_pFlatSceneGraph->PushObject(context));
+	FlatContext* pFlatContext = m_pHALImp->MakeFlatContext(width, height, channels);
+	//CR(m_pFlatSceneGraph->PushObject(pFlatContext));
+	CN(pFlatContext);
+
+	CR(AddObject(pFlatContext));
+
+	return pFlatContext;
 
 Error:
-	return context;
+	if (pFlatContext != nullptr) {
+		delete pFlatContext;
+		pFlatContext = nullptr;
+	}
+
+	return nullptr;
 }
 
 RESULT SandboxApp::RenderToTexture(FlatContext* pContext) {
 	RESULT r = R_PASS;
 	
-	CR(m_pHALImp->RenderToTexture(pContext));
+	CR(m_pHALImp->RenderToTexture(pContext, m_pCamera));
+
 Error:
 	return r;
 }
@@ -847,10 +1078,191 @@ volume* SandboxApp::AddVolume(double side, bool fTriangleBased) {
 	return AddVolume(side, side, side, fTriangleBased);
 }
 
-text* SandboxApp::AddText(std::shared_ptr<Font> pFont, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(pFont, content, size, isBillboard);
+	text *pText = MakeText(pFont, pLayout, margin, textFlags);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, pLayout, margin, textFlags);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = MakeText(pFont, strContent, lineHeightM, textFlags);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, strContent, lineHeightM, textFlags);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	text *pText = MakeText(pFont, strContent, width, height, textFlags);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+	//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width, double height, text::flags textFlags) {
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, strContent, width, height, textFlags);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, strContent, width, height, true, fBillboard);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, const std::string &strContent, double width, double height, bool fBillboard) {
+	RESULT r = R_PASS;
+
+	text *pText = MakeText(pFont, strContent, width, height, fBillboard);
+	CN(pText);
+
+	CR(AddObject(pText));
+
+//Success:
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
+	RESULT r = R_PASS;
+
+	auto pText = m_pHALImp->MakeText(pFont, pFontTexture, strContent, width, height, true, fBillboard);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		delete pText;
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
+text* SandboxApp::AddText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string &strContent, double width, double height, bool fBillboard) {
+	RESULT r = R_PASS;
+
+	text *pText = MakeText(pFont, pFontTexture, strContent, width, height, fBillboard);
 	CN(pText);
 
 	CR(AddObject(pText));
@@ -866,11 +1278,15 @@ Error:
 	return nullptr;
 }
 
-text* SandboxApp::AddText(const std::wstring & fontName, const std::string & content, double size, bool isBillboard) {
+text* SandboxApp::AddText(const std::wstring & fontName, const std::string &strContent, double width, double height, bool fBillboard) {
 	RESULT r = R_PASS;
 
-	text *pText = m_pHALImp->MakeText(fontName, content, size, isBillboard);
+	text *pText = m_pHALImp->MakeText(fontName, strContent, width, height, fBillboard);
 	CN(pText);
+
+	if (pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
 
 	CR(AddObject(pText));
 
@@ -883,6 +1299,10 @@ Error:
 		pText = nullptr;
 	}
 	return nullptr;
+}
+
+texture* SandboxApp::MakeTexture(const texture &srcTexture) {
+	return m_pHALImp->MakeTexture(srcTexture);
 }
 
 texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
@@ -1004,9 +1424,13 @@ composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pT
 	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
 }
 
+composite* SandboxApp::MakeComposite() {
+	return m_pHALImp->MakeComposite();
+}
+
 composite* SandboxApp::AddComposite() {
 	RESULT r = R_PASS;
-	composite* pComposite = m_pHALImp->MakeComposite();
+	composite* pComposite = MakeComposite();
 	CN(pComposite);
 	CR(AddObject(pComposite));
 	
@@ -1041,8 +1465,8 @@ Error:
 	return r;
 }
 
-camera* SandboxApp::GetCamera() {
-	return m_pHALImp->GetCamera();
+stereocamera* SandboxApp::GetCamera() {
+	return m_pCamera;
 }
 
 point SandboxApp::GetCameraPosition() {
@@ -1054,49 +1478,21 @@ quaternion SandboxApp::GetCameraOrientation() {
 }
 
 // Cloud Controller
-RESULT SandboxApp::RegisterPeersUpdateCallback(HandlePeersUpdateCallback fnHandlePeersUpdateCallback) {
-	return m_pCloudController->RegisterPeersUpdateCallback(fnHandlePeersUpdateCallback);
+RESULT SandboxApp::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {
+	return m_pCloudController->RegisterPeerConnectionObserver(pPeerConnectionObserver);
 }
 
-RESULT SandboxApp::RegisterDataMessageCallback(HandleDataMessageCallback fnHandleDataMessageCallback) {
-	return m_pCloudController->RegisterDataMessageCallback(fnHandleDataMessageCallback);
-}
-
-RESULT SandboxApp::RegisterHeadUpdateMessageCallback(HandleHeadUpdateMessageCallback fnHandleHeadUpdateMessageCallback) {
-	return m_pCloudController->RegisterHeadUpdateMessageCallback(fnHandleHeadUpdateMessageCallback);
-}
-
-RESULT SandboxApp::RegisterHandUpdateMessageCallback(HandleHandUpdateMessageCallback fnHandleHandUpdateMessageCallback) {
-	return m_pCloudController->RegisterHandUpdateMessageCallback(fnHandleHandUpdateMessageCallback);
-}
-
-RESULT SandboxApp::RegisterAudioDataCallback(HandleAudioDataCallback fnHandleAudioDataCallback) {
-	return m_pCloudController->RegisterAudioDataCallback(fnHandleAudioDataCallback);
+RESULT SandboxApp::RegisterEnvironmentObserver(CloudController::EnvironmentObserver *pEnvironmentObserver) {
+	return m_pCloudController->RegisterEnvironmentObserver(pEnvironmentObserver);
 }
 
 RESULT SandboxApp::SendDataMessage(long userID, Message *pDataMessage) {
 	return m_pCloudController->SendDataMessage(userID, pDataMessage);
 }
 
-RESULT SandboxApp::SendUpdateHeadMessage(long userID, point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	return m_pCloudController->SendUpdateHeadMessage(userID, ptPosition, qOrientation, vVelocity, qAngularVelocity);
-}
-
-RESULT SandboxApp::SendUpdateHandMessage(long userID, hand::HandState handState) {
-	return m_pCloudController->SendUpdateHandMessage(userID, handState);
-}
-
 
 RESULT SandboxApp::BroadcastDataMessage(Message *pDataMessage) {
 	return m_pCloudController->BroadcastDataMessage(pDataMessage);
-}
-
-RESULT SandboxApp::BroadcastUpdateHeadMessage(point ptPosition, quaternion qOrientation, vector vVelocity, quaternion qAngularVelocity) {
-	return m_pCloudController->BroadcastUpdateHeadMessage(ptPosition, qOrientation, vVelocity, qAngularVelocity);
-}
-
-RESULT SandboxApp::BroadcastUpdateHandMessage(hand::HandState handState) {
-	return m_pCloudController->BroadcastUpdateHandMessage(handState);
 }
 
 // TimeManager

@@ -6,6 +6,16 @@
 
 #include "Primitives/FlatContext.h"
 #include "Primitives/camera.h"
+#include "Primitives/stereocamera.h"
+
+#include "Primitives/sphere.h"
+#include "Primitives/volume.h"
+#include "Primitives/DimRay.h"
+#include "quad.h"
+
+#include "UI/UIView.h"
+
+#include "DreamOS.h"
 
 composite::composite(HALImp *pHALImp) :
 	m_pHALImp(pHALImp)
@@ -291,6 +301,58 @@ std::shared_ptr<volume> composite::AddVolume(double side) {
 	return AddVolume(side, side, side);
 }
 
+
+std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptOrigin) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin));
+
+	//Success:
+	return pQuad;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptOrigin) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad = MakeQuad(width, height, ptOrigin);
+	CR(AddObject(pQuad));
+
+	//Success:
+	return pQuad;
+
+Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::MakeQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) {
+
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
+
+	//Success:
+	return pQuad;
+
+	//Error:
+	return nullptr;
+}
+
+std::shared_ptr<quad> composite::AddQuad(double width, double height, point ptOrigin, const uvcoord& uvTopLeft, const uvcoord& uvBottomRight, vector vNormal) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<quad> pQuad(m_pHALImp->MakeQuad(width, height, ptOrigin, uvTopLeft, uvBottomRight, vNormal));
+	CR(AddObject(pQuad));
+
+	//Success:
+	return pQuad;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<quad> composite::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal) {
 	RESULT r = R_PASS;
 
@@ -304,8 +366,7 @@ Error:
 	return nullptr;
 }
 
-std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal)
-{
+std::shared_ptr<quad> composite::AddQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture * pTextureHeight, vector vNormal){
 	return MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
@@ -347,14 +408,32 @@ Error:
 	return nullptr;
 }
 
+std::shared_ptr<UIView> composite::MakeUIView(DreamOS *pDreamOS) {
+	std::shared_ptr<UIView> pView(new UIView(m_pHALImp, pDreamOS));
+
+	return pView;
+}
+
+std::shared_ptr<UIView> composite::AddUIView(DreamOS *pDreamOS) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<UIView> pView = MakeUIView(pDreamOS);
+	CR(AddObject(pView));
+	return pView;
+Error:
+	return nullptr;
+}
+
 RESULT composite::RenderToTexture(std::shared_ptr<FlatContext> pContext) {
 	RESULT r = R_PASS;
-	CR(m_pHALImp->RenderToTexture(pContext.get()));
+	
+	CR(m_pHALImp->RenderToTexture(pContext.get(), GetCamera()));
+
 Error:
 	return r;
 }
 
-camera *composite::GetCamera() {
+stereocamera* composite::GetCamera() {
 	return m_pHALImp->GetCamera();
 }
 

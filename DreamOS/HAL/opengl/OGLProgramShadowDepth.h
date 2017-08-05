@@ -17,7 +17,7 @@
 class OGLProgramShadowDepth : public OGLProgram {
 public:
 	OGLProgramShadowDepth(OpenGLImp *pParentImp) :
-		OGLProgram(pParentImp),
+		OGLProgram(pParentImp, "oglshadowdepth"),
 		m_pShadowEmitter(nullptr)
 	{
 		// empty
@@ -38,6 +38,11 @@ public:
 
 	Error:
 		return r;
+	}
+
+	virtual RESULT SetupConnections() override {
+		// TODO: do it
+		return R_NOT_IMPLEMENTED;
 	}
 
 	RESULT SetLights(std::vector<light*> *pLights) {
@@ -80,7 +85,7 @@ public:
 		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
 	}
 
-	RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) {
+	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) {
 		return m_pUniformViewProjectionMatrix->SetUniform(GetViewProjectionMatrix());
 	}
 

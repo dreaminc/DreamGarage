@@ -25,7 +25,7 @@ public:
 	bool Intersect(VirtualObj* pObj);
 	CollisionManifold Collide(VirtualObj* pObj);
 
-	ray GetRay();
+	virtual ray GetRay(bool fAbsolute = false) override;
 	RESULT UpdateFromRay(const ray &rCast);
 	ray GetRayFromVerts();
 

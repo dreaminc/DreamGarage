@@ -29,6 +29,20 @@ public:
 		// empty
 	}
 
+	/*
+	User(const User &user) :
+		m_userID(user.m_userID),
+		m_defaultEnvironmentID(user.m_defaultEnvironmentID),
+		m_strEmail(user.m_strEmail),
+		m_strFirstName(user.m_strFirstName),
+		m_strLastName(user.m_strLastName),
+		m_strScreenName(user.m_strScreenName),
+		m_version(user.m_version)
+	{
+		// empty
+	}
+	*/
+
 	User(long userID, long defaultEnvironmentID, 
 		std::string strEmail, std::string strScreename, 
 		std::string strFirstName, std::string strLastName, 

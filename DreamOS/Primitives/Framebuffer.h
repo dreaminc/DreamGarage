@@ -38,7 +38,8 @@ public:
 	int GetWidth() { return m_width; }
 	int GetHeight() { return m_height; }
 	int GetChannels() { return m_channels; }
-	virtual texture* GetTexture() { return nullptr; };
+
+	virtual texture *GetColorTexture() = 0;
 
 protected:
 	int m_width;

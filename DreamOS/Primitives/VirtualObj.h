@@ -33,6 +33,8 @@ typedef enum ObjectType {
 	OBJECT_INVALID
 } OBJECT_TYPE;
 
+class ray;
+
 class VirtualObj : public valid {
 public:
 	friend class PhysicsIntegrator;		// TODO: move physics stuff into state/derivative for RK4
@@ -84,6 +86,7 @@ public:
 
 	VirtualObj* SetOrigin(point p);
 	VirtualObj* SetPosition(point p);
+	VirtualObj* SetPosition(point_precision x, point_precision y, point_precision z);
 	VirtualObj* MoveTo(point p);
 	VirtualObj* MoveTo(point_precision x, point_precision y, point_precision z);
 
@@ -137,6 +140,9 @@ public:
 	VirtualObj* SetVelocity(matrix <point_precision, 4, 1> vVelocity);
 	VirtualObj* SetVelocity(point_precision x, point_precision y, point_precision z);
 
+	// Ray - objects can override this if they'd like to
+	virtual ray GetRay(bool fAbsolute = false);
+
 	// Acceleration
 	/*
 	VirtualObj* AddAcceleration(matrix <point_precision, 4, 1> vAccel);
@@ -179,6 +185,8 @@ public:
 
 	// Matrix Functions
 	//matrix<virtual_precision, 4, 4> GetModelMatrix();
+	matrix<virtual_precision, 4, 4> GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
+	matrix<virtual_precision, 4, 4> GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 	matrix<virtual_precision, 4, 4> GetModelMatrix(matrix<virtual_precision, 4, 4> childMat = matrix<virtual_precision, 4, 4>(1.0f));
 
 public:

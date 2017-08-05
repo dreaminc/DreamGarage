@@ -16,9 +16,11 @@ RESULT Win64Mouse::CaptureMouse() {
 	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
 	CN(hwnd);
 
-	SenseMouse::CaptureMouse();
-	HWND hwndLast = SetCapture(hwnd);
-	CB(ShowCursor(false));
+	if (m_fMouseCaptured == false) {
+		SenseMouse::CaptureMouse();
+		HWND hwndLast = SetCapture(hwnd);
+		CB(ShowCursor(false));
+	}
 
 Error:
 	return r;
@@ -32,10 +34,11 @@ RESULT Win64Mouse::ReleaseMouse() {
 	HWND hwnd = m_pWin64AppParent->GetWindowHandle();
 	CN(hwnd);
 
-	SenseMouse::ReleaseMouse();
-	
-	CB(ReleaseCapture());
-	CB(ShowCursor(true));
+	if (m_fMouseCaptured) {
+		SenseMouse::ReleaseMouse();
+		CB(ReleaseCapture());
+		CB(ShowCursor(true));
+	}
 
 Error:
 	return r;

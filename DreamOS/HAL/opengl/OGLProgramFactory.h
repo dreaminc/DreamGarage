@@ -7,6 +7,9 @@
 
 #include "OGLProgram.h"
 
+#include <string>
+#include <map>
+
 typedef enum {
 	OGLPROGRAM_MINIMAL,
 	OGLPROGRAM_MINIMAL_TEXTURE,
@@ -21,15 +24,25 @@ typedef enum {
 	OGLPROGRAM_FLAT,
 	OGLPROGRAM_CUSTOM,
 	OGLPROGRAM_SHADOW_DEPTH,
+	OGLPROGRAM_REFERENCE,
 	// Production shaders - using features from previous shaders 
 	OGLPROGRAM_ENVIRONMENT_OBJECTS, // used for models in the environment such as head and hands
+	OGLPROGRAM_DEBUG_CONSOLE,
+	OGLPROGRAM_SCREEN_QUAD,
+	OGLPROGRAM_DEPTH_PEEL,
+	OGLPROGRAM_BLEND_QUAD,
+	OGLPROGRAM_BLUR_QUAD,
 	// /Production shaders
 	OGLPROGRAM_INVALID
 } OGLPROGRAM_TYPE;
 
 class OGLProgramFactory {
+private:
+	static const std::map<std::string, OGLPROGRAM_TYPE> m_OGLProgramNameType;
+
 public:
-	static OGLProgram* MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL);
+	static ProgramNode* MakeOGLProgram(OGLPROGRAM_TYPE type, OpenGLImp *pParentImp, version versionOGL);
+	static 	OGLPROGRAM_TYPE OGLProgramTypeFromstring(std::string strProgramName);
 };
 
 #endif // ! OGL_PROGRAM_FACTORY_H_

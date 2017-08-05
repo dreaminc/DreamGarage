@@ -8,6 +8,7 @@ enum class AnimationCurveType {
 	EASE_OUT_QUART,
 	EASE_OUT_EXPO,
 	EASE_OUT_BACK,
+	EASE_IN_QUART,
 	LINEAR,
 	INVALID
 };

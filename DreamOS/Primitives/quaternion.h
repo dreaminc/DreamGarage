@@ -83,8 +83,6 @@ public:
 
 	static quaternion MakeQuaternionWithEuler(quaternion_precision x, quaternion_precision y, quaternion_precision z);
 
-	float ProjectedYRotationDeg();
-
 	RESULT Reverse();
 	quaternion GetReverse();
 	quaternion GetConjugate();

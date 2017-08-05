@@ -41,7 +41,7 @@ typedef enum SenseKeyboardVirtualKeys : unsigned int {
 	SVK_SNAPSHOT = 0x2C,
 	SVK_RETURN = 0x0D,
 	SVK_INSERT = 0x2D,
-	SVK_DELETE = 0x2E,
+	SVK_DELETE = 0x2E, 
 	SVK_HELP = 0x2F,
 	SVK_INVALID
 } SenseVirtualKey;
@@ -92,7 +92,7 @@ public:
 
 	~SenseKeyboard();
 
-	// raw keyboard eveny
+	// raw keyboard event
 	virtual RESULT UpdateKeyState(SenseVirtualKey key, uint8_t keyState) = 0;
 	// text typing event
 	// this event is separated than the raw event as it in Windows OS

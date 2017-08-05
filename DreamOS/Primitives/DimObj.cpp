@@ -113,10 +113,10 @@ bool DimObj::IsVisible() {
 	return m_fVisible;
 }
 
-RESULT DimObj::SetVisible(bool fVisible) { 
+RESULT DimObj::SetVisible(bool fVisible, bool fSetChildren) { 
 	m_fVisible = fVisible;
 
-	if (HasChildren()) {
+	if (fSetChildren && HasChildren()) {
 		for (auto& child : GetChildren()) {
 			std::shared_ptr<DimObj> pDimObj = std::dynamic_pointer_cast<DimObj>(child);
 			if (pDimObj) {
@@ -137,15 +137,32 @@ RESULT DimObj::SetWireframe(bool fWireframe) {
 	return R_PASS; 
 }
 
+color DimObj::GetColor() {
+	return GetMaterial()->GetDiffuseColor();
+}
+
 RESULT DimObj::SetColor(color c) {
-	for (unsigned int i = 0; i < NumberVertices(); i++)
+	for (unsigned int i = 0; i < NumberVertices(); i++) {
 		m_pVertices[i].SetColor(c);
+	}
+
+	SetDirty();
+
+	GetMaterial()->SetColors(c, c, c);
+
+	return R_PASS;
+}
+
+RESULT DimObj::SetAlpha(color_precision a) {
+	for (unsigned int i = 0; i < NumberVertices(); i++)
+		m_pVertices[i].SetAlpha(a);
 
 	SetDirty();
 
 	return R_PASS;
 }
 
+// This is busted
 RESULT DimObj::TransformUV(matrix<uv_precision, 2, 1> matA, matrix<uv_precision, 2, 2> matB) {
 	RESULT r = R_PASS;
 
@@ -163,15 +180,40 @@ Error:
 	return r;
 }
 
+RESULT DimObj::SetMaterialColors(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetColors(c,c,c);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialColors(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 	RESULT r = R_PASS;
 
-	#define SET_TEXTURE(type, texture) case DimObj::MaterialTexture::type: texture = pTexture; break
-
 	switch (type) {
-		SET_TEXTURE(Ambient, m_pTextureAmbient);
-		SET_TEXTURE(Diffuse, m_pTextureDiffuse);
-		SET_TEXTURE(Specular, m_pTextureSpecular);
+
+	case DimObj::MaterialTexture::Ambient: {
+		m_pTextureAmbient = pTexture;
+	} break;
+
+	case DimObj::MaterialTexture::Diffuse: {
+		m_pTextureDiffuse = pTexture; 
+	} break;
+
+	case DimObj::MaterialTexture::Specular: {
+		m_pTextureSpecular = pTexture;
+	} break;
+
 	}
 
 	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
@@ -195,6 +237,16 @@ RESULT DimObj::SetColorTexture(texture *pTexture) {
 	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
 Error:
+	return r;
+}
+
+RESULT DimObj::UpdateColorTexture(texture *pTexture) {
+
+	RESULT r = R_PASS;
+	m_pColorTexture = pTexture;
+	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+
+//Error:
 	return r;
 }
 
@@ -257,22 +309,82 @@ RESULT DimObj::SetRandomColor() {
 	return R_PASS;
 }
 
+RESULT DimObj::RemoveChild(std::shared_ptr<DimObj> pDimObj) {
+	RESULT r = R_PASS;
+
+	CN(m_pObjects);
+	CN(pDimObj);
+
+	{
+		auto it = std::find(m_pObjects->begin(), m_pObjects->end(), pDimObj);
+
+		CBR((it != m_pObjects->end()), R_NOT_FOUND);
+
+		m_pObjects->erase(it);
+	}
+
+Error:
+	return r;
+}
+
 // Children (composite objects)
-RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj) {
+RESULT DimObj::AddChild(std::shared_ptr<DimObj> pDimObj, bool fFront) {
 	if (m_pObjects == nullptr) {
 		m_pObjects = std::unique_ptr<std::vector<std::shared_ptr<VirtualObj>>>(new std::vector<std::shared_ptr<VirtualObj>>);
 	}
 
-	m_pObjects->push_back(pDimObj);
+	if (fFront) {
+		m_pObjects->insert(m_pObjects->begin(), pDimObj);
+	}
+	else {
+		m_pObjects->push_back(pDimObj);
+	}
+
 	pDimObj->SetParent(this);
 
 	return R_PASS;
 }
 
-RESULT DimObj::ClearChildren() {
-	if (m_pObjects != nullptr)
-		m_pObjects->clear();
+RESULT DimObj::RemoveChild(VirtualObj *pObj) {
+	RESULT r = R_PASS;
+	bool fFound = false;
+
+	CBM((m_pObjects->size() > 0), "no children");
+
+	for (auto &child : *m_pObjects) {
+		if (child.get() == pObj) {
+			auto it = std::find(m_pObjects->begin(), m_pObjects->end(), child);
+			m_pObjects->erase(it);
+			fFound = true;
+			break;
+		}
+	}
+
+	CBM((fFound), "child not found");
+
+Error:
+	return r;
+}
+
+RESULT DimObj::RemoveLastChild() {
+	if (m_pObjects != nullptr && m_pObjects->size() > 0)
+		m_pObjects->pop_back();
+
 	return R_PASS;
+}
+
+RESULT DimObj::ClearChildren() {
+	if (m_pObjects != nullptr) {
+		m_pObjects->clear();
+	}
+
+	return R_PASS;
+}
+
+// Explicit for VirtualObj
+template <>
+std::shared_ptr<VirtualObj> DimObj::GetFirstChild<VirtualObj>() {
+	return m_pObjects->front();
 }
 
 bool DimObj::HasChildren() {
@@ -284,26 +396,79 @@ std::vector<std::shared_ptr<VirtualObj>> DimObj::GetChildren() {
 }
 
 // Intersections and Collision
-bool DimObj::Intersect(VirtualObj* pObj) {
+bool DimObj::Intersect(VirtualObj* pObj, int depth) {
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
 
+	/*
 	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
 		return false;
 	}
 	else {
 		return GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get());
 	}
+	//*/
+
+	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
+		return false;
+	}
+	else {
+		if (GetBoundingVolume()->Intersect(pDimObj->GetBoundingVolume().get())) {
+			if (HasChildren()) {
+				for (auto &pChild : GetChildren()) {
+					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
+
+					// Bounding Volume is oriented correctly using the DimObj overloads
+					if (pDimChild->Intersect(pObj, (depth + 1))) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+			else {
+				return true;
+			}
+		}
+	}
+
+	return false;
 }
 
-CollisionManifold DimObj::Collide(VirtualObj* pObj) {
+CollisionManifold DimObj::Collide(VirtualObj* pObj, int depth) {
 	DimObj *pDimObj = dynamic_cast<DimObj*>(pObj);
 
+	/*
 	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
 		return CollisionManifold(this, pObj);
 	}
 	else {
 		return GetBoundingVolume()->Collide(pDimObj->GetBoundingVolume().get());
 	}
+	//*/
+
+	if (pDimObj == nullptr || pDimObj->GetBoundingVolume() == nullptr || GetBoundingVolume() == nullptr) {
+		return CollisionManifold(this, pObj);
+	}
+	else {
+		if (Intersect(pObj)) {
+			if (HasChildren()) {
+				for (auto &pChild : GetChildren()) {
+					DimObj *pDimChild = (std::dynamic_pointer_cast<DimObj>(pChild)).get();
+
+					if (pDimChild->Intersect(pObj)) {
+						return pDimChild->Collide(pObj, (depth + 1));
+					}
+				}
+
+				return CollisionManifold(this, pObj);
+			}
+			else {
+				return GetBoundingVolume()->Collide(pDimObj->GetBoundingVolume().get());
+			}
+		}
+	}
+
+	return CollisionManifold(this, pObj);
 }
 
 bool DimObj::Intersect(const ray &rCast, int depth) {
@@ -378,8 +543,10 @@ point DimObj::GetPosition(bool fAbsolute) {
 quaternion DimObj::GetOrientation(bool fAbsolute) {
 	quaternion qOrientation = m_objectState.m_qRotation;
 
-	if (fAbsolute && m_pParent != nullptr)
-		qOrientation *= m_pParent->GetOrientation(fAbsolute);
+	if (fAbsolute && m_pParent != nullptr) {
+		//qOrientation *= m_pParent->GetOrientation(fAbsolute);
+		qOrientation = m_pParent->GetOrientation(fAbsolute) * qOrientation;
+	}
 
 	return qOrientation;
 }
@@ -610,9 +777,34 @@ RESULT DimObj::Notify(TimeEvent *event) {
 	return R_PASS;
 }
 
-// TODO: This shoudln't be baked in here ultimately
+// TODO: This shouldn't be baked in here ultimately
 material* DimObj::GetMaterial() {
 	return (&m_material);
+}
+
+RESULT DimObj::SetMaterial(material mMaterial) {
+	m_material = mMaterial;
+	return R_PASS;
+}
+
+matrix<virtual_precision, 4, 4> DimObj::GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_pParent != nullptr) {
+		auto modelMatrix = VirtualObj::GetRotationMatrix(childMat);
+		return m_pParent->GetRotationMatrix(modelMatrix);
+	}
+	else {
+		return VirtualObj::GetRotationMatrix(childMat);
+	}
+}
+
+matrix<virtual_precision, 4, 4> DimObj::GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_pParent != nullptr) {
+		auto modelMatrix = VirtualObj::GetTranslationMatrix(childMat);
+		return m_pParent->GetTranslationMatrix(modelMatrix);
+	}
+	else {
+		return VirtualObj::GetTranslationMatrix(childMat);
+	}
 }
 
 matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision, 4, 4> childMat) {
@@ -623,6 +815,10 @@ matrix<virtual_precision, 4, 4> DimObj::GetModelMatrix(matrix<virtual_precision,
 	else {
 		return VirtualObj::GetModelMatrix(childMat);
 	}
+}
+
+matrix<virtual_precision, 4, 4> DimObj::GetRelativeModelMatrix() {
+	return VirtualObj::GetModelMatrix();
 }
 
 // Bounding Box
@@ -710,6 +906,20 @@ RESULT DimObj::InitializeBoundingSphere() {
 	CN(m_pBoundingVolume);
 
 	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::SPHERE);
+
+	CR(UpdateBoundingVolume());
+
+Error:
+	return r;
+}
+
+RESULT DimObj::InitializeBoundingQuad() {
+	RESULT r = R_PASS;
+
+	m_pBoundingVolume = std::shared_ptr<BoundingQuad>(new BoundingQuad(this));
+	CN(m_pBoundingVolume);
+
+	m_objectState.SetMassDistributionType(ObjectState::MassDistributionType::QUAD);
 
 	CR(UpdateBoundingVolume());
 

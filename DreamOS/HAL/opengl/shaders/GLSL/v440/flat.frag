@@ -5,7 +5,7 @@ in Data {
 	vec2 uvCoord;
 } DataIn;
 
-uniform	int u_hasTexture;
+uniform	bool u_hasColorTexture;
 uniform sampler2D u_textureColor;
 
 uniform bool u_fDistanceMap;
@@ -16,20 +16,23 @@ layout (location = 0) out vec4 out_vec4Color;
 
 vec4 g_ambient = vec4(0.1);
 
+float bufferValue = 0.5f;
+float gammaValue = 0.0125f;
+
 void main(void) {  
-	vec4 textureColor = texture(u_textureColor, DataIn.uvCoord * 1.0f);
-	if (u_hasTexture == 1) {
-		out_vec4Color = textureColor;
+	
+	// Distance mapping
+	if (u_fDistanceMap == true) {
+		float dist = texture(u_textureColor, DataIn.uvCoord * 1.0f).a;
+		float alpha = smoothstep(bufferValue - gammaValue, bufferValue + gammaValue, dist);
+		out_vec4Color = vec4(out_vec4Color.rgb, alpha * (out_vec4Color.a / u_buffer));
 	}
 	else {
-		out_vec4Color = DataIn.color;
-	}
-
-	// Distance mapping
-
-	if (u_fDistanceMap) {
-		float dist = texture(u_textureColor, DataIn.uvCoord * 1.0f).a;
-		float alpha = smoothstep(u_buffer - u_gamma, u_buffer + u_gamma, dist);
-		out_vec4Color = vec4(out_vec4Color.rgb, alpha * out_vec4Color.a/u_buffer);
+		if (u_hasColorTexture) {
+			out_vec4Color = texture(u_textureColor, DataIn.uvCoord * 1.0f);
+		}
+		else {
+			out_vec4Color = DataIn.color;
+		}
 	}
 }

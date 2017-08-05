@@ -40,7 +40,7 @@ public:
 	static DreamConsole* GetConsole()
 	{
 		static DreamConsole console;
-		console.Init();
+		console.Initialize();
 		return &console;
 	}
 
@@ -60,9 +60,10 @@ public:
 	const Configuration& GetConfiguration();
 
 public:
-	void Init();
+	RESULT Initialize();
 
 	bool IsInForeground();
+	RESULT SetInForeground(bool fInForeground);
 
 	void OnFrameRendered();
 
@@ -74,7 +75,7 @@ public:
 
 	const std::deque<std::string>& GetConsoleText();
 
-	void ForEach(std::function<bool(const std::string)> pred);
+	void ForEach(std::function<bool(const std::string)> fnPred);
 
 	const std::string& GetCmdText();
 	unsigned int GetCmtTextCursorPos();
@@ -93,11 +94,11 @@ private:
 	void TextCursorMoveForward();
 
 private:
-	bool m_isInit = false;
+	bool m_fInitialized = false;
 
 	// when DreamConsole is in foreground, it is to be displayed as an overlay
 	// and capture key input for the console command.
-	bool m_isInForeground = false;
+	bool m_fInForeground = false;
 
 	TickCounter	m_ticker;
 	FPSGraph_t m_FPSGraph{ 3.0 };
@@ -105,7 +106,7 @@ private:
 	std::deque<std::string>	m_ConsoleText;
 	const unsigned int console_max_lines = 200;
 
-	long long	m_lineCnt = 0;
+	long long m_lineCnt = 0;
 
 	std::mutex m_mutex;
 	std::string	m_cmdText;

@@ -1,6 +1,6 @@
 #include "AnimationQueue.h"
 #include "AnimationItem.h"
-#include "Primitives/VirtualObj.h"
+#include "Primitives/DimObj.h"
 #include "DreamConsole/DreamConsole.h"
 
 AnimationQueue::AnimationQueue() {
@@ -23,6 +23,7 @@ RESULT AnimationQueue::Update(double sNow) {
 
 		AnimationState state;
 		state.vScale = vector(1.0f, 1.0f, 1.0f);
+		bool fShouldAnimateColor = (*pItem)->ShouldAnimateColor();
 
 		do {
 			(*pItem)->Update(pObj, state, sNow);
@@ -33,38 +34,60 @@ RESULT AnimationQueue::Update(double sNow) {
 					(*pItem)->GetAnimationEndedCallback()((*pItem)->GetCallbackContext());
 				}
 				pQueue.pop_front();
-				continue;
+				
+				break;
 			}
 		} while ((*pItem)->GetFlags().fNoBlock && ++pItem != pQueue.end());
 
-		state.Apply(pObj);
+
+		//TODO: hack to avoid color issues
+		//state.Apply(pObj);
+		state.ApplyTransform(pObj);
+		if (fShouldAnimateColor) {
+			state.ApplyColor(pObj);
+		}
 	}
 //Error:
 	return r;
 }
 
-RESULT AnimationQueue::PushAnimationItem(VirtualObj *pObj, AnimationState endState, double startTime, double duration, AnimationCurveType curve, AnimationFlags flags, std::function<RESULT(void*)> endCallback, void* callbackContext) {
+RESULT AnimationQueue::PushAnimationItem(
+	DimObj *pObj, 
+	AnimationState endState, 
+	double startTime, 
+	double duration, 
+	AnimationCurveType curve, 
+	AnimationFlags flags, 
+	std::function<RESULT(void*)> fnStartCallback, 
+	std::function<RESULT(void*)> fnEndCallback, 
+	void* pCallbackContext) {
+
 	RESULT r = R_PASS;
 
 	AnimationState startState;
 	startState.ptPosition = pObj->GetOrigin();
 	startState.qRotation = pObj->GetOrientation();
 	startState.vScale = pObj->GetScale();
+	startState.cColor = pObj->GetMaterial()->GetDiffuseColor();
 
 	std::shared_ptr<AnimationItem> pItem = std::make_shared<AnimationItem>(startState, endState, startTime, duration);
 
 	pItem->SetFlags(flags);
 	pItem->SetCurveType(curve);
-	pItem->SetAnimationEndedCallback(endCallback);
-	pItem->SetCallbackContext(callbackContext);
+	pItem->SetAnimationStartCallback(fnStartCallback);
+	pItem->SetAnimationEndedCallback(fnEndCallback);
+	pItem->SetCallbackContext(pCallbackContext);
 
 	m_objectQueue[pObj].push_back(pItem);
 
-//Error:
+	CNR(fnStartCallback, R_PASS);
+	CR(fnStartCallback(pCallbackContext));
+
+Error:
 	return r;
 }
 
-RESULT AnimationQueue::CancelAnimation(VirtualObj *pObj, double startTime) {
+RESULT AnimationQueue::CancelAnimation(DimObj *pObj, double startTime) {
 	RESULT r = R_PASS;
 	
 	auto& qObj = m_objectQueue[pObj];
@@ -75,4 +98,18 @@ RESULT AnimationQueue::CancelAnimation(VirtualObj *pObj, double startTime) {
 	qObj.push_front(pNewItem);
 
 	return r;
+}
+
+RESULT AnimationQueue::RemoveAnimationObject(DimObj *pObj) {
+	m_objectQueue[pObj] = std::deque<std::shared_ptr<AnimationItem>>();
+	return R_PASS;
+}
+
+bool AnimationQueue::IsAnimating(DimObj *pObj) {
+	return m_objectQueue.count(pObj) > 0 && m_objectQueue[pObj].size() > 0;
+}
+
+RESULT AnimationQueue::RemoveAllObjects() {
+	m_objectQueue.clear();
+	return R_PASS;
 }

@@ -6,6 +6,10 @@
 #include <sstream>
 #include <string>
 
+#include "Cloud/WebRequest.h"
+#include "Cloud/WebRequestPostData.h"
+#include "Cloud/WebRequestPostDataElement.h"
+
 CEFBrowserController::CEFBrowserController(CefRefPtr<CefBrowser> pCEFBrowser) :
 	m_pCEFBrowser(pCEFBrowser)
 {
@@ -101,6 +105,96 @@ RESULT CEFBrowserController::LoadURL(const std::string& url) {
 	CN(m_pCEFBrowser);
 
 	m_pCEFBrowser->GetFocusedFrame()->LoadURL(url);
+
+Error:
+	return r;
+}
+
+CefRefPtr<CefPostData> CEFBrowserController::MakeCEFRequestPostData(std::shared_ptr<WebRequestPostData> pWebRequestPostData) {
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefPostData> pCEFPostData = CefPostData::Create();
+	CN(pCEFPostData);
+	CN(pWebRequestPostData);
+	
+	for (auto &pElement : pWebRequestPostData->GetElements()) {
+		CefRefPtr<CefPostDataElement> pCEFPostDataElement = CefPostDataElement::Create();
+		CN(pCEFPostDataElement);
+
+		pCEFPostDataElement->SetToBytes(pElement->GetValue().size(), pElement->GetValue().c_str());
+		
+		CB(pCEFPostData->AddElement(pCEFPostDataElement));
+	}
+
+	return pCEFPostData;
+Error:
+
+	if (pCEFPostData != nullptr) {
+		pCEFPostData = nullptr;
+	}
+
+	return nullptr;
+}
+
+CefRefPtr<CefRequest> CEFBrowserController::MakeCEFRequest(const WebRequest &webRequest) {
+	RESULT r = R_PASS;
+
+	CefRefPtr<CefRequest> pCEFRequest = CefRequest::Create();
+	CN(pCEFRequest);
+	
+	{
+		// URL
+		pCEFRequest->SetURL((CefString)(static_cast<WebRequest>(webRequest).GetURL().c_str()));
+
+		// Method
+		pCEFRequest->SetMethod((CefString)(static_cast<WebRequest>(webRequest).GetRequestMethodString().c_str()));
+
+		// Headers
+		// TODO: Might be a more bettarz way to code this
+		std::multimap<std::wstring, std::wstring> requestHeasders = static_cast<WebRequest>(webRequest).GetRequestHeaders();
+
+		if (requestHeasders.size() > 0) {
+			CefRequest::HeaderMap cefHeaderMap;
+			
+			for (auto& header: requestHeasders) {
+				cefHeaderMap.insert(header);
+			}
+
+			pCEFRequest->SetHeaderMap(cefHeaderMap);
+		}
+
+		// Post Data
+		std::shared_ptr<WebRequestPostData> pWebRequestPostData = static_cast<WebRequest>(webRequest).GetPostData();
+		if (pWebRequestPostData != nullptr) {
+			CefRefPtr<CefPostData> pCEFPostData = MakeCEFRequestPostData(pWebRequestPostData);
+			CN(pCEFPostData);
+
+			pCEFRequest->SetPostData(pCEFPostData);
+		}
+	}
+
+	return pCEFRequest;
+
+Error:
+	if (pCEFRequest != nullptr) {
+		pCEFRequest = nullptr;
+	}
+
+	return nullptr;
+}
+
+RESULT CEFBrowserController::LoadRequest(const WebRequest &webRequest) {
+	RESULT r = R_PASS;
+
+	CN(m_pCEFBrowser);
+
+	{
+		CefRefPtr<CefRequest> pCEFRequest = MakeCEFRequest(webRequest);
+		CN(pCEFRequest);
+
+		pCEFRequest->SetFlags(UR_FLAG_NO_DOWNLOAD_DATA);
+		m_pCEFBrowser->GetFocusedFrame()->LoadRequest(pCEFRequest);
+	}
 
 Error:
 	return r;
@@ -247,6 +341,41 @@ RESULT CEFBrowserController::OnPaint(CefRenderHandler::PaintElementType type, co
 	m_NewDirtyFrames.insert(m_NewDirtyFrames.end(), dirtyRects.begin(), dirtyRects.end());
 
 //Error:
+	return r;
+}
+
+RESULT CEFBrowserController::OnLoadingStateChanged(bool fLoading, bool fCanGoBack, bool fCanGoForward) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadingStateChange(fLoading, fCanGoBack, fCanGoForward));
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::OnLoadStart(CefRefPtr<CefFrame> pCEFFrame, CefLoadHandler::TransitionType transition_type) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+
+	// TODO: Add transition type
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadStart());
+
+Error:
+	return r;
+}
+
+RESULT CEFBrowserController::OnLoadEnd(CefRefPtr<CefFrame> pCEFFrame, int httpStatusCode) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFBrowserManager: OnLoadEnd");
+
+	CN(m_pWebBrowserControllerObserver);
+	CR(m_pWebBrowserControllerObserver->OnLoadEnd(httpStatusCode));
+
+Error:
 	return r;
 }
 

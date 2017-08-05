@@ -10,10 +10,9 @@
 #include "OpenGLCommon.h"
 #include "Primitives/Framebuffer.h"
 
-#include "OGLDepthbuffer.h"
-
 class OpenGLImp;
 class OGLTexture;
+class OGLAttachment;
 
 #define NUM_OGL_DRAW_BUFFERS 1
 
@@ -22,64 +21,62 @@ public:
 
 	OGLFramebuffer(OpenGLImp *pParentImp);
 	OGLFramebuffer(OpenGLImp *pParentImp, int width, int height, int channels);
-	OGLFramebuffer(OpenGLImp *pParentImp, GLuint textureID, int width, int height, int channels);
 
 	~OGLFramebuffer();
 
-	
+	virtual texture *GetColorTexture() override;
+
 	// TODO: Consolidate - there's a conflict with the texture swap chain stuff and this, so the code paths are different 
 	RESULT OGLInitialize(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT);
-	RESULT BindOGLFramebuffer();
-	RESULT BindOGLDepthBuffer();
-	RESULT UnbindOGLFramebuffer();
+	
+	RESULT Bind();
 	RESULT Unbind();
+	RESULT UnbindAttachments();
 
-	RESULT AttachOGLTexture(GLuint textureIndex);
-	RESULT AttachOGLDepthbuffer();
+	//RESULT SetAndClearViewport(bool fColor = true, bool fDepth = true);
+	RESULT SetAndClearViewport(bool fColor = true, bool fDepth = true, bool fBind = false);
+	RESULT BindToScreen(int pxWidth, int pxHeight);
 
-	RESULT SetOGLTextureToFramebuffer(GLenum target, GLenum attachment);
+	// TODO: These should not be directly used 
 	RESULT SetOGLTextureToFramebuffer2D(GLenum target, GLenum attachment, GLenum textarget);
-	RESULT SetOGLDepthbufferTextureToFramebuffer(GLenum target, GLenum attachment);
 	RESULT SetDepthTexture(int textureNumber);
+	
+	RESULT InitializeOGLDrawBuffers(int numDrawBuffers);
 
-	GLuint GetOGLDepthbufferIndex();
-	RESULT MakeOGLTexture();
-	OGLTexture *GetOGLTexture();
-	RESULT MakeOGLTextureMultisample();
-	RESULT SetOGLTexture(GLuint textureIndex = NULL);
-	RESULT SetOGLDrawBuffers(int numDrawBuffers);
-	RESULT SetOGLDepthbuffer(OGLDepthbuffer *pOGLDepthbuffer);
-	RESULT MakeOGLDepthbuffer();
+	RESULT MakeDepthAttachment();
+	RESULT MakeColorAttachment();
+	RESULT DeleteColorAttachment();
+	RESULT DeleteDepthAttachment();
 
-	GLuint GetOGLTextureIndex();
+	OGLAttachment* GetDepthAttachment() { return m_pOGLDepthAttachment; }
+	OGLAttachment* GetColorAttachment() { return m_pOGLColorAttachment; }
 
-	RESULT SetAndClearViewport();
+	// TODO: 
+	RESULT InitializeColorAttachment(OGLTexture *pOGLTexture);
+	RESULT InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth);
+
+	RESULT Resize(int pxWidth, int pxHeight, GLenum internalDepthFormat = GL_DEPTH_COMPONENT16, GLenum typeDepth = GL_FLOAT);
 
 	GLuint GetFramebufferIndex();
 
-	RESULT SetAndClearViewportDepthBuffer();
-	RESULT BindToScreen(int pxWidth, int pxHeight);
-
-	RESULT InitializeDepthBuffer(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT);
-	RESULT InitializeRenderBuffer(GLenum internalDepthFormat, GLenum typeDepth);
-	RESULT InitializeRenderBufferMultisample(GLenum internalDepthFormat = GL_DEPTH_COMPONENT24, GLenum typeDepth = GL_UNSIGNED_INT, int multisample = 4);
-
-public:
-	texture *GetTexture();
+	RESULT SetSampleCount(int samples) { m_samples = samples; return R_PASS; }
+	int GetSampleCount() { return m_samples; }
 
 private:
 	OpenGLImp *m_pParentImp;
 
-	//GLenum m_drawBuffers[NUM_OGL_DRAW_BUFFERS];
 	GLenum *m_pDrawBuffers;
 	int m_pDrawBuffers_n;
 	
 	GLuint m_framebufferIndex;
-	GLuint m_renderbufferIndex;
 
-	OGLDepthbuffer *m_pOGLDepthbuffer;
+	OGLAttachment* m_pOGLDepthAttachment = nullptr;
+	OGLAttachment* m_pOGLColorAttachment = nullptr;
+	
+	// TODO: Stencil attachments 
 
-	OGLTexture *m_pOGLTexture;
+private:
+	int m_samples = 1;
 };
 
 #endif // ! OGL_FRAMEBUFFER_H_

@@ -32,7 +32,7 @@ class HTTPControllerProxy : public ControllerProxy {
 public:
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) = 0;
 	//virtual RESULT RequestFile(std::string strURI, HTTPResponseFileCallback fnResponseFileCallback) = 0;
-	virtual RESULT RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback) = 0;
+	virtual RESULT RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback, void *pContext = nullptr) = 0;
 };
 
 
@@ -65,7 +65,7 @@ public:
 
 	// FILE DOWNLOAD
 	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse* pHTTPResponse = nullptr);
-	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseFileCallback fnResponseFileCallback);
+	RESULT AFILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponseFileCallback fnResponseFileCallback, void *pContext = nullptr);
 	//RESULT FILE(const std::string& strURI, const std::vector<std::string>& strHeaders, const std::string& strBody, const std::wstring &strDestinationPath, HTTPResponse& httpResponse);
 
 	static const std::vector<std::string> ContentHttp() {
@@ -85,7 +85,7 @@ public:
 
 	virtual RESULT RequestFile(std::string strURI, std::wstring strDestinationPath) override;
 	//virtual RESULT RequestFile(std::string strURI, HTTPResponseFileCallback fnResponseFileCallback) override;
-	virtual RESULT RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback) override;
+	virtual RESULT RequestFile(std::string strURI, std::vector<std::string> strHeaders, std::string strBody, HTTPResponseFileCallback fnResponseFileCallback, void *pContext = nullptr) override;
 
 private:
 	// CURL Callbacks

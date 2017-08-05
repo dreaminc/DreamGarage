@@ -40,8 +40,23 @@ RESULT ObjectStore::Reset() {
 	return m_pSceneGraphStore->ResetIterator();
 }
 
-RESULT ObjectStore::PushObject(VirtualObj *pObject) {
-	return m_pSceneGraphStore->PushObject(pObject);
+RESULT ObjectStore::PushObject(VirtualObj *pObject, bool fForce) {
+	RESULT r = R_PASS;
+
+	// Skip if already in store
+
+	// Force will skip this allowing for duplicates or however the object store imp
+	// handles duplicates 
+
+	if (fForce == false) {
+		CBR((m_pSceneGraphStore->FindObject(pObject) == nullptr), R_SKIPPED);
+	}
+
+	// Push otherwise
+	CR(m_pSceneGraphStore->PushObject(pObject));
+
+Error:
+	return r;
 }
 
 RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
@@ -52,6 +67,10 @@ RESULT ObjectStore::RemoveObject(VirtualObj *pObject) {
 
 Error:
 	return r;
+}
+
+VirtualObj* ObjectStore::FindObject(VirtualObj *pObject) {
+	return m_pSceneGraphStore->FindObject(pObject);
 }
 
 RESULT ObjectStore::RemoveAllObjects() {

@@ -22,6 +22,7 @@ typedef enum SenseMouseEventType {
 	SENSE_MOUSE_WHEEL,
 	SENSE_MOUSE_MOVE,
 	SENSE_MOUSE_LEFT_DRAG_MOVE,
+	SENSE_MOUSE_MIDDLE_DRAG_MOVE,
 	SENSE_MOUSE_RIGHT_DRAG_MOVE,
 	SENSE_MOUSE_INVALID
 } SENSE_MOUSE_EVENT_TYPE;
@@ -50,6 +51,16 @@ typedef struct SenseMouseEvent : SenseDevice::SenseDeviceEvent {
 } SENSE_MOUSE_EVENT;
 
 class SenseMouse : public SenseDevice, public Publisher<SenseMouseEventType, SenseMouseEvent> {
+public:
+	// Mouse dragging states
+	enum class MouseDragState : uint8_t {
+		NONE		= 0,
+		LEFT		= 1 << 0,
+		MIDDLE		= 1 << 1,
+		RIGHT		= 1 << 2,
+		INVALID		= 0xFF
+	};
+
 protected:
 	//uint8_t m_KeyStates[NUM_SENSE_KEYBOARD_KEYS];
 
@@ -61,15 +72,7 @@ protected:
 
 	bool m_fMouseCaptured;
 
-	// Mouse dragging states
-	enum class MouseDrag { 
-		LEFT_BUTTON, 
-		RIGHT_BUTTON, 
-		MIDDLE_BUTTON,
-		NONE 
-	};
-
-	MouseDrag m_dragState = MouseDrag::NONE;
+	MouseDragState m_dragState = MouseDragState::NONE;
 	int m_dragOriginX = 0;
 	int m_dragOriginY = 0;
 
@@ -89,9 +92,7 @@ public:
 	~SenseMouse();
 
 	static const char* GetEventTypeName(SenseMouseEventType eventType);
-
 	static const char* GetEventTypeName(SenseMouseEvent event);
-
 	static const char* GetEventTypeName(SenseMouseEvent *pEvent);
 
 	static RESULT PrintEvent(SenseMouseEvent *pEvent);
@@ -127,5 +128,23 @@ public:
 	//virtual RESULT SetMousePosition(int x, int y) = 0;
 
 };
+
+inline constexpr SenseMouse::MouseDragState operator | (const SenseMouse::MouseDragState &lhs, const SenseMouse::MouseDragState &rhs) {
+	return static_cast<SenseMouse::MouseDragState>(
+		static_cast<std::underlying_type<SenseMouse::MouseDragState>::type>(lhs) | static_cast<std::underlying_type<SenseMouse::MouseDragState>::type>(rhs)
+	);
+}
+
+inline constexpr SenseMouse::MouseDragState operator & (const SenseMouse::MouseDragState &lhs, const SenseMouse::MouseDragState &rhs) {
+	return static_cast<SenseMouse::MouseDragState>(
+		static_cast<std::underlying_type<SenseMouse::MouseDragState>::type>(lhs) & static_cast<std::underlying_type<SenseMouse::MouseDragState>::type>(rhs)
+	);
+}
+
+inline constexpr SenseMouse::MouseDragState operator ~ (const SenseMouse::MouseDragState &arg) {
+	return static_cast<SenseMouse::MouseDragState>(
+		~static_cast<std::underlying_type<SenseMouse::MouseDragState>::type>(arg)
+	);
+}
 
 #endif // ! SENSE_MOUSE_H_

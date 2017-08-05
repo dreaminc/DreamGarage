@@ -1,5 +1,7 @@
 #include "VirtualObj.h"
 
+#include "ray.h"
+
 VirtualObj::VirtualObj() :
 	m_objectState(this),
 	m_objectDerivative(),
@@ -111,6 +113,12 @@ VirtualObj* VirtualObj::SetPosition(point p) {
 	return this;
 }
 
+VirtualObj* VirtualObj::SetPosition(point_precision x, point_precision y, point_precision z) {
+	m_objectState.m_ptOrigin = point(x, y, z);
+	OnManipulation();
+	return this;
+}
+
 VirtualObj* VirtualObj::MoveTo(point p) {
 	m_objectState.m_ptOrigin = p;
 	OnManipulation();
@@ -192,6 +200,11 @@ VirtualObj* VirtualObj::SetVelocity(matrix <point_precision, 4, 1> vVelocity) {
 VirtualObj* VirtualObj::SetVelocity(point_precision x, point_precision y, point_precision z) {
 	m_objectState.SetVelocity(vector(x, y, z));
 	return this;
+}
+
+ray VirtualObj::GetRay(bool fAbsolute) {
+	vector vDirection = vector::jVector(1.0f).RotateByQuaternion(GetOrientation(fAbsolute));
+	return ray(GetOrigin(fAbsolute), vDirection);
 }
 
 /*
@@ -487,3 +500,17 @@ matrix<virtual_precision, 4, 4> VirtualObj::GetModelMatrix(matrix<virtual_precis
 		return (TranslationMatrix(m_objectState.m_ptOrigin, m_ptPivot) * RotationMatrix(m_objectState.m_qRotation) * ScalingMatrix(m_vScale) * childMat);
 	}
 }
+
+matrix<virtual_precision, 4, 4> VirtualObj::GetRotationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	return RotationMatrix(m_objectState.m_qRotation);
+}
+
+matrix<virtual_precision, 4, 4> VirtualObj::GetTranslationMatrix(matrix<virtual_precision, 4, 4> childMat) {
+	if (m_ptPivot.IsZero()) {
+		return TranslationMatrix(m_objectState.m_ptOrigin);
+	}
+	else {
+		return TranslationMatrix(m_objectState.m_ptOrigin, m_ptPivot);
+	}
+}
+

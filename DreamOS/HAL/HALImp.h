@@ -31,20 +31,39 @@
 #include "Primitives/user.h"
 #include "Primitives/DimRay.h"
 
+#include "Pipeline/Pipeline.h"
+
 class SandboxApp;
 
-class HALImp : 
-	//public Subscriber<SenseMouseEvent>, 
-	public valid 
+#include "Primitives/viewport.h"
+
+class SinkNode;
+class SourceNode;
+class ProgramNode;
+
+class UIKeyboardLayout;
+
+class FlatProgram;	// This one is special for render to texture
+
+class HALImp : public valid 
 {
 	friend class SandboxApp;
+
 public:
 	struct HALConfiguration {
 		unsigned fRenderReferenceGeometry : 1;
+		unsigned fDrawWireframe : 1;
+		unsigned fRenderProfiler : 1;
 	};
 
-private:
+protected:
 	HALConfiguration m_HALConfiguration;
+
+public:
+	RESULT SetDrawWireframe(bool fDrawWireframe);
+	bool IsDrawWireframe();
+	RESULT SetRenderProfiler(bool fRenderProfiler);
+	bool IsRenderProfiler();
 
 public:
 	HALImp();
@@ -54,29 +73,89 @@ public:
 	const HALImp::HALConfiguration& GetHALConfiguration();
 
 public:
-	camera *GetCamera();
+	stereocamera* GetCamera();
+	RESULT SetCamera(stereocamera* pCamera);
+
 	RESULT SetCameraOrientation(quaternion qOrientation);
 	RESULT SetCameraPositionDeviation(vector vDeviation);
 
 	RESULT SetHMD(HMD *pHMD);
+
+	RESULT SetViewport(const viewport &newViewport);
+	RESULT SetViewport(int pxWidth, int pxHeight);
+	const viewport& GetViewport();
+
+public:
+	RESULT InitializeRenderPipeline();
+	Pipeline* GetRenderPipelineHandle() {
+		return m_pRenderPipeline.get();
+	}
+	
+	virtual SinkNode* MakeSinkNode(std::string strSinkNodeName) = 0;
+	virtual SourceNode* MakeSourceNode(std::string strNodeName) = 0;
+	virtual ProgramNode* MakeProgramNode(std::string strNodeName) = 0;
+
 public:
 
-	virtual RESULT Resize(int pxWidth, int pxHeight) = 0;
+	virtual RESULT Resize(viewport newViewport) = 0;
 	virtual RESULT MakeCurrentContext() = 0;
+	virtual RESULT ReleaseCurrentContext() = 0;
 
-	virtual RESULT Render(ObjectStore* pSceneGraph, ObjectStore* pFlatSceneGraph, EYE_TYPE eye) = 0;
-	virtual RESULT RenderToTexture(FlatContext* pContext) = 0;
+	FlatProgram* GetFlatProgram();
+	virtual RESULT RenderToTexture(FlatContext* pContext, stereocamera* pCamera);
+	virtual RESULT RenderToTexture(FlatContext* pContext);
 
 	virtual RESULT Shutdown() = 0;
 
+	virtual RESULT SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) = 0;
+
+	virtual RESULT InitializeHAL() = 0;
+	virtual RESULT ClearHALBuffers() = 0;
+	virtual RESULT ConfigureHAL() = 0;
+	virtual RESULT FlushHALBuffers() = 0;
+
+private:
+	RESULT Render();
+
 protected:
 	RESULT SetRenderReferenceGeometry(bool fRenderReferenceGeometry);
-	bool IsRenderReferenceGeometry();
 
 public:
+	bool IsRenderReferenceGeometry();
+
+private:
+	template <typename objType>
+	class HelperFactory {
+		friend class HALImp;
+
+	protected:
+		HelperFactory(HALImp *pImp) : m_pImp(pImp) {
+			//empty 
+		}
+
+		template<typename... Targs>
+		objType *TMakeObject(Targs... Fargs);
+
+		HALImp *m_pImp = nullptr;
+	};
+
+public:
+	template<typename objType, typename... Targs>
+	objType* TMakeObject(Targs... Fargs) {
+		HelperFactory<objType> helperFactory(this);
+
+		objType *pObj = helperFactory.TMakeObject(Fargs...);
+
+		return pObj;
+	}
+
+	// TODO: Remove and use param pack fn
 	virtual light* MakeLight(LIGHT_TYPE type, light_precision intensity, point ptOrigin, color colorDiffuse, color colorSpecular, vector vectorDirection) = 0;
+
 	virtual quad* MakeQuad(double width, double height, int numHorizontalDivisions = 1, int numVerticalDivisions = 1, texture *pTextureHeight = nullptr, vector vNormal = vector::jVector()) = 0;
 	virtual quad* MakeQuad(double width, double height, point origin, vector vNormal = vector::jVector()) = 0;
+	virtual quad* MakeQuad(double width, double height, point origin, uvcoord uvTopLeft, uvcoord uvBottomRight, vector vNormal = vector::jVector()) = 0;
+	virtual quad* MakeQuad(float width, float height, int numHorizontalDivisions, int numVerticalDivisions, uvcoord uvTopLeft, uvcoord uvBottomRight, quad::CurveType curveType = quad::CurveType::FLAT, vector vNormal = vector::jVector()) = 0;
 
 	virtual sphere* MakeSphere(float radius = 1.0f, int numAngularDivisions = 3, int numVerticalDivisions = 3, color c = color(COLOR_WHITE)) = 0;
 	virtual cylinder* MakeCylinder(double radius, double height, int numAngularDivisions, int numVerticalDivisions) = 0;
@@ -84,13 +163,20 @@ public:
 	
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) = 0;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;
+	
+	
 
-	virtual text* MakeText(const std::wstring& fontName, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
-	virtual text* MakeText(std::shared_ptr<Font> pFont, const std::string& content, double size = 1.0f, bool fDistanceMap = false, bool isBillboard = false) = 0;
+	virtual text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE) = 0;
+	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE) = 0;
+	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE) = 0;
+	virtual text* MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
+	virtual text* MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
+	virtual text* MakeText(const std::wstring& wstrFontName, const std::string& strContent, double width = 1.0f, double height = 1.0f, bool fDistanceMap = false, bool fBillboard = false) = 0;
 
 	virtual texture* MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) = 0;
 	virtual texture* MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) = 0;
 	virtual texture *MakeTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n, texture::TEXTURE_TYPE type) = 0;
+	virtual texture* MakeTexture(const texture &srcTexture) = 0;
 
 	virtual skybox *MakeSkybox() = 0;
 	virtual model *MakeModel(wchar_t *pszModelName) = 0;
@@ -103,20 +189,73 @@ public:
 
 	virtual user *MakeUser() = 0;
 
+
+	// Composite
+	//template<typename... Targs>
+	composite* TMakeObject() {
+		return MakeComposite();
+	}
+
 	virtual composite *MakeComposite() = 0;
-	virtual FlatContext* MakeFlatContext(int width, int height, int channels) = 0;
+
+	virtual FlatContext* MakeFlatContext(int pxFBWidth, int pxFBHeight, int channels) = 0;
+
 	virtual hand* MakeHand() = 0;
 
 	/*
 	virtual model* MakeModel(const std::vector<vertex>& vertices) = 0;
 	*/
 
-protected:
-	stereocamera *m_pCamera;
+protected:	
 	HMD *m_pHMD;
+	stereocamera* m_pCamera = nullptr;
+	viewport m_viewport;
+
+protected:
+	std::unique_ptr<Pipeline> m_pRenderPipeline = nullptr;
+	
+	// This is used to render to texture
+	ProgramNode* m_pFlatProgram = nullptr;
+
+	bool m_fCurrentContext = false;
 
 private:
 	UID m_uid;
 };
+
+
+template<>
+template<typename... Targs>
+quad* HALImp::HelperFactory<quad>::TMakeObject(Targs... Fargs) {
+	return m_pImp->MakeQuad(Fargs...);
+}
+
+template<>
+template<typename... Targs>
+FlatContext* HALImp::HelperFactory<FlatContext>::TMakeObject(Targs... Fargs) {
+	return m_pImp->MakeFlatContext(Fargs...);
+}
+
+// TODO: a lot of this logic should go into the implementation maybe?
+template<>
+template<typename... Targs>
+text* HALImp::HelperFactory<text>::TMakeObject(Targs... Fargs) {
+	RESULT r = R_PASS;
+
+	text *pText = m_pImp->MakeText(Fargs...);
+	if (pText != nullptr && pText->IsRenderToQuad()) {
+		CR(pText->RenderToQuad());
+	}
+
+	return pText;
+
+Error:
+	if (pText != nullptr) {
+		pText = nullptr;
+	}
+
+	return nullptr;
+}
+
 
 #endif // ! HAL_IMP_H_

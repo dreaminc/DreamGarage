@@ -28,6 +28,8 @@
 #include "OGLLightsBlock.h"
 #include "OGLMaterialBlock.h"
 
+#include "HAL/Pipeline/ProgramNode.h"
+
 class OpenGLImp;
 class OGLVertexAttribute;
 class OGLUniform;
@@ -35,10 +37,14 @@ class OGLFramebuffer;
 class OGLTexture;
 class ObjectStore;
 
-class OGLProgram {
+class OGLProgram : public ProgramNode {
 public:
-	OGLProgram(OpenGLImp *pParentImp);
+	OGLProgram(OpenGLImp *pParentImp, std::string strName = "oglprogram");
 	~OGLProgram();
+
+	// ProgramNode Interface
+	virtual RESULT SetupConnections() = 0;
+	virtual RESULT ProcessNode(long frameID = 0) override;
 
 	virtual RESULT OGLInitialize();
 	RESULT OGLInitialize(const wchar_t *pszVertexShaderFilename, const wchar_t *pszFragmentShaderFilename, version versionFile);
@@ -81,12 +87,12 @@ public:
 	virtual RESULT SetMaterial(material *pMaterial);
 	
 	RESULT SetCamera(camera *pCamera);
-	RESULT SetStereoCamera(stereocamera *pStereoCamera, EYE_TYPE eye);
+	RESULT SetStereoCamera(stereocamera* pStereoCamera, EYE_TYPE eye);
 
 	virtual RESULT SetObjectTextures(OGLObj *pOGLObj) = 0;
 	virtual RESULT SetObjectUniforms(DimObj *pDimObj) = 0;
 	virtual RESULT SetCameraUniforms(camera *pCamera) = 0;
-	virtual RESULT SetCameraUniforms(stereocamera *pStereoCamera, EYE_TYPE eye) = 0;
+	virtual RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye) = 0;
 	
 	// Shaders
 	RESULT CreateShader(GLenum type, GLuint *pShaderID);
@@ -123,14 +129,9 @@ public:
 
 	RESULT InitializeRenderToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 	RESULT InitializeDepthToTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
-	GLuint GetOGLDepthbufferIndex();
-	RESULT SetDepthTexture(int textureNumber);
-
-	// TODO: Is this the right way to do it?  It's better than feeding the texture directly in
-	// This may be better with an OGLProgram hierarchy - children/dependents etc
-	RESULT SetOGLProgramDepth(OGLProgram *pOGLProgramDepth);
-protected:
-	OGLProgram *m_pOGLProgramDepth;
+	
+	//GLuint GetOGLDepthbufferIndex();
+	//RESULT SetDepthTexture(int textureNumber);
 
 public:
 	OGLFramebuffer *GetOGLFramebuffer();
@@ -144,11 +145,26 @@ protected:
 	// OGL Framebuffer
 	// This can be used to render the program to a texture / framebuffer
 	OGLFramebuffer *m_pOGLFramebuffer;
-	OGLTexture *m_pOGLRenderTexture;
-	//RESULT BindToFrameBuffer();
+	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
 	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
-	RESULT InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
+
+	RESULT InitializeFrameBufferWithDepth(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int channels = 4);
+	
+	RESULT InitializeDepthFrameBuffer(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
 	RESULT InitializeDepthFrameBuffer(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight);
+	
+	RESULT UpdateFramebufferToViewport(OGLFramebuffer*&pOGLFramebuffer, GLenum internalDepthFormat = GL_DEPTH_COMPONENT16, GLenum typeDepth = GL_FLOAT, int channels = 4);
+	RESULT UpdateFramebufferToViewport(GLenum internalDepthFormat = GL_DEPTH_COMPONENT16, GLenum typeDepth = GL_FLOAT, int channels = 4);
+
+	RESULT UpdateFramebufferToCamera(OGLFramebuffer*&pOGLFramebuffer, camera *pCamera, GLenum internalDepthFormat = GL_DEPTH_COMPONENT16, GLenum typeDepth = GL_FLOAT, int channels = 4);
+	RESULT UpdateFramebufferToCamera(camera *pCamera, GLenum internalDepthFormat = GL_DEPTH_COMPONENT16, GLenum typeDepth = GL_FLOAT, int channels = 4);
+
+	// Render Texture
+	OGLTexture *m_pOGLRenderTexture;
+	RESULT InitializeRenderTexture(OGLTexture*&pOGLRenderTexture, GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
+	RESULT InitializeRenderTexture(GLenum internalDepthFormat, GLenum typeDepth, int pxWidth, int pxHeight, int channels);
 
 	// Shaders
 	OGLVertexShader *m_pVertexShader;

@@ -15,7 +15,7 @@
 // TODO: Should this go into Sense?
 
 #include "HMD/HMD.h"
-#include "HAL/opengl/OGLDepthbuffer.h"
+#include "HAL/opengl/OGLAttachment.h"
 
 #define DEFAULT_OPENVR_RENDER_CHANNELS 3
 #define DEFAULT_OPENVR_RESOLVE_CHANNELS 4
@@ -23,8 +23,6 @@
 
 #include <vector>
 #include <algorithm>
-
-#include "HAL/opengl/OGLFramebuffer.h"
 
 // TODO: Temp for testing
 #include "External/Matrices/Matrices.h"
@@ -37,31 +35,39 @@
 #define CIVRM(ivrr, msg, ...) do{ivrResult=(ivrr);if(ivrResult != vr::VRInitError_None){DEBUG_OUT(CurrentFileLine);DEBUG_OUT(msg, ##__VA_ARGS__);DEBUG_OUT("Error: %s\n",vr::VR_GetVRInitErrorAsEnglishDescription(ivrResult));goto Error;}}while(0);
 
 class OpenVRDevice : public HMD {
+	friend class OpenVRHMDSinkNode;
+
 public:
 	OpenVRDevice(SandboxApp *pParentSandbox);
 	~OpenVRDevice();
 
-	RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0);
-	RESULT UpdateHMD();
-	RESULT ReleaseHMD();
+	// TODO: Do this for vive
+	virtual HMDSinkNode *GetHMDSinkNode() override;
+	virtual HMDSourceNode *GetHMDSourceNode() override { return nullptr; }
+	virtual RESULT InitializeHMDSourceNode() override;
+	virtual RESULT InitializeHMDSinkNode() override;
 
-	RESULT SetUpFrame();
-	RESULT BindFramebuffer(EYE_TYPE eye);
-	RESULT CommitSwapChain(EYE_TYPE eye);
-	RESULT SubmitFrame();
+	virtual RESULT InitializeHMD(HALImp *halimp, int wndWidth = 0, int wndHeight = 0) override;
+	virtual RESULT UpdateHMD() override;
+	virtual RESULT ReleaseHMD() override;
 
-	RESULT SetAndClearRenderSurface(EYE_TYPE eye);
-	RESULT UnsetRenderSurface(EYE_TYPE eye);
+	virtual RESULT SetUpFrame() override;
+	virtual RESULT BindFramebuffer(EYE_TYPE eye) override;
+	virtual RESULT CommitSwapChain(EYE_TYPE eye) override;
+	virtual RESULT SubmitFrame() override;
 
-	RESULT RenderHMDMirror();
+	virtual RESULT SetAndClearRenderSurface(EYE_TYPE eye) override;
+	virtual RESULT UnsetRenderSurface(EYE_TYPE eye) override;
 
-	ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar);
-	ViewMatrix GetViewMatrix(EYE_TYPE eye);
+	virtual RESULT RenderHMDMirror() override;
+
+	virtual ProjectionMatrix GetPerspectiveFOVMatrix(EYE_TYPE eye, float znear, float zfar) override;
+	virtual ViewMatrix GetViewMatrix(EYE_TYPE eye) override;
+
+	virtual VirtualObj *GetSenseControllerObject(ControllerType controllerType) override;
 
 private:
 	std::string GetTrackedDeviceString(vr::IVRSystem *pHmd, vr::TrackedDeviceIndex_t unDevice, vr::TrackedDeviceProperty prop, vr::TrackedPropertyError *peError = NULL);
-	RESULT InitializeFrameBuffer(EYE_TYPE eye, uint32_t nWidth, uint32_t nHeight);
-	RESULT SetupStereoRenderTargets();
 	RESULT HandleVREvent(vr::VREvent_t event);
 	//float PredictSecondsToPhotons(float secondOffset = 0.0f);
 	Matrix4 ConvertSteamVRMatrixToMatrix4(const vr::HmdMatrix34_t &matPose);
@@ -76,15 +82,9 @@ private:
 
 public:
 	vr::IVRSystem *m_pIVRHMD;
-	vr::IVRCompositor *m_pCompositor;
 
 	std::string m_strDriver;
 	std::string m_strDisplay;
-
-	OGLFramebuffer *m_pFramebufferRenderLeft;
-	OGLFramebuffer *m_pFramebufferResolveLeft;
-	OGLFramebuffer *m_pFramebufferRenderRight;
-	OGLFramebuffer *m_pFramebufferResolveRight;
 
 	// Pose / device tracking
 	int m_trackedControllerCount;
@@ -93,9 +93,6 @@ public:
 	int m_validPoseCount_Last;
 	vr::TrackedDevicePose_t m_rTrackedDevicePose[vr::k_unMaxTrackedDeviceCount];
 	std::string m_strPoseClasses;                            // what classes we saw poses for this frame
-
-	bool m_fVblank;
-	bool m_fGlFinishHack;
 
 	// Device Render Models
 	vr::IVRRenderModels *m_pRenderModels;
@@ -106,9 +103,12 @@ public:
 	model *m_pControllerModelRight;
 	texture *m_pControllerModelRightTexture;
 
-	uint32_t ovrFrame;
+	uint32_t m_vrFrameCount;
 
 	model *m_pHMDModel;
+
+private:
+	OpenVRHMDSinkNode *m_pOpenVRHMDSinkNode = nullptr;
 };
 
 #endif // ! OPENVR_DEVICE_H_

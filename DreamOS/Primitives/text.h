@@ -11,72 +11,148 @@
 #include "Vertex.h"
 #include "point.h"
 #include "color.h"
-#include "font.h"
 #include <memory>
 
-class text : public DimObj {
+#include "FlatContext.h"
+#include "quad.h"
+
+class font;
+//class quad;
+
+class HALImp;
+struct CharacterGlyph;
+
+class UIKeyboardLayout;
+
+//class text : public DimObj {
+class text : public FlatContext {
 public:
-
-	RESULT Allocate() {
-		RESULT r = R_PASS;
-
-		CR(AllocateVertices(m_nVertices));
-		CR(AllocateIndices(m_nIndices));
-
-	Error:
-		return R_PASS;
-	}
-
-	inline unsigned int NumberVertices() { return m_nVertices; }
-	inline unsigned int NumberIndices() { return m_nIndices; }
-
-private:
-	unsigned int m_nVertices;
-	unsigned int m_nIndices;
-
-public:
-
-	enum AlignmentType {
-		TOP_LEFT,
-		TOP_RIGHT,
-		CENTER,
-		BOTTOM_LEFT,
-		BOTTOM_RIGHT,
-		RIGHT,
-		LEFT,
+	enum class VerticalAlignment {
+		TOP,
+		MIDDLE,
+		BOTTOM,
+		INVALID
 	};
 
-	uv_precision m_width = 0.0f;
-	uv_precision m_height = 0.0f;
+	enum class HorizontalAlignment {
+		LEFT,
+		CENTER,
+		RIGHT,
+		INVALID
+	};
 
-	text(std::shared_ptr<Font> font, const std::string& text = "", double size = 1.0, bool isBillboard = false) :
-		m_font(font)
-	{
-		SetText(text, size);
+	enum class flags : uint16_t {
+		NONE					= 0,
+		WRAP					= 1 << 0,
+		SCALE_TO_FIT			= 1 << 1,
+		FIT_TO_SIZE				= 1 << 2,
+		BILLBOARD				= 1 << 3,
+		TRAIL_ELLIPSIS			= 1 << 4,
+		RENDER_QUAD 			= 1 << 5,
+		CURVE_QUAD_CIRCLE		= 1 << 6, 
+		CURVE_QUAD_PARABOLIC	= 1 << 7,
+		INVALID					= 0xFFFF
+	};
 
-		Validate();
-//	Error:
-//		Invalidate();
-	}
+public:
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, text::flags textFlags = text::flags::NONE);
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, text::flags textFlags = text::flags::NONE);
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE);
+	text(HALImp *pHALImp, std::shared_ptr<font> pFont, const std::string& strText = "", double width = 1.0f, double height = 0.25f, bool fBillboard = false);
+	~text();
 
-	RESULT SetText(const std::string& text, double size, bool* isChanged = nullptr);
+	virtual RESULT SetText(const std::string& strText);
+	RESULT CreateLayout(UIKeyboardLayout *pLayout, double marginRatio = 0.25f);
 	
-	VirtualObj* SetPosition(point p, AlignmentType align = CENTER)
-	{
-		uv_precision dx = (align == CENTER) ? 0.0f : (align == RIGHT) ? m_width / 2 : (align == LEFT) ? -m_width / 2 : (align == BOTTOM_LEFT || align == TOP_LEFT) ? -m_width / 2 : m_width / 2;
-		uv_precision dy = (align == CENTER || align == RIGHT || align == LEFT) ? 0.0f : (align == TOP_RIGHT || align == TOP_LEFT) ? m_height / 2 : -m_height / 2;
-		return this->MoveTo(p.x() + dx, p.y() + dy, p.z());
-	}
+	VirtualObj* SetPosition(point pt, VerticalAlignment vAlign = VerticalAlignment::MIDDLE, HorizontalAlignment hAlign = HorizontalAlignment::CENTER);
 
-	std::shared_ptr<Font> GetFont() { return m_font; }
+	std::string& GetText();
+	std::shared_ptr<font> GetFont();
+
+	RESULT RenderToQuad();
+
+	float GetWidth();
+	float GetHeight();
+
+	float GetDPMM(float mmVal = 1.0f);
+	float GetDPM(float mVal = 1.0f);
+
+	float GetMMSizeFromDots(float val);
+	float GetMSizeFromDots(float val);
+
+	RESULT SetWidth(float width);
+	RESULT SetHeight(float height);
+	RESULT SetDPMM(float dpmm);
+
+	RESULT SetFontHeightM(float mVal);
+	RESULT SetFontHeightMM(float mmVal);
+
+	RESULT SetOffset(float xOffset, float yOffset);
+	RESULT SetRows(int rows);
+
+	RESULT SetScaleToFit(bool fScaleToFit = true);
+	RESULT SetWrap(bool fWrap = true);
+	RESULT SetFitToSize(bool fFitToSize = true);
+	RESULT SetBillboard(bool fBillboard = true);
+
+	virtual bool IsScaleToFit() override;
+	bool IsWrap();
+	bool IsFitToSize();
+	bool IsBillboard();
+	bool IsTrailingEllipsis();
+	bool IsRenderToQuad();
+	
+	RESULT SetBackgroundColor(color backgroundColor);
+	RESULT SetBackgroundColorTexture(texture *pColorTexture);
+
+public:
+	//static text& MakeText()
 
 private:
+	std::shared_ptr<quad> AddGlyphQuad(CharacterGlyph glyph, float posX, float posY);
+	RESULT SetBackgroundQuad();
+
+private:
+	bool m_fScaleToFit = false;
+	flags m_flags = text::flags::NONE;
+
+	float m_scaleFactor = 1.0f;
+	
+	int m_rows = 1;
+
+	float m_dpmm = 11.0f;	// Dots per mm - global units in meters so this should be taken into consideration
+
+	float m_width = 0.0f;
+	float m_height = 0.0f;
+
+	float m_xOffset = 0.0f;
+	float m_yOffset = 0.0f;
+
+	VerticalAlignment m_vAlign = VerticalAlignment::TOP;
+	HorizontalAlignment m_hAlign = HorizontalAlignment::CENTER;
 
 	// Font to be used for the text
-	std::shared_ptr<Font> m_font = nullptr;
+	std::shared_ptr<font> m_pFont = nullptr;
 
 	// String of the text
-	std::string	m_text = "";
+	std::string	m_strText = "";
+
+	std::shared_ptr<quad> m_pBackgroundQuad = nullptr;
+	color m_backgroundColor = COLOR_WHITE;
+	texture *m_pBackgroundColorTexture = nullptr;
 };
+
+
+inline constexpr text::flags operator | (const text::flags &lhs, const text::flags &rhs) {
+	return static_cast<text::flags>(
+		static_cast<std::underlying_type<text::flags>::type>(lhs) | static_cast<std::underlying_type<text::flags>::type>(rhs)
+		);
+}
+
+inline constexpr text::flags operator & (const text::flags &lhs, const text::flags &rhs) {
+	return static_cast<text::flags>(
+		static_cast<std::underlying_type<text::flags>::type>(lhs) & static_cast<std::underlying_type<text::flags>::type>(rhs)
+		);
+}
 
 #endif // ! TEXT_H_

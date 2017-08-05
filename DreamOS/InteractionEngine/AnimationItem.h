@@ -11,7 +11,7 @@
 #include <memory>
 #include <functional>
 
-class VirtualObj;
+class DimObj;
 
 struct AnimationFlags {
 
@@ -32,13 +32,13 @@ public:
 	AnimationItem(AnimationState startState, AnimationState endState, double startTime, double duration);
 	~AnimationItem();
 
-	std::shared_ptr<AnimationItem> CreateCancelAnimation(VirtualObj *pObj, double msNow);
+	std::shared_ptr<AnimationItem> CreateCancelAnimation(DimObj *pObj, double msNow);
 
 private:
 	RESULT Initialize();
 
 public:
-	RESULT Update(VirtualObj *pObj, AnimationState& state, double msNow);
+	RESULT Update(DimObj *pObj, AnimationState& state, double msNow);
 
 	bool IsComplete(double msNow);
 
@@ -49,8 +49,13 @@ public:
 	std::function<RESULT(void*)> GetAnimationEndedCallback();
 	RESULT SetAnimationEndedCallback(std::function<RESULT(void*)> callback);
 
+	std::function<RESULT(void*)> GetAnimationStartCallback();
+	RESULT SetAnimationStartCallback(std::function<RESULT(void*)> callback);
+
 	void* GetCallbackContext();
 	RESULT SetCallbackContext(void* context);
+
+	bool ShouldAnimateColor();
 
 private:
 	double m_startTime;
@@ -62,8 +67,9 @@ private:
 	AnimationState m_startState;
 	AnimationState m_endState;
 
-	std::function<RESULT(void*)> fnOnAnimationEnded;
-	void* fnOnAnimationEndedContext;
+	std::function<RESULT(void*)> m_fnOnAnimationEnded;
+	std::function<RESULT(void*)> m_fnOnAnimationStart;
+	void* m_fnOnAnimationContext;
 };
 
 #endif // ! ANIMATION_ITEM_H_

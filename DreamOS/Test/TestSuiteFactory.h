@@ -13,6 +13,7 @@ public:
 		PHYSICS,
 		INTERACTION,
 		UI,
+		UIVIEW,
 		CLOUD,
 		HAL,
 		MATH,

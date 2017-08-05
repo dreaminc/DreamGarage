@@ -13,6 +13,8 @@ float AnimationCurve::GetAnimationProgress(float progress) {
 	switch (m_curveType) {
 	case AnimationCurveType::EASE_OUT_QUART:
 		return -1.0f * (pow((progress - 1), 4) - 1); break;
+	case AnimationCurveType::EASE_IN_QUART:
+		return 1.0f - 1.0f * (pow(((1 - progress) - 1), 4) - 1); break;
 	case AnimationCurveType::EASE_OUT_QUAD:
 		return -1.0f * progress * (progress - 2.0f); break;
 	case AnimationCurveType::EASE_OUT_EXPO:

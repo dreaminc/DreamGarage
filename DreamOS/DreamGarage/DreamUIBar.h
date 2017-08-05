@@ -3,26 +3,58 @@
 
 #include "DreamApp.h"
 
-#include "UI/UIBar.h"
-#include "Primitives/composite.h"
-
-#include <functional>
+#include "UI/UIEvent.h"
+#include "InteractionEngine/InteractionObjectEvent.h"
 
 #include "Cloud/Menu/MenuController.h"
 #include "Cloud/Menu/MenuNode.h"
-#include "Cloud/Environment/EnvironmentController.h"
 
-class DreamUIBar : public DreamApp<DreamUIBar>, public UIBar, public MenuController::observer, public Subscriber<InteractionObjectEvent> {
+#include "Primitives/Subscriber.h"
+
+#include <functional>
+#include <stack>
+#include <queue>
+
+class UIScrollView;
+class UIMallet;
+class UIView;
+
+class CloudController;
+class EnvironmentControllerProxy;
+class HTTPControllerProxy;
+class UserControllerProxy;
+
+class font;
+class texture;
+class UIButton;
+
+#define MENU_DEPTH -0.3f
+#define MENU_HEIGHT -0.16f
+#define KEYBOARD_OFFSET -0.07f
+
+#define SHOW_MENU_HEIGHT -0.5f
+#define SHOW_MENU_DEPTH 1.4f
+#define MENU_ANIMATION_DURATION 0.1f;
+
+#define ACTUATION_DEPTH 0.055f;
+
+enum class MenuState {
+	NONE,
+	ANIMATING
+};
+
+class DreamUIBar :	public DreamApp<DreamUIBar>, 
+					public MenuController::observer, 
+					public Subscriber<UIEvent>
+{
+
 	friend class DreamAppManager;
 
 public:
 	DreamUIBar(DreamOS *pDreamOS, void *pContext = nullptr);
 
-	RESULT SetParams(
-				const IconFormat& iconFormat, 
-				const LabelFormat& labelFormat, 
-				const RadialLayerFormat& menuFormat,
-				const RadialLayerFormat& titleFormat);
+	RESULT SetFont(const std::wstring& strFont);
+
 	~DreamUIBar();
 
 	virtual RESULT InitializeApp(void *pContext = nullptr) override;
@@ -31,6 +63,14 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	// Animation Callbacks
+	RESULT UpdateMenu(void *pContext);
+
+	// Animations
+	RESULT HideMenu(std::function<RESULT(void*)> fnStartCallback = nullptr);
+	RESULT ShowMenu(std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
+	RESULT SelectMenuItem(UIButton *pPushButton = nullptr, std::function<RESULT(void*)> fnStartCallback = nullptr, std::function<RESULT(void*)> fnEndCallback = nullptr);
+
 	RESULT HandleTouchStart(void* pContext);
 	RESULT HandleTouchMove(void* pContext);
 	RESULT HandleTouchEnd(void* pContext);
@@ -38,31 +78,62 @@ public:
 	RESULT HandleMenuUp(void* pContext);
 	RESULT HandleSelect(void* pContext);
 
-	// Callback signature
-	// RESULT fnEventCallback(struct (opt) pEventInfo, void* pContext)
+	RESULT HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector, void* pContext);
+
+	RESULT SetMenuStateAnimated(void *pContext);
+	RESULT ClearMenuState(void* pContext);
 
 	RESULT RegisterEvent(InteractionEventType type, std::function<RESULT(void*)> fnCallback);
 
 	std::map<InteractionEventType, std::function<RESULT(void*)>> m_callbacks;
 
-	virtual RESULT Notify(InteractionObjectEvent *event) override;
-
 // Menu Controller Observer
 	RESULT OnMenuData(std::shared_ptr<MenuNode> pMenuNode);
+	std::vector<std::string> GetStringHeaders();
+
+// UIEvent
+	RESULT Notify(UIEvent *pEvent);
 
 protected:
 	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
 private:
+
+	std::shared_ptr<UIView> m_pView; // not used for anything yet, but would be used for other UI elements
+	std::shared_ptr<UIScrollView> m_pScrollView;
+
+	//TODO: Mallets should probably become a system app, like keyboard
+	UIMallet *m_pLeftMallet;
+	UIMallet *m_pRightMallet;
+
 	//Cloud member variables
 	CloudController *m_pCloudController = nullptr;
 	MenuControllerProxy *m_pMenuControllerProxy = nullptr;
 	EnvironmentControllerProxy *m_pEnvironmentControllerProxy = nullptr;
+	HTTPControllerProxy *m_pHTTPControllerProxy = nullptr;
+	UserControllerProxy *m_pUserControllerProxy = nullptr;
 
 	std::shared_ptr<MenuNode> m_pMenuNode = nullptr;
+	std::vector<std::pair<std::string, std::shared_ptr<std::vector<uint8_t>>>> m_downloadQueue;
 
 	std::stack<std::shared_ptr<MenuNode>> m_pathStack = {};
-	std::map<MenuNode::MimeType, std::shared_ptr<texture>> m_images;
+
+	std::shared_ptr<texture> m_pDefaultThumbnail;
+	std::shared_ptr<texture> m_pDefaultIcon;
+	std::shared_ptr<texture> m_pShareIcon;
+	std::shared_ptr<texture> m_pMenuItemBg;
+
+	std::shared_ptr<font> m_pFont;
+
+	quaternion m_qMenuOrientation;
+	point m_ptMenuShowOffset = point(0.0f, SHOW_MENU_HEIGHT, SHOW_MENU_DEPTH);
+	float m_menuHeight = MENU_HEIGHT;
+	float m_keyboardOffset = KEYBOARD_OFFSET;
+	float m_menuDepth = MENU_DEPTH;
+	float m_animationDuration = MENU_ANIMATION_DURATION;
+	float m_actuationDepth = ACTUATION_DEPTH;
+
+	MenuState m_menuState = MenuState::NONE;
 };
 
 

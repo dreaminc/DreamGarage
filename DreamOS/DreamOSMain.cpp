@@ -51,7 +51,7 @@ Error:
 
 Error:
 	DEBUG_LINEOUT("DREAM OS Exiting with Error 0x%x result", r);
-	//system("pause");
+	DEBUG_SYSTEM_PAUSE();
 
 	return (int)(r);
 #endif

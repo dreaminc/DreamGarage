@@ -15,12 +15,20 @@
 
 class texture : public valid {
 public:
+	enum class flags : uint16_t {
+		NONE			= 0,
+		DISTANCE_MAP	= 1 << 0,
+		INVALID			= 0xFFFF
+	};
+
 	// The texture type and channel
 	enum class TEXTURE_TYPE {
 		TEXTURE_COLOR = 0,
 		TEXTURE_BUMP = 1,
 		TEXTURE_CUBE = 2,
 		TEXTURE_HEIGHT = 3,
+		TEXTURE_DEPTH = 4,
+		TEXTURE_RECTANGLE = 5,
 		TEXTURE_INVALID = 32
 	};
 
@@ -44,10 +52,11 @@ public:
 
 public:
 	texture();
+	texture(const texture& tex);
 	texture(texture::TEXTURE_TYPE type);
-	texture(texture::TEXTURE_TYPE type, int width, int height, int channels);
-	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n);
-	texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, int samples = 0);
+	texture(texture::TEXTURE_TYPE type, int width, int height, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
+	texture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n, int samples = 0);
 
 	// Loads from a file buffer (file loaded into buffer)
 	texture(texture::TEXTURE_TYPE type, uint8_t *pBuffer, size_t pBuffer_n);
@@ -73,12 +82,12 @@ public:
 	RESULT FlipTextureVertical();
 	RESULT ReleaseTextureData();
 
-	RESULT LoadTextureFromPath(wchar_t *pszFilepath);
-	RESULT LoadTextureFromFile(wchar_t *pszFilename);
+	RESULT LoadTextureFromPath(const wchar_t *pszFilepath);
+	RESULT LoadTextureFromFile(const wchar_t *pszFilename);
 	RESULT LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n);
 	//RESULT LoadCubeMapFromFiles(wchar_t *pszFilenameFront, wchar_t *pszFilenameBack, wchar_t *pszFilenameTop, wchar_t *pszFilenameBottom, wchar_t *pszFilenameLeft, wchar_t *pszFilenameRight);
-	RESULT LoadCubeMapFromFiles(wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
-	RESULT LoadCubeMapByName(wchar_t * pszName);
+	RESULT LoadCubeMapFromFiles(const wchar_t *pszName, std::vector<std::wstring> vstrCubeMapFiles);
+	RESULT LoadCubeMapByName(const wchar_t * pszName);
 	RESULT CopyTextureBuffer(int width, int height, int channels, void *pBuffer, int pBuffer_n);
 
 	virtual RESULT Update(unsigned char* pBuffer, int width, int height, texture::PixelFormat pixelFormat);
@@ -87,24 +96,20 @@ public:
 
 	double GetValueAtUV(double uValue, double vValue);
 
-	int GetWidth() {
-		return m_width;
-	}
-
-	int GetHeight() {
-		return m_height;
-	}
-
-	int GetChannels() {
-		return m_channels;
-	}
+	int GetWidth() { return m_width; }
+	int GetHeight() { return m_height; }
+	int GetChannels() { return m_channels; }
+	int GetSamples() { return m_samples; }
+	int GetLevels() { return m_levels; }
 
 	PixelFormat GetPixelFormat() {
 		return m_format;
 	}
 
+	RESULT SetParams(int pxWidth, int pxHeight, int channels, int samples = 1, int levels = 0);
+
 	RESULT SetWidth(int width) {
-		if (m_width != NULL) {
+		if (m_width != 0) {
 			return R_FAIL;
 		}
 		else {
@@ -114,7 +119,7 @@ public:
 	}
 
 	RESULT SetHeight(int height) {
-		if (m_height != NULL) {
+		if (m_height != 0) {
 			return R_FAIL;
 		}
 		else {
@@ -124,11 +129,31 @@ public:
 	}
 
 	RESULT SetChannels(int channels) {
-		if (m_channels != NULL) {
+		if (m_channels != 0) {
 			return R_FAIL;
 		}
 		else {
 			m_channels = channels;
+			return R_PASS;
+		}
+	}
+
+	RESULT SetSamples(int samples) {
+		if (m_samples != 0) {
+			return R_FAIL;
+		}
+		else {
+			m_samples = samples;
+			return R_PASS;
+		}
+	}
+
+	RESULT SetLevels(int levels) {
+		if (m_levels != 0) {
+			return R_FAIL;
+		}
+		else {
+			m_levels = levels;
 			return R_PASS;
 		}
 	}
@@ -138,19 +163,37 @@ public:
 		return R_PASS;
 	}
 
+	bool IsDistanceMapped();
+	RESULT SetDistanceMapped();
+
 protected:
-	int m_width;
-	int m_height;
-	int m_channels;
 	PixelFormat	m_format = PixelFormat::Unspecified;
-
-	unsigned char *m_pImageBuffer;
-
-	//int m_textureNumber;
 	TEXTURE_TYPE m_type;
+
+	int m_width = 0;
+	int m_height = 0;
+	int m_channels = 0;
+	int m_samples = 0;
+	int m_levels = 0;
+
+	flags m_flags = texture::flags::NONE;
+
+	unsigned char *m_pImageBuffer = nullptr;
 
 private:
 	UID m_uid;
 };
+
+inline constexpr texture::flags operator | (const texture::flags &lhs, const texture::flags &rhs) {
+	return static_cast<texture::flags>(
+		static_cast<std::underlying_type<texture::flags>::type>(lhs) | static_cast<std::underlying_type<texture::flags>::type>(rhs)
+		);
+}
+
+inline constexpr texture::flags operator & (const texture::flags &lhs, const texture::flags &rhs) {
+	return static_cast<texture::flags>(
+		static_cast<std::underlying_type<texture::flags>::type>(lhs) & static_cast<std::underlying_type<texture::flags>::type>(rhs)
+		);
+}
 
 #endif // ! TEXTURE_H_

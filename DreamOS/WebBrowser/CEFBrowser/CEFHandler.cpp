@@ -67,6 +67,12 @@ CefRefPtr<CefLoadHandler> CEFHandler::GetLoadHandler() {
 	return this;
 }
 
+/*
+CefRefPtr<CefDownloadHandler> CEFHandler::GetDownloadHandler() {
+	return this;
+}
+*/
+
 void PlatformTitleChange(CefRefPtr<CefBrowser> pCEFBrowser, const CefString& strTitle) {
 	CefWindowHandle hwnd = pCEFBrowser->GetHost()->GetWindowHandle();
 	SetWindowText(hwnd, std::wstring(strTitle).c_str());
@@ -158,6 +164,39 @@ void CEFHandler::OnLoadError(CefRefPtr<CefBrowser> pCEFBrowser, CefRefPtr<CefFra
 		").</h2></body></html>";
 
 	pCEFFrame->LoadString(ss.str(), strFailedURL);
+}
+
+void CEFHandler::OnLoadingStateChange(CefRefPtr<CefBrowser> browser, bool isLoading, bool canGoBack, bool canGoForward) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFHANDLE: OnLoadEnd");
+
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->OnLoadingStateChanged(browser, isLoading, canGoBack, canGoForward));
+
+Error:
+	return;
+}
+
+void CEFHandler::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefLoadHandler::TransitionType transition_type) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFHANDLE: OnLoadStart");
+
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->OnLoadStart(browser, frame, transition_type));
+
+Error:
+	return;
+}
+
+void CEFHandler::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int httpStatusCode) {
+	RESULT r = R_PASS;
+	DEBUG_LINEOUT("CEFHANDLE: OnPaint");
+
+	CN(m_pCEFHandlerObserver);
+	CR(m_pCEFHandlerObserver->OnLoadEnd(browser, frame, httpStatusCode));
+
+Error:
+	return;
 }
 
 void CEFHandler::CloseAllBrowsers(bool fForceClose) {
