@@ -105,7 +105,7 @@ private:
 private:
 	bool m_fSeated = false;
 	float m_tick = 0.0f;
-	float m_seatPositioningRadius = 3.5f;
+	float m_seatPositioningRadius = 4.0f;
 	std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
 	float m_initialAngle = 90.0f;
 	float m_keepOutAngle = 5.0f;
