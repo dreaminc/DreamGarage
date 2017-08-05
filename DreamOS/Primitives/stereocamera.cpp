@@ -68,7 +68,8 @@ RESULT stereocamera::SetHMDAdjustedPosition(point ptPosition) {
 		point ptHMDOffset = m_pHMD->GetHeadPointOrigin();
 		point ptAdjustedPosition = ptPosition - ptHMDOffset;
 
-		SetPosition(ptAdjustedPosition);
+		//SetPosition(ptAdjustedPosition);
+		SetPosition(ptPosition);
 	}
 	else {
 		SetPosition(ptPosition);
