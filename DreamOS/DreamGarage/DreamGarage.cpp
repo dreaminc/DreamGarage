@@ -544,7 +544,7 @@ RESULT DreamGarage::SetRoundtablePosition(DreamPeer *pDreamPeer, int seatingPosi
 
 	CR(GetRoundtablePosition(seatingPosition, ptSeatPosition, angleRotation));
 
-	pDreamPeer->GetUserModel()->RotateYByDeg(angleRotation);
+	pDreamPeer->GetUserModel()->GetHead()->RotateYByDeg(angleRotation);
 	pDreamPeer->SetPosition(ptSeatPosition);
 
 Error:
