@@ -35,6 +35,8 @@ public:
 	RESULT SetupPipeline();
 	RESULT Initialize();
 
+	RESULT AddTestSkybox();
+
 	RESULT AddTestCaptureObject();
 
 	RESULT AddTestObjectBasedEvents();

@@ -115,6 +115,12 @@ void main(void) {
  
 	float eyeExtinction = horizonExtinction(eyePosition, eyeDirection, surfaceHeight-0.15);
 
+	vec4 colorHorizon = vec4(0.9f, 0.9f, 0.9f, 1.0f);
+	//light sky blue
+	//vec4 colorSky = vec4(135.0f / 255.0f, 206.0f / 255.0f, 235.0f / 255.0f, 1.0f);
+	//deep sky blue
+	vec4 colorSky = vec4(0.0f / 255.0f, 191.0f / 255.0f, 235.0f / 255.0f, 1.0f);
+
 	// absorption profile of Nitrogen
 	vec3 Kr = vec3(
 		0.18867780436772762, 0.4978442963618773, 0.6616065586417131
@@ -149,13 +155,22 @@ void main(void) {
 	rayleighCollected = (rayleighCollected * eyeExtinction * pow(eyeDepth, rayleighCollectionPower))/float(stepCount);
 	mieCollected = (mieCollected * eyeExtinction * pow(eyeDepth, mieCollectionPower))/float(stepCount);
 
+	float ed = (eyeDirection.y + 1.0f) / 2.0f;
+	vec4 testColor = (ed * colorSky) + ((1.0f - ed) * colorHorizon);
+	float nm = clamp(1.0f - (mieFactor / 6.0f),0.0f, 1.0f);
+	testColor = nm * testColor;
 	vec3 outColor = vec3(
-		spotFactor*mieCollected +
-		mieFactor*mieCollected +
-		rayleighFactor*rayleighCollected);
+		(spotFactor*mieCollected) +
+		(mieFactor*mieCollected) +
+		(testColor.xyz)
+		);
+//		rayleighFactor*rayleighCollected);
 
-	// make it a bit brighter. couldn't find an easier way to do this.
-	out_vec4Color = vec4(1.08 * outColor, 1.0);
+	out_vec4Color = vec4(1.0 * outColor, 1.0);
+	//out_vec4Color = vec4(nm,nm,nm,1.0);
+	//out_vec4Color = vec4(miefactor,miefactor,miefactor,1.0f);
+
+	//out_vec4Color = vec4(spotFactor,spotFactor,spotFactor,1.0);
 
 	//out_vec4Color = vec4(theta, theta, theta, 1.0);
 	//out_vec4Color = displayAsColor(eyeDirection);
