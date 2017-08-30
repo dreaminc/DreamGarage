@@ -26,6 +26,8 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestSkybox());
 
+	CR(AddTestEnvironmentShader());
+
 	CR(AddTestMouseDrag());
 
 	CR(AddTestMinimalShader());
@@ -48,7 +50,7 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestRenderToTextureQuad());
 
-	CR(AddTestEnvironmentShader());
+//	CR(AddTestEnvironmentShader());
 
 	CR(AddTestBlinnPhongShaderTextureHMD());
 
@@ -532,6 +534,30 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 		CR(pVolume->SetColor(COLOR_BLUE));
 		//*/
+		{
+			point sceneOffset = point(90, -5, -25);
+			float sceneScale = 0.1f;
+			vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+			//*
+			//	AddModel(L"\\Models\\FloatingIsland\\env.obj",
+				//*
+			m_pDreamOS->AddModel(L"\\Models\\envTest.obj",
+				nullptr,
+				sceneOffset,
+				sceneScale,
+				sceneDirection);
+			composite* pRiver = m_pDreamOS->AddModel(L"\\Models\\riverTest.obj",
+				nullptr,
+				sceneOffset,
+				sceneScale,
+				sceneDirection);
+			composite* pClouds = m_pDreamOS->AddModel(L"\\Models\\cloudTest.obj",
+				nullptr,
+				sceneOffset,
+				sceneScale,
+				sceneDirection);
+			//*/
+		}
 
 	Error:
 		return r;
