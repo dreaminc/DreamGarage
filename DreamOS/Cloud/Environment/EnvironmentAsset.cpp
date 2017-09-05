@@ -1,6 +1,7 @@
 #include "EnvironmentAsset.h"
 
 #include "Cloud/Menu/MenuNode.h"
+#include "Sandbox/CommandLineManager.h"
 
 EnvironmentAsset::EnvironmentAsset(nlohmann::json jsonMenuNode) {
 	if (jsonMenuNode["/id"_json_pointer].is_number_integer())
@@ -63,7 +64,13 @@ const std::string& EnvironmentAsset::GetTitle() {
 }
 
 std::string EnvironmentAsset::GetURI() {
-	std::string strURI = "https://api.develop.dreamos.com/environment-asset/";
+	CommandLineManager *pCommandLineManager = CommandLineManager::instance();
+	std::string strURI = "";
+	std::string strAPIURL = pCommandLineManager->GetParameterValue("api.ip");
+	
+	//std::string strURI = "https://api.develop.dreamos.com/environment-asset/";
+
+	strURI = strAPIURL + "/environment-asset/";
 	strURI += std::to_string(m_assetID);
 	
 	//strURI += "/file";
