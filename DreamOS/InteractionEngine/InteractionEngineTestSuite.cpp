@@ -37,8 +37,6 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestSkybox());
-
 	CR(AddTestCaptureObject());
 
 	CR(AddTestMultiPrimitiveCompositeRemove());
@@ -177,39 +175,6 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 	}
 
 //Error:
-	return r;
-}
-
-RESULT InteractionEngineTestSuite::AddTestSkybox() {
-	RESULT r = R_PASS;
-
-	double sTestTime = 10000.0f;
-	int nRepeats = 1;
-
-	auto fnInitialize = [&](void *pContext) {
-		RESULT r = R_PASS;
-
-		CR(SetupPipeline());
-		CR(Initialize());
-		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
-
-	Error:
-		return r;
-	};
-
-	auto fnPass = [&](void *pContext) {
-		return R_PASS;
-	};
-
-	auto pNewTest = AddTest(fnInitialize, fnPass, fnPass, fnPass, nullptr);
-	CN(pNewTest);
-
-	pNewTest->SetTestName("Sky Test");
-	pNewTest->SetTestDescription("sky");
-	pNewTest->SetTestDuration(sTestTime);
-	pNewTest->SetTestRepeats(nRepeats);
-
-Error:
 	return r;
 }
 
@@ -1293,17 +1258,9 @@ RESULT InteractionEngineTestSuite::SetupPipeline() {
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
-	// Skybox
-	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-	CN(pSkyboxProgram);
-	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 	CN(pRenderScreenQuad);
-	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 

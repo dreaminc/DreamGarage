@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestSkybox());
+
 	CR(AddTestMouseDrag());
 
 	CR(AddTestMinimalShader());
@@ -77,6 +79,51 @@ RESULT HALTestSuite::ResetTest(void *pContext) {
 	HALImp *pHAL = m_pDreamOS->GetHALImp();
 	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
 	CR(pPipeline->Reset(false));
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::SetupSkyboxPipeline() {
+	RESULT r = R_PASS;
+
+	// Set up the pipeline
+	HALImp *pHAL = m_pDreamOS->GetHALImp();
+	Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+	SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+	CNM(pDestSinkNode, "Destination sink node isn't set");
+
+	CR(pHAL->MakeCurrentContext());
+
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
+	CN(pRenderProgramNode);
+	CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+	// Reference Geometry Shader Program
+	ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+	CN(pReferenceGeometryProgram);
+	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+	// Skybox
+	ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+	CN(pSkyboxProgram);
+	CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+	CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+	CN(pRenderScreenQuad);
+	CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+	//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+	CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+	CR(pHAL->ReleaseCurrentContext());
 
 Error:
 	return r;
@@ -339,6 +386,39 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureHMD() {
 
 	pNewTest->SetTestName("Blinn Phong Texture Shader");
 	pNewTest->SetTestDescription("Blinn phong texture shader test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestSkybox() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0f;
+	int nRepeats = 1;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CR(SetupSkyboxPipeline());
+		CR(Initialize());
+		m_pDreamOS->AddQuad(1.0f, 1.0f)->RotateXByDeg(90.0f);
+
+	Error:
+		return r;
+	};
+
+	auto fnPass = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	auto pNewTest = AddTest(fnInitialize, fnPass, fnPass, fnPass, nullptr);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("Sky Test");
+	pNewTest->SetTestDescription("sky");
 	pNewTest->SetTestDuration(sTestTime);
 	pNewTest->SetTestRepeats(nRepeats);
 
