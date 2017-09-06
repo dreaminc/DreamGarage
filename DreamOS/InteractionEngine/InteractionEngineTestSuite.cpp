@@ -1256,7 +1256,6 @@ RESULT InteractionEngineTestSuite::SetupPipeline() {
 	CN(pReferenceGeometryProgram);
 	CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 	CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
 	CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -1279,6 +1278,17 @@ RESULT InteractionEngineTestSuite::Initialize() {
 	m_pDreamOS->AddLight(LIGHT_POINT, 1.0f, point(4.0f, 7.0f, -4.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 	m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
+
+	point sceneOffset = point(90, -5, -25);
+	float sceneScale = 0.1f;
+	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+//*
+	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
+		nullptr,
+		sceneOffset,
+		sceneScale,
+		sceneDirection);
+		//*/
 
 	return R_PASS;
 }

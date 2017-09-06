@@ -27,6 +27,10 @@ public:
 public:
 	// Note: This should eventually call the DreamGarageApp pipeline
 	// function rather than duplicating it
+	RESULT SetupSkyboxPipeline();
+
+	RESULT AddTestSkybox();
+
 	RESULT AddTestEnvironmentShader();
 
 	RESULT AddTestText();
