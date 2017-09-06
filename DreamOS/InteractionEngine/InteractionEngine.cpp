@@ -335,34 +335,62 @@ RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pIntera
 		point(pInteractionObject->GetPosition(true) - pObject->GetPosition(true)),
 		pObject->GetPosition());
 
-	if (m_capturedObjects.count(pInteractionObject) > 0) {
-		auto& pOldCaptureObj = m_capturedObjects[pInteractionObject];
-		pOldCaptureObj->m_pObj->SetPosition(pOldCaptureObj->m_ptOrigin);
-	}
+	//if (m_capturedObjects.count(pInteractionObject) > 0) {
+//	if (IsObjectCaptured(pInteractionObject, cObj)) {
+		// reset object
+//		auto& pOldCaptureObj = m_capturedObjects[pInteractionObject];
+//		pOldCaptureObj->m_pObj->SetPosition(pOldCaptureObj->m_ptOrigin);
+//	}
+//	ResetObjects(pInteractionObject);
+//	ReleaseObjects(pInteractionObject);
 
-	m_capturedObjects[pInteractionObject] = cObj;
+//	m_capturedObjects[pInteractionObject] = cObj;
+	m_capturedObjects[pInteractionObject].emplace_back(cObj);
 
 //Error:
+	return r;
+}
+
+RESULT InteractionEngine::ResetObjects(VirtualObj *pInteractionObject) {
+	RESULT r = R_PASS;
+
+	CBR(HasCapturedObjects(pInteractionObject), R_OBJECT_NOT_FOUND);
+	for (auto& cObj : m_capturedObjects[pInteractionObject]) {
+		cObj->m_pObj->SetPosition(cObj->m_ptOrigin);
+	}
+
+Error:
 	return r;
 }
 
 RESULT InteractionEngine::ReleaseObjects(VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
-	CBR(m_capturedObjects.count(pInteractionObject) > 0, R_OBJECT_NOT_FOUND);
+	CBR(HasCapturedObjects(pInteractionObject), R_OBJECT_NOT_FOUND);
 	m_capturedObjects.erase(pInteractionObject);
 
 Error:
 	return r;
 }
 
-bool InteractionEngine::IsObjectCaptured(VirtualObj *pInteractionObject, CapturedObj *pCapturedObj) {
+bool InteractionEngine::HasCapturedObjects(VirtualObj *pInteractionObject) {
+	return m_capturedObjects.count(pInteractionObject) > 0;
+}
+
+bool InteractionEngine::IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) {
+	if (HasCapturedObjects(pInteractionObject)) {
+		for (auto& cObj : m_capturedObjects[pInteractionObject]) {
+			if (cObj->m_pObj == pCapturedObj) {
+				return true; 
+			}
+		}
+	}
 	return false;
 }
 
 std::vector<InteractionEngine::CapturedObj*> InteractionEngine::GetCapturedObjects(VirtualObj *pInteractionObject) {
-	if (m_capturedObjects.count(pInteractionObject) > 0) {
-		return { m_capturedObjects[pInteractionObject] };
+	if (HasCapturedObjects(pInteractionObject)) {
+		return m_capturedObjects[pInteractionObject];
 	}
 	return {};
 }
@@ -521,7 +549,8 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 		CollisionManifold manifold;
 		bool fIntersect = false;
 
-		if ((m_capturedObjects.count(pInteractionObject) > 0) && pEventObject == m_capturedObjects[pInteractionObject]->m_pObj) {
+//		if ((m_capturedObjects.count(pInteractionObject) > 0) && pEventObject == m_capturedObjects[pInteractionObject]->m_pObj) {
+		if (IsObjectCaptured(pInteractionObject, pEventObject)) {
 			continue;
 		}
 
@@ -618,41 +647,44 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 		for (auto &pInteractionObject : m_interactionObjects) {
 			//CR(UpdateObjectStoreRay(pObjectStore, pInteractionObject));
 			CR(UpdateObjectStore(activeObjectQueue.first, pObjectStore, pInteractionObject));
-			if (m_capturedObjects.count(pInteractionObject) > 0) {
+			//if (m_capturedObjects.count(pInteractionObject) > 0) {
+			if (HasCapturedObjects(pInteractionObject)) {
 
-				auto &pCaptureObj = m_capturedObjects[pInteractionObject];
-				point ptObj = pInteractionObject->GetPosition(true) - pCaptureObj->m_ptOffset;
-				point ptCap = pCaptureObj->m_pObj->GetPosition(true);
+				for (auto &pCaptureObj : m_capturedObjects[pInteractionObject]) {
 
-				// project difference of this frame along the movement vector
-				vector vDiff = ptObj - ptCap;
-				vector vDirection = pCaptureObj->m_planeContext.GetNormal();
-				float vDot = vDiff.dot(vDirection);
+					point ptObj = pInteractionObject->GetPosition(true) - pCaptureObj->m_ptOffset;
+					point ptCap = pCaptureObj->m_pObj->GetPosition(true);
 
-				// project the difference between the current position and the original position
-				// along the movement vector.  if this is negative, release the object
-				vector vOriginDiff = ptObj - pCaptureObj->m_planeContext.GetPosition();
-				float vOriginDot = vOriginDiff.dot(vDirection);
+					// project difference of this frame along the movement vector
+					vector vDiff = ptObj - ptCap;
+					vector vDirection = pCaptureObj->m_planeContext.GetNormal();
+					float vDot = vDiff.dot(vDirection);
 
-				if (vOriginDot < 0.0f) {
-					// clamp to original position
-					pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_ptOrigin);
-					capturedObjectsToRemove.push_back(pInteractionObject);
-				}
-				else {
-					vector vProj = vDirection * (vDot);
+					// project the difference between the current position and the original position
+					// along the movement vector.  if this is negative, release the object
+					vector vOriginDiff = ptObj - pCaptureObj->m_planeContext.GetPosition();
+					float vOriginDot = vOriginDiff.dot(vDirection);
 
-					pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_pObj->GetPosition() + vProj);
+					if (vOriginDot < 0.0f) {
+						// clamp to original position
+						pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_ptOrigin);
+						capturedObjectsToRemove.push_back(pInteractionObject);
+					}
+					else {
+						vector vProj = vDirection * (vDot);
 
-					plane planeCapture = pCaptureObj->m_planeContext;
-					vector vDistance = pCaptureObj->m_pObj->GetPosition(true) - planeCapture.GetPosition();
+						pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_pObj->GetPosition() + vProj);
 
-					if (vDistance.magnitude() > (pCaptureObj->m_threshold)) { 
-						// clamp to maximum position
-						pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_ptOrigin + (vDirection * pCaptureObj->m_threshold));
+						plane planeCapture = pCaptureObj->m_planeContext;
+						vector vDistance = pCaptureObj->m_pObj->GetPosition(true) - planeCapture.GetPosition();
 
-						InteractionObjectEvent interactionEvent(ELEMENT_COLLIDE_TRIGGER, pCaptureObj->m_pObj, pInteractionObject);
-						CR(NotifySubscribers(pCaptureObj->m_pObj, ELEMENT_COLLIDE_TRIGGER, &interactionEvent));
+						if (vDistance.magnitude() > (pCaptureObj->m_threshold)) {
+							// clamp to maximum position
+							pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_ptOrigin + (vDirection * pCaptureObj->m_threshold));
+
+							InteractionObjectEvent interactionEvent(ELEMENT_COLLIDE_TRIGGER, pCaptureObj->m_pObj, pInteractionObject);
+							CR(NotifySubscribers(pCaptureObj->m_pObj, ELEMENT_COLLIDE_TRIGGER, &interactionEvent));
+						}
 					}
 				}
 			}
@@ -694,7 +726,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 		}
 		for (auto& pInteractionObject : capturedObjectsToRemove) {
 			ReleaseObjects(pInteractionObject);
-			m_capturedObjects.erase(pInteractionObject);
+//			m_capturedObjects.erase(pInteractionObject);
 		}
 	}
 

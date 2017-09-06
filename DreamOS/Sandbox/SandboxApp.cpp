@@ -832,6 +832,15 @@ Error:
 	return r;
 }
 
+RESULT SandboxApp::ResetObjects(VirtualObj *pInteractionObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pInteractionEngine->ResetObjects(pInteractionObject));
+
+Error:
+	return r;
+}
+
 RESULT SandboxApp::ReleaseObjects(VirtualObj *pInteractionObject) {
 	RESULT r = R_PASS;
 
@@ -841,7 +850,11 @@ Error:
 	return r;
 }
 
-bool SandboxApp::IsObjectCaptured(VirtualObj *pInteractionObject, InteractionEngine::CapturedObj *pCapturedObj) {
+bool SandboxApp::HasCapturedObjects(VirtualObj *pInteractionObject) {
+	return m_pInteractionEngine->HasCapturedObjects(pInteractionObject);
+}
+
+bool SandboxApp::IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj) {
 	return m_pInteractionEngine->IsObjectCaptured(pInteractionObject, pCapturedObj);
 }
 

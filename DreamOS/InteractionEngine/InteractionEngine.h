@@ -149,8 +149,10 @@ public:
 	*/
 
 	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
+	RESULT ResetObjects(VirtualObj *pInteractionObject);
 	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
-	bool IsObjectCaptured(VirtualObj *pInteractionObject, CapturedObj *pCapturedObj);
+	bool HasCapturedObjects(VirtualObj *pInteractionObject);
+	bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj);
 	std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddInteractionObject(VirtualObj *pInteractionObject);
@@ -219,7 +221,7 @@ private:
 	std::vector<VirtualObj*> m_interactionObjects;
 	//std::list<std::shared_ptr<ActiveObject>> m_activeObjects;
 
-	std::map<VirtualObj*, CapturedObj*> m_capturedObjects;
+	std::map<VirtualObj*, std::vector<CapturedObj*>> m_capturedObjects;
 	std::map<ActiveObject::type, ActiveObjectQueue> m_activeObjectQueues;
 	
 	AnimationQueue* m_pObjectQueue = nullptr;

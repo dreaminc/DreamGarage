@@ -174,8 +174,10 @@ public:
 	RESULT AddInteractionObject(VirtualObj *pObject);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
+	RESULT ResetObjects(VirtualObj *pInteractionObject);
 	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
-	bool IsObjectCaptured(VirtualObj *pInteractionObject, InteractionEngine::CapturedObj *pCapturedObj);
+	bool HasCapturedObjects(VirtualObj *pInteractionObject);
+	bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj);
 	std::vector<InteractionEngine::CapturedObj*>GetCapturedObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);

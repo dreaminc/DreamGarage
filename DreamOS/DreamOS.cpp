@@ -532,11 +532,19 @@ RESULT DreamOS::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObjec
 	return m_pSandbox->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold);
 }
 
+RESULT DreamOS::ResetObjects(VirtualObj *pInteractionObject) {
+	return m_pSandbox->ResetObjects(pInteractionObject);
+}
+
 RESULT DreamOS::ReleaseObjects(VirtualObj *pInteractionObject) {
 	return m_pSandbox->ReleaseObjects(pInteractionObject);
 }
 
-bool DreamOS::IsObjectCaptured(VirtualObj *pInteractionObject, InteractionEngine::CapturedObj *pCapturedObject) {
+bool DreamOS::HasCapturedObjects(VirtualObj *pInteractionObject) {
+	return m_pSandbox->HasCapturedObjects(pInteractionObject);
+}
+
+bool DreamOS::IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObject) {
 	return m_pSandbox->IsObjectCaptured(pInteractionObject, pCapturedObject);
 }
 
