@@ -16,7 +16,7 @@ RESULT DreamTestApp::ConfigureSandbox() {
 	RESULT r = R_PASS;
 
 	SandboxApp::configuration sandboxconfig;
-	sandboxconfig.fUseHMD = false;
+	sandboxconfig.fUseHMD = true;
 	sandboxconfig.fUseLeap = false;
 	sandboxconfig.fMouseLook = true;
 	SetSandboxConfiguration(sandboxconfig);
@@ -92,6 +92,24 @@ RESULT DreamTestApp::Update(void) {
 Error:
 	return r;
 }
+
+// Cloud
+RESULT DreamTestApp::OnDreamMessage(PeerConnection* pPeerConnection, DreamMessage *pDreamMessage) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamTestApp::OnNewDreamPeer(DreamPeer *pDreamPeer) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamTestApp::OnDreamPeerConnectionClosed(std::shared_ptr<DreamPeer> pDreamPeer) {
+	return R_NOT_IMPLEMENTED;
+}
+
+RESULT DreamTestApp::OnAudioData(PeerConnection* pPeerConnection, const void* pAudioDataBuffer, int bitsPerSample, int samplingRate, size_t channels, size_t frames) {
+	return R_NOT_IMPLEMENTED;
+}
+
 
 RESULT DreamTestApp::Notify(SenseKeyboardEvent *kbEvent) {
 	RESULT r = R_PASS;
