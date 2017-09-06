@@ -24,7 +24,9 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-	CR(AddTestSkybox());
+//	CR(AddTestSkybox());
+
+	CR(AddTestEnvironmentShader());
 
 	CR(AddTestMouseDrag());
 
@@ -47,8 +49,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestBlinnPhongShaderTextureCopy());
 
 	CR(AddTestRenderToTextureQuad());
-
-	CR(AddTestEnvironmentShader());
 
 	CR(AddTestBlinnPhongShaderTextureHMD());
 
@@ -509,6 +509,30 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 
 		texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
+#ifndef _DEBUG
+		{
+			point sceneOffset = point(90, -5, -25);
+			float sceneScale = 0.1f;
+			vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+
+			m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
+				nullptr,
+				sceneOffset,
+				sceneScale,
+				sceneDirection);
+			m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\river.obj",
+				nullptr,
+				sceneOffset,
+				sceneScale,
+				sceneDirection);
+			m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
+				nullptr,
+				sceneOffset,
+				sceneScale,
+				sceneDirection);
+		}
+#endif
+
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
@@ -531,7 +555,6 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * -2.0f));
 		CR(pVolume->SetColor(COLOR_BLUE));
-		//*/
 
 	Error:
 		return r;
