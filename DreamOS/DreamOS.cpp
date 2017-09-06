@@ -536,6 +536,14 @@ RESULT DreamOS::ReleaseObjects(VirtualObj *pInteractionObject) {
 	return m_pSandbox->ReleaseObjects(pInteractionObject);
 }
 
+bool DreamOS::IsObjectCaptured(VirtualObj *pInteractionObject, InteractionEngine::CapturedObj *pCapturedObject) {
+	return m_pSandbox->IsObjectCaptured(pInteractionObject, pCapturedObject);
+}
+
+std::vector<InteractionEngine::CapturedObj*> DreamOS::GetCapturedObjects(VirtualObj *pInteractionObject) {
+	return m_pSandbox->GetCapturedObjects(pInteractionObject);
+}
+
 /*
 RESULT DreamOS::UpdateInteractionPrimitive(const ray &rCast) {
 	return m_pSandbox->UpdateInteractionPrimitive(rCast);

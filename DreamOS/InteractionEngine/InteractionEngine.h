@@ -127,6 +127,13 @@ public:
 		plane m_planeContext;
 		point m_ptOffset;
 		point m_ptOrigin;
+		CapturedObj(VirtualObj *pObj, float threshold, plane planeContext, point ptOffset, point ptOrigin) :
+			m_pObj(pObj),
+			m_threshold(threshold),
+			m_planeContext(planeContext),
+			m_ptOffset(ptOffset),
+			m_ptOrigin(ptOrigin)
+		{};
 	};
 
 	RESULT Update();
@@ -143,6 +150,8 @@ public:
 
 	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
 	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
+	bool IsObjectCaptured(VirtualObj *pInteractionObject, CapturedObj *pCapturedObj);
+	std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddInteractionObject(VirtualObj *pInteractionObject);
 	RESULT RemoveInteractionObject(VirtualObj *pInteractionObject);

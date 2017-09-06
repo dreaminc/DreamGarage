@@ -327,17 +327,19 @@ RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pIntera
 	RESULT r = R_PASS;
 
 	plane planeContext(pObject->GetPosition(true), vDirection);
-	CapturedObj *cObj = new CapturedObj();
-	cObj->m_ptOrigin = pObject->GetPosition();
-	cObj->m_pObj = pObject;
-	cObj->m_threshold = threshold;
-	cObj->m_planeContext = planeContext;
-	// save difference between initial position and 
-	cObj->m_ptOffset = pInteractionObject->GetPosition(true) - pObject->GetPosition(true);
+
+	CapturedObj *cObj = new CapturedObj(
+		pObject,
+		threshold,
+		planeContext,
+		point(pInteractionObject->GetPosition(true) - pObject->GetPosition(true)),
+		pObject->GetPosition());
+
 	if (m_capturedObjects.count(pInteractionObject) > 0) {
 		auto& pOldCaptureObj = m_capturedObjects[pInteractionObject];
 		pOldCaptureObj->m_pObj->SetPosition(pOldCaptureObj->m_ptOrigin);
 	}
+
 	m_capturedObjects[pInteractionObject] = cObj;
 
 //Error:
@@ -352,6 +354,17 @@ RESULT InteractionEngine::ReleaseObjects(VirtualObj *pInteractionObject) {
 
 Error:
 	return r;
+}
+
+bool InteractionEngine::IsObjectCaptured(VirtualObj *pInteractionObject, CapturedObj *pCapturedObj) {
+	return false;
+}
+
+std::vector<InteractionEngine::CapturedObj*> InteractionEngine::GetCapturedObjects(VirtualObj *pInteractionObject) {
+	if (m_capturedObjects.count(pInteractionObject) > 0) {
+		return { m_capturedObjects[pInteractionObject] };
+	}
+	return {};
 }
 
 RESULT InteractionEngine::AddInteractionObject(VirtualObj *pInteractionObject) {

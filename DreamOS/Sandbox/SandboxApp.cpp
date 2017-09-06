@@ -841,6 +841,14 @@ Error:
 	return r;
 }
 
+bool SandboxApp::IsObjectCaptured(VirtualObj *pInteractionObject, InteractionEngine::CapturedObj *pCapturedObj) {
+	return m_pInteractionEngine->IsObjectCaptured(pInteractionObject, pCapturedObj);
+}
+
+std::vector<InteractionEngine::CapturedObj*> SandboxApp::GetCapturedObjects(VirtualObj *pInteractionObject) {
+	return m_pInteractionEngine->GetCapturedObjects(pInteractionObject);
+}
+
 RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 

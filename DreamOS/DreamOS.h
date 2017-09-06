@@ -178,6 +178,8 @@ public:
 
 	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
 	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
+	bool IsObjectCaptured(VirtualObj *pInteractionObject, InteractionEngine::CapturedObj *pCapturedObj);
+	std::vector<InteractionEngine::CapturedObj*>GetCapturedObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
