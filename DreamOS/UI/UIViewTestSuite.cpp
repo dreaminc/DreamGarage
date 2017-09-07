@@ -140,8 +140,8 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestDreamUIBar());
-	//CR(AddTestUIScrollView());
+	//CR(AddTestDreamUIBar());
+	CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
@@ -505,7 +505,9 @@ RESULT UIViewTestSuite::AddTestUIScrollView() {
 		}
 
 		pScrollView->UpdateMenuButtons(pButtons);
-		pScrollView->SetPosition(point(0.0f, 0.0f, 5.0f));
+		//pScrollView->SetPosition(point(0.0f, 0.0f, 5.0f));
+		pScrollView->SetPosition(m_pDreamOS->GetCamera()->GetPosition() + point(0.0f, 1.0f, 0.0f));
+		pScrollView->SetOrientation(quaternion::MakeQuaternionWithEuler(0.0f, -(float)(M_PI_2), 0.0f));
 
 		pLeftMallet = new UIMallet(m_pDreamOS);
 		pRightMallet = new UIMallet(m_pDreamOS);

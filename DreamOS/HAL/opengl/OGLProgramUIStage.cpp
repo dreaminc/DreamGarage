@@ -104,7 +104,7 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// TODO: update with changes 
-	ProjectionMatrix matClipping = ProjectionMatrix(2.0f, 2.0f, -2.0f, 2.0f);
+	ProjectionMatrix matClipping = ProjectionMatrix(4.0f, 2.0f, -2.0f, 2.0f);
 
 	m_pUniformClippingProjection->SetUniform(matClipping);
 	m_pUniformClippingEnabled->SetUniform(true);

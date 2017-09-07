@@ -27,6 +27,8 @@ RESULT HALTestSuite::AddTests() {
 //	CR(AddTestSkybox());
 	CR(AddTestRenderToTextureQuad());
 
+	CR(AddTestUIShaderStage());
+
 	CR(AddTestEnvironmentShader());
 
 	CR(AddTestMouseDrag());
@@ -40,8 +42,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestSenseHaptics());
-
-	CR(AddTestUIShaderStage());
 
 	CR(AddTestModel());
 	
@@ -792,44 +792,21 @@ RESULT HALTestSuite::AddTestQuadObject() {
 		// Connect output as pass-thru to internal blend program
 		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
 		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
 
+		// Connect Program to Display
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
 		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
 
+		CR(pHAL->ReleaseCurrentContext());
+
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
-		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, -1.0f, -0.0f));
-		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
-
 		{
-			//auto pQuad = m_pDreamOS->AddQuad(1.0f, 1.0f);
-			//auto pQuad = m_pDreamOS->TAddQuad(1.0f, 1.0f);
-			//auto pQuad = m_pDreamOS->Add<quad>(1.0f, 1.0f);
-
-			//auto pQuad = m_pDreamOS->Add<quad>(4.0f, 1.0f, 10, 10, quad::CurveType::PARABOLIC);
-
-			/*
-			auto pComposite = m_pDreamOS->Add<composite>();
-			auto pQuad = pComposite->Add<quad>(5.0f, 1.0f, 10, 10, quad::CurveType::CIRCLE);
-
-			CN(pQuad);
-			pQuad->SetPosition(0.0f, -2.0f, 0.0f);
-			pQuad->RotateXByDeg(90.0f);
-			*/
-
-			/*
-			float lineHeight = 0.35f;
-
-			auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-			pFont->SetLineHeight(lineHeight);
-			CN(pFont);
-
-			auto pText = m_pDreamOS->Add<text>(pFont, "testing curved text", lineHeight * 10.0f, lineHeight * 2.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD | text::flags::CURVE_QUAD_CIRCLE);
-			//auto pText = m_pDreamOS->Add<text>(pFont, "testing curved text", lineHeight * 10.0f, lineHeight * 2.6f, text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD | text::flags::CURVE_QUAD_PARABOLIC);
-			CN(pText);
-			pText->RotateXByDeg(90.0f);
-			pText->SetPosition(point(0.0f, 0.0f, 0.0f));
-			pText->SetMaterialAmbient(0.8f);
-			*/
 
 			auto pFlatContext = m_pDreamOS->Add<FlatContext>(1024, 1024, 4);
 			CN(pFlatContext);
