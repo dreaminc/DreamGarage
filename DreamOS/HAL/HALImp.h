@@ -27,7 +27,7 @@
 #include "Primitives/volume.h"
 #include "Primitives/text.h"
 #include "Primitives/skybox.h"
-#include "Primitives/model.h"
+#include "Primitives/model/model.h"
 #include "Primitives/user.h"
 #include "Primitives/DimRay.h"
 

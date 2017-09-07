@@ -183,6 +183,9 @@
     <Filter Include="HAL\Pipeline">
       <UniqueIdentifier>{61e0e0cc-0539-461d-b419-c995721545e8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Primitives\model">
+      <UniqueIdentifier>{2c7c6ba9-bc7c-444f-8790-4a63b1945e22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -232,9 +235,6 @@
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp">
       <Filter>Primitives</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
-      <Filter>Sandbox</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\Primitives\version.cpp">
       <Filter>Primitives</Filter>
@@ -985,9 +985,6 @@
     <ClInclude Include="..\..\..\Primitives\stereocamera.h">
       <Filter>Primitives</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Sandbox\FileLoader.h">
-      <Filter>Sandbox</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\GL\glcorearb.h">
       <Filter>HAL\opengl\GL</Filter>
     </ClInclude>
@@ -1047,9 +1044,6 @@
     </ClInclude>
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h">
       <Filter>TimeManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\Primitives\model.h">
-      <Filter>Primitives</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
       <Filter>HAL\opengl</Filter>
@@ -1720,6 +1714,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\Primitives\Proxy.h">
       <Filter>Primitives</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\model\model.h">
+      <Filter>Primitives\model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -4,15 +4,15 @@
 #include "RESULT/EHM.h"
 
 // DREAM OS
-// DreamOS/Dimension/Primitives/model.h
+// DreamOS/Primitives/model.h
 
 #include <vector>
-#include "DimObj.h"
-#include "Vertex.h"
-#include "point.h"
-#include "color.h"
 
-#include "Sandbox/FileLoader.h"
+#include "Primitives/DimObj.h"
+#include "Primitives/Vertex.h"
+#include "Primitives/point.h"
+#include "Primitives/color.h"
+
 #include "Sandbox/PathManager.h"
 
 class model : public DimObj {
@@ -73,7 +73,7 @@ public:
 		delete[] pszFilePath;
 		pszFilePath = nullptr;
 
-		FileLoaderHelper::LoadOBJFile(objFile, vertices);
+		//FileLoaderHelper::LoadOBJFile(objFile, vertices);
 
 		// TODO: This is a stop gap approach, this should move to manipulating the verts/indices of the DimObj directly
 		// TODO: to avoid mem duplication
@@ -100,6 +100,7 @@ public:
 		return;
 	}
 	*/
+
 	model(const std::vector<vertex>& vertices) {
 		// init a model with index for each vertex
 		m_nIndices = m_nVertices;
@@ -122,21 +123,20 @@ public:
 		m_nVertices = static_cast<unsigned int>(vertices.size());
 		CR(Allocate());
 
-		unsigned int Cnt = 0;
+		unsigned int indexCount = 0;
 
 		for (auto& v : vertices) {
-			m_pVertices[Cnt] = vertex(v);
-			m_pVertices[Cnt].SetTangentBitangentFromNormal();
+			m_pVertices[indexCount] = vertex(v);
+			m_pVertices[indexCount].SetTangentBitangentFromNormal();
 
-			Cnt++;
+			indexCount++;
 		}
 
 
-		Cnt = 0;
+		indexCount = 0;
 
-		for (auto& i : indices)
-		{
-			m_pIndices[Cnt++] = i;
+		for (auto& i : indices) {
+			m_pIndices[indexCount++] = i;
 		}
 
 		Validate();

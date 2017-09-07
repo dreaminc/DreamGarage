@@ -7,7 +7,7 @@
 // DreamOS/HAL/OpenGL/OGLModel.h
 
 #include "OGLObj.h"
-#include "Primitives/model.h"
+#include "Primitives/model/model.h"
 
 class OGLModel : public model, public OGLObj {
 protected:

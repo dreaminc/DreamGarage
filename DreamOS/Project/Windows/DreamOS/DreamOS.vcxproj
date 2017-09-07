@@ -783,12 +783,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\VirtualObj.cpp" />
     <ClCompile Include="..\..\..\Primitives\volume.cpp" />
     <ClCompile Include="..\..\..\Sandbox\CommandLineManager.cpp" />
-    <ClCompile Include="..\..\..\Sandbox\FileLoader.cpp">
-      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</TreatWarningAsError>
-      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='TestingRelease|x64'">false</TreatWarningAsError>
-      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='Production|x64'">false</TreatWarningAsError>
-      <TreatWarningAsError Condition="'$(Configuration)|$(Platform)'=='DevProduction|x64'">false</TreatWarningAsError>
-    </ClCompile>
     <ClCompile Include="..\..\..\Sandbox\PathManager.cpp" />
     <ClCompile Include="..\..\..\Sandbox\PathManagerFactory.cpp" />
     <ClCompile Include="..\..\..\Sandbox\SandboxApp.cpp" />
@@ -1044,7 +1038,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h" />
-    <ClInclude Include="..\..\..\Primitives\model.h" />
+    <ClInclude Include="..\..\..\Primitives\model\model.h" />
     <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h" />
     <ClInclude Include="..\..\..\Primitives\ObjectState.h" />
     <ClInclude Include="..\..\..\Primitives\Proxy.h" />
@@ -1085,7 +1079,6 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\RESULT\RESULT.h" />
     <ClInclude Include="..\..\..\RESULT\STDTYPES.h" />
     <ClInclude Include="..\..\..\Sandbox\CommandLineManager.h" />
-    <ClInclude Include="..\..\..\Sandbox\FileLoader.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManager.h" />
     <ClInclude Include="..\..\..\Sandbox\PathManagerFactory.h" />
     <ClInclude Include="..\..\..\Sandbox\SandboxApp.h" />
