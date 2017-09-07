@@ -27,6 +27,8 @@ RESULT HALTestSuite::AddTests() {
 //	CR(AddTestSkybox());
 	CR(AddTestRenderToTextureQuad());
 
+	CR(AddTestModel());
+
 	CR(AddTestEnvironmentShader());
 
 	CR(AddTestMouseDrag());
@@ -40,8 +42,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestSenseHaptics());
-
-	CR(AddTestModel());
 	
 	CR(AddTestBlinnPhongShader());
 
@@ -588,8 +588,7 @@ Error:
 	return r;
 }
 
-// This will test the HAL model shit
-// TODO: Fix this
+// This will test the HAL model 
 RESULT HALTestSuite::AddTestModel() {
 	RESULT r = R_PASS;
 
