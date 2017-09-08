@@ -69,6 +69,9 @@ RESULT OGLProgramUIStage::SetupConnections() {
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
+
+	//TODO: MatrixNode(?)
+	//CR(MakeInput<ViewMatrix>("clipping_matrix", &m_clippingView, DCONNECTION_FLAGS::PASSIVE));
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
@@ -90,6 +93,7 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	//UpdateFramebufferToViewport(GL_DEPTH_COMPONENT16, GL_FLOAT);
 	//UpdateFramebufferToCamera(m_pCamera, GL_DEPTH_COMPONENT24, GL_UNSIGNED_INT);
 
+
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
@@ -104,9 +108,20 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
 
 	// TODO: update with changes 
-	ProjectionMatrix matClipping = ProjectionMatrix(4.0f, 2.0f, -2.0f, 2.0f);
+	ProjectionMatrix matClipping = ProjectionMatrix(0.75f, 1.5f, -10.0f, 10.0f);
 
-	m_pUniformClippingProjection->SetUniform(matClipping);
+//	ViewMatrix parentView = ViewMatrix::MakeIdentity();
+
+//	m_pUniformClippingProjection->SetUniform(matClipping);
+//	auto parentView = ViewMatrix(parentObj->GetPosition(true), parentObj->GetOrientation(true));
+//	auto cameraView = m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye());
+	
+//	m_pUniformClippingProjection->SetUniform(matClipping * m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye()));
+	//m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye()));
+	m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_clippingView);
+	//m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_clippingView);
+
+//		m_pUniformClippingProjection->SetUniform(matClipping * (RotationMatrix(parentObj->GetOrientation(true))));
 	m_pUniformClippingEnabled->SetUniform(true);
 
 	// 3D Object / skybox
@@ -138,6 +153,11 @@ RESULT OGLProgramUIStage::SetObjectTextures(OGLObj *pOGLObj) {
 	return r;
 }
 
+RESULT OGLProgramUIStage::SetClippingViewMatrix(ViewMatrix matView) {
+	m_clippingView = matView;
+	return R_PASS;
+}
+
 RESULT OGLProgramUIStage::SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) {
 	m_left = left;
 	m_right = right;
@@ -147,6 +167,8 @@ RESULT OGLProgramUIStage::SetClippingFrustrum(float left, float right, float top
 	m_farPlane = farPlane;
 
 	// TODO: Calc the matrix here for speed?
+	m_clippingProjection = ProjectionMatrix(1.25f, 1.5f, -10.0f, 10.0f);
+//	ProjectionMatrix matClipping = ProjectionMatrix(0.75f, 1.5f, -10.0f, 10.0f);
 
 	return R_PASS;
 }

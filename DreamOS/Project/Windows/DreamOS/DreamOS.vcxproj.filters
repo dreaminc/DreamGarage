@@ -1727,6 +1727,9 @@
     <ClInclude Include="..\..\..\HAL\opengl\OGLProgramUIStage.h">
       <Filter>HAL\opengl</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\HAL\UIStageProgram.h">
+      <Filter>HAL</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">

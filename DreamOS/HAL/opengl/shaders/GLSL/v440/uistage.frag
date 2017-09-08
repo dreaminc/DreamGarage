@@ -42,6 +42,11 @@ void main(void) {
 
 	// TODO: Might be able to do this in vertex and interpolate to 
 	// speed this up at cost of accuracy
+
+	if(u_hasTextureColor == true) {
+		color = texture(u_textureColor, DataIn.uvCoord);
+	}
+
 	if(u_clippingEnabled == true) {
 		float xDiff = 1.0f - abs(DataIn.vertClipSpace.x);
 		float yDiff = 1.0f - abs(DataIn.vertClipSpace.y);
@@ -56,13 +61,9 @@ void main(void) {
 			float ratio = (knee - minDistance) / knee;
 
 			if(ratio > 0.0f) {
-				color.a = (1.0f - ratio);
+				color.a = color.a * (1.0f - ratio);
 			}
 		}
-	}
-
-	if(u_hasTextureColor == true) {
-		color = texture(u_textureColor, DataIn.uvCoord);
 	}
 
 	out_vec4Color = material.m_colorDiffuse * color + g_ambient;

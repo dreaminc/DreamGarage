@@ -916,8 +916,8 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));

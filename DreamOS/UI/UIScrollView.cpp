@@ -162,7 +162,7 @@ RESULT UIScrollView::Update() {
 				pButton->SetVisible(true);
 			}
 			else {
-				pButton->SetVisible(false);
+				//pButton->SetVisible(false);
 			}
 		}
 	}

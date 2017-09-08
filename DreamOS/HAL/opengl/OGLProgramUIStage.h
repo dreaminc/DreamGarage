@@ -8,8 +8,9 @@
 #include "OGLProgram.h"
 #include "OGLObj.h"
 #include "OGLTexture.h"
+#include "../UIStageProgram.h"
 
-class OGLProgramUIStage : public OGLProgram {
+class OGLProgramUIStage : public OGLProgram, public UIStageProgram {
 public:
 	OGLProgramUIStage(OpenGLImp *pParentImp);
 
@@ -24,7 +25,9 @@ public:
 	RESULT SetCameraUniforms(camera *pCamera);
 	RESULT SetCameraUniforms(stereocamera* pStereoCamera, EYE_TYPE eye);
 
-	RESULT SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane);
+	//UIStageProgram
+	virtual RESULT SetClippingViewMatrix(ViewMatrix matView) override;
+	virtual RESULT SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) override;
 
 protected:
 	stereocamera *m_pCamera = nullptr;

@@ -28,6 +28,8 @@ class font;
 class texture;
 class UIButton;
 
+class UIStageProgram;
+
 #define MENU_DEPTH -0.3f
 #define MENU_HEIGHT -0.16f
 #define KEYBOARD_OFFSET -0.07f
@@ -94,6 +96,8 @@ public:
 // UIEvent
 	RESULT Notify(UIEvent *pEvent);
 
+	RESULT SetUIStageProgram(UIStageProgram *pUIStageProgram);
+
 protected:
 	static DreamUIBar* SelfConstruct(DreamOS *pDreamOS, void *pContext = nullptr);
 
@@ -134,6 +138,8 @@ private:
 	float m_actuationDepth = ACTUATION_DEPTH;
 
 	MenuState m_menuState = MenuState::NONE;
+
+	UIStageProgram *m_pUIStageProgram = nullptr;
 };
 
 

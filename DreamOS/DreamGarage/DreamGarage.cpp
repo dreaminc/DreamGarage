@@ -26,6 +26,7 @@ light *g_pLight = nullptr;
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/SourceNode.h"
+#include "HAL/UIStageProgram.h"
 
 #include "Core/Utilities.h"
 
@@ -107,12 +108,26 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	// Connect output as pass-thru to internal blend program
 	CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
+	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
+	CN(pUIProgramNode);
+	CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
+	CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
+
+	//TODO: Matrix node
+//	CR(pUIProgramNode->ConnectToInput("clipping_matrix", &m_pClippingView))
+
+	// Connect output as pass-thru to internal blend program
+	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+
+	// save interface for UI apps
+	m_pUIProgramNode = reinterpret_cast<UIStageProgram*>(pUIProgramNode);
+/*
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pUIProgramNode);
 	CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-
+//*/
 	// Debug Console
 	ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
 	CN(pDreamConsoleProgram);
@@ -120,6 +135,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	// Connect output as pass-thru to internal blend program
 	CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
+//	CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -276,6 +292,7 @@ RESULT DreamGarage::LoadScene() {
 #endif
 
 	m_pDreamUIBar = LaunchDreamApp<DreamUIBar>(this, false);
+	m_pDreamUIBar->SetUIStageProgram(m_pUIProgramNode);
 	CN(m_pDreamUIBar);
 
 #ifndef _DEBUG

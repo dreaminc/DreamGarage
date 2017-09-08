@@ -19,6 +19,8 @@
 
 #include "Cloud/HTTP/HTTPController.h"
 
+#include "HAL/UIStageProgram.h"
+
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
 {
@@ -155,6 +157,27 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 		m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
+		
+		auto pCamera = GetDOS()->GetCamera();
+		
+		m_pUIStageProgram->SetClippingFrustrum(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+
+		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
+		auto matView = ViewMatrix(GetComposite()->GetPosition(true), GetComposite()->GetOrientation(true));
+		point ptOrigin = GetComposite()->GetPosition();
+		ptOrigin.SetZeroW();
+		ptOrigin.Reverse();
+
+		quaternion q = GetComposite()->GetOrientation();
+
+//		ptOrigin += m_vDeviation;
+		ViewMatrix mat = ViewMatrix(ptOrigin, q);
+		//m_pUIStageProgram->SetClippingViewMatrix(matView);
+		m_pUIStageProgram->SetClippingViewMatrix(mat);
+		//m_pUIStageProgram->SetClippingViewMatrix(pCamera->GetViewMatrix(pCamera->GetCameraEye()));
+		//m_pUIStageProgram->m_clippingView = pCamera->GetViewMatrix(pCamera->GetCameraEye());
+		//m_pUIStageProgram->m_clippingProjection = ProjectionMatrix(0.75f, 1.5f, -10.0f, 10.0f);
+
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 	}
 	else {
@@ -570,4 +593,9 @@ Error:
 DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamUIBar *pDreamApp = new DreamUIBar(pDreamOS, pContext);
 	return pDreamApp;
+}
+
+RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
+	m_pUIStageProgram = pUIStageProgram;
+	return R_PASS;
 }

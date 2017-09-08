@@ -65,7 +65,8 @@ RESULT OGLProgramMinimalTexture::SetupConnections() {
 	//TODO: CR(MakeInput("lights"));
 
 	// Outputs
-	CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
+	CR(MakeOutputPassthru<OGLFramebuffer>("output_framebuffer", &m_pOGLFramebuffer));
+	//CR(MakeOutput<OGLFramebuffer>("output_framebuffer", m_pOGLFramebuffer));
 
 Error:
 	return r;
@@ -85,7 +86,8 @@ RESULT OGLProgramMinimalTexture::ProcessNode(long frameID) {
 	UseProgram();
 
 	if (m_pOGLFramebuffer != nullptr) {
-		BindToFramebuffer(m_pOGLFramebuffer);
+		m_pOGLFramebuffer->Bind();
+	//	BindToFramebuffer(m_pOGLFramebuffer);
 	}
 
 	glEnable(GL_BLEND);
