@@ -340,7 +340,11 @@ xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openvr\bin\win64\openvr_api.d
 
 xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libcrypto-1_1-x64.dll" "$(TargetDir)" 		
 
-xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 		</Command>
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)" 		
+
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\openssl\openssl-1.0.2\x64\Release\libssl-1_1-x64.dll" "$(TargetDir)"
+
+xcopy /y /s /e /d  "$(ProjectDir)..\..\..\External\assimp\3.3.1\bin\Debug\assimp-vc140-mt.dll" "$(TargetDir)" </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -763,6 +767,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClCompile Include="..\..\..\Primitives\matrix\RotationMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\ScalingMatrix.cpp" />
     <ClCompile Include="..\..\..\Primitives\matrix\TranslationMatrix.cpp" />
+    <ClCompile Include="..\..\..\Primitives\model\mesh.cpp" />
+    <ClCompile Include="..\..\..\Primitives\model\model.cpp" />
+    <ClCompile Include="..\..\..\Primitives\model\ModelFactory.cpp" />
     <ClCompile Include="..\..\..\Primitives\ObjectDerivative.cpp" />
     <ClCompile Include="..\..\..\Primitives\ObjectState.cpp" />
     <ClCompile Include="..\..\..\Primitives\point.cpp" />
@@ -891,6 +898,47 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\DreamOSMain.h" />
     <ClInclude Include="..\..\..\DreamOSWinMain.h" />
     <ClInclude Include="..\..\..\DreamPeer.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\anim.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\camera.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cexport.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cfileio.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cimport.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\color4.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\poppack1.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\pstdint.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\pushpack1.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\config.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultIOStream.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultIOSystem.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultLogger.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Defines.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\defs.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Exporter.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Importer.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\importerdesc.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\IOStream.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\IOSystem.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\light.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Logger.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\LogStream.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\material.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix3x3.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix4x4.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\mesh.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\metadata.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\NullLogger.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\postprocess.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ProgressHandler.hpp" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\quaternion.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\scene.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\SceneCombiner.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\texture.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\types.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.h" />
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\version.h" />
     <ClInclude Include="..\..\..\External\Matrices\Matrices.h" />
     <ClInclude Include="..\..\..\External\Matrices\Vectors.h" />
     <ClInclude Include="..\..\..\External\OCULUS\v132\Logging\include\Logging_Library.h" />
@@ -1038,7 +1086,9 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\Primitives\matrix\ScalingMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\TranslationMatrix.h" />
     <ClInclude Include="..\..\..\Primitives\matrix\ViewMatrix.h" />
+    <ClInclude Include="..\..\..\Primitives\model\mesh.h" />
     <ClInclude Include="..\..\..\Primitives\model\model.h" />
+    <ClInclude Include="..\..\..\Primitives\model\ModelFactory.h" />
     <ClInclude Include="..\..\..\Primitives\ObjectDerivative.h" />
     <ClInclude Include="..\..\..\Primitives\ObjectState.h" />
     <ClInclude Include="..\..\..\Primitives\Proxy.h" />
@@ -1129,6 +1179,13 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\color4.inl" />
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\material.inl" />
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix3x3.inl" />
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix4x4.inl" />
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\quaternion.inl" />
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.inl" />
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.inl" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\libcef_dll_wrapper.pdb" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\natives_blob.bin" />
     <None Include="..\..\..\External\CEF\CEF_BINARY_3.2924.1570\Debug\snapshot_blob.bin" />

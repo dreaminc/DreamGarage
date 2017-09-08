@@ -13,6 +13,8 @@
 #include "HAL/Pipeline/SinkNode.h"
 #include "HAL/Pipeline/ProgramNode.h"
 
+#include "Primitives/model/ModelFactory.h"
+
 #include <HMD/HMDFactory.h>
 
 SandboxApp::SandboxApp() :
@@ -1420,8 +1422,44 @@ Error:
 	return nullptr;
 }
 
-composite* SandboxApp::AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
-	return m_pHALImp->LoadModel(m_pSceneGraph, wstrOBJFilename, pTexture, ptPosition, scale, vEulerRotation);
+model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+	RESULT r = R_PASS;
+
+	// TODO: Other bits (position, scale, rotation)
+
+	model *pModel = ModelFactory::MakeModel(m_pHALImp, wstrModelFilename);
+	CN(pModel);
+
+// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+	RESULT r = R_PASS;
+
+	model *pModel = MakeModel(wstrModelFilename, pTexture, ptPosition, scale, vEulerRotation);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
+	}
+
+	return nullptr;
 }
 
 composite* SandboxApp::MakeComposite() {
@@ -1430,6 +1468,7 @@ composite* SandboxApp::MakeComposite() {
 
 composite* SandboxApp::AddComposite() {
 	RESULT r = R_PASS;
+
 	composite* pComposite = MakeComposite();
 	CN(pComposite);
 	CR(AddObject(pComposite));

@@ -84,15 +84,21 @@ public:
 	virtual RESULT GetCurrentPath(wchar_t*&pszCurrentPath) = 0;
 	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) = 0;
 	virtual RESULT GetDreamPath(char* &n_pszDreamPath) = 0;
+	virtual RESULT GetDreamPath(std::wstring &r_wstrDreamPath) = 0;
 	
 	RESULT GetVersionFolder(version ver, wchar_t* &n_pszVersionFolder);
 
 	RESULT GetValuePath(PATH_VALUE_TYPE type, wchar_t* &n_pszPath);
 	RESULT GetValuePath(PATH_VALUE_TYPE type, char* &n_pszPath);
+	RESULT GetValuePath(PATH_VALUE_TYPE type, std::wstring &r_wstrPath);
+
 	RESULT GetValuePathVersion(PATH_VALUE_TYPE type, version ver, wchar_t* &n_pszVersionPath);
 
 	RESULT GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName, wchar_t* &n_pszFilePath);
 	RESULT GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename, char* &n_pszFilePath);
+
+	RESULT GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename, wchar_t* &n_pszFilePath);
+	RESULT GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename, std::wstring &r_wstrFilePath);
 
 	RESULT GetFilePathVersion(PATH_VALUE_TYPE type, version ver, const wchar_t *pszFileName, wchar_t * &n_pszVersionFilePath);
 	RESULT GetFilePathWithFolder(PATH_VALUE_TYPE type, const wchar_t *pszFolderName, std::wstring &strPathWithFolder);

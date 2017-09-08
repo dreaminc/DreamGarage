@@ -35,6 +35,7 @@ public:
 	RESULT GetCurrentPath(wchar_t*&pszCurrentPath);
 	virtual RESULT GetDreamPath(wchar_t*&pszDreamPath) override;
 	virtual RESULT GetDreamPath(char* &n_pszDreamPath) override;
+	virtual RESULT GetDreamPath(std::wstring &r_wstrDreamPath) override;
 	//RESULT GetValuePath(PATH_VALUE_TYPE, wchar_t* &pszPath);
 
 private:

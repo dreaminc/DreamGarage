@@ -249,7 +249,9 @@ public:
 
 	model *AddModel(wchar_t *pszModelName);
 	model *MakeModel(wchar_t *pszModelName);
-	composite *AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+
+	model *MakeModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+	model *AddModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 	composite *AddComposite();
 	composite *MakeComposite();

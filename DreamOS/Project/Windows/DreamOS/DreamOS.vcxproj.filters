@@ -186,6 +186,9 @@
     <Filter Include="Primitives\model">
       <UniqueIdentifier>{2c7c6ba9-bc7c-444f-8790-4a63b1945e22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\assimp">
+      <UniqueIdentifier>{3a40f6d4-8224-4a7e-bc0d-fb9c9d399cb7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -814,6 +817,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\DreamPeer.cpp">
       <Filter>DreamOS</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\model\model.cpp">
+      <Filter>Primitives\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\model\mesh.cpp">
+      <Filter>Primitives\model</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\model\ModelFactory.cpp">
+      <Filter>Primitives\model</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1718,6 +1730,135 @@
     <ClInclude Include="..\..\..\Primitives\model\model.h">
       <Filter>Primitives\model</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\model\mesh.h">
+      <Filter>Primitives\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\model\ModelFactory.h">
+      <Filter>Primitives\model</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\poppack1.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\pstdint.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Compiler\pushpack1.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\port\AndroidJNI\AndroidJNIIOSystem.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ai_assert.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\anim.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\camera.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cexport.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cfileio.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\cimport.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\color4.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\config.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultIOStream.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultIOSystem.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\DefaultLogger.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Defines.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\defs.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Exporter.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Importer.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\importerdesc.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\IOStream.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\IOSystem.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\light.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\Logger.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\LogStream.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\material.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix3x3.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix4x4.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\mesh.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\metadata.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\NullLogger.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\postprocess.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\ProgressHandler.hpp">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\quaternion.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\scene.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\SceneCombiner.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\texture.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\types.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\version.h">
+      <Filter>External\assimp</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\Makefile">
@@ -1873,6 +2014,27 @@
     </None>
     <None Include="..\..\..\HAL\opengl\shaders\GLSL\v440\blurquad.vert">
       <Filter>HAL\opengl\shaders\GLSL\v440</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\color4.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\material.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix3x3.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\matrix4x4.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\quaternion.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector2.inl">
+      <Filter>External\assimp</Filter>
+    </None>
+    <None Include="..\..\..\External\assimp\3.3.1\include\assimp\vector3.inl">
+      <Filter>External\assimp</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

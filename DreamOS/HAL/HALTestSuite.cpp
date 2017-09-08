@@ -670,7 +670,7 @@ RESULT HALTestSuite::AddTestModel() {
 
 		{
 			///*
-			auto pHead = m_pDreamOS->AddModel(L"\\Models\\face4\\untitled.obj",
+			auto pHead = m_pDreamOS->AddModel(L"\\face4\\untitled.obj",
 				nullptr,
 				point(0.0f, 0.0f, 0.0f),
 				0.018f,

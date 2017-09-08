@@ -134,6 +134,21 @@ Error:
 	return r;
 }
 
+RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, std::wstring &r_wstrPath) {
+	RESULT r = R_PASS;
+
+	CRM(IsPathRegistered(type), "Value not registered");
+
+	r_wstrPath.clear();
+
+	CRM(GetDreamPath(r_wstrPath), "Failed to acquire dream path");
+
+	r_wstrPath += m_pmapNVPPaths->at(type);
+
+Error:
+	return r;
+}
+
 RESULT PathManager::GetValuePath(PATH_VALUE_TYPE type, char* &n_pszPath) {
 	RESULT r = R_PASS;
 
@@ -281,6 +296,54 @@ Error:
 		pszValuePath = nullptr;
 	}
 
+	return r;
+}
+
+RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename, wchar_t* &n_pszFilePath) {
+	RESULT r = R_PASS;
+
+	size_t wstrFilename_n = wstrFilename.size();
+	size_t n_pszFilePath_n = 0;
+
+	wchar_t *pszValuePath = nullptr;
+	size_t pszValuePath_n = 0;
+
+	std::string strFilename = util::WideStringToString(wstrFilename);
+
+	CRM(GetValuePath(type, pszValuePath), "Failed to get value path");
+	pszValuePath_n = wcslen(pszValuePath);
+
+	n_pszFilePath_n = wcslen(pszValuePath) + 1 + wstrFilename.size() + 1;
+	n_pszFilePath = (wchar_t*)(new wchar_t[n_pszFilePath_n]);
+	CN(n_pszFilePath);
+
+	memset(n_pszFilePath, 0, n_pszFilePath_n);
+
+	// Compose the path
+	// TODO: Maybe do some lower level parsing here since ./ will just get attached
+	wcsncat(n_pszFilePath, pszValuePath, pszValuePath_n);
+	wcsncat(n_pszFilePath, wstrFilename.c_str(), wstrFilename.size());
+
+Error:
+	// Release memory from GetValuePath
+	if (pszValuePath != nullptr) {
+		delete[] pszValuePath;
+		pszValuePath = nullptr;
+	}
+
+	return r;
+}
+
+RESULT PathManager::GetFilePath(PATH_VALUE_TYPE type, std::wstring wstrFilename, std::wstring &r_wstrFilePath) {
+	RESULT r = R_PASS;
+
+	r_wstrFilePath.clear();
+	
+	CRM(GetValuePath(type, r_wstrFilePath), "Failed to get value path");
+
+	r_wstrFilePath += wstrFilename;
+
+Error:
 	return r;
 }
 
