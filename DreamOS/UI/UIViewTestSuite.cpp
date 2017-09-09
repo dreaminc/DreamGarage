@@ -743,7 +743,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			auto& pAngleAdjust = pView->AddUIButton();
 			pAngleAdjust->SetPosition(point(0.5f, 1.85f, 3.9f));
 			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);
-			/*
+			//*
 			CR(pAngleAdjust->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
 			std::bind(&UIViewTestSuite::IncreaseAngle, this, std::placeholders::_1)));
 			//*/
@@ -806,6 +806,13 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 			pDimObj->ResetRotation();
 		}
 	} break;
+	//*
+	case (UIEventType::UI_SELECT_BEGIN): {
+		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
+		if (pDimObj != nullptr) {
+			pDimObj->RotateYByDeg(5.0f);
+		}
+	}
 	//*/
 	}
 

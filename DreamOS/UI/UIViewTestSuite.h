@@ -39,6 +39,7 @@ public:
 	RESULT DefaultCallback(void *pContext);
 	RESULT ResetTestCallback(void *pContext);
 	RESULT UpdateHandRay(void *pContext);
+	RESULT IncreaseAngle(void *pContext);
 
 // behaviors
 public:
