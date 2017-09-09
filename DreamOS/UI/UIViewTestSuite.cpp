@@ -734,6 +734,20 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 
 			CR(m_pDreamOS->InitializeKeyboard());
 
+			//*
+			auto pComposite = m_pDreamOS->AddComposite();
+			pComposite->InitializeOBB();
+			//pComposite->SetOrientation(m_pDreamOS->GetKeyboard()->GetOrientation());
+			auto& pView = pComposite->AddUIView(m_pDreamOS);
+			pView->InitializeOBB();
+			auto& pAngleAdjust = pView->AddUIButton();
+			pAngleAdjust->SetPosition(point(0.5f, 1.85f, 3.9f));
+			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);
+			/*
+			CR(pAngleAdjust->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
+			std::bind(&UIViewTestSuite::IncreaseAngle, this, std::placeholders::_1)));
+			//*/
+
 			float radius = 0.015f;
 			point ptcam = m_pDreamOS->GetCamera()->GetPosition();
 			auto pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
