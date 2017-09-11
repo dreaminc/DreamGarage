@@ -272,15 +272,35 @@ RESULT UIViewTestSuite::Rotate15(UIButton *pButtonContext, void *pContext) {
 =======
 RESULT UIViewTestSuite::IncreaseAngle(void *pContext) {
 	RESULT r = R_PASS;
+	UIButton* pSelected = reinterpret_cast<UIButton*>(pContext);
 	auto pKeyboard = m_pDreamOS->GetKeyboard();
 	CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
 	float current = pKeyboard->GetAngle();
-	pKeyboard->SetAngle(current + 10.0f);
-	//quaternion pCurrent = pKeyboard->GetOrientation();
-	//pCurrent *= (0.0f, 0.0f, 1.0f, 0.0f);
-	//pKeyboard->SetOrientation(pCurrent);
-	pKeyboard->UpdateOrientation(m_pMenuHeight+ KEYBOARD_OFFSET, m_pMenuDepth);
-	pKeyboard->UpdateComposite(m_pMenuHeight + KEYBOARD_OFFSET, m_pMenuDepth);
+	if (current > 90.0f) {
+		current = 15.0f;
+	}
+	else
+		current += 2.0f;
+	pKeyboard->SetAngle(current + 2.0f);
+	pKeyboard->UpdateOrientation();
+
+	/*m_pDreamOS->ReleaseObjects(pKeyboard->m_pLeftMallet->GetMalletHead());
+	//m_pDreamOS->ReleaseObjects(m_pRightMallet->GetMalletHead());
+	
+	auto pMalletHead = pSelected->GetInteractionObject();
+	if (pMalletHead != nullptr) {
+		if (pMalletHead == m_pLeftMallet->GetMalletHead()) {
+			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+			pKeyboard->SetAngle(30.0f);
+			pKeyboard->UpdateOrientation();
+		}
+		else if (pMalletHead == m_pRightMallet->GetMalletHead()) {
+			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(1), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+			pKeyboard->SetAngle(current + 2.0f);
+			pKeyboard->UpdateOrientation();
+		}
+	}
+	*/
 Error:	
 	return r;
 }
@@ -756,21 +776,21 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			CR(m_pDreamOS->InitializeKeyboard());
 
 			//*
-			m_pMenuDepth = pDreamUIBar->GetMenuDepth();
-			m_pMenuHeight = pDreamUIBar->GetMenuHeight();
+			auto m_MenuHeight = pDreamUIBar->GetMenuHeight();
+			auto m_MenuDepth = pDreamUIBar->GetMenuDepth();
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
 			//pComposite->SetOrientation(m_pDreamOS->GetKeyboard()->GetOrientation());
 			auto& pView = pComposite->AddUIView(m_pDreamOS);
 			//pView->InitializeOBB();
 			auto& pAngleAdjust = pView->AddUIButton();
-			pAngleAdjust->SetPosition(point(0.25f, 1.85f, 3.9f));
+			pAngleAdjust->SetPosition(point(0.4f, 1.75f, 4.2f));
 			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);
 			//*
 			CR(pAngleAdjust->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
 			std::bind(&UIViewTestSuite::IncreaseAngle, this, std::placeholders::_1)));
 			//*/
-
+			
 			float radius = 0.015f;
 			point ptcam = m_pDreamOS->GetCamera()->GetPosition();
 			auto pSphere = m_pDreamOS->AddSphere(radius, 10, 10);

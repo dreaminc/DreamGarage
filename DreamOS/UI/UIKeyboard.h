@@ -108,7 +108,7 @@ public:
 	RESULT UpdateTextBox(int chkey, std::string strEntered);
 	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
 	RESULT UpdateComposite(float height, float depth); // update position/orientation
-	RESULT UpdateOrientation(float height, float depth);
+	RESULT UpdateOrientation();
 
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);

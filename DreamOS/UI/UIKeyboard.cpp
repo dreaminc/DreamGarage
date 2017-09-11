@@ -640,7 +640,8 @@ RESULT UIKeyboard::UpdateComposite(float height, float depth) {
 	point ptHeader = m_pHeaderContainer->GetPosition();
 	m_pHeaderContainer->SetPosition(point(ptHeader.x(), ptHeader.y(), depth));
 	float offset = m_surfaceHeight / 2.0f;
-	float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
+	//float angle = m_surfaceAngle * (float)(M_PI) / 180.0f;
+	float angle = SURFACE_ANGLE * (float)(M_PI) / 180.0f;
 	m_pSurfaceContainer->SetPosition(point(0.0f, -(sin(angle) * offset + (2.0f * m_lineHeight * m_numLines)), depth + (cos(angle) * offset)));
 
 	CR(UpdateCompositeWithHands(height));
@@ -650,14 +651,10 @@ Error:
 	return r;
 }
 
-RESULT UIKeyboard::UpdateOrientation(float height, float depth) {
+RESULT UIKeyboard::UpdateOrientation() {
 	RESULT r = R_PASS;
-
 	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(m_surfaceAngle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
-
 	m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
-
-//Error:
 	return r;
 }
 
