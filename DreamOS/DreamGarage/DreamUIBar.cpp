@@ -164,11 +164,11 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
 		auto matView = ViewMatrix(GetComposite()->GetPosition(true), GetComposite()->GetOrientation(true));
-		point ptOrigin = GetComposite()->GetPosition();
+		point ptOrigin = GetComposite()->GetPosition(true);
 		ptOrigin.SetZeroW();
 		ptOrigin.Reverse();
 
-		quaternion q = GetComposite()->GetOrientation();
+		quaternion q = GetComposite()->GetOrientation(true);
 
 //		ptOrigin += m_vDeviation;
 		ViewMatrix mat = ViewMatrix(ptOrigin, q);
