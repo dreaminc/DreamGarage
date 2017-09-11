@@ -607,3 +607,12 @@ RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
 	m_pUIStageProgram = pUIStageProgram;
 	return R_PASS;
 }
+
+float DreamUIBar::GetMenuDepth() {
+	return m_menuDepth;
+}
+
+float DreamUIBar::GetMenuHeight() {
+	return m_menuHeight;
+}
+

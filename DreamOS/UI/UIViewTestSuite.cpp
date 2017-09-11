@@ -266,8 +266,29 @@ RESULT UIViewTestSuite::Rotate45(UIButton *pButtonContext, void *pContext) {
 	return R_PASS;
 };
 
+<<<<<<< HEAD
 RESULT UIViewTestSuite::Rotate15(UIButton *pButtonContext, void *pContext) {
 	pButtonContext->GetSurface()->RotateZByDeg(15.0f);
+=======
+RESULT UIViewTestSuite::IncreaseAngle(void *pContext) {
+	RESULT r = R_PASS;
+	auto pKeyboard = m_pDreamOS->GetKeyboard();
+	CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
+	float current = pKeyboard->GetAngle();
+	pKeyboard->SetAngle(current + 10.0f);
+	//quaternion pCurrent = pKeyboard->GetOrientation();
+	//pCurrent *= (0.0f, 0.0f, 1.0f, 0.0f);
+	//pKeyboard->SetOrientation(pCurrent);
+	pKeyboard->UpdateOrientation(m_pMenuHeight+ KEYBOARD_OFFSET, m_pMenuDepth);
+	pKeyboard->UpdateComposite(m_pMenuHeight + KEYBOARD_OFFSET, m_pMenuDepth);
+Error:	
+	return r;
+}
+
+RESULT UIViewTestSuite::Rotate15(void *pContext) {
+	UIButton *button = reinterpret_cast<UIButton*>(pContext);
+	button->GetSurface()->RotateZByDeg(15.0f);
+>>>>>>> keyboard rotation tool
 	return R_PASS;
 };
 
@@ -735,13 +756,15 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			CR(m_pDreamOS->InitializeKeyboard());
 
 			//*
+			m_pMenuDepth = pDreamUIBar->GetMenuDepth();
+			m_pMenuHeight = pDreamUIBar->GetMenuHeight();
 			auto pComposite = m_pDreamOS->AddComposite();
 			pComposite->InitializeOBB();
 			//pComposite->SetOrientation(m_pDreamOS->GetKeyboard()->GetOrientation());
 			auto& pView = pComposite->AddUIView(m_pDreamOS);
-			pView->InitializeOBB();
+			//pView->InitializeOBB();
 			auto& pAngleAdjust = pView->AddUIButton();
-			pAngleAdjust->SetPosition(point(0.5f, 1.85f, 3.9f));
+			pAngleAdjust->SetPosition(point(0.25f, 1.85f, 3.9f));
 			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);
 			//*
 			CR(pAngleAdjust->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
@@ -806,7 +829,7 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 			pDimObj->ResetRotation();
 		}
 	} break;
-	//*
+	/*
 	case (UIEventType::UI_SELECT_BEGIN): {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
 		if (pDimObj != nullptr) {

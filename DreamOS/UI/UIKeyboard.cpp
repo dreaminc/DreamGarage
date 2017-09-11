@@ -650,6 +650,17 @@ Error:
 	return r;
 }
 
+RESULT UIKeyboard::UpdateOrientation(float height, float depth) {
+	RESULT r = R_PASS;
+
+	m_qSurfaceOrientation = quaternion::MakeQuaternionWithEuler(m_surfaceAngle * (float)(M_PI) / 180.0f, 0.0f, 0.0f);
+
+	m_pSurfaceContainer->SetOrientation(m_qSurfaceOrientation);
+
+//Error:
+	return r;
+}
+
 RESULT UIKeyboard::ClearActiveKeys() {
 	m_activeKeys.clear();
 	return R_PASS;
@@ -747,6 +758,12 @@ Error:
 quaternion UIKeyboard::GetOrientation() {
 	quaternion o = GetComposite()->GetOrientation();
 	return o;
+}
+
+RESULT UIKeyboard::SetOrientation(quaternion orientation) {
+	RESULT r = R_PASS;
+	m_qSurfaceOrientation = orientation;
+	return r;
 }
 
 RESULT UIKeyboard::SetKeyTypeThreshold(float threshold) {

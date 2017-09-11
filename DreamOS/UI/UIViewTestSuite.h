@@ -57,6 +57,8 @@ public:
 
 private:
 	DreamOS *m_pDreamOS;
+	float m_pMenuDepth;
+	float m_pMenuHeight;
 };
 
 #define UI_VIEW_TEST_SUITE_H_

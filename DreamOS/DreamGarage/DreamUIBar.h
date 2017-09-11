@@ -74,6 +74,9 @@ public:
 	virtual RESULT Update(void *pContext = nullptr) override;
 	virtual RESULT Shutdown(void *pContext = nullptr) override;
 
+	float GetMenuHeight();
+	float GetMenuDepth();
+
 	// Animation Callbacks
 	RESULT UpdateMenu(void *pContext);
 

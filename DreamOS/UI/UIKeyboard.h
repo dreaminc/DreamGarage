@@ -94,6 +94,7 @@ public:
 	float GetAngle();
 	RESULT SetAngle(float angle);
 	quaternion GetOrientation();
+	RESULT SetOrientation(quaternion orientation);
 
 	RESULT SetKeyTypeThreshold(float threshold);
 	RESULT SetKeyReleaseThreshold(float threshold);
@@ -107,6 +108,7 @@ public:
 	RESULT UpdateTextBox(int chkey, std::string strEntered);
 	RESULT UpdateTitle(texture *pIconTexture, std::string strTitle);
 	RESULT UpdateComposite(float height, float depth); // update position/orientation
+	RESULT UpdateOrientation(float height, float depth);
 
 	//temp
 	RESULT SetMallets(UIMallet *leftMallet, UIMallet *rightMallet);
