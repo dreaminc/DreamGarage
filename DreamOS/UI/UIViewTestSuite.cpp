@@ -7,7 +7,6 @@
 #include "UIView.h"
 #include "UIButton.h"
 #include "UIScrollView.h"
-#include "UIMallet.h"
 
 #include "HAL/Pipeline/ProgramNode.h"
 #include "HAL/Pipeline/SinkNode.h"
@@ -18,6 +17,10 @@
 #include "InteractionEngine/AnimationItem.h"
 
 #include "Primitives/hand.h"
+
+#include "Primitives/font.h"
+#include "Primitives/text.h"
+#include <string>
 
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -266,50 +269,8 @@ RESULT UIViewTestSuite::Rotate45(UIButton *pButtonContext, void *pContext) {
 	return R_PASS;
 };
 
-<<<<<<< HEAD
 RESULT UIViewTestSuite::Rotate15(UIButton *pButtonContext, void *pContext) {
 	pButtonContext->GetSurface()->RotateZByDeg(15.0f);
-=======
-RESULT UIViewTestSuite::IncreaseAngle(void *pContext) {
-	RESULT r = R_PASS;
-	UIButton* pSelected = reinterpret_cast<UIButton*>(pContext);
-	auto pKeyboard = m_pDreamOS->GetKeyboard();
-	CR(m_pDreamOS->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-	float current = pKeyboard->GetAngle();
-	if (current > 90.0f) {
-		current = 15.0f;
-	}
-	else
-		current += 1.0f;
-	pKeyboard->SetAngle(current);
-	
-	pKeyboard->UpdateOrientation();
-
-	/*m_pDreamOS->ReleaseObjects(pKeyboard->m_pLeftMallet->GetMalletHead());
-	//m_pDreamOS->ReleaseObjects(m_pRightMallet->GetMalletHead());
-	
-	auto pMalletHead = pSelected->GetInteractionObject();
-	if (pMalletHead != nullptr) {
-		if (pMalletHead == m_pLeftMallet->GetMalletHead()) {
-			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(0), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-			pKeyboard->SetAngle(30.0f);
-			pKeyboard->UpdateOrientation();
-		}
-		else if (pMalletHead == m_pRightMallet->GetMalletHead()) {
-			CR(GetDOS()->GetHMD()->GetSenseController()->SubmitHapticImpulse(CONTROLLER_TYPE(1), SenseController::HapticCurveType::SINE, 1.0f, 20.0f, 1));
-			pKeyboard->SetAngle(current + 2.0f);
-			pKeyboard->UpdateOrientation();
-		}
-	}
-	*/
-Error:	
-	return r;
-}
-
-RESULT UIViewTestSuite::Rotate15(void *pContext) {
-	UIButton *button = reinterpret_cast<UIButton*>(pContext);
-	button->GetSurface()->RotateZByDeg(15.0f);
->>>>>>> keyboard rotation tool
 	return R_PASS;
 };
 
@@ -777,6 +738,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			CR(m_pDreamOS->InitializeKeyboard());
 
 			//*
+			
 			auto m_MenuHeight = pDreamUIBar->GetMenuHeight();
 			auto m_MenuDepth = pDreamUIBar->GetMenuDepth();
 			auto pComposite = m_pDreamOS->AddComposite();
@@ -785,11 +747,33 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			auto& pView = pComposite->AddUIView(m_pDreamOS);
 			//pView->InitializeOBB();
 			auto& pAngleAdjust = pView->AddUIButton();
-			pAngleAdjust->SetPosition(point(0.0f, 1.75f, 4.2f));
-			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);
+			pAngleAdjust->SetPosition(point(0.0f, 0.1f, -0.2f));
+			pAngleAdjust->SetOrientation(m_pDreamOS->GetKeyboard()->GetOrientation());
 			//*
-			CR(pAngleAdjust->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
-			std::bind(&UIViewTestSuite::IncreaseAngle, this, std::placeholders::_1)));
+			//Setup textbox
+			m_pTextBoxTexture = pComposite->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			m_pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+			m_pFont->SetLineHeight(m_lineHeight);
+			float offset = 1.3f;
+			float angle = m_pDreamOS->GetKeyboard()->GetAngle() *(float)(M_PI) / 180.0f;
+			pComposite->SetPosition(0.0f, offset + (2.0f * m_lineHeight * m_numLines), 4.0f);
+			pComposite->RotateXByDeg(90.0f);
+			pAngleAdjust->RotateXByDeg(-90.0f);
+			m_pTextBoxBackground = pComposite->AddQuad(m_lineWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
+			m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
+
+			m_pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+				m_pFont,
+				"",
+				m_lineWidth - 0.02f,
+				m_lineHeight * m_numLines,
+				text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+
+			pComposite->AddObject(m_pTextBoxText);
+			//*/
+			//interaction
+			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);
+			CR(pAngleAdjust->RegisterEvent(UIEventType::UI_SELECT_BEGIN, std::bind(&UIViewTestSuite::IncreaseAngle, this, std::placeholders::_1)));
 			//*/
 			
 			float radius = 0.015f;
@@ -863,3 +847,9 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 //Error:
 	return r;
 }
+//*
+RESULT UIViewTestSuite::UpdateTextBox(std::string entered) {
+	RESULT r = R_PASS;
+	m_pTextBoxText->SetText(entered);
+	return r;
+}//*/

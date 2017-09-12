@@ -77,7 +77,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 
 		m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
-			"",
+			"h",
 			m_surfaceWidth - 0.02f,
 			m_lineHeight * m_numLines, 
 			text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
