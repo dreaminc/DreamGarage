@@ -180,6 +180,91 @@ Error:
 	return r;
 }
 
+RESULT DimObj::SetMaterialDiffuseColor(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetDiffuseColor(c);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialDiffuseColor(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialSpecularColor(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetSpecularColor(c);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialSpecularColor(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialAmbientColor(color c, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetAmbientColor(c);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialAmbientColor(c, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialShininess(float shine, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetShininess(shine);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialShininess(shine, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
+RESULT DimObj::SetMaterialBumpiness(float bumpiness, bool fSetChildren) {
+	RESULT r = R_PASS;
+
+	GetMaterial()->SetBumpiness(bumpiness);
+
+	if (fSetChildren && HasChildren()) {
+		for (auto& pChild : GetChildren()) {
+			DimObj* pObj = reinterpret_cast<DimObj*>(pChild.get());
+			if (pObj == nullptr) continue;
+			CR(pObj->SetMaterialBumpiness(bumpiness, fSetChildren));
+		}
+	}
+
+Error:
+	return r;
+}
+
 RESULT DimObj::SetMaterialColors(color c, bool fSetChildren) {
 	RESULT r = R_PASS;
 

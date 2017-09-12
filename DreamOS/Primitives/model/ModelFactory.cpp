@@ -7,6 +7,7 @@
 #include "assimp/Importer.hpp"
 #include "assimp/scene.h"
 #include "assimp/postprocess.h"
+#include "assimp/color4.h"
 
 #include "model.h"
 #include "HAL/HALImp.h"
@@ -18,6 +19,115 @@
 #include "Primitives/point.h"
 #include "Primitives/vector.h"
 #include "Primitives/Vertex.h"
+
+std::vector<texture*> MakeTexturesFromAssetImporterMaterial(aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
+	RESULT r = R_PASS;
+	std::vector<texture*> retTextures;
+
+	unsigned int nTextures = pAIMaterial->GetTextureCount(textureType);
+	
+	for (unsigned int i = 0; i < nTextures; i++) {
+		
+		aiString aistrTextureFilepath;
+		pAIMaterial->GetTexture(textureType, i, &aistrTextureFilepath);
+
+		texture *pTexture = nullptr;
+
+		// TODO: Create the texture here
+
+		/*
+		texture.id = TextureFromFile(str.C_Str(), directory);
+		texture.type = typeName;
+		texture.path = str;
+		*/
+
+		retTextures.push_back(pTexture);
+	}
+
+	return retTextures;
+
+/*
+Error:
+	// Release memory on failure
+	for (auto &pTex : retTextures) {
+		delete pTex;
+		pTex = nullptr;
+	}
+
+	retTextures.clear();
+
+	return retTextures;
+	*/
+}
+
+RESULT ProcessAssetImporterMeshMaterial(std::shared_ptr<mesh> pMesh, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
+	RESULT r = R_PASS;
+
+	aiColor4D aic;
+
+	float aiShininess;
+	float aiBumpscale;
+
+	unsigned int retArraySize = 0;
+
+	//float aiStrength;
+	//float aiMax;
+
+	color c;
+
+	// Diffuse Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_DIFFUSE, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMesh->SetMaterialDiffuseColor(c, false);
+	}
+
+	// Specular Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_SPECULAR, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMesh->SetMaterialSpecularColor(c, false);
+	}
+
+	// Ambient Color
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_AMBIENT, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMesh->SetMaterialAmbientColor(c, false);
+	}
+
+	// TODO: Emission Color
+	/*
+	if (aiGetMaterialColor(pAIMaterial, AI_MATKEY_COLOR_EMISSIVE, &aic) == AI_SUCCESS) {
+		c = color(aic.r, aic.g, aic.b, aic.a);
+		pMesh->SetMaterialEmissiveColor(c, false);
+	}
+	*/
+
+	// Shininess 
+	if (aiGetMaterialFloatArray(pAIMaterial, AI_MATKEY_SHININESS, &aiShininess, &retArraySize) == AI_SUCCESS && retArraySize != 0) {
+		pMesh->SetMaterialShininess(aiShininess, false);
+	}
+
+	// Bumpiness
+	if (aiGetMaterialFloatArray(pAIMaterial, AI_MATKEY_BUMPSCALING, &aiBumpscale, &retArraySize) == AI_SUCCESS && retArraySize != 0) {
+		pMesh->SetMaterialBumpiness(aiBumpscale, false);
+	}
+
+	// Textures
+	if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
+		auto diffuseTextures = MakeTexturesFromAssetImporterMaterial(aiTextureType_DIFFUSE, pAIMaterial, pAIScene);
+	}
+
+	if (pAIMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
+		auto specularTextures = MakeTexturesFromAssetImporterMaterial(aiTextureType_SPECULAR, pAIMaterial, pAIScene);
+	}
+
+	if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
+		auto ambientTextures = MakeTexturesFromAssetImporterMaterial(aiTextureType_AMBIENT, pAIMaterial, pAIScene);
+	}
+
+
+//Error:
+	return r;
+}
 
 RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *pAIScene) {
 	RESULT r = R_PASS;
@@ -62,11 +172,17 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 			indices.push_back((dimindex)(face.mIndices[j]));
 		}
 	}
-
-	// TODO: Materials + Textures
-
+	
+	// Create the mesh and add to model
 	std::shared_ptr<mesh> pMesh = pModel->AddMesh(vertices, indices);
 	CN(pMesh);
+
+	// Materials 
+	if (pAIMesh->mMaterialIndex != 0) {
+		aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
+		CRM(ProcessAssetImporterMeshMaterial(pMesh, pAIMaterial, pAIScene), "Failed to process material for mesh");
+	}
+
 
 Error:
 	return r;

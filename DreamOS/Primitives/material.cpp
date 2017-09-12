@@ -69,3 +69,13 @@ RESULT material::SetAmbientIntensity(float ambient) {
 color material::GetDiffuseColor() {
 	return m_colorDiffuse;
 }
+
+RESULT material::SetShininess(float shine) {
+	m_shine = shine;
+	return R_PASS;
+}
+
+RESULT material::SetBumpiness(float bumpiness) {
+	m_bump = bumpiness;
+	return R_PASS;
+}

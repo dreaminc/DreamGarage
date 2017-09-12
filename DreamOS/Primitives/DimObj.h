@@ -54,6 +54,7 @@ protected:
 	
 	// TODO: textures need to go into material once we figure out how we put a sampler2D into a uniform block
 	// TODO: Multiple textures (one for now)
+	// TODO: This should go into material 
 	texture *m_pColorTexture;
 	texture *m_pBumpTexture;
 	texture *m_pTextureAmbient = nullptr;
@@ -120,10 +121,17 @@ public:
 	RESULT SetMaterialColors(color c, bool fSetChildren = false);
 	RESULT SetMaterialTexture(MaterialTexture type, texture *pTexture);
 	RESULT SetMaterialAmbient(float ambient);
+
+	RESULT SetMaterialDiffuseColor(color c, bool fSetChildren = false);
+	RESULT SetMaterialSpecularColor(color c, bool fSetChildren = false);
+	RESULT SetMaterialAmbientColor(color c, bool fSetChildren = false);
+	RESULT SetMaterialShininess(float shine, bool fSetChildren = false);
+	RESULT SetMaterialBumpiness(float bumpiness, bool fSetChildren = false);
 	
-	texture* GetTextureAmbient();
+	// TODO: Move this into material 
 	texture* GetTextureDiffuse();
 	texture* GetTextureSpecular();
+	texture* GetTextureAmbient();
 
 	RESULT SetRandomColor();
 	
