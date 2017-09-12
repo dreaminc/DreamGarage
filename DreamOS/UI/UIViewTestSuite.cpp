@@ -280,8 +280,9 @@ RESULT UIViewTestSuite::IncreaseAngle(void *pContext) {
 		current = 15.0f;
 	}
 	else
-		current += 2.0f;
-	pKeyboard->SetAngle(current + 2.0f);
+		current += 1.0f;
+	pKeyboard->SetAngle(current);
+	
 	pKeyboard->UpdateOrientation();
 
 	/*m_pDreamOS->ReleaseObjects(pKeyboard->m_pLeftMallet->GetMalletHead());
@@ -784,7 +785,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			auto& pView = pComposite->AddUIView(m_pDreamOS);
 			//pView->InitializeOBB();
 			auto& pAngleAdjust = pView->AddUIButton();
-			pAngleAdjust->SetPosition(point(0.4f, 1.75f, 4.2f));
+			pAngleAdjust->SetPosition(point(0.0f, 1.75f, 4.2f));
 			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);
 			//*
 			CR(pAngleAdjust->RegisterEvent(UIEventType::UI_SELECT_BEGIN,
