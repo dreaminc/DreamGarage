@@ -21,6 +21,7 @@ SandboxApp::SandboxApp() :
 	m_pOpenGLRenderingContext(nullptr),
 	m_pSceneGraph(nullptr),
 	m_pUISceneGraph(nullptr),
+	m_pUIClippingSceneGraph(nullptr),
 	m_pPhysicsGraph(nullptr),
 	m_pInteractionGraph(nullptr),
 	m_pFlatSceneGraph(nullptr),
@@ -527,9 +528,14 @@ RESULT SandboxApp::Initialize(int argc, const char *argv[]) {
 	m_pUISceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
 	CNM(m_pUISceneGraph, "Failed to allocate UI Scene Graph");
 	
+	m_pUIClippingSceneGraph = DNode::MakeNode<ObjectStoreNode>(ObjectStoreFactory::TYPE::LIST);
+	CNM(m_pUIClippingSceneGraph, "Failed to allocate UI Clipping Scene Graph");
+
 	// This will prevent scene graph from being deleted when not connected
 	// TODO: Attach to Sandbox somehow?
 	CB(m_pSceneGraph->incRefCount());
+	CB(m_pUISceneGraph->incRefCount());
+	CB(m_pUIClippingSceneGraph->incRefCount());
 
 	// Set up flat graph
 	m_pFlatSceneGraph = new ObjectStore(ObjectStoreFactory::TYPE::LIST);
@@ -839,6 +845,15 @@ RESULT SandboxApp::AddObjectToUIGraph(VirtualObj *pObject) {
 	RESULT r = R_PASS;
 
 	CR(m_pUISceneGraph->PushObject(pObject));
+
+Error:
+	return r;
+}
+
+RESULT SandboxApp::AddObjectToUIClippingGraph(VirtualObj *pObject) {
+	RESULT r = R_PASS;
+
+	CR(m_pUIClippingSceneGraph->PushObject(pObject));
 
 Error:
 	return r;

@@ -67,6 +67,7 @@ RESULT OGLProgramUIStage::SetupConnections() {
 
 	// Inputs
 	CR(MakeInput<stereocamera>("camera", &m_pCamera, DCONNECTION_FLAGS::PASSIVE));
+	CR(MakeInput<ObjectStore>("clippingscenegraph", &m_pClippingSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<ObjectStore>("scenegraph", &m_pSceneGraph, DCONNECTION_FLAGS::PASSIVE));
 	CR(MakeInput<OGLFramebuffer>("input_framebuffer", &m_pOGLFramebuffer));
 
@@ -106,26 +107,15 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
-
-	// TODO: update with changes 
-	ProjectionMatrix matClipping = ProjectionMatrix(0.75f, 1.5f, -10.0f, 10.0f);
-
-//	ViewMatrix parentView = ViewMatrix::MakeIdentity();
-
-//	m_pUniformClippingProjection->SetUniform(matClipping);
-//	auto parentView = ViewMatrix(parentObj->GetPosition(true), parentObj->GetOrientation(true));
-//	auto cameraView = m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye());
 	
-//	m_pUniformClippingProjection->SetUniform(matClipping * m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye()));
-	//m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye()));
 	m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_clippingView);
-	//m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_clippingView);
 
-//		m_pUniformClippingProjection->SetUniform(matClipping * (RotationMatrix(parentObj->GetOrientation(true))));
-	m_pUniformClippingEnabled->SetUniform(true);
 
-	// 3D Object / skybox
+	m_pUniformClippingEnabled->SetUniform(false);
 	RenderObjectStore(m_pSceneGraph);
+
+	m_pUniformClippingEnabled->SetUniform(true);
+	RenderObjectStore(m_pClippingSceneGraph);
 
 	UnbindFramebuffer();
 

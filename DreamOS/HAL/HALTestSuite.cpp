@@ -952,6 +952,7 @@ RESULT HALTestSuite::AddTestUIShaderStage() {
 		
 		ProgramNode* pUIStageProgram = pHAL->MakeProgramNode("uistage");
 		CN(pUIStageProgram);
+		CR(pUIStageProgram->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 		CR(pUIStageProgram->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
 		CR(pUIStageProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 

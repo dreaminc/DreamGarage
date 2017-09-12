@@ -110,6 +110,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
 	CN(pUIProgramNode);
+	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", GetUIClippingSceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("scenegraph", GetUISceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("camera", GetCameraNode()->Output("stereocamera")));
 

@@ -817,6 +817,10 @@ RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
 	return m_pSandbox->AddObjectToUIGraph(pObject);
 }
 
+RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
+	return m_pSandbox->AddObjectToUIClippingGraph(pObject);
+}
+
 // Cloud Controller
 
 RESULT DreamOS::RegisterPeerConnectionObserver(CloudController::PeerConnectionObserver *pPeerConnectionObserver) {

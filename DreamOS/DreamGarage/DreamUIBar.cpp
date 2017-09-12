@@ -49,7 +49,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	DreamOS *pDreamOS = GetDOS();
 
 	m_pFont = pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-	pDreamOS->AddObjectToUIGraph(GetComposite());
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
@@ -327,6 +326,7 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	CN(pDreamUIBar);
 
 	GetComposite()->SetVisible(true, false);
+	m_pScrollView->SetVisible(true, false);
 	m_pScrollView->SetScrollVisible(true);
 	m_pScrollView->SetPosition(m_ptMenuShowOffset);
 	m_pScrollView->ShowTitle();
@@ -482,6 +482,7 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 		CN(pDreamUIBar);
 
 		GetComposite()->SetVisible(false, false);
+		m_pScrollView->SetVisible(false, false);
 		m_menuState = MenuState::NONE;
 	Error:
 		return r;

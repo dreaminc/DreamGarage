@@ -180,6 +180,7 @@ public:
 	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
+	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);
 
 	RESULT RemoveObject(VirtualObj *pObject);
 	RESULT RemoveAllObjects();
@@ -266,6 +267,7 @@ public:
 	CameraNode* GetCameraNode() { return m_pSandbox->GetCameraNode(); }
 	ObjectStoreNode* GetSceneGraphNode() { return m_pSandbox->GetSceneGraphNode(); }
 	ObjectStoreNode* GetUISceneGraphNode() { return m_pSandbox->GetUISceneGraphNode(); }
+	ObjectStoreNode* GetUIClippingSceneGraphNode() { return m_pSandbox->GetUIClippingSceneGraphNode(); }
 
 	// Hands
 	hand *GetHand(hand::HAND_TYPE handType);

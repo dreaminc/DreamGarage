@@ -124,6 +124,7 @@ RESULT UIViewTestSuite::SetupUIStagePipeline() {
 //*
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
 	CN(pUIProgramNode);
+	CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
 	CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 
@@ -689,6 +690,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 	//*
 		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
 		CN(pUIProgramNode);
+		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
 		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
 		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
 

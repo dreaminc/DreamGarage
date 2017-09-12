@@ -35,6 +35,9 @@ UIScrollView::~UIScrollView()
 RESULT UIScrollView::Initialize() {
 	RESULT r = R_PASS;
 
+//	m_pDreamOS->AddObjectToUIGraph(this);
+//	m_pDreamOS->AddObjectToUIClippingGraph(this);
+
 	m_pTitleView = AddUIView();
 	float radY = (m_itemAngleY * M_PI / 180.0f) * -2.0f;
 
@@ -46,6 +49,8 @@ RESULT UIScrollView::Initialize() {
 	m_pTitleQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
 	m_pTitleQuad->RotateXByDeg(90.0f);
 	m_pTitleQuad->SetPosition(point(0.034f, m_titleHeight, 0.0f));
+	m_pTitleQuad->SetVisible(false);
+
 	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 	pFont->SetLineHeight(0.055f);
 	m_pTitleText = std::shared_ptr<text>(m_pDreamOS->MakeText(
@@ -57,16 +62,19 @@ RESULT UIScrollView::Initialize() {
 
 	m_pTitleText->RotateXByDeg(90.0f);
 	m_pTitleText->SetPosition(point(0.6f, m_titleHeight - 0.005f, 0.0f));
+	m_pTitleText->SetVisible(false);
 
 	m_pTitleView->AddObject(m_pTitleText);
+	m_pDreamOS->AddObjectToUIGraph(m_pTitleView.get());
 
 	m_pMenuButtonsContainer = AddUIView();
 	m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, -m_menuCenterOffset);
+	m_pDreamOS->AddObjectToUIClippingGraph(m_pMenuButtonsContainer.get());
 	//m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, 0.3f);
 
 	m_pLeftScrollButton = AddUIButton();
+	m_pDreamOS->AddObjectToUIGraph(m_pLeftScrollButton.get());
 	m_pLeftScrollButton->SetVisible(false);
-
 	//TODO: may be worth adding a constructor that exposes surface width / height
 	//point ptRightScrollButtonOffset = point(0.0f, -0.05f * cos(m_itemAngleX), 0.05f * sin(m_itemAngleX));
 	point ptScrollButtonOffset = point(0.0f, 0.0f, 0.05f * sin(m_itemAngleX));
@@ -76,6 +84,7 @@ RESULT UIScrollView::Initialize() {
 	m_pLeftScrollButton->SetPosition(m_pLeftScrollButton->GetPosition() + m_pMenuButtonsContainer->GetPosition() + ptScrollButtonOffset);
 
 	m_pRightScrollButton = AddUIButton();
+	m_pDreamOS->AddObjectToUIGraph(m_pRightScrollButton.get());
 	m_pRightScrollButton->SetVisible(false);
 	m_pRightScrollButton->GetSurface()->SetScale(vector(m_scrollScale * SCROLL_ASPECT_RATIO, m_scrollScale * 16.0f / 9.0f, m_scrollScale));
 	PositionMenuButton(m_maxElements - m_scrollBias, m_pRightScrollButton);
