@@ -301,7 +301,7 @@ RESULT DimObj::SetMaterialTexture(MaterialTexture type, texture *pTexture) {
 
 	}
 
-	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	pTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 //Error:
 	return r;
@@ -319,19 +319,57 @@ RESULT DimObj::SetColorTexture(texture *pTexture) {
 	// A different path will be needed to re-use textures
 	CR(ClearColorTexture());
 	m_pColorTexture = pTexture;
-	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 Error:
 	return r;
 }
 
-RESULT DimObj::UpdateColorTexture(texture *pTexture) {
-
+RESULT DimObj::SetDiffuseTexture(texture *pTexture) {
 	RESULT r = R_PASS;
-	m_pColorTexture = pTexture;
-	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_COLOR);
 
-//Error:
+	CN(pTexture);
+
+	m_pTextureDiffuse = pTexture;
+	m_pTextureDiffuse->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+Error:
+	return R_PASS;
+}
+
+RESULT DimObj::SetSpecularTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	CN(pTexture);
+
+	m_pTextureSpecular = pTexture;
+	m_pTextureSpecular->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_SPECULAR);
+
+Error:
+	return R_PASS;
+}
+
+RESULT DimObj::SetAmbientTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	CN(pTexture);
+
+	m_pTextureAmbient = pTexture;
+	m_pTextureAmbient->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_AMBIENT);
+
+Error:
+	return R_PASS;
+}
+
+RESULT DimObj::UpdateColorTexture(texture *pTexture) {
+	RESULT r = R_PASS;
+
+	CN(pTexture);
+
+	m_pColorTexture = pTexture;
+	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+Error:
 	return r;
 }
 

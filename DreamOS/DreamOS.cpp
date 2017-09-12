@@ -653,7 +653,7 @@ std::shared_ptr<font> DreamOS::MakeFont(std::wstring wstrFontFileName, bool fDis
 			std::wstring strFile = L"Fonts/" + pFont->GetFontImageFile();
 			const wchar_t* pszFile = strFile.c_str();
 
-			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_COLOR))));
+			CR(pFont->SetTexture(std::shared_ptr<texture>(MakeTexture(const_cast<wchar_t*>(pszFile), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE))));
 		}
 
 		// Push font into store

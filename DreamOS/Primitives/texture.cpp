@@ -148,7 +148,7 @@ texture::~texture() {
 
 // The texture type and channel
 enum class TEXTURE_TYPE {
-	TEXTURE_COLOR = 0,
+	TEXTURE_DIFFUSE = 0,
 	TEXTURE_BUMP = 1,
 	TEXTURE_INVALID = 32
 };

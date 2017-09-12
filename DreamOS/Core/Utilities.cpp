@@ -33,3 +33,51 @@ std::wstring util::StringToWideString(const std::string& strStr) {
 	std::wstring wstrStr = wstrConverter.from_bytes(strStr);
 	return wstrStr;
 }
+
+char* util::WideCStringToCString(const wchar_t *pwszStr) {
+	RESULT r = R_PASS;
+
+	char *pszString = nullptr;
+
+	size_t pwszStr_n = wcslen(pwszStr) + 1;
+
+	pszString = (char*)calloc(pwszStr_n * sizeof(char), 1);
+	CN(pszString);
+
+	size_t bytesWritten = wcstombs(pszString, pwszStr, pwszStr_n);
+	CB((bytesWritten == (pwszStr_n - 1)));
+
+	return pszString;
+
+Error:
+	if (pszString != nullptr) {
+		free(pszString);
+		pszString = nullptr;
+	}
+
+	return nullptr;
+}
+
+wchar_t* util::CStringToWideCString(const char *pszStr) {
+	RESULT r = R_PASS;
+
+	wchar_t *pwszString = nullptr;
+
+	size_t pszStr_n = strlen(pszStr) + 1;
+
+	pwszString = (wchar_t*)calloc(pszStr_n * sizeof(wchar_t), 1);
+	CN(pwszString);
+
+	size_t charsWritten = mbstowcs(pwszString, pszStr, pszStr_n);
+	CB((charsWritten == (pszStr_n - 1)));
+
+	return pwszString;
+
+Error:
+	if (pwszString != nullptr) {
+		free(pwszString);
+		pwszString = nullptr;
+	}
+
+	return nullptr;
+}

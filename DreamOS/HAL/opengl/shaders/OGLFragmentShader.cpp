@@ -84,7 +84,7 @@ RESULT OGLFragmentShader::SetTexture(OGLTexture *pTexture) {
 	RESULT r = R_PASS;
 
 	switch (pTexture->GetTextureType()) {
-		case texture::TEXTURE_TYPE::TEXTURE_COLOR: {
+		case texture::TEXTURE_TYPE::TEXTURE_DIFFUSE: {
 			//CR(SetColorTextureUniform(pTexture->GetTextureNumber()));
 			CR(SetColorTextureUniform(pTexture->GetOGLTextureIndex()));
 		} break;

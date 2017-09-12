@@ -63,7 +63,7 @@ public:
 	}
 
 	template<typename objType, typename... Targs>
-	objType *Make(Targs... Fargs) {
+	std::shared_ptr<objType> Make(Targs... Fargs) {
 		RESULT r = R_PASS;
 
 		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject<objType>(Fargs...));
@@ -101,7 +101,7 @@ public:
 	}
 
 	template<typename objType>
-	objType *Make() {
+	std::shared_ptr<objType> Make() {
 		RESULT r = R_PASS;
 
 		std::shared_ptr<objType> pObj(m_pHALImp->TMakeObject());
@@ -156,6 +156,11 @@ public:
 
 	std::shared_ptr<texture> MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 	std::shared_ptr<texture> MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n);
+
+	// TODO: This is temporary - should move all textures to 
+	// shared pointers or use a central store / special texture object handle
+	// that chops the memory when not used 
+	texture* MakeTextureRaw(wchar_t *pszFilename, texture::TEXTURE_TYPE type);
 
 public:
 	RESULT RenderToTexture(std::shared_ptr<FlatContext> context);

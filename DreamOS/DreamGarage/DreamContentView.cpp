@@ -57,7 +57,7 @@ RESULT DreamContentView::Update(void *pContext) {
 		uint8_t* pBuffer = &(m_pPendingBufferVector->operator[](0));
 		size_t pBuffer_n = m_pPendingBufferVector->size();
 
-		texture *pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		texture *pTexture = GetDOS()->MakeTextureFromFileBuffer(pBuffer, pBuffer_n, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		CN(pTexture);
 		CV(pTexture);
 
@@ -165,7 +165,7 @@ Error:
 RESULT DreamContentView::SetScreenTexture(const std::wstring &wstrTextureFilename) {
 	RESULT r = R_PASS;
 
-	texture *pTexture = GetDOS()->MakeTexture(const_cast<wchar_t*>(wstrTextureFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	texture *pTexture = GetDOS()->MakeTexture(const_cast<wchar_t*>(wstrTextureFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	CN(pTexture);
 
 	CR(SetScreenTexture(pTexture));

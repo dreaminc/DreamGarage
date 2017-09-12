@@ -47,7 +47,7 @@ RESULT user::Initialize() {
 	m_pMouth->RotateXByDeg(270);
 	m_pMouth->RotateZByDeg(90);
 
-	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+	m_pMouthTexture = MakeTexture(L"mouth.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 	
 	m_pMouth->SetMaterialTexture(MaterialTexture::Ambient, m_pMouthTexture.get());
 	m_pMouth->SetMaterialTexture(MaterialTexture::Diffuse, m_pMouthTexture.get());

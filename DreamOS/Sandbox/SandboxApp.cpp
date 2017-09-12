@@ -1308,7 +1308,7 @@ texture* SandboxApp::MakeTexture(const texture &srcTexture) {
 }
 
 texture* SandboxApp::MakeTexture(texture::TEXTURE_TYPE type, int width, int height, texture::PixelFormat format, int channels, void *pBuffer, int pBuffer_n) {
-	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_COLOR, width, height, format, channels, pBuffer, pBuffer_n);
+	return m_pHALImp->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, format, channels, pBuffer, pBuffer_n);
 }
 
 texture* SandboxApp::MakeTexture(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {

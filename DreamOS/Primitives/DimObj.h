@@ -109,6 +109,11 @@ public:
 	RESULT SetAlpha(color_precision a);
 
 	RESULT SetColorTexture(texture *pTexture);
+
+	RESULT SetDiffuseTexture(texture *pTexture);
+	RESULT SetSpecularTexture(texture *pTexture);
+	RESULT SetAmbientTexture(texture *pTexture);
+
 	RESULT UpdateColorTexture(texture *pTexture);
 	RESULT ClearColorTexture();
 	texture *GetColorTexture();

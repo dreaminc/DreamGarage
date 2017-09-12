@@ -168,6 +168,19 @@ std::shared_ptr<texture> composite::MakeTexture(texture::TEXTURE_TYPE type, int 
 	return pTexture;
 }
 
+texture* composite::MakeTextureRaw(wchar_t *pszFilename, texture::TEXTURE_TYPE type) {
+	RESULT r = R_PASS;
+
+	texture* pTexture = m_pHALImp->MakeTexture(pszFilename, type);
+	CN(pTexture);
+
+	//Success:
+	return pTexture;
+
+Error:
+	return nullptr;
+}
+
 std::shared_ptr<hand> composite::MakeHand() {
 	RESULT r = R_PASS;
 

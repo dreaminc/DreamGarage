@@ -238,6 +238,12 @@ FlatContext* HALImp::HelperFactory<FlatContext>::TMakeObject(Targs... Fargs) {
 	return m_pImp->MakeFlatContext(Fargs...);
 }
 
+template<>
+template<typename... Targs>
+texture* HALImp::HelperFactory<texture>::TMakeObject(Targs... Fargs) {
+	return m_pImp->MakeTexture(Fargs...);
+}
+
 // TODO: a lot of this logic should go into the implementation maybe?
 template<>
 template<typename... Targs>

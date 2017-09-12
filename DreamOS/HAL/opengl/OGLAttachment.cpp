@@ -162,7 +162,7 @@ Error:
 RESULT OGLAttachment::MakeOGLTextureMultisample() {
 	RESULT r = R_PASS;
 
-	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_COLOR, GL_TEXTURE_2D_MULTISAMPLE);
+	m_pOGLTexture = new OGLTexture(m_pParentImp, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, GL_TEXTURE_2D_MULTISAMPLE);
 	CN(m_pOGLTexture);
 
 	m_pOGLTexture->SetWidth(m_width);

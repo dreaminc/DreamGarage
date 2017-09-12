@@ -20,7 +20,7 @@
 #include "Primitives/vector.h"
 #include "Primitives/Vertex.h"
 
-std::vector<texture*> MakeTexturesFromAssetImporterMaterial(aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
+std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiTextureType textureType, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
 	RESULT r = R_PASS;
 	std::vector<texture*> retTextures;
 
@@ -31,9 +31,7 @@ std::vector<texture*> MakeTexturesFromAssetImporterMaterial(aiTextureType textur
 		aiString aistrTextureFilepath;
 		pAIMaterial->GetTexture(textureType, i, &aistrTextureFilepath);
 
-		texture *pTexture = nullptr;
-
-		// TODO: Create the texture here
+		// Make the texture
 
 		/*
 		texture.id = TextureFromFile(str.C_Str(), directory);
@@ -41,26 +39,31 @@ std::vector<texture*> MakeTexturesFromAssetImporterMaterial(aiTextureType textur
 		texture.path = str;
 		*/
 
+		// Automatically detect if absolute path, dream path, or local path
+		wchar_t *pwszFilename = util::CStringToWideCString(aistrTextureFilepath.C_Str());
+		texture* pTexture = pModel->MakeTextureRaw(pwszFilename, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		CN(pTexture);
+
 		retTextures.push_back(pTexture);
 	}
 
 	return retTextures;
 
-/*
 Error:
 	// Release memory on failure
-	for (auto &pTex : retTextures) {
-		delete pTex;
-		pTex = nullptr;
+	for (auto &pTexture : retTextures) {
+		if (pTexture != nullptr) {
+			delete pTexture;
+			pTexture = nullptr;
+		}
 	}
 
 	retTextures.clear();
 
-	return retTextures;
-	*/
+	return std::vector<texture*>();
 }
 
-RESULT ProcessAssetImporterMeshMaterial(std::shared_ptr<mesh> pMesh, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
+RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMesh, aiMaterial *pAIMaterial, const aiScene *pAIScene) {
 	RESULT r = R_PASS;
 
 	aiColor4D aic;
@@ -112,16 +115,30 @@ RESULT ProcessAssetImporterMeshMaterial(std::shared_ptr<mesh> pMesh, aiMaterial 
 	}
 
 	// Textures
+	// TODO: Support more than one texture
+	// TODO: Bump maps
 	if (pAIMaterial->GetTextureCount(aiTextureType_DIFFUSE) > 0) {
-		auto diffuseTextures = MakeTexturesFromAssetImporterMaterial(aiTextureType_DIFFUSE, pAIMaterial, pAIScene);
+		auto diffuseTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_DIFFUSE, pAIMaterial, pAIScene);
+		
+		if (diffuseTextures.size() > 0) {
+			pMesh->SetDiffuseTexture(diffuseTextures[0]);
+		}
 	}
 
 	if (pAIMaterial->GetTextureCount(aiTextureType_SPECULAR) > 0) {
-		auto specularTextures = MakeTexturesFromAssetImporterMaterial(aiTextureType_SPECULAR, pAIMaterial, pAIScene);
+		auto specularTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_SPECULAR, pAIMaterial, pAIScene);
+
+		if (specularTextures.size() > 0) {
+			pMesh->SetSpecularTexture(specularTextures[0]);
+		}
 	}
 
 	if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
-		auto ambientTextures = MakeTexturesFromAssetImporterMaterial(aiTextureType_AMBIENT, pAIMaterial, pAIScene);
+		auto ambientTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_AMBIENT, pAIMaterial, pAIScene);
+
+		if (ambientTextures.size() > 0) {
+			pMesh->SetAmbientTexture(ambientTextures[0]);
+		}
 	}
 
 
@@ -180,7 +197,7 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 	// Materials 
 	if (pAIMesh->mMaterialIndex != 0) {
 		aiMaterial *pAIMaterial = pAIScene->mMaterials[pAIMesh->mMaterialIndex];
-		CRM(ProcessAssetImporterMeshMaterial(pMesh, pAIMaterial, pAIScene), "Failed to process material for mesh");
+		CRM(ProcessAssetImporterMeshMaterial(pModel, pMesh, pAIMaterial, pAIScene), "Failed to process material for mesh");
 	}
 
 

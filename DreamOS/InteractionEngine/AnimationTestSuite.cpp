@@ -231,7 +231,7 @@ RESULT AnimationTestSuite::AddTestUIColor() {
 		auto pComposite = m_pDreamOS->MakeComposite();
 		m_pDreamOS->AddObjectToUIGraph(pComposite);
 
-		texture* pPNG = m_pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+		texture* pPNG = m_pDreamOS->MakeTexture(L"icons_600\\icon_png_600.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 		quad *m_pQuad = pComposite->MakeQuad(1.0f, 1.0f).get();
 		m_pQuad->MoveTo(0.0f, 0.0f, 0.0f);

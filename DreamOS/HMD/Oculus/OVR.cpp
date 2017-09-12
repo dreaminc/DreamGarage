@@ -129,7 +129,7 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		point(0.0f, 0.05715f, -0.04826f),
 		1.0f,
 		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
-	m_pLeftControllerModel->SetColorTexture(m_pParentSandbox->MakeTexture(L"external_controller_left_col.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pLeftControllerModel->SetColorTexture(m_pParentSandbox->MakeTexture(L"external_controller_left_col.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	m_pRightControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj",
 		nullptr,
@@ -137,7 +137,7 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 		1.0f,
 		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
 
-	m_pRightControllerModel->SetColorTexture(m_pParentSandbox->MakeTexture(L"external_controller_right_col.png", texture::TEXTURE_TYPE::TEXTURE_COLOR));
+	m_pRightControllerModel->SetColorTexture(m_pParentSandbox->MakeTexture(L"external_controller_right_col.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	
 
