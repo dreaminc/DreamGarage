@@ -964,7 +964,7 @@ $(ProjectDir)packages\squirrel.windows.1.5.2\tools\Squirrel.exe --releasify Drea
     <ClInclude Include="..\..\..\HAL\opengl\OGLAttachment.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLFramebuffer.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLHand.h" />
-    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h" />
+    <ClInclude Include="..\..\..\HAL\opengl\OGLMesh.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLLightsBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLMaterialBlock.h" />
     <ClInclude Include="..\..\..\HAL\opengl\OGLObj.h" />

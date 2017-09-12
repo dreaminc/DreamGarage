@@ -726,6 +726,7 @@ skybox *DreamOS::MakeSkybox() {
 	return m_pSandbox->MakeSkybox();
 }
 
+/*
 model *DreamOS::AddModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
@@ -733,6 +734,7 @@ model *DreamOS::AddModel(wchar_t *pszModelName) {
 model *DreamOS::MakeModel(wchar_t *pszModelName) {
 	return m_pSandbox->AddModel(pszModelName);
 }
+*/
 
 model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	return m_pSandbox->MakeModel(wstrModelFilename, pTexture, ptPosition, scale, vEulerRotation);

@@ -1342,6 +1342,7 @@ Error:
 	return nullptr;
 }
 
+/*
 model* SandboxApp::MakeModel(wchar_t *pszModelName) {
 	return m_pHALImp->MakeModel(pszModelName);
 }
@@ -1364,41 +1365,42 @@ Error:
 	}
 	return nullptr;
 }
+*/
 
-model *SandboxApp::AddModel(const std::vector<vertex>& vertices) {
+mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
-	model* pModel = m_pHALImp->MakeModel(vertices);
-	CN(pModel);
+	mesh* pMesh = m_pHALImp->MakeMesh(vertices);
+	CN(pMesh);
 
-	CR(AddObject(pModel));
+	CR(AddObject(pMesh));
 
 	//Success:
-	return pModel;
+	return pMesh;
 
 Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
 	}
 	return nullptr;
 }
 
-model *SandboxApp::AddModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh* SandboxApp::AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
-	model* pModel = m_pHALImp->MakeModel(vertices, indices);
-	CN(pModel);
+	mesh* pMesh = m_pHALImp->MakeMesh(vertices, indices);
+	CN(pMesh);
 
-	CR(AddObject(pModel));
+	CR(AddObject(pMesh));
 
 	//Success:
-	return pModel;
+	return pMesh;
 
 Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
 	}
 	return nullptr;
 }
@@ -1447,6 +1449,9 @@ model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTex
 
 	model *pModel = MakeModel(wstrModelFilename, pTexture, ptPosition, scale, vEulerRotation);
 	CN(pModel);
+
+	// temp
+	pModel->Scale(scale);
 
 	CR(AddObject(pModel));
 

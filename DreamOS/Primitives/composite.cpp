@@ -193,6 +193,7 @@ Error:
 	return nullptr;
 }
 
+/*
 std::shared_ptr<composite> composite::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 
@@ -217,6 +218,7 @@ std::shared_ptr<composite> composite::AddModel(const std::wstring& wstrOBJFilena
 Error:
 	return nullptr;
 }
+*/
 
 std::shared_ptr<composite> composite::MakeComposite() {
 	RESULT r = R_PASS;
@@ -240,6 +242,7 @@ std::shared_ptr<composite> composite::AddComposite() {
 	return pComposite;
 
 Error:
+	pComposite = nullptr;
 	return nullptr;
 }
 

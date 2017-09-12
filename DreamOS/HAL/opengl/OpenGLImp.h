@@ -32,6 +32,7 @@ class SandboxApp;
 class Windows64App;
 class OGLDreamConsole;
 class font;
+class mesh;
 
 class OpenGLImp : public HALImp {
 private:
@@ -91,10 +92,9 @@ public:
 	
 	skybox *MakeSkybox();
 
-	model *MakeModel(wchar_t *pszModelName);
-	model *MakeModel(const std::vector<vertex>& vertices);
-	model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
-	composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation);
+	//mesh *MakeMesh(wchar_t *pszModelName);
+	mesh *MakeMesh(const std::vector<vertex>& vertices);
+	mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	composite *MakeComposite();
 	FlatContext* MakeFlatContext(int width, int height, int channels);
@@ -102,7 +102,7 @@ public:
 	hand* MakeHand();
 
 	// TODO: Fix w/ scene graph not here
-	composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
+	//composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
 
 public:
 	virtual RESULT SetViewTarget(EYE_TYPE eye, int pxWidth, int pxHeight) override;

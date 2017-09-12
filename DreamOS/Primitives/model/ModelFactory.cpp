@@ -13,10 +13,90 @@
 
 #include "Core/Utilities.h"
 
+#include <vector>
+
+#include "Primitives/point.h"
+#include "Primitives/vector.h"
+#include "Primitives/Vertex.h"
+
+RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *pAIScene) {
+	RESULT r = R_PASS;
+
+	std::vector<vertex> vertices;
+	std::vector<dimindex> indices;
+	//std::vector<texture> textures;
+	
+	std::string strMeshName = "mesh";
+
+	for (unsigned int i = 0; i < pAIMesh->mNumVertices; i++) {
+		vertex vert;
+
+		// Point
+		point ptVert; 
+		ptVert.x() = pAIMesh->mVertices[i].x;
+		ptVert.y() = pAIMesh->mVertices[i].y;
+		ptVert.z() = pAIMesh->mVertices[i].z;
+		vert.SetPoint(ptVert);
+
+		// Normal
+		vector vNormal;
+		vNormal.x() = pAIMesh->mNormals[i].x;
+		vNormal.y() = pAIMesh->mNormals[i].y;
+		vNormal.z() = pAIMesh->mNormals[i].z;
+		vert.SetNormal(vNormal);
+
+		// UV 
+		// TODO: Support multi-textures (assimp supports up to 8 textures)
+		if (pAIMesh->mTextureCoords[0] != nullptr) {
+			vert.SetUV(pAIMesh->mTextureCoords[0][i].x, pAIMesh->mTextureCoords[0][i].y);
+		}
+
+		vertices.push_back(vert);
+	}
+
+	// Indices
+	for (unsigned int i = 0; i < pAIMesh->mNumFaces; i++) {
+		aiFace face = pAIMesh->mFaces[i];
+
+		for (unsigned int j = 0; j < face.mNumIndices; j++) {
+			indices.push_back((dimindex)(face.mIndices[j]));
+		}
+	}
+
+	// TODO: Materials + Textures
+
+	std::shared_ptr<mesh> pMesh = pModel->AddMesh(vertices, indices);
+	CN(pMesh);
+
+Error:
+	return r;
+}
+
+RESULT ProcessAssetImporterNode(model *pModel, aiNode *pAINode, const aiScene *pAIScene) {
+	RESULT r = R_PASS;
+
+	// process all the node's meshes (if any)
+	for (unsigned int i = 0; i < pAINode->mNumMeshes; i++) {
+		aiMesh *pAIMesh = pAIScene->mMeshes[pAINode->mMeshes[i]];
+		
+		//meshes.push_back(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene));
+
+		CR(ProcessAssetImporterMesh(pModel, pAIMesh, pAIScene));
+	}
+	// then do the same for each of its children
+	for (unsigned int i = 0; i < pAINode->mNumChildren; i++) {
+		ProcessAssetImporterNode(pModel, pAINode->mChildren[i], pAIScene);
+	}
+
+Error:
+	return r;
+}
+
 model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilename) {
 	RESULT r = R_PASS;
 
 	model *pModel = nullptr;
+
 	Assimp::Importer assetImporter;
 
 	// Get file path
@@ -25,14 +105,18 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	std::wstring wstrModelFilePath;
 	CRM(pPathManager->GetFilePath(PATH_MODEL, wstrModelFilename, wstrModelFilePath), "Failed to get model file path");
 	CRM(pPathManager->DoesPathExist(wstrModelFilePath, true), "Model file path not found");
+	
+	pModel = new model(pParentImp);
+	CN(pModel);
 
 	// Load model from disk
-	const aiScene *pScene = assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath), aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs);
+	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath), aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs);
 
-	CNM(pScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
-	CBM(((pScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
-	CNM(pScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
+	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
+	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());
+	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
 
+	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene), "Failed to process Asset Importer root node");
 
 // Success:
 	return pModel;

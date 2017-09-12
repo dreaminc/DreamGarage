@@ -198,10 +198,11 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 
 	CBM((verts.size() == pRenderModel->unVertexCount), "Vertex count mismatch");
 	CBM((indices.size() == (pRenderModel->unTriangleCount * 3)), "Index count mismatch");
-
-	model *pModel = m_pParentSandbox->AddModel(verts, indices);
-
-	pModel->SetMaterialAmbient(1.0f);
+	
+	model *pModel = nullptr;
+	//model *pModel = m_pParentSandbox->AddModel(verts, indices);
+	//pModel->SetMaterialAmbient(1.0f);
+	CNM(pModel, "Open VR Controller Models failed to load");
 
 	/*
 	uint16_t unWidth, unHeight; // width and height of the texture map in pixels

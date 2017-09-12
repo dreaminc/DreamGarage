@@ -28,6 +28,7 @@
 #include "Primitives/text.h"
 #include "Primitives/skybox.h"
 #include "Primitives/model/model.h"
+#include "Primitives/model/mesh.h"
 #include "Primitives/user.h"
 #include "Primitives/DimRay.h"
 
@@ -163,8 +164,6 @@ public:
 	
 	virtual volume* MakeVolume(double side, bool fTriangleBased = true) = 0;
 	virtual volume* MakeVolume(double width, double length, double height, bool fTriangleBased = true) = 0;
-	
-	
 
 	virtual text *MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout, double margin, text::flags textFlags = text::flags::NONE) = 0;
 	virtual text *MakeText(std::shared_ptr<font> pFont, const std::string& strContent, double lineHeightM = 0.25f, text::flags textFlags = text::flags::NONE) = 0;
@@ -179,13 +178,16 @@ public:
 	virtual texture* MakeTexture(const texture &srcTexture) = 0;
 
 	virtual skybox *MakeSkybox() = 0;
-	virtual model *MakeModel(wchar_t *pszModelName) = 0;
-	virtual model *MakeModel(const std::vector<vertex>& vertices) = 0;
-	virtual model *MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) = 0;
-	virtual composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) = 0;
+
+	//virtual model *MakeModel(wchar_t *pszModelName) = 0;
+
+	virtual mesh *MakeMesh(const std::vector<vertex>& vertices) = 0;
+	virtual mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) = 0;
+
+	//virtual composite* MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) = 0;
 
 	// TODO: Fix this
-	virtual composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f)) = 0;
+	//virtual composite *LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f)) = 0;
 
 	virtual user *MakeUser() = 0;
 

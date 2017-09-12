@@ -6,17 +6,29 @@
 // DREAM OS
 // DreamOS/Primitives/model/model.h
 
-#include <vector>
+//#include <vector>
 
-#include "Primitives/DimObj.h"
-#include "Primitives/Vertex.h"
-#include "Primitives/point.h"
-#include "Primitives/color.h"
+//#include "Primitives/DimObj.h"
+//#include "Primitives/Vertex.h"
+//#include "Primitives/point.h"
+//#include "Primitives/color.h"
 
-#include "Sandbox/PathManager.h"
+#include "Primitives/composite.h"
 
-// TODO: Make mesh, model as composite or use scene?
-class model : public DimObj {
+class HALImp;
+class mesh;
+
+class model : public composite {
+public:
+	model(HALImp *pParentImp);
+
+	std::shared_ptr<mesh> MakeMesh(const std::vector<vertex>& vertices);
+	std::shared_ptr<mesh> AddMesh(const std::vector<vertex>& vertices);
+
+	std::shared_ptr<mesh> MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+	std::shared_ptr<mesh> AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
+
+	/*
 public:
 	virtual RESULT Allocate() override;
 
@@ -34,6 +46,7 @@ public:
 
 private:
 	RESULT SetVertices(const std::vector<vertex>& vertices);
+	*/
 };
 
 #endif // ! MODEL_H_

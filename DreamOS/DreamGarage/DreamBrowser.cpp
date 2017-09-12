@@ -170,7 +170,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 	m_pBrowserQuad->SetColorTexture(m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
-	///*
+	/*
 	m_pPointerCursor = GetComposite()->AddModel(L"\\Models\\mouse-cursor\\mouse-cursor.obj",
 												nullptr,
 												point(-0.2f, -0.43f, 0.0f),

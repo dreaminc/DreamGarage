@@ -15,7 +15,7 @@
 
 #include "OGLVolume.h"
 
-#include "OGLModel.h"
+#include "OGLMesh.h"
 #include "OGLText.h"
 #include "Primitives/font.h"
 #include "OGLTriangle.h"
@@ -298,60 +298,38 @@ Error:
 }
 */
 
-// This should be ultimately completely removed (kept here to keep code compiling for now)
-composite *OpenGLImp::LoadModel(ObjectStore* pSceneGraph, const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
-	return nullptr;
-}
 
-model *OpenGLImp::MakeModel(wchar_t *pszModelName) {
+mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 
-	model *pModel = new OGLModel(this, pszModelName);
-	CN(pModel);
-
-//Success:
-	return pModel;
-
-Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
-	}
-	return nullptr;
-}
-
-
-model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices) {
-	RESULT r = R_PASS;
-
-	model *pModel = new OGLModel(this, vertices);
-	CN(pModel);
+	mesh *pMesh = new OGLMesh(this, vertices);
+	CN(pMesh);
 
 	//Success:
-	return pModel;
+	return pMesh;
 
 Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
 	}
 	return nullptr;
 }
 
-model *OpenGLImp::MakeModel(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
+mesh *OpenGLImp::MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) {
 	RESULT r = R_PASS;
 
 	// Not implemented yet, until size_t <-> dimindex conflict is resolved.
-	model *pModel = new OGLModel(this, vertices, indices);
-	CN(pModel);
+	mesh *pMesh = new OGLMesh(this, vertices, indices);
+	CN(pMesh);
 
 	//Success:
-	return pModel;
+	return pMesh;
 
 Error:
-	if (pModel != nullptr) {
-		delete pModel;
-		pModel = nullptr;
+	if (pMesh != nullptr) {
+		delete pMesh;
+		pMesh = nullptr;
 	}
 	return nullptr;
 }
@@ -567,6 +545,7 @@ Error:
 	return nullptr;
 }
 
+/*
 composite* OpenGLImp::MakeModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
 	RESULT r = R_PASS;
 
@@ -583,6 +562,7 @@ Error:
 	}
 	return nullptr;
 }
+*/
 
 hand* OpenGLImp::MakeHand() {
 	RESULT r = R_PASS;

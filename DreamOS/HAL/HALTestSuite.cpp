@@ -595,6 +595,10 @@ RESULT HALTestSuite::AddTestModel() {
 	double sTestTime = 70.0f;
 	int nRepeats = 1;
 
+	struct TestContext {
+		model *pModel = nullptr;
+	} *pTestContext = new TestContext();
+
 	float width = 5.5f;
 	float height = width;
 	float length = width;
@@ -662,26 +666,44 @@ RESULT HALTestSuite::AddTestModel() {
 
 		// Objects 
 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
 		volume *pVolume = nullptr;
 		sphere *pSphere = nullptr;
+		
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
 			///*
-			auto pHead = m_pDreamOS->AddModel(L"\\face4\\untitled.obj",
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj",
 				nullptr,
 				point(0.0f, 0.0f, 0.0f),
 				0.018f,
 				vector(0.0f, 0.0f, 0.0f));
 
-			pHead->SetPosition(point(0.0f, 0.0f, 2.0f));
+			pTestContext->pModel->SetPosition(point(0.0f, 0.0f, 2.0f));
 			//*/
 
-			pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20, COLOR_RED);
-			CN(pSphere);
-			pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
+			/*
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\car\\untitled.obj",
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj",
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\dodgeviper\\fbx.FBX",
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.FBX",
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\home\\model.fbx",
+				nullptr,
+				point(0.0f, 0.0f, 0.0f),
+				0.0018f,
+				vector(0.0f, 0.0f, 0.0f));
+
+			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, -4.0f));
+			//*/
+
+			//pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20, COLOR_RED);
+			//CN(pSphere);
+			//pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
 		}
 
 	Error:
@@ -694,8 +716,16 @@ RESULT HALTestSuite::AddTestModel() {
 	};
 
 	// Update Code 
-	auto fnUpdate = [&](void *pContext) {
-		return R_PASS;
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->pModel->RotateYByDeg(0.1f);
+
+	Error:
+		return r;
 	};
 
 	// Update Code 
@@ -704,7 +734,7 @@ RESULT HALTestSuite::AddTestModel() {
 	};
 
 	// Add the test
-	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, m_pDreamOS);
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
 	CN(pNewTest);
 
 	pNewTest->SetTestName("HAL Model Test");

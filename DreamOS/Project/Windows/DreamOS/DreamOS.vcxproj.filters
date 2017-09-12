@@ -1057,9 +1057,6 @@
     <ClInclude Include="..\..\..\TimeManager\TimeManager.h">
       <Filter>TimeManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
-      <Filter>HAL\opengl</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\Primitives\skybox.h">
       <Filter>Primitives</Filter>
     </ClInclude>
@@ -1858,6 +1855,9 @@
     </ClInclude>
     <ClInclude Include="..\..\..\External\assimp\3.3.1\include\assimp\version.h">
       <Filter>External\assimp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\HAL\opengl\OGLMesh.h">
+      <Filter>HAL\opengl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

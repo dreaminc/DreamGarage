@@ -7,9 +7,9 @@
 // DreamOS/HAL/OpenGL/OGLModel.h
 
 #include "OGLObj.h"
-#include "Primitives/model/model.h"
+#include "Primitives/model/mesh.h"
 
-class OGLModel : public model, public OGLObj {
+class OGLMesh : public mesh, public OGLObj {
 protected:
 	DimObj *GetDimObj() {
 		return (DimObj*)this;
@@ -17,29 +17,31 @@ protected:
 
 public:
 
-	OGLModel(OpenGLImp *pParentImp, const std::vector<vertex>& vertices) :
-		model(vertices),
+	OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices) :
+		mesh(vertices),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
 
-	OGLModel(OpenGLImp *pParentImp, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) :
-		model(vertices, indices),
+	OGLMesh(OpenGLImp *pParentImp, const std::vector<vertex>& vertices, const std::vector<dimindex>& indices) :
+		mesh(vertices, indices),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
 
-	OGLModel(OpenGLImp *pParentImp, wchar_t *pszModelName) :
-		model(pszModelName),
+	/*
+	OGLMesh(OpenGLImp *pParentImp, wchar_t *pszModelName) :
+		mesh(pszModelName),
 		OGLObj(pParentImp)
 	{
 		// TODO: Implement valid and CV EHM
 		RESULT r = OGLInitialize();
 	}
+	*/
 	
 	/* For DEBUG
 	// Override this method when necessary by a child object
