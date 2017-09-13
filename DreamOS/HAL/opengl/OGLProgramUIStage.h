@@ -28,6 +28,7 @@ public:
 	//UIStageProgram
 	virtual RESULT SetClippingViewMatrix(ViewMatrix matView) override;
 	virtual RESULT SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) override;
+	virtual RESULT SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) override;
 
 protected:
 	stereocamera *m_pCamera = nullptr;
@@ -44,14 +45,6 @@ private:
 
 	OGLUniformSampler2D *m_pUniformTextureColor;
 	OGLUniformBool *m_pUniformHasTextureColor;
-
-	// Clipping Projection
-	float m_left = -2.0f;
-	float m_right = 2.0f;
-	float m_top = 2.0f;
-	float m_bottom = -2.0f;
-	float m_nearPlane = -2.0f;
-	float m_farPlane = 2.0f;
 
 	OGLUniformBool *m_pUniformClippingEnabled;
 	OGLUniformMatrix4 *m_pUniformClippingProjection;

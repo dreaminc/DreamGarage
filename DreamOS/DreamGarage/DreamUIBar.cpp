@@ -159,23 +159,22 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		
 		auto pCamera = GetDOS()->GetCamera();
 		
-		m_pUIStageProgram->SetClippingFrustrum(0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f);
+		m_pUIStageProgram->SetClippingFrustrum(
+			m_projectionWidth,
+			m_projectionHeight,
+			m_projectionNearPlane,
+			m_projectionFarPlane,
+			m_projectionAngle);
 
 		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
 		auto matView = ViewMatrix(GetComposite()->GetPosition(true), GetComposite()->GetOrientation(true));
 		point ptOrigin = GetComposite()->GetPosition(true);
-		ptOrigin.SetZeroW();
 		ptOrigin.Reverse();
-
 		quaternion q = GetComposite()->GetOrientation(true);
+		q.Reverse();
 
-//		ptOrigin += m_vDeviation;
 		ViewMatrix mat = ViewMatrix(ptOrigin, q);
-		//m_pUIStageProgram->SetClippingViewMatrix(matView);
 		m_pUIStageProgram->SetClippingViewMatrix(mat);
-		//m_pUIStageProgram->SetClippingViewMatrix(pCamera->GetViewMatrix(pCamera->GetCameraEye()));
-		//m_pUIStageProgram->m_clippingView = pCamera->GetViewMatrix(pCamera->GetCameraEye());
-		//m_pUIStageProgram->m_clippingProjection = ProjectionMatrix(0.75f, 1.5f, -10.0f, 10.0f);
 
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 	}
@@ -326,7 +325,9 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	CN(pDreamUIBar);
 
 	GetComposite()->SetVisible(true, false);
-	m_pScrollView->SetVisible(true, false);
+	m_pScrollView->Show();
+	//m_pScrollView->SetVisible(true, true);
+	//m_pScrollView->SetVisible(true, false);
 	m_pScrollView->SetScrollVisible(true);
 	m_pScrollView->SetPosition(m_ptMenuShowOffset);
 	m_pScrollView->ShowTitle();
@@ -482,7 +483,9 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 		CN(pDreamUIBar);
 
 		GetComposite()->SetVisible(false, false);
-		m_pScrollView->SetVisible(false, false);
+		m_pScrollView->Hide();
+		//m_pScrollView->SetVisible(false, true);
+		//m_pScrollView->SetVisible(false, false);
 		m_menuState = MenuState::NONE;
 	Error:
 		return r;

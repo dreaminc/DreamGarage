@@ -107,7 +107,9 @@ RESULT OGLProgramUIStage::ProcessNode(long frameID) {
 	SetLights(pLights);
 
 	SetStereoCamera(m_pCamera, m_pCamera->GetCameraEye());
-	
+//*
+//	m_clippingView = m_pCamera->GetViewMatrix(m_pCamera->GetCameraEye());
+//*/
 	m_pUniformClippingProjection->SetUniform(m_clippingProjection * m_clippingView);
 
 
@@ -149,17 +151,16 @@ RESULT OGLProgramUIStage::SetClippingViewMatrix(ViewMatrix matView) {
 }
 
 RESULT OGLProgramUIStage::SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) {
-	m_left = left;
-	m_right = right;
-	m_top = top;
-	m_bottom = bottom;
-	m_nearPlane = nearPlane;
-	m_farPlane = farPlane;
+	m_clippingProjection = ProjectionMatrix(left, right, top, bottom, nearPlane, farPlane);
+	return R_PASS;
+}
 
-	// TODO: Calc the matrix here for speed?
-	m_clippingProjection = ProjectionMatrix(1.25f, 1.5f, -10.0f, 10.0f);
-//	ProjectionMatrix matClipping = ProjectionMatrix(0.75f, 1.5f, -10.0f, 10.0f);
-
+RESULT OGLProgramUIStage::SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) {
+	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 10.0f);
+	//m_clippingProjection = ProjectionMatrix(1.0f, 0.25f, 0.0f, 5.0f, 15.0f);
+	//m_clippingProjection = ProjectionMatrix(0.09f, 0.25f, 0.0f, 5.0f, 120.0f);
+	//m_clippingProjection = ProjectionMatrix(1.2f, 0.25f, 0.0f, 5.0f, 15.0f);
+	m_clippingProjection = ProjectionMatrix(width, height, nearPlane, farPlane, angle);
 	return R_PASS;
 }
 

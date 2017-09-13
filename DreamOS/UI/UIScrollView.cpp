@@ -284,6 +284,27 @@ RESULT UIScrollView::ShowTitle() {
 	return r;
 }
 
+RESULT UIScrollView::Show() {
+	RESULT r = R_PASS;
+
+	m_pTitleView->SetVisible(true, false);
+	m_pMenuButtonsContainer->SetVisible(true, false);
+
+	return r;
+}
+
+//needed because these objects may be in different scene graphs
+RESULT UIScrollView::Hide() {
+	RESULT r = R_PASS;
+
+	m_pTitleView->SetVisible(false, false);
+	m_pLeftScrollButton->SetVisible(false);
+	m_pRightScrollButton->SetVisible(false);
+	m_pMenuButtonsContainer->SetVisible(false, false);
+
+	return r;
+}
+
 RESULT UIScrollView::HideObject(DimObj* pObject) {
 	RESULT r = R_PASS;
 
