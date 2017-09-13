@@ -827,6 +827,9 @@
     <ClCompile Include="..\..\..\Primitives\model\ModelFactory.cpp">
       <Filter>Primitives\model</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.cpp">
+      <Filter>HAL\opengl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\DreamOSMain.h">

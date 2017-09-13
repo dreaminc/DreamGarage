@@ -388,11 +388,12 @@ texture* DimObj::GetColorTexture() {
 	return m_pColorTexture;
 }
 
-RESULT DimObj::SetBumpTexture(texture *pBumpTexture) {
+RESULT DimObj::SetBumpTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
-	CBM((m_pBumpTexture == nullptr), "Cannot overwrite bump texture");
-	m_pBumpTexture = pBumpTexture;
+	CN(pTexture);
+
+	m_pBumpTexture = pTexture;
 	m_pBumpTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_BUMP);
 
 Error:

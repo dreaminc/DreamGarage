@@ -128,6 +128,17 @@ RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMe
 		}
 	}
 
+	// TODO: This may or may not be a bug with assimp
+	//if (pAIMaterial->GetTextureCount(aiTextureType_NORMALS) > 0) {
+	if (pAIMaterial->GetTextureCount(aiTextureType_HEIGHT) > 0) {
+		//auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_NORMALS, pAIMaterial, pAIScene);
+		auto bumpTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_HEIGHT, pAIMaterial, pAIScene);
+
+		if (bumpTextures.size() > 0) {
+			pMesh->SetBumpTexture(bumpTextures[0]);
+		}
+	}
+
 	if (pAIMaterial->GetTextureCount(aiTextureType_AMBIENT) > 0) {
 		auto ambientTextures = MakeTexturesFromAssetImporterMaterial(pModel, pMesh, aiTextureType_AMBIENT, pAIMaterial, pAIScene);
 
@@ -168,6 +179,20 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 		vNormal.y() = pAIMesh->mNormals[i].y;
 		vNormal.z() = pAIMesh->mNormals[i].z;
 		vert.SetNormal(vNormal);
+
+		// Tangents
+		vector vTangent;
+		vTangent.x() = pAIMesh->mTangents[i].x;
+		vTangent.y() = pAIMesh->mTangents[i].y;
+		vTangent.z() = pAIMesh->mTangents[i].z;
+		vert.SetTangent(vTangent);
+
+		// Bitangents
+		vector vBitangent;
+		vBitangent.x() = pAIMesh->mBitangents[i].x;
+		vBitangent.y() = pAIMesh->mBitangents[i].y;
+		vBitangent.z() = pAIMesh->mBitangents[i].z;
+		vert.SetBitangent(vBitangent);
 
 		// UV 
 		// TODO: Support multi-textures (assimp supports up to 8 textures)
@@ -257,6 +282,7 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	const aiScene *pAIScene =
 		assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath),
 			//aiProcess_FlipUVs |
+			aiProcess_CalcTangentSpace |
 			aiProcess_GenNormals | 
 			aiProcess_PreTransformVertices |
 			aiProcess_Triangulate);

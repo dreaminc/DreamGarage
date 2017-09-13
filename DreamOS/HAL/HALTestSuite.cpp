@@ -621,7 +621,7 @@ RESULT HALTestSuite::AddTestModel() {
 
 		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");	
 		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_tex_bump");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -678,7 +678,7 @@ RESULT HALTestSuite::AddTestModel() {
 		sphere *pSphere = nullptr;
 		
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
@@ -729,7 +729,7 @@ RESULT HALTestSuite::AddTestModel() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		pTestContext->pModel->RotateYByDeg(0.1f);
+		pTestContext->pModel->RotateYByDeg(0.035f);
 
 	Error:
 		return r;
