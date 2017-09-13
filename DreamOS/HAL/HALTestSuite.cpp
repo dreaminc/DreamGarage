@@ -700,9 +700,10 @@ RESULT HALTestSuite::AddTestModel() {
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\home\\model.fbx",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\shelby\\Shelby.fbx",
 			pTestContext->pModel = m_pDreamOS->AddModel(L"\\nanosuit\\nanosuit.obj",
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.fbx",
 				nullptr,
 				point(0.0f, 0.0f, 0.0f),
-				0.618f,
+				0.518f,
 				vector(0.0f, 0.0f, 0.0f));
 
 			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, -4.0f));

@@ -32,7 +32,6 @@ private:
 	float m_bump;				// bumpiness 
 	float m_ambient;
 	float reserved3;
-
 	color m_colorAmbient;
 	color m_colorDiffuse;
 	color m_colorSpecular;

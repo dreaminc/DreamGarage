@@ -181,18 +181,18 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 		vert.SetNormal(vNormal);
 
 		// Tangents
-		vector vTangent;
-		vTangent.x() = pAIMesh->mTangents[i].x;
-		vTangent.y() = pAIMesh->mTangents[i].y;
-		vTangent.z() = pAIMesh->mTangents[i].z;
-		vert.SetTangent(vTangent);
-
-		// Bitangents
-		vector vBitangent;
-		vBitangent.x() = pAIMesh->mBitangents[i].x;
-		vBitangent.y() = pAIMesh->mBitangents[i].y;
-		vBitangent.z() = pAIMesh->mBitangents[i].z;
-		vert.SetBitangent(vBitangent);
+		//vector vTangent;
+		//vTangent.x() = pAIMesh->mTangents[i].x;
+		//vTangent.y() = pAIMesh->mTangents[i].y;
+		//vTangent.z() = pAIMesh->mTangents[i].z;
+		//vert.SetTangent(vTangent);
+		//
+		//// Bitangents
+		//vector vBitangent;
+		//vBitangent.x() = pAIMesh->mBitangents[i].x;
+		//vBitangent.y() = pAIMesh->mBitangents[i].y;
+		//vBitangent.z() = pAIMesh->mBitangents[i].z;
+		//vert.SetBitangent(vBitangent);
 
 		// UV 
 		// TODO: Support multi-textures (assimp supports up to 8 textures)
@@ -282,7 +282,7 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	const aiScene *pAIScene =
 		assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath),
 			//aiProcess_FlipUVs |
-			aiProcess_CalcTangentSpace |
+			//aiProcess_CalcTangentSpace |
 			aiProcess_GenNormals | 
 			aiProcess_PreTransformVertices |
 			aiProcess_Triangulate);
