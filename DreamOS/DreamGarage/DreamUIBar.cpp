@@ -157,8 +157,6 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
 		
-		auto pCamera = GetDOS()->GetCamera();
-		
 		m_pUIStageProgram->SetClippingFrustrum(
 			m_projectionWidth,
 			m_projectionHeight,
@@ -167,14 +165,13 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			m_projectionAngle);
 
 		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
-		auto matView = ViewMatrix(GetComposite()->GetPosition(true), GetComposite()->GetOrientation(true));
 		point ptOrigin = GetComposite()->GetPosition(true);
 		ptOrigin.Reverse();
 		quaternion q = GetComposite()->GetOrientation(true);
 		q.Reverse();
 
-		ViewMatrix mat = ViewMatrix(ptOrigin, q);
-		m_pUIStageProgram->SetClippingViewMatrix(mat);
+		ViewMatrix matView = ViewMatrix(ptOrigin, q);
+		m_pUIStageProgram->SetClippingViewMatrix(matView);
 
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 	}
@@ -326,8 +323,6 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 
 	GetComposite()->SetVisible(true, false);
 	m_pScrollView->Show();
-	//m_pScrollView->SetVisible(true, true);
-	//m_pScrollView->SetVisible(true, false);
 	m_pScrollView->SetScrollVisible(true);
 	m_pScrollView->SetPosition(m_ptMenuShowOffset);
 	m_pScrollView->ShowTitle();
@@ -484,8 +479,6 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 
 		GetComposite()->SetVisible(false, false);
 		m_pScrollView->Hide();
-		//m_pScrollView->SetVisible(false, true);
-		//m_pScrollView->SetVisible(false, false);
 		m_menuState = MenuState::NONE;
 	Error:
 		return r;
