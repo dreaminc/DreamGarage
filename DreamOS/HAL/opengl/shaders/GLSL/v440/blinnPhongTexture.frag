@@ -110,7 +110,7 @@ void main(void) {
 	else {
 		out_vec4Color = max((vec4LightValue * DataIn.color), ambientColor);
 	}
-
-
-	//out_vec4Color = textureColor;
+	
+	// DEBUG: 
+	//out_vec4Color = textureColor + (out_vec4Color * 0.0001f);
 }

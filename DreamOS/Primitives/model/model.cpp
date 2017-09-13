@@ -2,6 +2,8 @@
 
 #include "HAL/HALImp.h"
 
+#include "Sandbox/PathManager.h"
+
 model::model(HALImp *pParentImp) :
 	composite(pParentImp)
 {
@@ -62,4 +64,21 @@ std::shared_ptr<mesh> model::MakeMesh(const std::vector<vertex>& vertices, const
 Error:
 	pMesh = nullptr;
 	return nullptr;
+}
+
+RESULT model::SetModelFilePath(std::wstring wstrFilepath) {
+	m_wstrModelFilePath = wstrFilepath;
+
+	// Set the directory path
+	PathManager* pPathManager = PathManager::instance();
+	m_wstModelDirectoryPath = pPathManager->GetDirectoryPathFromFilePath(m_wstrModelFilePath);
+
+	return R_PASS;
+}
+std::wstring model::GetModelFilePath() {
+	return m_wstrModelFilePath;
+}
+
+std::wstring model::GetModelDirectoryPath() {
+	return m_wstModelDirectoryPath;
 }

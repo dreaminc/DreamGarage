@@ -33,15 +33,9 @@ std::vector<texture*> MakeTexturesFromAssetImporterMaterial(model *pModel, std::
 
 		// Make the texture
 
-		/*
-		texture.id = TextureFromFile(str.C_Str(), directory);
-		texture.type = typeName;
-		texture.path = str;
-		*/
-
 		// Automatically detect if absolute path, dream path, or local path
-		wchar_t *pwszFilename = util::CStringToWideCString(aistrTextureFilepath.C_Str());
-		texture* pTexture = pModel->MakeTextureRaw(pwszFilename, texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		std::wstring wstrFilename = pModel->GetModelDirectoryPath() + util::CStringToWideCString(aistrTextureFilepath.C_Str());
+		texture* pTexture = pModel->MakeTextureRaw(const_cast<wchar_t*>(wstrFilename.c_str()), texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		CN(pTexture);
 
 		retTextures.push_back(pTexture);
@@ -122,6 +116,7 @@ RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMe
 		
 		if (diffuseTextures.size() > 0) {
 			pMesh->SetDiffuseTexture(diffuseTextures[0]);
+			pMesh->SetColorTexture(diffuseTextures[0]);
 		}
 	}
 
@@ -141,7 +136,6 @@ RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMe
 		}
 	}
 
-
 //Error:
 	return r;
 }
@@ -157,6 +151,9 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 
 	for (unsigned int i = 0; i < pAIMesh->mNumVertices; i++) {
 		vertex vert;
+
+		// temp
+		vert.SetColor(color(COLOR_WHITE));
 
 		// Point
 		point ptVert; 
@@ -175,7 +172,18 @@ RESULT ProcessAssetImporterMesh(model *pModel, aiMesh *pAIMesh, const aiScene *p
 		// UV 
 		// TODO: Support multi-textures (assimp supports up to 8 textures)
 		if (pAIMesh->mTextureCoords[0] != nullptr) {
-			vert.SetUV(pAIMesh->mTextureCoords[0][i].x, pAIMesh->mTextureCoords[0][i].y);
+			float u = std::abs(pAIMesh->mTextureCoords[0][i].x);
+			float v = std::abs(pAIMesh->mTextureCoords[0][i].y);
+
+			if (u > 1.0f) {
+				u = u - (int)(u);
+			}
+
+			if (v > 1.0f) {
+				v = v - (int)(v);
+			}
+
+			vert.SetUV(u, v);
 		}
 
 		vertices.push_back(vert);
@@ -242,8 +250,16 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	pModel = new model(pParentImp);
 	CN(pModel);
 
+	// Set the path (used in texture loading)
+	CR(pModel->SetModelFilePath(wstrModelFilePath));
+
 	// Load model from disk
-	const aiScene *pAIScene = assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath), aiProcess_Triangulate | aiProcess_GenNormals | aiProcess_FlipUVs);
+	const aiScene *pAIScene =
+		assetImporter.ReadFile(util::WideStringToString(wstrModelFilePath),
+			//aiProcess_FlipUVs |
+			aiProcess_GenNormals | 
+			aiProcess_PreTransformVertices |
+			aiProcess_Triangulate);
 
 	CNM(pAIScene, "Asset Importer failed to allocate scene: %s", assetImporter.GetErrorString());
 	CBM(((pAIScene->mFlags & AI_SCENE_FLAGS_INCOMPLETE) == 0), "Asset Importer Scene Incomplete: %s", assetImporter.GetErrorString());

@@ -449,6 +449,56 @@ Error:
 	return wstrRet;
 }
 
+std::wstring PathManager::GetDirectoryPathFromFilePath(std::wstring wstrFilePath) {
+	return wstrFilePath.substr(0, wstrFilePath.find_last_of(L"\\/")) + L"\\";
+}
+
+bool PathManager::IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename) {
+	wchar_t *pwszFirst = nullptr;
+	bool fRetVal = false;
+
+	pwszFirst = wcschr(pwszFilename, L':');
+
+	if (pwszFirst == nullptr) {
+		return false;
+	}
+	
+	size_t sizeOfRoot = (pwszFirst - pwszFilename);
+
+	wchar_t *pwszRootTemp = new wchar_t[sizeOfRoot + 1];
+	memset(pwszRootTemp, 0, sizeof(wchar_t) * (sizeOfRoot + 1));
+	wcsncpy(pwszRootTemp, pwszFilename, sizeOfRoot);
+
+	if (wcscmp(pwszRootTemp, pwszRoot) == 0) {
+		fRetVal = true;
+	}
+	else {
+		fRetVal = false;
+	}
+
+	delete[] pwszRootTemp;
+	pwszRootTemp = nullptr;
+
+	return fRetVal;
+}
+
+bool PathManager::IsAbsolutePath(wchar_t *pwszFilename) {
+	wchar_t *pwszFirst = nullptr;
+	
+	pwszFirst = wcschr(pwszFilename, L':');
+
+	if (pwszFirst == nullptr) {
+		return false;
+	}
+	else {
+		return true;
+	}
+}
+
+bool PathManager::IsDreamPath(wchar_t *pwszFilename) {
+	return IsRootPath(DREAM_OS_PATH_WROOT, pwszFilename);
+}
+
 RESULT PathManager::DoesPathExist(PATH_VALUE_TYPE type) {
 	RESULT r = R_PASS;
 

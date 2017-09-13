@@ -13,6 +13,8 @@
 // This should be used to scrape Dream OS path
 #define DREAM_OS_PATH_ENV "DREAMOSPATH"
 #define DREAM_OS_PATHS_FILE "dreampaths.txt"	// TODO: Rename?
+#define DREAM_OS_PATH_ROOT "dreamos"
+#define DREAM_OS_PATH_WROOT L"dreamos"
 
 #include <list>
 #include <map>
@@ -105,6 +107,12 @@ public:
 
 	// std::wstring version
 	std::wstring GetFilePath(PATH_VALUE_TYPE type, const wchar_t *pszFileName);
+
+	std::wstring GetDirectoryPathFromFilePath(std::wstring wstrFilePath);
+
+	bool IsRootPath(wchar_t *pwszRoot, wchar_t *pwszFilename);
+	bool IsAbsolutePath(wchar_t *pwszFilename);
+	bool IsDreamPath(wchar_t *pwszFilename);
 
 	virtual RESULT DoesPathExist(const wchar_t *pszPath) = 0;
 	virtual RESULT GetListOfDirectoriesInPath(PATH_VALUE_TYPE type, std::list<wchar_t*>* pListDirs) = 0;

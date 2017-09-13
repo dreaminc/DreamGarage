@@ -619,7 +619,9 @@ RESULT HALTestSuite::AddTestModel() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");		
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");	
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -633,6 +635,7 @@ RESULT HALTestSuite::AddTestModel() {
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Skybox
+		///*
 		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 		CN(pSkyboxProgram);
 		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
@@ -648,12 +651,14 @@ RESULT HALTestSuite::AddTestModel() {
 
 		// Connect output as pass-thru to internal blend program
 		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
 
 		// Screen Quad Shader (opt - we could replace this if we need to)
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
 		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -677,7 +682,7 @@ RESULT HALTestSuite::AddTestModel() {
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
-			///*
+			/*
 			pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj",
 				nullptr,
 				point(0.0f, 0.0f, 0.0f),
@@ -687,23 +692,25 @@ RESULT HALTestSuite::AddTestModel() {
 			pTestContext->pModel->SetPosition(point(0.0f, 0.0f, 2.0f));
 			//*/
 
-			/*
+			///*
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\car\\untitled.obj",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\dodgeviper\\fbx.FBX",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.FBX",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\home\\model.fbx",
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\shelby\\Shelby.fbx",
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\nanosuit\\nanosuit.obj",
 				nullptr,
 				point(0.0f, 0.0f, 0.0f),
-				0.0018f,
+				0.618f,
 				vector(0.0f, 0.0f, 0.0f));
 
 			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, -4.0f));
 			//*/
 
-			//pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20, COLOR_RED);
-			//CN(pSphere);
-			//pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
+			pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20, COLOR_RED);
+			CN(pSphere);
+			pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
 		}
 
 	Error:

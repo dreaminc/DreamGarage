@@ -55,8 +55,8 @@ protected:
 	// TODO: textures need to go into material once we figure out how we put a sampler2D into a uniform block
 	// TODO: Multiple textures (one for now)
 	// TODO: This should go into material 
-	texture *m_pColorTexture;
-	texture *m_pBumpTexture;
+	texture *m_pColorTexture = nullptr;	// TODO: Remove color texture
+	texture *m_pBumpTexture = nullptr;
 	texture *m_pTextureAmbient = nullptr;
 	texture *m_pTextureDiffuse = nullptr;
 	texture *m_pTextureSpecular = nullptr;

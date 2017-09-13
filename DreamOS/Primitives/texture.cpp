@@ -312,10 +312,20 @@ RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 	RESULT r = R_PASS;
 	wchar_t *pszFilePath = nullptr;
 
-	CR(GetTextureFilePath(pszFilename, pszFilePath));
-	CN(pszFilePath);
+	// Check if this is an absolute path
+	PathManager *pPathManager = PathManager::instance();
+	if (pPathManager->IsDreamPath(const_cast<wchar_t*>(pszFilename))) {
+		// TODO: set to dream path
+	}
+	else if (pPathManager->IsAbsolutePath(const_cast<wchar_t*>(pszFilename))) {
+		CR(LoadTextureFromPath(const_cast<wchar_t*>(pszFilename)));
+	}
+	else {
+		CR(GetTextureFilePath(pszFilename, pszFilePath));
+		CN(pszFilePath);
 
-	CR(LoadTextureFromPath(pszFilePath));
+		CR(LoadTextureFromPath(pszFilePath));
+	}
 
 	// Flip image
 	CR(FlipTextureVertical());

@@ -47,6 +47,14 @@ public:
 private:
 	RESULT SetVertices(const std::vector<vertex>& vertices);
 	*/
+
+	RESULT SetModelFilePath(std::wstring wstrFilepath);
+	std::wstring GetModelFilePath();
+	std::wstring GetModelDirectoryPath();
+
+private:
+	std::wstring m_wstrModelFilePath;
+	std::wstring m_wstModelDirectoryPath;
 };
 
 #endif // ! MODEL_H_
