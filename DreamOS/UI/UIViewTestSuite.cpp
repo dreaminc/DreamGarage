@@ -738,38 +738,46 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			CR(m_pDreamOS->InitializeKeyboard());
 
 			//*
-			
+			//m_pDreamOS->GetKeyboard()->ShowKeyboard();
 			auto m_MenuHeight = pDreamUIBar->GetMenuHeight();
 			auto m_MenuDepth = pDreamUIBar->GetMenuDepth();
-			auto pComposite = m_pDreamOS->AddComposite();
-			pComposite->InitializeOBB();
-			//pComposite->SetOrientation(m_pDreamOS->GetKeyboard()->GetOrientation());
+			composite *pComposite = m_pDreamOS->AddComposite();
+			CR(pComposite->InitializeOBB());
+			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 1.0f));	//with hmd
+			//pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 0.5f));
+
 			auto& pView = pComposite->AddUIView(m_pDreamOS);
-			//pView->InitializeOBB();
+			pView->InitializeOBB();
 			auto& pAngleAdjust = pView->AddUIButton();
 			pAngleAdjust->SetPosition(point(0.0f, 0.1f, -0.2f));
-			pAngleAdjust->SetOrientation(m_pDreamOS->GetKeyboard()->GetOrientation());
+			
+			//pAngleAdjust->SetOrientation(m_pDreamOS->GetKeyboard()->GetOrientation());
+			
 			//*
 			//Setup textbox
-			m_pTextBoxTexture = pComposite->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
 			m_pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 			m_pFont->SetLineHeight(m_lineHeight);
-			float offset = 1.3f;
-			float angle = m_pDreamOS->GetKeyboard()->GetAngle() *(float)(M_PI) / 180.0f;
-			pComposite->SetPosition(0.0f, offset + (2.0f * m_lineHeight * m_numLines), 4.0f);
-			pComposite->RotateXByDeg(90.0f);
-			pAngleAdjust->RotateXByDeg(-90.0f);
-			m_pTextBoxBackground = pComposite->AddQuad(m_lineWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
-			m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
+			m_pTextBoxTexture = pComposite->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			pAngleAdjust->SetColorTexture(m_pTextBoxTexture.get());
+			{
+				float offset = 1.3f;
+				float angle = m_pDreamOS->GetKeyboard()->GetAngle() *(float)(M_PI) / 180.0f;
+				pComposite->RotateXByDeg(90.0f);
+				pAngleAdjust->RotateXByDeg(-90.0f);
 
-			m_pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
-				m_pFont,
-				"",
-				m_lineWidth - 0.02f,
-				m_lineHeight * m_numLines,
-				text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
+				m_pTextBoxBackground = pComposite->AddQuad(m_lineWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.01f, 0.0f));
+				m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
+				
+				m_pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+					m_pFont,
+					"hi",
+					m_lineWidth - 0.02f,
+					m_lineHeight * m_numLines,
+					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
 
-			pComposite->AddObject(m_pTextBoxText);
+				pComposite->AddObject(m_pTextBoxText);
+			}
+
 			//*/
 			//interaction
 			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);

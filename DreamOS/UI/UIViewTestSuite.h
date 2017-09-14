@@ -16,14 +16,7 @@
 
 class DreamOS;
 class UIView;
-<<<<<<< HEAD
 class UIButton;
-=======
-class text;
-class quad;
-class font;
-class texture;
->>>>>>> save point to debug fonts
 struct UIEvent;
 
 class UIViewTestSuite : public valid, public TestSuite, public Subscriber<UIEvent>
