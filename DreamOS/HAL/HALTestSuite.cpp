@@ -25,9 +25,9 @@ RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 //	CR(AddTestSkybox());
-	CR(AddTestRenderToTextureQuad());
-
 	CR(AddTestModel());
+
+	CR(AddTestRenderToTextureQuad());
 
 	CR(AddTestEnvironmentShader());
 
@@ -48,7 +48,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestText());
 
 	CR(AddTestBlinnPhongShaderTextureCopy());
-
 
 	CR(AddTestBlinnPhongShaderTextureHMD());
 
