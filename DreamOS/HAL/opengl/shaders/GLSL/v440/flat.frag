@@ -22,10 +22,10 @@ float gammaValue = 0.0125f;
 void main(void) {  
 	
 	// Distance mapping
-	if (u_fDistanceMap == true) {
+	if (u_fDistanceMap) {
 		float dist = texture(u_textureColor, DataIn.uvCoord * 1.0f).a;
 		float alpha = smoothstep(bufferValue - gammaValue, bufferValue + gammaValue, dist);
-		out_vec4Color = vec4(out_vec4Color.rgb, alpha * (out_vec4Color.a / u_buffer));
+		out_vec4Color = vec4(DataIn.color.rgb, alpha * (DataIn.color.a / bufferValue));
 	}
 	else {
 		if (u_hasColorTexture) {
@@ -35,4 +35,6 @@ void main(void) {
 			out_vec4Color = DataIn.color;
 		}
 	}
+
+	//out_vec4Color = vec4(1, 1, 1, 1) + out_vec4Color * 0.0001f;
 }
