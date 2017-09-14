@@ -25,6 +25,7 @@ RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
 //	CR(AddTestSkybox());
+	CR(AddTestRenderToTextureQuad());
 
 	CR(AddTestEnvironmentShader());
 
@@ -48,7 +49,6 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestBlinnPhongShaderTextureCopy());
 
-	CR(AddTestRenderToTextureQuad());
 
 	CR(AddTestBlinnPhongShaderTextureHMD());
 
@@ -2167,10 +2167,18 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 			std::shared_ptr<FlatContext> pFlatContext = pComposite->MakeFlatContext();
 			CN(pFlatContext);
 
-			std::shared_ptr<quad> pFlatQuad = pFlatContext->AddQuad(1.0f, 1.0f, point(0.0f));
-			CN(pContext);
+			std::shared_ptr<quad> pFlatQuad = pFlatContext->AddQuad(0.25f, 0.25f, point(0.0f));
+			CN(pFlatQuad);
+			pFlatQuad->translateX(-0.5f);
+			pFlatQuad->translateZ(-0.5f);
 
-			pComposite->RenderToTexture(pFlatContext);
+			pFlatQuad = pFlatContext->AddQuad(0.25f, 0.25f, point(0.0f));
+			CN(pFlatQuad);
+			pFlatQuad->translateX(0.5f);
+			pFlatQuad->translateZ(0.5f);
+
+			//pComposite->RenderToTexture(pFlatContext);
+			pFlatContext->RenderToTexture();
 
 			quad *pQuad = m_pDreamOS->AddQuad(width, height);
 			CN(pQuad);
