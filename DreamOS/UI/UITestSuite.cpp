@@ -57,7 +57,7 @@ RESULT UITestSuite::AddTests() {
 	
 	//CR(AddTestBrowserRequest());
 
-	//CR(AddTestFont());
+	CR(AddTestFont());
 
 	CR(AddTestKeyboard());
 
