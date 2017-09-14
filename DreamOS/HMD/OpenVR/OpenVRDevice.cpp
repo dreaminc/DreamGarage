@@ -215,7 +215,7 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	int pBuffer_n = sizeof(uint8_t) * width * height * channels;
 
 	texture *pTexture = m_pParentSandbox->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, texture::PixelFormat::Unspecified, channels, pBuffer, pBuffer_n);
-	pModel->SetColorTexture(pTexture);
+	pModel->SetDiffuseTexture(pTexture);
 
 	vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(deviceID);
 	CR(SetControllerModelTexture(pModel, pTexture, controllerRole))

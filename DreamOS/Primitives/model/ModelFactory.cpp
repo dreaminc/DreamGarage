@@ -116,7 +116,6 @@ RESULT ProcessAssetImporterMeshMaterial(model *pModel, std::shared_ptr<mesh> pMe
 		
 		if (diffuseTextures.size() > 0) {
 			pMesh->SetDiffuseTexture(diffuseTextures[0]);
-			pMesh->SetColorTexture(diffuseTextures[0]);
 		}
 	}
 

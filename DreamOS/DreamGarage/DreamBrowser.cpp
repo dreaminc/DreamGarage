@@ -167,7 +167,7 @@ RESULT DreamBrowser::InitializeApp(void *pContext) {
 
 	// Set up and map the texture
 	m_pBrowserTexture = GetComposite()->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, pxWidth, pxHeight, texture::PixelFormat::RGBA, 4, &vectorByteBuffer[0], pxWidth * pxHeight * 4);	
-	m_pBrowserQuad->SetColorTexture(m_pBrowserTexture.get());
+	m_pBrowserQuad->SetDiffuseTexture(m_pBrowserTexture.get());
 
 	// Set up mouse / hand cursor model
 	/*
@@ -605,7 +605,7 @@ RESULT DreamBrowser::SetScreenTexture(texture *pTexture) {
 	m_aspectRatio = (float)pTexture->GetWidth() / (float)pTexture->GetHeight();
 	SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);
 
-	return m_pBrowserQuad->SetColorTexture(pTexture);
+	return m_pBrowserQuad->SetDiffuseTexture(pTexture);
 }
 
 DreamBrowser* DreamBrowser::SelfConstruct(DreamOS *pDreamOS, void *pContext) {

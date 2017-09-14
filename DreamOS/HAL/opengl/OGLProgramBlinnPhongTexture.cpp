@@ -122,7 +122,7 @@ RESULT OGLProgramBlinnPhongTexture::SetObjectTextures(OGLObj *pOGLObj) {
 
 	OGLTexture *pTexture = nullptr;
 
-	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+	if ((pTexture = pOGLObj->GetTextureDiffuse()) != nullptr) {
 	//if ((pTexture = pOGLObj->GetTextureDiffuse()) != nullptr) {
 		//pTexture->OGLActivateTexture(0);
 		//m_pUniformTextureColor->SetUniform(pTexture);

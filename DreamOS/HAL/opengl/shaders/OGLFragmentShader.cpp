@@ -121,11 +121,11 @@ RESULT OGLFragmentShader::SetObjectTextures(OGLObj *pOGLObj) {
 
 	texture *pTexture = nullptr;
 
-	if ((pTexture = pOGLObj->GetColorTexture()) != nullptr) {
+	if ((pTexture = pOGLObj->GetTextureDiffuse()) != nullptr) {
 		WCR(SetTexture(reinterpret_cast<OGLTexture*>(pTexture)));
 	}
 
-	if ((pTexture = pOGLObj->GetBumpTexture()) != nullptr) {
+	if ((pTexture = pOGLObj->GetTextureBump()) != nullptr) {
 		WCR(SetTexture(reinterpret_cast<OGLTexture*>(pTexture)));
 	}
 

@@ -73,7 +73,7 @@ RESULT UIKeyboard::InitializeApp(void *pContext) {
 		m_pHeaderContainer->RotateXByDeg(90.0f);
 
 		m_pTextBoxBackground = m_pHeaderContainer->AddQuad(m_surfaceWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.001f, 0.0f));
-		m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
+		m_pTextBoxBackground->SetDiffuseTexture(m_pTextBoxTexture.get());
 
 		m_pTextBoxText = std::shared_ptr<text>(GetDOS()->MakeText(
 			m_pFont,
@@ -201,7 +201,7 @@ RESULT UIKeyboard::InitializeQuadsWithLayout(UIKeyboardLayout* pLayout) {
 				uvcoord(uvLeft, uvTop),
 				uvcoord(uvRight, uvBottom));
 
-			pQuad->SetColorTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
+			pQuad->SetDiffuseTexture(m_layoutAtlas[pLayout->GetLayoutType()]->GetFramebuffer()->GetColorTexture());
 
 			// Set up key quad positioning
 			pQuad->ScaleX((m_keyScale * 0.5f*pKey->m_width) / keyDimension);
@@ -548,7 +548,7 @@ RESULT UIKeyboard::UpdateKeyboardLayout(LayoutType kbType) {
 
 	for (auto layoutRow : m_pLayout->GetKeys()) {
 		for (auto& pKey : layoutRow) {
-			CR(pKey->m_pQuad->UpdateColorTexture(m_layoutAtlas[kbType]->GetFramebuffer()->GetColorTexture()));
+			CR(pKey->m_pQuad->SetDiffuseTexture(m_layoutAtlas[kbType]->GetFramebuffer()->GetColorTexture()));
 		}
 	}
 
@@ -626,7 +626,7 @@ RESULT UIKeyboard::UpdateTitle(texture *pIconTexture, std::string strTitle) {
 	RESULT r = R_PASS;
 
 	if (pIconTexture != nullptr) {
-		CR(m_pTitleIcon->UpdateColorTexture(pIconTexture));
+		CR(m_pTitleIcon->SetDiffuseTexture(pIconTexture));
 	}
 	m_pTitleText->SetText(strTitle);
 

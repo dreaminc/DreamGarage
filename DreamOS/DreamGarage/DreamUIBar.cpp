@@ -153,7 +153,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 
 	if (m_pathStack.empty()) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
-		m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 	}
@@ -164,7 +164,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		if (!m_pathStack.empty()) {
 			auto pNode = m_pathStack.top();
 			if (pNode->GetTitle() == "Share") {
-				m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
+				m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 			}
 			else {
 				auto strURI = pNode->GetThumbnailURL();
@@ -360,12 +360,12 @@ RESULT DreamUIBar::Update(void *pContext) {
 		for (auto& pChild : pChildren) {
 			auto pObj = dynamic_cast<UIMenuItem*>(pChild.get());
 			if (pObj != nullptr && pMenuNodeTitle.size() > 0 && pObj->GetName() == pMenuNodeTitle) {
-				pObj->GetSurface()->UpdateColorTexture(pTexture);
+				pObj->GetSurface()->SetDiffuseTexture(pTexture);
 			}
 		}
 
 		if (pMenuNodeTitle == "root_menu_title") {
-			m_pScrollView->GetTitleQuad()->UpdateColorTexture(pTexture);
+			m_pScrollView->GetTitleQuad()->SetDiffuseTexture(pTexture);
 			//TODO: temporary, should be revisited during menu cleanup
 			GetDOS()->GetKeyboard()->UpdateTitle(pTexture, "Website");
 		}

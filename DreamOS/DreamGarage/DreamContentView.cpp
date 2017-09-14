@@ -98,7 +98,7 @@ RESULT DreamContentView::SetScreenTexture(texture *pTexture) {
 		SetParams(GetOrigin(), m_diagonalSize, m_aspectRatio, m_vNormal);
 	}
 
-	return m_pScreenQuad->SetColorTexture(pTexture);
+	return m_pScreenQuad->SetDiffuseTexture(pTexture);
 }
 
 RESULT DreamContentView::HandleOnFileResponse(std::shared_ptr<std::vector<uint8_t>> pBufferVector) {

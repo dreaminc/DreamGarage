@@ -11,8 +11,6 @@ DimObj::DimObj() :
 	m_pVertices(nullptr),
 	m_pIndices(nullptr),
 	m_material(),
-	m_pColorTexture(nullptr),
-	m_pBumpTexture(nullptr),
 	m_pObjects(nullptr),
 	m_pParent(nullptr),
 	m_fVisible(true),
@@ -312,19 +310,6 @@ RESULT DimObj::SetMaterialAmbient(float ambient) {
 	return R_PASS;
 }
 
-RESULT DimObj::SetColorTexture(texture *pTexture) {
-	RESULT r = R_PASS;
-
-	// TODO: Currently, this will destroy the texture that is currently used
-	// A different path will be needed to re-use textures
-	CR(ClearColorTexture());
-	m_pColorTexture = pTexture;
-	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-
-Error:
-	return r;
-}
-
 RESULT DimObj::SetDiffuseTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
@@ -361,33 +346,6 @@ Error:
 	return R_PASS;
 }
 
-RESULT DimObj::UpdateColorTexture(texture *pTexture) {
-	RESULT r = R_PASS;
-
-	CN(pTexture);
-
-	m_pColorTexture = pTexture;
-	m_pColorTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
-
-Error:
-	return r;
-}
-
-RESULT DimObj::ClearColorTexture() {
-	RESULT r = R_PASS;
-
-	if (m_pColorTexture != nullptr) {
-		delete m_pColorTexture;
-		m_pColorTexture = nullptr;
-	}
-//Error:
-	return r;
-}
-
-texture* DimObj::GetColorTexture() {
-	return m_pColorTexture;
-}
-
 RESULT DimObj::SetBumpTexture(texture *pTexture) {
 	RESULT r = R_PASS;
 
@@ -395,16 +353,6 @@ RESULT DimObj::SetBumpTexture(texture *pTexture) {
 
 	m_pBumpTexture = pTexture;
 	m_pBumpTexture->SetTextureType(texture::TEXTURE_TYPE::TEXTURE_BUMP);
-
-Error:
-	return r;
-}
-
-RESULT DimObj::ClearBumpTexture() {
-	RESULT r = R_PASS;
-
-	CB((m_pBumpTexture != nullptr));
-	m_pBumpTexture = nullptr;
 
 Error:
 	return r;

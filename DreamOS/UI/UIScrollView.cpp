@@ -43,7 +43,7 @@ RESULT UIScrollView::Initialize() {
 
 	//TODO:  clean this up, potentially with curved quad implementation
 	m_pTitleQuad = m_pTitleView->AddQuad(0.068f, 0.068f * (3.0f / 4.0f));
-	m_pTitleQuad->SetColorTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pTitleQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"icon-share.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 	m_pTitleQuad->RotateXByDeg(90.0f);
 	m_pTitleQuad->SetPosition(point(0.034f, m_titleHeight, 0.0f));
 	auto pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
@@ -84,8 +84,8 @@ RESULT UIScrollView::Initialize() {
 	m_pLeftScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
 	m_pRightScrollButton->GetMaterial()->SetColors(m_hiddenColor, m_hiddenColor, m_hiddenColor);
 
-	m_pLeftScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-left.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-	m_pRightScrollButton->GetSurface()->SetColorTexture(m_pDreamOS->MakeTexture(L"chevron-right.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pLeftScrollButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"chevron-left.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pRightScrollButton->GetSurface()->SetDiffuseTexture(m_pDreamOS->MakeTexture(L"chevron-right.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 	m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE, this);
 

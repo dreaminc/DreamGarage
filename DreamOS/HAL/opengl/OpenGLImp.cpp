@@ -636,7 +636,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, texture *pFontTexture, co
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 //Success:
 	return pText;
@@ -681,7 +681,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 //Success:
 	return pText;
@@ -771,7 +771,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, UIKeyboardLayout *pLayout
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;
@@ -817,7 +817,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;
@@ -863,7 +863,7 @@ text* OpenGLImp::MakeText(std::shared_ptr<font> pFont, const std::string& strCon
 
 	CR(CheckFramebufferStatus(GL_FRAMEBUFFER));
 	
-	CR(pText->SetColorTexture(pFont->GetTexture().get()));
+	CR(pText->SetDiffuseTexture(pFont->GetTexture().get()));
 
 	//Success:
 	return pText;

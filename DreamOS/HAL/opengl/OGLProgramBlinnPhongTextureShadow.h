@@ -74,7 +74,7 @@ public:
 		RESULT r = R_PASS;
 
 		// color texture
-		SetTextureUniform(pOGLObj->GetColorTexture(), m_pUniformTextureColor, m_pUniformHasTextureColor);
+		SetTextureUniform(pOGLObj->GetTextureDiffuse(), m_pUniformTextureColor, m_pUniformHasTextureColor);
 
 		// material textures
 		SetTextureUniform(pOGLObj->GetTextureAmbient(), m_pUniformTextureAmbient, m_pUniformHasTextureAmbient);
@@ -83,7 +83,7 @@ public:
 
 		// bump texture
 		// TODO: add bump texture to shader
-		m_pUniformHasTextureBump->SetUniform(pOGLObj->GetBumpTexture() != nullptr);
+		m_pUniformHasTextureBump->SetUniform(pOGLObj->GetTextureBump() != nullptr);
 
 //	Error:
 		return r;

@@ -339,7 +339,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureHMD() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		pVolume->SetColorTexture(pColorTexture);
+		pVolume->SetDiffuseTexture(pColorTexture);
 
 		//CR(pVolume->SetColor(COLOR_WHITE));
 
@@ -535,7 +535,7 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		pVolume->SetColorTexture(pColorTexture);
+		pVolume->SetDiffuseTexture(pColorTexture);
 
 		//CR(pVolume->SetColor(COLOR_WHITE));
 
@@ -1037,7 +1037,7 @@ RESULT HALTestSuite::AddTestText() {
 			auto pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
 			CN(pQuad);
 			pQuad->SetPosition(point(0.0f, 0.0f, 0.0f));
-			pQuad->SetColorTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
+			pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
 
 			pFlatContext->ClearChildren();
 			
@@ -1047,7 +1047,7 @@ RESULT HALTestSuite::AddTestText() {
 			pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
 			CN(pQuad);
 			pQuad->SetPosition(point(1.0f, 0.0f, 0.0f));
-			pQuad->SetColorTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
+			pQuad->SetDiffuseTexture(m_pDreamOS->MakeTexture(*(pFlatContext->GetFramebuffer()->GetColorTexture())));
 
 			
 		}
@@ -1175,7 +1175,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureCopy() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		pVolume->SetColorTexture(pColorTexture1);
+		pVolume->SetDiffuseTexture(pColorTexture1);
 		//CR(pVolume->SetColor(COLOR_WHITE));
 
 		///*
@@ -1183,14 +1183,14 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTextureCopy() {
 		CN(pVolume);
 		pVolume->SetPosition(point(width, 0.0f, (length + padding) * -3.0f));
 		//CR(pVolume->SetColor(COLOR_GREEN));
-		pVolume->SetColorTexture(pColorTexture2);
+		pVolume->SetDiffuseTexture(pColorTexture2);
 
 
 		auto pQuad = m_pDreamOS->AddQuad(width, height, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
 		CN(pQuad);
 		pQuad->SetPosition(point(width, 0.0f, (length + padding) * -0.0f));
 		//CR(pVolume->SetColor(COLOR_GREEN));
-		pQuad->SetColorTexture(pColorTextureCopy);
+		pQuad->SetDiffuseTexture(pColorTextureCopy);
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
@@ -1396,7 +1396,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
 		pVolume->SetPosition(point(-width, 0.0f, (length + padding) * 0.0f));
-		pVolume->SetColorTexture(pColorTexture1);
+		pVolume->SetDiffuseTexture(pColorTexture1);
 		
 		//CR(pVolume->SetColor(COLOR_WHITE));
 
@@ -1405,14 +1405,14 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 		CN(pVolume);
 		pVolume->SetPosition(point(width, 0.0f, (length + padding) * -3.0f));
 		//CR(pVolume->SetColor(COLOR_GREEN));
-		pVolume->SetColorTexture(pColorTexture2);
+		pVolume->SetDiffuseTexture(pColorTexture2);
 
 
 		auto pQuad = m_pDreamOS->AddQuad(1.0f, 0.5f, 1, 1, nullptr, vector(0.0f, 0.0f, 1.0f).Normal());
 		CN(pQuad);
 		pQuad->SetPosition(point(width, 0.0f, (length + padding) * -0.0f));
 		//CR(pVolume->SetColor(COLOR_GREEN));
-		pQuad->SetColorTexture(pColorTexture1);
+		pQuad->SetDiffuseTexture(pColorTexture1);
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
@@ -2117,7 +2117,7 @@ RESULT HALTestSuite::AddTestMinimalTextureShader() {
 		texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 		CN(pColorTexture);
 
-		CR(pVolume->SetColorTexture(pColorTexture));
+		CR(pVolume->SetDiffuseTexture(pColorTexture));
 
 
 	Error:
@@ -2222,7 +2222,7 @@ RESULT HALTestSuite::AddTestRenderToTextureQuad() {
 			pQuad->SetColor(COLOR_GREEN);
 
 			// TODO: this is no longer supported:
-			CR(pQuad->SetColorTexture(pFlatContext->GetFramebuffer()->GetColorTexture()));
+			CR(pQuad->SetDiffuseTexture(pFlatContext->GetFramebuffer()->GetColorTexture()));
 			
 		}
 

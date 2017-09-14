@@ -210,7 +210,7 @@ RESULT FlatContext::RenderToQuad(float width, float height, float xOffset, float
 		}
 
 		CN(m_pQuad);
-		CR(m_pQuad->SetColorTexture(GetFramebuffer()->GetColorTexture()));
+		CR(m_pQuad->SetDiffuseTexture(GetFramebuffer()->GetColorTexture()));
 	}
 
 Error:
