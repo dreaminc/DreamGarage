@@ -856,13 +856,12 @@ RESULT HALTestSuite::AddTestModel() {
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
-			///*
-			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
-			//pTestContext->pModel->SetPosition(point(40.0f, -10.0f, -100.0f));
+			/*
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			pTestContext->pModel->SetPosition(point(40.0f, -10.0f, -100.0f));
 
-			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
-			//pTestContext->pModel->SetPosition(point(-40.0f, -10.0f, -100.0f));
-			//CR(pTestContext->pModel->InitializeOBB());
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			pTestContext->pModel->SetPosition(point(-40.0f, -10.0f, -100.0f));
 			//*/
 
 			///*
@@ -874,7 +873,7 @@ RESULT HALTestSuite::AddTestModel() {
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\shelby\\Shelby.fbx",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.fbx",
 
-
+			///*
 			pTestContext->pModel = m_pDreamOS->AddModel(L"\\nanosuit\\nanosuit.obj");
 			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, -8.0f));
 			pTestContext->pModel->SetScale(0.5f);

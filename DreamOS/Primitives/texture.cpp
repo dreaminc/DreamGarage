@@ -281,9 +281,15 @@ RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 
 	if (pPathManager->IsDreamPath(const_cast<wchar_t*>(pszFilename))) {
 		// TODO: set to dream path
+		CN(m_pImage);
 	}
 	else if (pPathManager->IsAbsolutePath(const_cast<wchar_t*>(pszFilename))) {
 		CR(LoadTextureFromPath(const_cast<wchar_t*>(pszFilename)));
+		CN(m_pImage);
+
+		// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
+		// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
+		m_format = PixelFormat::BGRA;	// TODO: move this into image
 	}
 	else {
 		CR(GetTextureFilePath(pszFilename, pszFilePath));
@@ -292,18 +298,18 @@ RESULT texture::LoadTextureFromFile(const wchar_t *pszFilename) {
 		CR(LoadTextureFromPath(pszFilePath));
 		CN(m_pImage);
 
-		// Update sizing
-		m_width = m_pImage->GetWidth();
-		m_height = m_pImage->GetHeight();
-		m_channels = m_pImage->GetChannels();
-
 		// FreeImage uses a BGR[A] pixel layout under a Little Endian processor (Windows, Linux) 
 		// and uses a RGB[A] pixel layout under a Big Endian processor (Mac OS X or any Big Endian Linux / Unix)
 		m_format = PixelFormat::BGRA;	// TODO: move this into image
 	}
 
+	// Update sizing
+	m_width = m_pImage->GetWidth();
+	m_height = m_pImage->GetHeight();
+	m_channels = m_pImage->GetChannels();
+
 	// Flip image
-	CR(m_pImage->FlipVertical());
+	//CR(m_pImage->FlipVertical());
 
 Error:
 	if (pszFilePath != nullptr) {
