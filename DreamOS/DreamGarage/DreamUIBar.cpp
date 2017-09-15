@@ -167,10 +167,10 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
 		point ptOrigin = GetComposite()->GetPosition(true);
 		ptOrigin.Reverse();
-		quaternion q = GetComposite()->GetOrientation(true);
-		q.Reverse();
+		quaternion qRotation = GetComposite()->GetOrientation(true);
+		qRotation.Reverse();
 
-		ViewMatrix matView = ViewMatrix(ptOrigin, q);
+		ViewMatrix matView = ViewMatrix(ptOrigin, qRotation);
 		m_pUIStageProgram->SetClippingViewMatrix(matView);
 
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
