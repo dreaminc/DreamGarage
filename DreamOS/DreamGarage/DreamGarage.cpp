@@ -121,7 +121,7 @@ RESULT DreamGarage::SetupPipeline(Pipeline* pRenderPipeline) {
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 
 	// save interface for UI apps
-	m_pUIProgramNode = reinterpret_cast<UIStageProgram*>(pUIProgramNode);
+	m_pUIProgramNode = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 /*
 	ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	CN(pUIProgramNode);

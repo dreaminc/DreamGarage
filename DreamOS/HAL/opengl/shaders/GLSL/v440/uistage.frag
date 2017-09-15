@@ -56,7 +56,7 @@ void main(void) {
 			discard;
 		}
 		else {
-			float knee = 0.1f;
+			float knee = 0.01f;
 			float minDistance = min(min(xDiff, yDiff), zDiff);
 			float ratio = (knee - minDistance) / knee;
 
