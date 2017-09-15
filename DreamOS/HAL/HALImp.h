@@ -198,7 +198,9 @@ public:
 		return MakeComposite();
 	}
 
+	// TODO: These are the same - should consolidate
 	virtual composite *MakeComposite() = 0;
+	virtual model *MakeModel() = 0;
 
 	virtual FlatContext* MakeFlatContext(int pxFBWidth, int pxFBHeight, int channels) = 0;
 

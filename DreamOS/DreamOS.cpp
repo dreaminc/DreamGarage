@@ -736,12 +736,12 @@ model *DreamOS::MakeModel(wchar_t *pszModelName) {
 }
 */
 
-model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
-	return m_pSandbox->MakeModel(wstrModelFilename, pTexture, ptPosition, scale, vEulerRotation);
+model *DreamOS::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	return m_pSandbox->MakeModel(wstrModelFilename, pTexture);
 }
 
-model *DreamOS::AddModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
-	return m_pSandbox->AddModel(wstrModelFilename, pTexture, ptPosition, scale, vEulerRotation);
+model *DreamOS::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	return m_pSandbox->AddModel(wstrModelFilename, pTexture);
 }
 
 composite *DreamOS::AddComposite() {

@@ -1,5 +1,5 @@
-#ifndef OGL_MODEL_H_
-#define OGL_MODEL_H_
+#ifndef OGL_MESH_H_
+#define OGL_MESH_H_
 
 #include "RESULT/EHM.h"
 
@@ -66,4 +66,4 @@ public:
 	*/
 };
 
-#endif // ! OGL_MODEL_H_
+#endif // ! OGL_MESH_H_

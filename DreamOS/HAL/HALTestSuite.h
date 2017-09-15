@@ -37,6 +37,8 @@ public:
 	RESULT AddTestModel();
 	RESULT AddTestQuadObject();
 
+	RESULT TestNestedOBB();
+
 	// TODO: Consolidate the HMD tests 
 	RESULT AddTestMinimalShaderHMD();
 	RESULT AddTestBlinnPhongShader();

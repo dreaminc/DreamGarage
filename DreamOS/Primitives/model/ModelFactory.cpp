@@ -271,8 +271,11 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	CRM(pPathManager->GetFilePath(PATH_MODEL, wstrModelFilename, wstrModelFilePath), "Failed to get model file path");
 	CRM(pPathManager->DoesPathExist(wstrModelFilePath, true), "Model file path not found");
 	
-	pModel = new model(pParentImp);
+	//pModel = new model(pParentImp);
+	pModel = pParentImp->MakeModel();
 	CN(pModel);
+	CR(pModel->InitializeOBB());
+	//CR(pModel->InitializeBoundingSphere());
 
 	// Set the path (used in texture loading)
 	CR(pModel->SetModelFilePath(wstrModelFilePath));
@@ -291,6 +294,8 @@ model* ModelFactory::MakeModel(HALImp *pParentImp, std::wstring wstrModelFilenam
 	CNM(pAIScene->mRootNode, "Asset Importer scene root is null: %s", assetImporter.GetErrorString());
 
 	CRM(ProcessAssetImporterNode(pModel, pAIScene->mRootNode, pAIScene), "Failed to process Asset Importer root node");
+
+	//pModel->UpdateBoundingVolume();
 
 // Success:
 	return pModel;

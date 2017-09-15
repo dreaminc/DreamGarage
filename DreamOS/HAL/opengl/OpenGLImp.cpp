@@ -24,6 +24,7 @@
 #include "OGLSphere.h"
 #include "OGLCylinder.h"
 #include "OGLComposite.h"
+#include "OGLModel.h"
 #include "Primitives/light.h"
 #include "OGLTexture.h"
 #include "OGLSkybox.h"
@@ -330,6 +331,23 @@ Error:
 	if (pMesh != nullptr) {
 		delete pMesh;
 		pMesh = nullptr;
+	}
+	return nullptr;
+}
+
+model* OpenGLImp::MakeModel() {
+	RESULT r = R_PASS;
+
+	model *pModel = new OGLModel(this);
+	CN(pModel);
+
+	//Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		delete pModel;
+		pModel = nullptr;
 	}
 	return nullptr;
 }

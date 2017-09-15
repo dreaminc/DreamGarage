@@ -37,6 +37,8 @@ InteractionEngineTestSuite::~InteractionEngineTestSuite() {
 RESULT InteractionEngineTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestNestedCompositeOBB());
+
 	CR(AddTestCaptureObject());
 
 	CR(AddTestMultiPrimitiveCompositeRemove());
@@ -48,8 +50,6 @@ RESULT InteractionEngineTestSuite::AddTests() {
 	CR(AddTestMultiPrimitive());
 
 	CR(AddTestObjectBasedEvents());
-
-	CR(AddTestNestedCompositeOBB());
 
 	CR(AddTestCompositeRayNested());
 
@@ -1279,16 +1279,15 @@ RESULT InteractionEngineTestSuite::Initialize() {
 
 	m_pDreamOS->AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
-	point sceneOffset = point(90, -5, -25);
+	point ptSceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
-	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
-//*
-	m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
-		//*/
+	//vector evSceneRotation = vector(0.0f, 0.0f, 0.0f);
+	
+	//*
+	auto pModel = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj");
+	pModel->SetPosition(ptSceneOffset),
+	pModel->SetScale(sceneScale); 		
+	//*/
 
 	return R_PASS;
 }

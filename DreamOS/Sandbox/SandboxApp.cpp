@@ -1424,7 +1424,7 @@ Error:
 	return nullptr;
 }
 
-model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+model* SandboxApp::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
 	RESULT r = R_PASS;
 
 	// TODO: Other bits (position, scale, rotation)
@@ -1444,14 +1444,11 @@ Error:
 	return nullptr;
 }
 
-model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTexture, point ptPosition, point_precision scale, vector vEulerRotation) {
+model* SandboxApp::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
 	RESULT r = R_PASS;
 
-	model *pModel = MakeModel(wstrModelFilename, pTexture, ptPosition, scale, vEulerRotation);
+	model *pModel = MakeModel(wstrModelFilename, pTexture);
 	CN(pModel);
-
-	// temp
-	pModel->Scale(scale);
 
 	CR(AddObject(pModel));
 

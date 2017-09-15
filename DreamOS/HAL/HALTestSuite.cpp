@@ -27,6 +27,8 @@ RESULT HALTestSuite::AddTests() {
 //	CR(AddTestSkybox());
 	CR(AddTestModel());
 
+	CR(TestNestedOBB());
+
 	CR(AddTestRenderToTextureQuad());
 
 	CR(AddTestEnvironmentShader());
@@ -587,6 +589,177 @@ Error:
 	return r;
 }
 
+RESULT HALTestSuite::TestNestedOBB() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		composite *pComposite = nullptr;
+		std::shared_ptr<volume> pVolume[8] = { nullptr };
+	} *pTestContext = new TestContext();
+
+	float width = 0.5f;
+	float height = width;
+	float length = width;
+
+	float padding = 0.5f;
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");	
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_tex_bump");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		/*
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		// Debug Console
+		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
+		CN(pDreamConsoleProgram);
+		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
+
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		// Connect Program to Display
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
+
+		{
+			pTestContext->pComposite = m_pDreamOS->AddComposite();
+			CN(pTestContext->pComposite);
+			pTestContext->pComposite->InitializeOBB();
+			pTestContext->pComposite->SetPosition(0.0f, 0.0f, -5.0f);
+		pTestContext->pComposite->Scale(0.5f);
+
+			pTestContext->pVolume[0] = pTestContext->pComposite->AddVolume(width);
+			CN(pTestContext->pVolume[0]);
+			pTestContext->pVolume[0]->SetPosition(point(-1.0f, -1.0f, -1.0f));
+
+			pTestContext->pVolume[1] = pTestContext->pComposite->AddVolume(width);
+			CN(pTestContext->pVolume[1]);
+			pTestContext->pVolume[1]->SetPosition(point(1.0f, 1.0f, 1.0f));
+
+			pTestContext->pVolume[2] = pTestContext->pComposite->AddVolume(width);
+			CN(pTestContext->pVolume[2]);
+			pTestContext->pVolume[2]->SetPosition(point(1.0f, 1.0f, -1.0f));
+
+			pTestContext->pVolume[3] = pTestContext->pComposite->AddVolume(width);
+			CN(pTestContext->pVolume[3]);
+			pTestContext->pVolume[3]->SetPosition(point(1.0f, -1.0f, -1.0f));
+
+			pTestContext->pVolume[4] = pTestContext->pComposite->AddVolume(width);
+			CN(pTestContext->pVolume[4]);
+			pTestContext->pVolume[4]->SetPosition(point(1.0f, -1.0f, 1.0f));
+
+			pTestContext->pVolume[5] = pTestContext->pComposite->AddVolume(width);
+			CN(pTestContext->pVolume[5]);
+			pTestContext->pVolume[5]->SetPosition(point(-1.0f, 1.0f, 1.0f));
+
+			pTestContext->pVolume[6] = pTestContext->pComposite->AddVolume(width);
+			CN(pTestContext->pVolume[6]);
+			pTestContext->pVolume[6]->SetPosition(point(-1.0f, 1.0f, -1.0f));
+
+			pTestContext->pVolume[7] = pTestContext->pComposite->AddVolume(width);
+			CN(pTestContext->pVolume[7]);
+			pTestContext->pVolume[7]->SetPosition(point(-1.0f, -1.0f, 1.0f));
+		}
+
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [=](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		pTestContext->pComposite->RotateYByDeg(0.035f);
+		pTestContext->pVolume[2]->RotateYByDeg(0.035f);
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("HAL Model Test");
+	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
 // This will test the HAL model 
 RESULT HALTestSuite::AddTestModel() {
 	RESULT r = R_PASS;
@@ -634,7 +807,7 @@ RESULT HALTestSuite::AddTestModel() {
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Skybox
-		///*
+		/*
 		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 		CN(pSkyboxProgram);
 		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
@@ -656,8 +829,8 @@ RESULT HALTestSuite::AddTestModel() {
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
@@ -681,14 +854,13 @@ RESULT HALTestSuite::AddTestModel() {
 		//light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 1.0f, point(0.0f, 10.0f, 0.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(-0.2f, -1.0f, -0.5f));
 
 		{
-			/*
-			pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj",
-				nullptr,
-				point(0.0f, 0.0f, 0.0f),
-				0.018f,
-				vector(0.0f, 0.0f, 0.0f));
+			///*
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			//pTestContext->pModel->SetPosition(point(40.0f, -10.0f, -100.0f));
 
-			pTestContext->pModel->SetPosition(point(0.0f, 0.0f, 2.0f));
+			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\face4\\untitled.obj");
+			//pTestContext->pModel->SetPosition(point(-40.0f, -10.0f, -100.0f));
+			//CR(pTestContext->pModel->InitializeOBB());
 			//*/
 
 			///*
@@ -698,19 +870,17 @@ RESULT HALTestSuite::AddTestModel() {
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.FBX",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\home\\model.fbx",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\shelby\\Shelby.fbx",
-			pTestContext->pModel = m_pDreamOS->AddModel(L"\\nanosuit\\nanosuit.obj",
 			//pTestContext->pModel = m_pDreamOS->AddModel(L"\\converse\\converse_fbx.fbx",
-				nullptr,
-				point(0.0f, 0.0f, 0.0f),
-				0.518f,
-				vector(0.0f, 0.0f, 0.0f));
 
-			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, -4.0f));
+
+			pTestContext->pModel = m_pDreamOS->AddModel(L"\\nanosuit\\nanosuit.obj");
+			pTestContext->pModel->SetPosition(point(0.0f, -5.0f, -8.0f));
+			pTestContext->pModel->SetScale(0.5f);
 			//*/
 
-			pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20, COLOR_RED);
-			CN(pSphere);
-			pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
+			//pSphere = m_pDreamOS->AddSphere(1.0f, 20, 20, COLOR_RED);
+			//CN(pSphere);
+			//pSphere->SetPosition(point(2.0f, 0.0f, 0.0f));
 		}
 
 	Error:
@@ -729,7 +899,7 @@ RESULT HALTestSuite::AddTestModel() {
 		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
 		CN(pTestContext);
 
-		pTestContext->pModel->RotateYByDeg(0.035f);
+		//pTestContext->pModel->RotateYByDeg(0.035f);
 
 	Error:
 		return r;

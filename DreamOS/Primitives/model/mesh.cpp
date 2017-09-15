@@ -40,6 +40,10 @@ mesh::mesh(const std::vector<vertex>& vertices) {
 	RESULT r = R_PASS;
 	CR(SetVertices(vertices));
 
+	// Bounding Box
+	//CR(InitializeBoundingSphere());
+	CR(InitializeOBB());
+
 	Validate();
 	return;
 
@@ -71,6 +75,10 @@ mesh::mesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& ind
 		m_pIndices[indexCount++] = i;
 	}
 
+	// Bounding Box
+	//CR(InitializeBoundingSphere());
+	CR(InitializeOBB());
+
 	Validate();
 	return;
 
@@ -94,6 +102,7 @@ RESULT mesh::SetVertices(const std::vector<vertex>& vertices) {
 
 	m_nVertices = static_cast<unsigned int>(vertices.size());
 	m_nIndices = m_nVertices;
+
 	CR(Allocate());
 
 	unsigned int verticesCnt = 0;

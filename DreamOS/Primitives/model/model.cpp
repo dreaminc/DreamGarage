@@ -7,7 +7,18 @@
 model::model(HALImp *pParentImp) :
 	composite(pParentImp)
 {
-	// empty
+	RESULT r = R_PASS;
+
+	// Bounding Box
+	//CR(InitializeBoundingSphere());
+	//CR(InitializeOBB());
+
+	Validate();
+	return;
+
+//Error:
+//	Invalidate();
+//	return;
 }
 
 std::shared_ptr<mesh> model::AddMesh(const std::vector<vertex>& vertices) {

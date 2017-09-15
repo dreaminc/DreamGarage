@@ -96,7 +96,9 @@ public:
 	mesh *MakeMesh(const std::vector<vertex>& vertices);
 	mesh *MakeMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
-	composite *MakeComposite();
+	virtual composite *MakeComposite() override;
+	virtual model *MakeModel() override;
+
 	FlatContext* MakeFlatContext(int width, int height, int channels);
 	user *MakeUser();
 	hand* MakeHand();
