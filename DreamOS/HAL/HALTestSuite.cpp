@@ -24,8 +24,11 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
-//	CR(AddTestSkybox());
 	CR(AddTestModel());
+
+	CR(AddTestBlinnPhongShaderTexture());
+
+//	CR(AddTestSkybox());
 
 	CR(TestNestedOBB());
 
@@ -41,7 +44,6 @@ RESULT HALTestSuite::AddTests() {
 
 	CR(AddTestQuadObject());
 
-	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestSenseHaptics());
 	

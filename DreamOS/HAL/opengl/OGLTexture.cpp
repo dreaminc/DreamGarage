@@ -1,5 +1,7 @@
 #include "OGLTexture.h"
 
+#include "Primitives/image/image.h"
+
 OGLTexture::OGLTexture(OpenGLImp *pParentImp, texture::TEXTURE_TYPE type, GLenum textureTarget) :
 	texture(type),
 	m_textureIndex(0),
@@ -127,12 +129,14 @@ RESULT OGLTexture::AllocateGLTexture(size_t optOffset) {
 	RESULT r = R_PASS;
 
 	GLenum glFormat = GetOGLPixelFormat();
-	GLint internalGLFormat = static_cast<GLint>(glFormat);
+
+	//GLint internalGLFormat = static_cast<GLint>(glFormat);
+	GLint internalGLFormat = GetOGLPixelFormat(PixelFormat::Unspecified, m_channels);
 
 	unsigned char *pImageBuffer = nullptr;
 
-	if (m_pImageBuffer != nullptr) {
-		pImageBuffer = m_pImageBuffer + (optOffset);
+	if (m_pImage != nullptr) {
+		pImageBuffer = m_pImage->GetImageBuffer() + (optOffset);
 	}
 
 	CR(AllocateGLTexture(pImageBuffer, internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
@@ -415,7 +419,7 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TE
 	CR(pTexture->SetParams(width, height, channels));
 	CR(pTexture->SetFormat(format));
 
-	CR(pTexture->CopyTextureBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
+	CR(pTexture->CopyTextureImageBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
 	CR(pTexture->AllocateGLTexture());
 
 	// TODO: Rename or remove this / specialize more
@@ -467,10 +471,17 @@ RESULT OGLTexture::OGLInitializeCubeMap(GLuint *pTextureIndex, GLenum textureNum
 	CR(m_pParentImp->MakeCurrentContext());
 	CR(m_pParentImp->GenerateTextures(1, pTextureIndex));
 
+	unsigned char *pImageBuffer = nullptr; 
+	
+	if (m_pImage != nullptr) {
+		m_pImage->GetImageBuffer();
+	}
+
 	for (int i = 0; i < NUM_CUBE_MAP_TEXTURES; i++) {
 		//size_t sizeSide = m_width * m_height * sizeof(unsigned char);
 		size_t sizeSide = GetTextureSize();
-		unsigned char *ptrOffset = m_pImageBuffer + (i * (sizeSide));
+		unsigned char *ptrOffset = pImageBuffer + (i * (sizeSide));
+
 		CR(m_pParentImp->TexImage2D(GLCubeMapEnums[i], 0, GL_RGB, m_width, m_height, 0, GL_RGB, GL_UNSIGNED_BYTE, ptrOffset));
 
 		CRM(m_pParentImp->TexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR), "Failed to set GL_TEXTURE_MAG_FILTER");

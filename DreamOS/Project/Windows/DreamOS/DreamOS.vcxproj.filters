@@ -189,6 +189,9 @@
     <Filter Include="External\assimp">
       <UniqueIdentifier>{3a40f6d4-8224-4a7e-bc0d-fb9c9d399cb7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Primitives\image">
+      <UniqueIdentifier>{598b61e9-4fb8-41df-97ab-dd5da1438cc2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\DreamOSMain.cpp">
@@ -829,6 +832,15 @@
     </ClCompile>
     <ClCompile Include="..\..\..\HAL\opengl\OGLProgramBlinnPhongTextureBump.cpp">
       <Filter>HAL\opengl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\image\image.cpp">
+      <Filter>Primitives\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\image\ImageFactory.cpp">
+      <Filter>Primitives\image</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\Primitives\image\FreeImageObj.cpp">
+      <Filter>Primitives\image</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -1864,6 +1876,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\HAL\opengl\OGLModel.h">
       <Filter>HAL\opengl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\image\image.h">
+      <Filter>Primitives\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\image\ImageFactory.h">
+      <Filter>Primitives\image</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\Primitives\image\FreeImageObj.h">
+      <Filter>Primitives\image</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
