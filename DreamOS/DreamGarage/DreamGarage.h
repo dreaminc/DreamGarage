@@ -17,6 +17,7 @@ class DreamUIBar;
 class DreamContentView;
 class DreamBrowser;
 class DreamControlView;
+class UIStageProgram;
 
 #define MAX_PEERS 8
 
@@ -109,8 +110,11 @@ private:
 	std::vector<int> m_seatLookup = { 4, 1, 3, 2, 5, 0 };
 	float m_initialAngle = 90.0f;
 	float m_keepOutAngle = 5.0f;
-	
+
 	// UI
+	//ViewMatrix *m_pClippingView;
+	UIStageProgram *m_pUIProgramNode;
+	
 	std::shared_ptr<DreamUIBar> m_pDreamUIBar;
 	std::shared_ptr<DreamContentView> m_pDreamContentView;
 	std::shared_ptr<DreamBrowser> m_pDreamBrowser;

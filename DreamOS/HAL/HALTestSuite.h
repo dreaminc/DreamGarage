@@ -36,6 +36,7 @@ public:
 	RESULT AddTestText();
 	RESULT AddTestModel();
 	RESULT AddTestQuadObject();
+	RESULT AddTestUIShaderStage();
 
 	// TODO: Consolidate the HMD tests 
 	RESULT AddTestMinimalShaderHMD();

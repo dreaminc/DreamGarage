@@ -56,6 +56,8 @@ public:
 	// pass optional pushButton to have an additional moving back animation
 	RESULT HideAllButtons(UIButton* pPushButton = nullptr);
 	RESULT ShowTitle();
+	RESULT Show();
+	RESULT Hide();
 
 public:
 	ScrollState GetState();

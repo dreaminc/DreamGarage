@@ -19,6 +19,8 @@
 
 #include "Cloud/HTTP/HTTPController.h"
 
+#include "HAL/UIStageProgram.h"
+
 DreamUIBar::DreamUIBar(DreamOS *pDreamOS, void *pContext) :
 	DreamApp<DreamUIBar>(pDreamOS, pContext)//,
 {
@@ -47,7 +49,6 @@ RESULT DreamUIBar::InitializeApp(void *pContext) {
 	DreamOS *pDreamOS = GetDOS();
 
 	m_pFont = pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-	pDreamOS->AddObjectToUIGraph(GetComposite());
 
 	SetAppName("DreamUIBar");
 	SetAppDescription("User Interface");
@@ -155,6 +156,23 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pMenuControllerProxy->RequestSubMenu("", "", "Share");
 		m_pScrollView->GetTitleQuad()->UpdateColorTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
+		
+		m_pUIStageProgram->SetClippingFrustrum(
+			m_projectionWidth,
+			m_projectionHeight,
+			m_projectionNearPlane,
+			m_projectionFarPlane,
+			m_projectionAngle);
+
+		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
+		point ptOrigin = GetComposite()->GetPosition(true);
+		ptOrigin.Reverse();
+		quaternion qRotation = GetComposite()->GetOrientation(true);
+		qRotation.Reverse();
+
+		ViewMatrix matView = ViewMatrix(ptOrigin, qRotation);
+		m_pUIStageProgram->SetClippingViewMatrix(matView);
+
 		GetDOS()->GetKeyboard()->UpdateComposite(m_menuHeight + m_keyboardOffset, m_menuDepth);
 	}
 	else {
@@ -304,6 +322,7 @@ RESULT DreamUIBar::UpdateMenu(void *pContext) {
 	CN(pDreamUIBar);
 
 	GetComposite()->SetVisible(true, false);
+	m_pScrollView->Show();
 	m_pScrollView->SetScrollVisible(true);
 	m_pScrollView->SetPosition(m_ptMenuShowOffset);
 	m_pScrollView->ShowTitle();
@@ -459,6 +478,7 @@ RESULT DreamUIBar::HideMenu(std::function<RESULT(void*)> fnStartCallback) {
 		CN(pDreamUIBar);
 
 		GetComposite()->SetVisible(false, false);
+		m_pScrollView->Hide();
 		m_menuState = MenuState::NONE;
 	Error:
 		return r;
@@ -570,4 +590,9 @@ Error:
 DreamUIBar* DreamUIBar::SelfConstruct(DreamOS *pDreamOS, void *pContext) {
 	DreamUIBar *pDreamApp = new DreamUIBar(pDreamOS, pContext);
 	return pDreamApp;
+}
+
+RESULT DreamUIBar::SetUIStageProgram(UIStageProgram *pUIStageProgram) {
+	m_pUIStageProgram = pUIStageProgram;
+	return R_PASS;
 }

@@ -610,6 +610,10 @@ quad *DreamOS::AddQuad(double width, double height, int numHorizontalDivisions, 
 	return m_pSandbox->AddQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
 }
 
+quad* DreamOS::MakeQuad(double width, double height, int numHorizontalDivisions, int numVerticalDivisions, texture *pTextureHeight, vector vNormal) {
+	return m_pSandbox->MakeQuad(width, height, numHorizontalDivisions, numVerticalDivisions, pTextureHeight, vNormal);
+}
+
 RESULT DreamOS::ReleaseFont(std::wstring wstrFontFileName) {
 	RESULT r = R_PASS;
 
@@ -811,6 +815,10 @@ Error:
 
 RESULT DreamOS::AddObjectToUIGraph(VirtualObj *pObject) {
 	return m_pSandbox->AddObjectToUIGraph(pObject);
+}
+
+RESULT DreamOS::AddObjectToUIClippingGraph(VirtualObj *pObject) {
+	return m_pSandbox->AddObjectToUIClippingGraph(pObject);
 }
 
 // Cloud Controller
