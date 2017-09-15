@@ -210,11 +210,12 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestDreamUIBar());
+	//CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
+	CR(AddTestKeyboardAngle());
 
 Error:
 	return r;
@@ -736,38 +737,104 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
 
 			CR(m_pDreamOS->InitializeKeyboard());
+			
+			float radius = 0.015f;
+			point ptcam = m_pDreamOS->GetCamera()->GetPosition();
+			auto pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
+			pSphere->SetPosition(ptcam + point(0.0f, 1.0f, -0.5f));
+			pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
+			pSphere->SetPosition(ptcam + point(0.0f, 1.0f, 0.5f));
+			pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
+			pSphere->SetPosition(ptcam + point(0.5f, 1.0f, 0.0f));
+			pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
+			pSphere->SetPosition(ptcam + point(-0.5f, 1.0f, 0.0f));
+		}
+
+	Error:
+		return r;
+	};
+
+	auto pUITest = AddTest(fnInitialize,
+		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
+		std::bind(&UIViewTestSuite::DefaultCallback, this, std::placeholders::_1),
+		std::bind(&UIViewTestSuite::ResetTestCallback, this, std::placeholders::_1),
+		nullptr);
+	CN(pUITest);
+
+	pUITest->SetTestName("Local UIView Test");
+	pUITest->SetTestDescription("Basic test of uiview working locally");
+	pUITest->SetTestDuration(sTestTime);
+	pUITest->SetTestRepeats(1);
+
+Error:
+	return r;
+}
+
+
+RESULT UIViewTestSuite::AddTestKeyboardAngle() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 10000.0;
+
+	auto fnInitialize = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		CN(m_pDreamOS);
+
+		CR(SetupUINodePipeline());
+
+		{
+			auto pCloudController = m_pDreamOS->GetCloudController();
+			auto pCommandLineManager = CommandLineManager::instance();
+			DEBUG_LINEOUT("Initializing Cloud Controller");
+			CRM(pCloudController->Initialize(), "Failed to initialize cloud controller");
+			{
+				std::string strUsername = pCommandLineManager->GetParameterValue("username");
+				std::string strPassword = pCommandLineManager->GetParameterValue("password");
+				std::string strOTK = pCommandLineManager->GetParameterValue("otk.id");
+
+				CRM(pCloudController->LoginUser(strUsername, strPassword, strOTK), "Failed to log in");
+			}
+
+			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
+			CN(pDreamUIBar);
+			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
+
+			CR(m_pDreamOS->InitializeKeyboard());
 
 			//*
-			//m_pDreamOS->GetKeyboard()->ShowKeyboard();
 			auto m_MenuHeight = pDreamUIBar->GetMenuHeight();
 			auto m_MenuDepth = pDreamUIBar->GetMenuDepth();
 			composite *pComposite = m_pDreamOS->AddComposite();
-			CR(pComposite->InitializeOBB());
-			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 1.0f));	//with hmd
-			//pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 0.5f));
-
+			m_tComposite = pComposite->AddComposite();
+			//CR(pComposite->InitializeOBB());
+			//CR(tComposite->InitializeOBB());
+			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 0.6f));	//with hmd
+			m_tComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 5.1f));	//with hmd
+			//pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 0.6f));
+			//tComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 4.6f));	
+			
 			auto& pView = pComposite->AddUIView(m_pDreamOS);
-			pView->InitializeOBB();
-			auto& pAngleAdjust = pView->AddUIButton();
-			pAngleAdjust->SetPosition(point(0.0f, 0.1f, -0.2f));
-			
-			//pAngleAdjust->SetOrientation(m_pDreamOS->GetKeyboard()->GetOrientation());
-			
-			//*
+			auto& pAngleIncrease = pView->AddUIButton();
+			auto& pAngleDecrease = pView->AddUIButton();
+			pAngleIncrease->SetPosition(point(0.5f, 0.0f, -0.1f));
+			pAngleDecrease->SetPosition(point(-0.5f, 0.0f, -0.1f));
+
 			//Setup textbox
 			m_pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
 			m_pFont->SetLineHeight(m_lineHeight);
-			m_pTextBoxTexture = pComposite->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-			pAngleAdjust->SetColorTexture(m_pTextBoxTexture.get());
+			//m_pTextBoxTexture = tComposite->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			//pAngleIncrease->GetSurface()->SetColorTexture(m_pTextBoxTexture.get());
+			pAngleDecrease->GetSurface()->SetColor(COLOR_BLUE);
 			{
 				float offset = 1.3f;
-				float angle = m_pDreamOS->GetKeyboard()->GetAngle() *(float)(M_PI) / 180.0f;
-				pComposite->RotateXByDeg(90.0f);
-				pAngleAdjust->RotateXByDeg(-90.0f);
+				float angle = m_pDreamOS->GetKeyboard()->GetAngle() *(float)(M_PI) / 180.0f;;
+				m_tComposite->RotateXByDeg(90.0f);
 
-				m_pTextBoxBackground = pComposite->AddQuad(m_lineWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.01f, 0.0f));
-				m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
-				
+				//m_pTextBoxBackground = tComposite->AddQuad(m_lineWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.01f, 0.0f));
+				//m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
+				//m_pTextBoxBackground->UpdateColorTexture(m_pTextBoxTexture.get());
+
 				m_pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
 					m_pFont,
 					"hi",
@@ -775,15 +842,17 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 					m_lineHeight * m_numLines,
 					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
 
-				pComposite->AddObject(m_pTextBoxText);
+				m_tComposite->AddObject(m_pTextBoxText);
 			}
 
-			//*/
 			//interaction
-			pAngleAdjust->RegisterToInteractionEngine(m_pDreamOS);
-			CR(pAngleAdjust->RegisterEvent(UIEventType::UI_SELECT_BEGIN, std::bind(&UIViewTestSuite::IncreaseAngle, this, std::placeholders::_1)));
+			pAngleIncrease->RegisterToInteractionEngine(m_pDreamOS);
+			pAngleDecrease->RegisterToInteractionEngine(m_pDreamOS);
+
+			CR(pAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, std::bind(&UIViewTestSuite::IncreaseAngle, this, std::placeholders::_1)));
+			CR(pAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, std::bind(&UIViewTestSuite::DecreaseAngle, this, std::placeholders::_1)));
 			//*/
-			
+
 			float radius = 0.015f;
 			point ptcam = m_pDreamOS->GetCamera()->GetPosition();
 			auto pSphere = m_pDreamOS->AddSphere(radius, 10, 10);
@@ -822,15 +891,15 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 	switch (pEvent->m_eventType) {
 	case (UIEventType::UI_SELECT_ENDED): {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
-		
+
 		if (pDimObj != nullptr) {
 			pDimObj->RotateYByDeg(45.0f);
 		}
 	}
-	//*
+										 //*
 	case (UIEventType::UI_HOVER_BEGIN): {
 		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
-		
+
 		if (pDimObj != nullptr) {
 			pDimObj->RotateZByDeg(45.0f);
 		}
@@ -842,20 +911,13 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 			pDimObj->ResetRotation();
 		}
 	} break;
-	/*
-	case (UIEventType::UI_SELECT_BEGIN): {
-		DimObj *pDimObj = dynamic_cast<DimObj*>(pEvent->m_pObj);
-		if (pDimObj != nullptr) {
-			pDimObj->RotateYByDeg(5.0f);
-		}
-	}
-	//*/
+
 	}
 
 //Error:
 	return r;
 }
-//*
+
 RESULT UIViewTestSuite::UpdateTextBox(std::string entered) {
 	RESULT r = R_PASS;
 	m_pTextBoxText->SetText(entered);

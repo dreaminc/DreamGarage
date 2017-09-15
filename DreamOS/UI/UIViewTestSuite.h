@@ -39,6 +39,8 @@ public:
 	RESULT AddTestUIButtons();
 	RESULT AddTestUIScrollView();
 	RESULT AddTestDreamUIBar();
+	RESULT AddTestKeyboardAngle();
+
 	RESULT UpdateTextBox(std::string strEntered);
 
 	virtual RESULT AddTests() override;
@@ -49,6 +51,7 @@ public:
 	RESULT ResetTestCallback(void *pContext);
 	RESULT UpdateHandRay(void *pContext);
 	RESULT IncreaseAngle(void *pContext);
+	RESULT DecreaseAngle(void *pContext);
 
 // behaviors
 public:
@@ -72,7 +75,7 @@ private:
 	float m_lineWidth = TEXTBOX_WIDTH;
 	std::shared_ptr<text> m_pTextBoxText;
 	std::shared_ptr<quad> m_pTextBoxBackground;
-	//std::shared_ptr<UIView> m_pComposite;
+	std::shared_ptr<composite> m_tComposite;
 	std::shared_ptr<font> m_pFont;
 	std::shared_ptr<texture> m_pTextBoxTexture;
 };

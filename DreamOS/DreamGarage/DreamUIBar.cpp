@@ -160,7 +160,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 	CN(pKeyboard);
 
 	CBM(m_pCloudController->IsUserLoggedIn(), "User not logged in");
-	CBM(m_pCloudController->IsEnvironmentConnected(), "Enironment socket not connected");
+	CBM(m_pCloudController->IsEnvironmentConnected(), "Environment socket not connected");
 
 
 	if (m_pathStack.empty()) {
