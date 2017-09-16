@@ -13,6 +13,8 @@
 #include "Primitives/DimRay.h"
 #include "quad.h"
 
+#include "Primitives/model/ModelFactory.h"
+
 #include "UI/UIView.h"
 
 #include "DreamOS.h"
@@ -256,6 +258,44 @@ std::shared_ptr<composite> composite::AddComposite() {
 
 Error:
 	pComposite = nullptr;
+	return nullptr;
+}
+
+std::shared_ptr<model> composite::MakeModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	RESULT r = R_PASS;
+
+	// TODO: Other bits (position, scale, rotation)
+
+	std::shared_ptr<model> pModel(ModelFactory::MakeModel(m_pHALImp, wstrModelFilename));
+	CN(pModel);
+
+	// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		pModel = nullptr;
+	}
+
+	return nullptr;
+}
+
+std::shared_ptr<model> composite::AddModel(const std::wstring& wstrModelFilename, texture* pTexture) {
+	RESULT r = R_PASS;
+
+	std::shared_ptr<model> pModel = MakeModel(wstrModelFilename, pTexture);
+	CN(pModel);
+
+	CR(AddObject(pModel));
+
+	// Success:
+	return pModel;
+
+Error:
+	if (pModel != nullptr) {
+		pModel = nullptr;
+	}
+
 	return nullptr;
 }
 

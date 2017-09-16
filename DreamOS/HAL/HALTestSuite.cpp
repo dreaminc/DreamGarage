@@ -514,25 +514,26 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 
 #ifndef _DEBUG
 		{
-			point sceneOffset = point(90, -5, -25);
+			point ptSceneOffset = point(90, -5, -25);
 			float sceneScale = 0.1f;
-			vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
-			m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj",
-				nullptr,
-				sceneOffset,
-				sceneScale,
-				sceneDirection);
-			m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\river.obj",
-				nullptr,
-				sceneOffset,
-				sceneScale,
-				sceneDirection);
-			m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
-				nullptr,
-				sceneOffset,
-				sceneScale,
-				sceneDirection);
+			model* pModel = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj");
+			pModel->SetPosition(ptSceneOffset);
+			pModel->SetScale(sceneScale);
+			//pModel->SetEulerOrientation(vSceneEulerOrientation);
+
+			model* pRiver = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\river.obj");
+			pRiver->SetPosition(ptSceneOffset);
+			pRiver->SetScale(sceneScale);
+			//pModel->SetEulerOrientation(vSceneEulerOrientation);
+
+			model* pClouds = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds.obj");
+			pClouds->SetPosition(ptSceneOffset);
+			pClouds->SetScale(sceneScale);
+			//pModel->SetEulerOrientation(vSceneEulerOrientation);
+
+			pClouds->SetMaterialAmbient(0.8f);
 		}
 #endif
 

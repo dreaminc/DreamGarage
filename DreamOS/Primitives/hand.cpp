@@ -2,7 +2,7 @@
 #include "Sense/SenseLeapMotionHand.h"
 #include "DreamConsole/DreamConsole.h"
 #include "Primitives/sphere.h"
-
+#include "Primitives/model/model.h"
 
 thumb::thumb(HALImp* pHALImp) :
 	finger(pHALImp)
@@ -229,17 +229,16 @@ RESULT hand::Initialize() {
 	float scaleModel = 0.015f;
 
 #ifndef _DEBUG
-	m_pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj",
-						nullptr,
-						ptModel,
-						scaleModel,
-						vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
-	
-	m_pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj",
-						nullptr,
-						ptModel,
-						scaleModel,
-						vector((float)(M_PI_2), (float)(M_PI_2), 0.0f));
+	m_pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj");
+	m_pLeftModel->SetPosition(ptModel);
+	m_pLeftModel->SetScale(scaleModel);
+	//m_pLeftModel->SetEulerOrientation(vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+						
+	m_pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj");
+	m_pLeftModel->SetPosition(ptModel);
+	m_pLeftModel->SetScale(scaleModel);
+	//m_pLeftModel->SetEulerOrientation(vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+						
 #else
 	m_pLeftModel = AddComposite();
 	m_pLeftModel->AddVolume(0.02f);

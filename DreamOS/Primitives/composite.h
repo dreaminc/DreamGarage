@@ -13,11 +13,13 @@
 #include <memory>
 
 class HALImp;
+//#include "HAL/HALImp.h"
 
 class sphere;
 class volume;
 class DimRay;
 class quad;
+class model;
 
 class hand;
 class camera;
@@ -132,6 +134,9 @@ public:
 
 	std::shared_ptr<composite> MakeComposite();
 	std::shared_ptr<composite> AddComposite();
+
+	std::shared_ptr<model> MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
+	std::shared_ptr<model> AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 
 	std::shared_ptr<hand> MakeHand();
 	std::shared_ptr<hand> AddHand();

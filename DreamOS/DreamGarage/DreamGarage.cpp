@@ -196,9 +196,9 @@ RESULT DreamGarage::LoadScene() {
 	RESULT r = R_PASS;
 
 	std::shared_ptr<OGLObj> pOGLObj = nullptr;
-	point sceneOffset = point(90, -5, -25);
+	point ptSceneOffset = point(90, -5, -25);
 	float sceneScale = 0.1f;
-	vector sceneDirection = vector(0.0f, 0.0f, 0.0f);
+	vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
 	// Keyboard
 	RegisterSubscriber(SenseVirtualKey::SVK_ALL, this);
@@ -230,21 +230,20 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 #ifndef _DEBUG
-	AddModel(L"\\Models\\FloatingIsland\\env.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
-	composite* pRiver = AddModel(L"\\Models\\FloatingIsland\\river.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
-	composite* pClouds = AddModel(L"\\Models\\FloatingIsland\\clouds.obj",
-		nullptr,
-		sceneOffset,
-		sceneScale,
-		sceneDirection);
+	model* pModel = AddModel(L"\\Models\\FloatingIsland\\env.obj");
+	pModel->SetPosition(ptSceneOffset);
+	pModel->SetScale(sceneScale);
+	//pModel->SetEulerOrientation(vSceneEulerOrientation);
+		
+	model* pRiver = AddModel(L"\\Models\\FloatingIsland\\river.obj");
+	pRiver->SetPosition(ptSceneOffset);
+	pRiver->SetScale(sceneScale);
+	//pModel->SetEulerOrientation(vSceneEulerOrientation);
+
+	model* pClouds = AddModel(L"\\Models\\FloatingIsland\\clouds.obj");
+	pClouds->SetPosition(ptSceneOffset);
+	pClouds->SetScale(sceneScale);
+	//pModel->SetEulerOrientation(vSceneEulerOrientation);
 
 	pClouds->SetMaterialAmbient(0.8f);
 

@@ -42,6 +42,8 @@ class SinkNode;
 class SourceNode;
 class ProgramNode;
 
+//class composite;
+
 class UIKeyboardLayout;
 
 class FlatProgram;	// This one is special for render to texture

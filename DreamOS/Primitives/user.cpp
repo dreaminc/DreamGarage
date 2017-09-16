@@ -1,5 +1,6 @@
 #include "user.h"
 #include "Primitives/quad.h"
+#include "Primitives/model/model.h"
 
 user::user(HALImp* pHALImp) :
 	composite(pHALImp)
@@ -14,11 +15,11 @@ RESULT user::Initialize() {
 	RESULT r = R_PASS;
 
 #ifndef _DEBUG
-	m_pHead = AddModel(L"\\Models\\face4\\untitled.obj",
-					   nullptr,
-					   point(0.0f, 0.0f - 0.35f, HEAD_POS),
-					   0.018f,
-					   vector(0.0f, (float)M_PI, 0.0f));
+	m_pHead = AddModel(L"\\Models\\face4\\untitled.obj");
+	m_pHead->SetPosition(point(0.0f, 0.0f - 0.35f, HEAD_POS));
+	m_pHead->SetScale(0.018f);
+	//m_pHead->SetEulerOrientation(vector(0.0f, (float)M_PI, 0.0f));
+
 #else
 	m_pHead = AddComposite();
 	m_pHead->AddVolume(0.2f);
