@@ -76,7 +76,7 @@ private:
 	// Models
 	RESULT InitializeRenderModels();								// This sets up the models
 	RESULT InitializeRenderModel(uint32_t deviceID);	// This sets up a given model
-	RESULT SetControllerModelTexture(model *pModel, texture *pTexture, vr::ETrackedControllerRole controllerRole);
+	RESULT SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr::ETrackedControllerRole controllerRole);
 
 	RESULT UpdateSenseController(vr::ETrackedControllerRole controllerRole, vr::VRControllerState_t state);
 
@@ -97,11 +97,11 @@ public:
 	// Device Render Models
 	vr::IVRRenderModels *m_pRenderModels;
 	
-	model *m_pControllerModelLeft;
-	texture *m_pControllerModelLeftTexture;
+	mesh *m_pControllerMeshLeft;
+	texture *m_pControllerMeshLeftTexture;
 	
-	model *m_pControllerModelRight;
-	texture *m_pControllerModelRightTexture;
+	mesh *m_pControllerMeshRight;
+	texture *m_pControllerMeshRightTexture;
 
 	uint32_t m_vrFrameCount;
 

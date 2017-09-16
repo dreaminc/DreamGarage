@@ -14,8 +14,8 @@ OpenVRDevice::OpenVRDevice(SandboxApp *pParentSandbox) :
 	HMD(pParentSandbox),
 	m_pIVRHMD(nullptr),
 	m_pRenderModels(nullptr),
-	m_pControllerModelLeft(nullptr),
-	m_pControllerModelRight(nullptr),
+	m_pControllerMeshLeft(nullptr),
+	m_pControllerMeshRight(nullptr),
 	m_pHMDModel(nullptr)
 {
 	// TODO
@@ -108,25 +108,25 @@ void IVRThreadSleep(unsigned long nMilliseconds) {
 }
 
 // TODO: Use a more generic interface for this
-RESULT OpenVRDevice::SetControllerModelTexture(model *pModel, texture *pTexture, vr::ETrackedControllerRole controllerRole) {
+RESULT OpenVRDevice::SetControllerMeshTexture(mesh *pMesh, texture *pTexture, vr::ETrackedControllerRole controllerRole) {
 	RESULT r = R_PASS;
 
 	if (controllerRole == vr::TrackedControllerRole_LeftHand) {
-		m_pControllerModelLeft = pModel;
-		m_pControllerModelLeftTexture = pTexture;
+		m_pControllerMeshLeft = pMesh;
+		m_pControllerMeshLeftTexture = pTexture;
 	}
 	else if (controllerRole == vr::TrackedControllerRole_RightHand) {
-		m_pControllerModelRight = pModel;
-		m_pControllerModelRightTexture = pTexture;
+		m_pControllerMeshRight = pMesh;
+		m_pControllerMeshRightTexture = pTexture;
 	}
 	else if (controllerRole == vr::TrackedControllerRole_Invalid) {
-		if (m_pControllerModelLeft == nullptr) {
-			m_pControllerModelLeft = pModel;
-			m_pControllerModelLeftTexture = pTexture;
+		if (m_pControllerMeshLeft == nullptr) {
+			m_pControllerMeshLeft = pMesh;
+			m_pControllerMeshLeftTexture = pTexture;
 		}
-		else if (m_pControllerModelRight == nullptr) {
-			m_pControllerModelRight = pModel;
-			m_pControllerModelRightTexture = pTexture;
+		else if (m_pControllerMeshRight == nullptr) {
+			m_pControllerMeshRight = pMesh;
+			m_pControllerMeshRightTexture = pTexture;
 		}
 		else {
 			CBM((0), "Invalid controller role and both controllers already set");
@@ -199,10 +199,10 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	CBM((verts.size() == pRenderModel->unVertexCount), "Vertex count mismatch");
 	CBM((indices.size() == (pRenderModel->unTriangleCount * 3)), "Index count mismatch");
 	
-	model *pModel = nullptr;
-	//model *pModel = m_pParentSandbox->AddModel(verts, indices);
+	//model *pModel = nullptr;
+	mesh *pControllerMesh = m_pParentSandbox->AddMesh(verts, indices);
 	//pModel->SetMaterialAmbient(1.0f);
-	CNM(pModel, "Open VR Controller Models failed to load");
+	CNM(pControllerMesh, "Open VR Controller Models failed to load");
 
 	/*
 	uint16_t unWidth, unHeight; // width and height of the texture map in pixels
@@ -215,10 +215,10 @@ RESULT OpenVRDevice::InitializeRenderModel(uint32_t deviceID) {
 	int pBuffer_n = sizeof(uint8_t) * width * height * channels;
 
 	texture *pTexture = m_pParentSandbox->MakeTexture(texture::TEXTURE_TYPE::TEXTURE_DIFFUSE, width, height, texture::PixelFormat::Unspecified, channels, pBuffer, pBuffer_n);
-	pModel->SetDiffuseTexture(pTexture);
+	pControllerMesh->SetDiffuseTexture(pTexture);
 
 	vr::ETrackedControllerRole controllerRole = m_pIVRHMD->GetControllerRoleForTrackedDeviceIndex(deviceID);
-	CR(SetControllerModelTexture(pModel, pTexture, controllerRole))
+	CR(SetControllerMeshTexture(pControllerMesh, pTexture, controllerRole))
 
 Error:
 	if(pRenderModel != nullptr) {
@@ -447,9 +447,9 @@ RESULT OpenVRDevice::UpdateHMD() {
 					qOrientation *= qRotation;
 					qOrientation.Reverse();
 
-					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerModelLeft != nullptr) {
-						m_pControllerModelLeft->SetPosition(ptControllerPosition);
-						m_pControllerModelLeft->SetOrientation(qOrientation);
+					if (controllerRole == vr::TrackedControllerRole_LeftHand && m_pControllerMeshLeft != nullptr) {
+						m_pControllerMeshLeft->SetPosition(ptControllerPosition);
+						m_pControllerMeshLeft->SetOrientation(qOrientation);
 
 						m_pLeftHand->SetPosition(ptControllerPosition);
 						m_pLeftHand->SetOrientation(qOrientation);
@@ -458,9 +458,9 @@ RESULT OpenVRDevice::UpdateHMD() {
 						fLeftHandTracked = true;
 						m_pLeftHand->SetTracked(true);
 					}
-					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerModelRight != nullptr) {
-						m_pControllerModelRight->SetPosition(ptControllerPosition);
-						m_pControllerModelRight->SetOrientation(qOrientation);
+					else if (controllerRole == vr::TrackedControllerRole_RightHand && m_pControllerMeshRight != nullptr) {
+						m_pControllerMeshRight->SetPosition(ptControllerPosition);
+						m_pControllerMeshRight->SetOrientation(qOrientation);
 
 						m_pRightHand->SetPosition(ptControllerPosition);
 						m_pRightHand->SetOrientation(qOrientation);

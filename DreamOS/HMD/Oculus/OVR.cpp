@@ -124,22 +124,15 @@ RESULT OVRHMD::InitializeHMD(HALImp *halimp, int wndWidth, int wndHeight) {
 	// Oculus controller dimensions: 4.1 x 4.5 x 3.8 in.
 	// model is off center, displacing by half height and half depth helps (engine is in meters)
 
-	m_pLeftControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj",
-		nullptr,
-		point(0.0f, 0.05715f, -0.04826f),
-		1.0f,
-		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
-	m_pLeftControllerModel->SetColorTexture(m_pParentSandbox->MakeTexture(L"external_controller_left_col.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
+	m_pLeftControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\LeftController\\oculus_cv1_controller_left.obj");
+	m_pLeftControllerModel->SetPosition(point(0.0f, 0.05715f, -0.04826f));
+	//m_pLeftControllerModel->SetEulerOrientation(vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
+	m_pLeftControllerModel->SetDiffuseTexture(m_pParentSandbox->MakeTexture(L"external_controller_left_col.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
-	m_pRightControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj",
-		nullptr,
-		point(0.0f, 0.05715f, -0.04826f),
-		1.0f,
-		vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
-
-	m_pRightControllerModel->SetColorTexture(m_pParentSandbox->MakeTexture(L"external_controller_right_col.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
-
-	
+	m_pRightControllerModel = m_pParentSandbox->AddModel(L"\\Models\\OculusTouch\\RightController\\oculus_cv1_controller_right.obj");
+	m_pRightControllerModel->SetPosition(point(0.0f, 0.05715f, -0.04826f));
+	//m_pRightControllerModel->SetEulerOrientation(vector((float)(M_PI / -4.0f), 0.0f, 0.0f));
+	m_pRightControllerModel->SetDiffuseTexture(m_pParentSandbox->MakeTexture(L"external_controller_right_col.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE));
 
 #endif
 

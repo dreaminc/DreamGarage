@@ -230,17 +230,17 @@ RESULT DreamGarage::LoadScene() {
 	AddLight(LIGHT_POINT, 5.0f, point(20.0f, 7.0f, -40.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.0f, 0.0f, 0.0f));
 
 #ifndef _DEBUG
-	model* pModel = AddModel(L"\\Models\\FloatingIsland\\env.obj");
+	model* pModel = AddModel(L"\\FloatingIsland\\env.obj");
 	pModel->SetPosition(ptSceneOffset);
 	pModel->SetScale(sceneScale);
 	//pModel->SetEulerOrientation(vSceneEulerOrientation);
 		
-	model* pRiver = AddModel(L"\\Models\\FloatingIsland\\river.obj");
+	model* pRiver = AddModel(L"\\FloatingIsland\\river.obj");
 	pRiver->SetPosition(ptSceneOffset);
 	pRiver->SetScale(sceneScale);
 	//pModel->SetEulerOrientation(vSceneEulerOrientation);
 
-	model* pClouds = AddModel(L"\\Models\\FloatingIsland\\clouds.obj");
+	model* pClouds = AddModel(L"\\FloatingIsland\\clouds.obj");
 	pClouds->SetPosition(ptSceneOffset);
 	pClouds->SetScale(sceneScale);
 	//pModel->SetEulerOrientation(vSceneEulerOrientation);

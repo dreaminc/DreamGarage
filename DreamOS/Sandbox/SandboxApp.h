@@ -318,8 +318,8 @@ public:
 	mesh *AddMesh(const std::vector<vertex>& vertices, const std::vector<dimindex>& indices);
 
 	//composite* AddModel(const std::wstring& wstrOBJFilename, texture* pTexture, point ptPosition, point_precision scale = 1.0, vector vEulerRotation = vector(0.0f, 0.0f, 0.0f));
-	model* MakeModel(const std::wstring& wstrModelFilename, texture* pTexture);
-	model* AddModel(const std::wstring& wstrModelFilename, texture* pTexture);
+	model* MakeModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
+	model* AddModel(const std::wstring& wstrModelFilename, texture* pTexture = nullptr);
 
 	composite* AddComposite();
 	composite* MakeComposite();

@@ -229,12 +229,12 @@ RESULT hand::Initialize() {
 	float scaleModel = 0.015f;
 
 #ifndef _DEBUG
-	m_pLeftModel = AddModel(L"\\Models\\face4\\LeftHand.obj");
+	m_pLeftModel = AddModel(L"\\face4\\LeftHand.obj");
 	m_pLeftModel->SetPosition(ptModel);
 	m_pLeftModel->SetScale(scaleModel);
 	//m_pLeftModel->SetEulerOrientation(vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
 						
-	m_pRightModel = AddModel(L"\\Models\\face4\\RightHand.obj");
+	m_pRightModel = AddModel(L"\\face4\\RightHand.obj");
 	m_pLeftModel->SetPosition(ptModel);
 	m_pLeftModel->SetScale(scaleModel);
 	//m_pLeftModel->SetEulerOrientation(vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
