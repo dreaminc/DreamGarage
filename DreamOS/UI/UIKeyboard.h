@@ -95,6 +95,8 @@ public:
 	RESULT SetAngle(float angle);
 	quaternion GetOrientation();
 	RESULT SetOrientation(quaternion orientation);
+	UIMallet* GetRightMallet();
+	UIMallet* GetLeftMallet();
 
 	RESULT SetKeyTypeThreshold(float threshold);
 	RESULT SetKeyReleaseThreshold(float threshold);

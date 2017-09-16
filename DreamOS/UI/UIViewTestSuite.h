@@ -73,6 +73,12 @@ private:
 	float m_lineHeight = TEXTBOX_LINE_HEIGHT;
 	float m_numLines = TEXTBOX_NUM_LINES;
 	float m_lineWidth = TEXTBOX_WIDTH;
+	float m_pDAngle = 180.0f;
+	UIMallet* m_pBLMallet;
+	UIMallet* m_pBRMallet;
+	UIMallet* m_pKLMallet;
+	UIMallet* m_pKRMallet;
+
 	std::shared_ptr<text> m_pTextBoxText;
 	std::shared_ptr<quad> m_pTextBoxBackground;
 	std::shared_ptr<composite> m_tComposite;

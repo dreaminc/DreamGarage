@@ -616,3 +616,11 @@ float DreamUIBar::GetMenuHeight() {
 	return m_menuHeight;
 }
 
+UIMallet* DreamUIBar::GetRightMallet() {
+	return m_pRightMallet;
+}
+
+UIMallet* DreamUIBar::GetLeftMallet() {
+	return m_pLeftMallet;
+}
+

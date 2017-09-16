@@ -803,6 +803,10 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			CR(m_pDreamOS->InitializeKeyboard());
 
 			//*
+			m_pBLMallet = pDreamUIBar->GetLeftMallet();
+			m_pBRMallet = pDreamUIBar->GetRightMallet();
+			m_pKLMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
+			m_pKRMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
 			auto m_MenuHeight = pDreamUIBar->GetMenuHeight();
 			auto m_MenuDepth = pDreamUIBar->GetMenuDepth();
 			composite *pComposite = m_pDreamOS->AddComposite();

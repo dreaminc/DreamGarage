@@ -571,6 +571,14 @@ Error:
 	return R_PASS;
 }
 
+UIMallet* UIKeyboard::GetRightMallet() {
+	return m_pRightMallet;
+}
+
+UIMallet* UIKeyboard::GetLeftMallet() {
+	return m_pLeftMallet;
+}
+
 RESULT UIKeyboard::UpdateTextBox(int chkey, std::string strEntered) {
 	RESULT r = R_PASS;
 
