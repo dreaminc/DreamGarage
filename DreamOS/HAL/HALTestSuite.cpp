@@ -24,17 +24,17 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestEnvironmentShader());
+
 	CR(AddTestModel());
 
 	CR(AddTestBlinnPhongShaderTexture());
 
-//	CR(AddTestSkybox());
+	CR(AddTestSkybox());
 
 	CR(TestNestedOBB());
 
 	CR(AddTestRenderToTextureQuad());
-
-	CR(AddTestEnvironmentShader());
 
 	CR(AddTestMouseDrag());
 
@@ -43,7 +43,6 @@ RESULT HALTestSuite::AddTests() {
 	CR(AddTestMinimalTextureShader());
 
 	CR(AddTestQuadObject());
-
 
 	CR(AddTestSenseHaptics());
 	
@@ -508,34 +507,34 @@ RESULT HALTestSuite::AddTestEnvironmentShader() {
 
 		volume *pVolume = nullptr;
 
-		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 5.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
 		texture *pColorTexture = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
-#ifndef _DEBUG
+//#ifndef _DEBUG
 		{
 			point ptSceneOffset = point(90, -5, -25);
 			float sceneScale = 0.1f;
 			vector vSceneEulerOrientation = vector(0.0f, 0.0f, 0.0f);
 
-			model* pModel = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\env.obj");
+			model* pModel = m_pDreamOS->AddModel(L"\\FloatingIsland\\env.obj");
 			pModel->SetPosition(ptSceneOffset);
 			pModel->SetScale(sceneScale);
 			//pModel->SetEulerOrientation(vSceneEulerOrientation);
 
-			model* pRiver = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\river.obj");
+			model* pRiver = m_pDreamOS->AddModel(L"\\FloatingIsland\\river.obj");
 			pRiver->SetPosition(ptSceneOffset);
 			pRiver->SetScale(sceneScale);
 			//pModel->SetEulerOrientation(vSceneEulerOrientation);
 
-			model* pClouds = m_pDreamOS->AddModel(L"\\Models\\FloatingIsland\\clouds.obj");
+			model* pClouds = m_pDreamOS->AddModel(L"\\FloatingIsland\\clouds.obj");
 			pClouds->SetPosition(ptSceneOffset);
 			pClouds->SetScale(sceneScale);
 			//pModel->SetEulerOrientation(vSceneEulerOrientation);
 
 			pClouds->SetMaterialAmbient(0.8f);
 		}
-#endif
+//#endif
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);
 		CN(pVolume);
@@ -794,9 +793,9 @@ RESULT HALTestSuite::AddTestModel() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");	
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");	
 		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_tex_bump");
+		//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_tex_bump");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -810,7 +809,7 @@ RESULT HALTestSuite::AddTestModel() {
 		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
 
 		// Skybox
-		/*
+		///*
 		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
 		CN(pSkyboxProgram);
 		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
@@ -832,8 +831,8 @@ RESULT HALTestSuite::AddTestModel() {
 		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
 		CN(pRenderScreenQuad);
 
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
 
 		// Connect Program to Display
 
