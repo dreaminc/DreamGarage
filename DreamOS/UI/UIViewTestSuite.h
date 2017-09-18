@@ -18,8 +18,9 @@ class DreamOS;
 class UIView;
 class UIButton;
 struct UIEvent;
+struct SenseControllerEvent;
 
-class UIViewTestSuite : public valid, public TestSuite, public Subscriber<UIEvent>
+class UIViewTestSuite : public valid, public TestSuite, public Subscriber<UIEvent>, public Subscriber<SenseControllerEvent>
 {
 public:
 	UIViewTestSuite(DreamOS *pDreamOS);
@@ -50,8 +51,10 @@ public:
 	RESULT DefaultCallback(void *pContext);
 	RESULT ResetTestCallback(void *pContext);
 	RESULT UpdateHandRay(void *pContext);
-	RESULT IncreaseAngle(void *pContext);
-	RESULT DecreaseAngle(void *pContext);
+	RESULT IncreaseAngleButton(void *pContext);
+	RESULT DecreaseAngleButton(void *pContext);
+	RESULT IncreaseAngleTrigger();
+	RESULT DecreaseAngleTrigger();
 
 // behaviors
 public:
@@ -66,6 +69,7 @@ public:
 
 public:
 	virtual RESULT Notify(UIEvent *pEvent) override;
+	virtual RESULT Notify(SenseControllerEvent *event) override;
 
 private:
 	DreamOS *m_pDreamOS;

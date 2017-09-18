@@ -365,12 +365,13 @@ RESULT UIKeyboard::Update(void *pContext) {
 
 	}
 
-	for (auto key : m_activeKeys) {	//runs once but fails on second time increment
+	for (auto key : m_activeKeys) {	
 		if (key->m_state == KeyState::KEY_NOT_INTERSECTED) {
 			ReleaseKey(key);
-			//RemoveActiveKey(key);
+			RemoveActiveKey(key);
 			key->m_state = KeyState::KEY_UP;
 		}
+		break;
 	}
 
 Error:

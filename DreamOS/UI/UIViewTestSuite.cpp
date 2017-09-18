@@ -21,6 +21,7 @@
 #include "Primitives/font.h"
 #include "Primitives/text.h"
 #include <string>
+#include "Sense/SenseController.h"
 
 UIViewTestSuite::UIViewTestSuite(DreamOS *pDreamOS) :
 	m_pDreamOS(pDreamOS)
@@ -852,9 +853,11 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			//interaction
 			pAngleIncrease->RegisterToInteractionEngine(m_pDreamOS);
 			pAngleDecrease->RegisterToInteractionEngine(m_pDreamOS);
-
-			CR(pAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, std::bind(&UIViewTestSuite::IncreaseAngle, this, std::placeholders::_1)));
-			CR(pAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, std::bind(&UIViewTestSuite::DecreaseAngle, this, std::placeholders::_1)));
+			
+			CR(m_pDreamOS->RegisterSubscriber(SenseControllerEventType::SENSE_CONTROLLER_TRIGGER_DOWN, this));
+			
+			CR(pAngleIncrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, std::bind(&UIViewTestSuite::IncreaseAngleButton, this, std::placeholders::_1)));
+			CR(pAngleDecrease->RegisterEvent(UIEventType::UI_SELECT_BEGIN, std::bind(&UIViewTestSuite::DecreaseAngleButton, this, std::placeholders::_1)));
 			//*/
 
 			float radius = 0.015f;
@@ -919,6 +922,24 @@ RESULT UIViewTestSuite::Notify(UIEvent *pEvent) {
 	}
 
 //Error:
+	return r;
+}
+
+RESULT UIViewTestSuite::Notify(SenseControllerEvent *event) {
+	RESULT r = R_PASS;
+	SENSE_CONTROLLER_EVENT_TYPE eventType = event->type;
+	
+	if (event->state.type == CONTROLLER_RIGHT) {
+		if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+			CR(IncreaseAngleTrigger());
+		}
+	}
+	else if (event->state.type == CONTROLLER_LEFT) {
+		if (eventType == SENSE_CONTROLLER_TRIGGER_DOWN) {
+			CR(DecreaseAngleTrigger());
+		}
+	}
+Error:
 	return r;
 }
 
