@@ -467,10 +467,11 @@ RESULT UIScrollView::Notify(SenseControllerEvent *pEvent) {
 	switch (pEvent->type) {
 	case SenseControllerEventType::SENSE_CONTROLLER_PAD_MOVE: {
 		m_velocity = pEvent->state.ptTouchpad.x() * PAD_MOVE_CONSTANT;
+
+		float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
 		if (m_velocity == 0.0f &&
 			!m_pDreamOS->GetInteractionEngineProxy()->IsAnimating(m_pMenuButtonsContainer.get())) {
 
-			float yRotationPerElement = (float)M_PI / (180.0f / m_itemAngleY);
 			float endYRotation = (float)(std::round(m_yRotation / yRotationPerElement)) * yRotationPerElement;
 			if (m_yRotation != endYRotation)
 				CR(Snap());
@@ -481,7 +482,9 @@ RESULT UIScrollView::Notify(SenseControllerEvent *pEvent) {
 			CR(m_pDreamOS->GetInteractionEngineProxy()->RemoveAnimationObject(m_pMenuButtonsContainer.get()));
 		}
 		if (m_velocity != 0.0f) {
-			m_pMenuButtonsContainer->SetVisible(true, true);
+			float maxRotation = (m_pMenuButtonsContainer->GetChildren().size() - m_maxElements) * yRotationPerElement;
+			if (m_yRotation > 0.0f && m_yRotation < maxRotation)
+				m_pMenuButtonsContainer->SetVisible(true, true);
 		}
 	} break;
 
