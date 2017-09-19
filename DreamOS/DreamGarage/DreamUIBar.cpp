@@ -168,6 +168,7 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 		m_pScrollView->GetTitleQuad()->SetDiffuseTexture(m_pShareIcon.get());
 		UpdateCompositeWithHands(m_menuHeight);
 		
+		CN(m_pUIStageProgram);
 		m_pUIStageProgram->SetClippingFrustrum(
 			m_projectionWidth,
 			m_projectionHeight,

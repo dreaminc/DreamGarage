@@ -31,7 +31,7 @@ public:
 private:
 	RESULT SetupPipeline();
 	RESULT SetupUINodePipeline();
-	RESULT SetupUIStagePipeline();
+	RESULT SetupUIStagePipeline(UIStageProgram* &pUIStageProgram);
 
 // Tests
 public:

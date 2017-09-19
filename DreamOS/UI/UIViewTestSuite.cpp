@@ -84,7 +84,7 @@ Error:
 	return r;
 }
 
-RESULT UIViewTestSuite::SetupUIStagePipeline() {
+RESULT UIViewTestSuite::SetupUIStagePipeline(UIStageProgram* &pUIStageProgram) {
 	RESULT r = R_PASS;
 
 	// Set up the pipeline
@@ -135,6 +135,7 @@ RESULT UIViewTestSuite::SetupUIStagePipeline() {
 	// Connect output as pass-thru to internal blend program
 	CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
 	//*/
+	pUIStageProgram = dynamic_cast<UIStageProgram*>(pUIProgramNode);
 
 	// Screen Quad Shader (opt - we could replace this if we need to)
 	ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
@@ -211,12 +212,12 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	//CR(AddTestDreamUIBar());
+	CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
-	CR(AddTestKeyboardAngle());
+	//CR(AddTestKeyboardAngle());
 
 Error:
 	return r;
@@ -647,67 +648,7 @@ RESULT UIViewTestSuite::AddTestDreamUIBar() {
 		
 		CN(m_pDreamOS);
 		UIStageProgram *pUIStageProgram = nullptr;
-		//CR(SetupUIStagePipeline());
-		// Set up the pipeline
-		HALImp *pHAL = m_pDreamOS->GetHALImp();
-		Pipeline* pRenderPipeline = pHAL->GetRenderPipelineHandle();
-
-		SinkNode* pDestSinkNode = pRenderPipeline->GetDestinationSinkNode();
-		CNM(pDestSinkNode, "Destination sink node isn't set");
-
-		//CR(pHAL->MakeCurrentContext());
-
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-		CN(pRenderProgramNode);
-		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Reference Geometry Shader Program
-		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
-		CN(pReferenceGeometryProgram);
-		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-		// Skybox
-		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
-		CN(pSkyboxProgram);
-		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
-		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
-		//CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
-
-	/*
-		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("minimal_texture");
-		CN(pUIProgramNode);
-		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		//*/
-
-	//*
-		ProgramNode* pUIProgramNode = pHAL->MakeProgramNode("uistage");
-		CN(pUIProgramNode);
-		CR(pUIProgramNode->ConnectToInput("clippingscenegraph", m_pDreamOS->GetUIClippingSceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetUISceneGraphNode()->Output("objectstore")));
-		CR(pUIProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
-
-		// Connect output as pass-thru to internal blend program
-		CR(pUIProgramNode->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		pUIStageProgram = dynamic_cast<UIStageProgram*>(pUIProgramNode);
-		//*/
-
-		// Screen Quad Shader (opt - we could replace this if we need to)
-		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
-		CN(pRenderScreenQuad);
-		
-		//CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
-		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pUIProgramNode->Output("output_framebuffer")));
-
-		// Connect Program to Display
-		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
-		//CR(SetupUINodePipeline());
+		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
@@ -781,8 +722,8 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		RESULT r = R_PASS;
 
 		CN(m_pDreamOS);
-
-		CR(SetupUINodePipeline());
+		UIStageProgram *pUIStageProgram = nullptr;
+		CR(SetupUIStagePipeline(pUIStageProgram));
 
 		{
 			auto pCloudController = m_pDreamOS->GetCloudController();
@@ -800,6 +741,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			auto pDreamUIBar = m_pDreamOS->LaunchDreamApp<DreamUIBar>(this, false);
 			CN(pDreamUIBar);
 			pDreamUIBar->SetFont(L"Basis_Grotesque_Pro.fnt");
+			pDreamUIBar->SetUIStageProgram(pUIStageProgram);
 
 			CR(m_pDreamOS->InitializeKeyboard());
 
