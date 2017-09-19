@@ -73,7 +73,7 @@ public:
 
 private:
 	DreamOS *m_pDreamOS;
-	float m_MalletAngle = 180.0f;
+	float m_malletAngle = 180.0f;
 };
 
 #define UI_VIEW_TEST_SUITE_H_

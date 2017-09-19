@@ -833,9 +833,7 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 		UIMallet *pBRightMallet = pTestContext->pDreamUIBar->GetRightMallet();
 		UIMallet *pKLeftMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
 		UIMallet *pKRightMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
-		point lcurrent = pKLeftMallet->GetHeadOffset();
-		point rcurrent = pKRightMallet->GetHeadOffset();
-		float rAngle = (m_MalletAngle * (float)(M_PI) / 180.0f);
+		float rAngle = (m_malletAngle * (float)(M_PI) / 180.0f);
 
 		pKLeftMallet->SetHeadOffset(point(0.0f, sin(rAngle) / 5, cos(rAngle) / 5));
 		pKRightMallet->SetHeadOffset(point(0.0f, sin(rAngle) / 5, cos(rAngle) / 5));
