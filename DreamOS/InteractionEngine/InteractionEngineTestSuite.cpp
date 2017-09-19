@@ -84,7 +84,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			
 			if (pDimObj != nullptr) {
 				//pDimObj->RotateYByDeg(15.0f);
-				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), 0.5f);
+				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.5f);
 			}
 
 		} break;
@@ -143,7 +143,7 @@ RESULT InteractionEngineTestSuite::Notify(InteractionObjectEvent *mEvent) {
 			if (pDimObj != nullptr) {
 				//pDimObj->RotateZByDeg(15.0f);
 				pDimObj->SetColor(COLOR_BLUE);
-				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), 0.1f);
+				m_pDreamOS->CaptureObject(mEvent->m_pObject, mEvent->m_pInteractionObject, mEvent->m_ptContact[0], vector(0.0f, 0.0f, -1.0f), vector(0.0f, 0.0f, -1.0f), 0.1f);
 			}
 
 		} break;

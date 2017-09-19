@@ -127,12 +127,14 @@ public:
 		plane m_planeContext;
 		point m_ptOffset;
 		point m_ptOrigin;
-		CapturedObj(VirtualObj *pObj, float threshold, plane planeContext, point ptOffset, point ptOrigin) :
+		vector m_vSurface;
+		CapturedObj(VirtualObj *pObj, float threshold, plane planeContext, point ptOffset, point ptOrigin, vector vSurface) :
 			m_pObj(pObj),
 			m_threshold(threshold),
 			m_planeContext(planeContext),
 			m_ptOffset(ptOffset),
-			m_ptOrigin(ptOrigin)
+			m_ptOrigin(ptOrigin),
+			m_vSurface(vSurface)
 		{};
 	};
 
@@ -148,7 +150,7 @@ public:
 	RESULT UpdateInteractionRay();
 	*/
 
-	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
+	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold);
 	RESULT ResetObjects(VirtualObj *pInteractionObject);
 	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
 	bool HasCapturedObjects(VirtualObj *pInteractionObject);

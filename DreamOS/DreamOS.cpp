@@ -528,8 +528,8 @@ RESULT DreamOS::AddInteractionObject(VirtualObj *pObject) {
 	return m_pSandbox->AddInteractionObject(pObject);
 }
 
-RESULT DreamOS::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
-	return m_pSandbox->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold);
+RESULT DreamOS::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) {
+	return m_pSandbox->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, vSurface, threshold);
 }
 
 RESULT DreamOS::ResetObjects(VirtualObj *pInteractionObject) {

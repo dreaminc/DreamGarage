@@ -323,7 +323,7 @@ Error:
 }
 */
 
-RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
+RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) {
 	RESULT r = R_PASS;
 
 	plane planeContext(pObject->GetPosition(true), vDirection);
@@ -333,7 +333,8 @@ RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pIntera
 		threshold,
 		planeContext,
 		point(pInteractionObject->GetPosition(true) - pObject->GetPosition(true)),
-		pObject->GetPosition());
+		pObject->GetPosition(), 
+		vSurface);
 
 	//if (m_capturedObjects.count(pInteractionObject) > 0) {
 //	if (IsObjectCaptured(pInteractionObject, cObj)) {
@@ -671,7 +672,8 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 						capturedObjectsToRemove.push_back(pInteractionObject);
 					}
 					else {
-						vector vProj = vDirection * (vDot);
+						vector vProj = pCaptureObj->m_vSurface * (vDot);
+						//vector vProj = vDirection * (vDot);
 
 						pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_pObj->GetPosition() + vProj);
 
@@ -680,7 +682,7 @@ RESULT InteractionEngine::UpdateObjectStore(ObjectStore *pObjectStore) {
 
 						if (vDistance.magnitude() > (pCaptureObj->m_threshold)) {
 							// clamp to maximum position
-							pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_ptOrigin + (vDirection * pCaptureObj->m_threshold));
+							pCaptureObj->m_pObj->SetPosition(pCaptureObj->m_ptOrigin + (pCaptureObj->m_vSurface * pCaptureObj->m_threshold));
 
 							InteractionObjectEvent interactionEvent(ELEMENT_COLLIDE_TRIGGER, pCaptureObj->m_pObj, pInteractionObject);
 							CR(NotifySubscribers(pCaptureObj->m_pObj, ELEMENT_COLLIDE_TRIGGER, &interactionEvent));

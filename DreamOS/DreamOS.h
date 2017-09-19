@@ -176,7 +176,7 @@ public:
 	RESULT AddAndRegisterInteractionObject(VirtualObj *pObject, InteractionEventType eventType, Subscriber<InteractionObjectEvent>* pInteractionSubscriber);
 	//RESULT UpdateInteractionPrimitive(const ray &rCast);
 
-	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold);
+	RESULT CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold);
 	RESULT ResetObjects(VirtualObj *pInteractionObject);
 	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
 	bool HasCapturedObjects(VirtualObj *pInteractionObject);

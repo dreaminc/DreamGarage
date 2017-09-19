@@ -823,10 +823,10 @@ Error:
 	return r;
 }
 
-RESULT SandboxApp::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, float threshold) {
+RESULT SandboxApp::CaptureObject(VirtualObj *pObject, VirtualObj *pInteractionObject, point ptContact, vector vDirection, vector vSurface, float threshold) {
 	RESULT r = R_PASS;
 
-	CR(m_pInteractionEngine->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, threshold));
+	CR(m_pInteractionEngine->CaptureObject(pObject, pInteractionObject, ptContact, vDirection, vSurface, threshold));
 
 Error:
 	return r;
