@@ -27,7 +27,8 @@
 #include <chrono>
 
 #include "Primitives/Multipublisher.h"
-#include "Primitives/plane.h"
+//#include "Primitives/plane.h"
+#include "Primitives/CapturedObj.h"
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f
 
@@ -121,22 +122,6 @@ private:
 	InteractionEventType UpdateActiveObject(ActiveObject::type activeObjectType, VirtualObj *pInteractionObject, CollisionManifold manifold, VirtualObj *pEventObject);
 
 public:
-	struct CapturedObj {
-		VirtualObj *m_pObj;
-		float m_threshold;
-		plane m_planeContext;
-		point m_ptOffset;
-		point m_ptOrigin;
-		vector m_vSurface;
-		CapturedObj(VirtualObj *pObj, float threshold, plane planeContext, point ptOffset, point ptOrigin, vector vSurface) :
-			m_pObj(pObj),
-			m_threshold(threshold),
-			m_planeContext(planeContext),
-			m_ptOffset(ptOffset),
-			m_ptOrigin(ptOrigin),
-			m_vSurface(vSurface)
-		{};
-	};
 
 	RESULT Update();
 	RESULT UpdateObjectStore(ObjectStore *pObjectStore);

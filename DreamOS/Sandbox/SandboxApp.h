@@ -178,7 +178,7 @@ public:
 	RESULT ReleaseObjects(VirtualObj *pInteractionObject);
 	bool HasCapturedObjects(VirtualObj *pInteractionObject);
 	bool IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapturedObj);
-	std::vector<InteractionEngine::CapturedObj*>GetCapturedObjects(VirtualObj *pInteractionObject);
+	std::vector<CapturedObj*> GetCapturedObjects(VirtualObj *pInteractionObject);
 
 	RESULT AddObjectToUIGraph(VirtualObj *pObject);
 	RESULT AddObjectToUIClippingGraph(VirtualObj *pObject);

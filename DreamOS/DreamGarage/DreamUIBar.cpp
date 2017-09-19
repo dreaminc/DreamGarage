@@ -111,28 +111,27 @@ RESULT DreamUIBar::HandleTouchStart(void* pContext) {
 
 	UIMenuItem* pSelected = reinterpret_cast<UIMenuItem*>(pContext);
 	auto pSurface = pSelected->GetSurface();
-	VirtualObj* pTest = reinterpret_cast<VirtualObj*>(pContext);
+
+	//vector for captured object movement
 	quaternion qSurface = pSelected->GetOrientation() * (pSurface->GetOrientation());
 	qSurface.Reverse();
 	vector vSurface = qSurface.RotateVector(pSurface->GetNormal() * -1.0f);
 
+	//vector for captured object collisions
 	quaternion qRotation = pSurface->GetOrientation(true);
 	qRotation.Reverse();
 	vector vRotation = qRotation.RotateVector(pSurface->GetNormal() * -1.0f);
 	
-	DreamOS *pDreamOS = GetDOS();
-
 	CBR(m_pScrollView->GetState() != ScrollState::SCROLLING, R_PASS);
 
+	DreamOS *pDreamOS = GetDOS();
 	pDreamOS->ResetObjects(pSelected->GetInteractionObject());
 	pDreamOS->ReleaseObjects(pSelected->GetInteractionObject());
 
 	pDreamOS->CaptureObject(
-	//	pSelected->GetSurface().get(), 
 		pSelected,
 		pSelected->GetInteractionObject(), 
 		pSelected->GetContactPoint(), 
-		//vector(0.0f, 0.0f, -1.0f), 
 		vRotation,
 		vSurface,
 		m_actuationDepth);

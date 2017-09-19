@@ -858,7 +858,7 @@ bool SandboxApp::IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pC
 	return m_pInteractionEngine->IsObjectCaptured(pInteractionObject, pCapturedObj);
 }
 
-std::vector<InteractionEngine::CapturedObj*> SandboxApp::GetCapturedObjects(VirtualObj *pInteractionObject) {
+std::vector<CapturedObj*> SandboxApp::GetCapturedObjects(VirtualObj *pInteractionObject) {
 	return m_pInteractionEngine->GetCapturedObjects(pInteractionObject);
 }
 

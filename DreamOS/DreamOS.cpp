@@ -548,7 +548,7 @@ bool DreamOS::IsObjectCaptured(VirtualObj *pInteractionObject, VirtualObj *pCapt
 	return m_pSandbox->IsObjectCaptured(pInteractionObject, pCapturedObject);
 }
 
-std::vector<InteractionEngine::CapturedObj*> DreamOS::GetCapturedObjects(VirtualObj *pInteractionObject) {
+std::vector<CapturedObj*> DreamOS::GetCapturedObjects(VirtualObj *pInteractionObject) {
 	return m_pSandbox->GetCapturedObjects(pInteractionObject);
 }
 
