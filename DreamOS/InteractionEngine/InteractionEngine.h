@@ -27,7 +27,6 @@
 #include <chrono>
 
 #include "Primitives/Multipublisher.h"
-//#include "Primitives/plane.h"
 #include "Primitives/CapturedObj.h"
 
 #define DEFAULT_INTERACTION_DIFF_THRESHOLD 0.025f

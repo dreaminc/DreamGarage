@@ -336,16 +336,6 @@ RESULT InteractionEngine::CaptureObject(VirtualObj *pObject, VirtualObj *pIntera
 		pObject->GetPosition(), 
 		vSurface);
 
-	//if (m_capturedObjects.count(pInteractionObject) > 0) {
-//	if (IsObjectCaptured(pInteractionObject, cObj)) {
-		// reset object
-//		auto& pOldCaptureObj = m_capturedObjects[pInteractionObject];
-//		pOldCaptureObj->m_pObj->SetPosition(pOldCaptureObj->m_ptOrigin);
-//	}
-//	ResetObjects(pInteractionObject);
-//	ReleaseObjects(pInteractionObject);
-
-//	m_capturedObjects[pInteractionObject] = cObj;
 	m_capturedObjects[pInteractionObject].emplace_back(cObj);
 
 //Error:
@@ -550,7 +540,6 @@ RESULT InteractionEngine::UpdateObjectStore(ActiveObject::type activeObjectType,
 		CollisionManifold manifold;
 		bool fIntersect = false;
 
-//		if ((m_capturedObjects.count(pInteractionObject) > 0) && pEventObject == m_capturedObjects[pInteractionObject]->m_pObj) {
 		if (IsObjectCaptured(pInteractionObject, pEventObject)) {
 			continue;
 		}
