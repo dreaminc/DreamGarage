@@ -212,12 +212,12 @@ Error:
 RESULT UIViewTestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
-	CR(AddTestDreamUIBar());
+	//CR(AddTestDreamUIBar());
 	//CR(AddTestUIScrollView());
 	//CR(AddTestUIButtons());
 	//CR(AddTestUIButton());
 	//CR(AddTestUIView());
-	//CR(AddTestKeyboardAngle());
+	CR(AddTestKeyboardAngle());
 
 Error:
 	return r;
@@ -715,12 +715,25 @@ Error:
 
 RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	RESULT r = R_PASS;
+	struct TestContext {
+		std::shared_ptr<text> pTextBoxText;
+		std::shared_ptr<composite> pChildComposite;
+		std::shared_ptr<font> pFont;
+		std::shared_ptr<texture> pTextBoxTexture;
+		std::shared_ptr<DreamUIBar> pDreamUIBar;
+	};
+	TestContext *pTestContext = new TestContext();
 
 	double sTestTime = 10000.0;
-
+	float m_lineHeight = TEXTBOX_LINE_HEIGHT;
+	float m_numLines = TEXTBOX_NUM_LINES;
+	float m_lineWidth = TEXTBOX_WIDTH;
 	auto fnInitialize = [&](void *pContext) {
 		RESULT r = R_PASS;
-
+		auto& pChildComposite = pTestContext->pChildComposite;
+		auto& pFont = pTestContext->pFont;
+		auto& pTextBoxText = pTestContext->pTextBoxText;
+		auto& pDreamUIBar = pTestContext->pDreamUIBar;
 		CN(m_pDreamOS);
 		UIStageProgram *pUIStageProgram = nullptr;
 		CR(SetupUIStagePipeline(pUIStageProgram));
@@ -746,18 +759,14 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			CR(m_pDreamOS->InitializeKeyboard());
 
 			//*
-			m_pBLMallet = pDreamUIBar->GetLeftMallet();
-			m_pBRMallet = pDreamUIBar->GetRightMallet();
-			m_pKLMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
-			m_pKRMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
-			auto m_MenuHeight = pDreamUIBar->GetMenuHeight();
-			auto m_MenuDepth = pDreamUIBar->GetMenuDepth();
+			float m_MenuHeight = pDreamUIBar->GetMenuHeight();
+			float m_MenuDepth = pDreamUIBar->GetMenuDepth();
 			composite *pComposite = m_pDreamOS->AddComposite();
-			m_tComposite = pComposite->AddComposite();
+			pChildComposite = pComposite->AddComposite();
 			//CR(pComposite->InitializeOBB());
 			//CR(tComposite->InitializeOBB());
 			pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, -1.5f, 0.6f));	//with hmd
-			m_tComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 5.1f));	//with hmd
+			pChildComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 5.1f));	//with hmd
 			//pComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 0.6f));
 			//tComposite->SetPosition(m_pDreamOS->GetCameraPosition() - point(0.0f, 0.0f, 4.6f));	
 			
@@ -768,28 +777,28 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 			pAngleDecrease->SetPosition(point(-0.5f, 0.0f, -0.1f));
 
 			//Setup textbox
-			m_pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
-			m_pFont->SetLineHeight(m_lineHeight);
-			//m_pTextBoxTexture = tComposite->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
-			//pAngleIncrease->GetSurface()->SetColorTexture(m_pTextBoxTexture.get());
+			pFont = m_pDreamOS->MakeFont(L"Basis_Grotesque_Pro.fnt", true);
+			pFont->SetLineHeight(m_lineHeight);
+			//pTextBoxTexture = tComposite->MakeTexture(L"text-input-background.png", texture::TEXTURE_TYPE::TEXTURE_COLOR);
+			//pAngleIncrease->GetSurface()->SetColorTexture(pTextBoxTexture.get());
 			pAngleDecrease->GetSurface()->SetColor(COLOR_BLUE);
 			{
 				float offset = 1.3f;
 				float angle = m_pDreamOS->GetKeyboard()->GetAngle() *(float)(M_PI) / 180.0f;;
-				m_tComposite->RotateXByDeg(90.0f);
+				pChildComposite->RotateXByDeg(90.0f);
 
 				//m_pTextBoxBackground = tComposite->AddQuad(m_lineWidth, m_lineHeight * m_numLines * 1.5f, point(0.0f, -0.01f, 0.0f));
-				//m_pTextBoxBackground->SetColorTexture(m_pTextBoxTexture.get());
-				//m_pTextBoxBackground->UpdateColorTexture(m_pTextBoxTexture.get());
+				//m_pTextBoxBackground->SetColorTexture(pTextBoxTexture.get());
+				//m_pTextBoxBackground->UpdateColorTexture(pTextBoxTexture.get());
 
-				m_pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
-					m_pFont,
+				pTextBoxText = std::shared_ptr<text>(m_pDreamOS->MakeText(
+					pFont,
 					"hi",
 					m_lineWidth - 0.02f,
 					m_lineHeight * m_numLines,
 					text::flags::TRAIL_ELLIPSIS | text::flags::WRAP | text::flags::RENDER_QUAD));
 
-				m_tComposite->AddObject(m_pTextBoxText);
+				pChildComposite->AddObject(pTextBoxText);
 			}
 
 			//interaction
@@ -818,6 +827,21 @@ RESULT UIViewTestSuite::AddTestKeyboardAngle() {
 	Error:
 		return r;
 	};
+
+	auto fnUpdate = [&](void *pContext) {
+		UIMallet *pBLeftMallet = pTestContext->pDreamUIBar->GetLeftMallet();
+		UIMallet *pBRightMallet = pTestContext->pDreamUIBar->GetRightMallet();
+		UIMallet *pKLeftMallet = m_pDreamOS->GetKeyboard()->GetLeftMallet();
+		UIMallet *pKRightMallet = m_pDreamOS->GetKeyboard()->GetRightMallet();
+		point lcurrent = pKLeftMallet->GetHeadOffset();
+		point rcurrent = pKRightMallet->GetHeadOffset();
+		float rAngle = (m_MalletAngle * (float)(M_PI) / 180.0f);
+
+		pKLeftMallet->SetHeadOffset(point(0.0f, sin(rAngle) / 5, cos(rAngle) / 5));
+		pKRightMallet->SetHeadOffset(point(0.0f, sin(rAngle) / 5, cos(rAngle) / 5));
+		pBLeftMallet->SetHeadOffset(point(0.0f, sin(rAngle) / 5, cos(rAngle) / 5));
+		pBRightMallet->SetHeadOffset(point(0.0f, sin(rAngle) / 5, cos(rAngle) / 5));
+	}
 
 	auto pUITest = AddTest(fnInitialize,
 		std::bind(&UIViewTestSuite::UpdateHandRay, this, std::placeholders::_1),
@@ -887,6 +911,6 @@ Error:
 
 RESULT UIViewTestSuite::UpdateTextBox(std::string entered) {
 	RESULT r = R_PASS;
-	m_pTextBoxText->SetText(entered);
+	pTextBoxText->SetText(entered);
 	return r;
 }//*/

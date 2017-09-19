@@ -401,7 +401,7 @@ RESULT OVRHMD::UpdateSenseController(ovrControllerType type, ovrInputState& inpu
 		} break;
 	}
 
-	cState.triggerRange = inputState.IndexTrigger[cState.type] > .8f;
+	cState.triggerRange = inputState.IndexTrigger[cState.type];
 
 	cState.fGrip = (inputState.HandTrigger[cState.type] > 0.9f);
 

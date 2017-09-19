@@ -762,13 +762,12 @@ Error:
 }
 
 quaternion UIKeyboard::GetOrientation() {
-	quaternion o = GetComposite()->GetOrientation();
-	return o;
+	return GetComposite()->GetOrientation();
 }
 
-RESULT UIKeyboard::SetOrientation(quaternion orientation) {
+RESULT UIKeyboard::SetOrientation(quaternion qOrientation) {
 	RESULT r = R_PASS;
-	m_qSurfaceOrientation = orientation;
+	m_qSurfaceOrientation = qOrientation;
 	return r;
 }
 
