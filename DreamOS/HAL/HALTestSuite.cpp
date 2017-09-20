@@ -24,11 +24,11 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestBlinnPhongShaderTexture());
+
 	CR(AddTestEnvironmentShader());
 
 	CR(AddTestModel());
-
-	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestSkybox());
 
@@ -1542,7 +1542,7 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 
 		CR(pHAL->MakeCurrentContext());
 
-		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
 		CN(pRenderProgramNode);
 		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
 		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
@@ -1561,7 +1561,10 @@ RESULT HALTestSuite::AddTestBlinnPhongShaderTexture() {
 
 		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
 
-		texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+		//texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"brickwall_color.jpg", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
+		texture *pColorTexture1 = m_pDreamOS->MakeTexture(L"google.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
+
 		texture *pColorTexture2 = m_pDreamOS->MakeTexture(L"crate_color.png", texture::TEXTURE_TYPE::TEXTURE_DIFFUSE);
 
 		pVolume = m_pDreamOS->AddVolume(width, height, length);

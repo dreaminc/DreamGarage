@@ -457,13 +457,12 @@ RESULT SandboxApp::RunAppLoop() {
 
 		//m_pOpenGLImp->RenderStereo(m_pSceneGraph);
 		//m_pOpenGLImp->Render(m_pSceneGraph);
-
 		m_pHALImp->Render();
 
 		// Swap buffers
 		SwapDisplayBuffers();
 
-		DreamConsole::GetConsole()->OnFrameRendered();
+		//DreamConsole::GetConsole()->OnFrameRendered();
 
 		if (GetAsyncKeyState(VK_ESCAPE) && !DreamConsole::GetConsole()->IsInForeground()) {
 			Shutdown();

@@ -264,7 +264,7 @@ Error:
 RESULT texture::CopyTextureImageBuffer(int width, int height, int channels, void *pBuffer, size_t pBuffer_n) {
 	RESULT r = R_PASS;
 
-	CN(m_pImage);
+	//CN(m_pImage);
 
 	CR(m_pImage->CopyBuffer(width, height, channels, pBuffer, pBuffer_n));
 
@@ -329,8 +329,15 @@ RESULT texture::LoadTextureFromFileBuffer(uint8_t *pBuffer, size_t pBuffer_n) {
 	m_pImage = ImageFactory::MakeImageFromMemory(IMAGE_FREEIMAGE, (unsigned char*)(pBuffer), pBuffer_n);
 	CN(m_pImage);
 
+	// Update sizing
+	m_width = m_pImage->GetWidth();
+	m_height = m_pImage->GetHeight();
+	m_channels = m_pImage->GetChannels();
+
+	m_format = PixelFormat::BGRA;	// TODO: move this into image
+
 	// Flip image
-	CR(m_pImage->FlipVertical());
+	//CR(m_pImage->FlipVertical());
 
 Error:
 	return r;

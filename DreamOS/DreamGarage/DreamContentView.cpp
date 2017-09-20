@@ -143,17 +143,17 @@ RESULT DreamContentView::SetScreenURI(const std::string &strURI) {
 	HTTPControllerProxy *pHTTPControllerProxy = (HTTPControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::HTTP);
 	CNM(pHTTPControllerProxy, "Failed to get http controller proxy");
 
-	UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
-	CNM(pUserControllerProxy, "Failed to get user controller proxy");
+	//UserControllerProxy *pUserControllerProxy = (UserControllerProxy*)GetDOS()->GetCloudControllerProxy(CLOUD_CONTROLLER_TYPE::USER);
+	//CNM(pUserControllerProxy, "Failed to get user controller proxy");
 
 	// Set up file request
 	DEBUG_LINEOUT("Requesting File %s", strURI.c_str());
 	{
-		std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
 		//auto strHeaders = HTTPController::ContentAcceptJson();
-
 		auto strHeaders = HTTPController::ContentHttp();
-		strHeaders.push_back(strAuthorizationToken);
+		
+		//std::string strAuthorizationToken = "Authorization: Token " + pUserControllerProxy->GetUserToken();
+		//strHeaders.push_back(strAuthorizationToken);
 
 		CR(pHTTPControllerProxy->RequestFile(strURI, strHeaders, "", std::bind(&DreamContentView::HandleOnFileResponse, this, std::placeholders::_1)));
 	}

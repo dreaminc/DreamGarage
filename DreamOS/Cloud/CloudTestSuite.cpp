@@ -24,11 +24,10 @@ RESULT CloudTestSuite::AddTests() {
 
 	// TODO: Closed box testing (multi user/environment instances or cloud controllers if need be)
 	//CR(AddTestMultiConnectTest());
+	CR(AddTestDownloadFile());	// requires logged in
 
 	CR(AddTestConnectLogin());
 	CR(AddTestMenuAPI());
-
-	CR(AddTestDownloadFile());	// requires logged in
 
 	// TODO: Add Websocket tests
 	// TODO: Add HTTP / CURL tests

@@ -419,8 +419,12 @@ OGLTexture* OGLTexture::MakeTextureFromBuffer(OpenGLImp *pParentImp, texture::TE
 	CR(pTexture->SetParams(width, height, channels));
 	CR(pTexture->SetFormat(format));
 
-	CR(pTexture->CopyTextureImageBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
-	CR(pTexture->AllocateGLTexture());
+	GLenum glFormat = pTexture->GetOGLPixelFormat();
+	GLint internalGLFormat = GetOGLPixelFormat(PixelFormat::Unspecified, channels);
+
+	//CR(pTexture->CopyTextureImageBuffer(width, height, channels, pBuffer, (int)(pBuffer_n)));
+	//CR(pTexture->AllocateGLTexture());
+	CR(pTexture->AllocateGLTexture((unsigned char*)(pBuffer), internalGLFormat, glFormat, GL_UNSIGNED_BYTE));
 
 	// TODO: Rename or remove this / specialize more
 	if (type == texture::TEXTURE_TYPE::TEXTURE_CUBE) {

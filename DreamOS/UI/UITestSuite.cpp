@@ -55,7 +55,10 @@ UITestSuite::~UITestSuite() {
 RESULT UITestSuite::AddTests() {
 	RESULT r = R_PASS;
 	
+	CR(AddTestSharedContentView());
+
 	//CR(AddTestBrowserRequest());
+	CR(AddTestBrowser());
 
 	CR(AddTestFont());
 
@@ -72,7 +75,6 @@ RESULT UITestSuite::AddTests() {
 	CR(AddTestBrowserRequestWithMenuAPI());
 
 
-	CR(AddTestBrowser());
 
 	//CR(AddTestBrowserRequestWithMenuAPI());
 	//CR(AddTestBrowserRequest());
@@ -81,7 +83,7 @@ RESULT UITestSuite::AddTests() {
 
 	//CR(AddTestBrowser());
 //	CR(AddTestInteractionFauxUI());
-//	CR(AddTestSharedContentView());
+
 
 Error:
 	return r;
@@ -837,8 +839,8 @@ RESULT UITestSuite::SetupPipeline() {
 
 	CR(pHAL->MakeCurrentContext());
 	
-	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
-	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
+	ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong_text");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal_texture");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("minimal");
 	//ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("blinnphong");
@@ -1112,7 +1114,7 @@ Error:
 RESULT UITestSuite::AddTestSharedContentView() {
 	RESULT r = R_PASS;
 
-	double sTestTime = 30.0f;
+	double sTestTime = 3000.0f;
 	int nRepeats = 1;
 
 	// Initialize Code
@@ -1122,6 +1124,10 @@ RESULT UITestSuite::AddTestSharedContentView() {
 
 		CN(m_pDreamOS);
 
+		CR(SetupPipeline());
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 10.0f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, 0.5f));
+
 		// Create the Shared View App
 		pDreamContentView = m_pDreamOS->LaunchDreamApp<DreamContentView>(this);
 		CNM(pDreamContentView, "Failed to create dream content view");
@@ -1130,8 +1136,8 @@ RESULT UITestSuite::AddTestSharedContentView() {
 		pDreamContentView->SetParams(point(0.0f), 5.0f, DreamContentView::AspectRatio::ASPECT_16_9, vector(0.0f, 0.0f, 1.0f));
 
 		//pDreamContentView->SetScreenTexture(L"crate_color.png");
-		//pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
-		pDreamContentView->SetScreenURI("https://static.dreamos.com/www/image/hero.387eddfc05dc.jpg");
+		pDreamContentView->SetScreenURI("https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png");
+		//pDreamContentView->SetScreenURI("https://static.dreamos.com/www/image/hero.387eddfc05dc.jpg");
 
 	Error:
 		return R_PASS;
