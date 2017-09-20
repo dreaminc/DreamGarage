@@ -22,8 +22,7 @@ class DreamControlView;
 
 class DreamGarage : public DreamOS, 
 				    public Subscriber<SenseKeyboardEvent>, 
-					public Subscriber<SenseTypingEvent>, 
-					public Subscriber<CmdPromptEvent>	// TODO: Remove this
+					public Subscriber<SenseTypingEvent>
 {
 public:
 
@@ -86,9 +85,6 @@ public:
 	// SenseKeyboardEventSubscriber
 	virtual RESULT Notify(SenseKeyboardEvent *kbEvent) override;
 	virtual RESULT Notify(SenseTypingEvent *kbEvent) override;
-
-	// CmdPromptEventSubscriber
-	virtual RESULT Notify(CmdPromptEvent *event) override;
 
 private:
 	//std::map<long, user*> m_peerUsers;

@@ -613,7 +613,9 @@ point DimObj::GetPosition(bool fAbsolute) {
 }
 
 quaternion DimObj::GetOrientation(bool fAbsolute) {
-	quaternion qOrientation = m_objectState.m_qRotation;
+	//quaternion qOrientation = m_objectState.m_qRotation;
+	//quaternion qOrientation = m_objectState.m_qOrientationOffset * m_objectState.m_qRotation;
+	quaternion qOrientation = VirtualObj::GetOrientation(fAbsolute);
 
 	if (fAbsolute && m_pParent != nullptr) {
 		//qOrientation *= m_pParent->GetOrientation(fAbsolute);

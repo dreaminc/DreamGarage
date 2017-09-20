@@ -232,12 +232,12 @@ RESULT hand::Initialize() {
 	m_pLeftModel = AddModel(L"\\face4\\LeftHand.obj");
 	m_pLeftModel->SetPosition(ptModel);
 	m_pLeftModel->SetScale(scaleModel);
-	//m_pLeftModel->SetEulerOrientation(vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+	m_pLeftModel->SetOrientationOffset((float)(M_PI_2), (float)(-M_PI_2), 0.0f);
 						
 	m_pRightModel = AddModel(L"\\face4\\RightHand.obj");
-	m_pLeftModel->SetPosition(ptModel);
-	m_pLeftModel->SetScale(scaleModel);
-	//m_pLeftModel->SetEulerOrientation(vector((float)(M_PI_2), (float)(-M_PI_2), 0.0f));
+	m_pRightModel->SetPosition(ptModel);
+	m_pRightModel->SetScale(scaleModel);
+	m_pRightModel->SetOrientationOffset((float)(M_PI_2), (float)(-M_PI_2), 0.0f);
 						
 #else
 	m_pLeftModel = AddComposite();
@@ -247,8 +247,8 @@ RESULT hand::Initialize() {
 	m_pRightModel->AddVolume(0.02f);
 #endif
 
-	m_qLeftModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI_2);
-	m_qRightModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI_2);
+	m_qLeftModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, -(float)M_PI);
+	m_qRightModel = quaternion::MakeQuaternionWithEuler(0.0f, 0.0f, (float)M_PI);
 	
 	m_fOriented = false;
 	m_fSkeleton = false;

@@ -18,7 +18,7 @@ RESULT user::Initialize() {
 	m_pHead = AddModel(L"\\face4\\untitled.obj");
 	m_pHead->SetPosition(point(0.0f, 0.0f - 0.35f, HEAD_POS));
 	m_pHead->SetScale(0.018f);
-	//m_pHead->SetEulerOrientation(vector(0.0f, (float)M_PI, 0.0f));
+	m_pHead->SetOrientationOffset(0.0f, (float)M_PI, 0.0f);
 
 #else
 	//m_pHead = AddComposite();
@@ -27,7 +27,7 @@ RESULT user::Initialize() {
 	m_pHead = AddModel(L"\\face4\\untitled.obj");
 	m_pHead->SetPosition(point(0.0f, 0.0f - 0.35f, HEAD_POS));
 	m_pHead->SetScale(0.018f);
-	//m_pHead->SetEulerOrientation(vector(0.0f, (float)M_PI, 0.0f));
+	m_pHead->SetOrientationOffset(vector(0.0f, (float)M_PI, 0.0f));
 #endif
 
 	m_pHeads.push_back(m_pHead);
@@ -64,7 +64,7 @@ RESULT user::Initialize() {
 	// Hands
 	m_pLeapLeftHand = AddHand();
 	m_pLeapLeftHand->OnLostTrack();
-
+	
 	m_pLeapRightHand = AddHand();
 	m_pLeapRightHand->OnLostTrack();
 
