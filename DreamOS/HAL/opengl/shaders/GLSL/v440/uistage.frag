@@ -9,13 +9,14 @@
 in Data {
 	vec4 color;
 	vec2 uvCoord;
-	vec4 vertClipSpace;
+	//vec4 vertClipSpace;
+	float angle;
 } DataIn;
 
 uniform bool u_hasTextureColor;
 uniform sampler2D u_textureColor;
 
-uniform mat4 u_mat4ClippingProjection;
+//uniform mat4 u_mat4ClippingProjection;
 uniform bool u_clippingEnabled;
 
 struct Material {
@@ -48,21 +49,15 @@ void main(void) {
 	}
 
 	if(u_clippingEnabled == true) {
-		float xDiff = 1.0f - abs(DataIn.vertClipSpace.x);
-		float yDiff = 1.0f - abs(DataIn.vertClipSpace.y);
-		float zDiff = 1.0f - abs(DataIn.vertClipSpace.z);
-
-		if(xDiff < 0.0f || yDiff < 0.0f || zDiff < 0.0f) {
+		float knee = 0.05f;
+		float minDistance = DataIn.angle - 0.3f;
+		if (minDistance < 0.0f) {
 			discard;
 		}
-		else {
-			float knee = 0.01f;
-			float minDistance = min(min(xDiff, yDiff), zDiff);
-			float ratio = (knee - minDistance) / knee;
 
-			if(ratio > 0.0f) {
-				color.a = color.a * (1.0f - ratio);
-			}
+		float ratio = (knee - minDistance) / knee;
+		if (ratio > 0.0f) {
+			color.a = color.a * (1.0f - ratio);
 		}
 	}
 

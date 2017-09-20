@@ -30,10 +30,14 @@ public:
 	virtual RESULT SetClippingFrustrum(float left, float right, float top, float bottom, float nearPlane, float farPlane) override;
 	virtual RESULT SetClippingFrustrum(float width, float height, float nearPlane, float farPlane, float angle) override;
 
+	virtual RESULT SetOriginPoint(point ptOrigin) override;
+	virtual RESULT SetOriginDirection(vector vOrigin) override;
+
 protected:
 	stereocamera *m_pCamera = nullptr;
 	ObjectStore *m_pSceneGraph = nullptr;
 	ObjectStore *m_pClippingSceneGraph = nullptr;
+	bool m_fClippingEnabled = true;
 
 private:
 	OGLVertexAttributePoint *m_pVertexAttributePosition;
@@ -48,6 +52,15 @@ private:
 
 	OGLUniformBool *m_pUniformClippingEnabled;
 	OGLUniformMatrix4 *m_pUniformClippingProjection;
+
+	// quad uniforms for clip
+	OGLUniformPoint *m_pUniformQuadCenter;
+	OGLUniformVector *m_pUniformQuadNormal;
+	OGLUniformFloat *m_pUniformQuadWidth;
+
+	OGLUniformPoint *m_pUniformptOrigin;
+	OGLUniformVector *m_pUniformvOrigin;
+	OGLUniformFloat *m_pUniformDot;
 
 	OGLMaterialBlock *m_pMaterialsBlock;
 };

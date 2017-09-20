@@ -14,14 +14,23 @@ layout (location = 3) in vec2 inV_vec2UVCoord;
 out Data {
 	vec4 color;
 	vec2 uvCoord;
-	vec4 vertClipSpace;
+	//vec4 vertClipSpace;
+	float angle;
 } DataOut;
 
 uniform mat4 u_mat4Model;
 uniform mat4 u_mat4ViewProjection;
 
-uniform mat4 u_mat4ClippingProjection;
+//uniform mat4 u_mat4ClippingProjection;
 uniform bool u_clippingEnabled;
+
+uniform vec4 u_ptQuadCenter;
+//uniform vec4 u_vQuadNormal;
+//uniform float u_quadWidth;
+
+uniform vec4 u_ptOrigin;
+uniform vec4 u_vOrigin;
+uniform float u_dot;
 
 void main(void) {	
 	// UV Coordinate
@@ -31,10 +40,12 @@ void main(void) {
 	DataOut.color = inV_vec4Color;
 
 	if(u_clippingEnabled == true) {
-		DataOut.vertClipSpace = u_mat4ClippingProjection * (u_mat4Model * vec4(inV_vec4Position.xyz, 1.0f));
+		vec3 dotOrigin = normalize(vec3(u_vOrigin.x, 0.0f, u_vOrigin.z));
+		vec3 dotDir = normalize(vec3(u_ptQuadCenter.x - u_ptOrigin.x, 0.0f, u_ptQuadCenter.z - u_ptOrigin.z));
+		DataOut.angle = dot(dotOrigin, dotDir);
 	}
 	else {
-		DataOut.vertClipSpace = vec4(0.0f);
+		DataOut.angle = 0.0f;
 	}
 
 	// Projected Vert Position

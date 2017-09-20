@@ -69,7 +69,7 @@ RESULT UIScrollView::Initialize() {
 
 	m_pMenuButtonsContainer = AddUIView();
 	m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, -m_menuCenterOffset);
-	m_pDreamOS->AddObjectToUIClippingGraph(m_pMenuButtonsContainer.get());
+	//m_pDreamOS->AddObjectToUIClippingGraph(m_pMenuButtonsContainer.get());
 	//m_pMenuButtonsContainer->SetPosition(0.0f, 0.0f, 0.3f);
 
 	m_pLeftScrollButton = AddUIButton();
@@ -125,6 +125,7 @@ RESULT UIScrollView::Update() {
 
 	double tDiff = (msNow - m_frameMs) * (90.0);
 
+	//m_yRotation = m_yRotation + (m_velocity*(float)(tDiff));
 	pChildren = m_pMenuButtonsContainer->GetChildren();
 	if (pChildren.size() > m_maxElements && m_fScrollButtonVisible) {
 		float maxRotation = (pChildren.size() - m_maxElements) * yRotationPerElement;

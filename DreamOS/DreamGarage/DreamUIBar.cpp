@@ -177,9 +177,18 @@ RESULT DreamUIBar::HandleMenuUp(void* pContext) {
 			m_projectionAngle);
 
 		//Probably need new view matrix with camera view matrix, but DreamUIBar orientation
-		point ptOrigin = GetComposite()->GetPosition(true);
+		point ptOrigin = GetComposite()->GetPosition();
+		//point ptOrigin = m_pView->GetPosition(true);
+		//point ptOrigin = m_pScrollView->GetPosition(true);
+		m_pUIStageProgram->SetOriginPoint(ptOrigin);
 		ptOrigin.Reverse();
-		quaternion qRotation = GetComposite()->GetOrientation(true);
+
+		quaternion qRotation = GetComposite()->GetOrientation(true);// *quaternion::MakeQuaternionWithEuler(-(float)(M_PI) / 2.0f, 0.0f, 0.0f);
+		//quaternion qRotation = m_pScrollView->GetOrientation(true);
+		vector vLook = GetDOS()->GetCamera()->GetLookVector();
+		vector vLookXZ = vector(vLook.x(), 0.0f, vLook.z()).Normal();
+		m_pUIStageProgram->SetOriginDirection(vLookXZ);
+		//m_pUIStageProgram->SetOriginDirection(qRotation.RotateVector(vector(0.0f, 0.0f, -1.0f)));
 		qRotation.Reverse();
 
 		ViewMatrix matView = ViewMatrix(ptOrigin, qRotation);
@@ -440,6 +449,7 @@ RESULT DreamUIBar::Update(void *pContext) {
 			//CR(pButton->RegisterEvent(UIEventType::UI_SELECT_ENDED,
 			//	std::bind(&DreamUIBar::HandleSelect, this, std::placeholders::_1)));
 
+			GetDOS()->AddObjectToUIClippingGraph(pButton->GetSurface().get());
 			pButtons.emplace_back(pButton);
 		}
 

@@ -68,6 +68,7 @@ RESULT UIMenuItem::Update(IconFormat& iconFormat, LabelFormat& labelFormat) {
 	m_pLabel->SetPosition(labelFormat.ptPosition);
 
 	auto pBgQuad = m_pSurfaceComposite->AddQuad(GetSurface()->GetWidth(), GetSurface()->GetHeight() / 2.0f);
+	m_pDreamOS->AddObjectToUIClippingGraph(pBgQuad.get());
 
 	point ptDiff = point(0.0f, (GetSurface()->GetHeight() + pBgQuad->GetHeight()) / 2.0f, 0.0001f);
 	pBgQuad->SetPosition(GetSurface()->GetPosition() - ptDiff);
