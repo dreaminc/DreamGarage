@@ -42,8 +42,6 @@ public:
 	RESULT AddTestDreamUIBar();
 	RESULT AddTestKeyboardAngle();
 
-	RESULT UpdateTextBox(std::string strEntered);
-
 	virtual RESULT AddTests() override;
 
 // Shared functions
@@ -51,8 +49,6 @@ public:
 	RESULT DefaultCallback(void *pContext);
 	RESULT ResetTestCallback(void *pContext);
 	RESULT UpdateHandRay(void *pContext);
-	RESULT IncreaseAngleButton(void *pContext);
-	RESULT DecreaseAngleButton(void *pContext);
 	RESULT IncreaseAngleTrigger();
 	RESULT DecreaseAngleTrigger();
 
