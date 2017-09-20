@@ -43,11 +43,11 @@ class UIStageProgram;
 //Projection clipping values
 //TODO: optimize these values to reduce error,
 // once scrolling snap animation is determined
-#define PROJECTION_WIDTH 1.2f
+#define PROJECTION_WIDTH 0.575f
 #define PROJECTION_HEIGHT 0.25f
 #define PROJECTION_NEAR 0.0f
 #define PROJECTION_FAR 5.0f
-#define PROJECTION_ANGLE 15.0f
+#define PROJECTION_ANGLE 30.0f
 
 enum class MenuState {
 	NONE,

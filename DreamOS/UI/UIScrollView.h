@@ -56,6 +56,7 @@ public:
 	// pass optional pushButton to have an additional moving back animation
 	RESULT HideAllButtons(UIButton* pPushButton = nullptr);
 	RESULT ShowTitle();
+	RESULT Snap();
 	RESULT Show();
 	RESULT Hide();
 
@@ -107,7 +108,7 @@ private:
 	ScrollState m_menuState;
 
 	std::shared_ptr<UIView> m_pMenuButtonsContainer = nullptr; // used to clear for now
-	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
+//	std::vector<std::shared_ptr<UIButton>> m_pMenuButtons;
 
 	bool m_fScrollButtonVisible = false;
 };
