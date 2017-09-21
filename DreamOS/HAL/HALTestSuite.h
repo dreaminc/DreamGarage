@@ -35,12 +35,14 @@ public:
 
 	RESULT AddTestText();
 	RESULT AddTestModel();
+	RESULT AddTestModelOrientation();
 	RESULT AddTestQuadObject();
 	RESULT AddTestUIShaderStage();
 
 	RESULT TestNestedOBB();
 
 	// TODO: Consolidate the HMD tests 
+	// TODO: This should be easy as this is now supported by pipeline
 	RESULT AddTestMinimalShaderHMD();
 	RESULT AddTestBlinnPhongShader();
 	RESULT AddTestBlinnPhongShaderBlurHMD();

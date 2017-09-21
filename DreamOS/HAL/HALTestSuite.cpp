@@ -24,6 +24,8 @@ HALTestSuite::~HALTestSuite() {
 RESULT HALTestSuite::AddTests() {
 	RESULT r = R_PASS;
 
+	CR(AddTestModelOrientation());
+
 	CR(AddTestBlinnPhongShaderTexture());
 
 	CR(AddTestUIShaderStage());
@@ -912,6 +914,154 @@ RESULT HALTestSuite::AddTestModel() {
 		m_pDreamOS->GetUISceneGraphNode()->Reset();
 		while ((pVirtualObj = pObjectStoreImp->GetNextObject()) != nullptr) {
 			pVirtualObj->translateX(0.001f);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Update Code 
+	auto fnReset = [&](void *pContext) {
+		return ResetTest(pContext);
+	};
+
+	// Add the test
+	auto pNewTest = AddTest(fnInitialize, fnUpdate, fnTest, fnReset, pTestContext);
+	CN(pNewTest);
+
+	pNewTest->SetTestName("HAL Model Test");
+	pNewTest->SetTestDescription("HAL Model test");
+	pNewTest->SetTestDuration(sTestTime);
+	pNewTest->SetTestRepeats(nRepeats);
+
+Error:
+	return r;
+}
+
+RESULT HALTestSuite::AddTestModelOrientation() {
+	RESULT r = R_PASS;
+
+	double sTestTime = 70.0f;
+	int nRepeats = 1;
+
+	struct TestContext {
+		model *pModelRight = nullptr;
+		model *pModelLeft = nullptr;
+	} *pTestContext = new TestContext();
+
+	// Initialize Code 
+	auto fnInitialize = [=](void *pContext) {
+		RESULT r = R_PASS;
+		m_pDreamOS->SetGravityState(false);
+
+		// Set up the pipeline
+		HALImp *pHAL = m_pDreamOS->GetHALImp();
+		Pipeline* pPipeline = pHAL->GetRenderPipelineHandle();
+
+		SinkNode* pDestSinkNode = pPipeline->GetDestinationSinkNode();
+		CNM(pDestSinkNode, "Destination sink node isn't set");
+
+		CR(pHAL->MakeCurrentContext());
+
+		ProgramNode* pRenderProgramNode = pHAL->MakeProgramNode("environment");
+		CN(pRenderProgramNode);
+		CR(pRenderProgramNode->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pRenderProgramNode->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Reference Geometry Shader Program
+		ProgramNode* pReferenceGeometryProgram = pHAL->MakeProgramNode("reference");
+		CN(pReferenceGeometryProgram);
+		CR(pReferenceGeometryProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pReferenceGeometryProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		CR(pReferenceGeometryProgram->ConnectToInput("input_framebuffer", pRenderProgramNode->Output("output_framebuffer")));
+
+		// Skybox
+		///*
+		ProgramNode* pSkyboxProgram = pHAL->MakeProgramNode("skybox_scatter");
+		CN(pSkyboxProgram);
+		CR(pSkyboxProgram->ConnectToInput("scenegraph", m_pDreamOS->GetSceneGraphNode()->Output("objectstore")));
+		CR(pSkyboxProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pSkyboxProgram->ConnectToInput("input_framebuffer", pReferenceGeometryProgram->Output("output_framebuffer")));
+
+		// Debug Console
+		ProgramNode* pDreamConsoleProgram = pHAL->MakeProgramNode("debugconsole");
+		CN(pDreamConsoleProgram);
+		CR(pDreamConsoleProgram->ConnectToInput("camera", m_pDreamOS->GetCameraNode()->Output("stereocamera")));
+
+		// Connect output as pass-thru to internal blend program
+		CR(pDreamConsoleProgram->ConnectToInput("input_framebuffer", pSkyboxProgram->Output("output_framebuffer")));
+		//*/
+
+		// Screen Quad Shader (opt - we could replace this if we need to)
+		ProgramNode *pRenderScreenQuad = pHAL->MakeProgramNode("screenquad");
+		CN(pRenderScreenQuad);
+
+		CR(pRenderScreenQuad->ConnectToInput("input_framebuffer", pDreamConsoleProgram->Output("output_framebuffer")));
+
+		// Connect Program to Display
+
+		// Connected in parallel (order matters)
+		// NOTE: Right now this won't work with mixing for example
+		CR(pDestSinkNode->ConnectToAllInputs(pRenderScreenQuad->Output("output_framebuffer")));
+
+		CR(pHAL->ReleaseCurrentContext());
+
+		// Objects 
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		light *pLight = m_pDreamOS->AddLight(LIGHT_DIRECITONAL, 2.5f, point(0.0f, 5.0f, 3.0f), color(COLOR_WHITE), color(COLOR_WHITE), vector(0.2f, -1.0f, -0.5f));
+
+		{
+			pTestContext->pModelLeft = m_pDreamOS->AddModel(L"\\face4\\LeftHand.obj");
+			pTestContext->pModelLeft->SetPosition(point(0.0f, -5.0f, -8.0f));
+			pTestContext->pModelLeft->SetScale(0.25f);
+			pTestContext->pModelLeft->SetOrientationOffset((float)(-M_PI_2), (float)(M_PI_2), 0.0f);
+
+			pTestContext->pModelRight = m_pDreamOS->AddModel(L"\\face4\\RightHand.obj");
+			pTestContext->pModelRight->SetPosition(point(0.0f, -5.0f, -8.0f));
+			pTestContext->pModelRight->SetScale(0.25f);
+			pTestContext->pModelRight->SetOrientationOffset((float)(-M_PI_2), (float)(-M_PI_2), 0.0f);
+		}
+
+	Error:
+		return r;
+	};
+
+	// Test Code (this evaluates the test upon completion)
+	auto fnTest = [&](void *pContext) {
+		return R_PASS;
+	};
+
+	// Update Code 
+	auto fnUpdate = [&](void *pContext) {
+		RESULT r = R_PASS;
+
+		TestContext *pTestContext = reinterpret_cast<TestContext*>(pContext);
+		CN(pTestContext);
+
+		CN(m_pDreamOS);
+
+		hand *pLeftHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_LEFT);
+		hand *pRightHand = m_pDreamOS->GetHand(hand::HAND_TYPE::HAND_RIGHT);
+
+		if (pLeftHand != nullptr) {
+			point ptHand = pLeftHand->GetPosition();
+			quaternion qHand = pLeftHand->GetHandState().qOrientation;
+			qHand.Normalize();
+
+			pTestContext->pModelLeft->SetOrientation(qHand);
+		}
+
+		if (pRightHand != nullptr) {
+			point ptHand = pRightHand->GetPosition();
+			quaternion qHand = pRightHand->GetHandState().qOrientation;
+			qHand.Normalize();
+
+			pTestContext->pModelRight->SetOrientation(qHand);
 		}
 
 	Error:

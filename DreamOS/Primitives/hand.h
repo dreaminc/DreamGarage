@@ -149,7 +149,7 @@ public:
 	RESULT ToggleRenderType();
 	RESULT SetFrameOfReferenceObject(std::shared_ptr<DimObj> pParent, const hand::HandState& pHandState);
 	RESULT SetHandModel(hand::HAND_TYPE type);
-	RESULT SetHandModelOrientation(quaternion q);
+	RESULT SetHandModelOrientation(quaternion qOrientation);
 
 	std::shared_ptr<composite> GetModel(hand::HAND_TYPE handType);
 
@@ -159,9 +159,6 @@ private:
 
 	std::shared_ptr<composite> m_pLeftModel;
 	std::shared_ptr<composite> m_pRightModel;
-
-	quaternion m_qLeftModel;
-	quaternion m_qRightModel;
 
 	std::shared_ptr<sphere> m_pPalm;
 
