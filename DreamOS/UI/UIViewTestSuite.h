@@ -7,8 +7,8 @@
 #include "Primitives/valid.h"
 #include "Primitives/TextEntryString.h"
 #include "Primitives/Subscriber.h"
+#include "Primitives/dirty.h"
 #include "Test/TestSuite.h"
-
 
 #define TEXTBOX_LINE_HEIGHT 0.027f // text box records what has been typed
 #define TEXTBOX_NUM_LINES 1.0f
@@ -49,8 +49,6 @@ public:
 	RESULT DefaultCallback(void *pContext);
 	RESULT ResetTestCallback(void *pContext);
 	RESULT UpdateHandRay(void *pContext);
-	RESULT IncreaseAngleTrigger();
-	RESULT DecreaseAngleTrigger();
 
 // behaviors
 public:
@@ -69,7 +67,6 @@ public:
 
 private:
 	DreamOS *m_pDreamOS;
-	float m_malletAngle = 180.0f;
 };
 
 #define UI_VIEW_TEST_SUITE_H_
